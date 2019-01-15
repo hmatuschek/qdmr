@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="download.png">data-transfer-download-4x.png</file>
+        <file alias="upload.png">data-transfer-upload-4x.png</file>
+        <file alias="new.png">document-4x.png</file>
+        <file alias="open.png">folder-4x.png</file>
+        <file alias="save.png">pencil-4x.png</file>
+        <file alias="search.png">magnifying-glass-4x.png</file>
+        <file alias="check.png">circle-check-4x.png</file>
+        <file alias="about.png">info-4x.png</file>
+        <file alias="help.png">book-4x.png</file>
+        <file alias="down.png">arrow-thick-bottom-4x.png</file>
+        <file alias="up.png">arrow-thick-top-4x.png</file>
+        <file alias="dialog.png">chat-4x.png</file>
+    </qresource>
+    <qresource prefix="/ui">
+        <file>mainwindow.ui</file>
+    </qresource>
+</RCC>
