@@ -67,25 +67,35 @@
           <item row="0" column="1">
            <widget class="QLineEdit" name="dmrID"/>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="introLine1Label">
             <property name="text">
              <string>Intro Line 1</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="2" column="1">
            <widget class="QLineEdit" name="introLine1"/>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="introLine2Label">
             <property name="text">
              <string>Intro Line 2</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QLineEdit" name="introLine2"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="nameLabel">
+            <property name="text">
+             <string>Name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="radioName"/>
           </item>
          </layout>
         </item>
@@ -107,6 +117,12 @@
               </property>
               <property name="accessibleDescription">
                <string>Lists all contacts.</string>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::SingleSelection</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
               </property>
              </widget>
             </item>
@@ -170,7 +186,11 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
             <item>
-             <widget class="QListView" name="groupListView"/>
+             <widget class="QListView" name="groupListView">
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+             </widget>
             </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -232,7 +252,14 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,0">
             <item>
-             <widget class="QTableView" name="channelView"/>
+             <widget class="QTableView" name="channelView">
+              <property name="selectionMode">
+               <enum>QAbstractItemView::SingleSelection</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+             </widget>
             </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -301,7 +328,11 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
-             <widget class="QListView" name="zoneView"/>
+             <widget class="QListView" name="zoneView">
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+             </widget>
             </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -363,7 +394,11 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,0">
             <item>
-             <widget class="QListView" name="scanListView"/>
+             <widget class="QListView" name="scanListView">
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+             </widget>
             </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -433,7 +468,7 @@
      <string>File</string>
     </property>
     <addaction name="actionNewCodeplug"/>
-    <addaction name="actionCodeplugWizzard"/>
+    <addaction name="actionCodeplugWizard"/>
     <addaction name="actionOpenCodeplug"/>
     <addaction name="actionSaveCodeplug"/>
     <addaction name="separator"/>
@@ -479,7 +514,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionNewCodeplug"/>
-   <addaction name="actionCodeplugWizzard"/>
+   <addaction name="actionCodeplugWizard"/>
    <addaction name="actionOpenCodeplug"/>
    <addaction name="actionSaveCodeplug"/>
    <addaction name="separator"/>
@@ -506,16 +541,16 @@
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionCodeplugWizzard">
+  <action name="actionCodeplugWizard">
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/icons/dialog.png</normaloff>:/icons/dialog.png</iconset>
    </property>
    <property name="text">
-    <string>New with wizzard ...</string>
+    <string>New with wizard ...</string>
    </property>
    <property name="toolTip">
-    <string>Creates a new codeplug with a wizzard.</string>
+    <string>Creates a new codeplug with a wizard.</string>
    </property>
   </action>
   <action name="actionOpenCodeplug">
@@ -626,9 +661,6 @@
    </property>
    <property name="text">
     <string>About qdrm</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+I</string>
    </property>
   </action>
   <action name="actionHelp">

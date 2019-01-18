@@ -5,8 +5,13 @@
 
 
 Application::Application(int &argc, char *argv[])
-  : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr)
+  : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _repeater(nullptr)
 {
+  setApplicationName("qdrm");
+  setOrganizationName("DM3MAT");
+  setOrganizationDomain("hmatuschek.github.io");
+
+  _repeater = new RepeaterDatabase(this);
   _config = new Config(this);
 
   if (argc>1) {
@@ -35,6 +40,10 @@ Application::mainWindow() {
   return _mainWindow;
 }
 
+const RepeaterDatabase &
+Application::repeater() const{
+  return *_repeater;
+}
 
 QMainWindow *
 Application::createMainWindow() {
@@ -42,19 +51,18 @@ Application::createMainWindow() {
     return _mainWindow;
 
   QUiLoader loader;
-
   QFile uiFile("://ui/mainwindow.ui");
   uiFile.open(QIODevice::ReadOnly);
-
   QWidget *window = loader.load(&uiFile);
   _mainWindow = qobject_cast<QMainWindow *>(window);
+
   QProgressBar *progress = new QProgressBar();
   progress->setObjectName("progress");
   _mainWindow->statusBar()->addPermanentWidget(progress);
   progress->setVisible(false);
 
   QAction *newCP   = _mainWindow->findChild<QAction*>("actionNewCodeplug");
-  QAction *cpWiz   = _mainWindow->findChild<QAction*>("actionCodeplugWizzard");
+  QAction *cpWiz   = _mainWindow->findChild<QAction*>("actionCodeplugWizard");
   QAction *loadCP  = _mainWindow->findChild<QAction*>("actionOpenCodeplug");
   QAction *saveCP  = _mainWindow->findChild<QAction*>("actionSaveCodeplug");
 
@@ -71,7 +79,9 @@ Application::createMainWindow() {
   connect(cpWiz, SIGNAL(triggered()), this, SLOT(codeplugWizzard()));
   connect(loadCP, SIGNAL(triggered()), this, SLOT(loadCodeplug()));
   connect(saveCP, SIGNAL(triggered()), this, SLOT(saveCodeplug()));
-  connect(quit, SIGNAL(triggered()), this, SLOT(quit()));
+  connect(quit, SIGNAL(triggered()), this, SLOT(quitApplication()));
+  connect(about, SIGNAL(triggered()), this, SLOT(showAbout()));
+  connect(help, SIGNAL(triggered()), this, SLOT(showHelp()));
 
   connect(findDev, SIGNAL(triggered()), this, SLOT(detectRadio()));
   connect(verCP, SIGNAL(triggered()), this, SLOT(verifyCodeplug()));
@@ -80,66 +90,84 @@ Application::createMainWindow() {
 
   // Wire-up "General Settings" view
   QLineEdit *dmrID  = _mainWindow->findChild<QLineEdit*>("dmrID");
+  QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
   dmrID->setText(QString::number(_config->id()));
+  rname->setText(_config->name());
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
   connect(dmrID, SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
+  connect(rname, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
   connect(intro1, SIGNAL(editingFinished()), this, SLOT(onIntroLine1Changed()));
   connect(intro2, SIGNAL(editingFinished()), this, SLOT(onIntroLine2Changed()));
 
   // Wire-up "Contact List" view
   QTableView *contacts = _mainWindow->findChild<QTableView *>("contactsView");
   QPushButton *cntUp   = _mainWindow->findChild<QPushButton *>("contactUp");
-  QPushButton *cntDown = _mainWindow->findChild<QPushButton *>("contactUp");
+  QPushButton *cntDown = _mainWindow->findChild<QPushButton *>("contactDown");
   QPushButton *addCnt  = _mainWindow->findChild<QPushButton *>("addContact");
   QPushButton *remCnt  = _mainWindow->findChild<QPushButton *>("remContact");
   contacts->setModel(_config->contacts());
   connect(addCnt, SIGNAL(clicked()), this, SLOT(onAddContact()));
   connect(remCnt, SIGNAL(clicked()), this, SLOT(onRemContact()));
+  connect(cntUp, SIGNAL(clicked()), this, SLOT(onContactUp()));
+  connect(cntDown, SIGNAL(clicked()), this, SLOT(onContactDown()));
   connect(contacts, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditContact(const QModelIndex &)));
 
   // Wire-up "RX Group List" view
   QListView *rxgroups  = _mainWindow->findChild<QListView *>("groupListView");
   QPushButton *grpUp   = _mainWindow->findChild<QPushButton *>("rxGroupUp");
-  QPushButton *grpDown = _mainWindow->findChild<QPushButton *>("rxGroupUp");
+  QPushButton *grpDown = _mainWindow->findChild<QPushButton *>("rxGroupDown");
   QPushButton *addGrp  = _mainWindow->findChild<QPushButton *>("addRXGroup");
   QPushButton *remGrp  = _mainWindow->findChild<QPushButton *>("remRXGroup");
   rxgroups->setModel(_config->rxGroupLists());
   connect(addGrp, SIGNAL(clicked()), this, SLOT(onAddRxGroup()));
   connect(remGrp, SIGNAL(clicked()), this, SLOT(onRemRxGroup()));
+  connect(grpUp, SIGNAL(clicked()), this, SLOT(onRxGroupUp()));
+  connect(grpDown, SIGNAL(clicked()), this, SLOT(onRxGroupDown()));
   connect(rxgroups, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditRxGroup(const QModelIndex &)));
 
   // Wire-up "Channel List" view
   QTableView *channels = _mainWindow->findChild<QTableView *>("channelView");
   QPushButton *chUp    = _mainWindow->findChild<QPushButton *>("channelUp");
-  QPushButton *chDown  = _mainWindow->findChild<QPushButton *>("channelUp");
-  QPushButton *addCh   = _mainWindow->findChild<QPushButton *>("addChannel");
+  QPushButton *chDown  = _mainWindow->findChild<QPushButton *>("channelDown");
+  QPushButton *addACh  = _mainWindow->findChild<QPushButton *>("addAnalogChannel");
+  QPushButton *addDCh  = _mainWindow->findChild<QPushButton *>("addDigitalChannel");
   QPushButton *remCh   = _mainWindow->findChild<QPushButton *>("remChannel");
   channels->setModel(_config->channelList());
-  connect(addCh, SIGNAL(clicked()), this, SLOT(onAddChannel()));
+  connect(addACh, SIGNAL(clicked()), this, SLOT(onAddAnalogChannel()));
+  connect(addDCh, SIGNAL(clicked()), this, SLOT(onAddDigitalChannel()));
   connect(remCh, SIGNAL(clicked()), this, SLOT(onRemChannel()));
+  connect(chUp, SIGNAL(clicked()), this, SLOT(onChannelUp()));
+  connect(chDown, SIGNAL(clicked()), this, SLOT(onChannelDown()));
+  connect(channels, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditChannel(const QModelIndex &)));
 
   // Wire-up "Zone List" view
   QListView *zones     = _mainWindow->findChild<QListView *>("zoneView");
   QPushButton *zoneUp   = _mainWindow->findChild<QPushButton *>("zoneUp");
-  QPushButton *zoneDown = _mainWindow->findChild<QPushButton *>("zoneUp");
+  QPushButton *zoneDown = _mainWindow->findChild<QPushButton *>("zoneDown");
   QPushButton *addZone  = _mainWindow->findChild<QPushButton *>("addZone");
   QPushButton *remZone  = _mainWindow->findChild<QPushButton *>("remZone");
   zones->setModel(_config->zones());
   connect(addZone, SIGNAL(clicked()), this, SLOT(onAddZone()));
   connect(remZone, SIGNAL(clicked()), this, SLOT(onRemZone()));
+  connect(zoneUp, SIGNAL(clicked()), this, SLOT(onZoneUp()));
+  connect(zoneDown, SIGNAL(clicked()), this, SLOT(onZoneDown()));
+  connect(zones, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditZone(const QModelIndex &)));
 
   // Wire-up "Scan List" view
   QListView *scanLists = _mainWindow->findChild<QListView *>("scanListView");
   QPushButton *slUp   = _mainWindow->findChild<QPushButton *>("scanListUp");
-  QPushButton *slDown = _mainWindow->findChild<QPushButton *>("scanListUp");
+  QPushButton *slDown = _mainWindow->findChild<QPushButton *>("scanListDown");
   QPushButton *addSl  = _mainWindow->findChild<QPushButton *>("addScanList");
   QPushButton *remSl  = _mainWindow->findChild<QPushButton *>("remScanList");
   scanLists->setModel(_config->scanlists());
   connect(addSl, SIGNAL(clicked()), this, SLOT(onAddScanList()));
   connect(remSl, SIGNAL(clicked()), this, SLOT(onRemScanList()));
+  connect(slUp, SIGNAL(clicked()), this, SLOT(onScanListUp()));
+  connect(slDown, SIGNAL(clicked()), this, SLOT(onScanListDown()));
+  connect(scanLists, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditScanList(const QModelIndex &)));
 
   return _mainWindow;
 }
@@ -179,7 +207,7 @@ Application::loadCodeplug() {
   }
 
   QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open codeplug"), QString(),
-                                                  tr("CSV Files (*.csv *.conf)"));
+                                                  tr("Codeplug Files (*.conf *.csv *.txt)"));
   if (filename.isEmpty())
     return;
   QFile file(filename);
@@ -200,7 +228,7 @@ Application::saveCodeplug() {
     return;
 
   QString filename = QFileDialog::getSaveFileName(nullptr, tr("Save codeplug"), QString(),
-                                                  tr("CSV Files (*.csv *.conf)"));
+                                                  tr("CSV Files (*.conf)"));
   if (filename.isEmpty())
     return;
 
@@ -217,6 +245,20 @@ Application::saveCodeplug() {
 
   file.flush();
   file.close();
+}
+
+
+void
+Application::quitApplication() {
+  if (_config->isModified()) {
+    if (QMessageBox::Ok != QMessageBox::question(0, tr("Unsaved changes to codeplug."),
+                                                 tr("There are unsaved changes to the current codeplug. "
+                                                    "These changes are lost if you proceed."),
+                                                 QMessageBox::Cancel|QMessageBox::Ok))
+      return;
+  }
+
+  quit();
 }
 
 
@@ -366,7 +408,14 @@ Application::onCodeplugUploaded(Radio *radio) {
 
 void
 Application::showAbout() {
-
+  QUiLoader loader;
+  QFile uiFile("://ui/aboutdialog.ui");
+  uiFile.open(QIODevice::ReadOnly);
+  QDialog *dialog = qobject_cast<QDialog *>(loader.load(&uiFile));
+  if (dialog) {
+    dialog->exec();
+    dialog->deleteLater();
+  }
 }
 
 void
@@ -399,15 +448,21 @@ Application::onDMRIDChanged() {
 }
 
 void
+Application::onNameChanged() {
+  QLineEdit *rname = _mainWindow->findChild<QLineEdit*>("radioName");
+  _config->setName(rname->text().simplified());
+}
+
+void
 Application::onIntroLine1Changed() {
   QLineEdit *line  = _mainWindow->findChild<QLineEdit*>("introLine1");
-  _config->setIntroLine1(line->text());
+  _config->setIntroLine1(line->text().simplified());
 }
 
 void
 Application::onIntroLine2Changed() {
   QLineEdit *line  = _mainWindow->findChild<QLineEdit*>("introLine2");
-  _config->setIntroLine2(line->text());
+  _config->setIntroLine2(line->text().simplified());
 }
 
 
@@ -447,6 +502,25 @@ Application::onEditContact(const QModelIndex &idx) {
   dialog.contact();
 }
 
+void
+Application::onContactUp() {
+  QTableView *table = _mainWindow->findChild<QTableView *>("contactsView");
+  QModelIndex selected = table->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || (0==selected.row()))
+    return;
+  if (_config->contacts()->moveUp(selected.row()))
+    table->selectRow(selected.row()-1);
+}
+
+void
+Application::onContactDown() {
+  QTableView *table = _mainWindow->findChild<QTableView *>("contactsView");
+  QModelIndex selected = table->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || ((_config->contacts()->count()-1) <= selected.row()))
+    return;
+  if (_config->contacts()->moveDown(selected.row()))
+    table->selectRow(selected.row()+1);
+}
 
 void
 Application::onAddRxGroup() {
@@ -491,5 +565,220 @@ Application::onEditRxGroup(const QModelIndex &index) {
 
   emit _mainWindow->findChild<QListView *>("groupListView")->model()->dataChanged(index,index);
 }
+
+void
+Application::onRxGroupUp() {
+  QListView *list = _mainWindow->findChild<QListView *>("groupListView");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || (0 >= selected.row()))
+    return;
+  if (_config->rxGroupLists()->moveUp(selected.row()))
+    list->setCurrentIndex(_config->rxGroupLists()->index(selected.row()-1));
+}
+
+void
+Application::onRxGroupDown() {
+  QListView *list = _mainWindow->findChild<QListView *>("groupListView");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || ((_config->rxGroupLists()->count()-1) <= selected.row()))
+    return;
+  if (_config->rxGroupLists()->moveDown(selected.row()))
+    list->setCurrentIndex(_config->rxGroupLists()->index(selected.row()+1));
+}
+
+void
+Application::onAddAnalogChannel() {
+  AnalogChannelDialog dialog(_config);
+  if (QDialog::Accepted != dialog.exec())
+    return;
+  _config->channelList()->addChannel(dialog.channel());
+}
+
+void
+Application::onAddDigitalChannel() {
+  DigitalChannelDialog dialog(_config);
+  if (QDialog::Accepted != dialog.exec())
+    return;
+  _config->channelList()->addChannel(dialog.channel());
+}
+
+void
+Application::onRemChannel() {
+  QModelIndex selected =_mainWindow->findChild<QTableView*>("channelView")->selectionModel()->currentIndex();
+  if (! selected.isValid()) {
+    QMessageBox::information(nullptr, tr("Cannot delete channel"),
+                             tr("Cannot delete channel: You have to select a channel first."));
+    return;
+  }
+
+  QString name = _config->channelList()->channel(selected.row())->name();
+  if (QMessageBox::No == QMessageBox::question(nullptr, tr("Delete channel?"), tr("Delete channel %1?").arg(name)))
+    return;
+
+  _config->channelList()->remChannel(selected.row());
+}
+
+void
+Application::onEditChannel(const QModelIndex &idx) {
+  Channel *channel = _config->channelList()->channel(idx.row());
+  if (! channel)
+    return;
+  if (channel->is<AnalogChannel>()) {
+    AnalogChannelDialog dialog(_config, channel->as<AnalogChannel>());
+    if (QDialog::Accepted != dialog.exec())
+      return;
+    dialog.channel();
+  } else {
+    DigitalChannelDialog dialog(_config, channel->as<DigitalChannel>());
+    if (QDialog::Accepted != dialog.exec())
+      return;
+    dialog.channel();
+  }
+}
+
+void
+Application::onChannelUp() {
+  QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
+  QModelIndex selected = table->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || (0 == selected.row()))
+    return;
+  if (_config->channelList()->moveUp(selected.row()))
+    table->selectRow(selected.row()-1);
+}
+
+void
+Application::onChannelDown() {
+  QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
+  QModelIndex selected = table->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || ((_config->channelList()->count()-1) == selected.row()))
+    return;
+  if (_config->channelList()->moveDown(selected.row()))
+    table->selectRow(selected.row()+1);
+}
+
+
+void
+Application::onAddZone() {
+  ZoneDialog dialog(_config);
+
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  Zone *zone = dialog.zone();
+  _config->zones()->addZone(zone);
+}
+
+void
+Application::onRemZone() {
+  QModelIndex idx = _mainWindow->findChild<QListView *>("zoneView")->selectionModel()->currentIndex();
+  if (! idx.isValid()) {
+    QMessageBox::information(nullptr, tr("Cannot delete zone"),
+                             tr("Cannot delete zone: You have to select a zone first."));
+    return;
+  }
+
+  QString name = _config->zones()->zone(idx.row())->name();
+  if (QMessageBox::No == QMessageBox::question(nullptr, tr("Delete zone?"), tr("Delete zone %1?").arg(name)))
+    return;
+
+  _config->zones()->remZone(idx.row());
+}
+
+void
+Application::onZoneUp() {
+  QListView *list = _mainWindow->findChild<QListView *>("zoneView");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || (0 >= selected.row()))
+    return;
+  if (_config->zones()->moveUp(selected.row()))
+    list->setCurrentIndex(_config->zones()->index(selected.row()-1));
+}
+
+void
+Application::onZoneDown() {
+  QListView *list = _mainWindow->findChild<QListView *>("zoneView");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || ((_config->zones()->count()-1) <= selected.row()))
+    return;
+  if (_config->zones()->moveDown(selected.row()))
+    list->setCurrentIndex(_config->zones()->index(selected.row()+1));
+}
+
+void
+Application::onEditZone(const QModelIndex &idx) {
+  if (idx.row() >= _config->zones()->rowCount(QModelIndex()))
+    return;
+
+  ZoneDialog dialog(_config, _config->zones()->zone(idx.row()));
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  dialog.zone();
+
+  emit _mainWindow->findChild<QListView *>("zoneView")->model()->dataChanged(idx,idx);
+}
+
+
+void
+Application::onAddScanList() {
+  ScanListDialog dialog(_config);
+
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  ScanList *scanlist = dialog.scanlist();
+  _config->scanlists()->addScanList(scanlist);
+}
+
+void
+Application::onRemScanList() {
+  QModelIndex idx = _mainWindow->findChild<QListView *>("scanListView")->selectionModel()->currentIndex();
+  if (! idx.isValid()) {
+    QMessageBox::information(nullptr, tr("Cannot delete scanlist"),
+                             tr("Cannot delete scanlist: You have to select a scanlist first."));
+    return;
+  }
+
+  QString name = _config->scanlists()->scanlist(idx.row())->name();
+  if (QMessageBox::No == QMessageBox::question(nullptr, tr("Delete scanlist?"), tr("Delete scanlist %1?").arg(name)))
+    return;
+
+  _config->scanlists()->remScanList(idx.row());
+}
+
+void
+Application::onScanListUp() {
+  QListView *list = _mainWindow->findChild<QListView *>("scanListView");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || (0 >= selected.row()))
+    return;
+  if (_config->scanlists()->moveUp(selected.row()))
+    list->setCurrentIndex(_config->scanlists()->index(selected.row()-1));
+}
+
+void
+Application::onScanListDown() {
+  QListView *list = _mainWindow->findChild<QListView *>("scanListView");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || ((_config->scanlists()->count()-1) <= selected.row()))
+    return;
+  if (_config->scanlists()->moveDown(selected.row()))
+    list->setCurrentIndex(_config->scanlists()->index(selected.row()+1));
+}
+
+void
+Application::onEditScanList(const QModelIndex &idx) {
+  if (idx.row()>=_config->scanlists()->count())
+    return;
+
+  ScanListDialog dialog(_config, _config->scanlists()->scanlist(idx.row()));
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  dialog.scanlist();
+
+  emit _mainWindow->findChild<QListView *>("scanListView")->model()->dataChanged(idx,idx);
+}
+
 
 

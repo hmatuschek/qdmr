@@ -66,6 +66,9 @@ public:
 	bool remList(RXGroupList *list);
 	bool remList(int idx);
 
+  bool moveUp(int row);
+  bool moveDown(int row);
+
 	// Implementation of QAbstractListModel
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -110,10 +113,12 @@ class RXGroupListBox: public QComboBox
   Q_OBJECT
 
 public:
-  RXGroupListBox(RXGroupLists *lists, QWidget *parent=0);
+  RXGroupListBox(RXGroupLists *groups, QWidget *parent=0);
 
   RXGroupList *groupList();
 };
+
+void populateRXGroupListBox(QComboBox *box, RXGroupLists *groups, RXGroupList *list=nullptr);
 
 
 #endif // RXGROUPLIST_HH

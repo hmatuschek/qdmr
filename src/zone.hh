@@ -12,6 +12,8 @@
 class Channel;
 class Config;
 
+#include "ui_zonedialog.h"
+
 
 class Zone : public QAbstractListModel
 {
@@ -63,6 +65,9 @@ public:
 	bool remZone(int idx);
 	bool remZone(Zone *zone);
 
+  bool moveUp(int row);
+  bool moveDown(int row);
+
 	// Implementation of QAbstractListModel
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -79,25 +84,7 @@ protected:
 };
 
 
-class ZoneListView: public QWidget
-{
-	Q_OBJECT
-
-public:
-	ZoneListView(Config *config, QWidget *parent=nullptr);
-
-protected slots:
-	void onAddZone();
-	void onRemZone();
-	void onEditZone(const QModelIndex &idx);
-
-protected:
-	Config *_config;
-	QListView *_view;
-};
-
-
-class ZoneDialog: public QDialog
+class ZoneDialog: public QDialog, private Ui::ZoneDialog
 {
 	Q_OBJECT
 
@@ -119,8 +106,6 @@ protected:
 protected:
 	Config *_config;
 	Zone *_zone;
-	QLineEdit *_name;
-	QListWidget *_list;
 };
 
 #endif // ZONE_HH

@@ -82,6 +82,11 @@ DigitalContact::type() const {
   return _type;
 }
 
+void
+DigitalContact::setType(DigitalContact::Type type) {
+  _type = type;
+}
+
 uint
 DigitalContact::number() const {
   return _number;
@@ -166,6 +171,27 @@ ContactList::addContact(Contact *contact) {
   return idx;
 }
 
+bool
+ContactList::moveUp(int row) {
+  if ((row <= 0) || (row>=count()))
+    return false;
+  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
+  std::swap(_contacts[row-1],_contacts[row]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+ContactList::moveDown(int row) {
+  if ((row >= (count()-1)) || (0 > row))
+    return false;
+  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
+  std::swap(_contacts[row+1],_contacts[row]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
 
 int
 ContactList::rowCount(const QModelIndex &index) const {
@@ -276,32 +302,38 @@ ContactDialog::ContactDialog(Contact *contact, QWidget *parent)
 void
 ContactDialog::construct() {
   setupUi(this);
-  contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9A-Da-d\\*#]+")));
+  contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
+  contactType->setItemData(0, uint(DigitalContact::PrivateCall));
+  contactType->setItemData(1, uint(DigitalContact::GroupCall));
+  contactType->setItemData(2, uint(DigitalContact::AllCall));
 
   if (_contact) {
-    contactType->setEnabled(false);
+    if (_contact->is<DTMFContact>()) {
+      DTMFContact *dtmf = _contact->as<DTMFContact>();
+      contactType->setEnabled(false);
+      contactNumber->setText(dtmf->number());
+    } else {
+      DigitalContact *digi = _contact->as<DigitalContact>();
+      if (DigitalContact::PrivateCall == digi->type())
+        contactType->setCurrentIndex(0);
+      else if (DigitalContact::PrivateCall == digi->type())
+        contactType->setCurrentIndex(1);
+      else
+        contactType->setCurrentIndex(2);
+      contactNumber->setText(QString::number(digi->number()));
+    }
     contactName->setText(_contact->name());
     contactRxTone->setChecked(_contact->rxTone());
-    DigitalContact *digi = _contact->as<DigitalContact>();
-    contactNumber->setText(QString::number(digi->number()));
-    if (DigitalContact::PrivateCall == digi->type())
-      contactType->setCurrentIndex(0);
-    else if (DigitalContact::GroupCall == digi->type())
-      contactType->setCurrentIndex(1);
-    else if (DigitalContact::AllCall == digi->type())
-      contactType->setCurrentIndex(2);
   }
 
   connect(contactType, SIGNAL(currentIndexChanged(int)), this, SLOT(onTypeChanged()));
+  connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
 void
 ContactDialog::onTypeChanged() {
-  if (0 == contactType->currentIndex()) {
-    contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9A-Da-d\\*#]+")));
-  } else {
-    contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
-  }
+  // pass...
 }
 
 Contact *
@@ -314,6 +346,8 @@ ContactDialog::contact()
       _contact->as<DTMFContact>()->setNumber(contactNumber->text());
     } else {
       _contact->as<DigitalContact>()->setNumber(contactNumber->text().toUInt());
+      _contact->as<DigitalContact>()->setType(
+            DigitalContact::Type(contactType->currentData().toUInt()));
     }
     return _contact;
   }

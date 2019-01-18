@@ -12,9 +12,18 @@ static const int CTCSS_TONES [NCTCSS] = {
 CTCSSBox::CTCSSBox(QWidget *parent)
   : QComboBox(parent)
 {
-  addItem(tr("None"), 0.0);
+  populateCTCSSBox(this);
+}
+
+void
+populateCTCSSBox(QComboBox *box, double value) {
+  box->addItem(QObject::tr("None"), 0.0);
   for (int i=0; i<NCTCSS; i++) {
     double f = double(CTCSS_TONES[i])/10;
-    addItem(tr("%1 Hz").arg(f), f);
+    box->addItem(QObject::tr("%1 Hz").arg(f), f);
+    if (f == value)
+      box->setCurrentIndex(i+1);
   }
 }
+
+

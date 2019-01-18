@@ -12,4 +12,6 @@ public:
 	double selectedFreq() const;
 };
 
+void populateCTCSSBox(QComboBox *box, double value=0.0);
+
 #endif // CTCSSBOX_HH

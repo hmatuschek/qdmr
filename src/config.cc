@@ -66,6 +66,8 @@ Config::id() const {
 }
 void
 Config::setId(uint id) {
+  if (id == _id)
+    return;
   _id = id;
   emit modified();
 }
@@ -76,6 +78,8 @@ Config::name() const {
 }
 void
 Config::setName(const QString &name) {
+  if (name == _name)
+    return;
   _name = name;
   emit modified();
 }
@@ -86,6 +90,8 @@ Config::introLine1() const {
 }
 void
 Config::setIntroLine1(const QString &line) {
+  if (line == _introLine1)
+    return;
   _introLine1 = line;
   emit modified();
 }
@@ -95,6 +101,8 @@ Config::introLine2() const {
 }
 void
 Config::setIntroLine2(const QString &line) {
+  if (line == _introLine2)
+    return;
   _introLine2 = line;
   emit modified();
 }
@@ -375,7 +383,11 @@ Config::readCSVLink(QTextStream &stream, QMap<int, Channel *> &channels,
       int idx = row.at(0).toUInt();
       if ((!channels.contains(idx)) || (!channels[idx]->is<AnalogChannel>()))
         continue;
-      //_channels->addChannel(channels[idx]);
+      if ("-" != row.at(5)) {
+        int scanListIdx = row.at(5).toUInt();
+        if (scanlists.contains(scanListIdx))
+          channels[idx]->setScanList(scanlists[scanListIdx]);
+      }
     } else if ((S_CONTACT == state) && line.simplified().isEmpty()) {
       state = S_START;
     } else if (S_CONTACT == state) {
@@ -494,15 +506,34 @@ bool
 Config::writeCSV(QTextStream &stream)
 {
   stream << "#\n"
-         << "# Configuration generated " << QDateTime::currentDateTime().toString() << "by qdrm, version 0.1.0\n"
+         << "# Configuration generated " << QDateTime::currentDateTime().toString()
+         << " by qdrm, version 0.1.0\n"
          << "#\n\n";
 
-  stream << "ID: " << id() << "\n"
+
+  stream << "# Unique DMR ID and name of this radio.\n"
+         << "ID: " << id() << "\n"
          << "Name: " << name() << "\n\n"
+         << "# Text displayed when the radio powers up.\n"
          << "Intro Line 1: " << introLine1() << "\n"
          << "Intro Line 2: " << introLine2() << "\n\n";
 
-  stream << "Digital Name             Receive   Transmit  Power Scan TOT RO Admit  Color Slot RxGL TxContact\n";
+  stream << "# Table of digital channels.\n"
+            "# 1) Channel number: 1-1024\n"
+            "# 2) Name: up to 16 characters, use '_' instead of space\n"
+            "# 3) Receive frequency in MHz\n"
+            "# 4) Transmit frequency or +/- offset in MHz\n"
+            "# 5) Transmit power: High, Low\n"
+            "# 6) Scan list: - or index in Scanlist table\n"
+            "# 7) Transmit timeout timer in seconds: 0, 15, 30, 45... 555\n"
+            "# 8) Receive only: -, +\n"
+            "# 9) Admit criteria: -, Free, Color\n"
+            "# 10) Color code: 0, 1, 2, 3... 15\n"
+            "# 11) Time slot: 1 or 2\n"
+            "# 12) Receive group list: - or index in Grouplist table\n"
+            "# 13) Contact for transmit: - or index in Contacts table\n"
+            "#\n"
+            "Digital Name             Receive   Transmit  Power Scan TOT RO Admit  Color Slot RxGL TxContact\n";
   for (int i=0; i<channelList()->count(); i++) {
     if (channelList()->channel(i)->is<AnalogChannel>())
       continue;
@@ -535,7 +566,22 @@ Config::writeCSV(QTextStream &stream)
   }
   stream << "\n";
 
-  stream << "Analog  Name             Receive   Transmit Power Scan TOT RO Admit  Squelch RxTone TxTone Width\n";
+  stream << "# Table of analog channels.\n"
+            "# 1) Channel number: 1-1024\n"
+            "# 2) Name: up to 16 characters, use '_' instead of space\n"
+            "# 3) Receive frequency in MHz\n"
+            "# 4) Transmit frequency or +/- offset in MHz\n"
+            "# 5) Transmit power: High, Low\n"
+            "# 6) Scan list: - or index\n"
+            "# 7) Transmit timeout timer in seconds: 0, 15, 30, 45... 555\n"
+            "# 8) Receive only: -, +\n"
+            "# 9) Admit criteria: -, Free, Tone\n"
+            "# 10) Squelch level: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9\n"
+            "# 11) Guard tone for receive, or '-' to disable\n"
+            "# 12) Guard tone for transmit, or '-' to disable\n"
+            "# 13) Bandwidth in kHz: 12.5, 25\n"
+            "#\n"
+            "Analog  Name             Receive   Transmit Power Scan TOT RO Admit  Squelch RxTone TxTone Width\n";
   for (int i=0; i<channelList()->count(); i++) {
     if (channelList()->channel(i)->is<DigitalChannel>())
       continue;
@@ -567,7 +613,12 @@ Config::writeCSV(QTextStream &stream)
   }
   stream << "\n";
 
-  stream << "Zone    Name             Channels\n";
+  stream << "# Table of channel zones.\n"
+            "# 1) Zone number: 1-250\n"
+            "# 2) Name: up to 16 characters, use '_' instead of space\n"
+            "# 3) List of channels: numbers and ranges (N-M) separated by comma\n"
+            "#\n"
+            "Zone    Name             Channels\n";
   for (int i=0; i<zones()->count(); i++) {
     Zone *zone = zones()->zone(i);
     stream << qSetFieldWidth(8)  << left << (i+1)
@@ -580,7 +631,15 @@ Config::writeCSV(QTextStream &stream)
   }
   stream << "\n";
 
-  stream << "Scanlist Name            PCh1 PCh2 TxCh Channels\n";
+  stream << "# Table of scan lists.\n"
+            "# 1) Scan list number: 1-250\n"
+            "# 2) Name: up to 16 characters, use '_' instead of space\n"
+            "# 3) Priority channel 1 (50% of scans): -, Sel or index\n"
+            "# 4) Priority channel 2 (25% of scans): -, Sel or index\n"
+            "# 5) Designated transmit channel: Last, Sel or index\n"
+            "# 6) List of channels: numbers and ranges (N-M) separated by comma\n"
+            "#\n"
+            "Scanlist Name            PCh1 PCh2 TxCh Channels\n";
   for (int i=0; i<scanlists()->count(); i++) {
     ScanList *list = scanlists()->scanlist(i);
     stream << qSetFieldWidth(9)  << left << (i+1)
@@ -596,7 +655,14 @@ Config::writeCSV(QTextStream &stream)
   }
   stream << "\n";
 
-  stream << "Contact Name             Type    ID       RxTone\n";
+  stream << "# Table of contacts.\n"
+            "# 1) Contact number: 1-256\n"
+            "# 2) Name: up to 16 characters, use '_' instead of space\n"
+            "# 3) Call type: Group, Private, All\n"
+            "# 4) Call ID: 1...16777215\n"
+            "# 5) Call receive tone: -, +\n"
+            "#\n"
+            "Contact Name             Type    ID       RxTone\n";
   for (int i=0; i<contacts()->count(); i++) {
     if (! contacts()->contact(i)->is<DigitalContact>())
       continue;
@@ -612,7 +678,12 @@ Config::writeCSV(QTextStream &stream)
   }
   stream << "\n";
 
-  stream << "Grouplist Name             Contacts\n";
+  stream << "# Table of group lists.\n"
+            "# 1) Group list number: 1-64\n"
+            "# 2) Name: up to 16 characters, use '_' instead of space\n"
+            "# 3) List of contacts: numbers and ranges (N-M) separated by comma\n"
+            "#\n"
+            "Grouplist Name             Contacts\n";
   for (int i=0; i<rxGroupLists()->count(); i++) {
     RXGroupList *list = rxGroupLists()->list(i);
     stream << qSetFieldWidth(10) << left << (i+1)

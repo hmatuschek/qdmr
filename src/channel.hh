@@ -11,6 +11,9 @@
 #include <QSpinBox>
 #include <QCheckBox>
 
+#include "ui_analogchanneldialog.h"
+#include "ui_digitalchanneldialog.h"
+
 
 class Config;
 class RXGroupList;
@@ -184,7 +187,7 @@ public:
 	bool remChannel(Channel *channel);
 	bool remChannel(int idx);
 
-  bool moveUp(int idx);
+  bool moveUp(int row);
   bool moveDown(int idx);
 
 	// QAbstractTableModel interface
@@ -228,7 +231,7 @@ protected:
 };
 
 
-class AnalogChannelDialog: public QDialog
+class AnalogChannelDialog: public QDialog, private Ui::AnalogChannelDialog
 {
   Q_OBJECT
 
@@ -244,22 +247,10 @@ protected:
 protected:
   Config *_config;
   AnalogChannel *_channel;
-  QLineEdit *_name;
-  QLineEdit *_rx;
-  QLineEdit *_tx;
-  QComboBox *_power;
-  QSpinBox *_timeout;
-  QCheckBox *_rxOnly;
-  QComboBox *_scanlist;
-  QComboBox *_admit;
-  QSpinBox *_squelch;
-  QComboBox *_rxTone;
-  QComboBox *_txTone;
-  QComboBox *_bw;
 };
 
 
-class DigitalChannelDialog: public QDialog
+class DigitalChannelDialog: public QDialog, private Ui::DigitalChannelDialog
 {
   Q_OBJECT
 
@@ -275,18 +266,6 @@ protected:
 protected:
   Config *_config;
   DigitalChannel *_channel;
-  QLineEdit *_name;
-  QLineEdit *_rx;
-  QLineEdit *_tx;
-  QComboBox *_power;
-  QSpinBox *_timeout;
-  QCheckBox *_rxOnly;
-  QComboBox *_scanlist;
-  QComboBox *_admit;
-  QSpinBox  *_colorCode;
-  QComboBox *_slot;
-  QComboBox *_rxGroup;
-  QComboBox *_contact;
 };
 
 

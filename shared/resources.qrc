@@ -15,5 +15,6 @@
     </qresource>
     <qresource prefix="/ui">
         <file>mainwindow.ui</file>
+        <file>aboutdialog.ui</file>
     </qresource>
 </RCC>

@@ -82,6 +82,8 @@ public:
 	DigitalContact(Type type, const QString &name, uint number, bool rxTone=false, QObject *parent=nullptr);
 
 	Type type() const;
+  void setType(Type type);
+
 	uint number() const;
 	bool setNumber(uint number);
 
@@ -109,6 +111,9 @@ public:
 
   bool remContact(int idx);
 	bool remContact(Contact *contact);
+
+  bool moveUp(int row);
+  bool moveDown(int row);
 
 	// Implementation of QAbstractListModel
 	int rowCount(const QModelIndex &index) const;

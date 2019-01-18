@@ -41,7 +41,7 @@ bool
 Zone::setName(const QString &name) {
   if (name.simplified().isEmpty())
     return false;
-  _name = name.simplified();
+  _name = name;
   emit modified();
   return true;
 }
@@ -178,6 +178,28 @@ ZoneList::remZone(Zone *zone) {
   return remZone(idx);
 }
 
+bool
+ZoneList::moveUp(int row) {
+  if ((0>=row) || (row>=count()))
+    return false;
+  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
+  std::swap(_zones[row], _zones[row-1]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+ZoneList::moveDown(int row) {
+  if ((0>row) || ((row-1)>=count()))
+    return false;
+  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
+  std::swap(_zones[row], _zones[row+1]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
 int
 ZoneList::rowCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
@@ -206,74 +228,6 @@ ZoneList::onZoneDeleted(QObject *obj) {
 
 
 /* ********************************************************************************************* *
- * Implementation of ZoneListView
- * ********************************************************************************************* */
-ZoneListView::ZoneListView(Config *config, QWidget *parent)
-  : QWidget(parent), _config(config)
-{
-  _view = new QListView();
-  _view->setModel(_config->zones());
-  connect(_view, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditZone(const QModelIndex &)));
-
-  QPushButton *add = new QPushButton(tr("Add Zone"));
-  QPushButton *rem = new QPushButton(tr("Delete Zone"));
-  connect(add, SIGNAL(clicked()), this, SLOT(onAddZone()));
-  connect(rem, SIGNAL(clicked()), this, SLOT(onRemZone()));
-
-  QHBoxLayout *bbox = new QHBoxLayout();
-  bbox->addWidget(add);
-  bbox->addWidget(rem);
-
-  QVBoxLayout *layout = new QVBoxLayout();
-  layout->addWidget(_view);
-  layout->addLayout(bbox);
-
-  setLayout(layout);
-}
-
-void
-ZoneListView::onAddZone() {
-  ZoneDialog dialog(_config);
-
-  if (QDialog::Accepted != dialog.exec())
-    return;
-
-  Zone *zone = dialog.zone();
-  _config->zones()->addZone(zone);
-}
-
-void
-ZoneListView::onRemZone() {
-  QModelIndex idx = _view->selectionModel()->currentIndex();
-  if (! idx.isValid()) {
-    QMessageBox::information(nullptr, tr("Cannot delete zone"),
-                             tr("Cannot delete zone: You have to select a zone first."));
-    return;
-  }
-
-  QString name = _config->zones()->zone(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(nullptr, tr("Delete zone?"), tr("Delete zone %1?").arg(name)))
-    return;
-
-  _config->zones()->remZone(idx.row());
-}
-
-void
-ZoneListView::onEditZone(const QModelIndex &idx) {
-  if (idx.row()>=_config->zones()->rowCount(QModelIndex()))
-    return;
-
-  ZoneDialog dialog(_config, _config->zones()->zone(idx.row()));
-  if (QDialog::Accepted != dialog.exec())
-    return;
-
-  dialog.zone();
-
-  emit _view->model()->dataChanged(idx,idx);
-}
-
-
-/* ********************************************************************************************* *
  * Implementation of ZoneDialog
  * ********************************************************************************************* */
 ZoneDialog::ZoneDialog(Config *config, Zone *zone, QWidget *parent)
@@ -290,65 +244,30 @@ ZoneDialog::ZoneDialog(Config *config, QWidget *parent)
 
 void
 ZoneDialog::construct() {
-  QLabel *label = new QLabel(tr("Name"));
-  _name = new QLineEdit("name");
-  if (_zone)
-    _name->setText(_zone->name());
-  label->setBuddy(_name);
+  setupUi(this);
 
-  _list = new QListWidget();
   if (_zone) {
+    zoneName->setText(_zone->name());
     for (int i=0; i<_zone->rowCount(QModelIndex()); i++) {
       Channel *channel = _zone->channel(i);
       if (channel->is<AnalogChannel>()) {
         QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
         item->setData(Qt::UserRole, QVariant::fromValue(channel));
-        _list->addItem(item);
+        channelList->addItem(item);
       } else {
         QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
         item->setData(Qt::UserRole, QVariant::fromValue(channel));
-        _list->addItem(item);
+        channelList->addItem(item);
       }
     }
   }
 
-  QPushButton *add = new QPushButton(tr("Add Channel"));
-  QPushButton *rem = new QPushButton(tr("Remove Channel"));
-  connect(add, SIGNAL(clicked()), this, SLOT(onAddChannel()));
-  connect(rem, SIGNAL(clicked()), this, SLOT(onRemChannel()));
-
-  QPushButton *up = new QPushButton(QIcon("://icons/up.png"), "");
-  up->setToolTip(tr("Up"));
-  QPushButton *down = new QPushButton(QIcon("://icons/down.png"),"");
-  down->setToolTip(tr("Down"));
-  connect(up, SIGNAL(clicked()), this, SLOT(onChannelUp()));
-  connect(down, SIGNAL(clicked()), this, SLOT(onChannelDown()));
-
-  QVBoxLayout *layout = new QVBoxLayout();
-
-  QHBoxLayout *nb = new QHBoxLayout();
-  nb->addWidget(label);
-  nb->addWidget(_name);
-  layout->addLayout(nb);
-
-  QVBoxLayout *ud = new QVBoxLayout();
-  ud->addWidget(up); ud->addWidget(down);
-  QHBoxLayout *lb = new QHBoxLayout();
-  lb->addWidget(_list, 1);
-  lb->addLayout(ud);
-  layout->addLayout(lb);
-
-  QHBoxLayout *bbox = new QHBoxLayout();
-  bbox->addWidget(add);
-  bbox->addWidget(rem);
-  layout->addLayout(bbox);
-
-  QDialogButtonBox *bb = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
-  connect(bb, SIGNAL(accepted()), this, SLOT(accept()));
-  connect(bb, SIGNAL(rejected()), this, SLOT(reject()));
-  layout->addWidget(bb);
-
-  setLayout(layout);
+  connect(addChannel, SIGNAL(clicked()), this, SLOT(onAddChannel()));
+  connect(remChannel, SIGNAL(clicked()), this, SLOT(onRemChannel()));
+  connect(channelUp, SIGNAL(clicked()), this, SLOT(onChannelUp()));
+  connect(channelDown, SIGNAL(clicked()), this, SLOT(onChannelDown()));
+  connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
 void
@@ -375,57 +294,57 @@ ZoneDialog::onAddChannel() {
   if (channel->is<AnalogChannel>()) {
     QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
     item->setData(Qt::UserRole, QVariant::fromValue(channel));
-    _list->addItem(item);
+    channelList->addItem(item);
   } else {
     QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
     item->setData(Qt::UserRole, QVariant::fromValue(channel));
-    _list->addItem(item);
+    channelList->addItem(item);
   }
 }
 
 void
 ZoneDialog::onRemChannel() {
-  if (0 == _list->selectedItems().size())
+  if (0 == channelList->selectedItems().size())
     return;
-  QListWidgetItem *item = _list->takeItem(_list->currentRow());
+  QListWidgetItem *item = channelList->takeItem(channelList->currentRow());
   delete item;
 }
 
 void
 ZoneDialog::onChannelUp() {
-  if (0 == _list->selectedItems().size())
+  if (0 == channelList->selectedItems().size())
     return;
-  int idx = _list->currentRow();
+  int idx = channelList->currentRow();
   if (0 == idx)
     return;
-  QListWidgetItem *item = _list->takeItem(idx);
-  _list->insertItem(idx-1, item);
-  _list->setCurrentRow(idx-1);
+  QListWidgetItem *item = channelList->takeItem(idx);
+  channelList->insertItem(idx-1, item);
+  channelList->setCurrentRow(idx-1);
 }
 
 void
 ZoneDialog::onChannelDown() {
-  if (0 == _list->selectedItems().size())
+  if (0 == channelList->selectedItems().size())
     return;
-  int idx = _list->currentRow();
-  if ((_list->count()-1) == idx)
+  int idx = channelList->currentRow();
+  if ((channelList->count()-1) <= idx)
     return;
-  QListWidgetItem *item = _list->takeItem(idx);
-  _list->insertItem(idx+1, item);
-  _list->setCurrentRow(idx+1);
+  QListWidgetItem *item = channelList->takeItem(idx);
+  channelList->insertItem(idx+1, item);
+  channelList->setCurrentRow(idx+1);
 }
 
 Zone *
 ZoneDialog::zone() {
   if (_zone) {
-    _zone->setName(_name->text().simplified());
+    _zone->setName(zoneName->text().simplified());
     _zone->clear();
-    for (int i=0; i<_list->count(); i++)
-      _zone->addChannel(_list->item(i)->data(Qt::UserRole).value<Channel*>());
+    for (int i=0; i<channelList->count(); i++)
+      _zone->addChannel(channelList->item(i)->data(Qt::UserRole).value<Channel*>());
     return _zone;
   }
-  Zone *zone = new Zone(_name->text(), this);
-  for (int i=0; i<_list->count(); i++)
-    zone->addChannel(_list->item(i)->data(Qt::UserRole).value<Channel *>());
+  Zone *zone = new Zone(zoneName->text(), this);
+  for (int i=0; i<channelList->count(); i++)
+    zone->addChannel(channelList->item(i)->data(Qt::UserRole).value<Channel *>());
   return zone;
 }

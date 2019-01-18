@@ -26,7 +26,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLineEdit" name="channeName"/>
+        <widget class="QLineEdit" name="channelName"/>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="rxFrequencyLabel">
@@ -115,7 +115,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="txAdmitComboBox">
+        <widget class="QComboBox" name="txAdmit">
          <item>
           <property name="text">
            <string>Always</string>

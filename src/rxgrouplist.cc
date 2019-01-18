@@ -184,6 +184,28 @@ RXGroupLists::remList(RXGroupList *list) {
   return remList(idx);
 }
 
+bool
+RXGroupLists::moveUp(int row) {
+  if ((row <= 0) || (row>=count()))
+    return false;
+  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
+  std::swap(_lists[row-1],_lists[row]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+RXGroupLists::moveDown(int row) {
+  if ((row >= (count()-1)) || (row>=count()))
+    return false;
+  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
+  std::swap(_lists[row+1], _lists[row]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
 int
 RXGroupLists::rowCount(const QModelIndex &parent) const {
   Q_UNUSED(parent);
@@ -251,7 +273,7 @@ RXGroupListDialog::construct() {
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(addContact, SIGNAL(clicked()), this, SLOT(onAddGroup()));
-  connect(addContact, SIGNAL(clicked()), this, SLOT(onRemGroup()));
+  connect(remContact, SIGNAL(clicked()), this, SLOT(onRemGroup()));
 
   if (_list) {
     groupListName->setText(_list->name());
@@ -309,7 +331,15 @@ RXGroupListDialog::onRemGroup() {
 RXGroupListBox::RXGroupListBox(RXGroupLists *groups, QWidget *parent)
   : QComboBox(parent)
 {
+  populateRXGroupListBox(this, groups);
+}
+
+void
+populateRXGroupListBox(QComboBox *box, RXGroupLists *groups, RXGroupList *list) {
+  box->addItem(QObject::tr("[None]"), QVariant::fromValue(nullptr));
   for (int i=0; i<groups->rowCount(QModelIndex()); i++) {
-    addItem(groups->list(i)->name(), QVariant::fromValue(groups->list(i)));
+    box->addItem(groups->list(i)->name(), QVariant::fromValue(groups->list(i)));
+    if (groups->list(i) == list)
+      box->setCurrentIndex(i+1);
   }
 }

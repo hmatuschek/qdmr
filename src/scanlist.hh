@@ -12,6 +12,8 @@
 class Channel;
 class Config;
 
+#include "ui_scanlistdialog.h"
+
 
 class ScanList : public QAbstractListModel
 {
@@ -65,6 +67,9 @@ public:
 	bool remScanList(int idx);
 	bool remScanList(ScanList *list);
 
+  bool moveUp(int row);
+  bool moveDown(int row);
+
 	// Implementation of QAbstractListModel
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -99,7 +104,7 @@ protected:
 };
 
 
-class ScanListDialog: public QDialog
+class ScanListDialog: public QDialog, private Ui::ScanListDialog
 {
 	Q_OBJECT
 
@@ -121,8 +126,6 @@ protected:
 protected:
 	Config *_config;
 	ScanList *_scanlist;
-	QLineEdit *_name;
-	QListWidget *_list;
 };
 
 

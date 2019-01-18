@@ -185,6 +185,29 @@ ScanLists::remScanList(ScanList *scanlist) {
   return remScanList(idx);
 }
 
+bool
+ScanLists::moveUp(int row) {
+  if ((0>=row) || (row>=count()))
+    return false;
+  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
+  std::swap(_scanlists[row], _scanlists[row-1]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+ScanLists::moveDown(int row) {
+  if ((0>row) || ((row-1)>=count()))
+    return false;
+  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
+  std::swap(_scanlists[row], _scanlists[row+1]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+
 int
 ScanLists::rowCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
@@ -297,65 +320,42 @@ ScanListDialog::ScanListDialog(Config *config, QWidget *parent)
 
 void
 ScanListDialog::construct() {
-  QLabel *label = new QLabel(tr("Name"));
-  _name = new QLineEdit("name");
-  if (_scanlist)
-    _name->setText(_scanlist->name());
-  label->setBuddy(_name);
+  setupUi(this);
 
-  _list = new QListWidget();
+  priorityChannel1->addItem(tr("[None]"), QVariant::fromValue(nullptr));
+  priorityChannel1->addItem(tr("[Selected]"), QVariant::fromValue(nullptr));
+  priorityChannel2->addItem(tr("[None]"), QVariant::fromValue(nullptr));
+  priorityChannel2->addItem(tr("[Selected]"), QVariant::fromValue(nullptr));
+  transmitChannel->addItem(tr("[Last]"), QVariant::fromValue(nullptr));
+  for (int i=0; i<_config->channelList()->count(); i++) {
+    Channel *channel = _config->channelList()->channel(i);
+    priorityChannel1->addItem(channel->name(), QVariant::fromValue(channel));
+    priorityChannel2->addItem(channel->name(), QVariant::fromValue(channel));
+    transmitChannel->addItem(channel->name(), QVariant::fromValue(channel));
+  }
+
   if (_scanlist) {
+    scanListName->setText(_scanlist->name());
     for (int i=0; i<_scanlist->rowCount(QModelIndex()); i++) {
       Channel *channel = _scanlist->channel(i);
       if (channel->is<AnalogChannel>()) {
         QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
         item->setData(Qt::UserRole, QVariant::fromValue(channel));
-        _list->addItem(item);
+        channelList->addItem(item);
       } else {
         QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
         item->setData(Qt::UserRole, QVariant::fromValue(channel));
-        _list->addItem(item);
+        channelList->addItem(item);
       }
     }
   }
 
-  QPushButton *add = new QPushButton(tr("Add Channel"));
-  QPushButton *rem = new QPushButton(tr("Remove Channel"));
-  connect(add, SIGNAL(clicked()), this, SLOT(onAddChannel()));
-  connect(rem, SIGNAL(clicked()), this, SLOT(onRemChannel()));
-
-  QPushButton *up = new QPushButton(QIcon("://icons/up.png"),"");
-  up->setToolTip(tr("Up"));
-  QPushButton *down = new QPushButton(QIcon("://icons/down.png"), "");
-  down->setToolTip(tr("Down"));
-  connect(up, SIGNAL(clicked()), this, SLOT(onChannelUp()));
-  connect(down, SIGNAL(clicked()), this, SLOT(onChannelDown()));
-
-  QVBoxLayout *layout = new QVBoxLayout();
-
-  QHBoxLayout *nb = new QHBoxLayout();
-  nb->addWidget(label);
-  nb->addWidget(_name);
-  layout->addLayout(nb);
-
-  QVBoxLayout *ud = new QVBoxLayout();
-  ud->addWidget(up); ud->addWidget(down);
-  QHBoxLayout *lb = new QHBoxLayout();
-  lb->addWidget(_list, 1);
-  lb->addLayout(ud);
-  layout->addLayout(lb);
-
-  QHBoxLayout *bbox = new QHBoxLayout();
-  bbox->addWidget(add);
-  bbox->addWidget(rem);
-  layout->addLayout(bbox);
-
-  QDialogButtonBox *bb = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
-  connect(bb, SIGNAL(accepted()), this, SLOT(accept()));
-  connect(bb, SIGNAL(rejected()), this, SLOT(reject()));
-  layout->addWidget(bb);
-
-  setLayout(layout);
+  connect(addChannel, SIGNAL(clicked()), this, SLOT(onAddChannel()));
+  connect(remChannel, SIGNAL(clicked()), this, SLOT(onRemChannel()));
+  connect(channelUp, SIGNAL(clicked()), this, SLOT(onChannelUp()));
+  connect(channelDown, SIGNAL(clicked()), this, SLOT(onChannelDown()));
+  connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
 void
@@ -382,58 +382,58 @@ ScanListDialog::onAddChannel() {
   if (channel->is<AnalogChannel>()) {
     QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
     item->setData(Qt::UserRole, QVariant::fromValue(channel));
-    _list->addItem(item);
+    channelList->addItem(item);
   } else {
     QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
     item->setData(Qt::UserRole, QVariant::fromValue(channel));
-    _list->addItem(item);
+    channelList->addItem(item);
   }
 }
 
 void
 ScanListDialog::onRemChannel() {
-  if (0 == _list->selectedItems().size())
+  if (0 == channelList->selectedItems().size())
     return;
-  QListWidgetItem *item = _list->takeItem(_list->currentRow());
+  QListWidgetItem *item = channelList->takeItem(channelList->currentRow());
   delete item;
 }
 
 void
 ScanListDialog::onChannelUp() {
-  if (0 == _list->selectedItems().size())
+  if (0 == channelList->selectedItems().size())
     return;
-  int idx = _list->currentRow();
+  int idx = channelList->currentRow();
   if (0 == idx)
     return;
-  QListWidgetItem *item = _list->takeItem(idx);
-  _list->insertItem(idx-1, item);
-  _list->setCurrentRow(idx-1);
+  QListWidgetItem *item = channelList->takeItem(idx);
+  channelList->insertItem(idx-1, item);
+  channelList->setCurrentRow(idx-1);
 }
 
 void
 ScanListDialog::onChannelDown() {
-  if (0 == _list->selectedItems().size())
+  if (0 == channelList->selectedItems().size())
     return;
-  int idx = _list->currentRow();
-  if ((_list->count()-1) == idx)
+  int idx = channelList->currentRow();
+  if ((channelList->count()-1) == idx)
     return;
-  QListWidgetItem *item = _list->takeItem(idx);
-  _list->insertItem(idx+1, item);
-  _list->setCurrentRow(idx+1);
+  QListWidgetItem *item = channelList->takeItem(idx);
+  channelList->insertItem(idx+1, item);
+  channelList->setCurrentRow(idx+1);
 }
 
 ScanList *
 ScanListDialog::scanlist() {
   if (_scanlist) {
-    _scanlist->setName(_name->text().simplified());
+    _scanlist->setName(scanListName->text().simplified());
     _scanlist->clear();
-    for (int i=0; i<_list->count(); i++)
-      _scanlist->addChannel(_list->item(i)->data(Qt::UserRole).value<Channel*>());
+    for (int i=0; i<channelList->count(); i++)
+      _scanlist->addChannel(channelList->item(i)->data(Qt::UserRole).value<Channel*>());
     return _scanlist;
   }
-  ScanList *scanlist = new ScanList(_name->text(), this);
-  for (int i=0; i<_list->count(); i++)
-    scanlist->addChannel(_list->item(i)->data(Qt::UserRole).value<Channel *>());
+  ScanList *scanlist = new ScanList(scanListName->text(), this);
+  for (int i=0; i<channelList->count(); i++)
+    scanlist->addChannel(channelList->item(i)->data(Qt::UserRole).value<Channel *>());
   return scanlist;
 }
 
