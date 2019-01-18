@@ -47,12 +47,24 @@
     </property>
     <item>
      <widget class="QTabWidget" name="tabs">
+      <property name="accessibleName">
+       <string>Tablist</string>
+      </property>
+      <property name="accessibleDescription">
+       <string>There are 6 tabs providing genral settings, contact, Rx group, channel zone and scan lists.</string>
+      </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabGeneral">
+       <property name="accessibleName">
+        <string>General settings</string>
+       </property>
        <attribute name="title">
         <string>Genral Settings</string>
+       </attribute>
+       <attribute name="toolTip">
+        <string>This tab contains all general settings like name and RMD ID of the radio.</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_12">
         <item>
@@ -65,7 +77,17 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="dmrID"/>
+           <widget class="QLineEdit" name="dmrID">
+            <property name="toolTip">
+             <string>Enter your 7 digit DMR ID number.</string>
+            </property>
+            <property name="accessibleName">
+             <string>DMR ID</string>
+            </property>
+            <property name="accessibleDescription">
+             <string/>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="introLine1Label">
@@ -75,7 +97,14 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="introLine1"/>
+           <widget class="QLineEdit" name="introLine1">
+            <property name="toolTip">
+             <string>First greeting line (if supported by the radio).</string>
+            </property>
+            <property name="accessibleName">
+             <string>Intro line 1</string>
+            </property>
+           </widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="introLine2Label">
@@ -85,7 +114,14 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLineEdit" name="introLine2"/>
+           <widget class="QLineEdit" name="introLine2">
+            <property name="statusTip">
+             <string>Second greeting line (if supported by the radio).</string>
+            </property>
+            <property name="accessibleName">
+             <string>Intro line 2</string>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="nameLabel">
@@ -95,15 +131,28 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="radioName"/>
+           <widget class="QLineEdit" name="radioName">
+            <property name="toolTip">
+             <string>Enter your name or callsign.</string>
+            </property>
+            <property name="accessibleName">
+             <string>Name/Callsign</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tabContacts">
+       <property name="accessibleName">
+        <string>Contact list</string>
+       </property>
        <attribute name="title">
         <string>Contacts</string>
+       </attribute>
+       <attribute name="toolTip">
+        <string>This tab contains the contact list.</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_13">
         <item>
@@ -113,10 +162,13 @@
             <item>
              <widget class="QTableView" name="contactsView">
               <property name="accessibleName">
-               <string>contactsView</string>
+               <string>Contact list</string>
               </property>
               <property name="accessibleDescription">
-               <string>Lists all contacts.</string>
+               <string>Contact list</string>
+              </property>
+              <property name="tabKeyNavigation">
+               <bool>false</bool>
               </property>
               <property name="selectionMode">
                <enum>QAbstractItemView::SingleSelection</enum>
@@ -130,6 +182,12 @@
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
                <widget class="QPushButton" name="contactUp">
+                <property name="toolTip">
+                 <string>Moves the selected contact up in the list.</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Move contact up</string>
+                </property>
                 <property name="text">
                  <string/>
                 </property>
@@ -141,6 +199,12 @@
               </item>
               <item>
                <widget class="QPushButton" name="contactDown">
+                <property name="toolTip">
+                 <string>Moves the selected contact down in the list.</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Move contact down</string>
+                </property>
                 <property name="text">
                  <string/>
                 </property>
@@ -158,6 +222,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
              <widget class="QPushButton" name="addContact">
+              <property name="toolTip">
+               <string>Adds a contact to the list.</string>
+              </property>
+              <property name="accessibleName">
+               <string>Add contact button</string>
+              </property>
               <property name="text">
                <string>Add Contact</string>
               </property>
@@ -165,6 +235,9 @@
             </item>
             <item>
              <widget class="QPushButton" name="remContact">
+              <property name="accessibleName">
+               <string>Delete contact button</string>
+              </property>
               <property name="text">
                <string>Delete Contact</string>
               </property>
@@ -177,8 +250,14 @@
        </layout>
       </widget>
       <widget class="QWidget" name="tabRXGroups">
+       <property name="accessibleName">
+        <string>Rx group list</string>
+       </property>
        <attribute name="title">
-        <string>RX Groups</string>
+        <string>Rx Groups</string>
+       </attribute>
+       <attribute name="toolTip">
+        <string>This tab contains the Rx group lists.</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_14">
         <item>
@@ -243,8 +322,14 @@
        </layout>
       </widget>
       <widget class="QWidget" name="tabChannels">
+       <property name="accessibleName">
+        <string>Channel list</string>
+       </property>
        <attribute name="title">
         <string>Channels</string>
+       </attribute>
+       <attribute name="toolTip">
+        <string>This tab contains the channel list.</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_15">
         <item>
@@ -253,6 +338,9 @@
            <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,0">
             <item>
              <widget class="QTableView" name="channelView">
+              <property name="tabKeyNavigation">
+               <bool>false</bool>
+              </property>
               <property name="selectionMode">
                <enum>QAbstractItemView::SingleSelection</enum>
               </property>
@@ -319,8 +407,14 @@
        </layout>
       </widget>
       <widget class="QWidget" name="tabZones">
+       <property name="accessibleName">
+        <string>Zone list</string>
+       </property>
        <attribute name="title">
         <string>Zones</string>
+       </attribute>
+       <attribute name="toolTip">
+        <string>This tab contains the zone list.</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_16">
         <item>
@@ -385,8 +479,14 @@
        </layout>
       </widget>
       <widget class="QWidget" name="tabScanLists">
+       <property name="accessibleName">
+        <string>Scan list</string>
+       </property>
        <attribute name="title">
         <string>Scan Lists</string>
+       </attribute>
+       <attribute name="toolTip">
+        <string>This tab contains the scan lists.</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_17">
         <item>
@@ -562,7 +662,7 @@
     <string>Open ...</string>
    </property>
    <property name="toolTip">
-    <string>Imports a codeplug from CSV files.</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Imports a codeplug from &amp;quot;conf&amp;quot; files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -577,7 +677,7 @@
     <string>Save ...</string>
    </property>
    <property name="toolTip">
-    <string>Saves the codeplug in a CSV file.</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Saves the codeplug in a &amp;quot;conf&amp;quot; file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -618,7 +718,7 @@
     <string>Verify</string>
    </property>
    <property name="toolTip">
-    <string>Verifies the codeplug with the connected radio.</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verifies the current codeplug with connected radios.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
@@ -633,7 +733,7 @@
     <string>Download</string>
    </property>
    <property name="toolTip">
-    <string>Downloads a codeplug from the connected device.</string>
+    <string>Downloads a codeplug from connected radios.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
@@ -648,7 +748,7 @@
     <string>Upload</string>
    </property>
    <property name="toolTip">
-    <string>Uploads the codeplug to the connected device.</string>
+    <string>Uploads the codeplug to the connected radio.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+U</string>
@@ -672,13 +772,47 @@
     <string>Help</string>
    </property>
    <property name="toolTip">
-    <string>Opens the handbook.</string>
+    <string>Read the handbook.</string>
    </property>
    <property name="shortcut">
     <string>F1</string>
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>tabs</tabstop>
+  <tabstop>dmrID</tabstop>
+  <tabstop>radioName</tabstop>
+  <tabstop>introLine1</tabstop>
+  <tabstop>introLine2</tabstop>
+  <tabstop>contactsView</tabstop>
+  <tabstop>contactsView</tabstop>
+  <tabstop>addContact</tabstop>
+  <tabstop>remContact</tabstop>
+  <tabstop>contactUp</tabstop>
+  <tabstop>contactDown</tabstop>
+  <tabstop>groupListView</tabstop>
+  <tabstop>addRXGroup</tabstop>
+  <tabstop>remRXGroup</tabstop>
+  <tabstop>rxGroupUp</tabstop>
+  <tabstop>rxGroupDown</tabstop>
+  <tabstop>channelView</tabstop>
+  <tabstop>addAnalogChannel</tabstop>
+  <tabstop>addDigitalChannel</tabstop>
+  <tabstop>remChannel</tabstop>
+  <tabstop>channelUp</tabstop>
+  <tabstop>channelDown</tabstop>
+  <tabstop>zoneView</tabstop>
+  <tabstop>addZone</tabstop>
+  <tabstop>remZone</tabstop>
+  <tabstop>zoneUp</tabstop>
+  <tabstop>zoneDown</tabstop>
+  <tabstop>scanListView</tabstop>
+  <tabstop>addScanList</tabstop>
+  <tabstop>remScanList</tabstop>
+  <tabstop>scanListDown</tabstop>
+  <tabstop>scanListUp</tabstop>
+ </tabstops>
  <resources>
   <include location="resources.qrc"/>
  </resources>

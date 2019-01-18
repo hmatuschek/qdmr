@@ -1,6 +1,7 @@
 #include "application.hh"
 #include <QMainWindow>
 #include <QtUiTools>
+#include <QDesktopServices>
 #include "radio.hh"
 
 
@@ -420,7 +421,7 @@ Application::showAbout() {
 
 void
 Application::showHelp() {
-
+  QDesktopServices::openUrl(QUrl("https://github.com/hmatuschek/qdmr/wiki"));
 }
 
 
