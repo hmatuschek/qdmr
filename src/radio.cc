@@ -13,26 +13,128 @@ Radio::Radio(QObject *parent)
 
 
 bool
-Radio::verifyConfig(Config *config, QStringList &issues)
+Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
 {
+  // Check general config
   if (config->name().size() > features().maxNameLength)
-    issues.append(tr("Radio name of length %1 exceeds limit of %2 characters.")
-                  .arg(config->name().size()).arg(features().maxNameLength));
+    issues.append(VerifyIssue(
+                    VerifyIssue::WARNING,
+                    tr("Radio name of length %1 exceeds limit of %2 characters.")
+                    .arg(config->name().size()).arg(features().maxNameLength)));
   if (config->introLine1().size() > features().maxIntroLineLength)
-    issues.append(tr("Intro line 1 of length %1 exceeds limit of %2 characters.")
-                  .arg(config->introLine1().size()).arg(features().maxNameLength));
+    issues.append(VerifyIssue(
+                    VerifyIssue::WARNING,
+                    tr("Intro line 1 of length %1 exceeds limit of %2 characters.")
+                    .arg(config->introLine1().size()).arg(features().maxNameLength)));
   if (config->introLine2().size() > features().maxIntroLineLength)
-    issues.append(tr("Intro line 2 of length %1 exceeds limit of %2 characters.")
-                  .arg(config->introLine2().size()).arg(features().maxNameLength));
+    issues.append(VerifyIssue(
+                    VerifyIssue::WARNING,
+                    tr("Intro line 2 of length %1 exceeds limit of %2 characters.")
+                    .arg(config->introLine2().size()).arg(features().maxNameLength)));
 
+  // Check contact list
   if (config->contacts()->count() > features().maxContacts)
-    issues.append(tr("Number of contacts %1 exceeds limit of %2.")
-                  .arg(config->contacts()->count()).arg(features().maxContacts));
+    issues.append(VerifyIssue(
+                    VerifyIssue::ERROR,
+                    tr("Number of contacts %1 exceeds limit of %2.")
+                    .arg(config->contacts()->count()).arg(features().maxContacts)));
   for (int i=0; i<config->contacts()->count(); i++) {
     Contact *contact = config->contacts()->contact(i);
     if (contact->name().size() > features().maxContactNameLength)
-      issues.append(tr("Length of name of contact '%1' %2 exceeds limit of %3 characters.")
-                    .arg(contact->name()).arg(contact->name().size()).arg(features().maxContactNameLength));
+      issues.append(VerifyIssue(
+                      VerifyIssue::WARNING,
+                      tr("Contact name '%1' length %2 exceeds limit of %3 characters.")
+                      .arg(contact->name()).arg(contact->name().size()).arg(features().maxContactNameLength)));
+    if (contact->is<DigitalContact>() && (! features().hasDigital))
+      issues.append(VerifyIssue(
+                      VerifyIssue::ERROR,
+                      tr("Radio does not support digital contact '%1'")
+                      .arg(contact->name())));
+    if (contact->is<DTMFContact>() && (! features().hasAnalog))
+      issues.append(VerifyIssue(
+                      VerifyIssue::ERROR,
+                      tr("Radio does not support DTMF contact '%1'")
+                      .arg(contact->name())));
+  }
+
+  // Check RX group lists.
+  if (config->rxGroupLists()->count() > features().maxGrouplists)
+    issues.append(VerifyIssue(
+                    VerifyIssue::ERROR,
+                    tr("Number of Rx group lists %1 exceeds limit of %2")
+                    .arg(config->rxGroupLists()->count()).arg(features().maxGrouplists)));
+  for (int i=0; i<config->rxGroupLists()->count(); i++) {
+    RXGroupList *list = config->rxGroupLists()->list(i);
+    if (list->name().size() > features().maxGrouplistNameLength)
+      issues.append(VerifyIssue(
+                      VerifyIssue::WARNING,
+                      tr("Group list name '%1' of length %2 exceeds limit of %2 characters.")
+                      .arg(list->name()).arg(list->name().size()).arg(features().maxGrouplistNameLength)));
+    if (list->count() > features().maxContactsInGrouplist)
+      issues.append(VerifyIssue(
+                      VerifyIssue::ERROR,
+                      tr("Number of contacts (%2) in group list '%1' exceeds limit %3.")
+                      .arg(list->name()).arg(list->count()).arg(features().maxContactsInGrouplist)));
+  }
+
+  // Check channel list
+  if (config->channelList()->count() > features().maxChannels)
+      issues.append(VerifyIssue(
+                      VerifyIssue::ERROR,
+                      tr("Number of channels %1 exceeds limit %2.")
+                      .arg(config->channelList()->count()).arg(features().maxChannels)));
+  for (int i=0; i<config->channelList()->count(); i++) {
+    Channel *channel = config->channelList()->channel(i);
+    if (channel->name().size() > features().maxChannelNameLength)
+      issues.append(VerifyIssue(
+                      VerifyIssue::WARNING,
+                      tr("Channel name '%1' length %2 exceeds limit of %3 characters.")
+                      .arg(channel->name()).arg(channel->name().length()).arg(features().maxChannelNameLength)));
+    if (channel->is<DigitalChannel>() && (! features().hasDigital))
+      issues.append(VerifyIssue(
+                      VerifyIssue::ERROR,
+                      tr("Radio does not support digital channel'%1'")
+                      .arg(channel->name())));
+    if (channel->is<AnalogChannel>() && (! features().hasAnalog))
+      issues.append(VerifyIssue(
+                      VerifyIssue::ERROR,
+                      tr("Radio does not support analog channel'%1'")
+                      .arg(channel->name())));
+  }
+
+  // Check zone list
+  if (config->zones()->count() > features().maxZones)
+    issues.append(VerifyIssue(
+                    VerifyIssue::ERROR,
+                    tr("Number of zones %1 exceeds limit %2")
+                    .arg(config->zones()->count()).arg(features().maxZones)));
+  for (int i=0; i<config->zones()->count(); i++) {
+    Zone *zone = config->zones()->zone(i);
+    if (zone->name().size()>features().maxZoneNameLength)
+      issues.append(VerifyIssue(
+                      VerifyIssue::WARNING,
+                      tr("Zone name '%1' length %2 exceeds limit of %3 characters.")
+                      .arg(zone->name()).arg(zone->name().size()).arg(features().maxZoneNameLength)));
+    if (zone->count() > features().maxChannelsInZone)
+      issues.append(VerifyIssue(
+                      VerifyIssue::ERROR,
+                      tr("Number of channels %2 in zone '%1' exceeds limit %3.")
+                      .arg(zone->name()).arg(zone->count()).arg(features().maxChannelsInZone)));
+  }
+
+  // Check scan lists
+  if (config->scanlists()->count() > features().maxScanlists)
+    issues.append(VerifyIssue(
+                    VerifyIssue::ERROR,
+                    tr("Number of scanlists %1 exceeds limit %2")
+                    .arg(config->scanlists()->count()).arg(features().maxScanlists)));
+  for (int i=0; i<config->scanlists()->count(); i++) {
+    ScanList *list = config->scanlists()->scanlist(i);
+    if (list->name().size() > features().maxScanlistNameLength)
+      issues.append(VerifyIssue(
+                      VerifyIssue::WARNING,
+                      tr("Scan list name '%1' length %2 exceeds limit of %3 characters.")
+                      .arg(list->name()).arg(list->name().size()).arg(features().maxScanlistNameLength)));
   }
 
   return 0 == issues.size();

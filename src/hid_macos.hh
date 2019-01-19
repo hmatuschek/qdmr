@@ -25,6 +25,8 @@ protected:
 	static void callback_close(void *ontext, IOReturn result, void *sender, IOHIDDeviceRef deviceRef);
 
 protected:
+  /** Device manager. */
+  IOHIDManagerRef _HIDManager;
 	/** Device handle. */
 	volatile IOHIDDeviceRef _dev;
 	/** Device buffer. */

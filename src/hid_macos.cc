@@ -10,8 +10,8 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
   : QObject(parent), _dev(nullptr)
 {
   // Create the USB HID Manager.
-  IOHIDManagerRef HIDManager = IOHIDManagerCreate(kCFAllocatorDefault,
-                                                  kIOHIDOptionsTypeNone);
+  _HIDManager = IOHIDManagerCreate(kCFAllocatorDefault,
+                                   kIOHIDOptionsTypeNone);
 
   // Create an empty matching dictionary for filtering USB devices in our HID manager.
   CFMutableDictionaryRef matchDict = CFDictionaryCreateMutable(
@@ -22,18 +22,18 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
   CFDictionarySetValue(matchDict, CFSTR(kIOHIDProductIDKey), CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &pid));
 
   // Apply the matching to our HID manager.
-  IOHIDManagerSetDeviceMatching(HIDManager, matchDict);
+  IOHIDManagerSetDeviceMatching(_HIDManager, matchDict);
   CFRelease(matchDict);
 
   // The HID manager will use callbacks when specified USB devices are connected/disconnected.
-  IOHIDManagerRegisterDeviceMatchingCallback(HIDManager, &callback_open, this);
-  IOHIDManagerRegisterDeviceRemovalCallback(HIDManager, &callback_close, this);
+  IOHIDManagerRegisterDeviceMatchingCallback(_HIDManager, &callback_open, this);
+  IOHIDManagerRegisterDeviceRemovalCallback(_HIDManager, &callback_close, this);
 
   // Add the HID manager to the main run loop
-  IOHIDManagerScheduleWithRunLoop(HIDManager, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
+  IOHIDManagerScheduleWithRunLoop(_HIDManager, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
 
   // Open the HID mangager
-  IOReturn IOReturn = IOHIDManagerOpen(HIDManager, kIOHIDOptionsTypeNone);
+  IOReturn IOReturn = IOHIDManagerOpen(_HIDManager, kIOHIDOptionsTypeNone);
   if (IOReturn != kIOReturnSuccess) {
     fprintf(stderr, "Cannot find USB device %04x:%04x\n", vid, pid);
     return;
@@ -57,6 +57,10 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
 HIDevice::~HIDevice() {
   if (_dev)
     close();
+  if (_HIDManager) {
+    IOHIDManagerClose(_HIDManager, kIOHIDOptionsTypeNone);
+    IOHIDManagerUnscheduleFromRunLoop(_HIDManager, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
+  }
 }
 bool
 HIDevice::isOpen() const {

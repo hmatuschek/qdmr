@@ -289,10 +289,10 @@ Application::verifyCodeplug(Radio *radio) {
     return false;
   }
 
-  QStringList issues;
+  QList<VerifyIssue> issues;
   if (! myRadio->verifyConfig(_config, issues)) {
-    QMessageBox::information(0, tr("Codeplug verification."),
-                             tr("Codeplug does not match device features!"));
+    VerifyDialog dialog(issues);
+    dialog.exec();
   }
 
   if (nullptr == radio)

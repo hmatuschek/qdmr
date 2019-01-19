@@ -2,6 +2,7 @@
 #define RADIO_HH
 
 #include <QThread>
+#include "verifydialog.hh"
 
 class Config;
 
@@ -43,7 +44,7 @@ public:
 	virtual const QString &name() const = 0;
 	virtual const Features &features() const = 0;
 
-	bool verifyConfig(Config *config, QStringList &issues);
+	bool verifyConfig(Config *config, QList<VerifyIssue> &issues);
 
 public:
 	static Radio *detect();
