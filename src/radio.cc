@@ -39,17 +39,24 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                     tr("Number of contacts %1 exceeds limit of %2.")
                     .arg(config->contacts()->count()).arg(features().maxContacts)));
   for (int i=0; i<config->contacts()->count(); i++) {
+    QSet<QString> names;
     Contact *contact = config->contacts()->contact(i);
+    if (names.contains(contact->name()))
+      issues.append(VerifyIssue(VerifyIssue::ERROR,tr("Duplicate contact name '%1'.").arg(contact->name())));
+    names.insert(contact->name());
+
     if (contact->name().size() > features().maxContactNameLength)
       issues.append(VerifyIssue(
                       VerifyIssue::WARNING,
                       tr("Contact name '%1' length %2 exceeds limit of %3 characters.")
                       .arg(contact->name()).arg(contact->name().size()).arg(features().maxContactNameLength)));
+
     if (contact->is<DigitalContact>() && (! features().hasDigital))
       issues.append(VerifyIssue(
                       VerifyIssue::ERROR,
                       tr("Radio does not support digital contact '%1'")
                       .arg(contact->name())));
+
     if (contact->is<DTMFContact>() && (! features().hasAnalog))
       issues.append(VerifyIssue(
                       VerifyIssue::ERROR,
@@ -64,7 +71,11 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                     tr("Number of Rx group lists %1 exceeds limit of %2")
                     .arg(config->rxGroupLists()->count()).arg(features().maxGrouplists)));
   for (int i=0; i<config->rxGroupLists()->count(); i++) {
+    QSet<QString> names;
     RXGroupList *list = config->rxGroupLists()->list(i);
+    if (names.contains(list->name()))
+      issues.append(VerifyIssue(VerifyIssue::ERROR,tr("Duplicate Rx group list name '%1'.").arg(list->name())));
+    names.insert(list->name());
     if (list->name().size() > features().maxGrouplistNameLength)
       issues.append(VerifyIssue(
                       VerifyIssue::WARNING,
@@ -84,7 +95,11 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                       tr("Number of channels %1 exceeds limit %2.")
                       .arg(config->channelList()->count()).arg(features().maxChannels)));
   for (int i=0; i<config->channelList()->count(); i++) {
+    QSet<QString> names;
     Channel *channel = config->channelList()->channel(i);
+    if (names.contains(channel->name()))
+      issues.append(VerifyIssue(VerifyIssue::ERROR,tr("Duplicate channel name '%1'.").arg(channel->name())));
+    names.insert(channel->name());
     if (channel->name().size() > features().maxChannelNameLength)
       issues.append(VerifyIssue(
                       VerifyIssue::WARNING,
@@ -109,7 +124,11 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                     tr("Number of zones %1 exceeds limit %2")
                     .arg(config->zones()->count()).arg(features().maxZones)));
   for (int i=0; i<config->zones()->count(); i++) {
+    QSet<QString> names;
     Zone *zone = config->zones()->zone(i);
+    if (names.contains(zone->name()))
+      issues.append(VerifyIssue(VerifyIssue::ERROR,tr("Duplicate zone name '%1'.").arg(zone->name())));
+    names.insert(zone->name());
     if (zone->name().size()>features().maxZoneNameLength)
       issues.append(VerifyIssue(
                       VerifyIssue::WARNING,
@@ -129,7 +148,11 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                     tr("Number of scanlists %1 exceeds limit %2")
                     .arg(config->scanlists()->count()).arg(features().maxScanlists)));
   for (int i=0; i<config->scanlists()->count(); i++) {
+    QSet<QString> names;
     ScanList *list = config->scanlists()->scanlist(i);
+    if (names.contains(list->name()))
+      issues.append(VerifyIssue(VerifyIssue::ERROR,tr("Duplicate scan list name '%1'.").arg(list->name())));
+    names.insert(list->name());
     if (list->name().size() > features().maxScanlistNameLength)
       issues.append(VerifyIssue(
                       VerifyIssue::WARNING,

@@ -268,18 +268,27 @@ RD5RCodePlug::encode(Config *config)
   memcpy(&_radio_mem[0], "BF-5R", 5);
 
   // Pack channels
-  for (int i=0; i<config->channelList()->count(); i++) {
-    _pack_channel(config, i, config->channelList()->channel(i));
+  for (int i=0; i<NCHAN; i++) {
+    if (i<config->channelList()->count())
+      _pack_channel(config, i, config->channelList()->channel(i));
+    else
+      _pack_channel(config, i, nullptr);
   }
 
   // Pack Zones
-  for (int i=0; i<config->zones()->count(); i++) {
-    _pack_zone(config, i, config->zones()->zone(i));
+  for (int i=0; i<NZONES; i++) {
+    if (i < config->zones()->count())
+      _pack_zone(config, i, config->zones()->zone(i));
+    else
+      _pack_zone(config, i, nullptr);
   }
 
   // Pack Scanlists
-  for (int i=0; i<config->scanlists()->count(); i++) {
-    _pack_scanlist(config, i, config->scanlists()->scanlist(i));
+  for (int i=0; i<NSCANL; i++) {
+    if (i < config->scanlists()->count())
+      _pack_scanlist(config, i, config->scanlists()->scanlist(i));
+    else
+      _pack_scanlist(config, i, nullptr);
   }
 
   // Pack contacts
@@ -394,6 +403,12 @@ RD5RCodePlug::_pack_channel(Config *config, int i, Channel *channel) {
   bank_t *b = _unpack_get_bank(i >> 7);
   channel_t *ch = &b->chan[i % 128];
 
+  if (nullptr == channel) {
+    // Disable channel
+    b->bitmap[i % 128 / 8] &= ~(1 << (i & 7));
+    return true;
+  }
+
   if (channel->is<DigitalChannel>()) {
     DigitalChannel *digi   = channel->as<DigitalChannel>();
     ch->channel_mode       = MODE_DIGITAL;
@@ -453,14 +468,23 @@ RD5RCodePlug::_pack_zone(Config *config, int i, Zone *zone) {
   zonetab_t *zt = GET_ZONETAB();
   zone_t *z = &zt->zone[i];
 
+  if (nullptr == zone) {
+    // Clear valid bit.
+    zt->bitmap[i / 8] &= ~(1 << (i & 7));
+    return true;
+  }
+
   memset(z->name, 0xff, sizeof (z->name));
   memcpy(z->name, zone->name().toLocal8Bit().constData(), std::min(int(sizeof(z->name)), zone->name().size()));
   memset(z->member, 0, sizeof(z->member));
 
   // Set valid bit.
   zt->bitmap[i / 8] |= 1 << (i & 7);
-  for (int i=0; i<std::min(16,zone->count()); i++) {
-    z->member[i] = config->channelList()->indexOf(zone->channel(i))+1;
+  for (int i=0; i<16; i++) {
+    if (i < zone->count())
+      z->member[i] = config->channelList()->indexOf(zone->channel(i))+1;
+    else
+      z->member[i] = 0;
   }
 
   return true;
@@ -470,6 +494,12 @@ bool
 RD5RCodePlug::_pack_scanlist(Config *config, int i, ScanList *list) {
   scantab_t *st = GET_SCANTAB();
   scanlist_t *sl = &st->scanlist[i];
+
+  if (nullptr == list) {
+    // Clear valid bit.
+    st->valid[i] = 0;
+    return true;
+  }
 
   memset(sl, 0, sizeof(scanlist_t));
 
@@ -488,13 +518,16 @@ RD5RCodePlug::_pack_scanlist(Config *config, int i, ScanList *list) {
   // Set valid bit.
   st->valid[i] = 1;
 
-  // First element is always Selected.
+  // First element is always selected channel.
   if (sl->member[0] == 0)
     sl->member[0] = CHAN_SELECTED;
 
-  for (i=1; i<std::min(32,list->count()); i++)
-    sl->member[i] = config->channelList()->indexOf(list->channel(i))+2;
-
+  for (i=1; i<32; i++) {
+    if (i < list->count())
+      sl->member[i] = config->channelList()->indexOf(list->channel(i))+2;
+    else
+      sl->member[i] = 0;
+  }
   return true;
 }
 

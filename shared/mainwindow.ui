@@ -54,7 +54,7 @@
        <string>There are 6 tabs providing genral settings, contact, Rx group, channel zone and scan lists.</string>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabGeneral">
        <property name="accessibleName">

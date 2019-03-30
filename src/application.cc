@@ -3,6 +3,7 @@
 #include <QtUiTools>
 #include <QDesktopServices>
 #include "radio.hh"
+#include "config.h"
 
 
 Application::Application(int &argc, char *argv[])
@@ -293,6 +294,9 @@ Application::verifyCodeplug(Radio *radio) {
   if (! myRadio->verifyConfig(_config, issues)) {
     VerifyDialog dialog(issues);
     dialog.exec();
+  } else {
+    QMessageBox::information(0, tr("Verification success"),
+                             tr("The codeplug was successfully verified with the radio '%1'").arg(myRadio->name()));
   }
 
   if (nullptr == radio)
@@ -413,6 +417,9 @@ Application::showAbout() {
   QFile uiFile("://ui/aboutdialog.ui");
   uiFile.open(QIODevice::ReadOnly);
   QDialog *dialog = qobject_cast<QDialog *>(loader.load(&uiFile));
+  QTextEdit *text = dialog->findChild<QTextEdit *>("textEdit");
+  text->setHtml(text->toHtml().arg(VERSION_STRING));
+
   if (dialog) {
     dialog->exec();
     dialog->deleteLater();
