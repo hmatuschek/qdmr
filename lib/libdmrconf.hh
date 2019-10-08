@@ -1,0 +1,4 @@
+#ifndef LIBDMRCONF_HH
+#define LIBDMRCONF_HH
+
+#endif // LIBDMRCONF_HH
