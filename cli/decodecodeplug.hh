@@ -1,11 +1,9 @@
 #ifndef DECODECODEPLUG_HH
 #define DECODECODEPLUG_HH
 
+class QCoreApplication;
+class QCommandLineParser;
 
-class decodecodeplug
-{
-public:
-  decodecodeplug();
-};
+int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app);
 
 #endif // DECODECODEPLUG_HH

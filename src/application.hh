@@ -19,8 +19,9 @@ public:
   virtual ~Application();
 
   QMainWindow *mainWindow();
-  const RepeaterDatabase &repeater() const;
-
+  RepeaterDatabase *repeater() const;
+  bool hasPosition() const;
+  QGeoCoordinate position() const;
 
 public slots:
   void newCodeplug();
@@ -35,6 +36,7 @@ public slots:
   void downloadCodeplug();
   void uploadCodeplug();
 
+  void showSettings();
   void showAbout();
   void showHelp();
 
@@ -84,10 +86,14 @@ private slots:
   void onScanListDown();
   void onEditScanList(const QModelIndex &index);
 
+  void positionUpdated(const QGeoPositionInfo &info);
+
 protected:
   Config *_config;
   QMainWindow *_mainWindow;
   RepeaterDatabase *_repeater;
+  QGeoPositionInfoSource *_source;
+  QGeoCoordinate _currentPosition;
 };
 
 #endif // APPLICATION_HH

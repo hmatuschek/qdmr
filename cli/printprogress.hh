@@ -2,10 +2,6 @@
 #define PRINTPROGRESS_HH
 
 
-class printprogress
-{
-public:
-  printprogress();
-};
+void print_progress(int prog);
 
 #endif // PRINTPROGRESS_HH

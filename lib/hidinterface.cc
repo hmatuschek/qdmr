@@ -17,7 +17,7 @@ static const unsigned char CMD_CWB1[]  = "CWB\4\0\1\0\0";
 static unsigned offset = 0;                 // CWD offset
 
 HID::HID(int vid, int pid, QObject *parent)
-  : HIDevice(vid, pid, parent)
+  : HIDevice(vid, pid, parent), _errorMessage()
 {
   // pass...
 }
@@ -33,22 +33,26 @@ HID::identify() {
   static unsigned char reply[38];
   unsigned char ack;
 
-  if ((!hid_send_recv(CMD_PRG, 7, &ack, 1)) || (ack != CMD_ACK[0])) {
-    fprintf(stderr, "%s: Wrong PRD acknowledge %#x, expected %#x\n",
-            __func__, ack, CMD_ACK[0]);
-    return "";
+  if (! hid_send_recv(CMD_PRG, 7, &ack, 1))
+    return QString();
+
+  if (ack != CMD_ACK[0]) {
+    _errorMessage = tr("%1: Wrong PRD acknowledge %2, expected %3.")
+        .arg(__func__).arg(ack,0,10).arg(CMD_ACK[0], 0, 16);
+    return QString();
   }
 
   if (! hid_send_recv(CMD_PRG2, 2, reply, 16))
-    return "";
+    return QString();
+
 
   if (! hid_send_recv(CMD_ACK, 1, &ack, 1))
-    return "";
+    return QString();
 
   if (ack != CMD_ACK[0]) {
-    fprintf(stderr, "%s: Wrong PRG2 acknowledge %#x, expected %#x\n",
-            __func__, ack, CMD_ACK[0]);
-    return "";
+    _errorMessage = tr("%1: Wrong PRG2 acknowledge %2, expected %3.")
+        .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
+    return QString();
   }
 
   // Reply:
@@ -62,6 +66,7 @@ HID::identify() {
   return (char*)reply;
 }
 
+
 bool
 HID::readBlock(int bno, unsigned char *data, int nbytes)
 {
@@ -69,22 +74,28 @@ HID::readBlock(int bno, unsigned char *data, int nbytes)
   unsigned char ack, cmd[4], reply[32+4];
   int n;
 
-  if (addr < 0x10000 && offset != 0) {
+  // select memory bank according to address
+  if ((addr < 0x10000) && (offset != 0)) {
     offset = 0;
-    if ((! hid_send_recv(CMD_CWB0, 8, &ack, 1)) || (ack != CMD_ACK[0])) {
-      fprintf(stderr, "%s: Wrong acknowledge %#x, expected %#x\n",
-              __func__, ack, CMD_ACK[0]);
+    if (! hid_send_recv(CMD_CWB0, 8, &ack, 1))
+      return false;
+    if (ack != CMD_ACK[0]) {
+      _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
+          .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
       return false;
     }
-  } else if (addr >= 0x10000 && offset == 0) {
+  } else if ((addr >= 0x10000) && (0 == offset)) {
     offset = 0x00010000;
-    if ((!hid_send_recv(CMD_CWB1, 8, &ack, 1)) || (ack != CMD_ACK[0])) {
-      fprintf(stderr, "%s: Wrong acknowledge %#x, expected %#x\n",
-              __func__, ack, CMD_ACK[0]);
+    if (! hid_send_recv(CMD_CWB1, 8, &ack, 1))
+      return false;
+    if (ack != CMD_ACK[0]) {
+      _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
+          .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
       return false;
     }
   }
 
+  // send data
   for (n=0; n<nbytes; n+=32) {
     cmd[0] = CMD_READ[0];
     cmd[1] = (addr + n) >> 8;
@@ -104,9 +115,11 @@ HID::readFinish()
 {
   unsigned char ack;
 
-  if ((!hid_send_recv(CMD_ENDR, 4, &ack, 1)) || (ack != CMD_ACK[0])) {
-    fprintf(stderr, "%s: Wrong acknowledge %#x, expected %#x\n",
-            __func__, ack, CMD_ACK[0]);
+  if (! hid_send_recv(CMD_ENDR, 4, &ack, 1))
+    return false;
+  if (ack != CMD_ACK[0]) {
+    _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
+        .arg(__func__).arg(ack).arg(CMD_ACK[0]);
     return false;
   }
 
@@ -119,31 +132,39 @@ HID::writeBlock(int bno, unsigned char *data, int nbytes)
   unsigned addr = bno * nbytes;
   unsigned char ack, cmd[4+32];
 
+  // Select memory bank according to address
   if (addr < 0x10000 && offset != 0) {
     offset = 0;
-    if ((!hid_send_recv(CMD_CWB0, 8, &ack, 1)) || (ack != CMD_ACK[0])) {
-      fprintf(stderr, "%s: Wrong acknowledge %#x, expected %#x\n",
-              __func__, ack, CMD_ACK[0]);
+    if (! hid_send_recv(CMD_CWB0, 8, &ack, 1))
+      return false;
+    if (ack != CMD_ACK[0]) {
+      _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
+          .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
       return false;
     }
   } else if (addr >= 0x10000 && offset == 0) {
     offset = 0x00010000;
-    if ((!hid_send_recv(CMD_CWB1, 8, &ack, 1)) || (ack != CMD_ACK[0])) {
-      fprintf(stderr, "%s: Wrong acknowledge %#x, expected %#x\n",
-              __func__, ack, CMD_ACK[0]);
+    if (! hid_send_recv(CMD_CWB1, 8, &ack, 1))
+      return false;
+    if (ack != CMD_ACK[0]) {
+      _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
+          .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
       return false;
     }
   }
 
+  // send data
   for (int n=0; n<nbytes; n+=32) {
     cmd[0] = CMD_WRITE[0];
     cmd[1] = (addr + n) >> 8;
     cmd[2] = addr + n;
     cmd[3] = 32;
     memcpy(cmd + 4, data + n, 32);
-    if ((!hid_send_recv(cmd, 4+32, &ack, 1)) || (ack != CMD_ACK[0])) {
-      fprintf(stderr, "%s: Wrong acknowledge %#x, expected %#x\n",
-              __func__, ack, CMD_ACK[0]);
+    if (! hid_send_recv(cmd, 4+32, &ack, 1))
+      n -= 32;
+    else if (ack != CMD_ACK[0]) {
+      _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
+          .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
       n-=32;
     }
   }
@@ -156,9 +177,12 @@ HID::writeFinish()
 {
   unsigned char ack;
 
-  if ((!hid_send_recv(CMD_ENDW, 4, &ack, 1)) || (ack != CMD_ACK[0])) {
-    fprintf(stderr, "%s: Wrong acknowledge %#x, expected %#x\n",
-            __func__, ack, CMD_ACK[0]);
+  if (! hid_send_recv(CMD_ENDW, 4, &ack, 1))
+    return false;
+
+  if (ack != CMD_ACK[0]) {
+    _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
+        .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
     return false;
   }
 

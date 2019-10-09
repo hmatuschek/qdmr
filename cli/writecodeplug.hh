@@ -1,11 +1,9 @@
 #ifndef WRITECODEPLUG_HH
 #define WRITECODEPLUG_HH
 
+class QCoreApplication;
+class QCommandLineParser;
 
-class writecodeplug
-{
-public:
-  writecodeplug();
-};
+int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app);
 
 #endif // WRITECODEPLUG_HH

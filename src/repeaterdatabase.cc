@@ -5,11 +5,27 @@
 #include <QFile>
 #include <QDir>
 #include <QNetworkReply>
-
+#include "application.hh"
 #include "settings.hh"
 
+class DistanceIsLess
+{
+public:
+  inline DistanceIsLess(const QGeoCoordinate &qth): _qth(qth) { }
+
+  inline bool operator()(const QJsonObject &a, const QJsonObject &b) {
+    QGeoCoordinate al(a.value("lat").toDouble(), a.value("lon").toDouble());
+    QGeoCoordinate bl(b.value("lat").toDouble(), b.value("lon").toDouble());
+    return _qth.distanceTo(al) < _qth.distanceTo(bl);
+  }
+
+private:
+  QGeoCoordinate  _qth;
+};
+
+
 RepeaterDatabase::RepeaterDatabase(QObject *parent)
-  : QObject(parent), _repeater(), _callsigns(), _network()
+  : QAbstractTableModel(parent), _repeater(), _callsigns(), _network()
 {
   connect(&_network, SIGNAL(finished(QNetworkReply*)),
           this, SLOT(downloadFinished(QNetworkReply*)));
@@ -24,6 +40,11 @@ RepeaterDatabase::load() {
   return load(path+"/repeater.json");
 }
 
+const QJsonObject &
+RepeaterDatabase::repeater(int idx) const {
+  return _repeater[idx];
+}
+
 bool
 RepeaterDatabase::load(const QString &filename) {
   QFile file(filename);
@@ -35,30 +56,41 @@ RepeaterDatabase::load(const QString &filename) {
   file.close();
 
   QJsonDocument doc = QJsonDocument::fromJson(data);
-  if (! doc.isObject())
+  if (! doc.isObject()) {
+    qDebug() << __FILE__ << __func__ << "Failed to load repeater DB: JSON document is not an object!";
     return false;
-  if (! doc.object().contains("repeaters"))
+  }
+  if (! doc.object().contains("relais")) {
+    qDebug() << __FILE__ << __func__ << "Failed to load repeater DB: JSON object does not contain 'relais' item.";
     return false;
-  if (! doc.object()["repeaters"].isArray())
+  }
+  if (! doc.object()["relais"].isArray()) {
+    qDebug() << __FILE__ << __func__ << "Failed to load repeater DB: 'relais' item is not an array.";
     return false;
+  }
 
+  beginResetModel();
   _repeater.clear();
   _callsigns.clear();
 
-  QJsonArray array = doc.object()["repeaters"].toArray();
+  QJsonArray array = doc.object()["relais"].toArray();
   _repeater.reserve(array.size());
   for (int i=0; i<array.size(); i++) {
     QJsonObject repeater = array.at(i).toObject();
     _repeater.append(repeater);
     _callsigns[repeater["callsign"].toString()] = i;
   }
-  qDebug() << "Loaded repeater list with" << _repeater.size() << "entries.";
+  QGeoCoordinate qth = Settings().position();
+  if (qth.isValid()) {
+    qStableSort(_repeater.begin(), _repeater.end(), DistanceIsLess(qth));
+  }
+  endResetModel();
   return true;
 }
 
 void
 RepeaterDatabase::download() {
-  QUrl url("https://ham-digital.org/status/rptrs.json");
+  QUrl url("https://repeatermap.de/api.php");
   QNetworkRequest request(url);
   _network.get(request);
 }
@@ -88,8 +120,90 @@ RepeaterDatabase::downloadFinished(QNetworkReply *reply) {
 
   load();
 
-  qDebug() << "Updated repeater list with" << _repeater.size() << "entries.";
   Settings().repeaterUpdated();
 
   reply->deleteLater();
+}
+
+int
+RepeaterDatabase::rowCount(const QModelIndex &parent) const {
+  Q_UNUSED(parent);
+  return _repeater.size();
+}
+
+int
+RepeaterDatabase::columnCount(const QModelIndex &parent) const {
+  Q_UNUSED(parent);
+  return 7;
+}
+
+QVariant
+RepeaterDatabase::data(const QModelIndex &index, int role) const {
+  if ((Qt::EditRole != role) && ((Qt::DisplayRole != role)))
+    return QVariant();
+
+  if (index.row() >= _repeater.size())
+    return QVariant();
+
+  if (0 == index.column()) {
+    // Call
+    if (Qt::DisplayRole == role)
+      return tr("%1 (%2, %3)")
+          .arg(_repeater[index.row()].value("call").toString())
+          .arg(_repeater[index.row()].value("qth").toString())
+          .arg(_repeater[index.row()].value("locator").toString());
+      else
+          return _repeater[index.row()].value("call").toString();
+  } else if (1 == index.column()) {
+    // Mode
+    return _repeater[index.row()].value("mode").toString();
+  } else if (2 == index.column()) {
+    // Repeater TX
+    if (Qt::DisplayRole == role)
+      return _repeater[index.column()].value("tx").toString();
+    else
+      return _repeater[index.column()].value("tx").toDouble();
+  } else if (3 == index.column()) {
+    // Repeater RX
+    if (Qt::DisplayRole == role)
+      return _repeater[index.column()].value("rx").toString();
+    else
+      return _repeater[index.column()].value("rx").toDouble();
+  } else if (4 == index.column()) {
+    // Locator
+    return _repeater[index.row()].value("locator").toString();
+  } else if (5 == index.column()) {
+    // Repeater position lon
+    if (Qt::DisplayRole == role)
+      return _repeater[index.column()].value("lon").toString();
+    else
+      return _repeater[index.column()].value("lon").toDouble();
+  } else if (6 == index.column()) {
+    // Repeater position lat
+    if (Qt::DisplayRole == role)
+      return _repeater[index.column()].value("lat").toString();
+    else
+      return _repeater[index.column()].value("lat").toDouble();
+  }
+
+  return QVariant();
+}
+
+
+
+DMRRepeaterFilter::DMRRepeaterFilter(QObject *parent)
+  : QSortFilterProxyModel(parent)
+{
+  setFilterKeyColumn(1);
+  setFilterRole(Qt::EditRole);
+  setFilterRegExp(QRegExp("^DMR$",Qt::CaseInsensitive));
+}
+
+
+FMRepeaterFilter::FMRepeaterFilter(QObject *parent)
+  : QSortFilterProxyModel(parent)
+{
+  setFilterKeyColumn(1);
+  setFilterRole(Qt::EditRole);
+  setFilterRegExp(QRegExp("^FM$",Qt::CaseInsensitive));
 }

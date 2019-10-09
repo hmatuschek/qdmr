@@ -3,6 +3,11 @@
 
 #include <QSettings>
 #include <QDateTime>
+#include <QGeoPositionInfoSource>
+#include <QGeoCoordinate>
+
+#include "ui_settingsdialog.h"
+
 
 class Settings : public QSettings
 {
@@ -14,6 +19,32 @@ public:
 	QDateTime lastRepeaterUpdate() const;
 	bool repeaterUpdateNeeded(uint period=7) const;
 	void repeaterUpdated();
+
+  bool queryPosition() const;
+  void setQueryPosition(bool enable);
+
+  QString locator() const;
+  void setLocator(const QString &locator);
+  QGeoCoordinate position() const;
+};
+
+
+class SettingsDialog: public QDialog, private Ui::SettingsDialog
+{
+  Q_OBJECT
+
+public:
+  explicit SettingsDialog(QWidget *parent=nullptr);
+
+  bool systemLocationEnabled() const;
+  QString locator() const;
+
+protected slots:
+  void onSystemLocationToggled(bool enable);
+  void positionUpdated(const QGeoPositionInfo &info);
+
+protected:
+  QGeoPositionInfoSource *_source;
 };
 
 #endif // SETTINGS_HH

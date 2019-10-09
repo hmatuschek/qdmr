@@ -1,11 +1,9 @@
 #ifndef VERIFY_HH
 #define VERIFY_HH
 
+class QCommandLineParser;
+class QCoreApplication;
 
-class verify
-{
-public:
-  verify();
-};
+int verify(QCommandLineParser &parser, QCoreApplication &app);
 
 #endif // VERIFY_HH

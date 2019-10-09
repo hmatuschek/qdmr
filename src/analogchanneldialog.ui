@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>404</width>
+    <width>432</width>
     <height>280</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Edit Analog Channel</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

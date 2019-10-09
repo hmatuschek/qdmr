@@ -3,7 +3,7 @@
 
 
 CodePlug::CodePlug(QObject *parent)
-    : QObject(parent)
+  : DFUFile(parent)
 {
 	// pass...
 }
@@ -13,6 +13,13 @@ CodePlug::~CodePlug() {
 }
 
 unsigned char *
-CodePlug::data() {
-	return _radio_mem;
+CodePlug::data(uint32_t offset) {
+	//return &_radio_mem[offset];
+  return (unsigned char *)&image(0).element(0).data().data()[offset];
+}
+
+const unsigned char *
+CodePlug::data(uint32_t offset) const {
+  //return &_radio_mem[offset];
+  return (unsigned char *)&image(0).element(0).data().data()[offset];
 }

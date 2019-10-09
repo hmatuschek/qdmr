@@ -1,17 +1,19 @@
 #ifndef CSVWRITER_HH
 #define CSVWRITER_HH
 
-#include <QObject>
+#include <QTextStream>
 
-class CSVWriter : public QObject
+class Config;
+
+
+/** Writing config files.
+ * @ingroup conffile */
+class CSVWriter
 {
-  Q_OBJECT
 public:
-  explicit CSVWriter(QObject *parent = nullptr);
-
-signals:
-
-public slots:
+  /** Writes the given @c config into the @c stream.
+   * @returns @c true on success. */
+	static bool write(const Config *config, QTextStream &stream);
 };
 
 #endif // CSVWRITER_HH

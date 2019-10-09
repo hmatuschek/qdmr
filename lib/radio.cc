@@ -1,16 +1,21 @@
 #include "radio.hh"
 #include "hidinterface.hh"
+#include "dfu_libusb.hh"
 #include <QDebug>
 #include "rd5r.hh"
+#include "uv390.hh"
 #include "config.hh"
 
 
+
+/* ******************************************************************************************** *
+ * Implementation of Radio
+ * ******************************************************************************************** */
 Radio::Radio(QObject *parent)
-  : QThread(parent)
+  : QThread(parent), _task(StatusIdle)
 {
   // pass...
 }
-
 
 bool
 Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
@@ -158,6 +163,16 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                       VerifyIssue::WARNING,
                       tr("Scan list name '%1' length %2 exceeds limit of %3 characters.")
                       .arg(list->name()).arg(list->name().size()).arg(features().maxScanlistNameLength)));
+    if (0 == list->priorityChannel())
+      issues.append(VerifyIssue(
+                      VerifyIssue::WARNING,
+                      tr("Scan list '%1' does not contain a priority channel.")
+                      .arg(list->name())));
+    else if (! list->contains(list->priorityChannel()))
+      issues.append(VerifyIssue(
+                      VerifyIssue::WARNING,
+                      tr("Scan list '%1' does not contain priority channel '%2'.")
+                      .arg(list->name()).arg(list->priorityChannel()->name())));
   }
 
   return 0 == issues.size();
@@ -166,21 +181,54 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
 
 Radio *
 Radio::detect() {
-  HID *hid = new HID(0x15a2, 0x0073);
-  if (! hid->isOpen()) {
-    qDebug() << "Cannot open HID.";
-    hid->deleteLater();
+  QString id;
+
+  // Try TYT MD Family
+  DFUDevice dfu(0x0483, 0xdf11);
+  if (dfu.isOpen()) {
+    id = dfu.identifier();
+  } else {
+    // Try Radioddity/Baofeng RD-5R
+    HID hid(0x15a2, 0x0073);
+    if (hid.isOpen()) {
+      id = hid.identify();
+      hid.close();
+    } else {
+      qDebug() << "No radio found.";
+      return nullptr;
+    }
+  }
+
+  if (id.isEmpty()) {
+    qDebug() << "Readio returned no idetifier!";
     return nullptr;
   }
 
-  QString id = hid->identify();
-  hid->close();
-  hid->deleteLater();
+  qDebug() << "Found Radio:" << id;
 
-  qDebug() << "Found" << id;
-
-  if ("BF-5R" == id)
+  if ("BF-5R" == id) {
     return new RD5R();
+  } else if ("MD-UV390") {
+    return new UV390();
+  }
 
   return nullptr;
+}
+
+Radio::Status
+Radio::status() const {
+  return _task;
+}
+
+const QString &
+Radio::errorMessage() const {
+  return _errorMessage;
+}
+
+void
+Radio::clearError() {
+  if (StatusError == _task) {
+    _task = StatusIdle;
+    _errorMessage.clear();
+  }
 }

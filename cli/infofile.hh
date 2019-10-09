@@ -2,10 +2,9 @@
 #define INFOFILE_HH
 
 
-class infofile
-{
-public:
-  infofile();
-};
+class QCoreApplication;
+class QCommandLineParser;
+
+int infoFile(QCommandLineParser &parser, QCoreApplication &app);
 
 #endif // INFOFILE_HH

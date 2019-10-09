@@ -19,6 +19,7 @@ static Radio::Features _rd5r_features =
   250,  // maxScanlists;
   16,   // maxScanlistNameLength;
   31,   // maxChannelsInScanlist;
+  true, // scanListNeedPriority;
 
   256,  // maxContacts;
   16,   // maxContactNameLength;
@@ -45,6 +46,11 @@ RD5R::features() const {
   return _rd5r_features;
 }
 
+const CodePlug &
+RD5R::codeplug() const {
+  return _codeplug;
+}
+
 bool
 RD5R::startDownload(Config *config) {
   _config = config;
@@ -57,7 +63,7 @@ RD5R::startDownload(Config *config) {
     return false;
   }
 
-  _task = TaskDownload;
+  _task = StatusDownload;
   _config->reset();
 
   start();
@@ -69,7 +75,7 @@ RD5R::startDownload(Config *config) {
 void
 RD5R::run()
 {
-  if (TaskDownload == _task) {
+  if (StatusDownload == _task) {
     emit downloadStarted();
 
     for (int bno=1; bno<966; bno++)
@@ -78,8 +84,8 @@ RD5R::run()
       if (bno >= 248 && bno < 256)
         continue;
 
-      if (! _dev->readBlock(bno, &_codeplug.data()[bno*128], 128)) {
-        _task = TaskNone;
+      if (! _dev->readBlock(bno, _codeplug.data(bno*128), 128)) {
+        _task = StatusError;
         _dev->readFinish();
         _dev->close();
         _dev->deleteLater();
@@ -90,24 +96,25 @@ RD5R::run()
       emit downloadProgress(float(bno*100)/966);
     }
 
-    _task = TaskNone;
+    _task = StatusIdle;
     _dev->readFinish();
     _dev->close();
     _dev->deleteLater();
 
     emit downloadFinished();
-  } else if (TaskUpload == _task) {
+  } else if (StatusUpload == _task) {
     emit uploadStarted();
 
+    // First download codeplug from device:
     for (int bno=1; bno<966; bno++)
     {
-      if (bno >= 248 && bno < 256) {
+      if ((bno >= 248) && (bno < 256)) {
         // Skip range 0x7c00...0x8000.
         continue;
       }
 
-      if (! _dev->readBlock(bno, &_codeplug.data()[bno*128], 128)) {
-        _task = TaskNone;
+      if (! _dev->readBlock(bno, _codeplug.data(bno*128), 128)) {
+        _task = StatusError;
         _dev->readFinish();
         _dev->close();
         _dev->deleteLater();
@@ -118,17 +125,19 @@ RD5R::run()
       emit uploadProgress(float(bno*50)/966);
     }
 
+    // Send encode config into codeplug
     _codeplug.encode(_config);
 
+    // then, upload modified codeplug
     for (int bno=1; bno<966; bno++)
     {
-      if (bno >= 248 && bno < 256) {
+      if ((bno >= 248) && (bno < 256)) {
         // Skip range 0x7c00...0x8000.
         continue;
       }
 
-      if (! _dev->writeBlock(bno, &_codeplug.data()[bno*128], 128)) {
-        _task = TaskNone;
+      if (! _dev->writeBlock(bno, _codeplug.data(bno*128), 128)) {
+        _task = StatusError;
         _dev->readFinish();
         _dev->close();
         _dev->deleteLater();
@@ -140,7 +149,7 @@ RD5R::run()
     }
     _dev->writeFinish();
 
-    _task = TaskNone;
+    _task = StatusIdle;
     _dev->close();
     _dev->deleteLater();
 
@@ -169,7 +178,7 @@ RD5R::startUpload(Config *config) {
     return false;
   }
 
-  _task = TaskUpload;
+  _task = StatusUpload;
   start();
 
   return true;

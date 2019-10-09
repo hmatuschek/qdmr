@@ -88,15 +88,6 @@ HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned cha
     memcpy(buf+4, data, nbytes);
   nbytes += 4;
 
-  /*if (trace_flag > 0) {
-    fprintf(stderr, "---Send");
-    for (k=0; k<nbytes; ++k) {
-      if (k != 0 && (k & 15) == 0)
-        fprintf(stderr, "\n       ");
-      fprintf(stderr, " %02x", buf[k]);
-    }
-    fprintf(stderr, "\n");
-  }*/
   _nbytes_received = 0;
   memset(_receive_buf, 0, sizeof(_receive_buf));
 again:
@@ -113,9 +104,6 @@ again:
     usleep(100);
     CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, 0);
     if (k >= 1000) {
-      /*if (trace_flag > 0) {
-        fprintf(stderr, "No response from HID device!\n");
-      }*/
       goto again;
     }
   }
@@ -125,15 +113,6 @@ again:
             _nbytes_received, (int)sizeof(_receive_buf));
     return false;
   }
-  /*if (trace_flag > 0) {
-    fprintf(stderr, "---Recv");
-    for (k=0; k<nbytes_received; ++k) {
-      if (k != 0 && (k & 15) == 0)
-        fprintf(stderr, "\n       ");
-      fprintf(stderr, " %02x", receive_buf[k]);
-    }
-    fprintf(stderr, "\n");
-  }*/
   if ((_receive_buf[0] != 3) || (_receive_buf[1] != 0) || (_receive_buf[3] != 0)) {
     fprintf(stderr, "incorrect reply\n");
     return false;

@@ -1,69 +1,166 @@
+/** @defgroup dsc Device specific classes.
+ * This module collects all classes that implement device specific configurations, aka codeplugs.
+ */
 #ifndef RADIO_HH
 #define RADIO_HH
 
 #include <QThread>
-#include "verifydialog.hh"
 
 class Config;
+class CodePlug;
+
+/** Simple container class to collect codeplug verification issues.
+ * As all radios are programmed from a common configuration, some radios may not support all
+ * features within the confiuration. Before uploading the device specific configuration, the
+ * generic configuration gets verified against the device features. This may lead to several
+ * issues/warning. This class represents such a issue/warning message.
+ *
+ * @ingroup rif */
+class VerifyIssue {
+public:
+  /** Issue type. */
+	typedef enum {
+		WARNING, ///< Verification warning, some configured fature is just ignored for the particular radio.
+    ERROR    ///< Verification error, a consistent device specific configutation cannot be derived from the generic config.
+	} Type;
+
+public:
+  /** Constructor from @c type and @c message. */
+	inline VerifyIssue(Type type, const QString &message)
+	    : _type(type), _message(message) { }
+
+  /** Returns the verification issue type. */
+	inline Type type() const { return _type; }
+  /** Returns the verification issue message. */
+	inline const QString & message() const { return _message; }
+
+protected:
+  /** The issue type. */
+	Type _type;
+  /** The issue message. */
+	QString _message;
+};
 
 
+/** Base class for all Radio objects.
+ *
+ * The radio objects represents a connected radio. This class controlles the communication
+ * with the device as well as the conversion betwenn device specific code-plugs and generic
+ * configurations.
+ *
+ * @ingroup rif
+ */
 class Radio : public QThread
 {
 	Q_OBJECT
 
 public:
+  /** Represents a radio feature list, a generic configuration is verified against. */
 	typedef struct {
+    /** If @c true, the device supports DMR. */
 		bool hasDigital;
+    /** If @c true, the device supports FM. */
 		bool hasAnalog;
-
+    /** Maximum length of the radio name. */
 		int maxNameLength;
+    /** Maximum number of channels. */
 		int maxIntroLineLength;
-
+    /** Maximum number of channels. */
 		int maxChannels;
+    /** Maximum length of channel names. */
 		int maxChannelNameLength;
-
+    /** Maximum number of zones. */
 		int maxZones;
+    /** Maximum length of zone names. */
 		int maxZoneNameLength;
+    /** Maximum number of channels per zone. */
 		int maxChannelsInZone;
-
+    /** Maximum number of scanlists. */
 		int maxScanlists;
+    /** Maximum length of scanlist names. */
 		int maxScanlistNameLength;
+    /** Maximum number of channels per scanlist. */
 		int maxChannelsInScanlist;
-
+    /** Does scanlist needs a priority channel?. */
+    bool scanListNeedsPriority;
+    /** Maximum number of contacts. */
 		int maxContacts;
+    /** Maximum length of contact name. */
 		int maxContactNameLength;
-
+    /** Maximum number of RX group lists. */
 		int maxGrouplists;
+    /** Maximum length of grouplist name. */
 		int maxGrouplistNameLength;
+    /** Maximum number contacts per RX group list. */
 		int maxContactsInGrouplist;
 	} Features;
 
+  /** Possible states of the radio object. */
+	typedef enum {
+    StatusIdle,      ///< Idle, nothing to do.
+    StatusDownload,  ///< Downloading codeplug.
+    StatusUpload,    ///< Uploading codeplug.
+    StatusError      ///< An error occured.
+  } Status;
+
 public:
+  /** Default constructor. */
 	explicit Radio(QObject *parent = nullptr);
 
+  /** Returns the name of the radio (e.g., device identifier). */
 	virtual const QString &name() const = 0;
+  /** Returns the features for the particular radio. */
 	virtual const Features &features() const = 0;
-
+  /** Returns the codeplug instance. */
+  virtual const CodePlug &codeplug() const = 0;
+  /** Verifies the configuration against the radio features.
+   * On exit, @c issues will contain the issues found. */
 	bool verifyConfig(Config *config, QList<VerifyIssue> &issues);
+  /** Returns the current status. */
+  Status status() const;
+  /** Returns the last error message. */
+  const QString &errorMessage() const;
+  /** Clears the last error message and state. */
+  void clearError();
 
 public:
+  /** Detects a radio and returns the corresponding device specific radio instance. */
 	static Radio *detect();
 
 public slots:
-	virtual bool startDownload(Config *config) = 0;
-    virtual bool startUpload(Config *config) = 0;
+  /** Starts the download of the codeplug and derives the generic configuration from it. */
+  virtual bool startDownload(Config *config) = 0;
+  /** Derives the device-specific codeplug from the generic configuration and uploads that
+   * codeplug to the radio. */
+  virtual bool startUpload(Config *config) = 0;
 
 signals:
+  /** Gets emitted once the codeplug download has been started. */
 	void downloadStarted();
+  /** Gets emitted on download progress (e.g., for progress bars). */
 	void downloadProgress(int percent);
+  /** Gets emitted once the codeplug download has been finished. */
 	void downloadFinished();
+  /** Gets emitted if there was an error during the codeplug download. */
 	void downloadError(Radio *radio);
+  /** Gets emitted once the codeplug download has been finished successfully and a generic
+   * configuration was derived from the codeplug. */
 	void downloadComplete(Radio *radio, Config *config);
 
+  /** Gets emitted once the codeplug upload has been started. */
 	void uploadStarted();
+  /** Gets emitted on upload progress (e.g., for progress bars). */
 	void uploadProgress(int percent);
+  /** Gets emitted if there was an error during the upload. */
 	void uploadError(Radio *radio);
+  /** Gets emitted once the codeplug upload has been completed successfully. */
 	void uploadComplete(Radio *radio);
+
+protected:
+  /** The current state/task. */
+  Status _task;
+  /** Holds the last error message. */
+  QString _errorMessage;
 };
 
 #endif // RADIO_HH

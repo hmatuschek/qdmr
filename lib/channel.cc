@@ -14,6 +14,10 @@
 #include <QIntValidator>
 #include <cmath>
 #include <QDebug>
+#include "application.hh"
+#include <QCompleter>
+#include <QAbstractProxyModel>
+
 
 
 /* ********************************************************************************************* *
@@ -119,9 +123,9 @@ Channel::onScanListDeleted(QObject *obj) {
  * Implementation of AnalogChannel
  * ********************************************************************************************* */
 AnalogChannel::AnalogChannel(const QString &name, float rxFreq, float txFreq, Power power,
-                             uint txTimout, bool txOnly, Admit admit, uint squelch, float rxTone,
+                             uint txTimeout, bool rxOnly, Admit admit, uint squelch, float rxTone,
                              float txTone, Bandwidth bw, ScanList *list, QObject *parent)
-  : Channel(name, rxFreq, txFreq, power, txTimout, txOnly, list, parent),
+  : Channel(name, rxFreq, txFreq, power, txTimeout, rxOnly, list, parent),
     _admit(admit), _squelch(squelch), _rxTone(rxTone), _txTone(txTone), _bw(bw)
 {
   // pass...
@@ -303,17 +307,18 @@ ChannelList::channel(int idx) const {
 }
 
 int
-ChannelList::addChannel(Channel *channel) {
+ChannelList::addChannel(Channel *channel, int row) {
   if (_channels.contains(channel))
     return -1;
-  int idx = _channels.size();
-  beginInsertRows(QModelIndex(), idx, idx);
+  if ((row<0) || (row>_channels.size()))
+    row = _channels.size();
+  beginInsertRows(QModelIndex(), row, row);
   connect(channel, SIGNAL(modified()), this, SIGNAL(modified()));
   connect(channel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
-  _channels.append(channel);
+  _channels.insert(row, channel);
   endInsertRows();
   emit modified();
-  return idx;
+  return row;
 }
 
 bool
@@ -377,8 +382,11 @@ inline QString formatFrequency(float f) {
 
 QVariant
 ChannelList::data(const QModelIndex &index, int role) const {
-  if ((! index.isValid()) || (Qt::DisplayRole!=role) || (index.row()>=_channels.size()))
+  if ((! index.isValid()) || (index.row()>=_channels.size()))
     return QVariant();
+  if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
+    return QVariant();
+
   Channel *channel = _channels[index.row()];
 
   switch (index.column()) {
@@ -551,360 +559,3 @@ ChannelList::onChannelEdited() {
 }
 
 
-/* ********************************************************************************************* *
- * Implementation of ChannelListView
- * ********************************************************************************************* */
-ChannelListView::ChannelListView(Config *config, QWidget *parent)
-  : QWidget(parent), _config(config), _list(config->channelList()), _view(nullptr)
-{
-  QPushButton *up   = new QPushButton(QIcon("://icons/up.png"),"");
-  QPushButton *down = new QPushButton(QIcon("://icons/down.png"), "");
-  up->setToolTip(tr("Move channel up in list."));
-  down->setToolTip(tr("Move channel down in list."));
-  QPushButton *adda = new QPushButton(tr("Add Analog Channel"));
-  QPushButton *addd = new QPushButton(tr("Add Digital Channel"));
-  QPushButton *rem  = new QPushButton(tr("Delete Channel"));
-
-  _view = new QTableView();
-  _view->setModel(_list);
-  _view->setColumnWidth(0, 60);
-  _view->setColumnWidth(1, 120);
-  _view->setColumnWidth(2, 80);
-  _view->setColumnWidth(3, 80);
-  _view->setColumnWidth(4, 50);
-  _view->setColumnWidth(5, 60);
-  _view->setColumnWidth(6, 50);
-  _view->setColumnWidth(7, 60);
-  _view->setColumnWidth(8, 120);
-  _view->setColumnWidth(9, 30);
-  _view->setColumnWidth(10, 30);
-  _view->setColumnWidth(11, 120);
-  _view->setColumnWidth(12, 120);
-  _view->setColumnWidth(13, 60);
-  _view->setColumnWidth(14, 60);
-  _view->setColumnWidth(15, 60);
-  _view->setColumnWidth(16, 60);
-
-  QVBoxLayout *layout = new QVBoxLayout();
-
-  QHBoxLayout *hbox = new QHBoxLayout();
-  hbox->addWidget(_view,1);
-  QVBoxLayout *vbox = new QVBoxLayout();
-  vbox->addWidget(up);
-  vbox->addWidget(down);
-  hbox->addLayout(vbox);
-  layout->addLayout(hbox);
-
-  hbox = new QHBoxLayout();
-  hbox->addWidget(adda);
-  hbox->addWidget(addd);
-  hbox->addWidget(rem);
-  layout->addLayout(hbox);
-  setLayout(layout);
-
-  connect(up,   SIGNAL(clicked()), this, SLOT(onChannelUp()));
-  connect(down, SIGNAL(clicked()), this, SLOT(onChannelDown()));
-  connect(adda, SIGNAL(clicked()), this, SLOT(onAddAnalogChannel()));
-  connect(addd, SIGNAL(clicked()), this, SLOT(onAddDigitalChannel()));
-  connect(rem,  SIGNAL(clicked()), this, SLOT(onRemChannel()));
-  connect(_view, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditChannel(const QModelIndex &)));
-}
-
-void
-ChannelListView::onChannelUp() {
-  QModelIndex selected =_view->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0==selected.row()))
-    return;
-  if (_config->channelList()->moveUp(selected.row()))
-    _view->selectRow(selected.row()-1);
-}
-
-void
-ChannelListView::onChannelDown() {
-  QModelIndex selected =_view->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (_config->channelList()->count()==(selected.row()+1)))
-    return;
-  if (_config->channelList()->moveDown(selected.row()))
-    _view->selectRow(selected.row()+1);
-}
-
-void
-ChannelListView::onAddAnalogChannel() {
-  AnalogChannelDialog dialog(_config);
-  if (QDialog::Accepted != dialog.exec())
-    return;
-
-  _list->addChannel(dialog.channel());
-}
-
-void
-ChannelListView::onAddDigitalChannel() {
-  DigitalChannelDialog dialog(_config);
-
-  if (QDialog::Accepted != dialog.exec())
-    return;
-
-  _list->addChannel(dialog.channel());
-}
-
-void
-ChannelListView::onRemChannel() {
-  QModelIndex selected =_view->selectionModel()->currentIndex();
-  if (! selected.isValid()) {
-    QMessageBox::information(nullptr, tr("Cannot delete channel"),
-                             tr("Cannot delete channel: You have to select a channel first."));
-    return;
-  }
-
-  QString name = _list->channel(selected.row())->name();
-  if (QMessageBox::No == QMessageBox::question(nullptr, tr("Delete channel?"), tr("Delete channel %1?").arg(name)))
-    return;
-
-  _list->remChannel(selected.row());
-}
-
-void
-ChannelListView::onEditChannel(const QModelIndex &index) {
-  Channel *channel = _config->channelList()->channel(index.row());
-  if (! channel)
-    return;
-  if (channel->is<AnalogChannel>()) {
-    AnalogChannelDialog dialog(_config, channel->as<AnalogChannel>());
-    if (QDialog::Accepted != dialog.exec())
-      return;
-    dialog.channel();
-  } else {
-    DigitalChannelDialog dialog(_config, channel->as<DigitalChannel>());
-    if (QDialog::Accepted != dialog.exec())
-      return;
-    dialog.channel();
-  }
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of AnalogChannelDialog
- * ********************************************************************************************* */
-AnalogChannelDialog::AnalogChannelDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _channel(nullptr)
-{
-  construct();
-}
-
-AnalogChannelDialog::AnalogChannelDialog(Config *config, AnalogChannel *channel, QWidget *parent)
-  : QDialog(parent), _config(config), _channel(channel)
-{
-  construct();
-}
-
-void
-AnalogChannelDialog::construct() {
-  setupUi(this);
-
-  rxFrequency->setValidator(new QDoubleValidator(0,500,5));
-  txFrequency->setValidator(new QDoubleValidator(0,500,5));
-  power->setItemData(0, uint(Channel::HighPower));
-  power->setItemData(1, uint(Channel::LowPower));
-  scanList->addItem(tr("[None]"), QVariant::fromValue((ScanList *)(nullptr)));
-  scanList->setCurrentIndex(0);
-  for (int i=0; i<_config->scanlists()->count(); i++) {
-    scanList->addItem(_config->scanlists()->scanlist(i)->name(),
-                      QVariant::fromValue(_config->scanlists()->scanlist(i)));
-    if (_channel && (_channel->scanList() == _config->scanlists()->scanlist(i)) )
-      scanList->setCurrentIndex(i+1);
-  }
-  txAdmit->setItemData(0, uint(AnalogChannel::AdmitNone));
-  txAdmit->setItemData(1, uint(AnalogChannel::AdmitFree));
-  txAdmit->setItemData(2, uint(AnalogChannel::AdmitTone));
-  populateCTCSSBox(rxTone, (nullptr != _channel ? _channel->rxTone() : 0.0));
-  populateCTCSSBox(txTone, (nullptr != _channel ? _channel->txTone() : 0.0));
-  bandwidth->setItemData(0, uint(AnalogChannel::BWNarrow));
-  bandwidth->setItemData(1, uint(AnalogChannel::BWWide));
-
-  if (_channel) {
-    channelName->setText(_channel->name());
-    rxFrequency->setText(QString::number(_channel->rxFrequency()));
-    txFrequency->setText(QString::number(_channel->txFrequency()));
-    if (Channel::HighPower==_channel->power())
-      power->setCurrentIndex(0);
-    else if (Channel::LowPower==_channel->power())
-      power->setCurrentIndex(1);
-    txTimeout->setValue(_channel->txTimeout());
-    rxOnly->setChecked(_channel->rxOnly());
-    switch (_channel->admit()) {
-      case AnalogChannel::AdmitNone: txAdmit->setCurrentIndex(0); break;
-      case AnalogChannel::AdmitFree: txAdmit->setCurrentIndex(1); break;
-      case AnalogChannel::AdmitTone: txAdmit->setCurrentIndex(2); break;
-    }
-    squelch->setValue(_channel->squelch());
-    if (AnalogChannel::BWNarrow == _channel->bandwidth())
-      bandwidth->setCurrentIndex(0);
-    else if (AnalogChannel::BWWide == _channel->bandwidth())
-      bandwidth->setCurrentIndex(1);
-  }
-
-  connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-  connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-}
-
-AnalogChannel *
-AnalogChannelDialog::channel() {
-  bool ok = false;
-  QString name = channelName->text();
-  double rx = rxFrequency->text().toDouble(&ok);
-  double tx = txFrequency->text().toDouble(&ok);
-  Channel::Power pwr = Channel::Power(power->currentData().toUInt(&ok));
-  uint timeout = txTimeout->text().toUInt(&ok);
-  bool rxonly = rxOnly->isChecked();
-  AnalogChannel::Admit admit = AnalogChannel::Admit(txAdmit->currentData().toUInt(&ok));
-  uint squ = squelch->text().toUInt(&ok);
-  double rxtone = rxTone->currentData().toDouble(&ok);
-  double txtone = txTone->currentData().toDouble(&ok);
-  AnalogChannel::Bandwidth bw = AnalogChannel::Bandwidth(bandwidth->currentData().toUInt());
-  ScanList *scanlist = scanList->currentData().value<ScanList *>();
-
-  if (_channel) {
-    _channel->setName(name);
-    _channel->setRXFrequency(rx);
-    _channel->setTXFrequency(tx);
-    _channel->setPower(pwr);
-    _channel->setTimeout(timeout);
-    _channel->setRXOnly(rxonly);
-    _channel->setAdmit(admit);
-    _channel->setSquelch(squ);
-    _channel->setRXTone(rxtone);
-    _channel->setTXTone(txtone);
-    _channel->setBandwidth(bw);
-    _channel->setScanList(scanlist);
-    return _channel;
-  } else {
-    return new AnalogChannel(name, rx, tx, pwr, timeout, rxonly, admit, squ,
-                             rxtone, txtone, bw, scanlist);
-  }
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of DigitalChannelDialog
- * ********************************************************************************************* */
-DigitalChannelDialog::DigitalChannelDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _channel(nullptr)
-{
-  construct();
-}
-
-DigitalChannelDialog::DigitalChannelDialog(Config *config, DigitalChannel *channel, QWidget *parent)
-  : QDialog(parent), _config(config), _channel(channel)
-{
-  construct();
-}
-
-void
-DigitalChannelDialog::construct() {
-  setupUi(this);
-  rxFrequency->setValidator(new QDoubleValidator(0,500,5));
-  txFrequency->setValidator(new QDoubleValidator(0,500,5));
-  power->setItemData(0, uint(Channel::HighPower));
-  power->setItemData(1, uint(Channel::LowPower));
-  scanList->addItem(tr("[None]"), QVariant::fromValue((ScanList *)(nullptr)));
-  scanList->setCurrentIndex(0);
-  for (int i=0; i<_config->scanlists()->count(); i++) {
-    scanList->addItem(_config->scanlists()->scanlist(i)->name(),
-                      QVariant::fromValue(_config->scanlists()->scanlist(i)));
-    if (_channel && (_channel->scanList() == _config->scanlists()->scanlist(i)) )
-      scanList->setCurrentIndex(i);
-  }
-  txAdmit->setItemData(0, uint(DigitalChannel::AdmitNone));
-  txAdmit->setItemData(1, uint(DigitalChannel::AdmitFree));
-  txAdmit->setItemData(2, uint(DigitalChannel::AdmitColorCode));
-  timeSlot->setItemData(0, uint(DigitalChannel::TimeSlot1));
-  timeSlot->setItemData(1, uint(DigitalChannel::TimeSlot2));
-  populateRXGroupListBox(rxGroupList, _config->rxGroupLists(),
-                         (nullptr != _channel ? _channel->rxGroupList() : nullptr));
-  for (int i=0; i<_config->contacts()->count(); i++) {
-    txContact->addItem(_config->contacts()->contact(i)->name(),
-                       QVariant::fromValue(_config->contacts()->contact(i)));
-    if (_channel && (_channel->txContact() == _config->contacts()->contact(i)) )
-      txContact->setCurrentIndex(i);
-  }
-
-  if (_channel) {
-    channelName->setText(_channel->name());
-    rxFrequency->setText(QString::number(_channel->rxFrequency()));
-    txFrequency->setText(QString::number(_channel->txFrequency()));
-    if (Channel::HighPower==_channel->power())
-      power->setCurrentIndex(0);
-    else if (Channel::LowPower==_channel->power())
-      power->setCurrentIndex(1);
-    txTimeout->setValue(_channel->txTimeout());
-    rxOnly->setChecked(_channel->rxOnly());
-    switch (_channel->admit()) {
-      case DigitalChannel::AdmitNone: txAdmit->setCurrentIndex(0); break;
-      case DigitalChannel::AdmitFree: txAdmit->setCurrentIndex(1); break;
-      case DigitalChannel::AdmitColorCode: txAdmit->setCurrentIndex(2); break;
-    }
-    colorCode->setValue(_channel->colorCode());
-    if (DigitalChannel::TimeSlot1 == _channel->timeslot())
-      timeSlot->setCurrentIndex(0);
-    else if (DigitalChannel::TimeSlot2 == _channel->timeslot())
-      timeSlot->setCurrentIndex(1);
-  }
-}
-
-DigitalChannel *
-DigitalChannelDialog::channel() {
-  bool ok = false;
-  QString name = channelName->text();
-  double rx = rxFrequency->text().toDouble(&ok);
-  double tx = txFrequency->text().toDouble(&ok);
-  Channel::Power pwr = Channel::Power(power->currentData().toUInt(&ok));
-  uint timeout = txTimeout->text().toUInt(&ok);
-  bool rxonly = rxOnly->isChecked();
-  DigitalChannel::Admit admit = DigitalChannel::Admit(txAdmit->currentData().toUInt(&ok));
-  uint colorcode = colorCode->value();
-  DigitalChannel::TimeSlot ts = DigitalChannel::TimeSlot(timeSlot->currentData().toUInt(&ok));
-  RXGroupList *rxgroup = rxGroupList->currentData().value<RXGroupList *>();
-  DigitalContact *contact = txContact->currentData().value<DigitalContact *>();
-  ScanList *scanlist = scanList->currentData().value<ScanList *>();
-
-  if (_channel) {
-    _channel->setName(name);
-    _channel->setRXFrequency(rx);
-    _channel->setTXFrequency(tx);
-    _channel->setPower(pwr);
-    _channel->setTimeout(timeout);
-    _channel->setRXOnly(rxonly);
-    _channel->setScanList(scanlist);
-    _channel->setAdmit(admit);
-    _channel->setColorCode(colorcode);
-    _channel->setTimeSlot(ts);
-    _channel->setRXGroupList(rxgroup);
-    _channel->setTXContact(contact);
-    return _channel;
-  } else {
-    return new DigitalChannel(name, rx, tx, pwr, timeout, rxonly, admit, colorcode, ts, rxgroup,
-                              contact, scanlist);
-  }
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of ChannelComboBox
- * ********************************************************************************************* */
-ChannelComboBox::ChannelComboBox(ChannelList *list, QWidget *parent)
-  : QComboBox(parent)
-{
-  for (int i=0; i<list->rowCount(QModelIndex()); i++) {
-    if (list->channel(i)->is<AnalogChannel>())
-      addItem(tr("%1 (Analog)").arg(list->channel(i)->name()),
-              QVariant::fromValue(list->channel(i)));
-    else
-      addItem(tr("%1 (Digital)").arg(list->channel(i)->name()),
-              QVariant::fromValue(list->channel(i)));
-  }
-}
-
-Channel *
-ChannelComboBox::channel() const {
-  return currentData().value<Channel*>();
-}

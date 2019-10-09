@@ -4,12 +4,20 @@
 #include <QDesktopServices>
 #include "radio.hh"
 #include "config.h"
+#include "settings.hh"
+#include "verifydialog.hh"
+#include "analogchanneldialog.hh"
+#include "digitalchanneldialog.hh"
+#include "contactdialog.hh"
+#include "rxgrouplistdialog.hh"
+#include "zonedialog.hh"
+#include "scanlistdialog.hh"
 
 
 Application::Application(int &argc, char *argv[])
   : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _repeater(nullptr)
 {
-  setApplicationName("qdrm");
+  setApplicationName("qdmr");
   setOrganizationName("DM3MAT");
   setOrganizationDomain("hmatuschek.github.io");
 
@@ -26,6 +34,19 @@ Application::Application(int &argc, char *argv[])
     _config->readCSV(stream);
   }
 
+  Settings settings;
+  _currentPosition = settings.position();
+  _source = QGeoPositionInfoSource::createDefaultSource(this);
+  if (_source) {    
+    connect(_source, SIGNAL(positionUpdated(QGeoPositionInfo)),
+            this, SLOT(positionUpdated(QGeoPositionInfo)));
+    if (settings.queryPosition()) {
+      _source->startUpdates();
+      _currentPosition = _source->lastKnownPosition().coordinate();
+    }
+  }
+
+  qDebug() << "Last known position: " << _currentPosition;
   connect(_config, SIGNAL(modified()), this, SLOT(onConfigModifed()));
 }
 
@@ -42,9 +63,8 @@ Application::mainWindow() {
   return _mainWindow;
 }
 
-const RepeaterDatabase &
-Application::repeater() const{
-  return *_repeater;
+RepeaterDatabase *Application::repeater() const{
+  return _repeater;
 }
 
 QMainWindow *
@@ -65,6 +85,7 @@ Application::createMainWindow() {
 
   QAction *newCP   = _mainWindow->findChild<QAction*>("actionNewCodeplug");
   QAction *cpWiz   = _mainWindow->findChild<QAction*>("actionCodeplugWizard");
+  cpWiz->setEnabled(false);
   QAction *loadCP  = _mainWindow->findChild<QAction*>("actionOpenCodeplug");
   QAction *saveCP  = _mainWindow->findChild<QAction*>("actionSaveCodeplug");
 
@@ -74,6 +95,7 @@ Application::createMainWindow() {
   QAction *upCP    = _mainWindow->findChild<QAction*>("actionUpload");
 
   QAction *about   = _mainWindow->findChild<QAction*>("actionAbout");
+  QAction *sett    = _mainWindow->findChild<QAction*>("actionSettings");
   QAction *help    = _mainWindow->findChild<QAction*>("actionHelp");
   QAction *quit    = _mainWindow->findChild<QAction*>("actionQuit");
 
@@ -83,6 +105,7 @@ Application::createMainWindow() {
   connect(saveCP, SIGNAL(triggered()), this, SLOT(saveCodeplug()));
   connect(quit, SIGNAL(triggered()), this, SLOT(quitApplication()));
   connect(about, SIGNAL(triggered()), this, SLOT(showAbout()));
+  connect(sett, SIGNAL(triggered()), this, SLOT(showSettings()));
   connect(help, SIGNAL(triggered()), this, SLOT(showHelp()));
 
   connect(findDev, SIGNAL(triggered()), this, SLOT(detectRadio()));
@@ -412,6 +435,22 @@ Application::onCodeplugUploaded(Radio *radio) {
 
 
 void
+Application::showSettings() {
+  SettingsDialog dialog;
+  if (QDialog::Accepted == dialog.exec()) {
+    Settings settings;
+    settings.setQueryPosition(dialog.systemLocationEnabled());
+    settings.setLocator(dialog.locator());
+    if (! settings.queryPosition()) {
+      _source->stopUpdates();
+      _currentPosition = settings.position();
+    } else {
+      _source->startUpdates();
+    }
+  }
+}
+
+void
 Application::showAbout() {
   QUiLoader loader;
   QFile uiFile("://ui/aboutdialog.ui");
@@ -479,7 +518,13 @@ Application::onAddContact() {
   ContactDialog dialog;
   if (QDialog::Accepted != dialog.exec())
     return;
-  _config->contacts()->addContact(dialog.contact());
+
+  QTableView *table = _mainWindow->findChild<QTableView *>("contactsView");
+  QModelIndex selected = table->selectionModel()->currentIndex();
+  if (selected.isValid())
+    _config->contacts()->addContact(dialog.contact(), selected.row()+1);
+  else
+    _config->contacts()->addContact(dialog.contact());
 }
 
 void
@@ -537,7 +582,13 @@ Application::onAddRxGroup() {
   if (QDialog::Accepted != dialog.exec())
     return;
 
-  _config->rxGroupLists()->addList(dialog.groupList());
+  QListView *list = _mainWindow->findChild<QListView *>("groupListView");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+
+  if (selected.isValid())
+    _config->rxGroupLists()->addList(dialog.groupList(), selected.row()+1);
+  else
+    _config->rxGroupLists()->addList(dialog.groupList());
 }
 
 void
@@ -596,18 +647,32 @@ Application::onRxGroupDown() {
 
 void
 Application::onAddAnalogChannel() {
+  QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
+  QModelIndex selected = table->selectionModel()->currentIndex();
+
   AnalogChannelDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
-  _config->channelList()->addChannel(dialog.channel());
+
+  if (selected.isValid())
+    _config->channelList()->addChannel(dialog.channel(), selected.row()+1);
+  else
+    _config->channelList()->addChannel(dialog.channel());
+
 }
 
 void
 Application::onAddDigitalChannel() {
+  QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
+  QModelIndex selected = table->selectionModel()->currentIndex();
+
   DigitalChannelDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
-  _config->channelList()->addChannel(dialog.channel());
+  if (selected.isValid())
+    _config->channelList()->addChannel(dialog.channel(), selected.row()+1);
+  else
+    _config->channelList()->addChannel(dialog.channel());
 }
 
 void
@@ -672,8 +737,14 @@ Application::onAddZone() {
   if (QDialog::Accepted != dialog.exec())
     return;
 
+  QListView *list = _mainWindow->findChild<QListView *>("zoneView");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+
   Zone *zone = dialog.zone();
-  _config->zones()->addZone(zone);
+  if (selected.isValid())
+    _config->zones()->addZone(zone, selected.row()+1);
+  else
+    _config->zones()->addZone(zone);
 }
 
 void
@@ -734,8 +805,13 @@ Application::onAddScanList() {
   if (QDialog::Accepted != dialog.exec())
     return;
 
+  QListView *list = _mainWindow->findChild<QListView *>("scanListView");
+  QModelIndex selected = list->selectionModel()->currentIndex();
   ScanList *scanlist = dialog.scanlist();
-  _config->scanlists()->addScanList(scanlist);
+  if (selected.isValid())
+    _config->scanlists()->addScanList(scanlist, selected.row()+1);
+  else
+    _config->scanlists()->addScanList(scanlist);
 }
 
 void
@@ -786,6 +862,22 @@ Application::onEditScanList(const QModelIndex &idx) {
   dialog.scanlist();
 
   emit _mainWindow->findChild<QListView *>("scanListView")->model()->dataChanged(idx,idx);
+}
+
+void
+Application::positionUpdated(const QGeoPositionInfo &info) {
+  if (info.isValid())
+    _currentPosition = info.coordinate();
+}
+
+bool
+Application::hasPosition() const {
+  return _currentPosition.isValid();
+}
+
+QGeoCoordinate
+Application::position() const {
+  return _currentPosition;
 }
 
 

@@ -1,11 +1,27 @@
 #ifndef CRC32_HH
 #define CRC32_HH
 
+#include <QByteArray>
 
-class crc32
+/** Implements the CRC32 checksum.
+ * @ingroup util */
+class CRC32
 {
 public:
-  crc32();
+  /** Default constructor. */
+	CRC32();
+  /** Update CRC with given byte. */
+	void update(uint8_t c);
+  /** Update CRC with given data. */
+	void update(const uint8_t *c, size_t n);
+  /** Update CRC with given data. */
+	void update(const QByteArray &data);
+  /** Returns the current CRC. */
+	inline uint32_t get() { return _crc; }
+
+protected:
+  /** Current CRC. */
+	uint32_t _crc;
 };
 
 #endif // CRC32_HH
