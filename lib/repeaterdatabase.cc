@@ -7,12 +7,15 @@
 #include <QNetworkReply>
 #include <algorithm>
 
-
+/// @cond with_internal_docs
+/** "is-less" Operator for sorting repeaters with respect to the distace. */
 class DistanceIsLess
 {
 public:
+  /** Constructor, @c qth specifies the QTH location. */
   inline DistanceIsLess(const QGeoCoordinate &qth): _qth(qth) { }
 
+  /** Compares two repeaters with respect to the distance to the QTH. */
   inline bool operator()(const QJsonObject &a, const QJsonObject &b) {
     QGeoCoordinate al(a.value("lat").toDouble(), a.value("lon").toDouble());
     QGeoCoordinate bl(b.value("lat").toDouble(), b.value("lon").toDouble());
@@ -20,8 +23,10 @@ public:
   }
 
 private:
+  /** QTH location. */
   QGeoCoordinate  _qth;
 };
+/// @endcond
 
 
 RepeaterDatabase::RepeaterDatabase(const QGeoCoordinate &qth, uint updatePeriodDays, QObject *parent)

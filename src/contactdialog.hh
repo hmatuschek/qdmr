@@ -24,7 +24,7 @@ public:
 	Contact *contact();
 
 protected slots:
-	void onTypeChanged();
+	void onTypeChanged(int idx);
 
 protected:
 	void construct();

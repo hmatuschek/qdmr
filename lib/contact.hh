@@ -76,6 +76,9 @@ public:
    * @param parent Specifies the QObject parent. */
 	DTMFContact(const QString &name, const QString &number, bool rxTone=false, QObject *parent=nullptr);
 
+  /** Retruns @c true if the DTMF contact is valid (has a valid DTMF number). */
+  bool isValid() const;
+
   /** Returns the DTMF number of this contact.
    * The number must consist of 0-9, a-f, * or #. */
 	const QString &number() const;

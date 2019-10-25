@@ -27,18 +27,24 @@ ContactDialog::ContactDialog(Contact *contact, QWidget *parent)
 void
 ContactDialog::construct() {
   setupUi(this);
-  contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
-  contactType->setItemData(0, uint(DigitalContact::PrivateCall));
-  contactType->setItemData(1, uint(DigitalContact::GroupCall));
-  contactType->setItemData(2, uint(DigitalContact::AllCall));
 
   if (_contact) {
     if (_contact->is<DTMFContact>()) {
       DTMFContact *dtmf = _contact->as<DTMFContact>();
+      contactType->addItem(tr("DTMF"));
+      contactType->setCurrentIndex(0);
       contactType->setEnabled(false);
+      contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9a-dA-D\\*#]+")));
       contactNumber->setText(dtmf->number());
     } else {
       DigitalContact *digi = _contact->as<DigitalContact>();
+      contactType->addItem(tr("Private Call"));
+      contactType->addItem(tr("Group Call"));
+      contactType->addItem(tr("All Call"));
+      contactType->setItemData(0, uint(DigitalContact::PrivateCall));
+      contactType->setItemData(1, uint(DigitalContact::GroupCall));
+      contactType->setItemData(2, uint(DigitalContact::AllCall));
+      contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
       if (DigitalContact::PrivateCall == digi->type())
         contactType->setCurrentIndex(0);
       else if (DigitalContact::GroupCall == digi->type())
@@ -49,16 +55,29 @@ ContactDialog::construct() {
     }
     contactName->setText(_contact->name());
     contactRxTone->setChecked(_contact->rxTone());
+  } else {
+    contactType->addItem(tr("Private Call"));
+    contactType->addItem(tr("Group Call"));
+    contactType->addItem(tr("All Call"));
+    contactType->addItem(tr("DTMF"));
+    contactType->setItemData(0, uint(DigitalContact::PrivateCall));
+    contactType->setItemData(1, uint(DigitalContact::GroupCall));
+    contactType->setItemData(2, uint(DigitalContact::AllCall));
+    contactType->setCurrentIndex(0);
+    contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
   }
 
-  connect(contactType, SIGNAL(currentIndexChanged(int)), this, SLOT(onTypeChanged()));
+  connect(contactType, SIGNAL(currentIndexChanged(int)), this, SLOT(onTypeChanged(int)));
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
 void
-ContactDialog::onTypeChanged() {
-  // pass...
+ContactDialog::onTypeChanged(int idx) {
+  if (3 == idx)
+    contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9a-dA-D\\*#]+")));
+  else
+    contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
 }
 
 Contact *
@@ -77,6 +96,11 @@ ContactDialog::contact()
     return _contact;
   }
 
+  if (3 == contactType->currentIndex()) {
+    // If DTMF contact
+    return new DTMFContact(contactName->text(), contactNumber->text(), contactRxTone->isChecked());
+  }
+
   DigitalContact::Type t = DigitalContact::Type(contactType->currentData().toUInt());
   return new DigitalContact(t, contactName->text(), contactNumber->text().toUInt(), contactRxTone->isChecked());
 }
@@ -88,10 +112,8 @@ ContactDialog::contact()
 DigitalContactBox::DigitalContactBox(ContactList *contacts, QWidget *parent)
   : QComboBox(parent)
 {
-  for (int i=0; i<contacts->rowCount(QModelIndex()); i++) {
-    if (contacts->contact(i)->is<DigitalContact>()) {
-      DigitalContact *digi = contacts->contact(i)->as<DigitalContact>();
-      addItem(digi->name(), QVariant::fromValue(digi));
-    }
+  for (int i=0; i<contacts->digitalCount(); i++) {
+    DigitalContact *digi = contacts->digitalContact(i);
+    addItem(digi->name(), QVariant::fromValue(digi));
   }
 }

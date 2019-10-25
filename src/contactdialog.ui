@@ -30,23 +30,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QComboBox" name="contactType">
-       <item>
-        <property name="text">
-         <string>Private Call</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Group Call</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>All Call</string>
-        </property>
-       </item>
-      </widget>
+      <widget class="QComboBox" name="contactType"/>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="nameLabel">

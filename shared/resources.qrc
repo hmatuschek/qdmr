@@ -13,6 +13,11 @@
         <file alias="up.png">arrow-thick-top-4x.png</file>
         <file alias="dialog.png">chat-4x.png</file>
         <file alias="settings.png">cog-4x.png</file>
+        <file>audio-spectrum-2x.png</file>
+        <file>globe-2x.png</file>
+        <file>people-2x.png</file>
+        <file>person-2x.png</file>
+        <file>pulse-2x.png</file>
     </qresource>
     <qresource prefix="/ui">
         <file>mainwindow.ui</file>

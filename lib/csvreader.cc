@@ -1,6 +1,7 @@
 #include "csvreader.hh"
 #include <QDebug>
 #include "config.hh"
+#include "utils.hh"
 
 #include <QRegExp>
 
@@ -135,6 +136,19 @@ CSVHandler::handleVoxLevel(uint level, qint64 line, qint64 column) {
 bool
 CSVHandler::handleMicLevel(uint level, qint64 line, qint64 column) {
   Q_UNUSED(level);
+  Q_UNUSED(line);
+  Q_UNUSED(column);
+  return true;
+}
+
+bool
+CSVHandler::handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
+                              qint64 line, qint64 column)
+{
+  Q_UNUSED(idx);
+  Q_UNUSED(name);
+  Q_UNUSED(num);
+  Q_UNUSED(rxTone);
   Q_UNUSED(line);
   Q_UNUSED(column);
   return true;
@@ -280,7 +294,7 @@ CSVParser::parse(QTextStream &stream) {
       if (! _parse_mic_level(lexer))
         return false;
     } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("contact" == token.value.toLower())) {
-      if (! _parse_digital_contacts(lexer))
+      if (! _parse_contacts(lexer))
         return false;
     } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("grouplist" == token.value.toLower())) {
       if (! _parse_rx_groups(lexer))
@@ -476,7 +490,7 @@ CSVParser::_parse_mic_level(CSVLexer &lexer) {
 }
 
 bool
-CSVParser::_parse_digital_contacts(CSVLexer &lexer) {
+CSVParser::_parse_contacts(CSVLexer &lexer) {
   // skip rest of header
   CSVLexer::Token token = lexer.next();
   for (; CSVLexer::Token::T_KEYWORD==token.type; token=lexer.next()) {
@@ -491,7 +505,7 @@ CSVParser::_parse_digital_contacts(CSVLexer &lexer) {
   token = lexer.next();
   for (; CSVLexer::Token::T_NUMBER == token.type; token=lexer.next()) {
     qint64 idx = token.value.toInt();
-    if (! _parse_digital_contact(idx, lexer))
+    if (! _parse_contact(idx, lexer))
       return false;
   }
 
@@ -504,7 +518,7 @@ CSVParser::_parse_digital_contacts(CSVLexer &lexer) {
 }
 
 bool
-CSVParser::_parse_digital_contact(qint64 idx, CSVLexer &lexer) {
+CSVParser::_parse_contact(qint64 idx, CSVLexer &lexer) {
   CSVLexer::Token token = lexer.next();
   qint64 line=token.line, column=token.column;
 
@@ -518,9 +532,10 @@ CSVParser::_parse_digital_contact(qint64 idx, CSVLexer &lexer) {
   token = lexer.next();
   if (CSVLexer::Token::T_KEYWORD != token.type) {
     qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect string.";
+             << ": Unexpected token" << token.type << "'" << token.value << "', expect keyword.";
     return false;
   }
+  bool dtmf = false;
   DigitalContact::Type type;
   if ("group" == token.value.toLower()) {
     type = DigitalContact::GroupCall;
@@ -528,17 +543,28 @@ CSVParser::_parse_digital_contact(qint64 idx, CSVLexer &lexer) {
     type = DigitalContact::PrivateCall;
   } else if ("all" == token.value.toLower()) {
     type = DigitalContact::AllCall;
+  } else if ("dtmf" == token.value.toLower()) {
+    dtmf = true;
   } else {
     qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected call type '" << token.value << "', expect 'Group', 'Private' or 'All'.";
+             << ": Unexpected call type '" << token.value << "', expect 'Group', 'Private', 'All' or 'DTMF'.";
     return false;
   }
 
   token = lexer.next();
-  if (CSVLexer::Token::T_NUMBER != token.type) {
+  if ( (!dtmf) && (CSVLexer::Token::T_NUMBER != token.type) ) {
     qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
              << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
     return false;
+  } else if (dtmf && (CSVLexer::Token::T_NUMBER != token.type) && (CSVLexer::Token::T_STRING != token.type)) {
+    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
+             << ": Unexpected token" << token.type << "'" << token.value << "', expect number or string.";
+    return false;
+  }
+  QString dtmf_num = token.value;
+  if (dtmf && (! validDTMFNumber(dtmf_num))) {
+    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
+             << ": Invalid DTMF number '" << token.value << "'.";
   }
   qint64 id = token.value.toInt();
 
@@ -561,6 +587,8 @@ CSVParser::_parse_digital_contact(qint64 idx, CSVLexer &lexer) {
     return false;
   }
 
+  if (dtmf)
+    return _handler->handleDTMFContact(idx, name, dtmf_num, rxToneEnabled, line, column);
   return _handler->handleDigitalContact(idx, name, type, id, rxToneEnabled, line, column);
 }
 
@@ -1264,6 +1292,30 @@ CSVReader::handleMicLevel(uint level, qint64 line, qint64 column) {
   return true;
 }
 
+
+bool
+CSVReader::handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
+                             qint64 line, qint64 column)
+{
+  if (_link) {
+    // pass...
+    return true;
+  }
+
+  if (_digital_contacts.contains(idx)) {
+    qDebug() << "Parse error @" << line << "," << column
+             << ": Cannot create contact '" << name << "' with index " << idx
+             << " index already taken.";
+    return false;
+  }
+  DTMFContact *contact = new DTMFContact(name, num, rxTone);
+  //_contacts[idx] = contact;
+  _config->contacts()->addContact(contact);
+
+  return true;
+}
+
+
 bool
 CSVReader::handleDigitalContact(qint64 idx, const QString &name, DigitalContact::Type type,
                                 qint64 id, bool rxTone, qint64 line, qint64 column)
@@ -1273,14 +1325,14 @@ CSVReader::handleDigitalContact(qint64 idx, const QString &name, DigitalContact:
     return true;
   }
 
-  if (_contacts.contains(idx)) {
+  if (_digital_contacts.contains(idx)) {
     qDebug() << "Parse error @" << line << "," << column
              << ": Cannot create contact '" << name << "' with index " << idx
              << " index already taken.";
     return false;
   }
   DigitalContact *contact = new DigitalContact(type, name, id, rxTone);
-  _contacts[idx] = contact;
+  _digital_contacts[idx] = contact;
   _config->contacts()->addContact(contact);
 
   return true;
@@ -1293,14 +1345,14 @@ CSVReader::handleGroupList(qint64 idx, const QString &name, const QList<qint64> 
   if (_link) {
     foreach(qint64 i, contacts) {
       // Check contacts
-      if (! _contacts.contains(i)) {
+      if (! _digital_contacts.contains(i)) {
         qDebug() << "Parse error @" << line << "," << column
                  << ": Cannot create contact list '" << name
                  << ": Unknwon contact index " << i;
         return false;
       }
       // link contacts
-      _rxgroups[idx]->addContact(_contacts[i]);
+      _rxgroups[idx]->addContact(_digital_contacts[i]);
     }
     // done
     return true;
@@ -1337,13 +1389,13 @@ CSVReader::handleDigitalChannel(
     }
     _channels[idx]->as<DigitalChannel>()->setRXGroupList(_rxgroups[gl]);
     // Check TX Contact
-    if ((0 < contact) && (! _contacts.contains(contact))) {
+    if ((0 < contact) && (! _digital_contacts.contains(contact))) {
       qDebug() << "Parse error @" << line << "," << column
                << ": Cannot link digital channel '" << name
                << ": Unknwon contact-index " << contact;
       return false;
     }
-    _channels[idx]->as<DigitalChannel>()->setTXContact(_contacts[contact]);
+    _channels[idx]->as<DigitalChannel>()->setTXContact(_digital_contacts[contact]);
     // Check scanlist
     if ((0 < scan) && (! _scanlists.contains(scan))) {
       qDebug() << "Parse error @" << line << "," << column

@@ -22,8 +22,8 @@ CSVWriter::write(const Config *config, QTextStream &stream)
          << "ID: " << config->id() << "\n"
          << "Name: \"" << config->name() << "\"\n\n"
          << "# Text displayed when the radio powers up (quoted).\n"
-         << "Intro Line 1: \"" << config->introLine1() << "\"\n"
-         << "Intro Line 2: \"" << config->introLine2() << "\"\n\n";
+         << "IntroLine1: \"" << config->introLine1() << "\"\n"
+         << "IntroLine2: \"" << config->introLine2() << "\"\n\n";
 
   stream << "# Table of digital channels.\n"
             "# 1) Channel number: 1-1024\n"
@@ -121,18 +121,18 @@ CSVWriter::write(const Config *config, QTextStream &stream)
   stream << "\n";
 
   stream << "# Table of channel zones.\n"
-            "# 1) Zone number: 1-250\n"
+            "# 1) Zone number\n"
             "# 2) Name in quotes. \n"
             "# 3) VFO: Either A or B.\n"
             "# 4) List of channels: numbers and ranges (N-M) separated by comma\n"
             "#\n"
-            "Zone    Name             Channels\n";
+            "Zone    Name             VFO Channels\n";
   for (int i=0; i<config->zones()->count(); i++) {
     Zone *zone = config->zones()->zone(i);
     if (zone->A()->count()) {
       stream << qSetFieldWidth(8)  << left << (i+1)
-             << qSetFieldWidth(4)  << left << "A"
-             << qSetFieldWidth(17) << left << ("\"" + zone->name() + "\"");
+             << qSetFieldWidth(17) << left << ("\"" + zone->name() + "\"")
+             << qSetFieldWidth(4)  << left << "A";
       QStringList tmp;
       for (int j=0; j<zone->A()->count(); j++) {
         tmp.append(QString::number(config->channelList()->indexOf(zone->A()->channel(j))+1));
@@ -141,8 +141,8 @@ CSVWriter::write(const Config *config, QTextStream &stream)
     }
     if (zone->B()->count()) {
       stream << qSetFieldWidth(8)  << left << (i+1)
-             << qSetFieldWidth(4)  << left << "B"
-             << qSetFieldWidth(17) << left << ("\"" + zone->name() + "\"");
+             << qSetFieldWidth(17) << left << ("\"" + zone->name() + "\"")
+             << qSetFieldWidth(4)  << left << "B";
       QStringList tmp;
       for (int j=0; j<zone->B()->count(); j++) {
         tmp.append(QString::number(config->channelList()->indexOf(zone->B()->channel(j))+1));
@@ -183,24 +183,32 @@ CSVWriter::write(const Config *config, QTextStream &stream)
   stream << "# Table of contacts.\n"
             "# 1) Contact number: 1-256\n"
             "# 2) Name in quotes.\n"
-            "# 3) Call type: Group, Private, All\n"
-            "# 4) Call ID: 1...16777215\n"
+            "# 3) Call type: Group, Private, All or DTMF\n"
+            "# 4) Call ID: 1...16777215 or string with DTMF number\n"
             "# 5) Call receive tone: -, +\n"
             "#\n"
-            "Contact Name             Type    ID       RxTone\n";
+            "Contact Name             Type    ID          RxTone\n";
   for (int i=0; i<config->contacts()->count(); i++) {
-    if (! config->contacts()->contact(i)->is<DigitalContact>())
-      continue;
-    DigitalContact *contact = config->contacts()->contact(i)->as<DigitalContact>();
-    stream << qSetFieldWidth(8)  << left << (i+1)
-           << qSetFieldWidth(17) << left << ("\"" + contact->name() + "\"")
-           << qSetFieldWidth(8)  << left
-           << (DigitalContact::PrivateCall == contact->type() ?
-                 "Private" : (DigitalContact::GroupCall == contact->type() ?
-                                "Group" : "All"))
-           << qSetFieldWidth(9)  << left << contact->number()
-           << qSetFieldWidth(6)  << left << (contact->rxTone() ? "+" : "-");
-    stream << qSetFieldWidth(0) << "\n";
+    if (config->contacts()->contact(i)->is<DigitalContact>()) {
+      DigitalContact *contact = config->contacts()->contact(i)->as<DigitalContact>();
+      stream << qSetFieldWidth(8)  << left << (i+1)
+             << qSetFieldWidth(17) << left << ("\"" + contact->name() + "\"")
+             << qSetFieldWidth(8)  << left
+             << (DigitalContact::PrivateCall == contact->type() ?
+                   "Private" : (DigitalContact::GroupCall == contact->type() ?
+                                  "Group" : "All"))
+             << qSetFieldWidth(12)  << left << contact->number()
+             << qSetFieldWidth(6)  << left << (contact->rxTone() ? "+" : "-");
+      stream << qSetFieldWidth(0) << "\n";
+    } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
+      DTMFContact *contact = config->contacts()->contact(i)->as<DTMFContact>();
+      stream << qSetFieldWidth(8)  << left << (i+1)
+             << qSetFieldWidth(17) << left << ("\"" + contact->name() + "\"")
+             << qSetFieldWidth(8)  << left << "DTMF"
+             << qSetFieldWidth(12) << left << ("\""+contact->number()+"\"")
+             << qSetFieldWidth(6)  << left << (contact->rxTone() ? "+" : "-");
+      stream << qSetFieldWidth(0) << "\n";
+    }
   }
   stream << "\n";
 

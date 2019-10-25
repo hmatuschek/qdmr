@@ -423,6 +423,9 @@ public:
   virtual bool handleVoxLevel(uint level, qint64 line, qint64 column);
   /** Gets called once the MIC level has been parsed. */
   virtual bool handleMicLevel(uint level, qint64 line, qint64 column);
+  /** Gets called once a DTMF contact has been parsed. */
+  virtual bool handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
+                                 qint64 line, qint64 column);
   /** Gets called once a digital contact has been parsed. */
   virtual bool handleDigitalContact(qint64 idx, const QString &name, DigitalContact::Type type, qint64 id,
                                     bool rxTone, qint64 line, qint64 column);
@@ -477,9 +480,9 @@ protected:
   /** Internal function to parse MIC level. */
   bool _parse_mic_level(CSVLexer &lexer);
   /** Internal function to parse a digital contact list. */
-  bool _parse_digital_contacts(CSVLexer &lexer);
+  bool _parse_contacts(CSVLexer &lexer);
   /** Internal function to parse digital contact. */
-  bool _parse_digital_contact(qint64 id, CSVLexer &lexer);
+  bool _parse_contact(qint64 id, CSVLexer &lexer);
   /** Internal function to parse an RX group list. */
   bool _parse_rx_groups(CSVLexer &lexer);
   /** Internal function to parse an RX group. */
@@ -506,7 +509,6 @@ protected:
   CSVHandler *_handler;
 };
 
-/// @endcond
 
 
 /** Implements the text-file codeplug reader.
@@ -530,6 +532,8 @@ public:
   virtual bool handleIntroLine2(const QString &text, qint64 line, qint64 column);
   virtual bool handleVoxLevel(uint level, qint64 line, qint64 column);
   virtual bool handleMicLevel(uint level, qint64 line, qint64 column);
+  virtual bool handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
+                                 qint64 line, qint64 column);
   virtual bool handleDigitalContact(
       qint64 idx, const QString &name, DigitalContact::Type type, qint64 id, bool rxTone,
       qint64 line, qint64 column);
@@ -555,8 +559,8 @@ protected:
   Config *_config;
   /** Index <-> Channel map. */
 	QMap<int, Channel *> _channels;
-  /** Index <-> Contact map. */
-  QMap<int, DigitalContact *> _contacts;
+  /** Index <-> Digital contact map. */
+  QMap<int, DigitalContact *> _digital_contacts;
   /** Index <-> RX group list map. */
   QMap<int, RXGroupList *> _rxgroups;
   /** Index <-> Zone map. */

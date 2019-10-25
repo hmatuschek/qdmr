@@ -1,5 +1,6 @@
 #include "contact.hh"
 #include "config.hh"
+#include "utils.hh"
 #include <QDebug>
 
 
@@ -45,6 +46,11 @@ DTMFContact::DTMFContact(const QString &name, const QString &number, bool rxTone
   // pass...
 }
 
+bool
+DTMFContact::isValid() const {
+  return validDTMFNumber(_number);
+}
+
 const QString &
 DTMFContact::number() const {
   return _number;
@@ -52,8 +58,7 @@ DTMFContact::number() const {
 
 bool
 DTMFContact::setNumber(const QString &number) {
-  QRegExp re("[0-9a-dA-D\\*#]+");
-  if (! re.exactMatch(number.simplified()))
+  if (! validDTMFNumber(number))
     return false;
   _number = number.simplified();
   emit modified();
@@ -278,7 +283,7 @@ ContactList::data(const QModelIndex &index, int role) const {
       DTMFContact *dtmf = contact->as<DTMFContact>();
       switch (index.column()) {
         case 0:
-          return tr("DTMF (analog)");
+          return tr("DTMF");
         case 1:
           return dtmf->name();
         case 2:
@@ -288,7 +293,7 @@ ContactList::data(const QModelIndex &index, int role) const {
         default:
           return QVariant();
       }
-    } else {
+    } else if (contact->is<DigitalContact>()) {
       DigitalContact *digi = contact->as<DigitalContact>();
       switch (index.column()) {
         case 0:
@@ -308,7 +313,6 @@ ContactList::data(const QModelIndex &index, int role) const {
       }
     }
   }
-
   return QVariant();
 }
 
