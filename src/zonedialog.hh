@@ -20,10 +20,15 @@ public:
 	Zone *zone();
 
 protected slots:
-	void onAddChannel();
-	void onRemChannel();
-	void onChannelUp();
-	void onChannelDown();
+	void onAddChannelA();
+	void onRemChannelA();
+	void onChannelAUp();
+	void onChannelADown();
+
+  void onAddChannelB();
+	void onRemChannelB();
+	void onChannelBUp();
+	void onChannelBDown();
 
 protected:
 	void construct();

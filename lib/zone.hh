@@ -8,24 +8,19 @@
 class Channel;
 class Config;
 
-/** Represents a zone within the generic configuration.
- * @ingroup conf */
-class Zone : public QAbstractListModel
+class ZoneChannelList: public QAbstractListModel
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-  /** Constructs an empty Zone with the given name. */
-	explicit Zone(const QString &name, QObject *parent = nullptr);
+  /** Constructs an empty zone channel list. */
+  explicit ZoneChannelList(QObject *parent=nullptr);
 
   /** Returns the number of channels within this zone. */
 	int count() const;
   /** Clears the zone. */
 	void clear();
-  /** Returns the name of the zone. */
-	const QString &name() const;
-  /** Sets the name of the zone. */
-	bool setName(const QString &name);
+
   /** Returns the channel at the given index. */
 	Channel *channel(int idx) const;
   /** Appends a channel to the zone. */
@@ -51,10 +46,47 @@ protected slots:
 	void onChannelDeleted(QObject *obj);
 
 protected:
-  /** Holds the name of the zone. */
-	QString _name;
   /** The channel list. */
 	QVector<Channel *> _channels;
+};
+
+
+
+/** Represents a zone within the generic configuration.
+ * @ingroup conf */
+class Zone : public QObject
+{
+	Q_OBJECT
+
+public:
+  /** Constructs an empty Zone with the given name. */
+	explicit Zone(const QString &name, QObject *parent = nullptr);
+
+  /** Returns the name of the zone. */
+	const QString &name() const;
+  /** Sets the name of the zone. */
+	bool setName(const QString &name);
+
+  /** Retruns the list of channels for VFO A in this zone. */
+  const ZoneChannelList *A() const;
+  /** Retruns the list of channels for VFO A in this zone. */
+  ZoneChannelList* A();
+  /** Retruns the list of channels for VFO B in this zone. */
+  const ZoneChannelList *B() const;
+  /** Retruns the list of channels for VFO B in this zone. */
+  ZoneChannelList* B();
+
+signals:
+  /** Gets emitted whenever the zone gets modified. */
+	void modified();
+
+protected:
+  /** Holds the name of the zone. */
+	QString _name;
+  /** List of channels for VFO A. */
+  ZoneChannelList *_A;
+  /** List of channels for VFO B. */
+  ZoneChannelList *_B;
 };
 
 

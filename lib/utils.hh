@@ -13,18 +13,35 @@
  * end-of-string symbol.
  * @returns The decoded string. */
 QString decode_unicode(const uint16_t *data, size_t size, uint16_t fill=0x0000);
+/** Encodes the string @c text as unicode and stores the result into @c data using up-to @c size
+ * 16bit words in data. The @c fill word specifies the fill and end-of-string word. */
 void encode_unicode(uint16_t *data, const QString &text, size_t size, uint16_t fill=0x0000);
 
+/** Decodes the ascii string in @c data into a @c QString of up-to size length. The @c fill word
+ * specifies the fill and end-of-string word. */
 QString decode_ascii(const uint8_t *data, size_t size, uint16_t fill=0x00);
+/** Encodes the given QString @c text of up-to size length as ASCII into @c data using the
+ * @c fill word as fill and end-of-string word. */
 void encode_ascii(uint8_t *data, const QString &text, size_t size, uint16_t fill=0x00);
 
+/** Decodes an 8 digit BCD encoded frequency (in MHz). */
 double decode_frequency(uint32_t bcd);
+/** Eecodes an 8 digit BCD encoded frequency (in MHz). */
 uint32_t encode_frequency(double freq);
 
+/** Decodes binary (24bit) encoded DMR ID. */
 uint32_t decode_dmr_id(const uint8_t *id);
+/** Encodes binary (24bit) encoded DMR ID. */
 void encode_dmr_id(uint8_t *id, uint32_t num);
 
+/** Decodes the CTCSS tone frequency in Hz. */
 float decode_ctcss_tone(uint16_t data);
+/** Encodes the CTCSS tone frequency in Hz. */
 uint16_t encode_ctcss_tone(float tone);
+
+/** Validates a DMR ID number. */
+bool validDMRNumber(const QString &text);
+/** Validates a DTMF number. */
+bool validDTMFNumber(const QString &text);
 
 #endif // UTILS_HH

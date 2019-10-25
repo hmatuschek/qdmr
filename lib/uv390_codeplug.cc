@@ -47,6 +47,7 @@
 #define VALID_GROUPLIST(gl) VALID_TEXT((gl)->name)
 #define VALID_CONTACT(ct)   ((ct)->type != 0 && VALID_TEXT((ct)->name))
 
+
 /* ******************************************************************************************** *
  * Implementation of UV390Codeplug::channel_t
  * ******************************************************************************************** */
@@ -249,10 +250,9 @@ UV390Codeplug::channel_t::linkChannelObj(Channel *c, Config *conf) const {
       dc->setScanList(conf->scanlists()->scanlist(scan_list_index-1));
     }
     if (contact_name_index) {
-      if ((contact_name_index-1) >= conf->contacts()->count())
+      if ((contact_name_index-1) >= conf->contacts()->digitalCount())
         return false;
-      ///@bug This method fails if there are some non-digital contacts!
-      dc->setTXContact(conf->contacts()->contact(contact_name_index-1)->as<DigitalContact>());
+      dc->setTXContact(conf->contacts()->digitalContact(contact_name_index-1));
     }
     if (group_list_index) {
       if ((group_list_index-1) >= conf->rxGroupLists()->count())
@@ -284,8 +284,8 @@ UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf
     }
     color_code = dchan->colorCode();
     time_slot = (DigitalChannel::TimeSlot1 == dchan->timeslot()) ? 1 : 2;
-    group_list_index = conf->rxGroupLists()->indexOf(dchan->rxGroupList())+1;
-    contact_name_index = conf->contacts()->indexOf(dchan->txContact())+2;
+    group_list_index = conf->rxGroupLists()->indexOf(dchan->rxGroupList()) + 1;
+    contact_name_index = conf->contacts()->indexOfDigital(dchan->txContact()) + 2;
   }
 }
 
@@ -343,6 +343,8 @@ void
 UV390Codeplug::contact_t::fromContactObj(const DigitalContact *cont, const Config *conf) {
   Q_UNUSED(conf);
   clear();
+  if (nullptr == cont)
+    return;
   setId(cont->number());
   setName(cont->name());
   switch (cont->type()) {
@@ -394,7 +396,7 @@ UV390Codeplug::zone_t::linkZone(Zone *zone, Config *conf) const {
   for (int i=0; ((i<16) && member_a[i]); i++) {
     if (member_a[i]>conf->channelList()->count())
       return false;
-    zone->addChannel(conf->channelList()->channel(member_a[i]-1));
+    zone->A()->addChannel(conf->channelList()->channel(member_a[i]-1));
   }
 
   return true;
@@ -405,8 +407,8 @@ UV390Codeplug::zone_t::fromZoneObj(const Zone *zone, const Config *conf) {
   clear();
   setName(zone->name());
   for (int i=0; i<16; i++) {
-    if (i < zone->count())
-      member_a[i] = conf->channelList()->indexOf(zone->channel(i))+1;
+    if (i < zone->A()->count())
+      member_a[i] = conf->channelList()->indexOf(zone->A()->channel(i))+1;
     else
       member_a[i] = 0;
   }
@@ -435,11 +437,31 @@ UV390Codeplug::zone_ext_t::linkZone(Zone *zone, Config *conf) const {
   for (int i=0; (i<48) && ext_a[i]; i++) {
     if ((ext_a[i]-1)>=conf->channelList()->count())
       return false;
-    zone->addChannel(conf->channelList()->channel(ext_a[i]-1));
+    zone->A()->addChannel(conf->channelList()->channel(ext_a[i]-1));
+  }
+  for (int i=0; (i<64) && member_b[i]; i++) {
+    if ((member_b[i]-1)>=conf->channelList()->count())
+      return false;
+    zone->B()->addChannel(conf->channelList()->channel(member_b[i]-1));
   }
 
-  ///@todo Implement ChannelList B for Zone!
   return false;
+}
+
+void
+UV390Codeplug::zone_ext_t::fromZoneObj(const Zone *zone, const Config *config) {
+  for (int i=16; i<64; i++) {
+    if (i < zone->A()->count())
+      ext_a[i-16] = config->channelList()->indexOf(zone->A()->channel(i))+1;
+    else
+      ext_a[i-16] = 0;
+  }
+  for (int i=0; i<64; i++) {
+    if (i < zone->B()->count())
+      member_b[i] = config->channelList()->indexOf(zone->B()->channel(i))+1;
+    else
+      member_b[i] = 0;
+  }
 }
 
 
@@ -480,9 +502,9 @@ UV390Codeplug::grouplist_t::linkRXGroupList(RXGroupList *grp, Config *conf) cons
     return false;
 
   for (int i=0; (i<32)&&(member[i]); i++) {
-    if ((member[i]-1) >= conf->contacts()->count())
+    if ((member[i]-1) >= conf->contacts()->digitalCount())
       return false;
-    grp->addContact(conf->contacts()->contact(member[i]-1)->as<DigitalContact>());
+    grp->addContact(conf->contacts()->digitalContact(member[i]-1));
   }
 
   return true;
@@ -494,7 +516,7 @@ UV390Codeplug::grouplist_t::fromRXGroupListObj(const RXGroupList *grp, const Con
   setName(grp->name());
   for (int i=0; i<32; i++) {
     if (i<grp->count())
-      member[i] = conf->contacts()->indexOf(grp->contact(i))+1;
+      member[i] = conf->contacts()->indexOfDigital(grp->contact(i)) + 1;
     else
       member[i] = 0;
   }
@@ -772,8 +794,8 @@ UV390Codeplug::encode(Config *config) {
   // Define Contacts
   for (int i=0; i<NCONTACTS; i++) {
     contact_t *cont = (contact_t *)(data(OFFSET_CONTACTS+i*sizeof(contact_t)));
-    if (i < config->contacts()->count())
-      cont->fromContactObj(config->contacts()->contact(i)->as<DigitalContact>(), config);
+    if (i < config->contacts()->digitalCount())
+      cont->fromContactObj(config->contacts()->digitalContact(i), config);
     else
       cont->clear();
   }
@@ -799,10 +821,14 @@ UV390Codeplug::encode(Config *config) {
   // Define Zones
   for (int i=0; i<NZONES; i++) {
     zone_t *zone = (zone_t *)(data(OFFSET_ZONES+i*sizeof(zone_t)));
-    if (i < config->zones()->count())
+    zone_ext_t *ext = (zone_ext_t*)(data(OFFSET_ZONEXT+i*sizeof(zone_ext_t)));
+    zone->clear();
+    ext->clear();
+    if (i < config->zones()->count()) {
       zone->fromZoneObj(config->zones()->zone(i), config);
-    else
-      zone->clear();
+      if (config->zones()->zone(i)->B()->count() || (16 < config->zones()->zone(i)->A()->count()))
+        ext->fromZoneObj(config->zones()->zone(i), config);
+    }
   }
 
   // Define Scanlists

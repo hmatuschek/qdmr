@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <QDebug>
 #include <QDateTime>
+#include <QFile>
 #include <cmath>
 #include "csvreader.hh"
 #include "csvwriter.hh"
@@ -156,6 +157,15 @@ Config::onConfigModified() {
 }
 
 bool
+Config::readCSV(const QString &filename) {
+  QFile file(filename);
+  if (! file.open(QIODevice::ReadOnly))
+    return false;
+  QTextStream stream(&file);
+  return readCSV(stream);
+}
+
+bool
 Config::readCSV(QTextStream &stream)
 {
   if (CSVReader::read(this, stream))
@@ -163,6 +173,15 @@ Config::readCSV(QTextStream &stream)
   else
     return false;
   return true;
+}
+
+bool
+Config::writeCSV(const QString &filename) {
+  QFile file(filename);
+  if (! file.open(QIODevice::WriteOnly))
+    return false;
+  QTextStream stream(&file);
+  return writeCSV(stream);
 }
 
 bool

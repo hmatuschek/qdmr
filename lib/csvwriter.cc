@@ -55,7 +55,7 @@ CSVWriter::write(const Config *config, QTextStream &stream)
     stream << qSetFieldWidth(6)  << left << ( (Channel::HighPower == digi->power()) ? "High" : "Low" )
            << qSetFieldWidth(5)  << left << ( nullptr != digi->scanList() ?
           QString::number(config->scanlists()->indexOf(digi->scanList())+1) : QString("-") )
-           << qSetFieldWidth(4)  << left << digi->txTimeout()
+           << qSetFieldWidth(4)  << left << ( (0 == digi->txTimeout()) ? '-' : digi->txTimeout() )
            << qSetFieldWidth(3)  << left << (digi->rxOnly() ? '+' : '-')
            << qSetFieldWidth(7)  << left << (DigitalChannel::AdmitNone ? "-" : (DigitalChannel::AdmitFree ? "Free" : "Color"))
            << qSetFieldWidth(6)  << left << digi->colorCode()
@@ -103,7 +103,7 @@ CSVWriter::write(const Config *config, QTextStream &stream)
     stream << qSetFieldWidth(6)  << left << ( (Channel::HighPower == analog->power()) ? "High" : "Low" )
            << qSetFieldWidth(5)  << left << ( nullptr != analog->scanList() ?
           QString::number(config->scanlists()->indexOf(analog->scanList())+1) : QString("-") )
-           << qSetFieldWidth(4)  << left << analog->txTimeout()
+           << qSetFieldWidth(4)  << left << ( (0 == analog->txTimeout()) ? '-' : analog->txTimeout() )
            << qSetFieldWidth(3)  << left << (analog->rxOnly() ? '+' : '-')
            << qSetFieldWidth(7)  << left << (AnalogChannel::AdmitNone ? "-" : (AnalogChannel::AdmitFree ? "Free" : "Tone"))
            << qSetFieldWidth(8)  << left << analog->squelch();
@@ -123,18 +123,32 @@ CSVWriter::write(const Config *config, QTextStream &stream)
   stream << "# Table of channel zones.\n"
             "# 1) Zone number: 1-250\n"
             "# 2) Name in quotes. \n"
-            "# 3) List of channels: numbers and ranges (N-M) separated by comma\n"
+            "# 3) VFO: Either A or B.\n"
+            "# 4) List of channels: numbers and ranges (N-M) separated by comma\n"
             "#\n"
             "Zone    Name             Channels\n";
   for (int i=0; i<config->zones()->count(); i++) {
     Zone *zone = config->zones()->zone(i);
-    stream << qSetFieldWidth(8)  << left << (i+1)
-           << qSetFieldWidth(17) << left << ("\"" + zone->name() + "\"");
-    QStringList tmp;
-    for (int j=0; j<zone->count(); j++) {
-      tmp.append(QString::number(config->channelList()->indexOf(zone->channel(j))+1));
+    if (zone->A()->count()) {
+      stream << qSetFieldWidth(8)  << left << (i+1)
+             << qSetFieldWidth(4)  << left << "A"
+             << qSetFieldWidth(17) << left << ("\"" + zone->name() + "\"");
+      QStringList tmp;
+      for (int j=0; j<zone->A()->count(); j++) {
+        tmp.append(QString::number(config->channelList()->indexOf(zone->A()->channel(j))+1));
+      }
+      stream << qSetFieldWidth(0) << tmp.join(",") << "\n";
     }
-    stream << qSetFieldWidth(0) << tmp.join(",") << "\n";
+    if (zone->B()->count()) {
+      stream << qSetFieldWidth(8)  << left << (i+1)
+             << qSetFieldWidth(4)  << left << "B"
+             << qSetFieldWidth(17) << left << ("\"" + zone->name() + "\"");
+      QStringList tmp;
+      for (int j=0; j<zone->B()->count(); j++) {
+        tmp.append(QString::number(config->channelList()->indexOf(zone->B()->channel(j))+1));
+      }
+      stream << qSetFieldWidth(0) << tmp.join(",") << "\n";
+    }
   }
   stream << "\n";
 

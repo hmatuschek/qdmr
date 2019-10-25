@@ -107,6 +107,24 @@ ContactList::count() const {
   return _contacts.size();
 }
 
+int
+ContactList::digitalCount() const {
+  int c=0;
+  for (int i=0; i<_contacts.size(); i++)
+    if (_contacts.at(i)->is<DigitalContact>())
+      c++;
+  return c;
+}
+
+int
+ContactList::dtmfCount() const {
+  int c=0;
+  for (int i=0; i<_contacts.size(); i++)
+    if (_contacts.at(i)->is<DTMFContact>())
+      c++;
+  return c;
+}
+
 void
 ContactList::clear() {
   for (int i=0; i<count(); i++)
@@ -120,11 +138,61 @@ ContactList::indexOf(Contact *contact) const {
   return _contacts.indexOf(contact);
 }
 
+int
+ContactList::indexOfDigital(DigitalContact *contact) const {
+  int idx = 0;
+  for (int i=0; i<_contacts.size(); i++) {
+    if (_contacts.at(i) == contact)
+      return idx;
+    else if (_contacts.at(i)->is<DigitalContact>())
+      idx++;
+  }
+  return -1;
+}
+
+int
+ContactList::indexOfDTMF(DTMFContact *contact) const {
+  int idx = 0;
+  for (int i=0; i<_contacts.size(); i++) {
+    if (_contacts.at(i) == contact)
+      return idx;
+    else if (_contacts.at(i)->is<DTMFContact>())
+      idx++;
+  }
+  return -1;
+}
+
 Contact *
 ContactList::contact(int idx) const {
   if (idx >= _contacts.size())
     return nullptr;
   return _contacts[idx];
+}
+
+DigitalContact *
+ContactList::digitalContact(int idx) const {
+  for (int i=0; i<_contacts.size(); i++) {
+    if (_contacts.at(i)->is<DigitalContact>()) {
+      if (0 == idx)
+        return _contacts.at(i)->as<DigitalContact>();
+      else
+        idx--;
+    }
+  }
+  return nullptr;
+}
+
+DTMFContact *
+ContactList::dtmfContact(int idx) const {
+  for (int i=0; i<_contacts.size(); i++) {
+    if (_contacts.at(i)->is<DTMFContact>()) {
+      if (0 == idx)
+        return _contacts.at(i)->as<DTMFContact>();
+      else
+        idx--;
+    }
+  }
+  return nullptr;
 }
 
 bool

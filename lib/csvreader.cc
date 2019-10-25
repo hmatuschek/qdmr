@@ -5,12 +5,12 @@
 #include <QRegExp>
 
 QVector< QPair<QRegExp, CSVLexer::Token::TokenType> > CSVLexer::_pattern = {
-  { QRegExp("^([a-zA-Z_][a-zA-Z0-9_]+)"),      CSVLexer::Token::T_KEYWORD },
+  { QRegExp("^([a-zA-Z_][a-zA-Z0-9_]*)"),      CSVLexer::Token::T_KEYWORD },
   { QRegExp("^\"([^\"\r\n]*)\""),              CSVLexer::Token::T_STRING },
   { QRegExp("^([+-]?[0-9]+(\\.[0-9]*)?)"),     CSVLexer::Token::T_NUMBER },
   { QRegExp("^(:)"),                           CSVLexer::Token::T_COLON },
   { QRegExp("^(-)"),                           CSVLexer::Token::T_NOT_SET },
-  { QRegExp("^(\\+)"),                           CSVLexer::Token::T_ENABLED },
+  { QRegExp("^(\\+)"),                         CSVLexer::Token::T_ENABLED },
   { QRegExp("^(,)"),                           CSVLexer::Token::T_COMMA },
   { QRegExp("^([ \t]+)"),                      CSVLexer::Token::T_WHITESPACE },
   { QRegExp("^(\r?\n)"),                       CSVLexer::Token::T_NEWLINE},
@@ -214,11 +214,12 @@ CSVHandler::handleAnalogChannel(qint64 idx, const QString &name, double rx, doub
 }
 
 bool
-CSVHandler::handleZone(qint64 idx, const QString &name, const QList<qint64> &channels,
+CSVHandler::handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels,
                        qint64 line, qint64 column)
 {
   Q_UNUSED(idx);
   Q_UNUSED(name);
+  Q_UNUSED(a);
   Q_UNUSED(channels);
   Q_UNUSED(line);
   Q_UNUSED(column);
@@ -709,12 +710,12 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  if (CSVLexer::Token::T_NUMBER != token.type) {
+  if ((CSVLexer::Token::T_NUMBER != token.type) && (CSVLexer::Token::T_NOT_SET != token.type)) {
     qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
              << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
     return false;
   }
-  qint64 tot = token.value.toInt();
+  qint64 tot =  (CSVLexer::Token::T_NOT_SET != token.type) ? 0 : token.value.toInt();
 
   bool rxOnly;
   token = lexer.next();
@@ -896,12 +897,12 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  if (CSVLexer::Token::T_NUMBER != token.type) {
+  if ((CSVLexer::Token::T_NUMBER != token.type) && (CSVLexer::Token::T_NOT_SET != token.type)) {
     qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
              << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
     return false;
   }
-  qint64 tot = token.value.toInt();
+  qint64 tot =  (CSVLexer::Token::T_NOT_SET != token.type) ? 0 : token.value.toInt();
 
   bool rxOnly;
   token = lexer.next();
@@ -1034,6 +1035,14 @@ CSVParser::_parse_zone(qint64 idx, CSVLexer &lexer) {
   }
   QString name = token.value;
 
+  token = lexer.next();
+  if ((CSVLexer::Token::T_KEYWORD != token.type) || (("a" != token.value.toLower()) && ("b" != token.value.toLower())) ) {
+    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
+             << ": Unexpected token" << token.type << "'" << token.value << "', expect 'A' or 'B'.";
+    return false;
+  }
+  bool a = ("a" == token.value.toLower());
+
   QList<qint64> lst;
   token = lexer.next();
   while (CSVLexer::Token::T_NUMBER == token.type) {
@@ -1049,7 +1058,7 @@ CSVParser::_parse_zone(qint64 idx, CSVLexer &lexer) {
     return false;
   }
 
-  return _handler->handleZone(idx, name, lst, line, column);
+  return _handler->handleZone(idx, name, a, lst, line, column);
 }
 
 bool
@@ -1398,7 +1407,7 @@ CSVReader::handleAnalogChannel(
 }
 
 bool
-CSVReader::handleZone(qint64 idx, const QString &name, const QList<qint64> &channels, qint64 line, qint64 column)
+CSVReader::handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels, qint64 line, qint64 column)
 {
   if (_link) {
     foreach(qint64 i, channels) {
@@ -1410,23 +1419,21 @@ CSVReader::handleZone(qint64 idx, const QString &name, const QList<qint64> &chan
         return false;
       }
       // link channels
-      _zones[idx]->addChannel(_channels[i]);
+      if (a)
+        _zones[idx]->A()->addChannel(_channels[i]);
+      else
+        _zones[idx]->B()->addChannel(_channels[i]);
     }
     // done
     return true;
   }
 
   // check index
-  if (_zones.contains(idx)) {
-    qDebug() << "Parse error @" << line << "," << column
-             << ": Cannot create zone '" << name << "' with index " << idx
-             << " index already taken.";
-    return false;
+  if (! _zones.contains(idx)) {
+    Zone *zone = new Zone(name);
+    _zones[idx] = zone;
+    _config->zones()->addZone(zone);
   }
-
-  Zone *zone = new Zone(name);
-  _zones[idx] = zone;
-  _config->zones()->addZone(zone);
 
   return true;
 }

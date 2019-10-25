@@ -240,7 +240,9 @@ public:
      * linking to the referred channels. */
     bool linkZoneObj(Zone *zone, const Config *conf) const;
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
-    void fromZoneObj(const Zone *zone, const Config *conf);
+    void fromZoneObjA(const Zone *zone, const Config *conf);
+    /** Resets this codeplug zone representation from the given generic @c Zone object. */
+    void fromZoneObjB(const Zone *zone, const Config *conf);
 	} zone_t;
 
 	/** Table of zones. */

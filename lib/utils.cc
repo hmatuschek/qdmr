@@ -1,4 +1,5 @@
 #include "utils.hh"
+#include <QRegExp>
 #include <QDebug>
 
 QString
@@ -142,4 +143,14 @@ encode_ctcss_tone(float hz)
   tag = 0;
 
   return (a << 12) | (b << 8) | (c << 4) | d | (tag << 14);
+}
+
+bool
+validDMRNumber(const QString &text) {
+  return QRegExp("^[0-9]+$").exactMatch(text);
+}
+
+bool
+validDTMFNumber(const QString &text) {
+  return QRegExp("^[0-9a-dA-D\\*#]+$").exactMatch(text);
 }

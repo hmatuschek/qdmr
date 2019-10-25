@@ -139,11 +139,16 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                       VerifyIssue::WARNING,
                       tr("Zone name '%1' length %2 exceeds limit of %3 characters.")
                       .arg(zone->name()).arg(zone->name().size()).arg(features().maxZoneNameLength)));
-    if (zone->count() > features().maxChannelsInZone)
+    if (zone->A()->count() > features().maxChannelsInZone)
       issues.append(VerifyIssue(
                       VerifyIssue::ERROR,
-                      tr("Number of channels %2 in zone '%1' exceeds limit %3.")
-                      .arg(zone->name()).arg(zone->count()).arg(features().maxChannelsInZone)));
+                      tr("Number of channels %2 in zone '%1' A exceeds limit %3.")
+                      .arg(zone->name()).arg(zone->A()->count()).arg(features().maxChannelsInZone)));
+    if (zone->B()->count() > features().maxChannelsInZone)
+      issues.append(VerifyIssue(
+                      VerifyIssue::ERROR,
+                      tr("Number of channels %2 in zone '%1' B exceeds limit %3.")
+                      .arg(zone->name()).arg(zone->A()->count()).arg(features().maxChannelsInZone)));
   }
 
   // Check scan lists

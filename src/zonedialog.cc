@@ -27,30 +27,46 @@ ZoneDialog::construct() {
 
   if (_zone) {
     zoneName->setText(_zone->name());
-    for (int i=0; i<_zone->rowCount(QModelIndex()); i++) {
-      Channel *channel = _zone->channel(i);
+    for (int i=0; i<_zone->A()->count(); i++) {
+      Channel *channel = _zone->A()->channel(i);
       if (channel->is<AnalogChannel>()) {
         QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
         item->setData(Qt::UserRole, QVariant::fromValue(channel));
-        channelList->addItem(item);
+        channelListA->addItem(item);
       } else {
         QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
         item->setData(Qt::UserRole, QVariant::fromValue(channel));
-        channelList->addItem(item);
+        channelListA->addItem(item);
+      }
+    }
+    for (int i=0; i<_zone->B()->count(); i++) {
+      Channel *channel = _zone->B()->channel(i);
+      if (channel->is<AnalogChannel>()) {
+        QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
+        item->setData(Qt::UserRole, QVariant::fromValue(channel));
+        channelListB->addItem(item);
+      } else {
+        QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
+        item->setData(Qt::UserRole, QVariant::fromValue(channel));
+        channelListB->addItem(item);
       }
     }
   }
 
-  connect(addChannel, SIGNAL(clicked()), this, SLOT(onAddChannel()));
-  connect(remChannel, SIGNAL(clicked()), this, SLOT(onRemChannel()));
-  connect(channelUp, SIGNAL(clicked()), this, SLOT(onChannelUp()));
-  connect(channelDown, SIGNAL(clicked()), this, SLOT(onChannelDown()));
+  connect(addChannelA, SIGNAL(clicked()), this, SLOT(onAddChannelA()));
+  connect(remChannelA, SIGNAL(clicked()), this, SLOT(onRemChannelA()));
+  connect(channelAUp, SIGNAL(clicked()), this, SLOT(onChannelAUp()));
+  connect(channelADown, SIGNAL(clicked()), this, SLOT(onChannelADown()));
+  connect(addChannelB, SIGNAL(clicked()), this, SLOT(onAddChannelB()));
+  connect(remChannelB, SIGNAL(clicked()), this, SLOT(onRemChannelB()));
+  connect(channelBUp, SIGNAL(clicked()), this, SLOT(onChannelBUp()));
+  connect(channelBDown, SIGNAL(clicked()), this, SLOT(onChannelBDown()));
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
 void
-ZoneDialog::onAddChannel() {
+ZoneDialog::onAddChannelA() {
   ChannelSelectionDialog dia(_config->channelList());
   if (QDialog::Accepted != dia.exec())
     return;
@@ -59,57 +75,112 @@ ZoneDialog::onAddChannel() {
   if (channel->is<AnalogChannel>()) {
     QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
     item->setData(Qt::UserRole, QVariant::fromValue(channel));
-    channelList->addItem(item);
+    channelListA->addItem(item);
   } else {
     QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
     item->setData(Qt::UserRole, QVariant::fromValue(channel));
-    channelList->addItem(item);
+    channelListA->addItem(item);
   }
 }
 
 void
-ZoneDialog::onRemChannel() {
-  if (0 == channelList->selectedItems().size())
+ZoneDialog::onRemChannelA() {
+  if (0 == channelListA->selectedItems().size())
     return;
-  QListWidgetItem *item = channelList->takeItem(channelList->currentRow());
+  QListWidgetItem *item = channelListA->takeItem(channelListA->currentRow());
   delete item;
 }
 
 void
-ZoneDialog::onChannelUp() {
-  if (0 == channelList->selectedItems().size())
+ZoneDialog::onChannelAUp() {
+  if (0 == channelListA->selectedItems().size())
     return;
-  int idx = channelList->currentRow();
+  int idx = channelListA->currentRow();
   if (0 == idx)
     return;
-  QListWidgetItem *item = channelList->takeItem(idx);
-  channelList->insertItem(idx-1, item);
-  channelList->setCurrentRow(idx-1);
+  QListWidgetItem *item = channelListA->takeItem(idx);
+  channelListA->insertItem(idx-1, item);
+  channelListA->setCurrentRow(idx-1);
 }
 
 void
-ZoneDialog::onChannelDown() {
-  if (0 == channelList->selectedItems().size())
+ZoneDialog::onChannelADown() {
+  if (0 == channelListA->selectedItems().size())
     return;
-  int idx = channelList->currentRow();
-  if ((channelList->count()-1) <= idx)
+  int idx = channelListA->currentRow();
+  if ((channelListA->count()-1) <= idx)
     return;
-  QListWidgetItem *item = channelList->takeItem(idx);
-  channelList->insertItem(idx+1, item);
-  channelList->setCurrentRow(idx+1);
+  QListWidgetItem *item = channelListA->takeItem(idx);
+  channelListA->insertItem(idx+1, item);
+  channelListA->setCurrentRow(idx+1);
+}
+
+void
+ZoneDialog::onAddChannelB() {
+  ChannelSelectionDialog dia(_config->channelList());
+  if (QDialog::Accepted != dia.exec())
+    return;
+
+  Channel *channel = dia.channel();
+  if (channel->is<AnalogChannel>()) {
+    QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
+    item->setData(Qt::UserRole, QVariant::fromValue(channel));
+    channelListB->addItem(item);
+  } else {
+    QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
+    item->setData(Qt::UserRole, QVariant::fromValue(channel));
+    channelListB->addItem(item);
+  }
+}
+
+void
+ZoneDialog::onRemChannelB() {
+  if (0 == channelListB->selectedItems().size())
+    return;
+  QListWidgetItem *item = channelListB->takeItem(channelListB->currentRow());
+  delete item;
+}
+
+void
+ZoneDialog::onChannelBUp() {
+  if (0 == channelListB->selectedItems().size())
+    return;
+  int idx = channelListB->currentRow();
+  if (0 == idx)
+    return;
+  QListWidgetItem *item = channelListB->takeItem(idx);
+  channelListB->insertItem(idx-1, item);
+  channelListB->setCurrentRow(idx-1);
+}
+
+void
+ZoneDialog::onChannelBDown() {
+  if (0 == channelListB->selectedItems().size())
+    return;
+  int idx = channelListB->currentRow();
+  if ((channelListB->count()-1) <= idx)
+    return;
+  QListWidgetItem *item = channelListB->takeItem(idx);
+  channelListB->insertItem(idx+1, item);
+  channelListB->setCurrentRow(idx+1);
 }
 
 Zone *
 ZoneDialog::zone() {
   if (_zone) {
     _zone->setName(zoneName->text().simplified());
-    _zone->clear();
-    for (int i=0; i<channelList->count(); i++)
-      _zone->addChannel(channelList->item(i)->data(Qt::UserRole).value<Channel*>());
+    _zone->A()->clear();
+    for (int i=0; i<channelListA->count(); i++)
+      _zone->A()->addChannel(channelListA->item(i)->data(Qt::UserRole).value<Channel*>());
+    _zone->B()->clear();
+    for (int i=0; i<channelListB->count(); i++)
+      _zone->B()->addChannel(channelListB->item(i)->data(Qt::UserRole).value<Channel*>());
     return _zone;
   }
   Zone *zone = new Zone(zoneName->text(), this);
-  for (int i=0; i<channelList->count(); i++)
-    zone->addChannel(channelList->item(i)->data(Qt::UserRole).value<Channel *>());
+  for (int i=0; i<channelListA->count(); i++)
+    zone->A()->addChannel(channelListA->item(i)->data(Qt::UserRole).value<Channel *>());
+  for (int i=0; i<channelListB->count(); i++)
+    zone->B()->addChannel(channelListB->item(i)->data(Qt::UserRole).value<Channel *>());
   return zone;
 }

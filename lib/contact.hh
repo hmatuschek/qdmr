@@ -129,6 +129,11 @@ protected:
 
 /** Represents the list of contacts within the abstract radio configuration.
  *
+ * A special feature of this list, is that DTMF and digital contacts can be accessed by their own
+ * unique index altough they are held within this single list. Most radios manage digital and
+ * DTMF contacts in separate lists, hence a means to iterate over and get indices of digital and
+ * DTMF contacts only is needed.
+ *
  * This class implements the @c QAbstractTableModel, such that the list can be shown with the
  * @c QTableView widget.
  *
@@ -143,12 +148,28 @@ public:
 
   /** Returns the number of contacts. */
 	int count() const;
+  /** Returns the number of digital contacts. */
+	int digitalCount() const;
+  /** Returns the number of DTMF contacts. */
+	int dtmfCount() const;
+
   /** Clears the contact list. */
   void clear();
+
   /** Returns the contact at index @c idx. */
   Contact *contact(int idx) const;
+  /** Returns the digital contact at index @c idx among digital contacts. */
+  DigitalContact *digitalContact(int idx) const;
+  /** Returns the DTMF contact at index @c idx among DTMF contacts. */
+  DTMFContact *dtmfContact(int idx) const;
+
   /** Returns the index of the given contact. */
   int indexOf(Contact *contact) const;
+  /** Returns the index of the given digital contact within digital contacts. */
+  int indexOfDigital(DigitalContact *contact) const;
+  /** Returns the index of the given DTMF contact within DTMF contacts. */
+  int indexOfDTMF(DTMFContact *contact) const;
+
   /** Adds a contact to the list at the given @ç row.
    * If row < 0, the contact gets appended to the list. */
   int addContact(Contact *contact, int row=-1);
@@ -156,6 +177,7 @@ public:
   bool remContact(int idx);
   /** Removes the given contact from the list. */
 	bool remContact(Contact *contact);
+
   /** Moves the contact at the given @c row one up. */
   bool moveUp(int row);
   /** Moves the contact at the given @c row one down. */

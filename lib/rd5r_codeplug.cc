@@ -158,8 +158,8 @@ RD5RCodeplug::channel_t::linkChannelObj(Channel *c, Config *conf) const {
       dc->setScanList(conf->scanlists()->scanlist(scan_list_index-1));
     if (group_list_index && (conf->rxGroupLists()->count() >= group_list_index))
       dc->setRXGroupList(conf->rxGroupLists()->list(group_list_index-1));
-    if (contact_name_index && (conf->contacts()->count() >= contact_name_index))
-      dc->setTXContact(conf->contacts()->contact(contact_name_index-1)->as<DigitalContact>());
+    if (contact_name_index && (conf->contacts()->digitalCount() >= contact_name_index))
+      dc->setTXContact(conf->contacts()->digitalContact(contact_name_index-1));
   }
   return true;
 }
@@ -198,7 +198,7 @@ RD5RCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
     colorcode_rx = colorcode_tx = dc->colorCode();
     scan_list_index = conf->scanlists()->indexOf(dc->scanList()) + 1;
     group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList()) + 1;
-    contact_name_index = conf->contacts()->indexOf(dc->txContact()) + 1;
+    contact_name_index = conf->contacts()->indexOfDigital(dc->txContact()) + 1;
   }
 }
 
@@ -298,17 +298,37 @@ RD5RCodeplug::zone_t::linkZoneObj(Zone *zone, const Config *conf) const {
   if (! isValid())
     return false;
   for (int i=0; (i<16) && member[i]; i++)
-    zone->addChannel(conf->channelList()->channel(member[i]-1));
+    zone->A()->addChannel(conf->channelList()->channel(member[i]-1));
   return true;
 }
 
 void
-RD5RCodeplug::zone_t::fromZoneObj(const Zone *zone, const Config *conf) {
+RD5RCodeplug::zone_t::fromZoneObjA(const Zone *zone, const Config *conf) {
   clear();
-  setName(zone->name());
+  if (zone->A()->count() && zone->B()->count())
+    setName(zone->name() + " A");
+  else
+    setName(zone->name());
+
   for (int i=0; i<16; i++) {
-    if (i < zone->count())
-      member[i] = conf->channelList()->indexOf(zone->channel(i))+1;
+    if (i < zone->A()->count())
+      member[i] = conf->channelList()->indexOf(zone->A()->channel(i))+1;
+    else
+      member[i] = 0;
+  }
+}
+
+void
+RD5RCodeplug::zone_t::fromZoneObjB(const Zone *zone, const Config *conf) {
+  clear();
+  if (zone->A()->count() && zone->B()->count())
+    setName(zone->name() + " B");
+  else
+    setName(zone->name());
+
+  for (int i=0; i<16; i++) {
+    if (i < zone->B()->count())
+      member[i] = conf->channelList()->indexOf(zone->B()->channel(i))+1;
     else
       member[i] = 0;
   }
@@ -334,9 +354,8 @@ RD5RCodeplug::grouplist_t::toRXGroupListObj() {
 
 bool
 RD5RCodeplug::grouplist_t::linkRXGroupListObj(RXGroupList *lst, const Config *conf) const {
-  for (int i=0; (i<16)&&member[i]; i++) {
-    lst->addContact(conf->contacts()->contact(member[i]-1)->as<DigitalContact>());
-  }
+  for (int i=0; (i<16) && member[i]; i++)
+    lst->addContact(conf->contacts()->digitalContact(member[i]-1));
   return false;
 }
 
@@ -345,7 +364,7 @@ RD5RCodeplug::grouplist_t::fromRXGroupListObj(const RXGroupList *lst, const Conf
   setName(lst->name());
   for (int i=0; i<16; i++) {
     if (i < lst->count())
-      member[i] = conf->contacts()->indexOf(lst->contact(i))+1;
+      member[i] = conf->contacts()->indexOfDigital(lst->contact(i))+1;
     else
       member[i] = 0;
   }
@@ -668,18 +687,34 @@ RD5RCodeplug::encode(Config *config)
   }
 
   // Pack Zones
-  for (int i=0; i<NZONES; i++) {
+  bool pack_zone_a = true;
+  for (int i=0, j=0; i<NZONES; i++) {
     zonetab_t *zt = (zonetab_t*) data(OFFSET_ZONETAB);
     zone_t *z = &zt->zone[i];
 
-    if (i >= config->zones()->count()) {
+next:
+    if (j >= config->zones()->count()) {
       // Clear valid bit.
       zt->bitmap[i / 8] &= ~(1 << (i & 7));
       continue;
     }
 
     // Construct from Zone obj
-    z->fromZoneObj(config->zones()->zone(i), config);
+    Zone *zone = config->zones()->zone(j);
+    if (pack_zone_a) {
+      pack_zone_a = false;
+      if (zone->A()->count())
+        z->fromZoneObjA(zone, config);
+      else
+        goto next;
+    } else {
+      pack_zone_a = true;
+      j++;
+      if (zone->B()->count())
+        z->fromZoneObjB(zone, config);
+      else
+        goto next;
+    }
 
     // Set valid bit.
     zt->bitmap[i / 8] |= 1 << (i & 7);
@@ -704,9 +739,9 @@ RD5RCodeplug::encode(Config *config)
   for (int i=0; i<NCONTACTS; i++) {
     contact_t *ct = (contact_t*) data(OFFSET_CONTACTS + (i)*sizeof(contact_t));
     ct->clear();
-    if (i >= config->contacts()->count())
+    if (i >= config->contacts()->digitalCount())
       continue;
-    ct->fromContactObj(config->contacts()->contact(i)->as<const DigitalContact>(), config);
+    ct->fromContactObj(config->contacts()->digitalContact(i), config);
   }
 
   // Pack Grouplists:

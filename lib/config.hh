@@ -80,8 +80,12 @@ public:
   /** Clears the complete configuration. */
   void reset();
 
+  /** Imports a configuration from the given file. */
+  bool readCSV(const QString &filename);
   /** Imports a configuration from the given text stream in text format. */
   bool readCSV(QTextStream &stream);
+  /** Exports the configuration to the given file. */
+  bool writeCSV(const QString &filename);
   /** Exports the configuration to the given text stream in text format. */
   bool writeCSV(QTextStream &stream);
 
