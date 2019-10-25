@@ -16,12 +16,14 @@ class RepeaterDatabase : public QAbstractTableModel
 	Q_OBJECT
 
 public:
-	explicit RepeaterDatabase(QObject *parent=nullptr);
+	explicit RepeaterDatabase(const QGeoCoordinate &qth, uint updatePeriodDays=5, QObject *parent=nullptr);
 
 	bool load();
 	bool load(const QString &filename);
 
   const QJsonObject &repeater(int idx) const;
+
+	uint dbAge() const;
 
   int rowCount(const QModelIndex &parent=QModelIndex()) const;
   int columnCount(const QModelIndex &parent=QModelIndex()) const;
@@ -34,6 +36,7 @@ protected slots:
 	void downloadFinished(QNetworkReply *reply);
 
 protected:
+	QGeoCoordinate _qth;
 	QVector<QJsonObject>  _repeater;
 	QHash<QString, uint>  _callsigns;
 	QNetworkAccessManager _network;
@@ -46,9 +49,6 @@ class DMRRepeaterFilter: public QSortFilterProxyModel
 
 public:
   explicit DMRRepeaterFilter(QObject *parent=nullptr);
-
-protected:
-  //bool lessThan(const QModelIndex &src_left, const QModelIndex &src_right) const;
 };
 
 
@@ -58,9 +58,6 @@ class FMRepeaterFilter: public QSortFilterProxyModel
 
 public:
   explicit FMRepeaterFilter(QObject *parent=nullptr);
-
-protected:
-  //bool lessThan(const QModelIndex &src_left, const QModelIndex &src_right) const;
 };
 
 #endif // REPEATERDATABASE_HH

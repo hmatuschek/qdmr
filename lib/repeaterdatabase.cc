@@ -5,8 +5,8 @@
 #include <QFile>
 #include <QDir>
 #include <QNetworkReply>
-#include "application.hh"
-#include "settings.hh"
+#include <algorithm>
+
 
 class DistanceIsLess
 {
@@ -24,13 +24,13 @@ private:
 };
 
 
-RepeaterDatabase::RepeaterDatabase(QObject *parent)
-  : QAbstractTableModel(parent), _repeater(), _callsigns(), _network()
+RepeaterDatabase::RepeaterDatabase(const QGeoCoordinate &qth, uint updatePeriodDays, QObject *parent)
+  : QAbstractTableModel(parent), _qth(qth), _repeater(), _callsigns(), _network()
 {
   connect(&_network, SIGNAL(finished(QNetworkReply*)),
           this, SLOT(downloadFinished(QNetworkReply*)));
 
-  if ((! load()) || Settings().repeaterUpdateNeeded())
+  if ((! load()) || (updatePeriodDays < dbAge()))
     download();
 }
 
@@ -80,11 +80,14 @@ RepeaterDatabase::load(const QString &filename) {
     _repeater.append(repeater);
     _callsigns[repeater["callsign"].toString()] = i;
   }
-  QGeoCoordinate qth = Settings().position();
-  if (qth.isValid()) {
-    qStableSort(_repeater.begin(), _repeater.end(), DistanceIsLess(qth));
-  }
+  // Sort repeater w.r.t. distance to me
+  if (_qth.isValid())
+    std::stable_sort(_repeater.begin(), _repeater.end(), DistanceIsLess(_qth));
+  // Done.
   endResetModel();
+
+  qDebug() << __FILE__ << "Loaded repeater database with" << _repeater.size() << "entries.";
+
   return true;
 }
 
@@ -119,10 +122,16 @@ RepeaterDatabase::downloadFinished(QNetworkReply *reply) {
   file.close();
 
   load();
-
-  Settings().repeaterUpdated();
-
   reply->deleteLater();
+}
+
+uint
+RepeaterDatabase::dbAge() const {
+  QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/repeater.json";
+  QFileInfo info(path);
+  if (! info.exists())
+    return -1;
+  return info.lastModified().daysTo(QDateTime::currentDateTime());
 }
 
 int

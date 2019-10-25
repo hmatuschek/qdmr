@@ -2,7 +2,7 @@
  * Libdmrconf is a Qt based library, providing methods to assemble, read and program codeplugs for
  * cheap Chineese DMR radios. To this end, it aims at providing a common way to describe codeplugs
  * irrespective of the actual radio being used. This project relies heavily on the work by
- * Serge (https://github.com/sergev/dmrconfig).
+ * Serge Vakulenko (https://github.com/sergev/dmrconfig).
  *
  * The aim of this project is, to define a minimal but sufficient generic configuration for all
  * radios, such that all relevant ham-radio features of the radios can be used. This is a challange,

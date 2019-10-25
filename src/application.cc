@@ -2,6 +2,7 @@
 #include <QMainWindow>
 #include <QtUiTools>
 #include <QDesktopServices>
+
 #include "radio.hh"
 #include "config.h"
 #include "settings.hh"
@@ -12,6 +13,8 @@
 #include "rxgrouplistdialog.hh"
 #include "zonedialog.hh"
 #include "scanlistdialog.hh"
+#include "repeaterdatabase.hh"
+#include "userdatabase.hh"
 
 
 Application::Application(int &argc, char *argv[])
@@ -21,7 +24,9 @@ Application::Application(int &argc, char *argv[])
   setOrganizationName("DM3MAT");
   setOrganizationDomain("hmatuschek.github.io");
 
-  _repeater = new RepeaterDatabase(this);
+  Settings settings;
+  _repeater = new RepeaterDatabase(settings.position(), 7, this);
+  _users    = new UserDatabase(30, this);
   _config = new Config(this);
 
   if (argc>1) {
@@ -34,7 +39,6 @@ Application::Application(int &argc, char *argv[])
     _config->readCSV(stream);
   }
 
-  Settings settings;
   _currentPosition = settings.position();
   _source = QGeoPositionInfoSource::createDefaultSource(this);
   if (_source) {    

@@ -315,8 +315,9 @@ class RXGroupList;
 class Zone;
 class ScanList;
 
-/** The lexer class divides a text stream into tokens.
- * @ingroup conffile */
+/// @cond with_internal_docs
+
+/** The lexer class divides a text stream into tokens. */
 class CSVLexer: public QObject
 {
   Q_OBJECT
@@ -390,12 +391,13 @@ protected:
   static QVector< QPair<QRegExp, Token::TokenType> > _pattern;
 };
 
+/// @endcond
+
 
 /** Basic parse-handler interface.
  *
  * That is, a set of callbacks getting called by the parser on the occurence of a particular
  * statement in the config file.
- *
  * @ingroup conffile */
 class CSVHandler: public QObject
 {
@@ -449,9 +451,7 @@ public:
 /** The actual config file parser.
  *
  * This class parses the config file and calls the associated callback functions of a handler
- * instance that is responsible to assemble the final @c Config instance.
- *
- * @ingroup conffile */
+ * instance that is responsible to assemble the final @c Config instance. */
 class CSVParser: public QObject
 {
   Q_OBJECT
@@ -505,6 +505,8 @@ protected:
   /** The handler instance. */
   CSVHandler *_handler;
 };
+
+/// @endcond
 
 
 /** Implements the text-file codeplug reader.

@@ -2,6 +2,7 @@
 #include "application.hh"
 #include <QCompleter>
 #include "ctcssbox.hh"
+#include "repeaterdatabase.hh"
 
 
 /* ********************************************************************************************* *

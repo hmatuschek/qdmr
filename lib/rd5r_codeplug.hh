@@ -42,6 +42,7 @@ class RD5RCodeplug : public CodePlug
 	Q_OBJECT
 
 public:
+  /// @cond with_internal_docs
   /** Represents a configured channel within the codeplug. */
 	typedef struct {
     /** Possible channel types. */
@@ -401,6 +402,7 @@ public:
     /** Set the time-stamp to the given date and time. */
     void set(const QDateTime &dt);
   } timestamp_t;
+  /// @endcond
 
 public:
   /** Empty constructor. */

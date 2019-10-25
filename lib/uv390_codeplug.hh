@@ -16,6 +16,7 @@ class UV390Codeplug : public CodePlug
   Q_OBJECT
 
 public:
+  /// @cond with_internal_docs
   /** Represents a single channel (analog or digital) within the codeplug. */
 	typedef struct {
     /** Possible channel modes. */
@@ -216,9 +217,7 @@ public:
     void fromChannelObj(const Channel *c, const Config *conf);
 	} channel_t;
 
-	/**
-	 * Contact data.
-	 **/
+	/** Represents a digital (DMR) contact within the codeplug. */
 	typedef struct {
     /** Call types. */
 		typedef enum {
@@ -258,9 +257,9 @@ public:
     void fromContactObj(const DigitalContact *obj, const Config *conf);
 	} contact_t;
 
-	/**
-	 * Zone data.
-	 */
+	/** Represents a zone within the codeplug.
+	 * Please note that a zone consists of two structs the @c zone_t and the @c zone_ext_t.
+	 * The latter adds additional channels for VFO A and the channels for VFO B. */
 	typedef struct {
     // Bytes 0-31
     uint16_t name[16];              ///< Zone Name (Unicode).
@@ -288,7 +287,7 @@ public:
 
   /** Extended zone data.
    * The zone definition @c zone_t contains only a single set of 16 channels. For each zone
-   * definition, there is a zone extension which extends a zone to zwo sets of each 64 channels. */
+   * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each. */
 	typedef struct {
     // Bytes 0-95
     uint16_t ext_a[48];             ///< Member A: Channels 17...64, 0=empty/EOL
@@ -307,9 +306,7 @@ public:
     void fromZoneObj(const Zone *zone, const Config *conf);
 	} zone_ext_t;
 
-	/**
-	 * Representation of a RX group list.
-	 */
+	/** Representation of an RX group list within the codeplug. */
 	typedef struct {
     // Bytes 0-31
     uint16_t name[16];              ///< Group List Name (16 x 16bit Unicode)
@@ -333,7 +330,6 @@ public:
     /** Initializes this codeplug group list from the given generic RX group list. */
     void fromRXGroupListObj(const RXGroupList *obj, const Config *conf);
 	} grouplist_t;
-
 
 	/** Represents a scan list within the codeplug. */
 	typedef struct {
@@ -532,7 +528,8 @@ public:
   } message_t;
 
 
-  /** Represents a single GPS system within the codeplug. */
+  /** Represents a single GPS system within the codeplug.
+   * @todo Verify layout and offset! */
   typedef struct {
     uint16_t revert_channel;              ///< Revert channel index, 0=current.
     uint8_t  repeat_interval;             ///< Repeat interval x*30s, 0=off.
@@ -542,14 +539,15 @@ public:
   } gpssystem_t;
 
 
-	/** Represents an entry within the callsign database. */
+	/** Represents an entry within the callsign database.
+   * @todo Implement generic config representation for callsign database. */
 	typedef struct {
-	    unsigned dmrid   : 24;      ///< DMR id in BCD
-	    unsigned _unused : 8;       ///< Unknown set to 0xff.
-	    char     callsign[16];      ///< ASCII zero-terminated
-	    char     name[100];         ///< Descriptive name, nickname, city, state, country.
-	} callsign_t;
-
+    unsigned dmrid   : 24;      ///< DMR id in BCD
+    unsigned _unused : 8;       ///< Unknown set to 0xff.
+    char     callsign[16];      ///< ASCII zero-terminated
+    char     name[100];         ///< Descriptive name, nickname, city, state, country.
+  } callsign_t;
+  /// @endcond
 
 public:
   /** Default constructor. */

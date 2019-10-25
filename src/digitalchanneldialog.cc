@@ -2,6 +2,7 @@
 #include "application.hh"
 #include <QCompleter>
 #include "rxgrouplistdialog.hh"
+#include "repeaterdatabase.hh"
 
 
 /* ********************************************************************************************* *

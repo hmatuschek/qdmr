@@ -3,11 +3,12 @@
 
 #include <QApplication>
 #include "config.hh"
-#include "repeaterdatabase.hh"
-
+#include <QGeoPositionInfoSource>
 
 class QMainWindow;
 class Radio;
+class RepeaterDatabase;
+class UserDatabase;
 
 
 class Application : public QApplication
@@ -92,6 +93,7 @@ protected:
   Config *_config;
   QMainWindow *_mainWindow;
   RepeaterDatabase *_repeater;
+  UserDatabase *_users;
   QGeoPositionInfoSource *_source;
   QGeoCoordinate _currentPosition;
 };
