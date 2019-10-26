@@ -1,12 +1,23 @@
 /** @defgroup rd5r Baofeng/Radioddity RD-5R device specific classes.
  *
+ * <img src="rd5r.jpg" width="200px" align="left"/>
  * The Baofeng/Radioddity RD-5R radio is likely the cheapest fully DMR compatiple (Tier I&II) VHF/UHF
  * radio on the market. Consequently, it is quiet popular and is usually the first DMR radio
- * many operators may buy.
+ * many operators may buy. In my opinion it is a decent radio with reasonable sensitivity and audio
+ * quality (for a handheld). However, the receiver frontend seems to be identical to the analog
+ * Baofeng handhelds and thus suffers from the same well known issue of blocking whenever a strong
+ * signal is nearby (even across bands). But you get a lot for a $70 radio.
  *
  * It features up to 1024 channels organized in 250 zones, where each zone may contain up to
- * 16 channels. The radio is a dual VFO and each VFO might be assigned to  a different zone. The
- * radio can also hold up to 255 contacts, 64 RX group lists and 250 scanlists.
+ * 16 channels. The radio is a dual VFO and each VFO might be assigned to a different zone. Hence, a
+ * zone is just a single list of up to 16 channels (in contrast to many other radios where a zone
+ * contains two lists of channels for each VFO).
+ *
+ * The radio can also hold up to 255 contacts (actually 256, but due to a bug in the firmware RX is
+ * disabled whenever all 256 contacts are set), 64 RX group lists and 250 scanlists.
+ *
+ * @todo Reverse engeneer & implement DTMF contacts for RD-5R codeplug.
+ * @todo Implement preset messages for RD-5R codeplug.
  *
  * @ingroup dsc */
 #ifndef RD5R_HH

@@ -109,7 +109,7 @@ UV390::run() {
   if (StatusDownload == _task) {
     emit downloadStarted();
 
-    for (size_t bno=1; bno<(_codeplug.size()/1024); bno++)
+    for (size_t bno=0; bno<(_codeplug.size()/1024); bno++)
     {
       if (! _dev->read_block(bno, _codeplug.data(bno*1024), 1024)) {
         _task = StatusError;

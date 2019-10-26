@@ -2,6 +2,7 @@
 #define RT3S_GPS_CODEPLUG_HH
 
 #include "codeplug.hh"
+#include <QDateTime>
 
 class Channel;
 class DigitalContact;
@@ -10,13 +11,40 @@ class RXGroupList;
 class ScanList;
 
 /** Represents the device specific binary codeplug for TYT UV-390 & Retevis RT3S radios.
+ *
+ * The codeplug consists of two segments. The first segment starts at address @c 0x002800 and ends at
+ * address @c 0x040800. The second segment starts at address @c 0x110800 and ends at @c 0x1a0800. The
+ * segments must align with @c 0x400 (1024 bytes).
+ *
+ * @section uv390cpl Codeplug structure within radio
+ * <table>
+ *  <tr><th>Start</th>    <th>End</th>      <th>Size</th>    <th>Content</th></tr>
+ *  <tr><th colspan="4">First segment 0x002800-0x040800</th></tr>
+ *  <tr><td>0x002800</td> <td>0x00280c</td> <td>0x0000c</td> <td>Timestamp see @c UV390Codeplug::timestamp_t.</td></tr>
+ *  <tr><td>0x00280c</td> <td>0x002840</td> <td>0x00034</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x002840</td> <td>0x0028e4</td> <td>0x000a4</td> <td>General settings see @c UV390Codeplug::general_settings_t.</td></tr>
+ *  <tr><td>0x0028e4</td> <td>0x002980</td> <td>0x0009c</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x002980</td> <td>0x0061c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each, see @c UV390Codeplug::message_t.</td></tr>
+ *  <tr><td>0x0061c0</td> <td>0x00f420</td> <td>0x09260</td> <td>??? Emergency systems ???</td></tr>
+ *  <tr><td>0x00f420</td> <td>0x0151e0</td> <td>0x05dc0</td> <td>250 RX Group lists @ 0x60 bytes each, see @c UV390Codeplug::grouplist_t.</td></tr>
+ *  <tr><td>0x0151e0</td> <td>0x019060</td> <td>0x03e80</td> <td>250 Zones @ 0x40 bytes each, see @c UV390Codeplug::zone_t.</td></tr>
+ *  <tr><td>0x019060</td> <td>0x01f5f0</td> <td>0x06590</td> <td>250 Scanlists @ 0x68 bytes each, see @c UV390Codeplug::scanlist_t.</td></tr>
+ *  <tr><td>0x01f5f0</td> <td>0x031860</td> <td>0x12270</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x031860</td> <td>0x03f320</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c UV390Codeplug::zone_ext_t.</td></tr>
+ *  <tr><td>0x03f320</td> <td>0x040800</td> <td>0x014e0</td> <td>??? Unknown ???</td></tr>
+ *  <tr><th colspan="4">Second segment 0x110800-0x1a0800</th></tr>
+ *  <tr><td>0x110800</td> <td>0x13f600</td> <td>0x2ee00</td> <td>3000 Channels @ 0x40 bytes each, see @c UV390Codeplug::channel_t.</td></tr>
+ *  <tr><td>0x13f600</td> <td>0x140800</td> <td>0x01200</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x140800</td> <td>0x198640</td> <td>0x57e40</td> <td>10000 Contacts @ 0x24 bytes each, see @c UV390Codeplug::contact_t.</td></tr>
+ *  <tr><td>0x198640</td> <td>0x1a0800</td> <td>0x081c0</td> <td>??? Unknown ???</td></tr>
+ * </table>
+ *
  * @ingroup uv390 */
 class UV390Codeplug : public CodePlug
 {
   Q_OBJECT
 
-public:
-  /// @cond with_internal_docs
+protected:
   /** Represents a single channel (analog or digital) within the codeplug. */
 	typedef struct {
     /** Possible channel modes. */
@@ -503,7 +531,6 @@ public:
     void fromConfigObj(const Config *conf);
   } general_settings_t;
 
-
   /** Represents a single message within the codeplug. */
   typedef struct {
     uint16_t text[144];                   ///< Message text (144 x 16bit Unicode), 0-terminated
@@ -527,6 +554,24 @@ public:
     }
   } message_t;
 
+  /** Codeplug representation of programming time-stamp and CPS version. */
+  typedef struct {
+    uint8_t _pad0;                       ///< Fixed 0xff
+    uint8_t date[7];                     ///< YYYY-MM-DD hh:mm:ss as 14 BCD numbers.
+    uint8_t cps_version[4];              ///< CPS version vv.vv, encoded using map "0123456789:;<=>?".
+
+    /** Returns @c true if the timestamp is valid. */
+    bool isValid() const;
+    /** Clears the timestamp. */
+    void clear();
+
+    /** Returns the timestamp. */
+    QDateTime getTimestamp() const;
+    /** Sets the timestamp. */
+    void setTimestamp(const QDateTime &dt=QDateTime::currentDateTimeUtc());
+    /** Returns the CSP version string. */
+    QString cpsVersion() const;
+  } timestamp_t;
 
   /** Represents a single GPS system within the codeplug.
    * @todo Verify layout and offset! */
@@ -538,7 +583,6 @@ public:
     uint8_t  _unused_6[10];               ///< Padding all = 0xff
   } gpssystem_t;
 
-
 	/** Represents an entry within the callsign database.
    * @todo Implement generic config representation for callsign database. */
 	typedef struct {
@@ -547,7 +591,6 @@ public:
     char     callsign[16];      ///< ASCII zero-terminated
     char     name[100];         ///< Descriptive name, nickname, city, state, country.
   } callsign_t;
-  /// @endcond
 
 public:
   /** Default constructor. */

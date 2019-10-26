@@ -36,13 +36,43 @@ class RXGroupList;
  * of the firmware. It must have been a real nightmare to Serge Vakulenko reverse-engineering this
  * codeplug.
  *
+ * @section uv390cpl Codeplug structure within radio
+ * The memory representation of the codeplug within the radio is divided into two segments.
+ * The first segment starts at the address 0x00080 and ends at 0x07c00 while the second section
+ * starts at 0x08000 and ends at 0x1e300.
+ *
+ * <table>
+ *  <tr><th>Start</th>   <th>End</th>      <th>Size</th>    <th>Content</th></tr>
+ *  <tr><th colspan="4">First segment 0x00080-0x07c00</th></tr>
+ *  <tr><td>0x00080</td> <td>0x00088</td> <td>0x0008</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x00088</td> <td>0x0008e</td> <td>0x0006</td> <td>Timestamp, see @c RD5RCodeplug::timestamp_t.</td></tr>
+ *  <tr><td>0x0008e</td> <td>0x000e0</td> <td>0x0052</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x000e0</td> <td>0x000ec</td> <td>0x000c</td> <td>General settings, see @c RD5RCodeplug::settings_t.</td></tr>
+ *  <tr><td>0x000ec</td> <td>0x00128</td> <td>0x003c</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x00128</td> <td>0x01370</td> <td>0x1248</td> <td>32 message texts, see @c RD5RCodeplug::msgtab_t</td></tr>
+ *  <tr><td>0x01370</td> <td>0x01788</td> <td>0x0418</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x01788</td> <td>0x02f88</td> <td>0x1800</td> <td>256 contacts, see @c RD5RCodeplug::contact_t</td></tr>
+ *  <tr><td>0x02f88</td> <td>0x03780</td> <td>0x07f8</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c RD5RCodeplug::bank_t</td></tr>
+ *  <tr><td>0x05390</td> <td>0x07540</td> <td>0x21b0</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x07540</td> <td>0x07560</td> <td>0x0020</td> <td>2 intro lines, @c RD5RCodeplug::intro_text_t</td></tr>
+ *  <tr><td>0x07560</td> <td>0x07c00</td> <td>0x06a0</td> <td>??? Unknown ???</td></tr>
+ *  <tr><th colspan="4">Second segment 0x08000-0x1e300</th></tr>
+ *  <tr><td>0x08000</td> <td>0x08010</td> <td>0x0010</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x08010</td> <td>0x0af10</td> <td>0x2f00</td> <td>250 zones, see @c RD5RCodeplug::zonetab_t</td></tr>
+ *  <tr><td>0x0af10</td> <td>0x0b1b0</td> <td>0x02a0</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x0b1b0</td> <td>0x17620</td> <td>0xc470</td> <td>Remaining 896 chanels (bank 1-7), see @c RD5RCodeplug::bank_t</td></tr>
+ *  <tr><td>0x17620</td> <td>0x1cd10</td> <td>0x56f0</td> <td>250 scan lists, see @c RD5RCodeplug::scantab_t</td></tr>
+ *  <tr><td>0x1cd10</td> <td>0x1d620</td> <td>0x0910</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x1d620</td> <td>0x1e2a0</td> <td>0x0c80</td> <td>64 RX group lists, see @c RD5RCodeplug::grouptab_t</td></tr>
+ *  <tr><td>0x1e2a0</td> <td>0x1e300</td> <td>0x0060</td> <td>??? Unknown ???</td></tr>
+ * </table>
  * @ingroup rd5r */
 class RD5RCodeplug : public CodePlug
 {
 	Q_OBJECT
 
 public:
-  /// @cond with_internal_docs
   /** Represents a configured channel within the codeplug. */
 	typedef struct {
     /** Possible channel types. */
@@ -402,7 +432,6 @@ public:
     /** Set the time-stamp to the given date and time. */
     void set(const QDateTime &dt);
   } timestamp_t;
-  /// @endcond
 
 public:
   /** Empty constructor. */

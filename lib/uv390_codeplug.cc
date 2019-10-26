@@ -13,17 +13,18 @@
 #define NMESSAGES       50
 #define NGPSSYSTEMS     16
 
-#define MEMSZ           0xd0000
-#define OFFSET_TIMESTMP 0x02001
-#define OFFSET_SETTINGS 0x02040
-#define OFFSET_MSG      0x02180
-#define OFFSET_GLISTS   0x0ec20
-#define OFFSET_ZONES    0x149e0
-#define OFFSET_SCANL    0x18860
-#define OFFSET_ZONEXT   0x31060
-#define OFFSET_CHANNELS 0x40000
-#define OFFSET_CONTACTS 0x70000
-#define OFFSET_GPS_SYS  0x02080
+// ---- first segment ---- additional offset 0x000800
+#define OFFSET_TIMESTMP 0x002801
+#define OFFSET_SETTINGS 0x002840
+#define OFFSET_GPS_SYS  0x002880  /// @bug Wrong offset!
+#define OFFSET_MSG      0x002980
+#define OFFSET_GLISTS   0x00f420
+#define OFFSET_ZONES    0x0151e0
+#define OFFSET_SCANL    0x019060
+#define OFFSET_ZONEXT   0x031860
+// ---- second segment ---- additional offset 0x110800
+#define OFFSET_CHANNELS 0x110800
+#define OFFSET_CONTACTS 0x140800
 
 #define CALLSIGN_START  0x00200000  // Start of callsign database
 #define CALLSIGN_FINISH 0x01000000  // End of callsign database
@@ -782,7 +783,8 @@ UV390Codeplug::UV390Codeplug(QObject *parent)
   : CodePlug(parent)
 {
   addImage("TYT UV390 Codeplug");
-  image(0).addElement(0, MEMSZ);
+  image(0).addElement(0x000800, 0x40000);
+  image(0).addElement(0x110800, 0x90000);
 }
 
 bool
