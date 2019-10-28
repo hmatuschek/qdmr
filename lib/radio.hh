@@ -65,6 +65,8 @@ public:
 		bool hasDigital;
     /** If @c true, the device supports FM. */
 		bool hasAnalog;
+    /** If @c true, the device supports GPS. */
+    bool hasGPS;
     /** Maximum length of the radio name. */
 		int maxNameLength;
     /** Maximum number of channels. */
@@ -79,6 +81,8 @@ public:
 		int maxZoneNameLength;
     /** Maximum number of channels per zone. */
 		int maxChannelsInZone;
+    /** If @c true, the radio has a zone list for each VFO. */
+    bool hasABZone;
     /** Maximum number of scanlists. */
 		int maxScanlists;
     /** Maximum length of scanlist names. */

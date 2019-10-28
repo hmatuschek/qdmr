@@ -1,5 +1,5 @@
-/** @defgroup gd77 Radiooddity GD-77
- * Device specific classes for Radiooddity GD-77 and GD-77S.
+/** @defgroup gd77 Radioddity GD-77
+ * Device specific classes for Radioddity GD-77 and GD-77S.
  *
  * <img src="gd77.jpg" width="200px" align="left"/>
  *
@@ -18,7 +18,7 @@
 #include "gd77_codeplug.hh"
 
 
-/** Implements an USB interface to the Radiooddity GD-77(S) VHF/UHF 5W DMR (Tier I&II) radios.
+/** Implements an USB interface to the Radioddity GD-77(S) VHF/UHF 5W DMR (Tier I&II) radios.
  *
  * @ingroup gd77 */
 class GD77 : public Radio

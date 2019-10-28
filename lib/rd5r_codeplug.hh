@@ -40,7 +40,7 @@ class RXGroupList;
  *  <tr><td>0x00080</td> <td>0x00088</td> <td>0x0008</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x00088</td> <td>0x0008e</td> <td>0x0006</td> <td>Timestamp, see @c RD5RCodeplug::timestamp_t.</td></tr>
  *  <tr><td>0x0008e</td> <td>0x000e0</td> <td>0x0052</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x000e0</td> <td>0x000ec</td> <td>0x000c</td> <td>General settings, see @c RD5RCodeplug::settings_t.</td></tr>
+ *  <tr><td>0x000e0</td> <td>0x000ec</td> <td>0x000c</td> <td>General settings, see @c RD5RCodeplug::general_settings_t.</td></tr>
  *  <tr><td>0x000ec</td> <td>0x00128</td> <td>0x003c</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x00128</td> <td>0x01370</td> <td>0x1248</td> <td>32 message texts, see @c RD5RCodeplug::msgtab_t</td></tr>
  *  <tr><td>0x01370</td> <td>0x01788</td> <td>0x0418</td> <td>??? Unknown ???</td></tr>
@@ -66,12 +66,12 @@ class RD5RCodeplug : public CodePlug
 	Q_OBJECT
 
 public:
-  static const int NCHAN     = 1024;
-  static const int NCONTACTS = 256;
-  static const int NZONES    = 250;
-  static const int NGLISTS   = 64;
-  static const int NSCANL    = 250;
-  static const int NMESSAGES = 32;
+  static const int NCHAN     = 1024;   ///< Defines the number of channels.
+  static const int NCONTACTS = 256;    ///< Defines the number of contacts.
+  static const int NZONES    = 250;    ///< Defines the number of zones.
+  static const int NGLISTS   = 64;     ///< Defines the number of RX group lists.
+  static const int NSCANL    = 250;    ///< Defines the number of scanlists.
+  static const int NMESSAGES = 32;     ///< Defines the number of preset messages.
 
   /** Represents a configured channel within the codeplug. */
 	typedef struct {
@@ -330,9 +330,8 @@ public:
       channel_mark        : 1,    ///< Channel mark, default 1.
       pl_type             : 2,    ///< PL type, default 3.
       talkback            : 1;    ///< Talkback, default 1.
-
     // Bytes 16-79
-    uint16_t member[32];          ///< Channel indices +1.
+    uint16_t member[32];          ///< Channel indices +2, 0=not used, 1=selected
 
     // Bytes 80-85
     uint16_t priority_ch1;        ///< Priority channel 1 index, index+2 or 0=None, 1=selected.

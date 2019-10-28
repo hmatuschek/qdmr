@@ -7,30 +7,32 @@
 
 static Radio::Features _uv390_features =
 {
-  true, // hasDigital
-  true, // hasAnalog
+  true,  // hasDigital
+  true,  // hasAnalog
+  true,  // hasGPS
 
-  8,    // maxNameLength
-  16,   // maxIntroLineLength
+  16,    // maxNameLength
+  10,    // maxIntroLineLength
 
-  1024, // maxChannels;
-  16,   // maxChannelNameLength;
+  3000,  // maxChannels;
+  16,    // maxChannelNameLength;
 
-  250,  // maxZones;
-  16,   // maxZoneNameLength;
-  16,   // maxChannelsInZone;
+  250,   // maxZones;
+  16,    // maxZoneNameLength;
+  64,    // maxChannelsInZone;
+  true,  // hasABZones
 
-  250,  // maxScanlists;
-  16,   // maxScanlistNameLength;
-  31,   // maxChannelsInScanlist;
-  true, // scanListNeedPriority;
+  250,   // maxScanlists;
+  16,    // maxScanlistNameLength;
+  31,    // maxChannelsInScanlist;
+  false, // scanListNeedPriority;
 
-  256,  // maxContacts;
-  16,   // maxContactNameLength;
+  10000, // maxContacts;
+  16,    // maxContactNameLength;
 
-  64,   // maxGrouplists;
-  16,   // maxGrouplistNameLength;
-  16    // maxContactsInGrouplist;
+  250,   // maxGrouplists;
+  16,    // maxGrouplistNameLength;
+  32     // maxContactsInGrouplist;
 };
 
 

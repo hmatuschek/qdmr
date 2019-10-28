@@ -8,31 +8,32 @@
 
 static Radio::Features _gd77_features =
 {
-  true, // hasDigital
-  true, // hasAnalog
+  true,  // hasDigital
+  true,  // hasAnalog
+  false, // hasGPS
+  8,     // maxNameLength
+  16,    // maxIntroLineLength
 
-  8,    // maxNameLength
-  16,   // maxIntroLineLength
+  1024,  // maxChannels
+  16,    // maxChannelNameLength
 
-  1024, // maxChannels;
-  16,   // maxChannelNameLength;
+  32,    // maxZones
+  16,    // maxZoneNameLength
+  32,    // maxChannelsInZone
+  false, // hasABZone
 
-  32,   // maxZones;
-  16,   // maxZoneNameLength;
-  32,   // maxChannelsInZone;
+  64,    // maxScanlists
+  16,    // maxScanlistNameLength
+  32,    // maxChannelsInScanlist
+  true,  // scanListNeedPriority
 
-  64,   // maxScanlists;
-  16,   // maxScanlistNameLength;
-  32,   // maxChannelsInScanlist;
-  true, // scanListNeedPriority;
-
-  256,  // maxContacts;
-  16,   // maxContactNameLength;
+  256,   // maxContacts
+  16,    // maxContactNameLength
 
   /// @bug Check.
-  64,   // maxGrouplists;
-  16,   // maxGrouplistNameLength;
-  16    // maxContactsInGrouplist;
+  64,   // maxGrouplists
+  16,   // maxGrouplistNameLength
+  16    // maxContactsInGrouplist
 };
 
 

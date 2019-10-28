@@ -6,18 +6,17 @@
 #include <QDateTime>
 
 
-#define OFFSET_TIMESTMP 0x00088
-#define OFFSET_SETTINGS 0x000e0
-#define OFFSET_MSGTAB   0x00128
-#define OFFSET_CONTACTS 0x01788
-#define OFFSET_BANK_0   0x03780 // Channels 1-128
-#define OFFSET_INTRO    0x07540
-#define OFFSET_ZONETAB  0x08010
-#define OFFSET_BANK_1   0x0b1b0 // Channels 129-1024
-#define OFFSET_SCANTAB  0x17620
-#define OFFSET_GROUPTAB 0x1d620
+#define OFFSET_TIMESTMP     0x00088
+#define OFFSET_SETTINGS     0x000e0
+#define OFFSET_MSGTAB       0x00128
+#define OFFSET_CONTACTS     0x01788
+#define OFFSET_BANK_0       0x03780 // Channels 1-128
+#define OFFSET_INTRO        0x07540
+#define OFFSET_ZONETAB      0x08010
+#define OFFSET_BANK_1       0x0b1b0 // Channels 129-1024
+#define OFFSET_SCANTAB      0x17620
+#define OFFSET_GROUPTAB     0x1d620
 
-#define GET_TIMESTAMP()     (&_radio_mem[OFFSET_TIMESTMP])
 #define GET_MSGTAB()        ((msgtab_t*) &_radio_mem[OFFSET_MSGTAB])
 
 
@@ -405,8 +404,8 @@ RD5RCodeplug::scanlist_t::linkScanListObj(ScanList *lst, const Config *conf) con
     lst->setPriorityChannel(conf->channelList()->channel(priority_ch1-2));
   if (1<priority_ch2)
     lst->setSecPriorityChannel(conf->channelList()->channel(priority_ch2-2));
-  for (int i=0; (i<32) && member[i]; i++)
-      lst->addChannel(conf->channelList()->channel(member[i]-1));
+  for (int i=0; (i<32) && (member[i]>1); i++)
+      lst->addChannel(conf->channelList()->channel(member[i]-2));
   return false;
 }
 

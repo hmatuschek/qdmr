@@ -7,30 +7,31 @@
 
 static Radio::Features _rd5r_features =
 {
-  true, // hasDigital
-  true, // hasAnalog
+  true,  // hasDigital
+  true,  // hasAnalog
+  false, // hasGPS
+  8,     // maxNameLength
+  16,    // maxIntroLineLength
 
-  8,    // maxNameLength
-  16,   // maxIntroLineLength
+  1024,  // maxChannels;
+  16,    // maxChannelNameLength;
 
-  1024, // maxChannels;
-  16,   // maxChannelNameLength;
+  250,   // maxZones;
+  16,    // maxZoneNameLength;
+  16,    // maxChannelsInZone;
+  false, // hasABZone
 
-  250,  // maxZones;
-  16,   // maxZoneNameLength;
-  16,   // maxChannelsInZone;
+  250,   // maxScanlists;
+  16,    // maxScanlistNameLength;
+  31,    // maxChannelsInScanlist;
+  true,  // scanListNeedPriority;
 
-  250,  // maxScanlists;
-  16,   // maxScanlistNameLength;
-  31,   // maxChannelsInScanlist;
-  true, // scanListNeedPriority;
+  256,   // maxContacts;
+  16,    // maxContactNameLength;
 
-  256,  // maxContacts;
-  16,   // maxContactNameLength;
-
-  64,   // maxGrouplists;
-  16,   // maxGrouplistNameLength;
-  16    // maxContactsInGrouplist;
+  64,    // maxGrouplists;
+  16,    // maxGrouplistNameLength;
+  16     // maxContactsInGrouplist;
 };
 
 
