@@ -43,24 +43,29 @@ HID::identifier() {
   static unsigned char reply[38];
   unsigned char ack;
 
-  if (! hid_send_recv(CMD_PRG, 7, &ack, 1))
+  if (! hid_send_recv(CMD_PRG, 7, &ack, 1)) {
+    _errorMessage = QString("%1: Cannot identify radio: %2").arg(__func__).arg(_errorMessage);
     return QString();
+  }
 
   if (ack != CMD_ACK[0]) {
-    _errorMessage = tr("%1: Wrong PRD acknowledge %2, expected %3.")
+    _errorMessage = tr("%1: Cannot identify radio: Wrong PRD acknowledge %2, expected %3.")
         .arg(__func__).arg(ack,0,10).arg(CMD_ACK[0], 0, 16);
     return QString();
   }
 
-  if (! hid_send_recv(CMD_PRG2, 2, reply, 16))
+  if (! hid_send_recv(CMD_PRG2, 2, reply, 16)) {
+    _errorMessage = QString("%1: Cannot identify radio: %2").arg(__func__).arg(_errorMessage);
     return QString();
+  }
 
-
-  if (! hid_send_recv(CMD_ACK, 1, &ack, 1))
+  if (! hid_send_recv(CMD_ACK, 1, &ack, 1)) {
+    _errorMessage = QString("%1: Cannot identify radio: %2").arg(__func__).arg(_errorMessage);
     return QString();
+  }
 
   if (ack != CMD_ACK[0]) {
-    _errorMessage = tr("%1: Wrong PRG2 acknowledge %2, expected %3.")
+    _errorMessage = tr("%1: Cannot identify radio: Wrong PRG2 acknowledge %2, expected %3.")
         .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
     return QString();
   }
@@ -81,28 +86,13 @@ bool
 HID::read_block(int bno, unsigned char *data, int nbytes)
 {
   unsigned addr = bno * nbytes;
-  unsigned char ack, cmd[4], reply[32+4];
+  unsigned char cmd[4], reply[32+4];
   int n;
 
-  // select memory bank according to address
-  if ((addr < 0x10000) && (offset != 0)) {
-    offset = 0;
-    if (! hid_send_recv(CMD_CWB0, 8, &ack, 1))
-      return false;
-    if (ack != CMD_ACK[0]) {
-      _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
-          .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
-      return false;
-    }
-  } else if ((addr >= 0x10000) && (0 == offset)) {
-    offset = 0x00010000;
-    if (! hid_send_recv(CMD_CWB1, 8, &ack, 1))
-      return false;
-    if (ack != CMD_ACK[0]) {
-      _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
-          .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
-      return false;
-    }
+  if (! selectMemoryBank(addr)) {
+    _errorMessage = QString("%1: Cannot read block %2 (n=%3): %4").arg(__func__)
+        .arg(bno).arg(nbytes);
+    return false;
   }
 
   // send data
@@ -112,7 +102,7 @@ HID::read_block(int bno, unsigned char *data, int nbytes)
     cmd[2] = addr + n;
     cmd[3] = 32;
     if (! hid_send_recv(cmd, 4, reply, sizeof(reply)))
-      n-=32;
+      n-=32;  // retry that block
     else
       memcpy(data + n, reply + 4, 32);
   }
@@ -125,10 +115,12 @@ HID::read_finish()
 {
   unsigned char ack;
 
-  if (! hid_send_recv(CMD_ENDR, 4, &ack, 1))
+  if (! hid_send_recv(CMD_ENDR, 4, &ack, 1)) {
+    _errorMessage = QString("%1: Cannot finish read(): %2").arg(__func__).arg(_errorMessage);
     return false;
+  }
   if (ack != CMD_ACK[0]) {
-    _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
+    _errorMessage = tr("%1: Cannot finish read(): Wrong acknowledge %2, expected %3.")
         .arg(__func__).arg(ack).arg(CMD_ACK[0]);
     return false;
   }
@@ -142,25 +134,10 @@ HID::write_block(int bno, unsigned char *data, int nbytes)
   unsigned addr = bno * nbytes;
   unsigned char ack, cmd[4+32];
 
-  // Select memory bank according to address
-  if (addr < 0x10000 && offset != 0) {
-    offset = 0;
-    if (! hid_send_recv(CMD_CWB0, 8, &ack, 1))
-      return false;
-    if (ack != CMD_ACK[0]) {
-      _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
-          .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
-      return false;
-    }
-  } else if (addr >= 0x10000 && offset == 0) {
-    offset = 0x00010000;
-    if (! hid_send_recv(CMD_CWB1, 8, &ack, 1))
-      return false;
-    if (ack != CMD_ACK[0]) {
-      _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
-          .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
-      return false;
-    }
+  if (! selectMemoryBank(addr)) {
+    _errorMessage = QString("%1: Cannot write block %2 (n=%3): %4").arg(__func__)
+        .arg(bno).arg(nbytes);
+    return false;
   }
 
   // send data
@@ -171,9 +148,9 @@ HID::write_block(int bno, unsigned char *data, int nbytes)
     cmd[3] = 32;
     memcpy(cmd + 4, data + n, 32);
     if (! hid_send_recv(cmd, 4+32, &ack, 1))
-      n -= 32;
+      n -= 32; // retry
     else if (ack != CMD_ACK[0]) {
-      _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
+      _errorMessage = tr("%1: Cannot write block: Wrong acknowledge %2, expected %3.")
           .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
       n-=32;
     }
@@ -187,11 +164,12 @@ HID::write_finish()
 {
   unsigned char ack;
 
-  if (! hid_send_recv(CMD_ENDW, 4, &ack, 1))
+  if (! hid_send_recv(CMD_ENDW, 4, &ack, 1)) {
+    _errorMessage = QString("%1: Cannot finish write(): %2").arg(__func__).arg(_errorMessage);
     return false;
-
+  }
   if (ack != CMD_ACK[0]) {
-    _errorMessage = tr("%1: Wrong acknowledge %2, expected %3.")
+    _errorMessage = tr("%1: Cannot finish write(): Wrong acknowledge %2, expected %3.")
         .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
     return false;
   }
@@ -199,3 +177,36 @@ HID::write_finish()
   return true;
 }
 
+bool
+HID::selectMemoryBank(uint addr) {
+  unsigned char ack;
+
+  // select memory bank according to address
+  if ((addr < 0x10000) && (offset != 0)) {
+    offset = 0;
+    if (! hid_send_recv(CMD_CWB0, 8, &ack, 1)) {
+      _errorMessage = QString("%1: Cannot select memory bank for addr %2: %3").arg(__func__)
+          .arg(addr).arg(_errorMessage);
+      return false;
+    }
+    if (ack != CMD_ACK[0]) {
+      _errorMessage = tr("%1: Cannot select memory bank for addr %2: Wrong acknowledge %3, expected %4.")
+          .arg(__func__).arg(addr).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
+      return false;
+    }
+  } else if ((addr >= 0x10000) && (0 == offset)) {
+    offset = 0x00010000;
+    if (! hid_send_recv(CMD_CWB1, 8, &ack, 1)) {
+      _errorMessage = QString("%1: Cannot select memory bank for addr %2: %3").arg(__func__)
+          .arg(addr).arg(_errorMessage);
+      return false;
+    }
+    if (ack != CMD_ACK[0]) {
+      _errorMessage = tr("%1: Cannot select memory bank for addr %2: Wrong acknowledge %3, expected %4.")
+          .arg(__func__).arg(addr).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
+      return false;
+    }
+  }
+
+  return true;
+}

@@ -54,6 +54,9 @@ public:
 
   /** Retruns the last error message. */
   inline const QString &errorMessage() const { return _errorMessage; }
+
+private:
+  bool selectMemoryBank(uint addr);
 };
 
 #endif // HIDINTERFACE_HH

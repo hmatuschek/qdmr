@@ -1,9 +1,9 @@
 #include "hid_macos.hh"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <QDebug>
 
 
 HIDevice::HIDevice(int vid, int pid, QObject *parent)
@@ -41,22 +41,18 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
     return;
   }
 
-  // Run main application loop until device found.
-  int k;
-  for (k=0; ; k++) {
+  // Run loop until device found.
+  for (int k=0; k<4; k++) {
     CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, 0);
     if (_dev)
       return;
-
-    if (k >= 3) {
-      _errorMessage = QString("Cannot find USB device %1:%2").arg(vid).arg(pid);
-      IOHIDManagerUnscheduleFromRunLoop(_HIDManager, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
-      IOHIDManagerClose(_HIDManager, kIOHIDOptionsTypeNone);
-      _HIDManager = nullptr;
-      return;
-    }
     usleep(10000);
   }
+
+  _errorMessage = QString("Cannot find USB device %1:%2").arg(vid).arg(pid);
+  IOHIDManagerUnscheduleFromRunLoop(_HIDManager, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
+  IOHIDManagerClose(_HIDManager, kIOHIDOptionsTypeNone);
+  _HIDManager = nullptr;
 }
 
 HIDevice::~HIDevice() {
@@ -84,6 +80,9 @@ HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned cha
   unsigned k;
   IOReturn result;
 
+  if (! isOpen())
+    return false;
+
   memset(buf, 0, sizeof(buf));
   buf[0] = 1;
   buf[1] = 0;
@@ -95,21 +94,23 @@ HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned cha
 
   _nbytes_received = 0;
   memset(_receive_buf, 0, sizeof(_receive_buf));
+
 again:
   // Write to HID device.
   result = IOHIDDeviceSetReport(_dev, kIOHIDReportTypeOutput, 0, buf, sizeof(buf));
   if (result != kIOReturnSuccess) {
     _errorMessage = QString("%1: HID output error: %2!").arg(__func__).arg(result);
-    fprintf(stderr, "HID output error: %d!\n", result);
     return false;
   }
 
-  // Run main application loop until reply received.
+  // Run application loop until reply received.
   CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, 0);
   for (k = 0; _nbytes_received <= 0; k++) {
     usleep(100);
     CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, 0);
     if (k >= 1000) {
+      qDebug() << __FILE__ << "," << __LINE__ << "in" << __func__
+               << ": No reply received -> retry writing to device.";
       goto again;
     }
   }
@@ -119,16 +120,21 @@ again:
         .arg(_nbytes_received).arg((int)sizeof(_receive_buf));
     return false;
   }
+
   if ((_receive_buf[0] != 3) || (_receive_buf[1] != 0) || (_receive_buf[3] != 0)) {
-    _errorMessage = QString("%1: Incorrect reply!").arg(__func__);
+    _errorMessage = QString("%1: Incorrect reply. Expected {3,0,0}, got {%2,%3,%4}").arg(__func__)
+        .arg(int(_receive_buf[0])).arg(int(_receive_buf[1])).arg(int(_receive_buf[3]));
     return false;
   }
+
   if (_receive_buf[2] != rlength) {
     _errorMessage = QString("%1: Incorrect reply length %2, expected %3!").arg(__func__)
         .arg(_receive_buf[2]).arg(rlength);
     return false;
   }
+
   memcpy(rdata, _receive_buf+4, rlength);
+
   return true;
 }
 
@@ -210,7 +216,6 @@ HIDevice::close()
 {
   if (! _dev)
     return;
-
   IOHIDDeviceClose(_dev, kIOHIDOptionsTypeNone);
   _dev = nullptr;
 }
