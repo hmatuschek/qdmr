@@ -75,6 +75,7 @@ protected:
 	status_t _status;
   /** Read identifier. */
   const char *_ident;
+  /** Holds the last error message. */
   QString _errorMessage;
 };
 

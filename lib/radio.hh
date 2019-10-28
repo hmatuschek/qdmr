@@ -131,7 +131,7 @@ public:
 
 public:
   /** Detects a radio and returns the corresponding device specific radio instance. */
-	static Radio *detect();
+	static Radio *detect(QString &errorMessage);
 
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */

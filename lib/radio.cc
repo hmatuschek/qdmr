@@ -3,6 +3,7 @@
 #include "dfu_libusb.hh"
 #include <QDebug>
 #include "rd5r.hh"
+#include "gd77.hh"
 #include "uv390.hh"
 #include "config.hh"
 
@@ -185,7 +186,7 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
 
 
 Radio *
-Radio::detect() {
+Radio::detect(QString &errorMessage) {
   QString id;
 
   // Try TYT MD Family
@@ -193,20 +194,20 @@ Radio::detect() {
   if (dfu.isOpen()) {
     id = dfu.identifier();
   } else {
-    // Try Radioddity/Baofeng RD-5R
+    // Try Radioddity/Baofeng RD5R & GD-77
     HID hid(0x15a2, 0x0073);
     if (hid.isOpen()) {
       id = hid.identifier();
       hid.close();
     } else {
-      qDebug() << hid.errorMessage();
-      qDebug() << "No matching radio found.";
+      errorMessage = QString("%1: No matching radio found: %2.")
+          .arg(__func__).arg(hid.errorMessage());
       return nullptr;
     }
   }
 
   if (id.isEmpty()) {
-    qDebug() << "Readio returned no idetifier!";
+    errorMessage = "Readio returned no identifier!";
     return nullptr;
   }
 
@@ -214,12 +215,15 @@ Radio::detect() {
 
   if ("BF-5R" == id) {
     return new RD5R();
-  } else if ("MD-UV390") {
+  } else if ("MD-760P" == id) {
+    return new GD77();
+  } else if ("MD-UV390" == id) {
     return new UV390();
   }
 
   return nullptr;
 }
+
 
 Radio::Status
 Radio::status() const {

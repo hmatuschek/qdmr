@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <QDebug>
 
 
 HIDevice::HIDevice(int vid, int pid, QObject *parent)
@@ -36,7 +35,7 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
   // Open the HID mangager
   IOReturn IOReturn = IOHIDManagerOpen(_HIDManager, kIOHIDOptionsTypeNone);
   if (IOReturn != kIOReturnSuccess) {
-    _errorMessage = QString("Cannot find USB device %1:%2").arg(vid).arg(pid);
+    _errorMessage = QString("%1: Cannot find USB device %2:%3").arg(__func__).arg(vid).arg(pid);
     IOHIDManagerUnscheduleFromRunLoop(_HIDManager, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
     _HIDManager = nullptr;
     return;
@@ -81,7 +80,6 @@ HIDevice::isOpen() const {
 bool
 HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned char *rdata, unsigned rlength)
 {
-  qDebug() << __FILE__ << "," << __LINE__ << ":" << __func__ << "...";
   unsigned char buf[42];
   unsigned k;
   IOReturn result;
@@ -101,6 +99,7 @@ again:
   // Write to HID device.
   result = IOHIDDeviceSetReport(_dev, kIOHIDReportTypeOutput, 0, buf, sizeof(buf));
   if (result != kIOReturnSuccess) {
+    _errorMessage = QString("%1: HID output error: %2!").arg(__func__).arg(result);
     fprintf(stderr, "HID output error: %d!\n", result);
     return false;
   }
@@ -116,17 +115,17 @@ again:
   }
 
   if (_nbytes_received != sizeof(_receive_buf)) {
-    fprintf(stderr, "Short read: %d bytes instead of %d!\n",
-            _nbytes_received, (int)sizeof(_receive_buf));
+    _errorMessage = QString("%1: Short read: %2 bytes instead of %3!").arg(__func__).arg(result)
+        .arg(_nbytes_received).arg((int)sizeof(_receive_buf));
     return false;
   }
   if ((_receive_buf[0] != 3) || (_receive_buf[1] != 0) || (_receive_buf[3] != 0)) {
-    fprintf(stderr, "incorrect reply\n");
+    _errorMessage = QString("%1: Incorrect reply!").arg(__func__);
     return false;
   }
   if (_receive_buf[2] != rlength) {
-    fprintf(stderr, "incorrect reply length %d, expected %d\n",
-            _receive_buf[2], rlength);
+    _errorMessage = QString("%1: Incorrect reply length %2, expected %3!").arg(__func__)
+        .arg(_receive_buf[2]).arg(rlength);
     return false;
   }
   memcpy(rdata, _receive_buf+4, rlength);
@@ -147,13 +146,13 @@ HIDevice::callback_input(void *context, IOReturn result, void *sender, IOHIDRepo
   HIDevice *self = reinterpret_cast<HIDevice *>(context);
 
   if (result != kIOReturnSuccess) {
-    fprintf(stderr, "HID input error: %d!\n", result);
+    self->_errorMessage = QString("%1: HID input error: %2!").arg(__func__).arg(result);
     self->close();
     return;
   }
 
   if (nbytes > CFIndex(sizeof(self->_receive_buf))) {
-    fprintf(stderr, "Too large HID input: %d bytes!\n", (int)nbytes);
+    self->_errorMessage = QString("%1: Too large HID input: %d bytes!").arg(__func__).arg((int)nbytes);
     self->close();
     return;
   }
@@ -176,7 +175,7 @@ HIDevice::callback_open(void *context, IOReturn result, void *sender, IOHIDDevic
 
   IOReturn o = IOHIDDeviceOpen(deviceRef, kIOHIDOptionsTypeSeizeDevice);
   if (o != kIOReturnSuccess) {
-    fprintf(stderr, "Cannot open HID device!\n");
+    self->_errorMessage = QString("%1: Cannot open HID device!").arg(__func__);
     return;
   }
 

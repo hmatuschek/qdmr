@@ -18,9 +18,10 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   if (0 == parser.positionalArguments().size())
     parser.showHelp(-1);
 
-  Radio *radio = Radio::detect();
+  QString errorMessage;
+  Radio *radio = Radio::detect(errorMessage);
   if (nullptr == radio) {
-    qDebug() << "Cannot detect radio.";
+    qDebug() << __func__ << "Cannot detect radio:" << errorMessage;
     return -1;
   }
 

@@ -4,13 +4,6 @@
 #include <QObject>
 #include "codeplug.hh"
 
-#define NCHAN           1024
-#define NCONTACTS       256
-#define NZONES          250
-#define NGLISTS         64
-#define NSCANL          250
-#define NMESSAGES       32
-
 class Channel;
 class Zone;
 class ScanList;
@@ -73,6 +66,13 @@ class RD5RCodeplug : public CodePlug
 	Q_OBJECT
 
 public:
+  static const int NCHAN     = 1024;
+  static const int NCONTACTS = 256;
+  static const int NZONES    = 250;
+  static const int NGLISTS   = 64;
+  static const int NSCANL    = 250;
+  static const int NMESSAGES = 32;
+
   /** Represents a configured channel within the codeplug. */
 	typedef struct {
     /** Possible channel types. */
@@ -114,7 +114,7 @@ public:
 		// Byte 24
 		uint8_t channel_mode;               ///< Mode analog or digital.
 		// Bytes 25-26
-		uint8_t _unused25[2];               ///< Unknown set to 0.
+		uint16_t _unused25;               ///< Unknown set to 0.
 		// Bytes 27-28
 		uint8_t tot;                        ///< TOT x 15sec, [0,33], 0-Infinite.
 		uint8_t tot_rekey_delay;            ///< TOT Rekey Delay in seconds [0,255].
@@ -144,7 +144,7 @@ public:
     uint8_t _unused48         : 6,      ///< Unknonw set to 0.
       emergency_alarm_ack     : 1,      ///< Emergency alarm ACK.
       data_call_conf          : 1;      ///< Data call confirmed.
-	    // Byte 49
+    // Byte 49
     uint8_t private_call_conf : 1,      ///< Private call confirmed.
       _unused49_1             : 3,      ///< Unknown, set to 0.
       privacy                 : 1,      ///< Privacy: Off or On.

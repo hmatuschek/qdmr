@@ -33,7 +33,7 @@ RD5RCodeplug::channel_t::isValid() const {
 void
 RD5RCodeplug::channel_t::clear() {
   memset(name, 0xff, 16);
-  _unused25[0] = _unused25[1] = 0;
+  _unused25 = 0;
   _unused30 = 0x50;
   _unused36 = 0;
   tx_signaling_syst = 0;

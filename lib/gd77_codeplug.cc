@@ -25,6 +25,19 @@
 #define VALID_CONTACT(ct)   ((ct) != 0 && VALID_TEXT((ct)->name))
 
 
+uint32_t
+GD77Codeplug::contact_t::getId() const {
+  return ((id[0] >> 4) * 10000000 +\
+      (id[0] & 15) * 1000000 +\
+      (id[1] >> 4) * 100000 +\
+      (id[1] & 15) * 10000 +\
+      (id[2] >> 4) * 1000 +\
+      (id[2] & 15) * 100 +\
+      (id[3] >> 4) * 10 +\
+      (id[3] & 15));
+}
+
+
 GD77Codeplug::GD77Codeplug(QObject *parent)
   : CodePlug(parent)
 {

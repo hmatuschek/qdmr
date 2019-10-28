@@ -1,7 +1,10 @@
 /** @defgroup gd77 Radiooddity GD-77
  * Device specific classes for Radiooddity GD-77 and GD-77S.
  *
- * <img src="uv390.jpg" width="200px" align="left"/>
+ * <img src="gd77.jpg" width="200px" align="left"/>
+ *
+ * @warning This device and its codplug are implemented based on the code by Serge and has not been
+ * tested! I do not own a GD-77 or GD-77S, hence I cannot test and verify the implementation!
  *
  * @todo Get a handheld.
  * @todo Reverse-engineer and implement everything.

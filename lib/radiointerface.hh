@@ -38,6 +38,9 @@ public:
    * @returns @c true on success. */
   virtual bool write_block(int bno, uint8_t *data, int nbytes) = 0;
 
+  /** This function ends a series of @c write_block operations.
+   * This function will be re-implemented by certain interfaces that need completion of write
+   * operations (e.g., HID). By default the method does nothing. */
   virtual bool write_finish();
 
   /** Reads a chunk of data from the block-address @c bno (block number).
@@ -47,9 +50,14 @@ public:
    * @returns @c true on success. */
 	virtual bool read_block(int bno, uint8_t *data, int nbytes) = 0;
 
+  /** This function ends a series of @c read_block operations.
+   * This function will be re-implemented by certain interfaces that need completion of read
+   * operations (e.g., HID). By default the method does nothing. */
   virtual bool read_finish();
 
-  /** Some radios needs to be rebooted after being read or programmed. */
+  /** Some radios need to be rebooted after being read or programmed. This function
+   * will be re-implemented by some interfaces (e.g., DFUDevice) to reboot the radio. By default
+   * this function does nothing. */
 	virtual bool reboot();
 
   /** Returns the last error message. */

@@ -293,13 +293,14 @@ Application::quitApplication() {
 
 void
 Application::detectRadio() {
-  Radio *radio = Radio::detect();
+  QString errorMessage;
+  Radio *radio = Radio::detect(errorMessage);
   if (radio) {
     QMessageBox::information(0, tr("Radio found"), tr("Found device '%1'.").arg(radio->name()));
     radio->deleteLater();
   } else {
     QMessageBox::information(0, tr("No Radio found."),
-                             tr("No known radio detected. Check connection?"));
+                             tr("No known radio detected. Check connection?\nError:")+errorMessage);
   }
   radio->deleteLater();
 }
@@ -308,12 +309,13 @@ Application::detectRadio() {
 bool
 Application::verifyCodeplug(Radio *radio) {
   Radio *myRadio = radio;
+  QString errorMessage;
   if (nullptr == myRadio)
-    myRadio = Radio::detect();
-
+    myRadio = Radio::detect(errorMessage);
   if (! myRadio) {
     QMessageBox::information(0, tr("No Radio found."),
-                             tr("Cannot verify codeplug: No known radio detected."));
+                             tr("Cannot verify codeplug: No known radio detected.\nError: ")
+                             + errorMessage);
     return false;
   }
 
@@ -346,10 +348,12 @@ Application::downloadCodeplug() {
       return;
   }
 
-  Radio *radio = Radio::detect();
+  QString errorMessage;
+  Radio *radio = Radio::detect(errorMessage);
   if (! radio) {
     QMessageBox::critical(0, tr("No Radio found."),
-                          tr("Can not download codeplug from device: No radio found."));
+                          tr("Can not download codeplug from device: No radio found.\nError: ")
+                          + errorMessage);
     return;
   }
 
@@ -391,9 +395,12 @@ Application::onCodeplugDownloaded(Radio *radio, Config *config) {
 void
 Application::uploadCodeplug() {
   // Start upload
-  Radio *radio = Radio::detect();
+  QString errorMessage;
+  Radio *radio = Radio::detect(errorMessage);
   if (! radio) {
-    QMessageBox::critical(0, tr("No Radio found."), tr("Can not upload codeplug to device: No radio found."));
+    QMessageBox::critical(0, tr("No Radio found."),
+                          tr("Can not upload codeplug to device: No radio found.\nError: ")
+                          + errorMessage);
     return;
   }
 
