@@ -112,6 +112,8 @@ DFUFile::read(QFile &file)
 {
   CRC32 crc;
 
+  _images.clear();
+
   file_prefix_t prefix;
   if (sizeof(file_prefix_t) != file.read((char *)&prefix, sizeof(file_prefix_t))) {
     _errorMessage = tr("Cannot read DFU file '%1': Cannot read prefix.").arg(file.fileName());
@@ -272,6 +274,11 @@ DFUFile::Element::setAddress(uint32_t addr) {
   _address = addr;
 }
 
+bool
+DFUFile::Element::isAligned(uint blocksize) const {
+  return (0 == (_address % blocksize)) && (0 == (_data.size() % blocksize));
+}
+
 const QByteArray &
 DFUFile::Element::data() const {
   return _data;
@@ -338,6 +345,40 @@ DFUFile::Element::write(QFile &file, CRC32 &crc, QString &errorMessage) const {
 void
 DFUFile::Element::dump(QTextStream &stream) const {
   stream << "  Element @ 0x" << hex << _address << ", size=0x" << hex << _data.size() << endl;
+  int nrow = _data.size()/16;
+  uint8_t last_line[16]; memset(last_line, 0, 16);
+  bool skipping = false;
+  for (int i=0; i<nrow; i++) {
+    if ((i>0) && (0==memcmp(last_line, _data.constData()+i*16, 16)) && skipping)
+      continue;
+    if ((i>0) && (0==memcmp(last_line, _data.constData()+i*16, 16))) {
+      skipping = true;
+      stream << qSetFieldWidth(8) << right << "*" << qSetFieldWidth(1) << endl;
+      continue;
+    }
+    memcpy(last_line, _data.constData()+i*16, 16);
+    skipping = false;
+    stream << qSetFieldWidth(8) << right << hex << (_address+i*16)
+           << qSetFieldWidth(1) << "  ";
+    for (int j=(i*16); j<(i*16+8); j++) {
+      stream << qSetFieldWidth(2) << right << hex << uint8_t(_data.at(j))
+             << qSetFieldWidth(1) << " ";
+    }
+    stream << " ";
+    for (int j=(i*16+8); j<(i*16+16); j++) {
+      stream << qSetFieldWidth(2) << right << hex << uint8_t(_data.at(j))
+             << qSetFieldWidth(1) << " ";
+    }
+    stream << " |";
+    for (int j=(i*16); j<(i*16+16); j++) {
+      char c = _data.at(j);
+      if ((c>=32) && (c<127))
+        stream << c;
+      else
+        stream << ".";
+    }
+    stream << "|" << endl;
+  }
 }
 
 

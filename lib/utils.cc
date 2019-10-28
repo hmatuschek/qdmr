@@ -48,13 +48,15 @@ inline int iround(double x) {
 
 double
 decode_frequency(uint32_t bcd) {
-  double freq = 100.0*((bcd>> 28) & 15) + 10.0*((bcd >> 24) & 15) + 1.0*((bcd >> 20) & 15)
-      + 0.1*((bcd >> 16) & 15) + 0.01*((bcd >> 12) & 15) + 0.001*((bcd >> 8) & 15);
-  if ((bcd & 0xff) != 0) {
-    freq += 0.0001*((bcd >> 4) & 15);
-    if ((bcd & 0x0f) != 0)
-      freq += 0.00001*(bcd & 15);
-  }
+  double freq =
+      100.0   * ((bcd >> 28) & 0xf) +
+      10.0    * ((bcd >> 24) & 0xf) +
+      1.0     * ((bcd >> 20) & 0xf) +
+      0.1     * ((bcd >> 16) & 0xf) +
+      0.01    * ((bcd >> 12) & 0xf) +
+      0.001   * ((bcd >>  8) & 0xf) +
+      0.0001  * ((bcd >>  4) & 0xf) +
+      0.00001 * ((bcd >>  0) & 0xf);
   return freq;
 }
 
@@ -70,7 +72,7 @@ encode_frequency(double freq) {
   uint32_t g  = (hz / 100)       % 10;
   uint32_t h  = (hz / 10)        % 10;
 
-  return g << 28 | h << 24 | e << 20 | f << 16 | c << 12 | d << 8 | a << 4 | b;
+  return a << 28 | b << 24 | c << 20 | d << 16 | e << 12 | f << 8 | g << 4 | h;
 }
 
 

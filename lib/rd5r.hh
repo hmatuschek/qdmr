@@ -1,4 +1,5 @@
-/** @defgroup rd5r Baofeng/Radioddity RD-5R device specific classes.
+/** @defgroup rd5r Baofeng/Radioddity RD-5R
+ * Device specific classes for Baofeng/Radioddity RD-5R.
  *
  * <img src="rd5r.jpg" width="200px" align="left"/>
  * The Baofeng/Radioddity RD-5R radio is likely the cheapest fully DMR compatiple (Tier I&II) VHF/UHF
@@ -29,6 +30,11 @@
 
 
 /** Implements an interface to the Baofeng/Radioddity RD-5R VHF/UHF 5W DMR (Tier I/II) radio.
+ *
+ * The Baofeng/Radioddity RD-5R radio uses a weird HID (human-interface device, see @c HID and
+ * @c HIDevice) protocol for communication. This class implements the communication details with
+ * the radio to read and write codeplugs on the device.
+ *
  * @ingroup rd5r */
 class RD5R: public Radio
 {
@@ -43,6 +49,7 @@ public:
 	const QString &name() const;
 	const Radio::Features &features() const;
   const CodePlug &codeplug() const;
+  CodePlug &codeplug();
 
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
@@ -56,11 +63,11 @@ protected:
    * device. */
 	void run();
 
-protected slots:
+private slots:
   /** Internal callback on finished downloads. */
 	void onDonwloadFinished();
 
-protected:
+private:
   /** Device identifier string. */
 	QString _name;
   /** HID interface to the radio. */

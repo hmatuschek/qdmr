@@ -32,27 +32,29 @@ enum {
 
 
 DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
-  : RadioInferface(parent), _ctx(nullptr), _dev(nullptr), _ident(nullptr)
+  : QObject(parent), RadioInterface(), _ctx(nullptr), _dev(nullptr), _ident(nullptr)
 {
   int error = libusb_init(&_ctx);
   if (error < 0) {
-    qDebug() << __func__ << "libusb init failed:"
-             << error << libusb_strerror((enum libusb_error) error);
+    _errorMessage = QString("%1 Libusb init failed: %2 %3").arg(__func__).arg(error)
+        .arg(libusb_strerror((enum libusb_error) error));
     return;
   }
 
   if (! (_dev = libusb_open_device_with_vid_pid(_ctx, vid, pid))) {
-      libusb_exit(_ctx);
-      _ctx = 0;
-      return;
+    _errorMessage = QString("%1 Cannot open device %2, %3: %4 %5").arg(__func__).arg(vid).arg(pid)
+        .arg(error).arg(libusb_strerror((enum libusb_error) error));
+    libusb_exit(_ctx);
+    _ctx = 0;
+    return;
   }
 
   if (libusb_kernel_driver_active(_dev, 0))
     libusb_detach_kernel_driver(_dev, 0);
 
   if (0 > (error = libusb_claim_interface(_dev, 0))) {
-    qDebug() << __func__ << "Failed to claim USB interface:"
-             << error << libusb_strerror((enum libusb_error) error);
+    _errorMessage = QString("%1 Failed to claim USB interface: %2 %3").arg(__func__).arg(error)
+        .arg(libusb_strerror((enum libusb_error) error));
     libusb_close(_dev);
     libusb_exit(_ctx);
     _ctx = 0;
@@ -95,6 +97,9 @@ DFUDevice::detach(int timeout)
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DETACH, timeout, 0, nullptr, 0, 0);
+  if (0 > error)
+    _errorMessage = QString("%1 Cannot detatch device: %2 %3").arg(__func__).arg(error)
+        .arg(libusb_strerror((enum libusb_error) error));
   return error;
 }
 
@@ -104,9 +109,11 @@ DFUDevice::get_status()
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_HOST, REQUEST_GETSTATUS, 0, 0, (unsigned char*)&_status, 6, 0);
-  if (error < 0) {
-    qDebug() << __func__ << ": Recv:" << _status.status << _status.poll_timeout
-             << _status.state << _status.string_index;
+  if (0 > error) {
+    _errorMessage = QString("%1 Cannot get status: %2 %3. Recv: %4, %5, %6, %7").arg(__func__)
+        .arg(error).arg(libusb_strerror((enum libusb_error) error))
+        .arg(_status.status).arg(_status.poll_timeout).arg(_status.state)
+        .arg(_status.string_index);
     return error;
   }
   return 0;
@@ -116,8 +123,11 @@ DFUDevice::get_status()
 int
 DFUDevice::clear_status()
 {
-  libusb_control_transfer(
+  int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_CLRSTATUS, 0, 0, NULL, 0, 0);
+  if (0 > error)
+    _errorMessage = QString("%1 Cannot clear status: %2 %3").arg(__func__).arg(error)
+        .arg(libusb_strerror((enum libusb_error) error));
   return 0;
 }
 
@@ -130,10 +140,9 @@ DFUDevice::get_state(int &pstate)
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_HOST, REQUEST_GETSTATE, 0, 0, &state, 1, 0);
   pstate = state;
-  if (error < 0) {
-    qDebug() << __func__ << ": Recv " << state;
-    return error;
-  }
+  if (error < 0)
+    _errorMessage = QString("%1 Cannot get state: %2 %3").arg(__func__).arg(error)
+        .arg(libusb_strerror((enum libusb_error) error));
   return 0;
 }
 
@@ -143,6 +152,9 @@ DFUDevice::abort()
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_ABORT, 0, 0, NULL, 0, 0);
+  if (error < 0)
+    _errorMessage = QString("%1 Cannot abort: %2 %3").arg(__func__).arg(error)
+        .arg(libusb_strerror((enum libusb_error) error));
   return error;
 }
 
@@ -153,12 +165,8 @@ DFUDevice::wait_idle()
   int state, error;
 
   for (;;) {
-    error = get_state(state);
-    if (error < 0) {
-      qDebug() << __func__ << "cannot get state:"
-               << error << libusb_strerror((enum libusb_error) error);
+    if (0 > (error = get_state(state)))
       return 1;
-    }
 
     switch (state) {
       case dfuIDLE:
@@ -183,11 +191,8 @@ DFUDevice::wait_idle()
         break;
     }
 
-    if (error < 0) {
-      qDebug() << __func__ << "unexpected usb error in state " << state << ":"
-               << error << libusb_strerror((enum libusb_error) error);
+    if (error < 0)
       return 1;
-    }
   }
 }
 
@@ -201,8 +206,8 @@ DFUDevice::md380_command(uint8_t a, uint8_t b)
           _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, 0, 0, cmd, 2, 0);
 
     if (error < 0) {
-      qDebug() << __func__ << "cannot send command:"
-               << error << libusb_strerror((enum libusb_error) error);
+      _errorMessage = QString("%1 Cannot send command: %2 %3").arg(__func__).arg(error)
+          .arg(libusb_strerror((enum libusb_error) error));
       return 1;
     }
 
@@ -227,8 +232,8 @@ DFUDevice::set_address(uint32_t address)
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, 0, 0, cmd, 5, 0);
   if (error < 0) {
-    qDebug() << __func__ << "cannot send command:"
-             << error << libusb_strerror((enum libusb_error) error);
+    _errorMessage = QString("%1 Cannot send command: %2 %3").arg(__func__).arg(error)
+        .arg(libusb_strerror((enum libusb_error) error));
     return 1;
   }
 
@@ -252,8 +257,8 @@ DFUDevice::erase_block(uint32_t address)
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, 0, 0, cmd, 5, 0);
   if (error < 0) {
-    qDebug() << __func__ << "cannot send command:"
-             << error << libusb_strerror((enum libusb_error) error);
+    _errorMessage = QString("%1 Cannot send command: %2 %3").arg(__func__).arg(error)
+        .arg(libusb_strerror((enum libusb_error) error));
     return 1;
   }
 
@@ -274,8 +279,8 @@ DFUDevice::identify()
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_HOST, REQUEST_UPLOAD, 0, 0, data, 64, 0);
   if (error < 0) {
-    qDebug() << __func__ << "cannot read data:"
-             << error << libusb_strerror((enum libusb_error) error);
+    _errorMessage = QString("%1 Cannot read data: %2 %3").arg(__func__).arg(error)
+        .arg(libusb_strerror((enum libusb_error) error));
     return nullptr;
   }
   get_status();
@@ -284,8 +289,7 @@ DFUDevice::identify()
 
 
 bool
-DFUDevice::erase(unsigned start, unsigned finish)
-{
+DFUDevice::erase(unsigned start, unsigned finish) {
   int error;
   // Enter Programming Mode.
   if ((error = get_status()))
@@ -339,16 +343,16 @@ DFUDevice::erase(unsigned start, unsigned finish)
 
 
 bool
-DFUDevice::read_block(int bno, uint8_t *data, int nbytes)
-{
-  if (bno >= 256 && bno < 2048)
-    bno += 832;
-
+DFUDevice::read_block(int bno, uint8_t *data, int nbytes) {
+  if (nullptr == data) {
+    _errorMessage = QString("%1 Cannot write data into nullptr!").arg(__func__);
+    return false;
+  }
   int error = libusb_control_transfer(
-        _dev, REQUEST_TYPE_TO_HOST, REQUEST_UPLOAD, bno+2, 0, data, nbytes, 0);
+        _dev, REQUEST_TYPE_TO_HOST, REQUEST_UPLOAD, bno, 0, data, nbytes, 0);
   if (error < 0) {
-    qDebug() << __func__ << "cannot read block" << bno << ", nbytes=" << nbytes
-             << ":" << error << libusb_strerror((enum libusb_error) error);
+    _errorMessage = QString("%1 Cannot read block: %2 %3").arg(__func__).arg(error)
+        .arg(libusb_strerror((enum libusb_error) error));
     return false;
   }
   return 0 == get_status();
@@ -356,16 +360,16 @@ DFUDevice::read_block(int bno, uint8_t *data, int nbytes)
 
 
 bool
-DFUDevice::write_block(int bno, uint8_t *data, int nbytes)
-{
-  if (bno >= 256 && bno < 2048)
-    bno += 832;
-
+DFUDevice::write_block(int bno, uint8_t *data, int nbytes) {
+  if (nullptr == data) {
+    _errorMessage = QString("%1 Cannot read data from nullptr!").arg(__func__);
+    return false;
+  }
   int error = libusb_control_transfer(
-        _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, bno+2, 0, data, nbytes, 0);
+        _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, bno, 0, data, nbytes, 0);
   if (error < 0) {
-    qDebug() << __func__ << "cannot write block" << bno << " nbytes=" << nbytes
-             << ":" << error << libusb_strerror((enum libusb_error) error);
+    _errorMessage = QString("%1 Cannot write block: %2 %3").arg(__func__).arg(error)
+        .arg(libusb_strerror((enum libusb_error) error));
     return false;
   }
   if ((error = get_status()))
@@ -374,8 +378,7 @@ DFUDevice::write_block(int bno, uint8_t *data, int nbytes)
 }
 
 
-bool DFUDevice::reboot()
-{
+bool DFUDevice::reboot() {
   unsigned char cmd[2] = { 0x91, 0x05 };
 
   if (! _ctx)
@@ -385,10 +388,15 @@ bool DFUDevice::reboot()
 
   int error;
   if (0 > (error = libusb_control_transfer(_dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, 0, 0, cmd, 2, 0))) {
-    qDebug() << __func__ << "cannot send command:"
-             << error << libusb_strerror((enum libusb_error) error);
+    _errorMessage = QString("%1 Cannot send reboot command: %2 %3").arg(__func__).arg(error)
+        .arg(libusb_strerror((enum libusb_error) error));
     return false;
   }
 
   return (0 <= get_status());
+}
+
+const QString &
+DFUDevice::errorMessage() const {
+  return _errorMessage;
 }

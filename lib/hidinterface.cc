@@ -17,7 +17,7 @@ static const unsigned char CMD_CWB1[]  = "CWB\4\0\1\0\0";
 static unsigned offset = 0;                 // CWD offset
 
 HID::HID(int vid, int pid, QObject *parent)
-  : HIDevice(vid, pid, parent), _errorMessage()
+  : HIDevice(vid, pid, parent)
 {
   // pass...
 }
@@ -28,8 +28,18 @@ HID::~HID() {
 }
 
 
+bool
+HID::isOpen() const {
+  return HIDevice::isOpen();
+}
+
+void
+HID::close() {
+  HIDevice::close();
+}
+
 QString
-HID::identify() {
+HID::identifier() {
   static unsigned char reply[38];
   unsigned char ack;
 
@@ -68,7 +78,7 @@ HID::identify() {
 
 
 bool
-HID::readBlock(int bno, unsigned char *data, int nbytes)
+HID::read_block(int bno, unsigned char *data, int nbytes)
 {
   unsigned addr = bno * nbytes;
   unsigned char ack, cmd[4], reply[32+4];
@@ -111,7 +121,7 @@ HID::readBlock(int bno, unsigned char *data, int nbytes)
 }
 
 bool
-HID::readFinish()
+HID::read_finish()
 {
   unsigned char ack;
 
@@ -127,7 +137,7 @@ HID::readFinish()
 }
 
 bool
-HID::writeBlock(int bno, unsigned char *data, int nbytes)
+HID::write_block(int bno, unsigned char *data, int nbytes)
 {
   unsigned addr = bno * nbytes;
   unsigned char ack, cmd[4+32];
@@ -173,7 +183,7 @@ HID::writeBlock(int bno, unsigned char *data, int nbytes)
 }
 
 bool
-HID::writeFinish()
+HID::write_finish()
 {
   unsigned char ack;
 

@@ -27,7 +27,7 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   QString filename = parser.positionalArguments()[0];
 
   if (!parser.isSet("csv") && !filename.endsWith(".conf") && !filename.endsWith(".csv") &&
-      !parser.isSet("bin") && !filename.endsWith(".bin") && !filename.endsWith(".rdt")) {
+      !parser.isSet("cpl") && !filename.endsWith(".bin") && !filename.endsWith(".dfu")) {
     qDebug() << "Cannot determine output filetype, consider using --csv or --bin options.";
     return -1;
   }
@@ -58,6 +58,6 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
     return -1;
   }
 
-  file.write((const char *)radio->codeplug().data(0), radio->codeplug().size());
+  radio->codeplug().write(filename);
   return 0;
 }

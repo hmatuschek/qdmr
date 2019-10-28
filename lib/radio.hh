@@ -1,6 +1,10 @@
-/** @defgroup dsc Device specific classes.
- * This module collects all classes that implement device specific configurations, aka codeplugs.
+/** @defgroup dsc Supported devices
+ * This module collects all classes are device specific.
+ *
+ * That is, implementing device specific configurations, aka codeplugs as well as the specific
+ * communication whith these radios.
  */
+
 #ifndef RADIO_HH
 #define RADIO_HH
 
@@ -113,6 +117,8 @@ public:
 	virtual const Features &features() const = 0;
   /** Returns the codeplug instance. */
   virtual const CodePlug &codeplug() const = 0;
+  /** Returns the codeplug instance. */
+  virtual CodePlug &codeplug() = 0;
   /** Verifies the configuration against the radio features.
    * On exit, @c issues will contain the issues found. */
 	bool verifyConfig(Config *config, QList<VerifyIssue> &issues);

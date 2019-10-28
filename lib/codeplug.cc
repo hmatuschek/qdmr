@@ -1,5 +1,6 @@
 #include "codeplug.hh"
 #include "config.hh"
+#include <QDebug>
 
 
 CodePlug::CodePlug(QObject *parent)
@@ -14,12 +15,28 @@ CodePlug::~CodePlug() {
 
 unsigned char *
 CodePlug::data(uint32_t offset) {
-	//return &_radio_mem[offset];
-  return (unsigned char *)&image(0).element(0).data().data()[offset];
+  // Search for element that contains address
+  for  (int i=0; i<image(0).numElements(); i++) {
+    if ((offset >= image(0).element(i).address()) &&
+        (offset < (image(0).element(i).address()+image(0).element(i).data().size())))
+    {
+      return (unsigned char *)(image(0).element(i).data().data()+
+                               (offset-image(0).element(i).address()));
+    }
+  }
+  return nullptr;
 }
 
 const unsigned char *
 CodePlug::data(uint32_t offset) const {
-  //return &_radio_mem[offset];
-  return (unsigned char *)&image(0).element(0).data().data()[offset];
+  // Search for element that contains address
+  for  (int i=0; i<image(0).numElements(); i++) {
+    if ((offset >= image(0).element(i).address()) &&
+        (offset < (image(0).element(i).address()+image(0).element(i).data().size())))
+    {
+      return (const unsigned char *)(image(0).element(i).data().data()+
+                                     (offset-image(0).element(i).address()));
+    }
+  }
+  return nullptr;
 }

@@ -16,7 +16,7 @@ int infoFile(QCommandLineParser &parser, QCoreApplication &app) {
 
   QString filename = parser.positionalArguments().at(0);
   DFUFile file;
-  if (!file.read(filename)) {
+  if (! file.read(filename)) {
     qDebug() << file.errorMessage();
     return -1;
   }

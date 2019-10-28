@@ -21,14 +21,10 @@ public:
   /** Destructor. */
 	virtual ~CodePlug();
 
-  /** Returns the size of the encoded code-plug in bytes.
-   * This must be implemented by the device-specific codeplug. */
-  virtual size_t size() const = 0;
-  /** Returns a pointer to the encoded/decoded data at the specified offset. */
+  /** Returns a pointer to the encoded raw data at the specified offset. */
   virtual unsigned char *data(uint32_t offset);
-  /** Returns a const pointer to the encoded/decoded data at the specified offset. */
+  /** Returns a const pointer to the encoded raw data at the specified offset. */
   virtual const unsigned char *data(uint32_t offset) const;
-
 
   /** Decodes a binary codeplug to the given abstract configuration @c config.
    * This must be implemented by the device-specific codeplug. */

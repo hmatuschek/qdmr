@@ -1,11 +1,12 @@
-#include "uv390.hh"
+#include "gd77.hh"
+
 #include "config.hh"
 #include <QDebug>
 
 
 #define BSIZE 1024
 
-static Radio::Features _uv390_features =
+static Radio::Features _gd77_features =
 {
   true, // hasDigital
   true, // hasAnalog
@@ -16,52 +17,53 @@ static Radio::Features _uv390_features =
   1024, // maxChannels;
   16,   // maxChannelNameLength;
 
-  250,  // maxZones;
+  32,   // maxZones;
   16,   // maxZoneNameLength;
-  16,   // maxChannelsInZone;
+  32,   // maxChannelsInZone;
 
-  250,  // maxScanlists;
+  64,   // maxScanlists;
   16,   // maxScanlistNameLength;
-  31,   // maxChannelsInScanlist;
+  32,   // maxChannelsInScanlist;
   true, // scanListNeedPriority;
 
   256,  // maxContacts;
   16,   // maxContactNameLength;
 
+  /// @bug Check.
   64,   // maxGrouplists;
   16,   // maxGrouplistNameLength;
   16    // maxContactsInGrouplist;
 };
 
 
-UV390::UV390(QObject *parent)
-  : Radio(parent), _name("TYT MD-UV390"), _dev(nullptr), _config(nullptr)
+GD77::GD77(QObject *parent)
+  : Radio(parent), _name("Radioddity GD-77"), _dev(nullptr), _config(nullptr)
 {
   // pass...
 }
 
 const QString &
-UV390::name() const {
+GD77::name() const {
   return _name;
 }
 
 const Radio::Features &
-UV390::features() const {
-  return _uv390_features;
+GD77::features() const {
+  return _gd77_features;
 }
 
 const CodePlug &
-UV390::codeplug() const {
+GD77::codeplug() const {
   return _codeplug;
 }
 
 CodePlug &
-UV390::codeplug() {
+GD77::codeplug() {
   return _codeplug;
 }
 
 bool
-UV390::startDownload(Config *config) {
+GD77::startDownload(Config *config) {
   if (StatusIdle != _task)
     return false;
 
@@ -69,7 +71,8 @@ UV390::startDownload(Config *config) {
   if (!_config)
     return false;
 
-  _dev = new DFUDevice(0x0483, 0xdf11, this);
+  /// @bug Implement.
+  _dev = new HID(0x0483, 0xdf11, this);
   if (! _dev->isOpen()) {
     _dev->deleteLater();
     return false;
@@ -84,14 +87,15 @@ UV390::startDownload(Config *config) {
 }
 
 bool
-UV390::startUpload(Config *config) {
+GD77::startUpload(Config *config) {
   if (StatusIdle != _task)
     return false;
 
   if (! (_config = config))
     return false;
 
-  _dev = new DFUDevice(0x15a2, 0x0073, this);
+  /// @bug Implement.
+  _dev = new HID(0x15a2, 0x0073, this);
   if (!_dev->isOpen()) {
     _dev->deleteLater();
     return false;
@@ -104,7 +108,7 @@ UV390::startUpload(Config *config) {
 }
 
 void
-UV390::onDonwloadFinished() {
+GD77::onDonwloadFinished() {
   if (_codeplug.decode(_config))
     emit downloadComplete(this, _config);
   else
@@ -113,7 +117,7 @@ UV390::onDonwloadFinished() {
 }
 
 void
-UV390::run() {
+GD77::run() {
   if (StatusDownload == _task) {
     emit downloadStarted();
 
@@ -145,6 +149,7 @@ UV390::run() {
           _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
           _task = StatusError;
+          _dev->read_finish();
           _dev->close();
           _dev->deleteLater();
           emit downloadError(this);
@@ -154,6 +159,7 @@ UV390::run() {
         emit downloadProgress(float(bcount*100)/totb);
       }
     }
+    _dev->read_finish();
 
     _task = StatusIdle;
     _dev->reboot();
@@ -173,6 +179,7 @@ UV390::run() {
             .arg(n).arg(_codeplug.image(0).element(n).address())
             .arg(_codeplug.image(0).element(n).data().size()).arg(BSIZE);
         _task = StatusError;
+        _dev->read_finish();
         _dev->close();
         _dev->deleteLater();
         emit downloadError(this);
@@ -180,6 +187,7 @@ UV390::run() {
       }
       totb += _codeplug.image(0).element(n).data().size()/BSIZE;
     }
+    _dev->read_finish();
 
     // First download codeplug from device:
     size_t bcount = 0;
@@ -192,6 +200,7 @@ UV390::run() {
           _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
           _task = StatusError;
+          _dev->read_finish();
           _dev->close();
           _dev->deleteLater();
           emit downloadError(this);
@@ -215,6 +224,7 @@ UV390::run() {
           _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
           _task = StatusError;
+          _dev->write_finish();
           _dev->close();
           _dev->deleteLater();
           emit uploadError(this);
@@ -225,6 +235,7 @@ UV390::run() {
     }
 
     _task = StatusIdle;
+    _dev->write_finish();
     _dev->reboot();
     _dev->close();
     _dev->deleteLater();

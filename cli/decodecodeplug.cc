@@ -17,23 +17,16 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   if (1 > parser.positionalArguments().size())
     parser.showHelp(-1);
 
-  QFile infile(parser.positionalArguments().at(0));
-  if (! infile.open(QIODevice::ReadOnly)) {
-    qDebug() << "Cannot decode binary codeplug file" << infile.fileName() << ":" << infile.errorString();
-    return -1;
-  }
+  QString filename = parser.positionalArguments().at(0);
 
-  // Determine type by file size
-  QFileInfo info(infile.fileName());
-  if ((0xd0000 == info.size()) || ("uv390"==parser.value("radio").toLower()) || ("rt3s"==parser.value("radio").toLower())) {
+  if (("uv390"==parser.value("radio").toLower()) || ("rt3s"==parser.value("radio").toLower())) {
     UV390Codeplug codeplug;
-    if (codeplug.size() != size_t(infile.read((char *)codeplug.data(0), codeplug.size()))) {
-      qDebug() << "Cannot decode binary codeplug file" << infile.fileName() << ":" << infile.errorString();
+    if (! codeplug.read(filename)) {
+      qDebug() << "Cannot decode binary codeplug file" << filename << ":" << codeplug.errorMessage();
       return -1;
     }
     Config config;
     codeplug.decode(&config);
-    infile.close();
 
     if (2 <= parser.positionalArguments().size()) {
       QFile outfile(parser.positionalArguments().at(1));
@@ -48,15 +41,14 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       QTextStream stream(stdout);
       config.writeCSV(stream);
     }
-  } else if ((0x20000 == info.size()) || ("rd5r"==parser.value("radio").toLower())) {
+  } else if ("rd5r"==parser.value("radio").toLower()) {
     RD5RCodeplug codeplug;
-    if (codeplug.size() != size_t(infile.read((char *)codeplug.data(0), codeplug.size()))) {
-      qDebug() << "Cannot decode binary codeplug file" << infile.fileName() << ":" << infile.errorString();
+    if (! codeplug.read(filename)) {
+      qDebug() << "Cannot decode binary codeplug file" << filename << ":" << codeplug.errorMessage();
       return -1;
     }
     Config config;
     codeplug.decode(&config);
-    infile.close();
 
     if (2 <= parser.positionalArguments().size()) {
       QFile outfile(parser.positionalArguments().at(1));

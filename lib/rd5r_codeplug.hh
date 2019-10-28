@@ -36,7 +36,7 @@ class RXGroupList;
  * of the firmware. It must have been a real nightmare to Serge Vakulenko reverse-engineering this
  * codeplug.
  *
- * @section uv390cpl Codeplug structure within radio
+ * @section rd5rcpl Codeplug structure within radio
  * The memory representation of the codeplug within the radio is divided into two segments.
  * The first segment starts at the address 0x00080 and ends at 0x07c00 while the second section
  * starts at 0x08000 and ends at 0x1e300.
@@ -441,9 +441,6 @@ public:
 	bool decode(Config *config);
   /** Encodes the given generic configuration into this codeplug. */
 	bool encode(Config *config);
-
-  /** Returns the size of the codeplug. */
-  size_t size() const;
 };
 
 #endif // RD5R_CODEPLUG_HH

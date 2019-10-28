@@ -21,22 +21,27 @@ class ScanList;
  *  <tr><th>Start</th>    <th>End</th>      <th>Size</th>    <th>Content</th></tr>
  *  <tr><th colspan="4">First segment 0x002800-0x040800</th></tr>
  *  <tr><td>0x002800</td> <td>0x00280c</td> <td>0x0000c</td> <td>Timestamp see @c UV390Codeplug::timestamp_t.</td></tr>
- *  <tr><td>0x00280c</td> <td>0x002840</td> <td>0x00034</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x00280c</td> <td>0x002840</td> <td>0x00034</td> <td>Reserved, filled with 0xff. </td></tr>
  *  <tr><td>0x002840</td> <td>0x0028e4</td> <td>0x000a4</td> <td>General settings see @c UV390Codeplug::general_settings_t.</td></tr>
  *  <tr><td>0x0028e4</td> <td>0x002980</td> <td>0x0009c</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x002980</td> <td>0x0061c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each, see @c UV390Codeplug::message_t.</td></tr>
- *  <tr><td>0x0061c0</td> <td>0x00f420</td> <td>0x09260</td> <td>??? Emergency systems ???</td></tr>
+ *  <tr><td>0x0061c0</td> <td>0x00f420</td> <td>0x09260</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x00f420</td> <td>0x0151e0</td> <td>0x05dc0</td> <td>250 RX Group lists @ 0x60 bytes each, see @c UV390Codeplug::grouplist_t.</td></tr>
  *  <tr><td>0x0151e0</td> <td>0x019060</td> <td>0x03e80</td> <td>250 Zones @ 0x40 bytes each, see @c UV390Codeplug::zone_t.</td></tr>
  *  <tr><td>0x019060</td> <td>0x01f5f0</td> <td>0x06590</td> <td>250 Scanlists @ 0x68 bytes each, see @c UV390Codeplug::scanlist_t.</td></tr>
- *  <tr><td>0x01f5f0</td> <td>0x031860</td> <td>0x12270</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x01f5f0</td> <td>0x02f700</td> <td>0x10110</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><td>0x02f700</td> <td>0x02f780</td> <td>0x00080</td> <td>??? Unknown. ???</td></tr>
+ *  <tr><td>0x02f780</td> <td>0x02f800</td> <td>0x00080</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><td>0x02f800</td> <td>0x030b88</td> <td>0x01388</td> <td>??? Unknown. ???</td></tr>
+ *  <tr><td>0x030b88</td> <td>0x031800</td> <td>0x00c78</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><td>0x031800</td> <td>0x031860</td> <td>0x00060</td> <td>Unknown, filled with @c 0x00! </td></tr>
  *  <tr><td>0x031860</td> <td>0x03f320</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c UV390Codeplug::zone_ext_t.</td></tr>
  *  <tr><td>0x03f320</td> <td>0x040800</td> <td>0x014e0</td> <td>??? Unknown ???</td></tr>
  *  <tr><th colspan="4">Second segment 0x110800-0x1a0800</th></tr>
  *  <tr><td>0x110800</td> <td>0x13f600</td> <td>0x2ee00</td> <td>3000 Channels @ 0x40 bytes each, see @c UV390Codeplug::channel_t.</td></tr>
- *  <tr><td>0x13f600</td> <td>0x140800</td> <td>0x01200</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x13f600</td> <td>0x140800</td> <td>0x01200</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x140800</td> <td>0x198640</td> <td>0x57e40</td> <td>10000 Contacts @ 0x24 bytes each, see @c UV390Codeplug::contact_t.</td></tr>
- *  <tr><td>0x198640</td> <td>0x1a0800</td> <td>0x081c0</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x198640</td> <td>0x1a0800</td> <td>0x081c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
  * </table>
  *
  * @ingroup uv390 */
@@ -98,7 +103,7 @@ protected:
 		uint8_t rx_ref_frequency : 2,   ///< RX Ref Frequency: 0=Low, 1=Medium, 2=High, default=0
       _unused3_2             : 1,   ///< Unknown = 0 ???, default = 0
       emergency_alarm_ack    : 1,   ///< Emergency Alarm Ack, default = 0
-      _unused3_4             : 3,   ///< Unknown 0b110 ???
+      _unused3_4             : 3,   ///< Unknown 0b100 ???
       display_pttid_dis      : 1;   ///< Display PTT ID (inverted), default = 1
 
     /** TX Admit criterion. */
@@ -315,7 +320,8 @@ protected:
 
   /** Extended zone data.
    * The zone definition @c zone_t contains only a single set of 16 channels. For each zone
-   * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each. */
+   * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each.
+   * @todo Check whether @c ext_a and @c member_b are swapped! */
 	typedef struct {
     // Bytes 0-95
     uint16_t ext_a[48];             ///< Member A: Channels 17...64, 0=empty/EOL
@@ -600,9 +606,6 @@ public:
 	bool decode(Config *config);
   /** Encodes the given generic configuration as a binary codeplug. */
 	bool encode(Config *config);
-
-  /** Returns the size of the binary codeplug. */
-  size_t size() const;
 };
 
 #endif // RT3S_GPS_CODEPLUG_HH

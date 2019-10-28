@@ -1,5 +1,9 @@
 #include "rd5r.hh"
 #include "config.hh"
+#include <QDebug>
+
+#define BSIZE 128
+
 
 static Radio::Features _rd5r_features =
 {
@@ -51,6 +55,11 @@ RD5R::codeplug() const {
   return _codeplug;
 }
 
+CodePlug &
+RD5R::codeplug() {
+  return _codeplug;
+}
+
 bool
 RD5R::startDownload(Config *config) {
   _config = config;
@@ -77,27 +86,30 @@ RD5R::run()
 {
   if (StatusDownload == _task) {
     emit downloadStarted();
-
-    for (int bno=1; bno<966; bno++)
-    {
-      // Skip range 0x7c00...0x8000.
-      if (bno >= 248 && bno < 256)
-        continue;
-
-      if (! _dev->readBlock(bno, _codeplug.data(bno*128), 128)) {
-        _task = StatusError;
-        _dev->readFinish();
-        _dev->close();
-        _dev->deleteLater();
-        emit downloadError(this);
-        return;
-      }
-
-      emit downloadProgress(float(bno*100)/966);
+    qDebug() << __FILE__ << "," << __LINE__ << ":" << __func__ << " Start download.";
+    uint btot = 0;
+    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+      btot += _codeplug.image(0).element(n).data().size()/BSIZE;
     }
 
+    uint bcount = 0;
+    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+      int b0 = _codeplug.image(0).element(n).address()/BSIZE;
+      int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
+      for (int i=0; i<nb; i++, bcount++) {
+        if (! _dev->read_block(b0+i, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+          _task = StatusError;
+          _dev->read_finish();
+          _dev->close();
+          _dev->deleteLater();
+          emit downloadError(this);
+          return;
+        }
+        emit downloadProgress(float(bcount*100)/btot);
+      }
+    }
     _task = StatusIdle;
-    _dev->readFinish();
+    _dev->read_finish();
     _dev->close();
     _dev->deleteLater();
 
@@ -105,49 +117,49 @@ RD5R::run()
   } else if (StatusUpload == _task) {
     emit uploadStarted();
 
-    // First download codeplug from device:
-    for (int bno=1; bno<966; bno++)
-    {
-      if ((bno >= 248) && (bno < 256)) {
-        // Skip range 0x7c00...0x8000.
-        continue;
-      }
+    uint btot = 0;
+    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+      btot += _codeplug.image(0).element(n).data().size()/BSIZE;
+    }
 
-      if (! _dev->readBlock(bno, _codeplug.data(bno*128), 128)) {
-        _task = StatusError;
-        _dev->readFinish();
-        _dev->close();
-        _dev->deleteLater();
-        emit uploadError(this);
-        return;
+    uint bcount = 0;
+    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+      int b0 = _codeplug.image(0).element(n).address()/BSIZE;
+      int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
+      for (int i=0; i<nb; i++, bcount++) {
+        if (! _dev->read_block(b0+i, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+          _task = StatusError;
+          _dev->read_finish();
+          _dev->close();
+          _dev->deleteLater();
+          emit uploadError(this);
+          return;
+        }
+        emit uploadProgress(float(bcount*50)/btot);
       }
-
-      emit uploadProgress(float(bno*50)/966);
     }
 
     // Send encode config into codeplug
     _codeplug.encode(_config);
 
     // then, upload modified codeplug
-    for (int bno=1; bno<966; bno++)
-    {
-      if ((bno >= 248) && (bno < 256)) {
-        // Skip range 0x7c00...0x8000.
-        continue;
+    bcount = 0;
+    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+      int b0 = _codeplug.image(0).element(n).address()/BSIZE;
+      int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
+      for (int i=0; i<nb; i++, bcount++) {
+        if (! _dev->write_block(b0+i, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+          _task = StatusError;
+          _dev->write_finish();
+          _dev->close();
+          _dev->deleteLater();
+          emit uploadError(this);
+          return;
+        }
+        emit uploadProgress(50+float(bcount*50)/btot);
       }
-
-      if (! _dev->writeBlock(bno, _codeplug.data(bno*128), 128)) {
-        _task = StatusError;
-        _dev->readFinish();
-        _dev->close();
-        _dev->deleteLater();
-        emit uploadError(this);
-        return;
-      }
-
-      emit uploadProgress(50+float(bno*100)/966);
     }
-    _dev->writeFinish();
+    _dev->write_finish();
 
     _task = StatusIdle;
     _dev->close();

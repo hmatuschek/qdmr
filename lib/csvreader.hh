@@ -1,4 +1,5 @@
 /** @defgroup conffile Config-file format
+ * @ingroup conf
  *
  * The config file format is a text-file format to describe generic code-plugs (a.k.a.,
  * the @c Config class). This format is aimed at being human-readable and allows to write

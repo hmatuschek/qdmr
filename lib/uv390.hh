@@ -1,12 +1,14 @@
-/** @defgroup uv390 TYT MD-UV390, Retevis RT3S device specific classes.
+/** @defgroup uv390 TYT MD-UV390, Retevis RT3S
+ * Device specific classes for TYT MD-UV390 and Retevis RT3S.
  *
- * <img src="../fig/uv390.jpg" width="200px" align="left"/>
+ * <img src="uv390.jpg" width="200px" align="left"/>
  * The TYT MD-UV390 and the identical Retevis RT-3S are decent VHF/UHF FM and DMR handheld radios.
  * Both radios are available with and without an GPS option. @c libdmrconf will support that
  * feature. Non-GPS variants of that radio will simply ignore any GPS system settings.
  *
  * These radios support up to 3000 channels organized in 250 zones. Each zone may hold up to 64
- * channels for each VFO (64 for VFO A and 64 for VFO B). There are also up to 250 scanlists.
+ * channels for each VFO (64 for VFO A and 64 for VFO B). There are also up to 250 scanlists
+ * holding up to 31(?) channels each.
  *
  * The radio can hold up to 3000 contacts (DMR contacts) and 250 RX group lists as well as up to 50
  * pre-programmed messages. Depending on the firmware programmed on the radio, it may also hold a
@@ -27,7 +29,12 @@
 #include "uv390_codeplug.hh"
 
 
-/** Implements an interface to the TYT UV-390 & Retevis RT3S VHF/UHF 5W DMR (Tier I&II) radios.
+/** Implements an USB interface to the TYT MD-UV390 & Retevis RT3S VHF/UHF 5W DMR (Tier I&II) radios.
+ *
+ * The TYT MD-UV390 and Retevis RT3S radios use a DFU-style communication protocol to read and write
+ * codeplugs onto the radio (see @c DFUDevice). This class implements the communication details
+ * using DFU protocol.
+ *
  * @ingroup uv390 */
 class UV390: public Radio
 {
@@ -40,6 +47,7 @@ public:
   const QString &name() const;
   const Radio::Features &features() const;
   const CodePlug &codeplug() const;
+  CodePlug &codeplug();
 
 public slots:
   /** Starts the codeplug download. On success the codeplug gets decoded and the given generic

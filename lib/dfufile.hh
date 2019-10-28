@@ -76,6 +76,8 @@ class DFUFile: public QObject
 
 		uint32_t size() const;
 
+    bool isAligned(uint blocksize) const;
+
 		const QByteArray &data() const;
 		QByteArray &data();
 

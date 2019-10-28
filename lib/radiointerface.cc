@@ -1,18 +1,25 @@
 #include "radiointerface.hh"
 
-RadioInferface::RadioInferface(QObject *parent)
-    : QObject(parent)
+RadioInterface::RadioInterface()
 {
 	// pass...
 }
 
-RadioInferface::~RadioInferface() {
+RadioInterface::~RadioInterface() {
   // pass...
 }
 
 bool
-RadioInferface::reboot() {
+RadioInterface::read_finish() {
   return true;
 }
 
+bool
+RadioInterface::write_finish() {
+  return true;
+}
 
+bool
+RadioInterface::reboot() {
+  return true;
+}

@@ -11,7 +11,7 @@
  * firmware of their radios. This class implements this protocol.
  *
  * @ingroup rif */
-class DFUDevice: public RadioInferface
+class DFUDevice: public QObject, public RadioInterface
 {
 	Q_OBJECT
 
@@ -30,14 +30,17 @@ public:
 	virtual ~DFUDevice();
 
 	bool isOpen() const { return nullptr != _ident; }
-	QString identifier() const { return _ident; }
+	QString identifier() { return _ident; }
 	void close();
 
   /** Erases a memory section from @c start to @c finish. */
 	bool erase(unsigned start, unsigned finish);
+
 	bool read_block(int bno, uint8_t *data, int nbytes);
 	bool write_block(int bno, uint8_t *data, int nbytes);
 	bool reboot();
+
+  const QString &errorMessage() const;
 
 protected:
   /** Internal used function to detach the device. */
@@ -72,6 +75,7 @@ protected:
 	status_t _status;
   /** Read identifier. */
   const char *_ident;
+  QString _errorMessage;
 };
 
 #endif // DFU_LIBUSB_HH

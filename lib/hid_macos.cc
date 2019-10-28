@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <QDebug>
 
 
 HIDevice::HIDevice(int vid, int pid, QObject *parent)
@@ -35,7 +36,9 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
   // Open the HID mangager
   IOReturn IOReturn = IOHIDManagerOpen(_HIDManager, kIOHIDOptionsTypeNone);
   if (IOReturn != kIOReturnSuccess) {
-    fprintf(stderr, "Cannot find USB device %04x:%04x\n", vid, pid);
+    _errorMessage = QString("Cannot find USB device %1:%2").arg(vid).arg(pid);
+    IOHIDManagerUnscheduleFromRunLoop(_HIDManager, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
+    _HIDManager = nullptr;
     return;
   }
 
@@ -47,7 +50,10 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
       return;
 
     if (k >= 3) {
-      fprintf(stderr, "Cannot find USB device %04x:%04x\n", vid, pid);
+      _errorMessage = QString("Cannot find USB device %1:%2").arg(vid).arg(pid);
+      IOHIDManagerUnscheduleFromRunLoop(_HIDManager, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
+      IOHIDManagerClose(_HIDManager, kIOHIDOptionsTypeNone);
+      _HIDManager = nullptr;
       return;
     }
     usleep(10000);
@@ -58,8 +64,8 @@ HIDevice::~HIDevice() {
   if (_dev)
     close();
   if (_HIDManager) {
-    IOHIDManagerClose(_HIDManager, kIOHIDOptionsTypeNone);
     IOHIDManagerUnscheduleFromRunLoop(_HIDManager, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
+    IOHIDManagerClose(_HIDManager, kIOHIDOptionsTypeNone);
   }
 }
 bool
@@ -75,6 +81,7 @@ HIDevice::isOpen() const {
 bool
 HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned char *rdata, unsigned rlength)
 {
+  qDebug() << __FILE__ << "," << __LINE__ << ":" << __func__ << "...";
   unsigned char buf[42];
   unsigned k;
   IOReturn result;

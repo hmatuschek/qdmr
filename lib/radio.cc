@@ -196,10 +196,11 @@ Radio::detect() {
     // Try Radioddity/Baofeng RD-5R
     HID hid(0x15a2, 0x0073);
     if (hid.isOpen()) {
-      id = hid.identify();
+      id = hid.identifier();
       hid.close();
     } else {
-      qDebug() << "No radio found.";
+      qDebug() << hid.errorMessage();
+      qDebug() << "No matching radio found.";
       return nullptr;
     }
   }

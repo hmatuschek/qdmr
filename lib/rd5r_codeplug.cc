@@ -6,7 +6,6 @@
 #include <QDateTime>
 
 
-#define MEMSZ           0x20000
 #define OFFSET_TIMESTMP 0x00088
 #define OFFSET_SETTINGS 0x000e0
 #define OFFSET_MSGTAB   0x00128
@@ -534,22 +533,13 @@ RD5RCodeplug::RD5RCodeplug(QObject *parent)
   : CodePlug(parent)
 {
   addImage("Radioddity RD5R Codeplug");
-  image(0).addElement(0, MEMSZ);
-}
-
-size_t
-RD5RCodeplug::size() const {
-  return MEMSZ;
+  image(0).addElement(0x00080, 0x07b80);
+  image(0).addElement(0x08000, 0x16300);
 }
 
 bool
 RD5RCodeplug::decode(Config *config)
 {
-  // Init radio memory
-  memset(data(0), 0xff, 128);
-  memset(data(966*128), 0xff, MEMSZ - 966*128);
-  memset(data(248*128), 0xff, 8*128);
-
   /*
    * Unpack general config
    */
@@ -657,12 +647,6 @@ RD5RCodeplug::decode(Config *config)
 bool
 RD5RCodeplug::encode(Config *config)
 {
-  // Clear header and footer.
-  memset(data(0), 0xff, 128);
-  memset(data(966*128), 0xff, MEMSZ - 966*128);
-  memset(data(248*128), 0xff, 8*128);
-  memcpy(data(0), "BF-5R", 5);
-
   // Pack channels
   for (int i=0; i<NCHAN; i++) {
     // First, get bank

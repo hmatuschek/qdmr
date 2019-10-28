@@ -14,7 +14,7 @@
 #define NGPSSYSTEMS     16
 
 // ---- first segment ---- additional offset 0x000800
-#define OFFSET_TIMESTMP 0x002801
+#define OFFSET_TIMESTMP 0x002800
 #define OFFSET_SETTINGS 0x002840
 #define OFFSET_GPS_SYS  0x002880  /// @bug Wrong offset!
 #define OFFSET_MSG      0x002980
@@ -54,7 +54,7 @@
  * ******************************************************************************************** */
 bool
 UV390Codeplug::channel_t::isValid() const {
-  return (rx_frequency!=0x40000000) && (tx_frequency!=0x40000000);
+  return (name[0] != 0x0000) && (name[0] != 0xffff);
 }
 
 void
@@ -62,7 +62,7 @@ UV390Codeplug::channel_t::clear() {
   channel_mode = MODE_ANALOG;
   bandwidth = BW_12_5_KHZ;
   autoscan = 0;
-  _unused0_1 = _unused0_2 = 0;
+  _unused0_1 = _unused0_2 = 1;
   lone_worker = 0;
 
   allow_talkaround = 0;
@@ -115,7 +115,7 @@ UV390Codeplug::channel_t::clear() {
   ctcss_dcs_transmit = 0xffff;
 
   rx_signaling_syst = 0;
-  tx_signaling_syst = 1;
+  tx_signaling_syst = 0;
 
   power = POWER_HIGH;
   _unused30_2 = 0b111111;
@@ -186,7 +186,6 @@ Channel *
 UV390Codeplug::channel_t::toChannelObj() const {
   if (! isValid())
     return nullptr;
-  qDebug() << rx_frequency;
 
   if (MODE_ANALOG == channel_mode) {
     Channel::Power pwr =
@@ -268,6 +267,7 @@ UV390Codeplug::channel_t::linkChannelObj(Channel *c, Config *conf) const {
 
 void
 UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf) {
+  clear();
   setName(chan->name());
   setRXFrequency(chan->rxFrequency());
   setTXFrequency(chan->txFrequency());
@@ -296,7 +296,7 @@ UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf
  * ******************************************************************************************** */
 bool
 UV390Codeplug::contact_t::isValid() const {
-  return 0 != type;
+  return (0 != type) && (name[0] != 0x0000) && (name[0] != 0xffff);
 }
 
 void
@@ -421,7 +421,7 @@ UV390Codeplug::zone_t::fromZoneObj(const Zone *zone, const Config *conf) {
  * ******************************************************************************************** */
 bool
 UV390Codeplug::zone_ext_t::isValid() const {
-  return ((0 != ext_a[0]) && (0 != member_b[0]));
+  return ((0 != ext_a[0]) || (0 != member_b[0]));
 }
 
 void
@@ -783,7 +783,7 @@ UV390Codeplug::UV390Codeplug(QObject *parent)
   : CodePlug(parent)
 {
   addImage("TYT UV390 Codeplug");
-  image(0).addElement(0x000800, 0x40000);
+  image(0).addElement(0x002800, 0x3e000);
   image(0).addElement(0x110800, 0x90000);
 }
 
@@ -852,8 +852,10 @@ UV390Codeplug::decode(Config *config) {
 
   // General config
   general_settings_t *genset = (general_settings_t *)data(OFFSET_SETTINGS);
-  if (! genset->updateConfigObj(config))
+  if (! genset->updateConfigObj(config)) {
+    qDebug() << "Cannot decode codeplug: Invlaid general settings.";
     return false;
+  }
 
   // Define Contacts
   for (int i=0; i<NCONTACTS; i++) {
@@ -862,8 +864,10 @@ UV390Codeplug::decode(Config *config) {
       break;
     if (Contact *obj = cont->toContactObj())
       config->contacts()->addContact(obj);
-    else
+    else {
+      qDebug() << "Cannot decode codeplug: Invlaid contact.";
       return false;
+    }
   }
 
   // Define RX GroupLists
@@ -873,8 +877,10 @@ UV390Codeplug::decode(Config *config) {
       break;
     if (RXGroupList *obj = glist->toRXGroupListObj())
       config->rxGroupLists()->addList(obj);
-    else
+    else {
+      qDebug() << "Cannot decode codeplug: Invlaid RX group list.";
       return false;
+    }
   }
 
   // Define Channels
@@ -884,8 +890,10 @@ UV390Codeplug::decode(Config *config) {
       break;
     if (Channel *obj = chan->toChannelObj())
       config->channelList()->addChannel(obj);
-    else
+    else {
+      qDebug() << "Cannot decode codeplug: Invlaid channel.";
       return false;
+    }
   }
 
   // Define Zones
@@ -893,10 +901,12 @@ UV390Codeplug::decode(Config *config) {
     zone_t *zone = (zone_t *)(data(OFFSET_ZONES+i*sizeof(zone_t)));
     if (! zone->isValid())
       break;
-    if (Zone *obj = zone->toZoneObj())
+    if (Zone *obj = zone->toZoneObj()) {
       config->zones()->addZone(obj);
-    else
+    } else {
+      qDebug() << "Cannot decode codeplug: Invlaid zone.";
       return false;
+    }
   }
 
   // Define Scanlists
@@ -906,8 +916,10 @@ UV390Codeplug::decode(Config *config) {
       break;
     if (ScanList *obj = scan->toScanListObj())
       config->scanlists()->addScanList(obj);
-    else
+    else {
+      qDebug() << "Cannot decode codeplug: Invlaid scanlist.";
       return false;
+    }
   }
 
   // Link RX GroupLists
@@ -927,8 +939,12 @@ UV390Codeplug::decode(Config *config) {
   // Link Zones
   for (int i=0; i<config->zones()->count(); i++) {
     zone_t *zone = (zone_t *)(data(OFFSET_ZONES+i*sizeof(zone_t)));
-    if (! zone->linkZone(config->zones()->zone(i), config))
+    if (! zone->linkZone(config->zones()->zone(i), config)) {
       return false;
+    } else {
+      zone_ext_t *zoneext = (zone_ext_t *)(data(OFFSET_ZONEXT+i*sizeof(zone_t)));
+      zoneext->linkZone(config->zones()->zone(i), config);
+    }
   }
 
   // Link Scanlists
@@ -939,9 +955,4 @@ UV390Codeplug::decode(Config *config) {
   }
 
   return true;
-}
-
-size_t
-UV390Codeplug::size() const {
-  return 0xd0000;
 }
