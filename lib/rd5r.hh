@@ -53,10 +53,10 @@ public:
 
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
-	bool startDownload(Config *config);
+	bool startDownload(Config *config, bool blocking=false);
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
-	bool startUpload(Config *config);
+	bool startUpload(Config *config, bool blocking=false);
 
 protected:
   /** Main function running in a separate thread performing the up- and download to and from the

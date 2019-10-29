@@ -42,11 +42,10 @@ ZoneChannelList::channel(int idx) const {
 
 bool
 ZoneChannelList::addChannel(Channel *channel) {
-  if (_channels.contains(channel))
+  if (_channels.contains(channel) || (nullptr == channel))
     return false;
   int idx = _channels.size();
   beginInsertRows(QModelIndex(), idx, idx);
-  channel->setParent(this);
   connect(channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
   _channels.append(channel);
   endInsertRows();

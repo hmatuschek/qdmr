@@ -36,7 +36,7 @@ static Radio::Features _rd5r_features =
 
 
 RD5R::RD5R(QObject *parent)
-  : Radio(parent), _name("Baofeng/Radiodity RD-5R"), _dev(nullptr), _config(nullptr), _codeplug()
+  : Radio(parent), _name("Baofeng/Radioddity RD-5R"), _dev(nullptr), _config(nullptr), _codeplug()
 {
   connect(this, SIGNAL(downloadFinished()), this, SLOT(onDonwloadFinished()));
 }
@@ -62,13 +62,16 @@ RD5R::codeplug() {
 }
 
 bool
-RD5R::startDownload(Config *config) {
+RD5R::startDownload(Config *config, bool blocking) {
   _config = config;
   if (!_config)
     return false;
 
   _dev = new HID(0x15a2, 0x0073);
   if (! _dev->isOpen()) {
+    _errorMessage = QString("%1(): Cannot open Download codeplug: %2")
+        .arg(__func__).arg(_dev->errorMessage());
+    qDebug() << _errorMessage;
     _dev->deleteLater();
     return false;
   }
@@ -76,8 +79,12 @@ RD5R::startDownload(Config *config) {
   _task = StatusDownload;
   _config->reset();
 
+  if (blocking) {
+    qDebug() << "Start blocking download.";
+    run();
+    return (StatusIdle == _task);
+  }
   start();
-
   return true;
 }
 
@@ -87,7 +94,6 @@ RD5R::run()
 {
   if (StatusDownload == _task) {
     emit downloadStarted();
-    qDebug() << __FILE__ << "," << __LINE__ << ":" << __func__ << " Start download.";
     uint btot = 0;
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {
       btot += _codeplug.image(0).element(n).data().size()/BSIZE;
@@ -99,11 +105,13 @@ RD5R::run()
       int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
       for (int i=0; i<nb; i++, bcount++) {
         if (! _dev->read_block(b0+i, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+          _errorMessage = QString("%1: Cannot download codeplug: %2").arg(__func__)
+              .arg(_dev->errorMessage());
           _task = StatusError;
           _dev->read_finish();
           _dev->close();
           _dev->deleteLater();
-          emit downloadError(this);
+          emit downloadFinished();
           return;
         }
         emit downloadProgress(float(bcount*100)/btot);
@@ -129,6 +137,9 @@ RD5R::run()
       int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
       for (int i=0; i<nb; i++, bcount++) {
         if (! _dev->read_block(b0+i, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+          _errorMessage = QString("%1: Cannot upload codeplug: %2").arg(__func__)
+              .arg(_dev->errorMessage());
+          qDebug() << _errorMessage;
           _task = StatusError;
           _dev->read_finish();
           _dev->close();
@@ -150,6 +161,9 @@ RD5R::run()
       int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
       for (int i=0; i<nb; i++, bcount++) {
         if (! _dev->write_block(b0+i, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+          _errorMessage = QString("%1: Cannot upload codeplug: %2").arg(__func__)
+              .arg(_dev->errorMessage());
+          qDebug() << _errorMessage;
           _task = StatusError;
           _dev->write_finish();
           _dev->close();
@@ -172,15 +186,15 @@ RD5R::run()
 
 void
 RD5R::onDonwloadFinished() {
-  if (_codeplug.decode(_config))
+  /*if (_codeplug.decode(_config))
     emit downloadComplete(this, _config);
   else
     emit downloadError(this);
-  _config = nullptr;
+  _config = nullptr; */
 }
 
 bool
-RD5R::startUpload(Config *config) {
+RD5R::startUpload(Config *config, bool blocking) {
   _config = config;
   if (!_config)
     return false;
@@ -192,7 +206,10 @@ RD5R::startUpload(Config *config) {
   }
 
   _task = StatusUpload;
+  if (blocking) {
+    run();
+    return (StatusIdle == _task);
+  }
   start();
-
   return true;
 }

@@ -8,6 +8,7 @@ class Channel;
 class Zone;
 class ScanList;
 class DigitalContact;
+class DTMFContact;
 class RXGroupList;
 
 /** Represents, encodes and decodes the device specific codeplug for a Baofeng/Radioddity RD-5R.
@@ -42,10 +43,11 @@ class RXGroupList;
  *  <tr><td>0x0008e</td> <td>0x000e0</td> <td>0x0052</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x000e0</td> <td>0x000ec</td> <td>0x000c</td> <td>General settings, see @c RD5RCodeplug::general_settings_t.</td></tr>
  *  <tr><td>0x000ec</td> <td>0x00128</td> <td>0x003c</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x00128</td> <td>0x01370</td> <td>0x1248</td> <td>32 message texts, see @c RD5RCodeplug::msgtab_t</td></tr>
+ *  <tr><td>0x00128</td> <td>0x01370</td> <td>0x1248</td> <td>32 preset message texts, see @c RD5RCodeplug::msgtab_t</td></tr>
  *  <tr><td>0x01370</td> <td>0x01788</td> <td>0x0418</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x01788</td> <td>0x02f88</td> <td>0x1800</td> <td>256 contacts, see @c RD5RCodeplug::contact_t</td></tr>
- *  <tr><td>0x02f88</td> <td>0x03780</td> <td>0x07f8</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x02f88</td> <td>0x03738</td> <td>0x07f8</td> <td>??? DTMF Contacts ???</td></tr>
+ *  <tr><td>0x03738</td> <td>0x03780</td> <td></td> <td>??? DTMF Contacts ???</td></tr>
  *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c RD5RCodeplug::bank_t</td></tr>
  *  <tr><td>0x05390</td> <td>0x07540</td> <td>0x21b0</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x07540</td> <td>0x07560</td> <td>0x0020</td> <td>2 intro lines, @c RD5RCodeplug::intro_text_t</td></tr>
@@ -74,7 +76,7 @@ public:
   static const int NMESSAGES = 32;     ///< Defines the number of preset messages.
 
   /** Represents a configured channel within the codeplug. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     /** Possible channel types. */
 		typedef enum {
 			MODE_ANALOG = 0,   ///< Analog channel, aka FM.
@@ -113,8 +115,8 @@ public:
 		uint32_t tx_frequency;              ///< TX Frequency, 8 digits BCD.
 		// Byte 24
 		uint8_t channel_mode;               ///< Mode analog or digital.
-		// Bytes 25-26
-		uint16_t _unused25;               ///< Unknown set to 0.
+    // Bytes 25-26
+    uint16_t _unused25;                 ///< Unknown set to 0.
 		// Bytes 27-28
 		uint8_t tot;                        ///< TOT x 15sec, [0,33], 0-Infinite.
 		uint8_t tot_rekey_delay;            ///< TOT Rekey Delay in seconds [0,255].
@@ -203,7 +205,7 @@ public:
 	} channel_t;
 
 	/** Bank of 128 channels including a bitmap for enabled channels. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     /** Bitmap for 128 channels, a bit is set when the coresspondig channel is valid/enabled. */
 		uint8_t bitmap[16];
     /** The actual 128 channels. */
@@ -211,7 +213,7 @@ public:
 	} bank_t;
 
 	/** Specific codeplug representation of a DMR contact. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     /** Possible call types. */
 		typedef enum {
 			CALL_GROUP   = 0,                 ///< A group call.
@@ -228,7 +230,7 @@ public:
     // Bytes 21-23
     uint8_t receive_tone;               ///< Call Receive Tone, 0=Off, 1=On.
     uint8_t ring_style;                 ///< Ring style: [0,10]
-		uint8_t is_valid;                   ///< 0xff for used contact, 0x00 for blank entry.
+		uint8_t _unused23;                  ///< Set to 0x00.
 
     /** Resets an invalidates the contact entry. */
     void clear();
@@ -249,8 +251,34 @@ public:
     void fromContactObj(const DigitalContact *obj, const Config *conf);
 	} contact_t;
 
-	/** Represents a single zone within the codeplug. */
-	typedef struct {
+  /** Specific codeplug representation of a DTMF (analog) contact. */
+	typedef struct __attribute__((packed)) {
+    // Bytes 0-15
+    uint8_t name[16];                   ///< Contact name in ASCII, 0xff terminated.
+    // Bytes 16-24
+    uint8_t number[16];                 ///< DTMF number {0-9,a-d,*,#}, 0xff terminated.
+
+    /** Resets an invalidates the contact entry. */
+    void clear();
+    /** Returns @c true, if the contact is valid. */
+    bool isValid() const;
+    /** Returns the DTMF number of the contact. */
+    QString getNumber() const;
+    /** Sets the DTMF number of the contact. */
+    bool setNumber(const QString &number);
+    /** Returns the name of the contact. */
+    QString getName() const;
+    /** Sets the name of the contact. */
+    void setName(const QString &name);
+
+    /** Constructs a @c DTMFContact instance from this codeplug contact. */
+    DTMFContact *toContactObj() const;
+    /** Resets this codeplug contact from the given @c DTMFContact. */
+    void fromContactObj(const DTMFContact *obj, const Config *conf);
+	} dtmf_contact_t;
+
+  /** Represents a single zone within the codeplug. */
+	typedef struct __attribute__((packed)) {
 		// Bytes 0-15
 		uint8_t name[16];                   ///< Zone name ASCII, 0xff terminated.
 		// Bytes 16-47
@@ -277,7 +305,7 @@ public:
 	} zone_t;
 
 	/** Table of zones. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     /** A bit representing the validity of every zone. If a bit is set, the corresponding zone in
      * @c zone ist valid. */
     uint8_t bitmap[32];
@@ -286,7 +314,7 @@ public:
 	} zonetab_t;
 
 	/** Represents a single RX group list within the codeplug. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     // Bytes 0-15
     uint8_t name[16];                   ///< RX group list name, ASCII, 0xff terminated.
     // Bytes 16-47
@@ -300,13 +328,13 @@ public:
     /** Constructs a @c RXGroupList object from the codeplug representation. */
     RXGroupList *toRXGroupListObj();
     /** Links a previously constructed @c RXGroupList to the rest of the generic configuration. */
-    bool linkRXGroupListObj(RXGroupList *lst, const Config *conf) const;
+    bool linkRXGroupListObj(int ncnt, RXGroupList *lst, const Config *conf) const;
     /** Reset this codeplug representation from a @c RXGroupList object. */
     void fromRXGroupListObj(const RXGroupList *lst, const Config *conf);
 	} grouplist_t;
 
 	/** Table of rx group lists. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     /** Specifies the number of contacts +1 in each group list, 0=disabled. */
     uint8_t     nitems1[128];
     /** The list of RX group lists. */
@@ -314,7 +342,7 @@ public:
 	} grouptab_t;
 
 	/** Represents a sinle scan list within the codeplug. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     /** Possible priority channel types. */
 		typedef enum {
 			PL_NONPRI = 0,              ///< Only non-priority channels.
@@ -326,12 +354,12 @@ public:
     // Bytes 0-14
     uint8_t name[15];             ///< Scan list name, ASCII, 0xff terminated.
     // Byte 15
-    uint8_t _unused       : 4,    ///< Unknown set to 0.
+    uint8_t _unused       : 4,    ///< Unknown set to 1.
       channel_mark        : 1,    ///< Channel mark, default 1.
       pl_type             : 2,    ///< PL type, default 3.
       talkback            : 1;    ///< Talkback, default 1.
     // Bytes 16-79
-    uint16_t member[32];          ///< Channel indices +2, 0=not used, 1=selected
+    uint16_t member[32];          ///< Channel indices, 0=not used/EOL or channel index+1.
 
     // Bytes 80-85
     uint16_t priority_ch1;        ///< Priority channel 1 index, index+2 or 0=None, 1=selected.
@@ -358,7 +386,7 @@ public:
   } scanlist_t;
 
 	/** Table/Bank of scanlists. */
-  typedef struct {
+  typedef struct __attribute__((packed)) {
     /** Byte-field to indicate which scanlist is valid. Set to 0x01 when valid, 0x00 otherwise. */
     uint8_t    valid[256];
     /** The scanlists. */
@@ -366,7 +394,7 @@ public:
 	} scantab_t;
 
 	/** Represents the general settings within the codeplug. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     // Bytes e0-e7
     uint8_t radio_name[8];        ///< The radio name in ASCII, 0xff terminated.
     // Bytes e8-eb
@@ -384,7 +412,7 @@ public:
 	} general_settings_t;
 
 	/** Represents the intro messages within the codeplug. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     // Bytes 7540-754f
     uint8_t intro_line1[16];       ///< The first intro line, ASCII, 0xff terminated.
     // Bytes 7550-755f
@@ -401,7 +429,7 @@ public:
 	} intro_text_t;
 
 	/** Represents the table of text messages within the codeplug. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     uint8_t count;                      ///< Number of messages.
     uint8_t _unused1[7];                ///< Unknown, set to 0.
     uint8_t len[NMESSAGES];             ///< Message lengths.
@@ -417,7 +445,7 @@ public:
   } msgtab_t;
 
   /** Represents the codeplug time-stamp within the codeplug. */
-  typedef struct {
+  typedef struct __attribute__((packed)) {
     uint16_t year_bcd;                  ///< The year in 4 x BCD
     uint8_t month_bcd;                  ///< The month in 2 x BCD
     uint8_t day_bcd;                    ///< The day in 2 x BCD.

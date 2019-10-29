@@ -10,6 +10,7 @@
 #define OFFSET_SETTINGS     0x000e0
 #define OFFSET_MSGTAB       0x00128
 #define OFFSET_CONTACTS     0x01788
+#define OFFSET_DTMF         0x02f80
 #define OFFSET_BANK_0       0x03780 // Channels 1-128
 #define OFFSET_INTRO        0x07540
 #define OFFSET_ZONETAB      0x08010
@@ -119,7 +120,7 @@ RD5RCodeplug::channel_t::toChannelObj() const {
       case ADMIT_ALWAYS: admit = AnalogChannel::AdmitNone; break;
       case ADMIT_CH_FREE: admit = AnalogChannel::AdmitFree; break;
       default:
-        return nullptr;
+        admit = AnalogChannel::AdmitFree;
     }
     AnalogChannel::Bandwidth bw = (BW_25_KHZ == bandwidth) ? AnalogChannel::BWWide : AnalogChannel::BWNarrow;
     return new AnalogChannel(
@@ -130,9 +131,9 @@ RD5RCodeplug::channel_t::toChannelObj() const {
     switch (admit_criteria) {
       case ADMIT_ALWAYS: admit = DigitalChannel::AdmitNone; break;
       case ADMIT_CH_FREE: admit = DigitalChannel::AdmitFree; break;
-      case ADMIT_COLOR: admit = DigitalChannel::AdmitColorCode; break;
+      case ADMIT_COLOR:
       default:
-        return nullptr;
+        admit = DigitalChannel::AdmitColorCode; break;
     }
     DigitalChannel::TimeSlot slot = repeater_slot2 ?
           DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1;
@@ -148,15 +149,15 @@ bool
 RD5RCodeplug::channel_t::linkChannelObj(Channel *c, Config *conf) const {
   if (c->is<AnalogChannel>()) {
     AnalogChannel *ac = c->as<AnalogChannel>();
-    if (scan_list_index && (conf->scanlists()->count() >= scan_list_index))
+    if (scan_list_index && ((scan_list_index-1) < conf->scanlists()->count()))
       ac->setScanList(conf->scanlists()->scanlist(scan_list_index-1));
   } else {
     DigitalChannel *dc = c->as<DigitalChannel>();
-    if (scan_list_index && (conf->scanlists()->count() >= scan_list_index))
+    if (scan_list_index && ((scan_list_index-1) < conf->scanlists()->count()))
       dc->setScanList(conf->scanlists()->scanlist(scan_list_index-1));
-    if (group_list_index && (conf->rxGroupLists()->count() >= group_list_index))
+    if (group_list_index && ((group_list_index-1) < conf->rxGroupLists()->count()))
       dc->setRXGroupList(conf->rxGroupLists()->list(group_list_index-1));
-    if (contact_name_index && (conf->contacts()->digitalCount() >= contact_name_index))
+    if (contact_name_index && ((contact_name_index-1) < conf->contacts()->digitalCount()))
       dc->setTXContact(conf->contacts()->digitalContact(contact_name_index-1));
   }
   return true;
@@ -206,20 +207,23 @@ RD5RCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
  * ******************************************************************************************** */
 void
 RD5RCodeplug::contact_t::clear() {
-  is_valid = 0x00;
+  memset(name, 0xff, 16);
+  memset(id, 0x00, 4);
+  type = receive_tone = ring_style = _unused23 = 0;
 }
+
 bool
 RD5RCodeplug::contact_t::isValid() const {
-  return 0xff == is_valid;
+  return 0xff != name[0];
 }
 
 uint32_t
 RD5RCodeplug::contact_t::getId() const {
-  return decode_dmr_id(id);
+  return decode_dmr_id_bcd(id);
 }
 void
 RD5RCodeplug::contact_t::setId(uint32_t num) {
-  encode_dmr_id(id, num);
+  encode_dmr_id_bcd(id, num);
 }
 
 QString
@@ -243,7 +247,7 @@ RD5RCodeplug::contact_t::toContactObj() const {
     case CALL_GROUP: ctype = DigitalContact::GroupCall; break;
     case CALL_ALL: ctype = DigitalContact::AllCall; break;
   }
-  bool rxTone = receive_tone;
+  bool rxTone = (receive_tone && ring_style);
   return new DigitalContact(ctype, name, id, rxTone);
 }
 
@@ -258,8 +262,56 @@ RD5RCodeplug::contact_t::fromContactObj(const DigitalContact *cont, const Config
     case DigitalContact::GroupCall: type = CALL_GROUP;
     case DigitalContact::AllCall: type = CALL_ALL;
   }
-  receive_tone = (cont->rxTone()) ? 1 : 0;
-  is_valid = 0xff;
+  if (cont->rxTone())
+    receive_tone = ring_style = 1;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of RD5RCodeplug::dtmf_contact_t
+ * ******************************************************************************************** */
+void
+RD5RCodeplug::dtmf_contact_t::clear() {
+  memset(name, 0xff, 16);
+  memset(number, 0xff, 16);
+}
+
+bool
+RD5RCodeplug::dtmf_contact_t::isValid() const {
+  return 0xff != name[0];
+}
+
+QString
+RD5RCodeplug::dtmf_contact_t::getNumber() const {
+  return decode_dtmf_bin(number, 16, 0xff);
+}
+bool
+RD5RCodeplug::dtmf_contact_t::setNumber(const QString &num) {
+  return encode_dtmf_bin(num, number, 16, 0xff);
+}
+
+QString
+RD5RCodeplug::dtmf_contact_t::getName() const {
+  return decode_ascii(name, 16, 0xff);
+}
+void
+RD5RCodeplug::dtmf_contact_t::setName(const QString &n) {
+  encode_ascii(name, n, 16, 0xff);
+}
+
+DTMFContact *
+RD5RCodeplug::dtmf_contact_t::toContactObj() const {
+  if (! isValid())
+    return nullptr;
+  return new DTMFContact(getName(), getNumber());
+}
+
+void
+RD5RCodeplug::dtmf_contact_t::fromContactObj(const DTMFContact *cont, const Config *conf) {
+  Q_UNUSED(conf);
+  clear();
+  setName(cont->name());
+  setNumber(cont->number());
 }
 
 
@@ -272,7 +324,7 @@ RD5RCodeplug::zone_t::isValid() const {
 }
 void
 RD5RCodeplug::zone_t::clear() {
-  // pass...
+  memset(name, 0xff, 16);
 }
 
 QString
@@ -295,8 +347,12 @@ bool
 RD5RCodeplug::zone_t::linkZoneObj(Zone *zone, const Config *conf) const {
   if (! isValid())
     return false;
-  for (int i=0; (i<16) && member[i]; i++)
-    zone->A()->addChannel(conf->channelList()->channel(member[i]-1));
+  for (int i=0; (i<16) && member[i]; i++) {
+    if ((member[i]-1)<conf->channelList()->count())
+      zone->A()->addChannel(conf->channelList()->channel(member[i]-1));
+    else
+      return false;
+  }
   return true;
 }
 
@@ -351,20 +407,25 @@ RD5RCodeplug::grouplist_t::toRXGroupListObj() {
 }
 
 bool
-RD5RCodeplug::grouplist_t::linkRXGroupListObj(RXGroupList *lst, const Config *conf) const {
-  for (int i=0; (i<16) && member[i]; i++)
-    lst->addContact(conf->contacts()->digitalContact(member[i]-1));
-  return false;
+RD5RCodeplug::grouplist_t::linkRXGroupListObj(int ncnt, RXGroupList *lst, const Config *conf) const {
+  for (int i=0; (i<16) && (i<ncnt); i++) {
+    if ((member[i]-1) < conf->contacts()->digitalCount())
+      lst->addContact(conf->contacts()->digitalContact(member[i]-1));
+    else
+      return false;
+  }
+  return true;
 }
 
 void
 RD5RCodeplug::grouplist_t::fromRXGroupListObj(const RXGroupList *lst, const Config *conf) {
   setName(lst->name());
   for (int i=0; i<16; i++) {
-    if (i < lst->count())
+    if (lst->count() > i) {
       member[i] = conf->contacts()->indexOfDigital(lst->contact(i))+1;
-    else
+    } else {
       member[i] = 0;
+    }
   }
 }
 
@@ -374,7 +435,8 @@ RD5RCodeplug::grouplist_t::fromRXGroupListObj(const RXGroupList *lst, const Conf
  * ******************************************************************************************** */
 void
 RD5RCodeplug::scanlist_t::clear() {
-  memset(name, 0, 15);
+  memset(name, 0xff, 15);
+  _unused = 1;
   channel_mark = 1;
   pl_type = PL_PRI_NONPRI;
   talkback = 1;
@@ -400,13 +462,15 @@ RD5RCodeplug::scanlist_t::toScanListObj() const {
 
 bool
 RD5RCodeplug::scanlist_t::linkScanListObj(ScanList *lst, const Config *conf) const {
-  if (1<priority_ch1)
+  if ((1<priority_ch1) && ((priority_ch1-2)<conf->channelList()->count()))
     lst->setPriorityChannel(conf->channelList()->channel(priority_ch1-2));
-  if (1<priority_ch2)
+  if ((1<priority_ch2) && ((priority_ch2-2)<conf->channelList()->count()))
     lst->setSecPriorityChannel(conf->channelList()->channel(priority_ch2-2));
-  for (int i=0; (i<32) && (member[i]>1); i++)
-      lst->addChannel(conf->channelList()->channel(member[i]-2));
-  return false;
+  for (int i=0; (i<32) && (member[i]>0); i++) {
+    if ((member[i]-1) < conf->channelList()->count())
+      lst->addChannel(conf->channelList()->channel(member[i]-1));
+  }
+  return true;
 }
 
 void
@@ -417,6 +481,12 @@ RD5RCodeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *con
   if (lst->secPriorityChannel())
     priority_ch2 = conf->channelList()->indexOf(lst->secPriorityChannel())+2;
   tx_designated_ch = 0;
+  for (int i=0; i<32; i++) {
+    if (i >= lst->count())
+      member[i] = 0;
+    else
+      member[i] = conf->channelList()->indexOf(lst->channel(i))+2;
+  }
 }
 
 
@@ -434,11 +504,11 @@ RD5RCodeplug::general_settings_t::setName(const QString &n) {
 
 uint32_t
 RD5RCodeplug::general_settings_t::getRadioId() const {
-  return decode_dmr_id(radio_id);
+  return decode_dmr_id_bcd(radio_id);
 }
 void
 RD5RCodeplug::general_settings_t::setRadioId(uint32_t num) {
-  encode_dmr_id(radio_id, num);
+  encode_dmr_id_bcd(radio_id, num);
 }
 
 
@@ -539,25 +609,41 @@ RD5RCodeplug::RD5RCodeplug(QObject *parent)
 bool
 RD5RCodeplug::decode(Config *config)
 {
-  /*
-   * Unpack general config
-   */
+  // Clear config
+  config->reset();
+
+  /* Unpack general config */
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
+  if (nullptr == gs) {
+    _errorMessage = QString("%1(): Cannot access general settings memory!")
+        .arg(__func__);
+    return false;
+  }
+
   config->setId(gs->getRadioId());
   config->setName(gs->getName());
   intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
   config->setIntroLine1(it->getIntroLine1());
   config->setIntroLine2(it->getIntroLine2());
 
-  /*
-   * Unpack Contacts
-   */
+  /* Unpack Contacts */
   for (int i=0; i<NCONTACTS; i++) {
     contact_t *ct = (contact_t *) data(OFFSET_CONTACTS+i*sizeof(contact_t));
+    if (nullptr == ct) {
+      _errorMessage = QString("%1(): Cannot access contact memory at index %2!")
+          .arg(__func__).arg(i);
+      return false;
+    }
     // If contact is disabled
     if (! ct->isValid())
       continue;
-    config->contacts()->addContact(ct->toContactObj());
+    if (DigitalContact *cont = ct->toContactObj()) {
+      config->contacts()->addContact(ct->toContactObj());
+    } else {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Invalid contact at index %2.")
+          .arg(__func__).arg(i);
+      return false;
+    }
   }
 
   /*
@@ -565,17 +651,35 @@ RD5RCodeplug::decode(Config *config)
    */
   for (int i=0; i<NGLISTS; i++) {
     grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB);
+    if (nullptr == gt) {
+      _errorMessage = QString("%1(): Cannot access group list table memory!")
+          .arg(__func__);
+      return false;
+    }
     if (0 == gt->nitems1[i])
       continue;
     grouplist_t *gl = &gt->grouplist[i];
+    if (nullptr == gl) {
+      _errorMessage = QString("%1(): Cannot access group list memory at index %2!")
+          .arg(__func__).arg(i);
+      return false;
+    }
     RXGroupList *list = gl->toRXGroupListObj();
-    config->rxGroupLists()->addList(list);
-    gl->linkRXGroupListObj(list, config);
+    if (list) {
+      config->rxGroupLists()->addList(list);
+    } else {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Invalid RX group-list at index %2.")
+          .arg(__func__).arg(i);
+      return false;
+    }
+    if(! gl->linkRXGroupListObj(gt->nitems1[i]-1, list, config)) {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link RX group list at index %2.")
+          .arg(__func__).arg(i);
+      return false;
+    }
   }
 
-  /*
-   * Unpack Channels
-   */
+  /* Unpack Channels */
   for (int i=0; i<NCHAN; i++) {
     // First, get bank
     bank_t *b;
@@ -583,42 +687,91 @@ RD5RCodeplug::decode(Config *config)
       b = (bank_t*) data(OFFSET_BANK_0);
     else
       b = ((i-1) + (bank_t*) data(OFFSET_BANK_1));
-    // If channel is disabled
+    if (nullptr == b) {
+      _errorMessage = QString("%1(): Cannot access channel bank at index %2!")
+          .arg(__func__).arg(i);
+      return false;
+    }
+    // If channel is disabled -> skip
     if (! ((b->bitmap[i % 128 / 8] >> (i & 7)) & 1) )
       continue;
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
-    config->channelList()->addChannel(ch->toChannelObj());
+    if (! ch){
+      _errorMessage = QString("%1(): Cannot access channel at index %2!")
+          .arg(__func__).arg(i);
+      return false;
+    }
+    if (Channel *chan = ch->toChannelObj()) {
+      config->channelList()->addChannel(chan);
+    } else {
+      _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid channel at index %2!")
+          .arg(__func__).arg(i);
+      return false;
+    }
   }
 
-  //
-  // Unpack Zones
-  //
+  /* Unpack Zones */
   for (int i=0; i<NZONES; i++) {
     zonetab_t *zt = (zonetab_t*) data(OFFSET_ZONETAB);
+    if (! zt){
+      _errorMessage = QString("%1(): Cannot access zone table memory.")
+          .arg(__func__);
+      return false;
+    }
     // if zone is disabled
     if (! (zt->bitmap[i / 8] >> (i & 7) & 1) )
       continue;
     // get zone_t
     zone_t *z = &zt->zone[i];
+    if (! z){
+      _errorMessage = QString("%1(): Cannot access zone at index %2")
+          .arg(__func__).arg(i);
+      return false;
+    }
 
     // Create & link zone obj
     Zone *zone = z->toZoneObj();
-    z->linkZoneObj(zone, config);
+    if (nullptr == zone) {
+      _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid zone at index %2")
+          .arg(__func__).arg(i);
+      return false;
+    }
+    if (! z->linkZoneObj(zone, config)) {
+      _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
+          .arg(__func__).arg(i);
+      return false;
+    }
     config->zones()->addZone(zone);
   }
 
-  //
-  // Unpack Scan lists
-  //
+  /* Unpack Scan lists */
   for (int i=0; i<NSCANL; i++) {
     scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB);
+    if (! st){
+      _errorMessage = QString("%1(): Cannot access scanlist table memory!")
+          .arg(__func__);
+      return false;
+    }
     if (! st->valid[i])
       continue;
     scanlist_t *sl = &st->scanlist[i];
-
+    if (! sl){
+      _errorMessage = QString("%1(): Cannot access scan list at index %2")
+          .arg(__func__).arg(i);
+      return false;
+    }
     ScanList *scan = sl->toScanListObj();
-    sl->linkScanListObj(scan, config);
+    if (nullptr == scan) {
+      _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid scanlist at index %2")
+          .arg(__func__).arg(i);
+      return false;
+    }
+    if (! sl->linkScanListObj(scan, config)) {
+      _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link scanlist at index %2")
+          .arg(__func__).arg(i);
+      return false;
+    }
     config->scanlists()->addScanList(scan);
   }
 
@@ -637,7 +790,11 @@ RD5RCodeplug::decode(Config *config)
       continue;
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
-    ch->linkChannelObj(config->channelList()->channel(i), config);
+    if (! ch->linkChannelObj(config->channelList()->channel(i), config)) {
+      _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link channel at index %2")
+          .arg(__func__).arg(i);
+      return false;
+    }
   }
 
   return true;

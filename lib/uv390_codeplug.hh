@@ -34,9 +34,8 @@ class ScanList;
  *  <tr><td>0x02f780</td> <td>0x02f800</td> <td>0x00080</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x02f800</td> <td>0x030b88</td> <td>0x01388</td> <td>??? Unknown. ???</td></tr>
  *  <tr><td>0x030b88</td> <td>0x031800</td> <td>0x00c78</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x031800</td> <td>0x031860</td> <td>0x00060</td> <td>Unknown, filled with @c 0x00! </td></tr>
- *  <tr><td>0x031860</td> <td>0x03f320</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c UV390Codeplug::zone_ext_t.</td></tr>
- *  <tr><td>0x03f320</td> <td>0x040800</td> <td>0x014e0</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x031800</td> <td>0x03f2c0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c UV390Codeplug::zone_ext_t.</td></tr>
+ *  <tr><td>0x03f2c0</td> <td>0x040800</td> <td>0x01540</td> <td>??? Unknown ???</td></tr>
  *  <tr><th colspan="4">Second segment 0x110800-0x1a0800</th></tr>
  *  <tr><td>0x110800</td> <td>0x13f600</td> <td>0x2ee00</td> <td>3000 Channels @ 0x40 bytes each, see @c UV390Codeplug::channel_t.</td></tr>
  *  <tr><td>0x13f600</td> <td>0x140800</td> <td>0x01200</td> <td>Reserved, filled with @c 0xff. </td></tr>
@@ -51,7 +50,7 @@ class UV390Codeplug : public CodePlug
 
 protected:
   /** Represents a single channel (analog or digital) within the codeplug. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     /** Possible channel modes. */
 		typedef enum {
 			MODE_ANALOG  = 1,             ///< Analog channel.
@@ -65,32 +64,12 @@ protected:
       BW_25_KHZ   = 2               ///< 25kHz wide.
 		} Bandwidth;
 
-		// Byte 0
-    uint8_t channel_mode     : 2,   ///< Channel Mode: 1=Analog or 2=Digital, default=Analog
-      bandwidth              : 2,   ///< Bandwidth: 0=12.5kHz, 1=20kHz or 2=25kHz, default = 0
-      autoscan               : 1,   ///< Autoscan: 0=disable, 1=enable, default=0
-      _unused0_1             : 1,   ///< Reserved = 1
-      _unused0_2             : 1,   ///< Reserved = 1
-      lone_worker            : 1;   ///< Lone Worker: 0=disable, 1=enable, default=0
-
-    // Byte1
-		uint8_t allow_talkaround : 1,   ///< Allow Talkaround: 0=off, 1=on, default=0
-      rx_only                : 1,   ///< RX Only: 0=off, 1=on, default=0
-      time_slot              : 2,   ///< Repeater slot: 2=TS2, 1=TS1, default=1
-      color_code             : 4;   ///< ColorCode [0..15], default=1
-
     /** Possible privacy types. */
 		typedef enum {
 			PRIV_NONE = 0,                ///< No privacy.
 			PRIV_BASIC = 1,               ///< Basic privacy.
 			PRIV_ENHANCED = 2             ///< Enhenced privacy.
 		} PrivacyType;
-
-		// Byte 2
-    uint8_t privacy_no       : 4,   ///< Privacy No. (+1): 1...16 ???, default=0
-      privacy                : 2,   ///< Privacy: None, Basic or Enhanced ???, default=0
-      private_call_conf      : 1,   ///< Private Call Confirmed ???, default=0
-      data_call_conf         : 1;   ///< Data Call Confirmed ???, default=0
 
     /** @todo I have absolutely no idea what that means. */
 		typedef enum {
@@ -99,13 +78,6 @@ protected:
 			REF_HIGH = 2
 		} RefFrequency;
 
-		// Byte 3
-		uint8_t rx_ref_frequency : 2,   ///< RX Ref Frequency: 0=Low, 1=Medium, 2=High, default=0
-      _unused3_2             : 1,   ///< Unknown = 0 ???, default = 0
-      emergency_alarm_ack    : 1,   ///< Emergency Alarm Ack, default = 0
-      _unused3_4             : 3,   ///< Unknown 0b100 ???
-      display_pttid_dis      : 1;   ///< Display PTT ID (inverted), default = 1
-
     /** TX Admit criterion. */
 		typedef enum {
 			ADMIT_ALWAYS = 0,             ///< Always allow TX.
@@ -113,13 +85,6 @@ protected:
 			ADMIT_TONE = 2,               ///< Allow TX if CTCSS tone matches.
 			ADMIT_COLOR = 3,              ///< Allow TX if color-code matches.
 		} Admit;
-
-		// Byte 4
-		uint8_t tx_ref_frequency : 2,   ///< TX Ref Frequency: 0=Low, 1=Medium, 2=High, default=0
-      _unused4_2             : 2,   ///< Unknow = 0b01
-      vox                    : 1,   ///< VOX Enable, 0=Disable, 1=Enable, default = 0
-      _unused4_5             : 1,   ///< Reserved = 1
-      admit_criteria         : 2;   ///< Admit Criteria: 0=Always, 1=Channel Free or 2=Correct CTS/DCS, default=0
 
     /** Again, I have no idea. */
 		typedef enum {
@@ -137,28 +102,75 @@ protected:
 			TURNOFF_55_2HZ = 1            ///< Turn-off on 55.2Hz tone.
 		} TurnOffFreq;
 
+    /** Dual-capacity direct mode. */
+		typedef enum {
+			DCDM_LEADER = 0,
+			DCDM_MS = 1
+		} DCDM;
+
+    /** Possible power settings. */
+		typedef enum {
+			POWER_HIGH = 3,               ///< High = 5W.
+			POWER_LOW = 0,                ///< Low = 1W
+			POWER_MIDDLE = 2              ///< Middle = ?W.
+		} Power;
+
+		// Byte 0
+    uint8_t channel_mode     : 2,   ///< Channel Mode: 1=Analog or 2=Digital, default=Analog
+      bandwidth              : 2,   ///< Bandwidth: 0=12.5kHz, 1=20kHz or 2=25kHz, default = 0
+      autoscan               : 1,   ///< Autoscan: 0=disable, 1=enable, default=0
+      _unused0_1             : 1,   ///< Reserved = 1
+      _unused0_2             : 1,   ///< Reserved = 1
+      lone_worker            : 1;   ///< Lone Worker: 0=disable, 1=enable, default=0
+
+    // Byte1
+		uint8_t allow_talkaround : 1,   ///< Allow Talkaround: 0=off, 1=on, default=0
+      rx_only                : 1,   ///< RX Only: 0=off, 1=on, default=0
+      time_slot              : 2,   ///< Repeater slot: 2=TS2, 1=TS1, default=1
+      color_code             : 4;   ///< ColorCode [0..15], default=1
+
+		// Byte 2
+    uint8_t privacy_no       : 4,   ///< Privacy No. (+1): 1...16 ???, default=0
+      privacy                : 2,   ///< Privacy: None, Basic or Enhanced ???, default=0
+      private_call_conf      : 1,   ///< Private Call Confirmed ???, default=0
+      data_call_conf         : 1;   ///< Data Call Confirmed ???, default=0
+
+		// Byte 3
+		uint8_t rx_ref_frequency : 2,   ///< RX Ref Frequency: 0=Low, 1=Medium, 2=High, default=0
+      _unused3_2             : 1,   ///< Unknown = 0 ???, default = 0
+      emergency_alarm_ack    : 1,   ///< Emergency Alarm Ack, default = 0
+      _unused3_4             : 3,   ///< Unknown 0b100 ???
+      display_pttid_dis      : 1;   ///< Display PTT ID (inverted), default = 1
+
+		// Byte 4
+		uint8_t tx_ref_frequency : 2,   ///< TX Ref Frequency: 0=Low, 1=Medium, 2=High, default=0
+      _unused4_2             : 2,   ///< Unknow = 0b01
+      vox                    : 1,   ///< VOX Enable, 0=Disable, 1=Enable, default = 0
+      _unused4_5             : 1,   ///< Reserved = 1
+      admit_criteria         : 2;   ///< Admit Criteria: 0=Always, 1=Channel Free or 2=Correct CTS/DCS, 3=Colorcode, default=0
+
 		// Byte 5
-    uint8_t _unused5_0    : 4,      ///< Reserved = 0 ???
+    uint8_t _unused5_0    : 4,      ///< Reserved = 0b0000 ???
       in_call_criteria    : 2,      ///< In Call Criteria: 0=Always, 1=Follow Admit Criteria, 2=TX Interrupt, default=0
-      turn_off_freq       : 2;      ///< Non-QT/DQT Turn-off Freq.: 3=None, 0=259.2Hz, 1=55.2Hz, default=3
+      turn_off_freq       : 2;      ///< Non-QT/DQT Turn-off Freq.: 3=none, 0=259.2Hz, 1=55.2Hz, default=3
 
 	    // Bytes 6-7
-		uint16_t contact_name_index;    ///< Contact Name: Index + 1, default=0
+		uint16_t contact_name_index;    ///< Contact Name index. 0=none or contact index+1, default=0.
 
 	    // Bytes 8-9
-		uint8_t tot           : 6,      ///< TOT x 15sec: 0-Infinite, 1=15s, ..., 37=555s, default=4
-      _unused8_6          : 2;      ///< Unknown = 0 ???
-    uint8_t tot_rekey_delay;        ///< TOT Rekey Delay: 0s...255s, default=0
+		uint8_t tot           : 6,      ///< TOT x 15sec, 0-Infinite, 1=15s, etc, 37=555s, default=4
+      _unused8_6          : 2;      ///< Unknown = 0b00 ???
+    uint8_t tot_rekey_delay;        ///< TOT Rekey Delay in seconds, default=0
 
 	    // Bytes 10-11
-		uint8_t emergency_system_index; ///< Emergency System: None, System 1...32, default=0
-		uint8_t scan_list_index;        ///< Scan List: None, ScanList 1...250, default=0
+		uint8_t emergency_system_index; ///< Emergency System, 0=none or system index+2, default=0.
+    uint8_t scan_list_index;        ///< Scan List, 0=none or scan-list index+1, default=0.
 
 		// Bytes 12
-		uint8_t group_list_index;       ///< Group List: None, GroupList1...250, default=0
+		uint8_t group_list_index;       ///< Group List, 0=none or group-list index+1, default=0.
 
     // Bytes 13
-		uint8_t gps_system;             ///< GPS System: Index+1 [1..16], default=0
+		uint8_t gps_system;             ///< GPS System, 0=none, GPS-system index+1, default=0.
 
 		// Bytes 14
     uint8_t dtmf_decode1  : 1,      ///< DTMF decode 1. 0=off, 1=on
@@ -185,22 +197,9 @@ protected:
 		uint8_t rx_signaling_syst;      ///< Rx Signaling System: Off, DTMF-1...4, default = 0
 		uint8_t tx_signaling_syst;      ///< Tx Signaling System: Off, DTMF-1...4, default = 0
 
-    /** Possible power settings. */
-		typedef enum {
-			POWER_HIGH = 3,               ///< High = 5W.
-			POWER_LOW = 0,                ///< Low = 1W
-			POWER_MIDDLE = 2              ///< Middle = ?W.
-		} Power;
-
 		// Byte 30
     uint8_t power         : 2,      ///< Power: Low, Middle, High, default=high
       _unused30_2         : 6;      ///< 0b111111
-
-    /** Again, I have no idea. */
-		typedef enum {
-			DCDM_LEADER = 0,
-			DCDM_MS = 1
-		} DCDM;
 
 		// Byte 31
 		uint8_t send_gps_info : 1,      ///< Send GSP Info (inv): 0=Send, 1=Disabled, default=1
@@ -251,7 +250,7 @@ protected:
 	} channel_t;
 
 	/** Represents a digital (DMR) contact within the codeplug. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     /** Call types. */
 		typedef enum {
 			CALL_GROUP = 1,             ///< Group call.
@@ -293,7 +292,7 @@ protected:
 	/** Represents a zone within the codeplug.
 	 * Please note that a zone consists of two structs the @c zone_t and the @c zone_ext_t.
 	 * The latter adds additional channels for VFO A and the channels for VFO B. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     // Bytes 0-31
     uint16_t name[16];              ///< Zone Name (Unicode).
 
@@ -322,15 +321,12 @@ protected:
    * The zone definition @c zone_t contains only a single set of 16 channels. For each zone
    * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each.
    * @todo Check whether @c ext_a and @c member_b are swapped! */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     // Bytes 0-95
     uint16_t ext_a[48];             ///< Member A: Channels 17...64, 0=empty/EOL
-
     // Bytes 96-223
     uint16_t member_b[64];          ///< Member B: Channels 1...64, 0=empty/EOL
 
-    /** Returns @c true if the zone extension is valid. */
-    bool isValid() const;
     /** Clears and invalidates this zone extension. */
     void clear();
 
@@ -341,7 +337,7 @@ protected:
 	} zone_ext_t;
 
 	/** Representation of an RX group list within the codeplug. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     // Bytes 0-31
     uint16_t name[16];              ///< Group List Name (16 x 16bit Unicode)
     // Bytes 32-95
@@ -366,7 +362,7 @@ protected:
 	} grouplist_t;
 
 	/** Represents a scan list within the codeplug. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     // Bytes 0-31
     uint16_t name[16];              ///< Scan List Name (16 x unicode), default=0
 
@@ -403,7 +399,7 @@ protected:
 	} scanlist_t;
 
 	/** Codeplug representation of the general settings. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     uint16_t intro_line1[10];             ///< Intro line 1: 10 x 16bit unicode, default=0
     uint16_t intro_line2[10];             ///< Intro line 2: 10 x 16bit unicode, default=0
     uint8_t  _unused40[24];               ///< Reserved: 24 bytes 0xff.
@@ -538,7 +534,7 @@ protected:
   } general_settings_t;
 
   /** Represents a single message within the codeplug. */
-  typedef struct {
+  typedef struct __attribute__((packed)) {
     uint16_t text[144];                   ///< Message text (144 x 16bit Unicode), 0-terminated
 
     /** Returns @c true if the message is valid. */
@@ -561,7 +557,7 @@ protected:
   } message_t;
 
   /** Codeplug representation of programming time-stamp and CPS version. */
-  typedef struct {
+  typedef struct __attribute__((packed)) {
     uint8_t _pad0;                       ///< Fixed 0xff
     uint8_t date[7];                     ///< YYYY-MM-DD hh:mm:ss as 14 BCD numbers.
     uint8_t cps_version[4];              ///< CPS version vv.vv, encoded using map "0123456789:;<=>?".
@@ -581,7 +577,7 @@ protected:
 
   /** Represents a single GPS system within the codeplug.
    * @todo Verify layout and offset! */
-  typedef struct {
+  typedef struct __attribute__((packed)) {
     uint16_t revert_channel;              ///< Revert channel index, 0=current.
     uint8_t  repeat_interval;             ///< Repeat interval x*30s, 0=off.
     uint8_t  _unused_3;                   ///< Reserved =0xff.
@@ -591,7 +587,7 @@ protected:
 
 	/** Represents an entry within the callsign database.
    * @todo Implement generic config representation for callsign database. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     unsigned dmrid   : 24;      ///< DMR id in BCD
     unsigned _unused : 8;       ///< Unknown set to 0xff.
     char     callsign[16];      ///< ASCII zero-terminated

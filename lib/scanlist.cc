@@ -61,7 +61,7 @@ ScanList::channel(int idx) const {
 
 bool
 ScanList::addChannel(Channel *channel) {
-  if (_channels.contains(channel))
+  if (_channels.contains(channel) || (nullptr == channel))
     return false;
   int idx = _channels.size();
   beginInsertRows(QModelIndex(), idx, idx);

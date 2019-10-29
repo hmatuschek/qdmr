@@ -40,13 +40,13 @@ CSVWriter::write(const Config *config, QTextStream &stream)
             "# 12) Receive group list: - or index in Grouplist table\n"
             "# 13) Contact for transmit: - or index in Contacts table\n"
             "#\n"
-            "Digital Name             Receive   Transmit  Power Scan TOT RO Admit  Color Slot RxGL TxContact\n";
+            "Digital Name                Receive   Transmit  Power Scan TOT RO Admit  Color Slot RxGL TxContact\n";
   for (int i=0; i<config->channelList()->count(); i++) {
     if (config->channelList()->channel(i)->is<AnalogChannel>())
       continue;
     DigitalChannel *digi = config->channelList()->channel(i)->as<DigitalChannel>();
     stream << qSetFieldWidth(8)  << left << (i+1)
-           << qSetFieldWidth(17) << left << ("\"" + digi->name() + "\"")
+           << qSetFieldWidth(20) << left << ("\"" + digi->name() + "\"")
            << qSetFieldWidth(10) << left << formatFrequency(digi->rxFrequency());
     if (digi->txFrequency()<digi->rxFrequency())
       stream << qSetFieldWidth(10) << left << formatFrequency(digi->txFrequency()-digi->rxFrequency());
@@ -57,7 +57,7 @@ CSVWriter::write(const Config *config, QTextStream &stream)
           QString::number(config->scanlists()->indexOf(digi->scanList())+1) : QString("-") )
            << qSetFieldWidth(4)  << left << ( (0 == digi->txTimeout()) ? '-' : digi->txTimeout() )
            << qSetFieldWidth(3)  << left << (digi->rxOnly() ? '+' : '-')
-           << qSetFieldWidth(7)  << left << (DigitalChannel::AdmitNone ? "-" : (DigitalChannel::AdmitFree ? "Free" : "Color"))
+           << qSetFieldWidth(7)  << left << ((DigitalChannel::AdmitNone==digi->admit()) ? "-" : ((DigitalChannel::AdmitFree==digi->admit()) ? "Free" : "Color"))
            << qSetFieldWidth(6)  << left << digi->colorCode()
            << qSetFieldWidth(5)  << left << (DigitalChannel::TimeSlot1==digi->timeslot() ? "1" : "2");
     if (nullptr == digi->rxGroupList())
@@ -88,13 +88,13 @@ CSVWriter::write(const Config *config, QTextStream &stream)
             "# 12) Guard tone for transmit, or '-' to disable\n"
             "# 13) Bandwidth in kHz: 12.5, 25\n"
             "#\n"
-            "Analog  Name             Receive   Transmit Power Scan TOT RO Admit  Squelch RxTone TxTone Width\n";
+            "Analog  Name                Receive   Transmit Power Scan TOT RO Admit  Squelch RxTone TxTone Width\n";
   for (int i=0; i<config->channelList()->count(); i++) {
     if (config->channelList()->channel(i)->is<DigitalChannel>())
       continue;
     AnalogChannel *analog = config->channelList()->channel(i)->as<AnalogChannel>();
     stream << qSetFieldWidth(8)  << left << (i+1)
-           << qSetFieldWidth(17) << left << ("\"" + analog->name() + "\"")
+           << qSetFieldWidth(20) << left << ("\"" + analog->name() + "\"")
            << qSetFieldWidth(10) << left << formatFrequency(analog->rxFrequency());
     if (analog->txFrequency()<analog->rxFrequency())
       stream << qSetFieldWidth(10) << left << formatFrequency(analog->txFrequency()-analog->rxFrequency());
@@ -105,7 +105,7 @@ CSVWriter::write(const Config *config, QTextStream &stream)
           QString::number(config->scanlists()->indexOf(analog->scanList())+1) : QString("-") )
            << qSetFieldWidth(4)  << left << ( (0 == analog->txTimeout()) ? '-' : analog->txTimeout() )
            << qSetFieldWidth(3)  << left << (analog->rxOnly() ? '+' : '-')
-           << qSetFieldWidth(7)  << left << (AnalogChannel::AdmitNone ? "-" : (AnalogChannel::AdmitFree ? "Free" : "Tone"))
+           << qSetFieldWidth(7)  << left << ((AnalogChannel::AdmitNone==analog->admit()) ? "-" : ((AnalogChannel::AdmitFree==analog->admit()) ? "Free" : "Tone"))
            << qSetFieldWidth(8)  << left << analog->squelch();
     if (0 == analog->rxTone())
       stream << qSetFieldWidth(7)  << left << "-";
@@ -126,12 +126,12 @@ CSVWriter::write(const Config *config, QTextStream &stream)
             "# 3) VFO: Either A or B.\n"
             "# 4) List of channels: numbers and ranges (N-M) separated by comma\n"
             "#\n"
-            "Zone    Name             VFO Channels\n";
+            "Zone    Name                VFO Channels\n";
   for (int i=0; i<config->zones()->count(); i++) {
     Zone *zone = config->zones()->zone(i);
     if (zone->A()->count()) {
       stream << qSetFieldWidth(8)  << left << (i+1)
-             << qSetFieldWidth(17) << left << ("\"" + zone->name() + "\"")
+             << qSetFieldWidth(20) << left << ("\"" + zone->name() + "\"")
              << qSetFieldWidth(4)  << left << "A";
       QStringList tmp;
       for (int j=0; j<zone->A()->count(); j++) {
@@ -141,7 +141,7 @@ CSVWriter::write(const Config *config, QTextStream &stream)
     }
     if (zone->B()->count()) {
       stream << qSetFieldWidth(8)  << left << (i+1)
-             << qSetFieldWidth(17) << left << ("\"" + zone->name() + "\"")
+             << qSetFieldWidth(20) << left << ("\"" + zone->name() + "\"")
              << qSetFieldWidth(4)  << left << "B";
       QStringList tmp;
       for (int j=0; j<zone->B()->count(); j++) {
@@ -160,11 +160,11 @@ CSVWriter::write(const Config *config, QTextStream &stream)
             "# 5) Designated transmit channel: Last, Sel or index\n"
             "# 6) List of channels: numbers and ranges (N-M) separated by comma\n"
             "#\n"
-            "Scanlist Name            PCh1 PCh2 TxCh Channels\n";
+            "Scanlist Name               PCh1 PCh2 TxCh Channels\n";
   for (int i=0; i<config->scanlists()->count(); i++) {
     ScanList *list = config->scanlists()->scanlist(i);
     stream << qSetFieldWidth(9)  << left << (i+1)
-           << qSetFieldWidth(17) << left << ("\"" + list->name() + "\"")
+           << qSetFieldWidth(20) << left << ("\"" + list->name() + "\"")
            << qSetFieldWidth(5)  << left
            << ( (0 == list->priorityChannel()) ?
                   "-" : QString::number(config->channelList()->indexOf(list->priorityChannel())+1) )
@@ -187,12 +187,12 @@ CSVWriter::write(const Config *config, QTextStream &stream)
             "# 4) Call ID: 1...16777215 or string with DTMF number\n"
             "# 5) Call receive tone: -, +\n"
             "#\n"
-            "Contact Name             Type    ID          RxTone\n";
+            "Contact Name                Type    ID          RxTone\n";
   for (int i=0; i<config->contacts()->count(); i++) {
     if (config->contacts()->contact(i)->is<DigitalContact>()) {
       DigitalContact *contact = config->contacts()->contact(i)->as<DigitalContact>();
       stream << qSetFieldWidth(8)  << left << (i+1)
-             << qSetFieldWidth(17) << left << ("\"" + contact->name() + "\"")
+             << qSetFieldWidth(20) << left << ("\"" + contact->name() + "\"")
              << qSetFieldWidth(8)  << left
              << (DigitalContact::PrivateCall == contact->type() ?
                    "Private" : (DigitalContact::GroupCall == contact->type() ?
@@ -217,11 +217,11 @@ CSVWriter::write(const Config *config, QTextStream &stream)
             "# 2) Name in quotes.\n"
             "# 3) List of contacts: numbers and ranges (N-M) separated by comma\n"
             "#\n"
-            "Grouplist Name             Contacts\n";
+            "Grouplist Name                Contacts\n";
   for (int i=0; i<config->rxGroupLists()->count(); i++) {
     RXGroupList *list = config->rxGroupLists()->list(i);
     stream << qSetFieldWidth(10) << left << (i+1)
-           << qSetFieldWidth(17) << left << ("\"" + list->name() + "\"");
+           << qSetFieldWidth(20) << left << ("\"" + list->name() + "\"");
     QStringList tmp;
     for (int j=0; j<list->count(); j++) {
       tmp.append(QString::number(config->contacts()->indexOf(list->contact(j))+1));

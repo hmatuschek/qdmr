@@ -52,11 +52,11 @@ public:
 public slots:
   /** Starts the codeplug download. On success the codeplug gets decoded and the given generic
    * configuration gets updated from its content. */
-	bool startDownload(Config *config);
+	bool startDownload(Config *config, bool blocking=false);
   /** Uloads a codeplug to the device.
    * Updates the codeplug from the given generic configuration and starts the upload of that
    * codeplug to the device. */
-	bool startUpload(Config *config);
+	bool startUpload(Config *config, bool blocking=false);
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */

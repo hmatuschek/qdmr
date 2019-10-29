@@ -139,10 +139,10 @@ public:
 
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
-  virtual bool startDownload(Config *config) = 0;
+  virtual bool startDownload(Config *config, bool blocking=false) = 0;
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
-  virtual bool startUpload(Config *config) = 0;
+  virtual bool startUpload(Config *config, bool blocking=false) = 0;
 
 signals:
   /** Gets emitted once the codeplug download has been started. */

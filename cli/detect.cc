@@ -3,20 +3,25 @@
 #include <QCoreApplication>
 #include <QDebug>
 
-#include "dfu_libusb.hh"
+#include "radio.hh"
+#include "radiointerface.hh"
 
 
 int detect(QCommandLineParser &parser, QCoreApplication &app) {
   Q_UNUSED(parser);
+  Q_UNUSED(app);
 
-  DFUDevice device(0x0483, 0xdf11, &app);
-  if (device.isOpen()) {
-    qDebug() << "Device: " << device.identifier();
-    return 0;
+  QString errorMessage;
+  Radio *radio = Radio::detect(errorMessage);
+  if (nullptr == radio) {
+    qDebug() << "No compatible radio found:" << errorMessage;
+    return -1;
   }
 
-  qDebug() << "Cannot detect device.";
-  return -1;
+  qDebug() << "Found:" << radio->name();
+  delete  radio;
+
+  return 0;
 }
 
 

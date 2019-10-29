@@ -26,7 +26,9 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
     Config config;
-    codeplug.decode(&config);
+    if (! codeplug.decode(&config)) {
+      qDebug() << "Cannot decode binary codeplug file" << filename << ":" << codeplug.errorMessage();
+    }
 
     if (2 <= parser.positionalArguments().size()) {
       QFile outfile(parser.positionalArguments().at(1));
@@ -48,7 +50,10 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
     Config config;
-    codeplug.decode(&config);
+    if (! codeplug.decode(&config)) {
+      qDebug() << "Cannot decode binary codeplug file" << filename << ":" << codeplug.errorMessage();
+      return -1;
+    }
 
     if (2 <= parser.positionalArguments().size()) {
       QFile outfile(parser.positionalArguments().at(1));

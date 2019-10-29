@@ -200,14 +200,14 @@ Radio::detect(QString &errorMessage) {
       id = hid.identifier();
       hid.close();
     } else {
-      errorMessage = QString("%1: No matching radio found: %2.")
+      errorMessage = QString("%1(): No matching radio found: %2.")
           .arg(__func__).arg(hid.errorMessage());
       return nullptr;
     }
   }
 
   if (id.isEmpty()) {
-    errorMessage = "Readio returned no identifier!";
+    errorMessage = QString("%1(): Cannot detect radio: Radio returned no identifier!").arg(__func__);
     return nullptr;
   }
 

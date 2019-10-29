@@ -76,16 +76,61 @@ encode_frequency(double freq) {
 }
 
 
-uint32_t decode_dmr_id(const uint8_t *id) {
+uint32_t decode_dmr_id_bin(const uint8_t *id) {
   return ( (id[0]) | (id[1] << 8) | (id[2] << 16) );
 }
 
-void encode_dmr_id(uint8_t *id, uint32_t no) {
+void encode_dmr_id_bin(uint8_t *id, uint32_t no) {
   id[0] = no;
   id[1] = no >> 8;
   id[2] = no >> 16;
 }
 
+
+uint32_t decode_dmr_id_bcd(const uint8_t *id) {
+  return ((id[0] >> 4) * 10000000
+      + (id[0] & 15) * 1000000
+      + (id[1] >> 4) * 100000
+      + (id[1] & 15) * 10000
+      + (id[2] >> 4) * 1000
+      + (id[2] & 15) * 100
+      + (id[3] >> 4) * 10
+      + (id[3] & 15));
+}
+
+void encode_dmr_id_bcd(uint8_t *id, uint32_t no) {
+  id[0] = ((no / 10000000) << 4)    | ((no / 1000000) % 10);
+  id[1] = ((no / 100000 % 10) << 4) | ((no / 10000) % 10);
+  id[2] = ((no / 1000 % 10) << 4)   | ((no / 100) % 10);
+  id[3] = ((no / 10 % 10) << 4)     | (no % 10);
+}
+
+QVector<char> bin_dtmf_tab = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','*','#'};
+
+QString
+decode_dtmf_bin(const uint8_t *num, int size, uint8_t fill) {
+  Q_UNUSED(fill);
+  QString number;
+  for (int i=0; (i<size)&&(num[i]<16); i++) {
+    number.append(bin_dtmf_tab[num[i]]);
+  }
+  return number;
+}
+
+bool
+encode_dtmf_bin(const QString &number, uint8_t *num, int size, uint8_t fill) {
+  QString tmp = number.simplified().toUpper();
+  for (int i=0; i<size; i++) {
+    num[i] = fill;
+    if (i>=tmp.size())
+      continue;
+    int idx = bin_dtmf_tab.indexOf(number.at(i).toLatin1());
+    if (idx<0)
+      continue;
+    num[i] = idx;
+  }
+  return true;
+}
 
 float decode_ctcss_tone(uint16_t data) {
   if (data == 0xffff)

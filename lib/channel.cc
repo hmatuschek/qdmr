@@ -104,6 +104,8 @@ Channel::scanList() const {
 }
 bool
 Channel::setScanList(ScanList *list) {
+  if (nullptr == list)
+    return false;
   _scanlist = list;
   if (_scanlist)
     connect(_scanlist, SIGNAL(destroyed(QObject *)), this, SLOT(onScanListDeleted(QObject *)));
@@ -235,8 +237,11 @@ RXGroupList *
 DigitalChannel::rxGroupList() const {
   return _rxGroup;
 }
+
 bool
 DigitalChannel::setRXGroupList(RXGroupList *g) {
+  if (nullptr == g)
+    return false;
   if (_rxGroup)
     disconnect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));
   _rxGroup = g;
@@ -250,8 +255,11 @@ DigitalContact *
 DigitalChannel::txContact() const {
   return _txContact;
 }
+
 bool
 DigitalChannel::setTXContact(DigitalContact *c) {
+  if (nullptr == c)
+    return false;
   if (_txContact)
     disconnect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
   _txContact = c;

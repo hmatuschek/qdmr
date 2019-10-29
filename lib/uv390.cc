@@ -63,7 +63,7 @@ UV390::codeplug() {
 }
 
 bool
-UV390::startDownload(Config *config) {
+UV390::startDownload(Config *config, bool blocking) {
   if (StatusIdle != _task)
     return false;
 
@@ -80,13 +80,16 @@ UV390::startDownload(Config *config) {
   _task = StatusDownload;
   _config->reset();
 
+  if (blocking) {
+    run();
+    return (StatusIdle == _task);
+  }
   start();
-
   return true;
 }
 
 bool
-UV390::startUpload(Config *config) {
+UV390::startUpload(Config *config, bool blocking) {
   if (StatusIdle != _task)
     return false;
 
@@ -100,8 +103,11 @@ UV390::startUpload(Config *config) {
   }
 
   _task = StatusUpload;
+  if (blocking) {
+    run();
+    return (StatusIdle == _task);
+  }
   start();
-
   return true;
 }
 

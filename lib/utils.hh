@@ -30,9 +30,16 @@ double decode_frequency(uint32_t bcd);
 uint32_t encode_frequency(double freq);
 
 /** Decodes binary (24bit) encoded DMR ID. */
-uint32_t decode_dmr_id(const uint8_t *id);
+uint32_t decode_dmr_id_bin(const uint8_t *id);
 /** Encodes binary (24bit) encoded DMR ID. */
-void encode_dmr_id(uint8_t *id, uint32_t num);
+void encode_dmr_id_bin(uint8_t *id, uint32_t num);
+/** Decodes bcd (32bit) encoded DMR ID. */
+uint32_t decode_dmr_id_bcd(const uint8_t *id);
+/** Encodes bcd (32bit) encoded DMR ID. */
+void encode_dmr_id_bcd(uint8_t *id, uint32_t num);
+
+QString decode_dtmf_bin(const uint8_t *num, int size=16, uint8_t fill=0xff);
+bool encode_dtmf_bin(const QString &number, uint8_t *num, int size=16, uint8_t fill=0xff);
 
 /** Decodes the CTCSS tone frequency in Hz. */
 float decode_ctcss_tone(uint16_t data);

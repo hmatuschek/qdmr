@@ -5,6 +5,8 @@
 #include <QFile>
 #include <QDebug>
 
+#include <QApplication>
+
 #include "radio.hh"
 #include "printprogress.hh"
 #include "config.hh"
@@ -21,7 +23,7 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   QString errorMessage;
   Radio *radio = Radio::detect(errorMessage);
   if (nullptr == radio) {
-    qDebug() << __func__ << "Cannot detect radio:" << errorMessage;
+    qDebug() << "Cannot detect radio:" << errorMessage;
     return -1;
   }
 
@@ -39,15 +41,8 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
     return -1;
   }
 
-  app.connect(radio, SIGNAL(downloadError(Radio *radio)), &app, SLOT(quit()));
-  app.connect(radio, SIGNAL(downloadFinished()), &app, SLOT(quit()));
-  app.connect(radio, &Radio::downloadProgress, print_progress);
-
   Config config;
-  if (radio->startDownload(&config))
-    app.exec();
-
-  radio->wait(10000);
+  radio->startDownload(&config, true);
 
   if (Radio::StatusError == radio->status()) {
     qDebug() << "Codeplug download error: " << radio->errorMessage();

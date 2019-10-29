@@ -58,7 +58,7 @@ protected:
 	static const int NMESSAGES = 32;    ///< The number of predefined text messages.
 
 	/** Channel representation within the binary codeplug. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     /** Possible channel types analog (FM) or digital (DMR). */
 		typedef enum {
 			MODE_ANALOG  = 0,               ///< An analog (FM) channel.
@@ -192,7 +192,7 @@ protected:
 	} channel_t;
 
 	/** A Bank of 128 channels. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
 		uint8_t bitmap[16];               ///< Corresponding bit is set when channel is valid.
 		channel_t chan[128];              ///< The list of channels.
 	} bank_t;
@@ -209,7 +209,7 @@ protected:
   typedef RD5RCodeplug::zonetab_t zonetab_t;
 
 	/** Represents an RX group list within the codeplug. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     // Bytes 0-15
     uint8_t name[16];                 ///< RX group list name, 16x ASCII, 0xff terminated.
     // Bytes 16-79
@@ -229,7 +229,7 @@ protected:
 	} grouplist_t;
 
 	/** Table of RX group lists. */
-	typedef struct {
+	typedef struct __attribute__((packed)) {
     uint8_t     nitems1[128];         ///< Number of members (N+1) for every group list, zero when disabled.
     grouplist_t grouplist[NGLISTS];   ///< The actual grouplists.
 	} grouptab_t;
@@ -239,7 +239,7 @@ protected:
   typedef RD5RCodeplug::scanlist_t scanlist_t;
 
   /** Represents a scan-list table within the codeplug */
-  typedef struct {
+  typedef struct __attribute__((packed)) {
     /** Byte-field to indicate which scanlist is valid. Set to 0x01 when valid, 0x00 otherwise. */
     uint8_t    valid[NSCANL];
     /** The scanlists. */

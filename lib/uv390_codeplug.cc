@@ -21,7 +21,7 @@
 #define OFFSET_GLISTS   0x00f420
 #define OFFSET_ZONES    0x0151e0
 #define OFFSET_SCANL    0x019060
-#define OFFSET_ZONEXT   0x031860
+#define OFFSET_ZONEXT   0x031800
 // ---- second segment ---- additional offset 0x110800
 #define OFFSET_CHANNELS 0x110800
 #define OFFSET_CONTACTS 0x140800
@@ -29,17 +29,6 @@
 #define CALLSIGN_START  0x00200000  // Start of callsign database
 #define CALLSIGN_FINISH 0x01000000  // End of callsign database
 #define CALLSIGN_OFFSET 0x4003
-
-#define GET_TIMESTAMP()     (&radio_mem[OFFSET_TIMESTMP])
-#define GET_SETTINGS()      ((general_settings_t*) &radio_mem[OFFSET_SETTINGS])
-#define GET_CHANNEL(i)      ((channel_t*) &radio_mem[OFFSET_CHANNELS + (i)*64])
-#define GET_ZONE(i)         ((zone_t*) &radio_mem[OFFSET_ZONES + (i)*64])
-#define GET_ZONEXT(i)       ((zone_ext_t*) &radio_mem[OFFSET_ZONEXT + (i)*224])
-#define GET_SCANLIST(i)     ((scanlist_t*) &radio_mem[OFFSET_SCANL + (i)*104])
-#define GET_CONTACT(i)      ((contact_t*) &radio_mem[OFFSET_CONTACTS + (i)*36])
-#define GET_GROUPLIST(i)    ((grouplist_t*) &radio_mem[OFFSET_GLISTS + (i)*96])
-#define GET_MESSAGE(i)      ((uint16_t*) &radio_mem[OFFSET_MSG + (i)*288])
-#define GET_CALLSIGN(m,i)   ((callsign_t*) ((m) + CALLSIGN_OFFSET + (i)*120))
 
 #define VALID_TEXT(txt)     (*(txt) != 0 && *(txt) != 0xffff)
 #define VALID_CHANNEL(ch)   VALID_TEXT((ch)->name)
@@ -162,6 +151,7 @@ UV390Codeplug::channel_t::setName(const QString &n) {
 
 float
 UV390Codeplug::channel_t::getRXTone() const {
+  ///@bug Impement CTCSS/DCS for UV380.
   return 0;
 }
 
@@ -169,10 +159,12 @@ void
 UV390Codeplug::channel_t::setRXTone(float freq) {
   Q_UNUSED(freq);
   ctcss_dcs_receive = 0xffff;
+  ///@bug Impement CTCSS/DCS for UV380.
 }
 
 float
 UV390Codeplug::channel_t::getTXTone() const {
+  ///@bug Impement CTCSS/DCS for UV380.
   return 0;
 }
 
@@ -180,6 +172,7 @@ void
 UV390Codeplug::channel_t::setTXTone(float freq)  {
   Q_UNUSED(freq);
   ctcss_dcs_transmit = 0xffff;
+  ///@bug Impement CTCSS/DCS for UV380.
 }
 
 Channel *
@@ -196,7 +189,7 @@ UV390Codeplug::channel_t::toChannelObj() const {
       case ADMIT_ALWAYS: admit_crit = AnalogChannel::AdmitNone; break;
       case ADMIT_TONE: admit_crit = AnalogChannel::AdmitTone; break;
       case ADMIT_CH_FREE: admit_crit = AnalogChannel::AdmitFree; break;
-      default: admit_crit = AnalogChannel::AdmitNone; break;
+      default: admit_crit = AnalogChannel::AdmitFree; break;
     }
 
     AnalogChannel::Bandwidth bw =
@@ -213,7 +206,7 @@ UV390Codeplug::channel_t::toChannelObj() const {
       case ADMIT_ALWAYS: admit_crit = DigitalChannel::AdmitNone; break;
       case ADMIT_CH_FREE: admit_crit = DigitalChannel::AdmitFree; break;
       case ADMIT_COLOR: admit_crit = DigitalChannel::AdmitColorCode; break;
-      default: admit_crit = DigitalChannel::AdmitNone; break;
+      default: admit_crit = DigitalChannel::AdmitFree; break;
     }
 
     DigitalChannel::TimeSlot slot =
@@ -243,7 +236,6 @@ UV390Codeplug::channel_t::linkChannelObj(Channel *c, Config *conf) const {
   } else if (MODE_DIGITAL == channel_mode) {
     DigitalChannel *dc = dynamic_cast<DigitalChannel *>(c);
     if (! dc) return false;
-
     if (scan_list_index) {
       if ((scan_list_index-1) >= conf->scanlists()->count())
         return false;
@@ -310,12 +302,12 @@ UV390Codeplug::contact_t::clear() {
 
 uint32_t
 UV390Codeplug::contact_t::getId() const {
-  return decode_dmr_id(id);
+  return decode_dmr_id_bin(id);
 }
 
 void
 UV390Codeplug::contact_t::setId(uint32_t num) {
-  encode_dmr_id(id, num);
+  encode_dmr_id_bin(id, num);
 }
 
 QString
@@ -362,7 +354,7 @@ UV390Codeplug::contact_t::fromContactObj(const DigitalContact *cont, const Confi
  * ******************************************************************************************** */
 bool
 UV390Codeplug::zone_t::isValid() const {
-  return (0 != member_a[0]);
+  return ((0 != name[0]) && (0xffff != name[0]));
 }
 
 void
@@ -419,11 +411,6 @@ UV390Codeplug::zone_t::fromZoneObj(const Zone *zone, const Config *conf) {
 /* ******************************************************************************************** *
  * Implementation of UV390Codeplug::zone_ext_t
  * ******************************************************************************************** */
-bool
-UV390Codeplug::zone_ext_t::isValid() const {
-  return ((0 != ext_a[0]) || (0 != member_b[0]));
-}
-
 void
 UV390Codeplug::zone_ext_t::clear() {
   memset(ext_a, 0, sizeof(ext_a));
@@ -432,9 +419,6 @@ UV390Codeplug::zone_ext_t::clear() {
 
 bool
 UV390Codeplug::zone_ext_t::linkZone(Zone *zone, Config *conf) const {
-  if (! isValid())
-    return false;
-
   for (int i=0; (i<48) && ext_a[i]; i++) {
     if ((ext_a[i]-1)>=conf->channelList()->count())
       return false;
@@ -446,7 +430,7 @@ UV390Codeplug::zone_ext_t::linkZone(Zone *zone, Config *conf) const {
     zone->B()->addChannel(conf->channelList()->channel(member_b[i]-1));
   }
 
-  return false;
+  return true;
 }
 
 void
@@ -471,7 +455,7 @@ UV390Codeplug::zone_ext_t::fromZoneObj(const Zone *zone, const Config *config) {
  * ******************************************************************************************** */
 bool
 UV390Codeplug::grouplist_t::isValid() const {
-  return (0 != member[0]);
+  return (0 != name[0]) && (0xffff != name[0]);
 }
 
 void
@@ -529,7 +513,7 @@ UV390Codeplug::grouplist_t::fromRXGroupListObj(const RXGroupList *grp, const Con
  * ******************************************************************************************** */
 bool
 UV390Codeplug::scanlist_t::isValid() const {
-  return (0xffff != priority_ch1) && (0xffff != priority_ch2) && (0 != member[0]);
+  return (0 != name[0]) && (0xffff != name[0]);
 }
 
 void
@@ -598,7 +582,6 @@ void
 UV390Codeplug::general_settings_t::clear() {
   memset(intro_line1, 0, sizeof(intro_line1));
   memset(intro_line2, 0, sizeof(intro_line2));
-
   memset(_unused40, 0xff, sizeof(_unused40));
 
   _unused64_0 = 1;
@@ -693,38 +676,38 @@ UV390Codeplug::general_settings_t::clear() {
 
 uint32_t
 UV390Codeplug::general_settings_t::getRadioId() const {
-  return decode_dmr_id(radio_id);
+  return decode_dmr_id_bin(radio_id);
 }
 void
 UV390Codeplug::general_settings_t::setRadioId(uint32_t num) {
-  encode_dmr_id(radio_id, num);
+  encode_dmr_id_bin(radio_id, num);
 }
 
 uint32_t
 UV390Codeplug::general_settings_t::getRadioId1() const {
-  return decode_dmr_id(radio_id1);
+  return decode_dmr_id_bin(radio_id1);
 }
 void
 UV390Codeplug::general_settings_t::setRadioId1(uint32_t num) {
-  encode_dmr_id(radio_id1, num);
+  encode_dmr_id_bin(radio_id1, num);
 }
 
 uint32_t
 UV390Codeplug::general_settings_t::getRadioId2() const {
-  return decode_dmr_id(radio_id2);
+  return decode_dmr_id_bin(radio_id2);
 }
 void
 UV390Codeplug::general_settings_t::setRadioId2(uint32_t num) {
-  encode_dmr_id(radio_id2, num);
+  encode_dmr_id_bin(radio_id2, num);
 }
 
 uint32_t
 UV390Codeplug::general_settings_t::getRadioId3() const {
-  return decode_dmr_id(radio_id3);
+  return decode_dmr_id_bin(radio_id3);
 }
 void
 UV390Codeplug::general_settings_t::setRadioId3(uint32_t num) {
-  encode_dmr_id(radio_id3, num);
+  encode_dmr_id_bin(radio_id3, num);
 }
 
 QString
@@ -767,6 +750,7 @@ UV390Codeplug::general_settings_t::updateConfigObj(Config *conf) const {
 
 void
 UV390Codeplug::general_settings_t::fromConfigObj(const Config *conf) {
+  clear();
   setName(conf->name());
   setRadioId(conf->id());
   setIntroLine1(conf->introLine1());
@@ -789,6 +773,7 @@ UV390Codeplug::UV390Codeplug(QObject *parent)
 
 bool
 UV390Codeplug::encode(Config *config) {
+  memset(data(0x00280c),0xff,52);
   // General config
   general_settings_t *genset = (general_settings_t *)(data(OFFSET_SETTINGS));
   genset->fromConfigObj(config);
@@ -852,20 +837,29 @@ UV390Codeplug::decode(Config *config) {
 
   // General config
   general_settings_t *genset = (general_settings_t *)data(OFFSET_SETTINGS);
+  if (! genset) {
+    _errorMessage = QString("%1(): Cannot access general settings memory!").arg(__func__);
+    return false;
+  }
   if (! genset->updateConfigObj(config)) {
-    qDebug() << "Cannot decode codeplug: Invlaid general settings.";
+    _errorMessage = QString("%1(): Invalid general settings!").arg(__func__);
     return false;
   }
 
   // Define Contacts
   for (int i=0; i<NCONTACTS; i++) {
     contact_t *cont = (contact_t *)(data(OFFSET_CONTACTS+i*sizeof(contact_t)));
+    if (! cont) {
+      _errorMessage = QString("%1(): Cannot access contact memory at index %2!").arg(__func__).arg(i);
+      return false;
+    }
     if (! cont->isValid())
       break;
     if (Contact *obj = cont->toContactObj())
       config->contacts()->addContact(obj);
     else {
-      qDebug() << "Cannot decode codeplug: Invlaid contact.";
+      _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid contact at index %2.")
+          .arg(__func__).arg(i);
       return false;
     }
   }
@@ -873,12 +867,17 @@ UV390Codeplug::decode(Config *config) {
   // Define RX GroupLists
   for (int i=0; i<NGLISTS; i++) {
     grouplist_t *glist = (grouplist_t *)(data(OFFSET_GLISTS+i*sizeof(grouplist_t)));
+    if (! glist) {
+      _errorMessage = QString("%1(): Cannot access group-list memory at index %2!").arg(__func__).arg(i);
+      return false;
+    }
     if (! glist->isValid())
       break;
     if (RXGroupList *obj = glist->toRXGroupListObj())
       config->rxGroupLists()->addList(obj);
     else {
-      qDebug() << "Cannot decode codeplug: Invlaid RX group list.";
+      _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid RX group list at index %2.")
+          .arg(__func__).arg(i);
       return false;
     }
   }
@@ -886,12 +885,17 @@ UV390Codeplug::decode(Config *config) {
   // Define Channels
   for (int i=0; i<NCHAN; i++) {
     channel_t *chan = (channel_t *)(data(OFFSET_CHANNELS+i*sizeof(channel_t)));
+    if (! chan) {
+      _errorMessage = QString("%1(): Cannot access channel memory at index %2!").arg(__func__).arg(i);
+      return false;
+    }
     if (! chan->isValid())
       break;
     if (Channel *obj = chan->toChannelObj())
       config->channelList()->addChannel(obj);
     else {
-      qDebug() << "Cannot decode codeplug: Invlaid channel.";
+      _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid channel at index %2.")
+          .arg(__func__).arg(i);
       return false;
     }
   }
@@ -899,12 +903,17 @@ UV390Codeplug::decode(Config *config) {
   // Define Zones
   for (int i=0; i<NZONES; i++) {
     zone_t *zone = (zone_t *)(data(OFFSET_ZONES+i*sizeof(zone_t)));
+    if (! zone) {
+      _errorMessage = QString("%1(): Cannot access zone memory at index %2!").arg(__func__).arg(i);
+      return false;
+    }
     if (! zone->isValid())
       break;
     if (Zone *obj = zone->toZoneObj()) {
       config->zones()->addZone(obj);
     } else {
-      qDebug() << "Cannot decode codeplug: Invlaid zone.";
+      _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid zone at index %2.")
+          .arg(__func__).arg(i);
       return false;
     }
   }
@@ -912,12 +921,17 @@ UV390Codeplug::decode(Config *config) {
   // Define Scanlists
   for (int i=0; i<NSCANL; i++) {
     scanlist_t *scan = (scanlist_t *)(data(OFFSET_SCANL+i*sizeof(scanlist_t)));
+    if (! scan) {
+      _errorMessage = QString("%1(): Cannot access scan-list memory at index %2!").arg(__func__).arg(i);
+      return false;
+    }
     if (! scan->isValid())
       break;
     if (ScanList *obj = scan->toScanListObj())
       config->scanlists()->addScanList(obj);
     else {
-      qDebug() << "Cannot decode codeplug: Invlaid scanlist.";
+      _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid scanlist at index %2.")
+          .arg(__func__).arg(i);
       return false;
     }
   }
@@ -925,33 +939,51 @@ UV390Codeplug::decode(Config *config) {
   // Link RX GroupLists
   for (int i=0; i<config->rxGroupLists()->count(); i++) {
     grouplist_t *glist = (grouplist_t *)(data(OFFSET_GLISTS+i*sizeof(grouplist_t)));
-    if (! glist->linkRXGroupList(config->rxGroupLists()->list(i), config))
+    if (! glist->linkRXGroupList(config->rxGroupLists()->list(i), config)) {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link group-list at index %2.")
+          .arg(__func__).arg(i);
       return false;
+    }
   }
 
   // Link Channels
   for (int i=0; i<config->channelList()->count(); i++) {
     channel_t *chan = (channel_t *)(data(OFFSET_CHANNELS+i*sizeof(channel_t)));
-    if (! chan->linkChannelObj(config->channelList()->channel(i), config))
+    if (! chan->linkChannelObj(config->channelList()->channel(i), config)) {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link channel at index %2.")
+          .arg(__func__).arg(i);
       return false;
+    }
   }
 
   // Link Zones
   for (int i=0; i<config->zones()->count(); i++) {
     zone_t *zone = (zone_t *)(data(OFFSET_ZONES+i*sizeof(zone_t)));
     if (! zone->linkZone(config->zones()->zone(i), config)) {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link zone at index %2.")
+          .arg(__func__).arg(i);
       return false;
-    } else {
-      zone_ext_t *zoneext = (zone_ext_t *)(data(OFFSET_ZONEXT+i*sizeof(zone_t)));
-      zoneext->linkZone(config->zones()->zone(i), config);
+    }
+    zone_ext_t *zoneext = (zone_ext_t *)(data(OFFSET_ZONEXT+i*sizeof(zone_ext_t)));
+    if (! zoneext) {
+      _errorMessage = QString("%1(): Cannot access zone extension memory at index %2!").arg(__func__).arg(i);
+      return false;
+    }
+    if (! zoneext->linkZone(config->zones()->zone(i), config)) {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link zone extension at index %2.")
+          .arg(__func__).arg(i);
+      return false;
     }
   }
 
   // Link Scanlists
   for (int i=0; i<config->scanlists()->count(); i++) {
     scanlist_t *scan = (scanlist_t *)(data(OFFSET_SCANL+i*sizeof(scanlist_t)));
-    if (! scan->linkScanListObj(config->scanlists()->scanlist(i), config))
+    if (! scan->linkScanListObj(config->scanlists()->scanlist(i), config)) {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link scan-list at index %2.")
+          .arg(__func__).arg(i);
       return false;
+    }
   }
 
   return true;
