@@ -13,7 +13,10 @@
 #define OFFSET_CONTACTS     0x01788
 #define OFFSET_DTMF         0x02f80
 #define OFFSET_BANK_0       0x03780 // Channels 1-128
+#define OFFSET_BOOT         0x07518
+#define OFFSET_MENU         0x07538
 #define OFFSET_INTRO        0x07540
+#define OFFSET_VFO          0x07590
 #define OFFSET_ZONETAB      0x08010
 #define OFFSET_BANK_1       0x0b1b0 // Channels 129-1024
 #define OFFSET_SCANTAB      0x17620
@@ -59,7 +62,6 @@ RD5RCodeplug::channel_t::clear() {
   _unused51_4            = 0;
   vox                    = 0;
   memset(_unused52, 0, 3);
-
 }
 
 double

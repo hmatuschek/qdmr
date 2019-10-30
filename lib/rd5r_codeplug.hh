@@ -36,7 +36,7 @@ class RXGroupList;
  * starts at 0x08000 and ends at 0x1e300.
  *
  * <table>
- *  <tr><th>Start</th>   <th>End</th>      <th>Size</th>    <th>Content</th></tr>
+ *  <tr><th>Start</th>   <th>End</th>     <th>Size</th>  <th>Content</th></tr>
  *  <tr><th colspan="4">First segment 0x00080-0x07c00</th></tr>
  *  <tr><td>0x00080</td> <td>0x00088</td> <td>0x0008</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x00088</td> <td>0x0008e</td> <td>0x0006</td> <td>Timestamp, see @c RD5RCodeplug::timestamp_t.</td></tr>
@@ -50,7 +50,9 @@ class RXGroupList;
  *  <tr><td>0x02f88</td> <td>0x03388</td> <td>0x0400</td> <td>32 DTMF contacts, see @c RD5RCodeplug::dtmf_contact_t.</td></tr>
  *  <tr><td>0x03388</td> <td>0x03780</td> <td>0x03f8</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c RD5RCodeplug::bank_t.</td></tr>
- *  <tr><td>0x05390</td> <td>0x07540</td> <td>0x21b0</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x05390</td> <td>0x07518</td> <td>0x2188</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x07518</td> <td>0x07538</td> <td>0x0020</td> <td>Boot settings, see @c RD5RCodeplug::boot_settings_t.</td></tr>
+ *  <tr><td>0x07538</td> <td>0x07540</td> <td>0x0008</td> <td>Menu settings, see @c RD5RCodeplug::menu_settings_t</td></tr>
  *  <tr><td>0x07540</td> <td>0x07560</td> <td>0x0020</td> <td>2 intro lines, @c RD5RCodeplug::intro_text_t.</td></tr>
  *  <tr><td>0x07560</td> <td>0x07590</td> <td>0x0030</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x07590</td> <td>0x07600</td> <td>0x0070</td> <td>VFO settings, see @c RD5RCodeplug::vfo_settings_t.</td></tr>
@@ -533,6 +535,78 @@ public:
     void clear();
     void initDefault();
   } button_settings_t;
+
+  /** Represents the menu settings. */
+  typedef struct __attribute__((packed)) {
+    // Byte 0
+    uint8_t hangtime;             ///< Menu hang-time in seconds [1,30], default 10.
+
+    // Byte 1
+    uint8_t message        : 1,   ///< Show text message menu entry, default=1.
+      scan_start           : 1,   ///< Show start-scan menu entry, default=1.
+      edit_scanlist        : 1,   ///< Show edit-scanlist menu entry, default=1.
+      call_alert           : 1,   ///< Show call-alert menu entry, default=1.
+      edit_contact         : 1,   ///< Show edit-contact menu entry, default=1.
+      manual_dial          : 1,   ///< Show manual-dial menu entry, default=1.
+      radio_check          : 1,   ///< Show radio-check menu entry, default=1.
+      remote_monitor       : 1;   ///< Show remote-monitor menu entry, default=1.
+
+    // Byte 2
+    uint8_t radio_enable   : 1,   ///< Show radio-enable menu entry, default=1.
+      radio_disable        : 1,   ///< Show radio-disable menu entry, default=1.
+      prog_passwd          : 1,   ///< Show programming-password menu entry, default=1.
+      talkaround           : 1,   ///< Show talkaround menu entry, default=1.
+      tone                 : 1,   ///< Show tone menu entry, default=1.
+      power                : 1,   ///< Show power-settings menu entry, default=1.
+      backlight            : 1,   ///< Show backlight menu entry, default=1.
+      introscreen          : 1;   ///< Show intro-screen menu entry, default=1.
+
+    // Byte 3
+    uint8_t keypadlock     : 1,   ///< Show key-pad lock menu entry, default=1.
+      led_indicator        : 1,   ///< Show LED indicator menu entry, default=1.
+      squelch              : 1,   ///< Show squelch menu entry, default=1.
+      privacy              : 1,   ///< Show privacy settings menu entry, default=1.
+      vox                  : 1,   ///< Show VOX menu entry, default=1.
+      passwd_lock          : 1,   ///< Show password and lock menu entry, default=1.
+      missed_calls         : 1,   ///< Show missed calles menu entry, default=1.
+      answered_calls       : 1;   ///< Show answered calls menu entry, default=1.
+
+    // Byte 4
+    uint8_t outgoing_calls : 1,   ///< Show outgoing calls menu entry, default=1.
+      ch_display_mode      : 1,   ///< Show channel display mode menu entry, default=1.
+      dbl_standby          : 1,   ///< Show double-standby (dual-watch) menu entry, default=1.
+      _unknown4_3          : 1,   ///< Unknown set to 0.
+      _unknown4_4          : 1,   ///< Unknown set to 0.
+      _unknown4_5          : 1,   ///< Unknown set to 1.
+      _unknown4_6          : 1,   ///< Unknown set to 1.
+      _unknown4_7          : 1;   ///< Unknown set to 1.
+
+    // Byte 5
+    uint8_t  _unknown5;           ///< Unknown set to 0xff.
+
+    // Byte 6
+    uint8_t key_lock_time  : 2,   ///< Keypad auto-lock time, 0=manual, 1=5s, 2=10s, 3=15s, default=manual.
+      backlight_time       : 2,   ///< Backlight on-time, 0=always, 1=5s, 2=10s, 3=15s, default=15s.
+      _unknown6_4          : 2,   ///< Unknown, default=0.
+      channel_display      : 2;   ///< Channel display type, 0=number, 1=name, 2=frequency, default=name.
+
+    // Byte 7
+    uint8_t  _unknown7_0   : 4,   ///< Unknown set to 0.
+      _unknown7_4          : 1,   ///< Unknown set to 1.
+      keytone              : 1,   ///< Enable key-tone, default=0.
+      double_wait          : 2;   ///< Double-wait (dual-watch) mode. 1=Double/Double, 2=Double/Single.
+  } menu_settings_t;
+
+  /** Represents the boot settings within the binary codeplug. */
+  typedef struct __attribute__((packed)) {
+    uint8_t boot_text;                  ///< Shows intro lines at boot (see @c RD5RCodeplug::intro_text_t), 0=image, 1=text, default=1.
+    uint8_t boot_password_enabled;      ///< Enables to boot-password, 0=disabled, 1=enabled, default=0.
+    uint8_t _unknown2;                  ///< Unkown, set to 0.
+    uint8_t _unknown3;                  ///< Unkown, set to 0.
+    uint8_t password[3];                ///< Boot password 6 x BCD number.
+    uint8_t _unknown7;                  ///< Unkown, set to 0.
+    uint8_t empty[24];                  ///< Unkown (boot image?), set to 0.
+  } boot_settings_t;
 
 	/** Represents the intro messages within the codeplug. */
 	typedef struct __attribute__((packed)) {
