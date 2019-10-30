@@ -35,12 +35,6 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
     return -1;
   }
 
-  QFile file(filename);
-  if (! file.open(QIODevice::WriteOnly)) {
-    qDebug() << "ERROR: Cannot open file" << filename;
-    return -1;
-  }
-
   Config config;
   radio->startDownload(&config, true);
 
@@ -50,8 +44,11 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   }
 
   if (parser.isSet("csv") || (filename.endsWith(".conf") || filename.endsWith(".csv"))) {
-    qDebug() << "BUG: CSV dump not implemented yet.";
-    return -1;
+    if (! config.writeCSV(filename)) {
+      qDebug() << "Cannot write CSV file" << filename;
+      return -1;
+    }
+    return 0;
   }
 
   radio->codeplug().write(filename);

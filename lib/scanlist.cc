@@ -65,7 +65,6 @@ ScanList::addChannel(Channel *channel) {
     return false;
   int idx = _channels.size();
   beginInsertRows(QModelIndex(), idx, idx);
-  channel->setParent(this);
   connect(channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
   _channels.append(channel);
   endInsertRows();

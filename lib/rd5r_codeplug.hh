@@ -40,18 +40,22 @@ class RXGroupList;
  *  <tr><th colspan="4">First segment 0x00080-0x07c00</th></tr>
  *  <tr><td>0x00080</td> <td>0x00088</td> <td>0x0008</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x00088</td> <td>0x0008e</td> <td>0x0006</td> <td>Timestamp, see @c RD5RCodeplug::timestamp_t.</td></tr>
- *  <tr><td>0x0008e</td> <td>0x000e0</td> <td>0x0052</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x000e0</td> <td>0x000ec</td> <td>0x000c</td> <td>General settings, see @c RD5RCodeplug::general_settings_t.</td></tr>
- *  <tr><td>0x000ec</td> <td>0x00128</td> <td>0x003c</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x00128</td> <td>0x01370</td> <td>0x1248</td> <td>32 preset message texts, see @c RD5RCodeplug::msgtab_t</td></tr>
- *  <tr><td>0x01370</td> <td>0x01788</td> <td>0x0418</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x01788</td> <td>0x02f88</td> <td>0x1800</td> <td>256 contacts, see @c RD5RCodeplug::contact_t</td></tr>
- *  <tr><td>0x02f88</td> <td>0x03738</td> <td>0x07f8</td> <td>??? DTMF Contacts ???</td></tr>
- *  <tr><td>0x03738</td> <td>0x03780</td> <td></td> <td>??? DTMF Contacts ???</td></tr>
- *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c RD5RCodeplug::bank_t</td></tr>
+ *  <tr><td>0x0008e</td> <td>0x000e0</td> <td>0x0052</td> <td>CPS, firmware, DSP version numbers (not touched).</td></tr>
+ *  <tr><td>0x000e0</td> <td>0x00108</td> <td>0x0028</td> <td>General settings, see @c RD5RCodeplug::general_settings_t.</td></tr>
+ *  <tr><td>0x00108</td> <td>0x00128</td> <td>0x0020</td> <td>Button settings, see @c RD5RCodeplug::button_settings_t.</td></tr>
+ *  <tr><td>0x00128</td> <td>0x01370</td> <td>0x1248</td> <td>32 preset message texts, see @c RD5RCodeplug::msgtab_t.</td></tr>
+ *  <tr><td>0x01370</td> <td>0x01588</td> <td>0x0218</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x01588</td> <td>0x01788</td> <td>0x0200</td> <td>??? 32 Emergency systems ???</td></tr>
+ *  <tr><td>0x01788</td> <td>0x02f88</td> <td>0x1800</td> <td>256 contacts, see @c RD5RCodeplug::contact_t.</td></tr>
+ *  <tr><td>0x02f88</td> <td>0x03388</td> <td>0x0400</td> <td>32 DTMF contacts, see @c RD5RCodeplug::dtmf_contact_t.</td></tr>
+ *  <tr><td>0x03388</td> <td>0x03780</td> <td>0x03f8</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c RD5RCodeplug::bank_t.</td></tr>
  *  <tr><td>0x05390</td> <td>0x07540</td> <td>0x21b0</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x07540</td> <td>0x07560</td> <td>0x0020</td> <td>2 intro lines, @c RD5RCodeplug::intro_text_t</td></tr>
- *  <tr><td>0x07560</td> <td>0x07c00</td> <td>0x06a0</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x07540</td> <td>0x07560</td> <td>0x0020</td> <td>2 intro lines, @c RD5RCodeplug::intro_text_t.</td></tr>
+ *  <tr><td>0x07560</td> <td>0x07590</td> <td>0x0030</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x07590</td> <td>0x07600</td> <td>0x0070</td> <td>VFO settings, see @c RD5RCodeplug::vfo_settings_t.</td></tr>
+ *  <tr><td>0x07600</td> <td>0x07c00</td> <td>0x0600</td> <td>??? Unknown ???</td></tr>
+ *
  *  <tr><th colspan="4">Second segment 0x08000-0x1e300</th></tr>
  *  <tr><td>0x08000</td> <td>0x08010</td> <td>0x0010</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x08010</td> <td>0x0af10</td> <td>0x2f00</td> <td>250 zones, see @c RD5RCodeplug::zonetab_t</td></tr>
@@ -70,6 +74,7 @@ class RD5RCodeplug : public CodePlug
 public:
   static const int NCHAN     = 1024;   ///< Defines the number of channels.
   static const int NCONTACTS = 256;    ///< Defines the number of contacts.
+  static const int NDTMF     = 32;     ///< Defines the number of DTMF contacts.
   static const int NZONES    = 250;    ///< Defines the number of zones.
   static const int NGLISTS   = 64;     ///< Defines the number of RX group lists.
   static const int NSCANL    = 250;    ///< Defines the number of scanlists.
@@ -143,7 +148,7 @@ public:
     uint8_t emergency_system_index;     ///< Emergency system index+1, 0=None.
     uint16_t contact_name_index;        ///< Transmit contact index+1.
     // Byte 48
-    uint8_t _unused48         : 6,      ///< Unknonw set to 0.
+    uint8_t _unused48_0       : 6,      ///< Unknown, set to 0.
       emergency_alarm_ack     : 1,      ///< Emergency alarm ACK.
       data_call_conf          : 1;      ///< Data call confirmed.
     // Byte 49
@@ -162,7 +167,7 @@ public:
     uint8_t _unused51_0       : 1,      ///< Unknown set to 0.
       bandwidth               : 1,      ///< Bandwidth 12.5 or 25 kHz.
       rx_only                 : 1,      ///< RX only enable.
-      talkaround              : 1,      ///< Allow talkaround.
+      talkaround              : 1,      ///< Allow talkaround, default 1.
       _unused51_4             : 2,      ///< Unknown 0.
       vox                     : 1,      ///< VOX Enable.
       power                   : 1;      ///< Power Low or High.
@@ -211,6 +216,12 @@ public:
     /** The actual 128 channels. */
 		channel_t chan[128];
 	} bank_t;
+
+  /** Binary codeplug representation of VFO settings. */
+  typedef struct __attribute__((packed)) {
+    channel_t vfo_a;
+    channel_t vfo_b;
+  } vfo_settings_t;
 
 	/** Specific codeplug representation of a DMR contact. */
 	typedef struct __attribute__((packed)) {
@@ -395,10 +406,72 @@ public:
 
 	/** Represents the general settings within the codeplug. */
 	typedef struct __attribute__((packed)) {
-    // Bytes e0-e7
-    uint8_t radio_name[8];        ///< The radio name in ASCII, 0xff terminated.
-    // Bytes e8-eb
-    uint8_t radio_id[4];          ///< The radio DMR ID in BCD.
+    typedef enum {
+      OPEN_SQUELCH = 0,
+      SILENT_MONITOR = 1
+    } MonitorType;
+
+    typedef enum {
+      ARTS_DISABLED = 0,
+      ARTS_ONCE     = 4,
+      ARTS_ALWAYS   = 8
+    } ARTSTone;
+
+    typedef enum {
+      SCANMODE_TIME    = 0,
+      SCANMODE_CARRIER = 1,
+      SCANMODE_SEARCH  = 2
+    } ScanMode;
+
+    uint8_t radio_name[8];         ///< The radio name in ASCII, 0xff terminated.
+    uint8_t radio_id[4];           ///< The radio DMR ID in BCD.
+
+    uint32_t _reserved12;          ///< Reserved, set to 0x00000000.
+    uint8_t _reserved16;           ///< Unknown, set to 0x00.
+
+    uint8_t tx_preamble;           ///< TX preamble duration in 60ms steps 0=0ms, 1=60ms, default=360ms (0x06).
+    uint8_t monitor_type;          ///< Monitor type, 0x00 = open squelch, 0x01 = silent.
+    uint8_t vox_sensitivity;       ///< VOX sensitivity [1,10], default 0x03.
+    uint8_t lowbat_intervall;      ///< Low-battery interfvall in 5sec setps, 0=0s, 1=5s, default 30s (0x06).
+    uint8_t call_alert_dur;        ///< Call-alert tone duration in 5sec steps, 0=infinity, 1=5s, etc, default 0x18=120s.
+    uint8_t lone_worker_response;  ///< Lone-worker response timer in minutes [1,255], default 1.
+    uint8_t lone_worker_reminder;  ///< Lone-worker reminder timer in seconds [1,255], default 10.
+    uint8_t talkaround_grp_hang;   ///< Talkaround group-call hang-time in 500ms setps 0=0ms, 1=500ms, default=3000ms (0x06).
+    uint8_t talkaround_priv_hang;  ///< Talkaround private-call hang-time in 500ms setps 0=0ms, 1=500ms, default=3000ms (0x06).
+
+    uint8_t downch_mode_vfo: 1,    ///< Down-channel mode=VFO, default 0.
+      upch_mode_vfo        : 1,    ///< Up-channel mode=VFO, default 0.
+      reset_tone           : 1,    ///< Reset tone, default 0.
+      unknown_number_tone  : 1,    ///< Unknown number tone, default 0.
+      arts_tone            : 4;    ///< ARTS tone, 0x0=disabled, 0x4=once, 0x8=always, default=once.
+
+    uint8_t permit_digital : 1,     ///< Talk permit tone digital, default=0.
+      permit_ananlog       : 1,     ///< Talk permit tone ananlog, default=0.
+      selftest_tone        : 1,     ///< Self-test pass tone, default=1.
+      freq_ind_tone        : 1,     ///< Channel frequency indication tone, default=0 (off).
+      _reserved27_4        : 1,     ///< Unknown, set to 0.
+      disable_all_tones    : 1,     ///< Disables all tones, default 0.
+      savebat_receive      : 1,     ///< Save battery by disable receive, default=1.
+      savebet_preamble     : 1;     ///< Save battery by disable preamble, default=1.
+
+    uint8_t _reserved28_0  : 5,     ///< Unknown, set to 0b00000.
+      disable_all_leds     : 1,     ///< Disables all LEDs, default=0.
+      inh_quickkey_ovr     : 1,     ///< Inhibit quick-key override, default=0.
+      _unknown38_7         : 1;     ///< Unknown, set to 1.
+
+    uint8_t tx_exit_tone   : 4,     ///< TX exit tone, 0x0=off, 0x8=on, default off.
+      dblwait_tx_active    : 1,     ///< Always TX on active channel on double-wait, not selected, default=1.
+      animation            : 1,     ///< Enable animation, default 0.
+      scan_mode            : 2;     ///< Scan mode 0b00=time, 0b01=carrier, 0b10=search, default time.
+
+    uint8_t repeater_end_delay : 4, ///< Repeater-end delay [0,10], default 0.
+      repeater_ste             : 4; ///< Repeater STE [0,10], default 0.
+
+    uint8_t _reserved31;            ///< Unknown, set to 0x00.
+    uint8_t prog_password[8];       ///< Programming password, 8 x ASCII 0xff terminated.
+
+    void clear();
+    void initDefault();
 
     /** Returns the name of the radio. */
     QString getName() const;
@@ -410,6 +483,56 @@ public:
     /** Sets the DMR ID of the radio. */
     void setRadioId(uint32_t num);
 	} general_settings_t;
+
+  /** Represents the button settings. */
+  typedef struct __attribute__((packed)) {
+    /** Possible actions for each button on short and long press. */
+    typedef enum {
+      None                   = 0x00,  ///< Disables button.
+      ToggleAllAlertTones    = 0x01,
+      EmergencyOn            = 0x02,
+      EmergencyOff           = 0x03,
+      ToggleMonitor          = 0x05,  ///< Toggle monitor on channel.
+      NuiaceDelete           = 0x06,
+      OneTouch1              = 0x07,  ///< Performs the first of 6 user-programmable actions (call, message).
+      OneTouch2              = 0x08,  ///< Performs the second of 6 user-programmable actions (call, message).
+      OneTouch3              = 0x09,  ///< Performs the third of 6 user-programmable actions (call, message).
+      OneTouch4              = 0x0a,  ///< Performs the fourth of 6 user-programmable actions (call, message).
+      OneTouch5              = 0x0b,  ///< Performs the fifth of 6 user-programmable actions (call, message).
+      OneTouch6              = 0x0c,  ///< Performs the sixt of 6 user-programmable actions (call, message).
+      ToggleRepeatTalkaround = 0x0d,
+      ToggleScan             = 0x0e,
+      TogglePrivacy          = 0x10,
+      ToggleVox              = 0x11,
+      ZoneSelect             = 0x12,
+      BatteryIndicator       = 0x13,
+      ToggleLoneWorker       = 0x14,
+      PhoneExit              = 0x16,
+      ToggleFlashLight       = 0x1a,
+      ToggleFMRadio          = 0x1b
+    } ButtonEvent;
+
+    /** Binary representation of one-touch actions (calls & messages). */
+    typedef struct __attribute__((packed)) {
+      uint8_t type;               ///< Specifies the type of the action, 0x00=disabled, 0x10 = digital call, 0x11 = digital message, 0x20 = analog call.
+      uint16_t contact_idx;       ///< Specifies the contact index, 0x00=none or index+1.
+      uint8_t message_idx;        ///< Specifies the message index, 0x00=none, index+1 or 0xff if call.
+      void clear();
+    } one_touch_t;
+
+    uint8_t  _unknown0;           ///< Unknown set to 0x01.
+    uint8_t  long_press_dur;      ///< Specifies the duration for a long-press in 250ms [4,16], default=6 (1500ms).
+    uint8_t  sk1_short;           ///< Event on short-press on SK1.
+    uint8_t  sk1_long;            ///< Event on long-press on SK1.
+    uint8_t  sk2_short;           ///< Event on short-press on SK2.
+    uint8_t  sk2_long;            ///< Event on long-press on SK2.
+    uint8_t  _unknown6;           ///< Unknown set to 0x13.
+    uint8_t  _unknown7;           ///< Unknown set to 0x11.
+    one_touch_t one_touch[6];     ///< 6 x one-touch actions.
+
+    void clear();
+    void initDefault();
+  } button_settings_t;
 
 	/** Represents the intro messages within the codeplug. */
 	typedef struct __attribute__((packed)) {

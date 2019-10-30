@@ -63,8 +63,7 @@ RD5R::codeplug() {
 
 bool
 RD5R::startDownload(Config *config, bool blocking) {
-  _config = config;
-  if (!_config)
+  if (nullptr == (_config = config))
     return false;
 
   _dev = new HID(0x15a2, 0x0073);
@@ -84,10 +83,31 @@ RD5R::startDownload(Config *config, bool blocking) {
     run();
     return (StatusIdle == _task);
   }
+
   start();
   return true;
 }
 
+bool
+RD5R::startUpload(Config *config, bool blocking) {
+  _config = config;
+  if (!_config)
+    return false;
+
+  _dev = new HID(0x15a2, 0x0073);
+  if (!_dev->isOpen()) {
+    _dev->deleteLater();
+    return false;
+  }
+
+  _task = StatusUpload;
+  if (blocking) {
+    run();
+    return (StatusIdle == _task);
+  }
+  start();
+  return true;
+}
 
 void
 RD5R::run()
@@ -152,7 +172,17 @@ RD5R::run()
     }
 
     // Send encode config into codeplug
-    _codeplug.encode(_config);
+    if (! _codeplug.encode(_config)) {
+      _errorMessage = QString("%1(): Upload failed: %2")
+          .arg(__func__).arg(_codeplug.errorMessage());
+      qDebug() << _errorMessage;
+      _task = StatusError;
+      _dev->read_finish();
+      _dev->close();
+      _dev->deleteLater();
+      emit uploadError(this);
+      return;
+    }
 
     // then, upload modified codeplug
     bcount = 0;
@@ -186,30 +216,12 @@ RD5R::run()
 
 void
 RD5R::onDonwloadFinished() {
-  /*if (_codeplug.decode(_config))
+  if (_codeplug.decode(_config)) {
     emit downloadComplete(this, _config);
-  else
+  } else {
+    _errorMessage = QString("%1(): Download failed: %2")
+        .arg(__func__).arg(_codeplug.errorMessage());
     emit downloadError(this);
-  _config = nullptr; */
-}
-
-bool
-RD5R::startUpload(Config *config, bool blocking) {
-  _config = config;
-  if (!_config)
-    return false;
-
-  _dev = new HID(0x15a2, 0x0073);
-  if (!_dev->isOpen()) {
-    _dev->deleteLater();
-    return false;
   }
-
-  _task = StatusUpload;
-  if (blocking) {
-    run();
-    return (StatusIdle == _task);
-  }
-  start();
-  return true;
+  _config = nullptr;
 }

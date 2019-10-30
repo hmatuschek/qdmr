@@ -78,8 +78,6 @@ HIDevice::isOpen() const {
 bool
 HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned char *rdata, unsigned rlength)
 {
-  qDebug() << __func__ << ": Send" << nbytes << "bytes and receive up to" << rlength << "bytes from HID.";
-
   unsigned char buf[42];
   unsigned k;
   IOReturn result;
@@ -99,6 +97,7 @@ HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned cha
   _nbytes_received = 0;
   memset(_receive_buf, 0, sizeof(_receive_buf));
 
+  uint retrycount = 0;
 again:
   // Write to HID device.
   result = IOHIDDeviceSetReport(_dev, kIOHIDReportTypeOutput, 0, buf, sizeof(buf));
@@ -113,11 +112,14 @@ again:
     usleep(100);
     CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, 0);
     if (k >= 1000) {
-      qDebug() << __FILE__ << "," << __LINE__ << "in" << __func__
-               << ": No reply received -> retry.";
-      goto again;
+      retrycount++;
+      if (retrycount<100)
+        goto again;
+      _errorMessage = QString("%1(): HID IO error: Exceeded max. retry count.").arg(__func__);
+      return false;
     }
   }
+  usleep(100);
 
   if (_nbytes_received != sizeof(_receive_buf)) {
     _errorMessage = QString("%1(): Short read: %2 bytes instead of %3!").arg(__func__).arg(result)

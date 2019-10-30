@@ -151,28 +151,22 @@ UV390Codeplug::channel_t::setName(const QString &n) {
 
 float
 UV390Codeplug::channel_t::getRXTone() const {
-  ///@bug Impement CTCSS/DCS for UV380.
-  return 0;
+  return decode_ctcss_tone(ctcss_dcs_receive);
 }
 
 void
 UV390Codeplug::channel_t::setRXTone(float freq) {
-  Q_UNUSED(freq);
-  ctcss_dcs_receive = 0xffff;
-  ///@bug Impement CTCSS/DCS for UV380.
+  ctcss_dcs_receive = encode_ctcss_tone(freq);
 }
 
 float
 UV390Codeplug::channel_t::getTXTone() const {
-  ///@bug Impement CTCSS/DCS for UV380.
-  return 0;
+  return decode_ctcss_tone(ctcss_dcs_transmit);
 }
 
 void
 UV390Codeplug::channel_t::setTXTone(float freq)  {
-  Q_UNUSED(freq);
-  ctcss_dcs_transmit = 0xffff;
-  ///@bug Impement CTCSS/DCS for UV380.
+  ctcss_dcs_transmit = encode_ctcss_tone(freq);
 }
 
 Channel *
@@ -766,14 +760,16 @@ UV390Codeplug::general_settings_t::fromConfigObj(const Config *conf) {
 UV390Codeplug::UV390Codeplug(QObject *parent)
   : CodePlug(parent)
 {
-  addImage("TYT UV390 Codeplug");
+  addImage("TYT MD-UV390 Codeplug");
   image(0).addElement(0x002800, 0x3e000);
   image(0).addElement(0x110800, 0x90000);
 }
 
 bool
 UV390Codeplug::encode(Config *config) {
+  // Some unused memory sections
   memset(data(0x00280c),0xff,52);
+
   // General config
   general_settings_t *genset = (general_settings_t *)(data(OFFSET_SETTINGS));
   genset->fromConfigObj(config);

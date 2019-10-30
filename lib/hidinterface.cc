@@ -102,7 +102,7 @@ HID::read_block(int bno, unsigned char *data, int nbytes)
     cmd[2] = addr + n;
     cmd[3] = 32;
     if (! hid_send_recv(cmd, 4, reply, sizeof(reply)))
-      n-=32;  // retry that block
+      return false;
     else
       memcpy(data + n, reply + 4, 32);
   }
@@ -148,7 +148,7 @@ HID::write_block(int bno, unsigned char *data, int nbytes)
     cmd[3] = 32;
     memcpy(cmd + 4, data + n, 32);
     if (! hid_send_recv(cmd, 4+32, &ack, 1))
-      n -= 32; // retry
+      return false;
     else if (ack != CMD_ACK[0]) {
       _errorMessage = tr("%1: Cannot write block: Wrong acknowledge %2, expected %3.")
           .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);

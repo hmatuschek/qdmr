@@ -8,6 +8,7 @@
 
 #define OFFSET_TIMESTMP     0x00088
 #define OFFSET_SETTINGS     0x000e0
+#define OFFSET_BUTTONS      0x00108
 #define OFFSET_MSGTAB       0x00128
 #define OFFSET_CONTACTS     0x01788
 #define OFFSET_DTMF         0x02f80
@@ -33,30 +34,30 @@ RD5RCodeplug::channel_t::isValid() const {
 void
 RD5RCodeplug::channel_t::clear() {
   memset(name, 0xff, 16);
-  _unused25 = 0;
-  _unused30 = 0x50;
-  _unused36 = 0;
-  tx_signaling_syst = 0;
-  _unused38 = 0;
-  rx_signaling_syst = 0;
-  _unused40 = 0x16;
-  privacy_group = 0;
+  _unused25              = 0;
+  _unused30              = 0x50;
+  _unused36              = 0;
+  tx_signaling_syst      = 0;
+  _unused38              = 0;
+  rx_signaling_syst      = 0;
+  _unused40              = 0x16;
+  privacy_group          = 0;
   emergency_system_index = 0;
-  _unused48 = 0;
-  emergency_alarm_ack = 0;
-  data_call_conf = 0;
-  private_call_conf = 1;
-  _unused49_1 = 0;
-  privacy = 0;
-  _unused49_5 = 0;
-  _unused49_7 = 0;
-  dcdm = 0;
-  _unused50_1 = 0;
-  _unused50_6 = 0;
-  _unused51_0 = 0;
-  talkaround = 1;
-  _unused51_4 = 0;
-  vox = 0;
+  _unused48_0            = 0;
+  emergency_alarm_ack    = 0;
+  data_call_conf         = 0;
+  private_call_conf      = 1;
+  _unused49_1            = 0;
+  privacy                = 0;
+  _unused49_5            = 0;
+  _unused49_7            = 0;
+  dcdm                   = 0;
+  _unused50_1            = 0;
+  _unused50_6            = 0;
+  _unused51_0            = 0;
+  talkaround             = 1;
+  _unused51_4            = 0;
+  vox                    = 0;
   memset(_unused52, 0, 3);
 
 }
@@ -258,9 +259,9 @@ RD5RCodeplug::contact_t::fromContactObj(const DigitalContact *cont, const Config
   setName(cont->name());
   setId(cont->number());
   switch (cont->type()) {
-    case DigitalContact::PrivateCall: type = CALL_PRIVATE;
-    case DigitalContact::GroupCall: type = CALL_GROUP;
-    case DigitalContact::AllCall: type = CALL_ALL;
+    case DigitalContact::PrivateCall: type = CALL_PRIVATE; break;
+    case DigitalContact::GroupCall:   type = CALL_GROUP; break;
+    case DigitalContact::AllCall:     type = CALL_ALL; break;
   }
   if (cont->rxTone())
     receive_tone = ring_style = 1;
@@ -493,6 +494,63 @@ RD5RCodeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *con
 /* ******************************************************************************************** *
  * Implementation of RD5RCodeplug::general_settings_t
  * ******************************************************************************************** */
+void
+RD5RCodeplug::general_settings_t::clear() {
+  memset(radio_name, 0xff, 8);
+  memset(radio_id, 0x00, 4);
+  _reserved12   = 0;
+  _reserved16   = 0;
+  _reserved27_4 = 0;
+  _reserved28_0 = 0;
+  _unknown38_7  = 1;
+  _reserved31   = 0;
+  memset(prog_password, 0xff, 8);
+}
+
+void
+RD5RCodeplug::general_settings_t::initDefault() {
+  clear();
+  tx_preamble          = 6;
+  monitor_type         = OPEN_SQUELCH; // 0x00
+  vox_sensitivity      = 3;
+  lowbat_intervall     = 6;
+  call_alert_dur       = 24; // 0x18
+  lone_worker_response = 1;
+  lone_worker_reminder = 10; //0x0a
+  talkaround_grp_hang  = 6;
+  talkaround_priv_hang = 6;
+
+  // default value 0x40
+  downch_mode_vfo      = 0;
+  upch_mode_vfo        = 0;
+  reset_tone           = 0;
+  unknown_number_tone  = 0;
+  arts_tone            = 4;
+
+  // default value 0xc4
+  permit_digital       = 0;
+  permit_ananlog       = 0;
+  selftest_tone        = 1;
+  freq_ind_tone        = 0;
+  disable_all_tones    = 0;
+  savebat_receive      = 1;
+  savebet_preamble     = 1;
+
+  // default value 0x80
+  disable_all_leds     = 0;
+  inh_quickkey_ovr     = 0;
+
+  // default value 0x10
+  tx_exit_tone         = 0;
+  dblwait_tx_active    = 1;
+  animation            = 0;
+  scan_mode            = SCANMODE_TIME;
+
+  // default value 0x00
+  repeater_end_delay   = 0;
+  repeater_ste         = 0;
+}
+
 QString
 RD5RCodeplug::general_settings_t::getName() const {
   return decode_ascii(radio_name, 8, 0xff);
@@ -509,6 +567,33 @@ RD5RCodeplug::general_settings_t::getRadioId() const {
 void
 RD5RCodeplug::general_settings_t::setRadioId(uint32_t num) {
   encode_dmr_id_bcd(radio_id, num);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of RD5RCodeplug::button_settings_t
+ * ******************************************************************************************** */
+void
+RD5RCodeplug::button_settings_t::clear() {
+  _unknown0      = 0x01;
+  long_press_dur = 0x06;
+  sk1_short      = 0x00;
+  sk1_long       = 0x00;
+  sk2_short      = 0x00;
+  sk2_short      = 0x00;
+  _unknown6      = 0x13;
+  _unknown7      = 0x11;
+  memset(one_touch, 0xff, 6*sizeof(one_touch_t));
+}
+
+void
+RD5RCodeplug::button_settings_t::initDefault() {
+  clear();
+  long_press_dur = 0x06;
+  sk1_short      = 0x00;
+  sk1_long       = 0x00;
+  sk2_short      = 0x00;
+  sk2_short      = 0x00;
 }
 
 
@@ -638,7 +723,7 @@ RD5RCodeplug::decode(Config *config)
     if (! ct->isValid())
       continue;
     if (DigitalContact *cont = ct->toContactObj()) {
-      config->contacts()->addContact(ct->toContactObj());
+      config->contacts()->addContact(cont);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid contact at index %2.")
           .arg(__func__).arg(i);
@@ -646,9 +731,27 @@ RD5RCodeplug::decode(Config *config)
     }
   }
 
-  /*
-   * Unpack RX Group Lists
-   */
+  /* Unpack DTMF Contacts */
+  for (int i=0; i<NDTMF; i++) {
+    dtmf_contact_t *ct = (dtmf_contact_t *) data(OFFSET_DTMF+i*sizeof(dtmf_contact_t));
+    if (nullptr == ct) {
+      _errorMessage = QString("%1(): Cannot access DTMF contact memory at index %2!")
+          .arg(__func__).arg(i);
+      return false;
+    }
+    // If contact is disabled
+    if (! ct->isValid())
+      continue;
+    if (DTMFContact *cont = ct->toContactObj()) {
+      config->contacts()->addContact(cont);
+    } else {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Invalid DTMF contact at index %2.")
+          .arg(__func__).arg(i);
+      return false;
+    }
+  }
+
+  /* Unpack RX Group Lists */
   for (int i=0; i<NGLISTS; i++) {
     grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB);
     if (nullptr == gt) {
@@ -803,6 +906,24 @@ RD5RCodeplug::decode(Config *config)
 bool
 RD5RCodeplug::encode(Config *config)
 {
+  // set timestamp
+  timestamp_t *ts = (timestamp_t *)data(OFFSET_TIMESTMP);
+  ts->setNow();
+
+  // pack basic config
+  general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
+  gs->initDefault();
+  gs->setName(config->name());
+  gs->setRadioId(config->id());
+
+  // store default button settings
+  button_settings_t *bs = (button_settings_t *)data(OFFSET_BUTTONS);
+  bs->initDefault();
+
+  intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
+  it->setIntroLine1(config->introLine1());
+  it->setIntroLine2(config->introLine2());
+
   // Pack channels
   for (int i=0; i<NCHAN; i++) {
     // First, get bank
@@ -884,6 +1005,15 @@ next:
     ct->fromContactObj(config->contacts()->digitalContact(i), config);
   }
 
+  // Pack DTMF contacts
+  for (int i=0; i<NDTMF; i++) {
+    dtmf_contact_t *ct = (dtmf_contact_t*) data(OFFSET_DTMF + (i)*sizeof(dtmf_contact_t));
+    ct->clear();
+    if (i >= config->contacts()->dtmfCount())
+      continue;
+    ct->fromContactObj(config->contacts()->dtmfContact(i), config);
+  }
+
   // Pack Grouplists:
   for (int i=0; i<NGLISTS; i++) {
     grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB);
@@ -905,14 +1035,6 @@ next:
       gl->member[j] = config->contacts()->indexOf(config->rxGroupLists()->list(i)->contact(j))+1;
     gt->nitems1[i] = std::min(15,config->rxGroupLists()->list(i)->count()) + 1;
   }
-
-  // Pack basic config
-  general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
-  gs->setName(config->name());
-  gs->setRadioId(config->id());
-  intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
-  it->setIntroLine1(config->introLine1());
-  it->setIntroLine2(config->introLine2());
 
   return true;
 }

@@ -181,7 +181,7 @@ encode_ctcss_tone(float hz)
     if (CTCSS_TONES[i] == val)
       break;
   if (i >= NCTCSS)
-    return -1;
+    return 0xffff;
 
   a = val / 1000;
   b = val / 100 % 10;
