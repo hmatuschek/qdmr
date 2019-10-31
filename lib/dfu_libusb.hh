@@ -15,6 +15,7 @@ class DFUDevice: public QObject, public RadioInterface
 {
 	Q_OBJECT
 
+private:
   /** Current status. */
 	typedef struct {
 		unsigned  status       : 8;
@@ -29,8 +30,8 @@ public:
   /** Destructor. */
 	virtual ~DFUDevice();
 
-	bool isOpen() const { return nullptr != _ident; }
-	QString identifier() { return _ident; }
+	bool isOpen() const;
+	QString identifier();
 	void close();
 
   /** Erases a memory section from @c start to @c finish. */

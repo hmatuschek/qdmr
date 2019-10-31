@@ -54,7 +54,7 @@ UV390Codeplug::channel_t::clear() {
   _unused0_1 = _unused0_2 = 1;
   lone_worker = 0;
 
-  allow_talkaround = 0;
+  allow_talkaround = 1;
   rx_only = 0;
   time_slot = 1;
   color_code = 1;
@@ -82,7 +82,7 @@ UV390Codeplug::channel_t::clear() {
 
   contact_name_index = 0;
 
-  tot = 4;
+  tot = 0;
   _unused8_6 = 0;
   tot_rekey_delay = 0;
 
@@ -109,8 +109,8 @@ UV390Codeplug::channel_t::clear() {
   power = POWER_HIGH;
   _unused30_2 = 0b111111;
 
-  send_gps_info = 1;
-  recv_gsp_info = 1;
+  send_gps_info = 0;
+  recv_gsp_info = 0;
   allow_interrupt = 1;
   dcdm_switch_dis = 1;
   leader_ms = 1;
@@ -579,7 +579,7 @@ UV390Codeplug::general_settings_t::clear() {
   memset(_unused40, 0xff, sizeof(_unused40));
 
   _unused64_0 = 1;
-  disable_all_leds = 1;
+  disable_all_leds = 0;
   _unused64_3 = 1;
   monitor_type = 1;
   _unused64_6 = 1;
@@ -591,7 +591,7 @@ UV390Codeplug::general_settings_t::clear() {
   _unused65_3 = 1;
   ch_free_indication_tone = 1;
   pw_and_lock_enable = 1;
-  talk_permit_tone = 0;
+  talk_permit_tone = 1;
 
   _unused66_0 = 0;
   channel_voice_announce = 0;
@@ -607,7 +607,6 @@ UV390Codeplug::general_settings_t::clear() {
   mode_select_b = 1;
 
   memset(radio_id, 0, sizeof(radio_id));
-
   _unused71 = 0;
 
   tx_preamble_duration = 0x0a;

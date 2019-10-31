@@ -80,6 +80,16 @@ DFUDevice::~DFUDevice() {
     close();
 }
 
+bool
+DFUDevice::isOpen() const {
+  return nullptr != _ident;
+}
+
+QString
+DFUDevice::identifier() {
+  return _ident;
+}
+
 void
 DFUDevice::close() {
   if (isOpen()) {

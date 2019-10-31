@@ -131,7 +131,7 @@ protected:
 
 		// Byte 2
     uint8_t privacy_no       : 4,   ///< Privacy No. (+1): 1...16 ???, default=0
-      privacy                : 2,   ///< Privacy: None, Basic or Enhanced ???, default=0
+      privacy                : 2,   ///< Privacy: 0=None, 1=Basic or 2=Enhanced, default=0
       private_call_conf      : 1,   ///< Private Call Confirmed ???, default=0
       data_call_conf         : 1;   ///< Data Call Confirmed ???, default=0
 
@@ -406,7 +406,7 @@ protected:
 
     uint8_t  _unused64_0     : 1,         ///< Reserved = 0
       _unused64_1            : 1,         ///< Reserved = 1
-      disable_all_leds       : 1,         ///< Disable all LEDs: 1 = Off, 0 = On, default=1
+      disable_all_leds       : 1,         ///< Disable all LEDs: 1 = Off, 0 = On, default=0
       _unused64_3            : 1,         ///< Reserved = 1.
       monitor_type           : 1,         ///< Monitor type: 1 = Open Squelch, 0 = Silent, default=1
       _unused64_6            : 1,         ///< Reserved = 1.
@@ -418,7 +418,7 @@ protected:
       _unused65_3            : 1,         ///< Reserved = 1
       ch_free_indication_tone: 1,         ///< Ch. free indication tone: 0 = Enabled, 1 = Disabled, default=1
       pw_and_lock_enable     : 1,         ///< Password and lock enable: 0 = Enabled, 1 = Disabled, default=1
-      talk_permit_tone       : 2;         ///< Talk permit tone: 0=None, 1=Digital, 2=Analog, 3=Analog+Digital, default=0
+      talk_permit_tone       : 2;         ///< Talk permit tone: 0=None, 1=Digital, 2=Analog, 3=Analog+Digital, default=1
 
 
     uint8_t  _unused66_0     : 1,         ///< Reserved = 0
@@ -473,15 +473,15 @@ protected:
 
     uint16_t radio_name[16];              ///< Radio name 16-bit unicode., default=0x00
 
-    uint8_t  channel_hang_time;           ///< Channel hang time @ 0x22f5: x*100ms [0..70], default=0x1e
+    uint8_t  channel_hang_time;           ///< Channel hang time: x*100ms [0..70], default=0x1e
 
-    uint8_t  _unused145;                  ///< Unused @ 0x22f6 = 0xff.
+    uint8_t  _unused145;                  ///< Unused, set to 0xff.
 
-    uint8_t  _unused146_0        : 2,     ///< Unused = 0b11.
-      public_zone                : 1,     ///< Public zone: 1 = enabled, 0 = disabled, default=1
-      _unused146_4               : 5;     ///< Unused = 0b11111.
+    uint8_t  _unused146_0        : 2,     ///< Unused, set to 0b11.
+      public_zone                : 1,     ///< Public zone: 1 = enabled, 0 = disabled, default=1.
+      _unused146_4               : 5;     ///< Unused, set to 0b11111.
 
-    uint8_t  _unused147;                  ///< Unused @ 0x22f8 = 0xff
+    uint8_t  _unused147;                  ///< Unused, set to 0xff.
 
     uint8_t radio_id1[3];                 ///< Radio ID 1 @ 0x22f9, default=0x000001
     uint8_t _pad151;                      ///< Padding byte @ 0x22fc = 0x00
@@ -493,7 +493,7 @@ protected:
     uint8_t _pad159;                      ///< Padding byte @ 0x2304 = 0x00
 
     uint8_t _unused_160_0       : 3,      ///< Reserved = 0b111
-      mic_level                 : 3,      ///< Mic Level 0=1, 1=2, ..., 5=6 [0..5], default=0
+      mic_level                 : 3,      ///< Mic Level 0=1, 1=2, ..., 5=6 [0..5], default=2
       edit_radio_id             : 1,      ///< Edit Radio ID 0=Enable, 1=Disable, default=0
       _unused_160_7             : 1;      ///< Reserved @ 0x2305 = 1
 
@@ -578,11 +578,16 @@ protected:
   /** Represents a single GPS system within the codeplug.
    * @todo Verify layout and offset! */
   typedef struct __attribute__((packed)) {
-    uint16_t revert_channel;              ///< Revert channel index, 0=current.
+    uint16_t revert_channel;              ///< Revert channel index, 0=current, index+1.
     uint8_t  repeat_interval;             ///< Repeat interval x*30s, 0=off.
-    uint8_t  _unused_3;                   ///< Reserved =0xff.
-    uint16_t destination;                 ///< Destination contact index, 0=none.
+    uint8_t  _unused_3;                   ///< Reserved, set to 0xff.
+    uint16_t destination;                 ///< Destination contact index, 0=none or index+1.
     uint8_t  _unused_6[10];               ///< Padding all = 0xff
+
+    void clear();
+
+    uint repeatInterval() const;
+    void setRepeatInterval(uint interval);
   } gpssystem_t;
 
 	/** Represents an entry within the callsign database.
