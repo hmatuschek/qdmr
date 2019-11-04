@@ -1,0 +1,80 @@
+\documentclass[11pt, a4paper,parskip=half]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{graphics}
+\usepackage{subcaption}
+\usepackage{eurosym}
+\usepackage[ngerman]{babel}
+\usepackage{makeidx}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, filecolor=blue, urlcolor=blue}
+\urlstyle{same}
+
+
+\title{DMR -- Eine Einführung}
+\author{Hannes Matuschek, DM3MAT,\\\texttt{dm3mat [at] darc [dot] de}}
+\date{\today}
+
+\input{../fig/repeater}
+\newenvironment{merke}{\begin{quotation}}{\end{quotation}}   
+
+\newcommand{\adef}[1]{\emph{#1}\index{#1}}
+\newcommand{\aref}[1]{#1\index{#1}}
+
+\makeindex
+
+\begin{document}
+
+\begin{titlepage}
+ \maketitle
+ \begin{abstract}
+  Dieses Script soll eine Einführung in DMR (digital mobile radio) für den 
+  unbedarften Funkamateur oder jeden Interessierten sein. Ich versuche dem 
+  Leser Details solange zu verheimlichen, bis es absolut notwendig wird 
+  diese zu erklären. Die meisten
+  Einführungen in DMR, die ich bisher gesehen habe, sind eher eine lange Liste
+  von Begriffserklärungen, die ohne Erfahrung mit DMR schwer zu verstehen sind. 
+  
+  Viel der empfundenen Komplexität von DMR, rührt aus dem Ursprung dieser 
+  Technik. DMR wurde für den kommerziellen Funk auf Großveranstaltungen oder 
+  großen industriellen Anlagen entwickelt, auch 
+  \href{https://de.wikipedia.org/wiki/B\%C3\%BCndelfunk}{Bündelfunk} genannt. 
+  Ich werde daher damit beginnen wofür DMR entwickelt wurde und fange erst dann
+  an zu erklären wie DMR für den Amateurfunk eingesetzt wird.
+ \end{abstract}
+ \vfill
+ \tableofcontents
+\end{titlepage}
+
+\input{script_de_01_vorwissen}
+
+\input{script_de_02_ursprung}
+
+\input{script_de_03_simplex}
+
+\input{script_de_04_lokal}	
+
+\input{script_de_05_privatecall}
+
+\input{script_de_06_textmsg}
+
+\input{script_de_07_talkgroup}
+
+\input{script_de_08_aprs}
+
+\input{script_de_09_roaming}
+
+\input{script_de_10_netze}
+
+\input{script_de_11_technik}
+
+\input{script_de_12_codeplug}
+
+\appendix
+\printindex
+
+\end{document}

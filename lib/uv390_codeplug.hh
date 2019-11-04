@@ -50,7 +50,7 @@ class UV390Codeplug : public CodePlug
 
 protected:
   /** Represents a single channel (analog or digital) within the codeplug. */
-	typedef struct __attribute__((packed)) {
+	typedef struct {
     /** Possible channel modes. */
 		typedef enum {
 			MODE_ANALOG  = 1,             ///< Analog channel.
@@ -247,10 +247,10 @@ protected:
     bool linkChannelObj(Channel *c, Config *conf) const;
     /** Initializes this codeplug channel from the given generic configuration. */
     void fromChannelObj(const Channel *c, const Config *conf);
-	} channel_t;
+	} __attribute__((packed)) channel_t;
 
 	/** Represents a digital (DMR) contact within the codeplug. */
-	typedef struct __attribute__((packed)) {
+	typedef struct {
     /** Call types. */
 		typedef enum {
 			CALL_GROUP = 1,             ///< Group call.
@@ -287,12 +287,12 @@ protected:
     DigitalContact *toContactObj() const;
     /** Initializes this codeplug contact from the given generic @c DigitalContact. */
     void fromContactObj(const DigitalContact *obj, const Config *conf);
-	} contact_t;
+	} __attribute__((packed)) contact_t;
 
 	/** Represents a zone within the codeplug.
 	 * Please note that a zone consists of two structs the @c zone_t and the @c zone_ext_t.
 	 * The latter adds additional channels for VFO A and the channels for VFO B. */
-	typedef struct __attribute__((packed)) {
+	typedef struct {
     // Bytes 0-31
     uint16_t name[16];              ///< Zone Name (Unicode).
 
@@ -315,13 +315,13 @@ protected:
     bool linkZone(Zone *zone, Config *conf) const;
     /** Initializes this codeplug zone from the given generic zone. */
     void fromZoneObj(const Zone *zone, const Config *conf);
-	} zone_t;
+	} __attribute__((packed)) zone_t;
 
   /** Extended zone data.
    * The zone definition @c zone_t contains only a single set of 16 channels. For each zone
    * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each.
    * @todo Check whether @c ext_a and @c member_b are swapped! */
-	typedef struct __attribute__((packed)) {
+	typedef struct {
     // Bytes 0-95
     uint16_t ext_a[48];             ///< Member A: Channels 17...64, 0=empty/EOL
     // Bytes 96-223
@@ -334,10 +334,10 @@ protected:
     bool linkZone(Zone *zone, Config *conf) const;
     /** Initializes this zone extension from the given generic zone. */
     void fromZoneObj(const Zone *zone, const Config *conf);
-	} zone_ext_t;
+	} __attribute__((packed)) zone_ext_t;
 
 	/** Representation of an RX group list within the codeplug. */
-	typedef struct __attribute__((packed)) {
+	typedef struct {
     // Bytes 0-31
     uint16_t name[16];              ///< Group List Name (16 x 16bit Unicode)
     // Bytes 32-95
@@ -359,10 +359,10 @@ protected:
     bool linkRXGroupList(RXGroupList *obj, Config *conf) const;
     /** Initializes this codeplug group list from the given generic RX group list. */
     void fromRXGroupListObj(const RXGroupList *obj, const Config *conf);
-	} grouplist_t;
+	} __attribute__((packed)) grouplist_t;
 
 	/** Represents a scan list within the codeplug. */
-	typedef struct __attribute__((packed)) {
+	typedef struct {
     // Bytes 0-31
     uint16_t name[16];              ///< Scan List Name (16 x unicode), default=0
 
@@ -396,10 +396,10 @@ protected:
     bool linkScanListObj(ScanList *l, Config *conf) const;
     /** Initializes this codeplug scanlist from the given generic scanlist. */
     void fromScanListObj(const ScanList *l, const Config *conf);
-	} scanlist_t;
+	} __attribute__((packed)) scanlist_t;
 
 	/** Codeplug representation of the general settings. */
-	typedef struct __attribute__((packed)) {
+	typedef struct {
     uint16_t intro_line1[10];             ///< Intro line 1: 10 x 16bit unicode, default=0
     uint16_t intro_line2[10];             ///< Intro line 2: 10 x 16bit unicode, default=0
     uint8_t  _unused40[24];               ///< Reserved: 24 bytes 0xff.
@@ -531,10 +531,10 @@ protected:
     bool updateConfigObj(Config *conf) const;
     /** Updates this codeplug general settings from the generic configuration. */
     void fromConfigObj(const Config *conf);
-  } general_settings_t;
+  } __attribute__((packed)) general_settings_t;
 
   /** Represents a single message within the codeplug. */
-  typedef struct __attribute__((packed)) {
+  typedef struct {
     uint16_t text[144];                   ///< Message text (144 x 16bit Unicode), 0-terminated
 
     /** Returns @c true if the message is valid. */
@@ -554,10 +554,10 @@ protected:
       for (int i=0; (i<128) && (i<text.size()); i++)
         this->text[i] = text.at(i).unicode();
     }
-  } message_t;
+  } __attribute__((packed)) message_t;
 
   /** Codeplug representation of programming time-stamp and CPS version. */
-  typedef struct __attribute__((packed)) {
+  typedef struct {
     uint8_t _pad0;                       ///< Fixed 0xff
     uint8_t date[7];                     ///< YYYY-MM-DD hh:mm:ss as 14 BCD numbers.
     uint8_t cps_version[4];              ///< CPS version vv.vv, encoded using map "0123456789:;<=>?".
@@ -573,11 +573,11 @@ protected:
     void setTimestamp(const QDateTime &dt=QDateTime::currentDateTimeUtc());
     /** Returns the CSP version string. */
     QString cpsVersion() const;
-  } timestamp_t;
+  } __attribute__((packed)) timestamp_t;
 
   /** Represents a single GPS system within the codeplug.
    * @todo Verify layout and offset! */
-  typedef struct __attribute__((packed)) {
+  typedef struct {
     uint16_t revert_channel;              ///< Revert channel index, 0=current, index+1.
     uint8_t  repeat_interval;             ///< Repeat interval x*30s, 0=off.
     uint8_t  _unused_3;                   ///< Reserved, set to 0xff.
@@ -588,16 +588,16 @@ protected:
 
     uint repeatInterval() const;
     void setRepeatInterval(uint interval);
-  } gpssystem_t;
+  } __attribute__((packed)) gpssystem_t;
 
 	/** Represents an entry within the callsign database.
    * @todo Implement generic config representation for callsign database. */
-	typedef struct __attribute__((packed)) {
+	typedef struct {
     unsigned dmrid   : 24;      ///< DMR id in BCD
     unsigned _unused : 8;       ///< Unknown set to 0xff.
     char     callsign[16];      ///< ASCII zero-terminated
     char     name[100];         ///< Descriptive name, nickname, city, state, country.
-  } callsign_t;
+  } __attribute__((packed)) callsign_t;
 
 public:
   /** Default constructor. */
