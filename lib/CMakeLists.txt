@@ -25,6 +25,5 @@ qt5_wrap_cpp(libdmrconf_MOC_SOURCES ${libdmrconf_MOC_HEADERS})
 
 add_library(libdmrconf SHARED ${libdmrconf_SOURCES} ${libdmrconf_MOC_SOURCES})
 set_target_properties(libdmrconf PROPERTIES OUTPUT_NAME dmrconf)
-target_link_libraries(libdmrconf ${LIBS} "-framework IOKit -framework CoreFoundation")
-
+target_link_libraries(libdmrconf ${LIBS})
 

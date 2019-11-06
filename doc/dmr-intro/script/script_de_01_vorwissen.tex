@@ -3,16 +3,8 @@ In diesem Abschnitt werde ich kurz den \emph{klassischen} FM-Relaisbetrieb auf V
 
 \begin{figure}[!ht]
  \centering
- \begin{tikzpicture}[every node/.style={scale=.8}]
-  \activeuser{U1}{0,0}{DM3MAT};
-  \user{U2}{6,0}{DL2XYZ};
-  \path[->] (U1) edge node[above] {$144.500 MHz$} (U2) ;
- \end{tikzpicture}
- \begin{tikzpicture}[every node/.style={scale=.8}]
-  \user{U1}{0,0}{DM3MAT};
-  \activeuser{U2}{6,0}{DL2XYZ};
-  \path[->] (U2) edge node[above] {$144.500 MHz$} (U1) ;
- \end{tikzpicture}
+ \input{../fig/fm_simplex_a}
+ \input{../fig/fm_simplex_b}
  \caption{Einfacher Simplexbetrieb, DM3MAT sendet auf der Frequenz $144.500 MHz$ direkt zu DL2XYZ. Dieser antwortet dann auf der selben Frequenz.} \label{fig:basicsimlpex}
 \end{figure}
 
@@ -24,20 +16,8 @@ Repeater sind automatisch arbeitende Amateurfunkstationen die meist in exponiert
 
 \begin{figure}[!ht]
  \centering
- \begin{tikzpicture}[every node/.style={scale=.8}]
-  \activeuser{U1}{0,0}{DM3MAT};
-  \activerepeater{R1}{3,1}{DL0LDS};
-  \user{U2}{6,0}{DL2XYZ};
-  \path[->] (U1) edge node[above,rotate=17] {$431.9625 MHz$} (R1) ;
-  \path[->] (R1) edge node[above,rotate=-17] {$439.5625 MHz$} (U2);
- \end{tikzpicture}
- \begin{tikzpicture}[every node/.style={scale=.8}]
-  \user{U1}{0,0}{DM3MAT};
-  \activerepeater{R1}{3,1}{DL0LDS};
-  \activeuser{U2}{6,0}{DL2XYZ};
-  \path[->] (U2) edge node[above,rotate=-17] {$431.9625 MHz$} (R1) ;
-  \path[->] (R1) edge node[above,rotate=17] {$439.5625 MHz$} (U1);
- \end{tikzpicture}
+ \input{../fig/fm_duplex_a}
+ \input{../fig/fm_duplex_b}
  \caption{Einfacher Repeaterbetrieb, DM3MAT sendet auf der Eingabefrequenz $431.9625 MHz$ zum Repeater (DB0LDS) und dieser setzt das empfangende Signal direct auf der Ausgabefrequenz $439.5625 MHz$ wieder ab. Auf dieser Frequenz kann DL2XYZ das umgesetzte Signal wieder empfangen.} \label{fig:basicrepeater}
 \end{figure}
 
@@ -48,31 +28,9 @@ Wenn jedoch zwei Funkamateure miteinander kommunizieren wollen, die sehr weit vo
 
 \begin{figure}[!ht]
  \centering
- \begin{tikzpicture}[every node/.style={scale=.8}]
-  \activeuser{U1}{0,0}{DM3MAT};
-  \activerepeater{R1}{3,1}{DB0SP};
-  \repeater{R2}{6,1}{DB0LDS};
-  \user{U2}{9,0}{DL2XYZ};
-  \path[->] (U1) edge node[above,rotate=17] {$DTMF: 662699$} node[below,rotate=17]{$431.825 MHz$} (R1) ;
- \end{tikzpicture}
- \begin{tikzpicture}[every node/.style={scale=.8}]
-  \activeuser{U1}{0,0}{DM3MAT};
-  \activerepeater{R1}{3,1}{DB0SP};
-  \activerepeater{R2}{6,1}{DB0LDS};
-  \user{U2}{9,0}{DL2XYZ};
-  \path[->] (U1) edge node[above,rotate=17] {$431.825 MHz$} (R1) ;
-  \path[->,dashed] (R1) edge node[above] {via Echolink} (R2) ;	
-  \path[->] (R2) edge node[above,rotate=-17] {$439.150 MHz$} (U2) ;
- \end{tikzpicture}
- \begin{tikzpicture}[every node/.style={scale=.8}]
-  \user{U1}{0,0}{DM3MAT};
-  \activerepeater{R1}{3,1}{DB0SP};
-  \activerepeater{R2}{6,1}{DB0LDS};
-  \activeuser{U2}{9,0}{DL2XYZ};
-  \path[->] (R1) edge node[above,rotate=17] {$439.425 MHz$} (U1) ;
-  \path[->,dashed] (R2) edge node[above] {via Echolink} (R1) ;	
-  \path[->] (U2) edge node[above,rotate=-17] {$431.875 MHz$} (R2) ;
- \end{tikzpicture}
+ \input{../fig/fm_echolink_a}
+ \input{../fig/fm_echolink_b}
+ \input{../fig/fm_echolink_c}
  \caption{Repeaterbetrieb mit Echolink. DM3MAT verbindet die Repeater DB0SP (bei Berlin) und DB0LEI (bei Leipzig) per Echolink. Daraufhin können DM3MAT und DL2XYZ wie über einen gemeinsamen Repeater kommunizieren.} \label{fig:echolink}
 \end{figure}
 

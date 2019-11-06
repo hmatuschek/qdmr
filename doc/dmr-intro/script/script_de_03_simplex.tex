@@ -3,14 +3,7 @@ Die einfachste Form eines DMR QSOs\footnote{Für alle nicht-Funkamateure: QSO is
 
 \begin{figure}[!ht]
  \centering
- \begin{tikzpicture}[every node/.style={scale=.8}]
-  \activeuser{u1}{ 0,0}{DM3MAT};
-  \activeuser{u2}{ 6,1}{DL1XYZ, TG99};
-  \user{u3}{ 6,0}{DL2XYZ, TG99};
-  \user{u4}{ 6,-1}{DL3XYZ};
-  \path[->] (u1) edge[bend left] node[above, rotate=10]{$433.450 MHz$} node[below, rotate=10]{PC: DL1XYZ} (u2);
-  \path[->] (u2) edge[bend left] node[above, rotate=10]{$433.450 MHz$} node[below, rotate=10]{PC: DM3MAT} (u1);
- \end{tikzpicture}
+ \input{../fig/simplex_privatecall}
  \caption{Beispiel eines DMR Simplex Direktrufs von DM3MAT an DL1XYZ.} \label{fig:splxpc}
 \end{figure}
 
@@ -20,34 +13,33 @@ An dieser Stelle ist es sinnvoll zu erwähnen, dass wenn DL1XYZ direkt auf den D
 
 \begin{figure}[!ht]
   \centering
-  \begin{tikzpicture}[every node/.style={scale=.8}]
-   \activeuser{u1}{ 0,0}{DM3MAT};
-   \user{u2}{ 6,1}{DL1XYZ, TG99};
-   \user{u3}{ 6,0}{DL2XYZ, TG99};
-   \user{u4}{ 6,-1}{DL3XYZ};
-   \path[->] (u1) edge[bend left] node[above, rotate=10]{$433.450 MHz$} node[below, rotate=10]{GC: TG99} (u2);
-   \path[->] (u1) edge node[above]{$433.450 MHz$} node[below]{GC: TG99} (u3);
-  \end{tikzpicture}
+  \input{../fig/simplex_groupcall}
   \caption{Beispiel eines DMR Simplex Gruppenrufs von DM3MAT an die Sprechgruppe TG99.} \label{fig:splxgc}
 \end{figure}
 
 Um im Simplexbetrieb nicht nur einzelne Teilnehmer anrufen zu können, sind auch Gruppenrufe im Simplexbetrieb möglich. Eine beliebte Sprechgruppe (Talk Group) für den Simplex Betrieb ist die Gruppe mit der Nummer 99, daher mit TG99 abgekürzt für \emph{talk group 99}. Solche Gruppenrufe werden dann von allen Funkgeräten empfangen, die entsprechend konfiguriert wurden. Wie beim Repeaterbetrieb muss auch beim Simplexbetrieb dem Funkgerät mitgeteilt werden, welche Sprechgruppen es auf welchen Kanälen empfangen soll (siehe Abs. \ref{sec:cp:rxgrplst}). 
 
-In Abbildung \ref{fig:splxgc} ist solch ein Simplex Gruppenruf von DM3MAT an die Sprechgruppe TG99 dargestellt. Da DL1XYZ und DL2XYZ ihre Funkgeräte so konfiguriert haben, dass sie die TG99 empfangen, hören sie den Ruf von DM3MAT. Da DL3XYZ dies nicht gemacht hat, empfängt er diesen Ruf nicht. DL1XYZ und DL2XYZ können nun auf diesen Gruppenruf antworten, wenn sie innerhalb der sog. Hangtime auf ihre PTT Taste drücken. Sie würden dann ebenfalls mit einem Gruppenruf zur TG99 antworten (Talkaround gilt auch für Gruppenrufe), auch wenn sie einen anderen Standardkontakt für diesen Simplexkanal eingestellt haben.
+In Abbildung \ref{fig:splxgc} ist solch ein Simplex Gruppenruf von DM3MAT an die Sprechgruppe TG99 dargestellt. Da DL1XYZ und DL2XYZ ihre Funkgeräte so konfiguriert haben, dass sie die TG99 empfangen, hören sie den Ruf von DM3MAT. Da DL3XYZ dies nicht gemacht hat, empfängt er diesen Ruf nicht. DL1XYZ und DL2XYZ können nun auf diesen Gruppenruf antworten, wenn sie innerhalb der sog. \aref{Hangtime} auf ihre PTT Taste drücken. Sie würden dann ebenfalls mit einem Gruppenruf zur TG99 antworten (Talkaround gilt auch für Gruppenrufe), auch wenn sie einen anderen Standardkontakt für diesen Simplexkanal eingestellt haben.
 
 \begin{figure}[!ht]
   \centering
-  \begin{tikzpicture}[every node/.style={scale=.8}]
-   \activeuser{u1}{ 0,0}{DM3MAT};
-   \user{u2}{ 6,1}{DL1XYZ, TG99};
-   \user{u3}{ 6,0}{DL2XYZ, TG99};
-   \user{u4}{ 6,-1}{DL3XYZ};
-   \path[->] (u1) edge[bend left] node[above, rotate=10]{$433.450 MHz$} node[below, rotate=10]{All Call} (u2);
-   \path[->] (u1) edge node[above]{$433.450 MHz$} node[below]{GC: TG99} (u3);
-   \path[->] (u1) edge[bend right] node[above, rotate=-10]{$433.450 MHz$} node[below, rotate=-10]{All Call} (u4);
-  \end{tikzpicture}
+  \input{../fig/simplex_allcall}
   \caption{Beispiel eines DMR All Calls von DM3MAT alle die ihn hören können.} \label{fig:splxac}
 \end{figure}
 
-Um wirklich sicher zu gehen, dass ein Ruf auf einem Simplexkanal von allen empfangen werden kann, sollte ein sogenannter \adef{All Call} verwendet werden. Dieser Ruf ist ein spezieller Ruf an eine ganz bestimmte Nummer ($16777215$), die von allen Geräten empfangen werden unabhängig von der Konfiguration der Geräte. In diesem Beispiel wird somit der Ruf von DM3MAT auch von DL3XYU empfangen. Durch \emph{Talkaround} ist es allen Teilnehmern möglich auf den Ruf von DM3MAT zu antworten, auch wenn diese Teilnehmer den All-Call nicht als den Standardkontakt für diesen Kanal konfiguriert haben. 
+Um wirklich sicher zu gehen, dass ein Ruf auf einem Simplexkanal von allen empfangen werden kann, sollte ein sogenannter \adef{All Call} verwendet werden. Dieser Ruf ist ein spezieller Ruf an eine ganz bestimmte Nummer ($16777215$), die von allen Geräten empfangen werden unabhängig von der Konfiguration dieser Geräte. In diesem Beispiel wird somit der Ruf von DM3MAT auch von DL3XYZ empfangen. Durch \emph{Talkaround} ist es allen Teilnehmern wieder möglich auf den All Call von DM3MAT zu antworten, auch wenn diese Teilnehmer den All Call nicht als den Standardkontakt für diesen Kanal konfiguriert haben. 
 
+\subsection{DMR Simplex Frequenzen}
+\begin{table}[!ht]
+ \centering
+ \begin{tabular}{|l|c||l|c|} \hline
+  Name & Frequenz & Name & Frequenz \\ \hline \hline
+  S0 (Anruf) & $433.4500 MHz$ & S4 & $433.6500 MHz$ \\
+  S1         & $433.6125 MHz$ & S5 & $433.6625 MHz$ \\
+  S2         & $433.6250 MHz$ & S6 & $433.6750 MHz$ \\
+  S3         & $433.6375 MHz$ & S7 & $433.6875 MHz$ \\ \hline
+ \end{tabular}
+ \caption{Liste der acht üblichen DMR Simplexkanäle. Der Kanal \emph{S0} ist der Anrufkanal.} \label{tab:simplex}
+\end{table}
+
+Im Tabelle \ref{tab:simplex} sind die acht üblichen Simplexkanäle aufgelistet. Der Simplexkanal \emph{S0} ist dabei der Anrufkanal. Gerade in Ballungsgebieten sollte für das eigentliche QSO der Kanal vom Anrufkanal auf einen der sieben weiteren Simplexkanäle \emph{S1-7} gewechselt werden, um den Anrufkanal nicht zu blockieren. 

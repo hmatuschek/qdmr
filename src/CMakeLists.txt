@@ -17,6 +17,6 @@ qt5_wrap_cpp(qdmr_MOC_SOURCES ${qdmr_MOC_HEADERS})
 qt5_add_resources(qdmr_RCC_SOURCES ../shared/resources.qrc)
 
 add_executable(qdmr WIN32 ${qdmr_SOURCES} ${qdmr_MOC_SOURCES} ${qdmr_RCC_SOURCES} ${qdmr_UI_FORMS})
-target_link_libraries(qdmr ${LIBS} libdmrconf "-framework IOKit -framework CoreFoundation")
+target_link_libraries(qdmr ${LIBS} libdmrconf)
 
 

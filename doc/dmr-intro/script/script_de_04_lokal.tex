@@ -1,1 +1,12 @@
 \section{Lokaler Repeater Betrieb} \label{sec:lokal}
+Eigentlich ist es das Ziel von DMR, transparent gegenüber Repeatern zu sein. Das heißt, es spielt keine Rolle für den Teilnehmer welchen Repeater er benutzt. Er wird immer die selben Teilnehmer erreichen können. Dieses Konzept wird aber durch die Sprechgruppen mit den Nummern $8$ und $9$ durchbrochen.
+ 
+\begin{figure}[!ht]
+ \centering
+ \input{../fig/repeater_local}
+ \caption{Beispiel mit zwei Regionen (links \& rechts) mit je zwei Repeatern.} \label{fig:tg9tg8}
+\end{figure}
+
+Die Sprechgruppe 9 (kurz TG9) ist die sogenannte \emph{lokale} Sprechgruppe. Gruppenrufen zu dieser Sprechgruppe werden nicht über das Netzwerk weitergeleitet, sonder nur lokal vom jeweiligen Repeater ausgesandt. Dieser Fall ist in Abbildung \ref{fig:tg9tg8} links dargestellt. Hier sendet DM3MAT einen Gruppenruf zur TG9 über den Repeater DB0ABC. Dieser Ruf wird nicht an weitere Repeater übertragen und ist somit nur in der Umgebung des Repeaters zu hören. DL1XYZ befindet sich in der Nähe des Repeaters und kann den Ruf empfangen, wenn er sein Funkgerät so konfiguriert hat, dass es Gruppenrufe an die TG9 empfängt.    
+
+Die Sprechgruppe 8 (TG8) ist die sogenannte \emph{regionale} Sprechgruppe. Ein Gruppenruf zu dieser Sprechgruppe wird meist durch alle Repeater innerhalb einer Region ausgesandt. Welche Repeater zu einer Region gehören und wie groß diese Region letztendlich ist, entscheiden die Administratoren der jeweiligen Repeater. Sie entscheiden ob ihre Repeater zu einer Region gehören sollen oder nicht. Im Beispiel in Abbildung \ref{fig:tg9tg8} rechts, sendet DL3XYZ einen Gruppenruf zur Sprechgruppe 8 an den Repeater DB0GHI, dieser sendet diesen Gruppenruf selbst aus und leitet ihn an alle Repeater im regionalen Verbund (auch \adef{Cluster}) weiter. In diesem Fall auch an den Repeater DB0JKL. Somit können alle Teilnehmer in der Region diesen Gruppenruf empfangen, solange sie ihre Funkgeräte entsprechend konfiguriert haben. In diesem Beispiel empfängt somit nicht nur DL4XYZ den Gruppenruf sondern auch DL5XYZ, auch wenn er sich nicht in der Nähe des Repeaters DB0GHI befindet. 

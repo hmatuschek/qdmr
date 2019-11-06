@@ -1,1 +1,14 @@
 \section{Direkte Anrufe} \label{sec:privatecall}
+Direktrufe (\aref{Private Call}) ermöglichen es mit einem anderen Teilnehmer direkt zu kommunizieren, ohne dabei weitere Teilnehmer zu stören (bis auf das Belegen eines Repeaters). Im Rahmen der DMR Einführung wurde der Direktruf auch über mehrere Repeater hinweg beschrieben. Eben dieser Aspekt von DMR ist meiner Meinung nach besonders interessant. Mit Ausnahme der Sprechgruppen 8 \& 9 (siehe Abs. \ref{sec:lokal}), sind Direkt- und Gruppenrufe in DMR transparent gegenüber den verwendeten Repeatern. Es spielt keine Rolle über welchen Repeater sich Teilnehmer an einem Direkt- oder Gruppenruf beteiligen und somit auch nicht wo sie sich befinden. 
+
+\begin{figure}[!ht]
+ \centering
+ \input{../fig/repeater_privatecall}
+ \caption{Beispiel eines Direktrufs über Ländergrenzen hinweg.} \label{fig:pc}
+\end{figure}
+
+D.h., YLs \& OMs \footnote{Für nicht-Funkamateure: Zwei weitere typische Abkürzungen im Amateurfunk die \emph{young lady} und \emph{old man} bedeuten und alle weiblichen b.z.w. männlichen Funkamateure bezeichnet.}, die sich im Urlaub aufhalten können wie gewohnt an ihren lokalen Runden teilnehmen, indem sie am Urlaubsort einen DMR Repeater auswählen und von dort aus einen Gruppenruf zu ihrer Sprechgruppe in der Heimat starten. Damit abonnieren sie ihre Sprechgruppe an ihrem Urlaubs Repeater temporär und dieser verhält sich danach wie ein Repeater der in der Heimat steht. 
+
+Ebenso können sie auch Direktrufe vom Urlaubsort an Bekannte absetzen und auch am Urlaubsort empfangen. Vorausgesetzt, sie haben sich durch kurzes drücken auf die PTT Taste beim Repeater am Urlaubsort angemeldet damit das DMR Netz weiß wo der Teilnehmer zu finden ist. Damit müssen die Teilnehmer in der Heimat aber nicht mehr wissen wie und wo sie den Urlauber erreichen können. Sie starten einfach einen Direktruf zum Urlauber und das DMR Netz kümmert sich um alles.
+
+In Abbildung \ref{fig:pc} ist eben solch ein Direktruf über Ländergrenzen hinweg dargestellt. DM3MAT ruft via seinem lokalen Repeater (DB0ABC) DL2XYZ per Direktruf an. Da sich dieser bei einem DMR Repeater (I0ABC) an seinem Urlaubsort in Italien angemeldet hat\footnote{Um sich an einem Repeater anzumelden, damit das Netzwerk weiß, dass man über diesen Repeater erreichbar ist, drückt man kurz die PTT Taste auf einem Kanal des Repeaters.}, kann der Direktruf an DL2XYZ vermittelt werden. Um diesen Direktruf durchzuführen, muss DM3MAT nicht wissen über welchen Repeater DL2XYZ erreichbar ist. Diese Eigenschaft des DMR Netzes stellt eine deutliche Vereinfachung gegenüber dem \aref{Echolink} Netzwerk dar. 

@@ -1,4 +1,5 @@
 \documentclass[11pt, a4paper,parskip=half]{scrartcl}
+\usepackage{standalone}
 \usepackage[utf8]{inputenc}
 \usepackage{geometry}
 \usepackage{graphics}
@@ -6,9 +7,10 @@
 \usepackage{eurosym}
 \usepackage[ngerman]{babel}
 \usepackage{makeidx}
+\usepackage[tikz]{bclogo}
 
 \usepackage{tikz}
-\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{shapes.geometric,patterns,snakes}
 
 \usepackage{hyperref}
 \hypersetup{colorlinks=true, linkcolor=blue, filecolor=blue, urlcolor=blue}
@@ -20,8 +22,10 @@
 \date{\today}
 
 \input{../fig/repeater}
-\newenvironment{merke}{\begin{quotation}}{\end{quotation}}   
 
+\newenvironment{merke}{\begin{bclogo}[couleur=blue!30,arrondi=.1,logo=\bccrayon,ombre=true]{Merke}}{\end{bclogo}}   
+\newenvironment{hinweis}{\begin{bclogo}[couleur=blue!30,arrondi=.1,logo=\bcinfo,ombre=true]{Hinweis}}{\end{bclogo}}   
+\newenvironment{achtung}{\begin{bclogo}[couleur=red!30,arrondi=.1,logo=\bcattention,ombre=true]{Hinweis}}{\end{bclogo}}   
 \newcommand{\adef}[1]{\emph{#1}\index{#1}}
 \newcommand{\aref}[1]{#1\index{#1}}
 
@@ -56,23 +60,21 @@
 
 \input{script_de_03_simplex}
 
-\input{script_de_04_lokal}	
-
 \input{script_de_05_privatecall}
 
-\input{script_de_06_textmsg}
+\input{script_de_04_lokal}	
 
 \input{script_de_07_talkgroup}
 
-\input{script_de_08_aprs}
+\input{script_de_06_textmsg}
 
 \input{script_de_09_roaming}
-
-\input{script_de_10_netze}
 
 \input{script_de_11_technik}
 
 \input{script_de_12_codeplug}
+
+\input{script_de_10_netze}
 
 \appendix
 \printindex

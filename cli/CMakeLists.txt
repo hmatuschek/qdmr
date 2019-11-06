@@ -11,4 +11,4 @@ set(dmrconf_HEADERS
 qt5_wrap_cpp(dmrconf_MOC_SOURCES ${dmrconf_MOC_HEADERS})
 
 add_executable(dmrconf WIN32 ${dmrconf_SOURCES} ${dmrconf_MOC_SOURCES})
-target_link_libraries(dmrconf ${LIBS} libdmrconf "-framework IOKit -framework CoreFoundation")
+target_link_libraries(dmrconf ${LIBS} libdmrconf)
