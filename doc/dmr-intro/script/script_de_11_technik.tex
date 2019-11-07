@@ -1,7 +1,7 @@
 \section{Technischer Hintergrund} \label{sec:technik}
 Nachdem ich in den vorherigen Abschnitten versucht habe Ihnen die Konzepte von DMR (Repeater-unabhängige Direkt und Gruppenrufe) näherzubringen, geht es in diesem Abschnitt an das Eingemachte. Da heißt, die technischen Details und Besonderheiten von DMR. Im speziellen um die Begriffe \emph{Time Slot} und \emph{Color Code}.
 
-\subsection{Zeitschlitze (Time Slots)}
+\subsection{Zeitschlitze (Time Slots)} \section{sec:timeslot}
 Wie zu Beginn erwähnt, ist DMR eine digitale Übertragungstechnik, bei der Sprache zunächst digitalisiert wird, mit einem sogenannten Codec komprimiert wird und als Datenpakete übertragen werden. Modere Sprachcodecs sind in der Zwischenzeit so effizient geworden, dass es möglich ist auf einem $12.5 kHz$ breiten Kanal zwei Sprachsignale in guter Qualität gleichzeitig übertragen zu können. Dies wird auch bei DMR ausgenutzt. DMR verwendet dazu ein Verfahren das sich \adef{TDMA} nennt. 
 
 \begin{figure}[!ht]
@@ -19,7 +19,7 @@ Was auf welchem Zeitschlitz passieren soll, hängt stark von der Konfiguration d
  Überregionale Kommunikation sollte auf Zeitschlitz 1 und lokale sowie regionale Kommunikation auf dem Zeitschlitz 2 stattfinden.
 \end{merke} 
 
-\subsection{Farbcodes (Color Codes)} \index{Color Code}
+\subsection{Farbcodes (Color Codes)} \label{sec:colorcode} \index{Color Code}
 Farbcodes sind ein technisches Hilfsmittel, das Störungen zwischen Repeatern vermeiden soll, die auf der selben Frequenz arbeiten. Dieses Problem tritt vor allem im professionellen Einsatz von DMR auf. Einem Unternehmen werden üblicherweise nur wenige Frequenzen zugewiesen, es werden mit unter aber viele Repeater benötigt um ein großes Firmengelände vollständig abdecken zu können (denken Sie an das Flughafenbeispiel). Da bleibt es nicht aus, dass verschiedenen Repeatern die selbe Frequenz zugewiesen werden muss. Wenn sich dann die Reichweiten dieser Repeater überlappen, kann es sein, dass die Aussendungen eines Teilnehmers von zwei Repeatern gleichzeitig aufgenommen werden. Um dies zu verhindern, werden den Repeatern verschiedene sogenannte Farbcodes zugewiesen. Diese kleine zusätzliche Information einer Aussendung erlaubt es einem Repeater oder jedem anderen Teilnehmer zu erkennen, ob eine Aussendung für sie bestimmt ist oder nicht. Nur wenn der Farbcode übereinstimmt, reagiert der Repeater oder das Funkgerät auf diese Aussendung. 
 
 \begin{merke}

@@ -1,5 +1,5 @@
 \section{DMR Einführung \& Ursprung} \label{sec:ursprung}
-DMR kurz für \emph{digital mobile radio} ist ein digitaler Funkstandard für Sprech- und Datenfunk. Das heißt, die Sprache wird nicht direkt über FM o.a. auf einem Kanal übertragen, sondern erst digitalisiert und mit einem Verlustbehafteten Codec codiert und dann als Datenpaket übertragen. Dies ermöglicht es bei jedem Ruf zusätzliche Informationen wie Quelle und Ziel des Rufs mitzuübertragen.
+DMR kurz für \emph{digital mobile radio} ist ein digitaler Funkstandard für Sprech- und Datenfunk. Das heißt, die Sprache wird nicht direkt per FM  auf einem Kanal übertragen, sondern zuerst digitalisiert, mit einem verlustbehafteten Codec kodiert und erst dann als Datenpaket übertragen. Dies ermöglicht es, bei jedem Ruf\footnote{PTT Taste drücken, ins Funkgerät sprechen und dann die PTT wieder loslassen.} zusätzliche Informationen wie Quelle und Ziel des Rufs mitzuübertragen.
 
 DMR wurde als Ersatz für den analogen Bündelfunk in der kommerziellen Anwendung entwickelt. Ein klassisches Beispiel für den kommerziellen Einsatz von DMR wäre ein Verkehrsflughafen. Damit ist nicht der Flugfunk auf dem Feld und in der Luft gemeint, sondern der Funkbetrieb zwischen dem ganzen Bodenpersonal. 
 
@@ -20,21 +20,21 @@ All diese Mitarbeiter bekommen ein Funkgerät und sollen die folgenden Möglichk
  \item Die Alarmierung Aller, einer ganzen Gruppe oder einzelner Personen durch die Zentrale (wird im Amateurfunk nicht verwendet).
 \end{itemize}
  
-Gleichzeitig ist so ein Flughafen ein riesiges Gelände. D.h., nicht alle Mitarbeiter können alle anderen Mitarbeiter direkt erreichen. Es müssen also Repeater aufgestellt werden, damit das gesamte Gelände per Funk abgedeckt ist, vor allem die Innenräume. Daher wird häufig in jedem Gebäude mindestens ein Repeater aufgestellt. 
+Gleichzeitig ist so ein Flughafen ein riesiges Gelände. Das heißt, nicht alle Mitarbeiter können alle anderen Mitarbeiter direkt erreichen. Es müssen also Repeater aufgestellt werden, damit das gesamte Gelände und alle Innenräume per Funk abgedeckt sind. Daher wird häufig in jedem Gebäude mindestens ein Repeater aufgestellt. 
 
-Vergleicht man nun die Ansprüche dies Kommunikationsnetzes mit dem klassischen FM-Repeaterbetrieb (Abs. \ref{sec:vorwissen}) wird schnell deutlich, dass es sehr schwierig wird dieses Konzept per analog FM-Repeater umzusetzen, vor allem wenn mehrere Repeater in einem Netz (ähnlich Echolink) verbunden sind. Jede Kommunikation zwischen zwei Personen würde dann aber das gesamte Kommunikationsnetz belegen. 
+Vergleicht man nun die Ansprüche dieses Kommunikationsnetzes mit dem klassischen FM-Repeaterbetrieb (Abs. \ref{sec:vorwissen}) wird schnell deutlich, dass es sehr schwierig wird dieses Konzept per analog FM-Repeater umzusetzen. Vor allem wenn mehrere Repeater in einem Netz (ähnlich Echolink) verbunden sind. Jede Kommunikation zwischen zwei Personen würde dann aber das gesamte Kommunikationsnetz belegen. 
 
 Besser wäre es, wenn nur jene Repeater aktiv würden, die für die Kommunikation zwischen zwei Teilnehmern nötig sind. Dann stünden alle anderen Repeater für weitere Verbindungen bereit. Dieses Routing von Verbindungen sollte aber automatisch geschehen, da die zwei Teilnehmer nicht immer wissen werden, wo sich die jeweils andere Person befindet und somit mit welchem Repeater sie sich verbinden müssen. 
 
-Um solche komplexen Kommunikationsnetze realisieren zu können ohne, dass der Teilnehmer detailliertes Wissen über dessen physische Struktur\footnote{Wissen darüber wo sich welcher Repeater befindet und wo sich welche Teilnehemer aufhalten.} benötigen, wurde DMR entwickelt.
+Um solche komplexen Kommunikationsnetze realisieren zu können, ohne dass die Teilnehmer detailliertes Wissen über dessen physische Struktur\footnote{Wissen darüber wo sich welcher Repeater befindet und wo sich welche Teilnehemer aufhalten.} benötigen, wurde DMR entwickelt.
 
 \begin{merke}
- DMR hat mehr Ähnlichkeit mit einem Telefonnetz mit zusätzlichen Gruppenruf (anstatt ausschließlich eins-zu-eins Verbindungen) als mit klassischem FM-Repeaterbetrieb.
+ DMR hat mehr Ähnlichkeit mit einem Telefonnetz mit zusätzlichen Gruppenruf als mit klassischem FM-Repeaterbetrieb.
 \end{merke} 
 
-Das heißt, jeder Teilnehmer und damit dessen Funkgerät besitzt eine eindeutige Nummer\index{DMR-ID}. Diese Nummer liegt im Bereich $1$--$16777215$. Und wie bei einem gewöhnlichen Telefonnetz, kann ein Teilnehmer einen Anderen mit seiner Nummer direkt anrufen. Dies wird \adef{Direktruf} oder auch \adef{Private Call} genannt.
+Das heißt, jeder Teilnehmer und damit dessen Funkgerät besitzt eine eindeutige Nummer\index{DMR-ID}. Diese Nummer liegt im Bereich $1$--$16777215$. Und wie bei einem gewöhnlichen Telefonnetz, kann ein Teilnehmer einen Anderen mit seiner Nummer direkt anrufen. Dies wird \adef{Direktruf} oder auch \altdef{Private Call}{Direktruf} genannt.
 
-Außerdem werden Gruppen definiert, die auch wieder ihre eigene Nummer erhalten. Die sog. \adef{Sprechgruppe} oder auch \adef{Talk Group} (\emph{TG}). Diese Sprechgruppen dienen dazu alle Mitarbeiter einer bestimmten Gruppe (z.B., den Wachschutz, die Betriebsfeuerwehr, etc.) gleichzeitig erreichen zu können. Das heißt, das Funkgerät einer Reinigungskraft muss wissen, dass es auf die Gruppenrufe der Sprachgruppe \emph{Reinigung} reagieren muss aber alle anderen Sprechgruppen ignorieren soll. 
+Außerdem werden Gruppen definiert, die auch wieder ihre eigene Nummer erhalten. Die sog. \adef{Sprechgruppe} oder auch \altdef{Talk Group}{Sprechgruppe} (\altdef{TG}{Sprechgruppe}). Diese Sprechgruppen dienen dazu, alle Mitarbeiter einer bestimmten Gruppe (z.B., den Wachschutz, die Betriebsfeuerwehr, etc.) gleichzeitig erreichen zu können. Das heißt, das Funkgerät einer Reinigungskraft muss wissen, dass es auf die Gruppenrufe der Sprachgruppe \emph{Reinigung} reagieren muss aber alle anderen Sprechgruppen ignorieren soll. 
 
 \begin{merke}
  Dieser Punkt ist sehr wichtig: Das DMR Netz selbst weiß nicht, welcher Teilnehmer zu welcher Gruppe gehört oder nicht. Das Funkgerät des Teilnehmers wird so konfiguriert, dass es nur auf bestimmte Gruppenrufe reagiert.
@@ -56,9 +56,9 @@ In Abbildung \ref{fig:exnet1} sei ein Beispielnetzwerk für den Flughafen darges
 
 In einem DMR Netz hingegen, werden für einen Direktruf (Privat Call) nur jene Repeater verwendet, die dafür nötig sind. Dies ist in Abbildung \ref{fig:exnet2} zu sehen: \emph{Reinigung 1} startet einen Direktruf (Private Call) über ihren lokalen Repeater in \emph{Terminal 1}. Da das DMR Netzwerk weiß über welchen Repeater \emph{Reinigung 3} zuletzt aktiv war, wird der Direktruf vom DMR Netz über den Repeater auf dem Vorfeld etabliert. Der Repeater im Terminal 2 hingegen wird für diesen Direktruf nicht aktiv. Daher steht dieser Repeater weiterhin für weitere Kommunikation zur Verfügung. Dies nutzt die Zentrale um \emph{Sicherheit 1} per Direktruf zu erreichen. 
 
-Solange das Gespräch zwischen \emph{Reinigung 1 \& 3} anhält sind aber die Repeater im Terminal 1 und auf dem Vorfeld belegt. D.h., die Zentrale kann \emph{Reinigung 2} und \emph{Sicherheit 2} nicht erreichen. 
+Solange das Gespräch zwischen \emph{Reinigung 1 \& 3} anhält sind aber die Repeater im Terminal 1 und auf dem Vorfeld belegt. Das heißt, die Zentrale kann \emph{Reinigung 2} und \emph{Sicherheit 2} nicht erreichen. 
 
-Dies klingt schlimmer als es ist. Im Gegensatz zu klassischen Telefonaten gilt im DMR Netz ein Direktruf als unterbrochen sobald ein Teilnehmer die PTT Taste loslässt. Daher kann die Zentrale in den Umschaltpausen des Gespräches \emph{dazwischenrufen} und z.B. \emph{Sicherheit 2} erreichen. 
+Dies klingt schlimmer als es ist. Im Gegensatz zu klassischen Telefonaten gilt im DMR Netz ein Direktruf als unterbrochen sobald ein Teilnehmer die PTT Taste loslässt. Daher kann die Zentrale in den Umschaltpausen des Gespräches \emph{dazwischenrufen} und so zum Beispiel \emph{Sicherheit 2} erreichen. 
 
 Im nächsten Beispiel (Abbildung \ref{fig:exnet3}) will die Zentrale alle Reinigungskräfte erreichen. Dazu macht sie einen Gruppenruf zur Sprechgruppe/Talk Group \emph{Reinigung} (R für Reinigung, S für Sicherheit). Damit erreicht sie die \emph{Reinigung 1 \& 2} problemlos, aber \emph{Reinigung 3} empfängt diesen Gruppenruf nicht. 
 
@@ -83,9 +83,9 @@ Dies liegt daran, dass das DMR Netz nicht weiß, welche Personen zu welcher Grup
  \caption{Temporäres Abonnement einer Sprechgruppe auf einem Repeater.} \label{fig:exnet4}
 \end{figure}
 
-Damit die Reinigungskraft 3 jedoch für Gruppenrufe erreichbar bleibt muss sie die Sprechgruppe \emph{Reinigung} auf dem Vorfeldrepeater temporär abonnieren. Dazu startet sie einen Gruppenruf zur Sprechgruppe \emph{Reinigung} vom Vorfeldrepeater aus (siehe Abb. \ref{fig:exnet4a}). Damit abonniert der Vorfeldrepeater diese Sprechgruppe für eine begrenzte Zeit\footnote{Diese Zeit wird auf jedem einzelnen Repeater konfiguriert. Üblich sind Zeiten zwischen $10$ und $30$ Minuten.} und wird während dieser Zeit Gruppenrufe dieser Sprechgruppe aussenden. 
+Damit die Reinigungskraft 3 jedoch für Gruppenrufe erreichbar bleibt, muss sie die Sprechgruppe \emph{Reinigung} auf dem Vorfeldrepeater temporär abonnieren. Dazu startet sie einen Gruppenruf zur Sprechgruppe \emph{Reinigung} vom Vorfeldrepeater aus (siehe Abb. \ref{fig:exnet4a}). Damit abonniert der Vorfeldrepeater diese Sprechgruppe für eine begrenzte Zeit\footnote{Diese Zeit wird auf jedem einzelnen Repeater konfiguriert. Üblich sind Zeiten zwischen $10$ und $30$ Minuten.} und wird während dieser Zeit Gruppenrufe dieser Sprechgruppe aussenden. 
 
-Dieses temporäre Abonnement wird jedes mal erneuert oder wiederhergestellt, wenn ein Gruppenruf zu dieser Sprechgruppe von diesem Repeater initiiert wird. Das heißt, das Abonnement verlängert sich jedes mal, wenn \emph{Reinigung 3} einen Gruppenruf zur Sprechgruppe \emph{Reinigung} startet oder darauf antwortet\footnote{Das Antworten auf einen Gruppenruf ist technisch identisch zum Start eines neuen Gruppenrufs.}.
+Dieses temporäre Abonnement wird jedes mal erneuert oder wiederhergestellt, wenn ein Gruppenruf zu dieser Sprechgruppe von diesem Repeater aus initiiert wird. Das heißt, das Abonnement verlängert sich jedes mal, wenn \emph{Reinigung 3} einen Gruppenruf zur Sprechgruppe \emph{Reinigung} startet oder darauf antwortet\footnote{Das Antworten auf einen Gruppenruf ist technisch identisch zum Start eines neuen Gruppenrufs.}.
 
-Mit diesen Beispielen sind die wichtigsten Grundbegriffe von DMR (DMR-ID, Talk Groups, Private sowie Group Call, Talk Group Abonnement) eingeführt und deren Verwendung in einem Beispiel DMR Netz erläutert worden. In den nächsten Absetzen wird die Verwendung von DMR im Amateurfunk beschrieben.
+Mit diesen Beispielen sind die wichtigsten Grundbegriffe von DMR (DMR-ID, Talk Groups, Private sowie Group Call \& Talk Group Abonnement) eingeführt und deren Verwendung in einem Beispiel DMR-Netz erläutert worden. In den nächsten Absätzen wird die Verwendung von DMR im Amateurfunk beschrieben.
 
