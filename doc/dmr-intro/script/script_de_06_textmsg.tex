@@ -1,10 +1,10 @@
 \section{Datendienste} \label{sec:data}
-Da DMR von sich aus schon eine digitale Betriebsart ist, bei der meist Sprache in digitalisierter Form übertragen wird, ist es natürlich auch möglich reine Datendienste über DMR anzubieten. Zum einen gibt es einen Textnachrichtendienst, der dem SMS Dienst der Mobiltelefone nachempfunden ist. Zum anderen gibt es auch die Möglichkeit, die eigene Position per DMR an das APRS\footnote{APRS steht für \emph{Automatic Packet Reporting System} und ermöglicht das Übertragen von kleinen Datensätzen über Packet-Radio wie zum Beispiel die Position, Wetter oder Textnachrichten. Mehr dazu erfahren sie in der \href{https://de.wikipedia.org/wiki/Automatic_Packet_Reporting_System}{Wikipedia}.} Netz zu übertragen.
+Da DMR von sich aus schon eine digitale Betriebsart ist, bei der meist Sprache in digitalisierter Form übertragen wird, ist es natürlich auch möglich reine Datendienste über DMR anzubieten. Zum einen gibt es einen Textnachrichtendienst, der dem SMS-Dienst der Mobiltelefone nachempfunden ist. Zum anderen gibt es auch die Möglichkeit, die eigene Position per DMR an das APRS\footnote{APRS steht für \emph{Automatic Packet Reporting System} und ermöglicht das Übertragen von kleinen Datensätzen über Packet-Radio wie zum Beispiel die Position, Wetter oder Textnachrichten. Mehr dazu erfahren sie in der \href{https://de.wikipedia.org/wiki/Automatic_Packet_Reporting_System}{Wikipedia}.} Netz zu übertragen.
  
 \subsection{Textnachrichten (SMS)} \label{sec:textmsg}
-Mit diesem Dienst können sie kurze Textnachrichten\footnote{Bis zu 144 Zeichen.} direkt an andere Teilnehmer verschicken\footnote{Sie können auch Textnachrichten an ganze Sprechgruppen versenden. Dies ist aber eher unüblich und nicht wünschenswert.}. Im Prinzip funktioniert so eine Textnachricht wie ein Direktruf. Ist der andere Teilnehmer erreichbar, wird die Textnachricht übermittelt. 
+Mit diesem Dienst können sie kurze Textnachrichten\footnote{Bis zu 144 Zeichen.} direkt an andere Teilnehmer verschicken\footnote{Sie können auch Textnachrichten an ganze Sprechgruppen versenden. Dies ist aber eher unüblich und nicht wünschenswert.}. Im Prinzip funktioniert eine Textnachricht wie ein Direktruf. Ist der andere Teilnehmer erreichbar, wird die Textnachricht übermittelt. 
 
-Es gibt aber auch bestimmte \emph{Servicenummern} (gebührenfrei). Wenn sie nun eine Privatnachricht\footnote{Eine Privatnachricht ist eine Textnachricht, die an einen Kontakt gesendet wird der als \emph{Direktruf} spezifiziert ist.} an eine solche Nummer senden, können Sie bestimmte Informationen abrufen oder versenden. In Deutschland wären das:
+Es gibt aber auch \emph{Servicenummern} (gebührenfrei). Wenn sie nun eine Nachricht an eine solche Nummer senden, können Sie bestimmte Informationen abrufen oder versenden. In Deutschland wären das:
 \begin{enumerate}
  \item 262993 -- GPS und Wetter
  \begin{itemize}
@@ -23,6 +23,6 @@ Es gibt aber auch bestimmte \emph{Servicenummern} (gebührenfrei). Wenn sie nun 
 \end{enumerate}
  
 \subsection{Positionsübermittlung (APRS via DMR)} \label{sec:aprs}
-Wie im vorherigen Abschnitt schon erwähnt ist es möglich seine Position ins DMR Netz zu senden. Diese wird dann üblicherweise direkt an das APRS-Netz weitergereicht und Ihre Position kann dann unter anderem bei \url{https://aprs.fi} abgefragt werden. Dazu ist jedoch ein DMR Funkgerät mit GPS Empfänger nötig. Aber auch diese Geräte sind in der Zwischenzeit nicht mehr teuer. Einfache DMR Handfunkgeräte mit GPS sind ab c.a. \EUR{120} zu haben. 
+Wie im vorherigen Abschnitt schon erwähnt, ist es möglich seine Position ins DMR Netz zu senden. Diese wird dann üblicherweise direkt an das APRS-Netz weitergereicht und Ihre Position kann dann unter anderem bei \url{https://aprs.fi} abgefragt werden. Dazu ist jedoch ein DMR Funkgerät mit GPS Empfänger nötig. Aber auch diese Geräte sind in der Zwischenzeit nicht mehr teuer. Einfache DMR Handfunkgeräte mit GPS sind ab circa \EUR{120} zu haben. 
 
 Neben dem SMS Service ist auch die Positionsübermitellung per DMR möglich. Dazu muss das GPS fähige Funkgerät so konfiguriert werden, dass die Positionsdaten auf den geeigneten Kanälen an die Nummer 262999 gesendet werden. Wie dies einzustellen ist, hängt sehr vom Hersteller des Funkgerätes ab. 
