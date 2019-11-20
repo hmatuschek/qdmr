@@ -71,7 +71,7 @@ class RXGroupList;
  * @ingroup rd5r */
 class RD5RCodeplug : public CodePlug
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
   static const int NCHAN     = 1024;   ///< Defines the number of channels.
@@ -83,54 +83,54 @@ public:
   static const int NMESSAGES = 32;     ///< Defines the number of preset messages.
 
   /** Represents a configured channel within the codeplug. */
-	typedef struct __attribute__((packed)) {
+  typedef struct __attribute__((packed)) {
     /** Possible channel types. */
-		typedef enum {
-			MODE_ANALOG = 0,   ///< Analog channel, aka FM.
-			MODE_DIGITAL = 1   ///< Digital channel, aka DMR.
-		} Mode;
+    typedef enum {
+      MODE_ANALOG = 0,   ///< Analog channel, aka FM.
+      MODE_DIGITAL = 1   ///< Digital channel, aka DMR.
+    } Mode;
 
     /** Possible admit criteria. */
-		typedef enum {
-			ADMIT_ALWAYS = 0,  ///< Allow always.
-			ADMIT_CH_FREE = 1, ///< Allow TX on channel free.
-			ADMIT_COLOR = 2    ///< Allow TX on matching color-code.
-		} Admit;
+    typedef enum {
+      ADMIT_ALWAYS = 0,  ///< Allow always.
+      ADMIT_CH_FREE = 1, ///< Allow TX on channel free.
+      ADMIT_COLOR = 2    ///< Allow TX on matching color-code.
+    } Admit;
 
     /** Possible privacy groups, not used in ham radio. */
-		typedef enum {
-			PRIVGR_NONE = 0,     ///< No privacy group, default.
-			PRIVGR_53474C39 = 1  ///< Privacy group 53474C39 (wtf?).
-		} PrivacyGroup;
+    typedef enum {
+      PRIVGR_NONE = 0,     ///< No privacy group, default.
+      PRIVGR_53474C39 = 1  ///< Privacy group 53474C39 (wtf?).
+    } PrivacyGroup;
 
     /** Bandwidth of channel. */
-		typedef enum {
-			BW_12_5_KHZ = 0,     ///< 12.5kHz (default on DMR)
-			BW_25_KHZ = 1        ///< 25kHz
-		} Bandwidth;
+    typedef enum {
+      BW_12_5_KHZ = 0,     ///< 12.5kHz (default on DMR)
+      BW_25_KHZ = 1        ///< 25kHz
+    } Bandwidth;
 
     /** Transmit power for channel. */
-		typedef enum {
-			POWER_HIGH = 1,      ///< High power, 5W.
-			POWER_LOW = 0        ///< Low power, 1W.
-		} Power;
+    typedef enum {
+      POWER_HIGH = 1,      ///< High power, 5W.
+      POWER_LOW = 0        ///< Low power, 1W.
+    } Power;
 
-		// Bytes 0-15
-		uint8_t name[16];                   ///< Channel Name 16 x ASCII 0xff terminated.
-		// Bytes 16-23
-		uint32_t rx_frequency;              ///< RX Frequency, 8 digits BCD.
-		uint32_t tx_frequency;              ///< TX Frequency, 8 digits BCD.
-		// Byte 24
-		uint8_t channel_mode;               ///< Mode analog or digital.
+    // Bytes 0-15
+    uint8_t name[16];                   ///< Channel Name 16 x ASCII 0xff terminated.
+    // Bytes 16-23
+    uint32_t rx_frequency;              ///< RX Frequency, 8 digits BCD.
+    uint32_t tx_frequency;              ///< TX Frequency, 8 digits BCD.
+    // Byte 24
+    uint8_t channel_mode;               ///< Mode analog or digital.
     // Bytes 25-26
     uint16_t _unused25;                 ///< Unknown set to 0.
-		// Bytes 27-28
-		uint8_t tot;                        ///< TOT x 15sec, [0,33], 0-Infinite.
-		uint8_t tot_rekey_delay;            ///< TOT Rekey Delay in seconds [0,255].
-		// Byte 29
-		uint8_t admit_criteria;             ///< Admit Criteria, Always, Channel Free or Color Code.
-		// Bytes 30-31
-		uint8_t _unused30;                  ///< Unknown set to 0x50.
+    // Bytes 27-28
+    uint8_t tot;                        ///< TOT x 15sec, [0,33], 0-Infinite.
+    uint8_t tot_rekey_delay;            ///< TOT Rekey Delay in seconds [0,255].
+    // Byte 29
+    uint8_t admit_criteria;             ///< Admit Criteria, Always, Channel Free or Color Code.
+    // Bytes 30-31
+    uint8_t _unused30;                  ///< Unknown set to 0x50.
     uint8_t scan_list_index;            ///< Scan List index + 1, 0=None.
     // Bytes 32-35
     uint16_t ctcss_dcs_receive;         ///< CTCSS/DCS decode, 4 digits BCD or 0xffff=disabled.
@@ -160,12 +160,12 @@ public:
       _unused49_5             : 1,      ///< Unknown set to 0.
       repeater_slot2          : 1,      ///< Repeater time slot, 0=slot1 or 1=slot2.
       _unused49_7             : 1;      ///< Unknown set to 0.
-		// Byte 50
-		uint8_t dcdm              : 1,      ///< Dual capacity direct mode enable.
+    // Byte 50
+    uint8_t dcdm              : 1,      ///< Dual capacity direct mode enable.
       _unused50_1             : 4,      ///< Unknown set to 0.
       non_ste_frequency       : 1,      ///< Non STE = Frequency
       _unused50_6             : 2;      ///< Unknown set to 0.
-		// Byte 51
+    // Byte 51
     uint8_t _unused51_0       : 1,      ///< Unknown set to 0.
       bandwidth               : 1,      ///< Bandwidth 12.5 or 25 kHz.
       rx_only                 : 1,      ///< RX only enable.
@@ -173,7 +173,7 @@ public:
       _unused51_4             : 2,      ///< Unknown 0.
       vox                     : 1,      ///< VOX Enable.
       power                   : 1;      ///< Power Low or High.
-		// Bytes 52-55
+    // Bytes 52-55
     uint8_t _unused52[3];               ///< Unknown set to 0.
     uint8_t squelch;                    ///< Squelch level [0,9]
 
@@ -209,15 +209,15 @@ public:
     /** Links a previously constructed @c Channel object to other object within the generic
      * configuration, for example scan lists etc. */
     bool linkChannelObj(Channel *c, Config *conf) const;
-	} channel_t;
+  } channel_t;
 
-	/** Bank of 128 channels including a bitmap for enabled channels. */
-	typedef struct __attribute__((packed)) {
+  /** Bank of 128 channels including a bitmap for enabled channels. */
+  typedef struct __attribute__((packed)) {
     /** Bitmap for 128 channels, a bit is set when the coresspondig channel is valid/enabled. */
-		uint8_t bitmap[16];
+    uint8_t bitmap[16];
     /** The actual 128 channels. */
-		channel_t chan[128];
-	} bank_t;
+    channel_t chan[128];
+  } bank_t;
 
   /** Binary codeplug representation of VFO settings. */
   typedef struct __attribute__((packed)) {
@@ -225,14 +225,14 @@ public:
     channel_t vfo_b;
   } vfo_settings_t;
 
-	/** Specific codeplug representation of a DMR contact. */
-	typedef struct __attribute__((packed)) {
+  /** Specific codeplug representation of a DMR contact. */
+  typedef struct __attribute__((packed)) {
     /** Possible call types. */
-		typedef enum {
-			CALL_GROUP   = 0,                 ///< A group call.
-			CALL_PRIVATE = 1,                 ///< A private call.
-			CALL_ALL     = 2                  ///< An all-call.
-		} CallType;
+    typedef enum {
+      CALL_GROUP   = 0,                 ///< A group call.
+      CALL_PRIVATE = 1,                 ///< A private call.
+      CALL_ALL     = 2                  ///< An all-call.
+    } CallType;
 
     // Bytes 0-15
     uint8_t name[16];                   ///< Contact name in ASCII, 0xff terminated.
@@ -243,7 +243,7 @@ public:
     // Bytes 21-23
     uint8_t receive_tone;               ///< Call Receive Tone, 0=Off, 1=On.
     uint8_t ring_style;                 ///< Ring style: [0,10]
-		uint8_t _unused23;                  ///< Set to 0x00.
+    uint8_t _unused23;                  ///< Set to 0x00.
 
     /** Resets an invalidates the contact entry. */
     void clear();
@@ -262,10 +262,10 @@ public:
     DigitalContact *toContactObj() const;
     /** Resets this codeplug contact from the given @c DigitalContact. */
     void fromContactObj(const DigitalContact *obj, const Config *conf);
-	} contact_t;
+  } contact_t;
 
   /** Specific codeplug representation of a DTMF (analog) contact. */
-	typedef struct __attribute__((packed)) {
+  typedef struct __attribute__((packed)) {
     // Bytes 0-15
     uint8_t name[16];                   ///< Contact name in ASCII, 0xff terminated.
     // Bytes 16-24
@@ -291,11 +291,11 @@ public:
 	} dtmf_contact_t;
 
   /** Represents a single zone within the codeplug. */
-	typedef struct __attribute__((packed)) {
-		// Bytes 0-15
-		uint8_t name[16];                   ///< Zone name ASCII, 0xff terminated.
-		// Bytes 16-47
-		uint16_t member[16];                ///< Member channel indices+1, 0=empty/not used.
+  typedef struct __attribute__((packed)) {
+    // Bytes 0-15
+    uint8_t name[16];                   ///< Zone name ASCII, 0xff terminated.
+    // Bytes 16-47
+    uint16_t member[16];                ///< Member channel indices+1, 0=empty/not used.
 
     /** Returns @c true if the zone entry is valid. */
     bool isValid() const;
@@ -315,19 +315,19 @@ public:
     void fromZoneObjA(const Zone *zone, const Config *conf);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     void fromZoneObjB(const Zone *zone, const Config *conf);
-	} zone_t;
+  } zone_t;
 
-	/** Table of zones. */
-	typedef struct __attribute__((packed)) {
+  /** Table of zones. */
+  typedef struct __attribute__((packed)) {
     /** A bit representing the validity of every zone. If a bit is set, the corresponding zone in
      * @c zone ist valid. */
     uint8_t bitmap[32];
     /** The list of zones. */
     zone_t  zone[NZONES];
-	} zonetab_t;
+  } zonetab_t;
 
-	/** Represents a single RX group list within the codeplug. */
-	typedef struct __attribute__((packed)) {
+  /** Represents a single RX group list within the codeplug. */
+  typedef struct __attribute__((packed)) {
     // Bytes 0-15
     uint8_t name[16];                   ///< RX group list name, ASCII, 0xff terminated.
     // Bytes 16-47
@@ -344,25 +344,25 @@ public:
     bool linkRXGroupListObj(int ncnt, RXGroupList *lst, const Config *conf) const;
     /** Reset this codeplug representation from a @c RXGroupList object. */
     void fromRXGroupListObj(const RXGroupList *lst, const Config *conf);
-	} grouplist_t;
+  } grouplist_t;
 
-	/** Table of rx group lists. */
-	typedef struct __attribute__((packed)) {
+  /** Table of rx group lists. */
+  typedef struct __attribute__((packed)) {
     /** Specifies the number of contacts +1 in each group list, 0=disabled. */
     uint8_t     nitems1[128];
     /** The list of RX group lists. */
     grouplist_t grouplist[NGLISTS];
-	} grouptab_t;
+  } grouptab_t;
 
-	/** Represents a sinle scan list within the codeplug. */
-	typedef struct __attribute__((packed)) {
+  /** Represents a sinle scan list within the codeplug. */
+  typedef struct __attribute__((packed)) {
     /** Possible priority channel types. */
-		typedef enum {
-			PL_NONPRI = 0,              ///< Only non-priority channels.
-			PL_DISABLE = 1,             ///< Disable priority channels.
-			PL_PRI = 2,                 ///< Only priority channels.
-			PL_PRI_NONPRI = 3           ///< Priority and non-priority channels.
-		} PriorityType;
+    typedef enum {
+      PL_NONPRI = 0,              ///< Only non-priority channels.
+      PL_DISABLE = 1,             ///< Disable priority channels.
+      PL_PRI = 2,                 ///< Only priority channels.
+      PL_PRI_NONPRI = 3           ///< Priority and non-priority channels.
+    } PriorityType;
 
     // Bytes 0-14
     uint8_t name[15];             ///< Scan list name, ASCII, 0xff terminated.
@@ -398,16 +398,16 @@ public:
     void fromScanListObj(const ScanList *lst, const Config *conf);
   } scanlist_t;
 
-	/** Table/Bank of scanlists. */
+  /** Table/Bank of scanlists. */
   typedef struct __attribute__((packed)) {
     /** Byte-field to indicate which scanlist is valid. Set to 0x01 when valid, 0x00 otherwise. */
     uint8_t    valid[256];
     /** The scanlists. */
     scanlist_t scanlist[NSCANL];
-	} scantab_t;
+  } scantab_t;
 
-	/** Represents the general settings within the codeplug. */
-	typedef struct __attribute__((packed)) {
+  /** Represents the general settings within the codeplug. */
+  typedef struct __attribute__((packed)) {
     typedef enum {
       OPEN_SQUELCH = 0,
       SILENT_MONITOR = 1
@@ -484,7 +484,7 @@ public:
     uint32_t getRadioId() const;
     /** Sets the DMR ID of the radio. */
     void setRadioId(uint32_t num);
-	} general_settings_t;
+  } general_settings_t;
 
   /** Represents the button settings. */
   typedef struct __attribute__((packed)) {
@@ -608,8 +608,8 @@ public:
     uint8_t empty[24];                  ///< Unkown (boot image?), set to 0.
   } boot_settings_t;
 
-	/** Represents the intro messages within the codeplug. */
-	typedef struct __attribute__((packed)) {
+  /** Represents the intro messages within the codeplug. */
+  typedef struct __attribute__((packed)) {
     // Bytes 7540-754f
     uint8_t intro_line1[16];       ///< The first intro line, ASCII, 0xff terminated.
     // Bytes 7550-755f
@@ -623,10 +623,10 @@ public:
     QString getIntroLine2() const;
     /** Sets the second intro line. */
     void setIntroLine2(const QString &text);
-	} intro_text_t;
+  } intro_text_t;
 
-	/** Represents the table of text messages within the codeplug. */
-	typedef struct __attribute__((packed)) {
+  /** Represents the table of text messages within the codeplug. */
+  typedef struct __attribute__((packed)) {
     uint8_t count;                      ///< Number of messages.
     uint8_t _unused1[7];                ///< Unknown, set to 0.
     uint8_t len[NMESSAGES];             ///< Message lengths.
@@ -659,12 +659,12 @@ public:
 
 public:
   /** Empty constructor. */
-	RD5RCodeplug(QObject *parent=0);
+  RD5RCodeplug(QObject *parent=0);
 
   /** Decodes the read codeplug and stores the result into the given generic configuration. */
-	bool decode(Config *config);
+  bool decode(Config *config);
   /** Encodes the given generic configuration into this codeplug. */
-	bool encode(Config *config);
+  bool encode(Config *config);
 };
 
 #endif // RD5R_CODEPLUG_HH

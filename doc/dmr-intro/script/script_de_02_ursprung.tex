@@ -55,6 +55,10 @@ In Abbildung \ref{fig:exnet1} sei ein Beispielnetzwerk für den Flughafen darges
 
 In einem DMR Netz hingegen, werden für einen Direktruf (Privat Call) nur jene Repeater verwendet, die dafür nötig sind. Dies ist in Abbildung \ref{fig:exnet2} zu sehen: \emph{Reinigung 1} startet einen Direktruf (Private Call) über ihren lokalen Repeater in \emph{Terminal 1}. Da das DMR Netzwerk weiß, über welchen Repeater \emph{Reinigung 3} zuletzt aktiv war, wird der Direktruf vom DMR Netz über eben diesen Repeater auf dem Vorfeld etabliert. Der Repeater im Terminal 2 hingegen wird für diesen Direktruf nicht aktiv. Daher steht dieser Repeater weiterhin zur Verfügung. Dies nutzt die Zentrale um \emph{Sicherheit 1} per Direktruf zu erreichen. 
 
+\begin{merke}
+Das DMR-Netz weiß lediglich über welchen Repeater ein Teilnehmer zuletzt aktiv war. Das Netz wird daher versuchen, einen Direktruf für diesen Teilnehmer über eben diesen Repeater zu vermitteln.
+\end{merke}
+
 Solange das Gespräch zwischen \emph{Reinigung 1 \& 3} anhält sind aber die Repeater im Terminal 1 und auf dem Vorfeld belegt. Das heißt, die Zentrale kann \emph{Reinigung 2} und \emph{Sicherheit 2} nicht erreichen. Dies klingt schlimmer als es ist. Im Gegensatz zu klassischen Telefonaten gilt im DMR Netz ein Direktruf als unterbrochen sobald ein Teilnehmer die PTT Taste loslässt. Daher kann die Zentrale in den Umschaltpausen des Gespräches \emph{dazwischenrufen} und so zum Beispiel \emph{Sicherheit 2} erreichen. 
 
 Im nächsten Beispiel (Abbildung \ref{fig:exnet3}) will die Zentrale alle Reinigungskräfte erreichen. Dazu macht sie einen Gruppenruf zur Sprechgruppe/Talk Group \emph{Reinigung} (R für Reinigung, S für Sicherheit). Damit erreicht sie die \emph{Reinigung 1 \& 2} problemlos, aber \emph{Reinigung 3} empfängt diesen Gruppenruf nicht. 

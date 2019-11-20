@@ -81,11 +81,11 @@ Zuletzt sollte die Sprechgruppen für lokale/regionale Kommunikation angelegt we
  Ber/Bra  & Lokal, Regional, Ber/Bra \\
  Sa/Th    & Lokal, Regional, Sa/Th \\ \hline
  \end{tabular}
- \caption{Beispielempfangsgruppen. Die ersten beiden sind recht universell für Deutschland, die letzten Beiden sind für die Regionen Berlin/Brandenburg und Sachsen/Thüringen wichtig.} \label{tab:grouplist}
+ \caption{Ein paar Beispielempfangsgruppen. Die ersten beiden sind recht universell für Deutschland, die letzten Beiden sind für die Regionen Berlin/Brandenburg und Sachsen/Thüringen wichtig.} \label{tab:grouplist}
 \end{table}
 
 
-\subsection{Kanäle anlegen} \label{sec:cp:channel}
+\subsection{Kanäle Anlegen} \label{sec:cp:channel}
 Bevor es los geht, sollte ich erwähnen, dass die meisten DMR Funkgeräte auch analoges FM unterstützen. Das heißt, Sie können mit ihrem DMR Funkgerät auch normalen analogen FM Simplex und Repeaterbetrieb durchführen. In diesem Abschnitt beschreibe ich aber nur die Konfiguration von DMR Kanälen (meist \emph{Digital Channel} genannt), die Konfiguration von sogenannten \emph{analogen} Kanälen wird hier nicht beschrieben. Um einen DMR Kanal anzulegen, müssen Sie im Feld \emph{Channel Type} den Wert \emph{digital} auswählen, für einen FM Kanal dann \emph{analog}.
 
 Wenn Sie schon Erfahrung mit dem \emph{klassischen} FM-Relaisbetrieb haben, wird Ihnen das Anlegen der Kanäle recht seltsam vorkommen. Im analogen FM-Relaisbetrieb haben Sie für jeden Repeater und Simplex-Kanal genau einen Kanal im Funkgerät konfiguriert. Für den DMR Betrieb werden Sie für jeden Repeater mindestens zwei (für Zeitschlitz 1 \& 2), meist aber deutlich mehr Kanäle programmieren. Lange Rede kurzer Sinn. Lassen Sie mich das an konkreten Beispielen erläutern.
@@ -117,7 +117,7 @@ In Ihrer CPS finden sie noch sehr viel mehr Optionen zu den Kanälen. Die Meiste
 
 Die Option \adef{Admit Criterion} definiert unter welchen Umständen das senden auf dem Kanal vom Funkgerät erlaubt wird. Hier stellen Sie bitte \emph{Channel Free} ein. Dies bedeutet, dass sie nur senden dürfen, wenn der Simplexkanal frei ist.  
 
-\subsubsection{Repeaterkanäle anlegen}
+\subsubsection{Repeaterkanäle Anlegen}
 Das Anlegen von Repeater Kanälen ist etwas aufwendiger als das Anlegen von Simplexkanälen, da für jeden Repeater gleich mehrere Kanäle definiert werden. Bevor Sie anfangen können Repeaterkanäle anzulegen, müssen Sie natürlich erst herausfinden welche Repeater sich in Ihrer Nähe befinden. Eine gute Übersicht bietet Ihnen die Seite \url{https://repeatermap.de/}. Sie können dort unter Filter die Anzeige auf DMR Repeater beschränken. Dort finden Sie auch alle wichtigen Information zu den jeweiligen Repeatern. Das heißt deren Eingabe- und Ausgabefrequenzen und Farbcodes. Diese Informationen benötigen Sie unbedingt um Kanäle für diesen Repeater anlegen zu können.
 
 \begin{sidewaystable}[p]
@@ -156,7 +156,31 @@ Kanäle vier, fünf und sechs sind für die lokale (TG9, nur auf diesem Repeater
 
 Das sogenannte \emph{Admit Criterion} sollte für alle Repeaterkanäle auf \emph{Color Code} gesetzt werden. Dies bedeutet, dass Ihr Funkgerät nur dann sendet, wenn der Kanal frei ist und der Farbcode des Repeaters mit dem Farbcode des Kanals übereinstimmt.
 
-\subsection{Zonen zusammenstellen} \label{sec:zone} \index{Zone}
+\subsubsection{Weitere Kanaloptionen}
+Die Maske, mit der Sie Kanäle konfigurieren ist recht umfangreich. Es gibt eine Vielzahl an Optionen die das Verhalten dieses Kanals beeinflussen. Die meisten dieser Optionen werden im Amateurfunk aber nicht verwendet. Dennoch möchte ich diese hier kurz erklären.
+
+Die \aref{Admit Criterion} Option hatte ich zuvor schon erwähnt. Sie liegt fest, unter welchen Umständen das Funkgerät ihnen erlaubt auf dem Kanal zu senden. Meist stehen hier drei Möglichkeiten zu Verfügung. \emph{Always} bedeutet, dass Sie immer senden dürfen. \emph{Channel Free} bedeutet, dass der Kanal frei sein muss, damit Sie senden dürfen. Und \emph{Color Code} bedeutet, dass nicht nur der Kanal frei sein muss, sonder auch der Farbcode des Repeaters stimmen muss. Daher macht es Sinn \emph{Channel Free} für Simplexkanäle und \emph{Color Code} für Repeaterkanäle zu wählen.
+
+Die Option \adef{TOT} oder auch \adef{TX Timeout} legt die maximale Dauer einer Aussendung fest. Das heißt, wenn Sie die PTT Taste länger als diese Zeitspanne drücken, wird das Funkgerät Ihre Aussendung unterbrechen. Dies ist eine Funktion für den kommerziellen Einsatz, die verhindert, dass eine Fehlbedienung das DMR Netz oder auch einen Repeater blockiert. Im Amateurfunk macht dies wenig Sinn. Daher können Sie diese Option auf \emph{unendlich} stellen.
+
+Die Option \adef{Emergency System} legt das Alarm- oder Notrufsystem für diesen Kanal fest. Auch dies ist eine Funktion für den kommerziellen Einsatz und wird im Amateurfunk nicht verwendet.
+
+Die Option \adef{Privacy Group} legt die Verschlüsselung der Aussendungen für diesen Kanal fest. Diese Funktion darf im Amateurfunk gar nicht verwendet werden.
+
+Die Optionen \adef{Emergency Alarm Confirmed}, \adef{Private Call Confirmed} und \adef{Data Call Confirmed}, legen fest, wie das Funkgerät Alarme, Direktrufe und Datenübermittlung durchführt. Sind diese Optionen angewählt, versucht das Funkgerät erst eine Verbindung zum Ziel herzustellen, bevor Sie sprechen dürfen. Das heißt, das Funkgerät sendet zunächst eine Anfrage an das Ziel. Erst wenn diese Anfrage vom Ziel positiv beantwortet wurde, ertönt ein Ton und Sie können sprechen. Wenn diese Optionen nicht angewählt sind, fangen Sie sofort an Sprachdaten an das Ziel zu senden. Ich empfehle Ihnen diese Option nicht anzuwählen.
+
+Die Option \aref{Talkaround} erlaubt auf einen empfangenden Ruf direkt zu antworten, unabhängig davon, welchen Standardkontakt Sie für diese Kanal eingestellt haben. Wenn diese Option nicht angewählt ist, werden Sie immer auf diesem Kanal einen Ruf an den Standardkontakt starten wenn sie die PTT Taste drücken. Ich empfehle Ihnen diese Option anzuwählen.
+
+Wenn die Option \adef{RX Only} angewählt ist, können Sie auf diesen Kanal nicht senden.
+
+Die Option \adef{VOX} bedeutet \altdef{VOX}{Voice Operated Switch} und erlaubt es Ihnen automatisch von Empfang auf Senden umzuschalten sobald sie in das Mikrofon sprechen. Dies lässt sich bei einigen Funkgeräten pro Kanal oder aber auch in den allgemeinen Einstellungen aktivieren.
+
+Die Option \adef{Power} legt die Sendeleistung auf diesen Kanal fest. Wenn Sie sich direkter Nähe des Repeaters befinden, können Sie die Sendeleistung reduzieren um die Batterielaufzeit bei Handfunkgeräten zu erhöhen. 
+
+Diese optionale Kanaleinstellung \aref{Scanlist} definiert welche Liste von Kanälen gescannt werden, wenn der Scan auf diesem Kanal gestartet wird. Es ist nicht zwingend notwendig, dass der Kanal selbst in dieser Scanliste enthalten ist.
+
+
+\subsection{Zonen Zusammenstellen} \label{sec:zone} \index{Zone}
 Wenn Sie nun alle für Sie interessanten Kanäle erstellt haben, werden Sie feststellen, dass die Liste doch schon recht lang und unübersichtlich ist. Alle DMR Funkgeräte organisieren daher die Kanäle in sogenannten Zonen. Diese Zonen sind einfach nur Listen von Kanälen. Wie Sie diese Listen zusammenstellen, ist allein Ihnen überlassen. Sie können die Kanäle nach Region zusammenfassen wie \emph{Zu Hause}, \emph{Arbeit}, \emph{Urlaub} etc.. 
 
 Sie können sie auch nach Sprechgruppen sortieren. So können Sie ein quasi händisches Roaming für eine bestimmte Sprechgruppe realisieren. Wenn Sie dann im Auto unterwegs sind, können Sie im Funkgerät immer jenen Repeater aus der Zone auswählen, den Sie gerade erreichen können. Somit bleiben Sie immer mit dieser Sprechgruppe verbunden. Einige (eher teurere) Funkgeräte unterstützen dies mit einer automatischen Roamingfunktion, bei der der jeweils stärkste Repeater an Ihrem Standort ausgewählt wird.
@@ -165,7 +189,6 @@ Sie können sie auch nach Sprechgruppen sortieren. So können Sie ein quasi hän
  Kanäle, die keiner Zone zugeordnet wurden, können nicht im Funkgerät ausgewählt werden. Es ist aber problemlos möglich, einen Kanal mehreren Zonen zuzuordnen.
 \end{hinweis}
 
-\subsection{Scanlisten zusammenstellen}
-Scanlisten sind einfach Listen von Kanälen, die beim Starten der Scanfunktion beobachtet werden.
+\subsection{Scanlisten Zusammenstellen}
+Scanlisten sind einfach Listen von Kanälen, die beim Starten der Scanfunktion sequenziell beobachtet werden. Wird ein Signal auf einem der Kanäle empfangen, wird der Scan unterbrochen und es kann dann auf diesen empfangenen Ruf geantwortet werden. Diese Funktion erlaubt es mehrere Kanäle zu beobachten. Zusätzlich können Sie bei vielen Geräten ein oder zwei Prioritätskanäle definieren werden, die während des Scans häufiger \emph{besucht} und somit \emph{intensiver} beobachtet werden.
 
-TODO
