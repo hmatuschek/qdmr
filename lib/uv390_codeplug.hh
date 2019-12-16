@@ -124,7 +124,7 @@ protected:
       lone_worker            : 1;   ///< Lone Worker: 0=disable, 1=enable, default=0
 
     // Byte1
-		uint8_t allow_talkaround : 1,   ///< Allow Talkaround: 0=off, 1=on, default=0
+    uint8_t allow_talkaround : 1,   ///< Allow Talkaround: 0=off, 1=on, default=1
       rx_only                : 1,   ///< RX Only: 0=off, 1=on, default=0
       time_slot              : 2,   ///< Repeater slot: 2=TS2, 1=TS1, default=1
       color_code             : 4;   ///< ColorCode [0..15], default=1
@@ -158,7 +158,7 @@ protected:
 		uint16_t contact_name_index;    ///< Contact Name index. 0=none or contact index+1, default=0.
 
 	    // Bytes 8-9
-		uint8_t tot           : 6,      ///< TOT x 15sec, 0-Infinite, 1=15s, etc, 37=555s, default=4
+    uint8_t tot           : 6,      ///< TOT x 15sec, 0-Infinite, 1=15s, etc, 37=555s, default=0
       _unused8_6          : 2;      ///< Unknown = 0b00 ???
     uint8_t tot_rekey_delay;        ///< TOT Rekey Delay in seconds, default=0
 

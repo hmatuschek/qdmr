@@ -1,7 +1,8 @@
 /** @defgroup gd77 Radioddity GD-77
  * Device specific classes for Radioddity GD-77 and GD-77S.
  *
- * <img src="gd77.jpg" width="200px" align="left"/>
+ * \image html gd77.jpg "GD-77" width=200px
+ * \image latex gd77.jpg "GD-77" width=200px
  *
  * @warning This device and its codplug are implemented based on the code by Serge and has not been
  * tested! I do not own a GD-77 or GD-77S, hence I cannot test and verify the implementation!
@@ -46,10 +47,6 @@ public slots:
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
 	void run();
-
-protected slots:
-  /** Internal used callback. */
-	void onDonwloadFinished();
 
 protected:
   /** The device identifier. */

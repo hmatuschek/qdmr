@@ -429,7 +429,7 @@ Application::uploadCodeplug() {
   connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
-  radio->startUpload(_config);
+  radio->startUpload(_config, false);
 
   _mainWindow->statusBar()->showMessage(tr("Upload ..."));
   _mainWindow->setEnabled(false);

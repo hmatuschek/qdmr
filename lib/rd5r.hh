@@ -1,7 +1,9 @@
 /** @defgroup rd5r Baofeng/Radioddity RD-5R
  * Device specific classes for Baofeng/Radioddity RD-5R.
  *
- * <img src="rd5r.jpg" width="200px" align="left"/>
+ * \image html rd5r.jpg "RD-5R" width=200px
+ * \image latex rd5r.jpg "RD-5R" width=200px
+ *
  * The Baofeng/Radioddity RD-5R radio is likely the cheapest fully DMR compatiple (Tier I&II) VHF/UHF
  * radio on the market. Consequently, it is quiet popular and is usually the first DMR radio
  * many operators may buy. In my opinion it is a decent radio with reasonable sensitivity and audio
@@ -62,10 +64,6 @@ protected:
   /** Main function running in a separate thread performing the up- and download to and from the
    * device. */
 	void run();
-
-private slots:
-  /** Internal callback on finished downloads. */
-	void onDonwloadFinished();
 
 private:
   /** Device identifier string. */

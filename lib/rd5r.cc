@@ -37,7 +37,7 @@ static Radio::Features _rd5r_features =
 RD5R::RD5R(QObject *parent)
   : Radio(parent), _name("Baofeng/Radioddity RD-5R"), _dev(nullptr), _config(nullptr), _codeplug()
 {
-  connect(this, SIGNAL(downloadFinished()), this, SLOT(onDonwloadFinished()));
+  // pass...
 }
 
 const QString &
@@ -92,7 +92,7 @@ RD5R::startUpload(Config *config, bool blocking) {
     return false;
 
   _dev = new HID(0x15a2, 0x0073);
-  if (!_dev->isOpen()) {
+  if (! _dev->isOpen()) {
     _dev->deleteLater();
     return false;
   }
@@ -102,6 +102,7 @@ RD5R::startUpload(Config *config, bool blocking) {
     run();
     return (StatusIdle == _task);
   }
+
   start();
   return true;
 }
@@ -140,6 +141,14 @@ RD5R::run()
     _dev->deleteLater();
 
     emit downloadFinished();
+    if (_codeplug.decode(_config)) {
+      emit downloadComplete(this, _config);
+    } else {
+      _errorMessage = tr("%1(): Download failed: %2")
+          .arg(__func__).arg(_codeplug.errorMessage());
+      emit downloadError(this);
+    }
+    _config = nullptr;
   } else if (StatusUpload == _task) {
     emit uploadStarted();
 
@@ -206,16 +215,4 @@ RD5R::run()
 
     emit uploadComplete(this);
   }
-}
-
-void
-RD5R::onDonwloadFinished() {
-  if (_codeplug.decode(_config)) {
-    emit downloadComplete(this, _config);
-  } else {
-    _errorMessage = tr("%1(): Download failed: %2")
-        .arg(__func__).arg(_codeplug.errorMessage());
-    emit downloadError(this);
-  }
-  _config = nullptr;
 }

@@ -48,7 +48,7 @@ RD5RCodeplug::channel_t::clear() {
   _unused48_0            = 0;
   emergency_alarm_ack    = 0;
   data_call_conf         = 0;
-  private_call_conf      = 1;
+  private_call_conf      = 0;
   _unused49_1            = 0;
   privacy                = 0;
   _unused49_5            = 0;

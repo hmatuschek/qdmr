@@ -83,6 +83,7 @@ UV390::startDownload(Config *config, bool blocking) {
     run();
     return (StatusIdle == _task);
   }
+
   start();
   return true;
 }
@@ -106,17 +107,9 @@ UV390::startUpload(Config *config, bool blocking) {
     run();
     return (StatusIdle == _task);
   }
+
   start();
   return true;
-}
-
-void
-UV390::onDonwloadFinished() {
-  if (_codeplug.decode(_config))
-    emit downloadComplete(this, _config);
-  else
-    emit downloadError(this);
-  _config = nullptr;
 }
 
 void
@@ -167,6 +160,11 @@ UV390::run() {
     _dev->deleteLater();
 
     emit downloadFinished();
+    if (_codeplug.decode(_config))
+      emit downloadComplete(this, _config);
+    else
+      emit downloadError(this);
+    _config = nullptr;
   } else if (StatusUpload == _task) {
     emit uploadStarted();
 

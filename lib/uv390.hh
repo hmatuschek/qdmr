@@ -1,6 +1,9 @@
 /** @defgroup uv390 TYT MD-UV390, Retevis RT3S
  * Device specific classes for TYT MD-UV390 and Retevis RT3S.
  *
+ * \image html uv390.jpg "MD-UV390" width=200px
+ * \image latex uv390.jpg "MD-UV390" width=200px
+ *
  * <img src="uv390.jpg" width="200px" align="left"/>
  * The TYT MD-UV390 and the identical Retevis RT-3S are decent VHF/UHF FM and DMR handheld radios.
  * Both radios are available with and without an GPS option. @c libdmrconf will support that
@@ -61,10 +64,6 @@ public slots:
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
 	void run();
-
-protected slots:
-  /** Internal used callback. */
-	void onDonwloadFinished();
 
 protected:
   /** The device identifier. */

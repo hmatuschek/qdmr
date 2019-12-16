@@ -72,7 +72,6 @@ GD77::startDownload(Config *config, bool blocking) {
   if (!_config)
     return false;
 
-  /// @bug Implement.
   _dev = new HID(0x0483, 0xdf11, this);
   if (! _dev->isOpen()) {
     _dev->deleteLater();
@@ -112,15 +111,6 @@ GD77::startUpload(Config *config, bool blocking) {
   }
   start();
   return true;
-}
-
-void
-GD77::onDonwloadFinished() {
-  if (_codeplug.decode(_config))
-    emit downloadComplete(this, _config);
-  else
-    emit downloadError(this);
-  _config = nullptr;
 }
 
 void
@@ -174,6 +164,11 @@ GD77::run() {
     _dev->deleteLater();
 
     emit downloadFinished();
+    if (_codeplug.decode(_config))
+      emit downloadComplete(this, _config);
+    else
+      emit downloadError(this);
+    _config = nullptr;
   } else if (StatusUpload == _task) {
     emit uploadStarted();
 
@@ -217,7 +212,7 @@ GD77::run() {
       }
     }
 
-    // Send encode config into codeplug
+    // Encode config into codeplug
     _codeplug.encode(_config);
 
     // then, upload modified codeplug

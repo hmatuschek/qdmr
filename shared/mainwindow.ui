@@ -19,6 +19,10 @@
   <property name="windowTitle">
    <string>qdrm [*]</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/icons/logo.png</normaloff>:/icons/logo.png</iconset>
+  </property>
   <property name="accessibleName">
    <string>Main window</string>
   </property>

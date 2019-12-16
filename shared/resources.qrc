@@ -18,6 +18,7 @@
         <file>people-2x.png</file>
         <file>person-2x.png</file>
         <file>pulse-2x.png</file>
+        <file alias="logo.png">logo-4x.png</file>
     </qresource>
     <qresource prefix="/ui">
         <file>mainwindow.ui</file>
