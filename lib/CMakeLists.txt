@@ -16,7 +16,7 @@ SET(libdmrconf_MOC_HEADERS
    csvreader.hh dfufile.hh repeaterdatabase.hh userdatabase.hh logger.hh
 	 config.hh contact.hh rxgrouplist.hh channel.hh zone.hh scanlist.hh codeplug.hh
    rd5r.hh rd5r_codeplug.hh uv390.hh uv390_codeplug.hh gd77.hh gd77_codeplug.hh)
-SET(libdmrconf_HEADERS libdmrconf.hh uitls.hh crc32.hh csvwriter.hh)
+SET(libdmrconf_HEADERS libdmrconf.hh utils.hh crc32.hh csvwriter.hh)
 
 configure_file(config.h.in ${PROJECT_BINARY_DIR}/lib/config.h)
 
@@ -26,4 +26,9 @@ qt5_wrap_cpp(libdmrconf_MOC_SOURCES ${libdmrconf_MOC_HEADERS})
 add_library(libdmrconf SHARED ${libdmrconf_SOURCES} ${libdmrconf_MOC_SOURCES})
 set_target_properties(libdmrconf PROPERTIES OUTPUT_NAME dmrconf)
 target_link_libraries(libdmrconf ${LIBS})
+
+install(TARGETS libdmrconf DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
+install(FILES ${libdmrconf_HEADERS} DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/libdmrconf)
+install(FILES ${libdmrconf_MOC_HEADERS} DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/libdmrconf)
+install(FILES ${PROJECT_BINARY_DIR}/lib/config.h DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/libdmrconf)
 

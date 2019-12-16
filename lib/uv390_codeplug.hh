@@ -584,9 +584,11 @@ protected:
     uint16_t destination;                 ///< Destination contact index, 0=none or index+1.
     uint8_t  _unused_6[10];               ///< Padding all = 0xff
 
+    /** Resets the GPS system settings. */
     void clear();
-
+    /** Returns the interval at which the GPS position is announced. */
     uint repeatInterval() const;
+    /** Sets the interval at which the GPS position is announced. */
     void setRepeatInterval(uint interval);
   } __attribute__((packed)) gpssystem_t;
 

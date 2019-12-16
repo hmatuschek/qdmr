@@ -221,8 +221,8 @@ public:
 
   /** Binary codeplug representation of VFO settings. */
   typedef struct __attribute__((packed)) {
-    channel_t vfo_a;
-    channel_t vfo_b;
+    channel_t vfo_a; ///< Channel settings for VFO A.
+    channel_t vfo_b; ///< Channel settings for VFO B.
   } vfo_settings_t;
 
   /** Specific codeplug representation of a DMR contact. */
@@ -408,17 +408,20 @@ public:
 
   /** Represents the general settings within the codeplug. */
   typedef struct __attribute__((packed)) {
+    /** Possible monitor types. */
     typedef enum {
-      OPEN_SQUELCH = 0,
-      SILENT_MONITOR = 1
+      OPEN_SQUELCH = 0,            ///< Monitoring by opening the squelch.
+      SILENT_MONITOR = 1           ///< Silent monitoring.
     } MonitorType;
 
+    /** Possible ARTS tone settings. */
     typedef enum {
-      ARTS_DISABLED = 0,
-      ARTS_ONCE     = 4,
-      ARTS_ALWAYS   = 8
+      ARTS_DISABLED = 0,           ///< ARTS tone is disabled.
+      ARTS_ONCE     = 4,           ///< ARTS tone once.
+      ARTS_ALWAYS   = 8            ///< ARTS tone always.
     } ARTSTone;
 
+    /** Possible scan modes. */
     typedef enum {
       SCANMODE_TIME    = 0,
       SCANMODE_CARRIER = 1,
@@ -472,7 +475,9 @@ public:
     uint8_t _reserved31;            ///< Unknown, set to 0x00.
     uint8_t prog_password[8];       ///< Programming password, 8 x ASCII 0xff terminated.
 
+    /** Resets the general settings. */
     void clear();
+    /** Resets the general settings to their default values. */
     void initDefault();
 
     /** Returns the name of the radio. */
@@ -519,6 +524,7 @@ public:
       uint8_t type;               ///< Specifies the type of the action, 0x00=disabled, 0x10 = digital call, 0x11 = digital message, 0x20 = analog call.
       uint16_t contact_idx;       ///< Specifies the contact index, 0x00=none or index+1.
       uint8_t message_idx;        ///< Specifies the message index, 0x00=none, index+1 or 0xff if call.
+      /** Resets the one-touch settings. */
       void clear();
     } one_touch_t;
 
@@ -532,7 +538,9 @@ public:
     uint8_t  _unknown7;           ///< Unknown set to 0x11.
     one_touch_t one_touch[6];     ///< 6 x one-touch actions.
 
+    /** Resets the button settings. */
     void clear();
+    /** Resets the button settings to their default values. */
     void initDefault();
   } button_settings_t;
 

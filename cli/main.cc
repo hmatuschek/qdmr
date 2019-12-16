@@ -17,7 +17,8 @@ int main(int argc, char *argv[])
 {
   // Install log handler to stderr.
   QTextStream out(stderr);
-  Logger::get().addHandler(new StreamLogHandler(out));
+  StreamLogHandler *handler = new StreamLogHandler(out, LogMessage::WARNING);
+  Logger::get().addHandler(handler);
 
   // Instantiate core application
   QCoreApplication app(argc, argv);
@@ -32,23 +33,11 @@ int main(int argc, char *argv[])
   parser.addHelpOption();
   parser.addVersionOption();
   parser.addOption(
-   {{"d","detect"}, QCoreApplication::translate("main", "Detect radio.")});
+  {{"V","verbose"}, QCoreApplication::translate("main", "Verbose output.")});
   parser.addOption(
-   {{"c", "csv"}, QCoreApplication::translate("main", "Up- and download codeplugs in CSV format")});
+   {{"c", "csv"}, QCoreApplication::translate("main", "Up- and download codeplugs in CSV format.")});
   parser.addOption(
-   {{"b", "bin"}, QCoreApplication::translate("main", "Up- and download codeplugs in binary format")});
-  parser.addOption(
-   {{"w","write"}, QCoreApplication::translate("main", "Upload codeplug to radio.")});
-  parser.addOption(
-   {{"r", "read"}, QCoreApplication::translate("main", "Download codeplug from radio.")});
-  parser.addOption(
-   {{"V", "verify"}, QCoreApplication::translate("main", "Verify codeplug.")});
-  parser.addOption(
-   {{"E", "encode"}, QCoreApplication::translate("main", "Encodes a CSV codeplug to a binary one.")});
-  parser.addOption(
-   {{"D", "decode"}, QCoreApplication::translate("main", "Decodes a binary codeplug to a CSV one.")});
-  parser.addOption(
-   {{"I", "info"}, QCoreApplication::translate("main", "Drops some information about the given file.")});
+   {{"b", "bin"}, QCoreApplication::translate("main", "Up- and download codeplugs in binary format.")});
   parser.addOption(
    {{"R", "radio"}, QCoreApplication::translate("main", "Specifies the radio."), QCoreApplication::translate("main", "directory")});
 
@@ -64,6 +53,8 @@ int main(int argc, char *argv[])
 
   if (1 > parser.positionalArguments().size())
     parser.showHelp(-1);
+  if (parser.isSet("verbose"))
+    handler->setMinLevel(LogMessage::DEBUG);
   QString command = parser.positionalArguments().at(0);
   if ("detect" == command)
     return detect(parser, app);

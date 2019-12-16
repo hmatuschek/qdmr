@@ -932,12 +932,12 @@ RD5RCodeplug::encode(Config *config)
     if ((i>>7) == 0)
       b = (bank_t*) data(OFFSET_BANK_0);
     else
-      b = ((i-1) + (bank_t *) data(OFFSET_BANK_1));
+      b = ((i-1)/128 + (bank_t *) data(OFFSET_BANK_1));
     channel_t *ch = &b->chan[i % 128];
 
     // Disable channel if not used
     if (i >= config->channelList()->count()) {
-      b->bitmap[i % 128 / 8] &= ~(1 << (i & 7));
+      b->bitmap[(i % 128) / 8] &= ~(1 << (i & 7));
       continue;
     }
 
@@ -945,7 +945,7 @@ RD5RCodeplug::encode(Config *config)
     ch->fromChannelObj(config->channelList()->channel(i), config);
 
     // Set valid bit.
-    b->bitmap[i % 128 / 8] |= 1 << (i & 7);
+    b->bitmap[(i % 128) / 8] |= (1 << (i & 7));
   }
 
   // Pack Zones
@@ -979,7 +979,7 @@ next:
     }
 
     // Set valid bit.
-    zt->bitmap[i / 8] |= 1 << (i & 7);
+    zt->bitmap[i / 8] |= (1 << (i & 7));
   }
 
   // Pack Scanlists

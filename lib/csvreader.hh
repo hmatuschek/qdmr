@@ -471,6 +471,7 @@ public:
   /** Parses the given text stream. */
   bool parse(QTextStream &stream);
 
+  /** Returns the current error message, for example if @c parse returns @c false. */
   const QString &errorMessage() const;
 
 protected:
@@ -512,6 +513,7 @@ protected:
   bool _parse_scanlist(qint64 id, CSVLexer &lexer);
 
 protected:
+  /** Holds the current error message. */
   QString _errorMessage;
   /** The handler instance. */
   CSVHandler *_handler;

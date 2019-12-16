@@ -121,6 +121,16 @@ StreamLogHandler::StreamLogHandler(QTextStream &stream, LogMessage::Level minLev
   // pass...
 }
 
+LogMessage::Level
+StreamLogHandler::minLevel() const {
+  return _minLevel;
+}
+
+void
+StreamLogHandler::setMinLevel(LogMessage::Level minLevel) {
+  _minLevel = minLevel;
+}
+
 void
 StreamLogHandler::handle(const LogMessage &message) {
   if (message.level() < _minLevel)

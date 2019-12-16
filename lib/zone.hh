@@ -8,6 +8,8 @@
 class Channel;
 class Config;
 
+/** Represents a list of channels that are part of a zone.
+ * @ingroup conf */
 class ZoneChannelList: public QAbstractListModel
 {
   Q_OBJECT

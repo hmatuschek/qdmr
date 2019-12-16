@@ -19,4 +19,10 @@ qt5_add_resources(qdmr_RCC_SOURCES ../shared/resources.qrc)
 add_executable(qdmr WIN32 ${qdmr_SOURCES} ${qdmr_MOC_SOURCES} ${qdmr_RCC_SOURCES} ${qdmr_UI_FORMS})
 target_link_libraries(qdmr ${LIBS} libdmrconf)
 
+install(TARGETS qdmr DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
+
+if (UNIX AND NOT APPLE)
+  install(FILES ${PROJECT_SOURCE_DIR}/dist/qdmr.desktop DESTINATION share/applications/)
+  install(FILES ${PROJECT_SOURCE_DIR}/dist/qdmr.png DESTINATION share/icons/hicolor/64x64/)
+endif(UNIX AND NOT APPLE)
 
