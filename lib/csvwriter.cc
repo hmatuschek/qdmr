@@ -10,7 +10,7 @@ inline QString formatFrequency(float f) {
 }
 
 bool
-CSVWriter::write(const Config *config, QTextStream &stream)
+CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessage)
 {
   stream << "#\n"
          << "# Configuration generated " << QDateTime::currentDateTime().toString()

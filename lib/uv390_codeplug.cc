@@ -2,7 +2,6 @@
 #include "config.hh"
 #include "utils.hh"
 #include "channel.hh"
-#include <QDebug>
 
 
 #define NCHAN           3000

@@ -1,12 +1,12 @@
 #include "radio.hh"
 #include "hidinterface.hh"
 #include "dfu_libusb.hh"
-#include <QDebug>
 #include "rd5r.hh"
 #include "gd77.hh"
 #include "uv390.hh"
 #include "config.hh"
-
+#include "logger.hh"
+#include <QSet>
 
 
 /* ******************************************************************************************** *
@@ -211,7 +211,7 @@ Radio::detect(QString &errorMessage) {
     return nullptr;
   }
 
-  qDebug() << "Found Radio:" << id;
+  logDebug() << "Found Radio:" << id;
 
   if ("BF-5R" == id) {
     return new RD5R();

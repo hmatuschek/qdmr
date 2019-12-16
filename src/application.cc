@@ -3,6 +3,7 @@
 #include <QtUiTools>
 #include <QDesktopServices>
 
+#include "logger.hh"
 #include "radio.hh"
 #include "config.h"
 #include "settings.hh"
@@ -35,8 +36,9 @@ Application::Application(int &argc, char *argv[])
 
       return;
     }
+    QString errorMessage;
     QTextStream stream(&file);
-    _config->readCSV(stream);
+    _config->readCSV(stream, errorMessage);
   }
 
   _currentPosition = settings.position();
@@ -50,7 +52,7 @@ Application::Application(int &argc, char *argv[])
     }
   }
 
-  qDebug() << "Last known position: " << _currentPosition;
+  logDebug() << "Last known position: " << _currentPosition.toString();
   connect(_config, SIGNAL(modified()), this, SLOT(onConfigModifed()));
 }
 
@@ -228,7 +230,7 @@ Application::loadCodeplug() {
     return;
 
   if (_config->isModified()) {
-    if (QMessageBox::Ok != QMessageBox::question(0, tr("Unsaved changes to codeplug."),
+    if (QMessageBox::Ok != QMessageBox::question(nullptr, tr("Unsaved changes to codeplug."),
                                                  tr("There are unsaved changes to the current codeplug. "
                                                     "These changes are lost if you proceed."),
                                                  QMessageBox::Cancel|QMessageBox::Ok))
@@ -245,9 +247,16 @@ Application::loadCodeplug() {
                           tr("Cannot read codeplug from file '%1': %2").arg(filename).arg(file.errorString()));
     return;
   }
+
+  logDebug() << "Load codeplug from '" << filename << "'.";
+
+  QString errorMessage;
   QTextStream stream(&file);
-  if (_config->readCSV(stream))
+  if (_config->readCSV(stream, errorMessage))
     _mainWindow->setWindowModified(false);
+  else
+    QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
+                          tr("Cannot read codeplug from file '%1': %2").arg(filename).arg(errorMessage));
 }
 
 
@@ -268,9 +277,13 @@ Application::saveCodeplug() {
     return;
   }
 
+  QString errorMessage;
   QTextStream stream(&file);
-  if (_config->writeCSV(stream))
+  if (_config->writeCSV(stream, errorMessage))
     _mainWindow->setWindowModified(false);
+  else
+    QMessageBox::critical(nullptr, tr("Cannot save codeplug"),
+                          tr("Cannot save codeplug to file '%1': %2").arg(filename).arg(errorMessage));
 
   file.flush();
   file.close();
@@ -280,7 +293,7 @@ Application::saveCodeplug() {
 void
 Application::quitApplication() {
   if (_config->isModified()) {
-    if (QMessageBox::Ok != QMessageBox::question(0, tr("Unsaved changes to codeplug."),
+    if (QMessageBox::Ok != QMessageBox::question(nullptr, tr("Unsaved changes to codeplug."),
                                                  tr("There are unsaved changes to the current codeplug. "
                                                     "These changes are lost if you proceed."),
                                                  QMessageBox::Cancel|QMessageBox::Ok))
@@ -296,10 +309,10 @@ Application::detectRadio() {
   QString errorMessage;
   Radio *radio = Radio::detect(errorMessage);
   if (radio) {
-    QMessageBox::information(0, tr("Radio found"), tr("Found device '%1'.").arg(radio->name()));
+    QMessageBox::information(nullptr, tr("Radio found"), tr("Found device '%1'.").arg(radio->name()));
     radio->deleteLater();
   } else {
-    QMessageBox::information(0, tr("No Radio found."),
+    QMessageBox::information(nullptr, tr("No Radio found."),
                              tr("No known radio detected. Check connection?\nError:")+errorMessage);
   }
   radio->deleteLater();
@@ -313,7 +326,7 @@ Application::verifyCodeplug(Radio *radio) {
   if (nullptr == myRadio)
     myRadio = Radio::detect(errorMessage);
   if (! myRadio) {
-    QMessageBox::information(0, tr("No Radio found."),
+    QMessageBox::information(nullptr, tr("No Radio found."),
                              tr("Cannot verify codeplug: No known radio detected.\nError: ")
                              + errorMessage);
     return false;
@@ -324,7 +337,7 @@ Application::verifyCodeplug(Radio *radio) {
     VerifyDialog dialog(issues);
     dialog.exec();
   } else {
-    QMessageBox::information(0, tr("Verification success"),
+    QMessageBox::information(nullptr, tr("Verification success"),
                              tr("The codeplug was successfully verified with the radio '%1'").arg(myRadio->name()));
   }
 
@@ -341,7 +354,7 @@ Application::downloadCodeplug() {
     return;
 
   if (_config->isModified()) {
-    if (QMessageBox::Ok != QMessageBox::question(0, tr("Unsaved changes to codeplug."),
+    if (QMessageBox::Ok != QMessageBox::question(nullptr, tr("Unsaved changes to codeplug."),
                                                  tr("There are unsaved changes to the current codeplug. "
                                                     "These changes are lost if you proceed."),
                                                  QMessageBox::Cancel|QMessageBox::Ok))
@@ -351,7 +364,7 @@ Application::downloadCodeplug() {
   QString errorMessage;
   Radio *radio = Radio::detect(errorMessage);
   if (! radio) {
-    QMessageBox::critical(0, tr("No Radio found."),
+    QMessageBox::critical(nullptr, tr("No Radio found."),
                           tr("Can not download codeplug from device: No radio found.\nError: ")
                           + errorMessage);
     return;
@@ -398,7 +411,7 @@ Application::uploadCodeplug() {
   QString errorMessage;
   Radio *radio = Radio::detect(errorMessage);
   if (! radio) {
-    QMessageBox::critical(0, tr("No Radio found."),
+    QMessageBox::critical(nullptr, tr("No Radio found."),
                           tr("Can not upload codeplug to device: No radio found.\nError: ")
                           + errorMessage);
     return;
@@ -426,8 +439,9 @@ Application::uploadCodeplug() {
 void
 Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Upload error"));
-  QMessageBox::critical(0, tr("Upload error"), tr("Cannot upload codeplug to device. "
-                                                  "An error occurred during upload."));
+  QMessageBox::critical(
+        nullptr, tr("Upload error"),
+        tr("Cannot upload codeplug to device. An error occurred during upload."));
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
@@ -488,10 +502,12 @@ Application::onConfigModifed() {
     return;
 
   QLineEdit *dmrID  = _mainWindow->findChild<QLineEdit*>("dmrID");
+  QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
 
   dmrID->setText(QString::number(_config->id()));
+  rname->setText(_config->name());
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
 
@@ -543,13 +559,15 @@ Application::onRemContact() {
   QTableView *table = _mainWindow->findChild<QTableView *>("contactsView");
   QModelIndex selected = table->selectionModel()->currentIndex();
   if (! selected.isValid()) {
-    QMessageBox::information(nullptr, tr("Cannot delete contact"),
-                             tr("Cannot delete contact: You have to select a contact first."));
+    QMessageBox::information(
+          nullptr, tr("Cannot delete contact"),
+          tr("Cannot delete contact: You have to select a contact first."));
     return;
   }
 
   QString name = _config->contacts()->contact(selected.row())->name();
-  if (QMessageBox::No == QMessageBox::question(nullptr, tr("Delete contact?"), tr("Delete contact %1?").arg(name)))
+  if (QMessageBox::No == QMessageBox::question(
+        nullptr, tr("Delete contact?"), tr("Delete contact %1?").arg(name)))
     return;
 
   _config->contacts()->remContact(selected.row());
@@ -609,13 +627,15 @@ Application::onRemRxGroup() {
 
   QModelIndex idx = _mainWindow->findChild<QListView *>("groupListView")->selectionModel()->currentIndex();
   if (! idx.isValid()) {
-    QMessageBox::information(nullptr, tr("Cannot delete group list"),
-                             tr("Cannot delete group list: You have to select a group list first."));
+    QMessageBox::information(
+          nullptr, tr("Cannot delete group list"),
+          tr("Cannot delete group list: You have to select a group list first."));
     return;
   }
 
   QString name = _config->rxGroupLists()->list(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(nullptr, tr("Delete group list?"), tr("Delete group list %1?").arg(name)))
+  if (QMessageBox::No == QMessageBox::question(
+        nullptr, tr("Delete group list?"), tr("Delete group list %1?").arg(name)))
     return;
 
   _config->rxGroupLists()->remList(idx.row());
@@ -690,13 +710,15 @@ void
 Application::onRemChannel() {
   QModelIndex selected =_mainWindow->findChild<QTableView*>("channelView")->selectionModel()->currentIndex();
   if (! selected.isValid()) {
-    QMessageBox::information(nullptr, tr("Cannot delete channel"),
-                             tr("Cannot delete channel: You have to select a channel first."));
+    QMessageBox::information(
+          nullptr, tr("Cannot delete channel"),
+          tr("Cannot delete channel: You have to select a channel first."));
     return;
   }
 
   QString name = _config->channelList()->channel(selected.row())->name();
-  if (QMessageBox::No == QMessageBox::question(nullptr, tr("Delete channel?"), tr("Delete channel %1?").arg(name)))
+  if (QMessageBox::No == QMessageBox::question(
+        nullptr, tr("Delete channel?"), tr("Delete channel %1?").arg(name)))
     return;
 
   _config->channelList()->remChannel(selected.row());
@@ -762,13 +784,15 @@ void
 Application::onRemZone() {
   QModelIndex idx = _mainWindow->findChild<QListView *>("zoneView")->selectionModel()->currentIndex();
   if (! idx.isValid()) {
-    QMessageBox::information(nullptr, tr("Cannot delete zone"),
-                             tr("Cannot delete zone: You have to select a zone first."));
+    QMessageBox::information(
+          nullptr, tr("Cannot delete zone"),
+          tr("Cannot delete zone: You have to select a zone first."));
     return;
   }
 
   QString name = _config->zones()->zone(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(nullptr, tr("Delete zone?"), tr("Delete zone %1?").arg(name)))
+  if (QMessageBox::No == QMessageBox::question(
+        nullptr, tr("Delete zone?"), tr("Delete zone %1?").arg(name)))
     return;
 
   _config->zones()->remZone(idx.row());
@@ -829,13 +853,15 @@ void
 Application::onRemScanList() {
   QModelIndex idx = _mainWindow->findChild<QListView *>("scanListView")->selectionModel()->currentIndex();
   if (! idx.isValid()) {
-    QMessageBox::information(nullptr, tr("Cannot delete scanlist"),
-                             tr("Cannot delete scanlist: You have to select a scanlist first."));
+    QMessageBox::information(
+          nullptr, tr("Cannot delete scanlist"),
+          tr("Cannot delete scanlist: You have to select a scanlist first."));
     return;
   }
 
   QString name = _config->scanlists()->scanlist(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(nullptr, tr("Delete scanlist?"), tr("Delete scanlist %1?").arg(name)))
+  if (QMessageBox::No == QMessageBox::question(
+        nullptr, tr("Delete scanlist?"), tr("Delete scanlist %1?").arg(name)))
     return;
 
   _config->scanlists()->remScanList(idx.row());

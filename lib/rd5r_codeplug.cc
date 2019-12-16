@@ -2,7 +2,6 @@
 #include "config.hh"
 #include "channel.hh"
 #include "utils.hh"
-#include <QDebug>
 #include <QDateTime>
 
 

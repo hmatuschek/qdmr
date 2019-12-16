@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QNetworkReply>
 #include <algorithm>
+#include "logger.hh"
 
 
 /* ********************************************************************************************* *
@@ -54,7 +55,7 @@ bool
 UserDatabase::load(const QString &filename) {
   QFile file(filename);
   if (! file.open(QIODevice::ReadOnly)) {
-    qDebug() << "Cannot open user list" << filename;
+    logError() << "Cannot open user list '" << filename << "'.";
     return false;
   }
   QByteArray data = file.readAll();
@@ -62,15 +63,15 @@ UserDatabase::load(const QString &filename) {
 
   QJsonDocument doc = QJsonDocument::fromJson(data);
   if (! doc.isObject()) {
-    qDebug() << __FILE__ << __func__ << "Failed to load user DB: JSON document is not an object!";
+    logError() << "Failed to load user DB: JSON document is not an object!";
     return false;
   }
   if (! doc.object().contains("users")) {
-    qDebug() << __FILE__ << __func__ << "Failed to load user DB: JSON object does not contain 'users' item.";
+    logError() << "Failed to load user DB: JSON object does not contain 'users' item.";
     return false;
   }
   if (! doc.object()["users"].isArray()) {
-    qDebug() << __FILE__ << __func__ << "Failed to load user DB: 'users' item is not an array.";
+    logError() << "Failed to load user DB: 'users' item is not an array.";
     return false;
   }
 
@@ -89,7 +90,7 @@ UserDatabase::load(const QString &filename) {
   // Done.
   endResetModel();
 
-  qDebug() << __FILE__ << "Loaded user database with" << _user.size() << "entries.";
+  logDebug() << "Loaded user database with " << _user.size() << " entries.";
 
   return true;
 }
@@ -104,7 +105,7 @@ UserDatabase::download() {
 void
 UserDatabase::downloadFinished(QNetworkReply *reply) {
   if (reply->error()) {
-    qDebug() << "Cannot download repeater list:" << reply->errorString();
+    logError() << "Cannot download repeater list: " << reply->errorString();
     return;
   }
 
@@ -112,11 +113,11 @@ UserDatabase::downloadFinished(QNetworkReply *reply) {
   QFile file(path+"/user.json");
   QDir directory;
   if ((! directory.exists(path)) && (!directory.mkpath(path))) {
-    qDebug() << "Cannot create path" << path;
+    logError() << "Cannot create path '" << path << "'.";
     return;
   }
   if (! file.open(QIODevice::WriteOnly)) {
-    qDebug() << "Cannot save user list at" << (path+"/user.json");
+    logError() << "Cannot save user list at '" << (path+"/user.json") << "'.";
     return;
   }
 

@@ -3,10 +3,10 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
 #include <QFile>
-#include <QDebug>
 
 #include <QApplication>
 
+#include "logger.hh"
 #include "radio.hh"
 #include "printprogress.hh"
 #include "config.hh"
@@ -17,21 +17,21 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
 {
   Q_UNUSED(app);
 
-  if (0 == parser.positionalArguments().size())
+  if (2 > parser.positionalArguments().size())
     parser.showHelp(-1);
 
   QString errorMessage;
   Radio *radio = Radio::detect(errorMessage);
   if (nullptr == radio) {
-    qDebug() << "Cannot detect radio:" << errorMessage;
+    logError() << "Cannot detect radio: " << errorMessage;
     return -1;
   }
 
-  QString filename = parser.positionalArguments()[0];
+  QString filename = parser.positionalArguments().at(1);
 
   if (!parser.isSet("csv") && !filename.endsWith(".conf") && !filename.endsWith(".csv") &&
       !parser.isSet("cpl") && !filename.endsWith(".bin") && !filename.endsWith(".dfu")) {
-    qDebug() << "Cannot determine output filetype, consider using --csv or --bin options.";
+    logError() << "Cannot determine output filetype, consider using --csv or --bin options.";
     return -1;
   }
 
@@ -39,13 +39,13 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   radio->startDownload(&config, true);
 
   if (Radio::StatusError == radio->status()) {
-    qDebug() << "Codeplug download error: " << radio->errorMessage();
+    logError() << "Codeplug download error: " << radio->errorMessage();
     return -1;
   }
 
   if (parser.isSet("csv") || (filename.endsWith(".conf") || filename.endsWith(".csv"))) {
-    if (! config.writeCSV(filename)) {
-      qDebug() << "Cannot write CSV file" << filename;
+    if (! config.writeCSV(filename, errorMessage)) {
+      logError() << "Cannot write CSV file '" << filename << "': " << errorMessage;
       return -1;
     }
     return 0;

@@ -44,7 +44,7 @@ HID::identifier() {
   unsigned char ack;
 
   if (! hid_send_recv(CMD_PRG, 7, &ack, 1)) {
-    _errorMessage = QString("%1: Cannot identify radio: %2").arg(__func__).arg(_errorMessage);
+    _errorMessage = tr("%1: Cannot identify radio: %2").arg(__func__).arg(_errorMessage);
     return QString();
   }
 
@@ -55,12 +55,12 @@ HID::identifier() {
   }
 
   if (! hid_send_recv(CMD_PRG2, 2, reply, 16)) {
-    _errorMessage = QString("%1: Cannot identify radio: %2").arg(__func__).arg(_errorMessage);
+    _errorMessage = tr("%1: Cannot identify radio: %2").arg(__func__).arg(_errorMessage);
     return QString();
   }
 
   if (! hid_send_recv(CMD_ACK, 1, &ack, 1)) {
-    _errorMessage = QString("%1: Cannot identify radio: %2").arg(__func__).arg(_errorMessage);
+    _errorMessage = tr("%1: Cannot identify radio: %2").arg(__func__).arg(_errorMessage);
     return QString();
   }
 
@@ -90,7 +90,7 @@ HID::read_block(int bno, unsigned char *data, int nbytes)
   int n;
 
   if (! selectMemoryBank(addr)) {
-    _errorMessage = QString("%1: Cannot read block %2 (n=%3): %4").arg(__func__)
+    _errorMessage = tr("%1: Cannot read block %2 (n=%3): %4").arg(__func__)
         .arg(bno).arg(nbytes);
     return false;
   }
@@ -116,7 +116,7 @@ HID::read_finish()
   unsigned char ack;
 
   if (! hid_send_recv(CMD_ENDR, 4, &ack, 1)) {
-    _errorMessage = QString("%1: Cannot finish read(): %2").arg(__func__).arg(_errorMessage);
+    _errorMessage = tr("%1: Cannot finish read(): %2").arg(__func__).arg(_errorMessage);
     return false;
   }
   if (ack != CMD_ACK[0]) {
@@ -135,7 +135,7 @@ HID::write_block(int bno, unsigned char *data, int nbytes)
   unsigned char ack, cmd[4+32];
 
   if (! selectMemoryBank(addr)) {
-    _errorMessage = QString("%1: Cannot write block %2 (n=%3): %4").arg(__func__)
+    _errorMessage = tr("%1: Cannot write block %2 (n=%3): %4").arg(__func__)
         .arg(bno).arg(nbytes);
     return false;
   }
@@ -165,7 +165,7 @@ HID::write_finish()
   unsigned char ack;
 
   if (! hid_send_recv(CMD_ENDW, 4, &ack, 1)) {
-    _errorMessage = QString("%1: Cannot finish write(): %2").arg(__func__).arg(_errorMessage);
+    _errorMessage = tr("%1: Cannot finish write(): %2").arg(__func__).arg(_errorMessage);
     return false;
   }
   if (ack != CMD_ACK[0]) {
@@ -185,7 +185,7 @@ HID::selectMemoryBank(uint addr) {
   if ((addr < 0x10000) && (offset != 0)) {
     offset = 0;
     if (! hid_send_recv(CMD_CWB0, 8, &ack, 1)) {
-      _errorMessage = QString("%1: Cannot select memory bank for addr %2: %3").arg(__func__)
+      _errorMessage = tr("%1: Cannot select memory bank for addr %2: %3").arg(__func__)
           .arg(addr).arg(_errorMessage);
       return false;
     }
@@ -197,7 +197,7 @@ HID::selectMemoryBank(uint addr) {
   } else if ((addr >= 0x10000) && (0 == offset)) {
     offset = 0x00010000;
     if (! hid_send_recv(CMD_CWB1, 8, &ack, 1)) {
-      _errorMessage = QString("%1: Cannot select memory bank for addr %2: %3").arg(__func__)
+      _errorMessage = tr("%1: Cannot select memory bank for addr %2: %3").arg(__func__)
           .arg(addr).arg(_errorMessage);
       return false;
     }

@@ -6,6 +6,8 @@
 #include <QDir>
 #include <QNetworkReply>
 #include <algorithm>
+#include "logger.hh"
+
 
 /// @cond with_internal_docs
 /** "is-less" Operator for sorting repeaters with respect to the distace. */
@@ -54,7 +56,7 @@ bool
 RepeaterDatabase::load(const QString &filename) {
   QFile file(filename);
   if (! file.open(QIODevice::ReadOnly)) {
-    qDebug() << "Cannot open repeater list" << filename;
+    logError() << "Cannot open repeater list '" << filename << "'.";
     return false;
   }
   QByteArray data = file.readAll();
@@ -62,15 +64,15 @@ RepeaterDatabase::load(const QString &filename) {
 
   QJsonDocument doc = QJsonDocument::fromJson(data);
   if (! doc.isObject()) {
-    qDebug() << __FILE__ << __func__ << "Failed to load repeater DB: JSON document is not an object!";
+    logError() << "Failed to load repeater DB: JSON document is not an object!";
     return false;
   }
   if (! doc.object().contains("relais")) {
-    qDebug() << __FILE__ << __func__ << "Failed to load repeater DB: JSON object does not contain 'relais' item.";
+    logError() << "Failed to load repeater DB: JSON object does not contain 'relais' item.";
     return false;
   }
   if (! doc.object()["relais"].isArray()) {
-    qDebug() << __FILE__ << __func__ << "Failed to load repeater DB: 'relais' item is not an array.";
+    logError() << "Failed to load repeater DB: 'relais' item is not an array.";
     return false;
   }
 
@@ -91,7 +93,7 @@ RepeaterDatabase::load(const QString &filename) {
   // Done.
   endResetModel();
 
-  qDebug() << __FILE__ << "Loaded repeater database with" << _repeater.size() << "entries.";
+  logDebug() << "Loaded repeater database with " << _repeater.size() << " entries.";
 
   return true;
 }
@@ -106,7 +108,7 @@ RepeaterDatabase::download() {
 void
 RepeaterDatabase::downloadFinished(QNetworkReply *reply) {
   if (reply->error()) {
-    qDebug() << "Cannot download repeater list:" << reply->errorString();
+    logError() << "Cannot download repeater list: " << reply->errorString();
     return;
   }
 
@@ -114,11 +116,11 @@ RepeaterDatabase::downloadFinished(QNetworkReply *reply) {
   QFile file(path+"/repeater.json");
   QDir directory;
   if ((! directory.exists(path)) && (!directory.mkpath(path))) {
-    qDebug() << "Cannot create path" << path;
+    logError() << "Cannot create path '" << path << "'.";
     return;
   }
   if (! file.open(QIODevice::WriteOnly)) {
-    qDebug() << "Cannot save repeaterlist at" << (path+"/repeater.json");
+    logError() << "Cannot save repeaterlist at '" << (path+"/repeater.json") << "'.";
     return;
   }
 

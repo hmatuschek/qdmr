@@ -1,8 +1,8 @@
 #include "configview.hh"
-#include <QDebug>
 #include <QFormLayout>
 #include <QIntValidator>
 #include <QDateTime>
+#include "logger.hh"
 
 
 /* ********************************************************************************************* *
@@ -34,6 +34,10 @@ ConfigView::ConfigView(Config *conf, QWidget *parent)
 
 void
 ConfigView::onConfigModified() {
+  logDebug() << "Config modified, set ID=" << _config->id()
+             << ", name='" << _config->name() << "', intro1=" << _config->introLine1()
+             << "', intro2=" << _config->introLine2() << "'.";
+
   if (_id->text().toUInt() != _config->id())
     _id->setText(QString::number(_config->id()));
   if (_name->text() != _config->name())

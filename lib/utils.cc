@@ -1,6 +1,7 @@
 #include "utils.hh"
 #include <QRegExp>
-#include <QDebug>
+#include <QVector>
+
 
 QString
 decode_unicode(const uint16_t *data, size_t size, uint16_t fill) {

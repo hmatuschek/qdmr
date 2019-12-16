@@ -157,28 +157,23 @@ HIDevice::read_callback(struct libusb_transfer *t)
 
   switch (t->status) {
     case LIBUSB_TRANSFER_COMPLETED:
-      //fprintf(stderr, "%s: Transfer complete, %d bytes\n", __func__, t->actual_length);
       memcpy(self->_receive_buf, t->buffer, t->actual_length);
       self->_nbytes_received = t->actual_length;
       break;
 
     case LIBUSB_TRANSFER_CANCELLED:
-        //fprintf(stderr, "%s: Transfer cancelled\n", __func__);
         self->_nbytes_received = LIBUSB_ERROR_INTERRUPTED;
         return;
 
     case LIBUSB_TRANSFER_NO_DEVICE:
-        //fprintf(stderr, "%s: No device\n", __func__);
         self->_nbytes_received = LIBUSB_ERROR_NO_DEVICE;
         return;
 
     case LIBUSB_TRANSFER_TIMED_OUT:
-        //fprintf(stderr, "%s: Timeout (normal)\n", __func__);
         self->_nbytes_received = LIBUSB_ERROR_TIMEOUT;
         break;
 
     default:
-        //fprintf(stderr, "%s: Unknown transfer code: %d\n", __func__, t->status);
         self->_nbytes_received = LIBUSB_ERROR_IO;
    }
 }

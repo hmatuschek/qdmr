@@ -1,5 +1,4 @@
 #include "csvreader.hh"
-#include <QDebug>
 #include "config.hh"
 #include "utils.hh"
 
@@ -23,12 +22,17 @@ QVector< QPair<QRegExp, CSVLexer::Token::TokenType> > CSVLexer::_pattern = {
  * Implementation of CSVLexer
  * ********************************************************************************************* */
 CSVLexer::CSVLexer(QTextStream &stream, QObject *parent)
-  : QObject(parent), _stream(stream), _stack(), _currentLine()
+  : QObject(parent), _errorMessage(), _stream(stream), _stack(), _currentLine()
 {
   _stream.seek(0);
   _stack.reserve(10);
   _stack.push_back({0, 1, 1});
   _currentLine = _stream.readLine();
+}
+
+const QString &
+CSVLexer::errorMessage() const {
+  return _errorMessage;
 }
 
 CSVLexer::Token
@@ -60,10 +64,9 @@ CSVLexer::lex() {
       return token;
     }
   }
-  QString err = tr("Lexer error %1,%2: Unexpected char '%3'.").arg(_stack.back().line)
+  _errorMessage = tr("Lexer error %1,%2: Unexpected char '%3'.").arg(_stack.back().line)
       .arg(_stack.back().column).arg(_currentLine.at(0));
-  qDebug() << err;
-  return {Token::T_ERROR, err, _stack.back().line, _stack.back().column};
+  return {Token::T_ERROR, _errorMessage, _stack.back().line, _stack.back().column};
 }
 
 void
@@ -94,56 +97,62 @@ CSVHandler::~CSVHandler() {
 }
 
 bool
-CSVHandler::handleRadioId(qint64 id, qint64 line, qint64 column) {
+CSVHandler::handleRadioId(qint64 id, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(id);
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage)
   return true;
 }
 
 bool
-CSVHandler::handleRadioName(const QString &name, qint64 line, qint64 column) {
+CSVHandler::handleRadioName(const QString &name, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(name);
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
   return true;
 }
 
 bool
-CSVHandler::handleIntroLine1(const QString &text, qint64 line, qint64 column) {
+CSVHandler::handleIntroLine1(const QString &text, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(text);
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
   return true;
 }
 
 bool
-CSVHandler::handleIntroLine2(const QString &text, qint64 line, qint64 column) {
+CSVHandler::handleIntroLine2(const QString &text, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(text);
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
   return true;
 }
 
 bool
-CSVHandler::handleVoxLevel(uint level, qint64 line, qint64 column) {
+CSVHandler::handleVoxLevel(uint level, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(level);
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
   return true;
 }
 
 bool
-CSVHandler::handleMicLevel(uint level, qint64 line, qint64 column) {
+CSVHandler::handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(level);
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
   return true;
 }
 
 bool
 CSVHandler::handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
-                              qint64 line, qint64 column)
+                              qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
   Q_UNUSED(name);
@@ -151,12 +160,13 @@ CSVHandler::handleDTMFContact(qint64 idx, const QString &name, const QString &nu
   Q_UNUSED(rxTone);
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
   return true;
 }
 
 bool
 CSVHandler::handleDigitalContact(qint64 idx, const QString &name, DigitalContact::Type type, qint64 id,
-                                 bool rxTone, qint64 line, qint64 column)
+                                 bool rxTone, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
   Q_UNUSED(name);
@@ -165,26 +175,27 @@ CSVHandler::handleDigitalContact(qint64 idx, const QString &name, DigitalContact
   Q_UNUSED(rxTone);
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
   return true;
 }
 
 bool
 CSVHandler::handleGroupList(qint64 idx, const QString &name, const QList<qint64> &contacts,
-                            qint64 line, qint64 column)
+                            qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
   Q_UNUSED(name);
   Q_UNUSED(contacts);
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
   return true;
 }
 
 bool
-CSVHandler::handleDigitalChannel(
-    qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
+CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
     qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-    qint64 gl, qint64 contact, qint64 line, qint64 column)
+    qint64 gl, qint64 contact, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
   Q_UNUSED(name);
@@ -201,13 +212,14 @@ CSVHandler::handleDigitalChannel(
   Q_UNUSED(contact);
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
   return true;
 }
 
 bool
 CSVHandler::handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
     qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, float rxTone, float txTone,
-    AnalogChannel::Bandwidth bw, qint64 line, qint64 column)
+    AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
   Q_UNUSED(name);
@@ -224,12 +236,13 @@ CSVHandler::handleAnalogChannel(qint64 idx, const QString &name, double rx, doub
   Q_UNUSED(bw);
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
   return true;
 }
 
 bool
 CSVHandler::handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels,
-                       qint64 line, qint64 column)
+                       qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
   Q_UNUSED(name);
@@ -237,12 +250,13 @@ CSVHandler::handleZone(qint64 idx, const QString &name, bool a, const QList<qint
   Q_UNUSED(channels);
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
   return true;
 }
 
 bool
 CSVHandler::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
-                           const QList<qint64> &channels, qint64 line, qint64 column)
+                           const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
   Q_UNUSED(name);
@@ -252,6 +266,7 @@ CSVHandler::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 
   Q_UNUSED(channels);
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
   return true;
 }
 
@@ -260,9 +275,14 @@ CSVHandler::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 
  * Implementation of CSVParser
  * ********************************************************************************************* */
 CSVParser::CSVParser(CSVHandler *handler, QObject *parent)
-  : QObject(parent), _handler(handler)
+  : QObject(parent), _errorMessage(), _handler(handler)
 {
   // pass...
+}
+
+const QString &
+CSVParser::errorMessage() const {
+  return _errorMessage;
 }
 
 bool
@@ -312,11 +332,12 @@ CSVParser::parse(QTextStream &stream) {
       if (! _parse_scanlists(lexer))
         return false;
     } else if (CSVLexer::Token::T_ERROR == token.type) {
-      qDebug() << __func__ << "Parse error:" << token.line << "," << token.column << ":" << token.value;
+      _errorMessage = QString("Lexer error @ %1,%2 '%3': %4").arg(token.line).arg(token.column)
+          .arg(token.value).arg(lexer.errorMessage());
       return false;
     } else {
-      qDebug() << __func__ << "Parse error" << token.line << "," << token.column
-               << ": Unexpected token" << token.type << "'" << token.value << "'";
+      _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4'.").arg(token.line)
+          .arg(token.column).arg(token.type).arg(token.value);
       return false;
     }
   }
@@ -328,15 +349,15 @@ bool
 CSVParser::_parse_radio_id(CSVLexer &lexer) {
   CSVLexer::Token token = lexer.next();
   if (CSVLexer::Token::T_COLON != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect ':'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected ':'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   token = lexer.next();
   if (CSVLexer::Token::T_NUMBER != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   qint64 id = token.value.toInt();
@@ -344,26 +365,26 @@ CSVParser::_parse_radio_id(CSVLexer &lexer) {
 
   token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline/EOS.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
-  return _handler->handleRadioId(id, line, column);
+  return _handler->handleRadioId(id, line, column, _errorMessage);
 }
 
 bool
 CSVParser::_parse_radio_name(CSVLexer &lexer) {
   CSVLexer::Token token = lexer.next();
   if (CSVLexer::Token::T_COLON != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect ':'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected ':'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   token = lexer.next();
   if (CSVLexer::Token::T_STRING != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect string.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   QString name = token.value;
@@ -371,26 +392,26 @@ CSVParser::_parse_radio_name(CSVLexer &lexer) {
 
   token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline/EOS.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
-  return _handler->handleRadioName(name, line, column);
+  return _handler->handleRadioName(name, line, column, _errorMessage);
 }
 
 bool
 CSVParser::_parse_introline1(CSVLexer &lexer) {
   CSVLexer::Token token = lexer.next();
   if (CSVLexer::Token::T_COLON != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect ':'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected ':'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   token = lexer.next();
   if (CSVLexer::Token::T_STRING != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect string.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   QString text = token.value;
@@ -398,26 +419,26 @@ CSVParser::_parse_introline1(CSVLexer &lexer) {
 
   token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline/EOS.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
-  return _handler->handleIntroLine1(text, line, column);
+  return _handler->handleIntroLine1(text, line, column, _errorMessage);
 }
 
 bool
 CSVParser::_parse_introline2(CSVLexer &lexer) {
   CSVLexer::Token token = lexer.next();
   if (CSVLexer::Token::T_COLON != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect ':'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected ':'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   token = lexer.next();
   if (CSVLexer::Token::T_STRING != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect string.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   QString text = token.value;
@@ -425,27 +446,27 @@ CSVParser::_parse_introline2(CSVLexer &lexer) {
 
   token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline/EOS.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
-  return _handler->handleIntroLine2(text, line, column);
+  return _handler->handleIntroLine2(text, line, column, _errorMessage);
 }
 
 bool
 CSVParser::_parse_vox_level(CSVLexer &lexer) {
   CSVLexer::Token token = lexer.next();
   if (CSVLexer::Token::T_COLON != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect ':'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected ':'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   token = lexer.next();
   if (CSVLexer::Token::T_NUMBER != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   qint64 level = token.value.toInt();
@@ -453,27 +474,27 @@ CSVParser::_parse_vox_level(CSVLexer &lexer) {
 
   token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline/EOS.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
-  return _handler->handleVoxLevel(level, line, column);
+  return _handler->handleVoxLevel(level, line, column, _errorMessage);
 }
 
 bool
 CSVParser::_parse_mic_level(CSVLexer &lexer) {
   CSVLexer::Token token = lexer.next();
   if (CSVLexer::Token::T_COLON != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect ':'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected ':'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   token = lexer.next();
   if (CSVLexer::Token::T_NUMBER != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   qint64 level = token.value.toInt();
@@ -481,12 +502,12 @@ CSVParser::_parse_mic_level(CSVLexer &lexer) {
 
   token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline/EOS.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
-  return _handler->handleMicLevel(level, line, column);
+  return _handler->handleMicLevel(level, line, column, _errorMessage);
 }
 
 bool
@@ -497,8 +518,8 @@ CSVParser::_parse_contacts(CSVLexer &lexer) {
     // skip
   }
   if (CSVLexer::Token::T_NEWLINE != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -512,8 +533,8 @@ CSVParser::_parse_contacts(CSVLexer &lexer) {
   if ((CSVLexer::Token::T_NEWLINE == token.type) || (CSVLexer::Token::T_END_OF_STREAM == token.type))
     return true;
 
-  qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-           << ": Unexpected token" << token.type << "'" << token.value << "', expect newline.";
+  _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline.")
+      .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
   return false;
 }
 
@@ -523,16 +544,16 @@ CSVParser::_parse_contact(qint64 idx, CSVLexer &lexer) {
   qint64 line=token.line, column=token.column;
 
   if (CSVLexer::Token::T_STRING != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect string.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   QString name = token.value;
 
   token = lexer.next();
   if (CSVLexer::Token::T_KEYWORD != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect keyword.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected keyword.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   bool dtmf = false;
@@ -546,25 +567,25 @@ CSVParser::_parse_contact(qint64 idx, CSVLexer &lexer) {
   } else if ("dtmf" == token.value.toLower()) {
     dtmf = true;
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected call type '" << token.value << "', expect 'Group', 'Private', 'All' or 'DTMF'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'Group', 'Private', 'All' or 'DTMF'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   token = lexer.next();
   if ( (!dtmf) && (CSVLexer::Token::T_NUMBER != token.type) ) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   } else if (dtmf && (CSVLexer::Token::T_NUMBER != token.type) && (CSVLexer::Token::T_STRING != token.type)) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number or string.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   QString dtmf_num = token.value;
   if (dtmf && (! validDTMFNumber(dtmf_num))) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Invalid DTMF number '" << token.value << "'.";
+    _errorMessage = QString("Parse error @ %1,%2: Invalid DTMF number '%3'.")
+        .arg(token.line).arg(token.column).arg(token.value);
   }
   qint64 id = token.value.toInt();
 
@@ -575,21 +596,21 @@ CSVParser::_parse_contact(qint64 idx, CSVLexer &lexer) {
   else if (CSVLexer::Token::T_ENABLED == token.type)
     rxToneEnabled = true;
   else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect '-' or '+'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected '+' or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline/EOS.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   if (dtmf)
-    return _handler->handleDTMFContact(idx, name, dtmf_num, rxToneEnabled, line, column);
-  return _handler->handleDigitalContact(idx, name, type, id, rxToneEnabled, line, column);
+    return _handler->handleDTMFContact(idx, name, dtmf_num, rxToneEnabled, line, column, _errorMessage);
+  return _handler->handleDigitalContact(idx, name, type, id, rxToneEnabled, line, column, _errorMessage);
 }
 
 
@@ -601,8 +622,8 @@ CSVParser::_parse_rx_groups(CSVLexer &lexer) {
     // skip
   }
   if (CSVLexer::Token::T_NEWLINE != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -616,8 +637,8 @@ CSVParser::_parse_rx_groups(CSVLexer &lexer) {
   if ((CSVLexer::Token::T_NEWLINE == token.type) || (CSVLexer::Token::T_END_OF_STREAM == token.type))
     return true;
 
-  qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-           << ": Unexpected token" << token.type << "'" << token.value << "', expect newline.";
+  _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+      .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
 
   return false;
 }
@@ -627,8 +648,8 @@ CSVParser::_parse_rx_group(qint64 idx, CSVLexer &lexer) {
   CSVLexer::Token token = lexer.next();
   qint64 line=token.line, column=token.column;
   if (CSVLexer::Token::T_STRING != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect string.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   QString name = token.value;
@@ -643,12 +664,12 @@ CSVParser::_parse_rx_group(qint64 idx, CSVLexer &lexer) {
   }
 
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline/EOS.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
-  return _handler->handleGroupList(idx, name, lst, line, column);
+  return _handler->handleGroupList(idx, name, lst, line, column, _errorMessage);
 }
 
 bool
@@ -659,8 +680,8 @@ CSVParser::_parse_digital_channels(CSVLexer &lexer) {
     // skip
   }
   if (CSVLexer::Token::T_NEWLINE != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -674,8 +695,8 @@ CSVParser::_parse_digital_channels(CSVLexer &lexer) {
   if ((CSVLexer::Token::T_NEWLINE == token.type) || (CSVLexer::Token::T_END_OF_STREAM == token.type))
     return true;
 
-  qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-           << ": Unexpected token" << token.type << "'" << token.value << "', expect newline.";
+  _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+      .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
   return false;
 }
 
@@ -684,24 +705,24 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   CSVLexer::Token token = lexer.next();
   qint64 line=token.line, column=token.column;
   if (CSVLexer::Token::T_STRING != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect string.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   QString name = token.value;
 
   token = lexer.next();
   if (CSVLexer::Token::T_NUMBER != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   double rx = token.value.toDouble();
 
   token = lexer.next();
   if (CSVLexer::Token::T_NUMBER != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   double tx = token.value.toDouble();
@@ -710,8 +731,8 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
 
   token = lexer.next();
   if (CSVLexer::Token::T_KEYWORD != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect keyword.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected keyword.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   Channel::Power pwr;
@@ -720,8 +741,8 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   else if ("low" == token.value.toLower())
     pwr = Channel::LowPower;
   else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected keyword '" << token.value << "', expect 'High' or 'Low'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'High' or 'Low'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -732,15 +753,15 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
     scanlist = token.value.toInt();
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number or '-'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   token = lexer.next();
   if ((CSVLexer::Token::T_NUMBER != token.type) && (CSVLexer::Token::T_NOT_SET != token.type)) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   qint64 tot =  (CSVLexer::Token::T_NOT_SET != token.type) ? 0 : token.value.toInt();
@@ -752,8 +773,8 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   else if (CSVLexer::Token::T_ENABLED == token.type)
     rxOnly = true;
   else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect '-' or '+'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected '+' or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -767,20 +788,20 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
     else if ("color" == token.value.toLower())
       admit = DigitalChannel::AdmitColorCode;
     else {
-      qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-               << ": Unexpected keyword '" << token.value << "', expect 'Free' or 'Color'.";
+      _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'Free' or 'Color'.")
+          .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
       return false;
     }
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect 'Free', 'Color' or '-'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'Free', 'Color' or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   token = lexer.next();
   if (CSVLexer::Token::T_NUMBER != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   qint64 color = token.value.toInt();
@@ -793,13 +814,13 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
     } else if (2 == token.value.toInt()) {
       slot = DigitalChannel::TimeSlot2;
     } else {
-      qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-               << ": Unexpected value '" << token.value << "', expect '1' or '2'.";
+      _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected '1' or '2'.")
+          .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
       return false;
     }
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -810,8 +831,8 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
     rxGroupList = token.value.toInt();
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number or '-'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -822,20 +843,20 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
     txContact = token.value.toInt();
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number or '-'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline/EOS.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   return _handler->handleDigitalChannel(idx, name, rx, tx, pwr, scanlist, tot, rxOnly, admit, color,
-                                        slot, rxGroupList, txContact, line, column);
+                                        slot, rxGroupList, txContact, line, column, _errorMessage);
 }
 
 bool
@@ -846,8 +867,8 @@ CSVParser::_parse_analog_channels(CSVLexer &lexer) {
     // skip
   }
   if (CSVLexer::Token::T_NEWLINE != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -861,8 +882,8 @@ CSVParser::_parse_analog_channels(CSVLexer &lexer) {
   if ((CSVLexer::Token::T_NEWLINE == token.type) || (CSVLexer::Token::T_END_OF_STREAM == token.type))
     return true;
 
-  qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-           << ": Unexpected token" << token.type << "'" << token.value << "', expect newline or EOS.";
+  _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+      .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
   return false;
 }
 
@@ -871,24 +892,24 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   CSVLexer::Token token = lexer.next();
   qint64 line=token.line, column=token.column;
   if (CSVLexer::Token::T_STRING != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect string.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   QString name = token.value;
 
   token = lexer.next();
   if (CSVLexer::Token::T_NUMBER != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   double rx = token.value.toDouble();
 
   token = lexer.next();
   if (CSVLexer::Token::T_NUMBER != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   double tx = token.value.toDouble();
@@ -897,8 +918,8 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
 
   token = lexer.next();
   if (CSVLexer::Token::T_KEYWORD != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect keyword.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected keyword.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   Channel::Power pwr;
@@ -907,8 +928,8 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   else if ("low" == token.value.toLower())
     pwr = Channel::LowPower;
   else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected keyword '" << token.value << "', expect 'High' or 'Low'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'High' or 'Low'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -919,15 +940,15 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
     scanlist = token.value.toInt();
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number or '-'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   token = lexer.next();
   if ((CSVLexer::Token::T_NUMBER != token.type) && (CSVLexer::Token::T_NOT_SET != token.type)) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   qint64 tot =  (CSVLexer::Token::T_NOT_SET != token.type) ? 0 : token.value.toInt();
@@ -939,8 +960,8 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   else if (CSVLexer::Token::T_ENABLED == token.type)
     rxOnly = true;
   else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect '-' or '+'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected '+' or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -954,20 +975,20 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
     else if ("color" == token.value.toLower())
       admit = AnalogChannel::AdmitTone;
     else {
-      qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-               << ": Unexpected keyword '" << token.value << "', expect 'Free' or 'Tone'.";
+      _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'Free', 'Tone'.")
+          .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
       return false;
     }
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect 'Free', 'Tone' or '-'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'Free', 'Tone' or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   token = lexer.next();
   if (CSVLexer::Token::T_NUMBER != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   qint64 squelch = token.value.toInt();
@@ -979,8 +1000,8 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
     rxTone = token.value.toFloat();
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number or '-'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -991,15 +1012,15 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
     txTone = token.value.toFloat();
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number or '-'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   token = lexer.next();
   if (CSVLexer::Token::T_NUMBER != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   AnalogChannel::Bandwidth bw;
@@ -1008,20 +1029,20 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   } else if (12.5 == token.value.toFloat()) {
     bw = AnalogChannel::BWNarrow;
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected bandwidth value '" << token.value << "', expect '12.5' or '25'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected '12.5' or '25'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline/EOS.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
   return _handler->handleAnalogChannel(idx, name, rx, tx, pwr, scanlist, tot, rxOnly, admit, squelch,
-                                       rxTone, txTone, bw, line, column);
+                                       rxTone, txTone, bw, line, column, _errorMessage);
 }
 
 bool
@@ -1032,8 +1053,8 @@ CSVParser::_parse_zones(CSVLexer &lexer) {
     // skip
   }
   if (CSVLexer::Token::T_NEWLINE != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -1047,8 +1068,8 @@ CSVParser::_parse_zones(CSVLexer &lexer) {
   if ((CSVLexer::Token::T_NEWLINE == token.type) || (CSVLexer::Token::T_END_OF_STREAM == token.type))
     return true;
 
-  qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-           << ": Unexpected token" << token.type << "'" << token.value << "', expect newline.";
+  _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+      .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
   return false;
 }
 
@@ -1057,16 +1078,16 @@ CSVParser::_parse_zone(qint64 idx, CSVLexer &lexer) {
   CSVLexer::Token token = lexer.next();
   qint64 line=token.line, column=token.column;
   if (CSVLexer::Token::T_STRING != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect string.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   QString name = token.value;
 
   token = lexer.next();
   if ((CSVLexer::Token::T_KEYWORD != token.type) || (("a" != token.value.toLower()) && ("b" != token.value.toLower())) ) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect 'A' or 'B'.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'A or 'B'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   bool a = ("a" == token.value.toLower());
@@ -1081,12 +1102,12 @@ CSVParser::_parse_zone(qint64 idx, CSVLexer &lexer) {
   }
 
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline/EOS.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
-  return _handler->handleZone(idx, name, a, lst, line, column);
+  return _handler->handleZone(idx, name, a, lst, line, column, _errorMessage);
 }
 
 bool
@@ -1097,8 +1118,8 @@ CSVParser::_parse_scanlists(CSVLexer &lexer) {
     // skip
   }
   if (CSVLexer::Token::T_NEWLINE != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -1112,8 +1133,8 @@ CSVParser::_parse_scanlists(CSVLexer &lexer) {
   if ((CSVLexer::Token::T_NEWLINE == token.type) || (CSVLexer::Token::T_END_OF_STREAM == token.type))
     return true;
 
-  qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-           << ": Unexpected token" << token.type << "'" << token.value << "', expect newline.";
+  _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+      .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
   return false;
 }
 
@@ -1122,8 +1143,8 @@ CSVParser::_parse_scanlist(qint64 idx, CSVLexer &lexer) {
   CSVLexer::Token token = lexer.next();
   qint64 line=token.line, column=token.column;
   if (CSVLexer::Token::T_STRING != token.type) {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect string.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
   QString name = token.value;
@@ -1135,8 +1156,8 @@ CSVParser::_parse_scanlist(qint64 idx, CSVLexer &lexer) {
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
     pch1 = token.value.toInt() + 1;
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect '-' or number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -1147,8 +1168,8 @@ CSVParser::_parse_scanlist(qint64 idx, CSVLexer &lexer) {
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
     pch2 = token.value.toInt() + 1;
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect '-' or number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -1160,15 +1181,15 @@ CSVParser::_parse_scanlist(qint64 idx, CSVLexer &lexer) {
     if ("sel" == token.value.toLower()) {
       txch = 1;
     } else {
-      qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-               << ": Unexpected token" << token.type << "'" << token.value << "', expect '-', 'Sel' or number.";
+      _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number, 'Sel' or '-'.")
+          .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
       return false;
     }
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
     txch = token.value.toInt() + 1;
   } else {
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect '-', 'Sel' or number.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number, 'Sel' or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
@@ -1182,12 +1203,12 @@ CSVParser::_parse_scanlist(qint64 idx, CSVLexer &lexer) {
   }
 
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
-    qDebug() << __func__ << "Parse error @" << token.line << "," << token.column
-             << ": Unexpected token" << token.type << "'" << token.value << "', expect newline/EOS.";
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
-  return _handler->handleScanList(idx, name, pch1, pch2, txch, lst, line, column);
+  return _handler->handleScanList(idx, name, pch1, pch2, txch, lst, line, column, _errorMessage);
 }
 
 
@@ -1202,10 +1223,10 @@ CSVReader::CSVReader(Config *config, QObject *parent)
 
 
 bool
-CSVReader::read(Config *config, QTextStream &stream) {
+CSVReader::read(Config *config, QTextStream &stream, QString &errorMessage) {
   // Seek to start-of-stream
   if (! stream.seek(0)) {
-    qDebug() << __func__ << "Cannot read CSV codeplug: Cannot seek within text stream. Abort import." ;
+    errorMessage = "Cannot read CSV codeplug: Cannot seek within text stream. Abort import." ;
     return false;
   }
 
@@ -1227,9 +1248,10 @@ CSVReader::read(Config *config, QTextStream &stream) {
 
 
 bool
-CSVReader::handleRadioId(qint64 id, qint64 line, qint64 column) {
+CSVReader::handleRadioId(qint64 id, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
 
   if (_link) {
     _config->setId(id);
@@ -1238,9 +1260,10 @@ CSVReader::handleRadioId(qint64 id, qint64 line, qint64 column) {
 }
 
 bool
-CSVReader::handleRadioName(const QString &name, qint64 line, qint64 column) {
+CSVReader::handleRadioName(const QString &name, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
 
   if (_link) {
     _config->setName(name);
@@ -1249,9 +1272,10 @@ CSVReader::handleRadioName(const QString &name, qint64 line, qint64 column) {
 }
 
 bool
-CSVReader::handleIntroLine1(const QString &text, qint64 line, qint64 column) {
+CSVReader::handleIntroLine1(const QString &text, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
 
   if (_link) {
     _config->setIntroLine1(text);
@@ -1260,9 +1284,10 @@ CSVReader::handleIntroLine1(const QString &text, qint64 line, qint64 column) {
 }
 
 bool
-CSVReader::handleIntroLine2(const QString &text, qint64 line, qint64 column) {
+CSVReader::handleIntroLine2(const QString &text, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
 
   if (_link) {
     _config->setIntroLine2(text);
@@ -1271,9 +1296,10 @@ CSVReader::handleIntroLine2(const QString &text, qint64 line, qint64 column) {
 }
 
 bool
-CSVReader::handleVoxLevel(uint level, qint64 line, qint64 column) {
+CSVReader::handleVoxLevel(uint level, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
 
   if (_link) {
     _config->setVoxLevel(level);
@@ -1282,9 +1308,10 @@ CSVReader::handleVoxLevel(uint level, qint64 line, qint64 column) {
 }
 
 bool
-CSVReader::handleMicLevel(uint level, qint64 line, qint64 column) {
+CSVReader::handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(line);
   Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
 
   if (_link) {
     _config->setMicLevel(level);
@@ -1295,7 +1322,7 @@ CSVReader::handleMicLevel(uint level, qint64 line, qint64 column) {
 
 bool
 CSVReader::handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
-                             qint64 line, qint64 column)
+                             qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
     // pass...
@@ -1303,9 +1330,8 @@ CSVReader::handleDTMFContact(qint64 idx, const QString &name, const QString &num
   }
 
   if (_digital_contacts.contains(idx)) {
-    qDebug() << "Parse error @" << line << "," << column
-             << ": Cannot create contact '" << name << "' with index " << idx
-             << " index already taken.";
+    errorMessage = QString("Parse error @ %1,%2: Cannot create contact '%3' with index %4, index already taken.")
+        .arg(line).arg(column).arg(name).arg(idx);
     return false;
   }
   DTMFContact *contact = new DTMFContact(name, num, rxTone);
@@ -1318,7 +1344,7 @@ CSVReader::handleDTMFContact(qint64 idx, const QString &name, const QString &num
 
 bool
 CSVReader::handleDigitalContact(qint64 idx, const QString &name, DigitalContact::Type type,
-                                qint64 id, bool rxTone, qint64 line, qint64 column)
+                                qint64 id, bool rxTone, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
     // pass...
@@ -1326,9 +1352,8 @@ CSVReader::handleDigitalContact(qint64 idx, const QString &name, DigitalContact:
   }
 
   if (_digital_contacts.contains(idx)) {
-    qDebug() << "Parse error @" << line << "," << column
-             << ": Cannot create contact '" << name << "' with index " << idx
-             << " index already taken.";
+    errorMessage = QString("Parse error @ %1,%2: Cannot create contact '%3' with index %4, index already taken.")
+        .arg(line).arg(column).arg(name).arg(idx);
     return false;
   }
   DigitalContact *contact = new DigitalContact(type, name, id, rxTone);
@@ -1340,15 +1365,14 @@ CSVReader::handleDigitalContact(qint64 idx, const QString &name, DigitalContact:
 
 bool
 CSVReader::handleGroupList(qint64 idx, const QString &name, const QList<qint64> &contacts,
-                           qint64 line, qint64 column)
+                           qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
     foreach(qint64 i, contacts) {
       // Check contacts
       if (! _digital_contacts.contains(i)) {
-        qDebug() << "Parse error @" << line << "," << column
-                 << ": Cannot create contact list '" << name
-                 << ": Unknwon contact index " << i;
+        errorMessage = QString("Parse error @ %1,%2: Cannot create contact list '%3' with index %4, unknown index.")
+            .arg(line).arg(column).arg(name).arg(i);
         return false;
       }
       // link contacts
@@ -1360,9 +1384,8 @@ CSVReader::handleGroupList(qint64 idx, const QString &name, const QList<qint64> 
 
   // check index
   if (_rxgroups.contains(idx)) {
-    qDebug() << "Parse error @" << line << "," << column
-             << ": Cannot create RX group-list '" << name << "' with index " << idx
-             << " index already taken.";
+    errorMessage = QString("Parse error @ %1,%2: Cannot create RX-group list '%3' with index %4, index already taken.")
+        .arg(line).arg(column).arg(name).arg(idx);
     return false;
   }
   // Create group list
@@ -1374,33 +1397,29 @@ CSVReader::handleGroupList(qint64 idx, const QString &name, const QList<qint64> 
 }
 
 bool
-CSVReader::handleDigitalChannel(
-    qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
+CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
     qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-    qint64 gl, qint64 contact, qint64 line, qint64 column)
+    qint64 gl, qint64 contact, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
     // Check RX Grouplist
     if ((0 < gl) && (! _rxgroups.contains(gl))) {
-      qDebug() << "Parse error @" << line << "," << column
-               << ": Cannot link digital channel '" << name
-               << ": Unknwon RX group-list-index " << gl;
+      errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown RX-group list %4.")
+          .arg(line).arg(column).arg(name).arg(gl);
       return false;
     }
     _channels[idx]->as<DigitalChannel>()->setRXGroupList(_rxgroups[gl]);
     // Check TX Contact
     if ((0 < contact) && (! _digital_contacts.contains(contact))) {
-      qDebug() << "Parse error @" << line << "," << column
-               << ": Cannot link digital channel '" << name
-               << ": Unknwon contact-index " << contact;
+      errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown contact index %4.")
+          .arg(line).arg(column).arg(name).arg(contact);
       return false;
     }
     _channels[idx]->as<DigitalChannel>()->setTXContact(_digital_contacts[contact]);
     // Check scanlist
     if ((0 < scan) && (! _scanlists.contains(scan))) {
-      qDebug() << "Parse error @" << line << "," << column
-               << ": Cannot link digital channel '" << name
-               << ": Unknwon scanlist-index " << scan;
+      errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown scan-list index %4.")
+          .arg(line).arg(column).arg(name).arg(scan);
       return false;
     }
     _channels[idx]->as<DigitalChannel>()->setScanList(_scanlists[scan]);
@@ -1409,9 +1428,8 @@ CSVReader::handleDigitalChannel(
 
   // check index
   if (_channels.contains(idx)) {
-    qDebug() << "Parse error @" << line << "," << column
-             << ": Cannot create digital channel '" << name << "' with index " << idx
-             << " index already taken.";
+    errorMessage = QString("Parse error @ %1,%2: Cannot create digital channel '%3' with index %4, index already taken.")
+        .arg(line).arg(column).arg(name).arg(idx);
     return false;
   }
 
@@ -1425,17 +1443,15 @@ CSVReader::handleDigitalChannel(
 
 
 bool
-CSVReader::handleAnalogChannel(
-    qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
+CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
     qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, float rxTone, float txTone,
-    AnalogChannel::Bandwidth bw, qint64 line, qint64 column)
+    AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
     // Check scanlist
     if ((0 < scan) && (! _scanlists.contains(scan))) {
-      qDebug() << "Parse error @" << line << "," << column
-               << ": Cannot link analog channel '" << name
-               << ": Unknwon scanlist-index " << scan;
+      errorMessage = QString("Parse error @ %1,%2: Cannot link analog channel '%3', unknown scan-list index %4.")
+          .arg(line).arg(column).arg(name).arg(scan);
       return false;
     }
     _channels[idx]->as<AnalogChannel>()->setScanList(_scanlists[scan]);
@@ -1444,9 +1460,8 @@ CSVReader::handleAnalogChannel(
 
   // check index
   if (_channels.contains(idx)) {
-    qDebug() << "Parse error @" << line << "," << column
-             << ": Cannot create analog channel '" << name << "' with index " << idx
-             << " index already taken.";
+    errorMessage = QString("Parse error @ %1,%2: Cannot create analog channel '%3' with index %4, index already taken.")
+        .arg(line).arg(column).arg(name).arg(idx);
     return false;
   }
 
@@ -1459,15 +1474,14 @@ CSVReader::handleAnalogChannel(
 }
 
 bool
-CSVReader::handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels, qint64 line, qint64 column)
+CSVReader::handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
     foreach(qint64 i, channels) {
       // Check channels
       if (! _channels.contains(i)) {
-        qDebug() << "Parse error @" << line << "," << column
-                 << ": Cannot create zone '" << name
-                 << ": Unknwon channel index " << i;
+        errorMessage = QString("Parse error @ %1,%2: Cannot create zone '%3', unknown channel index %4.")
+            .arg(line).arg(column).arg(name).arg(i);
         return false;
       }
       // link channels
@@ -1492,32 +1506,29 @@ CSVReader::handleZone(qint64 idx, const QString &name, bool a, const QList<qint6
 
 bool
 CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
-                          const QList<qint64> &channels, qint64 line, qint64 column)
+                          const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
     // Check PriChan 1
     if (pch1 && (! _channels.contains(pch1))) {
-      qDebug() << "Parse error @" << line << "," << column
-               << ": Cannot create scanlist '" << name
-               << ": Unknwon priority channel 1 index " << pch1;
+      errorMessage = QString("Parse error @ %1,%2: Cannot create scanlist '%3', unknown priority channel 1 index %4.")
+          .arg(line).arg(column).arg(name).arg(pch1);
       return false;
     }
     _scanlists[idx]->setPriorityChannel(_channels[pch1]);
 
     // Check PriChan 2
     if (pch2 && (! _channels.contains(pch2))) {
-      qDebug() << "Parse error @" << line << "," << column
-               << ": Cannot create scanlist '" << name
-               << ": Unknwon priority channel 2 index " << pch2;
+      errorMessage = QString("Parse error @ %1,%2: Cannot create scanlist '%3', unknown priority channel 2 index %4.")
+          .arg(line).arg(column).arg(name).arg(pch2);
       return false;
     }
     _scanlists[idx]->setSecPriorityChannel(_channels[pch2]);
 
     // Check Tx channel
     if ((txch>1) && (! _channels.contains(txch-1))) {
-      qDebug() << "Parse error @" << line << "," << column
-               << ": Cannot create scanlist '" << name
-               << ": Unknwon priority channel 2 index " << txch-1;
+      errorMessage = QString("Parse error @ %1,%2: Cannot create scanlist '%3', unknown TX channel index %4.")
+          .arg(line).arg(column).arg(name).arg(txch-1);
       return false;
     }
     /// @todo set TX Channel
@@ -1525,9 +1536,8 @@ CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 p
     // Check channels
     foreach(qint64 i, channels) {
       if (! _channels.contains(i)) {
-        qDebug() << "Parse error @" << line << "," << column
-                 << ": Cannot create scanlist '" << name
-                 << ": Unknwon channel index " << i;
+        errorMessage = QString("Parse error @ %1,%2: Cannot create scanlist '%3', unknown channel index %4.")
+            .arg(line).arg(column).arg(name).arg(i);
         return false;
       }
       // link channels
@@ -1539,10 +1549,11 @@ CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 p
 
   // check index
   if (_scanlists.contains(idx)) {
-    qDebug() << "Parse error @" << line << "," << column
-             << ": Cannot create zone '" << name << "' with index " << idx
-             << " index already taken.";
+    if (_channels.contains(idx)) {
+      errorMessage = QString("Parse error @ %1,%2: Cannot scan list '%3' with index %4, index already taken.")
+          .arg(line).arg(column).arg(name).arg(idx);
     return false;
+    }
   }
 
   ScanList *lst = new ScanList(name);

@@ -10,7 +10,6 @@
 #include <QLabel>
 #include <QInputDialog>
 #include "config.hh"
-#include <QDebug>
 
 
 /* ********************************************************************************************* *

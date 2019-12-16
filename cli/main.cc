@@ -1,7 +1,8 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
-#include <QDebug>
+#include <iostream>
 
+#include "logger.hh"
 #include "config.h"
 #include "detect.hh"
 #include "verify.hh"
@@ -14,6 +15,11 @@
 
 int main(int argc, char *argv[])
 {
+  // Install log handler to stderr.
+  QTextStream out(stderr);
+  Logger::get().addHandler(new StreamLogHandler(out));
+
+  // Instantiate core application
   QCoreApplication app(argc, argv);
   app.setApplicationName("dmrconf");
   app.setOrganizationName("dm3mat");
@@ -47,24 +53,33 @@ int main(int argc, char *argv[])
    {{"R", "radio"}, QCoreApplication::translate("main", "Specifies the radio."), QCoreApplication::translate("main", "directory")});
 
   parser.addPositionalArgument(
+        "command", QCoreApplication::translate("main", "Specifies the command to perform."),
+        QCoreApplication::translate("main", "[command]"));
+
+  parser.addPositionalArgument(
         "file", QCoreApplication::translate("main", "Codeplug file."),
         QCoreApplication::translate("main", "[filename]"));
+
   parser.process(app);
 
-  if (parser.isSet("detect"))
+  if (1 > parser.positionalArguments().size())
+    parser.showHelp(-1);
+  QString command = parser.positionalArguments().at(0);
+  if ("detect" == command)
     return detect(parser, app);
-  else if (parser.isSet("verify"))
+  if ("verify" == command)
     return verify(parser, app);
-  else if (parser.isSet("read"))
+  if ("read" == command)
     return readCodeplug(parser, app);
-  else if (parser.isSet("write"))
+  if ("write" == command)
     return writeCodeplug(parser, app);
-  else if (parser.isSet("encode"))
+  if ("encode" == command)
     return encodeCodeplug(parser, app);
-  else if (parser.isSet("decode"))
+  if ("decode" == command)
     return decodeCodeplug(parser, app);
-  else if (parser.isSet("info"))
+  if ("info" == command)
     return infoFile(parser, app);
 
+  parser.showHelp(-1);
   return -1;
 }

@@ -376,12 +376,16 @@ public:
   /** Reads the next token from the stream. */
   Token next();
 
+  const QString &errorMessage() const;
+
 protected:
   /** Internal used function to get the next token. Also returns ignored tokens like whitespace
    * and comment. */
   Token lex();
 
 protected:
+  /// The error message.
+  QString _errorMessage;
   /// The text stream to read from.
   QTextStream &_stream;
   /// The stack of saved lexer states
@@ -413,42 +417,42 @@ public:
   virtual ~CSVHandler();
 
   /** Gets called once the DMR ID has been parsed. */
-  virtual bool handleRadioId(qint64 id, qint64 line, qint64 column);
+  virtual bool handleRadioId(qint64 id, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the radio name has been parsed. */
-  virtual bool handleRadioName(const QString &name, qint64 line, qint64 column);
+  virtual bool handleRadioName(const QString &name, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the first intro line has been parsed. */
-  virtual bool handleIntroLine1(const QString &text, qint64 line, qint64 column);
+  virtual bool handleIntroLine1(const QString &text, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the second intro line has been parsed. */
-  virtual bool handleIntroLine2(const QString &text, qint64 line, qint64 column);
+  virtual bool handleIntroLine2(const QString &text, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the VOX level has been parsed. */
-  virtual bool handleVoxLevel(uint level, qint64 line, qint64 column);
+  virtual bool handleVoxLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the MIC level has been parsed. */
-  virtual bool handleMicLevel(uint level, qint64 line, qint64 column);
+  virtual bool handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a DTMF contact has been parsed. */
   virtual bool handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
-                                 qint64 line, qint64 column);
+                                 qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a digital contact has been parsed. */
   virtual bool handleDigitalContact(qint64 idx, const QString &name, DigitalContact::Type type, qint64 id,
-                                    bool rxTone, qint64 line, qint64 column);
+                                    bool rxTone, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once an RX group list has been parsed. */
   virtual bool handleGroupList(qint64 idx, const QString &name, const QList<qint64> &contacts,
-                               qint64 line, qint64 column);
+                               qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a digital channel has been parsed. */
   virtual bool handleDigitalChannel(
       qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
       qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-      qint64 gl, qint64 contact, qint64 line, qint64 column);
+      qint64 gl, qint64 contact, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a analog channel has been parsed. */
   virtual bool handleAnalogChannel(
       qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
       qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, float rxTone, float txTone,
-      AnalogChannel::Bandwidth bw, qint64 line, qint64 column);
+      AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a zone list has been parsed. */
   virtual bool handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels,
-                          qint64 line, qint64 column);
+                          qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a scan list has been parsed. */
   virtual bool handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
-                              const QList<qint64> &channels, qint64 line, qint64 column);
+                              const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage);
 };
 
 
@@ -466,6 +470,8 @@ public:
 
   /** Parses the given text stream. */
   bool parse(QTextStream &stream);
+
+  const QString &errorMessage() const;
 
 protected:
   /** Internal function to parse DMR IDs. */
@@ -506,6 +512,7 @@ protected:
   bool _parse_scanlist(qint64 id, CSVLexer &lexer);
 
 protected:
+  QString _errorMessage;
   /** The handler instance. */
   CSVHandler *_handler;
 };
@@ -525,33 +532,33 @@ protected:
 public:
   /** Reads a config file from @c stream and stores the read configuration into @c config.
    * @returns @c true on success. */
-	static bool read(Config *config, QTextStream &stream);
+  static bool read(Config *config, QTextStream &stream, QString &errorMessage);
 
-  virtual bool handleRadioId(qint64 id, qint64 line, qint64 column);
-  virtual bool handleRadioName(const QString &name, qint64 line, qint64 column);
-  virtual bool handleIntroLine1(const QString &text, qint64 line, qint64 column);
-  virtual bool handleIntroLine2(const QString &text, qint64 line, qint64 column);
-  virtual bool handleVoxLevel(uint level, qint64 line, qint64 column);
-  virtual bool handleMicLevel(uint level, qint64 line, qint64 column);
+  virtual bool handleRadioId(qint64 id, qint64 line, qint64 column, QString &errorMessage);
+  virtual bool handleRadioName(const QString &name, qint64 line, qint64 column, QString &errorMessage);
+  virtual bool handleIntroLine1(const QString &text, qint64 line, qint64 column, QString &errorMessage);
+  virtual bool handleIntroLine2(const QString &text, qint64 line, qint64 column, QString &errorMessage);
+  virtual bool handleVoxLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
+  virtual bool handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
-                                 qint64 line, qint64 column);
+                                 qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleDigitalContact(
       qint64 idx, const QString &name, DigitalContact::Type type, qint64 id, bool rxTone,
-      qint64 line, qint64 column);
+      qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleGroupList(qint64 idx, const QString &name, const QList<qint64> &contacts,
-                               qint64 line, qint64 column);
+                               qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleDigitalChannel(
       qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
       qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-      qint64 gl, qint64 contact, qint64 line, qint64 column);
+      qint64 gl, qint64 contact, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleAnalogChannel(
       qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
       qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, float rxTone, float txTone,
-      AnalogChannel::Bandwidth bw, qint64 line, qint64 column);
+      AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels,
-                          qint64 line, qint64 column);
+                          qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
-                              const QList<qint64> &channels, qint64 line, qint64 column);
+                              const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage);
 
 protected:
   /** If @c true, the reader is in "link" mode. */

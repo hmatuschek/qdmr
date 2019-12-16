@@ -1,7 +1,6 @@
 #include "contact.hh"
 #include "config.hh"
 #include "utils.hh"
-#include <QDebug>
 
 
 /* ********************************************************************************************* *

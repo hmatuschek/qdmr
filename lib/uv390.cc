@@ -1,6 +1,5 @@
 #include "uv390.hh"
 #include "config.hh"
-#include <QDebug>
 
 
 #define BSIZE 1024
@@ -158,7 +157,6 @@ UV390::run() {
           emit downloadError(this);
           return;
         }
-        qDebug() << "Read block" << (b0+b);
         emit downloadProgress(float(bcount*100)/totb);
       }
     }

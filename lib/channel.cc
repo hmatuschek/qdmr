@@ -13,7 +13,6 @@
 #include <QDoubleValidator>
 #include <QIntValidator>
 #include <cmath>
-#include <QDebug>
 #include "application.hh"
 #include <QCompleter>
 #include <QAbstractProxyModel>

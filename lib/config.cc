@@ -2,7 +2,6 @@
 #include "rxgrouplist.hh"
 #include "channel.hh"
 #include <QTextStream>
-#include <QDebug>
 #include <QDateTime>
 #include <QFile>
 #include <cmath>
@@ -149,6 +148,7 @@ Config::reset() {
   _introLine2.clear();
   _vox_level = 3;
   _mic_level = 2;
+  emit modified();
 }
 
 void
@@ -157,18 +157,18 @@ Config::onConfigModified() {
 }
 
 bool
-Config::readCSV(const QString &filename) {
+Config::readCSV(const QString &filename, QString &errorMessage) {
   QFile file(filename);
   if (! file.open(QIODevice::ReadOnly))
     return false;
   QTextStream stream(&file);
-  return readCSV(stream);
+  return readCSV(stream, errorMessage);
 }
 
 bool
-Config::readCSV(QTextStream &stream)
+Config::readCSV(QTextStream &stream, QString &errorMessage)
 {
-  if (CSVReader::read(this, stream))
+  if (CSVReader::read(this, stream, errorMessage))
     _modified = false;
   else
     return false;
@@ -176,18 +176,20 @@ Config::readCSV(QTextStream &stream)
 }
 
 bool
-Config::writeCSV(const QString &filename) {
+Config::writeCSV(const QString &filename, QString &errorMessage) {
   QFile file(filename);
-  if (! file.open(QIODevice::WriteOnly))
+  if (! file.open(QIODevice::WriteOnly)) {
+    errorMessage = QString("Cannot open file %1: %2").arg(filename).arg(file.errorString());
     return false;
+  }
   QTextStream stream(&file);
-  return writeCSV(stream);
+  return writeCSV(stream, errorMessage);
 }
 
 bool
-Config::writeCSV(QTextStream &stream)
+Config::writeCSV(QTextStream &stream, QString &errorMessage)
 {
-  if (! CSVWriter::write(this, stream))
+  if (! CSVWriter::write(this, stream, errorMessage))
     return false;
 
   _modified = false;

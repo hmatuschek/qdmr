@@ -3,21 +3,21 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
 #include <QTextStream>
-#include <QDebug>
 
+#include "logger.hh"
 #include "dfufile.hh"
 
 
 int infoFile(QCommandLineParser &parser, QCoreApplication &app) {
   Q_UNUSED(app)
 
-  if (1 != parser.positionalArguments().size())
+  if (2 > parser.positionalArguments().size())
     parser.showHelp(-1);
 
-  QString filename = parser.positionalArguments().at(0);
+  QString filename = parser.positionalArguments().at(1);
   DFUFile file;
   if (! file.read(filename)) {
-    qDebug() << file.errorMessage();
+    logError() << "Cannot read codeplug file '" << filename << "': " << file.errorMessage();
     return -1;
   }
 

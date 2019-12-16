@@ -2,8 +2,8 @@
 
 #include <QCoreApplication>
 #include <QCommandLineParser>
-#include <QDebug>
 
+#include "logger.hh"
 #include "radio.hh"
 #include "config.hh"
 
@@ -11,28 +11,28 @@
 int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   Q_UNUSED(app);
 
-  if (0 == parser.positionalArguments().size())
+  if (2 > parser.positionalArguments().size())
     parser.showHelp(-1);
 
-  QString filename = parser.positionalArguments()[0];
+  QString filename = parser.positionalArguments().at(1);
 
+  QString errorMessage;
   Config config;
-  if (! config.readCSV(filename)) {
-    qDebug() << "Cannot read CSV file" << filename;
+  if (! config.readCSV(filename, errorMessage)) {
+    logError() << "Cannot read CSV file '" << filename << "': " << errorMessage;
     return -1;
   }
 
-  QString errorMessage;
   Radio *radio = Radio::detect(errorMessage);
   if (nullptr == radio) {
-    qDebug() << "Cannot detect radio:" << errorMessage;
+    logError() << "Cannot detect radio: " << errorMessage;
     return -1;
   }
 
   radio->startUpload(&config, true);
 
   if (Radio::StatusError == radio->status()) {
-    qDebug() << "Codeplug upload error: " << radio->errorMessage();
+    logError() << "Codeplug upload error: " << radio->errorMessage();
     return -1;
   }
 

@@ -81,13 +81,13 @@ public:
   void reset();
 
   /** Imports a configuration from the given file. */
-  bool readCSV(const QString &filename);
+  bool readCSV(const QString &filename, QString &errorMessage);
   /** Imports a configuration from the given text stream in text format. */
-  bool readCSV(QTextStream &stream);
+  bool readCSV(QTextStream &stream, QString &errorMessage);
   /** Exports the configuration to the given file. */
-  bool writeCSV(const QString &filename);
+  bool writeCSV(const QString &filename, QString &errorMessage);
   /** Exports the configuration to the given text stream in text format. */
-  bool writeCSV(QTextStream &stream);
+  bool writeCSV(QTextStream &stream, QString &errorMessage);
 
 signals:
   /** Gets emitted if the configuration gets changed. */

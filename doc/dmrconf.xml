@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+
+<refentry xml:id="dmrconf"
+  xmlns="http://docbook.org/ns/docbook"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <refmeta>
+    <refentrytitle>dmrconf</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="source">dmrconf</refmiscinfo>
+    <refmiscinfo class="version">0.1.0</refmiscinfo>
+    <refmiscinfo class="manual">User Commands</refmiscinfo>
+  </refmeta>
+
+  <info>
+    <author>
+      <personname><firstname>Hannes</firstname> <surname>Matuschek</surname></personname>
+      <email>hmatuschek@gmail.com</email>
+      <contrib>Main author</contrib>
+    </author>
+  </info>
+
+  <refnamediv>
+    <refname>dmrconf</refname>
+    <refpurpose>Command-line tool for programming DMR radios.</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>dmrconf</command>
+      <arg choice="opt"><option>OPTIONS</option></arg>
+      <arg><option>COMMAND</option></arg>
+      <arg choice="opt">file</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+    <para><command>dmrconf</command> is a command-line tool to programm DMR radios. That is,
+    generating and uploading codeplugs to these radios. To this end, <command>dmrconf</command>
+    uses a common human-readable text format to describe the codeplug for all supported radios (see
+    below). This allows to share codeplugs between different radios.</para>
+
+    <para>Additionally, <command>dmrconf</command> also allows to download codeplugs from the radio
+    and to store it in the human-readable text format. </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Commands</title>
+    <variablelist>
+      <varlistentry>
+        <term><command>detect</command></term>
+        <listitem><para>Detects a connected radio. This command does not take any
+        additional options.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>write</command></term>
+        <listitem><para>Writes the specified codeplug to the radio. This command may need the
+          <option>-c</option> or <option>-b</option> options if the file type cannot be inferred
+          from the filename.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>read</command></term>
+        <listitem><para>Reads a codeplug from the radio and stores it into the given file. This
+          command may need the <option>-c</option> or <option>-b</option> options if the file type
+          cannot be inferred from the filename.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>verify</command></term>
+        <listitem><para>Verifies the codeplug with the connected radio or the specified
+          radio passed with the <option>--radio</option> option. This command may also need the
+          <option>-c</option> or <option>-b</option> options if the file type cannot be inferred
+          from the filename.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>encode</command></term>
+        <listitem><para>Encodes a CSV codeplug as a binary one for the connected or
+          specified radio using the <option>--radio</option> option. </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>decode</command></term>
+        <listitem><para>Decodes a binary codeplug and stores the result in
+          human-readable form.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>info</command></term>
+        <listitem><para>Prints some information about the given file.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+    <variablelist>
+      <varlistentry>
+        <term><option>-c</option> or <option>--csv</option></term>
+        <listitem><para>Specifies the file format for the input or output file
+          for the <command>verify</command>, <command>read</command> and
+          <command>write</command> commands. This option is not needed if the
+          filetype can be inferred from the filename. That is, if the file ends
+          on <filename>.conf</filename> or <filename>.csv</filename>.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-b</option> or <option>--bin</option></term>
+        <listitem><para>Specifies the file format for the input or output file
+          for the <command>verify</command>, <command>read</command> and
+          <command>write</command> commands. This option is not needed if the
+          filetype can be inferred from the filename. That is, if the file ends
+          on <filename>.bin</filename> or <filename>.dfu</filename>.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-R</option> or <option>--radio=</option>NAME</term>
+        <listitem><para>Specifies the radio for the <command>verify</command>,
+          <command>encode</command> or <command>decode</command> commands.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1>
+    <title>Supported Radios</title>
+    <para>The following list contains all supported radios and their names for the
+      <option>--radio</option> option.</para>
+    <variablelist>
+      <varlistentry>
+        <term><option>md390</option></term>
+        <listitem><para>TYT MD-390 or Retevis RT3S</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>gd77</option></term>
+        <listitem><para>Retevis GD-77</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>rd5r</option></term>
+        <listitem><para>Baofeng/Radioddity RD-5R</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1>
+    <title>Bugs</title>
+    <para>This programm is still under development and may contain bugs that
+      may cause harm to the radios and may even destroy them. Hence you may
+      use this software on your own risk. I you want to have guaranties,
+      consider using the CPS (code-plug programming software) supplied with
+      your radio.</para>
+  </refsect1>
+</refentry>

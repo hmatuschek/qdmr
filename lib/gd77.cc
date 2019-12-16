@@ -1,7 +1,7 @@
 #include "gd77.hh"
 
+#include "logger.hh"
 #include "config.hh"
-#include <QDebug>
 
 
 #define BSIZE 1024
@@ -162,7 +162,7 @@ GD77::run() {
           emit downloadError(this);
           return;
         }
-        qDebug() << "Read block" << (b0+b);
+        logDebug() << "Read block " << (b0+b) << ".";
         emit downloadProgress(float(bcount*100)/totb);
       }
     }

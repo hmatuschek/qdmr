@@ -1,5 +1,6 @@
 #include "settings.hh"
-#include <QDebug>
+#include "logger.hh"
+
 
 QGeoCoordinate loc2deg(const QString &loc) {
   double lon = 0, lat = 0;
@@ -153,7 +154,7 @@ SettingsDialog::onSystemLocationToggled(bool enabled) {
 
 void
 SettingsDialog::positionUpdated(const QGeoPositionInfo &info) {
-  qDebug() << "Application: Current position" << info;
+  logDebug() << "Application: Current position: " << info.coordinate().toString();
   if (info.isValid() && queryLocation->isChecked()) {
     locatorEntry->setText(deg2loc(info.coordinate()));
   }

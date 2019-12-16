@@ -1,6 +1,5 @@
 #include "codeplug.hh"
 #include "config.hh"
-#include <QDebug>
 
 
 CodePlug::CodePlug(QObject *parent)

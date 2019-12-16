@@ -2,7 +2,6 @@
 #include <QFile>
 #include <QtEndian>
 #include "crc32.hh"
-#include <QDebug>
 
 
 typedef struct __attribute((packed)) {
