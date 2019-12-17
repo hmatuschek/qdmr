@@ -18,6 +18,7 @@ qt5_add_resources(qdmr_RCC_SOURCES ../shared/resources.qrc)
 
 add_executable(qdmr WIN32 ${qdmr_SOURCES} ${qdmr_MOC_SOURCES} ${qdmr_RCC_SOURCES} ${qdmr_UI_FORMS})
 target_link_libraries(qdmr ${LIBS} libdmrconf)
+target_include_directories(qdmr PUBLIC "${AUTOGEN_BUILD_DIR}/include")
 
 install(TARGETS qdmr DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 
