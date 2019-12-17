@@ -5,7 +5,7 @@
 
 
 HIDevice::HIDevice(int vid, int pid, QObject *parent)
-  : QObject(parent), _ctx(nullptr), _dev(nullptr), _errorMessage()
+  : QObject(parent), _ctx(nullptr), _dev(nullptr), _transfer(nullptr), _errorMessage()
 {
   int error = libusb_init(&_ctx);
   if (error < 0) {

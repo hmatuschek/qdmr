@@ -9,6 +9,16 @@ provide a **single**, **comfortable**, **well-documented** and **platform-indepe
 several (mainly Chinese) DMR radios.
 
 
+## Supported Radios 
+Currently, there are only two supported radios
+
+  * Baofeng/Radioddity RD-5R
+  * TYT MD-UV390 / Retevis RT3S
+
+The limited amount of supported radios is due to the fact, that I only own these two radios to test
+the software with.
+
+
 ## Releases
  * **[Version 0.2.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.2.1)** -- First public release.
 
