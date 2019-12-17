@@ -45,6 +45,10 @@ UV390Codeplug::channel_t::isValid() const {
   return (name[0] != 0x0000) && (name[0] != 0xffff);
 }
 
+UV390Codeplug::channel_t::channel_t() {
+  clear();
+}
+
 void
 UV390Codeplug::channel_t::clear() {
   channel_mode = MODE_ANALOG;
@@ -252,7 +256,6 @@ UV390Codeplug::channel_t::linkChannelObj(Channel *c, Config *conf) const {
 
 void
 UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf) {
-  clear();
   setName(chan->name());
   setRXFrequency(chan->rxFrequency());
   setTXFrequency(chan->txFrequency());
@@ -279,6 +282,10 @@ UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf
 /* ******************************************************************************************** *
  * Implementation of UV390Codeplug::contact_t
  * ******************************************************************************************** */
+UV390Codeplug::contact_t::contact_t() {
+  clear();
+}
+
 bool
 UV390Codeplug::contact_t::isValid() const {
   return (0 != type) && (name[0] != 0x0000) && (name[0] != 0xffff);
@@ -328,7 +335,6 @@ UV390Codeplug::contact_t::toContactObj() const {
 void
 UV390Codeplug::contact_t::fromContactObj(const DigitalContact *cont, const Config *conf) {
   Q_UNUSED(conf);
-  clear();
   if (nullptr == cont)
     return;
   setId(cont->number());
@@ -348,6 +354,10 @@ UV390Codeplug::contact_t::fromContactObj(const DigitalContact *cont, const Confi
 bool
 UV390Codeplug::zone_t::isValid() const {
   return ((0 != name[0]) && (0xffff != name[0]));
+}
+
+UV390Codeplug::zone_t::zone_t() {
+  clear();
 }
 
 void
@@ -390,7 +400,6 @@ UV390Codeplug::zone_t::linkZone(Zone *zone, Config *conf) const {
 
 void
 UV390Codeplug::zone_t::fromZoneObj(const Zone *zone, const Config *conf) {
-  clear();
   setName(zone->name());
   for (int i=0; i<16; i++) {
     if (i < zone->A()->count())
@@ -404,6 +413,10 @@ UV390Codeplug::zone_t::fromZoneObj(const Zone *zone, const Config *conf) {
 /* ******************************************************************************************** *
  * Implementation of UV390Codeplug::zone_ext_t
  * ******************************************************************************************** */
+UV390Codeplug::zone_ext_t::zone_ext_t() {
+  clear();
+}
+
 void
 UV390Codeplug::zone_ext_t::clear() {
   memset(ext_a, 0, sizeof(ext_a));
@@ -446,6 +459,10 @@ UV390Codeplug::zone_ext_t::fromZoneObj(const Zone *zone, const Config *config) {
 /* ******************************************************************************************** *
  * Implementation of UV390Codeplug::grouplist_t
  * ******************************************************************************************** */
+UV390Codeplug::grouplist_t::grouplist_t() {
+  clear();
+}
+
 bool
 UV390Codeplug::grouplist_t::isValid() const {
   return (0 != name[0]) && (0xffff != name[0]);
@@ -490,7 +507,6 @@ UV390Codeplug::grouplist_t::linkRXGroupList(RXGroupList *grp, Config *conf) cons
 
 void
 UV390Codeplug::grouplist_t::fromRXGroupListObj(const RXGroupList *grp, const Config *conf) {
-  clear();
   setName(grp->name());
   for (int i=0; i<32; i++) {
     if (i<grp->count())
@@ -504,6 +520,10 @@ UV390Codeplug::grouplist_t::fromRXGroupListObj(const RXGroupList *grp, const Con
 /* ******************************************************************************************** *
  * Implementation of UV390Codeplug::scanlist_t
  * ******************************************************************************************** */
+UV390Codeplug::scanlist_t::scanlist_t() {
+  clear();
+}
+
 bool
 UV390Codeplug::scanlist_t::isValid() const {
   return (0 != name[0]) && (0xffff != name[0]);
@@ -553,8 +573,6 @@ UV390Codeplug::scanlist_t::linkScanListObj(ScanList *l, Config *conf) const {
 
 void
 UV390Codeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *conf) {
-  clear();
-
   setName(lst->name());
   priority_ch1 = conf->channelList()->indexOf(lst->priorityChannel())+1;
   priority_ch2 = conf->channelList()->indexOf(lst->secPriorityChannel())+1;
@@ -571,6 +589,10 @@ UV390Codeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *co
 /* ******************************************************************************************** *
  * Implementation of UV390Codeplug::general_settings_t
  * ******************************************************************************************** */
+UV390Codeplug::general_settings_t::general_settings_t() {
+  clear();
+}
+
 void
 UV390Codeplug::general_settings_t::clear() {
   memset(intro_line1, 0, sizeof(intro_line1));
@@ -578,7 +600,7 @@ UV390Codeplug::general_settings_t::clear() {
   memset(_unused40, 0xff, sizeof(_unused40));
 
   _unused64_0 = 1;
-  disable_all_leds = 0;
+  disable_all_leds_inv = 1;
   _unused64_3 = 1;
   monitor_type = 1;
   _unused64_6 = 1;
@@ -586,7 +608,7 @@ UV390Codeplug::general_settings_t::clear() {
 
   save_preamble = 1;
   save_mode_receive = 1;
-  disable_all_tones = 0;
+  disable_all_tones_inv = 1;
   _unused65_3 = 1;
   ch_free_indication_tone = 1;
   pw_and_lock_enable = 1;
@@ -609,7 +631,7 @@ UV390Codeplug::general_settings_t::clear() {
   _unused71 = 0;
 
   tx_preamble_duration = 0x0a;
-  group_call_hang_time = 0x1e;
+  group_call_hang_time = 0x28;
   private_call_hang_time = 0x28;
   vox_sensitivity = 0x03;
   _unused76 = 0x00;
@@ -742,7 +764,6 @@ UV390Codeplug::general_settings_t::updateConfigObj(Config *conf) const {
 
 void
 UV390Codeplug::general_settings_t::fromConfigObj(const Config *conf) {
-  clear();
   setName(conf->name());
   setRadioId(conf->id());
   setIntroLine1(conf->introLine1());
@@ -751,6 +772,38 @@ UV390Codeplug::general_settings_t::fromConfigObj(const Config *conf) {
   mic_level = conf->micLevel()/2;
 }
 
+
+/* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::message_t
+ * ******************************************************************************************** */
+UV390Codeplug::message_t::message_t() {
+  clear();
+}
+
+void
+UV390Codeplug::message_t::clear() {
+  memset(text, 0, sizeof(text));
+}
+
+bool
+UV390Codeplug::message_t::isValid() const {
+  return 0 != text[0];
+}
+
+QString
+UV390Codeplug::message_t::getText() const {
+  QString txt; txt.reserve(144);
+  for (int i=0; (i<144) && (0!=text[i]); i++)
+    txt.append(QChar(text[i]));
+  return txt;
+}
+
+void
+UV390Codeplug::message_t::setText(const QString text) {
+  memset(this->text, 0, 288);
+  for (int i=0; (i<128) && (i<text.size()); i++)
+    this->text[i] = text.at(i).unicode();
+}
 
 /* ******************************************************************************************** *
  * Implementation of UV390Codeplug

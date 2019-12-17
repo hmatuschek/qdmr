@@ -24,7 +24,10 @@ configure_file(config.h.in ${PROJECT_BINARY_DIR}/lib/config.h)
 qt5_wrap_cpp(libdmrconf_MOC_SOURCES ${libdmrconf_MOC_HEADERS})
 
 add_library(libdmrconf SHARED ${libdmrconf_SOURCES} ${libdmrconf_MOC_SOURCES})
-set_target_properties(libdmrconf PROPERTIES OUTPUT_NAME dmrconf)
+set_target_properties(libdmrconf PROPERTIES
+  OUTPUT_NAME dmrconf
+  VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
+  SOVERSION "${VERSION_MAJOR}.${VERSION_MINOR}")
 target_link_libraries(libdmrconf ${LIBS})
 
 install(TARGETS libdmrconf DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})

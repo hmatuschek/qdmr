@@ -1,6 +1,6 @@
 #include "uv390.hh"
 #include "config.hh"
-
+#include "logger.hh"
 
 #define BSIZE 1024
 
@@ -96,19 +96,20 @@ UV390::startUpload(Config *config, bool blocking) {
   if (! (_config = config))
     return false;
 
-  _dev = new DFUDevice(0x15a2, 0x0073, this);
+  _dev = new DFUDevice(0x0483, 0xdf11, this);
   if (!_dev->isOpen()) {
+    _errorMessage = QString("Cannot open device at 0483:DF11: %1").arg(_dev->errorMessage());
     _dev->deleteLater();
     return false;
   }
 
   _task = StatusUpload;
   if (blocking) {
-    run();
+    this->run();
     return (StatusIdle == _task);
   }
 
-  start();
+  this->start();
   return true;
 }
 
@@ -116,6 +117,7 @@ void
 UV390::run() {
   if (StatusDownload == _task) {
     emit downloadStarted();
+    logDebug() << "Download of " << _codeplug.image(0).numElements() << " elements.";
 
     // Check every segment in the codeplug
     size_t totb = 0;
@@ -125,7 +127,9 @@ UV390::run() {
                                 "is not aligned with blocksize %5.").arg(__func__)
             .arg(n).arg(_codeplug.image(0).element(n).address())
             .arg(_codeplug.image(0).element(n).data().size()).arg(BSIZE);
+        logError() << _errorMessage;
         _task = StatusError;
+        _dev->reboot();
         _dev->close();
         _dev->deleteLater();
         emit downloadError(this);
@@ -144,7 +148,9 @@ UV390::run() {
         if (! _dev->read_block(b0+b, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
           _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
+          logError() << _errorMessage;
           _task = StatusError;
+          _dev->reboot();
           _dev->close();
           _dev->deleteLater();
           emit downloadError(this);
@@ -167,16 +173,20 @@ UV390::run() {
     _config = nullptr;
   } else if (StatusUpload == _task) {
     emit uploadStarted();
+    logDebug() << "Upload " << _codeplug.image(0).numElements() << " elements.";
 
     // Check every segment in the codeplug
     size_t totb = 0;
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+      logDebug() << "Check element " << (n+1) << " of " << _codeplug.image(0).numElements() << ".";
       if (! _codeplug.image(0).element(n).isAligned(BSIZE)) {
         _errorMessage = QString("%1 Cannot upload codeplug: Codeplug element %2 (addr=%3, size=%4) "
                                 "is not aligned with blocksize %5.").arg(__func__)
             .arg(n).arg(_codeplug.image(0).element(n).address())
             .arg(_codeplug.image(0).element(n).data().size()).arg(BSIZE);
+        logError() << _errorMessage;
         _task = StatusError;
+        _dev->reboot();
         _dev->close();
         _dev->deleteLater();
         emit downloadError(this);
@@ -195,7 +205,9 @@ UV390::run() {
         if (! _dev->read_block(b0+b, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
           _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
+          logError() << _errorMessage;
           _task = StatusError;
+          _dev->reboot();
           _dev->close();
           _dev->deleteLater();
           emit downloadError(this);
@@ -208,17 +220,22 @@ UV390::run() {
     // Send encode config into codeplug
     _codeplug.encode(_config);
 
+    // then erase memory
+    _dev->erase(0, 0xd0000);
+
     // then, upload modified codeplug
     bcount = 0;
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {
       uint addr = _codeplug.image(0).element(n).address();
       uint size = _codeplug.image(0).element(n).data().size();
       uint b0 = addr/BSIZE, nb = size/BSIZE;
-      for (size_t b=1; b<nb; b++,bcount++) {
-        if (! _dev->write_block(b, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
+      for (size_t b=0; b<nb; b++,bcount++) {
+        if (! _dev->write_block(b0+b, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
           _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
+          logError() << _errorMessage;
           _task = StatusError;
+          _dev->reboot();
           _dev->close();
           _dev->deleteLater();
           emit uploadError(this);

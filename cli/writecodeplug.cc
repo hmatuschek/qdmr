@@ -22,19 +22,24 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     logError() << "Cannot read CSV file '" << filename << "': " << errorMessage;
     return -1;
   }
+  logDebug() << "Read codeplug from '" << filename << "'.";
 
   Radio *radio = Radio::detect(errorMessage);
   if (nullptr == radio) {
     logError() << "Cannot detect radio: " << errorMessage;
     return -1;
   }
-
-  radio->startUpload(&config, true);
+  logDebug() << "Start upload to " << radio->name() << ".";
+  if (! radio->startUpload(&config, true)) {
+    logError() << "Codeplug upload error: " << radio->errorMessage();
+    return -1;
+  }
 
   if (Radio::StatusError == radio->status()) {
     logError() << "Codeplug upload error: " << radio->errorMessage();
     return -1;
   }
 
+  logDebug() << "Upload completed.";
   return 0;
 }

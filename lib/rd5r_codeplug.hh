@@ -83,7 +83,7 @@ public:
   static const int NMESSAGES = 32;     ///< Defines the number of preset messages.
 
   /** Represents a configured channel within the codeplug. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) channel_t {
     /** Possible channel types. */
     typedef enum {
       MODE_ANALOG = 0,   ///< Analog channel, aka FM.
@@ -177,6 +177,9 @@ public:
     uint8_t _unused52[3];               ///< Unknown set to 0.
     uint8_t squelch;                    ///< Squelch level [0,9]
 
+    /** Constructor. */
+    channel_t();
+
     /** Returns @c true if the channel is valid. */
     bool isValid() const;
     /** Clears the channel settings. */
@@ -209,24 +212,24 @@ public:
     /** Links a previously constructed @c Channel object to other object within the generic
      * configuration, for example scan lists etc. */
     bool linkChannelObj(Channel *c, Config *conf) const;
-  } channel_t;
+  };
 
   /** Bank of 128 channels including a bitmap for enabled channels. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) bank_t {
     /** Bitmap for 128 channels, a bit is set when the coresspondig channel is valid/enabled. */
     uint8_t bitmap[16];
     /** The actual 128 channels. */
     channel_t chan[128];
-  } bank_t;
+  };
 
   /** Binary codeplug representation of VFO settings. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) vfo_settings_t {
     channel_t vfo_a; ///< Channel settings for VFO A.
     channel_t vfo_b; ///< Channel settings for VFO B.
-  } vfo_settings_t;
+  };
 
   /** Specific codeplug representation of a DMR contact. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) contact_t {
     /** Possible call types. */
     typedef enum {
       CALL_GROUP   = 0,                 ///< A group call.
@@ -245,6 +248,9 @@ public:
     uint8_t ring_style;                 ///< Ring style: [0,10]
     uint8_t _unused23;                  ///< Set to 0x00.
 
+    /** Constructor. */
+    contact_t();
+
     /** Resets an invalidates the contact entry. */
     void clear();
     /** Returns @c true, if the contact is valid. */
@@ -262,14 +268,17 @@ public:
     DigitalContact *toContactObj() const;
     /** Resets this codeplug contact from the given @c DigitalContact. */
     void fromContactObj(const DigitalContact *obj, const Config *conf);
-  } contact_t;
+  };
 
   /** Specific codeplug representation of a DTMF (analog) contact. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) dtmf_contact_t {
     // Bytes 0-15
     uint8_t name[16];                   ///< Contact name in ASCII, 0xff terminated.
     // Bytes 16-24
     uint8_t number[16];                 ///< DTMF number {0-9,a-d,*,#}, 0xff terminated.
+
+    /** Constructor. */
+    dtmf_contact_t();
 
     /** Resets an invalidates the contact entry. */
     void clear();
@@ -288,14 +297,17 @@ public:
     DTMFContact *toContactObj() const;
     /** Resets this codeplug contact from the given @c DTMFContact. */
     void fromContactObj(const DTMFContact *obj, const Config *conf);
-	} dtmf_contact_t;
+  };
 
   /** Represents a single zone within the codeplug. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) zone_t {
     // Bytes 0-15
     uint8_t name[16];                   ///< Zone name ASCII, 0xff terminated.
     // Bytes 16-47
     uint16_t member[16];                ///< Member channel indices+1, 0=empty/not used.
+
+    /** Constructor. */
+    zone_t();
 
     /** Returns @c true if the zone entry is valid. */
     bool isValid() const;
@@ -315,23 +327,26 @@ public:
     void fromZoneObjA(const Zone *zone, const Config *conf);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     void fromZoneObjB(const Zone *zone, const Config *conf);
-  } zone_t;
+  };
 
   /** Table of zones. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) zonetab_t {
     /** A bit representing the validity of every zone. If a bit is set, the corresponding zone in
      * @c zone ist valid. */
     uint8_t bitmap[32];
     /** The list of zones. */
     zone_t  zone[NZONES];
-  } zonetab_t;
+  };
 
   /** Represents a single RX group list within the codeplug. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) grouplist_t {
     // Bytes 0-15
     uint8_t name[16];                   ///< RX group list name, ASCII, 0xff terminated.
     // Bytes 16-47
     uint16_t member[16];                ///< Contact indices + 1, 0=empty.
+
+    /** Constructor. */
+    grouplist_t();
 
     /** Returns the name of the group list. */
     QString getName() const;
@@ -344,18 +359,18 @@ public:
     bool linkRXGroupListObj(int ncnt, RXGroupList *lst, const Config *conf) const;
     /** Reset this codeplug representation from a @c RXGroupList object. */
     void fromRXGroupListObj(const RXGroupList *lst, const Config *conf);
-  } grouplist_t;
+  };
 
   /** Table of rx group lists. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) grouptab_t {
     /** Specifies the number of contacts +1 in each group list, 0=disabled. */
     uint8_t     nitems1[128];
     /** The list of RX group lists. */
     grouplist_t grouplist[NGLISTS];
-  } grouptab_t;
+  };
 
   /** Represents a sinle scan list within the codeplug. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) scanlist_t {
     /** Possible priority channel types. */
     typedef enum {
       PL_NONPRI = 0,              ///< Only non-priority channels.
@@ -383,6 +398,9 @@ public:
     uint8_t sign_hold_time;       ///< Signaling Hold Time (x25 = msec) default 40=1000ms.
     uint8_t prio_sample_time;     ///< Priority Sample Time (x250 = msec) default 8=2000ms.
 
+    /** Constructor. */
+    scanlist_t();
+
     /** Resets the scan list. */
     void clear();
     /** Returns the name of the scan list. */
@@ -396,18 +414,18 @@ public:
     bool linkScanListObj(ScanList *lst, const Config *conf) const;
     /** Initializes this codeplug representation from the given @c ScanList object. */
     void fromScanListObj(const ScanList *lst, const Config *conf);
-  } scanlist_t;
+  };
 
   /** Table/Bank of scanlists. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) scantab_t {
     /** Byte-field to indicate which scanlist is valid. Set to 0x01 when valid, 0x00 otherwise. */
     uint8_t    valid[256];
     /** The scanlists. */
     scanlist_t scanlist[NSCANL];
-  } scantab_t;
+  };
 
   /** Represents the general settings within the codeplug. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed))  general_settings_t{
     /** Possible monitor types. */
     typedef enum {
       OPEN_SQUELCH = 0,            ///< Monitoring by opening the squelch.
@@ -475,6 +493,9 @@ public:
     uint8_t _reserved31;            ///< Unknown, set to 0x00.
     uint8_t prog_password[8];       ///< Programming password, 8 x ASCII 0xff terminated.
 
+    /** Constructor. */
+    general_settings_t();
+
     /** Resets the general settings. */
     void clear();
     /** Resets the general settings to their default values. */
@@ -489,10 +510,10 @@ public:
     uint32_t getRadioId() const;
     /** Sets the DMR ID of the radio. */
     void setRadioId(uint32_t num);
-  } general_settings_t;
+  };
 
   /** Represents the button settings. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) button_settings_t {
     /** Possible actions for each button on short and long press. */
     typedef enum {
       None                   = 0x00,  ///< Disables button.
@@ -520,13 +541,13 @@ public:
     } ButtonEvent;
 
     /** Binary representation of one-touch actions (calls & messages). */
-    typedef struct __attribute__((packed)) {
+    struct __attribute__((packed)) one_touch_t {
       uint8_t type;               ///< Specifies the type of the action, 0x00=disabled, 0x10 = digital call, 0x11 = digital message, 0x20 = analog call.
       uint16_t contact_idx;       ///< Specifies the contact index, 0x00=none or index+1.
       uint8_t message_idx;        ///< Specifies the message index, 0x00=none, index+1 or 0xff if call.
       /** Resets the one-touch settings. */
       void clear();
-    } one_touch_t;
+    };
 
     uint8_t  _unknown0;           ///< Unknown set to 0x01.
     uint8_t  long_press_dur;      ///< Specifies the duration for a long-press in 250ms [4,16], default=6 (1500ms).
@@ -538,14 +559,17 @@ public:
     uint8_t  _unknown7;           ///< Unknown set to 0x11.
     one_touch_t one_touch[6];     ///< 6 x one-touch actions.
 
+    /** Constructor. */
+    button_settings_t();
+
     /** Resets the button settings. */
     void clear();
     /** Resets the button settings to their default values. */
     void initDefault();
-  } button_settings_t;
+  };
 
   /** Represents the menu settings. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) menu_settings_t {
     // Byte 0
     uint8_t hangtime;             ///< Menu hang-time in seconds [1,30], default 10.
 
@@ -603,10 +627,10 @@ public:
       _unknown7_4          : 1,   ///< Unknown set to 1.
       keytone              : 1,   ///< Enable key-tone, default=0.
       double_wait          : 2;   ///< Double-wait (dual-watch) mode. 1=Double/Double, 2=Double/Single.
-  } menu_settings_t;
+  };
 
   /** Represents the boot settings within the binary codeplug. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) boot_settings_t {
     uint8_t boot_text;                  ///< Shows intro lines at boot (see @c RD5RCodeplug::intro_text_t), 0=image, 1=text, default=1.
     uint8_t boot_password_enabled;      ///< Enables to boot-password, 0=disabled, 1=enabled, default=0.
     uint8_t _unknown2;                  ///< Unkown, set to 0.
@@ -614,10 +638,10 @@ public:
     uint8_t password[3];                ///< Boot password 6 x BCD number.
     uint8_t _unknown7;                  ///< Unkown, set to 0.
     uint8_t empty[24];                  ///< Unkown (boot image?), set to 0.
-  } boot_settings_t;
+  };
 
   /** Represents the intro messages within the codeplug. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) intro_text_t {
     // Bytes 7540-754f
     uint8_t intro_line1[16];       ///< The first intro line, ASCII, 0xff terminated.
     // Bytes 7550-755f
@@ -631,26 +655,28 @@ public:
     QString getIntroLine2() const;
     /** Sets the second intro line. */
     void setIntroLine2(const QString &text);
-  } intro_text_t;
+  };
 
   /** Represents the table of text messages within the codeplug. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) msgtab_t {
     uint8_t count;                      ///< Number of messages.
     uint8_t _unused1[7];                ///< Unknown, set to 0.
     uint8_t len[NMESSAGES];             ///< Message lengths.
     uint8_t _unused2[NMESSAGES];        ///< Unknown, set to 0.
     uint8_t message[NMESSAGES][144];    ///< The actual messages, ASCII
 
+    /** Constructor. */
+    msgtab_t();
     /** Clears all messages. */
     void clear();
     /** Gets a particular message. */
     QString getMessage(int i) const;
     /** Adds particular message to the list. */
     bool addMessage(const QString &text);
-  } msgtab_t;
+  };
 
   /** Represents the codeplug time-stamp within the codeplug. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) timestamp_t {
     uint16_t year_bcd;                  ///< The year in 4 x BCD
     uint8_t month_bcd;                  ///< The month in 2 x BCD
     uint8_t day_bcd;                    ///< The day in 2 x BCD.
@@ -663,7 +689,7 @@ public:
     void setNow();
     /** Set the time-stamp to the given date and time. */
     void set(const QDateTime &dt);
-  } timestamp_t;
+  };
 
 public:
   /** Empty constructor. */

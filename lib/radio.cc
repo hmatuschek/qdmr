@@ -211,7 +211,7 @@ Radio::detect(QString &errorMessage) {
     return nullptr;
   }
 
-  logDebug() << "Found Radio:" << id;
+  logDebug() << "Found Radio: " << id;
 
   if ("BF-5R" == id) {
     return new RD5R();

@@ -27,6 +27,10 @@
 /* ******************************************************************************************** *
  * Implementation of RD5RCodeplug::channel_t
  * ******************************************************************************************** */
+RD5RCodeplug::channel_t::channel_t() {
+  clear();
+}
+
 bool
 RD5RCodeplug::channel_t::isValid() const {
   // Channel is enabled/disabled at channel bank
@@ -167,7 +171,6 @@ RD5RCodeplug::channel_t::linkChannelObj(Channel *c, Config *conf) const {
 
 void
 RD5RCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
-  clear();
   setName(c->name());
   setRXFrequency(c->rxFrequency());
   setTXFrequency(c->txFrequency());
@@ -207,6 +210,10 @@ RD5RCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
 /* ******************************************************************************************** *
  * Implementation of RD5RCodeplug::contact_t
  * ******************************************************************************************** */
+RD5RCodeplug::contact_t::contact_t() {
+  clear();
+}
+
 void
 RD5RCodeplug::contact_t::clear() {
   memset(name, 0xff, 16);
@@ -256,7 +263,6 @@ RD5RCodeplug::contact_t::toContactObj() const {
 void
 RD5RCodeplug::contact_t::fromContactObj(const DigitalContact *cont, const Config *conf) {
   Q_UNUSED(conf);
-  clear();
   setName(cont->name());
   setId(cont->number());
   switch (cont->type()) {
@@ -272,6 +278,10 @@ RD5RCodeplug::contact_t::fromContactObj(const DigitalContact *cont, const Config
 /* ******************************************************************************************** *
  * Implementation of RD5RCodeplug::dtmf_contact_t
  * ******************************************************************************************** */
+RD5RCodeplug::dtmf_contact_t::dtmf_contact_t() {
+  clear();
+}
+
 void
 RD5RCodeplug::dtmf_contact_t::clear() {
   memset(name, 0xff, 16);
@@ -311,7 +321,6 @@ RD5RCodeplug::dtmf_contact_t::toContactObj() const {
 void
 RD5RCodeplug::dtmf_contact_t::fromContactObj(const DTMFContact *cont, const Config *conf) {
   Q_UNUSED(conf);
-  clear();
   setName(cont->name());
   setNumber(cont->number());
 }
@@ -320,6 +329,10 @@ RD5RCodeplug::dtmf_contact_t::fromContactObj(const DTMFContact *cont, const Conf
 /* ******************************************************************************************** *
  * Implementation of RD5RCodeplug::zone_t
  * ******************************************************************************************** */
+RD5RCodeplug::zone_t::zone_t() {
+  clear();
+}
+
 bool
 RD5RCodeplug::zone_t::isValid() const {
   return true;
@@ -360,7 +373,6 @@ RD5RCodeplug::zone_t::linkZoneObj(Zone *zone, const Config *conf) const {
 
 void
 RD5RCodeplug::zone_t::fromZoneObjA(const Zone *zone, const Config *conf) {
-  clear();
   if (zone->A()->count() && zone->B()->count())
     setName(zone->name() + " A");
   else
@@ -376,7 +388,6 @@ RD5RCodeplug::zone_t::fromZoneObjA(const Zone *zone, const Config *conf) {
 
 void
 RD5RCodeplug::zone_t::fromZoneObjB(const Zone *zone, const Config *conf) {
-  clear();
   if (zone->A()->count() && zone->B()->count())
     setName(zone->name() + " B");
   else
@@ -394,6 +405,10 @@ RD5RCodeplug::zone_t::fromZoneObjB(const Zone *zone, const Config *conf) {
 /* ******************************************************************************************** *
  * Implementation of RD5RCodeplug::grouplist_t
  * ******************************************************************************************** */
+RD5RCodeplug::grouplist_t::grouplist_t() {
+  // pass...
+}
+
 QString
 RD5RCodeplug::grouplist_t::getName() const {
   return decode_ascii(name, 16, 0xff);
@@ -435,6 +450,10 @@ RD5RCodeplug::grouplist_t::fromRXGroupListObj(const RXGroupList *lst, const Conf
 /* ******************************************************************************************** *
  * Implementation of RD5RCodeplug::scanlist_t
  * ******************************************************************************************** */
+RD5RCodeplug::scanlist_t::scanlist_t() {
+  clear();
+}
+
 void
 RD5RCodeplug::scanlist_t::clear() {
   memset(name, 0xff, 15);
@@ -477,7 +496,6 @@ RD5RCodeplug::scanlist_t::linkScanListObj(ScanList *lst, const Config *conf) con
 
 void
 RD5RCodeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *conf) {
-  clear();
   if (lst->priorityChannel())
     priority_ch1 = conf->channelList()->indexOf(lst->priorityChannel())+2;
   if (lst->secPriorityChannel())
@@ -495,6 +513,11 @@ RD5RCodeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *con
 /* ******************************************************************************************** *
  * Implementation of RD5RCodeplug::general_settings_t
  * ******************************************************************************************** */
+RD5RCodeplug::general_settings_t::general_settings_t() {
+  clear();
+  initDefault();
+}
+
 void
 RD5RCodeplug::general_settings_t::clear() {
   memset(radio_name, 0xff, 8);
@@ -574,6 +597,11 @@ RD5RCodeplug::general_settings_t::setRadioId(uint32_t num) {
 /* ******************************************************************************************** *
  * Implementation of RD5RCodeplug::button_settings_t
  * ******************************************************************************************** */
+RD5RCodeplug::button_settings_t::button_settings_t() {
+  clear();
+  initDefault();
+}
+
 void
 RD5RCodeplug::button_settings_t::clear() {
   _unknown0      = 0x01;
@@ -623,6 +651,10 @@ RD5RCodeplug::intro_text_t::setIntroLine2(const QString &text) {
 /* ******************************************************************************************** *
  * Implementation of RD5RCodeplug::msgtab_t
  * ******************************************************************************************** */
+RD5RCodeplug::msgtab_t::msgtab_t() {
+  clear();
+}
+
 void
 RD5RCodeplug::msgtab_t::clear() {
   count = 0;

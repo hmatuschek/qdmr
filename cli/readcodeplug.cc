@@ -36,13 +36,17 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   }
 
   Config config;
-  radio->startDownload(&config, true);
+  if (! radio->startDownload(&config, true)) {
+    logError() << "Codeplug upload error: " << radio->errorMessage();
+    return -1;
+  }
 
   if (Radio::StatusError == radio->status()) {
     logError() << "Codeplug download error: " << radio->errorMessage();
     return -1;
   }
 
+  logDebug() << "Save codeplug at '" << filename << "'.";
   if (parser.isSet("csv") || (filename.endsWith(".conf") || filename.endsWith(".csv"))) {
     if (! config.writeCSV(filename, errorMessage)) {
       logError() << "Cannot write CSV file '" << filename << "': " << errorMessage;

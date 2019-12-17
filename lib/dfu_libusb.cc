@@ -1,5 +1,7 @@
 #include "dfu_libusb.hh"
 #include <unistd.h>
+#include "logger.hh"
+
 
 // USB request types.
 #define REQUEST_TYPE_TO_HOST    0xA1
@@ -374,6 +376,8 @@ DFUDevice::write_block(int bno, uint8_t *data, int nbytes) {
     _errorMessage = tr("%1 Cannot read data from nullptr!").arg(__func__);
     return false;
   }
+  logDebug() << "Write block #" << bno << " (" << nbytes << "b).";
+
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, bno, 0, data, nbytes, 0);
   if (error < 0) {
