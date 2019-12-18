@@ -822,7 +822,7 @@ RD5RCodeplug::decode(Config *config)
     if ((i>>7) == 0)
       b = (bank_t*) data(OFFSET_BANK_0);
     else
-      b = ((i-1) + (bank_t*) data(OFFSET_BANK_1));
+      b = (((i>>7)-1) + (bank_t*) data(OFFSET_BANK_1));
     if (nullptr == b) {
       _errorMessage = QString("%1(): Cannot access channel bank at index %2!")
           .arg(__func__).arg(i);
@@ -920,7 +920,7 @@ RD5RCodeplug::decode(Config *config)
     if ((i>>7) == 0)
       b = (bank_t*) data(OFFSET_BANK_0);
     else
-      b = ((i-1) + (bank_t*) data(OFFSET_BANK_1));
+      b = (((i>>7)-1) + (bank_t*) data(OFFSET_BANK_1));
     // If channel is disabled
     if (! ((b->bitmap[i % 128 / 8] >> (i & 7)) & 1) )
       continue;
@@ -964,7 +964,7 @@ RD5RCodeplug::encode(Config *config)
     if ((i>>7) == 0)
       b = (bank_t*) data(OFFSET_BANK_0);
     else
-      b = ((i-1)/128 + (bank_t *) data(OFFSET_BANK_1));
+      b = (((i>>7)-1) + (bank_t *) data(OFFSET_BANK_1));
     channel_t *ch = &b->chan[i % 128];
 
     // Disable channel if not used
