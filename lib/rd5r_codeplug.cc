@@ -406,7 +406,13 @@ RD5RCodeplug::zone_t::fromZoneObjB(const Zone *zone, const Config *conf) {
  * Implementation of RD5RCodeplug::grouplist_t
  * ******************************************************************************************** */
 RD5RCodeplug::grouplist_t::grouplist_t() {
-  // pass...
+  clear();
+}
+
+void
+RD5RCodeplug::grouplist_t::clear() {
+  memset(name, 0xff, sizeof(name));
+  memset(member, 0, sizeof(member));
 }
 
 QString
@@ -629,6 +635,16 @@ RD5RCodeplug::button_settings_t::initDefault() {
 /* ******************************************************************************************** *
  * Implementation of RD5RCodeplug::intro_text_t
  * ******************************************************************************************** */
+RD5RCodeplug::intro_text_t::intro_text_t() {
+  clear();
+}
+
+void
+RD5RCodeplug::intro_text_t::clear() {
+  memset(intro_line1, 0xff, 16);
+  memset(intro_line2, 0xff, 16);
+}
+
 QString
 RD5RCodeplug::intro_text_t::getIntroLine1() const {
   return decode_ascii(intro_line1, 16, 0xff);
@@ -722,6 +738,67 @@ RD5RCodeplug::RD5RCodeplug(QObject *parent)
   addImage("Radioddity RD5R Codeplug");
   image(0).addElement(0x00080, 0x07b80);
   image(0).addElement(0x08000, 0x16300);
+
+  // Clear codeplug and set to default values
+  // clear timestamp
+  timestamp_t *ts = (timestamp_t *)data(OFFSET_TIMESTMP);
+  ts->setNow();
+  // Clear basic config and set to default values
+  general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
+  gs->clear();
+  gs->initDefault();
+  // Clear default button settings
+  button_settings_t *bs = (button_settings_t *)data(OFFSET_BUTTONS);
+  bs->initDefault();
+  // Clear intro text.
+  intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
+  it->clear();
+  // Clear channels
+  for (int i=0; i<NCHAN; i++) {
+    // First, get bank
+    bank_t *b;
+    if (0 == (i>>7))
+      b = (bank_t*) data(OFFSET_BANK_0);
+    else
+      b = (((i>>7)-1) + (bank_t *) data(OFFSET_BANK_1));
+    channel_t *ch = &b->chan[i % 128];
+    ch->clear();
+    // Disable channel
+    b->bitmap[(i % 128) / 8] &= ~(1 << (i & 7));
+  }
+  // Clear Zones
+  for (int i=0; i<NZONES; i++) {
+    zonetab_t *zt = (zonetab_t*) data(OFFSET_ZONETAB);
+    zone_t *z = &zt->zone[i];
+    // Clear valid bit.
+    zt->bitmap[i / 8] &= ~(1 << (i & 7));
+    z->clear();
+  }
+  // Clear Scanlists
+  for (int i=0; i<NSCANL; i++) {
+    scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB);
+    scanlist_t *sl = &st->scanlist[i];
+    // Clear valid bit.
+    st->valid[i] = 0;
+    sl->clear();
+  }
+  // Clear contacts
+  for (int i=0; i<NCONTACTS; i++) {
+    contact_t *ct = (contact_t*) data(OFFSET_CONTACTS + (i)*sizeof(contact_t));
+    ct->clear();
+  }
+  // Clear DTMF contacts
+  for (int i=0; i<NDTMF; i++) {
+    dtmf_contact_t *ct = (dtmf_contact_t*) data(OFFSET_DTMF + (i)*sizeof(dtmf_contact_t));
+    ct->clear();
+  }
+  // Clear Grouplists:
+  for (int i=0; i<NGLISTS; i++) {
+    grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB);
+    grouplist_t *gl = &gt->grouplist[i];
+    gt->nitems1[i] = 0;
+    gl->clear();
+  }
 }
 
 bool

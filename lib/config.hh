@@ -17,6 +17,7 @@
 #include "channel.hh"
 #include "zone.hh"
 #include "scanlist.hh"
+#include "gpssystem.hh"
 
 
 /** The config class, representing the codeplug configuration.
@@ -48,6 +49,8 @@ public:
   ZoneList *zones() const;
   /** Retruns the list of scanlists. */
   ScanLists *scanlists() const;
+  /** Returns the list of GPS systems. */
+  GPSSystems *gpsSystems() const;
 
   /** Returns the DMR ID of the radio. */
   uint id() const;
@@ -110,6 +113,9 @@ protected:
   ZoneList *_zones;
   /** The list of scan lists. */
   ScanLists *_scanlists;
+  /** The list of GPS Systems. */
+  GPSSystems *_gpsSystems;
+
   /** DMR id of the radio. */
   uint _id;
   /** The name of the radio. */

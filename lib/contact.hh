@@ -90,6 +90,7 @@ protected:
 	QString _number;
 };
 
+
 /** Represents a digital contact, that is a DMR number.
  * @ingroup conf */
 class DigitalContact: public Contact

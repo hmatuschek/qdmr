@@ -255,6 +255,22 @@ CSVHandler::handleZone(qint64 idx, const QString &name, bool a, const QList<qint
 }
 
 bool
+CSVHandler::handleGPSSystem(
+    qint64 idx, const QString &name, qint64 contactIdx, qint64 period, qint64 revertChannelIdx,
+    qint64 line, qint64 column, QString &errorMessage)
+{
+  Q_UNUSED(idx);
+  Q_UNUSED(name);
+  Q_UNUSED(contactIdx);
+  Q_UNUSED(period);
+  Q_UNUSED(revertChannelIdx);
+  Q_UNUSED(line);
+  Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
+  return true;
+}
+
+bool
 CSVHandler::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
                            const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage)
 {
@@ -327,6 +343,9 @@ CSVParser::parse(QTextStream &stream) {
         return false;
     } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("zone" == token.value.toLower())) {
       if (! _parse_zones(lexer))
+        return false;
+    } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("gps" == token.value.toLower())) {
+      if (! _parse_gps_systems(lexer))
         return false;
     } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("scanlist" == token.value.toLower())) {
       if (! _parse_scanlists(lexer))
@@ -1110,6 +1129,82 @@ CSVParser::_parse_zone(qint64 idx, CSVLexer &lexer) {
   return _handler->handleZone(idx, name, a, lst, line, column, _errorMessage);
 }
 
+
+bool
+CSVParser::_parse_gps_systems(CSVLexer &lexer) {
+  // skip rest of header
+  CSVLexer::Token token = lexer.next();
+  for (; CSVLexer::Token::T_KEYWORD==token.type; token=lexer.next()) {
+    // skip
+  }
+  if (CSVLexer::Token::T_NEWLINE != token.type) {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
+  for (; CSVLexer::Token::T_NUMBER == token.type; token=lexer.next()) {
+    qint64 idx = token.value.toInt();
+    if (! _parse_gps_system(idx, lexer))
+      return false;
+  }
+
+  if ((CSVLexer::Token::T_NEWLINE == token.type) || (CSVLexer::Token::T_END_OF_STREAM == token.type))
+    return true;
+
+  _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+      .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+  return false;
+}
+
+bool
+CSVParser::_parse_gps_system(qint64 id, CSVLexer &lexer) {
+  CSVLexer::Token token = lexer.next();
+  qint64 line=token.line, column=token.column;
+  if (CSVLexer::Token::T_STRING != token.type) {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+  QString name = token.value;
+
+  qint64 contact;
+  token = lexer.next();
+  if (CSVLexer::Token::T_NUMBER == token.type) {
+    contact = token.value.toInt();
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  qint64 period;
+  token = lexer.next();
+  if (CSVLexer::Token::T_NUMBER == token.type) {
+    period = token.value.toInt();
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  qint64 chan;
+  token = lexer.next();
+  if (CSVLexer::Token::T_NOT_SET == token.type) {
+    chan = 0;
+  } else if (CSVLexer::Token::T_NUMBER == token.type) {
+    chan = token.value.toInt();
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  return _handler->handleGPSSystem(id, name, contact, period, chan, line, column, _errorMessage);
+}
+
+
 bool
 CSVParser::_parse_scanlists(CSVLexer &lexer) {
   // skip rest of header
@@ -1505,6 +1600,49 @@ CSVReader::handleZone(qint64 idx, const QString &name, bool a, const QList<qint6
 }
 
 bool
+CSVReader::handleGPSSystem(
+    qint64 idx, const QString &name, qint64 contactIdx, qint64 period, qint64 revertChannelIdx,
+    qint64 line, qint64 column, QString &errorMessage)
+{
+  if (_link) {
+    // Check contact ID
+    if (! _digital_contacts.contains(contactIdx)) {
+      errorMessage = QString("Parse error @ %1,%2: Cannot create GPS system '%3', unknown destination contact ID %4.")
+          .arg(line).arg(column).arg(name).arg(contactIdx);
+      return false;
+    }
+    _gpsSystems[idx]->setContact(_digital_contacts[contactIdx]);
+
+    if (revertChannelIdx) {
+      if (! _channels.contains(revertChannelIdx))  {
+        errorMessage = QString("Parse error @ %1,%2: Cannot create GPS system '%3', unknown revert channel ID %4.")
+            .arg(line).arg(column).arg(name).arg(revertChannelIdx);
+        return false;
+      }
+      if (! _channels[revertChannelIdx]->is<DigitalChannel>()) {
+        errorMessage = QString("Parse error @ %1,%2: Cannot create GPS system '%3', revert channel %4 is not a digital channel.")
+            .arg(line).arg(column).arg(name).arg(revertChannelIdx);
+        return false;
+      }
+      _gpsSystems[idx]->setRevertChannel(_channels[revertChannelIdx]->as<DigitalChannel>());
+    }
+  }
+
+  // check index
+  if (_gpsSystems.contains(idx)) {
+    errorMessage = QString("Parse error @ %1,%2: Cannot create GPS system '%3' with index %4, index already taken.")
+        .arg(line).arg(column).arg(name).arg(idx);
+    return false;
+  }
+
+  GPSSystem *gps = new GPSSystem(name, nullptr, nullptr, period);
+  _gpsSystems[idx] = gps;
+  _config->gpsSystems()->addGPSSystem(gps);
+
+  return true;
+}
+
+bool
 CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
                           const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage)
 {
@@ -1549,11 +1687,9 @@ CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 p
 
   // check index
   if (_scanlists.contains(idx)) {
-    if (_channels.contains(idx)) {
-      errorMessage = QString("Parse error @ %1,%2: Cannot scan list '%3' with index %4, index already taken.")
-          .arg(line).arg(column).arg(name).arg(idx);
+    errorMessage = QString("Parse error @ %1,%2: Cannot create scan list '%3' with index %4, index already taken.")
+        .arg(line).arg(column).arg(name).arg(idx);
     return false;
-    }
   }
 
   ScanList *lst = new ScanList(name);

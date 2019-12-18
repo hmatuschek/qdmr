@@ -347,6 +347,8 @@ public:
 
     /** Constructor. */
     grouplist_t();
+    /** Clears the group list. */
+    void clear();
 
     /** Returns the name of the group list. */
     QString getName() const;
@@ -646,6 +648,11 @@ public:
     uint8_t intro_line1[16];       ///< The first intro line, ASCII, 0xff terminated.
     // Bytes 7550-755f
     uint8_t intro_line2[16];       ///< The second intro line, ASCII, 0xff terminated.
+
+    /** Constructor. */
+    intro_text_t();
+    /** Clear intro text. */
+    void clear();
 
     /** Returns the first intro line. */
     QString getIntroLine1() const;

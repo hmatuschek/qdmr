@@ -15,6 +15,7 @@
 Config::Config(QObject *parent)
   : QObject(parent), _modified(false), _contacts(new ContactList(this)), _rxGroupLists(new RXGroupLists(this)),
     _channels(new ChannelList(this)), _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
+    _gpsSystems(new GPSSystems(this)),
     _id(0), _name(), _introLine1(), _introLine2(), _vox_level(3), _mic_level(2)
 {
   connect(_contacts, SIGNAL(modified()), this, SIGNAL(modified()));
@@ -22,6 +23,7 @@ Config::Config(QObject *parent)
   connect(_channels, SIGNAL(modified()), this, SIGNAL(modified()));
   connect(_zones, SIGNAL(modified()), this, SIGNAL(modified()));
   connect(_scanlists, SIGNAL(modified()), this, SIGNAL(modified()));
+  connect(_gpsSystems, SIGNAL(modified()), this, SIGNAL(modified()));
   connect(this, SIGNAL(modified()), this, SLOT(onConfigModified()));
 }
 
@@ -59,6 +61,11 @@ Config::zones() const {
 ScanLists *
 Config::scanlists() const {
   return _scanlists;
+}
+
+GPSSystems *
+Config::gpsSystems() const {
+  return _gpsSystems;
 }
 
 uint

@@ -180,6 +180,26 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
   }
   stream << "\n";
 
+  stream << "# Table of GPS systems.\n"
+            "# 1) GPS system ID\n"
+            "# 2) Name in quotes.\n"
+            "# 3) Destination contact ID.\n"
+            "# 4) Update period: period in ms\n"
+            "# 5) Revert channel ID or '-'.\n"
+            "#\n"
+            "GPS  Name               Dest Period Revert\n";
+  for (int i=0; i<config->gpsSystems()->count(); i++) {
+    GPSSystem *gps = config->gpsSystems()->gpsSystem(i);
+    stream << qSetFieldWidth(5)  << left << (i+1)
+           << qSetFieldWidth(20) << left << ("\"" + gps->name() + "\"")
+           << qSetFieldWidth(5)  << left << config->contacts()->indexOfDigital(gps->contact())+1
+           << qSetFieldWidth(7)  << left << gps->period()
+           << qSetFieldWidth(6)  << left
+           << ( (gps->hasRevertChannel()) ? QString::number(config->channelList()->indexOf(gps->revertChannel())+1) : "-" )
+           << "\n";
+  }
+  stream << "\n";
+
   stream << "# Table of contacts.\n"
             "# 1) Contact number: 1-256\n"
             "# 2) Name in quotes.\n"

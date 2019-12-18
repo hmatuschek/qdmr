@@ -9,6 +9,8 @@ class DigitalContact;
 class Zone;
 class RXGroupList;
 class ScanList;
+class GPSSystem;
+
 
 /** Represents the device specific binary codeplug for TYT UV-390 & Retevis RT3S radios.
  *
@@ -578,10 +580,8 @@ protected:
     /** Constructor. */
     timestamp_t();
 
-    /** Returns @c true if the timestamp is valid. */
-    bool isValid() const;
     /** Clears the timestamp. */
-    void clear();
+    void set();
 
     /** Returns the timestamp. */
     QDateTime getTimestamp() const;
@@ -600,19 +600,32 @@ protected:
     uint16_t destination;                 ///< Destination contact index, 0=none or index+1.
     uint8_t  _unused_6[10];               ///< Padding all = 0xff
 
+    /** Constructor. */
+    gpssystem_t();
+
     /** Resets the GPS system settings. */
     void clear();
+    /** Returns @c true if enabled. */
+    bool isValid() const;
+
     /** Returns the interval at which the GPS position is announced. */
     uint repeatInterval() const;
     /** Sets the interval at which the GPS position is announced. */
     void setRepeatInterval(uint interval);
+
+    /** Constructs a generic @c GPSSystem object from this codeplug representation. */
+    GPSSystem *toGPSSystemObj() const;
+    /** Links the previously constructed generic @c GPSSystem to the rest of the configuration. */
+    bool linkGPSSystemObj(GPSSystem *gs, Config *conf) const;
+    /** Initializes this codeplug GPS system from the given generic @c GPSSystem. */
+    void fromGPSSystemObj(const GPSSystem *l, const Config *conf);
   };
 
 	/** Represents an entry within the callsign database.
    * @todo Implement generic config representation for callsign database. */
   struct __attribute__((packed)) callsign_t {
-    unsigned dmrid   : 24;      ///< DMR id in BCD
-    unsigned _unused : 8;       ///< Unknown set to 0xff.
+    uint32_t dmrid   : 24,      ///< DMR id in BCD
+      _unused        :  8;      ///< Unknown set to 0xff.
     char     callsign[16];      ///< ASCII zero-terminated
     char     name[100];         ///< Descriptive name, nickname, city, state, country.
   };

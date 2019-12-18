@@ -314,6 +314,7 @@ class Config;
 class DigitalContact;
 class RXGroupList;
 class Zone;
+class GPSSystem;
 class ScanList;
 
 /// @cond with_internal_docs
@@ -450,6 +451,9 @@ public:
   /** Gets called once a zone list has been parsed. */
   virtual bool handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels,
                           qint64 line, qint64 column, QString &errorMessage);
+  /** Gets called once a GPS system has been parsed. */
+  virtual bool handleGPSSystem(qint64 idx, const QString &name, qint64 contactIdx, qint64 period,
+                               qint64 revertChannelIdx, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a scan list has been parsed. */
   virtual bool handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
                               const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage);
@@ -507,6 +511,10 @@ protected:
   bool _parse_zones(CSVLexer &lexer);
   /** Internal function to parse a zone. */
   bool _parse_zone(qint64 id, CSVLexer &lexer);
+  /** Internal function to parse a GPS system list. */
+  bool _parse_gps_systems(CSVLexer &lexer);
+  /** Internal function to parse a GPS system. */
+  bool _parse_gps_system(qint64 id, CSVLexer &lexer);
   /** Internal function to parse a scanlist list. */
   bool _parse_scanlists(CSVLexer &lexer);
   /** Internal function to parse a scanlist. */
@@ -559,6 +567,8 @@ public:
       AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels,
                           qint64 line, qint64 column, QString &errorMessage);
+  virtual bool handleGPSSystem(qint64 idx, const QString &name, qint64 contactIdx, qint64 period,
+                               qint64 revertChannelIdx, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
                               const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage);
 
@@ -575,6 +585,8 @@ protected:
   QMap<int, RXGroupList *> _rxgroups;
   /** Index <-> Zone map. */
   QMap<int, Zone *> _zones;
+  /** Index <-> GPS System map. */
+  QMap<int, GPSSystem *> _gpsSystems;
   /** Index <-> Scan list map. */
   QMap<int, ScanList *> _scanlists;
 };

@@ -2,6 +2,8 @@
 #include "config.hh"
 #include "utils.hh"
 #include "channel.hh"
+#include "gpssystem.hh"
+#include "config.h"
 
 
 #define NCHAN           3000
@@ -806,6 +808,116 @@ UV390Codeplug::message_t::setText(const QString text) {
 }
 
 /* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::timestamp_t
+ * ******************************************************************************************** */
+UV390Codeplug::timestamp_t::timestamp_t() {
+  set();
+}
+
+void
+UV390Codeplug::timestamp_t::set() {
+  static const char *vtable = "0123456789:;<=>?";
+  _pad0 = 0xff;
+  setTimestamp();
+  cps_version[0] = vtable[std::min(9,VERSION_MAJOR/10)];
+  cps_version[1] = vtable[VERSION_MAJOR%10];
+  cps_version[2] = vtable[std::min(9,VERSION_MINOR/10)];
+  cps_version[3] = vtable[VERSION_MINOR%10];
+}
+
+void
+UV390Codeplug::timestamp_t::setTimestamp(const QDateTime &dt) {
+  date[0] = ((dt.date().year()/1000) << 4)     | ((dt.date().year()%1000)/100);
+  date[1] = (((dt.date().year()%100)/10) << 4) | (dt.date().year()%10);
+  date[2] = ((dt.date().month()/10) << 4)      | (dt.date().month()%10);
+  date[3] = ((dt.date().day()/10) << 4)        | (dt.date().day()%10);
+  date[4] = ((dt.time().hour()/10) << 4)       | (dt.time().hour()%10);
+  date[5] = ((dt.time().minute()/10) << 4)     | (dt.time().minute()%10);
+  date[6] = ((dt.time().second()/10) << 4)     | (dt.time().second()%10);
+}
+
+QDateTime
+UV390Codeplug::timestamp_t::getTimestamp() const {
+  int year   = (date[0]>>4)*1000 + (date[0]&0xf)*100 + (date[1]>>4)*10 + (date[1]&0xf);
+  int month  = (date[2]>>4)*10 + (date[2]&0xf);
+  int day    = (date[3]>>4)*10 + (date[3]&0xf);
+  int hour   = (date[4]>>4)*10 + (date[4]&0xf);
+  int minute = (date[5]>>4)*10 + (date[5]&0xf);
+  int second = (date[6]>>4)*10 + (date[6]&0xf);
+  return QDateTime(QDate(year, month, day), QTime(hour, minute, second), Qt::UTC);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::gpssystem_t
+ * ******************************************************************************************** */
+UV390Codeplug::gpssystem_t::gpssystem_t() {
+  clear();
+}
+
+void
+UV390Codeplug::gpssystem_t::clear() {
+  revert_channel = 0;
+  repeat_interval = 0;
+  destination = 0;
+  _unused_3 = 0xff;
+  memset(_unused_6, 0xff, 10);
+}
+
+bool
+UV390Codeplug::gpssystem_t::isValid() const {
+  return repeat_interval != 0;
+}
+
+uint
+UV390Codeplug::gpssystem_t::repeatInterval() const {
+  return uint(repeat_interval)*30;
+}
+
+void
+UV390Codeplug::gpssystem_t::setRepeatInterval(uint interval) {
+  interval = std::min(interval, 7200u);
+  repeat_interval = interval/30;
+}
+
+GPSSystem *
+UV390Codeplug::gpssystem_t::toGPSSystemObj() const {
+  return new GPSSystem("GPS System", nullptr, nullptr, repeatInterval());
+}
+
+bool
+UV390Codeplug::gpssystem_t::linkGPSSystemObj(GPSSystem *gs, Config *conf) const {
+  if ((! destination) || ((destination-1)>=conf->contacts()->digitalCount()))
+    return false;
+  gs->setContact(conf->contacts()->digitalContact(destination-1));
+
+  if (0 < revert_channel) {
+    if ( ((revert_channel-1)>=conf->channelList()->count()) ||
+         (conf->channelList()->channel(revert_channel-1)->is<DigitalChannel>()))
+      return false;
+    gs->setRevertChannel(conf->channelList()->channel(revert_channel-1)->as<DigitalChannel>());
+  }
+
+  return true;
+}
+
+void
+UV390Codeplug::gpssystem_t::fromGPSSystemObj(const GPSSystem *l, const Config *conf) {
+  clear();
+
+  if (! l->hasContact())
+    return;
+
+  if (l->hasRevertChannel())
+    revert_channel = conf->channelList()->indexOf(l->revertChannel())+1;
+  else
+    revert_channel = 0;
+
+  destination = conf->contacts()->indexOfDigital(l->contact())+1;
+  setRepeatInterval(l->period());
+}
+
+/* ******************************************************************************************** *
  * Implementation of UV390Codeplug
  * ******************************************************************************************** */
 UV390Codeplug::UV390Codeplug(QObject *parent)
@@ -814,12 +926,41 @@ UV390Codeplug::UV390Codeplug(QObject *parent)
   addImage("TYT MD-UV390 Codeplug");
   image(0).addElement(0x002800, 0x3e000);
   image(0).addElement(0x110800, 0x90000);
+
+  // Clear entire codeplug
+
+  // Clear timestamp
+  ((timestamp_t *)(data(OFFSET_TIMESTMP)))->set();
+  // Clear some unused memory sections
+  memset(data(0x00280c),0xff,52);
+  // Clear general config
+  ((general_settings_t *)(data(OFFSET_SETTINGS)))->clear();
+  // Clear contacts
+  for (int i=0; i<NCONTACTS; i++)
+    ((contact_t *)(data(OFFSET_CONTACTS+i*sizeof(contact_t))))->clear();
+  // Clear RX group lists
+  for (int i=0; i<NGLISTS; i++)
+    ((grouplist_t *)(data(OFFSET_GLISTS+i*sizeof(grouplist_t))))->clear();
+  // Clear channels
+  for (int i=0; i<NCHAN; i++)
+    ((channel_t *)(data(OFFSET_CHANNELS+i*sizeof(channel_t))))->clear();
+  // Clear zones
+  for (int i=0; i<NZONES; i++) {
+    ((zone_t *)(data(OFFSET_ZONES+i*sizeof(zone_t))))->clear();
+    ((zone_ext_t*)(data(OFFSET_ZONEXT+i*sizeof(zone_ext_t))))->clear();
+  }
+  // Clear scan lists
+  for (int i=0; i<NSCANL; i++)
+    ((scanlist_t *)(data(OFFSET_SCANL+i*sizeof(scanlist_t))))->clear();
 }
 
 bool
 UV390Codeplug::encode(Config *config) {
   // Some unused memory sections
   memset(data(0x00280c),0xff,52);
+
+  // Set timestamp
+  ((timestamp_t *)(data(OFFSET_TIMESTMP)))->set();
 
   // General config
   general_settings_t *genset = (general_settings_t *)(data(OFFSET_SETTINGS));
