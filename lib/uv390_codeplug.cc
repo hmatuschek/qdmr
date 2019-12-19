@@ -770,6 +770,7 @@ UV390Codeplug::general_settings_t::updateConfigObj(Config *conf) const {
   conf->setIntroLine1(getIntroLine1());
   conf->setIntroLine2(getIntroLine2());
   conf->setMicLevel(1+mic_level*2);
+  conf->setSpeech(1 == channel_voice_announce);
   return true;
 }
 
