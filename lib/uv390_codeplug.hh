@@ -37,7 +37,9 @@ class GPSSystem;
  *  <tr><td>0x02f800</td> <td>0x030b88</td> <td>0x01388</td> <td>??? Unknown. ???</td></tr>
  *  <tr><td>0x030b88</td> <td>0x031800</td> <td>0x00c78</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x031800</td> <td>0x03f2c0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c UV390Codeplug::zone_ext_t.</td></tr>
- *  <tr><td>0x03f2c0</td> <td>0x040800</td> <td>0x01540</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x03f2c0</td> <td>0x03f40e</td> <td>0x0014e</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x03f40e</td> <td>0x03f50e</td> <td>0x00100</td> <td>16 GPS systems @ 0x10 bytes each, see @c UV390Codeplug::gpssystem_t.</td></tr>
+ *  <tr><td>0x03f50e</td> <td>0x040800</td> <td>0x012f2</td> <td>??? Unknown ???</td></tr>
  *  <tr><th colspan="4">Second segment 0x110800-0x1a0800</th></tr>
  *  <tr><td>0x110800</td> <td>0x13f600</td> <td>0x2ee00</td> <td>3000 Channels @ 0x40 bytes each, see @c UV390Codeplug::channel_t.</td></tr>
  *  <tr><td>0x13f600</td> <td>0x140800</td> <td>0x01200</td> <td>Reserved, filled with @c 0xff. </td></tr>
@@ -126,7 +128,7 @@ protected:
       lone_worker            : 1;   ///< Lone Worker: 0=disable, 1=enable, default=0
 
     // Byte1
-    uint8_t allow_talkaround : 1,   ///< Allow Talkaround: 0=off, 1=on, default=1
+    uint8_t allow_talkaround : 1,   ///< Allow Talkaround: 0=on, 1=off, default=1 (off)
       rx_only                : 1,   ///< RX Only: 0=off, 1=on, default=0
       time_slot              : 2,   ///< Repeater slot: 2=TS2, 1=TS1, default=1
       color_code             : 4;   ///< ColorCode [0..15], default=1
@@ -141,7 +143,7 @@ protected:
 		uint8_t rx_ref_frequency : 2,   ///< RX Ref Frequency: 0=Low, 1=Medium, 2=High, default=0
       _unused3_2             : 1,   ///< Unknown = 0 ???, default = 0
       emergency_alarm_ack    : 1,   ///< Emergency Alarm Ack, default = 0
-      _unused3_4             : 3,   ///< Unknown 0b100 ???
+      _unused3_4             : 3,   ///< Unknown 0b110 ???
       display_pttid_dis      : 1;   ///< Display PTT ID (inverted), default = 1
 
 		// Byte 4
@@ -205,7 +207,7 @@ protected:
 
 		// Byte 31
 		uint8_t send_gps_info : 1,      ///< Send GSP Info (inv): 0=Send, 1=Disabled, default=1
-      recv_gsp_info       : 1,      ///< Recv. GSP Info (inv): 0=Recv., 1=Disabled, default=1
+      recv_gps_info       : 1,      ///< Recv. GSP Info (inv): 0=Recv., 1=Disabled, default=1
       allow_interrupt     : 1,      ///< Allow interrupt (inv): 0=Allow, 1=Disabled, default=1
       dcdm_switch_dis     : 1,      ///< DCDM switch (inverted), default=1
       leader_ms           : 1,      ///< Leader/MS: Leader or MS, default=1

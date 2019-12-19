@@ -145,7 +145,7 @@ RD5RCodeplug::channel_t::toChannelObj() const {
           DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1;
     return new DigitalChannel(
           name, rxF, txF, pwr, timeout, rxOnly, admit, colorcode_rx, slot,
-          nullptr, nullptr, nullptr);
+          nullptr, nullptr, nullptr, nullptr);
   }
 
   return nullptr;

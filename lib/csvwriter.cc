@@ -1,6 +1,7 @@
 #include "csvwriter.hh"
 #include <QDateTime>
 #include "config.hh"
+#include "config.h"
 #include <cmath>
 
 
@@ -14,7 +15,8 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
 {
   stream << "#\n"
          << "# Configuration generated " << QDateTime::currentDateTime().toString()
-         << " by qdrm, version 0.1.0\n"
+         << " by qdrm, version " VERSION_STRING "\n"
+         << "# see https://dm3mat.darc.de/qdmr for details.\n"
          << "#\n\n";
 
 
@@ -39,8 +41,9 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 11) Time slot: 1 or 2\n"
             "# 12) Receive group list: - or index in Grouplist table\n"
             "# 13) Contact for transmit: - or index in Contacts table\n"
+            "# 14) GPS System: - or index in GPS table.\n"
             "#\n"
-            "Digital Name                Receive   Transmit  Power Scan TOT RO Admit  Color Slot RxGL TxContact\n";
+            "Digital Name                Receive   Transmit  Power Scan TOT RO Admit  CC SS RxGL TxC GPS\n";
   for (int i=0; i<config->channelList()->count(); i++) {
     if (config->channelList()->channel(i)->is<AnalogChannel>())
       continue;
@@ -58,17 +61,22 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
            << qSetFieldWidth(4)  << left << ( (0 == digi->txTimeout()) ? '-' : digi->txTimeout() )
            << qSetFieldWidth(3)  << left << (digi->rxOnly() ? '+' : '-')
            << qSetFieldWidth(7)  << left << ((DigitalChannel::AdmitNone==digi->admit()) ? "-" : ((DigitalChannel::AdmitFree==digi->admit()) ? "Free" : "Color"))
-           << qSetFieldWidth(6)  << left << digi->colorCode()
-           << qSetFieldWidth(5)  << left << (DigitalChannel::TimeSlot1==digi->timeslot() ? "1" : "2");
+           << qSetFieldWidth(3)  << left << digi->colorCode()
+           << qSetFieldWidth(3)  << left << (DigitalChannel::TimeSlot1==digi->timeslot() ? "1" : "2");
     if (nullptr == digi->rxGroupList())
       stream << qSetFieldWidth(5)  << left << '-';
     else
       stream << qSetFieldWidth(5) << left << (config->rxGroupLists()->indexOf(digi->rxGroupList())+1);
     if (nullptr == digi->txContact())
-      stream << qSetFieldWidth(5)  << left << '-';
+      stream << qSetFieldWidth(4)  << left << '-';
     else
-      stream << qSetFieldWidth(10) << left << (config->contacts()->indexOf(digi->txContact())+1)
-             << qSetFieldWidth(0) << "# " << digi->txContact()->name();
+      stream << qSetFieldWidth(4) << left << (config->contacts()->indexOf(digi->txContact())+1);
+    if (nullptr == digi->gpsSystem())
+      stream << qSetFieldWidth(4) << left << "-";
+    else
+      stream << qSetFieldWidth(4) << left << config->gpsSystems()->indexOf(digi->gpsSystem())+1;
+    if (digi->txContact())
+      stream << qSetFieldWidth(0) << "# " << digi->txContact()->name();
     stream << qSetFieldWidth(0) << "\n";
   }
   stream << "\n";
@@ -88,7 +96,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 12) Guard tone for transmit, or '-' to disable\n"
             "# 13) Bandwidth in kHz: 12.5, 25\n"
             "#\n"
-            "Analog  Name                Receive   Transmit Power Scan TOT RO Admit  Squelch RxTone TxTone Width\n";
+            "Analog  Name                Receive    Transmit Power Scan TOT RO Admit  Squelch RxTone TxTone Width\n";
   for (int i=0; i<config->channelList()->count(); i++) {
     if (config->channelList()->channel(i)->is<DigitalChannel>())
       continue;
@@ -187,7 +195,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 4) Update period: period in ms\n"
             "# 5) Revert channel ID or '-'.\n"
             "#\n"
-            "GPS  Name               Dest Period Revert\n";
+            "GPS  Name                Dest Period Revert\n";
   for (int i=0; i<config->gpsSystems()->count(); i++) {
     GPSSystem *gps = config->gpsSystems()->gpsSystem(i);
     stream << qSetFieldWidth(5)  << left << (i+1)

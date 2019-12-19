@@ -114,10 +114,10 @@ DigitalChannelDialog::channel() {
     _channel->setRXGroupList(rxgroup);
     _channel->setTXContact(contact);
     return _channel;
-  } else {
-    return new DigitalChannel(name, rx, tx, pwr, timeout, rxonly, admit, colorcode, ts, rxgroup,
-                              contact, scanlist);
   }
+
+  return new DigitalChannel(name, rx, tx, pwr, timeout, rxonly, admit, colorcode, ts, rxgroup,
+                            contact, nullptr, scanlist);
 }
 
 void

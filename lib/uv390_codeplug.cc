@@ -17,12 +17,12 @@
 // ---- first segment ---- additional offset 0x000800
 #define OFFSET_TIMESTMP 0x002800
 #define OFFSET_SETTINGS 0x002840
-#define OFFSET_GPS_SYS  0x002880  /// @bug Wrong offset!
 #define OFFSET_MSG      0x002980
 #define OFFSET_GLISTS   0x00f420
 #define OFFSET_ZONES    0x0151e0
 #define OFFSET_SCANL    0x019060
 #define OFFSET_ZONEXT   0x031800
+#define OFFSET_GPS_SYS  0x03f40e
 // ---- second segment ---- additional offset 0x110800
 #define OFFSET_CHANNELS 0x110800
 #define OFFSET_CONTACTS 0x140800
@@ -114,8 +114,8 @@ UV390Codeplug::channel_t::clear() {
   power = POWER_HIGH;
   _unused30_2 = 0b111111;
 
-  send_gps_info = 0;
-  recv_gsp_info = 0;
+  send_gps_info = 1;
+  recv_gps_info = 1;
   allow_interrupt = 1;
   dcdm_switch_dis = 1;
   leader_ms = 1;
@@ -212,7 +212,7 @@ UV390Codeplug::channel_t::toChannelObj() const {
         (1 == time_slot) ? DigitalChannel::TimeSlot1 : DigitalChannel::TimeSlot2;
 
     return new DigitalChannel(getName(), getRXFrequency(), getTXFrequency(), pwr, (tot*15),
-                              rx_only, admit_crit, color_code, slot, nullptr, nullptr, nullptr);
+                              rx_only, admit_crit, color_code, slot, nullptr, nullptr, nullptr, nullptr);
   }
 
   return nullptr;
@@ -250,6 +250,11 @@ UV390Codeplug::channel_t::linkChannelObj(Channel *c, Config *conf) const {
         return false;
       dc->setRXGroupList(conf->rxGroupLists()->list(group_list_index-1));
     }
+    if (gps_system) {
+      if ((gps_system-1) >= conf->gpsSystems()->count())
+        return false;
+      dc->setGPSSystem(conf->gpsSystems()->gpsSystem(gps_system-1));
+    }
     return true;
   }
 
@@ -277,6 +282,11 @@ UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf
     time_slot = (DigitalChannel::TimeSlot1 == dchan->timeslot()) ? 1 : 2;
     group_list_index = conf->rxGroupLists()->indexOf(dchan->rxGroupList()) + 1;
     contact_name_index = conf->contacts()->indexOfDigital(dchan->txContact()) + 2;
+    if (dchan->gpsSystem()) {
+      gps_system = conf->gpsSystems()->indexOf(dchan->gpsSystem())+1;
+      send_gps_info = 0;
+      recv_gps_info = 0;
+    }
   }
 }
 
@@ -1015,6 +1025,16 @@ UV390Codeplug::encode(Config *config) {
       scan->clear();
   }
 
+  // Define GPS systems
+  for (int i=0; i<NGPSSYSTEMS; i++) {
+    gpssystem_t *gps = (gpssystem_t *)(data(OFFSET_GPS_SYS+i*sizeof(gpssystem_t)));
+    if (i < config->gpsSystems()->count())
+      gps->fromGPSSystemObj(config->gpsSystems()->gpsSystem(i), config);
+    else
+      gps->clear();
+  }
+
+
   return true;
 }
 
@@ -1124,6 +1144,24 @@ UV390Codeplug::decode(Config *config) {
     }
   }
 
+  // Define GPS systems
+  for (int i=0; i<NGPSSYSTEMS; i++) {
+    gpssystem_t *gps = (gpssystem_t *)(data(OFFSET_GPS_SYS + i*sizeof(gpssystem_t)));
+    if (! gps) {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid GPS system at index %2.")
+          .arg(__func__).arg(i);
+    }
+    if (! gps->isValid())
+      break;
+    if (GPSSystem *obj = gps->toGPSSystemObj()) {
+      config->gpsSystems()->addGPSSystem(obj);
+    } else {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid GPS system at index %2.")
+          .arg(__func__).arg(i);
+      return false;
+    }
+  }
+
   // Link RX GroupLists
   for (int i=0; i<config->rxGroupLists()->count(); i++) {
     grouplist_t *glist = (grouplist_t *)(data(OFFSET_GLISTS+i*sizeof(grouplist_t)));
@@ -1169,6 +1207,16 @@ UV390Codeplug::decode(Config *config) {
     scanlist_t *scan = (scanlist_t *)(data(OFFSET_SCANL+i*sizeof(scanlist_t)));
     if (! scan->linkScanListObj(config->scanlists()->scanlist(i), config)) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link scan-list at index %2.")
+          .arg(__func__).arg(i);
+      return false;
+    }
+  }
+
+  // Link GPS systems
+  for (int i=0; i<config->gpsSystems()->count(); i++) {
+    gpssystem_t *gps = (gpssystem_t *)(data(OFFSET_GPS_SYS+i*sizeof(gpssystem_t)));
+    if (! gps->linkGPSSystemObj(config->gpsSystems()->gpsSystem(i), config)) {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link GPS system at index %2.")
           .arg(__func__).arg(i);
       return false;
     }

@@ -50,7 +50,7 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QTabWidget" name="tabs">
+     <widget class="QTabWidget" name="tabWidget">
       <property name="accessibleName">
        <string>Tablist</string>
       </property>
@@ -58,7 +58,7 @@
        <string>There are 6 tabs providing genral settings, contact, Rx group, channel zone and scan lists.</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="tabGeneral">
        <property name="accessibleName">
@@ -554,6 +554,64 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tabGPSSystems">
+       <attribute name="title">
+        <string>GPS</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_18">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_11">
+          <item>
+           <widget class="QTableView" name="gpsView"/>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_19">
+            <item>
+             <widget class="QPushButton" name="gpsUp">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resources.qrc">
+                <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="gpsDown">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resources.qrc">
+                <normaloff>:/icons/down.png</normaloff>:/icons/down.png</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_12">
+          <item>
+           <widget class="QPushButton" name="addGPS">
+            <property name="text">
+             <string>Add GPS System</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="remGPS">
+            <property name="text">
+             <string>Delete GPS System</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -797,7 +855,7 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>tabs</tabstop>
+  <tabstop>tabWidget</tabstop>
   <tabstop>dmrID</tabstop>
   <tabstop>radioName</tabstop>
   <tabstop>introLine1</tabstop>

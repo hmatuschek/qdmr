@@ -14,6 +14,7 @@
 #include "rxgrouplistdialog.hh"
 #include "zonedialog.hh"
 #include "scanlistdialog.hh"
+#include "gpssystemdialog.hh"
 #include "repeaterdatabase.hh"
 #include "userdatabase.hh"
 
@@ -38,7 +39,8 @@ Application::Application(int &argc, char *argv[])
     }
     QString errorMessage;
     QTextStream stream(&file);
-    _config->readCSV(stream, errorMessage);
+    if (! _config->readCSV(stream, errorMessage))
+      logError() << errorMessage;
   }
 
   _currentPosition = settings.position();
@@ -200,6 +202,18 @@ Application::createMainWindow() {
   connect(slDown, SIGNAL(clicked()), this, SLOT(onScanListDown()));
   connect(scanLists, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditScanList(const QModelIndex &)));
 
+  // Wire-up "GPS System List" view
+  QTableView *gpsList = _mainWindow->findChild<QTableView *>("gpsView");
+  QPushButton *gpsUp   = _mainWindow->findChild<QPushButton *>("gpsUp");
+  QPushButton *gpsDown = _mainWindow->findChild<QPushButton *>("gpsDown");
+  QPushButton *addGPS  = _mainWindow->findChild<QPushButton *>("addGPS");
+  QPushButton *remGPS  = _mainWindow->findChild<QPushButton *>("remGPS");
+  gpsList->setModel(_config->gpsSystems());
+  connect(addGPS, SIGNAL(clicked()), this, SLOT(onAddGPS()));
+  connect(remGPS, SIGNAL(clicked()), this, SLOT(onRemGPS()));
+  connect(gpsUp, SIGNAL(clicked()), this, SLOT(onGPSUp()));
+  connect(gpsDown, SIGNAL(clicked()), this, SLOT(onGPSDown()));
+  connect(gpsList, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditGPS(const QModelIndex &)));
   return _mainWindow;
 }
 
@@ -899,6 +913,74 @@ Application::onEditScanList(const QModelIndex &idx) {
   dialog.scanlist();
 
   emit _mainWindow->findChild<QListView *>("scanListView")->model()->dataChanged(idx,idx);
+}
+
+void
+Application::onAddGPS() {
+  GPSSystemDialog dialog(_config);
+
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  QTableView *list = _mainWindow->findChild<QTableView *>("gpsView");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+  GPSSystem *gps = dialog.gpsSystem();
+  if (selected.isValid())
+    _config->gpsSystems()->addGPSSystem(gps, selected.row()+1);
+  else
+    _config->gpsSystems()->addGPSSystem(gps);
+}
+
+void
+Application::onRemGPS() {
+  QModelIndex idx = _mainWindow->findChild<QTableView *>("gpsView")->selectionModel()->currentIndex();
+  if (! idx.isValid()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot delete GPS system"),
+          tr("Cannot delete GPS system: You have to select a GPS system first."));
+    return;
+  }
+
+  QString name = _config->gpsSystems()->gpsSystem(idx.row())->name();
+  if (QMessageBox::No == QMessageBox::question(
+        nullptr, tr("Delete GPS system?"), tr("Delete GPS system %1?").arg(name)))
+    return;
+
+  _config->gpsSystems()->remGPSSystem(idx.row());
+}
+
+void
+Application::onGPSUp() {
+  QTableView *list = _mainWindow->findChild<QTableView *>("gpsView");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || (0 >= selected.row()))
+    return;
+  if (_config->gpsSystems()->moveUp(selected.row()))
+    list->setCurrentIndex(_config->gpsSystems()->index(selected.row()-1,0));
+}
+
+void
+Application::onGPSDown() {
+  QTableView *list = _mainWindow->findChild<QTableView *>("gpsView");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || ((_config->gpsSystems()->count()-1) <= selected.row()))
+    return;
+  if (_config->gpsSystems()->moveDown(selected.row()))
+    list->setCurrentIndex(_config->gpsSystems()->index(selected.row()+1,0));
+}
+
+void
+Application::onEditGPS(const QModelIndex &idx) {
+  if (idx.row()>=_config->gpsSystems()->count())
+    return;
+
+  GPSSystemDialog dialog(_config, _config->gpsSystems()->gpsSystem(idx.row()));
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  dialog.gpsSystem();
+
+  emit _mainWindow->findChild<QTableView *>("gpsView")->model()->dataChanged(idx,idx);
 }
 
 void

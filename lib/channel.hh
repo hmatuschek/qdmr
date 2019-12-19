@@ -8,6 +8,8 @@ class Config;
 class RXGroupList;
 class DigitalContact;
 class ScanList;
+class GPSSystem;
+
 
 /** The base class of all channels (analog and digital) of a codeplug configuration.
  *
@@ -238,11 +240,12 @@ public:
    * @param timeslot  Specifies the time-slot.
    * @param rxGroup   Specifies the RX group list for the channel.
    * @param txContact Specifies the default TX contact to call on this channel.
+   * @param gpsSystem Specifies the GPS system to use on this channel.
    * @param list      Specifies the default scanlist for the channel.
    * @param parent    Specified the @c QObject parent object. */
 	DigitalChannel(const QString &name, float rxFreq, float txFreq, Power power, uint txTimeout,
 	               bool rxOnly, Admit admit, uint colorCode, TimeSlot timeslot, RXGroupList *rxGroup,
-	               DigitalContact *txContact, ScanList *list, QObject *parent=nullptr);
+                 DigitalContact *txContact, GPSSystem *gpsSystem, ScanList *list, QObject *parent=nullptr);
 
   /** Returns the admit criterion for the channel. */
 	Admit admit() const;
@@ -269,11 +272,16 @@ public:
   /** (Re-) Sets the default TX contact for this channel. */
 	bool setTXContact(DigitalContact *c);
 
+  GPSSystem *gpsSystem() const;
+  bool setGPSSystem(GPSSystem *gps);
+
 protected slots:
   /** Internal callback if RX group list is deleted. */
 	void onRxGroupDeleted();
   /** Internal callback if TX contact is deleted. */
 	void onTxContactDeleted();
+  /** Internal callback if GPS system is deleted. */
+  void onGPSSystemDeleted();
 
 protected:
   /** The admit criterion. */
@@ -286,6 +294,8 @@ protected:
 	RXGroupList *_rxGroup;
   /** The default TX contact. */
 	DigitalContact *_txContact;
+  /** The GPS system. */
+  GPSSystem *_gpsSystem;
 };
 
 

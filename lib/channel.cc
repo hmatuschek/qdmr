@@ -193,11 +193,17 @@ AnalogChannel::setBandwidth(Bandwidth bw) {
 DigitalChannel::DigitalChannel(const QString &name, float rxFreq, float txFreq, Power power,
                                uint txto, bool rxOnly, Admit admit, uint colorCode,
                                TimeSlot timeslot, RXGroupList *rxGroup, DigitalContact *txContact,
-                               ScanList *list, QObject *parent)
+                               GPSSystem *gpsSystem, ScanList *list, QObject *parent)
   : Channel(name, rxFreq, txFreq, power, txto, rxOnly, list, parent), _admit(admit),
-    _colorCode(colorCode), _timeSlot(timeslot), _rxGroup(rxGroup), _txContact(txContact)
+    _colorCode(colorCode), _timeSlot(timeslot), _rxGroup(rxGroup), _txContact(txContact),
+    _gpsSystem(gpsSystem)
 {
-  // pass...
+  if (_rxGroup)
+    connect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));
+  if (_txContact)
+    connect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
+  if (_gpsSystem)
+    connect(_gpsSystem, SIGNAL(destroyed()), this, SLOT(onGPSSystemDeleted()));
 }
 
 DigitalChannel::Admit
@@ -239,8 +245,6 @@ DigitalChannel::rxGroupList() const {
 
 bool
 DigitalChannel::setRXGroupList(RXGroupList *g) {
-  if (nullptr == g)
-    return false;
   if (_rxGroup)
     disconnect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));
   _rxGroup = g;
@@ -257,13 +261,27 @@ DigitalChannel::txContact() const {
 
 bool
 DigitalChannel::setTXContact(DigitalContact *c) {
-  if (nullptr == c)
-    return false;
   if (_txContact)
     disconnect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
   _txContact = c;
   if (_txContact)
     connect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
+  emit modified();
+  return true;
+}
+
+GPSSystem *
+DigitalChannel::gpsSystem() const {
+  return _gpsSystem;
+}
+
+bool
+DigitalChannel::setGPSSystem(GPSSystem *gps) {
+  if (_gpsSystem)
+    disconnect(_gpsSystem, SIGNAL(destroyed()), this, SLOT(onGPSSystemDeleted()));
+  _gpsSystem = gps;
+  if (_gpsSystem)
+    connect(_gpsSystem, SIGNAL(destroyed()), this, SLOT(onGPSSystemDeleted()));
   emit modified();
   return true;
 }
@@ -276,6 +294,11 @@ DigitalChannel::onRxGroupDeleted() {
 void
 DigitalChannel::onTxContactDeleted() {
   setTXContact(nullptr);
+}
+
+void
+DigitalChannel::onGPSSystemDeleted() {
+  setGPSSystem(nullptr);
 }
 
 
@@ -438,20 +461,20 @@ ChannelList::data(const QModelIndex &index, int role) const {
       if (channel->scanList()) {
         return channel->scanList()->name();
       } else {
-        return tr("[None]");
+        return tr("-");
       }
     case 9:
       if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
         return digi->colorCode();
       } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-        return tr("-");
+        return tr("[None]");
       }
       break;
     case 10:
       if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
         return (DigitalChannel::TimeSlot1 == digi->timeslot()) ? 1 : 2;
       } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-        return tr("-");
+        return tr("[None]");
       }
       break;
     case 11:
@@ -459,7 +482,7 @@ ChannelList::data(const QModelIndex &index, int role) const {
         if (digi->rxGroupList()) {
           return digi->rxGroupList()->name();
         } else {
-          return tr("[None]");
+          return tr("-");
         }
       } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
         return tr("[None]");
@@ -470,7 +493,7 @@ ChannelList::data(const QModelIndex &index, int role) const {
         if (digi->txContact())
           return digi->txContact()->name();
         else
-          return tr("[None]");
+          return tr("-");
       } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
         return tr("[None]");
       }
@@ -507,7 +530,7 @@ ChannelList::data(const QModelIndex &index, int role) const {
       break;
     case 16:
       if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-        return tr("Narrow");
+        return tr("[None]");
       } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
         if (AnalogChannel::BWWide == analog->bandwidth()) {
           return tr("Wide");

@@ -87,6 +87,12 @@ private slots:
   void onScanListDown();
   void onEditScanList(const QModelIndex &index);
 
+  void onAddGPS();
+  void onRemGPS();
+  void onGPSUp();
+  void onGPSDown();
+  void onEditGPS(const QModelIndex &index);
+
   void positionUpdated(const QGeoPositionInfo &info);
 
 protected:

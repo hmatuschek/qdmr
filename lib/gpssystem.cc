@@ -203,8 +203,8 @@ GPSSystems::data(const QModelIndex &index, int role) const {
     return gps->contact()->name();
   case 2:
     return gps->period();
-  case 4:
-    return (gps->hasRevertChannel() ? gps->revertChannel()->name() : tr("None"));
+  case 3:
+    return (gps->hasRevertChannel() ? gps->revertChannel()->name() : "-");
   default:
     break;
   }

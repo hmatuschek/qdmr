@@ -195,7 +195,7 @@ CSVHandler::handleGroupList(qint64 idx, const QString &name, const QList<qint64>
 bool
 CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
     qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-    qint64 gl, qint64 contact, qint64 line, qint64 column, QString &errorMessage)
+    qint64 gl, qint64 contact, qint64 gps, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
   Q_UNUSED(name);
@@ -210,6 +210,7 @@ CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, dou
   Q_UNUSED(slot);
   Q_UNUSED(gl);
   Q_UNUSED(contact);
+  Q_UNUSED(gps);
   Q_UNUSED(line);
   Q_UNUSED(column);
   Q_UNUSED(errorMessage);
@@ -868,6 +869,18 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
+  qint64 gps; bool ok;
+  if (CSVLexer::Token::T_NOT_SET == token.type) {
+    gps = 0;
+  } else if (CSVLexer::Token::T_NUMBER == token.type) {
+    gps = token.value.toInt(&ok);
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -875,7 +888,7 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   return _handler->handleDigitalChannel(idx, name, rx, tx, pwr, scanlist, tot, rxOnly, admit, color,
-                                        slot, rxGroupList, txContact, line, column, _errorMessage);
+                                        slot, rxGroupList, txContact, gps, line, column, _errorMessage);
 }
 
 bool
@@ -1330,13 +1343,16 @@ CSVReader::read(Config *config, QTextStream &stream, QString &errorMessage) {
   CSVReader reader(config);
   CSVParser parser(&reader);
 
-  if (! parser.parse(stream))
+  if (! parser.parse(stream)) {
+    errorMessage = parser.errorMessage();
     return false;
-
+  }
   reader._link = true;
 
-  if (! parser.parse(stream))
+  if (! parser.parse(stream)) {
+    errorMessage = parser.errorMessage();
     return false;
+  }
 
   return true;
 }
@@ -1494,7 +1510,7 @@ CSVReader::handleGroupList(qint64 idx, const QString &name, const QList<qint64> 
 bool
 CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
     qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-    qint64 gl, qint64 contact, qint64 line, qint64 column, QString &errorMessage)
+    qint64 gl, qint64 contact, qint64 gps, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
     // Check RX Grouplist
@@ -1518,6 +1534,13 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
       return false;
     }
     _channels[idx]->as<DigitalChannel>()->setScanList(_scanlists[scan]);
+    // Check GPS System
+    if ((0<gps) && (! _gpsSystems.contains(gps))) {
+      errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown system index %4.")
+          .arg(line).arg(column).arg(name).arg(gps);
+      return false;
+    }
+    _channels[idx]->as<DigitalChannel>()->setGPSSystem(_gpsSystems[gps]);
     return true;
   }
 
@@ -1529,7 +1552,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
   }
 
   DigitalChannel *chan = new DigitalChannel(name, rx, tx, power, tot, ro, admit, color, slot,
-                                            nullptr, nullptr, nullptr);
+                                            nullptr, nullptr, nullptr, nullptr);
   _config->channelList()->addChannel(chan);
   _channels[idx] = chan;
 
@@ -1626,6 +1649,8 @@ CSVReader::handleGPSSystem(
       }
       _gpsSystems[idx]->setRevertChannel(_channels[revertChannelIdx]->as<DigitalChannel>());
     }
+
+    return true;
   }
 
   // check index
