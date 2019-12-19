@@ -26,8 +26,6 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
          << "# Text displayed when the radio powers up (quoted).\n"
          << "IntroLine1: \"" << config->introLine1() << "\"\n"
          << "IntroLine2: \"" << config->introLine2() << "\"\n\n"
-         << "# Sensitivity of VOX (voice operated switch), value 1..10:\n"
-         << "VOXLevel: " << config->voxLevel() << "\n"
          << "# Microphone amplification, value 1..10:\n"
          << "MICLevel: " << config->micLevel() << "\n\n"
          << "# Speech-synthesis ('On' or 'Off'):\n"

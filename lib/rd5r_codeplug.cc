@@ -61,7 +61,7 @@ RD5RCodeplug::channel_t::clear() {
   _unused50_1            = 0;
   _unused50_6            = 0;
   _unused51_0            = 0;
-  talkaround             = 1;
+  talkaround             = 0;
   _unused51_4            = 0;
   vox                    = 0;
   memset(_unused52, 0, 3);

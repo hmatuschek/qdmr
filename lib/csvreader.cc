@@ -1,6 +1,7 @@
 #include "csvreader.hh"
 #include "config.hh"
 #include "utils.hh"
+#include "logger.hh"
 
 #include <QRegExp>
 
@@ -126,15 +127,6 @@ CSVHandler::handleIntroLine1(const QString &text, qint64 line, qint64 column, QS
 bool
 CSVHandler::handleIntroLine2(const QString &text, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(text);
-  Q_UNUSED(line);
-  Q_UNUSED(column);
-  Q_UNUSED(errorMessage);
-  return true;
-}
-
-bool
-CSVHandler::handleVoxLevel(uint level, qint64 line, qint64 column, QString &errorMessage) {
-  Q_UNUSED(level);
   Q_UNUSED(line);
   Q_UNUSED(column);
   Q_UNUSED(errorMessage);
@@ -333,9 +325,6 @@ CSVParser::parse(QTextStream &stream) {
     } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("introline2" == token.value.toLower())) {
       if (! _parse_introline2(lexer))
         return false;
-    } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("voxlevel" == token.value.toLower())) {
-      if (! _parse_vox_level(lexer))
-        return false;
     } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("miclevel" == token.value.toLower())) {
       if (! _parse_mic_level(lexer))
         return false;
@@ -484,34 +473,6 @@ CSVParser::_parse_introline2(CSVLexer &lexer) {
   }
 
   return _handler->handleIntroLine2(text, line, column, _errorMessage);
-}
-
-bool
-CSVParser::_parse_vox_level(CSVLexer &lexer) {
-  CSVLexer::Token token = lexer.next();
-  if (CSVLexer::Token::T_COLON != token.type) {
-    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected ':'.")
-        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
-    return false;
-  }
-
-  token = lexer.next();
-  if (CSVLexer::Token::T_NUMBER != token.type) {
-    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
-        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
-    return false;
-  }
-  qint64 level = token.value.toInt();
-  qint64 line=token.line, column=token.column;
-
-  token = lexer.next();
-  if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
-    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
-        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
-    return false;
-  }
-
-  return _handler->handleVoxLevel(level, line, column, _errorMessage);
 }
 
 bool
@@ -1449,18 +1410,6 @@ CSVReader::handleIntroLine2(const QString &text, qint64 line, qint64 column, QSt
 }
 
 bool
-CSVReader::handleVoxLevel(uint level, qint64 line, qint64 column, QString &errorMessage) {
-  Q_UNUSED(line);
-  Q_UNUSED(column);
-  Q_UNUSED(errorMessage);
-
-  if (_link) {
-    _config->setVoxLevel(level);
-  }
-  return true;
-}
-
-bool
 CSVReader::handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(line);
   Q_UNUSED(column);
@@ -1687,6 +1636,7 @@ CSVReader::handleGPSSystem(
     if (! _digital_contacts.contains(contactIdx)) {
       errorMessage = QString("Parse error @ %1,%2: Cannot create GPS system '%3', unknown destination contact ID %4.")
           .arg(line).arg(column).arg(name).arg(contactIdx);
+      logError() << errorMessage;
       return false;
     }
     _gpsSystems[idx]->setContact(_digital_contacts[contactIdx]);

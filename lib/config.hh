@@ -71,10 +71,6 @@ public:
   /** (Re-)Sets the second intro line. */
   void setIntroLine2(const QString &line);
 
-  /** Returns the VOX level [1,10] of the radio. */
-  uint voxLevel() const;
-  /** (Re-)Sets the VOX [1,10] level of the radio. */
-  void setVoxLevel(uint value);
   /** Returns the MIC amplification level [1,10]. */
   uint micLevel() const;
   /** (Re-)Sets the MIC amplification level [1,10]. */
@@ -129,8 +125,6 @@ protected:
   QString _introLine1;
   /** The second intro line. */
   QString _introLine2;
-  /** The VOX level [1-10]. */
-  uint _vox_level;
   /** The MIC amplification level [1-10]. */
   uint _mic_level;
   /** If @c true, speech synthesis is enabled. */

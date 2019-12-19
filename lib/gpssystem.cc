@@ -1,6 +1,7 @@
 #include "gpssystem.hh"
 #include "contact.hh"
 #include "channel.hh"
+#include "logger.hh"
 
 
 /* ********************************************************************************************* *
@@ -101,7 +102,6 @@ void
 GPSSystems::clear() {
   for (int i=0; i<count(); i++)
     _gpsSystems[i]->deleteLater();
-  _gpsSystems.clear();
 }
 
 int
@@ -138,7 +138,7 @@ GPSSystems::addGPSSystem(GPSSystem *gps, int row) {
 
 bool
 GPSSystems::remGPSSystem(int idx) {
-  if ((0>idx) || (idx >= _gpsSystems.size()))
+  if ((0>idx) || (idx >= count()))
     return false;
   beginRemoveRows(QModelIndex(), idx, idx);
   GPSSystem *gps = _gpsSystems.at(idx);
@@ -182,7 +182,7 @@ GPSSystems::moveDown(int row) {
 int
 GPSSystems::rowCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
-  return _gpsSystems.size();
+  return count();
 }
 int
 GPSSystems::columnCount(const QModelIndex &idx) const {
@@ -192,12 +192,12 @@ GPSSystems::columnCount(const QModelIndex &idx) const {
 
 QVariant
 GPSSystems::data(const QModelIndex &index, int role) const {
-  if ((! index.isValid()) || (index.row()>=_gpsSystems.size()))
+  if ((! index.isValid()) || (index.row()>=count()))
     return QVariant();
   if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
     return QVariant();
 
-  GPSSystem *gps = _gpsSystems[index.row()];
+  GPSSystem *gps = _gpsSystems.at(index.row());
 
   switch (index.column()) {
   case 0:
@@ -207,7 +207,7 @@ GPSSystems::data(const QModelIndex &index, int role) const {
   case 2:
     return gps->period();
   case 3:
-    return (gps->hasRevertChannel() ? gps->revertChannel()->name() : "-");
+    return (gps->hasRevertChannel() ? gps->revertChannel()->name() : "[Selected]");
   default:
     break;
   }
@@ -222,7 +222,7 @@ GPSSystems::headerData(int section, Qt::Orientation orientation, int role) const
   switch (section) {
   case 0: return tr("Name");
   case 1: return tr("Contact");
-  case 2: return tr("Period [ms]");
+  case 2: return tr("Period [s]");
   case 3: return tr("Revert Channel");
   default:
     break;

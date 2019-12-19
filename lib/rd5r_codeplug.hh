@@ -169,7 +169,7 @@ public:
     uint8_t _unused51_0       : 1,      ///< Unknown set to 0.
       bandwidth               : 1,      ///< Bandwidth 12.5 or 25 kHz.
       rx_only                 : 1,      ///< RX only enable.
-      talkaround              : 1,      ///< Allow talkaround, default 1.
+      talkaround              : 1,      ///< Allow talkaround, default 0.
       _unused51_4             : 2,      ///< Unknown 0.
       vox                     : 1,      ///< VOX Enable.
       power                   : 1;      ///< Power Low or High.

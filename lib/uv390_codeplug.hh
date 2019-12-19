@@ -593,8 +593,7 @@ protected:
     QString cpsVersion() const;
   };
 
-  /** Represents a single GPS system within the codeplug.
-   * @todo Verify layout and offset! */
+  /** Represents a single GPS system within the codeplug. */
   struct __attribute__((packed)) gpssystem_t {
     uint16_t revert_channel;              ///< Revert channel index, 0=current, index+1.
     uint8_t  repeat_interval;             ///< Repeat interval x*30s, 0=off.
@@ -628,8 +627,8 @@ protected:
   struct __attribute__((packed)) callsign_t {
     uint32_t dmrid   : 24,      ///< DMR id in BCD
       _unused        :  8;      ///< Unknown set to 0xff.
-    char     callsign[16];      ///< ASCII zero-terminated
-    char     name[100];         ///< Descriptive name, nickname, city, state, country.
+    char callsign[16];          ///< ASCII zero-terminated
+    char name[100];             ///< Descriptive name, nickname, city, state, country.
   };
 
 public:

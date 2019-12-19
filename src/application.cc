@@ -126,14 +126,22 @@ Application::createMainWindow() {
   QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
+  QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
+  QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
+
   dmrID->setText(QString::number(_config->id()));
   rname->setText(_config->name());
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
+  mic->setValue(_config->micLevel());
+  speech->setChecked(_config->speech());
+
   connect(dmrID, SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
   connect(rname, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
   connect(intro1, SIGNAL(editingFinished()), this, SLOT(onIntroLine1Changed()));
   connect(intro2, SIGNAL(editingFinished()), this, SLOT(onIntroLine2Changed()));
+  connect(mic, SIGNAL(valueChanged(int)), this, SLOT(onMicLevelChanged()));
+  connect(speech, SIGNAL(toggled(bool)), this, SLOT(onSpeechChanged()));
 
   // Wire-up "Contact List" view
   QTableView *contacts = _mainWindow->findChild<QTableView *>("contactsView");
@@ -520,11 +528,15 @@ Application::onConfigModifed() {
   QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
+  QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
+  QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
 
   dmrID->setText(QString::number(_config->id()));
   rname->setText(_config->name());
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
+  mic->setValue(_config->micLevel());
+  speech->setChecked(_config->speech());
 
   _mainWindow->setWindowModified(true);
 }
@@ -546,6 +558,18 @@ void
 Application::onIntroLine1Changed() {
   QLineEdit *line  = _mainWindow->findChild<QLineEdit*>("introLine1");
   _config->setIntroLine1(line->text().simplified());
+}
+
+void
+Application::onMicLevelChanged() {
+  QSpinBox *mic = _mainWindow->findChild<QSpinBox *>("mic");
+  _config->setMicLevel(mic->value());
+}
+
+void
+Application::onSpeechChanged() {
+  QCheckBox *speech = _mainWindow->findChild<QCheckBox *>("speech");
+  _config->setSpeech(speech->isChecked());
 }
 
 void

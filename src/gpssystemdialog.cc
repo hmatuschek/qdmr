@@ -32,7 +32,7 @@ GPSSystemDialog::construct() {
   else
     period->setValue(300);
   // setup revert channel
-  revChannel->addItem(tr("[None]"), QVariant::fromValue((DigitalChannel *)nullptr));
+  revChannel->addItem(tr("[Selected]"), QVariant::fromValue((DigitalChannel *)nullptr));
   for (int i=0,j=0; j<_config->channelList()->count(); j++) {
     if (! _config->channelList()->channel(j)->is<DigitalChannel>())
       continue;

@@ -769,7 +769,6 @@ UV390Codeplug::general_settings_t::updateConfigObj(Config *conf) const {
   conf->setName(getName());
   conf->setIntroLine1(getIntroLine1());
   conf->setIntroLine2(getIntroLine2());
-  conf->setVoxLevel(vox_sensitivity);
   conf->setMicLevel(1+mic_level*2);
   return true;
 }
@@ -780,8 +779,8 @@ UV390Codeplug::general_settings_t::fromConfigObj(const Config *conf) {
   setRadioId(conf->id());
   setIntroLine1(conf->introLine1());
   setIntroLine2(conf->introLine2());
-  vox_sensitivity = conf->voxLevel();
   mic_level = conf->micLevel()/2;
+  channel_voice_announce = (conf->speech() ? 1 : 0);
 }
 
 

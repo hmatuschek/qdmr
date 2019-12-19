@@ -55,6 +55,8 @@ private slots:
   void onNameChanged();
   void onIntroLine1Changed();
   void onIntroLine2Changed();
+  void onMicLevelChanged();
+  void onSpeechChanged();
 
   void onAddContact();
   void onRemContact();

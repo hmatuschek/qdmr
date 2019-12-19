@@ -425,8 +425,6 @@ public:
   virtual bool handleIntroLine1(const QString &text, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the second intro line has been parsed. */
   virtual bool handleIntroLine2(const QString &text, qint64 line, qint64 column, QString &errorMessage);
-  /** Gets called once the VOX level has been parsed. */
-  virtual bool handleVoxLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the MIC level has been parsed. */
   virtual bool handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the Speech flag has been parsed. */
@@ -489,8 +487,6 @@ protected:
   bool _parse_introline1(CSVLexer &lexer);
   /** Internal function to parse intro line 2. */
   bool _parse_introline2(CSVLexer &lexer);
-  /** Internal function to parse VOX level. */
-  bool _parse_vox_level(CSVLexer &lexer);
   /** Internal function to parse MIC level. */
   bool _parse_mic_level(CSVLexer &lexer);
   /** Internal function to parse Speech flag. */
@@ -552,7 +548,6 @@ public:
   virtual bool handleRadioName(const QString &name, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleIntroLine1(const QString &text, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleIntroLine2(const QString &text, qint64 line, qint64 column, QString &errorMessage);
-  virtual bool handleVoxLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleSpeech(bool speech, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
