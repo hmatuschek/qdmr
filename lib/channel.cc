@@ -402,7 +402,7 @@ ChannelList::rowCount(const QModelIndex &idx) const {
 int
 ChannelList::columnCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
-  return 17;
+  return 18;
 }
 
 inline QString formatFrequency(float f) {
@@ -420,127 +420,137 @@ ChannelList::data(const QModelIndex &index, int role) const {
   Channel *channel = _channels[index.row()];
 
   switch (index.column()) {
-    case 0:
-      if (channel->is<AnalogChannel>())
-        return tr("Analog");
-      else
-        return tr("Digital");
-    case 1:
-      return channel->name();
-    case 2:
-      return formatFrequency(channel->rxFrequency());
-    case 3:
-      if (channel->txFrequency()<channel->rxFrequency())
-        return formatFrequency(channel->txFrequency()-channel->rxFrequency());
-      else
-        return formatFrequency(channel->txFrequency());
-    case 4:
-      return (Channel::HighPower == channel->power()) ? tr("High") : tr("Low");
-    case 5:
-      if (0 == channel->txTimeout())
-        return tr("-");
-      return QString::number(channel->txTimeout());
-    case 6:
-      return channel->rxOnly() ? tr("On") : tr("Off");
-    case 7:
-      if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-        switch (digi->admit()) {
-          case DigitalChannel::AdmitNone: return tr("Always");
-          case DigitalChannel::AdmitFree: return tr("Free");
-          case DigitalChannel::AdmitColorCode: return tr("Color");
-        }
-      } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-        switch (analog->admit()) {
-          case AnalogChannel::AdmitNone: return tr("Always");
-          case AnalogChannel::AdmitFree: return tr("Free");
-          case AnalogChannel::AdmitTone: return tr("Tone");
-        }
+  case 0:
+    if (channel->is<AnalogChannel>())
+      return tr("Analog");
+    else
+      return tr("Digital");
+  case 1:
+    return channel->name();
+  case 2:
+    return formatFrequency(channel->rxFrequency());
+  case 3:
+    if (channel->txFrequency()<channel->rxFrequency())
+      return formatFrequency(channel->txFrequency()-channel->rxFrequency());
+    else
+      return formatFrequency(channel->txFrequency());
+  case 4:
+    return (Channel::HighPower == channel->power()) ? tr("High") : tr("Low");
+  case 5:
+    if (0 == channel->txTimeout())
+      return tr("-");
+    return QString::number(channel->txTimeout());
+  case 6:
+    return channel->rxOnly() ? tr("On") : tr("Off");
+  case 7:
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+      switch (digi->admit()) {
+      case DigitalChannel::AdmitNone: return tr("Always");
+      case DigitalChannel::AdmitFree: return tr("Free");
+      case DigitalChannel::AdmitColorCode: return tr("Color");
       }
-      break;
-    case 8:
-      if (channel->scanList()) {
-        return channel->scanList()->name();
+    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+      switch (analog->admit()) {
+      case AnalogChannel::AdmitNone: return tr("Always");
+      case AnalogChannel::AdmitFree: return tr("Free");
+      case AnalogChannel::AdmitTone: return tr("Tone");
+      }
+    }
+    break;
+  case 8:
+    if (channel->scanList()) {
+      return channel->scanList()->name();
+    } else {
+      return tr("-");
+    }
+  case 9:
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+      return digi->colorCode();
+    } else if (channel->is<AnalogChannel>()) {
+      return tr("[None]");
+    }
+    break;
+  case 10:
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+      return (DigitalChannel::TimeSlot1 == digi->timeslot()) ? 1 : 2;
+    } else if (channel->is<AnalogChannel>()) {
+      return tr("[None]");
+    }
+    break;
+  case 11:
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+      if (digi->rxGroupList()) {
+        return digi->rxGroupList()->name();
       } else {
         return tr("-");
       }
-    case 9:
-      if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-        return digi->colorCode();
-      } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-        return tr("[None]");
-      }
-      break;
-    case 10:
-      if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-        return (DigitalChannel::TimeSlot1 == digi->timeslot()) ? 1 : 2;
-      } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-        return tr("[None]");
-      }
-      break;
-    case 11:
-      if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-        if (digi->rxGroupList()) {
-          return digi->rxGroupList()->name();
-        } else {
-          return tr("-");
-        }
-      } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-        return tr("[None]");
-      }
-      break;
-    case 12:
-      if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-        if (digi->txContact())
-          return digi->txContact()->name();
-        else
-          return tr("-");
-      } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-        return tr("[None]");
-      }
-      break;
-    case 13:
-      if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-        return tr("[None]");
-      } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-        if (0 == analog->squelch()) {
-          return tr("Off");
-        } else
-          return analog->squelch();
-      }
-      break;
-    case 14:
-      if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-        return tr("[None]");
-      } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-        if (0 == analog->rxTone()) {
-          return tr("Off");
-        } else
-          return analog->rxTone();
-      }
-      break;
-    case 15:
-      if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-        return tr("[None]");
-      } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-        if (0 == analog->txTone()) {
-          return tr("Off");
-        } else
-          return analog->txTone();
-      }
-      break;
-    case 16:
-      if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-        return tr("[None]");
-      } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-        if (AnalogChannel::BWWide == analog->bandwidth()) {
-          return tr("Wide");
-        } else
-          return tr("Narrow");
-      }
-      break;
+    } else if (channel->is<AnalogChannel>()) {
+      return tr("[None]");
+    }
+    break;
+  case 12:
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+      if (digi->txContact())
+        return digi->txContact()->name();
+      else
+        return tr("-");
+    } else if (channel->is<AnalogChannel>()) {
+      return tr("[None]");
+    }
+    break;
+  case 13:
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+      if (digi->gpsSystem())
+        return digi->gpsSystem()->name();
+      else
+        return tr("-");
+    } else if (channel->is<AnalogChannel>()) {
+      return tr("[None]");
+    }
+    break;
+  case 14:
+    if (channel->is<DigitalChannel>()) {
+      return tr("[None]");
+    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+      if (0 == analog->squelch()) {
+        return tr("Off");
+      } else
+        return analog->squelch();
+    }
+    break;
+  case 15:
+    if (channel->is<DigitalChannel>()) {
+      return tr("[None]");
+    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+      if (0 == analog->rxTone()) {
+        return tr("Off");
+      } else
+        return analog->rxTone();
+    }
+    break;
+  case 16:
+    if (channel->is<DigitalChannel>()) {
+      return tr("[None]");
+    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+      if (0 == analog->txTone()) {
+        return tr("Off");
+      } else
+        return analog->txTone();
+    }
+    break;
+  case 17:
+    if (channel->is<DigitalChannel>()) {
+      return tr("[None]");
+    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+      if (AnalogChannel::BWWide == analog->bandwidth()) {
+        return tr("Wide");
+      } else
+        return tr("Narrow");
+    }
+    break;
 
-    default:
-      break;
+  default:
+    break;
   }
 
   return QVariant();
@@ -551,23 +561,24 @@ ChannelList::headerData(int section, Qt::Orientation orientation, int role) cons
   if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation))
     return QVariant();
   switch (section) {
-    case 0: return tr("Type");
-    case 1: return tr("Name");
-    case 2: return tr("Rx Frequency");
-    case 3: return tr("Tx Frequency");
-    case 4: return tr("Power");
-    case 5: return tr("Timeout");
-    case 6: return tr("Rx Only");
-    case 7: return tr("Admit");
-    case 8: return tr("Scanlist");
-    case 9: return tr("Colorcode");
-    case 10: return tr("Timeslot");
-    case 11: return tr("RX Group List");
-    case 12: return tr("TX Contact");
-    case 13: return tr("Squelch");
-    case 14: return tr("Rx Tone");
-    case 15: return tr("Tx Tone");
-    case 16: return tr("Bandwidth");
+  case 0: return tr("Type");
+  case 1: return tr("Name");
+  case 2: return tr("Rx Frequency");
+  case 3: return tr("Tx Frequency");
+  case 4: return tr("Power");
+  case 5: return tr("Timeout");
+  case 6: return tr("Rx Only");
+  case 7: return tr("Admit");
+  case 8: return tr("Scanlist");
+  case 9: return tr("CC");
+  case 10: return tr("TS");
+  case 11: return tr("RX Group List");
+  case 12: return tr("TX Contact");
+  case 13: return tr("GPS System");
+  case 14: return tr("Squelch");
+  case 15: return tr("Rx Tone");
+  case 16: return tr("Tx Tone");
+  case 17: return tr("Bandwidth");
     default:
       break;
   }

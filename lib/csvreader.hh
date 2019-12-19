@@ -429,6 +429,8 @@ public:
   virtual bool handleVoxLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the MIC level has been parsed. */
   virtual bool handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
+  /** Gets called once the Speech flag has been parsed. */
+  virtual bool handleSpeech(bool speech, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a DTMF contact has been parsed. */
   virtual bool handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
                                  qint64 line, qint64 column, QString &errorMessage);
@@ -491,6 +493,8 @@ protected:
   bool _parse_vox_level(CSVLexer &lexer);
   /** Internal function to parse MIC level. */
   bool _parse_mic_level(CSVLexer &lexer);
+  /** Internal function to parse Speech flag. */
+  bool _parse_speech(CSVLexer &lexer);
   /** Internal function to parse a digital contact list. */
   bool _parse_contacts(CSVLexer &lexer);
   /** Internal function to parse digital contact. */
@@ -550,6 +554,7 @@ public:
   virtual bool handleIntroLine2(const QString &text, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleVoxLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
+  virtual bool handleSpeech(bool speech, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
                                  qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleDigitalContact(

@@ -169,6 +169,7 @@ Application::createMainWindow() {
   QPushButton *addDCh  = _mainWindow->findChild<QPushButton *>("addDigitalChannel");
   QPushButton *remCh   = _mainWindow->findChild<QPushButton *>("remChannel");
   channels->setModel(_config->channelList());
+  channels->resizeColumnsToContents();
   connect(addACh, SIGNAL(clicked()), this, SLOT(onAddAnalogChannel()));
   connect(addDCh, SIGNAL(clicked()), this, SLOT(onAddDigitalChannel()));
   connect(remCh, SIGNAL(clicked()), this, SLOT(onRemChannel()));

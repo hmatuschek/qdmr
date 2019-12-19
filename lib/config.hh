@@ -80,6 +80,11 @@ public:
   /** (Re-)Sets the MIC amplification level [1,10]. */
   void setMicLevel(uint value);
 
+  /** Returns @c true if the speech synthesis is enabled. */
+  bool speech() const;
+  /** Enables/disables the speech synthesis. */
+  void setSpeech(bool enabled);
+
   /** Clears the complete configuration. */
   void reset();
 
@@ -128,6 +133,8 @@ protected:
   uint _vox_level;
   /** The MIC amplification level [1-10]. */
   uint _mic_level;
+  /** If @c true, speech synthesis is enabled. */
+  bool _speech;
 };
 
 #endif // CONFIG_HH

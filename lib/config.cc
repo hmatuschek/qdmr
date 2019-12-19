@@ -16,7 +16,7 @@ Config::Config(QObject *parent)
   : QObject(parent), _modified(false), _contacts(new ContactList(this)), _rxGroupLists(new RXGroupLists(this)),
     _channels(new ChannelList(this)), _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
     _gpsSystems(new GPSSystems(this)),
-    _id(0), _name(), _introLine1(), _introLine2(), _vox_level(3), _mic_level(2)
+    _id(0), _name(), _introLine1(), _introLine2(), _vox_level(3), _mic_level(2), _speech(false)
 {
   connect(_contacts, SIGNAL(modified()), this, SIGNAL(modified()));
   connect(_rxGroupLists, SIGNAL(modified()), this, SIGNAL(modified()));
@@ -141,6 +141,15 @@ Config::setMicLevel(uint level) {
   emit modified();
 }
 
+bool
+Config::speech() const {
+  return _speech;
+}
+void
+Config::setSpeech(bool enabled) {
+  _speech = enabled;
+}
+
 void
 Config::reset() {
   // Reset lists
@@ -155,6 +164,7 @@ Config::reset() {
   _introLine2.clear();
   _vox_level = 3;
   _mic_level = 2;
+  _speech    = false;
   emit modified();
 }
 

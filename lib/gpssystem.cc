@@ -122,9 +122,12 @@ int
 GPSSystems::addGPSSystem(GPSSystem *gps, int row) {
   if (_gpsSystems.contains(gps))
     return -1;
+  if (nullptr == gps)
+    return -1;
   if ((row<0) || (row>_gpsSystems.size()))
     row = _gpsSystems.size();
   beginInsertRows(QModelIndex(), row, row);
+  gps->setParent(this);
   connect(gps, SIGNAL(modified()), this, SIGNAL(modified()));
   connect(gps, SIGNAL(destroyed(QObject *)), this, SLOT(onGPSSystemDeleted(QObject *)));
   _gpsSystems.insert(row, gps);

@@ -58,7 +58,7 @@
        <string>There are 6 tabs providing genral settings, contact, Rx group, channel zone and scan lists.</string>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabGeneral">
        <property name="accessibleName">
@@ -93,40 +93,6 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="introLine1Label">
-            <property name="text">
-             <string>Intro Line 1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="introLine1">
-            <property name="toolTip">
-             <string>First greeting line (if supported by the radio).</string>
-            </property>
-            <property name="accessibleName">
-             <string>Intro line 1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="introLine2Label">
-            <property name="text">
-             <string>Intro Line 2</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="introLine2">
-            <property name="statusTip">
-             <string>Second greeting line (if supported by the radio).</string>
-            </property>
-            <property name="accessibleName">
-             <string>Intro line 2</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="0">
            <widget class="QLabel" name="nameLabel">
             <property name="text">
@@ -141,6 +107,130 @@
             </property>
             <property name="accessibleName">
              <string>Name/Callsign</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="introLine1Label">
+            <property name="text">
+             <string>Intro Line 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="introLine1">
+            <property name="toolTip">
+             <string>First greeting line (if supported by the radio).</string>
+            </property>
+            <property name="accessibleName">
+             <string>Intro line 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="introLine2Label">
+            <property name="text">
+             <string>Intro Line 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="introLine2">
+            <property name="statusTip">
+             <string>Second greeting line (if supported by the radio).</string>
+            </property>
+            <property name="accessibleName">
+             <string>Intro line 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="micLabel">
+            <property name="text">
+             <string>MIC Amp.</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QSpinBox" name="mic">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="Line" name="line_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="speechLabel">
+            <property name="text">
+             <string>Speech Synthesis</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
+           <widget class="QCheckBox" name="speech">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="Line" name="line_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>VOX</string>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="1">
+           <widget class="QCheckBox" name="voxEnabled">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="0">
+           <widget class="QLabel" name="voxLabel">
+            <property name="text">
+             <string>VOX Level</string>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="1">
+           <widget class="QSpinBox" name="vox">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>10</number>
             </property>
            </widget>
           </item>
@@ -351,6 +441,12 @@
               <property name="selectionBehavior">
                <enum>QAbstractItemView::SelectRows</enum>
               </property>
+              <attribute name="horizontalHeaderCascadingSectionResizes">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
              </widget>
             </item>
             <item>

@@ -42,7 +42,7 @@ GD77Codeplug::channel_t::clear() {
   _unused48              = 0;
   emergency_alarm_ack    = 0;
   data_call_conf         = 0;
-  private_call_conf      = 1;
+  private_call_conf      = 0;
   _unused49_1            = 0;
   privacy                = PRIVGR_NONE;
   _unused49_5            = 0;
@@ -52,7 +52,7 @@ GD77Codeplug::channel_t::clear() {
   _unused50_6            = 0;
   squelch                = SQ_NORMAL;
   bandwidth              = BW_12_5_KHZ;
-  talkaround             = 1;
+  talkaround             = 0;
   _unused51_4            = 0;
   vox                    = 0;
   _unused52              = 0;
