@@ -133,7 +133,7 @@ encode_dtmf_bin(const QString &number, uint8_t *num, int size, uint8_t fill) {
   return true;
 }
 
-float decode_ctcss_tone(uint16_t data) {
+float decode_ctcss_tone_table(uint16_t data) {
   if (data == 0xffff)
     return 0.0;
 
@@ -162,7 +162,7 @@ static const unsigned CTCSS_TONES [NCTCSS] = {
 };
 
 uint16_t
-encode_ctcss_tone(float hz)
+encode_ctcss_tone_table(float hz)
 {
   unsigned val, tag, a, b, c, d;
 

@@ -53,12 +53,7 @@ public:
   CodePlug &codeplug();
 
 public slots:
-  /** Starts the codeplug download. On success the codeplug gets decoded and the given generic
-   * configuration gets updated from its content. */
 	bool startDownload(Config *config, bool blocking=false);
-  /** Uloads a codeplug to the device.
-   * Updates the codeplug from the given generic configuration and starts the upload of that
-   * codeplug to the device. */
 	bool startUpload(Config *config, bool blocking=false);
 
 protected:
@@ -72,6 +67,8 @@ protected:
 	DFUDevice *_dev;
   /** The generic configuration. */
 	Config *_config;
+  /** A weak reference to the user-database. */
+  UserDatabase *_userDB;
   /** The actual binary codeplug representation. */
 	UV390Codeplug _codeplug;
 };

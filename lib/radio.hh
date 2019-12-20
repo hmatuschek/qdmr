@@ -12,6 +12,8 @@
 
 class Config;
 class CodePlug;
+class UserDatabase;
+
 
 /** Simple container class to collect codeplug verification issues.
  * As all radios are programmed from a common configuration, some radios may not support all
@@ -105,10 +107,10 @@ public:
 
   /** Possible states of the radio object. */
 	typedef enum {
-    StatusIdle,      ///< Idle, nothing to do.
-    StatusDownload,  ///< Downloading codeplug.
-    StatusUpload,    ///< Uploading codeplug.
-    StatusError      ///< An error occured.
+    StatusIdle,         ///< Idle, nothing to do.
+    StatusDownload,     ///< Downloading codeplug.
+    StatusUpload,       ///< Uploading codeplug.
+    StatusError         ///< An error occured.
   } Status;
 
 public:

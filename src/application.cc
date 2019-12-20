@@ -515,7 +515,7 @@ Application::showAbout() {
 
 void
 Application::showHelp() {
-  QDesktopServices::openUrl(QUrl("https://github.com/hmatuschek/qdmr/wiki"));
+  QDesktopServices::openUrl(QUrl("https://dm3mat.darc.de/qdmr/manual"));
 }
 
 

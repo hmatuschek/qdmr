@@ -7,6 +7,7 @@
 #include <QNetworkReply>
 #include <algorithm>
 #include "logger.hh"
+#include <cmath>
 
 
 /* ********************************************************************************************* *
@@ -26,6 +27,22 @@ UserDatabase::User::User(const QJsonObject &obj)
   // pass...
 }
 
+uint
+UserDatabase::User::distance(uint id) const {
+  // Fix number of digits
+  int a = this->id, b = id;
+  int ad = std::ceil(std::log10(a));
+  int bd = std::ceil(std::log10(b));
+  if (ad > bd)
+    b *= std::pow(10u, (ad-bd));
+  else if (bd > ad)
+    a *= std::pow(10u, (bd-ad));
+  // Distance is just the difference between these two numbers
+  // this ensures a small distance between two numbers with the same
+  // prefix.
+  return std::abs(a-b);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of UserDatabase
@@ -38,6 +55,11 @@ UserDatabase::UserDatabase(uint updatePeriodDays, QObject *parent)
 
   if ((! load()) || (updatePeriodDays < dbAge()))
     download();
+}
+
+qint64
+UserDatabase::count() const {
+  return _user.size();
 }
 
 bool
@@ -93,6 +115,14 @@ UserDatabase::load(const QString &filename) {
   logDebug() << "Loaded user database with " << _user.size() << " entries.";
 
   return true;
+}
+
+void
+UserDatabase::sortUsers(uint id) {
+  // Sort repeater w.r.t. distance to me
+  std::stable_sort(_user.begin(), _user.end(), [id](const User &a, const User &b){
+    return a.distance(id) < b.distance(id);
+  });
 }
 
 void

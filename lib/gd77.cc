@@ -97,7 +97,6 @@ GD77::startUpload(Config *config, bool blocking) {
   if (! (_config = config))
     return false;
 
-  /// @bug Implement.
   _dev = new HID(0x15a2, 0x0073, this);
   if (!_dev->isOpen()) {
     _dev->deleteLater();
@@ -109,6 +108,7 @@ GD77::startUpload(Config *config, bool blocking) {
     run();
     return (StatusIdle == _task);
   }
+
   start();
   return true;
 }

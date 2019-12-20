@@ -156,22 +156,22 @@ UV390Codeplug::channel_t::setName(const QString &n) {
 
 float
 UV390Codeplug::channel_t::getRXTone() const {
-  return decode_ctcss_tone(ctcss_dcs_receive);
+  return decode_ctcss_tone_table(ctcss_dcs_receive);
 }
 
 void
 UV390Codeplug::channel_t::setRXTone(float freq) {
-  ctcss_dcs_receive = encode_ctcss_tone(freq);
+  ctcss_dcs_receive = encode_ctcss_tone_table(freq);
 }
 
 float
 UV390Codeplug::channel_t::getTXTone() const {
-  return decode_ctcss_tone(ctcss_dcs_transmit);
+  return decode_ctcss_tone_table(ctcss_dcs_transmit);
 }
 
 void
 UV390Codeplug::channel_t::setTXTone(float freq)  {
-  ctcss_dcs_transmit = encode_ctcss_tone(freq);
+  ctcss_dcs_transmit = encode_ctcss_tone_table(freq);
 }
 
 Channel *
@@ -270,13 +270,14 @@ UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf
   tot     = chan->txTimeout()/15;
   scan_list_index = conf->scanlists()->indexOf(chan->scanList())+1;
   power = (Channel::HighPower == chan->power()) ? POWER_HIGH : POWER_LOW;
+
   if (chan->is<const DigitalChannel>()) {
     const DigitalChannel *dchan = chan->as<const DigitalChannel>();
     channel_mode = MODE_DIGITAL;
     switch (dchan->admit()) {
-      case DigitalChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS;
-      case DigitalChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE;
-      case DigitalChannel::AdmitColorCode: admit_criteria = ADMIT_COLOR;
+    case DigitalChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS;
+    case DigitalChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE;
+    case DigitalChannel::AdmitColorCode: admit_criteria = ADMIT_COLOR;
     }
     color_code = dchan->colorCode();
     time_slot = (DigitalChannel::TimeSlot1 == dchan->timeslot()) ? 1 : 2;
@@ -287,6 +288,18 @@ UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf
       send_gps_info = 0;
       recv_gps_info = 0;
     }
+  } else if (chan->is<AnalogChannel>()) {
+    const AnalogChannel *achan = chan->as<const AnalogChannel>();
+    channel_mode = MODE_ANALOG;
+    bandwidth = ((AnalogChannel::BWNarrow == achan->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ);
+    squelch = achan->squelch();
+    switch (achan->admit()) {
+    case AnalogChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS;
+    case AnalogChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE;
+    case AnalogChannel::AdmitTone: admit_criteria = ADMIT_TONE;
+    }
+    ctcss_dcs_receive = encode_ctcss_tone_table(achan->rxTone());
+    ctcss_dcs_transmit = encode_ctcss_tone_table(achan->txTone());
   }
 }
 

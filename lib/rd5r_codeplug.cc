@@ -96,20 +96,20 @@ RD5RCodeplug::channel_t::setName(const QString &n) {
 
 float
 RD5RCodeplug::channel_t::getRXTone() const {
-  return decode_ctcss_tone(ctcss_dcs_receive);
+  return decode_ctcss_tone_table(ctcss_dcs_receive);
 }
 void
 RD5RCodeplug::channel_t::setRXTone(float tone) {
-  ctcss_dcs_receive = encode_ctcss_tone(tone);
+  ctcss_dcs_receive = encode_ctcss_tone_table(tone);
 }
 
 float
 RD5RCodeplug::channel_t::getTXTone() const {
-  return decode_ctcss_tone(ctcss_dcs_transmit);
+  return decode_ctcss_tone_table(ctcss_dcs_transmit);
 }
 void
 RD5RCodeplug::channel_t::setTXTone(float tone) {
-  ctcss_dcs_transmit = encode_ctcss_tone(tone);
+  ctcss_dcs_transmit = encode_ctcss_tone_table(tone);
 }
 
 Channel *

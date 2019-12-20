@@ -42,9 +42,9 @@ QString decode_dtmf_bin(const uint8_t *num, int size=16, uint8_t fill=0xff);
 bool encode_dtmf_bin(const QString &number, uint8_t *num, int size=16, uint8_t fill=0xff);
 
 /** Decodes the CTCSS tone frequency in Hz. */
-float decode_ctcss_tone(uint16_t data);
+float decode_ctcss_tone_table(uint16_t data);
 /** Encodes the CTCSS tone frequency in Hz. */
-uint16_t encode_ctcss_tone(float tone);
+uint16_t encode_ctcss_tone_table(float tone);
 
 /** Validates a DMR ID number. */
 bool validDMRNumber(const QString &text);

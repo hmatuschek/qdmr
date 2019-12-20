@@ -35,6 +35,9 @@ public:
 		/** Returns @c true if the entry is valid. */
 		inline bool isValid() const { return 0 != id; }
 
+    /** Returns the "distance" between this user and the given ID. */
+    uint distance(uint id) const;
+
 		/** The DMR ID of the user. */
 		uint id;
 		/** The callsign of the user. */
@@ -53,10 +56,16 @@ public:
 	 * if the downloaded version is older than @c updatePeriodDays days. */
 	explicit UserDatabase(uint updatePeriodDays=30, QObject *parent=nullptr);
 
+  /** Returns the number of users. */
+  qint64 count() const;
+
 	/** Loads all entries from the downloaded user database. */
 	bool load();
 	/** Loads all entries from the downloaded user database at the specified location. */
 	bool load(const QString &filename);
+
+  /** Sorts users with respect to the distance to the given ID. */
+  void sortUsers(uint id);
 
 	/** Returns the user with index @c idx. */
   const User &user(int idx) const;
