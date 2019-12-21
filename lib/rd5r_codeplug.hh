@@ -394,7 +394,7 @@ public:
     // Bytes 80-85
     uint16_t priority_ch1;        ///< Priority channel 1 index, index+2 or 0=None, 1=selected.
     uint16_t priority_ch2;        ///< Priority channel 2 index, index+2 or 0=None, 1=selected.
-    uint16_t tx_designated_ch;    ///< Designated TX channel, channel index +1 or 0=last active channel.
+    uint16_t tx_designated_ch;    ///< Designated TX channel, channel index+1 or 0=last active channel.
 
     // Bytes 86-87
     uint8_t sign_hold_time;       ///< Signaling Hold Time (x25 = msec) default 40=1000ms.

@@ -282,7 +282,7 @@ UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf
     color_code = dchan->colorCode();
     time_slot = (DigitalChannel::TimeSlot1 == dchan->timeslot()) ? 1 : 2;
     group_list_index = conf->rxGroupLists()->indexOf(dchan->rxGroupList()) + 1;
-    contact_name_index = conf->contacts()->indexOfDigital(dchan->txContact()) + 2;
+    contact_name_index = conf->contacts()->indexOfDigital(dchan->txContact()) + 1;
     if (dchan->gpsSystem()) {
       gps_system = conf->gpsSystems()->indexOf(dchan->gpsSystem())+1;
       send_gps_info = 0;

@@ -98,7 +98,7 @@ protected:
 		} InCall;
 
     /** Turn-off tone frequency.
-     * This radio has a feature that allows to disable radios remote by sending a specific tone.
+     * This radio has a feature that allows to disable radios remotely by sending a specific tone.
      * Certainly not a feature used in ham-radio. */
 		typedef enum {
 			TURNOFF_NONE = 3,             ///< Turn-off disabled. Default!
@@ -106,7 +106,7 @@ protected:
 			TURNOFF_55_2HZ = 1            ///< Turn-off on 55.2Hz tone.
 		} TurnOffFreq;
 
-    /** Dual-capacity direct mode. */
+    /** Dual-capacity direct mode. Uses both time-slots in simplex operation. Not used in ham radio. */
 		typedef enum {
 			DCDM_LEADER = 0,
 			DCDM_MS = 1
