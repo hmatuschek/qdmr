@@ -67,7 +67,7 @@ RXGroupListDialog::onAddGroup() {
     if (! lst->contact(i)->is<DigitalContact>())
       continue;
     DigitalContact *contact = lst->contact(i)->as<DigitalContact>();
-    if (DigitalContact::GroupCall != contact->type())
+    if (DigitalContact::PrivateCall == contact->type())
       continue;
     names.append(contact->name());
     contacts.append(contact);
