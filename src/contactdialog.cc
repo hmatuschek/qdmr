@@ -74,10 +74,16 @@ ContactDialog::construct() {
 
 void
 ContactDialog::onTypeChanged(int idx) {
-  if (3 == idx)
+  if (3 == idx) {
     contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9a-dA-D\\*#]+")));
-  else
+    contactNumber->setEnabled(true);
+  } else if (2 == idx) {
+    contactNumber->setText("16777215");
+    contactNumber->setEnabled(false);
+  } else {
     contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
+    contactNumber->setEnabled(true);
+  }
 }
 
 Contact *
