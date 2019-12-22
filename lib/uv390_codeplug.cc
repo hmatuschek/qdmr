@@ -4,6 +4,7 @@
 #include "channel.hh"
 #include "gpssystem.hh"
 #include "config.h"
+#include <QTimeZone>
 
 
 #define NCHAN           3000
@@ -684,7 +685,7 @@ UV390Codeplug::general_settings_t::clear() {
   group_call_match = 1;
   private_call_match = 1;
   _unused107_4 = 1;
-  time_zone = 0x0c;
+  setTimeZone();
 
   _unused108 = 0xffffffff;
 
@@ -711,6 +712,21 @@ UV390Codeplug::general_settings_t::clear() {
   mic_level = 0;
   edit_radio_id = 0;
   _unused_160_7 = 1;
+}
+
+QTimeZone
+UV390Codeplug::general_settings_t::getTimeZone() const {
+  return QTimeZone((int(time_zone)-12)*3600);
+}
+
+void
+UV390Codeplug::general_settings_t::setTimeZone() {
+  setTimeZone(QTimeZone::systemTimeZone());
+}
+
+void
+UV390Codeplug::general_settings_t::setTimeZone(const QTimeZone &ts) {
+  time_zone = 12 + ts.offsetFromUtc(QDateTime::currentDateTime())/3600;
 }
 
 uint32_t
@@ -793,6 +809,7 @@ UV390Codeplug::general_settings_t::fromConfigObj(const Config *conf) {
   setRadioId(conf->id());
   setIntroLine1(conf->introLine1());
   setIntroLine2(conf->introLine2());
+  setTimeZone();
   mic_level = conf->micLevel()/2;
   channel_voice_announce = (conf->speech() ? 1 : 0);
 }

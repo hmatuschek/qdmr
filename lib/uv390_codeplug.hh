@@ -522,6 +522,10 @@ protected:
     /** Resets this general settings. */
     void clear();
 
+    QTimeZone getTimeZone() const;
+    void setTimeZone();
+    void setTimeZone(const QTimeZone &tz);
+
     /** Returns the radio DMR ID. */
     uint32_t getRadioId() const;
     /** Sets the radio DMR ID. */
@@ -550,6 +554,7 @@ protected:
     QString getIntroLine2() const;
     /** Sets the second intro line. */
     void setIntroLine2(const QString &text);
+
     /** Updates the generic configuration from this general settings. */
     bool updateConfigObj(Config *conf) const;
     /** Updates this codeplug general settings from the generic configuration. */
