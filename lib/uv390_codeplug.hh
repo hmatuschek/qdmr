@@ -24,8 +24,10 @@ class GPSSystem;
  *  <tr><th colspan="4">First segment 0x002800-0x040800</th></tr>
  *  <tr><td>0x002800</td> <td>0x00280c</td> <td>0x0000c</td> <td>Timestamp see @c UV390Codeplug::timestamp_t.</td></tr>
  *  <tr><td>0x00280c</td> <td>0x002840</td> <td>0x00034</td> <td>Reserved, filled with 0xff. </td></tr>
- *  <tr><td>0x002840</td> <td>0x0028e4</td> <td>0x000a4</td> <td>General settings see @c UV390Codeplug::general_settings_t.</td></tr>
- *  <tr><td>0x0028e4</td> <td>0x002980</td> <td>0x0009c</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x002840</td> <td>0x0028f0</td> <td>0x000b0</td> <td>General settings see @c UV390Codeplug::general_settings_t.</td></tr>
+ *  <tr><td>0x0028f0</td> <td>0x002900</td> <td>0x00010</td> <td>Menu settings, see @c UV390Codeplug::menu_t</td></tr>
+ *  <tr><td>0x002900</td> <td>0x002940</td> <td>0x00040</td> <td>Button config, see @c UV390Codeplug::buttons_t.</td></tr>
+ *  <tr><td>0x002940</td> <td>0x002980</td> <td>0x00040</td> <td>Reserved, filled with 0xff.</td></tr>
  *  <tr><td>0x002980</td> <td>0x0061c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each, see @c UV390Codeplug::message_t.</td></tr>
  *  <tr><td>0x0061c0</td> <td>0x00f420</td> <td>0x09260</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x00f420</td> <td>0x0151e0</td> <td>0x05dc0</td> <td>250 RX Group lists @ 0x60 bytes each, see @c UV390Codeplug::grouplist_t.</td></tr>
@@ -515,7 +517,9 @@ protected:
     uint8_t _unused_160_0       : 3,      ///< Reserved = 0b111
       mic_level                 : 3,      ///< Mic Level 0=1, 1=2, ..., 5=6 [0..5], default=2
       edit_radio_id             : 1,      ///< Edit Radio ID 0=Enable, 1=Disable, default=0
-      _unused_160_7             : 1;      ///< Reserved @ 0x2305 = 1
+      _unused_160_7             : 1;      ///< Reserved = 1
+
+    uint8_t _reserved_161[15];            ///< Reserved, filled with 0xff;
 
     /** Constructor. */
     general_settings_t();
@@ -625,6 +629,133 @@ protected:
     bool linkGPSSystemObj(GPSSystem *gs, Config *conf) const;
     /** Initializes this codeplug GPS system from the given generic @c GPSSystem. */
     void fromGPSSystemObj(const GPSSystem *l, const Config *conf);
+  };
+
+  struct __attribute__((packed)) menu_t {
+    uint8_t hangtime;                   ///< Specifies the menu hang-time in seconds, [0,30], 0=infinite.
+    uint8_t text_message  : 1,          ///< Show text message menu, 0=hide, 1=show.
+      call_alert          : 1,          ///< Contact call-alert.
+      contacts_edit       : 1,          ///< Contacts edit.
+      manual_dial         : 1,          ///< Manual dial.
+      radio_check         : 1,          ///< Contacts radio-check.
+      remote_monitor      : 1,          ///< Remote monitor.
+      radio_enable        : 1,          ///< Radio enable.
+      radio_disable       : 1;          ///< Radio disable.
+    uint8_t _reserved_2_0 : 1,          ///< Reverved, set to 1.
+      scan                : 1,          ///< Show scan settings.
+      edit_scan_list      : 1,          ///< Show edit scan list.
+      calllog_missed      : 1,          ///< Call-log missed.
+      calllog_answered    : 1,          ///< Call-log answered.
+      calllog_outgoing    : 1,          ///< Call-log outgoing.
+      talkaround          : 1,          ///< Talkaround.
+      tone_or_alert       : 1;          ///< Tone or Alert.
+    uint8_t power         : 1,          ///< Power.
+      backlight           : 1,          ///< Backlight.
+      intro_screen        : 1,          ///< Introscreen.
+      keypad_lock         : 1,          ///< Key-pad lock.
+      led_indicator       : 1,          ///< LED indicator.
+      squelch             : 1,          ///< Squelch.
+      _unknown_3_6        : 1,          ///< Unknown, set to 0.
+      vox                 : 1;          ///< Show VOX settings.
+    uint8_t password      : 1,          ///< Show password and lock settings.
+      display_mode        : 1,          ///< Show display mode settings.
+      hide_prog_radio     : 1,          ///< Hide programm radio settings.
+      _unknown_4_3        : 1,          ///< Unknown, set to 0b1.
+      hide_gps            : 1,          ///< Hide GPS settings.
+      record_switch       : 1,          ///< Show record switch settings.
+      _unknown_4_6        : 2;          ///< Unknown, set to 0b11.
+    uint8_t _unknown_5_0  : 2,          ///< Uknnown, set to 0b11.
+      group_call_match    : 1,          ///< Show Group-call match settings.
+      private_call_match  : 1,          ///< Show Private-call match settings.
+      menu_hangtime       : 1,          ///< Show menu hangtime settings.
+      tx_mode             : 1,          ///< Show TX mode settings.
+      zone                : 1,          ///< Show zone settings.
+      new_zone            : 1;          ///< Show new zone settings.
+    uint8_t edit_zone     : 1,          ///< Show edit zone settings.
+      new_scan_list       : 1,          ///< New scan list.
+      _unknown_6_2        : 6;          ///< Unknown, set to 0xb111111.
+
+    uint8_t _reserved_7[9];             ///< Reserved, filled with 0xff.
+
+    menu_t();
+    void clear();
+  };
+
+  struct __attribute__((packed)) buttons_t {
+    typedef enum {
+      Disabled = 0,
+      ToggleAllAlertTones = 1,
+      EmergencyOn = 2,
+      EmergencyOff = 3,
+      PowerSelect = 4,
+      MonitorToggle = 5,
+      OneTouch1 = 7,
+      OneTouch2 = 8,
+      OneTouch3 = 9,
+      OneTouch4 = 10,
+      OneTouch5 = 11,
+      OneTouch6 = 12,
+      RepeaterTalkaroundToggle = 13,
+      ScanToggle = 14,
+      SquelchToggle = 21,
+      PrivacyToggle = 22,
+      VoxToggle = 23,
+      ZoneIncrement = 24,
+      BatteryIndicator = 26,
+      LoneWorkerToggle = 31,
+      RecordToggle = 34,
+      RecordPlayback = 35,
+      RecordDeleteAll = 36,
+      Tone1750Hz = 38,
+      SwitchUpDown = 47,
+      RightKey = 48,
+      LeftKey = 49,
+      ZoneDecrement = 55
+    } Button;
+
+    struct __attribute__((packed)) one_touch_t {
+      typedef enum {
+        CALL    = 0b0000,
+        MESSAGE = 0b0001,
+        DTMF1   = 0b1000,
+        DTMF2   = 0b1001,
+        DTMF3   = 0b1010,
+        DTMF4   = 0b1011
+      } Action;
+
+      typedef enum {
+        Disabled = 0b00,
+        Digital  = 0b01,
+        Analog   = 0b10
+      } Type;
+
+      uint8_t action  : 4,                ///< Action 0b0000=call, 0b0001=message, 0b1000=DTMF1,
+                                          ///  0b1001=DTMF2, 0b1010=DTMF3, 0b1011=DTMF4
+        type          : 2,                ///< Type, 0b00=Disabled, 0b01=Digital, 0b10=Analog
+        _reserved_0_6 : 2;                ///< Reserved, set to 0b11;
+      uint8_t message;                    ///< Message idx+1, 0=none.
+      uint16_t contact;                   ///< Contact idx+1, 0=none.
+
+      void clear();
+    };
+
+    uint16_t _reserved_0;                 ///< Reserved, set to 0x0000.
+    uint8_t  side_button_1;               ///< Side button 1 short press, 0=disabled.
+    uint8_t  side_button_1_long;          ///< Side button 1 long press, 0=disabled.
+    uint8_t  side_button_2;               ///< Side button 2 short press, 0=disabled.
+    uint8_t  side_button_2_long;          ///< Side button 2 long press, 0=disabled.
+    uint8_t  _unused_6[10];               ///< Unknown set to 0x00.
+    uint8_t  _unknown_16;                 ///< Unkown set to 0x01;
+    uint8_t  long_press_dur;              ///< Long-press duration in 250ms steps, range [0x04,0x0f], default 0x04.
+
+    uint16_t _unused_18;                  ///< Unused set to 0xffff;
+
+    one_touch_t one_touch[6];             ///< One-touch settings 1-6.
+
+    uint8_t  _unused_42[20];              ///< Unkown set to 0x00;
+
+    buttons_t();
+    void clear();
   };
 
 	/** Represents an entry within the callsign database.

@@ -15,19 +15,21 @@
 #define NMESSAGES       50
 #define NGPSSYSTEMS     16
 
-// ---- first segment ---- additional offset 0x000800
+// ---- first segment ----
 #define OFFSET_TIMESTMP 0x002800
 #define OFFSET_SETTINGS 0x002840
+#define OFFSET_MENU     0x0028f0
+#define OFFSET_BUTTONS  0x002900
 #define OFFSET_MSG      0x002980
 #define OFFSET_GLISTS   0x00f420
 #define OFFSET_ZONES    0x0151e0
 #define OFFSET_SCANL    0x019060
 #define OFFSET_ZONEXT   0x031800
 #define OFFSET_GPS_SYS  0x03f40e
-// ---- second segment ---- additional offset 0x110800
+// ---- second segment ----
 #define OFFSET_CHANNELS 0x110800
 #define OFFSET_CONTACTS 0x140800
-
+// ---- thrid segement ----
 #define CALLSIGN_START  0x00200000  // Start of callsign database
 #define CALLSIGN_FINISH 0x01000000  // End of callsign database
 #define CALLSIGN_OFFSET 0x4003
@@ -712,6 +714,8 @@ UV390Codeplug::general_settings_t::clear() {
   mic_level = 0;
   edit_radio_id = 0;
   _unused_160_7 = 1;
+
+  memset(_reserved_161, 0xff, sizeof(_reserved_161));
 }
 
 QTimeZone
@@ -957,6 +961,107 @@ UV390Codeplug::gpssystem_t::fromGPSSystemObj(const GPSSystem *l, const Config *c
   setRepeatInterval(l->period());
 }
 
+
+/* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::buttons_t
+ * ******************************************************************************************** */
+UV390Codeplug::buttons_t::buttons_t()
+{
+  clear();
+}
+
+void
+UV390Codeplug::buttons_t::clear() {
+  _reserved_0 = 0x0000;
+  side_button_1 = Disabled;
+  side_button_1_long = Tone1750Hz;
+  side_button_2 = MonitorToggle;
+  side_button_2_long = Disabled;
+  memset(_unused_6, 0x00, sizeof(_unused_6));
+  _unknown_16 = 0x01;
+  long_press_dur = 0x04;
+  _unused_18 = 0xffff;
+  for (int i=0; i<6; i++)
+    one_touch[i].clear();
+  memset(_unused_42, 0x00, sizeof(_unused_42));
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::buttons_t::one_touch_t
+ * ******************************************************************************************** */
+void
+UV390Codeplug::buttons_t::one_touch_t::clear() {
+  action        = CALL;
+  type          = Disabled;
+  _reserved_0_6 = 0b11;
+  message       = 0;
+  contact       = 0;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::menu_t
+ * ******************************************************************************************** */
+UV390Codeplug::menu_t::menu_t() {
+  clear();
+}
+
+void
+UV390Codeplug::menu_t::clear() {
+  hangtime           = 0;
+
+  text_message       = 1;
+  call_alert         = 1;
+  contacts_edit      = 1;
+  manual_dial        = 1;
+  radio_check        = 0;
+  remote_monitor     = 0;
+  radio_disable      = 0;
+  radio_enable       = 0;
+
+  _reserved_2_0      = 1;
+  scan               = 1;
+  edit_scan_list     = 1;
+  calllog_missed     = 1;
+  calllog_answered   = 1;
+  calllog_outgoing   = 1;
+  talkaround         = 0;
+  tone_or_alert      = 1;
+
+  power              = 1;
+  backlight          = 1;
+  intro_screen       = 1;
+  keypad_lock        = 1;
+  led_indicator      = 1;
+  squelch            = 1;
+  _unknown_3_6       = 0;
+  vox                = 1;
+
+  password           = 0;
+  display_mode       = 1;
+  hide_prog_radio    = 0;
+  _unknown_4_3       = 1;
+  hide_gps           = 0;
+  record_switch      = 1;
+  _unknown_4_6       = 0b11;
+
+  _unknown_5_0       = 0b11;
+  group_call_match   = 1;
+  private_call_match = 1;
+  menu_hangtime      = 1;
+  tx_mode            = 1;
+  zone               = 1;
+  new_zone           = 1;
+
+  edit_zone          = 1;
+  new_scan_list      = 1;
+  _unknown_6_2       = 0b111111;
+
+  memset(_reserved_7, 0xff, sizeof(_reserved_7));
+}
+
+
 /* ******************************************************************************************** *
  * Implementation of UV390Codeplug
  * ******************************************************************************************** */
@@ -975,6 +1080,10 @@ UV390Codeplug::UV390Codeplug(QObject *parent)
   memset(data(0x00280c),0xff,52);
   // Clear general config
   ((general_settings_t *)(data(OFFSET_SETTINGS)))->clear();
+  // Clear menu settings
+  ((menu_t *)(data(OFFSET_MENU)))->clear();
+  // Clear button settings
+  ((buttons_t *)(data(OFFSET_BUTTONS)))->clear();
   // Clear contacts
   for (int i=0; i<NCONTACTS; i++)
     ((contact_t *)(data(OFFSET_CONTACTS+i*sizeof(contact_t))))->clear();
@@ -1005,6 +1114,19 @@ UV390Codeplug::encode(Config *config) {
   // General config
   general_settings_t *genset = (general_settings_t *)(data(OFFSET_SETTINGS));
   genset->fromConfigObj(config);
+
+  // Menu settings
+  menu_t *menu = (menu_t *)(data(OFFSET_MENU));
+  menu->hide_gps = 0;
+  menu->hide_prog_radio = 0;
+  menu->talkaround = 0;
+
+  // Button settings
+  buttons_t *buttons = (buttons_t *)(data(OFFSET_BUTTONS));
+  buttons->side_button_1 = buttons_t::Disabled;
+  buttons->side_button_1_long = buttons_t::Tone1750Hz;
+  buttons->side_button_2 = buttons_t::MonitorToggle;
+  buttons->side_button_2_long = buttons_t::Disabled;
 
   // Define Contacts
   for (int i=0; i<NCONTACTS; i++) {

@@ -12,6 +12,7 @@
 #include "decodecodeplug.hh"
 #include "infofile.hh"
 
+#include "uv390_codeplug.hh"
 
 int main(int argc, char *argv[])
 {
