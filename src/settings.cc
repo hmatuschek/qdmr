@@ -109,6 +109,15 @@ Settings::position() const {
   return loc2deg(locator());
 }
 
+bool
+Settings::updateCodeplug() const {
+  return value("updateCodeplug", true).toBool();
+}
+
+void
+Settings::setUpdateCodeplug(bool update) {
+  setValue("updateCodeplug", update);
+}
 
 SettingsDialog::SettingsDialog(QWidget *parent)
   : QDialog(parent)
@@ -129,6 +138,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   locatorEntry->setText(settings.locator());
   if (queryLocation->isChecked())
     locatorEntry->setEnabled(false);
+
+  Ui::SettingsDialog::updateCodeplug->setChecked(settings.updateCodeplug());
 
   connect(queryLocation, SIGNAL(toggled(bool)), this, SLOT(onSystemLocationToggled(bool)));
 }
@@ -158,6 +169,11 @@ SettingsDialog::positionUpdated(const QGeoPositionInfo &info) {
   if (info.isValid() && queryLocation->isChecked()) {
     locatorEntry->setText(deg2loc(info.coordinate()));
   }
+}
+
+bool
+SettingsDialog::updateCodeplug() const {
+  return Ui::SettingsDialog::updateCodeplug->isChecked();
 }
 
 

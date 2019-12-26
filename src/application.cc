@@ -431,6 +431,7 @@ Application::onCodeplugDownloaded(Radio *radio, Config *config) {
 void
 Application::uploadCodeplug() {
   // Start upload
+  Settings settings;
   QString errorMessage;
   Radio *radio = Radio::detect(errorMessage);
   if (! radio) {
@@ -452,7 +453,7 @@ Application::uploadCodeplug() {
   connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
-  radio->startUpload(_config, false);
+  radio->startUpload(_config, false, settings.updateCodeplug());
 
   _mainWindow->statusBar()->showMessage(tr("Upload ..."));
   _mainWindow->setEnabled(false);
@@ -489,6 +490,7 @@ Application::showSettings() {
     Settings settings;
     settings.setQueryPosition(dialog.systemLocationEnabled());
     settings.setLocator(dialog.locator());
+    settings.setUpdateCodeplug(dialog.updateCodeplug());
     if (! settings.queryPosition()) {
       _source->stopUpdates();
       _currentPosition = settings.position();

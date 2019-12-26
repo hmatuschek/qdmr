@@ -26,6 +26,9 @@ public:
   QString locator() const;
   void setLocator(const QString &locator);
   QGeoCoordinate position() const;
+
+  bool updateCodeplug() const;
+  void setUpdateCodeplug(bool update);
 };
 
 
@@ -38,6 +41,7 @@ public:
 
   bool systemLocationEnabled() const;
   QString locator() const;
+  bool updateCodeplug() const;
 
 protected slots:
   void onSystemLocationToggled(bool enable);
