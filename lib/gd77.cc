@@ -90,7 +90,7 @@ GD77::startDownload(Config *config, bool blocking) {
 }
 
 bool
-GD77::startUpload(Config *config, bool blocking) {
+GD77::startUpload(Config *config, bool blocking, bool update) {
   if (StatusIdle != _task)
     return false;
 

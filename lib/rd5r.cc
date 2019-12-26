@@ -35,7 +35,8 @@ static Radio::Features _rd5r_features =
 
 
 RD5R::RD5R(QObject *parent)
-  : Radio(parent), _name("Baofeng/Radioddity RD-5R"), _dev(nullptr), _config(nullptr), _codeplug()
+  : Radio(parent), _name("Baofeng/Radioddity RD-5R"), _dev(nullptr), _codeplugUpdate(true),
+    _config(nullptr), _codeplug()
 {
   // pass...
 }
@@ -86,7 +87,7 @@ RD5R::startDownload(Config *config, bool blocking) {
 }
 
 bool
-RD5R::startUpload(Config *config, bool blocking) {
+RD5R::startUpload(Config *config, bool blocking, bool update) {
   _config = config;
   if (!_config)
     return false;
@@ -98,6 +99,7 @@ RD5R::startUpload(Config *config, bool blocking) {
   }
 
   _task = StatusUpload;
+  _codeplugUpdate = update;
   if (blocking) {
     run();
     return (StatusIdle == _task);
@@ -158,21 +160,24 @@ RD5R::run()
     }
 
     uint bcount = 0;
-    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-      int b0 = _codeplug.image(0).element(n).address()/BSIZE;
-      int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
-      for (int i=0; i<nb; i++, bcount++) {
-        if (! _dev->read_block(b0+i, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
-          _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
-              .arg(_dev->errorMessage());
-          _task = StatusError;
-          _dev->read_finish();
-          _dev->close();
-          _dev->deleteLater();
-          emit uploadError(this);
-          return;
+    if (_codeplugUpdate) {
+      // If codeplug gets updated, download codeplug from device first:
+      for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+        int b0 = _codeplug.image(0).element(n).address()/BSIZE;
+        int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
+        for (int i=0; i<nb; i++, bcount++) {
+          if (! _dev->read_block(b0+i, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+            _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
+                .arg(_dev->errorMessage());
+            _task = StatusError;
+            _dev->read_finish();
+            _dev->close();
+            _dev->deleteLater();
+            emit uploadError(this);
+            return;
+          }
+          emit uploadProgress(float(bcount*50)/btot);
         }
-        emit uploadProgress(float(bcount*50)/btot);
       }
     }
 

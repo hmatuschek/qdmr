@@ -54,7 +54,7 @@ public:
 
 public slots:
 	bool startDownload(Config *config, bool blocking=false);
-	bool startUpload(Config *config, bool blocking=false);
+  bool startUpload(Config *config, bool blocking=false, bool update=true);
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
@@ -65,6 +65,9 @@ protected:
 	QString _name;
   /** The interface to the radio. */
 	DFUDevice *_dev;
+  /** If @c true, the codeplug on the radio gets updated upon upload. If @c false, it gets
+   * overridden. */
+  bool _codeplugUpdate;
   /** The generic configuration. */
 	Config *_config;
   /** A weak reference to the user-database. */

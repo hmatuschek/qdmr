@@ -37,7 +37,7 @@ public:
 
 public slots:
 	bool startDownload(Config *config, bool blocking=false);
-	bool startUpload(Config *config, bool blocking=false);
+  bool startUpload(Config *config, bool blocking=false, bool update=true);
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */

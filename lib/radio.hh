@@ -144,7 +144,7 @@ public slots:
   virtual bool startDownload(Config *config, bool blocking=false) = 0;
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
-  virtual bool startUpload(Config *config, bool blocking=false) = 0;
+  virtual bool startUpload(Config *config, bool blocking=false, bool update=true) = 0;
 
 signals:
   /** Gets emitted once the codeplug download has been started. */

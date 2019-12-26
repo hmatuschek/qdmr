@@ -47,7 +47,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 13) Contact for transmit: - or index in Contacts table\n"
             "# 14) GPS System: - or index in GPS table.\n"
             "#\n"
-            "Digital Name                Receive   Transmit  Power Scan TOT RO Admit  CC SS RxGL TxC GPS\n";
+            "Digital Name                Receive   Transmit  Power Scan TOT RO Admit  CC TS RxGL TxC GPS\n";
   for (int i=0; i<config->channelList()->count(); i++) {
     if (config->channelList()->channel(i)->is<AnalogChannel>())
       continue;

@@ -64,19 +64,17 @@
  * IntroLine2: "MY0CALL"
  * @endcode
  *
- * The VOX level is a number between 1 and 10, that indicates the sensitivity of the VOX (voice
- * operated switch). This feature (if present and enabled) allows to automatically switch to
- * transmit if you speak into the microphone. The threshold for switching is set by the VOX
- * sensitivity. This value may vary heavily from model to model.
- * @code{.py}
- * VoxLevel: 3
- * @endcode
- *
  * The microphone sensitivity/amplification can also be set (on some radios) using the MicLevel
  * entry. This entry is also a number between 1 and 10. The larger the level the larger the
  * microphone amplification. This value may vary heavily from model to model.
  * @code{.py}
  * MicLevel: 2
+ * @endcode
+ * The "Speech" option enables the speech synthesis of the radio if supported. Possible settings
+ * are "on" and "off".
+ * @code{.py}
+ * # Speech-synthesis ('On' or 'Off'):
+ * Speech: Off
  * @endcode
  *
  * @subsection confcont Contact table
@@ -147,21 +145,21 @@
  *
  * The digital channel table has the form
  * @code
- * Digital Name             Receive   Transmit  Power Scan TOT RO Admit  Color Slot RxGL TxContact
- * 11      "DM0TT Ref"      439.0870  -7.6000   High  1    -   -  Free   1     1    7    12   #    Regional
- * 12      "DM0TT BB"       439.0875  -7.6000   High  -    -   -  Free   1     2    7    15   #    Berlin/Brand
- * 84      "DMR_S0"         433.4500  433.4500  High  2    -   -  Free   1     1    6    9    #    Simplex TG99
- * 85      "DMR_S1"         433.6120  433.6120  High  2    -   -  Free   1     1    6    9    #    Simplex TG99
- * 86      "DMR_S2"         433.6250  433.6250  High  2    -   -  Free   1     1    6    9    #    Simplex TG99
- * 87      "DMR_S3"         433.6380  433.6380  High  2    -   -  Free   1     1    6    9    #    Simplex TG99
- * 88      "DMR_S4"         433.6500  433.6500  High  2    -   -  Free   1     1    6    9    #    Simplex TG99
- * 89      "DMR_S5"         433.6630  433.6630  High  2    -   -  Free   1     1    6    9    #    Simplex TG99
- * 90      "DMR_S6"         433.6750  433.6750  High  2    -   -  Free   1     1    6    9    #    Simplex TG99
- * 91      "DMR_S7"         433.6880  433.6880  High  2    -   -  Free   1     1    6    9    #    Simplex TG99
+ * Digital Name             Receive   Transmit  Power Scan TOT RO Admit  CC TS RxGL TxC GPS
+ * 11      "DM0TT Ref"      439.0870  -7.6000   High  1    -   -  Free   1  1  7    12  -  #    Regional
+ * 12      "DM0TT BB"       439.0875  -7.6000   High  -    -   -  Free   1  2  7    15  1  #    Berlin/Brand
+ * 84      "DMR_S0"         433.4500  433.4500  High  2    -   -  Free   1  1  6    9   -  #    Simplex TG99
+ * 85      "DMR_S1"         433.6120  433.6120  High  2    -   -  Free   1  1  6    9   -  #    Simplex TG99
+ * 86      "DMR_S2"         433.6250  433.6250  High  2    -   -  Free   1  1  6    9   -  #    Simplex TG99
+ * 87      "DMR_S3"         433.6380  433.6380  High  2    -   -  Free   1  1  6    9   -  #    Simplex TG99
+ * 88      "DMR_S4"         433.6500  433.6500  High  2    -   -  Free   1  1  6    9   -  #    Simplex TG99
+ * 89      "DMR_S5"         433.6630  433.6630  High  2    -   -  Free   1  1  6    9   -  #    Simplex TG99
+ * 90      "DMR_S6"         433.6750  433.6750  High  2    -   -  Free   1  1  6    9   -  #    Simplex TG99
+ * 91      "DMR_S7"         433.6880  433.6880  High  2    -   -  Free   1  1  6    9   -  #    Simplex TG99
  * @endcode
  * The digital-channel table starts with the keyword "Digital" and ends with an empty line. The
- * next keywords (Name, Receive, Transmit, Power, Scan, TOT, RO, Admit, Color, Slot, RxGL and
- * TxContact) are ignored and are maintained for the self-documentation of the configuraion file.
+ * next keywords (Name, Receive, Transmit, Power, Scan, TOT, RO, Admit, CC, TS, RxGL and
+ * TxC) are ignored and are maintained for the self-documentation of the configuraion file.
  *
  * Each channel is defined within a single line. The first column is the unique channel
  * identifier (any unique number among analog AND digital channels). The second column specifies the
@@ -179,15 +177,16 @@
  * pressed. The "Free" keyword indicates that the radio will only transmit if the channel is free.
  * The "Color" keyword indicates that the radio will only transmit if the channel is free and the
  * colorcode of the repeater matches the specified color-code of the channel (see next column). The
- * 10th column specifies the colorcode of the channel. The 10th (Color) column specifies the
+ * 10th column specifies the colorcode of the channel. The 10th (CC) column specifies the
  * color-code of the channel. To avoid interference between neighbouring radios and repreaters on
  * the same frequency (in case of DX conditions), the repeater and radio will only react to
  * tranmissions on a channel with the matching color-code. The color-code can be any number between
- * 0 and 15. The 11th (Slot) column specifies the time-slot for this channel. Due to the audio
+ * 0 and 15. The 11th (TS) column specifies the time-slot for this channel. Due to the audio
  * compression used in DMR, it is possible to operate two independent channels on a single
  * frequency by using time-sliceing. DMR uses two time-slots. This option specifies which of the
  * two time-slots is used for the channel. On simplex channels, this time-sliceing is irrelevant, as
- * there is no central instance (the repeater) that defines what time-slot 1 or 2 is.
+ * there is no central instance (the repeater) that defines what time-slot 1 or 2 is. The 12th (GPS)
+ * column specifies the GPS system (see below) to use on that channel.
  *
  * @subsection confana Analog channel table
  * The analog channel table collects all analog (FM) channels. As digital channels have some
@@ -272,7 +271,7 @@
  * A reference to any channel-type can be used here, analog and digital.
  *
  * @subsection confscan Scan lists
- * Finally a scan list is list of channels, that are scanned whenever scanning is started on a
+ * A scan list is list of channels, that are scanned whenever scanning is started on a
  * channel the scan list is associated with. A single scan list might be associated with several
  * channels. For example, all channels within that scan list.
  *
@@ -297,6 +296,19 @@
  * that the radio will transmit on the channel at which the scan stopped on, while specifying any
  * channel index implies, that the radio will transmit on that channel. Finally the 6th column
  * specifies the comma-separated list of channels that form the scan list.
+ *
+ * @subsection confgps GPS Systems
+ * The GPS System list just specifies the contact to which some positional information is send to
+ * (which usually gets forwarded to the APRS system) and at which period this information is send.
+ * @code
+ * GPS  Name                Dest Period Revert
+ * 1    "BM APRS"           20   300    -
+ * @endcode
+ * The first column specifies the ID of the GPS system. This can be any number >0. The second column
+ * (Name) specifies the name of the GPS system. The third column specifies the destination contact
+ * ID (see Contacts above), the position information is send to. The fourth column (Period) specifies
+ * the update period in seconds. The fifth column (Revert) specifies the revert channel. In amateur
+ * radio, this can be left blank ("-").
  */
 
 #ifndef CSVREADER_HH

@@ -29,7 +29,9 @@ class GPSSystem;
  *  <tr><td>0x002900</td> <td>0x002940</td> <td>0x00040</td> <td>Button config, see @c UV390Codeplug::buttons_t.</td></tr>
  *  <tr><td>0x002940</td> <td>0x002980</td> <td>0x00040</td> <td>Reserved, filled with 0xff.</td></tr>
  *  <tr><td>0x002980</td> <td>0x0061c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each, see @c UV390Codeplug::message_t.</td></tr>
- *  <tr><td>0x0061c0</td> <td>0x00f420</td> <td>0x09260</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x0061c0</td> <td>0x006270</td> <td>0x000b0</td> <td>Privacy keys, see @c UV390Codeplug::privacy_t.</td></tr>
+ *  <tr><td>0x006250</td> <td>0x006760</td> <td>0x00510</td> <td>Emergency Systems, see @c UV390Codeplug::emergency_t.</td></td>
+ *  <tr><td>0x006760</td> <td>0x00f420</td> <td>0x08cc0</td> <td>Reserved, filled with 0xff.</td></td>
  *  <tr><td>0x00f420</td> <td>0x0151e0</td> <td>0x05dc0</td> <td>250 RX Group lists @ 0x60 bytes each, see @c UV390Codeplug::grouplist_t.</td></tr>
  *  <tr><td>0x0151e0</td> <td>0x019060</td> <td>0x03e80</td> <td>250 Zones @ 0x40 bytes each, see @c UV390Codeplug::zone_t.</td></tr>
  *  <tr><td>0x019060</td> <td>0x01f5f0</td> <td>0x06590</td> <td>250 Scanlists @ 0x68 bytes each, see @c UV390Codeplug::scanlist_t.</td></tr>
@@ -758,18 +760,73 @@ protected:
     void clear();
   };
 
+  struct __attribute__((packed)) emergency_t {
+    struct __attribute__((packed)) system_t {
+      typedef enum {
+        DISABLED = 0,
+        REGULAR = 1,
+        SILENT = 2,
+        SILENT_W_VOICE = 3
+      } AlarmType;
+      typedef enum {
+        ALARM = 0,
+        ALARM_W_CALL = 1,
+        ALARM_W_VOICE = 2
+      } AlarmMode;
+
+      uint16_t name[16];                  ///< System name 16 x 16bit unicode 0x0000 terminated.
+      uint8_t alarm_type  : 2,            ///< Alarm type.
+        _unknown_32_2     : 2,            ///< Unknown set to 0b11
+        alarm_mode        : 2,            ///< Alarm mode.
+        _unknown_32_6     : 2;            ///< Unknown set to 0b01
+      uint8_t impolite_retires;           ///< Number of impolite retries [1-15], default=15.
+      uint8_t polite_retries;             ///< Number of polite retires [0-14], default=5, 0x0f=infinite.
+      uint8_t hot_mic_dur;                ///< Hot microphone duration in seconds in 10s steps, [10-120], default=10.
+      uint16_t revert_channel;            ///< Revert channel index+1, 0xfffe Selected, 0x0000 System disabled.
+      uint16_t _unused_37;                ///< Unused, set to 0xffff.
+
+      system_t();
+      void clear();
+      bool isValid();
+    };
+
+    uint8_t radio_dis_dec  : 1,           ///< Radio disable decode, 0=off, 1=on, default=1.
+      remote_mon_decode    : 1,           ///< Remote monitor decode, 0=off, 1=on, default=0.
+      em_remote_mon_decode : 1,           ///< Emergency remote monitor decode, 0=off, 1=on, default=0.
+      _unknown_0_3         : 5;           ///< Unknown, set to 0b11111.
+    uint8_t remote_mon_dur;               ///< Duration in seconds in 10s steps [20-120].
+    uint8_t tx_sync_wakeup_tot;           ///< TOT in ms in 25ms steps. [5-15].
+    uint8_t tx_wakeup_msg_limit;          ///< Message limit [1-3].
+    uint8_t _unused_4[12];                ///< Unused 12bytes set to 0xff;
+    system_t systems[32];                 ///< 32 x system_t Emergency systems.
+
+    emergency_t();
+    void clear();
+  };
+
+  struct __attribute__((packed)) privacy_t {
+    uint8_t enhanced_keys[8][16];         ///< 8 x 16-byte enhanced keys. Filled with 0xff by default.
+    uint8_t _reserved[16];                ///< Unused/reserved space 16-byte filled with 0xff.
+    uint8_t basic_keys[16][2];            ///< 16 x 2-byte basic keys. Filled with 0xff by default.
+
+    privacy_t();
+    void clear();
+  };
+
 	/** Represents an entry within the callsign database.
    * @todo Implement generic config representation for callsign database. */
   struct __attribute__((packed)) callsign_t {
-    uint32_t dmrid   : 24,      ///< DMR id in BCD
-      _unused        :  8;      ///< Unknown set to 0xff.
-    char callsign[16];          ///< ASCII zero-terminated
-    char name[100];             ///< Descriptive name, nickname, city, state, country.
+    uint32_t dmrid   : 24,                ///< DMR id in BCD
+      _unused        :  8;                ///< Unknown set to 0xff.
+    char callsign[16];                    ///< ASCII zero-terminated
+    char name[100];                       ///< Descriptive name, nickname, city, state, country.
   };
 
 public:
   /** Default constructor. */
 	explicit UV390Codeplug(QObject *parent = nullptr);
+
+  void clear();
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
 	bool decode(Config *config);

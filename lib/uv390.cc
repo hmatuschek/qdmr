@@ -36,7 +36,7 @@ static Radio::Features _uv390_features =
 
 
 UV390::UV390(QObject *parent)
-  : Radio(parent), _name("TYT MD-UV390"), _dev(nullptr), _config(nullptr)
+  : Radio(parent), _name("TYT MD-UV390"), _dev(nullptr), _codeplugUpdate(true), _config(nullptr)
 {
   // pass...
 }
@@ -89,7 +89,7 @@ UV390::startDownload(Config *config, bool blocking) {
 }
 
 bool
-UV390::startUpload(Config *config, bool blocking) {
+UV390::startUpload(Config *config, bool blocking, bool update) {
   if (StatusIdle != _task)
     return false;
 
@@ -104,6 +104,7 @@ UV390::startUpload(Config *config, bool blocking) {
   }
 
   _task = StatusUpload;
+  _codeplugUpdate = update;
   if (blocking) {
     this->run();
     return (StatusIdle == _task);
@@ -195,29 +196,32 @@ UV390::run() {
       totb += _codeplug.image(0).element(n).data().size()/BSIZE;
     }
 
-    // First download codeplug from device:
     size_t bcount = 0;
-    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-      uint addr = _codeplug.image(0).element(n).address();
-      uint size = _codeplug.image(0).element(n).data().size();
-      uint b0 = addr/BSIZE, nb = size/BSIZE;
-      for (uint b=0; b<nb; b++, bcount++) {
-        if (! _dev->read_block(b0+b, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
-          _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
-              .arg(_dev->errorMessage());
-          logError() << _errorMessage;
-          _task = StatusError;
-          _dev->reboot();
-          _dev->close();
-          _dev->deleteLater();
-          emit downloadError(this);
-          return;
+
+    // If codeplug gets updated, download codeplug from device first:
+    if (_codeplugUpdate) {
+      for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+        uint addr = _codeplug.image(0).element(n).address();
+        uint size = _codeplug.image(0).element(n).data().size();
+        uint b0 = addr/BSIZE, nb = size/BSIZE;
+        for (uint b=0; b<nb; b++, bcount++) {
+          if (! _dev->read_block(b0+b, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
+            _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
+                .arg(_dev->errorMessage());
+            logError() << _errorMessage;
+            _task = StatusError;
+            _dev->reboot();
+            _dev->close();
+            _dev->deleteLater();
+            emit downloadError(this);
+            return;
+          }
+          emit uploadProgress(float(bcount*50)/totb);
         }
-        emit uploadProgress(float(bcount*50)/totb);
       }
     }
 
-    // Send encode config into codeplug
+    // Encode config into codeplug
     _codeplug.encode(_config);
 
     // then erase memory

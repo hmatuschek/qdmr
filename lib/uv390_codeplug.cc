@@ -7,32 +7,34 @@
 #include <QTimeZone>
 
 
-#define NCHAN           3000
-#define NCONTACTS       10000
-#define NZONES          250
-#define NGLISTS         250
-#define NSCANL          250
-#define NMESSAGES       50
-#define NGPSSYSTEMS     16
+#define NCHAN            3000
+#define NCONTACTS        10000
+#define NZONES           250
+#define NEMERGENCY       32
+#define NGLISTS          250
+#define NSCANL           250
+#define NMESSAGES        50
+#define NGPSSYSTEMS      16
 
 // ---- first segment ----
-#define OFFSET_TIMESTMP 0x002800
-#define OFFSET_SETTINGS 0x002840
-#define OFFSET_MENU     0x0028f0
-#define OFFSET_BUTTONS  0x002900
-#define OFFSET_MSG      0x002980
-#define OFFSET_GLISTS   0x00f420
-#define OFFSET_ZONES    0x0151e0
-#define OFFSET_SCANL    0x019060
-#define OFFSET_ZONEXT   0x031800
-#define OFFSET_GPS_SYS  0x03f40e
+#define OFFSET_TIMESTMP  0x002800
+#define OFFSET_SETTINGS  0x002840
+#define OFFSET_MENU      0x0028f0
+#define OFFSET_BUTTONS   0x002900
+#define OFFSET_MSG       0x002980
+#define OFFSET_EMERGENCY 0x006250
+#define OFFSET_GLISTS    0x00f420
+#define OFFSET_ZONES     0x0151e0
+#define OFFSET_SCANL     0x019060
+#define OFFSET_ZONEXT    0x031800
+#define OFFSET_GPS_SYS   0x03f40e
 // ---- second segment ----
-#define OFFSET_CHANNELS 0x110800
-#define OFFSET_CONTACTS 0x140800
+#define OFFSET_CHANNELS  0x110800
+#define OFFSET_CONTACTS  0x140800
 // ---- thrid segement ----
-#define CALLSIGN_START  0x00200000  // Start of callsign database
-#define CALLSIGN_FINISH 0x01000000  // End of callsign database
-#define CALLSIGN_OFFSET 0x4003
+#define CALLSIGN_START   0x00200000  // Start of callsign database
+#define CALLSIGN_FINISH  0x01000000  // End of callsign database
+#define CALLSIGN_OFFSET  0x4003
 
 #define VALID_TEXT(txt)     (*(txt) != 0 && *(txt) != 0xffff)
 #define VALID_CHANNEL(ch)   VALID_TEXT((ch)->name)
@@ -1073,7 +1075,12 @@ UV390Codeplug::UV390Codeplug(QObject *parent)
   image(0).addElement(0x110800, 0x90000);
 
   // Clear entire codeplug
+  clear();
+}
 
+void
+UV390Codeplug::clear()
+{
   // Clear timestamp
   ((timestamp_t *)(data(OFFSET_TIMESTMP)))->set();
   // Clear some unused memory sections
@@ -1114,19 +1121,6 @@ UV390Codeplug::encode(Config *config) {
   // General config
   general_settings_t *genset = (general_settings_t *)(data(OFFSET_SETTINGS));
   genset->fromConfigObj(config);
-
-  // Menu settings
-  menu_t *menu = (menu_t *)(data(OFFSET_MENU));
-  menu->hide_gps = 0;
-  menu->hide_prog_radio = 0;
-  menu->talkaround = 0;
-
-  // Button settings
-  buttons_t *buttons = (buttons_t *)(data(OFFSET_BUTTONS));
-  buttons->side_button_1 = buttons_t::Disabled;
-  buttons->side_button_1_long = buttons_t::Tone1750Hz;
-  buttons->side_button_2 = buttons_t::MonitorToggle;
-  buttons->side_button_2_long = buttons_t::Disabled;
 
   // Define Contacts
   for (int i=0; i<NCONTACTS; i++) {

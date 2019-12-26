@@ -55,7 +55,7 @@ public:
 
 public slots:
 	bool startDownload(Config *config, bool blocking=false);
-	bool startUpload(Config *config, bool blocking=false);
+  bool startUpload(Config *config, bool blocking=false, bool update=true);
 
 protected:
   /** Main function running in a separate thread performing the up- and download to and from the
@@ -67,6 +67,8 @@ private:
 	QString _name;
   /** HID interface to the radio. */
 	HID *_dev;
+  /** If @c true, the codeplug gets updated otherwise overridden. */
+  bool _codeplugUpdate;
   /** Current generic configuration. */
 	Config *_config;
   /** Current device specific codeplug. */
