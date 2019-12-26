@@ -26,8 +26,10 @@
 #define OFFSET_GLISTS    0x00f420
 #define OFFSET_ZONES     0x0151e0
 #define OFFSET_SCANL     0x019060
+#define OFFSET_VFO_A     0x02f700
+#define OFFSET_VFO_B     0x02f740
 #define OFFSET_ZONEXT    0x031800
-#define OFFSET_GPS_SYS   0x03f40e
+#define OFFSET_GPS_SYS   0x03f440
 // ---- second segment ----
 #define OFFSET_CHANNELS  0x110800
 #define OFFSET_CONTACTS  0x140800

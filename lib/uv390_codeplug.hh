@@ -36,14 +36,15 @@ class GPSSystem;
  *  <tr><td>0x0151e0</td> <td>0x019060</td> <td>0x03e80</td> <td>250 Zones @ 0x40 bytes each, see @c UV390Codeplug::zone_t.</td></tr>
  *  <tr><td>0x019060</td> <td>0x01f5f0</td> <td>0x06590</td> <td>250 Scanlists @ 0x68 bytes each, see @c UV390Codeplug::scanlist_t.</td></tr>
  *  <tr><td>0x01f5f0</td> <td>0x02f700</td> <td>0x10110</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x02f700</td> <td>0x02f780</td> <td>0x00080</td> <td>??? Unknown. ???</td></tr>
- *  <tr><td>0x02f780</td> <td>0x02f800</td> <td>0x00080</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x02f800</td> <td>0x030b88</td> <td>0x01388</td> <td>??? Unknown. ???</td></tr>
- *  <tr><td>0x030b88</td> <td>0x031800</td> <td>0x00c78</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><td>0x02f700</td> <td>0x02f740</td> <td>0x00040</td> <td>VFO A channel, see @c UV390Codeplug::channel_t.</td></tr>
+ *  <tr><td>0x02f740</td> <td>0x02f780</td> <td>0x00040</td> <td>VFO B channel, see @c UV390Codeplug::channel_t.</td></tr>
+ *  <tr><td>0x02f780</td> <td>0x030800</td> <td>0x01080</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><td>0x030800</td> <td>0x030b80</td> <td>0x00380</td> <td>??? Unknown. DTMF Systems? ???</td></tr>
+ *  <tr><td>0x030b80</td> <td>0x031800</td> <td>0x00c80</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x031800</td> <td>0x03f2c0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c UV390Codeplug::zone_ext_t.</td></tr>
- *  <tr><td>0x03f2c0</td> <td>0x03f40e</td> <td>0x0014e</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x03f40e</td> <td>0x03f50e</td> <td>0x00100</td> <td>16 GPS systems @ 0x10 bytes each, see @c UV390Codeplug::gpssystem_t.</td></tr>
- *  <tr><td>0x03f50e</td> <td>0x040800</td> <td>0x012f2</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x03f2c0</td> <td>0x03f440</td> <td>0x00180</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><td>0x03f440</td> <td>0x03f540</td> <td>0x00100</td> <td>16 GPS systems @ 0x10 bytes each, see @c UV390Codeplug::gpssystem_t.</td></tr>
+ *  <tr><td>0x03f540</td> <td>0x040800</td> <td>0x012c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><th colspan="4">Second segment 0x110800-0x1a0800</th></tr>
  *  <tr><td>0x110800</td> <td>0x13f600</td> <td>0x2ee00</td> <td>3000 Channels @ 0x40 bytes each, see @c UV390Codeplug::channel_t.</td></tr>
  *  <tr><td>0x13f600</td> <td>0x140800</td> <td>0x01200</td> <td>Reserved, filled with @c 0xff. </td></tr>
@@ -218,7 +219,11 @@ protected:
       _unused31_5         : 3;      ///< Reserved = 0b111
 
 		// Bytes 32-63
-		uint16_t name[16];              ///< Channel Name (16 x Unicode), default=0x0000
+    union {
+      uint16_t name[16];              ///< Channel Name (16 x Unicode), default=0x0000
+      uint16_t step : 8,              ///< Step size in 2.5kHz steps [0-9] (VFO mode), 0=2.5kHz, 1=5kHz, ..., 9=50kHz.
+        _unused33_0 : 8;              ///< Unused set to 0xff in VFO mode.
+    };
 
     /** Constructor, also clears the struct. */
     channel_t();
