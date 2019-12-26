@@ -22,6 +22,7 @@
 #define OFFSET_MENU      0x0028f0
 #define OFFSET_BUTTONS   0x002900
 #define OFFSET_MSG       0x002980
+#define OFFSET_PRIVACY   0x0061c0
 #define OFFSET_EMERGENCY 0x006250
 #define OFFSET_GLISTS    0x00f420
 #define OFFSET_ZONES     0x0151e0
@@ -992,6 +993,71 @@ UV390Codeplug::buttons_t::clear() {
 
 
 /* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::emergency_t
+ * ******************************************************************************************** */
+UV390Codeplug::emergency_t::emergency_t() {
+  clear();
+}
+
+void
+UV390Codeplug::emergency_t::clear() {
+  radio_dis_dec = 1;
+  remote_mon_decode = 0;
+  em_remote_mon_decode = 1;
+  _unknown_0_3 = 0b11111;
+
+  remote_mon_dur = 1;
+  tx_sync_wakeup_tot = 5;
+  tx_wakeup_msg_limit = 2;
+  memset(_unused_4, 0xff, sizeof(_unused_4));
+
+  for (int i=0; i<32; i++)
+    systems[i].clear();
+}
+
+/* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::emergency_t::system_t
+ * ******************************************************************************************** */
+UV390Codeplug::emergency_t::system_t::system_t() {
+  clear();
+}
+
+void
+UV390Codeplug::emergency_t::system_t::clear() {
+  memset(name, 0x00, sizeof(name));
+  alarm_type = DISABLED;
+  _unknown_32_2 = 0b11;
+  alarm_mode = ALARM;
+  _unknown_32_6 = 0b01;
+  impolite_retires = 15;
+  polite_retries = 5;
+  hot_mic_dur = 10;
+  revert_channel = 0x0000;
+  _unused_37 = 0xffff;
+}
+
+bool
+UV390Codeplug::emergency_t::system_t::isValid() const {
+  return 0x0000 != revert_channel;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::privacy_t
+ * ******************************************************************************************** */
+UV390Codeplug::privacy_t::privacy_t() {
+  clear();
+}
+
+void
+UV390Codeplug::privacy_t::clear() {
+  memset(enhanced_keys, 0xff, sizeof(enhanced_keys));
+  memset(_reserved, 0xff, sizeof(_reserved));
+  memset(basic_keys, 0xff, sizeof(basic_keys));
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of UV390Codeplug::buttons_t::one_touch_t
  * ******************************************************************************************** */
 void
@@ -1083,40 +1149,65 @@ UV390Codeplug::UV390Codeplug(QObject *parent)
 void
 UV390Codeplug::clear()
 {
+  // Clear entire images
+  memset(data(0x002800), 0xff, 0x3e000);
+  memset(data(0x110800), 0xff, 0x90000);
+
   // Clear timestamp
   ((timestamp_t *)(data(OFFSET_TIMESTMP)))->set();
-  // Clear some unused memory sections
-  memset(data(0x00280c),0xff,52);
+
   // Clear general config
   ((general_settings_t *)(data(OFFSET_SETTINGS)))->clear();
+
   // Clear menu settings
   ((menu_t *)(data(OFFSET_MENU)))->clear();
+
   // Clear button settings
   ((buttons_t *)(data(OFFSET_BUTTONS)))->clear();
-  // Clear contacts
-  for (int i=0; i<NCONTACTS; i++)
-    ((contact_t *)(data(OFFSET_CONTACTS+i*sizeof(contact_t))))->clear();
+
+  // Clear text messages
+  for (int i=0; i<NMESSAGES; i++)
+    ((message_t *)(data(OFFSET_MSG+i*sizeof(message_t))))->clear();
+
+  // Clear privacy keys
+  ((privacy_t *)(data(OFFSET_PRIVACY)))->clear();
+
+  // Clear emergency systems
+  ((emergency_t *)(data(OFFSET_EMERGENCY)))->clear();
+
   // Clear RX group lists
   for (int i=0; i<NGLISTS; i++)
     ((grouplist_t *)(data(OFFSET_GLISTS+i*sizeof(grouplist_t))))->clear();
-  // Clear channels
-  for (int i=0; i<NCHAN; i++)
-    ((channel_t *)(data(OFFSET_CHANNELS+i*sizeof(channel_t))))->clear();
-  // Clear zones
+
+  // Clear zones & zone extensions
   for (int i=0; i<NZONES; i++) {
     ((zone_t *)(data(OFFSET_ZONES+i*sizeof(zone_t))))->clear();
     ((zone_ext_t*)(data(OFFSET_ZONEXT+i*sizeof(zone_ext_t))))->clear();
   }
+
   // Clear scan lists
   for (int i=0; i<NSCANL; i++)
     ((scanlist_t *)(data(OFFSET_SCANL+i*sizeof(scanlist_t))))->clear();
+
+  // Clear VFO A & B settings.
+  ((channel_t *)(data(OFFSET_VFO_A)))->clear();
+  ((channel_t *)(data(OFFSET_VFO_B)))->clear();
+
+  // Clear GPS systems
+  for (int i=0; i<NGPSSYSTEMS; i++)
+    ((gpssystem_t *)(data(OFFSET_GPS_SYS+i*sizeof(gpssystem_t))))->clear();
+
+  // Clear channels
+  for (int i=0; i<NCHAN; i++)
+    ((channel_t *)(data(OFFSET_CHANNELS+i*sizeof(channel_t))))->clear();
+
+  // Clear contacts
+  for (int i=0; i<NCONTACTS; i++)
+    ((contact_t *)(data(OFFSET_CONTACTS+i*sizeof(contact_t))))->clear();
 }
 
 bool
 UV390Codeplug::encode(Config *config) {
-  // Some unused memory sections
-  memset(data(0x00280c),0xff,52);
-
   // Set timestamp
   ((timestamp_t *)(data(OFFSET_TIMESTMP)))->set();
 

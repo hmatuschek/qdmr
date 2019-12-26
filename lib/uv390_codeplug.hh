@@ -792,7 +792,8 @@ protected:
 
       system_t();
       void clear();
-      bool isValid();
+
+      bool isValid() const;
     };
 
     uint8_t radio_dis_dec  : 1,           ///< Radio disable decode, 0=off, 1=on, default=1.
