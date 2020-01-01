@@ -37,14 +37,14 @@ GD77Codeplug::channel_t::clear() {
   _unused38              = 0;
   rx_signaling_syst      = 0;
   _unused40              = 0x16;
-  privacy_group          = 0;
+  privacy_group          = PRIVGR_NONE;
   emergency_system_index = 0;
   _unused48              = 0;
   emergency_alarm_ack    = 0;
   data_call_conf         = 0;
   private_call_conf      = 0;
   _unused49_1            = 0;
-  privacy                = PRIVGR_NONE;
+  privacy                = 0;
   _unused49_5            = 0;
   _unused49_7            = 0;
   dcdm                   = 0;

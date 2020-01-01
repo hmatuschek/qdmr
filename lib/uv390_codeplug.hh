@@ -19,6 +19,8 @@ class GPSSystem;
  * segments must align with @c 0x400 (1024 bytes).
  *
  * @section uv390cpl Codeplug structure within radio
+ * The codeplug structure is reverse engineered almost completely and can be programmed from
+ * scratch. That is, it is not neccessary to update an existing codeplug on the radio.
  * <table>
  *  <tr><th>Start</th>    <th>End</th>      <th>Size</th>    <th>Content</th></tr>
  *  <tr><th colspan="4">First segment 0x002800-0x040800</th></tr>
@@ -533,8 +535,11 @@ protected:
     /** Resets this general settings. */
     void clear();
 
+    /** Returns the time-zone set within the codeplug. */
     QTimeZone getTimeZone() const;
+    /** Sets the time-zone to the system time-zone. */
     void setTimeZone();
+    /** Sets the time-zone to the given one. */
     void setTimeZone(const QTimeZone &tz);
 
     /** Returns the radio DMR ID. */
@@ -638,6 +643,7 @@ protected:
     void fromGPSSystemObj(const GPSSystem *l, const Config *conf);
   };
 
+  /** Represents all menu settings within the codeplug on the radio. */
   struct __attribute__((packed)) menu_t {
     uint8_t hangtime;                   ///< Specifies the menu hang-time in seconds, [0,30], 0=infinite.
     uint8_t text_message  : 1,          ///< Show text message menu, 0=hide, 1=show.
@@ -684,73 +690,80 @@ protected:
 
     uint8_t _reserved_7[9];             ///< Reserved, filled with 0xff.
 
+    /** Default constructor. */
     menu_t();
+    /** Clears and resets all menu settings to default values (all ham-radio related menus are enabled). */
     void clear();
   };
 
+  /** Represents all button settings within the codeplug on the radio. */
   struct __attribute__((packed)) buttons_t {
+    /** Possible actions for the side-buttons. */
     typedef enum {
-      Disabled = 0,
-      ToggleAllAlertTones = 1,
-      EmergencyOn = 2,
-      EmergencyOff = 3,
-      PowerSelect = 4,
-      MonitorToggle = 5,
-      OneTouch1 = 7,
-      OneTouch2 = 8,
-      OneTouch3 = 9,
-      OneTouch4 = 10,
-      OneTouch5 = 11,
-      OneTouch6 = 12,
-      RepeaterTalkaroundToggle = 13,
-      ScanToggle = 14,
-      SquelchToggle = 21,
-      PrivacyToggle = 22,
-      VoxToggle = 23,
-      ZoneIncrement = 24,
-      BatteryIndicator = 26,
-      LoneWorkerToggle = 31,
-      RecordToggle = 34,
-      RecordPlayback = 35,
-      RecordDeleteAll = 36,
-      Tone1750Hz = 38,
-      SwitchUpDown = 47,
-      RightKey = 48,
-      LeftKey = 49,
-      ZoneDecrement = 55
-    } Button;
+      Disabled = 0,                       ///< Disabled side-button action.
+      ToggleAllAlertTones = 1,            ///< Toggle all alert tones.
+      EmergencyOn = 2,                    ///< Enable emergency.
+      EmergencyOff = 3,                   ///< Disable emergency.
+      PowerSelect = 4,                    ///< Select TX power.
+      MonitorToggle = 5,                  ///< Toggle monitor (promiscuous mode on digital channel, open squelch on analog channel).
+      OneTouch1 = 7,                      ///< Perform one-touch action 1.
+      OneTouch2 = 8,                      ///< Perform one-touch action 2.
+      OneTouch3 = 9,                      ///< Perform one-touch action 3.
+      OneTouch4 = 10,                     ///< Perform one-touch action 4.
+      OneTouch5 = 11,                     ///< Perform one-touch action 5.
+      OneTouch6 = 12,                     ///< Perform one-touch action 6.
+      RepeaterTalkaroundToggle = 13,      ///< Toggle repater mode / talkaround.
+      ScanToggle = 14,                    ///< Start/stop scan.
+      SquelchToggle = 21,                 ///< Enable/disable squelch.
+      PrivacyToggle = 22,                 ///< Enable/disable privacy system.
+      VoxToggle = 23,                     ///< Enable/disable VOX.
+      ZoneIncrement = 24,                 ///< Switch to next zone.
+      BatteryIndicator = 26,              ///< Show battery charge.
+      LoneWorkerToggle = 31,              ///< Toggle lone-worker.
+      RecordToggle = 34,                  ///< Enable/disable recording (dep. on firmware).
+      RecordPlayback = 35,                ///< Start/stop playback.
+      RecordDeleteAll = 36,               ///< Delete all recordings.
+      Tone1750Hz = 38,                    ///< Send 1750Hz tone.
+      SwitchUpDown = 47,                  ///< Switch Channel A/B.
+      RightKey = 48,                      ///< Who knows?
+      LeftKey = 49,                       ///< Who knows?
+      ZoneDecrement = 55                  ///< Switch to previous zone.
+    } ButtonAction;
 
+    /** Represents a single one-touch setting within the codeplug on the radio. */
     struct __attribute__((packed)) one_touch_t {
+      /** Possible one-touch actions. */
       typedef enum {
-        CALL    = 0b0000,
-        MESSAGE = 0b0001,
-        DTMF1   = 0b1000,
-        DTMF2   = 0b1001,
-        DTMF3   = 0b1010,
-        DTMF4   = 0b1011
+        CALL    = 0b0000,                 ///< Call someone, see @c contact.
+        MESSAGE = 0b0001,                 ///< Send a message, see @c message.
+        DTMF1   = 0b1000,                 ///< Analog call DTMF system 1.
+        DTMF2   = 0b1001,                 ///< Analog call DTMF system 2.
+        DTMF3   = 0b1010,                 ///< Analog call DTMF system 3.
+        DTMF4   = 0b1011                  ///< Analog call DTMF system 4.
       } Action;
 
+      /** Possible one-touch action types. */
       typedef enum {
-        Disabled = 0b00,
-        Digital  = 0b01,
-        Analog   = 0b10
+        Disabled = 0b00,                  ///< Disabled one-touch.
+        Digital  = 0b01,                  ///< Digital call/message.
+        Analog   = 0b10                   ///< Analog call.
       } Type;
 
-      uint8_t action  : 4,                ///< Action 0b0000=call, 0b0001=message, 0b1000=DTMF1,
-                                          ///  0b1001=DTMF2, 0b1010=DTMF3, 0b1011=DTMF4
+      uint8_t action  : 4,                ///< Action 0b0000=call, 0b0001=message, 0b1000=DTMF1, 0b1001=DTMF2, 0b1010=DTMF3, 0b1011=DTMF4
         type          : 2,                ///< Type, 0b00=Disabled, 0b01=Digital, 0b10=Analog
         _reserved_0_6 : 2;                ///< Reserved, set to 0b11;
       uint8_t message;                    ///< Message idx+1, 0=none.
       uint16_t contact;                   ///< Contact idx+1, 0=none.
 
+      /** Resets this one-touch action settings. */
       void clear();
     };
 
     uint16_t _reserved_0;                 ///< Reserved, set to 0x0000.
-    uint8_t  side_button_1;               ///< Side button 1 short press, 0=disabled.
-    uint8_t  side_button_1_long;          ///< Side button 1 long press, 0=disabled.
-    uint8_t  side_button_2;               ///< Side button 2 short press, 0=disabled.
-    uint8_t  side_button_2_long;          ///< Side button 2 long press, 0=disabled.
+    uint8_t  side_button_1;               ///< Side button 1 short press, 0=disabled, see @c UV390Codeplug::buttons_t::ButtonAction.
+    uint8_t  side_button_1_long;          ///< Side button 1 long press, 0=disabled, see @c UV390Codeplug::buttons_t::ButtonAction.
+    uint8_t  side_button_2;               ///< Side button 2 short press, 0=disabled, see @c UV390Codeplug::buttons_t::ButtonAction.
+    uint8_t  side_button_2_long;          ///< Side button 2 long press, 0=disabled, see @c UV390Codeplug::buttons_t::ButtonAction.
     uint8_t  _unused_6[10];               ///< Unknown set to 0x00.
     uint8_t  _unknown_16;                 ///< Unkown set to 0x01;
     uint8_t  long_press_dur;              ///< Long-press duration in 250ms steps, range [0x04,0x0f], default 0x04.
@@ -761,22 +774,30 @@ protected:
 
     uint8_t  _unused_42[20];              ///< Unkown set to 0x00;
 
+    /** Default constructor. */
     buttons_t();
+    /** Clears the button settings.
+     * Sets side button 1 (long press) to 1750Hz tone and side button 2 (short press) to monitor
+     * toggle. */
     void clear();
   };
 
+  /** Represents the emergency settings within the codeplug on the radio. */
   struct __attribute__((packed)) emergency_t {
+    /** Represents a single emergency system within the radio. */
     struct __attribute__((packed)) system_t {
+      /** Possible alarm type for the system. */
       typedef enum {
-        DISABLED = 0,
-        REGULAR = 1,
-        SILENT = 2,
-        SILENT_W_VOICE = 3
+        DISABLED = 0,                     ///< No alarm at all
+        REGULAR = 1,                      ///< Regular alarm sound.
+        SILENT = 2,                       ///< Silent alarm.
+        SILENT_W_VOICE = 3                ///< silent alarm with voice.
       } AlarmType;
+      /** Possible alarm modes for the system. */
       typedef enum {
-        ALARM = 0,
-        ALARM_W_CALL = 1,
-        ALARM_W_VOICE = 2
+        ALARM = 0,                        ///< Just alarm.
+        ALARM_W_CALL = 1,                 ///< Alarm + call.
+        ALARM_W_VOICE = 2                 ///< Alarm + call + voice?
       } AlarmMode;
 
       uint16_t name[16];                  ///< System name 16 x 16bit unicode 0x0000 terminated.
@@ -790,9 +811,11 @@ protected:
       uint16_t revert_channel;            ///< Revert channel index+1, 0xfffe Selected, 0x0000 System disabled.
       uint16_t _unused_37;                ///< Unused, set to 0xffff.
 
+      /** Default constructor. */
       system_t();
+      /** Resets and invalidates emergency system. */
       void clear();
-
+      /** Retruns true, if the emergency system is valid (enabled). */
       bool isValid() const;
     };
 
@@ -806,16 +829,21 @@ protected:
     uint8_t _unused_4[12];                ///< Unused 12bytes set to 0xff;
     system_t systems[32];                 ///< 32 x system_t Emergency systems.
 
+    /** Default constructor also disables all systems. */
     emergency_t();
+    /** Clears and resets all emergency system settings. */
     void clear();
   };
 
+  /** Represents all privacy settings within the codeplug on the device. */
   struct __attribute__((packed)) privacy_t {
     uint8_t enhanced_keys[8][16];         ///< 8 x 16-byte enhanced keys. Filled with 0xff by default.
     uint8_t _reserved[16];                ///< Unused/reserved space 16-byte filled with 0xff.
     uint8_t basic_keys[16][2];            ///< 16 x 2-byte basic keys. Filled with 0xff by default.
 
+    /** Default constructor. */
     privacy_t();
+    /** Resets all privacy keys. */
     void clear();
   };
 
@@ -829,9 +857,10 @@ protected:
   };
 
 public:
-  /** Default constructor. */
+  /** Empty constructor. */
 	explicit UV390Codeplug(QObject *parent = nullptr);
 
+  /** Clears and resets the complete codeplug to some default values. */
   void clear();
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */

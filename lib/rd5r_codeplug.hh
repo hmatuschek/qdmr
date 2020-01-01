@@ -35,6 +35,9 @@ class RXGroupList;
  * The first segment starts at the address 0x00080 and ends at 0x07c00 while the second section
  * starts at 0x08000 and ends at 0x1e300.
  *
+ * Please note, that the codeplug is not yet fully understood and a full codeplug cannot be build
+ * from scratch. That is, it is necessary to update an existing codeplug on the radio.
+ *
  * <table>
  *  <tr><th>Start</th>   <th>End</th>     <th>Size</th>  <th>Content</th></tr>
  *  <tr><th colspan="4">First segment 0x00080-0x07c00</th></tr>
@@ -701,6 +704,9 @@ public:
 public:
   /** Empty constructor. */
   RD5RCodeplug(QObject *parent=0);
+
+  /** Resets the codeplug to some default values. */
+  void clear();
 
   /** Decodes the read codeplug and stores the result into the given generic configuration. */
   bool decode(Config *config);

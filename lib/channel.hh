@@ -272,7 +272,9 @@ public:
   /** (Re-) Sets the default TX contact for this channel. */
 	bool setTXContact(DigitalContact *c);
 
+  /** Returns the GPS system associated with this channel or @c nullptr if not set. */
   GPSSystem *gpsSystem() const;
+  /** Associates the GPS System with this channel. */
   bool setGPSSystem(GPSSystem *gps);
 
 protected slots:

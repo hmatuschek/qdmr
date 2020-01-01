@@ -18,11 +18,8 @@
  * callsign database of up to 100000 entries. This can be used to resolve amlost any DMR ID assigned
  * (at the time of this writing, there are about 140k IDs assigned) to name and callsign.
  *
- * @todo Reverse-engineer and implement GSP system configuration.
  * @todo Reverse-engineer and implement CSV-Callsign database (100k entries) and connect with UserDatabase.
  * @todo Reverse-engineer and implement DTMF signaling systems to represent DTMFContact.
- * @todo Verify emergency system configuration for UV390 (does not need to be implemented properly
- *       as it is not being used.
  * @ingroup dsc */
 #ifndef UV390_HH
 #define UV390_HH
@@ -53,7 +50,10 @@ public:
   CodePlug &codeplug();
 
 public slots:
+  /** Starts the download of the codeplug and derives the generic configuration from it. */
 	bool startDownload(Config *config, bool blocking=false);
+  /** Derives the device-specific codeplug from the generic configuration and uploads that
+   * codeplug to the radio. */
   bool startUpload(Config *config, bool blocking=false, bool update=true);
 
 protected:

@@ -47,8 +47,9 @@ RD5RCodeplug::channel_t::clear() {
   _unused38              = 0;
   rx_signaling_syst      = 0;
   _unused40              = 0x16;
-  privacy_group          = 0;
+  privacy_group          = PRIVGR_NONE;
   emergency_system_index = 0;
+  contact_name_index     = 0;
   _unused48_0            = 0;
   emergency_alarm_ack    = 0;
   data_call_conf         = 0;
@@ -59,6 +60,7 @@ RD5RCodeplug::channel_t::clear() {
   _unused49_7            = 0;
   dcdm                   = 0;
   _unused50_1            = 0;
+  non_ste_frequency      = 0;
   _unused50_6            = 0;
   _unused51_0            = 0;
   talkaround             = 0;
@@ -738,21 +740,32 @@ RD5RCodeplug::RD5RCodeplug(QObject *parent)
   addImage("Radioddity RD5R Codeplug");
   image(0).addElement(0x00080, 0x07b80);
   image(0).addElement(0x08000, 0x16300);
+}
 
+void
+RD5RCodeplug::clear()
+{
   // Clear codeplug and set to default values
+  memset(data(0x00080), 0xff, 0x07b80);
+  memset(data(0x08000), 0xff, 0x16300);
+
   // clear timestamp
   timestamp_t *ts = (timestamp_t *)data(OFFSET_TIMESTMP);
   ts->setNow();
+
   // Clear basic config and set to default values
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
   gs->clear();
   gs->initDefault();
+
   // Clear default button settings
   button_settings_t *bs = (button_settings_t *)data(OFFSET_BUTTONS);
   bs->initDefault();
+
   // Clear intro text.
   intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
   it->clear();
+
   // Clear channels
   for (int i=0; i<NCHAN; i++) {
     // First, get bank
@@ -766,6 +779,7 @@ RD5RCodeplug::RD5RCodeplug(QObject *parent)
     // Disable channel
     b->bitmap[(i % 128) / 8] &= ~(1 << (i & 7));
   }
+
   // Clear Zones
   for (int i=0; i<NZONES; i++) {
     zonetab_t *zt = (zonetab_t*) data(OFFSET_ZONETAB);
@@ -774,6 +788,7 @@ RD5RCodeplug::RD5RCodeplug(QObject *parent)
     zt->bitmap[i / 8] &= ~(1 << (i & 7));
     z->clear();
   }
+
   // Clear Scanlists
   for (int i=0; i<NSCANL; i++) {
     scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB);
@@ -782,16 +797,19 @@ RD5RCodeplug::RD5RCodeplug(QObject *parent)
     st->valid[i] = 0;
     sl->clear();
   }
+
   // Clear contacts
   for (int i=0; i<NCONTACTS; i++) {
     contact_t *ct = (contact_t*) data(OFFSET_CONTACTS + (i)*sizeof(contact_t));
     ct->clear();
   }
+
   // Clear DTMF contacts
   for (int i=0; i<NDTMF; i++) {
     dtmf_contact_t *ct = (dtmf_contact_t*) data(OFFSET_DTMF + (i)*sizeof(dtmf_contact_t));
     ct->clear();
   }
+
   // Clear Grouplists:
   for (int i=0; i<NGLISTS; i++) {
     grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB);
