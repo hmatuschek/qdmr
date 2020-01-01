@@ -43,6 +43,15 @@ or the command-line-tool with
 
     sudo apt-get install dmrconf
 
+### Permissions
+When running *qdmr* or *dmrconf* under Linux, you may need to change the permissions to access USB devices.  Create a file /etc/udev/rules.d/99-dmr.rules with the following contents:
+
+    # TYT MD-UV380
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", MODE="666"
+    
+    # Baofeng RD-5R, TD-5R
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="15a2", ATTRS{idProduct}=="0073", MODE="666"
+
 
 ## License
 qdmr - A GUI application and command-line-tool to programm DMR radios.
