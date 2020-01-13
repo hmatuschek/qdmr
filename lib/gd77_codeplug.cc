@@ -251,7 +251,7 @@ GD77Codeplug::GD77Codeplug(QObject *parent)
 }
 
 bool
-GD77Codeplug::encode(Config *config) {
+GD77Codeplug::encode(Config *config, UserDatabase *users) {
   /// @bug Implement!
   return false;
 }

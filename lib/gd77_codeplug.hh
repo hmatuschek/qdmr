@@ -270,7 +270,7 @@ public:
 	/** Decodes the binary codeplug and stores its content in the given generic configuration. */
 	bool decode(Config *config);
   /** Encodes the given generic configuration as a binary codeplug. */
-	bool encode(Config *config);
+  bool encode(Config *config, UserDatabase *users=nullptr);
 };
 
 #endif // GD77_CODEPLUG_HH

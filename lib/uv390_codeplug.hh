@@ -52,6 +52,10 @@ class GPSSystem;
  *  <tr><td>0x13f600</td> <td>0x140800</td> <td>0x01200</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x140800</td> <td>0x198640</td> <td>0x57e40</td> <td>10000 Contacts @ 0x24 bytes each, see @c UV390Codeplug::contact_t.</td></tr>
  *  <tr><td>0x198640</td> <td>0x1a0800</td> <td>0x081c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><th colspan=4">Callsign database 0x0200000-0x1000000</th></tr>
+ *  <tr><td>0x200000</td> <td>0x204003</td> <td>0x04003</td> <td>Callsign database index table, see @c UV390Codeplug::callsign_db_t</td></tr>
+ *  <tr><td>0x204003</td> <td>0xffffdb</td> <td>0xdfbfd8</td> <td>122197 callsign database entries, see @c UV390Codeplug::callsign_db_t::callsign_t. </td></tr>
+ *  <tr><td>0xffffdb</td> <td>0x1000000</td> <td>0x00025</td> <td>Padding, filled with @c 0xff.</td></tr>
  * </table>
  *
  * @ingroup uv390 */
@@ -847,13 +851,56 @@ protected:
     void clear();
   };
 
-	/** Represents an entry within the callsign database.
-   * @todo Implement generic config representation for callsign database. */
-  struct __attribute__((packed)) callsign_t {
-    uint32_t dmrid   : 24,                ///< DMR id in BCD
-      _unused        :  8;                ///< Unknown set to 0xff.
-    char callsign[16];                    ///< ASCII zero-terminated
-    char name[100];                       ///< Descriptive name, nickname, city, state, country.
+  /** Represents a search index over the complete callsign database. */
+  struct __attribute__((packed)) callsign_db_t {
+    /** Represents an index entry, a pair of DMR ID and callsign DB index. */
+    struct __attribute__((packed)) entry_t {
+      uint32_t id_high: 12,               ///< High bits of DMR ID (23:12).
+        index: 20;                        ///< Index in callsign data base where to find these.
+
+      /// Empty constructor.
+      entry_t();
+
+      /** Clears this entry. */
+      void clear();
+      /** Returns true, if the database index entry is valid. */
+      bool isValid() const;
+    };
+
+    /** Represents an entry within the callsign database.
+     * The callsign DB entries must be ordered by their DMR id. */
+    struct __attribute__((packed)) callsign_t {
+      uint8_t dmrid[3];                   ///< DMR id in BCD
+      uint8_t _unused;                    ///< Unused set to 0xff.
+      char callsign[16];                  ///< ASCII zero-terminated
+      char name[100];                     ///< Descriptive name, nickname, city, state, country.
+
+      /// Empty constructor.
+      callsign_t();
+
+      /// Clears the DB entry.
+      void clear();
+      /// Returns @c true if entry is valid.
+      bool isValid() const;
+
+      void setID(uint32_t dmrid);
+      void setCall(const QString &call);
+      void setName(const QString &name);
+
+      void fromUser(const UserDatabase::User &user);
+    };
+
+    unsigned n : 24;                      ///< Number of contacts in compete database.
+    entry_t index[4096];                  ///< 4096 index entries, default 0xff.
+    callsign_t db[122197];                ///< 122197 database callsign entries.
+
+    /// Empty constructor.
+    callsign_db_t();
+
+    /// Clears the complete callsign database.
+    void clear();
+    /// Fills the callsign database from the given user db.
+    void fromUserDB(const UserDatabase *db);
   };
 
 public:
@@ -866,7 +913,7 @@ public:
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
 	bool decode(Config *config);
   /** Encodes the given generic configuration as a binary codeplug. */
-	bool encode(Config *config);
+  bool encode(Config *config, UserDatabase *users=nullptr);
 };
 
 #endif // RT3S_GPS_CODEPLUG_HH

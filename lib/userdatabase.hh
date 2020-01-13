@@ -15,7 +15,7 @@
  * This class repesents the complete DMR user database. The user database gets downloaded from
  * https://www.radioid.net/static/users.json and kept up-to-date by re-downloading it
  * periodically (by default every 30 days). This user database gets used in the GUI application
- * to help assemble private call contacts and to assemble so-call CSV callsign databases that
+ * to help assemble private call contacts and to assemble so-called CSV callsign databases, that
  * are programmable to some DMR radios to resolve the DMR ID to callsigns and names.
  *
  * @ingroup util */
