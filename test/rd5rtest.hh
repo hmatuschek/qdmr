@@ -21,6 +21,9 @@ private slots:
   void testDigitalContacts();
   void testRXGroups();
   void testDigitalChannels();
+  void testAnalogChannels();
+  void testZones();
+  void testScanLists();
 
 protected:
   RD5RCodeplug _codeplug;

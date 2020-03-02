@@ -42,6 +42,8 @@ RD5RCodeplug::channel_t::clear() {
   memset(name, 0xff, 16);
   _unused25              = 0;
   _unused30              = 0x50;
+  ctcss_dcs_receive      = 0xffff;
+  ctcss_dcs_transmit     = 0xffff;
   _unused36              = 0;
   tx_signaling_syst      = 0;
   _unused38              = 0;
@@ -1069,6 +1071,7 @@ RD5RCodeplug::encode(Config *config, UserDatabase *users)
     }
 
     // Construct from Channel object
+    ch->clear();
     ch->fromChannelObj(config->channelList()->channel(i), config);
 
     // Set valid bit.
