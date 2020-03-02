@@ -4,6 +4,7 @@
 #include "logger.hh"
 
 #include <QRegExp>
+#include <QDebug>
 
 QVector< QPair<QRegExp, CSVLexer::Token::TokenType> > CSVLexer::_pattern = {
   { QRegExp("^([a-zA-Z_][a-zA-Z0-9_]*)"),      CSVLexer::Token::T_KEYWORD },
@@ -798,7 +799,7 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
-  qint64 tot =  (CSVLexer::Token::T_NOT_SET != token.type) ? 0 : token.value.toInt();
+  qint64 tot =  (CSVLexer::Token::T_NOT_SET == token.type) ? 0 : token.value.toInt();
 
   bool rxOnly;
   token = lexer.next();
@@ -997,7 +998,7 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
-  qint64 tot =  (CSVLexer::Token::T_NOT_SET != token.type) ? 0 : token.value.toInt();
+  qint64 tot =  (CSVLexer::Token::T_NOT_SET == token.type) ? 0 : token.value.toInt();
 
   bool rxOnly;
   token = lexer.next();

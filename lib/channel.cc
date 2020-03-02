@@ -17,6 +17,7 @@
 #include <QCompleter>
 #include <QAbstractProxyModel>
 
+#include <QDebug>
 
 /* ********************************************************************************************* *
  * Implementation of Channel
