@@ -39,8 +39,8 @@ protected:
    * @param rxOnly    Specifies whether the channel is RX only.
    * @param scanlist  Specifies the default scanlist for the channel.
    * @param parent    Specified the @c QObject parent object. */
-	Channel(const QString &name, float rx, float tx, Power power, uint txTimeout, bool rxOnly,
-	        ScanList *scanlist, QObject *parent=nullptr);
+  Channel(const QString &name, double rx, double tx, Power power, uint txTimeout, bool rxOnly,
+          ScanList *scanlist, QObject *parent=nullptr);
 
 public:
   /** Returns @c true if the channel is of type @c T. This can be used to text wheter this channel
@@ -68,13 +68,13 @@ public:
   bool setName(const QString &name);
 
   /** Returns the RX frequency of the channel in MHz. */
-  float rxFrequency() const;
+  double rxFrequency() const;
   /** (Re-)Sets the RX frequency of the channel in MHz. */
-  bool setRXFrequency(float freq);
+  bool setRXFrequency(double freq);
   /** Returns the TX frequency of the channel in MHz. */
-  float txFrequency() const;
+  double txFrequency() const;
   /** (Re-)Sets the TX frequency of the channel in MHz. */
-  bool setTXFrequency(float freq);
+  bool setTXFrequency(double freq);
 
   /** Returns the power setting of the channel. */
   Power power() const;
@@ -108,9 +108,9 @@ protected:
   /** The channel name. */
   QString _name;
   /** The RX frequency in MHz. */
-  float _rxFreq;
+  double _rxFreq;
   /** The TX frequency in MHz. */
-  float _txFreq;
+  double _txFreq;
   /** The transmit power setting. */
   Power _power;
   /** Transmit timeout in seconds. */
@@ -160,7 +160,7 @@ public:
    * @param bw        Specifies the bandwidth.
    * @param list      Specifies the default scanlist for the channel.
    * @param parent    Specified the @c QObject parent object. */
-	AnalogChannel(const QString &name, float rxFreq, float txFreq, Power power, uint txTimeout,
+  AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
 	              bool rxOnly, Admit admit, uint squelch, float rxTone, float txTone, Bandwidth bw,
                 ScanList *list, QObject *parent=nullptr);
 
@@ -243,7 +243,7 @@ public:
    * @param gpsSystem Specifies the GPS system to use on this channel.
    * @param list      Specifies the default scanlist for the channel.
    * @param parent    Specified the @c QObject parent object. */
-	DigitalChannel(const QString &name, float rxFreq, float txFreq, Power power, uint txTimeout,
+  DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
 	               bool rxOnly, Admit admit, uint colorCode, TimeSlot timeslot, RXGroupList *rxGroup,
                  DigitalContact *txContact, GPSSystem *gpsSystem, ScanList *list, QObject *parent=nullptr);
 

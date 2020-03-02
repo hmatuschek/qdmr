@@ -1,6 +1,7 @@
 #include "utils.hh"
 #include <QRegExp>
 #include <QVector>
+#include <cmath>
 
 
 QString
@@ -40,40 +41,33 @@ encode_ascii(uint8_t *data, const QString &text, size_t size, uint16_t fill) {
   }
 }
 
-inline int iround(double x) {
-  if (x >= 0)
-    return (int)(x + 0.5);
-  return -(int)(-x + 0.5);
-}
-
-
 double
 decode_frequency(uint32_t bcd) {
   double freq =
-      100.0   * ((bcd >> 28) & 0xf) +
-      10.0    * ((bcd >> 24) & 0xf) +
-      1.0     * ((bcd >> 20) & 0xf) +
-      0.1     * ((bcd >> 16) & 0xf) +
-      0.01    * ((bcd >> 12) & 0xf) +
-      0.001   * ((bcd >>  8) & 0xf) +
-      0.0001  * ((bcd >>  4) & 0xf) +
-      0.00001 * ((bcd >>  0) & 0xf);
+      1e2  * ((bcd >> 28) & 0xf) +
+      1e1  * ((bcd >> 24) & 0xf) +
+      1.0  * ((bcd >> 20) & 0xf) +
+      1e-1 * ((bcd >> 16) & 0xf) +
+      1e-2 * ((bcd >> 12) & 0xf) +
+      1e-3 * ((bcd >>  8) & 0xf) +
+      1e-4 * ((bcd >>  4) & 0xf) +
+      1e-5 * ((bcd >>  0) & 0xf);
   return freq;
 }
 
 uint32_t
 encode_frequency(double freq) {
-  uint32_t hz = iround(freq * 1000000.0);
+  uint32_t hz = std::round(freq * 1e6);
   uint32_t a  = (hz / 100000000) % 10;
-  uint32_t b  = (hz / 10000000)  % 10;
-  uint32_t c  = (hz / 1000000)   % 10;
-  uint32_t d  = (hz / 100000)    % 10;
-  uint32_t e  = (hz / 10000)     % 10;
-  uint32_t f  = (hz / 1000)      % 10;
-  uint32_t g  = (hz / 100)       % 10;
-  uint32_t h  = (hz / 10)        % 10;
+  uint32_t b  = (hz /  10000000) % 10;
+  uint32_t c  = (hz /   1000000) % 10;
+  uint32_t d  = (hz /    100000) % 10;
+  uint32_t e  = (hz /     10000) % 10;
+  uint32_t f  = (hz /      1000) % 10;
+  uint32_t g  = (hz /       100) % 10;
+  uint32_t h  = (hz /        10) % 10;
 
-  return a << 28 | b << 24 | c << 20 | d << 16 | e << 12 | f << 8 | g << 4 | h;
+  return (a << 28) + (b << 24) + (c << 20) + (d << 16) + (e << 12) + (f << 8) + (g << 4) + h;
 }
 
 

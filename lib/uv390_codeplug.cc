@@ -1204,6 +1204,9 @@ UV390Codeplug::callsign_db_t::clear() {
 
 void
 UV390Codeplug::callsign_db_t::fromUserDB(const UserDatabase *db) {
+  // Clear database and index
+  clear();
+  // Limit users to 122197 entries
   n = std::min(122197ll, db->count());
   // If there are no users -> done.
   if (0 == n)
@@ -1213,7 +1216,8 @@ UV390Codeplug::callsign_db_t::fromUserDB(const UserDatabase *db) {
   QVector<UserDatabase::User> users;
   for (int i=0; i<n; i++)
     users.append(db->user(i));
-  std::sort(users.begin(), users.end(), [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
+  std::sort(users.begin(), users.end(),
+            [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
 
   // First index entry
   int  j = 0;

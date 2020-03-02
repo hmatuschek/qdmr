@@ -52,7 +52,7 @@ class GPSSystem;
  *  <tr><td>0x13f600</td> <td>0x140800</td> <td>0x01200</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x140800</td> <td>0x198640</td> <td>0x57e40</td> <td>10000 Contacts @ 0x24 bytes each, see @c UV390Codeplug::contact_t.</td></tr>
  *  <tr><td>0x198640</td> <td>0x1a0800</td> <td>0x081c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><th colspan=4">Callsign database 0x0200000-0x1000000</th></tr>
+ *  <tr><th colspan="4">Callsign database 0x0200000-0x1000000</th></tr>
  *  <tr><td>0x200000</td> <td>0x204003</td> <td>0x04003</td> <td>Callsign database index table, see @c UV390Codeplug::callsign_db_t</td></tr>
  *  <tr><td>0x204003</td> <td>0xffffdb</td> <td>0xdfbfd8</td> <td>122197 callsign database entries, see @c UV390Codeplug::callsign_db_t::callsign_t. </td></tr>
  *  <tr><td>0xffffdb</td> <td>0x1000000</td> <td>0x00025</td> <td>Padding, filled with @c 0xff.</td></tr>
@@ -63,7 +63,7 @@ class UV390Codeplug : public CodePlug
 {
   Q_OBJECT
 
-protected:
+public:
   /** Represents a single channel (analog or digital) within the codeplug. */
   struct __attribute__((packed)) channel_t {
     /** Possible channel modes. */
@@ -872,8 +872,9 @@ protected:
     struct __attribute__((packed)) callsign_t {
       uint8_t dmrid[3];                   ///< DMR id in BCD
       uint8_t _unused;                    ///< Unused set to 0xff.
-      char callsign[16];                  ///< ASCII zero-terminated
-      char name[100];                     ///< Descriptive name, nickname, city, state, country.
+      char callsign[16];                  ///< 16 x ASCII zero-terminated.
+      char name[100];                     ///< Descriptive name, nickname, city, state, country. 100 x ASCII zero-terminated.
+
 
       /// Empty constructor.
       callsign_t();
@@ -882,11 +883,13 @@ protected:
       void clear();
       /// Returns @c true if entry is valid.
       bool isValid() const;
-
+      /** Sets the ID of the entry. */
       void setID(uint32_t dmrid);
+      /** Sets the call of the entry. */
       void setCall(const QString &call);
+      /** Sets the name, city, country etc. of the entry. */
       void setName(const QString &name);
-
+      /** Constructs an entry from the given user. */
       void fromUser(const UserDatabase::User &user);
     };
 

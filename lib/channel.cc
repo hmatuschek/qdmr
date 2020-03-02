@@ -18,11 +18,10 @@
 #include <QAbstractProxyModel>
 
 
-
 /* ********************************************************************************************* *
  * Implementation of Channel
  * ********************************************************************************************* */
-Channel::Channel(const QString &name, float rx, float tx, Power power, uint txTimeout, bool rxOnly, ScanList *scanlist,
+Channel::Channel(const QString &name, double rx, double tx, Power power, uint txTimeout, bool rxOnly, ScanList *scanlist,
                  QObject *parent)
   : QObject(parent), _name(name), _rxFreq(rx), _txFreq(tx), _power(power), _txTimeOut(txTimeout),
     _rxOnly(rxOnly), _scanlist(scanlist)
@@ -43,23 +42,22 @@ Channel::setName(const QString &name) {
   return true;
 }
 
-float
-Channel::rxFrequency() const {
+double Channel::rxFrequency() const {
   return _rxFreq;
 }
 bool
-Channel::setRXFrequency(float freq) {
+Channel::setRXFrequency(double freq) {
   _rxFreq = freq;
   emit modified();
   return true;
 }
 
-float
+double
 Channel::txFrequency() const {
   return _txFreq;
 }
 bool
-Channel::setTXFrequency(float freq) {
+Channel::setTXFrequency(double freq) {
   _txFreq = freq;
   emit modified();
   return true;
@@ -123,7 +121,7 @@ Channel::onScanListDeleted(QObject *obj) {
 /* ********************************************************************************************* *
  * Implementation of AnalogChannel
  * ********************************************************************************************* */
-AnalogChannel::AnalogChannel(const QString &name, float rxFreq, float txFreq, Power power,
+AnalogChannel::AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power,
                              uint txTimeout, bool rxOnly, Admit admit, uint squelch, float rxTone,
                              float txTone, Bandwidth bw, ScanList *list, QObject *parent)
   : Channel(name, rxFreq, txFreq, power, txTimeout, rxOnly, list, parent),
@@ -190,7 +188,7 @@ AnalogChannel::setBandwidth(Bandwidth bw) {
 /* ********************************************************************************************* *
  * Implementation of DigitalChannel
  * ********************************************************************************************* */
-DigitalChannel::DigitalChannel(const QString &name, float rxFreq, float txFreq, Power power,
+DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power,
                                uint txto, bool rxOnly, Admit admit, uint colorCode,
                                TimeSlot timeslot, RXGroupList *rxGroup, DigitalContact *txContact,
                                GPSSystem *gpsSystem, ScanList *list, QObject *parent)

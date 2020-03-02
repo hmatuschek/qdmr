@@ -9,6 +9,7 @@ find_package(Qt5UiTools REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Positioning REQUIRED)
 find_package(Qt5LinguistTools REQUIRED)
+find_package(Qt5Test REQUIRED)
 find_package(LIBUSB_1 REQUIRED)
 
 ADD_DEFINITIONS(${Qt5Widgets_DEFINITIONS})
@@ -22,6 +23,7 @@ INCLUDE_DIRECTORIES(${Qt5Widgets_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${Qt5UiTools_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${Qt5Network_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${Qt5Positioning_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${Qt5Test_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${LIBUSB_1_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/lib)
@@ -30,7 +32,8 @@ LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/src)
 
 set(LIBS ${Qt5Core_LIBRARIES} ${Qt5Core_QTMAIN_LIBRARIES} ${Qt5Widgets_LIBRARIES}
 	${Qt5UiTools_LIBRARIES} ${Qt5Network_LIBRARIES} ${Qt5Positioning_LIBRARIES}
-	${LIBUSB_1_LIBRARIES})
+  ${Qt5Test_LIBRARIES} ${LIBUSB_1_LIBRARIES})
+
 IF (UNIX AND APPLE)
  SET(LIBS ${LIBS} "-framework IOKit -framework CoreFoundation")
 ENDIF(UNIX AND APPLE)
@@ -66,6 +69,9 @@ ENDIF(UNIX AND NOT APPLE)
 add_subdirectory(lib)
 add_subdirectory(cli)
 add_subdirectory(src)
+
+enable_testing()
+add_subdirectory(test)
 
 # Source distribution packages:
 set(CPACK_PACKAGE_VERSION_MAJOR "${VERSION_MAJOR}")

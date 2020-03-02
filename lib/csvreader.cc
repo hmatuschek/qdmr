@@ -725,6 +725,7 @@ CSVParser::_parse_digital_channels(CSVLexer &lexer) {
 
 bool
 CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
+  bool ok=false;
   CSVLexer::Token token = lexer.next();
   qint64 line=token.line, column=token.column;
   if (CSVLexer::Token::T_STRING != token.type) {
@@ -740,7 +741,12 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
-  double rx = token.value.toDouble();
+  double rx = token.value.toDouble(&ok);
+  if (! ok) {
+    _errorMessage = QString("Parse error @ %1,%2: Cannot convert '%3' to double.")
+        .arg(token.line).arg(token.column).arg(token.value);
+    return false;
+  }
 
   token = lexer.next();
   if (CSVLexer::Token::T_NUMBER != token.type) {
@@ -748,7 +754,12 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
-  double tx = token.value.toDouble();
+  double tx = token.value.toDouble(&ok);
+  if (! ok) {
+    _errorMessage = QString("Parse error @ %1,%2: Cannot convert '%3' to double.")
+        .arg(token.line).arg(token.column).arg(token.value);
+    return false;
+  }
   if (token.value.startsWith('+') || token.value.startsWith('-'))
     tx = rx + tx;
 
@@ -872,7 +883,7 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  qint64 gps; bool ok;
+  qint64 gps;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
     gps = 0;
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
