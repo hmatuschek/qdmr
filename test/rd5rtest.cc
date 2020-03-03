@@ -373,6 +373,14 @@ RD5RTest::testDecode() {
   Config decoded;
   QVERIFY(_codeplug.decode(&decoded));
 
+  // Compare basic config
+  QCOMPARE(decoded.name(), _config.name());
+  QCOMPARE(decoded.id(), _config.id());
+  QCOMPARE(decoded.introLine1(), _config.introLine1());
+  QCOMPARE(decoded.introLine2(), _config.introLine2());
+  QCOMPARE(decoded.micLevel(), _config.micLevel());
+  QCOMPARE(decoded.speech(), _config.speech());
+
   // Compare contacts
   QCOMPARE(decoded.contacts()->count(), _config.contacts()->count());
   for (int i=0; i<_config.contacts()->count(); i++) {
@@ -457,5 +465,27 @@ RD5RTest::testDecode() {
       QCOMPARE(dec->bandwidth(), ori->bandwidth());
     }
   }
+
+  // Compare Zones. Note Zones with VFO A/B are split into individual zones for RD5R
+  QCOMPARE(decoded.zones()->count(), 2*_config.zones()->count());
+  QCOMPARE(decoded.zones()->zone(0)->name(), _config.zones()->zone(0)->name()+" A");
+  QCOMPARE(decoded.zones()->zone(0)->A()->count(), _config.zones()->zone(0)->A()->count());
+  for (int i=0; i<_config.zones()->zone(0)->A()->count(); i++) {
+    QCOMPARE(decoded.channelList()->indexOf(decoded.zones()->zone(0)->A()->channel(i)),
+             _config.channelList()->indexOf(_config.zones()->zone(0)->A()->channel(i)));
+  }
+  QCOMPARE(decoded.zones()->zone(1)->name(), _config.zones()->zone(0)->name()+" B");
+  QCOMPARE(decoded.zones()->zone(1)->A()->count(), _config.zones()->zone(0)->B()->count());
+  for (int i=0; i<_config.zones()->zone(0)->B()->count(); i++) {
+    QCOMPARE(decoded.channelList()->indexOf(decoded.zones()->zone(1)->A()->channel(i)),
+             _config.channelList()->indexOf(_config.zones()->zone(0)->B()->channel(i)));
+  }
+
+  // Compare scanlist
+  QCOMPARE(decoded.scanlists()->count(), _config.scanlists()->count());
+
+  // Do not compare GPS systems (RD5R has no GPS).
+  QCOMPARE(decoded.gpsSystems()->count(), 0);
 }
+
 QTEST_GUILESS_MAIN(RD5RTest)
