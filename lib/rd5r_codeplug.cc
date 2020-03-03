@@ -551,8 +551,8 @@ RD5RCodeplug::general_settings_t::initDefault() {
   call_alert_dur       = 24; // 0x18
   lone_worker_response = 1;
   lone_worker_reminder = 10; //0x0a
-  talkaround_grp_hang  = 6;
-  talkaround_priv_hang = 6;
+  grp_hang  = 6;
+  priv_hang = 6;
 
   // default value 0x40
   downch_mode_vfo      = 0;

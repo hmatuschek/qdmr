@@ -464,8 +464,8 @@ public:
     uint8_t call_alert_dur;        ///< Call-alert tone duration in 5sec steps, 0=infinity, 1=5s, etc, default 0x18=120s.
     uint8_t lone_worker_response;  ///< Lone-worker response timer in minutes [1,255], default 1.
     uint8_t lone_worker_reminder;  ///< Lone-worker reminder timer in seconds [1,255], default 10.
-    uint8_t talkaround_grp_hang;   ///< Talkaround group-call hang-time in 500ms setps 0=0ms, 1=500ms, default=3000ms (0x06).
-    uint8_t talkaround_priv_hang;  ///< Talkaround private-call hang-time in 500ms setps 0=0ms, 1=500ms, default=3000ms (0x06).
+    uint8_t grp_hang;              ///< Group-call hang-time in 500ms setps 0=0ms, 1=500ms, default=3000ms (0x06).
+    uint8_t priv_hang;             ///< Private-call hang-time in 500ms setps 0=0ms, 1=500ms, default=3000ms (0x06).
 
     uint8_t downch_mode_vfo: 1,    ///< Down-channel mode=VFO, default 0.
       upch_mode_vfo        : 1,    ///< Up-channel mode=VFO, default 0.

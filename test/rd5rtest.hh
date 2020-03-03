@@ -18,6 +18,7 @@ private slots:
   void testDMRID();
   void testRadioName();
   void testIntroLines();
+  void testGeneralDefaults();
   void testDigitalContacts();
   void testRXGroups();
   void testDigitalChannels();

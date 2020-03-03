@@ -27,7 +27,7 @@ RD5RTest::cleanupTestCase() {
 
 void
 RD5RTest::testRadioName() {
-  QCOMPARE(decode_ascii(_codeplug.data(0x000e0+0x00), 16, 0xff), QString("DM3MAT"));
+  QCOMPARE(decode_ascii(_codeplug.data(0x000e0+0x00), 8, 0xff), QString("DM3MAT"));
 }
 
 void
@@ -39,6 +39,45 @@ void
 RD5RTest::testIntroLines() {
   QCOMPARE(decode_ascii(_codeplug.data(0x07540+0x00), 16, 0xff), QString("ABC"));
   QCOMPARE(decode_ascii(_codeplug.data(0x07540+0x10), 16, 0xff), QString("DEF"));
+}
+
+void
+RD5RTest::testGeneralDefaults() {
+  // Unused 0x00
+  QCOMPARE((int)*(uint32_t *)_codeplug.data(0x000e0+0x0c), 0);
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x10), 0);
+  // TX preamble default=0x06
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x11), 6);
+  // Monitor type 0=open SQ
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x12), 0);
+  // VOX sensitivity default=3
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x13), 3);
+  // low batt interval default=6
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x14), 6);
+  // Call alert dur default=0x18
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x15), 0x18);
+  // Lone worker response default=1
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x16), 1);
+   // Lone worker reminder default=10
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x17), 10);
+  // Group call hang time default=6
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x18), 6);
+  // Private call hang time default=6
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x19), 6);
+  // Up/Down-Ch mode, RST tone, unk. numb. tone, ARTS tone, default=0x40
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x1a), 0x40);
+  // perm. tone analog/digi, self-test tone, CH freq. ind. tone, dis. all tones, save bat, default=0xc4
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x1b), 0xc4);
+   // dis. LEDs, quick-key override, default=0x80
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x1c), 0x80);
+  // TX exit tone, TX on act. CH, animation, scan mode, default=0x10
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x1d), 0x10);
+  // repeat. delay & STE, default=0
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x1e), 0);
+  // unused 0x00
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x000e0+0x1f), 0);
+  // prog passwd., disabled=0xffffffffffffffff
+  QCOMPARE(*(uint64_t *)_codeplug.data(0x000e0+0x20), 0xffffffffffffffffUL);
 }
 
 void
@@ -95,10 +134,10 @@ RD5RTest::testRXGroups() {
   /*
    * Test RX Group List 01
    */
-  QCOMPARE(decode_ascii(_codeplug.data(0x1d620+0x80), 16, 0xff), QString("Berlin/Brand")); // Check name
-  QCOMPARE((int)*((uint16_t *)_codeplug.data(0x1d620+0x90)), 0x01); // 1st member index +1
-  QCOMPARE((int)*((uint16_t *)_codeplug.data(0x1d620+0x92)), 0x02); // 2nd member index +1
-  QCOMPARE((int)*((uint16_t *)_codeplug.data(0x1d620+0x94)), 0x00); // 3nd member index == 0 (EOL)
+  QCOMPARE(decode_ascii(_codeplug.data(0x1d6a0+0x00), 16, 0xff), QString("Berlin/Brand")); // Check name
+  QCOMPARE((int)*((uint16_t *)_codeplug.data(0x1d6a0+0x10)), 0x01); // 1st member index +1
+  QCOMPARE((int)*((uint16_t *)_codeplug.data(0x1d6a0+0x12)), 0x02); // 2nd member index +1
+  QCOMPARE((int)*((uint16_t *)_codeplug.data(0x1d6a0+0x14)), 0x00); // 3nd member index == 0 (EOL)
 }
 
 void
