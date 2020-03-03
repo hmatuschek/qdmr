@@ -57,6 +57,20 @@ UV390Test::testDigitalChannels() {
 
 void
 UV390Test::testAnalogChannels() {
+  /*
+   * Test Channel 04
+   */
+  // Mode analog, BW 12.5kHz, Autoscan off, lone worker off
+  QCOMPARE((int)*(uint8_t *)_codeplug.data(0x1108c0+0x00), 0x61);
+  // Talkaround off, RX only off, TS 1, CC 1
+  QCOMPARE((int)*(uint8_t *)_codeplug.data(0x1108c0+0x01), 0x15);
+  // Priv #0, priv none, prv. call conf. off, data call conf. off
+  QCOMPARE((int)*(uint8_t *)_codeplug.data(0x1108c0+0x02), 0x00);
+  // rx ref freq low, emrg. ack off, PTT id off (inv)
+  QCOMPARE((int)*(uint8_t *)_codeplug.data(0x1108c0+0x03), 0xe0);
+  // tx ref freq low, VOX off, admit CH CTCSS tone
+  QCOMPARE((int)*(uint8_t *)_codeplug.data(0x1108c0+0x04), 0xa4);
+
 }
 
 void

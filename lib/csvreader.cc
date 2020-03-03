@@ -1019,7 +1019,7 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   } else if (CSVLexer::Token::T_KEYWORD == token.type) {
     if ("free" == token.value.toLower())
       admit = AnalogChannel::AdmitFree;
-    else if ("color" == token.value.toLower())
+    else if ("tone" == token.value.toLower())
       admit = AnalogChannel::AdmitTone;
     else {
       _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'Free', 'Tone'.")

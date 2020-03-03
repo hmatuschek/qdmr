@@ -453,8 +453,8 @@ RD5RTest::testDecode() {
     } else {
       AnalogChannel *dec = decoded.channelList()->channel(i)->as<AnalogChannel>();
       AnalogChannel *ori = _config.channelList()->channel(i)->as<AnalogChannel>();
-      // Compare admit criterion
-      QCOMPARE(dec->admit(), ori->admit());
+      // Do not compare admit criterion, RD5R does not support Admit: CTCSS, mapped -> CH FREE
+      QCOMPARE(dec->admit(), AnalogChannel::AdmitFree);
       // squelch
       QCOMPARE(dec->squelch(), ori->squelch());
       // RX Tone
