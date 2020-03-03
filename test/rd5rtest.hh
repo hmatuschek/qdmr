@@ -1,8 +1,11 @@
 #ifndef RD5RTEST_HH
 #define RD5RTEST_HH
+
+#include "config.hh"
 #include "rd5r_codeplug.hh"
 
 #include <QObject>
+
 
 class RD5RTest : public QObject
 {
@@ -25,8 +28,10 @@ private slots:
   void testAnalogChannels();
   void testZones();
   void testScanLists();
+  void testDecode();
 
 protected:
+  Config _config;
   RD5RCodeplug _codeplug;
 };
 

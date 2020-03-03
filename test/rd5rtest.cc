@@ -12,11 +12,10 @@ RD5RTest::RD5RTest(QObject *parent) : QObject(parent)
 void
 RD5RTest::initTestCase() {
   // Read simple configuration file
-  Config config;
   QString errMessage;
-  QVERIFY(config.readCSV("://testconfig.conf", errMessage));
+  QVERIFY(_config.readCSV("://testconfig.conf", errMessage));
   // Encode config as code-plug
-  QVERIFY(_codeplug.encode(&config));
+  QVERIFY(_codeplug.encode(&_config));
 }
 
 void
@@ -368,4 +367,95 @@ RD5RTest::testScanLists() {
   QCOMPARE((int)*((uint8_t *)_codeplug.data(0x17620+0x01)), 0x00); // No scanlist enabled.
 }
 
+void
+RD5RTest::testDecode() {
+  /* Decode config */
+  Config decoded;
+  QVERIFY(_codeplug.decode(&decoded));
+
+  // Compare contacts
+  QCOMPARE(decoded.contacts()->count(), _config.contacts()->count());
+  for (int i=0; i<_config.contacts()->count(); i++) {
+    // Compare name
+    QCOMPARE(decoded.contacts()->contact(i)->name(), _config.contacts()->contact(i)->name());
+    // Compare number
+    QCOMPARE(decoded.contacts()->contact(i)->as<DigitalContact>()->number(),
+             _config.contacts()->contact(i)->as<DigitalContact>()->number());
+    // Compare type
+    QCOMPARE(decoded.contacts()->contact(i)->as<DigitalContact>()->type(),
+             _config.contacts()->contact(i)->as<DigitalContact>()->type());
+    // Compare tone
+    QCOMPARE(decoded.contacts()->contact(i)->rxTone(),
+             _config.contacts()->contact(i)->rxTone());
+  }
+
+  // Compare RX Groups
+  QCOMPARE(decoded.rxGroupLists()->count(), _config.rxGroupLists()->count());
+  for (int i=0; i<_config.rxGroupLists()->count(); i++) {
+    // Compare name
+    QCOMPARE(decoded.rxGroupLists()->list(i)->name(), _config.rxGroupLists()->list(i)->name());
+    // Compare number of entries
+    QCOMPARE(decoded.rxGroupLists()->list(i)->count(), _config.rxGroupLists()->list(i)->count());
+    // Compare entries
+    for (int j=0; j<_config.rxGroupLists()->list(i)->count(); j++) {
+      QCOMPARE(decoded.contacts()->indexOf(decoded.rxGroupLists()->list(i)->contact(j)),
+               _config.contacts()->indexOf(_config.rxGroupLists()->list(i)->contact(j)));
+    }
+  }
+
+  // Compare Channels
+  QCOMPARE(decoded.channelList()->count(), _config.channelList()->count());
+  for (int i=0; i<_config.channelList()->count(); i++) {
+    // Compare name
+    QCOMPARE(decoded.channelList()->channel(i)->name(), _config.channelList()->channel(i)->name());
+    // RX Frequency
+    QCOMPARE(decoded.channelList()->channel(i)->rxFrequency(), _config.channelList()->channel(i)->rxFrequency());
+    // TX Frequency
+    QCOMPARE(decoded.channelList()->channel(i)->txFrequency(), _config.channelList()->channel(i)->txFrequency());
+    // Power
+    QCOMPARE(decoded.channelList()->channel(i)->power(), _config.channelList()->channel(i)->power());
+    // TOT
+    QCOMPARE(decoded.channelList()->channel(i)->txTimeout(), _config.channelList()->channel(i)->txTimeout());
+    // RX only flag
+    QCOMPARE(decoded.channelList()->channel(i)->rxOnly(), _config.channelList()->channel(i)->rxOnly());
+    // Scanlist
+    QCOMPARE(decoded.scanlists()->indexOf(decoded.channelList()->channel(i)->scanList()),
+             _config.scanlists()->indexOf(_config.channelList()->channel(i)->scanList()));
+    // Check type
+    QCOMPARE(decoded.channelList()->channel(i)->is<DigitalChannel>(),
+             _config.channelList()->channel(i)->is<DigitalChannel>());
+    // Dispatch by type
+    if (_config.channelList()->channel(i)->is<DigitalChannel>()) {
+      DigitalChannel *dec = decoded.channelList()->channel(i)->as<DigitalChannel>();
+      DigitalChannel *ori = _config.channelList()->channel(i)->as<DigitalChannel>();
+      // Compare admit criterion
+      QCOMPARE(dec->admit(), ori->admit());
+      // color code
+      QCOMPARE(dec->colorCode(), ori->colorCode());
+      // time slot
+      QCOMPARE(dec->timeslot(), ori->timeslot());
+      // RX group list
+      QCOMPARE(decoded.rxGroupLists()->indexOf(dec->rxGroupList()),
+               _config.rxGroupLists()->indexOf(ori->rxGroupList()));
+      // TX contact
+      QCOMPARE(decoded.contacts()->indexOf(dec->txContact()),
+               _config.contacts()->indexOf(ori->txContact()));
+      // do not check GSP system (RD5R has no GPS).
+      QCOMPARE(dec->gpsSystem(), nullptr);
+    } else {
+      AnalogChannel *dec = decoded.channelList()->channel(i)->as<AnalogChannel>();
+      AnalogChannel *ori = _config.channelList()->channel(i)->as<AnalogChannel>();
+      // Compare admit criterion
+      QCOMPARE(dec->admit(), ori->admit());
+      // squelch
+      QCOMPARE(dec->squelch(), ori->squelch());
+      // RX Tone
+      QCOMPARE(dec->rxTone(), ori->rxTone());
+      // TX Tone
+      QCOMPARE(dec->txTone(), ori->txTone());
+      // Bandwidth
+      QCOMPARE(dec->bandwidth(), ori->bandwidth());
+    }
+  }
+}
 QTEST_GUILESS_MAIN(RD5RTest)
