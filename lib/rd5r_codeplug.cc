@@ -447,7 +447,7 @@ RD5RCodeplug::grouplist_t::linkRXGroupListObj(int ncnt, RXGroupList *lst, const 
 void
 RD5RCodeplug::grouplist_t::fromRXGroupListObj(const RXGroupList *lst, const Config *conf) {
   setName(lst->name());
-  for (int i=0; i<16; i++) {
+  for (int i=0; i<15; i++) {
     if (lst->count() > i) {
       member[i] = conf->contacts()->indexOfDigital(lst->contact(i))+1;
     } else {
@@ -1149,22 +1149,13 @@ next:
   for (int i=0; i<NGLISTS; i++) {
     grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB);
     grouplist_t *gl = &gt->grouplist[i];
-
     if (i >= config->rxGroupLists()->count()) {
       gt->nitems1[i] = 0;
       continue;
     }
-
     // Enable group list
-    gt->nitems1[i] = 1;
-
-    // RD-5R firmware up to v2.1.6 has a bug:
-    // when all 16 entries in RX group list are occupied,
-    // it stops functioning and no audio is received.
-    // As a workaround, we must use only 15 entries here.
-    for (int j=0; j<std::min(15,config->rxGroupLists()->list(i)->count()); j++)
-      gl->member[j] = config->contacts()->indexOf(config->rxGroupLists()->list(i)->contact(j))+1;
     gt->nitems1[i] = std::min(15,config->rxGroupLists()->list(i)->count()) + 1;
+    gl->fromRXGroupListObj(config->rxGroupLists()->list(i), config);
   }
 
   return true;
