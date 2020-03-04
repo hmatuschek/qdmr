@@ -52,6 +52,161 @@ UV390Test::testRXGroups() {
 
 void
 UV390Test::testDigitalChannels() {
+  /*
+   * Test Channel 01
+   */
+  // Mode digi, BW 12.5kHz, Autoscan off, lone worker off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x00), 0x62);
+  // Talkaround off, RX only off, TS 2, CC 1
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x01), 0x19);
+  // Priv #0, priv none, prv. call conf. off, data call conf. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x02), 0x00);
+  // rx ref freq low, emrg. ack off, PTT id off (inv)
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x03), 0xe0);
+  // tx ref freq low, VOX off, admit none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x04), 0xe4);
+  // in-call always, turn-off freq off.
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x05), 0xc0);
+  // TX contact 2
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x110800+0x06), 0x02);
+  // TOT 45s <-> 0x03
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x08), 0x03);
+  // TOT re-key delay 0
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x09), 0x00);
+  // Emerg. sys none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x0a), 0x00);
+  // Scanlist none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x0b), 0x00);
+  // RX group list 1
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x0c), 0x01);
+  // GPS system 1
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x0d), 0x01);
+  // DTMF decode none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x0e), 0x00);
+  // Squelch none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x0f), 0x00);
+  // RX frequency
+  QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x110800+0x10)), 439.5630);
+  // TX frequency
+  QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x110800+0x14)), 431.9630);
+  // RX CTCSS none
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110800+0x18)), 0.0);
+  // TX CTCSS none
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110800+0x1a)), 0.0);
+  // RX DTMF sig. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x1c), 0x00);
+  // TX DTMF sig. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x1d), 0x00);
+  // Power high
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x1e), 0xff);
+  // GPS on (inv), allow interrupt off (inv), DCDM off (inv), Leader/MS off (inv)
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x1f), 0xfc);
+  // Name
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x110800+0x20), 16, 0), QString("BB DB0LDS TS2"));
+
+  /*
+   * Test Channel 02
+   */
+  // Mode digi, BW 12.5kHz, Autoscan off, lone worker off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x00), 0x62);
+  // Talkaround off, RX only off, TS 2, CC 1
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x01), 0x19);
+  // Priv #0, priv none, prv. call conf. off, data call conf. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x02), 0x00);
+  // rx ref freq low, emrg. ack off, PTT id off (inv)
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x03), 0xe0);
+  // tx ref freq low, VOX off, admit none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x04), 0xe4);
+  // in-call always, turn-off freq off.
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x05), 0xc0);
+  // TX contact 2
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x110840+0x06), 0x02);
+  // TOT 45s <-> 0x03
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x08), 0x03);
+  // TOT re-key delay 0
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x09), 0x00);
+  // Emerg. sys none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x0a), 0x00);
+  // Scanlist none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x0b), 0x00);
+  // RX group list 1
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x0c), 0x01);
+  // GPS system 0
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x0d), 0x00);
+  // DTMF decode none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x0e), 0x00);
+  // Squelch none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x0f), 0x00);
+  // RX frequency
+  QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x110840+0x10)), 439.0870);
+  // TX frequency
+  QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x110840+0x14)), 431.4870);
+  // RX CTCSS none
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110840+0x18)), 0.0);
+  // TX CTCSS none
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110840+0x1a)), 0.0);
+  // RX DTMF sig. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x1c), 0x00);
+  // TX DTMF sig. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x1d), 0x00);
+  // Power high
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x1e), 0xff);
+  // GPS off (inv), allow interrupt off (inv), DCDM off (inv), Leader/MS off (inv)
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x1f), 0xff);
+  // Name
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x110840+0x20), 16, 0), QString("BB DM0TT TS2"));
+
+  /*
+   * Test Channel 03
+   */
+  // Mode digi, BW 12.5kHz, Autoscan off, lone worker off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x00), 0x62);
+  // Talkaround off, RX only off, TS 1, CC 1
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x01), 0x15);
+  // Priv #0, priv none, prv. call conf. off, data call conf. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x02), 0x00);
+  // rx ref freq low, emrg. ack off, PTT id off (inv)
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x03), 0xe0);
+  // tx ref freq low, VOX off, admit none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x04), 0xe4);
+  // in-call always, turn-off freq off.
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x05), 0xc0);
+  // TX contact 2
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x110880+0x06), 0x01);
+  // TOT 45s <-> 0x03
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x08), 0x03);
+  // TOT re-key delay 0
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x09), 0x00);
+  // Emerg. sys none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x0a), 0x00);
+  // Scanlist none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x0b), 0x00);
+  // RX group list 1
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x0c), 0x01);
+  // GPS system 0
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x0d), 0x00);
+  // DTMF decode none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x0e), 0x00);
+  // Squelch none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x0f), 0x00);
+  // RX frequency
+  QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x110880+0x10)), 439.5380);
+  // TX frequency
+  QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x110880+0x14)), 431.9380);
+  // RX CTCSS none
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110880+0x18)), 0.0);
+  // TX CTCSS none
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110880+0x1a)), 0.0);
+  // RX DTMF sig. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x1c), 0x00);
+  // TX DTMF sig. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x1d), 0x00);
+  // Power high
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x1e), 0xff);
+  // GPS off (inv), allow interrupt off (inv), DCDM off (inv), Leader/MS off (inv)
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x1f), 0xff);
+  // Name
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x110880+0x20), 16, 0), QString("TG9 DB0KK TS1"));
 }
 
 
@@ -61,16 +216,105 @@ UV390Test::testAnalogChannels() {
    * Test Channel 04
    */
   // Mode analog, BW 12.5kHz, Autoscan off, lone worker off
-  QCOMPARE((int)*(uint8_t *)_codeplug.data(0x1108c0+0x00), 0x61);
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x00), 0x61);
   // Talkaround off, RX only off, TS 1, CC 1
-  QCOMPARE((int)*(uint8_t *)_codeplug.data(0x1108c0+0x01), 0x15);
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x01), 0x15);
   // Priv #0, priv none, prv. call conf. off, data call conf. off
-  QCOMPARE((int)*(uint8_t *)_codeplug.data(0x1108c0+0x02), 0x00);
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x02), 0x00);
   // rx ref freq low, emrg. ack off, PTT id off (inv)
-  QCOMPARE((int)*(uint8_t *)_codeplug.data(0x1108c0+0x03), 0xe0);
-  // tx ref freq low, VOX off, admit CH CTCSS tone
-  QCOMPARE((int)*(uint8_t *)_codeplug.data(0x1108c0+0x04), 0xa4);
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x03), 0xe0);
+  // tx ref freq low, VOX off, admit CH admit tone
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x04), 0xa4);
+  // in-call always, turn-off freq off.
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x05), 0xc0);
+  // TX contact none
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x1108c0+0x06), 0x00);
+  // TOT 45s <-> 0x03
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x08), 0x03);
+  // TOT re-key delay 0
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x09), 0x00);
+  // Emerg. sys none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x0a), 0x00);
+  // Scanlist none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x0b), 0x00);
+  // RX group list 0
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x0c), 0x00);
+  // GPS system none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x0d), 0x00);
+  // DTMF decode none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x0e), 0x00);
+  // Squelch 1
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x0f), 0x01);
+  // RX frequency
+  QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x1108c0+0x10)), 439.5625);
+  // TX frequency
+  QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x1108c0+0x14)), 431.9625);
+  // RX CTCSS none
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x1108c0+0x18)), 67.0);
+  // TX CTCSS none
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x1108c0+0x1a)), 67.0);
+  // RX DTMF sig. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x1c), 0x00);
+  // TX DTMF sig. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x1d), 0x00);
+  // Power high
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x1e), 0xff);
+  // GPS off (inv), allow interrupt off (inv), DCDM off (inv), Leader/MS off (inv)
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x1f), 0xff);
+  // Name
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x1108c0+0x20), 16, 0), QString("DB0LDS"));
 
+  /*
+   * Test Channel 05
+   */
+  // Mode analog, BW 12.5kHz, Autoscan off, lone worker off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x00), 0x61);
+  // Talkaround off, RX only off, TS 1, CC 1
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x01), 0x15);
+  // Priv #0, priv none, prv. call conf. off, data call conf. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x02), 0x00);
+  // rx ref freq low, emrg. ack off, PTT id off (inv)
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x03), 0xe0);
+  // tx ref freq low, VOX off, admit CH free
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x04), 0x64);
+  // in-call always, turn-off freq off.
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x05), 0xc0);
+  // TX contact none
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x110900+0x06), 0x00);
+  // TOT 45s <-> 0x03
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x08), 0x03);
+  // TOT re-key delay 0
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x09), 0x00);
+  // Emerg. sys none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x0a), 0x00);
+  // Scanlist none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x0b), 0x00);
+  // RX group list none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x0c), 0x00);
+  // GPS system none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x0d), 0x00);
+  // DTMF decode none
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x0e), 0x00);
+  // Squelch 1
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x0f), 0x01);
+  // RX frequency
+  QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x110900+0x10)), 145.6000);
+  // TX frequency
+  QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x110900+0x14)), 145.0000);
+  // RX CTCSS none
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110900+0x18)), 0.0);
+  // TX CTCSS none
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110900+0x1a)), 0.0);
+  // RX DTMF sig. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x1c), 0x00);
+  // TX DTMF sig. off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x1d), 0x00);
+  // Power high
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x1e), 0xff);
+  // GPS off (inv), allow interrupt off (inv), DCDM off (inv), Leader/MS off (inv)
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x1f), 0xff);
+  // Name
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x110900+0x20), 16, 0), QString("DB0SP-2"));
 }
 
 void
@@ -204,7 +448,8 @@ UV390Test::testDecode() {
   // Compare GPS systems
   QCOMPARE(decoded.gpsSystems()->count(), _config.gpsSystems()->count());
   for (int i=0; i<_config.gpsSystems()->count(); i++) {
-    QCOMPARE(decoded.gpsSystems()->gpsSystem(i)->name(), _config.gpsSystems()->gpsSystem(i)->name());
+    // Do not compare GPS system name UV390 cannot save GPS system name.
+    QCOMPARE(decoded.gpsSystems()->gpsSystem(i)->name(), QString("GPS System"));
     QCOMPARE(decoded.gpsSystems()->gpsSystem(i)->period(), _config.gpsSystems()->gpsSystem(i)->period());
     QCOMPARE(decoded.contacts()->indexOf(decoded.gpsSystems()->gpsSystem(i)->contact()),
              _config.contacts()->indexOf(_config.gpsSystems()->gpsSystem(i)->contact()));

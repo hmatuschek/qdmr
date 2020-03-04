@@ -277,14 +277,18 @@ UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf
     const DigitalChannel *dchan = chan->as<const DigitalChannel>();
     channel_mode = MODE_DIGITAL;
     switch (dchan->admit()) {
-    case DigitalChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS;
-    case DigitalChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE;
-    case DigitalChannel::AdmitColorCode: admit_criteria = ADMIT_COLOR;
+    case DigitalChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS; break;
+    case DigitalChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE; break;
+    case DigitalChannel::AdmitColorCode: admit_criteria = ADMIT_COLOR; break;
     }
     color_code = dchan->colorCode();
     time_slot = (DigitalChannel::TimeSlot1 == dchan->timeslot()) ? 1 : 2;
     group_list_index = conf->rxGroupLists()->indexOf(dchan->rxGroupList()) + 1;
     contact_name_index = conf->contacts()->indexOfDigital(dchan->txContact()) + 1;
+    squelch = 0;
+    bandwidth = BW_12_5_KHZ;
+    ctcss_dcs_receive = 0xffff;
+    ctcss_dcs_transmit = 0xffff;
     if (dchan->gpsSystem()) {
       gps_system = conf->gpsSystems()->indexOf(dchan->gpsSystem())+1;
       send_gps_info = 0;
@@ -296,12 +300,14 @@ UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf
     bandwidth = ((AnalogChannel::BWNarrow == achan->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ);
     squelch = achan->squelch();
     switch (achan->admit()) {
-    case AnalogChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS;
-    case AnalogChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE;
-    case AnalogChannel::AdmitTone: admit_criteria = ADMIT_TONE;
+    case AnalogChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS; break;
+    case AnalogChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE; break;
+    case AnalogChannel::AdmitTone: admit_criteria = ADMIT_TONE; break;
     }
     ctcss_dcs_receive = encode_ctcss_tone_table(achan->rxTone());
     ctcss_dcs_transmit = encode_ctcss_tone_table(achan->txTone());
+    group_list_index = 0;
+    contact_name_index = 0;
   }
 }
 
