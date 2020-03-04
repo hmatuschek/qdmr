@@ -819,7 +819,7 @@ UV390Codeplug::general_settings_t::fromConfigObj(const Config *conf) {
   setIntroLine1(conf->introLine1());
   setIntroLine2(conf->introLine2());
   setTimeZone();
-  mic_level = conf->micLevel()/2;
+  mic_level = (conf->micLevel()-1)/2;
   channel_voice_announce = (conf->speech() ? 1 : 0);
 }
 

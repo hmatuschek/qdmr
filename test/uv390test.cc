@@ -26,28 +26,79 @@ UV390Test::cleanupTestCase() {
 
 void
 UV390Test::testRadioName() {
-
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x002840+0x70), 16, 0), QString("DM3MAT"));
 }
 
 void
 UV390Test::testDMRID() {
-
+  QCOMPARE(decode_dmr_id_bin(_codeplug.data(0x002840+0x44)), 1234567U);
 }
 
 void
 UV390Test::testIntroLines() {
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x002840+0x00), 10, 0), QString("ABC"));
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x002840+0x14), 10, 0), QString("DEF"));
 }
 
 void
 UV390Test::testGeneralDefaults() {
+  // Check voice announce (off)
+  QCOMPARE((int)*(uint8_t *)_codeplug.data(0x002840+0x42), 0xd8);
+  // Check MIC amplification: 3 in [1..10] => 1 in [0..5]
+  QCOMPARE((int)*(uint8_t *)_codeplug.data(0x002840+0xa0), 0x8f);
 }
 
 void
 UV390Test::testDigitalContacts() {
+  /*
+   * Test contact 01 (L9)
+   */
+  // Test ID
+  QCOMPARE(decode_dmr_id_bin(_codeplug.data(0x140800+0x00)), 9U);
+  // Type group call, rx tone off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x140800+0x03), 0xc1);
+  // Compare name
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x140800+0x04), 16, 0), QString("Lokal"));
+
+  /*
+   * Test contact 02 (BB)
+   */
+  // Test ID
+  QCOMPARE(decode_dmr_id_bin(_codeplug.data(0x140824+0x00)), 2621U);
+  // Type group call, rx tone off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x140824+0x03), 0xc1);
+  // Compare name
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x140824+0x04), 16, 0), QString("Bln/Brb"));
+
+  /*
+   * Test contact 03 (ALL)
+   */
+  // Test ID
+  QCOMPARE(decode_dmr_id_bin(_codeplug.data(0x140848+0x00)), 16777215U);
+  // Type all call, rx tone off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x140848+0x03), 0xc3);
+  // Compare name
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x140848+0x04), 16, 0), QString("All Call"));
+
+  /*
+   * Test contact 04 (APRS)
+   */
+  // Test ID
+  QCOMPARE(decode_dmr_id_bin(_codeplug.data(0x14086c+0x00)), 262999U);
+  // Type private call, rx tone off
+  QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x14086c+0x03), 0xc2);
+  // Compare name
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x14086c+0x04), 16, 0), QString("BM APRS"));
 }
 
 void
 UV390Test::testRXGroups() {
+  // Check name
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x00f420+0x00), 16, 0), QString("Berlin/Brand"));
+  // Check members
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x00f420+0x20), 1);
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x00f420+0x22), 2);
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x00f420+0x24), 0);
 }
 
 void
@@ -319,10 +370,22 @@ UV390Test::testAnalogChannels() {
 
 void
 UV390Test::testZones() {
+  // Check name
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x0151e0+0x00), 16, 0), QString("KW"));
+  // Check members A
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x0151e0+0x20), 1);
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x0151e0+0x22), 3);
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x0151e0+0x24), 5);
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x0151e0+0x26), 0);
+  // Check members B
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x031800+0x60), 2);
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x031800+0x62), 4);
 }
 
 void
 UV390Test::testScanLists() {
+  // There is none -> check if first scan list is invalid
+  QCOMPARE((int)*(uint16_t *)_codeplug.data(0x019060+0x00), 0x00);
 }
 
 void
