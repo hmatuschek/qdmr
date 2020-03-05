@@ -93,7 +93,7 @@ RepeaterDatabase::load(const QString &filename) {
   // Done.
   endResetModel();
 
-  logDebug() << "Loaded repeater database with " << _repeater.size() << " entries.";
+  logDebug() << "Loaded repeater database with " << _repeater.size() << " entries from " << filename << ".";
 
   return true;
 }

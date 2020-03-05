@@ -12,25 +12,28 @@
 #include <QCheckBox>
 
 #include "ui_contactdialog.h"
+class UserDatabase;
 
 class ContactDialog: public QDialog, private Ui::ContactDialog
 {
 	Q_OBJECT
 
 public:
-	ContactDialog(QWidget *parent=nullptr);
-	ContactDialog(Contact *contact, QWidget *parent=nullptr);
+  ContactDialog(UserDatabase *users, QWidget *parent=nullptr);
+  ContactDialog(UserDatabase *users, Contact *contact, QWidget *parent=nullptr);
 
 	Contact *contact();
 
 protected slots:
 	void onTypeChanged(int idx);
+  void onCompleterActivated(const QModelIndex &idx);
 
 protected:
 	void construct();
 
 protected:
 	Contact *_contact;
+  QCompleter *_completer;
 };
 
 

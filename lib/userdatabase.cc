@@ -21,7 +21,7 @@ UserDatabase::User::User()
 
 UserDatabase::User::User(const QJsonObject &obj)
   : id(obj.value("id").toInt()), call(obj.value("callsign").toString()),
-    name(obj.value("name").toString()), surname(obj.value("surname").toString()),
+    name(obj.value("fname").toString()), surname(obj.value("surname").toString()),
     country(obj.value("country").toString())
 {
   // pass...
@@ -107,19 +107,19 @@ UserDatabase::load(const QString &filename) {
     if (user.isValid())
       _user.append(user);
   }
-  // Sort repeater w.r.t. distance to me
+  // Sort repeater w.r.t. their IDs
   std::stable_sort(_user.begin(), _user.end(), [](const User &a, const User &b){ return a.id < b.id; });
   // Done.
   endResetModel();
 
-  logDebug() << "Loaded user database with " << _user.size() << " entries.";
+  logDebug() << "Loaded user database with " << _user.size() << " entries from " << filename << ".";
 
   return true;
 }
 
 void
 UserDatabase::sortUsers(uint id) {
-  // Sort repeater w.r.t. distance to me
+  // Sort repeater w.r.t. distance to ID
   std::stable_sort(_user.begin(), _user.end(), [id](const User &a, const User &b){
     return a.distance(id) < b.distance(id);
   });
@@ -190,13 +190,24 @@ UserDatabase::data(const QModelIndex &index, int role) const {
 
   if (0 == index.column()) {
     // Call
-    if (Qt::DisplayRole == role)
-      return tr("%1 (%2, %3)")
-          .arg(_user[index.row()].call)
-          .arg(_user[index.row()].name)
-          .arg(_user[index.row()].surname);
-    else
+    if (Qt::DisplayRole == role) {
+      if (_user[index.row()].surname.isEmpty()) {
+        if (_user[index.row()].name.isEmpty()) {
+          return _user[index.row()].call;
+        } else {
+          return tr("%1 (%2)")
+              .arg(_user[index.row()].call)
+              .arg(_user[index.row()].name);
+        }
+      } else {
+        return tr("%1 (%2, %3)")
+            .arg(_user[index.row()].call)
+            .arg(_user[index.row()].name)
+            .arg(_user[index.row()].surname);
+      }
+    } else {
       return _user[index.row()].call;
+    }
   } else if (1 == index.column()) {
     // ID
     return _user[index.row()].id;

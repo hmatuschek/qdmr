@@ -583,7 +583,7 @@ Application::onIntroLine2Changed() {
 
 void
 Application::onAddContact() {
-  ContactDialog dialog;
+  ContactDialog dialog(_users);
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -618,7 +618,7 @@ void
 Application::onEditContact(const QModelIndex &idx) {
   if (idx.row() >= _config->contacts()->count())
     return;
-  ContactDialog dialog(_config->contacts()->contact(idx.row()));
+  ContactDialog dialog(_users, _config->contacts()->contact(idx.row()));
   if (QDialog::Accepted != dialog.exec())
     return;
 

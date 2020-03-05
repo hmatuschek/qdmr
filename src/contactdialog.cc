@@ -7,19 +7,29 @@
 #include <QDialogButtonBox>
 #include <QRegExpValidator>
 #include <QFormLayout>
+#include <QCompleter>
+#include "userdatabase.hh"
+#include <QDebug>
 
 
 /* ********************************************************************************************* *
  * Implementation of ContactDialog
  * ********************************************************************************************* */
-ContactDialog::ContactDialog(QWidget *parent)
-  : QDialog(parent), _contact(nullptr)
+ContactDialog::ContactDialog(UserDatabase *users, QWidget *parent)
+  : QDialog(parent), _contact(nullptr), _completer(nullptr)
 {
+  _completer = new QCompleter(users, this);
+  _completer->setCompletionColumn(0);
+  _completer->setCaseSensitivity(Qt::CaseInsensitive);
+
+  connect(_completer, SIGNAL(activated(QModelIndex)),
+          this, SLOT(onCompleterActivated(QModelIndex)));
+
   construct();
 }
 
-ContactDialog::ContactDialog(Contact *contact, QWidget *parent)
-  : QDialog(parent), _contact(contact)
+ContactDialog::ContactDialog(UserDatabase *users, Contact *contact, QWidget *parent)
+  : QDialog(parent), _contact(contact), _completer(nullptr)
 {
   construct();
 }
@@ -54,6 +64,7 @@ ContactDialog::construct() {
       contactNumber->setText(QString::number(digi->number()));
     }
     contactName->setText(_contact->name());
+    contactName->setCompleter(nullptr);
     contactRxTone->setChecked(_contact->rxTone());
   } else {
     contactType->addItem(tr("Private Call"));
@@ -65,6 +76,7 @@ ContactDialog::construct() {
     contactType->setItemData(2, uint(DigitalContact::AllCall));
     contactType->setCurrentIndex(0);
     contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
+    contactName->setCompleter(_completer);
   }
 
   connect(contactType, SIGNAL(currentIndexChanged(int)), this, SLOT(onTypeChanged(int)));
@@ -84,6 +96,20 @@ ContactDialog::onTypeChanged(int idx) {
     contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
     contactNumber->setEnabled(true);
   }
+}
+
+void
+ContactDialog::onCompleterActivated(const QModelIndex &idx) {
+  if (nullptr == _completer)
+    return;
+  UserDatabase *db = qobject_cast<UserDatabase *>(_completer->model());
+  if (nullptr == db)
+    return;
+  QAbstractProxyModel *model = qobject_cast<QAbstractProxyModel *>(_completer->completionModel());
+  if (nullptr == model)
+    return;
+  QModelIndex srcidx = model->mapToSource(idx);
+  contactNumber->setText(QString::number(db->user(srcidx.row()).id));
 }
 
 Contact *
