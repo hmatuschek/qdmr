@@ -49,24 +49,20 @@ static const uint32_t _crc_table[256] = {
 
 
 CRC32::CRC32()
-  : _crc(0)
+  : _crc(0xFFFFFFFF)
 {
 	// pass...
 }
 
 void
 CRC32::update(uint8_t c) {
-	_crc = _crc ^ 0xFFFFFFFF;
-	_crc = _crc_table[(_crc ^ c) & 0xFF] ^ (_crc >> 8);
-	_crc = _crc ^ 0xFFFFFFFF;
+  _crc = ( _crc_table[(_crc ^ c) & 0xFF] ^ (_crc >> 8) );
 }
 
 void
 CRC32::update(const uint8_t *buf, size_t n) {
-	_crc = _crc ^ 0xFFFFFFFF;
 	for (size_t i=0; i<n; i++)
-		_crc = _crc_table[(_crc ^ buf[i]) & 0xFF] ^ (_crc >> 8);
-	_crc = _crc ^ 0xFFFFFFFF;
+    _crc = ( _crc_table[(_crc ^ buf[i]) & 0xFF] ^ (_crc >> 8) );
 }
 
 void

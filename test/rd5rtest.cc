@@ -378,8 +378,8 @@ RD5RTest::testDecode() {
   QCOMPARE(decoded.id(), _config.id());
   QCOMPARE(decoded.introLine1(), _config.introLine1());
   QCOMPARE(decoded.introLine2(), _config.introLine2());
-  QCOMPARE(decoded.micLevel(), _config.micLevel());
-  QCOMPARE(decoded.speech(), _config.speech());
+  // Do not compare MIC level, RD5R has not MIC level settings
+  // Do not compare speech settings, RD5R has no speech synthesis
 
   // Compare contacts
   QCOMPARE(decoded.contacts()->count(), _config.contacts()->count());

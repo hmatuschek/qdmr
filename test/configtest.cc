@@ -183,7 +183,7 @@ ConfigTest::testAnalogChannels() {
   QCOMPARE(_config.channelList()->channel(3)->scanList(), nullptr); // Scanlist
   QCOMPARE(_config.channelList()->channel(3)->txTimeout(), 45U);
   QCOMPARE(_config.channelList()->channel(3)->rxOnly(), false);
-  QCOMPARE(_config.channelList()->channel(3)->as<AnalogChannel>()->admit(), AnalogChannel::AdmitFree); // admit
+  QCOMPARE(_config.channelList()->channel(3)->as<AnalogChannel>()->admit(), AnalogChannel::AdmitTone); // admit
   QCOMPARE(_config.channelList()->channel(3)->as<AnalogChannel>()->squelch(), 1u); // squelch
   QCOMPARE(_config.channelList()->channel(3)->as<AnalogChannel>()->rxTone(), 67.0); // RX CTCSS tone
   QCOMPARE(_config.channelList()->channel(3)->as<AnalogChannel>()->txTone(), 67.0); // TX CTCSS tone

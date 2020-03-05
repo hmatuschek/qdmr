@@ -17,7 +17,7 @@ public:
   /** Update CRC with given data. */
 	void update(const QByteArray &data);
   /** Returns the current CRC. */
-	inline uint32_t get() { return _crc; }
+  inline uint32_t get() { return _crc; }
 
 protected:
   /** Current CRC. */

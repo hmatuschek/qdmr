@@ -85,7 +85,12 @@ public:
   static const int NSCANL    = 250;    ///< Defines the number of scanlists.
   static const int NMESSAGES = 32;     ///< Defines the number of preset messages.
 
-  /** Represents a configured channel within the codeplug. */
+  /** Represents a configured channel within the codeplug.
+   * Please note that channels are organized in banks, see @c RD5RCodeplug::bank_t for details.
+   *
+   * Memmory layout of encoded channel:
+   * @verbinclude rd5rchannel.txt
+   */
   struct __attribute__((packed)) channel_t {
     /** Possible channel types. */
     typedef enum {
@@ -217,7 +222,14 @@ public:
     bool linkChannelObj(Channel *c, Config *conf) const;
   };
 
-  /** Bank of 128 channels including a bitmap for enabled channels. */
+  /** One bank of 128 channels including a bitmap for enabled channels.
+   *
+   * This struct represents a single bank of 128 channels, see @c RD5RCodeplug::channel_t for
+   * details.
+   *
+   * Memmory layout of channel bank:
+   * @verbinclude rd5rchannelbank.txt
+   */
   struct __attribute__((packed)) bank_t {
     /** Bitmap for 128 channels, a bit is set when the coresspondig channel is valid/enabled. */
     uint8_t bitmap[16];
@@ -225,13 +237,24 @@ public:
     channel_t chan[128];
   };
 
-  /** Binary codeplug representation of VFO settings. */
+  /** Binary codeplug representation of VFO settings.
+   *
+   * This struct contains two channel settings (see @c RD5RCodeplug::channel_t). One for VFO A and
+   * one for VFO B settings.
+   *
+   * Memmory layout of the VFO settings:
+   * @verbinclude rd5rvfosettings.txt
+   */
   struct __attribute__((packed)) vfo_settings_t {
     channel_t vfo_a; ///< Channel settings for VFO A.
     channel_t vfo_b; ///< Channel settings for VFO B.
   };
 
-  /** Specific codeplug representation of a DMR contact. */
+  /** Specific codeplug representation of a DMR contact.
+   *
+   * Memmory layout of the contact:
+   * @verbinclude rd5rcontact.txt
+   */
   struct __attribute__((packed)) contact_t {
     /** Possible call types. */
     typedef enum {
@@ -273,7 +296,11 @@ public:
     void fromContactObj(const DigitalContact *obj, const Config *conf);
   };
 
-  /** Specific codeplug representation of a DTMF (analog) contact. */
+  /** Specific codeplug representation of a DTMF (analog) contact.
+   *
+   * Memmory layout of the DTMF contact:
+   * @verbinclude rd5rdtmfcontact.txt
+   */
   struct __attribute__((packed)) dtmf_contact_t {
     // Bytes 0-15
     uint8_t name[16];                   ///< Contact name in ASCII, 0xff terminated.
@@ -302,7 +329,11 @@ public:
     void fromContactObj(const DTMFContact *obj, const Config *conf);
   };
 
-  /** Represents a single zone within the codeplug. */
+  /** Represents a single zone within the codeplug.
+   *
+   * Memmory layout of the zone:
+   * @verbinclude rd5rzone.txt
+   */
   struct __attribute__((packed)) zone_t {
     // Bytes 0-15
     uint8_t name[16];                   ///< Zone name ASCII, 0xff terminated.
@@ -332,7 +363,11 @@ public:
     void fromZoneObjB(const Zone *zone, const Config *conf);
   };
 
-  /** Table of zones. */
+  /** Table of zones.
+   *
+   * Memmory layout of the zone table/bank:
+   * @verbinclude rd5rzonetab.txt
+   */
   struct __attribute__((packed)) zonetab_t {
     /** A bit representing the validity of every zone. If a bit is set, the corresponding zone in
      * @c zone ist valid. */
@@ -341,7 +376,11 @@ public:
     zone_t  zone[NZONES];
   };
 
-  /** Represents a single RX group list within the codeplug. */
+  /** Represents a single RX group list within the codeplug.
+   *
+   * Memmory layout of the RX group list:
+   * @verbinclude rd5rgrouplist.txt
+   */
   struct __attribute__((packed)) grouplist_t {
     // Bytes 0-15
     uint8_t name[16];                   ///< RX group list name, ASCII, 0xff terminated.
@@ -366,7 +405,11 @@ public:
     void fromRXGroupListObj(const RXGroupList *lst, const Config *conf);
   };
 
-  /** Table of rx group lists. */
+  /** Table of rx group lists.
+   *
+   * Memmory layout of the group list table:
+   * @verbinclude rd5rgrouplisttab.txt
+   */
   struct __attribute__((packed)) grouptab_t {
     /** Specifies the number of contacts +1 in each group list, 0=disabled. */
     uint8_t     nitems1[128];
@@ -374,7 +417,11 @@ public:
     grouplist_t grouplist[NGLISTS];
   };
 
-  /** Represents a sinle scan list within the codeplug. */
+  /** Represents a sinle scan list within the codeplug.
+   *
+   * Memmory layout of the scan list.
+   * @verbinclude rd5rscanlist.txt
+   */
   struct __attribute__((packed)) scanlist_t {
     /** Possible priority channel types. */
     typedef enum {
@@ -421,7 +468,11 @@ public:
     void fromScanListObj(const ScanList *lst, const Config *conf);
   };
 
-  /** Table/Bank of scanlists. */
+  /** Table/Bank of scanlists.
+   *
+   * Memmory layout of the scan list table.
+   * @verbinclude rd5rscanlisttab.txt
+   */
   struct __attribute__((packed)) scantab_t {
     /** Byte-field to indicate which scanlist is valid. Set to 0x01 when valid, 0x00 otherwise. */
     uint8_t    valid[256];
@@ -429,7 +480,11 @@ public:
     scanlist_t scanlist[NSCANL];
   };
 
-  /** Represents the general settings within the codeplug. */
+  /** Represents the general settings within the codeplug.
+   *
+   * Memmory layout of the general settings
+   * @verbinclude rd5rgeneralsettings.txt
+   */
   struct __attribute__((packed))  general_settings_t{
     /** Possible monitor types. */
     typedef enum {

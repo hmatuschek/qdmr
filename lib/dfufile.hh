@@ -96,7 +96,7 @@ class DFUFile: public QObject
 	{
 	public:
 		Image();
-		Image(const QString &name, uint8_t altSettings=1);
+    Image(const QString &name, uint8_t altSettings=0);
 		Image(const Image &other);
 
 		Image &operator=(const Image &other);

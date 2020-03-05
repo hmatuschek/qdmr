@@ -7,7 +7,7 @@
 typedef struct __attribute((packed)) {
   uint8_t signature[5];      ///< File signature = "DfuSe"
   uint8_t version;           ///< File version = 0x01
-  uint32_t image_size;       ///< Total file size in little endian
+  uint32_t image_size;       ///< Total file size in big-endian
   uint8_t n_targets;         ///< Number of images.
 } file_prefix_t;
 
@@ -15,10 +15,11 @@ typedef struct __attribute((packed)) {
   uint16_t device_id;        ///< Device id in little endian
   uint16_t product_id;       ///< Product id in little endian
   uint16_t vendor_id;        ///< Vendor id in little endian
-  uint16_t DFU;              ///< Fixed 0x011A in little endian
+  uint8_t DFUlo;             ///< Fixed 0x1A
+  uint8_t DFUhi;             ///< Fixed 0x01
   uint8_t signature[3];      ///< Fixed "UFD", {0x44, 0x46, 0x55}
   uint8_t size;              ///< Suffix size, fixed 16
-  uint32_t crc;              ///< CRC over compltete file excluding the CRC.
+  uint32_t crc;              ///< CRC over compltete file excluding the CRC in little endian.
 } file_suffix_t;
 
 typedef struct __attribute((packed)) {
@@ -26,13 +27,13 @@ typedef struct __attribute((packed)) {
   uint8_t alternate_setting; ///< Alternate setting for image.
   uint32_t is_named;         ///< Bool, if targed is named;
   uint8_t name[255];         ///< Target name (0-padded?).
-  uint32_t size;             ///< Size of complete image excl. prefix in little endian.
-  uint32_t n_elements;       ///< Number of elements in image in little endian.
+  uint32_t size;             ///< Size of complete image excl. prefix in big endian.
+  uint32_t n_elements;       ///< Number of elements in image in big endian.
 } image_prefix_t;
 
 typedef struct __attribute((packed)) {
-  uint32_t address;          ///< Target address of element in little endian.
-  uint32_t size;             ///< Element size in little endian;
+  uint32_t address;          ///< Target address of element in big endian.
+  uint32_t size;             ///< Element size in big endian;
 } element_prefix_t;
 
 
@@ -183,8 +184,8 @@ bool
 DFUFile::write(QFile &file) {
   file_prefix_t prefix;
   memcpy(prefix.signature, "DfuSe", 5);
-  prefix.version = 1;
-  prefix.image_size = size()-sizeof(file_suffix_t);
+  prefix.version = 0x01;
+  prefix.image_size = qToLittleEndian(size()-sizeof(file_suffix_t));
   prefix.n_targets = _images.size();
 
   if (sizeof(file_prefix_t) != file.write((char *)&prefix, sizeof(file_prefix_t))) {
@@ -202,10 +203,11 @@ DFUFile::write(QFile &file) {
   }
 
   file_suffix_t suffix;
-  suffix.device_id = qToLittleEndian(0);
-  suffix.product_id = qToLittleEndian(0);
-  suffix.vendor_id = qToLittleEndian(0);
-  suffix.DFU = qToLittleEndian(0x011A);
+  suffix.device_id = qToLittleEndian((uint16_t)0xffff);
+  suffix.product_id = qToLittleEndian((uint16_t)0xffff);
+  suffix.vendor_id = qToLittleEndian((uint16_t)0xffff);
+  suffix.DFUlo = 0x1a;
+  suffix.DFUhi = 0x01;
   memcpy(suffix.signature, "UFD", 3);
   suffix.size = 16;
 
@@ -319,8 +321,8 @@ DFUFile::Element::read(QFile &file, CRC32 &crc, QString &errorMessage)
 bool
 DFUFile::Element::write(QFile &file, CRC32 &crc, QString &errorMessage) const {
   element_prefix_t prefix;
-  prefix.address = _address;
-  prefix.size = _data.size();
+  prefix.address = qToLittleEndian(_address);
+  prefix.size = qToLittleEndian(uint32_t(_data.size()));
 
   crc.update((uint8_t *) &prefix, sizeof(element_prefix_t));
 
@@ -490,7 +492,7 @@ DFUFile::Image::read(QFile &file, CRC32 &crc, QString &errorMessage)
   }
 
   _alternate_settings = prefix.alternate_setting;
-  if (prefix.is_named) {
+  if (0x01 ==qFromLittleEndian(prefix.is_named)) {
     char tmp[256]; tmp[255]=0;
     memcpy(tmp, prefix.name, 255);
     _name = tmp;
@@ -519,12 +521,12 @@ DFUFile::Image::write(QFile &file, CRC32 &crc, QString &errorMessage) const {
   image_prefix_t prefix;
   memcpy(prefix.signature, "Target", 6);
   prefix.alternate_setting = _alternate_settings;
-  prefix.is_named = _name.isEmpty() ? 0 : 1;
+  prefix.is_named = qToLittleEndian(uint32_t(_name.isEmpty() ? 0 : 1));
   memset(prefix.name, 0, 255);
   if (! _name.isEmpty())
     memcpy(prefix.name, _name.toLocal8Bit().constData(), std::min(255, _name.size()));
-  prefix.size = size()-sizeof(image_prefix_t);
-  prefix.n_elements = _elements.size();
+  prefix.size = qToLittleEndian(uint32_t(size()-sizeof(image_prefix_t)));
+  prefix.n_elements = qToLittleEndian(uint32_t(_elements.size()));
 
   crc.update((uint8_t *)&prefix, sizeof(image_prefix_t));
 
