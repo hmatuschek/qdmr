@@ -3,6 +3,7 @@
 #include <QCompleter>
 #include "ctcssbox.hh"
 #include "repeaterdatabase.hh"
+#include "utils.hh"
 
 
 /* ********************************************************************************************* *
@@ -56,8 +57,8 @@ AnalogChannelDialog::construct() {
 
   if (_channel) {
     channelName->setText(_channel->name());
-    rxFrequency->setText(QString::number(_channel->rxFrequency()));
-    txFrequency->setText(QString::number(_channel->txFrequency()));
+    rxFrequency->setText(format_frequency(_channel->rxFrequency()));
+    txFrequency->setText(format_frequency(_channel->txFrequency()));
     if (Channel::HighPower==_channel->power())
       power->setCurrentIndex(0);
     else if (Channel::LowPower==_channel->power())

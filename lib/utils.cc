@@ -196,3 +196,8 @@ bool
 validDTMFNumber(const QString &text) {
   return QRegExp("^[0-9a-dA-D\\*#]+$").exactMatch(text);
 }
+
+QString
+format_frequency(double MHz) {
+  return QString::number(MHz, 'f', 5);
+}

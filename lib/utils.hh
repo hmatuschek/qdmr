@@ -51,4 +51,7 @@ bool validDMRNumber(const QString &text);
 /** Validates a DTMF number. */
 bool validDTMFNumber(const QString &text);
 
+/** Formats a frequency in MHz passed as double. */
+QString format_frequency(double MHz);
+
 #endif // UTILS_HH

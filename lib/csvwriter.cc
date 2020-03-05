@@ -2,13 +2,10 @@
 #include <QDateTime>
 #include "config.hh"
 #include "config.h"
+#include "utils.hh"
 #include <cmath>
 
 
-inline QString formatFrequency(float f) {
-  int val = std::round(f*10000);
-  return QString::number(double(val)/10000, 'f', 4);
-}
 
 bool
 CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessage)
@@ -54,15 +51,15 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     DigitalChannel *digi = config->channelList()->channel(i)->as<DigitalChannel>();
     stream << qSetFieldWidth(8)  << left << (i+1)
            << qSetFieldWidth(20) << left << ("\"" + digi->name() + "\"")
-           << qSetFieldWidth(10) << left << formatFrequency(digi->rxFrequency());
+           << qSetFieldWidth(10) << left << format_frequency(digi->rxFrequency());
     if (digi->txFrequency()<digi->rxFrequency())
-      stream << qSetFieldWidth(10) << left << formatFrequency(digi->txFrequency()-digi->rxFrequency());
+      stream << qSetFieldWidth(10) << left << format_frequency(digi->txFrequency()-digi->rxFrequency());
     else
-      stream << qSetFieldWidth(10) << left << formatFrequency(digi->txFrequency());
+      stream << qSetFieldWidth(10) << left << format_frequency(digi->txFrequency());
     stream << qSetFieldWidth(6)  << left << ( (Channel::HighPower == digi->power()) ? "High" : "Low" )
            << qSetFieldWidth(5)  << left << ( nullptr != digi->scanList() ?
           QString::number(config->scanlists()->indexOf(digi->scanList())+1) : QString("-") )
-           << qSetFieldWidth(4)  << left << ( (0 == digi->txTimeout()) ? '-' : digi->txTimeout() )
+           << qSetFieldWidth(4)  << left << ( (0 == digi->txTimeout()) ? QString("-") : QString::number(digi->txTimeout()) )
            << qSetFieldWidth(3)  << left << (digi->rxOnly() ? '+' : '-')
            << qSetFieldWidth(7)  << left << ((DigitalChannel::AdmitNone==digi->admit()) ? "-" : ((DigitalChannel::AdmitFree==digi->admit()) ? "Free" : "Color"))
            << qSetFieldWidth(3)  << left << digi->colorCode()
@@ -107,15 +104,15 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     AnalogChannel *analog = config->channelList()->channel(i)->as<AnalogChannel>();
     stream << qSetFieldWidth(8)  << left << (i+1)
            << qSetFieldWidth(20) << left << ("\"" + analog->name() + "\"")
-           << qSetFieldWidth(10) << left << formatFrequency(analog->rxFrequency());
+           << qSetFieldWidth(10) << left << format_frequency(analog->rxFrequency());
     if (analog->txFrequency()<analog->rxFrequency())
-      stream << qSetFieldWidth(10) << left << formatFrequency(analog->txFrequency()-analog->rxFrequency());
+      stream << qSetFieldWidth(10) << left << format_frequency(analog->txFrequency()-analog->rxFrequency());
     else
-      stream << qSetFieldWidth(10) << left << formatFrequency(analog->txFrequency());
+      stream << qSetFieldWidth(10) << left << format_frequency(analog->txFrequency());
     stream << qSetFieldWidth(6)  << left << ( (Channel::HighPower == analog->power()) ? "High" : "Low" )
            << qSetFieldWidth(5)  << left << ( nullptr != analog->scanList() ?
           QString::number(config->scanlists()->indexOf(analog->scanList())+1) : QString("-") )
-           << qSetFieldWidth(4)  << left << ( (0 == analog->txTimeout()) ? '-' : analog->txTimeout() )
+           << qSetFieldWidth(4)  << left << ( (0 == analog->txTimeout()) ? QString("-") : QString::number(analog->txTimeout()) )
            << qSetFieldWidth(3)  << left << (analog->rxOnly() ? '+' : '-')
            << qSetFieldWidth(7)  << left << ((AnalogChannel::AdmitNone==analog->admit()) ? "-" : ((AnalogChannel::AdmitFree==analog->admit()) ? "Free" : "Tone"))
            << qSetFieldWidth(8)  << left << analog->squelch();
