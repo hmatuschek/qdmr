@@ -12,7 +12,7 @@ CRC32Test::testCRC32() {
   QString txt("The quick brown fox jumps over the lazy dog");
   CRC32 crc;
   crc.update(txt.toLocal8Bit());
-  QCOMPARE(crc.get(), 0x414FA339U);
+  QCOMPARE(crc.get(), 0x414FA339U^0xFFFFFFFF);
 }
 
 QTEST_GUILESS_MAIN(CRC32Test)
