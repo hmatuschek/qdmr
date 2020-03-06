@@ -53,9 +53,9 @@ class GPSSystem;
  *  <tr><td>0x140800</td> <td>0x198640</td> <td>0x57e40</td> <td>10000 Contacts @ 0x24 bytes each, see @c UV390Codeplug::contact_t.</td></tr>
  *  <tr><td>0x198640</td> <td>0x1a0800</td> <td>0x081c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><th colspan="4">Callsign database 0x0200000-0x1000000</th></tr>
- *  <tr><td>0x200000</td> <td>0x204003</td> <td>0x04003</td> <td>Callsign database index table, see @c UV390Codeplug::callsign_db_t</td></tr>
- *  <tr><td>0x204003</td> <td>0xffffdb</td> <td>0xdfbfd8</td> <td>122197 callsign database entries, see @c UV390Codeplug::callsign_db_t::callsign_t. </td></tr>
- *  <tr><td>0xffffdb</td> <td>0x1000000</td> <td>0x00025</td> <td>Padding, filled with @c 0xff.</td></tr>
+ *  <tr><td>0x200000</td> <td>0x204004</td> <td>0x04004</td> <td>Callsign database index table, see @c UV390Codeplug::callsign_db_t</td></tr>
+ *  <tr><td>0x204004</td> <td>0xffffdc</td> <td>0xdfbfd8</td> <td>122197 callsign database entries, see @c UV390Codeplug::callsign_db_t::callsign_t. </td></tr>
+ *  <tr><td>0xffffdc</td> <td>0x1000000</td> <td>0x00025</td> <td>Padding, filled with @c 0xff.</td></tr>
  * </table>
  *
  * @ingroup uv390 */
@@ -64,7 +64,11 @@ class UV390Codeplug : public CodePlug
   Q_OBJECT
 
 public:
-  /** Represents a single channel (analog or digital) within the codeplug. */
+  /** Represents a single channel (analog or digital) within the codeplug.
+   *
+   * Memmory layout of encoded channel:
+   * @verbinclude uv390channel.txt
+   */
   struct __attribute__((packed)) channel_t {
     /** Possible channel modes. */
 		typedef enum {
@@ -271,7 +275,11 @@ public:
     void fromChannelObj(const Channel *c, const Config *conf);
   };
 
-	/** Represents a digital (DMR) contact within the codeplug. */
+  /** Represents a digital (DMR) contact within the codeplug.
+   *
+   * Memmory layout of encoded contact:
+   * @verbinclude uv390contact.txt
+   */
   struct __attribute__((packed)) contact_t {
     /** Call types. */
 		typedef enum {
@@ -314,7 +322,11 @@ public:
 
 	/** Represents a zone within the codeplug.
 	 * Please note that a zone consists of two structs the @c zone_t and the @c zone_ext_t.
-	 * The latter adds additional channels for VFO A and the channels for VFO B. */
+   * The latter adds additional channels for VFO A and the channels for VFO B.
+   *
+   * Memmory layout of encoded zone:
+   * @verbinclude uv390zone.txt
+   */
   struct __attribute__((packed)) zone_t {
     // Bytes 0-31
     uint16_t name[16];              ///< Zone Name (Unicode).
@@ -346,7 +358,11 @@ public:
   /** Extended zone data.
    * The zone definition @c zone_t contains only a single set of 16 channels. For each zone
    * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each.
-   * @todo Check whether @c ext_a and @c member_b are swapped! */
+   * @todo Check whether @c ext_a and @c member_b are swapped!
+   *
+   * Memmory layout of encoded zone extension:
+   * @verbinclude uv390zoneext.txt
+   */
   struct __attribute__((packed)) zone_ext_t {
     // Bytes 0-95
     uint16_t ext_a[48];             ///< Member A: Channels 17...64, 0=empty/EOL
@@ -365,7 +381,11 @@ public:
     void fromZoneObj(const Zone *zone, const Config *conf);
   };
 
-	/** Representation of an RX group list within the codeplug. */
+  /** Representation of an RX group list within the codeplug.
+   *
+   * Memmory layout of encoded RX group list:
+   * @verbinclude uv390rxgrouplist.txt
+   */
   struct __attribute__((packed)) grouplist_t {
     // Bytes 0-31
     uint16_t name[16];              ///< Group List Name (16 x 16bit Unicode)
@@ -393,7 +413,11 @@ public:
     void fromRXGroupListObj(const RXGroupList *obj, const Config *conf);
   };
 
-	/** Represents a scan list within the codeplug. */
+  /** Represents a scan list within the codeplug.
+   *
+   * Memmory layout of encoded scan list:
+   * @verbinclude uv390scanlist.txt
+   */
   struct __attribute__((packed)) scanlist_t {
     // Bytes 0-31
     uint16_t name[16];              ///< Scan List Name (16 x unicode), default=0
@@ -433,7 +457,11 @@ public:
     void fromScanListObj(const ScanList *l, const Config *conf);
   };
 
-	/** Codeplug representation of the general settings. */
+  /** Codeplug representation of the general settings.
+   *
+   * Memmory layout of encoded settings:
+   * @verbinclude uv390settings.txt
+   */
   struct __attribute__((packed)) general_settings_t {
     uint16_t intro_line1[10];             ///< Intro line 1: 10 x 16bit unicode, default=0
     uint16_t intro_line2[10];             ///< Intro line 2: 10 x 16bit unicode, default=0
@@ -581,7 +609,11 @@ public:
     void fromConfigObj(const Config *conf);
   };
 
-  /** Represents a single message within the codeplug. */
+  /** Represents a single message within the codeplug.
+   *
+   * Memmory layout of encoded message:
+   * @verbinclude uv390message.txt
+   */
   struct __attribute__((packed)) message_t {
     uint16_t text[144];                   ///< Message text (144 x 16bit Unicode), 0-terminated
 
@@ -598,7 +630,11 @@ public:
     void setText(const QString text);
   };
 
-  /** Codeplug representation of programming time-stamp and CPS version. */
+  /** Codeplug representation of programming time-stamp and CPS version.
+   *
+   * Memmory layout of encoded timestamp:
+   * @verbinclude uv390timestamp.txt
+   */
   struct __attribute__((packed)) timestamp_t {
     uint8_t _pad0;                       ///< Fixed 0xff
     uint8_t date[7];                     ///< YYYY-MM-DD hh:mm:ss as 14 BCD numbers.
@@ -618,7 +654,11 @@ public:
     QString cpsVersion() const;
   };
 
-  /** Represents a single GPS system within the codeplug. */
+  /** Represents a single GPS system within the codeplug.
+   *
+   * Memmory layout of encoded GPS system:
+   * @verbinclude uv390gpssystem.txt
+   */
   struct __attribute__((packed)) gpssystem_t {
     uint16_t revert_channel;              ///< Revert channel index, 0=current, index+1.
     uint8_t  repeat_interval;             ///< Repeat interval x*30s, 0=off.
@@ -851,9 +891,17 @@ public:
     void clear();
   };
 
-  /** Represents a search index over the complete callsign database. */
+  /** Represents a search index over the complete callsign database.
+   *
+   * Memmory layout of encoded Callsign/User database:
+   * @verbinclude uv390userdb.txt
+   */
   struct __attribute__((packed)) callsign_db_t {
-    /** Represents an index entry, a pair of DMR ID and callsign DB index. */
+    /** Represents an index entry, a pair of DMR ID and callsign DB index.
+     *
+     * Memmory layout of encoded Callsign/User database index entry:
+     * @verbinclude uv390userdbentry.txt
+     */
     struct __attribute__((packed)) entry_t {
       uint32_t id_high: 12,               ///< High bits of DMR ID (23:12).
         index: 20;                        ///< Index in callsign data base, where to find these.
@@ -868,7 +916,11 @@ public:
     };
 
     /** Represents an entry within the callsign database.
-     * The callsign DB entries must be ordered by their DMR id. */
+     * The callsign DB entries must be ordered by their DMR id.
+     *
+     * Memmory layout of encoded Callsign/User database index entry:
+     * @verbinclude uv390userdbcallsign.txt
+     */
     struct __attribute__((packed)) callsign_t {
       uint8_t dmrid[3];                   ///< DMR id in BCD
       uint8_t _unused;                    ///< Unused set to 0xff.
@@ -893,7 +945,7 @@ public:
       void fromUser(const UserDatabase::User &user);
     };
 
-    unsigned n : 24;                      ///< Number of contacts in compete database.
+    uint32_t n : 24;                      ///< Number of contacts in compete database.
     entry_t index[4096];                  ///< 4096 index entries, default 0xff.
     callsign_t db[122197];                ///< 122197 database callsign entries.
 
