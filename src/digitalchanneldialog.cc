@@ -55,11 +55,14 @@ DigitalChannelDialog::construct() {
   timeSlot->setItemData(1, uint(DigitalChannel::TimeSlot2));
   populateRXGroupListBox(rxGroupList, _config->rxGroupLists(),
                          (nullptr != _channel ? _channel->rxGroupList() : nullptr));
+  txContact->addItem(tr("[None]"), QVariant::fromValue(nullptr));
+  if (_channel && (nullptr == _channel->txContact()))
+    txContact->setCurrentIndex(0);
   for (int i=0; i<_config->contacts()->count(); i++) {
     txContact->addItem(_config->contacts()->contact(i)->name(),
                        QVariant::fromValue(_config->contacts()->contact(i)));
     if (_channel && (_channel->txContact() == _config->contacts()->contact(i)) )
-      txContact->setCurrentIndex(i);
+      txContact->setCurrentIndex(i+1);
   }
   gpsSystem->addItem(tr("[None]"), QVariant::fromValue((GPSSystem *)nullptr));
   for (int i=0; i<_config->gpsSystems()->count(); i++) {
