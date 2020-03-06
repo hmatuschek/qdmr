@@ -153,6 +153,15 @@ CSVHandler::handleSpeech(bool speech, qint64 line, qint64 column, QString &error
 }
 
 bool
+CSVHandler::handleUserDB(bool userdb, qint64 line, qint64 column, QString &errorMessage) {
+  Q_UNUSED(userdb);
+  Q_UNUSED(line);
+  Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
+  return true;
+}
+
+bool
 CSVHandler::handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
                               qint64 line, qint64 column, QString &errorMessage)
 {
@@ -331,6 +340,9 @@ CSVParser::parse(QTextStream &stream) {
         return false;
     } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("speech" == token.value.toLower())) {
       if (! _parse_speech(lexer))
+        return false;
+    } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("userdb" == token.value.toLower())) {
+      if (! _parse_userdb(lexer))
         return false;
     } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("contact" == token.value.toLower())) {
       if (! _parse_contacts(lexer))
@@ -532,6 +544,36 @@ CSVParser::_parse_speech(CSVLexer &lexer) {
   }
 
   return _handler->handleSpeech(speech, line, column, _errorMessage);
+}
+
+bool
+CSVParser::_parse_userdb(CSVLexer &lexer) {
+  CSVLexer::Token token = lexer.next();
+  if (CSVLexer::Token::T_COLON != token.type) {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected ':'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
+  if ((CSVLexer::Token::T_KEYWORD != token.type) ||
+      (("on" != token.value.toLower()) && ("off" != token.value.toLower())))
+  {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'On' or 'Off'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+  qint64 line=token.line, column=token.column;
+  bool userdb = ("on" == token.value.toLower());
+
+  token = lexer.next();
+  if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  return _handler->handleUserDB(userdb, line, column, _errorMessage);
 }
 
 bool
@@ -1442,6 +1484,19 @@ CSVReader::handleSpeech(bool speech, qint64 line, qint64 column, QString &errorM
 
   if (_link) {
     _config->setSpeech(speech);
+  }
+  return true;
+}
+
+
+bool
+CSVReader::handleUserDB(bool userdb, qint64 line, qint64 column, QString &errorMessage) {
+  Q_UNUSED(line);
+  Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
+
+  if (_link) {
+    _config->setUploadUserDB(userdb);
   }
   return true;
 }

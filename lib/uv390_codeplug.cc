@@ -814,6 +814,7 @@ UV390Codeplug::general_settings_t::updateConfigObj(Config *conf) const {
 
 void
 UV390Codeplug::general_settings_t::fromConfigObj(const Config *conf) {
+  // Set only those elements configured, preserve the rest as already configured in the radio.
   setName(conf->name());
   setRadioId(conf->id());
   setIntroLine1(conf->introLine1());
@@ -1254,7 +1255,6 @@ UV390Codeplug::UV390Codeplug(QObject *parent)
   addImage("TYT MD-UV390 Codeplug");
   image(0).addElement(0x002800, 0x3e000);
   image(0).addElement(0x110800, 0x90000);
-
   // Clear entire codeplug
   clear();
 }
@@ -1320,7 +1320,7 @@ UV390Codeplug::clear()
 }
 
 bool
-UV390Codeplug::encode(Config *config, UserDatabase *users) {
+UV390Codeplug::encode(Config *config) {
   // Set timestamp
   ((timestamp_t *)(data(OFFSET_TIMESTMP)))->set();
 
@@ -1388,13 +1388,13 @@ UV390Codeplug::encode(Config *config, UserDatabase *users) {
 
   // Define User DataBase (ContactCSV)
   // If userdatabase is given and not defined yet -> allocate user DB
-  if (users && (2 == this->image(0).numElements()))
+  if (config->uploadUserDB() && config->hasUserDB() && (2 == this->image(0).numElements()))
     this->image(0).addElement(CALLSIGN_START, CALLSIGN_END-CALLSIGN_START);
-  // If user database is givan and defined -> reset and fill user DB.
-  if (users && (3 == this->image(0).numElements())) {
+  // If user database is given and defined -> reset and fill user DB.
+  if (config->uploadUserDB() && config->hasUserDB() && (3 == this->image(0).numElements())) {
     // clear DB memory
     memset(data(CALLSIGN_START), 0xff, CALLSIGN_END-CALLSIGN_START);
-    ((callsign_db_t *)data(CALLSIGN_START))->fromUserDB(users);
+    ((callsign_db_t *)data(CALLSIGN_START))->fromUserDB(config->userDB());
   }
 
   return true;

@@ -1034,7 +1034,7 @@ RD5RCodeplug::decode(Config *config)
 }
 
 bool
-RD5RCodeplug::encode(Config *config, UserDatabase *users)
+RD5RCodeplug::encode(Config *config)
 {
   // set timestamp
   timestamp_t *ts = (timestamp_t *)data(OFFSET_TIMESTMP);

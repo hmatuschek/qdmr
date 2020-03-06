@@ -29,7 +29,7 @@ Application::Application(int &argc, char *argv[])
   Settings settings;
   _repeater = new RepeaterDatabase(settings.position(), 7, this);
   _users    = new UserDatabase(30, this);
-  _config = new Config(this);
+  _config = new Config(_users, this);
 
   if (argc>1) {
     QFile file(argv[1]);
@@ -128,6 +128,7 @@ Application::createMainWindow() {
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
+  QCheckBox *userdb = _mainWindow->findChild<QCheckBox*>("uploadUserDB");
 
   dmrID->setText(QString::number(_config->id()));
   rname->setText(_config->name());
@@ -135,6 +136,7 @@ Application::createMainWindow() {
   intro2->setText(_config->introLine2());
   mic->setValue(_config->micLevel());
   speech->setChecked(_config->speech());
+  userdb->setChecked(_config->uploadUserDB());
 
   connect(dmrID, SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
   connect(rname, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
@@ -142,6 +144,7 @@ Application::createMainWindow() {
   connect(intro2, SIGNAL(editingFinished()), this, SLOT(onIntroLine2Changed()));
   connect(mic, SIGNAL(valueChanged(int)), this, SLOT(onMicLevelChanged()));
   connect(speech, SIGNAL(toggled(bool)), this, SLOT(onSpeechChanged()));
+  connect(userdb, SIGNAL(toggled(bool)), this, SLOT(onUploadUserDBChanged()));
 
   // Wire-up "Contact List" view
   QTableView *contacts = _mainWindow->findChild<QTableView *>("contactsView");
@@ -572,6 +575,12 @@ void
 Application::onSpeechChanged() {
   QCheckBox *speech = _mainWindow->findChild<QCheckBox *>("speech");
   _config->setSpeech(speech->isChecked());
+}
+
+void
+Application::onUploadUserDBChanged() {
+  QCheckBox *userdb = _mainWindow->findChild<QCheckBox *>("uploadUserDB");
+  _config->setUploadUserDB(userdb->isChecked());
 }
 
 void

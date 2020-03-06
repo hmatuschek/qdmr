@@ -26,7 +26,9 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
          << "# Microphone amplification, value 1..10:\n"
          << "MICLevel: " << config->micLevel() << "\n\n"
          << "# Speech-synthesis ('On' or 'Off'):\n"
-         << "Speech: " << (config->speech() ? "On" : "Off") << "\n\n";
+         << "Speech: " << (config->speech() ? "On" : "Off") << "\n\n"
+         << "# Upload user-db ('On' or 'Off'):\n"
+         << "UserDB: " << (config->uploadUserDB() ? "On" : "Off") << "\n\n";
 
   stream << "# Table of digital channels.\n"
             "# 1) Channel number: 1-1024\n"

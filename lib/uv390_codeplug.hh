@@ -856,7 +856,7 @@ public:
     /** Represents an index entry, a pair of DMR ID and callsign DB index. */
     struct __attribute__((packed)) entry_t {
       uint32_t id_high: 12,               ///< High bits of DMR ID (23:12).
-        index: 20;                        ///< Index in callsign data base where to find these.
+        index: 20;                        ///< Index in callsign data base, where to find these.
 
       /// Empty constructor.
       entry_t();
@@ -908,7 +908,7 @@ public:
 
 public:
   /** Empty constructor. */
-	explicit UV390Codeplug(QObject *parent = nullptr);
+  explicit UV390Codeplug(QObject *parent = nullptr);
 
   /** Clears and resets the complete codeplug to some default values. */
   void clear();
@@ -916,7 +916,7 @@ public:
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
 	bool decode(Config *config);
   /** Encodes the given generic configuration as a binary codeplug. */
-  bool encode(Config *config, UserDatabase *users=nullptr);
+  bool encode(Config *config);
 };
 
 #endif // RT3S_GPS_CODEPLUG_HH

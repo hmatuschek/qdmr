@@ -32,7 +32,7 @@ public:
 	virtual bool decode(Config *config) = 0;
   /** Encodes a given abstract configuration (@c config) to the device specific binary code-plug.
    * This must be implemented by the device-specific codeplug. */
-  virtual bool encode(Config *config, UserDatabase *users=nullptr) = 0;
+  virtual bool encode(Config *config) = 0;
 };
 
 #endif // CODEPLUG_HH
