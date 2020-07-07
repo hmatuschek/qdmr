@@ -127,7 +127,7 @@ UserDatabase::sortUsers(uint id) {
 
 void
 UserDatabase::download() {
-  QUrl url("https://www.radioid.net/static/users.json");
+  QUrl url("https://database.radioid.net/static/users.json");
   QNetworkRequest request(url);
   _network.get(request);
 }
@@ -135,7 +135,7 @@ UserDatabase::download() {
 void
 UserDatabase::downloadFinished(QNetworkReply *reply) {
   if (reply->error()) {
-    logError() << "Cannot download repeater list: " << reply->errorString();
+    logError() << "Cannot download user database: " << reply->errorString();
     return;
   }
 
@@ -147,7 +147,7 @@ UserDatabase::downloadFinished(QNetworkReply *reply) {
     return;
   }
   if (! file.open(QIODevice::WriteOnly)) {
-    logError() << "Cannot save user list at '" << (path+"/user.json") << "'.";
+    logError() << "Cannot save user database at '" << (path+"/user.json") << "'.";
     return;
   }
 
