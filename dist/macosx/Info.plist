@@ -6,7 +6,7 @@
 	<string>qdmr</string>
 
 	<key>CFBundleGetInfoString</key>
-	<string>QDMR 0.2.3</string>
+	<string>QDMR 0.3.0</string>
 	
 	<key>CFBundleIdentifier</key>
 	<string>com.github.hmatuschek.qdmr</string>
@@ -24,10 +24,10 @@
 	<string>APPL</string>
 
 	<key>CFBundleShortVersionString</key>
-	<string>0.2</string>
+	<string>0.3</string>
 
 	<key>CFBundleVersion</key>
-	<string>0.2.3</string>
+	<string>0.3.0</string>
 
 	<key>LSMinimumSystemVersion</key>
 	<string>10.9.0</string>
