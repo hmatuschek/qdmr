@@ -26,6 +26,10 @@ Application::Application(int &argc, char *argv[])
   setOrganizationName("DM3MAT");
   setOrganizationDomain("hmatuschek.github.io");
 
+  // open logfile
+  QString logdir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+  Logger::get().addHandler(new FileLogHandler(logdir+"/qdmr.log"));
+
   Settings settings;
   _repeater = new RepeaterDatabase(settings.position(), 7, this);
   _users    = new UserDatabase(30, this);

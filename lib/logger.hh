@@ -3,6 +3,7 @@
 #ifndef LOGGER_HH
 #define LOGGER_HH
 
+#include <QFile>
 #include <QTextStream>
 #include <QList>
 
@@ -143,6 +144,39 @@ public:
 protected:
   /** A reference to the text stream to log into. */
   QTextStream &_stream;
+  /** The minimum log level. */
+  LogMessage::Level _minLevel;
+};
+
+
+/** A log-handler that dumps log-messages into files.
+ * @ingroup log */
+class FileLogHandler: public LogHandler
+{
+  Q_OBJECT
+
+public:
+  /** Constructor.
+   * @param filename Specifies the filename to log to.
+   * @param minLevel Specifies the minimum log-level to log.
+   * @param parent Specifies the parent object. */
+  FileLogHandler(const QString &file, LogMessage::Level minLevel=LogMessage::DEBUG, QObject *parent=nullptr);
+
+  /** Destructor, closes log file. */
+  virtual ~FileLogHandler();
+
+  /** Returns the minimum log level. */
+  LogMessage::Level minLevel() const;
+  /** Resets the minimum log level. */
+  void setMinLevel(LogMessage::Level minLevel);
+
+  void handle(const LogMessage &message);
+
+protected:
+  /** The file to log into. */
+  QFile _file;
+  /** A reference to the text stream to log into. */
+  QTextStream _stream;
   /** The minimum log level. */
   LogMessage::Level _minLevel;
 };

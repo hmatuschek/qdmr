@@ -100,7 +100,7 @@ public:
     /** TX Admit criterion. */
 		typedef enum {
 			ADMIT_ALWAYS = 0,             ///< Always allow TX.
-			ADMIT_CH_FREE = 1,            ///< Allow TX if channel is free.
+      ADMIT_CH_FREE = 1,            ///< Allow TX if channel is free.
 			ADMIT_TONE = 2,               ///< Allow TX if CTCSS tone matches.
 			ADMIT_COLOR = 3,              ///< Allow TX if color-code matches.
 		} Admit;

@@ -1,4 +1,8 @@
 #include "logger.hh"
+#include <QFileInfo>
+#include <QDir>
+#include <QDateTime>
+
 
 /* ********************************************************************************************* *
  * Implementation of LogMessage
@@ -135,6 +139,70 @@ void
 StreamLogHandler::handle(const LogMessage &message) {
   if (message.level() < _minLevel)
     return;
+  switch (message.level()) {
+  case LogMessage::DEBUG:   _stream << "Debug "; break;
+  case LogMessage::INFO:    _stream << "Info "; break;
+  case LogMessage::WARNING: _stream << "Warning "; break;
+  case LogMessage::ERROR:   _stream << "ERROR "; break;
+  case LogMessage::FATAL:   _stream << "FATAL "; break;
+  }
+  _stream << "in " << message.file() << "@" << message.line() << ": " << message.message() << endl;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of FileLogHandler
+ * ********************************************************************************************* */
+FileLogHandler::FileLogHandler(const QString &filename, LogMessage::Level minLevel, QObject *parent)
+  : LogHandler(parent), _file(filename), _stream(), _minLevel(minLevel)
+{
+  QFileInfo info(filename);
+  // Check if logfile exists
+  if (! info.exists()) {
+    // check and create path to logfile (if needed)
+    if (! info.absoluteDir().mkpath(info.absoluteDir().absolutePath())) {
+      logError() << "Cannot create log-file directory '" << info.absoluteDir().absolutePath() << "'.";
+      return;
+    }
+    // Create logfile
+    _file.open(QFile::WriteOnly);
+  } else {
+    // Open logfile
+    _file.open(QFile::Append);
+  }
+
+  if (_file.isOpen()) {
+    // Set stream desitnation to logfile
+    _stream.setDevice(&_file);
+  }
+}
+
+FileLogHandler::~FileLogHandler() {
+  if (_file.isOpen()) {
+    _file.flush();
+    _file.close();
+  }
+}
+
+LogMessage::Level
+FileLogHandler::minLevel() const {
+  return _minLevel;
+}
+
+void
+FileLogHandler::setMinLevel(LogMessage::Level minLevel) {
+  _minLevel = minLevel;
+}
+
+void
+FileLogHandler::handle(const LogMessage &message) {
+  if (!_file.isOpen())
+    return;
+
+  if (message.level() < _minLevel)
+    return;
+
+  _stream << QDateTime::currentDateTime().toString(Qt::ISODateWithMs) << ": ";
   switch (message.level()) {
   case LogMessage::DEBUG:   _stream << "Debug "; break;
   case LogMessage::INFO:    _stream << "Info "; break;
