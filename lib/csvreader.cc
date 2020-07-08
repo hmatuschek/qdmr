@@ -1750,7 +1750,7 @@ CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 p
           .arg(line).arg(column).arg(name).arg(pch1);
       return false;
     }
-    _scanlists[idx]->setPriorityChannel(_channels[pch1]);
+    _scanlists[idx]->setPriorityChannel(_channels[pch1-1]);
 
     // Check PriChan 2
     if (pch2 && (! _channels.contains(pch2))) {
@@ -1758,7 +1758,7 @@ CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 p
           .arg(line).arg(column).arg(name).arg(pch2);
       return false;
     }
-    _scanlists[idx]->setSecPriorityChannel(_channels[pch2]);
+    _scanlists[idx]->setSecPriorityChannel(_channels[pch2-1]);
 
     // Check Tx channel
     if ((txch>1) && (! _channels.contains(txch-1))) {

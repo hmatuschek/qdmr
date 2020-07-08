@@ -20,6 +20,7 @@ the software with.
 
 
 ## Releases
+ * **[Version 0.3.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.3.0)** -- Bugfix release.
  * **[Version 0.2.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.2.3)** -- Bugfix release.
  * **[Version 0.2.2](https://github.com/hmatuschek/qdmr/releases/tag/v0.2.2)** -- Bugfix release.
  * **[Version 0.2.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.2.1)** -- First public release.
