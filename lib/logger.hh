@@ -157,7 +157,7 @@ class FileLogHandler: public LogHandler
 
 public:
   /** Constructor.
-   * @param filename Specifies the filename to log to.
+   * @param file Specifies the filename to log to.
    * @param minLevel Specifies the minimum log-level to log.
    * @param parent Specifies the parent object. */
   FileLogHandler(const QString &file, LogMessage::Level minLevel=LogMessage::DEBUG, QObject *parent=nullptr);

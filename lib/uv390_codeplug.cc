@@ -292,7 +292,7 @@ UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf
     if (dchan->gpsSystem()) {
       gps_system = conf->gpsSystems()->indexOf(dchan->gpsSystem())+1;
       send_gps_info = 0;
-      recv_gps_info = 0;
+      recv_gps_info = 1;
     }
   } else if (chan->is<AnalogChannel>()) {
     const AnalogChannel *achan = chan->as<const AnalogChannel>();
@@ -1112,7 +1112,7 @@ UV390Codeplug::menu_t::clear() {
   password           = 0;
   display_mode       = 1;
   hide_prog_radio    = 0;
-  _unknown_4_3       = 1;
+  hide_gps_set       = 0; // default = 1
   hide_gps           = 0;
   record_switch      = 1;
   _unknown_4_6       = 0b11;

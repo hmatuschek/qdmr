@@ -376,7 +376,6 @@ DFUDevice::write_block(int bno, uint8_t *data, int nbytes) {
     _errorMessage = tr("%1 Cannot read data from nullptr!").arg(__func__);
     return false;
   }
-  logDebug() << "Write block #" << bno << " (" << nbytes << "b).";
 
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, bno, 0, data, nbytes, 0);

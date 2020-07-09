@@ -717,8 +717,8 @@ public:
     uint8_t password      : 1,          ///< Show password and lock settings.
       display_mode        : 1,          ///< Show display mode settings.
       hide_prog_radio     : 1,          ///< Hide programm radio settings.
-      _unknown_4_3        : 1,          ///< Unknown, set to 0b1.
-      hide_gps            : 1,          ///< Hide GPS settings.
+      hide_gps_set        : 1,          ///< Hide GPS settings.
+      hide_gps            : 1,          ///< Hide GPS information.
       record_switch       : 1,          ///< Show record switch settings.
       _unknown_4_6        : 2;          ///< Unknown, set to 0b11.
     uint8_t _unknown_5_0  : 2,          ///< Uknnown, set to 0b11.
