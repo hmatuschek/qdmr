@@ -1112,10 +1112,11 @@ UV390Codeplug::menu_t::clear() {
   password           = 0;
   display_mode       = 1;
   hide_prog_radio    = 0;
-  hide_gps_set       = 0; // default = 1
+  hide_gps_set       = 0;
   hide_gps           = 0;
   record_switch      = 1;
-  _unknown_4_6       = 0b11;
+  _unknown_4_6       = 1;
+  _unknown_4_7       = 1;
 
   _unknown_5_0       = 0b11;
   group_call_match   = 1;

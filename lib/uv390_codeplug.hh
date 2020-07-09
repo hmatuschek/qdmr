@@ -720,7 +720,8 @@ public:
       hide_gps_set        : 1,          ///< Hide GPS settings.
       hide_gps            : 1,          ///< Hide GPS information.
       record_switch       : 1,          ///< Show record switch settings.
-      _unknown_4_6        : 2;          ///< Unknown, set to 0b11.
+      _unknown_4_6        : 1,          ///< Unknown, set to 1.
+      _unknown_4_7        : 1;          ///< Unknown, set to 1.
     uint8_t _unknown_5_0  : 2,          ///< Uknnown, set to 0b11.
       group_call_match    : 1,          ///< Show Group-call match settings.
       private_call_match  : 1,          ///< Show Private-call match settings.
