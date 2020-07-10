@@ -8,7 +8,6 @@ device and even revision specific CPSs provided by the manufactures. The goal of
 provide a **single**, **comfortable**, **well-documented** and **platform-independent** CPS for
 several (mainly Chinese) DMR radios.
 
-
 ## Supported Radios 
 Currently, there are only two supported radios
 
@@ -43,6 +42,8 @@ after this, you may install the GUI application with
 or the command-line-tool with
 
     sudo apt-get install dmrconf
+
+[![qdmr](https://snapcraft.io//qdmr/badge.svg)](https://snapcraft.io/qdmr)
 
 ### Permissions
 When running *qdmr* or *dmrconf* under Linux, you may need to change the permissions to access USB devices.  Create a file /etc/udev/rules.d/99-dmr.rules with the following contents:
