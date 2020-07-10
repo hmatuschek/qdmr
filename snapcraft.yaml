@@ -1,6 +1,6 @@
 name: qdmr
 version: git
-grade: edge
+grade: devel
 #version: 0.3.0
 #grade: stable
 summary: Graphical codeplug programming tool DMR radios.
