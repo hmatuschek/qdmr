@@ -30,6 +30,13 @@ parts:
       - qttools5-dev-tools
       - qtpositioning5-dev
       - libusb-1.0-0-dev
+    stage-packages:
+      - libqt5core5a
+      - libqt5gui5
+      - libqt5network5
+      - libqt5positioning5
+      - libqt5widgets5
+      - libusb-1.0-0
     source: https://github.com/hmatuschek/qdmr.git
     source-type: git
     source-tag: v0.3.0
