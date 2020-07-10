@@ -18,7 +18,7 @@ apps:
     plugs:
       - desktop
       - network
-      - usb-raw
+      - raw-usb
       - serial-port
 
 parts:
