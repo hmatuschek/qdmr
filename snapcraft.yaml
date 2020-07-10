@@ -1,0 +1,38 @@
+name: qdmr
+version: 0.3.0
+grade: stable
+summary: Graphical codeplug programming tool DMR radios.
+description: |
+  qDMR is a simple to use and feature rich codeplug programming tool for cheap DMR radios.
+
+confinement: strict
+base: core18
+
+architectures:
+  - build-on: amd64
+
+apps:
+  qdmr:
+    command: qdmr
+    desktop: usr/share/applications/qdmr.desktop
+    plugs:
+      - desktop
+      - network
+      - usb-raw
+      - serial-port
+
+parts:
+  qdmr:
+    plugin: cmake
+    build-packages:
+      - qtbase5-dev
+      - qttools5-dev
+      - qttools5-dev-tools
+      - qtpositioning5-dev
+      - libusb-1.0-0-dev
+    source: https://github.com/hmatuschek/qdmr.git
+    source-type: git
+    source-tag: v0.3.0
+    configflags:
+      - "-DCMAKE_INSTALL_PREFIX=/usr"
+      - "-DCMAKE_BUILD_TYPE=Release"
