@@ -1,4 +1,5 @@
 #include "hid_libusb.hh"
+#include "logger.hh"
 
 #define HID_INTERFACE   0                   // interface index
 #define TIMEOUT_MSEC    500                 // receive timeout
@@ -7,6 +8,8 @@
 HIDevice::HIDevice(int vid, int pid, QObject *parent)
   : QObject(parent), _ctx(nullptr), _dev(nullptr), _transfer(nullptr), _errorMessage()
 {
+  logDebug() << "Try to detect USB HID interface " << hex << vid << ":" << pid << ".";
+
   int error = libusb_init(&_ctx);
   if (error < 0) {
     _errorMessage = tr("Cannot init libusb (%1): %2")

@@ -124,7 +124,7 @@ RD5R::run()
       int b0 = _codeplug.image(0).element(n).address()/BSIZE;
       int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
       for (int i=0; i<nb; i++, bcount++) {
-        if (! _dev->read_block(b0+i, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+        if (! _dev->read(0, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
           _errorMessage = tr("%1: Cannot download codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
           _task = StatusError;
@@ -166,7 +166,7 @@ RD5R::run()
         int b0 = _codeplug.image(0).element(n).address()/BSIZE;
         int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
         for (int i=0; i<nb; i++, bcount++) {
-          if (! _dev->read_block(b0+i, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+          if (! _dev->read(0, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
             _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
                 .arg(_dev->errorMessage());
             _task = StatusError;
@@ -199,7 +199,7 @@ RD5R::run()
       int b0 = _codeplug.image(0).element(n).address()/BSIZE;
       int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
       for (int i=0; i<nb; i++, bcount++) {
-        if (! _dev->write_block(b0+i, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+        if (! _dev->write(0, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
           _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
           _task = StatusError;

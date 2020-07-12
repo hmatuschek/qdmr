@@ -4,6 +4,7 @@
 #include "rd5r.hh"
 #include "gd77.hh"
 #include "uv390.hh"
+#include "opengd77.hh"
 #include "config.hh"
 #include "logger.hh"
 #include <QSet>
@@ -200,9 +201,14 @@ Radio::detect(QString &errorMessage) {
       id = hid.identifier();
       hid.close();
     } else {
-      errorMessage = QString("%1(): No matching radio found: %2.")
-          .arg(__func__).arg(hid.errorMessage());
-      return nullptr;
+      OpenGD77Interface ogd77;
+      if (ogd77.isOpen()) {
+        id = ogd77.identifier();
+        ogd77.close();
+      } else {
+        errorMessage = QString("%1(): No matching radio found.").arg(__func__);
+        return nullptr;
+      }
     }
   }
 
@@ -219,6 +225,8 @@ Radio::detect(QString &errorMessage) {
     return new GD77();
   } else if ("MD-UV390" == id) {
     return new UV390();
+  } else if ("OpenGD77" == id) {
+    return new OpenGD77();
   }
 
   return nullptr;

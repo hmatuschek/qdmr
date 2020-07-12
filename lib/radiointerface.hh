@@ -31,29 +31,32 @@ public:
   /** Returns a device identifier. */
 	virtual QString identifier() = 0;
 
+  virtual bool write_start(uint32_t bank, uint32_t addr)=0;
+
   /** Writes a chunk of @c data at the block-address @c bno (block number).
    * @param bno Specifies the block number to write to.
    * @param data Pointer to the actual data to be written.
    * @param nbytes Specifies the number of bytes to write.
    * @returns @c true on success. */
-  virtual bool write_block(int bno, uint8_t *data, int nbytes) = 0;
+  virtual bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) = 0;
 
   /** This function ends a series of @c write_block operations.
    * This function will be re-implemented by certain interfaces that need completion of write
    * operations (e.g., HID). By default the method does nothing. */
-  virtual bool write_finish();
+  virtual bool write_finish() = 0;
 
+  virtual bool read_start(uint32_t bank, uint32_t addr) = 0;
   /** Reads a chunk of data from the block-address @c bno (block number).
    * @param bno Specifies the block number to read from.
    * @param data Pointer where to store the read data.
    * @param nbytes Specifies the number of bytes to read.
    * @returns @c true on success. */
-	virtual bool read_block(int bno, uint8_t *data, int nbytes) = 0;
+  virtual bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) = 0;
 
   /** This function ends a series of @c read_block operations.
    * This function will be re-implemented by certain interfaces that need completion of read
    * operations (e.g., HID). By default the method does nothing. */
-  virtual bool read_finish();
+  virtual bool read_finish() = 0;
 
   /** Some radios need to be rebooted after being read or programmed. This function
    * will be re-implemented by some interfaces (e.g., DFUDevice) to reboot the radio. By default

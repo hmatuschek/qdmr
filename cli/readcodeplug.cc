@@ -37,7 +37,7 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
 
   Config config;
   if (! radio->startDownload(&config, true)) {
-    logError() << "Codeplug upload error: " << radio->errorMessage();
+    logError() << "Codeplug download error: " << radio->errorMessage();
     return -1;
   }
 

@@ -13,28 +13,28 @@ CodePlug::~CodePlug() {
 }
 
 unsigned char *
-CodePlug::data(uint32_t offset) {
+CodePlug::data(uint32_t offset, uint32_t img) {
   // Search for element that contains address
-  for  (int i=0; i<image(0).numElements(); i++) {
-    if ((offset >= image(0).element(i).address()) &&
-        (offset < (image(0).element(i).address()+image(0).element(i).data().size())))
+  for  (int i=0; i<image(img).numElements(); i++) {
+    if ((offset >= image(img).element(i).address()) &&
+        (offset < (image(img).element(i).address()+image(img).element(i).data().size())))
     {
-      return (unsigned char *)(image(0).element(i).data().data()+
-                               (offset-image(0).element(i).address()));
+      return (unsigned char *)(image(img).element(i).data().data()+
+                               (offset-image(img).element(i).address()));
     }
   }
   return nullptr;
 }
 
 const unsigned char *
-CodePlug::data(uint32_t offset) const {
+CodePlug::data(uint32_t offset, uint32_t img) const {
   // Search for element that contains address
-  for  (int i=0; i<image(0).numElements(); i++) {
-    if ((offset >= image(0).element(i).address()) &&
-        (offset < (image(0).element(i).address()+image(0).element(i).data().size())))
+  for  (int i=0; i<image(img).numElements(); i++) {
+    if ((offset >= image(img).element(i).address()) &&
+        (offset < (image(img).element(i).address()+image(img).element(i).data().size())))
     {
-      return (const unsigned char *)(image(0).element(i).data().data()+
-                                     (offset-image(0).element(i).address()));
+      return (const unsigned char *)(image(img).element(i).data().data()+
+                                     (offset-image(img).element(i).address()));
     }
   }
   return nullptr;

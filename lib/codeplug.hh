@@ -23,9 +23,9 @@ public:
 	virtual ~CodePlug();
 
   /** Returns a pointer to the encoded raw data at the specified offset. */
-  virtual unsigned char *data(uint32_t offset);
+  virtual unsigned char *data(uint32_t offset, uint32_t img=0);
   /** Returns a const pointer to the encoded raw data at the specified offset. */
-  virtual const unsigned char *data(uint32_t offset) const;
+  virtual const unsigned char *data(uint32_t offset, uint32_t img=0) const;
 
   /** Decodes a binary codeplug to the given abstract configuration @c config.
    * This must be implemented by the device-specific codeplug. */

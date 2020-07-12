@@ -142,7 +142,7 @@ GD77::run() {
       uint size = _codeplug.image(0).element(n).data().size();
       uint b0 = addr/BSIZE, nb = size/BSIZE;
       for (uint b=0; b<nb; b++, bcount++) {
-        if (! _dev->read_block(b0+b, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
+        if (! _dev->read(0, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
           _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
           _task = StatusError;
@@ -198,7 +198,7 @@ GD77::run() {
       uint size = _codeplug.image(0).element(n).data().size();
       uint b0 = addr/BSIZE, nb = size/BSIZE;
       for (uint b=0; b<nb; b++, bcount++) {
-        if (! _dev->read_block(b0+b, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
+        if (! _dev->read(0, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
           _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
           _task = StatusError;
@@ -222,7 +222,7 @@ GD77::run() {
       uint size = _codeplug.image(0).element(n).data().size();
       uint b0 = addr/BSIZE, nb = size/BSIZE;
       for (size_t b=1; b<nb; b++,bcount++) {
-        if (! _dev->write_block(b, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
+        if (! _dev->write(0, b*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
           _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
           _task = StatusError;

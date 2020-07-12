@@ -37,8 +37,12 @@ public:
   /** Erases a memory section from @c start to @c finish. */
 	bool erase(unsigned start, unsigned finish);
 
-	bool read_block(int bno, uint8_t *data, int nbytes);
-	bool write_block(int bno, uint8_t *data, int nbytes);
+  bool read_start(uint32_t bank, uint32_t addr);
+  bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
+  bool read_finish();
+  bool write_start(uint32_t bank, uint32_t addr);
+  bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
+  bool write_finish();
 	bool reboot();
 
   const QString &errorMessage() const;

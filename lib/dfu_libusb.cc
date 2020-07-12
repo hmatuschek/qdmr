@@ -35,6 +35,8 @@ enum {
 DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
   : QObject(parent), RadioInterface(), _ctx(nullptr), _dev(nullptr), _ident(nullptr)
 {
+  logDebug() << "Try to detect USB DFU interface " << hex << vid << ":" << pid << ".";
+
   int error = libusb_init(&_ctx);
   if (error < 0) {
     _errorMessage = tr("%1 Libusb init failed: %2 %3").arg(__func__).arg(error)
@@ -352,15 +354,23 @@ DFUDevice::erase(unsigned start, unsigned finish) {
   return (0 == set_address(0x00000000));
 }
 
+bool
+DFUDevice::read_start(uint32_t bank, uint32_t addr) {
+  // pass...
+  return true;
+}
 
 bool
-DFUDevice::read_block(int bno, uint8_t *data, int nbytes) {
+DFUDevice::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
+  Q_UNUSED(bank);
+
   if (nullptr == data) {
     _errorMessage = tr("%1 Cannot write data into nullptr!").arg(__func__);
     return false;
   }
+  uint32_t block = addr/1024;
   int error = libusb_control_transfer(
-        _dev, REQUEST_TYPE_TO_HOST, REQUEST_UPLOAD, bno, 0, data, nbytes, 0);
+        _dev, REQUEST_TYPE_TO_HOST, REQUEST_UPLOAD, block, 0, data, nbytes, 0);
   if (error < 0) {
     _errorMessage = tr("%1 Cannot read block: %2 %3").arg(__func__).arg(error)
         .arg(libusb_strerror((enum libusb_error) error));
@@ -369,16 +379,30 @@ DFUDevice::read_block(int bno, uint8_t *data, int nbytes) {
   return 0 == get_status();
 }
 
+bool
+DFUDevice::read_finish() {
+  // pass...
+  return true;
+}
+
 
 bool
-DFUDevice::write_block(int bno, uint8_t *data, int nbytes) {
+DFUDevice::write_start(uint32_t bank, uint32_t addr) {
+  // pass...
+  return true;
+}
+
+bool
+DFUDevice::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
+  Q_UNUSED(bank);
+
   if (nullptr == data) {
     _errorMessage = tr("%1 Cannot read data from nullptr!").arg(__func__);
     return false;
   }
-
+  uint32_t block = addr/1024;
   int error = libusb_control_transfer(
-        _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, bno, 0, data, nbytes, 0);
+        _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, block, 0, data, nbytes, 0);
   if (error < 0) {
     _errorMessage = tr("%1 Cannot write block: %2 %3").arg(__func__).arg(error)
         .arg(libusb_strerror((enum libusb_error) error));
@@ -387,6 +411,12 @@ DFUDevice::write_block(int bno, uint8_t *data, int nbytes) {
   if ((error = get_status()))
     return false;
   return 0 == wait_idle();
+}
+
+bool
+DFUDevice::write_finish() {
+  // pass...
+  return true;
 }
 
 

@@ -83,15 +83,22 @@ HID::identifier() {
 
 
 bool
-HID::read_block(int bno, unsigned char *data, int nbytes)
+HID::read_start(uint32_t bank, uint32_t addr) {
+  /// @bug perform bank selection here
+  return true;
+}
+
+bool
+HID::read(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
 {
-  unsigned addr = bno * nbytes;
+  Q_UNUSED(bank);
+
   unsigned char cmd[4], reply[32+4];
   int n;
 
   if (! selectMemoryBank(addr)) {
-    _errorMessage = tr("%1: Cannot read block %2 (n=%3): %4").arg(__func__)
-        .arg(bno).arg(nbytes);
+    _errorMessage = tr("%1: Cannot read addr 0x%2 (n=%3): %4")
+        .arg(__func__).arg(addr,0,16).arg(nbytes);
     return false;
   }
 
@@ -128,15 +135,23 @@ HID::read_finish()
   return true;
 }
 
+
 bool
-HID::write_block(int bno, unsigned char *data, int nbytes)
+HID::write_start(uint32_t bank, uint32_t addr) {
+  /// @bug perform bank selection here
+  return true;
+}
+
+bool
+HID::write(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
 {
-  unsigned addr = bno * nbytes;
+  Q_UNUSED(bank);
+
   unsigned char ack, cmd[4+32];
 
   if (! selectMemoryBank(addr)) {
-    _errorMessage = tr("%1: Cannot write block %2 (n=%3): %4").arg(__func__)
-        .arg(bno).arg(nbytes);
+    _errorMessage = tr("%1: Cannot write addr 0x%2 (n=%3): %4")
+        .arg(__func__).arg(addr,0,16).arg(nbytes);
     return false;
   }
 
