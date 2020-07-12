@@ -15,7 +15,7 @@
 #define OPENGD77_HH
 
 #include "radio.hh"
-#include "opengd77interface.hh"
+#include "opengd77_interface.hh"
 #include "opengd77_codeplug.hh"
 
 
