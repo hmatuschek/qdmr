@@ -5,6 +5,7 @@
 #include "gpssystem.hh"
 #include "userdatabase.hh"
 #include "config.h"
+#include "logger.hh"
 #include <QTimeZone>
 
 
@@ -594,14 +595,19 @@ UV390Codeplug::scanlist_t::toScanListObj() const {
 
 bool
 UV390Codeplug::scanlist_t::linkScanListObj(ScanList *l, Config *conf) const {
-  if (! isValid())
+  if (! isValid()) {
+    logDebug() << "Cannot link invalid scanlist.";
     return false;
-  for (int i=0; (i<31)&&(member[i]); i++) {
-    if ((member[i]-1) >= conf->channelList()->count())
+  }
+  for (int i=0; ((i<31) && (member[i])); i++) {
+    if ((member[i]-1) >= conf->channelList()->count()) {
+      logDebug() << "Cannot link scanlist to channel idx=" << member[i]
+                    << ". Only " << conf->channelList()->count() << " channels defined.";
       return false;
+    }
     l->addChannel(conf->channelList()->channel(member[i]-1));
   }
-  return false;
+  return true;
 }
 
 void
@@ -1410,10 +1416,12 @@ UV390Codeplug::decode(Config *config) {
   general_settings_t *genset = (general_settings_t *)data(OFFSET_SETTINGS);
   if (! genset) {
     _errorMessage = QString("%1(): Cannot access general settings memory!").arg(__func__);
+    logError() << _errorMessage;
     return false;
   }
   if (! genset->updateConfigObj(config)) {
     _errorMessage = QString("%1(): Invalid general settings!").arg(__func__);
+    logError() << _errorMessage;
     return false;
   }
 
@@ -1422,6 +1430,7 @@ UV390Codeplug::decode(Config *config) {
     contact_t *cont = (contact_t *)(data(OFFSET_CONTACTS+i*sizeof(contact_t)));
     if (! cont) {
       _errorMessage = QString("%1(): Cannot access contact memory at index %2!").arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
     if (! cont->isValid())
@@ -1431,6 +1440,7 @@ UV390Codeplug::decode(Config *config) {
     else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid contact at index %2.")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
   }
@@ -1440,6 +1450,7 @@ UV390Codeplug::decode(Config *config) {
     grouplist_t *glist = (grouplist_t *)(data(OFFSET_GLISTS+i*sizeof(grouplist_t)));
     if (! glist) {
       _errorMessage = QString("%1(): Cannot access group-list memory at index %2!").arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
     if (! glist->isValid())
@@ -1449,6 +1460,7 @@ UV390Codeplug::decode(Config *config) {
     else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid RX group list at index %2.")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
   }
@@ -1458,6 +1470,7 @@ UV390Codeplug::decode(Config *config) {
     channel_t *chan = (channel_t *)(data(OFFSET_CHANNELS+i*sizeof(channel_t)));
     if (! chan) {
       _errorMessage = QString("%1(): Cannot access channel memory at index %2!").arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
     if (! chan->isValid())
@@ -1467,6 +1480,7 @@ UV390Codeplug::decode(Config *config) {
     else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid channel at index %2.")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
   }
@@ -1476,6 +1490,7 @@ UV390Codeplug::decode(Config *config) {
     zone_t *zone = (zone_t *)(data(OFFSET_ZONES+i*sizeof(zone_t)));
     if (! zone) {
       _errorMessage = QString("%1(): Cannot access zone memory at index %2!").arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
     if (! zone->isValid())
@@ -1485,6 +1500,7 @@ UV390Codeplug::decode(Config *config) {
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid zone at index %2.")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
   }
@@ -1494,6 +1510,7 @@ UV390Codeplug::decode(Config *config) {
     scanlist_t *scan = (scanlist_t *)(data(OFFSET_SCANL+i*sizeof(scanlist_t)));
     if (! scan) {
       _errorMessage = QString("%1(): Cannot access scan-list memory at index %2!").arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
     if (! scan->isValid())
@@ -1503,6 +1520,7 @@ UV390Codeplug::decode(Config *config) {
     else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid scanlist at index %2.")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
   }
@@ -1513,6 +1531,8 @@ UV390Codeplug::decode(Config *config) {
     if (! gps) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid GPS system at index %2.")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
+      return false;
     }
     if (! gps->isValid())
       break;
@@ -1521,6 +1541,7 @@ UV390Codeplug::decode(Config *config) {
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid GPS system at index %2.")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
   }
@@ -1531,6 +1552,7 @@ UV390Codeplug::decode(Config *config) {
     if (! glist->linkRXGroupList(config->rxGroupLists()->list(i), config)) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link group-list at index %2.")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
   }
@@ -1541,6 +1563,7 @@ UV390Codeplug::decode(Config *config) {
     if (! chan->linkChannelObj(config->channelList()->channel(i), config)) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link channel at index %2.")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
   }
@@ -1551,16 +1574,20 @@ UV390Codeplug::decode(Config *config) {
     if (! zone->linkZone(config->zones()->zone(i), config)) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link zone at index %2.")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
     zone_ext_t *zoneext = (zone_ext_t *)(data(OFFSET_ZONEXT+i*sizeof(zone_ext_t)));
     if (! zoneext) {
-      _errorMessage = QString("%1(): Cannot access zone extension memory at index %2!").arg(__func__).arg(i);
+      _errorMessage = QString("%1(): Cannot access zone extension memory at index %2!")
+          .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
     if (! zoneext->linkZone(config->zones()->zone(i), config)) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link zone extension at index %2.")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
   }
@@ -1571,6 +1598,7 @@ UV390Codeplug::decode(Config *config) {
     if (! scan->linkScanListObj(config->scanlists()->scanlist(i), config)) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link scan-list at index %2.")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
   }
@@ -1581,6 +1609,7 @@ UV390Codeplug::decode(Config *config) {
     if (! gps->linkGPSSystemObj(config->gpsSystems()->gpsSystem(i), config)) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link GPS system at index %2.")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
   }

@@ -59,6 +59,7 @@ public:
 
 private:
   bool selectMemoryBank(uint addr);
+  uint32_t _offset;
 };
 
 #endif // HIDINTERFACE_HH

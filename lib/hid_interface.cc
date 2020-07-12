@@ -1,4 +1,4 @@
-#include "hidinterface.hh"
+#include "hid_interface.hh"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,10 +14,8 @@ static const unsigned char CMD_ENDW[]  = "ENDW";
 static const unsigned char CMD_CWB0[]  = "CWB\4\0\0\0\0";
 static const unsigned char CMD_CWB1[]  = "CWB\4\0\1\0\0";
 
-static unsigned offset = 0;                 // CWD offset
-
 HID::HID(int vid, int pid, QObject *parent)
-  : HIDevice(vid, pid, parent)
+  : HIDevice(vid, pid, parent), _offset(0)
 {
   // pass...
 }
@@ -138,7 +136,7 @@ HID::read_finish()
 
 bool
 HID::write_start(uint32_t bank, uint32_t addr) {
-  /// @bug perform bank selection here
+  /// @todo Perform bank selection here.
   return true;
 }
 
@@ -197,8 +195,8 @@ HID::selectMemoryBank(uint addr) {
   unsigned char ack;
 
   // select memory bank according to address
-  if ((addr < 0x10000) && (offset != 0)) {
-    offset = 0;
+  if ((addr < 0x10000) && (_offset != 0)) {
+    _offset = 0;
     if (! hid_send_recv(CMD_CWB0, 8, &ack, 1)) {
       _errorMessage = tr("%1: Cannot select memory bank for addr %2: %3").arg(__func__)
           .arg(addr).arg(_errorMessage);
@@ -209,8 +207,8 @@ HID::selectMemoryBank(uint addr) {
           .arg(__func__).arg(addr).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
       return false;
     }
-  } else if ((addr >= 0x10000) && (0 == offset)) {
-    offset = 0x00010000;
+  } else if ((addr >= 0x10000) && (0 == _offset)) {
+    _offset = 0x00010000;
     if (! hid_send_recv(CMD_CWB1, 8, &ack, 1)) {
       _errorMessage = tr("%1: Cannot select memory bank for addr %2: %3").arg(__func__)
           .arg(addr).arg(_errorMessage);

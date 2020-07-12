@@ -41,6 +41,10 @@ class OpenGD77Codeplug: public GD77Codeplug
 	Q_OBJECT
 
 public:
+  static const uint32_t EEPROM = 0;
+  static const uint32_t FLASH  = 1;
+
+public:
   /** Constructs an empty codeplug for the GD-77. */
   explicit OpenGD77Codeplug(QObject *parent=nullptr);
 

@@ -27,7 +27,7 @@
 #define RD5R_HH
 
 #include "radio.hh"
-#include "hidinterface.hh"
+#include "hid_interface.hh"
 #include "rd5r_codeplug.hh"
 
 

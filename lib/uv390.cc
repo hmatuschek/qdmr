@@ -144,6 +144,7 @@ UV390::run() {
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {
       uint addr = _codeplug.image(0).element(n).address();
       uint size = _codeplug.image(0).element(n).data().size();
+      logDebug() << "Download of block " << n << " " << hex << addr << ":" << size;
       uint b0 = addr/BSIZE, nb = size/BSIZE;
       for (uint b=0; b<nb; b++, bcount++) {
         if (! _dev->read(0, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {

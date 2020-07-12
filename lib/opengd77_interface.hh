@@ -9,6 +9,10 @@ class OpenGD77Interface : public USBSerial
   Q_OBJECT
 
 public:
+  static const uint32_t EEPROM = 0;
+  static const uint32_t FLASH  = 1;
+
+public:
   explicit OpenGD77Interface(QObject *parent=nullptr);
   virtual ~OpenGD77Interface();
 
@@ -43,6 +47,9 @@ protected:
     uint32_t address;
     /// Amount of data to read, max 32 bytes in big endian.
     uint16_t length;
+
+    bool initReadFlash(uint32_t address, uint16_t length);
+    bool initReadEEPROM(uint32_t address, uint16_t length);
   } ReadRequest;
 
   typedef struct __attribute__((packed)) {
@@ -91,7 +98,9 @@ protected:
   } WriteResponse;
 
 protected:
+  bool readEEPROM(uint32_t addr, uint8_t *data, uint16_t len);
   bool writeEEPROM(uint32_t addr, const uint8_t *data, uint16_t len);
+  bool readFlash(uint32_t addr, uint8_t *data, uint16_t len);
   bool setFlashSector(uint32_t addr);
   bool writeFlash(uint32_t addr, const uint8_t *data, uint16_t len);
   bool finishWriteFlash();

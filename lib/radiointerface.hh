@@ -4,7 +4,8 @@
 #ifndef RADIOINFERFACE_HH
 #define RADIOINFERFACE_HH
 
-#include <QObject>
+#include <QString>
+
 
 /** Abstract radio interface.
  * A radion interface must provide means to communicate with the device. That is, open a connection
@@ -12,6 +13,7 @@
  *
  * This class defines the common interface for all radio-interface classes, irrespective of the
  * actual communication protocol being used by the device.
+ *
  * @ingroup rif */
 class RadioInterface
 {
@@ -33,29 +35,29 @@ public:
 
   virtual bool write_start(uint32_t bank, uint32_t addr)=0;
 
-  /** Writes a chunk of @c data at the block-address @c bno (block number).
-   * @param bno Specifies the block number to write to.
+  /** Writes a chunk of @c data at the address @c addr.
+   * @param addr Specifies the address to write to.
    * @param data Pointer to the actual data to be written.
    * @param nbytes Specifies the number of bytes to write.
    * @returns @c true on success. */
   virtual bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) = 0;
 
-  /** This function ends a series of @c write_block operations.
-   * This function will be re-implemented by certain interfaces that need completion of write
-   * operations (e.g., HID). By default the method does nothing. */
+  /** This function ends a series of @c write operations.
+   * This function will be implemented by certain interfaces that need completion of write
+   * operations (e.g., HID). */
   virtual bool write_finish() = 0;
 
   virtual bool read_start(uint32_t bank, uint32_t addr) = 0;
   /** Reads a chunk of data from the block-address @c bno (block number).
-   * @param bno Specifies the block number to read from.
+   * @param addr Specifies the address to read from.
    * @param data Pointer where to store the read data.
    * @param nbytes Specifies the number of bytes to read.
    * @returns @c true on success. */
   virtual bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) = 0;
 
-  /** This function ends a series of @c read_block operations.
+  /** This function ends a series of @c read operations.
    * This function will be re-implemented by certain interfaces that need completion of read
-   * operations (e.g., HID). By default the method does nothing. */
+   * operations (e.g., HID). */
   virtual bool read_finish() = 0;
 
   /** Some radios need to be rebooted after being read or programmed. This function

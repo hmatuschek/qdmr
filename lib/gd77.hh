@@ -15,7 +15,7 @@
 #define GD77_HH
 
 #include "radio.hh"
-#include "hidinterface.hh"
+#include "hid_interface.hh"
 #include "gd77_codeplug.hh"
 
 

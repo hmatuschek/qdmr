@@ -1,5 +1,5 @@
 #include "radio.hh"
-#include "hidinterface.hh"
+#include "hid_interface.hh"
 #include "dfu_libusb.hh"
 #include "rd5r.hh"
 #include "gd77.hh"

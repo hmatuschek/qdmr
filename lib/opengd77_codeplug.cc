@@ -5,19 +5,17 @@
 #include "logger.hh"
 #include <QDateTime>
 
-
-#define OFFSET_TIMESTMP     0x00088
+// Stored in EEPROM
 #define OFFSET_SETTINGS     0x000e0
 #define OFFSET_MSGTAB       0x00128
 #define OFFSET_SCANTAB      0x01790
 #define OFFSET_BANK_0       0x03780 // Channels 1-128
 #define OFFSET_INTRO        0x07540
 #define OFFSET_ZONETAB      0x08010
+// Stored in flash
 #define OFFSET_BANK_1       0x7b1b0 // Channels 129-1024
 #define OFFSET_CONTACTS     0x87620
 #define OFFSET_GROUPTAB     0x8d620
-
-#define GET_MSGTAB()        ((msgtab_t*) &radio_mem[OFFSET_MSGTAB])
 
 
 /* ******************************************************************************************** *
@@ -38,17 +36,13 @@ OpenGD77Codeplug::OpenGD77Codeplug(QObject *parent)
 
 bool
 OpenGD77Codeplug::encode(Config *config) {
-  // set timestamp
-  timestamp_t *ts = (timestamp_t *)data(OFFSET_TIMESTMP);
-  ts->setNow();
-
   // pack basic config
-  general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
+  general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS, EEPROM);
   gs->initDefault();
   gs->setName(config->name());
   gs->setRadioId(config->id());
 
-  intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
+  intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO, EEPROM);
   it->setIntroLine1(config->introLine1());
   it->setIntroLine2(config->introLine2());
 
@@ -57,9 +51,9 @@ OpenGD77Codeplug::encode(Config *config) {
     // First, get bank
     bank_t *b;
     if ((i>>7) == 0)
-      b = (bank_t*) data(OFFSET_BANK_0);
+      b = (bank_t*) data(OFFSET_BANK_0, EEPROM);
     else
-      b = (((i>>7)-1) + (bank_t *) data(OFFSET_BANK_1));
+      b = (((i>>7)-1) + (bank_t *) data(OFFSET_BANK_1, FLASH));
     channel_t *ch = &b->chan[i % 128];
 
     // Disable channel if not used
@@ -79,7 +73,7 @@ OpenGD77Codeplug::encode(Config *config) {
   // Pack Zones
   bool pack_zone_a = true;
   for (int i=0, j=0; i<NZONES; i++) {
-    zonetab_t *zt = (zonetab_t*) data(OFFSET_ZONETAB);
+    zonetab_t *zt = (zonetab_t*) data(OFFSET_ZONETAB, EEPROM);
     zone_t *z = &zt->zone[i];
 
 next:
@@ -112,7 +106,7 @@ next:
 
   // Pack Scanlists
   for (int i=0; i<NSCANL; i++) {
-    scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB);
+    scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB, EEPROM);
     scanlist_t *sl = &st->scanlist[i];
 
     if (i >= config->scanlists()->count()) {
@@ -127,7 +121,7 @@ next:
 
   // Pack contacts
   for (int i=0; i<NCONTACTS; i++) {
-    contact_t *ct = (contact_t*) data(OFFSET_CONTACTS + (i)*sizeof(contact_t));
+    contact_t *ct = (contact_t*) data(OFFSET_CONTACTS + (i)*sizeof(contact_t), FLASH);
     ct->clear();
     if (i >= config->contacts()->digitalCount())
       continue;
@@ -136,7 +130,7 @@ next:
 
   // Pack Grouplists:
   for (int i=0; i<NGLISTS; i++) {
-    grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB);
+    grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB, FLASH);
     grouplist_t *gl = &gt->grouplist[i];
     if (i >= config->rxGroupLists()->count()) {
       gt->nitems1[i] = 0;
@@ -156,7 +150,7 @@ OpenGD77Codeplug::decode(Config *config) {
   config->reset();
 
   /* Unpack general config */
-  general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
+  general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS, EEPROM);
   if (nullptr == gs) {
     _errorMessage = QString("%1(): Cannot access general settings memory!")
         .arg(__func__);
@@ -165,13 +159,13 @@ OpenGD77Codeplug::decode(Config *config) {
 
   config->setId(gs->getRadioId());
   config->setName(gs->getName());
-  intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
+  intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO, EEPROM);
   config->setIntroLine1(it->getIntroLine1());
   config->setIntroLine2(it->getIntroLine2());
 
   /* Unpack Contacts */
   for (int i=0; i<NCONTACTS; i++) {
-    contact_t *ct = (contact_t *) data(OFFSET_CONTACTS+i*sizeof(contact_t));
+    contact_t *ct = (contact_t *) data(OFFSET_CONTACTS+i*sizeof(contact_t), FLASH);
     if (nullptr == ct) {
       _errorMessage = QString("%1(): Cannot access contact memory at index %2!")
           .arg(__func__).arg(i);
@@ -192,7 +186,7 @@ OpenGD77Codeplug::decode(Config *config) {
 
   /* Unpack RX Group Lists */
   for (int i=0; i<NGLISTS; i++) {
-    grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB);
+    grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB, FLASH);
     if (nullptr == gt) {
       _errorMessage = QString("%1(): Cannot access group list table memory!")
           .arg(__func__);
@@ -226,9 +220,9 @@ OpenGD77Codeplug::decode(Config *config) {
     // First, get bank
     bank_t *b;
     if ((i>>7) == 0)
-      b = (bank_t*) data(OFFSET_BANK_0);
+      b = (bank_t*) data(OFFSET_BANK_0, EEPROM);
     else
-      b = (((i>>7)-1) + (bank_t*) data(OFFSET_BANK_1));
+      b = (((i>>7)-1) + (bank_t*) data(OFFSET_BANK_1, FLASH));
     if (nullptr == b) {
       _errorMessage = QString("%1(): Cannot access channel bank at index %2!")
           .arg(__func__).arg(i);
@@ -255,7 +249,7 @@ OpenGD77Codeplug::decode(Config *config) {
 
   /* Unpack Zones */
   for (int i=0; i<NZONES; i++) {
-    zonetab_t *zt = (zonetab_t*) data(OFFSET_ZONETAB);
+    zonetab_t *zt = (zonetab_t*) data(OFFSET_ZONETAB, EEPROM);
     if (! zt){
       _errorMessage = QString("%1(): Cannot access zone table memory.")
           .arg(__func__);
@@ -289,7 +283,7 @@ OpenGD77Codeplug::decode(Config *config) {
 
   /* Unpack Scan lists */
   for (int i=0; i<NSCANL; i++) {
-    scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB);
+    scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB, EEPROM);
     if (! st){
       _errorMessage = QString("%1(): Cannot access scanlist table memory!")
           .arg(__func__);
@@ -324,9 +318,9 @@ OpenGD77Codeplug::decode(Config *config) {
     // First, get bank
     bank_t *b;
     if ((i>>7) == 0)
-      b = (bank_t*) data(OFFSET_BANK_0);
+      b = (bank_t*) data(OFFSET_BANK_0, EEPROM);
     else
-      b = (((i>>7)-1) + (bank_t*) data(OFFSET_BANK_1));
+      b = (((i>>7)-1) + (bank_t*) data(OFFSET_BANK_1, FLASH));
     // If channel is disabled
     if (! ((b->bitmap[i % 128 / 8] >> (i & 7)) & 1) )
       continue;
