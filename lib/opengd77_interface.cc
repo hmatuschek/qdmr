@@ -74,6 +74,81 @@ OpenGD77Interface::WriteRequest::initFinishWriteFlash() {
 
 
 /* ********************************************************************************************* *
+ * Implementation of OpenGD77Interface::CommandRequest
+ * ********************************************************************************************* */
+void
+OpenGD77Interface::CommandRequest::initShowCPSScreen() {
+  type = 'C';
+  command = SHOW_CPS_SCREEN;
+  x = 0;
+  y = 0;
+  size = 0;
+  alignment = 0;
+  inverted = 0;
+  memset(message, 0, sizeof(message));
+}
+
+void
+OpenGD77Interface::CommandRequest::initClearScreen() {
+  type = 'C';
+  command = CLEAR_SCREEN;
+  x = 0;
+  y = 0;
+  size = 0;
+  alignment = 0;
+  inverted = 0;
+  memset(message, 0, sizeof(message));
+}
+
+void
+OpenGD77Interface::CommandRequest::initDisplay(uint8_t x, uint8_t y, const char *message, uint8_t size, uint8_t alignment, uint8_t inverted) {
+  type = 'C';
+  command = DISPLAY;
+  this->x = x;
+  this->y = y;
+  this->size = std::min(size, uint8_t(16));
+  this->alignment = alignment;
+  this->inverted = inverted;
+  memcpy(this->message, message, this->size);
+}
+
+void
+OpenGD77Interface::CommandRequest::initRenderCPS() {
+  type = 'C';
+  command = RENDER_CPS;
+  x = 0;
+  y = 0;
+  size = 0;
+  alignment = 0;
+  inverted = 0;
+  memset(message, 0, sizeof(message));
+}
+
+void
+OpenGD77Interface::CommandRequest::initCloseScreen() {
+  type = 'C';
+  command = CLOSE_CPS_SCREEN;
+  x = 0;
+  y = 0;
+  size = 0;
+  alignment = 0;
+  inverted = 0;
+  memset(message, 0, sizeof(message));
+}
+
+void
+OpenGD77Interface::CommandRequest::initCommand(Option option) {
+  type = 'C';
+  command = COMMAND;
+  this->option = option;
+  y = 0;
+  size = 0;
+  alignment = 0;
+  inverted = 0;
+  memset(message, 0, sizeof(message));
+}
+
+/* ********************************************************************************************* *
  * Implementation of OpenGD77Interface
  * ********************************************************************************************* */
 OpenGD77Interface::OpenGD77Interface(QObject *parent)

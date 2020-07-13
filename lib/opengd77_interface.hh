@@ -97,6 +97,44 @@ protected:
     uint8_t command;
   } WriteResponse;
 
+  typedef struct __attribute__((packed)) {
+    typedef enum {
+      SHOW_CPS_SCREEN  = 0,
+      CLEAR_SCREEN     = 1,
+      DISPLAY          = 2,
+      RENDER_CPS       = 3,
+      CLOSE_CPS_SCREEN = 5,
+      COMMAND          = 6
+    } Command;
+
+    typedef enum {
+      SAVE_SETTINGS_NOT_VFOS = 0,
+      REBOOT = 1,
+      SAVE_SETTINGS_AND_VFOS = 2,
+      FLASH_GREEN_LED = 3,
+      FLASH_RED_LED = 4
+    } Option;
+
+    char type;
+    uint8_t command;
+    union {
+      uint8_t x;
+      uint8_t option;
+    };
+    uint8_t y;
+    uint8_t size;
+    uint8_t alignment;
+    uint8_t inverted;
+    char message[16];
+
+    void initShowCPSScreen();
+    void initClearScreen();
+    void initDisplay(uint8_t x, uint8_t y, const char *message, uint8_t size, uint8_t alignment, uint8_t inverted);
+    void initRenderCPS();
+    void initCloseScreen();
+    void initCommand(Option option);
+  } CommandRequest;
+
 protected:
   bool readEEPROM(uint32_t addr, uint8_t *data, uint16_t len);
   bool writeEEPROM(uint32_t addr, const uint8_t *data, uint16_t len);
