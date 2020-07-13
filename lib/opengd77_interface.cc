@@ -101,7 +101,9 @@ OpenGD77Interface::CommandRequest::initClearScreen() {
 }
 
 void
-OpenGD77Interface::CommandRequest::initDisplay(uint8_t x, uint8_t y, const char *message, uint8_t size, uint8_t alignment, uint8_t inverted) {
+OpenGD77Interface::CommandRequest::initDisplay(uint8_t x, uint8_t y,
+                                               const char *message, uint8_t size,
+                                               uint8_t alignment, uint8_t inverted) {
   type = 'C';
   command = DISPLAY;
   this->x = x;
