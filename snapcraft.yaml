@@ -1,8 +1,8 @@
 name: qdmr
-version: git
-grade: devel
-#version: 0.3.0
-#grade: stable
+#version: git
+#grade: devel
+version: 0.3.1
+grade: stable
 summary: Graphical codeplug programming tool DMR radios.
 description: |
   qDMR is a simple to use and feature rich codeplug programming tool for cheap DMR radios.
@@ -31,17 +31,19 @@ parts:
       - qttools5-dev
       - qttools5-dev-tools
       - qtpositioning5-dev
+      - libqt5serialport5-dev
       - libusb-1.0-0-dev
     stage-packages:
       - libqt5core5a
       - libqt5gui5
       - libqt5network5
       - libqt5positioning5
+      - libqt5serialport5
       - libqt5widgets5
       - libusb-1.0-0
     source: https://github.com/hmatuschek/qdmr.git
     source-type: git
-#    source-tag: "v$SNAPCRAFT_PROJECT_VERSION"
+    source-tag: "v$SNAPCRAFT_PROJECT_VERSION"
     configflags:
       - "-DCMAKE_INSTALL_PREFIX=/usr"
       - "-DCMAKE_BUILD_TYPE=Release"
