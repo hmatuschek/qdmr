@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>qdrm [*]</string>
+   <string>qdmr [*]</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
@@ -55,7 +55,7 @@
        <string>Tablist</string>
       </property>
       <property name="accessibleDescription">
-       <string>There are 6 tabs providing genral settings, contact, Rx group, channel zone and scan lists.</string>
+       <string>There are 6 tabs providing general settings, contact, Rx group, channel zone and scan lists.</string>
       </property>
       <property name="currentIndex">
        <number>0</number>
@@ -65,10 +65,10 @@
         <string>General settings</string>
        </property>
        <attribute name="title">
-        <string>Genral Settings</string>
+        <string>General Settings</string>
        </attribute>
        <attribute name="toolTip">
-        <string>This tab contains all general settings like name and RMD ID of the radio.</string>
+        <string>This tab contains all general settings like name and DMR ID of the radio.</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_12">
         <item>
