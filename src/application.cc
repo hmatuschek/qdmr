@@ -5,6 +5,7 @@
 
 #include "logger.hh"
 #include "radio.hh"
+#include "codeplug.hh"
 #include "config.h"
 #include "settings.hh"
 #include "verifydialog.hh"
@@ -404,7 +405,7 @@ Application::downloadCodeplug() {
   progress->setValue(0); progress->setMaximum(100); progress->setVisible(true);
   connect(radio, SIGNAL(downloadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(downloadError(Radio *)), this, SLOT(onCodeplugDownloadError(Radio *)));
-  connect(radio, SIGNAL(downloadComplete(Radio *,Config *)), this, SLOT(onCodeplugDownloaded(Radio *, Config *)));
+  connect(radio, SIGNAL(downloadFinished(Radio *, CodePlug *)), this, SLOT(onCodeplugDownloaded(Radio *, CodePlug *)));
   radio->startDownload(_config);
   _mainWindow->statusBar()->showMessage(tr("Download ..."));
   _mainWindow->setEnabled(false);
@@ -424,15 +425,22 @@ Application::onCodeplugDownloadError(Radio *radio) {
 
 
 void
-Application::onCodeplugDownloaded(Radio *radio, Config *config) {
-  Q_UNUSED(config)
-  _mainWindow->statusBar()->showMessage(tr("Download complete"));
-  _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
-  _mainWindow->setEnabled(true);
+Application::onCodeplugDownloaded(Radio *radio, CodePlug *codeplug) {
+  _config->reset();
+  if (codeplug->decode(_config)) {
+    _mainWindow->statusBar()->showMessage(tr("Download complete"));
+    _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
+    _mainWindow->setEnabled(true);
+
+    _mainWindow->setWindowModified(false);
+    _config->setModified(false);
+  } else {
+    QMessageBox::critical(
+          nullptr, tr("Cannot decode code-plug"),
+          tr("Cannot decode code-plug: %2").arg(codeplug->errorMessage()));
+  }
 
   radio->deleteLater();
-  _mainWindow->setWindowModified(false);
-  config->setModified(false);
 }
 
 void

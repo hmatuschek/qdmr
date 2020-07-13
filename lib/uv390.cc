@@ -77,7 +77,6 @@ UV390::startDownload(Config *config, bool blocking) {
   }
 
   _task = StatusDownload;
-  _config->reset();
 
   if (blocking) {
     run();
@@ -166,12 +165,7 @@ UV390::run() {
     _dev->reboot();
     _dev->close();
     _dev->deleteLater();
-
-    emit downloadFinished();
-    if (_codeplug.decode(_config))
-      emit downloadComplete(this, _config);
-    else
-      emit downloadError(this);
+    emit downloadFinished(this, &_codeplug);
     _config = nullptr;
   } else if (StatusUpload == _task) {
     emit uploadStarted();
