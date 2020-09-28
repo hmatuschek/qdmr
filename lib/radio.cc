@@ -226,7 +226,7 @@ Radio::detect(QString &errorMessage) {
   } else if ("MD-UV390" == id) {
     return new UV390();
   } else if ("OpenGD77" == id) {
-    //return new OpenGD77();
+    return new OpenGD77();
   }
 
   return nullptr;

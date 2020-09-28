@@ -28,6 +28,8 @@ public:
   bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
   bool write_finish();
 
+  bool reboot();
+
 protected:
   typedef struct __attribute__((packed)) {
     typedef enum {
@@ -129,7 +131,7 @@ protected:
 
     void initShowCPSScreen();
     void initClearScreen();
-    void initDisplay(uint8_t x, uint8_t y, const char *message, uint8_t size, uint8_t alignment, uint8_t inverted);
+    void initDisplay(uint8_t x, uint8_t y, const char *message, uint8_t iSize, uint8_t alignment, uint8_t inverted);
     void initRenderCPS();
     void initCloseScreen();
     void initCommand(Option option);
@@ -142,6 +144,13 @@ protected:
   bool setFlashSector(uint32_t addr);
   bool writeFlash(uint32_t addr, const uint8_t *data, uint16_t len);
   bool finishWriteFlash();
+
+  bool sendShowCPSScreen();
+  bool sendClearScreen();
+  bool sendDisplay(uint8_t x, uint8_t y, const char *message, uint8_t iSize, uint8_t alignment, uint8_t inverted);
+  bool sendRenderCPS();
+  bool sendCloseScreen();
+  bool sendCommand(CommandRequest::Option option);
 
 protected:
   int32_t _sector;

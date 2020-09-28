@@ -137,6 +137,16 @@ OpenGD77::run() {
     }
 
     // Then download codeplug
+    if (! _dev->read_start(0, _codeplug.image(0).element(0).address())) {
+      _errorMessage = QString("%1 Cannot start codeplug download: %2")
+          .arg(__func__).arg(_dev->errorMessage());
+      _task = StatusError;
+      _dev->close();
+      _dev->deleteLater();
+      emit downloadError(this);
+      return;
+    }
+
     size_t bcount = 0;
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {
       uint addr = _codeplug.image(0).element(n).address();
@@ -159,7 +169,6 @@ OpenGD77::run() {
     _dev->read_finish();
 
     _task = StatusIdle;
-    _dev->reboot();
     _dev->close();
     _dev->deleteLater();
 
@@ -181,7 +190,6 @@ OpenGD77::run() {
             .arg(n).arg(_codeplug.image(0).element(n).address())
             .arg(_codeplug.image(0).element(n).data().size()).arg(BSIZE);
         _task = StatusError;
-        _dev->read_finish();
         _dev->close();
         _dev->deleteLater();
         emit downloadError(this);
@@ -189,9 +197,19 @@ OpenGD77::run() {
       }
       totb += _codeplug.image(0).element(n).data().size()/BSIZE;
     }
-    _dev->read_finish();
 
     // First download codeplug from device:
+    if (! _dev->read_start(0, _codeplug.image(0).element(0).address())) {
+      _errorMessage = QString("%1 Cannot start codeplug download: %2")
+          .arg(__func__).arg(_dev->errorMessage());
+      _task = StatusError;
+      _dev->reboot();
+      _dev->close();
+      _dev->deleteLater();
+      emit downloadError(this);
+      return;
+    }
+
     size_t bcount = 0;
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {
       uint addr = _codeplug.image(0).element(n).address();
@@ -203,6 +221,7 @@ OpenGD77::run() {
               .arg(_dev->errorMessage());
           _task = StatusError;
           _dev->read_finish();
+          _dev->reboot();
           _dev->close();
           _dev->deleteLater();
           emit downloadError(this);
@@ -211,11 +230,23 @@ OpenGD77::run() {
         emit uploadProgress(float(bcount*50)/totb);
       }
     }
+    _dev->read_finish();
 
     // Encode config into codeplug
     _codeplug.encode(_config);
 
-    // then, upload modified codeplug
+    // Then download codeplug
+    if (! _dev->write_start(0, _codeplug.image(0).element(0).address())) {
+      _errorMessage = QString("%1 Cannot start codeplug upload: %2")
+          .arg(__func__).arg(_dev->errorMessage());
+      _task = StatusError;
+      _dev->reboot();
+      _dev->close();
+      _dev->deleteLater();
+      emit downloadError(this);
+      return;
+    }
+
     bcount = 0;
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {
       uint addr = _codeplug.image(0).element(n).address();
@@ -227,6 +258,7 @@ OpenGD77::run() {
               .arg(_dev->errorMessage());
           _task = StatusError;
           _dev->write_finish();
+          _dev->reboot();
           _dev->close();
           _dev->deleteLater();
           emit uploadError(this);
