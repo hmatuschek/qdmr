@@ -34,7 +34,7 @@ parts:
       - kde-frameworks-5-core18-sdk
       - kde-frameworks-5-core18
     build-packages:
-      - libegl-dev
+      - libegl-mesa0
       - libusb-1.0-0-dev
     stage-packages:
       - libusb-1.0-0
