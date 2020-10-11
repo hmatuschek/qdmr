@@ -10,7 +10,7 @@
 #define OFFSET_BUTTONS      0x00108
 #define OFFSET_MSGTAB       0x00128
 #define OFFSET_CONTACTS     0x01788
-#define OFFSET_DTMF         0x02f80
+#define OFFSET_DTMF         0x02f88
 #define OFFSET_BANK_0       0x03780 // Channels 1-128
 #define OFFSET_BOOT         0x07518
 #define OFFSET_MENU         0x07538
@@ -161,7 +161,7 @@ RD5RCodeplug::channel_t::linkChannelObj(Channel *c, Config *conf) const {
     AnalogChannel *ac = c->as<AnalogChannel>();
     if (scan_list_index && ((scan_list_index-1) < conf->scanlists()->count()))
       ac->setScanList(conf->scanlists()->scanlist(scan_list_index-1));
-  } else {
+  } else if (c->is<DigitalChannel>()) {
     DigitalChannel *dc = c->as<DigitalChannel>();
     if (scan_list_index && ((scan_list_index-1) < conf->scanlists()->count()))
       dc->setScanList(conf->scanlists()->scanlist(scan_list_index-1));
@@ -169,6 +169,8 @@ RD5RCodeplug::channel_t::linkChannelObj(Channel *c, Config *conf) const {
       dc->setRXGroupList(conf->rxGroupLists()->list(group_list_index-1));
     if (contact_name_index && ((contact_name_index-1) < conf->contacts()->digitalCount()))
       dc->setTXContact(conf->contacts()->digitalContact(contact_name_index-1));
+  } else {
+    return false;
   }
   return true;
 }
@@ -1011,7 +1013,7 @@ RD5RCodeplug::decode(Config *config)
   /*
    * Link Channels -> ScanLists
    */
-  for (int i=0; i<NCHAN; i++) {
+  for (int i=0, j=0; i<NCHAN; i++) {
     // First, get bank
     bank_t *b;
     if ((i>>7) == 0)
@@ -1023,11 +1025,13 @@ RD5RCodeplug::decode(Config *config)
       continue;
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
-    if (! ch->linkChannelObj(config->channelList()->channel(i), config)) {
+    if (! ch->linkChannelObj(config->channelList()->channel(j), config)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link channel at index %2")
-          .arg(__func__).arg(i);
+          .arg(__func__).arg(j);
       return false;
     }
+    // advance channel counter
+    j++;
   }
 
   return true;

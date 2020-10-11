@@ -1,7 +1,7 @@
 name: qdmr
 version: git
 grade: devel
-#version: 0.3.1
+#version: 0.3.2
 #grade: stable
 summary: Graphical codeplug programming tool for DMR radios.
 description: |
@@ -34,6 +34,7 @@ parts:
       - kde-frameworks-5-core18-sdk
       - kde-frameworks-5-core18
     build-packages:
+      - libegl-dev
       - libusb-1.0-0-dev
     stage-packages:
       - libusb-1.0-0
