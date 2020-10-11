@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
   parser.addOption(
    {{"b", "bin"}, QCoreApplication::translate("main", "Up- and download codeplugs in binary format.")});
   parser.addOption(
-   {{"R", "radio"}, QCoreApplication::translate("main", "Specifies the radio."), QCoreApplication::translate("main", "directory")});
+   {{"R", "radio"}, QCoreApplication::translate("main", "Specifies the radio."), QCoreApplication::translate("main", "RADIO")});
 
   parser.addPositionalArgument(
         "command", QCoreApplication::translate("main", "Specifies the command to perform."),
