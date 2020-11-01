@@ -152,12 +152,9 @@ signals:
   /** Gets emitted on download progress (e.g., for progress bars). */
 	void downloadProgress(int percent);
   /** Gets emitted once the codeplug download has been finished. */
-	void downloadFinished();
+  void downloadFinished(Radio *radio, CodePlug *codeplug);
   /** Gets emitted if there was an error during the codeplug download. */
 	void downloadError(Radio *radio);
-  /** Gets emitted once the codeplug download has been finished successfully and a generic
-   * configuration was derived from the codeplug. */
-	void downloadComplete(Radio *radio, Config *config);
 
   /** Gets emitted once the codeplug upload has been started. */
 	void uploadStarted();

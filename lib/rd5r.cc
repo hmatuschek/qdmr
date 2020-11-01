@@ -75,7 +75,6 @@ RD5R::startDownload(Config *config, bool blocking) {
   }
 
   _task = StatusDownload;
-  _config->reset();
 
   if (blocking) {
     run();
@@ -131,7 +130,7 @@ RD5R::run()
           _dev->read_finish();
           _dev->close();
           _dev->deleteLater();
-          emit downloadFinished();
+          emit downloadError(this);
           return;
         }
         emit downloadProgress(float(bcount*100)/btot);
@@ -141,15 +140,7 @@ RD5R::run()
     _dev->read_finish();
     _dev->close();
     _dev->deleteLater();
-
-    emit downloadFinished();
-    if (_codeplug.decode(_config)) {
-      emit downloadComplete(this, _config);
-    } else {
-      _errorMessage = tr("%1(): Download failed: %2")
-          .arg(__func__).arg(_codeplug.errorMessage());
-      emit downloadError(this);
-    }
+    emit downloadFinished(this, &_codeplug);
     _config = nullptr;
   } else if (StatusUpload == _task) {
     emit uploadStarted();
@@ -181,7 +172,7 @@ RD5R::run()
       }
     }
 
-    // Send encode config into codeplug
+    // Encode config into codeplug
     if (! _codeplug.encode(_config)) {
       _errorMessage = tr("%1(): Upload failed: %2")
           .arg(__func__).arg(_codeplug.errorMessage());

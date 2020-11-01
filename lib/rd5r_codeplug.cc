@@ -11,7 +11,7 @@
 #define OFFSET_BUTTONS      0x00108
 #define OFFSET_MSGTAB       0x00128
 #define OFFSET_CONTACTS     0x01788
-#define OFFSET_DTMF         0x02f80
+#define OFFSET_DTMF         0x02f88
 #define OFFSET_BANK_0       0x03780 // Channels 1-128
 #define OFFSET_BOOT         0x07518
 #define OFFSET_MENU         0x07538
@@ -1053,7 +1053,7 @@ RD5RCodeplug::decode(Config *config)
   /*
    * Link Channels -> ScanLists, etc.
    */
-  for (int i=0; i<NCHAN; i++) {
+  for (int i=0, j=0; i<NCHAN; i++) {
     // First, get bank
     bank_t *b;
     if ((i>>7) == 0)
@@ -1065,11 +1065,13 @@ RD5RCodeplug::decode(Config *config)
       continue;
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
-    if (! ch->linkChannelObj(config->channelList()->channel(i), config, scan_table, group_table, contact_table)) {
+    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i]), config, scan_table, group_table, contact_table)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link channel at index %2")
-          .arg(__func__).arg(i);
+          .arg(__func__).arg(j);
       return false;
     }
+    // advance channel counter
+    j++;
   }
 
   return true;

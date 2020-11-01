@@ -9,6 +9,7 @@ class QMainWindow;
 class Radio;
 class RepeaterDatabase;
 class UserDatabase;
+class CodePlug;
 
 
 class Application : public QApplication
@@ -45,7 +46,7 @@ private slots:
   QMainWindow *createMainWindow();
 
   void onCodeplugDownloadError(Radio *radio);
-  void onCodeplugDownloaded(Radio *radio, Config *config);
+  void onCodeplugDownloaded(Radio *radio, CodePlug *codeplug);
 
   void onCodeplugUploadError(Radio *radio);
   void onCodeplugUploaded(Radio *radio);

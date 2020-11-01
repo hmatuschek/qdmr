@@ -1,0 +1,5 @@
+# TYT MD-UV380
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", MODE="666"
+
+# Baofeng RD-5R, TD-5R
+SUBSYSTEM=="usb", ATTRS{idVendor}=="15a2", ATTRS{idProduct}=="0073", MODE="666"

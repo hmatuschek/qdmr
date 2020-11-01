@@ -381,7 +381,7 @@ OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len) {
     return false;
   }
 
-  mempcpy(data, resp.data, qFromBigEndian(resp.length));
+  memcpy(data, resp.data, qFromBigEndian(resp.length));
   return true;
 }
 
@@ -473,7 +473,7 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len) {
     return false;
   }
 
-  mempcpy(data, resp.data, qFromBigEndian(resp.length));
+  memcpy(data, resp.data, qFromBigEndian(resp.length));
   return true;
 }
 
