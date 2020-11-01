@@ -412,7 +412,9 @@ GD77Codeplug::decode(Config *config) {
       continue;
     logDebug() << "Contact " << i << " enabled.";
     if (DigitalContact *cont = ct->toContactObj()) {
-      contact_table[i] = config->contacts()->digitalCount();
+      logDebug() << "Contact at index " << i+1 << " mapped to "
+                 << config->contacts()->count();
+      contact_table[i+1] = config->contacts()->digitalCount();
       config->contacts()->addContact(cont);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid contact at index %2.")
@@ -443,7 +445,9 @@ GD77Codeplug::decode(Config *config) {
 
     RXGroupList *list = gl->toRXGroupListObj();
     if (list) {
-      group_table[i] = config->rxGroupLists()->count();
+      logDebug() << "RX group list at index " << i+1 << " mapped to "
+                 << config->rxGroupLists()->count();
+      group_table[i+1] = config->rxGroupLists()->count();
       config->rxGroupLists()->addList(list);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid RX group-list at index %2.")
@@ -486,7 +490,7 @@ GD77Codeplug::decode(Config *config) {
 
     if (Channel *chan = ch->toChannelObj()) {
       logDebug() << "Map channel index " << i << " to " << config->channelList()->count();
-      channel_table[i] = config->channelList()->count();
+      channel_table[i+1] = config->channelList()->count();
       config->channelList()->addChannel(chan);
     } else {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid channel at index %2!")
@@ -561,7 +565,9 @@ GD77Codeplug::decode(Config *config) {
       return false;
     }
 
-    scan_table[i] = config->scanlists()->count();
+    logDebug() << "Scan list at index " << i+1 << " mapped to "
+               << config->scanlists()->count();
+    scan_table[i+1] = config->scanlists()->count();
     config->scanlists()->addScanList(scan);
   }
 

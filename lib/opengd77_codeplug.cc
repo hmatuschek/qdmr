@@ -176,10 +176,10 @@ OpenGD77Codeplug::decode(Config *config) {
     if (! ct->isValid())
       continue;
     if (DigitalContact *cont = ct->toContactObj()) {
-      logDebug() << "Contact " << i << " enabled, mapped to index "
+      logDebug() << "Contact " << i+1 << " enabled, mapped to index "
                  << config->contacts()->digitalCount();
       // Store in index table
-      contact_table[i] = config->contacts()->digitalCount();
+      contact_table[i+1] = config->contacts()->digitalCount();
       // add contact to config
       config->contacts()->addContact(cont);
     } else {
@@ -210,9 +210,9 @@ OpenGD77Codeplug::decode(Config *config) {
 
     RXGroupList *list = gl->toRXGroupListObj();
     if (list) {
-      logDebug() << "RX group list at index " << i << " mapped to "
+      logDebug() << "RX group list at index " << i+1 << " mapped to "
                  << config->rxGroupLists()->count();
-      group_table[i] = config->rxGroupLists()->count();
+      group_table[i+1] = config->rxGroupLists()->count();
       config->rxGroupLists()->addList(list);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid RX group-list at index %2.")
@@ -252,8 +252,8 @@ OpenGD77Codeplug::decode(Config *config) {
       return false;
     }
     if (Channel *chan = ch->toChannelObj()) {
-      logDebug() << "Mapped channel index " << i << " to " << config->channelList()->count();
-      channel_table[i] = config->channelList()->count();
+      logDebug() << "Mapped channel index " << i+1 << " to " << config->channelList()->count();
+      channel_table[i+1] = config->channelList()->count();
       config->channelList()->addChannel(chan);
     } else {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid channel at index %2!")
@@ -327,11 +327,12 @@ OpenGD77Codeplug::decode(Config *config) {
     if (! sl->linkScanListObj(scan, config, channel_table)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link scanlist at index %2")
           .arg(__func__).arg(i);
+      scan->deleteLater();
       return false;
     }
 
-    logDebug() << "Map scan-list at index " << i << " to " << config->scanlists()->count();
-    scan_table[i] = config->scanlists()->count();
+    logDebug() << "Map scan-list at index " << i+1 << " to " << config->scanlists()->count();
+    scan_table[i+1] = config->scanlists()->count();
     config->scanlists()->addScanList(scan);
   }
 
