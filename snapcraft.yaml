@@ -1,11 +1,11 @@
 name: qdmr
 version: git
 grade: devel
-#version: 0.3.2
+#version: 0.4.0
 #grade: stable
 summary: Graphical codeplug programming tool for DMR radios.
 description: |
-  qDMR is a simple to use and feature rich codeplug programming tool for cheap DMR radios.
+  qDMR is a simple to use and feature-rich codeplug programming software (CPS) for cheap DMR radios.
 
 confinement: strict
 base: core18
