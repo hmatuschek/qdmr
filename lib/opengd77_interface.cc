@@ -189,7 +189,7 @@ OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
     return false;
   if (! sendDisplay(0, 16, "Write", 3, 1, 0))
     return false;
-  if (! sendDisplay(0, 16, "Codeplug", 3, 1, 0))
+  if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0))
     return false;
   if (! sendRenderCPS())
     return false;
