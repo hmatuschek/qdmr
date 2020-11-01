@@ -13,14 +13,13 @@ SET(qdmr_UI_FORMS contactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui z
   digitalchanneldialog.ui scanlistdialog.ui configwizardstart.ui verifydialog.ui settingsdialog.ui
   gpssystemdialog.ui)
 
-SET(CMAKE_AUTOUIC ON)
 qt5_wrap_cpp(qdmr_MOC_SOURCES ${qdmr_MOC_HEADERS})
+qt5_wrap_ui(qdmr_UI_SOURCES ${qdmr_UI_FORMS})
 qt5_add_resources(qdmr_RCC_SOURCES ../shared/resources.qrc)
 
-add_executable(qdmr WIN32 ${qdmr_SOURCES} ${qdmr_MOC_SOURCES} ${qdmr_RCC_SOURCES} ${qdmr_UI_FORMS})
+add_executable(qdmr WIN32 ${qdmr_SOURCES} ${qdmr_MOC_SOURCES} ${qdmr_RCC_SOURCES} ${qdmr_UI_SOURCES})
 target_link_libraries(qdmr ${LIBS} libdmrconf)
-target_include_directories(qdmr PUBLIC "${AUTOGEN_BUILD_DIR}/include")
-
+target_include_directories(qdmr PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 install(TARGETS qdmr DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 
 if (UNIX AND NOT APPLE)
