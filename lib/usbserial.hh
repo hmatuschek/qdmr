@@ -5,19 +5,31 @@
 #include <QSerialPort>
 #include "radiointerface.hh"
 
+/** Implements a serial connection to a radio via USB.
+ *
+ * The correct serial port is selected by the given VID and PID to the constructor.
+ *
+ * @ingroup rif
+ */
 class USBSerial : public QSerialPort, public RadioInterface
 {
   Q_OBJECT
 
 protected:
+  /** Constructs an opens new serial interface to the devices identified by the given vendor and
+   * product IDs. */
   explicit USBSerial(unsigned vid, unsigned pid, QObject *parent=nullptr);
 
 public:
+  /** Destrutor. */
   virtual ~USBSerial();
 
+  /** If @c true, the device has been found and is open. */
   bool isOpen() const;
+  /** Closes the interface to the device. */
   void close();
 
+  /** Returns the last error message. */
   const QString &errorMessage() const;
 
 protected:

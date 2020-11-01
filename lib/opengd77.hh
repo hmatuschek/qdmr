@@ -1,5 +1,5 @@
 /** @defgroup ogd77 Open GD-77 Firmware
- *
+ * Implements a radio running the Open GD77 firmware.
  * @ingroup dsc */
 
 #ifndef OPENGD77_HH
@@ -36,8 +36,9 @@ public slots:
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
 	void run();
-
+  /** Implements the actual download process. */
   void download();
+  /** Implements the actual upload process. */
   void upload();
 
 protected:
