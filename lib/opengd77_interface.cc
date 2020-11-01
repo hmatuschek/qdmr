@@ -10,19 +10,19 @@
  * ********************************************************************************************* */
 bool
 OpenGD77Interface::ReadRequest::initReadEEPROM(uint32_t addr, uint16_t length) {
-  type = 'R';
-  command = READ_EEPROM;
-  addr = qToBigEndian(addr);
-  length = qToBigEndian(length);
+  this->type = 'R';
+  this->command = READ_EEPROM;
+  this->address = qToBigEndian(addr);
+  this->length = qToBigEndian(length);
   return true;
 }
 
 bool
 OpenGD77Interface::ReadRequest::initReadFlash(uint32_t addr, uint16_t length) {
-  type = 'R';
-  command = READ_FLASH;
-  addr = qToBigEndian(addr);
-  length = qToBigEndian(length);
+  this->type = 'R';
+  this->command = READ_FLASH;
+  this->address = qToBigEndian(addr);
+  this->length = qToBigEndian(length);
   return true;
 }
 
@@ -34,22 +34,22 @@ bool
 OpenGD77Interface::WriteRequest::initWriteEEPROM(uint32_t addr, const uint8_t *data, uint16_t size) {
   if (size > 32)
     size = 32;
-  type = 'W';
-  command = WRITE_EEPROM;
-  payload.address = qToBigEndian(addr);
-  payload.length = qToBigEndian(size);
-  memcpy(payload.data, data, size);
+  this->type = 'W';
+  this->command = WRITE_EEPROM;
+  this->payload.address = qToBigEndian(addr);
+  this->payload.length = qToBigEndian(size);
+  memcpy(this->payload.data, data, size);
   return true;
 }
 
 bool
 OpenGD77Interface::WriteRequest::initSetFlashSector(uint32_t addr) {
   uint32_t sec = addr/SECTOR_SIZE;
-  type = 'W';
-  command = SET_FLASH_SECTOR;
-  sector[0] = ((sec>>16) & 0xff);
-  sector[1] = ((sec>>8) & 0xff);
-  sector[2] = (sec & 0xff);
+  this->type = 'W';
+  this->command = SET_FLASH_SECTOR;
+  this->sector[0] = ((sec>>16) & 0xff);
+  this->sector[1] = ((sec>>8) & 0xff);
+  this->sector[2] = (sec & 0xff);
   return true;
 }
 
@@ -57,18 +57,18 @@ bool
 OpenGD77Interface::WriteRequest::initWriteFlash(uint32_t addr, const uint8_t *data, uint16_t size) {
   if (size > 32)
     size = 32;
-  type = 'W';
-  command = WRITE_SECTOR_BUFFER;
-  payload.address = qToBigEndian(addr);
-  payload.length = qToBigEndian(size);
-  memcpy(payload.data, data, size);
+  this->type = 'W';
+  this->command = WRITE_SECTOR_BUFFER;
+  this->payload.address = qToBigEndian(addr);
+  this->payload.length = qToBigEndian(size);
+  memcpy(this->payload.data, data, size);
   return true;
 }
 
 bool
 OpenGD77Interface::WriteRequest::initFinishWriteFlash() {
-  type = 'W';
-  command = WRITE_FLASH_SECTOR;
+  this->type = 'W';
+  this->command = WRITE_FLASH_SECTOR;
   return true;
 }
 
@@ -78,34 +78,34 @@ OpenGD77Interface::WriteRequest::initFinishWriteFlash() {
  * ********************************************************************************************* */
 void
 OpenGD77Interface::CommandRequest::initShowCPSScreen() {
-  type = 'C';
-  command = SHOW_CPS_SCREEN;
-  x = 0;
-  y = 0;
-  size = 0;
-  alignment = 0;
-  inverted = 0;
-  memset(message, 0, sizeof(message));
+  this->type = 'C';
+  this->command = SHOW_CPS_SCREEN;
+  this->x = 0;
+  this->y = 0;
+  this->size = 0;
+  this->alignment = 0;
+  this->inverted = 0;
+  memset(this->message, 0, sizeof(this->message));
 }
 
 void
 OpenGD77Interface::CommandRequest::initClearScreen() {
-  type = 'C';
-  command = CLEAR_SCREEN;
-  x = 0;
-  y = 0;
-  size = 0;
-  alignment = 0;
-  inverted = 0;
-  memset(message, 0, sizeof(message));
+  this->type = 'C';
+  this->command = CLEAR_SCREEN;
+  this->x = 0;
+  this->y = 0;
+  this->size = 0;
+  this->alignment = 0;
+  this->inverted = 0;
+  memset(this->message, 0, sizeof(this->message));
 }
 
 void
 OpenGD77Interface::CommandRequest::initDisplay(uint8_t x, uint8_t y,
                                                const char *message, uint8_t iSize,
                                                uint8_t alignment, uint8_t inverted) {
-  type = 'C';
-  command = DISPLAY;
+  this->type = 'C';
+  this->command = DISPLAY;
   this->x = x;
   this->y = y;
   this->size = std::min(iSize, uint8_t(16));
@@ -116,39 +116,40 @@ OpenGD77Interface::CommandRequest::initDisplay(uint8_t x, uint8_t y,
 
 void
 OpenGD77Interface::CommandRequest::initRenderCPS() {
-  type = 'C';
-  command = RENDER_CPS;
-  x = 0;
-  y = 0;
-  size = 0;
-  alignment = 0;
-  inverted = 0;
-  memset(message, 0, sizeof(message));
+  this->type = 'C';
+  this->command = RENDER_CPS;
+  this->x = 0;
+  this->y = 0;
+  this->size = 0;
+  this->alignment = 0;
+  this->inverted = 0;
+  memset(this->message, 0, sizeof(this->message));
 }
 
 void
 OpenGD77Interface::CommandRequest::initCloseScreen() {
-  type = 'C';
-  command = CLOSE_CPS_SCREEN;
-  x = 0;
-  y = 0;
-  size = 0;
-  alignment = 0;
-  inverted = 0;
-  memset(message, 0, sizeof(message));
+  this->type = 'C';
+  this->command = CLOSE_CPS_SCREEN;
+  this->x = 0;
+  this->y = 0;
+  this->size = 0;
+  this->alignment = 0;
+  this->inverted = 0;
+  memset(this->message, 0, sizeof(this->message));
 }
 
 void
 OpenGD77Interface::CommandRequest::initCommand(Option option) {
-  type = 'C';
-  command = COMMAND;
+  this->type = 'C';
+  this->command = COMMAND;
   this->option = option;
-  y = 0;
-  size = 0;
-  alignment = 0;
-  inverted = 0;
-  memset(message, 0, sizeof(message));
+  this->y = 0;
+  this->size = 0;
+  this->alignment = 0;
+  this->inverted = 0;
+  memset(this->message, 0, sizeof(this->message));
 }
+
 
 /* ********************************************************************************************* *
  * Implementation of OpenGD77Interface
@@ -198,7 +199,7 @@ OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
     return false;
 
   if (EEPROM == bank) {
-    if (_sector >=0) {
+    if (_sector >= 0) {
       if (! finishWriteFlash())
         return false;
     }
@@ -277,7 +278,7 @@ OpenGD77Interface::read_start(uint32_t bank, uint32_t addr) {
     return false;
   if (! sendDisplay(0, 0, "qDMR", 3, 1, 0))
     return false;
-  if (! sendDisplay(0, 16, "Write", 3, 1, 0))
+  if (! sendDisplay(0, 16, "Read", 3, 1, 0))
     return false;
   if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0))
     return false;
@@ -337,20 +338,20 @@ bool
 OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len) {
   if (! isOpen()) {
     _errorMessage = "Cannot read block: Device not open!";
-    logError() << _errorMessage;
+    logError() << __FILE__ << ": " << _errorMessage;
     return false;
   }
 
   ReadRequest req; req.initReadEEPROM(addr, 32);
   if (sizeof(ReadRequest) != QSerialPort::write((const char *)&req, sizeof(ReadRequest))) {
     _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    logError() << __FILE__ << ": " << _errorMessage;
     return false;
   }
 
   if (! waitForReadyRead(1000)) {
     _errorMessage = tr("Cannot read from serial port: Timeout!");
-    logError() << _errorMessage;
+    logError() << __FILE__ << ": " << _errorMessage;
     return false;
   }
 
@@ -359,24 +360,24 @@ OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len) {
 
   if (0 > retlen) {
     _errorMessage = tr("Cannot read from serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    logError() << __FILE__ << ": " << _errorMessage;
     return false;
   } else if (0 == retlen) {
     _errorMessage = tr("Cannot read from serial port: Device returned empty message.");
-    logError() << _errorMessage;
+    logError() << __FILE__ << ": " << _errorMessage;
     return false;
   }
 
   if ('R' != resp.type) {
     _errorMessage = tr("Cannot read from device: Device returned error '%1'").arg(resp.type);
-    logError() << _errorMessage;
+    logError() << __FILE__ << ": " << _errorMessage;
     return false;
   }
 
   if (qFromBigEndian(req.length) != qFromBigEndian(resp.length)) {
     _errorMessage = tr("Cannot read from device: Device returned invalid length 0x%1.")
         .arg(qFromBigEndian(resp.length), 4, 16);
-    logError() << _errorMessage;
+    logError() << __FILE__ << ": " << _errorMessage;
     return false;
   }
 
@@ -432,7 +433,8 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len) {
     return false;
   }
 
-  ReadRequest req; req.initReadFlash(addr, 32);
+  ReadRequest req;
+  req.initReadFlash(addr, 32);
   if (sizeof(ReadRequest) != QSerialPort::write((const char *)&req, sizeof(ReadRequest))) {
     _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
     logError() << _errorMessage;
@@ -553,7 +555,8 @@ OpenGD77Interface::writeFlash(uint32_t addr, const uint8_t *data, uint16_t len) 
 
 bool
 OpenGD77Interface::finishWriteFlash() {
-  WriteRequest req; req.initFinishWriteFlash();
+  WriteRequest req;
+  req.initFinishWriteFlash();
   WriteResponse resp;
 
   if ((2) != QSerialPort::write((const char *)&req, 2)) {
@@ -627,7 +630,8 @@ OpenGD77Interface::sendShowCPSScreen() {
 
 bool
 OpenGD77Interface::sendClearScreen() {
-  CommandRequest req; req.initClearScreen();
+  CommandRequest req;
+  req.initClearScreen();
   uint8_t resp;
 
   if (sizeof(CommandRequest) != QSerialPort::write((const char *) &req, sizeof(CommandRequest))) {
@@ -663,7 +667,8 @@ OpenGD77Interface::sendClearScreen() {
 
 bool
 OpenGD77Interface::sendDisplay(uint8_t x, uint8_t y, const char *message, uint8_t iSize, uint8_t alignment, uint8_t inverted) {
-  CommandRequest req; req.initDisplay(x,y, message, iSize, alignment, inverted);
+  CommandRequest req;
+  req.initDisplay(x,y, message, iSize, alignment, inverted);
   uint8_t resp;
 
   if (sizeof(CommandRequest) != QSerialPort::write((const char *) &req, sizeof(CommandRequest))) {
@@ -699,8 +704,8 @@ OpenGD77Interface::sendDisplay(uint8_t x, uint8_t y, const char *message, uint8_
 
 bool
 OpenGD77Interface::sendRenderCPS() {
-  CommandRequest req; req.initRenderCPS();
-  uint8_t resp;
+  CommandRequest req;
+  req.initRenderCPS();
 
   if (sizeof(CommandRequest) != QSerialPort::write((const char *) &req, sizeof(CommandRequest))) {
     _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
@@ -714,6 +719,7 @@ OpenGD77Interface::sendRenderCPS() {
     return false;
   }
 
+  uint8_t resp;
   int retlen = QSerialPort::read((char *)&resp, 1);
 
   if (0 > retlen) {

@@ -48,6 +48,7 @@ public:
   virtual bool write_finish() = 0;
 
   virtual bool read_start(uint32_t bank, uint32_t addr) = 0;
+
   /** Reads a chunk of data from the block-address @c bno (block number).
    * @param addr Specifies the address to read from.
    * @param data Pointer where to store the read data.

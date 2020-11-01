@@ -1,14 +1,5 @@
-/** @defgroup ogd77 Radioddity GD-77
- * Device specific classes for Radioddity GD-77 and GD-77S.
+/** @defgroup ogd77 Open GD-77 Firmware
  *
- * \image html gd77.jpg "GD-77" width=200px
- * \image latex gd77.jpg "GD-77" width=200px
- *
- * @warning This device and its codplug are implemented based on the code by Serge and has not been
- * tested! I do not own a GD-77 or GD-77S, hence I cannot test and verify the implementation!
- *
- * @todo Get a handheld.
- * @todo Reverse-engineer and implement everything.
  * @ingroup dsc */
 
 #ifndef OPENGD77_HH
@@ -45,6 +36,9 @@ public slots:
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
 	void run();
+
+  void download();
+  void upload();
 
 protected:
   /** The device identifier. */

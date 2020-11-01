@@ -219,7 +219,8 @@ public:
     void fromChannelObj(const Channel *c, const Config *conf);
     /** Links a previously constructed @c Channel object to other object within the generic
      * configuration, for example scan lists etc. */
-    bool linkChannelObj(Channel *c, Config *conf) const;
+    bool linkChannelObj(Channel *c, Config *conf, const QHash<int, int> &scan_table,
+                        const QHash<int, int> &group_table, const QHash<int, int> &contact_table) const;
   };
 
   /** One bank of 128 channels including a bitmap for enabled channels.
@@ -356,7 +357,7 @@ public:
     Zone *toZoneObj() const;
     /** Links a previously constructed @c Zone object to the rest of the configuration. That is
      * linking to the referred channels. */
-    bool linkZoneObj(Zone *zone, const Config *conf) const;
+    bool linkZoneObj(Zone *zone, const Config *conf, const QHash<int,int> &channel_table) const;
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     void fromZoneObjA(const Zone *zone, const Config *conf);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
@@ -400,7 +401,7 @@ public:
     /** Constructs a @c RXGroupList object from the codeplug representation. */
     RXGroupList *toRXGroupListObj();
     /** Links a previously constructed @c RXGroupList to the rest of the generic configuration. */
-    bool linkRXGroupListObj(int ncnt, RXGroupList *lst, const Config *conf) const;
+    bool linkRXGroupListObj(int ncnt, RXGroupList *lst, const Config *conf, const QHash<int, int> &contact_table) const;
     /** Reset this codeplug representation from a @c RXGroupList object. */
     void fromRXGroupListObj(const RXGroupList *lst, const Config *conf);
   };
@@ -463,7 +464,7 @@ public:
     /** Constrcuts a @c ScanList object from this codeplug representation. */
     ScanList *toScanListObj() const;
     /** Links a previously constructed @c ScanList object to the rest of the generic configuration. */
-    bool linkScanListObj(ScanList *lst, const Config *conf) const;
+    bool linkScanListObj(ScanList *lst, const Config *conf, const QHash<int, int> &channel_table) const;
     /** Initializes this codeplug representation from the given @c ScanList object. */
     void fromScanListObj(const ScanList *lst, const Config *conf);
   };

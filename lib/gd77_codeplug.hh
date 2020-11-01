@@ -188,7 +188,8 @@ protected:
     void fromChannelObj(const Channel *c, const Config *conf);
     /** Links a previously constructed @c Channel object to other object within the generic
      * configuration, for example scan lists etc. */
-    bool linkChannelObj(Channel *c, Config *conf) const;
+    bool linkChannelObj(Channel *c, Config *conf, const QHash<int, int> &scan_table,
+                        const QHash<int, int> &group_table, const QHash<int, int> &contact_table) const;
 	} channel_t;
 
 	/** A Bank of 128 channels. */
@@ -223,7 +224,7 @@ protected:
     /** Constructs a @c RXGroupList object from the codeplug representation. */
     RXGroupList *toRXGroupListObj();
     /** Links a previously constructed @c RXGroupList to the rest of the generic configuration. */
-    bool linkRXGroupListObj(RXGroupList *lst, const Config *conf) const;
+    bool linkRXGroupListObj(RXGroupList *lst, const Config *conf, const QHash<int,int> &contact_table) const;
     /** Reset this codeplug representation from a @c RXGroupList object. */
     void fromRXGroupListObj(const RXGroupList *lst, const Config *conf);
 	} grouplist_t;

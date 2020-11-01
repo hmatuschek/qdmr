@@ -30,8 +30,8 @@ OpenGD77Codeplug::OpenGD77Codeplug(QObject *parent)
   image(0).addElement(0x000e0, 0x05f20);
   image(0).addElement(0x07500, 0x03b00);
   addImage("OpenGD77 Codeplug FLASH");
-  image(0).addElement(0x00000, 0x011a0);
-  image(0).addElement(0x7b000, 0x13e60);
+  image(1).addElement(0x00000, 0x011a0);
+  image(1).addElement(0x7b000, 0x13e60);
 }
 
 bool
@@ -164,6 +164,7 @@ OpenGD77Codeplug::decode(Config *config) {
   config->setIntroLine2(it->getIntroLine2());
 
   /* Unpack Contacts */
+  QHash<int,int> contact_table;
   for (int i=0; i<NCONTACTS; i++) {
     contact_t *ct = (contact_t *) data(OFFSET_CONTACTS+i*sizeof(contact_t), FLASH);
     if (nullptr == ct) {
@@ -174,8 +175,12 @@ OpenGD77Codeplug::decode(Config *config) {
     // If contact is disabled
     if (! ct->isValid())
       continue;
-    logDebug() << "Contact " << i << " enabled.";
     if (DigitalContact *cont = ct->toContactObj()) {
+      logDebug() << "Contact " << i << " enabled, mapped to index "
+                 << config->contacts()->digitalCount();
+      // Store in index table
+      contact_table[i] = config->contacts()->digitalCount();
+      // add contact to config
       config->contacts()->addContact(cont);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid contact at index %2.")
@@ -185,6 +190,7 @@ OpenGD77Codeplug::decode(Config *config) {
   }
 
   /* Unpack RX Group Lists */
+  QHash<int,int> group_table;
   for (int i=0; i<NGLISTS; i++) {
     grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB, FLASH);
     if (nullptr == gt) {
@@ -194,21 +200,26 @@ OpenGD77Codeplug::decode(Config *config) {
     }
     if (0 == gt->nitems1[i])
       continue;
+
     grouplist_t *gl = &gt->grouplist[i];
     if (nullptr == gl) {
       _errorMessage = QString("%1(): Cannot access group list memory at index %2!")
           .arg(__func__).arg(i);
       return false;
     }
+
     RXGroupList *list = gl->toRXGroupListObj();
     if (list) {
+      logDebug() << "RX group list at index " << i << " mapped to "
+                 << config->rxGroupLists()->count();
+      group_table[i] = config->rxGroupLists()->count();
       config->rxGroupLists()->addList(list);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid RX group-list at index %2.")
           .arg(__func__).arg(i);
       return false;
     }
-    if(! gl->linkRXGroupListObj(list, config)) {
+    if(! gl->linkRXGroupListObj(list, config, contact_table)) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link RX group list at index %2.")
           .arg(__func__).arg(i);
       return false;
@@ -216,6 +227,7 @@ OpenGD77Codeplug::decode(Config *config) {
   }
 
   /* Unpack Channels */
+  QHash<int,int> channel_table;
   for (int i=0; i<NCHAN; i++) {
     // First, get bank
     bank_t *b;
@@ -231,6 +243,7 @@ OpenGD77Codeplug::decode(Config *config) {
     // If channel is disabled -> skip
     if (! ((b->bitmap[i % 128 / 8] >> (i & 7)) & 1) )
       continue;
+
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
     if (! ch){
@@ -239,6 +252,8 @@ OpenGD77Codeplug::decode(Config *config) {
       return false;
     }
     if (Channel *chan = ch->toChannelObj()) {
+      logDebug() << "Mapped channel index " << i << " to " << config->channelList()->count();
+      channel_table[i] = config->channelList()->count();
       config->channelList()->addChannel(chan);
     } else {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid channel at index %2!")
@@ -255,9 +270,11 @@ OpenGD77Codeplug::decode(Config *config) {
           .arg(__func__);
       return false;
     }
-    // if zone is disabled
+
+    // if zone is disabled -> skip
     if (! (zt->bitmap[i / 8] >> (i & 7) & 1) )
       continue;
+
     // get zone_t
     zone_t *z = &zt->zone[i];
     if (! z){
@@ -273,7 +290,7 @@ OpenGD77Codeplug::decode(Config *config) {
           .arg(__func__).arg(i);
       return false;
     }
-    if (! z->linkZoneObj(zone, config)) {
+    if (! z->linkZoneObj(zone, config, channel_table)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
           .arg(__func__).arg(i);
       return false;
@@ -282,6 +299,7 @@ OpenGD77Codeplug::decode(Config *config) {
   }
 
   /* Unpack Scan lists */
+  QHash<int, int> scan_table;
   for (int i=0; i<NSCANL; i++) {
     scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB, EEPROM);
     if (! st){
@@ -291,23 +309,29 @@ OpenGD77Codeplug::decode(Config *config) {
     }
     if (! st->valid[i])
       continue;
+
     scanlist_t *sl = &st->scanlist[i];
     if (! sl){
       _errorMessage = QString("%1(): Cannot access scan list at index %2")
           .arg(__func__).arg(i);
       return false;
     }
+
     ScanList *scan = sl->toScanListObj();
     if (nullptr == scan) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid scanlist at index %2")
           .arg(__func__).arg(i);
       return false;
     }
-    if (! sl->linkScanListObj(scan, config)) {
+
+    if (! sl->linkScanListObj(scan, config, channel_table)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link scanlist at index %2")
           .arg(__func__).arg(i);
       return false;
     }
+
+    logDebug() << "Map scan-list at index " << i << " to " << config->scanlists()->count();
+    scan_table[i] = config->scanlists()->count();
     config->scanlists()->addScanList(scan);
   }
 
@@ -326,7 +350,10 @@ OpenGD77Codeplug::decode(Config *config) {
       continue;
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
-    if (! ch->linkChannelObj(config->channelList()->channel(i), config)) {
+
+    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i]),
+                             config, scan_table, group_table, contact_table))
+    {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link channel at index %2")
           .arg(__func__).arg(i);
       return false;
