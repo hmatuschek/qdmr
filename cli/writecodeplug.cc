@@ -29,6 +29,24 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     logError() << "Cannot detect radio: " << errorMessage;
     return -1;
   }
+
+  bool verified = true;
+  QList<VerifyIssue> issues;
+  if (radio->verifyConfig(&config, issues)) {
+    foreach(const VerifyIssue &issue, issues) {
+      if (VerifyIssue::WARNING == issue.type()) {
+        logWarn() << "Verification Issue: " << issue.message();
+      } else if (VerifyIssue::ERROR == issue.type()) {
+        logError() << "Verification Issue: " << issue.message();
+        verified = false;
+      }
+    }
+  }
+  if (! verified) {
+    logError() << "Cannot upload codeplug to device: Codeplug cannot be verified with radio.";
+    return -1;
+  }
+
   logDebug() << "Start upload to " << radio->name() << ".";
   if (! radio->startUpload(&config, true)) {
     logError() << "Codeplug upload error: " << radio->errorMessage();
