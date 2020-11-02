@@ -354,9 +354,11 @@ bool
 Application::verifyCodeplug(Radio *radio, bool showSuccess) {
   Radio *myRadio = radio;
   QString errorMessage;
+
+  // If no radio is given -> try to detect the radio
   if (nullptr == myRadio)
     myRadio = Radio::detect(errorMessage);
-  if (! myRadio) {
+  if (nullptr == myRadio) {
     QMessageBox::information(nullptr, tr("No Radio found."),
                              tr("Cannot verify codeplug: No known radio detected.\nError: ")
                              + errorMessage);
@@ -375,7 +377,7 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess) {
           tr("The codeplug was successfully verified with the radio '%1'").arg(myRadio->name()));
   }
 
-  // If a radio was not given
+  // If no radio was given -> close connection to radio again
   if (nullptr == radio)
     myRadio->deleteLater();
 
@@ -398,7 +400,7 @@ Application::downloadCodeplug() {
 
   QString errorMessage;
   Radio *radio = Radio::detect(errorMessage);
-  if (! radio) {
+  if (nullptr == radio) {
     QMessageBox::critical(nullptr, tr("No Radio found."),
                           tr("Can not download codeplug from device: No radio found.\nError: ")
                           + errorMessage);
@@ -452,8 +454,9 @@ Application::uploadCodeplug() {
   // Start upload
   Settings settings;
   QString errorMessage;
+
   Radio *radio = Radio::detect(errorMessage);
-  if (! radio) {
+  if (nullptr == radio) {
     QMessageBox::critical(nullptr, tr("No Radio found."),
                           tr("Can not upload codeplug to device: No radio found.\nError: ")
                           + errorMessage);
