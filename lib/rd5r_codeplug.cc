@@ -507,7 +507,9 @@ RD5RCodeplug::scanlist_t::linkScanListObj(ScanList *lst, const Config *conf, con
   if ((1<priority_ch2) && channel_table.contains(priority_ch2-1))
     lst->setSecPriorityChannel(conf->channelList()->channel(channel_table.contains(priority_ch2-1)));
   for (int i=0; (i<32) && (member[i]>0); i++) {
-    if (member[i] && channel_table.contains(member[i]-1))
+    if (1 == member[i])
+      lst->addChannel(lst->selectedChannel());
+    else if (member[i] && channel_table.contains(member[i]-1))
       lst->addChannel(conf->channelList()->channel(channel_table.contains(member[i]-1)));
   }
   return true;
@@ -523,6 +525,8 @@ RD5RCodeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *con
   for (int i=0; i<32; i++) {
     if (i >= lst->count())
       member[i] = 0;
+    else if (lst->isSelectedChannel(lst->channel(i)))
+      member[i] = 1;
     else
       member[i] = conf->channelList()->indexOf(lst->channel(i))+2;
   }

@@ -247,7 +247,6 @@ protected:
     scanlist_t scanlist[NSCANL];
 	} scantab_t;
 
-
 	/** Represents the general settings within the codeplug. This representation is identical to
 	 * the general settings of the RD-5R codeplug. Hence, it gets reused here. */
 	typedef RD5RCodeplug::general_settings_t general_settings_t;

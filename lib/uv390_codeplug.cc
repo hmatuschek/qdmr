@@ -613,14 +613,19 @@ UV390Codeplug::scanlist_t::linkScanListObj(ScanList *l, Config *conf) const {
 void
 UV390Codeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *conf) {
   setName(lst->name());
-  priority_ch1 = conf->channelList()->indexOf(lst->priorityChannel())+1;
-  priority_ch2 = conf->channelList()->indexOf(lst->secPriorityChannel())+1;
+  priority_ch1 = (nullptr == lst->priorityChannel())    ?
+        0 : (conf->channelList()->indexOf(lst->priorityChannel())+1);
+  priority_ch2 = (nullptr == lst->secPriorityChannel()) ?
+        0 : (conf->channelList()->indexOf(lst->secPriorityChannel())+1);
 
-  for (int i=0; i<31; i++) {
-    if (i < lst->count())
-      member[i] = conf->channelList()->indexOf(lst->channel(i))+1;
-    else
-      member[i] = 0;
+  for (int i=0, j=0; i<31;) {
+    if (j >= lst->count()) {
+      member[i++] = 0;
+    } else if (lst->isSelectedChannel(lst->channel(j))) {
+      j++;
+    } else {
+      member[i++] = conf->channelList()->indexOf(lst->channel(j++))+1;
+    }
   }
 }
 
