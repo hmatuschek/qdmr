@@ -11,6 +11,7 @@ several (mainly Chinese) DMR radios.
 ## Supported Radios 
 Currently, there are only two supported radios
 
+  * Open GD77 firmware
   * Baofeng/Radioddity RD-5R
   * TYT MD-UV390 / Retevis RT3S
 
