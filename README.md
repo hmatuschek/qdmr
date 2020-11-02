@@ -20,6 +20,7 @@ the software with.
 
 
 ## Releases
+ * **[Version 0.4.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.1)** -- Bugfix release..
  * **[Version 0.4.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.0)** -- Added Open GD77 support.
  * **[Version 0.3.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.3.0)** -- Bugfix release.
  * **[Version 0.2.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.2.3)** -- Bugfix release.
