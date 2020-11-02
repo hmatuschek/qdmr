@@ -12,11 +12,25 @@
 
 
 /* ********************************************************************************************* *
+ * Implementation of SelectedChannel
+ * ********************************************************************************************* */
+SelectedChannel::SelectedChannel(QObject *parent)
+  : Channel("[Selected]", 0, 0, Channel::LowPower, 0, true, nullptr, parent)
+{
+  // pass...
+}
+
+SelectedChannel::~SelectedChannel() {
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of ScanList
  * ********************************************************************************************* */
 ScanList::ScanList(const QString &name, QObject *parent)
   : QAbstractListModel(parent), _name(name), _channels(), _priorityChannel(nullptr),
-    _secPriorityChannel(nullptr)
+    _secPriorityChannel(nullptr), _selectedChannel(new SelectedChannel(this))
 {
   // pass...
 }
@@ -109,6 +123,16 @@ ScanList::setSecPriorityChannel(Channel *channel) {
   if (_secPriorityChannel)
     connect(_secPriorityChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
   emit modified();
+}
+
+bool
+ScanList::isSelectedChannel(const Channel *ch) const {
+  return _selectedChannel == ch;
+}
+
+Channel *
+ScanList::selectedChannel() const {
+  return _selectedChannel;
 }
 
 bool

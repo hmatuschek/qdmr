@@ -4,7 +4,22 @@
 #include <QObject>
 #include <QAbstractListModel>
 
-class Channel;
+#include "channel.hh"
+
+/** Internal class representing the "currently selected" channel within each scan list.
+ * @ingroup conf */
+class SelectedChannel: public Channel
+{
+  Q_OBJECT
+
+public:
+  /** Constructs the "selected" channel.
+   * @warning Do not use this class directly, call @c ScanList::selectedChannel() instead. */
+  explicit SelectedChannel(QObject *parent=nullptr);
+  /** Destructor. */
+  virtual ~SelectedChannel();
+};
+
 
 /** Generic representation of a scan list.
  * @ingroup conf */
@@ -45,6 +60,11 @@ public:
   /** Sets the secondary priority channel. */
   void setSecPriorityChannel(Channel *channel);
 
+  /** Retruns @c true if the given channel is the "selected" channel for this scan list. */
+  bool isSelectedChannel(const Channel *ch) const;
+  /** Returns the "selected" channel for this scan list. */
+  Channel * selectedChannel() const;
+
 	/** Implementation of QAbstractListModel, returns the number of channels. */
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
   /** Implementation of QAbstractListModel, returns the entry data at the given index. */
@@ -69,6 +89,8 @@ protected:
   Channel *_priorityChannel;
   /** The secondary priority channel. */
   Channel *_secPriorityChannel;
+  /** Holds a specific instance representing the "currently selected channel" for this scan list. */
+  SelectedChannel *_selectedChannel;
 };
 
 
