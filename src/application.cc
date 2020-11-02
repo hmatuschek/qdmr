@@ -351,7 +351,7 @@ Application::detectRadio() {
 
 
 bool
-Application::verifyCodeplug(Radio *radio) {
+Application::verifyCodeplug(Radio *radio, bool showSuccess) {
   Radio *myRadio = radio;
   QString errorMessage;
   if (nullptr == myRadio)
@@ -363,19 +363,23 @@ Application::verifyCodeplug(Radio *radio) {
     return false;
   }
 
+  bool verified = true;
   QList<VerifyIssue> issues;
   if (! myRadio->verifyConfig(_config, issues)) {
     VerifyDialog dialog(issues);
-    dialog.exec();
-  } else {
-    QMessageBox::information(nullptr, tr("Verification success"),
-                             tr("The codeplug was successfully verified with the radio '%1'").arg(myRadio->name()));
+    if (QDialog::Accepted != dialog.exec())
+      verified = false;
+  } else if (showSuccess) {
+    QMessageBox::information(
+          nullptr, tr("Verification success"),
+          tr("The codeplug was successfully verified with the radio '%1'").arg(myRadio->name()));
   }
 
+  // If a radio was not given
   if (nullptr == radio)
     myRadio->deleteLater();
 
-  return (0 == issues.size());
+  return verified;
 }
 
 
@@ -456,8 +460,9 @@ Application::uploadCodeplug() {
     return;
   }
 
-  // Verify codeplug against the radio before uploading
-  if (! verifyCodeplug(radio))
+  // Verify codeplug against the detected radio before uploading,
+  // but do not show a message on success.
+  if (! verifyCodeplug(radio, false))
     return;
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
