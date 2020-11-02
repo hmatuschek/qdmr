@@ -440,7 +440,7 @@ public:
       pl_type             : 2,    ///< PL type, default 3.
       talkback            : 1;    ///< Talkback, default 1.
     // Bytes 16-79
-    uint16_t member[32];          ///< Channel indices, 0=not used/EOL or channel index+1.
+    uint16_t member[32];          ///< Channel indices, 0=not used/EOL or channel index+2.
 
     // Bytes 80-85
     uint16_t priority_ch1;        ///< Priority channel 1 index, index+2 or 0=None, 1=selected.

@@ -599,7 +599,7 @@ UV390Codeplug::scanlist_t::linkScanListObj(ScanList *l, Config *conf) const {
     logDebug() << "Cannot link invalid scanlist.";
     return false;
   }
-  for (int i=0; ((i<31) && (member[i])); i++) {
+  for (int i=0; ((i<31) && member[i]); i++) {
     if ((member[i]-1) >= conf->channelList()->count()) {
       logDebug() << "Cannot link scanlist to channel idx=" << member[i]
                     << ". Only " << conf->channelList()->count() << " channels defined.";
