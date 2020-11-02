@@ -22,11 +22,12 @@ SET(libdmrconf_HEADERS libdmrconf.hh utils.hh crc32.hh csvwriter.hh)
 
 configure_file(config.h.in ${PROJECT_BINARY_DIR}/lib/config.h)
 
-
+#SET(CMAKE_AUTOMOC ON)
 qt5_wrap_cpp(libdmrconf_MOC_SOURCES ${libdmrconf_MOC_HEADERS})
 
 add_library(libdmrconf SHARED ${libdmrconf_SOURCES} ${libdmrconf_MOC_SOURCES})
 set_target_properties(libdmrconf PROPERTIES
+	MACOSX_RPATH TRUE
   OUTPUT_NAME dmrconf
   VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
   SOVERSION "${VERSION_MAJOR}.${VERSION_MINOR}")
@@ -40,3 +41,4 @@ install(FILES ${PROJECT_BINARY_DIR}/lib/config.h DESTINATION ${CMAKE_INSTALL_FUL
 if (UNIX AND NOT APPLE)
   install(FILES "${CMAKE_SOURCE_DIR}/dist/99-qdmr.rules" DESTINATION "/etc/udev/rules.d/")
 endif(UNIX AND NOT APPLE)
+
