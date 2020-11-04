@@ -1,8 +1,10 @@
 #ifndef RT3S_GPS_CODEPLUG_HH
 #define RT3S_GPS_CODEPLUG_HH
 
-#include "codeplug.hh"
 #include <QDateTime>
+
+#include "codeplug.hh"
+#include "signaling.hh"
 
 class Channel;
 class DigitalContact;
@@ -258,14 +260,14 @@ public:
     /** Sets the name of the radio. */
     void setName(const QString &name);
     /** Returns the RX CTCSS tone. */
-    float getRXTone() const;
+    Signaling::Code getRXTone() const;
     /** Sets the RX CTCSS tone. */
-    void setRXTone(float tone);
+    void setRXTone(Signaling::Code code);
 
     /** Returns the TX CTCSS tone. */
-    float getTXTone() const;
+    Signaling::Code getTXTone() const;
     /** Sets the TX CTCSS tone. */
-    void setTXTone(float tone);
+    void setTXTone(Signaling::Code code);
 
     /** Constructs a generic @c Channel object from the codeplug channel. */
     Channel *toChannelObj() const;

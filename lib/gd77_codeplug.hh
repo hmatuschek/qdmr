@@ -3,6 +3,7 @@
 
 #include "codeplug.hh"
 #include "rd5r_codeplug.hh"
+#include "signaling.hh"
 
 /** Represents, encodes and decodes the device specific codeplug for a Radioddity GD-77.
  *
@@ -174,11 +175,11 @@ protected:
     /** Sets the channel name. */
     void setName(const QString &name);
     /** Returns the CTCSS RX tone. */
-    float getRXTone() const;
+    Signaling::Code getRXTone() const;
     /** Sets the CTCSS RX tone. */
     void setRXTone(float tone);
     /** Returns the CTCSS TX tone. */
-    float getTXTone() const;
+    Signaling::Code getTXTone() const;
     /** Sets the CTCSS TX tone. */
     void setTXTone(float tone);
 

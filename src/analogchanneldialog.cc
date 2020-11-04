@@ -50,8 +50,8 @@ AnalogChannelDialog::construct() {
   txAdmit->setItemData(0, uint(AnalogChannel::AdmitNone));
   txAdmit->setItemData(1, uint(AnalogChannel::AdmitFree));
   txAdmit->setItemData(2, uint(AnalogChannel::AdmitTone));
-  populateCTCSSBox(rxTone, (nullptr != _channel ? _channel->rxTone() : 0.0));
-  populateCTCSSBox(txTone, (nullptr != _channel ? _channel->txTone() : 0.0));
+  populateCTCSSBox(rxTone, (nullptr != _channel ? _channel->rxTone() : Signaling::SIGNALING_NONE));
+  populateCTCSSBox(txTone, (nullptr != _channel ? _channel->txTone() : Signaling::SIGNALING_NONE));
   bandwidth->setItemData(0, uint(AnalogChannel::BWNarrow));
   bandwidth->setItemData(1, uint(AnalogChannel::BWWide));
 
@@ -92,8 +92,8 @@ AnalogChannelDialog::channel() {
   bool rxonly = rxOnly->isChecked();
   AnalogChannel::Admit admit = AnalogChannel::Admit(txAdmit->currentData().toUInt(&ok));
   uint squ = squelch->text().toUInt(&ok);
-  double rxtone = rxTone->currentData().toDouble(&ok);
-  double txtone = txTone->currentData().toDouble(&ok);
+  Signaling::Code rxtone = Signaling::Code(rxTone->currentData().toUInt(&ok));
+  Signaling::Code txtone = Signaling::Code(txTone->currentData().toUInt(&ok));
   AnalogChannel::Bandwidth bw = AnalogChannel::Bandwidth(bandwidth->currentData().toUInt());
   ScanList *scanlist = scanList->currentData().value<ScanList *>();
 

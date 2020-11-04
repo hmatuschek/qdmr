@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "codeplug.hh"
+#include "signaling.hh"
 
 class Channel;
 class Zone;
@@ -205,13 +206,13 @@ public:
     /** Sets the channel name. */
     void setName(const QString &name);
     /** Returns the CTCSS RX tone. */
-    float getRXTone() const;
+    Signaling::Code getRXTone() const;
     /** Sets the CTCSS RX tone. */
-    void setRXTone(float tone);
+    void setRXTone(Signaling::Code code);
     /** Returns the CTCSS TX tone. */
-    float getTXTone() const;
+    Signaling::Code getTXTone() const;
     /** Sets the CTCSS TX tone. */
-    void setTXTone(float tone);
+    void setTXTone(Signaling::Code code);
 
     /** Constructs a @c Channel object from this codeplug channel. */
     Channel *toChannelObj() const;

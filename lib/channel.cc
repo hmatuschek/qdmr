@@ -123,8 +123,9 @@ Channel::onScanListDeleted(QObject *obj) {
  * Implementation of AnalogChannel
  * ********************************************************************************************* */
 AnalogChannel::AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power,
-                             uint txTimeout, bool rxOnly, Admit admit, uint squelch, float rxTone,
-                             float txTone, Bandwidth bw, ScanList *list, QObject *parent)
+                             uint txTimeout, bool rxOnly, Admit admit, uint squelch,
+                             Signaling::Code rxTone, Signaling::Code txTone, Bandwidth bw,
+                             ScanList *list, QObject *parent)
   : Channel(name, rxFreq, txFreq, power, txTimeout, rxOnly, list, parent),
     _admit(admit), _squelch(squelch), _rxTone(rxTone), _txTone(txTone), _bw(bw)
 {
@@ -152,24 +153,24 @@ AnalogChannel::setSquelch(uint val) {
   return true;
 }
 
-float
+Signaling::Code
 AnalogChannel::rxTone() const {
   return _rxTone;
 }
 bool
-AnalogChannel::setRXTone(float val) {
-  _rxTone = val;
+AnalogChannel::setRXTone(Signaling::Code code) {
+  _rxTone = code;
   emit modified();
   return true;
 }
 
-float
+Signaling::Code
 AnalogChannel::txTone() const {
   return _txTone;
 }
 bool
-AnalogChannel::setTXTone(float val) {
-  _txTone = val;
+AnalogChannel::setTXTone(Signaling::Code code) {
+  _txTone = code;
   emit modified();
   return true;
 }

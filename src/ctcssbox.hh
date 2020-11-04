@@ -2,6 +2,7 @@
 #define CTCSSBOX_HH
 
 #include <QComboBox>
+#include "signaling.hh"
 
 class CTCSSBox : public QComboBox
 {
@@ -12,6 +13,6 @@ public:
 	double selectedFreq() const;
 };
 
-void populateCTCSSBox(QComboBox *box, double value=0.0);
+void populateCTCSSBox(QComboBox *box, Signaling::Code code=Signaling::SIGNALING_NONE);
 
 #endif // CTCSSBOX_HH

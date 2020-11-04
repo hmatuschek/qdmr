@@ -6,7 +6,7 @@ ELSE (APPLE)
  SET(hid_HEADERS hid_libusb.hh)
 ENDIF(APPLE)
 
-SET(libdmrconf_SOURCES utils.cc crc32.cc csvwriter.cc
+SET(libdmrconf_SOURCES utils.cc crc32.cc csvwriter.cc signaling.cc
    radio.cc radiointerface.cc ${hid_SOURCES} hid_interface.cc dfu_libusb.cc usbserial.cc
    csvreader.cc dfufile.cc repeaterdatabase.cc userdatabase.cc logger.cc
    config.cc contact.cc rxgrouplist.cc channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc
@@ -18,7 +18,7 @@ SET(libdmrconf_MOC_HEADERS
    config.hh contact.hh rxgrouplist.hh channel.hh zone.hh scanlist.hh gpssystem.hh codeplug.hh
    rd5r.hh rd5r_codeplug.hh uv390.hh uv390_codeplug.hh gd77.hh gd77_codeplug.hh
    opengd77.hh opengd77_interface.hh opengd77_codeplug.hh)
-SET(libdmrconf_HEADERS libdmrconf.hh utils.hh crc32.hh csvwriter.hh)
+SET(libdmrconf_HEADERS libdmrconf.hh utils.hh crc32.hh csvwriter.hh signaling.hh)
 
 configure_file(config.h.in ${PROJECT_BINARY_DIR}/lib/config.h)
 

@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QAbstractTableModel>
 
+#include "signaling.hh"
+
 class Config;
 class RXGroupList;
 class DigitalContact;
@@ -144,6 +146,8 @@ public:
     BWWide     ///< Wide bandwidth (25kHz).
 	} Bandwidth;
 
+
+
 public:
   /** Constructs a new analog channel.
    *
@@ -155,14 +159,14 @@ public:
    * @param rxOnly    Specifies whether the channel is RX only.
    * @param admit     Specifies the admit criterion.
    * @param squelch   Specifies the squelch level [0,10].
-   * @param rxTone    Specifies CTCSS RX tone.
-   * @param txTone    Specifies CTCSS transmit tone.
+   * @param rxTone    Specifies CTCSS/DCS RX tone/code.
+   * @param txTone    Specifies CTCSS/DCS TX tone/code.
    * @param bw        Specifies the bandwidth.
    * @param list      Specifies the default scanlist for the channel.
    * @param parent    Specified the @c QObject parent object. */
   AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
-	              bool rxOnly, Admit admit, uint squelch, float rxTone, float txTone, Bandwidth bw,
-                ScanList *list, QObject *parent=nullptr);
+                bool rxOnly, Admit admit, uint squelch, Signaling::Code rxTone,
+                Signaling::Code txTone, Bandwidth bw, ScanList *list, QObject *parent=nullptr);
 
   /** Returns the admit criterion for the analog channel. */
 	Admit admit() const;
@@ -174,14 +178,14 @@ public:
   /** (Re-)Sets the squelch level [0,10]. 0 Disables squelch (on some radios). */
 	bool setSquelch(uint squelch);
 
-  /** Returns the CTCSS RX tone, 0=disabled. */
-	float rxTone() const;
-  /** (Re-)Sets the CTCSS RX tone, 0 disables the RX tone. */
-	bool setRXTone(float freq);
-  /** Returns the CTCSS TX tone, 0=disabled. */
-	float txTone() const;
-  /** (Re-)Sets the CTCSS TX tone, 0 disables the TX tone. */
-	bool setTXTone(float freq);
+  /** Returns the CTCSS/DCS RX tone, @c SIGNALING_NONE means disabled. */
+  Signaling::Code rxTone() const;
+  /** (Re-)Sets the CTCSS/DCS RX tone, @c SIGNALING_NONE disables the RX tone. */
+  bool setRXTone(Signaling::Code code);
+  /** Returns the CTCSS/DCS TX tone, @c SIGNALING_NONE means disabled. */
+  Signaling::Code txTone() const;
+  /** (Re-)Sets the CTCSS/DCS TX tone, @c SIGNALING_NONE disables the TX tone. */
+  bool setTXTone(Signaling::Code code);
 
   /** Returns the bandwidth of the analog channel. */
 	Bandwidth bandwidth() const;
@@ -194,9 +198,9 @@ protected:
   /** Holds the squelch level [0,10]. */
 	uint  _squelch;
   /** The RX CTCSS tone. */
-	float _rxTone;
+  Signaling::Code _rxTone;
   /** The TX CTCSS tone. */
-	float _txTone;
+  Signaling::Code _txTone;
   /** The channel bandwidth. */
 	Bandwidth _bw;
 };

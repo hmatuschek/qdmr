@@ -1654,8 +1654,30 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
     return false;
   }
 
-  AnalogChannel *chan = new AnalogChannel(name, rx, tx, power, tot, ro, admit, squelch, rxTone,
-                                          txTone, bw, nullptr);
+  // check CTCSS tone
+  Signaling::Code rxSig = Signaling::SIGNALING_NONE;
+  if (0 != rxTone) {
+    if (! Signaling::isCTCSSFrequency(rxTone)) {
+      errorMessage = QString("Parse error @ %1,%2: Cannot create analog channel '%3' with index %4, unknown CTCSS frequency %5Hz for RX tone.")
+          .arg(line).arg(column).arg(name).arg(idx).arg(rxTone);
+      return false;
+    }
+    rxSig = Signaling::fromCTCSSFrequency(rxTone);
+  }
+
+  // check CTCSS tone
+  Signaling::Code txSig = Signaling::SIGNALING_NONE;
+  if (0 != txTone) {
+    if (! Signaling::isCTCSSFrequency(txTone)) {
+      errorMessage = QString("Parse error @ %1,%2: Cannot create analog channel '%3' with index %4, unknown CTCSS frequency %5Hz for TX tone.")
+          .arg(line).arg(column).arg(name).arg(idx).arg(txTone);
+      return false;
+    }
+    txSig = Signaling::fromCTCSSFrequency(txTone);
+  }
+
+  AnalogChannel *chan = new AnalogChannel(name, rx, tx, power, tot, ro, admit, squelch, rxSig,
+                                          txSig, bw, nullptr);
   _config->channelList()->addChannel(chan);
   _channels[idx] = chan;
 
