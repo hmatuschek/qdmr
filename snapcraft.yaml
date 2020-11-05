@@ -3,9 +3,9 @@ version: git
 grade: devel
 #version: 0.4.1
 #grade: stable
-summary: Graphical codeplug programming tool for DMR radios.
+summary: Graphical code-plug programming tool for DMR radios.
 description: |
-  qDMR is a simple to use and feature-rich codeplug programming software (CPS) for cheap DMR radios.
+  qDMR is a simple to use and feature-rich code-plug programming software (CPS) for cheap DMR radios.
 
 confinement: strict
 base: core18
@@ -17,12 +17,9 @@ apps:
   qdmr:
     command: qdmr
     desktop: usr/share/applications/qdmr.desktop
-    extensions:
-      - kde-neon
     plugs:
       - home
       - desktop
-      - opengl
       - network
       - raw-usb
       - serial-port
@@ -30,14 +27,21 @@ apps:
 parts:
   qdmr:
     plugin: cmake
-    build-snaps:
-      - kde-frameworks-5-core18-sdk
-      - kde-frameworks-5-core18
     build-packages:
-      - libegl1
+      - qtbase5-dev
+      - qttools5-dev
+      - qttools5-dev-tools
+      - qtpositioning5-dev
+      - libqt5serialport5-dev
       - libusb-1.0-0-dev
     stage-packages:
-      - libusb-1.0-0
+      - libqt5core5a
+      - libqt5gui5
+      - libqt5network5
+      - libqt5positioning5
+      - libqt5serialport5
+      - libqt5widgets5
+      - libusb-1.0-0    
     source: https://github.com/hmatuschek/qdmr.git
     source-type: git
 #    source-tag: "v$SNAPCRAFT_PROJECT_VERSION"

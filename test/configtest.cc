@@ -185,8 +185,8 @@ ConfigTest::testAnalogChannels() {
   QCOMPARE(_config.channelList()->channel(3)->rxOnly(), false);
   QCOMPARE(_config.channelList()->channel(3)->as<AnalogChannel>()->admit(), AnalogChannel::AdmitTone); // admit
   QCOMPARE(_config.channelList()->channel(3)->as<AnalogChannel>()->squelch(), 1u); // squelch
-  QCOMPARE(_config.channelList()->channel(3)->as<AnalogChannel>()->rxTone(), 67.0); // RX CTCSS tone
-  QCOMPARE(_config.channelList()->channel(3)->as<AnalogChannel>()->txTone(), 67.0); // TX CTCSS tone
+  QCOMPARE(_config.channelList()->channel(3)->as<AnalogChannel>()->rxTone(), Signaling::CTCSS_67_0Hz); // RX CTCSS tone
+  QCOMPARE(_config.channelList()->channel(3)->as<AnalogChannel>()->txTone(), Signaling::CTCSS_67_0Hz); // TX CTCSS tone
 
   /*
    * Test channel 05
@@ -200,8 +200,8 @@ ConfigTest::testAnalogChannels() {
   QCOMPARE(_config.channelList()->channel(4)->rxOnly(), false);
   QCOMPARE(_config.channelList()->channel(4)->as<AnalogChannel>()->admit(), AnalogChannel::AdmitFree); // admit
   QCOMPARE(_config.channelList()->channel(4)->as<AnalogChannel>()->squelch(), 1u); // squelch
-  QCOMPARE(_config.channelList()->channel(4)->as<AnalogChannel>()->rxTone(), 0.0); // RX CTCSS tone
-  QCOMPARE(_config.channelList()->channel(4)->as<AnalogChannel>()->txTone(), 0.0); // TX CTCSS tone
+  QCOMPARE(_config.channelList()->channel(4)->as<AnalogChannel>()->rxTone(), Signaling::SIGNALING_NONE); // RX CTCSS tone
+  QCOMPARE(_config.channelList()->channel(4)->as<AnalogChannel>()->txTone(), Signaling::SIGNALING_NONE); // TX CTCSS tone
 }
 
 void

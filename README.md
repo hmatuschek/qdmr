@@ -1,12 +1,12 @@
-# QDMR a GUI application and command-line-tool to programm DMR radios
+# QDMR a GUI application and command-line-tool to program DMR radios
 
 ![qdmr channel editor](https://raw.githubusercontent.com/hmatuschek/qdmr/master/doc/fig/qdmr-channels.png "The qdmr CPS software.")
 
 *qdmr* is a graphical user interface (GUI) application that allows to program several DMR radios.
 To this end, it aims at being a more universal code-plug programming software (CPS) compared to the
 device and even revision specific CPSs provided by the manufactures. The goal of this project is to
-provide a **single**, **comfortable**, **well-documented** and **platform-independent** CPS for
-several (mainly Chinese) DMR radios.
+provide a **single**, **comfortable**, [**well-documented**](https://dm3mat.darc.de/qdmr/manual/) 
+and **platform-independent** CPS for several (mainly Chinese) DMR radios.
 
 ## Supported Radios 
 Currently, there are only two supported radios
@@ -57,9 +57,10 @@ When running *qdmr* or *dmrconf* under Linux, you may need to change the permiss
     # Baofeng RD-5R, TD-5R
     SUBSYSTEM=="usb", ATTRS{idVendor}=="15a2", ATTRS{idProduct}=="0073", MODE="666"
 
+Finally execute `sudo udevadm control --reload-rules` to activate these new rules.
 
 ## License
-qdmr - A GUI application and command-line-tool to programm DMR radios.
+qdmr - A GUI application and command-line-tool to program DMR radios.
 Copyright (C) 2019 Hannes Matuschek, DM3MAT
 
 This program is free software; you can redistribute it and/or modify
