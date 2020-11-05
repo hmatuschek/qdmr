@@ -177,11 +177,11 @@ protected:
     /** Returns the CTCSS RX tone. */
     Signaling::Code getRXTone() const;
     /** Sets the CTCSS RX tone. */
-    void setRXTone(float tone);
+    void setRXTone(Signaling::Code tone);
     /** Returns the CTCSS TX tone. */
     Signaling::Code getTXTone() const;
     /** Sets the CTCSS TX tone. */
-    void setTXTone(float tone);
+    void setTXTone(Signaling::Code tone);
 
     /** Constructs a @c Channel object from this codeplug channel. */
     Channel *toChannelObj() const;

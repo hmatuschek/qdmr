@@ -88,25 +88,19 @@ GD77Codeplug::channel_t::setName(const QString &n) {
 
 Signaling::Code
 GD77Codeplug::channel_t::getRXTone() const {
-  float f = decode_ctcss_tone_table(ctcss_dcs_receive);
-  if (Signaling::isCTCSSFrequency(f))
-    return Signaling::fromCTCSSFrequency(f);
-  return Signaling::SIGNALING_NONE;
+  return decode_ctcss_tone_table(ctcss_dcs_receive);
 }
 void
-GD77Codeplug::channel_t::setRXTone(float tone) {
+GD77Codeplug::channel_t::setRXTone(Signaling::Code tone) {
   ctcss_dcs_receive = encode_ctcss_tone_table(tone);
 }
 
 Signaling::Code
 GD77Codeplug::channel_t::getTXTone() const {
-  float f = decode_ctcss_tone_table(ctcss_dcs_transmit);
-  if (Signaling::isCTCSSFrequency(f))
-    return Signaling::fromCTCSSFrequency(f);
-  return Signaling::SIGNALING_NONE;
+  return decode_ctcss_tone_table(ctcss_dcs_transmit);
 }
 void
-GD77Codeplug::channel_t::setTXTone(float tone) {
+GD77Codeplug::channel_t::setTXTone(Signaling::Code tone) {
   ctcss_dcs_transmit = encode_ctcss_tone_table(tone);
 }
 

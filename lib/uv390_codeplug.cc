@@ -159,28 +159,22 @@ UV390Codeplug::channel_t::setName(const QString &n) {
 
 Signaling::Code
 UV390Codeplug::channel_t::getRXTone() const {
-  float f = decode_ctcss_tone_table(ctcss_dcs_receive);
-  if (Signaling::isCTCSSFrequency(f))
-    return Signaling::fromCTCSSFrequency(f);
-  return Signaling::SIGNALING_NONE;
+  return decode_ctcss_tone_table(ctcss_dcs_receive);
 }
 
 void
 UV390Codeplug::channel_t::setRXTone(Signaling::Code code) {
-  ctcss_dcs_receive = encode_ctcss_tone_table(Signaling::toCTCSSFrequency(code));
+  ctcss_dcs_receive = encode_ctcss_tone_table(code);
 }
 
 Signaling::Code
 UV390Codeplug::channel_t::getTXTone() const {
-  float f = decode_ctcss_tone_table(ctcss_dcs_transmit);
-  if (Signaling::isCTCSSFrequency(f))
-    return Signaling::fromCTCSSFrequency(f);
-  return Signaling::SIGNALING_NONE;
+  return decode_ctcss_tone_table(ctcss_dcs_transmit);
 }
 
 void
 UV390Codeplug::channel_t::setTXTone(Signaling::Code code)  {
-  ctcss_dcs_transmit = encode_ctcss_tone_table(Signaling::toCTCSSFrequency(code));
+  ctcss_dcs_transmit = encode_ctcss_tone_table(code);
 }
 
 Channel *

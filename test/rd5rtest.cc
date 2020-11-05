@@ -275,8 +275,8 @@ RD5RTest::testAnalogChannels() {
   QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x3838+0x1d), 1);       // admit 1 = free
   QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x3838+0x1e), 0x50);    // unused 0x50
   QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x3838+0x1f), 0);       // scanlist index +1 (0=none)
-  QCOMPARE((uint16_t)*(uint16_t *)_codeplug.data(0x3838+0x20), encode_ctcss_tone_table(67.0));  // rx ctcss 0xffff = none
-  QCOMPARE((uint16_t)*(uint16_t *)_codeplug.data(0x3838+0x22), encode_ctcss_tone_table(67.0));  // tx ctcss 0xffff = none
+  QCOMPARE((uint16_t)*(uint16_t *)_codeplug.data(0x3838+0x20), encode_ctcss_tone_table(Signaling::CTCSS_67_0Hz));  // rx ctcss 0xffff = none
+  QCOMPARE((uint16_t)*(uint16_t *)_codeplug.data(0x3838+0x22), encode_ctcss_tone_table(Signaling::CTCSS_67_0Hz));  // tx ctcss 0xffff = none
   QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x3838+0x24), 0);       // unused 0x00
   QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x3838+0x25), 0);       // TX sig. 0=off
   QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x3838+0x26), 0);       // unused 0x00

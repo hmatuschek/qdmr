@@ -127,9 +127,10 @@ encode_dtmf_bin(const QString &number, uint8_t *num, int size, uint8_t fill) {
   return true;
 }
 
-float decode_ctcss_tone_table(uint16_t data) {
+Signaling::Code
+decode_ctcss_tone_table(uint16_t data) {
   if (data == 0xffff)
-    return 0.0;
+    return Signaling::SIGNALING_NONE;
 
   unsigned tag = data >> 14;
   unsigned a = (data >> 12) & 3;
@@ -138,51 +139,53 @@ float decode_ctcss_tone_table(uint16_t data) {
   unsigned d = data & 15;
 
   switch (tag) {
-    case 2:
-    case 3:
-      return 0;
-    default:
-      return 100.0*a+10.0*b+1.0*c+0.1*d;
+  case 2:
+    // DCS Normal
+    return Signaling::fromDCSNumber(100*b+10*c+1*d, false);
+  case 3:
+    // DCS Normal
+    return Signaling::fromDCSNumber(100*b+10*c+1*d, true);
+  default:
+    break;
   }
+
+  // CTCSS
+  return Signaling::fromCTCSSFrequency(100.0*a+10.0*b+1.0*c+0.1*d);
 }
 
-#define NCTCSS  50
-static const unsigned CTCSS_TONES [NCTCSS] = {
-  670,  693,  719,  744,  770,  797,  825,  854,  885,  915,
-  948,  974, 1000, 1035, 1072, 1109, 1148, 1188, 1230, 1273,
-  1318, 1365, 1413, 1462, 1514, 1567, 1598, 1622, 1655, 1679,
-  1713, 1738, 1773, 1799, 1835, 1862, 1899, 1928, 1966, 1995,
-  2035, 2065, 2107, 2181, 2257, 2291, 2336, 2418, 2503, 2541,
-};
 
 uint16_t
-encode_ctcss_tone_table(float hz)
+encode_ctcss_tone_table(Signaling::Code code)
 {
-  unsigned val, tag, a, b, c, d;
+  unsigned tag=0xff, a=0xf, b=0xf, c=0xf, d=0xf;
 
   // Disabled
-  if (0 == hz)
+  if (Signaling::SIGNALING_NONE == code)
     return 0xffff;
 
-  //
   // CTCSS tone
-  //
-  // Round to integer.
-  val = hz * 10.0 + 0.5;
-
-  // Find a valid index in CTCSS table.
-  int i;
-  for (i=0; i<NCTCSS; i++)
-    if (CTCSS_TONES[i] == val)
-      break;
-  if (i >= NCTCSS)
-    return 0xffff;
-
-  a = val / 1000;
-  b = val / 100 % 10;
-  c = val / 10 % 10;
-  d = val % 10;
-  tag = 0;
+  if (Signaling::isCTCSS(code)) {
+    tag = 0;
+    unsigned val = Signaling::toCTCSSFrequency(code) * 10.0 + 0.5;
+    a = val / 1000;
+    b = (val / 100) % 10;
+    c = (val / 10) % 10;
+    d = val % 10;
+  } else if (Signaling::isDCSNormal(code)) {
+    tag = 2;
+    unsigned val = Signaling::toDCSNumber(code);
+    a = 0;
+    b = (val / 100) % 10;
+    c = (val / 10) % 10;
+    d = val % 10;
+  } else if (Signaling::isDCSInverted(code)) {
+    tag = 3;
+    unsigned val = Signaling::toDCSNumber(code);
+    a = 0;
+    b = (val / 100) % 10;
+    c = (val / 10) % 10;
+    d = val % 10;
+  }
 
   return (a << 12) | (b << 8) | (c << 4) | d | (tag << 14);
 }

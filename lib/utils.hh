@@ -9,6 +9,9 @@
 #include <QString>
 #include <inttypes.h>
 
+#include "signaling.hh"
+
+
 /** Decodes the unicode string stored in @c data of size @c size. The @c fill code also defines the
  * end-of-string symbol.
  * @returns The decoded string. */
@@ -42,9 +45,9 @@ QString decode_dtmf_bin(const uint8_t *num, int size=16, uint8_t fill=0xff);
 bool encode_dtmf_bin(const QString &number, uint8_t *num, int size=16, uint8_t fill=0xff);
 
 /** Decodes the CTCSS tone frequency in Hz. */
-float decode_ctcss_tone_table(uint16_t data);
+Signaling::Code decode_ctcss_tone_table(uint16_t data);
 /** Encodes the CTCSS tone frequency in Hz. */
-uint16_t encode_ctcss_tone_table(float tone);
+uint16_t encode_ctcss_tone_table(Signaling::Code code);
 
 /** Validates a DMR ID number. */
 bool validDMRNumber(const QString &text);
