@@ -95,8 +95,8 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 8) Receive only: -, +\n"
             "# 9) Admit criteria: -, Free, Tone\n"
             "# 10) Squelch level: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9\n"
-            "# 11) Guard tone for receive, or '-' to disable\n"
-            "# 12) Guard tone for transmit, or '-' to disable\n"
+            "# 11) CTCSS/DCS for receive: frequency (e.g, 67.0), DCS number (e.g., n023 or i023) or '-' to disable\n"
+            "# 12) CTCSS/DCS for transmit: frequency (e.g, 67.0), DCS number (e.g., n023 or i023) or '-' to disable\n"
             "# 13) Bandwidth in kHz: 12.5, 25\n"
             "#\n"
             "Analog  Name                Receive    Transmit Power Scan TOT RO Admit  Squelch RxTone TxTone Width\n";
@@ -117,17 +117,11 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
            << qSetFieldWidth(4)  << left << ( (0 == analog->txTimeout()) ? QString("-") : QString::number(analog->txTimeout()) )
            << qSetFieldWidth(3)  << left << (analog->rxOnly() ? '+' : '-')
            << qSetFieldWidth(7)  << left << ((AnalogChannel::AdmitNone==analog->admit()) ? "-" : ((AnalogChannel::AdmitFree==analog->admit()) ? "Free" : "Tone"))
-           << qSetFieldWidth(8)  << left << analog->squelch();
-    if (Signaling::SIGNALING_NONE == analog->rxTone())
-      stream << qSetFieldWidth(7)  << left << "-";
-    else
-      stream << qSetFieldWidth(7)  << left << Signaling::toCTCSSFrequency(analog->rxTone());
-    if (Signaling::SIGNALING_NONE == analog->txTone())
-      stream << qSetFieldWidth(7)  << left << "-";
-    else
-      stream << qSetFieldWidth(7)  << left << Signaling::toCTCSSFrequency(analog->txTone());
-    stream << qSetFieldWidth(5) << left << (AnalogChannel::BWWide == analog->bandwidth() ? 25.0 : 12.5);
-    stream << qSetFieldWidth(0) << "\n";
+           << qSetFieldWidth(8)  << left << analog->squelch()
+           << qSetFieldWidth(7)  << left << Signaling::configString(analog->rxTone())
+           << qSetFieldWidth(7)  << left << Signaling::configString(analog->txTone())
+           << qSetFieldWidth(5) << left << (AnalogChannel::BWWide == analog->bandwidth() ? 25.0 : 12.5)
+           << qSetFieldWidth(0) << "\n";
   }
   stream << "\n";
 

@@ -10,6 +10,8 @@ QVector< QPair<QRegExp, CSVLexer::Token::TokenType> > CSVLexer::_pattern = {
   { QRegExp("^([a-zA-Z_][a-zA-Z0-9_]*)"),      CSVLexer::Token::T_KEYWORD },
   { QRegExp("^\"([^\"\r\n]*)\""),              CSVLexer::Token::T_STRING },
   { QRegExp("^([+-]?[0-9]+(\\.[0-9]*)?)"),     CSVLexer::Token::T_NUMBER },
+  { QRegExp("^n([0-9]{3})"),                   CSVLexer::Token::T_DCS_N },
+  { QRegExp("^i([0-9]{3})"),                   CSVLexer::Token::T_DCS_I },
   { QRegExp("^(:)"),                           CSVLexer::Token::T_COLON },
   { QRegExp("^(-)"),                           CSVLexer::Token::T_NOT_SET },
   { QRegExp("^(\\+)"),                         CSVLexer::Token::T_ENABLED },
@@ -230,7 +232,7 @@ CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, dou
 
 bool
 CSVHandler::handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-    qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, float rxTone, float txTone,
+    qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
     AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
@@ -1083,11 +1085,15 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   qint64 squelch = token.value.toInt();
 
   token = lexer.next();
-  float rxTone;
+  Signaling::Code rxTone;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
-    rxTone = 0.0;
+    rxTone = Signaling::SIGNALING_NONE;
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
-    rxTone = token.value.toFloat();
+    rxTone = Signaling::fromCTCSSFrequency(token.value.toFloat());
+  } else if (CSVLexer::Token::T_DCS_N == token.type) {
+    rxTone = Signaling::fromDCSNumber(token.value.toUInt(), false);
+  } else if (CSVLexer::Token::T_DCS_I == token.type) {
+    rxTone = Signaling::fromDCSNumber(token.value.toUInt(), true);
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1095,11 +1101,15 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  float txTone;
+  Signaling::Code txTone;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
-    txTone = 0.0;
+    txTone = Signaling::SIGNALING_NONE;
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
-    txTone = token.value.toFloat();
+    txTone = Signaling::fromCTCSSFrequency(token.value.toFloat());
+  } else if (CSVLexer::Token::T_DCS_N == token.type) {
+    txTone = Signaling::fromDCSNumber(token.value.toUInt(), false);
+  } else if (CSVLexer::Token::T_DCS_I == token.type) {
+    txTone = Signaling::fromDCSNumber(token.value.toUInt(), true);
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1633,7 +1643,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
 
 bool
 CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-    qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, float rxTone, float txTone,
+    qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
     AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
@@ -1654,30 +1664,8 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
     return false;
   }
 
-  // check CTCSS tone
-  Signaling::Code rxSig = Signaling::SIGNALING_NONE;
-  if (0 != rxTone) {
-    if (! Signaling::isCTCSSFrequency(rxTone)) {
-      errorMessage = QString("Parse error @ %1,%2: Cannot create analog channel '%3' with index %4, unknown CTCSS frequency %5Hz for RX tone.")
-          .arg(line).arg(column).arg(name).arg(idx).arg(rxTone);
-      return false;
-    }
-    rxSig = Signaling::fromCTCSSFrequency(rxTone);
-  }
-
-  // check CTCSS tone
-  Signaling::Code txSig = Signaling::SIGNALING_NONE;
-  if (0 != txTone) {
-    if (! Signaling::isCTCSSFrequency(txTone)) {
-      errorMessage = QString("Parse error @ %1,%2: Cannot create analog channel '%3' with index %4, unknown CTCSS frequency %5Hz for TX tone.")
-          .arg(line).arg(column).arg(name).arg(idx).arg(txTone);
-      return false;
-    }
-    txSig = Signaling::fromCTCSSFrequency(txTone);
-  }
-
-  AnalogChannel *chan = new AnalogChannel(name, rx, tx, power, tot, ro, admit, squelch, rxSig,
-                                          txSig, bw, nullptr);
+  AnalogChannel *chan = new AnalogChannel(name, rx, tx, power, tot, ro, admit, squelch, rxTone,
+                                          txTone, bw, nullptr);
   _config->channelList()->addChannel(chan);
   _channels[idx] = chan;
 

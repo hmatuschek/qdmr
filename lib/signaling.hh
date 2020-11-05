@@ -3,11 +3,13 @@
 
 #include <QString>
 
-
+/** Contains the enum and utility functions to deal with analog signaling like
+ * CTCSS and DCS.
+ * @ingroup util */
 namespace Signaling
 {
   /** This huge enum lists all possible RX/TX tones that can be associated with analog channels.
-   * That is all valid CTCSS tones and DSC codes (both normal @c DCS_*N and inverted @c DCS_*I).
+   * That is, all valid CTCSS tones and DSC numbers (both normal @c DCS_*N and inverted @c DCS_*I).
    * If @c SIGNALING_NONE is selected, no RX/TX tone is used. */
   typedef enum {
     SIGNALING_NONE = 0,
@@ -44,13 +46,35 @@ namespace Signaling
     DCS_731I, DCS_732I, DCS_734I, DCS_743I, DCS_754I
   } Code;
 
+  /** Returns @c true if the given Signaling::Code enum entry refers to a CTCSS frequency. */
+  bool isCTCSS(Code code);
+  /** Returns @c true if the given frequency is a valid CTCSS frequency. */
   bool isCTCSSFrequency(float freq);
-
+  /** Maps CTCSS enum to CTCSS frequency.
+   * Returns @c 0.0 if no valid CTCSS enum element is given (e.g., @c SIGNALING_NONE or one of the
+   * DCS enum elements). */
   float toCTCSSFrequency(Code code);
-
+  /** Maps a CTCSS frequency to the corresponding Signaling::Code enum element.
+   * Retuns @c SIGNALING_NONE if an invalid CTCSS frequency is given. */
   Code fromCTCSSFrequency(float freq);
 
+  /** Returns @c true if a valid DCS code number is given. */
+  bool isDCSNumber(uint16_t num);
+  /** Returns @c true if the given DCS code is not inverted. */
+  bool isDCSNormal(Code code);
+  /** Returns @c true if the given DCS code is inverted. */
+  bool isDCSInverted(Code code);
+  /** Maps a DCS Signaling::Code to the corresponding DCS number. */
+  uint16_t toDCSNumber(Code code);
+  /** Maps a DCS number to the corresponding DCS Signaling::Code enum element.
+   * The @c inverted parameter specifies whether an inverted code is used.
+   * Retruns SIGNALING_NONE if an invalid DCS number is given. */
+  Code fromDCSNumber(uint16_t num, bool inverted);
+
+  /** Maps a Signaling::Code enum element to its text label. */
   QString codeLabel(Code code);
+  /** Represents the given signaling code as a string as used in config files. */
+  QString configString(Code code);
 }
 
 #endif // SIGNALING_HH

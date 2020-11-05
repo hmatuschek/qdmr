@@ -37,6 +37,7 @@ static QHash<Code, float> CTCSS_code2freq {
 };
 
 static QHash<uint16_t, Code> DCS_N_num2code {
+  {  0, SIGNALING_NONE},
   { 32, DCS_023N}, { 25, DCS_025N}, { 26, DCS_026N}, { 31, DCS_031N}, { 32, DCS_032N},
   { 36, DCS_036N}, { 43, DCS_043N}, { 47, DCS_047N}, { 51, DCS_051N}, { 53, DCS_053N},
   { 54, DCS_054N}, { 71, DCS_071N}, { 72, DCS_072N}, { 73, DCS_073N}, { 74, DCS_074N},
@@ -61,6 +62,7 @@ static QHash<uint16_t, Code> DCS_N_num2code {
 };
 
 static QHash<Code, uint16_t> DCS_N_code2num {
+  {SIGNALING_NONE, 0},
   {DCS_023N,  32}, {DCS_025N,  25}, {DCS_026N,  26}, {DCS_031N,  31}, {DCS_032N,  32},
   {DCS_036N,  36}, {DCS_043N,  43}, {DCS_047N,  47}, {DCS_051N,  51}, {DCS_053N,  53},
   {DCS_054N,  54}, {DCS_071N,  71}, {DCS_072N,  72}, {DCS_073N,  73}, {DCS_074N,  74},
@@ -85,6 +87,7 @@ static QHash<Code, uint16_t> DCS_N_code2num {
 };
 
 static QHash<uint16_t, Code> DCS_I_num2code {
+  {  0, SIGNALING_NONE},
   { 32, DCS_023I}, { 25, DCS_025I}, { 26, DCS_026I}, { 31, DCS_031I}, { 32, DCS_032I},
   { 36, DCS_036I}, { 43, DCS_043I}, { 47, DCS_047I}, { 51, DCS_051I}, { 53, DCS_053I},
   { 54, DCS_054I}, { 71, DCS_071I}, { 72, DCS_072I}, { 73, DCS_073I}, { 74, DCS_074I},
@@ -109,6 +112,7 @@ static QHash<uint16_t, Code> DCS_I_num2code {
 };
 
 static QHash<Code, uint16_t> DCS_I_code2num {
+  {SIGNALING_NONE, 0},
   {DCS_023I,  32}, {DCS_025I,  25}, {DCS_026I,  26}, {DCS_031I,  31}, {DCS_032I,  32},
   {DCS_036I,  36}, {DCS_043I,  43}, {DCS_047I,  47}, {DCS_051I,  51}, {DCS_053I,  53},
   {DCS_054I,  54}, {DCS_071I,  71}, {DCS_072I,  72}, {DCS_073I,  73}, {DCS_074I,  74},
@@ -132,11 +136,10 @@ static QHash<Code, uint16_t> DCS_I_code2num {
   {DCS_732I, 732}, {DCS_734I, 734}, {DCS_743I, 743}, {DCS_754I, 754}
 };
 
-float
-Signaling::toCTCSSFrequency(Code code) {
-  if (! CTCSS_code2freq.contains(code))
-    return SIGNALING_NONE;
-  return CTCSS_code2freq[code];
+
+bool
+Signaling::isCTCSS(Code code) {
+  return ((CTCSS_67_0Hz<=code) && (CTCSS_250_3Hz>=code));
 }
 
 bool
@@ -146,6 +149,13 @@ Signaling::isCTCSSFrequency(float freq) {
   return CTCSS_freq2code.contains(freq);
 }
 
+float
+Signaling::toCTCSSFrequency(Code code) {
+  if (! CTCSS_code2freq.contains(code))
+    return SIGNALING_NONE;
+  return CTCSS_code2freq[code];
+}
+
 Signaling::Code
 Signaling::fromCTCSSFrequency(float f) {
   if ((0 == f) || (! CTCSS_freq2code.contains(f)))
@@ -153,14 +163,62 @@ Signaling::fromCTCSSFrequency(float f) {
   return CTCSS_freq2code[f];
 }
 
+
+bool
+Signaling::isDCSNumber(uint16_t num) {
+  if (0 == num)
+    return false;
+  return DCS_N_num2code.contains(num);
+}
+
+bool
+Signaling::isDCSNormal(Code code) {
+  return ((DCS_023N <= code) && (DCS_754N >= code));
+}
+
+bool
+Signaling::isDCSInverted(Code code) {
+  return ((DCS_023I <= code) && (DCS_754I >= code));
+}
+
+uint16_t
+Signaling::toDCSNumber(Code code) {
+  if ((DCS_023N <= code) && (DCS_754N >= code) && DCS_N_code2num.contains(code))
+    return DCS_N_code2num[code];
+  else if ((DCS_023I <= code) && (DCS_754I >= code) && DCS_I_code2num.contains(code))
+    return DCS_I_code2num[code];
+  return 0;
+}
+
+Signaling::Code
+Signaling::fromDCSNumber(uint16_t num, bool inverted) {
+  if (inverted && DCS_I_num2code.contains(num))
+    return DCS_I_num2code[num];
+  else if ((!inverted) && DCS_N_num2code.contains(num))
+    return DCS_N_num2code[num];
+  return SIGNALING_NONE;
+}
+
+
 QString
 Signaling::codeLabel(Code code) {
   if ((CTCSS_67_0Hz <= code) && (CTCSS_250_3Hz >= code))   // If CTCSS signaling
     return QObject::tr("CTCSS %1Hz").arg(toCTCSSFrequency(code));
   else if ((DCS_023N <= code) && (DCS_754N >= code))       // If DCS normal signaling
-    return QObject::tr("DCS %1 N").arg(DCS_N_code2num[code]);
+    return QObject::tr("DCS %1 N").arg(toDCSNumber(code));
   else if ((DCS_023I <= code) && (DCS_754I >= code))       // If DCS inverted signaling
-    return QObject::tr("DCS %1 I").arg(DCS_I_code2num[code]);
+    return QObject::tr("DCS %1 I").arg(toDCSNumber(code));
   else
     return QObject::tr("[None]");
+}
+
+QString
+Signaling::configString(Code code) {
+  if (Signaling::isCTCSS(code))
+    QString::number(Signaling::toCTCSSFrequency(code), 'f', 1);
+  else if (Signaling::isDCSNormal(code))
+    return QString("n%1").arg((int)Signaling::toDCSNumber(code), 3, 10, QChar('0'));
+  else if (Signaling::isDCSInverted(code))
+    return QString("i%1").arg((int)Signaling::toDCSNumber(code), 3, 10, QChar('0'));
+  return "-";
 }

@@ -344,7 +344,9 @@ public:
     typedef enum {
       T_KEYWORD,         ///< A Keyword/Identifier.
       T_STRING,          ///< A quoted string.
-      T_NUMBER,          ///< A integer or floating point number.
+      T_NUMBER,          ///< An integer or floating point number.
+      T_DCS_N,           ///< A normal DCS code number.
+      T_DCS_I,           ///< An inverted DCS code number.
       T_COLON,           ///< A colon.
       T_NOT_SET,         ///< A dash, being used as "not-set".
       T_ENABLED,         ///< A plus sign, being used as "enabled"
@@ -458,9 +460,8 @@ public:
       qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
       qint64 gl, qint64 contact, qint64 gps, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a analog channel has been parsed. */
-  virtual bool handleAnalogChannel(
-      qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-      qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, float rxTone, float txTone,
+  virtual bool handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
+      qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
       AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a zone list has been parsed. */
   virtual bool handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels,
@@ -580,7 +581,7 @@ public:
       qint64 gl, qint64 contact, qint64 gps, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleAnalogChannel(
       qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-      qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, float rxTone, float txTone,
+      qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
       AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels,
                           qint64 line, qint64 column, QString &errorMessage);
