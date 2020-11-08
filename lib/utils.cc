@@ -143,7 +143,7 @@ decode_ctcss_tone_table(uint16_t data) {
     // DCS Normal
     return Signaling::fromDCSNumber(100*b+10*c+1*d, false);
   case 3:
-    // DCS Normal
+    // DCS Inverted
     return Signaling::fromDCSNumber(100*b+10*c+1*d, true);
   default:
     break;
@@ -163,8 +163,8 @@ encode_ctcss_tone_table(Signaling::Code code)
   if (Signaling::SIGNALING_NONE == code)
     return 0xffff;
 
-  // CTCSS tone
   if (Signaling::isCTCSS(code)) {
+    // CTCSS tone
     tag = 0;
     unsigned val = Signaling::toCTCSSFrequency(code) * 10.0 + 0.5;
     a = val / 1000;
@@ -172,6 +172,7 @@ encode_ctcss_tone_table(Signaling::Code code)
     c = (val / 10) % 10;
     d = val % 10;
   } else if (Signaling::isDCSNormal(code)) {
+    // DCS normal
     tag = 2;
     unsigned val = Signaling::toDCSNumber(code);
     a = 0;
@@ -179,6 +180,7 @@ encode_ctcss_tone_table(Signaling::Code code)
     c = (val / 10) % 10;
     d = val % 10;
   } else if (Signaling::isDCSInverted(code)) {
+    // DCS inverted
     tag = 3;
     unsigned val = Signaling::toDCSNumber(code);
     a = 0;

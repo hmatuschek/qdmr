@@ -522,20 +522,20 @@ ChannelList::data(const QModelIndex &index, int role) const {
     if (channel->is<DigitalChannel>()) {
       return tr("[None]");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (0 == analog->rxTone()) {
+      if (Signaling::SIGNALING_NONE == analog->rxTone()) {
         return tr("Off");
       } else
-        return analog->rxTone();
+        return Signaling::codeLabel(analog->rxTone());
     }
     break;
   case 16:
     if (channel->is<DigitalChannel>()) {
       return tr("[None]");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (0 == analog->txTone()) {
+      if (Signaling::SIGNALING_NONE == analog->txTone()) {
         return tr("Off");
       } else
-        return analog->txTone();
+        return Signaling::codeLabel(analog->txTone());
     }
     break;
   case 17:

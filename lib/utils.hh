@@ -44,9 +44,9 @@ void encode_dmr_id_bcd(uint8_t *id, uint32_t num);
 QString decode_dtmf_bin(const uint8_t *num, int size=16, uint8_t fill=0xff);
 bool encode_dtmf_bin(const QString &number, uint8_t *num, int size=16, uint8_t fill=0xff);
 
-/** Decodes the CTCSS tone frequency in Hz. */
+/** Decodes the CTCSS tone or DCS code to @c Signaling::Code. */
 Signaling::Code decode_ctcss_tone_table(uint16_t data);
-/** Encodes the CTCSS tone frequency in Hz. */
+/** Encodes the CTCSS tone or DCS code from @c Signaling::Code. */
 uint16_t encode_ctcss_tone_table(Signaling::Code code);
 
 /** Validates a DMR ID number. */
