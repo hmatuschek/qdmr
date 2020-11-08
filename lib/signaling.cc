@@ -215,7 +215,7 @@ Signaling::codeLabel(Code code) {
 QString
 Signaling::configString(Code code) {
   if (Signaling::isCTCSS(code))
-    QString::number(Signaling::toCTCSSFrequency(code), 'f', 1);
+    return QString::number(Signaling::toCTCSSFrequency(code), 'f', 1);
   else if (Signaling::isDCSNormal(code))
     return QString("n%1").arg((int)Signaling::toDCSNumber(code), 3, 10, QChar('0'));
   else if (Signaling::isDCSInverted(code))
