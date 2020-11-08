@@ -7,11 +7,11 @@
 #include <QDebug>
 
 QVector< QPair<QRegExp, CSVLexer::Token::TokenType> > CSVLexer::_pattern = {
+  { QRegExp("^n([0-9]{3})"),                   CSVLexer::Token::T_DCS_N },
+  { QRegExp("^i([0-9]{3})"),                   CSVLexer::Token::T_DCS_I },
   { QRegExp("^([a-zA-Z_][a-zA-Z0-9_]*)"),      CSVLexer::Token::T_KEYWORD },
   { QRegExp("^\"([^\"\r\n]*)\""),              CSVLexer::Token::T_STRING },
   { QRegExp("^([+-]?[0-9]+(\\.[0-9]*)?)"),     CSVLexer::Token::T_NUMBER },
-  { QRegExp("^n([0-9]{3})"),                   CSVLexer::Token::T_DCS_N },
-  { QRegExp("^i([0-9]{3})"),                   CSVLexer::Token::T_DCS_I },
   { QRegExp("^(:)"),                           CSVLexer::Token::T_COLON },
   { QRegExp("^(-)"),                           CSVLexer::Token::T_NOT_SET },
   { QRegExp("^(\\+)"),                         CSVLexer::Token::T_ENABLED },
