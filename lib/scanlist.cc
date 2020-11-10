@@ -12,25 +12,11 @@
 
 
 /* ********************************************************************************************* *
- * Implementation of SelectedChannel
- * ********************************************************************************************* */
-SelectedChannel::SelectedChannel(QObject *parent)
-  : Channel("[Selected]", 0, 0, Channel::LowPower, 0, true, nullptr, parent)
-{
-  // pass...
-}
-
-SelectedChannel::~SelectedChannel() {
-  // pass...
-}
-
-
-/* ********************************************************************************************* *
  * Implementation of ScanList
  * ********************************************************************************************* */
 ScanList::ScanList(const QString &name, QObject *parent)
   : QAbstractListModel(parent), _name(name), _channels(), _priorityChannel(nullptr),
-    _secPriorityChannel(nullptr), _selectedChannel(new SelectedChannel(this))
+    _secPriorityChannel(nullptr)
 {
   // pass...
 }
@@ -123,16 +109,6 @@ ScanList::setSecPriorityChannel(Channel *channel) {
   if (_secPriorityChannel)
     connect(_secPriorityChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
   emit modified();
-}
-
-bool
-ScanList::isSelectedChannel(const Channel *ch) const {
-  return _selectedChannel == ch;
-}
-
-Channel *
-ScanList::selectedChannel() const {
-  return _selectedChannel;
 }
 
 bool
@@ -286,7 +262,7 @@ QVariant
 ScanLists::headerData(int section, Qt::Orientation orientation, int role) const {
   if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation) || (0 != section))
     return QVariant();
-  return tr("Zone");
+  return tr("Scan-List");
 }
 
 void

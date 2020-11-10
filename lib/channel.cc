@@ -303,6 +303,29 @@ DigitalChannel::onGPSSystemDeleted() {
 
 
 /* ********************************************************************************************* *
+ * Implementation of SelectedChannel
+ * ********************************************************************************************* */
+SelectedChannel *SelectedChannel::_instance = nullptr;
+
+SelectedChannel::SelectedChannel()
+  : Channel("[Selected]", 0, 0, Channel::LowPower, 0, true, nullptr, nullptr)
+{
+  // pass...
+}
+
+SelectedChannel::~SelectedChannel() {
+  SelectedChannel::_instance = nullptr;
+}
+
+SelectedChannel *
+SelectedChannel::get() {
+  if (nullptr == SelectedChannel::_instance)
+    SelectedChannel::_instance = new SelectedChannel();
+  return SelectedChannel::_instance;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of ChannelList
  * ********************************************************************************************* */
 ChannelList::ChannelList(QObject *parent)

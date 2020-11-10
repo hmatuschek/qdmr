@@ -24,10 +24,11 @@ ScanListDialog::construct() {
   setupUi(this);
 
   priorityChannel1->addItem(tr("[None]"), QVariant::fromValue(nullptr));
-  priorityChannel1->addItem(tr("[Selected]"), QVariant::fromValue(nullptr));
+  priorityChannel1->addItem(tr("[Selected]"), QVariant::fromValue(SelectedChannel::get()));
   priorityChannel2->addItem(tr("[None]"), QVariant::fromValue(nullptr));
-  priorityChannel2->addItem(tr("[Selected]"), QVariant::fromValue(nullptr));
+  priorityChannel2->addItem(tr("[Selected]"), QVariant::fromValue(SelectedChannel::get()));
   transmitChannel->addItem(tr("[Last]"), QVariant::fromValue(nullptr));
+
   for (int i=0; i<_config->channelList()->count(); i++) {
     Channel *channel = _config->channelList()->channel(i);
     priorityChannel1->addItem(channel->name(), QVariant::fromValue(channel));
@@ -51,8 +52,12 @@ ScanListDialog::construct() {
         QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
         item->setData(Qt::UserRole, QVariant::fromValue(channel));
         channelList->addItem(item);
-      } else {
+      } else if(channel->is<DigitalChannel>()) {
         QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
+        item->setData(Qt::UserRole, QVariant::fromValue(channel));
+        channelList->addItem(item);
+      } else if (SelectedChannel::get() == channel) {
+        QListWidgetItem *item = new QListWidgetItem(tr("[Selected Channel]"));
         item->setData(Qt::UserRole, QVariant::fromValue(channel));
         channelList->addItem(item);
       }
@@ -69,7 +74,7 @@ ScanListDialog::construct() {
 
 void
 ScanListDialog::onAddChannel() {
-  ChannelSelectionDialog dia(_config->channelList());
+  ChannelSelectionDialog dia(_config->channelList(), true);
   if (QDialog::Accepted != dia.exec())
     return;
 
@@ -78,8 +83,12 @@ ScanListDialog::onAddChannel() {
     QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
     item->setData(Qt::UserRole, QVariant::fromValue(channel));
     channelList->addItem(item);
-  } else {
+  } else if (channel->is<DigitalChannel>()) {
     QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
+    item->setData(Qt::UserRole, QVariant::fromValue(channel));
+    channelList->addItem(item);
+  } else if (SelectedChannel::get() == channel) {
+    QListWidgetItem *item = new QListWidgetItem(tr("[Selected Channel]"));
     item->setData(Qt::UserRole, QVariant::fromValue(channel));
     channelList->addItem(item);
   }

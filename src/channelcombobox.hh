@@ -11,7 +11,7 @@ class ChannelComboBox: public QComboBox
   Q_OBJECT
 
 public:
-  ChannelComboBox(ChannelList *lst, QWidget *parent=nullptr);
+  ChannelComboBox(ChannelList *lst, bool includeSelectedChannel=false, QWidget *parent=nullptr);
 
   Channel *channel() const;
 };

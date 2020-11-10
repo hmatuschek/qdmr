@@ -305,6 +305,30 @@ protected:
 };
 
 
+/** Internal singleton class representing the "currently selected" channel.
+ * @ingroup conf */
+class SelectedChannel: public Channel
+{
+  Q_OBJECT
+
+protected:
+  /** Constructs the "selected" channel.
+   * @warning Do not use this class directly, call @c SelectedChannel::get() instead. */
+  explicit SelectedChannel();
+
+public:
+  /** Destructor. */
+  virtual ~SelectedChannel();
+
+  /** Constructs/gets the singleton instance. */
+  static SelectedChannel *get();
+
+protected:
+  /** Holds the channel singleton instance. */
+  static SelectedChannel *_instance;
+};
+
+
 /** Container class holding all channels (analog and digital) for a specific configuration
  * (@c Config).
  *

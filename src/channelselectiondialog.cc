@@ -10,10 +10,10 @@
 /* ********************************************************************************************* *
  * Implementation of ChannelSelectionDialog
  * ********************************************************************************************* */
-ChannelSelectionDialog::ChannelSelectionDialog(ChannelList *lst, QWidget *parent)
+ChannelSelectionDialog::ChannelSelectionDialog(ChannelList *lst, bool includeSelectedChannel, QWidget *parent)
   : QDialog(parent)
 {
-  _channel = new ChannelComboBox(lst);
+  _channel = new ChannelComboBox(lst, includeSelectedChannel);
   QDialogButtonBox *bbox = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
   connect(bbox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(bbox, SIGNAL(rejected()), this, SLOT(reject()));

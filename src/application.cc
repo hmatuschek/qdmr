@@ -420,8 +420,9 @@ Application::downloadCodeplug() {
 void
 Application::onCodeplugDownloadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Download error"));
-  QMessageBox::critical(0, tr("Download error"), tr("Cannot download codeplug from device. "
-                                                    "An error occurred during download."));
+  QMessageBox::critical(0, tr("Download error"),
+                        tr("Cannot download codeplug from device. "
+                           "An error occurred during download: %1").arg(radio->errorMessage()));
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
@@ -488,7 +489,8 @@ Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Upload error"));
   QMessageBox::critical(
         nullptr, tr("Upload error"),
-        tr("Cannot upload codeplug to device. An error occurred during upload."));
+        tr("Cannot upload codeplug to device. "
+           "An error occurred during upload: %1").arg(radio->errorMessage()));
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 

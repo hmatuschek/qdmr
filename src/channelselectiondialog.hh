@@ -12,7 +12,7 @@ class ChannelSelectionDialog: public QDialog
   Q_OBJECT
 
 public:
-  ChannelSelectionDialog(ChannelList *lst, QWidget *parent=nullptr);
+  ChannelSelectionDialog(ChannelList *lst, bool includeSelectedChannel=false, QWidget *parent=nullptr);
 
   Channel *channel() const;
 

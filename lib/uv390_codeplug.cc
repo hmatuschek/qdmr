@@ -613,15 +613,20 @@ UV390Codeplug::scanlist_t::linkScanListObj(ScanList *l, Config *conf) const {
 void
 UV390Codeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *conf) {
   setName(lst->name());
-  priority_ch1 = (nullptr == lst->priorityChannel())    ?
-        0 : (conf->channelList()->indexOf(lst->priorityChannel())+1);
-  priority_ch2 = (nullptr == lst->secPriorityChannel()) ?
-        0 : (conf->channelList()->indexOf(lst->secPriorityChannel())+1);
+  if (lst->priorityChannel() && (SelectedChannel::get() == lst->priorityChannel()))
+    priority_ch1 = 0;
+  else if (lst->priorityChannel())
+    priority_ch1 = conf->channelList()->indexOf(lst->priorityChannel())+1;
+  if (lst->secPriorityChannel() && (SelectedChannel::get() == lst->secPriorityChannel()))
+    priority_ch2 = 0;
+  else if (lst->secPriorityChannel())
+    priority_ch2 = conf->channelList()->indexOf(lst->secPriorityChannel())+1;
 
   for (int i=0, j=0; i<31;) {
     if (j >= lst->count()) {
       member[i++] = 0;
-    } else if (lst->isSelectedChannel(lst->channel(j))) {
+    } else if (SelectedChannel::get() == lst->channel(j)) {
+      logInfo() << "Cannot encode '" << lst->channel(j) << "' for UV390: skip.";
       j++;
     } else {
       member[i++] = conf->channelList()->indexOf(lst->channel(j++))+1;
