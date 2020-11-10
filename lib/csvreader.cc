@@ -1330,6 +1330,8 @@ CSVParser::_parse_scanlist(qint64 idx, CSVLexer &lexer) {
     pch1 = 0;
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
     pch1 = token.value.toInt() + 1;
+  } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("sel" == token.value.toLower())) {
+    pch1 = -1;
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1342,6 +1344,8 @@ CSVParser::_parse_scanlist(qint64 idx, CSVLexer &lexer) {
     pch2 = 0;
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
     pch2 = token.value.toInt() + 1;
+  } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("sel" == token.value.toLower())) {
+    pch2 = -1;
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1354,7 +1358,7 @@ CSVParser::_parse_scanlist(qint64 idx, CSVLexer &lexer) {
     txch = 0;
   } else if (CSVLexer::Token::T_KEYWORD == token.type) {
     if ("sel" == token.value.toLower()) {
-      txch = 1;
+      txch = -1;
     } else {
       _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number, 'Sel' or '-'.")
           .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1370,8 +1374,19 @@ CSVParser::_parse_scanlist(qint64 idx, CSVLexer &lexer) {
 
   QList<qint64> lst;
   token = lexer.next();
-  while (CSVLexer::Token::T_NUMBER == token.type) {
-    lst.append(token.value.toInt());
+  while ((CSVLexer::Token::T_NUMBER == token.type) || (CSVLexer::Token::T_KEYWORD == token.type)) {
+    if (CSVLexer::Token::T_NUMBER == token.type) {
+      lst.append(token.value.toInt());
+    } else if (CSVLexer::Token::T_KEYWORD == token.type) {
+      if ("sel" == token.value.toLower())
+        lst.append(-1);
+      else {
+        _errorMessage = QString("Parse error @ %1,%2: Unexpected keyword '%3' expected number or 'Sel'.")
+            .arg(token.line).arg(token.column).arg(token.value);
+        return false;
+      }
+    }
+
     token = lexer.next();
     if (CSVLexer::Token::T_COMMA == token.type)
       token = lexer.next();
@@ -1755,38 +1770,47 @@ CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 p
 {
   if (_link) {
     // Check PriChan 1
-    if (pch1 && (! _channels.contains(pch1))) {
+    if ((pch1>0) && (! _channels.contains(pch1))) {
       errorMessage = QString("Parse error @ %1,%2: Cannot create scanlist '%3', unknown priority channel 1 index %4.")
           .arg(line).arg(column).arg(name).arg(pch1);
       return false;
     }
-    _scanlists[idx]->setPriorityChannel(_channels[pch1-1]);
+    if (pch1 < 0)
+      _scanlists[idx]->setPriorityChannel(SelectedChannel::get());
+    else
+      _scanlists[idx]->setPriorityChannel(_channels[pch1-1]);
 
     // Check PriChan 2
-    if (pch2 && (! _channels.contains(pch2))) {
+    if ((pch2>0) && (! _channels.contains(pch2))) {
       errorMessage = QString("Parse error @ %1,%2: Cannot create scanlist '%3', unknown priority channel 2 index %4.")
           .arg(line).arg(column).arg(name).arg(pch2);
       return false;
     }
-    _scanlists[idx]->setSecPriorityChannel(_channels[pch2-1]);
+    if (pch2 < 0)
+      _scanlists[idx]->setSecPriorityChannel(SelectedChannel::get());
+    else
+      _scanlists[idx]->setSecPriorityChannel(_channels[pch2-1]);
 
     // Check Tx channel
-    if ((txch>1) && (! _channels.contains(txch-1))) {
+    if ((txch>0) && (! _channels.contains(txch-1))) {
       errorMessage = QString("Parse error @ %1,%2: Cannot create scanlist '%3', unknown TX channel index %4.")
           .arg(line).arg(column).arg(name).arg(txch-1);
       return false;
     }
-    /// @todo set TX Channel
+    /// @bug set TX Channel
 
     // Check channels
     foreach(qint64 i, channels) {
-      if (! _channels.contains(i)) {
+      if ((i>=0) && (!_channels.contains(i))) {
         errorMessage = QString("Parse error @ %1,%2: Cannot create scanlist '%3', unknown channel index %4.")
             .arg(line).arg(column).arg(name).arg(i);
         return false;
       }
       // link channels
-      _scanlists[idx]->addChannel(_channels[i]);
+      if (i<0)
+        _scanlists[idx]->addChannel(SelectedChannel::get());
+      else
+        _scanlists[idx]->addChannel(_channels[i]);
     }
     // done
     return true;

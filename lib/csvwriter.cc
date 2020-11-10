@@ -1,5 +1,6 @@
 #include "csvwriter.hh"
 #include <QDateTime>
+#include "channel.hh"
 #include "config.hh"
 #include "config.h"
 #include "utils.hh"
@@ -163,23 +164,34 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 3) Priority channel 1 (50% of scans): -, Sel or index\n"
             "# 4) Priority channel 2 (25% of scans): -, Sel or index\n"
             "# 5) Designated transmit channel: Last, Sel or index\n"
-            "# 6) List of channels: numbers and ranges (N-M) separated by comma\n"
+            "# 6) List of channels: numbers, Sel or ranges (N-M) separated by comma\n"
             "#\n"
-            "Scanlist Name               PCh1 PCh2 TxCh Channels\n";
+            "Scanlist Name                PCh1 PCh2 TxCh Channels\n";
   for (int i=0; i<config->scanlists()->count(); i++) {
     ScanList *list = config->scanlists()->scanlist(i);
     stream << qSetFieldWidth(9)  << left << (i+1)
-           << qSetFieldWidth(20) << left << ("\"" + list->name() + "\"")
-           << qSetFieldWidth(5)  << left
-           << ( (0 == list->priorityChannel()) ?
-                  "-" : QString::number(config->channelList()->indexOf(list->priorityChannel())+1) )
-           << qSetFieldWidth(5)  << left
-           << ( (0 == list->secPriorityChannel()) ?
-                  "-" : QString::number(config->channelList()->indexOf(list->secPriorityChannel())+1) )
-           << qSetFieldWidth(5)  << left << "Sel";
+           << qSetFieldWidth(20) << left << ("\"" + list->name() + "\"");
+    if (nullptr == list->priorityChannel())
+      stream << qSetFieldWidth(5)  << left << "-";
+    else if (SelectedChannel::get() == list->priorityChannel())
+      stream << qSetFieldWidth(5)  << left << "Sel";
+    else
+      stream << qSetFieldWidth(5)  << left <<
+                QString::number(config->channelList()->indexOf(list->priorityChannel())+1);
+    if (nullptr == list->secPriorityChannel())
+      stream << qSetFieldWidth(5)  << left << "-";
+    else if (SelectedChannel::get() == list->secPriorityChannel())
+      stream << qSetFieldWidth(5)  << left << "Sel";
+    else
+      stream << qSetFieldWidth(5)  << left <<
+                QString::number(config->channelList()->indexOf(list->secPriorityChannel())+1);
+    stream << qSetFieldWidth(5)  << left << "Sel";
     QStringList tmp;
     for (int j=0; j<list->count(); j++) {
-      tmp.append(QString::number(config->channelList()->indexOf(list->channel(j))+1));
+      if (SelectedChannel::get() == list->channel(j))
+        tmp.append("Sel");
+      else
+        tmp.append(QString::number(config->channelList()->indexOf(list->channel(j))+1));
     }
     stream << qSetFieldWidth(0) << tmp.join(",") << "\n";
   }
