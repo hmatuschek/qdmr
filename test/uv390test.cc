@@ -301,9 +301,9 @@ UV390Test::testAnalogChannels() {
   // TX frequency
   QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x1108c0+0x14)), 431.9625);
   // RX CTCSS none
-  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x1108c0+0x18)), 67.0);
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x1108c0+0x18)), Signaling::CTCSS_67_0Hz);
   // TX CTCSS none
-  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x1108c0+0x1a)), 67.0);
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x1108c0+0x1a)), Signaling::CTCSS_67_0Hz);
   // RX DTMF sig. off
   QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x1108c0+0x1c), 0x00);
   // TX DTMF sig. off
@@ -353,9 +353,9 @@ UV390Test::testAnalogChannels() {
   // TX frequency
   QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x110900+0x14)), 145.0000);
   // RX CTCSS none
-  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110900+0x18)), 0.0);
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110900+0x18)), Signaling::SIGNALING_NONE);
   // TX CTCSS none
-  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110900+0x1a)), 0.0);
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110900+0x1a)), Signaling::SIGNALING_NONE);
   // RX DTMF sig. off
   QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110900+0x1c), 0x00);
   // TX DTMF sig. off
