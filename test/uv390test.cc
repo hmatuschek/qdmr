@@ -141,9 +141,9 @@ UV390Test::testDigitalChannels() {
   // TX frequency
   QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x110800+0x14)), 431.9630);
   // RX CTCSS none
-  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110800+0x18)), 0.0);
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110800+0x18)), Signaling::SIGNALING_NONE);
   // TX CTCSS none
-  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110800+0x1a)), 0.0);
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110800+0x1a)), Signaling::SIGNALING_NONE);
   // RX DTMF sig. off
   QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110800+0x1c), 0x00);
   // TX DTMF sig. off
@@ -193,9 +193,9 @@ UV390Test::testDigitalChannels() {
   // TX frequency
   QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x110840+0x14)), 431.4870);
   // RX CTCSS none
-  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110840+0x18)), 0.0);
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110840+0x18)), Signaling::SIGNALING_NONE);
   // TX CTCSS none
-  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110840+0x1a)), 0.0);
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110840+0x1a)), Signaling::SIGNALING_NONE);
   // RX DTMF sig. off
   QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110840+0x1c), 0x00);
   // TX DTMF sig. off
@@ -245,9 +245,9 @@ UV390Test::testDigitalChannels() {
   // TX frequency
   QCOMPARE(decode_frequency(*(uint32_t *)_codeplug.data(0x110880+0x14)), 431.9380);
   // RX CTCSS none
-  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110880+0x18)), 0.0);
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110880+0x18)), Signaling::SIGNALING_NONE);
   // TX CTCSS none
-  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110880+0x1a)), 0.0);
+  QCOMPARE(decode_ctcss_tone_table(*(uint16_t *)_codeplug.data(0x110880+0x1a)), Signaling::SIGNALING_NONE);
   // RX DTMF sig. off
   QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x110880+0x1c), 0x00);
   // TX DTMF sig. off
