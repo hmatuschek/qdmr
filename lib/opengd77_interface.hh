@@ -94,7 +94,7 @@ protected:
       WRITE_WAV_BUFFER = 7
     } Command;
 
-    /// 'R' read block, 'W' write block, 'C' command.
+    /// 'R' read block, 'W' write block or 'C' command.
     char type;
     /// Command, @see OpenGD77Internface::WriteReqest::Command.
     uint8_t command;

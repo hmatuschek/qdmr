@@ -43,6 +43,10 @@ OpenGD77::OpenGD77(QObject *parent)
   // pass...
 }
 
+OpenGD77::~OpenGD77() {
+  // pass...
+}
+
 const QString &
 OpenGD77::name() const {
   return _name;
@@ -66,17 +70,13 @@ OpenGD77::codeplug() {
 
 bool
 OpenGD77::startDownload(Config *config, bool blocking) {
-  if (StatusIdle != _task)
+  if (StatusIdle != _task) {
+    logError() << "Cannot download from radio, radio is not idle.";
     return false;
+  }
 
-  _config = config;
-  if (! _config)
-    return false;
-
-  _dev = new OpenGD77Interface(this);
-  if (! _dev->isOpen()) {
-    _errorMessage = tr("In %1(), cannot open OpenGD77 device:\n\t%2").arg(__func__).arg(_dev->errorMessage());
-    _dev->deleteLater();
+  if (! (_config = config)) {
+    logError() << "Cannot download from radio, no config given.";
     return false;
   }
 
@@ -95,15 +95,15 @@ OpenGD77::startDownload(Config *config, bool blocking) {
 
 bool
 OpenGD77::startUpload(Config *config, bool blocking, bool update) {
-  if (StatusIdle != _task)
-    return false;
+  logDebug() << "Start upload to " << name() << "...";
 
-  if (! (_config = config))
+  if (StatusIdle != _task) {
+    logError() << "Cannot upload to radio, radio is not idle.";
     return false;
+  }
 
-  _dev = new OpenGD77Interface(this);
-  if (!_dev->isOpen()) {
-    _dev->deleteLater();
+  if (! (_config = config)) {
+    logError() << "Cannot upload to radio, no config given.";
     return false;
   }
 
@@ -130,7 +130,19 @@ OpenGD77::run() {
 
 
 void
-OpenGD77::download() {
+OpenGD77::download()
+{
+  _dev = new OpenGD77Interface();
+  if (! _dev->isOpen()) {
+    _task = StatusError;
+    _errorMessage = tr("In %1(), cannot open OpenGD77 device:\n\t%2").arg(__func__).arg(_dev->errorMessage());
+    logError() << _errorMessage;
+    _dev->deleteLater();
+    _dev = nullptr;
+    emit downloadError(this);
+    return;
+  }
+
   emit downloadStarted();
 
   if (_codeplug.numImages() != 2) {
@@ -139,6 +151,7 @@ OpenGD77::download() {
     _task = StatusError;
     _dev->close();
     _dev->deleteLater();
+    _dev = nullptr;
     emit downloadError(this);
     return;
   }
@@ -152,9 +165,11 @@ OpenGD77::download() {
                                 "is not aligned with blocksize %5.").arg(__func__)
             .arg(n).arg(_codeplug.image(0).element(n).address())
             .arg(_codeplug.image(0).element(n).data().size()).arg(BSIZE);
+        logError() << _errorMessage;
         _task = StatusError;
         _dev->close();
         _dev->deleteLater();
+        _dev = nullptr;
         emit downloadError(this);
         return;
       }
@@ -165,18 +180,20 @@ OpenGD77::download() {
   if (! _dev->read_start(0, 0)) {
     _errorMessage = QString("in %1(), cannot start codeplug download:\n\t %2")
         .arg(__func__).arg(_dev->errorMessage());
+    logError() << _errorMessage;
     _task = StatusError;
     _dev->close();
     _dev->deleteLater();
+    _dev = nullptr;
     emit downloadError(this);
     return;
   }
 
   // Then download codeplug
+  size_t bcount = 0;
   for (int image=0; image<_codeplug.numImages(); image++) {
     uint32_t bank = (0 == image) ? OpenGD77Codeplug::EEPROM : OpenGD77Codeplug::FLASH;
 
-    size_t bcount = 0;
     for (int n=0; n<_codeplug.image(image).numElements(); n++) {
       uint addr = _codeplug.image(image).element(n).address();
       uint size = _codeplug.image(image).element(n).data().size();
@@ -186,10 +203,12 @@ OpenGD77::download() {
         if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
           _errorMessage = QString("In %1(), cannot read block %2:\n\t %3")
               .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
+          logError() << _errorMessage;
           _task = StatusError;
           _dev->read_finish();
           _dev->close();
           _dev->deleteLater();
+          _dev = nullptr;
           emit downloadError(this);
           return;
         }
@@ -204,6 +223,7 @@ OpenGD77::download() {
   _task = StatusIdle;
   _dev->close();
   _dev->deleteLater();
+  _dev = nullptr;
 
   if (_codeplug.decode(_config))
     emit downloadFinished(this, &_codeplug);
@@ -215,14 +235,28 @@ OpenGD77::download() {
 
 void
 OpenGD77::upload() {
+  _dev = new OpenGD77Interface();
+  if (!_dev->isOpen()) {
+    _task = StatusError;
+    _errorMessage = QString("Cannot upload to radio, device is not open: %1").arg(_dev->errorString());
+    logError() << _errorMessage;
+    _dev->deleteLater();
+    _dev = nullptr;
+    emit uploadError(this);
+    return;
+  }
+
+
   emit uploadStarted();
 
   if (_codeplug.numImages() != 2) {
     _errorMessage = QString("In %1(), cannot download codeplug:\n\t"
                             " Codeplug does not contain two images.").arg(__func__);
+    logError() << _errorMessage;
     _task = StatusError;
     _dev->close();
     _dev->deleteLater();
+    _dev = nullptr;
     emit uploadError(this);
     return;
   }
@@ -236,9 +270,11 @@ OpenGD77::upload() {
                                 "is not aligned with blocksize %5.").arg(__func__)
             .arg(n).arg(_codeplug.image(0).element(n).address())
             .arg(_codeplug.image(0).element(n).data().size()).arg(BSIZE);
+        logError() << _errorMessage;
         _task = StatusError;
         _dev->close();
         _dev->deleteLater();
+        _dev = nullptr;
         emit uploadError(this);
         return;
       }
@@ -249,18 +285,20 @@ OpenGD77::upload() {
   if (! _dev->read_start(0, 0)) {
     _errorMessage = QString("in %1(), cannot start codeplug download:\n\t %2")
         .arg(__func__).arg(_dev->errorMessage());
+    logError() << _errorMessage;
     _task = StatusError;
     _dev->close();
     _dev->deleteLater();
+    _dev = nullptr;
     emit uploadError(this);
     return;
   }
 
   // Then download codeplug
+  size_t bcount = 0;
   for (int image=0; image<_codeplug.numImages(); image++) {
     uint32_t bank = (0 == image) ? OpenGD77Codeplug::EEPROM : OpenGD77Codeplug::FLASH;
 
-    size_t bcount = 0;
     for (int n=0; n<_codeplug.image(image).numElements(); n++) {
       uint addr = _codeplug.image(image).element(n).address();
       uint size = _codeplug.image(image).element(n).data().size();
@@ -270,10 +308,12 @@ OpenGD77::upload() {
         if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
           _errorMessage = QString("In %1(), cannot read block %2:\n\t %3")
               .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
+          logError() << _errorMessage;
           _task = StatusError;
           _dev->read_finish();
           _dev->close();
           _dev->deleteLater();
+          _dev = nullptr;
           emit uploadError(this);
           return;
         }
@@ -289,9 +329,11 @@ OpenGD77::upload() {
   if (! _dev->write_start(0,0)) {
     _errorMessage = QString("in %1(), cannot start codeplug upload:\n\t %2")
         .arg(__func__).arg(_dev->errorMessage());
+    logError() << _errorMessage;
     _task = StatusError;
     _dev->close();
     _dev->deleteLater();
+    _dev = nullptr;
     emit uploadError(this);
     return;
   }
@@ -300,7 +342,6 @@ OpenGD77::upload() {
   for (int image=0; image<_codeplug.numImages(); image++) {
     uint32_t bank = (0 == image) ? OpenGD77Codeplug::EEPROM : OpenGD77Codeplug::FLASH;
 
-    size_t bcount = 0;
     for (int n=0; n<_codeplug.image(image).numElements(); n++) {
       uint addr = _codeplug.image(image).element(n).address();
       uint size = _codeplug.image(image).element(n).data().size();
@@ -310,10 +351,12 @@ OpenGD77::upload() {
         if (! _dev->write(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
           _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
               .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
+          logError() << _errorMessage;
           _task = StatusError;
           _dev->write_finish();
           _dev->close();
           _dev->deleteLater();
+          _dev = nullptr;
           emit uploadError(this);
           return;
         }
@@ -324,10 +367,10 @@ OpenGD77::upload() {
   }
 
   _task = StatusIdle;
-  _dev->write_finish();
   _dev->reboot();
   _dev->close();
   _dev->deleteLater();
+  _dev = nullptr;
 
   emit uploadComplete(this);
 }

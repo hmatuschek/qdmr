@@ -32,6 +32,10 @@ public:
   /** Returns the last error message. */
   const QString &errorMessage() const;
 
+protected slots:
+  void onError(QSerialPort::SerialPortError error_t);
+  void onClose();
+
 protected:
   /** Holds the last error message. */
   QString _errorMessage;

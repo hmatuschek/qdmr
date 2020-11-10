@@ -7,6 +7,7 @@ USBSerial::USBSerial(unsigned vid, unsigned pid, QObject *parent)
 {
   logDebug() << "Try to detect USB serial interface " << hex << vid << ":" << pid << ".";
 
+  // Find matching serial port by VID/PID.
   QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
   foreach (QSerialPortInfo port, ports) {
     if (port.hasProductIdentifier() && (pid == port.productIdentifier()) &&
@@ -28,7 +29,12 @@ USBSerial::USBSerial(unsigned vid, unsigned pid, QObject *parent)
   if ((! this->isOpen()) && _errorMessage.isEmpty()) {
     _errorMessage = tr("%1: No serial port found with %2:%3.")
         .arg(__func__).arg(vid, 4, 16).arg(pid, 4, 16);
+    return;
   }
+
+  connect(this, SIGNAL(aboutToClose()), this, SLOT(onClose()));
+  connect(this, SIGNAL(errorOccurred(QSerialPort::SerialPortError)),
+          this, SLOT(onError(QSerialPort::SerialPortError)));
 }
 
 USBSerial::~USBSerial() {
@@ -48,4 +54,14 @@ USBSerial::close() {
 const QString &
 USBSerial::errorMessage() const {
   return _errorMessage;
+}
+
+void
+USBSerial::onError(QSerialPort::SerialPortError err) {
+  logError() <<": Serial port error: (" << err << ") " << errorString() << ".";
+}
+
+void
+USBSerial::onClose() {
+  logError() << ": Serial port will close now.";
 }
