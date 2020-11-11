@@ -18,8 +18,6 @@
  * callsign database of up to 100000 entries. This can be used to resolve amlost any DMR ID assigned
  * (at the time of this writing, there are about 140k IDs assigned) to name and callsign.
  *
- * @todo Reverse-engineer and implement CSV-Callsign database (100k entries) and connect with UserDatabase.
- * @todo Reverse-engineer and implement DTMF signaling systems to represent DTMFContact.
  * @ingroup dsc */
 #ifndef UV390_HH
 #define UV390_HH

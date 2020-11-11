@@ -7,8 +7,6 @@
  * @warning This device and its codplug are implemented based on the code by Serge and has not been
  * tested! I do not own a GD-77 or GD-77S, hence I cannot test and verify the implementation!
  *
- * @todo Get a handheld.
- * @todo Reverse-engineer and implement everything.
  * @ingroup dsc */
 
 #ifndef GD77_HH

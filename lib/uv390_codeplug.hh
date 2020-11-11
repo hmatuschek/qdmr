@@ -92,7 +92,7 @@ public:
 			PRIV_ENHANCED = 2             ///< Enhenced privacy.
 		} PrivacyType;
 
-    /** @todo I have absolutely no idea what that means. */
+    /** I have absolutely no idea what this means. */
 		typedef enum {
 			REF_LOW = 0,
 			REF_MEDIUM = 1,
@@ -360,7 +360,6 @@ public:
   /** Extended zone data.
    * The zone definition @c zone_t contains only a single set of 16 channels. For each zone
    * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each.
-   * @todo Check whether @c ext_a and @c member_b are swapped!
    *
    * Memmory layout of encoded zone extension:
    * @verbinclude uv390zoneext.txt

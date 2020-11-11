@@ -19,9 +19,6 @@
  * The radio can also hold up to 255 contacts (actually 256, but due to a bug in the firmware RX is
  * disabled whenever all 256 contacts are set), 64 RX group lists and 250 scanlists.
  *
- * @todo Reverse engeneer & implement DTMF contacts for RD-5R codeplug.
- * @todo Implement preset messages for RD-5R codeplug.
- *
  * @ingroup dsc */
 #ifndef RD5R_HH
 #define RD5R_HH

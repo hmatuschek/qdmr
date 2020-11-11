@@ -17,7 +17,10 @@ class USBSerial : public QSerialPort, public RadioInterface
 
 protected:
   /** Constructs an opens new serial interface to the devices identified by the given vendor and
-   * product IDs. */
+   * product IDs.
+   * @param vid Vendor ID of device.
+   * @param pid Product ID of device.
+   * @param parent Specifies the parent object. */
   explicit USBSerial(unsigned vid, unsigned pid, QObject *parent=nullptr);
 
 public:
@@ -33,7 +36,9 @@ public:
   const QString &errorMessage() const;
 
 protected slots:
+  /** Callback for serial interface errors. */
   void onError(QSerialPort::SerialPortError error_t);
+  /** Callback when closing interface. */
   void onClose();
 
 protected:
