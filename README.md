@@ -15,7 +15,7 @@ Currently, there are only two supported radios
   * Baofeng/Radioddity RD-5R
   * TYT MD-UV390 / Retevis RT3S
 
-The limited amount of supported radios is due to the fact, that I only own these two radios to test
+The limited amount of supported radios is due to the fact, that I only own these radios to test
 the software with.
 
 
