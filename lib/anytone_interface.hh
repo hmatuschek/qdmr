@@ -1,9 +1,9 @@
-#ifndef D878UVINTERFACE_HH
-#define D878UVINTERFACE_HH
+#ifndef ANYTONEINTERFACE_HH
+#define ANYTONEINTERFACE_HH
 
 #include "usbserial.hh"
 
-/** Implements the interfact to an Anytone D878UV.
+/** Implements the interface to Anytone D868UV, D878UV, etc radios.
  *
  * This interface uses a USB serial-port to comunicate with the device. To find the corresponding
  * port, the device-specific VID @c 0x28e9 and PID @c 0x018a are used. Hence no udev rules are
@@ -12,16 +12,16 @@
  *
  * @ingroup d878uv
  */
-class D878UVInterface : public USBSerial
+class AnytoneInterface : public USBSerial
 {
   Q_OBJECT
 
 public:
-  /** Constructs a new interface to an Anyton D878UV. If a matching device was found, @c isOpen
+  /** Constructs a new interface to Anyton radios. If a matching device was found, @c isOpen
    * returns @c true. */
-  explicit D878UVInterface(QObject *parent=nullptr);
+  explicit AnytoneInterface(QObject *parent=nullptr);
   /** Destructor. */
-  virtual ~D878UVInterface();
+  virtual ~AnytoneInterface();
 
   /** Closes the interface to the device. */
   void close();
@@ -87,4 +87,4 @@ protected:
   QString _identifier;
 };
 
-#endif // D878UVINTERFACE_HH
+#endif // ANYTONEINTERFACE_HH

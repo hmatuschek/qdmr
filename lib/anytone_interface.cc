@@ -1,22 +1,22 @@
-#include "d878uv_interface.hh"
+#include "anytone_interface.hh"
 #include "logger.hh"
 #include <QtEndian>
 
 /* ********************************************************************************************* *
- * Implementation of D878UVInterface::ReadRequest
+ * Implementation of AnytoneInterface::ReadRequest
  * ********************************************************************************************* */
 void
-D878UVInterface::ReadRequest::initRead(uint32_t addr) {
+AnytoneInterface::ReadRequest::initRead(uint32_t addr) {
   cmd = 'R';
   this->addr = qToLittleEndian(addr);
   size = 64;
 }
 
 /* ********************************************************************************************* *
- * Implementation of D878UVInterface::ReadResponse
+ * Implementation of AnytoneInterface::ReadResponse
  * ********************************************************************************************* */
 bool
-D878UVInterface::ReadResponse::check(uint32_t addr, QString &msg) const {
+AnytoneInterface::ReadResponse::check(uint32_t addr, QString &msg) const {
   if ('R' != cmd) {
     msg = QObject::tr("Invalid read response: Expected command 'R' got '%1'").arg(cmd);
     return false;
@@ -50,10 +50,10 @@ D878UVInterface::ReadResponse::check(uint32_t addr, QString &msg) const {
 }
 
 /* ********************************************************************************************* *
- * Implementation of D878UVInterface::WriteRequest
+ * Implementation of AnytoneInterface::WriteRequest
  * ********************************************************************************************* */
 void
-D878UVInterface::WriteRequest::initWrite(uint32_t addr, const char *data) {
+AnytoneInterface::WriteRequest::initWrite(uint32_t addr, const char *data) {
   cmd = 'W';
   this->addr = qToLittleEndian(addr);
   size = 16;
@@ -67,9 +67,9 @@ D878UVInterface::WriteRequest::initWrite(uint32_t addr, const char *data) {
 
 
 /* ********************************************************************************************* *
- * Implementation of D878UVInterface
+ * Implementation of AnytoneInterface
  * ********************************************************************************************* */
-D878UVInterface::D878UVInterface(QObject *parent)
+AnytoneInterface::AnytoneInterface(QObject *parent)
   : USBSerial(0x28e9, 0x018a, parent), _state(STATE_INITIALIZED), _identifier("")
 {
   if (isOpen())
@@ -80,12 +80,12 @@ D878UVInterface::D878UVInterface(QObject *parent)
   this->identifier();
 }
 
-D878UVInterface::~D878UVInterface() {
+AnytoneInterface::~AnytoneInterface() {
   this->close();
 }
 
 void
-D878UVInterface::close() {
+AnytoneInterface::close() {
   switch (_state) {
   case STATE_INITIALIZED:
   case STATE_OPEN:
@@ -101,7 +101,7 @@ D878UVInterface::close() {
 }
 
 QString
-D878UVInterface::identifier() {
+AnytoneInterface::identifier() {
   if (! _identifier.isEmpty())
     return _identifier;
   if (! enter_program_mode()) {
@@ -115,7 +115,7 @@ D878UVInterface::identifier() {
 }
 
 bool
-D878UVInterface::write_start(uint32_t bank, uint32_t addr)
+AnytoneInterface::write_start(uint32_t bank, uint32_t addr)
 {
   Q_UNUSED(bank);
   Q_UNUSED(addr);
@@ -127,7 +127,7 @@ D878UVInterface::write_start(uint32_t bank, uint32_t addr)
 }
 
 bool
-D878UVInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
+AnytoneInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
 {
   if (0 != bank) {
     _errorMessage = tr("Anytone: Cannot write to bank %1. There is only one (idx=0).").arg(bank);
@@ -162,13 +162,13 @@ D878UVInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
 }
 
 bool
-D878UVInterface::write_finish() {
+AnytoneInterface::write_finish() {
   // pass...
   return true;
 }
 
 bool
-D878UVInterface::read_start(uint32_t bank, uint32_t addr) {
+AnytoneInterface::read_start(uint32_t bank, uint32_t addr) {
   Q_UNUSED(bank);
   Q_UNUSED(addr);
 
@@ -179,7 +179,7 @@ D878UVInterface::read_start(uint32_t bank, uint32_t addr) {
 }
 
 bool
-D878UVInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
+AnytoneInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
   if (0 != bank) {
     _errorMessage = tr("Anytone: Cannot read from bank %1. There is only one (idx=0).").arg(bank);
     logError() << _errorMessage;
@@ -214,13 +214,13 @@ D878UVInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
 }
 
 bool
-D878UVInterface::read_finish() {
+AnytoneInterface::read_finish() {
   // pass...
   return true;
 }
 
 bool
-D878UVInterface::reboot() {
+AnytoneInterface::reboot() {
   if (STATE_PROGRAM == _state) {
     if (! leave_program_mode())
       return false;
@@ -234,7 +234,7 @@ D878UVInterface::reboot() {
 
 
 bool
-D878UVInterface::enter_program_mode() {
+AnytoneInterface::enter_program_mode() {
   if (STATE_PROGRAM == _state) {
     logDebug() << "Already in program mode. Skip.";
     return true;
@@ -266,7 +266,7 @@ D878UVInterface::enter_program_mode() {
 }
 
 bool
-D878UVInterface::request_identifier(QString &radio, QString &version) {
+AnytoneInterface::request_identifier(QString &radio, QString &version) {
   if (STATE_PROGRAM != _state) {
       _errorMessage = tr("Anytone: Cannot request identifier. "
                          "Device not in program mode, is in state %1.").arg(_state);
@@ -297,7 +297,7 @@ D878UVInterface::request_identifier(QString &radio, QString &version) {
 }
 
 bool
-D878UVInterface::leave_program_mode() {
+AnytoneInterface::leave_program_mode() {
   if (STATE_OPEN == _state) {
     logDebug() << "Device in open mode -> no need to leave program mode.";
     return true;
@@ -317,7 +317,7 @@ D878UVInterface::leave_program_mode() {
 }
 
 bool
-D878UVInterface::send_receive(const char *cmd, int clen, char *resp, int rlen) {
+AnytoneInterface::send_receive(const char *cmd, int clen, char *resp, int rlen) {
   // Try to write command to device
   if (clen != QSerialPort::write(cmd, clen)) {
     _errorMessage = "Cannot send command to device: " + QSerialPort::errorString();

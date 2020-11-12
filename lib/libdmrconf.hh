@@ -45,6 +45,8 @@
 #include "radio.hh"
 #include "uv390.hh"
 #include "rd5r.hh"
-
+#include "opengd77.hh"
+#include "gd77.hh"
+#include "d878uv.hh"
 
 #endif // __LIBDMRCONF_HH__
