@@ -5,10 +5,9 @@
 /* ********************************************************************************************* *
  * Implementation of AnytoneInterface::ReadRequest
  * ********************************************************************************************* */
-void
-AnytoneInterface::ReadRequest::initRead(uint32_t addr) {
+AnytoneInterface::ReadRequest::ReadRequest(uint32_t addr) {
   cmd = 'R';
-  this->addr = qToLittleEndian(addr);
+  this->addr = qToBigEndian(addr);
   size = 64;
 }
 
@@ -17,11 +16,11 @@ AnytoneInterface::ReadRequest::initRead(uint32_t addr) {
  * ********************************************************************************************* */
 bool
 AnytoneInterface::ReadResponse::check(uint32_t addr, QString &msg) const {
-  if ('R' != cmd) {
+  if ('W' != cmd) {
     msg = QObject::tr("Invalid read response: Expected command 'R' got '%1'").arg(cmd);
     return false;
   }
-  if (qFromLittleEndian(this->addr) != addr) {
+  if (qFromBigEndian(this->addr) != addr) {
     msg = QObject::tr("Invalid read response: Expected address '%1' got '%2'")
         .arg(addr, 8, 16, QChar('0')).arg(qFromLittleEndian(this->addr), 8, 16, QChar('0'));
     return false;
@@ -31,9 +30,9 @@ AnytoneInterface::ReadResponse::check(uint32_t addr, QString &msg) const {
     return false;
   }
   // Compute checksum
-  uint8_t crc=0;
-  for (uint8_t i=0; i<size; i++)
-    crc += ((const uint8_t *)data)[i];
+  uint8_t crc=((const uint8_t *)this)[1];
+  for (uint8_t i=2; i<(size+6); i++)
+    crc += ((const uint8_t *)this)[i];
   // compare
   if (crc != sum) {
     msg = QObject::tr("Invalid read response: Expected check-sum %1 got %2")
@@ -52,10 +51,9 @@ AnytoneInterface::ReadResponse::check(uint32_t addr, QString &msg) const {
 /* ********************************************************************************************* *
  * Implementation of AnytoneInterface::WriteRequest
  * ********************************************************************************************* */
-void
-AnytoneInterface::WriteRequest::initWrite(uint32_t addr, const char *data) {
+AnytoneInterface::WriteRequest::WriteRequest(uint32_t addr, const char *data) {
   cmd = 'W';
-  this->addr = qToLittleEndian(addr);
+  this->addr = qToBigEndian(addr);
   size = 16;
   sum = 0;
   for (uint8_t i=0; i<size; i++) {
@@ -72,10 +70,13 @@ AnytoneInterface::WriteRequest::initWrite(uint32_t addr, const char *data) {
 AnytoneInterface::AnytoneInterface(QObject *parent)
   : USBSerial(0x28e9, 0x018a, parent), _state(STATE_INITIALIZED), _identifier("")
 {
-  if (isOpen())
+  if (isOpen()) {
     _state = STATE_OPEN;
-  else
+  } else {
     _state = STATE_ERROR;
+    return;
+  }
+
   // identify device
   this->identifier();
 }
@@ -111,6 +112,7 @@ AnytoneInterface::identifier() {
   if (! request_identifier(_identifier, version)) {
     return "";
   }
+  logDebug() << "Found radio '" << _identifier << "', version '" << version << "'.";
   return _identifier;
 }
 
@@ -135,7 +137,7 @@ AnytoneInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
     return false;
   }
 
-  if (STATE_PROGRAM == _state) {
+  if (STATE_PROGRAM != _state) {
     _errorMessage = "Anytone: Cannot write data to device: Not in programming mode.";
     logError() << _errorMessage;
     return false;
@@ -143,8 +145,7 @@ AnytoneInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
 
   for (int i=0; i<nbytes; i+=16) {
     uint8_t ack;
-    WriteRequest req;
-    req.initWrite(addr+i, (const char *)(data+i));
+    WriteRequest req(addr+i, (const char *)(data+i));
     if (! send_receive((const char *)&req, sizeof(ReadRequest),(char *)&ack, 1)) {
       _errorMessage = tr("Anytone: Cannot write data to device: %1").arg(_errorMessage);
       logError() << _errorMessage;
@@ -186,16 +187,17 @@ AnytoneInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) 
     return false;
   }
 
-  if (STATE_PROGRAM == _state) {
+  if (STATE_PROGRAM != _state) {
     _errorMessage = "Anytone: Cannot read data from device: Not in programming mode.";
     logError() << _errorMessage;
     return false;
   }
 
+  //logDebug() << "Anytone: Read " << nbytes << "b from addr 0x" << QString::number(addr, 16) << "...";
+
   for (int i=0; i<nbytes; i+=64) {
-    ReadRequest req;
+    ReadRequest req(addr + i);
     ReadResponse resp;
-    req.initRead(addr+i);
     if (! send_receive((const char *)&req, sizeof(ReadRequest),
                        (char *)&resp, sizeof(ReadResponse))) {
       _errorMessage = tr("Anytone: Cannot read data from device: %1").arg(_errorMessage);
@@ -224,6 +226,7 @@ AnytoneInterface::reboot() {
   if (STATE_PROGRAM == _state) {
     if (! leave_program_mode())
       return false;
+    _state = STATE_OPEN;
   }
   if (STATE_OPEN == _state) {
     this->close();
@@ -262,6 +265,8 @@ AnytoneInterface::enter_program_mode() {
     _state = STATE_ERROR;
     return false;
   }
+  logDebug() << "Anytone: In program-mode now.";
+  _state = STATE_PROGRAM;
   return true;
 }
 
@@ -291,8 +296,8 @@ AnytoneInterface::request_identifier(QString &radio, QString &version) {
     _state = STATE_ERROR;
     return false;
   }
-  radio = QString::fromLocal8Bit(resp+1,8).simplified();
-  version = QString::fromLocal8Bit(resp+9, 6).simplified();
+  radio = QString::fromLocal8Bit(resp+1, strnlen(resp+1, 8)).simplified();
+  version = QString::fromLocal8Bit(resp+9, strnlen(resp+9, 6)).simplified();
   return true;
 }
 
@@ -313,6 +318,8 @@ AnytoneInterface::leave_program_mode() {
     return false;
   }
 
+  logDebug() << "Anytone: Left program-mode.";
+  _state = STATE_OPEN;
   return true;
 }
 

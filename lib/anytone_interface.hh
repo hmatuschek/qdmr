@@ -46,25 +46,26 @@ protected:
   bool send_receive(const char *cmd, int clen, char *resp, int rlen);
 
 protected:
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) ReadRequest {
     char cmd;      ///< Fixed to 'W'.
     uint32_t addr; ///< Memory address in little-endian.
     uint8_t size;  ///< Fixed to 64.
     /// Constructs a read request for the specified address.
-    void initRead(uint32_t addr);
-  } ReadRequest;
+    ReadRequest(uint32_t addr);
+  };
 
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) ReadResponse {
     char cmd;      ///< Fixed to 'R'.
     uint32_t addr; ///< Memory address in little-endian.
     uint8_t size;  ///< Fixed to 64.
     char data[64]; ///< The actual data.
     uint8_t sum;   ///< Sum over address, size and data.
     uint8_t ack;   ///< Fixed to 0x06.
-    bool check(uint32_t addr, QString &msg) const;
-  } ReadResponse;
 
-  typedef struct __attribute__((packed)) {
+    bool check(uint32_t addr, QString &msg) const;
+  };
+
+  struct __attribute__((packed)) WriteRequest {
     char cmd;      ///< Fixed to 'W'
     uint32_t addr; ///< Memory address in little-endian.
     uint8_t size;  ///< Fixed to 16
@@ -72,8 +73,8 @@ protected:
     uint8_t sum;   ///< Sum over addr, size and data.
     uint8_t ack;   ///< Fixed to 0x06;
 
-    void initWrite(uint32_t addr, const char *data);
-  } WriteRequest;
+    WriteRequest(uint32_t addr, const char *data);
+  };
 
   typedef enum {
     STATE_INITIALIZED,

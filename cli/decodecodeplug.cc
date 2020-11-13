@@ -11,6 +11,7 @@
 #include "rd5r_codeplug.hh"
 #include "gd77_codeplug.hh"
 #include "opengd77_codeplug.hh"
+#include "d878uv_codeplug.hh"
 
 
 int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
@@ -98,6 +99,31 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if ("opengd77"==parser.value("radio").toLower()) {
     OpenGD77Codeplug codeplug;
+    if (! codeplug.read(filename)) {
+      logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
+      return -1;
+    }
+    Config config;
+    if (! codeplug.decode(&config)) {
+      logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
+      return -1;
+    }
+
+    if (3 <= parser.positionalArguments().size()) {
+      QFile outfile(parser.positionalArguments().at(2));
+      if (! outfile.open(QIODevice::WriteOnly)) {
+        logError() << "Cannot write CSV codeplug file '" << outfile.fileName() << "':" << outfile.errorString();
+        return -1;
+      }
+      QTextStream stream(&outfile);
+      config.writeCSV(stream, errorMessage);
+      outfile.close();
+    } else {
+      QTextStream stream(stdout);
+      config.writeCSV(stream, errorMessage);
+    }
+  } else if ("d878uv"==parser.value("radio").toLower()) {
+    D878UVCodeplug codeplug;
     if (! codeplug.read(filename)) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
       return -1;

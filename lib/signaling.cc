@@ -38,7 +38,7 @@ static QHash<Code, float> CTCSS_code2freq {
 
 static QHash<uint16_t, Code> DCS_N_num2code {
   {  0, SIGNALING_NONE},
-  { 32, DCS_023N}, { 25, DCS_025N}, { 26, DCS_026N}, { 31, DCS_031N}, { 32, DCS_032N},
+  { 23, DCS_023N}, { 25, DCS_025N}, { 26, DCS_026N}, { 31, DCS_031N}, { 32, DCS_032N},
   { 36, DCS_036N}, { 43, DCS_043N}, { 47, DCS_047N}, { 51, DCS_051N}, { 53, DCS_053N},
   { 54, DCS_054N}, { 71, DCS_071N}, { 72, DCS_072N}, { 73, DCS_073N}, { 74, DCS_074N},
   {114, DCS_114N}, {115, DCS_115N}, {116, DCS_116N}, {122, DCS_122N}, {125, DCS_125N},
@@ -63,7 +63,7 @@ static QHash<uint16_t, Code> DCS_N_num2code {
 
 static QHash<Code, uint16_t> DCS_N_code2num {
   {SIGNALING_NONE, 0},
-  {DCS_023N,  32}, {DCS_025N,  25}, {DCS_026N,  26}, {DCS_031N,  31}, {DCS_032N,  32},
+  {DCS_023N,  23}, {DCS_025N,  25}, {DCS_026N,  26}, {DCS_031N,  31}, {DCS_032N,  32},
   {DCS_036N,  36}, {DCS_043N,  43}, {DCS_047N,  47}, {DCS_051N,  51}, {DCS_053N,  53},
   {DCS_054N,  54}, {DCS_071N,  71}, {DCS_072N,  72}, {DCS_073N,  73}, {DCS_074N,  74},
   {DCS_114N, 114}, {DCS_115N, 115}, {DCS_116N, 116}, {DCS_122N, 122}, {DCS_125N, 125},
@@ -88,7 +88,7 @@ static QHash<Code, uint16_t> DCS_N_code2num {
 
 static QHash<uint16_t, Code> DCS_I_num2code {
   {  0, SIGNALING_NONE},
-  { 32, DCS_023I}, { 25, DCS_025I}, { 26, DCS_026I}, { 31, DCS_031I}, { 32, DCS_032I},
+  { 23, DCS_023I}, { 25, DCS_025I}, { 26, DCS_026I}, { 31, DCS_031I}, { 32, DCS_032I},
   { 36, DCS_036I}, { 43, DCS_043I}, { 47, DCS_047I}, { 51, DCS_051I}, { 53, DCS_053I},
   { 54, DCS_054I}, { 71, DCS_071I}, { 72, DCS_072I}, { 73, DCS_073I}, { 74, DCS_074I},
   {114, DCS_114I}, {115, DCS_115I}, {116, DCS_116I}, {122, DCS_122I}, {125, DCS_125I},
@@ -113,7 +113,7 @@ static QHash<uint16_t, Code> DCS_I_num2code {
 
 static QHash<Code, uint16_t> DCS_I_code2num {
   {SIGNALING_NONE, 0},
-  {DCS_023I,  32}, {DCS_025I,  25}, {DCS_026I,  26}, {DCS_031I,  31}, {DCS_032I,  32},
+  {DCS_023I,  23}, {DCS_025I,  25}, {DCS_026I,  26}, {DCS_031I,  31}, {DCS_032I,  32},
   {DCS_036I,  36}, {DCS_043I,  43}, {DCS_047I,  47}, {DCS_051I,  51}, {DCS_053I,  53},
   {DCS_054I,  54}, {DCS_071I,  71}, {DCS_072I,  72}, {DCS_073I,  73}, {DCS_074I,  74},
   {DCS_114I, 114}, {DCS_115I, 115}, {DCS_116I, 116}, {DCS_122I, 122}, {DCS_125I, 125},

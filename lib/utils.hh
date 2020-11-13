@@ -48,6 +48,12 @@ bool encode_dtmf_bin(const QString &number, uint8_t *num, int size=16, uint8_t f
 Signaling::Code decode_ctcss_tone_table(uint16_t data);
 /** Encodes the CTCSS tone or DCS code from @c Signaling::Code. */
 uint16_t encode_ctcss_tone_table(Signaling::Code code);
+/** Interprets the given number as octal and returns the decimal representation.
+ * @param oct The octal number between 0-7777.*/
+uint16_t oct_to_dec(uint16_t oct);
+/** Returns the given number as octal value.
+ * @param dec The decimal number between 0-4095*/
+uint16_t dec_to_oct(uint16_t dec);
 
 /** Validates a DMR ID number. */
 bool validDMRNumber(const QString &text);

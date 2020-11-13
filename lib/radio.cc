@@ -5,6 +5,7 @@
 #include "gd77.hh"
 #include "uv390.hh"
 #include "opengd77.hh"
+#include "d878uv.hh"
 #include "config.hh"
 #include "logger.hh"
 #include <QSet>
@@ -236,27 +237,48 @@ Radio::detect(QString &errorMessage) {
   QString id;
 
   // Try TYT MD Family
-  DFUDevice dfu(0x0483, 0xdf11);
-  if (dfu.isOpen()) {
-    id = dfu.identifier();
-  } else {
-    // Try Radioddity/Baofeng RD5R & GD-77
+  {
+    DFUDevice dfu(0x0483, 0xdf11);
+    if (dfu.isOpen()) {
+      id = dfu.identifier();
+      goto found;
+    }
+  }
+
+  // Try Radioddity/Baofeng RD5R & GD-77
+  {
     HID hid(0x15a2, 0x0073);
     if (hid.isOpen()) {
       id = hid.identifier();
       hid.close();
-    } else {
-      OpenGD77Interface ogd77;
-      if (ogd77.isOpen()) {
-        id = ogd77.identifier();
-        ogd77.close();
-      } else {
-        errorMessage = QString("%1(): No matching radio found.").arg(__func__);
-        return nullptr;
-      }
+      goto found;
     }
   }
 
+  // Try Open GD77 firmware
+  {
+    OpenGD77Interface ogd77;
+    if (ogd77.isOpen()) {
+      id = ogd77.identifier();
+      ogd77.close();
+      goto found;
+    }
+  }
+
+  // Try Anytone USB-serial devices
+  {
+    AnytoneInterface anytone;
+    if (anytone.isOpen()) {
+      id = anytone.identifier();
+      anytone.close();
+      goto found;
+    }
+  }
+
+  errorMessage = QString("%1(): No matching radio found.").arg(__func__);
+  return nullptr;
+
+found:
   if (id.isEmpty()) {
     errorMessage = QString("%1(): Cannot detect radio: Radio returned no identifier!").arg(__func__);
     return nullptr;
@@ -272,8 +294,11 @@ Radio::detect(QString &errorMessage) {
     return new UV390();
   } else if ("OpenGD77" == id) {
     return new OpenGD77();
+  } else if ("D878UV" == id) {
+    return new D878UV();
   }
 
+  errorMessage = QString("%1(): Unknown radio identifier '%2'.").arg(__func__, id);
   return nullptr;
 }
 

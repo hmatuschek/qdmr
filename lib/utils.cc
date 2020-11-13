@@ -192,6 +192,27 @@ encode_ctcss_tone_table(Signaling::Code code)
   return (a << 12) | (b << 8) | (c << 4) | d | (tag << 14);
 }
 
+
+uint16_t oct_to_dec(uint16_t oct) {
+  uint16_t a = oct % 10; oct /= 10;
+  uint16_t b = oct % 10; oct /= 10;
+  uint16_t c = oct % 10; oct /= 10;
+  uint16_t d = oct % 10; oct /= 10;
+  if ((a>7) || (b>7) || (c>6) || (d>7) || (oct>0))
+    return 0;
+  return (((d*8+c)*8 + b)*8 + a);
+}
+
+uint16_t dec_to_oct(uint16_t dec) {
+  uint16_t a = dec % 8; dec /= 8;
+  uint16_t b = dec % 8; dec /= 8;
+  uint16_t c = dec % 8; dec /= 8;
+  uint16_t d = dec % 8; dec /= 8;
+  if (dec>0)
+    return 0;
+  return (((d*10+c)*10 + b)*10 + a);
+}
+
 bool
 validDMRNumber(const QString &text) {
   return QRegExp("^[0-9]+$").exactMatch(text);
