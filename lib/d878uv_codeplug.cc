@@ -12,13 +12,38 @@
 
 #define NUM_CHANNELS              4000
 #define NUM_CHANNEL_BANKS         32
-#define ADDR_CHANNEL_BANK_0       0x00800000
-#define ADDR_CHANNEL_BANK_SIZE    0x00020000
-#define ADDR_CHANNEL_BANK_31      0x00fc0000
-#define ADDR_CHANNEL_BANK_31_SIZE 0x00000880
-#define ADDR_CHANNEL_BANK_OFFSET  0x00040000
-#define ADDR_CHANNEL_BITMAP       0x024c1500
-#define ADDR_CHANNEL_BITMAP_SIZE  0x00000240
+#define CHANNEL_BANK_0            0x00800000
+#define CHANNEL_BANK_SIZE         0x00020000
+#define CHANNEL_BANK_31           0x00fc0000
+#define CHANNEL_BANK_31_SIZE      0x00000880
+#define CHANNEL_BANK_OFFSET       0x00040000
+#define CHANNEL_BITMAP            0x024c1500
+#define CHANNEL_BITMAP_SIZE       0x00000240
+
+#define NUM_CONTACTS              10000
+#define ADDR_CONTACTS             0x02680000
+#define CONTACTS_SIZE             0x000f4240
+#define CONTACTS_BITMAP           0x02640000
+#define CONTACTS_BITMAP_SIZE      0x500
+
+#define NUM_RXGRP                 250
+#define ADDR_RXGRP_0              0x02980000
+#define RXGRP_SIZE                0x00000140
+#define RXGRP_OFFSET              0x00000200
+
+#define NUM_ZONES                 250
+#define ADDR_ZONES                0x01000000
+#define ADDR_ZONES_SIZE           0x0001f400
+#define ADDR_ZONES_BITMAP         0x024c1300
+#define ADDR_ZONES_BITMAP_SIZE    0x00000040
+
+#define NUM_SCAN_LISTS            250
+#define SCAN_BANK_0               0x01080000 // Scanlist 0-31.
+#define SCAN_BANK_OFFSET          0x00080000 // Offset to next bank.
+#define SCAN_LIST_SIZE            0x000000c0 // Size of scan-list.
+#define SCAN_LIST_OFFSET          0x00000200 // Offset to next scan-list within bank.
+#define SCAN_BITMAP               0x024c1340 // Address of scan-list bitmap.
+#define SCAN_BITMAP_SIZE          0x00000040 // Size of scan-list bitmap.
 
 using namespace Signaling;
 
@@ -264,6 +289,20 @@ D878UVCodeplug::channel_t::toChannelObj() const {
   return ch;
 }
 
+bool
+D878UVCodeplug::channel_t::linkChannelObj(Channel *c, CodeplugContext &ctx) const {
+  uint16_t conIdx = qFromBigEndian(contact_index);
+  if (MODE_DIGITAL == channel_mode) {
+    DigitalChannel *dc = c->as<DigitalChannel>();
+    if (nullptr == dc)
+      return false;
+    if (! ctx.hasDigitalContact(conIdx))
+      return false;
+    dc->setTXContact(ctx.getDigitalContact(conIdx));
+  }
+  /// @bug Complete D878UV channel linking.
+  return true;
+}
 
 void
 D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
@@ -324,6 +363,91 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
 
 
 /* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::contact_t
+ * ******************************************************************************************** */
+D878UVCodeplug::contact_t::contact_t() {
+  clear();
+}
+
+void
+D878UVCodeplug::contact_t::clear() {
+  memset(this, 0, sizeof(D878UVCodeplug::contact_t));
+}
+
+bool
+D878UVCodeplug::contact_t::isValid() const {
+  return (0 != name[0]) && (0xff != name[0]);
+}
+
+QString
+D878UVCodeplug::contact_t::getName() const {
+  return decode_ascii(name, 16, 0x00);
+}
+
+void
+D878UVCodeplug::contact_t::setName(const QString &name) {
+  encode_ascii(this->name, name, 16, 0);
+}
+
+DigitalContact::Type
+D878UVCodeplug::contact_t::getType() const {
+  switch ((CallType) type) {
+  case CALL_PRIVATE: return DigitalContact::PrivateCall;
+  case CALL_GROUP: return DigitalContact::GroupCall;
+  case CALL_ALL: return DigitalContact::AllCall;
+  }
+}
+
+void
+D878UVCodeplug::contact_t::setType(DigitalContact::Type type) {
+  switch (type) {
+  case DigitalContact::PrivateCall: this->type = CALL_PRIVATE; break;
+  case DigitalContact::GroupCall: this->type = CALL_GROUP; break;
+  case DigitalContact::AllCall:
+    this->type = CALL_ALL;
+    this->id = qToBigEndian(16777215);
+    break;
+  }
+}
+
+uint32_t
+D878UVCodeplug::contact_t::getId() const {
+  uint32_t tmp = qFromLittleEndian(id);
+  return decode_dmr_id_bcd((const uint8_t *)&tmp);
+}
+
+void
+D878UVCodeplug::contact_t::setId(uint32_t id) {
+  uint32_t tmp;
+  encode_dmr_id_bcd((uint8_t *)&tmp, id);
+  this->id = qToLittleEndian(tmp);
+}
+
+bool
+D878UVCodeplug::contact_t::getAlert() const {
+  return (ALERT_NONE != call_alert);
+}
+
+void
+D878UVCodeplug::contact_t::setAlert(bool enable) {
+  call_alert = enable ? ALERT_RING : ALERT_NONE;
+}
+
+DigitalContact *
+D878UVCodeplug::contact_t::toContactObj() const {
+  return new DigitalContact(getType(), getName(), getId(), getAlert());
+}
+
+void
+D878UVCodeplug::contact_t::fromContactObj(const DigitalContact *contact) {
+  setType(contact->type());
+  setName(contact->name());
+  setId(contact->number());
+  setAlert(contact->rxTone());
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug
  * ******************************************************************************************** */
 D878UVCodeplug::D878UVCodeplug(QObject *parent)
@@ -331,16 +455,11 @@ D878UVCodeplug::D878UVCodeplug(QObject *parent)
 {
   addImage("Anytone AT-D878UV Codeplug");
 
-  // Define channel banks
-  uint32_t addr=ADDR_CHANNEL_BANK_0;
-  for (uint32_t i=0; i<(NUM_CHANNEL_BANKS-1); i++, addr+=ADDR_CHANNEL_BANK_OFFSET)
-    image(0).addElement(addr, ADDR_CHANNEL_BANK_SIZE);
-  // last channel bank (idx 31) is smaller (contains channels 3969-4000 and VFO A, VFO B)
-  image(0).addElement(ADDR_CHANNEL_BANK_31, ADDR_CHANNEL_BANK_31_SIZE);
   // Channel bitmap
-  image(0).addElement(ADDR_CHANNEL_BITMAP, ADDR_CHANNEL_BITMAP_SIZE);
+  image(0).addElement(CHANNEL_BITMAP, CHANNEL_BITMAP_SIZE);
+  // Contacts bitmap
+  image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
 
-  // Clear entire codeplug
   clear();
 }
 
@@ -349,11 +468,27 @@ D878UVCodeplug::clear() {
   for (int i=0; i<image(0).numElements(); i++) {
     memset(image(0).element(i).data().data(), 0, image(0).element(i).size());
   }
+}
+
+void
+D878UVCodeplug::allocateFromBitmaps() {
+  // Check channel bitmap
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
-    uint16_t bank = i/128;
-    channel_t *ch = (channel_t *)data(ADDR_CHANNEL_BANK_0+bank*ADDR_CHANNEL_BANK_OFFSET);
-    ch->clear();
+    // Get byte and bit for channel, as well as bank of channel
+    uint16_t bit = i%8, byte = i/8, bank = i/128;
+    if (0 == (((*data(CHANNEL_BITMAP+byte))>>bit) & 0x01))
+      continue;
+    uint32_t addr = CHANNEL_BANK_0+bank*CHANNEL_BANK_OFFSET;
+    if (nullptr == data(addr, 0)) {
+      if (31 == bank)
+        image(0).addElement(addr, CHANNEL_BANK_31_SIZE);
+      else
+        image(0).addElement(addr, CHANNEL_BANK_SIZE);
+    }
   }
+
+  // Allocate complete contacts table (cannot be divied into banks)
+  image(0).addElement(ADDR_CONTACTS, CONTACTS_SIZE);
 }
 
 bool
@@ -371,27 +506,38 @@ D878UVCodeplug::decode(Config *config) {
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
     // Check if channel is enabled:
     uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
-    if (0 == (((*data(ADDR_CHANNEL_BITMAP+byte))>>bit) & 0x01))
+    if (0 == (((*data(CHANNEL_BITMAP+byte))>>bit) & 0x01))
       continue;
-    channel_t *ch = (channel_t *)data(ADDR_CHANNEL_BANK_0
-                                      +bank*ADDR_CHANNEL_BANK_OFFSET
+    channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
+                                      +bank*CHANNEL_BANK_OFFSET
                                       +idx*sizeof(channel_t));
     if (Channel *obj = ch->toChannelObj())
       ctx.addChannel(obj, i);
   }
 
+  // Create contacts
+  for (uint16_t i=0; i<NUM_CONTACTS; i++) {
+    // Check if contact is enabled:
+    uint16_t  bit = i%8, byte = i/8;
+    if (1 == (((*data(CONTACTS_BITMAP+byte))>>bit) & 0x01))
+      continue;
+    contact_t *con = (contact_t *)data(ADDR_CONTACTS+i*sizeof(contact_t));
+    if (DigitalContact *obj = con->toContactObj())
+      ctx.addDigitalContact(obj, i);
+  }
 
   // Link channel objects
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
     // Check if channel is enabled:
     uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
-    if (0 == (((*data(ADDR_CHANNEL_BITMAP+byte))>>bit) & 0x01))
+    if (0 == (((*data(CHANNEL_BITMAP+byte))>>bit) & 0x01))
       continue;
-    channel_t *ch = (channel_t *)data(ADDR_CHANNEL_BANK_0
-                                      +bank*ADDR_CHANNEL_BANK_OFFSET
+    channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
+                                      +bank*CHANNEL_BANK_OFFSET
                                       +idx*sizeof(channel_t));
-    //if (ctx.hasChannel(i))
-    //  ch->linkChannelObj(ctx.getChannel(i), ctx);
+
+    if (ctx.hasChannel(i))
+      ch->linkChannelObj(ctx.getChannel(i), ctx);
   }
 
   /// @bug Implement D878UV code-plug decoding.

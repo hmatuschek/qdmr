@@ -119,11 +119,36 @@ void
 D878UV::run() {
   if (StatusDownload == _task) {
     emit downloadStarted();
-    logDebug() << "Download of " << _codeplug.image(0).numElements() << " elements.";
+    logDebug() << "Download of " << _codeplug.image(0).numElements() << " bitmaps.";
 
-    // Check every segment in the codeplug
-    size_t totb = 0;
+    // Then download bitmaps
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+      uint addr = _codeplug.image(0).element(n).address();
+      uint size = _codeplug.image(0).element(n).data().size();
+      logDebug() << "Download of block " << n << " " << hex << addr << ":" << size;
+      uint b0 = addr/RBSIZE, nb = size/RBSIZE;
+      for (uint b=0; b<nb; b++) {
+        if (! _dev->read(0, (b0+b)*RBSIZE, _codeplug.data((b0+b)*RBSIZE), RBSIZE)) {
+          _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
+              .arg(_dev->errorMessage());
+          logError() << _errorMessage;
+          _task = StatusError;
+          _dev->reboot();
+          _dev->close();
+          _dev->deleteLater();
+          emit downloadError(this);
+          return;
+        }
+      }
+    }
+
+    // Allocate remaining memory sections
+    uint nstart = _codeplug.image(0).numElements();
+    _codeplug.allocateFromBitmaps();
+
+    // Check every segment in the remaining codeplug
+    size_t totb = 0;
+    for (int n=nstart; n<_codeplug.image(0).numElements(); n++) {
       if (! _codeplug.image(0).element(n).isAligned(RBSIZE)) {
         _errorMessage = QString("%1 Cannot download codeplug: Codeplug element %2 (addr=%3, size=%4) "
                                 "is not aligned with blocksize %5.").arg(__func__)
@@ -140,9 +165,9 @@ D878UV::run() {
       totb += _codeplug.image(0).element(n).data().size()/RBSIZE;
     }
 
-    // Then download codeplug
+    // Download remaining memory sections
     size_t bcount = 0;
-    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+    for (int n=nstart; n<_codeplug.image(0).numElements(); n++) {
       uint addr = _codeplug.image(0).element(n).address();
       uint size = _codeplug.image(0).element(n).data().size();
       logDebug() << "Download of block " << n << " " << hex << addr << ":" << size;

@@ -1,7 +1,7 @@
 #include "codeplugcontext.hh"
 
 CodeplugContext::CodeplugContext(Config *config)
-  : _config(config), _channelTable()
+  : _config(config), _channelTable(), _digitalContactTable()
 {
   // pass...
 }
@@ -32,4 +32,27 @@ CodeplugContext::getChannel(int index) const {
   if (! _channelTable.contains(index))
     return nullptr;
   return _config->channelList()->channel(_channelTable[index]);
+}
+
+bool
+CodeplugContext::hasDigitalContact(int index) const {
+  return _digitalContactTable.contains(index);
+}
+
+bool
+CodeplugContext::addDigitalContact(DigitalContact *con, int index) {
+  if (_digitalContactTable.contains(index))
+    return false;
+  int cidx = _config->contacts()->addContact(con);
+  if (0 > cidx)
+    return false;
+  _digitalContactTable[index] = cidx;
+  return true;
+}
+
+DigitalContact *
+CodeplugContext::getDigitalContact(int index) const {
+  if (! _digitalContactTable.contains(index))
+    return nullptr;
+  return _config->contacts()->digitalContact(_digitalContactTable[index]);
 }

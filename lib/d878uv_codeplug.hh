@@ -210,6 +210,53 @@ public:
     void fromChannelObj(const Channel *c, const Config *conf);
   };
 
+  struct __attribute__((packed)) contact_t {
+    typedef enum {
+      CALL_PRIVATE = 0,                 ///< Private call.
+      CALL_GROUP = 1,                   ///< Group call.
+      CALL_ALL = 2                      ///< All call.
+    } CallType;
+
+    typedef enum {
+      ALERT_NONE = 0,                   ///< Alert disabled.
+      ALERT_RING = 1,                   ///< Ring tone.
+      ALERT_ONLINE = 2                  ///< WTF?
+    } AlertType;
+
+    // Byte 0
+    uint8_t type;                       ///< Call Type: Group Call, Private Call or All Call.
+    // Bytes 1-16
+    uint8_t name[16];                   ///< Contact Name max 16 ASCII chars 0-terminated.
+    // Bytes 17-34
+    uint8_t _unused17[18];              ///< Unused, set to 0.
+    // Bytes 35-38
+    uint32_t id;                        ///< Call ID, BCD coded 8 digits, little-endian.
+    // Byte 39
+    uint8_t call_alert;                 ///< Call Alert: None, Ring, Online Alert
+    // Bytes 40-99
+    uint8_t _unused40[60];              ///< Unused, set to 0.
+
+    contact_t();
+    void clear();
+
+    bool isValid() const;
+
+    DigitalContact::Type getType() const;
+    void setType(DigitalContact::Type type);
+
+    QString getName() const;
+    void setName(const QString &name);
+
+    uint32_t getId() const;
+    void setId(uint32_t id);
+
+    bool getAlert() const;
+    void setAlert(bool enable);
+
+    DigitalContact *toContactObj() const;
+    void fromContactObj(const DigitalContact *contact);
+  };
+
 
 public:
   /** Empty constructor. */
@@ -217,6 +264,8 @@ public:
 
   /** Clears and resets the complete codeplug to some default values. */
   void clear();
+
+  void allocateFromBitmaps();
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
 	bool decode(Config *config);
