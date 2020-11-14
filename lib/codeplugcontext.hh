@@ -19,10 +19,15 @@ public:
   bool addDigitalContact(DigitalContact *con, int index);
   DigitalContact *getDigitalContact(int index) const;
 
+  bool hasGroupList(int index) const;
+  bool addGroupList(RXGroupList *grp, int index);
+  RXGroupList *getGroupList(int index) const;
+
 protected:
   Config *_config;
   QHash<int, int> _channelTable;
   QHash<int, int> _digitalContactTable;
+  QHash<int, int> _groupListTable;
 };
 
 #endif // CODEPLUGCONTEXT_HH

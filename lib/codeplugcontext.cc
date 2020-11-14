@@ -1,7 +1,7 @@
 #include "codeplugcontext.hh"
 
 CodeplugContext::CodeplugContext(Config *config)
-  : _config(config), _channelTable(), _digitalContactTable()
+  : _config(config), _channelTable(), _digitalContactTable(), _groupListTable()
 {
   // pass...
 }
@@ -34,6 +34,7 @@ CodeplugContext::getChannel(int index) const {
   return _config->channelList()->channel(_channelTable[index]);
 }
 
+
 bool
 CodeplugContext::hasDigitalContact(int index) const {
   return _digitalContactTable.contains(index);
@@ -56,3 +57,28 @@ CodeplugContext::getDigitalContact(int index) const {
     return nullptr;
   return _config->contacts()->digitalContact(_digitalContactTable[index]);
 }
+
+
+bool
+CodeplugContext::hasGroupList(int index) const {
+  return _groupListTable.contains(index);
+}
+
+bool
+CodeplugContext::addGroupList(RXGroupList *grp, int index) {
+  if (_groupListTable.contains(index))
+    return false;
+  int cidx = _config->rxGroupLists()->addList(grp);
+  if (0 > cidx)
+    return false;
+  _groupListTable[index] = cidx;
+  return true;
+}
+
+RXGroupList *
+CodeplugContext::getGroupList(int index) const {
+  if (! _groupListTable.contains(index))
+    return nullptr;
+  return _config->rxGroupLists()->list(_groupListTable[index]);
+}
+

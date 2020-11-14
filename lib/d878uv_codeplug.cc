@@ -21,10 +21,13 @@
 #define CHANNEL_BITMAP_SIZE       0x00000240
 
 #define NUM_CONTACTS              10000
-#define ADDR_CONTACTS             0x02680000
-#define CONTACTS_SIZE             0x000f4240
+#define NUM_CONTACT_BANKS         313
+#define CONTACT_BANK_0            0x02680000
+#define CONTACT_BANK_SIZE         0x00000c80
+#define CONTACT_BANK_312          0x02772f80 // Last bank of 16 contacts
+#define CONTACT_BANK_312_SIZE     0x00000640 //
 #define CONTACTS_BITMAP           0x02640000
-#define CONTACTS_BITMAP_SIZE      0x500
+#define CONTACTS_BITMAP_SIZE      0x00000500
 
 #define NUM_RXGRP                 250
 #define ADDR_RXGRP_0              0x02980000
@@ -32,10 +35,23 @@
 #define RXGRP_OFFSET              0x00000200
 
 #define NUM_ZONES                 250
-#define ADDR_ZONES                0x01000000
-#define ADDR_ZONES_SIZE           0x0001f400
-#define ADDR_ZONES_BITMAP         0x024c1300
-#define ADDR_ZONES_BITMAP_SIZE    0x00000040
+#define NUM_CH_PER_ZONE           250
+#define ADDR_ZONE                 0x01000000
+#define ZONE_SIZE                 0x00000200
+#define ZONE_OFFSET               0x00000200
+#define ADDR_ZONE_NAME            0x02540000
+#define ZONE_NAME_SIZE            0x00000010
+#define ZONE_NAME_OFFSET          0x00000020
+#define ZONE_BITMAPS              0x024c1300
+#define ZONE_BITMAPS_SIZE         0x00000040
+#define ZONE_A_BITMAP             0x024c1300
+#define ZONE_A_BITMAP_SIZE        0x00000020
+#define ZONE_B_BITMAP             0x024c1320
+#define ZONE_B_BITMAP_SIZE        0x00000020
+
+#define NUM_RADIOIDS              250
+#define ADDR_RADIOIDS             0x02580000
+#define RADIOIDS_SIZE             0x00001f40
 
 #define NUM_SCAN_LISTS            250
 #define SCAN_BANK_0               0x01080000 // Scanlist 0-31.
@@ -158,10 +174,10 @@ D878UVCodeplug::channel_t::getRXTone() const {
 
   if (rx_ctcss && (ctcss_receive < 52))
     return ctcss_num2code[ctcss_receive];
-  else if (rx_dcs && (qFromBigEndian(dcs_receive) < 512))
-    return Signaling::fromDCSNumber(dec_to_oct(qFromBigEndian(dcs_receive)), false);
-  else if (rx_dcs && (qFromBigEndian(dcs_receive) >= 512))
-    return Signaling::fromDCSNumber(dec_to_oct(qFromBigEndian(dcs_receive)-512), true);
+  else if (rx_dcs && (qFromLittleEndian(dcs_receive) < 512))
+    return Signaling::fromDCSNumber(dec_to_oct(qFromLittleEndian(dcs_receive)), false);
+  else if (rx_dcs && (qFromLittleEndian(dcs_receive) >= 512))
+    return Signaling::fromDCSNumber(dec_to_oct(qFromLittleEndian(dcs_receive)-512), true);
  return Signaling::SIGNALING_NONE;
 }
 
@@ -182,13 +198,13 @@ D878UVCodeplug::channel_t::setRXTone(Code code) {
     rx_ctcss = 0;
     rx_dcs = 1;
     ctcss_receive = 0;
-    dcs_receive = qToBigEndian(oct_to_dec(Signaling::toDCSNumber(code)));
+    dcs_receive = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code)));
   } else if (Signaling::isDCSInverted(code)) {
     squelch_mode = SQ_TONE;
     rx_ctcss = 0;
     rx_dcs = 1;
     ctcss_receive = 0;
-    dcs_receive = qToBigEndian(oct_to_dec(Signaling::toDCSNumber(code))+512);
+    dcs_receive = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code))+512);
   }
 }
 
@@ -196,10 +212,10 @@ Signaling::Code
 D878UVCodeplug::channel_t::getTXTone() const {
   if (tx_ctcss && (ctcss_transmit < 52))
     return ctcss_num2code[ctcss_transmit];
-  else if (tx_dcs && (qFromBigEndian(dcs_transmit) < 512))
-    return Signaling::fromDCSNumber(dec_to_oct(qFromBigEndian(dcs_transmit)), false);
-  else if (tx_dcs && (qFromBigEndian(dcs_transmit) >= 512))
-    return Signaling::fromDCSNumber(dec_to_oct(qFromBigEndian(dcs_transmit)-512), true);
+  else if (tx_dcs && (qFromLittleEndian(dcs_transmit) < 512))
+    return Signaling::fromDCSNumber(dec_to_oct(qFromLittleEndian(dcs_transmit)), false);
+  else if (tx_dcs && (qFromLittleEndian(dcs_transmit) >= 512))
+    return Signaling::fromDCSNumber(dec_to_oct(qFromLittleEndian(dcs_transmit)-512), true);
  return Signaling::SIGNALING_NONE;
 }
 
@@ -217,12 +233,12 @@ D878UVCodeplug::channel_t::setTXTone(Code code) {
     tx_ctcss = 0;
     tx_dcs = 1;
     ctcss_transmit = 0;
-    dcs_transmit = qToBigEndian(oct_to_dec(Signaling::toDCSNumber(code)));
+    dcs_transmit = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code)));
   } else if (Signaling::isDCSInverted(code)) {
     tx_ctcss = 0;
     tx_dcs = 1;
     ctcss_transmit = 0;
-    dcs_transmit = qToBigEndian(oct_to_dec(Signaling::toDCSNumber(code))+512);
+    dcs_transmit = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code))+512);
   }
 }
 
@@ -290,16 +306,20 @@ D878UVCodeplug::channel_t::toChannelObj() const {
 }
 
 bool
-D878UVCodeplug::channel_t::linkChannelObj(Channel *c, CodeplugContext &ctx) const {
-  uint16_t conIdx = qFromBigEndian(contact_index);
+D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx) const {
   if (MODE_DIGITAL == channel_mode) {
     DigitalChannel *dc = c->as<DigitalChannel>();
     if (nullptr == dc)
       return false;
-    if (! ctx.hasDigitalContact(conIdx))
-      return false;
-    dc->setTXContact(ctx.getDigitalContact(conIdx));
+
+    uint16_t conIdx = qFromLittleEndian(contact_index);
+    if (ctx.hasDigitalContact(conIdx))
+      dc->setTXContact(ctx.getDigitalContact(conIdx));
+
+    if (ctx.hasGroupList(group_list_index))
+      dc->setRXGroupList(ctx.getGroupList(group_list_index));
   }
+
   /// @bug Complete D878UV channel linking.
   return true;
 }
@@ -448,6 +468,91 @@ D878UVCodeplug::contact_t::fromContactObj(const DigitalContact *contact) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::grouplist_t
+ * ******************************************************************************************** */
+D878UVCodeplug::grouplist_t::grouplist_t() {
+  clear();
+}
+
+void
+D878UVCodeplug::grouplist_t::clear() {
+  memset(this, 0xff, sizeof(D878UVCodeplug::grouplist_t));
+}
+
+bool
+D878UVCodeplug::grouplist_t::isValid() const {
+  return (0 != name[0]) && (0xff != name[0]);
+}
+
+QString
+D878UVCodeplug::grouplist_t::getName() const {
+  return decode_ascii(name, 16, 0x00);
+}
+
+void
+D878UVCodeplug::grouplist_t::setName(const QString &name) {
+  encode_ascii(this->name, name, 16, 0x00);
+}
+
+RXGroupList *
+D878UVCodeplug::grouplist_t::toGroupListObj() const {
+  return new RXGroupList(getName());
+}
+
+bool
+D878UVCodeplug::grouplist_t::linkGroupList(RXGroupList *lst, const CodeplugContext &ctx) {
+  for (uint8_t i=0; i<64; i++) {
+    uint32_t idx = qFromLittleEndian(member[i]);
+    if ((0xffffffff == idx) || (! ctx.hasDigitalContact(idx)))
+      continue;
+    lst->addContact(ctx.getDigitalContact(idx));
+  }
+  return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::radioid_t
+ * ******************************************************************************************** */
+D878UVCodeplug::radioid_t::radioid_t() {
+  clear();
+}
+
+void
+D878UVCodeplug::radioid_t::clear() {
+  memset(this, 0, sizeof(D878UVCodeplug::radioid_t));
+}
+
+bool
+D878UVCodeplug::radioid_t::isValid() const {
+  return ((0x00 != name[0]) && (0xff != name[0]));
+}
+
+QString
+D878UVCodeplug::radioid_t::getName() const {
+  return decode_ascii(name, 16, 0);
+}
+
+void
+D878UVCodeplug::radioid_t::setName(const QString name) {
+  encode_ascii(this->name, name, 16, 0);
+}
+
+uint32_t
+D878UVCodeplug::radioid_t::getId() const {
+  uint32_t id_bcd = qFromLittleEndian(this->id);
+  return decode_dmr_id_bcd((const uint8_t *) &id_bcd);
+}
+
+void
+D878UVCodeplug::radioid_t::setId(uint32_t num) {
+  uint32_t id_bcd;
+  encode_dmr_id_bcd((uint8_t *)&id_bcd, num);
+  this->id = qToLittleEndian(id_bcd);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug
  * ******************************************************************************************** */
 D878UVCodeplug::D878UVCodeplug(QObject *parent)
@@ -459,6 +564,10 @@ D878UVCodeplug::D878UVCodeplug(QObject *parent)
   image(0).addElement(CHANNEL_BITMAP, CHANNEL_BITMAP_SIZE);
   // Contacts bitmap
   image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
+  // Zone bitmap
+  image(0).addElement(ZONE_BITMAPS, ZONE_BITMAPS_SIZE);
+  // All readio IDs
+  image(0).addElement(ADDR_RADIOIDS, RADIOIDS_SIZE);
 
   clear();
 }
@@ -473,10 +582,11 @@ D878UVCodeplug::clear() {
 void
 D878UVCodeplug::allocateFromBitmaps() {
   // Check channel bitmap
+  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
     // Get byte and bit for channel, as well as bank of channel
     uint16_t bit = i%8, byte = i/8, bank = i/128;
-    if (0 == (((*data(CHANNEL_BITMAP+byte))>>bit) & 0x01))
+    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
       continue;
     uint32_t addr = CHANNEL_BANK_0+bank*CHANNEL_BANK_OFFSET;
     if (nullptr == data(addr, 0)) {
@@ -487,8 +597,40 @@ D878UVCodeplug::allocateFromBitmaps() {
     }
   }
 
-  // Allocate complete contacts table (cannot be divied into banks)
-  image(0).addElement(ADDR_CONTACTS, CONTACTS_SIZE);
+  // Check contacts bitmap
+  uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
+  for (uint16_t i=0; i<NUM_CONTACTS; i++) {
+    // Get byte and bit for contact, as well as bank of contact
+    uint16_t bit = i%8, byte = i/8, bank = i/128;
+    if (1 == ((contact_bitmap[byte]>>bit) & 0x01))
+      continue;
+    uint32_t addr = CONTACT_BANK_0+bank*CONTACT_BANK_SIZE;
+    if (nullptr == data(addr, 0)) {
+      if (312 == bank)
+        image(0).addElement(addr, CONTACT_BANK_312_SIZE);
+      else
+        image(0).addElement(addr, CONTACT_BANK_SIZE);
+    }
+  }
+
+  // Allocate all group lists (no index table for RX groups! WTF!)
+  for (uint16_t i=0; i<NUM_RXGRP; i++) {
+    image(0).addElement(ADDR_RXGRP_0+i*RXGRP_OFFSET, RXGRP_SIZE);
+  }
+
+  // Allocate only valid zones
+  uint8_t *zone_bitmap = data(ZONE_BITMAPS);
+  for (uint16_t i=0; i<NUM_ZONES; i++) {
+    // Get byte and bit for zone
+    uint16_t bit = i%8, byte = i/8;
+    // If valid ...
+    if (0 == ((zone_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate zone name and zone itself
+    image(0).addElement(ADDR_ZONE+i*ZONE_OFFSET, ZONE_SIZE);
+  }
+  // but allocate all zone names (only 8k)
+  image(0).addElement(ADDR_ZONE_NAME, NUM_ZONES*ZONE_NAME_OFFSET);
 }
 
 bool
@@ -502,11 +644,23 @@ D878UVCodeplug::decode(Config *config) {
   // Maps code-plug indices to objects
   CodeplugContext ctx(config);
 
+  // Find a valid RadioID
+  uint8_t *radio_ids = data(ADDR_RADIOIDS);
+  for (uint16_t i=0; i<NUM_RADIOIDS; i++) {
+    radioid_t *id = (radioid_t *)(radio_ids+i*sizeof(radioid_t));
+    if (id->isValid()) {
+      config->setId(id->getId());
+      config->setName(id->getName());
+      break;
+    }
+  }
+
   // Create channels
+  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
     // Check if channel is enabled:
     uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
-    if (0 == (((*data(CHANNEL_BITMAP+byte))>>bit) & 0x01))
+    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
       continue;
     channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
                                       +bank*CHANNEL_BANK_OFFSET
@@ -516,14 +670,55 @@ D878UVCodeplug::decode(Config *config) {
   }
 
   // Create contacts
+  uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
   for (uint16_t i=0; i<NUM_CONTACTS; i++) {
     // Check if contact is enabled:
     uint16_t  bit = i%8, byte = i/8;
-    if (1 == (((*data(CONTACTS_BITMAP+byte))>>bit) & 0x01))
+    if (1 == ((contact_bitmap[byte]>>bit) & 0x01))
       continue;
-    contact_t *con = (contact_t *)data(ADDR_CONTACTS+i*sizeof(contact_t));
+    contact_t *con = (contact_t *)data(CONTACT_BANK_0+i*sizeof(contact_t));
     if (DigitalContact *obj = con->toContactObj())
       ctx.addDigitalContact(obj, i);
+  }
+
+  // Create RX group lists
+  for (uint16_t i=0; i<NUM_RXGRP; i++) {
+    grouplist_t *grp = (grouplist_t *)data(ADDR_RXGRP_0+i*RXGRP_OFFSET);
+    if (! grp->isValid())
+      continue;
+    if (RXGroupList *obj = grp->toGroupListObj()) {
+      ctx.addGroupList(obj, i);
+      grp->linkGroupList(obj, ctx);
+    }
+  }
+
+  // Create zones
+  uint8_t *zone_a_bitmap = data(ZONE_A_BITMAP);
+  //uint8_t *zone_b_bitmap = data(ZONE_A_BITMAP);
+  for (uint16_t i=0; i<NUM_ZONES; i++) {
+    // Check if zone is enabled:
+    uint16_t bit = i%8, byte = i/8;
+    bool has_a = ((zone_a_bitmap[byte]>>bit)&0x01);
+    //bool has_b = ((zone_b_bitmap[byte]>>bit)&0x01);
+    if (! has_a)
+      continue;
+    // If enabled, create zone with name
+    Zone *zone = new Zone(decode_ascii(data(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET), 16, 0));
+    // add to config
+    config->zones()->addZone(zone);
+    // link zone
+    uint16_t *channels = (uint16_t *)data(ADDR_ZONE+i*ZONE_OFFSET);
+    for (uint8_t i=0; i<NUM_CH_PER_ZONE; i++, channels++) {
+      // If not enabled -> continue
+      if (0xffff == *channels)
+        continue;
+      // Get channel index and check if defined
+      uint16_t cidx = qFromLittleEndian(*channels);
+      if (! ctx.hasChannel(cidx))
+        continue;
+      // If defined -> add channel to zone obj
+      zone->A()->addChannel(ctx.getChannel(cidx));
+    }
   }
 
   // Link channel objects

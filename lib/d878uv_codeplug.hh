@@ -101,8 +101,8 @@ public:
     // Bytes 10-15
     uint8_t     ctcss_transmit;         ///< TX CTCSS tone, 0=62.5, 50=254.1, 51=custom CTCSS tone.
     uint8_t     ctcss_receive;          ///< RX CTCSS tone: 0=62.5, 50=254.1, 51=custom CTCSS tone.
-    uint16_t    dcs_transmit;           ///< TX DCS code: 0=D000N, 511=D777N, 512=D000I, 1023=D777I, DCS code-number in octal, big-endian?.
-    uint16_t    dcs_receive;            ///< RX DCS code: 0=D000N, 511=D777N, 512=D000I, 1023=D777I, DCS code-number in octal, big-endian?.
+    uint16_t    dcs_transmit;           ///< TX DCS code: 0=D000N, 511=D777N, 512=D000I, 1023=D777I, DCS code-number in octal, little-endian.
+    uint16_t    dcs_receive;            ///< RX DCS code: 0=D000N, 511=D777N, 512=D000I, 1023=D777I, DCS code-number in octal, little-endian.
 
     // Bytes 16-19
     uint16_t    custom_ctcss;           ///< Custom CTCSS tone frequency: 0x09cf=251.1, 0x0a28=260, big-endian?.
@@ -110,7 +110,7 @@ public:
     uint8_t     _unused19;              ///< Unused, set to 0.
 
     // Bytes 20-23
-    uint16_t    contact_index;          ///< Contact index, zero-based, big-endian?
+    uint16_t    contact_index;          ///< Contact index, zero-based, little-endian
     uint16_t    _unused22;              ///< Unused, set to 0.
 
     // Byte 24
@@ -205,7 +205,7 @@ public:
     /** Constructs a generic @c Channel object from the codeplug channel. */
     Channel *toChannelObj() const;
     /** Links a previously constructed channel to the rest of the configuration. */
-    bool linkChannelObj(Channel *c, CodeplugContext &ctx) const;
+    bool linkChannelObj(Channel *c, const CodeplugContext &ctx) const;
     /** Initializes this codeplug channel from the given generic configuration. */
     void fromChannelObj(const Channel *c, const Config *conf);
   };
@@ -255,6 +255,45 @@ public:
 
     DigitalContact *toContactObj() const;
     void fromContactObj(const DigitalContact *contact);
+  };
+
+  struct __attribute__((packed)) grouplist_t {
+    // Bytes 0-255
+    uint32_t member[64];                ///< Contact indices, 0-based, little-endian.
+    // Bytes 256-319
+    uint8_t name[35];                   ///< Group-list name, up to 16 x ASCII, 0-terminated.
+    uint8_t unused[29];                 ///< Unused, set to 0.
+
+    grouplist_t();
+    void clear();
+    bool isValid() const;
+
+    QString getName() const;
+    void setName(const QString &name);
+
+    RXGroupList *toGroupListObj() const;
+    bool linkGroupList(RXGroupList *lst, const CodeplugContext &ctx);
+  };
+
+  struct __attribute__((packed)) radioid_t {
+    // Bytes 0-3.
+    uint32_t id;                        ///< Up to 8 BCD digits in little-endian.
+    // Byte 4.
+    uint8_t _unused4;                   ///< Unused, set to 0.
+    // Bytes 5-20
+    uint8_t name[16];                   ///< Name, up-to 16 ASCII chars, 0-terminated.
+    // Bytes 21-31
+    uint8_t _unused21[11];              ///< Unused, set to 0.
+
+    radioid_t();
+    void clear();
+    bool isValid() const;
+
+    QString getName() const;
+    void setName(const QString name);
+
+    uint32_t getId() const;
+    void setId(uint32_t num);
   };
 
 
