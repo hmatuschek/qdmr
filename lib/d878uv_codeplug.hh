@@ -296,6 +296,36 @@ public:
     void setId(uint32_t num);
   };
 
+  struct __attribute__((packed)) general_settings_t {
+    typedef enum {
+      PWON_DEFAULT = 0,         ///< Default.
+      PWON_CUSTOM_TEXT = 1,     ///< Custom text.
+      PWON_CUSTOM_IMG = 2       ///< Custom image.
+    } PowerOnDisplay;
+
+    // Bytes 0-5.
+    uint8_t  _unknown0[6];      ///< Unknown data.
+    // Bytes 6-7.
+    uint8_t  power_on;          ///< Power-on display.
+    uint8_t  _unused7;          ///< Unused, set to 0.
+    // Bytes 8-0x5ff.
+    uint8_t  _unknown8[0x5f8];   ///< Large unknown settings block.
+    // Bytes 0x600-0x61f
+    uint8_t intro_line1[16];    ///< Intro line 1, up to 14 ASCII characters, 0-terminated.
+    uint8_t intro_line2[16];    ///< Intro line 2, up to 14 ASCII characters, 0-terminated.
+    // Bytes 0x620-0x63f
+    uint8_t password[16];       ///< Boot password, up to 8 ASCII digits, 0-terminated.
+    uint8_t _unused630[16];     ///< Unused, set to 0xff.
+
+    general_settings_t();
+    void clear();
+
+    QString getIntroLine1() const;
+    void setIntroLine1(const QString line);
+    QString getIntroLine2() const;
+    void setIntroLine2(const QString line);
+  };
+
 
 public:
   /** Empty constructor. */

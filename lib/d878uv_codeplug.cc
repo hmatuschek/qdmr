@@ -61,6 +61,9 @@
 #define SCAN_BITMAP               0x024c1340 // Address of scan-list bitmap.
 #define SCAN_BITMAP_SIZE          0x00000040 // Size of scan-list bitmap.
 
+#define ADDR_GENERAL_CONFIG       0x02500000
+#define GENERAL_CONFIG_SIZE       0x00000640
+
 using namespace Signaling;
 
 Code ctcss_num2code[52] = {
@@ -553,6 +556,44 @@ D878UVCodeplug::radioid_t::setId(uint32_t num) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::general_settings_t
+ * ******************************************************************************************** */
+D878UVCodeplug::general_settings_t::general_settings_t() {
+  clear();
+}
+
+void
+D878UVCodeplug::general_settings_t::clear() {
+  power_on = PWON_DEFAULT;
+  _unused7 = 0;
+  memset(intro_line1, 0, sizeof(intro_line2));
+  memset(intro_line2, 0, sizeof(intro_line2));
+  memset(password, 0, sizeof(password));
+  memset(_unused630, 0, sizeof(_unused630));
+}
+
+QString
+D878UVCodeplug::general_settings_t::getIntroLine1() const {
+  return decode_ascii(intro_line1, 14, 0);
+}
+
+void
+D878UVCodeplug::general_settings_t::setIntroLine1(const QString line) {
+  encode_ascii(intro_line1, line, 14, 0);
+}
+
+QString
+D878UVCodeplug::general_settings_t::getIntroLine2() const {
+  return decode_ascii(intro_line2, 14, 0);
+}
+
+void
+D878UVCodeplug::general_settings_t::setIntroLine2(const QString line) {
+  encode_ascii(intro_line2, line, 14, 0);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug
  * ******************************************************************************************** */
 D878UVCodeplug::D878UVCodeplug(QObject *parent)
@@ -568,6 +609,8 @@ D878UVCodeplug::D878UVCodeplug(QObject *parent)
   image(0).addElement(ZONE_BITMAPS, ZONE_BITMAPS_SIZE);
   // All readio IDs
   image(0).addElement(ADDR_RADIOIDS, RADIOIDS_SIZE);
+  // General config
+  image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
 
   clear();
 }
@@ -734,6 +777,11 @@ D878UVCodeplug::decode(Config *config) {
     if (ctx.hasChannel(i))
       ch->linkChannelObj(ctx.getChannel(i), ctx);
   }
+
+  // Apply general settings
+  general_settings_t *settings = (general_settings_t *)data(ADDR_GENERAL_CONFIG);
+  config->setIntroLine1(settings->getIntroLine1());
+  config->setIntroLine2(settings->getIntroLine2());
 
   /// @bug Implement D878UV code-plug decoding.
   return true;
