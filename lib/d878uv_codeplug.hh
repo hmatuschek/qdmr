@@ -273,6 +273,7 @@ public:
 
     RXGroupList *toGroupListObj() const;
     bool linkGroupList(RXGroupList *lst, const CodeplugContext &ctx);
+    void fromGroupListObj(const RXGroupList *lst, const Config *conf);
   };
 
   struct __attribute__((packed)) radioid_t {
@@ -334,6 +335,7 @@ public:
   /** Clears and resets the complete codeplug to some default values. */
   void clear();
 
+  void setBitmaps(Config *config);
   void allocateFromBitmaps();
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */

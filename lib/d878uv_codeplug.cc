@@ -20,14 +20,14 @@
 #define CHANNEL_BITMAP            0x024c1500
 #define CHANNEL_BITMAP_SIZE       0x00000240
 
-#define NUM_CONTACTS              10000
-#define NUM_CONTACT_BANKS         313
-#define CONTACT_BANK_0            0x02680000
-#define CONTACT_BANK_SIZE         0x00000c80
-#define CONTACT_BANK_312          0x02772f80 // Last bank of 16 contacts
-#define CONTACT_BANK_312_SIZE     0x00000640 //
-#define CONTACTS_BITMAP           0x02640000
-#define CONTACTS_BITMAP_SIZE      0x00000500
+#define NUM_CONTACTS              10000      // total number of contacts
+#define NUM_CONTACT_BANKS         313        // number of contact banks
+#define CONTACT_BANK_0            0x02680000 // first bank of 32 contacts
+#define CONTACT_BANK_SIZE         0x00000c80 // size of 32 contacts
+#define CONTACT_BANK_312          0x02772f80 // last bank of 16 contacts
+#define CONTACT_BANK_312_SIZE     0x00000640 // size of last contact bank
+#define CONTACTS_BITMAP           0x02640000 // address of contact bitmap
+#define CONTACTS_BITMAP_SIZE      0x00000500 // size of contact bitmap
 
 #define NUM_RXGRP                 250
 #define ADDR_RXGRP_0              0x02980000
@@ -345,7 +345,9 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
   else
     scan_list_index = conf->scanlists()->indexOf(c->scanList());
   // Dispatch by channel type
-  if (const AnalogChannel *ac = c->as<AnalogChannel>()) {
+  if (c->is<AnalogChannel>()) {
+    const AnalogChannel *ac = c->as<const AnalogChannel>();
+    channel_mode = MODE_ANALOG;
     // pack analog channel config
     // set admit criterion
     switch (ac->admit()) {
@@ -359,7 +361,9 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     setTXTone(ac->txTone());
     // set bandwidth
     bandwidth = (AnalogChannel::BWNarrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
-  } else if (const DigitalChannel *dc = c->as<DigitalChannel>()) {
+  } else if (c->is<DigitalChannel>()) {
+    const DigitalChannel *dc = c->as<const DigitalChannel>();
+    channel_mode = MODE_DIGITAL;
     // pack digital channel config.
     // set admit criterion
     switch(dc->admit()) {
@@ -513,6 +517,19 @@ D878UVCodeplug::grouplist_t::linkGroupList(RXGroupList *lst, const CodeplugConte
   return true;
 }
 
+void
+D878UVCodeplug::grouplist_t::fromGroupListObj(const RXGroupList *lst, const Config *conf) {
+  // set name of group list
+  setName(lst->name());
+  // set members
+  for (uint8_t i=0; i<64; i++) {
+    if (i < lst->count())
+      member[i] = qToLittleEndian(conf->contacts()->indexOfDigital(lst->contact(i)));
+    else
+      member[i] = 0xffffffff;
+  }
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::radioid_t
@@ -591,6 +608,7 @@ void
 D878UVCodeplug::general_settings_t::setIntroLine2(const QString line) {
   encode_ascii(intro_line2, line, 14, 0);
 }
+
 
 
 /* ******************************************************************************************** *
@@ -676,14 +694,105 @@ D878UVCodeplug::allocateFromBitmaps() {
   image(0).addElement(ADDR_ZONE_NAME, NUM_ZONES*ZONE_NAME_OFFSET);
 }
 
+void
+D878UVCodeplug::setBitmaps(Config *config)
+{
+  // Mark valid channels (set bit)
+  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
+  memset(channel_bitmap, 0x00, CHANNEL_BITMAP_SIZE);
+  for (int i=0; i<config->channelList()->count(); i++) {
+    uint16_t bit = i%8, byte = i/8;
+    channel_bitmap[byte] |= (1 << bit);
+  }
+
+  // Mark valid contacts (clear bit)
+  uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
+  memset(contact_bitmap, 0xff, CONTACTS_BITMAP_SIZE);
+  for (int i=0; i<config->contacts()->digitalCount(); i++) {
+    uint16_t bit = i%8, byte = i/8;
+    contact_bitmap[byte] &= ~(1 << bit);
+  }
+
+  // Mark valid zones (set bits)
+  uint8_t *zone_a_bitmap = data(ZONE_A_BITMAP);
+  uint8_t *zone_b_bitmap = data(ZONE_A_BITMAP);
+  memset(zone_a_bitmap, 0, ZONE_BITMAPS_SIZE);
+  for (int i=0; i<config->zones()->count(); i++) {
+    uint16_t bit = i%8, byte = i/8;
+    zone_a_bitmap[byte] |= (1 << bit);
+    zone_b_bitmap[byte] |= (1 << bit);
+  }
+}
+
+
 bool
-D878UVCodeplug::encode(Config *config) {
-  /// @bug Implement D878UV code-plug encoding.
+D878UVCodeplug::encode(Config *config)
+{
+  // Encode radio IDs
+  radioid_t *radio_ids = (radioid_t *)data(ADDR_RADIOIDS);
+  for (int i=1; i<NUM_RADIOIDS; i++)
+    radio_ids[i].clear();
+  radio_ids[0].setId(config->id());
+  radio_ids[0].setName(config->name());
+
+  // Encode general config
+  general_settings_t *settings = (general_settings_t *)data(ADDR_GENERAL_CONFIG);
+  settings->setIntroLine1(config->introLine1());
+  settings->setIntroLine2(config->introLine2());
+
+  // Encode channels
+  for (int i=0; i<config->channelList()->count(); i++) {
+    uint16_t bank = i/128, idx = i%128;
+    channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
+                                      +bank*CHANNEL_BANK_OFFSET
+                                      +idx*sizeof(channel_t));
+    ch->fromChannelObj(config->channelList()->channel(i), config);
+  }
+
+  // Encode contacts
+  for (int i=0; i<config->contacts()->digitalCount(); i++) {
+    contact_t *con = (contact_t *)data(CONTACT_BANK_0+i*sizeof(contact_t));
+    con->fromContactObj(config->contacts()->digitalContact(i));
+  }
+
+  // Encode RX group-lists
+  for (int i=0; i<NUM_RXGRP; i++) {
+    grouplist_t *grp = (grouplist_t *)data(ADDR_RXGRP_0+i*RXGRP_OFFSET);
+    grp->clear();
+    if (i<config->rxGroupLists()->count())
+      grp->fromGroupListObj(config->rxGroupLists()->list(i), config);
+  }
+
+  for (int i=0; i<config->zones()->count(); i++) {
+    uint8_t  *name     = (uint8_t *)data(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET);
+    uint16_t *channels = (uint16_t *)data(ADDR_ZONE+i*ZONE_OFFSET);
+    encode_ascii(name, config->zones()->zone(i)->name(), 16, 0);
+    int nch_a = config->zones()->zone(i)->A()->count();
+    int nch_b = config->zones()->zone(i)->B()->count();
+    for (int j=0; j<NUM_CH_PER_ZONE; j++) {
+      if (j < nch_a) {
+        channels[j] = qToLittleEndian(
+              config->channelList()->indexOf(
+                config->zones()->zone(i)->A()->channel(j)));
+      } else if (j < (nch_a+nch_b)) {
+        channels[j] = qToLittleEndian(
+              config->channelList()->indexOf(
+                config->zones()->zone(i)->B()->channel(j-nch_a)));
+      } else {
+        channels[j] = 0xffff;
+      }
+    }
+  }
+
+  /// @bug Implement scan-list D878UV code-plug encoding.
+  /// @bug Implement analog contact D878UV code-plug encoding.
+  /// @bug Implement GPS D878UV code-plug encoding.
   return true;
 }
 
 bool
-D878UVCodeplug::decode(Config *config) {
+D878UVCodeplug::decode(Config *config)
+{
   // Maps code-plug indices to objects
   CodeplugContext ctx(config);
 
@@ -783,6 +892,9 @@ D878UVCodeplug::decode(Config *config) {
   config->setIntroLine1(settings->getIntroLine1());
   config->setIntroLine2(settings->getIntroLine2());
 
-  /// @bug Implement D878UV code-plug decoding.
+  /// @bug Implement scan-list D878UV code-plug decoding.
+  /// @bug Implement analog contact D878UV code-plug decoding.
+  /// @bug Implement GPS D878UV code-plug decoding.
+
   return true;
 }

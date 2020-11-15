@@ -10,6 +10,7 @@
 #include "rd5r_codeplug.hh"
 #include "gd77_codeplug.hh"
 #include "opengd77_codeplug.hh"
+#include "d878uv_codeplug.hh"
 #include "crc32.hh"
 
 
@@ -85,6 +86,23 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
     OpenGD77Codeplug codeplug;
+    codeplug.encode(&config);
+    if (! codeplug.write(parser.positionalArguments().at(2))) {
+      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
+                 << "': " << codeplug.errorMessage();
+      return -1;
+    }
+  } else if ("d878uv"==parser.value("radio").toLower()) {
+    Config config;
+    QString errorMessage;
+    QTextStream stream(&infile);
+    if (! config.readCSV(stream, errorMessage)) {
+      logError() << "Cannot parse CSV codeplug '" << infile.fileName() << "': " << errorMessage;
+      return -1;
+    }
+    D878UVCodeplug codeplug;
+    codeplug.setBitmaps(&config);
+    codeplug.allocateFromBitmaps();
     codeplug.encode(&config);
     if (! codeplug.write(parser.positionalArguments().at(2))) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)

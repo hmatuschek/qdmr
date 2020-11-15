@@ -56,7 +56,7 @@ protected:
 
   struct __attribute__((packed)) ReadResponse {
     char cmd;      ///< Fixed to 'R'.
-    uint32_t addr; ///< Memory address in little-endian.
+    uint32_t addr; ///< Memory address in big-endian.
     uint8_t size;  ///< Fixed to 64.
     char data[64]; ///< The actual data.
     uint8_t sum;   ///< Sum over address, size and data.
@@ -67,7 +67,7 @@ protected:
 
   struct __attribute__((packed)) WriteRequest {
     char cmd;      ///< Fixed to 'W'
-    uint32_t addr; ///< Memory address in little-endian.
+    uint32_t addr; ///< Memory address in big-endian.
     uint8_t size;  ///< Fixed to 16
     char data[16]; ///< The actual data.
     uint8_t sum;   ///< Sum over addr, size and data.

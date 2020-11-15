@@ -40,6 +40,9 @@ protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
 	void run();
 
+  bool download();
+  bool upload();
+
 protected:
   /** The device identifier. */
 	QString _name;

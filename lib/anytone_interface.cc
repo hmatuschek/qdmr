@@ -55,11 +55,11 @@ AnytoneInterface::WriteRequest::WriteRequest(uint32_t addr, const char *data) {
   cmd = 'W';
   this->addr = qToBigEndian(addr);
   size = 16;
+  memcpy(this->data, data, size);
   sum = 0;
-  for (uint8_t i=0; i<size; i++) {
-    this->data[i] = data[i];
-    sum += ((const uint8_t *)data)[i];
-  }
+  uint8_t *b=(uint8_t *)this;
+  for (uint8_t i=1; i<(size+6); i++)
+    sum += b[i];
   ack = 6;
 }
 
@@ -143,10 +143,12 @@ AnytoneInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
     return false;
   }
 
+  logDebug() << "Anytone: Write " << nbytes << "b to addr 0x" << QString::number(addr, 16) << "...";
+
   for (int i=0; i<nbytes; i+=16) {
     uint8_t ack;
     WriteRequest req(addr+i, (const char *)(data+i));
-    if (! send_receive((const char *)&req, sizeof(ReadRequest),(char *)&ack, 1)) {
+    if (! send_receive((const char *)&req, sizeof(WriteRequest),(char *)&ack, 1)) {
       _errorMessage = tr("Anytone: Cannot write data to device: %1").arg(_errorMessage);
       logError() << _errorMessage;
       return false;
@@ -339,7 +341,7 @@ AnytoneInterface::send_receive(const char *cmd, int clen, char *resp, int rlen) 
   int len = rlen;
   while (len > 0) {
     if (! waitForReadyRead(1000)) {
-      _errorMessage = "Cannot response from device: Timeout.";
+      _errorMessage = "No response from device: Timeout.";
       logError() << _errorMessage;
       close();
       _state = STATE_ERROR;
