@@ -294,7 +294,7 @@ found:
     return new UV390();
   } else if ("OpenGD77" == id) {
     return new OpenGD77();
-  } else if ("D878UV" == id) {
+  } else if (("D868UV" == id) || ("D868UVE" == id) || ("D6X2UV" == id) || ("D878UV" == id)) {
     return new D878UV();
   }
 

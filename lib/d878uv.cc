@@ -215,14 +215,14 @@ D878UV::upload() {
   logDebug() << "Upload " << _codeplug.image(0).numElements() << " elements.";
 
   // First set bitmaps according to config
-  _codeplug.setBitmaps(_config);
+  //_codeplug.setBitmaps(_config);
 
   // Allocate all memory sections needed
-  uint nstart = _codeplug.image(0).numElements();
-  _codeplug.allocateFromBitmaps();
+  //uint nstart = _codeplug.image(0).numElements();
+  //_codeplug.allocateFromBitmaps();
 
   // Download touched memory sections
-  for (int n=nstart; n<_codeplug.image(0).numElements(); n++) {
+  for (int n=0; n<_codeplug.image(0).numElements(); n++) {
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();
     logDebug() << "Download of block " << n << " " << hex << addr << ":" << size;
@@ -239,6 +239,28 @@ D878UV::upload() {
     }
     emit uploadProgress(float(n*50)/_codeplug.image(0).numElements());
   }
+
+  _codeplug.setBitmaps(_config);
+  _codeplug.allocateFromBitmaps();
+
+  for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+    uint addr = _codeplug.image(0).element(n).address();
+    uint size = _codeplug.image(0).element(n).data().size();
+    logDebug() << "Download of block " << n << " " << hex << addr << ":" << size;
+    if (! _dev->read(0, addr, _codeplug.data(addr), size)) {
+      _errorMessage = QString("%1 Cannot read codeplug for update: %2").arg(__func__)
+          .arg(_dev->errorMessage());
+      logError() << _errorMessage;
+      _task = StatusError;
+      _dev->reboot();
+      _dev->close();
+      _dev->deleteLater();
+      emit uploadError(this);
+      return false;
+    }
+    emit uploadProgress(float(n*50)/_codeplug.image(0).numElements());
+  }
+
 
   // Update binary codeplug from config
   if (! _codeplug.encode(_config)) {

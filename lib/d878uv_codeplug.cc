@@ -13,12 +13,12 @@
 #define NUM_CHANNELS              4000
 #define NUM_CHANNEL_BANKS         32
 #define CHANNEL_BANK_0            0x00800000
-#define CHANNEL_BANK_SIZE         0x00020000
+#define CHANNEL_BANK_SIZE         0x00002000
 #define CHANNEL_BANK_31           0x00fc0000
 #define CHANNEL_BANK_31_SIZE      0x00000880
 #define CHANNEL_BANK_OFFSET       0x00040000
 #define CHANNEL_BITMAP            0x024c1500
-#define CHANNEL_BITMAP_SIZE       0x00000240
+#define CHANNEL_BITMAP_SIZE       0x00000200
 
 #define NUM_CONTACTS              10000      // total number of contacts
 #define NUM_CONTACT_BANKS         313        // number of contact banks
@@ -42,6 +42,8 @@
 #define ADDR_ZONE_NAME            0x02540000
 #define ZONE_NAME_SIZE            0x00000010
 #define ZONE_NAME_OFFSET          0x00000020
+#define ADDR_ZONE_CH_A            0x02500100
+#define ADDR_ZONE_CH_B            0x02500200
 #define ZONE_BITMAPS              0x024c1300
 #define ZONE_BITMAPS_SIZE         0x00000040
 #define ZONE_A_BITMAP             0x024c1300
@@ -111,7 +113,7 @@ D878UVCodeplug::channel_t::channel_t() {
 
 void
 D878UVCodeplug::channel_t::clear() {
-  memset(this, 0xff, sizeof(D878UVCodeplug::channel_t));
+  memset(this, 0, sizeof(D878UVCodeplug::channel_t));
 }
 
 bool
@@ -329,6 +331,7 @@ D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
 
 void
 D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
+  clear();
   // Pack common channel config
   // set channel name
   setName(c->name());
@@ -483,7 +486,9 @@ D878UVCodeplug::grouplist_t::grouplist_t() {
 
 void
 D878UVCodeplug::grouplist_t::clear() {
-  memset(this, 0xff, sizeof(D878UVCodeplug::grouplist_t));
+  memset(member, 0xff, sizeof(member));
+  memset(name, 0x00, sizeof(name));
+  memset(unused, 0x00, sizeof(unused));
 }
 
 bool
@@ -705,17 +710,17 @@ D878UVCodeplug::setBitmaps(Config *config)
     channel_bitmap[byte] |= (1 << bit);
   }
 
-  // Mark valid contacts (clear bit)
+  /*// Mark valid contacts (clear bit)
   uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
   memset(contact_bitmap, 0xff, CONTACTS_BITMAP_SIZE);
   for (int i=0; i<config->contacts()->digitalCount(); i++) {
     uint16_t bit = i%8, byte = i/8;
     contact_bitmap[byte] &= ~(1 << bit);
-  }
+  }*/
 
   // Mark valid zones (set bits)
   uint8_t *zone_a_bitmap = data(ZONE_A_BITMAP);
-  uint8_t *zone_b_bitmap = data(ZONE_A_BITMAP);
+  uint8_t *zone_b_bitmap = data(ZONE_B_BITMAP);
   memset(zone_a_bitmap, 0, ZONE_BITMAPS_SIZE);
   for (int i=0; i<config->zones()->count(); i++) {
     uint16_t bit = i%8, byte = i/8;
@@ -728,7 +733,7 @@ D878UVCodeplug::setBitmaps(Config *config)
 bool
 D878UVCodeplug::encode(Config *config)
 {
-  // Encode radio IDs
+  /*// Encode radio IDs
   radioid_t *radio_ids = (radioid_t *)data(ADDR_RADIOIDS);
   for (int i=1; i<NUM_RADIOIDS; i++)
     radio_ids[i].clear();
@@ -739,6 +744,7 @@ D878UVCodeplug::encode(Config *config)
   general_settings_t *settings = (general_settings_t *)data(ADDR_GENERAL_CONFIG);
   settings->setIntroLine1(config->introLine1());
   settings->setIntroLine2(config->introLine2());
+  */
 
   // Encode channels
   for (int i=0; i<config->channelList()->count(); i++) {
@@ -749,7 +755,7 @@ D878UVCodeplug::encode(Config *config)
     ch->fromChannelObj(config->channelList()->channel(i), config);
   }
 
-  // Encode contacts
+  /*// Encode contacts
   for (int i=0; i<config->contacts()->digitalCount(); i++) {
     contact_t *con = (contact_t *)data(CONTACT_BANK_0+i*sizeof(contact_t));
     con->fromContactObj(config->contacts()->digitalContact(i));
@@ -761,15 +767,33 @@ D878UVCodeplug::encode(Config *config)
     grp->clear();
     if (i<config->rxGroupLists()->count())
       grp->fromGroupListObj(config->rxGroupLists()->list(i), config);
-  }
+  } */
 
+  // Clear zone names
+  memset(data(ADDR_ZONE_NAME), 0xff, NUM_ZONES*ZONE_NAME_OFFSET);
+  // Encode zones
   for (int i=0; i<config->zones()->count(); i++) {
     uint8_t  *name     = (uint8_t *)data(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET);
     uint16_t *channels = (uint16_t *)data(ADDR_ZONE+i*ZONE_OFFSET);
+    // Clear name
+    memset(name, 0, ZONE_NAME_OFFSET);
+    memset(channels, 0xff, ZONE_OFFSET);
     encode_ascii(name, config->zones()->zone(i)->name(), 16, 0);
     int nch_a = config->zones()->zone(i)->A()->count();
     int nch_b = config->zones()->zone(i)->B()->count();
     for (int j=0; j<NUM_CH_PER_ZONE; j++) {
+      if (0 == j) {
+        ((uint16_t *)data(ADDR_ZONE_CH_A))[i] = qToLittleEndian(
+              config->channelList()->indexOf(
+                config->zones()->zone(i)->A()->channel(j)));
+        ((uint16_t *)data(ADDR_ZONE_CH_B))[i] = qToLittleEndian(
+              config->channelList()->indexOf(
+                config->zones()->zone(i)->A()->channel(j)));
+      } else if (1 == j) {
+        ((uint16_t *)data(ADDR_ZONE_CH_B))[i] = qToLittleEndian(
+              config->channelList()->indexOf(
+                config->zones()->zone(i)->A()->channel(j)));
+      }
       if (j < nch_a) {
         channels[j] = qToLittleEndian(
               config->channelList()->indexOf(
