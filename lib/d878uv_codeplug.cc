@@ -470,6 +470,7 @@ D878UVCodeplug::contact_t::toContactObj() const {
 
 void
 D878UVCodeplug::contact_t::fromContactObj(const DigitalContact *contact) {
+  clear();
   setType(contact->type());
   setName(contact->name());
   setId(contact->number());
@@ -524,6 +525,7 @@ D878UVCodeplug::grouplist_t::linkGroupList(RXGroupList *lst, const CodeplugConte
 
 void
 D878UVCodeplug::grouplist_t::fromGroupListObj(const RXGroupList *lst, const Config *conf) {
+  clear();
   // set name of group list
   setName(lst->name());
   // set members
@@ -634,8 +636,6 @@ D878UVCodeplug::D878UVCodeplug(QObject *parent)
   image(0).addElement(ADDR_RADIOIDS, RADIOIDS_SIZE);
   // General config
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
-
-  clear();
 }
 
 void
@@ -692,7 +692,7 @@ D878UVCodeplug::allocateFromBitmaps() {
     // If valid ...
     if (0 == ((zone_bitmap[byte]>>bit) & 0x01))
       continue;
-    // Allocate zone name and zone itself
+    // Allocate zone itself
     image(0).addElement(ADDR_ZONE+i*ZONE_OFFSET, ZONE_SIZE);
   }
   // but allocate all zone names (only 8k)
@@ -704,19 +704,20 @@ D878UVCodeplug::setBitmaps(Config *config)
 {
   // Mark valid channels (set bit)
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
-  memset(channel_bitmap, 0x00, CHANNEL_BITMAP_SIZE);
+  memset(channel_bitmap, 0, CHANNEL_BITMAP_SIZE);
   for (int i=0; i<config->channelList()->count(); i++) {
     uint16_t bit = i%8, byte = i/8;
     channel_bitmap[byte] |= (1 << bit);
   }
 
-  /*// Mark valid contacts (clear bit)
+  // Mark valid contacts (clear bit)
   uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
   memset(contact_bitmap, 0xff, CONTACTS_BITMAP_SIZE);
+  memset(contact_bitmap+0x4e3, 0, 13);
   for (int i=0; i<config->contacts()->digitalCount(); i++) {
     uint16_t bit = i%8, byte = i/8;
     contact_bitmap[byte] &= ~(1 << bit);
-  }*/
+  }
 
   // Mark valid zones (set bits)
   uint8_t *zone_a_bitmap = data(ZONE_A_BITMAP);
@@ -755,13 +756,13 @@ D878UVCodeplug::encode(Config *config)
     ch->fromChannelObj(config->channelList()->channel(i), config);
   }
 
-  /*// Encode contacts
+  // Encode contacts
   for (int i=0; i<config->contacts()->digitalCount(); i++) {
     contact_t *con = (contact_t *)data(CONTACT_BANK_0+i*sizeof(contact_t));
     con->fromContactObj(config->contacts()->digitalContact(i));
   }
 
-  // Encode RX group-lists
+  /*// Encode RX group-lists
   for (int i=0; i<NUM_RXGRP; i++) {
     grouplist_t *grp = (grouplist_t *)data(ADDR_RXGRP_0+i*RXGRP_OFFSET);
     grp->clear();

@@ -32,7 +32,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
          << "UserDB: " << (config->uploadUserDB() ? "On" : "Off") << "\n\n";
 
   stream << "# Table of digital channels.\n"
-            "# 1) Channel number: 1-1024\n"
+            "# 1) Channel number.\n"
             "# 2) Name in quotes. E.g., \"NAME\" \n"
             "# 3) Receive frequency in MHz\n"
             "# 4) Transmit frequency or +/- offset in MHz\n"
@@ -86,7 +86,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
   stream << "\n";
 
   stream << "# Table of analog channels.\n"
-            "# 1) Channel number: 1-1024\n"
+            "# 1) Channel number.\n"
             "# 2) Name in quotes.\n"
             "# 3) Receive frequency in MHz\n"
             "# 4) Transmit frequency or +/- offset in MHz\n"
@@ -159,7 +159,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
   stream << "\n";
 
   stream << "# Table of scan lists.\n"
-            "# 1) Scan list number: 1-250\n"
+            "# 1) Scan list number.\n"
             "# 2) Name in quotes.\n"
             "# 3) Priority channel 1 (50% of scans): -, Sel or index\n"
             "# 4) Priority channel 2 (25% of scans): -, Sel or index\n"
@@ -218,7 +218,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
   stream << "\n";
 
   stream << "# Table of contacts.\n"
-            "# 1) Contact number: 1-256\n"
+            "# 1) Contact number.\n"
             "# 2) Name in quotes.\n"
             "# 3) Call type: Group, Private, All or DTMF\n"
             "# 4) Call ID: 1...16777215 or string with DTMF number\n"
@@ -250,7 +250,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
   stream << "\n";
 
   stream << "# Table of group lists.\n"
-            "# 1) Group list number: 1-64\n"
+            "# 1) Group list number.\n"
             "# 2) Name in quotes.\n"
             "# 3) List of contacts: numbers and ranges (N-M) separated by comma\n"
             "#\n"

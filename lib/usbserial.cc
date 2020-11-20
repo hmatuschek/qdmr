@@ -62,10 +62,10 @@ USBSerial::errorMessage() const {
 
 void
 USBSerial::onError(QSerialPort::SerialPortError err) {
-  logError() <<": Serial port error: (" << err << ") " << errorString() << ".";
+  //logError() <<": Serial port error: (" << err << ") " << errorString() << ".";
 }
 
 void
 USBSerial::onClose() {
-  logError() << ": Serial port will close now.";
+  //logInfo() << ": Serial port will close now.";
 }
