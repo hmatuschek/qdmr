@@ -35,10 +35,11 @@ OpenGD77Codeplug::OpenGD77Codeplug(QObject *parent)
 }
 
 bool
-OpenGD77Codeplug::encode(Config *config) {
+OpenGD77Codeplug::encode(Config *config, bool update) {
   // pack basic config
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS, EEPROM);
-  gs->initDefault();
+  if (! update)
+    gs->initDefault();
   gs->setName(config->name());
   gs->setRadioId(config->id());
 

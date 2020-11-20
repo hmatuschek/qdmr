@@ -217,7 +217,7 @@ UV390::run() {
     }
 
     // Encode config into codeplug
-    _codeplug.encode(_config);
+    _codeplug.encode(_config, _codeplugUpdate);
 
     // then erase memory
     _dev->erase(0, 0xd0000);

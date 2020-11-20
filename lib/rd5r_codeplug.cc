@@ -1101,7 +1101,7 @@ RD5RCodeplug::decode(Config *config)
 }
 
 bool
-RD5RCodeplug::encode(Config *config)
+RD5RCodeplug::encode(Config *config, bool update)
 {
   // set timestamp
   timestamp_t *ts = (timestamp_t *)data(OFFSET_TIMESTMP);
@@ -1109,13 +1109,15 @@ RD5RCodeplug::encode(Config *config)
 
   // pack basic config
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
-  gs->initDefault();
+  if (! update)
+    gs->initDefault();
   gs->setName(config->name());
   gs->setRadioId(config->id());
 
   // store default button settings
   button_settings_t *bs = (button_settings_t *)data(OFFSET_BUTTONS);
-  bs->initDefault();
+  if (! update)
+    bs->initDefault();
 
   intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
   it->setIntroLine1(config->introLine1());

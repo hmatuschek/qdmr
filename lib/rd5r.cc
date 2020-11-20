@@ -173,7 +173,7 @@ RD5R::run()
     }
 
     // Encode config into codeplug
-    if (! _codeplug.encode(_config)) {
+    if (! _codeplug.encode(_config, _codeplugUpdate)) {
       _errorMessage = tr("%1(): Upload failed: %2")
           .arg(__func__).arg(_codeplug.errorMessage());
       _task = StatusError;

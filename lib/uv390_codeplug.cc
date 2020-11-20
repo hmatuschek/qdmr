@@ -1337,7 +1337,7 @@ UV390Codeplug::clear()
 }
 
 bool
-UV390Codeplug::encode(Config *config) {
+UV390Codeplug::encode(Config *config, bool update) {
   // Set timestamp
   ((timestamp_t *)(data(OFFSET_TIMESTMP)))->set();
 

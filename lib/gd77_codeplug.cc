@@ -335,14 +335,15 @@ GD77Codeplug::GD77Codeplug(QObject *parent)
 }
 
 bool
-GD77Codeplug::encode(Config *config) {
+GD77Codeplug::encode(Config *config, bool update) {
   // set timestamp
   timestamp_t *ts = (timestamp_t *)data(OFFSET_TIMESTMP);
   ts->setNow();
 
   // pack basic config
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
-  gs->initDefault();
+  if (! update)
+    gs->initDefault();
   gs->setName(config->name());
   gs->setRadioId(config->id());
 
