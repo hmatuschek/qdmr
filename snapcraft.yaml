@@ -23,6 +23,8 @@ apps:
       - network
       - raw-usb
       - serial-port
+    extensions:
+      - kde-neon
 
 parts:
   qdmr:
