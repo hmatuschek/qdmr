@@ -661,10 +661,10 @@ void
 RD5RCodeplug::button_settings_t::initDefault() {
   clear();
   long_press_dur = 0x06;
-  sk1_short      = 0x00;
-  sk1_long       = 0x00;
-  sk2_short      = 0x00;
-  sk2_short      = 0x00;
+  sk1_short      = ZoneSelect;
+  sk1_long       = ToggleFMRadio;
+  sk2_short      = ToggleMonitor;
+  sk2_long       = ToggleFlashLight;
 }
 
 
