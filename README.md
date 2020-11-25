@@ -12,7 +12,8 @@ and **platform-independent** CPS for several (mainly Chinese) DMR radios.
 Currently, there are only two supported radios
 
   * Open GD77 firmware
-  * Baofeng/Radioddity RD-5R
+  * Radioddity GD77 (untested)
+  * Baofeng/Radioddity RD-5R & RD-5R+
   * TYT MD-UV390 / Retevis RT3S
 
 The limited amount of supported radios is due to the fact, that I only own these radios to test
@@ -20,6 +21,7 @@ the software with.
 
 
 ## Releases
+ * **[Version 0.4.5](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.5)** -- Bugfix release.
  * **[Version 0.4.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.3)** -- Bugfix release.
  * **[Version 0.4.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.1)** -- Bugfix release.
  * **[Version 0.4.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.0)** -- Added Open GD77 support.
@@ -33,8 +35,8 @@ the software with.
 Currently there is only a binary for MacOS X and Ubuntu Linux. The MacOS X binary can be downloaded
 from the [current release](https://github.com/hmatuschek/qdmr/releases/).
 
-Under Ubuntu Linux, you may add my [PPA](https://launchpad.net/~hmatuschek/+archive/ubuntu/ppa) to
-your list of Software sources with
+Under Ubuntu Linux (bionic and later), you may add my
+[PPA](https://launchpad.net/~hmatuschek/+archive/ubuntu/ppa) to your list of Software sources with
 
     sudo add-apt-repository ppa:hmatuschek/ppa
     sudo apt-get update
