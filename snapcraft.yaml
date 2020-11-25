@@ -30,11 +30,19 @@ parts:
   qdmr:
     plugin: cmake
     build-packages:
+      - qtbase5-dev
+      - qttools5-dev
+      - qttools5-dev-tools
+      - qtpositioning5-dev
+      - libqt5serialport5-dev
       - libusb-1.0-0-dev
-    build-snaps:
-      - kde-frameworks-5-core18-sdk
-      - kde-frameworks-5-core18
     stage-packages:
+      - libqt5core5a
+      - libqt5gui5
+      - libqt5network5
+      - libqt5positioning5
+      - libqt5serialport5
+      - libqt5widgets5
       - libusb-1.0-0
     source: https://github.com/hmatuschek/qdmr.git
     source-type: git
