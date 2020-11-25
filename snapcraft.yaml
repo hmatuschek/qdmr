@@ -41,7 +41,8 @@ parts:
       - libqt5positioning5
       - libqt5serialport5
       - libqt5widgets5
-      - libusb-1.0-0    
+      - qt5dxcb-plugin
+      - libusb-1.0-0
     source: https://github.com/hmatuschek/qdmr.git
     source-type: git
     #source-tag: "v$SNAPCRAFT_PROJECT_VERSION"

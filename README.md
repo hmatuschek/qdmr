@@ -64,7 +64,7 @@ Finally execute `sudo udevadm control --reload-rules` to activate these new rule
 
 ## License
 qdmr - A GUI application and command-line-tool to program DMR radios.
-Copyright (C) 2019 Hannes Matuschek, DM3MAT
+Copyright (C) 2019-2020 Hannes Matuschek, DM3MAT
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
