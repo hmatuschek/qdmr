@@ -269,18 +269,21 @@ OpenGD77Codeplug::decode(Config *config) {
     if (! zt){
       _errorMessage = QString("%1(): Cannot access zone table memory.")
           .arg(__func__);
+      logError() << _errorMessage;
       return false;
     }
 
     // if zone is disabled -> skip
-    if (! (zt->bitmap[i / 8] >> (i & 7) & 1) )
+    if (! ((zt->bitmap[i / 8] >> (i & 7)) & 1) )
       continue;
+    logDebug() << "Unpack zone " << i+1 << "...";
 
     // get zone_t
     zone_t *z = &zt->zone[i];
     if (! z){
       _errorMessage = QString("%1(): Cannot access zone at index %2")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
 
@@ -289,14 +292,23 @@ OpenGD77Codeplug::decode(Config *config) {
     if (nullptr == zone) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid zone at index %2")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
+
     if (! z->linkZoneObj(zone, config, channel_table)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
-    config->zones()->addZone(zone);
+
+    if (! config->zones()->addZone(zone)) {
+      _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot add zone %2 '%3' to list.")
+          .arg(__func__).arg(i).arg(zone->name());
+      logError() << _errorMessage;
+      return false;
+    }
   }
 
   /* Unpack Scan lists */
