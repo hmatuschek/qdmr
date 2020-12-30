@@ -62,6 +62,7 @@ When running *qdmr* or *dmrconf* under Linux, you may need to change the permiss
 
 Finally execute `sudo udevadm control --reload-rules` to activate these new rules.
 
+### Snap package and USB interface
 If you use the snap image of *qdmr*, you must (for now) grant access to the raw USB interface for
 *qdmr*. Otherwise, *qdmr* will not find any USB devices. That is, execute
 
