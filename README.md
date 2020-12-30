@@ -66,10 +66,16 @@ If you use the snap image of *qdmr*, you must (for now) grant access to the raw 
 *qdmr*. Otherwise, *qdmr* will not find any USB devices. That is, execute
 
     snap connect qdmr:raw-usb
-    snap connect qdmr:serial-port
 
 in a terminal. I'll request an auto-connect for this snap image, so this step is not needed in
 future. For the time being, however, you have to do that manually.
+
+### Snap package and serial interface
+Please note that it is very hard to gain access for a serial port for a snap image, hence it is 
+(for now) *impossible to access the OpenGD77 and the upcoming AnyTone devices using the snap 
+package of qdmr*. Please resort to the DEB package from my PPA. Any other direct USB (non-serial) 
+interface should work (i.e., RD5-R, GD77 and Retevis/TyT).
+
 
 ## License
 qdmr - A GUI application and command-line-tool to program DMR radios.
