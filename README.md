@@ -77,6 +77,39 @@ Please note that it is very hard to gain access for a serial port for a snap ima
 package of qdmr*. Please resort to the DEB package from my PPA. Any other direct USB (non-serial) 
 interface should work (i.e., RD5-R, GD77 and Retevis/TyT).
 
+## Building from sources
+To build the lastest development version of QDMR, you may build it and the command-line-tool `dmrconf` from 
+sources.
+
+Fist install git, the compiler and all needed dependencies with
+```
+$ sudo apt-get install build-essential git cmake 
+$ sudo apt-get install libusb-1.0-0-dev qtbase5-dev, qttools5-dev, qttools5-dev-tools, qtpositioning5-dev, libqt5serialport5-dev
+```
+
+Then clone the repository with
+```
+$ git clone https://github.com/hmatuschek/qdmr.git
+```
+If you already cloned that repository, you can update the sources to the latest version with (from within the `qdmr` directory)
+```
+$ git pull
+```
+
+This should create a new directory named `qdmr`. Enter this directory, create and enter a build-directory and configure the build with
+```
+cd qdmr
+mkdir build
+cd build
+cmake .. -DMAKE_INSTALL_PREFIX=~/.local/
+```
+This configures the build to later install binaries in your home directory and not on the system. This has to be done only once.
+
+To build and install the sources run
+```
+make
+make install
+```
 
 ## License
 qdmr - A GUI application and command-line-tool to program DMR radios.
