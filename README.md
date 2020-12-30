@@ -85,7 +85,7 @@ sources.
 Fist install git, the compiler and all needed dependencies with
 ```
 $ sudo apt-get install build-essential git cmake 
-$ sudo apt-get install libusb-1.0-0-dev qtbase5-dev, qttools5-dev, qttools5-dev-tools, qtpositioning5-dev, libqt5serialport5-dev
+$ sudo apt-get install libusb-1.0-0-dev qtbase5-dev qttools5-dev qttools5-dev-tools qtpositioning5-dev libqt5serialport5-dev
 ```
 
 Then clone the repository with
@@ -102,14 +102,14 @@ This should create a new directory named `qdmr`. Enter this directory, create an
 $ cd qdmr
 $ mkdir build
 $ cd build
-$ cmake .. -DMAKE_INSTALL_PREFIX=~/.local/
+$ cmake .. 
 ```
-This configures the build to install the binaries in your home directory and not on the system. This has to be done only once.
+This has to be done only once.
 
 To build and install the binaries run
 ```
 $ make
-$ make install
+$ sudo make install
 ```
 
 ## License
