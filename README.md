@@ -52,7 +52,8 @@ or the command-line-tool with
 [![qdmr](https://snapcraft.io//qdmr/badge.svg)](https://snapcraft.io/qdmr)
 
 ### Permissions
-When running *qdmr* or *dmrconf* under Linux, you may need to change the permissions to access USB devices.  Create a file /etc/udev/rules.d/99-dmr.rules with the following contents:
+When running *qdmr* or *dmrconf* under Linux, you may need to change the permissions to access USB devices.  
+Create a file /etc/udev/rules.d/99-dmr.rules with the following contents:
 
     # TYT MD-UV380
     SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", MODE="666"
