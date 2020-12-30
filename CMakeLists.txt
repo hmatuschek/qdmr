@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.8)
 project(qdmr)
 
+option(BUILD_TESTS "Build test programs" OFF)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
 find_package(Qt5Core REQUIRED)
@@ -76,8 +78,10 @@ add_subdirectory(lib)
 add_subdirectory(cli)
 add_subdirectory(src)
 
-enable_testing()
-add_subdirectory(test)
+if(BUILD_TESTS)
+ enable_testing()
+ add_subdirectory(test)
+endif(BUILD_TESTS)
 
 # Source distribution packages:
 set(CPACK_PACKAGE_VERSION_MAJOR "${VERSION_MAJOR}")

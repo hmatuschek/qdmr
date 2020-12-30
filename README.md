@@ -66,6 +66,7 @@ If you use the snap image of *qdmr*, you must (for now) grant access to the raw 
 *qdmr*. Otherwise, *qdmr* will not find any USB devices. That is, execute
 
     snap connect qdmr:raw-usb
+    snap connect qdmr:serial-port
 
 in a terminal. I'll request an auto-connect for this snap image, so this step is not needed in
 future. For the time being, however, you have to do that manually.

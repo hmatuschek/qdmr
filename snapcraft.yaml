@@ -1,11 +1,19 @@
 name: qdmr
-#version: git
-#grade: devel
-version: 0.4.5
-grade: stable
+
+version: git
+grade: devel
+#version: 0.4.5
+#grade: stable
+
 summary: Graphical code-plug programming tool for DMR radios.
 description: |
-  qDMR is a simple to use and feature-rich code-plug programming software (CPS) for cheap DMR radios.
+  qDMR is a simple to use and feature-rich code-plug programming software (CPS) for cheap DMR
+  radios. Currently supported devices are:
+   * Radioddity/Baofeng RD-5R
+   * TYT MD-UV390
+   * Retevis RT3S
+   * Open GD77 firmware (GD77, RD-5R & DM-1801)
+   * Radioddity GD77 (untested)
 
 confinement: strict
 base: core18
@@ -25,6 +33,18 @@ apps:
       - serial-port
     extensions:
       - kde-neon
+
+slots:
+  opengd77:
+    interface: serial-port
+    usb-vendor: 0x1fc9
+    usb-product: 0x0094
+    path: /dev/serial-port-opengd77
+  anytone:
+    interface: serial-port
+    usb-vendor: 0x28e9
+    usb-product: 0x018a
+    path: /dev/serial-port-anytone
 
 parts:
   qdmr:
@@ -46,7 +66,8 @@ parts:
       - libusb-1.0-0
     source: https://github.com/hmatuschek/qdmr.git
     source-type: git
-    source-tag: "v$SNAPCRAFT_PROJECT_VERSION"
+    #source-tag: "v$SNAPCRAFT_PROJECT_VERSION"
     configflags:
       - "-DCMAKE_INSTALL_PREFIX=/usr"
       - "-DCMAKE_BUILD_TYPE=Release"
+      - "-DBUILD_TESTS=Off"
