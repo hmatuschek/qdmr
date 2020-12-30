@@ -1089,7 +1089,7 @@ RD5RCodeplug::decode(Config *config)
       continue;
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
-    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i]), config, scan_table, group_table, contact_table)) {
+    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i+1]), config, scan_table, group_table, contact_table)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link channel at index %2")
           .arg(__func__).arg(j);
       return false;

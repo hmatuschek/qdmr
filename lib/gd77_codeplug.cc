@@ -656,7 +656,7 @@ GD77Codeplug::decode(Config *config) {
       continue;
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
-    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i]),
+    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i+1]),
                              config, scan_table, group_table, contact_table))
     {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link channel at index %2")
