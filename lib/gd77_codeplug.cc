@@ -270,7 +270,7 @@ GD77Codeplug::contact_t::clear() {
 
 bool
 GD77Codeplug::contact_t::isValid() const {
-  return 0x00 != valid;
+  return (0x00 != valid) && (0x00 != name[0]) && (0xff != name[0]);
 }
 
 uint32_t
