@@ -47,16 +47,16 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 13) Contact for transmit: - or index in Contacts table\n"
             "# 14) GPS System: - or index in GPS table.\n"
             "#\n"
-            "Digital Name                Receive   Transmit  Power Scan TOT RO Admit  CC TS RxGL TxC GPS\n";
+            "Digital Name                Receive    Transmit   Power Scan TOT RO Admit  CC TS RxGL TxC GPS\n";
   for (int i=0; i<config->channelList()->count(); i++) {
     if (config->channelList()->channel(i)->is<AnalogChannel>())
       continue;
     DigitalChannel *digi = config->channelList()->channel(i)->as<DigitalChannel>();
     stream << qSetFieldWidth(8)  << left << (i+1)
            << qSetFieldWidth(20) << left << ("\"" + digi->name() + "\"")
-           << qSetFieldWidth(10) << left << format_frequency(digi->rxFrequency());
+           << qSetFieldWidth(11) << left << format_frequency(digi->rxFrequency());
     if (digi->txFrequency()<digi->rxFrequency())
-      stream << qSetFieldWidth(10) << left << format_frequency(digi->txFrequency()-digi->rxFrequency());
+      stream << qSetFieldWidth(11) << left << format_frequency(digi->txFrequency()-digi->rxFrequency());
     else
       stream << qSetFieldWidth(10) << left << format_frequency(digi->txFrequency());
     stream << qSetFieldWidth(6)  << left << ( (Channel::HighPower == digi->power()) ? "High" : "Low" )
@@ -100,7 +100,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 12) CTCSS/DCS for transmit: frequency (e.g, 67.0), DCS number (e.g., n023 or i023) or '-' to disable\n"
             "# 13) Bandwidth in kHz: 12.5, 25\n"
             "#\n"
-            "Analog  Name                Receive    Transmit Power Scan TOT RO Admit  Squelch RxTone TxTone Width\n";
+            "Analog  Name                Receive     Transmit  Power Scan TOT RO Admit  Squelch RxTone TxTone Width\n";
   for (int i=0; i<config->channelList()->count(); i++) {
     if (config->channelList()->channel(i)->is<DigitalChannel>())
       continue;
@@ -109,9 +109,9 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
            << qSetFieldWidth(20) << left << ("\"" + analog->name() + "\"")
            << qSetFieldWidth(10) << left << format_frequency(analog->rxFrequency());
     if (analog->txFrequency()<analog->rxFrequency())
-      stream << qSetFieldWidth(10) << left << format_frequency(analog->txFrequency()-analog->rxFrequency());
+      stream << qSetFieldWidth(11) << left << format_frequency(analog->txFrequency()-analog->rxFrequency());
     else
-      stream << qSetFieldWidth(10) << left << format_frequency(analog->txFrequency());
+      stream << qSetFieldWidth(11) << left << format_frequency(analog->txFrequency());
     stream << qSetFieldWidth(6)  << left << ( (Channel::HighPower == analog->power()) ? "High" : "Low" )
            << qSetFieldWidth(5)  << left << ( nullptr != analog->scanList() ?
           QString::number(config->scanlists()->indexOf(analog->scanList())+1) : QString("-") )

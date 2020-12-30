@@ -133,6 +133,7 @@ void
 ContactList::clear() {
   for (int i=0; i<count(); i++)
     _contacts[i]->deleteLater();
+  _contacts.clear();
 }
 
 int
