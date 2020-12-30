@@ -223,11 +223,7 @@ OpenGD77::download()
   _dev->close();
   _dev->deleteLater();
   _dev = nullptr;
-
-  if (_codeplug.decode(_config))
-    emit downloadFinished(this, &_codeplug);
-  else
-    emit downloadError(this);
+  emit downloadFinished(this, &_codeplug);
   _config = nullptr;
 }
 
