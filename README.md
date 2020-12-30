@@ -98,17 +98,17 @@ $ git pull
 
 This should create a new directory named `qdmr`. Enter this directory, create and enter a build-directory and configure the build with
 ```
-cd qdmr
-mkdir build
-cd build
-cmake .. -DMAKE_INSTALL_PREFIX=~/.local/
+$ cd qdmr
+$ mkdir build
+$ cd build
+$ cmake .. -DMAKE_INSTALL_PREFIX=~/.local/
 ```
-This configures the build to later install binaries in your home directory and not on the system. This has to be done only once.
+This configures the build to install the binaries in your home directory and not on the system. This has to be done only once.
 
-To build and install the sources run
+To build and install the binaries run
 ```
-make
-make install
+$ make
+$ make install
 ```
 
 ## License
