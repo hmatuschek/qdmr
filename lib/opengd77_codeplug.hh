@@ -27,12 +27,12 @@
  *  <tr><td>0x02dd0</td> <td>0x03780</td> <td>0x09b0</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c GD77Codeplug::bank_t</td></tr>
  *  <tr><td>0x05390</td> <td>0x06000</td> <td>0x0c70</td> <td>??? Unknown ???</td></tr>
- *  <tr><th colspan="4">Second EEPROM segment 0x07500-0x0b000</th></tr>
+ *  <tr><th colspan="4">Second EEPROM segment 0x07500-0x13000</th></tr>
  *  <tr><td>0x07500</td> <td>0x07540</td> <td>0x0040</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x07540</td> <td>0x07560</td> <td>0x0020</td> <td>2 intro lines, @c GD77Codeplug::intro_text_t</td></tr>
  *  <tr><td>0x07560</td> <td>0x08010</td> <td>0x0ab0</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x08010</td> <td>0x0af10</td> <td>0x2f00</td> <td>250 zones, see @c GD77Codeplug::zonetab_t</td></tr>
- *  <tr><td>0x0af10</td> <td>0x0b000</td> <td>0x00f0</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x08010</td> <td>0x12c10</td> <td>0xac00</td> <td>250 zones, see @c OpenGD77Codeplug::zonetab_t</td></tr>
+ *  <tr><td>0x12c10</td> <td>0x13000</td> <td>0x03f0</td> <td>??? Unknown ???</td></tr>
  *  <tr><th colspan="4">First Flash segment 0x00000-0x011a0</th></tr>
  *  <tr><td>0x00000</td> <td>0x011a0</td> <td>0x11a0</td> <td>??? Unknown ???</td></tr>
  *  <tr><th colspan="4">Second Flash segment 0x7b000-0x8ee60</th></tr>
@@ -52,6 +52,47 @@ public:
   static const uint32_t EEPROM = 0;
   /** Flash memory bank. */
   static const uint32_t FLASH  = 1;
+
+protected:
+  /** Represents a single zone within the codeplug. */
+  struct __attribute__((packed)) zone_t {
+    // Bytes 0-15
+    uint8_t name[16];                   ///< Zone name ASCII, 0xff terminated.
+    // Bytes 16-47
+    uint16_t member[80];                ///< Member channel indices+1, 0=empty/not used.
+
+    /** Constructor. */
+    zone_t();
+
+    /** Returns @c true if the zone entry is valid. */
+    bool isValid() const;
+    /** Resets and invalidates the zone entry. */
+    void clear();
+    /** Retruns the zone name. */
+    QString getName() const;
+    /** Sets the zone name. */
+    void setName(const QString &name);
+
+    /** Constructs a generic @c Zone object from this codeplug zone. */
+    Zone *toZoneObj() const;
+    /** Links a previously constructed @c Zone object to the rest of the configuration. That is
+     * linking to the referred channels. */
+    bool linkZoneObj(Zone *zone, const Config *conf, const QHash<int,int> &channel_table) const;
+    /** Resets this codeplug zone representation from the given generic @c Zone object. */
+    void fromZoneObjA(const Zone *zone, const Config *conf);
+    /** Resets this codeplug zone representation from the given generic @c Zone object. */
+    void fromZoneObjB(const Zone *zone, const Config *conf);
+  };
+
+  /** Table of zones. */
+  struct __attribute__((packed)) zonetab_t {
+    /** A bit representing the validity of every zone. If a bit is set, the corresponding zone in
+     * @c zone ist valid. */
+    uint8_t bitmap[32];
+    /** The list of zones. */
+    zone_t  zone[NZONES];
+  };
+
 
 public:
   /** Constructs an empty codeplug for the GD-77. */

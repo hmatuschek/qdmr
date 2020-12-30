@@ -346,7 +346,8 @@ RD5RCodeplug::zone_t::isValid() const {
 }
 void
 RD5RCodeplug::zone_t::clear() {
-  memset(name, 0xff, 16);
+  memset(name, 0xff, sizeof(name));
+  memset(member, 0x00, sizeof(member));
 }
 
 QString
