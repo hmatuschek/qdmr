@@ -111,7 +111,7 @@ OpenGD77Codeplug::OpenGD77Codeplug(QObject *parent)
 
   addImage("OpenGD77 Codeplug EEPROM");
   image(0).addElement(0x000e0, 0x05f20);
-  image(0).addElement(0x07500, 0x03b00);
+  image(0).addElement(0x07500, 0x0bb00);
   addImage("OpenGD77 Codeplug FLASH");
   image(1).addElement(0x00000, 0x011a0);
   image(1).addElement(0x7b000, 0x13e60);
