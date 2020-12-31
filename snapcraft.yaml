@@ -34,17 +34,17 @@ apps:
     extensions:
       - kde-neon
 
-slots:
-  opengd77:
-    interface: serial-port
-    usb-vendor: 0x1fc9
-    usb-product: 0x0094
-    path: /dev/serial-port-opengd77
-  anytone:
-    interface: serial-port
-    usb-vendor: 0x28e9
-    usb-product: 0x018a
-    path: /dev/serial-port-anytone
+#slots:
+#  opengd77:
+#    interface: serial-port
+#    usb-vendor: 0x1fc9
+#    usb-product: 0x0094
+#    path: /dev/serial-port-opengd77
+#  anytone:
+#    interface: serial-port
+#    usb-vendor: 0x28e9
+#    usb-product: 0x018a
+#    path: /dev/serial-port-anytone
 
 parts:
   qdmr:
@@ -66,7 +66,7 @@ parts:
       - libusb-1.0-0
     source: https://github.com/hmatuschek/qdmr.git
     source-type: git
-    source-tag: "v$SNAPCRAFT_PROJECT_VERSION"
+    #source-tag: "v$SNAPCRAFT_PROJECT_VERSION"
     configflags:
       - "-DCMAKE_INSTALL_PREFIX=/usr"
       - "-DCMAKE_BUILD_TYPE=Release"
