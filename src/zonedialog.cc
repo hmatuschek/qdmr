@@ -67,19 +67,21 @@ ZoneDialog::construct() {
 
 void
 ZoneDialog::onAddChannelA() {
-  ChannelSelectionDialog dia(_config->channelList());
+  MultiChannelSelectionDialog dia(_config->channelList());
   if (QDialog::Accepted != dia.exec())
     return;
 
-  Channel *channel = dia.channel();
-  if (channel->is<AnalogChannel>()) {
-    QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
-    item->setData(Qt::UserRole, QVariant::fromValue(channel));
-    channelListA->addItem(item);
-  } else {
-    QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
-    item->setData(Qt::UserRole, QVariant::fromValue(channel));
-    channelListA->addItem(item);
+  QList<Channel *> channels = dia.channel();
+  foreach (Channel *channel, channels) {
+    if (channel->is<AnalogChannel>()) {
+      QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
+      item->setData(Qt::UserRole, QVariant::fromValue(channel));
+      channelListA->addItem(item);
+    } else {
+      QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
+      item->setData(Qt::UserRole, QVariant::fromValue(channel));
+      channelListA->addItem(item);
+    }
   }
 }
 
@@ -122,19 +124,21 @@ ZoneDialog::onChannelADown() {
 
 void
 ZoneDialog::onAddChannelB() {
-  ChannelSelectionDialog dia(_config->channelList());
+  MultiChannelSelectionDialog dia(_config->channelList());
   if (QDialog::Accepted != dia.exec())
     return;
 
-  Channel *channel = dia.channel();
-  if (channel->is<AnalogChannel>()) {
-    QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
-    item->setData(Qt::UserRole, QVariant::fromValue(channel));
-    channelListB->addItem(item);
-  } else {
-    QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
-    item->setData(Qt::UserRole, QVariant::fromValue(channel));
-    channelListB->addItem(item);
+  QList<Channel *> channels = dia.channel();
+  foreach (Channel *channel, channels) {
+    if (channel->is<AnalogChannel>()) {
+      QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
+      item->setData(Qt::UserRole, QVariant::fromValue(channel));
+      channelListB->addItem(item);
+    } else {
+      QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
+      item->setData(Qt::UserRole, QVariant::fromValue(channel));
+      channelListB->addItem(item);
+    }
   }
 }
 

@@ -41,7 +41,7 @@ MultiChannelSelectionDialog::MultiChannelSelectionDialog(ChannelList *lst, bool 
   _channel = new QListWidget();
   if (includeSelectedChannel) {
     QListWidgetItem *item = new QListWidgetItem(tr("[Selected]"));
-    item->setFlags(Qt::ItemIsUserCheckable);
+    item->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
     item->setData(Qt::UserRole, QVariant::fromValue(SelectedChannel::get()));
     item->setCheckState(Qt::Unchecked);
     _channel->addItem(item);
@@ -49,7 +49,7 @@ MultiChannelSelectionDialog::MultiChannelSelectionDialog(ChannelList *lst, bool 
   for (int i=0; i<lst->count(); i++) {
     Channel *channel = lst->channel(i);
     QListWidgetItem *item = new QListWidgetItem(channel->name());
-    item->setFlags(Qt::ItemIsUserCheckable);
+    item->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
     item->setData(Qt::UserRole, QVariant::fromValue(channel));
     item->setCheckState(Qt::Unchecked);
     _channel->addItem(item);
