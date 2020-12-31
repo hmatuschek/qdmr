@@ -96,10 +96,15 @@ ScanListDialog::onAddChannel() {
 
 void
 ScanListDialog::onRemChannel() {
-  if (0 == channelList->selectedItems().size())
+  QList<QListWidgetItem *> selection = channelList->selectedItems();
+  if (selection.isEmpty())
     return;
-  QListWidgetItem *item = channelList->takeItem(channelList->currentRow());
-  delete item;
+
+  foreach (QListWidgetItem *item, selection) {
+    int row = channelList->row(item);
+    channelList->takeItem(row);
+    delete item;
+  }
 }
 
 void
