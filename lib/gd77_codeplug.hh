@@ -278,17 +278,60 @@ protected:
     grouplist_t grouplist[NGLISTS];   ///< The actual grouplists.
 	} grouptab_t;
 
-	/** Represents a scan list within the codeplug. This representation is identical to the scan-list
-	 * within the RD-5R codeplug. Hence, it gets reused. */
-  typedef RD5RCodeplug::scanlist_t scanlist_t;
+  /** Represents a sinle scan list within the codeplug. */
+  struct __attribute__((packed)) scanlist_t {
+    /** Possible priority channel types. */
+    typedef enum {
+      PL_NONPRI = 0,              ///< Only non-priority channels.
+      PL_DISABLE = 1,             ///< Disable priority channels.
+      PL_PRI = 2,                 ///< Only priority channels.
+      PL_PRI_NONPRI = 3           ///< Priority and non-priority channels.
+    } PriorityType;
 
-  /** Represents a scan-list table within the codeplug */
-  typedef struct __attribute__((packed)) {
+    // Bytes 0-14
+    uint8_t name[15];             ///< Scan list name, ASCII, 0xff terminated.
+    // Byte 15
+    uint8_t _unused       : 4,    ///< Unknown set to 1.
+      channel_mark        : 1,    ///< Channel mark, default 1.
+      pl_type             : 2,    ///< PL type, default 3.
+      talkback            : 1;    ///< Talkback, default 1.
+    // Bytes 16-79
+    uint16_t member[32];          ///< Channel indices, 0=not used/EOL or channel index+2.
+
+    // Bytes 80-85
+    uint16_t priority_ch1;        ///< Priority channel 1 index, index+2 or 0=None, 1=selected.
+    uint16_t priority_ch2;        ///< Priority channel 2 index, index+2 or 0=None, 1=selected.
+    uint16_t tx_designated_ch;    ///< Designated TX channel, channel index+1 or 0=last active channel.
+
+    // Bytes 86-87
+    uint8_t sign_hold_time;       ///< Signaling Hold Time (x25 = msec) default 40=1000ms.
+    uint8_t prio_sample_time;     ///< Priority Sample Time (x250 = msec) default 8=2000ms.
+
+    /** Constructor. */
+    scanlist_t();
+
+    /** Resets the scan list. */
+    void clear();
+    /** Returns the name of the scan list. */
+    QString getName() const;
+    /** Sets the name of the scan list. */
+    void setName(const QString &name);
+
+    /** Constrcuts a @c ScanList object from this codeplug representation. */
+    ScanList *toScanListObj() const;
+    /** Links a previously constructed @c ScanList object to the rest of the generic configuration. */
+    bool linkScanListObj(ScanList *lst, const Config *conf, const QHash<int, int> &channel_table) const;
+    /** Initializes this codeplug representation from the given @c ScanList object. */
+    void fromScanListObj(const ScanList *lst, const Config *conf);
+  };
+
+  /** Table/Bank of scanlists. */
+  struct __attribute__((packed)) scantab_t {
     /** Byte-field to indicate which scanlist is valid. Set to 0x01 when valid, 0x00 otherwise. */
     uint8_t    valid[NSCANL];
     /** The scanlists. */
     scanlist_t scanlist[NSCANL];
-	} scantab_t;
+  };
 
 	/** Represents the general settings within the codeplug. This representation is identical to
 	 * the general settings of the RD-5R codeplug. Hence, it gets reused here. */

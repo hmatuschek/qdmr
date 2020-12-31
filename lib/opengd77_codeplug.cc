@@ -189,6 +189,8 @@ next:
   }
 
   // Pack Scanlists
+  /*
+   * Scan lists are not supported by OpenGD77 right now, hence encoding is disabled for now.
   for (int i=0; i<NSCANL; i++) {
     scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB, EEPROM);
     scanlist_t *sl = &st->scanlist[i];
@@ -201,7 +203,7 @@ next:
 
     sl->fromScanListObj(config->scanlists()->scanlist(i), config);
     st->valid[i] = 1;
-  }
+  } */
 
   // Pack contacts
   for (int i=0; i<NCONTACTS; i++) {
@@ -394,8 +396,10 @@ OpenGD77Codeplug::decode(Config *config) {
     }
   }
 
-  /* Unpack Scan lists */
   QHash<int, int> scan_table;
+  /* Unpack Scan lists
+   *
+   * OpenGD77 does not support any scan lists. Decoding/encoding is disabled for now.
   for (int i=0; i<NSCANL; i++) {
     scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB, EEPROM);
     if (! st){
@@ -430,10 +434,10 @@ OpenGD77Codeplug::decode(Config *config) {
     logDebug() << "Map scan-list at index " << i+1 << " to " << config->scanlists()->count();
     scan_table[i+1] = config->scanlists()->count();
     config->scanlists()->addScanList(scan);
-  }
+  } */
 
   /*
-   * Link Channels -> ScanLists
+   * Link Channels -> contacts, group lists, scan lists.
    */
   for (int i=0; i<NCHAN; i++) {
     // First, get bank
