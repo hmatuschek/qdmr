@@ -891,7 +891,7 @@
      <normaloff>:/icons/about.png</normaloff>:/icons/about.png</iconset>
    </property>
    <property name="text">
-    <string>About qdrm</string>
+    <string>About qdmr</string>
    </property>
   </action>
   <action name="actionHelp">
