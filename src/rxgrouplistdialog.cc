@@ -1,6 +1,8 @@
 #include "rxgrouplistdialog.hh"
 #include "config.hh"
 #include "contact.hh"
+#include "contactselectiondialog.hh"
+
 #include <QInputDialog>
 #include <QMessageBox>
 
@@ -60,28 +62,18 @@ RXGroupListDialog::construct() {
 
 void
 RXGroupListDialog::onAddGroup() {
-  QStringList names;
-  QVector<DigitalContact *> contacts;
-  ContactList *lst = _config->contacts();
-  for (int i=0; i<lst->rowCount(QModelIndex()); i++) {
-    if (! lst->contact(i)->is<DigitalContact>())
-      continue;
-    DigitalContact *contact = lst->contact(i)->as<DigitalContact>();
-    if (DigitalContact::PrivateCall == contact->type())
-      continue;
-    names.append(contact->name());
-    contacts.append(contact);
-  }
-
-  bool ok=false;
-  QString name  = QInputDialog::getItem(0, tr("Select group call"),
-                                        tr("Select a group call to add:"), names, 0, false, &ok);
-  if ((! ok) || (! names.contains(name)))
+  MultiGroupCallSelectionDialog dialog(_config->contacts());
+  if (QDialog::Accepted != dialog.exec())
     return;
 
-  QListWidgetItem *item = new QListWidgetItem(name);
-  item->setData(Qt::UserRole, QVariant::fromValue(contacts[names.indexOf(name)]));
-  groupListWidget->addItem(item);
+  QList<DigitalContact *> contacts = dialog.contacts();
+  foreach (DigitalContact *contact, contacts) {
+    if (groupListWidget->findItems(contact->name(), Qt::MatchExactly).size())
+      continue;
+    QListWidgetItem *item = new QListWidgetItem(contact->name());
+    item->setData(Qt::UserRole, QVariant::fromValue(contact));
+    groupListWidget->addItem(item);
+  }
 }
 
 void
