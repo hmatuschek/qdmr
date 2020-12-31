@@ -74,23 +74,34 @@ ScanListDialog::construct() {
 
 void
 ScanListDialog::onAddChannel() {
-  ChannelSelectionDialog dia(_config->channelList(), true);
+  MultiChannelSelectionDialog dia(_config->channelList(), true);
   if (QDialog::Accepted != dia.exec())
     return;
 
-  Channel *channel = dia.channel();
-  if (channel->is<AnalogChannel>()) {
-    QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
-    item->setData(Qt::UserRole, QVariant::fromValue(channel));
-    channelList->addItem(item);
-  } else if (channel->is<DigitalChannel>()) {
-    QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
-    item->setData(Qt::UserRole, QVariant::fromValue(channel));
-    channelList->addItem(item);
-  } else if (SelectedChannel::get() == channel) {
-    QListWidgetItem *item = new QListWidgetItem(tr("[Selected Channel]"));
-    item->setData(Qt::UserRole, QVariant::fromValue(channel));
-    channelList->addItem(item);
+  QList<Channel *> channels = dia.channel();
+  foreach (Channel *channel, channels) {
+    if (channel->is<AnalogChannel>()) {
+      QString name = tr("%1 (Analog)").arg(channel->name());
+      if (channelList->findItems(name, Qt::MatchExactly).size())
+        continue;
+      QListWidgetItem *item = new QListWidgetItem(name);
+      item->setData(Qt::UserRole, QVariant::fromValue(channel));
+      channelList->addItem(item);
+    } else if (channel->is<DigitalChannel>()) {
+      QString name = tr("%1 (Digital)").arg(channel->name());
+      if (channelList->findItems(name, Qt::MatchExactly).size())
+        continue;
+      QListWidgetItem *item = new QListWidgetItem(name);
+      item->setData(Qt::UserRole, QVariant::fromValue(channel));
+      channelList->addItem(item);
+    } else if (SelectedChannel::get() == channel) {
+      QString name = tr("[Selected Channel]");
+      if (channelList->findItems(name, Qt::MatchExactly).size())
+        continue;
+      QListWidgetItem *item = new QListWidgetItem(name);
+      item->setData(Qt::UserRole, QVariant::fromValue(channel));
+      channelList->addItem(item);
+    }
   }
 }
 
