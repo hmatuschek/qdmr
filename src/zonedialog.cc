@@ -85,15 +85,20 @@ ZoneDialog::onAddChannelA() {
 
 void
 ZoneDialog::onRemChannelA() {
-  if (0 == channelListA->selectedItems().size())
+  QList<QListWidgetItem*> selection = channelListA->selectedItems();
+  // Nothing is selected -> done.
+  if (0 == selection.size())
     return;
-  QListWidgetItem *item = channelListA->takeItem(channelListA->currentRow());
-  delete item;
+  // Remove every selected item from list
+  foreach(QListWidgetItem *item, selection) {
+    channelListA->takeItem(channelListA->row(item));
+    delete item;
+  }
 }
 
 void
 ZoneDialog::onChannelAUp() {
-  if (0 == channelListA->selectedItems().size())
+  if (1 != channelListA->selectedItems().size())
     return;
   int idx = channelListA->currentRow();
   if (0 == idx)
@@ -105,7 +110,7 @@ ZoneDialog::onChannelAUp() {
 
 void
 ZoneDialog::onChannelADown() {
-  if (0 == channelListA->selectedItems().size())
+  if (1 != channelListA->selectedItems().size())
     return;
   int idx = channelListA->currentRow();
   if ((channelListA->count()-1) <= idx)
@@ -135,15 +140,20 @@ ZoneDialog::onAddChannelB() {
 
 void
 ZoneDialog::onRemChannelB() {
-  if (0 == channelListB->selectedItems().size())
+  QList<QListWidgetItem*> selection = channelListB->selectedItems();
+  // Nothing is selected -> done.
+  if (0 == selection.size())
     return;
-  QListWidgetItem *item = channelListB->takeItem(channelListB->currentRow());
-  delete item;
+  // Remove every selected item from list
+  foreach(QListWidgetItem *item, selection) {
+    channelListB->takeItem(channelListB->row(item));
+    delete item;
+  }
 }
 
 void
 ZoneDialog::onChannelBUp() {
-  if (0 == channelListB->selectedItems().size())
+  if (1 != channelListB->selectedItems().size())
     return;
   int idx = channelListB->currentRow();
   if (0 == idx)
@@ -155,7 +165,7 @@ ZoneDialog::onChannelBUp() {
 
 void
 ZoneDialog::onChannelBDown() {
-  if (0 == channelListB->selectedItems().size())
+  if (1 != channelListB->selectedItems().size())
     return;
   int idx = channelListB->currentRow();
   if ((channelListB->count()-1) <= idx)
