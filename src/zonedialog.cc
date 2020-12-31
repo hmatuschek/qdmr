@@ -74,11 +74,17 @@ ZoneDialog::onAddChannelA() {
   QList<Channel *> channels = dia.channel();
   foreach (Channel *channel, channels) {
     if (channel->is<AnalogChannel>()) {
-      QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
+      QString name = tr("%1 (Analog)").arg(channel->name());
+      if (channelListA->findItems(name, Qt::MatchExactly).size())
+        continue;
+      QListWidgetItem *item = new QListWidgetItem(name);
       item->setData(Qt::UserRole, QVariant::fromValue(channel));
       channelListA->addItem(item);
     } else {
-      QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
+      QString name = tr("%1 (Digital)").arg(channel->name());
+      if (channelListA->findItems(name, Qt::MatchExactly).size())
+        continue;
+      QListWidgetItem *item = new QListWidgetItem(name);
       item->setData(Qt::UserRole, QVariant::fromValue(channel));
       channelListA->addItem(item);
     }
@@ -131,11 +137,17 @@ ZoneDialog::onAddChannelB() {
   QList<Channel *> channels = dia.channel();
   foreach (Channel *channel, channels) {
     if (channel->is<AnalogChannel>()) {
-      QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
+      QString name = tr("%1 (Analog)").arg(channel->name());
+      if (channelListB->findItems(name, Qt::MatchExactly).size())
+        continue;
+      QListWidgetItem *item = new QListWidgetItem(name);
       item->setData(Qt::UserRole, QVariant::fromValue(channel));
       channelListB->addItem(item);
     } else {
-      QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
+      QString name = tr("%1 (Digital)").arg(channel->name());
+      if (channelListB->findItems(name, Qt::MatchExactly).size())
+        continue;
+      QListWidgetItem *item = new QListWidgetItem(name);
       item->setData(Qt::UserRole, QVariant::fromValue(channel));
       channelListB->addItem(item);
     }
