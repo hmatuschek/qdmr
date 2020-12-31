@@ -2,7 +2,9 @@
 #include "contact.hh"
 
 #include <QListWidget>
-
+#include <QDialogButtonBox>
+#include <QVBoxLayout>
+#include <QLabel>
 
 /* ********************************************************************************************* *
  * Implementation of MultiGroupCallSelectionDialog
@@ -24,6 +26,16 @@ MultiGroupCallSelectionDialog::MultiGroupCallSelectionDialog(ContactList *contac
     item->setCheckState(Qt::Unchecked);
     _contacts->addItem(item);
   }
+
+  QDialogButtonBox *bbox = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
+  connect(bbox, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(bbox, SIGNAL(rejected()), this, SLOT(reject()));
+
+  QVBoxLayout *layout = new QVBoxLayout();
+  layout->addWidget(new QLabel(tr("Select a group call:")));
+  layout->addWidget(_contacts);
+  layout->addWidget(bbox);
+  setLayout(layout);
 }
 
 
