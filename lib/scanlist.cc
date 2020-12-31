@@ -176,6 +176,7 @@ void
 ScanLists::clear() {
   for (int i=0; i<count(); i++)
     _scanlists[i]->deleteLater();
+  _scanlists.clear();
 }
 
 ScanList *

@@ -343,6 +343,7 @@ void
 ChannelList::clear() {
   for (int i=0; i<count(); i++)
     _channels[i]->deleteLater();
+  _channels.clear();
 }
 
 int

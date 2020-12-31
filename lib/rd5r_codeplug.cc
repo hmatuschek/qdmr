@@ -346,7 +346,8 @@ RD5RCodeplug::zone_t::isValid() const {
 }
 void
 RD5RCodeplug::zone_t::clear() {
-  memset(name, 0xff, 16);
+  memset(name, 0xff, sizeof(name));
+  memset(member, 0x00, sizeof(member));
 }
 
 QString
@@ -661,10 +662,10 @@ void
 RD5RCodeplug::button_settings_t::initDefault() {
   clear();
   long_press_dur = 0x06;
-  sk1_short      = 0x00;
-  sk1_long       = 0x00;
-  sk2_short      = 0x00;
-  sk2_short      = 0x00;
+  sk1_short      = ZoneSelect;
+  sk1_long       = ToggleFMRadio;
+  sk2_short      = ToggleMonitor;
+  sk2_long       = ToggleFlashLight;
 }
 
 
@@ -1088,7 +1089,7 @@ RD5RCodeplug::decode(Config *config)
       continue;
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
-    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i]), config, scan_table, group_table, contact_table)) {
+    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i+1]), config, scan_table, group_table, contact_table)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link channel at index %2")
           .arg(__func__).arg(j);
       return false;
@@ -1101,7 +1102,7 @@ RD5RCodeplug::decode(Config *config)
 }
 
 bool
-RD5RCodeplug::encode(Config *config)
+RD5RCodeplug::encode(Config *config, bool update)
 {
   // set timestamp
   timestamp_t *ts = (timestamp_t *)data(OFFSET_TIMESTMP);
@@ -1109,12 +1110,10 @@ RD5RCodeplug::encode(Config *config)
 
   // pack basic config
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
+  if (! update)
+    gs->initDefault();
   gs->setName(config->name());
   gs->setRadioId(config->id());
-
-  // store default button settings
-  //button_settings_t *bs = (button_settings_t *)data(OFFSET_BUTTONS);
-  //bs->initDefault();
 
   intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
   it->setIntroLine1(config->introLine1());

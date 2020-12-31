@@ -19,7 +19,7 @@ static Radio::Features _open_gd77_features =
 
   32,    // maxZones
   16,    // maxZoneNameLength
-  32,    // maxChannelsInZone
+  80,    // maxChannelsInZone
   false, // hasABZone
 
   64,    // maxScanlists
@@ -30,10 +30,9 @@ static Radio::Features _open_gd77_features =
   256,   // maxContacts
   16,    // maxContactNameLength
 
-  /// @bug Check.
-  64,   // maxGrouplists
+  76,   // maxGrouplists
   16,   // maxGrouplistNameLength
-  16    // maxContactsInGrouplist
+  32    // maxContactsInGrouplist
 };
 
 
@@ -224,11 +223,7 @@ OpenGD77::download()
   _dev->close();
   _dev->deleteLater();
   _dev = nullptr;
-
-  if (_codeplug.decode(_config))
-    emit downloadFinished(this, &_codeplug);
-  else
-    emit downloadError(this);
+  emit downloadFinished(this, &_codeplug);
   _config = nullptr;
 }
 

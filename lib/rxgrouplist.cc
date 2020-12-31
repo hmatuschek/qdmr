@@ -132,6 +132,7 @@ void
 RXGroupLists::clear() {
   for (int i=0; i<count(); i++)
     _lists[i]->deleteLater();
+  _lists.clear();
 }
 
 

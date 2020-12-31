@@ -19,7 +19,90 @@
 
 
 /* ******************************************************************************************** *
- * Implementation of GD77Codeplug
+ * Implementation of OpenGD77Codeplug::zone_t
+ * ******************************************************************************************** */
+OpenGD77Codeplug::zone_t::zone_t() {
+  clear();
+}
+
+bool
+OpenGD77Codeplug::zone_t::isValid() const {
+  return 0xff != name[0];
+}
+void
+OpenGD77Codeplug::zone_t::clear() {
+  memset(name, 0xff, sizeof(name));
+  memset(member, 0x00, sizeof(member));
+}
+
+QString
+OpenGD77Codeplug::zone_t::getName() const {
+  return decode_ascii(name, 16, 0xff);
+}
+void
+OpenGD77Codeplug::zone_t::setName(const QString &n) {
+  encode_ascii(name, n, 16, 0xff);
+}
+
+Zone *
+OpenGD77Codeplug::zone_t::toZoneObj() const {
+  if (! isValid())
+    return nullptr;
+  return new Zone(getName());
+}
+
+bool
+OpenGD77Codeplug::zone_t::linkZoneObj(Zone *zone, const Config *conf, const QHash<int, int> &channel_table) const {
+  if (! isValid()) {
+    logDebug() << "Cannot link zone: Zone is invalid.";
+    return false;
+  }
+
+  for (int i=0; (i<80) && member[i]; i++) {
+    if (channel_table.contains(member[i]))
+      zone->A()->addChannel(conf->channelList()->channel(channel_table[member[i]]));
+    else {
+      logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
+                << member[i] << "->" << channel_table[member[i]] << " out of bounds.";
+    }
+  }
+  return true;
+}
+
+void
+OpenGD77Codeplug::zone_t::fromZoneObjA(const Zone *zone, const Config *conf) {
+  if (zone->A()->count() && zone->B()->count())
+    setName(zone->name() + " A");
+  else
+    setName(zone->name());
+
+  for (int i=0; i<80; i++) {
+    if (i < zone->A()->count())
+      member[i] = conf->channelList()->indexOf(zone->A()->channel(i))+1;
+    else
+      member[i] = 0;
+  }
+}
+
+void
+OpenGD77Codeplug::zone_t::fromZoneObjB(const Zone *zone, const Config *conf) {
+  if (zone->A()->count() && zone->B()->count())
+    setName(zone->name() + " B");
+  else
+    setName(zone->name());
+
+  for (int i=0; i<80; i++) {
+    if (i < zone->B()->count())
+      member[i] = conf->channelList()->indexOf(zone->B()->channel(i))+1;
+    else
+      member[i] = 0;
+  }
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77Codeplug
  * ******************************************************************************************** */
 OpenGD77Codeplug::OpenGD77Codeplug(QObject *parent)
   : GD77Codeplug(parent)
@@ -28,17 +111,18 @@ OpenGD77Codeplug::OpenGD77Codeplug(QObject *parent)
 
   addImage("OpenGD77 Codeplug EEPROM");
   image(0).addElement(0x000e0, 0x05f20);
-  image(0).addElement(0x07500, 0x03b00);
+  image(0).addElement(0x07500, 0x0bb00);
   addImage("OpenGD77 Codeplug FLASH");
   image(1).addElement(0x00000, 0x011a0);
   image(1).addElement(0x7b000, 0x13e60);
 }
 
 bool
-OpenGD77Codeplug::encode(Config *config) {
+OpenGD77Codeplug::encode(Config *config, bool update) {
   // pack basic config
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS, EEPROM);
-  gs->initDefault();
+  if (! update)
+    gs->initDefault();
   gs->setName(config->name());
   gs->setRadioId(config->id());
 
@@ -105,6 +189,8 @@ next:
   }
 
   // Pack Scanlists
+  /*
+   * Scan lists are not supported by OpenGD77 right now, hence encoding is disabled for now.
   for (int i=0; i<NSCANL; i++) {
     scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB, EEPROM);
     scanlist_t *sl = &st->scanlist[i];
@@ -117,7 +203,7 @@ next:
 
     sl->fromScanListObj(config->scanlists()->scanlist(i), config);
     st->valid[i] = 1;
-  }
+  } */
 
   // Pack contacts
   for (int i=0; i<NCONTACTS; i++) {
@@ -268,18 +354,21 @@ OpenGD77Codeplug::decode(Config *config) {
     if (! zt){
       _errorMessage = QString("%1(): Cannot access zone table memory.")
           .arg(__func__);
+      logError() << _errorMessage;
       return false;
     }
 
     // if zone is disabled -> skip
-    if (! (zt->bitmap[i / 8] >> (i & 7) & 1) )
+    if (! ((zt->bitmap[i / 8] >> (i & 7)) & 1) )
       continue;
+    logDebug() << "Unpack zone " << i+1 << "...";
 
     // get zone_t
     zone_t *z = &zt->zone[i];
     if (! z){
       _errorMessage = QString("%1(): Cannot access zone at index %2")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
 
@@ -288,18 +377,29 @@ OpenGD77Codeplug::decode(Config *config) {
     if (nullptr == zone) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid zone at index %2")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
+
     if (! z->linkZoneObj(zone, config, channel_table)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
           .arg(__func__).arg(i);
+      logError() << _errorMessage;
       return false;
     }
-    config->zones()->addZone(zone);
+
+    if (! config->zones()->addZone(zone)) {
+      _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot add zone %2 '%3' to list.")
+          .arg(__func__).arg(i).arg(zone->name());
+      logError() << _errorMessage;
+      return false;
+    }
   }
 
-  /* Unpack Scan lists */
   QHash<int, int> scan_table;
+  /* Unpack Scan lists
+   *
+   * OpenGD77 does not support any scan lists. Decoding/encoding is disabled for now.
   for (int i=0; i<NSCANL; i++) {
     scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB, EEPROM);
     if (! st){
@@ -334,10 +434,10 @@ OpenGD77Codeplug::decode(Config *config) {
     logDebug() << "Map scan-list at index " << i+1 << " to " << config->scanlists()->count();
     scan_table[i+1] = config->scanlists()->count();
     config->scanlists()->addScanList(scan);
-  }
+  } */
 
   /*
-   * Link Channels -> ScanLists
+   * Link Channels -> contacts, group lists, scan lists.
    */
   for (int i=0; i<NCHAN; i++) {
     // First, get bank
@@ -352,7 +452,7 @@ OpenGD77Codeplug::decode(Config *config) {
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
 
-    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i]),
+    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i+1]),
                              config, scan_table, group_table, contact_table))
     {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link channel at index %2")

@@ -166,6 +166,7 @@ void
 ZoneList::clear() {
   for (int i=0; i<count(); i++)
     _zones[i]->deleteLater();
+  _zones.clear();
 }
 
 Zone *

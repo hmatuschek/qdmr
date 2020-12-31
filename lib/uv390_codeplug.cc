@@ -101,7 +101,7 @@ UV390Codeplug::channel_t::clear() {
   gps_system = 0;
 
   dtmf_decode1 = dtmf_decode2 = dtmf_decode3 = dtmf_decode4 = dtmf_decode5 = dtmf_decode6 =
-      dtmf_decode6 = dtmf_decode7 = dtmf_decode8 = 0;
+      dtmf_decode7 = dtmf_decode8 = 0;
 
   squelch = 1;
 
@@ -1337,7 +1337,7 @@ UV390Codeplug::clear()
 }
 
 bool
-UV390Codeplug::encode(Config *config) {
+UV390Codeplug::encode(Config *config, bool update) {
   // Set timestamp
   ((timestamp_t *)(data(OFFSET_TIMESTMP)))->set();
 

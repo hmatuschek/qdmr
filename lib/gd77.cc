@@ -19,7 +19,7 @@ static Radio::Features _gd77_features =
 
   32,    // maxZones
   16,    // maxZoneNameLength
-  32,    // maxChannelsInZone
+  16,    // maxChannelsInZone
   false, // hasABZone
 
   64,    // maxScanlists
@@ -30,10 +30,9 @@ static Radio::Features _gd77_features =
   256,   // maxContacts
   16,    // maxContactNameLength
 
-  /// @bug Check.
-  64,   // maxGrouplists
+  76,   // maxGrouplists
   16,   // maxGrouplistNameLength
-  16    // maxContactsInGrouplist
+  32    // maxContactsInGrouplist
 };
 
 

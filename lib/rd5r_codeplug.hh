@@ -768,7 +768,7 @@ public:
   /** Decodes the read codeplug and stores the result into the given generic configuration. */
   bool decode(Config *config);
   /** Encodes the given generic configuration into this codeplug. */
-  bool encode(Config *config);
+  bool encode(Config *config, bool update=true);
 };
 
 #endif // RD5R_CODEPLUG_HH

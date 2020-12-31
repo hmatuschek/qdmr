@@ -255,6 +255,94 @@ GD77Codeplug::grouplist_t::fromRXGroupListObj(const RXGroupList *lst, const Conf
 
 
 /* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::scanlist_t
+ * ******************************************************************************************** */
+GD77Codeplug::scanlist_t::scanlist_t() {
+  clear();
+}
+
+void
+GD77Codeplug::scanlist_t::clear() {
+  memset(name, 0xff, 15);
+  _unused = 1;
+  channel_mark = 1;
+  pl_type = PL_PRI_NONPRI;
+  talkback = 1;
+  memset(member, 0x00, 64);
+  sign_hold_time = 40;
+  prio_sample_time = 8;
+  tx_designated_ch = 0;
+}
+
+QString
+GD77Codeplug::scanlist_t::getName() const {
+  return decode_ascii(name, 15, 0xff);
+}
+
+void
+GD77Codeplug::scanlist_t::setName(const QString &n) {
+  encode_ascii(name, n, 15, 0xff);
+}
+
+ScanList *
+GD77Codeplug::scanlist_t::toScanListObj() const {
+  return new ScanList(getName());
+}
+
+bool
+GD77Codeplug::scanlist_t::linkScanListObj(ScanList *lst, const Config *conf, const QHash<int, int> &channel_table) const {
+  if (1 == priority_ch1)
+    lst->setPriorityChannel(SelectedChannel::get());
+  else if ((1<priority_ch1) && channel_table.contains(priority_ch1-1))
+    lst->setPriorityChannel(conf->channelList()->channel(channel_table[priority_ch1-1]));
+  else
+    logWarn() << "Cannot deocde reference to priority channel index " << priority_ch1
+                 << " in scan list '" << getName() << "'.";
+  if (1 == priority_ch2)
+    lst->setSecPriorityChannel(SelectedChannel::get());
+  else if ((1<priority_ch2) && channel_table.contains(priority_ch2-1))
+    lst->setSecPriorityChannel(conf->channelList()->channel(channel_table.contains(priority_ch2-1)));
+  else
+    logWarn() << "Cannot deocde reference to secondary priority channel index " << priority_ch2
+              << " in scan list '" << getName() << "'.";
+
+  for (int i=0; (i<32) && (member[i]>0); i++) {
+    if (1 == member[i])
+      lst->addChannel(SelectedChannel::get());
+    else if (member[i] && channel_table.contains(member[i]-1))
+      lst->addChannel(conf->channelList()->channel(channel_table.contains(member[i]-1)));
+    else
+      logWarn() << "Cannot deocde reference to channel index " << priority_ch2
+                << " in scan list '" << getName() << "'.";
+  }
+  return true;
+}
+
+void
+GD77Codeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *conf) {
+  setName(lst->name());
+  if (lst->priorityChannel() && (SelectedChannel::get() == lst->priorityChannel()))
+    priority_ch1 = 1;
+  else if (lst->priorityChannel())
+    priority_ch1 = conf->channelList()->indexOf(lst->priorityChannel())+2;
+  if (lst->secPriorityChannel() && (SelectedChannel::get() == lst->secPriorityChannel()))
+    priority_ch2 = 1;
+  else if (lst->secPriorityChannel())
+    priority_ch2 = conf->channelList()->indexOf(lst->secPriorityChannel())+2;
+
+  tx_designated_ch = 0;
+  for (int i=0; i<32; i++) {
+    if (i >= lst->count())
+      member[i] = 0;
+    else if (SelectedChannel::get() == lst->channel(i))
+      member[i] = 1;
+    else
+      member[i] = conf->channelList()->indexOf(lst->channel(i))+2;
+  }
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of GD77Codeplug::contact_t
  * ******************************************************************************************** */
 GD77Codeplug::contact_t::contact_t() {
@@ -270,7 +358,7 @@ GD77Codeplug::contact_t::clear() {
 
 bool
 GD77Codeplug::contact_t::isValid() const {
-  return 0x00 != valid;
+  return (0x00 != valid) && (0x00 != name[0]) && (0xff != name[0]);
 }
 
 uint32_t
@@ -335,14 +423,15 @@ GD77Codeplug::GD77Codeplug(QObject *parent)
 }
 
 bool
-GD77Codeplug::encode(Config *config) {
+GD77Codeplug::encode(Config *config, bool update) {
   // set timestamp
   timestamp_t *ts = (timestamp_t *)data(OFFSET_TIMESTMP);
   ts->setNow();
 
   // pack basic config
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
-  gs->initDefault();
+  if (! update)
+    gs->initDefault();
   gs->setName(config->name());
   gs->setRadioId(config->id());
 
@@ -655,7 +744,7 @@ GD77Codeplug::decode(Config *config) {
       continue;
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
-    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i]),
+    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i+1]),
                              config, scan_table, group_table, contact_table))
     {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link channel at index %2")
