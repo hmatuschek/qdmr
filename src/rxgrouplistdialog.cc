@@ -88,12 +88,16 @@ void
 RXGroupListDialog::onRemGroup() {
   if (0 == groupListWidget->selectedItems().size()) {
     QMessageBox::information(nullptr, tr("Cannot remove group call"),
-                             tr("Cannot remove group call: You have to select a group call first."));
+                             tr("Cannot remove group call: You have to select at least one group call first."));
     return;
   }
 
-  QListWidgetItem *item = groupListWidget->takeItem(groupListWidget->currentRow());
-  delete item;
+  QList<QListWidgetItem *> selection = groupListWidget->selectedItems();
+  foreach (QListWidgetItem *item, selection) {
+    int row = groupListWidget->row(item);
+    groupListWidget->takeItem(row);
+    delete item;
+  }
 }
 
 
