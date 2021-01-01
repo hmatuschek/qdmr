@@ -130,10 +130,11 @@ OpenGD77Codeplug::channel_t::toChannelObj() const {
   if (MODE_ANALOG == channel_mode) {
     AnalogChannel::Admit admit;
     switch (admit_criteria) {
-      case ADMIT_ALWAYS: admit = AnalogChannel::AdmitNone; break;
-      case ADMIT_CH_FREE: admit = AnalogChannel::AdmitFree; break;
-      default:
-        return nullptr;
+    case ADMIT_ALWAYS: admit = AnalogChannel::AdmitNone; break;
+    case ADMIT_CH_FREE: admit = AnalogChannel::AdmitFree; break;
+    default:
+      logError() << "Unknwon admit criterion " << int(admit_criteria);
+      return nullptr;
     }
     AnalogChannel::Bandwidth bw = (BW_25_KHZ == bandwidth) ? AnalogChannel::BWWide : AnalogChannel::BWNarrow;
     return new AnalogChannel(
@@ -142,11 +143,12 @@ OpenGD77Codeplug::channel_t::toChannelObj() const {
   } else if(MODE_DIGITAL == channel_mode) {
     DigitalChannel::Admit admit;
     switch (admit_criteria) {
-      case ADMIT_ALWAYS: admit = DigitalChannel::AdmitNone; break;
-      case ADMIT_CH_FREE: admit = DigitalChannel::AdmitFree; break;
-      case ADMIT_COLOR: admit = DigitalChannel::AdmitColorCode; break;
-      default:
-        return nullptr;
+    case ADMIT_ALWAYS: admit = DigitalChannel::AdmitNone; break;
+    case ADMIT_CH_FREE: admit = DigitalChannel::AdmitFree; break;
+    case ADMIT_COLOR: admit = DigitalChannel::AdmitColorCode; break;
+    default:
+      logError() << "Unknwon admit criterion " << int(admit_criteria);
+      return nullptr;
     }
     DigitalChannel::TimeSlot slot = repeater_slot2 ?
           DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1;
@@ -154,6 +156,8 @@ OpenGD77Codeplug::channel_t::toChannelObj() const {
           name, rxF, txF, pwr, timeout, rxOnly, admit, colorcode_rx, slot,
           nullptr, nullptr, nullptr, nullptr);
   }
+
+  logError() << "Unknwon channel type " << int(channel_mode);
 
   return nullptr;
 }

@@ -111,9 +111,9 @@ protected:
     // Byte 24
     uint8_t channel_mode;             ///< Mode: Analog or Digital
     // Byte 25
-    uint16_t power;                   ///< Power setting (default=0, i.e., global).
+    uint8_t power;                    ///< Power setting (default=0, i.e., global).
     // Byte 26
-    uint8_t  _unused26;               ///< Unused, set to 0.
+    uint8_t _unused26;                ///< Unused, set to 0.
     // Bytes 27-28
     uint8_t tot;                      ///< TOT in 15sec steps: 0=Infinite.
     uint8_t tot_rekey_delay;          ///< TOT Rekey Delay in seconds [0, 255]s
