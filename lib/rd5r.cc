@@ -20,6 +20,7 @@ static Radio::Features _rd5r_features =
   16,    // maxChannelsInZone;
   false, // hasABZone
 
+  true,  // hasScanlists;
   250,   // maxScanlists;
   16,    // maxScanlistNameLength;
   31,    // maxChannelsInScanlist;
