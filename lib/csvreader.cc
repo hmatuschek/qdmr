@@ -1809,7 +1809,11 @@ CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 p
           .arg(line).arg(column).arg(name).arg(txch-1);
       return false;
     }
-    /// @bug set TX Channel
+    if (txch==0) {
+      _scanlists[idx]->setTXChannel(SelectedChannel::get());
+    } else if (txch>0) {
+      _scanlists[idx]->setTXChannel(_channels[txch-1]);
+    }
 
     // Check channels
     foreach(qint64 i, channels) {

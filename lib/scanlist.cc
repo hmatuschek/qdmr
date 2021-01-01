@@ -16,7 +16,7 @@
  * ********************************************************************************************* */
 ScanList::ScanList(const QString &name, QObject *parent)
   : QAbstractListModel(parent), _name(name), _channels(), _priorityChannel(nullptr),
-    _secPriorityChannel(nullptr)
+    _secPriorityChannel(nullptr), _txChannel(nullptr)
 {
   // pass...
 }
@@ -31,6 +31,10 @@ ScanList::clear() {
   beginResetModel();
   _channels.clear();
   endResetModel();
+  _name.clear();
+  _priorityChannel = nullptr;
+  _secPriorityChannel = nullptr;
+  _txChannel = nullptr;
   emit modified();
 }
 
@@ -38,6 +42,7 @@ const QString &
 ScanList::name() const {
   return _name;
 }
+
 bool
 ScanList::setName(const QString &name) {
   if (name.simplified().isEmpty())
@@ -85,6 +90,14 @@ ScanList::remChannel(int idx) {
   return true;
 }
 
+bool
+ScanList::remChannel(Channel *channel) {
+  if (! _channels.contains(channel))
+    return false;
+  int idx = _channels.indexOf(channel);
+  return remChannel(idx);
+}
+
 Channel *
 ScanList::priorityChannel() const {
   return _priorityChannel;
@@ -92,6 +105,9 @@ ScanList::priorityChannel() const {
 
 void
 ScanList::setPriorityChannel(Channel *channel) {
+  if (_priorityChannel)
+    disconnect(_priorityChannel, SIGNAL(destroyed(QObject*)),
+               this, SLOT(onChannelDeleted(QObject*)));
   _priorityChannel = channel;
   if (_priorityChannel)
     connect(_priorityChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
@@ -105,18 +121,28 @@ ScanList::secPriorityChannel() const {
 
 void
 ScanList::setSecPriorityChannel(Channel *channel) {
+  if (_secPriorityChannel)
+    disconnect(_secPriorityChannel, SIGNAL(destroyed(QObject*)),
+               this, SLOT(onChannelDeleted(QObject*)));
   _secPriorityChannel = channel;
   if (_secPriorityChannel)
     connect(_secPriorityChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
   emit modified();
 }
 
-bool
-ScanList::remChannel(Channel *channel) {
-  if (! _channels.contains(channel))
-    return false;
-  int idx = _channels.indexOf(channel);
-  return remChannel(idx);
+Channel *
+ScanList::txChannel() const {
+  return _txChannel;
+}
+
+void
+ScanList::setTXChannel(Channel *channel) {
+  if (_txChannel)
+    disconnect(_txChannel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
+  _txChannel = channel;
+  if (_txChannel)
+    connect(_txChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
+  emit modified();
 }
 
 int
@@ -147,6 +173,8 @@ ScanList::onChannelDeleted(QObject *obj) {
       _priorityChannel = nullptr;
     if (_secPriorityChannel == channel)
       _secPriorityChannel = nullptr;
+    if (_txChannel == channel)
+      _txChannel = nullptr;
   }
 }
 
