@@ -193,39 +193,41 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
   /*
    * Check scan lists
    */
-  if (config->scanlists()->count() > features().maxScanlists)
-    issues.append(VerifyIssue(
-                    VerifyIssue::ERROR,
-                    tr("Number of scanlists %1 exceeds limit %2")
-                    .arg(config->scanlists()->count()).arg(features().maxScanlists)));
-
-  for (int i=0; i<config->scanlists()->count(); i++) {
-    QSet<QString> names;
-    ScanList *list = config->scanlists()->scanlist(i);
-
-    if (names.contains(list->name()))
+  if (features().hasScanlists) {
+    if (config->scanlists()->count() > features().maxScanlists)
       issues.append(VerifyIssue(
-                      VerifyIssue::WARNING,
-                      tr("Duplicate scan list name '%1'.").arg(list->name())));
-    names.insert(list->name());
+                      VerifyIssue::ERROR,
+                      tr("Number of scanlists %1 exceeds limit %2")
+                      .arg(config->scanlists()->count()).arg(features().maxScanlists)));
 
-    if (list->name().size() > features().maxScanlistNameLength)
-      issues.append(VerifyIssue(
-                      VerifyIssue::WARNING,
-                      tr("Scan list name '%1' length %2 exceeds limit of %3 characters.")
-                      .arg(list->name()).arg(list->name().size()).arg(features().maxScanlistNameLength)));
+    for (int i=0; i<config->scanlists()->count(); i++) {
+      QSet<QString> names;
+      ScanList *list = config->scanlists()->scanlist(i);
 
-    if (0 == list->priorityChannel())
-      issues.append(VerifyIssue(
-                      VerifyIssue::WARNING,
-                      tr("Scan list '%1' has no priority channel set.")
-                      .arg(list->name())));
+      if (names.contains(list->name()))
+        issues.append(VerifyIssue(
+                        VerifyIssue::WARNING,
+                        tr("Duplicate scan list name '%1'.").arg(list->name())));
+      names.insert(list->name());
 
-    else if (! list->contains(list->priorityChannel()))
-      issues.append(VerifyIssue(
-                      VerifyIssue::WARNING,
-                      tr("Scan list '%1' does not contain priority channel '%2'.")
-                      .arg(list->name()).arg(list->priorityChannel()->name())));
+      if (list->name().size() > features().maxScanlistNameLength)
+        issues.append(VerifyIssue(
+                        VerifyIssue::WARNING,
+                        tr("Scan list name '%1' length %2 exceeds limit of %3 characters.")
+                        .arg(list->name()).arg(list->name().size()).arg(features().maxScanlistNameLength)));
+
+      if (0 == list->priorityChannel())
+        issues.append(VerifyIssue(
+                        VerifyIssue::WARNING,
+                        tr("Scan list '%1' has no priority channel set.")
+                        .arg(list->name())));
+
+      else if (! list->contains(list->priorityChannel()))
+        issues.append(VerifyIssue(
+                        VerifyIssue::WARNING,
+                        tr("Scan list '%1' does not contain priority channel '%2'.")
+                        .arg(list->name()).arg(list->priorityChannel()->name())));
+    }
   }
 
   return 0 == issues.size();

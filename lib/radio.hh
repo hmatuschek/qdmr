@@ -73,10 +73,12 @@ public:
 		int maxNameLength;
     /** Maximum number of channels. */
 		int maxIntroLineLength;
+
     /** Maximum number of channels. */
 		int maxChannels;
     /** Maximum length of channel names. */
 		int maxChannelNameLength;
+
     /** Maximum number of zones. */
 		int maxZones;
     /** Maximum length of zone names. */
@@ -85,6 +87,9 @@ public:
 		int maxChannelsInZone;
     /** If @c true, the radio has a zone list for each VFO. */
     bool hasABZone;
+
+    /** If true, the radio support scanlists. */
+    bool hasScanlists;
     /** Maximum number of scanlists. */
 		int maxScanlists;
     /** Maximum length of scanlist names. */
@@ -93,6 +98,7 @@ public:
 		int maxChannelsInScanlist;
     /** Does scanlist needs a priority channel?. */
     bool scanListNeedsPriority;
+
     /** Maximum number of contacts. */
 		int maxContacts;
     /** Maximum length of contact name. */

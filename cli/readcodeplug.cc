@@ -47,18 +47,25 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   }
 
   logDebug() << "Save codeplug at '" << filename << "'.";
+  // If output is CSV -> decode code-plug
   if (parser.isSet("csv") || (filename.endsWith(".conf") || filename.endsWith(".csv"))) {
+    // decode codeplug
     if (! radio->codeplug().decode(&config)) {
       logError() << "Cannot decode codeplug: " << radio->errorMessage();
       return -1;
     }
+
+    // try to write CSV file
     if (! config.writeCSV(filename, errorMessage)) {
       logError() << "Cannot write CSV file '" << filename << "': " << errorMessage;
       return -1;
     }
+
     return 0;
   }
 
+  // otherwise write binary code-plug
   radio->codeplug().write(filename);
+
   return 0;
 }

@@ -21,6 +21,7 @@ static Radio::Features _uv390_features =
   64,    // maxChannelsInZone;
   true,  // hasABZones
 
+  true,  // hasScanlists;
   250,   // maxScanlists;
   16,    // maxScanlistNameLength;
   31,    // maxChannelsInScanlist;

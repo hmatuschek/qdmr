@@ -67,7 +67,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     if (digi->txFrequency()<digi->rxFrequency())
       stream << qSetFieldWidth(11) << left << format_frequency(digi->txFrequency()-digi->rxFrequency());
     else
-      stream << qSetFieldWidth(10) << left << format_frequency(digi->txFrequency());
+      stream << qSetFieldWidth(11) << left << format_frequency(digi->txFrequency());
     stream << qSetFieldWidth(6)  << left << power2string(digi->power())
            << qSetFieldWidth(5)  << left << ( nullptr != digi->scanList() ?
           QString::number(config->scanlists()->indexOf(digi->scanList())+1) : QString("-") )
@@ -194,7 +194,13 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     else
       stream << qSetFieldWidth(5)  << left <<
                 QString::number(config->channelList()->indexOf(list->secPriorityChannel())+1);
-    stream << qSetFieldWidth(5)  << left << "Sel";
+    if (nullptr == list->txChannel())
+      stream << qSetFieldWidth(5)  << left << "-";
+    else if (SelectedChannel::get() == list->txChannel())
+      stream << qSetFieldWidth(5)  << left << "Sel";
+    else
+      stream << qSetFieldWidth(5)  << left
+             << QString::number(config->channelList()->indexOf(list->txChannel())+1);
     QStringList tmp;
     for (int j=0; j<list->count(); j++) {
       if (SelectedChannel::get() == list->channel(j))

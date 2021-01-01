@@ -22,6 +22,7 @@ static Radio::Features _open_gd77_features =
   80,    // maxChannelsInZone
   false, // hasABZone
 
+  false, // hasScanlists
   64,    // maxScanlists
   16,    // maxScanlistNameLength
   32,    // maxChannelsInScanlist

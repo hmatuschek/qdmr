@@ -44,6 +44,10 @@ public:
   Channel *secPriorityChannel() const;
   /** Sets the secondary priority channel. */
   void setSecPriorityChannel(Channel *channel);
+  /** Returns the TX channel. */
+  Channel *txChannel() const;
+  /** Sets the TX channel. */
+  void setTXChannel(Channel *channel);
 
 	/** Implementation of QAbstractListModel, returns the number of channels. */
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -69,6 +73,8 @@ protected:
   Channel *_priorityChannel;
   /** The secondary priority channel. */
   Channel *_secPriorityChannel;
+  /** The transmit channel. */
+  Channel *_txChannel;
 };
 
 
