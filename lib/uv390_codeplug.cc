@@ -616,6 +616,30 @@ UV390Codeplug::scanlist_t::linkScanListObj(ScanList *l, Config *conf) const {
     logDebug() << "Cannot link invalid scanlist.";
     return false;
   }
+
+  if (1 == priority_ch1)
+    l->setPriorityChannel(SelectedChannel::get());
+  else if ((1<priority_ch1) && ((priority_ch1-2)<conf->channelList()->count()))
+    l->setPriorityChannel(conf->channelList()->channel(priority_ch1-2));
+  else
+    logWarn() << "Cannot deocde reference to priority channel index " << priority_ch1
+                 << " in scan list '" << getName() << "'.";
+  if (1 == priority_ch2)
+    l->setSecPriorityChannel(SelectedChannel::get());
+  else if ((1<priority_ch2) && ((priority_ch2-2)<conf->channelList()->count()))
+    l->setSecPriorityChannel(conf->channelList()->channel(priority_ch2-2));
+  else
+    logWarn() << "Cannot deocde reference to secondary priority channel index " << priority_ch2
+              << " in scan list '" << getName() << "'.";
+
+  if (1 == tx_designated_ch)
+    l->setTXChannel(SelectedChannel::get());
+  else if ((1<priority_ch2) && ((tx_designated_ch-2)<conf->channelList()->count()))
+    l->setTXChannel(conf->channelList()->channel(tx_designated_ch-2));
+  else
+    logWarn() << "Cannot deocde reference to secondary priority channel index " << tx_designated_ch
+                << " in scan list '" << getName() << "'.";
+
   for (int i=0; ((i<31) && member[i]); i++) {
     if ((member[i]-1) >= conf->channelList()->count()) {
       logDebug() << "Cannot link scanlist to channel idx=" << member[i]
@@ -630,14 +654,21 @@ UV390Codeplug::scanlist_t::linkScanListObj(ScanList *l, Config *conf) const {
 void
 UV390Codeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *conf) {
   setName(lst->name());
+
   if (lst->priorityChannel() && (SelectedChannel::get() == lst->priorityChannel()))
     priority_ch1 = 0;
   else if (lst->priorityChannel())
     priority_ch1 = conf->channelList()->indexOf(lst->priorityChannel())+1;
+
   if (lst->secPriorityChannel() && (SelectedChannel::get() == lst->secPriorityChannel()))
     priority_ch2 = 0;
   else if (lst->secPriorityChannel())
     priority_ch2 = conf->channelList()->indexOf(lst->secPriorityChannel())+1;
+
+  if (lst->txChannel() && (SelectedChannel::get() == lst->txChannel()))
+    tx_designated_ch = 0;
+  else if (lst->txChannel())
+    tx_designated_ch = conf->channelList()->indexOf(lst->txChannel())+1;
 
   for (int i=0, j=0; i<31;) {
     if (j >= lst->count()) {
