@@ -63,10 +63,7 @@ RD5R::codeplug() {
 }
 
 bool
-RD5R::startDownload(Config *config, bool blocking) {
-  if (nullptr == (_config = config))
-    return false;
-
+RD5R::startDownload(bool blocking) {
   _dev = new HID(0x15a2, 0x0073);
   if (! _dev->isOpen()) {
     _errorMessage = tr("%1(): Cannot open Download codeplug: %2")

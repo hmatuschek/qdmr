@@ -419,7 +419,7 @@ Application::downloadCodeplug() {
   connect(radio, SIGNAL(downloadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(downloadError(Radio *)), this, SLOT(onCodeplugDownloadError(Radio *)));
   connect(radio, SIGNAL(downloadFinished(Radio *, CodePlug *)), this, SLOT(onCodeplugDownloaded(Radio *, CodePlug *)));
-  radio->startDownload(_config);
+  radio->startDownload(false);
   _mainWindow->statusBar()->showMessage(tr("Download ..."));
   _mainWindow->setEnabled(false);
 }

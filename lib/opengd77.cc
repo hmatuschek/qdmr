@@ -69,14 +69,9 @@ OpenGD77::codeplug() {
 
 
 bool
-OpenGD77::startDownload(Config *config, bool blocking) {
+OpenGD77::startDownload(bool blocking) {
   if (StatusIdle != _task) {
     logError() << "Cannot download from radio, radio is not idle.";
-    return false;
-  }
-
-  if (! (_config = config)) {
-    logError() << "Cannot download from radio, no config given.";
     return false;
   }
 

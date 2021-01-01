@@ -125,17 +125,22 @@ public:
 
   /** Returns the name of the radio (e.g., device identifier). */
 	virtual const QString &name() const = 0;
+
   /** Returns the features for the particular radio. */
 	virtual const Features &features() const = 0;
+
   /** Returns the codeplug instance. */
   virtual const CodePlug &codeplug() const = 0;
   /** Returns the codeplug instance. */
   virtual CodePlug &codeplug() = 0;
+
   /** Verifies the configuration against the radio features.
    * On exit, @c issues will contain the issues found. */
 	bool verifyConfig(Config *config, QList<VerifyIssue> &issues);
+
   /** Returns the current status. */
   Status status() const;
+
   /** Returns the last error message. */
   const QString &errorMessage() const;
   /** Clears the last error message and state. */
@@ -146,8 +151,10 @@ public:
 	static Radio *detect(QString &errorMessage);
 
 public slots:
-  /** Starts the download of the codeplug and derives the generic configuration from it. */
-  virtual bool startDownload(Config *config, bool blocking=false) = 0;
+  /** Starts the download of the codeplug.
+   * Once the download finished, the codeplug can be accessed and decoded using
+   * the @c codeplug() method. */
+  virtual bool startDownload(bool blocking=false) = 0;
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   virtual bool startUpload(Config *config, bool blocking=false, bool update=true) = 0;
