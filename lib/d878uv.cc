@@ -22,6 +22,7 @@ static Radio::Features _d878uv_features =
   250,   // maxChannelsInZone;
   false, // hasABZones
 
+  true,  // hasScanlists;
   250,   // maxScanlists;
   16,    // maxScanlistNameLength;
   31,    // maxChannelsInScanlist;
