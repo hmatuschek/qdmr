@@ -87,18 +87,19 @@ protected:
       BW_25_KHZ   = 1                 ///< 25kHz channel, wastes some energy.
     } Bandwidth;
 
+    /** All possible power settings. */
     typedef enum {
-      POWER_GLOBAL = 0,               ///< Use global power setting.
-      POWER_50mW   = 1,               ///< About 50mW.
-      POWER_250mW  = 2,               ///< About 250mW.
-      POWER_500mW  = 2,               ///< About 500mW.
-      POWER_750mW  = 2,               ///< About 750mW.
-      POWER_1W     = 2,               ///< About 1W.
-      POWER_2W     = 2,               ///< About 2W.
-      POWER_3W     = 2,               ///< About 3W.
-      POWER_4W     = 2,               ///< About 4W.
-      POWER_5W     = 2,               ///< About 5W.
-      POWER_MAX    = 2,               ///< Maximum power (5.5W on UHF, 7W on VHF).
+      POWER_GLOBAL =  0,              ///< Use global power setting.
+      POWER_50mW   =  1,              ///< About 50mW.
+      POWER_250mW  =  2,              ///< About 250mW.
+      POWER_500mW  =  3,              ///< About 500mW.
+      POWER_750mW  =  4,              ///< About 750mW.
+      POWER_1W     =  5,              ///< About 1W.
+      POWER_2W     =  6,              ///< About 2W.
+      POWER_3W     =  7,              ///< About 3W.
+      POWER_4W     =  8,              ///< About 4W.
+      POWER_5W     =  9,              ///< About 5W.
+      POWER_MAX    = 10,              ///< Maximum power (5.5W on UHF, 7W on VHF).
     } Power;
 
 
@@ -119,7 +120,7 @@ protected:
     // Byte 29
     uint8_t admit_criteria;           ///< Admit Criteria: Always, Channel Free or Color Code
     // Bytes 30-31
-    uint8_t _unused30;                ///< Unused, set to @c 0x50.
+    uint8_t _unused30;                ///< Unknown set to @c 0x50.
     uint8_t scan_list_index;          ///< Scan List index: 0=None or index + 1.
     // Bytes 32-35
     uint16_t ctcss_dcs_receive;       ///< RX CTCSS/DCS setting, 4 digits BCD or 0xffff if disabled.
