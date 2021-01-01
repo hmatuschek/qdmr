@@ -182,10 +182,16 @@ UV390Codeplug::channel_t::toChannelObj() const {
   if (! isValid())
     return nullptr;
 
-  if (MODE_ANALOG == channel_mode) {
-    Channel::Power pwr =
-        (POWER_HIGH == power) ? Channel::HighPower : Channel::LowPower;
+  // decode power setting
+  Channel::Power pwr;
+  if (POWER_HIGH == power)
+    pwr = Channel::HighPower;
+  else if (POWER_MIDDLE == power)
+    pwr = Channel::MidPower;
+  else
+    pwr = Channel::LowPower;
 
+  if (MODE_ANALOG == channel_mode) {
     AnalogChannel::Admit admit_crit;
     switch(admit_criteria) {
       case ADMIT_ALWAYS: admit_crit = AnalogChannel::AdmitNone; break;
@@ -200,9 +206,6 @@ UV390Codeplug::channel_t::toChannelObj() const {
     return new AnalogChannel(getName(), getRXFrequency(), getTXFrequency(), pwr, (tot*15), rx_only,
                              admit_crit, squelch, getRXTone(), getTXTone(), bw, nullptr);
   } else if (MODE_DIGITAL == channel_mode) {
-    Channel::Power pwr =
-        (POWER_HIGH == power) ? Channel::HighPower : Channel::LowPower;
-
     DigitalChannel::Admit admit_crit;
     switch(admit_criteria) {
       case ADMIT_ALWAYS: admit_crit = DigitalChannel::AdmitNone; break;
@@ -272,7 +275,21 @@ UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf
   rx_only = chan->rxOnly() ? 1 : 0;
   tot     = chan->txTimeout()/15;
   scan_list_index = conf->scanlists()->indexOf(chan->scanList())+1;
-  power = (Channel::HighPower == chan->power()) ? POWER_HIGH : POWER_LOW;
+
+  // encode power setting
+  switch (chan->power()) {
+  case Channel::MaxPower:
+  case Channel::HighPower:
+    power = POWER_HIGH;
+    break;
+  case Channel::MidPower:
+    power = POWER_MIDDLE;
+    break;
+  case Channel::LowPower:
+  case Channel::MinPower:
+    power = POWER_LOW;
+    break;
+  }
 
   if (chan->is<const DigitalChannel>()) {
     const DigitalChannel *dchan = chan->as<const DigitalChannel>();

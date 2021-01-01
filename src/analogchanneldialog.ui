@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>445</width>
+    <width>559</width>
     <height>280</height>
    </rect>
   </property>
@@ -64,6 +64,17 @@
        </item>
        <item row="3" column="1">
         <widget class="QComboBox" name="power">
+         <property name="currentText">
+          <string>High</string>
+         </property>
+         <property name="currentIndex">
+          <number>1</number>
+         </property>
+         <item>
+          <property name="text">
+           <string>Max</string>
+          </property>
+         </item>
          <item>
           <property name="text">
            <string>High</string>
@@ -71,7 +82,17 @@
          </item>
          <item>
           <property name="text">
+           <string>Mid</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>Low</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Min</string>
           </property>
          </item>
         </widget>

@@ -37,8 +37,11 @@ AnalogChannelDialog::construct() {
 
   rxFrequency->setValidator(new QDoubleValidator(0,500,5));
   txFrequency->setValidator(new QDoubleValidator(0,500,5));
-  power->setItemData(0, uint(Channel::HighPower));
-  power->setItemData(1, uint(Channel::LowPower));
+  power->setItemData(0, uint(Channel::MaxPower));
+  power->setItemData(1, uint(Channel::HighPower));
+  power->setItemData(2, uint(Channel::MidPower));
+  power->setItemData(3, uint(Channel::LowPower));
+  power->setItemData(4, uint(Channel::MinPower));
   scanList->addItem(tr("[None]"), QVariant::fromValue((ScanList *)(nullptr)));
   scanList->setCurrentIndex(0);
   for (int i=0; i<_config->scanlists()->count(); i++) {
