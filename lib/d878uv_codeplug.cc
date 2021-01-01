@@ -249,15 +249,19 @@ D878UVCodeplug::channel_t::setTXTone(Code code) {
 
 Channel *
 D878UVCodeplug::channel_t::toChannelObj() const {
+  // Decode power setting
   Channel::Power power = Channel::LowPower;
   switch ((channel_t::Power) this->power) {
   case POWER_LOW:
-  case POWER_MIDDLE:
     power = Channel::LowPower;
     break;
+  case POWER_MIDDLE:
+    power = Channel::MidPower;
+    break;
   case POWER_HIGH:
-  case POWER_TURBO:
     power = Channel::HighPower;
+  case POWER_TURBO:
+    power = Channel::MaxPower;
     break;
   }
   bool rxOnly = (1 == this->rx_only);
@@ -338,7 +342,22 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
   // set rx and tx frequencies
   setRXFrequency(c->rxFrequency());
   setTXFrequency(c->txFrequency());
-  // set power
+  // encode power setting
+  switch (c->power()) {
+  case Channel::MaxPower:
+    power = POWER_TURBO;
+  case Channel::HighPower:
+    power = POWER_HIGH;
+    break;
+  case Channel::MidPower:
+    power = POWER_MIDDLE;
+    break;
+  case Channel::LowPower:
+  case Channel::MinPower:
+    power = POWER_LOW;
+    break;
+  }
+
   power = (Channel::LowPower == c->power()) ? POWER_LOW : POWER_HIGH;
   // set tx-enable
   rx_only = c->rxOnly() ? 1 : 0;
