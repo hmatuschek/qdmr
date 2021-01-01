@@ -21,6 +21,7 @@ the software with.
 
 
 ## Releases
+ * **[Version 0.4.6](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.6)** -- Bugfix release.
  * **[Version 0.4.5](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.5)** -- Bugfix release.
  * **[Version 0.4.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.3)** -- Bugfix release.
  * **[Version 0.4.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.1)** -- Bugfix release.

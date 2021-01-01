@@ -48,6 +48,8 @@ RXGroupListDialog::construct() {
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(addContact, SIGNAL(clicked()), this, SLOT(onAddGroup()));
   connect(remContact, SIGNAL(clicked()), this, SLOT(onRemGroup()));
+  connect(groupUp, SIGNAL(clicked(bool)), this, SLOT(onGroupUp()));
+  connect(groupDown, SIGNAL(clicked(bool)), this, SLOT(onGroupDown()));
 
   if (_list) {
     groupListName->setText(_list->name());
@@ -92,6 +94,29 @@ RXGroupListDialog::onRemGroup() {
   }
 }
 
+void
+RXGroupListDialog::onGroupUp() {
+  if (1 != groupListWidget->selectedItems().size())
+    return;
+  int idx = groupListWidget->currentRow();
+  if (0 == idx)
+    return;
+  QListWidgetItem *item = groupListWidget->takeItem(idx);
+  groupListWidget->insertItem(idx-1, item);
+  groupListWidget->setCurrentRow(idx-1);
+}
+
+void
+RXGroupListDialog::onGroupDown() {
+  if (1 != groupListWidget->selectedItems().size())
+    return;
+  int idx = groupListWidget->currentRow();
+  if ((groupListWidget->count()-1) <= idx)
+    return;
+  QListWidgetItem *item = groupListWidget->takeItem(idx);
+  groupListWidget->insertItem(idx+1, item);
+  groupListWidget->setCurrentRow(idx+1);
+}
 
 /* ********************************************************************************************* *
  * Implementation of RXGroupListBox
