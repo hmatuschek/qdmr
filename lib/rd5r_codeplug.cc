@@ -531,6 +531,14 @@ RD5RCodeplug::scanlist_t::linkScanListObj(ScanList *lst, const Config *conf, con
     logWarn() << "Cannot deocde reference to secondary priority channel index " << priority_ch2
               << " in scan list '" << getName() << "'.";
 
+  if (1 == tx_designated_ch)
+    lst->setTXChannel(SelectedChannel::get());
+  else if ((1<tx_designated_ch) && channel_table.contains(tx_designated_ch-1))
+    lst->setTXChannel(conf->channelList()->channel(channel_table.contains(tx_designated_ch-1)));
+  else
+    logWarn() << "Cannot deocde reference to transmit channel index " << tx_designated_ch
+              << " in scan list '" << getName() << "'.";
+
   for (int i=0; (i<32) && (member[i]>0); i++) {
     if (1 == member[i])
       lst->addChannel(SelectedChannel::get());
@@ -553,6 +561,10 @@ RD5RCodeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *con
     priority_ch2 = 1;
   else if (lst->secPriorityChannel())
     priority_ch2 = conf->channelList()->indexOf(lst->secPriorityChannel())+2;
+  if (lst->txChannel() && (SelectedChannel::get() == lst->txChannel()))
+    tx_designated_ch = 1;
+  else if (lst->txChannel())
+    tx_designated_ch = conf->channelList()->indexOf(lst->txChannel())+2;
 
   tx_designated_ch = 0;
   for (int i=0; i<32; i++) {
