@@ -19,6 +19,225 @@
 
 
 /* ******************************************************************************************** *
+ * Implementation of OpenGD77Codeplug::channel_t
+ * ******************************************************************************************** */
+bool
+OpenGD77Codeplug::channel_t::isValid() const {
+  // Channel is enabled/disabled at channel bank
+  return true;
+}
+
+void
+OpenGD77Codeplug::channel_t::clear() {
+  memset(name, 0xff, 16);
+  power                  = POWER_GLOBAL;
+  _unused26              = 0;
+  _unused30              = 0x50;
+  _unused36              = 0;
+  tx_signaling_syst      = 0;
+  _unused38              = 0;
+  rx_signaling_syst      = 0;
+  _unused40              = 0x16;
+  privacy_group          = PRIVGR_NONE;
+  emergency_system_index = 0;
+  _unused48              = 0;
+  emergency_alarm_ack    = 0;
+  data_call_conf         = 0;
+  private_call_conf      = 0;
+  _unused49_1            = 0;
+  privacy                = 0;
+  _unused49_5            = 0;
+  _unused49_7            = 0;
+  dcdm                   = 0;
+  _unused50_1            = 0;
+  _unused50_6            = 0;
+  squelch                = SQ_NORMAL;
+  bandwidth              = BW_12_5_KHZ;
+  talkaround             = 0;
+  _unused51_4            = 0;
+  vox                    = 0;
+  _unused52              = 0;
+}
+
+double
+OpenGD77Codeplug::channel_t::getRXFrequency() const {
+  return decode_frequency(rx_frequency);
+}
+void
+OpenGD77Codeplug::channel_t::setRXFrequency(double freq) {
+  rx_frequency = encode_frequency(freq);
+}
+
+double
+OpenGD77Codeplug::channel_t::getTXFrequency() const {
+  return decode_frequency(tx_frequency);
+}
+void
+OpenGD77Codeplug::channel_t::setTXFrequency(double freq) {
+  tx_frequency = encode_frequency(freq);
+}
+
+QString
+OpenGD77Codeplug::channel_t::getName() const {
+  return decode_ascii(name, 16, 0xff);
+}
+void
+OpenGD77Codeplug::channel_t::setName(const QString &n) {
+  encode_ascii(name, n, 16, 0xff);
+}
+
+Signaling::Code
+OpenGD77Codeplug::channel_t::getRXTone() const {
+  return decode_ctcss_tone_table(ctcss_dcs_receive);
+}
+void
+OpenGD77Codeplug::channel_t::setRXTone(Signaling::Code tone) {
+  ctcss_dcs_receive = encode_ctcss_tone_table(tone);
+}
+
+Signaling::Code
+OpenGD77Codeplug::channel_t::getTXTone() const {
+  return decode_ctcss_tone_table(ctcss_dcs_transmit);
+}
+void
+OpenGD77Codeplug::channel_t::setTXTone(Signaling::Code tone) {
+  ctcss_dcs_transmit = encode_ctcss_tone_table(tone);
+}
+
+Channel *
+OpenGD77Codeplug::channel_t::toChannelObj() const {
+  QString name = getName();
+  double rxF = getRXFrequency();
+  double txF = getTXFrequency();
+  // decode power setting
+  Channel::Power pwr = Channel::LowPower;
+  if (POWER_GLOBAL == power) {
+    pwr = Channel::LowPower;
+  } else if (POWER_50mW == power) {
+    pwr = Channel::MinPower;
+  } else if ((POWER_250mW == power) || (POWER_500mW == power) || (POWER_750mW == power) || (POWER_1W == power)){
+    pwr = Channel::LowPower;
+  } else if ((POWER_2W == power) || (POWER_3W == power)) {
+    pwr = Channel::MidPower;
+  } else if ((POWER_4W == power) || (POWER_5W == power)) {
+    pwr = Channel::HighPower;
+  } else if (POWER_MAX == power) {
+    pwr = Channel::MaxPower;
+  }
+
+  uint timeout = tot*15;
+  bool rxOnly = rx_only;
+  if (MODE_ANALOG == channel_mode) {
+    AnalogChannel::Admit admit;
+    switch (admit_criteria) {
+      case ADMIT_ALWAYS: admit = AnalogChannel::AdmitNone; break;
+      case ADMIT_CH_FREE: admit = AnalogChannel::AdmitFree; break;
+      default:
+        return nullptr;
+    }
+    AnalogChannel::Bandwidth bw = (BW_25_KHZ == bandwidth) ? AnalogChannel::BWWide : AnalogChannel::BWNarrow;
+    return new AnalogChannel(
+          name, rxF, txF, pwr, timeout, rxOnly, admit, squelch,  getRXTone(), getTXTone(),
+          bw, nullptr);
+  } else if(MODE_DIGITAL == channel_mode) {
+    DigitalChannel::Admit admit;
+    switch (admit_criteria) {
+      case ADMIT_ALWAYS: admit = DigitalChannel::AdmitNone; break;
+      case ADMIT_CH_FREE: admit = DigitalChannel::AdmitFree; break;
+      case ADMIT_COLOR: admit = DigitalChannel::AdmitColorCode; break;
+      default:
+        return nullptr;
+    }
+    DigitalChannel::TimeSlot slot = repeater_slot2 ?
+          DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1;
+    return new DigitalChannel(
+          name, rxF, txF, pwr, timeout, rxOnly, admit, colorcode_rx, slot,
+          nullptr, nullptr, nullptr, nullptr);
+  }
+
+  return nullptr;
+}
+
+bool
+OpenGD77Codeplug::channel_t::linkChannelObj(
+    Channel *c, Config *conf,
+    const QHash<int,int> &scan_table, const QHash<int,int> &group_table, const QHash<int, int> &contact_table) const {
+  if (c->is<AnalogChannel>()) {
+    AnalogChannel *ac = c->as<AnalogChannel>();
+    if (scan_list_index && scan_table.contains(scan_list_index))
+      ac->setScanList(conf->scanlists()->scanlist(scan_table[scan_list_index]));
+  } else {
+    DigitalChannel *dc = c->as<DigitalChannel>();
+    if (scan_list_index && scan_table.contains(scan_list_index))
+      dc->setScanList(conf->scanlists()->scanlist(scan_table[scan_list_index]));
+    if (group_list_index && group_table.contains(group_list_index))
+      dc->setRXGroupList(conf->rxGroupLists()->list(group_table[group_list_index]));
+    if (contact_name_index && contact_table.contains(contact_name_index))
+      dc->setTXContact(conf->contacts()->digitalContact(contact_table[contact_name_index]));
+  }
+  return true;
+}
+
+void
+OpenGD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
+  clear();
+
+  setName(c->name());
+  setRXFrequency(c->rxFrequency());
+  setTXFrequency(c->txFrequency());
+
+  // encode power setting
+  switch (c->power()) {
+  case Channel::MaxPower:
+    power = POWER_MAX;
+  case Channel::HighPower:
+    power = POWER_5W;
+    break;
+  case Channel::MidPower:
+    power = POWER_3W;
+  case Channel::LowPower:
+    power = POWER_1W;
+  case Channel::MinPower:
+    power = POWER_50mW;
+    break;
+  }
+
+  tot = c->txTimeout()/15;
+  rx_only = c->rxOnly() ? 1 : 0;
+  bandwidth = BW_12_5_KHZ;
+
+  if (c->is<AnalogChannel>()) {
+    const AnalogChannel *ac = c->as<const AnalogChannel>();
+    channel_mode = MODE_ANALOG;
+    switch (ac->admit()) {
+      case AnalogChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS; break;
+      case AnalogChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE; break;
+      default: admit_criteria = ADMIT_CH_FREE; break;
+    }
+    bandwidth = (AnalogChannel::BWWide == ac->bandwidth()) ? BW_25_KHZ : BW_12_5_KHZ;
+    squelch = SQ_NORMAL; //ac->squelch();
+    setRXTone(ac->rxTone());
+    setTXTone(ac->txTone());
+    scan_list_index = conf->scanlists()->indexOf(ac->scanList())+1;
+  } else if (c->is<DigitalChannel>()) {
+    const DigitalChannel *dc = c->as<const DigitalChannel>();
+    channel_mode = MODE_DIGITAL;
+    switch (dc->admit()) {
+      case DigitalChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS; break;
+      case DigitalChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE; break;
+      case DigitalChannel::AdmitColorCode: admit_criteria = ADMIT_COLOR; break;
+    }
+    repeater_slot2 = (DigitalChannel::TimeSlot1 == dc->timeslot()) ? 0 : 1;
+    colorcode_rx = colorcode_tx = dc->colorCode();
+    scan_list_index = conf->scanlists()->indexOf(dc->scanList()) + 1;
+    group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList()) + 1;
+    contact_name_index = conf->contacts()->indexOfDigital(dc->txContact()) + 1;
+  }
+}
+
+
+
+/* ******************************************************************************************** *
  * Implementation of OpenGD77Codeplug::zone_t
  * ******************************************************************************************** */
 OpenGD77Codeplug::zone_t::zone_t() {
