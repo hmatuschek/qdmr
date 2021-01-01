@@ -26,8 +26,11 @@ class Channel: public QObject
 public:
   /** Possible power settings. */
 	typedef enum {
-		HighPower, ///< High power setting (e.g, 5W).
-    LowPower   ///< Low power setting (e.g., 1W)
+    MaxPower,  ///< Highest power setting (e.g. > 5W, if available).
+    HighPower, ///< High power setting (e.g, 5W).
+    MidPower,  ///< Medium power setting (e.g., 2W, if avaliable)
+    LowPower,  ///< Low power setting (e.g., 1W).
+    MinPower   ///< Lowest power setting (e.g., <1W, if available).
 	} Power;
 
 protected:

@@ -6,6 +6,15 @@
 #include "utils.hh"
 #include <cmath>
 
+inline QString power2string(Channel::Power power) {
+  switch (power) {
+  case Channel::MaxPower:  return "Max";
+  case Channel::HighPower: return "High";
+  case Channel::MidPower:  return "Mid";
+  case Channel::LowPower:  return "Low";
+  case Channel::MinPower:  return "Min";
+  }
+}
 
 
 bool
@@ -36,7 +45,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 2) Name in quotes. E.g., \"NAME\" \n"
             "# 3) Receive frequency in MHz\n"
             "# 4) Transmit frequency or +/- offset in MHz\n"
-            "# 5) Transmit power: High, Low\n"
+            "# 5) Transmit power: Max, High, Mid, Low or Min\n"
             "# 6) Scan list: - or index in Scanlist table\n"
             "# 7) Transmit timeout timer in seconds: 0, 15, 30, 45... 555\n"
             "# 8) Receive only: -, +\n"
@@ -59,7 +68,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
       stream << qSetFieldWidth(11) << left << format_frequency(digi->txFrequency()-digi->rxFrequency());
     else
       stream << qSetFieldWidth(10) << left << format_frequency(digi->txFrequency());
-    stream << qSetFieldWidth(6)  << left << ( (Channel::HighPower == digi->power()) ? "High" : "Low" )
+    stream << qSetFieldWidth(6)  << left << power2string(digi->power())
            << qSetFieldWidth(5)  << left << ( nullptr != digi->scanList() ?
           QString::number(config->scanlists()->indexOf(digi->scanList())+1) : QString("-") )
            << qSetFieldWidth(4)  << left << ( (0 == digi->txTimeout()) ? QString("-") : QString::number(digi->txTimeout()) )
@@ -90,7 +99,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 2) Name in quotes.\n"
             "# 3) Receive frequency in MHz\n"
             "# 4) Transmit frequency or +/- offset in MHz\n"
-            "# 5) Transmit power: High, Low\n"
+            "# 5) Transmit power: Max, High, Mid, Low or Min\n"
             "# 6) Scan list: - or index\n"
             "# 7) Transmit timeout timer in seconds: 0, 15, 30, 45... 555\n"
             "# 8) Receive only: -, +\n"
@@ -112,7 +121,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
       stream << qSetFieldWidth(11) << left << format_frequency(analog->txFrequency()-analog->rxFrequency());
     else
       stream << qSetFieldWidth(11) << left << format_frequency(analog->txFrequency());
-    stream << qSetFieldWidth(6)  << left << ( (Channel::HighPower == analog->power()) ? "High" : "Low" )
+    stream << qSetFieldWidth(6)  << left << power2string(analog->power())
            << qSetFieldWidth(5)  << left << ( nullptr != analog->scanList() ?
           QString::number(config->scanlists()->indexOf(analog->scanList())+1) : QString("-") )
            << qSetFieldWidth(4)  << left << ( (0 == analog->txTimeout()) ? QString("-") : QString::number(analog->txTimeout()) )

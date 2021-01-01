@@ -815,11 +815,17 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
     return false;
   }
   Channel::Power pwr;
-  if ("high" == token.value.toLower())
+  if ("max" == token.value.toLower()) {
+    pwr = Channel::MaxPower;
+  } else if ("high" == token.value.toLower()) {
     pwr = Channel::HighPower;
-  else if ("low" == token.value.toLower())
+  } else if ("mid" == token.value.toLower()) {
+    pwr = Channel::MidPower;
+  } else if ("low" == token.value.toLower()) {
     pwr = Channel::LowPower;
-  else {
+  } else if ("min" == token.value.toLower()) {
+    pwr = Channel::MinPower;
+  } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'High' or 'Low'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
@@ -1014,11 +1020,17 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
     return false;
   }
   Channel::Power pwr;
-  if ("high" == token.value.toLower())
+  if ("max" == token.value.toLower()) {
+    pwr = Channel::MaxPower;
+  } else if ("high" == token.value.toLower()) {
     pwr = Channel::HighPower;
-  else if ("low" == token.value.toLower())
+  } else if ("mid" == token.value.toLower()) {
+    pwr = Channel::MidPower;
+  } else if ("low" == token.value.toLower()) {
     pwr = Channel::LowPower;
-  else {
+  } else if ("min" == token.value.toLower()) {
+    pwr = Channel::MinPower;
+  } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'High' or 'Low'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
