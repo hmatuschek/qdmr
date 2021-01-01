@@ -67,7 +67,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     if (digi->txFrequency()<digi->rxFrequency())
       stream << qSetFieldWidth(11) << left << format_frequency(digi->txFrequency()-digi->rxFrequency());
     else
-      stream << qSetFieldWidth(10) << left << format_frequency(digi->txFrequency());
+      stream << qSetFieldWidth(11) << left << format_frequency(digi->txFrequency());
     stream << qSetFieldWidth(6)  << left << power2string(digi->power())
            << qSetFieldWidth(5)  << left << ( nullptr != digi->scanList() ?
           QString::number(config->scanlists()->indexOf(digi->scanList())+1) : QString("-") )
