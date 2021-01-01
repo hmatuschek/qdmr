@@ -96,6 +96,7 @@ private slots:
   void onGPSUp();
   void onGPSDown();
   void onEditGPS(const QModelIndex &index);
+  void onHideGPSNote();
 
   void positionUpdated(const QGeoPositionInfo &info);
 

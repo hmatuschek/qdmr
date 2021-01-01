@@ -29,6 +29,9 @@ public:
 
   bool updateCodeplug() const;
   void setUpdateCodeplug(bool update);
+
+  bool hideGSPNote() const;
+  void setHideGPSNote(bool hide);
 };
 
 

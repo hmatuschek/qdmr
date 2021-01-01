@@ -26,6 +26,8 @@ public:
 protected slots:
 	void onAddGroup();
 	void onRemGroup();
+  void onGroupUp();
+  void onGroupDown();
 
 protected:
 	void construct();

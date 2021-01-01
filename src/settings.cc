@@ -56,6 +56,9 @@ QString deg2loc(const QGeoCoordinate &coor) {
 }
 
 
+/* ********************************************************************************************* *
+ * Implementation of SettingsDialog
+ * ********************************************************************************************* */
 Settings::Settings(QObject *parent)
   : QSettings(parent)
 {
@@ -119,6 +122,20 @@ Settings::setUpdateCodeplug(bool update) {
   setValue("updateCodeplug", update);
 }
 
+bool
+Settings::hideGSPNote() const {
+  return value("hideGPSNote", false).toBool();
+}
+
+void
+Settings::setHideGPSNote(bool hide) {
+  setValue("hideGPSNote", hide);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of SettingsDialog
+ * ********************************************************************************************* */
 SettingsDialog::SettingsDialog(QWidget *parent)
   : QDialog(parent)
 {

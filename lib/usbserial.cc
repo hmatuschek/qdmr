@@ -16,7 +16,7 @@ USBSerial::USBSerial(unsigned vid, unsigned pid, QObject *parent)
       logDebug() << "Found serial port " << hex << vid << ":" << pid << ": "
                  << port.portName() << " '" << port.description() << "'.";
       this->setPort(port);
-      this->setBaudRate(921600);
+
       if (! this->open(QIODevice::ReadWrite)) {
         _errorMessage = tr("%1: Cannot open serial port '%2': %3")
             .arg(__func__).arg(port.portName()).arg(this->errorString());
@@ -27,6 +27,7 @@ USBSerial::USBSerial(unsigned vid, unsigned pid, QObject *parent)
       }
     }
   }
+
   if ((! this->isOpen()) && _errorMessage.isEmpty()) {
     _errorMessage = tr("%1: No serial port found with %2:%3.")
         .arg(__func__).arg(vid, 4, 16).arg(pid, 4, 16);
@@ -42,7 +43,7 @@ USBSerial::USBSerial(unsigned vid, unsigned pid, QObject *parent)
 }
 
 USBSerial::~USBSerial() {
-  QSerialPort::close();
+  close();
 }
 
 bool
@@ -52,7 +53,8 @@ USBSerial::isOpen() const {
 
 void
 USBSerial::close() {
-  QSerialPort::close();
+  if (isOpen())
+    QSerialPort::close();
 }
 
 const QString &
@@ -67,5 +69,9 @@ USBSerial::onError(QSerialPort::SerialPortError err) {
 
 void
 USBSerial::onClose() {
+<<<<<<< HEAD
   //logInfo() << ": Serial port will close now.";
+=======
+  logDebug() << ": Serial port will close now.";
+>>>>>>> master
 }

@@ -2,7 +2,7 @@ name: qdmr
 
 version: git
 grade: devel
-#version: 0.4.5
+#version: 0.4.6
 #grade: stable
 
 summary: Graphical code-plug programming tool for DMR radios.
@@ -34,17 +34,17 @@ apps:
     extensions:
       - kde-neon
 
-slots:
-  opengd77:
-    interface: serial-port
-    usb-vendor: 0x1fc9
-    usb-product: 0x0094
-    path: /dev/serial-port-opengd77
-  anytone:
-    interface: serial-port
-    usb-vendor: 0x28e9
-    usb-product: 0x018a
-    path: /dev/serial-port-anytone
+#slots:
+#  opengd77:
+#    interface: serial-port
+#    usb-vendor: 0x1fc9
+#    usb-product: 0x0094
+#    path: /dev/serial-port-opengd77
+#  anytone:
+#    interface: serial-port
+#    usb-vendor: 0x28e9
+#    usb-product: 0x018a
+#    path: /dev/serial-port-anytone
 
 parts:
   qdmr:

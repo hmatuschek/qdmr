@@ -85,6 +85,8 @@ Application::createMainWindow() {
   if (_mainWindow)
     return _mainWindow;
 
+  Settings settings;
+
   QUiLoader loader;
   QFile uiFile("://ui/mainwindow.ui");
   uiFile.open(QIODevice::ReadOnly);
@@ -225,12 +227,17 @@ Application::createMainWindow() {
   QPushButton *gpsDown = _mainWindow->findChild<QPushButton *>("gpsDown");
   QPushButton *addGPS  = _mainWindow->findChild<QPushButton *>("addGPS");
   QPushButton *remGPS  = _mainWindow->findChild<QPushButton *>("remGPS");
+  QLabel *gpsNote = _mainWindow->findChild<QLabel*>("gpsNote");
   gpsList->setModel(_config->gpsSystems());
+  if (settings.hideGSPNote())
+    gpsNote->setVisible(false);
   connect(addGPS, SIGNAL(clicked()), this, SLOT(onAddGPS()));
   connect(remGPS, SIGNAL(clicked()), this, SLOT(onRemGPS()));
   connect(gpsUp, SIGNAL(clicked()), this, SLOT(onGPSUp()));
   connect(gpsDown, SIGNAL(clicked()), this, SLOT(onGPSDown()));
   connect(gpsList, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditGPS(const QModelIndex &)));
+  connect(gpsNote, SIGNAL(linkActivated(QString)), this, SLOT(onHideGPSNote()));
+
   return _mainWindow;
 }
 
@@ -1039,6 +1046,13 @@ Application::onEditGPS(const QModelIndex &idx) {
   dialog.gpsSystem();
 
   emit _mainWindow->findChild<QTableView *>("gpsView")->model()->dataChanged(idx,idx);
+}
+
+void
+Application::onHideGPSNote() {
+  Settings setting; setting.setHideGPSNote(true);
+  QLabel *gpsNote = _mainWindow->findChild<QLabel*>("gpsNote");
+  gpsNote->setVisible(false);
 }
 
 void

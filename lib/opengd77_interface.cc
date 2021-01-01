@@ -264,7 +264,6 @@ OpenGD77Interface::write_finish() {
   _sector = -1;
   if (! finishWriteFlash())
     return false;
-  //if (! sendCommand(CommandRequest::SAVE_SETTINGS_NOT_VFOS))
   if (! sendCloseScreen())
     return false;
   return true;
