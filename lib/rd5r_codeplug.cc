@@ -181,7 +181,20 @@ RD5RCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
   setName(c->name());
   setRXFrequency(c->rxFrequency());
   setTXFrequency(c->txFrequency());
-  power = (Channel::HighPower == c->power()) ? POWER_HIGH : POWER_LOW;
+
+  // encode power setting
+  switch (c->power()) {
+  case Channel::MaxPower:
+  case Channel::HighPower:
+    power = POWER_HIGH;
+    break;
+  case Channel::MidPower:
+  case Channel::LowPower:
+  case Channel::MinPower:
+    power = POWER_LOW;
+    break;
+  }
+
   tot = c->txTimeout()/15;
   rx_only = c->rxOnly() ? 1 : 0;
   if (c->is<AnalogChannel>()) {
