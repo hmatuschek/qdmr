@@ -63,12 +63,8 @@ UV390::codeplug() {
 }
 
 bool
-UV390::startDownload(Config *config, bool blocking) {
+UV390::startDownload(bool blocking) {
   if (StatusIdle != _task)
-    return false;
-
-  _config = config;
-  if (!_config)
     return false;
 
   _dev = new DFUDevice(0x0483, 0xdf11, this);

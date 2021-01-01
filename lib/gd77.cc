@@ -64,12 +64,8 @@ GD77::codeplug() {
 }
 
 bool
-GD77::startDownload(Config *config, bool blocking) {
+GD77::startDownload(bool blocking) {
   if (StatusIdle != _task)
-    return false;
-
-  _config = config;
-  if (!_config)
     return false;
 
   _dev = new HID(0x0483, 0xdf11, this);
