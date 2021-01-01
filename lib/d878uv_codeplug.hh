@@ -23,7 +23,8 @@ class D878UVCodeplug : public CodePlug
   Q_OBJECT
 
 public:
-  /** Represents the actual channel encoded within the binary code-plug. */
+  /** Represents the actual channel encoded within the binary code-plug.
+   * Memeory size is 64 bytes. */
   struct __attribute__((packed)) channel_t {
     /** Defined possible channel modes, see @c channel_mode. */
     typedef enum {
@@ -341,7 +342,7 @@ public:
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
 	bool decode(Config *config);
   /** Encodes the given generic configuration as a binary codeplug. */
-  bool encode(Config *config);
+  bool encode(Config *config, bool update=true);
 };
 
 #endif // D878UVCODEPLUG_HH
