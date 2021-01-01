@@ -1787,10 +1787,11 @@ CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 p
           .arg(line).arg(column).arg(name).arg(pch1);
       return false;
     }
-    if (pch1 < 0)
+    if (pch1 < 0) {
       _scanlists[idx]->setPriorityChannel(SelectedChannel::get());
-    else
+    } else if (pch2 > 0) {
       _scanlists[idx]->setPriorityChannel(_channels[pch1-1]);
+    }
 
     // Check PriChan 2
     if ((pch2>0) && (! _channels.contains(pch2))) {
@@ -1798,10 +1799,11 @@ CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 p
           .arg(line).arg(column).arg(name).arg(pch2);
       return false;
     }
-    if (pch2 < 0)
+    if (pch2 < 0) {
       _scanlists[idx]->setSecPriorityChannel(SelectedChannel::get());
-    else
+    } else if (pch2 > 0){
       _scanlists[idx]->setSecPriorityChannel(_channels[pch2-1]);
+    }
 
     // Check Tx channel
     if ((txch>0) && (! _channels.contains(txch-1))) {
@@ -1809,10 +1811,10 @@ CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 p
           .arg(line).arg(column).arg(name).arg(txch-1);
       return false;
     }
-    if (txch==0) {
+    if (txch<0) {
       _scanlists[idx]->setTXChannel(SelectedChannel::get());
     } else if (txch>0) {
-      _scanlists[idx]->setTXChannel(_channels[txch-1]);
+      _scanlists[idx]->setTXChannel(_channels[txch-2]);
     }
 
     // Check channels

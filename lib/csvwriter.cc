@@ -194,7 +194,13 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     else
       stream << qSetFieldWidth(5)  << left <<
                 QString::number(config->channelList()->indexOf(list->secPriorityChannel())+1);
-    stream << qSetFieldWidth(5)  << left << "Sel";
+    if (nullptr == list->txChannel())
+      stream << qSetFieldWidth(5)  << left << "-";
+    else if (SelectedChannel::get() == list->txChannel())
+      stream << qSetFieldWidth(5)  << left << "Sel";
+    else
+      stream << qSetFieldWidth(5)  << left
+             << QString::number(config->channelList()->indexOf(list->txChannel())+1);
     QStringList tmp;
     for (int j=0; j<list->count(); j++) {
       if (SelectedChannel::get() == list->channel(j))
