@@ -2,8 +2,13 @@
 #include "config.hh"
 #include "logger.hh"
 
-#define RBSIZE 64
+#define RBSIZE 16
 #define WBSIZE 16
+
+#define MAGIC_ADDR 0x02FA0020
+#define MAGIC_DATA "\xff\xff\xff\xff\x00\x00\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00"
+#define MAGIC_LEN  16
+
 
 static Radio::Features _d878uv_features =
 {
@@ -64,12 +69,8 @@ D878UV::codeplug() {
 }
 
 bool
-D878UV::startDownload(Config *config, bool blocking) {
+D878UV::startDownload(bool blocking) {
   if (StatusIdle != _task)
-    return false;
-
-  _config = config;
-  if (!_config)
     return false;
 
   _dev = new AnytoneInterface(this);
@@ -274,6 +275,8 @@ D878UV::upload() {
     emit uploadError(this);
     return false;
   }
+
+  _codeplug.image(0).sort();
 
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
     uint addr = _codeplug.image(0).element(n).address();

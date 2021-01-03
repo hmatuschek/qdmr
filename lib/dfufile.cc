@@ -461,8 +461,11 @@ DFUFile::Image::element(int i) {
 }
 
 void
-DFUFile::Image::addElement(uint32_t addr, uint32_t size) {
-  _elements.append(Element(addr, size));
+DFUFile::Image::addElement(uint32_t addr, uint32_t size, int index) {
+  if ((0 > index) || (_elements.size() <= index))
+    _elements.append(Element(addr, size));
+  else
+    _elements.insert(index, Element(addr, size));
 }
 
 void
@@ -545,6 +548,14 @@ DFUFile::Image::write(QFile &file, CRC32 &crc, QString &errorMessage) const {
 }
 
 void
+DFUFile::Image::sort() {
+  std::stable_sort(_elements.begin(), _elements.end(),
+                   [](const Element &first, const Element &second) {
+                     return first.address()<second.address();
+                   });
+}
+
+void
 DFUFile::Image::dump(QTextStream &stream) const {
   stream << " Image";
   if (_name.isEmpty())
@@ -556,3 +567,4 @@ DFUFile::Image::dump(QTextStream &stream) const {
     e.dump(stream);
   }
 }
+

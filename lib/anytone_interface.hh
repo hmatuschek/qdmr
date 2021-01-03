@@ -47,18 +47,18 @@ protected:
 
 protected:
   struct __attribute__((packed)) ReadRequest {
-    char cmd;      ///< Fixed to 'W'.
+    char cmd;      ///< Fixed to 'R'.
     uint32_t addr; ///< Memory address in little-endian.
-    uint8_t size;  ///< Fixed to 64.
+    uint8_t size;  ///< Fixed to 16.
     /// Constructs a read request for the specified address.
     ReadRequest(uint32_t addr);
   };
 
   struct __attribute__((packed)) ReadResponse {
-    char cmd;      ///< Fixed to 'R'.
+    char cmd;      ///< Fixed to 'W'.
     uint32_t addr; ///< Memory address in big-endian.
-    uint8_t size;  ///< Fixed to 64.
-    char data[64]; ///< The actual data.
+    uint8_t size;  ///< Fixed to 16.
+    char data[16]; ///< The actual data.
     uint8_t sum;   ///< Sum over address, size and data.
     uint8_t ack;   ///< Fixed to 0x06.
 

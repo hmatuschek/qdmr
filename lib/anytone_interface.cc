@@ -8,7 +8,7 @@
 AnytoneInterface::ReadRequest::ReadRequest(uint32_t addr) {
   cmd = 'R';
   this->addr = qToBigEndian(addr);
-  size = 64;
+  size = 16;
 }
 
 /* ********************************************************************************************* *
@@ -25,7 +25,7 @@ AnytoneInterface::ReadResponse::check(uint32_t addr, QString &msg) const {
         .arg(addr, 8, 16, QChar('0')).arg(qFromLittleEndian(this->addr), 8, 16, QChar('0'));
     return false;
   }
-  if (64 != size) {
+  if (16 != size) {
     msg = QObject::tr("Invalid read response: Expected size 64 got %1").arg((int)size);
     return false;
   }
@@ -197,7 +197,7 @@ AnytoneInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) 
 
   //logDebug() << "Anytone: Read " << nbytes << "b from addr 0x" << QString::number(addr, 16) << "...";
 
-  for (int i=0; i<nbytes; i+=64) {
+  for (int i=0; i<nbytes; i+=16) {
     ReadRequest req(addr + i);
     ReadResponse resp;
     if (! send_receive((const char *)&req, sizeof(ReadRequest),
@@ -211,7 +211,7 @@ AnytoneInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) 
       logError() << _errorMessage;
       return false;
     }
-    memcpy(data+i, resp.data, 64);
+    memcpy(data+i, resp.data, 16);
   }
 
   return true;

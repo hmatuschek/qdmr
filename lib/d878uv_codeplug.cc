@@ -15,24 +15,30 @@
 #define CHANNEL_BANK_0            0x00800000
 #define CHANNEL_BANK_SIZE         0x00002000
 #define CHANNEL_BANK_31           0x00fc0000
-#define CHANNEL_BANK_31_SIZE      0x00000880
+#define CHANNEL_BANK_31_SIZE      0x00000800
 #define CHANNEL_BANK_OFFSET       0x00040000
 #define CHANNEL_BITMAP            0x024c1500
 #define CHANNEL_BITMAP_SIZE       0x00000200
 
-#define NUM_CONTACTS              10000      // total number of contacts
-#define NUM_CONTACT_BANKS         313        // number of contact banks
-#define CONTACT_BANK_0            0x02680000 // first bank of 32 contacts
-#define CONTACT_BANK_SIZE         0x00000c80 // size of 32 contacts
-#define CONTACT_BANK_312          0x02772f80 // last bank of 16 contacts
-#define CONTACT_BANK_312_SIZE     0x00000640 // size of last contact bank
-#define CONTACTS_BITMAP           0x02640000 // address of contact bitmap
-#define CONTACTS_BITMAP_SIZE      0x00000500 // size of contact bitmap
+#define VFO_A_ADDR                0x00fc0800 // Address of VFO A settings (channel_t)
+#define VFO_B_ADDR                0x00fc0840 // Address of VFO B settings (channel_t)
+#define VFO_SIZE                  0x00000040 // Size of each VFO settings.
 
-#define NUM_RXGRP                 250
-#define ADDR_RXGRP_0              0x02980000
-#define RXGRP_SIZE                0x00000140
-#define RXGRP_OFFSET              0x00000200
+#define NUM_CONTACTS              10000      // Total number of contacts
+#define NUM_CONTACT_BANKS         313        // Number of contact banks
+#define CONTACT_BANK_0            0x02680000 // First bank of 32 contacts
+#define CONTACT_BANK_SIZE         0x00000c80 // Size of 32 contacts
+#define CONTACT_BANK_312          0x02772f80 // Last bank of 16 contacts
+#define CONTACT_BANK_312_SIZE     0x00000640 // Size of last contact bank
+#define CONTACTS_BITMAP           0x02640000 // Address of contact bitmap
+#define CONTACTS_BITMAP_SIZE      0x000004f0 // Size of contact bitmap
+
+#define NUM_RXGRP                 250        // Total number of RX group lists
+#define ADDR_RXGRP_0              0x02980000 // Address of the first RX group list.
+#define RXGRP_SIZE                0x00000120 // Size of each RX group list.
+#define RXGRP_OFFSET              0x00000200 // Offset between group lists.
+#define RXGRP_BITMAP              0x025C0B10 // Address of RX group list bitmap.
+#define RXGRP_BITMAP_SIZE         0x00000020 // Storage size of RX group list bitmap.
 
 #define NUM_ZONES                 250
 #define NUM_CH_PER_ZONE           250
@@ -104,6 +110,7 @@ uint8_t ctcss_code2num(Signaling::Code code) {
   return 0;
 }
 
+
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::channel_t
  * ******************************************************************************************** */
@@ -114,6 +121,9 @@ D878UVCodeplug::channel_t::channel_t() {
 void
 D878UVCodeplug::channel_t::clear() {
   memset(this, 0, sizeof(D878UVCodeplug::channel_t));
+  custom_ctcss = qToLittleEndian(0x09cf); // some value
+  scan_list_index  = 0xff; // None
+  group_list_index = 0xff; // None
 }
 
 bool
@@ -358,14 +368,15 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     break;
   }
 
-  power = (Channel::LowPower == c->power()) ? POWER_LOW : POWER_HIGH;
   // set tx-enable
   rx_only = c->rxOnly() ? 1 : 0;
+
   // Link scan list if set
   if (nullptr == c->scanList())
     scan_list_index = 0xff;
   else
     scan_list_index = conf->scanlists()->indexOf(c->scanList());
+
   // Dispatch by channel type
   if (c->is<AnalogChannel>()) {
     const AnalogChannel *ac = c->as<const AnalogChannel>();
@@ -607,12 +618,10 @@ D878UVCodeplug::general_settings_t::general_settings_t() {
 
 void
 D878UVCodeplug::general_settings_t::clear() {
-  power_on = PWON_DEFAULT;
-  _unused7 = 0;
+  power_on = PWRON_DEFAULT;
   memset(intro_line1, 0, sizeof(intro_line2));
   memset(intro_line2, 0, sizeof(intro_line2));
   memset(password, 0, sizeof(password));
-  memset(_unused630, 0, sizeof(_unused630));
 }
 
 QString
@@ -648,20 +657,17 @@ D878UVCodeplug::D878UVCodeplug(QObject *parent)
   // Channel bitmap
   image(0).addElement(CHANNEL_BITMAP, CHANNEL_BITMAP_SIZE);
   // Contacts bitmap
-  image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
+  /*image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
   // Zone bitmap
   image(0).addElement(ZONE_BITMAPS, ZONE_BITMAPS_SIZE);
   // All readio IDs
-  image(0).addElement(ADDR_RADIOIDS, RADIOIDS_SIZE);
+  image(0).addElement(ADDR_RADIOIDS, RADIOIDS_SIZE);*/
   // General config
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
 }
 
 void
 D878UVCodeplug::clear() {
-  for (int i=0; i<image(0).numElements(); i++) {
-    memset(image(0).element(i).data().data(), 0, image(0).element(i).size());
-  }
 }
 
 void
@@ -671,30 +677,41 @@ D878UVCodeplug::allocateFromBitmaps() {
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
     // Get byte and bit for channel, as well as bank of channel
     uint16_t bit = i%8, byte = i/8, bank = i/128;
+    // enabled if true
     if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
       continue;
-    uint32_t addr = CHANNEL_BANK_0+bank*CHANNEL_BANK_OFFSET;
-    if (nullptr == data(addr, 0)) {
-      if (31 == bank)
-        image(0).addElement(addr, CHANNEL_BANK_31_SIZE);
-      else
-        image(0).addElement(addr, CHANNEL_BANK_SIZE);
-    }
+    // compute address for channel
+    uint32_t addr = CHANNEL_BANK_0
+        + bank*CHANNEL_BANK_OFFSET
+        + bit*sizeof(channel_t);
+    if (nullptr == data(addr, 0))
+      image(0).addElement(addr, sizeof(channel_t));
+    if (nullptr == data(addr+0x2000, 0))
+      image(0).addElement(addr+0x2000, sizeof(channel_t));
   }
 
+  image(0).addElement(VFO_A_ADDR, sizeof(channel_t));
+  image(0).addElement(VFO_A_ADDR+0x2000, sizeof(channel_t));
+  image(0).addElement(VFO_B_ADDR, sizeof(channel_t));
+  image(0).addElement(VFO_B_ADDR+0x2000, sizeof(channel_t));
+
   // Check contacts bitmap
-  uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
+  /*uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
   for (uint16_t i=0; i<NUM_CONTACTS; i++) {
     // Get byte and bit for contact, as well as bank of contact
     uint16_t bit = i%8, byte = i/8, bank = i/128;
+    // enabled if false (ass hole)
     if (1 == ((contact_bitmap[byte]>>bit) & 0x01))
       continue;
     uint32_t addr = CONTACT_BANK_0+bank*CONTACT_BANK_SIZE;
     if (nullptr == data(addr, 0)) {
-      if (312 == bank)
+      if (312 == bank) {
         image(0).addElement(addr, CONTACT_BANK_312_SIZE);
-      else
+        memset(data(addr), 0xff, CONTACT_BANK_312_SIZE);
+      } else {
         image(0).addElement(addr, CONTACT_BANK_SIZE);
+        memset(data(addr), 0xff, CONTACT_BANK_SIZE);
+      }
     }
   }
 
@@ -715,7 +732,7 @@ D878UVCodeplug::allocateFromBitmaps() {
     image(0).addElement(ADDR_ZONE+i*ZONE_OFFSET, ZONE_SIZE);
   }
   // but allocate all zone names (only 8k)
-  image(0).addElement(ADDR_ZONE_NAME, NUM_ZONES*ZONE_NAME_OFFSET);
+  image(0).addElement(ADDR_ZONE_NAME, NUM_ZONES*ZONE_NAME_OFFSET); */
 }
 
 void
@@ -730,9 +747,9 @@ D878UVCodeplug::setBitmaps(Config *config)
   }
 
   // Mark valid contacts (clear bit)
-  uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
-  memset(contact_bitmap, 0xff, CONTACTS_BITMAP_SIZE);
-  memset(contact_bitmap+0x4e3, 0, 13);
+  /*uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
+  memset(contact_bitmap, 0x00, CONTACTS_BITMAP_SIZE);
+  memset(contact_bitmap, 0xff, NUM_CONTACTS/8+1);
   for (int i=0; i<config->contacts()->digitalCount(); i++) {
     uint16_t bit = i%8, byte = i/8;
     contact_bitmap[byte] &= ~(1 << bit);
@@ -741,12 +758,12 @@ D878UVCodeplug::setBitmaps(Config *config)
   // Mark valid zones (set bits)
   uint8_t *zone_a_bitmap = data(ZONE_A_BITMAP);
   uint8_t *zone_b_bitmap = data(ZONE_B_BITMAP);
-  memset(zone_a_bitmap, 0, ZONE_BITMAPS_SIZE);
+  memset(zone_a_bitmap, 0x00, ZONE_BITMAPS_SIZE);
   for (int i=0; i<config->zones()->count(); i++) {
     uint16_t bit = i%8, byte = i/8;
     zone_a_bitmap[byte] |= (1 << bit);
     zone_b_bitmap[byte] |= (1 << bit);
-  }
+  }*/
 }
 
 
@@ -767,27 +784,53 @@ D878UVCodeplug::encode(Config *config, bool update)
   */
 
   // Encode channels
+  uint8_t *ch_bitmap = data(CHANNEL_BITMAP);
+  memset(ch_bitmap, 0, CHANNEL_BITMAP_SIZE);
   for (int i=0; i<config->channelList()->count(); i++) {
+    // enable channel
+    ch_bitmap[i/8] |= (1<<(i&7));
     uint16_t bank = i/128, idx = i%128;
     channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
-                                      +bank*CHANNEL_BANK_OFFSET
-                                      +idx*sizeof(channel_t));
+                                      + bank*CHANNEL_BANK_OFFSET
+                                      + idx*sizeof(channel_t));
     ch->fromChannelObj(config->channelList()->channel(i), config);
   }
 
+  {
+    // Enable VFO A & B
+    ch_bitmap[500] = 0x03;
+
+    // Encode VFOs
+    AnalogChannel vfoa(
+          "VFO A", 144.0, 144.0, Channel::HighPower, -1, false, AnalogChannel::AdmitFree, 1,
+          Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE, AnalogChannel::BWNarrow, nullptr);
+    channel_t *ch = (channel_t *)data(VFO_A_ADDR);
+    ch->fromChannelObj(&vfoa, config);
+
+    AnalogChannel vfob(
+          "VFO B", 144.0, 144.0, Channel::HighPower, -1, false, AnalogChannel::AdmitFree, 1,
+          Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE, AnalogChannel::BWNarrow, nullptr);
+    ch = (channel_t *)data(VFO_B_ADDR);
+    ch->fromChannelObj(&vfob, config);
+  }
+
   // Encode contacts
+  /*uint8_t *con_bitmap = data(CONTACTS_BITMAP);
+  memset(con_bitmap, 0xff, NUM_CONTACTS/8+1);
   for (int i=0; i<config->contacts()->digitalCount(); i++) {
     contact_t *con = (contact_t *)data(CONTACT_BANK_0+i*sizeof(contact_t));
     con->fromContactObj(config->contacts()->digitalContact(i));
+    // enable contact by clearing bit
+    con_bitmap[i/8] &= ~(1<<(i&7));
   }
 
-  /*// Encode RX group-lists
+  // Encode RX group-lists
   for (int i=0; i<NUM_RXGRP; i++) {
     grouplist_t *grp = (grouplist_t *)data(ADDR_RXGRP_0+i*RXGRP_OFFSET);
     grp->clear();
     if (i<config->rxGroupLists()->count())
       grp->fromGroupListObj(config->rxGroupLists()->list(i), config);
-  } */
+  }
 
   // Clear zone names
   memset(data(ADDR_ZONE_NAME), 0xff, NUM_ZONES*ZONE_NAME_OFFSET);
@@ -826,7 +869,7 @@ D878UVCodeplug::encode(Config *config, bool update)
         channels[j] = 0xffff;
       }
     }
-  }
+  }*/
 
   /// @bug Implement scan-list D878UV code-plug encoding.
   /// @bug Implement analog contact D878UV code-plug encoding.
@@ -841,7 +884,7 @@ D878UVCodeplug::decode(Config *config)
   CodeplugContext ctx(config);
 
   // Find a valid RadioID
-  uint8_t *radio_ids = data(ADDR_RADIOIDS);
+  /*uint8_t *radio_ids = data(ADDR_RADIOIDS);
   for (uint16_t i=0; i<NUM_RADIOIDS; i++) {
     radioid_t *id = (radioid_t *)(radio_ids+i*sizeof(radioid_t));
     if (id->isValid()) {
@@ -849,7 +892,7 @@ D878UVCodeplug::decode(Config *config)
       config->setName(id->getName());
       break;
     }
-  }
+  }*/
 
   // Create channels
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
@@ -866,7 +909,7 @@ D878UVCodeplug::decode(Config *config)
   }
 
   // Create contacts
-  uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
+  /*uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
   for (uint16_t i=0; i<NUM_CONTACTS; i++) {
     // Check if contact is enabled:
     uint16_t  bit = i%8, byte = i/8;
@@ -875,10 +918,10 @@ D878UVCodeplug::decode(Config *config)
     contact_t *con = (contact_t *)data(CONTACT_BANK_0+i*sizeof(contact_t));
     if (DigitalContact *obj = con->toContactObj())
       ctx.addDigitalContact(obj, i);
-  }
+  }*/
 
   // Create RX group lists
-  for (uint16_t i=0; i<NUM_RXGRP; i++) {
+  /*for (uint16_t i=0; i<NUM_RXGRP; i++) {
     grouplist_t *grp = (grouplist_t *)data(ADDR_RXGRP_0+i*RXGRP_OFFSET);
     if (! grp->isValid())
       continue;
@@ -934,7 +977,7 @@ D878UVCodeplug::decode(Config *config)
   // Apply general settings
   general_settings_t *settings = (general_settings_t *)data(ADDR_GENERAL_CONFIG);
   config->setIntroLine1(settings->getIntroLine1());
-  config->setIntroLine2(settings->getIntroLine2());
+  config->setIntroLine2(settings->getIntroLine2()); */
 
   /// @bug Implement scan-list D878UV code-plug decoding.
   /// @bug Implement analog contact D878UV code-plug decoding.

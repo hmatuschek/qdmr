@@ -137,8 +137,9 @@ class DFUFile: public QObject
 		const Element &element(int i) const;
     /** Returns a reference to the i-th element of the image. */
     Element &element(int i);
-    /** Adds an element to the image with the given address and size. */
-		void addElement(uint32_t addr, uint32_t size);
+    /** Adds an element to the image with the given address and size at the specified index.
+     * If the index is negative, the element gets appended. */
+    void addElement(uint32_t addr, uint32_t size, int index=-1);
     /** Adds an element to the image. */
     void addElement(const Element &element);
     /** Removes the i-th element from this image. */
@@ -151,6 +152,8 @@ class DFUFile: public QObject
 
     /** Prints a textual representation of the image into the given stream. */
 		void dump(QTextStream &stream) const;
+
+    void sort();
 
 	protected:
     /** Alternate settings byte. */

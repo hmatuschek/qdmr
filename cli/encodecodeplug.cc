@@ -104,6 +104,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     codeplug.setBitmaps(&config);
     codeplug.allocateFromBitmaps();
     codeplug.encode(&config);
+    codeplug.image(0).sort();
     if (! codeplug.write(parser.positionalArguments().at(2))) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
                  << "': " << codeplug.errorMessage();
