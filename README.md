@@ -83,10 +83,15 @@ interface should work (i.e., RD5-R, GD77 and Retevis/TyT).
 To build the lastest development version of QDMR, you may build it and the command-line-tool `dmrconf` from 
 sources.
 
-Fist install git, the compiler and all needed dependencies with
+Fist install git, the compiler and all needed dependencies.
+### Ubuntu
 ```
 $ sudo apt-get install build-essential git cmake 
 $ sudo apt-get install libusb-1.0-0-dev qtbase5-dev qttools5-dev qttools5-dev-tools qtpositioning5-dev libqt5serialport5-dev
+```
+### ARCH Linux
+```
+$ sudo pacman -S qt5-tools qt5-serialport qt5-location
 ```
 
 Then clone the repository with
@@ -103,11 +108,11 @@ This should create a new directory named `qdmr`. Enter this directory, create an
 $ cd qdmr
 $ mkdir build
 $ cd build
-$ cmake .. 
+$ cmake .. -DCMAKE_INSTALL_PREFIX=/usr/
 ```
-This has to be done only once.
+The last call, configures CMAKE to install everything under the system path `/usr/`. The previous steps has to be done only once.
 
-To build and install the binaries run
+To build and install the binaries run after every update, call
 ```
 $ make
 $ sudo make install
