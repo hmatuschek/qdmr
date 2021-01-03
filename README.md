@@ -83,13 +83,16 @@ interface should work (i.e., RD5-R, GD77 and Retevis/TyT).
 To build the lastest development version of QDMR, you may build it and the command-line-tool `dmrconf` from 
 sources.
 
-Fist install git, the compiler and all needed dependencies.
-### Ubuntu
+Fist install git, the compiler and all needed dependencies. These package names may differ between 
+Linux distributions.  
+#### Ubuntu
+Under Ubuntu run
 ```
 $ sudo apt-get install build-essential git cmake 
 $ sudo apt-get install libusb-1.0-0-dev qtbase5-dev qttools5-dev qttools5-dev-tools qtpositioning5-dev libqt5serialport5-dev
 ```
-### ARCH Linux
+#### Arch Linux
+Under Arch Linux run
 ```
 $ sudo pacman -S qt5-tools qt5-serialport qt5-location
 ```
@@ -112,7 +115,7 @@ $ cmake .. -DCMAKE_INSTALL_PREFIX=/usr/
 ```
 The last call, configures CMAKE to install everything under the system path `/usr/`. The previous steps has to be done only once.
 
-To build and install the binaries run after every update, call
+Finally, to build and install the binaries run after every update, call
 ```
 $ make
 $ sudo make install
