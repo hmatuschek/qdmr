@@ -1,4 +1,4 @@
-# QDMR, a GUI application and command-line-tool to program DMR radios
+# QDMR, a GUI application and command line tool to program DMR radios
 
 ![qdmr channel editor](https://raw.githubusercontent.com/hmatuschek/qdmr/master/doc/fig/qdmr-channels.png "The qdmr CPS software.")
 
