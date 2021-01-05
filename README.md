@@ -37,7 +37,7 @@ There currently are only binaries for MacOS X and Ubuntu Linux. The MacOS X bina
 from the [current release](https://github.com/hmatuschek/qdmr/releases/).
 
 Under Ubuntu Linux (bionic and later), you may add my
-[PPA](https://launchpad.net/~hmatuschek/+archive/ubuntu/ppa) to your list of Software sources with
+[PPA](https://launchpad.net/~hmatuschek/+archive/ubuntu/ppa) to your list of software repositories with
 
     sudo add-apt-repository ppa:hmatuschek/ppa
     sudo apt-get update
