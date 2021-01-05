@@ -3,20 +3,20 @@
 ![qdmr channel editor](https://raw.githubusercontent.com/hmatuschek/qdmr/master/doc/fig/qdmr-channels.png "The qdmr CPS software.")
 
 *qdmr* is a graphical user interface (GUI) application that allows to program several types of DMR radios.
-To this end, it aims at being a more universal code-plug programming software (CPS) compared to the
+To this end, it aims at being a more universal codeplug programming software (CPS) compared to the
 device and even revision specific CPSs provided by the manufacturers. The goal of this project is to
 provide a **single**, **comfortable**, [**well-documented**](https://dm3mat.darc.de/qdmr/manual/) 
-and **platform-independent** CPS for several (mainly Chinese) DMR radios.
+and **platform-independent** CPS for several types of (mainly Chinese) DMR radios.
 
 ## Supported Radios 
-Currently, there are only two supported radios
+Currently, there are only two radios that are supported
 
   * Open GD77 firmware
   * Radioddity GD77 (untested)
   * Baofeng/Radioddity RD-5R & RD-5R+
   * TYT MD-UV390 / Retevis RT3S
 
-The limited amount of supported radios is due to the fact, that I only own these radios to test
+The limited amount of supported radios is due to the fact that I only own these radios to test
 the software with.
 
 
