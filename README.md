@@ -94,7 +94,7 @@ $ sudo apt-get install libusb-1.0-0-dev qtbase5-dev qttools5-dev qttools5-dev-to
 #### Arch Linux
 Under Arch Linux run
 ```
-$ sudo pacman -S qt5-tools qt5-serialport qt5-location
+$ sudo pacman -S git base-devel cmake libusb qt5-tools qt5-serialport qt5-location
 ```
 
 Then clone the repository with
