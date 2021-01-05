@@ -1,22 +1,22 @@
-# QDMR a GUI application and command-line-tool to program DMR radios
+# QDMR, a GUI application and command line tool to program DMR radios
 
 ![qdmr channel editor](https://raw.githubusercontent.com/hmatuschek/qdmr/master/doc/fig/qdmr-channels.png "The qdmr CPS software.")
 
-*qdmr* is a graphical user interface (GUI) application that allows to program several DMR radios.
-To this end, it aims at being a more universal code-plug programming software (CPS) compared to the
-device and even revision specific CPSs provided by the manufactures. The goal of this project is to
+*qdmr* is a graphical user interface (GUI) application that allows to program several types of DMR radios.
+To this end, it aims at being a more universal codeplug programming software (CPS) compared to the
+device and even revision specific CPSs provided by the manufacturers. The goal of this project is to
 provide a **single**, **comfortable**, [**well-documented**](https://dm3mat.darc.de/qdmr/manual/) 
-and **platform-independent** CPS for several (mainly Chinese) DMR radios.
+and **platform-independent** CPS for several types of (mainly Chinese) DMR radios.
 
 ## Supported Radios 
-Currently, there are only two supported radios
+Currently, there are only two radios that are supported
 
   * Open GD77 firmware
   * Radioddity GD77 (untested)
   * Baofeng/Radioddity RD-5R & RD-5R+
   * TYT MD-UV390 / Retevis RT3S
 
-The limited amount of supported radios is due to the fact, that I only own these radios to test
+The limited amount of supported radios is due to the fact that I only own these radios to test
 the software with.
 
 
@@ -33,11 +33,11 @@ the software with.
 
 
 ## Install
-Currently there is only a binary for MacOS X and Ubuntu Linux. The MacOS X binary can be downloaded
+There currently are only binaries for MacOS X and Ubuntu Linux. The MacOS X binary can be downloaded
 from the [current release](https://github.com/hmatuschek/qdmr/releases/).
 
 Under Ubuntu Linux (bionic and later), you may add my
-[PPA](https://launchpad.net/~hmatuschek/+archive/ubuntu/ppa) to your list of Software sources with
+[PPA](https://launchpad.net/~hmatuschek/+archive/ubuntu/ppa) to your list of software repositories with
 
     sudo add-apt-repository ppa:hmatuschek/ppa
     sudo apt-get update
@@ -46,15 +46,15 @@ after this, you may install the GUI application with
 
     sudo apt-get install qdmr
 
-or the command-line-tool with
+or the command line tool with
 
     sudo apt-get install dmrconf
 
 [![qdmr](https://snapcraft.io//qdmr/badge.svg)](https://snapcraft.io/qdmr)
 
 ### Permissions
-When running *qdmr* or *dmrconf* under Linux, you may need to change the permissions to access USB devices.  
-Create a file /etc/udev/rules.d/99-dmr.rules with the following contents:
+When running *qdmr* or *dmrconf* under Linux, you may need to change the permissions for accessing USB devices.  
+Create a file /etc/udev/rules.d/99-dmr.rules with the following content:
 
     # TYT MD-UV380
     SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", MODE="666"
@@ -70,20 +70,20 @@ If you use the snap image of *qdmr*, you must (for now) grant access to the raw 
 
     snap connect qdmr:raw-usb
 
-in a terminal. I'll request an auto-connect for this snap image, so this step is not needed in
-future. For the time being, however, you have to do that manually.
+in a terminal. I will request an auto-connect for this snap image, so that this step will not be necessary in
+the future. For the time being, however, you have to do that manually.
 
 ### Snap package and serial interface
-Please note that it is very hard to gain access for a serial port for a snap image, hence it is 
+Please note that it is very hard to gain access to a serial port for a snap image, hence it is 
 (for now) *impossible to access the OpenGD77 and the upcoming AnyTone devices using the snap 
 package of qdmr*. Please resort to the DEB package from my PPA. Any other direct USB (non-serial) 
 interface should work (i.e., RD5-R, GD77 and Retevis/TyT).
 
 ## Building from sources
-To build the lastest development version of QDMR, you may build it and the command-line-tool `dmrconf` from 
+To build the lastest development version of QDMR, you may build it and the command line tool `dmrconf` from 
 sources.
 
-Fist install git, the compiler and all needed dependencies. These package names may differ between 
+First install git, the compiler and all needed dependencies. These package names may differ between 
 Linux distributions.  
 #### Ubuntu
 Under Ubuntu run
@@ -101,25 +101,27 @@ Then clone the repository with
 ```
 $ git clone https://github.com/hmatuschek/qdmr.git
 ```
-If you already cloned that repository, you can update the sources to the latest version with (from within the `qdmr` directory)
+If you have already cloned that repository, you can update the sources to the latest version with
 ```
 $ git pull
 ```
-
-This should create a new directory named `qdmr`. Enter this directory, create and enter a build-directory and configure the build with
+from within the `qdmr` directory.
+ 
+This should create a new directory named `qdmr`. Enter this directory, create and enter a build directory and configure the build with
 ```
 $ cd qdmr
 $ mkdir build
 $ cd build
 $ cmake .. -DCMAKE_INSTALL_PREFIX=/usr/
 ```
-The last call, configures CMAKE to install everything under the system path `/usr/`. The previous steps has to be done only once.
+The last call configures CMAKE to install everything under the system path `/usr/`. The previous steps has to be done only once.
 
-Finally, to build and install the binaries run after every update, call
+Finally, to build and install the binaries, run
 ```
 $ make
 $ sudo make install
 ```
+after every update.
 
 ## License
 qdmr - A GUI application and command-line-tool to program DMR radios.
