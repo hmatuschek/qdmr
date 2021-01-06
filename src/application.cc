@@ -304,7 +304,7 @@ Application::saveCodeplug() {
     return;
 
   QString filename = QFileDialog::getSaveFileName(nullptr, tr("Save codeplug"), QString(),
-                                                  tr("CSV Files (*.conf)"));
+                                                  tr("Codeplug Files (*.conf *.csv *.txt)"));
   if (filename.isEmpty())
     return;
 

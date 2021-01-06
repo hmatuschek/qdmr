@@ -40,18 +40,18 @@
 #define RXGRP_BITMAP              0x025C0B10 // Address of RX group list bitmap.
 #define RXGRP_BITMAP_SIZE         0x00000020 // Storage size of RX group list bitmap.
 
-#define NUM_ZONES                 250
-#define NUM_CH_PER_ZONE           250
-#define ADDR_ZONE                 0x01000000
-#define ZONE_SIZE                 0x00000200
-#define ZONE_OFFSET               0x00000200
-#define ADDR_ZONE_NAME            0x02540000
-#define ZONE_NAME_SIZE            0x00000010
-#define ZONE_NAME_OFFSET          0x00000020
+#define NUM_ZONES                 250        // Maximum number of zones
+#define NUM_CH_PER_ZONE           250        // Maximum number of channels per zone
+#define ADDR_ZONE                 0x01000000 // Address of zone-channel lists, see zone_t
+#define ZONE_SIZE                 0x00000200 // Size of each zone-channel list
+#define ZONE_OFFSET               0x00000200 // Offset between zone-channel lists
+#define ADDR_ZONE_NAME            0x02540000 // Address of zone names.
+#define ZONE_NAME_SIZE            0x00000010 // Size of zone names
+#define ZONE_NAME_OFFSET          0x00000020 // Offset between zone names.
 #define ADDR_ZONE_CH_A            0x02500100
 #define ADDR_ZONE_CH_B            0x02500200
-#define ZONE_BITMAPS              0x024c1300
-#define ZONE_BITMAPS_SIZE         0x00000040
+#define ZONE_BITMAPS              0x024c1300 // Bitmap of all enabled zones
+#define ZONE_BITMAPS_SIZE         0x00000040 // Size of the zone bitmap
 #define ZONE_A_BITMAP             0x024c1300
 #define ZONE_A_BITMAP_SIZE        0x00000020
 #define ZONE_B_BITMAP             0x024c1320
