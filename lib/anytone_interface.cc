@@ -17,7 +17,7 @@ AnytoneInterface::ReadRequest::ReadRequest(uint32_t addr) {
 bool
 AnytoneInterface::ReadResponse::check(uint32_t addr, QString &msg) const {
   if ('W' != cmd) {
-    msg = QObject::tr("Invalid read response: Expected command 'R' got '%1'").arg(cmd);
+    msg = QObject::tr("Invalid read response: Expected command 'W' got '%1'").arg(cmd);
     return false;
   }
   if (qFromBigEndian(this->addr) != addr) {

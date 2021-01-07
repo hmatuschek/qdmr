@@ -13,7 +13,7 @@
 #include "d878uv_codeplug.hh"
 
 
-/** Implements an interface to Anytone AT-D878UV VHF/UHF 7W DMR (Tier I&II) radios.
+/** Implements an interface to Anytone AT-D878UV VHF/UHF 7W DMR (Tier I & II) radios.
  *
  * @ingroup d878uv */
 class D878UV: public Radio
@@ -40,7 +40,9 @@ protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
 	void run();
 
+  /** Downloads the codeplug from the radio. This method block until the download is complete. */
   bool download();
+  /** Uploads the encoded codeplug to the radio. This method block until the upload is complete. */
   bool upload();
 
 protected:

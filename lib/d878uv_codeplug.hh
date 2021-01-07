@@ -104,7 +104,7 @@ public:
   /** Represents the actual channel encoded within the binary code-plug.
    * Memeory size is 64 bytes. */
   struct __attribute__((packed)) channel_t {
-    /** Defined possible channel modes, see @c channel_mode. */
+    /** Defines all possible channel modes, see @c channel_mode. */
     typedef enum {
       MODE_ANALOG    = 0,               ///< Analog channel.
       MODE_DIGITAL   = 1,               ///< Digital (DMR) channel.
@@ -112,6 +112,7 @@ public:
       MODE_MIXED_D_A = 3                ///< Mixed, transmit digital and receive analog.
     } Mode;
 
+    /** Defines all possible power settings.*/
     typedef enum {
       POWER_LOW = 0,                    ///< Low power, usually 1W.
       POWER_MIDDLE = 1,                 ///< Medium power, usually 2.5W.
@@ -119,17 +120,20 @@ public:
       POWER_TURBO = 3                   ///< Higher power, usually 7W on VHF and 6W on UHF.
     } Power;
 
+    /** Defines all band-width settings for analog channel.*/
     typedef enum {
       BW_12_5_KHZ = 0,                  ///< Narrow band-width (12.5kHz).
       BW_25_KHZ = 1                     ///< High band-width (25kHz).
     } Bandwidth;
 
+    /** Defines all possible repeater modes. */
     typedef enum {
       RM_SIMPLEX = 0,                   ///< Simplex mode, that is TX frequency = RX frequency. @c tx_offset is ignored.
       RM_TXPOS = 1,                     ///< Repeater mode with positive @c tx_offset.
       RM_TXNEG = 2                      ///< Repeater mode with negative @c tx_offset.
     } RepeaterMode;
 
+    /** Defines all possible PTT-ID settings. */
     typedef enum {
       PTTID_OFF = 0,                    ///< Never send PTT-ID.
       PTTID_START = 1,                  ///< Send PTT-ID at start.
@@ -137,11 +141,13 @@ public:
       PTTID_START_END = 3               ///< Send PTT-ID at start and end.
     } PTTId;
 
+    /** Defines all possible squelch settings. */
     typedef enum {
       SQ_CARRIER = 0,                   ///< Open squelch on carrier.
       SQ_TONE = 1                       ///< Open squelch on matching CTCSS tone or DCS code.
     } SquelchMode;
 
+    /** Defines all possible admit criteria. */
     typedef enum {
       ADMIT_ALWAYS = 0,                 ///< Admit TX always.
       ADMIT_CH_FREE = 1,                ///< Admit TX on channel free.
@@ -149,6 +155,7 @@ public:
       ADMIT_CC_SAME = 3                 ///< Admit TX on matching color-code.
     } Admit;
 
+    /** Defines all possible optional signalling settings. */
     typedef enum {
       OPTSIG_OFF = 0,                   ///< None.
       OPTSIG_DTMF = 1,                  ///< Use DTMF.
@@ -156,10 +163,11 @@ public:
       OPTSIG_5TONE = 3                  ///< Use 5-tone.
     } OptSignaling;
 
+    /** Defines all possible APRS reporting modes. */
     typedef enum {
-      APRS_REPORT_OFF = 0,
-      APRS_REPORT_ANALOG = 1,
-      APRS_REPORT_DIGITAL = 2
+      APRS_REPORT_OFF = 0,              ///< No APRS (GPS) reporting at all.
+      APRS_REPORT_ANALOG = 1,           ///< Use analog, actual APRS reporting.
+      APRS_REPORT_DIGITAL = 2           ///< Use digital reporting.
     } APRSReport;
 
     // Bytes 0-7
@@ -302,6 +310,7 @@ public:
   /** Represents a scan list within the binary codeplug.
    * Memory size is 144 bytes. */
   struct __attribute__((packed)) scanlist_t {
+    /** Defines all possible priority channel selections. */
     typedef enum {
       PRIO_CHAN_OFF = 0,                ///< Off.
       PRIO_CHAN_SEL1 = 1,               ///< Priority Channel Select 1.
@@ -309,6 +318,7 @@ public:
       PRIO_CHAN_SEL12 = 3               ///< Priority Channel Select 1 + Priority Channel Select 2.
     } PriChannel;
 
+    /** Defines all possible reply channel selections. */
     typedef enum {
       REVCH_SELECTED = 0,               ///< Selected.
       REVCH_SEL_TB = 1,                 ///< Selected + TalkBack.
@@ -348,13 +358,16 @@ public:
     uint8_t _unused132[12];             ///< Unused, set to 0.
   };
 
+  /** Represents a digital contact within the binary codeplug. */
   struct __attribute__((packed)) contact_t {
+    /** Possible call types. */
     typedef enum {
       CALL_PRIVATE = 0,                 ///< Private call.
       CALL_GROUP = 1,                   ///< Group call.
       CALL_ALL = 2                      ///< All call.
     } CallType;
 
+    /** Possible ring-tone types. */
     typedef enum {
       ALERT_NONE = 0,                   ///< Alert disabled.
       ALERT_RING = 1,                   ///< Ring tone.
@@ -374,24 +387,32 @@ public:
     // Bytes 40-99
     uint8_t _unused40[60];              ///< Unused, set to 0.
 
+    /** Constructs a new and empty contact. */
     contact_t();
+    /** Clears the contact. */
     void clear();
-
+    /** Returns @c true if the contact is valid. */
     bool isValid() const;
-
+    /** Retruns the call type. */
     DigitalContact::Type getType() const;
+    /** Sets the call type. */
     void setType(DigitalContact::Type type);
-
+    /** Returns the name of the contact. */
     QString getName() const;
+    /** Sets the name of the contact. */
     void setName(const QString &name);
-
+    /** Returns the number of the contact. */
     uint32_t getId() const;
+    /** Set the number of the contact. */
     void setId(uint32_t id);
-
+    /** Retunrs @c true if a ring-tone is enabled for this contact. */
     bool getAlert() const;
+    /** Enables/disables a ring-tone for this contact. */
     void setAlert(bool enable);
 
+    /** Assembles a @c DigitalContact from this contact. */
     DigitalContact *toContactObj() const;
+    /** Constructs this contact from the give @c DigitalContact. */
     void fromContactObj(const DigitalContact *contact);
   };
 
@@ -404,18 +425,29 @@ public:
     uint8_t name[16];                   ///< Group-list name, up to 16 x ASCII, 0-terminated.
     uint8_t unused[16];                 ///< Unused, set to 0.
 
+    /** Constructs an empty group list. */
     grouplist_t();
+    /** Clears this group list. */
     void clear();
+    /** Returns @c true if the group list is valid. */
     bool isValid() const;
-
+    /** Returns the name of the group list. */
     QString getName() const;
+    /** Sets the name of the group list. */
     void setName(const QString &name);
 
+    /** Constructs a new @c RXGroupList from this group list.
+     * None of the members are added yet. Call @c linkGroupList
+     * to do that. */
     RXGroupList *toGroupListObj() const;
+    /** Populates the @c RXGroupList from this group list. The CodeplugContext
+     * is used to map the member indices. */
     bool linkGroupList(RXGroupList *lst, const CodeplugContext &ctx);
+    /** Constructs this group list from the given @c RXGroupList. */
     void fromGroupListObj(const RXGroupList *lst, const Config *conf);
   };
 
+  /** Represents an entry of the radio ID table within the binary codeplug. */
   struct __attribute__((packed)) radioid_t {
     // Bytes 0-3.
     uint32_t id;                        ///< Up to 8 BCD digits in little-endian.
@@ -426,18 +458,27 @@ public:
     // Bytes 21-31
     uint8_t _unused21[11];              ///< Unused, set to 0.
 
+    /** Constructs an empty radio ID entry. */
     radioid_t();
+    /** Clears the radio ID enty. */
     void clear();
+    /** Returns @c true if the radio ID entry is valid. */
     bool isValid() const;
 
+    /** Returns the name of the radio ID entry. */
     QString getName() const;
+    /** Sets the name of the radio ID entry. */
     void setName(const QString name);
 
+    /** Returns the radio ID of the entry. */
     uint32_t getId() const;
+    /** Sets the radio ID of the entry. */
     void setId(uint32_t num);
   };
 
+  /** Represents the general config of the radio within the binary codeplug. */
   struct __attribute__((packed)) general_settings_t {
+    /** Possible power-on display settings. */
     typedef enum {
       PWRON_DEFAULT = 0,           ///< Default.
       PWRON_CUSTOM_TEXT = 1,       ///< Custom text.
@@ -452,7 +493,7 @@ public:
     uint8_t _unknown8[8];          ///< Unknown settings block.
 
     // Bytes 0x10-0x2f.
-    uint8_t _unknown16[31];
+    uint8_t _unknown16[31];        ///< Unknown settings block.
     uint8_t call_alert;            ///< Enable call tone, default=1, Off=0x00, On=0x01.
 
     // Byte 0x30-3f
@@ -497,12 +538,18 @@ public:
     // Bytes 0x620-0x62f
     uint8_t password[16];          ///< Boot password, up to 8 ASCII digits, 0-terminated.
 
+    /** Constructs an empty general settings. */
     general_settings_t();
+    /** Clears the general setting. */
     void clear();
 
+    /** Returns the first intro-line. */
     QString getIntroLine1() const;
+    /** Sets the first intro-line. */
     void setIntroLine1(const QString line);
+    /** Returns the second intro-line. */
     QString getIntroLine2() const;
+    /** Sets the second intro-line. */
     void setIntroLine2(const QString line);
   };
 
@@ -514,7 +561,9 @@ public:
   /** Clears and resets the complete codeplug to some default values. */
   void clear();
 
+  /** Sets all bitmaps for the given config. */
   void setBitmaps(Config *config);
+  /** Allocate memory for all elements marked as valid within the bitmaps. */
   void allocateFromBitmaps();
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */

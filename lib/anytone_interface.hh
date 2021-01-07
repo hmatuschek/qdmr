@@ -40,12 +40,17 @@ public:
   bool reboot();
 
 protected:
+  /** Send command message to radio to ender program state. */
   bool enter_program_mode();
+  /** Sends a request to radio to identify itself. */
   bool request_identifier(QString &radio, QString &version);
+  /** Sends a command message to radio to leave program state and reboot. */
   bool leave_program_mode();
+  /** Internal used method to send messages to and receive responses from radio. */
   bool send_receive(const char *cmd, int clen, char *resp, int rlen);
 
 protected:
+  /** Binary representation of a read request to the radio. */
   struct __attribute__((packed)) ReadRequest {
     char cmd;      ///< Fixed to 'R'.
     uint32_t addr; ///< Memory address in little-endian.
@@ -54,6 +59,7 @@ protected:
     ReadRequest(uint32_t addr);
   };
 
+  /** Binary representation of a read response from the radio. */
   struct __attribute__((packed)) ReadResponse {
     char cmd;      ///< Fixed to 'W'.
     uint32_t addr; ///< Memory address in big-endian.
@@ -61,10 +67,13 @@ protected:
     char data[16]; ///< The actual data.
     uint8_t sum;   ///< Sum over address, size and data.
     uint8_t ack;   ///< Fixed to 0x06.
-
+    /** Check the response, returns @c true if read request was successful.
+     * @param addr The read address to verify.
+     * @param msg On error, contains a message describing the issue. */
     bool check(uint32_t addr, QString &msg) const;
   };
 
+  /** Binary representation of a write request to the radio. */
   struct __attribute__((packed)) WriteRequest {
     char cmd;      ///< Fixed to 'W'
     uint32_t addr; ///< Memory address in big-endian.
@@ -73,18 +82,25 @@ protected:
     uint8_t sum;   ///< Sum over addr, size and data.
     uint8_t ack;   ///< Fixed to 0x06;
 
+    /** Assembles a write request message to the given address with the given data.
+     * @param addr Specifies the address to write to.
+     * @param data 16 bytes of payload. */
     WriteRequest(uint32_t addr, const char *data);
   };
 
+  /** Possible states of the radio interface. */
   typedef enum {
-    STATE_INITIALIZED,
-    STATE_OPEN,
-    STATE_PROGRAM,
-    STATE_CLOSED,
-    STATE_ERROR
+    STATE_INITIALIZED, ///< Initial state.
+    STATE_OPEN,        ///< Interface to radio is open.
+    STATE_PROGRAM,     ///< Radio is in program mode.
+    STATE_CLOSED,      ///< Interface to radio is closed (captive final state).
+    STATE_ERROR        ///< An error occurred (captive final state),
+                       ///  use @c errorMessage() to get an error message.
   } State;
 
+  /** Holds the state of the interface. */
   State _state;
+  /** Holds the identifyer string of the radio. */
   QString _identifier;
 };
 
