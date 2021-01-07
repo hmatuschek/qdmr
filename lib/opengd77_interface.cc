@@ -187,7 +187,7 @@ OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
     return false;
   if (! sendDisplay(0, 0, "qDMR", 3, 1, 0))
     return false;
-  if (! sendDisplay(0, 16, "Write", 3, 1, 0))
+  if (! sendDisplay(0, 16, "Writing", 3, 1, 0))
     return false;
   if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0))
     return false;
@@ -277,7 +277,7 @@ OpenGD77Interface::read_start(uint32_t bank, uint32_t addr) {
     return false;
   if (! sendDisplay(0, 0, "qDMR", 3, 1, 0))
     return false;
-  if (! sendDisplay(0, 16, "Read", 3, 1, 0))
+  if (! sendDisplay(0, 16, "Reading", 3, 1, 0))
     return false;
   if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0))
     return false;
