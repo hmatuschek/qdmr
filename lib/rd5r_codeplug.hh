@@ -72,6 +72,7 @@ class RXGroupList;
  *  <tr><td>0x1d620</td> <td>0x1e2a0</td> <td>0x0c80</td> <td>64 RX group lists, see @c RD5RCodeplug::grouptab_t</td></tr>
  *  <tr><td>0x1e2a0</td> <td>0x1e300</td> <td>0x0060</td> <td>??? Unknown ???</td></tr>
  * </table>
+ *
  * @ingroup rd5r */
 class RD5RCodeplug : public CodePlug
 {

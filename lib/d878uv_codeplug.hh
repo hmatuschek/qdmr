@@ -17,84 +17,146 @@ class GPSSystem;
 
 /** Represents the device specific binary codeplug for Anytone AT-D878UV radios.
  *
+ * @section d878uvcpl Codeplug structure within radio
  * <table>
- *  <tr><th colspan="4">Channels (0080000-0x00FC2880)</th></tr>
- *  <tr><th>Start</th>    <th>End</th>      <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>00800000</td> <td>00802000</td> <td>002000</td> <td>Channel bank 0, see @c channel_t</td></tr>
- *  <tr><td>00802000</td> <td>00804000</td> <td>002000</td> <td>Uknown data, related to CH bank 0?
+ *  <tr><th colspan="3">Channels</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
+ *  <tr><td>024C1500</td> <td>000200</td>      <td>Bitmap of 4000 channels, default 0x00, 0x00 padded.</td></tr>
+ *  <tr><td>00800000</td> <td>max. 002000</td> <td>Channel bank 0 of upto 128 channels, see @c channel_t 64 b each. </td></tr>
+ *  <tr><td>00802000</td> <td>max, 002000</td> <td>Unknown data, Maybe extended channel information for channel bank 0?
  *    It is of exactly the same size as the channel bank 0. Mostly 0x00, a few 0xff.</td></tr>
- *  <tr><td>00840000</td> <td>00846000</td> <td>002000</td> <td>Channel bank 1</td></tr>
- *  <tr><td>00842000</td> <td>00844000</td> <td>002000</td> <td>Uknown data, related to CH bank 1?</td></tr>
- *  <tr><td>...</td> <td>...</td> <td>...</td> <td>...</td></tr>
- *  <tr><td>00FC0000</td> <td>00FC0800</td> <td>000800</td> <td>Channel bank 32, last 32 channels.</td></tr>
- *  <tr><td>00FC0800</td> <td>00FC0840</td> <td>000040</td> <td>VFO A settings, see @c channel_t.</td></tr>
- *  <tr><td>00FC0840</td> <td>00FC0880</td> <td>000040</td> <td>VFO B settings, see @c channel_t.</td></tr>
- *  <tr><td>00FC2000</td> <td>00FC2800</td> <td>000800</td> <td>Unknown data, realted to CH bank 32.</td></tr>
- *  <tr><td>00FC2800</td> <td>00FC2880</td> <td>000080</td> <td>Unknonw data, related to VFO A+B?
+ *  <tr><td>00840000</td> <td>max. 002000</td> <td>Channel bank 1 of upto 128 channels.</td></tr>
+ *  <tr><td>00842000</td> <td>max. 002000</td> <td>Unknown data, related to CH bank 1?</td></tr>
+ *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
+ *  <tr><td>00FC0000</td> <td>max. 000800</td> <td>Channel bank 32, upto 32 channels.</td></tr>
+ *  <tr><td>00FC2000</td> <td>max. 000800</td> <td>Unknown data, realted to CH bank 32.</td></tr>
+ *  <tr><td>00FC0800</td> <td>000040</td>      <td>VFO A settings, see @c channel_t.</td></tr>
+ *  <tr><td>00FC0840</td> <td>000040</td>      <td>VFO B settings, see @c channel_t.</td></tr>
+ *  <tr><td>00FC2800</td> <td>000080</td>      <td>Unknonw data, related to VFO A+B?
  *    It is of exactly the same size as the two VFO channels. Mostly 0x00, a few 0xff. Same pattern as
  *    the unknown data associated with channel banks.</td></tr>
  *
- *  <tr><th colspan="4"></th></tr>
- *  <tr><th>Start</th>    <th>End</th>      <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>01000000</td> <td>0101f400</td> <td>01f400</td> <td>250 zones channel lists of 250 16bit indices each.
+ *  <tr><th colspan="3">Zones</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
+ *  <tr><td>024C1300</td> <td>000020</td>      <td>Bitmap of 250 zones.</td></tr>
+ *  <tr><td>01000000</td> <td>max. 01f400</td> <td>250 zones channel lists of 250 16bit indices each.
  *    0-based, little endian, default/padded=0xffff. Offset between channel lists 0x200, size of each list 0x1f4.</td></tr>
- *  <tr><td>01042000</td> <td>01042020</td> <td>000020</td> <td>Unknown data, default=0x00</td></tr>
- *  <tr><td>01042080</td> <td>01042090</td> <td>000010</td> <td>Unknown data, default=0x00</td></tr>
- *  <tr><td>01043000</td> <td>01043080</td> <td>000080</td> <td>Optional, roaming zone 1?</td></tr>
-
- *  <tr><th colspan="4">Scan lists (01080000-01441290)</th></tr>
- *  <tr><th>Start</th>    <th>End</th>      <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>01080000</td> <td>01080090</td> <td>000090</td> <td>Scanlist 1</td></tr>
- *  <tr><td>01080200</td> <td>01080290</td> <td>000090</td> <td>Scanlist 2</td></tr>
- *  <tr><td>...</td> <td>...</td> <td>...</td> <td>...</td></tr>
- *  <tr><td>01441200</td> <td>01441290</td> <td>000090</td> <td>Scanlist 250</td></tr>
- *  <tr><td>01640000</td> <td>01640050</td> <td>000050</td> <td>Unknown data.</td></tr>
- *  <tr><td>01640800</td> <td>01640890</td> <td>000090</td> <td>Unknown data.</td></tr>
- *  <tr><td>02140000</td> <td>02140800</td> <td>000800</td> <td>Messages 1-8</td></tr>
- *  <tr><td>02180000</td> <td>02180400</td> <td>000800</td> <td>Messages 9-16</td></tr>
- *  <tr><td>...</td> <td>...</td> <td>...</td> <td>...</td></tr>
- *  <tr><td>02440000</td> <td>02440000</td> <td>000800</td> <td>Messages 97-100</td></tr>
- *  <tr><td>02480000</td> <td>02480010</td> <td>000010</td> <td>Unkonwn data.</td></tr>
- *  <tr><td>02480200</td> <td>02480230</td> <td>000030</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C0000</td> <td>024C0020</td> <td>000020</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C0C80</td> <td>024C0C90</td> <td>000010</td> <td>Unknown data, bitmap?, default 0x00.</td></tr>
- *  <tr><td>024C0D00</td> <td>024C1000</td> <td>000010</td> <td>Empty, set to 0x00?`</td></tr>
- *  <tr><td>024C1000</td> <td>024C10D0</td> <td>0000D0</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C1100</td> <td>024C1110</td> <td>000010</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C1280</td> <td>024C12A0</td> <td>000020</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C1300</td> <td>024C1320</td> <td>000020</td> <td>Bitmap of 250 zones.</td></tr>
- *  <tr><td>024C1320</td> <td>024C1340</td> <td>000020</td> <td>Bitmap of 250 scan-lists.</td></tr>
- *  <tr><td>024C1340</td> <td>024C1380</td> <td>000020</td> <td>Unknown bitmap.</td></tr>
- *  <tr><td>024C1400</td> <td>024C1470</td> <td>000070</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C1500</td> <td>024C1700</td> <td>000200</td> <td>Bitmap of 4000 channels, default 0x00, 0x00 padded.</td></tr>
- *  <tr><td>024C1700</td> <td>024C1740</td> <td>000040</td> <td>Unknown, 8bit indices.</td></tr>
- *  <tr><td>024C1800</td> <td>024C1D00</td> <td>000500</td> <td>Empty, set to 0x00?</td></tr>
- *  <tr><td>024C2000</td> <td>024C23E0</td> <td>0003E0</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C2400</td> <td>024C2430</td> <td>000030</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C2600</td> <td>024C2610</td> <td>000010</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C4000</td> <td>024C8000</td> <td>004000</td> <td>Unknown data.</td></tr>
- *  <tr><td>02500000</td> <td>02500630</td> <td>000630</td> <td>General settings, see @c general_settings_t.</td></tr>
- *  <tr><td>02501000</td> <td>025010A0</td> <td>0000A0</td> <td>Unknown, GPS/APRS?</td>
- *  <tr><td>02501200</td> <td>02501240</td> <td>000040</td> <td>Unknown.</td></tr>
- *  <tr><td>02501280</td> <td>025012B0</td> <td>000030</td> <td>Unknown.</td></tr>
- *  <tr><td>02501400</td> <td>02501500</td> <td>000100</td> <td>Unknown.</td></tr>
- *  <tr><td>02540000</td> <td>02541f40</td> <td>001f40</td> <td>250 Zone names.</td></tr>
- *  <tr><td>02580000</td> <td>02581f40</td> <td>001f40</td> <td>250 Radio IDs?</td></tr>
- *  <tr><td>025C0000</td> <td>025C0850</td> <td>000850</td> <td>Unknown data, status messages?</td></tr>
- *  <tr><td>025C0B00</td> <td>025C0B10</td> <td>000010</td> <td>Unknown bitmap?, default 0x00.</td>
- *  <tr><td>025C0B10</td> <td>025C0B30</td> <td>000020</td> <td>Bitmap of 250 RX group lists, default/padding 0x00.</td></tr>
- *  <tr><td>02600000</td> <td>02609C40</td> <td>009C40</td> <td>Unknown, 10000 32bit indices, little endian, default 0xffffffff</td></tr>
- *  <tr><td>02640000</td> <td>026404F0</td> <td>000500</td> <td>Contact bitmap, 10000 bit, inverted, default 0xff, 0x00 padded.</td></tr>
- *  <tr><td>02680000</td> <td>02774240</td> <td>0f4240</td> <td>10000 contacts, see @c contact_t.</td></tr>
- *  <tr><td>02900000</td> <td>02900080</td> <td>000080</td> <td>Unknown bitmap, 1024 bit, inverted, default 0xff.</td></tr>
- *  <tr><td>02900100</td> <td>02900180</td> <td>000080</td> <td>Unknown bitmap, 1024 bit, inverted, default 0xff.</td></tr>
- *  <tr><td>02940000</td> <td>02940180</td> <td>000180</td> <td>128 analog contacts.</td></tr>
- *  <tr><td>02980000</td> <td>02980120</td> <td>000120</td> <td>Grouplist 0, see @c grouplist_t.</td></tr>
- *  <tr><td>02980200</td> <td>02980320</td> <td>000120</td> <td>Grouplist 1</td></tr>
- *  <tr><td>...</td>      <td>...</td>      <td>...</td>    <td>...</td></tr>
- *  <tr><td>0299f200</td> <td>0299f320</td> <td>000120</td> <td>Grouplist 250</td></tr>
- *  <tr><td>04340000</td> <td>04340050</td> <td>000050</td> <td>Unknown data.</td></tr>
+ *  <tr><td>02540000</td> <td>max. 001f40</td> <td>250 Zone names.
+ *    Each zone name is upto 16 ASCII chars long and gets 0-padded to 32b.</td></tr>
+ *
+ *  <tr><th colspan="3">Roaming</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
+ *  <tr><td>01043000</td> <td>000080</td>      <td>Optional, roaming zone 1?</td></tr>
+ *
+ *  <tr><th colspan="3">Contacts</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
+ *  <tr><td>02600000</td> <td>max. 009C40</td> <td>Index list of valid contacts.
+ *    10000 32bit indices, little endian, default 0xffffffff</td></tr>
+ *  <tr><td>02640000</td> <td>000500</td>      <td>Contact bitmap, 10000 bit, inverted, default 0xff, 0x00 padded.</td></tr>
+ *  <tr><td>02680000</td> <td>max. 0f4240</td> <td>10000 contacts, see @c contact_t.
+ *    As each contact is 100b, they do not align with the 16b blocks being transferred to the device.
+ *    Hence contacts are organized internally in groups of 4 contacts forming a "bank". </td></tr>
+ *
+ *  <tr><th colspan="3">Analog Contacts</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
+ *  <tr><td>02900000</td> <td>000080</td>      <td>Index list of valid ananlog contacts.</td></tr>
+ *  <tr><td>02900100</td> <td>000080</td>      <td>Bytemap for 128 analog contacts.</td></tr>
+ *  <tr><td>02940000</td> <td>max. 000180</td> <td>128 analog contacts. See @c analog_contact_t.
+ *    As each analog contact is 24b, they do not align with the 16b transfer block-size. Hence
+ *    analog contacts are internally organized in groups of 2. </td></tr>
+ *
+ *  <tr><th colspan="3">RX Group Lists</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
+ *  <tr><td>025C0B10</td> <td>000020</td>      <td>Bitmap of 250 RX group lists, default/padding 0x00.</td></tr>
+ *  <tr><td>02980000</td> <td>max. 000120</td> <td>Grouplist 0, see @c grouplist_t.</td></tr>
+ *  <tr><td>02980200</td> <td>max. 000120</td> <td>Grouplist 1</td></tr>
+ *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
+ *  <tr><td>0299f200</td> <td>max. 000120</td> <td>Grouplist 250</td></tr>
+ *
+ *  <tr><th colspan="3">Scan lists</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
+ *  <tr><td>024C1340</td> <td>000020</td> <td>Bitmap of 250 scan lists.</td></tr>
+ *  <tr><td>01080000</td> <td>000090</td> <td>Bank 0, Scanlist 1, see @c scanlist_t. </td></tr>
+ *  <tr><td>01080200</td> <td>000090</td> <td>Bank 0, Scanlist 2</td></tr>
+ *  <tr><td>...</td>      <td>...</td>    <td>...</td></tr>
+ *  <tr><td>01081E00</td> <td>000090</td> <td>Bank 0, Scanlist 16</td></tr>
+ *  <tr><td>010C0000</td> <td>000090</td> <td>Bank 1, Scanlist 17</td></tr>
+ *  <tr><td>...</td>      <td>...</td>    <td>...</td></tr>
+ *  <tr><td>01440000</td> <td>000090</td> <td>Bank 15, Scanlist 241</td></tr>
+ *  <tr><td>...</td>      <td>...</td>    <td>...</td></tr>
+ *  <tr><td>01441400</td> <td>000090</td> <td>Bank 15, Scanlist 250</td></tr>
+ *
+ *  <tr><th colspan="3">Radio IDs</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
+ *  <tr><td>024C1320</td> <td>000020</td>      <td>Bitmap of 250 radio IDs.</td></tr>
+ *  <tr><td>02580000</td> <td>max. 001f40</td> <td>250 Radio IDs. See @c radioid_t.</td></tr>
+ *
+ *  <tr><th colspan="3">GPS/APRS</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
+ *  <tr><td>02501000</td> <td>0000A0</td> <td>APRS/GPS settings, see @c aprs_setting_t.</td>
+ *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, upto 60 chars ASCII, 0-padded.</td>
+ *  <tr><td>02501280</td> <td>000030</td> <td>Unknown.</td></tr>
+ *
+ *  <tr><th colspan="3">General Settings</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
+ *  <tr><td>02500000</td> <td>000630</td> <td>General settings, see @c general_settings_t.</td></tr>
+ *
+ *  <tr><th colspan="3">Messages</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
+ *  <tr><td>01640000</td> <td>max. 000100</td> <td>Some kind of linked list of messages.
+ *    See @c message_list_t. Each entry has a size of 0x10.</td></tr>
+ *  <tr><td>01640800</td> <td>000090</td>      <td>Bytemap of up to 100 valid messages.
+ *    0x00=valid, 0xff=invalid, remaining 46b set to 0x00.</td></tr>
+ *  <tr><td>02140000</td> <td>max. 000800</td> <td>Bank 0, Messages 1-8.
+ *    Each message consumes 0x100b. See @c message_t. </td></tr>
+ *  <tr><td>02180000</td> <td>max. 000800</td> <td>Bank 1, Messages 9-16</td></tr>
+ *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
+ *  <tr><td>02440000</td> <td>max. 000800</td> <td>Bank 12, Messages 97-100</td></tr>
+ *
+ *  <tr><th colspan="3">Hot Keys</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
+ *  <tr><td>025C0000</td> <td>000100</td> <td>4 analog quick-call settings. See @c analog_quick_call_t.</td>
+ *  <tr><td>025C0100</td> <td>000400</td> <td>Upto 32 status messages.
+ *    Length unknown, offset 0x20. ASCII 0x00 terminated and padded.</td>
+ *  <tr><td>025C0500</td> <td>000360</td> <td>18 hot-key settings, see @c hotkey_t</td></tr>
+ *  <tr><td>025C0B00</td> <td>000010</td> <td>Status message bitmap.</td>
+ *
+ *  <tr><th colspan="3">Encryption keys</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
+ *  <tr><td>024C4000</td> <td>004000</td> <td>Upto 256 AES encryption keys.
+ *    See @c encryption_key_t.</td></tr>
+ *
+ *  <tr><th colspan="3">Misc</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
+ *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 offset frequencies.
+ *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000. Default 0x00000000, 0x00 padded.</td></tr>
+ *  <tr><td>02501400</td> <td>000100</td> <td>Talkeralias settings.</td></tr>
+ *  <tr><td>024C1400</td> <td>000070</td> <td>Alarm setting.</td></tr>
+ *
+ *  <tr><th colspan="3">FM Broadcast</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
+ *  <tr><td>02480210</td> <td>000010</td>      <td>Bitmap of 100 FM broadcast channels.</td></tr>
+ *  <tr><td>02480000</td> <td>max. 000200</td> <td>100 FM broadcast channels. Encoded
+ *    as 8-digit BCD little-endian in 100Hz. Filled with 0x00.</td></tr>
+ *  <tr><td>02480200</td> <td>000010</td>      <td>FM broadcast VFO frequency. Encoded
+ *    as 8-digit BCD little-endian in 100Hz. Filled with 0x00.</td></tr>
+ *
+ *  <tr><th colspan="3">Still unknown</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
+ *  <tr><td>01042000</td> <td>000020</td> <td>Roaming channel bitmask.</td></tr>
+ *  <tr><td>01042080</td> <td>000010</td> <td>Unknown data, default=0x00</td></tr>
+ *  <tr><td>024C0C80</td> <td>000010</td> <td>Unknown data, bitmap?, default 0x00.</td></tr>
+ *  <tr><td>024C0D00</td> <td>000010</td> <td>Empty, set to 0x00?`</td></tr>
+ *  <tr><td>024C1000</td> <td>0000D0</td> <td>Unknown data.</td></tr>
+ *  <tr><td>024C1100</td> <td>000010</td> <td>Unknown data.</td></tr>
+ *  <tr><td>024C1280</td> <td>000020</td> <td>Unknown data.</td></tr>
+ *  <tr><td>024C1700</td> <td>000040</td> <td>Unknown, 8bit indices.</td></tr>
+ *  <tr><td>024C1800</td> <td>000500</td> <td>Empty, set to 0x00?</td></tr>
+ *  <tr><td>024C2400</td> <td>000030</td> <td>Unknown data.</td></tr>
+ *  <tr><td>024C2600</td> <td>000010</td> <td>Unknown data.</td></tr>
+ *  <tr><td>04340000</td> <td>000050</td> <td>Unknown data, some how related to contacts.</td></tr>
  * </table>
+ *
  * @ingroup d878uv */
 class D878UVCodeplug : public CodePlug
 {
@@ -102,7 +164,10 @@ class D878UVCodeplug : public CodePlug
 
 public:
   /** Represents the actual channel encoded within the binary code-plug.
-   * Memeory size is 64 bytes. */
+   *
+   * Memmory layout of encoded channel (64byte):
+   * @verbinclude d878uvchannel.txt
+   */
   struct __attribute__((packed)) channel_t {
     /** Defines all possible channel modes, see @c channel_mode. */
     typedef enum {
@@ -218,7 +283,7 @@ public:
     // Byte 26
     uint8_t tx_permit       : 2,        ///< TX permit, see Admin.
       _unused26_1           : 2,        ///< Unused, set to 0.
-      _opt_signal           : 2,        ///< Optional signaling, see OptSignaling.
+      opt_signal            : 2,        ///< Optional signaling, see OptSignaling.
       _unused26_2           : 2;        ///< Unused, set to 0.
 
     // Bytes 27-31
@@ -307,58 +372,11 @@ public:
     void fromChannelObj(const Channel *c, const Config *conf);
   };
 
-  /** Represents a scan list within the binary codeplug.
-   * Memory size is 144 bytes. */
-  struct __attribute__((packed)) scanlist_t {
-    /** Defines all possible priority channel selections. */
-    typedef enum {
-      PRIO_CHAN_OFF = 0,                ///< Off.
-      PRIO_CHAN_SEL1 = 1,               ///< Priority Channel Select 1.
-      PRIO_CHAN_SEL2 = 2,               ///< Priority Channel Select 2.
-      PRIO_CHAN_SEL12 = 3               ///< Priority Channel Select 1 + Priority Channel Select 2.
-    } PriChannel;
-
-    /** Defines all possible reply channel selections. */
-    typedef enum {
-      REVCH_SELECTED = 0,               ///< Selected.
-      REVCH_SEL_TB = 1,                 ///< Selected + TalkBack.
-      REVCH_PRIO_CH1 = 2,               ///< Priority Channel Select 1.
-      REVCH_PRIO_CH2 = 3,               ///< Priority Channel Select 2.
-      REVCH_LAST_CALLED = 4,            ///< Last Called.
-      REVCH_LAST_USED = 5,              ///< Last Used.
-      REVCH_PRIO_CH1_TB = 6,            ///< Priority Channel Select 1 + TalkBack.
-      REVCH_PRIO_CH2_TB = 7             ///< Priority Channel Select 2 + TalkBack.
-    } RevertChannel;
-
-    // Bytes 0-1
-    uint8_t _unused0;                   ///< Unused, set to 0.
-    uint8_t prio_ch_select;             ///< Priority Channel Select, default = PRIO_CHAN_OFF.
-
-    // Bytes 2-5
-    uint16_t    priority_ch1;           ///< Priority Channel 1: 0=Current Channel, index+1, little endian, 0xffff=Off.
-    uint16_t    priority_ch2;           ///< Priority Channel 2: 0=Current Channel, index+1, little endian, 0xffff=Off.
-
-    // Bytes 6-13
-    uint16_t    look_back_a;            ///< Look Back Time A, sec*10, little endian, default 0x000f.
-    uint16_t    look_back_b;            ///< Look Back Time B, sec*10, little endian, default 0x0019.
-    uint16_t    dropout_delay;          ///< Dropout Delay Time, sec*10, little endian, default 0x001d.
-    uint16_t    dwell;                  ///< Dwell Time, sec*10, little endian, default 0x001d.
-
-    // Byte 14
-    uint8_t     revert_channel;         ///< Revert Channel, see @c RevertChannel, default REVCH_SELECTED.
-
-    // Bytes 15-31
-    uint8_t     name[16];               ///< Scan List Name, ASCII, 0-terminated.
-    uint8_t     _pad31;                 ///< Pad byte, set to 0x00.
-
-    // Bytes 32-131
-    uint16_t member[50];                ///< Channels indices, 0-based, little endian, 0xffff=empty
-
-    // Bytes 132-143
-    uint8_t _unused132[12];             ///< Unused, set to 0.
-  };
-
-  /** Represents a digital contact within the binary codeplug. */
+  /** Represents a digital contact within the binary codeplug.
+   *
+   * Memmory layout of encoded contact (100byte):
+   * @verbinclude d878uvcontact.txt
+   */
   struct __attribute__((packed)) contact_t {
     /** Possible call types. */
     typedef enum {
@@ -416,12 +434,26 @@ public:
     void fromContactObj(const DigitalContact *contact);
   };
 
+  /** Represents an ananlog contact within the binary codeplug.
+   *
+   * Memmory layout of encoded analog contact (48byte):
+   * @verbinclude d878uvanalogcontact.txt
+   */
+  struct __attribute__((packed)) analog_contact_t {
+    uint8_t number[7];                  ///< Number encoded as BCD little-endian.
+    uint8_t digits;                     ///< Number of digits.
+    uint8_t name[16];                   ///< Name, ASCII, upto 16 chars, 0-terminated & padded.
+  };
+
   /** Represents the actual RX group list encoded within the binary code-plug.
-   * Memory size is 288 bytes. */
+   *
+   * Memmory layout of encoded group list (288byte):
+   * @verbinclude d878uvgrouplist.txt
+   */
   struct __attribute__((packed)) grouplist_t {
     // Bytes 0-255
     uint32_t member[64];                ///< Contact indices, 0-based, little-endian.
-    // Bytes 256-319
+    // Bytes 256-287
     uint8_t name[16];                   ///< Group-list name, up to 16 x ASCII, 0-terminated.
     uint8_t unused[16];                 ///< Unused, set to 0.
 
@@ -447,7 +479,65 @@ public:
     void fromGroupListObj(const RXGroupList *lst, const Config *conf);
   };
 
-  /** Represents an entry of the radio ID table within the binary codeplug. */
+  /** Represents a scan list within the binary codeplug.
+   *
+   * Memmory layout of encoded scanlist (144byte):
+   * @verbinclude d878uvscanlist.txt
+   */
+  struct __attribute__((packed)) scanlist_t {
+    /** Defines all possible priority channel selections. */
+    typedef enum {
+      PRIO_CHAN_OFF = 0,                ///< Off.
+      PRIO_CHAN_SEL1 = 1,               ///< Priority Channel Select 1.
+      PRIO_CHAN_SEL2 = 2,               ///< Priority Channel Select 2.
+      PRIO_CHAN_SEL12 = 3               ///< Priority Channel Select 1 + Priority Channel Select 2.
+    } PriChannel;
+
+    /** Defines all possible reply channel selections. */
+    typedef enum {
+      REVCH_SELECTED = 0,               ///< Selected.
+      REVCH_SEL_TB = 1,                 ///< Selected + TalkBack.
+      REVCH_PRIO_CH1 = 2,               ///< Priority Channel Select 1.
+      REVCH_PRIO_CH2 = 3,               ///< Priority Channel Select 2.
+      REVCH_LAST_CALLED = 4,            ///< Last Called.
+      REVCH_LAST_USED = 5,              ///< Last Used.
+      REVCH_PRIO_CH1_TB = 6,            ///< Priority Channel Select 1 + TalkBack.
+      REVCH_PRIO_CH2_TB = 7             ///< Priority Channel Select 2 + TalkBack.
+    } RevertChannel;
+
+    // Bytes 0-1
+    uint8_t _unused0;                   ///< Unused, set to 0.
+    uint8_t prio_ch_select;             ///< Priority Channel Select, default = PRIO_CHAN_OFF.
+
+    // Bytes 2-5
+    uint16_t priority_ch1;              ///< Priority Channel 1: 0=Current Channel, index+1, little endian, 0xffff=Off.
+    uint16_t priority_ch2;              ///< Priority Channel 2: 0=Current Channel, index+1, little endian, 0xffff=Off.
+
+    // Bytes 6-13
+    uint16_t look_back_a;               ///< Look Back Time A, sec*10, little endian, default 0x000f.
+    uint16_t look_back_b;               ///< Look Back Time B, sec*10, little endian, default 0x0019.
+    uint16_t dropout_delay;             ///< Dropout Delay Time, sec*10, little endian, default 0x001d.
+    uint16_t dwell;                     ///< Dwell Time, sec*10, little endian, default 0x001d.
+
+    // Byte 14
+    uint8_t revert_channel;             ///< Revert Channel, see @c RevertChannel, default REVCH_SELECTED.
+
+    // Bytes 15-31
+    uint8_t name[16];                   ///< Scan List Name, ASCII, 0-terminated.
+    uint8_t _pad31;                     ///< Pad byte, set to 0x00.
+
+    // Bytes 32-131
+    uint16_t member[50];                ///< Channels indices, 0-based, little endian, 0xffff=empty
+
+    // Bytes 132-143
+    uint8_t _unused132[12];             ///< Unused, set to 0.
+  };
+
+  /** Represents an entry of the radio ID table within the binary codeplug.
+   *
+   * Memmory layout of encoded radio ID (32byte):
+   * @verbinclude d878uvradioid.txt
+   */
   struct __attribute__((packed)) radioid_t {
     // Bytes 0-3.
     uint32_t id;                        ///< Up to 8 BCD digits in little-endian.
@@ -553,6 +643,202 @@ public:
     void setIntroLine2(const QString line);
   };
 
+  /** Some weird linked list of valid message indices.
+   *
+   * Memmory layout of encoded radio ID (16byte):
+   * @verbinclude d878uvmessagelist.txt
+   */
+  struct __attribute__((packed)) message_list_t {
+    uint8_t _unknown0[2];          ///< Unused, set to 0x00.
+    uint8_t _next_index;           ///< Index of next message, 0xff=EOL.
+    uint8_t _current_index;        ///< Index of this message.
+    uint8_t _unknown4[12];         ///< Unused, set to 0x00.
+  };
+
+  /** Represents a prefabricated SMS message within the binary codeplug.
+   *
+   * Memmory layout of encoded radio ID (256byte):
+   * @verbinclude d878uvmessage.txt
+   */
+  struct __attribute__((packed)) message_t {
+    char text[99];                 ///< Up to 99 ASCII chars, 0-padded.
+    uint8_t _unused100[157];       ///< Unused, set to 0.
+  };
+
+  /** Represents an encryption key.
+   * Size is 64b. */
+  struct __attribute__((packed)) encryption_key_t {
+    uint8_t index;                 ///< Index/number of excryption key, off=0x00.
+    uint8_t key[32];               ///< Binary encryption key.
+    uint8_t _unused34;             ///< Unused, set to 0x00;
+    uint8_t _unknown35;            ///< Fixed to 0x40.
+    uint8_t _unused36[28];         ///< Unused, set to 0x00;
+  };
+
+  struct __attribute__((packed)) analog_quick_call_t {
+    typedef enum {
+      AQC_None = 0,
+      AQC_DTMF = 1,
+      AQC_2TONE = 2,
+      AQC_5TONE = 3
+    } Type;
+
+    uint8_t call_type;             ///< Type of quick call, see @c Type.
+    uint8_t call_id_idx;           ///< Index of whom to call. 0xff=none.
+  };
+
+  struct __attribute__((packed)) hotkey_t {
+    typedef enum {
+      HOTKEY_CALL = 0,
+      HOTKEY_MENU = 1
+    } Type;
+
+    typedef enum {
+      HOTKEY_MENU_SMS = 1,
+      HOTKEY_MENU_NEW_SMS = 2,
+      HOTKEY_MENU_HOT_TEXT = 3,
+      HOTKEY_MENU_RX_SMS = 4,
+      HOTKEY_MENU_TX_SMS = 5,
+      HOTKEY_MENU_CONTACT = 6,
+      HOTKEY_MENU_MANUAL_DIAL = 7,
+      HOTKEY_MENU_CALL_LOG = 8
+    } MenuItem;
+
+    typedef enum {
+      HOTKEY_CALL_ANALOG = 0,
+      HOTKEY_CALL_DIGITAL = 1
+    } CallType;
+
+    typedef enum {
+      HOTKEY_DIGI_CALL_OFF = 0xff,
+      HOTKEY_GROUP_CALL = 0,
+      HOTKEY_PRIVATE_CALL = 1,
+      HOTKEY_PRIVATE_ALLCALL = 2,
+      HOTKEY_HOT_TEXT = 3,
+      HOTKEY_CALL_TIP = 4,
+      HOTKEY_STATE = 5
+    } DigiCallType;
+
+    uint8_t type;                  ///< Type of the hot-key, see @c Type.
+    uint8_t meun_item;             ///< The menu item if type=HOTKEY_MENU, see @c MenuItem.
+    uint8_t call_type;             ///< The call type if type=HOTKEY_CALL, see @c CallType.
+    uint8_t digi_call_type;        ///< The digital call variant if call_type=HOTKEY_CALL_ANALOG, see @c DigiCallType.
+    uint32_t call_obj;             ///< 32bit index of contact to call, little-endian. 0xffffffff=off.
+                                   /// If call_type=HOTKEY_CALL_ANALOG, index of analog quick call.
+                                   /// If call_type=HOTKEY_CALL_DIGIAL, index of any contact (see @c contact_t).
+    uint8_t content;               ///< Content index, 0xff=none.
+                                   /// If digi_call_type=HOTKEY_HOT_TEXT, index of message.
+                                   /// If digi_call_type=HOTKEY_STATE, index of state message.
+    uint8_t _unused9[39];          ///< Unused, set to 0x00.
+  };
+
+  struct __attribute__((packed)) aprs_setting_t {
+    typedef enum {
+      SIG_OFF = 0,
+      SIG_CTCSS = 1,
+      SIG_DCS = 2
+    } SignalingType;
+
+    typedef enum {
+      POWER_LOW = 0,
+      POWER_MID = 1,
+      POWER_HIGH = 2,
+      POWER_TURBO = 3
+    } Power;
+
+    // byte 0x00
+    uint8_t _unknown0;             ///< Unknown, set to 0xff.
+    uint32_t frequency;            ///< TX frequency, BCD encoded, little endian in 10Hz.
+    uint8_t tx_delay;              ///< TX delay, multiples of 20ms, default=1200ms.
+    uint8_t sig_type;              ///< Signalling type, default=0.
+    uint8_t ctcss;                 ///< CTCSS tone-code, default=0.
+    uint8_t dcs;                   ///< DCS code, default=0x13.
+    uint8_t _unknown9;             ///< Unknown, set to 00.
+    uint8_t manual_tx_interval;    ///< Manual TX intervals in seconds.
+    uint8_t auto_tx_interval;      ///< Auto TX interval in multiples of 30s.
+    uint8_t tx_tone_enable;        ///< TX enable, 0=off, 1=on.
+    uint8_t fixed_location;        ///< Fixed location data, 0=off, 1=on.
+
+    uint8_t lat_deg;               ///< Latitude in degree.
+    uint8_t lat_min;               ///< Latitude minutes.
+    uint8_t lat_sec;               ///< Latitude seconds (1/100th of a minute).
+    uint8_t north_south;           ///< North or south flag, north=0, south=1.
+    uint8_t lon_deg;               ///< Longitude in degree.
+    uint8_t lon_min;               ///< Longitude in minutes.
+    uint8_t lon_sec;               ///< Longitude in seconds (1/100th of a minute).
+    uint8_t east_west;             ///< East or west flag, east=0, west=1.
+
+    uint8_t to_call[6];            ///< Destination call, 6 x ASCII, 0-padded.
+    uint8_t to_ssid;               ///< Destination SSID.
+
+    uint8_t from_call[6];          ///< Source call, 6 x ASCII, 0-padded.
+    uint8_t from_ssid;             ///< Source SSID.
+
+    // byte 0x24
+    uint8_t path[20];              ///< Path string, upto 20 ASCII chars, 0-padded.
+
+    // byte 0x38
+    uint8_t _unknown56;            ///< Unknown set to 00.
+    char symbol;                   ///< ASCII-char of APRS symbol table.
+    char map_icon;                 ///< ASCII-char of APRS map icon.
+    uint8_t power;                 ///< Transmit power.
+    uint8_t prewave_delay;         ///< Prewave delay in 10ms steps.
+
+    // bytes 0x3d
+    uint8_t _unknown61;            ///< Unknown, set to 01.
+    uint8_t _unknown62;            ///< Unknown, set to 03.
+    uint8_t _unknown63;            ///< Unknown, set to ff.
+
+    // byte 0x40
+    uint16_t digi_channels[8];     ///< 8 16bit channel indices in little-endian. VFO A=4000,
+                                   ///< VFO B=4001, Current=4002.
+    // byte 0x50
+    uint8_t _unknown80[3];         ///< Unknown, set to 0
+    uint8_t talkgroups[8];         ///< Talkgroups for all digi APRS channels.
+    uint8_t _unknown89[5];         ///< Unknown, set to 0
+
+    // byte 0x60
+    uint8_t _unknown96[32];        ///< Unknown yet.
+
+    // byte 0x70-0x8f
+    uint8_t calltypes[8];          ///< Calltype for all digi APRS chanels, 0=private, 1=group, 3=all call.
+    uint8_t roaming_support;       ///< Roaming support. 0=off, 1=on.
+    uint8_t timeslots[8];          ///< Timeslots for all digi APRS channels.
+    uint8_t rep_act_delay;         ///< Repeater activation delay in multiples of 100ms.
+                                   /// Default 0, range 0-1000ms.
+    uint8_t _unknown130[14];       ///< Unknown, set to 0.
+
+    // bytes 0x90-0x9f
+    uint8_t _unknown[16];          ///< Unknown, set to 0.
+  };
+
+  struct __attribute__((packed)) talkeralias_setting_t {
+    uint8_t send_alias;            ///< Send talker alias, 0=off, 1=on.
+    uint8_t _unknown1[15];         ///< Unknown, set to 0.
+  };
+
+  struct __attribute__((packed)) analog_alarm_setting_t {
+    typedef enum {
+      ALARM_AA_NONE = 0,
+      ALARM_AA_TX_AND_BACKGROUND = 1,
+      ALARM_AA_TX_AND_ALARM = 2,
+      ALARM_AA_BOTH = 3,
+    } Action;
+
+    typedef enum {
+      ALARM_ENI_NONE = 0,
+      ALARM_ENI_DTMF = 1,
+      ALARM_ENI_5TONE = 2
+    } ENIType;
+
+    uint8_t action;
+    uint8_t eni_type;
+    uint8_t emergency_id_idx;      ///< Emergency ID index, 0-based.
+    uint8_t time;                  ///< Alarm time in seconds, default 10.
+    uint8_t tx_dur;                ///< TX duration in seconds, default 10.
+    uint8_t rx_dur;                ///< RX duration in seconds, default 60.
+  };
+
 
 public:
   /** Empty constructor. */
@@ -563,8 +849,15 @@ public:
 
   /** Sets all bitmaps for the given config. */
   void setBitmaps(Config *config);
-  /** Allocate memory for all elements marked as valid within the bitmaps. */
-  void allocateFromBitmaps();
+
+  /** Allocate all code-plug elements that must be downloaded for decoding. All code-plug elements
+   * with the radio that are not represented within the common Config are omitted. */
+  void allocateForDecoding();
+  /** Allocate all code-plug elements that must be written back to the device to maintain a working
+   * codeplug. These elements might be updated during encoding. */
+  void allocateUntouched();
+  /** Allocate all code-plug elements that are defined through the common Config. */
+  void allocateForEncoding();
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
 	bool decode(Config *config);

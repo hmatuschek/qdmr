@@ -10,6 +10,8 @@
 #include <QTimeZone>
 #include <QtEndian>
 
+#define ALIGN_SIZE(n,m)          ((n%m) ? (n+(m-(n%m))) : n)
+
 #define NUM_CHANNELS              4000
 #define NUM_CHANNEL_BANKS         32
 #define CHANNEL_BANK_0            0x00800000
@@ -25,13 +27,20 @@
 #define VFO_SIZE                  0x00000040 // Size of each VFO settings.
 
 #define NUM_CONTACTS              10000      // Total number of contacts
-#define NUM_CONTACT_BANKS         313        // Number of contact banks
-#define CONTACT_BANK_0            0x02680000 // First bank of 32 contacts
-#define CONTACT_BANK_SIZE         0x00000c80 // Size of 32 contacts
-#define CONTACT_BANK_312          0x02772f80 // Last bank of 16 contacts
-#define CONTACT_BANK_312_SIZE     0x00000640 // Size of last contact bank
+#define NUM_CONTACT_BANKS         2500       // Number of contact banks
+#define CONTACTS_PER_BANK         4
+#define CONTACT_BANK_0            0x02680000 // First bank of 4 contacts
+#define CONTACT_BANK_SIZE         0x00000190 // Size of 4 contacts
 #define CONTACTS_BITMAP           0x02640000 // Address of contact bitmap
-#define CONTACTS_BITMAP_SIZE      0x000004f0 // Size of contact bitmap
+#define CONTACTS_BITMAP_SIZE      0x00000500 // Size of contact bitmap
+
+#define NUM_ANALOGCONTACTS        128
+#define NUM_ANALOGCONTACT_BANKS   64
+#define ANALOGCONTACTS_PER_BANK   2
+#define ANALOGCONTACT_BANK_0      0x02940000
+#define ANALOGCONTACT_BANK_SIZE   0x00000030
+#define ANALOGCONTACT_BITMAP      0x02900100 // Address of contact bitmap
+#define ANALOGCONTACT_BITMAP_SIZE 0x00000080 // Size of contact bitmap
 
 #define NUM_RXGRP                 250        // Total number of RX group lists
 #define ADDR_RXGRP_0              0x02980000 // Address of the first RX group list.
@@ -48,29 +57,61 @@
 #define ADDR_ZONE_NAME            0x02540000 // Address of zone names.
 #define ZONE_NAME_SIZE            0x00000010 // Size of zone names
 #define ZONE_NAME_OFFSET          0x00000020 // Offset between zone names.
-#define ADDR_ZONE_CH_A            0x02500100
-#define ADDR_ZONE_CH_B            0x02500200
 #define ZONE_BITMAPS              0x024c1300 // Bitmap of all enabled zones
-#define ZONE_BITMAPS_SIZE         0x00000040 // Size of the zone bitmap
-#define ZONE_A_BITMAP             0x024c1300
-#define ZONE_A_BITMAP_SIZE        0x00000020
-#define ZONE_B_BITMAP             0x024c1320
-#define ZONE_B_BITMAP_SIZE        0x00000020
+#define ZONE_BITMAPS_SIZE         0x00000020 // Size of the zone bitmap
 
 #define NUM_RADIOIDS              250
 #define ADDR_RADIOIDS             0x02580000
-#define RADIOIDS_SIZE             0x00001f40
+#define RADIOID_SIZE              0x00000020
+#define RADIOID_BITMAP            0x024c1320
+#define RADIOID_BITMAP_SIZE       0x00000020
 
 #define NUM_SCAN_LISTS            250
-#define SCAN_BANK_0               0x01080000 // Scanlist 0-31.
-#define SCAN_BANK_OFFSET          0x00080000 // Offset to next bank.
+#define NUM_SCANLISTS_PER_BANK    16
+#define SCAN_LIST_BANK_0          0x01080000 // First scanlist bank
+#define SCAN_LIST_OFFSET          0x00000200 // Offset to next list.
 #define SCAN_LIST_SIZE            0x000000c0 // Size of scan-list.
-#define SCAN_LIST_OFFSET          0x00000200 // Offset to next scan-list within bank.
+#define SCAN_LIST_BANK_OFFSET     0x00040000 // Offset to next bank
 #define SCAN_BITMAP               0x024c1340 // Address of scan-list bitmap.
-#define SCAN_BITMAP_SIZE          0x00000040 // Size of scan-list bitmap.
+#define SCAN_BITMAP_SIZE          0x00000020 // Size of scan-list bitmap.
 
 #define ADDR_GENERAL_CONFIG       0x02500000
 #define GENERAL_CONFIG_SIZE       0x00000640
+
+#define NUM_MESSAGES              100
+#define NUM_MESSAGES_PER_BANK     8
+#define MESSAGE_SIZE              0x00000100
+#define MESSAGE_BANK_0            0x02140000
+#define MESSAGE_BANK_SIZE         0x00000800
+#define MESSAGE_BANK_OFFSET       0x00040000
+#define MESSAGE_BITMAP            0x01640800
+#define MESSAGE_BITMAP_SIZE       0x00000090
+
+#define ADDR_HOTKEY               0x025C0000
+#define HOTKEY_SIZE               0x00000860
+#define STATUSMESSAGE_BITMAP      0x025C0B00
+#define STATUSMESSAGE_BITMAP_SIZE 0x00000010
+
+#define NUM_ENCRYPTION_KEYS       256
+#define ADDR_ENCRYPTION_KEYS      0x024C4000
+#define ENCRYPTION_KEY_SIZE       0x00000040
+#define ENCRYPTION_KEYS_SIZE      0x00004000
+
+#define ADDR_OFFSET_FREQ          0x024C2000
+#define OFFSET_FREQ_SIZE          0x000003F0
+
+#define ADDR_TALKER_ALIAS         0x02501400
+#define TALKER_ALIAS_SIZE         0x00000100
+
+#define ADDR_ALARM_SETTING        0x024C1400
+#define ALARM_SETTING_SIZE        0x00000070
+
+#define FMBC_BITMAP               0x02480210
+#define FMBC_BITMAP_SIZE          0x00000010
+#define ADDR_FMBC                 0x02480000
+#define FMBC_SIZE                 0x00000200
+#define ADDR_FMBC_VFO             0x02480200
+#define FMBC_VFO_SIZE             0x00000010
 
 using namespace Signaling;
 
@@ -656,14 +697,24 @@ D878UVCodeplug::D878UVCodeplug(QObject *parent)
 
   // Channel bitmap
   image(0).addElement(CHANNEL_BITMAP, CHANNEL_BITMAP_SIZE);
-  // Contacts bitmap
-  /*image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
   // Zone bitmap
   image(0).addElement(ZONE_BITMAPS, ZONE_BITMAPS_SIZE);
-  // All readio IDs
-  image(0).addElement(ADDR_RADIOIDS, RADIOIDS_SIZE);*/
-  // General config
-  image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+  // Contacts bitmap
+  image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
+  // Analog contacts bitmap
+  image(0).addElement(ANALOGCONTACT_BITMAP, ANALOGCONTACT_BITMAP_SIZE);
+  // RX group list bitmaps
+  image(0).addElement(RXGRP_BITMAP, RXGRP_BITMAP_SIZE);
+  // Scan list bitmaps
+  image(0).addElement(SCAN_BITMAP, SCAN_BITMAP_SIZE);
+  // Radio IDs bitmaps
+  image(0).addElement(RADIOID_BITMAP, RADIOID_BITMAP_SIZE);
+  // Messag bitmaps
+  image(0).addElement(MESSAGE_BITMAP, MESSAGE_BITMAP_SIZE);
+  // Status messages
+  image(0).addElement(STATUSMESSAGE_BITMAP, STATUSMESSAGE_BITMAP_SIZE);
+  // FM Broadcast bitmaps
+  image(0).addElement(FMBC_BITMAP, FMBC_BITMAP_SIZE);
 }
 
 void
@@ -671,13 +722,69 @@ D878UVCodeplug::clear() {
 }
 
 void
-D878UVCodeplug::allocateFromBitmaps() {
-  // Check channel bitmap
+D878UVCodeplug::allocateUntouched() {
+  /*
+   * Allocate VFO channels
+   */
+  image(0).addElement(VFO_A_ADDR, sizeof(channel_t));
+  image(0).addElement(VFO_A_ADDR+0x2000, sizeof(channel_t));
+  image(0).addElement(VFO_B_ADDR, sizeof(channel_t));
+  image(0).addElement(VFO_B_ADDR+0x2000, sizeof(channel_t));
+
+  // General config
+  image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+
+  /*
+   * Kept but untouched memory regions.
+   */
+
+  // Prefab. SMS messages
+  uint8_t *messages_bytemap = data(MESSAGE_BITMAP);
+  for (uint8_t i=0; i<NUM_MESSAGES; i++) {
+    uint8_t bank = i/NUM_MESSAGES_PER_BANK;
+    if (0xff == messages_bytemap[i])
+      continue;
+    uint32_t addr = MESSAGE_BANK_0 + bank*MESSAGE_BANK_SIZE;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, MESSAGE_BANK_SIZE);
+    }
+  }
+  // Allocate Hot Keys
+  image(0).addElement(ADDR_HOTKEY, HOTKEY_SIZE);
+  // Encryption keys
+  image(0).addElement(ADDR_ENCRYPTION_KEYS, ENCRYPTION_KEYS_SIZE);
+  // Offset frequencies
+  image(0).addElement(ADDR_OFFSET_FREQ, OFFSET_FREQ_SIZE);
+  // Talker alias settings
+  image(0).addElement(ADDR_TALKER_ALIAS, TALKER_ALIAS_SIZE);
+  // Alarm settings
+  image(0).addElement(ADDR_ALARM_SETTING, ALARM_SETTING_SIZE);
+  // FM broad-cast settings
+  image(0).addElement(ADDR_FMBC, FMBC_SIZE+FMBC_VFO_SIZE);
+  // Unknown memory region
+  image(0).addElement(0x01042000, 0x020);
+  image(0).addElement(0x01042080, 0x010);
+  image(0).addElement(0x024C0C80, 0x010);
+  image(0).addElement(0x024C0D00, 0x010);
+  image(0).addElement(0x02410000, 0x0D0);
+  image(0).addElement(0x02411000, 0x010);
+  image(0).addElement(0x024C1280, 0x020);
+  image(0).addElement(0x024C1700, 0x040);
+  image(0).addElement(0x024C1800, 0x500);
+  image(0).addElement(0x024C2400, 0x030);
+  image(0).addElement(0x024C2600, 0x010);
+}
+
+void
+D878UVCodeplug::allocateForEncoding() {
+  /*
+   * Allocate channels
+   */
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
     // Get byte and bit for channel, as well as bank of channel
     uint16_t bit = i%8, byte = i/8, bank = i/128;
-    // enabled if true
+    // if disabled -> skip
     if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
       continue;
     // compute address for channel
@@ -690,50 +797,229 @@ D878UVCodeplug::allocateFromBitmaps() {
       image(0).addElement(addr+0x2000, sizeof(channel_t));
   }
 
-  image(0).addElement(VFO_A_ADDR, sizeof(channel_t));
-  image(0).addElement(VFO_A_ADDR+0x2000, sizeof(channel_t));
-  image(0).addElement(VFO_B_ADDR, sizeof(channel_t));
-  image(0).addElement(VFO_B_ADDR+0x2000, sizeof(channel_t));
-
-  // Check contacts bitmap
-  /*uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
-  for (uint16_t i=0; i<NUM_CONTACTS; i++) {
-    // Get byte and bit for contact, as well as bank of contact
-    uint16_t bit = i%8, byte = i/8, bank = i/128;
-    // enabled if false (ass hole)
-    if (1 == ((contact_bitmap[byte]>>bit) & 0x01))
-      continue;
-    uint32_t addr = CONTACT_BANK_0+bank*CONTACT_BANK_SIZE;
-    if (nullptr == data(addr, 0)) {
-      if (312 == bank) {
-        image(0).addElement(addr, CONTACT_BANK_312_SIZE);
-        memset(data(addr), 0xff, CONTACT_BANK_312_SIZE);
-      } else {
-        image(0).addElement(addr, CONTACT_BANK_SIZE);
-        memset(data(addr), 0xff, CONTACT_BANK_SIZE);
-      }
-    }
-  }
-
-  // Allocate all group lists (no index table for RX groups! WTF!)
-  for (uint16_t i=0; i<NUM_RXGRP; i++) {
-    image(0).addElement(ADDR_RXGRP_0+i*RXGRP_OFFSET, RXGRP_SIZE);
-  }
-
-  // Allocate only valid zones
+  /*
+   *  Allocate zones
+   */
   uint8_t *zone_bitmap = data(ZONE_BITMAPS);
   for (uint16_t i=0; i<NUM_ZONES; i++) {
     // Get byte and bit for zone
     uint16_t bit = i%8, byte = i/8;
-    // If valid ...
+    // if invalid -> skip
     if (0 == ((zone_bitmap[byte]>>bit) & 0x01))
       continue;
     // Allocate zone itself
     image(0).addElement(ADDR_ZONE+i*ZONE_OFFSET, ZONE_SIZE);
+    image(0).addElement(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET, ZONE_NAME_SIZE);
   }
-  // but allocate all zone names (only 8k)
-  image(0).addElement(ADDR_ZONE_NAME, NUM_ZONES*ZONE_NAME_OFFSET); */
+
+  /*
+   * Allocate contacts
+   */
+  uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
+  for (uint16_t i=0; i<NUM_CONTACTS; i++) {
+    // Get byte and bit for contact, as well as bank of contact
+    uint16_t bit = i%8, byte = i/8;
+    // enabled if false (ass hole)
+    if (1 == ((contact_bitmap[byte]>>bit) & 0x01))
+      continue;
+    uint32_t addr = CONTACT_BANK_0+(i/CONTACTS_PER_BANK)*CONTACT_BANK_SIZE;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, CONTACT_BANK_SIZE);
+      memset(data(addr), 0x00, CONTACT_BANK_SIZE);
+    }
+  }
+
+  /*
+   * Allocate analog contacts
+   */
+  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BITMAP);
+  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
+    // if disabled -> skip
+    if (0 == analog_contact_bytemap[i])
+      continue;
+    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, ANALOGCONTACT_BANK_SIZE);
+      memset(data(addr), 0x00, ANALOGCONTACT_BANK_SIZE);
+    }
+  }
+
+  /*
+   * Allocate group lists
+   */
+  uint8_t *grouplist_bitmap = data(RXGRP_BITMAP);
+  for (uint16_t i=0; i<NUM_RXGRP; i++) {
+    // Get byte and bit for group list
+    uint16_t bit = i%8, byte = i/8;
+    // if disabled -> skip
+    if (0 == ((grouplist_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate RX group lists indivitually
+    uint32_t addr = ADDR_RXGRP_0 + i*RXGRP_OFFSET;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, RXGRP_SIZE);
+      memset(data(addr), 0xff, RXGRP_SIZE);
+    }
+  }
+
+  /*
+   * Allocate scan lists
+   */
+  uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
+  for (uint8_t i=0; i<NUM_SCAN_LISTS; i++) {
+    // Get byte and bit for scan list, bank and bank_idx
+    uint16_t bit = i%8, byte = i/8;
+    uint8_t bank = (i/NUM_SCANLISTS_PER_BANK), bank_idx = (i%NUM_SCANLISTS_PER_BANK);
+    // if disabled -> skip
+    if (0 == ((scanlist_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate scan lists indivitually
+    uint32_t addr = SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + bank_idx*SCAN_LIST_OFFSET;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, SCAN_LIST_SIZE);
+      memset(data(addr), 0xff, SCAN_LIST_SIZE);
+    }
+  }
+
+  /*
+   * Allocate radio IDs
+   */
+  uint8_t *radioid_bitmap = data(RADIOID_BITMAP);
+  for (uint8_t i=0; i<NUM_RADIOIDS; i++) {
+    // Get byte and bit for radio ID
+    uint16_t bit = i%8, byte = i/8;
+    // if disabled -> skip
+    if (0 == ((radioid_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate radio IDs individually
+    uint32_t addr = ADDR_RADIOIDS + i*RADIOID_SIZE;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, RADIOID_SIZE);
+    }
+  }
 }
+
+void
+D878UVCodeplug::allocateForDecoding() {
+  /*
+   * Allocate channels
+   */
+  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
+  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+    // Get byte and bit for channel, as well as bank of channel
+    uint16_t bit = i%8, byte = i/8, bank = i/128;
+    // if disabled -> skip
+    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // compute address for channel
+    uint32_t addr = CHANNEL_BANK_0
+        + bank*CHANNEL_BANK_OFFSET
+        + bit*sizeof(channel_t);
+    if (nullptr == data(addr, 0))
+      image(0).addElement(addr, sizeof(channel_t));
+  }
+
+  /*
+   *  Allocate zones
+   */
+  uint8_t *zone_bitmap = data(ZONE_BITMAPS);
+  for (uint16_t i=0; i<NUM_ZONES; i++) {
+    // Get byte and bit for zone
+    uint16_t bit = i%8, byte = i/8;
+    // if invalid -> skip
+    if (0 == ((zone_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate zone itself
+    image(0).addElement(ADDR_ZONE+i*ZONE_OFFSET, ZONE_SIZE);
+    image(0).addElement(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET, ZONE_NAME_SIZE);
+  }
+
+  /*
+   * Allocate contacts
+   */
+  uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
+  for (uint16_t i=0; i<NUM_CONTACTS; i++) {
+    // Get byte and bit for contact, as well as bank of contact
+    uint16_t bit = i%8, byte = i/8;
+    // enabled if false (ass hole)
+    if (1 == ((contact_bitmap[byte]>>bit) & 0x01))
+      continue;
+    uint32_t addr = CONTACT_BANK_0+(i/CONTACTS_PER_BANK)*CONTACT_BANK_SIZE;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, CONTACT_BANK_SIZE);
+    }
+  }
+
+  /*
+   * Allocate analog contacts
+   */
+  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BITMAP);
+  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
+    // if disabled -> skip
+    if (0 == analog_contact_bytemap[i])
+      continue;
+    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, ANALOGCONTACT_BANK_SIZE);
+    }
+  }
+
+  /*
+   * Allocate group lists
+   */
+  uint8_t *grouplist_bitmap = data(RXGRP_BITMAP);
+  for (uint16_t i=0; i<NUM_RXGRP; i++) {
+    // Get byte and bit for group list
+    uint16_t bit = i%8, byte = i/8;
+    // if disabled -> skip
+    if (0 == ((grouplist_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate RX group lists indivitually
+    uint32_t addr = ADDR_RXGRP_0 + i*RXGRP_OFFSET;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, RXGRP_SIZE);
+    }
+  }
+
+  /*
+   * Allocate scan lists
+   */
+  uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
+  for (uint8_t i=0; i<NUM_SCAN_LISTS; i++) {
+    // Get byte and bit for scan list, bank and bank_idx
+    uint16_t bit = i%8, byte = i/8;
+    uint8_t bank = (i/NUM_SCANLISTS_PER_BANK), bank_idx = (i%NUM_SCANLISTS_PER_BANK);
+    // if disabled -> skip
+    if (0 == ((scanlist_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate scan lists indivitually
+    uint32_t addr = SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + bank_idx*SCAN_LIST_OFFSET;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, SCAN_LIST_SIZE);
+    }
+  }
+
+  /*
+   * Allocate radio IDs
+   */
+  uint8_t *radioid_bitmap = data(RADIOID_BITMAP);
+  for (uint8_t i=0; i<NUM_RADIOIDS; i++) {
+    // Get byte and bit for radio ID
+    uint16_t bit = i%8, byte = i/8;
+    // if disabled -> skip
+    if (0 == ((radioid_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate radio IDs individually
+    uint32_t addr = ADDR_RADIOIDS + i*RADIOID_SIZE;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, RADIOID_SIZE);
+    }
+  }
+
+  // General config
+  image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+}
+
 
 void
 D878UVCodeplug::setBitmaps(Config *config)
@@ -884,7 +1170,7 @@ D878UVCodeplug::decode(Config *config)
   CodeplugContext ctx(config);
 
   // Find a valid RadioID
-  /*uint8_t *radio_ids = data(ADDR_RADIOIDS);
+  uint8_t *radio_ids = data(ADDR_RADIOIDS);
   for (uint16_t i=0; i<NUM_RADIOIDS; i++) {
     radioid_t *id = (radioid_t *)(radio_ids+i*sizeof(radioid_t));
     if (id->isValid()) {
@@ -892,7 +1178,12 @@ D878UVCodeplug::decode(Config *config)
       config->setName(id->getName());
       break;
     }
-  }*/
+  }
+
+  // Get intro lines
+  general_settings_t *settings = (general_settings_t *)data(ADDR_GENERAL_CONFIG);
+  config->setIntroLine1(settings->getIntroLine1());
+  config->setIntroLine2(settings->getIntroLine2());
 
   // Create channels
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
@@ -909,7 +1200,7 @@ D878UVCodeplug::decode(Config *config)
   }
 
   // Create contacts
-  /*uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
+  uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
   for (uint16_t i=0; i<NUM_CONTACTS; i++) {
     // Check if contact is enabled:
     uint16_t  bit = i%8, byte = i/8;
@@ -918,13 +1209,15 @@ D878UVCodeplug::decode(Config *config)
     contact_t *con = (contact_t *)data(CONTACT_BANK_0+i*sizeof(contact_t));
     if (DigitalContact *obj = con->toContactObj())
       ctx.addDigitalContact(obj, i);
-  }*/
+  }
 
   // Create RX group lists
-  /*for (uint16_t i=0; i<NUM_RXGRP; i++) {
-    grouplist_t *grp = (grouplist_t *)data(ADDR_RXGRP_0+i*RXGRP_OFFSET);
-    if (! grp->isValid())
+  uint8_t *grouplist_bitmap = data(RXGRP_BITMAP);
+  for (uint16_t i=0; i<NUM_RXGRP; i++) {
+    uint16_t  bit = i%8, byte = i/8;
+    if (0 == ((grouplist_bitmap[byte]>>bit) & 0x01))
       continue;
+    grouplist_t *grp = (grouplist_t *)data(ADDR_RXGRP_0+i*RXGRP_OFFSET);
     if (RXGroupList *obj = grp->toGroupListObj()) {
       ctx.addGroupList(obj, i);
       grp->linkGroupList(obj, ctx);
@@ -932,14 +1225,11 @@ D878UVCodeplug::decode(Config *config)
   }
 
   // Create zones
-  uint8_t *zone_a_bitmap = data(ZONE_A_BITMAP);
-  //uint8_t *zone_b_bitmap = data(ZONE_A_BITMAP);
+  uint8_t *zone_bitmap = data(ZONE_BITMAPS);
   for (uint16_t i=0; i<NUM_ZONES; i++) {
     // Check if zone is enabled:
     uint16_t bit = i%8, byte = i/8;
-    bool has_a = ((zone_a_bitmap[byte]>>bit)&0x01);
-    //bool has_b = ((zone_b_bitmap[byte]>>bit)&0x01);
-    if (! has_a)
+    if (0 == (zone_bitmap[byte]>>bit))
       continue;
     // If enabled, create zone with name
     Zone *zone = new Zone(decode_ascii(data(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET), 16, 0));
@@ -973,11 +1263,6 @@ D878UVCodeplug::decode(Config *config)
     if (ctx.hasChannel(i))
       ch->linkChannelObj(ctx.getChannel(i), ctx);
   }
-
-  // Apply general settings
-  general_settings_t *settings = (general_settings_t *)data(ADDR_GENERAL_CONFIG);
-  config->setIntroLine1(settings->getIntroLine1());
-  config->setIntroLine2(settings->getIntroLine2()); */
 
   /// @bug Implement scan-list D878UV code-plug decoding.
   /// @bug Implement analog contact D878UV code-plug decoding.

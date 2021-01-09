@@ -63,6 +63,9 @@ class Radio : public QThread
 public:
   /** Represents a radio feature list, a generic configuration is verified against. */
 	typedef struct {
+    /** If @c true, shows a beta warning at upload. */
+    bool betaWarning;
+
     /** If @c true, the device supports DMR. */
 		bool hasDigital;
     /** If @c true, the device supports FM. */

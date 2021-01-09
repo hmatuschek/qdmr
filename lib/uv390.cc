@@ -6,6 +6,8 @@
 
 static Radio::Features _uv390_features =
 {
+  false, // isBeta
+
   true,  // hasDigital
   true,  // hasAnalog
   true,  // hasGPS

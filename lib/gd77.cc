@@ -8,6 +8,8 @@
 
 static Radio::Features _gd77_features =
 {
+  true,  // isBeta
+
   true,  // hasDigital
   true,  // hasAnalog
   false, // hasGPS

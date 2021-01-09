@@ -5,13 +5,11 @@
 #define RBSIZE 16
 #define WBSIZE 16
 
-#define MAGIC_ADDR 0x02FA0020
-#define MAGIC_DATA "\xff\xff\xff\xff\x00\x00\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00"
-#define MAGIC_LEN  16
-
 
 static Radio::Features _d878uv_features =
 {
+  true,  // show beta-warning
+
   true,  // hasDigital
   true,  // hasAnalog
   true,  // hasGPS
@@ -171,7 +169,7 @@ bool D878UV::download() {
 
   // Allocate remaining memory sections
   uint nstart = _codeplug.image(0).numElements();
-  _codeplug.allocateFromBitmaps();
+  _codeplug.allocateForDecoding();
 
   // Check every segment in the remaining codeplug
   for (int n=nstart; n<_codeplug.image(0).numElements(); n++) {
@@ -214,16 +212,8 @@ bool D878UV::download() {
 
 bool
 D878UV::upload() {
-  logDebug() << "Upload " << _codeplug.image(0).numElements() << " elements.";
-
-  // First set bitmaps according to config
-  //_codeplug.setBitmaps(_config);
-
-  // Allocate all memory sections needed
-  //uint nstart = _codeplug.image(0).numElements();
-  //_codeplug.allocateFromBitmaps();
-
-  // Download touched memory sections
+  // Download bitmaps first
+  size_t nbitmaps = _codeplug.numImages();
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();
@@ -239,30 +229,35 @@ D878UV::upload() {
       emit uploadError(this);
       return false;
     }
-    emit uploadProgress(float(n*50)/_codeplug.image(0).numElements());
+    emit uploadProgress(float(n*25)/_codeplug.image(0).numElements());
   }
 
+  // Allocate all memory sections that must be read first
+  // and written back to the device
+  _codeplug.allocateUntouched();
+  // Download new memory sections for update
+  for (int n=nbitmaps; n<_codeplug.image(0).numElements(); n++) {
+    uint addr = _codeplug.image(0).element(n).address();
+    uint size = _codeplug.image(0).element(n).data().size();
+    logDebug() << "Download of block " << n << " " << hex << addr << ":" << size;
+    if (! _dev->read(0, addr, _codeplug.data(addr), size)) {
+      _errorMessage = QString("%1 Cannot read codeplug for update: %2").arg(__func__)
+          .arg(_dev->errorMessage());
+      logError() << _errorMessage;
+      _task = StatusError;
+      _dev->reboot();
+      _dev->close();
+      _dev->deleteLater();
+      emit uploadError(this);
+      return false;
+    }
+    emit uploadProgress(25+float(n*25)/_codeplug.image(0).numElements());
+  }
+
+  // Update bitmaps for all elements representing the common Config
   _codeplug.setBitmaps(_config);
-  _codeplug.allocateFromBitmaps();
-
-  for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-    uint addr = _codeplug.image(0).element(n).address();
-    uint size = _codeplug.image(0).element(n).data().size();
-    logDebug() << "Download of block " << n << " " << hex << addr << ":" << size;
-    if (! _dev->read(0, addr, _codeplug.data(addr), size)) {
-      _errorMessage = QString("%1 Cannot read codeplug for update: %2").arg(__func__)
-          .arg(_dev->errorMessage());
-      logError() << _errorMessage;
-      _task = StatusError;
-      _dev->reboot();
-      _dev->close();
-      _dev->deleteLater();
-      emit uploadError(this);
-      return false;
-    }
-    emit uploadProgress(float(n*50)/_codeplug.image(0).numElements());
-  }
-
+  // Allocate all memory elements representing the common config
+  _codeplug.allocateForEncoding();
 
   // Update binary codeplug from config
   if (! _codeplug.encode(_config)) {
@@ -276,8 +271,9 @@ D878UV::upload() {
     return false;
   }
 
+  // Sort all elements before uploading
   _codeplug.image(0).sort();
-
+  // Upload all elements back to the device
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();

@@ -10,8 +10,7 @@
  * needed to access these devices. The user, however, should be a member of the @c dialout group
  * to get access to the serial interfaces.
  *
- * @ingroup ogd77
- */
+ * @ingroup rif */
 class OpenGD77Interface : public USBSerial
 {
   Q_OBJECT

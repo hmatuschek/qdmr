@@ -6,6 +6,8 @@
 
 static Radio::Features _rd5r_features =
 {
+  false,  // isBeta
+
   true,  // hasDigital
   true,  // hasAnalog
   false, // hasGPS
