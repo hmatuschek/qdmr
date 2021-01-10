@@ -40,7 +40,7 @@
 #define ANALOGCONTACTS_PER_BANK   2
 #define ANALOGCONTACT_BANK_0      0x02940000
 #define ANALOGCONTACT_BANK_SIZE   0x00000030
-#define ANALOGCONTACT_INDEX_LIST  0x29000000 // Address of analog contact index list
+#define ANALOGCONTACT_INDEX_LIST  0x02900000 // Address of analog contact index list
 #define ANALOGCONTACT_INDEX_LIST_SIZE 0x00000080 // Address of analog contact index list
 #define ANALOGCONTACT_BITMAP      0x02900100 // Address of contact bytemap
 #define ANALOGCONTACT_BITMAP_SIZE 0x00000080 // Size of contact bytemap
@@ -169,6 +169,10 @@ D878UVCodeplug::channel_t::clear() {
   custom_ctcss = qToLittleEndian(0x09cf); // some value
   scan_list_index  = 0xff; // None
   group_list_index = 0xff; // None
+  id_index = 0;
+  squelch_mode = SQ_CARRIER;
+  tx_permit = ADMIT_ALWAYS;
+
 }
 
 bool
@@ -653,6 +657,11 @@ D878UVCodeplug::scanlist_t::getName() const {
   return decode_ascii(name, sizeof(name), 0);
 }
 
+void
+D878UVCodeplug::scanlist_t::setName(const QString &name) {
+  encode_ascii(this->name, name, 16, 0);
+}
+
 ScanList *
 D878UVCodeplug::scanlist_t::toScanListObj() {
   return new ScanList(getName());
@@ -670,6 +679,40 @@ D878UVCodeplug::scanlist_t::linkScanListObj(ScanList *lst, CodeplugContext &ctx)
     }
     lst->addChannel(ctx.getChannel(idx));
   }
+}
+
+bool
+D878UVCodeplug::scanlist_t::fromScanListObj(ScanList *lst, Config *config) {
+  clear();
+
+  setName(lst->name());
+
+  if (lst->priorityChannel()) {
+    prio_ch_select |= PRIO_CHAN_SEL1;
+    if (SelectedChannel::get() == lst->priorityChannel())
+      priority_ch1 = 0x0000;
+    else
+      priority_ch1 = qToLittleEndian(
+            config->channelList()->indexOf(lst->priorityChannel())+1);
+  }
+
+  if (lst->secPriorityChannel()) {
+    prio_ch_select |= PRIO_CHAN_SEL2;
+    if (SelectedChannel::get() == lst->secPriorityChannel())
+      priority_ch2 = 0x0000;
+    else
+      priority_ch2 = qToLittleEndian(
+            config->channelList()->indexOf(lst->secPriorityChannel())+1);
+  }
+
+  for (int i=0; i<std::min(50, lst->count()); i++) {
+    if (SelectedChannel::get() == lst->channel(i))
+      continue;
+    member[i] = qToLittleEndian(
+          config->channelList()->indexOf(lst->channel(i)));
+  }
+
+  return false;
 }
 
 
@@ -798,6 +841,24 @@ D878UVCodeplug::allocateUntouched() {
    * Kept but untouched memory regions.
    */
 
+  /*
+   * Allocate analog contacts
+   */
+  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BITMAP);
+  uint contactCount = 0;
+  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
+    // if disabled -> skip
+    if (0 == analog_contact_bytemap[i])
+      continue;
+    contactCount++;
+    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, ANALOGCONTACT_BANK_SIZE);
+      memset(data(addr), 0x00, ANALOGCONTACT_BANK_SIZE);
+    }
+  }
+  image(0).addElement(ANALOGCONTACT_INDEX_LIST, 0xff, ANALOGCONTACT_INDEX_LIST_SIZE);
+
   // Prefab. SMS messages
   uint8_t *messages_bytemap = data(MESSAGE_BITMAP);
   uint message_count = 0;
@@ -887,10 +948,8 @@ D878UVCodeplug::allocateForEncoding() {
   uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
   uint contactCount=0;
   for (uint16_t i=0; i<NUM_CONTACTS; i++) {
-    // Get byte and bit for contact, as well as bank of contact
-    uint16_t bit = i%8, byte = i/8;
     // enabled if false (ass hole)
-    if (1 == ((contact_bitmap[byte]>>bit) & 0x01))
+    if (1 == ((contact_bitmap[i/8]>>(i%8)) & 0x01))
       continue;
     contactCount++;
     uint32_t addr = CONTACT_BANK_0+(i/CONTACTS_PER_BANK)*CONTACT_BANK_SIZE;
@@ -901,26 +960,8 @@ D878UVCodeplug::allocateForEncoding() {
   }
   if (contactCount) {
     image(0).addElement(CONTACT_INDEX_LIST, ALIGN_SIZE(4*contactCount, 16));
-    memset(data(CONTACT_INDEX_LIST), 0xff, 4*contactCount);
+    memset(data(CONTACT_INDEX_LIST), 0xff, ALIGN_SIZE(4*contactCount, 16));
   }
-
-  /*
-   * Allocate analog contacts
-   */
-  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BITMAP);
-  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
-    // if disabled -> skip
-    if (0 == analog_contact_bytemap[i])
-      continue;
-    contactCount++;
-    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
-    if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, ANALOGCONTACT_BANK_SIZE);
-      memset(data(addr), 0x00, ANALOGCONTACT_BANK_SIZE);
-    }
-  }
-  image(0).addElement(ANALOGCONTACT_INDEX_LIST, 0xff, ANALOGCONTACT_INDEX_LIST_SIZE);
-  memset(data(ANALOGCONTACT_INDEX_LIST), 0xff, ANALOGCONTACT_INDEX_LIST_SIZE);
 
   /*
    * Allocate group lists
@@ -1173,23 +1214,21 @@ D878UVCodeplug::encode(Config *config, bool update)
   for (int i=0; i<config->contacts()->digitalCount(); i++) {
     contact_t *con = (contact_t *)data(CONTACT_BANK_0+i*sizeof(contact_t));
     con->fromContactObj(config->contacts()->digitalContact(i));
+    ((uint32_t *)data(CONTACT_INDEX_LIST))[i] = qToLittleEndian(i);
   }
 
   // Encode RX group-lists
-  for (int i=0; i<NUM_RXGRP; i++) {
-    grouplist_t *grp = (grouplist_t *)data(ADDR_RXGRP_0+i*RXGRP_OFFSET);
-    if (i<config->rxGroupLists()->count()) {
-      grp->clear();
-      grp->fromGroupListObj(config->rxGroupLists()->list(i), config);
-    }
+  for (int i=0; i<config->rxGroupLists()->count(); i++) {
+    grouplist_t *grp = (grouplist_t *)data(ADDR_RXGRP_0 + i*RXGRP_OFFSET);
+    grp->fromGroupListObj(config->rxGroupLists()->list(i), config);
   }
 
   // Encode zones
   uint zidx = 0;
   for (int i=0; i<config->zones()->count(); i++) {
     // Clear name and channel list
-    uint8_t  *name     = (uint8_t *)data(ADDR_ZONE_NAME+zidx*ZONE_NAME_OFFSET);
-    uint16_t *channels = (uint16_t *)data(ADDR_ZONE+zidx*ZONE_OFFSET);
+    uint8_t  *name     = (uint8_t *)data(ADDR_ZONE_NAME + zidx*ZONE_NAME_OFFSET);
+    uint16_t *channels = (uint16_t *)data(ADDR_ZONE + zidx*ZONE_OFFSET);
     memset(name, 0, ZONE_NAME_OFFSET);
     memset(channels, 0xff, ZONE_OFFSET);
     if (config->zones()->zone(i)->B()->count())
@@ -1222,8 +1261,13 @@ D878UVCodeplug::encode(Config *config, bool update)
   }
 
   // Encode scan lists
+  for (int i=0; i<config->scanlists()->count(); i++) {
+    uint8_t bank = i/NUM_SCANLISTS_PER_BANK, idx = i%NUM_SCANLISTS_PER_BANK;
+    scanlist_t *scan = (scanlist_t *)data(
+          SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + idx*SCAN_LIST_OFFSET);
+    scan->fromScanListObj(config->scanlists()->scanlist(i), config);
+  }
 
-  /// @bug Implement scan-list D878UV code-plug encoding.
   /// @bug Implement analog contact D878UV code-plug encoding.
   /// @bug Implement GPS D878UV code-plug encoding.
   return true;

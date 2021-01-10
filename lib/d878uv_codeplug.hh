@@ -535,8 +535,10 @@ public:
     scanlist_t();
     void clear();
     QString getName() const;
+    void setName(const QString &name);
     ScanList *toScanListObj();
     void linkScanListObj(ScanList *lst, CodeplugContext &ctx);
+    bool fromScanListObj(ScanList *lst, Config *config);
   };
 
   /** Represents an entry of the radio ID table within the binary codeplug.
