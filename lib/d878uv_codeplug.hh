@@ -596,13 +596,13 @@ public:
     uint8_t _unknown48;            ///< Unknown settings block.
     uint8_t talk_permit_tone;      ///< Enable talk permit, Off=0x00, Digi=0x01, Analog=0x02, Both=0x03.
     uint8_t call_idle_tone;        ///< Enable digi-call idle tone, Off=0x00, On=0x01.
-    uint16_t _unknown51;           ///< Unknown settings, default=0x01
-    uint16_t _unknown52;           ///< Unknown settings, default=0x00
-    uint16_t _unknown53;           ///< Unknown settings, default=0x00
+    uint8_t _unknown51;            ///< Unknown settings, default=0x01
+    uint8_t _unknown52;            ///< Unknown settings, default=0x00
+    uint8_t _unknown53;            ///< Unknown settings, default=0x00
     uint8_t ch_idle_tone;          ///< Enable channel idle tone, Off=0x00, On=0x01.
-    uint16_t _unknown55;           ///< Unknown settings, default=0x01;
+    uint8_t _unknown55;            ///< Unknown settings, default=0x01;
     uint8_t startup_tone;          ///< Enable Startup tone, Off=0x00, On=0x01.
-    uint8_t _unknown58[6];         ///< Unknown settings block.
+    uint8_t _unknown57[7];         ///< Unknown settings block.
 
     // Bytes 0x40-0xaf
     uint8_t _unknown64[112];       ///< Unknown settings block;
@@ -624,7 +624,7 @@ public:
     uint8_t vfo_b_ch_index;        ///< Default channel index (within selected zone) for VFO B, 0-based, default=0, 0xff=VFO.
     uint8_t _unknown219[5];        ///< Unknown settings block.
 
-    // Bytes 0x0e0-0x600
+    // Bytes 0x0e0-0x5ff
     uint8_t  _unknown224[1312];    ///< Large unknown settings block.
 
     // Bytes 0x600-0x61f
