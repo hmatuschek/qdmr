@@ -45,7 +45,7 @@ public:
   /** Adds a scan list to the config and maps the given index to that scan list. */
   bool addScanList(ScanList *lst, int index);
   /** Gets a scan list for the specified index or @c nullptr if not defined. */
-  RXGroupList *getScanList(int index) const;
+  ScanList *getScanList(int index) const;
 
 protected:
   /** The wrapped radio config (aka abstract code-plug). */

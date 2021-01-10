@@ -531,6 +531,12 @@ public:
 
     // Bytes 132-143
     uint8_t _unused132[12];             ///< Unused, set to 0.
+
+    scanlist_t();
+    void clear();
+    QString getName() const;
+    ScanList *toScanListObj();
+    void linkScanListObj(ScanList *lst, CodeplugContext &ctx);
   };
 
   /** Represents an entry of the radio ID table within the binary codeplug.

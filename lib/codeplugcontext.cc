@@ -82,3 +82,26 @@ CodeplugContext::getGroupList(int index) const {
   return _config->rxGroupLists()->list(_groupListTable[index]);
 }
 
+
+bool
+CodeplugContext::hasScanList(int index) const {
+  return _scanListTable.contains(index);
+}
+
+ScanList *
+CodeplugContext::getScanList(int index) const {
+  if (! _scanListTable.contains(index))
+    return nullptr;
+  return _config->scanlists()->scanlist(_scanListTable[index]);
+}
+
+bool
+CodeplugContext::addScanList(ScanList *lst, int index) {
+  if (_scanListTable.contains(index))
+    return false;
+  int sidx = _config->scanlists()->count();
+  if (! _config->scanlists()->addScanList(lst))
+    return false;
+  _scanListTable[index] = sidx;
+  return true;
+}

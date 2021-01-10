@@ -367,18 +367,27 @@ D878UVCodeplug::channel_t::toChannelObj() const {
 
 bool
 D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx) const {
+  // If channel is digital
   if (MODE_DIGITAL == channel_mode) {
     DigitalChannel *dc = c->as<DigitalChannel>();
     if (nullptr == dc)
       return false;
 
+    // Check if default contact is set
     uint16_t conIdx = qFromLittleEndian(contact_index);
-    if (ctx.hasDigitalContact(conIdx))
+    if ((0xffff != conIdx) && ctx.hasDigitalContact(conIdx))
       dc->setTXContact(ctx.getDigitalContact(conIdx));
 
-    if (ctx.hasGroupList(group_list_index))
+    // Set if RX group list is set
+    if ((0xff != group_list_index) && ctx.hasGroupList(group_list_index))
       dc->setRXGroupList(ctx.getGroupList(group_list_index));
   }
+
+  // For both, analog and digital channels:
+
+  // If channel has scan list
+  if ((0xff != scan_list_index) && ctx.hasScanList(scan_list_index))
+    c->setScanList(ctx.getScanList(scan_list_index));
 
   /// @bug Complete D878UV channel linking.
   return true;
@@ -605,6 +614,55 @@ D878UVCodeplug::grouplist_t::fromGroupListObj(const RXGroupList *lst, const Conf
       member[i] = qToLittleEndian(conf->contacts()->indexOfDigital(lst->contact(i)));
     else
       member[i] = 0xffffffff;
+  }
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::scanlist_t
+ * ******************************************************************************************** */
+D878UVCodeplug::scanlist_t::scanlist_t() {
+  clear();
+}
+
+void
+D878UVCodeplug::scanlist_t::clear() {
+  _unused0 = 0;
+  prio_ch_select = PRIO_CHAN_OFF;
+  priority_ch1 = 0xffff;
+  priority_ch2 = 0xffff;
+  look_back_a = qToLittleEndian(0x000f);
+  look_back_b = qToLittleEndian(0x0019);
+  dropout_delay = qToLittleEndian(0x001d);
+  dwell = qToLittleEndian(0x001d);
+  revert_channel = REVCH_SELECTED;
+  memset(name, 0, sizeof(name));
+  _pad31 = 0;
+  memset(member, 0xff, sizeof(member));
+  memset(_unused132, 0, sizeof(_unused132));
+}
+
+QString
+D878UVCodeplug::scanlist_t::getName() const {
+  return decode_ascii(name, sizeof(name), 0);
+}
+
+ScanList *
+D878UVCodeplug::scanlist_t::toScanListObj() {
+  return new ScanList(getName());
+}
+
+void
+D878UVCodeplug::scanlist_t::linkScanListObj(ScanList *lst, CodeplugContext &ctx) {
+  for (uint16_t i=0; i<50; i++) {
+    if (0xffff == member[i])
+      continue;
+    uint16_t idx = qFromLittleEndian(member[i]);
+    if (! ctx.hasChannel(idx)) {
+      logError() << "Cannot link scanlist '" << getName() << "', channel index " << idx << " unknown.";
+      continue;
+    }
+    lst->addChannel(ctx.getChannel(idx));
   }
 }
 
@@ -1248,6 +1306,22 @@ D878UVCodeplug::decode(Config *config)
       // If defined -> add channel to zone obj
       zone->A()->addChannel(ctx.getChannel(cidx));
     }
+  }
+
+  // Create scan lists
+  uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
+  for (uint i=0; i<NUM_SCAN_LISTS; i++) {
+    uint8_t byte=i/8, bit=i%8;
+    if (0 == (scanlist_bitmap[byte]>>bit))
+      continue;
+    uint8_t bank = i/NUM_SCANLISTS_PER_BANK, bank_idx = i%NUM_SCANLISTS_PER_BANK;
+    uint32_t addr = SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + bank_idx*SCAN_LIST_OFFSET;
+    scanlist_t *scanl = (scanlist_t *)data(addr);
+    // Create scanlist
+    ScanList *obj = scanl->toScanListObj();
+    ctx.addScanList(obj, i);
+    // Link scanlists immediately
+    scanl->linkScanListObj(obj, ctx);
   }
 
   // Link channel objects
