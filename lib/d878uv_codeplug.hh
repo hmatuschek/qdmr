@@ -17,6 +17,27 @@ class GPSSystem;
 
 /** Represents the device specific binary codeplug for Anytone AT-D878UV radios.
  *
+ * In contrast to many other code-plugs, the code-plug for Anytone radios are spread over a large
+ * memory area. In principle, this is a good idea, as it allows to upload only the portion of the
+ * codeplug that is actually configured. For example, if only a small portion of the available
+ * contacts and channels are used, the amount of data that is written to the device can be
+ * reduced.
+ *
+ * However, the implementation of this idea in this device is utter shit. The amount of
+ * fragmentation of the codeplug is overwhelming. For example, while channels are organized more or
+ * less nicely in continous banks, zones are distributed throughout the entire code-plug. That is,
+ * the names of zones are located in a different memory section that the channel lists. Some lists
+ * are defined though bit-masks others by byte-masks. All bit-masks are positive, that is 1
+ * indicates an enabled item while the bit-mask for contacts is inverted.
+ *
+ * In general the code-plug is huge and complex. Moreover, the radio provides a huge amount of
+ * options and features. To this end, reverse-engeneering this code-plug was a nightmare.
+ *
+ * More over, the binary code-plug file generate by the windows CPS does not directly relate to
+ * the data being written to the radio. To this end the code-plug has been reverse-engineered
+ * using wireshark to monitor the USB communication between the windows CPS (running in a vritual
+ * box) and the device. The latter makes the reverse-engineering particularily cumbersome.
+ *
  * @section d878uvcpl Codeplug structure within radio
  * <table>
  *  <tr><th colspan="3">Channels</th></tr>
@@ -95,7 +116,7 @@ class GPSSystem;
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02501000</td> <td>0000A0</td> <td>APRS/GPS settings, see @c aprs_setting_t.</td>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, upto 60 chars ASCII, 0-padded.</td>
- *  <tr><td>02501280</td> <td>000030</td> <td>Unknown.</td></tr>
+ *  <tr><td>02501280</td> <td>000030</td> <td>Unknown, set to 0x00. </td></tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
@@ -116,10 +137,10 @@ class GPSSystem;
  *  <tr><th colspan="3">Hot Keys</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>025C0000</td> <td>000100</td> <td>4 analog quick-call settings. See @c analog_quick_call_t.</td>
+ *  <tr><td>025C0B00</td> <td>000010</td> <td>Status message bitmap.</td>
  *  <tr><td>025C0100</td> <td>000400</td> <td>Upto 32 status messages.
  *    Length unknown, offset 0x20. ASCII 0x00 terminated and padded.</td>
  *  <tr><td>025C0500</td> <td>000360</td> <td>18 hot-key settings, see @c hotkey_t</td></tr>
- *  <tr><td>025C0B00</td> <td>000010</td> <td>Status message bitmap.</td>
  *
  *  <tr><th colspan="3">Encryption keys</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
@@ -130,12 +151,12 @@ class GPSSystem;
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 offset frequencies.
  *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000. Default 0x00000000, 0x00 padded.</td></tr>
- *  <tr><td>02501400</td> <td>000100</td> <td>Talkeralias settings.</td></tr>
- *  <tr><td>024C1400</td> <td>000070</td> <td>Alarm setting.</td></tr>
+ *  <tr><td>02501400</td> <td>000100</td> <td>Talkeralias settings, see @c talkeralias_setting_t.</td></tr>
+ *  <tr><td>024C1400</td> <td>000020</td> <td>Alarm setting, see @c analog_alarm_setting_t.</td></tr>
  *
  *  <tr><th colspan="3">FM Broadcast</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>02480210</td> <td>000010</td>      <td>Bitmap of 100 FM broadcast channels.</td></tr>
+ *  <tr><td>02480210</td> <td>000020</td>      <td>Bitmap of 100 FM broadcast channels.</td></tr>
  *  <tr><td>02480000</td> <td>max. 000200</td> <td>100 FM broadcast channels. Encoded
  *    as 8-digit BCD little-endian in 100Hz. Filled with 0x00.</td></tr>
  *  <tr><td>02480200</td> <td>000010</td>      <td>FM broadcast VFO frequency. Encoded
@@ -145,11 +166,13 @@ class GPSSystem;
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>01042000</td> <td>000020</td> <td>Roaming channel bitmask.</td></tr>
  *  <tr><td>01042080</td> <td>000010</td> <td>Unknown data, default=0x00</td></tr>
+ *  <tr><td>024C0000</td> <td>000020</td> <td>Unknown data.</td></tr>
  *  <tr><td>024C0C80</td> <td>000010</td> <td>Unknown data, bitmap?, default 0x00.</td></tr>
- *  <tr><td>024C0D00</td> <td>000010</td> <td>Empty, set to 0x00?`</td></tr>
+ *  <tr><td>024C0D00</td> <td>000200</td> <td>Empty, set to 0x00?`</td></tr>
  *  <tr><td>024C1000</td> <td>0000D0</td> <td>Unknown data.</td></tr>
  *  <tr><td>024C1100</td> <td>000010</td> <td>Unknown data.</td></tr>
  *  <tr><td>024C1280</td> <td>000020</td> <td>Unknown data.</td></tr>
+ *  <tr><td>024C1440</td> <td>000030</td> <td>Unknown data.</td></tr>
  *  <tr><td>024C1700</td> <td>000040</td> <td>Unknown, 8bit indices.</td></tr>
  *  <tr><td>024C1800</td> <td>000500</td> <td>Empty, set to 0x00?</td></tr>
  *  <tr><td>024C2400</td> <td>000030</td> <td>Unknown data.</td></tr>
@@ -532,12 +555,21 @@ public:
     // Bytes 132-143
     uint8_t _unused132[12];             ///< Unused, set to 0.
 
+    /** Constructor. */
     scanlist_t();
+    /** Clears the scan list. */
     void clear();
+    /** Returns the name of the scan list. */
     QString getName() const;
+    /** Sets the name of the scan list. */
     void setName(const QString &name);
+
+    /** Constructs a ScanList object from this definition. This only sets the properties of
+     * the scan list. To associate all members with the scan list object, call @c linkScanListObj. */
     ScanList *toScanListObj();
+    /** Links all channels (members and primary channels) with the given scan-list object. */
     void linkScanListObj(ScanList *lst, CodeplugContext &ctx);
+    /** Constructs the binary representation from the give config. */
     bool fromScanListObj(ScanList *lst, Config *config);
   };
 
@@ -683,48 +715,56 @@ public:
     uint8_t _unused36[28];         ///< Unused, set to 0x00;
   };
 
+  /** Represents analog quick-call settings within the binary code-plug.
+   * Size is 2 bytes. */
   struct __attribute__((packed)) analog_quick_call_t {
+    /** Analog quick-call types. */
     typedef enum {
-      AQC_None = 0,
-      AQC_DTMF = 1,
-      AQC_2TONE = 2,
-      AQC_5TONE = 3
+      AQC_None = 0,                ///< None, quick-call disabled.
+      AQC_DTMF = 1,                ///< DTMF call.
+      AQC_2TONE = 2,               ///< 2-tone call.
+      AQC_5TONE = 3                ///< 5-tone call
     } Type;
 
     uint8_t call_type;             ///< Type of quick call, see @c Type.
     uint8_t call_id_idx;           ///< Index of whom to call. 0xff=none.
   };
 
+  /** Represents hot-key settings. */
   struct __attribute__((packed)) hotkey_t {
+    /** Hot-key types. */
     typedef enum {
-      HOTKEY_CALL = 0,
-      HOTKEY_MENU = 1
+      HOTKEY_CALL = 0,             ///< Perform a call.
+      HOTKEY_MENU = 1              ///< Show a menu item.
     } Type;
 
+    /** Possible menu hot-key settings. */
     typedef enum {
-      HOTKEY_MENU_SMS = 1,
-      HOTKEY_MENU_NEW_SMS = 2,
-      HOTKEY_MENU_HOT_TEXT = 3,
-      HOTKEY_MENU_RX_SMS = 4,
-      HOTKEY_MENU_TX_SMS = 5,
-      HOTKEY_MENU_CONTACT = 6,
-      HOTKEY_MENU_MANUAL_DIAL = 7,
-      HOTKEY_MENU_CALL_LOG = 8
+      HOTKEY_MENU_SMS = 1,         ///< Show SMS menu.
+      HOTKEY_MENU_NEW_SMS = 2,     ///< Create new SMS.
+      HOTKEY_MENU_HOT_TEXT = 3,    ///< Send a hot-text.
+      HOTKEY_MENU_RX_SMS = 4,      ///< Show SMS inbox.
+      HOTKEY_MENU_TX_SMS = 5,      ///< Show SMS outbox.
+      HOTKEY_MENU_CONTACT = 6,     ///< Show contact list.
+      HOTKEY_MENU_MANUAL_DIAL = 7, ///< Show manual dial.
+      HOTKEY_MENU_CALL_LOG = 8     ///< Show call log.
     } MenuItem;
 
+    /** Possible hot-key calls. */
     typedef enum {
-      HOTKEY_CALL_ANALOG = 0,
-      HOTKEY_CALL_DIGITAL = 1
+      HOTKEY_CALL_ANALOG = 0,      ///< Perform an analog call.
+      HOTKEY_CALL_DIGITAL = 1      ///< Perform a digital call.
     } CallType;
 
+    /** Possible digital call types. */
     typedef enum {
-      HOTKEY_DIGI_CALL_OFF = 0xff,
-      HOTKEY_GROUP_CALL = 0,
-      HOTKEY_PRIVATE_CALL = 1,
-      HOTKEY_PRIVATE_ALLCALL = 2,
-      HOTKEY_HOT_TEXT = 3,
-      HOTKEY_CALL_TIP = 4,
-      HOTKEY_STATE = 5
+      HOTKEY_DIGI_CALL_OFF = 0xff, ///< Call disabled.
+      HOTKEY_GROUP_CALL = 0,       ///< Perform a group call.
+      HOTKEY_PRIVATE_CALL = 1,     ///< Perform private call.
+      HOTKEY_ALLCALL = 2,          ///< Perform all call.
+      HOTKEY_HOT_TEXT = 3,         ///< Send a text message.
+      HOTKEY_CALL_TIP = 4,         ///< Send a call tip (?).
+      HOTKEY_STATE = 5             ///< Send a state message.
     } DigiCallType;
 
     uint8_t type;                  ///< Type of the hot-key, see @c Type.
@@ -740,18 +780,25 @@ public:
     uint8_t _unused9[39];          ///< Unused, set to 0x00.
   };
 
+  /** Represents the APRS/GPS settings within the binary codeplug.
+   *
+   * Memmory layout of APRS/GPS settings (160byte):
+   * @verbinclude d878uvaprssetting.txt
+   */
   struct __attribute__((packed)) aprs_setting_t {
+    /** Possible signalling for APRS repeater.*/
     typedef enum {
-      SIG_OFF = 0,
-      SIG_CTCSS = 1,
-      SIG_DCS = 2
+      SIG_OFF = 0,                 ///< No signalling.
+      SIG_CTCSS = 1,               ///< CTCSS signalling.
+      SIG_DCS = 2                  ///< DCS signalling.
     } SignalingType;
 
+    /** Power setting for the APRS/GPS channel. */
     typedef enum {
-      POWER_LOW = 0,
-      POWER_MID = 1,
-      POWER_HIGH = 2,
-      POWER_TURBO = 3
+      POWER_LOW = 0,               ///< Low power (usually about 1W).
+      POWER_MID = 1,               ///< Medium power (usually about 2W).
+      POWER_HIGH = 2,              ///< High power (usually about 5W).
+      POWER_TURBO = 3              ///< Highest power (upto 7W).
     } Power;
 
     // byte 0x00
@@ -760,8 +807,7 @@ public:
     uint8_t tx_delay;              ///< TX delay, multiples of 20ms, default=1200ms.
     uint8_t sig_type;              ///< Signalling type, default=0.
     uint8_t ctcss;                 ///< CTCSS tone-code, default=0.
-    uint8_t dcs;                   ///< DCS code, default=0x13.
-    uint8_t _unknown9;             ///< Unknown, set to 00.
+    uint16_t dcs;                  ///< DCS code, little endian, default=0x0013.
     uint8_t manual_tx_interval;    ///< Manual TX intervals in seconds.
     uint8_t auto_tx_interval;      ///< Auto TX interval in multiples of 30s.
     uint8_t tx_tone_enable;        ///< TX enable, 0=off, 1=on.
@@ -787,7 +833,8 @@ public:
 
     // byte 0x38
     uint8_t _unknown56;            ///< Unknown set to 00.
-    char symbol;                   ///< ASCII-char of APRS symbol table.
+    char symbol;                   ///< ASCII-char for APRS icon table, ie. '/' or '\' for primary
+                                   ///  and alternate icon table respectively.
     char map_icon;                 ///< ASCII-char of APRS map icon.
     uint8_t power;                 ///< Transmit power.
     uint8_t prewave_delay;         ///< Prewave delay in 10ms steps.
@@ -820,27 +867,66 @@ public:
     uint8_t _unknown[16];          ///< Unknown, set to 0.
   };
 
+  /** Binary representation of the talker alias setting.
+   * This code-plug section is yet to be reverse-engineered.
+   * Size 0x100 bytes. */
   struct __attribute__((packed)) talkeralias_setting_t {
+    // Byte 0x00
     uint8_t send_alias;            ///< Send talker alias, 0=off, 1=on.
-    uint8_t _unknown1[15];         ///< Unknown, set to 0.
+    uint8_t _unknown1[15];         ///< Unknown.
+    // Byte 0x10
+    uint8_t _unknown16[16];        ///< Unknown.
+    // Byte 0x20
+    uint8_t _unknown32[16];        ///< Unknown.
+    // Byte 0x30
+    uint8_t _unknown48[16];        ///< Unknown.
+    // Byte 0x40
+    uint8_t _unknown64[16];        ///< Unknown.
+    // Byte 0x50
+    uint8_t _unknown80[16];        ///< Unknown.
+    // Byte 0x60
+    uint8_t _unknown90[16];        ///< Unknown.
+    // Byte 0x70
+    uint8_t _unknown112[16];       ///< Unknown.
+    // Byte 0x80
+    uint8_t _unknown128[16];       ///< Unknown.
+    // Byte 0x90
+    uint8_t _unknown144[16];       ///< Unknown.
+    // Byte 0xa0
+    uint8_t _unknown160[16];       ///< Unknown.
+    // Byte 0xb0
+    uint8_t _unknown176[16];       ///< Unknown.
+    // Byte 0xc0
+    uint8_t _unknown192[16];       ///< Unknown.
+    // Byte 0xd0
+    uint8_t _unknown208[16];       ///< Unknown.
+    // Byte 0xe0
+    uint8_t _unknown224[16];       ///< Unknown.
+    // Byte 0xf0
+    uint8_t _unknown240[16];       ///< Unknown.
   };
 
+  /** Binary representation of the analog alarm settings.
+   * This code-plug secion is yet to be reverse-engineered.
+   * Size 0x6 bytes. */
   struct __attribute__((packed)) analog_alarm_setting_t {
+    /** Possible alarm types. */
     typedef enum {
-      ALARM_AA_NONE = 0,
-      ALARM_AA_TX_AND_BACKGROUND = 1,
-      ALARM_AA_TX_AND_ALARM = 2,
-      ALARM_AA_BOTH = 3,
+      ALARM_AA_NONE = 0,           ///< No alarm at all.
+      ALARM_AA_TX_AND_BG = 1,      ///< Transmit and background.
+      ALARM_AA_TX_AND_ALARM = 2,   ///< Transmit and alarm
+      ALARM_AA_BOTH = 3,           ///< Both?
     } Action;
 
+    /** Possible alarm signalling types. */
     typedef enum {
-      ALARM_ENI_NONE = 0,
-      ALARM_ENI_DTMF = 1,
-      ALARM_ENI_5TONE = 2
+      ALARM_ENI_NONE = 0,          ///< No alarm code signalling.
+      ALARM_ENI_DTMF = 1,          ///< Send alarm code as DTMF.
+      ALARM_ENI_5TONE = 2          ///< Send alarm code as 5-tone.
     } ENIType;
 
-    uint8_t action;
-    uint8_t eni_type;
+    uint8_t action;                ///< Action to take, see @c Action.
+    uint8_t eni_type;              ///< ENI type, see @c ENIType.
     uint8_t emergency_id_idx;      ///< Emergency ID index, 0-based.
     uint8_t time;                  ///< Alarm time in seconds, default 10.
     uint8_t tx_dur;                ///< TX duration in seconds, default 10.

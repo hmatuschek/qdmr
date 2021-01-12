@@ -41,7 +41,7 @@
 #define ANALOGCONTACT_BANK_0      0x02940000
 #define ANALOGCONTACT_BANK_SIZE   0x00000030
 #define ANALOGCONTACT_INDEX_LIST  0x02900000 // Address of analog contact index list
-#define ANALOGCONTACT_INDEX_LIST_SIZE 0x00000080 // Address of analog contact index list
+#define ANALOGCONTACT_LIST_SIZE   0x00000080 // Address of analog contact index list
 #define ANALOGCONTACT_BITMAP      0x02900100 // Address of contact bytemap
 #define ANALOGCONTACT_BITMAP_SIZE 0x00000080 // Size of contact bytemap
 
@@ -88,8 +88,8 @@
 #define MESSAGE_BANK_SIZE         0x00000800
 #define MESSAGE_BANK_OFFSET       0x00040000
 #define MESSAGE_INDEX_LIST        0x01640000
-#define MESSAGE_BITMAP            0x01640800
-#define MESSAGE_BITMAP_SIZE       0x00000090
+#define MESSAGE_BYTEMAP           0x01640800
+#define MESSAGE_BYTEMAP_SIZE      0x00000090
 
 #define ADDR_HOTKEY               0x025C0000
 #define HOTKEY_SIZE               0x00000860
@@ -108,14 +108,15 @@
 #define TALKER_ALIAS_SIZE         0x00000100
 
 #define ADDR_ALARM_SETTING        0x024C1400
-#define ALARM_SETTING_SIZE        0x00000070
+#define ALARM_SETTING_SIZE        0x00000020
 
 #define FMBC_BITMAP               0x02480210
-#define FMBC_BITMAP_SIZE          0x00000010
+#define FMBC_BITMAP_SIZE          0x00000020
 #define ADDR_FMBC                 0x02480000
 #define FMBC_SIZE                 0x00000200
 #define ADDR_FMBC_VFO             0x02480200
 #define FMBC_VFO_SIZE             0x00000010
+
 
 using namespace Signaling;
 
@@ -815,7 +816,7 @@ D878UVCodeplug::D878UVCodeplug(QObject *parent)
   // Radio IDs bitmaps
   image(0).addElement(RADIOID_BITMAP, RADIOID_BITMAP_SIZE);
   // Messag bitmaps
-  image(0).addElement(MESSAGE_BITMAP, MESSAGE_BITMAP_SIZE);
+  image(0).addElement(MESSAGE_BYTEMAP, MESSAGE_BYTEMAP_SIZE);
   // Status messages
   image(0).addElement(STATUSMESSAGE_BITMAP, STATUSMESSAGE_BITMAP_SIZE);
   // FM Broadcast bitmaps
@@ -857,10 +858,10 @@ D878UVCodeplug::allocateUntouched() {
       memset(data(addr), 0x00, ANALOGCONTACT_BANK_SIZE);
     }
   }
-  image(0).addElement(ANALOGCONTACT_INDEX_LIST, 0xff, ANALOGCONTACT_INDEX_LIST_SIZE);
+  image(0).addElement(ANALOGCONTACT_INDEX_LIST, 0xff, ANALOGCONTACT_LIST_SIZE);
 
   // Prefab. SMS messages
-  uint8_t *messages_bytemap = data(MESSAGE_BITMAP);
+  uint8_t *messages_bytemap = data(MESSAGE_BYTEMAP);
   uint message_count = 0;
   for (uint8_t i=0; i<NUM_MESSAGES; i++) {
     uint8_t bank = i/NUM_MESSAGES_PER_BANK;
@@ -892,10 +893,12 @@ D878UVCodeplug::allocateUntouched() {
   image(0).addElement(0x01042000, 0x020);
   image(0).addElement(0x01042080, 0x010);
   image(0).addElement(0x024C0C80, 0x010);
-  image(0).addElement(0x024C0D00, 0x010);
-  image(0).addElement(0x02410000, 0x0D0);
-  image(0).addElement(0x02411000, 0x010);
+  image(0).addElement(0x024C0D00, 0x200);
+  image(0).addElement(0x024C0000, 0x020);
+  image(0).addElement(0x024C1000, 0x0D0);
+  image(0).addElement(0x024C1100, 0x010);
   image(0).addElement(0x024C1280, 0x020);
+  image(0).addElement(0x024C1440, 0x030);
   image(0).addElement(0x024C1700, 0x040);
   image(0).addElement(0x024C1800, 0x500);
   image(0).addElement(0x024C2400, 0x030);

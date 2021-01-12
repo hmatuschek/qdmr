@@ -233,7 +233,7 @@ D878UV::upload() {
   }
 
   // Allocate all memory sections that must be read first
-  // and written back to the device
+  // and written back to the device more or less untouched
   _codeplug.allocateUntouched();
   // Download new memory sections for update
   for (int n=nbitmaps; n<_codeplug.image(0).numElements(); n++) {
@@ -273,6 +273,7 @@ D878UV::upload() {
 
   // Sort all elements before uploading
   _codeplug.image(0).sort();
+
   // Upload all elements back to the device
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
     uint addr = _codeplug.image(0).element(n).address();
