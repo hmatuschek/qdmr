@@ -36,10 +36,14 @@ uint32_t encode_frequency(double freq);
 uint32_t decode_dmr_id_bin(const uint8_t *id);
 /** Encodes binary (24bit) encoded DMR ID. */
 void encode_dmr_id_bin(uint8_t *id, uint32_t num);
-/** Decodes bcd (32bit) encoded DMR ID. */
+/** Decodes bcd (32bit) encoded DMR ID, little endian. */
 uint32_t decode_dmr_id_bcd(const uint8_t *id);
-/** Encodes bcd (32bit) encoded DMR ID. */
+/** Decodes bcd (32bit) encoded DMR ID, big endian. */
+uint32_t decode_dmr_id_bcd_be(const uint8_t *id);
+/** Encodes bcd (32bit) encoded DMR ID, little endian. */
 void encode_dmr_id_bcd(uint8_t *id, uint32_t num);
+/** Encodes bcd (32bit) encoded DMR ID, big endian. */
+void encode_dmr_id_bcd_be(uint8_t *id, uint32_t num);
 
 QString decode_dtmf_bin(const uint8_t *num, int size=16, uint8_t fill=0xff);
 bool encode_dtmf_bin(const QString &number, uint8_t *num, int size=16, uint8_t fill=0xff);

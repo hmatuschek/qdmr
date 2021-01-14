@@ -162,6 +162,11 @@ class GPSSystem;
  *  <tr><td>02480200</td> <td>000010</td>      <td>FM broadcast VFO frequency. Encoded
  *    as 8-digit BCD little-endian in 100Hz. Filled with 0x00.</td></tr>
  *
+ *  <tr><th colspan="3">ID -> Contact map</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
+ *  <tr><td>04340000</td> <td>max. 013880</td> <td>DMR ID to contact index map, see @c contact_map_t.
+ *    Sorted by ID, empty entries set to 0xffffffffffffffff.</td>
+ *
  *  <tr><th colspan="3">Still unknown</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>01042000</td> <td>000020</td> <td>Roaming channel bitmask.</td></tr>
@@ -291,8 +296,7 @@ public:
     uint8_t _unused19;                  ///< Unused, set to 0.
 
     // Bytes 20-23
-    uint16_t contact_index;             ///< Contact index, zero-based, little-endian
-    uint16_t _unused22;                 ///< Unused, set to 0.
+    uint32_t contact_index;             ///< Contact index, zero-based, little-endian, none=0xffffffff.
 
     // Byte 24
     uint8_t id_index;                   ///< Index to radio-ID table.
@@ -931,6 +935,22 @@ public:
     uint8_t time;                  ///< Alarm time in seconds, default 10.
     uint8_t tx_dur;                ///< TX duration in seconds, default 10.
     uint8_t rx_dur;                ///< RX duration in seconds, default 60.
+  };
+
+  struct __attribute__((packed)) contact_map_t {
+    uint32_t id_group;
+    uint32_t contact_index;        ///< Index to contact, 32bit little endian.
+
+    contact_map_t();
+    void clear();
+    bool isValid() const;
+
+    bool isGroup() const;
+    uint32_t ID() const;
+    void setID(uint32_t id, bool group);
+
+    uint32_t index() const;
+    void setIndex(uint32_t index);
   };
 
 
