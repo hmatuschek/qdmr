@@ -30,33 +30,13 @@ GD77Codeplug::channel_t::isValid() const {
 
 void
 GD77Codeplug::channel_t::clear() {
+  memset(this, 0, sizeof(channel_t));
   memset(name, 0xff, 16);
-  _unused25              = 0;
   _unused30              = 0x50;
-  _unused36              = 0;
-  tx_signaling_syst      = 0;
-  _unused38              = 0;
-  rx_signaling_syst      = 0;
   _unused40              = 0x16;
   privacy_group          = PRIVGR_NONE;
-  emergency_system_index = 0;
-  _unused48              = 0;
-  emergency_alarm_ack    = 0;
-  data_call_conf         = 0;
-  private_call_conf      = 0;
-  _unused49_1            = 0;
-  privacy                = 0;
-  _unused49_5            = 0;
-  _unused49_7            = 0;
-  dcdm                   = 0;
-  _unused50_1            = 0;
-  _unused50_6            = 0;
   squelch                = SQ_NORMAL;
   bandwidth              = BW_12_5_KHZ;
-  talkaround             = 0;
-  _unused51_4            = 0;
-  vox                    = 0;
-  _unused52              = 0;
 }
 
 double
@@ -144,21 +124,19 @@ GD77Codeplug::channel_t::toChannelObj() const {
 }
 
 bool
-GD77Codeplug::channel_t::linkChannelObj(
-    Channel *c, Config *conf,
-    const QHash<int,int> &scan_table, const QHash<int,int> &group_table, const QHash<int, int> &contact_table) const {
+GD77Codeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx) const {
   if (c->is<AnalogChannel>()) {
     AnalogChannel *ac = c->as<AnalogChannel>();
-    if (scan_list_index && scan_table.contains(scan_list_index))
-      ac->setScanList(conf->scanlists()->scanlist(scan_table[scan_list_index]));
+    if (scan_list_index && ctx.hasScanList(scan_list_index))
+      ac->setScanList(ctx.getScanList(scan_list_index));
   } else {
     DigitalChannel *dc = c->as<DigitalChannel>();
-    if (scan_list_index && scan_table.contains(scan_list_index))
-      dc->setScanList(conf->scanlists()->scanlist(scan_table[scan_list_index]));
-    if (group_list_index && group_table.contains(group_list_index))
-      dc->setRXGroupList(conf->rxGroupLists()->list(group_table[group_list_index]));
-    if (contact_name_index && contact_table.contains(contact_name_index))
-      dc->setTXContact(conf->contacts()->digitalContact(contact_table[contact_name_index]));
+    if (scan_list_index && ctx.hasScanList(scan_list_index))
+      dc->setScanList(ctx.getScanList(scan_list_index));
+    if (group_list_index && ctx.hasGroupList(group_list_index))
+      dc->setRXGroupList(ctx.getGroupList(group_list_index));
+    if (contact_name_index && ctx.hasDigitalContact(contact_name_index))
+      dc->setTXContact(ctx.getDigitalContact(contact_name_index));
   }
   return true;
 }
@@ -236,20 +214,14 @@ GD77Codeplug::grouplist_t::toRXGroupListObj() {
 }
 
 bool
-GD77Codeplug::grouplist_t::linkRXGroupListObj(RXGroupList *lst, const Config *conf, const QHash<int, int> &contact_table) const {
+GD77Codeplug::grouplist_t::linkRXGroupListObj(RXGroupList *lst, const CodeplugContext &ctx) const {
   for (int i=0; (i<32) && member[i]; i++) {
-    if (! contact_table.contains(member[i])) {
+    if (! ctx.hasDigitalContact(member[i])) {
       logDebug() << "Cannot link RX group list '"<< lst->name() <<
-                    ": contact index " << member[i] << " is not defined in contact index-table.";
+                    ": contact #" << member[i] << " is not defined.";
       return false;
     }
-    DigitalContact *contact = conf->contacts()->digitalContact(contact_table[member[i]]);
-    if (nullptr == contact) {
-      logDebug() << "Cannot link RX group list '"<< lst->name() <<
-                    ": contact " << contact_table[member[i]] << " is not defined.";
-      return false;
-    }
-    lst->addContact(contact);
+    lst->addContact(ctx.getDigitalContact(member[i]));
   }
   return true;
 }
@@ -302,26 +274,26 @@ GD77Codeplug::scanlist_t::toScanListObj() const {
 }
 
 bool
-GD77Codeplug::scanlist_t::linkScanListObj(ScanList *lst, const Config *conf, const QHash<int, int> &channel_table) const {
+GD77Codeplug::scanlist_t::linkScanListObj(ScanList *lst, const CodeplugContext &ctx) const {
   if (1 == priority_ch1)
     lst->setPriorityChannel(SelectedChannel::get());
-  else if ((1<priority_ch1) && channel_table.contains(priority_ch1-1))
-    lst->setPriorityChannel(conf->channelList()->channel(channel_table[priority_ch1-1]));
+  else if ((1<priority_ch1) && ctx.hasChannel(priority_ch1-1))
+    lst->setPriorityChannel(ctx.getChannel(priority_ch1-1));
   else
     logWarn() << "Cannot deocde reference to priority channel index " << priority_ch1
                  << " in scan list '" << getName() << "'.";
   if (1 == priority_ch2)
     lst->setSecPriorityChannel(SelectedChannel::get());
-  else if ((1<priority_ch2) && channel_table.contains(priority_ch2-1))
-    lst->setSecPriorityChannel(conf->channelList()->channel(channel_table[priority_ch2-1]));
+  else if ((1<priority_ch2) && ctx.hasChannel(priority_ch2-1))
+    lst->setSecPriorityChannel(ctx.getChannel(priority_ch2-1));
   else
     logWarn() << "Cannot deocde reference to secondary priority channel index " << priority_ch2
               << " in scan list '" << getName() << "'.";
 
   if (1 == tx_designated_ch)
     lst->setTXChannel(SelectedChannel::get());
-  else if ((1<priority_ch2) && channel_table.contains(tx_designated_ch-1))
-    lst->setTXChannel(conf->channelList()->channel(channel_table[tx_designated_ch-1]));
+  else if ((1<priority_ch2) && ctx.hasChannel(tx_designated_ch-1))
+    lst->setTXChannel(ctx.getChannel(tx_designated_ch-1));
   else
     logWarn() << "Cannot deocde reference to secondary priority channel index " << tx_designated_ch
                 << " in scan list '" << getName() << "'.";
@@ -329,8 +301,8 @@ GD77Codeplug::scanlist_t::linkScanListObj(ScanList *lst, const Config *conf, con
   for (int i=0; (i<32) && (member[i]>0); i++) {
     if (1 == member[i])
       lst->addChannel(SelectedChannel::get());
-    else if (member[i] && channel_table.contains(member[i]-1))
-      lst->addChannel(conf->channelList()->channel(channel_table.contains(member[i]-1)));
+    else if (member[i] && ctx.hasChannel(member[i]-1))
+      lst->addChannel(ctx.getChannel(member[i]-1));
     else
       logWarn() << "Cannot deocde reference to channel index " << priority_ch2
                 << " in scan list '" << getName() << "'.";
@@ -579,8 +551,9 @@ GD77Codeplug::decode(Config *config) {
   config->setIntroLine1(it->getIntroLine1());
   config->setIntroLine2(it->getIntroLine2());
 
+  CodeplugContext ctx(config);
+
   /* Unpack Contacts */
-  QHash<int,int> contact_table;
   for (int i=0; i<NCONTACTS; i++) {
     contact_t *ct = (contact_t *) data(OFFSET_CONTACTS+i*sizeof(contact_t));
     if (nullptr == ct) {
@@ -595,8 +568,7 @@ GD77Codeplug::decode(Config *config) {
     if (DigitalContact *cont = ct->toContactObj()) {
       logDebug() << "Contact at index " << i+1 << " mapped to "
                  << config->contacts()->count();
-      contact_table[i+1] = config->contacts()->digitalCount();
-      config->contacts()->addContact(cont);
+      ctx.addDigitalContact(cont, i+1);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid contact at index %2.")
           .arg(__func__).arg(i);
@@ -605,7 +577,6 @@ GD77Codeplug::decode(Config *config) {
   }
 
   /* Unpack RX Group Lists */
-  QHash<int, int> group_table;
   for (int i=0; i<NGLISTS; i++) {
     grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB);
     if (nullptr == gt) {
@@ -628,15 +599,14 @@ GD77Codeplug::decode(Config *config) {
     if (list) {
       logDebug() << "RX group list at index " << i+1 << " mapped to "
                  << config->rxGroupLists()->count();
-      group_table[i+1] = config->rxGroupLists()->count();
-      config->rxGroupLists()->addList(list);
+      ctx.addGroupList(list, i+1);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid RX group-list at index %2.")
           .arg(__func__).arg(i);
       return false;
     }
 
-    if(! gl->linkRXGroupListObj(list, config, contact_table)) {
+    if(! gl->linkRXGroupListObj(list, ctx)) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link RX group list at index %2.")
           .arg(__func__).arg(i);
       return false;
@@ -644,7 +614,6 @@ GD77Codeplug::decode(Config *config) {
   }
 
   /* Unpack Channels */
-  QHash<int, int> channel_table;
   for (int i=0; i<NCHAN; i++) {
     // First, get bank
     bank_t *b;
@@ -671,8 +640,7 @@ GD77Codeplug::decode(Config *config) {
 
     if (Channel *chan = ch->toChannelObj()) {
       logDebug() << "Map channel index " << i << " to " << config->channelList()->count();
-      channel_table[i+1] = config->channelList()->count();
-      config->channelList()->addChannel(chan);
+      ctx.addChannel(chan, i+1);
     } else {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid channel at index %2!")
           .arg(__func__).arg(i);
@@ -706,7 +674,7 @@ GD77Codeplug::decode(Config *config) {
           .arg(__func__).arg(i);
       return false;
     }
-    if (! z->linkZoneObj(zone, config, channel_table)) {
+    if (! z->linkZoneObj(zone, ctx)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
           .arg(__func__).arg(i);
       return false;
@@ -715,7 +683,6 @@ GD77Codeplug::decode(Config *config) {
   }
 
   /* Unpack Scan lists */
-  QHash<int, int> scan_table;
   for (int i=0; i<NSCANL; i++) {
     scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB);
     if (! st){
@@ -740,7 +707,7 @@ GD77Codeplug::decode(Config *config) {
       return false;
     }
 
-    if (! sl->linkScanListObj(scan, config, channel_table)) {
+    if (! sl->linkScanListObj(scan, ctx)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link scanlist at index %2")
           .arg(__func__).arg(i);
       return false;
@@ -748,8 +715,7 @@ GD77Codeplug::decode(Config *config) {
 
     logDebug() << "Scan list at index " << i+1 << " mapped to "
                << config->scanlists()->count();
-    scan_table[i+1] = config->scanlists()->count();
-    config->scanlists()->addScanList(scan);
+    ctx.addScanList(scan, i+1);
   }
 
   /*
@@ -767,8 +733,7 @@ GD77Codeplug::decode(Config *config) {
       continue;
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
-    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i+1]),
-                             config, scan_table, group_table, contact_table))
+    if (! ch->linkChannelObj(ctx.getChannel(i+1), ctx))
     {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link channel at index %2")
           .arg(__func__).arg(i);

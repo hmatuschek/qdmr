@@ -4,6 +4,7 @@
 #include <QObject>
 #include "codeplug.hh"
 #include "signaling.hh"
+#include "codeplugcontext.hh"
 
 class Channel;
 class Zone;
@@ -359,7 +360,7 @@ public:
     Zone *toZoneObj() const;
     /** Links a previously constructed @c Zone object to the rest of the configuration. That is
      * linking to the referred channels. */
-    bool linkZoneObj(Zone *zone, const Config *conf, const QHash<int,int> &channel_table) const;
+    bool linkZoneObj(Zone *zone, const CodeplugContext &ctx) const;
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     void fromZoneObjA(const Zone *zone, const Config *conf);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */

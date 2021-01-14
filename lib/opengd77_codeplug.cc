@@ -472,6 +472,8 @@ OpenGD77Codeplug::decode(Config *config) {
   config->setIntroLine1(it->getIntroLine1());
   config->setIntroLine2(it->getIntroLine2());
 
+  CodeplugContext ctx(config);
+
   /* Unpack Contacts */
   QHash<int,int> contact_table;
   for (int i=0; i<NCONTACTS; i++) {
@@ -528,7 +530,7 @@ OpenGD77Codeplug::decode(Config *config) {
           .arg(__func__).arg(i);
       return false;
     }
-    if(! gl->linkRXGroupListObj(list, config, contact_table)) {
+    if(! gl->linkRXGroupListObj(list, ctx)) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link RX group list at index %2.")
           .arg(__func__).arg(i);
       return false;

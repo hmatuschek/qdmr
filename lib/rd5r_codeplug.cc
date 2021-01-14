@@ -380,18 +380,18 @@ RD5RCodeplug::zone_t::toZoneObj() const {
 }
 
 bool
-RD5RCodeplug::zone_t::linkZoneObj(Zone *zone, const Config *conf, const QHash<int, int> &channel_table) const {
+RD5RCodeplug::zone_t::linkZoneObj(Zone *zone, const CodeplugContext &ctx) const {
   if (! isValid()) {
     logDebug() << "Cannot link zone: Zone is invalid.";
     return false;
   }
 
   for (int i=0; (i<16) && member[i]; i++) {
-    if (channel_table.contains(member[i]))
-      zone->A()->addChannel(conf->channelList()->channel(channel_table[member[i]]));
+    if (ctx.hasChannel(member[i]))
+      zone->A()->addChannel(ctx.getChannel(member[i]));
     else {
       logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
-                << member[i] << "->" << channel_table[member[i]] << " out of bounds.";
+                << member[i] << " out of bounds.";
     }
   }
   return true;
@@ -899,6 +899,8 @@ RD5RCodeplug::decode(Config *config)
   config->setIntroLine1(it->getIntroLine1());
   config->setIntroLine2(it->getIntroLine2());
 
+  CodeplugContext ctx(config);
+
   /* Unpack Contacts */
   QHash<int, int> contact_table;
   for (int i=0; i<NCONTACTS; i++) {
@@ -1051,7 +1053,7 @@ RD5RCodeplug::decode(Config *config)
           .arg(__func__).arg(i);
       return false;
     }
-    if (! z->linkZoneObj(zone, config, channel_table)) {
+    if (! z->linkZoneObj(zone, ctx)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
           .arg(__func__).arg(i);
       return false;
