@@ -157,21 +157,20 @@ RD5RCodeplug::channel_t::toChannelObj() const {
 }
 
 bool
-RD5RCodeplug::channel_t::linkChannelObj(Channel *c, Config *conf, const QHash<int, int> &scan_table,
-                                        const QHash<int, int> &group_table, const QHash<int, int> &contact_table) const
+RD5RCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx) const
 {
   if (c->is<AnalogChannel>()) {
     AnalogChannel *ac = c->as<AnalogChannel>();
-    if (scan_list_index && scan_table.contains(scan_list_index))
-      ac->setScanList(conf->scanlists()->scanlist(scan_table[scan_list_index]));
+    if (scan_list_index && ctx.hasScanList(scan_list_index))
+      ac->setScanList(ctx.getScanList(scan_list_index));
   } else {
     DigitalChannel *dc = c->as<DigitalChannel>();
-    if (scan_list_index && scan_table.contains(scan_list_index))
-      dc->setScanList(conf->scanlists()->scanlist(scan_table[scan_list_index]));
-    if (group_list_index && group_table.contains(group_list_index))
-      dc->setRXGroupList(conf->rxGroupLists()->list(group_table[group_list_index]));
-    if (contact_name_index && contact_table.contains(contact_name_index))
-      dc->setTXContact(conf->contacts()->digitalContact(contact_table[contact_name_index]));
+    if (scan_list_index && ctx.hasScanList(scan_list_index))
+      dc->setScanList(ctx.getScanList(scan_list_index));
+    if (group_list_index && ctx.hasGroupList(group_list_index))
+      dc->setRXGroupList(ctx.getGroupList(group_list_index));
+    if (contact_name_index && ctx.hasDigitalContact(contact_name_index))
+      dc->setTXContact(ctx.getDigitalContact(contact_name_index));
   }
   return true;
 }
@@ -456,11 +455,10 @@ RD5RCodeplug::grouplist_t::toRXGroupListObj() {
 }
 
 bool
-RD5RCodeplug::grouplist_t::linkRXGroupListObj(int ncnt, RXGroupList *lst, const Config *conf,
-                                              const QHash<int, int> &contact_table) const {
+RD5RCodeplug::grouplist_t::linkRXGroupListObj(int ncnt, RXGroupList *lst, const CodeplugContext &ctx) const {
   for (int i=0; (i<16) && (i<ncnt); i++) {
-    if (contact_table.contains(member[i]))
-      lst->addContact(conf->contacts()->digitalContact(member[i]-1));
+    if (ctx.hasDigitalContact(member[i]))
+      lst->addContact(ctx.getDigitalContact(member[i]));
     else
       return false;
   }
@@ -515,26 +513,26 @@ RD5RCodeplug::scanlist_t::toScanListObj() const {
 }
 
 bool
-RD5RCodeplug::scanlist_t::linkScanListObj(ScanList *lst, const Config *conf, const QHash<int, int> &channel_table) const {
+RD5RCodeplug::scanlist_t::linkScanListObj(ScanList *lst, const CodeplugContext &ctx) const {
   if (1 == priority_ch1)
     lst->setPriorityChannel(SelectedChannel::get());
-  else if ((1<priority_ch1) && channel_table.contains(priority_ch1-1))
-    lst->setPriorityChannel(conf->channelList()->channel(channel_table[priority_ch1-1]));
+  else if ((1<priority_ch1) && ctx.hasChannel(priority_ch1-1))
+    lst->setPriorityChannel(ctx.getChannel(priority_ch1-1));
   else
     logWarn() << "Cannot deocde reference to priority channel index " << priority_ch1
                  << " in scan list '" << getName() << "'.";
   if (1 == priority_ch2)
     lst->setSecPriorityChannel(SelectedChannel::get());
-  else if ((1<priority_ch2) && channel_table.contains(priority_ch2-1))
-    lst->setSecPriorityChannel(conf->channelList()->channel(channel_table[priority_ch2-1]));
+  else if ((1<priority_ch2) && ctx.hasChannel(priority_ch2-1))
+    lst->setSecPriorityChannel(ctx.getChannel(priority_ch2-1));
   else
     logWarn() << "Cannot deocde reference to secondary priority channel index " << priority_ch2
               << " in scan list '" << getName() << "'.";
 
   if (1 == tx_designated_ch)
     lst->setTXChannel(SelectedChannel::get());
-  else if ((1<tx_designated_ch) && channel_table.contains(tx_designated_ch-1))
-    lst->setTXChannel(conf->channelList()->channel(channel_table[tx_designated_ch-1]));
+  else if ((1<tx_designated_ch) && ctx.hasChannel(tx_designated_ch-1))
+    lst->setTXChannel(ctx.getChannel(tx_designated_ch-1));
   else
     logWarn() << "Cannot deocde reference to transmit channel index " << tx_designated_ch
               << " in scan list '" << getName() << "'.";
@@ -542,8 +540,8 @@ RD5RCodeplug::scanlist_t::linkScanListObj(ScanList *lst, const Config *conf, con
   for (int i=0; (i<32) && (member[i]>0); i++) {
     if (1 == member[i])
       lst->addChannel(SelectedChannel::get());
-    else if (member[i] && channel_table.contains(member[i]-1))
-      lst->addChannel(conf->channelList()->channel(channel_table.contains(member[i]-1)));
+    else if (member[i] && ctx.hasChannel(member[i]-1))
+      lst->addChannel(ctx.getChannel(member[i]-1));
     else
       logWarn() << "Cannot deocde reference to channel index " << priority_ch2
                 << " in scan list '" << getName() << "'.";
@@ -902,7 +900,6 @@ RD5RCodeplug::decode(Config *config)
   CodeplugContext ctx(config);
 
   /* Unpack Contacts */
-  QHash<int, int> contact_table;
   for (int i=0; i<NCONTACTS; i++) {
     contact_t *ct = (contact_t *) data(OFFSET_CONTACTS+i*sizeof(contact_t));
     if (nullptr == ct) {
@@ -918,8 +915,7 @@ RD5RCodeplug::decode(Config *config)
     if (DigitalContact *cont = ct->toContactObj()) {
       logDebug() << "Contact at index " << i+1 << " mapped to "
                  << config->contacts()->count();
-      contact_table[i+1] = config->contacts()->digitalCount();
-      config->contacts()->addContact(cont);
+      ctx.addDigitalContact(cont, i+1);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid contact at index %2.")
           .arg(__func__).arg(i);
@@ -928,7 +924,6 @@ RD5RCodeplug::decode(Config *config)
   }
 
   /* Unpack DTMF Contacts */
-  QHash<int,int> dtmf_table;
   for (int i=0; i<NDTMF; i++) {
     dtmf_contact_t *ct = (dtmf_contact_t *) data(OFFSET_DTMF+i*sizeof(dtmf_contact_t));
     if (nullptr == ct) {
@@ -942,7 +937,6 @@ RD5RCodeplug::decode(Config *config)
     if (DTMFContact *cont = ct->toContactObj()) {
       logDebug() << "DTMF contact at index " << i+1 << " mapped to "
                  << config->contacts()->dtmfCount();
-      dtmf_table[i+1] = config->contacts()->dtmfCount();
       config->contacts()->addContact(cont);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid DTMF contact at index %2.")
@@ -952,7 +946,6 @@ RD5RCodeplug::decode(Config *config)
   }
 
   /* Unpack RX Group Lists */
-  QHash<int,int> group_table;
   for (int i=0; i<NGLISTS; i++) {
     grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB);
     if (nullptr == gt) {
@@ -975,15 +968,14 @@ RD5RCodeplug::decode(Config *config)
     if (list) {
       logDebug() << "RX group list at index " << i+1 << " mapped to "
                  << config->rxGroupLists()->count();
-      group_table[i+1] = config->rxGroupLists()->count();
-      config->rxGroupLists()->addList(list);
+      ctx.addGroupList(list, i+1);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid RX group-list at index %2.")
           .arg(__func__).arg(i);
       return false;
     }
 
-    if(! gl->linkRXGroupListObj(gt->nitems1[i]-1, list, config, contact_table)) {
+    if(! gl->linkRXGroupListObj(gt->nitems1[i]-1, list, ctx)) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link RX group list at index %2.")
           .arg(__func__).arg(i);
       return false;
@@ -991,7 +983,6 @@ RD5RCodeplug::decode(Config *config)
   }
 
   /* Unpack Channels */
-  QHash<int, int> channel_table;
   for (int i=0; i<NCHAN; i++) {
     // First, get bank
     bank_t *b;
@@ -1018,8 +1009,7 @@ RD5RCodeplug::decode(Config *config)
 
     if (Channel *chan = ch->toChannelObj()) {
       logDebug() << "Map channel index " << i << " to " << config->channelList()->count();
-      channel_table[i+1] = config->channelList()->count();
-      config->channelList()->addChannel(chan);
+      ctx.addChannel(chan, i+1);
     } else {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid channel at index %2!")
           .arg(__func__).arg(i);
@@ -1063,7 +1053,6 @@ RD5RCodeplug::decode(Config *config)
   }
 
   /* Unpack Scan lists */
-  QHash<int, int> scan_table;
   for (int i=0; i<NSCANL; i++) {
     scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB);
     if (! st){
@@ -1089,7 +1078,7 @@ RD5RCodeplug::decode(Config *config)
       return false;
     }
 
-    if (! sl->linkScanListObj(scan, config, channel_table)) {
+    if (! sl->linkScanListObj(scan, ctx)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link scanlist at index %2")
           .arg(__func__).arg(i);
       return false;
@@ -1097,8 +1086,7 @@ RD5RCodeplug::decode(Config *config)
 
     logDebug() << "Scan at index " << i+1 << " mapped to "
                << config->scanlists()->count();
-    scan_table[i+1] = config->scanlists()->count();
-    config->scanlists()->addScanList(scan);
+    ctx.addScanList(scan, i+1);
   }
 
   /*
@@ -1116,7 +1104,7 @@ RD5RCodeplug::decode(Config *config)
       continue;
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
-    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i+1]), config, scan_table, group_table, contact_table)) {
+    if (! ch->linkChannelObj(ctx.getChannel(i+1), ctx)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link channel at index %2")
           .arg(__func__).arg(j);
       return false;
