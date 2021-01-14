@@ -197,8 +197,7 @@ protected:
     void fromChannelObj(const Channel *c, const Config *conf);
     /** Links a previously constructed @c Channel object to other object within the generic
      * configuration, for example scan lists etc. */
-    bool linkChannelObj(Channel *c, Config *conf, const QHash<int, int> &scan_table,
-                        const QHash<int, int> &group_table, const QHash<int, int> &contact_table) const;
+    bool linkChannelObj(Channel *c, const CodeplugContext &ctx) const;
   } channel_t;
 
   /** A Bank of 128 channels. */
@@ -230,7 +229,7 @@ protected:
     Zone *toZoneObj() const;
     /** Links a previously constructed @c Zone object to the rest of the configuration. That is
      * linking to the referred channels. */
-    bool linkZoneObj(Zone *zone, const Config *conf, const QHash<int,int> &channel_table) const;
+    bool linkZoneObj(Zone *zone, const CodeplugContext &ctx) const;
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     void fromZoneObjA(const Zone *zone, const Config *conf);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */

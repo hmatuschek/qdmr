@@ -163,21 +163,19 @@ OpenGD77Codeplug::channel_t::toChannelObj() const {
 }
 
 bool
-OpenGD77Codeplug::channel_t::linkChannelObj(
-    Channel *c, Config *conf,
-    const QHash<int,int> &scan_table, const QHash<int,int> &group_table, const QHash<int, int> &contact_table) const {
+OpenGD77Codeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx) const {
   if (c->is<AnalogChannel>()) {
     AnalogChannel *ac = c->as<AnalogChannel>();
-    if (scan_list_index && scan_table.contains(scan_list_index))
-      ac->setScanList(conf->scanlists()->scanlist(scan_table[scan_list_index]));
+    if (scan_list_index && ctx.hasScanList(scan_list_index))
+      ac->setScanList(ctx.getScanList(scan_list_index));
   } else {
     DigitalChannel *dc = c->as<DigitalChannel>();
-    if (scan_list_index && scan_table.contains(scan_list_index))
-      dc->setScanList(conf->scanlists()->scanlist(scan_table[scan_list_index]));
-    if (group_list_index && group_table.contains(group_list_index))
-      dc->setRXGroupList(conf->rxGroupLists()->list(group_table[group_list_index]));
-    if (contact_name_index && contact_table.contains(contact_name_index))
-      dc->setTXContact(conf->contacts()->digitalContact(contact_table[contact_name_index]));
+    if (scan_list_index && ctx.getScanList(scan_list_index))
+      dc->setScanList(ctx.getScanList(scan_list_index));
+    if (group_list_index && ctx.getGroupList(group_list_index))
+      dc->setRXGroupList(ctx.getGroupList(group_list_index));
+    if (contact_name_index && ctx.hasDigitalContact(contact_name_index))
+      dc->setTXContact(ctx.getDigitalContact(contact_name_index));
   }
   return true;
 }
@@ -275,18 +273,18 @@ OpenGD77Codeplug::zone_t::toZoneObj() const {
 }
 
 bool
-OpenGD77Codeplug::zone_t::linkZoneObj(Zone *zone, const Config *conf, const QHash<int, int> &channel_table) const {
+OpenGD77Codeplug::zone_t::linkZoneObj(Zone *zone, const CodeplugContext &ctx) const {
   if (! isValid()) {
     logDebug() << "Cannot link zone: Zone is invalid.";
     return false;
   }
 
   for (int i=0; (i<80) && member[i]; i++) {
-    if (channel_table.contains(member[i]))
-      zone->A()->addChannel(conf->channelList()->channel(channel_table[member[i]]));
+    if (ctx.hasChannel(member[i]))
+      zone->A()->addChannel(ctx.getChannel(member[i]));
     else {
       logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
-                << member[i] << "->" << channel_table[member[i]] << " out of bounds.";
+                << member[i] << " out of bounds.";
     }
   }
   return true;
@@ -475,7 +473,6 @@ OpenGD77Codeplug::decode(Config *config) {
   CodeplugContext ctx(config);
 
   /* Unpack Contacts */
-  QHash<int,int> contact_table;
   for (int i=0; i<NCONTACTS; i++) {
     contact_t *ct = (contact_t *) data(OFFSET_CONTACTS+i*sizeof(contact_t), FLASH);
     if (nullptr == ct) {
@@ -489,10 +486,8 @@ OpenGD77Codeplug::decode(Config *config) {
     if (DigitalContact *cont = ct->toContactObj()) {
       logDebug() << "Contact " << i+1 << " enabled, mapped to index "
                  << config->contacts()->digitalCount();
-      // Store in index table
-      contact_table[i+1] = config->contacts()->digitalCount();
-      // add contact to config
-      config->contacts()->addContact(cont);
+      // Store in index table & config
+      ctx.addDigitalContact(cont, i+1);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid contact at index %2.")
           .arg(__func__).arg(i);
@@ -501,7 +496,6 @@ OpenGD77Codeplug::decode(Config *config) {
   }
 
   /* Unpack RX Group Lists */
-  QHash<int,int> group_table;
   for (int i=0; i<NGLISTS; i++) {
     grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB, FLASH);
     if (nullptr == gt) {
@@ -523,8 +517,7 @@ OpenGD77Codeplug::decode(Config *config) {
     if (list) {
       logDebug() << "RX group list at index " << i+1 << " mapped to "
                  << config->rxGroupLists()->count();
-      group_table[i+1] = config->rxGroupLists()->count();
-      config->rxGroupLists()->addList(list);
+      ctx.addGroupList(list, i+1);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid RX group-list at index %2.")
           .arg(__func__).arg(i);
@@ -538,7 +531,6 @@ OpenGD77Codeplug::decode(Config *config) {
   }
 
   /* Unpack Channels */
-  QHash<int,int> channel_table;
   for (int i=0; i<NCHAN; i++) {
     // First, get bank
     bank_t *b;
@@ -564,8 +556,7 @@ OpenGD77Codeplug::decode(Config *config) {
     }
     if (Channel *chan = ch->toChannelObj()) {
       logDebug() << "Mapped channel index " << i+1 << " to " << config->channelList()->count();
-      channel_table[i+1] = config->channelList()->count();
-      config->channelList()->addChannel(chan);
+      ctx.addChannel(chan, i+1);
     } else {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid channel at index %2!")
           .arg(__func__).arg(i);
@@ -606,7 +597,7 @@ OpenGD77Codeplug::decode(Config *config) {
       return false;
     }
 
-    if (! z->linkZoneObj(zone, config, channel_table)) {
+    if (! z->linkZoneObj(zone, ctx)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
           .arg(__func__).arg(i);
       logError() << _errorMessage;
@@ -621,7 +612,6 @@ OpenGD77Codeplug::decode(Config *config) {
     }
   }
 
-  QHash<int, int> scan_table;
   /* Unpack Scan lists
    *
    * OpenGD77 does not support any scan lists. Decoding/encoding is disabled for now.
@@ -677,8 +667,7 @@ OpenGD77Codeplug::decode(Config *config) {
     // finally, get channel
     channel_t *ch = &b->chan[i % 128];
 
-    if (! ch->linkChannelObj(config->channelList()->channel(channel_table[i+1]),
-                             config, scan_table, group_table, contact_table))
+    if (! ch->linkChannelObj(ctx.getChannel(i+1), ctx))
     {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link channel at index %2")
           .arg(__func__).arg(i);
