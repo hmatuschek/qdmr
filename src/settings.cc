@@ -132,6 +132,15 @@ Settings::setHideGPSNote(bool hide) {
   setValue("hideGPSNote", hide);
 }
 
+bool
+Settings::showDisclaimer() const {
+  return value("showDisclaimer", true).toBool();
+}
+void
+Settings::setShowDisclaimer(bool show) {
+  setValue("showDisclaimer", show);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of SettingsDialog

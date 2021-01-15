@@ -32,6 +32,9 @@ public:
 
   bool hideGSPNote() const;
   void setHideGPSNote(bool hide);
+
+  bool showDisclaimer() const;
+  void setShowDisclaimer(bool show);
 };
 
 

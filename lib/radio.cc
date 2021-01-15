@@ -23,6 +23,13 @@ Radio::Radio(QObject *parent)
 bool
 Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
 {
+  // Is still beta?
+  if (features().betaWarning)
+    issues.append(VerifyIssue(
+                    VerifyIssue::WARNING,
+                    tr("Support for this radio is still new and not well tested. "
+                       "The code-plug might be incomplete, non-functional or even harmful.")));
+
   /*
    *  Check general config
    */

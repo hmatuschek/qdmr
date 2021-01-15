@@ -937,19 +937,29 @@ public:
     uint8_t rx_dur;                ///< RX duration in seconds, default 60.
   };
 
+  /** Represents an entry in the DMR ID -> contact map within the binary code-plug. */
   struct __attribute__((packed)) contact_map_t {
-    uint32_t id_group;
+    uint32_t id_group;             ///< Combined ID and group-call flag. The ID is encoded in
+                                   /// BCD in big-endian, shifted to the left by one bit. Bit 0 is
+                                   /// then the group-call flag. The cobined id and flag is then
+                                   /// stored in little-endian.
     uint32_t contact_index;        ///< Index to contact, 32bit little endian.
 
+    /** Constructor, clears the map entry. */
     contact_map_t();
+    /** Clears the map entry. */
     void clear();
+    /** Returns @c true if this entry is valid. */
     bool isValid() const;
-
+    /** Returns @c true if the entry is a group-call contact. */
     bool isGroup() const;
+    /** Returns the DMR ID of the entry. */
     uint32_t ID() const;
+    /** Sets the ID and group-call flag of the entry. */
     void setID(uint32_t id, bool group);
-
+    /** Returns the contact index of the entry. */
     uint32_t index() const;
+    /** Sets the contact index of the entry. */
     void setIndex(uint32_t index);
   };
 
