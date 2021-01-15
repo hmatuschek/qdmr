@@ -217,9 +217,9 @@ bool
 GD77Codeplug::grouplist_t::linkRXGroupListObj(RXGroupList *lst, const CodeplugContext &ctx) const {
   for (int i=0; (i<32) && member[i]; i++) {
     if (! ctx.hasDigitalContact(member[i])) {
-      logDebug() << "Cannot link RX group list '"<< lst->name() <<
+      logWarn() << "Cannot link RX group list '"<< lst->name() <<
                     ": contact #" << member[i] << " is not defined.";
-      return false;
+      continue;
     }
     lst->addContact(ctx.getDigitalContact(member[i]));
   }
