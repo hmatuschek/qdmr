@@ -84,6 +84,13 @@
 #define ADDR_GENERAL_CONFIG       0x02500000
 #define GENERAL_CONFIG_SIZE       0x00000630
 
+#define ADDR_APRS_SETTING         0x02501000 // Address of APRS settings
+#define APRS_SETTING_SIZE         0x00000040 // Size of the APRS settings
+#define ADDR_GPS_SETTING          0x02501040 // Address of GPS settings
+#define GPS_SETTING_SIZE          0x00000060 // Size of the GPS settings
+#define ADDR_APRS_MESSAGES        0x02501200 // Address of APRS messages
+#define APRS_MESSAGES_SIZE        0x00000040 // Size of APRS messages
+
 #define NUM_MESSAGES              100
 #define NUM_MESSAGES_PER_BANK     8
 #define MESSAGE_SIZE              0x00000100
@@ -483,6 +490,11 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
       group_list_index = 0xff;
     else
       group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList());
+    // link GPS system
+    if (nullptr != dc->gpsSystem()) {
+      aprs_report = APRS_REPORT_DIGITAL;
+      gps_system = conf->gpsSystems()->indexOf(dc->gpsSystem());
+    }
   }
 }
 
@@ -797,6 +809,50 @@ D878UVCodeplug::general_settings_t::setIntroLine2(const QString line) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::gps_system_t
+ * ******************************************************************************************** */
+D878UVCodeplug::gps_systems_t::gps_systems_t() {
+  clear();
+}
+
+void
+D878UVCodeplug::gps_systems_t::clear() {
+  memset(this, 0, sizeof(gps_systems_t));
+  for (int i=0; i<8; i++) {
+    digi_channels[i] = 4002; // Set to current channel
+  }
+}
+
+void
+D878UVCodeplug::gps_systems_t::fromGPSSystemObj(GPSSystem *sys, const Config *conf) {
+  int idx = conf->gpsSystems()->indexOf(sys);
+  if ((idx < 0) || idx > 7)
+    return;
+  if (sys->hasContact()) {
+    uint32_t bcd; encode_dmr_id_bcd((uint8_t *)&bcd, sys->contact()->number());
+    talkgroups[idx] = qToBigEndian(bcd);
+    switch (sys->contact()->type()) {
+    case DigitalContact::PrivateCall: calltypes[idx]  = 0; break;
+    case DigitalContact::GroupCall: calltypes[idx]  = 1; break;
+    case DigitalContact::AllCall: calltypes[idx]  = 2; break;
+    }
+  }
+  if (sys->hasRevertChannel() && (SelectedChannel::get() != (Channel *)sys->revertChannel())) {
+    digi_channels[idx] = conf->channelList()->indexOf(sys->revertChannel());
+    timeslots[idx] = 0; // Use TS of channel
+  }
+}
+
+void
+D878UVCodeplug::gps_systems_t::fromGPSSystems(const Config *conf) {
+  if (conf->gpsSystems()->count() > 8)
+    return;
+  for (int i=0; i<conf->gpsSystems()->count(); i++)
+    fromGPSSystemObj(conf->gpsSystems()->gpsSystem(i), conf);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::contact_map_t
  * ******************************************************************************************** */
 D878UVCodeplug::contact_map_t::contact_map_t() {
@@ -938,6 +994,11 @@ D878UVCodeplug::allocateUntouched() {
   image(0).addElement(ADDR_ALARM_SETTING, ALARM_SETTING_SIZE);
   // FM broad-cast settings
   image(0).addElement(ADDR_FMBC, FMBC_SIZE+FMBC_VFO_SIZE);
+  // APRS & GPS settings
+  image(0).addElement(ADDR_APRS_SETTING, APRS_SETTING_SIZE);
+  image(0).addElement(ADDR_GPS_SETTING, GPS_SETTING_SIZE);
+  image(0).addElement(ADDR_APRS_MESSAGES, APRS_MESSAGES_SIZE);
+
   // Unknown memory region
   image(0).addElement(0x01042000, 0x020);
   image(0).addElement(0x01042080, 0x010);
@@ -1191,6 +1252,8 @@ D878UVCodeplug::allocateForDecoding() {
 
   // General config
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+  // GPS settings
+  image(0).addElement(ADDR_GPS_SETTING, GPS_SETTING_SIZE);
 }
 
 

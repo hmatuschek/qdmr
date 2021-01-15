@@ -114,7 +114,8 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">GPS/APRS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02501000</td> <td>0000A0</td> <td>APRS/GPS settings, see @c aprs_setting_t.</td>
+ *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings, see @c aprs_setting_t.</td>
+ *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings, see @c gps_systems_t.</td>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, upto 60 chars ASCII, 0-padded.</td>
  *  <tr><td>02501280</td> <td>000030</td> <td>Unknown, set to 0x00. </td></tr>
  *
@@ -351,8 +352,8 @@ public:
       _unused53             : 6;        ///< Unused, set to 0.
 
     // Bytes 54-63
-    uint8_t _unused54;                  ///< Unused, set to 0.
-    uint8_t _unused55;                  ///< Unused, set to 0.
+    uint8_t analog_aprs_ptt;            ///< Enable analog APRS PTT, 0=off, 1=start of transmission, 2=end of transmission.
+    uint8_t digi_aprs_ptt;              ///< Enable digital APRS PTT, 0=off, 1=on.
     uint8_t gps_system;                 ///< Index of DMR GPS report system, 0-7;
     uint8_t _unused57[7];               ///< Unused, set to 0.´
 
@@ -784,9 +785,9 @@ public:
     uint8_t _unused9[39];          ///< Unused, set to 0x00.
   };
 
-  /** Represents the APRS/GPS settings within the binary codeplug.
+  /** Represents the APRS settings within the binary codeplug.
    *
-   * Memmory layout of APRS/GPS settings (160byte):
+   * Memmory layout of APRS settings (0x40byte):
    * @verbinclude d878uvaprssetting.txt
    */
   struct __attribute__((packed)) aprs_setting_t {
@@ -847,28 +848,32 @@ public:
     uint8_t _unknown61;            ///< Unknown, set to 01.
     uint8_t _unknown62;            ///< Unknown, set to 03.
     uint8_t _unknown63;            ///< Unknown, set to ff.
+  };
 
-    // byte 0x40
+  /** Represents the 8 GPS systems within the binary codeplug.
+   *
+   * Memmory layout of GPS systems (0x60byte):
+   * @verbinclude d878uvgpssetting.txt
+   */
+  struct __attribute__((packed)) gps_systems_t {
+    // byte 0x00
     uint16_t digi_channels[8];     ///< 8 16bit channel indices in little-endian. VFO A=4000,
                                    ///< VFO B=4001, Current=4002.
-    // byte 0x50
-    uint8_t _unknown80[3];         ///< Unknown, set to 0
-    uint8_t talkgroups[8];         ///< Talkgroups for all digi APRS channels.
-    uint8_t _unknown89[5];         ///< Unknown, set to 0
-
-    // byte 0x60
-    uint8_t _unknown96[32];        ///< Unknown yet.
-
-    // byte 0x70-0x8f
+    // bytes 0x10-0x2f
+    uint32_t talkgroups[8];        ///< Talkgroup IDs for all digi APRS channels, BCD encoded, big-endian.
+    // bytes 0x30-0x4f
     uint8_t calltypes[8];          ///< Calltype for all digi APRS chanels, 0=private, 1=group, 3=all call.
     uint8_t roaming_support;       ///< Roaming support. 0=off, 1=on.
-    uint8_t timeslots[8];          ///< Timeslots for all digi APRS channels.
+    uint8_t timeslots[8];          ///< Timeslots for all digi APRS channels. 0=Ch sel, 1=TS1, 2=TS2.
     uint8_t rep_act_delay;         ///< Repeater activation delay in multiples of 100ms.
                                    /// Default 0, range 0-1000ms.
-    uint8_t _unknown130[14];       ///< Unknown, set to 0.
+    uint8_t _unknown66[30];        ///< Unknown, set to 0.
 
-    // bytes 0x90-0x9f
-    uint8_t _unknown[16];          ///< Unknown, set to 0.
+    gps_systems_t();
+    void clear();
+
+    void fromGPSSystems(const Config *conf);
+    void fromGPSSystemObj(GPSSystem *sys, const Config *conf);
   };
 
   /** Binary representation of the talker alias setting.
