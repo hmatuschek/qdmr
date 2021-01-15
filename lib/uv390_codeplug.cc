@@ -548,8 +548,11 @@ UV390Codeplug::grouplist_t::linkRXGroupList(RXGroupList *grp, Config *conf) cons
     return false;
 
   for (int i=0; (i<32)&&(member[i]); i++) {
-    if ((member[i]-1) >= conf->contacts()->digitalCount())
-      return false;
+    if ((member[i]-1) >= conf->contacts()->digitalCount()) {
+      logWarn() << "Cannot link contact " << member[i] << " to group list '"
+                << this->getName() << "': Invalid contact index. Ignored.";
+      continue;
+    }
     grp->addContact(conf->contacts()->digitalContact(member[i]-1));
   }
 
