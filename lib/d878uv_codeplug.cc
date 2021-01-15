@@ -395,8 +395,8 @@ D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
       return false;
 
     // Check if default contact is set
-    uint16_t conIdx = qFromLittleEndian(contact_index);
-    if ((0xffff != conIdx) && ctx.hasDigitalContact(conIdx))
+    uint32_t conIdx = qFromLittleEndian(contact_index);
+    if ((0xffffffff != conIdx) && ctx.hasDigitalContact(conIdx))
       dc->setTXContact(ctx.getDigitalContact(conIdx));
 
     // Set if RX group list is set
@@ -404,8 +404,8 @@ D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
       dc->setRXGroupList(ctx.getGroupList(group_list_index));
 
     // Link to GPS system
-    if ((APRS_REPORT_DIGITAL == aprs_report) && ctx.hasGPSSystem(gps_system))
-      dc->setGPSSystem(ctx.getGPSSystem(gps_system));
+    //if ((APRS_REPORT_DIGITAL == aprs_report) && ctx.hasGPSSystem(gps_system))
+    //  dc->setGPSSystem(ctx.getGPSSystem(gps_system));
 
   }
 

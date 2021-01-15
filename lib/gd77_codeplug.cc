@@ -32,11 +32,32 @@ void
 GD77Codeplug::channel_t::clear() {
   memset(this, 0, sizeof(channel_t));
   memset(name, 0xff, 16);
+  _unused25              = 0;
   _unused30              = 0x50;
+  _unused36              = 0;
+  tx_signaling_syst      = 0;
+  _unused38              = 0;
+  rx_signaling_syst      = 0;
   _unused40              = 0x16;
   privacy_group          = PRIVGR_NONE;
+  emergency_system_index = 0;
+  _unused48              = 0;
+  emergency_alarm_ack    = 0;
+  data_call_conf         = 0;
+  private_call_conf      = 0;
+  _unused49_1            = 0;
+  privacy                = 0;
+  _unused49_5            = 0;
+  _unused49_7            = 0;
+  dcdm                   = 0;
+  _unused50_1            = 0;
+  _unused50_6            = 0;
   squelch                = SQ_NORMAL;
   bandwidth              = BW_12_5_KHZ;
+  talkaround             = 0;
+  _unused51_4            = 0;
+  vox                    = 0;
+  _unused52              = 0;
 }
 
 double
