@@ -82,7 +82,6 @@ HID::identifier() {
 
 bool
 HID::read_start(uint32_t bank, uint32_t addr) {
-  /// @bug perform bank selection here
   return true;
 }
 
@@ -136,7 +135,6 @@ HID::read_finish()
 
 bool
 HID::write_start(uint32_t bank, uint32_t addr) {
-  /// @todo Perform bank selection here.
   return true;
 }
 

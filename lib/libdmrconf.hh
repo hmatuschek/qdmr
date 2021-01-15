@@ -30,7 +30,7 @@
  * configuration of the radio and from which the actual binary code-plug for each radio is derived.
  * If a radio does not support a particular feature within the configuration, it simply gets
  * ignored. The configuration language as well as classes for reading and writing config files are
- * documented in the @link conffile config-file module@endlink.
+ * documented in the <a href="https://dm3mat.darc.de/qdmr/manual/#conf">manual</a>.
  */
 
 #ifndef __LIBDMRCONF_HH__
@@ -39,7 +39,6 @@
 #include "config.h"
 #include "config.hh"
 #include "codeplug.hh"
-#include "csvreader.hh"
 #include "csvreader.hh"
 
 #include "radio.hh"

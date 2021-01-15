@@ -7,7 +7,7 @@ class Config;
 
 
 /** Writing config files.
- * @ingroup conffile */
+ * @ingroup conf */
 class CSVWriter
 {
 public:

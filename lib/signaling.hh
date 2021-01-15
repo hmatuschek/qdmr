@@ -5,7 +5,7 @@
 
 /** Contains the enum and utility functions to deal with analog signaling like
  * CTCSS and DCS.
- * @ingroup util */
+ * @ingroup conf */
 namespace Signaling
 {
   /** This huge enum lists all possible RX/TX tones that can be associated with analog channels.

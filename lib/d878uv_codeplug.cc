@@ -401,7 +401,6 @@ D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
   if ((0xff != scan_list_index) && ctx.hasScanList(scan_list_index))
     c->setScanList(ctx.getScanList(scan_list_index));
 
-  /// @bug Complete D878UV channel linking.
   return true;
 }
 
@@ -1081,14 +1080,14 @@ D878UVCodeplug::allocateForDecoding() {
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
     // Get byte and bit for channel, as well as bank of channel
-    uint16_t bit = i%8, byte = i/8, bank = i/128;
+    uint16_t bit = i%8, byte = i/8, bank = i/128, idx=i%128;
     // if disabled -> skip
     if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
       continue;
     // compute address for channel
     uint32_t addr = CHANNEL_BANK_0
         + bank*CHANNEL_BANK_OFFSET
-        + bit*sizeof(channel_t);
+        + idx*sizeof(channel_t);
     if (nullptr == data(addr, 0))
       image(0).addElement(addr, sizeof(channel_t));
   }
@@ -1337,8 +1336,6 @@ D878UVCodeplug::encode(Config *config, bool update)
     scan->fromScanListObj(config->scanlists()->scanlist(i), config);
   }
 
-  /// @bug Implement analog contact D878UV code-plug encoding.
-  /// @bug Implement GPS D878UV code-plug encoding.
   return true;
 }
 
@@ -1461,10 +1458,6 @@ D878UVCodeplug::decode(Config *config)
     if (ctx.hasChannel(i))
       ch->linkChannelObj(ctx.getChannel(i), ctx);
   }
-
-  /// @bug Implement analog contact D878UV code-plug decoding.
-  /// @bug Implement GPS D878UV code-plug decoding.
-  /// @bug Implement Roaming D878UV code-plug decoding.
 
   return true;
 }
