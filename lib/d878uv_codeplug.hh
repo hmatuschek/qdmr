@@ -297,7 +297,7 @@ public:
     uint8_t _unused19;                  ///< Unused, set to 0.
 
     // Bytes 20-23
-    uint32_t contact_index;             ///< Contact index, zero-based, little-endian, none=0xffffffff.
+    uint32_t contact_index;             ///< Contact index, zero-based, little-endian.
 
     // Byte 24
     uint8_t id_index;                   ///< Index to radio-ID table.

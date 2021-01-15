@@ -291,7 +291,7 @@ D878UV::upload() {
     }
     emit uploadProgress(50+float(n*50)/_codeplug.image(0).numElements());
   }
-
+  //_codeplug.write("debug_codeplug.dfu");
   return true;
 }
 

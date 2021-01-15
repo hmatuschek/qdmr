@@ -487,7 +487,7 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     slot2 = (DigitalChannel::TimeSlot2 == dc->timeslot()) ? 1 : 0;
     // link transmit contact
     if (nullptr == dc->txContact()) {
-      contact_index = 0xffffffff;
+      contact_index = 0;
     } else {
       contact_index = qToLittleEndian(
             uint32_t(conf->contacts()->indexOfDigital(dc->txContact())));
