@@ -498,10 +498,10 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     else
       group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList());
     // Set GPS system index
-    /*if (nullptr != dc->gpsSystem()) {
+    if (nullptr != dc->gpsSystem()) {
       aprs_report = APRS_REPORT_DIGITAL;
       gps_system = conf->gpsSystems()->indexOf(dc->gpsSystem());
-    }*/
+    }
   }
 }
 
@@ -1034,7 +1034,7 @@ D878UVCodeplug::allocateUntouched() {
   // General config
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
   // GPS settings
-  //image(0).addElement(ADDR_GPS_SETTING, GPS_SETTING_SIZE);
+  image(0).addElement(ADDR_GPS_SETTING, GPS_SETTING_SIZE);
 
   /*
    * Kept but untouched memory regions.
@@ -1088,8 +1088,8 @@ D878UVCodeplug::allocateUntouched() {
   // FM broad-cast settings
   image(0).addElement(ADDR_FMBC, FMBC_SIZE+FMBC_VFO_SIZE);
   // APRS settings
-  //image(0).addElement(ADDR_APRS_SETTING, APRS_SETTING_SIZE);
-  //image(0).addElement(ADDR_APRS_MESSAGES, APRS_MESSAGES_SIZE);
+  image(0).addElement(ADDR_APRS_SETTING, APRS_SETTING_SIZE);
+  image(0).addElement(ADDR_APRS_MESSAGES, APRS_MESSAGES_SIZE);
 
   // Unknown memory region
   image(0).addElement(0x01042000, 0x020);
@@ -1493,13 +1493,12 @@ D878UVCodeplug::encode(Config *config, bool update)
   }
 
   // Encode GPS systems
-  /*
   gps_systems_t *gps = (gps_systems_t *)data(ADDR_GPS_SETTING);
   gps->fromGPSSystems(config);
   if (0 < config->gpsSystems()->count()) {
     aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
     aprs->setAutoTxInterval(config->gpsSystems()->gpsSystem(0)->period());
-  }*/
+  }
 
   return true;
 }
