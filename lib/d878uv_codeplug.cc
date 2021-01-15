@@ -623,8 +623,16 @@ bool
 D878UVCodeplug::grouplist_t::linkGroupList(RXGroupList *lst, const CodeplugContext &ctx) {
   for (uint8_t i=0; i<64; i++) {
     uint32_t idx = qFromLittleEndian(member[i]);
-    if ((0xffffffff == idx) || (! ctx.hasDigitalContact(idx)))
+    // Disabled contact -> continue
+    if (0xffffffff == idx)
       continue;
+    // Missing contact ignore.
+    if (! ctx.hasDigitalContact(idx)) {
+      logWarn() << "Cannot link contact " << member[i] << " to group list '"
+                << this->getName() << "': Invalid contact index. Ignored.";
+      continue;
+    }
+
     lst->addContact(ctx.getDigitalContact(idx));
   }
   return true;
