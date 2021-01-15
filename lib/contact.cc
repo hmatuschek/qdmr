@@ -187,6 +187,17 @@ ContactList::digitalContact(int idx) const {
   return nullptr;
 }
 
+DigitalContact *
+ContactList::findDigitalContact(uint number) const {
+  for (int i=0; i<_contacts.size(); i++) {
+    if (! _contacts.at(i)->is<DigitalContact>())
+      continue;
+    if (_contacts.at(i)->as<DigitalContact>()->number() == number)
+      return _contacts.at(i)->as<DigitalContact>();
+  }
+  return nullptr;
+}
+
 DTMFContact *
 ContactList::dtmfContact(int idx) const {
   for (int i=0; i<_contacts.size(); i++) {

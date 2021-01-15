@@ -93,7 +93,7 @@ uint32_t decode_dmr_id_bcd(const uint8_t *id) {
       + (id[3] & 15));
 }
 
-uint32_t decode_dmr_id_bcd_be(const uint8_t *id) {
+uint32_t decode_dmr_id_bcd_le(const uint8_t *id) {
   return ((id[3] >> 4) * 10000000
       + (id[3] & 15) * 1000000
       + (id[2] >> 4) * 100000
@@ -111,7 +111,7 @@ void encode_dmr_id_bcd(uint8_t *id, uint32_t no) {
   id[3] = ((no / 10 % 10) << 4)     | (no % 10);
 }
 
-void encode_dmr_id_bcd_be(uint8_t *id, uint32_t no) {
+void encode_dmr_id_bcd_le(uint8_t *id, uint32_t no) {
   id[3] = ((no / 10000000) << 4)    | ((no / 1000000) % 10);
   id[2] = ((no / 100000 % 10) << 4) | ((no / 10000) % 10);
   id[1] = ((no / 1000 % 10) << 4)   | ((no / 100) % 10);

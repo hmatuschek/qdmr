@@ -848,6 +848,8 @@ public:
     uint8_t _unknown61;            ///< Unknown, set to 01.
     uint8_t _unknown62;            ///< Unknown, set to 03.
     uint8_t _unknown63;            ///< Unknown, set to ff.
+
+    void setAutoTxInterval(int sec);
   };
 
   /** Represents the 8 GPS systems within the binary codeplug.
@@ -871,9 +873,20 @@ public:
 
     gps_systems_t();
     void clear();
+    bool isValid(int idx) const;
+
+    uint32_t getContactId(int idx) const;
+    void setContactId(int idx, uint32_t number);
+    DigitalContact::Type getContactType(int idx) const;
+    void setContactType(int idx, DigitalContact::Type type);
+
+    uint16_t getChannelIndex(int idx) const;
+    void setChannelIndex(int idx, uint16_t ch_index);
 
     void fromGPSSystems(const Config *conf);
     void fromGPSSystemObj(GPSSystem *sys, const Config *conf);
+    GPSSystem *toGPSSystemObj(int idx) const;
+    bool linkGPSSystem(int idx, GPSSystem *sys, const CodeplugContext &ctx) const;
   };
 
   /** Binary representation of the talker alias setting.

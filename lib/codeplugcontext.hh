@@ -47,6 +47,13 @@ public:
   /** Gets a scan list for the specified index or @c nullptr if not defined. */
   ScanList *getScanList(int index) const;
 
+  /** Returns @c true, if the given GPS system index has been defined before. */
+  bool hasGPSSystem(int index) const;
+  /** Adds a GPS system to the config and maps the given index to that GPS system. */
+  bool addGPSSystem(GPSSystem *sys, int index);
+  /** Gets a GPS system for the specified index or @c nullptr if not defined. */
+  GPSSystem *getGPSSystem(int index) const;
+
 protected:
   /** The wrapped radio config (aka abstract code-plug). */
   Config *_config;
@@ -58,6 +65,8 @@ protected:
   QHash<int, int> _groupListTable;
   /** Maps a code-plug scan-list index to the scan-list index within the wrapped radio config. */
   QHash<int, int> _scanListTable;
+  /** Maps a code-plug GPS system index to the GPS system index within the wrapped radio config. */
+  QHash<int, int> _gpsSystemTable;
 };
 
 #endif // CODEPLUGCONTEXT_HH

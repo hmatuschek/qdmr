@@ -105,3 +105,26 @@ CodeplugContext::addScanList(ScanList *lst, int index) {
   _scanListTable[index] = sidx;
   return true;
 }
+
+bool
+CodeplugContext::hasGPSSystem(int index) const {
+  return _gpsSystemTable.contains(index);
+}
+
+GPSSystem *
+CodeplugContext::getGPSSystem(int index) const {
+  if (! _gpsSystemTable.contains(index))
+    return nullptr;
+  return _config->gpsSystems()->gpsSystem(_gpsSystemTable[index]);
+}
+
+bool
+CodeplugContext::addGPSSystem(GPSSystem *sys, int index) {
+  if (_gpsSystemTable.contains(index))
+    return false;
+  int sidx = _config->gpsSystems()->count();
+  if (0 > _config->gpsSystems()->addGPSSystem(sys))
+    return false;
+  _gpsSystemTable[index] = sidx;
+  return true;
+}

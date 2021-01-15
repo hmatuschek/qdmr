@@ -164,6 +164,9 @@ public:
   Contact *contact(int idx) const;
   /** Returns the digital contact at index @c idx among digital contacts. */
   DigitalContact *digitalContact(int idx) const;
+  /** Searches for a digital contact with the given number. */
+  DigitalContact *findDigitalContact(uint number) const;
+
   /** Returns the DTMF contact at index @c idx among DTMF contacts. */
   DTMFContact *dtmfContact(int idx) const;
 
