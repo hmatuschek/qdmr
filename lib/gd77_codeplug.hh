@@ -222,7 +222,8 @@ protected:
     // Bytes 21-23
     uint8_t receive_tone;               ///< Call Receive Tone, 0=Off, 1=On.
     uint8_t ring_style;                 ///< Ring style: [0,10]
-    uint8_t valid;                      ///< Valid if 0xff, 0x00 otherwise.
+    uint8_t _unknown23;                 ///< Usually 0xff if valid, 0x00 otherwise. For OpenGD77
+                                        ///< unknown flags.
 
     /** Constructor. */
     contact_t();
