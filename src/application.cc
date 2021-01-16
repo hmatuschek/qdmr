@@ -276,7 +276,7 @@ Application::loadCodeplug() {
   }
 
   QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open codeplug"), QString(),
-                                                  tr("Codeplug Files (*.conf *.csv *.txt)"));
+                                                  tr("Codeplug Files (*.conf *.csv *.txt);;All Files (*)"));
   if (filename.isEmpty())
     return;
   QFile file(filename);
@@ -307,6 +307,11 @@ Application::saveCodeplug() {
                                                   tr("Codeplug Files (*.conf *.csv *.txt)"));
   if (filename.isEmpty())
     return;
+
+  // check for file suffix
+  QFileInfo info(filename);
+  if (("conf" != info.suffix()) && ("csv" != info.suffix()) && ("txt" != info.suffix()))
+    filename = filename + ".conf";
 
   QFile file(filename);
   if (!file.open(QIODevice::WriteOnly)) {
