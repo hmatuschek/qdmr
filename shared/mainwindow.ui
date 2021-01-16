@@ -630,10 +630,13 @@
         <item>
          <widget class="QLabel" name="gpsNote">
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">padding:10px;border: 2px solid black; border-radius: 10px;</string>
           </property>
           <property name="frameShape">
-           <enum>QFrame::Box</enum>
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
           </property>
           <property name="lineWidth">
            <number>2</number>

@@ -1,5 +1,6 @@
 #include "zonedialog.hh"
 
+#include "settings.hh"
 #include "config.hh"
 #include "zone.hh"
 #include "channel.hh"
@@ -24,6 +25,10 @@ ZoneDialog::ZoneDialog(Config *config, QWidget *parent)
 void
 ZoneDialog::construct() {
   setupUi(this);
+  Settings settings;
+
+  if (settings.hideZoneNote())
+    zoneHint->setVisible(false);
 
   if (_zone) {
     zoneName->setText(_zone->name());
@@ -63,6 +68,7 @@ ZoneDialog::construct() {
   connect(channelBDown, SIGNAL(clicked()), this, SLOT(onChannelBDown()));
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+  connect(zoneHint, SIGNAL(linkActivated(QString)), this, SLOT(onHideZoneHint()));
 }
 
 void
@@ -189,6 +195,13 @@ ZoneDialog::onChannelBDown() {
   QListWidgetItem *item = channelListB->takeItem(idx);
   channelListB->insertItem(idx+1, item);
   channelListB->setCurrentRow(idx+1);
+}
+
+void
+ZoneDialog::onHideZoneHint() {
+  zoneHint->setVisible(false);
+  Settings settings;
+  settings.setHideZoneNote(false);
 }
 
 Zone *

@@ -30,6 +30,8 @@ protected slots:
 	void onChannelBUp();
 	void onChannelBDown();
 
+  void onHideZoneHint();
+
 protected:
 	void construct();
 

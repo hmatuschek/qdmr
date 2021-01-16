@@ -133,6 +133,16 @@ Settings::setHideGPSNote(bool hide) {
 }
 
 bool
+Settings::hideZoneNote() const {
+  return value("hideZoneNote", false).toBool();
+}
+
+void
+Settings::setHideZoneNote(bool hide) {
+  setValue("hideZoneNote", hide);
+}
+
+bool
 Settings::showDisclaimer() const {
   return value("showDisclaimer", true).toBool();
 }
