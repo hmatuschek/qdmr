@@ -17,8 +17,9 @@ Currently, there are only few radios that are supported
   * TYT MD-UV390 / Retevis RT3S
   * Anytone AT-D878UV (since version 0.5.0)
 
-The limited amount of supported radios is due to the fact that I only own these radios to test
-the software with.
+A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available. 
+The limited amount of supported radios is due to the fact that I only
+own these radios to test the software with.
 
 
 ## Releases
@@ -78,7 +79,7 @@ the future. For the time being, however, you have to do that manually.
 
 ### Snap package and serial interface
 Please note that it is very hard to gain access to a serial port for a snap image, hence it is 
-(for now) *impossible to access the OpenGD77 and the upcoming AnyTone devices using the snap 
+(for now) *impossible to access OpenGD77 and AnyTone devices using the snap 
 package of qdmr*. Please resort to the DEB package from my PPA. Any other direct USB (non-serial) 
 interface should work (i.e., RD5-R, GD77 and Retevis/TyT).
 
