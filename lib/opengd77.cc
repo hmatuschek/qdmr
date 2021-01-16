@@ -18,6 +18,7 @@ static Radio::Features _open_gd77_features =
 
   1024,  // maxChannels
   16,    // maxChannelNameLength
+  true,  // allowChannelNoDefaultContact
 
   32,    // maxZones
   16,    // maxZoneNameLength

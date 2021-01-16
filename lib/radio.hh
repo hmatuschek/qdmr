@@ -26,8 +26,9 @@ class VerifyIssue {
 public:
   /** Issue type. */
 	typedef enum {
-		WARNING, ///< Verification warning, some configured fature is just ignored for the particular radio.
-    ERROR    ///< Verification error, a consistent device specific configutation cannot be derived from the generic config.
+    NOTIFICATION, ///< Inform user about changes made to the config to fit radio.
+    WARNING,      ///< Verification warning, some configured fature is just ignored for the particular radio.
+    ERROR         ///< Verification error, a consistent device specific configutation cannot be derived from the generic config.
 	} Type;
 
 public:
@@ -74,13 +75,15 @@ public:
     bool hasGPS;
     /** Maximum length of the radio name. */
 		int maxNameLength;
-    /** Maximum number of channels. */
+    /** Maximum length of boot messages. */
 		int maxIntroLineLength;
 
     /** Maximum number of channels. */
 		int maxChannels;
     /** Maximum length of channel names. */
 		int maxChannelNameLength;
+    /** If @c true, the radio allows channels without default contact. */
+    bool allowChannelNoDefaultContact;
 
     /** Maximum number of zones. */
 		int maxZones;

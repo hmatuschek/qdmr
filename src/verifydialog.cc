@@ -13,7 +13,9 @@ VerifyDialog::VerifyDialog(const QList<VerifyIssue> &issues, QWidget *parent)
       item->setForeground(Qt::red);
       valid = false;
     } else if (VerifyIssue::WARNING == issue.type()) {
-      item->setForeground(Qt::blue);
+      item->setForeground(Qt::black);
+    } else if (VerifyIssue::NOTIFICATION == issue.type()) {
+      item->setForeground(Qt::gray);
     }
     listWidget->addItem(item);
   }

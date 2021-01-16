@@ -17,6 +17,7 @@ static Radio::Features _uv390_features =
 
   3000,  // maxChannels;
   16,    // maxChannelNameLength;
+  true,  // allowChannelNoDefaultContact;
 
   250,   // maxZones;
   16,    // maxZoneNameLength;

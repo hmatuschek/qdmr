@@ -157,6 +157,13 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                       VerifyIssue::ERROR,
                       tr("Radio does not support analog channel'%1'")
                       .arg(channel->name())));
+
+    if (channel->is<DigitalChannel>() && channel->as<DigitalChannel>()->txContact()
+        && (! features().allowChannelNoDefaultContact))
+      issues.append(VerifyIssue(
+                      VerifyIssue::WARNING,
+                      tr("Radio requires TX contact for channel '%1'!")
+                      .arg(channel->name())));
   }
 
   /*
@@ -164,7 +171,7 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
    */
   if (config->zones()->count() > features().maxZones)
     issues.append(VerifyIssue(
-                    VerifyIssue::WARNING,
+                    VerifyIssue::ERROR,
                     tr("Number of zones %1 exceeds limit %2")
                     .arg(config->zones()->count()).arg(features().maxZones)));
 
@@ -195,6 +202,13 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                       VerifyIssue::ERROR,
                       tr("Number of channels %2 in zone '%1' B exceeds limit %3.")
                       .arg(zone->name()).arg(zone->A()->count()).arg(features().maxChannelsInZone)));
+
+    if ((0 < zone->B()->count()) && (! features().hasABZone))
+      issues.append(VerifyIssue(
+                      VerifyIssue::NOTIFICATION,
+                      tr("Radio does not support dual-zones. Zone '%1' will be split into two.")
+                      .arg(zone->name())));
+
   }
 
   /*

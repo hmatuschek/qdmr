@@ -19,6 +19,7 @@ static Radio::Features _d878uv_features =
 
   4000,  // maxChannels;
   16,    // maxChannelNameLength;
+  false, // allowChannelNoDefaultContact
 
   250,   // maxZones;
   16,    // maxZoneNameLength;

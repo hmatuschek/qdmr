@@ -16,6 +16,7 @@ static Radio::Features _rd5r_features =
 
   1024,  // maxChannels;
   16,    // maxChannelNameLength;
+  true,  // allowChannelNoDefaultContact;
 
   250,   // maxZones;
   16,    // maxZoneNameLength;
