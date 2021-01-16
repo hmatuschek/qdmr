@@ -98,6 +98,84 @@ GPSSystem::onRevertChannelDeleted() {
 
 
 /* ********************************************************************************************* *
+ * Implementation of APRSSystem
+ * ********************************************************************************************* */
+APRSSystem::APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, uint dSSID,
+                       const QString &src, uint srcSSID, Icon icon, const QString &message,
+                       uint period, QObject *parent)
+  : PositioningSystem(name, period, parent), _channel(channel), _destination(dest), _destSSID(dSSID),
+    _source(src), _srcSSID(srcSSID), _icon(icon), _message(message)
+{
+  // pass...
+}
+
+AnalogChannel *
+APRSSystem::channel() const {
+  return _channel;
+}
+void
+APRSSystem::setChannel(AnalogChannel *channel) {
+  if (_channel)
+    disconnect(_channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
+  _channel = channel;
+  if (_channel)
+    connect(_channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
+}
+
+const QString &
+APRSSystem::destination() const {
+  return _destination;
+}
+uint
+APRSSystem::destSSID() const {
+  return _destSSID;
+}
+void
+APRSSystem::setDestination(const QString &call, uint ssid) {
+  _destination = call;
+  _destSSID = ssid;
+}
+
+const QString &
+APRSSystem::source() const {
+  return _source;
+}
+uint
+APRSSystem::srcSSID() const {
+  return _srcSSID;
+}
+void
+APRSSystem::setSource(const QString &call, uint ssid) {
+  _source = call;
+  _srcSSID = ssid;
+}
+
+APRSSystem::Icon
+APRSSystem::icon() const {
+  return _icon;
+}
+void
+APRSSystem::setIcon(Icon icon) {
+  _icon = icon;
+}
+
+const QString &
+APRSSystem::message() const {
+  return _message;
+}
+void
+APRSSystem::setMessage(const QString &msg) {
+  _message = msg;
+}
+
+void
+APRSSystem::onChannelDeleted(QObject *obj) {
+  if (_channel == obj)
+    _channel = nullptr;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of GPSSystems table
  * ********************************************************************************************* */
 PositioningSystems::PositioningSystems(QObject *parent)
@@ -111,44 +189,10 @@ PositioningSystems::count() const {
   return _posSystems.size();
 }
 
-int
-PositioningSystems::gpsCount() const {
-  int c=0;
-  for (int i=0; i<_posSystems.size(); i++)
-    if (_posSystems.at(i)->is<GPSSystem>())
-      c++;
-  return c;
-}
-
-int
-PositioningSystems::aprsCount() const {
-  int c=0;
-  for (int i=0; i<_posSystems.size(); i++)
-    if (_posSystems.at(i)->is<APRSSystem>())
-      c++;
-  return c;
-}
-
 void
 PositioningSystems::clear() {
   for (int i=0; i<count(); i++)
     _posSystems[i]->deleteLater();
-}
-
-int
-PositioningSystems::indexOfGPSSys(GPSSystem *gps) const {
-  if (! _posSystems.contains(gps))
-    return -1;
-
-  int idx=0;
-  for (int i=0; i<count(); i++) {
-    if (gps == _posSystems.at(i))
-      return idx;
-    if (_posSystems.at(i)->is<GPSSystem>())
-      idx++;
-  }
-
-  return -1;
 }
 
 PositioningSystem *
@@ -156,21 +200,6 @@ PositioningSystems::system(int idx) const {
   if ((0>idx) || (idx >= _posSystems.size()))
     return nullptr;
   return _posSystems.at(idx);
-}
-
-GPSSystem *
-PositioningSystems::gpsSystem(int idx) const {
-  if ((0>idx) || (idx >= _posSystems.size()))
-    return nullptr;
-  for (int i=0; i<_posSystems.size(); i++) {
-    if (_posSystems.at(i)->is<GPSSystem>()) {
-      if (0==idx)
-        return _posSystems.at(i)->as<GPSSystem>();
-      else
-        idx--;
-    }
-  }
-  return nullptr;
 }
 
 int
@@ -234,6 +263,89 @@ PositioningSystems::moveDown(int row) {
   return true;
 }
 
+
+int
+PositioningSystems::gpsCount() const {
+  int c=0;
+  for (int i=0; i<_posSystems.size(); i++)
+    if (_posSystems.at(i)->is<GPSSystem>())
+      c++;
+  return c;
+}
+
+int
+PositioningSystems::indexOfGPSSys(GPSSystem *gps) const {
+  if (! _posSystems.contains(gps))
+    return -1;
+
+  int idx=0;
+  for (int i=0; i<count(); i++) {
+    if (gps == _posSystems.at(i))
+      return idx;
+    if (_posSystems.at(i)->is<GPSSystem>())
+      idx++;
+  }
+
+  return -1;
+}
+
+GPSSystem *
+PositioningSystems::gpsSystem(int idx) const {
+  if ((0>idx) || (idx >= _posSystems.size()))
+    return nullptr;
+  for (int i=0; i<_posSystems.size(); i++) {
+    if (_posSystems.at(i)->is<GPSSystem>()) {
+      if (0==idx)
+        return _posSystems.at(i)->as<GPSSystem>();
+      else
+        idx--;
+    }
+  }
+  return nullptr;
+}
+
+
+int
+PositioningSystems::aprsCount() const {
+  int c=0;
+  for (int i=0; i<_posSystems.size(); i++)
+    if (_posSystems.at(i)->is<APRSSystem>())
+      c++;
+  return c;
+}
+
+int
+PositioningSystems::indexOfAPRSSys(APRSSystem *aprs) const {
+  if (! _posSystems.contains(aprs))
+    return -1;
+
+  int idx=0;
+  for (int i=0; i<count(); i++) {
+    if (aprs == _posSystems.at(i))
+      return idx;
+    if (_posSystems.at(i)->is<APRSSystem>())
+      idx++;
+  }
+
+  return -1;
+}
+
+APRSSystem *
+PositioningSystems::aprsSystem(int idx) const {
+  if ((0>idx) || (idx >= _posSystems.size()))
+    return nullptr;
+  for (int i=0; i<_posSystems.size(); i++) {
+    if (_posSystems.at(i)->is<APRSSystem>()) {
+      if (0==idx)
+        return _posSystems.at(i)->as<APRSSystem>();
+      else
+        idx--;
+    }
+  }
+  return nullptr;
+}
+
+
 int
 PositioningSystems::rowCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
@@ -242,7 +354,7 @@ PositioningSystems::rowCount(const QModelIndex &idx) const {
 int
 PositioningSystems::columnCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
-  return 4;
+  return 6;
 }
 
 QVariant
@@ -256,16 +368,35 @@ PositioningSystems::data(const QModelIndex &index, int role) const {
 
   switch (index.column()) {
   case 0:
-    return sys->name();
+    if (sys->is<GPSSystem>())
+      return tr("DMR");
+    else if (sys->is<APRSSystem>())
+      return tr("APRS");
+    else
+      return tr("OOps!");
   case 1:
+    return sys->name();
+  case 2:
     if (sys->is<GPSSystem>())
       return sys->as<GPSSystem>()->contact()->name();
-  case 2:
-    return sys->period();
+    else if (sys->is<APRSSystem>())
+      return tr("%1-%2").arg(sys->as<APRSSystem>()->destination())
+          .arg(sys->as<APRSSystem>()->destSSID());
   case 3:
+    return sys->period();
+  case 4:
     if (sys->is<GPSSystem>())
       return (sys->as<GPSSystem>()->hasRevertChannel() ?
                 sys->as<GPSSystem>()->revertChannel()->name() : tr("[Selected]"));
+    else if (sys->is<APRSSystem>())
+      return (sys->as<APRSSystem>()->channel() ?
+                sys->as<APRSSystem>()->channel()->name() : tr("OOPS!"));
+  case 5:
+    if (sys->is<GPSSystem>())
+      return tr("[None]");
+    else if (sys->is<APRSSystem>())
+      return sys->as<APRSSystem>()->message();
+
   default:
     break;
   }
@@ -278,10 +409,12 @@ PositioningSystems::headerData(int section, Qt::Orientation orientation, int rol
   if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation))
     return QVariant();
   switch (section) {
-  case 0: return tr("Name");
-  case 1: return tr("Destination");
-  case 2: return tr("Period [s]");
-  case 3: return tr("Channel");
+  case 0: return tr("Type");
+  case 1: return tr("Name");
+  case 2: return tr("Destination");
+  case 3: return tr("Period [s]");
+  case 4: return tr("Channel");
+  case 5: return tr("Message");
   default:
     break;
   }
