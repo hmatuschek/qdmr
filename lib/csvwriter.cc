@@ -109,7 +109,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 12) CTCSS/DCS for transmit: frequency (e.g, 67.0), DCS number (e.g., n023 or i023) or '-' to disable\n"
             "# 13) Bandwidth in kHz: 12.5, 25\n"
             "#\n"
-            "Analog  Name                Receive     Transmit  Power Scan TOT RO Admit  Squelch RxTone TxTone Width\n";
+            "Analog  Name                Receive   Transmit   Power Scan TOT RO Admit  Squelch RxTone TxTone Width\n";
   for (int i=0; i<config->channelList()->count(); i++) {
     if (config->channelList()->channel(i)->is<DigitalChannel>())
       continue;
