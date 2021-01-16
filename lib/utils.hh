@@ -10,7 +10,7 @@
 #include <inttypes.h>
 
 #include "signaling.hh"
-
+#include "gpssystem.hh"
 
 /** Decodes the unicode string stored in @c data of size @c size. The @c fill code also defines the
  * end-of-string symbol.
@@ -66,5 +66,8 @@ bool validDTMFNumber(const QString &text);
 
 /** Formats a frequency in MHz passed as double. */
 QString format_frequency(double MHz);
+
+QString aprsicon2name(APRSSystem::Icon icon);
+APRSSystem::Icon name2aprsicon(const QString &name);
 
 #endif // UTILS_HH

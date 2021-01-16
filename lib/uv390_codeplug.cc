@@ -259,7 +259,7 @@ UV390Codeplug::channel_t::linkChannelObj(Channel *c, Config *conf) const {
     if (gps_system) {
       if ((gps_system-1) >= conf->posSystems()->gpsCount())
         return false;
-      dc->setGPSSystem(conf->posSystems()->gpsSystem(gps_system-1));
+      dc->setPosSystem(conf->posSystems()->gpsSystem(gps_system-1));
     }
     return true;
   }
@@ -307,8 +307,8 @@ UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf
     bandwidth = BW_12_5_KHZ;
     ctcss_dcs_receive = 0xffff;
     ctcss_dcs_transmit = 0xffff;
-    if (dchan->gpsSystem()) {
-      gps_system = conf->posSystems()->indexOfGPSSys(dchan->gpsSystem())+1;
+    if (dchan->posSystem() && dchan->posSystem()->is<GPSSystem>()) {
+      gps_system = conf->posSystems()->indexOfGPSSys(dchan->posSystem()->as<GPSSystem>())+1;
       send_gps_info = 0;
       recv_gps_info = 1;
     }

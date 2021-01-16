@@ -195,6 +195,13 @@ PositioningSystems::clear() {
     _posSystems[i]->deleteLater();
 }
 
+int
+PositioningSystems::indexOf(PositioningSystem *sys) const {
+  if (! _posSystems.contains(sys))
+    return -1;
+  return _posSystems.indexOf(sys);
+}
+
 PositioningSystem *
 PositioningSystems::system(int idx) const {
   if ((0>idx) || (idx >= _posSystems.size()))

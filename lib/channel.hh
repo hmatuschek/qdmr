@@ -10,7 +10,7 @@ class Config;
 class RXGroupList;
 class DigitalContact;
 class ScanList;
-class GPSSystem;
+class PositioningSystem;
 
 
 /** The base class of all channels (analog and digital) of a codeplug configuration.
@@ -252,7 +252,7 @@ public:
    * @param parent    Specified the @c QObject parent object. */
   DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
 	               bool rxOnly, Admit admit, uint colorCode, TimeSlot timeslot, RXGroupList *rxGroup,
-                 DigitalContact *txContact, GPSSystem *gpsSystem, ScanList *list, QObject *parent=nullptr);
+                 DigitalContact *txContact, PositioningSystem *posSystem, ScanList *list, QObject *parent=nullptr);
 
   /** Returns the admit criterion for the channel. */
 	Admit admit() const;
@@ -280,9 +280,9 @@ public:
 	bool setTXContact(DigitalContact *c);
 
   /** Returns the GPS system associated with this channel or @c nullptr if not set. */
-  GPSSystem *gpsSystem() const;
+  PositioningSystem *posSystem() const;
   /** Associates the GPS System with this channel. */
-  bool setGPSSystem(GPSSystem *gps);
+  bool setPosSystem(PositioningSystem *sys);
 
 protected slots:
   /** Internal callback if RX group list is deleted. */
@@ -304,7 +304,7 @@ protected:
   /** The default TX contact. */
 	DigitalContact *_txContact;
   /** The GPS system. */
-  GPSSystem *_gpsSystem;
+  PositioningSystem *_posSystem;
 };
 
 

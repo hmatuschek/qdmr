@@ -71,7 +71,7 @@ DigitalChannelDialog::construct() {
   for (int i=0; i<_config->posSystems()->gpsCount(); i++) {
     gpsSystem->addItem(_config->posSystems()->gpsSystem(i)->name(),
                        QVariant::fromValue(_config->posSystems()->gpsSystem(i)));
-    if (_channel && (_channel->gpsSystem() == _config->posSystems()->gpsSystem(i)))
+    if (_channel && (_channel->posSystem() == _config->posSystems()->gpsSystem(i)))
       gpsSystem->setCurrentIndex(i+1);
   }
 
@@ -128,7 +128,7 @@ DigitalChannelDialog::channel() {
     _channel->setTimeSlot(ts);
     _channel->setRXGroupList(rxgroup);
     _channel->setTXContact(contact);
-    _channel->setGPSSystem(gps);
+    _channel->setPosSystem(gps);
     return _channel;
   }
 

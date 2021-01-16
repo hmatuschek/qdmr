@@ -13,7 +13,7 @@ class Config;
 class DigitalContact;
 class RXGroupList;
 class Zone;
-class GPSSystem;
+class PositioningSystem;
 class ScanList;
 
 /// @cond with_internal_docs
@@ -30,6 +30,7 @@ public:
     /** Possible token types. */
     typedef enum {
       T_KEYWORD,         ///< A Keyword/Identifier.
+      T_APRSCALL,        ///< A APRS call of form CALL-SSID.
       T_STRING,          ///< A quoted string.
       T_NUMBER,          ///< An integer or floating point number.
       T_DCS_N,           ///< A normal DCS code number.
@@ -156,6 +157,11 @@ public:
   /** Gets called once a GPS system has been parsed. */
   virtual bool handleGPSSystem(qint64 idx, const QString &name, qint64 contactIdx, qint64 period,
                                qint64 revertChannelIdx, qint64 line, qint64 column, QString &errorMessage);
+  /** Gets called once a APRS system has been parsed. */
+  virtual bool handleAPRSSystem(qint64 idx, const QString &name, qint64 channelIdx, qint64 period,
+                                const QString &src, uint srcSSID, const QString &dest, uint destSSID,
+                                const QString &icon, const QString &message,
+                                qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a scan list has been parsed. */
   virtual bool handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
                               const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage);
@@ -219,6 +225,10 @@ protected:
   bool _parse_gps_systems(CSVLexer &lexer);
   /** Internal function to parse a GPS system. */
   bool _parse_gps_system(qint64 id, CSVLexer &lexer);
+  /** Internal function to parse a APRS system list. */
+  bool _parse_aprs_systems(CSVLexer &lexer);
+  /** Internal function to parse a APRS system. */
+  bool _parse_aprs_system(qint64 id, CSVLexer &lexer);
   /** Internal function to parse a scanlist list. */
   bool _parse_scanlists(CSVLexer &lexer);
   /** Internal function to parse a scanlist. */
@@ -274,6 +284,10 @@ public:
                           qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleGPSSystem(qint64 idx, const QString &name, qint64 contactIdx, qint64 period,
                                qint64 revertChannelIdx, qint64 line, qint64 column, QString &errorMessage);
+  virtual bool handleAPRSSystem(qint64 idx, const QString &name, qint64 channelIdx, qint64 period,
+                                const QString &src, uint srcSSID, const QString &dest, uint destSSID,
+                                const QString &icon, const QString &message,
+                                qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
                               const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage);
 
@@ -291,7 +305,7 @@ protected:
   /** Index <-> Zone map. */
   QMap<int, Zone *> _zones;
   /** Index <-> GPS System map. */
-  QMap<int, GPSSystem *> _gpsSystems;
+  QMap<int, PositioningSystem *> _posSystems;
   /** Index <-> Scan list map. */
   QMap<int, ScanList *> _scanlists;
 };

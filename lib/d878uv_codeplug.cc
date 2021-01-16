@@ -498,9 +498,9 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     else
       group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList());
     // Set GPS system index
-    if (nullptr != dc->gpsSystem()) {
+    if (dc->posSystem() && dc->posSystem()->is<GPSSystem>()) {
       aprs_report = APRS_REPORT_DIGITAL;
-      gps_system = conf->posSystems()->indexOfGPSSys(dc->gpsSystem());
+      gps_system = conf->posSystems()->indexOfGPSSys(dc->posSystem()->as<GPSSystem>());
     }
   }
 }

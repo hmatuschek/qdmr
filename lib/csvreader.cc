@@ -7,18 +7,19 @@
 #include <QDebug>
 
 QVector< QPair<QRegExp, CSVLexer::Token::TokenType> > CSVLexer::_pattern = {
-  { QRegExp("^n([0-9]{3})"),                   CSVLexer::Token::T_DCS_N },
-  { QRegExp("^i([0-9]{3})"),                   CSVLexer::Token::T_DCS_I },
-  { QRegExp("^([a-zA-Z_][a-zA-Z0-9_]*)"),      CSVLexer::Token::T_KEYWORD },
-  { QRegExp("^\"([^\"\r\n]*)\""),              CSVLexer::Token::T_STRING },
-  { QRegExp("^([+-]?[0-9]+(\\.[0-9]*)?)"),     CSVLexer::Token::T_NUMBER },
-  { QRegExp("^(:)"),                           CSVLexer::Token::T_COLON },
-  { QRegExp("^(-)"),                           CSVLexer::Token::T_NOT_SET },
-  { QRegExp("^(\\+)"),                         CSVLexer::Token::T_ENABLED },
-  { QRegExp("^(,)"),                           CSVLexer::Token::T_COMMA },
-  { QRegExp("^([ \t]+)"),                      CSVLexer::Token::T_WHITESPACE },
-  { QRegExp("^(\r?\n)"),                       CSVLexer::Token::T_NEWLINE},
-  { QRegExp("^(#[^\n\r]*)"),                   CSVLexer::Token::T_COMMENT},
+  { QRegExp("^n([0-9]{3})"),                     CSVLexer::Token::T_DCS_N },
+  { QRegExp("^i([0-9]{3})"),                     CSVLexer::Token::T_DCS_I },
+  { QRegExp("^([a-zA-Z0-9]{1,6}-[0-9]{1,2})"),   CSVLexer::Token::T_APRSCALL },
+  { QRegExp("^([a-zA-Z_][a-zA-Z0-9_]*)"),        CSVLexer::Token::T_KEYWORD },
+  { QRegExp("^\"([^\"\r\n]*)\""),                CSVLexer::Token::T_STRING },
+  { QRegExp("^([+-]?[0-9]+(\\.[0-9]*)?)"),       CSVLexer::Token::T_NUMBER },
+  { QRegExp("^(:)"),                             CSVLexer::Token::T_COLON },
+  { QRegExp("^(-)"),                             CSVLexer::Token::T_NOT_SET },
+  { QRegExp("^(\\+)"),                           CSVLexer::Token::T_ENABLED },
+  { QRegExp("^(,)"),                             CSVLexer::Token::T_COMMA },
+  { QRegExp("^([ \t]+)"),                        CSVLexer::Token::T_WHITESPACE },
+  { QRegExp("^(\r?\n)"),                         CSVLexer::Token::T_NEWLINE},
+  { QRegExp("^(#[^\n\r]*)"),                     CSVLexer::Token::T_COMMENT},
 };
 
 
@@ -285,6 +286,28 @@ CSVHandler::handleGPSSystem(
 }
 
 bool
+CSVHandler::handleAPRSSystem(
+    qint64 idx, const QString &name, qint64 channelIdx, qint64 period,
+    const QString &src, uint srcSSID, const QString &dest, uint destSSID,
+    const QString &icon, const QString &message, qint64 line, qint64 column, QString &errorMessage)
+{
+  Q_UNUSED(idx);
+  Q_UNUSED(name);
+  Q_UNUSED(channelIdx);
+  Q_UNUSED(period);
+  Q_UNUSED(src);
+  Q_UNUSED(srcSSID);
+  Q_UNUSED(dest);
+  Q_UNUSED(destSSID);
+  Q_UNUSED(icon);
+  Q_UNUSED(message);
+  Q_UNUSED(line);
+  Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
+  return true;
+}
+
+bool
 CSVHandler::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
                            const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage)
 {
@@ -363,6 +386,9 @@ CSVParser::parse(QTextStream &stream) {
         return false;
     } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("gps" == token.value.toLower())) {
       if (! _parse_gps_systems(lexer))
+        return false;
+    } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("aprs" == token.value.toLower())) {
+      if (! _parse_aprs_systems(lexer))
         return false;
     } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("scanlist" == token.value.toLower())) {
       if (! _parse_scanlists(lexer))
@@ -1298,6 +1324,118 @@ CSVParser::_parse_gps_system(qint64 id, CSVLexer &lexer) {
 
 
 bool
+CSVParser::_parse_aprs_systems(CSVLexer &lexer) {
+  // skip rest of header
+  CSVLexer::Token token = lexer.next();
+  for (; CSVLexer::Token::T_KEYWORD==token.type; token=lexer.next()) {
+    // skip
+  }
+  if (CSVLexer::Token::T_NEWLINE != token.type) {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
+  for (; CSVLexer::Token::T_NUMBER == token.type; token=lexer.next()) {
+    qint64 idx = token.value.toInt();
+    if (! _parse_aprs_system(idx, lexer))
+      return false;
+  }
+
+  if ((CSVLexer::Token::T_NEWLINE == token.type) || (CSVLexer::Token::T_END_OF_STREAM == token.type))
+    return true;
+
+  _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+      .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+  return false;
+}
+
+bool
+CSVParser::_parse_aprs_system(qint64 id, CSVLexer &lexer) {
+  CSVLexer::Token token = lexer.next();
+  qint64 line=token.line, column=token.column;
+  if (CSVLexer::Token::T_STRING != token.type) {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+  QString name = token.value;
+
+  qint64 channel;
+  token = lexer.next();
+  if (CSVLexer::Token::T_NUMBER == token.type) {
+    channel = token.value.toInt();
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  qint64 period;
+  token = lexer.next();
+  if (CSVLexer::Token::T_NUMBER == token.type) {
+    period = token.value.toInt();
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
+  QString src=""; uint srcSSID=0;
+  if (CSVLexer::Token::T_APRSCALL == token.type) {
+    QStringList lst = token.value.split('-');
+    src = lst.first(); srcSSID = lst.last().toInt();
+  } else if ((CSVLexer::Token::T_KEYWORD == token.type) && (token.value.size()<=6)) {
+    src = token.value;
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected APRS call.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
+  QString dest=""; uint destSSID=0;
+  if (CSVLexer::Token::T_APRSCALL == token.type) {
+    QStringList lst = token.value.split('-');
+    dest = lst.first(); destSSID = lst.last().toInt();
+  } else if ((CSVLexer::Token::T_KEYWORD == token.type) && (token.value.size()<=6)) {
+    dest = token.value;
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected APRS call.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
+  QString iconname;
+  if ((CSVLexer::Token::T_KEYWORD == token.type) || (CSVLexer::Token::T_STRING == token.type)) {
+    iconname = token.value;
+  } else if (CSVLexer::Token::T_NOT_SET == token.type) {
+    iconname = "";
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected keyword or string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
+  QString message;
+  if (CSVLexer::Token::T_STRING == token.type) {
+    message = token.value;
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  return _handler->handleAPRSSystem(id, name, channel, period, src, srcSSID, dest, destSSID,
+                                    iconname, message, line, column, _errorMessage);
+}
+
+
+bool
 CSVParser::_parse_scanlists(CSVLexer &lexer) {
   // skip rest of header
   CSVLexer::Token token = lexer.next();
@@ -1643,12 +1781,12 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
     }
     _channels[idx]->as<DigitalChannel>()->setScanList(_scanlists[scan]);
     // Check GPS System
-    if ((0<gps) && (! _gpsSystems.contains(gps))) {
+    if ((0<gps) && (! _posSystems.contains(gps))) {
       errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown system index %4.")
           .arg(line).arg(column).arg(name).arg(gps);
       return false;
     }
-    _channels[idx]->as<DigitalChannel>()->setGPSSystem(_gpsSystems[gps]);
+    _channels[idx]->as<DigitalChannel>()->setPosSystem(_posSystems[gps]);
     return true;
   }
 
@@ -1736,6 +1874,7 @@ CSVReader::handleGPSSystem(
     qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
+    GPSSystem *gps = _posSystems[idx]->as<GPSSystem>();
     // Check contact ID
     if (! _digital_contacts.contains(contactIdx)) {
       errorMessage = QString("Parse error @ %1,%2: Cannot create GPS system '%3', unknown destination contact ID %4.")
@@ -1743,7 +1882,7 @@ CSVReader::handleGPSSystem(
       logError() << errorMessage;
       return false;
     }
-    _gpsSystems[idx]->setContact(_digital_contacts[contactIdx]);
+    gps->setContact(_digital_contacts[contactIdx]);
 
     if (revertChannelIdx) {
       if (! _channels.contains(revertChannelIdx))  {
@@ -1756,22 +1895,62 @@ CSVReader::handleGPSSystem(
             .arg(line).arg(column).arg(name).arg(revertChannelIdx);
         return false;
       }
-      _gpsSystems[idx]->setRevertChannel(_channels[revertChannelIdx]->as<DigitalChannel>());
+      gps->setRevertChannel(_channels[revertChannelIdx]->as<DigitalChannel>());
     }
 
     return true;
   }
 
   // check index
-  if (_gpsSystems.contains(idx)) {
+  if (_posSystems.contains(idx)) {
     errorMessage = QString("Parse error @ %1,%2: Cannot create GPS system '%3' with index %4, index already taken.")
         .arg(line).arg(column).arg(name).arg(idx);
     return false;
   }
 
   GPSSystem *gps = new GPSSystem(name, nullptr, nullptr, period);
-  _gpsSystems[idx] = gps;
+  _posSystems[idx] = gps;
   _config->posSystems()->addSystem(gps);
+
+  return true;
+}
+
+bool
+CSVReader::handleAPRSSystem(
+    qint64 idx, const QString &name, qint64 channelIdx, qint64 period,
+    const QString &src, uint srcSSID, const QString &dest, uint destSSID,
+    const QString &iconname, const QString &message,
+    qint64 line, qint64 column, QString &errorMessage)
+{
+  if (_link) {
+    APRSSystem *aprs = _posSystems[idx]->as<APRSSystem>();
+    if (! _channels.contains(channelIdx))  {
+      errorMessage = QString("Parse error @ %1,%2: Cannot create APRS system '%3', unknown channel ID %4.")
+          .arg(line).arg(column).arg(name).arg(channelIdx);
+      return false;
+    }
+    if (! _channels[channelIdx]->is<AnalogChannel>()) {
+      errorMessage = QString("Parse error @ %1,%2: Cannot create APRS system '%3', transmit channel %4 is not an analog channel.")
+          .arg(line).arg(column).arg(name).arg(channelIdx);
+      return false;
+    }
+    aprs->setChannel(_channels[channelIdx]->as<AnalogChannel>());
+
+    return true;
+  }
+
+  // check index
+  if (_posSystems.contains(idx)) {
+    errorMessage = QString("Parse error @ %1,%2: Cannot create GPS system '%3' with index %4, index already taken.")
+        .arg(line).arg(column).arg(name).arg(idx);
+    return false;
+  }
+
+  APRSSystem::Icon icon = name2aprsicon(iconname);
+  APRSSystem *aprs = new APRSSystem(name, nullptr, dest, destSSID, src, srcSSID, icon,
+                                    message, period);
+  _posSystems[idx] = aprs;
+  _config->posSystems()->addSystem(aprs);
 
   return true;
 }

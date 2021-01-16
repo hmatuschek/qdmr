@@ -84,15 +84,15 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
       stream << qSetFieldWidth(4)  << left << '-';
     else
       stream << qSetFieldWidth(4) << left << (config->contacts()->indexOf(digi->txContact())+1);
-    if (nullptr == digi->gpsSystem())
+    if (nullptr == digi->posSystem())
       stream << qSetFieldWidth(4) << left << "-";
     else
-      stream << qSetFieldWidth(4) << left << config->posSystems()->indexOfGPSSys(digi->gpsSystem())+1;
+      stream << qSetFieldWidth(4) << left << config->posSystems()->indexOf(digi->posSystem())+1;
     if (digi->txContact())
       stream << qSetFieldWidth(0) << "# " << digi->txContact()->name();
     stream << qSetFieldWidth(0) << "\n";
   }
-  stream << "\n";
+  stream << qSetFieldWidth(0) << left << "\n";
 
   stream << "# Table of analog channels.\n"
             "# 1) Channel number.\n"
@@ -133,7 +133,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
            << qSetFieldWidth(5) << left << (AnalogChannel::BWWide == analog->bandwidth() ? 25.0 : 12.5)
            << qSetFieldWidth(0) << "\n";
   }
-  stream << "\n";
+  stream << qSetFieldWidth(0) << left << "\n";
 
   stream << "# Table of channel zones.\n"
             "# 1) Zone number\n"
@@ -165,7 +165,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
       stream << qSetFieldWidth(0) << tmp.join(",") << "\n";
     }
   }
-  stream << "\n";
+  stream << qSetFieldWidth(0) << left << "\n";
 
   stream << "# Table of scan lists.\n"
             "# 1) Scan list number.\n"
@@ -210,7 +210,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     }
     stream << qSetFieldWidth(0) << tmp.join(",") << "\n";
   }
-  stream << "\n";
+  stream << qSetFieldWidth(0) << left << "\n";
 
   stream << "# Table of GPS systems.\n"
             "# 1) GPS system ID\n"
@@ -220,8 +220,10 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 5) Revert channel ID or '-'.\n"
             "#\n"
             "GPS  Name                Dest Period Revert\n";
-  for (int i=0; i<config->posSystems()->gpsCount(); i++) {
-    GPSSystem *gps = config->posSystems()->gpsSystem(i);
+  for (int i=0; i<config->posSystems()->count(); i++) {
+    if (! config->posSystems()->system(i)->is<GPSSystem>())
+      continue;
+    GPSSystem *gps = config->posSystems()->system(i)->as<GPSSystem>();
     stream << qSetFieldWidth(5)  << left << (i+1)
            << qSetFieldWidth(20) << left << ("\"" + gps->name() + "\"")
            << qSetFieldWidth(5)  << left << config->contacts()->indexOfDigital(gps->contact())+1
@@ -230,7 +232,33 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
            << ( (gps->hasRevertChannel()) ? QString::number(config->channelList()->indexOf(gps->revertChannel())+1) : "-" )
            << "\n";
   }
-  stream << "\n";
+  stream << qSetFieldWidth(0) << left << "\n";
+
+  stream << "# Table of APRS systems (there is usually only one).\n"
+            "# 1) APRS system ID\n"
+            "# 2) Name in quotes.\n"
+            "# 3) Transmit channel ID.\n"
+            "# 4) Transmit period in seconds.\n"
+            "# 5) Your (source) call and SSID as CALLSIGN-SSID.\n"
+            "# 6) Destination call and SSID as CALLSIGN-SSID.\n"
+            "# 7) Icon name.\n"
+            "# 8) Message, optional message in quotes.\n"
+            "#\n"
+            "APRS Name                Channel Period Source      Destination Icon        Message\n";
+  for(int i=0; i<config->posSystems()->aprsCount(); i++) {
+    if (! config->posSystems()->system(i)->is<APRSSystem>())
+      continue;
+    APRSSystem *aprs = config->posSystems()->system(i)->as<APRSSystem>();
+    stream << qSetFieldWidth(5) << left << (i+1)
+           << qSetFieldWidth(20) << left << ("\""+aprs->name()+"\"")
+           << qSetFieldWidth(8) << left << (config->channelList()->indexOf(aprs->channel())+1)
+           << qSetFieldWidth(7) << left << aprs->period()
+           << qSetFieldWidth(12) << left << QString("%1-%2").arg(aprs->source()).arg(aprs->srcSSID())
+           << qSetFieldWidth(12) << left << QString("%1-%2").arg(aprs->destination()).arg(aprs->destSSID())
+           << qSetFieldWidth(12) << left << ("\""+aprsicon2name(aprs->icon())+"\"")
+           << qSetFieldWidth(0) << left << ("\""+aprs->message()+"\"") << "\n";
+   }
+  stream << qSetFieldWidth(0) << left << "\n";
 
   stream << "# Table of contacts.\n"
             "# 1) Contact number.\n"
@@ -262,7 +290,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
       stream << qSetFieldWidth(0) << "\n";
     }
   }
-  stream << "\n";
+  stream << qSetFieldWidth(0) << left << "\n";
 
   stream << "# Table of group lists.\n"
             "# 1) Group list number.\n"
@@ -280,7 +308,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     }
     stream << qSetFieldWidth(0) << tmp.join(",") << "\n";
   }
-  stream << "\n";
+  stream << qSetFieldWidth(0) << left << "\n";
 
   return true;
 }

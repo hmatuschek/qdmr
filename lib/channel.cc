@@ -193,17 +193,17 @@ AnalogChannel::setBandwidth(Bandwidth bw) {
 DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power,
                                uint txto, bool rxOnly, Admit admit, uint colorCode,
                                TimeSlot timeslot, RXGroupList *rxGroup, DigitalContact *txContact,
-                               GPSSystem *gpsSystem, ScanList *list, QObject *parent)
+                               PositioningSystem *posSystem, ScanList *list, QObject *parent)
   : Channel(name, rxFreq, txFreq, power, txto, rxOnly, list, parent), _admit(admit),
     _colorCode(colorCode), _timeSlot(timeslot), _rxGroup(rxGroup), _txContact(txContact),
-    _gpsSystem(gpsSystem)
+    _posSystem(posSystem)
 {
   if (_rxGroup)
     connect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));
   if (_txContact)
     connect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
-  if (_gpsSystem)
-    connect(_gpsSystem, SIGNAL(destroyed()), this, SLOT(onGPSSystemDeleted()));
+  if (_posSystem)
+    connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onGPSSystemDeleted()));
 }
 
 DigitalChannel::Admit
@@ -270,18 +270,17 @@ DigitalChannel::setTXContact(DigitalContact *c) {
   return true;
 }
 
-GPSSystem *
-DigitalChannel::gpsSystem() const {
-  return _gpsSystem;
+PositioningSystem *DigitalChannel::posSystem() const {
+  return _posSystem;
 }
 
 bool
-DigitalChannel::setGPSSystem(GPSSystem *gps) {
-  if (_gpsSystem)
-    disconnect(_gpsSystem, SIGNAL(destroyed()), this, SLOT(onGPSSystemDeleted()));
-  _gpsSystem = gps;
-  if (_gpsSystem)
-    connect(_gpsSystem, SIGNAL(destroyed()), this, SLOT(onGPSSystemDeleted()));
+DigitalChannel::setPosSystem(PositioningSystem *sys) {
+  if (_posSystem)
+    disconnect(_posSystem, SIGNAL(destroyed()), this, SLOT(onGPSSystemDeleted()));
+  _posSystem = sys;
+  if (_posSystem)
+    connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onGPSSystemDeleted()));
   emit modified();
   return true;
 }
@@ -298,7 +297,7 @@ DigitalChannel::onTxContactDeleted() {
 
 void
 DigitalChannel::onGPSSystemDeleted() {
-  setGPSSystem(nullptr);
+  setPosSystem(nullptr);
 }
 
 
@@ -524,8 +523,8 @@ ChannelList::data(const QModelIndex &index, int role) const {
     break;
   case 13:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->gpsSystem())
-        return digi->gpsSystem()->name();
+      if (digi->posSystem())
+        return digi->posSystem()->name();
       else
         return tr("-");
     } else if (channel->is<AnalogChannel>()) {

@@ -185,6 +185,7 @@ public:
   /** Returns the number of Positioning systems in this list. */
   int count() const;
   PositioningSystem *system(int idx) const;
+  int indexOf(PositioningSystem *sys) const;
   /** Adds a positioning system to the list at the specified row.
    * If row<0 the system gets appendet to the list.*/
   int addSystem(PositioningSystem *sys, int row=-1);

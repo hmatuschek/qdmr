@@ -245,3 +245,13 @@ QString
 format_frequency(double MHz) {
   return QString::number(MHz, 'f', 5);
 }
+
+QString
+aprsicon2name(APRSSystem::Icon icon) {
+  return "-";
+}
+
+APRSSystem::Icon
+name2aprsicon(const QString &name) {
+  return APRSSystem::APRS_ICON_NO_SYMBOL;
+}
