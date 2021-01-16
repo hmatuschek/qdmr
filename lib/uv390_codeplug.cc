@@ -257,9 +257,9 @@ UV390Codeplug::channel_t::linkChannelObj(Channel *c, Config *conf) const {
       dc->setRXGroupList(conf->rxGroupLists()->list(group_list_index-1));
     }
     if (gps_system) {
-      if ((gps_system-1) >= conf->gpsSystems()->count())
+      if ((gps_system-1) >= conf->posSystems()->gpsCount())
         return false;
-      dc->setGPSSystem(conf->gpsSystems()->gpsSystem(gps_system-1));
+      dc->setGPSSystem(conf->posSystems()->gpsSystem(gps_system-1));
     }
     return true;
   }
@@ -308,7 +308,7 @@ UV390Codeplug::channel_t::fromChannelObj(const Channel *chan, const Config *conf
     ctcss_dcs_receive = 0xffff;
     ctcss_dcs_transmit = 0xffff;
     if (dchan->gpsSystem()) {
-      gps_system = conf->gpsSystems()->indexOf(dchan->gpsSystem())+1;
+      gps_system = conf->posSystems()->indexOfGPSSys(dchan->gpsSystem())+1;
       send_gps_info = 0;
       recv_gps_info = 1;
     }
@@ -1448,8 +1448,8 @@ UV390Codeplug::encode(Config *config, bool update) {
   // Define GPS systems
   for (int i=0; i<NGPSSYSTEMS; i++) {
     gpssystem_t *gps = (gpssystem_t *)(data(OFFSET_GPS_SYS+i*sizeof(gpssystem_t)));
-    if (i < config->gpsSystems()->count())
-      gps->fromGPSSystemObj(config->gpsSystems()->gpsSystem(i), config);
+    if (i < config->posSystems()->gpsCount())
+      gps->fromGPSSystemObj(config->posSystems()->gpsSystem(i), config);
     else
       gps->clear();
   }
@@ -1598,7 +1598,7 @@ UV390Codeplug::decode(Config *config) {
     if (! gps->isValid())
       break;
     if (GPSSystem *obj = gps->toGPSSystemObj()) {
-      config->gpsSystems()->addGPSSystem(obj);
+      config->posSystems()->addSystem(obj);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid GPS system at index %2.")
           .arg(__func__).arg(i);
@@ -1665,9 +1665,9 @@ UV390Codeplug::decode(Config *config) {
   }
 
   // Link GPS systems
-  for (int i=0; i<config->gpsSystems()->count(); i++) {
+  for (int i=0; i<config->posSystems()->gpsCount(); i++) {
     gpssystem_t *gps = (gpssystem_t *)(data(OFFSET_GPS_SYS+i*sizeof(gpssystem_t)));
-    if (! gps->linkGPSSystemObj(config->gpsSystems()->gpsSystem(i), config)) {
+    if (! gps->linkGPSSystemObj(config->posSystems()->gpsSystem(i), config)) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link GPS system at index %2.")
           .arg(__func__).arg(i);
       logError() << _errorMessage;

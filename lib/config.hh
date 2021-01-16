@@ -51,8 +51,8 @@ public:
   ZoneList *zones() const;
   /** Retruns the list of scanlists. */
   ScanLists *scanlists() const;
-  /** Returns the list of GPS systems. */
-  GPSSystems *gpsSystems() const;
+  /** Returns the list of positioning systems. */
+  PositioningSystems *posSystems() const;
 
   /** Returns the DMR ID of the radio. */
   uint id() const;
@@ -130,7 +130,7 @@ protected:
   /** The list of scan lists. */
   ScanLists *_scanlists;
   /** The list of GPS Systems. */
-  GPSSystems *_gpsSystems;
+  PositioningSystems *_gpsSystems;
 
   /** DMR id of the radio. */
   uint _id;

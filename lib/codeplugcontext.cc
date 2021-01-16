@@ -115,15 +115,15 @@ GPSSystem *
 CodeplugContext::getGPSSystem(int index) const {
   if (! _gpsSystemTable.contains(index))
     return nullptr;
-  return _config->gpsSystems()->gpsSystem(_gpsSystemTable[index]);
+  return _config->posSystems()->gpsSystem(_gpsSystemTable[index]);
 }
 
 bool
 CodeplugContext::addGPSSystem(GPSSystem *sys, int index) {
   if (_gpsSystemTable.contains(index))
     return false;
-  int sidx = _config->gpsSystems()->count();
-  if (0 > _config->gpsSystems()->addGPSSystem(sys))
+  int sidx = _config->posSystems()->gpsCount();
+  if (0 > _config->posSystems()->addSystem(sys))
     return false;
   _gpsSystemTable[index] = sidx;
   return true;

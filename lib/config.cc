@@ -16,7 +16,7 @@
 Config::Config(UserDatabase *userdb, QObject *parent)
   : QObject(parent), _modified(false), _contacts(new ContactList(this)), _rxGroupLists(new RXGroupLists(this)),
     _channels(new ChannelList(this)), _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
-    _gpsSystems(new GPSSystems(this)),
+    _gpsSystems(new PositioningSystems(this)),
     _id(0), _name(), _introLine1(), _introLine2(), _mic_level(2),
     _speech(false), _uploadUserDB(false), _userDB(userdb)
 {
@@ -65,8 +65,8 @@ Config::scanlists() const {
   return _scanlists;
 }
 
-GPSSystems *
-Config::gpsSystems() const {
+PositioningSystems *
+Config::posSystems() const {
   return _gpsSystems;
 }
 

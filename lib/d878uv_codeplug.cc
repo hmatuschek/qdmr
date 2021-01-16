@@ -500,7 +500,7 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     // Set GPS system index
     if (nullptr != dc->gpsSystem()) {
       aprs_report = APRS_REPORT_DIGITAL;
-      gps_system = conf->gpsSystems()->indexOf(dc->gpsSystem());
+      gps_system = conf->posSystems()->indexOfGPSSys(dc->gpsSystem());
     }
   }
 }
@@ -892,7 +892,7 @@ D878UVCodeplug::gps_systems_t::setChannelIndex(int idx, uint16_t ch_index) {
 
 void
 D878UVCodeplug::gps_systems_t::fromGPSSystemObj(GPSSystem *sys, const Config *conf) {
-  int idx = conf->gpsSystems()->indexOf(sys);
+  int idx = conf->posSystems()->indexOfGPSSys(sys);
   if ((idx < 0) || idx > 7)
     return;
   if (sys->hasContact()) {
@@ -907,10 +907,10 @@ D878UVCodeplug::gps_systems_t::fromGPSSystemObj(GPSSystem *sys, const Config *co
 
 void
 D878UVCodeplug::gps_systems_t::fromGPSSystems(const Config *conf) {
-  if (conf->gpsSystems()->count() > 8)
+  if (conf->posSystems()->gpsCount() > 8)
     return;
-  for (int i=0; i<conf->gpsSystems()->count(); i++)
-    fromGPSSystemObj(conf->gpsSystems()->gpsSystem(i), conf);
+  for (int i=0; i<conf->posSystems()->gpsCount(); i++)
+    fromGPSSystemObj(conf->posSystems()->gpsSystem(i), conf);
 }
 
 GPSSystem *
@@ -1495,9 +1495,9 @@ D878UVCodeplug::encode(Config *config, bool update)
   // Encode GPS systems
   gps_systems_t *gps = (gps_systems_t *)data(ADDR_GPS_SETTING);
   gps->fromGPSSystems(config);
-  if (0 < config->gpsSystems()->count()) {
+  if (0 < config->posSystems()->gpsCount()) {
     aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
-    aprs->setAutoTxInterval(config->gpsSystems()->gpsSystem(0)->period());
+    aprs->setAutoTxInterval(config->posSystems()->gpsSystem(0)->period());
   }
 
   return true;

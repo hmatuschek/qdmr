@@ -87,7 +87,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     if (nullptr == digi->gpsSystem())
       stream << qSetFieldWidth(4) << left << "-";
     else
-      stream << qSetFieldWidth(4) << left << config->gpsSystems()->indexOf(digi->gpsSystem())+1;
+      stream << qSetFieldWidth(4) << left << config->posSystems()->indexOfGPSSys(digi->gpsSystem())+1;
     if (digi->txContact())
       stream << qSetFieldWidth(0) << "# " << digi->txContact()->name();
     stream << qSetFieldWidth(0) << "\n";
@@ -220,8 +220,8 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 5) Revert channel ID or '-'.\n"
             "#\n"
             "GPS  Name                Dest Period Revert\n";
-  for (int i=0; i<config->gpsSystems()->count(); i++) {
-    GPSSystem *gps = config->gpsSystems()->gpsSystem(i);
+  for (int i=0; i<config->posSystems()->gpsCount(); i++) {
+    GPSSystem *gps = config->posSystems()->gpsSystem(i);
     stream << qSetFieldWidth(5)  << left << (i+1)
            << qSetFieldWidth(20) << left << ("\"" + gps->name() + "\"")
            << qSetFieldWidth(5)  << left << config->contacts()->indexOfDigital(gps->contact())+1

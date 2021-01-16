@@ -228,7 +228,7 @@ Application::createMainWindow() {
   QPushButton *addGPS  = _mainWindow->findChild<QPushButton *>("addGPS");
   QPushButton *remGPS  = _mainWindow->findChild<QPushButton *>("remGPS");
   QLabel *gpsNote = _mainWindow->findChild<QLabel*>("gpsNote");
-  gpsList->setModel(_config->gpsSystems());
+  gpsList->setModel(_config->posSystems());
   if (settings.hideGSPNote())
     gpsNote->setVisible(false);
   connect(addGPS, SIGNAL(clicked()), this, SLOT(onAddGPS()));
@@ -996,9 +996,9 @@ Application::onAddGPS() {
   QModelIndex selected = list->selectionModel()->currentIndex();
   GPSSystem *gps = dialog.gpsSystem();
   if (selected.isValid())
-    _config->gpsSystems()->addGPSSystem(gps, selected.row()+1);
+    _config->posSystems()->addSystem(gps, selected.row()+1);
   else
-    _config->gpsSystems()->addGPSSystem(gps);
+    _config->posSystems()->addSystem(gps);
 }
 
 void
@@ -1011,12 +1011,12 @@ Application::onRemGPS() {
     return;
   }
 
-  QString name = _config->gpsSystems()->gpsSystem(idx.row())->name();
+  QString name = _config->posSystems()->gpsSystem(idx.row())->name();
   if (QMessageBox::No == QMessageBox::question(
         nullptr, tr("Delete GPS system?"), tr("Delete GPS system %1?").arg(name)))
     return;
 
-  _config->gpsSystems()->remGPSSystem(idx.row());
+  _config->posSystems()->remSystem(idx.row());
 }
 
 void
@@ -1025,31 +1025,33 @@ Application::onGPSUp() {
   QModelIndex selected = list->selectionModel()->currentIndex();
   if ((! selected.isValid()) || (0 >= selected.row()))
     return;
-  if (_config->gpsSystems()->moveUp(selected.row()))
-    list->setCurrentIndex(_config->gpsSystems()->index(selected.row()-1,0));
+  if (_config->posSystems()->moveUp(selected.row()))
+    list->setCurrentIndex(_config->posSystems()->index(selected.row()-1,0));
 }
 
 void
 Application::onGPSDown() {
   QTableView *list = _mainWindow->findChild<QTableView *>("gpsView");
   QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->gpsSystems()->count()-1) <= selected.row()))
+  if ((! selected.isValid()) || ((_config->posSystems()->count()-1) <= selected.row()))
     return;
-  if (_config->gpsSystems()->moveDown(selected.row()))
-    list->setCurrentIndex(_config->gpsSystems()->index(selected.row()+1,0));
+  if (_config->posSystems()->moveDown(selected.row()))
+    list->setCurrentIndex(_config->posSystems()->index(selected.row()+1,0));
 }
 
 void
 Application::onEditGPS(const QModelIndex &idx) {
-  if (idx.row()>=_config->gpsSystems()->count())
+  if (idx.row()>=_config->posSystems()->count())
     return;
-
-  GPSSystemDialog dialog(_config, _config->gpsSystems()->gpsSystem(idx.row()));
-  if (QDialog::Accepted != dialog.exec())
-    return;
-
-  dialog.gpsSystem();
-
+  PositioningSystem *sys = _config->posSystems()->system(idx.row());
+  if (sys->is<GPSSystem>()) {
+    GPSSystemDialog dialog(_config, sys->as<GPSSystem>());
+    if (QDialog::Accepted != dialog.exec())
+      return;
+    dialog.gpsSystem();
+  } else if (sys->is<APRSSystem>()) {
+    QMessageBox::critical(nullptr, tr("Not implemented yet"), tr("APRS system editor is not implemented yet."));
+  }
   emit _mainWindow->findChild<QTableView *>("gpsView")->model()->dataChanged(idx,idx);
 }
 

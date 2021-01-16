@@ -1771,7 +1771,7 @@ CSVReader::handleGPSSystem(
 
   GPSSystem *gps = new GPSSystem(name, nullptr, nullptr, period);
   _gpsSystems[idx] = gps;
-  _config->gpsSystems()->addGPSSystem(gps);
+  _config->posSystems()->addSystem(gps);
 
   return true;
 }

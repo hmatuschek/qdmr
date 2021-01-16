@@ -68,10 +68,10 @@ DigitalChannelDialog::construct() {
       txContact->setCurrentIndex(i+1);
   }
   gpsSystem->addItem(tr("[None]"), QVariant::fromValue((GPSSystem *)nullptr));
-  for (int i=0; i<_config->gpsSystems()->count(); i++) {
-    gpsSystem->addItem(_config->gpsSystems()->gpsSystem(i)->name(),
-                       QVariant::fromValue(_config->gpsSystems()->gpsSystem(i)));
-    if (_channel && (_channel->gpsSystem() == _config->gpsSystems()->gpsSystem(i)))
+  for (int i=0; i<_config->posSystems()->gpsCount(); i++) {
+    gpsSystem->addItem(_config->posSystems()->gpsSystem(i)->name(),
+                       QVariant::fromValue(_config->posSystems()->gpsSystem(i)));
+    if (_channel && (_channel->gpsSystem() == _config->posSystems()->gpsSystem(i)))
       gpsSystem->setCurrentIndex(i+1);
   }
 

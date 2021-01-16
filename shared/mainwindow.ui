@@ -624,7 +624,7 @@
       </widget>
       <widget class="QWidget" name="tabGPSSystems">
        <attribute name="title">
-        <string>GPS</string>
+        <string>GPS/APRS</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_18">
         <item>
@@ -645,7 +645,7 @@
            <number>0</number>
           </property>
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support GPS. Hence these settings might be ignored when programming this code-plug to the device. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support GPS or APRS. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textFormat">
            <enum>Qt::RichText</enum>
@@ -710,9 +710,19 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="addAPRS">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Add APRS System</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="remGPS">
             <property name="text">
-             <string>Delete GPS System</string>
+             <string>Delete Position System</string>
             </property>
            </widget>
           </item>

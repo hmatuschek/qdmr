@@ -10,10 +10,50 @@ class DigitalContact;
 class DigitalChannel;
 
 
+class PositioningSystem: public QObject
+{
+  Q_OBJECT
+
+protected:
+  explicit PositioningSystem(const QString &name, uint period=300, QObject *parent=nullptr);
+
+public:
+  virtual ~PositioningSystem();
+
+  template <class System>
+  bool is() const { return nullptr != dynamic_cast<const System *>(this); }
+
+  template <class System>
+  System *as() { return dynamic_cast<System *>(this); }
+
+  template <class System>
+  const System *as() const { return dynamic_cast<const System *>(this); }
+
+  /** Returns the name of the GPS system. */
+  const QString &name() const;
+  /** Sets the name of the GPS system. */
+  void setName(const QString &name);
+
+  /** Returns the update period in seconds. */
+  uint period() const;
+  /** Sets the update period in seconds. */
+  void setPeriod(uint period);
+
+signals:
+  /** Gets emitted if the GPS system is modified. */
+  void modified();
+
+protected:
+  /** Holds the name of the GPS system. */
+  QString _name;
+  /** Holds the update period in seconds. */
+  uint _period;
+};
+
 
 /** This class represents a GPS signalling system within the codeplug.
  * @ingroup conf */
-class GPSSystem : public QObject
+class GPSSystem : public PositioningSystem
 {
   Q_OBJECT
 
@@ -32,11 +72,6 @@ public:
             DigitalChannel *revertChannel = nullptr, uint period=300,
             QObject *parent = nullptr);
 
-  /** Returns the name of the GPS system. */
-  const QString &name() const;
-  /** Sets the name of the GPS system. */
-  void setName(const QString &name);
-
   /** Returns @c true if a contact is set for the GPS system. */
   bool hasContact() const;
   /** Returns the destination contact for the GPS information or @c nullptr if not set. */
@@ -52,15 +87,6 @@ public:
   /** Sets the revert channel for the GPS information to be send on. */
   void setRevertChannel(DigitalChannel *channel);
 
-  /** Returns the update period in seconds. */
-  uint period() const;
-  /** Sets the update period in seconds. */
-  void setPeriod(uint period);
-
-signals:
-  /** Gets emitted if the GPS system is modified. */
-  void modified();
-
 protected slots:
   /** Internal used callback to get notified if the destination contact is deleted. */
   void onContactDeleted();
@@ -68,42 +94,51 @@ protected slots:
   void onRevertChannelDeleted();
 
 protected:
-  /** Holds the name of the GPS system. */
-  QString _name;
   /** Holds the destination contact for the GPS information. */
   DigitalContact *_contact;
   /** Holds the revert channel on which the GPS information is send on. */
   DigitalChannel *_revertChannel;
-  /** Holds the update period in seconds. */
-  uint _period;
+};
+
+
+class APRSSystem: public PositioningSystem
+{
+  Q_OBJECT
 };
 
 
 /** The list of GPS systems.
  * @ingroup conf */
-class GPSSystems: public QAbstractTableModel
+class PositioningSystems: public QAbstractTableModel
 {
 Q_OBJECT
 
 public:
   /** Constructs an empty list of GPS systems. */
-  explicit GPSSystems(QObject *parent=nullptr);
+  explicit PositioningSystems(QObject *parent=nullptr);
 
-  /** Returns the number of GPS systems in this list. */
-  int count() const;
   /** Clears the list. */
   void clear();
+
+  /** Returns the number of Positioning systems in this list. */
+  int count() const;
+  PositioningSystem *system(int idx) const;
+  /** Adds a positioning system to the list at the specified row.
+   * If row<0 the system gets appendet to the list.*/
+  int addSystem(PositioningSystem *sys, int row=-1);
+  /** Removes the given GPS system from the list. */
+  bool remSystem(PositioningSystem *gps);
+  /** Removes the GPS system at the given index from the list. */
+  bool remSystem(int idx);
+
+  int gpsCount() const;
   /** Returns the index of the GPS System. */
-  int indexOf(GPSSystem *gps) const;
+  int indexOfGPSSys(GPSSystem *gps) const;
   /** Gets the GPS system at the specified index. */
   GPSSystem *gpsSystem(int idx) const;
-  /** Adds a GPS system to the list at the specified row.
-   * If row<0 the system gets appendet to the list.*/
-  int addGPSSystem(GPSSystem *gps, int row=-1);
-  /** Removes the given GPS system from the list. */
-  bool remGPSSystem(GPSSystem *gps);
-  /** Removes the GPS system at the given index from the list. */
-  bool remGPSSystem(int idx);
+
+  int aprsCount() const;
+
   /** Moves the GPS system at index @c idx one step up. */
   bool moveUp(int idx);
   /** Moves the GPS system at index @c idx one step up. */
@@ -124,14 +159,14 @@ signals:
   void modified();
 
 protected slots:
-  /** Internal callback on deleted GPS systems. */
-  void onGPSSystemDeleted(QObject *obj);
-  /** Internal callback on modified GPS systems. */
-  void onGPSSystemEdited();
+  /** Internal callback on deleted positioning systems. */
+  void onSystemDeleted(QObject *obj);
+  /** Internal callback on modified positioning systems. */
+  void onSystemEdited();
 
 protected:
-  /** Just the vector of GPS systems. */
-  QVector<GPSSystem *> _gpsSystems;
+  /** Just the vector of positioning systems. */
+  QVector<PositioningSystem *> _posSystems;
 };
 
 

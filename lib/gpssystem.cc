@@ -3,6 +3,40 @@
 #include "channel.hh"
 #include "logger.hh"
 
+/* ********************************************************************************************* *
+ * Implementation of PositioningSystem
+ * ********************************************************************************************* */
+PositioningSystem::PositioningSystem(const QString &name, uint period, QObject *parent)
+  : QObject(parent), _name(name), _period(period)
+{
+  // pass...
+}
+
+PositioningSystem::~PositioningSystem() {
+  // pass...
+}
+
+const QString &
+PositioningSystem::name() const {
+  return _name;
+}
+
+void
+PositioningSystem::setName(const QString &name) {
+  _name = name;
+  emit modified();
+}
+
+uint
+PositioningSystem::period() const {
+  return _period;
+}
+
+void
+PositioningSystem::setPeriod(uint period) {
+  _period = period;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of GPSSystem
@@ -10,30 +44,9 @@
 GPSSystem::GPSSystem(const QString &name, DigitalContact *contact,
                      DigitalChannel *revertChannel, uint period,
                      QObject *parent)
-  : QObject(parent), _name(name), _contact(contact), _revertChannel(revertChannel), _period(period)
+  : PositioningSystem(name, period, parent), _contact(contact), _revertChannel(revertChannel)
 {
   // pass...
-}
-
-const QString &
-GPSSystem::name() const {
-  return _name;
-}
-
-void
-GPSSystem::setName(const QString &name) {
-  _name = name;
-  emit modified();
-}
-
-uint
-GPSSystem::period() const {
-  return _period;
-}
-
-void
-GPSSystem::setPeriod(uint period) {
-  _period = period;
 }
 
 bool
@@ -87,127 +100,172 @@ GPSSystem::onRevertChannelDeleted() {
 /* ********************************************************************************************* *
  * Implementation of GPSSystems table
  * ********************************************************************************************* */
-GPSSystems::GPSSystems(QObject *parent)
-  : QAbstractTableModel(parent), _gpsSystems()
+PositioningSystems::PositioningSystems(QObject *parent)
+  : QAbstractTableModel(parent), _posSystems()
 {
-  connect(this, SIGNAL(modified()), this, SLOT(onGPSSystemEdited()));
+  connect(this, SIGNAL(modified()), this, SLOT(onSystemEdited()));
 }
 
 int
-GPSSystems::count() const {
-  return _gpsSystems.size();
+PositioningSystems::count() const {
+  return _posSystems.size();
+}
+
+int
+PositioningSystems::gpsCount() const {
+  int c=0;
+  for (int i=0; i<_posSystems.size(); i++)
+    if (_posSystems.at(i)->is<GPSSystem>())
+      c++;
+  return c;
+}
+
+int
+PositioningSystems::aprsCount() const {
+  int c=0;
+  for (int i=0; i<_posSystems.size(); i++)
+    if (_posSystems.at(i)->is<APRSSystem>())
+      c++;
+  return c;
 }
 
 void
-GPSSystems::clear() {
+PositioningSystems::clear() {
   for (int i=0; i<count(); i++)
-    _gpsSystems[i]->deleteLater();
+    _posSystems[i]->deleteLater();
 }
 
 int
-GPSSystems::indexOf(GPSSystem *gps) const {
-if (! _gpsSystems.contains(gps))
+PositioningSystems::indexOfGPSSys(GPSSystem *gps) const {
+  if (! _posSystems.contains(gps))
+    return -1;
+
+  int idx=0;
+  for (int i=0; i<count(); i++) {
+    if (gps == _posSystems.at(i))
+      return idx;
+    if (_posSystems.at(i)->is<GPSSystem>())
+      idx++;
+  }
+
   return -1;
-return _gpsSystems.indexOf(gps);
+}
+
+PositioningSystem *
+PositioningSystems::system(int idx) const {
+  if ((0>idx) || (idx >= _posSystems.size()))
+    return nullptr;
+  return _posSystems.at(idx);
 }
 
 GPSSystem *
-GPSSystems::gpsSystem(int idx) const {
-  if ((0>idx) || (idx >= _gpsSystems.size()))
+PositioningSystems::gpsSystem(int idx) const {
+  if ((0>idx) || (idx >= _posSystems.size()))
     return nullptr;
-  return _gpsSystems.at(idx);
+  for (int i=0; i<_posSystems.size(); i++) {
+    if (_posSystems.at(i)->is<GPSSystem>()) {
+      if (0==idx)
+        return _posSystems.at(i)->as<GPSSystem>();
+      else
+        idx--;
+    }
+  }
+  return nullptr;
 }
 
 int
-GPSSystems::addGPSSystem(GPSSystem *gps, int row) {
-  if (_gpsSystems.contains(gps))
+PositioningSystems::addSystem(PositioningSystem *sys, int row) {
+  if (_posSystems.contains(sys))
     return -1;
-  if (nullptr == gps)
+  if (nullptr == sys)
     return -1;
-  if ((row<0) || (row>_gpsSystems.size()))
-    row = _gpsSystems.size();
+  if ((row<0) || (row>_posSystems.size()))
+    row = _posSystems.size();
   beginInsertRows(QModelIndex(), row, row);
-  gps->setParent(this);
-  connect(gps, SIGNAL(modified()), this, SIGNAL(modified()));
-  connect(gps, SIGNAL(destroyed(QObject *)), this, SLOT(onGPSSystemDeleted(QObject *)));
-  _gpsSystems.insert(row, gps);
+  sys->setParent(this);
+  connect(sys, SIGNAL(modified()), this, SIGNAL(modified()));
+  connect(sys, SIGNAL(destroyed(QObject *)), this, SLOT(onSystemDeleted(QObject *)));
+  _posSystems.insert(row, sys);
   endInsertRows();
   emit modified();
   return row;
 }
 
 bool
-GPSSystems::remGPSSystem(int idx) {
+PositioningSystems::remSystem(int idx) {
   if ((0>idx) || (idx >= count()))
     return false;
   beginRemoveRows(QModelIndex(), idx, idx);
-  GPSSystem *gps = _gpsSystems.at(idx);
-  _gpsSystems.remove(idx);
-  gps->deleteLater();
+  PositioningSystem *sys = _posSystems.at(idx);
+  _posSystems.remove(idx);
+  sys->deleteLater();
   endRemoveRows();
   emit modified();
   return true;
 }
 
 bool
-GPSSystems::remGPSSystem(GPSSystem *gps) {
-  if (! _gpsSystems.contains(gps))
+PositioningSystems::remSystem(PositioningSystem *sys) {
+  if (! _posSystems.contains(sys))
     return false;
-  int idx = _gpsSystems.indexOf(gps);
-  return remGPSSystem(idx);
+  int idx = _posSystems.indexOf(sys);
+  return remSystem(idx);
 }
 
 bool
-GPSSystems::moveUp(int row) {
+PositioningSystems::moveUp(int row) {
   if ((0>=row) || (row>=count()))
     return false;
   beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  std::swap(_gpsSystems[row], _gpsSystems[row-1]);
+  std::swap(_posSystems[row], _posSystems[row-1]);
   endMoveRows();
   emit modified();
   return true;
 }
 
 bool
-GPSSystems::moveDown(int row) {
+PositioningSystems::moveDown(int row) {
   if ((0>row) || ((row-1)>=count()))
     return false;
   beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  std::swap(_gpsSystems[row], _gpsSystems[row+1]);
+  std::swap(_posSystems[row], _posSystems[row+1]);
   endMoveRows();
   emit modified();
   return true;
 }
 
 int
-GPSSystems::rowCount(const QModelIndex &idx) const {
+PositioningSystems::rowCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
   return count();
 }
 int
-GPSSystems::columnCount(const QModelIndex &idx) const {
+PositioningSystems::columnCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
   return 4;
 }
 
 QVariant
-GPSSystems::data(const QModelIndex &index, int role) const {
+PositioningSystems::data(const QModelIndex &index, int role) const {
   if ((! index.isValid()) || (index.row()>=count()))
     return QVariant();
   if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
     return QVariant();
 
-  GPSSystem *gps = _gpsSystems.at(index.row());
+  PositioningSystem *sys = _posSystems.at(index.row());
 
   switch (index.column()) {
   case 0:
-    return gps->name();
+    return sys->name();
   case 1:
-    return gps->contact()->name();
+    if (sys->is<GPSSystem>())
+      return sys->as<GPSSystem>()->contact()->name();
   case 2:
-    return gps->period();
+    return sys->period();
   case 3:
-    return (gps->hasRevertChannel() ? gps->revertChannel()->name() : "[Selected]");
+    if (sys->is<GPSSystem>())
+      return (sys->as<GPSSystem>()->hasRevertChannel() ?
+                sys->as<GPSSystem>()->revertChannel()->name() : tr("[Selected]"));
   default:
     break;
   }
@@ -216,14 +274,14 @@ GPSSystems::data(const QModelIndex &index, int role) const {
 }
 
 QVariant
-GPSSystems::headerData(int section, Qt::Orientation orientation, int role) const {
+PositioningSystems::headerData(int section, Qt::Orientation orientation, int role) const {
   if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation))
     return QVariant();
   switch (section) {
   case 0: return tr("Name");
-  case 1: return tr("Contact");
+  case 1: return tr("Destination");
   case 2: return tr("Period [s]");
-  case 3: return tr("Revert Channel");
+  case 3: return tr("Channel");
   default:
     break;
   }
@@ -231,13 +289,13 @@ GPSSystems::headerData(int section, Qt::Orientation orientation, int role) const
 }
 
 void
-GPSSystems::onGPSSystemDeleted(QObject *obj) {
-  if (GPSSystem *gps = reinterpret_cast<GPSSystem *>(obj))
-    remGPSSystem(gps);
+PositioningSystems::onSystemDeleted(QObject *obj) {
+  if (PositioningSystem *gps = reinterpret_cast<PositioningSystem *>(obj))
+    remSystem(gps);
 }
 
 void
-GPSSystems::onGPSSystemEdited() {
+PositioningSystems::onSystemEdited() {
   if (0 == count())
     return;
   QModelIndex tl = index(0,0), br = index(count()-1, columnCount(QModelIndex()));
