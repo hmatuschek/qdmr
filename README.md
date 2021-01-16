@@ -9,12 +9,13 @@ provide a **single**, **comfortable**, [**well-documented**](https://dm3mat.darc
 and **platform-independent** CPS for several types of (mainly Chinese) DMR radios.
 
 ## Supported Radios 
-Currently, there are only two radios that are supported
+Currently, there are only few radios that are supported
 
-  * Open GD77 firmware
+  * Open GD77 firmware (since version 0.4.0)
   * Radioddity GD77 (untested)
   * Baofeng/Radioddity RD-5R & RD-5R+
   * TYT MD-UV390 / Retevis RT3S
+  * Anytone AT-D878UV (since version 0.5.0)
 
 The limited amount of supported radios is due to the fact that I only own these radios to test
 the software with.
