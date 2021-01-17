@@ -101,15 +101,16 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 4) Transmit frequency or +/- offset in MHz\n"
             "# 5) Transmit power: Max, High, Mid, Low or Min\n"
             "# 6) Scan list: - or index\n"
-            "# 7) Transmit timeout timer in seconds: 0, 15, 30, 45... 555\n"
-            "# 8) Receive only: -, +\n"
-            "# 9) Admit criteria: -, Free, Tone\n"
-            "# 10) Squelch level: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9\n"
-            "# 11) CTCSS/DCS for receive: frequency (e.g, 67.0), DCS number (e.g., n023 or i023) or '-' to disable\n"
-            "# 12) CTCSS/DCS for transmit: frequency (e.g, 67.0), DCS number (e.g., n023 or i023) or '-' to disable\n"
-            "# 13) Bandwidth in kHz: 12.5, 25\n"
+            "# 7) APRS system: - or index\n"
+            "# 8) Transmit timeout timer in seconds: 0, 15, 30, 45... 555\n"
+            "# 9) Receive only: -, +\n"
+            "# 10) Admit criteria: -, Free, Tone\n"
+            "# 11) Squelch level: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9\n"
+            "# 12) CTCSS/DCS for receive: frequency (e.g, 67.0), DCS number (e.g., n023 or i023) or '-' to disable\n"
+            "# 13) CTCSS/DCS for transmit: frequency (e.g, 67.0), DCS number (e.g., n023 or i023) or '-' to disable\n"
+            "# 14) Bandwidth in kHz: 12.5, 25\n"
             "#\n"
-            "Analog  Name                Receive   Transmit   Power Scan TOT RO Admit  Squelch RxTone TxTone Width\n";
+            "Analog  Name                Receive   Transmit   Power Scan APRS TOT RO Admit  Squelch RxTone TxTone Width\n";
   for (int i=0; i<config->channelList()->count(); i++) {
     if (config->channelList()->channel(i)->is<DigitalChannel>())
       continue;
@@ -122,8 +123,8 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     else
       stream << qSetFieldWidth(11) << left << format_frequency(analog->txFrequency());
     stream << qSetFieldWidth(6)  << left << power2string(analog->power())
-           << qSetFieldWidth(5)  << left << ( nullptr != analog->scanList() ?
-          QString::number(config->scanlists()->indexOf(analog->scanList())+1) : QString("-") )
+           << qSetFieldWidth(5)  << left << ( nullptr != analog->scanList() ? QString::number(config->scanlists()->indexOf(analog->scanList())+1) : QString("-") )
+           << qSetFieldWidth(5)  << left << ( nullptr != analog->aprs() ? QString::number(config->posSystems()->indexOf(analog->aprs())+1) : QString("-"))
            << qSetFieldWidth(4)  << left << ( (0 == analog->txTimeout()) ? QString("-") : QString::number(analog->txTimeout()) )
            << qSetFieldWidth(3)  << left << (analog->rxOnly() ? '+' : '-')
            << qSetFieldWidth(7)  << left << ((AnalogChannel::AdmitNone==analog->admit()) ? "-" : ((AnalogChannel::AdmitFree==analog->admit()) ? "Free" : "Tone"))

@@ -10,6 +10,7 @@ class Config;
 class RXGroupList;
 class DigitalContact;
 class ScanList;
+class APRSSystem;
 class PositioningSystem;
 
 
@@ -171,7 +172,8 @@ public:
    * @param parent    Specified the @c QObject parent object. */
   AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
                 bool rxOnly, Admit admit, uint squelch, Signaling::Code rxTone,
-                Signaling::Code txTone, Bandwidth bw, ScanList *list, QObject *parent=nullptr);
+                Signaling::Code txTone, Bandwidth bw, ScanList *list,
+                APRSSystem *aprsSys=nullptr, QObject *parent=nullptr);
 
   /** Returns the admit criterion for the analog channel. */
 	Admit admit() const;
@@ -197,6 +199,13 @@ public:
   /** (Re-)Sets the bandwidth of the analog channel. */
 	bool setBandwidth(Bandwidth bw);
 
+  /** Returns the APRS system used for this channel or @c nullptr if disabled. */
+  APRSSystem *aprs() const;
+  void setAPRS(APRSSystem *sys);
+
+protected:
+  void onAPRSSystemDeleted();
+
 protected:
   /** Holds the admit criterion. */
 	Admit _admit;
@@ -208,6 +217,8 @@ protected:
   Signaling::Code _txTone;
   /** The channel bandwidth. */
 	Bandwidth _bw;
+  /** A reference to the APRS system used on the channel or @c nullptr if disabled. */
+  APRSSystem *_aprsSystem;
 };
 
 
@@ -249,7 +260,7 @@ public:
    * @param timeslot  Specifies the time-slot.
    * @param rxGroup   Specifies the RX group list for the channel.
    * @param txContact Specifies the default TX contact to call on this channel.
-   * @param gpsSystem Specifies the GPS system to use on this channel.
+   * @param posSystem Specifies the positioning system to use on this channel.
    * @param list      Specifies the default scanlist for the channel.
    * @param parent    Specified the @c QObject parent object. */
   DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
@@ -292,7 +303,7 @@ protected slots:
   /** Internal callback if TX contact is deleted. */
 	void onTxContactDeleted();
   /** Internal callback if GPS system is deleted. */
-  void onGPSSystemDeleted();
+  void onPosSystemDeleted();
 
 protected:
   /** The admit criterion. */

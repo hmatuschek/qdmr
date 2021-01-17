@@ -233,7 +233,7 @@ CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, dou
 
 bool
 CSVHandler::handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-    qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
+    qint64 aprs, qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
     AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
@@ -242,6 +242,7 @@ CSVHandler::handleAnalogChannel(qint64 idx, const QString &name, double rx, doub
   Q_UNUSED(tx);
   Q_UNUSED(power);
   Q_UNUSED(scan);
+  Q_UNUSED(aprs);
   Q_UNUSED(tot);
   Q_UNUSED(ro);
   Q_UNUSED(admit);
@@ -1075,6 +1076,18 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
+  qint64 aprs;
+  if (CSVLexer::Token::T_NOT_SET == token.type) {
+    aprs = 0;
+  } else if (CSVLexer::Token::T_NUMBER == token.type) {
+    aprs = token.value.toInt();
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
   if ((CSVLexer::Token::T_NUMBER != token.type) && (CSVLexer::Token::T_NOT_SET != token.type)) {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1178,7 +1191,7 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
     return false;
   }
 
-  return _handler->handleAnalogChannel(idx, name, rx, tx, pwr, scanlist, tot, rxOnly, admit, squelch,
+  return _handler->handleAnalogChannel(idx, name, rx, tx, pwr, scanlist, aprs, tot, rxOnly, admit, squelch,
                                        rxTone, txTone, bw, line, column, _errorMessage);
 }
 
@@ -1808,7 +1821,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
 
 bool
 CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-    qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
+    qint64 aprs, qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
     AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
@@ -1819,6 +1832,19 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
       return false;
     }
     _channels[idx]->as<AnalogChannel>()->setScanList(_scanlists[scan]);
+
+    // Check APRS system
+    if ((0 < aprs) && (! _posSystems.contains(aprs))) {
+      errorMessage = QString("Parse error @ %1,%2: Cannot link analog channel '%3', unknown APRS system index %4.")
+          .arg(line).arg(column).arg(name).arg(aprs);
+      return false;
+    }
+    if (! _posSystems[aprs]->is<APRSSystem>()) {
+      errorMessage = QString("Parse error @ %1,%2: Cannot link analog channel '%3', positioning system %4 ('%5') is not an APRS system!.")
+          .arg(line).arg(column).arg(name).arg(aprs).arg(_posSystems[aprs]->name());
+      return false;
+    }
+    _channels[idx]->as<AnalogChannel>()->setAPRS(_posSystems[aprs]->as<APRSSystem>());
     return true;
   }
 

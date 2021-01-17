@@ -42,12 +42,12 @@ AnalogChannelDialog::construct() {
   power->setItemData(2, uint(Channel::MidPower));
   power->setItemData(3, uint(Channel::LowPower));
   power->setItemData(4, uint(Channel::MinPower));
-  scanList->addItem(tr("[None]"), QVariant::fromValue((ScanList *)(nullptr)));
+  scanList->addItem(tr("[None]"), QVariant::fromValue((ScanList *)nullptr));
   scanList->setCurrentIndex(0);
   for (int i=0; i<_config->scanlists()->count(); i++) {
-    scanList->addItem(_config->scanlists()->scanlist(i)->name(),
-                      QVariant::fromValue(_config->scanlists()->scanlist(i)));
-    if (_channel && (_channel->scanList() == _config->scanlists()->scanlist(i)) )
+    ScanList *lst = _config->scanlists()->scanlist(i);
+    scanList->addItem(lst->name(),QVariant::fromValue(lst));
+    if (_channel && (_channel->scanList() == lst) )
       scanList->setCurrentIndex(i+1);
   }
   txAdmit->setItemData(0, uint(AnalogChannel::AdmitNone));
@@ -57,6 +57,14 @@ AnalogChannelDialog::construct() {
   populateCTCSSBox(txTone, (nullptr != _channel ? _channel->txTone() : Signaling::SIGNALING_NONE));
   bandwidth->setItemData(0, uint(AnalogChannel::BWNarrow));
   bandwidth->setItemData(1, uint(AnalogChannel::BWWide));
+  aprsList->addItem(tr("[None]"), QVariant::fromValue((APRSSystem *)nullptr));
+  aprsList->setCurrentIndex(0);
+  for (int i=0; i<_config->posSystems()->aprsCount(); i++) {
+    APRSSystem *sys = _config->posSystems()->aprsSystem(i);
+    aprsList->addItem(sys->name(),QVariant::fromValue(sys));
+    if (_channel && (_channel->aprs() == sys))
+      aprsList->setCurrentIndex(i+1);
+  }
 
   if (_channel) {
     channelName->setText(_channel->name());
@@ -99,6 +107,7 @@ AnalogChannelDialog::channel() {
   Signaling::Code txtone = Signaling::Code(txTone->currentData().toUInt(&ok));
   AnalogChannel::Bandwidth bw = AnalogChannel::Bandwidth(bandwidth->currentData().toUInt());
   ScanList *scanlist = scanList->currentData().value<ScanList *>();
+  APRSSystem *aprs = aprsList->currentData().value<APRSSystem *>();
 
   if (_channel) {
     _channel->setName(name);
@@ -113,10 +122,11 @@ AnalogChannelDialog::channel() {
     _channel->setTXTone(txtone);
     _channel->setBandwidth(bw);
     _channel->setScanList(scanlist);
+    _channel->setAPRS(aprs);
     return _channel;
   } else {
     return new AnalogChannel(name, rx, tx, pwr, timeout, rxonly, admit, squ,
-                             rxtone, txtone, bw, scanlist);
+                             rxtone, txtone, bw, scanlist, aprs);
   }
 }
 

@@ -125,9 +125,9 @@ Channel::onScanListDeleted(QObject *obj) {
 AnalogChannel::AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power,
                              uint txTimeout, bool rxOnly, Admit admit, uint squelch,
                              Signaling::Code rxTone, Signaling::Code txTone, Bandwidth bw,
-                             ScanList *list, QObject *parent)
+                             ScanList *list, APRSSystem *aprsSys, QObject *parent)
   : Channel(name, rxFreq, txFreq, power, txTimeout, rxOnly, list, parent),
-    _admit(admit), _squelch(squelch), _rxTone(rxTone), _txTone(txTone), _bw(bw)
+    _admit(admit), _squelch(squelch), _rxTone(rxTone), _txTone(txTone), _bw(bw), _aprsSystem(aprsSys)
 {
   // pass...
 }
@@ -186,6 +186,24 @@ AnalogChannel::setBandwidth(Bandwidth bw) {
   return true;
 }
 
+APRSSystem *
+AnalogChannel::aprs() const {
+  return _aprsSystem;
+}
+void
+AnalogChannel::setAPRS(APRSSystem *sys) {
+  if (_aprsSystem)
+    disconnect(_aprsSystem, SIGNAL(destroyed(QObject*)), this, SLOT(onAPRSSystemDeleted()));
+  _aprsSystem = sys;
+  if (_aprsSystem)
+    connect(_aprsSystem, SIGNAL(destroyed(QObject*)), this, SLOT(onAPRSSystemDeleted()));
+}
+
+void
+AnalogChannel::onAPRSSystemDeleted() {
+  _aprsSystem = nullptr;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of DigitalChannel
@@ -203,7 +221,7 @@ DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq
   if (_txContact)
     connect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
   if (_posSystem)
-    connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onGPSSystemDeleted()));
+    connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
 }
 
 DigitalChannel::Admit
@@ -277,10 +295,10 @@ PositioningSystem *DigitalChannel::posSystem() const {
 bool
 DigitalChannel::setPosSystem(PositioningSystem *sys) {
   if (_posSystem)
-    disconnect(_posSystem, SIGNAL(destroyed()), this, SLOT(onGPSSystemDeleted()));
+    disconnect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
   _posSystem = sys;
   if (_posSystem)
-    connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onGPSSystemDeleted()));
+    connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
   emit modified();
   return true;
 }
@@ -296,7 +314,7 @@ DigitalChannel::onTxContactDeleted() {
 }
 
 void
-DigitalChannel::onGPSSystemDeleted() {
+DigitalChannel::onPosSystemDeleted() {
   setPosSystem(nullptr);
 }
 
@@ -558,8 +576,11 @@ ChannelList::data(const QModelIndex &index, int role) const {
         return digi->posSystem()->name();
       else
         return tr("-");
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
+    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+      if (analog->aprs())
+        return analog->aprs()->name();
+      else
+        return tr("-");
     }
     break;
   case 14:
@@ -628,7 +649,7 @@ ChannelList::headerData(int section, Qt::Orientation orientation, int role) cons
   case 10: return tr("TS");
   case 11: return tr("RX Group List");
   case 12: return tr("TX Contact");
-  case 13: return tr("GPS System");
+  case 13: return tr("GPS/APRS");
   case 14: return tr("Squelch");
   case 15: return tr("Rx Tone");
   case 16: return tr("Tx Tone");
