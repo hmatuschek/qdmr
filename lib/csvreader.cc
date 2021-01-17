@@ -1773,33 +1773,45 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
 {
   if (_link) {
     // Check RX Grouplist
-    if ((0 < gl) && (! _rxgroups.contains(gl))) {
-      errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown RX-group list %4.")
-          .arg(line).arg(column).arg(name).arg(gl);
-      return false;
+    if (0 < gl) {
+      if (! _rxgroups.contains(gl)) {
+        errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown RX-group list %4.")
+            .arg(line).arg(column).arg(name).arg(gl);
+        return false;
+      }
+      _channels[idx]->as<DigitalChannel>()->setRXGroupList(_rxgroups[gl]);
     }
-    _channels[idx]->as<DigitalChannel>()->setRXGroupList(_rxgroups[gl]);
+
     // Check TX Contact
-    if ((0 < contact) && (! _digital_contacts.contains(contact))) {
-      errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown contact index %4.")
-          .arg(line).arg(column).arg(name).arg(contact);
-      return false;
+    if (0 < contact) {
+      if (! _digital_contacts.contains(contact)) {
+        errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown contact index %4.")
+            .arg(line).arg(column).arg(name).arg(contact);
+        return false;
+      }
+      _channels[idx]->as<DigitalChannel>()->setTXContact(_digital_contacts[contact]);
     }
-    _channels[idx]->as<DigitalChannel>()->setTXContact(_digital_contacts[contact]);
+
     // Check scanlist
-    if ((0 < scan) && (! _scanlists.contains(scan))) {
-      errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown scan-list index %4.")
-          .arg(line).arg(column).arg(name).arg(scan);
-      return false;
+    if (0 < scan) {
+      if (! _scanlists.contains(scan)) {
+        errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown scan-list index %4.")
+            .arg(line).arg(column).arg(name).arg(scan);
+        return false;
+      }
+      _channels[idx]->as<DigitalChannel>()->setScanList(_scanlists[scan]);
     }
-    _channels[idx]->as<DigitalChannel>()->setScanList(_scanlists[scan]);
+
     // Check GPS System
-    if ((0<gps) && (! _posSystems.contains(gps))) {
-      errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown system index %4.")
-          .arg(line).arg(column).arg(name).arg(gps);
-      return false;
+    if (0 < gps) {
+      if (! _posSystems.contains(gps)) {
+        errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown system index %4.")
+            .arg(line).arg(column).arg(name).arg(gps);
+        return false;
+      }
+      _channels[idx]->as<DigitalChannel>()->setPosSystem(_posSystems[gps]);
     }
-    _channels[idx]->as<DigitalChannel>()->setPosSystem(_posSystems[gps]);
+
     return true;
   }
 
@@ -1826,25 +1838,29 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
 {
   if (_link) {
     // Check scanlist
-    if ((0 < scan) && (! _scanlists.contains(scan))) {
-      errorMessage = QString("Parse error @ %1,%2: Cannot link analog channel '%3', unknown scan-list index %4.")
-          .arg(line).arg(column).arg(name).arg(scan);
-      return false;
+    if (0 < scan) {
+      if (! _scanlists.contains(scan)) {
+        errorMessage = QString("Parse error @ %1,%2: Cannot link analog channel '%3', unknown scan-list index %4.")
+            .arg(line).arg(column).arg(name).arg(scan);
+        return false;
+      }
+      _channels[idx]->as<AnalogChannel>()->setScanList(_scanlists[scan]);
     }
-    _channels[idx]->as<AnalogChannel>()->setScanList(_scanlists[scan]);
 
     // Check APRS system
-    if ((0 < aprs) && (! _posSystems.contains(aprs))) {
-      errorMessage = QString("Parse error @ %1,%2: Cannot link analog channel '%3', unknown APRS system index %4.")
-          .arg(line).arg(column).arg(name).arg(aprs);
-      return false;
+    if (0 < aprs) {
+      if (! _posSystems.contains(aprs)) {
+        errorMessage = QString("Parse error @ %1,%2: Cannot link analog channel '%3', unknown APRS system index %4.")
+            .arg(line).arg(column).arg(name).arg(aprs);
+        return false;
+      }
+      if (! _posSystems[aprs]->is<APRSSystem>()) {
+        errorMessage = QString("Parse error @ %1,%2: Cannot link analog channel '%3', positioning system %4 ('%5') is not an APRS system!.")
+            .arg(line).arg(column).arg(name).arg(aprs).arg(_posSystems[aprs]->name());
+        return false;
+      }
+      _channels[idx]->as<AnalogChannel>()->setAPRS(_posSystems[aprs]->as<APRSSystem>());
     }
-    if (! _posSystems[aprs]->is<APRSSystem>()) {
-      errorMessage = QString("Parse error @ %1,%2: Cannot link analog channel '%3', positioning system %4 ('%5') is not an APRS system!.")
-          .arg(line).arg(column).arg(name).arg(aprs).arg(_posSystems[aprs]->name());
-      return false;
-    }
-    _channels[idx]->as<AnalogChannel>()->setAPRS(_posSystems[aprs]->as<APRSSystem>());
     return true;
   }
 
