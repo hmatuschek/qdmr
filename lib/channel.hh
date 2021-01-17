@@ -135,6 +135,8 @@ protected:
  * @ingroup conf */
 class AnalogChannel: public Channel
 {
+  Q_OBJECT
+
 public:
   /** Admit criteria of analog channel. */
 	typedef enum {

@@ -16,6 +16,7 @@
 #include "zonedialog.hh"
 #include "scanlistdialog.hh"
 #include "gpssystemdialog.hh"
+#include "aprssystemdialog.hh"
 #include "repeaterdatabase.hh"
 #include "userdatabase.hh"
 
@@ -226,12 +227,14 @@ Application::createMainWindow() {
   QPushButton *gpsUp   = _mainWindow->findChild<QPushButton *>("gpsUp");
   QPushButton *gpsDown = _mainWindow->findChild<QPushButton *>("gpsDown");
   QPushButton *addGPS  = _mainWindow->findChild<QPushButton *>("addGPS");
+  QPushButton *addAPRS = _mainWindow->findChild<QPushButton *>("addAPRS");
   QPushButton *remGPS  = _mainWindow->findChild<QPushButton *>("remGPS");
   QLabel *gpsNote = _mainWindow->findChild<QLabel*>("gpsNote");
   gpsList->setModel(_config->posSystems());
   if (settings.hideGSPNote())
     gpsNote->setVisible(false);
   connect(addGPS, SIGNAL(clicked()), this, SLOT(onAddGPS()));
+  connect(addAPRS, SIGNAL(clicked()), this, SLOT(onAddAPRS()));
   connect(remGPS, SIGNAL(clicked()), this, SLOT(onRemGPS()));
   connect(gpsUp, SIGNAL(clicked()), this, SLOT(onGPSUp()));
   connect(gpsDown, SIGNAL(clicked()), this, SLOT(onGPSDown()));
@@ -1002,6 +1005,22 @@ Application::onAddGPS() {
 }
 
 void
+Application::onAddAPRS() {
+  APRSSystemDialog dialog(_config);
+
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  QTableView *list = _mainWindow->findChild<QTableView *>("gpsView");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+  APRSSystem *aprs = dialog.aprsSystem();
+  if (selected.isValid())
+    _config->posSystems()->addSystem(aprs, selected.row()+1);
+  else
+    _config->posSystems()->addSystem(aprs);
+}
+
+void
 Application::onRemGPS() {
   QModelIndex idx = _mainWindow->findChild<QTableView *>("gpsView")->selectionModel()->currentIndex();
   if (! idx.isValid()) {
@@ -1050,7 +1069,10 @@ Application::onEditGPS(const QModelIndex &idx) {
       return;
     dialog.gpsSystem();
   } else if (sys->is<APRSSystem>()) {
-    QMessageBox::critical(nullptr, tr("Not implemented yet"), tr("APRS system editor is not implemented yet."));
+    APRSSystemDialog dialog(_config, sys->as<APRSSystem>());
+    if (QDialog::Accepted != dialog.exec())
+      return;
+    dialog.aprsSystem();
   }
   emit _mainWindow->findChild<QTableView *>("gpsView")->model()->dataChanged(idx,idx);
 }

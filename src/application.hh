@@ -92,6 +92,7 @@ private slots:
   void onEditScanList(const QModelIndex &index);
 
   void onAddGPS();
+  void onAddAPRS();
   void onRemGPS();
   void onGPSUp();
   void onGPSDown();
