@@ -24,4 +24,9 @@
         <file>mainwindow.ui</file>
         <file>aboutdialog.ui</file>
     </qresource>
+    <qresource prefix="/icons/aprs">
+        <file alias="table0.png">aprs/aprs-symbols-24-0.png</file>
+        <file alias="table1.png">aprs/aprs-symbols-24-1.png</file>
+        <file alias="table2.png">aprs/aprs-symbols-24-2.png</file>
+    </qresource>
 </RCC>

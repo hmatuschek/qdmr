@@ -70,4 +70,6 @@ QString format_frequency(double MHz);
 QString aprsicon2name(APRSSystem::Icon icon);
 APRSSystem::Icon name2aprsicon(const QString &name);
 
+int levDist(const QString &source, const QString &target, Qt::CaseSensitivity cs=Qt::CaseInsensitive);
+
 #endif // UTILS_HH

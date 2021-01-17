@@ -2,6 +2,7 @@
 #define APRSSYSTEMDIALOG_HH
 
 #include <QDialog>
+#include <QImage>
 #include "config.hh"
 
 namespace Ui {
@@ -22,6 +23,7 @@ public:
 
 protected:
   void construct();
+  QIcon aprsIcon(APRSSystem::Icon icon);
 
 protected:
   Config *_config;
@@ -29,6 +31,7 @@ protected:
 
 private:
   Ui::aprssystemdialog *ui;
+  QImage _icons0;
 };
 
 #endif // APRSSYSTEMDIALOG_HH
