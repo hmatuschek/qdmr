@@ -850,6 +850,10 @@ public:
     uint8_t _unknown63;            ///< Unknown, set to ff.
 
     void setAutoTxInterval(int sec);
+    void setSignaling(Signaling::Code signaling);
+    void fromAPRSSystem(APRSSystem *sys);
+    APRSSystem *toAPRSSystem();
+
   };
 
   /** Represents the 8 GPS systems within the binary codeplug.
