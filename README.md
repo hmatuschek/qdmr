@@ -23,6 +23,7 @@ own these radios to test the software with.
 
 
 ## Releases
+ * **[Version 0.5.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.5.1)** -- Bugfix release.
  * **[Version 0.5.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.5.0)** -- Added support for Anytone AT-D878UV.
  * **[Version 0.4.7](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.7)** -- Feature release.
  * **[Version 0.4.6](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.6)** -- Bugfix release.
