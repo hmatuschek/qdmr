@@ -100,8 +100,6 @@ Application::createMainWindow() {
   progress->setVisible(false);
 
   QAction *newCP   = _mainWindow->findChild<QAction*>("actionNewCodeplug");
-  QAction *cpWiz   = _mainWindow->findChild<QAction*>("actionCodeplugWizard");
-  cpWiz->setEnabled(false);
   QAction *loadCP  = _mainWindow->findChild<QAction*>("actionOpenCodeplug");
   QAction *saveCP  = _mainWindow->findChild<QAction*>("actionSaveCodeplug");
 
@@ -116,7 +114,6 @@ Application::createMainWindow() {
   QAction *quit    = _mainWindow->findChild<QAction*>("actionQuit");
 
   connect(newCP, SIGNAL(triggered()), this, SLOT(newCodeplug()));
-  connect(cpWiz, SIGNAL(triggered()), this, SLOT(codeplugWizzard()));
   connect(loadCP, SIGNAL(triggered()), this, SLOT(loadCodeplug()));
   connect(saveCP, SIGNAL(triggered()), this, SLOT(saveCodeplug()));
   connect(quit, SIGNAL(triggered()), this, SLOT(quitApplication()));
@@ -257,11 +254,6 @@ Application::newCodeplug() {
 
   _config->reset();
   _config->setModified(false);
-}
-
-void
-Application::codeplugWizzard() {
-
 }
 
 

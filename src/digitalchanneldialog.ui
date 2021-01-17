@@ -216,7 +216,7 @@
        <item row="5" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>GPS System</string>
+          <string>Positioning System</string>
          </property>
         </widget>
        </item>

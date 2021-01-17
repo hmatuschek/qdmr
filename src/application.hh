@@ -27,7 +27,6 @@ public:
 
 public slots:
   void newCodeplug();
-  void codeplugWizzard();
   void loadCodeplug();
   void saveCodeplug();
   void quitApplication();

@@ -173,6 +173,7 @@ APRSSystemDialog::aprsSystem() {
     _aprs->setIcon(APRSSystem::Icon(ui->icon->currentData().toUInt()));
     _aprs->setPeriod(ui->updatePeriod->value());
     _aprs->setMessage(ui->message->text().simplified());
+
     return _aprs;
   }
 

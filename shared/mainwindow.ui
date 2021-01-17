@@ -794,7 +794,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionNewCodeplug"/>
-   <addaction name="actionCodeplugWizard"/>
    <addaction name="actionOpenCodeplug"/>
    <addaction name="actionSaveCodeplug"/>
    <addaction name="separator"/>

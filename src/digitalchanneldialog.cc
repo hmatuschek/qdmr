@@ -68,10 +68,10 @@ DigitalChannelDialog::construct() {
       txContact->setCurrentIndex(i+1);
   }
   gpsSystem->addItem(tr("[None]"), QVariant::fromValue((GPSSystem *)nullptr));
-  for (int i=0; i<_config->posSystems()->gpsCount(); i++) {
-    gpsSystem->addItem(_config->posSystems()->gpsSystem(i)->name(),
-                       QVariant::fromValue(_config->posSystems()->gpsSystem(i)));
-    if (_channel && (_channel->posSystem() == _config->posSystems()->gpsSystem(i)))
+  for (int i=0; i<_config->posSystems()->count(); i++) {
+    PositioningSystem *sys = _config->posSystems()->system(i);
+    gpsSystem->addItem(sys->name(), QVariant::fromValue(sys));
+    if (_channel && (_channel->posSystem() == sys))
       gpsSystem->setCurrentIndex(i+1);
   }
 
@@ -113,7 +113,7 @@ DigitalChannelDialog::channel() {
   RXGroupList *rxgroup = rxGroupList->currentData().value<RXGroupList *>();
   DigitalContact *contact = txContact->currentData().value<DigitalContact *>();
   ScanList *scanlist = scanList->currentData().value<ScanList *>();
-  GPSSystem *gps = gpsSystem->currentData().value<GPSSystem *>();
+  PositioningSystem *pos = gpsSystem->currentData().value<PositioningSystem *>();
 
   if (_channel) {
     _channel->setName(name);
@@ -128,12 +128,12 @@ DigitalChannelDialog::channel() {
     _channel->setTimeSlot(ts);
     _channel->setRXGroupList(rxgroup);
     _channel->setTXContact(contact);
-    _channel->setPosSystem(gps);
+    _channel->setPosSystem(pos);
     return _channel;
   }
 
   return new DigitalChannel(name, rx, tx, pwr, timeout, rxonly, admit, colorcode, ts, rxgroup,
-                            contact, gps, scanlist);
+                            contact, pos, scanlist);
 }
 
 void
