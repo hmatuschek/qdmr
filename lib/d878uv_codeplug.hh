@@ -117,7 +117,6 @@ class GPSSystem;
  *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings, see @c aprs_setting_t.</td>
  *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings, see @c gps_systems_t.</td>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, upto 60 chars ASCII, 0-padded.</td>
- *  <tr><td>02501280</td> <td>000030</td> <td>Unknown, set to 0x00. </td></tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
@@ -183,7 +182,7 @@ class GPSSystem;
  *  <tr><td>024C1800</td> <td>000500</td> <td>Empty, set to 0x00?</td></tr>
  *  <tr><td>024C2400</td> <td>000030</td> <td>Unknown data.</td></tr>
  *  <tr><td>024C2600</td> <td>000010</td> <td>Unknown data.</td></tr>
- *  <tr><td>04340000</td> <td>000050</td> <td>Unknown data, some how related to contacts.</td></tr>
+ *  <tr><td>02501280</td> <td>000030</td> <td>Unknown, set to 0x00. </td></tr>
  * </table>
  *
  * @ingroup d878uv */
@@ -849,11 +848,31 @@ public:
     uint8_t _unknown62;            ///< Unknown, set to 03.
     uint8_t _unknown63;            ///< Unknown, set to ff.
 
+    bool isValid() const;
+
+    double getFrequency() const;
+    void setFrequency(double freq);
+
+    int getAutoTXInterval() const;
     void setAutoTxInterval(int sec);
+
+    QString getDestination() const;
+    void setDestination(const QString &call);
+    QString getSource() const;
+    void setSource(const QString &call);
+
+    Signaling::Code getSignaling() const;
     void setSignaling(Signaling::Code signaling);
+
+    Channel::Power getPower() const;
+    void setPower(Channel::Power pwr);
+
+    APRSSystem::Icon getIcon() const;
+    void setIcon(APRSSystem::Icon icon);
+
     void fromAPRSSystem(APRSSystem *sys);
     APRSSystem *toAPRSSystem();
-
+    void linkAPRSSystem(APRSSystem *sys, CodeplugContext &ctx);
   };
 
   /** Represents the 8 GPS systems within the binary codeplug.

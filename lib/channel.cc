@@ -359,6 +359,37 @@ ChannelList::channel(int idx) const {
   return _channels.at(idx);
 }
 
+Channel *
+ChannelList::findChannel(double freq) const {
+  for (int i=0; i<count(); i++) {
+    if ((_channels[i]->txFrequency() == freq) || (_channels[i]->rxFrequency() == freq))
+      return _channels[i];
+  }
+  return nullptr;
+}
+
+DigitalChannel *
+ChannelList::findDigitalChannel(double freq) const {
+  for (int i=0; i<count(); i++) {
+    if (! _channels[i]->is<DigitalChannel>())
+      continue;
+    if ((_channels[i]->txFrequency() == freq) || (_channels[i]->rxFrequency() == freq))
+      return _channels[i]->as<DigitalChannel>();
+  }
+  return nullptr;
+}
+
+AnalogChannel *
+ChannelList::findAnalogChannel(double freq) const {
+  for (int i=0; i<count(); i++) {
+    if (! _channels[i]->is<AnalogChannel>())
+      continue;
+    if ((_channels[i]->txFrequency() == freq) || (_channels[i]->rxFrequency() == freq))
+      return _channels[i]->as<AnalogChannel>();
+  }
+  return nullptr;
+}
+
 int
 ChannelList::addChannel(Channel *channel, int row) {
   if (_channels.contains(channel))

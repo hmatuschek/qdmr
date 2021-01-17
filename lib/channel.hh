@@ -357,6 +357,12 @@ public:
   int indexOf(Channel *channel) const;
   /** Gets the channel at the specified index. */
 	Channel *channel(int idx) const;
+  /** Finds a channel with the given frequeny. */
+  Channel *findChannel(double freq) const;
+  /** Finds a digial channel with the given frequeny. */
+  DigitalChannel *findDigitalChannel(double freq) const;
+  /** Finds an analog channel with the given frequeny. */
+  AnalogChannel *findAnalogChannel(double freq) const;
   /** Adds a channel to the list at the specified row.
    * If row<0 the channel gets appendet to the list.*/
 	int addChannel(Channel *channel, int row=-1);
