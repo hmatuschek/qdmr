@@ -20,7 +20,7 @@ static Radio::Features _open_gd77_features =
   16,    // maxChannelNameLength
   true,  // allowChannelNoDefaultContact
 
-  32,    // maxZones
+  68,    // maxZones
   16,    // maxZoneNameLength
   80,    // maxChannelsInZone
   false, // hasABZone
@@ -31,7 +31,7 @@ static Radio::Features _open_gd77_features =
   32,    // maxChannelsInScanlist
   true,  // scanListNeedPriority
 
-  256,   // maxContacts
+  1024,  // maxContacts
   16,    // maxContactNameLength
 
   76,   // maxGrouplists

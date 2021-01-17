@@ -39,7 +39,7 @@
  *  <tr><td>0x7b000</td> <td>0x7b1b0</td> <td>0x01b0</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x7b1b0</td> <td>0x87620</td> <td>0xc470</td> <td>Remaining 896 chanels (bank 1-7), see @c GD77Codeplug::bank_t</td></tr>
  *  <tr><td>0x87620</td> <td>0x8d620</td> <td>0x6000</td> <td>1024 contacts, see @c GD77Codeplug::contact_t.</td></tr>
- *  <tr><td>0x8d620</td> <td>0x8e2a0</td> <td>0x0c80</td> <td>64 RX group lists, see @c GD77Codeplug::grouptab_t</td></tr>
+ *  <tr><td>0x8d620</td> <td>0x8e2a0</td> <td>0x0c80</td> <td>76 RX group lists, see @c GD77Codeplug::grouptab_t</td></tr>
  *  <tr><td>0x8e2a0</td> <td>0x8ee60</td> <td>0x0bc0</td> <td>??? Unknown ???</td></tr>
  * </table>
  * @ingroup ogd77 */
@@ -54,6 +54,8 @@ public:
   static const uint32_t FLASH  = 1;
 
 protected:
+  static const int NZONES    = 68;    ///< The number of zones.
+
   /** Channel representation within the binary codeplug. */
   typedef struct __attribute__((packed)) {
     /** Possible channel types analog (FM) or digital (DMR). */

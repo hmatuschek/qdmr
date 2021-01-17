@@ -40,7 +40,7 @@
  *  <tr><td>0x07560</td> <td>0x07c00</td> <td>0x06a0</td> <td>??? Unknown ???</td></tr>
  *  <tr><th colspan="4">Second segment 0x08000-0x1e300</th></tr>
  *  <tr><td>0x08000</td> <td>0x08010</td> <td>0x0010</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x08010</td> <td>0x0af10</td> <td>0x2f00</td> <td>250 zones, see @c GD77Codeplug::zonetab_t</td></tr>
+ *  <tr><td>0x08010</td> <td>0x0af10</td> <td>0x2f00</td> <td>68 zones of 80 channels each, see @c GD77Codeplug::zonetab_t</td></tr>
  *  <tr><td>0x0af10</td> <td>0x0b1b0</td> <td>0x02a0</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x0b1b0</td> <td>0x17620</td> <td>0xc470</td> <td>Remaining 896 chanels (bank 1-7), see @c GD77Codeplug::bank_t</td></tr>
  *  <tr><td>0x17620</td> <td>0x1d620</td> <td>0x6000</td> <td>1024 contacts, see @c GD77Codeplug::contact_t.</td></tr>
@@ -55,7 +55,7 @@ class GD77Codeplug: public CodePlug
 protected:
 	static const int NCHAN     = 1024;  ///< The number of channels.
   static const int NCONTACTS = 1024;  ///< The number of contacts.
-	static const int NZONES    = 250;   ///< The number of zones.
+  static const int NZONES    = 250;   ///< The number of zones.
 	static const int NGLISTS   = 76;    ///< The number of RX group-lists.
 	static const int NSCANL    = 64;    ///< The number of scan-lists.
 	static const int NMESSAGES = 32;    ///< The number of predefined text messages.
