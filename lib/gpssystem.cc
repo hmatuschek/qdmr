@@ -315,9 +315,10 @@ PositioningSystems::gpsSystem(int idx) const {
 int
 PositioningSystems::aprsCount() const {
   int c=0;
-  for (int i=0; i<_posSystems.size(); i++)
+  for (int i=0; i<count(); i++) {
     if (_posSystems.at(i)->is<APRSSystem>())
       c++;
+  }
   return c;
 }
 

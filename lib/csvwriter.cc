@@ -245,7 +245,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 8) Message, optional message in quotes.\n"
             "#\n"
             "APRS Name                Channel Period Source      Destination Icon        Message\n";
-  for(int i=0; i<config->posSystems()->aprsCount(); i++) {
+  for(int i=0; i<config->posSystems()->count(); i++) {
     if (! config->posSystems()->system(i)->is<APRSSystem>())
       continue;
     APRSSystem *aprs = config->posSystems()->system(i)->as<APRSSystem>();
