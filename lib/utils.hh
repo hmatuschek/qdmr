@@ -69,7 +69,14 @@ QString format_frequency(double MHz);
 
 QString aprsicon2name(APRSSystem::Icon icon);
 APRSSystem::Icon name2aprsicon(const QString &name);
+char aprsicon2iconcode(APRSSystem::Icon icon);
+char aprsicon2tablecode(APRSSystem::Icon icon);
+APRSSystem::Icon code2aprsicon(char table, char icon);
 
-int levDist(const QString &source, const QString &target, Qt::CaseSensitivity cs=Qt::CaseInsensitive);
+/** Implements the Levenshteim distance between two strings.
+ * That is, the number of edits (insert, delete or replace operations) needed to turn source
+ * into target. */
+int levDist(const QString &source, const QString &target,
+            Qt::CaseSensitivity cs=Qt::CaseInsensitive);
 
 #endif // UTILS_HH

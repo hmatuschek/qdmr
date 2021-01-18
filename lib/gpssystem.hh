@@ -10,23 +10,34 @@ class DigitalContact;
 class DigitalChannel;
 class AnalogChannel;
 
-
+/** Base class of the positioning systems, that is APRS and DMR position reporting system.
+ * @ingroup conf */
 class PositioningSystem: public QObject
 {
   Q_OBJECT
 
 protected:
+  /** Hidden constructor.
+   * The PositioningSystem class is not instantiated directly, use either @c GPSSystem or
+   * @c APRSSystem instead.
+   * @param name Specifies the name of the system.
+   * @param period Specifies the auto-update period in seconds.
+   * @param parent Specified the QObject parent object. */
   explicit PositioningSystem(const QString &name, uint period=300, QObject *parent=nullptr);
 
 public:
+  /** Destructor. */
   virtual ~PositioningSystem();
 
+  /** Returns @c true if this positioning system is an instance of the specified system. */
   template <class System>
   bool is() const { return nullptr != dynamic_cast<const System *>(this); }
 
+  /** Casts this positioning system to an instance of the specified system. */
   template <class System>
   System *as() { return dynamic_cast<System *>(this); }
 
+  /** Casts this positioning system to an instance of the specified system. */
   template <class System>
   const System *as() const { return dynamic_cast<const System *>(this); }
 
@@ -102,16 +113,19 @@ protected:
 };
 
 
+/** Represents an APRS system wihtin the generic config.
+ * @ingroup conf */
 class APRSSystem: public PositioningSystem
 {
   Q_OBJECT
 
 public:
-  static const uint PRIMARY_TABLE   = (0<<8);
-  static const uint SECONDARY_TABLE = (1<<8);
-  static const uint TABLE_MASK      = (3<<8);
-  static const uint ICON_MASK       = 0x7f;
+  static const uint PRIMARY_TABLE   = (0<<8);   ///< Primary icon table flag.
+  static const uint SECONDARY_TABLE = (1<<8);   ///< Secondary icon table flag.
+  static const uint TABLE_MASK      = (3<<8);   ///< Bitmask for icon table flags.
+  static const uint ICON_MASK       = 0x7f;     ///< Bitmask for the icon table entry.
 
+  /** All implemented APRS icons. */
   typedef enum {
     APRS_ICON_POLICE_STN = (PRIMARY_TABLE | 0), APRS_ICON_NO_SYMBOL, APRS_ICON_DIGI, APRS_ICON_PHONE,
     APRS_ICON_DX_CLUSTER, APRS_ICON_HF_GATEWAY, APRS_ICON_PLANE_SMALL, APRS_ICON_MOB_SAT_STN,
@@ -136,42 +150,76 @@ public:
   } Icon;
 
 public:
-  explicit APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, uint dSSID,
+  /** Constructor for a APRS system.
+   * @param name Specifies the name of the APRS system. This property is just a name, it does not
+   *        affect the radio configuration.
+   * @param channel Specifies the transmit channel. This property is not optional. A transmit
+   *        channel must be specified to obtain a working APRS system.
+   * @param dest Specifies the destination call, APRS messages are send to. Usually 'WIDE3' is a
+   *        reasonable setting.
+   * @param destSSID Specifies the destination SSID. Usually 3 is a reasonable choice.
+   * @param src Specifies the source call, usually you call has to be entered here.
+   * @param srcSSID The source SSID, usually 7 is a reasonable choice of handhelds.
+   * @param icon Specifies the map icon to send.
+   * @param message An optional message to send.
+   * @param period Specifies the auto-update period in seconds.
+   * @param parent Specifies the QObject parent object. */
+  explicit APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, uint destSSID,
                       const QString &src, uint srcSSID, Icon icon=APRS_ICON_JOGGER,
                       const QString &message="", uint period=300, QObject *parent=nullptr);
 
+  /** Returns the transmit channel of the APRS system. */
   AnalogChannel *channel() const;
+  /** Sets the transmit channel of the APRS system. */
   void setChannel(AnalogChannel *channel);
 
+  /** Retruns the destination call. */
   const QString &destination() const;
+  /** Returns the destination SSID. */
   uint destSSID() const;
+  /** Sets the destination call and SSID. */
   void setDestination(const QString &call, uint ssid);
 
+  /** Returns the source call. */
   const QString &source() const;
+  /** Returns the source SSID. */
   uint srcSSID() const;
+  /** Sets the source call and SSID. */
   void setSource(const QString &call, uint ssid);
 
+  /** Returns the map icon. */
   Icon icon() const;
+  /** Sets the map icon. */
   void setIcon(Icon icon);
 
+  /** Retunrs the optional message. */
   const QString &message() const;
+  /** Sets the optional APRS message text. */
   void setMessage(const QString &msg);
 
 protected slots:
+  /** Internal call-back if the transmit channel gets deleted. */
   void onChannelDeleted(QObject *obj);
 
 protected:
+  /** A weak reference to the transmit channel. */
   AnalogChannel *_channel;
+  /** Holds the destination call. */
   QString _destination;
+  /** Holds the destination SSID. */
   uint _destSSID;
+  /** Holds the source call. */
   QString _source;
+  /** Holds the source SSID. */
   uint _srcSSID;
+  /** Holds the map icon. */
   Icon _icon;
+  /** Holds the optional message. */
   QString _message;
 };
 
 
-/** The list of GPS systems.
+/** The list of positioning systems.
  * @ingroup conf */
 class PositioningSystems: public QAbstractTableModel
 {
@@ -186,24 +234,34 @@ public:
 
   /** Returns the number of Positioning systems in this list. */
   int count() const;
+  /** Returns the positioning system at the specified index. */
   PositioningSystem *system(int idx) const;
+  /** Returns the index of given positioning system. */
   int indexOf(PositioningSystem *sys) const;
   /** Adds a positioning system to the list at the specified row.
    * If row<0 the system gets appendet to the list.*/
   int addSystem(PositioningSystem *sys, int row=-1);
-  /** Removes the given GPS system from the list. */
+  /** Removes the given positioning system from the list. */
   bool remSystem(PositioningSystem *gps);
-  /** Removes the GPS system at the given index from the list. */
+  /** Removes the positioning system at the given index from the list. */
   bool remSystem(int idx);
 
+  /** Returns the number of defined GPS systems. */
   int gpsCount() const;
-  /** Returns the index of the GPS System. */
+  /** Returns the index of the GPS System.
+   * This index in only within all defined GPS systems. */
   int indexOfGPSSys(GPSSystem *gps) const;
-  /** Gets the GPS system at the specified index. */
+  /** Gets the GPS system at the specified index.
+   * This index is only within all defined GPS systems. */
   GPSSystem *gpsSystem(int idx) const;
 
+  /** Returns the number of defined APRS system. */
   int aprsCount() const;
+  /** Returns the index of the specified APRS system. That index is only within all
+   * defined APRS systems. */
   int indexOfAPRSSys(APRSSystem *gps) const;
+  /** Returns the APRS system at index @c idx.
+   * That index is only within all defined APRS systems. */
   APRSSystem *aprsSystem(int idx) const;
 
   /** Moves the GPS system at index @c idx one step up. */

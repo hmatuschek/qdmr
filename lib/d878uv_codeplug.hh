@@ -837,9 +837,9 @@ public:
 
     // byte 0x38
     uint8_t _unknown56;            ///< Unknown set to 00.
-    char symbol;                   ///< ASCII-char for APRS icon table, ie. '/' or '\' for primary
+    char table;                    ///< ASCII-char for APRS icon table, ie. '/' or '\' for primary
                                    ///  and alternate icon table respectively.
-    char map_icon;                 ///< ASCII-char of APRS map icon.
+    char icon;                     ///< ASCII-char of APRS map icon.
     uint8_t power;                 ///< Transmit power.
     uint8_t prewave_delay;         ///< Prewave delay in 10ms steps.
 
@@ -848,30 +848,51 @@ public:
     uint8_t _unknown62;            ///< Unknown, set to 03.
     uint8_t _unknown63;            ///< Unknown, set to ff.
 
+    /** Returns @c true, if the APRS setting is vaild. That is, it has a valid destination and
+     * source calls and SSIDs. */
     bool isValid() const;
 
+    /** Decodes the transmit frequency. */
     double getFrequency() const;
+    /** Encodes the given frequency. */
     void setFrequency(double freq);
 
+    /** Decodes the auto TX period. */
     int getAutoTXInterval() const;
+    /** Encodes the auto TX period. */
     void setAutoTxInterval(int sec);
 
+    /** Decodes the destination call. */
     QString getDestination() const;
+    /** Encodes the given destination call. */
     void setDestination(const QString &call);
+
+    /** Decodes the destination SSID. */
     QString getSource() const;
+    /** Encodes the destination SSID. */
     void setSource(const QString &call);
 
+    /** Decodes the TX signaling. */
     Signaling::Code getSignaling() const;
+    /** Encodes the TX signaling. */
     void setSignaling(Signaling::Code signaling);
 
+    /** Decodes the transmit power. */
     Channel::Power getPower() const;
+    /** Encodes the given transmit power. */
     void setPower(Channel::Power pwr);
 
+    /** Decodes the APRS map icon. */
     APRSSystem::Icon getIcon() const;
+    /** Encodes the specified map icon. */
     void setIcon(APRSSystem::Icon icon);
 
+    /** Configures this APRS system from the given generic config. */
     void fromAPRSSystem(APRSSystem *sys);
+    /** Constructs a generic APRS system configuration from this APRS system. */
     APRSSystem *toAPRSSystem();
+    /** Links the transmit channel within the generic APRS system based on the transmit frequency
+     * defined within this APRS system. */
     void linkAPRSSystem(APRSSystem *sys, CodeplugContext &ctx);
   };
 
@@ -894,21 +915,34 @@ public:
                                    /// Default 0, range 0-1000ms.
     uint8_t _unknown66[30];        ///< Unknown, set to 0.
 
+    /** Constructor, resets the GPS systems. */
     gps_systems_t();
+    /** Reset the GPS systems. */
     void clear();
+    /** Returns @c true if the specified GPS system is valid. */
     bool isValid(int idx) const;
 
+    /** Returns the contact ID to send GPS information to for the idx-th system. */
     uint32_t getContactId(int idx) const;
+    /** Sets the contact ID for the idx-th GPS system. */
     void setContactId(int idx, uint32_t number);
+    /** Returns the call type for the idx-th GPS system. */
     DigitalContact::Type getContactType(int idx) const;
+    /** Set the call type for the idx-th GPS system. */
     void setContactType(int idx, DigitalContact::Type type);
 
+    /** Retruns the channel index for the idx-th GPS system. */
     uint16_t getChannelIndex(int idx) const;
+    /** Sets the channel idx for th idx-th GPS system. */
     void setChannelIndex(int idx, uint16_t ch_index);
 
+    /** Constructs all GPS system from the generic configuration. */
     void fromGPSSystems(const Config *conf);
+    /** Encodes the given GPS system. */
     void fromGPSSystemObj(GPSSystem *sys, const Config *conf);
+    /** Constructs a generic GPS system from the idx-th encoded GPS system. */
     GPSSystem *toGPSSystemObj(int idx) const;
+    /** Links the specified generic GPS system. */
     bool linkGPSSystem(int idx, GPSSystem *sys, const CodeplugContext &ctx) const;
   };
 

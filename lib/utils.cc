@@ -4,7 +4,20 @@
 #include <QHash>
 #include <cmath>
 
-static QHash<APRSSystem::Icon, QString> aprsIconTable{
+// Maps APRS icon number to code-char
+static QVector<char> aprsIconCodeTable{
+  '!','"','#','$','%','&','\'','(',')','*',
+  '+',',','-','.','/','0','1','2','3','4',
+  '5','6','7','8','9',':',';','<','=','>',
+  '?','@','A','B','C','D','E','F','G','H',
+  'H','I','J','K','L','M','N','O','P','Q',
+  'R','S','T','U','V','W','X','Y','Z','[',
+  '/',']','^','_','`','a','b','c','d','e',
+  'f','g','h','i','j','k','l','m','n','o',
+  'p','q','r','s','t','u','v','w','x','y',
+  'z','{','|','}','~'};
+
+static QHash<APRSSystem::Icon, QString> aprsIconNameTable{
   {APRSSystem::APRS_ICON_NO_SYMBOL, ""},
   {APRSSystem::APRS_ICON_POLICE_STN, "Police station"},
   {APRSSystem::APRS_ICON_DIGI, "Digipeater"},
@@ -340,7 +353,7 @@ QString
 aprsicon2name(APRSSystem::Icon icon) {
   if (APRSSystem::APRS_ICON_NO_SYMBOL == icon)
     return "-";
-  return aprsIconTable.value(icon, "-");
+  return aprsIconNameTable.value(icon, "-");
 }
 
 APRSSystem::Icon
@@ -351,8 +364,8 @@ name2aprsicon(const QString &name) {
   APRSSystem::Icon icon = APRSSystem::APRS_ICON_NO_SYMBOL;
   int best = levDist(name, "");
 
-  QHash<APRSSystem::Icon, QString>::const_iterator item=aprsIconTable.constBegin();
-  for(; item != aprsIconTable.constEnd(); item++) {
+  QHash<APRSSystem::Icon, QString>::const_iterator item=aprsIconNameTable.constBegin();
+  for(; item != aprsIconNameTable.constEnd(); item++) {
     int dist = levDist(name, item.value());
     if (dist < best) {
       icon = item.key();
@@ -361,6 +374,36 @@ name2aprsicon(const QString &name) {
   }
 
   return icon;
+}
+
+char
+aprsicon2iconcode(APRSSystem::Icon icon) {
+ uint num = uint(APRSSystem::ICON_MASK & icon);
+ if (num >= uint(aprsIconCodeTable.size()))
+   return '"';
+ return aprsIconCodeTable[num];
+}
+
+char
+aprsicon2tablecode(APRSSystem::Icon icon) {
+  uint tab = (APRSSystem::TABLE_MASK & icon);
+  switch (tab) {
+  case APRSSystem::SECONDARY_TABLE: return '\\';
+  case APRSSystem::PRIMARY_TABLE: return '/';
+  }
+  return '/';
+}
+
+APRSSystem::Icon
+code2aprsicon(char table, char icon) {
+  uint num = (APRSSystem::ICON_MASK & APRSSystem::APRS_ICON_NO_SYMBOL);
+  if (aprsIconCodeTable.contains(icon))
+    num = aprsIconCodeTable.indexOf(icon);
+  if ('/' == table)
+    num = num | APRSSystem::PRIMARY_TABLE;
+  else if ('\\' == table)
+    num = num | APRSSystem::PRIMARY_TABLE;
+  return APRSSystem::Icon(num);
 }
 
 int

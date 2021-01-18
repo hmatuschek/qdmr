@@ -169,6 +169,7 @@ public:
    * @param txTone    Specifies CTCSS/DCS TX tone/code.
    * @param bw        Specifies the bandwidth.
    * @param list      Specifies the default scanlist for the channel.
+   * @param aprsSys   Specifies the APRS system for the channel.
    * @param parent    Specified the @c QObject parent object. */
   AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
                 bool rxOnly, Admit admit, uint squelch, Signaling::Code rxTone,
@@ -201,9 +202,11 @@ public:
 
   /** Returns the APRS system used for this channel or @c nullptr if disabled. */
   APRSSystem *aprs() const;
+  /** Sets the APRS system. */
   void setAPRS(APRSSystem *sys);
 
 protected:
+  /** Internal call-back that gets called if the associated APRS gets deleted. */
   void onAPRSSystemDeleted();
 
 protected:

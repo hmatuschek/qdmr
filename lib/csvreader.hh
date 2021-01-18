@@ -16,8 +16,6 @@ class Zone;
 class PositioningSystem;
 class ScanList;
 
-/// @cond with_internal_docs
-
 /** The lexer class divides a text stream into tokens. */
 class CSVLexer: public QObject
 {
@@ -78,7 +76,7 @@ public:
   void pop();
   /** Reads the next token from the stream. */
   Token next();
-
+  /** Returns the last error message. */
   const QString &errorMessage() const;
 
 protected:
@@ -98,8 +96,6 @@ protected:
   /// The list of patterns to match
   static QVector< QPair<QRegExp, Token::TokenType> > _pattern;
 };
-
-/// @endcond
 
 
 /** Basic parse-handler interface.

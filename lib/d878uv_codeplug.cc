@@ -936,15 +936,12 @@ D878UVCodeplug::aprs_setting_t::setPower(Channel::Power pwr) {
 
 APRSSystem::Icon
 D878UVCodeplug::aprs_setting_t::getIcon() const {
-  /// @bug Implement APRS icon decoding.
-  return APRSSystem::APRS_ICON_NO_SYMBOL;
+  return code2aprsicon(table, icon);
 }
 void
 D878UVCodeplug::aprs_setting_t::setIcon(APRSSystem::Icon icon) {
-  /// @bug Implement icon number -> code char translation
-  uint table = APRSSystem::TABLE_MASK & icon;
-  uint iconnum = APRSSystem::ICON_MASK & icon;
-  this->symbol = '/'; this->map_icon = '[';
+  this->table = aprsicon2tablecode(icon);
+  this->icon = aprsicon2iconcode(icon);
 }
 
 void
