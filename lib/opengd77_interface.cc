@@ -4,6 +4,7 @@
 
 #define BLOCK_SIZE  32
 #define SECTOR_SIZE 4096
+#define ALIGN_BLOCK_SIZE(n) ((0==((n)%BLOCK_SIZE)) ? (n) : (n)+(BLOCK_SIZE-((n)%BLOCK_SIZE)))
 
 /* ********************************************************************************************* *
  * Implementation of OpenGD77Interface::ReadRequest
@@ -220,8 +221,8 @@ OpenGD77Interface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes
   if (EEPROM == bank) {
     if ((0 <= _sector) && (! finishWriteFlash()))
       return false;
-    for (int i=0; i<nbytes; i+=32) {
-      if (! writeEEPROM(addr+i, data+i, 32)) {
+    for (int i=0; i<nbytes; i+=BLOCK_SIZE) {
+      if (! writeEEPROM(addr+i, data+i, BLOCK_SIZE)) {
         _sector = -1;
         return false;
       }
@@ -239,8 +240,8 @@ start:
   }
 
   if (sector == _sector) {
-    for (int i=0; i<nbytes; i+=32) {
-      if (! writeFlash(addr+i, data+i, 32)) {
+    for (int i=0; i<nbytes; i+=BLOCK_SIZE) {
+      if (! writeFlash(addr+i, data+i, BLOCK_SIZE)) {
         _sector = -1;
         return false;
       }
@@ -299,12 +300,12 @@ OpenGD77Interface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
     return false;
   }
 
-  for (int i=0; i<nbytes; i+=32) {
+  for (int i=0; i<nbytes; i+=BLOCK_SIZE) {
     bool ok;
     if (EEPROM == bank)
-      ok = readEEPROM(addr+i, data+i, 32);
+      ok = readEEPROM(addr+i, data+i, BLOCK_SIZE);
     else if (FLASH == bank)
-      ok = readFlash(addr+i, data+i, 32);
+      ok = readFlash(addr+i, data+i, BLOCK_SIZE);
     else {
       _errorMessage = tr("%1: Cannot read from bank %2: Unknown memory bank.")
           .arg(__func__).arg(bank);
@@ -341,7 +342,7 @@ OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len) {
     return false;
   }
 
-  ReadRequest req; req.initReadEEPROM(addr, 32);
+  ReadRequest req; req.initReadEEPROM(addr, BLOCK_SIZE);
   if (sizeof(ReadRequest) != QSerialPort::write((const char *)&req, sizeof(ReadRequest))) {
     _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
     logError() << __FILE__ << ": " << _errorMessage;
@@ -433,7 +434,7 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len) {
   }
 
   ReadRequest req;
-  req.initReadFlash(addr, 32);
+  req.initReadFlash(addr, BLOCK_SIZE);
   if (sizeof(ReadRequest) != QSerialPort::write((const char *)&req, sizeof(ReadRequest))) {
     _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
     logError() << _errorMessage;

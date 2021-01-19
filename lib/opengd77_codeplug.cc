@@ -4,6 +4,7 @@
 #include "utils.hh"
 #include "logger.hh"
 #include <QDateTime>
+#include <QtEndian>
 
 // Stored in EEPROM
 #define OFFSET_SETTINGS     0x000e0
@@ -16,6 +17,13 @@
 #define OFFSET_BANK_1       0x7b1b0 // Channels 129-1024
 #define OFFSET_CONTACTS     0x87620
 #define OFFSET_GROUPTAB     0x8d620
+
+#define OFFSET_USERDB       0x30000
+#define USERDB_SIZE         0x40000
+#define USERDB_NUM_ENTRIES  (USERDB_SIZE-sizeof(userdb_t))/sizeof(userdb_entry_t)
+
+#define BLOCK_SIZE  32
+#define ALIGN_BLOCK_SIZE(n) ((0==((n)%BLOCK_SIZE)) ? (n) : (n)+(BLOCK_SIZE-((n)%BLOCK_SIZE)))
 
 
 /* ******************************************************************************************** *
@@ -238,6 +246,74 @@ OpenGD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf
 }
 
 
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77Codeplug::contact_t
+ * ******************************************************************************************** */
+OpenGD77Codeplug::contact_t::contact_t() {
+  clear();
+}
+
+void
+OpenGD77Codeplug::contact_t::clear() {
+  memset(name, 0xff, 16);
+  memset(id, 0x00, 4);
+  type = receive_tone = ring_style = timeslot_override = 0;
+}
+
+bool
+OpenGD77Codeplug::contact_t::isValid() const {
+  return (0x00 != name[0]) && (0xff != name[0]);
+}
+
+uint32_t
+OpenGD77Codeplug::contact_t::getId() const {
+  return decode_dmr_id_bcd(id);
+}
+void
+OpenGD77Codeplug::contact_t::setId(uint32_t num) {
+  encode_dmr_id_bcd(id, num);
+}
+
+QString
+OpenGD77Codeplug::contact_t::getName() const {
+  return decode_ascii(name, 16, 0xff);
+}
+void
+OpenGD77Codeplug::contact_t::setName(const QString &n) {
+  encode_ascii(name, n, 16, 0xff);
+}
+
+DigitalContact *
+OpenGD77Codeplug::contact_t::toContactObj() const {
+  if (! isValid())
+    return nullptr;
+  QString name = getName();
+  uint32_t id = getId();
+  DigitalContact::Type ctype;
+  switch (type) {
+    case CALL_PRIVATE: ctype = DigitalContact::PrivateCall; break;
+    case CALL_GROUP: ctype = DigitalContact::GroupCall; break;
+    case CALL_ALL: ctype = DigitalContact::AllCall; break;
+  }
+  bool rxTone = (receive_tone && ring_style);
+  return new DigitalContact(ctype, name, id, rxTone);
+}
+
+void
+OpenGD77Codeplug::contact_t::fromContactObj(const DigitalContact *cont, const Config *conf) {
+  Q_UNUSED(conf);
+  timeslot_override = 0x00;
+  setName(cont->name());
+  setId(cont->number());
+  switch (cont->type()) {
+    case DigitalContact::PrivateCall: type = CALL_PRIVATE; break;
+    case DigitalContact::GroupCall:   type = CALL_GROUP; break;
+    case DigitalContact::AllCall:     type = CALL_ALL; break;
+  }
+  if (cont->rxTone())
+    receive_tone = ring_style = 1;
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of OpenGD77Codeplug::zone_t
@@ -320,6 +396,68 @@ OpenGD77Codeplug::zone_t::fromZoneObjB(const Zone *zone, const Config *conf) {
   }
 }
 
+
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77Codeplug::userdb_entry_t
+ * ******************************************************************************************** */
+OpenGD77Codeplug::userdb_entry_t::userdb_entry_t() {
+  clear();
+}
+
+void
+OpenGD77Codeplug::userdb_entry_t::clear() {
+  memset(this, 0, sizeof(userdb_entry_t));
+}
+
+uint32_t
+OpenGD77Codeplug::userdb_entry_t::getNumber() const {
+  return decode_dmr_id_bcd((uint8_t *)&number);
+}
+void
+OpenGD77Codeplug::userdb_entry_t::setNumber(uint32_t number) {
+  encode_dmr_id_bcd((uint8_t *)&(this->number), number);
+}
+
+QString
+OpenGD77Codeplug::userdb_entry_t::getName() const {
+  return decode_ascii((const uint8_t *)name, 15, 0x00);
+}
+void
+OpenGD77Codeplug::userdb_entry_t::setName(const QString &name) {
+  encode_ascii((uint8_t *)(this->name), name, 15, 0x00);
+}
+
+void
+OpenGD77Codeplug::userdb_entry_t::fromEntry(const UserDatabase::User &user) {
+  setNumber(user.id);
+  QString tmp = user.call;
+  if (!user.name.isEmpty())
+    tmp = tmp + " " + user.name;
+  setName(tmp);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77Codeplug::userdb_t
+ * ******************************************************************************************** */
+OpenGD77Codeplug::userdb_t::userdb_t() {
+  clear();
+}
+
+void
+OpenGD77Codeplug::userdb_t::clear() {
+  memcpy(magic, "ID-", 3);
+  size = 0x5d;
+  memcpy(version, "001", 3);
+  count = 0;
+  unused6 = unused9 = 0;
+}
+
+void
+OpenGD77Codeplug::userdb_t::fromUserDB(const UserDatabase *db) {
+  clear();
+  count = qToLittleEndian(std::min(db->count(), qint64(USERDB_NUM_ENTRIES)));
+}
 
 
 /* ******************************************************************************************** *
@@ -446,6 +584,23 @@ next:
     // Enable group list
     gt->nitems1[i] = std::min(15,config->rxGroupLists()->list(i)->count()) + 1;
     gl->fromRXGroupListObj(config->rxGroupLists()->list(i), config);
+  }
+
+  if (! config->uploadUserDB())
+    return true;
+
+  // Prepare user DB, i.e. sort DB wrt to own DMR ID
+  config->userDB()->sortUsers(config->id());
+  // Allocate segment for user db if requested
+  uint n_entry = std::min(config->userDB()->count(), qint64(USERDB_NUM_ENTRIES));
+  uint size = ALIGN_BLOCK_SIZE(sizeof(userdb_t)+n_entry*sizeof(userdb_entry_t));
+  this->image(1).addElement(OFFSET_USERDB, size);
+  // Encode user DB
+  userdb_t *userdb = (userdb_t *)this->data(OFFSET_USERDB, 1);
+  userdb->fromUserDB(config->userDB());
+  userdb_entry_t *db = (userdb_entry_t *)this->data(OFFSET_USERDB+sizeof(userdb_t), 1);
+  for (uint i=0; i<n_entry; i++) {
+    db[i].fromEntry(config->userDB()->user(i));
   }
 
   return true;
