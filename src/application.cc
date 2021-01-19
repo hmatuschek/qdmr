@@ -34,7 +34,7 @@ Application::Application(int &argc, char *argv[])
   Settings settings;
   _repeater = new RepeaterDatabase(settings.position(), 7, this);
   _users    = new UserDatabase(30, this);
-  _config = new Config(_users, this);
+  _config = new Config(this);
 
   if (argc>1) {
     QFile file(argv[1]);
@@ -135,7 +135,6 @@ Application::createMainWindow() {
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
-  QCheckBox *userdb = _mainWindow->findChild<QCheckBox*>("uploadUserDB");
 
   dmrID->setText(QString::number(_config->id()));
   rname->setText(_config->name());
@@ -143,7 +142,6 @@ Application::createMainWindow() {
   intro2->setText(_config->introLine2());
   mic->setValue(_config->micLevel());
   speech->setChecked(_config->speech());
-  userdb->setChecked(_config->uploadUserDB());
 
   connect(dmrID, SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
   connect(rname, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
@@ -151,7 +149,6 @@ Application::createMainWindow() {
   connect(intro2, SIGNAL(editingFinished()), this, SLOT(onIntroLine2Changed()));
   connect(mic, SIGNAL(valueChanged(int)), this, SLOT(onMicLevelChanged()));
   connect(speech, SIGNAL(toggled(bool)), this, SLOT(onSpeechChanged()));
-  connect(userdb, SIGNAL(toggled(bool)), this, SLOT(onUploadUserDBChanged()));
 
   // Wire-up "Contact List" view
   QTableView *contacts = _mainWindow->findChild<QTableView *>("contactsView");
@@ -495,13 +492,55 @@ Application::uploadCodeplug() {
   _mainWindow->setEnabled(false);
 }
 
+void
+Application::uploadUserDB() {
+  // Start upload
+  Settings settings;
+  QString errorMessage;
+
+  Radio *radio = Radio::detect(errorMessage);
+  if (nullptr == radio) {
+    QMessageBox::critical(nullptr, tr("No Radio found."),
+                          tr("Can not upload codeplug to device: No radio found.\nError: ")
+                          + errorMessage);
+    return;
+  }
+
+  if (! radio->features().hasCallsignDB) {
+    QMessageBox::information(nullptr, tr("Cannot upload user DB."),
+                             tr("The detected radio '%1' does not support "
+                                "the upload of an callsign DB.")
+                             .arg(radio->name()));
+    return;
+  }
+  if (! radio->features().callsignDBImplemented) {
+    QMessageBox::critical(nullptr, tr("Cannot upload user DB."),
+                          tr("The detected radio '%1' does support the upload of an callsign DB. "
+                             "This feature, however, is not implemented yet.").arg(radio->name()));
+    return;
+  }
+
+  QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
+  progress->setValue(0);
+  progress->setMaximum(100);
+  progress->setVisible(true);
+
+  connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
+  connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
+  connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
+  radio->startUploadCallsignDB(_users, false);
+
+  _mainWindow->statusBar()->showMessage(tr("Upload User DB ..."));
+  _mainWindow->setEnabled(false);
+}
+
 
 void
 Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Upload error"));
   QMessageBox::critical(
         nullptr, tr("Upload error"),
-        tr("Cannot upload codeplug to device. "
+        tr("Cannot upload codeplug or user DB to device. "
            "An error occurred during upload: %1").arg(radio->errorMessage()));
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
@@ -611,12 +650,6 @@ void
 Application::onSpeechChanged() {
   QCheckBox *speech = _mainWindow->findChild<QCheckBox *>("speech");
   _config->setSpeech(speech->isChecked());
-}
-
-void
-Application::onUploadUserDBChanged() {
-  QCheckBox *userdb = _mainWindow->findChild<QCheckBox *>("uploadUserDB");
-  _config->setUploadUserDB(userdb->isChecked());
 }
 
 void

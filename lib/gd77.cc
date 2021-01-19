@@ -111,6 +111,16 @@ GD77::startUpload(Config *config, bool blocking, bool update) {
   return true;
 }
 
+bool
+GD77::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+  Q_UNUSED(db);
+  Q_UNUSED(blocking);
+
+  _errorMessage = tr("RD5R does not support a callsign DB.");
+
+  return false;
+}
+
 void
 GD77::run() {
   if (StatusDownload == _task) {

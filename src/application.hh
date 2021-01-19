@@ -37,6 +37,7 @@ public slots:
 
   void downloadCodeplug();
   void uploadCodeplug();
+  void uploadUserDB();
 
   void showSettings();
   void showAbout();
@@ -58,7 +59,6 @@ private slots:
   void onIntroLine2Changed();
   void onMicLevelChanged();
   void onSpeechChanged();
-  void onUploadUserDBChanged();
 
   void onAddContact();
   void onRemContact();

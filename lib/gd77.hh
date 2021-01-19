@@ -39,6 +39,7 @@ public slots:
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   bool startUpload(Config *config, bool blocking=false, bool update=true);
+  bool startUploadCallsignDB(UserDatabase *db, bool blocking=false);
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */

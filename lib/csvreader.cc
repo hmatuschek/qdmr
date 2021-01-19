@@ -155,15 +155,6 @@ CSVHandler::handleSpeech(bool speech, qint64 line, qint64 column, QString &error
 }
 
 bool
-CSVHandler::handleUserDB(bool userdb, qint64 line, qint64 column, QString &errorMessage) {
-  Q_UNUSED(userdb);
-  Q_UNUSED(line);
-  Q_UNUSED(column);
-  Q_UNUSED(errorMessage);
-  return true;
-}
-
-bool
 CSVHandler::handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
                               qint64 line, qint64 column, QString &errorMessage)
 {
@@ -566,7 +557,6 @@ CSVParser::_parse_userdb(CSVLexer &lexer) {
     return false;
   }
   qint64 line=token.line, column=token.column;
-  bool userdb = ("on" == token.value.toLower());
 
   token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
@@ -575,7 +565,11 @@ CSVParser::_parse_userdb(CSVLexer &lexer) {
     return false;
   }
 
-  return _handler->handleUserDB(userdb, line, column, _errorMessage);
+  logWarn() << line << "," << column << ": The 'UserDB' setting is obsolete. "
+            << "It will be removed in future releases. Just delete this line.";
+
+  // Ignore user DB setting
+  return true;
 }
 
 bool
@@ -1521,19 +1515,6 @@ CSVReader::handleSpeech(bool speech, qint64 line, qint64 column, QString &errorM
 
   if (_link) {
     _config->setSpeech(speech);
-  }
-  return true;
-}
-
-
-bool
-CSVReader::handleUserDB(bool userdb, qint64 line, qint64 column, QString &errorMessage) {
-  Q_UNUSED(line);
-  Q_UNUSED(column);
-  Q_UNUSED(errorMessage);
-
-  if (_link) {
-    _config->setUploadUserDB(userdb);
   }
   return true;
 }

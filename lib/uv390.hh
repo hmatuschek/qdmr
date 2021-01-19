@@ -25,7 +25,7 @@
 #include "radio.hh"
 #include "dfu_libusb.hh"
 #include "uv390_codeplug.hh"
-
+#include "uv390_callsigndb.hh"
 
 /** Implements an USB interface to the TYT MD-UV390 & Retevis RT3S VHF/UHF 5W DMR (Tier I&II) radios.
  *
@@ -53,10 +53,16 @@ public slots:
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   bool startUpload(Config *config, bool blocking=false, bool update=true);
+  bool startUploadCallsignDB(UserDatabase *db, bool blocking=false);
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
 	void run();
+
+private:
+  void download();
+  void upload();
+  void uploadCallsigns();
 
 protected:
   /** The device identifier. */
@@ -72,6 +78,8 @@ protected:
   UserDatabase *_userDB;
   /** The actual binary codeplug representation. */
 	UV390Codeplug _codeplug;
+  /** The acutal binary callsign-db representation. */
+  UV390CallsignDB _callsigns;
 };
 
 #endif // UV390_HH

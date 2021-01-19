@@ -204,6 +204,11 @@ public:
   /** Dumps a text representation of the DFU file structure to the specified text stream. */
 	void dump(QTextStream &stream) const;
 
+  /** Returns a pointer to the encoded raw data at the specified offset. */
+  virtual unsigned char *data(uint32_t offset, uint32_t img=0);
+  /** Returns a const pointer to the encoded raw data at the specified offset. */
+  virtual const unsigned char *data(uint32_t offset, uint32_t img=0) const;
+
 protected:
   /// Holds the error string.
 	QString _errorMessage;

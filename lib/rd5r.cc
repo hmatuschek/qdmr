@@ -108,6 +108,16 @@ RD5R::startUpload(Config *config, bool blocking, bool update) {
   return true;
 }
 
+bool
+RD5R::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+  Q_UNUSED(db);
+  Q_UNUSED(blocking);
+
+  _errorMessage = tr("RD5R does not support a callsign DB.");
+
+  return false;
+}
+
 void
 RD5R::run()
 {

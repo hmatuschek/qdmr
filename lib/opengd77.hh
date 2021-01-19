@@ -8,6 +8,7 @@
 #include "radio.hh"
 #include "opengd77_interface.hh"
 #include "opengd77_codeplug.hh"
+#include "opengd77_callsigndb.hh"
 
 
 /** Implements an USB interface to Open GD-77(S) VHF/UHF 5W DMR (Tier I&II) radios.
@@ -33,14 +34,17 @@ public slots:
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   bool startUpload(Config *config, bool blocking=false, bool update=true);
+  bool startUploadCallsignDB(UserDatabase *db, bool blocking=false);
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
 	void run();
   /** Implements the actual download process. */
   void download();
-  /** Implements the actual upload process. */
+  /** Implements the actual codeplug upload process. */
   void upload();
+  /** Implements the actual callsign DB upload process. */
+  void uploadCallsigns();
 
 protected:
   /** The device identifier. */
@@ -51,6 +55,8 @@ protected:
 	Config *_config;
   /** The actual binary codeplug representation. */
   OpenGD77Codeplug _codeplug;
+  /** The acutal binary callsign DB representation. */
+  OpenGD77CallsignDB _callsigns;
 };
 
 #endif // OPENGD77_HH

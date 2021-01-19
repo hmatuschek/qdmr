@@ -130,8 +130,6 @@ public:
   virtual bool handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the Speech flag has been parsed. */
   virtual bool handleSpeech(bool speech, qint64 line, qint64 column, QString &errorMessage);
-  /** Gets called once the UserDB flag has been parsed. */
-  virtual bool handleUserDB(bool userdb, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a DTMF contact has been parsed. */
   virtual bool handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
                                  qint64 line, qint64 column, QString &errorMessage);
@@ -254,7 +252,6 @@ public:
   virtual bool handleIntroLine2(const QString &text, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleSpeech(bool speech, qint64 line, qint64 column, QString &errorMessage);
-  virtual bool handleUserDB(bool userdb, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
                                  qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleDigitalContact(

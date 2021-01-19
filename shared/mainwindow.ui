@@ -196,16 +196,6 @@
             </property>
            </widget>
           </item>
-          <item row="9" column="0">
-           <widget class="QLabel" name="uploadUserDBLabel">
-            <property name="text">
-             <string>Upload User DB</string>
-            </property>
-           </widget>
-          </item>
-          <item row="9" column="1">
-           <widget class="QCheckBox" name="uploadUserDB"/>
-          </item>
          </layout>
         </item>
        </layout>
@@ -789,6 +779,7 @@
    <addaction name="actionVerifyCodeplug"/>
    <addaction name="actionDownload"/>
    <addaction name="actionUpload"/>
+   <addaction name="actionWrite_UserDB"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="actionAbout"/>
@@ -956,6 +947,15 @@
    </property>
    <property name="toolTip">
     <string>Shows settings dialog</string>
+   </property>
+  </action>
+  <action name="actionWrite_UserDB">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/userupload-4x.png</normaloff>:/icons/userupload-4x.png</iconset>
+   </property>
+   <property name="text">
+    <string>Write UserDB</string>
    </property>
   </action>
  </widget>
