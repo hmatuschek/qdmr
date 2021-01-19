@@ -529,10 +529,12 @@ Application::showSettings() {
     settings.setLocator(dialog.locator());
     settings.setUpdateCodeplug(dialog.updateCodeplug());
     if (! settings.queryPosition()) {
-      _source->stopUpdates();
+      if (_source)
+        _source->stopUpdates();
       _currentPosition = settings.position();
     } else {
-      _source->startUpdates();
+      if (_source)
+        _source->startUpdates();
     }
   }
 }
