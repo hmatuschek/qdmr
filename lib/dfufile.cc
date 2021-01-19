@@ -60,6 +60,15 @@ DFUFile::size() const {
   return size+sizeof(file_suffix_t);
 }
 
+uint32_t
+DFUFile::memSize() const {
+  uint32_t size = 0;
+  foreach (const Image &i, _images) {
+    size += i.memSize();
+  }
+  return size;
+}
+
 int
 DFUFile::numImages() const {
   return _images.size();
@@ -88,6 +97,13 @@ DFUFile::addImage(const Image &img) {
 void
 DFUFile::remImage(int i) {
   _images.remove(i);
+}
+
+bool
+DFUFile::isAligned(uint blocksize) const {
+  for (int i=0; i<_images.count(); i++)
+    if (! _images.at(i).isAligned(blocksize))
+      return false;
 }
 
 bool
@@ -294,6 +310,11 @@ DFUFile::Element::size() const {
 }
 
 uint32_t
+DFUFile::Element::memSize() const {
+  return _data.size();
+}
+
+uint32_t
 DFUFile::Element::address() const {
   return _address;
 }
@@ -448,6 +469,14 @@ DFUFile::Image::size() const {
   return size;
 }
 
+uint32_t
+DFUFile::Image::memSize() const {
+  uint32_t size = 0;
+  foreach (const Element &e, _elements)
+    size += e.memSize();
+  return size;
+}
+
 uint8_t
 DFUFile::Image::alternateSettings() const {
   return _alternate_settings;
@@ -504,6 +533,14 @@ DFUFile::Image::addElement(const Element &element) {
 void
 DFUFile::Image::remElement(int i) {
   _elements.remove(i);
+}
+
+bool
+DFUFile::Image::isAligned(uint blocksize) const {
+  for (int i=0; i<_elements.count(); i++)
+    if (! _elements.at(i).isAligned(blocksize))
+      return false;
+  return true;
 }
 
 bool

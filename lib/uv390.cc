@@ -209,34 +209,28 @@ UV390::upload() {
   logDebug() << "Upload " << _codeplug.image(0).numElements() << " elements.";
 
   // Check every segment in the codeplug
-  size_t totb = 0;
-  for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-    logDebug() << "Check element " << (n+1) << " of " << _codeplug.image(0).numElements() << ".";
-    if (! _codeplug.image(0).element(n).isAligned(BSIZE)) {
-      _errorMessage = QString("%1 Cannot upload codeplug: Codeplug element %2 (addr=%3, size=%4) "
-                              "is not aligned with blocksize %5.").arg(__func__)
-          .arg(n).arg(_codeplug.image(0).element(n).address())
-          .arg(_codeplug.image(0).element(n).data().size()).arg(BSIZE);
-      logError() << _errorMessage;
-      _task = StatusError;
-      _dev->reboot();
-      _dev->close();
-      _dev->deleteLater();
-      emit downloadError(this);
-      return;
-    }
-    totb += _codeplug.image(0).element(n).data().size()/BSIZE;
+  if (! _codeplug.isAligned(BSIZE)) {
+    _errorMessage = QString("%1 Cannot upload codeplug: "
+                            "Codeplug is not aligned with blocksize %5.").arg(__func__).arg(BSIZE);
+    logError() << _errorMessage;
+    _task = StatusError;
+    _dev->reboot();
+    _dev->close();
+    _dev->deleteLater();
+    emit downloadError(this);
+    return;
   }
 
-  size_t bcount = 0;
+  size_t totb = _codeplug.memSize();
 
+  size_t bcount = 0;
   // If codeplug gets updated, download codeplug from device first:
   if (_codeplugUpdate) {
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {
       uint addr = _codeplug.image(0).element(n).address();
       uint size = _codeplug.image(0).element(n).data().size();
       uint b0 = addr/BSIZE, nb = size/BSIZE;
-      for (uint b=0; b<nb; b++, bcount++) {
+      for (uint b=0; b<nb; b++, bcount+=BSIZE) {
         if (! _dev->read(0, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
           _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
@@ -265,7 +259,7 @@ UV390::upload() {
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();
     uint b0 = addr/BSIZE, nb = size/BSIZE;
-    for (size_t b=0; b<nb; b++,bcount++) {
+    for (size_t b=0; b<nb; b++,bcount+=BSIZE) {
       if (! _dev->write(0, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
         _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());

@@ -82,6 +82,7 @@ class DFUFile: public QObject
 		void setAddress(uint32_t addr);
     /** Returns the size of the element. */
 		uint32_t size() const;
+    uint32_t memSize() const;
     /** Checks if the element address and size is aligned with the given block size. */
     bool isAligned(uint blocksize) const;
     /** Returns a reference to the data. */
@@ -131,6 +132,7 @@ class DFUFile: public QObject
 		void setName(const QString &name);
     /** Returns the total size of the image. */
 		uint32_t size() const;
+    uint32_t memSize() const;
     /** Returns the number of elements of this image. */
 		int numElements() const;
     /** Returns a reference to the i-th element of the image. */
@@ -144,6 +146,8 @@ class DFUFile: public QObject
     void addElement(const Element &element);
     /** Removes the i-th element from this image. */
 		void remElement(int i);
+    /** Checks if all element addresses and sizes is aligned with the given block size. */
+    bool isAligned(uint blocksize) const;
 
     /** Reads an image from the given file and updates the CRC. */
 		bool read(QFile &file, CRC32 &crc, QString &errorMessage);
@@ -170,6 +174,7 @@ public:
 
   /** Returns the total size of the DFU file. */
 	uint32_t size() const;
+  uint32_t memSize() const;
 
   /** Returns the number of images within the DFU file. */
 	int numImages() const;
@@ -183,6 +188,9 @@ public:
 	void addImage(const Image &img);
   /** Deletes the @c i-th image from the file. */
 	void remImage(int i);
+
+  /** Checks if all image addresses and sizes is aligned with the given block size. */
+  bool isAligned(uint blocksize) const;
 
   /** Returns the error message in case of an error. */
 	const QString &errorMessage() const;
