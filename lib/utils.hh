@@ -67,4 +67,6 @@ bool validDTMFNumber(const QString &text);
 /** Formats a frequency in MHz passed as double. */
 QString format_frequency(double MHz);
 
+uint32_t align_size(uint32_t addr, uint32_t size);
+
 #endif // UTILS_HH

@@ -1,6 +1,7 @@
 #include "uv390.hh"
 #include "config.hh"
 #include "logger.hh"
+#include "utils.hh"
 
 #define BSIZE 1024
 
@@ -308,10 +309,12 @@ UV390::uploadCallsigns() {
     totb += _callsigns.image(0).element(n).data().size()/BSIZE;
   }
 
-  size_t bcount = 0;
+  // then erase memory
+  _dev->erase(_callsigns.image(0).element(0).address(),
+              align_size(_callsigns.image(0).element(0).size(), 0x10000));
 
   // then, upload callsign DB
-  bcount = 0;
+  size_t bcount = 0;
   for (int n=0; n<_callsigns.image(0).numElements(); n++) {
     uint addr = _callsigns.image(0).element(n).address();
     uint size = _callsigns.image(0).element(n).data().size();

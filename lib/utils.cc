@@ -245,3 +245,10 @@ QString
 format_frequency(double MHz) {
   return QString::number(MHz, 'f', 5);
 }
+
+uint32_t
+align_size(uint32_t addr, uint32_t size) {
+  if (0 == (addr % size))
+    return addr;
+  return (addr + (size - (addr%size)));
+}
