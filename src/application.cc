@@ -108,6 +108,7 @@ Application::createMainWindow() {
   QAction *verCP   = _mainWindow->findChild<QAction*>("actionVerifyCodeplug");
   QAction *downCP  = _mainWindow->findChild<QAction*>("actionDownload");
   QAction *upCP    = _mainWindow->findChild<QAction*>("actionUpload");
+  QAction *upCDB   = _mainWindow->findChild<QAction*>("actionUploadCallsignDB");
 
   QAction *about   = _mainWindow->findChild<QAction*>("actionAbout");
   QAction *sett    = _mainWindow->findChild<QAction*>("actionSettings");
@@ -127,6 +128,7 @@ Application::createMainWindow() {
   connect(verCP, SIGNAL(triggered()), this, SLOT(verifyCodeplug()));
   connect(downCP, SIGNAL(triggered()), this, SLOT(downloadCodeplug()));
   connect(upCP, SIGNAL(triggered()), this, SLOT(uploadCodeplug()));
+  connect(upCDB, SIGNAL(triggered()), this, SLOT(uploadCallsignDB()));
 
   // Wire-up "General Settings" view
   QLineEdit *dmrID  = _mainWindow->findChild<QLineEdit*>("dmrID");
@@ -493,29 +495,28 @@ Application::uploadCodeplug() {
 }
 
 void
-Application::uploadUserDB() {
+Application::uploadCallsignDB() {
   // Start upload
-  Settings settings;
   QString errorMessage;
 
   Radio *radio = Radio::detect(errorMessage);
   if (nullptr == radio) {
     QMessageBox::critical(nullptr, tr("No Radio found."),
-                          tr("Can not upload codeplug to device: No radio found.\nError: ")
+                          tr("Can not upload call-sign DB to device: No radio found.\nError: ")
                           + errorMessage);
     return;
   }
 
   if (! radio->features().hasCallsignDB) {
-    QMessageBox::information(nullptr, tr("Cannot upload user DB."),
+    QMessageBox::information(nullptr, tr("Cannot upload call-sign DB."),
                              tr("The detected radio '%1' does not support "
-                                "the upload of an callsign DB.")
+                                "the upload of an call-sign DB.")
                              .arg(radio->name()));
     return;
   }
   if (! radio->features().callsignDBImplemented) {
-    QMessageBox::critical(nullptr, tr("Cannot upload user DB."),
-                          tr("The detected radio '%1' does support the upload of an callsign DB. "
+    QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
+                          tr("The detected radio '%1' does support the upload of acall-sign DB. "
                              "This feature, however, is not implemented yet.").arg(radio->name()));
     return;
   }

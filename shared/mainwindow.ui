@@ -740,6 +740,7 @@
     <addaction name="separator"/>
     <addaction name="actionDownload"/>
     <addaction name="actionUpload"/>
+    <addaction name="actionUploadCallsignDB"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -779,7 +780,7 @@
    <addaction name="actionVerifyCodeplug"/>
    <addaction name="actionDownload"/>
    <addaction name="actionUpload"/>
-   <addaction name="actionWrite_UserDB"/>
+   <addaction name="actionUploadCallsignDB"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="actionAbout"/>
@@ -949,13 +950,16 @@
     <string>Shows settings dialog</string>
    </property>
   </action>
-  <action name="actionWrite_UserDB">
+  <action name="actionUploadCallsignDB">
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/icons/userupload-4x.png</normaloff>:/icons/userupload-4x.png</iconset>
    </property>
    <property name="text">
-    <string>Write UserDB</string>
+    <string>Upload Callsign DB</string>
+   </property>
+   <property name="toolTip">
+    <string>Upload call-sign DB to radio.</string>
    </property>
   </action>
  </widget>

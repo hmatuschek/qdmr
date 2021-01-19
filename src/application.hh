@@ -37,7 +37,7 @@ public slots:
 
   void downloadCodeplug();
   void uploadCodeplug();
-  void uploadUserDB();
+  void uploadCallsignDB();
 
   void showSettings();
   void showAbout();
