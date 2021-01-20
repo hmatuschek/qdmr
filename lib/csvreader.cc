@@ -1433,6 +1433,8 @@ CSVReader::read(Config *config, QTextStream &stream, QString &errorMessage) {
 
   if (! parser.parse(stream)) {
     errorMessage = parser.errorMessage();
+    errorMessage.append(tr("\nThe generic code-plug format might be changed with a new release of qdmr."
+                           "\nVisit https://github.com/hmatuschek/qdmr/releases for further information."));
     return false;
   }
   reader._link = true;

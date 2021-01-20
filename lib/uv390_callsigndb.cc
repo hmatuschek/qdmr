@@ -127,11 +127,13 @@ UV390CallsignDB::UV390CallsignDB(QObject *parent)
   : DFUFile(parent)
 {
   // allocate and clear DB memory
-  this->image(0).addElement(CALLSIGN_START, CALLSIGN_END-CALLSIGN_START);
+  addImage("TYT MD-UV390 Callsign database.");
 }
 
 void
 UV390CallsignDB::encode(UserDatabase *db) {
+  if (0 == image(0).numElements())
+    this->image(0).addElement(CALLSIGN_START, CALLSIGN_END-CALLSIGN_START);
   memset(data(CALLSIGN_START), 0xff, CALLSIGN_END-CALLSIGN_START);
   ((callsign_db_t *)data(CALLSIGN_START))->fromUserDB(db);
 }
