@@ -67,9 +67,8 @@ OpenGD77CallsignDB::userdb_t::clear() {
 }
 
 void
-OpenGD77CallsignDB::userdb_t::fromUserDB(const UserDatabase *db) {
-  clear();
-  count = qToLittleEndian(std::min(db->count(), qint64(USERDB_NUM_ENTRIES)));
+OpenGD77CallsignDB::userdb_t::setSize(uint n) {
+  count = qToLittleEndian(std::min(n, uint(USERDB_NUM_ENTRIES)));
 }
 
 
@@ -82,15 +81,19 @@ OpenGD77CallsignDB::OpenGD77CallsignDB(QObject *parent)
   addImage("OpenGD77 call-sign database");
 }
 
+OpenGD77CallsignDB::~OpenGD77CallsignDB() {
+  // pass...
+}
+
 bool
 OpenGD77CallsignDB::encode(UserDatabase *calldb) {
-  // Limit users to USERDB_NUM_ENTRIES entries
+  // Limit entries to USERDB_NUM_ENTRIES
   uint n = std::min(calldb->count(), qint64(USERDB_NUM_ENTRIES));
-  // If there are no users -> done.
+  // If there are no entries -> done.
   if (0 == n)
     return true;
 
-  // Select n users and sort them in ascending order of their IDs
+  // Select first n entries and sort them in ascending order of their IDs
   QVector<UserDatabase::User> users;
   for (uint i=0; i<n; i++)
     users.append(calldb->user(i));
@@ -102,11 +105,11 @@ OpenGD77CallsignDB::encode(UserDatabase *calldb) {
   this->image(0).addElement(OFFSET_USERDB, size);
 
   // Encode user DB
-  userdb_t *userdb = (userdb_t *)this->data(OFFSET_USERDB, 1);
-  userdb->fromUserDB(calldb);
-  userdb_entry_t *db = (userdb_entry_t *)this->data(OFFSET_USERDB+sizeof(userdb_t), 1);
+  userdb_t *userdb = (userdb_t *)this->data(OFFSET_USERDB);
+  userdb->clear(); userdb->setSize(n);
+  userdb_entry_t *db = (userdb_entry_t *)this->data(OFFSET_USERDB+sizeof(userdb_t));
   for (uint i=0; i<n; i++) {
-    db[i].fromEntry(calldb->user(i));
+    db[i].fromEntry(users[i]);
   }
 
   return true;

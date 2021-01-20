@@ -37,12 +37,13 @@ class OpenGD77CallsignDB : public DFUFile
     userdb_t();
     void clear();
 
-    void fromUserDB(const UserDatabase *db);
+    void setSize(uint n);
   };
 
 
 public:
   explicit OpenGD77CallsignDB(QObject *parent=nullptr);
+  virtual ~OpenGD77CallsignDB();
 
   virtual bool encode(UserDatabase *calldb);
 };

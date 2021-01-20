@@ -40,7 +40,7 @@ static Radio::Features _open_gd77_features =
 
 
 OpenGD77::OpenGD77(QObject *parent)
-  : Radio(parent), _name("Open GD-77"), _dev(nullptr), _config(nullptr)
+  : Radio(parent), _name("Open GD-77"), _dev(nullptr), _config(nullptr), _codeplug(), _callsigns()
 {
   // pass...
 }
@@ -124,7 +124,8 @@ OpenGD77::startUploadCallsignDB(UserDatabase *db, bool blocking) {
     return false;
   }
 
-  // Assemble callsign db from user DB
+  // Assemble call-sign db from user DB
+  logDebug() << "Encode call-signs into db.";
   _callsigns.encode(db);
 
   _task = StatusUploadCallsigns;
@@ -384,7 +385,7 @@ OpenGD77::upload() {
 void
 OpenGD77::uploadCallsigns() {
   _dev = new OpenGD77Interface();
-  if (!_dev->isOpen()) {
+  if (! _dev->isOpen()) {
     _task = StatusError;
     _errorMessage = QString("Cannot upload to radio, device is not open: %1").arg(_dev->errorString());
     logError() << _errorMessage;

@@ -521,6 +521,10 @@ Application::uploadCallsignDB() {
     return;
   }
 
+  // Sort call-sign DB w.r.t. the current DMR ID in _config
+  // this is part of the "auto-selection" of calls-signs for upload
+  _users->sortUsers(_config->id());
+
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
   progress->setValue(0);
   progress->setMaximum(100);

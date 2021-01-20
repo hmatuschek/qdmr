@@ -8,6 +8,7 @@
 #include "verify.hh"
 #include "readcodeplug.hh"
 #include "writecodeplug.hh"
+#include "writecallsigndb.hh"
 #include "encodecodeplug.hh"
 #include "decodecodeplug.hh"
 #include "infofile.hh"
@@ -33,14 +34,28 @@ int main(int argc, char *argv[])
         QCoreApplication::translate("main", "Up- and Download codeplugs for cheap Chineese radios."));
   parser.addHelpOption();
   parser.addVersionOption();
-  parser.addOption(
-  {{"V","verbose"}, QCoreApplication::translate("main", "Verbose output.")});
-  parser.addOption(
-   {{"c", "csv"}, QCoreApplication::translate("main", "Up- and download codeplugs in CSV format.")});
-  parser.addOption(
-   {{"b", "bin"}, QCoreApplication::translate("main", "Up- and download codeplugs in binary format.")});
-  parser.addOption(
-   {{"R", "radio"}, QCoreApplication::translate("main", "Specifies the radio."), QCoreApplication::translate("main", "RADIO")});
+  parser.addOption({
+                     {"V","verbose"},
+                     QCoreApplication::translate("main", "Verbose output.")
+                   });
+  parser.addOption({
+                     {"c", "csv"},
+                     QCoreApplication::translate("main", "Up- and download codeplugs in CSV format.")
+                   });
+  parser.addOption({
+                     {"b", "bin"},
+                     QCoreApplication::translate("main", "Up- and download codeplugs in binary format.")
+                   });
+  parser.addOption({
+                     {"R", "radio"},
+                     QCoreApplication::translate("main", "Specifies the radio."),
+                     QCoreApplication::translate("main", "RADIO")
+                   });
+  parser.addOption({
+                     {"i", "id"},
+                     QCoreApplication::translate("main", "Specifes the DMR id."),
+                     QCoreApplication::translate("main", "ID")
+                   });
 
   parser.addPositionalArgument(
         "command", QCoreApplication::translate("main", "Specifies the command to perform."),
@@ -56,6 +71,7 @@ int main(int argc, char *argv[])
     parser.showHelp(-1);
   if (parser.isSet("verbose"))
     handler->setMinLevel(LogMessage::DEBUG);
+
   QString command = parser.positionalArguments().at(0);
   if ("detect" == command)
     return detect(parser, app);
@@ -65,6 +81,8 @@ int main(int argc, char *argv[])
     return readCodeplug(parser, app);
   if ("write" == command)
     return writeCodeplug(parser, app);
+  if ("write-db" == command)
+    return writeCallsignDB(parser, app);
   if ("encode" == command)
     return encodeCodeplug(parser, app);
   if ("decode" == command)

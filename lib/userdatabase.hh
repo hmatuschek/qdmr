@@ -80,6 +80,10 @@ public:
 	/** Implements the QAbstractTableModel interface, return the entry data. */
   QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
 
+signals:
+  void loaded();
+  void error(const QString &msg);
+
 public slots:
 	/** Starts the download of the user database. */
 	void download();

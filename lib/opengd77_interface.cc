@@ -218,6 +218,8 @@ OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
 bool
 OpenGD77Interface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
 {
+  logDebug() << "Write to bank " << bank << ", addr " << hex << addr << " " << nbytes <<"b.";
+
   if (EEPROM == bank) {
     if ((0 <= _sector) && (! finishWriteFlash()))
       return false;

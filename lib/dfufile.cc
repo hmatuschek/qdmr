@@ -101,9 +101,10 @@ DFUFile::remImage(int i) {
 
 bool
 DFUFile::isAligned(uint blocksize) const {
-  for (int i=0; i<_images.count(); i++)
+  for (int i=0; i<_images.size(); i++)
     if (! _images.at(i).isAligned(blocksize))
       return false;
+  return true;
 }
 
 bool
