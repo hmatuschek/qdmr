@@ -33,7 +33,11 @@ static Radio::Features _rd5r_features =
 
   64,    // maxGrouplists;
   16,    // maxGrouplistNameLength;
-  16     // maxContactsInGrouplist;
+  16,    // maxContactsInGrouplist;
+
+  false, // hasCallsignDB
+  false, // callsignDBImplemented
+  0      // maxCallsignsInDB
 };
 
 

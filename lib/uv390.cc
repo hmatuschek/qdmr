@@ -35,7 +35,11 @@ static Radio::Features _uv390_features =
 
   250,   // maxGrouplists;
   16,    // maxGrouplistNameLength;
-  32     // maxContactsInGrouplist;
+  32,    // maxContactsInGrouplist;
+
+  true,  // hasCallsignDB
+  true,  // callsignDBImplemented
+  122197 // maxCallsignsInDB
 };
 
 

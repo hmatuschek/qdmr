@@ -185,23 +185,23 @@ OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
   logDebug() << "Send enter prog mode ...";
   if (! sendShowCPSScreen())
     return false;
-  logDebug() << "Send clear screen ...";
+  //logDebug() << "Send clear screen ...";
   if (! sendClearScreen())
     return false;
-  logDebug() << "Send display text ...";
+  //logDebug() << "Send display text ...";
   if (! sendDisplay(0, 0, "qDMR", 3, 1, 0))
     return false;
   if (! sendDisplay(0, 16, "Writing", 3, 1, 0))
     return false;
   if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0))
     return false;
-  logDebug() << "Send 'render CPS' ...";
+  //logDebug() << "Send 'render CPS' ...";
   if (! sendRenderCPS())
     return false;
-  logDebug() << "Send 'flash red LED' ...";
+  //logDebug() << "Send 'flash red LED' ...";
   if (! sendCommand(CommandRequest::FLASH_RED_LED))
     return false;
-  logDebug() << "Send save settings and VFOs ...";
+  //logDebug() << "Send save settings and VFOs ...";
   if (! sendCommand(CommandRequest::SAVE_SETTINGS_AND_VFOS))
     return false;
 
@@ -224,7 +224,7 @@ OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
 bool
 OpenGD77Interface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
 {
-  logDebug() << "Write to bank " << bank << ", addr " << hex << addr << " " << nbytes <<"b.";
+  //logDebug() << "Write to bank " << bank << ", addr " << hex << addr << " " << nbytes <<"b.";
 
   if (EEPROM == bank) {
     if ((0 <= _sector) && (! finishWriteFlash()))
@@ -487,7 +487,7 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len) {
 
 bool
 OpenGD77Interface::setFlashSector(uint32_t addr) {
-  logDebug() << "Send set-flash-sector: 0x" << hex << addr << " ...";
+  //logDebug() << "Send set-flash-sector: 0x" << hex << addr << " ...";
   WriteRequest req; req.initSetFlashSector(addr);
   WriteResponse resp;
 
@@ -564,7 +564,7 @@ OpenGD77Interface::writeFlash(uint32_t addr, const uint8_t *data, uint16_t len) 
 
 bool
 OpenGD77Interface::finishWriteFlash() {
-  logDebug() << "Send finish write flash command ...";
+  //logDebug() << "Send finish write flash command ...";
   WriteRequest req;
   req.initFinishWriteFlash();
   WriteResponse resp;

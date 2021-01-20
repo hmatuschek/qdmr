@@ -34,7 +34,11 @@ static Radio::Features _gd77_features = {
 
   76,   // maxGrouplists
   16,   // maxGrouplistNameLength
-  32    // maxContactsInGrouplist
+  32,   // maxContactsInGrouplist
+
+  true, // hasCallsignDB
+  false, // callsignDBImplemented
+  0      // maxCallsignsInDB
 };
 
 

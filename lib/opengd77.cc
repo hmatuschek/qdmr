@@ -35,7 +35,11 @@ static Radio::Features _open_gd77_features =
 
   76,   // maxGrouplists
   16,   // maxGrouplistNameLength
-  32    // maxContactsInGrouplist
+  32,   // maxContactsInGrouplist
+
+  true, // hasCallsignDB
+  true, // callsignDBImplemented
+  15796 // maxCallsignsInDB
 };
 
 
@@ -249,7 +253,7 @@ OpenGD77::download()
 void
 OpenGD77::upload() {
   _dev = new OpenGD77Interface();
-  if (!_dev->isOpen()) {
+  if (! _dev->isOpen()) {
     _task = StatusError;
     _errorMessage = QString("Cannot upload to radio, device is not open: %1").arg(_dev->errorString());
     logError() << _errorMessage;
@@ -366,7 +370,7 @@ OpenGD77::upload() {
           emit uploadError(this);
           return;
         }
-        emit uploadProgress(50.0+float(bcount*50)/totb);
+        emit uploadProgress(float(bcount*50)/totb);
       }
     }
     _dev->write_finish();
@@ -445,7 +449,7 @@ OpenGD77::uploadCallsigns() {
         emit uploadError(this);
         return;
       }
-      emit uploadProgress(50.0+float(bcount*50)/totb);
+      emit uploadProgress(float(bcount*100)/totb);
     }
   }
   _dev->write_finish();

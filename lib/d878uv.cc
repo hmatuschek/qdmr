@@ -36,7 +36,11 @@ static Radio::Features _d878uv_features =
 
   250,   // maxGrouplists;
   16,    // maxGrouplistNameLength;
-  32     // maxContactsInGrouplist;
+  32,    // maxContactsInGrouplist;
+
+  true,  // hasCallsignDB
+  false, // callsignDBImplemented
+  0      // maxCallsignsInDB
 };
 
 
