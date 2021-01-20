@@ -10,6 +10,7 @@
 #include "writecodeplug.hh"
 #include "writecallsigndb.hh"
 #include "encodecodeplug.hh"
+#include "encodecallsigndb.hh"
 #include "decodecodeplug.hh"
 #include "infofile.hh"
 
@@ -85,6 +86,8 @@ int main(int argc, char *argv[])
     return writeCallsignDB(parser, app);
   if ("encode" == command)
     return encodeCodeplug(parser, app);
+  if ("encode-db" == command)
+    return encodeCallsignDB(parser, app);
   if ("decode" == command)
     return decodeCodeplug(parser, app);
   if ("info" == command)

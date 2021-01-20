@@ -293,31 +293,25 @@ UV390::uploadCallsigns() {
   emit uploadStarted();
   logDebug() << "Upload " << _callsigns.image(0).numElements() << " elements.";
 
-  // Check every segment in the codeplug
-  size_t totb = 0;
-  for (int n=0; n<_callsigns.image(0).numElements(); n++) {
-    logDebug() << "Check element " << (n+1) << " of " << _callsigns.image(0).numElements() << ".";
-    if (! _callsigns.image(0).element(n).isAligned(BSIZE)) {
-      _errorMessage = QString("%1 Cannot upload callsign db: Callsign DB element %2 (addr=%3, size=%4) "
-                              "is not aligned with blocksize %5.").arg(__func__)
-          .arg(n).arg(_callsigns.image(0).element(n).address())
-          .arg(_callsigns.image(0).element(n).data().size()).arg(BSIZE);
-      logError() << _errorMessage;
-      _task = StatusError;
-      _dev->reboot();
-      _dev->close();
-      _dev->deleteLater();
-      emit downloadError(this);
-      return;
-    }
-    totb += _callsigns.image(0).element(n).data().size()/BSIZE;
+  // Check alignment in the codeplug
+  if (! _callsigns.isAligned(BSIZE)) {
+    _errorMessage = QString("%1 Cannot upload callsign db: Callsign DB is not aligned with blocksize %5.").arg(__func__);
+    logError() << _errorMessage;
+    _task = StatusError;
+    _dev->reboot();
+    _dev->close();
+    _dev->deleteLater();
+    emit downloadError(this);
+    return;
   }
 
   // then erase memory
   _dev->erase(_callsigns.image(0).element(0).address(),
               align_size(_callsigns.image(0).element(0).size(), 0x10000));
 
-  // then, upload callsign DB
+  // Total amount of data to transfer
+  size_t totb = _callsigns.memSize();
+  // Upload callsign DB
   size_t bcount = 0;
   uint addr = _callsigns.image(0).element(0).address();
   uint size = _callsigns.image(0).element(0).data().size();

@@ -10,7 +10,6 @@
 
 int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
   UserDatabase userdb;
-
   if (0 == userdb.count()) {
     logInfo() << "Downloading call-sign DB...";
     // Wait for download to finish
