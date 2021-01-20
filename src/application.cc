@@ -59,6 +59,9 @@ Application::Application(int &argc, char *argv[])
     }
   }
 
+  // Check if updated
+  _releaseNotes.checkForUpdate();
+
   logDebug() << "Last known position: " << _currentPosition.toString();
   connect(_config, SIGNAL(modified()), this, SLOT(onConfigModifed()));
 }

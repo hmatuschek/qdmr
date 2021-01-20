@@ -35,6 +35,9 @@ public:
 
   bool showDisclaimer() const;
   void setShowDisclaimer(bool show);
+
+  bool isUpdated() const;
+  void markUpdated();
 };
 
 

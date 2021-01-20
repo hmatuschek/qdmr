@@ -1,5 +1,6 @@
 #include "settings.hh"
 #include "logger.hh"
+#include "config.h"
 
 
 QGeoCoordinate loc2deg(const QString &loc) {
@@ -139,6 +140,17 @@ Settings::showDisclaimer() const {
 void
 Settings::setShowDisclaimer(bool show) {
   setValue("showDisclaimer", show);
+}
+
+bool
+Settings::isUpdated() const {
+  if (! contains("version"))
+    return false;
+  return VERSION_STRING == value("version").toString();
+}
+void
+Settings::markUpdated() {
+  setValue("version", VERSION_STRING);
 }
 
 

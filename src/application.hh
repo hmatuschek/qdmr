@@ -4,6 +4,7 @@
 #include <QApplication>
 #include "config.hh"
 #include <QGeoPositionInfoSource>
+#include "releasenotes.hh"
 
 class QMainWindow;
 class Radio;
@@ -107,6 +108,7 @@ protected:
   UserDatabase *_users;
   QGeoPositionInfoSource *_source;
   QGeoCoordinate _currentPosition;
+  ReleaseNotes _releaseNotes;
 };
 
 #endif // APPLICATION_HH
