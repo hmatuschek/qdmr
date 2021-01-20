@@ -182,20 +182,26 @@ OpenGD77Interface::identifier() {
 bool
 OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
 {
+  logDebug() << "Send enter prog mode ...";
   if (! sendShowCPSScreen())
     return false;
+  logDebug() << "Send clear screen ...";
   if (! sendClearScreen())
     return false;
+  logDebug() << "Send display text ...";
   if (! sendDisplay(0, 0, "qDMR", 3, 1, 0))
     return false;
   if (! sendDisplay(0, 16, "Writing", 3, 1, 0))
     return false;
   if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0))
     return false;
+  logDebug() << "Send 'render CPS' ...";
   if (! sendRenderCPS())
     return false;
+  logDebug() << "Send 'flash red LED' ...";
   if (! sendCommand(CommandRequest::FLASH_RED_LED))
     return false;
+  logDebug() << "Send save settings and VFOs ...";
   if (! sendCommand(CommandRequest::SAVE_SETTINGS_AND_VFOS))
     return false;
 
@@ -207,7 +213,7 @@ OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
     _sector = -1;
   } else if (FLASH == bank) {
     int32_t sector = addr/SECTOR_SIZE;
-    if (_sector != sector) {
+    if ((-1 != _sector) && (_sector != sector)) {
       if (! finishWriteFlash())
         return false;
     }
@@ -481,6 +487,7 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len) {
 
 bool
 OpenGD77Interface::setFlashSector(uint32_t addr) {
+  logDebug() << "Send set-flash-sector: 0x" << hex << addr << " ...";
   WriteRequest req; req.initSetFlashSector(addr);
   WriteResponse resp;
 
@@ -557,6 +564,7 @@ OpenGD77Interface::writeFlash(uint32_t addr, const uint8_t *data, uint16_t len) 
 
 bool
 OpenGD77Interface::finishWriteFlash() {
+  logDebug() << "Send finish write flash command ...";
   WriteRequest req;
   req.initFinishWriteFlash();
   WriteResponse resp;
