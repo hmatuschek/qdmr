@@ -22,14 +22,14 @@ public:
      * @verbinclude uv390userdbentry.txt
      */
     struct __attribute__((packed)) entry_t {
-      uint32_t id_high: 12,               ///< High bits of DMR ID (23:12).
-        index: 20;                        ///< Index in callsign data base, where to find these.
+      uint8_t val[4]; // Combined index and ID MSBs;
 
       /// Empty constructor.
       entry_t();
-
       /** Clears this entry. */
       void clear();
+      void set(uint id, uint index);
+
       /** Returns true, if the database index entry is valid. */
       bool isValid() const;
     };
@@ -41,10 +41,10 @@ public:
      * @verbinclude uv390userdbcallsign.txt
      */
     struct __attribute__((packed)) callsign_t {
-      uint8_t dmrid[3];                   ///< DMR id in BCD
-      uint8_t _unused;                    ///< Unused set to 0xff.
-      char callsign[16];                  ///< 16 x ASCII zero-terminated.
-      char name[100];                     ///< Descriptive name, nickname, city, state, country. 100 x ASCII zero-terminated.
+      uint32_t dmrid:24,                  ///< DMR id in binary little-endian
+        _unused: 8;                       ///< Unused set to 0xff.
+      uint8_t callsign[16];               ///< 16 x ASCII zero-terminated.
+      uint8_t name[100];                  ///< Descriptive name, nickname, city, state, country. 100 x ASCII zero-terminated.
 
 
       /// Empty constructor.
@@ -64,15 +64,16 @@ public:
       void fromUser(const UserDatabase::User &user);
     };
 
-    uint32_t n : 24;                      ///< Number of contacts in compete database.
+    uint8_t n[3];                         ///< Number of contacts in compete database, 24bit big-endian.
     entry_t index[4096];                  ///< 4096 index entries, default 0xff.
-    callsign_t db[122197];                ///< 122197 database callsign entries.
+    callsign_t db[122197];                ///< up to 122197 database callsign entries.
 
     /// Empty constructor.
     callsign_db_t();
 
     /// Clears the complete callsign database.
     void clear();
+    void setN(uint N);
     /// Fills the callsign database from the given user db.
     void fromUserDB(const UserDatabase *db);
   };

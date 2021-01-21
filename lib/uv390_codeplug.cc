@@ -18,23 +18,23 @@
 #define NGPSSYSTEMS      16
 
 // ---- first segment ----
-#define OFFSET_TIMESTMP  0x002800
-#define OFFSET_SETTINGS  0x002840
-#define OFFSET_MENU      0x0028f0
-#define OFFSET_BUTTONS   0x002900
-#define OFFSET_MSG       0x002980
-#define OFFSET_PRIVACY   0x0061c0
-#define OFFSET_EMERGENCY 0x006250
-#define OFFSET_GLISTS    0x00f420
-#define OFFSET_ZONES     0x0151e0
-#define OFFSET_SCANL     0x019060
-#define OFFSET_VFO_A     0x02f700
-#define OFFSET_VFO_B     0x02f740
-#define OFFSET_ZONEXT    0x031800
-#define OFFSET_GPS_SYS   0x03f440
+#define OFFSET_TIMESTMP  0x002000
+#define OFFSET_SETTINGS  0x002040
+#define OFFSET_MENU      0x0020f0
+#define OFFSET_BUTTONS   0x002100
+#define OFFSET_MSG       0x002180
+#define OFFSET_PRIVACY   0x0059c0
+#define OFFSET_EMERGENCY 0x005a50
+#define OFFSET_GLISTS    0x00ec20
+#define OFFSET_ZONES     0x0149e0
+#define OFFSET_SCANL     0x018860
+#define OFFSET_VFO_A     0x02ef00
+#define OFFSET_VFO_B     0x02ef40
+#define OFFSET_ZONEXT    0x031000
+#define OFFSET_GPS_SYS   0x03ec40
 // ---- second segment ----
-#define OFFSET_CHANNELS  0x110800
-#define OFFSET_CONTACTS  0x140800
+#define OFFSET_CHANNELS  0x110000
+#define OFFSET_CONTACTS  0x140000
 
 
 /* ******************************************************************************************** *
@@ -1204,8 +1204,8 @@ UV390Codeplug::UV390Codeplug(QObject *parent)
   : CodePlug(parent)
 {
   addImage("TYT MD-UV390 Codeplug");
-  image(0).addElement(0x002800, 0x3e000);
-  image(0).addElement(0x110800, 0x90000);
+  image(0).addElement(0x002000, 0x3e000);
+  image(0).addElement(0x110000, 0x90000);
   // Clear entire codeplug
   clear();
 }
@@ -1214,8 +1214,8 @@ void
 UV390Codeplug::clear()
 {
   // Clear entire images
-  memset(data(0x002800), 0xff, 0x3e000);
-  memset(data(0x110800), 0xff, 0x90000);
+  memset(data(0x002000), 0xff, 0x3e000);
+  memset(data(0x110000), 0xff, 0x90000);
 
   // Clear timestamp
   ((timestamp_t *)(data(OFFSET_TIMESTMP)))->set();

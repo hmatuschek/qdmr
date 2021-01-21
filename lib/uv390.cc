@@ -211,8 +211,6 @@ UV390::download() {
 void
 UV390::upload() {
   emit uploadStarted();
-  logDebug() << "Upload " << _codeplug.image(0).numElements() << " elements.";
-
   // Check every segment in the codeplug
   if (! _codeplug.isAligned(BSIZE)) {
     _errorMessage = QString("%1 Cannot upload codeplug: "
@@ -253,11 +251,15 @@ UV390::upload() {
   }
 
   // Encode config into codeplug
+  logDebug() << "Encode call-sign DB.";
   _codeplug.encode(_config, _codeplugUpdate);
 
   // then erase memory
-  _dev->erase(0, 0xd0000);
+  logDebug() << "Erase memory.";
+  for (int i=0; i<_codeplug.image(0).numElements(); i++)
+    _dev->erase(_codeplug.image(0).element(i).address(), _codeplug.image(0).element(i).size());
 
+  logDebug() << "Upload " << _codeplug.image(0).numElements() << " elements.";
   // then, upload modified codeplug
   bcount = 0;
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
@@ -291,8 +293,8 @@ UV390::upload() {
 void
 UV390::uploadCallsigns() {
   emit uploadStarted();
-  logDebug() << "Upload " << _callsigns.image(0).numElements() << " elements.";
 
+  logDebug() << "Check alignment.";
   // Check alignment in the codeplug
   if (! _callsigns.isAligned(BSIZE)) {
     _errorMessage = QString("%1 Cannot upload callsign db: Callsign DB is not aligned with blocksize %5.").arg(__func__);
@@ -306,9 +308,10 @@ UV390::uploadCallsigns() {
   }
 
   // then erase memory
-  _dev->erase(_callsigns.image(0).element(0).address(),
-              align_size(_callsigns.image(0).element(0).size(), 0x10000));
+  logDebug() << "Erase memory section for call-sign DB.";
+  _dev->erase(_callsigns.image(0).element(0).address(), _callsigns.image(0).element(0).size());
 
+  logDebug() << "Upload " << _callsigns.image(0).numElements() << " elements.";
   // Total amount of data to transfer
   size_t totb = _callsigns.memSize();
   // Upload callsign DB

@@ -247,8 +247,15 @@ format_frequency(double MHz) {
 }
 
 uint32_t
-align_size(uint32_t addr, uint32_t size) {
-  if (0 == (addr % size))
+align_size(uint32_t size, uint32_t block) {
+  if (0 == (size % block))
+    return size;
+  return (size + (block - (size%block)));
+}
+
+uint32_t
+align_addr(uint32_t addr, uint32_t block) {
+  if (0 == (addr % block))
     return addr;
-  return (addr + (size - (addr%size)));
+  return (addr - (addr%block));
 }
