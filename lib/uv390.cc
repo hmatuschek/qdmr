@@ -255,16 +255,20 @@ UV390::upload() {
   _codeplug.encode(_config, _codeplugUpdate);
 
   // then erase memory
-  logDebug() << "Erase memory.";
+  logDebug() << "Erase memory from 0x" << hex << _codeplug.image(0).element(0).address()
+             << " to 0x" << hex <<
+                (_codeplug.image(0).element(0).address()+
+                 _codeplug.image(0).element(0).memSize());
+
   for (int i=0; i<_codeplug.image(0).numElements(); i++)
-    _dev->erase(_codeplug.image(0).element(i).address(), _codeplug.image(0).element(i).size());
+    _dev->erase(_codeplug.image(0).element(i).address(), _codeplug.image(0).element(i).memSize());
 
   logDebug() << "Upload " << _codeplug.image(0).numElements() << " elements.";
   // then, upload modified codeplug
   bcount = 0;
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
     uint addr = _codeplug.image(0).element(n).address();
-    uint size = _codeplug.image(0).element(n).data().size();
+    uint size = _codeplug.image(0).element(n).memSize();
     uint b0 = addr/BSIZE, nb = size/BSIZE;
     for (size_t b=0; b<nb; b++,bcount+=BSIZE) {
       if (! _dev->write(0, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
@@ -309,7 +313,8 @@ UV390::uploadCallsigns() {
 
   // then erase memory
   logDebug() << "Erase memory section for call-sign DB.";
-  _dev->erase(_callsigns.image(0).element(0).address(), _callsigns.image(0).element(0).size());
+  _dev->erase(_callsigns.image(0).element(0).address(),
+              _callsigns.image(0).element(0).memSize());
 
   logDebug() << "Upload " << _callsigns.image(0).numElements() << " elements.";
   // Total amount of data to transfer
@@ -317,9 +322,9 @@ UV390::uploadCallsigns() {
   // Upload callsign DB
   size_t bcount = 0;
   uint addr = _callsigns.image(0).element(0).address();
-  uint size = _callsigns.image(0).element(0).data().size();
+  uint size = _callsigns.image(0).element(0).memSize();
   uint b0 = addr/BSIZE, nb = size/BSIZE;
-  for (size_t b=0; b<nb; b++,bcount++) {
+  for (size_t b=0; b<nb; b++,bcount+=BSIZE) {
     if (! _dev->write(0, (b0+b)*BSIZE, _callsigns.data((b0+b)*BSIZE), BSIZE)) {
       _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
           .arg(_dev->errorMessage());

@@ -314,6 +314,8 @@ DFUDevice::erase(uint start, uint size) {
     return false;
   usleep(100000);
 
+  logDebug() << "Erase flash for section 0x" << hex << start << " of size 0x" << hex << size;
+
   uint end = start+size;
   start = align_addr(start, 0x10000);
   end = align_size(end, 0x10000);

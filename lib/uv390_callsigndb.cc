@@ -147,10 +147,12 @@ UV390CallsignDB::encode(UserDatabase *db) {
   // Determine size of call-sign DB in memory
   qint64 n = std::min(db->count(), qint64(MAX_CALLSIGNS));
   qint64 size = align_size(0x4003 + 120*n, 1024);
+
   // allocate & clear memory
   if (0 == image(0).numElements())
     this->image(0).addElement(CALLSIGN_START, size);
   memset(data(CALLSIGN_START), 0xff, size);
+
   // Encode call-sign DB
   ((callsign_db_t *)data(CALLSIGN_START))->fromUserDB(db);
 }
