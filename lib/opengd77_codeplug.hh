@@ -247,6 +247,51 @@ protected:
     zone_t  zone[NZONES];
   };
 
+  /** Specific codeplug representation of a DMR contact.
+   *
+   * Memmory layout of the contact:
+   * @verbinclude opengd77contact.txt
+   */
+  struct __attribute__((packed)) contact_t {
+    /** Possible call types. */
+    typedef enum {
+      CALL_GROUP   = 0,                 ///< A group call.
+      CALL_PRIVATE = 1,                 ///< A private call.
+      CALL_ALL     = 2                  ///< An all-call.
+    } CallType;
+
+    // Bytes 0-15
+    uint8_t name[16];                   ///< Contact name in ASCII, 0xff terminated.
+    // Bytes 16-19
+    uint8_t id[4];                      ///< BCD coded 8 digits DMR ID.
+    // Byte 20
+    uint8_t type;                       ///< Call Type, one of Group Call, Private Call or All Call.
+    // Bytes 21-23
+    uint8_t receive_tone;               ///< Call Receive Tone, 0=Off, 1=On.
+    uint8_t ring_style;                 ///< Ring style: [0,10]
+    uint8_t timeslot_override;          ///< Time-slot override, 0x00=Off, 0x01=TS1, 0x02=TS2.
+
+    /** Constructor. */
+    contact_t();
+
+    /** Resets an invalidates the contact entry. */
+    void clear();
+    /** Returns @c true, if the contact is valid. */
+    bool isValid() const;
+    /** Returns the DMR ID of the contact. */
+    uint32_t getId() const;
+    /** Sets the DMR ID of the contact. */
+    void setId(uint32_t num);
+    /** Returns the name of the contact. */
+    QString getName() const;
+    /** Sets the name of the contact. */
+    void setName(const QString &name);
+
+    /** Constructs a @c DigitalContact instance from this codeplug contact. */
+    DigitalContact *toContactObj() const;
+    /** Resets this codeplug contact from the given @c DigitalContact. */
+    void fromContactObj(const DigitalContact *obj, const Config *conf);
+  };
 
 public:
   /** Constructs an empty codeplug for the GD-77. */

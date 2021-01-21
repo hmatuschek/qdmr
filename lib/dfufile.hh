@@ -80,8 +80,10 @@ class DFUFile: public QObject
 		uint32_t address() const;
     /** Sets the address of the element. */
 		void setAddress(uint32_t addr);
-    /** Returns the size of the element. */
+    /** Returns the size of the element (including headers). */
 		uint32_t size() const;
+    /** Returns the memory size of the element. */
+    uint32_t memSize() const;
     /** Checks if the element address and size is aligned with the given block size. */
     bool isAligned(uint blocksize) const;
     /** Returns a reference to the data. */
@@ -129,8 +131,10 @@ class DFUFile: public QObject
 		const QString &name() const;
     /** Sets the name of the image. */
 		void setName(const QString &name);
-    /** Returns the total size of the image. */
+    /** Returns the total size of the image (including headers). */
 		uint32_t size() const;
+    /** Returns the memory size stored in the image. */
+    uint32_t memSize() const;
     /** Returns the number of elements of this image. */
 		int numElements() const;
     /** Returns a reference to the i-th element of the image. */
@@ -144,6 +148,8 @@ class DFUFile: public QObject
     void addElement(const Element &element);
     /** Removes the i-th element from this image. */
 		void remElement(int i);
+    /** Checks if all element addresses and sizes is aligned with the given block size. */
+    bool isAligned(uint blocksize) const;
 
     /** Reads an image from the given file and updates the CRC. */
 		bool read(QFile &file, CRC32 &crc, QString &errorMessage);
@@ -153,6 +159,7 @@ class DFUFile: public QObject
     /** Prints a textual representation of the image into the given stream. */
 		void dump(QTextStream &stream) const;
 
+    /** Sorts all elements with respect to their addresses. */
     void sort();
 
 	protected:
@@ -170,6 +177,8 @@ public:
 
   /** Returns the total size of the DFU file. */
 	uint32_t size() const;
+  /** Returns the total memory size stored in the DFU file. */
+  uint32_t memSize() const;
 
   /** Returns the number of images within the DFU file. */
 	int numImages() const;
@@ -183,6 +192,9 @@ public:
 	void addImage(const Image &img);
   /** Deletes the @c i-th image from the file. */
 	void remImage(int i);
+
+  /** Checks if all image addresses and sizes is aligned with the given block size. */
+  bool isAligned(uint blocksize) const;
 
   /** Returns the error message in case of an error. */
 	const QString &errorMessage() const;
@@ -203,6 +215,11 @@ public:
 
   /** Dumps a text representation of the DFU file structure to the specified text stream. */
 	void dump(QTextStream &stream) const;
+
+  /** Returns a pointer to the encoded raw data at the specified offset. */
+  virtual unsigned char *data(uint32_t offset, uint32_t img=0);
+  /** Returns a const pointer to the encoded raw data at the specified offset. */
+  virtual const unsigned char *data(uint32_t offset, uint32_t img=0) const;
 
 protected:
   /// Holds the error string.

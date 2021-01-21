@@ -115,14 +115,22 @@ public:
 		int maxGrouplistNameLength;
     /** Maximum number contacts per RX group list. */
 		int maxContactsInGrouplist;
+
+    /** If true, the radio supports a callsign DB. */
+    bool hasCallsignDB;
+    /** If true, the callsign DB of the radio is implemented. */
+    bool callsignDBImplemented;
+    /** Maximum number of entries in callsign DB. */
+    uint maxCallsignsInDB;
 	} Features;
 
   /** Possible states of the radio object. */
 	typedef enum {
-    StatusIdle,         ///< Idle, nothing to do.
-    StatusDownload,     ///< Downloading codeplug.
-    StatusUpload,       ///< Uploading codeplug.
-    StatusError         ///< An error occured.
+    StatusIdle,            ///< Idle, nothing to do.
+    StatusDownload,        ///< Downloading codeplug.
+    StatusUpload,          ///< Uploading codeplug.
+    StatusUploadCallsigns, ///< Uploading codeplug.
+    StatusError            ///< An error occured.
   } Status;
 
 public:
@@ -164,6 +172,8 @@ public slots:
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   virtual bool startUpload(Config *config, bool blocking=false, bool update=true) = 0;
+  /** Assembles the callsign DB from the given one and uploads it to the device. */
+  virtual bool startUploadCallsignDB(UserDatabase *db, bool blocking=false) = 0;
 
 signals:
   /** Gets emitted once the codeplug download has been started. */

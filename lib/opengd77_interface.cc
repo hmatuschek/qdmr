@@ -4,6 +4,7 @@
 
 #define BLOCK_SIZE  32
 #define SECTOR_SIZE 4096
+#define ALIGN_BLOCK_SIZE(n) ((0==((n)%BLOCK_SIZE)) ? (n) : (n)+(BLOCK_SIZE-((n)%BLOCK_SIZE)))
 
 /* ********************************************************************************************* *
  * Implementation of OpenGD77Interface::ReadRequest
@@ -181,20 +182,26 @@ OpenGD77Interface::identifier() {
 bool
 OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
 {
+  logDebug() << "Send enter prog mode ...";
   if (! sendShowCPSScreen())
     return false;
+  //logDebug() << "Send clear screen ...";
   if (! sendClearScreen())
     return false;
+  //logDebug() << "Send display text ...";
   if (! sendDisplay(0, 0, "qDMR", 3, 1, 0))
     return false;
   if (! sendDisplay(0, 16, "Writing", 3, 1, 0))
     return false;
   if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0))
     return false;
+  //logDebug() << "Send 'render CPS' ...";
   if (! sendRenderCPS())
     return false;
+  //logDebug() << "Send 'flash red LED' ...";
   if (! sendCommand(CommandRequest::FLASH_RED_LED))
     return false;
+  //logDebug() << "Send save settings and VFOs ...";
   if (! sendCommand(CommandRequest::SAVE_SETTINGS_AND_VFOS))
     return false;
 
@@ -206,7 +213,7 @@ OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
     _sector = -1;
   } else if (FLASH == bank) {
     int32_t sector = addr/SECTOR_SIZE;
-    if (_sector != sector) {
+    if ((-1 != _sector) && (_sector != sector)) {
       if (! finishWriteFlash())
         return false;
     }
@@ -217,11 +224,13 @@ OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
 bool
 OpenGD77Interface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
 {
+  //logDebug() << "Write to bank " << bank << ", addr " << hex << addr << " " << nbytes <<"b.";
+
   if (EEPROM == bank) {
     if ((0 <= _sector) && (! finishWriteFlash()))
       return false;
-    for (int i=0; i<nbytes; i+=32) {
-      if (! writeEEPROM(addr+i, data+i, 32)) {
+    for (int i=0; i<nbytes; i+=BLOCK_SIZE) {
+      if (! writeEEPROM(addr+i, data+i, BLOCK_SIZE)) {
         _sector = -1;
         return false;
       }
@@ -239,8 +248,8 @@ start:
   }
 
   if (sector == _sector) {
-    for (int i=0; i<nbytes; i+=32) {
-      if (! writeFlash(addr+i, data+i, 32)) {
+    for (int i=0; i<nbytes; i+=BLOCK_SIZE) {
+      if (! writeFlash(addr+i, data+i, BLOCK_SIZE)) {
         _sector = -1;
         return false;
       }
@@ -299,12 +308,12 @@ OpenGD77Interface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
     return false;
   }
 
-  for (int i=0; i<nbytes; i+=32) {
+  for (int i=0; i<nbytes; i+=BLOCK_SIZE) {
     bool ok;
     if (EEPROM == bank)
-      ok = readEEPROM(addr+i, data+i, 32);
+      ok = readEEPROM(addr+i, data+i, BLOCK_SIZE);
     else if (FLASH == bank)
-      ok = readFlash(addr+i, data+i, 32);
+      ok = readFlash(addr+i, data+i, BLOCK_SIZE);
     else {
       _errorMessage = tr("%1: Cannot read from bank %2: Unknown memory bank.")
           .arg(__func__).arg(bank);
@@ -341,7 +350,7 @@ OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len) {
     return false;
   }
 
-  ReadRequest req; req.initReadEEPROM(addr, 32);
+  ReadRequest req; req.initReadEEPROM(addr, BLOCK_SIZE);
   if (sizeof(ReadRequest) != QSerialPort::write((const char *)&req, sizeof(ReadRequest))) {
     _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
     logError() << __FILE__ << ": " << _errorMessage;
@@ -433,7 +442,7 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len) {
   }
 
   ReadRequest req;
-  req.initReadFlash(addr, 32);
+  req.initReadFlash(addr, BLOCK_SIZE);
   if (sizeof(ReadRequest) != QSerialPort::write((const char *)&req, sizeof(ReadRequest))) {
     _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
     logError() << _errorMessage;
@@ -478,6 +487,7 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len) {
 
 bool
 OpenGD77Interface::setFlashSector(uint32_t addr) {
+  //logDebug() << "Send set-flash-sector: 0x" << hex << addr << " ...";
   WriteRequest req; req.initSetFlashSector(addr);
   WriteResponse resp;
 
@@ -554,6 +564,7 @@ OpenGD77Interface::writeFlash(uint32_t addr, const uint8_t *data, uint16_t len) 
 
 bool
 OpenGD77Interface::finishWriteFlash() {
+  //logDebug() << "Send finish write flash command ...";
   WriteRequest req;
   req.initFinishWriteFlash();
   WriteResponse resp;

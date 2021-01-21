@@ -4,6 +4,7 @@
 #include <QApplication>
 #include "config.hh"
 #include <QGeoPositionInfoSource>
+#include "releasenotes.hh"
 
 class QMainWindow;
 class Radio;
@@ -36,6 +37,7 @@ public slots:
 
   void downloadCodeplug();
   void uploadCodeplug();
+  void uploadCallsignDB();
 
   void showSettings();
   void showAbout();
@@ -57,7 +59,6 @@ private slots:
   void onIntroLine2Changed();
   void onMicLevelChanged();
   void onSpeechChanged();
-  void onUploadUserDBChanged();
 
   void onAddContact();
   void onRemContact();
@@ -107,6 +108,7 @@ protected:
   UserDatabase *_users;
   QGeoPositionInfoSource *_source;
   QGeoCoordinate _currentPosition;
+  ReleaseNotes _releaseNotes;
 };
 
 #endif // APPLICATION_HH

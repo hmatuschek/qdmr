@@ -369,7 +369,7 @@ void
 GD77Codeplug::contact_t::clear() {
   memset(name, 0xff, 16);
   memset(id, 0x00, 4);
-  type = receive_tone = ring_style = _unknown23 = 0;
+  type = receive_tone = ring_style = valid = 0;
 }
 
 bool
@@ -414,7 +414,7 @@ GD77Codeplug::contact_t::toContactObj() const {
 void
 GD77Codeplug::contact_t::fromContactObj(const DigitalContact *cont, const Config *conf) {
   Q_UNUSED(conf);
-  _unknown23 = 0xff;
+  valid = 0xff;
   setName(cont->name());
   setId(cont->number());
   switch (cont->type()) {

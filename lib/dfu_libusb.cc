@@ -1,6 +1,7 @@
 #include "dfu_libusb.hh"
 #include <unistd.h>
 #include "logger.hh"
+#include "utils.hh"
 
 
 // USB request types.
@@ -302,7 +303,7 @@ DFUDevice::identify()
 
 
 bool
-DFUDevice::erase(unsigned start, unsigned finish) {
+DFUDevice::erase(uint start, uint size) {
   int error;
   // Enter Programming Mode.
   if ((error = get_status()))
@@ -313,41 +314,17 @@ DFUDevice::erase(unsigned start, unsigned finish) {
     return false;
   usleep(100000);
 
-  if (start == 0) {
-    // Erase 256kbytes of configuration memory.
-    error = erase_block(0x00000000)
-        || erase_block(0x00010000)
-        || erase_block(0x00020000)
-        || erase_block(0x00030000);
-    if (error)
-      return false;
+  logDebug() << "Erase flash for section 0x" << hex << start << " of size 0x" << hex << size;
 
-    if (finish > 256*1024) {
-      // Erase 768kbytes of extended configuration memory.
-      error = erase_block(0x00110000)
-          || erase_block(0x00120000)
-          || erase_block(0x00130000)
-          || erase_block(0x00140000)
-          || erase_block(0x00150000)
-          || erase_block(0x00160000)
-          || erase_block(0x00170000)
-          || erase_block(0x00180000)
-          || erase_block(0x00190000)
-          || erase_block(0x001a0000)
-          || erase_block(0x001b0000)
-          || erase_block(0x001c0000)
-          || erase_block(0x001d0000);
-      if (error)
-        return false;
-    }
-  } else {
-    // Erase callsign database.
-    unsigned int addr;
+  uint end = start+size;
+  start = align_addr(start, 0x10000);
+  end = align_size(end, 0x10000);
+  size = end-start;
 
-    for (addr=start; addr<finish; addr+=0x00010000) {
-      if ((error = erase_block(addr)))
-        return false;
-    }
+  logDebug() << "Erase block at 0x" << hex << start << " of size 0x" << hex << size;
+  for (uint i=0; i<size; i+=0x10000) {
+    logDebug() << "Erase 0x10000 block at 0x" << hex << (start+i);
+    erase_block(start+i);
   }
 
   // Zero address.
@@ -370,7 +347,7 @@ DFUDevice::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
   }
   uint32_t block = addr/1024;
   int error = libusb_control_transfer(
-        _dev, REQUEST_TYPE_TO_HOST, REQUEST_UPLOAD, block, 0, data, nbytes, 0);
+        _dev, REQUEST_TYPE_TO_HOST, REQUEST_UPLOAD, block+2, 0, data, nbytes, 0);
   if (error < 0) {
     _errorMessage = tr("%1 Cannot read block: %2 %3").arg(__func__).arg(error)
         .arg(libusb_strerror((enum libusb_error) error));
@@ -402,7 +379,7 @@ DFUDevice::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
   }
   uint32_t block = addr/1024;
   int error = libusb_control_transfer(
-        _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, block, 0, data, nbytes, 0);
+        _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, block+2, 0, data, nbytes, 0);
   if (error < 0) {
     _errorMessage = tr("%1 Cannot write block: %2 %3").arg(__func__).arg(error)
         .arg(libusb_strerror((enum libusb_error) error));

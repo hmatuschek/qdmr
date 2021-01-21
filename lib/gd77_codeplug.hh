@@ -222,8 +222,7 @@ protected:
     // Bytes 21-23
     uint8_t receive_tone;               ///< Call Receive Tone, 0=Off, 1=On.
     uint8_t ring_style;                 ///< Ring style: [0,10]
-    uint8_t _unknown23;                 ///< Usually 0xff if valid, 0x00 otherwise. For OpenGD77
-                                        ///< unknown flags.
+    uint8_t valid;                      ///< Contact is valid, 0xff if valid, 0x00 otherwise.
 
     /** Constructor. */
     contact_t();
@@ -350,6 +349,7 @@ protected:
   /** Represents the timestamp within the codeplug. This representation is identical to
 	 * the timestamp of the RD-5R codeplug. Hence, it gets reused here. */
 	typedef RD5RCodeplug::timestamp_t timestamp_t;
+
 
 public:
   /** Constructs an empty codeplug for the GD-77. */

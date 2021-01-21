@@ -102,6 +102,12 @@ Under Arch Linux run
 $ sudo pacman -S git base-devel cmake libusb qt5-tools qt5-serialport qt5-location
 ```
 
+#### Fedora
+Under Fedora Linux run
+```
+$ sudo dnf install libusb-devel qt5-qtlocation-devel qt5-qtserialport-devel qt5-qttools-static qt5-qttools-devel qt5-qtbase-devel gcc-c++ git
+```
+
 Then clone the repository with
 ```
 $ git clone https://github.com/hmatuschek/qdmr.git

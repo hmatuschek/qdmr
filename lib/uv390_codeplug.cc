@@ -3,7 +3,6 @@
 #include "utils.hh"
 #include "channel.hh"
 #include "gpssystem.hh"
-#include "userdatabase.hh"
 #include "config.h"
 #include "logger.hh"
 #include <QTimeZone>
@@ -19,27 +18,23 @@
 #define NGPSSYSTEMS      16
 
 // ---- first segment ----
-#define OFFSET_TIMESTMP  0x002800
-#define OFFSET_SETTINGS  0x002840
-#define OFFSET_MENU      0x0028f0
-#define OFFSET_BUTTONS   0x002900
-#define OFFSET_MSG       0x002980
-#define OFFSET_PRIVACY   0x0061c0
-#define OFFSET_EMERGENCY 0x006250
-#define OFFSET_GLISTS    0x00f420
-#define OFFSET_ZONES     0x0151e0
-#define OFFSET_SCANL     0x019060
-#define OFFSET_VFO_A     0x02f700
-#define OFFSET_VFO_B     0x02f740
-#define OFFSET_ZONEXT    0x031800
-#define OFFSET_GPS_SYS   0x03f440
+#define OFFSET_TIMESTMP  0x002000
+#define OFFSET_SETTINGS  0x002040
+#define OFFSET_MENU      0x0020f0
+#define OFFSET_BUTTONS   0x002100
+#define OFFSET_MSG       0x002180
+#define OFFSET_PRIVACY   0x0059c0
+#define OFFSET_EMERGENCY 0x005a50
+#define OFFSET_GLISTS    0x00ec20
+#define OFFSET_ZONES     0x0149e0
+#define OFFSET_SCANL     0x018860
+#define OFFSET_VFO_A     0x02ef00
+#define OFFSET_VFO_B     0x02ef40
+#define OFFSET_ZONEXT    0x031000
+#define OFFSET_GPS_SYS   0x03ec40
 // ---- second segment ----
-#define OFFSET_CHANNELS  0x110800
-#define OFFSET_CONTACTS  0x140800
-// ---- thrid segement ----
-#define CALLSIGN_START   0x00200000  // Start of callsign database
-#define CALLSIGN_END     0x01000000  // End of callsign database
-#define CALLSIGN_OFFSET  0x00204003  // Start of callsign entries
+#define OFFSET_CHANNELS  0x110000
+#define OFFSET_CONTACTS  0x140000
 
 
 /* ******************************************************************************************** *
@@ -712,7 +707,7 @@ UV390Codeplug::general_settings_t::clear() {
   _unused65_3 = 1;
   ch_free_indication_tone = 1;
   pw_and_lock_enable = 1;
-  talk_permit_tone = 1;
+  talk_permit_tone = 0;
 
   _unused66_0 = 0;
   channel_voice_announce = 0;
@@ -1200,118 +1195,6 @@ UV390Codeplug::menu_t::clear() {
   memset(_reserved_7, 0xff, sizeof(_reserved_7));
 }
 
-/* ******************************************************************************************** *
- * Implementation of UV390Codeplug::callsign_db_t
- * ******************************************************************************************** */
-UV390Codeplug::callsign_db_t::entry_t::entry_t() {
-  clear();
-}
-
-void
-UV390Codeplug::callsign_db_t::entry_t::clear() {
-  id_high = 0xfff;
-  index   = 0xfffff;
-}
-
-bool
-UV390Codeplug::callsign_db_t::entry_t::isValid() const {
-  return (0xfff != id_high) && (0xfffff != index);
-}
-
-UV390Codeplug::callsign_db_t::callsign_t::callsign_t() {
-  clear();
-}
-
-void
-UV390Codeplug::callsign_db_t::callsign_t::clear() {
-  memset(dmrid, 0xff, sizeof(dmrid));
-  _unused = 0xff;
-  memset(callsign, 0xff, sizeof(callsign));
-  memset(name, 0xff, sizeof(name));
-}
-
-bool
-UV390Codeplug::callsign_db_t::callsign_t::isValid() const {
-  return (0xff != dmrid[0]) && (0xff != dmrid[1]) && (0xff != dmrid[2]);
-}
-
-void
-UV390Codeplug::callsign_db_t::callsign_t::setID(uint32_t dmrid) {
-  encode_dmr_id_bcd(this->dmrid, dmrid);
-}
-
-void
-UV390Codeplug::callsign_db_t::callsign_t::setCall(const QString &call) {
-  memset(callsign, 0xff, sizeof(callsign));
-  strncpy(callsign, call.toStdString().c_str(), sizeof(callsign));
-}
-
-void
-UV390Codeplug::callsign_db_t::callsign_t::setName(const QString &name) {
-  memset(this->name, 0xff, sizeof(this->name));
-  strncpy(this->name, name.toStdString().c_str(), sizeof(this->name));
-}
-
-void
-UV390Codeplug::callsign_db_t::callsign_t::fromUser(const UserDatabase::User &user) {
-  setID(user.id);
-  setCall(user.call);
-  QString name = user.name;
-  if (! user.surname.isEmpty())
-    name += " " + user.surname;
-  if (! user.country.isEmpty())
-    name += ", " + user.country;
-  setName(name);
-}
-
-UV390Codeplug::callsign_db_t::callsign_db_t() {
-  clear();
-}
-
-void
-UV390Codeplug::callsign_db_t::clear() {
-  n = 0;
-  for (int i=0; i<4096; i++)
-    index[i].clear();
-  for (int i=0; i<122197; i++)
-    db[i].clear();
-}
-
-void
-UV390Codeplug::callsign_db_t::fromUserDB(const UserDatabase *db) {
-  // Clear database and index
-  clear();
-  // Limit users to 122197 entries
-  n = std::min(122197ll, db->count());
-  // If there are no users -> done.
-  if (0 == n)
-    return;
-
-  // Select n users and sort them in ascending order of their IDs
-  QVector<UserDatabase::User> users;
-  for (int i=0; i<n; i++)
-    users.append(db->user(i));
-  std::sort(users.begin(), users.end(),
-            [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
-
-  // First index entry
-  int  j = 0;
-  uint cidh = (users[0].id >> 12);
-  this->index[j].id_high = cidh;
-  this->index[j].index = 1;
-  j++;
-
-  // Store users and update index
-  for (int i=0; i<n; i++) {
-    this->db[i].fromUser(users[i]);
-    uint idh = (users[i].id >> 12);
-    if (idh != cidh) {
-      this->index[j].id_high = idh;
-      this->index[j].index = i+1;
-      cidh = idh; j++;
-    }
-  }
-}
 
 
 /* ******************************************************************************************** *
@@ -1321,8 +1204,8 @@ UV390Codeplug::UV390Codeplug(QObject *parent)
   : CodePlug(parent)
 {
   addImage("TYT MD-UV390 Codeplug");
-  image(0).addElement(0x002800, 0x3e000);
-  image(0).addElement(0x110800, 0x90000);
+  image(0).addElement(0x002000, 0x3e000);
+  image(0).addElement(0x110000, 0x90000);
   // Clear entire codeplug
   clear();
 }
@@ -1331,8 +1214,8 @@ void
 UV390Codeplug::clear()
 {
   // Clear entire images
-  memset(data(0x002800), 0xff, 0x3e000);
-  memset(data(0x110800), 0xff, 0x90000);
+  memset(data(0x002000), 0xff, 0x3e000);
+  memset(data(0x110000), 0xff, 0x90000);
 
   // Clear timestamp
   ((timestamp_t *)(data(OFFSET_TIMESTMP)))->set();
@@ -1452,17 +1335,6 @@ UV390Codeplug::encode(Config *config, bool update) {
       gps->fromGPSSystemObj(config->posSystems()->gpsSystem(i), config);
     else
       gps->clear();
-  }
-
-  // Define User DataBase (ContactCSV)
-  // If userdatabase is given and not defined yet -> allocate user DB
-  if (config->uploadUserDB() && config->hasUserDB() && (2 == this->image(0).numElements()))
-    this->image(0).addElement(CALLSIGN_START, CALLSIGN_END-CALLSIGN_START);
-  // If user database is given and defined -> reset and fill user DB.
-  if (config->uploadUserDB() && config->hasUserDB() && (3 == this->image(0).numElements())) {
-    // clear DB memory
-    memset(data(CALLSIGN_START), 0xff, CALLSIGN_END-CALLSIGN_START);
-    ((callsign_db_t *)data(CALLSIGN_START))->fromUserDB(config->userDB());
   }
 
   return true;

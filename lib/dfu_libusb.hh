@@ -34,8 +34,8 @@ public:
 	QString identifier();
 	void close();
 
-  /** Erases a memory section from @c start to @c finish. */
-	bool erase(unsigned start, unsigned finish);
+  /** Erases a memory section at @c start of size @c size. */
+  bool erase(uint start, uint size);
 
   bool read_start(uint32_t bank, uint32_t addr);
   bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);

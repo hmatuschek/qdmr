@@ -60,6 +60,15 @@ DFUFile::size() const {
   return size+sizeof(file_suffix_t);
 }
 
+uint32_t
+DFUFile::memSize() const {
+  uint32_t size = 0;
+  foreach (const Image &i, _images) {
+    size += i.memSize();
+  }
+  return size;
+}
+
 int
 DFUFile::numImages() const {
   return _images.size();
@@ -88,6 +97,14 @@ DFUFile::addImage(const Image &img) {
 void
 DFUFile::remImage(int i) {
   _images.remove(i);
+}
+
+bool
+DFUFile::isAligned(uint blocksize) const {
+  for (int i=0; i<_images.size(); i++)
+    if (! _images.at(i).isAligned(blocksize))
+      return false;
+  return true;
 }
 
 bool
@@ -223,6 +240,34 @@ DFUFile::write(QFile &file) {
   return true;
 }
 
+unsigned char *
+DFUFile::data(uint32_t offset, uint32_t img) {
+  // Search for element that contains address
+  for  (int i=0; i<image(img).numElements(); i++) {
+    if ((offset >= image(img).element(i).address()) &&
+        (offset < (image(img).element(i).address()+image(img).element(i).data().size())))
+    {
+      return (unsigned char *)(image(img).element(i).data().data()+
+                               (offset-image(img).element(i).address()));
+    }
+  }
+  return nullptr;
+}
+
+const unsigned char *
+DFUFile::data(uint32_t offset, uint32_t img) const {
+  // Search for element that contains address
+  for  (int i=0; i<image(img).numElements(); i++) {
+    if ((offset >= image(img).element(i).address()) &&
+        (offset < (image(img).element(i).address()+image(img).element(i).data().size())))
+    {
+      return (const unsigned char *)(image(img).element(i).data().data()+
+                                     (offset-image(img).element(i).address()));
+    }
+  }
+  return nullptr;
+}
+
 void
 DFUFile::dump(QTextStream &stream) const {
   stream << "DFU file with " << _images.size() << " images:" << endl;
@@ -263,6 +308,11 @@ DFUFile::Element::operator=(const Element &other) {
 uint32_t
 DFUFile::Element::size() const {
   return sizeof(element_prefix_t) + _data.size();
+}
+
+uint32_t
+DFUFile::Element::memSize() const {
+  return _data.size();
 }
 
 uint32_t
@@ -420,6 +470,14 @@ DFUFile::Image::size() const {
   return size;
 }
 
+uint32_t
+DFUFile::Image::memSize() const {
+  uint32_t size = 0;
+  foreach (const Element &e, _elements)
+    size += e.memSize();
+  return size;
+}
+
 uint8_t
 DFUFile::Image::alternateSettings() const {
   return _alternate_settings;
@@ -476,6 +534,14 @@ DFUFile::Image::addElement(const Element &element) {
 void
 DFUFile::Image::remElement(int i) {
   _elements.remove(i);
+}
+
+bool
+DFUFile::Image::isAligned(uint blocksize) const {
+  for (int i=0; i<_elements.count(); i++)
+    if (! _elements.at(i).isAligned(blocksize))
+      return false;
+  return true;
 }
 
 bool

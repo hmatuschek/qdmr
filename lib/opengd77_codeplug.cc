@@ -4,6 +4,7 @@
 #include "utils.hh"
 #include "logger.hh"
 #include <QDateTime>
+#include <QtEndian>
 
 // Stored in EEPROM
 #define OFFSET_SETTINGS     0x000e0
@@ -238,6 +239,74 @@ OpenGD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf
 }
 
 
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77Codeplug::contact_t
+ * ******************************************************************************************** */
+OpenGD77Codeplug::contact_t::contact_t() {
+  clear();
+}
+
+void
+OpenGD77Codeplug::contact_t::clear() {
+  memset(name, 0xff, 16);
+  memset(id, 0x00, 4);
+  type = receive_tone = ring_style = timeslot_override = 0;
+}
+
+bool
+OpenGD77Codeplug::contact_t::isValid() const {
+  return (0x00 != name[0]) && (0xff != name[0]);
+}
+
+uint32_t
+OpenGD77Codeplug::contact_t::getId() const {
+  return decode_dmr_id_bcd(id);
+}
+void
+OpenGD77Codeplug::contact_t::setId(uint32_t num) {
+  encode_dmr_id_bcd(id, num);
+}
+
+QString
+OpenGD77Codeplug::contact_t::getName() const {
+  return decode_ascii(name, 16, 0xff);
+}
+void
+OpenGD77Codeplug::contact_t::setName(const QString &n) {
+  encode_ascii(name, n, 16, 0xff);
+}
+
+DigitalContact *
+OpenGD77Codeplug::contact_t::toContactObj() const {
+  if (! isValid())
+    return nullptr;
+  QString name = getName();
+  uint32_t id = getId();
+  DigitalContact::Type ctype;
+  switch (type) {
+    case CALL_PRIVATE: ctype = DigitalContact::PrivateCall; break;
+    case CALL_GROUP: ctype = DigitalContact::GroupCall; break;
+    case CALL_ALL: ctype = DigitalContact::AllCall; break;
+  }
+  bool rxTone = (receive_tone && ring_style);
+  return new DigitalContact(ctype, name, id, rxTone);
+}
+
+void
+OpenGD77Codeplug::contact_t::fromContactObj(const DigitalContact *cont, const Config *conf) {
+  Q_UNUSED(conf);
+  timeslot_override = 0x00;
+  setName(cont->name());
+  setId(cont->number());
+  switch (cont->type()) {
+    case DigitalContact::PrivateCall: type = CALL_PRIVATE; break;
+    case DigitalContact::GroupCall:   type = CALL_GROUP; break;
+    case DigitalContact::AllCall:     type = CALL_ALL; break;
+  }
+  if (cont->rxTone())
+    receive_tone = ring_style = 1;
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of OpenGD77Codeplug::zone_t
@@ -319,7 +388,6 @@ OpenGD77Codeplug::zone_t::fromZoneObjB(const Zone *zone, const Config *conf) {
       member[i] = 0;
   }
 }
-
 
 
 /* ******************************************************************************************** *

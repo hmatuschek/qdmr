@@ -77,7 +77,9 @@ bool
 UserDatabase::load(const QString &filename) {
   QFile file(filename);
   if (! file.open(QIODevice::ReadOnly)) {
-    logError() << "Cannot open user list '" << filename << "'.";
+    QString msg = QString("Cannot open user list '%1': ").arg(filename).arg(file.errorString());
+    logError() << msg;
+    emit error(msg);
     return false;
   }
   QByteArray data = file.readAll();
@@ -85,15 +87,21 @@ UserDatabase::load(const QString &filename) {
 
   QJsonDocument doc = QJsonDocument::fromJson(data);
   if (! doc.isObject()) {
-    logError() << "Failed to load user DB: JSON document is not an object!";
+    QString msg = "Failed to load user DB: JSON document is not an object!";
+    logError() << msg;
+    emit error(msg);
     return false;
   }
   if (! doc.object().contains("users")) {
-    logError() << "Failed to load user DB: JSON object does not contain 'users' item.";
+    QString msg = "Failed to load user DB: JSON object does not contain 'users' item.";
+    logError() << msg;
+    emit error(msg);
     return false;
   }
   if (! doc.object()["users"].isArray()) {
-    logError() << "Failed to load user DB: 'users' item is not an array.";
+    QString msg = "Failed to load user DB: 'users' item is not an array.";
+    logError() << msg;
+    emit error(msg);
     return false;
   }
 
@@ -114,6 +122,7 @@ UserDatabase::load(const QString &filename) {
 
   logDebug() << "Loaded user database with " << _user.size() << " entries from " << filename << ".";
 
+  emit loaded();
   return true;
 }
 
@@ -135,7 +144,9 @@ UserDatabase::download() {
 void
 UserDatabase::downloadFinished(QNetworkReply *reply) {
   if (reply->error()) {
-    logError() << "Cannot download user database: " << reply->errorString();
+    QString msg = QString("Cannot download user database: %1").arg(reply->errorString());
+    logError() << msg;
+    emit error(msg);
     return;
   }
 
@@ -143,11 +154,15 @@ UserDatabase::downloadFinished(QNetworkReply *reply) {
   QFile file(path+"/user.json");
   QDir directory;
   if ((! directory.exists(path)) && (!directory.mkpath(path))) {
-    logError() << "Cannot create path '" << path << "'.";
+    QString msg = QString("Cannot create path '%1'.").arg(path);
+    logError() << msg;
+    emit error(msg);
     return;
   }
   if (! file.open(QIODevice::WriteOnly)) {
-    logError() << "Cannot save user database at '" << (path+"/user.json") << "'.";
+    QString msg = QString("Cannot save user database at '%1'.").arg(path+"/user.json");
+    logError() << msg;
+    emit error(msg);
     return;
   }
 

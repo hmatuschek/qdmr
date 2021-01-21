@@ -34,7 +34,7 @@ class Config : public QObject
 
 public:
   /** Constructs an empty configuration. */
-  explicit Config(UserDatabase *userdb=nullptr, QObject *parent = nullptr);
+  explicit Config(QObject *parent = nullptr);
 
   /** Returns @c true if the config was modified, @see modified. */
   bool isModified() const;
@@ -83,17 +83,6 @@ public:
   /** Enables/disables the speech synthesis. */
   void setSpeech(bool enabled);
 
-  /** Should the UserDB be uploaded. */
-  bool uploadUserDB() const;
-  /** Enables/disables the upload of the user-db. */
-  void setUploadUserDB(bool upload);
-  /** Returns @c true if a user-db is associated with this config. */
-  bool hasUserDB() const;
-  /** Get the user-db to upload. */
-  UserDatabase *userDB() const;
-  /** Sets the user-db to upload. */
-  void setUserDB(UserDatabase *userdb);
-
   /** Clears the complete configuration. */
   void reset();
 
@@ -113,8 +102,6 @@ signals:
 protected slots:
   /** Iternal callback. */
   void onConfigModified();
-  /** Gets called whenever the UserDB gets deleted. */
-  void onUserDBDeleted();
 
 protected:
   /** If @c true, the configuration was modified. */
@@ -144,10 +131,6 @@ protected:
   uint _mic_level;
   /** If @c true, speech synthesis is enabled. */
   bool _speech;
-  /** If @c true, the user-db should be uploaded. */
-  bool _uploadUserDB;
-  /** Weak reference to the user database. */
-  UserDatabase *_userDB;
 };
 
 #endif // CONFIG_HH

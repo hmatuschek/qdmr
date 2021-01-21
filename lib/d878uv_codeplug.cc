@@ -10,8 +10,6 @@
 #include <QTimeZone>
 #include <QtEndian>
 
-#define ALIGN_SIZE(n,m)          ((n%m) ? (n+(m-(n%m))) : n)
-
 #define NUM_CHANNELS              4000
 #define NUM_CHANNEL_BANKS         32
 #define CHANNEL_BANK_0            0x00800000
@@ -1315,10 +1313,10 @@ D878UVCodeplug::allocateForEncoding() {
     }
   }
   if (contactCount) {
-    image(0).addElement(CONTACT_INDEX_LIST, ALIGN_SIZE(4*contactCount, 16));
-    memset(data(CONTACT_INDEX_LIST), 0xff, ALIGN_SIZE(4*contactCount, 16));
-    image(0).addElement(CONTACT_ID_MAP, ALIGN_SIZE(CONTACT_ID_ENTRY_SIZE*(1+contactCount), 16));
-    memset(data(CONTACT_ID_MAP), 0xff, ALIGN_SIZE(CONTACT_ID_ENTRY_SIZE*(1+contactCount), 16));
+    image(0).addElement(CONTACT_INDEX_LIST, align_size(4*contactCount, 16));
+    memset(data(CONTACT_INDEX_LIST), 0xff, align_size(4*contactCount, 16));
+    image(0).addElement(CONTACT_ID_MAP, align_size(CONTACT_ID_ENTRY_SIZE*(1+contactCount), 16));
+    memset(data(CONTACT_ID_MAP), 0xff, align_size(CONTACT_ID_ENTRY_SIZE*(1+contactCount), 16));
   }
 
   /*

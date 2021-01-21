@@ -34,7 +34,11 @@ static Radio::Features _rd5r_features =
 
   64,    // maxGrouplists;
   16,    // maxGrouplistNameLength;
-  16     // maxContactsInGrouplist;
+  16,    // maxContactsInGrouplist;
+
+  false, // hasCallsignDB
+  false, // callsignDBImplemented
+  0      // maxCallsignsInDB
 };
 
 
@@ -107,6 +111,16 @@ RD5R::startUpload(Config *config, bool blocking, bool update) {
 
   start();
   return true;
+}
+
+bool
+RD5R::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+  Q_UNUSED(db);
+  Q_UNUSED(blocking);
+
+  _errorMessage = tr("RD5R does not support a callsign DB.");
+
+  return false;
 }
 
 void

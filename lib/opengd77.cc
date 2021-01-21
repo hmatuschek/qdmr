@@ -36,12 +36,16 @@ static Radio::Features _open_gd77_features =
 
   76,   // maxGrouplists
   16,   // maxGrouplistNameLength
-  32    // maxContactsInGrouplist
+  32,   // maxContactsInGrouplist
+
+  true, // hasCallsignDB
+  true, // callsignDBImplemented
+  15796 // maxCallsignsInDB
 };
 
 
 OpenGD77::OpenGD77(QObject *parent)
-  : Radio(parent), _name("Open GD-77"), _dev(nullptr), _config(nullptr)
+  : Radio(parent), _name("Open GD-77"), _dev(nullptr), _config(nullptr), _codeplug(), _callsigns()
 {
   // pass...
 }
@@ -116,6 +120,30 @@ OpenGD77::startUpload(Config *config, bool blocking, bool update) {
   return true;
 }
 
+bool
+OpenGD77::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+  logDebug() << "Start upload to " << name() << "...";
+
+  if (StatusIdle != _task) {
+    logError() << "Cannot upload to radio, radio is not idle.";
+    return false;
+  }
+
+  // Assemble call-sign db from user DB
+  logDebug() << "Encode call-signs into db.";
+  _callsigns.encode(db);
+
+  _task = StatusUploadCallsigns;
+  if (blocking) {
+    run();
+    return (StatusIdle == _task);
+  }
+
+  // start thread for upload
+  start();
+  return true;
+}
+
 
 void
 OpenGD77::run() {
@@ -123,6 +151,8 @@ OpenGD77::run() {
     download();
   } else if (StatusUpload == _task) {
     upload();
+  } else if (StatusUploadCallsigns == _task) {
+    uploadCallsigns();
   }
 }
 
@@ -155,25 +185,19 @@ OpenGD77::download()
   }
 
   // Check every segment in the codeplug
-  size_t totb = 0;
-  for (int image=0; image<_codeplug.numImages(); image++) {
-    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-      if (! _codeplug.image(0).element(n).isAligned(BSIZE)) {
-        _errorMessage = QString("In %1(), cannot download codeplug:\n\t Codeplug element %2 (addr=%3, size=%4) "
-                                "is not aligned with blocksize %5.").arg(__func__)
-            .arg(n).arg(_codeplug.image(0).element(n).address())
-            .arg(_codeplug.image(0).element(n).data().size()).arg(BSIZE);
-        logError() << _errorMessage;
-        _task = StatusError;
-        _dev->close();
-        _dev->deleteLater();
-        _dev = nullptr;
-        emit downloadError(this);
-        return;
-      }
-      totb += _codeplug.image(0).element(n).data().size()/BSIZE;
-    }
+  if (! _codeplug.isAligned(BSIZE)) {
+    _errorMessage = QString("In %1(), cannot download codeplug:\n\t "
+                            "Codeplug is not aligned with blocksize %5.").arg(__func__).arg(BSIZE);
+    logError() << _errorMessage;
+    _task = StatusError;
+    _dev->close();
+    _dev->deleteLater();
+    _dev = nullptr;
+    emit downloadError(this);
+    return;
   }
+
+  size_t totb = _codeplug.memSize();
 
   if (! _dev->read_start(0, 0)) {
     _errorMessage = QString("in %1(), cannot start codeplug download:\n\t %2")
@@ -197,7 +221,7 @@ OpenGD77::download()
       uint size = _codeplug.image(image).element(n).data().size();
       uint b0 = addr/BSIZE, nb = size/BSIZE;
 
-      for (uint b=0; b<nb; b++, bcount++) {
+      for (uint b=0; b<nb; b++, bcount+=BSIZE) {
         if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
           _errorMessage = QString("In %1(), cannot read block %2:\n\t %3")
               .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
@@ -230,7 +254,7 @@ OpenGD77::download()
 void
 OpenGD77::upload() {
   _dev = new OpenGD77Interface();
-  if (!_dev->isOpen()) {
+  if (! _dev->isOpen()) {
     _task = StatusError;
     _errorMessage = QString("Cannot upload to radio, device is not open: %1").arg(_dev->errorString());
     logError() << _errorMessage;
@@ -256,25 +280,19 @@ OpenGD77::upload() {
   }
 
   // Check every segment in the codeplug
-  size_t totb = 0;
-  for (int image=0; image<_codeplug.numImages(); image++) {
-    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-      if (! _codeplug.image(0).element(n).isAligned(BSIZE)) {
-        _errorMessage = QString("In %1(), cannot download codeplug:\n\t Codeplug element %2 (addr=%3, size=%4) "
-                                "is not aligned with blocksize %5.").arg(__func__)
-            .arg(n).arg(_codeplug.image(0).element(n).address())
-            .arg(_codeplug.image(0).element(n).data().size()).arg(BSIZE);
-        logError() << _errorMessage;
-        _task = StatusError;
-        _dev->close();
-        _dev->deleteLater();
-        _dev = nullptr;
-        emit uploadError(this);
-        return;
-      }
-      totb += _codeplug.image(0).element(n).data().size()/BSIZE;
-    }
+  if (! _codeplug.isAligned(BSIZE)) {
+    _errorMessage = QString("In %1(), cannot upload code-plug:\n\t "
+                            "Codeplug is not aligned with blocksize %5.").arg(__func__).arg(BSIZE);
+    logError() << _errorMessage;
+    _task = StatusError;
+    _dev->close();
+    _dev->deleteLater();
+    _dev = nullptr;
+    emit uploadError(this);
+    return;
   }
+
+  size_t totb = _codeplug.memSize();
 
   if (! _dev->read_start(0, 0)) {
     _errorMessage = QString("in %1(), cannot start codeplug download:\n\t %2")
@@ -291,14 +309,13 @@ OpenGD77::upload() {
   // Then download codeplug
   size_t bcount = 0;
   for (int image=0; image<_codeplug.numImages(); image++) {
-    uint32_t bank = (0 == image) ? OpenGD77Codeplug::EEPROM : OpenGD77Codeplug::FLASH;
+    uint32_t bank = ( (0 == image) ? OpenGD77Codeplug::EEPROM : OpenGD77Codeplug::FLASH );
 
     for (int n=0; n<_codeplug.image(image).numElements(); n++) {
       uint addr = _codeplug.image(image).element(n).address();
       uint size = _codeplug.image(image).element(n).data().size();
       uint b0 = addr/BSIZE, nb = size/BSIZE;
-
-      for (uint b=0; b<nb; b++, bcount++) {
+      for (uint b=0; b<nb; b++, bcount+=BSIZE) {
         if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
           _errorMessage = QString("In %1(), cannot read block %2:\n\t %3")
               .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
@@ -341,7 +358,7 @@ OpenGD77::upload() {
       uint size = _codeplug.image(image).element(n).data().size();
       uint b0 = addr/BSIZE, nb = size/BSIZE;
 
-      for (uint b=0; b<nb; b++, bcount++) {
+      for (uint b=0; b<nb; b++, bcount+=BSIZE) {
         if (! _dev->write(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
           _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
               .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
@@ -354,11 +371,89 @@ OpenGD77::upload() {
           emit uploadError(this);
           return;
         }
-        emit uploadProgress(50.0+float(bcount*50)/totb);
+        emit uploadProgress(float(bcount*50)/totb);
       }
     }
     _dev->write_finish();
   }
+
+  _task = StatusIdle;
+  _dev->reboot();
+  _dev->close();
+  _dev->deleteLater();
+  _dev = nullptr;
+
+  emit uploadComplete(this);
+}
+
+
+void
+OpenGD77::uploadCallsigns() {
+  _dev = new OpenGD77Interface();
+  if (! _dev->isOpen()) {
+    _task = StatusError;
+    _errorMessage = QString("Cannot upload to radio, device is not open: %1").arg(_dev->errorString());
+    logError() << _errorMessage;
+    _dev->deleteLater();
+    _dev = nullptr;
+    emit uploadError(this);
+    return;
+  }
+
+  emit uploadStarted();
+
+  // Check every segment in the codeplug
+  if (! _callsigns.isAligned(BSIZE)) {
+    _errorMessage = QString("In %1(), cannot upload call-sign DB:\n\t "
+                            "Not aligned with block-size!").arg(__func__);
+    logError() << _errorMessage;
+    _task = StatusError;
+    _dev->close();
+    _dev->deleteLater();
+    _dev = nullptr;
+    emit uploadError(this);
+    return;
+  }
+
+  size_t totb = _callsigns.memSize();
+
+  if (! _dev->write_start(OpenGD77Codeplug::FLASH, 0)) {
+    _errorMessage = QString("in %1(), cannot start callsign DB upload:\n\t %2")
+        .arg(__func__).arg(_dev->errorMessage());
+    logError() << _errorMessage;
+    _task = StatusError;
+    _dev->close();
+    _dev->deleteLater();
+    _dev = nullptr;
+    emit uploadError(this);
+    return;
+  }
+
+  uint bcount = 0;
+  // Then upload callsign DB
+  for (int n=0; n<_callsigns.image(0).numElements(); n++) {
+    uint addr = _callsigns.image(0).element(n).address();
+    uint size = _callsigns.image(0).element(n).data().size();
+    uint b0 = addr/BSIZE, nb = size/BSIZE;
+    for (uint b=0; b<nb; b++, bcount+=BSIZE) {
+      if (! _dev->write(OpenGD77Codeplug::FLASH, (b0+b)*BSIZE,
+                        _callsigns.data((b0+b)*BSIZE, 0), BSIZE))
+      {
+        _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
+            .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
+        logError() << _errorMessage;
+        _task = StatusError;
+        _dev->write_finish();
+        _dev->close();
+        _dev->deleteLater();
+        _dev = nullptr;
+        emit uploadError(this);
+        return;
+      }
+      emit uploadProgress(float(bcount*100)/totb);
+    }
+  }
+  _dev->write_finish();
 
   _task = StatusIdle;
   _dev->reboot();

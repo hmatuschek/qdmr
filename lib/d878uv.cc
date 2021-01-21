@@ -37,7 +37,11 @@ static Radio::Features _d878uv_features =
 
   250,   // maxGrouplists;
   16,    // maxGrouplistNameLength;
-  32     // maxContactsInGrouplist;
+  32,    // maxContactsInGrouplist;
+
+  true,  // hasCallsignDB
+  false, // callsignDBImplemented
+  0      // maxCallsignsInDB
 };
 
 
@@ -114,6 +118,16 @@ D878UV::startUpload(Config *config, bool blocking, bool update) {
 
   this->start();
   return true;
+}
+
+bool
+D878UV::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+  Q_UNUSED(db);
+  Q_UNUSED(blocking);
+
+  _errorMessage = tr("RD5R does not support a callsign DB.");
+
+  return false;
 }
 
 void

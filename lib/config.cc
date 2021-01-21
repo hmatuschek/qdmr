@@ -13,12 +13,12 @@
 /* ********************************************************************************************* *
  * Implementation of Config
  * ********************************************************************************************* */
-Config::Config(UserDatabase *userdb, QObject *parent)
+Config::Config(QObject *parent)
   : QObject(parent), _modified(false), _contacts(new ContactList(this)), _rxGroupLists(new RXGroupLists(this)),
     _channels(new ChannelList(this)), _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
     _gpsSystems(new PositioningSystems(this)),
     _id(0), _name(), _introLine1(), _introLine2(), _mic_level(2),
-    _speech(false), _uploadUserDB(false), _userDB(userdb)
+    _speech(false)
 {
   connect(_contacts, SIGNAL(modified()), this, SIGNAL(modified()));
   connect(_rxGroupLists, SIGNAL(modified()), this, SIGNAL(modified()));
@@ -142,35 +142,6 @@ Config::setSpeech(bool enabled) {
   emit modified();
 }
 
-bool
-Config::uploadUserDB() const {
-  return _uploadUserDB;
-}
-void
-Config::setUploadUserDB(bool upload) {
-  if (upload == _uploadUserDB)
-    return;
-  _uploadUserDB = upload;
-  emit modified();
-}
-
-bool
-Config::hasUserDB() const {
-  return (nullptr != _userDB) && (_userDB->count());
-}
-UserDatabase *
-Config::userDB() const {
-  return _userDB;
-}
-void
-Config::setUserDB(UserDatabase *userdb) {
-  if (_userDB)
-    disconnect(_userDB, SIGNAL(destroyed()), this, SLOT(onUserDBDeleted()));
-  _userDB = userdb;
-  if (_userDB)
-    connect(_userDB, SIGNAL(destroyed()), this, SLOT(onUserDBDeleted()));
-}
-
 void
 Config::reset() {
   // Reset lists
@@ -186,18 +157,12 @@ Config::reset() {
   _introLine2.clear();
   _mic_level = 2;
   _speech    = false;
-  _uploadUserDB = false;
   emit modified();
 }
 
 void
 Config::onConfigModified() {
   _modified = true;
-}
-
-void
-Config::onUserDBDeleted() {
-  _userDB = nullptr;
 }
 
 bool

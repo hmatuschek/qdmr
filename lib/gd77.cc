@@ -6,8 +6,7 @@
 
 #define BSIZE 1024
 
-static Radio::Features _gd77_features =
-{
+static Radio::Features _gd77_features = {
   true,  // isBeta
 
   true,  // hasDigital
@@ -36,7 +35,11 @@ static Radio::Features _gd77_features =
 
   76,   // maxGrouplists
   16,   // maxGrouplistNameLength
-  32    // maxContactsInGrouplist
+  32,   // maxContactsInGrouplist
+
+  true, // hasCallsignDB
+  false, // callsignDBImplemented
+  0      // maxCallsignsInDB
 };
 
 
@@ -110,6 +113,16 @@ GD77::startUpload(Config *config, bool blocking, bool update) {
 
   start();
   return true;
+}
+
+bool
+GD77::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+  Q_UNUSED(db);
+  Q_UNUSED(blocking);
+
+  _errorMessage = tr("Call-sign DB support for GD77 is not implemented yet.");
+
+  return false;
 }
 
 void
