@@ -5,6 +5,8 @@
 #include "userdatabase.hh"
 
 
+/** Represents and encodes the binary format for the call-sign database within the radio.
+ * @ingroup opengd77 */
 class OpenGD77CallsignDB : public DFUFile
 {
   Q_OBJECT
@@ -42,9 +44,12 @@ class OpenGD77CallsignDB : public DFUFile
 
 
 public:
+  /** Constructor. */
   explicit OpenGD77CallsignDB(QObject *parent=nullptr);
+  /** Destructor. */
   virtual ~OpenGD77CallsignDB();
 
+  /** Encodes as many entries as possible of the given user-database. */
   virtual bool encode(UserDatabase *calldb);
 };
 

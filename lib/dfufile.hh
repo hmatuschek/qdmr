@@ -80,8 +80,9 @@ class DFUFile: public QObject
 		uint32_t address() const;
     /** Sets the address of the element. */
 		void setAddress(uint32_t addr);
-    /** Returns the size of the element. */
+    /** Returns the size of the element (including headers). */
 		uint32_t size() const;
+    /** Returns the memory size of the element. */
     uint32_t memSize() const;
     /** Checks if the element address and size is aligned with the given block size. */
     bool isAligned(uint blocksize) const;
@@ -130,8 +131,9 @@ class DFUFile: public QObject
 		const QString &name() const;
     /** Sets the name of the image. */
 		void setName(const QString &name);
-    /** Returns the total size of the image. */
+    /** Returns the total size of the image (including headers). */
 		uint32_t size() const;
+    /** Returns the memory size stored in the image. */
     uint32_t memSize() const;
     /** Returns the number of elements of this image. */
 		int numElements() const;
@@ -157,6 +159,7 @@ class DFUFile: public QObject
     /** Prints a textual representation of the image into the given stream. */
 		void dump(QTextStream &stream) const;
 
+    /** Sorts all elements with respect to their addresses. */
     void sort();
 
 	protected:
@@ -174,6 +177,7 @@ public:
 
   /** Returns the total size of the DFU file. */
 	uint32_t size() const;
+  /** Returns the total memory size stored in the DFU file. */
   uint32_t memSize() const;
 
   /** Returns the number of images within the DFU file. */

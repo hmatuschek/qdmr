@@ -4,7 +4,8 @@
 #include "dfufile.hh"
 #include "userdatabase.hh"
 
-
+/** Represents and encodes the binary format for the call-sign database within the radio.
+ * @ingroup uv390 */
 class UV390CallsignDB : public DFUFile
 {
   Q_OBJECT
@@ -22,12 +23,13 @@ public:
      * @verbinclude uv390userdbentry.txt
      */
     struct __attribute__((packed)) entry_t {
-      uint8_t val[4]; // Combined index and ID MSBs;
+      uint8_t val[4];                   ///< Combined index and ID MSBs;
 
       /// Empty constructor.
       entry_t();
       /** Clears this entry. */
       void clear();
+      /** Sets ID and index. */
       void set(uint id, uint index);
 
       /** Returns true, if the database index entry is valid. */
@@ -73,14 +75,17 @@ public:
 
     /// Clears the complete callsign database.
     void clear();
+    /** Stets the number of entries in the call-sign DB. */
     void setN(uint N);
     /// Fills the callsign database from the given user db.
     void fromUserDB(const UserDatabase *db);
   };
 
 public:
+  /** Constructor, does not allocate any memory yet. */
   explicit UV390CallsignDB(QObject *parent=nullptr);
 
+  /** Tries to encode as many entries of the given user-database. */
   void encode(UserDatabase *db);
 };
 

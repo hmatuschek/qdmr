@@ -81,7 +81,9 @@ public:
   QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
 
 signals:
+  /** Gets emitted once the call-sign database has been loaded. */
   void loaded();
+  /** Gets emitted if the loading of the call-sign database fails. */
   void error(const QString &msg);
 
 public slots:
