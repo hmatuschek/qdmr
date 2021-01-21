@@ -7,7 +7,7 @@
     <refentrytitle>dmrconf</refentrytitle>
     <manvolnum>1</manvolnum>
     <refmiscinfo class="source">dmrconf</refmiscinfo>
-    <refmiscinfo class="version">0.1.0</refmiscinfo>
+    <refmiscinfo class="version">0.5.2</refmiscinfo>
     <refmiscinfo class="manual">User Commands</refmiscinfo>
   </refmeta>
 
@@ -53,16 +53,23 @@
         additional options.</para></listitem>
       </varlistentry>
       <varlistentry>
+        <term><command>read</command></term>
+        <listitem><para>Reads a codeplug from the radio and stores it into the given file. This
+          command may need the <option>-c</option> or <option>-b</option> options if the file type
+          cannot be inferred from the filename.</para></listitem>
+      </varlistentry>
+      <varlistentry>
         <term><command>write</command></term>
         <listitem><para>Writes the specified codeplug to the radio. This command may need the
           <option>-c</option> or <option>-b</option> options if the file type cannot be inferred
           from the filename.</para></listitem>
       </varlistentry>
       <varlistentry>
-        <term><command>read</command></term>
-        <listitem><para>Reads a codeplug from the radio and stores it into the given file. This
-          command may need the <option>-c</option> or <option>-b</option> options if the file type
-          cannot be inferred from the filename.</para></listitem>
+        <term><command>write-db</command></term>
+        <listitem><para>Writes the call-sign database to the device. This command may need the
+          <option>--id</option> option to select call-signs if the complete database does not 
+          fit into the device. If specified, all callsigns closest to the specified ID are 
+          used. </para></listitem>
       </varlistentry>
       <varlistentry>
         <term><command>verify</command></term>
@@ -75,6 +82,14 @@
         <term><command>encode</command></term>
         <listitem><para>Encodes a CSV codeplug as a binary one for the connected or
           specified radio using the <option>--radio</option> option. </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>encode-db</command></term>
+        <listitem><para>Encodes the call-sign datavase as a binary one for the connected or
+          specified radio using the <option>--radio</option> option. This command may need the
+          <option>--id</option> option to select call-signs if the complete database does not 
+          fit into the device. If specified, all callsigns closest to the specified ID are 
+          used. </para></listitem>
       </varlistentry>
       <varlistentry>
         <term><command>decode</command></term>
@@ -112,6 +127,11 @@
         <listitem><para>Specifies the radio for the <command>verify</command>,
           <command>encode</command> or <command>decode</command> commands.</para></listitem>
       </varlistentry>
+      <varlistentry>
+        <term><option>-I</option> or <option>--id=</option>DMR_ID</term>
+        <listitem><para>Specifies the DMR ID for the <command>write-db</command> or
+          <command>encode-db</command> commands.</para></listitem>
+      </varlistentry>
     </variablelist>
   </refsect1>
 
@@ -120,6 +140,14 @@
     <para>The following list contains all supported radios and their names for the
       <option>--radio</option> option.</para>
     <variablelist>
+      <varlistentry>
+        <term><option>opengd77</option></term>
+        <listitem><para>All radios running the Open GD77 firmeare</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>d878uv</option></term>
+        <listitem><para>Anytone AT-D878UV</para></listitem>
+      </varlistentry>
       <varlistentry>
         <term><option>md390</option></term>
         <listitem><para>TYT MD-390 or Retevis RT3S</para></listitem>

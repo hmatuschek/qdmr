@@ -2,12 +2,12 @@
 .\"     Title: dmrconf
 .\"    Author: Hannes Matuschek <hmatuschek@gmail.com>
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: 12/13/2019
+.\"      Date: 01/21/2021
 .\"    Manual: User Commands
-.\"    Source: dmrconf 0.1.0
+.\"    Source: dmrconf 0.5.2
 .\"  Language: English
 .\"
-.TH "DMRCONF" "1" "12/13/2019" "dmrconf 0\&.1\&.0" "User Commands"
+.TH "DMRCONF" "1" "01/21/2021" "dmrconf 0\&.5\&.2" "User Commands"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -49,6 +49,15 @@ also allows to download codeplugs from the radio and to store it in the human\-r
 Detects a connected radio\&. This command does not take any additional options\&.
 .RE
 .PP
+\fBread\fR
+.RS 4
+Reads a codeplug from the radio and stores it into the given file\&. This command may need the
+\fB\-c\fR
+or
+\fB\-b\fR
+options if the file type cannot be inferred from the filename\&.
+.RE
+.PP
 \fBwrite\fR
 .RS 4
 Writes the specified codeplug to the radio\&. This command may need the
@@ -58,13 +67,11 @@ or
 options if the file type cannot be inferred from the filename\&.
 .RE
 .PP
-\fBread\fR
+\fBwrite\-db\fR
 .RS 4
-Reads a codeplug from the radio and stores it into the given file\&. This command may need the
-\fB\-c\fR
-or
-\fB\-b\fR
-options if the file type cannot be inferred from the filename\&.
+Writes the call\-sign database to the device\&. This command may need the
+\fB\-\-id\fR
+option to select call\-signs if the complete database does not fit into the device\&. If specified, all callsigns closest to the specified ID are used\&.
 .RE
 .PP
 \fBverify\fR
@@ -83,6 +90,15 @@ options if the file type cannot be inferred from the filename\&.
 Encodes a CSV codeplug as a binary one for the connected or specified radio using the
 \fB\-\-radio\fR
 option\&.
+.RE
+.PP
+\fBencode\-db\fR
+.RS 4
+Encodes the call\-sign datavase as a binary one for the connected or specified radio using the
+\fB\-\-radio\fR
+option\&. This command may need the
+\fB\-\-id\fR
+option to select call\-signs if the complete database does not fit into the device\&. If specified, all callsigns closest to the specified ID are used\&.
 .RE
 .PP
 \fBdecode\fR
@@ -131,11 +147,30 @@ or
 \fBdecode\fR
 commands\&.
 .RE
+.PP
+\fB\-I\fR or \fB\-\-id=\fRDMR_ID
+.RS 4
+Specifies the DMR ID for the
+\fBwrite\-db\fR
+or
+\fBencode\-db\fR
+commands\&.
+.RE
 .SH "SUPPORTED RADIOS"
 .PP
 The following list contains all supported radios and their names for the
 \fB\-\-radio\fR
 option\&.
+.PP
+\fBopengd77\fR
+.RS 4
+All radios running the Open GD77 firmeare
+.RE
+.PP
+\fBd878uv\fR
+.RS 4
+Anytone AT\-D878UV
+.RE
 .PP
 \fBmd390\fR
 .RS 4
