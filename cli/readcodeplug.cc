@@ -11,6 +11,7 @@
 #include "printprogress.hh"
 #include "config.hh"
 #include "codeplug.hh"
+#include "progressbar.hh"
 
 
 int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
@@ -34,6 +35,9 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
     logError() << "Cannot determine output filetype, consider using --csv or --bin options.";
     return -1;
   }
+
+  showProgress();
+  QObject::connect(radio, &Radio::downloadProgress, updateProgress);
 
   Config config;
   if (! radio->startDownload(true)) {

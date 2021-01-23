@@ -315,7 +315,7 @@ UV390::uploadCallsigns() {
   logDebug() << "Erase memory section for call-sign DB.";
   _dev->erase(_callsigns.image(0).element(0).address(),
               _callsigns.image(0).element(0).memSize(),
-              [](uint percent, void *ctx) { emit ((UV390 *)ctx)->uploadProgress(percent/2); } );
+              [](uint percent, void *ctx) { emit ((UV390 *)ctx)->uploadProgress(percent/2); }, this);
 
   logDebug() << "Upload " << _callsigns.image(0).numElements() << " elements.";
   // Total amount of data to transfer

@@ -6,6 +6,7 @@
 #include "logger.hh"
 #include "radio.hh"
 #include "config.hh"
+#include "progressbar.hh"
 
 
 int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
@@ -46,6 +47,9 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     logError() << "Cannot upload codeplug to device: Codeplug cannot be verified with radio.";
     return -1;
   }
+
+  showProgress();
+  QObject::connect(radio, &Radio::uploadProgress, updateProgress);
 
   logDebug() << "Start upload to " << radio->name() << ".";
   if (! radio->startUpload(&config, true)) {
