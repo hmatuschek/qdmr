@@ -314,17 +314,17 @@ UV390::uploadCallsigns() {
   // then erase memory
   logDebug() << "Erase memory section for call-sign DB.";
   _dev->erase(_callsigns.image(0).element(0).address(),
-              _callsigns.image(0).element(0).memSize());
+              _callsigns.image(0).element(0).memSize(),
+              [](uint percent, void *ctx) { emit ((UV390 *)ctx)->uploadProgress(percent/2); } );
 
   logDebug() << "Upload " << _callsigns.image(0).numElements() << " elements.";
   // Total amount of data to transfer
   size_t totb = _callsigns.memSize();
   // Upload callsign DB
-  size_t bcount = 0;
   uint addr = _callsigns.image(0).element(0).address();
   uint size = _callsigns.image(0).element(0).memSize();
   uint b0 = addr/BSIZE, nb = size/BSIZE;
-  for (size_t b=0; b<nb; b++,bcount+=BSIZE) {
+  for (size_t b=0, bcount=0; b<nb; b++,bcount+=BSIZE) {
     if (! _dev->write(0, (b0+b)*BSIZE, _callsigns.data((b0+b)*BSIZE), BSIZE)) {
       _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
           .arg(_dev->errorMessage());
@@ -336,7 +336,7 @@ UV390::uploadCallsigns() {
       emit uploadError(this);
       return;
     }
-    emit uploadProgress(float(bcount*100)/totb);
+    emit uploadProgress(50+float(bcount*50)/totb);
   }
 
   _task = StatusIdle;

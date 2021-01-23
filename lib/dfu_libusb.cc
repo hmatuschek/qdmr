@@ -303,7 +303,7 @@ DFUDevice::identify()
 
 
 bool
-DFUDevice::erase(uint start, uint size) {
+DFUDevice::erase(uint start, uint size, void(*progress)(uint, void *), void *ctx) {
   int error;
   // Enter Programming Mode.
   if ((error = get_status()))
@@ -325,6 +325,8 @@ DFUDevice::erase(uint start, uint size) {
   for (uint i=0; i<size; i+=0x10000) {
     logDebug() << "Erase 0x10000 block at 0x" << hex << (start+i);
     erase_block(start+i);
+    if (progress)
+      progress((i*100)/size, ctx);
   }
 
   // Zero address.
