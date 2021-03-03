@@ -299,7 +299,7 @@ found:
     return new RD5R();
   } else if ("MD-760P" == id) {
     return new GD77();
-  } else if ("MD-UV390" == id) {
+  } else if (("MD-UV380" == id) || ("MD-UV390" == id)) {
     return new UV390();
   } else if ("OpenGD77" == id) {
     return new OpenGD77();
