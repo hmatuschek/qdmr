@@ -146,7 +146,8 @@ StreamLogHandler::handle(const LogMessage &message) {
   case LogMessage::ERROR:   _stream << "ERROR "; break;
   case LogMessage::FATAL:   _stream << "FATAL "; break;
   }
-  _stream << "in " << message.file() << "@" << message.line() << ": " << message.message() << endl;
+  _stream << "in " << message.file() << "@" << message.line()
+          << ": " << message.message() << Qt::endl;
 }
 
 
@@ -210,5 +211,6 @@ FileLogHandler::handle(const LogMessage &message) {
   case LogMessage::ERROR:   _stream << "ERROR "; break;
   case LogMessage::FATAL:   _stream << "FATAL "; break;
   }
-  _stream << "in " << message.file() << "@" << message.line() << ": " << message.message() << endl;
+  _stream << "in " << message.file() << "@" << message.line()
+          << ": " << message.message() << Qt::endl;
 }
