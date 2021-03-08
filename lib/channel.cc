@@ -187,11 +187,11 @@ AnalogChannel::setBandwidth(Bandwidth bw) {
 }
 
 APRSSystem *
-AnalogChannel::aprs() const {
+AnalogChannel::aprsSystem() const {
   return _aprsSystem;
 }
 void
-AnalogChannel::setAPRS(APRSSystem *sys) {
+AnalogChannel::setAPRSSystem(APRSSystem *sys) {
   if (_aprsSystem)
     disconnect(_aprsSystem, SIGNAL(destroyed(QObject*)), this, SLOT(onAPRSSystemDeleted()));
   _aprsSystem = sys;
@@ -577,8 +577,8 @@ ChannelList::data(const QModelIndex &index, int role) const {
       else
         return tr("-");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (analog->aprs())
-        return analog->aprs()->name();
+      if (analog->aprsSystem())
+        return analog->aprsSystem()->name();
       else
         return tr("-");
     }

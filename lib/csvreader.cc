@@ -1842,7 +1842,7 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
             .arg(line).arg(column).arg(name).arg(aprs).arg(_posSystems[aprs]->name());
         return false;
       }
-      _channels[idx]->as<AnalogChannel>()->setAPRS(_posSystems[aprs]->as<APRSSystem>());
+      _channels[idx]->as<AnalogChannel>()->setAPRSSystem(_posSystems[aprs]->as<APRSSystem>());
     }
     return true;
   }

@@ -54,6 +54,13 @@ public:
   /** Gets a GPS system for the specified index or @c nullptr if not defined. */
   GPSSystem *getGPSSystem(int index) const;
 
+  /** Returns @c true, if the given APRS system index has been defined before. */
+  bool hasAPRSSystem(int index) const;
+  /** Adds an APRS system to the config and maps the given index to that APRS system. */
+  bool addAPRSSystem(APRSSystem *sys, int index);
+  /** Gets an APRS system for the specified index or @c nullptr if not defined. */
+  APRSSystem *getAPRSSystem(int index) const;
+
 protected:
   /** The wrapped radio config (aka abstract code-plug). */
   Config *_config;
@@ -67,6 +74,8 @@ protected:
   QHash<int, int> _scanListTable;
   /** Maps a code-plug GPS system index to the GPS system index within the wrapped radio config. */
   QHash<int, int> _gpsSystemTable;
+  /** Maps a code-plug APRS system index to the APRS system index within the wrapped radio config. */
+  QHash<int, int> _aprsSystemTable;
 };
 
 #endif // CODEPLUGCONTEXT_HH

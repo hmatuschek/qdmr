@@ -1,7 +1,8 @@
 #include "codeplugcontext.hh"
 
 CodeplugContext::CodeplugContext(Config *config)
-  : _config(config), _channelTable(), _digitalContactTable(), _groupListTable()
+  : _config(config), _channelTable(), _digitalContactTable(), _groupListTable(), _scanListTable(),
+    _gpsSystemTable(), _aprsSystemTable()
 {
   // pass...
 }
@@ -10,6 +11,7 @@ Config *
 CodeplugContext::config() const {
   return _config;
 }
+
 
 bool
 CodeplugContext::hasChannel(int index) const {
@@ -106,6 +108,7 @@ CodeplugContext::addScanList(ScanList *lst, int index) {
   return true;
 }
 
+
 bool
 CodeplugContext::hasGPSSystem(int index) const {
   return _gpsSystemTable.contains(index);
@@ -126,5 +129,29 @@ CodeplugContext::addGPSSystem(GPSSystem *sys, int index) {
   if (0 > _config->posSystems()->addSystem(sys))
     return false;
   _gpsSystemTable[index] = sidx;
+  return true;
+}
+
+
+bool
+CodeplugContext::hasAPRSSystem(int index) const {
+  return _aprsSystemTable.contains(index);
+}
+
+APRSSystem *
+CodeplugContext::getAPRSSystem(int index) const {
+  if (! _aprsSystemTable.contains(index))
+    return nullptr;
+  return _config->posSystems()->aprsSystem(_aprsSystemTable[index]);
+}
+
+bool
+CodeplugContext::addAPRSSystem(APRSSystem *sys, int index) {
+  if (_aprsSystemTable.contains(index))
+    return false;
+  int sidx = _config->posSystems()->aprsCount();
+  if (0 > _config->posSystems()->addSystem(sys))
+    return false;
+  _aprsSystemTable[index] = sidx;
   return true;
 }

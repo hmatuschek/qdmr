@@ -122,7 +122,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
       stream << qSetFieldWidth(11) << left << format_frequency(analog->txFrequency());
     stream << qSetFieldWidth(6)  << left << power2string(analog->power())
            << qSetFieldWidth(5)  << left << ( nullptr != analog->scanList() ? QString::number(config->scanlists()->indexOf(analog->scanList())+1) : QString("-") )
-           << qSetFieldWidth(5)  << left << ( nullptr != analog->aprs() ? QString::number(config->posSystems()->indexOf(analog->aprs())+1) : QString("-"))
+           << qSetFieldWidth(5)  << left << ( nullptr != analog->aprsSystem() ? QString::number(config->posSystems()->indexOf(analog->aprsSystem())+1) : QString("-"))
            << qSetFieldWidth(4)  << left << ( (0 == analog->txTimeout()) ? QString("-") : QString::number(analog->txTimeout()) )
            << qSetFieldWidth(3)  << left << (analog->rxOnly() ? '+' : '-')
            << qSetFieldWidth(7)  << left << ((AnalogChannel::AdmitNone==analog->admit()) ? "-" : ((AnalogChannel::AdmitFree==analog->admit()) ? "Free" : "Tone"))

@@ -62,7 +62,7 @@ AnalogChannelDialog::construct() {
   for (int i=0; i<_config->posSystems()->aprsCount(); i++) {
     APRSSystem *sys = _config->posSystems()->aprsSystem(i);
     aprsList->addItem(sys->name(),QVariant::fromValue(sys));
-    if (_channel && (_channel->aprs() == sys))
+    if (_channel && (_channel->aprsSystem() == sys))
       aprsList->setCurrentIndex(i+1);
   }
 
@@ -122,7 +122,7 @@ AnalogChannelDialog::channel() {
     _channel->setTXTone(txtone);
     _channel->setBandwidth(bw);
     _channel->setScanList(scanlist);
-    _channel->setAPRS(aprs);
+    _channel->setAPRSSystem(aprs);
     return _channel;
   } else {
     return new AnalogChannel(name, rx, tx, pwr, timeout, rxonly, admit, squ,

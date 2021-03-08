@@ -201,9 +201,9 @@ public:
 	bool setBandwidth(Bandwidth bw);
 
   /** Returns the APRS system used for this channel or @c nullptr if disabled. */
-  APRSSystem *aprs() const;
+  APRSSystem *aprsSystem() const;
   /** Sets the APRS system. */
-  void setAPRS(APRSSystem *sys);
+  void setAPRSSystem(APRSSystem *sys);
 
 protected:
   /** Internal call-back that gets called if the associated APRS gets deleted. */

@@ -386,8 +386,8 @@ D878UVCodeplug::channel_t::toChannelObj() const {
 
 bool
 D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx) const {
-  // If channel is digital
   if (MODE_DIGITAL == channel_mode) {
+    // If channel is digital
     DigitalChannel *dc = c->as<DigitalChannel>();
     if (nullptr == dc)
       return false;
@@ -402,9 +402,22 @@ D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
       dc->setRXGroupList(ctx.getGroupList(group_list_index));
 
     // Link to GPS system
-    //if ((APRS_REPORT_DIGITAL == aprs_report) && ctx.hasGPSSystem(gps_system))
-    //  dc->setGPSSystem(ctx.getGPSSystem(gps_system));
+    if ((APRS_REPORT_DIGITAL == aprs_report) && ctx.hasGPSSystem(gps_system))
+      dc->setPosSystem(ctx.getGPSSystem(gps_system));
+    // Link APRS system if one is defined
+    //  There can only be one active APRS system, hence the index is fixed to one.
+    if ((APRS_REPORT_ANALOG == aprs_report) && ctx.hasAPRSSystem(0))
+      dc->setPosSystem(ctx.getAPRSSystem(0));
+  } else if (MODE_ANALOG == channel_mode) {
+    // If channel is analog
+    AnalogChannel *ac = c->as<AnalogChannel>();
+    if (nullptr == ac)
+      return false;
 
+    // Link APRS system if one is defined
+    //  There can only be one active APRS system, hence the index is fixed to one.
+    if ((APRS_REPORT_ANALOG == aprs_report) && ctx.hasAPRSSystem(0))
+      ac->setAPRSSystem(ctx.getAPRSSystem(0));
   }
 
   // For both, analog and digital channels:
@@ -469,6 +482,9 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     setTXTone(ac->txTone());
     // set bandwidth
     bandwidth = (AnalogChannel::BWNarrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
+    // Set APRS system
+    if (nullptr != ac->aprsSystem())
+      aprs_report = APRS_REPORT_ANALOG;
   } else if (c->is<DigitalChannel>()) {
     const DigitalChannel *dc = c->as<const DigitalChannel>();
     // pack digital channel config.
