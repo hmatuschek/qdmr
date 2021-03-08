@@ -444,6 +444,7 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
   switch (c->power()) {
   case Channel::MaxPower:
     power = POWER_TURBO;
+    break;
   case Channel::HighPower:
     power = POWER_HIGH;
     break;
