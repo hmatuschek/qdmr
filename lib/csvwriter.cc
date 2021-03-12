@@ -99,16 +99,16 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 4) Transmit frequency or +/- offset in MHz\n"
             "# 5) Transmit power: Max, High, Mid, Low or Min\n"
             "# 6) Scan list: - or index\n"
-            "# 7) APRS system: - or index\n"
-            "# 8) Transmit timeout timer in seconds: 0, 15, 30, 45... 555\n"
-            "# 9) Receive only: -, +\n"
-            "# 10) Admit criteria: -, Free, Tone\n"
-            "# 11) Squelch level: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9\n"
-            "# 12) CTCSS/DCS for receive: frequency (e.g, 67.0), DCS number (e.g., n023 or i023) or '-' to disable\n"
-            "# 13) CTCSS/DCS for transmit: frequency (e.g, 67.0), DCS number (e.g., n023 or i023) or '-' to disable\n"
-            "# 14) Bandwidth in kHz: 12.5, 25\n"
+            "# 7) Transmit timeout timer in seconds: 0, 15, 30, 45... 555\n"
+            "# 8) Receive only: -, +\n"
+            "# 9) Admit criteria: -, Free, Tone\n"
+            "# 10) Squelch level: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9\n"
+            "# 11) CTCSS/DCS for receive: frequency (e.g, 67.0), DCS number (e.g., n023 or i023) or '-' to disable\n"
+            "# 12) CTCSS/DCS for transmit: frequency (e.g, 67.0), DCS number (e.g., n023 or i023) or '-' to disable\n"
+            "# 13) Bandwidth in kHz: 12.5, 25\n"
+            "# 14) APRS system: - or index\n"
             "#\n"
-            "Analog  Name                Receive   Transmit   Power Scan APRS TOT RO Admit  Squelch RxTone TxTone Width\n";
+            "Analog  Name                Receive   Transmit   Power Scan TOT RO Admit  Squelch RxTone TxTone Width APRS\n";
   for (int i=0; i<config->channelList()->count(); i++) {
     if (config->channelList()->channel(i)->is<DigitalChannel>())
       continue;
@@ -122,14 +122,14 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
       stream << qSetFieldWidth(11) << left << format_frequency(analog->txFrequency());
     stream << qSetFieldWidth(6)  << left << power2string(analog->power())
            << qSetFieldWidth(5)  << left << ( nullptr != analog->scanList() ? QString::number(config->scanlists()->indexOf(analog->scanList())+1) : QString("-") )
-           << qSetFieldWidth(5)  << left << ( nullptr != analog->aprsSystem() ? QString::number(config->posSystems()->indexOf(analog->aprsSystem())+1) : QString("-"))
            << qSetFieldWidth(4)  << left << ( (0 == analog->txTimeout()) ? QString("-") : QString::number(analog->txTimeout()) )
            << qSetFieldWidth(3)  << left << (analog->rxOnly() ? '+' : '-')
            << qSetFieldWidth(7)  << left << ((AnalogChannel::AdmitNone==analog->admit()) ? "-" : ((AnalogChannel::AdmitFree==analog->admit()) ? "Free" : "Tone"))
            << qSetFieldWidth(8)  << left << analog->squelch()
            << qSetFieldWidth(7)  << left << Signaling::configString(analog->rxTone())
            << qSetFieldWidth(7)  << left << Signaling::configString(analog->txTone())
-           << qSetFieldWidth(5) << left << (AnalogChannel::BWWide == analog->bandwidth() ? 25.0 : 12.5)
+           << qSetFieldWidth(6) << left << (AnalogChannel::BWWide == analog->bandwidth() ? 25.0 : 12.5)
+           << qSetFieldWidth(5)  << left << ( nullptr != analog->aprsSystem() ? QString::number(config->posSystems()->indexOf(analog->aprsSystem())+1) : QString("-"))
            << qSetFieldWidth(0) << "\n";
   }
   stream << qSetFieldWidth(0) << left << "\n";
@@ -240,10 +240,11 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 4) Transmit period in seconds.\n"
             "# 5) Your (source) call and SSID as CALLSIGN-SSID.\n"
             "# 6) Destination call and SSID as CALLSIGN-SSID.\n"
+            "# 7) Path string or '-'.\n"
             "# 7) Icon name.\n"
             "# 8) Message, optional message in quotes.\n"
             "#\n"
-            "APRS Name                Channel Period Source      Destination Icon        Message\n";
+            "APRS Name                Channel Period Source      Destination Path                   Icon        Message\n";
   for(int i=0; i<config->posSystems()->count(); i++) {
     if (! config->posSystems()->system(i)->is<APRSSystem>())
       continue;
@@ -254,7 +255,8 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
            << qSetFieldWidth(7) << left << aprs->period()
            << qSetFieldWidth(12) << left << QString("%1-%2").arg(aprs->source()).arg(aprs->srcSSID())
            << qSetFieldWidth(12) << left << QString("%1-%2").arg(aprs->destination()).arg(aprs->destSSID())
-           << qSetFieldWidth(12) << left << ("\""+aprsicon2name(aprs->icon())+"\"")
+           << qSetFieldWidth(23) << left << ("\""+aprs->path()+"\"")
+           << qSetFieldWidth(12) << left << aprsicon2name(aprs->icon())
            << qSetFieldWidth(0) << left << ("\""+aprs->message()+"\"") << "\n";
    }
   stream << qSetFieldWidth(0) << left << "\n";

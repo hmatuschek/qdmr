@@ -815,8 +815,8 @@ public:
     uint8_t manual_tx_interval;    ///< Manual TX intervals in seconds.
     uint8_t auto_tx_interval;      ///< Auto TX interval in multiples of 30s.
     uint8_t tx_tone_enable;        ///< TX enable, 0=off, 1=on.
-    uint8_t fixed_location;        ///< Fixed location data, 0=off, 1=on.
 
+    uint8_t fixed_location;        ///< Fixed location data, 0=off, 1=on.
     uint8_t lat_deg;               ///< Latitude in degree.
     uint8_t lat_min;               ///< Latitude minutes.
     uint8_t lat_sec;               ///< Latitude seconds (1/100th of a minute).
@@ -826,17 +826,17 @@ public:
     uint8_t lon_sec;               ///< Longitude in seconds (1/100th of a minute).
     uint8_t east_west;             ///< East or west flag, east=0, west=1.
 
-    uint8_t to_call[6];            ///< Destination call, 6 x ASCII, 0-padded.
-    uint8_t to_ssid;               ///< Destination SSID.
+    uint8_t to_call[6];            ///< Destination call, 6 x ASCII, 0x20-padded.
+    uint8_t to_ssid;               ///< Destination SSID, 0xff=None.
 
-    uint8_t from_call[6];          ///< Source call, 6 x ASCII, 0-padded.
-    uint8_t from_ssid;             ///< Source SSID.
+    uint8_t from_call[6];          ///< Source call, 6 x ASCII, 0x20-padded.
+    uint8_t from_ssid;             ///< Source SSID, 0xff=None.
 
     // byte 0x24
     uint8_t path[20];              ///< Path string, upto 20 ASCII chars, 0-padded.
+    uint8_t _pad56;                ///< Pad-byte 0x00.
 
-    // byte 0x38
-    uint8_t _unknown56;            ///< Unknown set to 00.
+    // byte 0x39
     char table;                    ///< ASCII-char for APRS icon table, ie. '/' or '\' for primary
                                    ///  and alternate icon table respectively.
     char icon;                     ///< ASCII-char of APRS map icon.
@@ -862,15 +862,21 @@ public:
     /** Encodes the auto TX period. */
     void setAutoTxInterval(int sec);
 
+    int getManualTXInterval() const;
+    void setManualTxInterval(int sec);
+
     /** Decodes the destination call. */
     QString getDestination() const;
     /** Encodes the given destination call. */
-    void setDestination(const QString &call);
+    void setDestination(const QString &call, uint8_t ssid);
 
     /** Decodes the destination SSID. */
     QString getSource() const;
     /** Encodes the destination SSID. */
-    void setSource(const QString &call);
+    void setSource(const QString &call, uint8_t ssid);
+
+    QString getPath() const;
+    void setPath(const QString &path);
 
     /** Decodes the TX signaling. */
     Signaling::Code getSignaling() const;

@@ -330,6 +330,7 @@ D878UVCodeplug::channel_t::toChannelObj() const {
     break;
   case POWER_HIGH:
     power = Channel::HighPower;
+    break;
   case POWER_TURBO:
     power = Channel::MaxPower;
     break;
@@ -845,8 +846,7 @@ D878UVCodeplug::general_settings_t::setIntroLine2(const QString line) {
  * ******************************************************************************************** */
 bool
 D878UVCodeplug::aprs_setting_t::isValid() const {
-  return (0x00 != to_call[0]) && (0xff != to_call[0]) &&
-      (0x00 != from_call[0]) && (0xff != from_call[0]);
+  return getFrequency() && (! getDestination().isEmpty()) && (! getSource().isEmpty());
 }
 
 double
@@ -858,7 +858,6 @@ D878UVCodeplug::aprs_setting_t::setFrequency(double freq) {
   frequency = qToBigEndian(encode_frequency(freq));
 }
 
-
 int
 D878UVCodeplug::aprs_setting_t::getAutoTXInterval() const {
   return int(auto_tx_interval)*30;
@@ -869,22 +868,43 @@ D878UVCodeplug::aprs_setting_t::setAutoTxInterval(int sec) {
   auto_tx_interval = (sec+29)/30;
 }
 
-QString
-D878UVCodeplug::aprs_setting_t::getDestination() const {
-  return decode_ascii(to_call, 6, 0x00);
+int
+D878UVCodeplug::aprs_setting_t::getManualTXInterval() const {
+  return manual_tx_interval;
 }
 void
-D878UVCodeplug::aprs_setting_t::setDestination(const QString &call) {
-  encode_ascii(to_call, call, 6, 0x00);
+D878UVCodeplug::aprs_setting_t::setManualTxInterval(int sec) {
+  // round up to multiples of 30
+  manual_tx_interval = sec;
+}
+
+QString
+D878UVCodeplug::aprs_setting_t::getDestination() const {
+  return decode_ascii(to_call, 6, 0x20);
+}
+void
+D878UVCodeplug::aprs_setting_t::setDestination(const QString &call, uint8_t ssid) {
+  encode_ascii(to_call, call, 6, 0x20);
+  to_ssid = std::min(uint8_t(16), ssid);
 }
 
 QString
 D878UVCodeplug::aprs_setting_t::getSource() const {
-  return decode_ascii(from_call, 6, 0x00);
+  return decode_ascii(from_call, 6, 0x20);
 }
 void
-D878UVCodeplug::aprs_setting_t::setSource(const QString &call) {
-  encode_ascii(from_call, call, 6, 0x00);
+D878UVCodeplug::aprs_setting_t::setSource(const QString &call, uint8_t ssid) {
+  encode_ascii(from_call, call, 6, 0x20);
+  from_ssid = ssid;
+}
+
+QString
+D878UVCodeplug::aprs_setting_t::getPath() const {
+  return decode_ascii(path, 20, 0x00);
+}
+void
+D878UVCodeplug::aprs_setting_t::setPath(const QString &path) {
+  encode_ascii(this->path, path, 20, 0x00);
 }
 
 void
@@ -961,24 +981,35 @@ D878UVCodeplug::aprs_setting_t::setIcon(APRSSystem::Icon icon) {
 
 void
 D878UVCodeplug::aprs_setting_t::fromAPRSSystem(APRSSystem *sys) {
+  _unknown0 = 0xff;
   setFrequency(sys->channel()->txFrequency());
   setSignaling(sys->channel()->txTone());
+  tx_delay = 0x03;
+  sig_type = 0;
+  ctcss    = 0;
+  dcs      = 0;
+  setManualTxInterval(sys->period());
   setAutoTxInterval(sys->period());
-  encode_ascii(to_call, sys->destination(), 6, 0);
-  to_ssid = sys->destSSID();
-  encode_ascii(from_call, sys->source(), 6, 0);
-  from_ssid = sys->srcSSID();
+  tx_tone_enable = 0;
+
+  setDestination(sys->destination(), sys->destSSID());
+  setSource(sys->source(), sys->srcSSID());
+  setPath(sys->path());
   setIcon(sys->icon());
-  memset(path, 0, sizeof(path));
   setPower(sys->channel()->power());
+  prewave_delay = 0;
+  _unknown61 = 0x01;
+  _unknown62 = 0x03;
+  _unknown63 = 0xff;
 }
 
 APRSSystem *
 D878UVCodeplug::aprs_setting_t::toAPRSSystem() {
   return new APRSSystem(
-        tr("APRS System %1").arg(getDestination()), nullptr,
+        tr("APRS %1").arg(getDestination()), nullptr,
         getDestination(), to_ssid,
         getSource(), from_ssid,
+        getPath(),
         getIcon(),
         "",
         getAutoTXInterval());
@@ -1668,12 +1699,12 @@ D878UVCodeplug::encode(Config *config, bool update)
     aprs->setAutoTxInterval(config->posSystems()->gpsSystem(0)->period());
   }
 
-  // Encode APRS system
-  /*if (0 < config->posSystems()->aprsCount()) {
+  // Encode APRS system (there can only be one)
+  if (0 < config->posSystems()->aprsCount()) {
     ((aprs_setting_t *)data(ADDR_APRS_SETTING))->fromAPRSSystem(config->posSystems()->aprsSystem(0));
     uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
     encode_ascii(aprsmsg, config->posSystems()->aprsSystem(0)->message(), 60, 0x00);
-  }*/
+  }
 
   return true;
 }
@@ -1794,13 +1825,15 @@ D878UVCodeplug::decode(Config *config)
       logDebug() << "Create GPS sys '" << sys->name() << "' at idx " << i << ".";
     ctx.addGPSSystem(sys, i);
   }
-  /*aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
+
+  // Create APRS system (if enabled)
+  aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
   uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
   if (aprs->isValid()) {
     APRSSystem *sys = aprs->toAPRSSystem();
     sys->setMessage(decode_ascii(aprsmsg, 60, 0x00));
-    ctx.config()->posSystems()->addSystem(sys);
-  }*/
+    ctx.addAPRSSystem(sys,0);
+  }
 
   // Link channel objects
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
@@ -1824,9 +1857,9 @@ D878UVCodeplug::decode(Config *config)
   }
 
   // Link APRS system
-  /*if (aprs->isValid()) {
+  if (aprs->isValid()) {
     aprs->linkAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
-  }*/
+  }
 
   return true;
 }

@@ -205,7 +205,7 @@ public:
   /** Sets the APRS system. */
   void setAPRSSystem(APRSSystem *sys);
 
-protected:
+protected slots:
   /** Internal call-back that gets called if the associated APRS gets deleted. */
   void onAPRSSystemDeleted();
 

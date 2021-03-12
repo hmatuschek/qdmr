@@ -278,9 +278,8 @@ CSVHandler::handleGPSSystem(
 }
 
 bool
-CSVHandler::handleAPRSSystem(
-    qint64 idx, const QString &name, qint64 channelIdx, qint64 period,
-    const QString &src, uint srcSSID, const QString &dest, uint destSSID,
+CSVHandler::handleAPRSSystem(qint64 idx, const QString &name, qint64 channelIdx, qint64 period,
+    const QString &src, uint srcSSID, const QString &dest, uint destSSID, const QString &path,
     const QString &icon, const QString &message, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
@@ -1070,18 +1069,6 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  qint64 aprs;
-  if (CSVLexer::Token::T_NOT_SET == token.type) {
-    aprs = 0;
-  } else if (CSVLexer::Token::T_NUMBER == token.type) {
-    aprs = token.value.toInt();
-  } else {
-    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
-        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
-    return false;
-  }
-
-  token = lexer.next();
   if ((CSVLexer::Token::T_NUMBER != token.type) && (CSVLexer::Token::T_NOT_SET != token.type)) {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1174,6 +1161,18 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
     bw = AnalogChannel::BWNarrow;
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected '12.5' or '25'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
+  qint64 aprs;
+  if (CSVLexer::Token::T_NOT_SET == token.type) {
+    aprs = 0;
+  } else if (CSVLexer::Token::T_NUMBER == token.type) {
+    aprs = token.value.toInt();
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
@@ -1416,6 +1415,18 @@ CSVParser::_parse_aprs_system(qint64 id, CSVLexer &lexer) {
   }
 
   token = lexer.next();
+  QString path="";
+  if (CSVLexer::Token::T_NOT_SET == token.type) {
+    // pass..
+  } else if (CSVLexer::Token::T_STRING == token.type) {
+    path = token.value;
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
   QString iconname;
   if ((CSVLexer::Token::T_KEYWORD == token.type) || (CSVLexer::Token::T_STRING == token.type)) {
     iconname = token.value;
@@ -1438,7 +1449,7 @@ CSVParser::_parse_aprs_system(qint64 id, CSVLexer &lexer) {
   }
 
   return _handler->handleAPRSSystem(id, name, channel, period, src, srcSSID, dest, destSSID,
-                                    iconname, message, line, column, _errorMessage);
+                                    path, iconname, message, line, column, _errorMessage);
 }
 
 
@@ -1944,7 +1955,7 @@ bool
 CSVReader::handleAPRSSystem(
     qint64 idx, const QString &name, qint64 channelIdx, qint64 period,
     const QString &src, uint srcSSID, const QString &dest, uint destSSID,
-    const QString &iconname, const QString &message,
+    const QString &path, const QString &iconname, const QString &message,
     qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
@@ -1972,8 +1983,8 @@ CSVReader::handleAPRSSystem(
   }
 
   APRSSystem::Icon icon = name2aprsicon(iconname);
-  APRSSystem *aprs = new APRSSystem(name, nullptr, dest, destSSID, src, srcSSID, icon,
-                                    message, period);
+  APRSSystem *aprs = new APRSSystem(name, nullptr, dest, destSSID, src, srcSSID, path,
+                                    icon, message, period);
   _posSystems[idx] = aprs;
   _config->posSystems()->addSystem(aprs);
 

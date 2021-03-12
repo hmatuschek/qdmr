@@ -154,7 +154,7 @@ public:
   /** Gets called once a APRS system has been parsed. */
   virtual bool handleAPRSSystem(qint64 idx, const QString &name, qint64 channelIdx, qint64 period,
                                 const QString &src, uint srcSSID, const QString &dest, uint destSSID,
-                                const QString &icon, const QString &message,
+                                const QString &path, const QString &icon, const QString &message,
                                 qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a scan list has been parsed. */
   virtual bool handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
@@ -278,7 +278,7 @@ public:
   virtual bool handleGPSSystem(qint64 idx, const QString &name, qint64 contactIdx, qint64 period,
                                qint64 revertChannelIdx, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleAPRSSystem(qint64 idx, const QString &name, qint64 channelIdx, qint64 period,
-                                const QString &src, uint srcSSID, const QString &dest, uint destSSID,
+                                const QString &src, uint srcSSID, const QString &dest, uint destSSID, const QString &path,
                                 const QString &icon, const QString &message,
                                 qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,

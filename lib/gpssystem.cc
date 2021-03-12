@@ -101,10 +101,10 @@ GPSSystem::onRevertChannelDeleted() {
  * Implementation of APRSSystem
  * ********************************************************************************************* */
 APRSSystem::APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, uint destSSID,
-                       const QString &src, uint srcSSID, Icon icon, const QString &message,
+                       const QString &src, uint srcSSID, const QString &path, Icon icon, const QString &message,
                        uint period, QObject *parent)
   : PositioningSystem(name, period, parent), _channel(channel), _destination(dest), _destSSID(destSSID),
-    _source(src), _srcSSID(srcSSID), _icon(icon), _message(message)
+    _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message)
 {
   // pass...
 }
@@ -148,6 +148,16 @@ void
 APRSSystem::setSource(const QString &call, uint ssid) {
   _source = call;
   _srcSSID = ssid;
+}
+
+const QString &
+APRSSystem::path() const {
+  return _path;
+}
+void
+APRSSystem::setPath(const QString &path) {
+  _path = path.toUpper();
+  _path.replace(" ","");
 }
 
 APRSSystem::Icon

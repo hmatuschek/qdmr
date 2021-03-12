@@ -351,9 +351,9 @@ format_frequency(double MHz) {
 
 QString
 aprsicon2name(APRSSystem::Icon icon) {
-  if (APRSSystem::APRS_ICON_NO_SYMBOL == icon)
+  if ((APRSSystem::APRS_ICON_NO_SYMBOL == icon) || (! aprsIconCodeTable.contains(icon)))
     return "-";
-  return aprsIconNameTable.value(icon, "-");
+  return QString("\"%1\"").arg(aprsIconNameTable.value(icon));
 }
 
 APRSSystem::Icon

@@ -146,6 +146,11 @@ APRSSystemDialog::construct() {
     ui->destSSID->setValue(_aprs->destSSID());
   }
 
+  // Setup path
+  if (_aprs) {
+    ui->path->setText(_aprs->path());
+  }
+
   // Setup icons
   for (int i=0; i<aprsIconTable.size(); i++) {
     const QPair<APRSSystem::Icon, QString> &item = aprsIconTable[i];
@@ -180,6 +185,7 @@ APRSSystemDialog::aprsSystem() {
   return new APRSSystem(ui->name->text().simplified(), ui->channel->currentData().value<AnalogChannel *>(),
                         ui->destination->text().simplified(), ui->destSSID->value(),
                         ui->source->text().simplified(), ui->srcSSID->value(),
+                        ui->path->text().simplified(),
                         APRSSystem::Icon(ui->icon->currentData().toUInt()),
                         ui->message->text().simplified());
 }

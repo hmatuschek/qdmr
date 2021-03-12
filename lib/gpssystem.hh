@@ -165,7 +165,8 @@ public:
    * @param period Specifies the auto-update period in seconds.
    * @param parent Specifies the QObject parent object. */
   explicit APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, uint destSSID,
-                      const QString &src, uint srcSSID, Icon icon=APRS_ICON_JOGGER,
+                      const QString &src, uint srcSSID,
+                      const QString &path="", Icon icon=APRS_ICON_JOGGER,
                       const QString &message="", uint period=300, QObject *parent=nullptr);
 
   /** Returns the transmit channel of the APRS system. */
@@ -186,6 +187,9 @@ public:
   uint srcSSID() const;
   /** Sets the source call and SSID. */
   void setSource(const QString &call, uint ssid);
+
+  const QString &path() const;
+  void setPath(const QString &path);
 
   /** Returns the map icon. */
   Icon icon() const;
@@ -212,6 +216,7 @@ protected:
   QString _source;
   /** Holds the source SSID. */
   uint _srcSSID;
+  QString _path;
   /** Holds the map icon. */
   Icon _icon;
   /** Holds the optional message. */
