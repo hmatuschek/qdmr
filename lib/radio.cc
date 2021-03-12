@@ -158,7 +158,7 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                       tr("Radio does not support analog channel'%1'")
                       .arg(channel->name())));
 
-    if (channel->is<DigitalChannel>() && channel->as<DigitalChannel>()->txContact()
+    if (channel->is<DigitalChannel>() && (nullptr == channel->as<DigitalChannel>()->txContact())
         && (! features().allowChannelNoDefaultContact))
       issues.append(VerifyIssue(
                       VerifyIssue::WARNING,

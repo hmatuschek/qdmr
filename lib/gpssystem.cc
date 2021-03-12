@@ -106,7 +106,8 @@ APRSSystem::APRSSystem(const QString &name, AnalogChannel *channel, const QStrin
   : PositioningSystem(name, period, parent), _channel(channel), _destination(dest), _destSSID(destSSID),
     _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message)
 {
-  // pass...
+  if (_channel)
+    connect(_channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
 }
 
 AnalogChannel *

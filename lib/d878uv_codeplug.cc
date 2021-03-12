@@ -983,14 +983,10 @@ void
 D878UVCodeplug::aprs_setting_t::fromAPRSSystem(APRSSystem *sys) {
   _unknown0 = 0xff;
   setFrequency(sys->channel()->txFrequency());
-  setSignaling(sys->channel()->txTone());
   tx_delay = 0x03;
-  sig_type = 0;
-  ctcss    = 0;
-  dcs      = 0;
+  setSignaling(sys->channel()->txTone());
   setManualTxInterval(sys->period());
   setAutoTxInterval(sys->period());
-  tx_tone_enable = 0;
 
   setDestination(sys->destination(), sys->destSSID());
   setSource(sys->source(), sys->srcSSID());

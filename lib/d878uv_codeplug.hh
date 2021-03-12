@@ -805,11 +805,19 @@ public:
       POWER_TURBO = 3              ///< Highest power (upto 7W).
     } Power;
 
+    /** Hemisphere settings for the fixed location beacon. */
+    typedef enum {
+      NORTH = 0,
+      SOUTH = 1,
+      EAST  = 0,
+      WEST  = 1
+    } Hemisphere;
+
     // byte 0x00
     uint8_t _unknown0;             ///< Unknown, set to 0xff.
     uint32_t frequency;            ///< TX frequency, BCD encoded, little endian in 10Hz.
     uint8_t tx_delay;              ///< TX delay, multiples of 20ms, default=1200ms.
-    uint8_t sig_type;              ///< Signalling type, default=0.
+    uint8_t sig_type;              ///< Signalling type, 0=off, 1=ctcss, 2=dcs, default=off.
     uint8_t ctcss;                 ///< CTCSS tone-code, default=0.
     uint16_t dcs;                  ///< DCS code, little endian, default=0x0013.
     uint8_t manual_tx_interval;    ///< Manual TX intervals in seconds.
