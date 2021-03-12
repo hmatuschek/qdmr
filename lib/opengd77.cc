@@ -8,39 +8,47 @@
 
 static Radio::Features _open_gd77_features =
 {
-  false, // isBeta
+  .betaWarning = false,
 
-  true,  // hasDigital
-  true,  // hasAnalog
-  false, // hasGPS
-  8,     // maxNameLength
-  16,    // maxIntroLineLength
+  .hasDigital = true,
+  .hasAnalog = true,
 
-  1024,  // maxChannels
-  16,    // maxChannelNameLength
-  true,  // allowChannelNoDefaultContact
+  .maxNameLength = 8,
+  .maxIntroLineLength = 16,
 
-  68,    // maxZones
-  16,    // maxZoneNameLength
-  80,    // maxChannelsInZone
-  false, // hasABZone
+  .maxChannels = 1024,
+  .maxChannelNameLength = 16,
+  .allowChannelNoDefaultContact = true,
 
-  false, // hasScanlists
-  64,    // maxScanlists
-  16,    // maxScanlistNameLength
-  32,    // maxChannelsInScanlist
-  true,  // scanListNeedPriority
+  .maxZones = 68,
+  .maxZoneNameLength = 16,
+  .maxChannelsInZone = 80,
+  .hasABZone = false,
 
-  1024,  // maxContacts
-  16,    // maxContactNameLength
+  .hasScanlists = false,
+  .maxScanlists = 64,
+  .maxScanlistNameLength = 16,
+  .maxChannelsInScanlist = 32,
+  .scanListNeedsPriority = true,
 
-  76,   // maxGrouplists
-  16,   // maxGrouplistNameLength
-  32,   // maxContactsInGrouplist
+  .maxContacts = 1024,
+  .maxContactNameLength = 16,
 
-  true, // hasCallsignDB
-  true, // callsignDBImplemented
-  15796 // maxCallsignsInDB
+  .maxGrouplists = 76,
+  .maxGrouplistNameLength = 16,
+  .maxContactsInGrouplist = 32,
+
+  .hasGPS = false,
+  .maxGPSSystems = 0,
+
+  .hasAPRS = false,
+  .maxAPRSSystems = 0,
+
+  .hasRoaming = false,
+
+  .hasCallsignDB = true,
+  .callsignDBImplemented = true,
+  .maxCallsignsInDB = 15796
 };
 
 

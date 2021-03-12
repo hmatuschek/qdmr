@@ -8,40 +8,55 @@
 
 static Radio::Features _d878uv_features =
 {
-  true,  // show beta-warning
+  // show beta-warning
+  .betaWarning = true,
+  // general capabilities
+  .hasDigital  = true,
+  .hasAnalog   = true,
 
-  true,  // hasDigital
-  true,  // hasAnalog
-  true,  // hasGPS
+  // general limits
+  .maxNameLength      = 16,
+  .maxIntroLineLength = 14,
 
-  16,    // maxNameLength
-  14,    // maxIntroLineLength
+  // channel limits
+  .maxChannels                  = 4000,
+  .maxChannelNameLength         = 16,
+  .allowChannelNoDefaultContact = false,
 
-  4000,  // maxChannels;
-  16,    // maxChannelNameLength;
-  false, // allowChannelNoDefaultContact
+  // zone limits
+  .maxZones               = 250,
+  .maxZoneNameLength      = 16,
+  .maxChannelsInZone      = 250,
+  .hasABZone              = false,
 
-  250,   // maxZones;
-  16,    // maxZoneNameLength;
-  250,   // maxChannelsInZone;
-  false, // hasABZones
+  // scanlist limits
+  .hasScanlists           = true,
+  .maxScanlists           = 250,
+  .maxScanlistNameLength  = 16,
+  .maxChannelsInScanlist  = 31,
+  .scanListNeedsPriority  = false,
 
-  true,  // hasScanlists;
-  250,   // maxScanlists;
-  16,    // maxScanlistNameLength;
-  31,    // maxChannelsInScanlist;
-  false, // scanListNeedPriority;
+  // contact list limits
+  .maxContacts            = 10000,
+  .maxContactNameLength   = 16,
 
-  10000, // maxContacts;
-  16,    // maxContactNameLength;
+  // rx group list limits
+  .maxGrouplists          = 250,
+  .maxGrouplistNameLength = 16,
+  .maxContactsInGrouplist = 32,
 
-  250,   // maxGrouplists;
-  16,    // maxGrouplistNameLength;
-  32,    // maxContactsInGrouplist;
+  .hasGPS = true,
+  .maxGPSSystems = 8,
 
-  true,  // hasCallsignDB
-  false, // callsignDBImplemented
-  0      // maxCallsignsInDB
+  .hasAPRS = true,
+  .maxAPRSSystems = 1,
+
+  .hasRoaming = true,
+
+  // call-sign database limits
+  .hasCallsignDB          = true,  // hasCallsignDB
+  .callsignDBImplemented  = false, // callsignDBImplemented
+  .maxCallsignsInDB       = 0      // maxCallsignsInDB
 };
 
 

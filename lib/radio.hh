@@ -71,8 +71,7 @@ public:
 		bool hasDigital;
     /** If @c true, the device supports FM. */
 		bool hasAnalog;
-    /** If @c true, the device supports GPS. */
-    bool hasGPS;
+
     /** Maximum length of the radio name. */
 		int maxNameLength;
     /** Maximum length of boot messages. */
@@ -115,6 +114,19 @@ public:
 		int maxGrouplistNameLength;
     /** Maximum number contacts per RX group list. */
 		int maxContactsInGrouplist;
+
+    /** If @c true, the device supports GPS. */
+    bool hasGPS;
+    /** Maximum number of different GPS systems. */
+    int maxGPSSystems;
+
+    /** If @c true, the device supports APRS (analog) position reporting. */
+    bool hasAPRS;
+    /** Maximum number of different APRS systems. */
+    int maxAPRSSystems;
+
+    /** If @c true, the device supports roaming. */
+    bool hasRoaming;
 
     /** If true, the radio supports a callsign DB. */
     bool hasCallsignDB;

@@ -6,39 +6,47 @@
 
 static Radio::Features _rd5r_features =
 {
-  false,  // isBeta
+  .betaWarning = false,
 
-  true,  // hasDigital
-  true,  // hasAnalog
-  false, // hasGPS
-  8,     // maxNameLength
-  16,    // maxIntroLineLength
+  .hasDigital = true,
+  .hasAnalog  = true,
 
-  1024,  // maxChannels;
-  16,    // maxChannelNameLength;
-  true,  // allowChannelNoDefaultContact;
+  .maxNameLength = 8,
+  .maxIntroLineLength = 16,
 
-  250,   // maxZones;
-  16,    // maxZoneNameLength;
-  16,    // maxChannelsInZone;
-  false, // hasABZone
+  .maxChannels = 1024,
+  .maxChannelNameLength = 16,
+  .allowChannelNoDefaultContact = true,
 
-  true,  // hasScanlists;
-  250,   // maxScanlists;
-  16,    // maxScanlistNameLength;
-  31,    // maxChannelsInScanlist;
-  true,  // scanListNeedPriority;
+  .maxZones = 250,
+  .maxZoneNameLength = 16,
+  .maxChannelsInZone = 16,
+  .hasABZone = false,
 
-  256,   // maxContacts;
-  16,    // maxContactNameLength;
+  .hasScanlists = true,
+  .maxScanlists = 250,
+  .maxScanlistNameLength = 16,
+  .maxChannelsInScanlist = 31,
+  .scanListNeedsPriority = true,
 
-  64,    // maxGrouplists;
-  16,    // maxGrouplistNameLength;
-  16,    // maxContactsInGrouplist;
+  .maxContacts = 256,
+  .maxContactNameLength = 16,
 
-  false, // hasCallsignDB
-  false, // callsignDBImplemented
-  0      // maxCallsignsInDB
+  .maxGrouplists = 64,
+  .maxGrouplistNameLength = 16,
+  .maxContactsInGrouplist = 16,
+
+  .hasGPS = false,
+  .maxGPSSystems = 0,
+
+  .hasAPRS = false,
+  .maxAPRSSystems = 0,
+
+  .hasRoaming = false,
+
+  .hasCallsignDB = false,
+  .callsignDBImplemented = false,
+  .maxCallsignsInDB = 0
 };
 
 

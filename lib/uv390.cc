@@ -7,40 +7,47 @@
 
 static Radio::Features _uv390_features =
 {
-  false, // isBeta
+  .betaWarning = false,
 
-  true,  // hasDigital
-  true,  // hasAnalog
-  true,  // hasGPS
+  .hasDigital = true,
+  .hasAnalog = true,
 
-  16,    // maxNameLength
-  10,    // maxIntroLineLength
+  .maxNameLength = 16,
+  .maxIntroLineLength = 10,
 
-  3000,  // maxChannels;
-  16,    // maxChannelNameLength;
-  true,  // allowChannelNoDefaultContact;
+  .maxChannels = 3000,
+  .maxChannelNameLength = 16,
+  .allowChannelNoDefaultContact = true,
 
-  250,   // maxZones;
-  16,    // maxZoneNameLength;
-  64,    // maxChannelsInZone;
-  true,  // hasABZones
+  .maxZones = 250,
+  .maxZoneNameLength = 16,
+  .maxChannelsInZone = 64,
+  .hasABZone = true,
 
-  true,  // hasScanlists;
-  250,   // maxScanlists;
-  16,    // maxScanlistNameLength;
-  31,    // maxChannelsInScanlist;
-  false, // scanListNeedPriority;
+  .hasScanlists = true,
+  .maxScanlists = 250,
+  .maxScanlistNameLength = 16,
+  .maxChannelsInScanlist = 31,
+  .scanListNeedsPriority = false,
 
-  10000, // maxContacts;
-  16,    // maxContactNameLength;
+  .maxContacts = 10000,
+  .maxContactNameLength = 16,
 
-  250,   // maxGrouplists;
-  16,    // maxGrouplistNameLength;
-  32,    // maxContactsInGrouplist;
+  .maxGrouplists = 250,
+  .maxGrouplistNameLength = 16,
+  .maxContactsInGrouplist = 32,
 
-  true,  // hasCallsignDB
-  true,  // callsignDBImplemented
-  122197 // maxCallsignsInDB
+  .hasGPS = true,
+  .maxGPSSystems = 16,
+
+  .hasAPRS = false,
+  .maxAPRSSystems = 0,
+
+  .hasRoaming = false,
+
+  .hasCallsignDB = true,
+  .callsignDBImplemented = true,
+  .maxCallsignsInDB = 122197
 };
 
 
