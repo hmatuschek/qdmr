@@ -1769,7 +1769,7 @@ D878UVCodeplug::decode(Config *config)
   uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
   for (uint i=0; i<NUM_SCAN_LISTS; i++) {
     uint8_t byte=i/8, bit=i%8;
-    if (0 == (scanlist_bitmap[byte]>>bit))
+    if (0 == ((scanlist_bitmap[byte]>>bit) & 0x01))
       continue;
     uint8_t bank = i/NUM_SCANLISTS_PER_BANK, bank_idx = i%NUM_SCANLISTS_PER_BANK;
     uint32_t addr = SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + bank_idx*SCAN_LIST_OFFSET;
