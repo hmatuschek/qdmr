@@ -1512,6 +1512,9 @@ D878UVCodeplug::allocateForDecoding() {
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
   // GPS settings
   image(0).addElement(ADDR_GPS_SETTING, GPS_SETTING_SIZE);
+  // APRS settings and messages
+  image(0).addElement(ADDR_APRS_SETTING, APRS_SETTING_SIZE);
+  image(0).addElement(ADDR_APRS_MESSAGE, APRS_MESSAGE_SIZE);
 }
 
 
@@ -1666,11 +1669,11 @@ D878UVCodeplug::encode(Config *config, bool update)
   }
 
   // Encode APRS system
-  if (0 < config->posSystems()->aprsCount()) {
+  /*if (0 < config->posSystems()->aprsCount()) {
     ((aprs_setting_t *)data(ADDR_APRS_SETTING))->fromAPRSSystem(config->posSystems()->aprsSystem(0));
     uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
     encode_ascii(aprsmsg, config->posSystems()->aprsSystem(0)->message(), 60, 0x00);
-  }
+  }*/
 
   return true;
 }
@@ -1791,13 +1794,13 @@ D878UVCodeplug::decode(Config *config)
       logDebug() << "Create GPS sys '" << sys->name() << "' at idx " << i << ".";
     ctx.addGPSSystem(sys, i);
   }
-  aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
+  /*aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
   uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
   if (aprs->isValid()) {
     APRSSystem *sys = aprs->toAPRSSystem();
     sys->setMessage(decode_ascii(aprsmsg, 60, 0x00));
     ctx.config()->posSystems()->addSystem(sys);
-  }
+  }*/
 
   // Link channel objects
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
@@ -1821,9 +1824,9 @@ D878UVCodeplug::decode(Config *config)
   }
 
   // Link APRS system
-  if (aprs->isValid()) {
+  /*if (aprs->isValid()) {
     aprs->linkAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
-  }
+  }*/
 
   return true;
 }
