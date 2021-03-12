@@ -127,6 +127,18 @@
 #define ADDR_FMBC_VFO             0x02480200
 #define FMBC_VFO_SIZE             0x00000010
 
+#define ADDR_ROAMING_CHANNEL_BITMAP 0x01042000
+#define ROAMING_CHANNEL_BITMAP_SIZE 0x00000020
+#define ADDR_ROAMING_CHANNEL_0      0x01040000
+#define ROAMING_CHANNEL_SIZE        0x00000020
+#define ROAMING_CHANNEL_OFFSET      0x00000020
+
+#define ADDR_ROAMING_ZONE_BITMAP    0x01042080
+#define ROAMING_ZONE_BITMAP_SIZE    0x00000010
+#define ADDR_ROAMING_ZONE_0         0x01043000
+#define ROAMING_ZONE_SIZE           0x00000080
+#define ROAMING_ZONE_OFFSET         0x00000080
+
 
 using namespace Signaling;
 
@@ -987,10 +999,12 @@ D878UVCodeplug::aprs_setting_t::fromAPRSSystem(APRSSystem *sys) {
   setSignaling(sys->channel()->txTone());
   setManualTxInterval(sys->period());
   setAutoTxInterval(sys->period());
+  tx_tone_enable = 0;
 
   setDestination(sys->destination(), sys->destSSID());
   setSource(sys->source(), sys->srcSSID());
   setPath(sys->path());
+  _pad56 = 0;
   setIcon(sys->icon());
   setPower(sys->channel()->power());
   prewave_delay = 0;
@@ -1182,6 +1196,69 @@ D878UVCodeplug::contact_map_t::setIndex(uint32_t index) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::roaming_channel_t
+ * ******************************************************************************************** */
+double
+D878UVCodeplug::roaming_channel_t::getRXFrequency() const {
+  return decode_frequency(qFromBigEndian(rx_frequency));
+}
+void
+D878UVCodeplug::roaming_channel_t::setRXFrequency(double f) {
+  rx_frequency = qToBigEndian(encode_frequency(f));
+}
+
+double
+D878UVCodeplug::roaming_channel_t::getTXFrequency() const {
+  return decode_frequency(qFromBigEndian(tx_frequency));
+}
+void
+D878UVCodeplug::roaming_channel_t::setTXFrequency(double f) {
+  tx_frequency = qToBigEndian(encode_frequency(f));
+}
+
+DigitalChannel::TimeSlot
+D878UVCodeplug::roaming_channel_t::getTimeslot() const {
+  if (0 == timeslot)
+    return DigitalChannel::TimeSlot1;
+  return DigitalChannel::TimeSlot2;
+}
+void
+D878UVCodeplug::roaming_channel_t::setTimeslot(DigitalChannel::TimeSlot ts) {
+  if (DigitalChannel::TimeSlot1 == ts)
+    timeslot = 0;
+  else
+    timeslot = 1;
+}
+
+uint
+D878UVCodeplug::roaming_channel_t::getColorCode() const {
+  return std::min(uint8_t(16), colorcode);
+}
+void
+D878UVCodeplug::roaming_channel_t::setColorCode(uint cc) {
+  colorcode = std::min(uint(16), cc);
+}
+
+QString
+D878UVCodeplug::roaming_channel_t::getName() const {
+  return decode_ascii(name, 16, 0x00);
+}
+void
+D878UVCodeplug::roaming_channel_t::setName(const QString &name) {
+  encode_ascii(this->name, name, 16, 0x00);
+}
+
+void
+D878UVCodeplug::roaming_channel_t::fromChannel(DigitalChannel *ch) {
+  setName(ch->name());
+  setRXFrequency(ch->rxFrequency());
+  setTXFrequency(ch->txFrequency());
+  setColorCode(ch->colorCode());
+  setTimeslot(ch->timeslot());
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug
  * ******************************************************************************************** */
 D878UVCodeplug::D878UVCodeplug(QObject *parent)
@@ -1209,6 +1286,10 @@ D878UVCodeplug::D878UVCodeplug(QObject *parent)
   image(0).addElement(STATUSMESSAGE_BITMAP, STATUSMESSAGE_BITMAP_SIZE);
   // FM Broadcast bitmaps
   image(0).addElement(FMBC_BITMAP, FMBC_BITMAP_SIZE);
+  // Roaming channel bitmaps
+  image(0).addElement(ADDR_ROAMING_CHANNEL_BITMAP, ROAMING_CHANNEL_BITMAP_SIZE);
+  // Roaming zone bitmaps
+  image(0).addElement(ADDR_ROAMING_ZONE_BITMAP, ROAMING_ZONE_BITMAP_SIZE);
 }
 
 void
@@ -1284,8 +1365,6 @@ D878UVCodeplug::allocateUntouched() {
   image(0).addElement(ADDR_FMBC, FMBC_SIZE+FMBC_VFO_SIZE);
 
   // Unknown memory region
-  image(0).addElement(0x01042000, 0x020);
-  image(0).addElement(0x01042080, 0x010);
   image(0).addElement(0x024C0C80, 0x010);
   image(0).addElement(0x024C0D00, 0x200);
   image(0).addElement(0x024C0000, 0x020);
@@ -1589,6 +1668,15 @@ D878UVCodeplug::setBitmaps(Config *config)
   for (int i=0; i<config->scanlists()->count(); i++) {
     scan_bitmap[i/8] |= (1<<(i%8));
   }
+
+  // Mark roaming zones
+  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
+  memset(roaming_zone_bitmap, 0x00, ROAMING_ZONE_SIZE);
+
+  // Mark roaming channels
+  uint8_t *roaming_ch_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
+  memset(roaming_ch_bitmap, 0x00, ROAMING_CHANNEL_BITMAP_SIZE);
+
 }
 
 

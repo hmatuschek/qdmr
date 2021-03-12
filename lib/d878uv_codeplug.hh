@@ -67,7 +67,12 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">Roaming</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>01043000</td> <td>000080</td>      <td>Optional, roaming zone 1?</td></tr>
+ *  <tr><td>01042000</td> <td>000020</td>      <td>Roaming channel bitmask, up to 250 bits, 0-padded, default 0.</td></tr>
+ *  <tr><td>01040000</td> <td>max. 0x1f40</td> <td>Optional up to 250 roaming channels, of 32b each.
+ *    See @c roaming_channel_t for details.</td></tr>
+ *  <tr><td>01042080</td> <td>000010</td>      <td>Roaming zone bitmask, up to 64 bits, 0-padded, default 0.</td></tr>
+ *  <tr><td>01043000</td> <td>max. 0x2000</td> <td>Optional up to 64 roaming zones, of 128b each.
+ *    See @c roaming_zone_t for details.</td></tr>
  *
  *  <tr><th colspan="3">Contacts</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -169,8 +174,6 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">Still unknown</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>01042000</td> <td>000020</td> <td>Roaming channel bitmask.</td></tr>
- *  <tr><td>01042080</td> <td>000010</td> <td>Unknown data, default=0x00</td></tr>
  *  <tr><td>024C0000</td> <td>000020</td> <td>Unknown data.</td></tr>
  *  <tr><td>024C0C80</td> <td>000010</td> <td>Unknown data, bitmap?, default 0x00.</td></tr>
  *  <tr><td>024C0D00</td> <td>000200</td> <td>Empty, set to 0x00?`</td></tr>
@@ -822,7 +825,7 @@ public:
     uint16_t dcs;                  ///< DCS code, little endian, default=0x0013.
     uint8_t manual_tx_interval;    ///< Manual TX intervals in seconds.
     uint8_t auto_tx_interval;      ///< Auto TX interval in multiples of 30s.
-    uint8_t tx_tone_enable;        ///< TX enable, 0=off, 1=on.
+    uint8_t tx_tone_enable;        ///< TX tone enable, 0=off, 1=on.
 
     uint8_t fixed_location;        ///< Fixed location data, 0=off, 1=on.
     uint8_t lat_deg;               ///< Latitude in degree.
@@ -856,8 +859,8 @@ public:
     uint8_t _unknown62;            ///< Unknown, set to 03.
     uint8_t _unknown63;            ///< Unknown, set to ff.
 
-    /** Returns @c true, if the APRS setting is vaild. That is, it has a valid destination and
-     * source calls and SSIDs. */
+    /** Returns @c true, if the APRS setting is vaild. That is, it has a valid frequency,
+     * destination and source calls. */
     bool isValid() const;
 
     /** Decodes the transmit frequency. */
@@ -870,7 +873,9 @@ public:
     /** Encodes the auto TX period. */
     void setAutoTxInterval(int sec);
 
+    /** Decodes the manual TX interval in seconds. */
     int getManualTXInterval() const;
+    /** Encodes the manual TX interval in seconds. */
     void setManualTxInterval(int sec);
 
     /** Decodes the destination call. */
@@ -883,7 +888,9 @@ public:
     /** Encodes the destination SSID. */
     void setSource(const QString &call, uint8_t ssid);
 
+    /** Decodes the APRS path. */
     QString getPath() const;
+    /** Encodes the given APRS path. */
     void setPath(const QString &path);
 
     /** Decodes the TX signaling. */
@@ -1000,7 +1007,6 @@ public:
   };
 
   /** Binary representation of the analog alarm settings.
-   * This code-plug secion is yet to be reverse-engineered.
    * Size 0x6 bytes. */
   struct __attribute__((packed)) analog_alarm_setting_t {
     /** Possible alarm types. */
@@ -1050,6 +1056,40 @@ public:
     uint32_t index() const;
     /** Sets the contact index of the entry. */
     void setIndex(uint32_t index);
+  };
+
+  /** Implements the binary representation of a roaming channel within the codeplug.
+   * Memmory layout of roaming channel (0x40byte):
+   * @verbinclude d878uvroamingchannel.txt */
+  struct __attribute__((packed)) roaming_channel_t {
+    uint32_t rx_frequency;         ///< RX frequency 8-digit BCD big-endian as MMMkkkHH.
+    uint32_t tx_frequency;         ///< TX frequency 8-digit BCD big-endian as MMMkkkHH.
+    uint8_t colorcode;             ///< Colorcode 1-16.
+    uint8_t timeslot;              ///< Timeslot, 0=TS1, 1=TS2.
+    uint8_t name[16];              ///< Channel name, 16byte ASCII 0-terminated.
+    uint8_t _unused26[6];          ///< Unused, set to 0x00
+
+    double getRXFrequency() const;
+    void setRXFrequency(double f);
+    double getTXFrequency() const;
+    void setTXFrequency(double f);
+
+    DigitalChannel::TimeSlot getTimeslot() const;
+    void setTimeslot(DigitalChannel::TimeSlot ts);
+
+    uint getColorCode() const;
+    void setColorCode(uint cc);
+
+    QString getName() const;
+    void setName(const QString &name);
+
+    void fromChannel(DigitalChannel *ch);
+  };
+
+  struct __attribute__((packed)) roaming_zone_t {
+    uint8_t channels[64];          ///< List of roaming channel indices, 0xff=unused/end-of-list.
+    uint8_t name[16];              ///< Roaming zone name, 16b ASCII 0x00 padded.
+    uint8_t _unused80[48];        ///< Unused, set to 0x00.
   };
 
 

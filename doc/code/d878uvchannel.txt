@@ -1,8 +1,8 @@
      0                               8                               16                              24
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-00 | RX Frequency 32bit BCD encoded in little-endian as MMMkkkhh                                                                   |
+00 | RX Frequency 32bit BCD encoded in big-endian as MMMkkkhh                                                                      |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-04 | Tx Frequency Offset 32bit BCD encoded in little-endian as MMMkkkhh                                                            |
+04 | Tx Frequency Offset 32bit BCD encoded in big-endian as MMMkkkhh                                                               |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 08 | RMode | 0 |BWd|  PWR  | CMode |TAr|CaC|RXO|CTR|TDC|TCT|RDC|RCT| CTCSS transmit                | CTCSS receive                 |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+

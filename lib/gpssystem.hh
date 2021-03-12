@@ -160,6 +160,7 @@ public:
    * @param destSSID Specifies the destination SSID. Usually 3 is a reasonable choice.
    * @param src Specifies the source call, usually you call has to be entered here.
    * @param srcSSID The source SSID, usually 7 is a reasonable choice of handhelds.
+   * @param path Specifies the APRS path string.
    * @param icon Specifies the map icon to send.
    * @param message An optional message to send.
    * @param period Specifies the auto-update period in seconds.
@@ -188,7 +189,9 @@ public:
   /** Sets the source call and SSID. */
   void setSource(const QString &call, uint ssid);
 
+  /** Retruns the APRS path. */
   const QString &path() const;
+  /** Sets the APRS path. */
   void setPath(const QString &path);
 
   /** Returns the map icon. */
@@ -216,6 +219,7 @@ protected:
   QString _source;
   /** Holds the source SSID. */
   uint _srcSSID;
+  /** Holds the APRS path string. */
   QString _path;
   /** Holds the map icon. */
   Icon _icon;
