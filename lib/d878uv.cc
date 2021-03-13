@@ -51,7 +51,10 @@ static Radio::Features _d878uv_features =
   .hasAPRS = true,
   .maxAPRSSystems = 1,
 
-  .hasRoaming = true,
+  .hasRoaming               = true,
+  .maxRoamingChannels       = 250,
+  .maxRoamingZones          = 64,
+  .maxChannelsInRoamingZone = 64,
 
   // call-sign database limits
   .hasCallsignDB          = true,  // hasCallsignDB

@@ -43,6 +43,9 @@ static Radio::Features _rd5r_features =
   .maxAPRSSystems = 0,
 
   .hasRoaming = false,
+  .maxRoamingChannels = 0,
+  .maxRoamingZones = 0,
+  .maxChannelsInRoamingZone = 0,
 
   .hasCallsignDB = false,
   .callsignDBImplemented = false,

@@ -44,6 +44,9 @@ static Radio::Features _gd77_features = {
   .maxAPRSSystems = 0,
 
   .hasRoaming = false,
+  .maxRoamingChannels = 0,
+  .maxRoamingZones = 0,
+  .maxChannelsInRoamingZone = 0,
 
   .hasCallsignDB = true,
   .callsignDBImplemented = false,

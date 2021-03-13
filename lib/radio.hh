@@ -127,6 +127,12 @@ public:
 
     /** If @c true, the device supports roaming. */
     bool hasRoaming;
+    /** Specifies the maximum number of roaming channels. */
+    int maxRoamingChannels;
+    /** Specifies the maximum number of roaming zones. */
+    int maxRoamingZones;
+    /** Specifies the maximum number of channels per roaming zone. */
+    int maxChannelsInRoamingZone;
 
     /** If true, the radio supports a callsign DB. */
     bool hasCallsignDB;

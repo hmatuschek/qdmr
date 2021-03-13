@@ -251,6 +251,33 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
     }
   }
 
+  /*
+   * Check roaming zones and channels
+   */
+  if (features().hasRoaming) {
+    // Check total numer of unique roaming channels
+    QSet<DigitalChannel *> roamingChannels; config->roaming()->uniqueChannels(roamingChannels);
+    if (roamingChannels.size() > features().maxRoamingChannels)
+      issues.append(VerifyIssue(
+                      VerifyIssue::ERROR,
+                      tr("Total number of roaming channels %1 exceeds limit %2")
+                      .arg(roamingChannels.size()).arg(features().maxRoamingChannels)));
+    // Check number of roaming zones
+    if (config->roaming()->count() > features().maxRoamingZones)
+      issues.append(VerifyIssue(
+                      VerifyIssue::ERROR,
+                      tr("Number of roaming zones %1 exceeds limit %2")
+                      .arg(config->roaming()->count()).arg(features().maxRoamingZones)));
+    for (int i=0; i<config->roaming()->count(); i++) {
+      RoamingZone *zone = config->roaming()->zone(i);
+      if (zone->count() > features().maxChannelsInRoamingZone)
+        issues.append(VerifyIssue(
+                        VerifyIssue::WARNING,
+                        tr("Number of channels (%1) in roaming zone '%2' exceeds limit %3")
+                        .arg(roamingChannels.size()).arg(zone->name()).arg(features().maxRoamingChannels)));
+    }
+  }
+
   return 0 == issues.size();
 }
 
