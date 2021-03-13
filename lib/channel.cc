@@ -416,8 +416,28 @@ ChannelList::findDigitalChannel(double freq) const {
   for (int i=0; i<count(); i++) {
     if (! _channels[i]->is<DigitalChannel>())
       continue;
-    if ((_channels[i]->txFrequency() == freq) || (_channels[i]->rxFrequency() == freq))
+    if ((1e-6>std::abs(_channels[i]->txFrequency()-freq)) ||
+        (1e-6>std::abs(_channels[i]->rxFrequency()-freq)))
       return _channels[i]->as<DigitalChannel>();
+  }
+  return nullptr;
+}
+
+DigitalChannel *
+ChannelList::findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, uint cc) const {
+  for (int i=0; i<count(); i++) {
+    if (! _channels[i]->is<DigitalChannel>())
+      continue;
+    /// @bug I should certainly change the frequency handling to integer values!
+    if ( (1e-6<std::abs(_channels[i]->txFrequency()-tx)) ||
+         (1e-6<std::abs(_channels[i]->rxFrequency()-rx)) )
+      continue;
+    DigitalChannel *digi = _channels[i]->as<DigitalChannel>();
+    if (digi->timeslot() != ts)
+      continue;
+    if (digi->colorCode() != cc)
+      continue;
+    return digi;
   }
   return nullptr;
 }

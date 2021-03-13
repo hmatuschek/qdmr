@@ -1059,7 +1059,8 @@ public:
   };
 
   /** Implements the binary representation of a roaming channel within the codeplug.
-   * Memmory layout of roaming channel (0x40byte):
+   *
+   * Memmory layout of roaming channel (0x20byte):
    * @verbinclude d878uvroamingchannel.txt */
   struct __attribute__((packed)) roaming_channel_t {
     uint32_t rx_frequency;         ///< RX frequency 8-digit BCD big-endian as MMMkkkHH.
@@ -1069,29 +1070,53 @@ public:
     uint8_t name[16];              ///< Channel name, 16byte ASCII 0-terminated.
     uint8_t _unused26[6];          ///< Unused, set to 0x00
 
+    /** Decodes the RX frequency. */
     double getRXFrequency() const;
+    /** Encodes the given RX frequency. */
     void setRXFrequency(double f);
+    /** Decodes the TX frequency. */
     double getTXFrequency() const;
+    /** Encodes the given TX frequency. */
     void setTXFrequency(double f);
-
+    /** Returns the time-slot of the roaming channel. */
     DigitalChannel::TimeSlot getTimeslot() const;
+    /** Sets the time-slot of the roaming channel. */
     void setTimeslot(DigitalChannel::TimeSlot ts);
-
+    /** Returns the color-code [0-15] of the roaming channel. */
     uint getColorCode() const;
-    void setColorCode(uint cc);
-
+    /** Sets the color-code [0-15] of the roaming channel. */
+    void setColorCode(uint8_t cc);
+    /** Decodes the name of the roaming channel. */
     QString getName() const;
+    /** Encodes the name of the roaming channel. */
     void setName(const QString &name);
 
+    /** Constructs a roaming channel from the given digital channel. */
     void fromChannel(DigitalChannel *ch);
+    /** Constructs/Searches a matching DigitalChannel for this roaming channel. */
+    DigitalChannel *toChannel(CodeplugContext &ctx);
   };
 
+  /** Represents a roaming zone within the binary codeplug.
+   *
+   * Memmory layout of roaming zone (0x80byte):
+   * @verbinclude d878uvroamingzone.txt */
   struct __attribute__((packed)) roaming_zone_t {
     uint8_t channels[64];          ///< List of roaming channel indices, 0xff=unused/end-of-list.
     uint8_t name[16];              ///< Roaming zone name, 16b ASCII 0x00 padded.
-    uint8_t _unused80[48];        ///< Unused, set to 0x00.
+    uint8_t _unused80[48];         ///< Unused, set to 0x00.
 
+    /** Returns the name of the roaming zone. */
+    QString getName() const;
+    /** Sets the name of the roaming zone. */
+    void setName(const QString &name);
+
+    /** Assembles a binary representation of the given RoamingZone instance.*/
     void fromRoamingZone(RoamingZone *zone, const QHash<DigitalChannel *, int> &map);
+    /** Constructs a @c RoamingZone instance from this configuration. */
+    RoamingZone *toRoamingZone();
+    /** Links the given RoamingZone. */
+    bool linkRoamingZone(RoamingZone *zone, CodeplugContext &ctx);
   };
 
 

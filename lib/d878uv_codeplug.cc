@@ -423,6 +423,10 @@ D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
     //  There can only be one active APRS system, hence the index is fixed to one.
     if ((APRS_REPORT_ANALOG == aprs_report) && ctx.hasAPRSSystem(0))
       dc->setPosSystem(ctx.getAPRSSystem(0));
+
+    // If roaming is not disabled -> link to default roaming zone
+    if (0 == excl_from_roaming)
+      dc->setRoaming(DefaultRoamingZone::get());
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
     AnalogChannel *ac = c->as<AnalogChannel>();
@@ -1234,11 +1238,11 @@ D878UVCodeplug::roaming_channel_t::setTimeslot(DigitalChannel::TimeSlot ts) {
 
 uint
 D878UVCodeplug::roaming_channel_t::getColorCode() const {
-  return std::min(uint8_t(16), colorcode);
+  return std::min(uint8_t(15), colorcode);
 }
 void
-D878UVCodeplug::roaming_channel_t::setColorCode(uint cc) {
-  colorcode = std::min(uint(16), cc);
+D878UVCodeplug::roaming_channel_t::setColorCode(uint8_t cc) {
+  colorcode = std::min(uint8_t(15), cc);
 }
 
 QString
@@ -1259,20 +1263,69 @@ D878UVCodeplug::roaming_channel_t::fromChannel(DigitalChannel *ch) {
   setTimeslot(ch->timeslot());
 }
 
-
+DigitalChannel *
+D878UVCodeplug::roaming_channel_t::toChannel(CodeplugContext &ctx) {
+  // Find matching channel for RX, TX frequency, TS and CC
+  double rx = getRXFrequency(), tx = getTXFrequency();
+  DigitalChannel *digi = ctx.config()->channelList()->findDigitalChannel(
+        rx, tx, getTimeslot(), getColorCode());
+  if (nullptr == digi) {
+    // If no matching channel can be found -> create one
+    digi = new DigitalChannel(getName(), getRXFrequency(), getTXFrequency(),
+                              Channel::LowPower, 0, false, DigitalChannel::AdmitColorCode,
+                              getColorCode(), getTimeslot(), nullptr, nullptr, nullptr,
+                              nullptr, nullptr);
+    logDebug() << "Create channel '" << digi->name() << "' as roaming channel.";
+    ctx.config()->channelList()->addChannel(digi);
+  }
+  return digi;
+}
 
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::roaming_zone_t
  * ******************************************************************************************** */
+QString
+D878UVCodeplug::roaming_zone_t::getName() const {
+  return decode_ascii(name, 16, 0x00);
+}
+void
+D878UVCodeplug::roaming_zone_t::setName(const QString &name) {
+  encode_ascii(this->name, name, 16, 0x00);
+}
+
 void
 D878UVCodeplug::roaming_zone_t::fromRoamingZone(RoamingZone *zone, const QHash<DigitalChannel *,int> &map) {
   memset(channels, 0xff, sizeof(channels));
-  encode_ascii(name, zone->name(), 16, 0x00);
+  setName(zone->name());
   memset(_unused80, 0x00, sizeof(_unused80));
   for (int i=0; i<std::min(64, zone->count()); i++) {
     channels[i] = map.value(zone->channel(i), 0xff);
   }
 }
+
+RoamingZone *
+D878UVCodeplug::roaming_zone_t::toRoamingZone() {
+  return new RoamingZone(getName());
+}
+
+bool
+D878UVCodeplug::roaming_zone_t::linkRoamingZone(RoamingZone *zone, CodeplugContext &ctx) {
+  for (uint8_t i=0; (i<NUM_CH_PER_ZONE)&&(0xff!=channels[i]); i++) {
+    DigitalChannel *digi = nullptr;
+    if (ctx.hasRoamingChannel(channels[i])) {
+      // If matching index is known -> resolve directly
+      digi = ctx.getRoamingChannel(channels[i]);
+    } else {
+      logError() << "Cannot link roaming zone '" << zone->name()
+                 << "', unknown roaming channel index " << channels[i];
+      return false;
+    }
+    zone->addChannel(digi);
+  }
+
+  return true;
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug
@@ -1750,7 +1803,6 @@ D878UVCodeplug::setBitmaps(Config *config)
   // Mark roaming zones
   uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
   memset(roaming_zone_bitmap, 0x00, ROAMING_ZONE_BITMAP_SIZE);
-  logDebug() << "Mark " << config->roaming()->count() << " roaming zones.";
   for (int i=0; i<config->roaming()->count(); i++)
     roaming_zone_bitmap[i/8] |= (1<<(i%8));
 
@@ -1760,7 +1812,6 @@ D878UVCodeplug::setBitmaps(Config *config)
   // Get all (unique) channels used in roaming
   QSet<DigitalChannel*> roaming_channels;
   config->roaming()->uniqueChannels(roaming_channels);
-  logDebug() << "Mark " << roaming_channels.count() << " roaming channels.";
   for (int i=0; i<std::min(NUM_ROAMING_CHANNEL,roaming_channels.count()); i++)
     roaming_ch_bitmap[i/8] |= (1<<(i%8));
 }
@@ -2029,6 +2080,34 @@ D878UVCodeplug::decode(Config *config)
     APRSSystem *sys = aprs->toAPRSSystem();
     sys->setMessage(decode_ascii(aprsmsg, 60, 0x00));
     ctx.addAPRSSystem(sys,0);
+  }
+
+  // Create or find roaming channels
+  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
+  for (int i=0; i<NUM_ROAMING_CHANNEL; i++) {
+    uint8_t byte=i/8, bit=i%8;
+    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
+      continue;
+    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
+    roaming_channel_t *ch = (roaming_channel_t *)data(addr);
+    DigitalChannel *digi = ch->toChannel(ctx);
+    if (digi) {
+      logDebug() << "Register channel '" << digi->name() << "' as roaming channel " << i+1;
+      ctx.addRoamingChannel(digi, i+1);
+    }
+  }
+
+  // Create and link roaming zones
+  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
+  for (int i=0; i<NUM_ROAMING_ZONES; i++) {
+    uint8_t byte=i/8, bit=i%8;
+    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
+      continue;
+    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
+    roaming_zone_t *z = (roaming_zone_t *)data(addr);
+    RoamingZone *zone = z->toRoamingZone();
+    ctx.addRoamingZone(zone, i);
+    z->linkRoamingZone(zone, ctx);
   }
 
   // Link channel objects

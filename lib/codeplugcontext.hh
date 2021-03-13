@@ -61,6 +61,19 @@ public:
   /** Gets an APRS system for the specified index or @c nullptr if not defined. */
   APRSSystem *getAPRSSystem(int index) const;
 
+  /** Retruns @c true if the given roaming zone index is defined. */
+  bool hasRoamingZone(int index) const;
+  /** Associates the given roaming zone with the given index. */
+  bool addRoamingZone(RoamingZone *zone, int index);
+  /** Returns the roaming zone associated with the given index. */
+  RoamingZone *getRoamingZone(int index) const;
+  /** Returns @c true if a roaming channel is defined for the given index. */
+  bool hasRoamingChannel(int index) const;
+  /** Associates the given digital channel as the roaming channel with the given index. */
+  bool addRoamingChannel(DigitalChannel *ch, int index);
+  /** Returns the roaming channel associated with the given index. */
+  DigitalChannel *getRoamingChannel(int index) const;
+
 protected:
   /** The wrapped radio config (aka abstract code-plug). */
   Config *_config;
@@ -76,6 +89,10 @@ protected:
   QHash<int, int> _gpsSystemTable;
   /** Maps a code-plug APRS system index to the APRS system index within the wrapped radio config. */
   QHash<int, int> _aprsSystemTable;
+  /** Maps a code-plug roaming zone index to the roaming zone index within the wrapped radio config. */
+  QHash<int, int> _roamingZoneTable;
+  /** Maps a code-plug roaming channel index to a digital channel index within the wrapped radio config. */
+  QHash<int, int> _roamingChannelTable;
 };
 
 #endif // CODEPLUGCONTEXT_HH

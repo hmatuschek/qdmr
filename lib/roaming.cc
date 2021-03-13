@@ -64,7 +64,6 @@ RoamingZone::remChannel(int row) {
   _channel.removeAt(row);
   endRemoveRows();
   disconnect(ch, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  disconnect(ch, SIGNAL(modified()), this, SIGNAL(modified()));
   emit modified();
   return true;
 }

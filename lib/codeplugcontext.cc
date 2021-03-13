@@ -155,3 +155,49 @@ CodeplugContext::addAPRSSystem(APRSSystem *sys, int index) {
   _aprsSystemTable[index] = sidx;
   return true;
 }
+
+
+bool
+CodeplugContext::hasRoamingZone(int index) const {
+  return _roamingZoneTable.contains(index);
+}
+
+RoamingZone *
+CodeplugContext::getRoamingZone(int index) const {
+  if (! _roamingZoneTable.contains(index))
+    return nullptr;
+  return _config->roaming()->zone(_roamingZoneTable[index]);
+}
+
+bool
+CodeplugContext::addRoamingZone(RoamingZone *zone, int index) {
+  if (_roamingZoneTable.contains(index))
+    return false;
+  int sidx = _config->roaming()->count();
+  if (! _config->roaming()->addZone(zone))
+    return false;
+  _roamingZoneTable[index] = sidx;
+  return true;
+}
+
+
+bool
+CodeplugContext::hasRoamingChannel(int index) const {
+  return _roamingChannelTable.contains(index);
+}
+
+DigitalChannel *
+CodeplugContext::getRoamingChannel(int index) const {
+  if (! _roamingChannelTable.contains(index))
+    return nullptr;
+  return _config->channelList()->channel(_roamingChannelTable[index])->as<DigitalChannel>();
+}
+
+bool
+CodeplugContext::addRoamingChannel(DigitalChannel *ch, int index) {
+  if (_roamingChannelTable.contains(index))
+    return false;
+  int sidx = _config->channelList()->indexOf(ch);
+  _roamingChannelTable[index] = sidx;
+  return true;
+}

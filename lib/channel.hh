@@ -387,6 +387,8 @@ public:
   Channel *findChannel(double freq) const;
   /** Finds a digial channel with the given frequeny. */
   DigitalChannel *findDigitalChannel(double freq) const;
+  /** Finds a digial channel with the given frequencies, time slot and color code. */
+  DigitalChannel *findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, uint cc) const;
   /** Finds an analog channel with the given frequeny. */
   AnalogChannel *findAnalogChannel(double freq) const;
   /** Adds a channel to the list at the specified row.
