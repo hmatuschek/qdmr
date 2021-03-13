@@ -24,7 +24,14 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   }
   logDebug() << "Read codeplug from '" << filename << "'.";
 
-  Radio *radio = Radio::detect(errorMessage);
+  QString forceRadio="";
+  if (parser.isSet("radio")) {
+    logWarn() << "You force the radio type to be '" << parser.value("radio").toUpper()
+              << "' this is generally a very bad idea! You have been warned.";
+    forceRadio = parser.value("radio");
+  }
+
+  Radio *radio = Radio::detect(errorMessage, forceRadio);
   if (nullptr == radio) {
     logError() << "Cannot detect radio: " << errorMessage;
     return -1;

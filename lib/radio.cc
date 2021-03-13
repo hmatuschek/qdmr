@@ -283,7 +283,7 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
 
 
 Radio *
-Radio::detect(QString &errorMessage) {
+Radio::detect(QString &errorMessage, const QString &force) {
   QString id;
 
   // Try TYT MD Family
@@ -336,15 +336,16 @@ found:
 
   logDebug() << "Found Radio: " << id;
 
-  if ("BF-5R" == id) {
+  if (("BF-5R" == id) || ("RD5R" == force.toUpper())) {
     return new RD5R();
-  } else if ("MD-760P" == id) {
+  } else if (("MD-760P" == id) || ("GD77" == force.toUpper())) {
     return new GD77();
-  } else if ("MD-UV390" == id) {
+  } else if (("MD-UV390" == id) || ("UV390" == force.toUpper())) {
     return new UV390();
-  } else if ("OpenGD77" == id) {
+  } else if (("OpenGD77" == id) || ("OpenGD77" == force.toUpper())) {
     return new OpenGD77();
-  } else if (("D868UV" == id) || ("D868UVE" == id) || ("D6X2UV" == id) || ("D878UV" == id)) {
+  } else if (("D868UV" == id) || ("D868UVE" == id) || ("D6X2UV" == id) || ("D878UV" == id)
+             || ("D878UV" == force.toUpper())) {
     return new D878UV();
   }
 

@@ -180,7 +180,7 @@ public:
 
 public:
   /** Detects a radio and returns the corresponding device specific radio instance. */
-	static Radio *detect(QString &errorMessage);
+  static Radio *detect(QString &errorMessage, const QString &force="");
 
 public slots:
   /** Starts the download of the codeplug.

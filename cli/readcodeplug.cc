@@ -20,8 +20,15 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   if (2 > parser.positionalArguments().size())
     parser.showHelp(-1);
 
+  QString forceRadio="";
+  if (parser.isSet("radio")) {
+    logWarn() << "You force the radio type to be '" << parser.value("radio").toUpper()
+              << "' this is generally a very bad idea! You have been warned.";
+    forceRadio = parser.value("radio");
+  }
+
   QString errorMessage;
-  Radio *radio = Radio::detect(errorMessage);
+  Radio *radio = Radio::detect(errorMessage, forceRadio);
   if (nullptr == radio) {
     logError() << "Cannot detect radio: " << errorMessage;
     return -1;
