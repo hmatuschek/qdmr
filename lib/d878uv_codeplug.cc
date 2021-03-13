@@ -387,7 +387,7 @@ D878UVCodeplug::channel_t::toChannelObj() const {
     DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1);
     ch = new DigitalChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
-          color_code, ts, nullptr, nullptr, nullptr, nullptr);
+          color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr);
   } else {
     logError() << "Cannot create channel '" << getName()
                << "': Mixed channel types not supported.";

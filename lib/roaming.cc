@@ -1,4 +1,5 @@
 #include "roaming.hh"
+#include <QSet>
 
 /* ********************************************************************************************* *
  * Implementation of RoamingZone
@@ -104,6 +105,25 @@ RoamingZone::onChannelDeleted(QObject *obj) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of DefaultRoamingZone
+ * ********************************************************************************************* */
+DefaultRoamingZone *DefaultRoamingZone::_instance = nullptr;
+
+DefaultRoamingZone::DefaultRoamingZone(QObject *parent)
+  : RoamingZone(tr("[Default]"), parent)
+{
+  // pass...
+}
+
+DefaultRoamingZone *
+DefaultRoamingZone::get() {
+  if (nullptr == _instance)
+    _instance = new DefaultRoamingZone();
+  return _instance;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RoamingZoneList
  * ********************************************************************************************* */
 RoamingZoneList::RoamingZoneList(QObject *parent)
@@ -124,6 +144,30 @@ RoamingZoneList::clear() {
   _zones.clear();
 }
 
+int
+RoamingZoneList::indexOf(RoamingZone *zone) const {
+  if (! _zones.contains(zone))
+    return -1;
+  return _zones.indexOf(zone);
+}
+
+QSet<DigitalChannel *>
+RoamingZoneList::uniqueChannels() const {
+  QSet<DigitalChannel *> channels;
+  uniqueChannels(channels);
+  return channels;
+}
+
+void
+RoamingZoneList::uniqueChannels(QSet<DigitalChannel *> &channels) const {
+  for (int i=0; i<count(); i++) {
+    RoamingZone *zone = _zones[i];
+    for (int j=0; j<zone->count(); j++) {
+      channels.insert(zone->channel(j));
+    }
+  }
+}
+
 RoamingZone *
 RoamingZoneList::zone(int idx) const {
   if ((0>idx) || (idx>=_zones.size()))
@@ -133,6 +177,8 @@ RoamingZoneList::zone(int idx) const {
 
 bool
 RoamingZoneList::addZone(RoamingZone *zone, int row) {
+  if (DefaultRoamingZone::get() == zone)
+    return false;
   if (_zones.contains(zone))
     return false;
   if ((row<0) || (row>=_zones.size()))

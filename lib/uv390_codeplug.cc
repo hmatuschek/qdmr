@@ -213,7 +213,8 @@ UV390Codeplug::channel_t::toChannelObj() const {
         (1 == time_slot) ? DigitalChannel::TimeSlot1 : DigitalChannel::TimeSlot2;
 
     return new DigitalChannel(getName(), getRXFrequency(), getTXFrequency(), pwr, (tot*15),
-                              rx_only, admit_crit, color_code, slot, nullptr, nullptr, nullptr, nullptr);
+                              rx_only, admit_crit, color_code, slot,
+                              nullptr, nullptr, nullptr, nullptr, nullptr);
   }
 
   return nullptr;

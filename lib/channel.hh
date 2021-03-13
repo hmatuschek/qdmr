@@ -12,6 +12,7 @@ class DigitalContact;
 class ScanList;
 class APRSSystem;
 class PositioningSystem;
+class RoamingZone;
 
 
 /** The base class of all channels (analog and digital) of a codeplug configuration.
@@ -265,10 +266,12 @@ public:
    * @param txContact Specifies the default TX contact to call on this channel.
    * @param posSystem Specifies the positioning system to use on this channel.
    * @param list      Specifies the default scanlist for the channel.
+   * @param roaming   Specified the roaming zone for the channel.
    * @param parent    Specified the @c QObject parent object. */
   DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
 	               bool rxOnly, Admit admit, uint colorCode, TimeSlot timeslot, RXGroupList *rxGroup,
-                 DigitalContact *txContact, PositioningSystem *posSystem, ScanList *list, QObject *parent=nullptr);
+                 DigitalContact *txContact, PositioningSystem *posSystem, ScanList *list,
+                 RoamingZone *roaming, QObject *parent=nullptr);
 
   /** Returns the admit criterion for the channel. */
 	Admit admit() const;
@@ -300,6 +303,11 @@ public:
   /** Associates the GPS System with this channel. */
   bool setPosSystem(PositioningSystem *sys);
 
+  /** Returns the roaming zone associated with this channel or @c nullptr if not set. */
+  RoamingZone *roaming() const;
+  /** Associates the given roaming zone with this channel. */
+  bool setRoaming(RoamingZone *zone);
+
 protected slots:
   /** Internal callback if RX group list is deleted. */
 	void onRxGroupDeleted();
@@ -307,6 +315,8 @@ protected slots:
 	void onTxContactDeleted();
   /** Internal callback if GPS system is deleted. */
   void onPosSystemDeleted();
+  /** Internal callback if roaming zone is deleted. */
+  void onRoamingZoneDeleted();
 
 protected:
   /** The admit criterion. */
@@ -321,6 +331,8 @@ protected:
 	DigitalContact *_txContact;
   /** The GPS system. */
   PositioningSystem *_posSystem;
+  /** Roaming zone for the channel. */
+  RoamingZone *_roaming;
 };
 
 

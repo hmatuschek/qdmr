@@ -53,8 +53,9 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 12) Receive group list: - or index in Grouplist table\n"
             "# 13) Contact for transmit: - or index in Contacts table\n"
             "# 14) GPS System: - or index in GPS table.\n"
+            "# 15) Roaming zone: -, + or index in roaming-zone table.\n"
             "#\n"
-            "Digital Name                Receive    Transmit   Power Scan TOT RO Admit  CC TS RxGL TxC GPS\n";
+            "Digital Name                Receive    Transmit   Power Scan TOT RO Admit  CC TS RxGL TxC GPS Roam\n";
   for (int i=0; i<config->channelList()->count(); i++) {
     if (config->channelList()->channel(i)->is<AnalogChannel>())
       continue;
@@ -86,6 +87,12 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
       stream << qSetFieldWidth(4) << left << "-";
     else
       stream << qSetFieldWidth(4) << left << config->posSystems()->indexOf(digi->posSystem())+1;
+    if (nullptr == digi->roaming())
+      stream << qSetFieldWidth(5) << left << "-";
+    else if (DefaultRoamingZone::get() == digi->roaming())
+      stream << qSetFieldWidth(5) << left << "+";
+    else
+      stream << qSetFieldWidth(5) << left << (config->roaming()->indexOf(digi->roaming())+1);
     if (digi->txContact())
       stream << qSetFieldWidth(0) << "# " << digi->txContact()->name();
     stream << qSetFieldWidth(0) << "\n";

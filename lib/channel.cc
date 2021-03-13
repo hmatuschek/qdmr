@@ -211,7 +211,7 @@ AnalogChannel::onAPRSSystemDeleted() {
 DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power,
                                uint txto, bool rxOnly, Admit admit, uint colorCode,
                                TimeSlot timeslot, RXGroupList *rxGroup, DigitalContact *txContact,
-                               PositioningSystem *posSystem, ScanList *list, QObject *parent)
+                               PositioningSystem *posSystem, ScanList *list, RoamingZone *roaming, QObject *parent)
   : Channel(name, rxFreq, txFreq, power, txto, rxOnly, list, parent), _admit(admit),
     _colorCode(colorCode), _timeSlot(timeslot), _rxGroup(rxGroup), _txContact(txContact),
     _posSystem(posSystem)
@@ -288,7 +288,8 @@ DigitalChannel::setTXContact(DigitalContact *c) {
   return true;
 }
 
-PositioningSystem *DigitalChannel::posSystem() const {
+PositioningSystem *
+DigitalChannel::posSystem() const {
   return _posSystem;
 }
 
@@ -299,6 +300,23 @@ DigitalChannel::setPosSystem(PositioningSystem *sys) {
   _posSystem = sys;
   if (_posSystem)
     connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
+  emit modified();
+  return true;
+}
+
+
+RoamingZone *
+DigitalChannel::roaming() const {
+  return _roaming;
+}
+
+bool
+DigitalChannel::setRoaming(RoamingZone *zone) {
+  if (_roaming)
+    disconnect(_roaming, SIGNAL(destroyed(QObject*)), this, SLOT(onRoamingZoneDeleted()));
+  _roaming = zone;
+  if (_roaming)
+    connect(_roaming, SIGNAL(destroyed(QObject*)), this, SLOT(onRoamingZoneDeleted()));
   emit modified();
   return true;
 }
@@ -316,6 +334,11 @@ DigitalChannel::onTxContactDeleted() {
 void
 DigitalChannel::onPosSystemDeleted() {
   setPosSystem(nullptr);
+}
+
+void
+DigitalChannel::onRoamingZoneDeleted() {
+  setRoaming(nullptr);
 }
 
 

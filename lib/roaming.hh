@@ -51,6 +51,20 @@ protected:
 };
 
 
+class DefaultRoamingZone: public RoamingZone
+{
+  Q_OBJECT
+
+protected:
+  explicit DefaultRoamingZone(QObject *parent=nullptr);
+
+public:
+  static DefaultRoamingZone *get();
+
+protected:
+  static DefaultRoamingZone *_instance;
+};
+
 
 class RoamingZoneList: public QAbstractListModel
 {
@@ -63,6 +77,14 @@ public:
   int count() const;
   /** Clears the roaming zone list. */
   void clear();
+  /** Returns the index of the given roaming zone within this list.
+   * @returns Index or -1 if zone is not a member. */
+  int indexOf(RoamingZone *zone) const;
+
+  /** Returns a set of unique channels used in all roaming zones. */
+  QSet<DigitalChannel *> uniqueChannels() const;
+  /** Adds all channels of all roaming zones to the given set. */
+  void uniqueChannels(QSet<DigitalChannel *> &channels) const;
 
   /** Returns the roaming zone at the given index. */
   RoamingZone *zone(int idx) const;

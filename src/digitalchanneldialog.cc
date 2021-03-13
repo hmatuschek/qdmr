@@ -133,7 +133,7 @@ DigitalChannelDialog::channel() {
   }
 
   return new DigitalChannel(name, rx, tx, pwr, timeout, rxonly, admit, colorcode, ts, rxgroup,
-                            contact, pos, scanlist);
+                            contact, pos, scanlist, nullptr);
 }
 
 void

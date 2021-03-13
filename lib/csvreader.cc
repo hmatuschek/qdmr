@@ -200,7 +200,7 @@ CSVHandler::handleGroupList(qint64 idx, const QString &name, const QList<qint64>
 bool
 CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
     qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-    qint64 gl, qint64 contact, qint64 gps, qint64 line, qint64 column, QString &errorMessage)
+    qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
   Q_UNUSED(name);
@@ -216,6 +216,7 @@ CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, dou
   Q_UNUSED(gl);
   Q_UNUSED(contact);
   Q_UNUSED(gps);
+  Q_UNUSED(roam);
   Q_UNUSED(line);
   Q_UNUSED(column);
   Q_UNUSED(errorMessage);
@@ -982,14 +983,32 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
+  qint64 roam = -1;
+  if (CSVLexer::Token::T_NOT_SET == token.type) {
+    roam = -1;
+  } if (CSVLexer::Token::T_ENABLED == token.type) {
+    roam = 0;
+  } else if (CSVLexer::Token::T_NUMBER == token.type) {
+    roam = token.value.toInt(&ok);
+  } else if ((CSVLexer::Token::T_NEWLINE == token.type) || (CSVLexer::Token::T_END_OF_STREAM == token.type)) {
+    // This entry is optional for backward compatibility.
+    goto done;
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number, '-' or '+'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
+  if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)) {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
+done:
   return _handler->handleDigitalChannel(idx, name, rx, tx, pwr, scanlist, tot, rxOnly, admit, color,
-                                        slot, rxGroupList, txContact, gps, line, column, _errorMessage);
+                                        slot, rxGroupList, txContact, gps, roam, line, column, _errorMessage);
 }
 
 bool
@@ -1182,11 +1201,14 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  qint64 aprs;
+  qint64 aprs = 0;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
     aprs = 0;
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
     aprs = token.value.toInt();
+  } else if ((CSVLexer::Token::T_NEWLINE == token.type) || (CSVLexer::Token::T_END_OF_STREAM == token.type)) {
+    // This entry is optional for backward compatibility.
+    goto done;
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1200,6 +1222,7 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
     return false;
   }
 
+done:
   return _handler->handleAnalogChannel(idx, name, rx, tx, pwr, scanlist, aprs, tot, rxOnly, admit, squelch,
                                        rxTone, txTone, bw, line, column, _errorMessage);
 }
@@ -1836,7 +1859,7 @@ CSVReader::handleGroupList(qint64 idx, const QString &name, const QList<qint64> 
 bool
 CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
     qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-    qint64 gl, qint64 contact, qint64 gps, qint64 line, qint64 column, QString &errorMessage)
+    qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
     // Check RX Grouplist
@@ -1872,13 +1895,26 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
     // Check GPS System
     if (0 < gps) {
       if (! _posSystems.contains(gps)) {
-        errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown system index %4.")
+        errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown GPS system index %4.")
             .arg(line).arg(column).arg(name).arg(gps);
         return false;
       }
       _channels[idx]->as<DigitalChannel>()->setPosSystem(_posSystems[gps]);
     }
 
+    // Check roaming zone
+    if (0 == roam) {
+      // index 0 mean default zone -> just set it
+      _channels[idx]->as<DigitalChannel>()->setRoaming(DefaultRoamingZone::get());
+    } else if (0 < roam) {
+      // positive index means reference to roaming specific roaming zone
+      if (! _roamingZones.contains(roam)) {
+        errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown roaming zone index %4.")
+            .arg(line).arg(column).arg(name).arg(gps);
+        return false;
+      }
+      _channels[idx]->as<DigitalChannel>()->setRoaming(_roamingZones[roam]);
+    }
     return true;
   }
 
@@ -1890,7 +1926,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
   }
 
   DigitalChannel *chan = new DigitalChannel(name, rx, tx, power, tot, ro, admit, color, slot,
-                                            nullptr, nullptr, nullptr, nullptr);
+                                            nullptr, nullptr, nullptr, nullptr, nullptr);
   _config->channelList()->addChannel(chan);
   _channels[idx] = chan;
 
