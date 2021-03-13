@@ -397,6 +397,9 @@ CSVParser::parse(QTextStream &stream) {
     } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("scanlist" == token.value.toLower())) {
       if (! _parse_scanlists(lexer))
         return false;
+    } else if ((CSVLexer::Token::T_KEYWORD == token.type) && ("roaming" == token.value.toLower())) {
+      if (! _parse_roaming_zones(lexer))
+        return false;
     } else if (CSVLexer::Token::T_ERROR == token.type) {
       _errorMessage = QString("Lexer error @ %1,%2 '%3': %4").arg(token.line).arg(token.column)
           .arg(token.value).arg(lexer.errorMessage());

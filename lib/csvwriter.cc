@@ -316,7 +316,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 2) Name in quotes. \n"
             "# 3) List of digital channels: numbers and ranges (N-M) separated by comma\n"
             "#\n"
-            "Zone    Name                Channels\n";
+            "Roaming Name                Channels\n";
   for (int i=0; i<config->roaming()->count(); i++) {
     RoamingZone *zone = config->roaming()->zone(i);
     stream << qSetFieldWidth(8)  << left << (i+1)
