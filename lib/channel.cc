@@ -214,7 +214,7 @@ DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq
                                PositioningSystem *posSystem, ScanList *list, RoamingZone *roaming, QObject *parent)
   : Channel(name, rxFreq, txFreq, power, txto, rxOnly, list, parent), _admit(admit),
     _colorCode(colorCode), _timeSlot(timeslot), _rxGroup(rxGroup), _txContact(txContact),
-    _posSystem(posSystem)
+    _posSystem(posSystem), _roaming(roaming)
 {
   if (_rxGroup)
     connect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));

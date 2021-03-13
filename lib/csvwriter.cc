@@ -87,12 +87,14 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
       stream << qSetFieldWidth(4) << left << "-";
     else
       stream << qSetFieldWidth(4) << left << config->posSystems()->indexOf(digi->posSystem())+1;
+    // Write roaming
     if (nullptr == digi->roaming())
       stream << qSetFieldWidth(5) << left << "-";
     else if (DefaultRoamingZone::get() == digi->roaming())
       stream << qSetFieldWidth(5) << left << "+";
     else
       stream << qSetFieldWidth(5) << left << (config->roaming()->indexOf(digi->roaming())+1);
+    // add contact name as comment
     if (digi->txContact())
       stream << qSetFieldWidth(0) << "# " << digi->txContact()->name();
     stream << qSetFieldWidth(0) << "\n";

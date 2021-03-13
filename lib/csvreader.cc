@@ -986,7 +986,7 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   qint64 roam = -1;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
     roam = -1;
-  } if (CSVLexer::Token::T_ENABLED == token.type) {
+  } else if (CSVLexer::Token::T_ENABLED == token.type) {
     roam = 0;
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
     roam = token.value.toInt(&ok);
