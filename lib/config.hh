@@ -18,6 +18,7 @@
 #include "zone.hh"
 #include "scanlist.hh"
 #include "gpssystem.hh"
+#include "roaming.hh"
 
 // Forward declaration
 class UserDatabase;
@@ -53,6 +54,8 @@ public:
   ScanLists *scanlists() const;
   /** Returns the list of positioning systems. */
   PositioningSystems *posSystems() const;
+  /** Returns the list of roaming zones. */
+  RoamingZoneList *roaming() const;
 
   /** Returns the DMR ID of the radio. */
   uint id() const;
@@ -118,6 +121,8 @@ protected:
   ScanLists *_scanlists;
   /** The list of GPS Systems. */
   PositioningSystems *_gpsSystems;
+  /** The list of roaming zones. */
+  RoamingZoneList *_roaming;
 
   /** DMR id of the radio. */
   uint _id;

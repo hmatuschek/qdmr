@@ -134,6 +134,16 @@ Settings::setHideGPSNote(bool hide) {
 }
 
 bool
+Settings::hideRoamingNote() const {
+  return value("hideRoamingNote", false).toBool();
+}
+
+void
+Settings::setHideRoamingNote(bool hide) {
+  setValue("hideRoamingNote", hide);
+}
+
+bool
 Settings::hideZoneNote() const {
   return value("hideZoneNote", false).toBool();
 }

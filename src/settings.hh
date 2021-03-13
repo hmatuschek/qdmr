@@ -33,6 +33,9 @@ public:
   bool hideGSPNote() const;
   void setHideGPSNote(bool hide);
 
+  bool hideRoamingNote() const;
+  void setHideRoamingNote(bool hide);
+
   bool hideZoneNote() const;
   void setHideZoneNote(bool hide);
 

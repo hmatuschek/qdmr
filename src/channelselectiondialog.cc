@@ -35,7 +35,7 @@ ChannelSelectionDialog::channel() const {
 /* ********************************************************************************************* *
  * Implementation of MultiChannelSelectionDialog
  * ********************************************************************************************* */
-MultiChannelSelectionDialog::MultiChannelSelectionDialog(ChannelList *lst, bool includeSelectedChannel, QWidget *parent)
+MultiChannelSelectionDialog::MultiChannelSelectionDialog(ChannelList *lst, bool includeSelectedChannel, bool digitalOnly, QWidget *parent)
   : QDialog(parent)
 {
   _channel = new QListWidget();
@@ -48,6 +48,8 @@ MultiChannelSelectionDialog::MultiChannelSelectionDialog(ChannelList *lst, bool 
   }
   for (int i=0; i<lst->count(); i++) {
     Channel *channel = lst->channel(i);
+    if (digitalOnly && channel->is<AnalogChannel>())
+      continue;
     QListWidgetItem *item = new QListWidgetItem(channel->name());
     item->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
     item->setData(Qt::UserRole, QVariant::fromValue(channel));

@@ -749,7 +749,7 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_21">
             <item>
-             <widget class="QPushButton" name="roamingUp">
+             <widget class="QPushButton" name="roamingZoneUp">
               <property name="text">
                <string/>
               </property>
@@ -760,7 +760,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="roamingDown">
+             <widget class="QPushButton" name="roamingZoneDown">
               <property name="text">
                <string/>
               </property>
@@ -777,14 +777,14 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_14">
           <item>
-           <widget class="QPushButton" name="addRoaming">
+           <widget class="QPushButton" name="addRoamingZone">
             <property name="text">
              <string>Add Roaming Zone</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="remRoaming">
+           <widget class="QPushButton" name="remRoamingZone">
             <property name="text">
              <string>Delete Roaming Zone</string>
             </property>

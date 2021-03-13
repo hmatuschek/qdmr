@@ -16,6 +16,7 @@
 #include "zonedialog.hh"
 #include "scanlistdialog.hh"
 #include "gpssystemdialog.hh"
+#include "roamingzonedialog.hh"
 #include "aprssystemdialog.hh"
 #include "repeaterdatabase.hh"
 #include "userdatabase.hh"
@@ -239,6 +240,24 @@ Application::createMainWindow() {
   connect(gpsDown, SIGNAL(clicked()), this, SLOT(onGPSDown()));
   connect(gpsList, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditGPS(const QModelIndex &)));
   connect(gpsNote, SIGNAL(linkActivated(QString)), this, SLOT(onHideGPSNote()));
+
+  // Wire-up "Roaming Zone List" view
+  QListView *roamingZones      = _mainWindow->findChild<QListView *>("roamingZoneList");
+  QPushButton *roamingZoneUp   = _mainWindow->findChild<QPushButton *>("roamingZoneUp");
+  QPushButton *roamingZoneDown = _mainWindow->findChild<QPushButton *>("roamingZoneDown");
+  QPushButton *addRoamingZone  = _mainWindow->findChild<QPushButton *>("addRoamingZone");
+  QPushButton *remRoamingZone  = _mainWindow->findChild<QPushButton *>("remRoamingZone");
+  QLabel *roamingNote          = _mainWindow->findChild<QLabel*>("roamingNote");
+  roamingZones->setModel(_config->roaming());
+  connect(addRoamingZone, SIGNAL(clicked()), this, SLOT(onAddRoamingZone()));
+  connect(remRoamingZone, SIGNAL(clicked()), this, SLOT(onRemRoamingZone()));
+  connect(roamingZoneUp, SIGNAL(clicked()), this, SLOT(onRoamingZoneUp()));
+  connect(roamingZoneDown, SIGNAL(clicked()), this, SLOT(onRoamingZoneDown()));
+  connect(roamingZones, SIGNAL(doubleClicked(const QModelIndex &)),
+          this, SLOT(onEditRoamingZone(const QModelIndex &)));
+  connect(roamingNote, SIGNAL(linkActivated(QString)), this, SLOT(onHideRoamingNote()));
+  if (settings.hideRoamingNote())
+    roamingNote->setVisible(false);
 
   return _mainWindow;
 }
@@ -1118,6 +1137,85 @@ Application::onHideGPSNote() {
   QLabel *gpsNote = _mainWindow->findChild<QLabel*>("gpsNote");
   gpsNote->setVisible(false);
 }
+
+
+
+void
+Application::onAddRoamingZone() {
+  RoamingZoneDialog dialog(_config);
+
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  QListView *list = _mainWindow->findChild<QListView *>("roamingZoneList");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+
+  RoamingZone *zone = dialog.zone();
+  if (selected.isValid())
+    _config->roaming()->addZone(zone, selected.row()+1);
+  else
+    _config->roaming()->addZone(zone);
+}
+
+void
+Application::onRemRoamingZone() {
+  QModelIndex idx = _mainWindow->findChild<QListView *>("roamingZoneList")->selectionModel()->currentIndex();
+  if (! idx.isValid()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot delete roaming zone"),
+          tr("Cannot delete roaming zone: You have to select a zone first."));
+    return;
+  }
+
+  QString name = _config->roaming()->zone(idx.row())->name();
+  if (QMessageBox::No == QMessageBox::question(
+        nullptr, tr("Delete roaming zone?"), tr("Delete roaming zone %1?").arg(name)))
+    return;
+
+  _config->roaming()->remZone(idx.row());
+}
+
+void
+Application::onRoamingZoneUp() {
+  QListView *list = _mainWindow->findChild<QListView *>("roamingZoneList");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || (0 >= selected.row()))
+    return;
+  if (_config->roaming()->moveUp(selected.row()))
+    list->setCurrentIndex(_config->roaming()->index(selected.row()-1));
+}
+
+void
+Application::onRoamingZoneDown() {
+  QListView *list = _mainWindow->findChild<QListView *>("roamingZoneList");
+  QModelIndex selected = list->selectionModel()->currentIndex();
+  if ((! selected.isValid()) || ((_config->roaming()->count()-1) <= selected.row()))
+    return;
+  if (_config->roaming()->moveDown(selected.row()))
+    list->setCurrentIndex(_config->roaming()->index(selected.row()+1));
+}
+
+void
+Application::onEditRoamingZone(const QModelIndex &idx) {
+  if (idx.row() >= _config->roaming()->count())
+    return;
+
+  RoamingZoneDialog dialog(_config, _config->roaming()->zone(idx.row()));
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  dialog.zone();
+
+  emit _mainWindow->findChild<QListView *>("roamingZoneList")->model()->dataChanged(idx,idx);
+}
+
+void
+Application::onHideRoamingNote() {
+  Settings setting; setting.setHideRoamingNote(true);
+  QLabel *roamingNote = _mainWindow->findChild<QLabel*>("roamingNote");
+  roamingNote->setVisible(false);
+}
+
 
 void
 Application::positionUpdated(const QGeoPositionInfo &info) {

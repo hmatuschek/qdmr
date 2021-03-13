@@ -27,7 +27,8 @@ class MultiChannelSelectionDialog: public QDialog
   Q_OBJECT
 
 public:
-  MultiChannelSelectionDialog(ChannelList *lst, bool includeSelectedChannel=false, QWidget *parent=nullptr);
+  MultiChannelSelectionDialog(ChannelList *lst, bool includeSelectedChannel=false,
+                              bool digitalOnly=false, QWidget *parent=nullptr);
 
   QList<Channel *> channel() const;
 

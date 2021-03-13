@@ -99,6 +99,13 @@ private slots:
   void onEditGPS(const QModelIndex &index);
   void onHideGPSNote();
 
+  void onAddRoamingZone();
+  void onRemRoamingZone();
+  void onRoamingZoneUp();
+  void onRoamingZoneDown();
+  void onEditRoamingZone(const QModelIndex &index);
+  void onHideRoamingNote();
+
   void positionUpdated(const QGeoPositionInfo &info);
 
 protected:
