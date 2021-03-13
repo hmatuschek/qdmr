@@ -200,7 +200,8 @@ QVariant
 RoamingZoneList::data(const QModelIndex &index, int role) const {
   if ((Qt::DisplayRole!=role) || (index.row()>=_zones.size()) || (0 != index.column()))
     return QVariant();
-  return _zones[index.row()]->name();
+  RoamingZone *zone = _zones[index.row()];
+  return tr("%1 (containing %2 channels)").arg(zone->name()).arg(zone->count());
 }
 
 QVariant
