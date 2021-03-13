@@ -127,12 +127,14 @@
 #define ADDR_FMBC_VFO             0x02480200
 #define FMBC_VFO_SIZE             0x00000010
 
+#define NUM_ROAMING_CHANNEL         250
 #define ADDR_ROAMING_CHANNEL_BITMAP 0x01042000
 #define ROAMING_CHANNEL_BITMAP_SIZE 0x00000020
 #define ADDR_ROAMING_CHANNEL_0      0x01040000
 #define ROAMING_CHANNEL_SIZE        0x00000020
 #define ROAMING_CHANNEL_OFFSET      0x00000020
 
+#define NUM_ROAMING_ZONES           64
 #define ADDR_ROAMING_ZONE_BITMAP    0x01042080
 #define ROAMING_ZONE_BITMAP_SIZE    0x00000010
 #define ADDR_ROAMING_ZONE_0         0x01043000
@@ -1258,6 +1260,20 @@ D878UVCodeplug::roaming_channel_t::fromChannel(DigitalChannel *ch) {
 }
 
 
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::roaming_zone_t
+ * ******************************************************************************************** */
+void
+D878UVCodeplug::roaming_zone_t::fromRoamingZone(RoamingZone *zone, const QHash<DigitalChannel *,int> &map) {
+  memset(channels, 0xff, sizeof(channels));
+  encode_ascii(name, zone->name(), 16, 0x00);
+  memset(_unused80, 0x00, sizeof(_unused80));
+  for (int i=0; i<std::min(64, zone->count()); i++) {
+    channels[i] = map.value(zone->channel(i), 0xff);
+  }
+}
+
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug
  * ******************************************************************************************** */
@@ -1495,6 +1511,38 @@ D878UVCodeplug::allocateForEncoding() {
       image(0).addElement(addr, RADIOID_SIZE);
     }
   }
+
+  /*
+   * Allocate roaming channel and zones
+   */
+  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
+  for (uint8_t i=0; i<NUM_ROAMING_CHANNEL; i++) {
+    // Get byte and bit for radio ID
+    uint16_t bit = i%8, byte = i/8;
+    // if disabled -> skip
+    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate roaming channel
+    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
+    if (nullptr == data(addr, 0)) {
+      logDebug() << "Allocate roaming channel at " << hex << addr;
+      image(0).addElement(addr, ROAMING_CHANNEL_SIZE);
+    }
+  }
+  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
+  for (uint8_t i=0; i<NUM_ROAMING_ZONES; i++) {
+    // Get byte and bit for radio ID
+    uint16_t bit = i%8, byte = i/8;
+    // if disabled -> skip
+    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate roaming zone
+    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
+    if (nullptr == data(addr, 0)) {
+      logDebug() << "Allocate roaming zone at " << hex << addr;
+      image(0).addElement(addr, ROAMING_ZONE_SIZE);
+    }
+  }
 }
 
 void
@@ -1614,6 +1662,36 @@ D878UVCodeplug::allocateForDecoding() {
     }
   }
 
+  /*
+   * Allocate roaming channel and zones
+   */
+  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
+  for (uint8_t i=0; i<NUM_ROAMING_CHANNEL; i++) {
+    // Get byte and bit for radio ID
+    uint16_t bit = i%8, byte = i/8;
+    // if disabled -> skip
+    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate roaming channel
+    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, ROAMING_CHANNEL_SIZE);
+    }
+  }
+  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
+  for (uint8_t i=0; i<NUM_ROAMING_ZONES; i++) {
+    // Get byte and bit for radio ID
+    uint16_t bit = i%8, byte = i/8;
+    // if disabled -> skip
+    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate roaming zone
+    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, ROAMING_ZONE_SIZE);
+    }
+  }
+
   // General config
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
   // GPS settings
@@ -1671,12 +1749,20 @@ D878UVCodeplug::setBitmaps(Config *config)
 
   // Mark roaming zones
   uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
-  memset(roaming_zone_bitmap, 0x00, ROAMING_ZONE_SIZE);
+  memset(roaming_zone_bitmap, 0x00, ROAMING_ZONE_BITMAP_SIZE);
+  logDebug() << "Mark " << config->roaming()->count() << " roaming zones.";
+  for (int i=0; i<config->roaming()->count(); i++)
+    roaming_zone_bitmap[i/8] |= (1<<(i%8));
 
   // Mark roaming channels
   uint8_t *roaming_ch_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
   memset(roaming_ch_bitmap, 0x00, ROAMING_CHANNEL_BITMAP_SIZE);
-
+  // Get all (unique) channels used in roaming
+  QSet<DigitalChannel*> roaming_channels;
+  config->roaming()->uniqueChannels(roaming_channels);
+  logDebug() << "Mark " << roaming_channels.count() << " roaming channels.";
+  for (int i=0; i<std::min(NUM_ROAMING_CHANNEL,roaming_channels.count()); i++)
+    roaming_ch_bitmap[i/8] |= (1<<(i%8));
 }
 
 
@@ -1788,6 +1874,32 @@ D878UVCodeplug::encode(Config *config, bool update)
     ((aprs_setting_t *)data(ADDR_APRS_SETTING))->fromAPRSSystem(config->posSystems()->aprsSystem(0));
     uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
     encode_ascii(aprsmsg, config->posSystems()->aprsSystem(0)->message(), 60, 0x00);
+  }
+
+  // Encode roaming channels
+  QHash<DigitalChannel *, int> roaming_ch_map;
+  {
+    // Get set of unique roaming channels
+    QSet<DigitalChannel*> roaming_channels;
+    config->roaming()->uniqueChannels(roaming_channels);
+    // Encode channels and store in index<->channel map
+    int i=0; QSet<DigitalChannel*>::iterator ch=roaming_channels.begin();
+    for(; ch != roaming_channels.end(); ch++, i++) {
+      roaming_ch_map[*ch] = i+1;
+      uint32_t addr = ADDR_ROAMING_CHANNEL_0+i*ROAMING_CHANNEL_OFFSET;
+      roaming_channel_t *rch = (roaming_channel_t *)data(addr);
+      rch->fromChannel(*ch);
+      logDebug() << "Encode roaming channel " << (*ch)->name() << " (" << (i+1)
+                 << ") at " << hex << addr;
+    }
+  }
+  // Encode roaming zones
+  for (int i=0; i<config->roaming()->count(); i++){
+    uint32_t addr = ADDR_ROAMING_ZONE_0+i*ROAMING_ZONE_OFFSET;
+    roaming_zone_t *zone = (roaming_zone_t *)data(addr);
+    logDebug() << "Encode roaming zone " << config->roaming()->zone(i)->name() << " (" << (i+1)
+               << ") at " << hex << addr;
+    zone->fromRoamingZone(config->roaming()->zone(i), roaming_ch_map);
   }
 
   return true;

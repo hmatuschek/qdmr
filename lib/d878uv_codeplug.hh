@@ -1090,6 +1090,8 @@ public:
     uint8_t channels[64];          ///< List of roaming channel indices, 0xff=unused/end-of-list.
     uint8_t name[16];              ///< Roaming zone name, 16b ASCII 0x00 padded.
     uint8_t _unused80[48];        ///< Unused, set to 0x00.
+
+    void fromRoamingZone(RoamingZone *zone, const QHash<DigitalChannel *, int> &map);
   };
 
 

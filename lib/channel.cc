@@ -222,6 +222,8 @@ DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq
     connect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
   if (_posSystem)
     connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
+  if (_roaming)
+    connect(_roaming, SIGNAL(destroyed()), this, SLOT(onRoamingZoneDeleted()));
 }
 
 DigitalChannel::Admit

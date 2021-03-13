@@ -42,7 +42,7 @@ RoamingZone::channel(int idx) const {
 
 bool
 RoamingZone::addChannel(DigitalChannel *ch, int row) {
-  if (_channel.contains(ch))
+  if ((nullptr==ch) || _channel.contains(ch))
     return false;
   if (row <=0 || row>=count())
     row = count();
