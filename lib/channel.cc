@@ -497,7 +497,7 @@ ChannelList::rowCount(const QModelIndex &idx) const {
 int
 ChannelList::columnCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
-  return 18;
+  return 19;
 }
 
 inline QString formatFrequency(float f) {
@@ -607,6 +607,16 @@ ChannelList::data(const QModelIndex &index, int role) const {
     }
     break;
   case 14:
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+      if (digi->roaming())
+        return digi->roaming()->name();
+      else
+        return tr("-");
+    } else if (channel->is<AnalogChannel>()) {
+      return tr("[None]");
+    }
+    break;
+  case 15:
     if (channel->is<DigitalChannel>()) {
       return tr("[None]");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
@@ -616,7 +626,7 @@ ChannelList::data(const QModelIndex &index, int role) const {
         return analog->squelch();
     }
     break;
-  case 15:
+  case 16:
     if (channel->is<DigitalChannel>()) {
       return tr("[None]");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
@@ -626,7 +636,7 @@ ChannelList::data(const QModelIndex &index, int role) const {
         return Signaling::codeLabel(analog->rxTone());
     }
     break;
-  case 16:
+  case 17:
     if (channel->is<DigitalChannel>()) {
       return tr("[None]");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
@@ -636,7 +646,7 @@ ChannelList::data(const QModelIndex &index, int role) const {
         return Signaling::codeLabel(analog->txTone());
     }
     break;
-  case 17:
+  case 18:
     if (channel->is<DigitalChannel>()) {
       return tr("[None]");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
@@ -673,10 +683,11 @@ ChannelList::headerData(int section, Qt::Orientation orientation, int role) cons
   case 11: return tr("RX Group List");
   case 12: return tr("TX Contact");
   case 13: return tr("GPS/APRS");
-  case 14: return tr("Squelch");
-  case 15: return tr("Rx Tone");
-  case 16: return tr("Tx Tone");
-  case 17: return tr("Bandwidth");
+  case 14: return tr("Roaming");
+  case 15: return tr("Squelch");
+  case 16: return tr("Rx Tone");
+  case 17: return tr("Tx Tone");
+  case 18: return tr("Bandwidth");
     default:
       break;
   }

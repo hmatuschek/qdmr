@@ -74,6 +74,16 @@ DigitalChannelDialog::construct() {
     if (_channel && (_channel->posSystem() == sys))
       gpsSystem->setCurrentIndex(i+1);
   }
+  roaming->addItem(tr("[None]"), QVariant::fromValue((RoamingZone *)nullptr));
+  roaming->addItem(tr("[Default]"), QVariant::fromValue(DefaultRoamingZone::get()));
+  if (_channel && (_channel->roaming() == DefaultRoamingZone::get()))
+    roaming->setCurrentIndex(1);
+  for (int i=0; i<_config->roaming()->count(); i++) {
+    RoamingZone *zone = _config->roaming()->zone(i);
+    roaming->addItem(zone->name(), QVariant::fromValue(zone));
+    if (_channel && (_channel->roaming() == zone))
+      roaming->setCurrentIndex(i+2);
+  }
 
   if (_channel) {
     channelName->setText(_channel->name());
@@ -114,6 +124,7 @@ DigitalChannelDialog::channel() {
   DigitalContact *contact = txContact->currentData().value<DigitalContact *>();
   ScanList *scanlist = scanList->currentData().value<ScanList *>();
   PositioningSystem *pos = gpsSystem->currentData().value<PositioningSystem *>();
+  RoamingZone *roamingZone = roaming->currentData().value<RoamingZone *>();
 
   if (_channel) {
     _channel->setName(name);
@@ -129,11 +140,12 @@ DigitalChannelDialog::channel() {
     _channel->setRXGroupList(rxgroup);
     _channel->setTXContact(contact);
     _channel->setPosSystem(pos);
+    _channel->setRoaming(roamingZone);
     return _channel;
   }
 
   return new DigitalChannel(name, rx, tx, pwr, timeout, rxonly, admit, colorcode, ts, rxgroup,
-                            contact, pos, scanlist, nullptr);
+                            contact, pos, scanlist, roamingZone);
 }
 
 void
