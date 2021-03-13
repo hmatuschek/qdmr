@@ -311,6 +311,24 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
   }
   stream << qSetFieldWidth(0) << left << "\n";
 
+  stream << "# Table of roaming zones.\n"
+            "# 1) Roaming zone number\n"
+            "# 2) Name in quotes. \n"
+            "# 3) List of digital channels: numbers and ranges (N-M) separated by comma\n"
+            "#\n"
+            "Zone    Name                Channels\n";
+  for (int i=0; i<config->roaming()->count(); i++) {
+    RoamingZone *zone = config->roaming()->zone(i);
+    stream << qSetFieldWidth(8)  << left << (i+1)
+           << qSetFieldWidth(20) << left << ("\"" + zone->name() + "\"");
+    QStringList tmp;
+    for (int j=0; j<zone->count(); j++) {
+      tmp.append(QString::number(config->channelList()->indexOf(zone->channel(j))+1));
+    }
+    stream << qSetFieldWidth(0) << tmp.join(",") << "\n";
+  }
+  stream << qSetFieldWidth(0) << left << "\n";
+
   return true;
 }
 

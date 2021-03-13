@@ -15,6 +15,8 @@ class RXGroupList;
 class Zone;
 class PositioningSystem;
 class ScanList;
+class RoamingZone;
+
 
 /** The lexer class divides a text stream into tokens. */
 class CSVLexer: public QObject
@@ -159,6 +161,10 @@ public:
   /** Gets called once a scan list has been parsed. */
   virtual bool handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
                               const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage);
+  /** Gets called once a roaming zone list has been parsed. */
+  virtual bool handleRoamingZone(qint64 idx, const QString &name, const QList<qint64> &channels,
+                                 qint64 line, qint64 column, QString &errorMessage);
+
 };
 
 
@@ -227,6 +233,10 @@ protected:
   bool _parse_scanlists(CSVLexer &lexer);
   /** Internal function to parse a scanlist. */
   bool _parse_scanlist(qint64 id, CSVLexer &lexer);
+  /** Internal function to parse a roaming zone list. */
+  bool _parse_roaming_zones(CSVLexer &lexer);
+  /** Internal function to parse a zone. */
+  bool _parse_roaming_zone(qint64 id, CSVLexer &lexer);
 
 protected:
   /** Holds the current error message. */
@@ -283,6 +293,8 @@ public:
                                 qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
                               const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage);
+  virtual bool handleRoamingZone(qint64 idx, const QString &name, const QList<qint64> &channels,
+                                 qint64 line, qint64 column, QString &errorMessage);
 
 protected:
   /** If @c true, the reader is in "link" mode. */
@@ -301,6 +313,8 @@ protected:
   QMap<int, PositioningSystem *> _posSystems;
   /** Index <-> Scan list map. */
   QMap<int, ScanList *> _scanlists;
+  /** Index <-> RoamingZone map */
+  QMap<int, RoamingZone *> _roamingZones;
 };
 
 #endif // CSVREADER_HH

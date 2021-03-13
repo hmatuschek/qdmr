@@ -314,6 +314,19 @@ CSVHandler::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 
   return true;
 }
 
+bool
+CSVHandler::handleRoamingZone(qint64 idx, const QString &name, const QList<qint64> &channels,
+                              qint64 line, qint64 column, QString &errorMessage)
+{
+  Q_UNUSED(idx);
+  Q_UNUSED(name);
+  Q_UNUSED(channels);
+  Q_UNUSED(line);
+  Q_UNUSED(column);
+  Q_UNUSED(errorMessage);
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of CSVParser
@@ -1569,6 +1582,63 @@ CSVParser::_parse_scanlist(qint64 idx, CSVLexer &lexer) {
   return _handler->handleScanList(idx, name, pch1, pch2, txch, lst, line, column, _errorMessage);
 }
 
+bool
+CSVParser::_parse_roaming_zones(CSVLexer &lexer) {
+  // skip rest of header
+  CSVLexer::Token token = lexer.next();
+  for (; CSVLexer::Token::T_KEYWORD==token.type; token=lexer.next()) {
+    // skip
+  }
+  if (CSVLexer::Token::T_NEWLINE != token.type) {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
+  for (; CSVLexer::Token::T_NUMBER == token.type; token=lexer.next()) {
+    qint64 idx = token.value.toInt();
+    if (! _parse_roaming_zone(idx, lexer))
+      return false;
+  }
+
+  if ((CSVLexer::Token::T_NEWLINE == token.type) || (CSVLexer::Token::T_END_OF_STREAM == token.type))
+    return true;
+
+  _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+      .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+  return false;
+}
+
+bool
+CSVParser::_parse_roaming_zone(qint64 idx, CSVLexer &lexer) {
+  CSVLexer::Token token = lexer.next();
+  qint64 line=token.line, column=token.column;
+  if (CSVLexer::Token::T_STRING != token.type) {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+  QString name = token.value;
+
+  QList<qint64> lst;
+  token = lexer.next();
+  while (CSVLexer::Token::T_NUMBER == token.type) {
+    lst.append(token.value.toInt());
+    token = lexer.next();
+    if (CSVLexer::Token::T_COMMA == token.type)
+      token = lexer.next();
+  }
+
+  if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  return _handler->handleRoamingZone(idx, name, lst, line, column, _errorMessage);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of CSVReader
@@ -2059,6 +2129,38 @@ CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 p
   ScanList *lst = new ScanList(name);
   _scanlists[idx] = lst;
   _config->scanlists()->addScanList(lst);
+
+  return true;
+}
+
+bool
+CSVReader::handleRoamingZone(qint64 idx, const QString &name, const QList<qint64> &channels, qint64 line, qint64 column, QString &errorMessage)
+{
+  if (_link) {
+    foreach(qint64 i, channels) {
+      // Check channels
+      if (! _channels.contains(i)) {
+        errorMessage = QString("Parse error @ %1,%2: Cannot create zone '%3', unknown channel index %4.")
+            .arg(line).arg(column).arg(name).arg(i);
+        return false;
+      } else if (_channels[i]->is<AnalogChannel>()) {
+        errorMessage = QString("Parse error @ %1,%2: Cannot add channel '%3' (idx %4) "
+                               "to roaming zone, only digital channels can be used.")
+            .arg(line).arg(column).arg(name).arg(i);
+        return false;
+      }
+      _roamingZones[idx]->addChannel(_channels[i]->as<DigitalChannel>());
+    }
+    // done
+    return true;
+  }
+
+  // check index
+  if (! _zones.contains(idx)) {
+    RoamingZone *zone = new RoamingZone(name);
+    _roamingZones[idx] = zone;
+    _config->roaming()->addZone(zone);
+  }
 
   return true;
 }
