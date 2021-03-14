@@ -1102,7 +1102,7 @@ public:
    * Memmory layout of roaming zone (0x80byte):
    * @verbinclude d878uvroamingzone.txt */
   struct __attribute__((packed)) roaming_zone_t {
-    uint8_t channels[64];          ///< List of roaming channel indices, 0xff=unused/end-of-list.
+    uint8_t channels[64];          ///< List of roaming channel indices 0-based, 0xff=unused/end-of-list.
     uint8_t name[16];              ///< Roaming zone name, 16b ASCII 0x00 padded.
     uint8_t _unused80[48];         ///< Unused, set to 0x00.
 

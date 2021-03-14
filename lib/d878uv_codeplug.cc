@@ -1936,11 +1936,11 @@ D878UVCodeplug::encode(Config *config, bool update)
     // Encode channels and store in index<->channel map
     int i=0; QSet<DigitalChannel*>::iterator ch=roaming_channels.begin();
     for(; ch != roaming_channels.end(); ch++, i++) {
-      roaming_ch_map[*ch] = i+1;
+      roaming_ch_map[*ch] = i;
       uint32_t addr = ADDR_ROAMING_CHANNEL_0+i*ROAMING_CHANNEL_OFFSET;
       roaming_channel_t *rch = (roaming_channel_t *)data(addr);
       rch->fromChannel(*ch);
-      logDebug() << "Encode roaming channel " << (*ch)->name() << " (" << (i+1)
+      logDebug() << "Encode roaming channel " << (*ch)->name() << " (" << i
                  << ") at " << hex << addr;
     }
   }
@@ -2093,7 +2093,7 @@ D878UVCodeplug::decode(Config *config)
     DigitalChannel *digi = ch->toChannel(ctx);
     if (digi) {
       logDebug() << "Register channel '" << digi->name() << "' as roaming channel " << i+1;
-      ctx.addRoamingChannel(digi, i+1);
+      ctx.addRoamingChannel(digi, i);
     }
   }
 
@@ -2106,7 +2106,7 @@ D878UVCodeplug::decode(Config *config)
     uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
     roaming_zone_t *z = (roaming_zone_t *)data(addr);
     RoamingZone *zone = z->toRoamingZone();
-    ctx.addRoamingZone(zone, i);
+    ctx.addRoamingZone(zone, i+1);
     z->linkRoamingZone(zone, ctx);
   }
 
