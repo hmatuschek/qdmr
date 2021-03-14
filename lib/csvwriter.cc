@@ -59,33 +59,33 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     if (config->channelList()->channel(i)->is<AnalogChannel>())
       continue;
     DigitalChannel *digi = config->channelList()->channel(i)->as<DigitalChannel>();
-    stream << qSetFieldWidth(8)  << left << (i+1)
-           << qSetFieldWidth(20) << left << ("\"" + digi->name() + "\"")
-           << qSetFieldWidth(11) << left << format_frequency(digi->rxFrequency());
+    stream << qSetFieldWidth(8)  << Qt::left << (i+1)
+           << qSetFieldWidth(20) << Qt::left << ("\"" + digi->name() + "\"")
+           << qSetFieldWidth(11) << Qt::left << format_frequency(digi->rxFrequency());
     if (digi->txFrequency()<digi->rxFrequency())
-      stream << qSetFieldWidth(11) << left << format_frequency(digi->txFrequency()-digi->rxFrequency());
+      stream << qSetFieldWidth(11) << Qt::left << format_frequency(digi->txFrequency()-digi->rxFrequency());
     else
-      stream << qSetFieldWidth(11) << left << format_frequency(digi->txFrequency());
-    stream << qSetFieldWidth(6)  << left << power2string(digi->power())
-           << qSetFieldWidth(5)  << left << ( nullptr != digi->scanList() ?
+      stream << qSetFieldWidth(11) << Qt::left << format_frequency(digi->txFrequency());
+    stream << qSetFieldWidth(6)  << Qt::left << power2string(digi->power())
+           << qSetFieldWidth(5)  << Qt::left << ( nullptr != digi->scanList() ?
           QString::number(config->scanlists()->indexOf(digi->scanList())+1) : QString("-") )
-           << qSetFieldWidth(4)  << left << ( (0 == digi->txTimeout()) ? QString("-") : QString::number(digi->txTimeout()) )
-           << qSetFieldWidth(3)  << left << (digi->rxOnly() ? '+' : '-')
-           << qSetFieldWidth(7)  << left << ((DigitalChannel::AdmitNone==digi->admit()) ? "-" : ((DigitalChannel::AdmitFree==digi->admit()) ? "Free" : "Color"))
-           << qSetFieldWidth(3)  << left << digi->colorCode()
-           << qSetFieldWidth(3)  << left << (DigitalChannel::TimeSlot1==digi->timeslot() ? "1" : "2");
+           << qSetFieldWidth(4)  << Qt::left << ( (0 == digi->txTimeout()) ? QString("-") : QString::number(digi->txTimeout()) )
+           << qSetFieldWidth(3)  << Qt::left << (digi->rxOnly() ? '+' : '-')
+           << qSetFieldWidth(7)  << Qt::left << ((DigitalChannel::AdmitNone==digi->admit()) ? "-" : ((DigitalChannel::AdmitFree==digi->admit()) ? "Free" : "Color"))
+           << qSetFieldWidth(3)  << Qt::left << digi->colorCode()
+           << qSetFieldWidth(3)  << Qt::left << (DigitalChannel::TimeSlot1==digi->timeslot() ? "1" : "2");
     if (nullptr == digi->rxGroupList())
-      stream << qSetFieldWidth(5)  << left << '-';
+      stream << qSetFieldWidth(5)  << Qt::left << '-';
     else
-      stream << qSetFieldWidth(5) << left << (config->rxGroupLists()->indexOf(digi->rxGroupList())+1);
+      stream << qSetFieldWidth(5) << Qt::left << (config->rxGroupLists()->indexOf(digi->rxGroupList())+1);
     if (nullptr == digi->txContact())
-      stream << qSetFieldWidth(4)  << left << '-';
+      stream << qSetFieldWidth(4)  << Qt::left << '-';
     else
-      stream << qSetFieldWidth(4) << left << (config->contacts()->indexOf(digi->txContact())+1);
+      stream << qSetFieldWidth(4) << Qt::left << (config->contacts()->indexOf(digi->txContact())+1);
     if (nullptr == digi->gpsSystem())
-      stream << qSetFieldWidth(4) << left << "-";
+      stream << qSetFieldWidth(4) << Qt::left << "-";
     else
-      stream << qSetFieldWidth(4) << left << config->gpsSystems()->indexOf(digi->gpsSystem())+1;
+      stream << qSetFieldWidth(4) << Qt::left << config->gpsSystems()->indexOf(digi->gpsSystem())+1;
     if (digi->txContact())
       stream << qSetFieldWidth(0) << "# " << digi->txContact()->name();
     stream << qSetFieldWidth(0) << "\n";
@@ -112,23 +112,23 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     if (config->channelList()->channel(i)->is<DigitalChannel>())
       continue;
     AnalogChannel *analog = config->channelList()->channel(i)->as<AnalogChannel>();
-    stream << qSetFieldWidth(8)  << left << (i+1)
-           << qSetFieldWidth(20) << left << ("\"" + analog->name() + "\"")
-           << qSetFieldWidth(10) << left << format_frequency(analog->rxFrequency());
+    stream << qSetFieldWidth(8)  << Qt::left << (i+1)
+           << qSetFieldWidth(20) << Qt::left << ("\"" + analog->name() + "\"")
+           << qSetFieldWidth(10) << Qt::left << format_frequency(analog->rxFrequency());
     if (analog->txFrequency()<analog->rxFrequency())
-      stream << qSetFieldWidth(11) << left << format_frequency(analog->txFrequency()-analog->rxFrequency());
+      stream << qSetFieldWidth(11) << Qt::left << format_frequency(analog->txFrequency()-analog->rxFrequency());
     else
-      stream << qSetFieldWidth(11) << left << format_frequency(analog->txFrequency());
-    stream << qSetFieldWidth(6)  << left << power2string(analog->power())
-           << qSetFieldWidth(5)  << left << ( nullptr != analog->scanList() ?
+      stream << qSetFieldWidth(11) << Qt::left << format_frequency(analog->txFrequency());
+    stream << qSetFieldWidth(6)  << Qt::left << power2string(analog->power())
+           << qSetFieldWidth(5)  << Qt::left << ( nullptr != analog->scanList() ?
           QString::number(config->scanlists()->indexOf(analog->scanList())+1) : QString("-") )
-           << qSetFieldWidth(4)  << left << ( (0 == analog->txTimeout()) ? QString("-") : QString::number(analog->txTimeout()) )
-           << qSetFieldWidth(3)  << left << (analog->rxOnly() ? '+' : '-')
-           << qSetFieldWidth(7)  << left << ((AnalogChannel::AdmitNone==analog->admit()) ? "-" : ((AnalogChannel::AdmitFree==analog->admit()) ? "Free" : "Tone"))
-           << qSetFieldWidth(8)  << left << analog->squelch()
-           << qSetFieldWidth(7)  << left << Signaling::configString(analog->rxTone())
-           << qSetFieldWidth(7)  << left << Signaling::configString(analog->txTone())
-           << qSetFieldWidth(5) << left << (AnalogChannel::BWWide == analog->bandwidth() ? 25.0 : 12.5)
+           << qSetFieldWidth(4)  << Qt::left << ( (0 == analog->txTimeout()) ? QString("-") : QString::number(analog->txTimeout()) )
+           << qSetFieldWidth(3)  << Qt::left << (analog->rxOnly() ? '+' : '-')
+           << qSetFieldWidth(7)  << Qt::left << ((AnalogChannel::AdmitNone==analog->admit()) ? "-" : ((AnalogChannel::AdmitFree==analog->admit()) ? "Free" : "Tone"))
+           << qSetFieldWidth(8)  << Qt::left << analog->squelch()
+           << qSetFieldWidth(7)  << Qt::left << Signaling::configString(analog->rxTone())
+           << qSetFieldWidth(7)  << Qt::left << Signaling::configString(analog->txTone())
+           << qSetFieldWidth(5) << Qt::left << (AnalogChannel::BWWide == analog->bandwidth() ? 25.0 : 12.5)
            << qSetFieldWidth(0) << "\n";
   }
   stream << "\n";
@@ -143,9 +143,9 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
   for (int i=0; i<config->zones()->count(); i++) {
     Zone *zone = config->zones()->zone(i);
     if (zone->A()->count()) {
-      stream << qSetFieldWidth(8)  << left << (i+1)
-             << qSetFieldWidth(20) << left << ("\"" + zone->name() + "\"")
-             << qSetFieldWidth(4)  << left << "A";
+      stream << qSetFieldWidth(8)  << Qt::left << (i+1)
+             << qSetFieldWidth(20) << Qt::left << ("\"" + zone->name() + "\"")
+             << qSetFieldWidth(4)  << Qt::left << "A";
       QStringList tmp;
       for (int j=0; j<zone->A()->count(); j++) {
         tmp.append(QString::number(config->channelList()->indexOf(zone->A()->channel(j))+1));
@@ -153,9 +153,9 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
       stream << qSetFieldWidth(0) << tmp.join(",") << "\n";
     }
     if (zone->B()->count()) {
-      stream << qSetFieldWidth(8)  << left << (i+1)
-             << qSetFieldWidth(20) << left << ("\"" + zone->name() + "\"")
-             << qSetFieldWidth(4)  << left << "B";
+      stream << qSetFieldWidth(8)  << Qt::left << (i+1)
+             << qSetFieldWidth(20) << Qt::left << ("\"" + zone->name() + "\"")
+             << qSetFieldWidth(4)  << Qt::left << "B";
       QStringList tmp;
       for (int j=0; j<zone->B()->count(); j++) {
         tmp.append(QString::number(config->channelList()->indexOf(zone->B()->channel(j))+1));
@@ -176,28 +176,28 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "Scanlist Name                PCh1 PCh2 TxCh Channels\n";
   for (int i=0; i<config->scanlists()->count(); i++) {
     ScanList *list = config->scanlists()->scanlist(i);
-    stream << qSetFieldWidth(9)  << left << (i+1)
-           << qSetFieldWidth(20) << left << ("\"" + list->name() + "\"");
+    stream << qSetFieldWidth(9)  << Qt::left << (i+1)
+           << qSetFieldWidth(20) << Qt::left << ("\"" + list->name() + "\"");
     if (nullptr == list->priorityChannel())
-      stream << qSetFieldWidth(5)  << left << "-";
+      stream << qSetFieldWidth(5)  << Qt::left << "-";
     else if (SelectedChannel::get() == list->priorityChannel())
-      stream << qSetFieldWidth(5)  << left << "Sel";
+      stream << qSetFieldWidth(5)  << Qt::left << "Sel";
     else
-      stream << qSetFieldWidth(5)  << left <<
+      stream << qSetFieldWidth(5)  << Qt::left <<
                 QString::number(config->channelList()->indexOf(list->priorityChannel())+1);
     if (nullptr == list->secPriorityChannel())
-      stream << qSetFieldWidth(5)  << left << "-";
+      stream << qSetFieldWidth(5)  << Qt::left << "-";
     else if (SelectedChannel::get() == list->secPriorityChannel())
-      stream << qSetFieldWidth(5)  << left << "Sel";
+      stream << qSetFieldWidth(5)  << Qt::left << "Sel";
     else
-      stream << qSetFieldWidth(5)  << left <<
+      stream << qSetFieldWidth(5)  << Qt::left <<
                 QString::number(config->channelList()->indexOf(list->secPriorityChannel())+1);
     if (nullptr == list->txChannel())
-      stream << qSetFieldWidth(5)  << left << "-";
+      stream << qSetFieldWidth(5)  << Qt::left << "-";
     else if (SelectedChannel::get() == list->txChannel())
-      stream << qSetFieldWidth(5)  << left << "Sel";
+      stream << qSetFieldWidth(5)  << Qt::left << "Sel";
     else
-      stream << qSetFieldWidth(5)  << left
+      stream << qSetFieldWidth(5)  << Qt::left
              << QString::number(config->channelList()->indexOf(list->txChannel())+1);
     QStringList tmp;
     for (int j=0; j<list->count(); j++) {
@@ -220,11 +220,11 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "GPS  Name                Dest Period Revert\n";
   for (int i=0; i<config->gpsSystems()->count(); i++) {
     GPSSystem *gps = config->gpsSystems()->gpsSystem(i);
-    stream << qSetFieldWidth(5)  << left << (i+1)
-           << qSetFieldWidth(20) << left << ("\"" + gps->name() + "\"")
-           << qSetFieldWidth(5)  << left << config->contacts()->indexOfDigital(gps->contact())+1
-           << qSetFieldWidth(7)  << left << gps->period()
-           << qSetFieldWidth(6)  << left
+    stream << qSetFieldWidth(5)  << Qt::left << (i+1)
+           << qSetFieldWidth(20) << Qt::left << ("\"" + gps->name() + "\"")
+           << qSetFieldWidth(5)  << Qt::left << config->contacts()->indexOfDigital(gps->contact())+1
+           << qSetFieldWidth(7)  << Qt::left << gps->period()
+           << qSetFieldWidth(6)  << Qt::left
            << ( (gps->hasRevertChannel()) ? QString::number(config->channelList()->indexOf(gps->revertChannel())+1) : "-" )
            << "\n";
   }
@@ -241,22 +241,22 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
   for (int i=0; i<config->contacts()->count(); i++) {
     if (config->contacts()->contact(i)->is<DigitalContact>()) {
       DigitalContact *contact = config->contacts()->contact(i)->as<DigitalContact>();
-      stream << qSetFieldWidth(8)  << left << (i+1)
-             << qSetFieldWidth(20) << left << ("\"" + contact->name() + "\"")
-             << qSetFieldWidth(8)  << left
+      stream << qSetFieldWidth(8)  << Qt::left << (i+1)
+             << qSetFieldWidth(20) << Qt::left << ("\"" + contact->name() + "\"")
+             << qSetFieldWidth(8)  << Qt::left
              << (DigitalContact::PrivateCall == contact->type() ?
                    "Private" : (DigitalContact::GroupCall == contact->type() ?
                                   "Group" : "All"))
-             << qSetFieldWidth(12)  << left << contact->number()
-             << qSetFieldWidth(6)  << left << (contact->rxTone() ? "+" : "-");
+             << qSetFieldWidth(12)  << Qt::left << contact->number()
+             << qSetFieldWidth(6)  << Qt::left << (contact->rxTone() ? "+" : "-");
       stream << qSetFieldWidth(0) << "\n";
     } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
       DTMFContact *contact = config->contacts()->contact(i)->as<DTMFContact>();
-      stream << qSetFieldWidth(8)  << left << (i+1)
-             << qSetFieldWidth(17) << left << ("\"" + contact->name() + "\"")
-             << qSetFieldWidth(8)  << left << "DTMF"
-             << qSetFieldWidth(12) << left << ("\""+contact->number()+"\"")
-             << qSetFieldWidth(6)  << left << (contact->rxTone() ? "+" : "-");
+      stream << qSetFieldWidth(8)  << Qt::left << (i+1)
+             << qSetFieldWidth(17) << Qt::left << ("\"" + contact->name() + "\"")
+             << qSetFieldWidth(8)  << Qt::left << "DTMF"
+             << qSetFieldWidth(12) << Qt::left << ("\""+contact->number()+"\"")
+             << qSetFieldWidth(6)  << Qt::left << (contact->rxTone() ? "+" : "-");
       stream << qSetFieldWidth(0) << "\n";
     }
   }
@@ -270,8 +270,8 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "Grouplist Name                Contacts\n";
   for (int i=0; i<config->rxGroupLists()->count(); i++) {
     RXGroupList *list = config->rxGroupLists()->list(i);
-    stream << qSetFieldWidth(10) << left << (i+1)
-           << qSetFieldWidth(20) << left << ("\"" + list->name() + "\"");
+    stream << qSetFieldWidth(10) << Qt::left << (i+1)
+           << qSetFieldWidth(20) << Qt::left << ("\"" + list->name() + "\"");
     QStringList tmp;
     for (int j=0; j<list->count(); j++) {
       tmp.append(QString::number(config->contacts()->indexOf(list->contact(j))+1));
