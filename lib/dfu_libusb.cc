@@ -36,8 +36,8 @@ enum {
 DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
   : QObject(parent), RadioInterface(), _ctx(nullptr), _dev(nullptr), _ident(nullptr)
 {
-  logDebug() << "Try to detect USB DFU interface " << hex << vid << ":" << pid << ".";
-
+  //logDebug() << "Try to detect USB DFU interface " << Qt::hex << vid << ":" << pid << ".";
+  logDebug() << "Try to detect USB DFU interface " << vid << ":" << pid << ".";
   int error = libusb_init(&_ctx);
   if (error < 0) {
     _errorMessage = tr("%1 Libusb init failed: %2 %3").arg(__func__).arg(error)
@@ -303,7 +303,7 @@ DFUDevice::identify()
 
 
 bool
-DFUDevice::erase(uint start, uint size) {
+DFUDevice::erase(uint start, uint size, void(*progress)(uint, void *), void *ctx) {
   int error;
   // Enter Programming Mode.
   if ((error = get_status()))
@@ -314,17 +314,15 @@ DFUDevice::erase(uint start, uint size) {
     return false;
   usleep(100000);
 
-  logDebug() << "Erase flash for section 0x" << hex << start << " of size 0x" << hex << size;
-
   uint end = start+size;
   start = align_addr(start, 0x10000);
   end = align_size(end, 0x10000);
   size = end-start;
 
-  logDebug() << "Erase block at 0x" << hex << start << " of size 0x" << hex << size;
   for (uint i=0; i<size; i+=0x10000) {
-    logDebug() << "Erase 0x10000 block at 0x" << hex << (start+i);
     erase_block(start+i);
+    if (progress)
+      progress((i*100)/size, ctx);
   }
 
   // Zero address.
@@ -333,6 +331,8 @@ DFUDevice::erase(uint start, uint size) {
 
 bool
 DFUDevice::read_start(uint32_t bank, uint32_t addr) {
+  Q_UNUSED(bank);
+  Q_UNUSED(addr);
   // pass...
   return true;
 }
@@ -365,7 +365,8 @@ DFUDevice::read_finish() {
 
 bool
 DFUDevice::write_start(uint32_t bank, uint32_t addr) {
-  // pass...
+  Q_UNUSED(bank);
+  Q_UNUSED(addr);
   return true;
 }
 

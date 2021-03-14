@@ -270,7 +270,7 @@ DFUFile::data(uint32_t offset, uint32_t img) const {
 
 void
 DFUFile::dump(QTextStream &stream) const {
-  stream << "DFU file with " << _images.size() << " images:" << endl;
+  stream << "DFU file with " << _images.size() << " images:\n";
   foreach (const Image &i, _images) {
     i.dump(stream);
   }
@@ -395,7 +395,8 @@ DFUFile::Element::write(QFile &file, CRC32 &crc, QString &errorMessage) const {
 
 void
 DFUFile::Element::dump(QTextStream &stream) const {
-  stream << "  Element @ 0x" << hex << _address << ", size=0x" << hex << _data.size() << endl;
+  stream.setIntegerBase(16);
+  stream << "  Element @ 0x" << _address << ", size=0x" << _data.size() << "\n";
   int nrow = _data.size()/16;
   uint8_t last_line[16]; memset(last_line, 0, 16);
   bool skipping = false;
@@ -404,20 +405,21 @@ DFUFile::Element::dump(QTextStream &stream) const {
       continue;
     if ((i>0) && (0==memcmp(last_line, _data.constData()+i*16, 16))) {
       skipping = true;
-      stream << qSetFieldWidth(8) << right << "*" << qSetFieldWidth(1) << endl;
+      stream.setFieldAlignment(QTextStream::AlignRight);
+      stream << qSetFieldWidth(8) << "*" << qSetFieldWidth(1) << "\n";
       continue;
     }
     memcpy(last_line, _data.constData()+i*16, 16);
     skipping = false;
-    stream << qSetFieldWidth(8) << right << hex << (_address+i*16)
+    stream << qSetFieldWidth(8) << (_address+i*16)
            << qSetFieldWidth(1) << "  ";
     for (int j=(i*16); j<(i*16+8); j++) {
-      stream << qSetFieldWidth(2) << right << hex << uint8_t(_data.at(j))
+      stream << qSetFieldWidth(2) << uint8_t(_data.at(j))
              << qSetFieldWidth(1) << " ";
     }
     stream << " ";
     for (int j=(i*16+8); j<(i*16+16); j++) {
-      stream << qSetFieldWidth(2) << right << hex << uint8_t(_data.at(j))
+      stream << qSetFieldWidth(2) << uint8_t(_data.at(j))
              << qSetFieldWidth(1) << " ";
     }
     stream << " |";
@@ -428,7 +430,7 @@ DFUFile::Element::dump(QTextStream &stream) const {
       else
         stream << ".";
     }
-    stream << "|" << endl;
+    stream << "|\n";
   }
 }
 
@@ -628,7 +630,7 @@ DFUFile::Image::dump(QTextStream &stream) const {
     stream << ", target not named";
   else
     stream << ", target '" << _name << "'";
-  stream << ", #elements=" << _elements.size() << ":" << endl;
+  stream << ", #elements=" << _elements.size() << ":\n";
   foreach (const Element &e, _elements) {
     e.dump(stream);
   }

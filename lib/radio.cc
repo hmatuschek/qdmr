@@ -340,7 +340,7 @@ found:
     return new RD5R();
   } else if (("MD-760P" == id) || ("GD77" == force.toUpper())) {
     return new GD77();
-  } else if (("MD-UV390" == id) || ("UV390" == force.toUpper())) {
+  } else if (("MD-UV380" == id) || ("MD-UV390" == id) || ("UV390" == force.toUpper())) {
     return new UV390();
   } else if (("OpenGD77" == id) || ("OpenGD77" == force.toUpper())) {
     return new OpenGD77();

@@ -6,6 +6,7 @@
 #include "logger.hh"
 #include "radio.hh"
 #include "userdatabase.hh"
+#include "progressbar.hh"
 
 
 int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
@@ -46,6 +47,9 @@ int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     logError() << "Could not detect a known radio. Check connection?";
     return -1;
   }
+
+  showProgress();
+  QObject::connect(radio, &Radio::uploadProgress, updateProgress);
 
   if (! radio->startUploadCallsignDB(&userdb, true)) {
     logError() << "Could not upload call-sign DB to radio: " << radio->errorMessage();

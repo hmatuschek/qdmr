@@ -185,7 +185,6 @@ bool D878UV::download() {
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();
-    logDebug() << "Download of block " << n << " " << hex << addr << ":" << size;
     if (! _dev->read(0, addr, _codeplug.data(addr), size)) {
       _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
           .arg(_dev->errorMessage());
@@ -225,7 +224,6 @@ bool D878UV::download() {
   for (int n=nstart; n<_codeplug.image(0).numElements(); n++) {
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();
-    logDebug() << "Download of block " << n << " " << hex << addr << ":" << size;
     if (! _dev->read(0, addr, _codeplug.data(addr), size)) {
       _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
           .arg(_dev->errorMessage());
@@ -250,7 +248,6 @@ D878UV::upload() {
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();
-    logDebug() << "Download of block " << n << " " << hex << addr << ":" << size;
     if (! _dev->read(0, addr, _codeplug.data(addr), size)) {
       _errorMessage = QString("%1 Cannot read codeplug for update: %2").arg(__func__)
           .arg(_dev->errorMessage());
@@ -272,7 +269,6 @@ D878UV::upload() {
   for (int n=nbitmaps; n<_codeplug.image(0).numElements(); n++) {
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();
-    logDebug() << "Download of block " << n << " " << hex << addr << ":" << size;
     if (! _dev->read(0, addr, _codeplug.data(addr), size)) {
       _errorMessage = QString("%1 Cannot read codeplug for update: %2").arg(__func__)
           .arg(_dev->errorMessage());
