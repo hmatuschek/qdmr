@@ -204,6 +204,9 @@ void
 PositioningSystems::clear() {
   for (int i=0; i<count(); i++)
     _posSystems[i]->deleteLater();
+  beginResetModel();
+  _posSystems.clear();
+  endResetModel();
 }
 
 int

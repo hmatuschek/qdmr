@@ -1093,8 +1093,6 @@ D878UVCodeplug::aprs_setting_t::linkAPRSSystem(APRSSystem *sys, CodeplugContext 
               << ", create one as 'APRS Channel'";
     ctx.config()->channelList()->addChannel(ch);
   }
-  logDebug() << "Link APRS system '" << sys->name()
-             << "' to analog channel '" << ch->name() << "'.";
   sys->setChannel(ch);
 }
 
