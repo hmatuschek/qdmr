@@ -56,6 +56,6 @@ The *diff* of the two hex files reveals
 ```
 This tells me, that at the address 0x02500020 + 8, a single byte changed from 00 to 01. The entire
 remaining code-plug (about 100kB) stayed the same. Comparing the address 0x02500028 with the 
-(https://dm3mat.darc.de/qdmr/libdmrconf/class_d878_u_v_codeplug.html)[coarse memory layout] 
+[coarse memory layout](https://dm3mat.darc.de/qdmr/libdmrconf/class_d878_u_v_codeplug.html) 
 of the code-plug tells me, that byte 40 (hex 0x28) of the general settings section of the 
 code-plug enables or disables the GPS.
