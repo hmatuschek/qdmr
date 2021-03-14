@@ -201,7 +201,7 @@ void
 ZoneDialog::onHideZoneHint() {
   zoneHint->setVisible(false);
   Settings settings;
-  settings.setHideZoneNote(false);
+  settings.setHideZoneNote(true);
 }
 
 Zone *
