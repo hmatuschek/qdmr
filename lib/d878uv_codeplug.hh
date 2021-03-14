@@ -126,6 +126,10 @@ class GPSSystem;
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02500000</td> <td>000630</td> <td>General settings, see @c general_settings_t.</td></tr>
+ *  <tr><td>02501280</td> <td>000030</td> <td>General settings extension 1, see @c general_settings_ext1_t.</td></tr>
+ *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2, see @c general_settings_ext2_t.</td></tr>
+ *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
+ *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000. Default 0x00000000, 0x00 padded.</td></tr>
  *
  *  <tr><th colspan="3">Messages</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
@@ -154,9 +158,6 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">Misc</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 offset frequencies.
- *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000. Default 0x00000000, 0x00 padded.</td></tr>
- *  <tr><td>02501400</td> <td>000100</td> <td>Talkeralias settings, see @c talkeralias_setting_t.</td></tr>
  *  <tr><td>024C1400</td> <td>000020</td> <td>Alarm setting, see @c analog_alarm_setting_t.</td></tr>
  *
  *  <tr><th colspan="3">FM Broadcast</th></tr>
@@ -185,7 +186,6 @@ class GPSSystem;
  *  <tr><td>024C1800</td> <td>000500</td> <td>Empty, set to 0x00?</td></tr>
  *  <tr><td>024C2400</td> <td>000030</td> <td>Unknown data.</td></tr>
  *  <tr><td>024C2600</td> <td>000010</td> <td>Unknown data.</td></tr>
- *  <tr><td>02501280</td> <td>000030</td> <td>Unknown, set to 0x00. </td></tr>
  * </table>
  *
  * @ingroup d878uv */
@@ -535,32 +535,32 @@ public:
       REVCH_PRIO_CH2_TB = 7             ///< Priority Channel Select 2 + TalkBack.
     } RevertChannel;
 
-    // Bytes 0-1
-    uint8_t _unused0;                   ///< Unused, set to 0.
+    // Bytes 0x00
+    uint8_t _unused0000;                ///< Unused, set to 0.
     uint8_t prio_ch_select;             ///< Priority Channel Select, default = PRIO_CHAN_OFF.
 
-    // Bytes 2-5
+    // Bytes 0x02
     uint16_t priority_ch1;              ///< Priority Channel 1: 0=Current Channel, index+1, little endian, 0xffff=Off.
     uint16_t priority_ch2;              ///< Priority Channel 2: 0=Current Channel, index+1, little endian, 0xffff=Off.
 
-    // Bytes 6-13
+    // Bytes 0x06
     uint16_t look_back_a;               ///< Look Back Time A, sec*10, little endian, default 0x000f.
     uint16_t look_back_b;               ///< Look Back Time B, sec*10, little endian, default 0x0019.
     uint16_t dropout_delay;             ///< Dropout Delay Time, sec*10, little endian, default 0x001d.
     uint16_t dwell;                     ///< Dwell Time, sec*10, little endian, default 0x001d.
 
-    // Byte 14
+    // Byte 0x0d
     uint8_t revert_channel;             ///< Revert Channel, see @c RevertChannel, default REVCH_SELECTED.
 
-    // Bytes 15-31
+    // Bytes 0xe
     uint8_t name[16];                   ///< Scan List Name, ASCII, 0-terminated.
-    uint8_t _pad31;                     ///< Pad byte, set to 0x00.
+    uint8_t _pad001e;                   ///< Pad byte, set to 0x00.
 
-    // Bytes 32-131
+    // Bytes 0x20
     uint16_t member[50];                ///< Channels indices, 0-based, little endian, 0xffff=empty
 
-    // Bytes 132-143
-    uint8_t _unused132[12];             ///< Unused, set to 0.
+    // Bytes 0x84-0x8f
+    uint8_t _unused0084[12];            ///< Unused, set to 0.
 
     /** Constructor. */
     scanlist_t();
@@ -613,8 +613,10 @@ public:
     void setId(uint32_t num);
   };
 
-  /** Represents the general config of the radio within the binary codeplug. */
-  struct __attribute__((packed)) general_settings_t {
+  /** Represents the general config of the radio within the binary codeplug.
+   *
+   * At 0x02500000, size 0x630. */
+  struct __attribute__((packed)) general_settings_base_t {
     /** Possible power-on display settings. */
     typedef enum {
       PWRON_DEFAULT = 0,           ///< Default.
@@ -624,49 +626,113 @@ public:
 
     // Bytes 0x00-0x0f.
     uint8_t keytone;               ///< Enable key tones, Off=0x00, On=0x01.
-    uint8_t _unknown1[5];          ///< Unknown settings, default= 00 00 00 00 04 00.
+    uint8_t _unknown0001[5];       ///< Unknown settings, default= 00 00 00 00 04 00.
     uint8_t power_on;              ///< Power-on display, see @c PowerOnDisplay, default=PWRON_DEFAULT.
     uint8_t pwron_passwd;          ///< Boot password enabled, Off=0x00, On=0x01.
-    uint8_t _unknown8[8];          ///< Unknown settings block.
+    uint8_t _unknown0008[7];       ///< Unknown settings block.
+    uint8_t mic_gain;              ///< Microphone gain value in [0,4], default 2.
 
-    // Bytes 0x10-0x2f.
-    uint8_t _unknown16[31];        ///< Unknown settings block.
+    // Bytes 0x10-0x1f.
+    uint8_t _unknown0010[16];      ///< Unknown settings block.
+
+    // Bytes 0x20-0x2f.
+    uint8_t _unknown0020[2];       ///< Unknown settings block.
+    uint8_t autorep_uhf2_off;      ///< Auto repeater offset UHF2 index, 0-based, disabled=0xff.
+    uint8_t autorep_vhf2_off;      ///< Auto repeater offset VHF2 index, 0-based, disabled=0xff.
+    uint8_t _unknown0023[4];       ///< Unknown settings block.
+    uint8_t gps_enable;            ///< Enable GPS, Off=0x00, On=0x01.
+    uint8_t _unknown002a[6];       ///< Unknown settings block.
     uint8_t call_alert;            ///< Enable call tone, default=1, Off=0x00, On=0x01.
 
     // Byte 0x30-3f
-    uint8_t _unknown48;            ///< Unknown settings block.
+    uint8_t gps_timezone;          ///< GPS time zone, GMT-12=0x00, GMT=0x0c, GMT+1=0x0d, GMT+13=0x19.
     uint8_t talk_permit_tone;      ///< Enable talk permit, Off=0x00, Digi=0x01, Analog=0x02, Both=0x03.
     uint8_t call_idle_tone;        ///< Enable digi-call idle tone, Off=0x00, On=0x01.
-    uint8_t _unknown51;            ///< Unknown settings, default=0x01
-    uint8_t _unknown52;            ///< Unknown settings, default=0x00
-    uint8_t _unknown53;            ///< Unknown settings, default=0x00
+    uint8_t _unknown0033;          ///< Unknown settings, default=0x01
+    uint8_t _unknown0034;          ///< Unknown settings, default=0x00
+    uint8_t _unknown0035;          ///< Unknown settings, default=0x00
     uint8_t ch_idle_tone;          ///< Enable channel idle tone, Off=0x00, On=0x01.
-    uint8_t _unknown55;            ///< Unknown settings, default=0x01;
+    uint8_t _unknown0037;          ///< Unknown settings, default=0x01;
     uint8_t startup_tone;          ///< Enable Startup tone, Off=0x00, On=0x01.
-    uint8_t _unknown57[7];         ///< Unknown settings block.
+    uint8_t _unknown0039;          ///< Unknown settings block.
+    uint8_t _unknown003a;          ///< Unknown settings block.
+    uint8_t max_sp_volume;         ///< Maximum speaker volume, value in [1,8], default 5.
+    uint8_t _unknown003c;          ///< Unknown settings block.
+    uint8_t _unknown003d;          ///< Unknown settings block.
+    uint8_t _unknown003e;          ///< Unknown settings block.
+    uint8_t gps_sms_enable;        ///< Enable GPS SMS reporting, Off=0x00, On=0x01.
 
-    // Bytes 0x40-0xaf
-    uint8_t _unknown64[112];       ///< Unknown settings block;
+    // Bytes 0x40-0x4f
+    uint8_t _unknown0040[8];       ///< Unknown settings block;
+    uint8_t autorep_vfo_a;         ///< Auto repeater offset direction VFO A, Off=0x00, positive=0x01, negative=0x02, default=off.
+    uint8_t _unknown0049[7];       ///< Unknown settings block;
+
+    // Bytes 0x50-0x5f
+    uint8_t _unknown0050;          ///< Unknown setting.
+    uint8_t _unknown0051;          ///< Unknown setting.
+    uint8_t max_hp_volume;         ///< Maximum headphone volume, value in [1,8], default 5.
+    uint8_t gps_message_enable;    ///< Enable GPS text message, Off=0x00, On=0x01
+    uint8_t _unknown0054[3];       ///< Unknown settings block;
+    uint8_t enh_mic_sound;         ///< Enhanced mic sound quality, Off=0x00, On=0x01.
+    uint8_t _unknown0058[8];       ///< Unknown settings block;
+
+    // Bytes 0x60-0x6f
+    uint8_t _unknown0060[8];       ///< Unknown settings block;
+    uint8_t autorep_uhf1_off;      ///< Auto repeater offset UHF1 index, 0-based, disabled=0xff.
+    uint8_t autorep_vhf1_off;      ///< Auto repeater offset VHF1 index, 0-based, disabled=0xff.
+    uint8_t _unknown0069[6];       ///< Unknown settings block;
+
+    // Bytes 0x70-0xaf
+    uint8_t _unknown0070[64];      ///< Unknown settings block;
 
     // Bytes 0xb0-0xbf
-    uint8_t _unknown176[11];       ///< Unknown settings block;
+    uint8_t _unknown00b0[5];       ///< Unknown settings block.
+    uint8_t gps_sms_interval;      ///< GPS ranging SMS interval in seconds [5,255], default=5.
+    uint8_t _unknown00b6[4];       ///< Unknown settings block.
+    uint8_t roam_period;           ///< Auto roaming period in minutes -1, 1min=0x00, 2m=0x01, 256min=0xff, default=1min.
     uint8_t key_tone_adj;          ///< Key tone adjust, fixed 0x01-0x0f, or 0x00=variable.
-    uint8_t _unknown188[4];        ///< Unknown settings block;
+    uint8_t _unknown00bc;          ///< Unknown settings.
+    uint8_t gps_unit;              ///< GPS units Metric=0x00, Imperial=0x01.
+    uint8_t _unknown00be;          ///< Unknown settings block.
+    uint8_t roam_wait;             ///< Auto roaming wait time in seconds 0s=0x00, 1s=0x01, 30s=0x1e, default=0s.
 
     // Bytes 0xc0-0xcf
-    uint8_t _unknown192[16];       ///< Unknown settings block;
+    uint8_t _unknown00c0[4];       ///< Unknown settings block;
+    uint32_t autorep_vhf1_min;     ///< Auto repeater VHF1 minimum frequency, in 10Hz, little endian.
+    uint32_t autorep_vhf1_max;     ///< Auto repeater VHF1 maximum frequency, in 10Hz, little endian.
+    uint32_t autorep_uhf1_min;     ///< Auto repeater UHF1 minimum frequency, in 10Hz, little endian.
 
     // Bytes 0xd0-0xdf
-    uint8_t _unknown208[6];        ///< Unknown settings block;
+    uint32_t autorep_uhf1_max;     ///< Auto repeater UHF1 maximum frequency, in 10Hz, little endian.
+    uint8_t autorep_vfo_b;         ///< Auto repeater offset direction VFO B, Off=0x00, positive=0x01, negative=0x02, default=off.
+    uint8_t _unknown00d5;          ///< Unknown setting.
     uint8_t boot_ch;               ///< Enable default channel on boot, Off=0x00, On=0x01.
     uint8_t vfo_a_zone_index;      ///< Index of default zone for VFO A, 0-based, default=0.
     uint8_t vfo_b_zone_index;      ///< Index of default zone for VFO B, 0-based, default=0.
     uint8_t vfo_a_ch_index;        ///< Default channel index (within selected zone) for VFO A, 0-based, default=0, 0xff=VFO.
     uint8_t vfo_b_ch_index;        ///< Default channel index (within selected zone) for VFO B, 0-based, default=0, 0xff=VFO.
-    uint8_t _unknown219[5];        ///< Unknown settings block.
+    uint8_t _unknown00db;          ///< Unknown setting.
+    uint8_t roam_default_zone;     ///< Roaming default zone index, 0-based.
+    uint8_t repchk_enable;         ///< Repeater range check enable, Off=0x00, On=0x01.
+    uint8_t repchk_interval;       ///< Repeater range check interval in multiple of 5 seconds, 30s=0x05, 35s=0x06, default=30s.
+    uint8_t repchk_recon;          ///< Number of reconnections 3=0x00, 4=0x01, 5=0x02, default=5.
 
-    // Bytes 0x0e0-0x5ff
-    uint8_t  _unknown224[1312];    ///< Large unknown settings block.
+    // Bytes 0x0e0-0x0ef
+    uint8_t roam_start_cond;       ///< Auto roaming start condition, Periodic=0x00, Out-of-range=0x01.
+    uint8_t  _unknown00e1[4];      ///< Unknown settings block.
+    uint8_t  repchk_notify;        ///< Repeater range check notification Off=0x00, Beep=0x01, Voice=0x02, default=Voice.
+    uint8_t  _unknown00e6;         ///< Unknown settings block.
+    uint8_t  roam_enable;          ///< Enable roaming, Off=0x00, On=0x01.
+    uint8_t  _unknown00e8;         ///< Unknown settings block.
+    uint8_t  _unknown00e9;         ///< Unknown settings block.
+    uint8_t  repchk_num_notify;    ///< Number of repeater out-of-range notifications, 1=0x00, 2=0x01, 3=0x02, 10=0x0b, default=3.
+    uint8_t  _unknown00eb[5];      ///< Unknown settings block.
+
+    // Bytes 0x0f0-0x0ff
+    uint8_t  _unknown00f0[16];     ///< Unknown settings block.
+
+    // Bytes 0x100-0x5ff
+    uint8_t  _unknown0100[1280];    ///< Huge unknown settings block.
 
     // Bytes 0x600-0x61f
     uint8_t intro_line1[16];       ///< Intro line 1, up to 14 ASCII characters, 0-terminated.
@@ -676,7 +742,7 @@ public:
     uint8_t password[16];          ///< Boot password, up to 8 ASCII digits, 0-terminated.
 
     /** Constructs an empty general settings. */
-    general_settings_t();
+    general_settings_base_t();
     /** Clears the general setting. */
     void clear();
 
@@ -684,11 +750,72 @@ public:
     QString getIntroLine1() const;
     /** Sets the first intro-line. */
     void setIntroLine1(const QString line);
+
     /** Returns the second intro-line. */
     QString getIntroLine2() const;
     /** Sets the second intro-line. */
     void setIntroLine2(const QString line);
+
+    uint getMicGain() const;
+    void setMicGain(uint gain);
+
+    void fromConfig(const Config *config);
+    void updateConfig(Config *config);
   };
+
+  /** General settings extension 1.
+   *
+   * At 0x02501280, size 0x30 bytes. */
+  struct __attribute__((packed)) general_settings_ext1_t {
+    uint8_t gps_message[32];       ///< GPS message text, upto 32b ASCII text, 0x00 padded.
+    uint8_t _unkown0020[16];       ///< Unknown settings block.
+  };
+
+  /** General settings extension 2.
+   *
+   * At 0x02501400, size 0x100 bytes. */
+  struct __attribute__((packed)) general_settings_ext2_t {
+    // Byte 0x00
+    uint8_t send_alias;            ///< Send talker alias, 0=off, 1=on.
+    uint8_t _unknown0001[15];      ///< Unknown.
+    // Byte 0x10
+    uint8_t _unknown0010[16];      ///< Unknown.
+    // Byte 0x20
+    uint8_t _unknown0020[4];       ///< Unknown.
+    uint32_t autorep_vhf2_min;     ///< Auto repeater VHF2 minimum frequency, in 10Hz, little endian.
+    uint32_t autorep_vfh2_max;     ///< Auto repeater VHF2 maximum frequency, in 10Hz, little endian.
+    uint32_t autorep_uhf2_min;     ///< Auto repeater UHF2 minimum frequency, in 10Hz, little endian.
+    // Byte 0x30
+    uint32_t autorep_uhf2_max;     ///< Auto repeater UHF2 maximum frequency, in 10Hz, little endian.
+    uint8_t _unknown0034;          ///< Unknown.
+    uint8_t gps_mode;              ///< GPS mode, GPS=0x00, BDS=0x01, GPS+BDS=0x02.
+    uint8_t _unknown0036[10];      ///< Unknown.
+    // Byte 0x40
+    uint8_t _unknown0040[16];      ///< Unknown.
+    // Byte 0x50
+    uint8_t _unknown0050[16];      ///< Unknown.
+    // Byte 0x60
+    uint8_t _unknown0060[16];      ///< Unknown.
+    // Byte 0x70
+    uint8_t _unknown0070[16];      ///< Unknown.
+    // Byte 0x80
+    uint8_t _unknown0080[16];      ///< Unknown.
+    // Byte 0x90
+    uint8_t _unknown0090[16];      ///< Unknown.
+    // Byte 0xa0
+    uint8_t _unknown00a0[16];      ///< Unknown.
+    // Byte 0xb0
+    uint8_t _unknown00b0[16];      ///< Unknown.
+    // Byte 0xc0
+    uint8_t _unknown00c0[16];      ///< Unknown.
+    // Byte 0xd0
+    uint8_t _unknown00d0[16];      ///< Unknown.
+    // Byte 0xe0
+    uint8_t _unknown00e0[16];      ///< Unknown.
+    // Byte 0xf0
+    uint8_t _unknown00f0[16];      ///< Unknown.
+  };
+
 
   /** Some weird linked list of valid message indices.
    *
@@ -965,45 +1092,6 @@ public:
     GPSSystem *toGPSSystemObj(int idx) const;
     /** Links the specified generic GPS system. */
     bool linkGPSSystem(int idx, GPSSystem *sys, const CodeplugContext &ctx) const;
-  };
-
-  /** Binary representation of the talker alias setting.
-   * This code-plug section is yet to be reverse-engineered.
-   * Size 0x100 bytes. */
-  struct __attribute__((packed)) talkeralias_setting_t {
-    // Byte 0x00
-    uint8_t send_alias;            ///< Send talker alias, 0=off, 1=on.
-    uint8_t _unknown1[15];         ///< Unknown.
-    // Byte 0x10
-    uint8_t _unknown16[16];        ///< Unknown.
-    // Byte 0x20
-    uint8_t _unknown32[16];        ///< Unknown.
-    // Byte 0x30
-    uint8_t _unknown48[16];        ///< Unknown.
-    // Byte 0x40
-    uint8_t _unknown64[16];        ///< Unknown.
-    // Byte 0x50
-    uint8_t _unknown80[16];        ///< Unknown.
-    // Byte 0x60
-    uint8_t _unknown90[16];        ///< Unknown.
-    // Byte 0x70
-    uint8_t _unknown112[16];       ///< Unknown.
-    // Byte 0x80
-    uint8_t _unknown128[16];       ///< Unknown.
-    // Byte 0x90
-    uint8_t _unknown144[16];       ///< Unknown.
-    // Byte 0xa0
-    uint8_t _unknown160[16];       ///< Unknown.
-    // Byte 0xb0
-    uint8_t _unknown176[16];       ///< Unknown.
-    // Byte 0xc0
-    uint8_t _unknown192[16];       ///< Unknown.
-    // Byte 0xd0
-    uint8_t _unknown208[16];       ///< Unknown.
-    // Byte 0xe0
-    uint8_t _unknown224[16];       ///< Unknown.
-    // Byte 0xf0
-    uint8_t _unknown240[16];       ///< Unknown.
   };
 
   /** Binary representation of the analog alarm settings.

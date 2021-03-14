@@ -52,6 +52,9 @@
 #define RXGRP_OFFSET              0x00000200 // Offset between group lists.
 #define RXGRP_BITMAP              0x025C0B10 // Address of RX group list bitmap.
 #define RXGRP_BITMAP_SIZE         0x00000020 // Storage size of RX group list bitmap.
+static_assert(
+  RXGRP_SIZE == sizeof(D878UVCodeplug::grouplist_t),
+  "D878UVCodeplug::grouplist_t size check failed.");
 
 #define NUM_ZONES                 250        // Maximum number of zones
 #define NUM_CH_PER_ZONE           250        // Maximum number of channels per zone
@@ -69,27 +72,54 @@
 #define RADIOID_SIZE              0x00000020
 #define RADIOID_BITMAP            0x024c1320
 #define RADIOID_BITMAP_SIZE       0x00000020
+static_assert(
+  RADIOID_SIZE == sizeof(D878UVCodeplug::radioid_t),
+  "D878UVCodeplug::radioid_t size check failed.");
 
 #define NUM_SCAN_LISTS            250
 #define NUM_SCANLISTS_PER_BANK    16
 #define SCAN_LIST_BANK_0          0x01080000 // First scanlist bank
 #define SCAN_LIST_OFFSET          0x00000200 // Offset to next list.
-#define SCAN_LIST_SIZE            0x000000c0 // Size of scan-list.
+#define SCAN_LIST_SIZE            0x00000090 // Size of scan-list.
 #define SCAN_LIST_BANK_OFFSET     0x00040000 // Offset to next bank
 #define SCAN_BITMAP               0x024c1340 // Address of scan-list bitmap.
 #define SCAN_BITMAP_SIZE          0x00000020 // Size of scan-list bitmap.
+static_assert(
+  SCAN_LIST_SIZE == sizeof(D878UVCodeplug::scanlist_t),
+  "D878UVCodeplug::scanlist_t size check failed.");
 
 #define ADDR_GENERAL_CONFIG       0x02500000
 #define GENERAL_CONFIG_SIZE       0x00000630
+static_assert(
+  GENERAL_CONFIG_SIZE == sizeof(D878UVCodeplug::general_settings_base_t),
+  "D878UVCodeplug::general_settings_base_t size check failed.");
+
+#define ADDR_GENERAL_CONFIG_EXT1  0x02501280
+#define GENERAL_CONFIG_EXT1_SIZE  0x00000030
+static_assert(
+  GENERAL_CONFIG_EXT1_SIZE == sizeof(D878UVCodeplug::general_settings_ext1_t),
+  "D878UVCodeplug::general_settings_ext1_t size check failed.");
+
+#define ADDR_GENERAL_CONFIG_EXT2  0x02501400
+#define GENERAL_CONFIG_EXT2_SIZE  0x00000100
+static_assert(
+  GENERAL_CONFIG_EXT2_SIZE == sizeof(D878UVCodeplug::general_settings_ext2_t),
+  "D878UVCodeplug::general_settings_ext2_t size check failed.");
 
 #define ADDR_APRS_SETTING         0x02501000 // Address of APRS settings
 #define APRS_SETTING_SIZE         0x00000040 // Size of the APRS settings
 #define ADDR_APRS_MESSAGE         0x02501200 // Address of APRS messages
 #define APRS_MESSAGE_SIZE         0x00000040 // Size of APRS messages
+static_assert(
+  APRS_SETTING_SIZE == sizeof(D878UVCodeplug::aprs_setting_t),
+  "D878UVCodeplug::aprs_setting_t size check failed.");
 
 #define NUM_GPS_SYSTEMS           8
 #define ADDR_GPS_SETTING          0x02501040 // Address of GPS settings
 #define GPS_SETTING_SIZE          0x00000060 // Size of the GPS settings
+static_assert(
+  GPS_SETTING_SIZE == sizeof(D878UVCodeplug::gps_systems_t),
+    "D878UVCodeplug::gps_systems_t size check failed.");
 
 #define NUM_MESSAGES              100
 #define NUM_MESSAGES_PER_BANK     8
@@ -100,6 +130,10 @@
 #define MESSAGE_INDEX_LIST        0x01640000
 #define MESSAGE_BYTEMAP           0x01640800
 #define MESSAGE_BYTEMAP_SIZE      0x00000090
+static_assert(
+  MESSAGE_SIZE == sizeof(D878UVCodeplug::message_t),
+  "D878UVCodeplug::grouplist_t size check failed.");
+
 
 #define ADDR_HOTKEY               0x025C0000
 #define HOTKEY_SIZE               0x00000860
@@ -113,9 +147,6 @@
 
 #define ADDR_OFFSET_FREQ          0x024C2000
 #define OFFSET_FREQ_SIZE          0x000003F0
-
-#define ADDR_TALKER_ALIAS         0x02501400
-#define TALKER_ALIAS_SIZE         0x00000100
 
 #define ADDR_ALARM_SETTING        0x024C1400
 #define ALARM_SETTING_SIZE        0x00000020
@@ -705,7 +736,7 @@ D878UVCodeplug::scanlist_t::scanlist_t() {
 
 void
 D878UVCodeplug::scanlist_t::clear() {
-  _unused0 = 0;
+  _unused0000 = 0;
   prio_ch_select = PRIO_CHAN_OFF;
   priority_ch1 = 0xffff;
   priority_ch2 = 0xffff;
@@ -715,9 +746,9 @@ D878UVCodeplug::scanlist_t::clear() {
   dwell = qToLittleEndian(0x001d);
   revert_channel = REVCH_SELECTED;
   memset(name, 0, sizeof(name));
-  _pad31 = 0;
+  _pad001e = 0;
   memset(member, 0xff, sizeof(member));
-  memset(_unused132, 0, sizeof(_unused132));
+  memset(_unused0084, 0, sizeof(_unused0084));
 }
 
 QString
@@ -828,34 +859,56 @@ D878UVCodeplug::radioid_t::setId(uint32_t num) {
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::general_settings_t
  * ******************************************************************************************** */
-D878UVCodeplug::general_settings_t::general_settings_t() {
+D878UVCodeplug::general_settings_base_t::general_settings_base_t() {
   clear();
 }
 
 void
-D878UVCodeplug::general_settings_t::clear() {
+D878UVCodeplug::general_settings_base_t::clear() {
   memset(intro_line1, 0, sizeof(intro_line2));
   memset(intro_line2, 0, sizeof(intro_line2));
+  mic_gain = 2;
 }
 
 QString
-D878UVCodeplug::general_settings_t::getIntroLine1() const {
+D878UVCodeplug::general_settings_base_t::getIntroLine1() const {
   return decode_ascii(intro_line1, 14, 0);
 }
-
 void
-D878UVCodeplug::general_settings_t::setIntroLine1(const QString line) {
+D878UVCodeplug::general_settings_base_t::setIntroLine1(const QString line) {
   encode_ascii(intro_line1, line, 14, 0);
 }
 
 QString
-D878UVCodeplug::general_settings_t::getIntroLine2() const {
+D878UVCodeplug::general_settings_base_t::getIntroLine2() const {
   return decode_ascii(intro_line2, 14, 0);
+}
+void
+D878UVCodeplug::general_settings_base_t::setIntroLine2(const QString line) {
+  encode_ascii(intro_line2, line, 14, 0);
+}
+
+uint
+D878UVCodeplug::general_settings_base_t::getMicGain() const {
+  return (mic_gain+1)*2;
+}
+void
+D878UVCodeplug::general_settings_base_t::setMicGain(uint gain) {
+  mic_gain = (gain-1)/2;
 }
 
 void
-D878UVCodeplug::general_settings_t::setIntroLine2(const QString line) {
-  encode_ascii(intro_line2, line, 14, 0);
+D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config) {
+  setIntroLine1(config->introLine1());
+  setIntroLine2(config->introLine2());
+  setMicGain(config->micLevel());
+}
+
+void
+D878UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
+  config->setIntroLine1(getIntroLine1());
+  config->setIntroLine2(getIntroLine2());
+  config->setMicLevel(getMicGain());
 }
 
 
@@ -1375,8 +1428,12 @@ D878UVCodeplug::allocateUntouched() {
 
   // General config
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+  image(0).addElement(ADDR_GENERAL_CONFIG_EXT1, GENERAL_CONFIG_EXT1_SIZE);
+  image(0).addElement(ADDR_GENERAL_CONFIG_EXT2, GENERAL_CONFIG_EXT2_SIZE);
+
   // GPS settings
   image(0).addElement(ADDR_GPS_SETTING, GPS_SETTING_SIZE);
+
   // APRS settings
   image(0).addElement(ADDR_APRS_SETTING, APRS_SETTING_SIZE);
   image(0).addElement(ADDR_APRS_MESSAGE, APRS_MESSAGE_SIZE);
@@ -1426,8 +1483,6 @@ D878UVCodeplug::allocateUntouched() {
   image(0).addElement(ADDR_ENCRYPTION_KEYS, ENCRYPTION_KEYS_SIZE);
   // Offset frequencies
   image(0).addElement(ADDR_OFFSET_FREQ, OFFSET_FREQ_SIZE);
-  // Talker alias settings
-  image(0).addElement(ADDR_TALKER_ALIAS, TALKER_ALIAS_SIZE);
   // Alarm settings
   image(0).addElement(ADDR_ALARM_SETTING, ALARM_SETTING_SIZE);
   // FM broad-cast settings
@@ -1445,7 +1500,6 @@ D878UVCodeplug::allocateUntouched() {
   image(0).addElement(0x024C1800, 0x500);
   image(0).addElement(0x024C2400, 0x030);
   image(0).addElement(0x024C2600, 0x010);
-  //image(0).addElement(0x02501280, 0x030); // <- related to GPS/APRS?
 }
 
 void
@@ -1826,9 +1880,8 @@ D878UVCodeplug::encode(Config *config, bool update)
   radio_ids[0].setName(config->name());
 
   // Encode general config
-  general_settings_t *settings = (general_settings_t *)data(ADDR_GENERAL_CONFIG);
-  settings->setIntroLine1(config->introLine1());
-  settings->setIntroLine2(config->introLine2());
+  general_settings_base_t *settings = (general_settings_base_t *)data(ADDR_GENERAL_CONFIG);
+  settings->fromConfig(config);
 
   // Encode channels
   for (int i=0; i<config->channelList()->count(); i++) {
@@ -1974,9 +2027,8 @@ D878UVCodeplug::decode(Config *config)
   }
 
   // Get intro lines
-  general_settings_t *settings = (general_settings_t *)data(ADDR_GENERAL_CONFIG);
-  config->setIntroLine1(settings->getIntroLine1());
-  config->setIntroLine2(settings->getIntroLine2());
+  general_settings_base_t *settings = (general_settings_base_t *)data(ADDR_GENERAL_CONFIG);
+  settings->updateConfig(config);
 
   // Create channels
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
