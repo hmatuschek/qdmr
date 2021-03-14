@@ -408,7 +408,7 @@ PositioningSystems::data(const QModelIndex &index, int role) const {
       return (sys->as<GPSSystem>()->hasRevertChannel() ?
                 sys->as<GPSSystem>()->revertChannel()->name() : tr("[Selected]"));
     else if (sys->is<APRSSystem>())
-      return (sys->as<APRSSystem>()->channel() ?
+      return ((nullptr != sys->as<APRSSystem>()->channel()) ?
                 sys->as<APRSSystem>()->channel()->name() : tr("OOPS!"));
   case 5:
     if (sys->is<GPSSystem>())

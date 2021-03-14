@@ -1076,24 +1076,25 @@ APRSSystem *
 D878UVCodeplug::aprs_setting_t::toAPRSSystem() {
   return new APRSSystem(
         tr("APRS %1").arg(getDestination()), nullptr,
-        getDestination(), to_ssid,
-        getSource(), from_ssid,
-        getPath(),
-        getIcon(),
-        "",
-        getAutoTXInterval());
+        getDestination(), to_ssid, getSource(), from_ssid,
+        getPath(), getIcon(), "", getAutoTXInterval());
 }
 
 void
 D878UVCodeplug::aprs_setting_t::linkAPRSSystem(APRSSystem *sys, CodeplugContext &ctx) {
   // First, try to find a matching analog channel in list
-  AnalogChannel *ch = ctx.config()->channelList()->findAnalogChannel(getFrequency());
+  AnalogChannel *ch = ctx.config()->channelList()->findAnalogChannelByTxFreq(getFrequency());
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
     ch = new AnalogChannel("APRS Channel", getFrequency(), getFrequency(), getPower(),
                            0, false, AnalogChannel::AdmitFree, 1, Signaling::SIGNALING_NONE,
                            getSignaling(), AnalogChannel::BWWide, nullptr);
+    logInfo() << "No matching APRS chanel found for TX frequency " << getFrequency()
+              << ", create one as 'APRS Channel'";
+    ctx.config()->channelList()->addChannel(ch);
   }
+  logDebug() << "Link APRS system '" << sys->name()
+             << "' to analog channel '" << ch->name() << "'.";
   sys->setChannel(ch);
 }
 

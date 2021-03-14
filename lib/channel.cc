@@ -402,27 +402,6 @@ ChannelList::channel(int idx) const {
   return _channels.at(idx);
 }
 
-Channel *
-ChannelList::findChannel(double freq) const {
-  for (int i=0; i<count(); i++) {
-    if ((_channels[i]->txFrequency() == freq) || (_channels[i]->rxFrequency() == freq))
-      return _channels[i];
-  }
-  return nullptr;
-}
-
-DigitalChannel *
-ChannelList::findDigitalChannel(double freq) const {
-  for (int i=0; i<count(); i++) {
-    if (! _channels[i]->is<DigitalChannel>())
-      continue;
-    if ((1e-6>std::abs(_channels[i]->txFrequency()-freq)) ||
-        (1e-6>std::abs(_channels[i]->rxFrequency()-freq)))
-      return _channels[i]->as<DigitalChannel>();
-  }
-  return nullptr;
-}
-
 DigitalChannel *
 ChannelList::findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, uint cc) const {
   for (int i=0; i<count(); i++) {
@@ -443,11 +422,11 @@ ChannelList::findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot t
 }
 
 AnalogChannel *
-ChannelList::findAnalogChannel(double freq) const {
+ChannelList::findAnalogChannelByTxFreq(double freq) const {
   for (int i=0; i<count(); i++) {
     if (! _channels[i]->is<AnalogChannel>())
       continue;
-    if ((_channels[i]->txFrequency() == freq) || (_channels[i]->rxFrequency() == freq))
+    if (1e-6 > (_channels[i]->txFrequency()-freq))
       return _channels[i]->as<AnalogChannel>();
   }
   return nullptr;

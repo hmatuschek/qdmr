@@ -157,6 +157,7 @@ Config::reset() {
   _rxGroupLists->clear();
   _contacts->clear();
   _gpsSystems->clear();
+  _roaming->clear();
   _id = 0;
   _name.clear();
   _introLine1.clear();
