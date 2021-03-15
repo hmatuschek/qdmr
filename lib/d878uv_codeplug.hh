@@ -773,6 +773,8 @@ public:
   struct __attribute__((packed)) general_settings_ext1_t {
     uint8_t gps_message[32];       ///< GPS message text, upto 32b ASCII text, 0x00 padded.
     uint8_t _unkown0020[16];       ///< Unknown settings block.
+
+    void fromConfig(const Config *conf);
   };
 
   /** General settings extension 2.
@@ -818,6 +820,8 @@ public:
     uint8_t _unknown00e0[16];      ///< Unknown.
     // Byte 0xf0
     uint8_t _unknown00f0[16];      ///< Unknown.
+
+    void fromConfig(const Config *conf);
   };
 
 

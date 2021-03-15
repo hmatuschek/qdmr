@@ -913,6 +913,27 @@ D878UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::general_settings_ext1_t
+ * ******************************************************************************************** */
+void
+D878UVCodeplug::general_settings_ext1_t::fromConfig(const Config *conf) {
+  memset(gps_message, 0, sizeof(gps_message));
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::general_settings_ext1_t
+ * ******************************************************************************************** */
+void
+D878UVCodeplug::general_settings_ext2_t::fromConfig(const Config *conf) {
+  // Do not send talker alias
+  send_alias = 0x00;
+  // Enable only GPS here.
+  gps_mode = 0x00;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::aprs_system_t
  * ******************************************************************************************** */
 bool
@@ -1879,8 +1900,9 @@ D878UVCodeplug::encode(Config *config, bool update)
   radio_ids[0].setName(config->name());
 
   // Encode general config
-  general_settings_base_t *settings = (general_settings_base_t *)data(ADDR_GENERAL_CONFIG);
-  settings->fromConfig(config);
+  ((general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->fromConfig(config);
+  ((general_settings_ext1_t *)data(ADDR_GENERAL_CONFIG_EXT1))->fromConfig(config);
+  ((general_settings_ext2_t *)data(ADDR_GENERAL_CONFIG_EXT2))->fromConfig(config);
 
   // Encode channels
   for (int i=0; i<config->channelList()->count(); i++) {
