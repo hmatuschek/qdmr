@@ -2121,7 +2121,7 @@ D878UVCodeplug::decode(Config *config)
       config->zones()->addZone(last_zone);
     } else {
       // when extending the last zone, chop its name to remove the "... A" part.
-      last_zone->setName(last_zone->name().chopped(2));
+      last_zone->setName(last_zonebasename);
     }
 
     // link zone
