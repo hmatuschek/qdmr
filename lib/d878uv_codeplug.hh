@@ -125,7 +125,7 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02500000</td> <td>000630</td> <td>General settings, see @c general_settings_t.</td></tr>
+ *  <tr><td>02500000</td> <td>000630</td> <td>General settings, see @c general_settings_base_t.</td></tr>
  *  <tr><td>02501280</td> <td>000030</td> <td>General settings extension 1, see @c general_settings_ext1_t.</td></tr>
  *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2, see @c general_settings_ext2_t.</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
@@ -756,10 +756,14 @@ public:
     /** Sets the second intro-line. */
     void setIntroLine2(const QString line);
 
+    /** Decodes the microphone gain. */
     uint getMicGain() const;
+    /** Encodes the microphone gain. */
     void setMicGain(uint gain);
 
+    /** Updates the general settings from the given abstract configuration. */
     void fromConfig(const Config *config);
+    /** Updates the abstract configuration from this general settings. */
     void updateConfig(Config *config);
   };
 

@@ -2073,15 +2073,30 @@ D878UVCodeplug::decode(Config *config)
 
   // Create zones
   uint8_t *zone_bitmap = data(ZONE_BITMAPS);
+  QString last_zone_name; Zone *last_zone = nullptr;
+  bool extend_last_zone = false;
   for (uint16_t i=0; i<NUM_ZONES; i++) {
     // Check if zone is enabled:
     uint16_t bit = i%8, byte = i/8;
     if (0 == (zone_bitmap[byte]>>bit))
       continue;
+    // Determine whether this zone should be combined with the previous one
+    QString zonename = decode_ascii(data(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET), 16, 0);
+    extend_last_zone = ( zonename.endsWith(" B") && last_zone_name.endsWith(" A")
+                         && (zonename.chopped(2) == last_zone_name.chopped(2))
+                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
+    last_zone_name = zonename;
+
     // If enabled, create zone with name
-    Zone *zone = new Zone(decode_ascii(data(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET), 16, 0));
-    // add to config
-    config->zones()->addZone(zone);
+    if (! extend_last_zone) {
+      last_zone = new Zone(zonename);
+      // add to config
+      config->zones()->addZone(last_zone);
+    } else {
+      // when extending the last zone, chop its name to remove the "... A" part.
+      last_zone->setName(last_zone->name().chopped(2));
+    }
+
     // link zone
     uint16_t *channels = (uint16_t *)data(ADDR_ZONE+i*ZONE_OFFSET);
     for (uint8_t i=0; i<NUM_CH_PER_ZONE; i++, channels++) {
@@ -2093,7 +2108,10 @@ D878UVCodeplug::decode(Config *config)
       if (! ctx.hasChannel(cidx))
         continue;
       // If defined -> add channel to zone obj
-      zone->A()->addChannel(ctx.getChannel(cidx));
+      if (extend_last_zone)
+        last_zone->B()->addChannel(ctx.getChannel(cidx));
+      else
+        last_zone->A()->addChannel(ctx.getChannel(cidx));
     }
   }
 
