@@ -2098,7 +2098,7 @@ D878UVCodeplug::decode(Config *config)
 
   // Create zones
   uint8_t *zone_bitmap = data(ZONE_BITMAPS);
-  QString last_zone_name; Zone *last_zone = nullptr;
+  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
   for (uint16_t i=0; i<NUM_ZONES; i++) {
     // Check if zone is enabled:
@@ -2107,10 +2107,12 @@ D878UVCodeplug::decode(Config *config)
       continue;
     // Determine whether this zone should be combined with the previous one
     QString zonename = decode_ascii(data(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET), 16, 0);
-    extend_last_zone = ( zonename.endsWith(" B") && last_zone_name.endsWith(" A")
-                         && (zonename.chopped(2) == last_zone_name.chopped(2))
+    QString zonebasename = zonename; zonebasename.chop(2);
+    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
+                         && (zonebasename == last_zonebasename)
                          && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
-    last_zone_name = zonename;
+    last_zonename = zonename;
+    last_zonebasename = zonebasename;
 
     // If enabled, create zone with name
     if (! extend_last_zone) {
