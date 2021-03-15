@@ -438,7 +438,7 @@ D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
     if (nullptr == dc)
       return false;
 
-    // Check if default contact is set
+    // Check if default contact is set, in fact a valid contact index is mandatory.
     uint32_t conIdx = qFromLittleEndian(contact_index);
     if ((0xffffffff != conIdx) && ctx.hasDigitalContact(conIdx))
       dc->setTXContact(ctx.getDigitalContact(conIdx));
@@ -1968,8 +1968,11 @@ D878UVCodeplug::encode(Config *config, bool update)
   gps_systems_t *gps = (gps_systems_t *)data(ADDR_GPS_SETTING);
   gps->fromGPSSystems(config);
   if (0 < config->posSystems()->gpsCount()) {
+    // If there is at least one GPS system defined -> set auto TX interval.
+    //  This setting might be overridden by any analog APRS system below
     aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
     aprs->setAutoTxInterval(config->posSystems()->gpsSystem(0)->period());
+    aprs->setManualTxInterval(config->posSystems()->gpsSystem(0)->period());
   }
 
   // Encode APRS system (there can only be one)
@@ -2131,6 +2134,8 @@ D878UVCodeplug::decode(Config *config)
     scanl->linkScanListObj(obj, ctx);
   }
 
+  // Before creating any GPS/APRS systems, get global auto TX intervall
+  uint pos_intervall = ((aprs_setting_t *)data(ADDR_APRS_SETTING))->getAutoTXInterval();
   // Create GPS systems
   gps_systems_t *gps_systems = (gps_systems_t *)data(ADDR_GPS_SETTING);
   for (int i=0; i<NUM_GPS_SYSTEMS; i++) {
@@ -2139,6 +2144,7 @@ D878UVCodeplug::decode(Config *config)
     GPSSystem *sys = gps_systems->toGPSSystemObj(i);
     if (sys)
       logDebug() << "Create GPS sys '" << sys->name() << "' at idx " << i << ".";
+    sys->setPeriod(pos_intervall);
     ctx.addGPSSystem(sys, i);
   }
 

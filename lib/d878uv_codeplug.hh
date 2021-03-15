@@ -954,8 +954,8 @@ public:
     uint8_t sig_type;              ///< Signalling type, 0=off, 1=ctcss, 2=dcs, default=off.
     uint8_t ctcss;                 ///< CTCSS tone-code, default=0.
     uint16_t dcs;                  ///< DCS code, little endian, default=0x0013.
-    uint8_t manual_tx_interval;    ///< Manual TX intervals in seconds.
-    uint8_t auto_tx_interval;      ///< Auto TX interval in multiples of 30s.
+    uint8_t manual_tx_interval;    ///< Global manual TX intervals in seconds.
+    uint8_t auto_tx_interval;      ///< Global auto TX interval in multiples of 30s.
     uint8_t tx_tone_enable;        ///< TX tone enable, 0=off, 1=on.
 
     uint8_t fixed_location;        ///< Fixed location data, 0=off, 1=on.
