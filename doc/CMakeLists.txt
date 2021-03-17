@@ -10,10 +10,10 @@ add_custom_command(
           ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.xml
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.xml
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  COMMENT "Generate man-page for dmrconf."
+  COMMENT "Generating man-page for dmrconf."
   VERBATIM)
 
-add_custom_target(manpage ALL DEPENDS dmrconf.1)
+add_custom_target(manpage ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.1)
 
 if (UNIX AND NOT APPLE)
  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.1
