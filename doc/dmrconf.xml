@@ -14,7 +14,7 @@
   <info>
     <author>
       <personname><firstname>Hannes</firstname> <surname>Matuschek</surname></personname>
-      <email>hmatuschek@gmail.com</email>
+      <email>dm3mat@darc.de</email>
       <contrib>Main author</contrib>
     </author>
   </info>
@@ -125,12 +125,32 @@
       <varlistentry>
         <term><option>-R</option> or <option>--radio=</option>NAME</term>
         <listitem><para>Specifies the radio for the <command>verify</command>,
-          <command>encode</command> or <command>decode</command> commands.</para></listitem>
+          <command>encode</command> or <command>decode</command> commands.
+          This option can also be used to override the automatic radio detection
+          for the <command>read</command> and <command>write</command> 
+          commands. Be careful using this option when writing to the device.
+          An incompatible code-plug might be written.</para></listitem>
       </varlistentry>
       <varlistentry>
         <term><option>-I</option> or <option>--id=</option>DMR_ID</term>
         <listitem><para>Specifies the DMR ID for the <command>write-db</command> or
           <command>encode-db</command> commands.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--init-codeplug</option></term>
+        <listitem><para>Initializes the code-plug from scratch. If omitted (default)
+        the code-plug on the device gets updated. This maintains all settings made 
+        earlier via the manufacturer CPS or on the radio itself.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--auto-enable-gps</option></term>
+        <listitem><para>Automatically enables GPS/APRS if at least one GPS/APRS 
+        system is defined and used by any channel. </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--auto-enable-roaming</option></term>
+        <listitem><para>Automatically enables roaming if at least one roaming 
+        zone is defined and used by any channel. </para></listitem>
       </varlistentry>
     </variablelist>
   </refsect1>
