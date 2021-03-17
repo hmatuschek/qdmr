@@ -71,6 +71,7 @@ protected:
 	QString _name;
   /** The interface to the radio. */
 	DFUDevice *_dev;
+  /** Holds the flags to controll assembly and upload of code-plugs. */
   CodePlug::Flags _codeplugFlags;
   /** The generic configuration. */
 	Config *_config;

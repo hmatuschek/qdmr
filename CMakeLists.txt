@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(qdmr)
+project(qdmr VERSION 0.6.2)
 
 option(BUILD_TESTS "Build test programs" OFF)
+option(BUILD_DOCS  "Build API documentation" OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -15,6 +16,10 @@ find_package(Qt5LinguistTools REQUIRED)
 find_package(Qt5Test REQUIRED)
 find_package(LIBUSB_1 REQUIRED)
 find_program(XSLTPROC_EXECUTABLE xsltproc DOC "xsltproc for man-page generation." REQUIRED)
+
+if (${BUILD_DOCS})
+  find_package(Doxygen REQUIRED dot)
+endif(${BUILD_DOCS})
 
 ADD_DEFINITIONS(${Qt5Widgets_DEFINITIONS})
 #add_definitions("-DQT_EVENT_DISPATCHER_CORE_FOUNDATION=1")
@@ -43,12 +48,8 @@ IF (UNIX AND APPLE)
  SET(LIBS ${LIBS} "-framework IOKit -framework CoreFoundation")
 ENDIF(UNIX AND APPLE)
 
-set(VERSION_MAJOR 0)
-set(VERSION_MINOR 6)
-set(VERSION_PATCH 2)
-set(VERSION_TAG "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
-set(VERSION_STRING "\"${VERSION_TAG}\"")
-message(STATUS "Build version ${VERSION_TAG}")
+set(PROJECT_VERSION_STRING "\"${PROJECT_VERSION}\"")
+message(STATUS "Build version ${PROJECT_VERSION}")
 
 # Set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -Wall -Wsign-compare")
@@ -87,9 +88,6 @@ if(BUILD_TESTS)
 endif(BUILD_TESTS)
 
 # Source distribution packages:
-set(CPACK_PACKAGE_VERSION_MAJOR "${VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}")
 set(CPACK_SOURCE_GENERATOR "TGZ")
 set(CPACK_SOURCE_PACKAGE_FILE_NAME
   "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")

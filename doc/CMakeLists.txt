@@ -1,4 +1,7 @@
 
+#
+# man-page generation
+#
 message(STATUS "Using xsltproc: ${XSLTPROC_EXECUTABLE}")
 configure_file("dmrconf.in.xml" "dmrconf.xml")
 
@@ -19,3 +22,26 @@ if (UNIX AND NOT APPLE)
  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.1
          DESTINATION ${CMAKE_INSTALL_FULL_MANDIR}/man1/)
 endif (UNIX AND NOT APPLE)
+
+
+#
+# optional API docs
+#
+if (${BUILD_DOCS})
+  set(DOXYGEN_PROJECT_NAME "libdrmconf")
+  set(DOXYGEN_PROJECT_BRIEF "A library to program DMR radios.")
+  set(DOXYGEN_BRIEF_MEMBER_DESC YES)
+  set(DOXYGEN_JAVADOC_AUTOBRIEF YES)
+  set(DOXYGEN_EXAMPLE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/code")
+  set(DOXYGEN_ENABLE_PREPROCESSING YES)
+  set(DOXYGEN_MACRO_EXPANSION YES)
+  set(DOXYGEN_EXPAND_ONLY_PREDEF YES)
+  set(DOXYGEN_PREDEFINED __attribute__(x)=)
+  set(DOXYGEN_IMAGE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/fig")
+  doxygen_add_docs(apidocs
+    ALL
+    ${CMAKE_SOURCE_DIR}/lib
+    COMMENT "Build API documentation")
+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
+          DESTINATION ${CMAKE_INSTALL_DOCDIR}/libdmrconf/)
+endif(${BUILD_DOCS})

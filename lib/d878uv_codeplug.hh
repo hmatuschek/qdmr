@@ -774,6 +774,7 @@ public:
     uint8_t gps_message[32];       ///< GPS message text, upto 32b ASCII text, 0x00 padded.
     uint8_t _unkown0020[16];       ///< Unknown settings block.
 
+    /** Derives the general settings from the given abstact configuration. */
     void fromConfig(const Config *conf);
   };
 
@@ -821,6 +822,7 @@ public:
     // Byte 0xf0
     uint8_t _unknown00f0[16];      ///< Unknown.
 
+    /** Derives the general settings from the given abstact configuration. */
     void fromConfig(const Config *conf);
   };
 
