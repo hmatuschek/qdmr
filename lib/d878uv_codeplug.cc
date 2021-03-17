@@ -898,10 +898,40 @@ D878UVCodeplug::general_settings_base_t::setMicGain(uint gain) {
 }
 
 void
-D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config) {
+D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const Flags &flags) {
   setIntroLine1(config->introLine1());
   setIntroLine2(config->introLine2());
   setMicGain(config->micLevel());
+
+  // Check is roaming should be enabled
+  bool chHasRoaming = false;
+  for (int i=0; i<config->channelList()->count(); i++) {
+    DigitalChannel *digi = config->channelList()->channel(i)->as<DigitalChannel>();
+    if (nullptr == digi)
+      continue;
+    if (nullptr != digi->roaming()) {
+      chHasRoaming = true;
+      break;
+    }
+  }
+
+  // If auto-enable roaming is enable
+  if (flags.autoEnableRoaming) {
+    // If roaming is required -> configure & enable
+    if (chHasRoaming) {
+      repchk_enable     = 0x01;
+      repchk_interval   = 0x05; // 0x05 == 30s
+      repchk_recon      = 0x02; // 0x02 == 3 times
+      repchk_notify     = 0x00; // 0x00 == no notification
+      roam_enable       = 0x01;
+      roam_default_zone = 0x00; // Default roaming zone index
+      roam_start_cond   = 0x01; // Start condition == out-of-range
+    } else {
+      // If roaming is not required -> disable
+      repchk_enable = 0x00;
+      roam_enable   = 0x00;
+    }
+  }
 }
 
 void
@@ -916,7 +946,7 @@ D878UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
  * Implementation of D878UVCodeplug::general_settings_ext1_t
  * ******************************************************************************************** */
 void
-D878UVCodeplug::general_settings_ext1_t::fromConfig(const Config *conf) {
+D878UVCodeplug::general_settings_ext1_t::fromConfig(const Config *conf, const Flags &flags) {
   memset(gps_message, 0, sizeof(gps_message));
 }
 
@@ -925,7 +955,7 @@ D878UVCodeplug::general_settings_ext1_t::fromConfig(const Config *conf) {
  * Implementation of D878UVCodeplug::general_settings_ext1_t
  * ******************************************************************************************** */
 void
-D878UVCodeplug::general_settings_ext2_t::fromConfig(const Config *conf) {
+D878UVCodeplug::general_settings_ext2_t::fromConfig(const Config *conf, const Flags &flags) {
   // Do not send talker alias
   send_alias = 0x00;
   // Enable only GPS here.
@@ -1900,9 +1930,9 @@ D878UVCodeplug::encode(Config *config, const Flags &flags)
   radio_ids[0].setName(config->name());
 
   // Encode general config
-  ((general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->fromConfig(config);
-  ((general_settings_ext1_t *)data(ADDR_GENERAL_CONFIG_EXT1))->fromConfig(config);
-  ((general_settings_ext2_t *)data(ADDR_GENERAL_CONFIG_EXT2))->fromConfig(config);
+  ((general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->fromConfig(config, flags);
+  ((general_settings_ext1_t *)data(ADDR_GENERAL_CONFIG_EXT1))->fromConfig(config, flags);
+  ((general_settings_ext2_t *)data(ADDR_GENERAL_CONFIG_EXT2))->fromConfig(config, flags);
 
   // Encode channels
   for (int i=0; i<config->channelList()->count(); i++) {

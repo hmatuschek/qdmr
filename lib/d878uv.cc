@@ -289,7 +289,7 @@ D878UV::upload() {
   _codeplug.allocateForEncoding();
 
   // Update binary codeplug from config
-  if (! _codeplug.encode(_config)) {
+  if (! _codeplug.encode(_config, _codeplugFlags)) {
     _errorMessage = QString("Cannot encode codeplug: %1").arg(_codeplug.errorMessage());
     logError() << _errorMessage;
     _task = StatusError;
