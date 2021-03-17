@@ -1892,7 +1892,7 @@ D878UVCodeplug::setBitmaps(Config *config)
 
 
 bool
-D878UVCodeplug::encode(Config *config, bool update)
+D878UVCodeplug::encode(Config *config, const Flags &flags)
 {
   // Encode radio IDs
   radioid_t *radio_ids = (radioid_t *)data(ADDR_RADIOIDS);

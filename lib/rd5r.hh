@@ -55,7 +55,8 @@ public slots:
   bool startDownload(bool blocking=false);
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
-  bool startUpload(Config *config, bool blocking=false, bool update=true);
+  bool startUpload(Config *config, bool blocking=false,
+                   const CodePlug::Flags &flags = CodePlug::Flags());
   /** Encodes the given user-database and uploades it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false);
 
@@ -69,8 +70,7 @@ private:
 	QString _name;
   /** HID interface to the radio. */
 	HID *_dev;
-  /** If @c true, the codeplug gets updated otherwise overridden. */
-  bool _codeplugUpdate;
+  CodePlug::Flags _codeplugFlags;
   /** Current generic configuration. */
 	Config *_config;
   /** Current device specific codeplug. */

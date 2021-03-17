@@ -54,7 +54,7 @@ static Radio::Features _rd5r_features =
 
 
 RD5R::RD5R(QObject *parent)
-  : Radio(parent), _name("Baofeng/Radioddity RD-5R"), _dev(nullptr), _codeplugUpdate(true),
+  : Radio(parent), _name("Baofeng/Radioddity RD-5R"), _dev(nullptr), _codeplugFlags(),
     _config(nullptr), _codeplug()
 {
   // pass...
@@ -102,7 +102,7 @@ RD5R::startDownload(bool blocking) {
 }
 
 bool
-RD5R::startUpload(Config *config, bool blocking, bool update) {
+RD5R::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
   _config = config;
   if (!_config)
     return false;
@@ -114,7 +114,7 @@ RD5R::startUpload(Config *config, bool blocking, bool update) {
   }
 
   _task = StatusUpload;
-  _codeplugUpdate = update;
+  _codeplugFlags = flags;
   if (blocking) {
     run();
     return (StatusIdle == _task);
@@ -177,7 +177,7 @@ RD5R::run()
     }
 
     uint bcount = 0;
-    if (_codeplugUpdate) {
+    if (_codeplugFlags.updateCodePlug) {
       // If codeplug gets updated, download codeplug from device first:
       for (int n=0; n<_codeplug.image(0).numElements(); n++) {
         int b0 = _codeplug.image(0).element(n).address()/BSIZE;
@@ -199,7 +199,7 @@ RD5R::run()
     }
 
     // Encode config into codeplug
-    if (! _codeplug.encode(_config, _codeplugUpdate)) {
+    if (! _codeplug.encode(_config, _codeplugFlags)) {
       _errorMessage = tr("%1(): Upload failed: %2")
           .arg(__func__).arg(_codeplug.errorMessage());
       _task = StatusError;

@@ -140,6 +140,15 @@ Settings::setAutoEnableRoaming(bool update) {
   setValue("autoEnableRoaming", update);
 }
 
+CodePlug::Flags
+Settings::codePlugFlags() const {
+  CodePlug::Flags flags;
+  flags.updateCodePlug = updateCodeplug();
+  flags.autoEnableGPS  = autoEnableGPS();
+  flags.autoEnableRoaming = autoEnableRoaming();
+  return flags;
+}
+
 bool
 Settings::hideGSPNote() const {
   return value("hideGPSNote", false).toBool();

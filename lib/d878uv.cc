@@ -64,7 +64,7 @@ static Radio::Features _d878uv_features =
 
 
 D878UV::D878UV(QObject *parent)
-  : Radio(parent), _name("Anytone AT-D878UV"), _dev(nullptr), _codeplugUpdate(true), _config(nullptr)
+  : Radio(parent), _name("Anytone AT-D878UV"), _dev(nullptr), _codeplugFlags(), _config(nullptr)
 {
   // pass...
 }
@@ -113,7 +113,7 @@ D878UV::startDownload(bool blocking) {
 }
 
 bool
-D878UV::startUpload(Config *config, bool blocking, bool update) {
+D878UV::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
   if (StatusIdle != _task)
     return false;
 
@@ -128,7 +128,7 @@ D878UV::startUpload(Config *config, bool blocking, bool update) {
   }
 
   _task = StatusUpload;
-  _codeplugUpdate = update;
+  _codeplugFlags = flags;
   if (blocking) {
     this->run();
     return (StatusIdle == _task);

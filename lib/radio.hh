@@ -9,9 +9,9 @@
 #define RADIO_HH
 
 #include <QThread>
+#include "codeplug.hh"
 
 class Config;
-class CodePlug;
 class UserDatabase;
 
 
@@ -189,7 +189,8 @@ public slots:
   virtual bool startDownload(bool blocking=false) = 0;
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
-  virtual bool startUpload(Config *config, bool blocking=false, bool update=true) = 0;
+  virtual bool startUpload(Config *config, bool blocking=false,
+                           const CodePlug::Flags &flags = CodePlug::Flags()) = 0;
   /** Assembles the callsign DB from the given one and uploads it to the device. */
   virtual bool startUploadCallsignDB(UserDatabase *db, bool blocking=false) = 0;
 

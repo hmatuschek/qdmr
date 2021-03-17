@@ -8,6 +8,8 @@
 
 #include "ui_settingsdialog.h"
 
+#include "codeplug.hh"
+
 
 class Settings : public QSettings
 {
@@ -35,6 +37,8 @@ public:
 
   bool autoEnableRoaming() const;
   void setAutoEnableRoaming(bool enable);
+
+  CodePlug::Flags codePlugFlags() const;
 
   bool hideGSPNote() const;
   void setHideGPSNote(bool hide);
