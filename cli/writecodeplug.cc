@@ -58,8 +58,16 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   showProgress();
   QObject::connect(radio, &Radio::uploadProgress, updateProgress);
 
+  CodePlug::Flags flags;
+  if (parser.isSet("init-codeplug"))
+    flags.updateCodePlug = false;
+  if (parser.isSet("auto-enable-gps"))
+    flags.autoEnableGPS = true;
+  if (parser.isSet("auto-enable-roaming"))
+    flags.autoEnableRoaming = true;
+
   logDebug() << "Start upload to " << radio->name() << ".";
-  if (! radio->startUpload(&config, true)) {
+  if (! radio->startUpload(&config, true, flags)) {
     logError() << "Codeplug upload error: " << radio->errorMessage();
     return -1;
   }

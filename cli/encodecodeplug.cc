@@ -31,6 +31,14 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     parser.showHelp(-1);
   }
 
+  CodePlug::Flags flags;
+  if (parser.isSet("init-codeplug"))
+    flags.updateCodePlug = false;
+  if (parser.isSet("auto-enable-gps"))
+    flags.autoEnableGPS = true;
+  if (parser.isSet("auto-enable-roaming"))
+    flags.autoEnableRoaming = true;
+
   if (("uv390"==parser.value("radio").toLower()) || ("rt3s"==parser.value("radio").toLower())) {
     Config config;
     QString errorMessage;
@@ -41,7 +49,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
 
     UV390Codeplug codeplug;
-    codeplug.encode(&config);
+    codeplug.encode(&config, flags);
     if (! codeplug.write(parser.positionalArguments().at(2))) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
                  << "': " << codeplug.errorMessage();
@@ -56,7 +64,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
     RD5RCodeplug codeplug;
-    codeplug.encode(&config);
+    codeplug.encode(&config, flags);
     if (! codeplug.write(parser.positionalArguments().at(2))) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
                  << "': " << codeplug.errorMessage();
@@ -71,7 +79,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
     GD77Codeplug codeplug;
-    codeplug.encode(&config);
+    codeplug.encode(&config, flags);
     if (! codeplug.write(parser.positionalArguments().at(2))) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
                  << "': " << codeplug.errorMessage();
@@ -86,7 +94,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
     OpenGD77Codeplug codeplug;
-    codeplug.encode(&config);
+    codeplug.encode(&config, flags);
     if (! codeplug.write(parser.positionalArguments().at(2))) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
                  << "': " << codeplug.errorMessage();
@@ -104,7 +112,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     codeplug.setBitmaps(&config);
     codeplug.allocateUntouched();
     codeplug.allocateForEncoding();
-    codeplug.encode(&config);
+    codeplug.encode(&config, flags);
     codeplug.image(0).sort();
     if (! codeplug.write(parser.positionalArguments().at(2))) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
