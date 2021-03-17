@@ -586,9 +586,6 @@ Application::showSettings() {
   SettingsDialog dialog;
   if (QDialog::Accepted == dialog.exec()) {
     Settings settings;
-    settings.setQueryPosition(dialog.systemLocationEnabled());
-    settings.setLocator(dialog.locator());
-    settings.setUpdateCodeplug(dialog.updateCodeplug());
     if (! settings.queryPosition()) {
       if (_source)
         _source->stopUpdates();

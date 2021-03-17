@@ -117,10 +117,27 @@ bool
 Settings::updateCodeplug() const {
   return value("updateCodeplug", true).toBool();
 }
-
 void
 Settings::setUpdateCodeplug(bool update) {
   setValue("updateCodeplug", update);
+}
+
+bool
+Settings::autoEnableGPS() const {
+  return value("autoEnableGPS", false).toBool();
+}
+void
+Settings::setAutoEnableGPS(bool update) {
+  setValue("autoEnableGPS", update);
+}
+
+bool
+Settings::autoEnableRoaming() const {
+  return value("autoEnableRoaming", false).toBool();
+}
+void
+Settings::setAutoEnableRoaming(bool update) {
+  setValue("autoEnableRoaming", update);
 }
 
 bool
@@ -198,6 +215,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     locatorEntry->setEnabled(false);
 
   Ui::SettingsDialog::updateCodeplug->setChecked(settings.updateCodeplug());
+  Ui::SettingsDialog::autoEnableGPS->setChecked(settings.autoEnableGPS());
+  Ui::SettingsDialog::autoEnableRoaming->setChecked(settings.autoEnableRoaming());
 
   connect(queryLocation, SIGNAL(toggled(bool)), this, SLOT(onSystemLocationToggled(bool)));
 }
@@ -229,11 +248,16 @@ SettingsDialog::positionUpdated(const QGeoPositionInfo &info) {
   }
 }
 
-bool
-SettingsDialog::updateCodeplug() const {
-  return Ui::SettingsDialog::updateCodeplug->isChecked();
+void
+SettingsDialog::accept() {
+  Settings settings;
+  settings.setQueryPosition(queryLocation->isChecked());
+  settings.setLocator(locatorEntry->text().simplified());
+  settings.setUpdateCodeplug(updateCodeplug->isChecked());
+  settings.setAutoEnableGPS(autoEnableGPS->isChecked());
+  settings.setAutoEnableRoaming(autoEnableRoaming->isChecked());
+  QDialog::accept();
 }
-
 
 
 
