@@ -150,6 +150,15 @@ Settings::codePlugFlags() const {
 }
 
 bool
+Settings::ignoreVerificationWarning() const {
+  return value("ignoreVerificationWarning", true).toBool();
+}
+void
+Settings::setIgnoreVerificationWarning(bool ignore) {
+  setValue("ignoreVerificationWarning", ignore);
+}
+
+bool
 Settings::hideGSPNote() const {
   return value("hideGPSNote", false).toBool();
 }
@@ -226,6 +235,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   Ui::SettingsDialog::updateCodeplug->setChecked(settings.updateCodeplug());
   Ui::SettingsDialog::autoEnableGPS->setChecked(settings.autoEnableGPS());
   Ui::SettingsDialog::autoEnableRoaming->setChecked(settings.autoEnableRoaming());
+  Ui::SettingsDialog::ignoreVerificationWarnings->setChecked(settings.ignoreVerificationWarning());
 
   connect(queryLocation, SIGNAL(toggled(bool)), this, SLOT(onSystemLocationToggled(bool)));
 }
@@ -265,6 +275,7 @@ SettingsDialog::accept() {
   settings.setUpdateCodeplug(updateCodeplug->isChecked());
   settings.setAutoEnableGPS(autoEnableGPS->isChecked());
   settings.setAutoEnableRoaming(autoEnableRoaming->isChecked());
+  settings.setIgnoreVerificationWarning(ignoreVerificationWarnings->isChecked());
   QDialog::accept();
 }
 

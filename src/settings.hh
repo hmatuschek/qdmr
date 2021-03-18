@@ -40,6 +40,9 @@ public:
 
   CodePlug::Flags codePlugFlags() const;
 
+  bool ignoreVerificationWarning() const;
+  void setIgnoreVerificationWarning(bool ignore);
+
   bool hideGSPNote() const;
   void setHideGPSNote(bool hide);
 

@@ -107,6 +107,23 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Ignore verification warnings</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QCheckBox" name="ignoreVerificationWarnings">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As the communication interface to the radio is kept open after verification, time-outs may occur and the code-plug upload may fail when the verification dialog pops up. To prevent this, verification warnings can be ignored, eliminating the time-gap between verification and upload. Verification errors still prevent the upload.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
