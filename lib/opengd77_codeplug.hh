@@ -231,7 +231,7 @@ protected:
     Zone *toZoneObj() const;
     /** Links a previously constructed @c Zone object to the rest of the configuration. That is
      * linking to the referred channels. */
-    bool linkZoneObj(Zone *zone, const CodeplugContext &ctx) const;
+    bool linkZoneObj(Zone *zone, const CodeplugContext &ctx, bool putInB) const;
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     void fromZoneObjA(const Zone *zone, const Config *conf);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
