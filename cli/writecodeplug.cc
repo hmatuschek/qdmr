@@ -40,7 +40,7 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
 
   bool verified = true;
   QList<VerifyIssue> issues;
-  if (radio->verifyConfig(&config, issues)) {
+  if (VerifyIssue::WARNING <= radio->verifyConfig(&config, issues)) {
     foreach(const VerifyIssue &issue, issues) {
       if (VerifyIssue::WARNING == issue.type()) {
         logWarn() << "Verification Issue: " << issue.message();
