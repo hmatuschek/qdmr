@@ -85,12 +85,6 @@ UV390::startDownload(bool blocking) {
   if (StatusIdle != _task)
     return false;
 
-  _dev = new DFUDevice(0x0483, 0xdf11, this);
-  if (! _dev->isOpen()) {
-    _dev->deleteLater();
-    return false;
-  }
-
   _task = StatusDownload;
 
   if (blocking) {
@@ -110,13 +104,6 @@ UV390::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) 
   if (! (_config = config))
     return false;
 
-  _dev = new DFUDevice(0x0483, 0xdf11, this);
-  if (!_dev->isOpen()) {
-    _errorMessage = QString("Cannot open device at 0483:DF11: %1").arg(_dev->errorMessage());
-    _dev->deleteLater();
-    return false;
-  }
-
   _task = StatusUpload;
   _codeplugFlags = flags;
   if (blocking) {
@@ -134,13 +121,6 @@ UV390::startUploadCallsignDB(UserDatabase *db, bool blocking) {
     return false;
 
   _callsigns.encode(db);
-
-  _dev = new DFUDevice(0x0483, 0xdf11, this);
-  if (!_dev->isOpen()) {
-    _errorMessage = QString("Cannot open device at 0483:DF11: %1").arg(_dev->errorMessage());
-    _dev->deleteLater();
-    return false;
-  }
 
   _task = StatusUploadCallsigns;
   if (blocking) {
@@ -168,6 +148,15 @@ void
 UV390::download() {
   emit downloadStarted();
   logDebug() << "Download of " << _codeplug.image(0).numElements() << " elements.";
+
+  _dev = new DFUDevice(0x0483, 0xdf11, this);
+  if (!_dev->isOpen()) {
+    _errorMessage = QString("Cannot open device at 0483:DF11: %1").arg(_dev->errorMessage());
+    _dev->deleteLater();
+    _task = StatusError;
+    emit downloadError(this);
+    return;
+  }
 
   // Check every segment in the codeplug
   size_t totb = 0;
@@ -221,6 +210,16 @@ UV390::download() {
 void
 UV390::upload() {
   emit uploadStarted();
+
+  _dev = new DFUDevice(0x0483, 0xdf11, this);
+  if (!_dev->isOpen()) {
+    _errorMessage = QString("Cannot open device at 0483:DF11: %1").arg(_dev->errorMessage());
+    _dev->deleteLater();
+    _task = StatusError;
+    emit uploadError(this);
+    return;
+  }
+
   // Check every segment in the codeplug
   if (! _codeplug.isAligned(BSIZE)) {
     _errorMessage = QString("%1 Cannot upload codeplug: "
@@ -302,6 +301,15 @@ UV390::upload() {
 void
 UV390::uploadCallsigns() {
   emit uploadStarted();
+
+  _dev = new DFUDevice(0x0483, 0xdf11, this);
+  if (!_dev->isOpen()) {
+    _errorMessage = QString("Cannot open device at 0483:DF11: %1").arg(_dev->errorMessage());
+    _dev->deleteLater();
+    _task = StatusError;
+    emit uploadError(this);
+    return;
+  }
 
   logDebug() << "Check alignment.";
   // Check alignment in the codeplug

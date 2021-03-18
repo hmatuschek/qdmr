@@ -52,6 +52,16 @@ or the command line tool with
 
 [![qdmr](https://snapcraft.io//qdmr/badge.svg)](https://snapcraft.io/qdmr)
 
+Under Debian and Rasbpian, you may also use my PPA. However, the PPA must be added differently
+
+    echo "deb http://ppa.launchpad.net/hmatuschek/ppa/ubuntu bionic main" | sudo tee /etc/apt/sources.list.d/qdmr.list
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6DA8548661C080AF76E4F4E1AA2AC2E559564524
+
+The first line adds the PPA (using is *bionic* version) to your package sources while the second
+adds the PPA public key to your package-keyring. After this, the install is straigt forward.
+
+    sudo apt-get install qdmr
+
 ### Permissions
 When running *qdmr* or *dmrconf* under Linux, you may need to change the permissions for accessing USB devices.  
 Create a file /etc/udev/rules.d/99-dmr.rules with the following content:

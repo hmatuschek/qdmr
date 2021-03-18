@@ -82,14 +82,6 @@ RD5R::codeplug() {
 
 bool
 RD5R::startDownload(bool blocking) {
-  _dev = new HID(0x15a2, 0x0073);
-  if (! _dev->isOpen()) {
-    _errorMessage = tr("%1(): Cannot open Download codeplug: %2")
-        .arg(__func__).arg(_dev->errorMessage());
-    _dev->deleteLater();
-    return false;
-  }
-
   _task = StatusDownload;
 
   if (blocking) {
@@ -139,6 +131,17 @@ RD5R::run()
 {
   if (StatusDownload == _task) {
     emit downloadStarted();
+
+    _dev = new HID(0x15a2, 0x0073);
+    if (! _dev->isOpen()) {
+      _errorMessage = tr("%1(): Cannot open Download codeplug: %2")
+          .arg(__func__).arg(_dev->errorMessage());
+      _dev->deleteLater();
+      _task = StatusError;
+      emit downloadError(this);
+      return;
+    }
+
     uint btot = 0;
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {
       btot += _codeplug.image(0).element(n).data().size()/BSIZE;
@@ -170,6 +173,16 @@ RD5R::run()
     _config = nullptr;
   } else if (StatusUpload == _task) {
     emit uploadStarted();
+
+    _dev = new HID(0x15a2, 0x0073);
+    if (! _dev->isOpen()) {
+      _errorMessage = tr("%1(): Cannot open Download codeplug: %2")
+          .arg(__func__).arg(_dev->errorMessage());
+      _dev->deleteLater();
+      _task = StatusError;
+      emit uploadError(this);
+      return;
+    }
 
     uint btot = 0;
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {

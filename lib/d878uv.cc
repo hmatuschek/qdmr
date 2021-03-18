@@ -136,16 +136,7 @@ D878UV::startUploadCallsignDB(UserDatabase *db, bool blocking) {
 
 void
 D878UV::run() {
-  _dev = new AnytoneInterface(this);
-  if (! _dev->isOpen()) {
-    _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());
-    _dev->deleteLater();
-    _task = StatusError;
-    return;
-  }
-
-  if (StatusDownload == _task)
-  {
+  if (StatusDownload == _task) {
     emit downloadStarted();
 
     if (! download())
@@ -155,6 +146,7 @@ D878UV::run() {
     _dev->reboot();
     _dev->close();
     _dev->deleteLater();
+
     emit downloadFinished(this, &_codeplug);
     _config = nullptr;
   } else if (StatusUpload == _task) {
@@ -172,8 +164,20 @@ D878UV::run() {
   }
 }
 
-bool D878UV::download() {
+bool
+D878UV::download() {
   logDebug() << "Download of " << _codeplug.image(0).numElements() << " bitmaps.";
+
+  // The first thing happening within the thread is creating the interface to the device.
+  // For some reason this object cannot be created outside of the thread.
+  _dev = new AnytoneInterface(this);
+  if (! _dev->isOpen()) {
+    _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());
+    _dev->deleteLater();
+    _task = StatusError;
+    emit downloadError(this);
+    return false;
+  }
 
   // Download bitmaps
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
@@ -237,6 +241,17 @@ bool D878UV::download() {
 
 bool
 D878UV::upload() {
+  // The first thing happening within the thread is creating the interface to the device.
+  // For some reason this object cannot be created outside of the thread.
+  _dev = new AnytoneInterface(this);
+  if (! _dev->isOpen()) {
+    _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());
+    _dev->deleteLater();
+    _task = StatusError;
+    emit uploadError(this);
+    return false;
+  }
+
   // Download bitmaps first
   size_t nbitmaps = _codeplug.numImages();
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
