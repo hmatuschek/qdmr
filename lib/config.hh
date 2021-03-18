@@ -56,6 +56,8 @@ public:
   PositioningSystems *posSystems() const;
   /** Returns the list of roaming zones. */
   RoamingZoneList *roaming() const;
+  /** Returns @c true if one of the digital channels has a roaming zone assigned. */
+  bool requiresRoaming() const;
 
   /** Returns the DMR ID of the radio. */
   uint id() const;

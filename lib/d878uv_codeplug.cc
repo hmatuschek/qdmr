@@ -903,22 +903,10 @@ D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const 
   setIntroLine2(config->introLine2());
   setMicGain(config->micLevel());
 
-  // Check is roaming should be enabled
-  bool chHasRoaming = false;
-  for (int i=0; i<config->channelList()->count(); i++) {
-    DigitalChannel *digi = config->channelList()->channel(i)->as<DigitalChannel>();
-    if (nullptr == digi)
-      continue;
-    if (nullptr != digi->roaming()) {
-      chHasRoaming = true;
-      break;
-    }
-  }
-
-  // If auto-enable roaming is enable
+  // If auto-enable roaming is enabled
   if (flags.autoEnableRoaming) {
-    // If roaming is required -> configure & enable
-    if (chHasRoaming) {
+    // Check if roaming is required -> configure & enable
+    if (config->requiresRoaming()) {
       repchk_enable     = 0x01;
       repchk_interval   = 0x05; // 0x05 == 30s
       repchk_recon      = 0x02; // 0x02 == 3 times
@@ -927,7 +915,7 @@ D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const 
       roam_default_zone = 0x00; // Default roaming zone index
       roam_start_cond   = 0x01; // Start condition == out-of-range
     } else {
-      // If roaming is not required -> disable
+      // If roaming is not required -> disable repeater check and roaming
       repchk_enable = 0x00;
       roam_enable   = 0x00;
     }

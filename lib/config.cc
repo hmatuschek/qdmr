@@ -76,6 +76,22 @@ Config::roaming() const {
   return _roaming;
 }
 
+bool
+Config::requiresRoaming() const {
+  // Check is roaming should be enabled
+  bool chHasRoaming = false;
+  for (int i=0; i<channelList()->count(); i++) {
+    const DigitalChannel *digi = channelList()->channel(i)->as<const DigitalChannel>();
+    if (nullptr == digi)
+      continue;
+    if (nullptr != digi->roaming()) {
+      chHasRoaming = true;
+      break;
+    }
+  }
+  return chHasRoaming;
+}
+
 uint
 Config::id() const {
   return _id;
