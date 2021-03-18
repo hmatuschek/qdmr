@@ -94,13 +94,6 @@ D878UV::startDownload(bool blocking) {
   if (StatusIdle != _task)
     return false;
 
-  _dev = new AnytoneInterface(this);
-  if (! _dev->isOpen()) {
-    _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());
-    _dev->deleteLater();
-    return false;
-  }
-
   _task = StatusDownload;
 
   if (blocking) {
@@ -119,13 +112,6 @@ D878UV::startUpload(Config *config, bool blocking, bool update) {
 
   if (! (_config = config))
     return false;
-
-  _dev = new AnytoneInterface(this);
-  if (!_dev->isOpen()) {
-    _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());
-    _dev->deleteLater();
-    return false;
-  }
 
   _task = StatusUpload;
   _codeplugUpdate = update;
@@ -150,6 +136,14 @@ D878UV::startUploadCallsignDB(UserDatabase *db, bool blocking) {
 
 void
 D878UV::run() {
+  _dev = new AnytoneInterface(this);
+  if (! _dev->isOpen()) {
+    _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());
+    _dev->deleteLater();
+    _task = StatusError;
+    return;
+  }
+
   if (StatusDownload == _task)
   {
     emit downloadStarted();

@@ -17,7 +17,7 @@ USBSerial::USBSerial(unsigned vid, unsigned pid, QObject *parent)
       logDebug() << "Found serial port " << vid << ":" << pid << ": "
                  << port.portName() << " '" << port.description() << "'.";
       this->setPort(port);
-
+      this->setBaudRate(115200);
       if (! this->open(QIODevice::ReadWrite)) {
         _errorMessage = tr("%1: Cannot open serial port '%2': %3")
             .arg(__func__).arg(port.portName()).arg(this->errorString());
