@@ -58,6 +58,8 @@ public:
   RoamingZoneList *roaming() const;
   /** Returns @c true if one of the digital channels has a roaming zone assigned. */
   bool requiresRoaming() const;
+  /** Returns @c true if one of the channels has a GPS or APRS system assigned. */
+  bool requiresGPS() const;
 
   /** Returns the DMR ID of the radio. */
   uint id() const;

@@ -920,6 +920,24 @@ D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const 
       roam_enable   = 0x00;
     }
   }
+
+  // If auto-enable GPS is enabled
+  if (flags.autoEnableGPS) {
+    // Check if GPS is required -> enable
+    if (config->requiresGPS()) {
+      gps_enable = 0x01;
+      // Set time zone based on system time zone.
+      int offset = QTimeZone::systemTimeZone().offsetFromUtc(QDateTime::currentDateTime());
+      gps_timezone = 12 + offset/3600;
+      gps_sms_enable = 0x00;
+      gps_message_enable = 0x00;
+      gps_sms_interval = 0x05;
+      // Set measurement system based on system locale (0x00==Metric)
+      gps_unit = (QLocale::MetricSystem == QLocale::system().measurementSystem()) ? 0x00 : 0x01;
+    } else {
+      gps_enable = 0x00;
+    }
+  }
 }
 
 void
@@ -935,6 +953,8 @@ D878UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
  * ******************************************************************************************** */
 void
 D878UVCodeplug::general_settings_ext1_t::fromConfig(const Config *conf, const Flags &flags) {
+  Q_UNUSED(conf)
+  Q_UNUSED(flags)
   memset(gps_message, 0, sizeof(gps_message));
 }
 
@@ -944,6 +964,8 @@ D878UVCodeplug::general_settings_ext1_t::fromConfig(const Config *conf, const Fl
  * ******************************************************************************************** */
 void
 D878UVCodeplug::general_settings_ext2_t::fromConfig(const Config *conf, const Flags &flags) {
+  Q_UNUSED(conf)
+  Q_UNUSED(flags)
   // Do not send talker alias
   send_alias = 0x00;
   // Enable only GPS here.
