@@ -379,16 +379,19 @@ RD5RCodeplug::zone_t::toZoneObj() const {
 }
 
 bool
-RD5RCodeplug::zone_t::linkZoneObj(Zone *zone, const CodeplugContext &ctx) const {
+RD5RCodeplug::zone_t::linkZoneObj(Zone *zone, const CodeplugContext &ctx, bool putInB) const {
   if (! isValid()) {
     logDebug() << "Cannot link zone: Zone is invalid.";
     return false;
   }
 
   for (int i=0; (i<16) && member[i]; i++) {
-    if (ctx.hasChannel(member[i]))
-      zone->A()->addChannel(ctx.getChannel(member[i]));
-    else {
+    if (ctx.hasChannel(member[i])) {
+      if (! putInB)
+        zone->A()->addChannel(ctx.getChannel(member[i]));
+      else
+        zone->B()->addChannel(ctx.getChannel(member[i]));
+    } else {
       logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
                 << member[i] << " out of bounds.";
     }
@@ -1018,6 +1021,8 @@ RD5RCodeplug::decode(Config *config)
   }
 
   /* Unpack Zones */
+  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
+  bool extend_last_zone = false;
   for (int i=0; i<NZONES; i++) {
     zonetab_t *zt = (zonetab_t*) data(OFFSET_ZONETAB);
     if (! zt){
@@ -1028,6 +1033,7 @@ RD5RCodeplug::decode(Config *config)
     // if zone is disabled
     if (! (zt->bitmap[i / 8] >> (i & 7) & 1) )
       continue;
+
     // get zone_t
     zone_t *z = &zt->zone[i];
     if (! z){
@@ -1036,20 +1042,35 @@ RD5RCodeplug::decode(Config *config)
       return false;
     }
 
-    // Create & link zone obj
-    Zone *zone = z->toZoneObj();
-    if (nullptr == zone) {
-      _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid zone at index %2")
-          .arg(__func__).arg(i);
-      return false;
+    // Determine whether this zone should be combined with the previous one
+    QString zonename = z->getName();
+    QString zonebasename = zonename; zonebasename.chop(2);
+    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
+                         && (zonebasename == last_zonebasename)
+                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
+    last_zonename = zonename;
+    last_zonebasename = zonebasename;
+
+    // Create zone obj
+    if (! extend_last_zone) {
+      last_zone = z->toZoneObj();
+      if (nullptr == last_zone) {
+        _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid zone at index %2")
+            .arg(__func__).arg(i);
+        return false;
+      }
+      config->zones()->addZone(last_zone);
+    } else {
+      // when extending the last zone, chop its name to remove the "... A" part.
+      last_zone->setName(last_zonebasename);
     }
-    if (! z->linkZoneObj(zone, ctx)) {
+
+    // Link zone obj
+    if (! z->linkZoneObj(last_zone, ctx, extend_last_zone)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
           .arg(__func__).arg(i);
       return false;
     }
-
-    config->zones()->addZone(zone);
   }
 
   /* Unpack Scan lists */
