@@ -342,16 +342,19 @@ OpenGD77Codeplug::zone_t::toZoneObj() const {
 }
 
 bool
-OpenGD77Codeplug::zone_t::linkZoneObj(Zone *zone, const CodeplugContext &ctx) const {
+OpenGD77Codeplug::zone_t::linkZoneObj(Zone *zone, const CodeplugContext &ctx, bool putInB) const {
   if (! isValid()) {
     logDebug() << "Cannot link zone: Zone is invalid.";
     return false;
   }
 
   for (int i=0; (i<80) && member[i]; i++) {
-    if (ctx.hasChannel(member[i]))
-      zone->A()->addChannel(ctx.getChannel(member[i]));
-    else {
+    if (ctx.hasChannel(member[i])) {
+      if (! putInB)
+        zone->A()->addChannel(ctx.getChannel(member[i]));
+      else
+        zone->B()->addChannel(ctx.getChannel(member[i]));
+    } else {
       logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
                 << member[i] << " out of bounds.";
     }
@@ -407,10 +410,10 @@ OpenGD77Codeplug::OpenGD77Codeplug(QObject *parent)
 }
 
 bool
-OpenGD77Codeplug::encode(Config *config, bool update) {
+OpenGD77Codeplug::encode(Config *config, const Flags &flags) {
   // pack basic config
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS, EEPROM);
-  if (! update)
+  if (! flags.updateCodePlug)
     gs->initDefault();
   gs->setName(config->name());
   gs->setRadioId(config->id());
@@ -633,6 +636,8 @@ OpenGD77Codeplug::decode(Config *config) {
   }
 
   /* Unpack Zones */
+  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
+  bool extend_last_zone = false;
   for (int i=0; i<NZONES; i++) {
     zonetab_t *zt = (zonetab_t*) data(OFFSET_ZONETAB, EEPROM);
     if (! zt){
@@ -656,25 +661,34 @@ OpenGD77Codeplug::decode(Config *config) {
       return false;
     }
 
-    // Create & link zone obj
-    Zone *zone = z->toZoneObj();
-    if (nullptr == zone) {
-      _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid zone at index %2")
-          .arg(__func__).arg(i);
-      logError() << _errorMessage;
-      return false;
+    // Determine whether this zone should be combined with the previous one
+    QString zonename = z->getName();
+    QString zonebasename = zonename; zonebasename.chop(2);
+    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
+                         && (zonebasename == last_zonebasename)
+                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
+    last_zonename = zonename;
+    last_zonebasename = zonebasename;
+
+    // Create zone obj
+    if (! extend_last_zone) {
+      last_zone = z->toZoneObj();
+      if (nullptr == last_zone) {
+        _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid zone at index %2")
+            .arg(__func__).arg(i);
+        logError() << _errorMessage;
+        return false;
+      }
+      config->zones()->addZone(last_zone);
+    } else {
+      // when extending the last zone, chop its name to remove the "... A" part.
+      last_zone->setName(last_zonebasename);
     }
 
-    if (! z->linkZoneObj(zone, ctx)) {
+    // Link zone
+    if (! z->linkZoneObj(last_zone, ctx, extend_last_zone)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
           .arg(__func__).arg(i);
-      logError() << _errorMessage;
-      return false;
-    }
-
-    if (! config->zones()->addZone(zone)) {
-      _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot add zone %2 '%3' to list.")
-          .arg(__func__).arg(i).arg(zone->name());
       logError() << _errorMessage;
       return false;
     }

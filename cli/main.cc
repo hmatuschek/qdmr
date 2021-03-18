@@ -32,7 +32,9 @@ int main(int argc, char *argv[])
 
   QCommandLineParser parser;
   parser.setApplicationDescription(
-        QCoreApplication::translate("main", "Up- and Download codeplugs for cheap Chineese radios."));
+        QCoreApplication::translate(
+          "main", "Up- and download codeplugs for cheap Chineese DMR radios."));
+
   parser.addHelpOption();
   parser.addVersionOption();
   parser.addOption({
@@ -49,7 +51,9 @@ int main(int argc, char *argv[])
                    });
   parser.addOption({
                      {"R", "radio"},
-                     QCoreApplication::translate("main", "Specifies the radio."),
+                     QCoreApplication::translate("main", "Specifies the radio. This option can also "
+                     "be used to override the auto-detection of radios. Be careful using this "
+                     "option when writing to the device. A incompatible code-plug might be written."),
                      QCoreApplication::translate("main", "RADIO")
                    });
   parser.addOption({
@@ -57,13 +61,31 @@ int main(int argc, char *argv[])
                      QCoreApplication::translate("main", "Specifes the DMR id."),
                      QCoreApplication::translate("main", "ID")
                    });
+  parser.addOption(QCommandLineOption(
+                     "init-codeplug",
+                     QCoreApplication::translate(
+                       "main", "Initializes the code-plug in the radio. If not present (default) "
+                               "the code-plug gets updated, maintining all settings made earlier.")));
+  parser.addOption(QCommandLineOption(
+                     "auto-enable-gps",
+                     QCoreApplication::translate("main", "Automatically enables GPS if there is a "
+                                                         "GPS/APRS system used by any channel.")));
+  parser.addOption(QCommandLineOption(
+                     "auto-enable-roaming",
+                     QCoreApplication::translate("main", "Automatically enables roaming if there is a "
+                                                         "roaming zone used by any channel.")));
 
   parser.addPositionalArgument(
-        "command", QCoreApplication::translate("main", "Specifies the command to perform."),
+        "command", QCoreApplication::translate(
+          "main", "Specifies the command to perform. Either detect, verify, read, write, "
+          "write-db, encode, encode-db, decode or info. Consult the man-page of dmrconf for a "
+          "detailed descriptoin of these commands."),
         QCoreApplication::translate("main", "[command]"));
 
   parser.addPositionalArgument(
-        "file", QCoreApplication::translate("main", "Codeplug file."),
+        "file", QCoreApplication::translate(
+          "main", "The code-plug file. Either binary (extension .dfu) or text/csv (extension .conf "
+          "or .csv). The format can be forced using the --csc or --binary options."),
         QCoreApplication::translate("main", "[filename]"));
 
   parser.process(app);

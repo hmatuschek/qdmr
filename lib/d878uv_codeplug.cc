@@ -898,10 +898,46 @@ D878UVCodeplug::general_settings_base_t::setMicGain(uint gain) {
 }
 
 void
-D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config) {
+D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const Flags &flags) {
   setIntroLine1(config->introLine1());
   setIntroLine2(config->introLine2());
   setMicGain(config->micLevel());
+
+  // If auto-enable roaming is enabled
+  if (flags.autoEnableRoaming) {
+    // Check if roaming is required -> configure & enable
+    if (config->requiresRoaming()) {
+      repchk_enable     = 0x01;
+      repchk_interval   = 0x05; // 0x05 == 30s
+      repchk_recon      = 0x02; // 0x02 == 3 times
+      repchk_notify     = 0x00; // 0x00 == no notification
+      roam_enable       = 0x01;
+      roam_default_zone = 0x00; // Default roaming zone index
+      roam_start_cond   = 0x01; // Start condition == out-of-range
+    } else {
+      // If roaming is not required -> disable repeater check and roaming
+      repchk_enable = 0x00;
+      roam_enable   = 0x00;
+    }
+  }
+
+  // If auto-enable GPS is enabled
+  if (flags.autoEnableGPS) {
+    // Check if GPS is required -> enable
+    if (config->requiresGPS()) {
+      gps_enable = 0x01;
+      // Set time zone based on system time zone.
+      int offset = QTimeZone::systemTimeZone().offsetFromUtc(QDateTime::currentDateTime());
+      gps_timezone = 12 + offset/3600;
+      gps_sms_enable = 0x00;
+      gps_message_enable = 0x00;
+      gps_sms_interval = 0x05;
+      // Set measurement system based on system locale (0x00==Metric)
+      gps_unit = (QLocale::MetricSystem == QLocale::system().measurementSystem()) ? 0x00 : 0x01;
+    } else {
+      gps_enable = 0x00;
+    }
+  }
 }
 
 void
@@ -916,7 +952,9 @@ D878UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
  * Implementation of D878UVCodeplug::general_settings_ext1_t
  * ******************************************************************************************** */
 void
-D878UVCodeplug::general_settings_ext1_t::fromConfig(const Config *conf) {
+D878UVCodeplug::general_settings_ext1_t::fromConfig(const Config *conf, const Flags &flags) {
+  Q_UNUSED(conf)
+  Q_UNUSED(flags)
   memset(gps_message, 0, sizeof(gps_message));
 }
 
@@ -925,7 +963,9 @@ D878UVCodeplug::general_settings_ext1_t::fromConfig(const Config *conf) {
  * Implementation of D878UVCodeplug::general_settings_ext1_t
  * ******************************************************************************************** */
 void
-D878UVCodeplug::general_settings_ext2_t::fromConfig(const Config *conf) {
+D878UVCodeplug::general_settings_ext2_t::fromConfig(const Config *conf, const Flags &flags) {
+  Q_UNUSED(conf)
+  Q_UNUSED(flags)
   // Do not send talker alias
   send_alias = 0x00;
   // Enable only GPS here.
@@ -1892,7 +1932,7 @@ D878UVCodeplug::setBitmaps(Config *config)
 
 
 bool
-D878UVCodeplug::encode(Config *config, bool update)
+D878UVCodeplug::encode(Config *config, const Flags &flags)
 {
   // Encode radio IDs
   radioid_t *radio_ids = (radioid_t *)data(ADDR_RADIOIDS);
@@ -1900,9 +1940,9 @@ D878UVCodeplug::encode(Config *config, bool update)
   radio_ids[0].setName(config->name());
 
   // Encode general config
-  ((general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->fromConfig(config);
-  ((general_settings_ext1_t *)data(ADDR_GENERAL_CONFIG_EXT1))->fromConfig(config);
-  ((general_settings_ext2_t *)data(ADDR_GENERAL_CONFIG_EXT2))->fromConfig(config);
+  ((general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->fromConfig(config, flags);
+  ((general_settings_ext1_t *)data(ADDR_GENERAL_CONFIG_EXT1))->fromConfig(config, flags);
+  ((general_settings_ext2_t *)data(ADDR_GENERAL_CONFIG_EXT2))->fromConfig(config, flags);
 
   // Encode channels
   for (int i=0; i<config->channelList()->count(); i++) {

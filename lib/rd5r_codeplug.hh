@@ -359,7 +359,7 @@ public:
     Zone *toZoneObj() const;
     /** Links a previously constructed @c Zone object to the rest of the configuration. That is
      * linking to the referred channels. */
-    bool linkZoneObj(Zone *zone, const CodeplugContext &ctx) const;
+    bool linkZoneObj(Zone *zone, const CodeplugContext &ctx, bool putInB) const;
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     void fromZoneObjA(const Zone *zone, const Config *conf);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
@@ -769,7 +769,7 @@ public:
   /** Decodes the read codeplug and stores the result into the given generic configuration. */
   bool decode(Config *config);
   /** Encodes the given generic configuration into this codeplug. */
-  bool encode(Config *config, bool update=true);
+  bool encode(Config *config, const Flags &flags = Flags());
 };
 
 #endif // RD5R_CODEPLUG_HH

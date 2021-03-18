@@ -762,7 +762,7 @@ public:
     void setMicGain(uint gain);
 
     /** Updates the general settings from the given abstract configuration. */
-    void fromConfig(const Config *config);
+    void fromConfig(const Config *config, const Flags &flags);
     /** Updates the abstract configuration from this general settings. */
     void updateConfig(Config *config);
   };
@@ -774,7 +774,8 @@ public:
     uint8_t gps_message[32];       ///< GPS message text, upto 32b ASCII text, 0x00 padded.
     uint8_t _unkown0020[16];       ///< Unknown settings block.
 
-    void fromConfig(const Config *conf);
+    /** Derives the general settings from the given abstact configuration. */
+    void fromConfig(const Config *conf, const Flags &flags);
   };
 
   /** General settings extension 2.
@@ -821,7 +822,8 @@ public:
     // Byte 0xf0
     uint8_t _unknown00f0[16];      ///< Unknown.
 
-    void fromConfig(const Config *conf);
+    /** Derives the general settings from the given abstact configuration. */
+    void fromConfig(const Config *conf, const Flags &flags);
   };
 
 
@@ -1238,7 +1240,7 @@ public:
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
 	bool decode(Config *config);
   /** Encodes the given generic configuration as a binary codeplug. */
-  bool encode(Config *config, bool update=true);
+  bool encode(Config *config, const Flags &flags = Flags());
 };
 
 #endif // D878UVCODEPLUG_HH

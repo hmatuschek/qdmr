@@ -55,7 +55,7 @@ static Radio::Features _uv390_features =
 
 
 UV390::UV390(QObject *parent)
-  : Radio(parent), _name("TYT MD-UV390"), _dev(nullptr), _codeplugUpdate(true), _config(nullptr)
+  : Radio(parent), _name("TYT MD-UV390"), _dev(nullptr), _codeplugFlags(), _config(nullptr)
 {
   // pass...
 }
@@ -103,7 +103,7 @@ UV390::startDownload(bool blocking) {
 }
 
 bool
-UV390::startUpload(Config *config, bool blocking, bool update) {
+UV390::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
   if (StatusIdle != _task)
     return false;
 
@@ -118,7 +118,7 @@ UV390::startUpload(Config *config, bool blocking, bool update) {
   }
 
   _task = StatusUpload;
-  _codeplugUpdate = update;
+  _codeplugFlags = flags;
   if (blocking) {
     this->run();
     return (StatusIdle == _task);
@@ -238,7 +238,7 @@ UV390::upload() {
 
   size_t bcount = 0;
   // If codeplug gets updated, download codeplug from device first:
-  if (_codeplugUpdate) {
+  if (_codeplugFlags.updateCodePlug) {
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {
       uint addr = _codeplug.image(0).element(n).address();
       uint size = _codeplug.image(0).element(n).data().size();
@@ -262,7 +262,7 @@ UV390::upload() {
 
   // Encode config into codeplug
   logDebug() << "Encode call-sign DB.";
-  _codeplug.encode(_config, _codeplugUpdate);
+  _codeplug.encode(_config, _codeplugFlags);
 
   // then erase memory
   for (int i=0; i<_codeplug.image(0).numElements(); i++)

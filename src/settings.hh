@@ -8,6 +8,8 @@
 
 #include "ui_settingsdialog.h"
 
+#include "codeplug.hh"
+
 
 class Settings : public QSettings
 {
@@ -29,6 +31,17 @@ public:
 
   bool updateCodeplug() const;
   void setUpdateCodeplug(bool update);
+
+  bool autoEnableGPS() const;
+  void setAutoEnableGPS(bool enable);
+
+  bool autoEnableRoaming() const;
+  void setAutoEnableRoaming(bool enable);
+
+  CodePlug::Flags codePlugFlags() const;
+
+  bool ignoreVerificationWarning() const;
+  void setIgnoreVerificationWarning(bool ignore);
 
   bool hideGSPNote() const;
   void setHideGPSNote(bool hide);
@@ -56,7 +69,9 @@ public:
 
   bool systemLocationEnabled() const;
   QString locator() const;
-  bool updateCodeplug() const;
+
+public slots:
+  void accept();
 
 protected slots:
   void onSystemLocationToggled(bool enable);

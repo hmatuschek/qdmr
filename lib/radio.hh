@@ -9,9 +9,9 @@
 #define RADIO_HH
 
 #include <QThread>
+#include "codeplug.hh"
 
 class Config;
-class CodePlug;
 class UserDatabase;
 
 
@@ -26,6 +26,7 @@ class VerifyIssue {
 public:
   /** Issue type. */
 	typedef enum {
+    NONE,         ///< All ok.
     NOTIFICATION, ///< Inform user about changes made to the config to fit radio.
     WARNING,      ///< Verification warning, some configured fature is just ignored for the particular radio.
     ERROR         ///< Verification error, a consistent device specific configutation cannot be derived from the generic config.
@@ -167,8 +168,8 @@ public:
   virtual CodePlug &codeplug() = 0;
 
   /** Verifies the configuration against the radio features.
-   * On exit, @c issues will contain the issues found. */
-	bool verifyConfig(Config *config, QList<VerifyIssue> &issues);
+   * On exit, @c issues will contain the issues found and the maximum severity is returned. */
+  VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues);
 
   /** Returns the current status. */
   Status status() const;
@@ -189,7 +190,8 @@ public slots:
   virtual bool startDownload(bool blocking=false) = 0;
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
-  virtual bool startUpload(Config *config, bool blocking=false, bool update=true) = 0;
+  virtual bool startUpload(Config *config, bool blocking=false,
+                           const CodePlug::Flags &flags = CodePlug::Flags()) = 0;
   /** Assembles the callsign DB from the given one and uploads it to the device. */
   virtual bool startUploadCallsignDB(UserDatabase *db, bool blocking=false) = 0;
 

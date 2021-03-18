@@ -379,7 +379,7 @@ Application::detectRadio() {
 
 
 bool
-Application::verifyCodeplug(Radio *radio, bool showSuccess) {
+Application::verifyCodeplug(Radio *radio, bool showSuccess, bool ignoreWarnings) {
   Radio *myRadio = radio;
   QString errorMessage;
 
@@ -395,7 +395,9 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess) {
 
   bool verified = true;
   QList<VerifyIssue> issues;
-  if (! myRadio->verifyConfig(_config, issues)) {
+  VerifyIssue::Type maxIssue = myRadio->verifyConfig(_config, issues);
+  if ( (ignoreWarnings && (maxIssue>VerifyIssue::WARNING)) ||
+       ((!ignoreWarnings) && (maxIssue>=VerifyIssue::WARNING)) ) {
     VerifyDialog dialog(issues);
     if (QDialog::Accepted != dialog.exec())
       verified = false;
@@ -494,7 +496,7 @@ Application::uploadCodeplug() {
 
   // Verify codeplug against the detected radio before uploading,
   // but do not show a message on success.
-  if (! verifyCodeplug(radio, false))
+  if (! verifyCodeplug(radio, false, settings.ignoreVerificationWarning()))
     return;
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
@@ -505,7 +507,7 @@ Application::uploadCodeplug() {
   connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
-  radio->startUpload(_config, false, settings.updateCodeplug());
+  radio->startUpload(_config, false, settings.codePlugFlags());
 
   _mainWindow->statusBar()->showMessage(tr("Upload ..."));
   _mainWindow->setEnabled(false);
@@ -586,9 +588,6 @@ Application::showSettings() {
   SettingsDialog dialog;
   if (QDialog::Accepted == dialog.exec()) {
     Settings settings;
-    settings.setQueryPosition(dialog.systemLocationEnabled());
-    settings.setLocator(dialog.locator());
-    settings.setUpdateCodeplug(dialog.updateCodeplug());
     if (! settings.queryPosition()) {
       if (_source)
         _source->stopUpdates();

@@ -52,7 +52,8 @@ public slots:
   bool startDownload(bool blocking=false);
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
-  bool startUpload(Config *config, bool blocking=false, bool update=true);
+  bool startUpload(Config *config, bool blocking=false,
+                   const CodePlug::Flags &flags = CodePlug::Flags());
   /** Encodes the given user-database and uploades it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false);
 
@@ -70,9 +71,8 @@ protected:
 	QString _name;
   /** The interface to the radio. */
 	DFUDevice *_dev;
-  /** If @c true, the codeplug on the radio gets updated upon upload. If @c false, it gets
-   * overridden. */
-  bool _codeplugUpdate;
+  /** Holds the flags to controll assembly and upload of code-plugs. */
+  CodePlug::Flags _codeplugFlags;
   /** The generic configuration. */
 	Config *_config;
   /** A weak reference to the user-database. */

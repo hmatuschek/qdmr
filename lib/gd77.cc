@@ -103,7 +103,7 @@ GD77::startDownload(bool blocking) {
 }
 
 bool
-GD77::startUpload(Config *config, bool blocking, bool update) {
+GD77::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
   if (StatusIdle != _task)
     return false;
 

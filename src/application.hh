@@ -33,7 +33,7 @@ public slots:
   void quitApplication();
 
   void detectRadio();
-  bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true);
+  bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true, bool ignoreWarnings=false);
 
   void downloadCodeplug();
   void uploadCodeplug();

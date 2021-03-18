@@ -439,14 +439,14 @@ GD77Codeplug::GD77Codeplug(QObject *parent)
 }
 
 bool
-GD77Codeplug::encode(Config *config, bool update) {
+GD77Codeplug::encode(Config *config, const Flags &flags) {
   // set timestamp
   timestamp_t *ts = (timestamp_t *)data(OFFSET_TIMESTMP);
   ts->setNow();
 
   // pack basic config
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
-  if (! update)
+  if (! flags.updateCodePlug)
     gs->initDefault();
   gs->setName(config->name());
   gs->setRadioId(config->id());
@@ -682,7 +682,7 @@ GD77Codeplug::decode(Config *config) {
       continue;
     // get zone_t
     zone_t *z = &zt->zone[i];
-    if (! z){
+    if (! z) {
       _errorMessage = QString("%1(): Cannot access zone at index %2")
           .arg(__func__).arg(i);
       return false;
@@ -695,7 +695,7 @@ GD77Codeplug::decode(Config *config) {
           .arg(__func__).arg(i);
       return false;
     }
-    if (! z->linkZoneObj(zone, ctx)) {
+    if (! z->linkZoneObj(zone, ctx, false)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
           .arg(__func__).arg(i);
       return false;

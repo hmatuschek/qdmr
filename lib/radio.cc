@@ -20,7 +20,7 @@ Radio::Radio(QObject *parent)
   // pass...
 }
 
-bool
+VerifyIssue::Type
 Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
 {
   // Is still beta?
@@ -278,7 +278,13 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
     }
   }
 
-  return 0 == issues.size();
+  // Get max issue severity
+  VerifyIssue::Type maxType = VerifyIssue::NONE;
+  foreach (VerifyIssue issue, issues) {
+    if (issue.type() > maxType)
+      maxType = issue.type();
+  }
+  return maxType;
 }
 
 

@@ -231,7 +231,7 @@ protected:
     Zone *toZoneObj() const;
     /** Links a previously constructed @c Zone object to the rest of the configuration. That is
      * linking to the referred channels. */
-    bool linkZoneObj(Zone *zone, const CodeplugContext &ctx) const;
+    bool linkZoneObj(Zone *zone, const CodeplugContext &ctx, bool putInB) const;
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     void fromZoneObjA(const Zone *zone, const Config *conf);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
@@ -300,7 +300,7 @@ public:
 	/** Decodes the binary codeplug and stores its content in the given generic configuration. */
 	bool decode(Config *config);
   /** Encodes the given generic configuration as a binary codeplug. */
-  bool encode(Config *config, bool update=true);
+  bool encode(Config *config, const Flags &flags = Flags());
 };
 
 #endif // OPENGD77_CODEPLUG_HH
