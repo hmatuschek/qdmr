@@ -35,8 +35,8 @@ add_library(libdmrconf SHARED ${libdmrconf_SOURCES} ${libdmrconf_MOC_SOURCES})
 set_target_properties(libdmrconf PROPERTIES
 	MACOSX_RPATH TRUE
   OUTPUT_NAME dmrconf
-  VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
-  SOVERSION "${VERSION_MAJOR}.${VERSION_MINOR}")
+  VERSION "${PROJECT_VERSION}"
+  SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 target_link_libraries(libdmrconf ${LIBS})
 
 install(TARGETS libdmrconf DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
