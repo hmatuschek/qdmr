@@ -5,5 +5,5 @@ Comment=A universal code-plug programming software for DMR radios.
 Exec=qdmr
 Icon=qdmr.png
 Type=Application
-Categories=Ham-Radio;Network;
+Categories=Application;Network;Ham-Radio;
 Terminal=false

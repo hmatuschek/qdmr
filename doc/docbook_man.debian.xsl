@@ -5,5 +5,5 @@
 
   <xsl:strip-space elements="*"/>
 
-  <xsl:include href="file:///opt/local/share/xsl/docbook-xsl-nons/manpages/docbook.xsl"/>
+  <xsl:include href="file:///usr/share/xml/docbook/stylesheet/docbook-xsl/manpages/docbook.xsl"/>
 </xsl:stylesheet>

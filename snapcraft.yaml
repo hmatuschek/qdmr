@@ -13,7 +13,7 @@ description: |
    * TYT MD-UV390
    * Retevis RT3S
    * Open GD77 firmware (GD77, RD-5R & DM-1801)
-   * AnyTone D-878UV
+   * AnyTone AT-D878UV
    * Radioddity GD77 (untested)
 
 confinement: strict
@@ -57,6 +57,8 @@ parts:
       - qtpositioning5-dev
       - libqt5serialport5-dev
       - libusb-1.0-0-dev
+      - xsltproc
+      - docbook-xsl
     stage-packages:
       - libqt5core5a
       - libqt5gui5
