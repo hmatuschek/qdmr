@@ -3,6 +3,7 @@ project(qdmr VERSION 0.6.2)
 
 option(BUILD_TESTS "Build test programs" OFF)
 option(BUILD_DOCS  "Build API documentation" OFF)
+option(BUILD_MAN   "Build man page for dmrconf" OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -15,11 +16,15 @@ find_package(Qt5Positioning REQUIRED)
 find_package(Qt5LinguistTools REQUIRED)
 find_package(Qt5Test REQUIRED)
 find_package(LIBUSB_1 REQUIRED)
-find_program(XSLTPROC_EXECUTABLE xsltproc DOC "xsltproc for man-page generation." REQUIRED)
+
+if (${BUILD_MAN})
+  find_program(XSLTPROC_EXECUTABLE xsltproc DOC "xsltproc for man-page generation." REQUIRED)
+endif(${BUILD_MAN})
 
 if (${BUILD_DOCS})
   find_package(Doxygen REQUIRED dot)
 endif(${BUILD_DOCS})
+
 
 ADD_DEFINITIONS(${Qt5Widgets_DEFINITIONS})
 #add_definitions("-DQT_EVENT_DISPATCHER_CORE_FOUNDATION=1")

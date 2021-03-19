@@ -22,13 +22,15 @@ add_custom_command(
   COMMENT "Generating man-page for dmrconf."
   VERBATIM)
 
-add_custom_target(manpage ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.1)
-
-if (UNIX AND NOT APPLE)
- install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.1
-         DESTINATION ${CMAKE_INSTALL_FULL_MANDIR}/man1/)
-endif (UNIX AND NOT APPLE)
-
+if (${BUILD_MAN})
+  # Create man page from docbook
+  add_custom_target(manpage ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.1)
+  # install man page on unix systems
+  if (UNIX)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.1
+      DESTINATION ${CMAKE_INSTALL_FULL_MANDIR}/man1/)
+  endif (UNIX)
+endif(${BUILD_MAN})
 
 #
 # optional API docs
