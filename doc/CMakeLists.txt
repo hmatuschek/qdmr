@@ -5,11 +5,17 @@
 message(STATUS "Using xsltproc: ${XSLTPROC_EXECUTABLE}")
 configure_file("dmrconf.in.xml" "dmrconf.xml")
 
+if(UNIX AND NOT APPLE)
+  set(DOCBOOK2MAN_XSLT ${CMAKE_CURRENT_SOURCE_DIR}/docbook_man.debian.xsl)
+elseif(UNIX AND APPLE)
+  set(DOCBOOK2MAN_XSLT ${CMAKE_CURRENT_SOURCE_DIR}/docbook_man.macports.xsl)
+endif(UNIX AND APPLE)
+
 add_custom_command(
   OUTPUT dmrconf.1
   COMMAND ${XSLTPROC_EXECUTABLE}
           -o ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.1
-          ${CMAKE_CURRENT_SOURCE_DIR}/docbook_man.xsl
+          ${DOCBOOK2MAN_XSLT}
           ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.xml
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.xml
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
