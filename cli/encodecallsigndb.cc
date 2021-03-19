@@ -8,6 +8,7 @@
 #include "config.hh"
 #include "uv390_callsigndb.hh"
 #include "opengd77_callsigndb.hh"
+#include "d878uv_callsigndb.hh"
 #include "crc32.hh"
 
 
@@ -64,6 +65,14 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if ("opengd77"==parser.value("radio").toLower()) {
     OpenGD77CallsignDB db;
+    db.encode(&userdb);
+    if (! db.write(parser.positionalArguments().at(1))) {
+      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
+                 << "': " << db.errorMessage();
+      return -1;
+    }
+  } else if ("d878uv"==parser.value("radio").toLower()) {
+    D878UVCallsignDB db;
     db.encode(&userdb);
     if (! db.write(parser.positionalArguments().at(1))) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)

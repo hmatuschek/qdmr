@@ -13,35 +13,39 @@
  *  <tr><td>04000000</td> <td>max. 186a00</th> <td>Index of callsign entries. Follows the same
  *   weird format as @c D878UVCodeplug::contact_map_t. Sorted by ID. Empty entries set to
  *   0xffffffffffffffff.</td></tr>
- *  <tr><td>044c0000</td> <td>unknown</td>     <td>Unknown, kind of an search index.</td></tr>
- *  <td><td>04500000</td> <td>unknown</td>     <td>The actual DB entries, each entry is of
+ *  <tr><td>044c0000</td> <td>unknown</td>     <td>Unknown, kind of an search index. First 4b are
+ *   number of entries in a uint32_t little endian. </td></tr>
+ *  <tr><td>04500000</td> <td>unknown</td>     <td>The actual DB entries, each entry is of
  *   variable size but shares the same header, see @c entry_head_t. Order arbitrary.
  *   Filled with 0x00.</td></tr>
  * </table>
+ *
  * @ingroup d878uv */
 class D878UVCallsignDB : public DFUFile
 {
   Q_OBJECT
 
 public:
-  /** Represents the header of an entry the callsign database.
+  /** Represents the header of an entry in the callsign database.
    * Each entry is of variable size. That is, every entry has a common header containing the
-   * number, call-type etc. All names, that is contact name, city, callsign, state, country and
-   * comment are 0x00 terminated string lists.
+   * number, call-type etc. All strings, that is contact name, city, callsign, state, country and
+   * comment are 0x00 terminated strings in a lists.
    *
-   * Max lenghth for name is 16, city is 16, call is 8, state is 16, country is 16 and
+   * Max lenghth for name is 16, city is 16, callsign is 8, state is 16, country is 16 and
    * comment is 16, excluding terminating 0x00.
    *
    * Memmory layout of encoded Callsign/User database entry:
    * @verbinclude d878uvuserdbentry.txt
    */
-  struct __attribute__((packed)) enty_head_t {
+  struct __attribute__((packed)) entry_t {
+    /** Possible call types for each entry of the callsign db. */
     typedef enum {
       PRIVATE_CALL = 0,                 ///< A private call entry.
       GROUP_CALL   = 1,                 ///< A group call entry.
       ALL_CALL     = 2                  ///< An all-call entry.
     } CallType;
 
+    /** Notification tones for callsign entry. */
     typedef enum {
       RING_NONE = 0,
       RING_TONE = 1,
@@ -51,11 +55,30 @@ public:
     uint8_t call_type;                  ///< Call type, see @c CallType.
     uint32_t id;                        ///< DMR ID, BCD encoded, big endian.
     uint8_t ring;                       ///< Ring tone, see @c RingTone.
+
+    uint8_t body[94];                   ///< Up to 94 bytes name, city, callsign, state, country and comment.
+
+    size_t fromUser(const UserDatabase::User &user);
+
+    static size_t getSize(const UserDatabase::User &user);
   };
 
-  /** Same index entry used by codeplug to map normal digital contacts to an offset. Here
+
+  /** Same index entry used by the codeplug to map normal digital contacts to an contact index. Here
    * it maps to the byte offset within the database entries. */
   typedef D878UVCodeplug::contact_map_t index_entry_t;
+
+  struct __attribute__((packed)) limits_t {
+    uint32_t count;                     ///< Number of db entries, little-endian.
+    uint32_t end_of_db;                 ///< Memory address of end of entries, or where to insert
+                                        ///  the next entry, little endian.
+    uint32_t _unused8;                  ///< Unused? Set to 0x000000.
+    uint32_t _unused12;                 ///< Unused? Set to 0x000000.
+
+    void setCount(uint32_t n);
+    void setEndOfDB(uint32_t addr);
+  };
+
 
 public:
   /** Constructor, does not allocate any memory yet. */

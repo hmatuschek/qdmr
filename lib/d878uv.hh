@@ -11,6 +11,7 @@
 #include "radio.hh"
 #include "anytone_interface.hh"
 #include "d878uv_codeplug.hh"
+#include "d878uv_callsigndb.hh"
 
 
 /** Implements an interface to Anytone AT-D878UV VHF/UHF 7W DMR (Tier I & II) radios.
@@ -64,6 +65,9 @@ protected:
   bool download();
   /** Uploads the encoded codeplug to the radio. This method block until the upload is complete. */
   bool upload();
+  /** Uploads the encoded callsign database to the radio.
+   * This method block until the upload is complete. */
+  bool uploadCallsigns();
 
 protected:
   /** The device identifier. */
@@ -79,6 +83,7 @@ protected:
   UserDatabase *_userDB;
   /** The actual binary codeplug representation. */
   D878UVCodeplug _codeplug;
+  D878UVCallsignDB _callsigns;
 };
 
 #endif // __D878UV_HH__

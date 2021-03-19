@@ -64,6 +64,7 @@ class DFUFile: public QObject
 {
 	Q_OBJECT
 
+public:
   /** Represents a single element within a @c Image. */
 	class Element {
 	public:
