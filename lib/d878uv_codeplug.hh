@@ -82,6 +82,8 @@ class GPSSystem;
  *  <tr><td>02680000</td> <td>max. 0f4240</td> <td>10000 contacts, see @c contact_t.
  *    As each contact is 100b, they do not align with the 16b blocks being transferred to the device.
  *    Hence contacts are organized internally in groups of 4 contacts forming a "bank". </td></tr>
+ *  <tr><td>04340000</td> <td>max. 013880</td> <td>DMR ID to contact index map, see @c contact_map_t.
+ *    Sorted by ID, empty entries set to 0xffffffffffffffff.</td>
  *
  *  <tr><th colspan="3">Analog Contacts</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -167,11 +169,6 @@ class GPSSystem;
  *    as 8-digit BCD little-endian in 100Hz. Filled with 0x00.</td></tr>
  *  <tr><td>02480200</td> <td>000010</td>      <td>FM broadcast VFO frequency. Encoded
  *    as 8-digit BCD little-endian in 100Hz. Filled with 0x00.</td></tr>
- *
- *  <tr><th colspan="3">ID -> Contact map</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>04340000</td> <td>max. 013880</td> <td>DMR ID to contact index map, see @c contact_map_t.
- *    Sorted by ID, empty entries set to 0xffffffffffffffff.</td>
  *
  *  <tr><th colspan="3">Still unknown</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
