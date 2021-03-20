@@ -148,6 +148,8 @@ This can then be interperted as a read request with payload
 
 
 ## Read request payload
+**Not all read requests follow this format exactly. The majority does.**
+
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
 00 | Unknown           | Memory page?      | 0x01    | 0x0c    | 0x00    | 0x00    |
@@ -175,6 +177,7 @@ two consecutive reads increments by extactly the length of the previous read.
 
 
 ## Read response payload
+**Not all read responses follow this format exactly. The majority does.**
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
 00 | Unkown 16bit      | Memory page?      | 0x81    | 0x85    | 0x50    | 0x00    |
