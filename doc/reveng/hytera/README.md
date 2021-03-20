@@ -154,15 +154,16 @@ This can then be interperted as a read request with payload
    +---------+---------+---------+---------+---------+---------+---------+---------+
 08 | 0x00    | 0x00    | 0x01    | 0x00    | 0x00    | Offset 32bit LE          ...
    +---------+---------+---------+---------+---------+---------+---------+---------+
-10  ...      | Lenght, 16bit, LE |
+10  ...      | Length, 16bit, LE |
    +---------+---------+---------+
 ```
  - The first field appears to be relatively random.
  - The second field appears to be a memory page. This address is repeated in the response.
  - Several unknown or empty fields. *TODO: verify that they are fixed for all reads.*
- - Field 0x0d is a 16bit little endian offset. Likely the byte offset within each memory page to
+ - Field 0x0d is a 32bit little endian offset. Likely the byte offset within each memory page to
    read from.
- - Field 0x11 is the number of bytes to read starting from the specified offset.
+ - Field 0x11 is the number of bytes to read starting from the specified offset in a
+   16bit little endian integer.
 
 ### Continuing the example above
 The payload
@@ -180,7 +181,7 @@ two consecutive reads increments by extactly the length of the previous read.
    +---------+---------+---------+---------+---------+---------+---------+---------+
 08 | 0x00    | 0x00    | 0x00    | 0x01    | 0x00    | 0x00    | Offset 32bit LE...
    +---------+---------+---------+---------+---------+---------+---------+---------+
-10  ...                | Lenght, 16bit, LE | Actual data                        ...
+10  ...                | Length, 16bit, LE | Actual data                        ...
    +---------+---------+---------+---------+---------+---------+---------+---------+
     ...                                                                            |
    +---------+---------+---------+---------+---------+---------+---------+---------+
@@ -189,7 +190,7 @@ two consecutive reads increments by extactly the length of the previous read.
  ship between this field and the first field of the corresponding read request.
  - The second field appears to be a memory page. This address is repeated from the request.
  - Several or empty fields. *TODO: verify that they are fixed for all reads.*
- - Field 0x0e is a 16bit litte endian offset. Likely the byte offset within the memory page the
+ - Field 0x0e is a 32bit litte endian offset. Likely the byte offset within the memory page the
    data was read from.
  - Field 0x12 is the length of the data read.
 
