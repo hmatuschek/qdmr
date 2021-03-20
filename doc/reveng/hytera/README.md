@@ -112,7 +112,7 @@ several redundant length fields.
 
 ```
 +---------+---------+---------+---------+---------+---------+---------+---------+
-| Preamb  | Cmd/Res |  0x00?  | Flags?  | Source  | Dest.   |  Unknown          |
+| Preamb  | Cmd/Res |  0x00?  | Flags?  | Source  | Dest.   |  Resp. Count      |
 +---------+---------+---------+---------+---------+---------+---------+---------+
 | TLen., 16bit, BE  | PAYLOAD, optional, variable size ...
 +---------+---------+---------+---------+---------+---------+---------+---------+
@@ -128,7 +128,7 @@ several redundant length fields.
   - Flags: Possible command/packet flags. Observed as
   - Source tag: 0x20 Host, 0x10 Device
   - Destination tag: 0x20 Host, 0x10 Device
-  - Unknown, usually 0x0000 on requests, and 0x0001 or 0x0003 on responses.
+  - Response counter, 16 bit big endian. Only present on responses and 0x0000 on requests.
   - Total lenght of packet, including headers etc.
   - Optional content, not present in command request and responses.
   - Some sort of parity/error check sum. TODO is is certainly not a simple byte-sum.
@@ -152,7 +152,7 @@ This can then be interperted as a read request with payload
 
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
-00 | Unknown           | Memory page?      | 0x01    | 0x0c    | 0x00    | 0x00    |
+00 | Unknown           | 0x02    | What    | ???     | 0x0c    | 0x00    | 0x00    |
    +---------+---------+---------+---------+---------+---------+---------+---------+
 08 | 0x00    | 0x00    | 0x01    | 0x00    | 0x00    | Offset 32bit LE          ...
    +---------+---------+---------+---------+---------+---------+---------+---------+
@@ -160,12 +160,17 @@ This can then be interperted as a read request with payload
    +---------+---------+---------+
 ```
  - The first field appears to be relatively random.
- - The second field appears to be a memory page. This address is repeated in the response.
- - Several unknown or empty fields. *TODO: verify that they are fixed for all reads.*
- - Field 0x0d is a 32bit little endian offset. Likely the byte offset within each memory page to
-   read from.
- - Field 0x11 is the number of bytes to read starting from the specified offset in a
-   16bit little endian integer.
+ - The second field appears to be fixed to 0x02 (also for the response).
+ - The third field appears to specify what to read:
+   - 0x03: unknown, likely device identification
+   - 0xc5: unknown
+   - 0x01: unknown
+   - 0xc7: this means likely "read code-plug"
+ - Unknown field, have seen 0x01, 0x02.
+   - 0x01: during download of actual code-plug
+ - Several other hopefully constant values.
+ - Field 13 is a 32bit little endian address. I can confirm that this is the byte address to read from.
+ - Field 17 is the number of bytes to read starting from the specified address. 16bit little endian integer.
 
 ### Continuing the example above
 The payload
@@ -180,7 +185,7 @@ two consecutive reads increments by extactly the length of the previous read.
 **Not all read responses follow this format exactly. The majority does.**
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
-00 | Unkown 16bit      | Memory page?      | 0x81    | 0x85    | 0x50    | 0x00    |
+00 | Unkown 16bit      | 0x02    | What    | ???     | 0x85    | 0x50    | 0x00    |
    +---------+---------+---------+---------+---------+---------+---------+---------+
 08 | 0x00    | 0x00    | 0x00    | 0x01    | 0x00    | 0x00    | Offset 32bit LE...
    +---------+---------+---------+---------+---------+---------+---------+---------+
@@ -191,8 +196,11 @@ two consecutive reads increments by extactly the length of the previous read.
 ```
  - The first field is again unkown and appears to be relatively radom. Maybe there is a relation
  ship between this field and the first field of the corresponding read request.
- - The second field appears to be a memory page. This address is repeated from the request.
- - Several or empty fields. *TODO: verify that they are fixed for all reads.*
+ - The second field appears to be fixed to 0x02. Save value as the request at that position.
+ - What was read? Same value as the request at that position.
+ - Unknown byte, however if 0x01 was send in the request at that position, the response contains
+ 0x81. And when 0x02 was send in the request, the response contains 0x82. Maybe bitflags?
+ - Several unknown or empty fields. *TODO: verify that they are fixed for all reads.*
  - Field 0x0e is a 32bit litte endian offset. Likely the byte offset within the memory page the
    data was read from.
  - Field 0x12 is the length of the data read.
@@ -209,3 +217,36 @@ Furhter, the very next read response payload starts with
 ```
 d8:68:02:c7:81:85:05:00:00:00:00:01:00:00:78:05:00:00:78:05:00:00:00:...
 ```
+
+## Special read request/response: Identify radio
+The very first read request to the radio appears to be a request for identification from the radio.
+It returns with 16bit unicode strings. Containing strings like
+```
+X1p05-000G0000-MB0000-U1-0-B
+```
+So I guess you read the code-plug from you X1p?
+
+### Request
+This request however, does not follow the
+*read-code-plug* requests and responses above. Here is what I found for the request:
+```
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+00 | Unkown 16bit      | 0x02    | 0x03    | 0x02    | 0x01    | 0x00    | 0x00    |
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+``
+
+### Response
+The response also does not follow the typical format of a read response above.
+```
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+00 | Unkown 16bit      | 0x02    | 0x03    | 0x82    | Length 16bit LE   | Data ...
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+    ...                                                                            |
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+```
+
+The data section contains 0x48 bytes. Containing 16bit unicode strings.
+
+## Special read request/response: Firmware version
+The second read request appears to request the firmware version and other information from the
+radio. Also this request does not follow the general "read-code-plug" read request format above.
