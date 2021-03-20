@@ -95,9 +95,113 @@ The following can be observed:
       `0x1020` when radio-to-host.
     - `K` -  Packet header, always has value `0x7e010000`.
 
+
   - Read Command Fields:
 
       - `D` - Unknown, but seems to have a static value across all read
         commands.
       - `C` - The address to read data from.
       - `B` - The size of data to read.
+
+
+## Basic packet format
+This format appears to be a nested packet format. That is, there is a common
+header and end of packet with some payload area in between. This payload area
+than contains another packet format. These formats usualy imply that there are
+several redundant length fields.
+
+```
++---------+---------+---------+---------+---------+---------+---------+---------+
+| Preamb  | Cmd/Res |  0x00?  | Flags?  | Source  | Dest.   |  Unknown          |
++---------+---------+---------+---------+---------+---------+---------+---------+
+| TLen., 16bit, BE  | PAYLOAD, optional, variable size ...
++---------+---------+---------+---------+---------+---------+---------+---------+
+ ...                                                        | CRC     | PktEnd  |
++---------+---------+---------+---------+---------+---------+---------+---------+
+```
+  - Preable: Fixed to 0x7e (binary 01111110).
+  - Command/Type:
+    - 00 -> Command request
+    - 01 -> Read request
+    - 04 -> Read/Command response on success
+  - Byte 3 appears to be reserved or part of the next byte (flags). Only observed as 0x00.
+  - Flags: Possible command/packet flags. Observed as
+  - Source tag: 0x20 Host, 0x10 Device
+  - Destination tag: 0x20 Host, 0x10 Device
+  - Unknown, usually 0x0000 on requests, and 0x0001 or 0x0003 on responses.
+  - Total lenght of packet, including headers etc.
+  - Optional content, not present in command request and responses.
+  - Some sort of parity/error check sum. TODO is is certainly not a simple byte-sum.
+  - End of packet flag (observed 0xe5, 0xd2, 0x03).
+    - Command request to enter read/program mode 0xe5
+    - Command response entered read/program mode 0xd2
+    - Read command and response 0x03.
+
+### Example
+```
+7e:01:00:00:20:10:00:00:00:1f:53:a4:02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05:e0:03
+```
+This can then be interperted as a read request with payload
+```
+53:a4:02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05
+```
+
+
+## Read request payload
+```
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+00 | Unknown           | Memory page?      | 0x01    | 0x0c    | 0x00    | 0x00    |
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+08 | 0x00    | 0x00    | 0x01    | 0x00    | 0x00    | Offset 32bit LE          ...
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+10  ...      | Lenght, 16bit, LE |
+   +---------+---------+---------+
+```
+ - The first field appears to be relatively random.
+ - The second field appears to be a memory page. This address is repeated in the response.
+ - Several unknown or empty fields. *TODO: verify that they are fixed for all reads.*
+ - Field 0x0d is a 16bit little endian offset. Likely the byte offset within each memory page to
+   read from.
+ - Field 0x11 is the number of bytes to read starting from the specified offset.
+
+### Continuing the example above
+The payload
+```
+53:a4:02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05
+```
+This would request to read 0x0578 bytes from offset 0x0000. I have verified that, as the offset of
+two consecutive reads increments by extactly the length of the previous read.
+
+
+## Read response payload
+```
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+00 | Unkown 16bit      | Memory page?      | 0x81    | 0x85    | 0x50    | 0x00    |
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+08 | 0x00    | 0x00    | 0x00    | 0x01    | 0x00    | 0x00    | Offset 32bit LE...
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+10  ...                | Lenght, 16bit, LE | Actual data                        ...
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+    ...                                                                            |
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+```
+ - The first field is again unkown and appears to be relatively radom. Maybe there is a relation
+ ship between this field and the first field of the corresponding read request.
+ - The second field appears to be a memory page. This address is repeated from the request.
+ - Several or empty fields. *TODO: verify that they are fixed for all reads.*
+ - Field 0x0e is a 16bit litte endian offset. Likely the byte offset within the memory page the
+   data was read from.
+ - Field 0x12 is the length of the data read.
+
+### Continuing the example above
+The payload of the response to the read request in the previous example starts with
+```
+45:b2:02:c7:81:85:05:00:00:00:00:01:00:00:00:00:00:00:78:05:16:01:52:...
+```
+the total length of this payload is 0x058C. Removing 20bytes of response header yields exactly
+0x578 bytes of data, matching exactly the amount in the read request and in the response header.
+
+Furhter, the very next read response payload starts with
+```
+d8:68:02:c7:81:85:05:00:00:00:00:01:00:00:78:05:00:00:78:05:00:00:00:...
+```
