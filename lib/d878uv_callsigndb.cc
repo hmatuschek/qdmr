@@ -53,13 +53,18 @@ D878UVCallsignDB::entry_t::getSize(const UserDatabase::User &user) {
  * Implementation of D878UVCallsignDB::limits_t
  * ******************************************************************************************** */
 void
+D878UVCallsignDB::limits_t::clear() {
+  count = end_of_db = _unused8 = _unused12 = 0;
+}
+
+void
 D878UVCallsignDB::limits_t::setCount(uint32_t n) {
   count = qToLittleEndian(n);
 }
 
 void
-D878UVCallsignDB::limits_t::setEndOfDB(uint32_t addr) {
-  end_of_db = qToLittleEndian(addr);
+D878UVCallsignDB::limits_t::setTotalSize(uint32_t size) {
+  end_of_db = qToLittleEndian(ADDR_CALLSIGN + size);
 }
 
 
@@ -87,18 +92,22 @@ D878UVCallsignDB::encode(UserDatabase *db) {
 
   // Compute total size of callsign db entries
   size_t dbSize = 0;
+  size_t indexSize = n*sizeof(index_entry_t);
   for (qint64 i=0; i<n; i++)
     dbSize += entry_t::getSize(users[i]);
 
-  // Allocate space for everything
-  image(0).addElement(ADDR_CALLSIGN_INDEX, align_size(n*sizeof(index_entry_t), 16));
+  // Allocate and clear space for everything
+  image(0).addElement(ADDR_CALLSIGN_INDEX, align_size(indexSize, 16));
+  memset(data(ADDR_CALLSIGN_INDEX), 0xff, align_size(indexSize, 16));
   image(0).addElement(ADDR_UNKNOWN, sizeof(limits_t));
+  memset(data(ADDR_UNKNOWN), 0x00, sizeof(limits_t));
   image(0).addElement(ADDR_CALLSIGN, align_size(dbSize, 16));
+  memset(data(ADDR_CALLSIGN), 0x00, align_size(dbSize, 16));
 
   // Store DB limits
   limits_t *limits = (limits_t *)data(ADDR_UNKNOWN);
   limits->setCount(n);
-  limits->setEndOfDB(ADDR_CALLSIGN+dbSize);
+  limits->setTotalSize(dbSize);
 
   // Then fill index and DB
   uint32_t entry_addr = ADDR_CALLSIGN;

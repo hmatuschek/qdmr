@@ -13,10 +13,9 @@
  *  <tr><td>04000000</td> <td>max. 186a00</th> <td>Index of callsign entries. Follows the same
  *   weird format as @c D878UVCodeplug::contact_map_t. Sorted by ID. Empty entries set to
  *   0xffffffffffffffff.</td></tr>
- *  <tr><td>044c0000</td> <td>unknown</td>     <td>Unknown, kind of an search index. First 4b are
- *   number of entries in a uint32_t little endian. </td></tr>
+ *  <tr><td>044c0000</td> <td>unknown</td>     <td>Database limits, see @c limits_t.</td></tr>
  *  <tr><td>04500000</td> <td>unknown</td>     <td>The actual DB entries, each entry is of
- *   variable size but shares the same header, see @c entry_head_t. Order arbitrary.
+ *   variable size but shares the same header, see @c entry_t. Order arbitrary.
  *   Filled with 0x00.</td></tr>
  * </table>
  *
@@ -35,7 +34,7 @@ public:
    * comment is 16, excluding terminating 0x00.
    *
    * Memmory layout of encoded Callsign/User database entry:
-   * @verbinclude d878uvuserdbentry.txt
+   * @verbinclude d878uvcallsigndbentry.txt
    */
   struct __attribute__((packed)) entry_t {
     /** Possible call types for each entry of the callsign db. */
@@ -58,8 +57,10 @@ public:
 
     uint8_t body[94];                   ///< Up to 94 bytes name, city, callsign, state, country and comment.
 
+    /** Constructs a database entry from the given user.
+     * @returns The size of the entry. */
     size_t fromUser(const UserDatabase::User &user);
-
+    /** Computes the size of the database entry for the given user. */
     static size_t getSize(const UserDatabase::User &user);
   };
 
@@ -68,6 +69,10 @@ public:
    * it maps to the byte offset within the database entries. */
   typedef D878UVCodeplug::contact_map_t index_entry_t;
 
+  /** Stores some basic limits of the callsign db.
+   *
+   * Memmory layout of encoded Callsign/User database entry:
+   * @verbinclude d878uvcallsigndblimit.txt */
   struct __attribute__((packed)) limits_t {
     uint32_t count;                     ///< Number of db entries, little-endian.
     uint32_t end_of_db;                 ///< Memory address of end of entries, or where to insert
@@ -75,8 +80,12 @@ public:
     uint32_t _unused8;                  ///< Unused? Set to 0x000000.
     uint32_t _unused12;                 ///< Unused? Set to 0x000000.
 
+    /** Clear the db limits. */
+    void clear();
+    /** Sets the total amount of database entries. */
     void setCount(uint32_t n);
-    void setEndOfDB(uint32_t addr);
+    /** Sets the total size of the db (only the entry section, not index). */
+    void setTotalSize(uint32_t size);
   };
 
 

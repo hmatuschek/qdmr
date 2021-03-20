@@ -83,6 +83,7 @@ protected:
   UserDatabase *_userDB;
   /** The actual binary codeplug representation. */
   D878UVCodeplug _codeplug;
+  /** The actual binary callsign database representation. */
   D878UVCallsignDB _callsigns;
 };
 
