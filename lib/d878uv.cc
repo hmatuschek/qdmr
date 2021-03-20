@@ -367,22 +367,28 @@ D878UV::uploadCallsigns() {
   // Sort all elements before uploading
   _callsigns.image(0).sort();
 
+  size_t totalBlocks = _callsigns.memSize()/WBSIZE;
+  size_t blkWritten  = 0;
   // Upload all elements back to the device
   for (int n=0; n<_callsigns.image(0).numElements(); n++) {
     uint addr = _callsigns.image(0).element(n).address();
     uint size = _callsigns.image(0).element(n).data().size();
-    if (! _dev->write(0, addr, _callsigns.data(addr), size)) {
-      _errorMessage = QString("%1 Cannot upload callsign db: %2").arg(__func__)
-          .arg(_dev->errorMessage());
-      logError() << _errorMessage;
-      _task = StatusError;
-      _dev->reboot();
-      _dev->close();
-      _dev->deleteLater();
-      emit uploadError(this);
-      return false;
+    uint nblks = size/WBSIZE;
+    for (uint i=0; i<nblks; i++) {
+      if (! _dev->write(0, addr+i*WBSIZE, _callsigns.data(addr)+i*WBSIZE, WBSIZE)) {
+        _errorMessage = QString("%1 Cannot upload callsign db: %2").arg(__func__)
+            .arg(_dev->errorMessage());
+        logError() << _errorMessage;
+        _task = StatusError;
+        _dev->reboot();
+        _dev->close();
+        _dev->deleteLater();
+        emit uploadError(this);
+        return false;
+      }
+      blkWritten++;
+      emit uploadProgress(float(blkWritten*100)/totalBlocks);
     }
-    emit uploadProgress(float(n*100)/_codeplug.image(0).numElements());
   }
   //_codeplug.write("debug_codeplug.dfu");
   return true;
