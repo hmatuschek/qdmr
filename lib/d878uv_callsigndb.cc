@@ -78,9 +78,11 @@ D878UVCallsignDB::D878UVCallsignDB(QObject *parent)
   addImage("AnyTone AT-D878UV Callsign database.");
 }
 
-bool D878UVCallsignDB::encode(UserDatabase *db) {
+bool D878UVCallsignDB::encode(UserDatabase *db, const Selection &selection) {
   // Determine size of call-sign DB in memory
   qint64 n = std::min(db->count(), qint64(MAX_CALLSIGNS));
+  if (selection.hasCountLimit())
+    n = std::min(n, (qint64)selection.countLimit());
 
   // Select n users and sort them in ascending order of their IDs
   QVector<UserDatabase::User> users;
@@ -114,8 +116,9 @@ bool D878UVCallsignDB::encode(UserDatabase *db) {
   index_entry_t *index_ptr = (index_entry_t *)data(ADDR_CALLSIGN_INDEX);
   for (qint64 i=0; i<n; i++) {
     index_ptr->setID(entry_addr, false);
+    index_ptr->setIndex(entry_addr - ADDR_CALLSIGN);
     size_t off = ((entry_t *)entry_ptr)->fromUser(users[i]);
-    entry_addr += off; entry_ptr += off;
+    entry_addr += off; entry_ptr += off; index_ptr += 1;
   }
 
   return true;

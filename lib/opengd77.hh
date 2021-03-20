@@ -36,7 +36,8 @@ public slots:
   bool startUpload(Config *config, bool blocking=false,
                    const CodePlug::Flags &flags = CodePlug::Flags());
   /** Encodes the given user-database and uploades it to the device. */
-  bool startUploadCallsignDB(UserDatabase *db, bool blocking=false);
+  bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
+                             const CallsignDB::Selection &selection=CallsignDB::Selection());
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */

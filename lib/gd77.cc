@@ -127,7 +127,7 @@ GD77::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
 }
 
 bool
-GD77::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
   Q_UNUSED(db);
   Q_UNUSED(blocking);
 

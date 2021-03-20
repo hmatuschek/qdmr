@@ -7,6 +7,7 @@
 #include "radio.hh"
 #include "userdatabase.hh"
 #include "progressbar.hh"
+#include "callsigndb.hh"
 
 
 int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
@@ -41,6 +42,16 @@ int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
               << "select those entries 'closest' to you. I.e., DMR IDs with the same prefix.";
   }
 
+  CallsignDB::Selection selection;
+  if (parser.isSet("limit")) {
+    bool ok=true;
+    selection.setCountLimit(parser.value("limit").toUInt(&ok));
+    if (! ok) {
+      logError() << "Please specify a valid limit for the number of callsign db entries using the -n/--limit option.";
+      return -1;
+    }
+  }
+
   QString msg;
   Radio *radio = Radio::detect(msg);
   if (nullptr == radio) {
@@ -51,7 +62,7 @@ int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
   showProgress();
   QObject::connect(radio, &Radio::uploadProgress, updateProgress);
 
-  if (! radio->startUploadCallsignDB(&userdb, true)) {
+  if (! radio->startUploadCallsignDB(&userdb, true, selection)) {
     logError() << "Could not upload call-sign DB to radio: " << radio->errorMessage();
     return -1;
   }

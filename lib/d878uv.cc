@@ -125,11 +125,11 @@ D878UV::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags)
 }
 
 bool
-D878UV::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+D878UV::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
   Q_UNUSED(db);
   Q_UNUSED(blocking);
 
-  _callsigns.encode(db);
+  _callsigns.encode(db, selection);
 
   _task = StatusUploadCallsigns;
   if (blocking) {

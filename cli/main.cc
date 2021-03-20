@@ -61,6 +61,13 @@ int main(int argc, char *argv[])
                      QCoreApplication::translate("main", "Specifes the DMR id."),
                      QCoreApplication::translate("main", "ID")
                    });
+  parser.addOption({
+                     {"n", "limit"},
+                     QCoreApplication::translate("main", "Limits several amonuts, depending on the "
+                     "context. When encoding/writing the callsign db, this option speicifies the "
+                     "maximum number of callsigns to encode."),
+                     QCoreApplication::translate("main", "N")
+                   });
   parser.addOption(QCommandLineOption(
                      "init-codeplug",
                      QCoreApplication::translate(
@@ -74,7 +81,6 @@ int main(int argc, char *argv[])
                      "auto-enable-roaming",
                      QCoreApplication::translate("main", "Automatically enables roaming if there is a "
                                                          "roaming zone used by any channel.")));
-
   parser.addPositionalArgument(
         "command", QCoreApplication::translate(
           "main", "Specifies the command to perform. Either detect, verify, read, write, "

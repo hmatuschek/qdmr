@@ -86,7 +86,7 @@ public:
   explicit UV390CallsignDB(QObject *parent=nullptr);
 
   /** Tries to encode as many entries of the given user-database. */
-  bool encode(UserDatabase *db);
+  bool encode(UserDatabase *db, const Selection &selection=Selection());
 };
 
 #endif // UV390CALLSIGNDB_HH

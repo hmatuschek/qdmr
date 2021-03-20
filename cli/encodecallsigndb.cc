@@ -49,6 +49,16 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
               << "select those entries 'closest' to you. I.e., DMR IDs with the same prefix.";
   }
 
+  CallsignDB::Selection selection;
+  if (parser.isSet("limit")) {
+    bool ok=true;
+    selection.setCountLimit(parser.value("limit").toUInt(&ok));
+    if (! ok) {
+      logError() << "Please specify a valid limit for the number of callsign db entries using the -n/--limit option.";
+      return -1;
+    }
+  }
+
   if (! parser.isSet("radio")) {
     logError() << "You have to specify the radio using the --radio option.";
     parser.showHelp(-1);
@@ -57,7 +67,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
 
   if (("uv390"==parser.value("radio").toLower()) || ("rt3s"==parser.value("radio").toLower())) {
     UV390CallsignDB db;
-    db.encode(&userdb);
+    db.encode(&userdb, selection);
     if (! db.write(parser.positionalArguments().at(1))) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
                  << "': " << db.errorMessage();
@@ -65,7 +75,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if ("opengd77"==parser.value("radio").toLower()) {
     OpenGD77CallsignDB db;
-    db.encode(&userdb);
+    db.encode(&userdb, selection);
     if (! db.write(parser.positionalArguments().at(1))) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
                  << "': " << db.errorMessage();
@@ -73,7 +83,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if ("d878uv"==parser.value("radio").toLower()) {
     D878UVCallsignDB db;
-    db.encode(&userdb);
+    db.encode(&userdb, selection);
     if (! db.write(parser.positionalArguments().at(1))) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
                  << "': " << db.errorMessage();
