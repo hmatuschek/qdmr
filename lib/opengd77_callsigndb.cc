@@ -1,5 +1,6 @@
 #include "opengd77_callsigndb.hh"
 #include "utils.hh"
+#include "userdatabase.hh"
 #include <QtEndian>
 
 #define OFFSET_USERDB       0x30000
@@ -76,7 +77,7 @@ OpenGD77CallsignDB::userdb_t::setSize(uint n) {
  * Implementation of OpenGD77CallsignDB
  * ******************************************************************************************** */
 OpenGD77CallsignDB::OpenGD77CallsignDB(QObject *parent)
-  : DFUFile(parent)
+  : CallsignDB(parent)
 {
   addImage("OpenGD77 call-sign database");
 }

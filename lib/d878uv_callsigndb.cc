@@ -72,14 +72,13 @@ D878UVCallsignDB::limits_t::setTotalSize(uint32_t size) {
  * Implementation of D878UVCallsignDB
  * ********************************************************************************************* */
 D878UVCallsignDB::D878UVCallsignDB(QObject *parent)
-  : DFUFile(parent)
+  : CallsignDB(parent)
 {
   // allocate and clear DB memory
   addImage("AnyTone AT-D878UV Callsign database.");
 }
 
-void
-D878UVCallsignDB::encode(UserDatabase *db) {
+bool D878UVCallsignDB::encode(UserDatabase *db) {
   // Determine size of call-sign DB in memory
   qint64 n = std::min(db->count(), qint64(MAX_CALLSIGNS));
 
@@ -118,4 +117,6 @@ D878UVCallsignDB::encode(UserDatabase *db) {
     size_t off = ((entry_t *)entry_ptr)->fromUser(users[i]);
     entry_addr += off; entry_ptr += off;
   }
+
+  return true;
 }

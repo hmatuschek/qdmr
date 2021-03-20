@@ -136,13 +136,13 @@ UV390CallsignDB::callsign_db_t::fromUserDB(const UserDatabase *db) {
  * Implementation of UV390CallsignDB
  * ********************************************************************************************* */
 UV390CallsignDB::UV390CallsignDB(QObject *parent)
-  : DFUFile(parent)
+  : CallsignDB(parent)
 {
   // allocate and clear DB memory
   addImage("TYT MD-UV390 Callsign database.");
 }
 
-void
+bool
 UV390CallsignDB::encode(UserDatabase *db) {
   // Determine size of call-sign DB in memory
   qint64 n = std::min(db->count(), qint64(MAX_CALLSIGNS));
@@ -155,4 +155,6 @@ UV390CallsignDB::encode(UserDatabase *db) {
 
   // Encode call-sign DB
   ((callsign_db_t *)data(CALLSIGN_START))->fromUserDB(db);
+
+  return true;
 }

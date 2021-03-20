@@ -1,8 +1,7 @@
 #ifndef D878UVCALLSIGNDB_HH
 #define D878UVCALLSIGNDB_HH
 
-#include "dfufile.hh"
-#include "userdatabase.hh"
+#include "callsigndb.hh"
 #include "d878uv_codeplug.hh"
 
 /** Represents and encodes the binary format for the call-sign database within the radio.
@@ -20,7 +19,7 @@
  * </table>
  *
  * @ingroup d878uv */
-class D878UVCallsignDB : public DFUFile
+class D878UVCallsignDB : public CallsignDB
 {
   Q_OBJECT
 
@@ -94,7 +93,7 @@ public:
   explicit D878UVCallsignDB(QObject *parent=nullptr);
 
   /** Tries to encode as many entries of the given user-database. */
-  void encode(UserDatabase *db);
+  bool encode(UserDatabase *db);
 };
 
 #endif // D878UVCALLSIGNDB_HH
