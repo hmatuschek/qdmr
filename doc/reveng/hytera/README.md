@@ -104,22 +104,22 @@ The following can be observed:
       - `B` - The size of data to read.
 
 
-## Basic packet format
+## Basic packet format (Layer 0)
 This format appears to be a nested packet format. That is, there is a common
 header and end of packet with some payload area in between. This payload area
-than contains another packet format. These formats usualy imply that there are
+than contains another packet format. These formats usually imply that there are
 several redundant length fields.
 
 ```
 +---------+---------+---------+---------+---------+---------+---------+---------+
 | Preamb  | Cmd/Res |  0x00?  | Flags?  | Source  | Dest.   |  Resp. Count      |
 +---------+---------+---------+---------+---------+---------+---------+---------+
-| TLen., 16bit, BE  | PAYLOAD, optional, variable size ...
+| TLen., 16bit, BE  | Payload layer 1, optional, variable size ...
 +---------+---------+---------+---------+---------+---------+---------+---------+
- ...                                                        | CRC     | PktEnd  |
+ ...                                                        | LSB CRC | PktEnd  |
 +---------+---------+---------+---------+---------+---------+---------+---------+
 ```
-  - Preable: Fixed to 0x7e (binary 01111110).
+  - Preamble: Fixed to 0x7e (binary 01111110).
   - Command/Type:
     - 00 -> Command request
     - 01 -> Read request
@@ -129,9 +129,9 @@ several redundant length fields.
   - Source tag: 0x20 Host, 0x10 Device
   - Destination tag: 0x20 Host, 0x10 Device
   - Response counter, 16 bit big endian. Only present on responses and 0x0000 on requests.
-  - Total lenght of packet, including headers etc.
+  - Total length of packet, including headers etc.
   - Optional content, not present in command request and responses.
-  - Some sort of parity/error check sum. TODO is is certainly not a simple byte-sum.
+  - least significant byte of CRC?!?. MSB stored in layer 1?!?
   - End of packet flag (observed 0xe5, 0xd2, 0x03).
     - Command request to enter read/program mode 0xe5
     - Command response entered read/program mode 0xd2
@@ -141,112 +141,147 @@ several redundant length fields.
 ```
 7e:01:00:00:20:10:00:00:00:1f:53:a4:02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05:e0:03
 ```
-This can then be interperted as a read request with payload
+This can then be interpreted as a read request with payload
 ```
 53:a4:02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05
 ```
 
 
-## Read request payload
-**Not all read requests follow this format exactly. The majority does.**
+## Read request & response (Layer 1)
+This protocol is certainly nested. For now I have identified 3 layers. This is layer 1 and 
+describes the content of the payload of layer 0. This layer itself contains of a header and 
+payload. The payload of this layer is layer 2 and is described below.
 
+### Request 
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
-00 | Unknown           | 0x02    | What    | ???     | 0x0c    | 0x00    | 0x00    |
+00 | MSB CRC | Count?  | 0x02    | What    | ???     | ReqLen 16b LE     |      ...
    +---------+---------+---------+---------+---------+---------+---------+---------+
-08 | 0x00    | 0x00    | 0x01    | 0x00    | 0x00    | Offset 32bit LE          ...
+    ... Payload of layer 2                                                         |
    +---------+---------+---------+---------+---------+---------+---------+---------+
-10  ...      | Length, 16bit, LE |
-   +---------+---------+---------+
 ```
- - The first field appears to be relatively random.
- - The second field appears to be fixed to 0x02 (also for the response).
- - The third field appears to specify what to read:
-   - 0x03: unknown, likely device identification
-   - 0xc5: unknown
+ - Most significant byte of CRC? Breaks structure as CRC is element of layer 0. **This is
+   really a problem, as for the CMD requests, there is no payload but a CRC, thus the MSB 
+   would be missing.**
+ - Some weird counter, appears to increment by a certain amount from request to request.
+ - Appears to be fixed to 0x02 for all read requests.
+ - Unknown, but appears to specify what should be read (Device identifier, firmware version,
+   code-plug?). This value gets repeated in the response
+   - 0x03: likely device identification
+   - 0xc5: unknown, likely firmware version
    - 0x01: unknown
    - 0xc7: this means likely "read code-plug"
- - Unknown field, have seen 0x01, 0x02.
-   - 0x01: during download of actual code-plug
- - Several other hopefully constant values.
- - Field 13 is a 32bit little endian address. I can confirm that this is the byte address to read from.
- - Field 17 is the number of bytes to read starting from the specified address. 16bit little endian integer.
+ - Unknown but relates to value in the response at the same place.
+ - Read-request payload length (aka layer 2). 16bit little-endian integer. This is 
+   the length of the rest of the request.
+ - Payload read request layer 2.
 
-### Continuing the example above
-The payload
-```
-53:a4:02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05
-```
-This would request to read 0x0578 bytes from offset 0x0000. I have verified that, as the offset of
-two consecutive reads increments by extactly the length of the previous read.
-
-
-## Read response payload
-**Not all read responses follow this format exactly. The majority does.**
+### Response
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
-00 | Unkown 16bit      | 0x02    | What    | ???     | 0x85    | 0x50    | 0x00    |
+00 | MSB CRC | Count?  | 0x02    | What    | ???     | ResLen 16b LE     |      ...
    +---------+---------+---------+---------+---------+---------+---------+---------+
-08 | 0x00    | 0x00    | 0x00    | 0x01    | 0x00    | 0x00    | Offset 32bit LE...
+    ... Payload of layer 2                                                         |
    +---------+---------+---------+---------+---------+---------+---------+---------+
-10  ...                | Length, 16bit, LE | Actual data                        ...
+```
+ - Most significant byte of CRC? Breaks structure as CRC is element of layer 0.
+ - Some weird counter, appears to increment by a certain amount from request to request.
+ - Appears to be fixed to 0x02 for all read responses.
+ - Unknown, but appears to specify what should be read (Device identifier, firmware version,
+   code-plug?). This value is copied from the request.
+ - Unknown byte, however if 0x01 was send in the request at that position, the response contains
+   0x81. And when 0x02 was send in the request, the response contains 0x82. Maybe bit flags?
+ - Read-response payload length, a 16bit little endian integer. This is the length of the 
+   response.
+ - Payload request-response layer 2
+
+
+## Memory read request & response (Layer 2)
+
+### Request 
+```
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+00 | 0x00    | 0x00    | 0x00    | 0x01    | 0x00    | 0x00    | Addr 32bit LE  ... 
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+08  ...                | Size, 16bit, LE   | 
+   +---------+---------+---------+---------+
+```
+ - The first 6 bytes appear to be constant.
+ - The address to read from, 32bit little endian.
+ - The amount of data to read, 16bit little endian.
+
+### Response
+```
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+00 | 0x00    | 0x00    | 0x00    | 0x00    | 0x01    | 0x00    | 0x00    |      ... 
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+08  ... Addr 32bit LE            | Size, 16bit, LE   | The actual data ...           
    +---------+---------+---------+---------+---------+---------+---------+---------+
     ...                                                                            |
    +---------+---------+---------+---------+---------+---------+---------+---------+
 ```
- - The first field is again unkown and appears to be relatively radom. Maybe there is a relation
- ship between this field and the first field of the corresponding read request.
- - The second field appears to be fixed to 0x02. Save value as the request at that position.
- - What was read? Same value as the request at that position.
- - Unknown byte, however if 0x01 was send in the request at that position, the response contains
- 0x81. And when 0x02 was send in the request, the response contains 0x82. Maybe bitflags?
- - Several unknown or empty fields. *TODO: verify that they are fixed for all reads.*
- - Field 0x0e is a 32bit litte endian offset. Likely the byte offset within the memory page the
-   data was read from.
- - Field 0x12 is the length of the data read.
+ - The first 7 bytes appear to be constant.
+ - The address read from, 32bit little endian.
+ - The amount of data read, 16bit little endian.
+ - The actual data, size specified in previous field.
 
-### Continuing the example above
-The payload of the response to the read request in the previous example starts with
-```
-45:b2:02:c7:81:85:05:00:00:00:00:01:00:00:00:00:00:00:78:05:16:01:52:...
-```
-the total length of this payload is 0x058C. Removing 20bytes of response header yields exactly
-0x578 bytes of data, matching exactly the amount in the read request and in the response header.
-
-Furhter, the very next read response payload starts with
-```
-d8:68:02:c7:81:85:05:00:00:00:00:01:00:00:78:05:00:00:78:05:00:00:00:...
-```
-
-## Special read request/response: Identify radio
+## Identify radio read-request (Layer 2)
 The very first read request to the radio appears to be a request for identification from the radio.
 It returns with 16bit unicode strings. Containing strings like
 ```
 X1p05-000G0000-MB0000-U1-0-B
 ```
-So I guess you read the code-plug from you X1p?
+So I guess you read the code-plug from your X1p?
 
 ### Request
-This request however, does not follow the
-*read-code-plug* requests and responses above. Here is what I found for the request:
+This request however, does not follow the *read-code-plug* requests and responses above (layer 2). 
+
+The *what* field in layer 1 is 0x03, likely requesting the radio identifier. The unknown field is
+0x02. The layer 2 content is then pretty simple:
 ```
-   +---------+---------+---------+---------+---------+---------+---------+---------+
-00 | Unkown 16bit      | 0x02    | 0x03    | 0x02    | 0x01    | 0x00    | 0x00    |
-   +---------+---------+---------+---------+---------+---------+---------+---------+
-``
+   +---------+
+00 | 0x00    |
+   +---------+
+```
+   - Payload a single byte 0x00.
 
 ### Response
-The response also does not follow the typical format of a read response above.
+The response also does not follow the typical format of a memory-read response above. 
+
+The response content, however is quiet simple:
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
-00 | Unkown 16bit      | 0x02    | 0x03    | 0x82    | Length 16bit LE   | Data ...
+00 | Data ...
    +---------+---------+---------+---------+---------+---------+---------+---------+
     ...                                                                            |
    +---------+---------+---------+---------+---------+---------+---------+---------+
 ```
-
-The data section contains 0x48 bytes. Containing 16bit unicode strings.
+ - Contains 0x48 bytes. Containing 16bit unicode strings.
 
 ## Special read request/response: Firmware version
 The second read request appears to request the firmware version and other information from the
 radio. Also this request does not follow the general "read-code-plug" read request format above.
+
+### Request
+The request is much longer that all other read requests, but contains only 0x00.
+
+The *what* field in layer 1 is set to 0xc5, the unknown field is set to 0x01. The payload is simply
+17 times 0x00.
+
+```
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+00 | 17 x 0                                                                     ...
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+18  ...      |
+   +---------+
+```
+
+### Response
+The response is then pretty simple
+```
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+00 | Data                                                                      ...
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+    ...                                                                            |
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+```
