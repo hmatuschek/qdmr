@@ -14,7 +14,7 @@ parser.add_argument("cap_file", help="Path to the captured data.")
 args = parser.parse_args()
 
 
-def hexDump(s, prefix=""):
+def hexDump(s, prefix="", addr=0):
   N = len(s)
   Nb = N//16
   if (N%16): Nb += 1
@@ -31,8 +31,9 @@ def hexDump(s, prefix=""):
         t += chr(c)
       else:
         t += "."
-    res += (prefix + h + " | " + t + "\n")
-  return res
+
+    res += (prefix + "{:08X} ".format(addr+16*j) + h + " | " + t + "\n")
+  return res[:-1]
 
 def isDataPacket(p):
   return ("USB.CAPDATA" in p)
@@ -127,11 +128,38 @@ elif "payload" == args.command:
         print(hexDump(payload, "  |  | "))
       elif (0xC8 == what) and ("REQ"==cmd):
         addr, length, payload = unpackReadWriteRequest(payload)
-        print("  | Write to={:08X}, len={:04X}".format(addr, length))
+        print("  | WRITE to={:08X}, len={:04X}".format(addr, length))
         print(hexDump(payload, "  |  | "))
       elif (0xC8 == what) and ("RES"==cmd):
         addr, length, payload = unpackReadWriteResponse(payload)
-        print("  | Write to={:08X}, len={:04X}".format(addr, length))
+        print("  | WRITE to={:08X}, len={:04X}".format(addr, length))
         print(hexDump(payload, "  |  | "))
       else:
         print(hexDump(payload, "  | "))
+
+
+elif "read_codeplug"==args.command:
+  print("#")
+  cap = pyshark.FileCapture(args.cap_file, include_raw=True, use_json=True)
+  current_addr = 0xffffffff
+  for p in cap:
+    if (not isDataPacket(p)) or isFromHost(p):
+      continue
+    
+    # unpack layer 0
+    cmd, flag, src, des, ukn, tlen, payload, sum, ack = unpackPacket(p)
+    plen = len(payload)
+    if (0x04 != cmd) or (7 > plen): # only handle responses
+      continue
+    
+    # unpack layer 1
+    crc, u1, f1, what, u2, plen, payload = unpackRequestResponse(payload)
+    if 0xC7 != what: # filter only read data 
+      continue
+
+    # unpack layer 2
+    addr, length, payload = unpackReadWriteResponse(payload)
+    if (current_addr != addr):
+      print("-"*75)
+    print(hexDump(payload, "", addr))
+    current_addr = addr+length
