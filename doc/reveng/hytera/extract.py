@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("command", help="""What to extract. Possible commands are: serial (dumps serial data in hex).
 """)
 parser.add_argument("cap_file", help="Path to the captured data.")
-
+parser.add_argument("--nodump", help="Hide data dumps.", action="count", default=0)
 args = parser.parse_args()
 
 
@@ -64,7 +64,7 @@ def unpackRequestResponse(payload):
 
 def unpackReadWriteRequest(payload):
   ukn1, ukn2, ukn3, ukn4, addr, length = struct.unpack("<bHHbIH", payload[:12])
-  crc = 0x59fd - (addr&0xffff) - (addr>>16) - length - ukn1 - ukn2 - ukn3 - ukn4
+  crc = 0x59fd - (addr&0xffff) - (addr>>16) - length - 0x01
   content = payload[12:]
   for i in range(len(content)):
     crc -= content[i]
@@ -127,25 +127,45 @@ elif "payload" == args.command:
     print("{} type={}, len={:04X}, plen={:04X}, rcount={:04X}:".format(dir, cmd, tlen, plen, rcount))
     if (("REQ" == cmd) or ("RES"==cmd)) and plen>9:
       u1, f1, what, u2, crc, end, plen, payload = unpackRequestResponse(payload)
-
       print("  | crc={:04X}, ukn1={:02X}, fixed={:02X}, what={:02X}, ukn2={:02X}, payload len={:04X}".format(crc, u1, f1, what, u2, plen))
+
       if (0xC7 == what) and ("REQ"==cmd): # read request
-        ukn1, ukn2, ukn3, ukn4, addr, length, crc, payload = unpackReadWriteRequest(payload); crc-=u1
-        print("  | READ from={:08X}, len={:04X}, crc={:04X}, ukn1={:02X}, ukn2={:04X}, ukn3={:04X}, ukn4={:02X}".format(addr, length, crc, ukn1, ukn2, ukn3, ukn4))
-        print(hexDump(payload, "  |  | "))
+        ukn1, ukn2, ukn3, ukn4, addr, length, crc_comp, payload = unpackReadWriteRequest(payload); crc_comp-=u1
+        if crc!=crc_comp:
+          crc = "\x1b[1;31m{:04X} ERR\x1b[0m".format(crc_comp)
+        else: 
+          crc = "{:04X}".format(crc_comp) 
+        print("  | READ from={:08X}, len={:04X}, crc={}".format(addr, length, crc))
+        if not args.nodump:
+          print(hexDump(payload, "  |  | "))
       elif (0xC7 == what) and ("RES"==cmd): # read response
-        addr, length, crc, payload = unpackReadWriteResponse(payload); crc-=u1
-        print("  | READ from={:08X}, len={:04X}, crc={:04X}".format(addr, length, crc))
-        print(hexDump(payload, "  |  | "))
+        addr, length, crc_comp, payload = unpackReadWriteResponse(payload); crc-=u1
+        if crc!=crc_comp:
+          crc = "{:04X} ERR".format(crc_comp)
+        else: 
+          crc = "{:04X}".format(crc_comp) 
+        print("  | READ from={:08X}, len={:04X}, crc={}".format(addr, length, crc))
+        if not args.nodump:
+          print(hexDump(payload, "  |  | "))
       elif (0xC8 == what) and ("REQ"==cmd):
-        ukn1, ukn2, ukn3, ukn4, addr, length, crc, payload = unpackReadWriteRequest(payload)
-        print("  | WRITE to={:08X}, len={:04X}, crc={:04X}".format(addr, length, crc))
-        print(hexDump(payload, "  |  | "))
+        ukn1, ukn2, ukn3, ukn4, addr, length, crc_comp, payload = unpackReadWriteRequest(payload)
+        if crc!=crc_comp:
+          crc = "{:04X} ERR".format(crc_comp)
+        else: 
+          crc = "{:04X}".format(crc_comp) 
+        print("  | WRITE to={:08X}, len={:04X}, crc={}".format(addr, length, crc))
+        if not args.nodump:
+          print(hexDump(payload, "  |  | "))
       elif (0xC8 == what) and ("RES"==cmd):
-        addr, length, crc, payload = unpackReadWriteResponse(payload)
-        print("  | WRITE to={:08X}, len={:04X}, crc={:04X}".format(addr, length, crc))
-        print(hexDump(payload, "  |  | "))
-      else:
+        addr, length, crc_comp, payload = unpackReadWriteResponse(payload)
+        if crc!=crc_comp:
+          crc = "{:04X} ERR".format(crc_comp)
+        else: 
+          crc = "{:04X}".format(crc_comp) 
+        print("  | WRITE to={:08X}, len={:04X}, crc={}".format(addr, length, crc))
+        if not args.nodump:
+          print(hexDump(payload, "  |  | "))
+      elif not args.nodump:
         print(hexDump(payload, "  | "))
 
 
