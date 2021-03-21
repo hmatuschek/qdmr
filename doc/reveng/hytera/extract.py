@@ -163,3 +163,29 @@ elif "read_codeplug"==args.command:
       print("-"*75)
     print(hexDump(payload, "", addr))
     current_addr = addr+length
+
+elif "write_codeplug"==args.command:
+  print("#")
+  cap = pyshark.FileCapture(args.cap_file, include_raw=True, use_json=True)
+  current_addr = 0xffffffff
+  for p in cap:
+    if (not isDataPacket(p)) or isToHost(p):
+      continue
+    
+    # unpack layer 0
+    cmd, flag, src, des, ukn, tlen, payload, sum, ack = unpackPacket(p)
+    plen = len(payload)
+    if (0x01 != cmd) or (6 > plen): # only handle requests
+      continue
+    
+    # unpack layer 1
+    crc, u1, f1, what, u2, plen, payload = unpackRequestResponse(payload)
+    if 0xC8 != what: # filter only write data 
+      continue
+
+    # unpack layer 2
+    addr, length, payload = unpackReadWriteRequest(payload)
+    if (current_addr != addr):
+      print("-"*75)
+    print(hexDump(payload, "", addr))
+    current_addr = addr+length
