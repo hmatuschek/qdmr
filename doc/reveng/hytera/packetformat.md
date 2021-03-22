@@ -67,29 +67,38 @@ described below.
  - Request type (Device identifier, firmware version, code-plug?). This value gets 
    repeated in the response, except for bit 7 being set. That is a 0x0102 gets responded 
    with type 0x0182.
-   - 0x0102: unknown, before reading/writing code-plug
-   - 0x010C: unknown, before reading/writing code-plug
-   - 0x0302: likely device identification
-   - 0x0502: during handshake before writing code-plug
-   - 0xc501: likely firmware version
-   - 0xc601: last request when reading/writing code-plug, reboot?
-   - 0xc701: likely read code-plug memory
-   - 0xc801: likely write code-plug memory
-   - 0xce01: several request before writing to memory
+   - 0x0102 = 0b0000 0001 0000 0010: unknown, before reading/writing code-plug
+   - 0x010C = 0b0000 0001 0000 1100: unknown, before reading/writing code-plug
+   - 0x0302 = 0b0000 0011 0000 0010: likely device identification
+   - 0xc501 = 0b0000 0101 0000 0001: likely read firmware version
+   - 0x0502 = 0b0000 0101 0000 0010: during handshake before writing code-plug
+   - 0xc601 = 0b1100 0110 0000 0001: last request when reading/writing code-plug, reboot?
+   - 0xc701 = 0b1100 0111 0000 0001: likely read code-plug memory
+   - 0xc801 = 0b1100 1000 0000 0001: likely write code-plug memory
+   - 0xce01 = 0b1100 1110 0000 0001: several requests before writing to memory
  - Read-request payload length (aka layer 2). 16bit little-endian integer.
- - Payload, variable length
+ - Payload, variable length. Contains a further layer 2 for read and write operations.
  - LSB of CRC
  - fixed to 0x03
 
 #### Example
 ```
-
+53:a4:02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05:e0:03
 ```
+Means 
+  - CRC is 0x53e0,
+  - Sequence number 0xa4,
+  - Fixed unknown value 0x02
+  - Request type is 0xc701 -> read code-plug memory
+  - Payload length is 0x000c (12)
+  - Payload 00:00:00:01:00:00:00:00:00:00:78:05
+  - End of packet flag 0x03
+
 
 
 ## Memory read/write request & response (Layer 2)
 
-### Request 
+### Request (ReqType=0xc701/0xc801)
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
 00 | 0x00    | 0x00    | 0x00    | 0x01    | 0x00    | 0x00    | Addr 32bit LE  ... 
@@ -104,7 +113,7 @@ described below.
  - The amount of data to read/write, 16bit little endian.
  - The actual data to write. Not present on read requests.
 
-### Response
+### Response (ReqType=0xc781/0xc881)
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
 00 | 0x00    | 0x00    | 0x00    | 0x00    | 0x01    | 0x00    | 0x00    |      ... 
@@ -120,19 +129,12 @@ described below.
  - The actual data, only present for read requests.
 
 
-## Identify radio read-request (Layer 2)
-The very first read request to the radio appears to be a request for identification from the radio.
-It returns with 16bit unicode strings. Containing strings like
-```
-X1p05-000G0000-MB0000-U1-0-B
-```
-So I guess you read the code-plug from your X1p?
+## Identify radio request
+The very first request to the radio (after being put into program mode) appears to be a 
+request for identification from the radio. It returns with 16bit unicode strings.
+The request type field in layer 1 is 0x0302, likely requesting the radio identifier.
 
-### Request
-This request however, does not follow the *read-code-plug* requests and responses above (layer 2). 
-
-The request type field in layer 1 is 0x03, likely requesting the radio identifier. The unknown field is
-0x02. The layer 2 content is then pretty simple:
+### Request (ReqType=0x0302) 
 ```
    +---------+
 00 | 0x00    |
@@ -140,10 +142,7 @@ The request type field in layer 1 is 0x03, likely requesting the radio identifie
 ```
    - Payload a single byte 0x00.
 
-### Response
-The response also does not follow the typical format of a memory-read response above. 
-
-The response content, however is quiet simple:
+### Response (ReqType=0x0382) 
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
 00 | Data ...
@@ -151,14 +150,15 @@ The response content, however is quiet simple:
     ...                                                                            |
    +---------+---------+---------+---------+---------+---------+---------+---------+
 ```
- - Contains 0x48 bytes. Containing 16bit unicode strings.
+ - Contains 0x48 bytes. Containing 16bit unicode strings. The first and last bytes 
+ of the response are 0x00.
 
 
-## Special read request/response: Firmware version
+## Firmware version request
 The second read request appears to request the firmware version and other information from the
 radio. Also this request does not follow the general "read-code-plug" read request format above.
 
-### Request
+### Request (ReqType=0xC501) 
 The request is much longer that all other read requests, but contains only 0x00.
 
 The *what* field in layer 1 is set to 0xc5, the unknown field is set to 0x01. The payload is simply
@@ -172,7 +172,7 @@ The *what* field in layer 1 is set to 0xc5, the unknown field is set to 0x01. Th
    +---------+
 ```
 
-### Response
+### Response (ReqType=0xC581)
 The response is then pretty simple
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
@@ -181,3 +181,25 @@ The response is then pretty simple
     ...                                                                            |
    +---------+---------+---------+---------+---------+---------+---------+---------+
 ```
+
+
+## Another weird read-request 
+This request is send to the radio before writing the firmware. This is certainly a read 
+request including address and length fields. The memory being read is unknown, however.
+
+### Request (ReqType=0xCE01) 
+```
+   +---------+---------+---------+---------+---------+---------+
+00 | Address? 32bit little endian          | Length, 16bit BE  |
+   +---------+---------+---------+---------+---------+---------+
+```
+
+### Response (ReqType=0xCE81) 
+```
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+00 | 0x00    | Address? 32bit little endian          | Length, 16bit BE  | ...
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+    ... Payload, variable length                                                   |
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+```
+
