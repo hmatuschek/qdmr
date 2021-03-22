@@ -77,3 +77,57 @@ changes:
   
 - The third diff shows that the DMRID is stored at address 0xd5ff7 as three
   bytes BE.
+
+## Channels
+### Frequency Format (`freq_t`)
+
+Frequencies appear to be stored as 32-bit unsigned fixed-point LE values. For
+example the frequency 450.71250MHz is encoded as `b4 53 dd 1a`, which when
+interpreted as a 32-bit unsigned LE integer yields `450712500`.
+
+## Digitial
+### Layout
+
+```c
+typedef uint32_t freq_t // 32-bit fixed point frequency
+
+typedef struct
+{
+    ...
+    freq_t rx_freq;
+    freq_t tx_freq;
+    ...
+} digital_chan_t;
+
+```
+
+### TX and RX frequency
+
+For the same digitial channel an RX frequency was seen to change at address
+`0x3ab4e`. The TX frequency was seen to change at address `0x3ab52`.
+
+## Digitial Contacts
+
+Contacts start at address `0x65b70` and runs to `0x71b70` thus allowing for a
+maximum of 1024 contacts. Each record has the format:
+
+```c
+typedef uint16_t unicode_char_t;
+
+// 0 - private call
+// 1 - group call
+typedef uint8_t call_type_t;
+
+typedef struct
+{
+    uint16_t index;
+    unicode_char_t name[16];
+    call_type_t call_type;
+    uint8_t unk0;
+    uint16_t __pad_1;
+    uint32_t id;
+    uint32_t unk1;
+    uint16_t unk2;
+}
+
+```
