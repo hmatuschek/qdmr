@@ -4,6 +4,11 @@ import pyshark
 import struct
 import sys
 import binascii
+import itertools
+import usb.core
+import usb.util
+import math
+from functools import partial
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -53,6 +58,9 @@ def unpackLayer0(p):
   if not isDataPacket(p):
     return None
   data = getData(p)
+  return unpackLayer0Data(data)
+
+def unpackLayer0Data(data):
   cmd, flag, src, des, unknown, length = struct.unpack(">xBxBBBHH", data[:10])
   payload = data[10:]
   return cmd, flag, src, des, unknown, length, payload
@@ -190,7 +198,7 @@ elif "read_codeplug"==args.command:
       continue
 
     # unpack layer 2
-    addr, length, payload = unpackReadWriteResponse(payload)
+    addr, length, crc_comp, payload = unpackReadWriteResponse(payload)
     # Prepend left over bytes to fill up to 16b
     if len(leftover):
       payload  = leftover+payload
@@ -248,3 +256,61 @@ elif "write_codeplug"==args.command:
     
     # update current address
     current_addr = addr+length
+
+####### USB Reading
+elif "download" == args.command:
+  MEM_SZ = 0x196b28
+  READ_SZ = 0x400
+  TIMEOUT = 1500
+  OUT_EP = 0x04
+  IN_EP = 0x84
+
+  dev = usb.core.find(idVendor=0x238b, idProduct=0x0a11)
+
+  def compose_read_command(address, length):
+    x = 0x5959 - (address + length + 1)
+
+    # Count the number of times this number has wrapped around 0
+    wraps = abs(math.floor(x / 0xffff))
+    crc = struct.pack('>H', ((x - wraps) & 0xffff))
+    lengthBytes = struct.pack('<H', length)
+    addressBytes = struct.pack('<I', address)
+
+    return b'\x7e\x01\x00\x00\x20\x10\x00\x00\x00\x1f' + \
+      bytes([crc[0]]) + b'\xa4\x02\xc7\x01\x0c\x00\x00\x00\x00\x01\x00\x00' + \
+      addressBytes + lengthBytes + bytes([crc[1]]) + b'\x03'
+
+  if dev is None:
+    raise ValueError('Radio not found')
+
+  dev.set_configuration()
+
+  # Send preamble packets
+  for pkt in [b'\x7e\x00\x00\xfe\x20\x10\x00\x00\x00\x0c\x60\xe5',
+              b'\x7e\x01\x00\x00\x20\x10\x00\x00\x00\x14\x31\xd3\x02\x03\x02\x01\x00\x00\x2c\x03',
+              b'\x7e\x01\x00\x00\x20\x10\x00\x00\x00\x24\x02\xf1\x02\xc5\x01\x11\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x5b\x03',
+              b'\x7e\x01\x00\x00\x20\x10\x00\x00\x00\x14\x41\xc3\x02\x01\x02\x01\x00\x12\x1c\x03']:
+    dev.write(OUT_EP, pkt, TIMEOUT)
+    dev.read(IN_EP, 1024, TIMEOUT)
+
+  for addr in range(0, MEM_SZ, READ_SZ):
+    length = READ_SZ if (addr + READ_SZ) < MEM_SZ else MEM_SZ - addr
+    dev.write(OUT_EP, compose_read_command(addr, length), TIMEOUT)
+    data = dev.read(IN_EP, 0x700, TIMEOUT)
+
+    cmd, flag, src, des, unknown, length, payload = unpackLayer0Data(data)
+    plen = len(payload)
+    if (0x04 != cmd) or (7 > plen):
+      raise ValueError('Expected response packet')
+
+    # unpack layer 1
+    u1, f1, what, u2, crc, end, plen, payload = unpackRequestResponse(payload)
+    if 0xC7 != what:
+      raise ValueError('Expected only read data')
+
+    # unpack layer 2
+    addr, length, crc_comp, payload = unpackReadWriteResponse(payload)
+    print(hexDump(payload, "", addr))
+
+  dev.write(OUT_EP, b'\x7e\x01\x00\x00\x20\x10\x00\x00\x00\x14\xf4\x0f\x02\xc6\x01\x01\x00\x00\x6a\x03')
+  dev.read(IN_EP, 1024, TIMEOUT)
