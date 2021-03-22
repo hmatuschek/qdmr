@@ -328,15 +328,33 @@ elif "download" == args.command:
 elif "download_contacts" == args.command:
   contactData = download(0x65b70, 0xc000)
 
-  table = PrettyTable(['Index','Name', 'Type', 'unk0', 'pad1', 'id', 'unk1', 'unk2'])
+  table = PrettyTable(['Index','Name', 'Type', 'unk0', 'pad1', 'id', 'unk1', 'link'])
+  contactSlots = []
 
-  for idx, name, type, unk0, pad1, id, unk1, unk2 in struct.iter_unpack('<H32sBBHIIH', contactData):
+  # Build contact table.
+  for idx, name, type, unk0, pad1, id, unk1, link in struct.iter_unpack('<H32sBBHIIH', contactData):
+    contactSlots.append([idx, name.decode('utf-8'), type, unk0, pad1, id, unk1, link])
+
+  # Now traverse
+  currentSlot = contactSlots[0]
+  while True:
+    link = currentSlot[7]
+    type = currentSlot[2]
+
     typeName = "Unknown"
     if type == 0:
       typeName = 'Private Call'
     elif type == 1:
       typeName = 'Group Call'
 
-    table.add_row([idx, name.decode('utf-8'), typeName, unk0, pad1, id, unk1, unk2])
+      currentSlot[2] = typeName
+
+    if type != 0x11:
+      table.add_row(currentSlot)
+
+    if link == 0:
+      break
+
+    currentSlot = next(filter(lambda s: s[0] == link, contactSlots))
 
   print(table)

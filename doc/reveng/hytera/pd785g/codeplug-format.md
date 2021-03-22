@@ -127,7 +127,107 @@ typedef struct
     uint16_t __pad_1;
     uint32_t id;
     uint32_t unk1;
-    uint16_t unk2;
+    uint16_t link;
 }
 
 ```
+
+### Contact traversal
+
+Not all slots in the address range contain valid contacts; some may be empty or
+some may contain old contact data. In order to filter out these contacts and
+find only valid contacts, we need to use the `link` field to establish a link of
+valid contacts. We begin at the first slot, located at `0x65b70` and continue
+until we find a contact that has a `link` back to the `idx` 0.
+
+As an example, lets take `base.hex` and add one contact. This results in the
+following contact data (empty data has been omitted):
+
+```
+0x00065b70  0000 4300 6100 6c00 6c00 2000 3100 0000  ..C.a.l.l. .1...
+0x00065b80  0000 0000 0000 0000 0000 0000 0000 0000  ................
+0x00065b90  0000 0101 0000 0100 0000 0000 0000 0100  ................
+0x00065ba0  0200 4300 6100 6c00 6c00 3100 0000 0000  ..C.a.l.l.1.....
+0x00065bb0  0000 0000 0000 0000 0000 0000 0000 0000  ................
+0x00065bc0  0000 1101 0000 0100 0000 0000 0000 0000  ................
+0x00065bd0  0100 6e00 6500 7700 6e00 6500 7700 6e00  ..n.e.w.n.e.w.n.
+0x00065be0  6500 7700 6e00 6500 7700 6e00 6500 7700  e.w.n.e.w.n.e.w.
+0x00065bf0  6e00 0000 0000 4e61 bc00 0000 0000 0000  n.....Na........
+```
+
+We can cast this data using the structure above to obtain three channel 'slots'
+with the following data:
+
+```
+slot[0] =
+       idx : 0x00065b70 = 0x0000
+      name : 0x00065b72 = "C"
+ call_type : 0x00065b92 = 0x01
+      unk0 : 0x00065b93 = 0x01
+     __pad : 0x00065b94 = 0x0000
+        id : 0x00065b96 = 1
+      unk1 : 0x00065b9a = 0
+      link : 0x00065b9e = 0x0001
+
+slot[1] =
+       idx : 0x00065ba0 = 0x0002
+      name : 0x00065ba2 = "C"
+ call_type : 0x00065bc2 = 0x11
+      unk0 : 0x00065bc3 = 0x01
+     __pad : 0x00065bc4 = 0x0000
+        id : 0x00065bc6 = 1
+      unk1 : 0x00065bca = 0
+      link : 0x00065bce = 0x0000
+
+slot[2] =
+       idx : 0x00065bd0 = 0x0001
+      name : 0x00065bd2 = "n"
+ call_type : 0x00065bf2 = 0x00
+      unk0 : 0x00065bf3 = 0x00
+     __pad : 0x00065bf4 = 0x0000
+        id : 0x00065bf6 = 12345678
+      unk1 : 0x00065bfa = 0
+      link : 0x00065bfe = 0x0000
+```
+
+If we follow the algorithm above, we would walk along the indexes: `0 -> 1 -> 0`
+this we can disregard slot 1 (which has an index of 2) as it is not part of the
+link traversal.
+
+A special case should be mentioned when there is only a single channel in the
+code plug. I would have assumed that the link and index on the slot in question
+would have both equaled 0 so the channel refers to itself. However, the CPS
+appears to do something different:
+
+```
+0x00065b70  0000 4300 6100 6c00 6c00 2000 3100 0000  ..C.a.l.l. .1...
+0x00065b80  0000 0000 0000 0000 0000 0000 0000 0000  ................
+0x00065b90  0000 0101 0000 0100 0000 0000 0000 0100  ................
+0x00065ba0  0100 4300 6100 6c00 6c00 3100 0000 0000  ..C.a.l.l.1.....
+0x00065bb0  0000 0000 0000 0000 0000 0000 0000 0000  ................
+0x00065bc0  0000 1101 0000 0100 0000 0000 0000 0000  ................
+
+slot[0] =
+       idx : 0x00065b70 = 0x0000
+      name : 0x00065b72 = "C"
+ call_type : 0x00065b92 = 0x01
+      unk0 : 0x00065b93 = 0x01
+     __pad : 0x00065b94 = 0x0000
+        id : 0x00065b96 = 1
+      unk1 : 0x00065b9a = 0
+      link : 0x00065b9e = 0x0001
+
+slot[1] =
+       idx : 0x00065ba0 = 0x0001
+      name : 0x00065ba2 = "C"
+ call_type : 0x00065bc2 = 0x11
+      unk0 : 0x00065bc3 = 0x01
+     __pad : 0x00065bc4 = 0x0000
+        id : 0x00065bc6 = 1
+      unk1 : 0x00065bca = 0
+      link : 0x00065bce = 0x0000
+```
+
+A 'dummy' node is created that links back to index 0. Notice on this node that
+`call_type` is `0x11`. My assumption here is that the value `0x11` on call type
+indicates this is a dummy node and should be ignored.
