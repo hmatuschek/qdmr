@@ -53,9 +53,9 @@ def unpackLayer0(p):
   if not isDataPacket(p):
     return None
   data = getData(p)
-  cmd, flag, src, des, unknown, length = struct.unpack(">xBxBBBHH", data[:10])
+  cmd, flag, src, des, rcount, length = struct.unpack(">xBxBBBHH", data[:10])
   payload = data[10:]
-  return cmd, flag, src, des, unknown, length, payload
+  return cmd, flag, src, des, rcount, length, payload
 
 def unpackRequestResponse(payload):
   msb, u1, f1, what, u2, length = struct.unpack("<BBBBBH", payload[:7])
@@ -68,7 +68,7 @@ def unpackReadWriteRequest(payload):
   content = payload[12:]
   for i in range(len(content)):
     crc -= content[i]
-  return ukn1, ukn2, ukn3, ukn4, addr, length, crc&0xffff, content
+  return ukn1, ukn2, ukn3, ukn4, addr, length, crc%0xffff, content
 
 def unpackReadWriteResponse(payload):
   addr, length = struct.unpack("<xxxxxxxIH", payload[:13])
@@ -85,7 +85,7 @@ def isReadResponse(p):
   return isDataPacket(p) and isToHost(p) and (0x04 == getData(p)[1])
 
 
-if "serial" == args.command:
+if "raw" == args.command:
   print("#")
   print("# Serial data from '{0}'".format(args.cap_file))
   print("# '>' means from host to device.")
@@ -103,6 +103,25 @@ if "serial" == args.command:
     elif isToHost(p):
       print(hexDump(getData(p), "< | "))
       
+elif "level0" == args.command:
+  cap = pyshark.FileCapture(args.cap_file, include_raw=True, use_json=True)
+  for p in cap:
+    if not isDataPacket(p):
+      continue
+    if isFromHost(p):
+      print("-"*80)
+    cmd, flag, src, des, rcount, tlen, payload = unpackLayer0(p)
+    plen = len(payload)
+    dir = None
+    if isFromHost(p): dir = ">"
+    elif isToHost(p): dir = "<"
+
+    if 0x00 == cmd: cmd = "CMD"
+    elif 0x01 == cmd: cmd = "REQ"
+    elif 0x04 == cmd: cmd = "RES"
+    print("{} type={}, len={:04X}, flag={:02X}, rcount={:04X}:".format(dir, cmd, tlen, flag, rcount))
+    print(hexDump(payload, "  | "))
+
 elif "payload" == args.command:
   print("#")
   print("#")
@@ -124,13 +143,14 @@ elif "payload" == args.command:
     if (">" == dir):
       print("-"*80) 
     
-    print("{} type={}, len={:04X}, plen={:04X}, rcount={:04X}:".format(dir, cmd, tlen, plen, rcount))
+    print("{} type={}, len={:04X}, flag={:02X}, rcount={:04X}:".format(dir, cmd, tlen, flag, rcount))
     if (("REQ" == cmd) or ("RES"==cmd)) and plen>9:
       u1, f1, what, u2, crc, end, plen, payload = unpackRequestResponse(payload)
-      print("  | crc={:04X}, ukn1={:02X}, fixed={:02X}, what={:02X}, ukn2={:02X}, payload len={:04X}".format(crc, u1, f1, what, u2, plen))
+      print("  | crc={:04X}, seq={:02X}, fixed={:02X}, req={:02X}, ukn2={:02X}, payload len={:04X}".format(crc, u1, f1, what, u2, plen))
 
       if (0xC7 == what) and ("REQ"==cmd): # read request
-        ukn1, ukn2, ukn3, ukn4, addr, length, crc_comp, payload = unpackReadWriteRequest(payload); crc_comp-=u1
+        ukn1, ukn2, ukn3, ukn4, addr, length, crc_comp, payload = unpackReadWriteRequest(payload); 
+        crc_comp -= u1; crc_comp = crc_comp % 0xffff
         if crc!=crc_comp:
           crc = "\x1b[1;31m{:04X} ERR\x1b[0m".format(crc_comp)
         else: 
@@ -139,7 +159,9 @@ elif "payload" == args.command:
         if not args.nodump:
           print(hexDump(payload, "  |  | "))
       elif (0xC7 == what) and ("RES"==cmd): # read response
-        addr, length, crc_comp, payload = unpackReadWriteResponse(payload); crc-=u1
+        addr, length, crc_comp, payload = unpackReadWriteResponse(payload); 
+        crc_comp -= (u1)
+        crc_comp = crc_comp % 0xffff
         if crc!=crc_comp:
           crc = "{:04X} ERR".format(crc_comp)
         else: 
@@ -248,3 +270,23 @@ elif "write_codeplug"==args.command:
     
     # update current address
     current_addr = addr+length
+
+elif "crc" == args.command:
+  print("#crc,ukn1,ukn2,addr,length")
+  cap = pyshark.FileCapture(args.cap_file, include_raw=True, use_json=True)
+  for p in cap:
+    if (not isDataPacket(p)) or isFromHost(p):
+      continue
+    # unpack layer 0
+    cmd, flag, src, des, ukn, tlen, payload = unpackLayer0(p)
+    plen = len(payload)
+    # only handle responses
+    if (0x04 != cmd) or (8 > plen): 
+      continue
+    # unpack layer 1
+    u1, f1, what, u2, crc, end, plen, payload = unpackRequestResponse(payload)
+    if 0xC8 != what: # filter only write data 
+      continue
+    # unpack layer 2
+    addr, length, crc_comp, payload = unpackReadWriteResponse(payload)
+    print("{},{},{},{},{}".format(crc, u1, u2, addr, length))
