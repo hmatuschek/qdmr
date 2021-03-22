@@ -56,7 +56,7 @@ described below.
 ### Request & Response
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
-00 | MSB CRC | Count?  | 0x02    | ReqType | ???     | ReqLen 16b LE     |      ...
+00 | MSB CRC | Count?  | 0x02    | ReqType           | ReqLen 16b LE     |      ...
    +---------+---------+---------+---------+---------+---------+---------+---------+
     ... Payload, variable length                               | CRC LSB | 0x03    |
    +---------+---------+---------+---------+---------+---------+---------+---------+
@@ -65,16 +65,17 @@ described below.
  - Some weird counter, appears to increment by a certain amount from request to request.
  - Appears to be fixed to 0x02 for all read requests.
  - Request type (Device identifier, firmware version, code-plug?). This value gets 
-   repeated in the response
-   - 0x01: unknown, before reading/writing code-plug
-   - 0x03: likely device identification
-   - 0x05: during handshake before writing code-plug
-   - 0xc5: likely firmware version
-   - 0xc6: last request when reading/writing code-plug, reboot?
-   - 0xc7: likely read code-plug memory
-   - 0xc8: likely write code-plug memory
-   - 0xce: several request before writing to memory
- - Unknown but relates to value in the response at the same place.
+   repeated in the response, except for bit 7 being set. That is a 0x0102 gets responded 
+   with type 0x0182.
+   - 0x0102: unknown, before reading/writing code-plug
+   - 0x010C: unknown, before reading/writing code-plug
+   - 0x0302: likely device identification
+   - 0x0502: during handshake before writing code-plug
+   - 0xc501: likely firmware version
+   - 0xc601: last request when reading/writing code-plug, reboot?
+   - 0xc701: likely read code-plug memory
+   - 0xc801: likely write code-plug memory
+   - 0xce01: several request before writing to memory
  - Read-request payload length (aka layer 2). 16bit little-endian integer.
  - Payload, variable length
  - LSB of CRC

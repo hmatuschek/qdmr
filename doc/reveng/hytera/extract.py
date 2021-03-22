@@ -68,23 +68,23 @@ def unpackLayer0Data(data):
 def unpackRequestResponse(payload):
   msb, u1, f1, what, u2, length = struct.unpack("<BBBBBH", payload[:7])
   lsb, end = struct.unpack("BB", payload[-2:])
-  return u1, f1, what, u2, ((msb<<8)|lsb), end, length, payload[7:-2]
+  crc, a,b = 0x5ECF, 1, -2
+  if len(payload)%2==0: b=-3
+  for x in struct.iter_unpack("<H", payload[a:b]):
+    crc -= x[0]
+  if len(payload)%2==0: crc -= payload[-3]
+  crc = crc%0xffff
+  return u1, f1, what, u2, ((msb<<8)|lsb), crc, end, length, payload[7:-2]
 
 def unpackReadWriteRequest(payload):
   ukn1, ukn2, ukn3, ukn4, addr, length = struct.unpack("<bHHbIH", payload[:12])
-  crc = 0x59fd - (addr&0xffff) - (addr>>16) - length - 0x01
   content = payload[12:]
-  for i in range(len(content)):
-    crc -= content[i]
-  return ukn1, ukn2, ukn3, ukn4, addr, length, crc%0xffff, content
+  return ukn1, ukn2, ukn3, ukn4, addr, length, content
 
 def unpackReadWriteResponse(payload):
   addr, length = struct.unpack("<xxxxxxxIH", payload[:13])
-  crc = 0x59fd - (addr&0xffff) - (addr>>16) - length - 0x01
   content = payload[13:]
-  for i in range(len(content)):
-    crc -= content[i]
-  return addr, length, crc&0xffff, content
+  return addr, length, content
 
 def isReadRequest(p):
   return isDataPacket(p) and isFromHost(p) and (0x01 == getData(p)[1])
@@ -153,12 +153,11 @@ elif "payload" == args.command:
     
     print("{} type={}, len={:04X}, flag={:02X}, rcount={:04X}:".format(dir, cmd, tlen, flag, rcount))
     if (("REQ" == cmd) or ("RES"==cmd)) and plen>9:
-      u1, f1, what, u2, crc, end, plen, payload = unpackRequestResponse(payload)
+      u1, f1, what, u2, crc, crc_comp, end, plen, payload = unpackRequestResponse(payload)
       print("  | crc={:04X}, seq={:02X}, fixed={:02X}, req={:02X}, ukn2={:02X}, payload len={:04X}".format(crc, u1, f1, what, u2, plen))
 
       if (0xC7 == what) and ("REQ"==cmd): # read request
-        ukn1, ukn2, ukn3, ukn4, addr, length, crc_comp, payload = unpackReadWriteRequest(payload); 
-        crc_comp -= u1; crc_comp = crc_comp % 0xffff
+        ukn1, ukn2, ukn3, ukn4, addr, length, payload = unpackReadWriteRequest(payload); 
         if crc!=crc_comp:
           crc = "\x1b[1;31m{:04X} ERR\x1b[0m".format(crc_comp)
         else: 
@@ -167,7 +166,7 @@ elif "payload" == args.command:
         if not args.nodump:
           print(hexDump(payload, "  |  | "))
       elif (0xC7 == what) and ("RES"==cmd): # read response
-        addr, length, crc_comp, payload = unpackReadWriteResponse(payload); 
+        addr, length, payload = unpackReadWriteResponse(payload); 
         crc_comp -= (u1)
         crc_comp = crc_comp % 0xffff
         if crc!=crc_comp:
@@ -178,7 +177,7 @@ elif "payload" == args.command:
         if not args.nodump:
           print(hexDump(payload, "  |  | "))
       elif (0xC8 == what) and ("REQ"==cmd):
-        ukn1, ukn2, ukn3, ukn4, addr, length, crc_comp, payload = unpackReadWriteRequest(payload)
+        ukn1, ukn2, ukn3, ukn4, addr, length, payload = unpackReadWriteRequest(payload)
         if crc!=crc_comp:
           crc = "{:04X} ERR".format(crc_comp)
         else: 
@@ -187,7 +186,7 @@ elif "payload" == args.command:
         if not args.nodump:
           print(hexDump(payload, "  |  | "))
       elif (0xC8 == what) and ("RES"==cmd):
-        addr, length, crc_comp, payload = unpackReadWriteResponse(payload)
+        addr, length, payload = unpackReadWriteResponse(payload)
         if crc!=crc_comp:
           crc = "{:04X} ERR".format(crc_comp)
         else: 
