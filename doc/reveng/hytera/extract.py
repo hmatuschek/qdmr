@@ -331,6 +331,12 @@ elif "download_contacts" == args.command:
   table = PrettyTable(['Index','Name', 'Type', 'unk0', 'pad1', 'id', 'unk1', 'unk2'])
 
   for idx, name, type, unk0, pad1, id, unk1, unk2 in struct.iter_unpack('<H32sBBHIIH', contactData):
-    table.add_row([idx, name.decode('utf-8'), type, unk0, pad1, id, unk1, unk2])
+    typeName = "Unknown"
+    if type == 0:
+      typeName = 'Private Call'
+    elif type == 1:
+      typeName = 'Group Call'
+
+    table.add_row([idx, name.decode('utf-8'), typeName, unk0, pad1, id, unk1, unk2])
 
   print(table)
