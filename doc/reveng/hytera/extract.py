@@ -61,7 +61,7 @@ def unpackLayer0(p):
   return unpackLayer0Data(data)
 
 def unpackLayer0Data(data):
-  cmd, flag, src, des, unknown, length = struct.unpack(">xBxBBBHH", data[:10])
+  cmd, flag, src, des, rcount, length = struct.unpack(">xBxBBBHH", data[:10])
   payload = data[10:]
   return cmd, flag, src, des, rcount, length, payload
 
@@ -268,7 +268,7 @@ elif "write_codeplug"==args.command:
       continue
 
     # unpack layer 2
-    addr, length, payload = unpackReadWriteRequest(payload)
+    ukn1, ukn2, ukn3, ukn4, addr, length, crc_comp, payload = unpackReadWriteRequest(payload)
 
     # if not continuos -> print separator
     if (current_addr != addr):

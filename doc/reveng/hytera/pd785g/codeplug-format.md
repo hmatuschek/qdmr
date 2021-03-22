@@ -29,6 +29,25 @@ cause diffs. The following diff is generated:
 We can therefore disregard any changes seen at these addresses when changing CP
 values.  Any diffs shown in this document will filter out these changes.
 
+### Programming time stamp 
+Haveing a look at the transferred data, there is a dedicated write of 6 bytes to address 
+0x00000094. Here this would correspond to 
+```
+e5 07 03 16 02 17
+```
+being replaced by 
+```
+e5 07 03 16 02 1a
+```
+ - 07e3 03 16 02 17-> 2021-03-16, 02:23
+ - 07e3 03 16 02 1a-> 2021-03-16, 02:26
+
+### SHA1 HMACs?!?
+The other two changes are certainly worrying: These are both 160bit blocks and they change completely without changing the code-plug at all (except for the suspected programming time stamp). This would imply a cryptographic hash function over parts or the compete code-plug. A likely candidate would be SHA1. 
+
+The latter, however, does not make sense as a kind of checksum. This can be done cheaper using CRC32, in particular as many MCUs have dedicated hardware to compute such checksums. SHA1 would make sense if it is used as a HMAC. If this turns out to be true, then we will never be able to programm these Hytera devices.
+
+
 ## DMR ID
 
 Changing the DMRID of the radio (from 1 to 12345678) results in the following
