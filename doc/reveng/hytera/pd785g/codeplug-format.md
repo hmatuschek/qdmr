@@ -142,105 +142,11 @@ The number of contacts in the list is stored in address `0x65b5c` as a LE
 uint16_t. This number denotes the number of elements, so to get the size of the
 table to download it needs to be multiplied by `0x30`.
 
-Not all slots in the table contain valid contacts; some may be empty or some may
-contain old contact data. In order to filter out these contacts and find only
-valid contacts, we need to use the `link` field to establish a chain of valid
-contacts. The `link` field establishes a linked-list, indexed by the `index`
-field. The first element in the list can be found by reading a LE uint16_t value
-from `0x65b6e`; this value is the first `index` in the table. The final contact
-is denoted by visiting a node that has already been visited, i.e. the end of the
-list forms a loop between two contacts.
-
-As an example, lets take the following contact data.
-
-```
-0x00065b50  0000 0000 0000 0000 2a00 0004 0300 2000  ........*..... .
-0x00065b60  0000 3261 0400 00c0 0000 16c0 0000 0300  ..2a............
-0x00065b70  0200 4300 6100 6c00 6c00 3100 0000 0000  ..C.a.l.l.1.....
-0x00065b80  0000 0000 0000 0000 0000 0000 0000 0000  ................
-0x00065b90  0000 1101 0000 0100 0000 0000 0000 0000  ................
-0x00065ba0  0300 6e00 6500 7700 2000 3100 0000 0000  ..n.e.w. .1.....
-0x00065bb0  0000 0000 0000 0000 0000 0000 0000 0000  ................
-0x00065bc0  0000 0100 0000 0200 0000 0000 0000 0000  ................
-0x00065bd0  0000 6e00 6500 7700 2000 3200 0000 0000  ..n.e.w. .2.....
-0x00065be0  0000 0000 0000 0000 0000 0000 0000 0000  ................
-0x00065bf0  0000 0100 0000 0300 0000 0000 0000 0000  ................
-```
-
-The value at address `0x65b5c` indicates we have a table of three elements. We
-can cast this data using the structure above to obtain three channel 'slots':
-
-```
-slot[0] =
-       idx : 0x00065b70 = 0x0002
-      name : 0x00065b72 = "C"
- call_type : 0x00065b92 = 0x11
-      unk0 : 0x00065b93 = 0x01
-     __pad : 0x00065b94 = 0x0000
-        id : 0x00065b96 = 1
-      unk1 : 0x00065b9a = 0
-      link : 0x00065b9e = 0x0000
-slot[1] =
-       idx : 0x00065ba0 = 0x0003
-      name : 0x00065ba2 = "n"
- call_type : 0x00065bc2 = 0x01
-      unk0 : 0x00065bc3 = 0x00
-     __pad : 0x00065bc4 = 0x0000
-        id : 0x00065bc6 = 2
-      unk1 : 0x00065bca = 0
-      link : 0x00065bce = 0x0000
-slot[2] =
-       idx : 0x00065bd0 = 0x0000
-      name : 0x00065bd2 = "n"
- call_type : 0x00065bf2 = 0x01
-      unk0 : 0x00065bf3 = 0x00
-     __pad : 0x00065bf4 = 0x0000
-        id : 0x00065bf6 = 3
-      unk1 : 0x00065bfa = 0
-      link : 0x00065bfe = 0x0000
-```
-
-The value at `0x65b6e` indicates that we should start the traversal at the
-element with `index` 3. Thus we traverse: `3 -> 0 -> 0` and since index `0` is
-one that we've previously visited we finish with the set of contacts as `3` and
-`0`.
-
-A special case should be mentioned when there is only a single channel in the
-code plug. I would have assumed that the link and index on the slot in question
-would have both been 0 so the channel refers to itself. However, the CPS appears
-to do something different:
-
-```
-0x00065b50  0000 0000 0000 0000 2a00 0004 0200 2000  ........*..... .
-0x00065b60  0000 3261 0400 00c0 0000 16c0 0000 0000  ..2a............
-0x00065b70  0000 4300 6100 6c00 6c00 2000 3100 0000  ..C.a.l.l. .1...
-0x00065b80  0000 0000 0000 0000 0000 0000 0000 0000  ................
-0x00065b90  0000 0101 0000 0100 0000 0000 0000 0100  ................
-0x00065ba0  0100 4300 6100 6c00 6c00 3100 0000 0000  ..C.a.l.l.1.....
-0x00065bb0  0000 0000 0000 0000 0000 0000 0000 0000  ................
-0x00065bc0  0000 1101 0000 0100 0000 0000 0000 0000  ................
-
-slot[0] =
-       idx : 0x00065b70 = 0x0000
-      name : 0x00065b72 = "C"
- call_type : 0x00065b92 = 0x01
-      unk0 : 0x00065b93 = 0x01
-     __pad : 0x00065b94 = 0x0000
-        id : 0x00065b96 = 1
-      unk1 : 0x00065b9a = 0
-      link : 0x00065b9e = 0x0001
-
-slot[1] =
-       idx : 0x00065ba0 = 0x0001
-      name : 0x00065ba2 = "C"
- call_type : 0x00065bc2 = 0x11
-      unk0 : 0x00065bc3 = 0x01
-     __pad : 0x00065bc4 = 0x0000
-        id : 0x00065bc6 = 1
-      unk1 : 0x00065bca = 0
-      link : 0x00065bce = 0x0000
-```
-
 A 'dummy' node is created that links back to index 0. Notice on this node that
 `call_type` is `0x11`. My assumption here is that the value `0x11` on call type
 indicates this is a dummy node and should be ignored.
+
+The use of the `link` and `idx` fields is currently unknown. It was assumed that
+the `index` field would be used to link into the table by digital channels.
+However, it appears as though this is simply done based upon an offset into the
+table. This leaves the function of `index` and `link` currently a mystery.
