@@ -95,21 +95,48 @@ typedef uint32_t freq_t // 32-bit fixed point frequency
 #define FLAGS2_SLOT_2 (1 << 0)
 #define FLAGS2_VOX (1 << 6)
 
-typedef struct
+// If you don't mind, I would rather use the C++ struct definition. 
+// This also defines a new namespace, thus the embedded enum names do not pollute the namespace.
+struct digital_chan_t
 {
-    char name[32];
-    uint8_t unk4;
-    uint8_t flags;
-    uint16_t unkN1;
-    freq_t rx_freq;
-    freq_t tx_freq;
-    uint16_t unk0;
-    uint8_t unk1[3];
-    uint8_t colour_code;
-    uint16_t tx_contact_idx;
-    uint8_t unk2[6];
-    uint8_t flags2;
-} digital_chan_t;
+  // Using enums to translate meaning to values
+  typedef enum {
+    TIMESLOT_1 = 0,
+    TIMESLOT_2 = 1
+  } TimeSlot;
+
+  typedef enum {
+    POWER_LOW  = 1,
+    POWER_HIGH = 0 
+  } Power;
+  
+  // byte 0
+  char name[32];
+  // byte 32
+  uint8_t unk32;
+  // Using bitfields for single flags from LSB to MSB
+  uint8_t ukn33_1    : 4,    /// unknown set to ???
+          power      : 1,    /// 1=High, 0=Low
+          ukn33_5    : 3;    /// <- Althoug not needed, it helps me to check whether I've got them all.
+  // byte 34
+  uint16_t unk34;
+  // byte 35
+  freq_t rx_freq;
+  // byte 39
+  freq_t tx_freq;
+  uint16_t unk43;
+  uint8_t unk44[3];
+  // byte 47
+  uint8_t colour_code;
+  // byte 47
+  uint16_t tx_contact_idx;
+  uint8_t unk49[6];
+  // byte 55
+  uint8_t timeslot   : 1,    /// 1=TS2, 0=TS1
+          ukn56_1    : 5,    /// unknown set to ???
+          vox        : 1,    /// 1=Enabled, 0=Disabled.
+          ukn56_7    : 1;    /// unknown set to ???
+};
 
 ```
 
@@ -126,22 +153,25 @@ maximum of 1024 contacts. Each record has the format:
 ```c
 typedef uint16_t unicode_char_t;
 
-// 0 - private call
-// 1 - group call
-// 0x11 - Ignore contact
-typedef uint8_t call_type_t;
-
-typedef struct
+struct gigital_contact_t
 {
-    uint16_t index;
-    unicode_char_t name[16];
-    call_type_t call_type;
-    uint8_t is_referenced;
-    uint16_t __pad_1;
-    uint32_t id;
-    uint32_t unk1;
-    uint16_t link;
-}
+  // We could also use this fancy new C++17 enum-struct type extending an integer type. 
+  // This allows to set the field width and possible values explicitly.
+  enum struct call_type_t : uint8_t {
+    PRIVATE_CALL   = 0,
+    GROUP_CALL     = 1,
+    IGNORE_CONTACT = 0x11
+  };
+  
+  uint16_t index;
+  unicode_char_t name[16];
+  call_type_t call_type;    // is basically a uin8_t with values limited to thos specified in the enum above.
+  uint8_t is_referenced;
+  uint16_t __pad_1;
+  uint32_t id;
+  uint32_t unk1;
+  uint16_t link;
+};
 
 ```
 
