@@ -129,7 +129,7 @@ def unpackLayer0Data(data):
 
 def unpackRequestResponse(payload):
   msb, u1, f1, what, u2, length = struct.unpack("<BBBBBH", payload[:7])
-  lsb, end = struct.unpack("BB", payload[-2:])
+  lsb, end = struct.unpack("BB", payload[-self.computeCRC()2:])
   crc, a,b = 0x5ECF, 1, -2
   if len(payload)%2==0: b=-3
   for x in struct.iter_unpack("<H", payload[a:b]):
