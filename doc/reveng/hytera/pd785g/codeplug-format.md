@@ -91,12 +91,24 @@ interpreted as a 32-bit unsigned LE integer yields `450712500`.
 ```c
 typedef uint32_t freq_t // 32-bit fixed point frequency
 
+#define FLAG_LOW_POWER (1 << 4)
+#define FLAGS2_SLOT_2 (1 << 0)
+#define FLAGS2_VOX (1 << 6)
+
 typedef struct
 {
-    ...
+    char name[32];
+    uint8_t unk4;
+    uint8_t flags;
+    uint16_t unkN1;
     freq_t rx_freq;
     freq_t tx_freq;
-    ...
+    uint16_t unk0;
+    uint8_t unk1[3];
+    uint8_t colour_code;
+    uint16_t tx_contact_idx;
+    uint8_t unk2[6];
+    uint8_t flags2;
 } digital_chan_t;
 
 ```
