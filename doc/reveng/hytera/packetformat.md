@@ -67,19 +67,34 @@ described below.
  - Request type (Device identifier, firmware version, code-plug?). This value gets 
    repeated in the response, except for bit 7 being set. That is a 0x0102 gets responded 
    with type 0x0182.
-   - 0x0102 = 0b0000 0001 0000 0010: unknown, before reading/writing code-plug
-   - 0x010C = 0b0000 0001 0000 1100: unknown, before reading/writing code-plug
-   - 0x0302 = 0b0000 0011 0000 0010: likely device identification
-   - 0xc501 = 0b0000 0101 0000 0001: likely read firmware version
-   - 0x0502 = 0b0000 0101 0000 0010: during handshake before writing code-plug
-   - 0xc601 = 0b1100 0110 0000 0001: last request when reading/writing code-plug, reboot?
-   - 0xc701 = 0b1100 0111 0000 0001: likely read code-plug memory
-   - 0xc801 = 0b1100 1000 0000 0001: likely write code-plug memory
-   - 0xce01 = 0b1100 1110 0000 0001: several requests before writing to memory
  - Read-request payload length (aka layer 2). 16bit little-endian integer.
  - Payload, variable length. Contains a further layer 2 for read and write operations.
  - LSB of CRC
  - fixed to 0x03
+
+### Request type field
+ The request type field appears to be a 16bit wide bit field encoding several informations about the request and expected response.
+```
+ +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ | Target        | Operation     | R | 0 | 0 | 0 | Type          |
+ +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+```
+ - The first 4 bit appear to specify the target of the operation, seen 0x0 and 0xC. 0xC is used 
+   when reading and writing the code-plug. 0x0 is used when identifying the radio. Maybe 0xC means
+   *flash* and 0x0 *rom*. Interestingly, 0xC is used when reading the firmware version.
+ - The second 4bit field contains some sort of an op-code. Seen 0x1,0x3,0x5,0x6,0x7,0x8 and 0xe.
+
+ReqType | Meaning
+--------|------------------------------------------------------------------------------------------
+ 0x0102 | Unknown, before reading/writing code-plug, fixed length response 0x48 bytes.
+ 0x010C | Unknown, before reading/writing code-plug.
+ 0x0302 | Likely get device identification, fixed length response 0x48 bytes.
+ 0xc501 | Likely read firmware version
+ 0x0502 | During handshake before writing code-plug, fixed length response 0x28 bytes.
+ 0xc601 | Last request when reading/writing code-plug, flush or reboot?
+ 0xc701 | Read code-plug memory
+ 0xc801 | Write code-plug memory
+ 0xce01 | Several requests before writing to memory
 
 #### Example
 ```
@@ -166,26 +181,55 @@ The *what* field in layer 1 is set to 0xc5, the unknown field is set to 0x01. Th
 
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
-00 | 17 x 0                                                                     ...
+00 | Code    | 16 x 0                                                           ...
    +---------+---------+---------+---------+---------+---------+---------+---------+
 18  ...      |
    +---------+
 ```
+- Unknown code byte. Seen 0x00 in code-plug read and 0x02 in code-plug write. Code does not affect
+  response. 
 
 ### Response (ReqType=0xC581)
-The response is then pretty simple
+The response is then pretty simple but appears to have a length field. The content consists of
+several ASCII strings and some few unknown data fields.
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
-00 | Data                                                                      ...
+00 | 0x00    | Code    | Length, 16bit LE  | Content                            ...
    +---------+---------+---------+---------+---------+---------+---------+---------+
     ...                                                                            |
    +---------+---------+---------+---------+---------+---------+---------+---------+
 ```
+- The unknown code of the request is repeated in the response.
+- The response payload length is encoded as 16bit little-endian integer.
 
 
-## Another weird read-request 
+## Unknown request 0x0102
+This request is send directly before reading the code plug from the device. 
+
+### Request (ReqType=0x0102) 
+```
+   +---------+
+00 | Unknown |
+   +---------+
+```
+- Some magic command byte.
+  - 0x12 - Seen in code-plug download, 0x48b response mostly 0x00.
+  - 0x09 - Seen in code-plug upload, 0x48b response mostly 0x00. A few single uni-code 
+    chars.
+
+### Response (ReqType=0x0182) 
+```
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+00 | 0x48 bytes unknown data, mostly 0x00                                       ...
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+40  ...                                                                            |
+   +---------+---------+---------+---------+---------+---------+---------+---------+
+```
+
+## Unknown memory read-request 
 This request is send to the radio before writing the firmware. This is certainly a read 
-request including address and length fields. The memory being read is unknown, however.
+request of some kind, including address and length fields. The memory being read is 
+unknown.
 
 ### Request (ReqType=0xCE01) 
 ```
@@ -203,3 +247,4 @@ request including address and length fields. The memory being read is unknown, h
    +---------+---------+---------+---------+---------+---------+---------+---------+
 ```
 
+## Unknown request 0x0502
