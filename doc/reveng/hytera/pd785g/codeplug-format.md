@@ -153,7 +153,7 @@ struct gigital_contact_t
 {
   // We could also use this fancy new C++17 enum-struct type extending an integer type. 
   // This allows to set the field width and possible values explicitly.
-  enum struct call_type_t : uint8_t {
+  enum call_type_t : uint8_t {
     PRIVATE_CALL   = 0,
     GROUP_CALL     = 1,
     IGNORE_CONTACT = 0x11
