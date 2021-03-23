@@ -91,10 +91,6 @@ interpreted as a 32-bit unsigned LE integer yields `450712500`.
 ```c
 typedef uint32_t freq_t // 32-bit fixed point frequency
 
-#define FLAG_LOW_POWER (1 << 4)
-#define FLAGS2_SLOT_2 (1 << 0)
-#define FLAGS2_VOX (1 << 6)
-
 // If you don't mind, I would rather use the C++ struct definition. 
 // This also defines a new namespace, thus the embedded enum names do not pollute the namespace.
 struct digital_chan_t
@@ -165,7 +161,7 @@ struct gigital_contact_t
   
   uint16_t index;
   unicode_char_t name[16];
-  call_type_t call_type;    // is basically a uin8_t with values limited to thos specified in the enum above.
+  call_type_t call_type;    // is basically a uint8_t with values limited to those specified in the enum above.
   uint8_t is_referenced;
   uint16_t __pad_1;
   uint32_t id;
