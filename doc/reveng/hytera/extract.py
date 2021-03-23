@@ -16,29 +16,13 @@ parser.add_argument("command", help="""What to extract. Possible commands are: s
 """)
 args = parser.parse_args()
 
-def download(start_address, size):
-  end_address = start_address + size
+def download(segments):
   READ_SZ = 0x400
   TIMEOUT = 1500
   OUT_EP = 0x04
   IN_EP = 0x84
 
-  ret = bytes()
-
   dev = usb.core.find(idVendor=0x238b, idProduct=0x0a11)
-
-  def compose_read_command(address, length):
-    x = 0x5959 - (address + length + 1)
-
-    # Count the number of times this number has wrapped around 0
-    wraps = abs(math.floor(x / 0xffff))
-    crc = struct.pack('>H', ((x - wraps) & 0xffff))
-    lengthBytes = struct.pack('<H', length)
-    addressBytes = struct.pack('<I', address)
-
-    return b'\x7e\x01\x00\x00\x20\x10\x00\x00\x00\x1f' + \
-      bytes([crc[0]]) + b'\xa4\x02\xc7\x01\x0c\x00\x00\x00\x00\x01\x00\x00' + \
-      addressBytes + lengthBytes + bytes([crc[1]]) + b'\x03'
 
   if dev is None:
     raise ValueError('Radio not found')
@@ -53,30 +37,51 @@ def download(start_address, size):
     dev.write(OUT_EP, pkt, TIMEOUT)
     dev.read(IN_EP, 1024, TIMEOUT)
 
-  for addr in range(start_address, end_address, READ_SZ):
-    length = READ_SZ if (addr + READ_SZ) < end_address else end_address - addr
-    dev.write(OUT_EP, compose_read_command(addr, length), TIMEOUT)
-    data = dev.read(IN_EP, 0x700, TIMEOUT)
+  def compose_read_command(address, length):
+    x = 0x5959 - (address + length + 1)
 
-    cmd, flag, src, des, unknown, length, payload = unpackLayer0Data(data)
-    plen = len(payload)
-    if (0x04 != cmd) or (7 > plen):
-      raise ValueError('Expected response packet')
+    # Count the number of times this number has wrapped around 0
+    wraps = abs(math.floor(x / 0xffff))
+    crc = struct.pack('>H', ((x - wraps) & 0xffff))
+    lengthBytes = struct.pack('<H', length)
+    addressBytes = struct.pack('<I', address)
 
-    # unpack layer 1
-    u1, f1, what, u2, crc, crc_comp, end, plen, payload = unpackRequestResponse(payload)
-    if 0xC7 != what:
-      raise ValueError('Expected only read data')
+    return b'\x7e\x01\x00\x00\x20\x10\x00\x00\x00\x1f' + \
+      bytes([crc[0]]) + b'\xa4\x02\xc7\x01\x0c\x00\x00\x00\x00\x01\x00\x00' + \
+      addressBytes + lengthBytes + bytes([crc[1]]) + b'\x03'
 
-    # unpack layer 2
-    addr, length, payload = unpackReadWriteResponse(payload)
+  def readSegment(start_address, sz):
+    end_address = start_address + sz
+    ret = bytes()
 
-    ret += payload
+    for addr in range(start_address, end_address, READ_SZ):
+      length = READ_SZ if (addr + READ_SZ) < end_address else end_address - addr
+      dev.write(OUT_EP, compose_read_command(addr, length), TIMEOUT)
+      data = dev.read(IN_EP, 0x700, TIMEOUT)
+
+      cmd, flag, src, des, unknown, length, payload = unpackLayer0Data(data)
+      plen = len(payload)
+      if (0x04 != cmd) or (7 > plen):
+        raise ValueError('Expected response packet')
+
+      # unpack layer 1
+      u1, f1, what, u2, crc, end, plen, payload = unpackRequestResponse(payload)
+      if 0xC7 != what:
+        raise ValueError('Expected only read data')
+
+      # unpack layer 2
+      addr, length, crc_comp, payload = unpackReadWriteResponse(payload)
+
+      ret += payload
+
+    return ret
+
+  segmentData = [readSegment(x[0], x[1]) for x in segments]
 
   dev.write(OUT_EP, b'\x7e\x01\x00\x00\x20\x10\x00\x00\x00\x14\xf4\x0f\x02\xc6\x01\x01\x00\x00\x6a\x03')
   dev.read(IN_EP, 1024, TIMEOUT)
 
-  return ret
+  return segmentData
 
 def hexDump(s, prefix="", addr=0):
   N = len(s)
@@ -128,23 +133,58 @@ def unpackReadWriteResponse(payload):
 
 
 ####### USB Reading
-if "download" == args.command:
-  data = download(0, 0x196b28)
-  print(hexDump(data, "", 0))
-
+elif "download" == args.command:
+  data = download([(0, 0x196b28)])
+  print(hexDump(data[0], "", 0))
 
 elif "download_contacts" == args.command:
-  contactData = download(0x65b70, 0xc000)
+  data = download([(0x65b5c, 2), # Table Size
+                   (0x65b6e, 2), # First contact index
+                   (0x65b70, 0xc000)])
 
-  table = PrettyTable(['Index','Name', 'Type', 'unk0', 'pad1', 'id', 'unk1', 'unk2'])
+  tableElements = struct.unpack('<H', data[0])[0]
+  currentIndex = struct.unpack('<H', data[1])[0]
+  contactStructure = '<H32sBBHIIH'
+  tableSize = tableElements * struct.calcsize(contactStructure)
 
-  for idx, name, type, unk0, pad1, id, unk1, unk2 in struct.iter_unpack('<H32sBBHIIH', contactData):
+  table = PrettyTable(['Index','Name', 'Type', 'Is referenced', 'pad1', 'id', 'unk1', 'link'])
+  contactSlots = []
+
+  # Build contact table.
+  for idx, name, type, is_ref, pad1, id, unk1, link in struct.iter_unpack(contactStructure, data[2][:tableSize]):
+    contactSlots.append([idx, name.decode('utf-8'), type, is_ref, pad1, id, unk1, link])
+
+  assert len(contactSlots) == tableElements
+
+  # Now traverse
+  visitedIndexes = []
+  while True:
+    currentSlot = next(filter(lambda s: s[0] == currentIndex, contactSlots))
+    link = currentSlot[7]
+    type = currentSlot[2]
+    isRef = currentSlot[3]
+
+    if currentIndex in visitedIndexes:
+      break
+
+    visitedIndexes.append(currentIndex)
+
     typeName = "Unknown"
     if type == 0:
       typeName = 'Private Call'
     elif type == 1:
       typeName = 'Group Call'
 
-    table.add_row([idx, name.decode('utf-8'), typeName, unk0, pad1, id, unk1, unk2])
+    isRefString = "Unknown"
+
+    isRefBool = bool(isRef)
+
+    currentSlot[2] = typeName
+    currentSlot[3] = isRefBool
+
+    if type != 0x11:
+      table.add_row(currentSlot)
+
+    currentIndex = link
 
   print(table)
