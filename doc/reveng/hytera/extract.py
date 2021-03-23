@@ -157,17 +157,9 @@ elif "download_contacts" == args.command:
   assert len(contactSlots) == tableElements
 
   # Now traverse
-  visitedIndexes = []
-  while True:
-    currentSlot = next(filter(lambda s: s[0] == currentIndex, contactSlots))
-    link = currentSlot[7]
+  for currentSlot in contactSlots:
     type = currentSlot[2]
     isRef = currentSlot[3]
-
-    if currentIndex in visitedIndexes:
-      break
-
-    visitedIndexes.append(currentIndex)
 
     typeName = "Unknown"
     if type == 0:
@@ -184,7 +176,5 @@ elif "download_contacts" == args.command:
 
     if type != 0x11:
       table.add_row(currentSlot)
-
-    currentIndex = link
 
   print(table)
