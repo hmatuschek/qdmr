@@ -340,12 +340,12 @@ elif "download_contacts" == args.command:
   contactStructure = '<H32sBBHIIH'
   tableSize = tableElements * struct.calcsize(contactStructure)
 
-  table = PrettyTable(['Index','Name', 'Type', 'unk0', 'pad1', 'id', 'unk1', 'link'])
+  table = PrettyTable(['Index','Name', 'Type', 'Is referenced', 'pad1', 'id', 'unk1', 'link'])
   contactSlots = []
 
   # Build contact table.
-  for idx, name, type, unk0, pad1, id, unk1, link in struct.iter_unpack(contactStructure, data[2][:tableSize]):
-    contactSlots.append([idx, name.decode('utf-8'), type, unk0, pad1, id, unk1, link])
+  for idx, name, type, is_ref, pad1, id, unk1, link in struct.iter_unpack(contactStructure, data[2][:tableSize]):
+    contactSlots.append([idx, name.decode('utf-8'), type, is_ref, pad1, id, unk1, link])
 
   assert len(contactSlots) == tableElements
 
@@ -355,6 +355,7 @@ elif "download_contacts" == args.command:
     currentSlot = next(filter(lambda s: s[0] == currentIndex, contactSlots))
     link = currentSlot[7]
     type = currentSlot[2]
+    isRef = currentSlot[3]
 
     if currentIndex in visitedIndexes:
       break
@@ -367,7 +368,12 @@ elif "download_contacts" == args.command:
     elif type == 1:
       typeName = 'Group Call'
 
-      currentSlot[2] = typeName
+    isRefString = "Unknown"
+
+    isRefBool = bool(isRef)
+
+    currentSlot[2] = typeName
+    currentSlot[3] = isRefBool
 
     if type != 0x11:
       table.add_row(currentSlot)

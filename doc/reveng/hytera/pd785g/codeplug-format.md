@@ -124,7 +124,7 @@ typedef struct
     uint16_t index;
     unicode_char_t name[16];
     call_type_t call_type;
-    uint8_t unk0;
+    uint8_t is_referenced;
     uint16_t __pad_1;
     uint32_t id;
     uint32_t unk1;
@@ -132,6 +132,9 @@ typedef struct
 }
 
 ```
+
+The `is_referenced` field has a value of `1` when any digital channel references
+this contact and `0` otherwise.
 
 ### Contact traversal
 
