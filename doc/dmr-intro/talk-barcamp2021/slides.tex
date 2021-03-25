@@ -1,0 +1,317 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Boadilla}
+
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{standalone}
+\usepackage[ngerman]{babel}
+\usepackage{tikz}
+\title[QDMR]{QDMR ein universeller Code-Plug Editor (CPS) für Linux \& Mac\\ (und vielleicht Windows)}
+\subtitle{}
+
+\author{Hannes, DM3MAT}
+\institute{\texttt{dm3mat [at] darc [dot] de}}
+\date{25. März 2021}
+
+\input{../fig/repeater}
+
+
+\begin{document}
+\begin{frame}
+ \titlepage
+\end{frame}
+
+\begin{frame} \frametitle{Übersicht}
+ \tableofcontents
+\end{frame}
+
+
+
+\section{Ganz kurze Einführung in DMR}
+\begin{frame} \frametitle{Einführung -- DMR ein Mobilfunknetz für den Amateurfunk} 
+\begin{block}{Was ist DMR?}
+ \begin{itemize}
+  \item Ein digitaler Daten und Sprachübertragungsmodi für UKW.
+  \item Gedacht als Ersatz für den analogen Bündelfunk.
+  \item Endpunkte werde über \emph{Telefonnummern} identifiziert.
+  \item Verwendet 12.5kHz Raster (wie NBFM). 
+  \item Erlaubt vernetzten Repeater betrieb (über sog. Sprechgruppen).
+  \item Erlaubt durch Kompression das \emph{Bedienen} zweier Endgeräte auf einem physischen Kanal (zwei unabhängige \emph{Zeitschlitze}).
+ \end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame} \frametitle{Repeater Betrieb und Direktrufe}
+ \begin{block}{Merke}
+  Alle DMR Repeater sind untereinander vernetzt und vermitteln Gespräche.
+ \end{block}
+ \begin{center}
+   \input{../fig/repeater_privatecall}
+ \end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Repeater Betrieb und Sprechgruppen}
+ \begin{block}{Sprechgruppe}
+  Sprechgruppen sind reservierte Telefonnummern für Telefonkonferenzen: Ein \emph{Gruppenruf} zu einer Sprechgruppe wird von allen Repeatern ausgesandt, die diese Sprechgruppe abonniert haben.
+  
+  Es gibt Sprechgruppen für Regionen aber auch für bestimmte Themen.
+ \end{block}
+ \begin{center}
+  \begin{tabular}{|l|c|} \hline
+  Name & Sprechgruppe \\ \hline
+  Lokal & 9 \\
+  Global & 91 \\
+  Europa & 92 \\
+  Deutschland & 262 \\
+  Berlin \& Brandenburg & 2621 \\
+  ... & ... \\
+  Whitesticker & 264022\\ \hline
+ \end{tabular}
+ \end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Lokale und Regionale Verbindungen}
+ \begin{center}
+  \input{../fig/repeater_local}
+ \end{center} 
+\end{frame}
+
+\begin{frame}\frametitle{Nachmittagsrundenbeispiel}
+ \begin{center}
+  \input{../fig/talkgroup_ex1a}
+ \end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Nachmittagsrundenbeispiel}
+ \begin{center}
+  \input{../fig/talkgroup_ex1b}
+ \end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Nachmittagsrundenbeispiel}
+ \begin{center}
+  \input{../fig/talkgroup_ex1c}
+ \end{center}
+\end{frame}
+
+
+\section{Code Plugs und CPS}
+\begin{frame}\frametitle{Kanäle einrichten: analog}
+ Kanäle für analog Repeater einzurichten ist leicht: Ein- und Ausgabe Frequenz und ggf. Subton.
+\begin{center}
+ \begin{tabular}{l|l|l|l}
+ Name & Ausgabe & Eingabe & Subton \\ \hline
+ DB0LDS & $439.5625$ & $431.9625$ & $67.0Hz$ \\
+ \end{tabular}
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Kanäle einrichten: DMR}
+Aus Bequemlichkeit richtet man einfach für alle Sprechgruppen, an denen man teilnehmen möchte einen separaten Kanal ein. Und das für jeden Repeater, den man verwendet. 
+\vspace{0.5cm}
+\begin{center}
+ \begin{tabular}{l|l|l|l|l|l|l}
+ Name & Ausgabe & Eingabe & CC & TS & Kontakt & Empfangsgruppe \\ \hline
+ DL DB0LDS & $439.5625$ & $431.9625$ & 1 & 1 & 262 & 91, 92, 262 \\
+ Sa/Th DB0LDS & $439.5625$ & $431.9625$ & 1 & 1 & 2629 & 2629 \\
+ WS DB0LDS & $439.5625$ & $431.9625$ & 1 & 1 & 264022 & 264022 \\
+ L9 DB0LDS & $439.5625$ & $431.9625$ & 1 & 2 & L9 & 8, 9, 2621 \\
+ BB DB0LDS & $439.5625$ & $431.9625$ & 1 & 2 & 2621 & 8, 9, 2621 \\
+ \end{tabular}
+\end{center}
+\vspace{.5cm}
+Hier habe ich 5 logische Kanäle für einen einzigen physischen Kanal eingerichtet. Wirklich notwendig sind nur zwei, einen für Timeslot 1 und einen für Timeslot 2.
+\end{frame}
+
+\begin{frame} \frametitle{Code-plug programming software (CPS)}
+ Weil eine Menge Kanäle, Sprechgruppen und Empfangsgruppen eingerichtet werden müssen, wird eine Software verwendet anstatt das Gerät über das Bedienfeld zu programmieren. Die sog. \emph{CPS}. Das Ergebnis wird \emph{code plug} genannt. 
+ \vspace{0.5cm} 
+ Probleme:
+ \begin{itemize}
+  \item Die Software ist Mist. Bedienkonzept aus den 90er Jahren.
+  \item Sehr auf kommerziellen Einsatz ausgelegt. 
+  \item Sehr viele unnütze/verbotene Optionen (Verschlüsselung)
+  \item Schlechte Übersetzung aus dem Chinesischen.
+  \item Hardware- oder gar versionsspezifische, binäre code plugs 
+  \item Jeder muss quasi seinen eigenen code plug bauen. Es gibt keinen Austausch.
+ \end{itemize}
+\end{frame}
+
+\section{QDMR -- Ein Versuch einer universellen CPS}
+\begin{frame} \frametitle{QDMR -- Ein Versuch einer universellen CPS}
+\begin{center}
+ \includegraphics[width=0.75\linewidth]{../fig/qdmr-general-settings.png}
+\end{center}
+QDMR ist ein Versuch eine \emph{universelle} CPS zu bauen für verschiedene Geräte und Hersteller mit einem lesbaren code-plug und einer halbwegs modernen Oberfläche.
+\end{frame}
+
+\begin{frame}
+ Unterstütze Geräte (bisher):
+ \begin{itemize}
+  \item Open GD-77 Firmware (RD-5R, GD-77, ...)
+  \item Radioddity RD-5R
+  \item Retevis RT3S
+  \item TyT MD-UV390
+  \item AnyTone AT-D878UV
+ \end{itemize}
+ \pause Quasi fertig:
+ \begin{itemize}
+  \item Radioddity GD-77
+  \item TYT MD-UV380, MD-2017, MD-9600
+  \item Retevis RT84
+  \item Anytone AT-D868UVE
+  \item BTECH DMR-6X2 (läuft wahrscheinlich schon, identisch zum AT-D878UV)
+ \end{itemize}  
+ \pause Nahe Zukunft:
+ \begin{itemize}
+  \item Hytera Geräte (vielen Dank an Matt)!
+ \end{itemize}
+\end{frame}
+
+\begin{frame}
+ \begin{center}
+  {\Huge Demo!}
+ \end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Grundeinstellungen (1/5)}
+\begin{center}
+ \includegraphics[width=0.75\linewidth]{../fig/qdmr-general-settings.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Kontakte/Sprechgruppen (2/5)}
+\begin{center}
+ \includegraphics[width=0.75\linewidth]{../fig/qdmr-contacts-empty.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Kontakte/Sprechgruppen: Direktruf}
+\begin{center}
+ \includegraphics[width=0.25\linewidth]{../fig/qdmr-edit-contact-private-call.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Kontakte/Sprechgruppen: Gruppenruf}
+\begin{center}
+ \includegraphics[width=0.25\linewidth]{../fig/qdmr-edit-contact-group-call.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Kontakte/Sprechgruppen (2/5)}
+\begin{center}
+ \includegraphics[width=0.75\linewidth]{../fig/qdmr-contacts-example.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Empfangsgruppen (3/5)}
+\begin{center}
+ \includegraphics[width=0.75\linewidth]{../fig/qdmr-rxgroup-empty.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Empfangsgruppen: Hinzufügen}
+\begin{center}
+ \includegraphics[width=0.25\linewidth]{../fig/qdmr-edit-rxgroup-empty.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Empfangsgruppen: Hinzufügen}
+\begin{center}
+ \includegraphics[width=0.25\linewidth]{../fig/qdmr-edit-rxgroup-select.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Empfangsgruppen (3/5)}
+\begin{center}
+ \includegraphics[width=0.75\linewidth]{../fig/qdmr-rxgroup-list.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Kanäle (4/5)}
+\begin{center}
+ \includegraphics[width=0.75\linewidth]{../fig/qdmr-channels-empty.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Kanäle: Analog}
+\begin{center}
+ \includegraphics[width=0.5\linewidth]{../fig/qdmr-channels-edit-analog.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Kanäle: Digital}
+\begin{center}
+ \includegraphics[width=0.5\linewidth]{../fig/qdmr-channels-edit-digital.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Kanäle (4/5)}
+\begin{center}
+ \includegraphics[width=0.75\linewidth]{../fig/qdmr-channels-example.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Zonen (5/5)}
+\begin{center}
+ \includegraphics[width=0.75\linewidth]{../fig/qdmr-zone-empty.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Zone hinzufügen}
+\begin{center}
+ \includegraphics[width=0.5\linewidth]{../fig/qdmr-zone-edit.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Kanäle zur Zone hinzufügen}
+\begin{center}
+ \includegraphics[width=0.25\linewidth]{../fig/qdmr-zone-edit-select.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Zonen (5/5)}
+\begin{center}
+ \includegraphics[width=0.75\linewidth]{../fig/qdmr-zone-empty.png}
+\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Code-plug Format}
+\begin{center}
+ \includegraphics[width=0.9\linewidth]{../fig/qdmr-codeplug-format.png}
+\end{center}
+\end{frame}
+
+
+\section{Down the rabbit hole}
+\begin{frame} \frametitle{Howto reverse engineer a code-plug?}
+ Hilfsmittel:
+ \begin{itemize}
+  \item Eine Windows Instanz in einer virtuellen Maschine (VirtualBox, o.ä.) mit der original CPS
+  \item Wireshark mit \emph{usbmon} Kernelmodul (bei allen Linux Distributionen dabei)
+  \item Viel Geduld
+  \item Viel Frustrationstoleranz
+ \end{itemize}
+ Vorgehen:
+ \begin{itemize}
+  \item Die Kommunikation zwischen CPS und Gerät belauschen und mitschneiden.
+  \item Die Rohdaten aus den Mitschnitten extrahieren und Gemeinsamkeiten/Unterschiede darin finden.
+  \item Daraus das Kommunikationsprotokoll sowie das Paketformat ableiten (sehr aufwendig).
+  \item Danach differentielle Analyse des Code-plugs. D.h., 
+  \begin{itemize}
+    \item \textbf{Eine} kleine Änderung im code-plug auf das Gerät spielen.
+    \item Kommunikation mitschneiden
+    \item Code-plug daraus extrahieren.
+    \item Vergleichen vor und nach der Änderung.
+  \end{itemize}
+ \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Howto reverse engineer a code-plug?}
+Beispiel Hytera:
+\begin{verbatim}
+ 
+\end{verbatim}
+\end{frame}
+\end{document}
