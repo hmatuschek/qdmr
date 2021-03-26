@@ -143,8 +143,11 @@
           </item>
           <item row="4" column="1">
            <widget class="QLineEdit" name="introLine2">
-            <property name="statusTip">
+            <property name="toolTip">
              <string>Second greeting line (if supported by the radio).</string>
+            </property>
+            <property name="statusTip">
+             <string/>
             </property>
             <property name="accessibleName">
              <string>Intro line 2</string>
