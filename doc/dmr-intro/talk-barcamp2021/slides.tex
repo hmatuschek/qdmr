@@ -7,6 +7,8 @@
 \usepackage{standalone}
 \usepackage[ngerman]{babel}
 \usepackage{tikz}
+\usepackage{listings}
+
 \title[QDMR]{QDMR ein universeller Code-Plug Editor (CPS) für Linux \& Mac\\ (und vielleicht Windows)}
 \subtitle{}
 
@@ -14,8 +16,12 @@
 \institute{\texttt{dm3mat [at] darc [dot] de}}
 \date{25. März 2021}
 
-\input{../fig/repeater}
+\lstset{ %
+basicstyle=\tiny    % the size of the fonts that are used for the line-numbers
+}
 
+
+\input{../fig/repeater}
 
 \begin{document}
 \begin{frame}
@@ -25,7 +31,6 @@
 \begin{frame} \frametitle{Übersicht}
  \tableofcontents
 \end{frame}
-
 
 
 \section{Ganz kurze Einführung in DMR}
@@ -42,7 +47,7 @@
 \end{block}
 \end{frame}
 
-\begin{frame} \frametitle{Repeater Betrieb und Direktrufe}
+\begin{frame} \frametitle{Repeaterbetrieb und Direktrufe}
  \begin{block}{Merke}
   Alle DMR Repeater sind untereinander vernetzt und vermitteln Gespräche.
  \end{block}
@@ -51,7 +56,7 @@
  \end{center}
 \end{frame}
 
-\begin{frame} \frametitle{Repeater Betrieb und Sprechgruppen}
+\begin{frame} \frametitle{Repeaterbetrieb und Sprechgruppen}
  \begin{block}{Sprechgruppe}
   Sprechgruppen sind reservierte Telefonnummern für Telefonkonferenzen: Ein \emph{Gruppenruf} zu einer Sprechgruppe wird von allen Repeatern ausgesandt, die diese Sprechgruppe abonniert haben.
   
@@ -71,7 +76,7 @@
  \end{center}
 \end{frame}
 
-\begin{frame}\frametitle{Lokale und Regionale Verbindungen}
+\begin{frame}\frametitle{Lokale und regionale Verbindungen}
  \begin{center}
   \input{../fig/repeater_local}
  \end{center} 
@@ -308,10 +313,56 @@ QDMR ist ein Versuch eine \emph{universelle} CPS zu bauen für verschiedene Ger�
  \end{itemize}
 \end{frame}
 
-\begin{frame}\frametitle{Howto reverse engineer a code-plug?}
-Beispiel Hytera:
+\begin{frame}[fragile]\frametitle{Howto reverse engineer a code-plug?}
+Beispiel Hytera (Rohdaten):
 \begin{verbatim}
- 
+7e 00 00 fe 20 10 00 00 00 0c 60 e5
+7e 01 00 00 20 10 00 00 00 14 31 d3 02 03 02 01 00 00 2c 03    
+7e 01 00 00 20 10 00 00 00 24 02 f1 02 c5 01 11 00 [...] 00 5b 03
+7e 01 00 00 20 10 00 00 00 14 41 c3 02 01 02 01 00 12 1c 03    
 \end{verbatim}
 \end{frame}
+
+\begin{frame}[fragile]\frametitle{Howto reverse engineer a code-plug?}
+Beispiel Hytera (Code-plug extrahieren):
+\begin{lstlisting}
+< RES: flags=00, src=10, dest=20, seq=0004
+  | RSP: type=81C7 seq=EA crc=170F (1887)
+  | RD: addr=00000000
+  | |  00000000 16 01 52 43 44 42 01 db 07 02 18 50 44 37 38 30 | ..RCDB.....PD780
+  | |  00000010 30 30 47 30 30 4d 30 30 30 30 30 00 00 85 85 00 | 00G00M00000.....
+  | |  00000020 00 00 00 00 00 00 56 6a 19 00 9a 00 00 00 00 00 | ......Vj........
+...
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Howto reverse engineer a code-plug?}
+Beispiel Hytera (Code-plug vergleichen, einfach mit \emph{diff}):
+Hier wurde gar nichts geändert, dennoch gibt es einen unterschied im übertragenen Code-plug
+\begin{lstlisting}
+< 00000090 80 a1 03 1c e5 07 03 16 02 17 db 07 03 0a 0a 21 | ...............!
+---
+> 00000090 80 a1 03 1c e5 07 03 16 02 1a db 07 03 0a 0a 21 | ...............!
+\end{lstlisting}
+\begin{itemize}
+ \item \texttt{0x07e3} = 2021, \texttt{0x03} = 3, \texttt{0x16} = 22, \texttt{0x02} = 2, \texttt{0x17}=23
+ \item \texttt{0x07e3} = 2021, \texttt{0x03} = 3, \texttt{0x16} = 22, \texttt{0x02} = 2, \texttt{0x1a}=26
+ \item $\Rightarrow$ Unterschied ist Zeitstempel der letzten Programmierung.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Howto reverse engineer a code-plug?}
+Beispiel Hytera (Code-plug vergleichen, einfach mit \emph{diff}):
+Hier wurde die DMR ID von 1 auf 12345678 geändert:
+\begin{lstlisting}
+< 00065AA0 04 00 4c 00 00 00 62 00 00 00 01 00 00 00 10 06 | ..L...b.........
+---
+> 00065AA0 04 00 4c 00 00 00 62 00 00 00 4e 61 bc 00 10 06 | ..L...b...Na....
+\end{lstlisting}
+\begin{itemize}
+ \item \texttt{0x01} = 1, \texttt{0xbc614e} = 12345678
+ \item $\Rightarrow$ Die DMR ID wird an der Adresse \texttt{0x00065AAA} als 24bit little-endian Zahl abgelegt.
+\end{itemize}
+\end{frame}
+
 \end{document}
