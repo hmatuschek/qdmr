@@ -2143,7 +2143,7 @@ D878UVCodeplug::decode(Config *config)
   for (uint16_t i=0; i<NUM_ZONES; i++) {
     // Check if zone is enabled:
     uint16_t bit = i%8, byte = i/8;
-    if (0 == (zone_bitmap[byte]>>bit))
+    if (0 == ((zone_bitmap[byte]>>bit) & 0x01))
       continue;
     // Determine whether this zone should be combined with the previous one
     QString zonename = decode_ascii(data(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET), 16, 0);
