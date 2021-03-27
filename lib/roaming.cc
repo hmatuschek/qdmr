@@ -138,9 +138,12 @@ RoamingZoneList::count() const {
 
 void
 RoamingZoneList::clear() {
+  beginResetModel();
   for (int i=0; i<count(); i++)
     _zones[i]->deleteLater();
   _zones.clear();
+  endResetModel();
+  emit modified();
 }
 
 int

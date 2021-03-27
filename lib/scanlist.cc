@@ -202,9 +202,12 @@ ScanLists::indexOf(ScanList *list) const {
 
 void
 ScanLists::clear() {
+  beginResetModel();
   for (int i=0; i<count(); i++)
     _scanlists[i]->deleteLater();
   _scanlists.clear();
+  endResetModel();
+  emit modified();
 }
 
 ScanList *

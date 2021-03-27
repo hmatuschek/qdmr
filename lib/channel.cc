@@ -383,9 +383,12 @@ ChannelList::count() const {
 
 void
 ChannelList::clear() {
+  beginResetModel();
   for (int i=0; i<count(); i++)
     _channels[i]->deleteLater();
   _channels.clear();
+  endResetModel();
+  emit modified();
 }
 
 int

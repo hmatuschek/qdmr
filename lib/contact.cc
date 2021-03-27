@@ -131,9 +131,12 @@ ContactList::dtmfCount() const {
 
 void
 ContactList::clear() {
+  beginResetModel();
   for (int i=0; i<count(); i++)
     _contacts[i]->deleteLater();
   _contacts.clear();
+  endResetModel();
+  emit modified();
 }
 
 int

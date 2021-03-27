@@ -130,9 +130,12 @@ RXGroupLists::count() const {
 
 void
 RXGroupLists::clear() {
+  beginResetModel();
   for (int i=0; i<count(); i++)
     _lists[i]->deleteLater();
   _lists.clear();
+  endResetModel();
+  emit modified();
 }
 
 
