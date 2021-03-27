@@ -1,0 +1,5 @@
+rd5r:
+  general-config:
+    tx-preamble: 360
+    monitor-type: open
+    radio-name: "DM3MAT"
