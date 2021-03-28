@@ -20,6 +20,8 @@
 #include "aprssystemdialog.hh"
 #include "repeaterdatabase.hh"
 #include "userdatabase.hh"
+#include "talkgroupdatabase.hh"
+
 
 
 Application::Application(int &argc, char *argv[])
@@ -34,8 +36,9 @@ Application::Application(int &argc, char *argv[])
   Logger::get().addHandler(new FileLogHandler(logdir+"/qdmr.log"));
 
   Settings settings;
-  _repeater = new RepeaterDatabase(settings.position(), 7, this);
-  _users    = new UserDatabase(30, this);
+  _repeater   = new RepeaterDatabase(settings.position(), 7, this);
+  _users      = new UserDatabase(30, this);
+  _talkgroups = new TalkGroupDatabase(30, this);
   _config = new Config(this);
 
   if (argc>1) {
@@ -684,7 +687,7 @@ Application::onIntroLine2Changed() {
 
 void
 Application::onAddContact() {
-  ContactDialog dialog(_users);
+  ContactDialog dialog(_users, _talkgroups);
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -719,7 +722,7 @@ void
 Application::onEditContact(const QModelIndex &idx) {
   if (idx.row() >= _config->contacts()->count())
     return;
-  ContactDialog dialog(_users, _config->contacts()->contact(idx.row()));
+  ContactDialog dialog(_config->contacts()->contact(idx.row()));
   if (QDialog::Accepted != dialog.exec())
     return;
 
