@@ -4,13 +4,13 @@
 \input{repeater}
 \begin{document}
  \begin{tikzpicture}[every node/.style={scale=.8}]
-  \activeuser{u1}{ 0,0}{DM3MAT};
+  \activeuser{u1}{ 0,0}{DM3MAT 2621370};
   \activerepeater{R1}{1,3}{DB0ABC};
   \draw[dotted] (2,4) -- (2,-1);
-  \user{u2}{ 4,0}{I/DL2XYZ 2};	
+  \user{u2}{ 4,0}{I/DL2XYZ\\2621234};	
   \activerepeater{R2}{3,3}{I0ABC};
-  \draw[->] (u1) -- node[above,rotate=70]{PC: DL2XYZ} (R1);
-  \draw[->] (R2) -- node[above,rotate=-70]{PC: DL2XYZ} (u2);
+  \draw[->] (u1) -- node[above,rotate=70]{PC: 2621234} (R1);
+  \draw[->] (R2) -- node[above,rotate=-70]{PC: 2621234} (u2);
   \path[->] (R1) edge[dashed,bend left] node[above]{via Netzwerk} (R2);
  \end{tikzpicture}
 \end{document}

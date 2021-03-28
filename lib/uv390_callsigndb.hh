@@ -5,6 +5,7 @@
 #include "userdatabase.hh"
 
 /** Represents and encodes the binary format for the call-sign database within the radio.
+ *
  * @ingroup uv390 */
 class UV390CallsignDB : public CallsignDB
 {

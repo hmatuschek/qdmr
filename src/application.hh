@@ -11,6 +11,7 @@ class Radio;
 class RepeaterDatabase;
 class UserDatabase;
 class CodePlug;
+class TalkGroupDatabase;
 
 
 class Application : public QApplication
@@ -74,6 +75,7 @@ private slots:
 
   void onAddAnalogChannel();
   void onAddDigitalChannel();
+  void onCloneChannel();
   void onRemChannel();
   void onChannelUp();
   void onChannelDown();
@@ -113,6 +115,7 @@ protected:
   QMainWindow *_mainWindow;
   RepeaterDatabase *_repeater;
   UserDatabase *_users;
+  TalkGroupDatabase *_talkgroups;
   QGeoPositionInfoSource *_source;
   QGeoCoordinate _currentPosition;
   ReleaseNotes _releaseNotes;

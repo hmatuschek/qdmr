@@ -383,9 +383,12 @@ ChannelList::count() const {
 
 void
 ChannelList::clear() {
+  beginResetModel();
   for (int i=0; i<count(); i++)
     _channels[i]->deleteLater();
   _channels.clear();
+  endResetModel();
+  emit modified();
 }
 
 int
@@ -531,7 +534,13 @@ ChannelList::data(const QModelIndex &index, int role) const {
     else
       return formatFrequency(channel->txFrequency());
   case 4:
-    return (Channel::HighPower == channel->power()) ? tr("High") : tr("Low");
+    switch (channel->power()) {
+    case Channel::MaxPower: return tr("Max");
+    case Channel::HighPower: return tr("High");
+    case Channel::MidPower: return tr("Mid");
+    case Channel::LowPower: return tr("Low");
+    case Channel::MinPower: return tr("Min");
+    }
   case 5:
     if (0 == channel->txTimeout())
       return tr("-");

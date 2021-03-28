@@ -202,11 +202,12 @@ PositioningSystems::count() const {
 
 void
 PositioningSystems::clear() {
+  beginResetModel();
   for (int i=0; i<count(); i++)
     _posSystems[i]->deleteLater();
-  beginResetModel();
   _posSystems.clear();
   endResetModel();
+  emit modified();
 }
 
 int

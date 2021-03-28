@@ -34,7 +34,7 @@ RXGroupListDialog::groupList() {
   }
 
   RXGroupList *list = new RXGroupList(groupListName->text());
-  for (int i=0; i<list->count(); i++) {
+  for (int i=0; i<groupListWidget->count(); i++) {
     list->addContact(groupListWidget->item(i)->data(Qt::UserRole).value<DigitalContact*>());
   }
   return list;

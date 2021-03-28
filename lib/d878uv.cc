@@ -43,7 +43,7 @@ static Radio::Features _d878uv_features =
   // rx group list limits
   .maxGrouplists          = 250,
   .maxGrouplistNameLength = 16,
-  .maxContactsInGrouplist = 32,
+  .maxContactsInGrouplist = 64,
 
   .hasGPS = true,
   .maxGPSSystems = 8,
