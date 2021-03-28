@@ -138,7 +138,7 @@ void
 encode_ascii(uint8_t *data, const QString &text, size_t size, uint16_t fill) {
   for (size_t i=0; (i<size); i++) {
     if (i<size_t(text.size()))
-      data[i] = text.at(i).unicode();
+      data[i] = text.at(i).toLatin1();
     else
       data[i] = fill;
   }
