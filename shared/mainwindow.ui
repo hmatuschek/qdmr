@@ -459,6 +459,13 @@
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="cloneChannel">
+              <property name="text">
+               <string>Clone Channel</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="remChannel">
               <property name="text">
                <string>Delete Channel</string>

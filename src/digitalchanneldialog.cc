@@ -89,10 +89,13 @@ DigitalChannelDialog::construct() {
     channelName->setText(_channel->name());
     rxFrequency->setText(format_frequency(_channel->rxFrequency()));
     txFrequency->setText(format_frequency(_channel->txFrequency()));
-    if (Channel::HighPower==_channel->power())
-      power->setCurrentIndex(0);
-    else if (Channel::LowPower==_channel->power())
-      power->setCurrentIndex(1);
+    switch (_channel->power()) {
+    case Channel::MaxPower: power->setCurrentIndex(0); break;
+    case Channel::HighPower: power->setCurrentIndex(1); break;
+    case Channel::MidPower: power->setCurrentIndex(2); break;
+    case Channel::LowPower: power->setCurrentIndex(3); break;
+    case Channel::MinPower: power->setCurrentIndex(4); break;
+    }
     txTimeout->setValue(_channel->txTimeout());
     rxOnly->setChecked(_channel->rxOnly());
     switch (_channel->admit()) {

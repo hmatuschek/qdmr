@@ -74,6 +74,7 @@ private slots:
 
   void onAddAnalogChannel();
   void onAddDigitalChannel();
+  void onCloneChannel();
   void onRemChannel();
   void onChannelUp();
   void onChannelDown();

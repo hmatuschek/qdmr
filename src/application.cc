@@ -186,11 +186,13 @@ Application::createMainWindow() {
   QPushButton *chDown  = _mainWindow->findChild<QPushButton *>("channelDown");
   QPushButton *addACh  = _mainWindow->findChild<QPushButton *>("addAnalogChannel");
   QPushButton *addDCh  = _mainWindow->findChild<QPushButton *>("addDigitalChannel");
+  QPushButton *cloneCh = _mainWindow->findChild<QPushButton *>("cloneChannel");
   QPushButton *remCh   = _mainWindow->findChild<QPushButton *>("remChannel");
   channels->setModel(_config->channelList());
   channels->resizeColumnsToContents();
   connect(addACh, SIGNAL(clicked()), this, SLOT(onAddAnalogChannel()));
   connect(addDCh, SIGNAL(clicked()), this, SLOT(onAddDigitalChannel()));
+  connect(cloneCh, SIGNAL(clicked()), this, SLOT(onCloneChannel()));
   connect(remCh, SIGNAL(clicked()), this, SLOT(onRemChannel()));
   connect(chUp, SIGNAL(clicked()), this, SLOT(onChannelUp()));
   connect(chDown, SIGNAL(clicked()), this, SLOT(onChannelDown()));
@@ -844,6 +846,62 @@ Application::onAddDigitalChannel() {
     _config->channelList()->addChannel(dialog.channel(), selected.row()+1);
   else
     _config->channelList()->addChannel(dialog.channel());
+}
+
+void
+Application::onCloneChannel() {
+  // get selection
+  QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
+  QModelIndex selected = table->selectionModel()->currentIndex();
+  if (! selected.isValid()) {
+    QMessageBox::information(nullptr, tr("Select a channel first"),
+                             tr("To clone a channel, please select a channel to clone."),
+                             QMessageBox::Close);
+    return;
+  }
+  // Get selected channel
+  Channel *channel = _config->channelList()->channel(selected.row());
+  if (! channel)
+    return;
+  // Dispatch by type
+  if (channel->is<AnalogChannel>()) {
+    AnalogChannel *selch = channel->as<AnalogChannel>();
+    // clone channel
+    AnalogChannel *clone = new AnalogChannel(
+          selch->name()+" clone", selch->rxFrequency(), selch->txFrequency(), selch->power(),
+          selch->txTimeout(), selch->rxOnly(), selch->admit(), selch->squelch(),
+          selch->rxTone(), selch->txTone(), selch->bandwidth(), selch->scanList(),
+          selch->aprsSystem());
+    // open editor
+    AnalogChannelDialog dialog(_config, clone);
+    if (QDialog::Accepted != dialog.exec()) {
+      // if rejected -> destroy clone
+      clone->deleteLater();
+      return;
+    }
+    // update channel
+    dialog.channel();
+    // add to list (below selected one)
+    _config->channelList()->addChannel(clone, selected.row()+1);
+  } else {
+    DigitalChannel *selch = channel->as<DigitalChannel>();
+    // clone channel
+    DigitalChannel *clone = new DigitalChannel(
+          selch->name()+" clone", selch->rxFrequency(), selch->txFrequency(), selch->power(),
+          selch->txTimeout(), selch->rxOnly(), selch->admit(), selch->colorCode(),
+          selch->timeslot(), selch->rxGroupList(), selch->txContact(), selch->posSystem(),
+          selch->scanList(), selch->roaming());
+    // open editor
+    DigitalChannelDialog dialog(_config, clone);
+    if (QDialog::Accepted != dialog.exec()) {
+      clone->deleteLater();
+      return;
+    }
+    // update channel
+    dialog.channel();
+    // add to list (below selected one)
+    _config->channelList()->addChannel(clone, selected.row()+1);
+  }
 }
 
 void
