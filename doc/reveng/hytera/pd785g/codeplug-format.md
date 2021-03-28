@@ -91,7 +91,7 @@ interpreted as a 32-bit unsigned LE integer yields `450712500`.
 ```c
 typedef uint32_t freq_t // 32-bit fixed point frequency
 
-// If you don't mind, I would rather use the C++ struct definition. 
+// If you don't mind, I would rather use the C++ struct definition.
 // This also defines a new namespace, thus the embedded enum names do not pollute the namespace.
 struct digital_chan_t
 {
@@ -103,37 +103,76 @@ struct digital_chan_t
 
   typedef enum {
     POWER_LOW  = 1,
-    POWER_HIGH = 0 
+    POWER_HIGH = 0
   } Power;
-  
+
+  typedef enum {
+    TX_ALLOWED = 0,
+    RX_ONLY = 1
+  } TxAllowed;
+
+  typedef enum {
+    ALWAYS = 0,
+    CHANNEL_FREE = 1,
+    COLOUR_CODE_FREE = 2
+  } TxAdmit;
+
+  typedef enum {
+    INFINITE = 0,
+    SECS_60 = 0x0c,
+  } TxTimeout;
+
   // byte 0
   char name[32];
   // byte 32
   uint8_t unk32;
+  // byte 33
   // Using bitfields for single flags from LSB to MSB
-  uint8_t ukn33_1    : 4,    /// unknown set to ???
+  uint8_t rx_only    : 1,    /// 1=rx ony, 0=tx allowed
+          unk33      : 3,
           power      : 1,    /// 1=High, 0=Low
           ukn33_5    : 3;    /// <- Althoug not needed, it helps me to check whether I've got them all.
   // byte 34
   uint16_t unk34;
-  // byte 35
+  // byte 36
   freq_t rx_freq;
-  // byte 39
+  // byte 40
   freq_t tx_freq;
-  uint16_t unk43;
-  uint8_t unk44[3];
+  // byte 44
+  TxAdmit tx_admit; /// Unsure how to specify this as a uint8_t enum.
+  // byte 45
+  TxTimeout tx_timeout;
+  // byte 46
+  uint8_t tx_timeout_prealert_secs;
   // byte 47
-  uint8_t colour_code;
-  // byte 47
+  uint8_t tx_timeout_rekey_secs;
+  // byte 48
+  uint8_t tx_timeout_reset_secs;
+  // byte 49
+  uint8_t colour_code : 4,
+          unk34_1 : 1,
+          prority_interrupt_encode : 1,
+          prority_interrupt_decode : 1,
+          unk34_2 : 1;
+  // byte 50
   uint16_t tx_contact_idx;
-  uint8_t unk49[6];
-  // byte 55
-  uint8_t timeslot   : 1,    /// 1=TS2, 0=TS1
-          ukn56_1    : 5,    /// unknown set to ???
-          vox        : 1,    /// 1=Enabled, 0=Disabled.
-          ukn56_7    : 1;    /// unknown set to ???
+  // byte 52
+  uint16_t rx_group_list_idx;
+  // byte 54
+  uint16_t emergency_system_idx;
+  // byte 56
+  uint8_t unk2[2];
+  //byte 58
+  uint8_t timeslot    : 1,    /// 1=TS2, 0=TS1
+          ukn56_1     : 4,    /// unknown set to ???
+          vox         : 1,    /// 1=Enabled, 0=Disabled.
+          unk58_2     : 1,
+          option_board: 1;    /// 1=enable, 0=disable
+  // byte 59
+  uint8_t unk5[7];
+  // byte 66
+  uint16_t phone_system_idx;
 };
-
 ```
 
 ### TX and RX frequency
