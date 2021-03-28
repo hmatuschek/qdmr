@@ -116,11 +116,11 @@ UV390::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) 
 }
 
 bool
-UV390::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+UV390::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
   if (StatusIdle != _task)
     return false;
 
-  _callsigns.encode(db);
+  _callsigns.encode(db, selection);
 
   _task = StatusUploadCallsigns;
   if (blocking) {

@@ -22,7 +22,8 @@ UserDatabase::User::User()
 UserDatabase::User::User(const QJsonObject &obj)
   : id(obj.value("id").toInt()), call(obj.value("callsign").toString()),
     name(obj.value("fname").toString()), surname(obj.value("surname").toString()),
-    country(obj.value("country").toString())
+    city(obj.value("city").toString()), state(obj.value("state").toString()),
+    country(obj.value("country").toString()), comment(obj.value("remarks").toString())
 {
   // pass...
 }

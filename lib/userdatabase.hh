@@ -46,8 +46,14 @@ public:
 		QString name;
 		/** The surname of the user. */
 		QString surname;
+    /** The city of the user. */
+    QString city;
+    /** The state of the user. */
+    QString state;
 		/** The country of the user. */
 		QString country;
+    /** Some arbitrary comment or text. */
+    QString comment;
 	};
 
 public:

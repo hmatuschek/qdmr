@@ -10,6 +10,7 @@
 
 #include <QThread>
 #include "codeplug.hh"
+#include "callsigndb.hh"
 
 class Config;
 class UserDatabase;
@@ -190,10 +191,13 @@ public slots:
   virtual bool startDownload(bool blocking=false) = 0;
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
-  virtual bool startUpload(Config *config, bool blocking=false,
-                           const CodePlug::Flags &flags = CodePlug::Flags()) = 0;
+  virtual bool startUpload(
+      Config *config, bool blocking=false,
+      const CodePlug::Flags &flags = CodePlug::Flags()) = 0;
   /** Assembles the callsign DB from the given one and uploads it to the device. */
-  virtual bool startUploadCallsignDB(UserDatabase *db, bool blocking=false) = 0;
+  virtual bool startUploadCallsignDB(
+      UserDatabase *db, bool blocking=false,
+      const CallsignDB::Selection &selection=CallsignDB::Selection()) = 0;
 
 signals:
   /** Gets emitted once the codeplug download has been started. */

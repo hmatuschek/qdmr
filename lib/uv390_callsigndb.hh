@@ -1,12 +1,13 @@
 #ifndef UV390CALLSIGNDB_HH
 #define UV390CALLSIGNDB_HH
 
-#include "dfufile.hh"
+#include "callsigndb.hh"
 #include "userdatabase.hh"
 
 /** Represents and encodes the binary format for the call-sign database within the radio.
+ *
  * @ingroup uv390 */
-class UV390CallsignDB : public DFUFile
+class UV390CallsignDB : public CallsignDB
 {
   Q_OBJECT
 
@@ -86,7 +87,7 @@ public:
   explicit UV390CallsignDB(QObject *parent=nullptr);
 
   /** Tries to encode as many entries of the given user-database. */
-  void encode(UserDatabase *db);
+  bool encode(UserDatabase *db, const Selection &selection=Selection());
 };
 
 #endif // UV390CALLSIGNDB_HH

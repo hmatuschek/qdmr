@@ -117,7 +117,7 @@ RD5R::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
 }
 
 bool
-RD5R::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+RD5R::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
   Q_UNUSED(db);
   Q_UNUSED(blocking);
 
