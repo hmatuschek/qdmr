@@ -14,6 +14,7 @@ inline QString power2string(Channel::Power power) {
   case Channel::LowPower:  return "Low";
   case Channel::MinPower:  return "Min";
   }
+  return "Min";
 }
 
 
