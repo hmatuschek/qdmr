@@ -43,7 +43,7 @@ class GPSSystem;
  *  <tr><td>0x02ef00</td> <td>0x02ef40</td> <td>0x00040</td> <td>VFO A channel, see @c UV390Codeplug::channel_t.</td></tr>
  *  <tr><td>0x02ef40</td> <td>0x02ef80</td> <td>0x00040</td> <td>VFO B channel, see @c UV390Codeplug::channel_t.</td></tr>
  *  <tr><td>0x02ef80</td> <td>0x02f000</td> <td>0x00080</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>Some unkown settings like current channel.</td></tr>
+ *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>Some unkown settings like current channel, see @c UV390Codeplug::boot_settings_t.</td></tr>
  *  <tr><td>0x02f010</td> <td>0x031000</td> <td>0x01ff0</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x031000</td> <td>0x03eac0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c UV390Codeplug::zone_ext_t.</td></tr>
  *  <tr><td>0x03eac0</td> <td>0x03ec40</td> <td>0x00180</td> <td>Reserved, filled with @c 0xff. </td></tr>
@@ -608,6 +608,23 @@ public:
     bool updateConfigObj(Config *conf) const;
     /** Updates this codeplug general settings from the generic configuration. */
     void fromConfigObj(const Config *conf);
+  };
+
+  /** Represents the boot-time settings (selected zone and channels) within the code-plug. */
+  struct __attribute__((packed)) boot_settings_t {
+    uint8_t _unused0[3];                  ///< Unused, filled with 0xff.
+    uint8_t boot_zone;                    ///< Zone index (1-based) to select at boot.
+    uint8_t boot_channel_a;               ///< Channel index (1-based) within selected zone to select at boot for VFO A.
+    uint8_t _unused5;                     ///< Unused, set to 0xff.
+    uint8_t boot_channel_b;               ///< Channel index (1-based) within selected zone to select at boot for VFB B.
+    uint8_t _unused7[2];                  ///< Unused, filled with 0xff.
+    uint16_t _unknown9;                   ///< Unknown, little endian index, default 0x0001.
+    uint8_t _unused10[5];                 ///< Unused, filled with 0xff.
+
+    /** Constructor. */
+    boot_settings_t();
+    /** Resets the boot time settings. */
+    void clear();
   };
 
   /** Represents a single message within the codeplug.

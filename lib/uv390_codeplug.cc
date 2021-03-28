@@ -6,7 +6,7 @@
 #include "config.h"
 #include "logger.hh"
 #include <QTimeZone>
-
+#include <QtEndian>
 
 #define NCHAN            3000
 #define NCONTACTS        10000
@@ -30,6 +30,7 @@
 #define OFFSET_SCANL     0x018860
 #define OFFSET_VFO_A     0x02ef00
 #define OFFSET_VFO_B     0x02ef40
+#define OFFSET_BOOT_SET  0x02f000
 #define OFFSET_ZONEXT    0x031000
 #define OFFSET_GPS_SYS   0x03ec40
 // ---- second segment ----
@@ -889,6 +890,22 @@ UV390Codeplug::general_settings_t::fromConfigObj(const Config *conf) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::general_settings_t
+ * ******************************************************************************************** */
+UV390Codeplug::boot_settings_t::boot_settings_t() {
+  clear();
+}
+
+void
+UV390Codeplug::boot_settings_t::clear() {
+  memset(this, 0xff, sizeof(boot_settings_t));
+  boot_zone = 1;
+  boot_channel_a = 1;
+  boot_channel_b = 1;
+  _unknown9 = qToLittleEndian(uint16_t(1));
+}
+
+/* ******************************************************************************************** *
  * Implementation of UV390Codeplug::message_t
  * ******************************************************************************************** */
 UV390Codeplug::message_t::message_t() {
@@ -1279,6 +1296,10 @@ UV390Codeplug::encode(Config *config, const Flags &flags) {
   // General config
   general_settings_t *genset = (general_settings_t *)(data(OFFSET_SETTINGS));
   genset->fromConfigObj(config);
+
+  // Boot time settings
+  boot_settings_t *boot = (boot_settings_t *)(data(OFFSET_BOOT_SET));
+  boot->clear();
 
   // Define Contacts
   for (int i=0; i<NCONTACTS; i++) {
