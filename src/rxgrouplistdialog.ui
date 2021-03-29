@@ -51,6 +51,9 @@
           <iconset resource="../shared/resources.qrc">
            <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
          </property>
+         <property name="shortcut">
+          <string>Alt+Up</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -61,6 +64,9 @@
          <property name="icon">
           <iconset resource="../shared/resources.qrc">
            <normaloff>:/icons/down.png</normaloff>:/icons/down.png</iconset>
+         </property>
+         <property name="shortcut">
+          <string>Alt+Down</string>
          </property>
         </widget>
        </item>
@@ -75,12 +81,18 @@
        <property name="text">
         <string>Add Contact</string>
        </property>
+       <property name="shortcut">
+        <string>Alt++</string>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="remContact">
        <property name="text">
         <string>Remove Contact</string>
+       </property>
+       <property name="shortcut">
+        <string>Alt+-</string>
        </property>
       </widget>
      </item>
