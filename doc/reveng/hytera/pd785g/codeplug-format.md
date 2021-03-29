@@ -91,36 +91,34 @@ interpreted as a 32-bit unsigned LE integer yields `450712500`.
 ```c
 typedef uint32_t freq_t // 32-bit fixed point frequency
 
-// If you don't mind, I would rather use the C++ struct definition.
-// This also defines a new namespace, thus the embedded enum names do not pollute the namespace.
 struct digital_chan_t
 {
   // Using enums to translate meaning to values
-  typedef enum {
+  enum TimeSlot {
     TIMESLOT_1 = 0,
     TIMESLOT_2 = 1
-  } TimeSlot;
+  };
 
-  typedef enum {
+  enum Power {
     POWER_LOW  = 1,
     POWER_HIGH = 0
-  } Power;
+  };
 
-  typedef enum {
+  enum TxAllowed {
     TX_ALLOWED = 0,
     RX_ONLY = 1
-  } TxAllowed;
+  };
 
-  typedef enum {
+  enum TxAdmit : uint8_t {
     ALWAYS = 0,
     CHANNEL_FREE = 1,
     COLOUR_CODE_FREE = 2
-  } TxAdmit;
+  };
 
-  typedef enum {
+  enum TxTimeout : uint8_t {
     INFINITE = 0,
     SECS_60 = 0x0c,
-  } TxTimeout;
+  };
 
   // byte 0
   char name[32];
@@ -139,7 +137,7 @@ struct digital_chan_t
   // byte 40
   freq_t tx_freq;
   // byte 44
-  TxAdmit tx_admit; /// Unsure how to specify this as a uint8_t enum.
+  TxAdmit tx_admit; 
   // byte 45
   TxTimeout tx_timeout;
   // byte 46
@@ -155,11 +153,11 @@ struct digital_chan_t
           prority_interrupt_decode : 1,
           unk34_2 : 1;
   // byte 50
-  uint16_t tx_contact_idx;
+  uint16_t tx_contact_idx;       /// Endianess?
   // byte 52
-  uint16_t rx_group_list_idx;
+  uint16_t rx_group_list_idx;    /// Endianess?
   // byte 54
-  uint16_t emergency_system_idx;
+  uint16_t emergency_system_idx; /// Endianess?
   // byte 56
   uint8_t unk2[2];
   //byte 58
@@ -171,7 +169,7 @@ struct digital_chan_t
   // byte 59
   uint8_t unk5[7];
   // byte 66
-  uint16_t phone_system_idx;
+  uint16_t phone_system_idx;     /// Endianess?
 };
 ```
 
@@ -190,22 +188,20 @@ typedef uint16_t unicode_char_t;
 
 struct gigital_contact_t
 {
-  // We could also use this fancy new C++17 enum-struct type extending an integer type. 
-  // This allows to set the field width and possible values explicitly.
   enum call_type_t : uint8_t {
     PRIVATE_CALL   = 0,
     GROUP_CALL     = 1,
     IGNORE_CONTACT = 0x11
   };
   
-  uint16_t index;
+  uint16_t index;           /// Endianess?
   unicode_char_t name[16];
-  call_type_t call_type;    // is basically a uint8_t with values limited to those specified in the enum above.
+  call_type_t call_type;    
   uint8_t is_referenced;
   uint16_t __pad_1;
-  uint32_t id;
+  uint32_t id;              /// Endianess?
   uint32_t unk1;
-  uint16_t link;
+  uint16_t link;            /// Endianess?
 };
 
 ```
