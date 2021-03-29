@@ -4,20 +4,30 @@
 #include <QAbstractTableModel>
 #include <QNetworkAccessManager>
 
+/** Downloads, periodically updates and provides a list of talk group IDs and their names.
+ *
+ * @ingroup utils */
 class TalkGroupDatabase : public QAbstractTableModel
 {
   Q_OBJECT
 
+  /** A talk group entry in the database. */
   class TalkGroup {
   public:
+    /** Empty constructor. */
     TalkGroup();
+    /** Constructor form name and DMR ID. */
     TalkGroup(const QString &name, uint number);
-
+    /** The DMR ID of the talk group. */
     uint id;
+    /** The Name of the talk group. */
     QString name;
   };
 
 public:
+  /** Constructs a talk group database.
+   * @param updatePeriodDays Specifies the update period of the DB in days.
+   * @param parent Specifies the QObject parent. */
   TalkGroupDatabase(uint updatePeriodDays=30, QObject *parent=nullptr);
 
   /** Returns the number of talk groups. */
@@ -25,6 +35,7 @@ public:
   /** Returns the age of the database in days. */
   uint dbAge() const;
 
+  /** Returns the talk group entry at the given index. */
   TalkGroup talkgroup(int index) const;
 
   /** Loads all entries from the downloaded talk group db. */
@@ -58,7 +69,6 @@ protected:
   QVector<TalkGroup>    _talkgroups;
   /** The network access used for downloading. */
   QNetworkAccessManager _network;
-
 };
 
 #endif // TALKGROUPDATABASE_HH
