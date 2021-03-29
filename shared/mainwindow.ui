@@ -889,6 +889,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="genRoamingZone">
+            <property name="text">
+             <string>Generate Roaming Zone</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="remRoamingZone">
             <property name="text">
              <string>Delete Roaming Zone</string>

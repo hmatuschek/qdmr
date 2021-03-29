@@ -31,13 +31,19 @@ MultiGroupCallSelectionDialog::MultiGroupCallSelectionDialog(ContactList *contac
   connect(bbox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(bbox, SIGNAL(rejected()), this, SLOT(reject()));
 
+  _label = new QLabel(tr("Select a group call:"));
   QVBoxLayout *layout = new QVBoxLayout();
-  layout->addWidget(new QLabel(tr("Select a group call:")));
+  layout->addWidget(_label);
   layout->addWidget(_contacts);
   layout->addWidget(bbox);
   setLayout(layout);
 }
 
+
+void
+MultiGroupCallSelectionDialog::setLabel(const QString &text) {
+  _label->setText(text);
+}
 
 QList<DigitalContact *>
 MultiGroupCallSelectionDialog::contacts() {

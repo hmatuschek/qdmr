@@ -7,6 +7,7 @@
 class DigitalContact;
 class ContactList;
 class QListWidget;
+class QLabel;
 
 
 class MultiGroupCallSelectionDialog: public QDialog
@@ -18,7 +19,10 @@ public:
 
   QList<DigitalContact *> contacts();
 
+  void setLabel(const QString &text);
+
 protected:
+  QLabel *_label;
   QListWidget *_contacts;
 };
 

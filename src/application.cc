@@ -22,7 +22,7 @@
 #include "userdatabase.hh"
 #include "talkgroupdatabase.hh"
 #include "searchpopup.hh"
-
+#include "contactselectiondialog.hh"
 
 
 Application::Application(int &argc, char *argv[])
@@ -271,10 +271,12 @@ Application::createMainWindow() {
   QPushButton *roamingZoneUp   = _mainWindow->findChild<QPushButton *>("roamingZoneUp");
   QPushButton *roamingZoneDown = _mainWindow->findChild<QPushButton *>("roamingZoneDown");
   QPushButton *addRoamingZone  = _mainWindow->findChild<QPushButton *>("addRoamingZone");
+  QPushButton *genRoamingZone  = _mainWindow->findChild<QPushButton *>("genRoamingZone");
   QPushButton *remRoamingZone  = _mainWindow->findChild<QPushButton *>("remRoamingZone");
   QLabel *roamingNote          = _mainWindow->findChild<QLabel*>("roamingNote");
   roamingZones->setModel(_config->roaming());
   connect(addRoamingZone, SIGNAL(clicked()), this, SLOT(onAddRoamingZone()));
+  connect(genRoamingZone, SIGNAL(clicked(bool)), this, SLOT(onGenRoamingZone()));
   connect(remRoamingZone, SIGNAL(clicked()), this, SLOT(onRemRoamingZone()));
   connect(roamingZoneUp, SIGNAL(clicked()), this, SLOT(onRoamingZoneUp()));
   connect(roamingZoneDown, SIGNAL(clicked()), this, SLOT(onRoamingZoneDown()));
@@ -1282,6 +1284,32 @@ Application::onAddRoamingZone() {
     _config->roaming()->addZone(zone, selected.row()+1);
   else
     _config->roaming()->addZone(zone);
+}
+
+void
+Application::onGenRoamingZone() {
+  MultiGroupCallSelectionDialog contSel(_config->contacts());
+  contSel.setWindowTitle(tr("Generate roaming zone"));
+  contSel.setLabel(tr("Create a roaming zone by collecting all channels with these group calls."));
+  if (QDialog::Accepted != contSel.exec())
+    return;
+  QList<DigitalContact *> contacts = contSel.contacts();
+  RoamingZone *zone = new RoamingZone("Name");
+  for (int i=0; i<_config->channelList()->count(); i++) {
+    DigitalChannel *dch = _config->channelList()->channel(i)->as<DigitalChannel>();
+    if (nullptr == dch)
+      continue;
+    if (contacts.contains(dch->txContact()))
+      zone->addChannel(dch);
+  }
+
+  RoamingZoneDialog dialog(_config, zone);
+  if (QDialog::Accepted != dialog.exec()) {
+    zone->deleteLater();
+    return;
+  }
+  dialog.zone();
+  _config->roaming()->addZone(zone);
 }
 
 void

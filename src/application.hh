@@ -108,6 +108,7 @@ private slots:
   void storePositioningSectionState();
 
   void onAddRoamingZone();
+  void onGenRoamingZone();
   void onRemRoamingZone();
   void onRoamingZoneUp();
   void onRoamingZoneDown();
