@@ -133,7 +133,7 @@ def unpackReadWriteResponse(payload):
 
 
 ####### USB Reading
-elif "download" == args.command:
+if "download" == args.command:
   data = download([(0, 0x196b28)])
   print(hexDump(data[0], "", 0))
 
