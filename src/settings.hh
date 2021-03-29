@@ -58,8 +58,8 @@ public:
   bool showDisclaimer() const;
   void setShowDisclaimer(bool show);
 
-  QSize mainWindowSize() const;
-  void setMainWindowSize(const QSize &size);
+  QByteArray mainWindowState() const;
+  void setMainWindowState(const QByteArray &state);
 
   QByteArray channelListHeaderState() const;
   void setChannelListHeaderState(const QByteArray &state);

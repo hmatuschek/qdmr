@@ -207,13 +207,13 @@ Settings::setShowDisclaimer(bool show) {
   setValue("showDisclaimer", show);
 }
 
-QSize
-Settings::mainWindowSize() const {
-  return value("mainWindowSize", QSize()).toSize();
+QByteArray
+Settings::mainWindowState() const {
+  return value("mainWindowState", QByteArray()).toByteArray();
 }
 void
-Settings::setMainWindowSize(const QSize &size) {
-  setValue("mainWindowSize", size);
+Settings::setMainWindowState(const QByteArray &state) {
+  setValue("mainWindowState", state);
 }
 
 QByteArray

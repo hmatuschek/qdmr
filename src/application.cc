@@ -276,6 +276,7 @@ Application::createMainWindow() {
   if (settings.hideRoamingNote())
     roamingNote->setVisible(false);
 
+  _mainWindow->restoreGeometry(settings.mainWindowState());
   return _mainWindow;
 }
 
@@ -379,6 +380,10 @@ Application::quitApplication() {
                                                  QMessageBox::Cancel|QMessageBox::Ok))
       return;
   }
+
+  Settings settings;
+  if (_mainWindow)
+    settings.setMainWindowState(_mainWindow->saveGeometry());
 
   quit();
 }
@@ -661,12 +666,6 @@ Application::onConfigModifed() {
   speech->setChecked(_config->speech());
 
   _mainWindow->setWindowModified(true);
-}
-
-void
-Application::storeMainWindowSize() {
-  Settings settings;
-  settings.setMainWindowSize(_mainWindow->size());
 }
 
 void
