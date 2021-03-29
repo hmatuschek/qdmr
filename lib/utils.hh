@@ -27,6 +27,13 @@ QString decode_ascii(const uint8_t *data, size_t size, uint16_t fill=0x00);
  * @c fill word as fill and end-of-string word. */
 void encode_ascii(uint8_t *data, const QString &text, size_t size, uint16_t fill=0x00);
 
+/** Decodes the UTF-8 string in @c data into a @c QString of up-to size length. The @c fill word
+ * specifies the fill and end-of-string word. */
+QString decode_utf8(const uint8_t *data, size_t size, uint16_t fill=0x00);
+/** Encodes the given QString @c text of up-to size length as UTF-8 into @c data using the
+ * @c fill word as fill and end-of-string word. */
+void encode_utf8(uint8_t *data, const QString &text, size_t size, uint16_t fill=0x00);
+
 /** Decodes an 8 digit BCD encoded frequency (in MHz). */
 double decode_frequency(uint32_t bcd);
 /** Eecodes an 8 digit BCD encoded frequency (in MHz). */
