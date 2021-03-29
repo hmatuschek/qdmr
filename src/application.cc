@@ -287,7 +287,6 @@ void
 Application::loadCodeplug() {
   if (! _mainWindow)
     return;
-
   if (_config->isModified()) {
     if (QMessageBox::Ok != QMessageBox::question(nullptr, tr("Unsaved changes to codeplug."),
                                                  tr("There are unsaved changes to the current codeplug. "
@@ -296,7 +295,8 @@ Application::loadCodeplug() {
       return;
   }
 
-  QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open codeplug"), QString(),
+  Settings settings;
+  QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open codeplug"), settings.lastDirectory().absolutePath(),
                                                   tr("Codeplug Files (*.conf *.csv *.txt);;All Files (*)"));
   if (filename.isEmpty())
     return;
@@ -308,6 +308,8 @@ Application::loadCodeplug() {
   }
 
   logDebug() << "Load codeplug from '" << filename << "'.";
+  QFileInfo info(filename);
+  settings.setLastDirectoryDir(info.absoluteDir());
 
   QString errorMessage;
   QTextStream stream(&file);
@@ -324,7 +326,8 @@ Application::saveCodeplug() {
   if (! _mainWindow)
     return;
 
-  QString filename = QFileDialog::getSaveFileName(nullptr, tr("Save codeplug"), QString(),
+  Settings settings;
+  QString filename = QFileDialog::getSaveFileName(nullptr, tr("Save codeplug"), settings.lastDirectory().absolutePath(),
                                                   tr("Codeplug Files (*.conf *.csv *.txt)"));
   if (filename.isEmpty())
     return;
@@ -351,6 +354,7 @@ Application::saveCodeplug() {
 
   file.flush();
   file.close();
+  settings.setLastDirectoryDir(info.absoluteDir());
 }
 
 

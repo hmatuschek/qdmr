@@ -1,7 +1,8 @@
 #include "settings.hh"
 #include "logger.hh"
 #include "config.h"
-
+#include <QStandardPaths>
+#include <QDir>
 
 QGeoCoordinate loc2deg(const QString &loc) {
   double lon = 0, lat = 0;
@@ -138,6 +139,15 @@ Settings::autoEnableRoaming() const {
 void
 Settings::setAutoEnableRoaming(bool update) {
   setValue("autoEnableRoaming", update);
+}
+
+QDir
+Settings::lastDirectory() const {
+  return QDir(value("lastDir", QStandardPaths::standardLocations(QStandardPaths::HomeLocation).first()).toString());
+}
+void
+Settings::setLastDirectoryDir(const QDir &dir) {
+  setValue("lastDir", dir.absolutePath());
 }
 
 CodePlug::Flags

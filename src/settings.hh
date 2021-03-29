@@ -38,6 +38,9 @@ public:
   bool autoEnableRoaming() const;
   void setAutoEnableRoaming(bool enable);
 
+  QDir lastDirectory() const;
+  void setLastDirectoryDir(const QDir &dir);
+
   CodePlug::Flags codePlugFlags() const;
 
   bool ignoreVerificationWarning() const;
