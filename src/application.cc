@@ -21,6 +21,7 @@
 #include "repeaterdatabase.hh"
 #include "userdatabase.hh"
 #include "talkgroupdatabase.hh"
+#include "searchpopup.hh"
 
 
 
@@ -160,6 +161,7 @@ Application::createMainWindow() {
 
   // Wire-up "Contact List" view
   QTableView *contacts = _mainWindow->findChild<QTableView *>("contactsView");
+  SearchPopup::attach(contacts);
   QPushButton *cntUp   = _mainWindow->findChild<QPushButton *>("contactUp");
   QPushButton *cntDown = _mainWindow->findChild<QPushButton *>("contactDown");
   QPushButton *addCnt  = _mainWindow->findChild<QPushButton *>("addContact");
@@ -177,6 +179,7 @@ Application::createMainWindow() {
 
   // Wire-up "RX Group List" view
   QListView *rxgroups  = _mainWindow->findChild<QListView *>("groupListView");
+  SearchPopup::attach(rxgroups);
   QPushButton *grpUp   = _mainWindow->findChild<QPushButton *>("rxGroupUp");
   QPushButton *grpDown = _mainWindow->findChild<QPushButton *>("rxGroupDown");
   QPushButton *addGrp  = _mainWindow->findChild<QPushButton *>("addRXGroup");
@@ -190,6 +193,7 @@ Application::createMainWindow() {
 
   // Wire-up "Channel List" view
   QTableView *channels = _mainWindow->findChild<QTableView *>("channelView");
+  SearchPopup::attach(channels);
   QPushButton *chUp    = _mainWindow->findChild<QPushButton *>("channelUp");
   QPushButton *chDown  = _mainWindow->findChild<QPushButton *>("channelDown");
   QPushButton *addACh  = _mainWindow->findChild<QPushButton *>("addAnalogChannel");
@@ -211,6 +215,7 @@ Application::createMainWindow() {
 
   // Wire-up "Zone List" view
   QListView *zones     = _mainWindow->findChild<QListView *>("zoneView");
+  SearchPopup::attach(zones);
   QPushButton *zoneUp   = _mainWindow->findChild<QPushButton *>("zoneUp");
   QPushButton *zoneDown = _mainWindow->findChild<QPushButton *>("zoneDown");
   QPushButton *addZone  = _mainWindow->findChild<QPushButton *>("addZone");
@@ -224,6 +229,7 @@ Application::createMainWindow() {
 
   // Wire-up "Scan List" view
   QListView *scanLists = _mainWindow->findChild<QListView *>("scanListView");
+  SearchPopup::attach(scanLists);
   QPushButton *slUp   = _mainWindow->findChild<QPushButton *>("scanListUp");
   QPushButton *slDown = _mainWindow->findChild<QPushButton *>("scanListDown");
   QPushButton *addSl  = _mainWindow->findChild<QPushButton *>("addScanList");
@@ -237,6 +243,7 @@ Application::createMainWindow() {
 
   // Wire-up "GPS System List" view
   QTableView *gpsList = _mainWindow->findChild<QTableView *>("gpsView");
+  SearchPopup::attach(gpsList);
   QPushButton *gpsUp   = _mainWindow->findChild<QPushButton *>("gpsUp");
   QPushButton *gpsDown = _mainWindow->findChild<QPushButton *>("gpsDown");
   QPushButton *addGPS  = _mainWindow->findChild<QPushButton *>("addGPS");
@@ -260,6 +267,7 @@ Application::createMainWindow() {
 
   // Wire-up "Roaming Zone List" view
   QListView *roamingZones      = _mainWindow->findChild<QListView *>("roamingZoneList");
+  SearchPopup::attach(roamingZones);
   QPushButton *roamingZoneUp   = _mainWindow->findChild<QPushButton *>("roamingZoneUp");
   QPushButton *roamingZoneDown = _mainWindow->findChild<QPushButton *>("roamingZoneDown");
   QPushButton *addRoamingZone  = _mainWindow->findChild<QPushButton *>("addRoamingZone");

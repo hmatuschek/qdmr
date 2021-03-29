@@ -736,7 +736,14 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_11">
           <item>
-           <widget class="QTableView" name="gpsView"/>
+           <widget class="QTableView" name="gpsView">
+            <property name="selectionMode">
+             <enum>QAbstractItemView::SingleSelection</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+           </widget>
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -832,7 +839,11 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_13">
           <item>
-           <widget class="QListView" name="roamingZoneList"/>
+           <widget class="QListView" name="roamingZoneList">
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+           </widget>
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_21">
@@ -1047,9 +1058,6 @@
    </property>
    <property name="toolTip">
     <string>Detect connected radios.</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+F</string>
    </property>
   </action>
   <action name="actionVerifyCodeplug">
