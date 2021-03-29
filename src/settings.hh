@@ -58,6 +58,18 @@ public:
   bool showDisclaimer() const;
   void setShowDisclaimer(bool show);
 
+  QSize mainWindowSize() const;
+  void setMainWindowSize(const QSize &size);
+
+  QByteArray channelListHeaderState() const;
+  void setChannelListHeaderState(const QByteArray &state);
+
+  QByteArray contactListHeaderState() const;
+  void setContactListHeaderState(const QByteArray &state);
+
+  QByteArray positioningHeaderState() const;
+  void setPositioningHeaderState(const QByteArray &state);
+
   bool isUpdated() const;
   void markUpdated();
 };

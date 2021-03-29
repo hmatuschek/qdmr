@@ -81,6 +81,7 @@ QMainWindow *
 Application::mainWindow() {
   if (0 == _mainWindow)
     return createMainWindow();
+
   return _mainWindow;
 }
 
@@ -163,6 +164,10 @@ Application::createMainWindow() {
   QPushButton *cntDown = _mainWindow->findChild<QPushButton *>("contactDown");
   QPushButton *addCnt  = _mainWindow->findChild<QPushButton *>("addContact");
   QPushButton *remCnt  = _mainWindow->findChild<QPushButton *>("remContact");
+  connect(contacts->horizontalHeader(), SIGNAL(sectionCountChanged(int,int)),
+          this, SLOT(loadContactListSectionState()));
+  connect(contacts->horizontalHeader(), SIGNAL(sectionResized(int,int,int)),
+          this, SLOT(storeContactListSectionState()));
   contacts->setModel(_config->contacts());
   connect(addCnt, SIGNAL(clicked()), this, SLOT(onAddContact()));
   connect(remCnt, SIGNAL(clicked()), this, SLOT(onRemContact()));
@@ -191,8 +196,11 @@ Application::createMainWindow() {
   QPushButton *addDCh  = _mainWindow->findChild<QPushButton *>("addDigitalChannel");
   QPushButton *cloneCh = _mainWindow->findChild<QPushButton *>("cloneChannel");
   QPushButton *remCh   = _mainWindow->findChild<QPushButton *>("remChannel");
+  connect(channels->horizontalHeader(), SIGNAL(sectionCountChanged(int,int)),
+          this, SLOT(loadChannelListSectionState()));
+  connect(channels->horizontalHeader(), SIGNAL(sectionResized(int,int,int)),
+          this, SLOT(storeChannelListSectionState()));
   channels->setModel(_config->channelList());
-  channels->resizeColumnsToContents();
   connect(addACh, SIGNAL(clicked()), this, SLOT(onAddAnalogChannel()));
   connect(addDCh, SIGNAL(clicked()), this, SLOT(onAddDigitalChannel()));
   connect(cloneCh, SIGNAL(clicked()), this, SLOT(onCloneChannel()));
@@ -235,6 +243,10 @@ Application::createMainWindow() {
   QPushButton *addAPRS = _mainWindow->findChild<QPushButton *>("addAPRS");
   QPushButton *remGPS  = _mainWindow->findChild<QPushButton *>("remGPS");
   QLabel *gpsNote = _mainWindow->findChild<QLabel*>("gpsNote");
+  connect(gpsList->horizontalHeader(), SIGNAL(sectionCountChanged(int,int)),
+          this, SLOT(loadPositioningSectionState()));
+  connect(gpsList->horizontalHeader(), SIGNAL(sectionResized(int,int,int)),
+          this, SLOT(storePositioningSectionState()));
   gpsList->setModel(_config->posSystems());
   if (settings.hideGSPNote())
     gpsNote->setVisible(false);
@@ -651,6 +663,11 @@ Application::onConfigModifed() {
   _mainWindow->setWindowModified(true);
 }
 
+void
+Application::storeMainWindowSize() {
+  Settings settings;
+  settings.setMainWindowSize(_mainWindow->size());
+}
 
 void
 Application::onDMRIDChanged() {
@@ -752,6 +769,20 @@ Application::onContactDown() {
   if (_config->contacts()->moveDown(selected.row()))
     table->selectRow(selected.row()+1);
 }
+
+void
+Application::loadContactListSectionState() {
+  Settings settings;
+  QTableView *contacts = _mainWindow->findChild<QTableView *>("contactsView");
+  contacts->horizontalHeader()->restoreState(settings.contactListHeaderState());
+}
+void
+Application::storeContactListSectionState() {
+  Settings settings;
+  QTableView *contacts = _mainWindow->findChild<QTableView *>("contactsView");
+  settings.setContactListHeaderState(contacts->horizontalHeader()->saveState());
+}
+
 
 void
 Application::onAddRxGroup() {
@@ -965,6 +996,19 @@ Application::onChannelDown() {
     return;
   if (_config->channelList()->moveDown(selected.row()))
     table->selectRow(selected.row()+1);
+}
+
+void
+Application::loadChannelListSectionState() {
+  Settings settings;
+  QTableView *channels = _mainWindow->findChild<QTableView *>("channelView");
+  channels->horizontalHeader()->restoreState(settings.channelListHeaderState());
+}
+void
+Application::storeChannelListSectionState() {
+  Settings settings;
+  QTableView *channels = _mainWindow->findChild<QTableView *>("channelView");
+  settings.setChannelListHeaderState(channels->horizontalHeader()->saveState());
 }
 
 
@@ -1202,6 +1246,18 @@ Application::onHideGPSNote() {
   gpsNote->setVisible(false);
 }
 
+void
+Application::loadPositioningSectionState() {
+  Settings settings;
+  QTableView *gps = _mainWindow->findChild<QTableView *>("gpsView");
+  gps->horizontalHeader()->restoreState(settings.positioningHeaderState());
+}
+void
+Application::storePositioningSectionState() {
+  Settings settings;
+  QTableView *gps = _mainWindow->findChild<QTableView *>("gpsView");
+  settings.setPositioningHeaderState(gps->horizontalHeader()->saveState());
+}
 
 
 void

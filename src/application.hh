@@ -46,6 +46,7 @@ public slots:
 
 private slots:
   QMainWindow *createMainWindow();
+  void storeMainWindowSize();
 
   void onCodeplugDownloadError(Radio *radio);
   void onCodeplugDownloaded(Radio *radio, CodePlug *codeplug);
@@ -66,6 +67,8 @@ private slots:
   void onEditContact(const QModelIndex &idx);
   void onContactUp();
   void onContactDown();
+  void loadContactListSectionState();
+  void storeContactListSectionState();
 
   void onAddRxGroup();
   void onRemRxGroup();
@@ -80,6 +83,8 @@ private slots:
   void onChannelUp();
   void onChannelDown();
   void onEditChannel(const QModelIndex &index);
+  void loadChannelListSectionState();
+  void storeChannelListSectionState();
 
   void onAddZone();
   void onRemZone();
@@ -100,6 +105,8 @@ private slots:
   void onGPSDown();
   void onEditGPS(const QModelIndex &index);
   void onHideGPSNote();
+  void loadPositioningSectionState();
+  void storePositioningSectionState();
 
   void onAddRoamingZone();
   void onRemRoamingZone();

@@ -207,6 +207,42 @@ Settings::setShowDisclaimer(bool show) {
   setValue("showDisclaimer", show);
 }
 
+QSize
+Settings::mainWindowSize() const {
+  return value("mainWindowSize", QSize()).toSize();
+}
+void
+Settings::setMainWindowSize(const QSize &size) {
+  setValue("mainWindowSize", size);
+}
+
+QByteArray
+Settings::channelListHeaderState() const {
+  return value("channelListHeaderState", QByteArray()).toByteArray();
+}
+void
+Settings::setChannelListHeaderState(const QByteArray &state) {
+  setValue("channelListHeaderState", state);
+}
+
+QByteArray
+Settings::contactListHeaderState() const {
+  return value("contactListHeaderState", QByteArray()).toByteArray();
+}
+void
+Settings::setContactListHeaderState(const QByteArray &state) {
+  setValue("contactListHeaderState", state);
+}
+
+QByteArray
+Settings::positioningHeaderState() const {
+  return value("positioningHeaderState", QByteArray()).toByteArray();
+}
+void
+Settings::setPositioningHeaderState(const QByteArray &state) {
+  setValue("positioningHeaderState", state);
+}
+
 bool
 Settings::isUpdated() const {
   if (! contains("version"))
