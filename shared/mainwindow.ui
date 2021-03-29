@@ -254,6 +254,9 @@
                  <iconset resource="resources.qrc">
                   <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
                 </property>
+                <property name="shortcut">
+                 <string>Alt+Up</string>
+                </property>
                </widget>
               </item>
               <item>
@@ -270,6 +273,9 @@
                 <property name="icon">
                  <iconset resource="resources.qrc">
                   <normaloff>:/icons/down.png</normaloff>:/icons/down.png</iconset>
+                </property>
+                <property name="shortcut">
+                 <string>Alt+Down</string>
                 </property>
                </widget>
               </item>
@@ -290,6 +296,9 @@
               <property name="text">
                <string>Add Contact</string>
               </property>
+              <property name="shortcut">
+               <string>Alt++</string>
+              </property>
              </widget>
             </item>
             <item>
@@ -299,6 +308,9 @@
               </property>
               <property name="text">
                <string>Delete Contact</string>
+              </property>
+              <property name="shortcut">
+               <string>Alt+-</string>
               </property>
              </widget>
             </item>
@@ -341,6 +353,9 @@
                  <iconset resource="resources.qrc">
                   <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
                 </property>
+                <property name="shortcut">
+                 <string>Alt+Up</string>
+                </property>
                </widget>
               </item>
               <item>
@@ -351,6 +366,9 @@
                 <property name="icon">
                  <iconset resource="resources.qrc">
                   <normaloff>:/icons/down.png</normaloff>:/icons/down.png</iconset>
+                </property>
+                <property name="shortcut">
+                 <string>Alt+Down</string>
                 </property>
                </widget>
               </item>
@@ -365,12 +383,18 @@
               <property name="text">
                <string>Add RX Group</string>
               </property>
+              <property name="shortcut">
+               <string>Alt++</string>
+              </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="remRXGroup">
               <property name="text">
                <string>Delete RX Group</string>
+              </property>
+              <property name="shortcut">
+               <string>Alt+-</string>
               </property>
              </widget>
             </item>
@@ -425,6 +449,9 @@
                  <iconset resource="resources.qrc">
                   <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
                 </property>
+                <property name="shortcut">
+                 <string>Alt+Up</string>
+                </property>
                </widget>
               </item>
               <item>
@@ -435,6 +462,9 @@
                 <property name="icon">
                  <iconset resource="resources.qrc">
                   <normaloff>:/icons/down.png</normaloff>:/icons/down.png</iconset>
+                </property>
+                <property name="shortcut">
+                 <string>Alt+Down</string>
                 </property>
                </widget>
               </item>
@@ -449,12 +479,18 @@
               <property name="text">
                <string>Add Analog Channel</string>
               </property>
+              <property name="shortcut">
+               <string>Alt+A</string>
+              </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="addDigitalChannel">
               <property name="text">
                <string>Add Digital Channel</string>
+              </property>
+              <property name="shortcut">
+               <string>Alt+D</string>
               </property>
              </widget>
             </item>
@@ -463,12 +499,18 @@
               <property name="text">
                <string>Clone Channel</string>
               </property>
+              <property name="shortcut">
+               <string>Alt+C</string>
+              </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="remChannel">
               <property name="text">
                <string>Delete Channel</string>
+              </property>
+              <property name="shortcut">
+               <string>Alt+-</string>
               </property>
              </widget>
             </item>
@@ -511,6 +553,9 @@
                  <iconset resource="resources.qrc">
                   <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
                 </property>
+                <property name="shortcut">
+                 <string>Alt+Up</string>
+                </property>
                </widget>
               </item>
               <item>
@@ -521,6 +566,9 @@
                 <property name="icon">
                  <iconset resource="resources.qrc">
                   <normaloff>:/icons/down.png</normaloff>:/icons/down.png</iconset>
+                </property>
+                <property name="shortcut">
+                 <string>Alt+Down</string>
                 </property>
                </widget>
               </item>
@@ -535,12 +583,18 @@
               <property name="text">
                <string>Add Zone</string>
               </property>
+              <property name="shortcut">
+               <string>Alt++</string>
+              </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="remZone">
               <property name="text">
                <string>Delete Zone</string>
+              </property>
+              <property name="shortcut">
+               <string>Alt+-</string>
               </property>
              </widget>
             </item>
@@ -594,6 +648,9 @@
                  <iconset resource="resources.qrc">
                   <normaloff>:/icons/down.png</normaloff>:/icons/down.png</iconset>
                 </property>
+                <property name="shortcut">
+                 <string>Alt+Down</string>
+                </property>
                </widget>
               </item>
              </layout>
@@ -604,8 +661,14 @@
            <layout class="QHBoxLayout" name="horizontalLayout_10">
             <item>
              <widget class="QPushButton" name="addScanList">
+              <property name="toolTip">
+               <string/>
+              </property>
               <property name="text">
                <string>Add Scan List</string>
+              </property>
+              <property name="shortcut">
+               <string>Alt++</string>
               </property>
              </widget>
             </item>
@@ -613,6 +676,9 @@
              <widget class="QPushButton" name="remScanList">
               <property name="text">
                <string>Delete Scan List</string>
+              </property>
+              <property name="shortcut">
+               <string>Alt+-</string>
               </property>
              </widget>
             </item>
@@ -683,6 +749,9 @@
                <iconset resource="resources.qrc">
                 <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
               </property>
+              <property name="shortcut">
+               <string>Alt+Up</string>
+              </property>
              </widget>
             </item>
             <item>
@@ -707,6 +776,9 @@
             <property name="text">
              <string>Add GPS System</string>
             </property>
+            <property name="shortcut">
+             <string>Alt+G</string>
+            </property>
            </widget>
           </item>
           <item>
@@ -717,12 +789,18 @@
             <property name="text">
              <string>Add APRS System</string>
             </property>
+            <property name="shortcut">
+             <string>Alt+A</string>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="remGPS">
             <property name="text">
              <string>Delete Position System</string>
+            </property>
+            <property name="shortcut">
+             <string>Alt+-</string>
             </property>
            </widget>
           </item>
@@ -767,6 +845,9 @@
                <iconset resource="resources.qrc">
                 <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
               </property>
+              <property name="shortcut">
+               <string>Alt+Up</string>
+              </property>
              </widget>
             </item>
             <item>
@@ -791,12 +872,18 @@
             <property name="text">
              <string>Add Roaming Zone</string>
             </property>
+            <property name="shortcut">
+             <string>Alt++</string>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="remRoamingZone">
             <property name="text">
              <string>Delete Roaming Zone</string>
+            </property>
+            <property name="shortcut">
+             <string>Alt+-</string>
             </property>
            </widget>
           </item>
