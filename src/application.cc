@@ -1466,13 +1466,10 @@ Application::onAddRoamingZone() {
     return;
 
   QListView *list = _mainWindow->findChild<QListView *>("roamingZoneList");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-
-  RoamingZone *zone = dialog.zone();
-  if (selected.isValid())
-    _config->roaming()->addZone(zone, selected.row()+1);
-  else
-    _config->roaming()->addZone(zone);
+  int row=-1;
+  if (list->selectionModel()->hasSelection())
+    row = list->selectionModel()->selection().back().bottom()+1;
+  _config->roaming()->addZone(dialog.zone(), row);
 }
 
 void
@@ -1497,46 +1494,80 @@ Application::onGenRoamingZone() {
     zone->deleteLater();
     return;
   }
-  dialog.zone();
-  _config->roaming()->addZone(zone);
+
+  QListView *list = _mainWindow->findChild<QListView *>("roamingZoneList");
+  int row=-1;
+  if (list->selectionModel()->hasSelection())
+    row = list->selectionModel()->selection().back().bottom()+1;
+  _config->roaming()->addZone(dialog.zone(), row);
 }
 
 void
 Application::onRemRoamingZone() {
-  QModelIndex idx = _mainWindow->findChild<QListView *>("roamingZoneList")->selectionModel()->currentIndex();
-  if (! idx.isValid()) {
+  QListView *list = _mainWindow->findChild<QListView *>("roamingZoneList");
+  if (! list->selectionModel()->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete roaming zone"),
           tr("Cannot delete roaming zone: You have to select a zone first."));
     return;
   }
 
-  QString name = _config->roaming()->zone(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete roaming zone?"), tr("Delete roaming zone %1?").arg(name)))
-    return;
-
-  _config->roaming()->remZone(idx.row());
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(list->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->roaming()->zone(rows.first())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete roaming zone?"), tr("Delete roaming zone %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete roaming zones?"), tr("Delete %1 roaming zones?").arg(rows.count())))
+      return;
+  }
+  // collect all selected zones
+  // need to collect them first as rows change when deleting
+  QList<RoamingZone *> lists; lists.reserve(rows.count());
+  foreach (int row, rows)
+    lists.push_back(_config->roaming()->zone(row));
+  // remove
+  foreach (RoamingZone *zone, lists)
+    _config->roaming()->remZone(zone);
 }
 
 void
 Application::onRoamingZoneUp() {
   QListView *list = _mainWindow->findChild<QListView *>("roamingZoneList");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0 >= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move roaming zones."),
+          tr("Cannot move roaming zones: You have to select at least one roaming zone first."));
     return;
-  if (_config->roaming()->moveUp(selected.row()))
-    list->setCurrentIndex(_config->roaming()->index(selected.row()-1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->roaming()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onRoamingZoneDown() {
   QListView *list = _mainWindow->findChild<QListView *>("roamingZoneList");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->roaming()->count()-1) <= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move roaming zones."),
+          tr("Cannot move roaming zones: You have to select at least one roaming zone first."));
     return;
-  if (_config->roaming()->moveDown(selected.row()))
-    list->setCurrentIndex(_config->roaming()->index(selected.row()+1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->roaming()->moveDown(rows.first, rows.second);
 }
 
 void

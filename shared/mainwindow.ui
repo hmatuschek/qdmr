@@ -849,6 +849,9 @@
          <layout class="QHBoxLayout" name="horizontalLayout_13">
           <item>
            <widget class="QListView" name="roamingZoneList">
+            <property name="selectionMode">
+             <enum>QAbstractItemView::ContiguousSelection</enum>
+            </property>
             <property name="selectionBehavior">
              <enum>QAbstractItemView::SelectRows</enum>
             </property>
