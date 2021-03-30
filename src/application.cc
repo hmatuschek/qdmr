@@ -24,6 +24,29 @@
 #include "searchpopup.hh"
 #include "contactselectiondialog.hh"
 
+QPair<int, int>
+getSelectionRowRange(const QModelIndexList &indices) {
+  int rmin=-1, rmax=-1;
+  foreach (QModelIndex idx, indices) {
+    if ((-1==rmin) || (rmin>idx.row()))
+      rmin = idx.row();
+    if ((-1==rmax) || (rmax<idx.row()))
+      rmax = idx.row();
+  }
+  return QPair<int,int>(rmin, rmax);
+}
+
+QList<int>
+getSelectionRows(const QModelIndexList &indices) {
+  QList<int> rows;
+  foreach (QModelIndex idx, indices) {
+    if (rows.contains(idx.row()))
+      continue;
+    rows.append(idx.row());
+  }
+  return rows;
+}
+
 
 Application::Application(int &argc, char *argv[])
   : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _repeater(nullptr)
@@ -722,30 +745,43 @@ Application::onAddContact() {
     return;
 
   QTableView *table = _mainWindow->findChild<QTableView *>("contactsView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-  if (selected.isValid())
-    _config->contacts()->addContact(dialog.contact(), selected.row()+1);
-  else
-    _config->contacts()->addContact(dialog.contact());
+  int row=-1;
+  if (table->selectionModel()->hasSelection())
+    row = table->selectionModel()->selection().back().bottom()+1;
+  _config->contacts()->addContact(dialog.contact(), row);
 }
 
 void
 Application::onRemContact() {
+  // Get table
   QTableView *table = _mainWindow->findChild<QTableView *>("contactsView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-  if (! selected.isValid()) {
+  // Check if there is any contacts seleced
+  if (! table->selectionModel()->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete contact"),
           tr("Cannot delete contact: You have to select a contact first."));
     return;
   }
-
-  QString name = _config->contacts()->contact(selected.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete contact?"), tr("Delete contact %1?").arg(name)))
-    return;
-
-  _config->contacts()->remContact(selected.row());
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(table->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->contacts()->contact(rows.front())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete contact?"), tr("Delete contact %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete contacts?"), tr("Delete %1 contacts?").arg(rows.count())))
+      return;
+  }
+  // collect all selected contacts
+  // need to collect them first as rows change when deleting contacts
+  QList<Contact *> contacts; contacts.reserve(rows.count());
+  foreach (int row, rows)
+    contacts.push_back(_config->contacts()->contact(row));
+  // remove contacts
+  foreach (Contact *contact, contacts)
+    _config->contacts()->remContact(contact);
 }
 
 void
@@ -762,21 +798,37 @@ Application::onEditContact(const QModelIndex &idx) {
 void
 Application::onContactUp() {
   QTableView *table = _mainWindow->findChild<QTableView *>("contactsView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0==selected.row()))
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move contacts"),
+          tr("Cannot move contacts: You have to select at least one contact first."));
     return;
-  if (_config->contacts()->moveUp(selected.row()))
-    table->selectRow(selected.row()-1);
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->contacts()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onContactDown() {
   QTableView *table = _mainWindow->findChild<QTableView *>("contactsView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->contacts()->count()-1) <= selected.row()))
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move contacts"),
+          tr("Cannot move contacts: You have to select at least one contact first."));
     return;
-  if (_config->contacts()->moveDown(selected.row()))
-    table->selectRow(selected.row()+1);
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->contacts()->moveDown(rows.first, rows.second);
 }
 
 void
