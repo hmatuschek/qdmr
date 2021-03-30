@@ -105,10 +105,14 @@ public:
   /** Removes the specified scanlist from the list. */
 	bool remScanList(ScanList *list);
 
-  /** Moves the scanlist at the given row one up. */
+  /** Moves the scan list at the given row one up. */
   bool moveUp(int row);
-  /** Moves the scanlist at the given row one down. */
+  /** Moves the scan lists one up. */
+  bool moveUp(int first, int last);
+  /** Moves the scan list at the given row one down. */
   bool moveDown(int row);
+  /** Moves the scan lists one down. */
+  bool moveDown(int first, int last);
 
 	/** Implementation of QAbstractListModel, returns the number of scanlists. */
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;

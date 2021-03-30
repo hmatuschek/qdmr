@@ -1235,50 +1235,78 @@ Application::onAddScanList() {
     return;
 
   QListView *list = _mainWindow->findChild<QListView *>("scanListView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  ScanList *scanlist = dialog.scanlist();
-  if (selected.isValid())
-    _config->scanlists()->addScanList(scanlist, selected.row()+1);
-  else
-    _config->scanlists()->addScanList(scanlist);
+
+  int row=-1;
+  if (list->selectionModel()->hasSelection())
+    row = list->selectionModel()->selection().back().bottom()+1;
+  _config->scanlists()->addScanList(dialog.scanlist(), row);
 }
 
 void
 Application::onRemScanList() {
-  QModelIndex idx = _mainWindow->findChild<QListView *>("scanListView")->selectionModel()->currentIndex();
-  if (! idx.isValid()) {
+  QListView *list = _mainWindow->findChild<QListView *>("scanListView");
+  if (! list->selectionModel()->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete scanlist"),
           tr("Cannot delete scanlist: You have to select a scanlist first."));
     return;
   }
-
-  QString name = _config->scanlists()->scanlist(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete scanlist?"), tr("Delete scanlist %1?").arg(name)))
-    return;
-
-  _config->scanlists()->remScanList(idx.row());
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(list->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->scanlists()->scanlist(rows.first())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete scan list?"), tr("Delete scan list %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete scan lists?"), tr("Delete %1 scan lists?").arg(rows.count())))
+      return;
+  }
+  // collect all selected scan lists
+  // need to collect them first as rows change when deleting
+  QList<ScanList *> lists; lists.reserve(rows.count());
+  foreach (int row, rows)
+    lists.push_back(_config->scanlists()->scanlist(row));
+  // remove
+  foreach (ScanList *list, lists)
+    _config->scanlists()->remScanList(list);
 }
 
 void
 Application::onScanListUp() {
   QListView *list = _mainWindow->findChild<QListView *>("scanListView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0 >= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move scan lists."),
+          tr("Cannot move scan lists: You have to select at least one scan list first."));
     return;
-  if (_config->scanlists()->moveUp(selected.row()))
-    list->setCurrentIndex(_config->scanlists()->index(selected.row()-1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->scanlists()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onScanListDown() {
   QListView *list = _mainWindow->findChild<QListView *>("scanListView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->scanlists()->count()-1) <= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move scan lists."),
+          tr("Cannot move scan lists: You have to select at least one scan list first."));
     return;
-  if (_config->scanlists()->moveDown(selected.row()))
-    list->setCurrentIndex(_config->scanlists()->index(selected.row()+1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->scanlists()->moveDown(rows.first, rows.second);
 }
 
 void
