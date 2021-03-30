@@ -396,8 +396,12 @@ public:
 	bool remChannel(int idx);
   /** Moves the channel at index @c idx one step up. */
   bool moveUp(int idx);
-  /** Moves the channel at index @c idx one step up. */
+  /** Moves the channels at one step up. */
+  bool moveUp(int first, int last);
+  /** Moves the channel at index @c idx one step down. */
   bool moveDown(int idx);
+  /** Moves the channels one step down. */
+  bool moveDown(int first, int last);
 
 	// QAbstractTableModel interface
   /** Implements QAbstractTableModel, returns number of rows. */

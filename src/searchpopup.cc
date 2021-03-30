@@ -35,7 +35,7 @@ SearchPopup::SearchPopup(QAbstractItemView *parent)
   down->setIcon(QIcon(":/icons/down.png"));
   connect(down, SIGNAL(clicked(bool)), this, SLOT(onNext()));
   QToolButton *close = new QToolButton(this);
-  close->setIcon(QIcon(":/icons/save.png"));
+  close->setIcon(QIcon(":/icons/close.png"));
   connect(close, SIGNAL(clicked(bool)), this, SLOT(hide()));
 
   QHBoxLayout *layout = new QHBoxLayout();

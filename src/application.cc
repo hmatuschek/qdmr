@@ -853,7 +853,6 @@ Application::onAddRxGroup() {
     return;
 
   QListView *list = _mainWindow->findChild<QListView *>("groupListView");
-
   int row=-1;
   if (list->selectionModel()->hasSelection())
     row = list->selectionModel()->selection().back().bottom()+1;
@@ -949,31 +948,27 @@ Application::onRxGroupDown() {
 void
 Application::onAddAnalogChannel() {
   QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-
   AnalogChannelDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
 
-  if (selected.isValid())
-    _config->channelList()->addChannel(dialog.channel(), selected.row()+1);
-  else
-    _config->channelList()->addChannel(dialog.channel());
-
+  int row=-1;
+  if (table->selectionModel()->hasSelection())
+    row = table->selectionModel()->selection().back().bottom()+1;
+  _config->channelList()->addChannel(dialog.channel(), row);
 }
 
 void
 Application::onAddDigitalChannel() {
   QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-
   DigitalChannelDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
-  if (selected.isValid())
-    _config->channelList()->addChannel(dialog.channel(), selected.row()+1);
-  else
-    _config->channelList()->addChannel(dialog.channel());
+
+  int row=-1;
+  if (table->selectionModel()->hasSelection())
+    row = table->selectionModel()->selection().back().bottom()+1;
+  _config->channelList()->addChannel(dialog.channel(), row);
 }
 
 void
@@ -982,8 +977,8 @@ Application::onCloneChannel() {
   QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
   QModelIndex selected = table->selectionModel()->currentIndex();
   if (! selected.isValid()) {
-    QMessageBox::information(nullptr, tr("Select a channel first"),
-                             tr("To clone a channel, please select a channel to clone."),
+    QMessageBox::information(nullptr, tr("Select a single channel first"),
+                             tr("To clone a channel, please select a single channel to clone."),
                              QMessageBox::Close);
     return;
   }
@@ -1034,20 +1029,35 @@ Application::onCloneChannel() {
 
 void
 Application::onRemChannel() {
-  QModelIndex selected =_mainWindow->findChild<QTableView*>("channelView")->selectionModel()->currentIndex();
-  if (! selected.isValid()) {
+  QTableView *table =_mainWindow->findChild<QTableView*>("channelView");
+  if (! table->selectionModel()->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete channel"),
           tr("Cannot delete channel: You have to select a channel first."));
     return;
   }
 
-  QString name = _config->channelList()->channel(selected.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete channel?"), tr("Delete channel %1?").arg(name)))
-    return;
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(table->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->channelList()->channel(rows.front())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete channel?"), tr("Delete channel %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete channel?"), tr("Delete %1 channels?").arg(rows.count())))
+      return;
+  }
 
-  _config->channelList()->remChannel(selected.row());
+  // collect all selected channels
+  // need to collect them first as rows change when deleting channels
+  QList<Channel *> channels; channels.reserve(rows.count());
+  foreach (int row, rows)
+    channels.push_back(_config->channelList()->channel(row));
+  // remove channels
+  foreach (Channel *channel, channels)
+    _config->channelList()->remChannel(channel);
 }
 
 void
@@ -1071,21 +1081,37 @@ Application::onEditChannel(const QModelIndex &idx) {
 void
 Application::onChannelUp() {
   QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0 == selected.row()))
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move channels"),
+          tr("Cannot move channels: You have to select at least one channel first."));
     return;
-  if (_config->channelList()->moveUp(selected.row()))
-    table->selectRow(selected.row()-1);
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->channelList()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onChannelDown() {
   QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->channelList()->count()-1) == selected.row()))
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move channels"),
+          tr("Cannot move channels: You have to select at least one channel first."));
     return;
-  if (_config->channelList()->moveDown(selected.row()))
-    table->selectRow(selected.row()+1);
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->channelList()->moveDown(rows.first, rows.second);
 }
 
 void
