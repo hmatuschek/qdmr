@@ -88,6 +88,8 @@ interpreted as a 32-bit unsigned LE integer yields `450712500`.
 ## Digitial
 ### Layout
 
+Note all fields that are greater than one byte have LE byte ordering.
+
 ```c
 typedef uint32_t freq_t // 32-bit fixed point frequency
 
@@ -153,23 +155,48 @@ struct digital_chan_t
           prority_interrupt_decode : 1,
           unk34_2 : 1;
   // byte 50
-  uint16_t tx_contact_idx;       /// Endianess?
+  uint16_t tx_contact_idx;
   // byte 52
-  uint16_t rx_group_list_idx;    /// Endianess?
+  uint16_t rx_group_list_idx;
   // byte 54
-  uint16_t emergency_system_idx; /// Endianess?
+  uint16_t emergency_system_idx;
   // byte 56
-  uint8_t unk2[2];
+  uint8_t scan_chan_idx;
+  // byte 57
+  uint8_t unk57;
   //byte 58
-  uint8_t timeslot    : 1,    /// 1=TS2, 0=TS1
-          ukn56_1     : 4,    /// unknown set to ???
+  uint8_t timeslot    : 2,    /// 2=pseudo trunk (both timeslots) 1=TS2, 0=TS1
+          ukn56_1     : 2,    /// unknown set to ???
+          has_scan_ch : 1,    /// 1=scan_chan_idx is used, 0=ignore scan_chan_idx
           vox         : 1,    /// 1=Enabled, 0=Disabled.
           unk58_2     : 1,
           option_board: 1;    /// 1=enable, 0=disable
   // byte 59
-  uint8_t unk5[7];
+  uint8_t unk59[3];
+  // byte 62
+  
+  // 0xffff = None
+  // 0x0000 = Selected
+  // otherwise idx = loc_revert_channel - 1
+  uint16_t loc_revert_channel;
+  // byte 64
+  uint8_t unk64[2]
   // byte 66
-  uint16_t phone_system_idx;     /// Endianess?
+  uint16_t phone_system_idx;
+  // byte 68
+  
+  // 0x00 = None
+  // 0x01 = slot 1
+  // 0x02 = slot 2
+  uint8_t designated_pseudo_trunk_tx;
+  // byte 69
+  uint8_t unk68[3];
+
+  //byte 72
+  // 0xffff = None
+  // 0x0000 = Selected
+  // otherwise idx = rrs_revert_channel - 1
+  uint16_t rrs_revert_channel;
 };
 ```
 
