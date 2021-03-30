@@ -540,6 +540,9 @@
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
              <widget class="QListView" name="zoneView">
+              <property name="selectionMode">
+               <enum>QAbstractItemView::ContiguousSelection</enum>
+              </property>
               <property name="selectionBehavior">
                <enum>QAbstractItemView::SelectRows</enum>
               </property>

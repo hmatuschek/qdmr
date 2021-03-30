@@ -1136,51 +1136,80 @@ Application::onAddZone() {
     return;
 
   QListView *list = _mainWindow->findChild<QListView *>("zoneView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
 
-  Zone *zone = dialog.zone();
-  if (selected.isValid())
-    _config->zones()->addZone(zone, selected.row()+1);
-  else
-    _config->zones()->addZone(zone);
+  int row=-1;
+  if (list->selectionModel()->hasSelection())
+    row = list->selectionModel()->selection().back().bottom()+1;
+  _config->zones()->addZone(dialog.zone(), row);
 }
 
 void
 Application::onRemZone() {
-  QModelIndex idx = _mainWindow->findChild<QListView *>("zoneView")->selectionModel()->currentIndex();
-  if (! idx.isValid()) {
+  QListView *list = _mainWindow->findChild<QListView *>("zoneView");
+
+  // Check if there is any zones seleced
+  if (! list->selectionModel()->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete zone"),
           tr("Cannot delete zone: You have to select a zone first."));
     return;
   }
-
-  QString name = _config->zones()->zone(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete zone?"), tr("Delete zone %1?").arg(name)))
-    return;
-
-  _config->zones()->remZone(idx.row());
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(list->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->zones()->zone(rows.first())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete zone?"), tr("Delete zone %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete zones?"), tr("Delete %1 zones?").arg(rows.count())))
+      return;
+  }
+  // collect all selected zones
+  // need to collect them first as rows change when deleting
+  QList<Zone *> lists; lists.reserve(rows.count());
+  foreach (int row, rows)
+    lists.push_back(_config->zones()->zone(row));
+  // remove
+  foreach (Zone *zone, lists)
+    _config->zones()->remZone(zone);
 }
 
 void
 Application::onZoneUp() {
   QListView *list = _mainWindow->findChild<QListView *>("zoneView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0 >= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move zones."),
+          tr("Cannot move zones: You have to select at least one zone first."));
     return;
-  if (_config->zones()->moveUp(selected.row()))
-    list->setCurrentIndex(_config->zones()->index(selected.row()-1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->zones()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onZoneDown() {
   QListView *list = _mainWindow->findChild<QListView *>("zoneView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->zones()->count()-1) <= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move zones."),
+          tr("Cannot move zones: You have to select at least one zone first."));
     return;
-  if (_config->zones()->moveDown(selected.row()))
-    list->setCurrentIndex(_config->zones()->index(selected.row()+1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->zones()->moveDown(rows.first, rows.second);
 }
 
 void
