@@ -1330,13 +1330,11 @@ Application::onAddGPS() {
   if (QDialog::Accepted != dialog.exec())
     return;
 
-  QTableView *list = _mainWindow->findChild<QTableView *>("gpsView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  GPSSystem *gps = dialog.gpsSystem();
-  if (selected.isValid())
-    _config->posSystems()->addSystem(gps, selected.row()+1);
-  else
-    _config->posSystems()->addSystem(gps);
+  QTableView *table = _mainWindow->findChild<QTableView *>("gpsView");
+  int row=-1;
+  if (table->selectionModel()->hasSelection())
+    row = table->selectionModel()->selection().back().bottom()+1;
+  _config->posSystems()->addSystem(dialog.gpsSystem(), row);
 }
 
 void
@@ -1346,51 +1344,78 @@ Application::onAddAPRS() {
   if (QDialog::Accepted != dialog.exec())
     return;
 
-  QTableView *list = _mainWindow->findChild<QTableView *>("gpsView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  APRSSystem *aprs = dialog.aprsSystem();
-  if (selected.isValid())
-    _config->posSystems()->addSystem(aprs, selected.row()+1);
-  else
-    _config->posSystems()->addSystem(aprs);
+  QTableView *table = _mainWindow->findChild<QTableView *>("gpsView");
+  int row=-1;
+  if (table->selectionModel()->hasSelection())
+    row = table->selectionModel()->selection().back().bottom()+1;
+  _config->posSystems()->addSystem(dialog.aprsSystem(), row);
 }
 
 void
 Application::onRemGPS() {
-  QModelIndex idx = _mainWindow->findChild<QTableView *>("gpsView")->selectionModel()->currentIndex();
-  if (! idx.isValid()) {
+  QTableView *table = _mainWindow->findChild<QTableView *>("gpsView");
+  if (! table->selectionModel()->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete GPS system"),
           tr("Cannot delete GPS system: You have to select a GPS system first."));
     return;
   }
-
-  QString name = _config->posSystems()->gpsSystem(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete GPS system?"), tr("Delete GPS system %1?").arg(name)))
-    return;
-
-  _config->posSystems()->remSystem(idx.row());
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(table->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->posSystems()->system(rows.front())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete positioning system?"), tr("Delete positioning system %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete positioning system?"), tr("Delete %1 positioning systems?").arg(rows.count())))
+      return;
+  }
+  // collect all selected systems
+  // need to collect them first as rows change when deleting systems
+  QList<PositioningSystem *> systems; systems.reserve(rows.count());
+  foreach (int row, rows)
+    systems.push_back(_config->posSystems()->system(row));
+  // remove systems
+  foreach (PositioningSystem *system, systems)
+    _config->posSystems()->remSystem(system);
 }
 
 void
 Application::onGPSUp() {
-  QTableView *list = _mainWindow->findChild<QTableView *>("gpsView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0 >= selected.row()))
+  QTableView *table = _mainWindow->findChild<QTableView *>("gpsView");
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move positioning systems"),
+          tr("Cannot move positioning systems: You have to select at least one positioning system first."));
     return;
-  if (_config->posSystems()->moveUp(selected.row()))
-    list->setCurrentIndex(_config->posSystems()->index(selected.row()-1,0));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->posSystems()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onGPSDown() {
-  QTableView *list = _mainWindow->findChild<QTableView *>("gpsView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->posSystems()->count()-1) <= selected.row()))
+  QTableView *table = _mainWindow->findChild<QTableView *>("gpsView");
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move positioning systems"),
+          tr("Cannot move positioning systems: You have to select at least one positioning system first."));
     return;
-  if (_config->posSystems()->moveDown(selected.row()))
-    list->setCurrentIndex(_config->posSystems()->index(selected.row()+1,0));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->posSystems()->moveDown(rows.first, rows.second);
 }
 
 void
