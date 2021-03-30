@@ -23,6 +23,7 @@ own these radios to test the software with.
 
 
 ## Releases
+ * **[Version 0.6.4](https://github.com/hmatuschek/qdmr/releases/tag/v0.6.4)** -- A lot of bugfixes and minor improvements.
  * **[Version 0.6.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.6.0)** -- Added APRS & roaming.
  * **[Version 0.5.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.5.3)** -- Fixed detection of TYT MD-UV390 radios.
  * **[Version 0.5.2](https://github.com/hmatuschek/qdmr/releases/tag/v0.5.2)** -- Added call-sign database support for OpenGD77.
