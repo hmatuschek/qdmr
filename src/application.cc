@@ -853,12 +853,11 @@ Application::onAddRxGroup() {
     return;
 
   QListView *list = _mainWindow->findChild<QListView *>("groupListView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
 
-  if (selected.isValid())
-    _config->rxGroupLists()->addList(dialog.groupList(), selected.row()+1);
-  else
-    _config->rxGroupLists()->addList(dialog.groupList());
+  int row=-1;
+  if (list->selectionModel()->hasSelection())
+    row = list->selectionModel()->selection().back().bottom()+1;
+  _config->rxGroupLists()->addList(dialog.groupList(), row);
 }
 
 void
@@ -866,25 +865,39 @@ Application::onRemRxGroup() {
   if (! _mainWindow)
     return;
 
-  QModelIndex idx = _mainWindow->findChild<QListView *>("groupListView")->selectionModel()->currentIndex();
-  if (! idx.isValid()) {
+  QListView *list = _mainWindow->findChild<QListView *>("groupListView");
+  // Check if there is any groups seleced
+  if (! list->selectionModel()->hasSelection()) {
     QMessageBox::information(
-          nullptr, tr("Cannot delete group list"),
-          tr("Cannot delete group list: You have to select a group list first."));
+          nullptr, tr("Cannot delete RX group list"),
+          tr("Cannot delete RX group lists: You have to select a group list first."));
     return;
   }
-
-  QString name = _config->rxGroupLists()->list(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete group list?"), tr("Delete group list %1?").arg(name)))
-    return;
-
-  _config->rxGroupLists()->remList(idx.row());
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(list->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->rxGroupLists()->list(rows.first())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete RX group list?"), tr("Delete RX group list %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete RX group list?"), tr("Delete %1 RX group lists?").arg(rows.count())))
+      return;
+  }
+  // collect all selected group lists
+  // need to collect them first as rows change when deleting
+  QList<RXGroupList *> lists; lists.reserve(rows.count());
+  foreach (int row, rows)
+    lists.push_back(_config->rxGroupLists()->list(row));
+  // remove list
+  foreach (RXGroupList *list, lists)
+    _config->rxGroupLists()->remList(list);
 }
 
 void
 Application::onEditRxGroup(const QModelIndex &index) {
-  if (index.row() >= _config->rxGroupLists()->rowCount(QModelIndex()))
+  if (index.row() >= _config->rxGroupLists()->count())
     return;
 
   RXGroupListDialog dialog(_config, _config->rxGroupLists()->list(index.row()));
@@ -900,21 +913,37 @@ Application::onEditRxGroup(const QModelIndex &index) {
 void
 Application::onRxGroupUp() {
   QListView *list = _mainWindow->findChild<QListView *>("groupListView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0 >= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move RX group lists."),
+          tr("Cannot move RX group lists: You have to select at least one list first."));
     return;
-  if (_config->rxGroupLists()->moveUp(selected.row()))
-    list->setCurrentIndex(_config->rxGroupLists()->index(selected.row()-1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->rxGroupLists()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onRxGroupDown() {
   QListView *list = _mainWindow->findChild<QListView *>("groupListView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->rxGroupLists()->count()-1) <= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move RX group lists."),
+          tr("Cannot move RX group lists: You have to select at least one list first."));
     return;
-  if (_config->rxGroupLists()->moveDown(selected.row()))
-    list->setCurrentIndex(_config->rxGroupLists()->index(selected.row()+1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->rxGroupLists()->moveDown(rows.first, rows.second);
 }
 
 void

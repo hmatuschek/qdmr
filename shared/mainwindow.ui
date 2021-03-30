@@ -337,6 +337,9 @@
            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
             <item>
              <widget class="QListView" name="groupListView">
+              <property name="selectionMode">
+               <enum>QAbstractItemView::ContiguousSelection</enum>
+              </property>
               <property name="selectionBehavior">
                <enum>QAbstractItemView::SelectRows</enum>
               </property>

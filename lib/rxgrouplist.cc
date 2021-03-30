@@ -200,11 +200,35 @@ RXGroupLists::moveUp(int row) {
 }
 
 bool
+RXGroupLists::moveUp(int first, int last) {
+  if ((first <= 0) || (last >= count()))
+    return false;
+  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
+  for (int row=first; row<=last; row++)
+    std::swap(_lists[row-1],_lists[row]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
 RXGroupLists::moveDown(int row) {
   if ((row >= (count()-1)) || (row>=count()))
     return false;
   beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
   std::swap(_lists[row+1], _lists[row]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+RXGroupLists::moveDown(int first, int last) {
+  if ((last >= (count()-1)) || (first<0))
+    return false;
+  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
+  for (int row=last; row>=first; row--)
+    std::swap(_lists[row+1], _lists[row]);
   endMoveRows();
   emit modified();
   return true;
