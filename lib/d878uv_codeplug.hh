@@ -263,16 +263,24 @@ public:
       APRS_REPORT_DIGITAL = 2           ///< Use digital reporting.
     } APRSReport;
 
+    /** Defines all possible APRS PTT settings. */
+    typedef enum {
+      APRS_PTT_OFF   = 0,               ///< Do not send APRS on PTT.
+      APRS_PTT_START = 1,               ///< Send APRS at start of transmission.
+      APRS_PTT_END   = 2                ///< Send APRS at end of transmission.
+    } APRSPTT;
+
+
     // Bytes 0-7
     uint32_t rx_frequency;              ///< RX Frequency, 8 digits BCD, big-endian.
     uint32_t tx_offset;                 ///< TX Offset, 8 digits BCD, big-endian, sign in repeater_mode.
 
     // Byte 8
-    uint8_t channel_mode    : 2,        ///< Mode: Analog or Digital
-      power                 : 2,        ///< Power: Low, Middle, High, Turbo
-      bandwidth             : 1,        ///< Bandwidth: 12.5 or 25 kHz
+    uint8_t channel_mode    : 2,        ///< Mode: Analog or Digital, see @c Mode.
+      power                 : 2,        ///< Power: Low, Middle, High, Turbo, see @c Power.
+      bandwidth             : 1,        ///< Bandwidth: 12.5 or 25 kHz, see @c Bandwidth.
       _unused8              : 1,        ///< Unused, set to 0.
-      repeater_mode         : 2;        ///< Sign of TX frequency offset.
+      repeater_mode         : 2;        ///< Sign of TX frequency offset, see @c RepeaterMode.
 
     // Byte 9
     uint8_t rx_ctcss        : 1,        ///< CTCSS decode enable.
@@ -291,7 +299,7 @@ public:
     uint16_t dcs_receive;               ///< RX DCS code: 0=D000N, 511=D777N, 512=D000I, 1023=D777I, DCS code-number in octal, little-endian.
 
     // Bytes 16-19
-    uint16_t custom_ctcss;              ///< Custom CTCSS tone frequency: 0x09cf=251.1, 0x0a28=260, big-endian?.
+    uint16_t custom_ctcss;              ///< Custom CTCSS tone frequency: 0x09cf=251.1, 0x0a28=260, big-endian.
     uint8_t tone2_decode;               ///< 2-Tone decode: 0x00=1, 0x0f=16
     uint8_t _unused19;                  ///< Unused, set to 0.
 
@@ -299,18 +307,18 @@ public:
     uint32_t contact_index;             ///< Contact index, zero-based, little-endian.
 
     // Byte 24
-    uint8_t id_index;                   ///< Index to radio-ID table.
+    uint8_t id_index;                   ///< Index to radio ID table.
 
     // Byte 25
     uint8_t ptt_id          : 2,        ///< PTT ID, see PTTId.
       _unused25_1           : 2,        ///< Unused, set to 0.
-      squelch_mode          : 1,        ///< Squelch mode, see SquelchMode.
+      squelch_mode          : 1,        ///< Squelch mode, see @c SquelchMode.
       _unused25_2           : 3;        ///< Unused, set to 0.
 
     // Byte 26
-    uint8_t tx_permit       : 2,        ///< TX permit, see Admin.
+    uint8_t tx_permit       : 2,        ///< TX permit, see @c Admit.
       _unused26_1           : 2,        ///< Unused, set to 0.
-      opt_signal            : 2,        ///< Optional signaling, see OptSignaling.
+      opt_signal            : 2,        ///< Optional signaling, see @c OptSignaling.
       _unused26_2           : 2;        ///< Unused, set to 0.
 
     // Bytes 27-31
@@ -325,7 +333,7 @@ public:
 
     // Byte 33
     uint8_t slot2           : 1,        ///< Timeslot, 0=TS1, 1=TS2.
-      _unused33_1           : 1,        ///< Unused, set to 0.
+      sms_confirm           : 1,        ///< Send SMS confirmation, 0=off, 1=on.
       simplex_tdma          : 1,        ///< Simplex TDMA enabled.
       _unused33_2           : 1,        ///< Unused, set to 0.
       tdma_adaptive         : 1,        ///< TDMA adaptive enable.
@@ -334,11 +342,11 @@ public:
       work_alone            : 1;        ///< Work alone, 0=off, 1=on.
 
     // Byte 34
-    uint8_t encryption;                 ///< Digital encryption, 1-32, 0=off.
+    uint8_t aes_encryption;             ///< Digital AES encryption, 1-32, 0=off.
 
     // Bytes 35-51
     uint8_t name[16];                   ///< Channel name, ASCII, zero filled.
-    uint8_t _unused51;                  ///< Unused, set to 0.
+    uint8_t _pad51;                     ///< Pad byte, set to 0.
 
     // Byte 52
     uint8_t ranging         : 1,        ///< Ranging enabled.
@@ -347,14 +355,20 @@ public:
       _unused52             : 5;        ///< Unused, set to 0.
 
     // Byte 53
-    uint8_t aprs_report     : 2,        ///< Enable APRS report.
+    uint8_t aprs_report     : 2,        ///< Enable APRS report, see @c APRSReport.
       _unused53             : 6;        ///< Unused, set to 0.
 
     // Bytes 54-63
-    uint8_t analog_aprs_ptt;            ///< Enable analog APRS PTT, 0=off, 1=start of transmission, 2=end of transmission.
+    uint8_t analog_aprs_ptt;            ///< Enable analog APRS PTT, see @c APRSPTT.
     uint8_t digi_aprs_ptt;              ///< Enable digital APRS PTT, 0=off, 1=on.
     uint8_t gps_system;                 ///< Index of DMR GPS report system, 0-7;
-    uint8_t _unused57[7];               ///< Unused, set to 0.´
+    int8_t  freq_correction;            ///< Signed int in 10Hz.
+    uint8_t dmr_encryption;             ///< Digital encryption, 1-32, 0=off.
+    uint8_t multiple_keys   : 1,        ///< Enable multiple keys.
+      random_key            : 1,        ///< Enable random key.
+      sms_forbid            : 1,        ///< Forbit SMS tramsission.
+      _unused59_3           : 5;        ///< Unused, set to 0.
+    uint32_t _unused60;                 ///< Unused, set to 0.
 
     /** Constructor, also clears the struct. */
     channel_t();
