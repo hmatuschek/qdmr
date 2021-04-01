@@ -1105,9 +1105,6 @@
    <property name="toolTip">
     <string>Downloads a codeplug from connected radios.</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+D</string>
-   </property>
   </action>
   <action name="actionUpload">
    <property name="icon">
@@ -1119,9 +1116,6 @@
    </property>
    <property name="toolTip">
     <string>Uploads the codeplug to the connected radio.</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+U</string>
    </property>
   </action>
   <action name="actionAbout">
