@@ -99,12 +99,6 @@ RD5R::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
   if (!_config)
     return false;
 
-  _dev = new HID(0x15a2, 0x0073);
-  if (! _dev->isOpen()) {
-    _dev->deleteLater();
-    return false;
-  }
-
   _task = StatusUpload;
   _codeplugFlags = flags;
   if (blocking) {

@@ -14,12 +14,14 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
   if (error < 0) {
     _errorMessage = tr("Cannot init libusb (%1): %2")
         .arg(error).arg(libusb_strerror((enum libusb_error) error));
+    logError() << _errorMessage;
     return;
   }
 
   if (! (_dev = libusb_open_device_with_vid_pid(_ctx, vid, pid))) {
     _errorMessage = tr("Cannot find USB device %1:%2")
         .arg(vid,0,16).arg(pid,0,16);
+    logError() << _errorMessage;
     libusb_exit(_ctx);
     _ctx = nullptr;
     return;
@@ -32,6 +34,7 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
   if (error < 0) {
     _errorMessage = tr("Failed to claim USB interface: %1: %2")
         .arg(error).arg(libusb_strerror((enum libusb_error) error));
+    logError() << _errorMessage;
     libusb_close(_dev);
     libusb_exit(_ctx);
     _ctx = nullptr;
@@ -51,6 +54,7 @@ void
 HIDevice::close() {
   if (! _ctx)
     return;
+  logDebug() << "Closing HIDevice.";
 
   if (_transfer) {
     libusb_free_transfer(_transfer);
@@ -60,7 +64,8 @@ HIDevice::close() {
   libusb_release_interface(_dev, HID_INTERFACE);
   libusb_close(_dev);
   libusb_exit(_ctx);
-  _ctx = 0;
+  _ctx = nullptr;
+  _dev = nullptr;
 }
 
 bool
@@ -85,15 +90,18 @@ HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned cha
   if (reply_len != sizeof(reply)) {
     _errorMessage = tr("Short read: %1 bytes instead of %2!")
         .arg(reply_len).arg((int)sizeof(reply));
+    logError() << _errorMessage;
     return false;
   }
   if (reply[0] != 3 || reply[1] != 0 || reply[3] != 0) {
     _errorMessage = tr("Incorrect reply!");
+    logError() << _errorMessage;
     return false;
   }
   if (reply[2] != rlength) {
     _errorMessage = tr("Incorrect reply length %1, expected %1.")
         .arg(reply[2]).arg(rlength);
+    logError() << _errorMessage;
     return false;
   }
 
