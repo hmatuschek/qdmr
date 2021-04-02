@@ -359,11 +359,13 @@ Application::loadCodeplug() {
 
   QString errorMessage;
   QTextStream stream(&file);
-  if (_config->readCSV(stream, errorMessage))
+  if (_config->readCSV(stream, errorMessage)) {
     _mainWindow->setWindowModified(false);
-  else
+  } else {
     QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
                           tr("Cannot read codeplug from file '%1': %2").arg(filename).arg(errorMessage));
+    _config->reset();
+  }
 }
 
 
