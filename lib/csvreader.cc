@@ -1364,6 +1364,13 @@ CSVParser::_parse_gps_system(qint64 id, CSVLexer &lexer) {
     return false;
   }
 
+  token = lexer.next();
+  if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
   return _handler->handleGPSSystem(id, name, contact, period, chan, line, column, _errorMessage);
 }
 
@@ -1483,6 +1490,13 @@ CSVParser::_parse_aprs_system(qint64 id, CSVLexer &lexer) {
     message = token.value;
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
+  if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
