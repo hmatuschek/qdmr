@@ -89,10 +89,28 @@ static_assert(
   "D878UVCodeplug::scanlist_t size check failed.");
 
 #define ADDR_GENERAL_CONFIG       0x02500000
-#define GENERAL_CONFIG_SIZE       0x00000630
+#define GENERAL_CONFIG_SIZE       0x00000100
 static_assert(
   GENERAL_CONFIG_SIZE == sizeof(D878UVCodeplug::general_settings_base_t),
   "D878UVCodeplug::general_settings_base_t size check failed.");
+
+#define ADDR_ZONE_CHANNELS        0x02500100
+#define ZONE_CHANNELS_SIZE        0x00000400
+static_assert(
+  ZONE_CHANNELS_SIZE == sizeof(D878UVCodeplug::zone_channels_t),
+  "D878UVCodeplug::zone_channels_t size check failed.");
+
+#define ADDR_DTMF_NUMBERS         0x02500500
+#define DTMF_NUMBERS_SIZE         0x00000100
+static_assert(
+  DTMF_NUMBERS_SIZE == sizeof(D878UVCodeplug::dtmf_numbers_t),
+  "D878UVCodeplug::dtmf_numbers_t size check failed.");
+
+#define ADDR_BOOT_SETTINGS        0x02500600
+#define BOOT_SETTINGS_SIZE        0x00000030
+static_assert(
+  BOOT_SETTINGS_SIZE == sizeof(D878UVCodeplug::boot_settings_t),
+  "D878UVCodeplug::boot_settings_t size check failed.");
 
 #define ADDR_GENERAL_CONFIG_EXT1  0x02501280
 #define GENERAL_CONFIG_EXT1_SIZE  0x00000030
@@ -865,27 +883,7 @@ D878UVCodeplug::general_settings_base_t::general_settings_base_t() {
 
 void
 D878UVCodeplug::general_settings_base_t::clear() {
-  memset(intro_line1, 0, sizeof(intro_line2));
-  memset(intro_line2, 0, sizeof(intro_line2));
   mic_gain = 2;
-}
-
-QString
-D878UVCodeplug::general_settings_base_t::getIntroLine1() const {
-  return decode_ascii(intro_line1, 14, 0);
-}
-void
-D878UVCodeplug::general_settings_base_t::setIntroLine1(const QString line) {
-  encode_ascii(intro_line1, line, 14, 0);
-}
-
-QString
-D878UVCodeplug::general_settings_base_t::getIntroLine2() const {
-  return decode_ascii(intro_line2, 14, 0);
-}
-void
-D878UVCodeplug::general_settings_base_t::setIntroLine2(const QString line) {
-  encode_ascii(intro_line2, line, 14, 0);
 }
 
 uint
@@ -899,9 +897,9 @@ D878UVCodeplug::general_settings_base_t::setMicGain(uint gain) {
 
 void
 D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const Flags &flags) {
-  setIntroLine1(config->introLine1());
-  setIntroLine2(config->introLine2());
   setMicGain(config->micLevel());
+
+  sms_format = SMS_FMT_DMR;
 
   // If auto-enable roaming is enabled
   if (flags.autoEnableRoaming) {
@@ -928,7 +926,7 @@ D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const 
       gps_enable = 0x01;
       // Set time zone based on system time zone.
       int offset = QTimeZone::systemTimeZone().offsetFromUtc(QDateTime::currentDateTime());
-      gps_timezone = 12 + offset/3600;
+      timezone = 12 + offset/3600;
       gps_sms_enable = 0x00;
       gps_message_enable = 0x00;
       gps_sms_interval = 0x05;
@@ -942,10 +940,50 @@ D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const 
 
 void
 D878UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
-  config->setIntroLine1(getIntroLine1());
-  config->setIntroLine2(getIntroLine2());
   config->setMicLevel(getMicGain());
 }
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::boot_settings_t
+ * ******************************************************************************************** */
+void
+D878UVCodeplug::boot_settings_t::clear() {
+  memset(intro_line1, 0, sizeof(intro_line2));
+  memset(intro_line2, 0, sizeof(intro_line2));
+}
+
+QString
+D878UVCodeplug::boot_settings_t::getIntroLine1() const {
+  return decode_ascii(intro_line1, 14, 0);
+}
+void
+D878UVCodeplug::boot_settings_t::setIntroLine1(const QString line) {
+  encode_ascii(intro_line1, line, 14, 0);
+}
+
+QString
+D878UVCodeplug::boot_settings_t::getIntroLine2() const {
+  return decode_ascii(intro_line2, 14, 0);
+}
+void
+D878UVCodeplug::boot_settings_t::setIntroLine2(const QString line) {
+  encode_ascii(intro_line2, line, 14, 0);
+}
+
+void
+D878UVCodeplug::boot_settings_t::fromConfig(const Config *config, const Flags &flags) {
+  setIntroLine1(config->introLine1());
+  setIntroLine2(config->introLine2());
+}
+
+void
+D878UVCodeplug::boot_settings_t::updateConfig(Config *config) {
+  config->setIntroLine1(getIntroLine1());
+  config->setIntroLine2(getIntroLine2());
+}
+
 
 
 /* ******************************************************************************************** *
@@ -1488,6 +1526,9 @@ D878UVCodeplug::allocateUntouched() {
 
   // General config
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+  image(0).addElement(ADDR_ZONE_CHANNELS, ZONE_CHANNELS_SIZE);
+  image(0).addElement(ADDR_DTMF_NUMBERS, DTMF_NUMBERS_SIZE);
+  image(0).addElement(ADDR_BOOT_SETTINGS, BOOT_SETTINGS_SIZE);
   image(0).addElement(ADDR_GENERAL_CONFIG_EXT1, GENERAL_CONFIG_EXT1_SIZE);
   image(0).addElement(ADDR_GENERAL_CONFIG_EXT2, GENERAL_CONFIG_EXT2_SIZE);
 
@@ -1861,6 +1902,9 @@ D878UVCodeplug::allocateForDecoding() {
 
   // General config
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+  image(0).addElement(ADDR_ZONE_CHANNELS, ZONE_CHANNELS_SIZE);
+  image(0).addElement(ADDR_DTMF_NUMBERS, DTMF_NUMBERS_SIZE);
+  image(0).addElement(ADDR_BOOT_SETTINGS, BOOT_SETTINGS_SIZE);
   // GPS settings
   image(0).addElement(ADDR_GPS_SETTING, GPS_SETTING_SIZE);
   // APRS settings and messages
