@@ -232,13 +232,13 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     if (! config->posSystems()->system(i)->is<GPSSystem>())
       continue;
     GPSSystem *gps = config->posSystems()->system(i)->as<GPSSystem>();
-    stream << qSetFieldWidth(5)  << (i+1)
+    stream << qSetFieldWidth(5)  << left << (i+1)
            << qSetFieldWidth(20) << ("\"" + gps->name() + "\"")
            << qSetFieldWidth(5)  << config->contacts()->indexOfDigital(gps->contact())+1
            << qSetFieldWidth(7)  << gps->period()
-           << qSetFieldWidth(6)  << left
-           << ( (gps->hasRevertChannel()) ? QString::number(config->channelList()->indexOf(gps->revertChannel())+1) : "-" )
-           << "\n";
+           << qSetFieldWidth(6)  << ( (gps->hasRevertChannel()) ?
+                                        QString::number(config->channelList()->indexOf(gps->revertChannel())+1) : "-" )
+           << qSetFieldWidth(0) << "\n";
   }
   stream << qSetFieldWidth(0) << "\n";
 
