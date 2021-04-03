@@ -786,6 +786,28 @@ D878UVCodeplug::scanlist_t::toScanListObj() {
 
 void
 D878UVCodeplug::scanlist_t::linkScanListObj(ScanList *lst, CodeplugContext &ctx) {
+  if (prio_ch_select & PRIO_CHAN_SEL1) {
+    uint16_t idx = qFromLittleEndian(priority_ch1);
+    if (! ctx.hasChannel(idx)) {
+      logError() << "Cannot link scanlist '" << getName()
+                 << "', priority channel 1 index " << idx << " unknown.";
+      // Ignore error, continue decoding
+    } else {
+      lst->setPriorityChannel(ctx.getChannel(idx));
+    }
+  }
+
+  if (prio_ch_select & PRIO_CHAN_SEL2) {
+    uint16_t idx = qFromLittleEndian(priority_ch2);
+    if (! ctx.hasChannel(idx)) {
+      logError() << "Cannot link scanlist '" << getName()
+                 << "', priority channel 2 index " << idx << " unknown.";
+      // Ignore error, continue decoding
+    } else {
+      lst->setSecPriorityChannel(ctx.getChannel(idx));
+    }
+  }
+
   for (uint16_t i=0; i<50; i++) {
     if (0xffff == member[i])
       continue;
@@ -803,6 +825,7 @@ D878UVCodeplug::scanlist_t::fromScanListObj(ScanList *lst, Config *config) {
   clear();
 
   setName(lst->name());
+  prio_ch_select = PRIO_CHAN_OFF;
 
   if (lst->priorityChannel()) {
     prio_ch_select |= PRIO_CHAN_SEL1;
