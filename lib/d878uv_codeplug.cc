@@ -641,15 +641,12 @@ D878UVCodeplug::contact_t::setType(DigitalContact::Type type) {
 
 uint32_t
 D878UVCodeplug::contact_t::getId() const {
-  uint32_t tmp = qFromLittleEndian(id);
-  return decode_dmr_id_bcd((const uint8_t *)&tmp);
+  return decode_dmr_id_bcd((const uint8_t *)&id);
 }
 
 void
 D878UVCodeplug::contact_t::setId(uint32_t id) {
-  uint32_t tmp;
-  encode_dmr_id_bcd((uint8_t *)&tmp, id);
-  this->id = qToLittleEndian(tmp);
+  encode_dmr_id_bcd((uint8_t *)&(this->id), id);
 }
 
 bool

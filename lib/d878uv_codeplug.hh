@@ -420,50 +420,56 @@ public:
    */
   struct __attribute__((packed)) contact_t {
     /** Possible call types. */
-    typedef enum {
+    enum CallType : uint8_t {
       CALL_PRIVATE = 0,                 ///< Private call.
       CALL_GROUP = 1,                   ///< Group call.
       CALL_ALL = 2                      ///< All call.
-    } CallType;
+    };
 
     /** Possible ring-tone types. */
-    typedef enum {
+    enum AlertType : uint8_t {
       ALERT_NONE = 0,                   ///< Alert disabled.
       ALERT_RING = 1,                   ///< Ring tone.
       ALERT_ONLINE = 2                  ///< WTF?
-    } AlertType;
+    };
 
     // Byte 0
-    uint8_t type;                       ///< Call Type: Group Call, Private Call or All Call.
+    CallType type;                      ///< Call Type: Group Call, Private Call or All Call.
     // Bytes 1-16
     uint8_t name[16];                   ///< Contact Name max 16 ASCII chars 0-terminated.
     // Bytes 17-34
     uint8_t _unused17[18];              ///< Unused, set to 0.
     // Bytes 35-38
-    uint32_t id;                        ///< Call ID, BCD coded 8 digits, little-endian.
+    uint32_t id;                        ///< Call ID, BCD coded 8 digits, big-endian.
     // Byte 39
-    uint8_t call_alert;                 ///< Call Alert. One of None, Ring, Online Alert.
+    AlertType call_alert;               ///< Call Alert. One of None, Ring, Online Alert.
     // Bytes 40-99
     uint8_t _unused40[60];              ///< Unused, set to 0.
 
     /** Constructs a new and empty contact. */
     contact_t();
+
     /** Clears the contact. */
     void clear();
+
     /** Returns @c true if the contact is valid. */
     bool isValid() const;
+
     /** Retruns the call type. */
     DigitalContact::Type getType() const;
     /** Sets the call type. */
     void setType(DigitalContact::Type type);
+
     /** Returns the name of the contact. */
     QString getName() const;
     /** Sets the name of the contact. */
     void setName(const QString &name);
+
     /** Returns the number of the contact. */
     uint32_t getId() const;
     /** Set the number of the contact. */
     void setId(uint32_t id);
+
     /** Retunrs @c true if a ring-tone is enabled for this contact. */
     bool getAlert() const;
     /** Enables/disables a ring-tone for this contact. */
@@ -481,9 +487,11 @@ public:
    * @verbinclude d878uvanalogcontact.txt
    */
   struct __attribute__((packed)) analog_contact_t {
-    uint8_t number[7];                  ///< Number encoded as BCD little-endian.
+    uint8_t number[7];                  ///< Number encoded as BCD big-endian. Although it can hold
+                                        /// up to 14 digits, more than 8 will crash the manufacturer CPS.
     uint8_t digits;                     ///< Number of digits.
-    uint8_t name[16];                   ///< Name, ASCII, upto 16 chars, 0-terminated & padded.
+    uint8_t name[15];                   ///< Name, ASCII, upto 15 chars, 0-terminated & padded.
+    uint8_t pad47;                      ///< Pad byte set to 0x00.
   };
 
   /** Represents the actual RX group list encoded within the binary code-plug.
@@ -493,17 +501,19 @@ public:
    */
   struct __attribute__((packed)) grouplist_t {
     // Bytes 0-255
-    uint32_t member[64];                ///< Contact indices, 0-based, little-endian.
+    uint32_t member[64];                ///< Contact indices, 0-based, little-endian, empty=0xffffffff.
     // Bytes 256-287
     uint8_t name[16];                   ///< Group-list name, up to 16 x ASCII, 0-terminated.
     uint8_t unused[16];                 ///< Unused, set to 0.
 
     /** Constructs an empty group list. */
     grouplist_t();
+
     /** Clears this group list. */
     void clear();
     /** Returns @c true if the group list is valid. */
     bool isValid() const;
+
     /** Returns the name of the group list. */
     QString getName() const;
     /** Sets the name of the group list. */
@@ -535,7 +545,7 @@ public:
     } PriChannel;
 
     /** Defines all possible reply channel selections. */
-    typedef enum {
+    enum RevertChannel : uint8_t {
       REVCH_SELECTED = 0,               ///< Selected.
       REVCH_SEL_TB = 1,                 ///< Selected + TalkBack.
       REVCH_PRIO_CH1 = 2,               ///< Priority Channel Select 1.
@@ -544,33 +554,21 @@ public:
       REVCH_LAST_USED = 5,              ///< Last Used.
       REVCH_PRIO_CH1_TB = 6,            ///< Priority Channel Select 1 + TalkBack.
       REVCH_PRIO_CH2_TB = 7             ///< Priority Channel Select 2 + TalkBack.
-    } RevertChannel;
+    };
 
-    // Bytes 0x00
     uint8_t _unused0000;                ///< Unused, set to 0.
     uint8_t prio_ch_select;             ///< Priority Channel Select, default = PRIO_CHAN_OFF.
-
-    // Bytes 0x02
     uint16_t priority_ch1;              ///< Priority Channel 1: 0=Current Channel, index+1, little endian, 0xffff=Off.
     uint16_t priority_ch2;              ///< Priority Channel 2: 0=Current Channel, index+1, little endian, 0xffff=Off.
-
-    // Bytes 0x06
     uint16_t look_back_a;               ///< Look Back Time A, sec*10, little endian, default 0x000f.
     uint16_t look_back_b;               ///< Look Back Time B, sec*10, little endian, default 0x0019.
     uint16_t dropout_delay;             ///< Dropout Delay Time, sec*10, little endian, default 0x001d.
     uint16_t dwell;                     ///< Dwell Time, sec*10, little endian, default 0x001d.
-
-    // Byte 0x0d
-    uint8_t revert_channel;             ///< Revert Channel, see @c RevertChannel, default REVCH_SELECTED.
-
-    // Bytes 0xe
+    RevertChannel revert_channel;       ///< Revert Channel, see @c RevertChannel, default REVCH_SELECTED.
     uint8_t name[16];                   ///< Scan List Name, ASCII, 0-terminated.
     uint8_t _pad001e;                   ///< Pad byte, set to 0x00.
-
     // Bytes 0x20
     uint16_t member[50];                ///< Channels indices, 0-based, little endian, 0xffff=empty
-
-    // Bytes 0x84-0x8f
     uint8_t _unused0084[12];            ///< Unused, set to 0.
 
     /** Constructor. */
