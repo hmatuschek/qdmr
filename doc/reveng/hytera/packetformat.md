@@ -38,13 +38,37 @@ several redundant length fields.
   - CRC computed over complete packet
   - Optional content, not present in command request and responses.
   
+### CRC
+The CRC is computed over the complete packet. That is, every 16bits of the packet is 
+interpreted as a little-endian value (except for the CRC field itself) and summed up. 
+For packets of odd length, the last byte is added as a 8bit value. The sum
+is then turned back into 16bit value by adding the upper 16bit to the lower one. 
+That is,
+```c
+ sum = (sum >> 16) + (sum&0xffff);
+```
+As the last sum may cause the value to exceed 16bit again, the operation is repeated.
+The *negated* CRC is then stored as a little-end value.
+
 ### Example
 ```
-7e:01:00:00:20:10:00:00:00:1f:53:a4:02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05
+7e:01:00:00:20:10:00:00:00:1f:53:a4:02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05:e0:03
 ```
 This can then be interpreted as a read request with payload
 ```
 02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05:e0:03
+```
+The CRC is then computed as the sum of all 16bit interpreted as little-endian values 
+except for the crc itself. That is (excluding 0x0000)
+```cpp
+uint32_t crc = 0x017e + 0x1020 + 0x1f00 + 0xc702 + 0x0c01 + 0x0001 + 0x7800 + 0xe005 + 0x03; // 0x25baa
+// turn back to 16bit value
+crc = (crc >> 16) + (crc & 0xffff); // = 0x5bac
+// the last sum may result in a crc > 0xffff, so repeat once more
+crc = (crc >> 16) + (crc & 0xffff);
+// negate 
+crc ^= 0xffff; // = 0xa453
+// in LE 0x53a4
 ```
 
 
@@ -59,7 +83,7 @@ described below.
    +---------+---------+---------+---------+---------+---------+---------+---------+
 00 | 0x02    | ReqType LE        | ReqLen 16b LE     |                          ...
    +---------+---------+---------+---------+---------+---------+---------+---------+
-    ... Payload, variable length                               | CRC LSB | 0x03    |
+    ... Payload, variable length                               | CRC     | 0x03    |
    +---------+---------+---------+---------+---------+---------+---------+---------+
 ```
  - Appears to be fixed to 0x02 for all requests.
@@ -69,6 +93,25 @@ described below.
  - Request payload, variable length. Contains a further layer 2 data for various operations.
  - CRC computed over header and payload
  - Fixed to 0x03
+
+#### Example
+```
+02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05:e0:03
+```
+Here the request type is 0x01c7, request length is 0x000c, CRC is 0xe0 and the payload 
+```
+00:00:00:01:00:00:00:00:00:00:78:05
+```
+The CRC can be computed by first adding all bytes of the request type, length and payload
+(ignoring all 0x00), negate the sum finally add 0x33 
+```cpp
+uint8_t crc = 0xc7+0x01+0x0c+0x01+0x78+0x05; // = 0x52
+// negate
+crc ^= 0xff; // = 0xad
+// add 0x33
+crc += 0x33; // = 0xe0
+```
+
 
 ### Request type field
  The request type field appears to be a 16bit wide bit field encoding several informations about the request and expected response.
@@ -106,15 +149,14 @@ ReqType | Meaning
 
 #### Example
 ```
-53:a4:02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05:e0:03
+02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05:e0:03
 ```
 Means 
-  - CRC is 0x53e0,
-  - Sequence number 0xa4,
-  - Fixed unknown value 0x02
+  - Fixed value 0x02
   - Request type is 0x01c7 -> read code-plug memory
   - Payload length is 0x000c (12)
   - Payload 00:00:00:01:00:00:00:00:00:00:78:05
+  - CRC is 0xe0
   - End of packet flag 0x03
 
 
@@ -190,7 +232,7 @@ may return data of different length.
 ### Request (ReqType=0x01C5) 
 The request is much longer that all other read requests, but contains only 0x00.
 
-The *what* field in layer 1 is set to 0xc5, the unknown field is set to 0x01. The payload is simply
+The *what* field in layer 1 is set to 0x01c5. The payload is simply
 17 times 0x00.
 
 ```
