@@ -11,14 +11,14 @@ several redundant length fields.
    +---------+---------+---------+---------+---------+---------+---------+---------+
 00 | 0x7e    | Type    |  0x00   | Flags?  | Source  | Dest.   |  Resp. Count      |
    +---------+---------+---------+---------+---------+---------+---------+---------+
-08 | TLen., 16bit, BE  | CRC               | Payload, variable length           ...
+08 | TLen., 16bit, BE  | CRC, LE           | Payload, variable length           ...
    +---------+---------+---------+---------+---------+---------+---------+---------+
     ...                                                                            |
    +---------+---------+---------+---------+---------+---------+---------+---------+
 ```
   - Preamble: Fixed to 0x7e (binary 01111110).
   - Packet type:
-    - 00 -> Command
+    - 00 -> Command (no payload)
     - 01 -> Request
     - 04 -> Response/Success
   - Byte 3 appears to be reserved or part of the next byte (flags). Only observed as 0x00.
@@ -35,7 +35,7 @@ several redundant length fields.
     - Only set on responses, incrementing by 1 for each response.
     - 0x0000 on requests.
   - Total length of packet including headers etc. 16bit big endian.
-  - CRC computed over complete packet
+  - CRC computed over complete packet, LE
   - Optional content, not present in command request and responses.
   
 ### CRC

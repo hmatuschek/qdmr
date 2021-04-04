@@ -1,6 +1,23 @@
+""" Module implementing the assembly and disassembly/parsing of Hytera packets. 
+
+The most important class here is Packet. This class provides static methods to 
+assemble and parse *any* packets used in the communication with the Hytera devices. 
+
+>>> from packet import Packet
+>>> p = Packet.enterProgramMode()
+>>> print(Packet.unpack(p.pack()))
+> CMD: flags=FE, src=20, dest=10, seq=0000, crc=E560 (OK)
+>>> # send p.pack(), receive response into data
+>>> r = Packet.unpack(data)
+>>> # inspect packet if you want to
+>>> print(r)
+< RES: flags=FD, src=10, dest=20, seq=0000, crc=D270 (OK)
+"""
+
 import struct 
 
 def hexDump(s, prefix="", addr=0):
+  """ Utility function to hex-dump binary data. """
   N = len(s)
   Nb = N//16
   if (N%16): Nb += 1
@@ -24,6 +41,10 @@ def hexDump(s, prefix="", addr=0):
 
 
 class Packet:
+  """Represents a packet send to or received from the device. 
+  
+  Use the static methods enterProgramMode(), readCodeplug(), writeCodeplug() and reboot() to assemble 
+  request packets or unpack to parse received packets. """
   CMD = 0x00
   REQ = 0x01
   RES = 0x04
@@ -31,7 +52,24 @@ class Packet:
   DEVICE = 0x10
   HOST   = 0x20
 
+  FLAGS_DEFAULT      = 0x00
+  FLAGS_CMD_PRG_MODE = 0xfe
+  FLAGS_RES_PRG_MODE = 0xfd
+
   def __init__(self, ptype, flags, src, dest, seq, content, crc=0):
+    """ Contstructs a new packet.
+
+    To construct a packet to send to the device, consider using one of the static helper methods.
+
+    Args:
+      ptype (int): Specifies the packet type. One of CMD, REQ or RES.
+      flags (int): Specifies additional flags (only used for ptype=CMD). One of FLAGS_DEFAULT, FLAGS_CMD_PRG_MODE or FLAGS_RES_PRG_MODE.
+      src (int): Specifies the packet source (usually HOST). One of HOST or DEVICE.
+      dest (int): Specifies the packet destination (usually DEVICE). One of HOST or DEVICE.
+      seq (int): Response sequence number. This is set to 0 for all requests. Every response will increase this counter by one.
+      content (Object): The packet content. An instance of either EmptyContent, UnknownData or Request
+      crc (int): Optional CRC value for the packet. Will be recomputed when calling pack().
+    """
     self._type    = ptype
     self._flags   = flags
     self._src     = src
@@ -41,19 +79,21 @@ class Packet:
     self._content = content
 
   def pack(self):
+    """ Packs the packet into a bytes object. """
     payload = self._content.pack()
     tlength = 12 + len(payload)
     crc = 0
-    header = struct.pack(">BBBBBBHH", 0x7e, self._type, 0x00, self._flags, self._src, self._dest, tlength, self._seq)
+    header = struct.pack(">BBBBBBHH", 0x7e, self._type, 0x00, self._flags, self._src, self._dest, self._seq, tlength)
     header += struct.pack("<H", crc)
     crc = self.crc(header + payload)
     # repack header with correct crc
-    header = struct.pack(">BBBBBBHH", 0x7e, self._type, 0x00, self._flags, self._src, self._dest, tlength, self._seq)
+    header = struct.pack(">BBBBBBHH", 0x7e, self._type, 0x00, self._flags, self._src, self._dest, self._seq, tlength)
     header += struct.pack("<H", crc)
     return header + payload
 
   @staticmethod
   def unpack(data):
+    """ Unpacks the given bytes string. """ 
     f1, ptype, f2, flags, src, dest, seq, tlength = struct.unpack(">BBBBBBHH", data[:10])
     (crc,) = struct.unpack("<H", data[10:12])
     payload = data[12:]
@@ -61,12 +101,13 @@ class Packet:
     assert (0x00 == f2) 
     assert (tlength==len(data))
     if (Packet.CMD == ptype) or ((Packet.RES==ptype) and (0x00 != flags)):
-      return Packet(ptype, flags, src, dest, seq, UnknownData.unpack(payload), crc)
+      return Packet(ptype, flags, src, dest, seq, EmptyContent(), crc)
     elif (Packet.REQ==ptype) or ((Packet.RES == ptype) and (0x00 == flags)):
       return Packet(ptype, flags, src, dest, seq, Request.unpack(payload), crc)
 
   @staticmethod
   def crc(packet):
+    """ Computes the CRC over the given packed packet. """
     s = 0
     for i in range(5):
       s += struct.unpack("<H", packet[(2*i):(2*(i+1))])[0]
@@ -79,12 +120,17 @@ class Packet:
     return s^0xffff
 
   def __str__(self):
+    """ Returns a string representation of the packet. """
     return self.dump()    
 
   def __len__(self):
+    """ Returns the length of the packed packet. """
     return 12+len(self._content)
 
   def dump(self, prefix=""):
+    """ Returns a string representation of the packet. 
+    
+    Each line is prefixed with the given prefix."""
     s = prefix
     if (Packet.CMD == self._type): 
       s += "> CMD: "
@@ -101,9 +147,80 @@ class Packet:
     s += "flags={:02X}, src={:02X}, dest={:02X}, seq={:04X}, crc={}\n".format(self._flags, self._src, self._dest, self._seq, crc_fmt)
     return s + self._content.dump(prefix + "     | ")
 
-    
+  @staticmethod
+  def enterProgramMode():
+    """ Assembles a command request to the radio to enter program mode. """
+    return Packet(Packet.CMD, Packet.FLAGS_CMD_PRG_MODE, Packet.HOST, Packet.DEVICE, 0, EmptyContent())
+  
+  @staticmethod
+  def getRadioID():
+    """ Assembles a request for the radio to identify itself. """
+    return Packet(Packet.REQ, Packet.FLAGS_DEFAULT, Packet.HOST, Packet.DEVICE, 0, 
+      Request(Request.GET_RADIO_ID, 
+        GetStringRequest(0x00)))
+
+  @staticmethod
+  def getVersion():
+    """ Assembles a version string request. """
+    return Packet(Packet.REQ, Packet.FLAGS_DEFAULT, Packet.HOST, Packet.DEVICE, 0, 
+      Request(Request.GET_VERSION, 
+        GetStringRequest(0x00)))
+
+  @staticmethod
+  def readCodeplug(addr, length):
+    """ Assembles a read codeplug memory request for the given memory address and length to read. """
+    return Packet(Packet.REQ, Packet.FLAGS_DEFAULT, Packet.HOST, Packet.DEVICE, 0, 
+      Request(Request.READ_CODEPLUG, 
+        ReadCodeplugRequest(addr, length)))
+
+  @staticmethod
+  def writeCodeplug(addr, payload):
+    """ Assembles a write request to the codeplug memory at the specified address and writing the given payload. """
+    return Packet(Packet.REQ, Packet.FLAGS_DEFAULT, Packet.HOST, Packet.DEVICE, 0, 
+      Request(Request.WRITE_CODEPLUG, 
+        WriteCodeplugRequest(addr, payload)))
+
+  @staticmethod
+  def reboot():
+    """ Assembles a request to the radio to reboot (and write codeplug to device). """
+    return Packet(Packet.REQ, Packet.FLAGS_DEFAULT, Packet.HOST, Packet.DEVICE, 0, 
+      Request(Request.REBOOT, 
+        RebootRequest()))
+
+
+
+class EmptyContent: 
+  """ Tiny helper class to represent some empty packet/request content. """
+  def __init__(self):
+    pass
+
+  def pack(self):
+    return b""
+
+  @staticmethod
+  def unpack(data):
+    assert(0 == len(data))
+    return EmptyContent()
+
+  def __str__(self):
+    return ""
+
+  def __len__(self):
+    return 0
+
+  def dump(self, prefix=""):
+    return ""
+
+
+
 class UnknownData:
+  """ Helper class representing some raw data. This can be used to represent some unknown raw packet content. """
   def __init__(self, data):
+    """ Constructor.
+
+    Args:
+      data (bytes): The raw data. 
+    """
     self._data = data
 
   def pack(self):
@@ -125,8 +242,10 @@ class UnknownData:
     return s
     
 
+
 class Request:
   REQUEST_RESPONSE = 0x8000
+  REBOOT           = 0x01c6
   READ_CODEPLUG    = 0x01c7
   WRITE_CODEPLUG   = 0x01c8
   GET_VERSION      = 0x0201
@@ -165,6 +284,10 @@ class Request:
       return Request(rtype, GetStringRequest.unpack(payload), crc)
     elif ((Request.GET_RADIO_ID | Request.REQUEST_RESPONSE) == rtype) or ((Request.GET_VERSION | Request.REQUEST_RESPONSE) == rtype):
       return Request(rtype, GetStringResponse.unpack(payload), crc)
+    elif Request.REBOOT == rtype:
+      return Request(rtype, RebootRequest.unpack(payload), crc)
+    elif (Request.REBOOT | Request.REQUEST_RESPONSE) == rtype:
+      return Request(rtype, RebootResponse.unpack(payload), crc)
     else: 
       return Request(rtype, UnknownData(payload), crc)
 
@@ -197,6 +320,7 @@ class Request:
     return s + self._content.dump(prefix + "   | ")
 
 
+
 class ReadCodeplugRequest:
   def __init__(self, addr, length):
     self._addr = addr 
@@ -222,6 +346,7 @@ class ReadCodeplugRequest:
     s  = prefix
     s += "RD: addr={:08X} len={:04X}\n".format(self._addr, self._length)
     return s
+
 
 
 class ReadCodeplugResponse:
@@ -254,6 +379,7 @@ class ReadCodeplugResponse:
     return s + hexDump(self._payload, prefix+"  | ", self._addr)
 
 
+
 class WriteCodeplugRequest:
   def __init__(self, addr, payload):
     self._addr = addr 
@@ -282,6 +408,7 @@ class WriteCodeplugRequest:
     s  = prefix
     s += "WR: addr={:08X}\n".format(self._addr)
     return s + hexDump(self._payload, prefix+"  | ", self._addr)
+
 
 
 class WriteCodeplugResponse:
@@ -313,6 +440,10 @@ class WriteCodeplugResponse:
 
 
 class GetStringRequest:
+  RADIO_ID = 0x00
+  UNKNOWN_1 = 0x12
+  UNKNOWN_2 = 0x09
+
   def __init__(self, what):
     self._what = what
 
@@ -359,3 +490,66 @@ class GetStringResponse:
 
   def dump(self, prefix=""):
     return prefix + "STR: what={:02X}, ukn1={:02X}\n".format(self._what, self._ukn1) + prefix + "   | " + self._string 
+
+
+class RebootRequest: 
+  def __init__(self, ukn1=0x00):
+    self._ukn1 = ukn1
+
+  def pack(self):
+    return struct.pack("B", self._ukn1)
+
+  @staticmethod
+  def unpack(data):
+    assert(1 == len(data))
+    ukn1, = struct.unpack("B", data)
+    return RebootRequest(ukn1)
+
+  def __str__(self):
+    return self.dump()
+
+  def __len__(self):
+    return 1
+
+  def dump(self, prefix=""):
+    return prefix + "REBOOT: ukn1={:02X}".format(self._ukn1)
+
+class RebootResponse: 
+  def __init__(self, ukn1=0x00):
+    self._ukn1 = ukn1
+
+  def pack(self):
+    return struct.pack("B", self._ukn1)
+
+  @staticmethod
+  def unpack(data):
+    assert(1 == len(data))
+    ukn1, = struct.unpack("B", data)
+    return RebootRequest(ukn1)
+
+  def __str__(self):
+    return self.dump()
+
+  def __len__(self):
+    return 1
+
+  def dump(self, prefix=""):
+    return prefix + "REBOOT: ukn1={:02X}".format(self._ukn1)
+
+
+if "__main__" == __name__:
+  # Example script
+
+  # "enter program mode" request and disassembly
+  print(hexDump(Packet.enterProgramMode().pack()))
+  print(Packet.unpack(Packet.enterProgramMode().pack()))
+  # ID radio request an disassembly
+  print(hexDump(Packet.getRadioID().pack()))
+  print(Packet.unpack(Packet.getRadioID().pack()))
+  # Read some data request and disassembly
+  print(hexDump(Packet.readCodeplug(0x00000000, 0x100).pack()))
+  print(Packet.unpack(Packet.readCodeplug(0x00000000, 0x100).pack()))
+  # reboot radio request and disassembly
+  print(hexDump(Packet.reboot().pack()))
+  print(Packet.unpack(Packet.reboot().pack()))
+  
