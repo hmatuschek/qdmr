@@ -31,37 +31,58 @@ class Packet:
   DEVICE = 0x10
   HOST   = 0x20
 
-  def __init__(self, ptype, flags, src, dest, seq, content):
+  def __init__(self, ptype, flags, src, dest, seq, content, crc=0):
     self._type    = ptype
     self._flags   = flags
     self._src     = src
     self._dest    = dest 
     self._seq     = seq
+    self._crc     = crc
     self._content = content
 
   def pack(self):
     payload = self._content.pack()
-    tlength = 10 + len(payload)
+    tlength = 12 + len(payload)
+    crc = 0
     header = struct.pack(">BBBBBBHH", 0x7e, self._type, 0x00, self._flags, self._src, self._dest, tlength, self._seq)
-    return header + payload 
+    header += struct.pack("<H", crc)
+    crc = self.crc(header + payload)
+    # repack header with correct crc
+    header = struct.pack(">BBBBBBHH", 0x7e, self._type, 0x00, self._flags, self._src, self._dest, tlength, self._seq)
+    header += struct.pack("<H", crc)
+    return header + payload
 
   @staticmethod
   def unpack(data):
     f1, ptype, f2, flags, src, dest, seq, tlength = struct.unpack(">BBBBBBHH", data[:10])
-    payload = data[10:]
+    (crc,) = struct.unpack("<H", data[10:12])
+    payload = data[12:]
     assert (0x7e == f1) 
     assert (0x00 == f2) 
     assert (tlength==len(data))
     if (Packet.CMD == ptype) or ((Packet.RES==ptype) and (0x00 != flags)):
-      return Packet(ptype, flags, src, dest, seq, UnknownData.unpack(payload))
+      return Packet(ptype, flags, src, dest, seq, UnknownData.unpack(payload), crc)
     elif (Packet.REQ==ptype) or ((Packet.RES == ptype) and (0x00 == flags)):
-      return Packet(ptype, flags, src, dest, seq, Request.unpack(payload))
+      return Packet(ptype, flags, src, dest, seq, Request.unpack(payload), crc)
+
+  @staticmethod
+  def crc(packet):
+    s = 0
+    for i in range(5):
+      s += struct.unpack("<H", packet[(2*i):(2*(i+1))])[0]
+    for i in range(6,len(packet)//2):
+      s += struct.unpack("<H", packet[(2*i):(2*(i+1))])[0]
+    if len(packet)%2:
+      s += packet[-1]
+    while s > 0xffff:
+      s = (s>>16) + (s&0xffff)
+    return s^0xffff
 
   def __str__(self):
     return self.dump()    
 
   def __len__(self):
-    return 10+len(self._content)
+    return 12+len(self._content)
 
   def dump(self, prefix=""):
     s = prefix
@@ -71,7 +92,13 @@ class Packet:
       s += "> REQ: "
     elif (Packet.RES == self._type):
       s += "< RES: "
-    s += "flags={:02X}, src={:02X}, dest={:02X}, seq={:04X}\n".format(self._flags, self._src, self._dest, self._seq)
+    crc_fmt = "{:04X}".format(self._crc)
+    crc_comp = self.crc(self.pack())
+    if self._crc == crc_comp:
+      crc_fmt += " (OK)"
+    else:
+      crc_fmt += " (ERR: \x1b[1;31m{:02X}\x1b[0m)".format(crc_comp)
+    s += "flags={:02X}, src={:02X}, dest={:02X}, seq={:04X}, crc={}\n".format(self._flags, self._src, self._dest, self._seq, crc_fmt)
     return s + self._content.dump(prefix + "     | ")
 
     
@@ -105,57 +132,55 @@ class Request:
   GET_VERSION      = 0x0201
   GET_RADIO_ID     = 0x0203
 
-  def __init__(self, seq, rtype, content, crc=None):
+  def __init__(self, rtype, content, crc=None):
     self._crc = crc
-    self._seq = seq
     self._rtype = rtype
     self._content = content 
 
-  def computeCRC(self):
-    payload = self._content.pack()
-    crc = 0x5ec3 - (0x0200+self._seq) - self._rtype
-    #crc = 0x5ECF - (0x0200+self._seq) - len(payload) - self._rtype
-    if Request.REQUEST_RESPONSE & self._rtype:
-      crc += -len(payload) #self._seq #+  Request.REQUEST_RESPONSE
-    for i in range(len(payload)//2):
-      crc -= struct.unpack("<H",payload[(2*i):(2*(i+1))])[0]
-    return crc % 0xffff
-
   def pack(self):
+    crc = 0
     payload = self._content.pack()
-    self._crc = self.computeCRC()
-    header = struct.pack("BBBHH", self._crc>>8, self._seq, 0x02, self._rtype, len(payload))
-    footer = struct.pack("BB", self._crc&0xff, 0x03)
+    header = struct.pack("<BHH", 0x02, self._rtype, len(payload))
+    footer = struct.pack("BB", crc, 0x03)
+    crc = self.crc(header + payload + footer)
+    footer = struct.pack("BB", crc, 0x03)
     return header + payload + footer
 
   @staticmethod
   def unpack(data):
-    crc_msb, seq, f1, rtype, plen = struct.unpack("<BBBHH", data[:7])
-    crc_lsb, f2 = struct.unpack("BB", data[-2:])
-    crc   = (crc_msb<<8)|crc_lsb
-    payload = data[7:-2]
-    assert (0x02 == f1) and (0x03==f2) and (plen==(len(data)-9))
+    f1, rtype, plen = struct.unpack("<BHH", data[:5])
+    crc, f2 = struct.unpack("BB", data[-2:])
+    payload = data[5:-2]
+    assert (0x02 == f1) and (0x03==f2) and (plen==(len(data)-7))
     # assert (crc == self.computeCRC())
     if Request.READ_CODEPLUG == rtype:
-      return Request(seq, rtype, ReadCodeplugRequest.unpack(payload), crc)
+      return Request(rtype, ReadCodeplugRequest.unpack(payload), crc)
     elif (Request.READ_CODEPLUG | Request.REQUEST_RESPONSE) == rtype:
-      return Request(seq, rtype, ReadCodeplugResponse.unpack(payload), crc)
+      return Request(rtype, ReadCodeplugResponse.unpack(payload), crc)
     elif Request.WRITE_CODEPLUG == rtype:
-      return Request(seq, rtype, WriteCodeplugRequest.unpack(payload), crc)
+      return Request(rtype, WriteCodeplugRequest.unpack(payload), crc)
     elif (Request.WRITE_CODEPLUG | Request.REQUEST_RESPONSE) == rtype:
-      return Request(seq, rtype, WriteCodeplugResponse.unpack(payload), crc)
+      return Request(rtype, WriteCodeplugResponse.unpack(payload), crc)
     elif (Request.GET_RADIO_ID == rtype) or (Request.GET_VERSION == rtype):
-      return Request(seq, rtype, GetStringRequest.unpack(payload), crc)
+      return Request(rtype, GetStringRequest.unpack(payload), crc)
     elif ((Request.GET_RADIO_ID | Request.REQUEST_RESPONSE) == rtype) or ((Request.GET_VERSION | Request.REQUEST_RESPONSE) == rtype):
-      return Request(seq, rtype, GetStringResponse.unpack(payload), crc)
+      return Request(rtype, GetStringResponse.unpack(payload), crc)
     else: 
-      return Request(seq, rtype, UnknownData(payload), crc)
+      return Request(rtype, UnknownData(payload), crc)
 
+  @staticmethod
+  def crc(packet):
+    s = 0
+    for i in range(1,len(packet)-2):
+      s += packet[i]
+    s = ((~s)+0x33)&0xff  
+    return s
+    
   def __str__(self):
     return self.dump()    
 
   def __len__(self):
-    return 9 + len(self._content)
+    return 7 + len(self._content)
 
   def dump(self, prefix=""):
     s  = prefix
@@ -164,11 +189,11 @@ class Request:
     else:
       s += "REQ: "
     crc_note = "OK"
-    crc_comp = self.computeCRC()
+    crc_comp = self.crc(self.pack())
     if self._crc != crc_comp:
-      crc_note = "\x1b[1;31m{:04X}\x1b[0m".format(crc_comp)
-    s += "type={:04X} seq={:02X} crc={:04X} ({})\n".format(
-      self._rtype, self._seq, self._crc, crc_note)
+      crc_note = "\x1b[1;31m{:02X}\x1b[0m".format(crc_comp)
+    s += "type={:04X} crc={:02X} ({})\n".format(
+      self._rtype, self._crc, crc_note)
     return s + self._content.dump(prefix + "   | ")
 
 

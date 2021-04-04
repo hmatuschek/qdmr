@@ -9,9 +9,9 @@ several redundant length fields.
 ```
     0         1         2         3         4         5         6         7 
    +---------+---------+---------+---------+---------+---------+---------+---------+
-00 | Preamb  | Type    |  0x00   | Flags?  | Source  | Dest.   |  Resp. Count      |
+00 | 0x7e    | Type    |  0x00   | Flags?  | Source  | Dest.   |  Resp. Count      |
    +---------+---------+---------+---------+---------+---------+---------+---------+
-08 | TLen., 16bit, BE  | Payload, variable length                               ...
+08 | TLen., 16bit, BE  | CRC               | Payload, variable length           ...
    +---------+---------+---------+---------+---------+---------+---------+---------+
     ...                                                                            |
    +---------+---------+---------+---------+---------+---------+---------+---------+
@@ -35,6 +35,7 @@ several redundant length fields.
     - Only set on responses, incrementing by 1 for each response.
     - 0x0000 on requests.
   - Total length of packet including headers etc. 16bit big endian.
+  - CRC computed over complete packet
   - Optional content, not present in command request and responses.
   
 ### Example
@@ -43,7 +44,7 @@ several redundant length fields.
 ```
 This can then be interpreted as a read request with payload
 ```
-53:a4:02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05:e0:03
+02:c7:01:0c:00:00:00:00:01:00:00:00:00:00:00:78:05:e0:03
 ```
 
 
@@ -56,19 +57,17 @@ described below.
 ### Request & Response
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
-00 | MSB CRC | Count?  | 0x02    | ReqType LE        | ReqLen 16b LE     |      ...
+00 | 0x02    | ReqType LE        | ReqLen 16b LE     |                          ...
    +---------+---------+---------+---------+---------+---------+---------+---------+
     ... Payload, variable length                               | CRC LSB | 0x03    |
    +---------+---------+---------+---------+---------+---------+---------+---------+
 ```
- - MSB of CRC.
- - Some weird counter, appears to increment by some amount from request to request.
  - Appears to be fixed to 0x02 for all requests.
  - Request type (Device identifier, firmware version, code-plug?). This value gets 
-   repeated in the response, except for bit 0 being set. See below.
+   repeated in the response, except for bit 8 being set. See below.
  - Request payload length (aka layer 2). 16bit little-endian integer.
  - Request payload, variable length. Contains a further layer 2 data for various operations.
- - LSB of CRC
+ - CRC computed over header and payload
  - Fixed to 0x03
 
 ### Request type field
