@@ -100,7 +100,7 @@ class Packet:
     assert (0x7e == f1) 
     assert (0x00 == f2) 
     assert (tlength==len(data))
-    if (Packet.CMD == ptype) or ((Packet.RES==ptype) and (0x00 != flags)):
+    if (Packet.CMD == ptype) or ((Packet.RES == ptype) and (0x00 != flags)):
       return Packet(ptype, flags, src, dest, seq, EmptyContent(), crc)
     elif (Packet.REQ==ptype) or ((Packet.RES == ptype) and (0x00 == flags)):
       return Packet(ptype, flags, src, dest, seq, Request.unpack(payload), crc)
@@ -165,6 +165,14 @@ class Packet:
     return Packet(Packet.REQ, Packet.FLAGS_DEFAULT, Packet.HOST, Packet.DEVICE, 0, 
       Request(Request.GET_VERSION, 
         GetStringRequest(0x00)))
+
+  @staticmethod 
+  def readUnknownRadioInfo():
+    """ This request, or better its response is not yet understood. 
+    
+    The request type is 0x01c5 and the payload is just 17 x 0x00. """
+    return Packet(Packet.REQ, Packet.FLAGS_DEFAULT, Packet.HOST, Packet.DEVICE, 0,
+      Request(Request.UNKNOWN_INFO, ReadRadioInfoRequest()))
 
   @staticmethod
   def readCodeplug(addr, length):
@@ -237,7 +245,7 @@ class UnknownData:
     return len(self._data)
 
   def dump(self, prefix=""):
-    s = prefix + "Raw data len={}\n".format(len(self))
+    s = prefix + "Raw data len={:04X}\n".format(len(self))
     s += hexDump(self._data, prefix)
     return s
     
@@ -245,6 +253,7 @@ class UnknownData:
 
 class Request:
   REQUEST_RESPONSE = 0x8000
+  UNKNOWN_INFO     = 0x01c5
   REBOOT           = 0x01c6
   READ_CODEPLUG    = 0x01c7
   WRITE_CODEPLUG   = 0x01c8
@@ -288,6 +297,10 @@ class Request:
       return Request(rtype, RebootRequest.unpack(payload), crc)
     elif (Request.REBOOT | Request.REQUEST_RESPONSE) == rtype:
       return Request(rtype, RebootResponse.unpack(payload), crc)
+    elif Request.UNKNOWN_INFO == rtype:
+      return Request(rtype, ReadRadioInfoRequest.unpack(payload), crc)
+    elif (Request.UNKNOWN_INFO | Request.REQUEST_RESPONSE) == rtype:
+      return Request(rtype, ReadRadioInfoResponse.unpack(payload), crc)
     else: 
       return Request(rtype, UnknownData(payload), crc)
 
@@ -480,7 +493,7 @@ class GetStringResponse:
   def unpack(data):
     ukn1,f2,f3,f4,what,f6,f7,f8 = struct.unpack("BBBBBBBB",data[:8])
     assert (0==f2) and (0==f3) and (0==f4) and (0==f6) and (0==f7) and (0==f8)
-    return GetStringResponse(ukn1, what,data[8:].decode("utf_16_le").replace("\u0000",""))
+    return GetStringResponse(ukn1, what,data[8:].decode("utf_16_le"))
   
   def __str__(self):
     return self.dump()
@@ -489,7 +502,9 @@ class GetStringResponse:
     return 8+32
 
   def dump(self, prefix=""):
-    return prefix + "STR: what={:02X}, ukn1={:02X}\n".format(self._what, self._ukn1) + prefix + "   | " + self._string 
+    res  = prefix + "STR: what={:02X}, ukn1={:02X}, len={:04X}\n".format(self._what, self._ukn1, len(self._string))
+    res += prefix + "   | " + self._string.replace("\u0000","")
+    return res  
 
 
 class RebootRequest: 
@@ -514,6 +529,7 @@ class RebootRequest:
   def dump(self, prefix=""):
     return prefix + "REBOOT: ukn1={:02X}".format(self._ukn1)
 
+
 class RebootResponse: 
   def __init__(self, ukn1=0x00):
     self._ukn1 = ukn1
@@ -537,19 +553,76 @@ class RebootResponse:
     return prefix + "REBOOT: ukn1={:02X}".format(self._ukn1)
 
 
+class ReadRadioInfoRequest: 
+  def __init__(self, ukn1=0x00):
+    self._ukn1 = ukn1
+
+  def pack(self):
+    return struct.pack("BBBBBBBBBBBBBBBBB", self._ukn1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+
+  @staticmethod
+  def unpack(data):
+    ukn1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17 = struct.unpack("BBBBBBBBBBBBBBBBB", data)
+    return ReadRadioInfoRequest(ukn1)
+
+  def __str__(self):
+    return self.dump()
+
+  def __len__(self):
+    return 17
+
+  def dump(self, prefix=""):
+    return prefix + "RD INFO: ukn1={:02X}".format(self._ukn1)
+
+
+class ReadRadioInfoResponse: 
+  def __init__(self, payload, ukn1=0x00):
+    self._payload = payload
+    self._ukn1 = ukn1
+
+  def pack(self):
+    payload = self._payload.pack()
+    header = struct.pack("<BBH", 0, self._ukn1, len(payload))
+    return header+payload
+
+  @staticmethod
+  def unpack(data):
+    f1, ukn1, length = struct.unpack("<BBH", data[:4])
+    return ReadRadioInfoResponse(UnknownData.unpack(data[4:]), ukn1)
+
+  def __str__(self):
+    return self.dump()
+
+  def __len__(self):
+    return 4+len(self._payload)
+
+  def dump(self, prefix=""):
+    res  = prefix + "RD INFO: ukn1={:02X}, len={:04X}\n".format(self._ukn1, len(self._payload))
+    res += self._payload.dump(prefix+"   | ")
+    return res
+
+
+
 if "__main__" == __name__:
   # Example script
 
   # "enter program mode" request and disassembly
   print(hexDump(Packet.enterProgramMode().pack()))
   print(Packet.unpack(Packet.enterProgramMode().pack()))
+  print()
   # ID radio request an disassembly
   print(hexDump(Packet.getRadioID().pack()))
   print(Packet.unpack(Packet.getRadioID().pack()))
+  print()
+  # Read some unknown radio info
+  print(hexDump(Packet.readUnknownRadioInfo().pack()))
+  print(Packet.unpack(Packet.readUnknownRadioInfo().pack()))
+  print()
   # Read some data request and disassembly
   print(hexDump(Packet.readCodeplug(0x00000000, 0x100).pack()))
   print(Packet.unpack(Packet.readCodeplug(0x00000000, 0x100).pack()))
+  print()
   # reboot radio request and disassembly
   print(hexDump(Packet.reboot().pack()))
   print(Packet.unpack(Packet.reboot().pack()))
-  
+  print()

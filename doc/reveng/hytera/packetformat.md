@@ -232,8 +232,8 @@ may return data of different length.
 ### Request (ReqType=0x01C5) 
 The request is much longer that all other read requests, but contains only 0x00.
 
-The *what* field in layer 1 is set to 0x01c5. The payload is simply
-17 times 0x00.
+The *what* field in layer 1 is set to 0x01c5. The payload is mostly
+17 0x00.
 
 ```
    +---------+---------+---------+---------+---------+---------+---------+---------+
@@ -245,7 +245,7 @@ The *what* field in layer 1 is set to 0x01c5. The payload is simply
 - Unknown code byte. Seen 0x00 in code-plug read and 0x02 in code-plug write. Code does not affect
   response. 
 
-### Response (ReqType=0xC581)
+### Response (ReqType=0x81C5)
 The response is then pretty simple but appears to have a length field. The content consists of
 several ASCII strings and some few unknown data fields.
 ```
