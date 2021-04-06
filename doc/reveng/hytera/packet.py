@@ -196,6 +196,78 @@ class Packet:
         RebootRequest()))
 
 
+class FirmwarePacket:
+  """Represents a firmware packet send to or received from the device."""
+
+  def __init__(self, ptype, content, crc=0):
+    """ Contstructs a new packet.
+
+    To construct a packet to send to the device, consider using one of the static helper methods.
+
+    Args:
+      ptype (int): Specifies the packet type, a 16-bit LE value who's function is unknown
+      content (Object): The packet content. An instance of Request.
+      crc (int): Optional CRC value for the packet. Will be recomputed when calling pack().
+    """
+    self._type    = ptype
+    self._crc     = crc
+    self._content = content
+
+  def pack(self):
+    """ Packs the packet into a bytes object. """
+    payload = self._content.pack()
+    tlength = 4 + len(payload)
+    crc = 0
+    header = struct.pack("<HH", self._type, crc)
+    crc = self.crc(header + payload)
+    # repack header with correct crc
+    header = struct.pack("<HH", self._type, crc)
+    return header + payload
+
+  @staticmethod
+  def unpack(data):
+    """ Unpacks the given bytes string. """
+    ptype, crc = struct.unpack("<HH", data[:4])
+    payload = data[4:]
+    return FirmwarePacket(ptype, Request.unpack(payload, True), crc)
+
+  @staticmethod
+  def crc(packet):
+    """ Computes the CRC over the given packed packet. """
+    s = 0
+    for i in range(1):
+      s += struct.unpack("<H", packet[(2*i):(2*(i+1))])[0]
+    for i in range(2,len(packet)//2):
+      s += struct.unpack("<H", packet[(2*i):(2*(i+1))])[0]
+    if len(packet)%2:
+      s += packet[-1]
+    while s > 0xffff:
+      s = (s>>16) + (s&0xffff)
+    return s^0xffff
+
+  def __str__(self):
+    """ Returns a string representation of the packet. """
+    return self.dump()
+
+  def __len__(self):
+    """ Returns the length of the packed packet. """
+    return 4+len(self._content)
+
+  def dump(self, prefix=""):
+    """ Returns a string representation of the packet.
+
+    Each line is prefixed with the given prefix."""
+    s = prefix
+    s += "FW: type={:04X}".format(self._type)
+    crc_fmt = "{:04X}".format(self._crc)
+    crc_comp = self.crc(self.pack())
+    if self._crc == crc_comp:
+      crc_fmt += " (OK)"
+    else:
+      crc_fmt += " (ERR: \x1b[1;31m{:02X}\x1b[0m diff:{:05X})".format(crc_comp, self._crc - crc_comp)
+    s += " crc={}\n".format(crc_fmt)
+    return s + self._content.dump(prefix + "     | ")
+
 
 class EmptyContent: 
   """ Tiny helper class to represent some empty packet/request content. """
@@ -253,6 +325,7 @@ class UnknownData:
 
 class Request:
   REQUEST_RESPONSE = 0x8000
+  FW_READ_CODEPLUG = 0x01c2
   UNKNOWN_INFO     = 0x01c5
   REBOOT           = 0x01c6
   READ_CODEPLUG    = 0x01c7
@@ -263,7 +336,7 @@ class Request:
   def __init__(self, rtype, content, crc=None):
     self._crc = crc
     self._rtype = rtype
-    self._content = content 
+    self._content = content
 
   def pack(self):
     crc = 0
@@ -275,12 +348,22 @@ class Request:
     return header + payload + footer
 
   @staticmethod
-  def unpack(data):
+  def unpack(data, isFirmware=False):
     f1, rtype, plen = struct.unpack("<BHH", data[:5])
     crc, f2 = struct.unpack("BB", data[-2:])
     payload = data[5:-2]
     assert (0x02 == f1) and (0x03==f2) and (plen==(len(data)-7))
     # assert (crc == self.computeCRC())
+
+    # Firmware request unpacking
+    if isFirmware:
+      if Request.FW_READ_CODEPLUG == rtype:
+        return Request(rtype, FwReadCodeplugRequest.unpack(payload), crc)
+      elif (Request.FW_READ_CODEPLUG | Request.REQUEST_RESPONSE) == rtype:
+        return Request(rtype, FwReadCodeplugResponse.unpack(payload), crc)
+      else:
+        return Request(rtype,UnknownData(payload), crc)
+
     if Request.READ_CODEPLUG == rtype:
       return Request(rtype, ReadCodeplugRequest.unpack(payload), crc)
     elif (Request.READ_CODEPLUG | Request.REQUEST_RESPONSE) == rtype:
@@ -361,6 +444,30 @@ class ReadCodeplugRequest:
     return s
 
 
+class FwReadCodeplugRequest:
+  def __init__(self, rtype, addr, length):
+    self._rtype = rtype
+    self._addr = addr
+    self._length = length
+
+  def pack(self):
+    return struct.pack('<BIH', self._rtype, self._addr, self._length)
+
+  @staticmethod
+  def unpack(data):
+    rtype, addr, length = struct.unpack('<BIH',  data)
+    return FwReadCodeplugRequest(rtype, addr, length)
+
+  def __str__(self):
+    return self.dump()
+
+  def __len__(self):
+    return 7
+
+  def dump(self, prefix=""):
+    s  = prefix
+    s += "FWRD: type={:02X} addr={:08X} len={:04X}\n".format(self._rtype, self._addr, self._length)
+    return s
 
 class ReadCodeplugResponse:
   def __init__(self, addr, payload=None):
@@ -380,15 +487,32 @@ class ReadCodeplugResponse:
              (0x00 == f7) and (length==len(payload)) )
     return ReadCodeplugResponse(addr, payload)
 
+class FwReadCodeplugResponse:
+  def __init__(self, rtype, addr, payload=None):
+    self._rtype = rtype
+    self._addr = addr
+    self._payload = payload
+
+  def pack(self):
+    header = struct.pack("<BBIH", 0x00, self._rtype, self._addr, len(self._payload))
+    return header + self._payload
+
+  @staticmethod
+  def unpack(data):
+    f1, rtype, addr, length = struct.unpack("<BBIH", data[:8])
+    payload = data[8:]
+    assert ( (0x00 == f1) and (length==len(payload)) )
+    return FwReadCodeplugResponse(rtype, addr, payload)
+
   def __str__(self):
     return self.dump()    
 
   def __len__(self):
-    return 13+len(self._payload)
+    return 8+len(self._payload)
     
   def dump(self, prefix=""):
     s  = prefix
-    s += "RD: addr={:08X}\n".format(self._addr)
+    s += "FWRD: type={:02X} addr={:08X}\n".format(self._rtype, self._addr)
     return s + hexDump(self._payload, prefix+"  | ", self._addr)
 
 

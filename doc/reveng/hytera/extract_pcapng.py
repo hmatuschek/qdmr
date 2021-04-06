@@ -55,3 +55,37 @@ elif "structure" == args.command:
       print("-"*80)
     print(packet)
 
+elif "fw_structure" == args.command:
+  print("#")
+  print("#")
+  HOST = 0
+  DEV = 1
+  cap = pyshark.FileCapture(args.cap_file, include_raw=True, use_json=True)
+
+  # It seems as though single FW packets are split over multiple USB packets in
+  # firmware mode. Concatenate them, assuming that we can use host packets as
+  # delimeters.
+  currentData = bytes()
+
+  # Assume that first data source is host
+  lastDataSource = HOST
+
+  for p in cap:
+    currentDataSource = DEV
+
+    if not isDataPacket(p):
+      continue
+
+    if isFromHost(p):
+      currentDataSource = HOST
+
+    if currentDataSource != lastDataSource:
+      packet = FirmwarePacket.unpack(currentData)
+      print(packet)
+      currentData = bytes()
+
+      lastDataSource = currentDataSource
+      if currentDataSource == HOST:
+        print('-'*80)
+
+    currentData += getData(p)
