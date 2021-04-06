@@ -445,18 +445,18 @@ class ReadCodeplugRequest:
 
 
 class FwReadCodeplugRequest:
-  def __init__(self, addr, length):
+  def __init__(self, rtype, addr, length):
+    self._rtype = rtype
     self._addr = addr
     self._length = length
 
   def pack(self):
-    return struct.pack('<BIH', 0x03, self._addr, self._length)
+    return struct.pack('<BIH', self._rtype, self._addr, self._length)
 
   @staticmethod
   def unpack(data):
-    f1, addr, length = struct.unpack('<BIH',  data)
-    assert f1 == 0x03
-    return FwReadCodeplugRequest(addr, length)
+    rtype, addr, length = struct.unpack('<BIH',  data)
+    return FwReadCodeplugRequest(rtype, addr, length)
 
   def __str__(self):
     return self.dump()
@@ -466,7 +466,7 @@ class FwReadCodeplugRequest:
 
   def dump(self, prefix=""):
     s  = prefix
-    s += "FWRD: addr={:08X} len={:04X}\n".format(self._addr, self._length)
+    s += "FWRD: type={:02X} addr={:08X} len={:04X}\n".format(self._rtype, self._addr, self._length)
     return s
 
 class ReadCodeplugResponse:
@@ -488,20 +488,21 @@ class ReadCodeplugResponse:
     return ReadCodeplugResponse(addr, payload)
 
 class FwReadCodeplugResponse:
-  def __init__(self, addr, payload=None):
+  def __init__(self, rtype, addr, payload=None):
+    self._rtype = rtype
     self._addr = addr
     self._payload = payload
 
   def pack(self):
-    header = struct.pack("<BBIH", 0x00, 0x03, self._addr, len(self._payload))
+    header = struct.pack("<BBIH", 0x00, self._rtype, self._addr, len(self._payload))
     return header + self._payload
 
   @staticmethod
   def unpack(data):
-    f1,f2, addr, length = struct.unpack("<BBIH", data[:8])
+    f1, rtype, addr, length = struct.unpack("<BBIH", data[:8])
     payload = data[8:]
-    assert ( (0x00 == f1) and (0x03 == f2) and (length==len(payload)) )
-    return FwReadCodeplugResponse(addr, payload)
+    assert ( (0x00 == f1) and (length==len(payload)) )
+    return FwReadCodeplugResponse(rtype, addr, payload)
 
   def __str__(self):
     return self.dump()    
@@ -511,7 +512,7 @@ class FwReadCodeplugResponse:
     
   def dump(self, prefix=""):
     s  = prefix
-    s += "FWRD: addr={:08X}\n".format(self._addr)
+    s += "FWRD: type={:02X} addr={:08X}\n".format(self._rtype, self._addr)
     return s + hexDump(self._payload, prefix+"  | ", self._addr)
 
 
