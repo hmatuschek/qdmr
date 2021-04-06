@@ -264,7 +264,7 @@ class FirmwarePacket:
     if self._crc == crc_comp:
       crc_fmt += " (OK)"
     else:
-      crc_fmt += " (ERR: \x1b[1;31m{:02X}\x1b[0m)".format(crc_comp)
+      crc_fmt += " (ERR: \x1b[1;31m{:02X}\x1b[0m diff:{:05X})".format(crc_comp, self._crc - crc_comp)
     s += " crc={}\n".format(crc_fmt)
     return s + self._content.dump(prefix + "     | ")
 
