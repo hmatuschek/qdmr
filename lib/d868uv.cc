@@ -58,8 +58,8 @@ static Radio::Features _d868uv_features =
 
   // call-sign database limits
   .hasCallsignDB          = true,  // hasCallsignDB
-  .callsignDBImplemented  = true,  // callsignDBImplemented
-  .maxCallsignsInDB       = 200000 // maxCallsignsInDB
+  .callsignDBImplemented  = false,  // callsignDBImplemented
+  .maxCallsignsInDB       = 0 // maxCallsignsInDB
 };
 
 
