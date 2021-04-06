@@ -1302,7 +1302,7 @@ public:
   virtual void setBitmaps(Config *config);
 
   /** Allocate all code-plug elements that must be downloaded for decoding. All code-plug elements
-   * with the radio that are not represented within the common Config are omitted. */
+   * within the radio that are not represented within the common Config are omitted. */
   virtual void allocateForDecoding();
   /** Allocate all code-plug elements that must be written back to the device to maintain a working
    * codeplug. These elements might be updated during encoding. */
@@ -1312,12 +1312,17 @@ public:
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
 	bool decode(Config *config);
-  virtual bool decode(Config *config, CodeplugContext &ctx);
 
   /** Encodes the given generic configuration as a binary codeplug. */
   bool encode(Config *config, const Flags &flags = Flags());
 
 protected:
+  virtual bool decode(Config *config, CodeplugContext &ctx);
+
+  virtual void allocateGeneralSettings();
+  virtual bool encodeGeneralSettings(Config *config, const Flags &flags);
+  virtual bool decodeGeneralSettings(Config *config);
+
   static uint8_t ctcss_code2num(Signaling::Code code);
   static Signaling::Code ctcss_num2code(uint8_t num);
 };

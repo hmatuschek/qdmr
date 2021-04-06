@@ -979,6 +979,7 @@ D868UVCodeplug::boot_settings_t::setIntroLine2(const QString line) {
 
 void
 D868UVCodeplug::boot_settings_t::fromConfig(const Config *config, const Flags &flags) {
+  Q_UNUSED(flags)
   setIntroLine1(config->introLine1());
   setIntroLine2(config->introLine2());
 }
@@ -1215,7 +1216,7 @@ D868UVCodeplug::allocateUntouched() {
   image(0).addElement(VFO_B_ADDR+0x2000, sizeof(channel_t));
 
   // General config
-  image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+  this->allocateGeneralSettings();
   image(0).addElement(ADDR_ZONE_CHANNELS, ZONE_CHANNELS_SIZE);
   image(0).addElement(ADDR_DTMF_NUMBERS, DTMF_NUMBERS_SIZE);
   image(0).addElement(ADDR_BOOT_SETTINGS, BOOT_SETTINGS_SIZE);
@@ -1591,7 +1592,9 @@ D868UVCodeplug::encode(Config *config, const Flags &flags)
   radio_ids[0].setName(config->name());
 
   // Encode general config
-  ((general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->fromConfig(config, flags);
+  if (! this->encodeGeneralSettings(config, flags))
+    return false;
+  ((boot_settings_t *)data(ADDR_BOOT_SETTINGS))->fromConfig(config, flags);
   ((general_settings_ext1_t *)data(ADDR_GENERAL_CONFIG_EXT1))->fromConfig(config, flags);
   ((general_settings_ext2_t *)data(ADDR_GENERAL_CONFIG_EXT2))->fromConfig(config, flags);
 
@@ -1711,9 +1714,10 @@ D868UVCodeplug::decode(Config *config, CodeplugContext &ctx)
     }
   }
 
+  if (! this->decodeGeneralSettings(config))
+    return false;
   // Get intro lines
-  general_settings_base_t *settings = (general_settings_base_t *)data(ADDR_GENERAL_CONFIG);
-  settings->updateConfig(config);
+  ((boot_settings_t *)data(ADDR_BOOT_SETTINGS))->updateConfig(config);
 
   // Create channels
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
@@ -1854,5 +1858,21 @@ D868UVCodeplug::decode(Config *config, CodeplugContext &ctx)
     gps_systems->linkGPSSystem(i, ctx.getGPSSystem(i), ctx);
   }
 
+  return true;
+}
+
+
+void
+D868UVCodeplug::allocateGeneralSettings() {
+  image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+}
+bool
+D868UVCodeplug::encodeGeneralSettings(Config *config, const Flags &flags) {
+  ((general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->fromConfig(config, flags);
+  return true;
+}
+bool
+D868UVCodeplug::decodeGeneralSettings(Config *config) {
+  ((general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->updateConfig(config);
   return true;
 }

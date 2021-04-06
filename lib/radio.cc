@@ -5,6 +5,7 @@
 #include "gd77.hh"
 #include "uv390.hh"
 #include "opengd77.hh"
+#include "d868uv.hh"
 #include "d878uv.hh"
 #include "config.hh"
 #include "logger.hh"
@@ -350,9 +351,10 @@ found:
     return new UV390();
   } else if (("OpenGD77" == id) || ("OpenGD77" == force.toUpper())) {
     return new OpenGD77();
-  } else if (("D868UV" == id) || ("D868UVE" == id) || ("D6X2UV" == id) || ("D878UV" == id)
-             || ("D878UV" == force.toUpper())) {
+  } else if (("D6X2UV" == id) || ("D878UV" == id) || ("D878UV" == force.toUpper())) {
     return new D878UV();
+  } else if (("D868UV" == id) || ("D868UVE" == id) || ("D868UV" == force.toUpper())) {
+    return new D868UV();
   }
 
   errorMessage = QString("%1(): Unknown radio identifier '%2'.").arg(__func__, id);

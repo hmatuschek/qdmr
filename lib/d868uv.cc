@@ -48,13 +48,13 @@ static Radio::Features _d868uv_features =
   .hasGPS = true,
   .maxGPSSystems = 8,
 
-  .hasAPRS = true,
-  .maxAPRSSystems = 1,
+  .hasAPRS = false,
+  .maxAPRSSystems = 0,
 
-  .hasRoaming               = true,
-  .maxRoamingChannels       = 250,
-  .maxRoamingZones          = 64,
-  .maxChannelsInRoamingZone = 64,
+  .hasRoaming               = false,
+  .maxRoamingChannels       = 0,
+  .maxRoamingZones          = 0,
+  .maxChannelsInRoamingZone = 0,
 
   // call-sign database limits
   .hasCallsignDB          = true,  // hasCallsignDB

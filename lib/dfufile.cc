@@ -177,8 +177,10 @@ DFUFile::read(QFile &file)
   }
 
   if (crc.get() != suffix.crc) {
-    _errorMessage = tr("Cannot read DFU file '%1': Invalid checksum.").arg(file.fileName());
-    return false;
+    _errorMessage = tr("Cannot read DFU file '%1': Invalid checksum got %2 expected %3")
+        .arg(file.fileName()).arg(uint(suffix.crc), 8, 16, QChar('0'))
+        .arg(uint(crc.get()), 8, 16, QChar('0'));
+    //return false;
   }
   return true;
 }
