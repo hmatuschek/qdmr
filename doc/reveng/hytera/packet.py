@@ -199,7 +199,7 @@ class Packet:
 class FirmwarePacket:
   """Represents a firmware packet send to or received from the device."""
 
-  def __init__(self, ptype, content, crc=0):
+  def __init__(self, content, crc=0):
     """ Contstructs a new packet.
 
     To construct a packet to send to the device, consider using one of the static helper methods.
@@ -209,7 +209,6 @@ class FirmwarePacket:
       content (Object): The packet content. An instance of Request.
       crc (int): Optional CRC value for the packet. Will be recomputed when calling pack().
     """
-    self._type    = ptype
     self._crc     = crc
     self._content = content
 
@@ -218,32 +217,29 @@ class FirmwarePacket:
     payload = self._content.pack()
     tlength = 4 + len(payload)
     crc = 0
-    header = struct.pack("<HH", self._type, crc)
+    header = struct.pack("<HH", tlength, crc)
     crc = self.crc(header + payload)
     # repack header with correct crc
-    header = struct.pack("<HH", self._type, crc)
+    header = struct.pack("<HH", tlength, crc)
     return header + payload
 
   @staticmethod
   def unpack(data):
     """ Unpacks the given bytes string. """
-    ptype, crc = struct.unpack("<HH", data[:4])
+    tlength, crc = struct.unpack("<HH", data[:4])
+    assert tlength == len(data)
     payload = data[4:]
-    return FirmwarePacket(ptype, Request.unpack(payload, True), crc)
+    return FirmwarePacket(Request.unpack(payload, True), crc)
 
   @staticmethod
   def crc(packet):
     """ Computes the CRC over the given packed packet. """
-    s = 0
-    for i in range(1):
-      s += struct.unpack("<H", packet[(2*i):(2*(i+1))])[0]
+    s = (~len(packet)) & 0xffff
     for i in range(2,len(packet)//2):
-      s += struct.unpack("<H", packet[(2*i):(2*(i+1))])[0]
+      s += (~(struct.unpack("<H", packet[(2*i):(2*(i+1))])[0])) & 0xffff
     if len(packet)%2:
-      s += packet[-1]
-    while s > 0xffff:
-      s = (s>>16) + (s&0xffff)
-    return s^0xffff
+      s += (~(packet[-1] << 8)) & 0xffff
+    return s&0xffff
 
   def __str__(self):
     """ Returns a string representation of the packet. """
@@ -258,14 +254,14 @@ class FirmwarePacket:
 
     Each line is prefixed with the given prefix."""
     s = prefix
-    s += "FW: type={:04X}".format(self._type)
+    s += "FW: "
     crc_fmt = "{:04X}".format(self._crc)
     crc_comp = self.crc(self.pack())
     if self._crc == crc_comp:
       crc_fmt += " (OK)"
     else:
       crc_fmt += " (ERR: \x1b[1;31m{:02X}\x1b[0m diff:{:05X})".format(crc_comp, self._crc - crc_comp)
-    s += " crc={}\n".format(crc_fmt)
+    s += "crc={}\n".format(crc_fmt)
     return s + self._content.dump(prefix + "     | ")
 
 
