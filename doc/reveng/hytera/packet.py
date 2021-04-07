@@ -264,6 +264,16 @@ class FirmwarePacket:
     s += "crc={}\n".format(crc_fmt)
     return s + self._content.dump(prefix + "     | ")
 
+  @staticmethod
+  def readCodeplug(addr, length):
+    """ Assembles a read codeplug memory request for the given memory address and length to read. """
+    return FirmwarePacket(Request(Request.FW_READ_CODEPLUG,
+                                  FwReadCodeplugRequest(0x03, addr, length)))
+
+  @staticmethod
+  def setMemoryAccess(enableAccess):
+    return FirmwarePacket(Request(Request.FW_SET_MEM_ACCESS,
+                                  FwMemoryAccessRequest(enableAccess)))
 
 class EmptyContent: 
   """ Tiny helper class to represent some empty packet/request content. """
@@ -328,11 +338,17 @@ class Request:
   WRITE_CODEPLUG   = 0x01c8
   GET_VERSION      = 0x0201
   GET_RADIO_ID     = 0x0203
+  FW_SET_MEM_ACCESS= 0x0218
 
   def __init__(self, rtype, content, crc=None):
-    self._crc = crc
     self._rtype = rtype
     self._content = content
+
+    if crc == None:
+      self._crc = 0
+    else:
+      self._crc = crc
+
 
   def pack(self):
     crc = 0
@@ -357,6 +373,10 @@ class Request:
         return Request(rtype, FwReadCodeplugRequest.unpack(payload), crc)
       elif (Request.FW_READ_CODEPLUG | Request.REQUEST_RESPONSE) == rtype:
         return Request(rtype, FwReadCodeplugResponse.unpack(payload), crc)
+      elif Request.FW_SET_MEM_ACCESS == rtype:
+        return Request(rtype, FwMemoryAccessRequest.unpack(payload), crc)
+      elif (Request.FW_SET_MEM_ACCESS | Request.REQUEST_RESPONSE) == rtype:
+        return Request(rtype, FwMemoryAccessResponse.unpack(payload), crc)
       else:
         return Request(rtype,UnknownData(payload), crc)
 
@@ -424,7 +444,7 @@ class ReadCodeplugRequest:
   @staticmethod
   def unpack(data):
     f1,f2,f3,f4,f5,f6, addr, length = struct.unpack("<BBBBBBIH", data[:12])
-    assert ( (0x00 == f1) and (0x00 == f2) and (0x00 == f3) and 
+    assert ( (0x00 == f1) and (0x00 == f2) and (0x00 == f3) and
              (0x01 == f4) and (0x00 == f5) and (0x00 == f6) )
     return ReadCodeplugRequest(addr, length)
     
@@ -484,7 +504,10 @@ class ReadCodeplugResponse:
     return ReadCodeplugResponse(addr, payload)
 
 class FwReadCodeplugResponse:
-  def __init__(self, rtype, addr, payload=None):
+  STATUS_SUCCESS = 0x00
+
+  def __init__(self, status, rtype, addr, payload=None):
+    self._status = status
     self._rtype = rtype
     self._addr = addr
     self._payload = payload
@@ -495,23 +518,105 @@ class FwReadCodeplugResponse:
 
   @staticmethod
   def unpack(data):
-    f1, rtype, addr, length = struct.unpack("<BBIH", data[:8])
+    status, rtype, addr, length = struct.unpack("<BBIH", data[:8])
     payload = data[8:]
-    assert ( (0x00 == f1) and (length==len(payload)) )
-    return FwReadCodeplugResponse(rtype, addr, payload)
+
+    if status == FwReadCodeplugResponse.STATUS_SUCCESS:
+      assert length==len(payload)
+
+    return FwReadCodeplugResponse(status, rtype, addr, payload)
 
   def __str__(self):
     return self.dump()    
 
   def __len__(self):
     return 8+len(self._payload)
-    
+
+  def __getStatusMessage__(self):
+    if self._status == FwReadCodeplugResponse.STATUS_SUCCESS:
+      return "SUCCESS"
+    else:
+      return "{:02X}".format(self._status)
+
   def dump(self, prefix=""):
     s  = prefix
-    s += "FWRD: type={:02X} addr={:08X}\n".format(self._rtype, self._addr)
+    s += "FWRD: status={} type={:02X} addr={:08X}\n".format(self.__getStatusMessage__(),
+                                                            self._rtype, self._addr)
     return s + hexDump(self._payload, prefix+"  | ", self._addr)
 
 
+class FwMemoryAccessRequest:
+  DISABLE_ACCESS = 0x0000
+  ENABLE_ACCESS = 0x10fb
+
+  """Construct an enable access request.
+
+  enableAccess = True to enable access, False otherwise."""
+  def __init__(self, enableAccess):
+    self._enableAccess = enableAccess
+
+  def pack(self):
+    return struct.pack("<H", FwMemoryAccessRequest.ENABLE_ACCESS if self._enableAccess \
+                             else FwMemoryAccessRequest.DISABLE_ACCESS)
+
+  @staticmethod
+  def unpack(data):
+    x = struct.unpack("<H", data)[0]
+    enableAccess = False
+
+    assert (x == FwMemoryAccessRequest.DISABLE_ACCESS or
+            x == FwMemoryAccessRequest.ENABLE_ACCESS)
+
+    if x == FwMemoryAccessRequest.ENABLE_ACCESS:
+      enableAccess = True
+
+    return FwMemoryAccessRequest(enableAccess)
+
+  def __str__(self):
+    return self.dump()
+
+  def __len__(self):
+    return 2
+
+  def __getStatusMessage__(self):
+    if self._status == FwReadCodeplugResponse.STATUS_SUCCESS:
+      return "SUCCESS"
+    else:
+      return "{:02X}".format(self._status)
+
+  def dump(self, prefix=""):
+    s  = prefix
+    stateString = "Enable" if self._enableAccess else "Disable"
+    s += "MemoryAccessRequest: {} access\n".format(stateString)
+    return s
+
+class FwMemoryAccessResponse:
+  STATUS_OK = 0x5e
+
+  def __init__(self, status):
+    self._status = status
+
+  def pack(self):
+    return struct.pack("<B", self._status)
+
+  @staticmethod
+  def unpack(data):
+    status = struct.unpack("B", data)[0]
+    return FwMemoryAccessResponse(status)
+
+  def __str__(self):
+    return self.dump()
+
+  def __len__(self):
+    return 1
+
+  def dump(self, prefix=""):
+    s  = prefix
+    statusText = 'SUCCESS'
+    if not self._status == FwMemoryAccessResponse.STATUS_OK:
+      statusText = "ERR ({:02X})".format(self._status)
+    s += "MemoryAccessRequestResponse: status={}\n".format(statusText)
+    return s
 
 class WriteCodeplugRequest:
   def __init__(self, addr, payload):
