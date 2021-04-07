@@ -10,6 +10,12 @@
 #include <QTimeZone>
 #include <QtEndian>
 
+#define ADDR_GENERAL_CONFIG       0x02500000
+#define GENERAL_CONFIG_SIZE       0x00000100
+static_assert(
+  GENERAL_CONFIG_SIZE == sizeof(D878UVCodeplug::general_settings_base_t),
+  "D878UVCodeplug::general_settings_base_t size check failed.");
+
 #define ADDR_APRS_SETTING         0x02501000 // Address of APRS settings
 #define APRS_SETTING_SIZE         0x00000040 // Size of the APRS settings
 #define ADDR_APRS_MESSAGE         0x02501200 // Address of APRS messages
@@ -33,6 +39,76 @@ static_assert(
 #define ROAMING_ZONE_SIZE           0x00000080
 #define ROAMING_ZONE_OFFSET         0x00000080
 
+
+
+  /* ******************************************************************************************** *
+   * Implementation of D878UVCodeplug::general_settings_t
+   * ******************************************************************************************** */
+  D878UVCodeplug::general_settings_base_t::general_settings_base_t() {
+    clear();
+  }
+
+  void
+  D878UVCodeplug::general_settings_base_t::clear() {
+    mic_gain = 2;
+  }
+
+  uint
+  D878UVCodeplug::general_settings_base_t::getMicGain() const {
+    return (mic_gain+1)*2;
+  }
+  void
+  D878UVCodeplug::general_settings_base_t::setMicGain(uint gain) {
+    mic_gain = (gain-1)/2;
+  }
+
+  void
+  D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const Flags &flags) {
+    setMicGain(config->micLevel());
+
+    sms_format = SMS_FMT_DMR;
+
+    // If auto-enable roaming is enabled
+    if (flags.autoEnableRoaming) {
+      // Check if roaming is required -> configure & enable
+      if (config->requiresRoaming()) {
+        repchk_enable     = 0x01;
+        repchk_interval   = 0x05; // 0x05 == 30s
+        repchk_recon      = 0x02; // 0x02 == 3 times
+        repchk_notify     = 0x00; // 0x00 == no notification
+        roam_enable       = 0x01;
+        roam_default_zone = 0x00; // Default roaming zone index
+        roam_start_cond   = 0x01; // Start condition == out-of-range
+      } else {
+        // If roaming is not required -> disable repeater check and roaming
+        repchk_enable = 0x00;
+        roam_enable   = 0x00;
+      }
+    }
+
+    // If auto-enable GPS is enabled
+    if (flags.autoEnableGPS) {
+      // Check if GPS is required -> enable
+      if (config->requiresGPS()) {
+        gps_enable = 0x01;
+        // Set time zone based on system time zone.
+        int offset = QTimeZone::systemTimeZone().offsetFromUtc(QDateTime::currentDateTime());
+        timezone = 12 + offset/3600;
+        gps_sms_enable = 0x00;
+        gps_message_enable = 0x00;
+        gps_sms_interval = 0x05;
+        // Set measurement system based on system locale (0x00==Metric)
+        gps_unit = (QLocale::MetricSystem == QLocale::system().measurementSystem()) ? 0x00 : 0x01;
+      } else {
+        gps_enable = 0x00;
+      }
+    }
+  }
+
+  void
+  D878UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
+    config->setMicLevel(getMicGain());
+  }
 
 
 /* ******************************************************************************************** *
@@ -579,5 +655,21 @@ D878UVCodeplug::decode(Config *config, CodeplugContext &ctx)
     aprs->linkAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
   }
 
+  return true;
+}
+
+void
+D878UVCodeplug::allocateGeneralSettings() {
+  // override allocation of general settings for D878UV code-plug. General settings are larger!
+  image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+}
+bool
+D878UVCodeplug::encodeGeneralSettings(Config *config, const Flags &flags) {
+  ((D878UVCodeplug::general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->fromConfig(config, flags);
+  return true;
+}
+bool
+D878UVCodeplug::decodeGeneralSettings(Config *config) {
+  ((D878UVCodeplug::general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->updateConfig(config);
   return true;
 }

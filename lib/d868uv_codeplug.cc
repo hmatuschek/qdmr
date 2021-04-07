@@ -89,7 +89,7 @@ static_assert(
   "D868UVCodeplug::scanlist_t size check failed.");
 
 #define ADDR_GENERAL_CONFIG       0x02500000
-#define GENERAL_CONFIG_SIZE       0x00000100
+#define GENERAL_CONFIG_SIZE       0x000000d0
 static_assert(
   GENERAL_CONFIG_SIZE == sizeof(D868UVCodeplug::general_settings_base_t),
   "D868UVCodeplug::general_settings_base_t size check failed.");
@@ -879,73 +879,18 @@ D868UVCodeplug::radioid_t::setId(uint32_t num) {
 }
 
 
+
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::general_settings_t
+ * Implementation of D868UVCodeplug::general_settings_base_t
  * ******************************************************************************************** */
-D868UVCodeplug::general_settings_base_t::general_settings_base_t() {
-  clear();
-}
-
 void
-D868UVCodeplug::general_settings_base_t::clear() {
-  mic_gain = 2;
-}
-
-uint
-D868UVCodeplug::general_settings_base_t::getMicGain() const {
-  return (mic_gain+1)*2;
-}
-void
-D868UVCodeplug::general_settings_base_t::setMicGain(uint gain) {
-  mic_gain = (gain-1)/2;
-}
-
-void
-D868UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const Flags &flags) {
-  setMicGain(config->micLevel());
-
-  sms_format = SMS_FMT_DMR;
-
-  // If auto-enable roaming is enabled
-  if (flags.autoEnableRoaming) {
-    // Check if roaming is required -> configure & enable
-    if (config->requiresRoaming()) {
-      repchk_enable     = 0x01;
-      repchk_interval   = 0x05; // 0x05 == 30s
-      repchk_recon      = 0x02; // 0x02 == 3 times
-      repchk_notify     = 0x00; // 0x00 == no notification
-      roam_enable       = 0x01;
-      roam_default_zone = 0x00; // Default roaming zone index
-      roam_start_cond   = 0x01; // Start condition == out-of-range
-    } else {
-      // If roaming is not required -> disable repeater check and roaming
-      repchk_enable = 0x00;
-      roam_enable   = 0x00;
-    }
-  }
-
-  // If auto-enable GPS is enabled
-  if (flags.autoEnableGPS) {
-    // Check if GPS is required -> enable
-    if (config->requiresGPS()) {
-      gps_enable = 0x01;
-      // Set time zone based on system time zone.
-      int offset = QTimeZone::systemTimeZone().offsetFromUtc(QDateTime::currentDateTime());
-      timezone = 12 + offset/3600;
-      gps_sms_enable = 0x00;
-      gps_message_enable = 0x00;
-      gps_sms_interval = 0x05;
-      // Set measurement system based on system locale (0x00==Metric)
-      gps_unit = (QLocale::MetricSystem == QLocale::system().measurementSystem()) ? 0x00 : 0x01;
-    } else {
-      gps_enable = 0x00;
-    }
-  }
+D868UVCodeplug::general_settings_base_t::fromConfig(Config *config, const Flags &flags) {
+  // pass
 }
 
 void
 D868UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
-  config->setMicLevel(getMicGain());
+  // pass
 }
 
 
