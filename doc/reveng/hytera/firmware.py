@@ -4,9 +4,9 @@ import usb.core
 import usb.util
 import binascii
 import argparse
-
 import packet
 import struct
+import os
 
 isVerbose = False
 
@@ -69,11 +69,32 @@ def dump(outFile):
         for x in range(0, 0x1fffff, 0x100):
             resp = radio.xfer(packet.FirmwarePacket.readCodeplug(x, 0x100))
             status = resp._content._content._status
-            if status != packet.FwReadCodeplugResponse.STATUS_SUCCESS:
+            if status != packet.FwReadMemoryResponse.STATUS_SUCCESS:
                 raise RuntimeError("Error reading CP memory (status {:02X})".format(status))
             data = resp._content._content._payload
             outFile.write(data)
 
+
+def write(inFile):
+
+    data = inFile.read()
+
+    def chunks(lst, n):
+        for i in range(0, len(lst), n):
+            yield lst[i:i + n]
+
+    addr = 0
+
+    with Radio() as radio:
+        print("Writing...")
+        for chunk in chunks(data, 0x100):
+            resp = radio.xfer(packet.FirmwarePacket.writeCodePlug(addr, chunk))
+            status = resp._content._content._status
+
+            if status != packet.FwWriteMemoryResponse.STATUS_SUCCESS:
+                raise RuntimeError("Error writing CP memory (status {:02X})".format(status))
+
+            addr += len(chunk)
 
 
 if __name__ == "__main__":
@@ -86,15 +107,25 @@ if __name__ == "__main__":
                                        required=True,
                                        description="Commands that can be sent to the radio")
 
-    dumpCPMemoryParser = subparsers.add_parser("dump",
-                                               help="Dump codeplug memory.")
+    dumpCPMemoryParser = subparsers.add_parser("readCP",
+                                               help="Read codeplug memory to file.")
 
     dumpCPMemoryParser.add_argument("OUT_FILE",
-                                    type=argparse.FileType('bw'))
+                                    type=argparse.FileType('bw'),
+                                    help="Output file where codeplug memory is written.")
+
+    writeCPMemoryParser = subparsers.add_parser("writeCP",
+                                               help="Write codeplug memory.")
+
+    writeCPMemoryParser.add_argument("CP_IMAGE",
+                                     type=argparse.FileType('br'),
+                                     help="Input file where CP memory is read from")
 
     args = parser.parse_args()
 
     isVerbose = args.verbose
 
-    if args.command == "dump":
+    if args.command == "readCP":
         dump(args.OUT_FILE)
+    elif args.command == "writeCP":
+        write(args.CP_IMAGE)
