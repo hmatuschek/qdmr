@@ -88,14 +88,18 @@ class CPSRadio(Radio):
         super().__init__(0x0a11, 0x238b, 0x04, verbose)
 
     def getTotalPacketLength(self, partialPacket):
-        return struct.unpack('<H', partialPacket[8:10])[0]
+        return struct.unpack('>H', partialPacket[8:10])[0]
 
     def unpack(self, data):
         return packet.Packet.unpack(data)
 
     def __enter__(self):
         super().__enter__()
+        self.xfer(packet.Packet.connect())
+        self.xfer(packet.Packet.enterProgMode(packet.EnterProgModeRequest.READ_MODE))
+
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        self.xfer(packet.Packet.leaveProgMode())
         pass
