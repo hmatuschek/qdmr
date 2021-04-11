@@ -44,18 +44,11 @@ class GPSSystem;
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>024C1500</td> <td>000200</td>      <td>Bitmap of 4000 channels, default 0x00, 0x00 padded.</td></tr>
  *  <tr><td>00800000</td> <td>max. 002000</td> <td>Channel bank 0 of upto 128 channels, see @c channel_t 64 b each. </td></tr>
- *  <tr><td>00802000</td> <td>max, 002000</td> <td>Unknown data, Maybe extended channel information for channel bank 0?
- *    It is of exactly the same size as the channel bank 0. Mostly 0x00, a few 0xff.</td></tr>
  *  <tr><td>00840000</td> <td>max. 002000</td> <td>Channel bank 1 of upto 128 channels.</td></tr>
- *  <tr><td>00842000</td> <td>max. 002000</td> <td>Unknown data, related to CH bank 1?</td></tr>
  *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
  *  <tr><td>00FC0000</td> <td>max. 000800</td> <td>Channel bank 32, upto 32 channels.</td></tr>
- *  <tr><td>00FC2000</td> <td>max. 000800</td> <td>Unknown data, realted to CH bank 32.</td></tr>
  *  <tr><td>00FC0800</td> <td>000040</td>      <td>VFO A settings, see @c channel_t.</td></tr>
  *  <tr><td>00FC0840</td> <td>000040</td>      <td>VFO B settings, see @c channel_t.</td></tr>
- *  <tr><td>00FC2800</td> <td>000080</td>      <td>Unknonw data, related to VFO A+B?
- *    It is of exactly the same size as the two VFO channels. Mostly 0x00, a few 0xff. Same pattern as
- *    the unknown data associated with channel banks.</td></tr>
  *
  *  <tr><th colspan="3">Zones</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -64,15 +57,6 @@ class GPSSystem;
  *    0-based, little endian, default/padded=0xffff. Offset between channel lists 0x200, size of each list 0x1f4.</td></tr>
  *  <tr><td>02540000</td> <td>max. 001f40</td> <td>250 Zone names.
  *    Each zone name is upto 16 ASCII chars long and gets 0-padded to 32b.</td></tr>
- *
- *  <tr><th colspan="3">Roaming</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>01042000</td> <td>000020</td>      <td>Roaming channel bitmask, up to 250 bits, 0-padded, default 0.</td></tr>
- *  <tr><td>01040000</td> <td>max. 0x1f40</td> <td>Optional up to 250 roaming channels, of 32b each.
- *    See @c roaming_channel_t for details.</td></tr>
- *  <tr><td>01042080</td> <td>000010</td>      <td>Roaming zone bitmask, up to 64 bits, 0-padded, default 0.</td></tr>
- *  <tr><td>01043000</td> <td>max. 0x2000</td> <td>Optional up to 64 roaming zones, of 128b each.
- *    See @c roaming_zone_t for details.</td></tr>
  *
  *  <tr><th colspan="3">Contacts</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -119,17 +103,17 @@ class GPSSystem;
  *  <tr><td>024C1320</td> <td>000020</td>      <td>Bitmap of 250 radio IDs.</td></tr>
  *  <tr><td>02580000</td> <td>max. 001f40</td> <td>250 Radio IDs. See @c radioid_t.</td></tr>
  *
- *  <tr><th colspan="3">GPS/APRS</th></tr>
+ *  <tr><th colspan="3">GPS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings, see @c aprs_setting_t.</td>
- *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings, see @c gps_systems_t.</td>
- *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, upto 60 chars ASCII, 0-padded.</td>
+ *  <tr><td>02501000</td> <td>000030</td> <td>GPS settings, see @c gps_setting_t.</td>
+ *  <tr><td>02501100</td> <td>000030</td> <td>GPS message.</td>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02500000</td> <td>000630</td> <td>General settings, see @c general_settings_base_t.</td></tr>
- *  <tr><td>02501280</td> <td>000030</td> <td>General settings extension 1, see @c general_settings_ext1_t.</td></tr>
- *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2, see @c general_settings_ext2_t.</td></tr>
+ *  <tr><td>02500000</td> <td>0000D0</td> <td>General settings, see @c general_settings_t.</td></tr>
+ *  <tr><td>02500100</td> <td>000500</td> <td>Zone A & B channel list.</td></tr>
+ *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
+ *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
  *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000. Default 0x00000000, 0x00 padded.</td></tr>
  *
@@ -152,11 +136,6 @@ class GPSSystem;
  *  <tr><td>025C0100</td> <td>000400</td> <td>Upto 32 status messages.
  *    Length unknown, offset 0x20. ASCII 0x00 terminated and padded.</td>
  *  <tr><td>025C0500</td> <td>000360</td> <td>18 hot-key settings, see @c hotkey_t</td></tr>
- *
- *  <tr><th colspan="3">Encryption keys</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C4000</td> <td>004000</td> <td>Upto 256 AES encryption keys.
- *    See @c encryption_key_t.</td></tr>
  *
  *  <tr><th colspan="3">Misc</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
@@ -626,9 +605,11 @@ public:
    *
    * At 0x02500000, size 0x0d0. */
   struct __attribute__((packed)) general_settings_base_t {
-    uint8_t _unknown0[0xd0];
+    uint8_t _unknown0[0xd0];       ///< For now a big unknown settings block.
 
+    /** Encodes the general settings. */
     void fromConfig(Config *config, const Flags &flags);
+    /** Updates the abstract config from general settings. */
     void updateConfig(Config *config);
   };
 
@@ -676,81 +657,12 @@ public:
     void updateConfig(Config *config);
   };
 
-  /** General settings extension 1.
-   *
-   * At 0x02501280, size 0x30 bytes. */
-  struct __attribute__((packed)) general_settings_ext1_t {
-    uint8_t gps_message[32];       ///< GPS message text, upto 32b ASCII text, 0x00 padded.
-    uint8_t _unkown0020[16];       ///< Unknown settings block.
-
-    /** Derives the general settings from the given abstact configuration. */
-    void fromConfig(const Config *conf, const Flags &flags);
+  /** GPS settings within the codeplug. */
+  struct __attribute__((packed)) gps_settings_t {
+    uint8_t _unknown0000[0x10];    ///< Big unknown settings block for now.
+    uint8_t _unknown0010[0x10];    ///< Big unknown settings block for now.
+    uint8_t _unknown0020[0x10];    ///< Big unknown settings block for now.
   };
-
-  /** General settings extension 2.
-   *
-   * At 0x02501400, size 0x100 bytes. */
-  struct __attribute__((packed)) general_settings_ext2_t {
-    enum TalkerAliasDisplay : uint8_t {
-      TA_DISPLAY_OFF = 0,
-      TA_DISPLAY_CONTACTS = 1,
-      TA_DISPLAY_AIR = 2
-    };
-
-    enum TalkerAliasEncoding : uint8_t {
-      TA_ENCODING_ISO8 = 0,
-      TA_ENCODING_ISO7 = 1,
-      TA_ENCODING_UNICODE = 2,
-    };
-
-    // Byte 0x00
-    uint8_t send_alias;            ///< Send talker alias, 0=off, 1=on.
-    uint8_t _unknown0001[15];      ///< Unused, filled with 0x00.
-    // Byte 0x10
-    uint8_t _unknown0010[14];      ///< Unknown.
-    TalkerAliasDisplay ta_display; ///< Talker alias display priority, see @c TalkerAliasDisplay.
-    TalkerAliasEncoding ta_enc;    ///< Talker alias encoding, see @c TalkerAliasEncoding.
-    // Byte 0x20
-    uint8_t _unknown0020[2];       ///< Unused, set to 0x00.
-    uint8_t autorep_uhf2_off;      ///< Auto repeater offset UHF2 index, 0-based, disabled=0xff.
-    uint8_t autorep_vhf2_off;      ///< Auto repeater offset VHF2 index, 0-based, disabled=0xff.
-    uint32_t autorep_vhf2_min;     ///< Auto repeater VHF2 minimum frequency, in 10Hz, little endian.
-    uint32_t autorep_vfh2_max;     ///< Auto repeater VHF2 maximum frequency, in 10Hz, little endian.
-    uint32_t autorep_uhf2_min;     ///< Auto repeater UHF2 minimum frequency, in 10Hz, little endian.
-    // Byte 0x30
-    uint32_t autorep_uhf2_max;     ///< Auto repeater UHF2 maximum frequency, in 10Hz, little endian.
-    uint8_t _unknown0034;          ///< Unknown.
-    uint8_t gps_mode;              ///< GPS mode, GPS=0x00, BDS=0x01, GPS+BDS=0x02.
-    uint8_t _unknown0036[10];      ///< Unknown.
-    // Byte 0x40
-    uint8_t _unknown0040[16];      ///< Unknown.
-    // Byte 0x50
-    uint8_t _unknown0050[16];      ///< Unknown.
-    // Byte 0x60
-    uint8_t _unknown0060[16];      ///< Unknown.
-    // Byte 0x70
-    uint8_t _unknown0070[16];      ///< Unknown.
-    // Byte 0x80
-    uint8_t _unknown0080[16];      ///< Unknown.
-    // Byte 0x90
-    uint8_t _unknown0090[16];      ///< Unknown.
-    // Byte 0xa0
-    uint8_t _unknown00a0[16];      ///< Unknown.
-    // Byte 0xb0
-    uint8_t _unknown00b0[16];      ///< Unknown.
-    // Byte 0xc0
-    uint8_t _unknown00c0[16];      ///< Unknown.
-    // Byte 0xd0
-    uint8_t _unknown00d0[16];      ///< Unknown.
-    // Byte 0xe0
-    uint8_t _unknown00e0[16];      ///< Unknown.
-    // Byte 0xf0
-    uint8_t _unknown00f0[16];      ///< Unknown.
-
-    /** Derives the general settings from the given abstact configuration. */
-    void fromConfig(const Config *conf, const Flags &flags);
-  };
-
 
   /** Some weird linked list of valid message indices.
    *
@@ -772,16 +684,6 @@ public:
   struct __attribute__((packed)) message_t {
     char text[99];                 ///< Up to 99 ASCII chars, 0-padded.
     uint8_t _unused100[157];       ///< Unused, set to 0.
-  };
-
-  /** Represents an encryption key.
-   * Size is 64b. */
-  struct __attribute__((packed)) encryption_key_t {
-    uint8_t index;                 ///< Index/number of excryption key, off=0x00.
-    uint8_t key[32];               ///< Binary encryption key.
-    uint8_t _unused34;             ///< Unused, set to 0x00;
-    uint8_t _unknown35;            ///< Fixed to 0x40.
-    uint8_t _unused36[28];         ///< Unused, set to 0x00;
   };
 
   /** Represents analog quick-call settings within the binary code-plug.
@@ -849,56 +751,6 @@ public:
     uint8_t _unused9[39];          ///< Unused, set to 0x00.
   };
 
-
-  /** Represents the 8 GPS systems within the binary codeplug.
-   *
-   * Memmory layout of GPS systems (0x60byte):
-   * @verbinclude d878uvgpssetting.txt
-   */
-  struct __attribute__((packed)) gps_systems_t {
-    // byte 0x00
-    uint16_t digi_channels[8];     ///< 8 16bit channel indices in little-endian. VFO A=4000,
-                                   ///< VFO B=4001, Current=4002.
-    // bytes 0x10-0x2f
-    uint32_t talkgroups[8];        ///< Talkgroup IDs for all digi APRS channels, BCD encoded, big-endian.
-    // bytes 0x30-0x4f
-    uint8_t calltypes[8];          ///< Calltype for all digi APRS chanels, 0=private, 1=group, 3=all call.
-    uint8_t roaming_support;       ///< Roaming support. 0=off, 1=on.
-    uint8_t timeslots[8];          ///< Timeslots for all digi APRS channels. 0=Ch sel, 1=TS1, 2=TS2.
-    uint8_t rep_act_delay;         ///< Repeater activation delay in multiples of 100ms.
-                                   /// Default 0, range 0-1000ms.
-    uint8_t _unknown66[30];        ///< Unknown, set to 0.
-
-    /** Constructor, resets the GPS systems. */
-    gps_systems_t();
-    /** Reset the GPS systems. */
-    void clear();
-    /** Returns @c true if the specified GPS system is valid. */
-    bool isValid(int idx) const;
-
-    /** Returns the contact ID to send GPS information to for the idx-th system. */
-    uint32_t getContactId(int idx) const;
-    /** Sets the contact ID for the idx-th GPS system. */
-    void setContactId(int idx, uint32_t number);
-    /** Returns the call type for the idx-th GPS system. */
-    DigitalContact::Type getContactType(int idx) const;
-    /** Set the call type for the idx-th GPS system. */
-    void setContactType(int idx, DigitalContact::Type type);
-
-    /** Retruns the channel index for the idx-th GPS system. */
-    uint16_t getChannelIndex(int idx) const;
-    /** Sets the channel idx for th idx-th GPS system. */
-    void setChannelIndex(int idx, uint16_t ch_index);
-
-    /** Constructs all GPS system from the generic configuration. */
-    void fromGPSSystems(const Config *conf);
-    /** Encodes the given GPS system. */
-    void fromGPSSystemObj(GPSSystem *sys, const Config *conf);
-    /** Constructs a generic GPS system from the idx-th encoded GPS system. */
-    GPSSystem *toGPSSystemObj(int idx) const;
-    /** Links the specified generic GPS system. */
-    bool linkGPSSystem(int idx, GPSSystem *sys, const CodeplugContext &ctx) const;
-  };
 
   /** Binary representation of the analog alarm settings.
    * Size 0x6 bytes. */
@@ -968,7 +820,7 @@ public:
   virtual void allocateForDecoding();
   /** Allocate all code-plug elements that must be written back to the device to maintain a working
    * codeplug. These elements might be updated during encoding. */
-  virtual void allocateUntouched();
+  virtual void allocateUpdated();
   /** Allocate all code-plug elements that are defined through the common Config. */
   virtual void allocateForEncoding();
 
@@ -979,13 +831,108 @@ public:
   bool encode(Config *config, const Flags &flags = Flags());
 
 protected:
+  /** Decodes the downloaded codeplug. */
   virtual bool decode(Config *config, CodeplugContext &ctx);
 
+  /** Allocate channels from bitmap. */
+  virtual void allocateChannels();
+  /** Encode channels into codeplug. */
+  virtual bool encodeChannels(Config *config, const Flags &flags);
+  /** Create channels from codeplug. */
+  virtual bool createChannels(Config *config, CodeplugContext &ctx);
+  /** Link channels. */
+  virtual bool linkChannels(Config *config, CodeplugContext &ctx);
+
+  /** Allocate VFO settings. */
+  virtual void allocateVFOSettings();
+
+  /** Allocate contacts from bitmaps. */
+  virtual void allocateContacts();
+  /** Encode contacts into codeplug. */
+  virtual bool encodeContacts(Config *config, const Flags &flags);
+  /** Create contacts from codeplug. */
+  virtual bool createContacts(Config *config, CodeplugContext &ctx);
+
+  /** Allocate analog contacts from bitmaps. */
+  virtual void allocateAnalogContacts();
+
+  /** Allocate radio IDs from bitmaps. */
+  virtual void allocateRadioIDs();
+  /** Encode radio ID into codeplug. */
+  virtual bool encodeRadioID(Config *config, const Flags &flags);
+  /** Set radio ID from codeplug. */
+  virtual bool setRadioID(Config *config, CodeplugContext &ctx);
+
+  /** Allocates RX group lists from bitmaps. */
+  virtual void allocateRXGroupLists();
+  /** Encode RX group lists into codeplug. */
+  virtual bool encodeRXGroupLists(Config *config, const Flags &flags);
+  /** Create RX group lists from codeplug. */
+  virtual bool createRXGroupLists(Config *config, CodeplugContext &ctx);
+  /** Link RX group lists. */
+  virtual bool linkRXGroupLists(Config *config, CodeplugContext &ctx);
+
+  /** Allocate zones from bitmaps. */
+  virtual void allocateZones();
+  /** Encode zones into codeplug. */
+  virtual bool encodeZones(Config *config, const Flags &flags);
+  /** Create zones from codeplug. */
+  virtual bool createZones(Config *config, CodeplugContext &ctx);
+  /** Link zones. */
+  virtual bool linkZones(Config *config, CodeplugContext &ctx);
+
+  /** Allocate scanlists from bitmaps. */
+  virtual void allocateScanLists();
+  /** Encode scan lists into codeplug. */
+  virtual bool encodeScanLists(Config *config, const Flags &flags);
+  /** Create scan lists from codeplug. */
+  virtual bool createScanLists(Config *config, CodeplugContext &ctx);
+  /** Link scan lists. */
+  virtual bool linkScanLists(Config *config, CodeplugContext &ctx);
+
+  /** Allocates general settings memory section. */
   virtual void allocateGeneralSettings();
+  /** Encodes the general settings section. */
   virtual bool encodeGeneralSettings(Config *config, const Flags &flags);
+  /** Decodes the general settings section. */
   virtual bool decodeGeneralSettings(Config *config);
 
+  /** Allocates zone channel list memory section. */
+  virtual void allocateZoneChannelList();
+
+  /** Allocates DTMF number list memory section. */
+  virtual void allocateDTMFNumbers();
+
+  /** Allocates boot settings memory section. */
+  virtual void allocateBootSettings();
+  /** Encodes the boot settings section. */
+  virtual bool encodeBootSettings(Config *config, const Flags &flags);
+  /** Decodes the boot settings section. */
+  virtual bool decodeBootSettings(Config *config);
+
+  /** Allocates GPS settings memory section. */
+  virtual void allocateGPSSystems();
+  /** Encodes the GPS settings section. */
+  virtual bool encodeGPSSystems(Config *config, const Flags &flags);
+  /** Create GPS systems from codeplug. */
+  virtual bool createGPSSystems(Config *config, CodeplugContext &ctx);
+  /** Link GPS systems. */
+  virtual bool linkGPSSystems(Config *config, CodeplugContext &ctx);
+
+  /** Allocate refab SMS messages. */
+  virtual void allocateSMSMessages();
+  /** Allocates hot key settings memory section. */
+  virtual void allocateHotKeySettings();
+  /** Allocates repeater offset settings memory section. */
+  virtual void allocateRepeaterOffsetSettings();
+  /** Allocates alarm settings memory section. */
+  virtual void allocateAlarmSettings();
+  /** Allocates FM broadcast settings memory section. */
+  virtual void allocateFMBroadcastSettings();
+
+  /** Internal used function to encode CTCSS frequencies. */
   static uint8_t ctcss_code2num(Signaling::Code code);
+  /** Internal used function to decode CTCSS frequencies. */
   static Signaling::Code ctcss_num2code(uint8_t num);
 };
 

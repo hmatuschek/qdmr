@@ -242,12 +242,14 @@ public:
       PWR_SAVE_2_TO_1 = 2              ///< Power save 2:1.
     };
 
+    /** All possible scan types. */
     enum VFOScanType : uint8_t {
       SCAN_TYPE_TO = 0,
       SCAN_TYPE_CO = 1,
       SCAN_TYPE_SE = 2
     };
 
+    /** All possible key functions. */
     enum KeyFunction : uint8_t {
       KF_OFF = 0x00, KF_VOLTAGE = 0x01, KF_POWER = 0x02, KF_REPEATER = 0x03, KF_REVERSE = 0x04,
       KF_DIGITAL_ENCRYPTION = 0x05, KF_CALL = 0x06, KF_VOX = 0x07, KF_VFO_CHANNEL = 0x08,
@@ -264,6 +266,7 @@ public:
       KF_BLUETOOTH = 0x2f, KF_GPS = 0x30, KF_CHANNEL_NAME = 0x31, KF_CDT_SCAN = 0x32
     };
 
+    /** All possible STE types. */
     enum STEType : uint8_t {
       STE_TYPE_OFF     = 0,
       STE_TYPE_SILENT  = 1,
@@ -272,12 +275,14 @@ public:
       STE_TYPE_DEG_240 = 4
     };
 
+    /** All possible STE frequencies. */
     enum STEFrequency : uint8_t {
       STE_FREQ_OFF = 0,
       STE_FREQ_STE_55_2Hz = 1,
       STE_FREQ_STE_259_2Hz = 2
     };
 
+    /** DTMF signalling durations. */
     enum DTMFDuration : uint8_t {
       DTMF_DUR_50ms = 0,
       DTMF_DUR_100ms = 1,
@@ -286,6 +291,7 @@ public:
       DTMF_DUR_500ms = 4
     };
 
+    /** Backlight durations. */
     enum BackLightDur : uint8_t {
       BACKLIGHT_ALWAYS = 0,
       BACKLIGHT_5s = 1,
@@ -305,6 +311,7 @@ public:
       BACKLIGHT_60min = 15,
     };
 
+    /** TBST (open repeater) frequencies. */
     enum TBSTFrequency : uint8_t {
       TBST_1000Hz = 0,
       TBST_1450Hz = 1,
@@ -312,6 +319,7 @@ public:
       TBST_2100Hz = 3
     };
 
+    /** Permit tone combinations. */
     enum PermitTone : uint8_t {
       PERMIT_OFF = 0,
       PERMIT_DIGITAL = 1,
@@ -319,12 +327,14 @@ public:
       PERMIT_BOTH = 3
     };
 
+    /** VOX sources. */
     enum VOXSource : uint8_t {
       VOXSRC_BUILT_IN = 0,
       VOXSRC_EXTERNAL = 1,
       VOXSRC_BOTH     = 2
     };
 
+    /** Text and background colors. */
     enum Color : uint8_t {
       COL_ORANGE    = 0,
       COL_RED       = 1,
@@ -335,6 +345,7 @@ public:
       COL_WHITE     = 6
     };
 
+    /** SMS formats. */
     enum SMSFormat : uint8_t {
       SMS_FMT_M = 0,
       SMS_FMT_H = 1,
@@ -360,11 +371,11 @@ public:
     uint8_t mic_gain;              ///< Microphone gain value in [0,4], default 2.
 
     // Bytes 0x10-0x1f.
-    KeyFunction pf1_short;
-    KeyFunction pf2_short;
-    KeyFunction pf3_short;
-    KeyFunction p1_short;
-    KeyFunction p2_short;
+    KeyFunction pf1_short;         ///< Programmable function key 1 short press function.
+    KeyFunction pf2_short;         ///< Programmable function key 2 short press function.
+    KeyFunction pf3_short;         ///< Programmable function key 3 short press function.
+    KeyFunction p1_short;          ///< P1 function key short press function.
+    KeyFunction p2_short;          ///< P1 function key short press function.
     uint8_t vfo_mode_a;            ///< Enables VFO mode for VFO A, default memory mode = 0x00.
     uint8_t vfo_mode_b;            ///< Enables VFO mode for VFO B, default memory mode = 0x00.
     STEType ste_type;              ///< STE type of CTCSS.
@@ -415,11 +426,11 @@ public:
 
     // Bytes 0x40-0x4f
     uint8_t _unknown0040;          ///< Unknown settings, default set to 0x01;
-    KeyFunction pf1_long;
-    KeyFunction pf2_long;
-    KeyFunction pf3_long;
-    KeyFunction p1_long;
-    KeyFunction p2_long;
+    KeyFunction pf1_long;          ///< Programmable function key 1 long press function.
+    KeyFunction pf2_long;          ///< Programmable function key 2 long press function.
+    KeyFunction pf3_long;          ///< Programmable function key 3 long press function.
+    KeyFunction p1_long;           ///< P1 function key long press function.
+    KeyFunction p2_long;           ///< P1 function key long press function.
     uint8_t long_key_time;         ///< Specifies the long-press time in seconds + 1s offset, value in [0,4].
     uint8_t show_volume_change;    ///< Display volume change promt.
     uint8_t autorep_vfo_a;         ///< Auto repeater offset direction VFO A, Off=0x00, positive=0x01, negative=0x02, default=off.
@@ -537,6 +548,82 @@ public:
     void fromConfig(const Config *config, const Flags &flags);
     /** Updates the abstract configuration from this general settings. */
     void updateConfig(Config *config);
+  };
+
+  /** General settings extension 1.
+   *
+   * At 0x02501280, size 0x30 bytes. */
+  struct __attribute__((packed)) general_settings_ext1_t {
+    uint8_t gps_message[32];       ///< GPS message text, upto 32b ASCII text, 0x00 padded.
+    uint8_t _unkown0020[16];       ///< Unknown settings block.
+
+    /** Derives the general settings from the given abstact configuration. */
+    void fromConfig(const Config *conf, const Flags &flags);
+  };
+
+  /** General settings extension 2.
+   *
+   * At 0x02501400, size 0x100 bytes. */
+  struct __attribute__((packed)) general_settings_ext2_t {
+    /** Talker alias display preference. */
+    enum TalkerAliasDisplay : uint8_t {
+      TA_DISPLAY_OFF = 0,
+      TA_DISPLAY_CONTACTS = 1,
+      TA_DISPLAY_AIR = 2
+    };
+    /** Talker alias encoding. */
+    enum TalkerAliasEncoding : uint8_t {
+      TA_ENCODING_ISO8 = 0,
+      TA_ENCODING_ISO7 = 1,
+      TA_ENCODING_UNICODE = 2,
+    };
+
+    // Byte 0x00
+    uint8_t send_alias;            ///< Send talker alias, 0=off, 1=on.
+    uint8_t _unknown0001[15];      ///< Unused, filled with 0x00.
+    // Byte 0x10
+    uint8_t _unknown0010[14];      ///< Unknown.
+    TalkerAliasDisplay ta_display; ///< Talker alias display priority, see @c TalkerAliasDisplay.
+    TalkerAliasEncoding ta_enc;    ///< Talker alias encoding, see @c TalkerAliasEncoding.
+    // Byte 0x20
+    uint8_t _unknown0020[2];       ///< Unused, set to 0x00.
+    uint8_t autorep_uhf2_off;      ///< Auto repeater offset UHF2 index, 0-based, disabled=0xff.
+    uint8_t autorep_vhf2_off;      ///< Auto repeater offset VHF2 index, 0-based, disabled=0xff.
+    uint32_t autorep_vhf2_min;     ///< Auto repeater VHF2 minimum frequency, in 10Hz, little endian.
+    uint32_t autorep_vfh2_max;     ///< Auto repeater VHF2 maximum frequency, in 10Hz, little endian.
+    uint32_t autorep_uhf2_min;     ///< Auto repeater UHF2 minimum frequency, in 10Hz, little endian.
+    // Byte 0x30
+    uint32_t autorep_uhf2_max;     ///< Auto repeater UHF2 maximum frequency, in 10Hz, little endian.
+    uint8_t _unknown0034;          ///< Unknown.
+    uint8_t gps_mode;              ///< GPS mode, GPS=0x00, BDS=0x01, GPS+BDS=0x02.
+    uint8_t _unknown0036[10];      ///< Unknown.
+    // Byte 0x40
+    uint8_t _unknown0040[16];      ///< Unknown.
+    // Byte 0x50
+    uint8_t _unknown0050[16];      ///< Unknown.
+    // Byte 0x60
+    uint8_t _unknown0060[16];      ///< Unknown.
+    // Byte 0x70
+    uint8_t _unknown0070[16];      ///< Unknown.
+    // Byte 0x80
+    uint8_t _unknown0080[16];      ///< Unknown.
+    // Byte 0x90
+    uint8_t _unknown0090[16];      ///< Unknown.
+    // Byte 0xa0
+    uint8_t _unknown00a0[16];      ///< Unknown.
+    // Byte 0xb0
+    uint8_t _unknown00b0[16];      ///< Unknown.
+    // Byte 0xc0
+    uint8_t _unknown00c0[16];      ///< Unknown.
+    // Byte 0xd0
+    uint8_t _unknown00d0[16];      ///< Unknown.
+    // Byte 0xe0
+    uint8_t _unknown00e0[16];      ///< Unknown.
+    // Byte 0xf0
+    uint8_t _unknown00f0[16];      ///< Unknown.
+
+    /** Derives the general settings from the given abstact configuration. */
+    void fromConfig(const Config *conf, const Flags &flags);
   };
 
   /** Represents the APRS settings within the binary codeplug.
@@ -669,6 +756,58 @@ public:
     void linkAPRSSystem(APRSSystem *sys, CodeplugContext &ctx);
   };
 
+
+  /** Represents the 8 GPS systems within the binary codeplug.
+   *
+   * Memmory layout of GPS systems (0x60byte):
+   * @verbinclude d878uvgpssetting.txt
+   */
+  struct __attribute__((packed)) gps_systems_t {
+    // byte 0x00
+    uint16_t digi_channels[8];     ///< 8 16bit channel indices in little-endian. VFO A=4000,
+                                   ///< VFO B=4001, Current=4002.
+    // bytes 0x10-0x2f
+    uint32_t talkgroups[8];        ///< Talkgroup IDs for all digi APRS channels, BCD encoded, big-endian.
+    // bytes 0x30-0x4f
+    uint8_t calltypes[8];          ///< Calltype for all digi APRS chanels, 0=private, 1=group, 3=all call.
+    uint8_t roaming_support;       ///< Roaming support. 0=off, 1=on.
+    uint8_t timeslots[8];          ///< Timeslots for all digi APRS channels. 0=Ch sel, 1=TS1, 2=TS2.
+    uint8_t rep_act_delay;         ///< Repeater activation delay in multiples of 100ms.
+                                   /// Default 0, range 0-1000ms.
+    uint8_t _unknown66[30];        ///< Unknown, set to 0.
+
+    /** Constructor, resets the GPS systems. */
+    gps_systems_t();
+    /** Reset the GPS systems. */
+    void clear();
+    /** Returns @c true if the specified GPS system is valid. */
+    bool isValid(int idx) const;
+
+    /** Returns the contact ID to send GPS information to for the idx-th system. */
+    uint32_t getContactId(int idx) const;
+    /** Sets the contact ID for the idx-th GPS system. */
+    void setContactId(int idx, uint32_t number);
+    /** Returns the call type for the idx-th GPS system. */
+    DigitalContact::Type getContactType(int idx) const;
+    /** Set the call type for the idx-th GPS system. */
+    void setContactType(int idx, DigitalContact::Type type);
+
+    /** Retruns the channel index for the idx-th GPS system. */
+    uint16_t getChannelIndex(int idx) const;
+    /** Sets the channel idx for th idx-th GPS system. */
+    void setChannelIndex(int idx, uint16_t ch_index);
+
+    /** Constructs all GPS system from the generic configuration. */
+    void fromGPSSystems(const Config *conf);
+    /** Encodes the given GPS system. */
+    void fromGPSSystemObj(GPSSystem *sys, const Config *conf);
+    /** Constructs a generic GPS system from the idx-th encoded GPS system. */
+    GPSSystem *toGPSSystemObj(int idx) const;
+    /** Links the specified generic GPS system. */
+    bool linkGPSSystem(int idx, GPSSystem *sys, const CodeplugContext &ctx) const;
+  };
+
+
   /** Implements the binary representation of a roaming channel within the codeplug.
    *
    * Memmory layout of roaming channel (0x20byte):
@@ -730,6 +869,15 @@ public:
     bool linkRoamingZone(RoamingZone *zone, CodeplugContext &ctx);
   };
 
+  /** Represents an encryption key.
+   * Size is 64b. */
+  struct __attribute__((packed)) encryption_key_t {
+    uint8_t index;                 ///< Index/number of excryption key, off=0x00.
+    uint8_t key[32];               ///< Binary encryption key.
+    uint8_t _unused34;             ///< Unused, set to 0x00;
+    uint8_t _unknown35;            ///< Fixed to 0x40.
+    uint8_t _unused36[28];         ///< Unused, set to 0x00;
+  };
 
 public:
   /** Empty constructor. */
@@ -746,7 +894,7 @@ public:
   void allocateForDecoding();
   /** Allocate all code-plug elements that must be written back to the device to maintain a working
    * codeplug. These elements might be updated during encoding. */
-  void allocateUntouched();
+  void allocateUpdated();
   /** Allocate all code-plug elements that are defined through the common Config. */
   void allocateForEncoding();
 
@@ -761,6 +909,11 @@ protected:
   void allocateGeneralSettings();
   bool encodeGeneralSettings(Config *config, const Flags &flags);
   bool decodeGeneralSettings(Config *config);
+
+  virtual void allocateGPSSystems();
+  virtual bool encodeGPSSystems(Config *config, const Flags &flags);
+  virtual bool createGPSSystems(Config *config, CodeplugContext &ctx);
+  virtual bool linkGPSSystems(Config *config, CodeplugContext &ctx);
 };
 
 #endif // D878UVCODEPLUG_HH

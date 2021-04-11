@@ -110,7 +110,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
     D878UVCodeplug codeplug;
     codeplug.setBitmaps(&config);
-    codeplug.allocateUntouched();
+    codeplug.allocateUpdated();
     codeplug.allocateForEncoding();
     codeplug.encode(&config, flags);
     codeplug.image(0).sort();

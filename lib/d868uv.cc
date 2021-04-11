@@ -292,7 +292,7 @@ D868UV::upload() {
 
   // Allocate all memory sections that must be read first
   // and written back to the device more or less untouched
-  _codeplug.allocateUntouched();
+  _codeplug.allocateUpdated();
   // Download new memory sections for update
   for (int n=nbitmaps; n<_codeplug.image(0).numElements(); n++) {
     uint addr = _codeplug.image(0).element(n).address();

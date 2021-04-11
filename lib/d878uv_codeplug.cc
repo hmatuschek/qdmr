@@ -10,11 +10,33 @@
 #include <QTimeZone>
 #include <QtEndian>
 
+#define NUM_CHANNELS              4000
+#define NUM_CHANNEL_BANKS         32
+#define CHANNEL_BANK_0            0x00800000
+#define CHANNEL_BANK_SIZE         0x00002000
+#define CHANNEL_BANK_31           0x00fc0000
+#define CHANNEL_BANK_31_SIZE      0x00000800
+#define CHANNEL_BANK_OFFSET       0x00040000
+#define CHANNEL_BITMAP            0x024c1500
+#define CHANNEL_BITMAP_SIZE       0x00000200
+
 #define ADDR_GENERAL_CONFIG       0x02500000
 #define GENERAL_CONFIG_SIZE       0x00000100
 static_assert(
   GENERAL_CONFIG_SIZE == sizeof(D878UVCodeplug::general_settings_base_t),
   "D878UVCodeplug::general_settings_base_t size check failed.");
+
+#define ADDR_GENERAL_CONFIG_EXT1  0x02501280
+#define GENERAL_CONFIG_EXT1_SIZE  0x00000030
+static_assert(
+  GENERAL_CONFIG_EXT1_SIZE == sizeof(D878UVCodeplug::general_settings_ext1_t),
+  "D878UVCodeplug::general_settings_ext1_t size check failed.");
+
+#define ADDR_GENERAL_CONFIG_EXT2  0x02501400
+#define GENERAL_CONFIG_EXT2_SIZE  0x00000100
+static_assert(
+  GENERAL_CONFIG_EXT2_SIZE == sizeof(D878UVCodeplug::general_settings_ext2_t),
+  "D878UVCodeplug::general_settings_ext2_t size check failed.");
 
 #define ADDR_APRS_SETTING         0x02501000 // Address of APRS settings
 #define APRS_SETTING_SIZE         0x00000040 // Size of the APRS settings
@@ -23,6 +45,13 @@ static_assert(
 static_assert(
   APRS_SETTING_SIZE == sizeof(D878UVCodeplug::aprs_setting_t),
   "D878UVCodeplug::aprs_setting_t size check failed.");
+
+#define NUM_GPS_SYSTEMS           8
+#define ADDR_GPS_SETTING          0x02501040 // Address of GPS settings
+#define GPS_SETTING_SIZE          0x00000060 // Size of the GPS settings
+static_assert(
+  GPS_SETTING_SIZE == sizeof(D878UVCodeplug::gps_systems_t),
+  "D878UVCodeplug::gps_systems_t size check failed.");
 
 #define NUM_ROAMING_CHANNEL         250
 #define ADDR_ROAMING_CHANNEL_BITMAP 0x01042000
@@ -39,76 +68,106 @@ static_assert(
 #define ROAMING_ZONE_SIZE           0x00000080
 #define ROAMING_ZONE_OFFSET         0x00000080
 
+#define NUM_ENCRYPTION_KEYS       256
+#define ADDR_ENCRYPTION_KEYS      0x024C4000
+#define ENCRYPTION_KEY_SIZE       0x00000040
+#define ENCRYPTION_KEYS_SIZE      0x00004000
 
 
-  /* ******************************************************************************************** *
-   * Implementation of D878UVCodeplug::general_settings_t
-   * ******************************************************************************************** */
-  D878UVCodeplug::general_settings_base_t::general_settings_base_t() {
-    clear();
-  }
 
-  void
-  D878UVCodeplug::general_settings_base_t::clear() {
-    mic_gain = 2;
-  }
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::general_settings_t
+ * ******************************************************************************************** */
+D878UVCodeplug::general_settings_base_t::general_settings_base_t() {
+  clear();
+}
 
-  uint
-  D878UVCodeplug::general_settings_base_t::getMicGain() const {
-    return (mic_gain+1)*2;
-  }
-  void
-  D878UVCodeplug::general_settings_base_t::setMicGain(uint gain) {
-    mic_gain = (gain-1)/2;
-  }
+void
+D878UVCodeplug::general_settings_base_t::clear() {
+  mic_gain = 2;
+}
 
-  void
-  D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const Flags &flags) {
-    setMicGain(config->micLevel());
+uint
+D878UVCodeplug::general_settings_base_t::getMicGain() const {
+  return (mic_gain+1)*2;
+}
+void
+D878UVCodeplug::general_settings_base_t::setMicGain(uint gain) {
+  mic_gain = (gain-1)/2;
+}
 
-    sms_format = SMS_FMT_DMR;
+void
+D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const Flags &flags) {
+  setMicGain(config->micLevel());
 
-    // If auto-enable roaming is enabled
-    if (flags.autoEnableRoaming) {
-      // Check if roaming is required -> configure & enable
-      if (config->requiresRoaming()) {
-        repchk_enable     = 0x01;
-        repchk_interval   = 0x05; // 0x05 == 30s
-        repchk_recon      = 0x02; // 0x02 == 3 times
-        repchk_notify     = 0x00; // 0x00 == no notification
-        roam_enable       = 0x01;
-        roam_default_zone = 0x00; // Default roaming zone index
-        roam_start_cond   = 0x01; // Start condition == out-of-range
-      } else {
-        // If roaming is not required -> disable repeater check and roaming
-        repchk_enable = 0x00;
-        roam_enable   = 0x00;
-      }
-    }
+  sms_format = SMS_FMT_DMR;
 
-    // If auto-enable GPS is enabled
-    if (flags.autoEnableGPS) {
-      // Check if GPS is required -> enable
-      if (config->requiresGPS()) {
-        gps_enable = 0x01;
-        // Set time zone based on system time zone.
-        int offset = QTimeZone::systemTimeZone().offsetFromUtc(QDateTime::currentDateTime());
-        timezone = 12 + offset/3600;
-        gps_sms_enable = 0x00;
-        gps_message_enable = 0x00;
-        gps_sms_interval = 0x05;
-        // Set measurement system based on system locale (0x00==Metric)
-        gps_unit = (QLocale::MetricSystem == QLocale::system().measurementSystem()) ? 0x00 : 0x01;
-      } else {
-        gps_enable = 0x00;
-      }
+  // If auto-enable roaming is enabled
+  if (flags.autoEnableRoaming) {
+    // Check if roaming is required -> configure & enable
+    if (config->requiresRoaming()) {
+      repchk_enable     = 0x01;
+      repchk_interval   = 0x05; // 0x05 == 30s
+      repchk_recon      = 0x02; // 0x02 == 3 times
+      repchk_notify     = 0x00; // 0x00 == no notification
+      roam_enable       = 0x01;
+      roam_default_zone = 0x00; // Default roaming zone index
+      roam_start_cond   = 0x01; // Start condition == out-of-range
+    } else {
+      // If roaming is not required -> disable repeater check and roaming
+      repchk_enable = 0x00;
+      roam_enable   = 0x00;
     }
   }
 
-  void
-  D878UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
-    config->setMicLevel(getMicGain());
+  // If auto-enable GPS is enabled
+  if (flags.autoEnableGPS) {
+    // Check if GPS is required -> enable
+    if (config->requiresGPS()) {
+      gps_enable = 0x01;
+      // Set time zone based on system time zone.
+      int offset = QTimeZone::systemTimeZone().offsetFromUtc(QDateTime::currentDateTime());
+      timezone = 12 + offset/3600;
+      gps_sms_enable = 0x00;
+      gps_message_enable = 0x00;
+      gps_sms_interval = 0x05;
+      // Set measurement system based on system locale (0x00==Metric)
+      gps_unit = (QLocale::MetricSystem == QLocale::system().measurementSystem()) ? 0x00 : 0x01;
+    } else {
+      gps_enable = 0x00;
+    }
   }
+}
+
+void
+D878UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
+  config->setMicLevel(getMicGain());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::general_settings_ext1_t
+ * ******************************************************************************************** */
+void
+D878UVCodeplug::general_settings_ext1_t::fromConfig(const Config *conf, const Flags &flags) {
+  Q_UNUSED(conf)
+  Q_UNUSED(flags)
+  memset(gps_message, 0, sizeof(gps_message));
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::general_settings_ext1_t
+ * ******************************************************************************************** */
+void
+D878UVCodeplug::general_settings_ext2_t::fromConfig(const Config *conf, const Flags &flags) {
+  Q_UNUSED(conf)
+  Q_UNUSED(flags)
+  // Do not send talker alias
+  send_alias = 0x00;
+  // Enable only GPS here.
+  gps_mode = 0x00;
+}
 
 
 /* ******************************************************************************************** *
@@ -297,6 +356,116 @@ D878UVCodeplug::aprs_setting_t::linkAPRSSystem(APRSSystem *sys, CodeplugContext 
 
 
 /* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::gps_systems_t
+ * ******************************************************************************************** */
+D878UVCodeplug::gps_systems_t::gps_systems_t() {
+  clear();
+}
+
+void
+D878UVCodeplug::gps_systems_t::clear() {
+  //memset(this, 0, sizeof(gps_systems_t));
+  for (int i=0; i<8; i++)
+    setChannelIndex(i, 4002);
+}
+
+bool
+D878UVCodeplug::gps_systems_t::isValid(int idx) const {
+  if ((idx<0)||(idx>7))
+    return false;
+  return 0 != this->getContactId(idx);
+}
+
+uint32_t
+D878UVCodeplug::gps_systems_t::getContactId(int idx) const {
+  return decode_dmr_id_bcd((uint8_t *)&(talkgroups[idx]));
+}
+void
+D878UVCodeplug::gps_systems_t::setContactId(int idx, uint32_t number) {
+  encode_dmr_id_bcd((uint8_t *)&(talkgroups[idx]), number);
+}
+
+DigitalContact::Type
+D878UVCodeplug::gps_systems_t::getContactType(int idx) const {
+  switch (calltypes[idx]) {
+  case 1: return DigitalContact::GroupCall;
+  case 2: return DigitalContact::AllCall;
+  default:
+    return DigitalContact::PrivateCall;
+  }
+}
+void
+D878UVCodeplug::gps_systems_t::setContactType(int idx, DigitalContact::Type type) {
+  switch (type) {
+  case DigitalContact::PrivateCall: calltypes[idx]  = 0; break;
+  case DigitalContact::GroupCall: calltypes[idx]  = 1; break;
+  case DigitalContact::AllCall: calltypes[idx]  = 2; break;
+  }
+}
+
+uint16_t
+D878UVCodeplug::gps_systems_t::getChannelIndex(int idx) const {
+  return qFromLittleEndian(digi_channels[idx]);
+}
+void
+D878UVCodeplug::gps_systems_t::setChannelIndex(int idx, uint16_t ch_index) {
+  digi_channels[idx] = qToLittleEndian(ch_index);
+}
+
+void
+D878UVCodeplug::gps_systems_t::fromGPSSystemObj(GPSSystem *sys, const Config *conf) {
+  int idx = conf->posSystems()->indexOfGPSSys(sys);
+  if ((idx < 0) || idx > 7)
+    return;
+  if (sys->hasContact()) {
+    setContactId(idx, sys->contact()->number());
+    setContactType(idx, sys->contact()->type());
+  }
+  if (sys->hasRevertChannel() && (SelectedChannel::get() != (Channel *)sys->revertChannel())) {
+    digi_channels[idx] = conf->channelList()->indexOf(sys->revertChannel());
+    timeslots[idx] = 0; // Use TS of channel
+  }
+}
+
+void
+D878UVCodeplug::gps_systems_t::fromGPSSystems(const Config *conf) {
+  if (conf->posSystems()->gpsCount() > 8)
+    return;
+  for (int i=0; i<conf->posSystems()->gpsCount(); i++)
+    fromGPSSystemObj(conf->posSystems()->gpsSystem(i), conf);
+}
+
+GPSSystem *
+D878UVCodeplug::gps_systems_t::toGPSSystemObj(int idx) const {
+  if (! isValid(idx))
+    return nullptr;
+  return new GPSSystem(tr("GPS Sys #%1").arg(idx+1));
+}
+
+bool
+D878UVCodeplug::gps_systems_t::linkGPSSystem(int idx, GPSSystem *sys, const CodeplugContext &ctx) const {
+  // Clear revert channel from GPS system
+  sys->setRevertChannel(nullptr);
+  // if a revert channel is defined -> link to it
+  if (ctx.hasChannel(getChannelIndex(idx)) && ctx.getChannel(getChannelIndex(idx))->is<DigitalChannel>())
+    sys->setRevertChannel(ctx.getChannel(getChannelIndex(idx))->as<DigitalChannel>());
+
+  // Search for a matching contact in contacts
+  DigitalContact *cont = ctx.config()->contacts()->findDigitalContact(getContactId(idx));
+  // If no matching contact is found, create one
+  if (nullptr == cont) {
+    cont = new DigitalContact(getContactType(idx), tr("GPS #%1 Contact").arg(idx+1),
+                              getContactId(idx), false);
+    ctx.config()->contacts()->addContact(cont);
+  }
+  // link contact to GPS system.
+  sys->setContact(cont);
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::roaming_channel_t
  * ******************************************************************************************** */
 double
@@ -443,19 +612,41 @@ D878UVCodeplug::clear() {
 }
 
 void
-D878UVCodeplug::allocateUntouched() {
+D878UVCodeplug::allocateUpdated() {
   // First allocate everything common between D868UV and D878UV codeplugs.
-  D868UVCodeplug::allocateUntouched();
+  D868UVCodeplug::allocateUpdated();
 
-  // APRS settings
-  image(0).addElement(ADDR_APRS_SETTING, APRS_SETTING_SIZE);
-  image(0).addElement(ADDR_APRS_MESSAGE, APRS_MESSAGE_SIZE);
+  image(0).addElement(ADDR_GENERAL_CONFIG_EXT1, GENERAL_CONFIG_EXT1_SIZE);
+  image(0).addElement(ADDR_GENERAL_CONFIG_EXT2, GENERAL_CONFIG_EXT2_SIZE);
+
+  // Encryption keys
+  image(0).addElement(ADDR_ENCRYPTION_KEYS, ENCRYPTION_KEYS_SIZE);
 }
 
 void
 D878UVCodeplug::allocateForEncoding() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateForEncoding();
+
+  /*
+   * Allocate extended settings for channels
+   */
+  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
+  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+    // Get byte and bit for channel, as well as bank of channel
+    uint16_t bit = i%8, byte = i/8, bank = i/128, idx=i%128;
+    // if disabled -> skip
+    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // compute address for channel
+    uint32_t addr = CHANNEL_BANK_0
+        + bank*CHANNEL_BANK_OFFSET
+        + idx*sizeof(channel_t);
+    if (nullptr == data(addr+0x2000, 0)) {
+      image(0).addElement(addr+0x2000, sizeof(channel_t));
+      memset(data(addr+0x2000), 0x00, sizeof(channel_t));
+    }
+  }
 
   /*
    * Allocate roaming channel and zones
@@ -559,6 +750,9 @@ D878UVCodeplug::encode(Config *config, const Flags &flags)
 {
   // Encode everything common between d868uv and d878uv radios.
   D868UVCodeplug::encode(config, flags);
+
+  ((general_settings_ext1_t *)data(ADDR_GENERAL_CONFIG_EXT1))->fromConfig(config, flags);
+  ((general_settings_ext2_t *)data(ADDR_GENERAL_CONFIG_EXT2))->fromConfig(config, flags);
 
   // Encode APRS system (there can only be one)
   if (0 < config->posSystems()->aprsCount()) {
@@ -673,3 +867,57 @@ D878UVCodeplug::decodeGeneralSettings(Config *config) {
   ((D878UVCodeplug::general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->updateConfig(config);
   return true;
 }
+
+void
+D878UVCodeplug::allocateGPSSystems() {
+  // APRS settings
+  image(0).addElement(ADDR_APRS_SETTING, APRS_SETTING_SIZE);
+  image(0).addElement(ADDR_APRS_MESSAGE, APRS_MESSAGE_SIZE);
+  image(0).addElement(ADDR_GPS_SETTING, GPS_SETTING_SIZE);
+}
+
+bool
+D878UVCodeplug::encodeGPSSystems(Config *config, const Flags &flags) {
+  // Encode GPS systems
+  gps_systems_t *gps = (gps_systems_t *)data(ADDR_GPS_SETTING);
+  gps->fromGPSSystems(config);
+  if (0 < config->posSystems()->gpsCount()) {
+    // If there is at least one GPS system defined -> set auto TX interval.
+    //  This setting might be overridden by any analog APRS system below
+    aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
+    aprs->setAutoTxInterval(config->posSystems()->gpsSystem(0)->period());
+    aprs->setManualTxInterval(config->posSystems()->gpsSystem(0)->period());
+  }
+  return true;
+}
+
+bool
+D878UVCodeplug::createGPSSystems(Config *config, CodeplugContext &ctx) {
+  // Before creating any GPS/APRS systems, get global auto TX intervall
+  uint pos_intervall = ((aprs_setting_t *)data(ADDR_APRS_SETTING))->getAutoTXInterval();
+  // Create GPS systems
+  gps_systems_t *gps_systems = (gps_systems_t *)data(ADDR_GPS_SETTING);
+  for (int i=0; i<NUM_GPS_SYSTEMS; i++) {
+    if (! gps_systems->isValid(i))
+      continue;
+    GPSSystem *sys = gps_systems->toGPSSystemObj(i);
+    if (sys)
+      logDebug() << "Create GPS sys '" << sys->name() << "' at idx " << i << ".";
+    sys->setPeriod(pos_intervall);
+    ctx.addGPSSystem(sys, i);
+  }
+  return true;
+}
+
+bool
+D878UVCodeplug::linkGPSSystems(Config *config, CodeplugContext &ctx) {
+  // Link GPS systems
+  gps_systems_t *gps_systems = (gps_systems_t *)data(ADDR_GPS_SETTING);
+  for (int i=0; i<NUM_GPS_SYSTEMS; i++) {
+    if (! gps_systems->isValid(i))
+      continue;
+    gps_systems->linkGPSSystem(i, ctx.getGPSSystem(i), ctx);
+  }
+  return true;
+}
+
