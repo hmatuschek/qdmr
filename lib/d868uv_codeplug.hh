@@ -205,26 +205,16 @@ public:
       RM_TXNEG = 2                      ///< Repeater mode with negative @c tx_offset.
     } RepeaterMode;
 
-    /** Defines all possible PTT-ID settings. */
-    typedef enum {
-      PTTID_OFF = 0,                    ///< Never send PTT-ID.
-      PTTID_START = 1,                  ///< Send PTT-ID at start.
-      PTTID_END = 2,                    ///< Send PTT-ID at end.
-      PTTID_START_END = 3               ///< Send PTT-ID at start and end.
-    } PTTId;
-
     /** Defines all possible squelch settings. */
     typedef enum {
-      SQ_CARRIER = 0,                   ///< Open squelch on carrier.
-      SQ_TONE = 1                       ///< Open squelch on matching CTCSS tone or DCS code.
+      SQ_CARRIER = 0                    ///< Open squelch on carrier.
     } SquelchMode;
 
     /** Defines all possible admit criteria. */
     typedef enum {
       ADMIT_ALWAYS = 0,                 ///< Admit TX always.
-      ADMIT_CH_FREE = 1,                ///< Admit TX on channel free.
-      ADMIT_CC_DIFF = 2,                ///< Admit TX on mismatching color-code.
-      ADMIT_CC_SAME = 3                 ///< Admit TX on matching color-code.
+      ADMIT_COLORCODE = 1,              ///< Admit TX on matching color-code.
+      ADMIT_CH_FREE = 2,                   ///< Admit TX on channel free.
     } Admit;
 
     /** Defines all possible optional signalling settings. */
@@ -234,21 +224,6 @@ public:
       OPTSIG_2TONE = 2,                 ///< Use 2-tone.
       OPTSIG_5TONE = 3                  ///< Use 5-tone.
     } OptSignaling;
-
-    /** Defines all possible APRS reporting modes. */
-    typedef enum {
-      APRS_REPORT_OFF = 0,              ///< No APRS (GPS) reporting at all.
-      APRS_REPORT_ANALOG = 1,           ///< Use analog, actual APRS reporting.
-      APRS_REPORT_DIGITAL = 2           ///< Use digital reporting.
-    } APRSReport;
-
-    /** Defines all possible APRS PTT settings. */
-    typedef enum {
-      APRS_PTT_OFF   = 0,               ///< Do not send APRS on PTT.
-      APRS_PTT_START = 1,               ///< Send APRS at start of transmission.
-      APRS_PTT_END   = 2                ///< Send APRS at end of transmission.
-    } APRSPTT;
-
 
     // Bytes 0-7
     uint32_t rx_frequency;              ///< RX Frequency, 8 digits BCD, big-endian.
@@ -289,8 +264,7 @@ public:
     uint8_t id_index;                   ///< Index to radio ID table.
 
     // Byte 25
-    uint8_t ptt_id          : 2,        ///< PTT ID, see PTTId.
-      _unused25_1           : 2,        ///< Unused, set to 0.
+    uint8_t _unused25_0     : 4,        ///< Unused set to 0.
       squelch_mode          : 1,        ///< Squelch mode, see @c SquelchMode.
       _unused25_2           : 3;        ///< Unused, set to 0.
 
@@ -321,27 +295,26 @@ public:
       work_alone            : 1;        ///< Work alone, 0=off, 1=on.
 
     // Byte 34
-    uint8_t aes_encryption;             ///< Digital AES encryption, 1-32, 0=off.
+    uint8_t _unused34;                  ///< Unused, set to 0.
 
     // Bytes 35-51
     uint8_t name[16];                   ///< Channel name, ASCII, zero filled.
     uint8_t _pad51;                     ///< Pad byte, set to 0.
 
     // Byte 52
-    uint8_t ranging         : 1,        ///< Ranging enabled.
+    uint8_t rangeing        : 1,        ///< Rangeing enable.
       through_mode          : 1,        ///< Through-mode enabled.
-      excl_from_roaming     : 1,        ///< Exclude channel from roaming.
+      data_ack_forbit       : 1,        ///< Data ACK forbit.
       _unused52             : 5;        ///< Unused, set to 0.
 
     // Byte 53
-    uint8_t aprs_report     : 2,        ///< Enable APRS report, see @c APRSReport.
-      _unused53             : 6;        ///< Unused, set to 0.
-
-    // Bytes 54-63
-    uint8_t analog_aprs_ptt;            ///< Enable analog APRS PTT, see @c APRSPTT.
-    uint8_t digi_aprs_ptt;              ///< Enable digital APRS PTT, 0=off, 1=on.
+    uint8_t aprs_report;                ///< Enable positioning, 0x00=off, 0x01 on.
     uint8_t gps_system;                 ///< Index of DMR GPS report system, 0-7;
-    int8_t  freq_correction;            ///< Signed int in 10Hz.
+
+    // Bytes 55-63
+    uint8_t _unused55;                  ///< Unused set to 0.
+    uint8_t _unused56;                  ///< Unused set to 0
+    uint8_t _unused57;                  ///< Unused set to 0.
     uint8_t dmr_encryption;             ///< Digital encryption, 1-32, 0=off.
     uint8_t multiple_keys   : 1,        ///< Enable multiple keys.
       random_key            : 1,        ///< Enable random key.
@@ -605,7 +578,19 @@ public:
    *
    * At 0x02500000, size 0x0d0. */
   struct __attribute__((packed)) general_settings_base_t {
-    uint8_t _unknown0[0xd0];       ///< For now a big unknown settings block.
+    uint8_t _unknown0000[0x10];    ///< For now a big unknown settings block.
+    uint8_t _unknown0010[0x10];    ///< For now a big unknown settings block.
+    uint8_t _unknown0020[0x10];    ///< For now a big unknown settings block.
+    uint8_t _unknown0030[0x10];    ///< For now a big unknown settings block.
+    uint8_t _unknown0040[0x10];    ///< For now a big unknown settings block.
+    uint8_t _unknown0050[0x10];    ///< For now a big unknown settings block.
+    uint8_t _unknown0060[0x10];    ///< For now a big unknown settings block.
+    uint8_t _unknown0070[0x10];    ///< For now a big unknown settings block.
+    uint8_t _unknown0080[0x10];    ///< For now a big unknown settings block.
+    uint8_t _unknown0090[0x10];    ///< For now a big unknown settings block.
+    uint8_t _unknown00a0[0x10];    ///< For now a big unknown settings block.
+    uint8_t _unknown00b0[0x10];    ///< For now a big unknown settings block.
+    uint8_t _unknown00c0[0x10];    ///< For now a big unknown settings block.
 
     /** Encodes the general settings. */
     void fromConfig(Config *config, const Flags &flags);

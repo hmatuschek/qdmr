@@ -276,10 +276,6 @@ D868UVCodeplug::channel_t::setName(const QString &name) {
 
 Signaling::Code
 D868UVCodeplug::channel_t::getRXTone() const {
-  // If squelch is not SQ_TONE -> RX tone is ignored
-  if (SQ_TONE != squelch_mode)
-    return Signaling::SIGNALING_NONE;
-
   if (rx_ctcss && (ctcss_receive < 52))
     return ctcss_num2code(ctcss_receive);
   else if (rx_dcs && (qFromLittleEndian(dcs_receive) < 512))
@@ -292,23 +288,19 @@ D868UVCodeplug::channel_t::getRXTone() const {
 void
 D868UVCodeplug::channel_t::setRXTone(Code code) {
   if (Signaling::SIGNALING_NONE == code) {
-    squelch_mode = SQ_CARRIER;
     rx_ctcss = rx_dcs = 0;
     ctcss_receive = dcs_receive = 0;
   } else if (Signaling::isCTCSS(code)) {
-    squelch_mode = SQ_TONE;
     rx_ctcss = 1;
     rx_dcs = 0;
     ctcss_receive = ctcss_code2num(code);
     dcs_receive = 0;
   } else if (Signaling::isDCSNormal(code)) {
-    squelch_mode = SQ_TONE;
     rx_ctcss = 0;
     rx_dcs = 1;
     ctcss_receive = 0;
     dcs_receive = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code)));
   } else if (Signaling::isDCSInverted(code)) {
-    squelch_mode = SQ_TONE;
     rx_ctcss = 0;
     rx_dcs = 1;
     ctcss_receive = 0;
@@ -400,8 +392,7 @@ D868UVCodeplug::channel_t::toChannelObj() const {
     case ADMIT_CH_FREE:
       admit = DigitalChannel::AdmitFree;
       break;
-    case ADMIT_CC_SAME:
-    case ADMIT_CC_DIFF:
+    case ADMIT_COLORCODE:
       admit = DigitalChannel::AdmitColorCode;
       break;
     }
@@ -436,26 +427,13 @@ D868UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
       dc->setRXGroupList(ctx.getGroupList(group_list_index));
 
     // Link to GPS system
-    if ((APRS_REPORT_DIGITAL == aprs_report) && ctx.hasGPSSystem(gps_system))
+    if (aprs_report && ctx.hasGPSSystem(gps_system))
       dc->setPosSystem(ctx.getGPSSystem(gps_system));
-    // Link APRS system if one is defined
-    //  There can only be one active APRS system, hence the index is fixed to one.
-    if ((APRS_REPORT_ANALOG == aprs_report) && ctx.hasAPRSSystem(0))
-      dc->setPosSystem(ctx.getAPRSSystem(0));
-
-    // If roaming is not disabled -> link to default roaming zone
-    if (0 == excl_from_roaming)
-      dc->setRoaming(DefaultRoamingZone::get());
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
     AnalogChannel *ac = c->as<AnalogChannel>();
     if (nullptr == ac)
       return false;
-
-    // Link APRS system if one is defined
-    //  There can only be one active APRS system, hence the index is fixed to one.
-    if ((APRS_REPORT_ANALOG == aprs_report) && ctx.hasAPRSSystem(0))
-      ac->setAPRSSystem(ctx.getAPRSSystem(0));
   }
 
   // For both, analog and digital channels:
@@ -516,14 +494,10 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     case AnalogChannel::AdmitTone: tx_permit = ADMIT_ALWAYS; break;
     }
     // squelch mode
-    squelch_mode = (Signaling::SIGNALING_NONE == ac->rxTone()) ? SQ_CARRIER : SQ_TONE;
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     // set bandwidth
     bandwidth = (AnalogChannel::BWNarrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
-    // Set APRS system
-    if (nullptr != ac->aprsSystem())
-      aprs_report = APRS_REPORT_ANALOG;
   } else if (c->is<DigitalChannel>()) {
     const DigitalChannel *dc = c->as<const DigitalChannel>();
     // pack digital channel config.
@@ -532,7 +506,7 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     switch(dc->admit()) {
     case DigitalChannel::AdmitNone: tx_permit = ADMIT_ALWAYS; break;
     case DigitalChannel::AdmitFree: tx_permit = ADMIT_CH_FREE; break;
-    case DigitalChannel::AdmitColorCode: tx_permit = ADMIT_CC_SAME; break;
+    case DigitalChannel::AdmitColorCode: tx_permit = ADMIT_COLORCODE; break;
     }
     // set color code
     color_code = dc->colorCode();
@@ -552,10 +526,8 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
       group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList());
     // Set GPS system index
     if (dc->posSystem() && dc->posSystem()->is<GPSSystem>()) {
-      aprs_report = APRS_REPORT_DIGITAL;
+      aprs_report = 1;
       gps_system = conf->posSystems()->indexOfGPSSys(dc->posSystem()->as<GPSSystem>());
-    } else if (dc->posSystem() && dc->posSystem()->is<APRSSystem>()) {
-      aprs_report = APRS_REPORT_ANALOG;
     }
   }
 }
