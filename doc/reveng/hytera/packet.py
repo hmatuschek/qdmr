@@ -14,9 +14,12 @@ assemble and parse *any* packets used in the communication with the Hytera devic
 < RES: flags=FD, src=10, dest=20, seq=0000, crc=D270 (OK)
 """
 
+from __future__ import annotations
 import struct
+from typing import Union
+from abc import ABC, abstractmethod, abstractstaticmethod
 
-def hexDump(s, prefix="", addr=0):
+def hexDump(s: bytes, prefix="", addr=0) -> str:
   """ Utility function to hex-dump binary data. """
   N = len(s)
   Nb = N//16
@@ -38,9 +41,29 @@ def hexDump(s, prefix="", addr=0):
     res += (prefix + "{:08X} ".format(addr+16*j) + h + " | " + t + "\n")
   return res[:-1]
 
+class AbstractPacket(ABC):
+  @abstractmethod
+  def pack(self) -> bytes:
+    ...
 
+  @staticmethod
+  @abstractmethod
+  def unpack(data : bytes) -> AbstractPacket:
+    ...
 
-class Packet:
+  @abstractmethod
+  def __len__(self) -> int:
+    ...
+
+  def __str__(self) -> str:
+    """ Returns a string representation of the packet. """
+    return self.dump()
+
+  @abstractmethod
+  def dump(self, prefix="") -> str:
+    ...
+
+class Packet(AbstractPacket):
   """Represents a packet send to or received from the device.
 
   Use the static methods connect(), readCodeplug(), writeCodeplug() and reboot() to assemble
@@ -56,7 +79,8 @@ class Packet:
   FLAGS_CONNNECT    = 0xfe
   FLAGS_RES_CONNECT = 0xfd
 
-  def __init__(self, ptype, flags, src, dest, seq, content, crc=0):
+  def __init__(self, ptype, flags, src, dest, seq, 
+               content : Union[Request, EmptyContent], crc=0) -> None:
     """ Contstructs a new packet.
 
     To construct a packet to send to the device, consider using one of the static helper methods.
@@ -78,7 +102,7 @@ class Packet:
     self._crc     = crc
     self._content = content
 
-  def pack(self):
+  def pack(self) -> bytes:
     """ Packs the packet into a bytes object. """
     payload = self._content.pack()
     tlength = 12 + len(payload)
@@ -92,7 +116,7 @@ class Packet:
     return header + payload
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> Packet:
     """ Unpacks the given bytes string. """
     f1, ptype, f2, flags, src, dest, seq, tlength = struct.unpack(">BBBBBBHH", data[:10])
     (crc,) = struct.unpack("<H", data[10:12])
@@ -104,9 +128,11 @@ class Packet:
       return Packet(ptype, flags, src, dest, seq, EmptyContent(), crc)
     elif (Packet.REQ==ptype) or ((Packet.RES == ptype) and (0x00 == flags)):
       return Packet(ptype, flags, src, dest, seq, Request.unpack(payload), crc)
+    else:
+      raise RuntimeError("Unable to unpack packet")
 
   @staticmethod
-  def crc(packet):
+  def crc(packet: bytes) -> int:
     """ Computes the CRC over the given packed packet. """
     s = 0
     for i in range(5):
@@ -119,15 +145,11 @@ class Packet:
       s = (s>>16) + (s&0xffff)
     return s^0xffff
 
-  def __str__(self):
-    """ Returns a string representation of the packet. """
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     """ Returns the length of the packed packet. """
     return 12+len(self._content)
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     """ Returns a string representation of the packet.
 
     Each line is prefixed with the given prefix."""
@@ -148,26 +170,26 @@ class Packet:
     return s + self._content.dump(prefix + "     | ")
 
   @staticmethod
-  def connect():
+  def connect() -> Packet:
     """ Assembles a command request to the radio to connect. """
     return Packet(Packet.CONNECT, Packet.FLAGS_CONNNECT, Packet.HOST, Packet.DEVICE, 0, EmptyContent())
 
   @staticmethod
-  def getRadioID():
+  def getRadioID() -> Packet:
     """ Assembles a request for the radio to identify itself. """
     return Packet(Packet.REQ, Packet.FLAGS_DEFAULT, Packet.HOST, Packet.DEVICE, 0,
       Request(Request.GET_RADIO_ID,
         GetStringRequest(0x00)))
 
   @staticmethod
-  def getVersion():
+  def getVersion() -> Packet:
     """ Assembles a version string request. """
     return Packet(Packet.REQ, Packet.FLAGS_DEFAULT, Packet.HOST, Packet.DEVICE, 0,
       Request(Request.GET_VERSION,
         GetStringRequest(0x12)))
 
   @staticmethod
-  def enterProgMode(mode):
+  def enterProgMode(mode) -> Packet:
     """Instruct the radio to enter programming mode.
 
     This packet needs to be sent in order for any read or writes to codeplug
@@ -181,21 +203,21 @@ class Packet:
       Request(Request.ENTER_PROG_MODE, EnterProgModeRequest(mode)))
 
   @staticmethod
-  def readCodeplug(addr, length):
+  def readCodeplug(addr, length) -> Packet:
     """ Assembles a read codeplug memory request for the given memory address and length to read. """
     return Packet(Packet.REQ, Packet.FLAGS_DEFAULT, Packet.HOST, Packet.DEVICE, 0,
       Request(Request.READ_CODEPLUG,
         ReadCodeplugRequest(addr, length)))
 
   @staticmethod
-  def writeCodeplug(addr, payload):
+  def writeCodeplug(addr, payload) -> Packet:
     """ Assembles a write request to the codeplug memory at the specified address and writing the given payload. """
     return Packet(Packet.REQ, Packet.FLAGS_DEFAULT, Packet.HOST, Packet.DEVICE, 0,
       Request(Request.WRITE_CODEPLUG,
         WriteCodeplugRequest(addr, payload)))
 
   @staticmethod
-  def leaveProgMode():
+  def leaveProgMode() -> Packet:
     """ Assembles a request to the radio to leave programming mode.
 
     NOTE: this causes the radio to be rebooted when in WRITE mode."""
@@ -204,23 +226,23 @@ class Packet:
         LeaveProgModeRequest()))
 
 
-class FirmwarePacket:
+class FirmwarePacket(AbstractPacket):
   """Represents a firmware packet send to or received from the device."""
 
-  def __init__(self, content, crc=0):
+  def __init__(self, content : Request, crc=0) -> None:
     """ Contstructs a new packet.
 
     To construct a packet to send to the device, consider using one of the static helper methods.
 
     Args:
       ptype (int): Specifies the packet type, a 16-bit LE value who's function is unknown
-      content (Object): The packet content. An instance of Request.
+      content (Request): The packet content. An instance of Request.
       crc (int): Optional CRC value for the packet. Will be recomputed when calling pack().
     """
     self._crc     = crc
     self._content = content
 
-  def pack(self):
+  def pack(self) -> bytes:
     """ Packs the packet into a bytes object. """
     payload = self._content.pack()
     tlength = 4 + len(payload)
@@ -232,7 +254,7 @@ class FirmwarePacket:
     return header + payload
 
   @staticmethod
-  def unpack(data):
+  def unpack(data) -> FirmwarePacket:
     """ Unpacks the given bytes string. """
     tlength, crc = struct.unpack("<HH", data[:4])
     assert tlength == len(data)
@@ -240,7 +262,7 @@ class FirmwarePacket:
     return FirmwarePacket(Request.unpack(payload, True), crc)
 
   @staticmethod
-  def crc(packet):
+  def crc(packet : bytes) -> int:
     """ Computes the CRC over the given packed packet. """
     s = (~len(packet)) & 0xffff
     for i in range(2,len(packet)//2):
@@ -249,15 +271,11 @@ class FirmwarePacket:
       s += (~(packet[-1] << 8)) & 0xffff
     return s&0xffff
 
-  def __str__(self):
-    """ Returns a string representation of the packet. """
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     """ Returns the length of the packed packet. """
     return 4+len(self._content)
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     """ Returns a string representation of the packet.
 
     Each line is prefixed with the given prefix."""
@@ -273,49 +291,46 @@ class FirmwarePacket:
     return s + self._content.dump(prefix + "     | ")
 
   @staticmethod
-  def readCodeplug(addr, length):
+  def readCodeplug(addr, length) -> FirmwarePacket:
     """ Assembles a read codeplug memory request for the given memory address and length to read. """
     return FirmwarePacket(Request(Request.FW_READ_MEMORY,
                                   FwReadMemoryRequest(0x03, addr, length)))
 
   @staticmethod
-  def writeCodePlug(addr, payload):
+  def writeCodePlug(addr, payload) -> FirmwarePacket:
     """ Assembles a write codeplug memory request for the given memory address and length. """
     return FirmwarePacket(Request(Request.FW_WRITE_MEMORY,
                                   FwWriteMemoryRequest(0x03, addr, payload)))
 
   @staticmethod
-  def setMemoryAccess(enableAccess):
+  def setMemoryAccess(enableAccess) -> FirmwarePacket:
     return FirmwarePacket(Request(Request.FW_SET_MEM_ACCESS,
                                   FwMemoryAccessRequest(enableAccess)))
 
-class EmptyContent:
+class EmptyContent(AbstractPacket):
   """ Tiny helper class to represent some empty packet/request content. """
-  def __init__(self):
-    pass
+  def __init__(self) -> None:
+    ...
 
-  def pack(self):
+  def pack(self) -> bytes:
     return b""
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> EmptyContent:
     assert(0 == len(data))
     return EmptyContent()
 
-  def __str__(self):
-    return ""
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 0
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     return ""
 
 
 
-class UnknownData:
+class UnknownData(AbstractPacket):
   """ Helper class representing some raw data. This can be used to represent some unknown raw packet content. """
-  def __init__(self, data):
+  def __init__(self, data: bytes) -> None:
     """ Constructor.
 
     Args:
@@ -323,27 +338,23 @@ class UnknownData:
     """
     self._data = data
 
-  def pack(self):
+  def pack(self) -> bytes:
     return self._data
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> UnknownData:
     return UnknownData(data)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return len(self._data)
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     s = prefix + "Raw data len={:04X}\n".format(len(self))
     s += hexDump(self._data, prefix)
     return s
 
 
-
-class Request:
+class Request(AbstractPacket):
   REQUEST_RESPONSE = 0x8000
   FW_READ_MEMORY = 0x01c2
   FW_WRITE_MEMORY= 0x01c3
@@ -355,7 +366,7 @@ class Request:
   GET_RADIO_ID     = 0x0203
   FW_SET_MEM_ACCESS= 0x0218
 
-  def __init__(self, rtype, content, crc=None):
+  def __init__(self, rtype, content, crc=None) -> None:
     self._rtype = rtype
     self._content = content
 
@@ -364,8 +375,7 @@ class Request:
     else:
       self._crc = crc
 
-
-  def pack(self):
+  def pack(self) -> bytes:
     crc = 0
     payload = self._content.pack()
     header = struct.pack("<BHH", 0x02, self._rtype, len(payload))
@@ -375,7 +385,7 @@ class Request:
     return header + payload + footer
 
   @staticmethod
-  def unpack(data, isFirmware=False):
+  def unpack(data, isFirmware=False) -> Request:
     f1, rtype, plen = struct.unpack("<BHH", data[:5])
     crc, f2 = struct.unpack("BB", data[-2:])
     payload = data[5:-2]
@@ -423,20 +433,17 @@ class Request:
       return Request(rtype, UnknownData(payload), crc)
 
   @staticmethod
-  def crc(packet):
+  def crc(packet: bytes) -> int:
     s = 0
     for i in range(1,len(packet)-2):
       s += packet[i]
     s = ((~s)+0x33)&0xff
     return s
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 7 + len(self._content)
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     s  = prefix
     if Request.REQUEST_RESPONSE & self._rtype:
       s += "RSP: "
@@ -452,69 +459,63 @@ class Request:
 
 
 
-class ReadCodeplugRequest:
-  def __init__(self, addr, length):
+class ReadCodeplugRequest(AbstractPacket):
+  def __init__(self, addr, length) -> None:
     self._addr = addr
     self._length = length
 
-  def pack(self):
+  def pack(self) -> bytes:
     return struct.pack("<BBBBBBIH", 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, self._addr, self._length)
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> ReadCodeplugRequest:
     f1,f2,f3,f4,f5,f6, addr, length = struct.unpack("<BBBBBBIH", data[:12])
     assert ( (0x00 == f1) and (0x00 == f2) and (0x00 == f3) and
              (0x01 == f4) and (0x00 == f5) and (0x00 == f6) )
     return ReadCodeplugRequest(addr, length)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 12
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     s  = prefix
     s += "RD: addr={:08X} len={:04X}\n".format(self._addr, self._length)
     return s
 
 
-class FwReadMemoryRequest:
-  def __init__(self, memory, addr, length):
+class FwReadMemoryRequest(AbstractPacket):
+  def __init__(self, memory, addr, length) ->  None:
     self._memory = memory
     self._addr = addr
     self._length = length
 
-  def pack(self):
+  def pack(self) -> bytes:
     return struct.pack('<BIH', self._memory, self._addr, self._length)
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> FwReadMemoryRequest:
     memory, addr, length = struct.unpack('<BIH',  data)
     return FwReadMemoryRequest(memory, addr, length)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 7
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     s  = prefix
     s += "FWRD: memory={:02X} addr={:08X} len={:04X}\n".format(self._memory, self._addr, self._length)
     return s
 
-class ReadCodeplugResponse:
-  def __init__(self, addr, payload=None):
+class ReadCodeplugResponse(AbstractPacket):
+  def __init__(self, addr, payload : bytes = b"") -> None:
     self._addr = addr
     self._payload = payload
 
-  def pack(self):
+  def pack(self) -> bytes:
     header = struct.pack("<BBBBBBBIH", 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, self._addr, len(self._payload))
     return header + self._payload
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> ReadCodeplugResponse:
     f1,f2,f3,f4,f5,f6,f7, addr, length = struct.unpack("<BBBBBBBIH", data[:13])
     payload = data[13:]
     assert ( (0x00 == f1) and (0x00 == f2) and (0x00 == f3) and
@@ -522,32 +523,29 @@ class ReadCodeplugResponse:
              (0x00 == f7) and (length==len(payload)) )
     return ReadCodeplugResponse(addr, payload)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 13+len(self._payload)
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     s  = prefix
     s += "RD: addr={:08X}\n".format(self._addr)
     return s + hexDump(self._payload, prefix+"  | ", self._addr)
 
-class FwReadMemoryResponse:
+class FwReadMemoryResponse(AbstractPacket):
   STATUS_SUCCESS = 0x00
 
-  def __init__(self, status, memory, addr, payload=None):
+  def __init__(self, status, memory, addr, payload=b"") -> None:
     self._status = status
     self._memory = memory
     self._addr = addr
     self._payload = payload
 
-  def pack(self):
+  def pack(self) -> bytes:
     header = struct.pack("<BBIH", self._status, self._memory, self._addr, len(self._payload))
     return header + self._payload
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> FwReadMemoryResponse:
     status, memory, addr, length = struct.unpack("<BBIH", data[:8])
     payload = data[8:]
 
@@ -556,38 +554,34 @@ class FwReadMemoryResponse:
 
     return FwReadMemoryResponse(status, memory, addr, payload)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 8+len(self._payload)
 
-  def __getStatusMessage__(self):
+  def __getStatusMessage__(self) -> str:
     if self._status == FwReadMemoryResponse.STATUS_SUCCESS:
       return "SUCCESS"
     else:
       return "{:02X}".format(self._status)
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     s  = prefix
     s += "FWRD: status={} memory={:02X} addr={:08X}\n".format(self.__getStatusMessage__(),
                                                               self._memory, self._addr)
     return s + hexDump(self._payload, prefix+"  | ", self._addr)
 
 
-class FwWriteMemoryRequest:
-
-  def __init__(self, memory, addr, payload=None):
+class FwWriteMemoryRequest(AbstractPacket):
+  def __init__(self, memory, addr, payload=b"") -> None:
     self._memory = memory
     self._addr = addr
     self._payload = payload
 
-  def pack(self):
+  def pack(self) -> bytes:
     header = struct.pack("<BIH", self._memory, self._addr, len(self._payload))
     return header + self._payload
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> FwWriteMemoryRequest:
     memory, addr, length = struct.unpack("<BIH", data[:7])
     payload = data[7:]
 
@@ -595,70 +589,65 @@ class FwWriteMemoryRequest:
 
     return FwWriteMemoryRequest(memory, addr, payload)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 7+len(self._payload)
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     s  = prefix
     s += "FWWR: memory={:02X} addr={:08X}\n".format(self._memory, self._addr)
     return s + hexDump(self._payload, prefix+"  | ", self._addr)
 
-class FwWriteMemoryResponse:
+class FwWriteMemoryResponse(AbstractPacket):
   STATUS_SUCCESS = 0x00
   MEM_CP = 0x03
 
-  def __init__(self, status, memory, addr, length):
+  def __init__(self, status, memory, addr, length) -> None:
     self._status = status
     self._memory = memory
     self._addr = addr
     self._length = length
 
-  def pack(self):
+  def pack(self) -> bytes:
     return struct.pack("<BBIH", self._status, 0x00, self._addr, self._length)
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> FwWriteMemoryResponse:
     status, memory, addr, length = struct.unpack("<BBIH", data)
 
     return FwWriteMemoryResponse(status, memory, addr, length)
 
-  def __str__(self):
-    return self.dump()
 
   def __len__(self):
-    return 7+len(self._payload)
+    return 8
 
-  def __getStatusMessage__(self):
+  def __getStatusMessage__(self) -> str:
     if self._status == FwReadMemoryResponse.STATUS_SUCCESS:
       return "SUCCESS"
     else:
       return "{:02X}".format(self._status)
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     s  = prefix
     s += "FWWR: status={} memory={:02X} addr={:08X} len={:04X}\n".format(self.__getStatusMessage__(),
                                                                          self._memory, self._addr, self._length)
     return s
 
-class FwMemoryAccessRequest:
+class FwMemoryAccessRequest(AbstractPacket):
   DISABLE_ACCESS = 0x0000
   ENABLE_ACCESS = 0x10fb
 
   """Construct an enable access request.
 
   enableAccess = True to enable access, False otherwise."""
-  def __init__(self, enableAccess):
+  def __init__(self, enableAccess) -> None:
     self._enableAccess = enableAccess
 
-  def pack(self):
+  def pack(self) -> bytes:
     return struct.pack("<H", FwMemoryAccessRequest.ENABLE_ACCESS if self._enableAccess \
                              else FwMemoryAccessRequest.DISABLE_ACCESS)
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> FwMemoryAccessRequest:
     x = struct.unpack("<H", data)[0]
     enableAccess = False
 
@@ -670,45 +659,33 @@ class FwMemoryAccessRequest:
 
     return FwMemoryAccessRequest(enableAccess)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 2
 
-  def __getStatusMessage__(self):
-    if self._status == FwReadMemoryResponse.STATUS_SUCCESS:
-      return "SUCCESS"
-    else:
-      return "{:02X}".format(self._status)
-
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     s  = prefix
     stateString = "Enable" if self._enableAccess else "Disable"
     s += "MemoryAccessRequest: {} access\n".format(stateString)
     return s
 
-class FwMemoryAccessResponse:
+class FwMemoryAccessResponse(AbstractPacket):
   STATUS_OK = 0x5e
 
-  def __init__(self, status):
+  def __init__(self, status) -> None:
     self._status = status
 
-  def pack(self):
+  def pack(self) -> bytes:
     return struct.pack("<B", self._status)
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> FwMemoryAccessResponse:
     status = struct.unpack("B", data)[0]
     return FwMemoryAccessResponse(status)
-
-  def __str__(self):
-    return self.dump()
 
   def __len__(self):
     return 1
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     s  = prefix
     statusText = 'SUCCESS'
     if not self._status == FwMemoryAccessResponse.STATUS_OK:
@@ -716,190 +693,170 @@ class FwMemoryAccessResponse:
     s += "MemoryAccessRequestResponse: status={}\n".format(statusText)
     return s
 
-class WriteCodeplugRequest:
-  def __init__(self, addr, payload):
+class WriteCodeplugRequest(AbstractPacket):
+  def __init__(self, addr, payload) -> None:
     self._addr = addr
     self._payload = payload
 
-  def pack(self):
+  def pack(self) -> bytes:
     length = len(self._payload)
     header = struct.pack("<BBBBBBIH", 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, self._addr, length)
     return header + self._payload
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> WriteCodeplugRequest:
     f1,f2,f3,f4,f5,f6, addr, length = struct.unpack("<BBBBBBIH", data[:12])
     assert ( (0x00 == f1) and (0x00 == f2) and (0x00 == f3) and
              (0x01 == f4) and (0x00 == f5) and (0x00 == f6) )
     payload = data[12:]
+    assert (length == len(payload))
     return WriteCodeplugRequest(addr, payload)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
    return 12+len(self._payload)
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     s  = prefix
     s += "WR: addr={:08X}\n".format(self._addr)
     return s + hexDump(self._payload, prefix+"  | ", self._addr)
 
 
 
-class WriteCodeplugResponse:
-  def __init__(self, addr, length):
+class WriteCodeplugResponse(AbstractPacket):
+  def __init__(self, addr, length) -> None:
     self._addr = addr
     self._length = length
 
-  def pack(self):
+  def pack(self) -> bytes:
     return struct.pack("<BBBBBBBIH", 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, self._addr, self._length)
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> WriteCodeplugResponse:
     f1,f2,f3,f4,f5,f6,f7, addr, length = struct.unpack("<BBBBBBBIH", data[:13])
     assert ( (0x00 == f1) and (0x00 == f2) and (0x00 == f3) and
              (0x00 == f4) and (0x01 == f5) and (0x00 == f6) and
              (0x00 == f7) )
     return WriteCodeplugResponse(addr, length)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 13
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     s  = prefix
     s += "WR: addr={:08X} len={:04X}\n".format(self._addr, self._length)
     return s
 
 
-class GetStringRequest:
+class GetStringRequest(AbstractPacket):
   RADIO_ID = 0x00
   UNKNOWN_1 = 0x12
   UNKNOWN_2 = 0x09
 
-  def __init__(self, what):
+  def __init__(self, what) -> None:
     self._what = what
 
-  def pack(self):
+  def pack(self) -> bytes:
     return struct.pack("B", self._what)
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> GetStringRequest:
     assert(1 == len(data))
     what, = struct.unpack("B",data)
     return GetStringRequest(what)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 1
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     return prefix + "STR: what={:02X}".format(self._what)
 
 
-class GetStringResponse:
-  def __init__(self, ukn1, what, s):
+class GetStringResponse(AbstractPacket):
+  def __init__(self, ukn1, what, s) -> None:
     self._ukn1 = ukn1
     self._what = what
     self._string = str(s)
 
-  def pack(self):
+  def pack(self) -> bytes:
     header = struct.pack("BBBBBBBB",self._ukn1,0,0,0,self._what,0,0,0)
     return header + self._string.encode("utf_16_le")
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> GetStringResponse:
     ukn1,f2,f3,f4,what,f6,f7,f8 = struct.unpack("BBBBBBBB",data[:8])
     assert (0==f2) and (0==f3) and (0==f4) and (0==f6) and (0==f7) and (0==f8)
     return GetStringResponse(ukn1, what,data[8:].decode("utf_16_le"))
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 8+32
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     res  = prefix + "STR: what={:02X}, ukn1={:02X}, len={:04X}\n".format(self._what, self._ukn1, len(self._string))
     res += prefix + "   | " + self._string.replace("\u0000","")
     return res
 
 
-class LeaveProgModeRequest:
-  def __init__(self, ukn1=0x00):
+class LeaveProgModeRequest(AbstractPacket):
+  def __init__(self, ukn1=0x00) -> None:
     self._ukn1 = ukn1
 
-  def pack(self):
+  def pack(self) -> bytes:
     return struct.pack("B", self._ukn1)
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> LeaveProgModeRequest:
     assert(1 == len(data))
     ukn1, = struct.unpack("B", data)
     return LeaveProgModeRequest(ukn1)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 1
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     return prefix + "LEAVE_PROG_MODE: ukn1={:02X}".format(self._ukn1)
 
 
-class LeaveProgModeResponse:
-  def __init__(self, ukn1=0x00):
+class LeaveProgModeResponse(AbstractPacket):
+  def __init__(self, ukn1=0x00) -> None:
     self._ukn1 = ukn1
 
-  def pack(self):
+  def pack(self) -> bytes:
     return struct.pack("B", self._ukn1)
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> LeaveProgModeRequest:
     assert(1 == len(data))
     ukn1, = struct.unpack("B", data)
     return LeaveProgModeRequest(ukn1)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 1
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     return prefix + "LEAVE_PROG_MODE: ukn1={:02X}".format(self._ukn1)
 
 
-class EnterProgModeRequest:
+class EnterProgModeRequest(AbstractPacket):
   READ_MODE = 0x00
   WRITE_MODE = 0x02
 
-  def __init__(self, mode):
+  def __init__(self, mode) -> None:
     self._mode = mode
 
-  def pack(self):
+  def pack(self) -> bytes:
     return struct.pack("BBBBBBBBBBBBBBBBB", self._mode,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> EnterProgModeRequest:
     mode,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17 = struct.unpack("BBBBBBBBBBBBBBBBB", data)
     assert ((mode == EnterProgModeRequest.READ_MODE) or
             (mode == EnterProgModeRequest.WRITE_MODE))
     return EnterProgModeRequest(mode)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 17
 
-  def __geModeString__(self):
+  def __geModeString__(self) -> str:
     if self._mode == EnterProgModeRequest.READ_MODE:
       return 'READ'
     elif self._mode == EnterProgModeRequest.WRITE_MODE:
@@ -907,26 +864,26 @@ class EnterProgModeRequest:
     else:
       return 'UNKOWN ({:02X})'.format(self._mode)
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     return prefix + "ENTER_PROG_MODE: mode={}".format(self.__geModeString__())
 
 
-class EnterProgModeResponse:
+class EnterProgModeResponse(AbstractPacket):
   READ_MODE = 0x00
   WRITE_MODE = 0x02
 
-  def __init__(self, status, mode, headData):
+  def __init__(self, status, mode, headData) -> None:
     self._status = status
     self._mode = mode
     self._headData = headData
 
-  def pack(self):
+  def pack(self) -> bytes:
     payload = self._headData
     header = struct.pack("<BBH", 0, self._mode, len(payload))
     return header+payload
 
   @staticmethod
-  def unpack(data):
+  def unpack(data: bytes) -> EnterProgModeResponse:
     status, mode, length = struct.unpack("<BBH", data[:4])
     payload = data[4:]
     assert ((mode == EnterProgModeResponse.READ_MODE) or
@@ -937,19 +894,16 @@ class EnterProgModeResponse:
 
     return EnterProgModeResponse(status, mode, payload)
 
-  def __str__(self):
-    return self.dump()
-
-  def __len__(self):
+  def __len__(self) -> int:
     return 4+len(self._headData)
 
-  def __getStatusMessage__(self):
+  def __getStatusMessage__(self) -> str:
     if self._status == FwReadMemoryResponse.STATUS_SUCCESS:
       return "SUCCESS"
     else:
       return "{:02X}".format(self._status)
 
-  def __getModeString__(self):
+  def __getModeString__(self) -> str:
     if self._mode == EnterProgModeRequest.READ_MODE:
       return 'READ'
     elif self._mode == EnterProgModeRequest.WRITE_MODE:
@@ -957,31 +911,7 @@ class EnterProgModeResponse:
     else:
       return 'UNKOWN ({:02X})'.format(self._mode)
 
-  def dump(self, prefix=""):
+  def dump(self, prefix="") -> str:
     res  = prefix + "ENTER_PROG_MODE: status={} mode={} headData:\n".format(self.__getStatusMessage__(),
                                                                             self.__getModeString__())
     return res + hexDump(self._headData, prefix+"  | ", 0)
-
-if "__main__" == __name__:
-  # Example script
-
-  # "enter program mode" request and disassembly
-  print(hexDump(Packet.enterProgramMode().pack()))
-  print(Packet.unpack(Packet.enterProgramMode().pack()))
-  print()
-  # ID radio request an disassembly
-  print(hexDump(Packet.getRadioID().pack()))
-  print(Packet.unpack(Packet.getRadioID().pack()))
-  print()
-  # Read some unknown radio info
-  print(hexDump(Packet.readUnknownRadioInfo().pack()))
-  print(Packet.unpack(Packet.readUnknownRadioInfo().pack()))
-  print()
-  # Read some data request and disassembly
-  print(hexDump(Packet.readCodeplug(0x00000000, 0x100).pack()))
-  print(Packet.unpack(Packet.readCodeplug(0x00000000, 0x100).pack()))
-  print()
-  # reboot radio request and disassembly
-  print(hexDump(Packet.reboot().pack()))
-  print(Packet.unpack(Packet.reboot().pack()))
-  print()
