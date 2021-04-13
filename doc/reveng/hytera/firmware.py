@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 
-import usb.core
-import usb.util
-import binascii
 import argparse
 import packet
-import struct
-import os
 from radio import FirmwareRadio
+
 
 def dump(args):
     with FirmwareRadio(args.verbose) as radio:
