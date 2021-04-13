@@ -1,8 +1,9 @@
 import struct
-import usb.core
-import usb.util
+import usb.core # type: ignore
+import usb.util # type: ignore
 import packet
 from abc import ABC, abstractmethod
+
 
 class Radio(ABC):
     READ_SZ = 0x400
@@ -10,13 +11,12 @@ class Radio(ABC):
     OUT_EP = 0x01
     IN_EP = 0x81
 
-    def __init__(self, productId, vendorId, ep, verbose):
+    def __init__(self, productId: int, vendorId: int, ep: int, verbose: bool):
         self._pid = productId
         self._vid = vendorId
         self._outEp = ep
         self._inEp = ep | 0x80
         self._verbose = verbose
-        pass
 
     def __enter__(self):
         self._dev = usb.core.find(idVendor=self._vid, idProduct=self._pid)
@@ -29,14 +29,14 @@ class Radio(ABC):
         return self
 
     @abstractmethod
-    def getTotalPacketLength(self, partialPacket):
-        pass
+    def getTotalPacketLength(self, partialPacket: bytes) -> int:
+        ...
 
     @abstractmethod
     def unpack(self, data):
-        pass
+        ...
 
-    def xfer(self, cmd):
+    def xfer(self, cmd: packet.Packet) -> packet.Packet:
         if self._verbose:
             print('-'*80)
             print(cmd)
@@ -56,11 +56,12 @@ class Radio(ABC):
 
         return pkt
 
+
 class FirmwareRadio(Radio):
-    def __init__(self, verbose):
+    def __init__(self, verbose: bool):
         super().__init__(0x1234, 0x8765, 0x01, verbose)
 
-    def getTotalPacketLength(self, partialPacket):
+    def getTotalPacketLength(self, partialPacket: bytes) -> int:
         return struct.unpack('<H', partialPacket[:2])[0]
 
     def unpack(self, data):
@@ -83,14 +84,15 @@ class FirmwareRadio(Radio):
         if openStatus != packet.FwMemoryAccessResponse.STATUS_OK:
             raise RuntimeError("Failed to disable write on radio (status={:02X})".format(openStatus))
 
+
 class CPSRadio(Radio):
-    def __init__(self, verbose):
+    def __init__(self, verbose: bool):
         super().__init__(0x0a11, 0x238b, 0x04, verbose)
 
-    def getTotalPacketLength(self, partialPacket):
+    def getTotalPacketLength(self, partialPacket: bytes) -> int:
         return struct.unpack('>H', partialPacket[8:10])[0]
 
-    def unpack(self, data):
+    def unpack(self, data: bytes):
         return packet.Packet.unpack(data)
 
     def __enter__(self):
