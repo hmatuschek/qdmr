@@ -129,9 +129,9 @@ struct digital_chan_t
   // byte 33
   // Using bitfields for single flags from LSB to MSB
   uint8_t rx_only    : 1,    /// 1=rx ony, 0=tx allowed
-          unk33      : 3,
+          unk33      : 2,
           power      : 1,    /// 1=High, 0=Low
-          ukn33_5    : 3;    /// <- Althoug not needed, it helps me to check whether I've got them all.
+          ukn33_5    : 4;    /// <- Althoug not needed, it helps me to check whether I've got them all.
   // byte 34
   uint16_t unk34;
   // byte 36
