@@ -1,7 +1,6 @@
 #!/usr/bin/env python3 
 
-import pyshark
-import sys
+import pyshark  # type: ignore
 import binascii
 from packet import *
 
@@ -80,8 +79,8 @@ elif "fw_structure" == args.command:
       currentDataSource = HOST
 
     if currentDataSource != lastDataSource:
-      packet = FirmwarePacket.unpack(currentData)
-      print(packet)
+      fwPacket = FirmwarePacket.unpack(currentData)
+      print(fwPacket)
       currentData = bytes()
 
       lastDataSource = currentDataSource
