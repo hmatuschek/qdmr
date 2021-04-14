@@ -111,7 +111,7 @@ def read(radio: CPSRadio, start_addr: int, length: int) -> bytes:
 
 def dump_cp_memory(args) -> None:
     with CPSRadio(args.verbose) as radio:
-        data = read(radio, 0x0003ab2a, 1)
+        data = read(radio, 0, 0x200000)
         args.OUT_FILE.write(data)
 
 
