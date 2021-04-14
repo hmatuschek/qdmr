@@ -46,7 +46,7 @@ static Radio::Features _d868uv_features =
   .maxContactsInGrouplist = 64,
 
   .hasGPS = true,
-  .maxGPSSystems = 8,
+  .maxGPSSystems = 1,
 
   .hasAPRS = false,
   .maxAPRSSystems = 0,

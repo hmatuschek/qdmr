@@ -9,6 +9,8 @@
 
 #include <QTimeZone>
 #include <QtEndian>
+#include <QSet>
+
 
 #define NUM_CHANNELS              4000
 #define NUM_CHANNEL_BANKS         32
@@ -427,7 +429,9 @@ D868UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
       dc->setRXGroupList(ctx.getGroupList(group_list_index));
 
     // Link to GPS system
-    if (aprs_report && ctx.hasGPSSystem(gps_system))
+    if (aprs_report && (!ctx.hasGPSSystem(gps_system)))
+      logWarn() << "Cannot link to GPS system index " << gps_system << ": undefined GPS system.";
+    else if (ctx.hasGPSSystem(gps_system))
       dc->setPosSystem(ctx.getGPSSystem(gps_system));
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
@@ -1055,6 +1059,52 @@ D868UVCodeplug::gps_settings_t::setTargetType(DigitalContact::Type type) {
   case DigitalContact::GroupCall: call_type = GROUP_CALL; break;
   case DigitalContact::AllCall: call_type = ALL_CALL; break;
   }
+}
+
+void
+D868UVCodeplug::gps_settings_t::fromConfig(Config *config, const Flags &flags) {
+  if (1 < config->posSystems()->gpsCount()) {
+    logDebug() << "D868UV only supports a single independent GPS positioning system.";
+  } else if (0 == config->posSystems()->gpsCount()) {
+    return;
+  }
+
+  GPSSystem *sys = config->posSystems()->gpsSystem(0);
+  setTargetID(sys->contact()->number());
+  setTargetType(sys->contact()->type());
+  setManualTXIntervall(sys->period());
+  setAutomaticTXIntervall(sys->period());
+  if (SelectedChannel::get() == sys->revertChannel()->as<Channel>()) {
+    setChannelSelected(0);
+    timeslot = TIMESLOT_SAME;
+  } else {
+    setChannelIndex(0, config->channelList()->indexOf(sys->revertChannel()));
+    timeslot = TIMESLOT_SAME;
+  }
+}
+
+bool
+D868UVCodeplug::gps_settings_t::createGPSSystem(uint8_t i, Config *config, CodeplugContext &ctx) {
+  ctx.addGPSSystem(new GPSSystem(QString("GPS sys %1").arg(i+1), nullptr, nullptr, getAutomaticTXIntervall()), i);
+  return true;
+}
+
+bool
+D868UVCodeplug::gps_settings_t::linkGPSSystem(uint8_t i, Config *config, CodeplugContext &ctx) {
+  DigitalContact *cont = nullptr;
+  // Find matching contact, if not found -> create one.
+  if (nullptr == (cont = config->contacts()->findDigitalContact(getTargetID()))) {
+    cont = new DigitalContact(getTargetType(), QString("GPS target"), getTargetID());
+    config->contacts()->addContact(cont);
+  }
+  ctx.getGPSSystem(i)->setContact(cont);
+
+  // Check if there is a revert channel set
+  if ((! isChannelSelected(i)) && (ctx.hasChannel(getChannelIndex(i))) && (ctx.getChannel(getChannelIndex(i)))->is<DigitalChannel>()) {
+    DigitalChannel *ch = ctx.getChannel(getChannelIndex(i))->as<DigitalChannel>();
+    ctx.getGPSSystem(i)->setRevertChannel(ch);
+  }
+  return true;
 }
 
 
@@ -1832,21 +1882,45 @@ D868UVCodeplug::allocateGPSSystems() {
 bool
 D868UVCodeplug::encodeGPSSystems(Config *config, const Flags &flags) {
   gps_settings_t *gps = (gps_settings_t *)data(ADDR_GPS_SETTINGS);
-  /// @todo Implement GPS systems encoding and settings.
+  gps->fromConfig(config, flags);
   return true;
 }
 
 bool
 D868UVCodeplug::createGPSSystems(Config *config, CodeplugContext &ctx) {
+  QSet<uint8_t> systems;
+  // First find all GPS systems linked, that is referenced by any channel
+  // Create channels
+  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
+  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+    // Check if channel is enabled:
+    uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
+    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
+      continue;
+    if (ctx.getChannel(i)->is<AnalogChannel>())
+      continue;
+    channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
+                                      +bank*CHANNEL_BANK_OFFSET
+                                      +idx*sizeof(channel_t));
+    if (ch->aprs_report)
+      systems.insert(ch->gps_system);
+  }
+  // Then create all referenced GPS systems
   gps_settings_t *gps = (gps_settings_t *)data(ADDR_GPS_SETTINGS);
-  /// @todo Implement GPS systems decoding and settings.
+  for (QSet<uint8_t>::iterator idx=systems.begin(); idx!=systems.end(); idx++)
+    gps->createGPSSystem(*idx, config, ctx);
   return true;
 }
 
 bool
 D868UVCodeplug::linkGPSSystems(Config *config, CodeplugContext &ctx) {
   gps_settings_t *gps = (gps_settings_t *)data(ADDR_GPS_SETTINGS);
-  /// @todo Implement GPS systems linking
+  // Then link all referenced GPS systems
+  for (uint8_t i=0; i<8; i++) {
+    if (! ctx.hasGPSSystem(i))
+      continue;
+    gps->linkGPSSystem(i, config, ctx);
+  }
   return true;
 }
 

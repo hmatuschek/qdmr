@@ -714,6 +714,10 @@ public:
 
     DigitalContact::Type getTargetType() const;
     void setTargetType(DigitalContact::Type type);
+
+    void fromConfig(Config *config, const Flags &flags);
+    bool createGPSSystem(uint8_t i, Config *config, CodeplugContext &ctx);
+    bool linkGPSSystem(uint8_t i, Config *config, CodeplugContext &ctx);
   };
 
   /** Some weird linked list of valid message indices.
