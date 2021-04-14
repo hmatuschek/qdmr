@@ -895,6 +895,170 @@ D868UVCodeplug::boot_settings_t::updateConfig(Config *config) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of D868UVCodeplug::gps_settings_t
+ * ******************************************************************************************** */
+void
+D868UVCodeplug::gps_settings_t::clear() {
+  manual_tx_intervall = 0;
+  auto_tx_intervall = 0;
+  enable_fixed_location = 0;
+  transmit_power = POWER_LOW;
+  for (uint8_t i=0; i<8; i++)
+    channel_idxs[i] = qToLittleEndian(0x0fa1);
+  target_id = 1;
+  call_type = PRIVATE_CALL;
+  timeslot = TIMESLOT_SAME;
+}
+
+uint8_t
+D868UVCodeplug::gps_settings_t::getManualTXIntervall() const {
+  return manual_tx_intervall;
+}
+void
+D868UVCodeplug::gps_settings_t::setManualTXIntervall(uint8_t period) {
+  manual_tx_intervall = period;
+}
+
+uint16_t
+D868UVCodeplug::gps_settings_t::getAutomaticTXIntervall() const {
+  if (0 == auto_tx_intervall)
+    return 0;
+  return 45 + 15*auto_tx_intervall;
+}
+void
+D868UVCodeplug::gps_settings_t::setAutomaticTXIntervall(uint16_t period) {
+  if (0 == period)
+    auto_tx_intervall = 0;
+  else if (60 > period)
+    auto_tx_intervall = 1;
+  else
+    auto_tx_intervall = (period-45)/15;
+}
+
+Channel::Power
+D868UVCodeplug::gps_settings_t::getTransmitPower() const {
+  switch (transmit_power) {
+  case POWER_LOW: return Channel::LowPower;
+  case POWER_MID: return Channel::MidPower;
+  case POWER_HIGH: return Channel::HighPower;
+  case POWER_TURBO: return Channel::MaxPower;
+  }
+}
+void
+D868UVCodeplug::gps_settings_t::setTransmitPower(Channel::Power power) {
+  switch(power) {
+  case Channel::MinPower:
+  case Channel::LowPower:
+    transmit_power = POWER_LOW;
+    break;
+  case Channel::MidPower:
+    transmit_power = POWER_MID;
+    break;
+  case Channel::HighPower:
+    transmit_power = POWER_HIGH;
+    break;
+  case Channel::MaxPower:
+    transmit_power = POWER_TURBO;
+    break;
+  }
+}
+
+bool
+D868UVCodeplug::gps_settings_t::isFixedLocation() const {
+  return enable_fixed_location;
+}
+
+double
+D868UVCodeplug::gps_settings_t::getFixedLat() const {
+  return ((1 == north_south) ? -1 : 1) * (lat_deg + double(lat_min)/60 + double(lat_sec)/3600);
+}
+
+double
+D868UVCodeplug::gps_settings_t::getFixedLon() const {
+  return ((1 == east_west) ? -1 : 1) * (lon_deg + double(lon_min)/60 + double(lon_sec)/3600);
+}
+
+void
+D868UVCodeplug::gps_settings_t::setFixedLocation(double lat, double lon) {
+  enable_fixed_location = 1;
+  north_south = (lat < 0) ? 1 : 0; lat = std::abs(lat);
+  lat_deg = uint(lat); lat -= uint(lat); lat *= 60;
+  lat_min = uint(lat); lat -= uint(lat); lat *= 60;
+  lat_sec = uint(lat);
+  east_west = (lon < 0) ? 1 : 0; lon = std::abs(lon);
+  lon_deg = uint(lon); lon -= uint(lon); lon *= 60;
+  lon_min = uint(lon); lon -= uint(lon); lon *= 60;
+  lon_sec = uint(lon);
+}
+
+bool
+D868UVCodeplug::gps_settings_t::isChannelSelected(uint8_t i) const {
+  return 0x0fa2 == qFromLittleEndian(channel_idxs[i]);
+}
+
+bool
+D868UVCodeplug::gps_settings_t::isChannelVFOA(uint8_t i) const {
+  return 0x0fa0 == qFromLittleEndian(channel_idxs[i]);
+}
+
+bool
+D868UVCodeplug::gps_settings_t::isChannelVFOB(uint8_t i) const {
+  return 0x0fa1 == qFromLittleEndian(channel_idxs[i]);
+}
+
+uint16_t
+D868UVCodeplug::gps_settings_t::getChannelIndex(uint8_t i) const {
+  return qFromLittleEndian(channel_idxs[i]);
+}
+
+void
+D868UVCodeplug::gps_settings_t::setChannelIndex(uint8_t i, uint16_t idx) {
+  channel_idxs[i] = qToLittleEndian(idx);
+}
+
+void
+D868UVCodeplug::gps_settings_t::setChannelSelected(uint8_t i) {
+  channel_idxs[i] = qToLittleEndian(0x0fa2);
+}
+
+void
+D868UVCodeplug::gps_settings_t::setChannelVFOA(uint8_t i) {
+  channel_idxs[i] = qToLittleEndian(0x0fa0);
+}
+
+void
+D868UVCodeplug::gps_settings_t::setChannelVFOB(uint8_t i) {
+  channel_idxs[i] = qToLittleEndian(0x0fa1);
+}
+
+uint32_t
+D868UVCodeplug::gps_settings_t::getTargetID() const {
+  return decode_dmr_id_bcd((uint8_t *)&target_id);
+}
+void
+D868UVCodeplug::gps_settings_t::setTargetID(uint32_t id) {
+  encode_dmr_id_bcd((uint8_t *)&target_id, id);
+}
+
+DigitalContact::Type
+D868UVCodeplug::gps_settings_t::getTargetType() const {
+  switch (call_type) {
+  case PRIVATE_CALL: return DigitalContact::PrivateCall;
+  case GROUP_CALL: return DigitalContact::GroupCall;
+  case ALL_CALL: return DigitalContact::AllCall;
+  }
+}
+void
+D868UVCodeplug::gps_settings_t::setTargetType(DigitalContact::Type type) {
+  switch(type) {
+  case DigitalContact::PrivateCall: call_type = PRIVATE_CALL; break;
+  case DigitalContact::GroupCall: call_type = GROUP_CALL; break;
+  case DigitalContact::AllCall: call_type = ALL_CALL; break;
+  }
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::contact_map_t
  * ******************************************************************************************** */
 D868UVCodeplug::contact_map_t::contact_map_t() {

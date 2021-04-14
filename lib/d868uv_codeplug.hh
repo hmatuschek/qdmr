@@ -18,17 +18,12 @@ class GPSSystem;
 /** Represents the device specific binary codeplug for Anytone AT-D868UV radios.
  *
  * In contrast to many other code-plugs, the code-plug for Anytone radios are spread over a large
- * memory area. In principle, this is a good idea, as it allows to upload only the portion of the
- * codeplug that is actually configured. For example, if only a small portion of the available
- * contacts and channels are used, the amount of data that is written to the device can be
- * reduced.
- *
- * However, the implementation of this idea in this device is utter shit. The amount of
- * fragmentation of the codeplug is overwhelming. For example, while channels are organized more or
- * less nicely in continous banks, zones are distributed throughout the entire code-plug. That is,
- * the names of zones are located in a different memory section that the channel lists. Some lists
- * are defined though bit-masks others by byte-masks. All bit-masks are positive, that is 1
- * indicates an enabled item while the bit-mask for contacts is inverted.
+ * memory area. The amount of fragmentation of the codeplug is overwhelming.
+ * For example, while channels are organized more or less nicely in continous banks, zones are
+ * distributed throughout the entire code-plug. That is, the names of zones are located in a
+ * different memory section that the channel lists. Some lists are defined though bit-masks others
+ * by byte-masks. All bit-masks are positive, that is 1 indicates an enabled item while the
+ * bit-mask for contacts is inverted.
  *
  * In general the code-plug is huge and complex. Moreover, the radio provides a huge amount of
  * options and features. To this end, reverse-engeneering this code-plug was a nightmare.
@@ -644,9 +639,81 @@ public:
 
   /** GPS settings within the codeplug. */
   struct __attribute__((packed)) gps_settings_t {
-    uint8_t _unknown0000[0x10];    ///< Big unknown settings block for now.
-    uint8_t _unknown0010[0x10];    ///< Big unknown settings block for now.
-    uint8_t _unknown0020[0x10];    ///< Big unknown settings block for now.
+    enum Power: uint8_t {
+      POWER_LOW = 0,
+      POWER_MID = 1,
+      POWER_HIGH = 2,
+      POWER_TURBO = 3
+    };
+
+    enum CallType: uint8_t {
+      PRIVATE_CALL = 0,
+      GROUP_CALL = 1,
+      ALL_CALL = 2
+    };
+
+    enum TimeSlot: uint8_t {
+      TIMESLOT_SAME = 0,
+      TIMESLOT_1    = 1,
+      TIMESLOT_2    = 2
+    };
+
+    uint8_t manual_tx_intervall;   ///< Specifies the manual transmit intervall in seconds [0,255].
+    uint8_t auto_tx_intervall;     ///< Specifies the automatic transmit intervall in multiples of
+                                   ///  15 seconds. The time is then defined as t=45+15*n, 0=off.
+
+    uint8_t enable_fixed_location; ///< If 0x01, enables fixed location beacon, default 0x00=off.
+    uint8_t lat_deg;               ///< Latitude in degree.
+    uint8_t lat_min;               ///< Latitude minutes.
+    uint8_t lat_sec;               ///< Latitude seconds (1/100th of a minute).
+    uint8_t north_south;           ///< North or south flag, north=0, south=1.
+    uint8_t lon_deg;               ///< Longitude in degree.
+    uint8_t lon_min;               ///< Longitude in minutes.
+    uint8_t lon_sec;               ///< Longitude in seconds (1/100th of a minute).
+    uint8_t east_west;             ///< East or west flag, east=0, west=1.
+
+    Power transmit_power;          ///< Specifies the transmit power.
+
+    uint16_t channel_idxs[8];      ///< Specifies the 8 transmit channels for GPS information, litte endian.
+                                   ///  Default 0x0fa1=VFO B, 0x0fa2=current channel.
+
+    uint32_t target_id;            ///< Specifies the target DMR ID to send the APRS info to.
+                                   ///  Encoded as big-endian 32bit BCD (8 digits).
+
+    CallType call_type;            ///< Specifies the call type used to transmit the APRS info.
+    TimeSlot timeslot;             ///< Specifies the time slot to use default=0 (same as selected channel).
+    uint8_t _unused0022[14];       ///< Unused, set to 0.
+
+    void clear();
+
+    uint8_t getManualTXIntervall() const;
+    void setManualTXIntervall(uint8_t period);
+
+    uint16_t getAutomaticTXIntervall() const;
+    void setAutomaticTXIntervall(uint16_t period);
+
+    bool isFixedLocation() const;
+    double getFixedLon() const;
+    double getFixedLat() const;
+    void setFixedLocation(double lat, double lon);
+
+    Channel::Power getTransmitPower() const;
+    void setTransmitPower(Channel::Power power);
+
+    bool isChannelSelected(uint8_t i) const;
+    bool isChannelVFOA(uint8_t i) const;
+    bool isChannelVFOB(uint8_t i) const;
+    uint16_t getChannelIndex(uint8_t i) const;
+    void setChannelIndex(uint8_t i, uint16_t idx);
+    void setChannelSelected(uint8_t i);
+    void setChannelVFOA(uint8_t i);
+    void setChannelVFOB(uint8_t i);
+
+    uint32_t getTargetID() const;
+    void setTargetID(uint32_t id);
+
+    DigitalContact::Type getTargetType() const;
+    void setTargetType(DigitalContact::Type type);
   };
 
   /** Some weird linked list of valid message indices.
