@@ -573,19 +573,232 @@ public:
    *
    * At 0x02500000, size 0x0d0. */
   struct __attribute__((packed)) general_settings_base_t {
-    uint8_t _unknown0000[0x10];    ///< For now a big unknown settings block.
-    uint8_t _unknown0010[0x10];    ///< For now a big unknown settings block.
-    uint8_t _unknown0020[0x10];    ///< For now a big unknown settings block.
-    uint8_t _unknown0030[0x10];    ///< For now a big unknown settings block.
-    uint8_t _unknown0040[0x10];    ///< For now a big unknown settings block.
-    uint8_t _unknown0050[0x10];    ///< For now a big unknown settings block.
-    uint8_t _unknown0060[0x10];    ///< For now a big unknown settings block.
-    uint8_t _unknown0070[0x10];    ///< For now a big unknown settings block.
-    uint8_t _unknown0080[0x10];    ///< For now a big unknown settings block.
-    uint8_t _unknown0090[0x10];    ///< For now a big unknown settings block.
-    uint8_t _unknown00a0[0x10];    ///< For now a big unknown settings block.
-    uint8_t _unknown00b0[0x10];    ///< For now a big unknown settings block.
-    uint8_t _unknown00c0[0x10];    ///< For now a big unknown settings block.
+    enum AutoRepFlag : uint8_t {
+      AUTOREP_OFF = 0,
+      AUTOREP_POSITIVE = 1,
+      AUTOREP_NEGATIVE = 2
+    };
+
+    enum VFOScanType : uint8_t {
+      VFOSCAN_TO = 0,
+      VFOSCAN_CO = 1,
+      VFOSCAN_SE = 2
+    };
+
+    enum GPSUnits : uint8_t {
+      GPS_METRIC = 0,
+      GPS_IMPERIAL = 1
+    };
+
+    enum LastCaller : uint8_t {
+      SHOW_LASTCALLER_OFF = 0,
+      SHOW_LASTCALLER_ID = 1,
+      SHOW_LASTCALLER_CALL = 2,
+      SHOW_LASTCALLER_BOTH = 3
+    };
+
+    enum CallDisplayMode : uint8_t {
+      CDM_NAME_BASED = 0,
+      CDM_CALL_BASED = 1
+    };
+
+    enum TalkPermit : uint8_t {
+      TALKPERMIT_NONE = 0,
+      TALKPERMIT_DIGITAL = 1,
+      TALKPERMIT_ANALOG  = 2,
+      TALKPERMIT_BOTH    = 3
+    };
+
+    enum BootDisplay : uint8_t {
+      BOOT_DEFAULT      = 0,
+      BOOT_CUSTOM_TEXT  = 1,
+      BOOT_CUSTOM_IMAGE = 2
+    };
+
+    enum DisplayMode : uint8_t {
+      DISPMODE_CHANNEL = 0,
+      DISPMODE_FREQUENCY = 1
+    };
+
+    enum WorkMode : uint8_t {
+      WORKMODE_CHANNEL = 0,
+      WORKMODE_VFO = 1
+    };
+
+    enum VoxSource : uint8_t {
+      VOX_SRC_INTERNAL = 0,
+      VOX_SRC_EXTERNAL = 1,
+      VOX_SRC_BOTH = 2
+    };
+
+    // bytes [0x00-0x0f]
+    uint8_t enable_key_tone;       ///< Enable key tone.
+    DisplayMode display_mode;      ///< Display mode.
+    uint8_t _unknown0002;          ///< Unknown settings.
+    uint8_t _unknown0003;          ///< Unknown settings.
+    uint8_t _unknown0004;          ///< Unknown settings.
+    uint8_t _unknown0005;          ///< Unknown settings.
+    BootDisplay boot_display;      ///< Boot display settings.
+    uint8_t enable_boot_passwd;    ///< Enable boot password.
+    uint8_t _unknown0008[4];       ///< Unknown settings.
+    uint8_t vox_level;             ///< VOX level/sensitivity [0-3], 0=off.
+    uint8_t vox_delay;             ///< VOX delay in 100ms + 500ms.
+    VFOScanType vfo_scan_type;     ///< VFO scan type.
+    uint8_t mic_gain;              ///< Sets the microphone gain [0,4].
+
+    // bytes [0x10-0x1f]
+    uint8_t _unknown0010;          ///< Unknown settings.
+    uint8_t _unknown0011;          ///< Unknown settings.
+    uint8_t _unknown0012;          ///< Unknown settings.
+    uint8_t _unknown0013;          ///< Unknown settings.
+    uint8_t _unknown0014;          ///< Unknown settings.
+    uint8_t _unknown0015;          ///< Unknown settings.
+    WorkMode work_mode_b;          ///< Work mode B.
+    WorkMode work_mode_a;          ///< Work mode A.
+    uint8_t _unknown0018[4];       ///< Unknown settings block.
+    uint8_t _unknown001c;          ///< Unknown settings.
+    uint8_t _unknown001d;          ///< Unknown settings.
+    uint8_t _unknown001e;          ///< Unknown settings.
+    uint8_t wm_mem_zone_a;         ///< Memory zone A.
+
+    // bytes [0x20-0x2f]
+    uint8_t wm_mem_zone_b;         ///< Memory zone B.
+    uint8_t _unknown0021;          ///< Unknown setting.
+    uint8_t enable_recording;      ///< Enable record function.
+    uint8_t _unknown0023;          ///< Unknown setting.
+    uint8_t _unknown0024;          ///< Unknown setting.
+    uint8_t _unknown0025;          ///< Unknown setting.
+    uint8_t disp_brightness;       ///< Sets the display brightness [0,4].
+    uint8_t backlight_dur;         ///< Sets the backlight duration in multiple of 5s, 0=always.
+    uint8_t enable_gps;            ///< Enables GPS.
+    uint8_t enable_sms_alert;      ///< Enable SMS alert.
+    uint8_t _unknown002a;          ///< Unknown settings.
+    uint8_t _unknown002b;          ///< Unknown settings.
+    uint8_t wm_main_ch_set;        ///< Work mode, main channel set 0=A, 1=B.
+    uint8_t enable_subch;          ///< Work mode, enable sub channel.
+    uint8_t _unknown002e;          ///< Unknown settings.
+    uint8_t enable_call_alert;     ///< Enable call alert.
+
+    // bytes [0x30-0x3f]
+    uint8_t gps_timezone;          ///< GPS time zone, 0=GMT-12, 0x19=GMT+12.
+    TalkPermit talk_permit_tone;   ///< Enable talk permit tones.
+    uint8_t digi_call_reset_tone;  ///< Enable digital call reset tone.
+    VoxSource vox_source;          ///< VOX source.
+    uint8_t _unknown0034;          ///< Unknown settings.
+    uint8_t _unknown0035;          ///< Unknown settings.
+    uint8_t idle_channel_tone;     ///< Enable idle channel tone.
+    uint8_t menu_exit_time;        ///< Sets the menu exit time in multiple of 5s + 5s,
+    uint8_t _unknown0038;          ///< Unknown settings.
+    uint8_t startup_tone;          ///< Enable startup tone.
+    uint8_t enable_call_end_prompt; ///< Enables call end prompt box.
+    uint8_t max_volume;            ///< Maximum volume [0,8], 0 == indoors.
+    uint8_t _unknown003c;          ///< Unknown settings.
+    uint8_t _unknown003d;          ///< Unknown settings.
+    uint8_t _unknown003e;          ///< Unknown settings.
+    uint8_t enable_get_gps_pos;    ///< Enables "get GPS positioning".
+
+    // bytes [0x40-0x4f]
+    uint8_t _unknown0040[4];       ///< For now a big unknown settings block.
+    uint8_t _unknown0044;          ///< Unkown settings.
+    uint8_t _unknown0045;          ///< Unkown settings.
+    uint8_t _unknown0046;          ///< Unkown settings.
+    uint8_t vol_change_prompt;     ///< Show volume change prompt.
+    AutoRepFlag autorep_a;         ///< Auto repeater A direction.
+    uint8_t _unknown0049;          ///< Unkown settings.
+    uint8_t _unknown004a;          ///< Unkown settings.
+    uint8_t _unknown004b;          ///< Unkown settings.
+    uint8_t _unknown004c;          ///< Unkown settings.
+    LastCaller disp_last_caller;   ///< Unkown settings.
+    uint8_t _unknown004e;          ///< Unkown settings.
+    uint8_t _unknown004f;          ///< Unkown settings.
+
+    // bytes [0x50-0x5f]
+    uint8_t _unknown0050;          ///< Unknown settings.
+    uint8_t enable_disp_clock;     ///< Display clock.
+    uint8_t max_hp_volume;         ///< Maximum head phone volume [0,8], 0 == indoors.
+    uint8_t _unknown0053;          ///< Unknown settings.
+    uint8_t _unknown0054;          ///< Unknown settings.
+    uint8_t _unknown0055;          ///< Unknown settings.
+    uint8_t _unknown0056;          ///< Unknown settings.
+    uint8_t enable_enh_audio;      ///< Enable "enhanced audio".
+    uint32_t vfo_scan_uhf_min;     ///< VFO scan UHF minimum frequency. Frequency in multiple of 10Hz, little endian.
+    uint32_t vfo_scan_uhf_max;     ///< VFO scan UHF maximum frequency. Frequency in multiple of 10Hz, little endian.
+
+    // bytes [0x60-0x6f]
+    uint32_t vfo_scan_vhf_min;     ///< VFO scan VHF minimum frequency. Frequency in multiple of 10Hz, little endian.
+    uint32_t vfo_scan_vhf_max;     ///< VFO scan VHF maximum frequency. Frequency in multiple of 10Hz, little endian.
+    uint8_t autorep_uhf_off_idx;   ///< Auto repeater UHF offset frequency index, 0-based, 0xff=off.
+    uint8_t autorep_vhf_off_idx;   ///< Auto repeater VHF offset frequency index, 0-based, 0xff=off.
+    uint8_t _unknown006a;          ///< Unknown settings.
+    uint8_t _unknown006b;          ///< Unknown settings.
+    uint8_t _unknown006c[4];       ///< Unknown settings block.
+
+    // bytes [0x70-0x7f]
+    uint8_t _unknown0070;          ///< Unknown settings.
+    uint8_t _unknown0071;          ///< Unknown settings.
+    uint16_t call_tone_freq1;      ///< Call tone melody tone 1 in Hz little endian [300,3000].
+    uint16_t call_tone_freq2;      ///< Call tone melody tone 2 in Hz little endian [300,3000].
+    uint16_t call_tone_freq3;      ///< Call tone melody tone 3 in Hz little endian [300,3000].
+    uint16_t call_tone_freq4;      ///< Call tone melody tone 4 in Hz little endian [300,3000].
+    uint16_t call_tone_freq5;      ///< Call tone melody tone 5 in Hz little endian [300,3000].
+    uint16_t call_tone_dur1;       ///< Call tone melody durarion 1 in ms little endian [0,200].
+    uint16_t call_tone_dur2;       ///< Call tone melody durarion 2 in ms little endian [0,200].
+
+    // bytes [0x80-0x8f]
+    uint16_t call_tone_dur3;       ///< Call tone melody durarion 3 in ms little endian [0,200].
+    uint16_t call_tone_dur4;       ///< Call tone melody durarion 4 in ms little endian [0,200].
+    uint16_t call_tone_dur5;       ///< Call tone melody durarion 5 in ms little endian [0,200].
+    uint16_t idle_tone_freq1;      ///< Idle tone melody tone 1 in Hz little endian [300,3000].
+    uint16_t idle_tone_freq2;      ///< Idle tone melody tone 2 in Hz little endian [300,3000].
+    uint16_t idle_tone_freq3;      ///< Idle tone melody tone 3 in Hz little endian [300,3000].
+    uint16_t idle_tone_freq4;      ///< Idle tone melody tone 4 in Hz little endian [300,3000].
+    uint16_t idle_tone_freq5;      ///< Idle tone melody tone 5 in Hz little endian [300,3000].
+
+    // bytes [0x90-0x9f]
+    uint16_t idle_tone_dur1;       ///< Idle tone melody durarion 1 in ms little endian [0,200].
+    uint16_t idle_tone_dur2;       ///< Idle tone melody durarion 2 in ms little endian [0,200].
+    uint16_t idle_tone_dur3;       ///< Idle tone melody durarion 3 in ms little endian [0,200].
+    uint16_t idle_tone_dur4;       ///< Idle tone melody durarion 4 in ms little endian [0,200].
+    uint16_t idle_tone_dur5;       ///< Idle tone melody durarion 5 in ms little endian [0,200].
+    uint16_t reset_tone_freq1;     ///< Reset tone melody tone 1 in Hz little endian [300,3000].
+    uint16_t reset_tone_freq2;     ///< Reset tone melody tone 2 in Hz little endian [300,3000].
+    uint16_t reset_tone_freq3;     ///< Reset tone melody tone 3 in Hz little endian [300,3000].
+
+    // bytes [0xa0-0xaf]
+    uint16_t reset_tone_freq4;     ///< Reset tone melody tone 4 in Hz little endian [300,3000].
+    uint16_t reset_tone_freq5;     ///< Reset tone melody tone 5 in Hz little endian [300,3000].
+    uint16_t reset_tone_dur1;      ///< Reset tone melody durarion 1 in ms little endian [0,200].
+    uint16_t reset_tone_dur2;      ///< Reset tone melody durarion 2 in ms little endian [0,200].
+    uint16_t reset_tone_dur3;      ///< Reset tone melody durarion 3 in ms little endian [0,200].
+    uint16_t reset_tone_dur4;      ///< Reset tone melody durarion 4 in ms little endian [0,200].
+    uint16_t reset_tone_dur5;      ///< Reset tone melody durarion 5 in ms little endian [0,200].
+    uint8_t record_delay;          ///< Specifies the delay before recording in multiple of 0.2s.
+    CallDisplayMode call_display;  ///< Call display mode.
+
+    // bytes [0xb0-0xbf]
+    uint8_t call_disp_color;       ///< Callsign display color (0x01=red, 0x00=black).
+    uint8_t gps_update_period;     ///< GPS update period in seconds, default 30s.
+    uint8_t show_zone_tg;          ///< Show zone and contact.
+    uint8_t key_tone_level;        ///< Key tone level [0-15], 0=adjustable.
+    GPSUnits gps_units;            ///< Specifies the unit system.
+    uint8_t _unknown00b5;          ///< Unknown setting.
+    uint8_t show_last_heard;       ///< Show last heard while pressing PTT.
+    uint8_t _unknown00b7;          ///< Unknown setting.
+    uint32_t autorep_vhf_min;      ///< Auto repeater range VHF minimum frequency. Frequency in multiples of 10Hz, little endian.
+    uint32_t autorep_vhf_max;      ///< Auto repeater range VHF maximum frequency. Frequency in multiples of 10Hz, little endian.
+
+    // bytes [0xc0-0xcf]
+    uint32_t autorep_uhf_min;      ///< Auto repeater range UHF minimum frequency. Frequency in multiples of 10Hz, little endian.
+    uint32_t autorep_uhf_max;      ///< Auto repeater range UHF maximum frequency. Frequency in multiples of 10Hz, little endian.
+    AutoRepFlag autorep_b;         ///< Auto repeater B direction.
+    uint8_t _unknown00c9;          ///< Unknown setting.
+    uint8_t enable_default_ch;     ///< Enable default boot channel.
+    uint8_t default_a_zone_idx;    ///< Boot zone A index.
+    uint8_t default_b_zone_idx;    ///< Boot zone B index.
+    uint8_t default_a_ch_idx;      ///< Boot channel A index within selected default zone, 0xff=VFO.
+    uint8_t default_b_ch_idx;      ///< Boot channel B index within selected default zone, 0xff=VFO.
+    uint8_t keep_last_caller;      ///< Keep last caller when changing channel.
+
 
     /** Encodes the general settings. */
     void fromConfig(Config *config, const Flags &flags);
