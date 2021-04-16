@@ -703,10 +703,10 @@ public:
     WorkMode work_mode_b;          ///< Work mode B.
     WorkMode work_mode_a;          ///< Work mode A.
     uint8_t _unknown0017;          ///< Unknown settings.
-    uint8_t _unknown0018;          ///< Unknown settings block.
-    uint8_t _unknown0019;          ///< Unknown settings block.
-    uint8_t _unknown001a;          ///< Unknown settings block.
-    uint8_t _unknown001b;          ///< Unknown settings block.
+    uint8_t _unknown0018;          ///< Unknown settings.
+    uint8_t _unknown0019;          ///< Unknown settings.
+    uint8_t _unknown001a;          ///< Unknown settings.
+    uint8_t _unknown001b;          ///< Unknown settings.
     uint8_t _unknown001c;          ///< Unknown settings.
     uint8_t _unknown001d;          ///< Unknown settings.
     uint8_t _unknown001e;          ///< Unknown settings.
