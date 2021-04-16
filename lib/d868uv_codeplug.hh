@@ -168,7 +168,7 @@ public:
   /** Represents the actual channel encoded within the binary code-plug.
    *
    * Memmory layout of encoded channel (64byte):
-   * @verbinclude d878uvchannel.txt
+   * @verbinclude d868uvchannel.txt
    */
   struct __attribute__((packed)) channel_t {
     /** Defines all possible channel modes, see @c channel_mode. */
@@ -363,7 +363,7 @@ public:
   /** Represents a digital contact within the binary codeplug.
    *
    * Memmory layout of encoded contact (100byte):
-   * @verbinclude d878uvcontact.txt
+   * @verbinclude d868uvcontact.txt
    */
   struct __attribute__((packed)) contact_t {
     /** Possible call types. */
@@ -431,7 +431,7 @@ public:
   /** Represents an ananlog contact within the binary codeplug.
    *
    * Memmory layout of encoded analog contact (48byte):
-   * @verbinclude d878uvanalogcontact.txt
+   * @verbinclude d868uvanalogcontact.txt
    */
   struct __attribute__((packed)) analog_contact_t {
     uint8_t number[7];                  ///< Number encoded as BCD big-endian. Although it can hold
@@ -444,7 +444,7 @@ public:
   /** Represents the actual RX group list encoded within the binary code-plug.
    *
    * Memmory layout of encoded group list (288byte):
-   * @verbinclude d878uvgrouplist.txt
+   * @verbinclude d868uvgrouplist.txt
    */
   struct __attribute__((packed)) grouplist_t {
     // Bytes 0-255
@@ -480,7 +480,7 @@ public:
   /** Represents a scan list within the binary codeplug.
    *
    * Memmory layout of encoded scanlist (144byte):
-   * @verbinclude d878uvscanlist.txt
+   * @verbinclude d868uvscanlist.txt
    */
   struct __attribute__((packed)) scanlist_t {
     /** Defines all possible priority channel selections. */
@@ -539,7 +539,7 @@ public:
   /** Represents an entry of the radio ID table within the binary codeplug.
    *
    * Memmory layout of encoded radio ID (32byte):
-   * @verbinclude d878uvradioid.txt
+   * @verbinclude d868uvradioid.txt
    */
   struct __attribute__((packed)) radioid_t {
     // Bytes 0-3.
@@ -571,25 +571,31 @@ public:
 
   /** Represents the general config of the radio within the binary codeplug.
    *
-   * At 0x02500000, size 0x0d0. */
+   * Memmory layout of encoded general settings at 0x02500000, size 0x0d0:
+   * @verbinclude d868uvgeneralsettings.txt
+   */
   struct __attribute__((packed)) general_settings_base_t {
+    /** Encodes the auto-repeater offset sign. */
     enum AutoRepFlag : uint8_t {
-      AUTOREP_OFF = 0,
-      AUTOREP_POSITIVE = 1,
-      AUTOREP_NEGATIVE = 2
+      AUTOREP_OFF = 0,       ///< Disabled.
+      AUTOREP_POSITIVE = 1,  ///< Positive frequency offset.
+      AUTOREP_NEGATIVE = 2   ///< Negative frequency offset.
     };
 
+    /** Encodes the possible VFO scan types. */
     enum VFOScanType : uint8_t {
       VFOSCAN_TO = 0,
       VFOSCAN_CO = 1,
       VFOSCAN_SE = 2
     };
 
+    /** Encodes the possible units used to display distances. */
     enum GPSUnits : uint8_t {
       GPS_METRIC = 0,
       GPS_IMPERIAL = 1
     };
 
+    /** What to show from the last caller. */
     enum LastCaller : uint8_t {
       SHOW_LASTCALLER_OFF = 0,
       SHOW_LASTCALLER_ID = 1,
@@ -597,11 +603,13 @@ public:
       SHOW_LASTCALLER_BOTH = 3
     };
 
+    /** Callsign display modes. */
     enum CallDisplayMode : uint8_t {
       CDM_NAME_BASED = 0,
       CDM_CALL_BASED = 1
     };
 
+    /** Talk permit tones. */
     enum TalkPermit : uint8_t {
       TALKPERMIT_NONE = 0,
       TALKPERMIT_DIGITAL = 1,
@@ -609,28 +617,33 @@ public:
       TALKPERMIT_BOTH    = 3
     };
 
+    /** What to display during boot. */
     enum BootDisplay : uint8_t {
       BOOT_DEFAULT      = 0,
       BOOT_CUSTOM_TEXT  = 1,
       BOOT_CUSTOM_IMAGE = 2
     };
 
+    /** Display channel or frequency. */
     enum DisplayMode : uint8_t {
       DISPMODE_CHANNEL = 0,
       DISPMODE_FREQUENCY = 1
     };
 
+    /** Work mode. */
     enum WorkMode : uint8_t {
       WORKMODE_CHANNEL = 0,
       WORKMODE_VFO = 1
     };
 
+    /** Source for the VOX. */
     enum VoxSource : uint8_t {
       VOX_SRC_INTERNAL = 0,
       VOX_SRC_EXTERNAL = 1,
       VOX_SRC_BOTH = 2
     };
 
+    /** Possible automatic shutdown delays. */
     enum AutoShutdown : uint8_t {
       AUTO_SHUTDOWN_OFF    = 0,
       AUTO_SHUTDOWN_10min  = 1,
@@ -639,6 +652,7 @@ public:
       AUTO_SHUTDOWN_120min = 4,
     };
 
+    /** Possible power save modes. */
     enum PowerSave : uint8_t {
       POWER_SAVE_OFF = 0,
       POWER_SAVE_1to1 = 1,
@@ -850,7 +864,11 @@ public:
     void updateConfig(Config *config);
   };
 
-  /** At 0x02500100, size 0x400. */
+  /** Encodes for each zone the initially selected channel for VFO A & B.
+   *
+   * Memmory layout of zone channels at 0x02500100, size 0x400:
+   * @verbinclude d868uvzonechannels.txt
+   */
   struct __attribute__((packed)) zone_channels_t {
     // Bytes 0x000-0x1ff
     uint16_t zone_a_channel[250];  ///< Channel index whithin each zone for channel A. Index 0-based litte-endian.
@@ -896,6 +914,7 @@ public:
 
   /** GPS settings within the codeplug. */
   struct __attribute__((packed)) gps_settings_t {
+    /** Possible power settings for GPS transmission. */
     enum Power: uint8_t {
       POWER_LOW = 0,
       POWER_MID = 1,
@@ -903,12 +922,14 @@ public:
       POWER_TURBO = 3
     };
 
+    /** Call type for GPS transmission. */
     enum CallType: uint8_t {
       PRIVATE_CALL = 0,
       GROUP_CALL = 1,
       ALL_CALL = 2
     };
 
+    /** Timeslots for GPS transmission. */
     enum TimeSlot: uint8_t {
       TIMESLOT_SAME = 0,
       TIMESLOT_1    = 1,
@@ -941,46 +962,73 @@ public:
     TimeSlot timeslot;             ///< Specifies the time slot to use default=0 (same as selected channel).
     uint8_t _unused0022[14];       ///< Unused, set to 0.
 
+    /** Resets the GPS settings. */
     void clear();
 
+    /** Returns the manual transmit intervall in seconds. */
     uint8_t getManualTXIntervall() const;
+    /** Sets the manual transmit intervall in seconds. */
     void setManualTXIntervall(uint8_t period);
-
+    /** Returns the automatic transmit intervall in seconds. */
     uint16_t getAutomaticTXIntervall() const;
+    /** Sets the automatic transmit intervall in seconds. */
     void setAutomaticTXIntervall(uint16_t period);
 
+    /** Returns @c true if the location is set fixed (no GPS needed). */
     bool isFixedLocation() const;
+    /** Returns the longitude of the fixed location in degrees, negative west.*/
     double getFixedLon() const;
+    /** Returns the latitude of the fixed location in degrees, negative south. */
     double getFixedLat() const;
+    /** Set the fixed location. */
     void setFixedLocation(double lat, double lon);
 
+    /** Returns the transmit power. */
     Channel::Power getTransmitPower() const;
+    /** Sets the transmit power. */
     void setTransmitPower(Channel::Power power);
 
+    /** Returns @c true if the currently selected channel is used for trasmission of the GPS
+     * location. */
     bool isChannelSelected(uint8_t i) const;
+    /** Returns @c true if VFO A is used for trasmission of the GPS location. */
     bool isChannelVFOA(uint8_t i) const;
+    /** Returns @c true if VFO B is used for trasmission of the GPS location. */
     bool isChannelVFOB(uint8_t i) const;
+    /** Returns the channel index used for the GPS location transmission. */
     uint16_t getChannelIndex(uint8_t i) const;
+    /** Sets the channel index used for the GPS location transmission. */
     void setChannelIndex(uint8_t i, uint16_t idx);
+    /** Sets the currently selected channel to be used for GPS location transmission. */
     void setChannelSelected(uint8_t i);
+    /** Sets VFO A to be used for GPS location transmission. */
     void setChannelVFOA(uint8_t i);
+    /** Sets VFO B to be used for GPS location transmission. */
     void setChannelVFOB(uint8_t i);
 
+    /** Returns the DMR ID, the GPS information is send to.
+     * This setting affects all GPS systems. */
     uint32_t getTargetID() const;
+    /** Sets the DMR ID, the GPS information is send to.
+     * This setting affects all GPS systems. */
     void setTargetID(uint32_t id);
-
+    /** Returns the call type used for sending the GPS location. */
     DigitalContact::Type getTargetType() const;
+    /** Sets the call type used for sending the GPS location. */
     void setTargetType(DigitalContact::Type type);
 
+    /** Updates the GPS settings from the given config. */
     void fromConfig(Config *config, const Flags &flags);
+    /** Creates GPS system from this GPS settings. */
     bool createGPSSystem(uint8_t i, Config *config, CodeplugContext &ctx);
+    /** Links GPS system from this GPS settings. */
     bool linkGPSSystem(uint8_t i, Config *config, CodeplugContext &ctx);
   };
 
   /** Some weird linked list of valid message indices.
    *
    * Memmory layout of encoded radio ID (16byte):
-   * @verbinclude d878uvmessagelist.txt
+   * @verbinclude d868uvmessagelist.txt
    */
   struct __attribute__((packed)) message_list_t {
     uint8_t _unknown0[2];          ///< Unused, set to 0x00.
@@ -992,7 +1040,7 @@ public:
   /** Represents a prefabricated SMS message within the binary codeplug.
    *
    * Memmory layout of encoded radio ID (256byte):
-   * @verbinclude d878uvmessage.txt
+   * @verbinclude d868uvmessage.txt
    */
   struct __attribute__((packed)) message_t {
     char text[99];                 ///< Up to 99 ASCII chars, 0-padded.
