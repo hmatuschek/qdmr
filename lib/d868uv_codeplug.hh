@@ -631,31 +631,68 @@ public:
       VOX_SRC_BOTH = 2
     };
 
+    enum AutoShutdown : uint8_t {
+      AUTO_SHUTDOWN_OFF    = 0,
+      AUTO_SHUTDOWN_10min  = 1,
+      AUTO_SHUTDOWN_30min  = 2,
+      AUTO_SHUTDOWN_60min  = 3,
+      AUTO_SHUTDOWN_120min = 4,
+    };
+
+    enum PowerSave : uint8_t {
+      POWER_SAVE_OFF = 0,
+      POWER_SAVE_1to1 = 1,
+      POWER_SAVE_2to1 = 2
+    };
+
+    /** All possible key functions. */
+    enum KeyFunction : uint8_t {
+      KF_OFF = 0x00, KF_VOLTAGE = 0x01, KF_POWER = 0x02, KF_REPEATER = 0x03, KF_REVERSE = 0x04,
+      KF_DIGITAL_ENCRYPTION = 0x05, KF_CALL = 0x06, KF_VOX = 0x07, KF_VFO_CHANNEL = 0x08,
+      KF_SUB_PTT = 0x09, KF_SCAN = 0x0a, KF_FM = 0x0b, KF_ALARM = 0x0c, KF_RECORD_SWITCH = 0x0d,
+      KF_RECORD = 0x0e, KF_SMS = 0x0f, KF_DIAL = 0x10, KF_GPS_INFORMATION = 0x11, KF_MONITOR = 0x12,
+      KF_MAIN_CHANNEL_SWITCH = 0x13, KF_HOT_KEY_1 = 0x14, KF_HOT_KEY_2 = 0x15, KF_HOT_KEY_3 = 0x16,
+      KF_HOT_KEY_4 = 0x17, KF_HOT_KEY_5 = 0x18, KF_HOT_KEY_6 = 0x19, KF_WORK_ALONE = 0x1a,
+      KF_NUISANCE_DELETE = 0x1b, KF_DIGITAL_MONITOR = 0x1c, KF_SUB_CH_SWITCH = 0x1d,
+      KF_PRIORITY_ZONE = 0x1e, KF_VFO_SCAN = 0x1f, KF_MIC_SOUND_QUALITY = 0x20,
+      KF_LAST_CALL_REPLY = 0x21, KF_CHANNEL_TYPE_SWITCH = 0x22, KF_RANGING = 0x23,
+      KF_ROAMING = 0x24, KF_CHANEL_RANGING = 0x25, KF_MAX_VOLUME = 0x26, KF_SLOT_SWITCH = 0x27,
+      KF_APRS_TYPE_SWITCH = 0x28, KF_ZONE_SELECT = 0x29, KF_TIMED_ROAMING_SET = 0x2a,
+      KF_APRS_SET = 0x2b, KF_MUTE_TIMEING = 0x2c, KF_CTCSS_DCS_SET = 0x2d, KF_TBST_SEND = 0x2e,
+      KF_BLUETOOTH = 0x2f, KF_GPS = 0x30, KF_CHANNEL_NAME = 0x31, KF_CDT_SCAN = 0x32
+    };
+
     // bytes [0x00-0x0f]
     uint8_t enable_key_tone;       ///< Enable key tone.
     DisplayMode display_mode;      ///< Display mode.
-    uint8_t _unknown0002;          ///< Unknown settings.
-    uint8_t _unknown0003;          ///< Unknown settings.
+    uint8_t enable_auto_keylock;   ///< Automatic key lock.
+    AutoShutdown auto_shutdown;    ///< Auto shutdown.
     uint8_t _unknown0004;          ///< Unknown settings.
     uint8_t _unknown0005;          ///< Unknown settings.
     BootDisplay boot_display;      ///< Boot display settings.
     uint8_t enable_boot_passwd;    ///< Enable boot password.
-    uint8_t _unknown0008[4];       ///< Unknown settings.
+    uint8_t _unknown0008;          ///< Unknown settings.
+    uint8_t squelch_level_a;       ///< Squelch level A (0=off).
+    uint8_t squelch_level_b;       ///< Squelch level B (0=off).
+    uint8_t power_save;            ///< Unknown settings.
     uint8_t vox_level;             ///< VOX level/sensitivity [0-3], 0=off.
     uint8_t vox_delay;             ///< VOX delay in 100ms + 500ms.
     VFOScanType vfo_scan_type;     ///< VFO scan type.
     uint8_t mic_gain;              ///< Sets the microphone gain [0,4].
 
     // bytes [0x10-0x1f]
-    uint8_t _unknown0010;          ///< Unknown settings.
-    uint8_t _unknown0011;          ///< Unknown settings.
-    uint8_t _unknown0012;          ///< Unknown settings.
-    uint8_t _unknown0013;          ///< Unknown settings.
-    uint8_t _unknown0014;          ///< Unknown settings.
-    uint8_t _unknown0015;          ///< Unknown settings.
+    KeyFunction pf1_short;         ///< Programmable function key 1 short press function.
+    KeyFunction pf2_short;         ///< Programmable function key 2 short press function.
+    KeyFunction pf3_short;         ///< Programmable function key 3 short press function.
+    KeyFunction p1_short;          ///< P1 function key short press function.
+    KeyFunction p2_short;          ///< P1 function key short press function.
     WorkMode work_mode_b;          ///< Work mode B.
     WorkMode work_mode_a;          ///< Work mode A.
-    uint8_t _unknown0018[4];       ///< Unknown settings block.
+    uint8_t _unknown0017;          ///< Unknown settings.
+    uint8_t _unknown0018;          ///< Unknown settings block.
+    uint8_t _unknown0019;          ///< Unknown settings block.
+    uint8_t _unknown001a;          ///< Unknown settings block.
+    uint8_t _unknown001b;          ///< Unknown settings block.
     uint8_t _unknown001c;          ///< Unknown settings.
     uint8_t _unknown001d;          ///< Unknown settings.
     uint8_t _unknown001e;          ///< Unknown settings.
@@ -698,10 +735,13 @@ public:
     uint8_t enable_get_gps_pos;    ///< Enables "get GPS positioning".
 
     // bytes [0x40-0x4f]
-    uint8_t _unknown0040[4];       ///< For now a big unknown settings block.
-    uint8_t _unknown0044;          ///< Unkown settings.
-    uint8_t _unknown0045;          ///< Unkown settings.
-    uint8_t _unknown0046;          ///< Unkown settings.
+    uint8_t _unknown0040;          ///< Unkown settings.
+    KeyFunction pf1_long;          ///< Programmable function key 1 long press function.
+    KeyFunction pf2_long;          ///< Programmable function key 2 long press function.
+    KeyFunction pf3_long;          ///< Programmable function key 3 long press function.
+    KeyFunction p1_long;           ///< P1 function key long press function.
+    KeyFunction p2_long;           ///< P1 function key long press function.
+    uint8_t long_press_dur;        ///< Long press duration in seconds +1s.
     uint8_t vol_change_prompt;     ///< Show volume change prompt.
     AutoRepFlag autorep_a;         ///< Auto repeater A direction.
     uint8_t _unknown0049;          ///< Unkown settings.
@@ -781,7 +821,11 @@ public:
     uint8_t show_zone_tg;          ///< Show zone and contact.
     uint8_t key_tone_level;        ///< Key tone level [0-15], 0=adjustable.
     GPSUnits gps_units;            ///< Specifies the unit system.
-    uint8_t _unknown00b5;          ///< Unknown setting.
+    uint8_t enable_knob_lock : 1,  ///< Enable knob lock.
+      enable_keypad_lock     : 1,  ///< Enable keypad lock
+      unused00b5_2           : 1,  ///< Unused set to 0.
+      enable_sidekey_lock    : 1,  ///< Enable side-key lock.
+      enable_prof_key_lock   : 1;  ///< Enable "professional" key lock.´
     uint8_t show_last_heard;       ///< Show last heard while pressing PTT.
     uint8_t _unknown00b7;          ///< Unknown setting.
     uint32_t autorep_vhf_min;      ///< Auto repeater range VHF minimum frequency. Frequency in multiples of 10Hz, little endian.
