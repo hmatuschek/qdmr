@@ -201,8 +201,8 @@ public:
     typedef enum {
       MODE_ANALOG    = 0,               ///< Analog channel.
       MODE_DIGITAL   = 1,               ///< Digital (DMR) channel.
-      MODE_MIXED_A_D = 2,               ///< Mixed, transmit analog and receive digital.
-      MODE_MIXED_D_A = 3                ///< Mixed, transmit digital and receive analog.
+      MODE_MIXED_A_D = 2,               ///< Mixed, analog channel with digital RX.
+      MODE_MIXED_D_A = 3                ///< Mixed, digital channel with analog RX.
     } Mode;
 
     /** Defines all possible power settings.*/

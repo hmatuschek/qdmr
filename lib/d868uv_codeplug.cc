@@ -365,7 +365,7 @@ D868UVCodeplug::channel_t::toChannelObj() const {
   bool rxOnly = (1 == this->rx_only);
 
   Channel *ch;
-  if (MODE_ANALOG == channel_mode) {
+  if ((MODE_ANALOG == channel_mode) || (MODE_MIXED_A_D == channel_mode)){
     AnalogChannel::Admit admit = AnalogChannel::AdmitNone;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
@@ -385,7 +385,7 @@ D868UVCodeplug::channel_t::toChannelObj() const {
     ch = new AnalogChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           1, getRXTone(), getTXTone(), bw, nullptr);
-  } else if (MODE_DIGITAL == channel_mode) {
+  } else if ((MODE_DIGITAL == channel_mode) || (MODE_MIXED_D_A == channel_mode)) {
     DigitalChannel::Admit admit = DigitalChannel::AdmitNone;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
@@ -846,12 +846,33 @@ D868UVCodeplug::radioid_t::setId(uint32_t num) {
  * ******************************************************************************************** */
 void
 D868UVCodeplug::general_settings_base_t::fromConfig(Config *config, const Flags &flags) {
-  // pass
+  // Set microphone gain
+  mic_gain = std::min(uint(4), config->micLevel()/10);
+
+  // If auto-enable GPS is enabled
+  if (flags.autoEnableGPS) {
+    // Check if GPS is required -> enable
+    if (config->requiresGPS()) {
+      enable_gps = 0x01;
+      // Set time zone based on system time zone.
+      int offset = QTimeZone::systemTimeZone().offsetFromUtc(QDateTime::currentDateTime());
+      gps_timezone = 12 + offset/3600;
+      enable_get_gps_pos = 0x00;
+      gps_update_period = 0x05;
+      // Set measurement system based on system locale (0x00==Metric)
+      gps_units = (QLocale::MetricSystem == QLocale::system().measurementSystem()) ? GPS_METRIC : GPS_IMPERIAL;
+    } else {
+      enable_gps = 0x00;
+    }
+  }
 }
 
 void
 D868UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
-  // pass
+  // get microphone gain
+  config->setMicLevel(2*mic_gain+1);
+  // D868UV does not support speech synthesis?
+  config->setSpeech(false);
 }
 
 

@@ -246,7 +246,7 @@ D878UVCodeplug::channel_t::toChannelObj() const {
   bool rxOnly = (1 == this->rx_only);
 
   Channel *ch;
-  if (MODE_ANALOG == channel_mode) {
+  if ((MODE_ANALOG == channel_mode) || (MODE_MIXED_A_D == channel_mode)) {
     AnalogChannel::Admit admit = AnalogChannel::AdmitNone;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
@@ -266,7 +266,7 @@ D878UVCodeplug::channel_t::toChannelObj() const {
     ch = new AnalogChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           1, getRXTone(), getTXTone(), bw, nullptr);
-  } else if (MODE_DIGITAL == channel_mode) {
+  } else if ((MODE_DIGITAL == channel_mode) || (MODE_MIXED_D_A == channel_mode)) {
     DigitalChannel::Admit admit = DigitalChannel::AdmitNone;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
