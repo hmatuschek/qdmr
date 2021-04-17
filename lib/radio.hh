@@ -65,7 +65,17 @@ class Radio : public QThread
 
 public:
   /** Represents a radio feature list, a generic configuration is verified against. */
-	typedef struct {
+  struct Features {
+    /** Represents a frequency range [min, max]. */
+    struct FrequencyRange {
+      double min; ///< Lower frequency limit.
+      double max; ///< Upper frequency limit.
+      /** Constructs a frequency range from limits. */
+      FrequencyRange(double lower, double upper);
+      /** Returns @c true if @c f is inside this limit. */
+      bool contains(double f) const;
+    };
+
     /** If @c true, shows a beta warning at upload. */
     bool betaWarning;
 
@@ -73,6 +83,11 @@ public:
 		bool hasDigital;
     /** If @c true, the device supports FM. */
 		bool hasAnalog;
+
+    /** VHF frequency limits. */
+    FrequencyRange vhfLimits;
+    /** UHF frequency limits. */
+    FrequencyRange uhfLimits;
 
     /** Maximum length of the radio name. */
 		int maxNameLength;
@@ -142,7 +157,7 @@ public:
     bool callsignDBImplemented;
     /** Maximum number of entries in callsign DB. */
     uint maxCallsignsInDB;
-	} Features;
+  };
 
   /** Possible states of the radio object. */
 	typedef enum {

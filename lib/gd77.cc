@@ -12,6 +12,9 @@ static Radio::Features _gd77_features = {
   .hasDigital = true,
   .hasAnalog = true,
 
+  .vhfLimits = {136., 174.},
+  .uhfLimits = {400., 470.},
+
   .maxNameLength = 8,
   .maxIntroLineLength = 16,
 

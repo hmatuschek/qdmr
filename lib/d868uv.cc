@@ -10,9 +10,13 @@ static Radio::Features _d868uv_features =
 {
   // show beta-warning
   .betaWarning = true,
+
   // general capabilities
   .hasDigital  = true,
   .hasAnalog   = true,
+
+  .vhfLimits = {136., 174.},
+  .uhfLimits = {400., 480.},
 
   // general limits
   .maxNameLength      = 16,

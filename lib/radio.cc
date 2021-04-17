@@ -11,6 +11,20 @@
 #include "logger.hh"
 #include <QSet>
 
+/* ******************************************************************************************** *
+ * Implementation of Radio::Featrues::FrequencyRange
+ * ******************************************************************************************** */
+Radio::Features::FrequencyRange::FrequencyRange(double lower, double upper)
+  : min(lower), max(upper)
+{
+  // pass..
+}
+
+bool
+Radio::Features::FrequencyRange::contains(double f) const {
+  return (min<=f) && (max<=f);
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of Radio
@@ -140,6 +154,14 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                       VerifyIssue::WARNING,
                       tr("Duplicate channel name '%1'.").arg(channel->name())));
     names.insert(channel->name());
+
+    if ( ((!features().vhfLimits.contains(channel->rxFrequency())) &&
+          (!features().uhfLimits.contains(channel->rxFrequency()))) ||
+         ((!features().vhfLimits.contains(channel->txFrequency())) &&
+          (!features().uhfLimits.contains(channel->txFrequency()))) )
+      issues.append(VerifyIssue(
+                      VerifyIssue::ERROR,
+                      tr("Frequency of channel '%1' is out of range.").arg(channel->name())));
 
     if (channel->name().size() > features().maxChannelNameLength)
       issues.append(VerifyIssue(
