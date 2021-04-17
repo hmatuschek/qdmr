@@ -1735,8 +1735,8 @@ D868UVCodeplug::encodeZones(Config *config, const Flags &flags) {
     // Clear name and channel list
     uint8_t  *name     = (uint8_t *)data(ADDR_ZONE_NAME + zidx*ZONE_NAME_OFFSET);
     uint16_t *channels = (uint16_t *)data(ADDR_ZONE + zidx*ZONE_OFFSET);
-    memset(name, 0, ZONE_NAME_OFFSET);
-    memset(channels, 0xff, ZONE_OFFSET);
+    memset(name, 0, ZONE_NAME_SIZE);
+    memset(channels, 0xff, ZONE_SIZE);
     if (config->zones()->zone(i)->B()->count())
       encode_ascii(name, config->zones()->zone(i)->name()+" A", 16, 0);
     else
@@ -1754,8 +1754,8 @@ D868UVCodeplug::encodeZones(Config *config, const Flags &flags) {
     // Process list B if present
     name     = (uint8_t *)data(ADDR_ZONE_NAME+zidx*ZONE_NAME_OFFSET);
     channels = (uint16_t *)data(ADDR_ZONE+zidx*ZONE_OFFSET);
-    memset(name, 0, ZONE_NAME_OFFSET);
-    memset(channels, 0xff, ZONE_OFFSET);
+    memset(name, 0, ZONE_NAME_SIZE);
+    memset(channels, 0xff, ZONE_SIZE);
     encode_ascii(name, config->zones()->zone(i)->name()+" B", 16, 0);
     // Handle list B
     for (int j=0; j<config->zones()->zone(i)->B()->count(); j++) {
