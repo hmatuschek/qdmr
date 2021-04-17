@@ -13,6 +13,8 @@
 #include "uv390.hh"
 #include "gd77.hh"
 #include "opengd77.hh"
+#include "d868uv.hh"
+#include "d878uv.hh"
 
 
 int verify(QCommandLineParser &parser, QCoreApplication &app)
@@ -64,6 +66,10 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     GD77 radio; radio.verifyConfig(&config, issues);
   } else if ("opengd77" == radio) {
     OpenGD77 radio; radio.verifyConfig(&config, issues);
+  } else if ("d868uv" == radio) {
+    D868UV radio; radio.verifyConfig(&config, issues);
+  } else if ("d878uv" == radio) {
+    D878UV radio; radio.verifyConfig(&config, issues);
   } else {
     logError() << "Cannot verify code-plug against unknown radio '" << radio << "'.";
     return -1;
