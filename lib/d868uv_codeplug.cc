@@ -365,7 +365,10 @@ D868UVCodeplug::channel_t::toChannelObj() const {
   bool rxOnly = (1 == this->rx_only);
 
   Channel *ch;
-  if ((MODE_ANALOG == channel_mode) || (MODE_MIXED_A_D == channel_mode)){
+  if ((MODE_ANALOG == channel_mode) || (MODE_MIXED_A_D == channel_mode)) {
+    if (MODE_MIXED_A_D == channel_mode)
+      logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
+                << getName() <<"' as analog channel.";
     AnalogChannel::Admit admit = AnalogChannel::AdmitNone;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
@@ -386,6 +389,9 @@ D868UVCodeplug::channel_t::toChannelObj() const {
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           1, getRXTone(), getTXTone(), bw, nullptr);
   } else if ((MODE_DIGITAL == channel_mode) || (MODE_MIXED_D_A == channel_mode)) {
+    if (MODE_MIXED_A_D == channel_mode)
+      logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
+                << getName() <<"' as digital channel.";
     DigitalChannel::Admit admit = DigitalChannel::AdmitNone;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
@@ -404,7 +410,7 @@ D868UVCodeplug::channel_t::toChannelObj() const {
           color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr);
   } else {
     logError() << "Cannot create channel '" << getName()
-               << "': Mixed channel types not supported.";
+               << "': Channel type " << channel_mode << "not supported.";
     return nullptr;
   }
 

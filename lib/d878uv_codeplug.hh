@@ -1137,10 +1137,19 @@ protected:
   bool encodeGeneralSettings(Config *config, const Flags &flags);
   bool decodeGeneralSettings(Config *config);
 
-  virtual void allocateGPSSystems();
-  virtual bool encodeGPSSystems(Config *config, const Flags &flags);
-  virtual bool createGPSSystems(Config *config, CodeplugContext &ctx);
-  virtual bool linkGPSSystems(Config *config, CodeplugContext &ctx);
+  void allocateGPSSystems();
+  bool encodeGPSSystems(Config *config, const Flags &flags);
+  bool createGPSSystems(Config *config, CodeplugContext &ctx);
+  bool linkGPSSystems(Config *config, CodeplugContext &ctx);
+
+  /** Allocates memory to store all roaming channels and zones. */
+  virtual void allocateRoaming();
+  /** Encodes the roaming channels and zones. */
+  virtual bool encodeRoaming(Config *config, const Flags &flags);
+  /** Creates roaming channels and zones from codeplug. */
+  virtual bool createRoaming(Config *config, CodeplugContext &ctx);
+  /** Links roaming channels and zones. */
+  virtual bool linkRoaming(Config *config, CodeplugContext &ctx);
 };
 
 #endif // D878UVCODEPLUG_HH

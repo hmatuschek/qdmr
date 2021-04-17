@@ -247,6 +247,9 @@ D878UVCodeplug::channel_t::toChannelObj() const {
 
   Channel *ch;
   if ((MODE_ANALOG == channel_mode) || (MODE_MIXED_A_D == channel_mode)) {
+    if (MODE_MIXED_A_D == channel_mode)
+      logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
+                << getName() <<"' as analog channel.";
     AnalogChannel::Admit admit = AnalogChannel::AdmitNone;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
@@ -267,6 +270,9 @@ D878UVCodeplug::channel_t::toChannelObj() const {
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           1, getRXTone(), getTXTone(), bw, nullptr);
   } else if ((MODE_DIGITAL == channel_mode) || (MODE_MIXED_D_A == channel_mode)) {
+    if (MODE_MIXED_D_A == channel_mode)
+      logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
+                << getName() <<"' as digital channel.";
     DigitalChannel::Admit admit = DigitalChannel::AdmitNone;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
@@ -286,7 +292,7 @@ D878UVCodeplug::channel_t::toChannelObj() const {
           color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr);
   } else {
     logError() << "Cannot create channel '" << getName()
-               << "': Mixed channel types not supported.";
+               << "': Channel type " << channel_mode << "not supported.";
     return nullptr;
   }
 
@@ -976,10 +982,6 @@ void
 D878UVCodeplug::allocateUpdated() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateUpdated();
-
-  image(0).addElement(ADDR_GENERAL_CONFIG_EXT1, GENERAL_CONFIG_EXT1_SIZE);
-  image(0).addElement(ADDR_GENERAL_CONFIG_EXT2, GENERAL_CONFIG_EXT2_SIZE);
-
   // Encryption keys
   image(0).addElement(ADDR_ENCRYPTION_KEYS, ENCRYPTION_KEYS_SIZE);
 }
@@ -988,98 +990,14 @@ void
 D878UVCodeplug::allocateForEncoding() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateForEncoding();
-
-  /*
-   * Allocate extended settings for channels
-   */
-  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
-  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
-    // Get byte and bit for channel, as well as bank of channel
-    uint16_t bit = i%8, byte = i/8, bank = i/128, idx=i%128;
-    // if disabled -> skip
-    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
-      continue;
-    // compute address for channel
-    uint32_t addr = CHANNEL_BANK_0
-        + bank*CHANNEL_BANK_OFFSET
-        + idx*sizeof(channel_t);
-    if (nullptr == data(addr+0x2000, 0)) {
-      image(0).addElement(addr+0x2000, sizeof(channel_t));
-      memset(data(addr+0x2000), 0x00, sizeof(channel_t));
-    }
-  }
-
-  /*
-   * Allocate roaming channel and zones
-   */
-  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
-  for (uint8_t i=0; i<NUM_ROAMING_CHANNEL; i++) {
-    // Get byte and bit for radio ID
-    uint16_t bit = i%8, byte = i/8;
-    // if disabled -> skip
-    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
-      continue;
-    // Allocate roaming channel
-    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
-    if (nullptr == data(addr, 0)) {
-      logDebug() << "Allocate roaming channel at " << hex << addr;
-      image(0).addElement(addr, ROAMING_CHANNEL_SIZE);
-    }
-  }
-  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
-  for (uint8_t i=0; i<NUM_ROAMING_ZONES; i++) {
-    // Get byte and bit for radio ID
-    uint16_t bit = i%8, byte = i/8;
-    // if disabled -> skip
-    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
-      continue;
-    // Allocate roaming zone
-    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
-    if (nullptr == data(addr, 0)) {
-      logDebug() << "Allocate roaming zone at " << hex << addr;
-      image(0).addElement(addr, ROAMING_ZONE_SIZE);
-    }
-  }
+  this->allocateRoaming();
 }
 
 void
 D878UVCodeplug::allocateForDecoding() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateForDecoding();
-
-  /*
-   * Allocate roaming channel and zones
-   */
-  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
-  for (uint8_t i=0; i<NUM_ROAMING_CHANNEL; i++) {
-    // Get byte and bit for radio ID
-    uint16_t bit = i%8, byte = i/8;
-    // if disabled -> skip
-    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
-      continue;
-    // Allocate roaming channel
-    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
-    if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, ROAMING_CHANNEL_SIZE);
-    }
-  }
-  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
-  for (uint8_t i=0; i<NUM_ROAMING_ZONES; i++) {
-    // Get byte and bit for radio ID
-    uint16_t bit = i%8, byte = i/8;
-    // if disabled -> skip
-    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
-      continue;
-    // Allocate roaming zone
-    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
-    if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, ROAMING_ZONE_SIZE);
-    }
-  }
-
-  // APRS settings and messages
-  image(0).addElement(ADDR_APRS_SETTING, APRS_SETTING_SIZE);
-  image(0).addElement(ADDR_APRS_MESSAGE, APRS_MESSAGE_SIZE);
+  this->allocateRoaming();
 }
 
 
@@ -1112,41 +1030,8 @@ D878UVCodeplug::encode(Config *config, const Flags &flags)
   // Encode everything common between d868uv and d878uv radios.
   D868UVCodeplug::encode(config, flags);
 
-  ((general_settings_ext1_t *)data(ADDR_GENERAL_CONFIG_EXT1))->fromConfig(config, flags);
-  ((general_settings_ext2_t *)data(ADDR_GENERAL_CONFIG_EXT2))->fromConfig(config, flags);
-
-  // Encode APRS system (there can only be one)
-  if (0 < config->posSystems()->aprsCount()) {
-    ((aprs_setting_t *)data(ADDR_APRS_SETTING))->fromAPRSSystem(config->posSystems()->aprsSystem(0));
-    uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
-    encode_ascii(aprsmsg, config->posSystems()->aprsSystem(0)->message(), 60, 0x00);
-  }
-
-  // Encode roaming channels
-  QHash<DigitalChannel *, int> roaming_ch_map;
-  {
-    // Get set of unique roaming channels
-    QSet<DigitalChannel*> roaming_channels;
-    config->roaming()->uniqueChannels(roaming_channels);
-    // Encode channels and store in index<->channel map
-    int i=0; QSet<DigitalChannel*>::iterator ch=roaming_channels.begin();
-    for(; ch != roaming_channels.end(); ch++, i++) {
-      roaming_ch_map[*ch] = i;
-      uint32_t addr = ADDR_ROAMING_CHANNEL_0+i*ROAMING_CHANNEL_OFFSET;
-      roaming_channel_t *rch = (roaming_channel_t *)data(addr);
-      rch->fromChannel(*ch);
-      logDebug() << "Encode roaming channel " << (*ch)->name() << " (" << i
-                 << ") at " << hex << addr;
-    }
-  }
-  // Encode roaming zones
-  for (int i=0; i<config->roaming()->count(); i++){
-    uint32_t addr = ADDR_ROAMING_ZONE_0+i*ROAMING_ZONE_OFFSET;
-    roaming_zone_t *zone = (roaming_zone_t *)data(addr);
-    logDebug() << "Encode roaming zone " << config->roaming()->zone(i)->name() << " (" << (i+1)
-               << ") at " << hex << addr;
-    zone->fromRoamingZone(config->roaming()->zone(i), roaming_ch_map);
-  }
+  if (! this->encodeRoaming(config, flags))
+    return false;
 
   return true;
 }
@@ -1163,52 +1048,14 @@ bool
 D878UVCodeplug::decode(Config *config, CodeplugContext &ctx)
 {
   // Decode everything commong between d868uv and d878uv codeplugs.
-  D868UVCodeplug::decode(config, ctx);
+  if (! D868UVCodeplug::decode(config, ctx))
+    return false;
 
-  // Before creating any GPS/APRS systems, get global auto TX intervall
-  uint pos_intervall = ((aprs_setting_t *)data(ADDR_APRS_SETTING))->getAutoTXInterval();
+  if (! this->createRoaming(config, ctx))
+    return false;
 
-  // Create APRS system (if enabled)
-  aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
-  uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
-  if (aprs->isValid()) {
-    APRSSystem *sys = aprs->toAPRSSystem();
-    sys->setMessage(decode_ascii(aprsmsg, 60, 0x00));
-    ctx.addAPRSSystem(sys,0);
-  }
-
-  // Create or find roaming channels
-  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
-  for (int i=0; i<NUM_ROAMING_CHANNEL; i++) {
-    uint8_t byte=i/8, bit=i%8;
-    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
-      continue;
-    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
-    roaming_channel_t *ch = (roaming_channel_t *)data(addr);
-    DigitalChannel *digi = ch->toChannel(ctx);
-    if (digi) {
-      logDebug() << "Register channel '" << digi->name() << "' as roaming channel " << i+1;
-      ctx.addRoamingChannel(digi, i);
-    }
-  }
-
-  // Create and link roaming zones
-  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
-  for (int i=0; i<NUM_ROAMING_ZONES; i++) {
-    uint8_t byte=i/8, bit=i%8;
-    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
-      continue;
-    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
-    roaming_zone_t *z = (roaming_zone_t *)data(addr);
-    RoamingZone *zone = z->toRoamingZone();
-    ctx.addRoamingZone(zone, i+1);
-    z->linkRoamingZone(zone, ctx);
-  }
-
-  // Link APRS system
-  if (aprs->isValid()) {
-    aprs->linkAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
-  }
+  if (! this->linkRoaming(config, ctx))
+    return false;
 
   return true;
 }
@@ -1228,7 +1075,11 @@ D878UVCodeplug::allocateChannels() {
         + bank*CHANNEL_BANK_OFFSET
         + idx*sizeof(channel_t);
     if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, sizeof(channel_t));
+      image(0).addElement(addr, sizeof(channel_t));      
+    }
+    if (nullptr == data(addr+0x2000, 0)) {
+      image(0).addElement(addr+0x2000, sizeof(channel_t));
+      memset(data(addr+0x2000), 0x00, sizeof(channel_t));
     }
   }
 }
@@ -1288,10 +1139,15 @@ void
 D878UVCodeplug::allocateGeneralSettings() {
   // override allocation of general settings for D878UV code-plug. General settings are larger!
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+  image(0).addElement(ADDR_GENERAL_CONFIG_EXT1, GENERAL_CONFIG_EXT1_SIZE);
+  image(0).addElement(ADDR_GENERAL_CONFIG_EXT2, GENERAL_CONFIG_EXT2_SIZE);
+
 }
 bool
 D878UVCodeplug::encodeGeneralSettings(Config *config, const Flags &flags) {
   ((D878UVCodeplug::general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->fromConfig(config, flags);
+  ((general_settings_ext1_t *)data(ADDR_GENERAL_CONFIG_EXT1))->fromConfig(config, flags);
+  ((general_settings_ext2_t *)data(ADDR_GENERAL_CONFIG_EXT2))->fromConfig(config, flags);
   return true;
 }
 bool
@@ -1310,6 +1166,13 @@ D878UVCodeplug::allocateGPSSystems() {
 
 bool
 D878UVCodeplug::encodeGPSSystems(Config *config, const Flags &flags) {
+  // Encode APRS system (there can only be one)
+  if (0 < config->posSystems()->aprsCount()) {
+    ((aprs_setting_t *)data(ADDR_APRS_SETTING))->fromAPRSSystem(config->posSystems()->aprsSystem(0));
+    uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
+    encode_ascii(aprsmsg, config->posSystems()->aprsSystem(0)->message(), 60, 0x00);
+  }
+
   // Encode GPS systems
   gps_systems_t *gps = (gps_systems_t *)data(ADDR_GPS_SETTING);
   gps->fromGPSSystems(config);
@@ -1327,6 +1190,17 @@ bool
 D878UVCodeplug::createGPSSystems(Config *config, CodeplugContext &ctx) {
   // Before creating any GPS/APRS systems, get global auto TX intervall
   uint pos_intervall = ((aprs_setting_t *)data(ADDR_APRS_SETTING))->getAutoTXInterval();
+
+  // Create APRS system (if enabled)
+  aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
+  uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
+  if (aprs->isValid()) {
+    APRSSystem *sys = aprs->toAPRSSystem();
+    sys->setPeriod(pos_intervall);
+    sys->setMessage(decode_ascii(aprsmsg, 60, 0x00));
+    ctx.addAPRSSystem(sys,0);
+  }
+
   // Create GPS systems
   gps_systems_t *gps_systems = (gps_systems_t *)data(ADDR_GPS_SETTING);
   for (int i=0; i<NUM_GPS_SYSTEMS; i++) {
@@ -1343,6 +1217,12 @@ D878UVCodeplug::createGPSSystems(Config *config, CodeplugContext &ctx) {
 
 bool
 D878UVCodeplug::linkGPSSystems(Config *config, CodeplugContext &ctx) {
+  // Link APRS system
+  aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
+  if (aprs->isValid()) {
+    aprs->linkAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
+  }
+
   // Link GPS systems
   gps_systems_t *gps_systems = (gps_systems_t *)data(ADDR_GPS_SETTING);
   for (int i=0; i<NUM_GPS_SYSTEMS; i++) {
@@ -1350,6 +1230,110 @@ D878UVCodeplug::linkGPSSystems(Config *config, CodeplugContext &ctx) {
       continue;
     gps_systems->linkGPSSystem(i, ctx.getGPSSystem(i), ctx);
   }
+
+  return true;
+}
+
+
+void
+D878UVCodeplug::allocateRoaming() {
+  /* Allocate roaming channels */
+  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
+  for (uint8_t i=0; i<NUM_ROAMING_CHANNEL; i++) {
+    // Get byte and bit for roaming channel
+    uint16_t bit = i%8, byte = i/8;
+    // if disabled -> skip
+    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate roaming channel
+    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
+    if (nullptr == data(addr, 0))
+      image(0).addElement(addr, ROAMING_CHANNEL_SIZE);
+  }
+
+  /* Allocate roaming zones. */
+  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
+  for (uint8_t i=0; i<NUM_ROAMING_ZONES; i++) {
+    // Get byte and bit for radio ID
+    uint16_t bit = i%8, byte = i/8;
+    // if disabled -> skip
+    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate roaming zone
+    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
+    if (nullptr == data(addr, 0)) {
+      logDebug() << "Allocate roaming zone at " << hex << addr;
+      image(0).addElement(addr, ROAMING_ZONE_SIZE);
+    }
+  }
+}
+
+bool
+D878UVCodeplug::encodeRoaming(Config *config, const Flags &flags) {
+  // Encode roaming channels
+  QHash<DigitalChannel *, int> roaming_ch_map;
+  {
+    // Get set of unique roaming channels
+    QSet<DigitalChannel*> roaming_channels;
+    config->roaming()->uniqueChannels(roaming_channels);
+    // Encode channels and store in index<->channel map
+    int i=0; QSet<DigitalChannel*>::iterator ch=roaming_channels.begin();
+    for(; ch != roaming_channels.end(); ch++, i++) {
+      roaming_ch_map[*ch] = i;
+      uint32_t addr = ADDR_ROAMING_CHANNEL_0+i*ROAMING_CHANNEL_OFFSET;
+      roaming_channel_t *rch = (roaming_channel_t *)data(addr);
+      rch->fromChannel(*ch);
+    }
+  }
+
+  // Encode roaming zones
+  for (int i=0; i<config->roaming()->count(); i++){
+    uint32_t addr = ADDR_ROAMING_ZONE_0+i*ROAMING_ZONE_OFFSET;
+    roaming_zone_t *zone = (roaming_zone_t *)data(addr);
+    logDebug() << "Encode roaming zone " << config->roaming()->zone(i)->name() << " (" << (i+1)
+               << ") at " << hex << addr;
+    zone->fromRoamingZone(config->roaming()->zone(i), roaming_ch_map);
+  }
+
+  return true;
+}
+
+bool
+D878UVCodeplug::createRoaming(Config *config, CodeplugContext &ctx) {
+  // Create or find roaming channels
+  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
+  for (int i=0; i<NUM_ROAMING_CHANNEL; i++) {
+    uint8_t byte=i/8, bit=i%8;
+    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
+      continue;
+    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
+    roaming_channel_t *ch = (roaming_channel_t *)data(addr);
+    DigitalChannel *digi = ch->toChannel(ctx);
+    if (digi) {
+      logDebug() << "Register channel '" << digi->name() << "' as roaming channel " << i+1;
+      ctx.addRoamingChannel(digi, i);
+    }
+  }
+
+  // Create and link roaming zones
+  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
+  for (int i=0; i<NUM_ROAMING_ZONES; i++) {
+    uint8_t byte=i/8, bit=i%8;
+    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
+      continue;
+    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
+    roaming_zone_t *z = (roaming_zone_t *)data(addr);
+    RoamingZone *zone = z->toRoamingZone();
+    ctx.addRoamingZone(zone, i+1);
+    z->linkRoamingZone(zone, ctx);
+  }
+
+  return true;
+}
+
+bool
+D878UVCodeplug::linkRoaming(Config *config, CodeplugContext &ctx) {
+  // Pass, no need to link roaming channels.
   return true;
 }
 
