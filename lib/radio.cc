@@ -22,7 +22,7 @@ Radio::Features::FrequencyRange::FrequencyRange(double lower, double upper)
 
 bool
 Radio::Features::FrequencyRange::contains(double f) const {
-  return (min<=f) && (max<=f);
+  return (min<=f) && (max>=f);
 }
 
 
@@ -155,13 +155,19 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                       tr("Duplicate channel name '%1'.").arg(channel->name())));
     names.insert(channel->name());
 
-    /*if ( ((!features().vhfLimits.contains(channel->rxFrequency())) &&
-          (!features().uhfLimits.contains(channel->rxFrequency()))) ||
-         ((!features().vhfLimits.contains(channel->txFrequency())) &&
-          (!features().uhfLimits.contains(channel->txFrequency()))) )
+    if ((!features().vhfLimits.contains(channel->rxFrequency())) &&
+        (!features().uhfLimits.contains(channel->rxFrequency())))
       issues.append(VerifyIssue(
                       VerifyIssue::ERROR,
-                      tr("Frequency of channel '%1' is out of range.").arg(channel->name())));*/
+                      tr("RX frequency %1 of channel '%2' is out of range.")
+                      .arg(channel->rxFrequency()).arg(channel->name())));
+
+    if ((!features().vhfLimits.contains(channel->txFrequency())) &&
+        (!features().uhfLimits.contains(channel->txFrequency())))
+      issues.append(VerifyIssue(
+                      VerifyIssue::ERROR,
+                      tr("TX frequency %1 of channel '%2' is out of range.")
+                      .arg(channel->txFrequency()).arg(channel->name())));
 
     if (channel->name().size() > features().maxChannelNameLength)
       issues.append(VerifyIssue(
