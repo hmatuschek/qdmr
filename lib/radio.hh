@@ -50,6 +50,26 @@ protected:
 	QString _message;
 };
 
+/** Flags to control the verification process.
+ * @ingroup rif*/
+struct VerifyFlags {
+  /** If set, warnings will not interrupt the upload. */
+  bool ignoreWarnings;
+  /** If set, frequency limit voilations will be handled as warnings. */
+  bool ignoreFrequencyLimits;
+
+  /** Default constructor. */
+  inline VerifyFlags()
+    : ignoreWarnings(false), ignoreFrequencyLimits(false) {
+    // pass...
+  }
+  /** Full constructor. */
+  inline VerifyFlags(bool ignWarn, bool ignFreqLimits)
+    : ignoreWarnings(ignWarn), ignoreFrequencyLimits(ignFreqLimits) {
+    // pass...
+  }
+};
+
 
 /** Base class for all Radio objects.
  *
@@ -185,7 +205,8 @@ public:
 
   /** Verifies the configuration against the radio features.
    * On exit, @c issues will contain the issues found and the maximum severity is returned. */
-  VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues);
+  VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
+                                 const VerifyFlags &flags=VerifyFlags());
 
   /** Returns the current status. */
   Status status() const;

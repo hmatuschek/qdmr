@@ -5,12 +5,11 @@
 #include "config.hh"
 #include <QGeoPositionInfoSource>
 #include "releasenotes.hh"
+#include "radio.hh"
 
 class QMainWindow;
-class Radio;
 class RepeaterDatabase;
 class UserDatabase;
-class CodePlug;
 class TalkGroupDatabase;
 
 
@@ -34,7 +33,8 @@ public slots:
   void quitApplication();
 
   void detectRadio();
-  bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true, bool ignoreWarnings=false);
+  bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true,
+                      const VerifyFlags &flags=VerifyFlags());
 
   void downloadCodeplug();
   void uploadCodeplug();

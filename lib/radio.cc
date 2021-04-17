@@ -11,6 +11,7 @@
 #include "logger.hh"
 #include <QSet>
 
+
 /* ******************************************************************************************** *
  * Implementation of Radio::Featrues::FrequencyRange
  * ******************************************************************************************** */
@@ -36,7 +37,7 @@ Radio::Radio(QObject *parent)
 }
 
 VerifyIssue::Type
-Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
+Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlags &flags)
 {
   // Is still beta?
   if (features().betaWarning)
@@ -156,18 +157,18 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
     names.insert(channel->name());
 
     if ((!features().vhfLimits.contains(channel->rxFrequency())) &&
-        (!features().uhfLimits.contains(channel->rxFrequency())))
-      issues.append(VerifyIssue(
-                      VerifyIssue::ERROR,
-                      tr("RX frequency %1 of channel '%2' is out of range.")
-                      .arg(channel->rxFrequency()).arg(channel->name())));
+        (!features().uhfLimits.contains(channel->rxFrequency()))) {
+      VerifyIssue::Type type = flags.ignoreFrequencyLimits ? VerifyIssue::WARNING : VerifyIssue::ERROR;
+      issues.append(VerifyIssue(type,tr("RX frequency %1 of channel '%2' is out of range.")
+                                .arg(channel->rxFrequency()).arg(channel->name())));
+    }
 
     if ((!features().vhfLimits.contains(channel->txFrequency())) &&
-        (!features().uhfLimits.contains(channel->txFrequency())))
-      issues.append(VerifyIssue(
-                      VerifyIssue::ERROR,
-                      tr("TX frequency %1 of channel '%2' is out of range.")
-                      .arg(channel->txFrequency()).arg(channel->name())));
+        (!features().uhfLimits.contains(channel->txFrequency()))) {
+      VerifyIssue::Type type = flags.ignoreFrequencyLimits ? VerifyIssue::WARNING : VerifyIssue::ERROR;
+      issues.append(VerifyIssue(type,tr("TX frequency %1 of channel '%2' is out of range.")
+                                .arg(channel->txFrequency()).arg(channel->name())));
+    }
 
     if (channel->name().size() > features().maxChannelNameLength)
       issues.append(VerifyIssue(

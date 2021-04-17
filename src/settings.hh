@@ -46,6 +46,9 @@ public:
   bool ignoreVerificationWarning() const;
   void setIgnoreVerificationWarning(bool ignore);
 
+  bool ignoreFrequencyLimits() const;
+  void setIgnoreFrequencyLimits(bool ignore);
+
   bool hideGSPNote() const;
   void setHideGPSNote(bool hide);
 
@@ -91,6 +94,7 @@ public slots:
 protected slots:
   void onSystemLocationToggled(bool enable);
   void positionUpdated(const QGeoPositionInfo &info);
+  void onIgnoreFrequencyLimitsSet(bool enabled);
 
 protected:
   QGeoPositionInfoSource *_source;

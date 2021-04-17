@@ -440,7 +440,7 @@ Application::detectRadio() {
 
 
 bool
-Application::verifyCodeplug(Radio *radio, bool showSuccess, bool ignoreWarnings) {
+Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &flags) {
   Radio *myRadio = radio;
   QString errorMessage;
 
@@ -457,8 +457,8 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess, bool ignoreWarnings)
   bool verified = true;
   QList<VerifyIssue> issues;
   VerifyIssue::Type maxIssue = myRadio->verifyConfig(_config, issues);
-  if ( (ignoreWarnings && (maxIssue>VerifyIssue::WARNING)) ||
-       ((!ignoreWarnings) && (maxIssue>=VerifyIssue::WARNING)) ) {
+  if ( (flags.ignoreWarnings && (maxIssue>VerifyIssue::WARNING)) ||
+       ((!flags.ignoreWarnings) && (maxIssue>=VerifyIssue::WARNING)) ) {
     VerifyDialog dialog(issues);
     if (QDialog::Accepted != dialog.exec())
       verified = false;
@@ -557,7 +557,12 @@ Application::uploadCodeplug() {
 
   // Verify codeplug against the detected radio before uploading,
   // but do not show a message on success.
-  if (! verifyCodeplug(radio, false, settings.ignoreVerificationWarning()))
+  VerifyFlags flags = {
+    settings.ignoreVerificationWarning(),
+    settings.ignoreFrequencyLimits()
+  };
+
+  if (! verifyCodeplug(radio, false, flags))
     return;
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");

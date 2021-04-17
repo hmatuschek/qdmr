@@ -169,6 +169,15 @@ Settings::setIgnoreVerificationWarning(bool ignore) {
 }
 
 bool
+Settings::ignoreFrequencyLimits() const {
+  return value("ignoreFrequencyLimits", false).toBool();
+}
+void
+Settings::setIgnoreFrequencyLimits(bool ignore) {
+  setValue("ignoreFrequencyLimits", ignore);
+}
+
+bool
 Settings::hideGSPNote() const {
   return value("hideGPSNote", false).toBool();
 }
@@ -278,12 +287,16 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   if (queryLocation->isChecked())
     locatorEntry->setEnabled(false);
 
+  connect(Ui::SettingsDialog::ignoreFrequencyLimits, SIGNAL(toggled(bool)),
+          this, SLOT(onIgnoreFrequencyLimitsSet(bool)));
+  connect(queryLocation, SIGNAL(toggled(bool)), this, SLOT(onSystemLocationToggled(bool)));
+
   Ui::SettingsDialog::updateCodeplug->setChecked(settings.updateCodeplug());
   Ui::SettingsDialog::autoEnableGPS->setChecked(settings.autoEnableGPS());
   Ui::SettingsDialog::autoEnableRoaming->setChecked(settings.autoEnableRoaming());
   Ui::SettingsDialog::ignoreVerificationWarnings->setChecked(settings.ignoreVerificationWarning());
+  Ui::SettingsDialog::ignoreFrequencyLimits->setChecked(settings.ignoreFrequencyLimits());
 
-  connect(queryLocation, SIGNAL(toggled(bool)), this, SLOT(onSystemLocationToggled(bool)));
 }
 
 bool
@@ -306,6 +319,15 @@ SettingsDialog::onSystemLocationToggled(bool enabled) {
 }
 
 void
+SettingsDialog::onIgnoreFrequencyLimitsSet(bool enabled) {
+  if (enabled) {
+    Ui::SettingsDialog::ignoreFrequencyLimits->setText(tr("Warning!"));
+  } else {
+    Ui::SettingsDialog::ignoreFrequencyLimits->setText("");
+  }
+}
+
+void
 SettingsDialog::positionUpdated(const QGeoPositionInfo &info) {
   logDebug() << "Application: Current position: " << info.coordinate().toString();
   if (info.isValid() && queryLocation->isChecked()) {
@@ -322,6 +344,7 @@ SettingsDialog::accept() {
   settings.setAutoEnableGPS(autoEnableGPS->isChecked());
   settings.setAutoEnableRoaming(autoEnableRoaming->isChecked());
   settings.setIgnoreVerificationWarning(ignoreVerificationWarnings->isChecked());
+  settings.setIgnoreFrequencyLimits(ignoreFrequencyLimits->isChecked());
   QDialog::accept();
 }
 
