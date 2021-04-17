@@ -144,19 +144,24 @@ class GPSSystem;
  *  <tr><td>02480200</td> <td>000010</td>      <td>FM broadcast VFO frequency. Encoded
  *    as 8-digit BCD little-endian in 100Hz. Filled with 0x00.</td></tr>
  *
+ *  <tr><th colspan="3">DTMF, 2-tone & 5-tone signaling.</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
+ *  <tr><td>024C0C80</td> <td>000010</td> <td>5-tone encoding bitmap.</td></tr>
+ *  <tr><td>024C0000</td> <td>000020</td> <td>5-tone encoding.</td></tr>
+ *  <tr><td>024C0D00</td> <td>000200</td> <td>5-tone ID list.</td></tr>
+ *  <tr><td>024C1000</td> <td>000080</td> <td>5-tone settings.</td></tr>
+ *  <tr><td>024C1080</td> <td>000050</td> <td>DTMF settings.</td></tr>
+ *  <tr><td>024C1280</td> <td>000010</td> <td>2-tone encoding bitmap.</td></tr>
+ *  <tr><td>024C1100</td> <td>000010</td> <td>2-tone encoding.</td></tr>
+ *  <tr><td>024C1290</td> <td>000010</td> <td>2-tone settings.</td></tr>
+ *  <tr><td>024C2600</td> <td>000010</td> <td>2-tone decoding bitmap.</td></tr>
+ *  <tr><td>024C2400</td> <td>000030</td> <td>2-tone decoding.</td></tr>
+ *
  *  <tr><th colspan="3">Still unknown</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C0000</td> <td>000020</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C0C80</td> <td>000010</td> <td>Unknown data, bitmap?, default 0x00.</td></tr>
- *  <tr><td>024C0D00</td> <td>000200</td> <td>Empty, set to 0x00?`</td></tr>
- *  <tr><td>024C1000</td> <td>0000D0</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C1100</td> <td>000010</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C1280</td> <td>000020</td> <td>Unknown data.</td></tr>
  *  <tr><td>024C1440</td> <td>000030</td> <td>Unknown data.</td></tr>
  *  <tr><td>024C1700</td> <td>000040</td> <td>Unknown, 8bit indices.</td></tr>
  *  <tr><td>024C1800</td> <td>000500</td> <td>Empty, set to 0x00?</td></tr>
- *  <tr><td>024C2400</td> <td>000030</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C2600</td> <td>000010</td> <td>Unknown data.</td></tr>
  * </table>
  *
  * @ingroup d868uv */
@@ -1290,6 +1295,10 @@ protected:
   virtual void allocateAlarmSettings();
   /** Allocates FM broadcast settings memory section. */
   virtual void allocateFMBroadcastSettings();
+  /** Allocates all 5-Tone functions used. */
+  virtual void allocate5ToneFunctions();
+  /** Allocates all 2-Tone functions used. */
+  virtual void allocate2ToneFunctions();
 
   /** Internal used function to encode CTCSS frequencies. */
   static uint8_t ctcss_code2num(Signaling::Code code);

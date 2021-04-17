@@ -154,6 +154,36 @@ static_assert(
 #define ADDR_FMBC_VFO             0x02480200
 #define FMBC_VFO_SIZE             0x00000010
 
+#define FIVE_TONE_BITMAP          0x024C0C80
+#define FIVE_TONE_BITMAP_SIZE     0x00000010
+#define NUM_FIVE_TONE_FUNCTIONS   100
+#define ADDR_FIVE_TONE_FUNCTIONS  0x024C0000
+#define FIVE_TONE_FUNCTION_SIZE   0x00000020
+
+#define NUM_FIVE_TONE_IDS         16
+#define ADDR_FIVE_TONE_ID_LIST    0x024C0D00
+#define FIVE_TONE_ID_SIZE         0x00000020
+#define FIVE_TONE_ID_LIST_SIZE    0x00000200
+
+#define ADDR_FIVE_TONE_SETTINGS   0x024C1000
+#define FIVE_TONE_SETTINGS_SIZE   0x00000080
+#define ADDR_DTMF_SETTINGS        0x024C1080
+#define DTMF_SETTINGS_SIZE        0x00000050
+
+#define NUM_TWO_TONE_ENC_FUNC     24
+#define TWO_TONE_ENC_BITMAP       0x024C1280
+#define TWO_TONE_ENC_BITMAP_SIZE  0x00000010
+#define ADDR_TWO_TONE_ENC_FUNC    0x024C1100
+#define TWO_TONE_ENC_FUNC_SIZE    0x00000010
+#define NUM_TWO_TONE_DEC_FUNC     24
+#define TWO_TONE_DEC_BITMAP       0x024c2600
+#define TWO_TONE_DEC_BITMAP_SIZE  0x00000010
+#define ADDR_TWO_TONE_DEC_FUNC    0x024c2400
+#define TWO_TONE_DEC_FUNC_SIZE    0x00000020
+
+#define ADDR_TWO_TONE_SETTINGS    0x024C1290
+#define TWO_TONE_SETTINGS_SIZE    0x00000010
+
 
 using namespace Signaling;
 
@@ -1209,6 +1239,11 @@ D868UVCodeplug::D868UVCodeplug(QObject *parent)
   image(0).addElement(STATUSMESSAGE_BITMAP, STATUSMESSAGE_BITMAP_SIZE);
   // FM Broadcast bitmaps
   image(0).addElement(FMBC_BITMAP, FMBC_BITMAP_SIZE);
+  // 5-Tone function bitmaps
+  image(0).addElement(FIVE_TONE_BITMAP, FIVE_TONE_BITMAP_SIZE);
+  // 2-Tone function bitmaps
+  image(0).addElement(TWO_TONE_ENC_BITMAP, TWO_TONE_ENC_BITMAP_SIZE);
+  image(0).addElement(TWO_TONE_DEC_BITMAP, TWO_TONE_DEC_BITMAP_SIZE);
 }
 
 void
@@ -1234,19 +1269,18 @@ D868UVCodeplug::allocateUpdated() {
   this->allocateRepeaterOffsetSettings();
   this->allocateAlarmSettings();
   this->allocateFMBroadcastSettings();
+  this->allocate5ToneFunctions();
+  this->allocate2ToneFunctions();
+
+  image(0).addElement(ADDR_FIVE_TONE_ID_LIST, FIVE_TONE_ID_LIST_SIZE);
+  image(0).addElement(ADDR_FIVE_TONE_SETTINGS, FIVE_TONE_SETTINGS_SIZE);
+  image(0).addElement(ADDR_DTMF_SETTINGS, DTMF_SETTINGS_SIZE);
+  image(0).addElement(ADDR_TWO_TONE_SETTINGS, TWO_TONE_SETTINGS_SIZE);
 
   // Unknown memory region
-  image(0).addElement(0x024C0000, 0x020);
-  image(0).addElement(0x024C0C80, 0x010);
-  image(0).addElement(0x024C0D00, 0x200);
-  image(0).addElement(0x024C1000, 0x0D0);
-  image(0).addElement(0x024C1100, 0x010);
-  image(0).addElement(0x024C1280, 0x020);
   image(0).addElement(0x024C1440, 0x030);
   image(0).addElement(0x024C1700, 0x040);
   image(0).addElement(0x024C1800, 0x500);
-  image(0).addElement(0x024C2400, 0x030);
-  image(0).addElement(0x024C2600, 0x010);
 }
 
 void
@@ -1994,4 +2028,36 @@ void
 D868UVCodeplug::allocateFMBroadcastSettings() {
   // FM broad-cast settings
   image(0).addElement(ADDR_FMBC, FMBC_SIZE+FMBC_VFO_SIZE);
+}
+
+void
+D868UVCodeplug::allocate5ToneFunctions() {
+  // Allocate 5-tone functions
+  uint8_t *bitmap = data(FIVE_TONE_BITMAP);
+  for (uint8_t i=0; i<NUM_FIVE_TONE_FUNCTIONS; i++) {
+    uint16_t  bit = i%8, byte = i/8;
+    if (0 == (bitmap[byte] & (1<<bit)))
+      continue;
+    image(0).addElement(ADDR_FIVE_TONE_FUNCTIONS + i*FIVE_TONE_FUNCTION_SIZE, FIVE_TONE_FUNCTION_SIZE);
+  }
+}
+
+void
+D868UVCodeplug::allocate2ToneFunctions() {
+  // Allocate 2-tone encoding
+  uint8_t *enc_bitmap = data(TWO_TONE_ENC_BITMAP);
+  for (uint8_t i=0; i<NUM_TWO_TONE_ENC_FUNC; i++) {
+    uint16_t  bit = i%8, byte = i/8;
+    if (0 == (enc_bitmap[byte] & (1<<bit)))
+      continue;
+    image(0).addElement(ADDR_TWO_TONE_ENC_FUNC + i*TWO_TONE_ENC_FUNC_SIZE, TWO_TONE_ENC_FUNC_SIZE);
+  }
+  // Allocate 2-tone decoding
+  uint8_t *dec_bitmap = data(TWO_TONE_DEC_BITMAP);
+  for (uint8_t i=0; i<NUM_TWO_TONE_DEC_FUNC; i++) {
+    uint16_t  bit = i%8, byte = i/8;
+    if (0 == (dec_bitmap[byte] & (1<<bit)))
+      continue;
+    image(0).addElement(ADDR_TWO_TONE_DEC_FUNC + i*TWO_TONE_DEC_FUNC_SIZE, TWO_TONE_DEC_FUNC_SIZE);
+  }
 }
