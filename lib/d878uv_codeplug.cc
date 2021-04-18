@@ -467,7 +467,10 @@ void
 D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const Flags &flags) {
   setMicGain(config->micLevel());
 
+  // Set SMS format
   sms_format = SMS_FMT_DMR;
+  // Enable "amateur mode", this enables all menu items.
+  enable_pro_mode = 0x00;
 
   // If auto-enable roaming is enabled
   if (flags.autoEnableRoaming) {

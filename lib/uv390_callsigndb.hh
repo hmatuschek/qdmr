@@ -6,6 +6,15 @@
 
 /** Represents and encodes the binary format for the call-sign database within the radio.
  *
+ * @section uv390cdb Callsign database structure
+ * <table>
+ *  <tr><th>Start</th>    <th>End</th>      <th>Size</th>    <th>Content</th></tr>
+ *  <tr><th colspan="4">Callsign database 0x0200000-0x1000000</th></tr>
+ *  <tr><td>0x200000</td> <td>0x204004</td> <td>0x04004</td> <td>Callsign database index table, see @c UV390Codeplug::callsign_db_t</td></tr>
+ *  <tr><td>0x204004</td> <td>0xffffdc</td> <td>0xdfbfd8</td> <td>122197 callsign database entries, see @c UV390Codeplug::callsign_db_t::callsign_t. </td></tr>
+ *  <tr><td>0xffffdc</td> <td>0x1000000</td> <td>0x00025</td> <td>Padding, filled with @c 0xff.</td></tr>
+ * </table>
+ *
  * @ingroup uv390 */
 class UV390CallsignDB : public CallsignDB
 {
