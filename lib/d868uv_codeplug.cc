@@ -1295,6 +1295,7 @@ D868UVCodeplug::allocateForEncoding() {
 
 void
 D868UVCodeplug::allocateForDecoding() {
+  this->allocateRadioIDs();
   this->allocateChannels();
   this->allocateZones();
   this->allocateContacts();
