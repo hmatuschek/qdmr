@@ -24,6 +24,7 @@
 #include "searchpopup.hh"
 #include "contactselectiondialog.hh"
 
+
 QPair<int, int>
 getSelectionRowRange(const QModelIndexList &indices) {
   int rmin=-1, rmax=-1;
@@ -525,19 +526,18 @@ Application::onCodeplugDownloadError(Radio *radio) {
 void
 Application::onCodeplugDownloaded(Radio *radio, CodePlug *codeplug) {
   _config->reset();
+  _mainWindow->setWindowModified(false);
   if (codeplug->decode(_config)) {
     _mainWindow->statusBar()->showMessage(tr("Download complete"));
     _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
-    _mainWindow->setEnabled(true);
 
-    _mainWindow->setWindowModified(false);
     _config->setModified(false);
   } else {
     QMessageBox::critical(
           nullptr, tr("Cannot decode code-plug"),
           tr("Cannot decode code-plug: %2").arg(codeplug->errorMessage()));
   }
-
+  _mainWindow->setEnabled(true);
   radio->deleteLater();
 }
 
