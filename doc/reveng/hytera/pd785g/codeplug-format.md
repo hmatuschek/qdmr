@@ -205,6 +205,31 @@ struct digital_chan_t
 For the same digitial channel an RX frequency was seen to change at address
 `0x3ab4e`. The TX frequency was seen to change at address `0x3ab52`.
 
+### Mappings
+Digitial channels can be 'pointed to' by other portions of CP memory, for example zones.  Referencing channels is done by a `uint16_t` value.  This value *does not* refer to the index of a channel in the channel list.  Instead the CP memory contains a set of mappings that defines a seperate value for each channel.  These mappings are located at the end of the digitial channel list, at address `0x0004fad6` and has the format:
+
+```C
+struct ChannelMapping
+{
+  uint16_t idx;
+  uint32_t offset;
+};
+```
+
+The `idx` and `offset` of the `ChannelMapping` structure index into the channel
+list array, however it is the position of the `ChannelMapping` object in the mappings array that defines the mapping value.  For example, suppose we had the following memory  at address `0x0004fad6`:
+
+```
+5500 e41b 0000 5400 901b 0000 5300 3c1b 0000
+```
+
+The following mappings are then defined:
+
+| Mappning Index | Channel Array Index |
+| 0              | `0x55`              |
+| 1              | `0x54`              |
+| 2              | `0x53`              |
+
 ## Digitial Contacts
 
 Contacts start at address `0x65b70` and runs to `0x71b70` thus allowing for a
@@ -250,3 +275,46 @@ The use of the `link` and `idx` fields is currently unknown. It was assumed that
 the `index` field would be used to link into the table by digital channels.
 However, it appears as though this is simply done based upon an offset into the
 table. This leaves the function of `index` and `link` currently a mystery.
+
+## Zones
+
+Zones appear to be split into two parts of memory. First, a list of zone names
+is present at address `0x39764`. For each zone name sgment, there is a
+corresponding zone list segment at `0x125c + (zone_name_idx * 0xe0e)`.
+
+### Zone Names
+The number of zones is found at address `0x39764 - 0x12`. Each zone name has the
+following format:
+
+```C
+struct ZoneName
+{
+  char name[32];
+  uint16_t num_zone_entries;
+  uint8_t zone_list_data[6];
+};
+```
+
+Where:
+  - `name` is the name of the zone in unicode format.
+  - `num_zone_entries` is the number of channels listed in the zone.
+  - `zone_list_data` is a copy of the first six bytes of the zone_list data for
+    this particular entry.
+
+### Zone Lists
+Each zone name entry has a Zone list entry. Each zone list entry defines the
+channels in the zone and contains a contagious list of `ZonePointer` entries:
+
+```C
+struct ZonePointer
+{
+  uint16_t channel_ref;
+  uint16_t is_analog;
+};
+```
+
+Where
+  - `channel_ref` is a number that references a channel through the channel
+    mappings.
+  - `is_analog`: `0` when a digitial channel, `1` when analog. Other values have
+    not been observed.
