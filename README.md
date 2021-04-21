@@ -28,6 +28,7 @@ own these radios to test the software with.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
 
+ * **[Version 0.7.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.7.0)** -- Added AT-D868UVE support and many bugfixes.
  * **[Version 0.6.4](https://github.com/hmatuschek/qdmr/releases/tag/v0.6.4)** -- A lot of bugfixes and minor improvements.
  * **[Version 0.6.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.6.0)** -- Added APRS & roaming.
  * **[Version 0.5.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.5.3)** -- Fixed detection of TYT MD-UV390 radios.

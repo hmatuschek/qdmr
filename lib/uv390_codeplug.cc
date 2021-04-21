@@ -996,7 +996,7 @@ UV390Codeplug::gpssystem_t::clear() {
 
 bool
 UV390Codeplug::gpssystem_t::isValid() const {
-  return (repeat_interval != 0) && (repeat_interval != 0xff);
+  return (repeat_interval != 0) && (repeat_interval != 0xff) && (revert_channel != 0xffff);
 }
 
 uint
