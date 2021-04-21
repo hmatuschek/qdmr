@@ -244,30 +244,16 @@ DFUFile::write(QFile &file) {
 
 unsigned char *
 DFUFile::data(uint32_t offset, uint32_t img) {
-  // Search for element that contains address
-  for  (int i=0; i<image(img).numElements(); i++) {
-    if ((offset >= image(img).element(i).address()) &&
-        (offset < (image(img).element(i).address()+image(img).element(i).data().size())))
-    {
-      return (unsigned char *)(image(img).element(i).data().data()+
-                               (offset-image(img).element(i).address()));
-    }
-  }
-  return nullptr;
+  if (int(img) >= _images.size())
+    return nullptr;
+  return image(img).data(offset);
 }
 
 const unsigned char *
 DFUFile::data(uint32_t offset, uint32_t img) const {
-  // Search for element that contains address
-  for  (int i=0; i<image(img).numElements(); i++) {
-    if ((offset >= image(img).element(i).address()) &&
-        (offset < (image(img).element(i).address()+image(img).element(i).data().size())))
-    {
-      return (const unsigned char *)(image(img).element(i).data().data()+
-                                     (offset-image(img).element(i).address()));
-    }
-  }
-  return nullptr;
+  if (int(img) >= _images.size())
+    return nullptr;
+  return image(img).data(offset);
 }
 
 void
@@ -441,20 +427,25 @@ DFUFile::Element::dump(QTextStream &stream) const {
  * Implementation of DFUFile::Image
  * ********************************************************************************************* */
 DFUFile::Image::Image()
-  : _alternate_settings(0), _name(), _elements()
+  : _alternate_settings(0), _name(), _elements(), _addressmap()
 {
   // pass...
 }
 
 DFUFile::Image::Image(const QString &name, uint8_t altSettings)
-  : _alternate_settings(altSettings), _name(name), _elements()
+  : _alternate_settings(altSettings), _name(name), _elements(), _addressmap()
 {
   // pass...
 }
 
 DFUFile::Image::Image(const Image &other)
-  : _alternate_settings(other._alternate_settings), _name(other._name), _elements(other._elements)
+  : _alternate_settings(other._alternate_settings), _name(other._name), _elements(other._elements),
+    _addressmap(other._addressmap)
 {
+  // pass...
+}
+
+DFUFile::Image::~Image() {
   // pass...
 }
 
@@ -463,6 +454,7 @@ DFUFile::Image::operator=(const Image &other) {
   _alternate_settings = other._alternate_settings;
   _name = other._name;
   _elements = other._elements;
+  _addressmap = other._addressmap;
   return *this;
 }
 
@@ -524,20 +516,25 @@ DFUFile::Image::element(int i) {
 
 void
 DFUFile::Image::addElement(uint32_t addr, uint32_t size, int index) {
-  if ((0 > index) || (_elements.size() <= index))
+  if ((0 > index) || (_elements.size() <= index)) {
     _elements.append(Element(addr, size));
-  else
+    _addressmap.add(addr, size);
+  } else {
     _elements.insert(index, Element(addr, size));
+    _addressmap.add(addr, size, index);
+  }
 }
 
 void
 DFUFile::Image::addElement(const Element &element) {
   _elements.append(element);
+  _addressmap.add(element.address(), element.size());
 }
 
 void
 DFUFile::Image::remElement(int i) {
   _elements.remove(i);
+  _addressmap.rem(i);
 }
 
 bool
@@ -577,7 +574,7 @@ DFUFile::Image::read(QFile &file, CRC32 &crc, QString &errorMessage)
     Element element;
     if (! element.read(file, crc, errorMessage))
       return false;
-    _elements.append(element);
+    this->addElement(element);
   }
 
   // verify size:
@@ -638,3 +635,30 @@ DFUFile::Image::dump(QTextStream &stream) const {
   }
 }
 
+unsigned char *
+DFUFile::Image::data(uint32_t offset) {
+  // Search for element that contains address
+  /*for  (int i=0; i<numElements(); i++) {
+    if ((offset >= element(i).address()) &&
+        (offset < (element(i).address()+element(i).data().size())))
+    {
+      return (unsigned char *)(element(i).data().data()+
+                               (offset-element(i).address()));
+    }
+  }
+  return nullptr;*/
+  int idx = _addressmap.find(offset);
+  if (0 > idx)
+    return nullptr;
+  return (unsigned char *)(element(idx).data().data()+
+                           (offset-element(idx).address()));
+}
+
+const unsigned char *
+DFUFile::Image::data(uint32_t offset) const {
+  int idx = _addressmap.find(offset);
+  if (0 > idx)
+    return nullptr;
+  return (unsigned char *)(element(idx).data().data()+
+                           (offset-element(idx).address()));
+}

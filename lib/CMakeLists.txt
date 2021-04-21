@@ -7,7 +7,7 @@ ELSE (APPLE)
 ENDIF(APPLE)
 
 SET(libdmrconf_SOURCES
-    utils.cc crc32.cc csvwriter.cc signaling.cc codeplugcontext.cc
+    utils.cc crc32.cc csvwriter.cc signaling.cc codeplugcontext.cc addressmap.cc
     radio.cc radiointerface.cc ${hid_SOURCES} hid_interface.cc dfu_libusb.cc usbserial.cc
     csvreader.cc dfufile.cc repeaterdatabase.cc userdatabase.cc logger.cc
     config.cc contact.cc rxgrouplist.cc channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc
@@ -26,7 +26,7 @@ SET(libdmrconf_MOC_HEADERS
     anytone_interface.hh d878uv.hh d878uv_codeplug.hh d878uv_callsigndb.hh
     d868uv.hh d868uv_codeplug.hh)
 SET(libdmrconf_HEADERS libdmrconf.hh
-    utils.hh crc32.hh csvwriter.hh signaling.hh codeplugcontext.hh)
+    utils.hh crc32.hh csvwriter.hh signaling.hh codeplugcontext.hh addressmap.hh)
 
 configure_file(config.h.in ${PROJECT_BINARY_DIR}/lib/config.h)
 
