@@ -61,6 +61,11 @@ int
 AddressMap::find(uint32_t addr) const {
   std::vector<AddrMapItem>::const_iterator at = std::lower_bound(_items.begin(), _items.end(), addr);
   if (_items.end() == at)
+    return _items.back().contains(addr) ? _items.back().index : -1;
+  if (at->contains(addr))
+    return at->index;
+  if (_items.begin() == at)
     return -1;
+  --at;
   return at->contains(addr) ? at->index : -1;
 }
