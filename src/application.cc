@@ -595,13 +595,13 @@ Application::uploadCallsignDB() {
   if (! radio->features().hasCallsignDB) {
     QMessageBox::information(nullptr, tr("Cannot upload call-sign DB."),
                              tr("The detected radio '%1' does not support "
-                                "the upload of an call-sign DB.")
+                                "the upload of a call-sign DB.")
                              .arg(radio->name()));
     return;
   }
   if (! radio->features().callsignDBImplemented) {
     QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
-                          tr("The detected radio '%1' does support the upload of acall-sign DB. "
+                          tr("The detected radio '%1' does support the upload of a call-sign DB. "
                              "This feature, however, is not implemented yet.").arg(radio->name()));
     return;
   }
