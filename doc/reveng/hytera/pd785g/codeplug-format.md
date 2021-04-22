@@ -47,6 +47,107 @@ The other two changes are certainly worrying: These are both 160bit blocks and t
 
 The latter, however, does not make sense as a kind of checksum. This can be done cheaper using CRC32, in particular as many MCUs have dedicated hardware to compute such checksums. SHA1 would make sense if it is used as a HMAC. If this turns out to be true, then we will never be able to programm these Hytera devices.
 
+## High level structure (Sections)
+
+The codeplug appears to be split into numerous sections that are contagious in
+memory.  Each section contains three parts:
+
+ - Header
+ - Data
+ - Mapping table
+ 
+Note you can use the `printSections` cps command to print out the sections. For
+example:
+
+```
+matthew@prax $ python cps.py -i ./my-cp.bin printSections
+Section: address=0x392 type=02 cap=1 elem_in_use=1 size=180  unk1=0x00 unk2=0x6132 unk3=0x04
+Section: address=0x462 type=03 cap=1 elem_in_use=1 size=48  unk1=0x00 unk2=0x6132 unk3=0x04
+Section: address=0x4AE type=77 cap=1 elem_in_use=1 size=68  unk1=0x00 unk2=0x6132 unk3=0x04
+Section: address=0x50E type=76 cap=1 elem_in_use=1 size=32  unk1=0x00 unk2=0x6132 unk3=0x04
+Section: address=0x54A type=04 cap=1 elem_in_use=1 size=4  unk1=0x00 unk2=0x6132 unk3=0x04
+Section: address=0x56A type=05 cap=1 elem_in_use=1 size=8  unk1=0x00 unk2=0x6132 unk3=0x04
+Section: address=0x58E type=06 cap=1 elem_in_use=1 size=16  unk1=0x00 unk2=0x6132 unk3=0x04
+Section: address=0x5BA type=07 cap=1 elem_in_use=1 size=8  unk1=0x00 unk2=0x6132 unk3=0x04
+Section: address=0x5DE type=08 cap=1 elem_in_use=1 size=100  unk1=0x00 unk2=0x6132 unk3=0x04
+
+...
+```
+
+### Section Header
+
+The format of a section header is:
+
+```C++
+strcut section_header {
+  uint16_t kind;
+  uint16_t capacity;
+  uint16_t num_elements : 12,
+           unk1 : 4;
+  
+  uint16_t unk2; // seems to always be 0x0020
+  uint16_t unk3; // seems to always be 0x0000
+  uint16_t unk4;
+  uint16_t unk5;
+  uint16_t data_size; // in bytes
+  uint16_t data_size_2; // seems to always be `data_size + 0x16`.
+}
+```
+
+Where:
+  - `kind`: This value seems to indicate which kind of data the section contains.
+  - `capacity`: This is the number of *elements* that the section can store. The
+    size of the elements depends upon the `kind` of data stored in this section.
+  - `num_elements`: The number of elements contained within the data.
+  - `unk1`: This value seems to be `8` when the data doesn't contain elements
+    that are packed together.
+  - `unk2`: Observed to be `0x0020`.
+  - `unk3`: Observed to be `0x0000`.
+  - `unk4`: Seems to have different values depending upon the codeplug used.
+  - `unk5`: Seems to have different values depending upon the codeplug used.
+  - `data_size`: The size of the data section, in bytes, not including the hader.
+  - `data_size_2`: Seems to always have the value of `data_size + 0x16`, for
+    some strange reason.
+    
+### Data
+
+The section data follows after the header and is `data_size` bytes long. It
+normally contains `num_elements` elements of data and the size of each element
+depends upon the `kind` of data that this section stores.
+
+### mappings
+
+At the end of each section there appears to be a mapping table. This table
+allows elements of data in this section to be referenced from other sections in
+the codeplug.  Each mapping has the following structure:
+
+```C++
+struct section_mapping
+{
+  uint16_t idx;
+  uint32_t offset;
+}
+
+```
+
+The `offset` field appears superfluous, as it can be calcuated as `idx *
+sizeof(element kind)`. The *index* in the mapping list is important as this
+defines the mapping. As an example. Suppose we have the following list of
+mappings (only `idx` fields shown);
+
+```
+mappings = [7,26,84,3,2]
+```
+*Note* It has been observed that reference indices map into the mappings
+table at a position of `-1`.
+
+And we have a refence in some other structure that has a value of `2`. In that
+case, the index of the element in the data that we should link to is at offset
+`26`, since:
+
+```
+section_data[mappings[2 - 1]]
+```
 
 ## DMR ID
 
