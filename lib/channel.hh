@@ -13,6 +13,7 @@ class ScanList;
 class APRSSystem;
 class PositioningSystem;
 class RoamingZone;
+class RadioID;
 
 
 /** The base class of all channels (analog and digital) of a codeplug configuration.
@@ -271,7 +272,7 @@ public:
   DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
 	               bool rxOnly, Admit admit, uint colorCode, TimeSlot timeslot, RXGroupList *rxGroup,
                  DigitalContact *txContact, PositioningSystem *posSystem, ScanList *list,
-                 RoamingZone *roaming, QObject *parent=nullptr);
+                 RoamingZone *roaming, RadioID *radioID, QObject *parent=nullptr);
 
   /** Returns the admit criterion for the channel. */
 	Admit admit() const;
@@ -308,6 +309,11 @@ public:
   /** Associates the given roaming zone with this channel. */
   bool setRoaming(RoamingZone *zone);
 
+  /** Returns the radio ID associated with this channel or @c nullptr if the default ID is used. */
+  RadioID *radioId() const;
+  /** Associates the given radio ID with this channel. Pass nullptr to set to default ID. */
+  bool setRadioId(RadioID *id);
+
 protected slots:
   /** Internal callback if RX group list is deleted. */
 	void onRxGroupDeleted();
@@ -317,6 +323,8 @@ protected slots:
   void onPosSystemDeleted();
   /** Internal callback if roaming zone is deleted. */
   void onRoamingZoneDeleted();
+  /** Internal used callback if radio ID is deleted. */
+  void onRadioIdDeleted();
 
 protected:
   /** The admit criterion. */
@@ -333,6 +341,8 @@ protected:
   PositioningSystem *_posSystem;
   /** Roaming zone for the channel. */
   RoamingZone *_roaming;
+  /** Radio ID to use on this channel. @c nullptr if default ID is used. */
+  RadioID *_radioId;
 };
 
 

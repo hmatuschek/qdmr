@@ -1950,7 +1950,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
   }
 
   DigitalChannel *chan = new DigitalChannel(name, rx, tx, power, tot, ro, admit, color, slot,
-                                            nullptr, nullptr, nullptr, nullptr, nullptr);
+                                            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
   _config->channelList()->addChannel(chan);
   _channels[idx] = chan;
 

@@ -289,7 +289,7 @@ D878UVCodeplug::channel_t::toChannelObj() const {
     DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1);
     ch = new DigitalChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
-          color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr);
+          color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
   } else {
     logError() << "Cannot create channel '" << getName()
                << "': Channel type " << channel_mode << "not supported.";
@@ -327,6 +327,10 @@ D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
     // If roaming is not disabled -> link to default roaming zone
     if (0 == excl_from_roaming)
       dc->setRoaming(DefaultRoamingZone::get());
+
+    // Link radio ID
+    dc->setRadioId(ctx.getRadioId(id_index));
+
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
     AnalogChannel *ac = c->as<AnalogChannel>();
@@ -908,7 +912,7 @@ D878UVCodeplug::roaming_channel_t::toChannel(CodeplugContext &ctx) {
     digi = new DigitalChannel(getName(), getRXFrequency(), getTXFrequency(),
                               Channel::LowPower, 0, false, DigitalChannel::AdmitColorCode,
                               getColorCode(), getTimeslot(), nullptr, nullptr, nullptr,
-                              nullptr, nullptr);
+                              nullptr, nullptr, nullptr);
     logDebug() << "Create channel '" << digi->name() << "' as roaming channel.";
     ctx.config()->channelList()->addChannel(digi);
   }

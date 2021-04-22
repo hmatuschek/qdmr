@@ -1020,7 +1020,7 @@ Application::onCloneChannel() {
           selch->name()+" clone", selch->rxFrequency(), selch->txFrequency(), selch->power(),
           selch->txTimeout(), selch->rxOnly(), selch->admit(), selch->colorCode(),
           selch->timeslot(), selch->rxGroupList(), selch->txContact(), selch->posSystem(),
-          selch->scanList(), selch->roaming());
+          selch->scanList(), selch->roaming(), nullptr);
     // open editor
     DigitalChannelDialog dialog(_config, clone);
     if (QDialog::Accepted != dialog.exec()) {

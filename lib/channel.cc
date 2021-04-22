@@ -211,10 +211,10 @@ AnalogChannel::onAPRSSystemDeleted() {
 DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power,
                                uint txto, bool rxOnly, Admit admit, uint colorCode,
                                TimeSlot timeslot, RXGroupList *rxGroup, DigitalContact *txContact,
-                               PositioningSystem *posSystem, ScanList *list, RoamingZone *roaming, QObject *parent)
+                               PositioningSystem *posSystem, ScanList *list, RoamingZone *roaming, RadioID *radioID, QObject *parent)
   : Channel(name, rxFreq, txFreq, power, txto, rxOnly, list, parent), _admit(admit),
     _colorCode(colorCode), _timeSlot(timeslot), _rxGroup(rxGroup), _txContact(txContact),
-    _posSystem(posSystem), _roaming(roaming)
+    _posSystem(posSystem), _roaming(roaming), _radioId(radioID)
 {
   if (_rxGroup)
     connect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));
@@ -224,6 +224,8 @@ DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq
     connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
   if (_roaming)
     connect(_roaming, SIGNAL(destroyed()), this, SLOT(onRoamingZoneDeleted()));
+  if (_radioId)
+    connect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
 }
 
 DigitalChannel::Admit
@@ -323,6 +325,23 @@ DigitalChannel::setRoaming(RoamingZone *zone) {
   return true;
 }
 
+RadioID *
+DigitalChannel::radioId() const {
+  return _radioId;
+}
+
+bool
+DigitalChannel::setRadioId(RadioID *id) {
+  if (_radioId)
+    disconnect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
+  _radioId = id;
+  if (_radioId)
+    connect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
+  emit modified();
+  return true;
+}
+
+
 void
 DigitalChannel::onRxGroupDeleted() {
   setRXGroupList(nullptr);
@@ -343,6 +362,10 @@ DigitalChannel::onRoamingZoneDeleted() {
   setRoaming(nullptr);
 }
 
+void
+DigitalChannel::onRadioIdDeleted() {
+  setRadioId(nullptr);
+}
 
 /* ********************************************************************************************* *
  * Implementation of SelectedChannel

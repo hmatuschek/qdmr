@@ -215,7 +215,7 @@ UV390Codeplug::channel_t::toChannelObj() const {
 
     return new DigitalChannel(getName(), getRXFrequency(), getTXFrequency(), pwr, (tot*15),
                               rx_only, admit_crit, color_code, slot,
-                              nullptr, nullptr, nullptr, nullptr, nullptr);
+                              nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
   }
 
   return nullptr;

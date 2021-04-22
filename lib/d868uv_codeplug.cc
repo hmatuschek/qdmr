@@ -437,7 +437,7 @@ D868UVCodeplug::channel_t::toChannelObj() const {
     DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1);
     ch = new DigitalChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
-          color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr);
+          color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
   } else {
     logError() << "Cannot create channel '" << getName()
                << "': Channel type " << channel_mode << "not supported.";
@@ -469,6 +469,9 @@ D868UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
       logWarn() << "Cannot link to GPS system index " << gps_system << ": undefined GPS system.";
     else if (ctx.hasGPSSystem(gps_system))
       dc->setPosSystem(ctx.getGPSSystem(gps_system));
+
+    // Link radio ID
+    dc->setRadioId(ctx.getRadioId(id_index));
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
     AnalogChannel *ac = c->as<AnalogChannel>();
