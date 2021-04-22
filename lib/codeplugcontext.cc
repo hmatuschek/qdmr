@@ -1,8 +1,8 @@
 #include "codeplugcontext.hh"
 
 CodeplugContext::CodeplugContext(Config *config)
-  : _config(config), _channelTable(), _digitalContactTable(), _groupListTable(), _scanListTable(),
-    _gpsSystemTable(), _aprsSystemTable()
+  : _config(config), _radioIDTable(), _channelTable(), _digitalContactTable(), _groupListTable(),
+    _scanListTable(), _gpsSystemTable(), _aprsSystemTable()
 {
   // pass...
 }
@@ -10,6 +10,39 @@ CodeplugContext::CodeplugContext(Config *config)
 Config *
 CodeplugContext::config() const {
   return _config;
+}
+
+
+bool
+CodeplugContext::hasRadioId(int index) const {
+  return _radioIDTable.contains(index);
+}
+
+bool
+CodeplugContext::setDefaultRadioId(uint32_t id, int index) {
+  if (_radioIDTable.contains(0))
+    return false;
+  _config->radioIDs()->getId(0)->setId(id);
+  _radioIDTable[index] = 0;
+  return true;
+}
+
+bool
+CodeplugContext::addRadioId(uint32_t id, int index) {
+  if (_radioIDTable.contains(index))
+    return false;
+  int cidx = _config->radioIDs()->addId(id);
+  if (cidx < 0)
+    return false;
+  _radioIDTable[index] = cidx;
+  return true;
+}
+
+RadioID *
+CodeplugContext::getRadioId(int idx) const {
+  if (! _radioIDTable.contains(idx))
+    return nullptr;
+  return _config->radioIDs()->getId(_radioIDTable[idx]);
 }
 
 

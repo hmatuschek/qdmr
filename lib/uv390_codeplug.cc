@@ -867,7 +867,7 @@ UV390Codeplug::general_settings_t::setIntroLine2(const QString &txt) {
 
 bool
 UV390Codeplug::general_settings_t::updateConfigObj(Config *conf) const {
-  conf->setId(getRadioId());
+  conf->radioIDs()->getId(0)->setId(getRadioId());
   conf->setName(getName());
   conf->setIntroLine1(getIntroLine1());
   conf->setIntroLine2(getIntroLine2());
@@ -880,7 +880,7 @@ void
 UV390Codeplug::general_settings_t::fromConfigObj(const Config *conf) {
   // Set only those elements configured, preserve the rest as already configured in the radio.
   setName(conf->name());
-  setRadioId(conf->id());
+  setRadioId(conf->radioIDs()->getId(0)->id());
   setIntroLine1(conf->introLine1());
   setIntroLine2(conf->introLine2());
   setTimeZone();

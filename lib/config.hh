@@ -19,6 +19,8 @@
 #include "scanlist.hh"
 #include "gpssystem.hh"
 #include "roaming.hh"
+#include "radioid.hh"
+
 
 // Forward declaration
 class UserDatabase;
@@ -42,6 +44,8 @@ public:
   /** Sets the modified flag. */
   void setModified(bool modified);
 
+  /** Returns the list of radio IDs. */
+  RadioIDList *radioIDs() const;
   /** Returns the list of contacts. */
 	ContactList *contacts() const;
   /** Returns the list of RX group lists. */
@@ -60,11 +64,6 @@ public:
   bool requiresRoaming() const;
   /** Returns @c true if one of the channels has a GPS or APRS system assigned. */
   bool requiresGPS() const;
-
-  /** Returns the DMR ID of the radio. */
-  uint id() const;
-  /** (Re-)Sets the DMR ID of the radio. */
-  void setId(uint id);
 
   /** Returns the name of the radio. */
   const QString &name() const;
@@ -113,6 +112,8 @@ protected slots:
 protected:
   /** If @c true, the configuration was modified. */
   bool _modified;
+  /** The list of radio IDs. */
+  RadioIDList *_radioIDs;
   /** The list of contacts. */
 	ContactList *_contacts;
   /** The list of RX group lists. */
@@ -128,8 +129,6 @@ protected:
   /** The list of roaming zones. */
   RoamingZoneList *_roaming;
 
-  /** DMR id of the radio. */
-  uint _id;
   /** The name of the radio. */
   QString _name;
   /** The fist intro line. */

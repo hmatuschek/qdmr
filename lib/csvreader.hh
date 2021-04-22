@@ -117,8 +117,8 @@ public:
   /** Destructor. */
   virtual ~CSVHandler();
 
-  /** Gets called once the DMR ID has been parsed. */
-  virtual bool handleRadioId(qint64 id, qint64 line, qint64 column, QString &errorMessage);
+  /** Gets called once the DMR IDs has been parsed. */
+  virtual bool handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the radio name has been parsed. */
   virtual bool handleRadioName(const QString &name, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the first intro line has been parsed. */
@@ -262,7 +262,7 @@ public:
    * @returns @c true on success. */
   static bool read(Config *config, QTextStream &stream, QString &errorMessage);
 
-  virtual bool handleRadioId(qint64 id, qint64 line, qint64 column, QString &errorMessage);
+  virtual bool handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleRadioName(const QString &name, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleIntroLine1(const QString &text, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleIntroLine2(const QString &text, qint64 line, qint64 column, QString &errorMessage);

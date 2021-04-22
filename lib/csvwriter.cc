@@ -29,9 +29,12 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
          << "# see https://dm3mat.darc.de/qdmr for details.\n"
          << "#\n\n";
 
+  QStringList radio_ids;
+  for (int i=0; i<config->radioIDs()->count(); i++)
+    radio_ids.append(QString::number(config->radioIDs()->getId(i)->id()));
 
   stream << "# Unique DMR ID and name (quoted) of this radio.\n"
-         << "ID: " << config->id() << "\n"
+         << "ID: " << radio_ids.join(", ") << "\n"
          << "Name: \"" << config->name() << "\"\n\n"
          << "# Text displayed when the radio powers up (quoted).\n"
          << "IntroLine1: \"" << config->introLine1() << "\"\n"

@@ -162,14 +162,14 @@ Application::createMainWindow() {
   connect(upCDB, SIGNAL(triggered()), this, SLOT(uploadCallsignDB()));
 
   // Wire-up "General Settings" view
-  QLineEdit *dmrID  = _mainWindow->findChild<QLineEdit*>("dmrID");
+  QComboBox *dmrID  = _mainWindow->findChild<QComboBox*>("dmrID");
   QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
 
-  dmrID->setText(QString::number(_config->id()));
+  dmrID->addItem(QString::number(_config->radioIDs()->getId(0)->id()));
   rname->setText(_config->name());
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
@@ -608,7 +608,7 @@ Application::uploadCallsignDB() {
 
   // Sort call-sign DB w.r.t. the current DMR ID in _config
   // this is part of the "auto-selection" of calls-signs for upload
-  _users->sortUsers(_config->id());
+  _users->sortUsers(_config->radioIDs()->getId(0)->id());
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
   progress->setValue(0);
@@ -698,7 +698,7 @@ Application::onConfigModifed() {
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
 
-  dmrID->setText(QString::number(_config->id()));
+  dmrID->setText(QString::number(_config->radioIDs()->getId(0)->id()));
   rname->setText(_config->name());
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
@@ -710,8 +710,8 @@ Application::onConfigModifed() {
 
 void
 Application::onDMRIDChanged() {
-  QLineEdit *dmrID  = _mainWindow->findChild<QLineEdit*>("dmrID");
-  _config->setId(dmrID->text().toUInt());
+  QComboBox *dmrID  = _mainWindow->findChild<QComboBox *>("dmrID");
+  _config->radioIDs()->getId(0)->setId(dmrID->currentText().toUInt());
 }
 
 void

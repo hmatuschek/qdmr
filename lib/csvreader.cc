@@ -102,8 +102,8 @@ CSVHandler::~CSVHandler() {
 }
 
 bool
-CSVHandler::handleRadioId(qint64 id, qint64 line, qint64 column, QString &errorMessage) {
-  Q_UNUSED(id);
+CSVHandler::handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, QString &errorMessage) {
+  Q_UNUSED(ids);
   Q_UNUSED(line);
   Q_UNUSED(column);
   Q_UNUSED(errorMessage)
@@ -424,23 +424,30 @@ CSVParser::_parse_radio_id(CSVLexer &lexer) {
     return false;
   }
 
+  QList<qint64> ids;
   token = lexer.next();
-  if (CSVLexer::Token::T_NUMBER != token.type) {
-    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
-        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
-    return false;
+  while (CSVLexer::Token::T_NUMBER == token.type) {
+    ids.append(token.value.toInt());
+    token = lexer.next();
+    if (CSVLexer::Token::T_COMMA == token.type) {
+      token = lexer.next();
+      continue;
+    }
   }
-  qint64 id = token.value.toInt();
-  qint64 line=token.line, column=token.column;
 
-  token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
-  return _handler->handleRadioId(id, line, column, _errorMessage);
+  if (0 == ids.size()) {
+    _errorMessage = QString("Parse error @ %1,%2: At least one radio ID must be specified.")
+        .arg(token.line).arg(token.column);
+    return false;
+  }
+
+  return _handler->handleRadioId(ids, token.line, token.column, _errorMessage);
 }
 
 bool
@@ -1721,14 +1728,17 @@ CSVReader::read(Config *config, QTextStream &stream, QString &errorMessage) {
 
 
 bool
-CSVReader::handleRadioId(qint64 id, qint64 line, qint64 column, QString &errorMessage) {
+CSVReader::handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(line);
   Q_UNUSED(column);
   Q_UNUSED(errorMessage);
 
-  if (_link) {
-    _config->setId(id);
+  if (! _link) {
+    _config->radioIDs()->getId(0)->setId(ids.front());
+    for (int i=1; i<_config->radioIDs()->count(); i++)
+      _config->radioIDs()->addId(ids.at(i));
   }
+
   return true;
 }
 

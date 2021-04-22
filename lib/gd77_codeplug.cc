@@ -449,7 +449,7 @@ GD77Codeplug::encode(Config *config, const Flags &flags) {
   if (! flags.updateCodePlug)
     gs->initDefault();
   gs->setName(config->name());
-  gs->setRadioId(config->id());
+  gs->setRadioId(config->radioIDs()->getId(0)->id());
 
   intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
   it->setIntroLine1(config->introLine1());
@@ -566,7 +566,7 @@ GD77Codeplug::decode(Config *config) {
     return false;
   }
 
-  config->setId(gs->getRadioId());
+  config->radioIDs()->getId(0)->setId(gs->getRadioId());
   config->setName(gs->getName());
   intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
   config->setIntroLine1(it->getIntroLine1());

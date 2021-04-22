@@ -1318,7 +1318,9 @@ D868UVCodeplug::setBitmaps(Config *config)
 {
   // Mark first radio ID as valid
   uint8_t *radioid_bitmap = data(RADIOID_BITMAP);
-  radioid_bitmap[0] |= 1;
+  memset(radioid_bitmap, 0, RADIOID_BITMAP_SIZE);
+  for (int i=0; i<std::min(NUM_RADIOIDS, config->radioIDs()->count()); i++)
+    radioid_bitmap[i/8] |= (1 << (i%8));
 
   // Mark valid channels (set bit)
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
@@ -1630,8 +1632,10 @@ bool
 D868UVCodeplug::encodeRadioID(Config *config, const Flags &flags) {
   // Encode radio IDs
   radioid_t *radio_ids = (radioid_t *)data(ADDR_RADIOIDS);
-  radio_ids[0].setId(config->id());
-  radio_ids[0].setName(config->name());
+  for (int i=0; i<config->radioIDs()->count(); i++) {
+    radio_ids[i].setId(config->radioIDs()->getId(i)->id());
+    radio_ids[i].setName(config->name());
+  }
   return true;
 }
 
@@ -1639,12 +1643,18 @@ bool
 D868UVCodeplug::setRadioID(Config *config, CodeplugContext &ctx) {
   // Find a valid RadioID
   uint8_t *radio_ids = data(ADDR_RADIOIDS);
+  uint8_t *radio_id_bitmap = data(RADIOID_BITMAP);
+  bool first = true;
   for (uint16_t i=0; i<NUM_RADIOIDS; i++) {
+    if (0 == (radio_id_bitmap[i/8] & (1 << (i%8))))
+      continue;
     radioid_t *id = (radioid_t *)(radio_ids+i*sizeof(radioid_t));
-    if (id->isValid()) {
-      config->setId(id->getId());
+    if (first) {
+      ctx.setDefaultRadioId(id->getId(), i);
       config->setName(id->getName());
-      return true;
+      first = false;
+    } else {
+      ctx.addRadioId(id->getId(), i);
     }
   }
   return true;
