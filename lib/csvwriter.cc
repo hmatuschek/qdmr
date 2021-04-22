@@ -60,8 +60,9 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 13) Contact for transmit: - or index in Contacts table\n"
             "# 14) GPS System: - or index in GPS table.\n"
             "# 15) Roaming zone: -, + or index in roaming-zone table.\n"
+            "# 16) Radio ID: -, index in radio ID list above. - means default ID.\n"
             "#\n"
-            "Digital Name                Receive    Transmit   Power Scan TOT RO Admit  CC TS RxGL TxC GPS Roam\n";
+            "Digital Name                Receive    Transmit   Power Scan TOT RO Admit  CC TS RxGL TxC GPS Roam ID\n";
   for (int i=0; i<config->channelList()->count(); i++) {
     if (config->channelList()->channel(i)->is<AnalogChannel>())
       continue;
@@ -100,6 +101,11 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
       stream << qSetFieldWidth(5) << "+";
     else
       stream << qSetFieldWidth(5) << (config->roaming()->indexOf(digi->roaming())+1);
+    // Write radio ID
+    if (nullptr == digi->radioId())
+      stream << qSetFieldWidth(3) << "-";
+    else
+      stream << qSetFieldWidth(3) << (config->radioIDs()->indexOf(digi->radioId())+1);
     // add contact name as comment
     if (digi->txContact())
       stream << qSetFieldWidth(0) << "# " << digi->txContact()->name();

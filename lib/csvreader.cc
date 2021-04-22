@@ -200,7 +200,7 @@ CSVHandler::handleGroupList(qint64 idx, const QString &name, const QList<qint64>
 bool
 CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
     qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-    qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 line, qint64 column, QString &errorMessage)
+    qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 radioID, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
   Q_UNUSED(name);
@@ -217,6 +217,7 @@ CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, dou
   Q_UNUSED(contact);
   Q_UNUSED(gps);
   Q_UNUSED(roam);
+  Q_UNUSED(radioID);
   Q_UNUSED(line);
   Q_UNUSED(column);
   Q_UNUSED(errorMessage);
@@ -990,7 +991,7 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  qint64 roam = -1;
+  qint64 roam = -1, radioID = -1;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
     roam = -1;
   } else if (CSVLexer::Token::T_ENABLED == token.type) {
@@ -1007,6 +1008,20 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
+  if (CSVLexer::Token::T_NOT_SET == token.type) {
+    radioID = -1;
+  } else if (CSVLexer::Token::T_NUMBER == token.type) {
+    radioID = token.value.toInt(&ok);
+  } else if ((CSVLexer::Token::T_NEWLINE == token.type) || (CSVLexer::Token::T_END_OF_STREAM == token.type)) {
+    // This entry is optional for backward compatibility.
+    goto done;
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)) {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1015,7 +1030,7 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
 
 done:
   return _handler->handleDigitalChannel(idx, name, rx, tx, pwr, scanlist, tot, rxOnly, admit, color,
-                                        slot, rxGroupList, txContact, gps, roam, line, column, _errorMessage);
+                                        slot, rxGroupList, txContact, gps, roam, radioID, line, column, _errorMessage);
 }
 
 bool
@@ -1733,10 +1748,15 @@ CSVReader::handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, Q
   Q_UNUSED(column);
   Q_UNUSED(errorMessage);
 
-  if (! _link) {
-    _config->radioIDs()->getId(0)->setId(ids.front());
-    for (int i=1; i<_config->radioIDs()->count(); i++)
-      _config->radioIDs()->addId(ids.at(i));
+  if (_link)
+    return true;
+  logDebug() << "Got " << ids.count() << " IDs...";
+  _config->radioIDs()->getId(0)->setId(ids.front());
+  _radioIDs[0] = _config->radioIDs()->getId(0);
+  for (int i=1; i<ids.count(); i++) {
+    RadioID *id = new RadioID(ids.at(i));
+    _config->radioIDs()->addId(id);
+    _radioIDs[i] = id;
   }
 
   return true;
@@ -1883,7 +1903,7 @@ CSVReader::handleGroupList(qint64 idx, const QString &name, const QList<qint64> 
 bool
 CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
     qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-    qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 line, qint64 column, QString &errorMessage)
+    qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 radioID, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
     // Check RX Grouplist
@@ -1938,6 +1958,18 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
         return false;
       }
       _channels[idx]->as<DigitalChannel>()->setRoaming(_roamingZones[roam]);
+    }
+
+    // check radio ID
+    if (-1 == radioID) {
+      _channels[idx]->as<DigitalChannel>()->setRadioId(nullptr);
+    } else if (0 < roam) {
+      if (! _radioIDs.contains(radioID)) {
+        errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown radio ID index %4.")
+            .arg(line).arg(column).arg(name).arg(gps);
+        return false;
+      }
+      _channels[idx]->as<DigitalChannel>()->setRadioId(_radioIDs[roam]);
     }
     return true;
   }
