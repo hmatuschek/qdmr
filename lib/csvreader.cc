@@ -1752,11 +1752,11 @@ CSVReader::handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, Q
     return true;
   logDebug() << "Got " << ids.count() << " IDs...";
   _config->radioIDs()->getId(0)->setId(ids.front());
-  _radioIDs[0] = _config->radioIDs()->getId(0);
+  _radioIDs[1] = _config->radioIDs()->getId(0);
   for (int i=1; i<ids.count(); i++) {
     RadioID *id = new RadioID(ids.at(i));
     _config->radioIDs()->addId(id);
-    _radioIDs[i] = id;
+    _radioIDs[i+1] = id;
   }
 
   return true;
@@ -1954,7 +1954,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
       // positive index means reference to roaming specific roaming zone
       if (! _roamingZones.contains(roam)) {
         errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown roaming zone index %4.")
-            .arg(line).arg(column).arg(name).arg(gps);
+            .arg(line).arg(column).arg(name).arg(roam);
         return false;
       }
       _channels[idx]->as<DigitalChannel>()->setRoaming(_roamingZones[roam]);
@@ -1963,14 +1963,14 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
     // check radio ID
     if (-1 == radioID) {
       _channels[idx]->as<DigitalChannel>()->setRadioId(nullptr);
-    } else if (0 < roam) {
-      if (! _radioIDs.contains(radioID)) {
-        errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown radio ID index %4.")
-            .arg(line).arg(column).arg(name).arg(gps);
-        return false;
-      }
-      _channels[idx]->as<DigitalChannel>()->setRadioId(_radioIDs[roam]);
+    } else if ((0 < radioID) && (_radioIDs.contains(radioID))) {
+      _channels[idx]->as<DigitalChannel>()->setRadioId(_radioIDs[radioID]);
+    } else {
+      errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown radio ID index %4.")
+          .arg(line).arg(column).arg(name).arg(radioID);
+      return false;
     }
+
     return true;
   }
 
