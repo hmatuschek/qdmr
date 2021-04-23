@@ -15,7 +15,8 @@ static Radio::Features _gd77_features = {
   .vhfLimits = {136., 174.},
   .uhfLimits = {400., 470.},
 
-  .maxNameLength = 8,
+  .maxRadioIDs        = 1,
+  .maxNameLength      = 8,
   .maxIntroLineLength = 16,
 
   .maxChannels = 1024,

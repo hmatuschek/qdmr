@@ -109,6 +109,9 @@ public:
     /** UHF frequency limits. */
     FrequencyRange uhfLimits;
 
+    /** Maximum number of radio IDs. */
+    int maxRadioIDs;
+
     /** Maximum length of the radio name. */
 		int maxNameLength;
     /** Maximum length of boot messages. */

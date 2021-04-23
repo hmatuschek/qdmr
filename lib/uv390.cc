@@ -15,7 +15,8 @@ static Radio::Features _uv390_features =
   .vhfLimits = {136., 174.},
   .uhfLimits = {400., 480.},
 
-  .maxNameLength = 16,
+  .maxRadioIDs        = 1,  /// @todo UV390 supports multiple radio IDs, not implemented yet.
+  .maxNameLength      = 16,
   .maxIntroLineLength = 10,
 
   .maxChannels = 3000,

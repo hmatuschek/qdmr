@@ -46,6 +46,14 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                     tr("Support for this radio is still new and not well tested. "
                        "The code-plug might be incomplete, non-functional or even harmful.")));
 
+  // Check radio IDs
+  if (config->radioIDs()->count() > features().maxRadioIDs) {
+    issues.append(VerifyIssue(
+                    VerifyIssue::ERROR,
+                    tr("This radio only supports %1 DMR IDs, %2 are set.")
+                    .arg(features().maxRadioIDs).arg(config->radioIDs()->count())));
+  }
+
   /*
    *  Check general config
    */

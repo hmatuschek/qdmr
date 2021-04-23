@@ -19,6 +19,7 @@ static Radio::Features _d878uv_features =
   .uhfLimits = {400., 480.},
 
   // general limits
+  .maxRadioIDs        = 250,
   .maxNameLength      = 16,
   .maxIntroLineLength = 14,
 
