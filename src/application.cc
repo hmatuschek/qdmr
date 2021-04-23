@@ -163,6 +163,8 @@ Application::createMainWindow() {
 
   // Wire-up "General Settings" view
   QComboBox *dmrID  = _mainWindow->findChild<QComboBox*>("dmrID");
+  QPushButton *addID = _mainWindow->findChild<QPushButton*>("addID");
+  QPushButton *remID = _mainWindow->findChild<QPushButton*>("remID");
   QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
@@ -178,8 +180,10 @@ Application::createMainWindow() {
   mic->setValue(_config->micLevel());
   speech->setChecked(_config->speech());
 
-  connect(dmrID, SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
+  connect(dmrID->lineEdit(), SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
   connect(dmrID, SIGNAL(currentIndexChanged(int)), this, SLOT(onDMRIDSelected(int)));
+  connect(addID, SIGNAL(clicked(bool)), this, SLOT(onAddDMRID()));
+  connect(remID, SIGNAL(clicked(bool)), this, SLOT(onRemDMRID()));
   connect(rname, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
   connect(intro1, SIGNAL(editingFinished()), this, SLOT(onIntroLine1Changed()));
   connect(intro2, SIGNAL(editingFinished()), this, SLOT(onIntroLine2Changed()));
@@ -694,14 +698,12 @@ Application::onConfigModifed() {
   if (! _mainWindow)
     return;
 
-  QLineEdit *dmrID  = _mainWindow->findChild<QLineEdit*>("dmrID");
   QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
 
-  dmrID->setText(QString::number(_config->radioIDs()->getId(0)->id()));
   rname->setText(_config->name());
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
@@ -720,6 +722,25 @@ Application::onDMRIDChanged() {
 void
 Application::onDMRIDSelected(int idx) {
   _config->radioIDs()->setDefault(idx);
+}
+
+void
+Application::onAddDMRID() {
+  int idx = _config->radioIDs()->addId(uint32_t(0));
+  _config->radioIDs()->setDefault(idx);
+  QComboBox *dmrID  = _mainWindow->findChild<QComboBox *>("dmrID");
+  dmrID->setCurrentIndex(0);
+}
+
+void
+Application::onRemDMRID() {
+  if (1 == _config->radioIDs()->count()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot remove last DMR ID"),
+          tr("The codeplug needs at least one valid DMR ID."));
+    return;
+  }
+  _config->radioIDs()->delId(_config->radioIDs()->getId(0));
 }
 
 void

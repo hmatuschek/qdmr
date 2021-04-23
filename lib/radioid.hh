@@ -41,8 +41,8 @@ public:
   int addId(RadioID *id);
   int addId(uint32_t id);
 
-  bool remId(RadioID *id);
-  bool remId(uint32_t id);
+  bool delId(RadioID *id);
+  bool delId(uint32_t id);
 
   int rowCount(const QModelIndex &parent) const;
   QVariant data(const QModelIndex &index, int role) const;
@@ -56,5 +56,6 @@ protected slots:
 protected:
   QList<RadioID *> _ids;
 };
+
 
 #endif // RADIOID_HH

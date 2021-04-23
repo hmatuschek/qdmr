@@ -84,6 +84,15 @@ DigitalChannelDialog::construct() {
     if (_channel && (_channel->roaming() == zone))
       roaming->setCurrentIndex(i+2);
   }
+  dmrID->addItem(tr("[Default]"), QVariant::fromValue(nullptr));
+  dmrID->setCurrentIndex(0);
+  for (int i=0; i<_config->radioIDs()->count(); i++) {
+    dmrID->addItem(QString::number(_config->radioIDs()->getId(i)->id()),
+                   QVariant::fromValue(_config->radioIDs()->getId(i)));
+    if (_channel && (_config->radioIDs()->getId(i) == _channel->radioId())) {
+      dmrID->setCurrentIndex(i+1);
+    }
+  }
 
   if (_channel) {
     channelName->setText(_channel->name());
@@ -128,8 +137,10 @@ DigitalChannelDialog::channel() {
   ScanList *scanlist = scanList->currentData().value<ScanList *>();
   PositioningSystem *pos = gpsSystem->currentData().value<PositioningSystem *>();
   RoamingZone *roamingZone = roaming->currentData().value<RoamingZone *>();
+  RadioID *id = dmrID->currentData().value<RadioID*>();
 
   if (_channel) {
+    _channel->setRadioId(id);
     _channel->setName(name);
     _channel->setRXFrequency(rx);
     _channel->setTXFrequency(tx);
@@ -148,7 +159,7 @@ DigitalChannelDialog::channel() {
   }
 
   return new DigitalChannel(name, rx, tx, pwr, timeout, rxonly, admit, colorcode, ts, rxgroup,
-                            contact, pos, scanlist, roamingZone, nullptr);
+                            contact, pos, scanlist, roamingZone, id);
 }
 
 void

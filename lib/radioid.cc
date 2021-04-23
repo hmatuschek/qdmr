@@ -36,12 +36,15 @@ RadioIDList::RadioIDList(QObject *parent)
 
 void
 RadioIDList::clear() {
+  beginResetModel();
   foreach (RadioID *id, _ids) {
     id->deleteLater();
   }
   _ids.clear();
   _ids.push_back(new RadioID(0));
   connect(_ids.at(0), SIGNAL(destroyed(QObject*)), this, SLOT(onIdDeleted(QObject*)));
+  endResetModel();
+  emit modified();
 }
 
 int
@@ -80,6 +83,7 @@ RadioIDList::addId(RadioID *id) {
   _ids.append(id);
   connect(id, SIGNAL(destroyed(QObject*)), this, SLOT(onIdDeleted(QObject*)));
   endInsertRows();
+  emit modified();
   return r;
 }
 
@@ -90,7 +94,7 @@ RadioIDList::addId(uint32_t id) {
 
 bool
 RadioIDList::setDefault(uint idx) {
-  if (int(idx) >= count())
+  if (idx >= uint(count()))
     return false;
   if (0 == idx)
     return true;
@@ -99,11 +103,12 @@ RadioIDList::setDefault(uint idx) {
   _ids.removeAt(idx);
   _ids.prepend(obj);
   endMoveRows();
+  emit modified();
   return true;
 }
 
 bool
-RadioIDList::remId(RadioID *id) {
+RadioIDList::delId(RadioID *id) {
   if ((nullptr == id) || (! _ids.contains(id)))
     return false;
   int idx = _ids.indexOf(id);
@@ -112,17 +117,18 @@ RadioIDList::remId(RadioID *id) {
   disconnect(id, SIGNAL(destroyed(QObject*)), this, SLOT(onIdDeleted(QObject*)));
   id->deleteLater();
   endRemoveRows();
+  emit modified();
   return true;
 }
 
 bool
-RadioIDList::remId(uint32_t id) {
-  return remId(find(id));
+RadioIDList::delId(uint32_t id) {
+  return delId(find(id));
 }
 
 void
 RadioIDList::onIdDeleted(QObject *obj) {
-  remId(qobject_cast<RadioID *>(obj));
+  delId(qobject_cast<RadioID *>(obj));
 }
 
 int

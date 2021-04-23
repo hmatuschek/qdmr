@@ -196,15 +196,37 @@
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The default DMR ID. &lt;/p&gt;&lt;p&gt;Usually, you will ever only need &lt;span style=&quot; font-weight:600;&quot;&gt;one&lt;/span&gt; DMR IDs for all your radios. In some rare cases, multiple DMR IDs are needed and can be added using the '+' button to the right.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
               <property name="editable">
+               <bool>true</bool>
+              </property>
+              <property name="insertPolicy">
+               <enum>QComboBox::NoInsert</enum>
+              </property>
+              <property name="duplicatesEnabled">
                <bool>true</bool>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="editIDs">
+             <widget class="QPushButton" name="addID">
+              <property name="toolTip">
+               <string>Adds a DMR ID</string>
+              </property>
               <property name="text">
-               <string>...</string>
+               <string>+</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="remID">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deletes the selected DMR ID.&lt;/p&gt;&lt;p&gt;All channes using the deleted ID will switch back to the default DMR ID selected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>-</string>
               </property>
              </widget>
             </item>
