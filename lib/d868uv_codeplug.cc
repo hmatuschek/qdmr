@@ -1642,7 +1642,10 @@ D868UVCodeplug::encodeRadioID(Config *config, const Flags &flags) {
   radioid_t *radio_ids = (radioid_t *)data(ADDR_RADIOIDS);
   for (int i=0; i<config->radioIDs()->count(); i++) {
     radio_ids[i].setId(config->radioIDs()->getId(i)->id());
-    radio_ids[i].setName(config->name());
+    if (0 == i)
+      radio_ids[i].setName(config->name());
+    else
+      radio_ids[i].setName(config->name()+" "+QString::number(i));
   }
   return true;
 }
