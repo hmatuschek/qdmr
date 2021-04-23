@@ -572,6 +572,11 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
       aprs_report = 1;
       gps_system = conf->posSystems()->indexOfGPSSys(dc->posSystem()->as<GPSSystem>());
     }
+    // Set radio ID
+    if (nullptr != dc->radioId())
+      id_index = conf->radioIDs()->indexOf(dc->radioId());
+    else
+      id_index = 0;
   }
 }
 

@@ -442,6 +442,11 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     } else if (dc->posSystem() && dc->posSystem()->is<APRSSystem>()) {
       aprs_report = APRS_REPORT_ANALOG;
     }
+    // Set radio ID
+    if (nullptr != dc->radioId())
+      id_index = conf->radioIDs()->indexOf(dc->radioId());
+    else
+      id_index = 0;
   }
 }
 
