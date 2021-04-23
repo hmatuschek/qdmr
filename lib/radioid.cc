@@ -88,6 +88,19 @@ RadioIDList::addId(uint32_t id) {
   return addId(new RadioID(id, this));
 }
 
+bool
+RadioIDList::setDefault(uint idx) {
+  if (int(idx) >= count())
+    return false;
+  if (0 == idx)
+    return true;
+  beginMoveRows(QModelIndex(), idx, idx, QModelIndex(), 0);
+  RadioID *obj = _ids.at(idx);
+  _ids.removeAt(idx);
+  _ids.prepend(obj);
+  endMoveRows();
+  return true;
+}
 
 bool
 RadioIDList::remId(RadioID *id) {

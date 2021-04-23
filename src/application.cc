@@ -169,7 +169,9 @@ Application::createMainWindow() {
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
 
-  dmrID->addItem(QString::number(_config->radioIDs()->getId(0)->id()));
+  dmrID->setModel(_config->radioIDs());
+  dmrID->setCurrentIndex(0);
+
   rname->setText(_config->name());
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
@@ -177,6 +179,7 @@ Application::createMainWindow() {
   speech->setChecked(_config->speech());
 
   connect(dmrID, SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
+  connect(dmrID, SIGNAL(currentIndexChanged(int)), this, SLOT(onDMRIDSelected(int)));
   connect(rname, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
   connect(intro1, SIGNAL(editingFinished()), this, SLOT(onIntroLine1Changed()));
   connect(intro2, SIGNAL(editingFinished()), this, SLOT(onIntroLine2Changed()));
@@ -712,6 +715,11 @@ void
 Application::onDMRIDChanged() {
   QComboBox *dmrID  = _mainWindow->findChild<QComboBox *>("dmrID");
   _config->radioIDs()->getId(0)->setId(dmrID->currentText().toUInt());
+}
+
+void
+Application::onDMRIDSelected(int idx) {
+  _config->radioIDs()->setDefault(idx);
 }
 
 void

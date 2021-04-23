@@ -55,6 +55,7 @@ private slots:
 
   void onConfigModifed();
   void onDMRIDChanged();
+  void onDMRIDSelected(int idx);
   void onNameChanged();
   void onIntroLine1Changed();
   void onIntroLine2Changed();

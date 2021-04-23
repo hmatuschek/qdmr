@@ -36,6 +36,8 @@ public:
   RadioID *find(uint32_t id) const;
   int indexOf(RadioID *id) const;
 
+  bool setDefault(uint idx);
+
   int addId(RadioID *id);
   int addId(uint32_t id);
 
