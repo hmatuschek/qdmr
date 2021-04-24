@@ -36,6 +36,7 @@ D878UVCallsignDB::entry_t::fromUser(const UserDatabase::User &user) {
   // append call
   n = std::min(8, user.call.size());
   strncpy(strings, user.call.toLocal8Bit().data(), n); size += n; strings += n;
+  (*strings) = 0x00; size ++; strings ++;
   // append state
   n = std::min(16, user.state.size());
   strncpy(strings, user.state.toLocal8Bit().data(), n); size += n; strings += n;
