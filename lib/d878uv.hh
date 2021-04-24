@@ -11,7 +11,8 @@
 #include "radio.hh"
 #include "anytone_interface.hh"
 #include "d878uv_codeplug.hh"
-#include "d878uv_callsigndb.hh"
+// uses same callsign db as 878
+#include "d868uv_callsigndb.hh"
 
 
 /** Implements an interface to Anytone AT-D878UV VHF/UHF 7W DMR (Tier I & II) radios.
@@ -85,7 +86,7 @@ protected:
   /** The actual binary codeplug representation. */
   D878UVCodeplug _codeplug;
   /** The actual binary callsign database representation. */
-  D878UVCallsignDB _callsigns;
+  D868UVCallsignDB _callsigns;
 };
 
 #endif // __D878UV_HH__

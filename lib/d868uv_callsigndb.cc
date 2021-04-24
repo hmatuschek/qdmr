@@ -1,4 +1,4 @@
-#include "d878uv_callsigndb.hh"
+#include "d868uv_callsigndb.hh"
 #include "utils.hh"
 #include <QtEndian>
 
@@ -16,10 +16,10 @@
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCallsignDB::enty_head_t
+ * Implementation of D868UVCallsignDB::enty_head_t
  * ******************************************************************************************** */
 size_t
-D878UVCallsignDB::entry_t::fromUser(const UserDatabase::User &user) {
+D868UVCallsignDB::entry_t::fromUser(const UserDatabase::User &user) {
   call_type = PRIVATE_CALL;
   ring = RING_NONE;
   encode_dmr_id_bcd((uint8_t *)&id, user.id);
@@ -51,7 +51,7 @@ D878UVCallsignDB::entry_t::fromUser(const UserDatabase::User &user) {
 }
 
 size_t
-D878UVCallsignDB::entry_t::getSize(const UserDatabase::User &user) {
+D868UVCallsignDB::entry_t::getSize(const UserDatabase::User &user) {
   return 6 // header
       + std::min(16, user.name.size())+1 // name
       + std::min(16, user.city.size())+1 // city
@@ -66,17 +66,17 @@ D878UVCallsignDB::entry_t::getSize(const UserDatabase::User &user) {
  * Implementation of D878UVCallsignDB::limits_t
  * ******************************************************************************************** */
 void
-D878UVCallsignDB::limits_t::clear() {
+D868UVCallsignDB::limits_t::clear() {
   count = end_of_db = _unused8 = _unused12 = 0;
 }
 
 void
-D878UVCallsignDB::limits_t::setCount(uint32_t n) {
+D868UVCallsignDB::limits_t::setCount(uint32_t n) {
   count = qToLittleEndian(n);
 }
 
 void
-D878UVCallsignDB::limits_t::setTotalSize(uint32_t size) {
+D868UVCallsignDB::limits_t::setTotalSize(uint32_t size) {
   end_of_db = qToLittleEndian(CALLSIGN_BANK0 + size);
 }
 
@@ -84,14 +84,14 @@ D878UVCallsignDB::limits_t::setTotalSize(uint32_t size) {
 /* ********************************************************************************************* *
  * Implementation of D878UVCallsignDB
  * ********************************************************************************************* */
-D878UVCallsignDB::D878UVCallsignDB(QObject *parent)
+D868UVCallsignDB::D868UVCallsignDB(QObject *parent)
   : CallsignDB(parent)
 {
   // allocate and clear DB memory
   addImage("AnyTone AT-D878UV Callsign database.");
 }
 
-bool D878UVCallsignDB::encode(UserDatabase *db, const Selection &selection) {
+bool D868UVCallsignDB::encode(UserDatabase *db, const Selection &selection) {
   // Determine size of call-sign DB in memory
   qint64 n = std::min(db->count(), qint64(MAX_CALLSIGNS));
   // If DB size is limited by settings

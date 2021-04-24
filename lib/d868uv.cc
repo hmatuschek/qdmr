@@ -63,8 +63,8 @@ static Radio::Features _d868uv_features =
 
   // call-sign database limits
   .hasCallsignDB          = true,  // hasCallsignDB
-  .callsignDBImplemented  = false,  // callsignDBImplemented
-  .maxCallsignsInDB       = 0 // maxCallsignsInDB
+  .callsignDBImplemented  = true,  // callsignDBImplemented
+  .maxCallsignsInDB       = 200000 // maxCallsignsInDB
 };
 
 
@@ -395,6 +395,6 @@ D868UV::uploadCallsigns() {
       emit uploadProgress(float(blkWritten*100)/totalBlocks);
     }
   }
-  //_codeplug.write("debug_codeplug.dfu");
+
   return true;
 }

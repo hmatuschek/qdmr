@@ -1,8 +1,8 @@
-#ifndef D878UVCALLSIGNDB_HH
-#define D878UVCALLSIGNDB_HH
+#ifndef D868UVCALLSIGNDB_HH
+#define D868UVCALLSIGNDB_HH
 
 #include "callsigndb.hh"
-#include "d878uv_codeplug.hh"
+#include "d868uv_codeplug.hh"
 
 /** Represents and encodes the binary format for the call-sign database within the radio.
  *
@@ -19,7 +19,7 @@
  * </table>
  *
  * @ingroup d878uv */
-class D878UVCallsignDB : public CallsignDB
+class D868UVCallsignDB : public CallsignDB
 {
   Q_OBJECT
 
@@ -66,7 +66,7 @@ public:
 
   /** Same index entry used by the codeplug to map normal digital contacts to an contact index. Here
    * it maps to the byte offset within the database entries. */
-  typedef D878UVCodeplug::contact_map_t index_entry_t;
+  typedef D868UVCodeplug::contact_map_t index_entry_t;
 
   /** Stores some basic limits of the callsign db.
    *
@@ -90,10 +90,10 @@ public:
 
 public:
   /** Constructor, does not allocate any memory yet. */
-  explicit D878UVCallsignDB(QObject *parent=nullptr);
+  explicit D868UVCallsignDB(QObject *parent=nullptr);
 
   /** Tries to encode as many entries of the given user-database. */
   bool encode(UserDatabase *db, const Selection &selection=Selection());
 };
 
-#endif // D878UVCALLSIGNDB_HH
+#endif // D868UVCALLSIGNDB_HH
