@@ -1,0 +1,131 @@
+version: "0.8.0"
+
+radio-ids:
+  - { name: "DM3MAT", number: 2621370, id: default_id }
+
+channels:
+  - digital:
+      name: "DB0LDS TS1"
+      rx: 439.56250
+      tx: -7.6
+      power: high
+      admit: color-code
+      color-code: 1
+      time-slot: 1
+      group-list: gl_dl
+      tx-contact: ww
+      dmr-id: default_id
+      id: ch_lds1
+
+  - digital:
+      name: "Sa/Th DB0LDS TS1"
+      rx: 439.56250
+      tx: -7.6
+      power: high
+      admit: color-code
+      color-code: 1
+      time-slot: 1
+      group-list: gl_sa_th
+      tx-contact: sa_th
+      id: ch_lds2
+
+  - digital:
+      name: "TG8 DB0LDS TS2"
+      rx: 439.56250
+      tx: -7.6
+      power: high
+      admit: color-code
+      color-code: 1
+      time-slot: 2
+      group-list: gl_bb
+      tx-contact: reg
+      id: ch_lds3
+
+  - digital:
+      name: "TG9 DB0LDS TS2"
+      rx: 439.56250
+      tx: -7.6
+      power: high
+      admit: color-code
+      color-code: 1
+      time-slot: 2
+      group-list: gl_bb
+      tx-contact: loc
+      id: ch_lds4
+
+  - digital:
+      name: "BB DB0LDS TS2"
+      rx: 439.56250
+      tx: -7.6
+      power: high
+      admit: color-code
+      color-code: 1
+      time-slot: 2
+      group-list: gl_bb
+      tx-contact: bb
+      scan-list: scan_kw
+      id: ch_lds5
+
+  - analog:
+      name: "DB0LDS"
+      rx: 439.56250
+      tx: -7.6
+      power: high
+      admit: tone
+      squelch: 1
+      rx-tone: {ctcss: 67.0}
+      tx-tone: {ctcss: 67.0}
+      band-width: narrow
+      scan-list: scan_kw
+      id: ch_lds75
+
+
+zones:
+  - name: "KW"
+    A: [ch_lds1, ch_lds2, ch_lds3, ch_lds4, ch_lds5]
+    B: [ch_lds75]
+    id: optional_id_for_zone
+
+
+scan-lists:
+  - { name: "KW", channels: [ch_lds5, ch_lds4, ch_lds75], id: scan_kw }
+
+
+contacts:
+  - group:   { name: "World wide", number: 91, id: ww }
+  - group:   { name: "EU", number: 91, id: eu}
+  - group:   { name: "DL", number: 262, id: dl }
+  - group:   { name: "DL MM", number: 263, id: dl_mm }
+  - group:   { name: "Regional", number: 8, id: reg }
+  - group:   { name: "Lokal", number: 9, id: loc }
+  - group:   { name: "Berlin Brand.", number: 2621, id: bb }
+  - group:   { name: "Sa/Th", number: 2629, id: sa_th }
+  - group:   { name: "SA/MV", number: 2620, id: sa_mv}
+  - group:   { name: "Hessen", number: 2626, id: he }
+  - all:     { name: "All Call", id: all }
+  - group:   { name: "Simplex TG99", number: 99, id: simp99 }
+  - group:   { name: "Cl Brandenburg", number: 26209, id: cl_brand }
+  - group:   { name: "Cl Berlin", number: 26212, id: cl_berlin }
+  - private: { name: "Refl Brandenburg", number: 4044, id: refl_brand }
+  - private: { name: "Refl Berlin", number: 4016, id: refl_berl }
+  - private: { name: "BM SMS", number: 262993, id: bm_sms }
+  - private: { name: "BM DAPNET", number: 262994, id: bm_dapnet }
+  - private: { name: "BM Parrot", number: 262997, id: bm_par }
+  - private: { name: "BM APRS", number: 262999, id: bm_aprs }
+  - private: { name: "DG2RON Ronny", number: 2621246, ring: true, id: dg2ron }
+  - private: { name: "DM9KS Silvio", number: 2621045, ring: true, id: dm9ks }
+  - private: { name: "Hannes DM3MAT", number: 2621370, ring: true, id: me }
+  - private: { name: "DL2BQF Thomas", number: 2621437, ring: true, id: dl2bwf }
+  - private: { name: "DL7JOM Olaf", number: 2621004, ring: true, id: dl7jom }
+  - private: { name: "DG1RPH Peter", number: 2621528, ring: true, id: dg1rph }
+  - private: { name: "DO1RPH Richard", number: 2634160, ring: true, id: do1rph }
+
+
+group-lists:
+  - { name: "DL", members: [dl, eu, ww], id: gl_dl }
+  - { name: "Berlin/Brand", members: [loc, reg, bb], id: gl_bb }
+  - { name: "Sa/Th", members: [loc, reg, sa_th], id: gl_sath }
+  - { name: "SA/MV", members: [loc, reg, sa_mv], id: gl_samv }
+  - { name: "Hessen", members: [loc, reg, he], id: gl_he }
+  - { name: "Simplex", members: [loc, all, simp99], id: gl_sim }
+
