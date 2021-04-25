@@ -89,8 +89,12 @@ public:
 	bool remList(int idx);
   /** Moves the group list at the given row one up. */
   bool moveUp(int row);
+  /** Moves the group lists at the given rows one up. */
+  bool moveUp(int first, int last);
   /** Moves the group list at the given row one down. */
   bool moveDown(int row);
+  /** Moves the group lists at the given rows one down. */
+  bool moveDown(int first, int last);
 
   /** Implements the QAbstractListModel, returns the number of rows. */
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;

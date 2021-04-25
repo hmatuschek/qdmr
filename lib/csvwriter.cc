@@ -29,9 +29,12 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
          << "# see https://dm3mat.darc.de/qdmr for details.\n"
          << "#\n\n";
 
+  QStringList radio_ids;
+  for (int i=0; i<config->radioIDs()->count(); i++)
+    radio_ids.append(QString::number(config->radioIDs()->getId(i)->id()));
 
   stream << "# Unique DMR ID and name (quoted) of this radio.\n"
-         << "ID: " << config->id() << "\n"
+         << "ID: " << radio_ids.join(", ") << "\n"
          << "Name: \"" << config->name() << "\"\n\n"
          << "# Text displayed when the radio powers up (quoted).\n"
          << "IntroLine1: \"" << config->introLine1() << "\"\n"
@@ -57,8 +60,9 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
             "# 13) Contact for transmit: - or index in Contacts table\n"
             "# 14) GPS System: - or index in GPS table.\n"
             "# 15) Roaming zone: -, + or index in roaming-zone table.\n"
+            "# 16) Radio ID: -, index in radio ID list above. - means default ID.\n"
             "#\n"
-            "Digital Name                Receive    Transmit   Power Scan TOT RO Admit  CC TS RxGL TxC GPS Roam\n";
+            "Digital Name                Receive    Transmit   Power Scan TOT RO Admit  CC TS RxGL TxC GPS Roam ID\n";
   for (int i=0; i<config->channelList()->count(); i++) {
     if (config->channelList()->channel(i)->is<AnalogChannel>())
       continue;
@@ -97,6 +101,11 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
       stream << qSetFieldWidth(5) << "+";
     else
       stream << qSetFieldWidth(5) << (config->roaming()->indexOf(digi->roaming())+1);
+    // Write radio ID
+    if (nullptr == digi->radioId())
+      stream << qSetFieldWidth(3) << "-";
+    else
+      stream << qSetFieldWidth(3) << (config->radioIDs()->indexOf(digi->radioId())+1);
     // add contact name as comment
     if (digi->txContact())
       stream << qSetFieldWidth(0) << "# " << digi->txContact()->name();
@@ -232,13 +241,13 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     if (! config->posSystems()->system(i)->is<GPSSystem>())
       continue;
     GPSSystem *gps = config->posSystems()->system(i)->as<GPSSystem>();
-    stream << qSetFieldWidth(5)  << (i+1)
+    stream << qSetFieldWidth(5)  << left << (i+1)
            << qSetFieldWidth(20) << ("\"" + gps->name() + "\"")
            << qSetFieldWidth(5)  << config->contacts()->indexOfDigital(gps->contact())+1
            << qSetFieldWidth(7)  << gps->period()
-           << qSetFieldWidth(6)  << left
-           << ( (gps->hasRevertChannel()) ? QString::number(config->channelList()->indexOf(gps->revertChannel())+1) : "-" )
-           << "\n";
+           << qSetFieldWidth(6)  << ( (gps->hasRevertChannel()) ?
+                                        QString::number(config->channelList()->indexOf(gps->revertChannel())+1) : "-" )
+           << qSetFieldWidth(0) << "\n";
   }
   stream << qSetFieldWidth(0) << "\n";
 

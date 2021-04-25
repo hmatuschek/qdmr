@@ -11,7 +11,11 @@ static Radio::Features _rd5r_features =
   .hasDigital = true,
   .hasAnalog  = true,
 
-  .maxNameLength = 8,
+  .vhfLimits = {136., 174.},
+  .uhfLimits = {400., 470.},
+
+  .maxRadioIDs        = 1,
+  .maxNameLength      = 8,
   .maxIntroLineLength = 16,
 
   .maxChannels = 1024,
@@ -99,12 +103,6 @@ RD5R::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
   if (!_config)
     return false;
 
-  _dev = new HID(0x15a2, 0x0073);
-  if (! _dev->isOpen()) {
-    _dev->deleteLater();
-    return false;
-  }
-
   _task = StatusUpload;
   _codeplugFlags = flags;
   if (blocking) {
@@ -117,7 +115,7 @@ RD5R::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
 }
 
 bool
-RD5R::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+RD5R::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
   Q_UNUSED(db);
   Q_UNUSED(blocking);
 

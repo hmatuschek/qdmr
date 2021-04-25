@@ -211,10 +211,10 @@ AnalogChannel::onAPRSSystemDeleted() {
 DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power,
                                uint txto, bool rxOnly, Admit admit, uint colorCode,
                                TimeSlot timeslot, RXGroupList *rxGroup, DigitalContact *txContact,
-                               PositioningSystem *posSystem, ScanList *list, RoamingZone *roaming, QObject *parent)
+                               PositioningSystem *posSystem, ScanList *list, RoamingZone *roaming, RadioID *radioID, QObject *parent)
   : Channel(name, rxFreq, txFreq, power, txto, rxOnly, list, parent), _admit(admit),
     _colorCode(colorCode), _timeSlot(timeslot), _rxGroup(rxGroup), _txContact(txContact),
-    _posSystem(posSystem), _roaming(roaming)
+    _posSystem(posSystem), _roaming(roaming), _radioId(radioID)
 {
   if (_rxGroup)
     connect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));
@@ -224,6 +224,8 @@ DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq
     connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
   if (_roaming)
     connect(_roaming, SIGNAL(destroyed()), this, SLOT(onRoamingZoneDeleted()));
+  if (_radioId)
+    connect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
 }
 
 DigitalChannel::Admit
@@ -323,6 +325,23 @@ DigitalChannel::setRoaming(RoamingZone *zone) {
   return true;
 }
 
+RadioID *
+DigitalChannel::radioId() const {
+  return _radioId;
+}
+
+bool
+DigitalChannel::setRadioId(RadioID *id) {
+  if (_radioId)
+    disconnect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
+  _radioId = id;
+  if (_radioId)
+    connect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
+  emit modified();
+  return true;
+}
+
+
 void
 DigitalChannel::onRxGroupDeleted() {
   setRXGroupList(nullptr);
@@ -343,6 +362,10 @@ DigitalChannel::onRoamingZoneDeleted() {
   setRoaming(nullptr);
 }
 
+void
+DigitalChannel::onRadioIdDeleted() {
+  setRadioId(nullptr);
+}
 
 /* ********************************************************************************************* *
  * Implementation of SelectedChannel
@@ -483,11 +506,35 @@ ChannelList::moveUp(int row) {
 }
 
 bool
+ChannelList::moveUp(int first, int last) {
+  if ((0>=first) || (last>=count()))
+    return false;
+  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
+  for (int row=first; row<=last; row++)
+    std::swap(_channels[row], _channels[row-1]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
 ChannelList::moveDown(int row) {
-  if ((0>row) || ((row-1)>=count()))
+  if ((0>row) || ((row+1)>=count()))
     return false;
   beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
   std::swap(_channels[row], _channels[row+1]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+ChannelList::moveDown(int first, int last) {
+  if ((0>first) || ((last+1)>=count()))
+    return false;
+  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
+  for (int row=last; row>=first; row--)
+    std::swap(_channels[row], _channels[row+1]);
   endMoveRows();
   emit modified();
   return true;
@@ -501,7 +548,7 @@ ChannelList::rowCount(const QModelIndex &idx) const {
 int
 ChannelList::columnCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
-  return 19;
+  return 20;
 }
 
 inline QString formatFrequency(float f) {
@@ -605,6 +652,16 @@ ChannelList::data(const QModelIndex &index, int role) const {
     break;
   case 13:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+      if (digi->radioId())
+        return digi->radioId()->id();
+      else
+        return tr("[Default]");
+    } else if (channel->is<AnalogChannel>()) {
+      return tr("[None]");
+    }
+    break;
+  case 14:
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
       if (digi->posSystem())
         return digi->posSystem()->name();
       else
@@ -616,7 +673,7 @@ ChannelList::data(const QModelIndex &index, int role) const {
         return tr("-");
     }
     break;
-  case 14:
+  case 15:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
       if (digi->roaming())
         return digi->roaming()->name();
@@ -626,7 +683,7 @@ ChannelList::data(const QModelIndex &index, int role) const {
       return tr("[None]");
     }
     break;
-  case 15:
+  case 16:
     if (channel->is<DigitalChannel>()) {
       return tr("[None]");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
@@ -636,7 +693,7 @@ ChannelList::data(const QModelIndex &index, int role) const {
         return analog->squelch();
     }
     break;
-  case 16:
+  case 17:
     if (channel->is<DigitalChannel>()) {
       return tr("[None]");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
@@ -646,7 +703,7 @@ ChannelList::data(const QModelIndex &index, int role) const {
         return Signaling::codeLabel(analog->rxTone());
     }
     break;
-  case 17:
+  case 18:
     if (channel->is<DigitalChannel>()) {
       return tr("[None]");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
@@ -656,7 +713,7 @@ ChannelList::data(const QModelIndex &index, int role) const {
         return Signaling::codeLabel(analog->txTone());
     }
     break;
-  case 18:
+  case 19:
     if (channel->is<DigitalChannel>()) {
       return tr("[None]");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
@@ -692,12 +749,13 @@ ChannelList::headerData(int section, Qt::Orientation orientation, int role) cons
   case 10: return tr("TS");
   case 11: return tr("RX Group List");
   case 12: return tr("TX Contact");
-  case 13: return tr("GPS/APRS");
-  case 14: return tr("Roaming");
-  case 15: return tr("Squelch");
-  case 16: return tr("Rx Tone");
-  case 17: return tr("Tx Tone");
-  case 18: return tr("Bandwidth");
+  case 13: return tr("DMR ID");
+  case 14: return tr("GPS/APRS");
+  case 15: return tr("Roaming");
+  case 16: return tr("Squelch");
+  case 17: return tr("Rx Tone");
+  case 18: return tr("Tx Tone");
+  case 19: return tr("Bandwidth");
     default:
       break;
   }

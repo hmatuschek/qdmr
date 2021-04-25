@@ -14,12 +14,13 @@
  * Implementation of Config
  * ********************************************************************************************* */
 Config::Config(QObject *parent)
-  : QObject(parent), _modified(false), _contacts(new ContactList(this)), _rxGroupLists(new RXGroupLists(this)),
+  : QObject(parent), _modified(false), _radioIDs(new RadioIDList(this)),
+    _contacts(new ContactList(this)), _rxGroupLists(new RXGroupLists(this)),
     _channels(new ChannelList(this)), _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
     _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this)),
-    _id(0), _name(), _introLine1(), _introLine2(), _mic_level(2),
-    _speech(false)
+    _name(), _introLine1(), _introLine2(), _mic_level(2), _speech(false)
 {
+  connect(_radioIDs, SIGNAL(modified()), this, SIGNAL(modified()));
   connect(_contacts, SIGNAL(modified()), this, SIGNAL(modified()));
   connect(_rxGroupLists, SIGNAL(modified()), this, SIGNAL(modified()));
   connect(_channels, SIGNAL(modified()), this, SIGNAL(modified()));
@@ -39,6 +40,11 @@ Config::setModified(bool modified) {
   _modified = modified;
   if (_modified)
     emit this->modified();
+}
+
+RadioIDList *
+Config::radioIDs() const {
+  return _radioIDs;
 }
 
 ContactList *
@@ -110,18 +116,6 @@ Config::requiresGPS() const {
 }
 
 
-uint
-Config::id() const {
-  return _id;
-}
-void
-Config::setId(uint id) {
-  if (id == _id)
-    return;
-  _id = id;
-  emit modified();
-}
-
 const QString &
 Config::name() const {
   return _name;
@@ -185,6 +179,7 @@ Config::setSpeech(bool enabled) {
 void
 Config::reset() {
   // Reset lists
+  _radioIDs->clear();
   _scanlists->clear();
   _zones->clear();
   _channels->clear();
@@ -192,7 +187,6 @@ Config::reset() {
   _contacts->clear();
   _gpsSystems->clear();
   _roaming->clear();
-  _id = 0;
   _name.clear();
   _introLine1.clear();
   _introLine2.clear();

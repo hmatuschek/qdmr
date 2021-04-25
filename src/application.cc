@@ -20,6 +20,33 @@
 #include "aprssystemdialog.hh"
 #include "repeaterdatabase.hh"
 #include "userdatabase.hh"
+#include "talkgroupdatabase.hh"
+#include "searchpopup.hh"
+#include "contactselectiondialog.hh"
+
+
+QPair<int, int>
+getSelectionRowRange(const QModelIndexList &indices) {
+  int rmin=-1, rmax=-1;
+  foreach (QModelIndex idx, indices) {
+    if ((-1==rmin) || (rmin>idx.row()))
+      rmin = idx.row();
+    if ((-1==rmax) || (rmax<idx.row()))
+      rmax = idx.row();
+  }
+  return QPair<int,int>(rmin, rmax);
+}
+
+QList<int>
+getSelectionRows(const QModelIndexList &indices) {
+  QList<int> rows;
+  foreach (QModelIndex idx, indices) {
+    if (rows.contains(idx.row()))
+      continue;
+    rows.append(idx.row());
+  }
+  return rows;
+}
 
 
 Application::Application(int &argc, char *argv[])
@@ -34,8 +61,9 @@ Application::Application(int &argc, char *argv[])
   Logger::get().addHandler(new FileLogHandler(logdir+"/qdmr.log"));
 
   Settings settings;
-  _repeater = new RepeaterDatabase(settings.position(), 7, this);
-  _users    = new UserDatabase(30, this);
+  _repeater   = new RepeaterDatabase(settings.position(), 7, this);
+  _users      = new UserDatabase(30, this);
+  _talkgroups = new TalkGroupDatabase(30, this);
   _config = new Config(this);
 
   if (argc>1) {
@@ -78,6 +106,7 @@ QMainWindow *
 Application::mainWindow() {
   if (0 == _mainWindow)
     return createMainWindow();
+
   return _mainWindow;
 }
 
@@ -133,21 +162,28 @@ Application::createMainWindow() {
   connect(upCDB, SIGNAL(triggered()), this, SLOT(uploadCallsignDB()));
 
   // Wire-up "General Settings" view
-  QLineEdit *dmrID  = _mainWindow->findChild<QLineEdit*>("dmrID");
+  QComboBox *dmrID  = _mainWindow->findChild<QComboBox*>("dmrID");
+  QPushButton *addID = _mainWindow->findChild<QPushButton*>("addID");
+  QPushButton *remID = _mainWindow->findChild<QPushButton*>("remID");
   QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
 
-  dmrID->setText(QString::number(_config->id()));
+  dmrID->setModel(_config->radioIDs());
+  dmrID->setCurrentIndex(0);
+
   rname->setText(_config->name());
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
   mic->setValue(_config->micLevel());
   speech->setChecked(_config->speech());
 
-  connect(dmrID, SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
+  connect(dmrID->lineEdit(), SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
+  connect(dmrID, SIGNAL(currentIndexChanged(int)), this, SLOT(onDMRIDSelected(int)));
+  connect(addID, SIGNAL(clicked(bool)), this, SLOT(onAddDMRID()));
+  connect(remID, SIGNAL(clicked(bool)), this, SLOT(onRemDMRID()));
   connect(rname, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
   connect(intro1, SIGNAL(editingFinished()), this, SLOT(onIntroLine1Changed()));
   connect(intro2, SIGNAL(editingFinished()), this, SLOT(onIntroLine2Changed()));
@@ -156,10 +192,15 @@ Application::createMainWindow() {
 
   // Wire-up "Contact List" view
   QTableView *contacts = _mainWindow->findChild<QTableView *>("contactsView");
+  SearchPopup::attach(contacts);
   QPushButton *cntUp   = _mainWindow->findChild<QPushButton *>("contactUp");
   QPushButton *cntDown = _mainWindow->findChild<QPushButton *>("contactDown");
   QPushButton *addCnt  = _mainWindow->findChild<QPushButton *>("addContact");
   QPushButton *remCnt  = _mainWindow->findChild<QPushButton *>("remContact");
+  connect(contacts->horizontalHeader(), SIGNAL(sectionCountChanged(int,int)),
+          this, SLOT(loadContactListSectionState()));
+  connect(contacts->horizontalHeader(), SIGNAL(sectionResized(int,int,int)),
+          this, SLOT(storeContactListSectionState()));
   contacts->setModel(_config->contacts());
   connect(addCnt, SIGNAL(clicked()), this, SLOT(onAddContact()));
   connect(remCnt, SIGNAL(clicked()), this, SLOT(onRemContact()));
@@ -169,6 +210,7 @@ Application::createMainWindow() {
 
   // Wire-up "RX Group List" view
   QListView *rxgroups  = _mainWindow->findChild<QListView *>("groupListView");
+  SearchPopup::attach(rxgroups);
   QPushButton *grpUp   = _mainWindow->findChild<QPushButton *>("rxGroupUp");
   QPushButton *grpDown = _mainWindow->findChild<QPushButton *>("rxGroupDown");
   QPushButton *addGrp  = _mainWindow->findChild<QPushButton *>("addRXGroup");
@@ -182,14 +224,18 @@ Application::createMainWindow() {
 
   // Wire-up "Channel List" view
   QTableView *channels = _mainWindow->findChild<QTableView *>("channelView");
+  SearchPopup::attach(channels);
   QPushButton *chUp    = _mainWindow->findChild<QPushButton *>("channelUp");
   QPushButton *chDown  = _mainWindow->findChild<QPushButton *>("channelDown");
   QPushButton *addACh  = _mainWindow->findChild<QPushButton *>("addAnalogChannel");
   QPushButton *addDCh  = _mainWindow->findChild<QPushButton *>("addDigitalChannel");
   QPushButton *cloneCh = _mainWindow->findChild<QPushButton *>("cloneChannel");
   QPushButton *remCh   = _mainWindow->findChild<QPushButton *>("remChannel");
+  connect(channels->horizontalHeader(), SIGNAL(sectionCountChanged(int,int)),
+          this, SLOT(loadChannelListSectionState()));
+  connect(channels->horizontalHeader(), SIGNAL(sectionResized(int,int,int)),
+          this, SLOT(storeChannelListSectionState()));
   channels->setModel(_config->channelList());
-  channels->resizeColumnsToContents();
   connect(addACh, SIGNAL(clicked()), this, SLOT(onAddAnalogChannel()));
   connect(addDCh, SIGNAL(clicked()), this, SLOT(onAddDigitalChannel()));
   connect(cloneCh, SIGNAL(clicked()), this, SLOT(onCloneChannel()));
@@ -200,6 +246,7 @@ Application::createMainWindow() {
 
   // Wire-up "Zone List" view
   QListView *zones     = _mainWindow->findChild<QListView *>("zoneView");
+  SearchPopup::attach(zones);
   QPushButton *zoneUp   = _mainWindow->findChild<QPushButton *>("zoneUp");
   QPushButton *zoneDown = _mainWindow->findChild<QPushButton *>("zoneDown");
   QPushButton *addZone  = _mainWindow->findChild<QPushButton *>("addZone");
@@ -213,6 +260,7 @@ Application::createMainWindow() {
 
   // Wire-up "Scan List" view
   QListView *scanLists = _mainWindow->findChild<QListView *>("scanListView");
+  SearchPopup::attach(scanLists);
   QPushButton *slUp   = _mainWindow->findChild<QPushButton *>("scanListUp");
   QPushButton *slDown = _mainWindow->findChild<QPushButton *>("scanListDown");
   QPushButton *addSl  = _mainWindow->findChild<QPushButton *>("addScanList");
@@ -226,12 +274,17 @@ Application::createMainWindow() {
 
   // Wire-up "GPS System List" view
   QTableView *gpsList = _mainWindow->findChild<QTableView *>("gpsView");
+  SearchPopup::attach(gpsList);
   QPushButton *gpsUp   = _mainWindow->findChild<QPushButton *>("gpsUp");
   QPushButton *gpsDown = _mainWindow->findChild<QPushButton *>("gpsDown");
   QPushButton *addGPS  = _mainWindow->findChild<QPushButton *>("addGPS");
   QPushButton *addAPRS = _mainWindow->findChild<QPushButton *>("addAPRS");
   QPushButton *remGPS  = _mainWindow->findChild<QPushButton *>("remGPS");
   QLabel *gpsNote = _mainWindow->findChild<QLabel*>("gpsNote");
+  connect(gpsList->horizontalHeader(), SIGNAL(sectionCountChanged(int,int)),
+          this, SLOT(loadPositioningSectionState()));
+  connect(gpsList->horizontalHeader(), SIGNAL(sectionResized(int,int,int)),
+          this, SLOT(storePositioningSectionState()));
   gpsList->setModel(_config->posSystems());
   if (settings.hideGSPNote())
     gpsNote->setVisible(false);
@@ -245,13 +298,16 @@ Application::createMainWindow() {
 
   // Wire-up "Roaming Zone List" view
   QListView *roamingZones      = _mainWindow->findChild<QListView *>("roamingZoneList");
+  SearchPopup::attach(roamingZones);
   QPushButton *roamingZoneUp   = _mainWindow->findChild<QPushButton *>("roamingZoneUp");
   QPushButton *roamingZoneDown = _mainWindow->findChild<QPushButton *>("roamingZoneDown");
   QPushButton *addRoamingZone  = _mainWindow->findChild<QPushButton *>("addRoamingZone");
+  QPushButton *genRoamingZone  = _mainWindow->findChild<QPushButton *>("genRoamingZone");
   QPushButton *remRoamingZone  = _mainWindow->findChild<QPushButton *>("remRoamingZone");
   QLabel *roamingNote          = _mainWindow->findChild<QLabel*>("roamingNote");
   roamingZones->setModel(_config->roaming());
   connect(addRoamingZone, SIGNAL(clicked()), this, SLOT(onAddRoamingZone()));
+  connect(genRoamingZone, SIGNAL(clicked(bool)), this, SLOT(onGenRoamingZone()));
   connect(remRoamingZone, SIGNAL(clicked()), this, SLOT(onRemRoamingZone()));
   connect(roamingZoneUp, SIGNAL(clicked()), this, SLOT(onRoamingZoneUp()));
   connect(roamingZoneDown, SIGNAL(clicked()), this, SLOT(onRoamingZoneDown()));
@@ -261,6 +317,7 @@ Application::createMainWindow() {
   if (settings.hideRoamingNote())
     roamingNote->setVisible(false);
 
+  _mainWindow->restoreGeometry(settings.mainWindowState());
   return _mainWindow;
 }
 
@@ -284,7 +341,6 @@ void
 Application::loadCodeplug() {
   if (! _mainWindow)
     return;
-
   if (_config->isModified()) {
     if (QMessageBox::Ok != QMessageBox::question(nullptr, tr("Unsaved changes to codeplug."),
                                                  tr("There are unsaved changes to the current codeplug. "
@@ -293,7 +349,8 @@ Application::loadCodeplug() {
       return;
   }
 
-  QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open codeplug"), QString(),
+  Settings settings;
+  QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open codeplug"), settings.lastDirectory().absolutePath(),
                                                   tr("Codeplug Files (*.conf *.csv *.txt);;All Files (*)"));
   if (filename.isEmpty())
     return;
@@ -305,14 +362,18 @@ Application::loadCodeplug() {
   }
 
   logDebug() << "Load codeplug from '" << filename << "'.";
+  QFileInfo info(filename);
+  settings.setLastDirectoryDir(info.absoluteDir());
 
   QString errorMessage;
   QTextStream stream(&file);
-  if (_config->readCSV(stream, errorMessage))
+  if (_config->readCSV(stream, errorMessage)) {
     _mainWindow->setWindowModified(false);
-  else
+  } else {
     QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
                           tr("Cannot read codeplug from file '%1': %2").arg(filename).arg(errorMessage));
+    _config->reset();
+  }
 }
 
 
@@ -321,7 +382,8 @@ Application::saveCodeplug() {
   if (! _mainWindow)
     return;
 
-  QString filename = QFileDialog::getSaveFileName(nullptr, tr("Save codeplug"), QString(),
+  Settings settings;
+  QString filename = QFileDialog::getSaveFileName(nullptr, tr("Save codeplug"), settings.lastDirectory().absolutePath(),
                                                   tr("Codeplug Files (*.conf *.csv *.txt)"));
   if (filename.isEmpty())
     return;
@@ -348,6 +410,7 @@ Application::saveCodeplug() {
 
   file.flush();
   file.close();
+  settings.setLastDirectoryDir(info.absoluteDir());
 }
 
 
@@ -360,6 +423,10 @@ Application::quitApplication() {
                                                  QMessageBox::Cancel|QMessageBox::Ok))
       return;
   }
+
+  Settings settings;
+  if (_mainWindow)
+    settings.setMainWindowState(_mainWindow->saveGeometry());
 
   quit();
 }
@@ -381,7 +448,7 @@ Application::detectRadio() {
 
 
 bool
-Application::verifyCodeplug(Radio *radio, bool showSuccess, bool ignoreWarnings) {
+Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &flags) {
   Radio *myRadio = radio;
   QString errorMessage;
 
@@ -398,8 +465,8 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess, bool ignoreWarnings)
   bool verified = true;
   QList<VerifyIssue> issues;
   VerifyIssue::Type maxIssue = myRadio->verifyConfig(_config, issues);
-  if ( (ignoreWarnings && (maxIssue>VerifyIssue::WARNING)) ||
-       ((!ignoreWarnings) && (maxIssue>=VerifyIssue::WARNING)) ) {
+  if ( (flags.ignoreWarnings && (maxIssue>VerifyIssue::WARNING)) ||
+       ((!flags.ignoreWarnings) && (maxIssue>=VerifyIssue::WARNING)) ) {
     VerifyDialog dialog(issues);
     if (QDialog::Accepted != dialog.exec())
       verified = false;
@@ -466,19 +533,18 @@ Application::onCodeplugDownloadError(Radio *radio) {
 void
 Application::onCodeplugDownloaded(Radio *radio, CodePlug *codeplug) {
   _config->reset();
+  _mainWindow->setWindowModified(false);
   if (codeplug->decode(_config)) {
     _mainWindow->statusBar()->showMessage(tr("Download complete"));
     _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
-    _mainWindow->setEnabled(true);
 
-    _mainWindow->setWindowModified(false);
     _config->setModified(false);
   } else {
     QMessageBox::critical(
           nullptr, tr("Cannot decode code-plug"),
           tr("Cannot decode code-plug: %2").arg(codeplug->errorMessage()));
   }
-
+  _mainWindow->setEnabled(true);
   radio->deleteLater();
 }
 
@@ -498,7 +564,12 @@ Application::uploadCodeplug() {
 
   // Verify codeplug against the detected radio before uploading,
   // but do not show a message on success.
-  if (! verifyCodeplug(radio, false, settings.ignoreVerificationWarning()))
+  VerifyFlags flags = {
+    settings.ignoreVerificationWarning(),
+    settings.ignoreFrequencyLimits()
+  };
+
+  if (! verifyCodeplug(radio, false, flags))
     return;
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
@@ -531,20 +602,20 @@ Application::uploadCallsignDB() {
   if (! radio->features().hasCallsignDB) {
     QMessageBox::information(nullptr, tr("Cannot upload call-sign DB."),
                              tr("The detected radio '%1' does not support "
-                                "the upload of an call-sign DB.")
+                                "the upload of a call-sign DB.")
                              .arg(radio->name()));
     return;
   }
   if (! radio->features().callsignDBImplemented) {
     QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
-                          tr("The detected radio '%1' does support the upload of acall-sign DB. "
+                          tr("The detected radio '%1' does support the upload of a call-sign DB. "
                              "This feature, however, is not implemented yet.").arg(radio->name()));
     return;
   }
 
   // Sort call-sign DB w.r.t. the current DMR ID in _config
   // this is part of the "auto-selection" of calls-signs for upload
-  _users->sortUsers(_config->id());
+  _users->sortUsers(_config->radioIDs()->getId(0)->id());
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
   progress->setValue(0);
@@ -627,14 +698,12 @@ Application::onConfigModifed() {
   if (! _mainWindow)
     return;
 
-  QLineEdit *dmrID  = _mainWindow->findChild<QLineEdit*>("dmrID");
   QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
 
-  dmrID->setText(QString::number(_config->id()));
   rname->setText(_config->name());
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
@@ -644,11 +713,34 @@ Application::onConfigModifed() {
   _mainWindow->setWindowModified(true);
 }
 
-
 void
 Application::onDMRIDChanged() {
-  QLineEdit *dmrID  = _mainWindow->findChild<QLineEdit*>("dmrID");
-  _config->setId(dmrID->text().toUInt());
+  QComboBox *dmrID  = _mainWindow->findChild<QComboBox *>("dmrID");
+  _config->radioIDs()->getId(0)->setId(dmrID->currentText().toUInt());
+}
+
+void
+Application::onDMRIDSelected(int idx) {
+  _config->radioIDs()->setDefault(idx);
+}
+
+void
+Application::onAddDMRID() {
+  int idx = _config->radioIDs()->addId(uint32_t(0));
+  _config->radioIDs()->setDefault(idx);
+  QComboBox *dmrID  = _mainWindow->findChild<QComboBox *>("dmrID");
+  dmrID->setCurrentIndex(0);
+}
+
+void
+Application::onRemDMRID() {
+  if (1 == _config->radioIDs()->count()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot remove last DMR ID"),
+          tr("The codeplug needs at least one valid DMR ID."));
+    return;
+  }
+  _config->radioIDs()->delId(_config->radioIDs()->getId(0));
 }
 
 void
@@ -684,42 +776,55 @@ Application::onIntroLine2Changed() {
 
 void
 Application::onAddContact() {
-  ContactDialog dialog(_users);
+  ContactDialog dialog(_users, _talkgroups);
   if (QDialog::Accepted != dialog.exec())
     return;
 
   QTableView *table = _mainWindow->findChild<QTableView *>("contactsView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-  if (selected.isValid())
-    _config->contacts()->addContact(dialog.contact(), selected.row()+1);
-  else
-    _config->contacts()->addContact(dialog.contact());
+  int row=-1;
+  if (table->selectionModel()->hasSelection())
+    row = table->selectionModel()->selection().back().bottom()+1;
+  _config->contacts()->addContact(dialog.contact(), row);
 }
 
 void
 Application::onRemContact() {
+  // Get table
   QTableView *table = _mainWindow->findChild<QTableView *>("contactsView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-  if (! selected.isValid()) {
+  // Check if there is any contacts seleced
+  if (! table->selectionModel()->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete contact"),
           tr("Cannot delete contact: You have to select a contact first."));
     return;
   }
-
-  QString name = _config->contacts()->contact(selected.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete contact?"), tr("Delete contact %1?").arg(name)))
-    return;
-
-  _config->contacts()->remContact(selected.row());
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(table->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->contacts()->contact(rows.front())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete contact?"), tr("Delete contact %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete contacts?"), tr("Delete %1 contacts?").arg(rows.count())))
+      return;
+  }
+  // collect all selected contacts
+  // need to collect them first as rows change when deleting contacts
+  QList<Contact *> contacts; contacts.reserve(rows.count());
+  foreach (int row, rows)
+    contacts.push_back(_config->contacts()->contact(row));
+  // remove contacts
+  foreach (Contact *contact, contacts)
+    _config->contacts()->remContact(contact);
 }
 
 void
 Application::onEditContact(const QModelIndex &idx) {
   if (idx.row() >= _config->contacts()->count())
     return;
-  ContactDialog dialog(_users, _config->contacts()->contact(idx.row()));
+  ContactDialog dialog(_config->contacts()->contact(idx.row()));
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -729,22 +834,52 @@ Application::onEditContact(const QModelIndex &idx) {
 void
 Application::onContactUp() {
   QTableView *table = _mainWindow->findChild<QTableView *>("contactsView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0==selected.row()))
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move contacts"),
+          tr("Cannot move contacts: You have to select at least one contact first."));
     return;
-  if (_config->contacts()->moveUp(selected.row()))
-    table->selectRow(selected.row()-1);
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->contacts()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onContactDown() {
   QTableView *table = _mainWindow->findChild<QTableView *>("contactsView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->contacts()->count()-1) <= selected.row()))
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move contacts"),
+          tr("Cannot move contacts: You have to select at least one contact first."));
     return;
-  if (_config->contacts()->moveDown(selected.row()))
-    table->selectRow(selected.row()+1);
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->contacts()->moveDown(rows.first, rows.second);
 }
+
+void
+Application::loadContactListSectionState() {
+  Settings settings;
+  QTableView *contacts = _mainWindow->findChild<QTableView *>("contactsView");
+  contacts->horizontalHeader()->restoreState(settings.contactListHeaderState());
+}
+void
+Application::storeContactListSectionState() {
+  Settings settings;
+  QTableView *contacts = _mainWindow->findChild<QTableView *>("contactsView");
+  settings.setContactListHeaderState(contacts->horizontalHeader()->saveState());
+}
+
 
 void
 Application::onAddRxGroup() {
@@ -754,12 +889,10 @@ Application::onAddRxGroup() {
     return;
 
   QListView *list = _mainWindow->findChild<QListView *>("groupListView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-
-  if (selected.isValid())
-    _config->rxGroupLists()->addList(dialog.groupList(), selected.row()+1);
-  else
-    _config->rxGroupLists()->addList(dialog.groupList());
+  int row=-1;
+  if (list->selectionModel()->hasSelection())
+    row = list->selectionModel()->selection().back().bottom()+1;
+  _config->rxGroupLists()->addList(dialog.groupList(), row);
 }
 
 void
@@ -767,25 +900,39 @@ Application::onRemRxGroup() {
   if (! _mainWindow)
     return;
 
-  QModelIndex idx = _mainWindow->findChild<QListView *>("groupListView")->selectionModel()->currentIndex();
-  if (! idx.isValid()) {
+  QListView *list = _mainWindow->findChild<QListView *>("groupListView");
+  // Check if there is any groups seleced
+  if (! list->selectionModel()->hasSelection()) {
     QMessageBox::information(
-          nullptr, tr("Cannot delete group list"),
-          tr("Cannot delete group list: You have to select a group list first."));
+          nullptr, tr("Cannot delete RX group list"),
+          tr("Cannot delete RX group lists: You have to select a group list first."));
     return;
   }
-
-  QString name = _config->rxGroupLists()->list(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete group list?"), tr("Delete group list %1?").arg(name)))
-    return;
-
-  _config->rxGroupLists()->remList(idx.row());
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(list->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->rxGroupLists()->list(rows.first())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete RX group list?"), tr("Delete RX group list %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete RX group list?"), tr("Delete %1 RX group lists?").arg(rows.count())))
+      return;
+  }
+  // collect all selected group lists
+  // need to collect them first as rows change when deleting
+  QList<RXGroupList *> lists; lists.reserve(rows.count());
+  foreach (int row, rows)
+    lists.push_back(_config->rxGroupLists()->list(row));
+  // remove list
+  foreach (RXGroupList *list, lists)
+    _config->rxGroupLists()->remList(list);
 }
 
 void
 Application::onEditRxGroup(const QModelIndex &index) {
-  if (index.row() >= _config->rxGroupLists()->rowCount(QModelIndex()))
+  if (index.row() >= _config->rxGroupLists()->count())
     return;
 
   RXGroupListDialog dialog(_config, _config->rxGroupLists()->list(index.row()));
@@ -801,51 +948,63 @@ Application::onEditRxGroup(const QModelIndex &index) {
 void
 Application::onRxGroupUp() {
   QListView *list = _mainWindow->findChild<QListView *>("groupListView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0 >= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move RX group lists."),
+          tr("Cannot move RX group lists: You have to select at least one list first."));
     return;
-  if (_config->rxGroupLists()->moveUp(selected.row()))
-    list->setCurrentIndex(_config->rxGroupLists()->index(selected.row()-1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->rxGroupLists()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onRxGroupDown() {
   QListView *list = _mainWindow->findChild<QListView *>("groupListView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->rxGroupLists()->count()-1) <= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move RX group lists."),
+          tr("Cannot move RX group lists: You have to select at least one list first."));
     return;
-  if (_config->rxGroupLists()->moveDown(selected.row()))
-    list->setCurrentIndex(_config->rxGroupLists()->index(selected.row()+1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->rxGroupLists()->moveDown(rows.first, rows.second);
 }
 
 void
 Application::onAddAnalogChannel() {
   QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-
   AnalogChannelDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
 
-  if (selected.isValid())
-    _config->channelList()->addChannel(dialog.channel(), selected.row()+1);
-  else
-    _config->channelList()->addChannel(dialog.channel());
-
+  int row=-1;
+  if (table->selectionModel()->hasSelection())
+    row = table->selectionModel()->selection().back().bottom()+1;
+  _config->channelList()->addChannel(dialog.channel(), row);
 }
 
 void
 Application::onAddDigitalChannel() {
   QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-
   DigitalChannelDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
-  if (selected.isValid())
-    _config->channelList()->addChannel(dialog.channel(), selected.row()+1);
-  else
-    _config->channelList()->addChannel(dialog.channel());
+
+  int row=-1;
+  if (table->selectionModel()->hasSelection())
+    row = table->selectionModel()->selection().back().bottom()+1;
+  _config->channelList()->addChannel(dialog.channel(), row);
 }
 
 void
@@ -854,8 +1013,8 @@ Application::onCloneChannel() {
   QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
   QModelIndex selected = table->selectionModel()->currentIndex();
   if (! selected.isValid()) {
-    QMessageBox::information(nullptr, tr("Select a channel first"),
-                             tr("To clone a channel, please select a channel to clone."),
+    QMessageBox::information(nullptr, tr("Select a single channel first"),
+                             tr("To clone a channel, please select a single channel to clone."),
                              QMessageBox::Close);
     return;
   }
@@ -890,7 +1049,7 @@ Application::onCloneChannel() {
           selch->name()+" clone", selch->rxFrequency(), selch->txFrequency(), selch->power(),
           selch->txTimeout(), selch->rxOnly(), selch->admit(), selch->colorCode(),
           selch->timeslot(), selch->rxGroupList(), selch->txContact(), selch->posSystem(),
-          selch->scanList(), selch->roaming());
+          selch->scanList(), selch->roaming(), nullptr);
     // open editor
     DigitalChannelDialog dialog(_config, clone);
     if (QDialog::Accepted != dialog.exec()) {
@@ -906,20 +1065,35 @@ Application::onCloneChannel() {
 
 void
 Application::onRemChannel() {
-  QModelIndex selected =_mainWindow->findChild<QTableView*>("channelView")->selectionModel()->currentIndex();
-  if (! selected.isValid()) {
+  QTableView *table =_mainWindow->findChild<QTableView*>("channelView");
+  if (! table->selectionModel()->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete channel"),
           tr("Cannot delete channel: You have to select a channel first."));
     return;
   }
 
-  QString name = _config->channelList()->channel(selected.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete channel?"), tr("Delete channel %1?").arg(name)))
-    return;
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(table->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->channelList()->channel(rows.front())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete channel?"), tr("Delete channel %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete channel?"), tr("Delete %1 channels?").arg(rows.count())))
+      return;
+  }
 
-  _config->channelList()->remChannel(selected.row());
+  // collect all selected channels
+  // need to collect them first as rows change when deleting channels
+  QList<Channel *> channels; channels.reserve(rows.count());
+  foreach (int row, rows)
+    channels.push_back(_config->channelList()->channel(row));
+  // remove channels
+  foreach (Channel *channel, channels)
+    _config->channelList()->remChannel(channel);
 }
 
 void
@@ -943,21 +1117,50 @@ Application::onEditChannel(const QModelIndex &idx) {
 void
 Application::onChannelUp() {
   QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0 == selected.row()))
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move channels"),
+          tr("Cannot move channels: You have to select at least one channel first."));
     return;
-  if (_config->channelList()->moveUp(selected.row()))
-    table->selectRow(selected.row()-1);
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->channelList()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onChannelDown() {
   QTableView *table = _mainWindow->findChild<QTableView *>("channelView");
-  QModelIndex selected = table->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->channelList()->count()-1) == selected.row()))
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move channels"),
+          tr("Cannot move channels: You have to select at least one channel first."));
     return;
-  if (_config->channelList()->moveDown(selected.row()))
-    table->selectRow(selected.row()+1);
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->channelList()->moveDown(rows.first, rows.second);
+}
+
+void
+Application::loadChannelListSectionState() {
+  Settings settings;
+  QTableView *channels = _mainWindow->findChild<QTableView *>("channelView");
+  channels->horizontalHeader()->restoreState(settings.channelListHeaderState());
+}
+void
+Application::storeChannelListSectionState() {
+  Settings settings;
+  QTableView *channels = _mainWindow->findChild<QTableView *>("channelView");
+  settings.setChannelListHeaderState(channels->horizontalHeader()->saveState());
 }
 
 
@@ -969,51 +1172,80 @@ Application::onAddZone() {
     return;
 
   QListView *list = _mainWindow->findChild<QListView *>("zoneView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
 
-  Zone *zone = dialog.zone();
-  if (selected.isValid())
-    _config->zones()->addZone(zone, selected.row()+1);
-  else
-    _config->zones()->addZone(zone);
+  int row=-1;
+  if (list->selectionModel()->hasSelection())
+    row = list->selectionModel()->selection().back().bottom()+1;
+  _config->zones()->addZone(dialog.zone(), row);
 }
 
 void
 Application::onRemZone() {
-  QModelIndex idx = _mainWindow->findChild<QListView *>("zoneView")->selectionModel()->currentIndex();
-  if (! idx.isValid()) {
+  QListView *list = _mainWindow->findChild<QListView *>("zoneView");
+
+  // Check if there is any zones seleced
+  if (! list->selectionModel()->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete zone"),
           tr("Cannot delete zone: You have to select a zone first."));
     return;
   }
-
-  QString name = _config->zones()->zone(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete zone?"), tr("Delete zone %1?").arg(name)))
-    return;
-
-  _config->zones()->remZone(idx.row());
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(list->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->zones()->zone(rows.first())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete zone?"), tr("Delete zone %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete zones?"), tr("Delete %1 zones?").arg(rows.count())))
+      return;
+  }
+  // collect all selected zones
+  // need to collect them first as rows change when deleting
+  QList<Zone *> lists; lists.reserve(rows.count());
+  foreach (int row, rows)
+    lists.push_back(_config->zones()->zone(row));
+  // remove
+  foreach (Zone *zone, lists)
+    _config->zones()->remZone(zone);
 }
 
 void
 Application::onZoneUp() {
   QListView *list = _mainWindow->findChild<QListView *>("zoneView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0 >= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move zones."),
+          tr("Cannot move zones: You have to select at least one zone first."));
     return;
-  if (_config->zones()->moveUp(selected.row()))
-    list->setCurrentIndex(_config->zones()->index(selected.row()-1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->zones()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onZoneDown() {
   QListView *list = _mainWindow->findChild<QListView *>("zoneView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->zones()->count()-1) <= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move zones."),
+          tr("Cannot move zones: You have to select at least one zone first."));
     return;
-  if (_config->zones()->moveDown(selected.row()))
-    list->setCurrentIndex(_config->zones()->index(selected.row()+1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->zones()->moveDown(rows.first, rows.second);
 }
 
 void
@@ -1039,50 +1271,78 @@ Application::onAddScanList() {
     return;
 
   QListView *list = _mainWindow->findChild<QListView *>("scanListView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  ScanList *scanlist = dialog.scanlist();
-  if (selected.isValid())
-    _config->scanlists()->addScanList(scanlist, selected.row()+1);
-  else
-    _config->scanlists()->addScanList(scanlist);
+
+  int row=-1;
+  if (list->selectionModel()->hasSelection())
+    row = list->selectionModel()->selection().back().bottom()+1;
+  _config->scanlists()->addScanList(dialog.scanlist(), row);
 }
 
 void
 Application::onRemScanList() {
-  QModelIndex idx = _mainWindow->findChild<QListView *>("scanListView")->selectionModel()->currentIndex();
-  if (! idx.isValid()) {
+  QListView *list = _mainWindow->findChild<QListView *>("scanListView");
+  if (! list->selectionModel()->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete scanlist"),
           tr("Cannot delete scanlist: You have to select a scanlist first."));
     return;
   }
-
-  QString name = _config->scanlists()->scanlist(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete scanlist?"), tr("Delete scanlist %1?").arg(name)))
-    return;
-
-  _config->scanlists()->remScanList(idx.row());
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(list->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->scanlists()->scanlist(rows.first())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete scan list?"), tr("Delete scan list %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete scan lists?"), tr("Delete %1 scan lists?").arg(rows.count())))
+      return;
+  }
+  // collect all selected scan lists
+  // need to collect them first as rows change when deleting
+  QList<ScanList *> lists; lists.reserve(rows.count());
+  foreach (int row, rows)
+    lists.push_back(_config->scanlists()->scanlist(row));
+  // remove
+  foreach (ScanList *list, lists)
+    _config->scanlists()->remScanList(list);
 }
 
 void
 Application::onScanListUp() {
   QListView *list = _mainWindow->findChild<QListView *>("scanListView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0 >= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move scan lists."),
+          tr("Cannot move scan lists: You have to select at least one scan list first."));
     return;
-  if (_config->scanlists()->moveUp(selected.row()))
-    list->setCurrentIndex(_config->scanlists()->index(selected.row()-1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->scanlists()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onScanListDown() {
   QListView *list = _mainWindow->findChild<QListView *>("scanListView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->scanlists()->count()-1) <= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move scan lists."),
+          tr("Cannot move scan lists: You have to select at least one scan list first."));
     return;
-  if (_config->scanlists()->moveDown(selected.row()))
-    list->setCurrentIndex(_config->scanlists()->index(selected.row()+1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->scanlists()->moveDown(rows.first, rows.second);
 }
 
 void
@@ -1106,13 +1366,11 @@ Application::onAddGPS() {
   if (QDialog::Accepted != dialog.exec())
     return;
 
-  QTableView *list = _mainWindow->findChild<QTableView *>("gpsView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  GPSSystem *gps = dialog.gpsSystem();
-  if (selected.isValid())
-    _config->posSystems()->addSystem(gps, selected.row()+1);
-  else
-    _config->posSystems()->addSystem(gps);
+  QTableView *table = _mainWindow->findChild<QTableView *>("gpsView");
+  int row=-1;
+  if (table->selectionModel()->hasSelection())
+    row = table->selectionModel()->selection().back().bottom()+1;
+  _config->posSystems()->addSystem(dialog.gpsSystem(), row);
 }
 
 void
@@ -1122,51 +1380,78 @@ Application::onAddAPRS() {
   if (QDialog::Accepted != dialog.exec())
     return;
 
-  QTableView *list = _mainWindow->findChild<QTableView *>("gpsView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  APRSSystem *aprs = dialog.aprsSystem();
-  if (selected.isValid())
-    _config->posSystems()->addSystem(aprs, selected.row()+1);
-  else
-    _config->posSystems()->addSystem(aprs);
+  QTableView *table = _mainWindow->findChild<QTableView *>("gpsView");
+  int row=-1;
+  if (table->selectionModel()->hasSelection())
+    row = table->selectionModel()->selection().back().bottom()+1;
+  _config->posSystems()->addSystem(dialog.aprsSystem(), row);
 }
 
 void
 Application::onRemGPS() {
-  QModelIndex idx = _mainWindow->findChild<QTableView *>("gpsView")->selectionModel()->currentIndex();
-  if (! idx.isValid()) {
+  QTableView *table = _mainWindow->findChild<QTableView *>("gpsView");
+  if (! table->selectionModel()->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete GPS system"),
           tr("Cannot delete GPS system: You have to select a GPS system first."));
     return;
   }
-
-  QString name = _config->posSystems()->gpsSystem(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete GPS system?"), tr("Delete GPS system %1?").arg(name)))
-    return;
-
-  _config->posSystems()->remSystem(idx.row());
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(table->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->posSystems()->system(rows.front())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete positioning system?"), tr("Delete positioning system %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete positioning system?"), tr("Delete %1 positioning systems?").arg(rows.count())))
+      return;
+  }
+  // collect all selected systems
+  // need to collect them first as rows change when deleting systems
+  QList<PositioningSystem *> systems; systems.reserve(rows.count());
+  foreach (int row, rows)
+    systems.push_back(_config->posSystems()->system(row));
+  // remove systems
+  foreach (PositioningSystem *system, systems)
+    _config->posSystems()->remSystem(system);
 }
 
 void
 Application::onGPSUp() {
-  QTableView *list = _mainWindow->findChild<QTableView *>("gpsView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0 >= selected.row()))
+  QTableView *table = _mainWindow->findChild<QTableView *>("gpsView");
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move positioning systems"),
+          tr("Cannot move positioning systems: You have to select at least one positioning system first."));
     return;
-  if (_config->posSystems()->moveUp(selected.row()))
-    list->setCurrentIndex(_config->posSystems()->index(selected.row()-1,0));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->posSystems()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onGPSDown() {
-  QTableView *list = _mainWindow->findChild<QTableView *>("gpsView");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->posSystems()->count()-1) <= selected.row()))
+  QTableView *table = _mainWindow->findChild<QTableView *>("gpsView");
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move positioning systems"),
+          tr("Cannot move positioning systems: You have to select at least one positioning system first."));
     return;
-  if (_config->posSystems()->moveDown(selected.row()))
-    list->setCurrentIndex(_config->posSystems()->index(selected.row()+1,0));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->posSystems()->moveDown(rows.first, rows.second);
 }
 
 void
@@ -1195,6 +1480,18 @@ Application::onHideGPSNote() {
   gpsNote->setVisible(false);
 }
 
+void
+Application::loadPositioningSectionState() {
+  Settings settings;
+  QTableView *gps = _mainWindow->findChild<QTableView *>("gpsView");
+  gps->horizontalHeader()->restoreState(settings.positioningHeaderState());
+}
+void
+Application::storePositioningSectionState() {
+  Settings settings;
+  QTableView *gps = _mainWindow->findChild<QTableView *>("gpsView");
+  settings.setPositioningHeaderState(gps->horizontalHeader()->saveState());
+}
 
 
 void
@@ -1205,51 +1502,108 @@ Application::onAddRoamingZone() {
     return;
 
   QListView *list = _mainWindow->findChild<QListView *>("roamingZoneList");
-  QModelIndex selected = list->selectionModel()->currentIndex();
+  int row=-1;
+  if (list->selectionModel()->hasSelection())
+    row = list->selectionModel()->selection().back().bottom()+1;
+  _config->roaming()->addZone(dialog.zone(), row);
+}
 
-  RoamingZone *zone = dialog.zone();
-  if (selected.isValid())
-    _config->roaming()->addZone(zone, selected.row()+1);
-  else
-    _config->roaming()->addZone(zone);
+void
+Application::onGenRoamingZone() {
+  MultiGroupCallSelectionDialog contSel(_config->contacts());
+  contSel.setWindowTitle(tr("Generate roaming zone"));
+  contSel.setLabel(tr("Create a roaming zone by collecting all channels with these group calls."));
+  if (QDialog::Accepted != contSel.exec())
+    return;
+  QList<DigitalContact *> contacts = contSel.contacts();
+  RoamingZone *zone = new RoamingZone("Name");
+  for (int i=0; i<_config->channelList()->count(); i++) {
+    DigitalChannel *dch = _config->channelList()->channel(i)->as<DigitalChannel>();
+    if (nullptr == dch)
+      continue;
+    if (contacts.contains(dch->txContact()))
+      zone->addChannel(dch);
+  }
+
+  RoamingZoneDialog dialog(_config, zone);
+  if (QDialog::Accepted != dialog.exec()) {
+    zone->deleteLater();
+    return;
+  }
+
+  QListView *list = _mainWindow->findChild<QListView *>("roamingZoneList");
+  int row=-1;
+  if (list->selectionModel()->hasSelection())
+    row = list->selectionModel()->selection().back().bottom()+1;
+  _config->roaming()->addZone(dialog.zone(), row);
 }
 
 void
 Application::onRemRoamingZone() {
-  QModelIndex idx = _mainWindow->findChild<QListView *>("roamingZoneList")->selectionModel()->currentIndex();
-  if (! idx.isValid()) {
+  QListView *list = _mainWindow->findChild<QListView *>("roamingZoneList");
+  if (! list->selectionModel()->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete roaming zone"),
           tr("Cannot delete roaming zone: You have to select a zone first."));
     return;
   }
 
-  QString name = _config->roaming()->zone(idx.row())->name();
-  if (QMessageBox::No == QMessageBox::question(
-        nullptr, tr("Delete roaming zone?"), tr("Delete roaming zone %1?").arg(name)))
-    return;
-
-  _config->roaming()->remZone(idx.row());
+  // Get selection and ask for deletion
+  QList<int> rows = getSelectionRows(list->selectionModel()->selection().indexes());
+  if (1 == rows.count()) {
+    QString name = _config->roaming()->zone(rows.first())->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete roaming zone?"), tr("Delete roaming zone %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete roaming zones?"), tr("Delete %1 roaming zones?").arg(rows.count())))
+      return;
+  }
+  // collect all selected zones
+  // need to collect them first as rows change when deleting
+  QList<RoamingZone *> lists; lists.reserve(rows.count());
+  foreach (int row, rows)
+    lists.push_back(_config->roaming()->zone(row));
+  // remove
+  foreach (RoamingZone *zone, lists)
+    _config->roaming()->remZone(zone);
 }
 
 void
 Application::onRoamingZoneUp() {
   QListView *list = _mainWindow->findChild<QListView *>("roamingZoneList");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0 >= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move roaming zones."),
+          tr("Cannot move roaming zones: You have to select at least one roaming zone first."));
     return;
-  if (_config->roaming()->moveUp(selected.row()))
-    list->setCurrentIndex(_config->roaming()->index(selected.row()-1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->roaming()->moveUp(rows.first, rows.second);
 }
 
 void
 Application::onRoamingZoneDown() {
   QListView *list = _mainWindow->findChild<QListView *>("roamingZoneList");
-  QModelIndex selected = list->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || ((_config->roaming()->count()-1) <= selected.row()))
+  // Check if there is a selection
+  if (! list->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move roaming zones."),
+          tr("Cannot move roaming zones: You have to select at least one roaming zone first."));
     return;
-  if (_config->roaming()->moveDown(selected.row()))
-    list->setCurrentIndex(_config->roaming()->index(selected.row()+1));
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(list->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  _config->roaming()->moveDown(rows.first, rows.second);
 }
 
 void

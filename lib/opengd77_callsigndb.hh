@@ -1,13 +1,12 @@
 #ifndef OPENGD77CALLSIGNDB_HH
 #define OPENGD77CALLSIGNDB_HH
 
-#include "dfufile.hh"
+#include "callsigndb.hh"
 #include "userdatabase.hh"
-
 
 /** Represents and encodes the binary format for the call-sign database within the radio.
  * @ingroup opengd77 */
-class OpenGD77CallsignDB : public DFUFile
+class OpenGD77CallsignDB : public CallsignDB
 {
   Q_OBJECT
 
@@ -50,7 +49,7 @@ public:
   virtual ~OpenGD77CallsignDB();
 
   /** Encodes as many entries as possible of the given user-database. */
-  virtual bool encode(UserDatabase *calldb);
+  virtual bool encode(UserDatabase *calldb, const Selection &selection=Selection());
 };
 
 #endif // OPENGD77CALLSIGNDB_HH

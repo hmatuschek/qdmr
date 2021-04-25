@@ -2,7 +2,7 @@ name: qdmr
 
 version: git
 grade: devel
-#version: 0.6.3
+#version: 0.7.1
 #grade: stable
 
 summary: Graphical code-plug programming tool for DMR radios.
@@ -13,7 +13,7 @@ description: |
    * TYT MD-UV390
    * Retevis RT3S
    * Open GD77 firmware (GD77, RD-5R & DM-1801)
-   * AnyTone AT-D878UV
+   * AnyTone AT-D878UV, AT-D868UVE
    * Radioddity GD77 (untested)
 
 confinement: strict

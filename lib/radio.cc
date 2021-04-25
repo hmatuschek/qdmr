@@ -5,10 +5,26 @@
 #include "gd77.hh"
 #include "uv390.hh"
 #include "opengd77.hh"
+#include "d868uv.hh"
 #include "d878uv.hh"
 #include "config.hh"
 #include "logger.hh"
 #include <QSet>
+
+
+/* ******************************************************************************************** *
+ * Implementation of Radio::Featrues::FrequencyRange
+ * ******************************************************************************************** */
+Radio::Features::FrequencyRange::FrequencyRange(double lower, double upper)
+  : min(lower), max(upper)
+{
+  // pass..
+}
+
+bool
+Radio::Features::FrequencyRange::contains(double f) const {
+  return (min<=f) && (max>=f);
+}
 
 
 /* ******************************************************************************************** *
@@ -21,7 +37,7 @@ Radio::Radio(QObject *parent)
 }
 
 VerifyIssue::Type
-Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
+Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlags &flags)
 {
   // Is still beta?
   if (features().betaWarning)
@@ -29,6 +45,14 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                     VerifyIssue::WARNING,
                     tr("Support for this radio is still new and not well tested. "
                        "The code-plug might be incomplete, non-functional or even harmful.")));
+
+  // Check radio IDs
+  if (config->radioIDs()->count() > features().maxRadioIDs) {
+    issues.append(VerifyIssue(
+                    VerifyIssue::ERROR,
+                    tr("This radio only supports %1 DMR IDs, %2 are set.")
+                    .arg(features().maxRadioIDs).arg(config->radioIDs()->count())));
+  }
 
   /*
    *  Check general config
@@ -139,6 +163,20 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues)
                       VerifyIssue::WARNING,
                       tr("Duplicate channel name '%1'.").arg(channel->name())));
     names.insert(channel->name());
+
+    if ((!features().vhfLimits.contains(channel->rxFrequency())) &&
+        (!features().uhfLimits.contains(channel->rxFrequency()))) {
+      VerifyIssue::Type type = flags.ignoreFrequencyLimits ? VerifyIssue::WARNING : VerifyIssue::ERROR;
+      issues.append(VerifyIssue(type,tr("RX frequency %1 of channel '%2' is out of range.")
+                                .arg(channel->rxFrequency()).arg(channel->name())));
+    }
+
+    if ((!features().vhfLimits.contains(channel->txFrequency())) &&
+        (!features().uhfLimits.contains(channel->txFrequency()))) {
+      VerifyIssue::Type type = flags.ignoreFrequencyLimits ? VerifyIssue::WARNING : VerifyIssue::ERROR;
+      issues.append(VerifyIssue(type,tr("TX frequency %1 of channel '%2' is out of range.")
+                                .arg(channel->txFrequency()).arg(channel->name())));
+    }
 
     if (channel->name().size() > features().maxChannelNameLength)
       issues.append(VerifyIssue(
@@ -350,9 +388,10 @@ found:
     return new UV390();
   } else if (("OpenGD77" == id) || ("OpenGD77" == force.toUpper())) {
     return new OpenGD77();
-  } else if (("D868UV" == id) || ("D868UVE" == id) || ("D6X2UV" == id) || ("D878UV" == id)
-             || ("D878UV" == force.toUpper())) {
+  } else if (("D6X2UV" == id) || ("D878UV" == id) || ("D878UV" == force.toUpper())) {
     return new D878UV();
+  } else if (("D868UV" == id) || ("D868UVE" == id) || ("D868UV" == force.toUpper())) {
+    return new D868UV();
   }
 
   errorMessage = QString("%1(): Unknown radio identifier '%2'.").arg(__func__, id);

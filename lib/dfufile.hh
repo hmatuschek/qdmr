@@ -7,6 +7,9 @@
 #include <QString>
 #include <QTextStream>
 
+#include "addressmap.hh"
+
+
 class CRC32;
 
 /** Implements reading and writing DFU files.
@@ -64,6 +67,7 @@ class DFUFile: public QObject
 {
 	Q_OBJECT
 
+public:
   /** Represents a single element within a @c Image. */
 	class Element {
 	public:
@@ -117,6 +121,8 @@ class DFUFile: public QObject
     Image(const QString &name, uint8_t altSettings=0);
     /** Copy constructor. */
 		Image(const Image &other);
+    /** Destructor. */
+    virtual ~Image();
     /** Copying assignment. */
 		Image &operator=(const Image &other);
 
@@ -159,6 +165,11 @@ class DFUFile: public QObject
     /** Prints a textual representation of the image into the given stream. */
 		void dump(QTextStream &stream) const;
 
+    /** Returns a pointer to the encoded raw data at the specified offset. */
+    virtual unsigned char *data(uint32_t offset);
+    /** Returns a const pointer to the encoded raw data at the specified offset. */
+    virtual const unsigned char *data(uint32_t offset) const;
+
     /** Sorts all elements with respect to their addresses. */
     void sort();
 
@@ -169,6 +180,8 @@ class DFUFile: public QObject
 		QString _name;
     /** The elements of the image. */
 		QVector<Element> _elements;
+    /** Maps an address range to element index. */
+    AddressMap _addressmap;
 	};
 
 public:

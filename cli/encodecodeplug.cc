@@ -110,7 +110,26 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
     D878UVCodeplug codeplug;
     codeplug.setBitmaps(&config);
-    codeplug.allocateUntouched();
+    codeplug.allocateUpdated();
+    codeplug.allocateForEncoding();
+    codeplug.encode(&config, flags);
+    codeplug.image(0).sort();
+    if (! codeplug.write(parser.positionalArguments().at(2))) {
+      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
+                 << "': " << codeplug.errorMessage();
+      return -1;
+    }
+  } else if ("d868uv"==parser.value("radio").toLower()) {
+    Config config;
+    QString errorMessage;
+    QTextStream stream(&infile);
+    if (! config.readCSV(stream, errorMessage)) {
+      logError() << "Cannot parse CSV codeplug '" << infile.fileName() << "': " << errorMessage;
+      return -1;
+    }
+    D868UVCodeplug codeplug;
+    codeplug.setBitmaps(&config);
+    codeplug.allocateUpdated();
     codeplug.allocateForEncoding();
     codeplug.encode(&config, flags);
     codeplug.image(0).sort();

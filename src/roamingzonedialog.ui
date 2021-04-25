@@ -44,6 +44,9 @@
           <iconset resource="../shared/resources.qrc">
            <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
          </property>
+         <property name="shortcut">
+          <string>Alt+Up</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -54,6 +57,9 @@
          <property name="icon">
           <iconset resource="../shared/resources.qrc">
            <normaloff>:/icons/down.png</normaloff>:/icons/down.png</iconset>
+         </property>
+         <property name="shortcut">
+          <string>Alt+Down</string>
          </property>
         </widget>
        </item>
@@ -66,14 +72,20 @@
      <item>
       <widget class="QPushButton" name="add">
        <property name="text">
-        <string>add Channel</string>
+        <string>Add Channel</string>
+       </property>
+       <property name="shortcut">
+        <string>Alt++</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="rem">
        <property name="text">
-        <string>remove Channel</string>
+        <string>Remove Channel</string>
+       </property>
+       <property name="shortcut">
+        <string>Alt+-</string>
        </property>
       </widget>
      </item>

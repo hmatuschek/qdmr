@@ -12,7 +12,11 @@ static Radio::Features _uv390_features =
   .hasDigital = true,
   .hasAnalog = true,
 
-  .maxNameLength = 16,
+  .vhfLimits = {136., 174.},
+  .uhfLimits = {400., 480.},
+
+  .maxRadioIDs        = 1,  /// @todo UV390 supports multiple radio IDs, not implemented yet.
+  .maxNameLength      = 16,
   .maxIntroLineLength = 10,
 
   .maxChannels = 3000,
@@ -116,11 +120,11 @@ UV390::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) 
 }
 
 bool
-UV390::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+UV390::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
   if (StatusIdle != _task)
     return false;
 
-  _callsigns.encode(db);
+  _callsigns.encode(db, selection);
 
   _task = StatusUploadCallsigns;
   if (blocking) {

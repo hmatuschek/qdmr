@@ -13,7 +13,11 @@ static Radio::Features _open_gd77_features =
   .hasDigital = true,
   .hasAnalog = true,
 
-  .maxNameLength = 8,
+  .vhfLimits = {136., 174.},
+  .uhfLimits = {400., 470.},
+
+  .maxRadioIDs        = 1,
+  .maxNameLength      = 8,
   .maxIntroLineLength = 16,
 
   .maxChannels = 1024,
@@ -132,7 +136,7 @@ OpenGD77::startUpload(Config *config, bool blocking, const CodePlug::Flags &flag
 }
 
 bool
-OpenGD77::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+OpenGD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
   logDebug() << "Start upload to " << name() << "...";
 
   if (StatusIdle != _task) {
@@ -142,7 +146,7 @@ OpenGD77::startUploadCallsignDB(UserDatabase *db, bool blocking) {
 
   // Assemble call-sign db from user DB
   logDebug() << "Encode call-signs into db.";
-  _callsigns.encode(db);
+  _callsigns.encode(db, selection);
 
   _task = StatusUploadCallsigns;
   if (blocking) {

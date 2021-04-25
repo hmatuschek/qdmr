@@ -117,8 +117,8 @@ public:
   /** Destructor. */
   virtual ~CSVHandler();
 
-  /** Gets called once the DMR ID has been parsed. */
-  virtual bool handleRadioId(qint64 id, qint64 line, qint64 column, QString &errorMessage);
+  /** Gets called once the DMR IDs has been parsed. */
+  virtual bool handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the radio name has been parsed. */
   virtual bool handleRadioName(const QString &name, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the first intro line has been parsed. */
@@ -139,10 +139,9 @@ public:
   virtual bool handleGroupList(qint64 idx, const QString &name, const QList<qint64> &contacts,
                                qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a digital channel has been parsed. */
-  virtual bool handleDigitalChannel(
-      qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
+  virtual bool handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
       qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-      qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 line, qint64 column, QString &errorMessage);
+      qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 radioID, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a analog channel has been parsed. */
   virtual bool handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan, qint64 aprs,
       qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
@@ -262,7 +261,7 @@ public:
    * @returns @c true on success. */
   static bool read(Config *config, QTextStream &stream, QString &errorMessage);
 
-  virtual bool handleRadioId(qint64 id, qint64 line, qint64 column, QString &errorMessage);
+  virtual bool handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleRadioName(const QString &name, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleIntroLine1(const QString &text, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleIntroLine2(const QString &text, qint64 line, qint64 column, QString &errorMessage);
@@ -278,7 +277,7 @@ public:
   virtual bool handleDigitalChannel(
       qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
       qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-      qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 line, qint64 column, QString &errorMessage);
+      qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 radioID, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleAnalogChannel(
       qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan, qint64 aprs,
       qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
@@ -315,6 +314,8 @@ protected:
   QMap<int, ScanList *> _scanlists;
   /** Index <-> RoamingZone map */
   QMap<int, RoamingZone *> _roamingZones;
+  /** Index <-> radio ID map */
+  QMap<int, RadioID *> _radioIDs;
 };
 
 #endif // CSVREADER_HH

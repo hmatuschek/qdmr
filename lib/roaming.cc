@@ -228,11 +228,35 @@ RoamingZoneList::moveUp(int row) {
 }
 
 bool
+RoamingZoneList::moveUp(int first, int last) {
+  if ((0>=first) || (last>=count()))
+    return false;
+  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
+  for (int row=first; row<=last; row++)
+    std::swap(_zones[row], _zones[row-1]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
 RoamingZoneList::moveDown(int row) {
   if ((0>row) || ((row-1)>=count()))
     return false;
   beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
   std::swap(_zones[row], _zones[row+1]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+RoamingZoneList::moveDown(int first, int last) {
+  if ((0>first) || ((last+1)>=count()))
+    return false;
+  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
+  for (int row=last; row>=first; row--)
+    std::swap(_zones[row], _zones[row+1]);
   endMoveRows();
   emit modified();
   return true;

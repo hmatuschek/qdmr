@@ -38,10 +38,16 @@ public:
   bool autoEnableRoaming() const;
   void setAutoEnableRoaming(bool enable);
 
+  QDir lastDirectory() const;
+  void setLastDirectoryDir(const QDir &dir);
+
   CodePlug::Flags codePlugFlags() const;
 
   bool ignoreVerificationWarning() const;
   void setIgnoreVerificationWarning(bool ignore);
+
+  bool ignoreFrequencyLimits() const;
+  void setIgnoreFrequencyLimits(bool ignore);
 
   bool hideGSPNote() const;
   void setHideGPSNote(bool hide);
@@ -54,6 +60,18 @@ public:
 
   bool showDisclaimer() const;
   void setShowDisclaimer(bool show);
+
+  QByteArray mainWindowState() const;
+  void setMainWindowState(const QByteArray &state);
+
+  QByteArray channelListHeaderState() const;
+  void setChannelListHeaderState(const QByteArray &state);
+
+  QByteArray contactListHeaderState() const;
+  void setContactListHeaderState(const QByteArray &state);
+
+  QByteArray positioningHeaderState() const;
+  void setPositioningHeaderState(const QByteArray &state);
 
   bool isUpdated() const;
   void markUpdated();
@@ -76,6 +94,7 @@ public slots:
 protected slots:
   void onSystemLocationToggled(bool enable);
   void positionUpdated(const QGeoPositionInfo &info);
+  void onIgnoreFrequencyLimitsSet(bool enabled);
 
 protected:
   QGeoPositionInfoSource *_source;

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "logger.hh"
 
 static const unsigned char CMD_PRG[]   = "\2PROGRA";
 static const unsigned char CMD_PRG2[]  = "M\2";
@@ -42,29 +43,34 @@ HID::identifier() {
   unsigned char ack;
 
   if (! hid_send_recv(CMD_PRG, 7, &ack, 1)) {
-    _errorMessage = tr("%1: Cannot identify radio: %2").arg(__func__).arg(_errorMessage);
+    _errorMessage = tr("Cannot identify radio: %1").arg(_errorMessage);
+    logError() << _errorMessage;
     return QString();
   }
 
   if (ack != CMD_ACK[0]) {
-    _errorMessage = tr("%1: Cannot identify radio: Wrong PRD acknowledge %2, expected %3.")
-        .arg(__func__).arg(ack,0,10).arg(CMD_ACK[0], 0, 16);
+    _errorMessage = tr("Cannot identify radio: Wrong PRD acknowledge %1, expected %2.")
+        .arg(ack,0,10).arg(CMD_ACK[0], 0, 16);
+    logError() << _errorMessage;
     return QString();
   }
 
   if (! hid_send_recv(CMD_PRG2, 2, reply, 16)) {
-    _errorMessage = tr("%1: Cannot identify radio: %2").arg(__func__).arg(_errorMessage);
+    _errorMessage = tr("Cannot identify radio: %1").arg(_errorMessage);
+    logError() << _errorMessage;
     return QString();
   }
 
   if (! hid_send_recv(CMD_ACK, 1, &ack, 1)) {
-    _errorMessage = tr("%1: Cannot identify radio: %2").arg(__func__).arg(_errorMessage);
+    _errorMessage = tr("Cannot identify radio: %1").arg(_errorMessage);
+    logError() << _errorMessage;
     return QString();
   }
 
   if (ack != CMD_ACK[0]) {
-    _errorMessage = tr("%1: Cannot identify radio: Wrong PRG2 acknowledge %2, expected %3.")
-        .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
+    _errorMessage = tr("Cannot identify radio: Wrong PRG2 acknowledge %1, expected %2.")
+        .arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
+    logError() << _errorMessage;
     return QString();
   }
 

@@ -6,7 +6,7 @@
 #include "config.h"
 #include "logger.hh"
 #include <QTimeZone>
-
+#include <QtEndian>
 
 #define NCHAN            3000
 #define NCONTACTS        10000
@@ -30,6 +30,7 @@
 #define OFFSET_SCANL     0x018860
 #define OFFSET_VFO_A     0x02ef00
 #define OFFSET_VFO_B     0x02ef40
+#define OFFSET_BOOT_SET  0x02f000
 #define OFFSET_ZONEXT    0x031000
 #define OFFSET_GPS_SYS   0x03ec40
 // ---- second segment ----
@@ -214,7 +215,7 @@ UV390Codeplug::channel_t::toChannelObj() const {
 
     return new DigitalChannel(getName(), getRXFrequency(), getTXFrequency(), pwr, (tot*15),
                               rx_only, admit_crit, color_code, slot,
-                              nullptr, nullptr, nullptr, nullptr, nullptr);
+                              nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
   }
 
   return nullptr;
@@ -866,7 +867,7 @@ UV390Codeplug::general_settings_t::setIntroLine2(const QString &txt) {
 
 bool
 UV390Codeplug::general_settings_t::updateConfigObj(Config *conf) const {
-  conf->setId(getRadioId());
+  conf->radioIDs()->getId(0)->setId(getRadioId());
   conf->setName(getName());
   conf->setIntroLine1(getIntroLine1());
   conf->setIntroLine2(getIntroLine2());
@@ -879,7 +880,7 @@ void
 UV390Codeplug::general_settings_t::fromConfigObj(const Config *conf) {
   // Set only those elements configured, preserve the rest as already configured in the radio.
   setName(conf->name());
-  setRadioId(conf->id());
+  setRadioId(conf->radioIDs()->getId(0)->id());
   setIntroLine1(conf->introLine1());
   setIntroLine2(conf->introLine2());
   setTimeZone();
@@ -887,6 +888,22 @@ UV390Codeplug::general_settings_t::fromConfigObj(const Config *conf) {
   channel_voice_announce = (conf->speech() ? 1 : 0);
 }
 
+
+/* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::general_settings_t
+ * ******************************************************************************************** */
+UV390Codeplug::boot_settings_t::boot_settings_t() {
+  clear();
+}
+
+void
+UV390Codeplug::boot_settings_t::clear() {
+  memset(this, 0xff, sizeof(boot_settings_t));
+  boot_zone = 1;
+  boot_channel_a = 1;
+  boot_channel_b = 1;
+  _unknown9 = qToLittleEndian(uint16_t(1));
+}
 
 /* ******************************************************************************************** *
  * Implementation of UV390Codeplug::message_t
@@ -979,7 +996,7 @@ UV390Codeplug::gpssystem_t::clear() {
 
 bool
 UV390Codeplug::gpssystem_t::isValid() const {
-  return repeat_interval != 0;
+  return (repeat_interval != 0) && (repeat_interval != 0xff) && (revert_channel != 0xffff);
 }
 
 uint
@@ -1279,6 +1296,10 @@ UV390Codeplug::encode(Config *config, const Flags &flags) {
   // General config
   general_settings_t *genset = (general_settings_t *)(data(OFFSET_SETTINGS));
   genset->fromConfigObj(config);
+
+  // Boot time settings
+  boot_settings_t *boot = (boot_settings_t *)(data(OFFSET_BOOT_SET));
+  boot->clear();
 
   // Define Contacts
   for (int i=0; i<NCONTACTS; i++) {

@@ -5,12 +5,12 @@
 #include "config.hh"
 #include <QGeoPositionInfoSource>
 #include "releasenotes.hh"
+#include "radio.hh"
 
 class QMainWindow;
-class Radio;
 class RepeaterDatabase;
 class UserDatabase;
-class CodePlug;
+class TalkGroupDatabase;
 
 
 class Application : public QApplication
@@ -33,7 +33,8 @@ public slots:
   void quitApplication();
 
   void detectRadio();
-  bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true, bool ignoreWarnings=false);
+  bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true,
+                      const VerifyFlags &flags=VerifyFlags());
 
   void downloadCodeplug();
   void uploadCodeplug();
@@ -54,6 +55,10 @@ private slots:
 
   void onConfigModifed();
   void onDMRIDChanged();
+  void onDMRIDSelected(int idx);
+  void onAddDMRID();
+  void onRemDMRID();
+
   void onNameChanged();
   void onIntroLine1Changed();
   void onIntroLine2Changed();
@@ -65,6 +70,8 @@ private slots:
   void onEditContact(const QModelIndex &idx);
   void onContactUp();
   void onContactDown();
+  void loadContactListSectionState();
+  void storeContactListSectionState();
 
   void onAddRxGroup();
   void onRemRxGroup();
@@ -79,6 +86,8 @@ private slots:
   void onChannelUp();
   void onChannelDown();
   void onEditChannel(const QModelIndex &index);
+  void loadChannelListSectionState();
+  void storeChannelListSectionState();
 
   void onAddZone();
   void onRemZone();
@@ -99,8 +108,11 @@ private slots:
   void onGPSDown();
   void onEditGPS(const QModelIndex &index);
   void onHideGPSNote();
+  void loadPositioningSectionState();
+  void storePositioningSectionState();
 
   void onAddRoamingZone();
+  void onGenRoamingZone();
   void onRemRoamingZone();
   void onRoamingZoneUp();
   void onRoamingZoneDown();
@@ -114,6 +126,7 @@ protected:
   QMainWindow *_mainWindow;
   RepeaterDatabase *_repeater;
   UserDatabase *_users;
+  TalkGroupDatabase *_talkgroups;
   QGeoPositionInfoSource *_source;
   QGeoCoordinate _currentPosition;
   ReleaseNotes _releaseNotes;

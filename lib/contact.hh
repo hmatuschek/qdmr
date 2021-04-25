@@ -186,8 +186,12 @@ public:
 
   /** Moves the contact at the given @c row one up. */
   bool moveUp(int row);
+  /** Moves the contacts at the given @c rows one up. */
+  bool moveUp(int first, int last);
   /** Moves the contact at the given @c row one down. */
   bool moveDown(int row);
+  /** Moves the contacts at the given @c rows one down. */
+  bool moveDown(int first, int last);
 
 	// Implementation of QAbstractTableModel
   /** Returns the number of rows, implements the QAbstractTableModel. */

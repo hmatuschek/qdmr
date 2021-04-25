@@ -102,8 +102,8 @@ CSVHandler::~CSVHandler() {
 }
 
 bool
-CSVHandler::handleRadioId(qint64 id, qint64 line, qint64 column, QString &errorMessage) {
-  Q_UNUSED(id);
+CSVHandler::handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, QString &errorMessage) {
+  Q_UNUSED(ids);
   Q_UNUSED(line);
   Q_UNUSED(column);
   Q_UNUSED(errorMessage)
@@ -200,7 +200,7 @@ CSVHandler::handleGroupList(qint64 idx, const QString &name, const QList<qint64>
 bool
 CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
     qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-    qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 line, qint64 column, QString &errorMessage)
+    qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 radioID, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
   Q_UNUSED(name);
@@ -217,6 +217,7 @@ CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, dou
   Q_UNUSED(contact);
   Q_UNUSED(gps);
   Q_UNUSED(roam);
+  Q_UNUSED(radioID);
   Q_UNUSED(line);
   Q_UNUSED(column);
   Q_UNUSED(errorMessage);
@@ -424,23 +425,30 @@ CSVParser::_parse_radio_id(CSVLexer &lexer) {
     return false;
   }
 
+  QList<qint64> ids;
   token = lexer.next();
-  if (CSVLexer::Token::T_NUMBER != token.type) {
-    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number.")
-        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
-    return false;
+  while (CSVLexer::Token::T_NUMBER == token.type) {
+    ids.append(token.value.toInt());
+    token = lexer.next();
+    if (CSVLexer::Token::T_COMMA == token.type) {
+      token = lexer.next();
+      continue;
+    }
   }
-  qint64 id = token.value.toInt();
-  qint64 line=token.line, column=token.column;
 
-  token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
 
-  return _handler->handleRadioId(id, line, column, _errorMessage);
+  if (0 == ids.size()) {
+    _errorMessage = QString("Parse error @ %1,%2: At least one radio ID must be specified.")
+        .arg(token.line).arg(token.column);
+    return false;
+  }
+
+  return _handler->handleRadioId(ids, token.line, token.column, _errorMessage);
 }
 
 bool
@@ -983,7 +991,7 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  qint64 roam = -1;
+  qint64 roam = -1, radioID = -1;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
     roam = -1;
   } else if (CSVLexer::Token::T_ENABLED == token.type) {
@@ -1000,6 +1008,20 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
+  if (CSVLexer::Token::T_NOT_SET == token.type) {
+    radioID = -1;
+  } else if (CSVLexer::Token::T_NUMBER == token.type) {
+    radioID = token.value.toInt(&ok);
+  } else if ((CSVLexer::Token::T_NEWLINE == token.type) || (CSVLexer::Token::T_END_OF_STREAM == token.type)) {
+    // This entry is optional for backward compatibility.
+    goto done;
+  } else {
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
   if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)) {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1008,7 +1030,7 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
 
 done:
   return _handler->handleDigitalChannel(idx, name, rx, tx, pwr, scanlist, tot, rxOnly, admit, color,
-                                        slot, rxGroupList, txContact, gps, roam, line, column, _errorMessage);
+                                        slot, rxGroupList, txContact, gps, roam, radioID, line, column, _errorMessage);
 }
 
 bool
@@ -1364,6 +1386,13 @@ CSVParser::_parse_gps_system(qint64 id, CSVLexer &lexer) {
     return false;
   }
 
+  token = lexer.next();
+  if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
   return _handler->handleGPSSystem(id, name, contact, period, chan, line, column, _errorMessage);
 }
 
@@ -1483,6 +1512,13 @@ CSVParser::_parse_aprs_system(qint64 id, CSVLexer &lexer) {
     message = token.value;
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected string.")
+        .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
+    return false;
+  }
+
+  token = lexer.next();
+  if ((CSVLexer::Token::T_NEWLINE != token.type) && (CSVLexer::Token::T_END_OF_STREAM != token.type)){
+    _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline/EOS.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
@@ -1707,14 +1743,22 @@ CSVReader::read(Config *config, QTextStream &stream, QString &errorMessage) {
 
 
 bool
-CSVReader::handleRadioId(qint64 id, qint64 line, qint64 column, QString &errorMessage) {
+CSVReader::handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(line);
   Q_UNUSED(column);
   Q_UNUSED(errorMessage);
 
-  if (_link) {
-    _config->setId(id);
+  if (_link)
+    return true;
+  logDebug() << "Got " << ids.count() << " IDs...";
+  _config->radioIDs()->getId(0)->setId(ids.front());
+  _radioIDs[1] = _config->radioIDs()->getId(0);
+  for (int i=1; i<ids.count(); i++) {
+    RadioID *id = new RadioID(ids.at(i));
+    _config->radioIDs()->addId(id);
+    _radioIDs[i+1] = id;
   }
+
   return true;
 }
 
@@ -1859,7 +1903,7 @@ CSVReader::handleGroupList(qint64 idx, const QString &name, const QList<qint64> 
 bool
 CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
     qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
-    qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 line, qint64 column, QString &errorMessage)
+    qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 radioID, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
     // Check RX Grouplist
@@ -1910,11 +1954,23 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
       // positive index means reference to roaming specific roaming zone
       if (! _roamingZones.contains(roam)) {
         errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown roaming zone index %4.")
-            .arg(line).arg(column).arg(name).arg(gps);
+            .arg(line).arg(column).arg(name).arg(roam);
         return false;
       }
       _channels[idx]->as<DigitalChannel>()->setRoaming(_roamingZones[roam]);
     }
+
+    // check radio ID
+    if (-1 == radioID) {
+      _channels[idx]->as<DigitalChannel>()->setRadioId(nullptr);
+    } else if ((0 < radioID) && (_radioIDs.contains(radioID))) {
+      _channels[idx]->as<DigitalChannel>()->setRadioId(_radioIDs[radioID]);
+    } else {
+      errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown radio ID index %4.")
+          .arg(line).arg(column).arg(name).arg(radioID);
+      return false;
+    }
+
     return true;
   }
 
@@ -1926,7 +1982,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
   }
 
   DigitalChannel *chan = new DigitalChannel(name, rx, tx, power, tot, ro, admit, color, slot,
-                                            nullptr, nullptr, nullptr, nullptr, nullptr);
+                                            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
   _config->channelList()->addChannel(chan);
   _channels[idx] = chan;
 

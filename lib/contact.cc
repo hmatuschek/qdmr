@@ -264,11 +264,35 @@ ContactList::moveUp(int row) {
 }
 
 bool
+ContactList::moveUp(int first, int last) {
+  if ((first <= 0) || (last>=count()))
+    return false;
+  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
+  for (int row=first; row<=last; row++)
+    std::swap(_contacts[row-1],_contacts[row]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
 ContactList::moveDown(int row) {
   if ((row >= (count()-1)) || (0 > row))
     return false;
   beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
   std::swap(_contacts[row+1],_contacts[row]);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+ContactList::moveDown(int first, int last) {
+  if ((last >= (count()-1)) || (0 > first))
+    return false;
+  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
+  for (int row=last; row>=first; row--)
+    std::swap(_contacts[row+1],_contacts[row]);
   endMoveRows();
   emit modified();
   return true;

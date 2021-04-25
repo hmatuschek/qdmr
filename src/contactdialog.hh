@@ -13,14 +13,16 @@
 
 #include "ui_contactdialog.h"
 class UserDatabase;
+class TalkGroupDatabase;
+
 
 class ContactDialog: public QDialog, private Ui::ContactDialog
 {
 	Q_OBJECT
 
 public:
-  ContactDialog(UserDatabase *users, QWidget *parent=nullptr);
-  ContactDialog(UserDatabase *users, Contact *contact, QWidget *parent=nullptr);
+  ContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, QWidget *parent=nullptr);
+  ContactDialog(Contact *contact, QWidget *parent=nullptr);
 
 	Contact *contact();
 
@@ -33,7 +35,8 @@ protected:
 
 protected:
 	Contact *_contact;
-  QCompleter *_completer;
+  QCompleter *_user_completer;
+  QCompleter *_tg_completer;
 };
 
 

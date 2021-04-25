@@ -25,39 +25,35 @@ class GPSSystem;
  * scratch. That is, it is not neccessary to update an existing codeplug on the radio.
  * <table>
  *  <tr><th>Start</th>    <th>End</th>      <th>Size</th>    <th>Content</th></tr>
- *  <tr><th colspan="4">First segment 0x002800-0x040800</th></tr>
- *  <tr><td>0x002800</td> <td>0x00280c</td> <td>0x0000c</td> <td>Timestamp see @c UV390Codeplug::timestamp_t.</td></tr>
- *  <tr><td>0x00280c</td> <td>0x002840</td> <td>0x00034</td> <td>Reserved, filled with 0xff. </td></tr>
- *  <tr><td>0x002840</td> <td>0x0028f0</td> <td>0x000b0</td> <td>General settings see @c UV390Codeplug::general_settings_t.</td></tr>
- *  <tr><td>0x0028f0</td> <td>0x002900</td> <td>0x00010</td> <td>Menu settings, see @c UV390Codeplug::menu_t</td></tr>
- *  <tr><td>0x002900</td> <td>0x002940</td> <td>0x00040</td> <td>Button config, see @c UV390Codeplug::buttons_t.</td></tr>
- *  <tr><td>0x002940</td> <td>0x002980</td> <td>0x00040</td> <td>Reserved, filled with 0xff.</td></tr>
- *  <tr><td>0x002980</td> <td>0x0061c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each, see @c UV390Codeplug::message_t.</td></tr>
- *  <tr><td>0x0061c0</td> <td>0x006270</td> <td>0x000b0</td> <td>Privacy keys, see @c UV390Codeplug::privacy_t.</td></tr>
- *  <tr><td>0x006250</td> <td>0x006760</td> <td>0x00510</td> <td>Emergency Systems, see @c UV390Codeplug::emergency_t.</td></td>
- *  <tr><td>0x006760</td> <td>0x00f420</td> <td>0x08cc0</td> <td>Reserved, filled with 0xff.</td></td>
- *  <tr><td>0x00f420</td> <td>0x0151e0</td> <td>0x05dc0</td> <td>250 RX Group lists @ 0x60 bytes each, see @c UV390Codeplug::grouplist_t.</td></tr>
- *  <tr><td>0x0151e0</td> <td>0x019060</td> <td>0x03e80</td> <td>250 Zones @ 0x40 bytes each, see @c UV390Codeplug::zone_t.</td></tr>
- *  <tr><td>0x019060</td> <td>0x01f5f0</td> <td>0x06590</td> <td>250 Scanlists @ 0x68 bytes each, see @c UV390Codeplug::scanlist_t.</td></tr>
- *  <tr><td>0x01f5f0</td> <td>0x02f700</td> <td>0x10110</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x02f700</td> <td>0x02f740</td> <td>0x00040</td> <td>VFO A channel, see @c UV390Codeplug::channel_t.</td></tr>
- *  <tr><td>0x02f740</td> <td>0x02f780</td> <td>0x00040</td> <td>VFO B channel, see @c UV390Codeplug::channel_t.</td></tr>
- *  <tr><td>0x02f780</td> <td>0x030800</td> <td>0x01080</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x030800</td> <td>0x030b80</td> <td>0x00380</td> <td>??? Unknown. DTMF Systems? ???</td></tr>
- *  <tr><td>0x030b80</td> <td>0x031800</td> <td>0x00c80</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x031800</td> <td>0x03f2c0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c UV390Codeplug::zone_ext_t.</td></tr>
- *  <tr><td>0x03f2c0</td> <td>0x03f440</td> <td>0x00180</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x03f440</td> <td>0x03f540</td> <td>0x00100</td> <td>16 GPS systems @ 0x10 bytes each, see @c UV390Codeplug::gpssystem_t.</td></tr>
- *  <tr><td>0x03f540</td> <td>0x040800</td> <td>0x012c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><th colspan="4">Second segment 0x110800-0x1a0800</th></tr>
- *  <tr><td>0x110800</td> <td>0x13f600</td> <td>0x2ee00</td> <td>3000 Channels @ 0x40 bytes each, see @c UV390Codeplug::channel_t.</td></tr>
- *  <tr><td>0x13f600</td> <td>0x140800</td> <td>0x01200</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x140800</td> <td>0x198640</td> <td>0x57e40</td> <td>10000 Contacts @ 0x24 bytes each, see @c UV390Codeplug::contact_t.</td></tr>
- *  <tr><td>0x198640</td> <td>0x1a0800</td> <td>0x081c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><th colspan="4">Callsign database 0x0200000-0x1000000</th></tr>
- *  <tr><td>0x200000</td> <td>0x204004</td> <td>0x04004</td> <td>Callsign database index table, see @c UV390Codeplug::callsign_db_t</td></tr>
- *  <tr><td>0x204004</td> <td>0xffffdc</td> <td>0xdfbfd8</td> <td>122197 callsign database entries, see @c UV390Codeplug::callsign_db_t::callsign_t. </td></tr>
- *  <tr><td>0xffffdc</td> <td>0x1000000</td> <td>0x00025</td> <td>Padding, filled with @c 0xff.</td></tr>
+ *  <tr><th colspan="4">First segment 0x002000-0x040000</th></tr>
+ *  <tr><td>0x002000</td> <td>0x00200c</td> <td>0x0000c</td> <td>Timestamp see @c UV390Codeplug::timestamp_t.</td></tr>
+ *  <tr><td>0x00200c</td> <td>0x002040</td> <td>0x00034</td> <td>Reserved, filled with 0xff. </td></tr>
+ *  <tr><td>0x002040</td> <td>0x0020f0</td> <td>0x000b0</td> <td>General settings see @c UV390Codeplug::general_settings_t.</td></tr>
+ *  <tr><td>0x0020f0</td> <td>0x002100</td> <td>0x00010</td> <td>Menu settings, see @c UV390Codeplug::menu_t</td></tr>
+ *  <tr><td>0x002100</td> <td>0x002140</td> <td>0x00040</td> <td>Button config, see @c UV390Codeplug::buttons_t.</td></tr>
+ *  <tr><td>0x002140</td> <td>0x002180</td> <td>0x00040</td> <td>Reserved, filled with 0xff.</td></tr>
+ *  <tr><td>0x002180</td> <td>0x0059c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each, see @c UV390Codeplug::message_t.</td></tr>
+ *  <tr><td>0x0059c0</td> <td>0x005a70</td> <td>0x000b0</td> <td>Privacy keys, see @c UV390Codeplug::privacy_t.</td></tr>
+ *  <tr><td>0x005a50</td> <td>0x005f60</td> <td>0x00510</td> <td>Emergency Systems, see @c UV390Codeplug::emergency_t.</td></td>
+ *  <tr><td>0x005f60</td> <td>0x00ec20</td> <td>0x08cc0</td> <td>Reserved, filled with 0xff.</td></td>
+ *  <tr><td>0x00ec20</td> <td>0x0149e0</td> <td>0x05dc0</td> <td>250 RX Group lists @ 0x60 bytes each, see @c UV390Codeplug::grouplist_t.</td></tr>
+ *  <tr><td>0x0149e0</td> <td>0x018860</td> <td>0x03e80</td> <td>250 Zones @ 0x40 bytes each, see @c UV390Codeplug::zone_t.</td></tr>
+ *  <tr><td>0x018860</td> <td>0x01edf0</td> <td>0x06590</td> <td>250 Scanlists @ 0x68 bytes each, see @c UV390Codeplug::scanlist_t.</td></tr>
+ *  <tr><td>0x01edf0</td> <td>0x02ef00</td> <td>0x10110</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><td>0x02ef00</td> <td>0x02ef40</td> <td>0x00040</td> <td>VFO A channel, see @c UV390Codeplug::channel_t.</td></tr>
+ *  <tr><td>0x02ef40</td> <td>0x02ef80</td> <td>0x00040</td> <td>VFO B channel, see @c UV390Codeplug::channel_t.</td></tr>
+ *  <tr><td>0x02ef80</td> <td>0x02f000</td> <td>0x00080</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>Some unkown settings like current channel, see @c UV390Codeplug::boot_settings_t.</td></tr>
+ *  <tr><td>0x02f010</td> <td>0x031000</td> <td>0x01ff0</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><td>0x031000</td> <td>0x03eac0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c UV390Codeplug::zone_ext_t.</td></tr>
+ *  <tr><td>0x03eac0</td> <td>0x03ec40</td> <td>0x00180</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><td>0x03ec40</td> <td>0x03ed40</td> <td>0x00100</td> <td>16 GPS systems @ 0x10 bytes each, see @c UV390Codeplug::gpssystem_t.</td></tr>
+ *  <tr><td>0x03ed40</td> <td>0x040000</td> <td>0x012c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><th colspan="4">Second segment 0x110000-0x1a0000</th></tr>
+ *  <tr><td>0x110000</td> <td>0x13ee00</td> <td>0x2ee00</td> <td>3000 Channels @ 0x40 bytes each, see @c UV390Codeplug::channel_t.</td></tr>
+ *  <tr><td>0x13ee00</td> <td>0x140000</td> <td>0x01200</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><td>0x140000</td> <td>0x197e40</td> <td>0x57e40</td> <td>10000 Contacts @ 0x24 bytes each, see @c UV390Codeplug::contact_t.</td></tr>
+ *  <tr><td>0x197e40</td> <td>0x1a0000</td> <td>0x081c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
  * </table>
  *
  * @ingroup uv390 */
@@ -608,6 +604,23 @@ public:
     bool updateConfigObj(Config *conf) const;
     /** Updates this codeplug general settings from the generic configuration. */
     void fromConfigObj(const Config *conf);
+  };
+
+  /** Represents the boot-time settings (selected zone and channels) within the code-plug. */
+  struct __attribute__((packed)) boot_settings_t {
+    uint8_t _unused0[3];                  ///< Unused, filled with 0xff.
+    uint8_t boot_zone;                    ///< Zone index (1-based) to select at boot.
+    uint8_t boot_channel_a;               ///< Channel index (1-based) within selected zone to select at boot for VFO A.
+    uint8_t _unused5;                     ///< Unused, set to 0xff.
+    uint8_t boot_channel_b;               ///< Channel index (1-based) within selected zone to select at boot for VFB B.
+    uint8_t _unused7[2];                  ///< Unused, filled with 0xff.
+    uint16_t _unknown9;                   ///< Unknown, little endian index, default 0x0001.
+    uint8_t _unused10[5];                 ///< Unused, filled with 0xff.
+
+    /** Constructor. */
+    boot_settings_t();
+    /** Resets the boot time settings. */
+    void clear();
   };
 
   /** Represents a single message within the codeplug.

@@ -12,7 +12,11 @@ static Radio::Features _gd77_features = {
   .hasDigital = true,
   .hasAnalog = true,
 
-  .maxNameLength = 8,
+  .vhfLimits = {136., 174.},
+  .uhfLimits = {400., 470.},
+
+  .maxRadioIDs        = 1,
+  .maxNameLength      = 8,
   .maxIntroLineLength = 16,
 
   .maxChannels = 1024,
@@ -127,7 +131,7 @@ GD77::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
 }
 
 bool
-GD77::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
   Q_UNUSED(db);
   Q_UNUSED(blocking);
 

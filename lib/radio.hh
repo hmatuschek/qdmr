@@ -10,6 +10,7 @@
 
 #include <QThread>
 #include "codeplug.hh"
+#include "callsigndb.hh"
 
 class Config;
 class UserDatabase;
@@ -49,6 +50,26 @@ protected:
 	QString _message;
 };
 
+/** Flags to control the verification process.
+ * @ingroup rif*/
+struct VerifyFlags {
+  /** If set, warnings will not interrupt the upload. */
+  bool ignoreWarnings;
+  /** If set, frequency limit voilations will be handled as warnings. */
+  bool ignoreFrequencyLimits;
+
+  /** Default constructor. */
+  inline VerifyFlags()
+    : ignoreWarnings(false), ignoreFrequencyLimits(false) {
+    // pass...
+  }
+  /** Full constructor. */
+  inline VerifyFlags(bool ignWarn, bool ignFreqLimits)
+    : ignoreWarnings(ignWarn), ignoreFrequencyLimits(ignFreqLimits) {
+    // pass...
+  }
+};
+
 
 /** Base class for all Radio objects.
  *
@@ -64,7 +85,17 @@ class Radio : public QThread
 
 public:
   /** Represents a radio feature list, a generic configuration is verified against. */
-	typedef struct {
+  struct Features {
+    /** Represents a frequency range [min, max]. */
+    struct FrequencyRange {
+      double min; ///< Lower frequency limit.
+      double max; ///< Upper frequency limit.
+      /** Constructs a frequency range from limits. */
+      FrequencyRange(double lower, double upper);
+      /** Returns @c true if @c f is inside this limit. */
+      bool contains(double f) const;
+    };
+
     /** If @c true, shows a beta warning at upload. */
     bool betaWarning;
 
@@ -72,6 +103,14 @@ public:
 		bool hasDigital;
     /** If @c true, the device supports FM. */
 		bool hasAnalog;
+
+    /** VHF frequency limits. */
+    FrequencyRange vhfLimits;
+    /** UHF frequency limits. */
+    FrequencyRange uhfLimits;
+
+    /** Maximum number of radio IDs. */
+    int maxRadioIDs;
 
     /** Maximum length of the radio name. */
 		int maxNameLength;
@@ -141,7 +180,7 @@ public:
     bool callsignDBImplemented;
     /** Maximum number of entries in callsign DB. */
     uint maxCallsignsInDB;
-	} Features;
+  };
 
   /** Possible states of the radio object. */
 	typedef enum {
@@ -169,7 +208,8 @@ public:
 
   /** Verifies the configuration against the radio features.
    * On exit, @c issues will contain the issues found and the maximum severity is returned. */
-  VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues);
+  VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
+                                 const VerifyFlags &flags=VerifyFlags());
 
   /** Returns the current status. */
   Status status() const;
@@ -190,10 +230,13 @@ public slots:
   virtual bool startDownload(bool blocking=false) = 0;
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
-  virtual bool startUpload(Config *config, bool blocking=false,
-                           const CodePlug::Flags &flags = CodePlug::Flags()) = 0;
+  virtual bool startUpload(
+      Config *config, bool blocking=false,
+      const CodePlug::Flags &flags = CodePlug::Flags()) = 0;
   /** Assembles the callsign DB from the given one and uploads it to the device. */
-  virtual bool startUploadCallsignDB(UserDatabase *db, bool blocking=false) = 0;
+  virtual bool startUploadCallsignDB(
+      UserDatabase *db, bool blocking=false,
+      const CallsignDB::Selection &selection=CallsignDB::Selection()) = 0;
 
 signals:
   /** Gets emitted once the codeplug download has been started. */

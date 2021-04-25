@@ -10,11 +10,16 @@ static Radio::Features _d878uv_features =
 {
   // show beta-warning
   .betaWarning = true,
+
   // general capabilities
   .hasDigital  = true,
   .hasAnalog   = true,
 
+  .vhfLimits = {136., 174.},
+  .uhfLimits = {400., 480.},
+
   // general limits
+  .maxRadioIDs        = 250,
   .maxNameLength      = 16,
   .maxIntroLineLength = 14,
 
@@ -43,7 +48,7 @@ static Radio::Features _d878uv_features =
   // rx group list limits
   .maxGrouplists          = 250,
   .maxGrouplistNameLength = 16,
-  .maxContactsInGrouplist = 32,
+  .maxContactsInGrouplist = 64,
 
   .hasGPS = true,
   .maxGPSSystems = 8,
@@ -58,8 +63,8 @@ static Radio::Features _d878uv_features =
 
   // call-sign database limits
   .hasCallsignDB          = true,  // hasCallsignDB
-  .callsignDBImplemented  = false, // callsignDBImplemented
-  .maxCallsignsInDB       = 0      // maxCallsignsInDB
+  .callsignDBImplemented  = true,  // callsignDBImplemented
+  .maxCallsignsInDB       = 200000 // maxCallsignsInDB
 };
 
 
@@ -125,13 +130,20 @@ D878UV::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags)
 }
 
 bool
-D878UV::startUploadCallsignDB(UserDatabase *db, bool blocking) {
+D878UV::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
   Q_UNUSED(db);
   Q_UNUSED(blocking);
 
-  _errorMessage = tr("RD5R does not support a callsign DB.");
+  _callsigns.encode(db, selection);
 
-  return false;
+  _task = StatusUploadCallsigns;
+  if (blocking) {
+    this->run();
+    return (StatusIdle == _task);
+  }
+
+  this->start();
+  return true;
 }
 
 void
@@ -153,6 +165,18 @@ D878UV::run() {
     emit uploadStarted();
 
     if (! upload())
+      return;
+
+    _task = StatusIdle;
+    _dev->reboot();
+    _dev->close();
+    _dev->deleteLater();
+
+    emit uploadComplete(this);
+  } else if (StatusUploadCallsigns == _task) {
+    emit uploadStarted();
+
+    if (! uploadCallsigns())
       return;
 
     _task = StatusIdle;
@@ -273,7 +297,7 @@ D878UV::upload() {
 
   // Allocate all memory sections that must be read first
   // and written back to the device more or less untouched
-  _codeplug.allocateUntouched();
+  _codeplug.allocateUpdated();
   // Download new memory sections for update
   for (int n=nbitmaps; n<_codeplug.image(0).numElements(); n++) {
     uint addr = _codeplug.image(0).element(n).address();
@@ -333,3 +357,44 @@ D878UV::upload() {
   return true;
 }
 
+
+bool
+D878UV::uploadCallsigns() {
+  _dev = new AnytoneInterface(this);
+  if (! _dev->isOpen()) {
+    _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());
+    _dev->deleteLater();
+    _task = StatusError;
+    emit uploadError(this);
+    return false;
+  }
+
+  // Sort all elements before uploading
+  _callsigns.image(0).sort();
+
+  size_t totalBlocks = _callsigns.memSize()/WBSIZE;
+  size_t blkWritten  = 0;
+  // Upload all elements back to the device
+  for (int n=0; n<_callsigns.image(0).numElements(); n++) {
+    uint addr = _callsigns.image(0).element(n).address();
+    uint size = _callsigns.image(0).element(n).data().size();
+    uint nblks = size/WBSIZE;
+    for (uint i=0; i<nblks; i++) {
+      if (! _dev->write(0, addr+i*WBSIZE, _callsigns.data(addr)+i*WBSIZE, WBSIZE)) {
+        _errorMessage = QString("%1 Cannot upload callsign db: %2").arg(__func__)
+            .arg(_dev->errorMessage());
+        logError() << _errorMessage;
+        _task = StatusError;
+        _dev->reboot();
+        _dev->close();
+        _dev->deleteLater();
+        emit uploadError(this);
+        return false;
+      }
+      blkWritten++;
+      emit uploadProgress(float(blkWritten*100)/totalBlocks);
+    }
+  }
+  //_codeplug.write("debug_codeplug.dfu");
+  return true;
+}

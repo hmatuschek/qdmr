@@ -130,8 +130,12 @@ public:
 
   /** Moves the roaming zone at the given row one up. */
   bool moveUp(int row);
+  /** Moves the roaming zones one up. */
+  bool moveUp(int first, int last);
   /** Moves the roaming zone at the given row one down. */
   bool moveDown(int row);
+  /** Moves the roaming zones one down. */
+  bool moveDown(int first, int last);
 
   /** Implementation of QAbstractListModel, returns the number of rows. */
   int rowCount(const QModelIndex &parent = QModelIndex()) const;

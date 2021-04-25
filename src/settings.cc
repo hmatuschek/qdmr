@@ -1,7 +1,8 @@
 #include "settings.hh"
 #include "logger.hh"
 #include "config.h"
-
+#include <QStandardPaths>
+#include <QDir>
 
 QGeoCoordinate loc2deg(const QString &loc) {
   double lon = 0, lat = 0;
@@ -140,6 +141,15 @@ Settings::setAutoEnableRoaming(bool update) {
   setValue("autoEnableRoaming", update);
 }
 
+QDir
+Settings::lastDirectory() const {
+  return QDir(value("lastDir", QStandardPaths::standardLocations(QStandardPaths::HomeLocation).first()).toString());
+}
+void
+Settings::setLastDirectoryDir(const QDir &dir) {
+  setValue("lastDir", dir.absolutePath());
+}
+
 CodePlug::Flags
 Settings::codePlugFlags() const {
   CodePlug::Flags flags;
@@ -156,6 +166,15 @@ Settings::ignoreVerificationWarning() const {
 void
 Settings::setIgnoreVerificationWarning(bool ignore) {
   setValue("ignoreVerificationWarning", ignore);
+}
+
+bool
+Settings::ignoreFrequencyLimits() const {
+  return value("ignoreFrequencyLimits", false).toBool();
+}
+void
+Settings::setIgnoreFrequencyLimits(bool ignore) {
+  setValue("ignoreFrequencyLimits", ignore);
 }
 
 bool
@@ -197,6 +216,42 @@ Settings::setShowDisclaimer(bool show) {
   setValue("showDisclaimer", show);
 }
 
+QByteArray
+Settings::mainWindowState() const {
+  return value("mainWindowState", QByteArray()).toByteArray();
+}
+void
+Settings::setMainWindowState(const QByteArray &state) {
+  setValue("mainWindowState", state);
+}
+
+QByteArray
+Settings::channelListHeaderState() const {
+  return value("channelListHeaderState", QByteArray()).toByteArray();
+}
+void
+Settings::setChannelListHeaderState(const QByteArray &state) {
+  setValue("channelListHeaderState", state);
+}
+
+QByteArray
+Settings::contactListHeaderState() const {
+  return value("contactListHeaderState", QByteArray()).toByteArray();
+}
+void
+Settings::setContactListHeaderState(const QByteArray &state) {
+  setValue("contactListHeaderState", state);
+}
+
+QByteArray
+Settings::positioningHeaderState() const {
+  return value("positioningHeaderState", QByteArray()).toByteArray();
+}
+void
+Settings::setPositioningHeaderState(const QByteArray &state) {
+  setValue("positioningHeaderState", state);
+}
+
 bool
 Settings::isUpdated() const {
   if (! contains("version"))
@@ -232,12 +287,16 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   if (queryLocation->isChecked())
     locatorEntry->setEnabled(false);
 
+  connect(Ui::SettingsDialog::ignoreFrequencyLimits, SIGNAL(toggled(bool)),
+          this, SLOT(onIgnoreFrequencyLimitsSet(bool)));
+  connect(queryLocation, SIGNAL(toggled(bool)), this, SLOT(onSystemLocationToggled(bool)));
+
   Ui::SettingsDialog::updateCodeplug->setChecked(settings.updateCodeplug());
   Ui::SettingsDialog::autoEnableGPS->setChecked(settings.autoEnableGPS());
   Ui::SettingsDialog::autoEnableRoaming->setChecked(settings.autoEnableRoaming());
   Ui::SettingsDialog::ignoreVerificationWarnings->setChecked(settings.ignoreVerificationWarning());
+  Ui::SettingsDialog::ignoreFrequencyLimits->setChecked(settings.ignoreFrequencyLimits());
 
-  connect(queryLocation, SIGNAL(toggled(bool)), this, SLOT(onSystemLocationToggled(bool)));
 }
 
 bool
@@ -260,6 +319,15 @@ SettingsDialog::onSystemLocationToggled(bool enabled) {
 }
 
 void
+SettingsDialog::onIgnoreFrequencyLimitsSet(bool enabled) {
+  if (enabled) {
+    Ui::SettingsDialog::ignoreFrequencyLimits->setText(tr("Warning!"));
+  } else {
+    Ui::SettingsDialog::ignoreFrequencyLimits->setText("");
+  }
+}
+
+void
 SettingsDialog::positionUpdated(const QGeoPositionInfo &info) {
   logDebug() << "Application: Current position: " << info.coordinate().toString();
   if (info.isValid() && queryLocation->isChecked()) {
@@ -276,6 +344,7 @@ SettingsDialog::accept() {
   settings.setAutoEnableGPS(autoEnableGPS->isChecked());
   settings.setAutoEnableRoaming(autoEnableRoaming->isChecked());
   settings.setIgnoreVerificationWarning(ignoreVerificationWarnings->isChecked());
+  settings.setIgnoreFrequencyLimits(ignoreFrequencyLimits->isChecked());
   QDialog::accept();
 }
 

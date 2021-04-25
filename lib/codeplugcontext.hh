@@ -19,6 +19,11 @@ public:
   /** Returns the wrapped config. */
   Config *config() const;
 
+  bool hasRadioId(int index) const;
+  bool setDefaultRadioId(uint32_t id, int index);
+  bool addRadioId(uint32_t id, int index);
+  RadioID *getRadioId(int idx) const;
+
   /** Returns @c true, if the given channel index has been defined before. */
   bool hasChannel(int index) const;
   /** Adds a channel to the config and maps the given index to that channel. */
@@ -77,6 +82,8 @@ public:
 protected:
   /** The wrapped radio config (aka abstract code-plug). */
   Config *_config;
+  /** Maps a code-plug radio ID index to the radio ID index within the wrapped radio config. */
+  QHash<int, int> _radioIDTable;
   /** Maps a code-plug channel index to the channel index within the wrapped radio config. */
   QHash<int, int> _channelTable;
   /** Maps a code-plug digital-contact index to the contact index within the wrapped radio config. */

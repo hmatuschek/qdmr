@@ -138,10 +138,22 @@ void
 encode_ascii(uint8_t *data, const QString &text, size_t size, uint16_t fill) {
   for (size_t i=0; (i<size); i++) {
     if (i<size_t(text.size()))
-      data[i] = text.at(i).unicode();
+      data[i] = text.at(i).toLatin1();
     else
       data[i] = fill;
   }
+}
+
+QString
+decode_utf8(const uint8_t *data, size_t size, uint16_t fill) {
+  return QString::fromUtf8((const char *)data, size);
+}
+
+void
+encode_utf8(uint8_t *data, const QString &text, size_t size, uint16_t fill) {
+  QByteArray buffer = text.toUtf8();
+  memset(data, fill, size);
+  memcpy(data, buffer.data(), std::min(size_t(buffer.size()), size));
 }
 
 double
