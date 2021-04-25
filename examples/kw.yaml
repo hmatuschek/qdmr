@@ -25,7 +25,7 @@ channels:
       admit: color-code
       color-code: 1
       time-slot: 1
-      group-list: gl_sa_th
+      group-list: gl_sath
       tx-contact: sa_th
       id: ch_lds2
 
@@ -65,6 +65,60 @@ channels:
       tx-contact: bb
       scan-list: scan_kw
       id: ch_lds5
+      # An example of a device specific extension. Here the mixed mode channel is configured
+      # where RX is also FM using CTCSS tone.
+      d878uv:
+        type: "dmr+fm"
+        tone: { ctcss: 67.0 }
+        squelch: 1
+
+  - digital:
+      name: "DM0TZN TS1"
+      rx: 438.82500
+      tx: -7.6
+      power: high
+      admit: color-code
+      color-code: 1
+      time-slot: 1
+      group-list: gl_dl
+      tx-contact: ww
+      id: ch_tzn6
+
+  - digital:
+      name: "TG8 DM0TZN TS2"
+      rx: 438.82500
+      tx: -7.6
+      power: high
+      admit: color-code
+      color-code: 1
+      time-slot: 2
+      group-list: gl_bb
+      tx-contact: reg
+      id: ch_tzn7
+
+  - digital:
+      name: "TG8 DM0TZN TS2"
+      rx: 438.82500
+      tx: -7.6
+      power: high
+      admit: color-code
+      color-code: 1
+      time-slot: 2
+      group-list: gl_bb
+      tx-contact: loc
+      id: ch_tzn8
+
+  - digital:
+      name: "BB DM0TZN TS2"
+      rx: 438.82500
+      tx: -7.6
+      power: high
+      admit: color-code
+      color-code: 1
+      time-slot: 2
+      group-list: gl_bb
+      tx-contact: bb
+      id: ch_tzn9
 
   - analog:
       name: "DB0LDS"
@@ -77,8 +131,18 @@ channels:
       tx-tone: {ctcss: 67.0}
       band-width: narrow
       scan-list: scan_kw
+      aprs: pos_aprs
       id: ch_lds75
 
+  - analog:
+      name: "APRS"
+      rx: 144.80000
+      power: high
+      admit: free
+      squelch: 1
+      band-width: narrow
+      aprs: pos_aprs
+      id: ch_aprs103
 
 zones:
   - name: "KW"
@@ -129,3 +193,26 @@ group-lists:
   - { name: "Hessen", members: [loc, reg, he], id: gl_he }
   - { name: "Simplex", members: [loc, all, simp99], id: gl_sim }
 
+
+positioning:
+  - dmr:
+      name: "BM ARPS"
+      destination: bm_aprs
+      period: 300
+      id: pos_dmr
+  - aprs:
+      name: "APRS APAT81"
+      period: 300
+      channel: ch_aprs103
+      source: "DM3MAT-7"
+      destination: "APAT81-0"
+      path: ["WIDE1-1","WIDE2-1"]
+      icon: "Jogger"
+      message: "Y07"
+      id: pos_aprs
+
+
+roaming:
+  - name: "Berlin/Brand"
+    channels: [ch_lds5, ch_tzn9]
+    id: roam_bb

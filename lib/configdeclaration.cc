@@ -1,6 +1,7 @@
 #include "configdeclaration.hh"
 #include "logger.hh"
 
+
 inline QString nodeTypeName(const YAML::Node &node) {
   QString type = QObject::tr("Null");
   switch (node.Type()) {
@@ -38,6 +39,11 @@ ConfigDeclItem::isMandatory() const {
   return _mandatory;
 }
 
+bool
+ConfigDeclItem::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ConfigDeclScalar
@@ -49,7 +55,7 @@ ConfigDeclScalar::ConfigDeclScalar(bool mandatory, const QString &description, Q
 }
 
 bool
-ConfigDeclScalar::verifyForm(const YAML::Node &node, QString &msg) const {
+ConfigDeclScalar::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
   if (! node.IsScalar()) {
     msg = tr("Expected scalar, got %1.").arg(nodeTypeName(node));
     return false;
@@ -68,8 +74,8 @@ ConfigDeclBool::ConfigDeclBool(bool mandatory, const QString &description, QObje
 }
 
 bool
-ConfigDeclBool::verifyForm(const YAML::Node &node, QString &msg) const {
-  if (! ConfigDeclScalar::verifyForm(node, msg))
+ConfigDeclBool::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! ConfigDeclScalar::verifyForm(node, ctx, msg))
     return false;
   QString val = QString::fromStdString(node.as<std::string>());
   if (("true" != val) && ("false" != val)) {
@@ -101,8 +107,8 @@ ConfigDeclInt::maximum() const {
 }
 
 bool
-ConfigDeclInt::verifyForm(const YAML::Node &node, QString &msg) const {
-  if (! ConfigDeclScalar::verifyForm(node, msg))
+ConfigDeclInt::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! ConfigDeclScalar::verifyForm(node, ctx, msg))
     return false;
   qint64 val = node.as<qint64>();
   if ((val < _min) || (val>_max)) {
@@ -145,8 +151,8 @@ ConfigDeclFloat::maximum() const {
 }
 
 bool
-ConfigDeclFloat::verifyForm(const YAML::Node &node, QString &msg) const {
-  if (! ConfigDeclScalar::verifyForm(node, msg))
+ConfigDeclFloat::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! ConfigDeclScalar::verifyForm(node, ctx, msg))
     return false;
   double val = node.as<double>();
   if ((val < _min) || (val>_max)) {
@@ -168,8 +174,8 @@ ConfigDeclStr::ConfigDeclStr(bool mandatory, const QString &description, QObject
 }
 
 bool
-ConfigDeclStr::verifyForm(const YAML::Node &node, QString &msg) const {
-  if (! ConfigDeclScalar::verifyForm(node, msg))
+ConfigDeclStr::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! ConfigDeclScalar::verifyForm(node, ctx, msg))
     return false;
   return true;
 }
@@ -185,8 +191,8 @@ ConfigDeclID::ConfigDeclID(bool mandatory, const QString &description, QObject *
 }
 
 bool
-ConfigDeclID::verifyForm(const YAML::Node &node, QString &msg) const {
-  if (! ConfigDeclStr::verifyForm(node, msg))
+ConfigDeclID::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! ConfigDeclStr::verifyForm(node, ctx, msg))
     return false;
   QString value = QString::fromStdString(node.as<std::string>());
   QRegExp pattern("^[a-zA-Z_]+[a-zA-Z0-9_]*$");
@@ -194,6 +200,11 @@ ConfigDeclID::verifyForm(const YAML::Node &node, QString &msg) const {
     msg = tr("Identifier '%1' does not match pattern '%2'.").arg(value).arg(pattern.pattern());
     return false;
   }
+  if (ctx.contains(value)) {
+    msg = tr("Identifier '%1' already defined.").arg(value);
+    return false;
+  }
+  ctx.insert(value);
   return true;
 }
 
@@ -208,13 +219,23 @@ ConfigDeclRef::ConfigDeclRef(bool mandatory, const QString &description, QObject
 }
 
 bool
-ConfigDeclRef::verifyForm(const YAML::Node &node, QString &msg) const {
-  if (! ConfigDeclStr::verifyForm(node, msg))
+ConfigDeclRef::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! ConfigDeclStr::verifyForm(node, ctx, msg))
     return false;
   QString value = QString::fromStdString(node.as<std::string>());
   QRegExp pattern("^[a-zA-Z_]+[a-zA-Z0-9_]*$");
   if (! pattern.exactMatch(value)) {
     msg = tr("Reference '%1' does not match pattern '%2'.").arg(value).arg(pattern.pattern());
+    return false;
+  }
+  return true;
+}
+
+bool
+ConfigDeclRef::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
+  QString value = QString::fromStdString(node.as<std::string>());
+  if (! ctx.contains(value)) {
+    msg = tr("Reference '%1' is not defined.").arg(value);
     return false;
   }
   return true;
@@ -237,8 +258,8 @@ ConfigDeclEnum::possibleValues() const {
 }
 
 bool
-ConfigDeclEnum::verifyForm(const YAML::Node &node, QString &msg) const {
-  if (! ConfigDeclScalar::verifyForm(node, msg))
+ConfigDeclEnum::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! ConfigDeclScalar::verifyForm(node, ctx, msg))
     return false;
   QString value = QString::fromStdString(node.as<std::string>());
   if (! _values.contains(value)) {
@@ -277,7 +298,7 @@ ConfigDeclDispatch::add(const QString &name, ConfigDeclItem *element) {
 }
 
 bool
-ConfigDeclDispatch::verifyForm(const YAML::Node &node, QString &msg) const {
+ConfigDeclDispatch::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
   if (! node.IsMap()) {
     msg = tr("Expected dispatch, got %1.").arg(nodeTypeName(node));
     return false;
@@ -294,7 +315,19 @@ ConfigDeclDispatch::verifyForm(const YAML::Node &node, QString &msg) const {
     return false;
   }
 
-  if (! _elements[ename]->verifyForm(it->second, msg)) {
+  if (! _elements[ename]->verifyForm(it->second, ctx, msg)) {
+    msg = tr("Element '%1': %2").arg(ename).arg(msg);
+    return false;
+  }
+
+  return true;
+}
+
+bool
+ConfigDeclDispatch::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
+  YAML::const_iterator it = node.begin();
+  QString ename = QString::fromStdString(it->first.as<std::string>());
+  if (! _elements[ename]->verifyReferences(it->second, ctx, msg)) {
     msg = tr("Element '%1': %2").arg(ename).arg(msg);
     return false;
   }
@@ -329,7 +362,7 @@ ConfigDeclObj::add(const QString &name, ConfigDeclItem *element) {
 }
 
 bool
-ConfigDeclObj::verifyForm(const YAML::Node &node, QString &msg) const {
+ConfigDeclObj::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
   if (! node.IsMap()) {
     msg = tr("Expected object, got %1.").arg(nodeTypeName(node));
     return false;
@@ -342,7 +375,7 @@ ConfigDeclObj::verifyForm(const YAML::Node &node, QString &msg) const {
       logWarn() << tr("Unkown element '%1'.").arg(ename);
       continue;
     }
-    if (! _elements[ename]->verifyForm(it->second, msg)) {
+    if (! _elements[ename]->verifyForm(it->second, ctx, msg)) {
       msg = tr("Element '%1': %2").arg(ename).arg(msg);
       return false;
     }
@@ -360,6 +393,20 @@ ConfigDeclObj::verifyForm(const YAML::Node &node, QString &msg) const {
   return true;
 }
 
+bool
+ConfigDeclObj::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
+  for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
+    QString ename = QString::fromStdString(it->first.as<std::string>());
+    if (! _elements.contains(ename))
+      continue;
+    if (! _elements[ename]->verifyReferences(it->second, ctx, msg)) {
+      msg = tr("Element '%1': %2").arg(ename).arg(msg);
+      return false;
+    }
+  }
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ConfigDeclList
@@ -371,7 +418,7 @@ ConfigDeclList::ConfigDeclList(ConfigDeclItem *element, const QString &descripti
 }
 
 bool
-ConfigDeclList::verifyForm(const YAML::Node &node, QString &msg) const {
+ConfigDeclList::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
   if (! node.IsSequence()) {
     msg = tr("Expected list, got %2.").arg(nodeTypeName(node));
     return false;
@@ -383,7 +430,18 @@ ConfigDeclList::verifyForm(const YAML::Node &node, QString &msg) const {
   }
 
   for (size_t i=0; i<node.size(); i++) {
-    if (! _element->verifyForm(node[i], msg)) {
+    if (! _element->verifyForm(node[i], ctx, msg)) {
+      msg = tr("List element %1: %2").arg(i).arg(msg);
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+ConfigDeclList::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
+  for (size_t i=0; i<node.size(); i++) {
+    if (! _element->verifyReferences(node[i], ctx, msg)) {
       msg = tr("List element %1: %2").arg(i).arg(msg);
       return false;
     }
@@ -492,6 +550,47 @@ ConfigDeclDigitalChannel::ConfigDeclDigitalChannel(bool mandatory, const QString
 
 
 /* ********************************************************************************************* *
+ * Implementation of ConfigDeclPositioning
+ * ********************************************************************************************* */
+ConfigDeclPositioning::ConfigDeclPositioning(bool mandatory, const QString &description, QObject *parent)
+  : ConfigDeclObj(QHash<QString, ConfigDeclItem *>(), mandatory, description, parent)
+{
+  add("name", new ConfigDeclStr(true, tr("Specifies the name of the positioning system.")));
+  add("id", new ConfigDeclID(true, tr("Specifies the id of the positioning system for reference within the codeplug.")));
+  add("period", new ConfigDeclInt(1, 1000, true, tr("Specifies the update period in seconds.")));
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of ConfigDeclDMRPos
+ * ********************************************************************************************* */
+ConfigDeclDMRPos::ConfigDeclDMRPos(bool mandatory, const QString &description, QObject *parent)
+  : ConfigDeclPositioning(mandatory, description, parent)
+{
+  add("destination", new ConfigDeclRef(true, tr("Specifies the destination contact.")));
+  add("channel", new ConfigDeclRef(false, tr("Specifies the optional revert channel.")));
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of ConfigDeclAPRSPos
+ * ********************************************************************************************* */
+ConfigDeclAPRSPos::ConfigDeclAPRSPos(bool mandatory, const QString &description, QObject *parent)
+  : ConfigDeclPositioning(mandatory, description, parent)
+{
+  add("source", new ConfigDeclStr(true, tr("Specifies the source call and SSID.")));
+  add("destination", new ConfigDeclStr(true, tr("Specifies the destination call and SSID.")));
+  add("channel", new ConfigDeclRef(true, tr("Specifies the optional revert channel.")));
+  add("path", new ConfigDeclList(
+        new ConfigDeclStr(false, tr("Specifies a path element of the APRS packet.")),
+        tr("Specifies the APRS path as a list.")));
+  add("icon", new ConfigDeclStr(true, tr("Specifies the icon name.")));
+  add("message", new ConfigDeclStr(false, tr("Specifies the optional APRS message.")));
+}
+
+
+
+/* ********************************************************************************************* *
  * Implementation of ConfigDeclaration
  * ********************************************************************************************* */
 ConfigDeclaration::ConfigDeclaration(QObject *parent)
@@ -552,5 +651,22 @@ ConfigDeclaration::ConfigDeclaration(QObject *parent)
                              tr("The list of group calls forming the group list."))} },
                           true, tr("Defines a RX group list.")),
         tr("Lists all RX group lists within the codeplug.")));
+
+  add("positioning",
+      new ConfigDeclList(
+        new ConfigDeclDispatch({ {"dmr", new ConfigDeclDMRPos(true, tr("Specifies a DMR positioning system."))},
+                                 {"aprs", new ConfigDeclAPRSPos(true, tr("Specifies an APRS positioning system."))} },
+                               false),
+        tr("List of all positioning systems.")));
+
 }
 
+bool
+ConfigDeclaration::verify(const YAML::Node &doc, QString &message) {
+  QSet<QString> ctx;
+  if (! this->verifyForm(doc, ctx, message))
+    return false;
+  if (! this->verifyReferences(doc, ctx, message))
+    return false;
+  return true;
+}

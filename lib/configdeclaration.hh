@@ -35,7 +35,8 @@ public:
   /** Returns @c true if the item is mandatory for a complete config. */
   bool isMandatory() const;
 
-  virtual bool verifyForm(const YAML::Node &node, QString &msg) const = 0;
+  virtual bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const = 0;
+  virtual bool verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const;
 
 protected:
   /** Holds the description of the item. */
@@ -54,8 +55,7 @@ Q_OBJECT
 protected:
   ConfigDeclScalar(bool mandatory, const QString &description="", QObject *parent=nullptr);
 
-public:
-  bool verifyForm(const YAML::Node &node, QString &msg) const;
+  bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
 };
 
 
@@ -68,7 +68,7 @@ Q_OBJECT
 public:
   ConfigDeclBool(bool mandatory, const QString &description="", QObject *parent=nullptr);
 
-  bool verifyForm(const YAML::Node &node, QString &msg) const;
+  bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
 };
 
 
@@ -85,7 +85,7 @@ public:
   qint64 mininum() const;
   qint64 maximum() const;
 
-  bool verifyForm(const YAML::Node &node, QString &msg) const;
+  bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
 
 protected:
   qint64 _min;
@@ -117,7 +117,7 @@ public:
   double mininum() const;
   double maximum() const;
 
-  bool verifyForm(const YAML::Node &node, QString &msg) const;
+  bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
 
 protected:
   double _min;
@@ -134,7 +134,7 @@ class ConfigDeclStr: public ConfigDeclScalar
 public:
   ConfigDeclStr(bool mandatory, const QString &description="", QObject *parent=nullptr);
 
-  bool verifyForm(const YAML::Node &node, QString &msg) const;
+  bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
 };
 
 
@@ -145,7 +145,7 @@ class ConfigDeclID: public ConfigDeclStr
 public:
   ConfigDeclID(bool mandatory, const QString &description="", QObject *parent=nullptr);
 
-  bool verifyForm(const YAML::Node &node, QString &msg) const;
+  bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
 };
 
 
@@ -156,7 +156,8 @@ class ConfigDeclRef: public ConfigDeclStr
 public:
   ConfigDeclRef(bool mandatory, const QString &description="", QObject *parent=nullptr);
 
-  bool verifyForm(const YAML::Node &node, QString &msg) const;
+  bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
+  bool verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const;
 };
 
 
@@ -172,7 +173,7 @@ public:
 
   const QSet<QString> &possibleValues() const;
 
-  bool verifyForm(const YAML::Node &node, QString &msg) const;
+  bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
 
 protected:
   QSet<QString> _values;
@@ -189,7 +190,8 @@ public:
 
   bool add(const QString &name, ConfigDeclItem *element);
 
-  bool verifyForm(const YAML::Node &node, QString &msg) const;
+  bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
+  bool verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const;
 
 protected:
   QHash<QString, ConfigDeclItem *> _elements;
@@ -208,7 +210,8 @@ public:
 
   bool add(const QString &name, ConfigDeclItem *element);
 
-  bool verifyForm(const YAML::Node &node, QString &msg) const;
+  bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
+  bool verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const;
 
 protected:
   QSet<QString> _mandatoryElements;
@@ -225,7 +228,8 @@ Q_OBJECT
 public:
   ConfigDeclList(ConfigDeclItem *element, const QString &description="", QObject *parent=nullptr);
 
-  bool verifyForm(const YAML::Node &node, QString &msg) const;
+  bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
+  bool verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const;
 
 protected:
   ConfigDeclItem *_element;
@@ -292,6 +296,31 @@ public:
 };
 
 
+class ConfigDeclPositioning: public ConfigDeclObj
+{
+  Q_OBJECT
+
+protected:
+  ConfigDeclPositioning(bool mandatory, const QString &description="", QObject *parent=nullptr);
+};
+
+class ConfigDeclDMRPos: public ConfigDeclPositioning
+{
+  Q_OBJECT
+
+public:
+  ConfigDeclDMRPos(bool mandatory, const QString &description="", QObject *parent=nullptr);
+};
+
+class ConfigDeclAPRSPos: public ConfigDeclPositioning
+{
+  Q_OBJECT
+
+public:
+  ConfigDeclAPRSPos(bool mandatory, const QString &description="", QObject *parent=nullptr);
+};
+
+
 class ConfigDeclaration: public ConfigDeclObj
 {
   Q_OBJECT
@@ -299,6 +328,7 @@ class ConfigDeclaration: public ConfigDeclObj
 public:
   explicit ConfigDeclaration(QObject *parent = nullptr);
 
+  virtual bool verify(const YAML::Node &doc, QString &message);
 };
 
 #endif // CONFIGDECLARATION_HH

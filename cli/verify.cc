@@ -48,7 +48,7 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     YAML::Node doc = YAML::LoadFile(filename.toStdString());
     ConfigDeclaration confDecl;
     QString errMessage;
-    if (! confDecl.verifyForm(doc, errMessage)) {
+    if (! confDecl.verify(doc, errMessage)) {
       logError() << "Verification of config in '" << filename << "' failed!" ;
       logError() << errMessage;
       return -1;
