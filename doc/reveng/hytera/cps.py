@@ -6,6 +6,7 @@ from section import read_codeplug_sections
 from contact import print_contacts
 from digital_channel import print_digital_channels
 from zone import print_zones
+from scan_list import print_scanlists
 
 
 def dump_cp_memory(reader: CPReader, args) -> None:
@@ -27,6 +28,8 @@ def go(reader: CPReader, args):
         print_zones(cp)
     elif args.command == "printDigitalChannels":
         print_digital_channels(cp)
+    elif args.command == "printScanLists":
+        print_scanlists(cp)
     elif args.command == "printSections":
         for section in cp.values():
             print(section)
@@ -70,6 +73,9 @@ if __name__ == "__main__":
 
     dumpZonesParser = subparsers.add_parser(
         "printZones", help="Read codeplug zones and print to table.")
+
+    scanListsParser = subparsers.add_parser(
+        "printScanLists", help="Read codeplug scanlists and print.")
 
     dumpDigitalChannelParser = subparsers.add_parser(
         "printDigitalChannels", help="Dump digitial channels")

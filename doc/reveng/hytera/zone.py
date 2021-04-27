@@ -1,35 +1,9 @@
 import struct
-from typing import Dict, List, Any
+from typing import Dict, List
 from section import CPSSection
 from util import chunks
 from digital_channel import parse_digital_channels
-
-
-class ZonePointer:
-    """Represents a pointer from to a channel in a zone list."""
-    STRUCT_FMT = "<HH"
-
-    def __init__(self, data: bytes) -> None:
-        fields = struct.unpack(ZonePointer.STRUCT_FMT, data)
-        self.addr = fields[0]
-
-        assert self.addr != 0
-
-        assert fields[1] <= 1
-
-        self.is_analog = bool(fields[1])
-
-    def __eq__(self, o: Any) -> bool:
-        if not isinstance(o, ZonePointer):
-            return False
-
-        return (o.addr == self.addr and
-                o.is_analog == self.is_analog)
-
-    @staticmethod
-    def size() -> int:
-        """Return the size of the element in the codeplug."""
-        return struct.calcsize(ZonePointer.STRUCT_FMT)
+from channel_pointer import ChannelPointer
 
 
 class ZoneName:
@@ -41,7 +15,7 @@ class ZoneName:
         self.name = fields[0].decode('utf-8')
         self.num_channels = fields[1]
         self.list_byte_check = fields[2:]
-        self.pointers: List[ZonePointer] = []
+        self.pointers: List[ChannelPointer] = []
 
     @staticmethod
     def size() -> int:
@@ -70,13 +44,13 @@ def parse_zones(cps: Dict[int, CPSSection]) -> Dict[int, ZoneName]:
     zp_data = zp_section.data[14:]
 
     def read_zp_list(zp_data: bytes, idx: int,
-                     zone: ZoneName) -> List[ZonePointer]:
+                     zone: ZoneName) -> List[ChannelPointer]:
         start_addr = i * 0xe0e
 
         # Each zone list pointer is duplicated in the list, apart from the first
         # one.
         num_elements = zone.num_channels * 2 - 1
-        end_addr = start_addr + ZonePointer.size() * num_elements
+        end_addr = start_addr + ChannelPointer.size() * num_elements
         data = zp_data[start_addr:end_addr]
 
         # Ensure that the bytes listed in the zone name match those in the zone
@@ -85,8 +59,8 @@ def parse_zones(cps: Dict[int, CPSSection]) -> Dict[int, ZoneName]:
 
         pointers = []
 
-        for ptr_data in chunks(data, ZonePointer.size()):
-            pointers.append(ZonePointer(ptr_data))
+        for ptr_data in chunks(data, ChannelPointer.size()):
+            pointers.append(ChannelPointer(ptr_data))
 
         # Other than the first entry, all others appear to be duplicated. Check tha
         # assertion and only yield de-duped entries.
