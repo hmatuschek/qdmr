@@ -19,9 +19,13 @@ public:
   /** Returns the wrapped config. */
   Config *config() const;
 
+  /** Returns @c true if the radio DMR ID of given index is set.*/
   bool hasRadioId(int index) const;
+  /** Stores the given ID at the specified index as the default radio ID. */
   bool setDefaultRadioId(uint32_t id, int index);
+  /** Adds the given radio ID at the given index to the list. */
   bool addRadioId(uint32_t id, int index);
+  /** Maps the given index to the associated radio ID. */
   RadioID *getRadioId(int idx) const;
 
   /** Returns @c true, if the given channel index has been defined before. */
