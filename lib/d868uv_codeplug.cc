@@ -471,7 +471,11 @@ D868UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
       dc->setPosSystem(ctx.getGPSSystem(gps_system));
 
     // Link radio ID
-    dc->setRadioId(ctx.getRadioId(id_index));
+    RadioID *rid = ctx.getRadioId(id_index);
+    if (rid == ctx.config()->radioIDs()->getDefaultId())
+      dc->setRadioId(nullptr);
+    else
+      dc->setRadioId(rid);
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
     AnalogChannel *ac = c->as<AnalogChannel>();
@@ -1639,13 +1643,13 @@ D868UVCodeplug::allocateRadioIDs() {
 bool
 D868UVCodeplug::encodeRadioID(Config *config, const Flags &flags) {
   // Encode radio IDs
-  radioid_t *radio_ids = (radioid_t *)data(ADDR_RADIOIDS);
   for (int i=0; i<config->radioIDs()->count(); i++) {
-    radio_ids[i].setId(config->radioIDs()->getId(i)->id());
+    radioid_t *radio_id = (radioid_t *)data(ADDR_RADIOIDS + i*RADIOID_SIZE);
+    radio_id->setId(config->radioIDs()->getId(i)->id());
     if (0 == i)
-      radio_ids[i].setName(config->name());
+      radio_id->setName(config->name());
     else
-      radio_ids[i].setName(config->name()+" "+QString::number(i));
+      radio_id->setName(config->name()+" "+QString::number(i));
   }
   return true;
 }
@@ -1653,18 +1657,19 @@ D868UVCodeplug::encodeRadioID(Config *config, const Flags &flags) {
 bool
 D868UVCodeplug::setRadioID(Config *config, CodeplugContext &ctx) {
   // Find a valid RadioID
-  uint8_t *radio_ids = data(ADDR_RADIOIDS);
   uint8_t *radio_id_bitmap = data(RADIOID_BITMAP);
   bool first = true;
   for (uint16_t i=0; i<NUM_RADIOIDS; i++) {
     if (0 == (radio_id_bitmap[i/8] & (1 << (i%8))))
       continue;
-    radioid_t *id = (radioid_t *)(radio_ids+i*sizeof(radioid_t));
+    radioid_t *id = (radioid_t *)data(ADDR_RADIOIDS + i*RADIOID_SIZE);
     if (first) {
+      logDebug() << "Store id " << id->getId() << " at idx " << i << " as default ID.";
       ctx.setDefaultRadioId(id->getId(), i);
       config->setName(id->getName());
       first = false;
     } else {
+      logDebug() << "Store id " << id->getId() << " at idx " << i << ".";
       ctx.addRadioId(id->getId(), i);
     }
   }

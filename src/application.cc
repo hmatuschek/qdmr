@@ -699,12 +699,14 @@ Application::onConfigModifed() {
     return;
 
   QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
+  QComboBox *dmrID  = _mainWindow->findChild<QComboBox*>("dmrID");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
 
   rname->setText(_config->name());
+  dmrID->setCurrentIndex(0);
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
   mic->setValue(_config->micLevel());
