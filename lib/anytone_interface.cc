@@ -55,7 +55,7 @@ AnytoneInterface::WriteRequest::WriteRequest(uint32_t addr, const char *data) {
   cmd = 'W';
   this->addr = qToBigEndian(addr);
   size = 16;
-  memcpy(this->data, data, size);
+   memcpy(this->data, data, size);
   sum = 0;
   uint8_t *b=(uint8_t *)this;
   for (uint8_t i=1; i<(size+6); i++)

@@ -359,7 +359,8 @@ D878UV::upload() {
 
 
 bool
-D878UV::uploadCallsigns() {
+D878UV::uploadCallsigns()
+{
   _dev = new AnytoneInterface(this);
   if (! _dev->isOpen()) {
     _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());

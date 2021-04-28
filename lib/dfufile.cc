@@ -620,6 +620,11 @@ DFUFile::Image::sort() {
                    [](const Element &first, const Element &second) {
                      return first.address()<second.address();
                    });
+
+  // Rebuild address map
+  _addressmap.clear();
+  for (int i=0; i<_elements.size(); i++)
+    _addressmap.add(_elements[i].address(), _elements.size());
 }
 
 void
