@@ -1,0 +1,5 @@
+if (UNIX AND NOT APPLE)
+  configure_file("qdmr.desktop.in" "qdmr.desktop")
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/qdmr.desktop DESTINATION share/applications/)
+  install(FILES ${PROJECT_SOURCE_DIR}/dist/qdmr.png DESTINATION share/icons/hicolor/64x64/)
+endif(UNIX AND NOT APPLE)

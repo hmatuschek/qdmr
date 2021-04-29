@@ -86,6 +86,7 @@ add_subdirectory(lib)
 add_subdirectory(cli)
 add_subdirectory(src)
 add_subdirectory(doc)
+add_subdirectory(dist)
 
 if(BUILD_TESTS)
  enable_testing()

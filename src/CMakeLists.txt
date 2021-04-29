@@ -24,8 +24,3 @@ target_link_libraries(qdmr ${LIBS} libdmrconf)
 target_include_directories(qdmr PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 install(TARGETS qdmr DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 
-if (UNIX AND NOT APPLE)
-  install(FILES ${PROJECT_SOURCE_DIR}/dist/qdmr.desktop DESTINATION share/applications/)
-  install(FILES ${PROJECT_SOURCE_DIR}/dist/qdmr.png DESTINATION share/icons/hicolor/64x64/)
-endif(UNIX AND NOT APPLE)
-

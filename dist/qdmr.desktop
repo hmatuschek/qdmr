@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=QDMR	
-GenericName=Code-plug programming software for DMR radios.
-Comment=A universal code-plug programming software for DMR radios. 
-Exec=qdmr
-Icon=qdmr.png
-Type=Application
-Categories=Application;Network;Ham-Radio;
-Terminal=false
