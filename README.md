@@ -28,13 +28,10 @@ own these radios to test the software with.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
 
- * **[Version 0.7.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.7.1)** -- Bugfix release.
+ * **[Version 0.7.2](https://github.com/hmatuschek/qdmr/releases/tag/v0.7.2)** -- Bugfix release.
  * **[Version 0.7.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.7.0)** -- Added AT-D868UVE support and many bugfixes.
- * **[Version 0.6.4](https://github.com/hmatuschek/qdmr/releases/tag/v0.6.4)** -- A lot of bugfixes and minor improvements.
- * **[Version 0.5.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.5.3)** -- Fixed detection of TYT MD-UV390 radios.
- * **[Version 0.5.2](https://github.com/hmatuschek/qdmr/releases/tag/v0.5.2)** -- Added call-sign database support for OpenGD77.
+ * **[Version 0.6.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.6.4)** -- Added APRS & roaming for AT-D878UV.
  * **[Version 0.5.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.5.0)** -- Added support for Anytone AT-D878UV.
- * **[Version 0.4.7](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.7)** -- Feature release.
  * **[Version 0.4.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.0)** -- Added Open GD77 support.
  * **[Version 0.2.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.2.1)** -- First public release.
 
