@@ -3,6 +3,7 @@ from typing import Dict, List
 from section import CPSSection
 from util import chunks
 from digital_channel import parse_digital_channels
+from analog_channel import parse_analog_channels
 from channel_pointer import ChannelPointer
 
 
@@ -89,14 +90,17 @@ def parse_zones(cps: Dict[int, CPSSection]) -> Dict[int, ZoneName]:
 
 def print_zones(cps: Dict[int, CPSSection]) -> None:
     zones = parse_zones(cps)
-    channels = parse_digital_channels(cps)
+    dig_channels = parse_digital_channels(cps)
+    ana_channels = parse_analog_channels(cps)
 
     for zone in zones.values():
         print("Zone: {}".format(zone.name))
 
         for ptr in zone.pointers:
             if ptr.is_analog:
-                print("  <ANALOG_CHANNEL>")
+                print("  Addr: {} channel: {}".format(ptr.addr,
+                                                      ana_channels[ptr.addr - 1].name))
+
             else:
                 print("  Addr: {} channel: {}".format(ptr.addr,
-                                                      channels[ptr.addr - 1].name))
+                                                      dig_channels[ptr.addr - 1].name))

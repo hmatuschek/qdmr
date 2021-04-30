@@ -5,6 +5,7 @@ from radio import CPSRadio
 from section import read_codeplug_sections
 from contact import print_contacts
 from digital_channel import print_digital_channels
+from analog_channel import print_analog_channels
 from zone import print_zones
 from scan_list import print_scanlists
 
@@ -28,6 +29,8 @@ def go(reader: CPReader, args):
         print_zones(cp)
     elif args.command == "printDigitalChannels":
         print_digital_channels(cp)
+    elif args.command == "printAnalogChannels":
+        print_analog_channels(cp)
     elif args.command == "printScanLists":
         print_scanlists(cp)
     elif args.command == "printSections":
@@ -79,6 +82,9 @@ if __name__ == "__main__":
 
     dumpDigitalChannelParser = subparsers.add_parser(
         "printDigitalChannels", help="Dump digitial channels")
+
+    printAnalogChannelParser = subparsers.add_parser(
+        "printAnalogChannels", help="print analog channels")
 
     parsedArgs = parser.parse_args()
 
