@@ -44,9 +44,13 @@
 #define ANALOGCONTACT_BANK_0      0x02940000
 #define ANALOGCONTACT_BANK_SIZE   0x00000030
 #define ANALOGCONTACT_INDEX_LIST  0x02900000 // Address of analog contact index list
-#define ANALOGCONTACT_LIST_SIZE   0x00000080 // Address of analog contact index list
-#define ANALOGCONTACT_BITMAP      0x02900100 // Address of contact bytemap
-#define ANALOGCONTACT_BITMAP_SIZE 0x00000080 // Size of contact bytemap
+#define ANALOGCONTACT_LIST_SIZE   0x00000080 // Size of analog contact index list
+#define ANALOGCONTACT_BYTEMAP     0x02900100 // Address of contact bytemap
+#define ANALOGCONTACT_BYTEMAP_SIZE 0x00000080 // Size of contact bytemap
+#define ANALOGCONTACT_SIZE        0x00000018 // Size of analog contact
+static_assert(
+  ANALOGCONTACT_SIZE == sizeof(D868UVCodeplug::analog_contact_t),
+  "D868UVCodeplug::analog_contact_t size check failed.");
 
 #define NUM_RXGRP                 250        // Total number of RX group lists
 #define ADDR_RXGRP_0              0x02980000 // Address of the first RX group list.
@@ -1283,8 +1287,8 @@ D868UVCodeplug::D868UVCodeplug(QObject *parent)
   image(0).addElement(ZONE_BITMAPS, ZONE_BITMAPS_SIZE);
   // Contacts bitmap
   image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
-  // Analog contacts bitmap
-  image(0).addElement(ANALOGCONTACT_BITMAP, ANALOGCONTACT_BITMAP_SIZE);
+  // Analog contacts bytemap
+  image(0).addElement(ANALOGCONTACT_BYTEMAP, ANALOGCONTACT_BYTEMAP_SIZE);
   // RX group list bitmaps
   image(0).addElement(RXGRP_BITMAP, RXGRP_BITMAP_SIZE);
   // Scan list bitmaps
@@ -1320,7 +1324,6 @@ D868UVCodeplug::allocateUpdated() {
   this->allocateBootSettings();
 
   this->allocateGPSSystems();
-  this->allocateAnalogContacts();
 
   this->allocateSMSMessages();
   this->allocateHotKeySettings();
@@ -1346,6 +1349,7 @@ D868UVCodeplug::allocateForEncoding() {
   this->allocateChannels();
   this->allocateZones();
   this->allocateContacts();
+  this->allocateAnalogContacts();
   this->allocateRXGroupLists();
   this->allocateScanLists();
   this->allocateRadioIDs();
@@ -1383,7 +1387,7 @@ D868UVCodeplug::setBitmaps(Config *config)
   // Mark valid channels (set bit)
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
   memset(channel_bitmap, 0, CHANNEL_BITMAP_SIZE);
-  for (int i=0; i<config->channelList()->count(); i++) {
+  for (int i=0; i<std::min(NUM_CHANNELS, config->channelList()->count()); i++) {
     channel_bitmap[i/8] |= (1 << (i%8));
   }
 
@@ -1391,14 +1395,21 @@ D868UVCodeplug::setBitmaps(Config *config)
   uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
   memset(contact_bitmap, 0x00, CONTACTS_BITMAP_SIZE);
   memset(contact_bitmap, 0xff, NUM_CONTACTS/8+1);
-  for (int i=0; i<config->contacts()->digitalCount(); i++) {
+  for (int i=0; i<std::min(NUM_CONTACTS, config->contacts()->digitalCount()); i++) {
     contact_bitmap[i/8] &= ~(1 << (i%8));
+  }
+
+  // Mark valid analog contacts (clear bytes)
+  uint8_t *analog_contact_bitmap = data(ANALOGCONTACT_BYTEMAP);
+  memset(analog_contact_bitmap, 0xff, ANALOGCONTACT_BYTEMAP_SIZE);
+  for (int i=0; i<std::min(NUM_ANALOGCONTACTS, config->contacts()->dtmfCount()); i++) {
+    analog_contact_bitmap[i] = 0x00;
   }
 
   // Mark valid zones (set bits)
   uint8_t *zone_bitmap = data(ZONE_BITMAPS);
   memset(zone_bitmap, 0x00, ZONE_BITMAPS_SIZE);
-  for (int i=0,z=0; i<config->zones()->count(); i++) {
+  for (int i=0,z=0; i<std::min(NUM_ZONES, config->zones()->count()); i++) {
     zone_bitmap[z/8] |= (1 << (z%8)); z++;
     if (config->zones()->zone(i)->B()->count()) {
       zone_bitmap[z/8] |= (1 << (z%8)); z++;
@@ -1408,13 +1419,13 @@ D868UVCodeplug::setBitmaps(Config *config)
   // Mark group lists
   uint8_t *group_bitmap = data(RXGRP_BITMAP);
   memset(group_bitmap, 0x00, RXGRP_BITMAP_SIZE);
-  for (int i=0; i<config->rxGroupLists()->count(); i++)
+  for (int i=0; i<std::min(NUM_RXGRP, config->rxGroupLists()->count()); i++)
     group_bitmap[i/8] |= (1 << (i%8));
 
   // Mark scan lists
   uint8_t *scan_bitmap = data(SCAN_BITMAP);
   memset(scan_bitmap, 0x00, SCAN_BITMAP_SIZE);
-  for (int i=0; i<config->scanlists()->count(); i++) {
+  for (int i=0; i<std::min(NUM_SCAN_LISTS, config->scanlists()->count()); i++) {
     scan_bitmap[i/8] |= (1<<(i%8));
   }
 }
@@ -1436,6 +1447,8 @@ D868UVCodeplug::encode(Config *config, const Flags &flags)
     return false;
 
   if (! this->encodeContacts(config, flags))
+    return false;
+  if (! this->encodeAnalogContacts(config, flags))
     return false;
 
   if (! this->encodeRXGroupLists(config, flags))
@@ -1474,6 +1487,8 @@ D868UVCodeplug::decode(Config *config, CodeplugContext &ctx)
     return false;
 
   if (! this->createContacts(config, ctx))
+    return false;
+  if (! this->createAnalogContacts(config, ctx))
     return false;
 
   if (! this->createRXGroupLists(config, ctx))
@@ -1654,10 +1669,10 @@ D868UVCodeplug::createContacts(Config *config, CodeplugContext &ctx) {
 void
 D868UVCodeplug::allocateAnalogContacts() {
   /* Allocate analog contacts */
-  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BITMAP);
-  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
+  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BYTEMAP);
+  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i+=2) {
     // if disabled -> skip
-    if (0 == analog_contact_bytemap[i])
+    if (0xff == analog_contact_bytemap[i])
       continue;
     uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
     if (nullptr == data(addr, 0)) {
@@ -1669,22 +1684,27 @@ D868UVCodeplug::allocateAnalogContacts() {
 
 bool
 D868UVCodeplug::encodeAnalogContacts(Config *config, const Flags &flags) {
+  uint8_t *idxlst = data(ANALOGCONTACT_INDEX_LIST);
+  memset(idxlst, 0xff, ANALOGCONTACT_LIST_SIZE);
   for (int i=0; i<config->contacts()->dtmfCount(); i++) {
-    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
+    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
+        + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
     analog_contact_t *cont = (analog_contact_t *)data(addr);
     cont->fromContact(config->contacts()->dtmfContact(i));
+    idxlst[i] = i;
   }
   return true;
 }
 
 bool
 D868UVCodeplug::createAnalogContacts(Config *config, CodeplugContext &ctx) {
-  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BITMAP);
+  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BYTEMAP);
   for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
     // if disabled -> skip
-    if (0 == analog_contact_bytemap[i])
+    if (0xff == analog_contact_bytemap[i])
       continue;
-    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
+    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
+        + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
     analog_contact_t *cont = (analog_contact_t *)data(addr);
     ctx.addAnalogContact(cont->toContact(), i);
   }
