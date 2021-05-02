@@ -260,6 +260,30 @@ encode_dtmf_bin(const QString &number, uint8_t *num, int size, uint8_t fill) {
   return true;
 }
 
+QString
+decode_dtmf_bcd_be(const uint8_t *num, int digits) {
+  QString number;
+  for (int i=0; i<digits; i++) {
+    uint8_t d = (0 == (i%2)) ? (((num[i/2])>>4)&0xf) : ((num[i/2])&0xf);
+    number.append(bin_dtmf_tab[d]);
+  }
+  return number;
+}
+
+bool
+encode_dtmf_bcd_be(const QString &number, uint8_t *num, int size, uint8_t fill) {
+  memset(num, fill, size);
+  QString tmp = number.simplified().toUpper();
+  for (int i=0; i<tmp.size(); i++) {
+    if (0 == (i%2)) {
+      num[i/2] = ((bin_dtmf_tab.indexOf(tmp[i].toLatin1()))<<4);
+    } else {
+      num[i/2] |= bin_dtmf_tab.indexOf(tmp[i].toLatin1());
+    }
+  }
+  return true;
+}
+
 Signaling::Code
 decode_ctcss_tone_table(uint16_t data) {
   if (data == 0xffff)

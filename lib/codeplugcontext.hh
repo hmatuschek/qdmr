@@ -42,6 +42,13 @@ public:
   /** Gets a digital contact for the specified index or @c nullptr if not defined. */
   DigitalContact *getDigitalContact(int index) const;
 
+  /** Returns @c true, if the given analog contact index has been defined before. */
+  bool hasAnalogContact(int index) const;
+  /** Adds a analog contact to the config and maps the given index to that contact. */
+  bool addAnalogContact(DTMFContact *con, int index);
+  /** Gets a analog contact for the specified index or @c nullptr if not defined. */
+  DTMFContact *getAnalogContact(int index) const;
+
   /** Returns @c true, if the given RX group list index has been defined before. */
   bool hasGroupList(int index) const;
   /** Adds a RX group list to the config and maps the given index to that group list. */
@@ -92,6 +99,8 @@ protected:
   QHash<int, int> _channelTable;
   /** Maps a code-plug digital-contact index to the contact index within the wrapped radio config. */
   QHash<int, int> _digitalContactTable;
+  /** Maps a code-plug analog-contact index to the contact index within the wrapped radio config. */
+  QHash<int, int> _analogContactTable;
   /** Maps a code-plug RX group-list index to the group-list index within the wrapped radio config. */
   QHash<int, int> _groupListTable;
   /** Maps a code-plug scan-list index to the scan-list index within the wrapped radio config. */

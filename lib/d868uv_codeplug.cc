@@ -233,7 +233,7 @@ D868UVCodeplug::ctcss_num2code(uint8_t num) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::channel_t
+ * Implementation of D868UVCodeplug::channel_t
  * ******************************************************************************************** */
 D868UVCodeplug::channel_t::channel_t() {
   clear();
@@ -586,7 +586,7 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::contact_t
+ * Implementation of D868UVCodeplug::contact_t
  * ******************************************************************************************** */
 D868UVCodeplug::contact_t::contact_t() {
   clear();
@@ -669,7 +669,53 @@ D868UVCodeplug::contact_t::fromContactObj(const DigitalContact *contact) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::grouplist_t
+ * Implementation of D868UVCodeplug::analog_contact_t
+ * ******************************************************************************************** */
+void
+D868UVCodeplug::analog_contact_t::clear() {
+  memset(number, 0, sizeof(number));
+  digits = 0;
+  memset(name, 0, sizeof(name));
+  pad47 = 0;
+}
+
+QString
+D868UVCodeplug::analog_contact_t::getNumber() const {
+  return decode_dtmf_bcd_be(number, digits);
+}
+
+bool
+D868UVCodeplug::analog_contact_t::setNumber(const QString &num) {
+  if (! validDTMFNumber(num))
+    return false;
+  digits = num.length();
+  return encode_dtmf_bcd_be(num, number, sizeof(number), 0);
+}
+
+QString
+D868UVCodeplug::analog_contact_t::getName() const {
+  return decode_ascii(name, sizeof(name), 0);
+}
+
+void
+D868UVCodeplug::analog_contact_t::setName(const QString &name) {
+  encode_ascii(this->name, name, sizeof(this->name), 0);
+}
+
+void
+D868UVCodeplug::analog_contact_t::fromContact(const DTMFContact *contact) {
+  setNumber(contact->number());
+  setName(contact->name());
+}
+
+DTMFContact *
+D868UVCodeplug::analog_contact_t::toContact() const {
+  return new DTMFContact(getName(), getNumber());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D868UVCodeplug::grouplist_t
  * ******************************************************************************************** */
 D868UVCodeplug::grouplist_t::grouplist_t() {
   clear();
@@ -737,7 +783,7 @@ D868UVCodeplug::grouplist_t::fromGroupListObj(const RXGroupList *lst, const Conf
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::scanlist_t
+ * Implementation of D868UVCodeplug::scanlist_t
  * ******************************************************************************************** */
 D868UVCodeplug::scanlist_t::scanlist_t() {
   clear();
@@ -848,7 +894,7 @@ D868UVCodeplug::scanlist_t::fromScanListObj(ScanList *lst, Config *config) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::radioid_t
+ * Implementation of D868UVCodeplug::radioid_t
  * ******************************************************************************************** */
 D868UVCodeplug::radioid_t::radioid_t() {
   clear();
@@ -926,7 +972,7 @@ D868UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::boot_settings_t
+ * Implementation of D868UVCodeplug::boot_settings_t
  * ******************************************************************************************** */
 void
 D868UVCodeplug::boot_settings_t::clear() {
@@ -1178,7 +1224,7 @@ D868UVCodeplug::gps_settings_t::linkGPSSystem(uint8_t i, Config *config, Codeplu
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::contact_map_t
+ * Implementation of D868UVCodeplug::contact_map_t
  * ******************************************************************************************** */
 D868UVCodeplug::contact_map_t::contact_map_t() {
   clear();
@@ -1619,6 +1665,30 @@ D868UVCodeplug::allocateAnalogContacts() {
     }
   }
   image(0).addElement(ANALOGCONTACT_INDEX_LIST, ANALOGCONTACT_LIST_SIZE);
+}
+
+bool
+D868UVCodeplug::encodeAnalogContacts(Config *config, const Flags &flags) {
+  for (int i=0; i<config->contacts()->dtmfCount(); i++) {
+    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
+    analog_contact_t *cont = (analog_contact_t *)data(addr);
+    cont->fromContact(config->contacts()->dtmfContact(i));
+  }
+  return true;
+}
+
+bool
+D868UVCodeplug::createAnalogContacts(Config *config, CodeplugContext &ctx) {
+  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BITMAP);
+  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
+    // if disabled -> skip
+    if (0 == analog_contact_bytemap[i])
+      continue;
+    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
+    analog_contact_t *cont = (analog_contact_t *)data(addr);
+    ctx.addAnalogContact(cont->toContact(), i);
+  }
+  return true;
 }
 
 

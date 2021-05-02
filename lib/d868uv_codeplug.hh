@@ -444,6 +444,22 @@ public:
     uint8_t digits;                     ///< Number of digits.
     uint8_t name[15];                   ///< Name, ASCII, upto 15 chars, 0-terminated & padded.
     uint8_t pad47;                      ///< Pad byte set to 0x00.
+
+    /** Clears the analog contact entry. */
+    void clear();
+    /** Returns the DTMF number. */
+    QString getNumber() const;
+    /** Sets the DTMF number. */
+    bool setNumber(const QString &num);
+    /** Returns the name. */
+    QString getName() const;
+    /** Sets the name. */
+    void setName(const QString &name);
+
+    /** Encodes an analog contact from the given one. */
+    void fromContact(const DTMFContact *contact);
+    /** Creates an analog contact from the entry. */
+    DTMFContact *toContact() const;
   };
 
   /** Represents the actual RX group list encoded within the binary code-plug.
@@ -1170,7 +1186,6 @@ public:
     void setIndex(uint32_t index);
   };
 
-
 public:
   /** Empty constructor. */
   explicit D868UVCodeplug(QObject *parent = nullptr);
@@ -1221,6 +1236,10 @@ protected:
 
   /** Allocate analog contacts from bitmaps. */
   virtual void allocateAnalogContacts();
+  /** Encode analog contacts into codeplug. */
+  virtual bool encodeAnalogContacts(Config *config, const Flags &flags);
+  /** Create analog contacts from codeplug. */
+  virtual bool createAnalogContacts(Config *config, CodeplugContext &ctx);
 
   /** Allocate radio IDs from bitmaps. */
   virtual void allocateRadioIDs();

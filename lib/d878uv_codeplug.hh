@@ -1108,6 +1108,73 @@ public:
     uint8_t _unused36[28];         ///< Unused, set to 0x00;
   };
 
+  /** Encodes some information about the radio and firmware.
+   *
+   * At 0x02fa0000, size 0x100.
+   *
+   * @verbinclude d878uvradioinfo.txt */
+  struct __attribute__((packed)) radio_info_t {
+    enum FrequencyRange : uint8_t {
+      FR_RX_400_480_136_174_TX_400_480_136_174 = 0,
+      FR_RX_400_480_136_174_TX_400_480_136_174_STEP_12_5kHz = 1,
+      FR_RX_430_440_136_174_TX_430_440_136_174 = 2,
+      FR_RX_400_480_136_174_TX_430_440_144_146 = 3,
+      FR_RX_440_480_136_174_TX_440_480_136_174 = 4,
+      FR_RX_440_480_144_146_TX_440_480_144_146 = 5,
+      FR_RX_446_447_136_174_TX_446_447_136_174 = 6,
+      FR_RX_400_480_136_174_TX_420_450_136_174 = 7,
+      FR_RX_400_470_136_174_TX_400_470_136_174 = 8,
+      FR_RX_430_432_144_146_TX_430_432_144_146 = 9,
+      FR_RX_400_480_136_174_TX_430_450_144_148 = 10,
+      FR_RX_400_520_136_174_TX_400_520_136_174 = 11,
+      FR_RX_400_490_136_174_TX_400_490_136_174 = 12,
+      FR_RX_400_480_136_174_TX_403_470_136_174 = 13,
+      FR_RX_400_520_220_225_136_174_TX_400_520_220_225_136_174 = 14,
+      FR_RX_420_520_144_148_TX_420_520_144_148 = 15,
+      FR_RX_430_440_144_147_TX_430_440_144_147 = 16,
+      FR_RX_430_440_136_174_TX_136_174 = 17
+    };
+
+    uint16_t _unknown00;           ///< Uknown informaion, usually 0x0000.
+    uint8_t  enable_full_test;     ///< Enables full test mode. DO NOT SET, MAY BRICK DEVICE.
+    FrequencyRange freq_range;     ///< Specifies the frequency range of the radio.
+    uint8_t enable_internat;       ///< None Chinese?!?
+    uint8_t _unknown05;            ///< Unknown information, usually set to 0x01.
+    uint8_t enable_band_select;    ///< Enable band select.
+    uint8_t _unknown07[4];         ///< Unknown information usually 0x00000101.
+    char band_select_passwd[4];    ///< Band select password. Set to 4 x 0x20 (space) by default.
+    uint8_t _unknown0f;            ///< Unknown information usually 0xff.
+
+    char radio_type[7];            ///< Radiotype as 0-terminated ASCII string.
+    uint16_t _unknown17;           ///< Unknown information usually 0x0001 LE.
+    uint8_t _unknown19[7];         ///< Unknown, usually filled with 0xff.
+
+    uint8_t _unkown20[8];          ///< Unknown, usually filled with 0xff.
+    char prog_passwd[4];           ///< Program password, 0-terminated ASCII string.
+    char area_code[4];             ///< Area code, 0-terminated ASCII string.
+
+    char serial_number[16];        ///< Serial number, 0-terminated ASCII string.
+
+    char production_date[10];      ///< Production date, 0-terminated ASCII string.
+    uint8_t _unused4a[6];          ///< Unused, filled with 0x00.
+
+    char maunfacture[8];           ///< Manufacture code, 0-terminated ASCII string.
+    uint8_t _unused58[8];          ///< Unused, filled with 0x00.
+    // 0x60
+    char maintained_date[16];      ///< Maintained date, 0-terminated ASCII string.
+    // 0x70
+    char dealer_code[16];          ///< Dealer code, 0-terminated ASCII string.
+    // 0x80
+    char stock_date[16];           ///< Stock date, 0-terminated ASCII string.
+    // 0x90
+    char sell_date[16];            ///< Sell date, 0-terminated ASCII string.
+    // 0xa0
+    char seller[16];               ///< Seller, 0-terminated ASCII string.
+    // 0xb0
+    char maintained_desc[0x80];    ///< Maintained date, 0-terminated ASCII string.
+  };
+
+
 public:
   /** Empty constructor. */
   explicit D878UVCodeplug(QObject *parent = nullptr);
