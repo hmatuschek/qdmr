@@ -135,6 +135,7 @@ Application::createMainWindow() {
   QAction *newCP   = _mainWindow->findChild<QAction*>("actionNewCodeplug");
   QAction *loadCP  = _mainWindow->findChild<QAction*>("actionOpenCodeplug");
   QAction *saveCP  = _mainWindow->findChild<QAction*>("actionSaveCodeplug");
+  QAction *refreshCallsignDB  = _mainWindow->findChild<QAction*>("actionRefreshCallsignDB");
 
   QAction *findDev = _mainWindow->findChild<QAction*>("actionDetectDevice");
   QAction *verCP   = _mainWindow->findChild<QAction*>("actionVerifyCodeplug");
@@ -150,6 +151,7 @@ Application::createMainWindow() {
   connect(newCP, SIGNAL(triggered()), this, SLOT(newCodeplug()));
   connect(loadCP, SIGNAL(triggered()), this, SLOT(loadCodeplug()));
   connect(saveCP, SIGNAL(triggered()), this, SLOT(saveCodeplug()));
+  connect(refreshCallsignDB, SIGNAL(triggered()), _users, SLOT(download()));
   connect(quit, SIGNAL(triggered()), this, SLOT(quitApplication()));
   connect(about, SIGNAL(triggered()), this, SLOT(showAbout()));
   connect(sett, SIGNAL(triggered()), this, SLOT(showSettings()));

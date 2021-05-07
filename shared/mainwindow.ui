@@ -975,6 +975,7 @@
     <addaction name="actionCodeplugWizard"/>
     <addaction name="actionOpenCodeplug"/>
     <addaction name="actionSaveCodeplug"/>
+    <addaction name="actionRefreshCallsignDB"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -1197,6 +1198,18 @@
    </property>
    <property name="toolTip">
     <string>Upload call-sign DB to radio.</string>
+   </property>
+  </action>
+  <action name="actionRefreshCallsignDB">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/people-2x.png</normaloff>:/icons/people-2x.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh Callsign DB</string>
+   </property>
+   <property name="toolTip">
+    <string>Refreshes the downloaded callsign DB</string>
    </property>
   </action>
  </widget>
