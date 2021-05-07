@@ -249,6 +249,7 @@ OpenGD77::download()
           emit downloadError(this);
           return;
         }
+        QThread::usleep(100);
         emit downloadProgress(float(bcount*100)/totb);
       }
     }
@@ -343,6 +344,7 @@ OpenGD77::upload() {
           emit uploadError(this);
           return;
         }
+        QThread::usleep(100);
         emit uploadProgress(float(bcount*50)/totb);
       }
     }
@@ -386,6 +388,7 @@ OpenGD77::upload() {
           emit uploadError(this);
           return;
         }
+        QThread::usleep(100);
         emit uploadProgress(float(bcount*50)/totb);
       }
     }
