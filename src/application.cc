@@ -142,6 +142,10 @@ Application::createMainWindow() {
   QAction *upCP    = _mainWindow->findChild<QAction*>("actionUpload");
   QAction *upCDB   = _mainWindow->findChild<QAction*>("actionUploadCallsignDB");
 
+  QAction *refreshCallsignDB  = _mainWindow->findChild<QAction*>("actionRefreshCallsignDB");
+  QAction *refreshTalkgroupDB  = _mainWindow->findChild<QAction*>("actionRefreshTalkgroupDB");
+  QAction *refreshRepeaterDB  = _mainWindow->findChild<QAction*>("actionRefreshRepeaterDB");
+
   QAction *about   = _mainWindow->findChild<QAction*>("actionAbout");
   QAction *sett    = _mainWindow->findChild<QAction*>("actionSettings");
   QAction *help    = _mainWindow->findChild<QAction*>("actionHelp");
@@ -154,6 +158,10 @@ Application::createMainWindow() {
   connect(about, SIGNAL(triggered()), this, SLOT(showAbout()));
   connect(sett, SIGNAL(triggered()), this, SLOT(showSettings()));
   connect(help, SIGNAL(triggered()), this, SLOT(showHelp()));
+
+  connect(refreshCallsignDB, SIGNAL(triggered()), _users, SLOT(download()));
+  connect(refreshTalkgroupDB, SIGNAL(triggered()), _talkgroups, SLOT(download()));
+  connect(refreshRepeaterDB, SIGNAL(triggered()), _repeater, SLOT(download()));
 
   connect(findDev, SIGNAL(triggered()), this, SLOT(detectRadio()));
   connect(verCP, SIGNAL(triggered()), this, SLOT(verifyCodeplug()));
