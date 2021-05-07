@@ -1,29 +1,20 @@
-/** @defgroup d868uv Anytone AT-D868UV
- * Device specific classes for Anytone AT-D868UV.
- *
- * \image html d878uv.jpg "AT-D868UV" width=200px
- * \image latex d878uv.jpg "AT-D868UV" width=200px
+/** @defgroup anytone Anytone Radios
+ * Base class for all anytone radios.
  *
  * @ingroup dsc */
-#ifndef __D868UV_HH__
-#define __D868UV_HH__
+#ifndef __ANYTONE_RADIO_HH__
+#define __ANYTONE_RADIO_HH__
 
 #include "radio.hh"
 #include "anytone_interface.hh"
-#include "d868uv_codeplug.hh"
-#include "d868uv_callsigndb.hh"
+#include "anytone_codeplug.hh"
 
-
-/** Implements an interface to Anytone AT-D868UV VHF/UHF 7W DMR (Tier I & II) radios.
+/** Implements an interface to Anytone radios.
  *
- * The reverse-engineering of the D868UVCodeplug was quiet hard as it is huge and the radio
- * provides a lot of bells and whistles. Moreover, the binary code-plug file created by the
- * windows CPS does not directly relate to the data being written to the device. These two issues
- * (a lot of features and a huge codeplug) require that the transfer of the codeplug to the
- * device is performed in 4 steps.
+ * The transfer of the codeplug to the device is performed in 4 steps.
  *
  * First only the bitmaps of all lists are downloaded from the device. Then all elements that are
- * not touched or only updated by the common code-plug config are downloaded. Then, the common
+ * not touched or only updated by the common codeplug config are downloaded. Then, the common
  * config gets applied to the binary codeplug. That is, all channels, contacts, zones, group-lists
  * and scan-lists are generated and their bitmaps gets updated accordingly. Also the general config
  * gets updated from the common codeplug settings. Finally, the resulting binary codeplug gets
@@ -33,34 +24,23 @@
  * settings within the radio that are not defined within the common codeplug config while keeping
  * the amount of data being read from and written to the device small.
  *
- * @ingroup d868uv */
-class D868UV: public Radio
+ * @ingroup anytone */
+class AnytoneRadio: public Radio
 {
-	Q_OBJECT
+  Q_OBJECT
+
+protected:
+  /** Do not construct this class directly. */
+  explicit AnytoneRadio(QObject *parent=nullptr);
 
 public:
-  /** Do not construct this class directly, rather use @c Radio::detect. */
-  explicit D868UV(QObject *parent=nullptr);
-
   const QString &name() const;
-  const Radio::Features &features() const;
   const CodePlug &codeplug() const;
   CodePlug &codeplug();
 
-public slots:
-  /** Starts the download of the codeplug and derives the generic configuration from it. */
-  bool startDownload(bool blocking=false);
-  /** Derives the device-specific codeplug from the generic configuration and uploads that
-   * codeplug to the radio. */
-  bool startUpload(Config *config, bool blocking=false,
-                   const CodePlug::Flags &flags = CodePlug::Flags());
-  /** Encodes the given user-database and uploades it to the device. */
-  bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
-                             const CallsignDB::Selection &selection=CallsignDB::Selection());
-
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
-	void run();
+  void run();
 
   /** Connects to the radio, if a radio interface is passed to the constructor, this interface
    * instance is used. */
@@ -75,20 +55,20 @@ protected:
 
 protected:
   /** The device identifier. */
-	QString _name;
+  QString _name;
   /** The interface to the radio. */
   AnytoneInterface *_dev;
   /** If @c true, the codeplug on the radio gets updated upon upload. If @c false, it gets
    * overridden. */
   CodePlug::Flags _codeplugFlags;
   /** The generic configuration. */
-	Config *_config;
+  Config *_config;
   /** A weak reference to the user-database. */
   UserDatabase *_userDB;
   /** The actual binary codeplug representation. */
-  D868UVCodeplug _codeplug;
+  AnytoneCodeplug *_codeplug;
   /** The actual binary callsign database representation. */
-  D868UVCallsignDB _callsigns;
+  CallsignDB *_callsigns;
 };
 
 #endif // __D868UV_HH__

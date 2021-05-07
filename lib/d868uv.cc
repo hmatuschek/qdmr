@@ -189,15 +189,33 @@ D868UV::run() {
 }
 
 bool
+D868UV::connect() {
+  // Check if there is a connection
+  if ((nullptr != _dev) && (_dev->isOpen()))
+    return true;
+
+  // If there is a connection but it is not open -> close it.
+  if (nullptr != _dev)
+    _dev->deleteLater();
+
+  // If no connection -> open one.
+  _dev = new AnytoneInterface(this);
+  if (! _dev->isOpen()) {
+    _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());
+    _dev->deleteLater();
+    return false;
+  }
+
+  return true;
+}
+
+bool
 D868UV::download() {
   logDebug() << "Download of " << _codeplug.image(0).numElements() << " bitmaps.";
 
   // The first thing happening within the thread is creating the interface to the device.
   // For some reason this object cannot be created outside of the thread.
-  _dev = new AnytoneInterface(this);
-  if (! _dev->isOpen()) {
-    _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());
-    _dev->deleteLater();
+  if (! connect()) {
     _task = StatusError;
     emit downloadError(this);
     return false;
@@ -267,10 +285,7 @@ bool
 D868UV::upload() {
   // The first thing happening within the thread is creating the interface to the device.
   // For some reason this object cannot be created outside of the thread.
-  _dev = new AnytoneInterface(this);
-  if (! _dev->isOpen()) {
-    _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());
-    _dev->deleteLater();
+  if (! connect()) {
     _task = StatusError;
     emit uploadError(this);
     return false;
@@ -353,6 +368,7 @@ D868UV::upload() {
     }
     emit uploadProgress(50+float(n*50)/_codeplug.image(0).numElements());
   }
+
   //_codeplug.write("debug_codeplug.dfu");
   return true;
 }
@@ -360,10 +376,8 @@ D868UV::upload() {
 
 bool
 D868UV::uploadCallsigns() {
-  _dev = new AnytoneInterface(this);
-  if (! _dev->isOpen()) {
-    _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());
-    _dev->deleteLater();
+  // Connect to radio
+  if (! connect()) {
     _task = StatusError;
     emit uploadError(this);
     return false;
