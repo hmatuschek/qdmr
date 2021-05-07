@@ -8,9 +8,9 @@
 #define WBSIZE 16
 
 
-AnytoneRadio::AnytoneRadio(QObject *parent)
-  : Radio(parent), _dev(nullptr), _codeplugFlags(), _config(nullptr), _codeplug(nullptr),
-    _callsigns(nullptr)
+AnytoneRadio::AnytoneRadio(const QString &name, QObject *parent)
+  : Radio(parent), _name(name), _dev(nullptr), _codeplugFlags(), _config(nullptr),
+    _codeplug(nullptr), _callsigns(nullptr)
 {
   // pass...
 }
@@ -28,6 +28,58 @@ AnytoneRadio::codeplug() const {
 CodePlug &
 AnytoneRadio::codeplug() {
   return *_codeplug;
+}
+
+bool
+AnytoneRadio::startDownload(bool blocking) {
+  if (StatusIdle != _task)
+    return false;
+
+  _task = StatusDownload;
+
+  if (blocking) {
+    run();
+    return (StatusIdle == _task);
+  }
+
+  start();
+  return true;
+}
+
+bool
+AnytoneRadio::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
+  if (StatusIdle != _task)
+    return false;
+
+  if (! (_config = config))
+    return false;
+
+  _task = StatusUpload;
+  _codeplugFlags = flags;
+  if (blocking) {
+    this->run();
+    return (StatusIdle == _task);
+  }
+
+  this->start();
+  return true;
+}
+
+bool
+AnytoneRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
+  Q_UNUSED(db);
+  Q_UNUSED(blocking);
+
+  _callsigns->encode(db, selection);
+
+  _task = StatusUploadCallsigns;
+  if (blocking) {
+    this->run();
+    return (StatusIdle == _task);
+  }
+
+  this->start();
+  return true;
 }
 
 void

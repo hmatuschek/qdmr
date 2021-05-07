@@ -3,7 +3,7 @@
 
 #include <QDateTime>
 
-#include "codeplug.hh"
+#include "anytone_codeplug.hh"
 #include "signaling.hh"
 #include "codeplugcontext.hh"
 
@@ -165,7 +165,7 @@ class GPSSystem;
  * </table>
  *
  * @ingroup d868uv */
-class D868UVCodeplug : public CodePlug
+class D868UVCodeplug : public AnytoneCodeplug
 {
   Q_OBJECT
 

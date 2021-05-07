@@ -31,7 +31,7 @@ class AnytoneRadio: public Radio
 
 protected:
   /** Do not construct this class directly. */
-  explicit AnytoneRadio(QObject *parent=nullptr);
+  explicit AnytoneRadio(const QString &name, QObject *parent=nullptr);
 
 public:
   const QString &name() const;
@@ -41,6 +41,16 @@ public:
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
   void run();
+
+  /** Starts the download of the codeplug and derives the generic configuration from it. */
+  bool startDownload(bool blocking=false);
+  /** Derives the device-specific codeplug from the generic configuration and uploads that
+   * codeplug to the radio. */
+  bool startUpload(Config *config, bool blocking=false,
+                   const CodePlug::Flags &flags = CodePlug::Flags());
+  /** Encodes the given user-database and uploades it to the device. */
+  bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
+                             const CallsignDB::Selection &selection=CallsignDB::Selection());
 
   /** Connects to the radio, if a radio interface is passed to the constructor, this interface
    * instance is used. */

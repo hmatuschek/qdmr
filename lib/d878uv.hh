@@ -8,11 +8,8 @@
 #ifndef __D878UV_HH__
 #define __D878UV_HH__
 
-#include "radio.hh"
+#include "anytone_radio.hh"
 #include "anytone_interface.hh"
-#include "d878uv_codeplug.hh"
-// uses same callsign db as 878
-#include "d868uv_callsigndb.hh"
 
 
 /** Implements an interface to Anytone AT-D878UV VHF/UHF 7W DMR (Tier I & II) radios.
@@ -35,7 +32,7 @@
  * the amount of data being read from and written to the device small.
  *
  * @ingroup d878uv */
-class D878UV: public Radio
+class D878UV: public AnytoneRadio
 {
 	Q_OBJECT
 
@@ -43,50 +40,7 @@ public:
   /** Do not construct this class directly, rather use @c Radio::detect. */
   explicit D878UV(QObject *parent=nullptr);
 
-  const QString &name() const;
   const Radio::Features &features() const;
-  const CodePlug &codeplug() const;
-  CodePlug &codeplug();
-
-public slots:
-  /** Starts the download of the codeplug and derives the generic configuration from it. */
-  bool startDownload(bool blocking=false);
-  /** Derives the device-specific codeplug from the generic configuration and uploads that
-   * codeplug to the radio. */
-  bool startUpload(Config *config, bool blocking=false,
-                   const CodePlug::Flags &flags = CodePlug::Flags());
-  /** Encodes the given user-database and uploades it to the device. */
-  bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
-                             const CallsignDB::Selection &selection=CallsignDB::Selection());
-
-protected:
-  /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
-	void run();
-
-  /** Downloads the codeplug from the radio. This method block until the download is complete. */
-  bool download();
-  /** Uploads the encoded codeplug to the radio. This method block until the upload is complete. */
-  bool upload();
-  /** Uploads the encoded callsign database to the radio.
-   * This method block until the upload is complete. */
-  bool uploadCallsigns();
-
-protected:
-  /** The device identifier. */
-	QString _name;
-  /** The interface to the radio. */
-  AnytoneInterface *_dev;
-  /** If @c true, the codeplug on the radio gets updated upon upload. If @c false, it gets
-   * overridden. */
-  CodePlug::Flags _codeplugFlags;
-  /** The generic configuration. */
-	Config *_config;
-  /** A weak reference to the user-database. */
-  UserDatabase *_userDB;
-  /** The actual binary codeplug representation. */
-  D878UVCodeplug _codeplug;
-  /** The actual binary callsign database representation. */
-  D868UVCallsignDB _callsigns;
 };
 
 #endif // __D878UV_HH__

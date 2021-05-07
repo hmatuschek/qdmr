@@ -1278,7 +1278,7 @@ D868UVCodeplug::contact_map_t::setIndex(uint32_t index) {
  * Implementation of D868UVCodeplug
  * ******************************************************************************************** */
 D868UVCodeplug::D868UVCodeplug(QObject *parent)
-  : CodePlug(parent)
+  : AnytoneCodeplug(parent)
 {
   addImage("Anytone AT-D868UV Codeplug");
 
