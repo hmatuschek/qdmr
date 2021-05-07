@@ -38,9 +38,13 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     return -1;
   }
 
+  VerifyFlags verify_flags;
+  if (parser.isSet("ignore-limits"))
+    verify_flags.ignoreFrequencyLimits = true;
+
   bool verified = true;
   QList<VerifyIssue> issues;
-  if (VerifyIssue::WARNING <= radio->verifyConfig(&config, issues)) {
+  if (VerifyIssue::WARNING <= radio->verifyConfig(&config, issues, verify_flags)) {
     foreach(const VerifyIssue &issue, issues) {
       if (VerifyIssue::WARNING == issue.type()) {
         logWarn() << "Verification Issue: " << issue.message();

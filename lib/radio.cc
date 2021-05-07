@@ -21,9 +21,34 @@ Radio::Features::FrequencyRange::FrequencyRange(double lower, double upper)
   // pass..
 }
 
+Radio::Features::FrequencyRange::FrequencyRange(double limits[2])
+  : min(limits[0]), max(limits[1])
+{
+  // pass..
+}
+
 bool
 Radio::Features::FrequencyRange::contains(double f) const {
   return (min<=f) && (max>=f);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of Radio::Featrues::FrequencyLimits
+ * ******************************************************************************************** */
+Radio::Features::FrequencyLimits::FrequencyLimits(const QVector<FrequencyRange> &frequency_ranges)
+  : ranges(frequency_ranges)
+{
+  // pass...
+}
+
+bool
+Radio::Features::FrequencyLimits::contains(double f) const {
+  for (int i=0; i<ranges.size(); i++) {
+    if (ranges[i].contains(f))
+      return true;
+  }
+  return false;
 }
 
 
@@ -164,15 +189,13 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                       tr("Duplicate channel name '%1'.").arg(channel->name())));
     names.insert(channel->name());
 
-    if ((!features().vhfLimits.contains(channel->rxFrequency())) &&
-        (!features().uhfLimits.contains(channel->rxFrequency()))) {
+    if (!features().frequencyLimits.contains(channel->rxFrequency())) {
       VerifyIssue::Type type = flags.ignoreFrequencyLimits ? VerifyIssue::WARNING : VerifyIssue::ERROR;
       issues.append(VerifyIssue(type,tr("RX frequency %1 of channel '%2' is out of range.")
                                 .arg(channel->rxFrequency()).arg(channel->name())));
     }
 
-    if ((!features().vhfLimits.contains(channel->txFrequency())) &&
-        (!features().uhfLimits.contains(channel->txFrequency()))) {
+    if (!features().frequencyLimits.contains(channel->txFrequency())) {
       VerifyIssue::Type type = flags.ignoreFrequencyLimits ? VerifyIssue::WARNING : VerifyIssue::ERROR;
       issues.append(VerifyIssue(type,tr("TX frequency %1 of channel '%2' is out of range.")
                                 .arg(channel->txFrequency()).arg(channel->name())));

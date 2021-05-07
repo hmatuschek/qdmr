@@ -12,8 +12,7 @@ static Radio::Features _gd77_features = {
   .hasDigital = true,
   .hasAnalog = true,
 
-  .vhfLimits = {136., 174.},
-  .uhfLimits = {400., 470.},
+  .frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 470.} },
 
   .maxRadioIDs        = 1,
   .maxNameLength      = 8,

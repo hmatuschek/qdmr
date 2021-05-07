@@ -10,7 +10,7 @@
  * needed to access these devices. The user, however, should be a member of the @c dialout group
  * to get access to the serial interfaces.
  *
- * @ingroup rif */
+ * @ingroup anytone */
 class AnytoneInterface : public USBSerial
 {
   Q_OBJECT

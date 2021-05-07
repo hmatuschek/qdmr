@@ -12,8 +12,7 @@ static Radio::Features _uv390_features =
   .hasDigital = true,
   .hasAnalog = true,
 
-  .vhfLimits = {136., 174.},
-  .uhfLimits = {400., 480.},
+  .frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 480.} },
 
   .maxRadioIDs        = 1,  /// @todo UV390 supports multiple radio IDs, not implemented yet.
   .maxNameLength      = 16,

@@ -1,5 +1,10 @@
 /** @defgroup anytone Anytone Radios
- * Base class for all anytone radios.
+ * Base classes for all anytone radios.
+ *
+ * Anytone radios share a lot of common formats and interfaces.
+ * Consequently there are base-classes for radio interfaces (@c AnytoneInterface), codeplugs
+ * (@c AnytoneCodeplug) and radios (@c AnytoneRadio). This helps to keep the burden of implementing
+ * the support for each radio at a minimum.
  *
  * @ingroup dsc */
 #ifndef __ANYTONE_RADIO_HH__

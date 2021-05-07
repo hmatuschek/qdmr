@@ -1,5 +1,6 @@
 /** @defgroup conf Common codeplug configuration
  * This module collects all classes that represent the general configuration for all DMR codeplugs.
+ *
  * To this end, it aims at covering the important features for ham radio applications but ignoring
  * all features that are more related to "professional" applications of these radios.
  *

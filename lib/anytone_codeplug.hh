@@ -4,9 +4,12 @@
 #include "codeplug.hh"
 
 /** Base class interface for all Anytone radio codeplugs.
+ *
  * This class extends the generic @c CodePlug to provide an interface to the multi-step up and
  * download of the binary codeplug. In contrast to the majority of radios, the Anytone codeplugs
- * are heavily segmented and only valid sections are read from a written to the device. */
+ * are heavily segmented and only valid sections are read from a written to the device.
+ *
+ * @ingroup anytone */
 class AnytoneCodeplug : public CodePlug
 {
   Q_OBJECT

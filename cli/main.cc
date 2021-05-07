@@ -81,6 +81,10 @@ int main(int argc, char *argv[])
                      "auto-enable-roaming",
                      QCoreApplication::translate("main", "Automatically enables roaming if there is a "
                                                          "roaming zone used by any channel.")));
+  parser.addOption(QCommandLineOption(
+                     "ignore-limits",
+                     QCoreApplication::translate("main", "Disables some limit checks.")));
+
   parser.addPositionalArgument(
         "command", QCoreApplication::translate(
           "main", "Specifies the command to perform. Either detect, verify, read, write, "

@@ -4,7 +4,7 @@
  * \image html d878uv.jpg "AT-D878UV" width=200px
  * \image latex d878uv.jpg "AT-D878UV" width=200px
  *
- * @ingroup dsc */
+ * @ingroup anytone */
 #ifndef __D878UV_HH__
 #define __D878UV_HH__
 

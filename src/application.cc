@@ -464,7 +464,7 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &f
 
   bool verified = true;
   QList<VerifyIssue> issues;
-  VerifyIssue::Type maxIssue = myRadio->verifyConfig(_config, issues);
+  VerifyIssue::Type maxIssue = myRadio->verifyConfig(_config, issues, flags);
   if ( (flags.ignoreWarnings && (maxIssue>VerifyIssue::WARNING)) ||
        ((!flags.ignoreWarnings) && (maxIssue>=VerifyIssue::WARNING)) ) {
     VerifyDialog dialog(issues);
