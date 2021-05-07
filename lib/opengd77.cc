@@ -162,28 +162,46 @@ OpenGD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignD
 void
 OpenGD77::run() {
   if (StatusDownload == _task) {
-    download();
+    if (! download())
+      emit downloadError(this);
   } else if (StatusUpload == _task) {
-    upload();
+    if (! upload())
+      emit uploadError(this);
   } else if (StatusUploadCallsigns == _task) {
-    uploadCallsigns();
+    if (! uploadCallsigns())
+      emit uploadError(this);
   }
 }
 
 
-void
-OpenGD77::download()
-{
+bool
+OpenGD77::connect() {
+  if ((nullptr != _dev) && _dev->isOpen())
+    return true;
+
+  if (! _dev->isOpen()) {
+    _dev->deleteLater();
+    _dev = nullptr;
+  }
+
   _dev = new OpenGD77Interface();
   if (! _dev->isOpen()) {
     _task = StatusError;
-    _errorMessage = tr("In %1(), cannot open OpenGD77 device:\n\t%2").arg(__func__).arg(_dev->errorMessage());
+    _errorMessage = QString("Cannot connect to radio: %1").arg(_dev->errorString());
     logError() << _errorMessage;
     _dev->deleteLater();
     _dev = nullptr;
-    emit downloadError(this);
-    return;
+    return false;
   }
+  return true;
+}
+
+
+bool
+OpenGD77::download()
+{
+  if (! connect())
+    return false;
 
   emit downloadStarted();
 
@@ -194,8 +212,7 @@ OpenGD77::download()
     _dev->close();
     _dev->deleteLater();
     _dev = nullptr;
-    emit downloadError(this);
-    return;
+    return false;
   }
 
   // Check every segment in the codeplug
@@ -207,8 +224,7 @@ OpenGD77::download()
     _dev->close();
     _dev->deleteLater();
     _dev = nullptr;
-    emit downloadError(this);
-    return;
+    return false;
   }
 
   size_t totb = _codeplug.memSize();
@@ -221,8 +237,7 @@ OpenGD77::download()
     _dev->close();
     _dev->deleteLater();
     _dev = nullptr;
-    emit downloadError(this);
-    return;
+    return false;
   }
 
   // Then download codeplug
@@ -245,8 +260,7 @@ OpenGD77::download()
           _dev->close();
           _dev->deleteLater();
           _dev = nullptr;
-          emit downloadError(this);
-          return;
+          return false;
         }
         QThread::usleep(100);
         emit downloadProgress(float(bcount*100)/totb);
@@ -263,22 +277,16 @@ OpenGD77::download()
   _dev = nullptr;
   emit downloadFinished(this, &_codeplug);
   _config = nullptr;
+
+  return true;
 }
 
 
-void
-OpenGD77::upload() {
-  _dev = new OpenGD77Interface();
-  if (! _dev->isOpen()) {
-    _task = StatusError;
-    _errorMessage = QString("Cannot upload to radio, device is not open: %1").arg(_dev->errorString());
-    logError() << _errorMessage;
-    _dev->deleteLater();
-    _dev = nullptr;
-    emit uploadError(this);
-    return;
-  }
-
+bool
+OpenGD77::upload()
+{
+  if (! connect())
+    return false;
 
   emit uploadStarted();
 
@@ -290,8 +298,7 @@ OpenGD77::upload() {
     _dev->close();
     _dev->deleteLater();
     _dev = nullptr;
-    emit uploadError(this);
-    return;
+    return false;
   }
 
   // Check every segment in the codeplug
@@ -303,8 +310,7 @@ OpenGD77::upload() {
     _dev->close();
     _dev->deleteLater();
     _dev = nullptr;
-    emit uploadError(this);
-    return;
+    return false;
   }
 
   size_t totb = _codeplug.memSize();
@@ -317,8 +323,7 @@ OpenGD77::upload() {
     _dev->close();
     _dev->deleteLater();
     _dev = nullptr;
-    emit uploadError(this);
-    return;
+    return false;
   }
 
   // Then download codeplug
@@ -340,8 +345,7 @@ OpenGD77::upload() {
           _dev->close();
           _dev->deleteLater();
           _dev = nullptr;
-          emit uploadError(this);
-          return;
+          return false;
         }
         QThread::usleep(100);
         emit uploadProgress(float(bcount*50)/totb);
@@ -361,8 +365,7 @@ OpenGD77::upload() {
     _dev->close();
     _dev->deleteLater();
     _dev = nullptr;
-    emit uploadError(this);
-    return;
+    return false;
   }
 
   // Then upload codeplug
@@ -384,8 +387,7 @@ OpenGD77::upload() {
           _dev->close();
           _dev->deleteLater();
           _dev = nullptr;
-          emit uploadError(this);
-          return;
+          return false;
         }
         QThread::usleep(100);
         emit uploadProgress(float(bcount*50)/totb);
@@ -401,21 +403,15 @@ OpenGD77::upload() {
   _dev = nullptr;
 
   emit uploadComplete(this);
+  return true;
 }
 
 
-void
-OpenGD77::uploadCallsigns() {
-  _dev = new OpenGD77Interface();
-  if (! _dev->isOpen()) {
-    _task = StatusError;
-    _errorMessage = QString("Cannot upload to radio, device is not open: %1").arg(_dev->errorString());
-    logError() << _errorMessage;
-    _dev->deleteLater();
-    _dev = nullptr;
-    emit uploadError(this);
-    return;
-  }
+bool
+OpenGD77::uploadCallsigns()
+{
+  if (! connect())
+    return false;
 
   emit uploadStarted();
 
@@ -428,8 +424,7 @@ OpenGD77::uploadCallsigns() {
     _dev->close();
     _dev->deleteLater();
     _dev = nullptr;
-    emit uploadError(this);
-    return;
+    return false;
   }
 
   size_t totb = _callsigns.memSize();
@@ -442,8 +437,7 @@ OpenGD77::uploadCallsigns() {
     _dev->close();
     _dev->deleteLater();
     _dev = nullptr;
-    emit uploadError(this);
-    return;
+    return false;
   }
 
   uint bcount = 0;
@@ -464,8 +458,7 @@ OpenGD77::uploadCallsigns() {
         _dev->close();
         _dev->deleteLater();
         _dev = nullptr;
-        emit uploadError(this);
-        return;
+        return false;
       }
       emit uploadProgress(float(bcount*100)/totb);
     }
@@ -479,5 +472,6 @@ OpenGD77::uploadCallsigns() {
   _dev = nullptr;
 
   emit uploadComplete(this);
+  return true;
 }
 
