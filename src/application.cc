@@ -449,7 +449,7 @@ Application::detectRadio() {
     radio->deleteLater();
   } else {
     QMessageBox::information(nullptr, tr("No Radio found."),
-                             tr("No known radio detected. Check connection?\nError:")+errorMessage);
+                             tr("No known radio detected. Check connection?\nError: %1").arg(errorMessage));
   }
   radio->deleteLater();
 }

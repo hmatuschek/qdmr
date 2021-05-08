@@ -179,7 +179,7 @@ OpenGD77::connect() {
   if ((nullptr != _dev) && _dev->isOpen())
     return true;
 
-  if (! _dev->isOpen()) {
+  if ((nullptr != _dev) && (! _dev->isOpen())) {
     _dev->deleteLater();
     _dev = nullptr;
   }
