@@ -1114,6 +1114,7 @@ public:
    *
    * @verbinclude d878uvradioinfo.txt */
   struct __attribute__((packed)) radio_info_t {
+    /** Possible frequency ranges for the AT-D878UV. */
     enum FrequencyRange : uint8_t {
       FR_RX_400_480_136_174_TX_400_480_136_174 = 0,
       FR_RX_400_480_136_174_TX_400_480_136_174_STEP_12_5kHz = 1,
