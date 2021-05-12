@@ -6,6 +6,7 @@
 #include "userdatabase.hh"
 #include "config.h"
 #include "logger.hh"
+#include <cmath>
 
 #include <QTimeZone>
 #include <QtEndian>
