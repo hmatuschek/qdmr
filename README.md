@@ -106,7 +106,7 @@ $ sudo apt-get install build-essential git cmake
 $ sudo apt-get install libusb-1.0-0-dev qtbase5-dev qttools5-dev qttools5-dev-tools qtpositioning5-dev libqt5serialport5-dev
 ```
 #### Arch Linux
-Under Arch Linux run
+Under Arch Linux run (qdmr is now part of the Arch Linux distribution, you can install it with `sudo packman -S qdmr-git`)
 ```
 $ sudo pacman -S git base-devel cmake libusb qt5-tools qt5-serialport qt5-location
 ```
