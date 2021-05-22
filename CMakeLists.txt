@@ -14,7 +14,6 @@ find_package(Qt5Network REQUIRED)
 find_package(Qt5SerialPort REQUIRED)
 find_package(Qt5Positioning REQUIRED)
 find_package(Qt5LinguistTools REQUIRED)
-find_package(Qt5Test REQUIRED)
 find_package(LIBUSB_1 REQUIRED)
 
 if (${BUILD_MAN})
@@ -25,6 +24,9 @@ if (${BUILD_DOCS})
   find_package(Doxygen REQUIRED dot)
 endif(${BUILD_DOCS})
 
+if (${BUILD_TESTS})
+  find_package(Qt5Test REQUIRED)
+endif(${BUILD_TESTS})
 
 ADD_DEFINITIONS(${Qt5Widgets_DEFINITIONS})
 #add_definitions("-DQT_EVENT_DISPATCHER_CORE_FOUNDATION=1")
