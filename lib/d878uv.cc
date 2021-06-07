@@ -19,7 +19,7 @@ static Radio::Features _d878uv_features =
   .hasDigital  = true,
   .hasAnalog   = true,
 
-  .frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 480.} },
+  .frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {220., 225.}, {400., 480.} },
 
   // general limits
   .maxRadioIDs        = 250,
