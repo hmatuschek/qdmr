@@ -83,7 +83,7 @@ char aprsicon2iconcode(APRSSystem::Icon icon);
 char aprsicon2tablecode(APRSSystem::Icon icon);
 APRSSystem::Icon code2aprsicon(char table, char icon);
 
-/** Implements the Levenshteim distance between two strings.
+/** Implements the Levenshtein distance between two strings.
  * That is, the number of edits (insert, delete or replace operations) needed to turn source
  * into target. */
 int levDist(const QString &source, const QString &target,
