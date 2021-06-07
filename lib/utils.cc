@@ -6,16 +6,12 @@
 
 // Maps APRS icon number to code-char
 static QVector<char> aprsIconCodeTable{
-  '!','"','#','$','%','&','\'','(',')','*',
-  '+',',','-','.','/','0','1','2','3','4',
-  '5','6','7','8','9',':',';','<','=','>',
-  '?','@','A','B','C','D','E','F','G','H',
-  'H','I','J','K','L','M','N','O','P','Q',
-  'R','S','T','U','V','W','X','Y','Z','[',
-  '/',']','^','_','`','a','b','c','d','e',
-  'f','g','h','i','j','k','l','m','n','o',
-  'p','q','r','s','t','u','v','w','x','y',
-  'z','{','|','}','~'};
+  '!','"','#','$','%','&','\'','(',')','*','+',',','-','.','/','0',
+  '1','2','3','4','5','6', '7','8','9',':',';','<','=','>','?','@',
+  'A','B','C','D','E','F', 'G','H','I','J','K','L','M','N','O','P',
+  'Q','R','S','T','U','V', 'W','X','Y','Z','[','/',']','^','_','`',
+  'a','b','c','d','e','f', 'g','h','i','j','k','l','m','n','o','p',
+  'q','r','s','t','u','v','w','x','y','z','{','|','}','~'};
 
 static QHash<APRSSystem::Icon, QString> aprsIconNameTable{
   {APRSSystem::APRS_ICON_NO_SYMBOL, ""},
@@ -30,7 +26,7 @@ static QHash<APRSSystem::Icon, QString> aprsIconNameTable{
   {APRSSystem::APRS_ICON_SNOWMOBILE, "Snowmobile"},
   {APRSSystem::APRS_ICON_RED_CROSS, "Red cross"},
   {APRSSystem::APRS_ICON_BOY_SCOUT, "Boy scout"},
-  {APRSSystem::APRS_ICON_HOME,  QObject::tr("Home")},
+  {APRSSystem::APRS_ICON_HOME,  "Home"},
   {APRSSystem::APRS_ICON_X, "X"},
   {APRSSystem::APRS_ICON_RED_DOT, "Red dot"},
   {APRSSystem::APRS_ICON_CIRCLE_0, "Circle 0"},
