@@ -148,9 +148,10 @@ GD77::connect() {
   // connect
   _dev = new HID(0x15a2, 0x0073, this);
   if (! _dev->isOpen()) {
+    _task = StatusError;
+    _errorMessage = tr("%1(): Cannot connect to radio: %2").arg(__func__).arg(_dev->errorMessage());
     _dev->deleteLater();
     _dev = nullptr;
-    _task = StatusError;
     return false;
   }
   return true;
@@ -169,13 +170,13 @@ GD77::run() {
       _task = StatusError;
       _dev->read_finish();
       _dev->close();
-      _dev->deleteLater();
-      _dev = nullptr;
       emit downloadError(this);
       return;
     }
 
     _task = StatusIdle;
+    _dev->reboot();
+    _dev->close();
     emit downloadFinished(this, &_codeplug);
   } else if (StatusUpload == _task) {
     if (! connect()) {
@@ -187,13 +188,13 @@ GD77::run() {
       _task = StatusError;
       _dev->write_finish();
       _dev->close();
-      _dev->deleteLater();
-      _dev = nullptr;
       emit uploadError(this);
       return;
     }
 
     _task = StatusIdle;
+    _dev->reboot();
+    _dev->close();
     emit uploadComplete(this);
   }
 }

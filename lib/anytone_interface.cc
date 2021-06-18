@@ -103,7 +103,8 @@ AnytoneInterface::AnytoneInterface(QObject *parent)
 }
 
 AnytoneInterface::~AnytoneInterface() {
-  this->close();
+  if (isOpen())
+    this->close();
 }
 
 void

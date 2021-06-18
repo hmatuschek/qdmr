@@ -69,7 +69,10 @@ OpenGD77::OpenGD77(OpenGD77Interface *device, QObject *parent)
 }
 
 OpenGD77::~OpenGD77() {
-  // pass...
+  if (_dev && _dev->isOpen())  {
+    _dev->reboot();
+    _dev->close();
+  }
 }
 
 const QString &
@@ -107,6 +110,9 @@ OpenGD77::startDownload(bool blocking) {
     return (StatusIdle == _task);
   }
 
+  // When running in a separate thread -> reopen connection to radio
+  if (_dev && _dev->isOpen())
+    _dev->close();
   // start thread for download
   start();
   return true;
@@ -133,8 +139,12 @@ OpenGD77::startUpload(Config *config, bool blocking, const CodePlug::Flags &flag
     return (StatusIdle == _task);
   }
 
+  // When running in a separate thread -> reopen connection to radio
+  if (_dev && _dev->isOpen())
+    _dev->close();
   // start thread for upload
   start();
+
   return true;
 }
 
@@ -157,8 +167,12 @@ OpenGD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignD
     return (StatusIdle == _task);
   }
 
+  // When running in a separate thread -> reopen connection to radio
+  if (_dev && _dev->isOpen())
+    _dev->close();
   // start thread for upload
   start();
+
   return true;
 }
 
@@ -166,27 +180,68 @@ OpenGD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignD
 void
 OpenGD77::run() {
   if (StatusDownload == _task) {
-    if (! download())
+    if (! connect()) {
       emit downloadError(this);
+      return;
+    }
+
+    if (! download()) {
+      _task = StatusError;
+      _dev->read_finish();
+      _dev->close();
+      emit downloadError(this);
+      return;
+    }
+
+    _dev->reboot();
+    _dev->close();
+    _task = StatusIdle;
+    emit downloadFinished(this, &_codeplug);
+    _config = nullptr;
   } else if (StatusUpload == _task) {
-    if (! upload())
+    if (! connect()) {
       emit uploadError(this);
+      return;
+    }
+
+    if (! upload()) {
+      _task = StatusError;
+      _dev->write_finish();
+      _dev->close();
+      emit uploadError(this);
+    }
+
+    _dev->reboot();
+    _dev->close();
+    _task = StatusIdle;
+    emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {
-    if (! uploadCallsigns())
+    if (! connect()) {
+      emit downloadError(this);
+      return;
+    }
+
+    if (! uploadCallsigns()) {
+      _task = StatusError;
+      _dev->write_finish();
+      _dev->close();
       emit uploadError(this);
+    }
+
+    _dev->reboot();
+    _dev->close();
+    _task = StatusIdle;
+    emit uploadComplete(this);
   }
 }
 
 
 bool
 OpenGD77::connect() {
-  if ((nullptr != _dev) && _dev->isOpen())
+  if (_dev && _dev->isOpen())
     return true;
-
-  if ((nullptr != _dev) && (! _dev->isOpen())) {
+  if (_dev)
     _dev->deleteLater();
-    _dev = nullptr;
-  }
 
   _dev = new OpenGD77Interface(this);
   if (! _dev->isOpen()) {
@@ -197,6 +252,7 @@ OpenGD77::connect() {
     _dev = nullptr;
     return false;
   }
+
   return true;
 }
 
@@ -204,18 +260,11 @@ OpenGD77::connect() {
 bool
 OpenGD77::download()
 {
-  if (! connect())
-    return false;
-
   emit downloadStarted();
 
   if (_codeplug.numImages() != 2) {
     _errorMessage = QString("In %1(), cannot download codeplug:\n\t"
                             " Codeplug does not contain two images.").arg(__func__);
-    _task = StatusError;
-    _dev->close();
-    _dev->deleteLater();
-    _dev = nullptr;
     return false;
   }
 
@@ -224,10 +273,6 @@ OpenGD77::download()
     _errorMessage = QString("In %1(), cannot download codeplug:\n\t "
                             "Codeplug is not aligned with blocksize %5.").arg(__func__).arg(BSIZE);
     logError() << _errorMessage;
-    _task = StatusError;
-    _dev->close();
-    _dev->deleteLater();
-    _dev = nullptr;
     return false;
   }
 
@@ -237,10 +282,7 @@ OpenGD77::download()
     _errorMessage = QString("in %1(), cannot start codeplug download:\n\t %2")
         .arg(__func__).arg(_dev->errorMessage());
     logError() << _errorMessage;
-    _task = StatusError;
     _dev->close();
-    _dev->deleteLater();
-    _dev = nullptr;
     return false;
   }
 
@@ -259,11 +301,6 @@ OpenGD77::download()
           _errorMessage = QString("In %1(), cannot read block %2:\n\t %3")
               .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
           logError() << _errorMessage;
-          _task = StatusError;
-          _dev->read_finish();
-          _dev->close();
-          _dev->deleteLater();
-          _dev = nullptr;
           return false;
         }
         QThread::usleep(100);
@@ -273,15 +310,6 @@ OpenGD77::download()
     _dev->read_finish();
   }
 
-  _dev->reboot();
-
-  _task = StatusIdle;
-  _dev->close();
-  _dev->deleteLater();
-  _dev = nullptr;
-  emit downloadFinished(this, &_codeplug);
-  _config = nullptr;
-
   return true;
 }
 
@@ -289,19 +317,12 @@ OpenGD77::download()
 bool
 OpenGD77::upload()
 {
-  if (! connect())
-    return false;
-
   emit uploadStarted();
 
   if (_codeplug.numImages() != 2) {
     _errorMessage = QString("In %1(), cannot download codeplug:\n\t"
                             " Codeplug does not contain two images.").arg(__func__);
     logError() << _errorMessage;
-    _task = StatusError;
-    _dev->close();
-    _dev->deleteLater();
-    _dev = nullptr;
     return false;
   }
 
@@ -310,10 +331,6 @@ OpenGD77::upload()
     _errorMessage = QString("In %1(), cannot upload code-plug:\n\t "
                             "Codeplug is not aligned with blocksize %5.").arg(__func__).arg(BSIZE);
     logError() << _errorMessage;
-    _task = StatusError;
-    _dev->close();
-    _dev->deleteLater();
-    _dev = nullptr;
     return false;
   }
 
@@ -323,10 +340,6 @@ OpenGD77::upload()
     _errorMessage = QString("in %1(), cannot start codeplug download:\n\t %2")
         .arg(__func__).arg(_dev->errorMessage());
     logError() << _errorMessage;
-    _task = StatusError;
-    _dev->close();
-    _dev->deleteLater();
-    _dev = nullptr;
     return false;
   }
 
@@ -344,11 +357,6 @@ OpenGD77::upload()
           _errorMessage = QString("In %1(), cannot read block %2:\n\t %3")
               .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
           logError() << _errorMessage;
-          _task = StatusError;
-          _dev->read_finish();
-          _dev->close();
-          _dev->deleteLater();
-          _dev = nullptr;
           return false;
         }
         QThread::usleep(100);
@@ -365,10 +373,6 @@ OpenGD77::upload()
     _errorMessage = QString("in %1(), cannot start codeplug upload:\n\t %2")
         .arg(__func__).arg(_dev->errorMessage());
     logError() << _errorMessage;
-    _task = StatusError;
-    _dev->close();
-    _dev->deleteLater();
-    _dev = nullptr;
     return false;
   }
 
@@ -386,11 +390,6 @@ OpenGD77::upload()
           _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
               .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
           logError() << _errorMessage;
-          _task = StatusError;
-          _dev->write_finish();
-          _dev->close();
-          _dev->deleteLater();
-          _dev = nullptr;
           return false;
         }
         QThread::usleep(100);
@@ -400,13 +399,6 @@ OpenGD77::upload()
     _dev->write_finish();
   }
 
-  _task = StatusIdle;
-  _dev->reboot();
-  _dev->close();
-  _dev->deleteLater();
-  _dev = nullptr;
-
-  emit uploadComplete(this);
   return true;
 }
 
@@ -414,9 +406,6 @@ OpenGD77::upload()
 bool
 OpenGD77::uploadCallsigns()
 {
-  if (! connect())
-    return false;
-
   emit uploadStarted();
 
   // Check every segment in the codeplug
@@ -424,10 +413,6 @@ OpenGD77::uploadCallsigns()
     _errorMessage = QString("In %1(), cannot upload call-sign DB:\n\t "
                             "Not aligned with block-size!").arg(__func__);
     logError() << _errorMessage;
-    _task = StatusError;
-    _dev->close();
-    _dev->deleteLater();
-    _dev = nullptr;
     return false;
   }
 
@@ -437,10 +422,6 @@ OpenGD77::uploadCallsigns()
     _errorMessage = QString("in %1(), cannot start callsign DB upload:\n\t %2")
         .arg(__func__).arg(_dev->errorMessage());
     logError() << _errorMessage;
-    _task = StatusError;
-    _dev->close();
-    _dev->deleteLater();
-    _dev = nullptr;
     return false;
   }
 
@@ -457,25 +438,13 @@ OpenGD77::uploadCallsigns()
         _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
             .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
         logError() << _errorMessage;
-        _task = StatusError;
-        _dev->write_finish();
-        _dev->close();
-        _dev->deleteLater();
-        _dev = nullptr;
         return false;
       }
       emit uploadProgress(float(bcount*100)/totb);
     }
   }
+
   _dev->write_finish();
-
-  _task = StatusIdle;
-  _dev->reboot();
-  _dev->close();
-  _dev->deleteLater();
-  _dev = nullptr;
-
-  emit uploadComplete(this);
   return true;
 }
 

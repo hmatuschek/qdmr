@@ -61,6 +61,10 @@ Radio::Radio(QObject *parent)
   // pass...
 }
 
+Radio::~Radio() {
+  // pass...
+}
+
 VerifyIssue::Type
 Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlags &flags)
 {

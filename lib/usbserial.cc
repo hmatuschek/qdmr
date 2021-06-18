@@ -5,6 +5,9 @@
 USBSerial::USBSerial(unsigned vid, unsigned pid, QObject *parent)
   : QSerialPort(parent), RadioInterface(), _errorMessage()
 {
+  static int idMetaType = qRegisterMetaType<QSerialPort::SerialPortError>();
+  Q_UNUSED(idMetaType);
+
   //logDebug() << "Try to detect USB serial interface " << Qt::hex << vid << ":" << pid << ".";
   logDebug() << "Try to detect USB serial interface " << QString::number(vid,16) << ":"
              << QString::number(pid,16) << ".";
@@ -46,7 +49,8 @@ USBSerial::USBSerial(unsigned vid, unsigned pid, QObject *parent)
 }
 
 USBSerial::~USBSerial() {
-  close();
+  if (isOpen())
+    close();
 }
 
 bool

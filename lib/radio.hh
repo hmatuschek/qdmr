@@ -205,6 +205,8 @@ public:
   /** Default constructor. */
 	explicit Radio(QObject *parent = nullptr);
 
+  virtual ~Radio();
+
   /** Returns the name of the radio (e.g., device identifier). */
 	virtual const QString &name() const = 0;
 

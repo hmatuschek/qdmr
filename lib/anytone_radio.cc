@@ -16,14 +16,16 @@ AnytoneRadio::AnytoneRadio(const QString &name, AnytoneInterface *device, QObjec
   if (nullptr != _dev) {
     _dev->setParent(this);
   } else if (! connect()) {
-    _errorMessage = tr("Cannot connect to AnyTone radio: %1").arg(_errorMessage);
     _task = StatusError;
     return;
   }  
 }
 
 AnytoneRadio::~AnytoneRadio() {
-  // pass...
+  if (_dev && _dev->isOpen()) {
+    _dev->reboot();
+    _dev->close();
+  }
 }
 
 const QString &
@@ -53,7 +55,10 @@ AnytoneRadio::startDownload(bool blocking) {
     return (StatusIdle == _task);
   }
 
+  if (_dev && _dev->isOpen())
+    _dev->close();
   start();
+
   return true;
 }
 
@@ -68,11 +73,14 @@ AnytoneRadio::startUpload(Config *config, bool blocking, const CodePlug::Flags &
   _task = StatusUpload;
   _codeplugFlags = flags;
   if (blocking) {
-    this->run();
+    run();
     return (StatusIdle == _task);
   }
 
-  this->start();
+  if (_dev && _dev->isOpen())
+    _dev->close();
+  start();
+
   return true;
 }
 
@@ -85,57 +93,82 @@ AnytoneRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const Calls
 
   _task = StatusUploadCallsigns;
   if (blocking) {
-    this->run();
+    run();
     return (StatusIdle == _task);
   }
 
-  this->start();
+  if (_dev && _dev->isOpen())
+    _dev->close();
+  start();
+
   return true;
 }
 
 void
 AnytoneRadio::run() {
   if (StatusDownload == _task) {
-    emit downloadStarted();
-
-    if (! download()) {
+    if (! connect()) {
+      _task = StatusError;
       emit downloadError(this);
       return;
     }
-    _task = StatusIdle;
-    _dev->reboot();
-    _dev->close();
-    //_dev->deleteLater();
 
+    emit downloadStarted();
+
+    if (! download()) {
+      _dev->reboot();
+      _dev->close();
+      _task = StatusError;
+      emit downloadError(this);
+      return;
+    }
+
+    //_dev->reboot();
+    _dev->close();
+    _task = StatusIdle;
     emit downloadFinished(this, _codeplug);
     _config = nullptr;
   } else if (StatusUpload == _task) {
+    if (! connect()) {
+      _task = StatusError;
+      emit uploadError(this);
+      return;
+    }
+
     emit uploadStarted();
 
     if (! upload()) {
+      _dev->reboot();
+      _dev->close();
+      _task = StatusError;
       emit uploadError(this);
       return;
     }
 
-    _task = StatusIdle;
     _dev->reboot();
     _dev->close();
-    //_dev->deleteLater();
-
+    _task = StatusIdle;
     emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {
+    if (! connect()) {
+      _task = StatusError;
+      emit uploadError(this);
+      return;
+    }
+
     emit uploadStarted();
 
     if (! uploadCallsigns()) {
+      _dev->reboot();
+      _dev->close();
+      _task = StatusError;
       emit uploadError(this);
       return;
     }
 
-    _task = StatusIdle;
     _dev->reboot();
     _dev->close();
-    _dev->deleteLater();
-
+    _task = StatusIdle;
     emit uploadComplete(this);
   }
 }
@@ -154,7 +187,9 @@ AnytoneRadio::connect() {
   _dev = new AnytoneInterface(this);
   if (! _dev->isOpen()) {
     _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());
+    _task = StatusError;
     _dev->deleteLater();
+    _dev = nullptr;
     return false;
   }
 
@@ -170,13 +205,6 @@ AnytoneRadio::download() {
 
   logDebug() << "Download of " << _codeplug->image(0).numElements() << " bitmaps.";
 
-  // The first thing happening within the thread is creating the interface to the device.
-  // For some reason this object cannot be created outside of the thread.
-  if (! connect()) {
-    _task = StatusError;
-    return false;
-  }
-
   // Download bitmaps
   for (int n=0; n<_codeplug->image(0).numElements(); n++) {
     uint addr = _codeplug->image(0).element(n).address();
@@ -185,10 +213,6 @@ AnytoneRadio::download() {
       _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
           .arg(_dev->errorMessage());
       logError() << _errorMessage;
-      _task = StatusError;
-      _dev->reboot();
-      _dev->close();
-      _dev->deleteLater();
       return false;
     }
     emit downloadProgress(float(n*100)/_codeplug->image(0).numElements());
@@ -206,10 +230,6 @@ AnytoneRadio::download() {
           .arg(n).arg(_codeplug->image(0).element(n).address())
           .arg(_codeplug->image(0).element(n).data().size()).arg(RBSIZE);
       logError() << _errorMessage;
-      _task = StatusError;
-      _dev->reboot();
-      _dev->close();
-      _dev->deleteLater();
       return false;
     }
   }
@@ -222,10 +242,6 @@ AnytoneRadio::download() {
       _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
           .arg(_dev->errorMessage());
       logError() << _errorMessage;
-      _task = StatusError;
-      _dev->reboot();
-      _dev->close();
-      _dev->deleteLater();
       return false;
     }
     emit downloadProgress(float(n*100)/_codeplug->image(0).numElements());
@@ -241,13 +257,6 @@ AnytoneRadio::upload() {
     return false;
   }
 
-  // The first thing happening within the thread is creating the interface to the device.
-  // For some reason this object cannot be created outside of the thread.
-  if (! connect()) {
-    _task = StatusError;
-    return false;
-  }
-
   // Download bitmaps first
   size_t nbitmaps = _codeplug->numImages();
   for (int n=0; n<_codeplug->image(0).numElements(); n++) {
@@ -257,10 +266,6 @@ AnytoneRadio::upload() {
       _errorMessage = QString("%1 Cannot read codeplug for update: %2").arg(__func__)
           .arg(_dev->errorMessage());
       logError() << _errorMessage;
-      _task = StatusError;
-      _dev->reboot();
-      _dev->close();
-      _dev->deleteLater();
       return false;
     }
     emit uploadProgress(float(n*25)/_codeplug->image(0).numElements());
@@ -278,10 +283,6 @@ AnytoneRadio::upload() {
       _errorMessage = QString("%1 Cannot read codeplug for update: %2").arg(__func__)
           .arg(_dev->errorMessage());
       logError() << _errorMessage;
-      _task = StatusError;
-      _dev->reboot();
-      _dev->close();
-      _dev->deleteLater();
       return false;
     }
     emit uploadProgress(25+float(n*25)/_codeplug->image(0).numElements());
@@ -296,10 +297,6 @@ AnytoneRadio::upload() {
   if (! _codeplug->encode(_config, _codeplugFlags)) {
     _errorMessage = QString("Cannot encode codeplug: %1").arg(_codeplug->errorMessage());
     logError() << _errorMessage;
-    _task = StatusError;
-    _dev->reboot();
-    _dev->close();
-    _dev->deleteLater();
     return false;
   }
 
@@ -314,10 +311,6 @@ AnytoneRadio::upload() {
       _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
           .arg(_dev->errorMessage());
       logError() << _errorMessage;
-      _task = StatusError;
-      _dev->reboot();
-      _dev->close();
-      _dev->deleteLater();
       return false;
     }
     emit uploadProgress(50+float(n*50)/_codeplug->image(0).numElements());
@@ -330,12 +323,6 @@ AnytoneRadio::upload() {
 
 bool
 AnytoneRadio::uploadCallsigns() {
-  // Connect to radio
-  if (! connect()) {
-    _task = StatusError;
-    return false;
-  }
-
   // Sort all elements before uploading
   _callsigns->image(0).sort();
 
@@ -354,7 +341,6 @@ AnytoneRadio::uploadCallsigns() {
         _task = StatusError;
         _dev->reboot();
         _dev->close();
-        _dev->deleteLater();
         return false;
       }
       blkWritten++;

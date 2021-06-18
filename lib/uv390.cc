@@ -66,6 +66,14 @@ UV390::UV390(DFUDevice *device, QObject *parent)
     return;
 }
 
+UV390::~UV390() {
+  if (_dev && _dev->isOpen()) {
+    logDebug() << "Reboot and close connection to radio.";
+    _dev->reboot();
+    _dev->close();
+  }
+}
+
 const QString &
 UV390::name() const {
   return _name;
@@ -126,6 +134,7 @@ UV390::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::
   if (StatusIdle != _task)
     return false;
 
+  logDebug() << "Encode call-sign DB.";
   _callsigns.encode(db, selection);
 
   _task = StatusUploadCallsigns;
@@ -141,11 +150,61 @@ UV390::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::
 void
 UV390::run() {
   if (StatusDownload == _task) {
-    download();
+    if (! connect()) {
+      emit downloadError(this);
+      return;
+    }
+
+    if (! download()) {
+      _dev->reboot();
+      _dev->close();
+      _task = StatusError;
+      emit downloadError(this);
+      return;
+    }
+
+    _task = StatusIdle;
+    _dev->reboot();
+    _dev->close();
+    emit downloadFinished(this, &_codeplug);
+    _config = nullptr;
   } else if (StatusUpload == _task) {
-    upload();
+    if (! connect()) {
+      emit uploadError(this);
+      return;
+    }
+
+    if (! upload()) {
+      _dev->reboot();
+      _dev->close();
+      _task = StatusError;
+      emit uploadError(this);
+      return;
+    }
+
+    _dev->reboot();
+    _dev->close();
+    _task = StatusIdle;
+    emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {
-    uploadCallsigns();
+    if (! connect()) {
+      emit uploadError(this);
+      return;
+    }
+
+    if(! uploadCallsigns()) {
+      _dev->reboot();
+      _dev->close();
+      _task = StatusError;
+      emit uploadError(this);
+      return;
+    }
+
+    _task = StatusIdle;
+    _dev->reboot();
+    _dev->close();
+    emit uploadComplete(this);
+
   }
 }
 
@@ -170,14 +229,8 @@ UV390::connect() {
   return true;
 }
 
-void
+bool
 UV390::download() {
-  // First ensure connection to device
-  if (! connect()) {
-    emit downloadError(this);
-    return;
-  }
-
   emit downloadStarted();
   logDebug() << "Download of " << _codeplug.image(0).numElements() << " elements.";
 
@@ -190,12 +243,7 @@ UV390::download() {
           .arg(n).arg(_codeplug.image(0).element(n).address())
           .arg(_codeplug.image(0).element(n).data().size()).arg(BSIZE);
       logError() << _errorMessage;
-      _task = StatusError;
-      _dev->reboot();
-      _dev->close();
-      _dev->deleteLater();
-      emit downloadError(this);
-      return;
+      return false;
     }
     totb += _codeplug.image(0).element(n).data().size()/BSIZE;
   }
@@ -211,33 +259,17 @@ UV390::download() {
         _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
         logError() << _errorMessage;
-        _task = StatusError;
-        _dev->reboot();
-        _dev->close();
-        _dev->deleteLater();
-        emit downloadError(this);
-        return;
+        return false;
       }
       emit downloadProgress(float(bcount*100)/totb);
     }
   }
 
-  _task = StatusIdle;
-  _dev->reboot();
-  _dev->close();
-  _dev->deleteLater();
-  emit downloadFinished(this, &_codeplug);
-  _config = nullptr;
+  return true;
 }
 
-void
+bool
 UV390::upload() {
-  // Ensure connection to device
-  if (! connect()) {
-    emit uploadError(this);
-    return;
-  }
-
   emit uploadStarted();
 
   // Check every segment in the codeplug
@@ -245,12 +277,7 @@ UV390::upload() {
     _errorMessage = QString("%1 Cannot upload codeplug: "
                             "Codeplug is not aligned with blocksize %5.").arg(__func__).arg(BSIZE);
     logError() << _errorMessage;
-    _task = StatusError;
-    _dev->reboot();
-    _dev->close();
-    _dev->deleteLater();
-    emit downloadError(this);
-    return;
+    return false;
   }
 
   size_t totb = _codeplug.memSize();
@@ -267,12 +294,7 @@ UV390::upload() {
           _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
           logError() << _errorMessage;
-          _task = StatusError;
-          _dev->reboot();
-          _dev->close();
-          _dev->deleteLater();
-          emit downloadError(this);
-          return;
+          return false;
         }
         emit uploadProgress(float(bcount*50)/totb);
       }
@@ -280,7 +302,7 @@ UV390::upload() {
   }
 
   // Encode config into codeplug
-  logDebug() << "Encode call-sign DB.";
+  logDebug() << "Encode codeplug.";
   _codeplug.encode(_config, _codeplugFlags);
 
   // then erase memory
@@ -299,33 +321,17 @@ UV390::upload() {
         _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
         logError() << _errorMessage;
-        _task = StatusError;
-        _dev->reboot();
-        _dev->close();
-        _dev->deleteLater();
-        emit uploadError(this);
-        return;
+        return false;
       }
       emit uploadProgress(50+float(bcount*50)/totb);
     }
   }
 
-  _task = StatusIdle;
-  _dev->reboot();
-  _dev->close();
-  _dev->deleteLater();
-
-  emit uploadComplete(this);
+  return true;
 }
 
-void
+bool
 UV390::uploadCallsigns() {
-  // Ensure connection to device
-  if (! connect()) {
-    emit uploadError(this);
-    return;
-  }
-
   emit uploadStarted();
 
   logDebug() << "Check alignment.";
@@ -333,12 +339,7 @@ UV390::uploadCallsigns() {
   if (! _callsigns.isAligned(BSIZE)) {
     _errorMessage = QString("%1 Cannot upload callsign db: Callsign DB is not aligned with blocksize %5.").arg(__func__);
     logError() << _errorMessage;
-    _task = StatusError;
-    _dev->reboot();
-    _dev->close();
-    _dev->deleteLater();
-    emit downloadError(this);
-    return;
+    return false;
   }
 
   // then erase memory
@@ -359,20 +360,10 @@ UV390::uploadCallsigns() {
       _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
           .arg(_dev->errorMessage());
       logError() << _errorMessage;
-      _task = StatusError;
-      _dev->reboot();
-      _dev->close();
-      _dev->deleteLater();
-      emit uploadError(this);
-      return;
+      return false;
     }
     emit uploadProgress(50+float(bcount*50)/totb);
   }
 
-  _task = StatusIdle;
-  _dev->reboot();
-  _dev->close();
-  _dev->deleteLater();
-
-  emit uploadComplete(this);
+  return true;
 }

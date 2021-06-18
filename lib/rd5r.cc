@@ -67,10 +67,10 @@ RD5R::RD5R(HID *device, QObject *parent)
 }
 
 RD5R::~RD5R() {
-  if (_dev && _dev->isOpen())
-  _dev->close();
-  if (_dev)
-    _dev->deleteLater();
+  if (_dev && _dev->isOpen()) {
+    _dev->reboot();
+    _dev->close();
+  }
   _dev = nullptr;
 }
 
@@ -149,10 +149,16 @@ RD5R::run()
     if (! download()) {
       _task = StatusError;
       _dev->read_finish();
+      _dev->reboot();
       _dev->close();
-      _dev->deleteLater();
       emit downloadError(this);
     }
+
+    _dev->reboot();
+    _dev->close();
+    _task = StatusIdle;
+    emit downloadFinished(this, &_codeplug);
+    _config = nullptr;
   } else if (StatusUpload == _task) {
     if (! connect()) {
       _errorMessage = tr("%1(): Cannot upload codeplug: %2")
@@ -165,12 +171,18 @@ RD5R::run()
     if (! upload()) {
       _task = StatusError;
       _dev->write_finish();
+      _dev->reboot();
       _dev->close();
-      _dev->deleteLater();
-      _dev = nullptr;
       emit uploadError(this);
       return;
     }
+
+    _dev->write_finish();
+    _dev->reboot();
+    _dev->close();
+
+    _task = StatusIdle;
+    emit uploadComplete(this);
   }
 }
 
@@ -219,10 +231,6 @@ RD5R::download() {
   }
 
   _dev->read_finish();
-  _task = StatusIdle;
-  emit downloadFinished(this, &_codeplug);
-  _config = nullptr;
-
   return true;
 }
 
@@ -274,8 +282,5 @@ RD5R::upload() {
     }
   }
 
-  _dev->write_finish();
-  _task = StatusIdle;
-  emit uploadComplete(this);
   return true;
 }
