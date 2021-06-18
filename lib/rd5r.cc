@@ -60,9 +60,7 @@ RD5R::RD5R(HID *device, QObject *parent)
   : Radio(parent), _name("Baofeng/Radioddity RD-5R"), _dev(device), _codeplugFlags(),
     _config(nullptr), _codeplug()
 {
-  if (_dev && _dev->isOpen())
-    _dev->setParent(this);
-  else if (! connect())
+  if (! connect())
     return;
 }
 
@@ -71,7 +69,10 @@ RD5R::~RD5R() {
     _dev->reboot();
     _dev->close();
   }
-  _dev = nullptr;
+  if (_dev) {
+    _dev->deleteLater();
+    _dev = nullptr;
+  }
 }
 
 const QString &

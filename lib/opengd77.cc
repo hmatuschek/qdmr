@@ -61,9 +61,7 @@ static Radio::Features _open_gd77_features =
 OpenGD77::OpenGD77(OpenGD77Interface *device, QObject *parent)
   : Radio(parent), _name("Open GD-77"), _dev(device), _config(nullptr), _codeplug(), _callsigns()
 {
-  if (_dev)
-    _dev->setParent(this);
-  else if (! connect())
+  if (! connect())
     return;
   logDebug() << "Connected to radio '" << _name << "'.";
 }
@@ -72,6 +70,10 @@ OpenGD77::~OpenGD77() {
   if (_dev && _dev->isOpen())  {
     _dev->reboot();
     _dev->close();
+  }
+  if (_dev) {
+    _dev->deleteLater();
+    _dev = nullptr;
   }
 }
 
@@ -243,7 +245,7 @@ OpenGD77::connect() {
   if (_dev)
     _dev->deleteLater();
 
-  _dev = new OpenGD77Interface(this);
+  _dev = new OpenGD77Interface();
   if (! _dev->isOpen()) {
     _task = StatusError;
     _errorMessage = QString("Cannot connect to radio: %1").arg(_dev->errorString());

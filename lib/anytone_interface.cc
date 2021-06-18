@@ -164,7 +164,7 @@ AnytoneInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
     return false;
   }
 
-  logDebug() << "Anytone: Write " << nbytes << "b to addr 0x" << QString::number(addr, 16) << "...";
+  //logDebug() << "Anytone: Write " << nbytes << "b to addr 0x" << QString::number(addr, 16) << "...";
 
   for (int i=0; i<nbytes; i+=16) {
     uint8_t ack;

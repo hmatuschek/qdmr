@@ -13,9 +13,7 @@ AnytoneRadio::AnytoneRadio(const QString &name, AnytoneInterface *device, QObjec
     _codeplug(nullptr), _callsigns(nullptr)
 {
   // Open device to radio if not already present
-  if (nullptr != _dev) {
-    _dev->setParent(this);
-  } else if (! connect()) {
+  if (! connect()) {
     _task = StatusError;
     return;
   }  
@@ -25,6 +23,10 @@ AnytoneRadio::~AnytoneRadio() {
   if (_dev && _dev->isOpen()) {
     _dev->reboot();
     _dev->close();
+  }
+  if (_dev) {
+    _dev->deleteLater();
+    _dev = nullptr;
   }
 }
 
@@ -184,7 +186,7 @@ AnytoneRadio::connect() {
     _dev->deleteLater();
 
   // If no connection -> open one.
-  _dev = new AnytoneInterface(this);
+  _dev = new AnytoneInterface();
   if (! _dev->isOpen()) {
     _errorMessage = QString("Cannot open device: %1").arg(_dev->errorMessage());
     _task = StatusError;
@@ -316,7 +318,6 @@ AnytoneRadio::upload() {
     emit uploadProgress(50+float(n*50)/_codeplug->image(0).numElements());
   }
 
-  //_codeplug.write("debug_codeplug.dfu");
   return true;
 }
 
@@ -339,8 +340,6 @@ AnytoneRadio::uploadCallsigns() {
             .arg(_dev->errorMessage());
         logError() << _errorMessage;
         _task = StatusError;
-        _dev->reboot();
-        _dev->close();
         return false;
       }
       blkWritten++;

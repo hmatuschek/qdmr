@@ -60,9 +60,7 @@ static Radio::Features _gd77_features = {
 GD77::GD77(HID *device, QObject *parent)
   : Radio(parent), _name("Radioddity GD-77"), _dev(device), _config(nullptr)
 {
-  if (_dev)
-    _dev->setParent(this);
-  else if (! connect())
+  if (! connect())
     return;
 }
 
@@ -70,6 +68,10 @@ GD77::~GD77() {
   if (_dev && _dev->isOpen()) {
     _dev->reboot();
     _dev->close();
+  }
+  if (_dev) {
+    _dev->deleteLater();
+    _dev = nullptr;
   }
 }
 
@@ -146,7 +148,7 @@ GD77::connect() {
   if (_dev)
     _dev->deleteLater();
   // connect
-  _dev = new HID(0x15a2, 0x0073, this);
+  _dev = new HID(0x15a2, 0x0073);
   if (! _dev->isOpen()) {
     _task = StatusError;
     _errorMessage = tr("%1(): Cannot connect to radio: %2").arg(__func__).arg(_dev->errorMessage());

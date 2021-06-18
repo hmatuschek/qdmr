@@ -60,9 +60,7 @@ static Radio::Features _uv390_features =
 UV390::UV390(DFUDevice *device, QObject *parent)
   : Radio(parent), _name("TYT MD-UV390"), _dev(device), _codeplugFlags(), _config(nullptr)
 {
-  if (_dev)
-    _dev->setParent(this);
-  else if (! connect())
+  if (! connect())
     return;
 }
 
@@ -71,6 +69,10 @@ UV390::~UV390() {
     logDebug() << "Reboot and close connection to radio.";
     _dev->reboot();
     _dev->close();
+  }
+  if (_dev) {
+    _dev->deleteLater();
+    _dev = nullptr;
   }
 }
 
@@ -217,7 +219,7 @@ UV390::connect() {
   if (_dev)
     _dev->deleteLater();
 
-  _dev = new DFUDevice(0x0483, 0xdf11, this);
+  _dev = new DFUDevice(0x0483, 0xdf11);
   if (!_dev->isOpen()) {
     _errorMessage = QString("Cannot open device at 0483:DF11: %1").arg(_dev->errorMessage());
     _dev->deleteLater();
