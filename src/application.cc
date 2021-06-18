@@ -519,9 +519,14 @@ Application::downloadCodeplug() {
   connect(radio, SIGNAL(downloadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(downloadError(Radio *)), this, SLOT(onCodeplugDownloadError(Radio *)));
   connect(radio, SIGNAL(downloadFinished(Radio *, CodePlug *)), this, SLOT(onCodeplugDownloaded(Radio *, CodePlug *)));
-  radio->startDownload(false);
-  _mainWindow->statusBar()->showMessage(tr("Download ..."));
-  _mainWindow->setEnabled(false);
+  if (radio->startDownload(false)) {
+    _mainWindow->statusBar()->showMessage(tr("Download ..."));
+    _mainWindow->setEnabled(false);
+  } else {
+    QMessageBox::critical(nullptr, tr("Cannot download codeplug."),
+                          tr("Cannot download codeplug: %1").arg(radio->errorMessage()));
+    progress->setVisible(false);
+  }
 }
 
 void
@@ -588,10 +593,15 @@ Application::uploadCodeplug() {
   connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
-  radio->startUpload(_config, false, settings.codePlugFlags());
 
-  _mainWindow->statusBar()->showMessage(tr("Upload ..."));
-  _mainWindow->setEnabled(false);
+  if (radio->startUpload(_config, false, settings.codePlugFlags())) {
+     _mainWindow->statusBar()->showMessage(tr("Upload ..."));
+     _mainWindow->setEnabled(false);
+  } else {
+    QMessageBox::critical(nullptr, tr("Cannot upload codeplug."),
+                          tr("Cannot upload codeplug: %1").arg(radio->errorMessage()));
+    progress->setVisible(false);
+  }
 }
 
 void
@@ -633,10 +643,14 @@ Application::uploadCallsignDB() {
   connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
-  radio->startUploadCallsignDB(_users, false);
-
-  _mainWindow->statusBar()->showMessage(tr("Upload User DB ..."));
-  _mainWindow->setEnabled(false);
+  if (radio->startUploadCallsignDB(_users, false)) {
+    _mainWindow->statusBar()->showMessage(tr("Upload User DB ..."));
+    _mainWindow->setEnabled(false);
+  } else {
+    QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
+                          tr("Cannot upload call-sign DB: %1").arg(radio->errorMessage()));
+    progress->setVisible(false);
+  }
 }
 
 
