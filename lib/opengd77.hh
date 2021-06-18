@@ -20,7 +20,7 @@ class OpenGD77 : public Radio
 
 public:
 	/** Do not construct this class directly, rather use @c Radio::detect. */
-  explicit OpenGD77(QObject *parent=nullptr);
+  explicit OpenGD77(OpenGD77Interface *device=nullptr, QObject *parent=nullptr);
   virtual ~OpenGD77();
 
 	const QString &name() const;

@@ -26,7 +26,9 @@ class GD77 : public Radio
 
 public:
 	/** Do not construct this class directly, rather use @c Radio::detect. */
-	explicit GD77(QObject *parent=nullptr);
+  explicit GD77(HID *device=nullptr, QObject *parent=nullptr);
+
+  virtual ~GD77();
 
 	const QString &name() const;
   const Radio::Features &features() const;
@@ -47,6 +49,12 @@ public slots:
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
 	void run();
+  /** Connects to the device. */
+  bool connect();
+  /** Reads the codeplug from the device. */
+  bool download();
+  /** Writes the codeplug to the device. */
+  bool upload();
 
 protected:
   /** The device identifier. */

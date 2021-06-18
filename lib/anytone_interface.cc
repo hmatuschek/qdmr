@@ -65,10 +65,25 @@ AnytoneInterface::WriteRequest::WriteRequest(uint32_t addr, const char *data) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneInterface::RadioInfo
+ * ********************************************************************************************* */
+AnytoneInterface::RadioInfo::RadioInfo()
+  : name(""), bands(0x00), version("")
+{
+  // pass...
+}
+
+bool
+AnytoneInterface::RadioInfo::isValid() const {
+  return ! name.isEmpty();
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneInterface
  * ********************************************************************************************* */
 AnytoneInterface::AnytoneInterface(QObject *parent)
-  : USBSerial(0x28e9, 0x018a, parent), _state(STATE_INITIALIZED), _identifier("")
+  : USBSerial(0x28e9, 0x018a, parent), _state(STATE_INITIALIZED), _info()
 {
   if (isOpen()) {
     _state = STATE_OPEN;
@@ -77,8 +92,14 @@ AnytoneInterface::AnytoneInterface(QObject *parent)
     return;
   }
 
+  // enter program mode
+  if (! this->enter_program_mode())
+    return;
   // identify device
-  this->identifier();
+  if (! this->request_identifier(_info)) {
+    _info = RadioInfo();
+    _state = STATE_ERROR;
+  }
 }
 
 AnytoneInterface::~AnytoneInterface() {
@@ -103,17 +124,16 @@ AnytoneInterface::close() {
 
 QString
 AnytoneInterface::identifier() {
-  if (! _identifier.isEmpty())
-    return _identifier;
-  if (! enter_program_mode()) {
-    return "";
+  return _info.name;
+}
+
+bool
+AnytoneInterface::getInfo(RadioInfo &info) {
+  if (_info.isValid()) {
+    info = _info;
+    return true;
   }
-  QString version;
-  if (! request_identifier(_identifier, version)) {
-    return "";
-  }
-  logDebug() << "Found radio '" << _identifier << "', version '" << version << "'.";
-  return _identifier;
+  return false;
 }
 
 bool
@@ -273,7 +293,7 @@ AnytoneInterface::enter_program_mode() {
 }
 
 bool
-AnytoneInterface::request_identifier(QString &radio, QString &version) {
+AnytoneInterface::request_identifier(RadioInfo &info) {
   if (STATE_PROGRAM != _state) {
       _errorMessage = tr("Anytone: Cannot request identifier. "
                          "Device not in program mode, is in state %1.").arg(_state);
@@ -281,25 +301,28 @@ AnytoneInterface::request_identifier(QString &radio, QString &version) {
       return false;
     }
 
-  char resp[16];
+  RadioInfoResponse resp;
   // send "identify" command (in program mode)
-  if (! send_receive("\2", 1, resp, 16)) {
+  if (! send_receive("\2", 1, (char *)&resp, sizeof(RadioInfoResponse))) {
     _errorMessage = tr("Anytone: Cannot request identifier: %1").arg(_errorMessage);
     logError() << _errorMessage;
     return false;
   }
   // check response
-  if (('I'!=resp[0]) || (6 != resp[15])) {
+  if (('I'!=resp.prefix) || (0x06 != resp.eot)) {
     _errorMessage = tr("Anytone: Cannot request identifier: Unexpected response. "
                        "Expected 49...06 got %1...%2.")
-        .arg((int)resp[0],2,16,QChar('0')).arg((int)resp[15],2,16,QChar('0'));
+        .arg((int)resp.prefix,2,16,QChar('0'))
+        .arg((int)resp.eot,2,16,QChar('0'));
     logError() << _errorMessage;
     close();
     _state = STATE_ERROR;
     return false;
   }
-  radio = QString::fromLocal8Bit(resp+1, strnlen(resp+1, 8)).simplified();
-  version = QString::fromLocal8Bit(resp+9, strnlen(resp+9, 6)).simplified();
+  info.name = QString::fromLocal8Bit(resp.model, strnlen(resp.model, sizeof(resp.model))).simplified();
+  info.bands = resp.bands;
+  info.version = QString::fromLocal8Bit(resp.version, strnlen(resp.version, sizeof(resp.model))).simplified();
+  logDebug() << "Found radio '" << info.name << "', version '" << info.version << "'.";
   return true;
 }
 

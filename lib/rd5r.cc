@@ -56,11 +56,22 @@ static Radio::Features _rd5r_features =
 };
 
 
-RD5R::RD5R(QObject *parent)
-  : Radio(parent), _name("Baofeng/Radioddity RD-5R"), _dev(nullptr), _codeplugFlags(),
+RD5R::RD5R(HID *device, QObject *parent)
+  : Radio(parent), _name("Baofeng/Radioddity RD-5R"), _dev(device), _codeplugFlags(),
     _config(nullptr), _codeplug()
 {
-  // pass...
+  if (_dev && _dev->isOpen())
+    _dev->setParent(this);
+  else if (! connect())
+    return;
+}
+
+RD5R::~RD5R() {
+  if (_dev && _dev->isOpen())
+  _dev->close();
+  if (_dev)
+    _dev->deleteLater();
+  _dev = nullptr;
 }
 
 const QString &
@@ -127,124 +138,144 @@ void
 RD5R::run()
 {
   if (StatusDownload == _task) {
-    emit downloadStarted();
-
-    _dev = new HID(0x15a2, 0x0073);
-    if (! _dev->isOpen()) {
-      _errorMessage = tr("%1(): Cannot open Download codeplug: %2")
+    if (! connect()) {
+      _errorMessage = tr("%1(): Cannot download codeplug: %2")
           .arg(__func__).arg(_dev->errorMessage());
-      _dev->deleteLater();
       _task = StatusError;
       emit downloadError(this);
       return;
     }
 
-    uint btot = 0;
-    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-      btot += _codeplug.image(0).element(n).data().size()/BSIZE;
+    if (! download()) {
+      _task = StatusError;
+      _dev->read_finish();
+      _dev->close();
+      _dev->deleteLater();
+      emit downloadError(this);
+    }
+  } else if (StatusUpload == _task) {
+    if (! connect()) {
+      _errorMessage = tr("%1(): Cannot upload codeplug: %2")
+          .arg(__func__).arg(_dev->errorMessage());
+      _task = StatusError;
+      emit uploadError(this);
+      return;
     }
 
-    uint bcount = 0;
+    if (! upload()) {
+      _task = StatusError;
+      _dev->write_finish();
+      _dev->close();
+      _dev->deleteLater();
+      _dev = nullptr;
+      emit uploadError(this);
+      return;
+    }
+  }
+}
+
+
+bool
+RD5R::connect() {
+  // If connected -> done
+  if (_dev && _dev->isOpen())
+    return true;
+  // If not open -> reconnect
+  if (_dev)
+    _dev->deleteLater();
+  _dev = new HID(0x15a2, 0x0073);
+  if (! _dev->isOpen()) {
+    _errorMessage = tr("%1(): Cannot connect to RD5R: %2")
+        .arg(__func__).arg(_dev->errorMessage());
+    _dev->deleteLater();
+    _dev = nullptr;
+    _task = StatusError;
+    return false;
+  }
+  return true;
+}
+
+bool
+RD5R::download() {
+  emit downloadStarted();
+
+  uint btot = 0;
+  for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+    btot += _codeplug.image(0).element(n).data().size()/BSIZE;
+  }
+
+  uint bcount = 0;
+  for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+    int b0 = _codeplug.image(0).element(n).address()/BSIZE;
+    int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
+    for (int i=0; i<nb; i++, bcount++) {
+      if (! _dev->read(0, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+        _errorMessage = tr("%1: Cannot download codeplug: %2").arg(__func__)
+            .arg(_dev->errorMessage());
+        return false;
+      }
+      emit downloadProgress(float(bcount*100)/btot);
+    }
+  }
+
+  _dev->read_finish();
+  _task = StatusIdle;
+  emit downloadFinished(this, &_codeplug);
+  _config = nullptr;
+
+  return true;
+}
+
+bool
+RD5R::upload() {
+  emit uploadStarted();
+
+  uint btot = 0;
+  for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+    btot += _codeplug.image(0).element(n).data().size()/BSIZE;
+  }
+
+  uint bcount = 0;
+  if (_codeplugFlags.updateCodePlug) {
+    // If codeplug gets updated, download codeplug from device first:
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {
       int b0 = _codeplug.image(0).element(n).address()/BSIZE;
       int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
       for (int i=0; i<nb; i++, bcount++) {
         if (! _dev->read(0, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
-          _errorMessage = tr("%1: Cannot download codeplug: %2").arg(__func__)
-              .arg(_dev->errorMessage());
-          _task = StatusError;
-          _dev->read_finish();
-          _dev->close();
-          _dev->deleteLater();
-          emit downloadError(this);
-          return;
-        }
-        emit downloadProgress(float(bcount*100)/btot);
-      }
-    }
-    _task = StatusIdle;
-    _dev->read_finish();
-    _dev->close();
-    _dev->deleteLater();
-    emit downloadFinished(this, &_codeplug);
-    _config = nullptr;
-  } else if (StatusUpload == _task) {
-    emit uploadStarted();
-
-    _dev = new HID(0x15a2, 0x0073);
-    if (! _dev->isOpen()) {
-      _errorMessage = tr("%1(): Cannot open Download codeplug: %2")
-          .arg(__func__).arg(_dev->errorMessage());
-      _dev->deleteLater();
-      _task = StatusError;
-      emit uploadError(this);
-      return;
-    }
-
-    uint btot = 0;
-    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-      btot += _codeplug.image(0).element(n).data().size()/BSIZE;
-    }
-
-    uint bcount = 0;
-    if (_codeplugFlags.updateCodePlug) {
-      // If codeplug gets updated, download codeplug from device first:
-      for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-        int b0 = _codeplug.image(0).element(n).address()/BSIZE;
-        int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
-        for (int i=0; i<nb; i++, bcount++) {
-          if (! _dev->read(0, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
-            _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
-                .arg(_dev->errorMessage());
-            _task = StatusError;
-            _dev->read_finish();
-            _dev->close();
-            _dev->deleteLater();
-            emit uploadError(this);
-            return;
-          }
-          emit uploadProgress(float(bcount*50)/btot);
-        }
-      }
-    }
-
-    // Encode config into codeplug
-    if (! _codeplug.encode(_config, _codeplugFlags)) {
-      _errorMessage = tr("%1(): Upload failed: %2")
-          .arg(__func__).arg(_codeplug.errorMessage());
-      _task = StatusError;
-      _dev->read_finish();
-      _dev->close();
-      _dev->deleteLater();
-      emit uploadError(this);
-      return;
-    }
-
-    // then, upload modified codeplug
-    bcount = 0;
-    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-      int b0 = _codeplug.image(0).element(n).address()/BSIZE;
-      int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
-      for (int i=0; i<nb; i++, bcount++) {
-        if (! _dev->write(0, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
           _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
-          _task = StatusError;
-          _dev->write_finish();
-          _dev->close();
-          _dev->deleteLater();
-          emit uploadError(this);
-          return;
+          return false;
         }
-        emit uploadProgress(50+float(bcount*50)/btot);
+        emit uploadProgress(float(bcount*50)/btot);
       }
     }
-    _dev->write_finish();
-
-    _task = StatusIdle;
-    _dev->close();
-    _dev->deleteLater();
-
-    emit uploadComplete(this);
   }
+
+  // Encode config into codeplug
+  if (! _codeplug.encode(_config, _codeplugFlags)) {
+    _errorMessage = tr("%1(): Upload failed: %2")
+        .arg(__func__).arg(_codeplug.errorMessage());
+    return false;
+  }
+
+  // then, upload modified codeplug
+  bcount = 0;
+  for (int n=0; n<_codeplug.image(0).numElements(); n++) {
+    int b0 = _codeplug.image(0).element(n).address()/BSIZE;
+    int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
+    for (int i=0; i<nb; i++, bcount++) {
+      if (! _dev->write(0, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+        _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
+            .arg(_dev->errorMessage());
+        return false;
+      }
+      emit uploadProgress(50+float(bcount*50)/btot);
+    }
+  }
+
+  _dev->write_finish();
+  _task = StatusIdle;
+  emit uploadComplete(this);
+  return true;
 }

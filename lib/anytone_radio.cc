@@ -8,10 +8,21 @@
 #define WBSIZE 16
 
 
-AnytoneRadio::AnytoneRadio(const QString &name, QObject *parent)
-  : Radio(parent), _name(name), _dev(nullptr), _codeplugFlags(), _config(nullptr),
+AnytoneRadio::AnytoneRadio(const QString &name, AnytoneInterface *device, QObject *parent)
+  : Radio(parent), _name(name), _dev(device), _codeplugFlags(), _config(nullptr),
     _codeplug(nullptr), _callsigns(nullptr)
 {
+  // Open device to radio if not already present
+  if (nullptr != _dev) {
+    _dev->setParent(this);
+  } else if (! connect()) {
+    _errorMessage = tr("Cannot connect to AnyTone radio: %1").arg(_errorMessage);
+    _task = StatusError;
+    return;
+  }  
+}
+
+AnytoneRadio::~AnytoneRadio() {
   // pass...
 }
 
@@ -94,7 +105,7 @@ AnytoneRadio::run() {
     _task = StatusIdle;
     _dev->reboot();
     _dev->close();
-    _dev->deleteLater();
+    //_dev->deleteLater();
 
     emit downloadFinished(this, _codeplug);
     _config = nullptr;
@@ -109,7 +120,7 @@ AnytoneRadio::run() {
     _task = StatusIdle;
     _dev->reboot();
     _dev->close();
-    _dev->deleteLater();
+    //_dev->deleteLater();
 
     emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {

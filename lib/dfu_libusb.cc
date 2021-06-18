@@ -299,6 +299,7 @@ DFUDevice::identify()
     return nullptr;
   }
   get_status();
+
   return (const char*) data;
 }
 

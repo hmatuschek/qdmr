@@ -57,10 +57,13 @@ static Radio::Features _uv390_features =
 };
 
 
-UV390::UV390(QObject *parent)
-  : Radio(parent), _name("TYT MD-UV390"), _dev(nullptr), _codeplugFlags(), _config(nullptr)
+UV390::UV390(DFUDevice *device, QObject *parent)
+  : Radio(parent), _name("TYT MD-UV390"), _dev(device), _codeplugFlags(), _config(nullptr)
 {
-  // pass...
+  if (_dev)
+    _dev->setParent(this);
+  else if (! connect())
+    return;
 }
 
 const QString &
@@ -146,20 +149,37 @@ UV390::run() {
   }
 }
 
+bool
+UV390::connect() {
+  if (_dev && _dev->isOpen())
+    return true;
 
-void
-UV390::download() {
-  emit downloadStarted();
-  logDebug() << "Download of " << _codeplug.image(0).numElements() << " elements.";
+  // Connected but not open
+  if (_dev)
+    _dev->deleteLater();
 
   _dev = new DFUDevice(0x0483, 0xdf11, this);
   if (!_dev->isOpen()) {
     _errorMessage = QString("Cannot open device at 0483:DF11: %1").arg(_dev->errorMessage());
     _dev->deleteLater();
+    _dev = nullptr;
     _task = StatusError;
+    return false;
+  }
+
+  return true;
+}
+
+void
+UV390::download() {
+  // First ensure connection to device
+  if (! connect()) {
     emit downloadError(this);
     return;
   }
+
+  emit downloadStarted();
+  logDebug() << "Download of " << _codeplug.image(0).numElements() << " elements.";
 
   // Check every segment in the codeplug
   size_t totb = 0;
@@ -212,16 +232,13 @@ UV390::download() {
 
 void
 UV390::upload() {
-  emit uploadStarted();
-
-  _dev = new DFUDevice(0x0483, 0xdf11, this);
-  if (!_dev->isOpen()) {
-    _errorMessage = QString("Cannot open device at 0483:DF11: %1").arg(_dev->errorMessage());
-    _dev->deleteLater();
-    _task = StatusError;
+  // Ensure connection to device
+  if (! connect()) {
     emit uploadError(this);
     return;
   }
+
+  emit uploadStarted();
 
   // Check every segment in the codeplug
   if (! _codeplug.isAligned(BSIZE)) {
@@ -303,16 +320,13 @@ UV390::upload() {
 
 void
 UV390::uploadCallsigns() {
-  emit uploadStarted();
-
-  _dev = new DFUDevice(0x0483, 0xdf11, this);
-  if (!_dev->isOpen()) {
-    _errorMessage = QString("Cannot open device at 0483:DF11: %1").arg(_dev->errorMessage());
-    _dev->deleteLater();
-    _task = StatusError;
+  // Ensure connection to device
+  if (! connect()) {
     emit uploadError(this);
     return;
   }
+
+  emit uploadStarted();
 
   logDebug() << "Check alignment.";
   // Check alignment in the codeplug

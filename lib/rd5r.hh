@@ -43,7 +43,9 @@ public:
   /** Constructor.
    * Do not call this constructor directly. Consider using the factory method
    * @c Radio::detect. */
-	RD5R(QObject *parent=nullptr );
+  RD5R(HID *device=nullptr, QObject *parent=nullptr);
+
+  virtual ~RD5R();
 
 	const QString &name() const;
 	const Radio::Features &features() const;
@@ -65,6 +67,13 @@ protected:
   /** Main function running in a separate thread performing the up- and download to and from the
    * device. */
 	void run();
+
+  /** Connect to the radio. */
+  bool connect();
+  /** Read codeplug. */
+  bool download();
+  /** Write/Update codeplug. */
+  bool upload();
 
 private:
   /** Device identifier string. */

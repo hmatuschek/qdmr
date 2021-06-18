@@ -36,9 +36,12 @@ class AnytoneRadio: public Radio
 
 protected:
   /** Do not construct this class directly. */
-  explicit AnytoneRadio(const QString &name, QObject *parent=nullptr);
+  explicit AnytoneRadio(const QString &name, AnytoneInterface *device=nullptr, QObject *parent=nullptr);
 
 public:
+  /** Destructor. */
+  virtual ~AnytoneRadio();
+
   const QString &name() const;
   const CodePlug &codeplug() const;
   CodePlug &codeplug();

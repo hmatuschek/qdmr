@@ -38,9 +38,13 @@ class D868UV: public AnytoneRadio
 
 public:
   /** Do not construct this class directly, rather use @c Radio::detect. */
-  explicit D868UV(QObject *parent=nullptr);
+  explicit D868UV(AnytoneInterface *device=nullptr, QObject *parent=nullptr);
 
   const Radio::Features &features() const;
+
+protected:
+  /** Features of detected radio, variant and mode. */
+  Radio::Features _features;
 };
 
 #endif // __D868UV_HH__

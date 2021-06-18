@@ -16,6 +16,22 @@ class AnytoneInterface : public USBSerial
   Q_OBJECT
 
 public:
+  /** Collects information about the particular radio being accessed. */
+  struct RadioInfo {
+    /** The name of the radio. */
+    QString name;
+    /** A code for which bands are supported. */
+    char bands;
+    /** The (firmware/hardware) version. */
+    QString version;
+
+    /** Empty constructor. */
+    RadioInfo();
+    /** Returns @c true if the radio info is valid. */
+    bool isValid() const;
+  };
+
+public:
   /** Constructs a new interface to Anyton radios. If a matching device was found, @c isOpen
    * returns @c true. */
   explicit AnytoneInterface(QObject *parent=nullptr);
@@ -27,6 +43,10 @@ public:
 
   /** Returns an identifier of the radio. */
   QString identifier();
+
+  /** Reads the radio info from the device and returns it.
+   * The information is only read once. */
+  bool getInfo(RadioInfo &info);
 
   bool read_start(uint32_t bank, uint32_t addr);
   bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
@@ -42,7 +62,7 @@ protected:
   /** Send command message to radio to ender program state. */
   bool enter_program_mode();
   /** Sends a request to radio to identify itself. */
-  bool request_identifier(QString &radio, QString &version);
+  bool request_identifier(RadioInfo &info);
   /** Sends a command message to radio to leave program state and reboot. */
   bool leave_program_mode();
   /** Internal used method to send messages to and receive responses from radio. */
@@ -87,20 +107,29 @@ protected:
     WriteRequest(uint32_t addr, const char *data);
   };
 
+  /** Structure of radio information response. */
+  struct __attribute__((packed)) RadioInfoResponse {
+    char prefix;       ///< Fixed prefix. Set to 'I' on success.
+    char model[7];     ///< Model name.
+    uint8_t bands;     ///< Frequency bands supported by radio.
+    char version[6];   ///< Version number. Either hardware or 'radio' version.
+    uint8_t eot;       ///< Fixed 0x06 on success.
+  };
+
   /** Possible states of the radio interface. */
-  typedef enum {
+  enum State {
     STATE_INITIALIZED, ///< Initial state.
     STATE_OPEN,        ///< Interface to radio is open.
     STATE_PROGRAM,     ///< Radio is in program mode.
     STATE_CLOSED,      ///< Interface to radio is closed (captive final state).
     STATE_ERROR        ///< An error occurred (captive final state),
                        ///  use @c errorMessage() to get an error message.
-  } State;
+  };
 
   /** Holds the state of the interface. */
   State _state;
-  /** Holds the identifyer string of the radio. */
-  QString _identifier;
+  /** Holds the radio info. */
+  RadioInfo _info;
 };
 
 #endif // ANYTONEINTERFACE_HH
