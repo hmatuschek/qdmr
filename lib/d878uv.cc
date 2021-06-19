@@ -145,5 +145,5 @@ D878UV::D878UV(AnytoneInterface *device, QObject *parent)
 
 const Radio::Features &
 D878UV::features() const {
-  return _d878uv_features;
+  return _features;
 }
