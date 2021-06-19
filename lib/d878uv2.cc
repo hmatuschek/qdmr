@@ -75,7 +75,7 @@ D878UV2::D878UV2(AnytoneInterface *device, QObject *parent)
   : AnytoneRadio("Anytone AT-D878UVII", device, parent), _features(_d878uv2_features)
 {
   _codeplug = new D878UV2Codeplug(this);
-  _callsigns = new D868UVCallsignDB(this);
+  _callsigns = new D878UV2CallsignDB(this);
 
   // Get device info and determine supported TX frequency bands
   AnytoneInterface::RadioInfo info; _dev->getInfo(info);

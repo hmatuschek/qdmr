@@ -43,6 +43,7 @@ public:
   const Radio::Features &features() const;
 
 protected:
+  /** Holds a copy of the specific radio features. */
   Radio::Features _features;
 };
 

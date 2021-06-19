@@ -38,12 +38,12 @@ class GPSSystem;
  * using wireshark to monitor the USB communication between the windows CPS (running in a vritual
  * box) and the device. The latter makes the reverse-engineering particularily cumbersome.
  *
- * @section d878uvcpl Codeplug structure within radio
+ * @section d878uv2cpl Codeplug structure within radio
  * <table>
  *  <tr><th colspan="3">Channels</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>024C1500</td> <td>000200</td>      <td>Bitmap of 4000 channels, default 0x00, 0x00 padded.</td></tr>
- *  <tr><td>00800000</td> <td>max. 002000</td> <td>Channel bank 0 of upto 128 channels, see @c channel_t 64 b each. </td></tr>
+ *  <tr><td>00800000</td> <td>max. 002000</td> <td>Channel bank 0 of upto 128 channels, see @c D878UVCodeplug::channel_t 64 b each. </td></tr>
  *  <tr><td>00802000</td> <td>max, 002000</td> <td>Unknown data, Maybe extended channel information for channel bank 0?
  *    It is of exactly the same size as the channel bank 0. Mostly 0x00, a few 0xff.</td></tr>
  *  <tr><td>00840000</td> <td>max. 002000</td> <td>Channel bank 1 of upto 128 channels.</td></tr>
@@ -69,34 +69,34 @@ class GPSSystem;
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>01042000</td> <td>000020</td>      <td>Roaming channel bitmask, up to 250 bits, 0-padded, default 0.</td></tr>
  *  <tr><td>01040000</td> <td>max. 0x1f40</td> <td>Optional up to 250 roaming channels, of 32b each.
- *    See @c roaming_channel_t for details.</td></tr>
+ *    See @c D878UVCodeplug::roaming_channel_t for details.</td></tr>
  *  <tr><td>01042080</td> <td>000010</td>      <td>Roaming zone bitmask, up to 64 bits, 0-padded, default 0.</td></tr>
  *  <tr><td>01043000</td> <td>max. 0x2000</td> <td>Optional up to 64 roaming zones, of 128b each.
- *    See @c roaming_zone_t for details.</td></tr>
+ *    See @c D878UVCodeplug::roaming_zone_t for details.</td></tr>
  *
  *  <tr><th colspan="3">Contacts</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>02600000</td> <td>max. 009C40</td> <td>Index list of valid contacts.
  *    10000 32bit indices, little endian, default 0xffffffff</td></tr>
  *  <tr><td>02640000</td> <td>000500</td>      <td>Contact bitmap, 10000 bit, inverted, default 0xff, 0x00 padded.</td></tr>
- *  <tr><td>02680000</td> <td>max. 0f4240</td> <td>10000 contacts, see @c contact_t.
+ *  <tr><td>02680000</td> <td>max. 0f4240</td> <td>10000 contacts, see @c D868UVCodeplug::contact_t.
  *    As each contact is 100b, they do not align with the 16b blocks being transferred to the device.
  *    Hence contacts are organized internally in groups of 4 contacts forming a "bank". </td></tr>
- *  <tr><td>04340000</td> <td>max. 013880</td> <td>DMR ID to contact index map, see @c contact_map_t.
+ *  <tr><td>04340000</td> <td>max. 013880</td> <td>DMR ID to contact index map, see @c D868UVCodeplug::contact_map_t.
  *    Sorted by ID, empty entries set to 0xffffffffffffffff.</td>
  *
  *  <tr><th colspan="3">Analog Contacts</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>02900000</td> <td>000080</td>      <td>Index list of valid ananlog contacts.</td></tr>
  *  <tr><td>02900100</td> <td>000080</td>      <td>Bytemap for 128 analog contacts.</td></tr>
- *  <tr><td>02940000</td> <td>max. 000180</td> <td>128 analog contacts. See @c analog_contact_t.
+ *  <tr><td>02940000</td> <td>max. 000180</td> <td>128 analog contacts. See @c D868UVCodeplug::analog_contact_t.
  *    As each analog contact is 24b, they do not align with the 16b transfer block-size. Hence
  *    analog contacts are internally organized in groups of 2. </td></tr>
  *
  *  <tr><th colspan="3">RX Group Lists</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>025C0B10</td> <td>000020</td>      <td>Bitmap of 250 RX group lists, default/padding 0x00.</td></tr>
- *  <tr><td>02980000</td> <td>max. 000120</td> <td>Grouplist 0, see @c grouplist_t.</td></tr>
+ *  <tr><td>02980000</td> <td>max. 000120</td> <td>Grouplist 0, see @c D868UVCodeplug::grouplist_t.</td></tr>
  *  <tr><td>02980200</td> <td>max. 000120</td> <td>Grouplist 1</td></tr>
  *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
  *  <tr><td>0299f200</td> <td>max. 000120</td> <td>Grouplist 250</td></tr>
@@ -104,7 +104,7 @@ class GPSSystem;
  *  <tr><th colspan="3">Scan lists</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>024C1340</td> <td>000020</td> <td>Bitmap of 250 scan lists.</td></tr>
- *  <tr><td>01080000</td> <td>000090</td> <td>Bank 0, Scanlist 1, see @c scanlist_t. </td></tr>
+ *  <tr><td>01080000</td> <td>000090</td> <td>Bank 0, Scanlist 1, see @c D868UVCodeplug::scanlist_t. </td></tr>
  *  <tr><td>01080200</td> <td>000090</td> <td>Bank 0, Scanlist 2</td></tr>
  *  <tr><td>...</td>      <td>...</td>    <td>...</td></tr>
  *  <tr><td>01081E00</td> <td>000090</td> <td>Bank 0, Scanlist 16</td></tr>
@@ -117,21 +117,24 @@ class GPSSystem;
  *  <tr><th colspan="3">Radio IDs</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>024C1320</td> <td>000020</td>      <td>Bitmap of 250 radio IDs.</td></tr>
- *  <tr><td>02580000</td> <td>max. 001f40</td> <td>250 Radio IDs. See @c radioid_t.</td></tr>
+ *  <tr><td>02580000</td> <td>max. 001f40</td> <td>250 Radio IDs. See @c D868UVCodeplug::radioid_t.</td></tr>
  *
  *  <tr><th colspan="3">GPS/APRS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings, see @c aprs_setting_t.</td>
- *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings, see @c gps_systems_t.</td>
+ *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings, see @c D878UVCodeplug::aprs_setting_t.</td>
+ *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings, see @c D878UVCodeplug::gps_systems_t.</td>
+ *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings, see @c aprs_setting_ext_t.</tr>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, upto 60 chars ASCII, 0-padded.</td>
+ *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
+ *    See @c aprs_rx_entry_t.</td></tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02500000</td> <td>000100</td> <td>General settings, see @c general_settings_base_t.</td></tr>
- *  <tr><td>02500100</td> <td>000500</td> <td>Zone A & B channel list.</td></tr>
+ *  <tr><td>02500000</td> <td>000100</td> <td>General settings, see @c D878UVCodeplug::general_settings_base_t.</td></tr>
+ *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
- *  <tr><td>02501280</td> <td>000030</td> <td>General settings extension 1, see @c general_settings_ext1_t.</td></tr>
- *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2, see @c general_settings_ext2_t.</td></tr>
+ *  <tr><td>02501280</td> <td>000030</td> <td>General settings extension 1, see @c D878UVCodeplug::general_settings_ext1_t.</td></tr>
+ *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2, see @c D878UVCodeplug::general_settings_ext2_t.</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
  *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000. Default 0x00000000, 0x00 padded.</td></tr>
  *
@@ -142,27 +145,27 @@ class GPSSystem;
  *  <tr><td>01640800</td> <td>000090</td>      <td>Bytemap of up to 100 valid messages.
  *    0x00=valid, 0xff=invalid, remaining 46b set to 0x00.</td></tr>
  *  <tr><td>02140000</td> <td>max. 000800</td> <td>Bank 0, Messages 1-8.
- *    Each message consumes 0x100b. See @c message_t. </td></tr>
+ *    Each message consumes 0x100b. See @c D868UVCodeplug::message_t. </td></tr>
  *  <tr><td>02180000</td> <td>max. 000800</td> <td>Bank 1, Messages 9-16</td></tr>
  *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
  *  <tr><td>02440000</td> <td>max. 000800</td> <td>Bank 12, Messages 97-100</td></tr>
  *
  *  <tr><th colspan="3">Hot Keys</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>025C0000</td> <td>000100</td> <td>4 analog quick-call settings. See @c analog_quick_call_t.</td>
+ *  <tr><td>025C0000</td> <td>000100</td> <td>4 analog quick-call settings. See @c D868UVCodeplug::analog_quick_call_t.</td>
  *  <tr><td>025C0B00</td> <td>000010</td> <td>Status message bitmap.</td>
  *  <tr><td>025C0100</td> <td>000400</td> <td>Upto 32 status messages.
  *    Length unknown, offset 0x20. ASCII 0x00 terminated and padded.</td>
- *  <tr><td>025C0500</td> <td>000360</td> <td>18 hot-key settings, see @c hotkey_t</td></tr>
+ *  <tr><td>025C0500</td> <td>000360</td> <td>18 hot-key settings, see @c D868UVCodeplug::hotkey_t</td></tr>
  *
  *  <tr><th colspan="3">Encryption keys</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>024C4000</td> <td>004000</td> <td>Upto 256 AES encryption keys.
- *    See @c encryption_key_t.</td></tr>
+ *    See @c D878UVCodeplug::encryption_key_t.</td></tr>
  *
  *  <tr><th colspan="3">Misc</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C1400</td> <td>000020</td> <td>Alarm setting, see @c analog_alarm_setting_t.</td></tr>
+ *  <tr><td>024C1400</td> <td>000020</td> <td>Alarm setting, see @c D868UVCodeplug::analog_alarm_setting_t.</td></tr>
  *
  *  <tr><th colspan="3">FM Broadcast</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -190,6 +193,8 @@ class GPSSystem;
  *  <tr><td>024C1440</td> <td>000030</td> <td>Unknown data.</td></tr>
  *  <tr><td>024C1700</td> <td>000040</td> <td>Unknown, 8bit indices.</td></tr>
  *  <tr><td>024C1800</td> <td>000500</td> <td>Empty, set to 0x00?</td></tr>
+ *
+ *  <tr><td>02500600</td> <td>000030</td> <td>Unknown, set to 0x00.</td></tr>
  * </table>
  *
  * @ingroup d878uv2 */
@@ -198,11 +203,41 @@ class D878UV2Codeplug : public D878UVCodeplug
   Q_OBJECT
 
 public:
+  /** Represents an APRS RX entry.
+   */
+  struct __attribute__((packed)) aprs_rx_entry_t {
+    uint8_t enabled;                    ///< Enabled entry 0x01=on, 0x00=off.
+    char    call[6];                    ///< Callsign, 6x ASCII, 0-terminated.
+    uint8_t ssid;                       ///< SSID [0,15], 16=off.
+  };
+
+  /** Represents an extension to the APRS settings. */
+  struct __attribute__((packed)) aprs_setting_ext_t {
+    uint8_t _unknown0000[8];            ///< Unknown settings block.
+    uint8_t rep_position : 1,           ///< Report position flag.
+      rep_mic_e          : 1,           ///< Report MIC-E flag.
+      rep_object         : 1,           ///< Report object flag.
+      rep_item           : 1,           ///< Report item flag.
+      rep_message        : 1,           ///< Report message flag.
+      rep_wx             : 1,           ///< WX report flag.
+      rep_nmea           : 1,           ///< NMEA report flag.
+      rep_status         : 1;           ///< Report status flag.
+    uint8_t rep_other    : 1,           ///< Report "other" flag.
+      _unused0009_1      :7;            ///< Unused set to 0.
+    uint8_t _unknown000a[6];            ///< Unknown settings block.
+
+    uint8_t _unknown0010[16];           ///< Unknown settings block.
+    uint8_t _unknown0020[16];           ///< Unknown settings block.
+    uint8_t _unknown0030[16];           ///< Unknown settings block.
+    uint8_t _unknown0040[16];           ///< Unknown settings block.
+    uint8_t _unknown0050[16];           ///< Unknown settings block.
+  };
 
 public:
   /** Empty constructor. */
   explicit D878UV2Codeplug(QObject *parent = nullptr);
 
+  void allocateUpdated();
 };
 
 #endif // D878UVCODEPLUG_HH

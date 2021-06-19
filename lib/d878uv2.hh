@@ -1,5 +1,5 @@
-/** @defgroup d878uv Anytone AT-D878UV
- * Device specific classes for Anytone AT-D878UV.
+/** @defgroup d878uv2 Anytone AT-D878UVII
+ * Device specific classes for Anytone AT-D878UVII.
  *
  * \image html d878uv.jpg "AT-D878UV" width=200px
  * \image latex d878uv.jpg "AT-D878UV" width=200px
@@ -10,7 +10,7 @@
 
 #include "anytone_radio.hh"
 #include "anytone_interface.hh"
-
+#include "d878uv2_callsigndb.hh"
 
 /** Implements an interface to Anytone AT-D878UVII VHF/UHF 7W DMR (Tier I & II) radios.
  *
@@ -43,6 +43,7 @@ public:
   const Radio::Features &features() const;
 
 protected:
+  /** Holds a copy of the specific radio features. */
   Radio::Features _features;
 };
 

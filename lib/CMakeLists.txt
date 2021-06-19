@@ -16,7 +16,7 @@ SET(libdmrconf_SOURCES
     opengd77.cc opengd77_interface.cc opengd77_codeplug.cc opengd77_callsigndb.cc
     anytone_interface.cc anytone_radio.cc anytone_codeplug.cc
     d868uv.cc d868uv_codeplug.cc d868uv_callsigndb.cc d878uv.cc d878uv_codeplug.cc
-    d878uv2.cc d878uv2_codeplug.cc)
+    d878uv2.cc d878uv2_codeplug.cc d878uv2_callsigndb.cc)
 SET(libdmrconf_MOC_HEADERS
     radio.hh ${hid_HEADERS} hid_interface.hh dfu_libusb.hh usbserial.hh
     csvreader.hh dfufile.hh repeaterdatabase.hh userdatabase.hh logger.hh
@@ -26,7 +26,7 @@ SET(libdmrconf_MOC_HEADERS
     opengd77.hh opengd77_interface.hh opengd77_codeplug.hh opengd77_callsigndb.hh
     anytone_interface.hh anytone_radio.hh anytone_codeplug.hh
     d868uv.hh d868uv_codeplug.hh d868uv_callsigndb.hh d878uv.hh d878uv_codeplug.hh
-    d878uv2.hh d878uv2_codeplug.hh)
+    d878uv2.hh d878uv2_codeplug.hh d878uv2_callsigndb.hh)
 SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh
     utils.hh crc32.hh csvwriter.hh signaling.hh codeplugcontext.hh addressmap.hh)
 
