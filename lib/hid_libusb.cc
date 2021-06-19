@@ -22,7 +22,7 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
   if (! (_dev = libusb_open_device_with_vid_pid(_ctx, vid, pid))) {
     _errorMessage = tr("Cannot find USB device %1:%2")
         .arg(vid,0,16).arg(pid,0,16);
-    logError() << _errorMessage;
+    logDebug() << _errorMessage;
     libusb_exit(_ctx);
     _ctx = nullptr;
     return;

@@ -57,8 +57,9 @@ AnytoneRadio::startDownload(bool blocking) {
     return (StatusIdle == _task);
   }
 
+  // If non-blocking -> move device to this thread
   if (_dev && _dev->isOpen())
-    _dev->close();
+    _dev->moveToThread(this);
   start();
 
   return true;
@@ -79,8 +80,9 @@ AnytoneRadio::startUpload(Config *config, bool blocking, const CodePlug::Flags &
     return (StatusIdle == _task);
   }
 
+  // If non-blocking -> move device to this thread
   if (_dev && _dev->isOpen())
-    _dev->close();
+    _dev->moveToThread(this);
   start();
 
   return true;
@@ -99,8 +101,9 @@ AnytoneRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const Calls
     return (StatusIdle == _task);
   }
 
+  // If non-blocking -> move device to this thread
   if (_dev && _dev->isOpen())
-    _dev->close();
+    _dev->moveToThread(this);
   start();
 
   return true;
@@ -125,7 +128,6 @@ AnytoneRadio::run() {
       return;
     }
 
-    //_dev->reboot();
     _dev->close();
     _task = StatusIdle;
     emit downloadFinished(this, _codeplug);

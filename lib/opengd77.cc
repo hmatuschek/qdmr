@@ -112,9 +112,9 @@ OpenGD77::startDownload(bool blocking) {
     return (StatusIdle == _task);
   }
 
-  // When running in a separate thread -> reopen connection to radio
+  // If non-blocking -> move device to this thread
   if (_dev && _dev->isOpen())
-    _dev->close();
+    _dev->moveToThread(this);
   // start thread for download
   start();
   return true;
@@ -141,9 +141,9 @@ OpenGD77::startUpload(Config *config, bool blocking, const CodePlug::Flags &flag
     return (StatusIdle == _task);
   }
 
-  // When running in a separate thread -> reopen connection to radio
+  // If non-blocking -> move device to this thread
   if (_dev && _dev->isOpen())
-    _dev->close();
+    _dev->moveToThread(this);
   // start thread for upload
   start();
 
@@ -169,9 +169,9 @@ OpenGD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignD
     return (StatusIdle == _task);
   }
 
-  // When running in a separate thread -> reopen connection to radio
+  // If non-blocking -> move device to this thread
   if (_dev && _dev->isOpen())
-    _dev->close();
+    _dev->moveToThread(this);
   // start thread for upload
   start();
 
