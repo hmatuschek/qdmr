@@ -82,7 +82,7 @@ class GPSSystem;
  *  <tr><td>02680000</td> <td>max. 0f4240</td> <td>10000 contacts, see @c D868UVCodeplug::contact_t.
  *    As each contact is 100b, they do not align with the 16b blocks being transferred to the device.
  *    Hence contacts are organized internally in groups of 4 contacts forming a "bank". </td></tr>
- *  <tr><td>04340000</td> <td>max. 013880</td> <td>DMR ID to contact index map, see @c D868UVCodeplug::contact_map_t.
+ *  <tr><td>04800000</td> <td>max. 013880</td> <td>DMR ID to contact index map, see @c D868UVCodeplug::contact_map_t.
  *    Sorted by ID, empty entries set to 0xffffffffffffffff.</td>
  *
  *  <tr><th colspan="3">Analog Contacts</th></tr>
@@ -238,6 +238,8 @@ public:
   explicit D878UV2Codeplug(QObject *parent = nullptr);
 
   void allocateUpdated();
+  void allocateContacts();
+  bool encodeContacts(Config *config, const Flags &flags);
 };
 
 #endif // D878UVCODEPLUG_HH
