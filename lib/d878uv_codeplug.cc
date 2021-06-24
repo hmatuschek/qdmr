@@ -407,8 +407,11 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     // set bandwidth
     bandwidth = (AnalogChannel::BWNarrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
     // Set APRS system
-    if (nullptr != ac->aprsSystem())
+    rx_gps = 0;
+    if (nullptr != ac->aprsSystem()) {
       aprs_report = APRS_REPORT_ANALOG;
+      rx_gps = 1;
+    }
   } else if (c->is<DigitalChannel>()) {
     const DigitalChannel *dc = c->as<const DigitalChannel>();
     // pack digital channel config.
@@ -436,11 +439,14 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     else
       group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList());
     // Set GPS system index
+    rx_gps = 0;
     if (dc->posSystem() && dc->posSystem()->is<GPSSystem>()) {
       aprs_report = APRS_REPORT_DIGITAL;
       gps_system = conf->posSystems()->indexOfGPSSys(dc->posSystem()->as<GPSSystem>());
+      rx_gps = 1;
     } else if (dc->posSystem() && dc->posSystem()->is<APRSSystem>()) {
       aprs_report = APRS_REPORT_ANALOG;
+      rx_gps = 1;
     }
     // Set radio ID
     if (nullptr != dc->radioId())

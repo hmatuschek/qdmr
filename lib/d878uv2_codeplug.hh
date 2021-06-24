@@ -17,27 +17,6 @@ class GPSSystem;
 
 /** Represents the device specific binary codeplug for Anytone AT-D878UVII radios.
  *
- * In contrast to many other code-plugs, the code-plug for Anytone radios are spread over a large
- * memory area. In principle, this is a good idea, as it allows to upload only the portion of the
- * codeplug that is actually configured. For example, if only a small portion of the available
- * contacts and channels are used, the amount of data that is written to the device can be
- * reduced.
- *
- * However, the implementation of this idea in this device is utter shit. The amount of
- * fragmentation of the codeplug is overwhelming. For example, while channels are organized more or
- * less nicely in continous banks, zones are distributed throughout the entire code-plug. That is,
- * the names of zones are located in a different memory section that the channel lists. Some lists
- * are defined though bit-masks others by byte-masks. All bit-masks are positive, that is 1
- * indicates an enabled item while the bit-mask for contacts is inverted.
- *
- * In general the code-plug is huge and complex. Moreover, the radio provides a huge amount of
- * options and features. To this end, reverse-engeneering this code-plug was a nightmare.
- *
- * More over, the binary code-plug file generate by the windows CPS does not directly relate to
- * the data being written to the radio. To this end the code-plug has been reverse-engineered
- * using wireshark to monitor the USB communication between the windows CPS (running in a vritual
- * box) and the device. The latter makes the reverse-engineering particularily cumbersome.
- *
  * @section d878uv2cpl Codeplug structure within radio
  * <table>
  *  <tr><th colspan="3">Channels</th></tr>

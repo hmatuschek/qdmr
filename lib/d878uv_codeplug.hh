@@ -359,7 +359,8 @@ public:
     uint8_t ranging         : 1,        ///< Ranging enabled.
       through_mode          : 1,        ///< Through-mode enabled.
       excl_from_roaming     : 1,        ///< Exclude channel from roaming, data ACK forbit in D868UV.
-      _unused52             : 5;        ///< Unused, set to 0.
+      data_ack_disable      : 1,        ///< Data ACK disable.
+      _unused52_4           : 4;        ///< Unused, set to 0.
 
     // Byte 53
     uint8_t aprs_report     : 2,        ///< Enable APRS report, see @c APRSReport.
