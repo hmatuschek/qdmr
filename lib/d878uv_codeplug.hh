@@ -128,7 +128,7 @@ class GPSSystem;
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02500000</td> <td>000100</td> <td>General settings, see @c general_settings_base_t.</td></tr>
- *  <tr><td>02500100</td> <td>000500</td> <td>Zone A & B channel list.</td></tr>
+ *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
  *  <tr><td>02501280</td> <td>000030</td> <td>General settings extension 1, see @c general_settings_ext1_t.</td></tr>
  *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2, see @c general_settings_ext2_t.</td></tr>
@@ -359,7 +359,8 @@ public:
     uint8_t ranging         : 1,        ///< Ranging enabled.
       through_mode          : 1,        ///< Through-mode enabled.
       excl_from_roaming     : 1,        ///< Exclude channel from roaming, data ACK forbit in D868UV.
-      _unused52             : 5;        ///< Unused, set to 0.
+      data_ack_disable      : 1,        ///< Data ACK disable.
+      _unused52_4           : 4;        ///< Unused, set to 0.
 
     // Byte 53
     uint8_t aprs_report     : 2,        ///< Enable APRS report, see @c APRSReport.

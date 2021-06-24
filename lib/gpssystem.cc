@@ -46,7 +46,10 @@ GPSSystem::GPSSystem(const QString &name, DigitalContact *contact,
                      QObject *parent)
   : PositioningSystem(name, period, parent), _contact(contact), _revertChannel(revertChannel)
 {
-  // pass...
+  if (_contact)
+    connect(_contact, SIGNAL(destroyed(QObject*)), this, SLOT(onContactDeleted()));
+  if (_revertChannel)
+    connect(_revertChannel, SIGNAL(destroyed(QObject*)), this, SLOT(onRevertChannelDeleted()));
 }
 
 bool

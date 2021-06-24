@@ -1,8 +1,8 @@
-#include "d878uv.hh"
+#include "d878uv2.hh"
 #include "config.hh"
 #include "logger.hh"
 
-#include "d878uv_codeplug.hh"
+#include "d878uv2_codeplug.hh"
 // uses same callsign db as 878
 #include "d868uv_callsigndb.hh"
 
@@ -10,7 +10,7 @@
 #define WBSIZE 16
 
 
-static Radio::Features _d878uv_features =
+static Radio::Features _d878uv2_features =
 {
   // show beta-warning
   .betaWarning = true,
@@ -67,15 +67,15 @@ static Radio::Features _d878uv_features =
   // call-sign database limits
   .hasCallsignDB          = true,  // hasCallsignDB
   .callsignDBImplemented  = true,  // callsignDBImplemented
-  .maxCallsignsInDB       = 200000 // maxCallsignsInDB
+  .maxCallsignsInDB       = 500000 // maxCallsignsInDB
 };
 
 
-D878UV::D878UV(AnytoneInterface *device, QObject *parent)
-  : AnytoneRadio("Anytone AT-D878UV", device, parent), _features(_d878uv_features)
+D878UV2::D878UV2(AnytoneInterface *device, QObject *parent)
+  : AnytoneRadio("Anytone AT-D878UVII", device, parent), _features(_d878uv2_features)
 {
-  _codeplug = new D878UVCodeplug(this);
-  _callsigns = new D868UVCallsignDB(this);
+  _codeplug = new D878UV2Codeplug(this);
+  _callsigns = new D878UV2CallsignDB(this);
 
   // Get device info and determine supported TX frequency bands
   AnytoneInterface::RadioInfo info; _dev->getInfo(info);
@@ -144,6 +144,6 @@ D878UV::D878UV(AnytoneInterface *device, QObject *parent)
 }
 
 const Radio::Features &
-D878UV::features() const {
+D878UV2::features() const {
   return _features;
 }

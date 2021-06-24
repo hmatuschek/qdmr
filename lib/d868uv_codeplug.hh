@@ -106,7 +106,7 @@ class GPSSystem;
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02500000</td> <td>0000D0</td> <td>General settings, see @c general_settings_t.</td></tr>
- *  <tr><td>02500100</td> <td>000500</td> <td>Zone A & B channel list.</td></tr>
+ *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
  *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.

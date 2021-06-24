@@ -322,7 +322,7 @@ AnytoneInterface::request_identifier(RadioInfo &info) {
   }
   info.name = QString::fromLocal8Bit(resp.model, strnlen(resp.model, sizeof(resp.model))).simplified();
   info.bands = resp.bands;
-  info.version = QString::fromLocal8Bit(resp.version, strnlen(resp.version, sizeof(resp.model))).simplified();
+  info.version = QString::fromLocal8Bit(resp.version, strnlen(resp.version, sizeof(resp.version))).simplified();
   logDebug() << "Found radio '" << info.name << "', version '" << info.version << "'.";
   return true;
 }

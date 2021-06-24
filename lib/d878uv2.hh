@@ -1,18 +1,18 @@
-/** @defgroup d878uv Anytone AT-D878UV
- * Device specific classes for Anytone AT-D878UV.
+/** @defgroup d878uv2 Anytone AT-D878UVII
+ * Device specific classes for Anytone AT-D878UVII.
  *
  * \image html d878uv.jpg "AT-D878UV" width=200px
  * \image latex d878uv.jpg "AT-D878UV" width=200px
  *
  * @ingroup anytone */
-#ifndef __D878UV_HH__
-#define __D878UV_HH__
+#ifndef __D878UV2_HH__
+#define __D878UV2_HH__
 
 #include "anytone_radio.hh"
 #include "anytone_interface.hh"
+#include "d878uv2_callsigndb.hh"
 
-
-/** Implements an interface to Anytone AT-D878UV VHF/UHF 7W DMR (Tier I & II) radios.
+/** Implements an interface to Anytone AT-D878UVII VHF/UHF 7W DMR (Tier I & II) radios.
  *
  * The reverse-engineering of the D878UVCodeplug was quiet hard as it is huge and the radio
  * provides a lot of bells and whistles. Moreover, the binary code-plug file created by the
@@ -31,14 +31,14 @@
  * settings within the radio that are not defined within the common code-plug config while keeping
  * the amount of data being read from and written to the device small.
  *
- * @ingroup d878uv */
-class D878UV: public AnytoneRadio
+ * @ingroup d878uv2 */
+class D878UV2: public AnytoneRadio
 {
 	Q_OBJECT
 
 public:
   /** Do not construct this class directly, rather use @c Radio::detect. */
-  explicit D878UV(AnytoneInterface *device=nullptr, QObject *parent=nullptr);
+  explicit D878UV2(AnytoneInterface *device=nullptr, QObject *parent=nullptr);
 
   const Radio::Features &features() const;
 
@@ -47,4 +47,4 @@ protected:
   Radio::Features _features;
 };
 
-#endif // __D878UV_HH__
+#endif // __D878UV2_HH__

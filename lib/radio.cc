@@ -7,6 +7,7 @@
 #include "opengd77.hh"
 #include "d868uv.hh"
 #include "d878uv.hh"
+#include "d878uv2.hh"
 #include "config.hh"
 #include "logger.hh"
 #include <QSet>
@@ -415,10 +416,12 @@ Radio::detect(QString &errorMessage, const QString &force) {
     AnytoneInterface *anytone = new AnytoneInterface();
     if (anytone->isOpen()) {
       id = anytone->identifier();
-      if (("D878UV" == id) || ("D878UV" == force.toUpper())) {
+      if (("D6X2UV" == id) || ("D868UV" == id) || ("D868UVE" == id) || ("D868UV" == force.toUpper())) {
+              return new D868UV(anytone);
+      } else if (("D878UV" == id) || ("D878UV" == force.toUpper())) {
         return new D878UV(anytone);
-      } else if (("D6X2UV" == id) || ("D868UV" == id) || ("D868UVE" == id) || ("D868UV" == force.toUpper())) {
-        return new D868UV(anytone);
+      } else if (("D878UV2" == id) || ("D878UV2" == force.toUpper())) {
+        return new D878UV2(anytone);
       } else {
         anytone->close();
         anytone->deleteLater();
