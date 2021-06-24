@@ -996,8 +996,17 @@
     <addaction name="actionAbout"/>
     <addaction name="actionHelp"/>
    </widget>
+   <widget class="QMenu" name="menuDatabases">
+    <property name="title">
+     <string>Databases</string>
+    </property>
+    <addaction name="actionRefreshCallsignDB"/>
+    <addaction name="actionRefreshTalkgroupDB"/>
+    <addaction name="actionRefreshRepeaterDB"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuDevice"/>
+   <addaction name="menuDatabases"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -1197,6 +1206,42 @@
    </property>
    <property name="toolTip">
     <string>Upload call-sign DB to radio.</string>
+   </property>
+  </action>
+  <action name="actionRefreshCallsignDB">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/cloud-download-4x.png</normaloff>:/icons/cloud-download-4x.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh Callsign DB</string>
+   </property>
+   <property name="toolTip">
+    <string>Refreshes the downloaded callsign DB</string>
+   </property>
+  </action>
+  <action name="actionRefreshTalkgroupDB">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/cloud-download-4x.png</normaloff>:/icons/cloud-download-4x.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh Talkgroup DB</string>
+   </property>
+   <property name="toolTip">
+    <string>Refreshes the downloaded talkgroup DB</string>
+   </property>
+  </action>
+  <action name="actionRefreshRepeaterDB">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/cloud-download-4x.png</normaloff>:/icons/cloud-download-4x.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh Repeater DB</string>
+   </property>
+   <property name="toolTip">
+    <string>Refreshes the downloaded repeater DB</string>
    </property>
   </action>
  </widget>

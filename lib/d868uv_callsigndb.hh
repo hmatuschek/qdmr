@@ -18,7 +18,7 @@
  *   Filled with 0x00.</td></tr>
  * </table>
  *
- * @ingroup d878uv */
+ * @ingroup d868uv */
 class D868UVCallsignDB : public CallsignDB
 {
   Q_OBJECT

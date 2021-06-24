@@ -40,7 +40,9 @@ class UV390: public Radio
 
 public:
   /** Do not construct this class directly, rather use @c Radio::detect. */
-  explicit UV390(QObject *parent=nullptr);
+  explicit UV390(DFUDevice *device=nullptr, QObject *parent=nullptr);
+
+  virtual ~UV390();
 
   const QString &name() const;
   const Radio::Features &features() const;
@@ -63,9 +65,10 @@ protected:
 	void run();
 
 private:
-  void download();
-  void upload();
-  void uploadCallsigns();
+  bool connect();
+  bool download();
+  bool upload();
+  bool uploadCallsigns();
 
 protected:
   /** The device identifier. */

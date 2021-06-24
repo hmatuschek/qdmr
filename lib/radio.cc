@@ -7,6 +7,7 @@
 #include "opengd77.hh"
 #include "d868uv.hh"
 #include "d878uv.hh"
+#include "d878uv2.hh"
 #include "config.hh"
 #include "logger.hh"
 #include <QSet>
@@ -21,9 +22,34 @@ Radio::Features::FrequencyRange::FrequencyRange(double lower, double upper)
   // pass..
 }
 
+Radio::Features::FrequencyRange::FrequencyRange(double limits[2])
+  : min(limits[0]), max(limits[1])
+{
+  // pass..
+}
+
 bool
 Radio::Features::FrequencyRange::contains(double f) const {
   return (min<=f) && (max>=f);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of Radio::Featrues::FrequencyLimits
+ * ******************************************************************************************** */
+Radio::Features::FrequencyLimits::FrequencyLimits(const QVector<FrequencyRange> &frequency_ranges)
+  : ranges(frequency_ranges)
+{
+  // pass...
+}
+
+bool
+Radio::Features::FrequencyLimits::contains(double f) const {
+  for (int i=0; i<ranges.size(); i++) {
+    if (ranges[i].contains(f))
+      return true;
+  }
+  return false;
 }
 
 
@@ -33,6 +59,10 @@ Radio::Features::FrequencyRange::contains(double f) const {
 Radio::Radio(QObject *parent)
   : QThread(parent), _task(StatusIdle)
 {
+  // pass...
+}
+
+Radio::~Radio() {
   // pass...
 }
 
@@ -164,15 +194,13 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                       tr("Duplicate channel name '%1'.").arg(channel->name())));
     names.insert(channel->name());
 
-    if ((!features().vhfLimits.contains(channel->rxFrequency())) &&
-        (!features().uhfLimits.contains(channel->rxFrequency()))) {
+    /*if (!features().frequencyLimits.contains(channel->rxFrequency())) {
       VerifyIssue::Type type = flags.ignoreFrequencyLimits ? VerifyIssue::WARNING : VerifyIssue::ERROR;
       issues.append(VerifyIssue(type,tr("RX frequency %1 of channel '%2' is out of range.")
                                 .arg(channel->rxFrequency()).arg(channel->name())));
-    }
+    }*/
 
-    if ((!features().vhfLimits.contains(channel->txFrequency())) &&
-        (!features().uhfLimits.contains(channel->txFrequency()))) {
+    if (!features().frequencyLimits.contains(channel->txFrequency())) {
       VerifyIssue::Type type = flags.ignoreFrequencyLimits ? VerifyIssue::WARNING : VerifyIssue::ERROR;
       issues.append(VerifyIssue(type,tr("TX frequency %1 of channel '%2' is out of range.")
                                 .arg(channel->txFrequency()).arg(channel->name())));
@@ -332,69 +360,80 @@ Radio::detect(QString &errorMessage, const QString &force) {
 
   // Try TYT MD Family
   {
-    DFUDevice dfu(0x0483, 0xdf11);
-    if (dfu.isOpen()) {
-      id = dfu.identifier();
-      goto found;
+    DFUDevice *dfu = new DFUDevice(0x0483, 0xdf11);
+    if (dfu->isOpen()) {
+      id = dfu->identifier();
+      if (("MD-UV380" == id) || ("MD-UV390" == id) || ("UV390" == force.toUpper())) {
+        return new UV390(dfu);
+      } else {
+        dfu->close();
+        dfu->deleteLater();
+        errorMessage = tr("%1(): TyT/Retevis device '%2'.").arg(__func__).arg(id);
+      }
+    } else {
+      dfu->deleteLater();
     }
   }
 
   // Try Radioddity/Baofeng RD5R & GD-77
   {
-    HID hid(0x15a2, 0x0073);
-    if (hid.isOpen()) {
-      id = hid.identifier();
-      hid.close();
-      goto found;
+    HID *hid = new HID(0x15a2, 0x0073);
+    if (hid->isOpen()) {
+      id = hid->identifier();
+      if (("BF-5R" == id) || ("RD5R" == force.toUpper())) {
+        return new RD5R(hid);
+      } else if (("MD-760P" == id) || ("GD77" == force.toUpper())) {
+        return new GD77(hid);
+      } else {
+        errorMessage = tr("%1(): Unknown Baofeng/Radioddity device '%2'.").arg(__func__).arg(id);
+        hid->close();
+        hid->deleteLater();
+      }
+    } else {
+      hid->deleteLater();
     }
   }
 
   // Try Open GD77 firmware
   {
-    OpenGD77Interface ogd77;
-    if (ogd77.isOpen()) {
-      id = ogd77.identifier();
-      ogd77.close();
-      goto found;
+    OpenGD77Interface *ogd77 = new OpenGD77Interface();
+    if (ogd77->isOpen()) {
+      id = ogd77->identifier();
+      if (("OpenGD77" == id) || ("OpenGD77" == force.toUpper())) {
+        return new OpenGD77(ogd77);
+      } else {
+        errorMessage = tr("%1(): Unkown OpenGD77 radio '%1'.").arg(__func__).arg(id);
+        ogd77->close();
+        ogd77->deleteLater();
+      }
+    } else {
+      ogd77->deleteLater();
     }
   }
 
   // Try Anytone USB-serial devices
   {
-    AnytoneInterface anytone;
-    if (anytone.isOpen()) {
-      id = anytone.identifier();
-      anytone.close();
-      goto found;
+    AnytoneInterface *anytone = new AnytoneInterface();
+    if (anytone->isOpen()) {
+      id = anytone->identifier();
+      if (("D6X2UV" == id) || ("D868UV" == id) || ("D868UVE" == id) || ("D868UV" == force.toUpper())) {
+              return new D868UV(anytone);
+      } else if (("D878UV" == id) || ("D878UV" == force.toUpper())) {
+        return new D878UV(anytone);
+      } else if (("D878UV2" == id) || ("D878UV2" == force.toUpper())) {
+        return new D878UV2(anytone);
+      } else {
+        anytone->close();
+        anytone->deleteLater();
+        errorMessage = tr("%1(): Unknown AnyTone radio %2.").arg(__func__).arg(id);
+        return nullptr;
+      }
+    } else {
+      anytone->deleteLater();
     }
   }
 
   errorMessage = QString("%1(): No matching radio found.").arg(__func__);
-  return nullptr;
-
-found:
-  if (id.isEmpty()) {
-    errorMessage = QString("%1(): Cannot detect radio: Radio returned no identifier!").arg(__func__);
-    return nullptr;
-  }
-
-  logDebug() << "Found Radio: " << id;
-
-  if (("BF-5R" == id) || ("RD5R" == force.toUpper())) {
-    return new RD5R();
-  } else if (("MD-760P" == id) || ("GD77" == force.toUpper())) {
-    return new GD77();
-  } else if (("MD-UV380" == id) || ("MD-UV390" == id) || ("UV390" == force.toUpper())) {
-    return new UV390();
-  } else if (("OpenGD77" == id) || ("OpenGD77" == force.toUpper())) {
-    return new OpenGD77();
-  } else if (("D6X2UV" == id) || ("D878UV" == id) || ("D878UV" == force.toUpper())) {
-    return new D878UV();
-  } else if (("D868UV" == id) || ("D868UVE" == id) || ("D868UV" == force.toUpper())) {
-    return new D868UV();
-  }
-
-  errorMessage = QString("%1(): Unknown radio identifier '%2'.").arg(__func__, id);
   return nullptr;
 }
 

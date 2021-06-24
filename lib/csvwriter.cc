@@ -302,7 +302,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
       DTMFContact *contact = config->contacts()->contact(i)->as<DTMFContact>();
       stream << qSetFieldWidth(8)  << (i+1)
-             << qSetFieldWidth(17) << ("\"" + contact->name() + "\"")
+             << qSetFieldWidth(20) << ("\"" + contact->name() + "\"")
              << qSetFieldWidth(8)  << "DTMF"
              << qSetFieldWidth(12) << ("\""+contact->number()+"\"")
              << qSetFieldWidth(6)  << (contact->rxTone() ? "+" : "-");

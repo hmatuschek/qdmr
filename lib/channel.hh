@@ -268,7 +268,7 @@ public:
    * @param posSystem Specifies the positioning system to use on this channel.
    * @param list      Specifies the default scanlist for the channel.
    * @param roaming   Specifies the roaming zone for the channel.
-   * @param radioID   Specifies the radio ID to use on this channel, nullptr for default.
+   * @param radioID   Specifies the radio ID to use for this channel, @c nullptr is default ID.
    * @param parent    Specified the @c QObject parent object. */
   DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
 	               bool rxOnly, Admit admit, uint colorCode, TimeSlot timeslot, RXGroupList *rxGroup,

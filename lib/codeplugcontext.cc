@@ -1,8 +1,8 @@
 #include "codeplugcontext.hh"
 
 CodeplugContext::CodeplugContext(Config *config)
-  : _config(config), _radioIDTable(), _channelTable(), _digitalContactTable(), _groupListTable(),
-    _scanListTable(), _gpsSystemTable(), _aprsSystemTable()
+  : _config(config), _radioIDTable(), _channelTable(), _digitalContactTable(), _analogContactTable(),
+    _groupListTable(), _scanListTable(), _gpsSystemTable(), _aprsSystemTable()
 {
   // pass...
 }
@@ -91,6 +91,30 @@ CodeplugContext::getDigitalContact(int index) const {
   if (! _digitalContactTable.contains(index))
     return nullptr;
   return _config->contacts()->digitalContact(_digitalContactTable[index]);
+}
+
+
+bool
+CodeplugContext::hasAnalogContact(int index) const {
+  return _analogContactTable.contains(index);
+}
+
+bool
+CodeplugContext::addAnalogContact(DTMFContact *con, int index) {
+  if (_analogContactTable.contains(index))
+    return false;
+  int cidx = _config->contacts()->addContact(con);
+  if (0 > cidx)
+    return false;
+  _analogContactTable[index] = cidx;
+  return true;
+}
+
+DTMFContact *
+CodeplugContext::getAnalogContact(int index) const {
+  if (! _analogContactTable.contains(index))
+    return nullptr;
+  return _config->contacts()->dtmfContact(_analogContactTable[index]);
 }
 
 

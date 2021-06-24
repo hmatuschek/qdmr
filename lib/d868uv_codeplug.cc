@@ -6,6 +6,7 @@
 #include "userdatabase.hh"
 #include "config.h"
 #include "logger.hh"
+#include <cmath>
 
 #include <QTimeZone>
 #include <QtEndian>
@@ -44,9 +45,13 @@
 #define ANALOGCONTACT_BANK_0      0x02940000
 #define ANALOGCONTACT_BANK_SIZE   0x00000030
 #define ANALOGCONTACT_INDEX_LIST  0x02900000 // Address of analog contact index list
-#define ANALOGCONTACT_LIST_SIZE   0x00000080 // Address of analog contact index list
-#define ANALOGCONTACT_BITMAP      0x02900100 // Address of contact bytemap
-#define ANALOGCONTACT_BITMAP_SIZE 0x00000080 // Size of contact bytemap
+#define ANALOGCONTACT_LIST_SIZE   0x00000080 // Size of analog contact index list
+#define ANALOGCONTACT_BYTEMAP     0x02900100 // Address of contact bytemap
+#define ANALOGCONTACT_BYTEMAP_SIZE 0x00000080 // Size of contact bytemap
+#define ANALOGCONTACT_SIZE        0x00000018 // Size of analog contact
+static_assert(
+  ANALOGCONTACT_SIZE == sizeof(D868UVCodeplug::analog_contact_t),
+  "D868UVCodeplug::analog_contact_t size check failed.");
 
 #define NUM_RXGRP                 250        // Total number of RX group lists
 #define ADDR_RXGRP_0              0x02980000 // Address of the first RX group list.
@@ -189,7 +194,8 @@ using namespace Signaling;
 
 Code _ctcss_num2code[52] = {
   SIGNALING_NONE, // 62.5 not supported
-  CTCSS_67_0Hz,  CTCSS_71_0Hz,  CTCSS_74_4Hz,  CTCSS_77_0Hz,  CTCSS_79_9Hz,  CTCSS_82_5Hz,
+  CTCSS_67_0Hz,  SIGNALING_NONE, // 69.3 not supported
+  CTCSS_71_9Hz,  CTCSS_74_4Hz,  CTCSS_77_0Hz,  CTCSS_79_7Hz,  CTCSS_82_5Hz,
   CTCSS_85_4Hz,  CTCSS_88_5Hz,  CTCSS_91_5Hz,  CTCSS_94_8Hz,  CTCSS_97_4Hz,  CTCSS_100_0Hz,
   CTCSS_103_5Hz, CTCSS_107_2Hz, CTCSS_110_9Hz, CTCSS_114_8Hz, CTCSS_118_8Hz, CTCSS_123_0Hz,
   CTCSS_127_3Hz, CTCSS_131_8Hz, CTCSS_136_5Hz, CTCSS_141_3Hz, CTCSS_146_2Hz, CTCSS_151_4Hz,
@@ -233,7 +239,7 @@ D868UVCodeplug::ctcss_num2code(uint8_t num) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::channel_t
+ * Implementation of D868UVCodeplug::channel_t
  * ******************************************************************************************** */
 D868UVCodeplug::channel_t::channel_t() {
   clear();
@@ -471,7 +477,11 @@ D868UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
       dc->setPosSystem(ctx.getGPSSystem(gps_system));
 
     // Link radio ID
-    dc->setRadioId(ctx.getRadioId(id_index));
+    RadioID *rid = ctx.getRadioId(id_index);
+    if (rid == ctx.config()->radioIDs()->getDefaultId())
+      dc->setRadioId(nullptr);
+    else
+      dc->setRadioId(rid);
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
     AnalogChannel *ac = c->as<AnalogChannel>();
@@ -582,7 +592,7 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::contact_t
+ * Implementation of D868UVCodeplug::contact_t
  * ******************************************************************************************** */
 D868UVCodeplug::contact_t::contact_t() {
   clear();
@@ -665,7 +675,53 @@ D868UVCodeplug::contact_t::fromContactObj(const DigitalContact *contact) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::grouplist_t
+ * Implementation of D868UVCodeplug::analog_contact_t
+ * ******************************************************************************************** */
+void
+D868UVCodeplug::analog_contact_t::clear() {
+  memset(number, 0, sizeof(number));
+  digits = 0;
+  memset(name, 0, sizeof(name));
+  pad47 = 0;
+}
+
+QString
+D868UVCodeplug::analog_contact_t::getNumber() const {
+  return decode_dtmf_bcd_be(number, digits);
+}
+
+bool
+D868UVCodeplug::analog_contact_t::setNumber(const QString &num) {
+  if (! validDTMFNumber(num))
+    return false;
+  digits = num.length();
+  return encode_dtmf_bcd_be(num, number, sizeof(number), 0);
+}
+
+QString
+D868UVCodeplug::analog_contact_t::getName() const {
+  return decode_ascii(name, sizeof(name), 0);
+}
+
+void
+D868UVCodeplug::analog_contact_t::setName(const QString &name) {
+  encode_ascii(this->name, name, sizeof(this->name), 0);
+}
+
+void
+D868UVCodeplug::analog_contact_t::fromContact(const DTMFContact *contact) {
+  setNumber(contact->number());
+  setName(contact->name());
+}
+
+DTMFContact *
+D868UVCodeplug::analog_contact_t::toContact() const {
+  return new DTMFContact(getName(), getNumber());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D868UVCodeplug::grouplist_t
  * ******************************************************************************************** */
 D868UVCodeplug::grouplist_t::grouplist_t() {
   clear();
@@ -733,7 +789,7 @@ D868UVCodeplug::grouplist_t::fromGroupListObj(const RXGroupList *lst, const Conf
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::scanlist_t
+ * Implementation of D868UVCodeplug::scanlist_t
  * ******************************************************************************************** */
 D868UVCodeplug::scanlist_t::scanlist_t() {
   clear();
@@ -844,7 +900,7 @@ D868UVCodeplug::scanlist_t::fromScanListObj(ScanList *lst, Config *config) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::radioid_t
+ * Implementation of D868UVCodeplug::radioid_t
  * ******************************************************************************************** */
 D868UVCodeplug::radioid_t::radioid_t() {
   clear();
@@ -922,7 +978,7 @@ D868UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::boot_settings_t
+ * Implementation of D868UVCodeplug::boot_settings_t
  * ******************************************************************************************** */
 void
 D868UVCodeplug::boot_settings_t::clear() {
@@ -1174,7 +1230,7 @@ D868UVCodeplug::gps_settings_t::linkGPSSystem(uint8_t i, Config *config, Codeplu
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::contact_map_t
+ * Implementation of D868UVCodeplug::contact_map_t
  * ******************************************************************************************** */
 D868UVCodeplug::contact_map_t::contact_map_t() {
   clear();
@@ -1223,7 +1279,7 @@ D868UVCodeplug::contact_map_t::setIndex(uint32_t index) {
  * Implementation of D868UVCodeplug
  * ******************************************************************************************** */
 D868UVCodeplug::D868UVCodeplug(QObject *parent)
-  : CodePlug(parent)
+  : AnytoneCodeplug(parent)
 {
   addImage("Anytone AT-D868UV Codeplug");
 
@@ -1233,8 +1289,8 @@ D868UVCodeplug::D868UVCodeplug(QObject *parent)
   image(0).addElement(ZONE_BITMAPS, ZONE_BITMAPS_SIZE);
   // Contacts bitmap
   image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
-  // Analog contacts bitmap
-  image(0).addElement(ANALOGCONTACT_BITMAP, ANALOGCONTACT_BITMAP_SIZE);
+  // Analog contacts bytemap
+  image(0).addElement(ANALOGCONTACT_BYTEMAP, ANALOGCONTACT_BYTEMAP_SIZE);
   // RX group list bitmaps
   image(0).addElement(RXGRP_BITMAP, RXGRP_BITMAP_SIZE);
   // Scan list bitmaps
@@ -1270,7 +1326,6 @@ D868UVCodeplug::allocateUpdated() {
   this->allocateBootSettings();
 
   this->allocateGPSSystems();
-  this->allocateAnalogContacts();
 
   this->allocateSMSMessages();
   this->allocateHotKeySettings();
@@ -1296,6 +1351,7 @@ D868UVCodeplug::allocateForEncoding() {
   this->allocateChannels();
   this->allocateZones();
   this->allocateContacts();
+  this->allocateAnalogContacts();
   this->allocateRXGroupLists();
   this->allocateScanLists();
   this->allocateRadioIDs();
@@ -1333,7 +1389,7 @@ D868UVCodeplug::setBitmaps(Config *config)
   // Mark valid channels (set bit)
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
   memset(channel_bitmap, 0, CHANNEL_BITMAP_SIZE);
-  for (int i=0; i<config->channelList()->count(); i++) {
+  for (int i=0; i<std::min(NUM_CHANNELS, config->channelList()->count()); i++) {
     channel_bitmap[i/8] |= (1 << (i%8));
   }
 
@@ -1341,14 +1397,21 @@ D868UVCodeplug::setBitmaps(Config *config)
   uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
   memset(contact_bitmap, 0x00, CONTACTS_BITMAP_SIZE);
   memset(contact_bitmap, 0xff, NUM_CONTACTS/8+1);
-  for (int i=0; i<config->contacts()->digitalCount(); i++) {
+  for (int i=0; i<std::min(NUM_CONTACTS, config->contacts()->digitalCount()); i++) {
     contact_bitmap[i/8] &= ~(1 << (i%8));
+  }
+
+  // Mark valid analog contacts (clear bytes)
+  uint8_t *analog_contact_bitmap = data(ANALOGCONTACT_BYTEMAP);
+  memset(analog_contact_bitmap, 0xff, ANALOGCONTACT_BYTEMAP_SIZE);
+  for (int i=0; i<std::min(NUM_ANALOGCONTACTS, config->contacts()->dtmfCount()); i++) {
+    analog_contact_bitmap[i] = 0x00;
   }
 
   // Mark valid zones (set bits)
   uint8_t *zone_bitmap = data(ZONE_BITMAPS);
   memset(zone_bitmap, 0x00, ZONE_BITMAPS_SIZE);
-  for (int i=0,z=0; i<config->zones()->count(); i++) {
+  for (int i=0,z=0; i<std::min(NUM_ZONES, config->zones()->count()); i++) {
     zone_bitmap[z/8] |= (1 << (z%8)); z++;
     if (config->zones()->zone(i)->B()->count()) {
       zone_bitmap[z/8] |= (1 << (z%8)); z++;
@@ -1358,13 +1421,13 @@ D868UVCodeplug::setBitmaps(Config *config)
   // Mark group lists
   uint8_t *group_bitmap = data(RXGRP_BITMAP);
   memset(group_bitmap, 0x00, RXGRP_BITMAP_SIZE);
-  for (int i=0; i<config->rxGroupLists()->count(); i++)
+  for (int i=0; i<std::min(NUM_RXGRP, config->rxGroupLists()->count()); i++)
     group_bitmap[i/8] |= (1 << (i%8));
 
   // Mark scan lists
   uint8_t *scan_bitmap = data(SCAN_BITMAP);
   memset(scan_bitmap, 0x00, SCAN_BITMAP_SIZE);
-  for (int i=0; i<config->scanlists()->count(); i++) {
+  for (int i=0; i<std::min(NUM_SCAN_LISTS, config->scanlists()->count()); i++) {
     scan_bitmap[i/8] |= (1<<(i%8));
   }
 }
@@ -1386,6 +1449,8 @@ D868UVCodeplug::encode(Config *config, const Flags &flags)
     return false;
 
   if (! this->encodeContacts(config, flags))
+    return false;
+  if (! this->encodeAnalogContacts(config, flags))
     return false;
 
   if (! this->encodeRXGroupLists(config, flags))
@@ -1424,6 +1489,8 @@ D868UVCodeplug::decode(Config *config, CodeplugContext &ctx)
     return false;
 
   if (! this->createContacts(config, ctx))
+    return false;
+  if (! this->createAnalogContacts(config, ctx))
     return false;
 
   if (! this->createRXGroupLists(config, ctx))
@@ -1604,10 +1671,10 @@ D868UVCodeplug::createContacts(Config *config, CodeplugContext &ctx) {
 void
 D868UVCodeplug::allocateAnalogContacts() {
   /* Allocate analog contacts */
-  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BITMAP);
-  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
+  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BYTEMAP);
+  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i+=2) {
     // if disabled -> skip
-    if (0 == analog_contact_bytemap[i])
+    if (0xff == analog_contact_bytemap[i])
       continue;
     uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
     if (nullptr == data(addr, 0)) {
@@ -1615,6 +1682,35 @@ D868UVCodeplug::allocateAnalogContacts() {
     }
   }
   image(0).addElement(ANALOGCONTACT_INDEX_LIST, ANALOGCONTACT_LIST_SIZE);
+}
+
+bool
+D868UVCodeplug::encodeAnalogContacts(Config *config, const Flags &flags) {
+  uint8_t *idxlst = data(ANALOGCONTACT_INDEX_LIST);
+  memset(idxlst, 0xff, ANALOGCONTACT_LIST_SIZE);
+  for (int i=0; i<config->contacts()->dtmfCount(); i++) {
+    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
+        + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
+    analog_contact_t *cont = (analog_contact_t *)data(addr);
+    cont->fromContact(config->contacts()->dtmfContact(i));
+    idxlst[i] = i;
+  }
+  return true;
+}
+
+bool
+D868UVCodeplug::createAnalogContacts(Config *config, CodeplugContext &ctx) {
+  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BYTEMAP);
+  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
+    // if disabled -> skip
+    if (0xff == analog_contact_bytemap[i])
+      continue;
+    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
+        + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
+    analog_contact_t *cont = (analog_contact_t *)data(addr);
+    ctx.addAnalogContact(cont->toContact(), i);
+  }
+  return true;
 }
 
 
@@ -1639,13 +1735,13 @@ D868UVCodeplug::allocateRadioIDs() {
 bool
 D868UVCodeplug::encodeRadioID(Config *config, const Flags &flags) {
   // Encode radio IDs
-  radioid_t *radio_ids = (radioid_t *)data(ADDR_RADIOIDS);
   for (int i=0; i<config->radioIDs()->count(); i++) {
-    radio_ids[i].setId(config->radioIDs()->getId(i)->id());
+    radioid_t *radio_id = (radioid_t *)data(ADDR_RADIOIDS + i*RADIOID_SIZE);
+    radio_id->setId(config->radioIDs()->getId(i)->id());
     if (0 == i)
-      radio_ids[i].setName(config->name());
+      radio_id->setName(config->name());
     else
-      radio_ids[i].setName(config->name()+" "+QString::number(i));
+      radio_id->setName(config->name()+" "+QString::number(i));
   }
   return true;
 }
@@ -1653,18 +1749,19 @@ D868UVCodeplug::encodeRadioID(Config *config, const Flags &flags) {
 bool
 D868UVCodeplug::setRadioID(Config *config, CodeplugContext &ctx) {
   // Find a valid RadioID
-  uint8_t *radio_ids = data(ADDR_RADIOIDS);
   uint8_t *radio_id_bitmap = data(RADIOID_BITMAP);
   bool first = true;
   for (uint16_t i=0; i<NUM_RADIOIDS; i++) {
     if (0 == (radio_id_bitmap[i/8] & (1 << (i%8))))
       continue;
-    radioid_t *id = (radioid_t *)(radio_ids+i*sizeof(radioid_t));
+    radioid_t *id = (radioid_t *)data(ADDR_RADIOIDS + i*RADIOID_SIZE);
     if (first) {
+      logDebug() << "Store id " << id->getId() << " at idx " << i << " as default ID.";
       ctx.setDefaultRadioId(id->getId(), i);
       config->setName(id->getName());
       first = false;
     } else {
+      logDebug() << "Store id " << id->getId() << " at idx " << i << ".";
       ctx.addRadioId(id->getId(), i);
     }
   }

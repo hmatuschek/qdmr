@@ -1,7 +1,9 @@
 /doc/html/
 /doc/latex/
+/doc/reveng/cotre/*.pcapng.gz
 /parts/
 /prime/
 /snap/
 /stage/
 CMakeLists.txt.user
+/build/

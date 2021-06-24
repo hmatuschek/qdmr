@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=QDMR	
+GenericName=Codeplug programming software for DMR radios.
+Comment=A universal codeplug programming software for DMR radios.
+Exec=qdmr
+Icon=@CMAKE_INSTALL_PREFIX@/share/icons/hicolor/64x64/qdmr.png
+Type=Application
+Categories=Network;HamRadio;
+Terminal=false
+X-Desktop-File-Install-Version=0.24

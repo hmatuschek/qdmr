@@ -60,6 +60,11 @@ RadioIDList::getId(uint idx) const {
 }
 
 RadioID *
+RadioIDList::getDefaultId() const {
+  return getId(0);
+}
+
+RadioID *
 RadioIDList::find(uint32_t id) const {
   foreach (RadioID *item, _ids) {
     if (id == item->id())

@@ -49,6 +49,8 @@ public:
 
   /** Returns the number of defined DMR IDs. */
   int count() const;
+  /** Returns the current default ID for the radio. */
+  RadioID * getDefaultId() const;
   /** Returns the DMR ID specified by the given index. */
   RadioID * getId(uint idx) const;
   /** Searches the DMR ID object associated with the given DMR ID. */

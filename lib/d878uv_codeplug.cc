@@ -407,8 +407,11 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     // set bandwidth
     bandwidth = (AnalogChannel::BWNarrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
     // Set APRS system
-    if (nullptr != ac->aprsSystem())
+    rx_gps = 0;
+    if (nullptr != ac->aprsSystem()) {
       aprs_report = APRS_REPORT_ANALOG;
+      rx_gps = 1;
+    }
   } else if (c->is<DigitalChannel>()) {
     const DigitalChannel *dc = c->as<const DigitalChannel>();
     // pack digital channel config.
@@ -436,11 +439,14 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     else
       group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList());
     // Set GPS system index
+    rx_gps = 0;
     if (dc->posSystem() && dc->posSystem()->is<GPSSystem>()) {
       aprs_report = APRS_REPORT_DIGITAL;
       gps_system = conf->posSystems()->indexOfGPSSys(dc->posSystem()->as<GPSSystem>());
+      rx_gps = 1;
     } else if (dc->posSystem() && dc->posSystem()->is<APRSSystem>()) {
       aprs_report = APRS_REPORT_ANALOG;
+      rx_gps = 1;
     }
     // Set radio ID
     if (nullptr != dc->radioId())
@@ -521,6 +527,10 @@ D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const 
 void
 D878UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
   config->setMicLevel(getMicGain());
+  // Check if default roaming zone is defined
+  if (roam_default_zone >= config->roaming()->count()) {
+    roam_default_zone = 0;
+  }
 }
 
 
@@ -1040,7 +1050,8 @@ bool
 D878UVCodeplug::encode(Config *config, const Flags &flags)
 {
   // Encode everything common between d868uv and d878uv radios.
-  D868UVCodeplug::encode(config, flags);
+  if (! D868UVCodeplug::encode(config, flags))
+    return false;
 
   if (! this->encodeRoaming(config, flags))
     return false;
@@ -1053,6 +1064,7 @@ D878UVCodeplug::decode(Config *config)
 {
   // Maps code-plug indices to objects
   CodeplugContext ctx(config);
+
   return this->decode(config, ctx);
 }
 
@@ -1170,6 +1182,8 @@ D878UVCodeplug::decodeGeneralSettings(Config *config) {
 
 void
 D878UVCodeplug::allocateGPSSystems() {
+  // replaces D868UVCodeplug::allocateGPSSystems
+
   // APRS settings
   image(0).addElement(ADDR_APRS_SETTING, APRS_SETTING_SIZE);
   image(0).addElement(ADDR_APRS_MESSAGE, APRS_MESSAGE_SIZE);
@@ -1178,6 +1192,8 @@ D878UVCodeplug::allocateGPSSystems() {
 
 bool
 D878UVCodeplug::encodeGPSSystems(Config *config, const Flags &flags) {
+  // replaces D868UVCodeplug::encodeGPSSystems
+
   // Encode APRS system (there can only be one)
   if (0 < config->posSystems()->aprsCount()) {
     ((aprs_setting_t *)data(ADDR_APRS_SETTING))->fromAPRSSystem(config->posSystems()->aprsSystem(0));
@@ -1200,6 +1216,8 @@ D878UVCodeplug::encodeGPSSystems(Config *config, const Flags &flags) {
 
 bool
 D878UVCodeplug::createGPSSystems(Config *config, CodeplugContext &ctx) {
+  // replaces D868UVCodeplug::createGPSSystems
+
   // Before creating any GPS/APRS systems, get global auto TX intervall
   uint pos_intervall = ((aprs_setting_t *)data(ADDR_APRS_SETTING))->getAutoTXInterval();
 
@@ -1229,6 +1247,8 @@ D878UVCodeplug::createGPSSystems(Config *config, CodeplugContext &ctx) {
 
 bool
 D878UVCodeplug::linkGPSSystems(Config *config, CodeplugContext &ctx) {
+  // replaces D868UVCodeplug::linkGPSSystems
+
   // Link APRS system
   aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
   if (aprs->isValid()) {

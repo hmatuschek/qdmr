@@ -142,6 +142,10 @@ Application::createMainWindow() {
   QAction *upCP    = _mainWindow->findChild<QAction*>("actionUpload");
   QAction *upCDB   = _mainWindow->findChild<QAction*>("actionUploadCallsignDB");
 
+  QAction *refreshCallsignDB  = _mainWindow->findChild<QAction*>("actionRefreshCallsignDB");
+  QAction *refreshTalkgroupDB  = _mainWindow->findChild<QAction*>("actionRefreshTalkgroupDB");
+  QAction *refreshRepeaterDB  = _mainWindow->findChild<QAction*>("actionRefreshRepeaterDB");
+
   QAction *about   = _mainWindow->findChild<QAction*>("actionAbout");
   QAction *sett    = _mainWindow->findChild<QAction*>("actionSettings");
   QAction *help    = _mainWindow->findChild<QAction*>("actionHelp");
@@ -154,6 +158,10 @@ Application::createMainWindow() {
   connect(about, SIGNAL(triggered()), this, SLOT(showAbout()));
   connect(sett, SIGNAL(triggered()), this, SLOT(showSettings()));
   connect(help, SIGNAL(triggered()), this, SLOT(showHelp()));
+
+  connect(refreshCallsignDB, SIGNAL(triggered()), _users, SLOT(download()));
+  connect(refreshTalkgroupDB, SIGNAL(triggered()), _talkgroups, SLOT(download()));
+  connect(refreshRepeaterDB, SIGNAL(triggered()), _repeater, SLOT(download()));
 
   connect(findDev, SIGNAL(triggered()), this, SLOT(detectRadio()));
   connect(verCP, SIGNAL(triggered()), this, SLOT(verifyCodeplug()));
@@ -441,7 +449,7 @@ Application::detectRadio() {
     radio->deleteLater();
   } else {
     QMessageBox::information(nullptr, tr("No Radio found."),
-                             tr("No known radio detected. Check connection?\nError:")+errorMessage);
+                             tr("No known radio detected. Check connection?\nError: %1").arg(errorMessage));
   }
   radio->deleteLater();
 }
@@ -464,7 +472,7 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &f
 
   bool verified = true;
   QList<VerifyIssue> issues;
-  VerifyIssue::Type maxIssue = myRadio->verifyConfig(_config, issues);
+  VerifyIssue::Type maxIssue = myRadio->verifyConfig(_config, issues, flags);
   if ( (flags.ignoreWarnings && (maxIssue>VerifyIssue::WARNING)) ||
        ((!flags.ignoreWarnings) && (maxIssue>=VerifyIssue::WARNING)) ) {
     VerifyDialog dialog(issues);
@@ -511,9 +519,14 @@ Application::downloadCodeplug() {
   connect(radio, SIGNAL(downloadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(downloadError(Radio *)), this, SLOT(onCodeplugDownloadError(Radio *)));
   connect(radio, SIGNAL(downloadFinished(Radio *, CodePlug *)), this, SLOT(onCodeplugDownloaded(Radio *, CodePlug *)));
-  radio->startDownload(false);
-  _mainWindow->statusBar()->showMessage(tr("Download ..."));
-  _mainWindow->setEnabled(false);
+  if (radio->startDownload(false)) {
+    _mainWindow->statusBar()->showMessage(tr("Download ..."));
+    _mainWindow->setEnabled(false);
+  } else {
+    QMessageBox::critical(nullptr, tr("Cannot download codeplug."),
+                          tr("Cannot download codeplug: %1").arg(radio->errorMessage()));
+    progress->setVisible(false);
+  }
 }
 
 void
@@ -580,10 +593,15 @@ Application::uploadCodeplug() {
   connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
-  radio->startUpload(_config, false, settings.codePlugFlags());
 
-  _mainWindow->statusBar()->showMessage(tr("Upload ..."));
-  _mainWindow->setEnabled(false);
+  if (radio->startUpload(_config, false, settings.codePlugFlags())) {
+     _mainWindow->statusBar()->showMessage(tr("Upload ..."));
+     _mainWindow->setEnabled(false);
+  } else {
+    QMessageBox::critical(nullptr, tr("Cannot upload codeplug."),
+                          tr("Cannot upload codeplug: %1").arg(radio->errorMessage()));
+    progress->setVisible(false);
+  }
 }
 
 void
@@ -625,10 +643,14 @@ Application::uploadCallsignDB() {
   connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
-  radio->startUploadCallsignDB(_users, false);
-
-  _mainWindow->statusBar()->showMessage(tr("Upload User DB ..."));
-  _mainWindow->setEnabled(false);
+  if (radio->startUploadCallsignDB(_users, false)) {
+    _mainWindow->statusBar()->showMessage(tr("Upload User DB ..."));
+    _mainWindow->setEnabled(false);
+  } else {
+    QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
+                          tr("Cannot upload call-sign DB: %1").arg(radio->errorMessage()));
+    progress->setVisible(false);
+  }
 }
 
 
@@ -699,12 +721,14 @@ Application::onConfigModifed() {
     return;
 
   QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
+  QComboBox *dmrID  = _mainWindow->findChild<QComboBox*>("dmrID");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
 
   rname->setText(_config->name());
+  dmrID->setCurrentIndex(0);
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
   mic->setValue(_config->micLevel());

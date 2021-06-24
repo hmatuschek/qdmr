@@ -15,13 +15,14 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
     _errorMessage = tr("Cannot init libusb (%1): %2")
         .arg(error).arg(libusb_strerror((enum libusb_error) error));
     logError() << _errorMessage;
+    _ctx = nullptr;
     return;
   }
 
   if (! (_dev = libusb_open_device_with_vid_pid(_ctx, vid, pid))) {
     _errorMessage = tr("Cannot find USB device %1:%2")
         .arg(vid,0,16).arg(pid,0,16);
-    logError() << _errorMessage;
+    logDebug() << _errorMessage;
     libusb_exit(_ctx);
     _ctx = nullptr;
     return;
@@ -37,6 +38,7 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
     logError() << _errorMessage;
     libusb_close(_dev);
     libusb_exit(_ctx);
+    _dev = nullptr;
     _ctx = nullptr;
   }
 }
@@ -47,25 +49,29 @@ HIDevice::~HIDevice() {
 
 bool
 HIDevice::isOpen() const {
-  return nullptr != _ctx;
+  return (nullptr != _ctx) && (nullptr != _dev);
 }
 
 void
 HIDevice::close() {
-  if (! _ctx)
+  if (nullptr == _ctx)
     return;
+
   logDebug() << "Closing HIDevice.";
 
-  if (_transfer) {
+  if (nullptr != _transfer) {
     libusb_free_transfer(_transfer);
     _transfer = nullptr;
   }
 
-  libusb_release_interface(_dev, HID_INTERFACE);
-  libusb_close(_dev);
+  if (nullptr != _dev) {
+    libusb_release_interface(_dev, HID_INTERFACE);
+    libusb_close(_dev);
+    _dev = nullptr;
+  }
+
   libusb_exit(_ctx);
   _ctx = nullptr;
-  _dev = nullptr;
 }
 
 bool
@@ -117,6 +123,7 @@ HIDevice::write_read(const unsigned char *data, unsigned length, unsigned char *
     // Allocate transfer descriptor on first invocation.
     _transfer = libusb_alloc_transfer(0);
   }
+
   libusb_fill_interrupt_transfer(
         _transfer, _dev,
         LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN,
@@ -135,7 +142,7 @@ again:
   if (result < 0) {
     _errorMessage = tr("Error %1 transmitting data via control transfer: %2.")
         .arg(result).arg(libusb_strerror((enum libusb_error) result));
-    libusb_cancel_transfer(_transfer);
+    _transfer = nullptr;
     return -1;
   }
 

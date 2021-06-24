@@ -152,6 +152,10 @@
         <listitem><para>Automatically enables roaming if at least one roaming 
         zone is defined and used by any channel. </para></listitem>
       </varlistentry>
+      <varlistentry>
+        <term><option>--ignore-limits</option></term>
+        <listitem><para>Disables the enforement of limits. Warnings are atill show.</para></listitem>
+      </varlistentry>
     </variablelist>
   </refsect1>
 

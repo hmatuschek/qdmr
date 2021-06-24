@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(qdmr VERSION 0.7.1)
+project(qdmr VERSION 0.8.0)
 
 option(BUILD_TESTS "Build test programs" OFF)
 option(BUILD_DOCS  "Build API documentation" OFF)
@@ -14,7 +14,6 @@ find_package(Qt5Network REQUIRED)
 find_package(Qt5SerialPort REQUIRED)
 find_package(Qt5Positioning REQUIRED)
 find_package(Qt5LinguistTools REQUIRED)
-find_package(Qt5Test REQUIRED)
 find_package(LIBUSB_1 REQUIRED)
 find_package(YAML-CPP REQUIRED)
 
@@ -26,6 +25,9 @@ if (${BUILD_DOCS})
   find_package(Doxygen REQUIRED dot)
 endif(${BUILD_DOCS})
 
+if (${BUILD_TESTS})
+  find_package(Qt5Test REQUIRED)
+endif(${BUILD_TESTS})
 
 ADD_DEFINITIONS(${Qt5Widgets_DEFINITIONS})
 #add_definitions("-DQT_EVENT_DISPATCHER_CORE_FOUNDATION=1")
@@ -61,7 +63,7 @@ message(STATUS "Build version ${PROJECT_VERSION}")
 
 # Set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -Wall -Wsign-compare")
-set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}  -O0 -ggdb")
+set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}  -O0 -ggdb -fstack-protector")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 
@@ -89,6 +91,7 @@ add_subdirectory(lib)
 add_subdirectory(cli)
 add_subdirectory(src)
 add_subdirectory(doc)
+add_subdirectory(dist)
 
 if(BUILD_TESTS)
  enable_testing()

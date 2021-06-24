@@ -6,16 +6,12 @@
 
 // Maps APRS icon number to code-char
 static QVector<char> aprsIconCodeTable{
-  '!','"','#','$','%','&','\'','(',')','*',
-  '+',',','-','.','/','0','1','2','3','4',
-  '5','6','7','8','9',':',';','<','=','>',
-  '?','@','A','B','C','D','E','F','G','H',
-  'H','I','J','K','L','M','N','O','P','Q',
-  'R','S','T','U','V','W','X','Y','Z','[',
-  '/',']','^','_','`','a','b','c','d','e',
-  'f','g','h','i','j','k','l','m','n','o',
-  'p','q','r','s','t','u','v','w','x','y',
-  'z','{','|','}','~'};
+  '!','"','#','$','%','&','\'','(',')','*','+',',','-','.','/','0',
+  '1','2','3','4','5','6', '7','8','9',':',';','<','=','>','?','@',
+  'A','B','C','D','E','F', 'G','H','I','J','K','L','M','N','O','P',
+  'Q','R','S','T','U','V', 'W','X','Y','Z','[','/',']','^','_','`',
+  'a','b','c','d','e','f', 'g','h','i','j','k','l','m','n','o','p',
+  'q','r','s','t','u','v','w','x','y','z','{','|','}','~'};
 
 static QHash<APRSSystem::Icon, QString> aprsIconNameTable{
   {APRSSystem::APRS_ICON_NO_SYMBOL, ""},
@@ -30,7 +26,7 @@ static QHash<APRSSystem::Icon, QString> aprsIconNameTable{
   {APRSSystem::APRS_ICON_SNOWMOBILE, "Snowmobile"},
   {APRSSystem::APRS_ICON_RED_CROSS, "Red cross"},
   {APRSSystem::APRS_ICON_BOY_SCOUT, "Boy scout"},
-  {APRSSystem::APRS_ICON_HOME,  QObject::tr("Home")},
+  {APRSSystem::APRS_ICON_HOME,  "Home"},
   {APRSSystem::APRS_ICON_X, "X"},
   {APRSSystem::APRS_ICON_RED_DOT, "Red dot"},
   {APRSSystem::APRS_ICON_CIRCLE_0, "Circle 0"},
@@ -256,6 +252,30 @@ encode_dtmf_bin(const QString &number, uint8_t *num, int size, uint8_t fill) {
     if (idx<0)
       continue;
     num[i] = idx;
+  }
+  return true;
+}
+
+QString
+decode_dtmf_bcd_be(const uint8_t *num, int digits) {
+  QString number;
+  for (int i=0; i<digits; i++) {
+    uint8_t d = (0 == (i%2)) ? (((num[i/2])>>4)&0xf) : ((num[i/2])&0xf);
+    number.append(bin_dtmf_tab[d]);
+  }
+  return number;
+}
+
+bool
+encode_dtmf_bcd_be(const QString &number, uint8_t *num, int size, uint8_t fill) {
+  memset(num, fill, size);
+  QString tmp = number.simplified().toUpper();
+  for (int i=0; i<tmp.size(); i++) {
+    if (0 == (i%2)) {
+      num[i/2] = ((bin_dtmf_tab.indexOf(tmp[i].toLatin1()))<<4);
+    } else {
+      num[i/2] |= bin_dtmf_tab.indexOf(tmp[i].toLatin1());
+    }
   }
   return true;
 }

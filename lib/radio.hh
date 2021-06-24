@@ -92,7 +92,19 @@ public:
       double max; ///< Upper frequency limit.
       /** Constructs a frequency range from limits. */
       FrequencyRange(double lower, double upper);
+      /** Constructs a frequency range from limits. */
+      FrequencyRange(double limits[2]);
       /** Returns @c true if @c f is inside this limit. */
+      bool contains(double f) const;
+    };
+
+    /** A list of frequency limits. */
+    struct FrequencyLimits {
+      /** The actual list of frequency limits. */
+      QVector <FrequencyRange> ranges;
+      /** Constructs a list of frequency limits. */
+      FrequencyLimits(const QVector<FrequencyRange> &frequency_ranges);
+      /** Check if the given frequency is within one of the frequency limits. */
       bool contains(double f) const;
     };
 
@@ -104,10 +116,8 @@ public:
     /** If @c true, the device supports FM. */
 		bool hasAnalog;
 
-    /** VHF frequency limits. */
-    FrequencyRange vhfLimits;
-    /** UHF frequency limits. */
-    FrequencyRange uhfLimits;
+    /** The frequency limits of the radio. */
+    FrequencyLimits frequencyLimits;
 
     /** Maximum number of radio IDs. */
     int maxRadioIDs;
@@ -194,6 +204,8 @@ public:
 public:
   /** Default constructor. */
 	explicit Radio(QObject *parent = nullptr);
+
+  virtual ~Radio();
 
   /** Returns the name of the radio (e.g., device identifier). */
 	virtual const QString &name() const = 0;

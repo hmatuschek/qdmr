@@ -621,6 +621,8 @@ UV390Codeplug::scanlist_t::linkScanListObj(ScanList *l, Config *conf) const {
     l->setPriorityChannel(SelectedChannel::get());
   else if ((1<priority_ch1) && ((priority_ch1-2)<conf->channelList()->count()))
     l->setPriorityChannel(conf->channelList()->channel(priority_ch1-2));
+  else if (0xffff == priority_ch1)
+    l->setPriorityChannel(nullptr);
   else
     logWarn() << "Cannot deocde reference to priority channel index " << priority_ch1
                  << " in scan list '" << getName() << "'.";
@@ -628,6 +630,8 @@ UV390Codeplug::scanlist_t::linkScanListObj(ScanList *l, Config *conf) const {
     l->setSecPriorityChannel(SelectedChannel::get());
   else if ((1<priority_ch2) && ((priority_ch2-2)<conf->channelList()->count()))
     l->setSecPriorityChannel(conf->channelList()->channel(priority_ch2-2));
+  else if (0xffff == priority_ch2)
+    l->setSecPriorityChannel(nullptr);
   else
     logWarn() << "Cannot deocde reference to secondary priority channel index " << priority_ch2
               << " in scan list '" << getName() << "'.";
