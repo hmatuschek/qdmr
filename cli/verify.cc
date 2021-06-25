@@ -8,7 +8,7 @@
 #include "logger.hh"
 #include "config.hh"
 #include "csvreader.hh"
-#include "configdeclaration.hh"
+#include "configitem.hh"
 #include "dfufile.hh"
 #include "rd5r.hh"
 #include "uv390.hh"
@@ -48,9 +48,9 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     return -1;
   } else if (parser.isSet("yaml") || (filename.endsWith(".yaml") || filename.endsWith(".yml"))) {
     YAML::Node doc = YAML::LoadFile(filename.toStdString());
-    ConfigDeclaration confDecl;
+    Configuration::Declaration *confDecl = Configuration::Declaration::get();
     QString errMessage;
-    if (! confDecl.verify(doc, errMessage)) {
+    if (! confDecl->verify(doc, errMessage)) {
       logError() << "Verification of config in '" << filename << "' failed!" ;
       logError() << errMessage;
       return -1;

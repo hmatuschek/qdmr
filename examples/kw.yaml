@@ -67,7 +67,7 @@ channels:
       id: ch_lds5
       # An example of a device specific extension. Here the mixed mode channel is configured
       # where RX is also FM using CTCSS tone.
-      d878uv:
+      anytone:
         type: "dmr+fm"
         tone: { ctcss: 67.0 }
         squelch: 1
