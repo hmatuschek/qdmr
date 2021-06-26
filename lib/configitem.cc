@@ -93,7 +93,6 @@ ConfigScalarItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> 
   return true;
 }
 
-
 /* ********************************************************************************************* *
  * Implementation of ConfigItemScalar
  * ********************************************************************************************* */
@@ -391,49 +390,129 @@ ConfigIdDeclaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QStr
 
 
 /* ********************************************************************************************* *
- * Implementation of ConfigDeclRef
+ * Implementation of ConfigReference::Declaration
  * ********************************************************************************************* */
-ConfigReferenceDeclaration::ConfigReferenceDeclaration(bool mandatory, const QString &description)
-  : ConfigStrItem::Declaration(mandatory, description)
+ConfigReference::Declaration::Declaration(bool mandatory, bool (*typeChk)(const ConfigItem *), const QString &description)
+  : ConfigStrItem::Declaration(mandatory, description), _ref_type_check(typeChk)
 {
   // pass...
 }
 
 bool
-ConfigReferenceDeclaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+ConfigReference::Declaration::isValidReference(const ConfigItem *item) const {
+  return _ref_type_check(item);
+}
+
+bool
+ConfigReference::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
   if (! ConfigStrItem::Declaration::verifyForm(node, ctx, msg))
     return false;
   QString value = QString::fromStdString(node.as<std::string>());
   QRegExp pattern("^[a-zA-Z_]+[a-zA-Z0-9_]*$");
   if (! pattern.exactMatch(value)) {
-    msg = QString("Reference '%1' does not match pattern '%2'.").arg(value).arg(pattern.pattern());
+    msg = tr("Reference '%1' does not match pattern '%2'.").arg(value).arg(pattern.pattern());
     return false;
   }
   return true;
 }
 
 bool
-ConfigReferenceDeclaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
+ConfigReference::Declaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
   QString value = QString::fromStdString(node.as<std::string>());
   if (! ctx.contains(value)) {
-    msg = QString("Reference '%1' is not defined.").arg(value);
+    msg = tr("Reference '%1' is not defined.").arg(value);
     return false;
   }
   return true;
+}
+
+ConfigItem *
+ConfigReference::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
+  return new ConfigReference(this);
+}
+
+bool
+ConfigReference::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+  return true;
+}
+
+bool
+ConfigReference::Declaration::parseLink(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+  QString id = QString::fromStdString(node.as<std::string>());
+  if (! ctx.contains(id)) {
+    msg = tr("Cannot resolve element '%1'.").arg(id);
+    return false;
+  }
+  if (! isValidReference(ctx[id])) {
+    msg = tr("Referenced object '%1' is of wrong type.").arg(id);
+    return false;
+  }
+  item->as<ConfigReference>()->set(ctx.value(id, nullptr));
+  return true;
+}
+
+/* ********************************************************************************************* *
+ * Implementation of ConfigReference
+ * ********************************************************************************************* */
+ConfigReference::ConfigReference(const Declaration *declaraion, QObject *parent)
+  : ConfigItem(declaraion, parent), _reference(nullptr)
+{
+  // pass...
+}
+
+ConfigReference::ConfigReference(ConfigObjItem *obj, const Declaration *declaraion, QObject *parent)
+  : ConfigItem(declaraion, parent), _reference(nullptr)
+{
+  _reference = declaraion->isValidReference(obj) ? obj : nullptr;
+}
+
+bool
+ConfigReference::isNull() const {
+  return nullptr == _reference;
+}
+
+ConfigItem *
+ConfigReference::get() const {
+  return _reference;
+}
+
+ConfigItem *
+ConfigReference::take() {
+  if (nullptr == _reference)
+    return nullptr;
+  disconnect(_reference, SIGNAL(destroyed(QObject*)), this, SLOT(onReferenceDeleted(QObject*)));
+  ConfigItem *ref = _reference;
+  _reference = nullptr;
+  return ref;
+}
+
+void
+ConfigReference::set(ConfigItem *item) {
+  take();
+  if (! declaraion()->as<ConfigReference::Declaration>()->isValidReference(item))
+    return;
+  _reference = item;
+  if (_reference)
+    connect(_reference, SIGNAL(destroyed(QObject*)), this, SLOT(onReferenceDeleted(QObject*)));
+}
+
+void
+ConfigReference::onReferenceDeleted(QObject *obj) {
+  if (_reference == obj)
+    _reference = nullptr;
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemEnum::Declaration
  * ********************************************************************************************* */
-ConfigEnumItem::Declaration::Declaration(
-    const QSet<QString> &values, bool mandatory, const QString &description)
+ConfigEnumItem::Declaration::Declaration(const QHash<QString, uint32_t> &values, bool mandatory, const QString &description)
   : ConfigScalarItem::Declaration(mandatory, description), _values(values)
 {
   // pass...
 }
 
-const QSet<QString> &
+const QHash<QString, uint32_t> &
 ConfigEnumItem::Declaration::possibleValues() const {
   return _values;
 }
@@ -445,7 +524,7 @@ ConfigEnumItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &c
   QString value = QString::fromStdString(node.as<std::string>());
   if (! _values.contains(value)) {
     QStringList pval;
-    foreach (QString val, _values)
+    foreach (QString val, _values.keys())
       pval.append(val);
     msg = tr("Expected one of (%1), got %2.")
         .arg(pval.join(", ")).arg(value);
@@ -456,35 +535,56 @@ ConfigEnumItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &c
 
 ConfigItem *
 ConfigEnumItem::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigEnumItem("", this);
+  return new ConfigEnumItem(this);
 }
 bool
 ConfigEnumItem::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
-  return item->as<ConfigEnumItem>()->setValue(
-        QString::fromStdString(node.as<std::string>()));
+  return item->as<ConfigEnumItem>()->setKey(QString::fromStdString(node.as<std::string>()));
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemEnum
  * ********************************************************************************************* */
-ConfigEnumItem::ConfigEnumItem(const QString &value, const Declaration *declaration, QObject *parent)
-  : ConfigScalarItem(declaration, parent), _value(value)
+ConfigEnumItem::ConfigEnumItem(const Declaration *declaration, QObject *parent)
+  : ConfigScalarItem(declaration, parent), _value(std::numeric_limits<uint32_t>::max())
 {
   // pass...
 }
 
-const QString &
-ConfigEnumItem::value() const {
+ConfigEnumItem::ConfigEnumItem(uint32_t value, const Declaration *declaration, QObject *parent)
+  : ConfigScalarItem(declaration, parent)
+{
+  setValue(value);
+}
+
+uint32_t ConfigEnumItem::value(uint32_t default_value) const {
+  if (std::numeric_limits<uint32_t>::max() == _value)
+    return default_value;
   return _value;
 }
 
 bool
-ConfigEnumItem::setValue(const QString &key) {
+ConfigEnumItem::setKey(const QString &key) {
   if (! declaraion()->as<ConfigEnumItem::Declaration>()->possibleValues().contains(key))
     return false;
-  _value = key;
+  _value = declaraion()->as<ConfigEnumItem::Declaration>()->possibleValues()[key];
   return true;
 }
+
+bool
+ConfigEnumItem::setValue(uint32_t value) {
+  const QHash<QString, uint32_t> table =
+      declaraion()->as<ConfigEnumItem::Declaration>()->possibleValues();
+  foreach (uint32_t x, table.values()) {
+    if (value == x) {
+      _value = value;
+      return true;
+    }
+  }
+  _value = std::numeric_limits<uint32_t>::max();
+  return false;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ConfigDeclDispatch
@@ -778,16 +878,29 @@ ConfigObjItem::ConfigObjItem(const Declaration *declaration, QObject *parent)
 
 
 /* ********************************************************************************************* *
- * Implementation of ConfigItemList::Declaration
+ * Implementation of ConfigAbstractList::Declaration
  * ********************************************************************************************* */
-ConfigList::Declaration::Declaration(ConfigItem::Declaration *element, const QString &description)
-  : ConfigItem::Declaration(element->isMandatory(), description), _element(element)
+ConfigAbstractList::Declaration::Declaration(
+    ConfigItem::Declaration *element, bool (*typeChk)(const ConfigItem *),
+    const QString &description)
+  : ConfigItem::Declaration(element->isMandatory(), description), _element(element),
+    _element_type_check(typeChk)
 {
   // pass...
 }
 
 bool
-ConfigList::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+ConfigAbstractList::Declaration::isValidType(const ConfigItem *item) const {
+  return _element_type_check(item);
+}
+
+ConfigItem::Declaration *
+ConfigAbstractList::Declaration::elementDeclaration() const {
+  return _element;
+}
+
+bool
+ConfigAbstractList::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
   if (! node.IsSequence()) {
     msg = tr("Expected list, got %2.").arg(nodeTypeName(node));
     return false;
@@ -808,7 +921,7 @@ ConfigList::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, 
 }
 
 bool
-ConfigList::Declaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
+ConfigAbstractList::Declaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
   for (size_t i=0; i<node.size(); i++) {
     if (! _element->verifyReferences(node[i], ctx, msg)) {
       msg = tr("List element %1: %2").arg(i).arg(msg);
@@ -818,54 +931,68 @@ ConfigList::Declaration::verifyReferences(const YAML::Node &node, const QSet<QSt
   return true;
 }
 
-ConfigItem *
-ConfigList::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigList(this);
-}
-
 bool
-ConfigList::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+ConfigAbstractList::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
   for (size_t i=0; i<node.size(); i++) {
     ConfigItem *element = _element->parseDefine(node, ctx, msg);
     if (nullptr == element)
       return false;
-    item->as<ConfigList>()->add(element);
+    if (! isValidType(element)) {
+      msg = tr("Cannot create list: Elment %1 is of wrong type.").arg(i);
+      return false;
+    }
+    if (! item->as<ConfigAbstractList>()->add(element))
+      return false;
+  }
+  return true;
+}
+
+bool
+ConfigAbstractList::Declaration::parseLink(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+  for (size_t i=0; i<node.size(); i++) {
+    if(! _element->parseLink(item->as<ConfigAbstractList>()->get(i), node, ctx, msg))
+      return false;
   }
   return true;
 }
 
 /* ********************************************************************************************* *
- * Implementation of ConfigItemList
+ * Implementation of ConfigAbstractList
  * ********************************************************************************************* */
-ConfigList::ConfigList(const Declaration *declaration, QObject *parent)
+ConfigAbstractList::ConfigAbstractList(const Declaration *declaration, QObject *parent)
   : ConfigItem(declaration, parent), _items()
 {
   // pass...
 }
 
+ConfigAbstractList::~ConfigAbstractList() {
+  // pass...
+}
+
 int
-ConfigList::count() const {
+ConfigAbstractList::count() const {
   return _items.count();
 }
 
-void
-ConfigList::add(ConfigItem *item) {
+bool ConfigAbstractList::add(ConfigItem *item) {
   if (nullptr == item)
-    return;
+    return false;
+  if (! declaraion()->as<ConfigAbstractList::Declaration>()->isValidType(item))
+    return false;
   _items.append(item);
-  item->setParent(this);
   connect(item, SIGNAL(destroyed(QObject*)), this, SLOT(onItemDeleted(QObject*)));
+  return true;
 }
 
 ConfigItem *
-ConfigList::get(int i) const {
+ConfigAbstractList::get(int i) const {
   if (i >= count())
     return nullptr;
   return _items[i];
 }
 
 ConfigItem *
-ConfigList::take(int i) {
+ConfigAbstractList::take(int i) {
   if (i >= count())
     return nullptr;
   ConfigItem *item = _items.takeAt(i);
@@ -874,17 +1001,121 @@ ConfigList::take(int i) {
 }
 
 bool
-ConfigList::del(int i) {
+ConfigAbstractList::del(int i) {
   ConfigItem *item = take(i);
   if (! item)
+    return false;
+  return true;
+}
+
+void
+ConfigAbstractList::onItemDeleted(QObject *item) {
+  _items.removeAll(qobject_cast<ConfigItem *>(item));
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of ConfigObjList::Declaration
+ * ********************************************************************************************* */
+ConfigList::Declaration::Declaration(ConfigItem::Declaration *element, bool (*typeChk)(const ConfigItem *), const QString &description)
+  : ConfigAbstractList::Declaration(element, typeChk, description)
+{
+  // pass...
+}
+
+ConfigItem *
+ConfigList::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
+  return new ConfigList(this);
+}
+
+/* ********************************************************************************************* *
+ * Implementation of ConfigObjList
+ * ********************************************************************************************* */
+ConfigList::ConfigList(const Declaration *declaration, QObject *parent)
+  : ConfigAbstractList(declaration, parent)
+{
+  // pass...
+}
+
+bool
+ConfigList::add(ConfigItem *item) {
+  if (! ConfigAbstractList::add(item))
+    return false;
+  item->setParent(this);
+  return true;
+}
+
+ConfigItem *
+ConfigList::take(int i) {
+  ConfigItem *item = ConfigAbstractList::take(i);
+  if (nullptr == item)
+    return nullptr;
+  item->setParent(nullptr);
+  return item;
+}
+
+bool
+ConfigList::del(int i) {
+  ConfigItem *item = take(i);
+  if (nullptr == item)
     return false;
   item->deleteLater();
   return true;
 }
 
-void
-ConfigList::onItemDeleted(QObject *item) {
-  _items.removeAll(qobject_cast<ConfigItem *>(item));
+
+/* ********************************************************************************************* *
+ * Implementation of ConfigRefList::Declaration
+ * ********************************************************************************************* */
+ConfigRefList::Declaration::Declaration(ConfigItem::Declaration *element, bool (*typeChk)(const ConfigItem *), const QString &description)
+  : ConfigAbstractList::Declaration(element, typeChk, description)
+{
+  // pass...
+}
+
+ConfigItem *
+ConfigRefList::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
+  return new ConfigRefList(this);
+}
+
+bool
+ConfigRefList::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+  // Polulation of list is delayed to link stage.
+  return true;
+}
+
+bool
+ConfigRefList::Declaration::parseLink(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+  for (size_t i=0; i<node.size(); i++) {
+    if (! node[i].IsScalar()) {
+      msg = tr("Expected ID string, got '%1'").arg(nodeTypeName(node[i]));
+      return false;
+    }
+    QString id = QString::fromStdString(node[i].as<std::string>());
+    if (! ctx.contains(id)) {
+      msg = tr("Cannot resolve ID '%1'.").arg(id);
+      return false;
+    }
+    ConfigItem *element = ctx.value(id, nullptr);
+    if (nullptr == element)
+      return false;
+    if (! isValidType(element)) {
+      msg = tr("Cannot create list: Elment %1 is of wrong type.").arg(i);
+      return false;
+    }
+    if (! item->as<ConfigAbstractList>()->add(element))
+      return false;
+  }
+  return true;
+}
+
+/* ********************************************************************************************* *
+ * Implementation of ConfigRefList
+ * ********************************************************************************************* */
+ConfigRefList::ConfigRefList(const Declaration *declaration, QObject *parent)
+  : ConfigAbstractList(declaration, parent)
+{
+  // pass...
 }
 
 
@@ -1102,9 +1333,9 @@ ConfigGroupList::Declaration::Declaration(bool mandatory, const QString &descrip
   : ConfigObjItem::Declaration(mandatory, description)
 {
   add("name", new ConfigStrItem::Declaration(true, tr("Specifies the name of the contact.")));
-  add("members", new ConfigList::Declaration(
-        new ConfigReferenceDeclaration(true, tr("A reference to one of the group calls.")),
-        tr("The list of group calls forming the group list.")));
+  add("members",
+      ConfigRefList::Declaration::get<ConfigGroupCall>(
+        false, tr("The list of group calls forming the group list.")));
 }
 
 ConfigItem *
@@ -1134,9 +1365,9 @@ ConfigGroupList::name() const {
   return get("name")->as<ConfigStrItem>()->value();
 }
 
-ConfigList *
+ConfigAbstractList *
 ConfigGroupList::members() const {
-  return get("members")->as<ConfigList>();
+  return get("members")->as<ConfigAbstractList>();
 }
 
 
@@ -1150,13 +1381,17 @@ ConfigChannel::Declaration::Declaration(bool mandatory, const QString &descripti
   add("rx", new ConfigFloatItem::Declaration(0, 10e3, true, tr("Specifies the RX frequency of the channel in MHz.")));
   add("tx", new ConfigFloatItem::Declaration(-10e3, 10e3, false, tr("Specifies the TX frequency of the channel or offset in MHz.")));
   add("power", new ConfigEnumItem::Declaration(
-        {"min", "low", "mid", "high", "max"}, true,
-        tr("Specifies the transmit power on the channel.")));
+    { {"min", Channel::MinPower},
+      {"low", Channel::LowPower},
+      {"mid", Channel::MidPower},
+      {"high", Channel::HighPower},
+      {"max", Channel::MaxPower} }, true, tr("Specifies the transmit power on the channel.")));
   add("tx-timeout", new ConfigIntItem::Declaration(
         0, 10000, false, tr("Specifies the transmit timeout in seconds. None if 0 or omitted.")));
   add("rx-only", new ConfigBoolItem::Declaration(
         false, tr("If true, TX is disabled for this channel.")));
-  add("scan-list", new ConfigReferenceDeclaration(false, tr("References the scanlist associated with this channel.")));
+  add("scan-list", ConfigReference::Declaration::get<ConfigScanList>(
+        false, tr("References the scanlist associated with this channel.")));
 }
 
 /* ********************************************************************************************* *
@@ -1183,9 +1418,9 @@ ConfigChannel::tx() const {
   return get("tx")->as<ConfigFloatItem>()->value();
 }
 
-const QString &
+Channel::Power
 ConfigChannel::power() const {
-  return get("power")->as<ConfigEnumItem>()->value();
+  return get("power")->as<ConfigEnumItem>()->as<Channel::Power>(Channel::MaxPower);
 }
 
 qint64
@@ -1213,15 +1448,21 @@ ConfigDigitalChannel::Declaration::Declaration(bool mandatory, const QString &de
   : ConfigChannel::Declaration(mandatory, description)
 {
   add("admit", new ConfigEnumItem::Declaration(
-    {"always", "free", "color-code"},
-    true, tr("Specifies the transmit admit criterion.")));
+    { {"always", DigitalChannel::AdmitNone},
+      {"free", DigitalChannel::AdmitFree},
+      {"color-code", DigitalChannel::AdmitColorCode} }, true, tr("Specifies the transmit admit criterion.")));
   add("color-code", new ConfigIntItem::Declaration(1,16, true, tr("Specifies the color-code of the channel.")));
   add("time-slot", new ConfigIntItem::Declaration(1,2, true, tr("Specifies the time-slot of the channel.")));
-  add("group-list", new ConfigReferenceDeclaration(true, tr("References the RX group list of the channel.")));
-  add("tx-contact", new ConfigReferenceDeclaration(false, tr("References the default TX contact of the channel.")));
-  add("aprs", new ConfigReferenceDeclaration(false, tr("References the positioning system used by this channel.")));
-  add("roaming-zone", new ConfigReferenceDeclaration(false, tr("References the roaming zone used by this channel.")));
-  add("dmr-id", new ConfigReferenceDeclaration(false, tr("Specifies the DMR ID to use on this channel.")));
+  add("group-list", ConfigReference::Declaration::get<ConfigGroupList>(
+        true, tr("References the RX group list of the channel.")));
+  add("tx-contact", ConfigReference::Declaration::get<ConfigDigitalContact>(
+        false, tr("References the default TX contact of the channel.")));
+  add("aprs", ConfigReference::Declaration::get<ConfigPositioning>(
+        false, tr("References the positioning system used by this channel.")));
+  add("roaming-zone", ConfigReference::Declaration::get<ConfigRoamingZone>(
+        false, tr("References the roaming zone used by this channel.")));
+  add("dmr-id", ConfigReference::Declaration::get<ConfigRadioId>(
+        false, tr("Specifies the DMR ID to use on this channel.")));
 }
 
 ConfigItem *
@@ -1302,8 +1543,10 @@ ConfigAnalogChannel::Declaration *ConfigAnalogChannel::Declaration::_instance = 
 ConfigAnalogChannel::Declaration::Declaration(bool mandatory, const QString &description)
   : ConfigChannel::Declaration(mandatory, description)
 {
-  add("admit", new ConfigEnumItem::Declaration({"always", "free", "tone"},
-                                               false, tr("Specifies the transmit admit criterion.")));
+  add("admit", new ConfigEnumItem::Declaration(
+    {{"always", AnalogChannel::AdmitNone},
+     {"free", AnalogChannel::AdmitFree},
+     {"tone", AnalogChannel::AdmitTone} }, false, tr("Specifies the transmit admit criterion.")));
   add("squelch", new ConfigIntItem::Declaration(1,10, true, tr("Specifies the squelch level.")));
   add("rx-tone", new ConfigDispatchDeclaration(
   { {"ctcss", new ConfigFloatItem::Declaration(0,300, true, tr("Specifies the CTCSS frequency."))},
@@ -1313,8 +1556,11 @@ ConfigAnalogChannel::Declaration::Declaration(bool mandatory, const QString &des
   { {"ctcss", new ConfigFloatItem::Declaration(0,300, true, tr("Specifies the CTCSS frequency."))},
     {"dcs", new ConfigIntItem::Declaration(-300,300, true, tr("Specifies the DCS code."))} },
         false, tr("Specifies the DCS/CTCSS signaling for TX.")));
-  add("band-width", new ConfigEnumItem::Declaration({"narrow","wide"}, true, tr("Specifies the bandwidth of the channel.")));
-  add("aprs", new ConfigReferenceDeclaration(false, tr("References the APRS system used by this channel.")));
+  add("band-width", new ConfigEnumItem::Declaration(
+    {{"narrow", AnalogChannel::BWNarrow},
+     {"wide", AnalogChannel::BWWide}}, true, tr("Specifies the bandwidth of the channel.")));
+  add("aprs", ConfigReference::Declaration::get<ConfigAPRSPositioning>(
+        false, tr("References the APRS system used by this channel.")));
 }
 
 ConfigItem *
@@ -1338,35 +1584,49 @@ ConfigAnalogChannel::ConfigAnalogChannel(QObject *parent)
   // pass...
 }
 
-const QString &
+AnalogChannel::Admit
 ConfigAnalogChannel::admit() const {
-  return get("admit")->as<ConfigEnumItem>()->value();
+  return get("admit")->as<ConfigEnumItem>()->as<AnalogChannel::Admit>(AnalogChannel::AdmitNone);
 }
 
-uint32_t
+Signaling::Code
 ConfigAnalogChannel::rxSignalling() const {
   if (! has("rx-tone"))
-    return 0;
-  if (get("rx-tone")->as<ConfigObjItem>()->has("ctcss"))
-    return get("rx-tone")->as<ConfigObjItem>()->get("ctcss")->as<ConfigFloatItem>()->value();
-  // handle as DCS
-  return get("rx-tone")->as<ConfigObjItem>()->get("dcs")->as<ConfigIntItem>()->value();
+    return Signaling::SIGNALING_NONE;
+
+  if (get("rx-tone")->is<ConfigFloatItem>()) {
+    double f = get("rx-tone")->as<ConfigFloatItem>()->value();
+    return Signaling::fromCTCSSFrequency(f);
+  } else if (get("rx-tone")->is<ConfigIntItem>()) {
+    // handle as DCS
+    qint64 num = get("rx-tone")->as<ConfigIntItem>()->value();
+    return Signaling::fromDCSNumber(std::abs(num), num<0);
+  }
+
+  return Signaling::SIGNALING_NONE;
 }
 
 
-uint32_t
+Signaling::Code
 ConfigAnalogChannel::txSignalling() const {
-  if (! has("tx-tone"))
-    return 0;
-  if (get("tx-tone")->as<ConfigObjItem>()->has("ctcss"))
-    return get("tx-tone")->as<ConfigObjItem>()->get("ctcss")->as<ConfigFloatItem>()->value();
-  // handle as DCS
-  return get("tx-tone")->as<ConfigObjItem>()->get("dcs")->as<ConfigIntItem>()->value();
+  if (! has("rx-tone"))
+    return Signaling::SIGNALING_NONE;
+
+  if (get("rx-tone")->is<ConfigFloatItem>()) {
+    double f = get("rx-tone")->as<ConfigFloatItem>()->value();
+    return Signaling::fromCTCSSFrequency(f);
+  } else if (get("rx-tone")->is<ConfigIntItem>()) {
+    // handle as DCS
+    qint64 num = get("rx-tone")->as<ConfigIntItem>()->value();
+    return Signaling::fromDCSNumber(std::abs(num), num<0);
+  }
+
+  return Signaling::SIGNALING_NONE;
 }
 
-const QString &
+AnalogChannel::Bandwidth
 ConfigAnalogChannel::bandWidth() const {
-  return get("band-width")->as<ConfigEnumItem>()->value();
+  return get("band-width")->as<ConfigEnumItem>()->as<AnalogChannel::Bandwidth>(AnalogChannel::BWNarrow);
 }
 
 ConfigAPRSPositioning *
@@ -1386,8 +1646,10 @@ ConfigZone::Declaration::Declaration(bool mandatory, const QString &description)
   : ConfigObjItem::Declaration(mandatory, description)
 {
   add("name", new ConfigStrItem::Declaration(true, tr("Specifies the name of the zone.")));
-  add("A", new ConfigList::Declaration(new ConfigReferenceDeclaration(false, tr("Channel references."))));
-  add("B", new ConfigList::Declaration(new ConfigReferenceDeclaration(false, tr("Channel references."))));
+  add("A",
+      ConfigRefList::Declaration::get<ConfigChannel>(false, tr("Channel references.")));
+  add("B",
+      ConfigRefList::Declaration::get<ConfigChannel>(false, tr("Channel references.")));
 }
 
 ConfigItem *
@@ -1421,11 +1683,14 @@ ConfigScanList::Declaration::Declaration(bool mandatory, const QString &descript
   : ConfigObjItem::Declaration(mandatory, description)
 {
   add("name", new ConfigStrItem::Declaration(true, tr("Name of the scan list.")));
-  add("pimary", new ConfigReferenceDeclaration(false, tr("Reference to the primary priority channel.")));
-  add("secondary", new ConfigReferenceDeclaration(false, tr("Reference to the secondary priority channel.")));
-  add("revert", new ConfigReferenceDeclaration(false, tr("Reference to the revert (transmit) channel.")));
-  add("channels", new ConfigList::Declaration(
-        new ConfigReferenceDeclaration(false, tr("Reference to a channel.")), tr("List of channels in scan list.")));
+  add("pimary", ConfigReference::Declaration::get<ConfigChannel>(
+        false, tr("Reference to the primary priority channel.")));
+  add("secondary", ConfigReference::Declaration::get<ConfigChannel>(
+        false, tr("Reference to the secondary priority channel.")));
+  add("revert", ConfigReference::Declaration::get<ConfigChannel>(
+        false, tr("Reference to the revert (transmit) channel.")));
+  add("channels", ConfigRefList::Declaration::get<ConfigChannel>(
+        false, tr("Reference to a channel.")));
 }
 
 ConfigItem *
@@ -1475,16 +1740,16 @@ ConfigScanList::revert() const {
   return get("revert")->as<ConfigChannel>();
 }
 
-ConfigList *
+ConfigAbstractList *
 ConfigScanList::channels() const {
   if (! has("channels"))
     return nullptr;
-  return get("channels")->as<ConfigList>();
+  return get("channels")->as<ConfigAbstractList>();
 }
 
 
 /* ********************************************************************************************* *
- * Implementation of ConfigPositioningItem::Declaration
+ * Implementation of ConfigPositioning::Declaration
  * ********************************************************************************************* */
 ConfigPositioning::Declaration::Declaration(bool mandatory, const QString &description)
   : ConfigObjItem::Declaration(mandatory, description)
@@ -1494,7 +1759,7 @@ ConfigPositioning::Declaration::Declaration(bool mandatory, const QString &descr
 }
 
 /* ********************************************************************************************* *
- * Implementation of ConfigPositioningItem
+ * Implementation of ConfigPositioning
  * ********************************************************************************************* */
 ConfigPositioning::ConfigPositioning(Declaration *declaraion, QObject *parent)
   : ConfigObjItem(declaraion, parent)
@@ -1521,8 +1786,10 @@ ConfigDMRPositioning::Declaration *ConfigDMRPositioning::Declaration::_instance 
 ConfigDMRPositioning::Declaration::Declaration(bool mandatory, const QString &description)
   : ConfigPositioning::Declaration(mandatory, description)
 {
-  add("destination", new ConfigReferenceDeclaration(true, tr("Specifies the destination contact.")));
-  add("channel", new ConfigReferenceDeclaration(false, tr("Specifies the optional revert channel.")));
+  add("destination", ConfigReference::Declaration::get<ConfigDigitalContact>(
+        true, tr("Specifies the destination contact.")));
+  add("channel", ConfigReference::Declaration::get<ConfigDigitalChannel>(
+        false, tr("Specifies the optional revert channel.")));
 }
 
 ConfigItem *
@@ -1557,8 +1824,9 @@ ConfigAPRSPositioning::Declaration::Declaration(bool mandatory, const QString &d
 {
   add("source", new ConfigStrItem::Declaration(true, tr("Specifies the source call and SSID.")));
   add("destination", new ConfigStrItem::Declaration(true, tr("Specifies the destination call and SSID.")));
-  add("channel", new ConfigReferenceDeclaration(true, tr("Specifies the optional revert channel.")));
-  add("path", new ConfigList::Declaration(
+  add("channel", ConfigReference::Declaration::get<ConfigAnalogChannel>(
+        true, tr("Specifies the optional revert channel.")));
+  add("path", ConfigList::Declaration::get<ConfigStrItem>(
         new ConfigStrItem::Declaration(false, tr("Specifies a path element of the APRS packet.")),
         tr("Specifies the APRS path as a list.")));
   add("icon", new ConfigStrItem::Declaration(true, tr("Specifies the icon name.")));
@@ -1596,9 +1864,8 @@ ConfigRoamingZone::Declaration::Declaration(bool mandatory, const QString &descr
   : ConfigObjItem::Declaration(mandatory, description)
 {
   add("name", new ConfigStrItem::Declaration(true, tr("Specifies name of the roaming zone.")));
-  add("channels", new ConfigList::Declaration(
-        new ConfigReferenceDeclaration(false, tr("References a channel")),
-        tr("Specifies the list of channels for the roaming zone.")));
+  add("channels", ConfigRefList::Declaration::get<ConfigDigitalChannel>(
+        false, tr("References a channel")));
 }
 
 ConfigItem *
@@ -1636,28 +1903,26 @@ Configuration::Declaration::Declaration()
   add("intro-line2", new ConfigStrItem::Declaration(false, tr("Specifies the optional second boot display line.")));
 
   add("radio-ids",
-      new ConfigList::Declaration(
-        ConfigRadioId::Declaration::get(),
+      ConfigList::Declaration::get<ConfigRadioId>(
         tr("This list specifies the DMR IDs and names for the radio.")));
 
   add("channels",
-      new ConfigList::Declaration(
+      ConfigList::Declaration::get<ConfigChannel>(
         new ConfigDispatchDeclaration({ {"analog", ConfigAnalogChannel::Declaration::get()},
                                         {"digital", ConfigDigitalChannel::Declaration::get()}},
                                       true),
         tr("The list of all channels within the codeplug.")));
 
   add("zones",
-      new ConfigList::Declaration(ConfigZone::Declaration::get(),
-                                      tr("Defines the list of zones.")));
+      ConfigList::Declaration::get<ConfigZone>(
+        tr("Defines the list of zones.")));
 
   add("scan-lists",
-      new ConfigList::Declaration(
-        ConfigScanList::Declaration::get(),
+      ConfigList::Declaration::get<ConfigScanList>(
         tr("Defines the list of all scan lists.")));
 
   add("contacts",
-      new ConfigList::Declaration(
+      ConfigList::Declaration::get<ConfigContact>(
         new ConfigDispatchDeclaration({ {"private", ConfigPrivateCall::Declaration::get()},
                                         {"group", ConfigGroupCall::Declaration::get()},
                                         {"all", ConfigAllCall::Declaration::get()} },
@@ -1665,20 +1930,18 @@ Configuration::Declaration::Declaration()
         tr("Specifies the list of contacts.")));
 
   add("group-lists",
-      new ConfigList::Declaration(
-        ConfigGroupList::Declaration::get(),
+      ConfigList::Declaration::get<ConfigGroupList>(
         tr("Lists all RX group lists within the codeplug.")));
 
   add("positioning",
-      new ConfigList::Declaration(
+      ConfigList::Declaration::get<ConfigPositioning>(
         new ConfigDispatchDeclaration({ {"dmr", ConfigDMRPositioning::Declaration::get()},
                                         {"aprs", ConfigAPRSPositioning::Declaration::get()} },
                                       false),
         tr("List of all positioning systems.")));
 
   add("roaming",
-      new ConfigList::Declaration(
-        ConfigRoamingZone::Declaration::get(),
+      ConfigList::Declaration::get<ConfigRoamingZone>(
         tr("List of all roaming zones.")));
 
 }
