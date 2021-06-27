@@ -9,25 +9,29 @@
 
 #include "channel.hh"
 #include "signaling.hh"
+#include "logger.hh"
 
-class ConfigObjItem;
-class ConfigScanList;
-class ConfigGroupList;
-class ConfigPositioning;
-class ConfigRoamingZone;
-class ConfigRadioId;
-class ConfigAPRSPositioning;
-class ConfigChannel;
-class ConfigDigitalChannel;
-class ConfigAnalogChannel;
-class ConfigDigitalContact;
-class ConfigGroupCall;
 
+namespace Configuration {
+
+class Object;
+class ScanList;
+class GroupList;
+class Positioning;
+class RoamingZone;
+class RadioId;
+class APRSPositioning;
+class Channel;
+class DigitalChannel;
+class AnalogChannel;
+class DigitalContact;
+class GroupCall;
+class Reference;
 
 /** Base class of all YAML extensible codeplug/config items.
  * These objects form the CST of the parsed YAML codeplug.
  * @ingroup conf */
-class ConfigItem : public QObject
+class Item : public QObject
 {
   Q_OBJECT
 
@@ -49,6 +53,8 @@ public:
     const QString &description() const;
     /** Returns @c true if the item is mandatory for a complete config. */
     bool isMandatory() const;
+    /** Returns the name of the declaration. */
+    const QString &name() const;
 
     /** Returns @c true if this item is of given type @c T. */
     template <class T>
@@ -74,32 +80,37 @@ public:
     virtual bool verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const;
 
     /** Implements the definition phase of the two-step parsing. */
-    virtual ConfigItem *parseDefine(YAML::Node &node, QHash<QString, ConfigItem*> &ctx, QString &msg) const;
+    virtual Item *parseDefine(const YAML::Node &node, QHash<QString, Item*> &ctx, QString &msg) const;
     /** Implements the link phase of the two-step parsing. */
-    virtual bool parseLink(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem*> &ctx, QString &msg) const;
+    virtual bool parseLink(Item *item, const YAML::Node &node, QHash<QString, Item*> &ctx, QString &msg) const;
+
+    /** Creates YAML nodes according to this declaration. */
+    virtual YAML::Node generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const = 0;
 
   protected:
     /** Allocates the parsed item. */
-    virtual ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const = 0;
+    virtual Item *parseAllocate(const YAML::Node &node, QString &msg) const = 0;
     /** Populates the parsed item. */
-    virtual bool parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem*> &ctx, QString &msg) const = 0;
+    virtual bool parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item*> &ctx, QString &msg) const = 0;
 
   protected:
     /** Holds the description of the item. */
     QString _description;
     /** If @c true, the item is mandatory for a complete config. */
     bool _mandatory;
+    /** Optional name of declaration. */
+    QString _name;
   };
 
 protected:
   /** Hidden constructor.
    * @param declaration Specifies the declaration of the item.
    * @param parent Specifies the QObject parent. */
-  ConfigItem(const Declaration *declaration, QObject *parent = nullptr);
+  Item(const Declaration *declaration, QObject *parent = nullptr);
 
 public:
   /** Destructor. */
-  virtual ~ConfigItem();
+  virtual ~Item();
 
   /** Returns the declaraion of this item. */
   const Declaration *declaraion() const;
@@ -122,6 +133,14 @@ public:
     return dynamic_cast<T *>(this);
   }
 
+  /** Serializes the item for debug purposes. */
+  virtual QString dump(const QString &prefix="") const;
+
+  /** Recursively assignes Ids to objects. */
+  virtual bool generateIds(QHash<const Item *, QString> &ctx, QString &message) const;
+  /** Recursively creates YAML nodes. */
+  virtual YAML::Node generateNode(const QHash<const Item *, QString> &ctx, QString &message) const;
+
 protected:
   /** Holds the declaration of this item. */
   const Declaration *_declaration;
@@ -131,13 +150,13 @@ protected:
 
 /** Base class of all scalar config items (bool, string, etc).
  * @ingroup conf */
-class ConfigScalarItem: public ConfigItem
+class ScalarItem: public Item
 {
   Q_OBJECT
 
 public:
   /** Base class for all scalar value declarations. */
-  class Declaration: public ConfigItem::Declaration
+  class Declaration: public Item::Declaration
   {
   protected:
     /** Hidden constructor. */
@@ -151,28 +170,31 @@ protected:
   /** Hidden constructor.
    * @param declaration Specifies the declaration of the item.
    * @param parent Specifies the QObject parent. */
-  ConfigScalarItem(const Declaration *declaration, QObject *parent = nullptr);
+  ScalarItem(const Declaration *declaration, QObject *parent = nullptr);
 };
 
 
 /** Represents a boolean config item.
  * @ingroup conf */
-class ConfigBoolItem: public ConfigScalarItem
+class BoolItem: public ScalarItem
 {
   Q_OBJECT
 
 public:
   /** Represents a single boolean valued field.
    * @ingroup conf */
-  class Declaration: public ConfigScalarItem::Declaration
+  class Declaration: public ScalarItem::Declaration
   {
   public:
     /** Hidden constructor. */
     Declaration(bool mandatory, const QString &description="");
 
     bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
-    bool parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem*> &ctx, QString &msg) const;
+
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
+    bool parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item*> &ctx, QString &msg) const;
+
+    YAML::Node generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const;
   };
 
 public:
@@ -180,12 +202,14 @@ public:
    * @param value Specifies the value of the boolean item.
    * @param declaration Specifies the item declaraion.
    * @param parent Specifies the parent of the item. */
-  ConfigBoolItem(bool value, const Declaration *declaration, QObject *parent=nullptr);
+  BoolItem(bool value, const Declaration *declaration, QObject *parent=nullptr);
 
   /** Returns the actual value. */
   bool value() const;
   /** Sets the value. */
   void setValue(bool val);
+
+  virtual QString dump(const QString &prefix="") const;
 
 protected:
   /** Holds the value of the item. */
@@ -195,13 +219,13 @@ protected:
 
 /** Represents an integer config item.
  * @ingroup conf*/
-class ConfigIntItem: public ConfigScalarItem
+class IntItem: public ScalarItem
 {
   Q_OBJECT
 
 public:
   /** Represents a single integer valued field. */
-  class Declaration: public ConfigScalarItem::Declaration
+  class Declaration: public ScalarItem::Declaration
   {
   public:
     /** Constructs an integer field declaration.
@@ -218,8 +242,11 @@ public:
     qint64 maximum() const;
 
     bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
-    bool parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem*> &ctx, QString &msg) const;
+
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
+    bool parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item*> &ctx, QString &msg) const;
+
+    YAML::Node generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const;
 
   protected:
     /** Holds the lower bound. */
@@ -233,12 +260,14 @@ public:
    * @param value Specifies the value of the item.
    * @param declaration Specifies the item declaraion.
    * @param parent Specifies the parent of the item. */
-  ConfigIntItem(qint64 value, const Declaration *declaration, QObject *parent=nullptr);
+  IntItem(qint64 value, const Declaration *declaration, QObject *parent=nullptr);
 
   /** Returns the actual value. */
   qint64 value() const;
   /** Sets the value and limits it to the declaration. */
   void setValue(qint64 value);
+
+  virtual QString dump(const QString &prefix="") const;
 
 protected:
   /** Holds the value of the item. */
@@ -248,20 +277,20 @@ protected:
 
 /** Represents a DMR ID config item.
  * @ingroup conf*/
-class ConfigDMRIdItem: public ConfigIntItem
+class DMRId: public IntItem
 {
   Q_OBJECT
 
 public:
   /** Represents a DMR ID field, that is an integer in range [0, 16777215]. */
-  class Declaration: public ConfigIntItem::Declaration
+  class Declaration: public IntItem::Declaration
   {
   public:
     /** Constructs a DMR ID field. */
     Declaration(bool mandatory, const QString &description="");
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
-    bool parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem*> &ctx, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
+    bool parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item*> &ctx, QString &msg) const;
   };
 
 public:
@@ -269,19 +298,21 @@ public:
    * @param value Specifies the ID.
    * @param declaration Specifies the item declaraion.
    * @param parent Specifies the parent of the item. */
-  ConfigDMRIdItem(uint32_t value, const Declaration *declaration, QObject *parent=nullptr);
+  DMRId(uint32_t value, const Declaration *declaration, QObject *parent=nullptr);
+
+  virtual QString dump(const QString &prefix="") const;
 };
 
 
 /** Represents a floating point number config item.
  * @ingroup conf*/
-class ConfigFloatItem: public ConfigScalarItem
+class FloatItem: public ScalarItem
 {
   Q_OBJECT
 
 public:
   /** Represents a single floating point valued field. */
-  class Declaration: public ConfigScalarItem::Declaration
+  class Declaration: public ScalarItem::Declaration
   {
   public:
     /** Constructs a floating point value field declaration.
@@ -298,8 +329,11 @@ public:
     double maximum() const;
 
     bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
-    bool parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem*> &ctx, QString &msg) const;
+
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
+    bool parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item*> &ctx, QString &msg) const;
+
+    YAML::Node generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const;
 
   protected:
     /** Holds the lower bound. */
@@ -313,12 +347,14 @@ public:
    * @param value Specifies the value of the item.
    * @param declaration Specifies the item declaraion.
    * @param parent Specifies the parent of the item. */
-  ConfigFloatItem(double value, const Declaration *declaration, QObject *parent=nullptr);
+  FloatItem(double value, const Declaration *declaration, QObject *parent=nullptr);
 
   /** Returns the value of the item. */
   double value() const;
   /** Sets the value and limits it to the declaration. */
   void setValue(double value);
+
+  virtual QString dump(const QString &prefix="") const;
 
 protected:
   /** Holds the value of the item. */
@@ -328,13 +364,13 @@ protected:
 
 /** Represents a string config item.
  * @ingroup conf*/
-class ConfigStrItem: public ConfigScalarItem
+class StringItem: public ScalarItem
 {
   Q_OBJECT
 
 public:
   /** Represents a string field. */
-  class Declaration: public ConfigScalarItem::Declaration
+  class Declaration: public ScalarItem::Declaration
   {
   public:
     /** Constructs a string-valued field. */
@@ -342,8 +378,10 @@ public:
 
     bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
-    bool parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem*> &ctx, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
+    bool parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item*> &ctx, QString &msg) const;
+
+    YAML::Node generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const;
   };
 
 public:
@@ -351,12 +389,14 @@ public:
    * @param value Specifies the value of the item.
    * @param declaration Specifies the item declaraion.
    * @param parent Specifies the parent of the item. */
-  ConfigStrItem(const QString &value, const Declaration *declaration, QObject *parent=nullptr);
+  StringItem(const QString &value, const Declaration *declaration, QObject *parent=nullptr);
 
   /** Returns the value of the item. */
   const QString &value() const;
   /** Sets the value. */
   void setValue(const QString &value);
+
+  virtual QString dump(const QString &prefix="") const;
 
 protected:
   /** Holds the value of the item. */
@@ -367,25 +407,25 @@ protected:
 /** Declares a field holding an identifier for cross-refrerence.
  * That is a string, that gets collected to check every reference. See @c CondifDeclRef.
  * @ingroup conf */
-class ConfigIdDeclaration: public ConfigStrItem::Declaration
+class IdDeclaration: public StringItem::Declaration
 {
 public:
   /** Constructor. */
-  ConfigIdDeclaration(bool mandatory, const QString &description="");
+  IdDeclaration(bool mandatory, const QString &description="");
 
   bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
 };
 
 /** Represents an enum value config item.
  * @ingroup conf*/
-class ConfigEnumItem: public ConfigScalarItem
+class Enum: public ScalarItem
 {
   Q_OBJECT
 
 public:
   /** Represents a single enumeration field. This is a string valued field that can only take
    * one of a pre-defined set of values. */
-  class Declaration: public ConfigScalarItem::Declaration
+  class Declaration: public ScalarItem::Declaration
   {
   public:
     /** Constructor.
@@ -397,10 +437,15 @@ public:
 
     /** Returns the set of possible values. */
     const QHash<QString, uint32_t> &possibleValues() const;
+    /** Retruns the key for the given value. */
+    QString key(uint32_t value) const;
 
     bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
-    bool parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem*> &ctx, QString &msg) const;
+
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
+    bool parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item*> &ctx, QString &msg) const;
+
+    YAML::Node generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const;
 
   protected:
     /** Holds the set of possible values. */
@@ -411,13 +456,13 @@ public:
   /** Empty constructor.
    * @param declaration Specifies the item declaraion.
    * @param parent Specifies the parent of the item. */
-  ConfigEnumItem(const Declaration *declaration, QObject *parent=nullptr);
+  Enum(const Declaration *declaration, QObject *parent=nullptr);
 
   /** Constructor.
    * @param value Specifies the value of the item.
    * @param declaration Specifies the item declaraion.
    * @param parent Specifies the parent of the item. */
-  ConfigEnumItem(uint32_t value, const Declaration *declaration, QObject *parent=nullptr);
+  Enum(uint32_t value, const Declaration *declaration, QObject *parent=nullptr);
 
   /** Returns the value of the item. */
   uint32_t value(uint32_t default_value=0) const;
@@ -433,6 +478,8 @@ public:
    * @returns @c true if the key is defined. */
   bool setValue(uint32_t value);
 
+  virtual QString dump(const QString &prefix="") const;
+
 protected:
   /** Holds the enum value. */
   uint32_t _value;
@@ -442,182 +489,108 @@ protected:
 /** Represents a mapping, that can only hold a single element.
  * This can be used to specify a predefined set of options.
  * @ingroup conf */
-class ConfigDispatchDeclaration: public ConfigItem::Declaration
+class DispatchDeclaration: public Item::Declaration
 {
 public:
   /** Declares a dispatch/cases.
    * @param elements The map of possible elements. Only one of these can be used.
    * @param mandatory If @c true, the element is mandatory.
    * @param description Specifies the optional element description. */
-  ConfigDispatchDeclaration(const QHash<QString, ConfigItem::Declaration *> &elements, bool mandatory,
+  DispatchDeclaration(const QHash<QString, Item::Declaration *> &elements, bool mandatory,
                      const QString &description="");
 
   /** Adds an element to the set. */
-  bool add(const QString &name, ConfigItem::Declaration *element);
+  bool add(const QString &name, Item::Declaration *element);
 
   bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
   bool verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const;
 
-  ConfigItem *parseDefine(YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const;
+  Item *parseDefine(const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const;
+  bool parseLink(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const;
+
+  YAML::Node generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const;
 
 protected:
-  ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
-  bool parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const;
+  Item *parseAllocate(const YAML::Node &node, QString &msg) const;
+  bool parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const;
 
 protected:
   /** The set of possible elements. */
-  QHash<QString, ConfigItem::Declaration *> _elements;
-};
-
-
-/** Represents a key-value map item.
- * @ingroup conf */
-class ConfigMapItem: public ConfigItem
-{
-  Q_OBJECT
-
-public:
-  /** Represents a key-value mapping within the configuration. */
-  class Declaration: public ConfigItem::Declaration
-  {
-  public:
-    /** Constructs a map declaration.
-     * @param elements The fields of the mapping.
-     * @param mandatory If @c true, the mapping is mandatory.
-     * @param description Specifies the optional object description. */
-    Declaration(const QHash<QString, ConfigItem::Declaration *> &elements, bool mandatory,
-                const QString &description="");
-
-    /** Adds an element/field to the object. */
-    bool add(const QString &name, ConfigItem::Declaration *element);
-
-    bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
-    bool verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const;
-
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
-    bool parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem*> &ctx, QString &msg) const;
-
-  protected:
-    /** The set of mandatory elements. */
-    QSet<QString> _mandatoryElements;
-    /** The set of all elements. */
-    QHash<QString, ConfigItem::Declaration *> _elements;
-  };
-
-public:
-  /** Empty constructor.
-   * @param declaration Specifies the item declaraion.
-   * @param parent Specifies the parent of the item. */
-  ConfigMapItem(const Declaration *declaration, QObject *parent=nullptr);
-
-  /** Returns @c true if the object contains the given element. */
-  bool has(const QString &name) const;
-  /** Adds the given element to the object */
-  bool add(const QString &name, ConfigItem *element);
-  /** Adds or replaces the given element in the object */
-  void set(const QString &name, ConfigItem *element);
-  /** Returns the given element by name. */
-  ConfigItem *get(const QString &name) const;
-  /** Removes the given element from the object and returns it. */
-  ConfigItem *take(const QString &name);
-  /** Deletes the element from the object. */
-  bool del(const QString &name);
-
-protected slots:
-  /** Gets called if one of the elements of this object gets deleted. */
-  void onElementDeleted(QObject *element);
-
-protected:
-  /** Holds the elements of the object. */
-  QHash<QString, ConfigItem *>_elements;
-};
-
-
-/** Represents an object config item.
- * @ingroup conf */
-class ConfigObjItem: public ConfigMapItem
-{
-  Q_OBJECT
-
-public:
-  /** Represents an object (a key-value mapping with an ID) within the configuration. */
-  class Declaration: public ConfigMapItem::Declaration
-  {
-  public:
-    /** Constructs a map declaration.
-     * @param mandatory If @c true, the object is mandatory.
-     * @param description Specifies the optional object description. */
-    Declaration(bool mandatory, const QString &description="");
-
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
-    bool parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const;
-    ConfigItem *parseDefine(YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const;
-  };
-
-public:
-  /** Empty constructor.
-   * @param declaration Specifies the item declaraion.
-   * @param parent Specifies the parent of the item. */
-  ConfigObjItem(const Declaration *declaration, QObject *parent=nullptr);
+  QHash<QString, Item::Declaration *> _elements;
 };
 
 
 /** Represents a reference to an arbitrary element.
  * @ingroup conf */
-class ConfigReference: public ConfigItem
+class Reference: public Item
 {
   Q_OBJECT
 public:
   /** Declares a field referencing a previously defined ID.
    * See @c ConfigIdDeclaration.*/
-  class Declaration: public ConfigStrItem::Declaration
+  class Declaration: public StringItem::Declaration
   {
   protected:
     /** Constructs a reference field declaration. */
-    Declaration(bool mandatory, bool (*typeChk)(const ConfigItem *), const QString &description="");
+    Declaration(bool mandatory, bool (*typeChk)(const Item *), const QString &description="");
 
   public:
     /** Returns @c true if the given item is of the required type. */
-    bool isValidReference(const ConfigItem *item) const;
+    bool isValidReference(const Item *item) const;
 
     bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
     bool verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const;
-    bool parseLink(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const;
+    bool parseLink(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const;
+
+    YAML::Node generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const;
 
   public:
     /** Constructs a reference declaration to the given intem class. */
-    template <class RefType = ConfigItem>
+    template <class RefType = Item>
     static Declaration *get(bool mandatory, const QString &description="") {
-      return new ConfigReference::Declaration(
+      return new Reference::Declaration(
             mandatory,
-            [](const ConfigItem *item)->bool {
+            [](const Item *item)->bool {
               return ((nullptr == item) || (nullptr != dynamic_cast<const RefType *>(item) ));
             }, description);
     }
 
   protected:
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
-    bool parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
+    bool parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const;
 
   protected:
     /** Holds the declaration of the referenced object. */
-    bool (*_ref_type_check)(const ConfigItem *);
+    bool (*_ref_type_check)(const Item *);
   };
 
 public:
   /** Empty constructor. */
-  ConfigReference(const Declaration *declaraion, QObject *parent=nullptr);
+  Reference(const Declaration *declaraion, QObject *parent=nullptr);
   /** Constructs a reference to the given object. */
-  ConfigReference(ConfigObjItem *obj, const Declaration *declaraion, QObject *parent=nullptr);
+  Reference(Object *obj, const Declaration *declaraion, QObject *parent=nullptr);
 
   /** Returns @c nullptr if nothing is referenced. */
   bool isNull() const;
   /** Returns the referenced object or @c nullptr. */
-  ConfigItem *get() const;
+  template <class ItemType=Item>
+  ItemType *get() const {
+    if (isNull())
+      return nullptr;
+    if (! _reference->is<ItemType>()) {
+      logDebug() << "Cannot dereference item a " << typeid(ItemType).name()
+                 << " referenced object is not of that type.";
+      return nullptr;
+    }
+    return _reference->as<ItemType>();
+  }
+
   /** Removes the reference. */
-  ConfigItem *take();
+  Item *take();
   /** Sets the referenced object. */
-  void set(ConfigItem *item);
+  bool set(Item *item);
+
+  virtual QString dump(const QString &prefix="") const;
 
 protected slots:
   /** Gets called if the referenced object is deleted. */
@@ -625,20 +598,168 @@ protected slots:
 
 protected:
   /** The reference to the element. */
-  ConfigItem *_reference;
+  Item *_reference;
+};
+
+
+/** Represents a key-value map item.
+ * @ingroup conf */
+class Map: public Item
+{
+  Q_OBJECT
+
+public:
+  /** Represents a key-value mapping within the configuration. */
+  class Declaration: public Item::Declaration
+  {
+  public:
+    /** Constructs a map declaration.
+     * @param elements The fields of the mapping.
+     * @param mandatory If @c true, the mapping is mandatory.
+     * @param description Specifies the optional object description. */
+    Declaration(const QHash<QString, Item::Declaration *> &elements, bool mandatory,
+                const QString &description="");
+
+    /** Adds an element/field to the object. */
+    bool add(const QString &name, Item::Declaration *element);
+    /** Returns @c true if the declaration of the map contains the given element. */
+    bool has(const QString &name) const;
+    /** Returns the declaration given element. */
+    Item::Declaration *get(const QString &name) const;
+
+    bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
+    bool verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const;
+    bool parseLink(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const;
+
+    YAML::Node generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const;
+
+  protected:
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
+    bool parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item*> &ctx, QString &msg) const;
+
+  protected:
+    /** The set of mandatory elements. */
+    QSet<QString> _mandatoryElements;
+    /** The set of all elements. */
+    QHash<QString, Item::Declaration *> _elements;
+  };
+
+public:
+  /** Empty constructor.
+   * @param declaration Specifies the item declaraion.
+   * @param parent Specifies the parent of the item. */
+  Map(const Declaration *declaration, QObject *parent=nullptr);
+
+  /** Returns @c true if the object contains the given element. */
+  bool has(const QString &name) const;
+  /** Adds the given element to the object */
+  bool add(const QString &name, Item *element);
+
+  /** Adds or replaces the given element in the object */
+  bool set(const QString &name, Item *element);
+
+  /** Returns the given element by name. */
+  template <class ItemType=Item>
+  ItemType *get(const QString &name) const {
+    if (! has(name))
+      return nullptr;
+    Item *item = _elements[name];
+    if (! item->is<ItemType>()) {
+      logDebug() << "Cannot get element " << name
+                 << " as " << typeid(ItemType).name() << ".";
+      return nullptr;
+    }
+    return item->as<ItemType>();
+  }
+
+  /** Dereferences the given reference by name. */
+  template <class ItemType=Item>
+  ItemType *getRef(const QString &name) const {
+    if (! has(name))
+      return nullptr;
+    Item *item = _elements[name];
+    if (! item->is<Reference>()) {
+      logDebug() << "Cannot get reference " << name
+                 << " element is not a reference to some other object .";
+      return nullptr;
+    }
+    Reference *ref = item->as<Reference>();
+    if (ref->isNull())
+      return nullptr;
+    return ref->get<ItemType>();
+  }
+
+  /** Removes the given element from the object and returns it. */
+  Item *take(const QString &name);
+  /** Deletes the element from the object. */
+  bool del(const QString &name);
+
+  virtual bool generateIds(QHash<const Item *, QString> &ctx, QString &message) const;
+
+  virtual QString dump(const QString &prefix="") const;
+
+protected slots:
+  /** Gets called if one of the elements of this object gets deleted. */
+  void onElementDeleted(QObject *element);
+
+protected:
+  /** Holds the elements of the object. */
+  QHash<QString, Item *>_elements;
+};
+
+
+/** Represents an object config item.
+ * @ingroup conf */
+class Object: public Map
+{
+  Q_OBJECT
+
+public:
+  /** Represents an object (a key-value mapping with an ID) within the configuration. */
+  class Declaration: public Map::Declaration
+  {
+  public:
+    /** Constructs a map declaration.
+     * @param mandatory If @c true, the object is mandatory.
+     * @param description Specifies the optional object description. */
+    Declaration(bool mandatory, const QString &description="");
+
+    Item *parseDefine(const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const;
+    bool parseLink(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const;
+
+    YAML::Node generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const;
+
+  protected:
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
+    bool parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const;
+  };
+
+public:
+  /** Empty constructor.
+   * @param declaration Specifies the item declaraion.
+   * @param parent Specifies the parent of the item. */
+  Object(const Declaration *declaration, QObject *parent=nullptr);
+
+  virtual bool generateIds(QHash<const Item *, QString> &ctx, QString &message) const;
+
+  virtual QString dump(const QString &prefix="") const;
+
+protected:
+  /** Holds the object ID template. */
+  QString _idTemplate;
 };
 
 
 /** Represents a list of configuration items.
  * @ingroup conf */
-class ConfigAbstractList: public ConfigItem
+class AbstractList: public Item
 {
   Q_OBJECT
 
 public:
   /** Represents an abstract list within the configuration.
    * The list is a list of equal types. */
-  class Declaration: public ConfigItem::Declaration
+  class Declaration: public Item::Declaration
   {
   protected:
     /** Declares a list.
@@ -647,48 +768,56 @@ public:
      * @param element Content declaration.
      * @param typeChk Specifies the type-check function for the list.
      * @param description The optional description of the list. */
-    Declaration(ConfigItem::Declaration *element, bool (*typeChk)(const ConfigItem *), const QString &description="");
+    Declaration(Item::Declaration *element, bool (*typeChk)(const Item *), const QString &description="");
 
   public:
     /** Returns @c true if the type of the given item is accepted by the list. */
-    bool isValidType(const ConfigItem *item) const;
+    bool isValidType(const Item *item) const;
     /** Returns the declaration of the elements of this list. */
-    ConfigItem::Declaration *elementDeclaration() const;
+    Item::Declaration *elementDeclaration() const;
 
   public:
     bool verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const;
     bool verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const;
 
-    bool parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const;
-    bool parseLink(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const;
+    bool parseLink(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const;
+
+    YAML::Node generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const;
+
+  protected:
+    bool parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const;
 
   protected:
     /** Holds the content element declaration. */
-    ConfigItem::Declaration *_element;
+    Item::Declaration *_element;
     /** Holds the type-check function. */
-    bool (*_element_type_check)(const ConfigItem *);
+    bool (*_element_type_check)(const Item *);
   };
 
 protected:
   /** Empty constructor.
    * @param declaration Specifies the item declaraion.
    * @param parent Specifies the parent of the item. */
-  ConfigAbstractList(const Declaration *declaration, QObject *parent=nullptr);
+  AbstractList(const Declaration *declaration, QObject *parent=nullptr);
 
 public:
   /** Destructor. */
-  virtual ~ConfigAbstractList();
+  virtual ~AbstractList();
 
   /** Returns the number of items in the list. */
   int count() const;
   /** Adds an item to the list. */
-  virtual bool add(ConfigItem *item);
+  virtual bool add(Item *item);
   /** Returns the i-th item. */
-  virtual ConfigItem *get(int i) const;
+  virtual Item *get(int i) const;
   /** Removes the i-th item from the list and returns it. */
-  virtual ConfigItem *take(int i);
+  virtual Item *take(int i);
   /** Deletes the i-th item from the list. */
   virtual bool del(int i);
+
+  virtual bool generateIds(QHash<const Item *, QString> &ctx, QString &message) const;
+
+  virtual QString dump(const QString &prefix="") const;
 
 protected slots:
   /** Gets called if a list item is deleted. */
@@ -696,20 +825,20 @@ protected slots:
 
 protected:
   /** Holds the list items. */
-  QVector<ConfigItem *>_items;
+  QVector<Item *>_items;
 };
 
 
 /** Represents a list of elements owned by the list.
  * @ingroup conf */
-class ConfigList: public ConfigAbstractList
+class List: public AbstractList
 {
   Q_OBJECT
 
 public:
   /** Represents a list of objects within the configuration.
    * The list is a list of equal object types. */
-  class Declaration: public ConfigAbstractList::Declaration
+  class Declaration: public AbstractList::Declaration
   {
   protected:
     /** Declares a list.
@@ -718,30 +847,30 @@ public:
      * @param element Content declaration.
      * @param typeChk Specifies the type-check function.
      * @param description The optional description of the list. */
-    Declaration(ConfigItem::Declaration *element, bool (*typeChk)(const ConfigItem *), const QString &description="");
+    Declaration(Item::Declaration *element, bool (*typeChk)(const Item *), const QString &description="");
 
-  public:
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+  protected:
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
     /** Creates a list declaration for the specified object type.
      * The declaration of this object type must specifiy a static factory function @c get. */
-    template<class ObjType=ConfigObjItem>
+    template<class ObjType=Object>
     static Declaration *get(const QString &description="") {
       return new Declaration(
             ObjType::Declaration::get(),
-            [](const ConfigItem *item)->bool { return (nullptr != dynamic_cast<const ObjType *>(item)); },
+            [](const Item *item)->bool { return (nullptr != dynamic_cast<const ObjType *>(item)); },
             description);
     }
 
     /** Creates a list declaration for the specified elment type.
      * The declaration of this object type may not specifiy a static factory function @c get.
      * This method uses the explicitly given declaration. */
-    template<class ElmType=ConfigObjItem>
-    static Declaration *get(ConfigItem::Declaration *declaration, const QString &description="") {
+    template<class ElmType=Object>
+    static Declaration *get(Item::Declaration *declaration, const QString &description="") {
       return new Declaration(
             declaration,
-            [](const ConfigItem *item)->bool { return (nullptr != dynamic_cast<const ElmType *>(item)); },
+            [](const Item *item)->bool { return (nullptr != dynamic_cast<const ElmType *>(item)); },
             description);
     }
   };
@@ -750,12 +879,12 @@ public:
   /** Empty constructor.
    * @param declaration Specifies the item declaraion.
    * @param parent Specifies the parent of the item. */
-  ConfigList(const Declaration *declaration, QObject *parent=nullptr);
+  List(const Declaration *declaration, QObject *parent=nullptr);
 
   /** Adds an object to the list. */
-  bool add(ConfigItem *item);
+  bool add(Item *item);
   /** Removes the i-th item from the list and returns it. */
-  ConfigItem *take(int i);
+  Item *take(int i);
   /** Deletes the i-th item from the list. */
   bool del(int i);
 };
@@ -763,14 +892,14 @@ public:
 
 /** Represents a list of references to objects.
  * @ingroup conf */
-class ConfigRefList: public ConfigAbstractList
+class RefList: public AbstractList
 {
   Q_OBJECT
 
 public:
   /** Represents a list of references within the configuration.
    * The list is a list of equal object types. */
-  class Declaration: public ConfigAbstractList::Declaration
+  class Declaration: public AbstractList::Declaration
   {
   protected:
     /** Declares a list.
@@ -779,21 +908,23 @@ public:
      * @param element Content declaration.
      * @param typeChk Specifies the type-check function.
      * @param description The optional description of the list. */
-    Declaration(ConfigItem::Declaration *element, bool (*typeChk)(const ConfigItem *), const QString &description="");
+    Declaration(Item::Declaration *element, bool (*typeChk)(const Item *), const QString &description="");
 
   public:
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
-    bool parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const;
-    bool parseLink(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const;
+    bool parseLink(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const;
+
+  protected:
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
+    bool parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const;
 
   public:
     /** Constructs a declaration for a list of references to the specified object type.
      * The object declaration must provide a static @c get function. */
-    template<class ObjType=ConfigObjItem>
+    template<class ObjType=Object>
     static Declaration *get(bool mandatory, const QString &description="") {
       return new Declaration(
-            ConfigReference::Declaration::get<ObjType>(mandatory),
-            [](const ConfigItem *item)->bool { return (nullptr != dynamic_cast<const ObjType *>(item)); },
+            Reference::Declaration::get<ObjType>(mandatory),
+            [](const Item *item)->bool { return (nullptr != dynamic_cast<const ObjType *>(item)); },
             description);
     }
   };
@@ -802,19 +933,21 @@ public:
   /** Empty constructor.
    * @param declaration Specifies the item declaraion.
    * @param parent Specifies the parent of the item. */
-  ConfigRefList(const Declaration *declaration, QObject *parent=nullptr);
+  RefList(const Declaration *declaration, QObject *parent=nullptr);
+
+  virtual QString dump(const QString &prefix="") const;
 };
 
 
 /** Represents a radio ID and name definition. *
  * @ingroup conf */
-class ConfigRadioId: public ConfigObjItem
+class RadioId: public Object
 {
   Q_OBJECT
 
 public:
   /** Declares a radio ID. */
-  class Declaration: public ConfigObjItem::Declaration
+  class Declaration: public Object::Declaration
   {
   protected:
     /** Constructor.
@@ -822,7 +955,8 @@ public:
      * @param description Specifies the optional field description. */
     Declaration(bool mandatory, const QString &description="");
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+  protected:
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
     /** Returns/creates the singleton instance. */
@@ -835,7 +969,7 @@ public:
 
 public:
   /** Empty constructor. */
-  explicit ConfigRadioId(QObject *parent=nullptr);
+  explicit RadioId(QObject *parent=nullptr);
 
 public:
   /** Returns the name for this radio id. */
@@ -847,13 +981,13 @@ public:
 
 /** Base class for all contact definitions.
  * @ingroup conf */
-class ConfigContact: public ConfigObjItem
+class Contact: public Object
 {
 Q_OBJECT
 
 public:
   /** Base class of all contact declarations. */
-  class Declaration: public ConfigObjItem::Declaration
+  class Declaration: public Object::Declaration
   {
   protected:
     /** Hidden constructor. */
@@ -862,7 +996,7 @@ public:
 
 protected:
   /** Hidden constructor. */
-  ConfigContact(Declaration *declaraion, QObject *parent=nullptr);
+  Contact(Declaration *declaraion, QObject *parent=nullptr);
 
 public:
   /** Returns the name of the contact. */
@@ -874,13 +1008,13 @@ public:
 
 /** Base class for all digitial (ie, DMR) contacts.
  * @ingroup conf */
-class ConfigDigitalContact: public ConfigContact
+class DigitalContact: public Contact
 {
 Q_OBJECT
 
 public:
   /** Base class of all digital contact declarations. */
-  class Declaration: public ConfigContact::Declaration
+  class Declaration: public Contact::Declaration
   {
   protected:
     /** Hidden constructor. */
@@ -889,19 +1023,19 @@ public:
 
 protected:
   /** Hidden constructor. */
-  ConfigDigitalContact(Declaration *declaraion, QObject *parent=nullptr);
+  DigitalContact(Declaration *declaraion, QObject *parent=nullptr);
 };
 
 
 /** Represents a private call conact.
  * @ingroup conf */
-class ConfigPrivateCall: public ConfigDigitalContact
+class PrivateCall: public DigitalContact
 {
 Q_OBJECT
 
 public:
   /** Declares a private call contact. */
-  class Declaration: public ConfigDigitalContact::Declaration
+  class Declaration: public DigitalContact::Declaration
   {
   protected:
     /** Constructor.
@@ -909,7 +1043,7 @@ public:
      * @param description Specifies the optional field description. */
     Declaration(bool mandatory, const QString &description="");
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
     /** Returns/creates the singleton instance. */
@@ -922,7 +1056,7 @@ public:
 
 public:
   /** Empty constructor. */
-  explicit ConfigPrivateCall(QObject *parent=nullptr);
+  explicit PrivateCall(QObject *parent=nullptr);
 
   /** Returns the number of the contact. */
   uint32_t number() const;
@@ -931,13 +1065,13 @@ public:
 
 /** Represents a group call contact.
  * @ingroup conf */
-class ConfigGroupCall: public ConfigDigitalContact
+class GroupCall: public DigitalContact
 {
 Q_OBJECT
 
 public:
   /** Declares a group call contact. */
-  class Declaration: public ConfigDigitalContact::Declaration
+  class Declaration: public DigitalContact::Declaration
   {
   protected:
     /** Constructor.
@@ -945,7 +1079,7 @@ public:
      * @param description Specifies the optional field description. */
     Declaration(bool mandatory, const QString &description="");
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
     /** Returns/creates the singleton instance. */
@@ -958,7 +1092,7 @@ public:
 
 public:
   /** Empty constructor. */
-  explicit ConfigGroupCall(QObject *parent=nullptr);
+  explicit GroupCall(QObject *parent=nullptr);
 
   /** Returns the number of the contact. */
   uint32_t number() const;
@@ -967,13 +1101,13 @@ public:
 
 /** Represets an all-call contact.
  * @ingroup conf */
-class ConfigAllCall: public ConfigDigitalContact
+class AllCall: public DigitalContact
 {
 Q_OBJECT
 
 public:
   /** Declares a all call contact. */
-  class Declaration: public ConfigDigitalContact::Declaration
+  class Declaration: public DigitalContact::Declaration
   {
   protected:
     /** Constructor.
@@ -981,7 +1115,7 @@ public:
      * @param description Specifies the optional field description. */
     Declaration(bool mandatory, const QString &description="");
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
     /** Returns/creates the singleton instance. */
@@ -994,19 +1128,19 @@ public:
 
 public:
   /** Empty constructor. */
-  explicit ConfigAllCall(QObject *parent=nullptr);
+  explicit AllCall(QObject *parent=nullptr);
 };
 
 
 /** Represents an RX group list.
  * @ingroup conf */
-class ConfigGroupList: public ConfigObjItem
+class GroupList: public Object
 {
   Q_OBJECT
 
 public:
   /** Declares a all call contact. */
-  class Declaration: public ConfigObjItem::Declaration
+  class Declaration: public Object::Declaration
   {
   protected:
     /** Constructor.
@@ -1014,7 +1148,7 @@ public:
      * @param description Specifies the optional field description. */
      Declaration(bool mandatory, const QString &description="");
 
-     ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+     Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
      /** Returns/creates the singleton instance. */
@@ -1027,24 +1161,24 @@ public:
 
 public:
   /** Empty constructor. */
-  explicit ConfigGroupList(QObject *parent=nullptr);
+  explicit GroupList(QObject *parent=nullptr);
 
   /** Returns the name of the group list. */
   const QString &name() const;
   /** Returns the list of members. */
-  ConfigAbstractList *members() const;
+  AbstractList *members() const;
 };
 
 
 /** Base class of all channels.
  * @ingroup conf */
-class ConfigChannel: public ConfigObjItem
+class Channel: public Object
 {
   Q_OBJECT
 
 public:
   /** Base class for all channel declarations. */
-  class Declaration: public ConfigObjItem::Declaration
+  class Declaration: public Object::Declaration
   {
   protected:
     /** Constructor.
@@ -1055,7 +1189,7 @@ public:
 
 protected:
   /** Hidden constructor. */
-  ConfigChannel(Declaration *declaraion, QObject *parent=nullptr);
+  Channel(Declaration *declaraion, QObject *parent=nullptr);
 
 public:
   /** Returns the name of the channel. */
@@ -1065,25 +1199,25 @@ public:
   /** Returns the TX frequency in Mhz. */
   double tx() const;
   /** Returns the TX power. */
-  Channel::Power power() const;
+  ::Channel::Power power() const;
   /** Returns the transmit timeout for this channel. */
   qint64 txTimeout() const;
   /** Returns @c true if the channel is RX only. */
   bool rxOnly() const;
   /** Returns a reference to the scan-list or @c nullptr if none is set. */
-  ConfigScanList *scanlist() const;
+  ScanList *scanlist() const;
 };
 
 
 /** Represents a digital channel (ie, DMR channel).
  * @ingroup conf */
-class ConfigDigitalChannel: public ConfigChannel
+class DigitalChannel: public Channel
 {
   Q_OBJECT
 
 public:
   /** Declares a digital channel. */
-  class Declaration: public ConfigChannel::Declaration
+  class Declaration: public Channel::Declaration
   {
   protected:
     /** Constructor.
@@ -1091,7 +1225,7 @@ public:
      * @param description Specifies the optional field description. */
     Declaration(bool mandatory, const QString &description="");
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
     /** Returns/creates the singleton instance. */
@@ -1104,36 +1238,36 @@ public:
 
 public:
   /** Empty constructor. */
-  explicit ConfigDigitalChannel(QObject *parent=nullptr);
+  explicit DigitalChannel(QObject *parent=nullptr);
 
   /** Returns the admit criterion for this channel. */
-  const QString &admit() const;
+  ::DigitalChannel::Admit admit() const;
   /** Returns the color-code of the channel. */
   uint8_t colorCode() const;
   /** Returns the time-slot of the channel. */
-  uint8_t timeSlot() const;
+  ::DigitalChannel::TimeSlot timeSlot() const;
   /** Returns a reference to the RX group list. */
-  ConfigGroupList *groupList() const;
+  GroupList *groupList() const;
   /** Returns a reference to the default TX contact or @c nullptr if none is set. */
-  ConfigDigitalContact *txContact() const;
+  DigitalContact *txContact() const;
   /** Returns a reference to the positioning system or @c nullptr if none is set. */
-  ConfigPositioning *aprs() const;
+  Positioning *aprs() const;
   /** Returns a reference to the roaming zone or @c nullptr if none is set. */
-  ConfigRoamingZone *roamingZone() const;
+  RoamingZone *roamingZone() const;
   /** Returns a reference to the radio used by the channel or @c nullptr if the default should be used. */
-  ConfigRadioId *radioId() const;
+  RadioId *radioId() const;
 };
 
 
 /** Represents an analog (ie, FM) channel.
  * @ingroup conf */
-class ConfigAnalogChannel: public ConfigChannel
+class AnalogChannel: public Channel
 {
   Q_OBJECT
 
 public:
   /** Declares an analog channel. */
-  class Declaration: public ConfigChannel::Declaration
+  class Declaration: public Channel::Declaration
   {
   protected:
     /** Constructor.
@@ -1141,7 +1275,7 @@ public:
      * @param description Specifies the optional field description. */
     Declaration(bool mandatory, const QString &description="");
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
     /** Returns/creates the singleton instance. */
@@ -1154,10 +1288,10 @@ public:
 
 public:
   /** Empty constructor. */
-  explicit ConfigAnalogChannel(QObject *parent=nullptr);
+  explicit AnalogChannel(QObject *parent=nullptr);
 
   /** Returns the admit criterion. */
-  AnalogChannel::Admit admit() const;
+  ::AnalogChannel::Admit admit() const;
   /** Returns the squelch value in [1,10]. */
   uint8_t squelch() const;
   /** Retunrs the RX signalling. */
@@ -1165,21 +1299,21 @@ public:
   /** Retunrs the TX signalling. */
   Signaling::Code txSignalling() const;
   /** Retunrs the band-width. */
-  AnalogChannel::Bandwidth bandWidth() const;
+  ::AnalogChannel::Bandwidth bandWidth() const;
   /** Retunrs the APRS positioning system or @c nullptr if none is set. */
-  ConfigAPRSPositioning *aprs() const;
+  APRSPositioning *aprs() const;
 };
 
 
 /** Represents a zone.
  * @ingroup conf */
-class ConfigZone: public ConfigObjItem
+class Zone: public Object
 {
   Q_OBJECT
 
 public:
   /** Represents the zone declaration. */
-  class Declaration: public ConfigObjItem::Declaration
+  class Declaration: public Object::Declaration
   {
   protected:
     /** Constructor.
@@ -1187,7 +1321,7 @@ public:
      * @param description Specifies the optional field description. */
     Declaration(bool mandatory, const QString &description="");
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
     /** Returns/creates the singleton instance. */
@@ -1200,26 +1334,26 @@ public:
 
 public:
   /** Empty constructor. */
-  explicit ConfigZone(QObject *parent=nullptr);
+  explicit Zone(QObject *parent=nullptr);
 
   /** Returns the name of the zone. */
   const QString &name() const;
   /** Returns the channel list for VFO A. */
-  ConfigAbstractList *a() const;
+  AbstractList *a() const;
   /** Returns the channel list for VFO B. */
-  ConfigAbstractList *b() const;
+  AbstractList *b() const;
 };
 
 
 /** Represents a scan-list.
  * @ingroup conf */
-class ConfigScanList: public ConfigObjItem
+class ScanList: public Object
 {
   Q_OBJECT
 
 public:
   /** Represents the scan-list declaration. */
-  class Declaration: public ConfigObjItem::Declaration
+  class Declaration: public Object::Declaration
   {
   protected:
     /** Constructor.
@@ -1227,7 +1361,7 @@ public:
      * @param description Specifies the optional field description. */
     Declaration(bool mandatory, const QString &description="");
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
     /** Returns/creates the singleton instance. */
@@ -1241,30 +1375,30 @@ public:
 
 public:
   /** Empty constructor. */
-  explicit ConfigScanList(QObject *parent=nullptr);
+  explicit ScanList(QObject *parent=nullptr);
 
   /** Returns the name of the scan-list. */
   const QString &name() const;
   /** Returns a reference to the primary channel or @c nullptr if none is set. */
-  ConfigChannel *primary() const;
+  Channel *primary() const;
   /** Returns a reference to the secondary channel or @c nullptr if none is set. */
-  ConfigChannel *secondary() const;
+  Channel *secondary() const;
   /** Returns a reference to the revert/transmit channel or @c nullptr if none is set. */
-  ConfigChannel *revert() const;
+  Channel *revert() const;
   /** Returns the channel list */
-  ConfigAbstractList *channels() const;
+  RefList *channels() const;
 };
 
 
 /** Base class of all positioning systems.
  * @ingroup conf */
-class ConfigPositioning: public ConfigObjItem
+class Positioning: public Object
 {
   Q_OBJECT
 
 public:
   /** Base class for all positioning declarations. */
-  class Declaration: public ConfigObjItem::Declaration
+  class Declaration: public Object::Declaration
   {
   protected:
     /** Constructor.
@@ -1275,7 +1409,7 @@ public:
 
 protected:
   /** Hidden constructor. */
-  ConfigPositioning(Declaration *declaraion, QObject *parent=nullptr);
+  Positioning(Declaration *declaraion, QObject *parent=nullptr);
 
 public:
   /** Returns the name of the positioning system. */
@@ -1287,13 +1421,13 @@ public:
 
 /** Represents an DMR positioning system.
  * @ingroup conf */
-class ConfigDMRPositioning: public ConfigPositioning
+class DMRPositioning: public Positioning
 {
   Q_OBJECT
 
 public:
   /** Declares a DMR positioning system. */
-  class Declaration: public ConfigPositioning::Declaration
+  class Declaration: public Positioning::Declaration
   {
   protected:
     /** Constructor.
@@ -1301,7 +1435,7 @@ public:
      * @param description Specifies the optional field description. */
     Declaration(bool mandatory, const QString &description="");
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
     /** Returns/creates the singleton instance. */
@@ -1314,23 +1448,23 @@ public:
 
 public:
   /** Empty constructor. */
-  explicit ConfigDMRPositioning(QObject *parent=nullptr);
+  explicit DMRPositioning(QObject *parent=nullptr);
   /** Returns the destination contact the position is send to. */
-  ConfigDigitalContact *destination() const;
+  DigitalContact *destination() const;
   /** Returns the transmit channel or @c nullptr if none is set. */
-  ConfigDigitalChannel *channel() const;
+  DigitalChannel *channel() const;
 };
 
 
 /** Represents an APRS positioning system.
  * @ingroup conf */
-class ConfigAPRSPositioning: public ConfigPositioning
+class APRSPositioning: public Positioning
 {
   Q_OBJECT
 
 public:
   /** Declares an APRS positioning system. */
-  class Declaration: public ConfigPositioning::Declaration
+  class Declaration: public Positioning::Declaration
   {
   protected:
     /** Constructor.
@@ -1338,7 +1472,7 @@ public:
      * @param description Specifies the optional field description. */
     Declaration(bool mandatory, const QString &description="");
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
     /** Returns/creates the singleton instance. */
@@ -1351,16 +1485,16 @@ public:
 
 public:
   /** Empty constructor. */
-  ConfigAPRSPositioning(QObject *parent=nullptr);
+  APRSPositioning(QObject *parent=nullptr);
 
   /** Returns the source call and SSID. */
   const QString &source() const;
   /** Returns the destination call and SSID. */
   const QString &destination() const;
   /** Returns the transmit channel. */
-  ConfigAnalogChannel *channel() const;
+  AnalogChannel *channel() const;
   /** Returns the list of path calls and SSIDs. */
-  ConfigAbstractList *path() const;
+  AbstractList *path() const;
   /** Returns the map icon. */
   const QString &icon() const;
   /** Returns the APRS message. */
@@ -1370,13 +1504,13 @@ public:
 
 /** Represents a roaming zone
  * @ingroup conf */
-class ConfigRoamingZone: public ConfigObjItem
+class RoamingZone: public Object
 {
   Q_OBJECT
 
 public:
   /** Declares a roaming zone. */
-  class Declaration: public ConfigObjItem::Declaration
+  class Declaration: public Object::Declaration
   {
   protected:
     /** Constructor.
@@ -1384,7 +1518,7 @@ public:
      * @param description Specifies the optional field description. */
     Declaration(bool mandatory, const QString &description="");
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
     /** Returns/creates the singleton instance. */
@@ -1397,32 +1531,32 @@ public:
 
 public:
   /** Empty constructor. */
-  ConfigRoamingZone(QObject *parent=nullptr);
+  RoamingZone(QObject *parent=nullptr);
 
 public:
   /** Returns the name of the roaming zone. */
   const QString &name() const;
   /** Returns the list of channels. */
-  ConfigAbstractList *channels() const;
+  AbstractList *channels() const;
 };
 
 
 /** Holds the entire abstract codeplug configuration.
  * @ingroup conf */
-class Configuration: public ConfigMapItem
+class Config: public Map
 {
   Q_OBJECT
 
 public:
   /** This class represents the complete configuration declaration.
    * That is the codeplug YAML format declaration. */
-  class Declaration: public ConfigMapItem::Declaration
+  class Declaration: public Map::Declaration
   {
   protected:
     /** Constructor. */
     explicit Declaration();
 
-    ConfigItem *parseAllocate(YAML::Node &node, QString &msg) const;
+    Item *parseAllocate(const YAML::Node &node, QString &msg) const;
 
   public:
     /** Verifies the parsed codeplug.
@@ -1430,8 +1564,11 @@ public:
      * will contain the error message. */
     virtual bool verify(const YAML::Node &doc, QString &message);
 
+    bool parse(Config *config, YAML::Node &doc, QString &message);
+    Config *parse(YAML::Node &doc, QString &message);
+
     /** Returns/creates the singleton instance. */
-    static Declaration *get();
+    static Config::Declaration *get();
 
   private:
     /** The singleton instance. */
@@ -1440,9 +1577,12 @@ public:
 
 public:
   /** Empty constructor. */
-  explicit Configuration(QObject *parent = nullptr);
+  explicit Config(QObject *parent = nullptr);
+
+  YAML::Node generate(QString &message) const;
 };
 
 
+}
 
 #endif // CONFIGITEM_HH

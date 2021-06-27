@@ -4,6 +4,7 @@
 #include <QString>
 #include <QFile>
 #include <QTextStream>
+#include <iostream>
 
 #include "logger.hh"
 #include "config.hh"
@@ -48,7 +49,7 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     return -1;
   } else if (parser.isSet("yaml") || (filename.endsWith(".yaml") || filename.endsWith(".yml"))) {
     YAML::Node doc = YAML::LoadFile(filename.toStdString());
-    Configuration::Declaration *confDecl = Configuration::Declaration::get();
+    Configuration::Config::Declaration *confDecl = Configuration::Config::Declaration::get();
     QString errMessage;
     if (! confDecl->verify(doc, errMessage)) {
       logError() << "Verification of config in '" << filename << "' failed!" ;
@@ -56,6 +57,18 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
       return -1;
     }
     logInfo() << "YAML format OK.";
+    Configuration::Config *config = confDecl->parse(doc, errMessage);
+    if (nullptr == config) {
+      logError() << "Verification of config in '" << filename << "' failed!" ;
+      logError() << errMessage;
+      return -1;
+    }
+    doc = config->generate(errMessage);
+    if (doc.IsNull()) {
+      logError() << "Generation of YAML document failed: " << errMessage;
+      return -1;
+    }
+    std::cout << doc << std::endl << std::endl;
     return 0;
   } else {
     logError() << "Cannot determine filetype from filename '" << filename

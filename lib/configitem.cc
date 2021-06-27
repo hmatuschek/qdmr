@@ -13,38 +13,45 @@ inline QString nodeTypeName(const YAML::Node &node) {
   return type;
 }
 
+using namespace Configuration;
+
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItem::Declaration
  * ********************************************************************************************* */
-ConfigItem::Declaration::Declaration(bool mandatory, const QString &desc)
-  : _description(desc), _mandatory(mandatory)
+Item::Declaration::Declaration(bool mandatory, const QString &desc)
+  : _description(desc), _mandatory(mandatory), _name("Item")
 {
   // pass...
 }
 
-ConfigItem::Declaration::~Declaration() {
+Item::Declaration::~Declaration() {
   // pass...
 }
 
 const QString &
-ConfigItem::Declaration::description() const {
+Item::Declaration::description() const {
   return _description;
 }
 
 bool
-ConfigItem::Declaration::isMandatory() const {
+Item::Declaration::isMandatory() const {
   return _mandatory;
 }
 
+const QString &
+Item::Declaration::name() const {
+  return _name;
+}
+
 bool
-ConfigItem::Declaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
+Item::Declaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
   return true;
 }
 
-ConfigItem *
-ConfigItem::Declaration::parseDefine(YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
-  ConfigItem *item = parseAllocate(node, msg);
+Item *
+Item::Declaration::parseDefine(const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
+  Item *item = parseAllocate(node, msg);
   if (nullptr == item)
     return nullptr;
   parsePopulate(item, node, ctx, msg);
@@ -52,40 +59,55 @@ ConfigItem::Declaration::parseDefine(YAML::Node &node, QHash<QString, ConfigItem
 }
 
 bool
-ConfigItem::Declaration::parseLink(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+Item::Declaration::parseLink(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
   return true;
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItem
  * ********************************************************************************************* */
-ConfigItem::ConfigItem(const Declaration *declaration, QObject *parent)
+Item::Item(const Declaration *declaration, QObject *parent)
   : QObject(parent), _declaration(declaration)
 {
   // pass...
 }
 
-ConfigItem::~ConfigItem() {
+Item::~Item() {
   // pass...
 }
 
-const ConfigItem::Declaration *
-ConfigItem::declaraion() const {
+const Item::Declaration *
+Item::declaraion() const {
   return _declaration;
+}
+
+QString
+Item::dump(const QString &prefix) const {
+  return QString("%1<Item @0x%2>").arg(prefix).arg(ulong(this),16,16,QChar('0'));
+}
+
+bool
+Item::generateIds(QHash<const Item *, QString> &ctx, QString &message) const {
+  return true;
+}
+
+YAML::Node
+Item::generateNode(const QHash<const Item *, QString> &ctx, QString &message) const {
+  return declaraion()->generate(this, ctx, message);
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigScalarItem::Declaration
  * ********************************************************************************************* */
-ConfigScalarItem::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigItem::Declaration(mandatory, description)
+ScalarItem::Declaration::Declaration(bool mandatory, const QString &description)
+  : Item::Declaration(mandatory, description)
 {
   // pass...
 }
 
 bool
-ConfigScalarItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+ScalarItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
   if (! node.IsScalar()) {
     msg = tr("Expected scalar, got %1.").arg(nodeTypeName(node));
     return false;
@@ -96,8 +118,8 @@ ConfigScalarItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemScalar
  * ********************************************************************************************* */
-ConfigScalarItem::ConfigScalarItem(const Declaration *declaration, QObject *parent)
-  : ConfigItem(declaration, parent)
+ScalarItem::ScalarItem(const Declaration *declaration, QObject *parent)
+  : Item(declaration, parent)
 {
   // pass...
 }
@@ -106,15 +128,15 @@ ConfigScalarItem::ConfigScalarItem(const Declaration *declaration, QObject *pare
 /* ********************************************************************************************* *
  * Implementation of ConfigItemBool::Declaration
  * ********************************************************************************************* */
-ConfigBoolItem::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigScalarItem::Declaration(mandatory, description)
+BoolItem::Declaration::Declaration(bool mandatory, const QString &description)
+  : ScalarItem::Declaration(mandatory, description)
 {
-  // pass...
+  _name = "Bool";
 }
 
 bool
-ConfigBoolItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
-  if (! ConfigScalarItem::Declaration::verifyForm(node, ctx, msg))
+BoolItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! ScalarItem::Declaration::verifyForm(node, ctx, msg))
     return false;
   QString val = QString::fromStdString(node.as<std::string>());
   if (("true" != val) && ("false" != val)) {
@@ -124,61 +146,74 @@ ConfigBoolItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &c
   return true;
 }
 
-ConfigItem *
-ConfigBoolItem::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigBoolItem(false, this);
+Item *
+BoolItem::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new BoolItem(false, this);
 }
 
 bool
-ConfigBoolItem::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+BoolItem::Declaration::parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
   QString val = QString::fromStdString(node.as<std::string>());
-  item->as<ConfigBoolItem>()->setValue((val=="true") ? true : false);
+  item->as<BoolItem>()->setValue((val=="true") ? true : false);
   return true;
+}
+
+YAML::Node
+BoolItem::Declaration::generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const {
+  YAML::Node node;
+  node = item->as<BoolItem>()->value();
+  return node;
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemBool
  * ********************************************************************************************* */
-ConfigBoolItem::ConfigBoolItem(bool value, const Declaration *declaration, QObject *parent)
-  : ConfigScalarItem(declaration, parent), _value(value)
+BoolItem::BoolItem(bool value, const Declaration *declaration, QObject *parent)
+  : ScalarItem(declaration, parent), _value(value)
 {
   // pass...
 }
 
 bool
-ConfigBoolItem::value() const {
+BoolItem::value() const {
   return _value;
 }
 
 void
-ConfigBoolItem::setValue(bool val) {
+BoolItem::setValue(bool val) {
   _value = val;
 }
+
+QString
+BoolItem::dump(const QString &prefix) const {
+  return QString("%1<Bool %2>").arg(prefix).arg(_value ? "true": "false");
+}
+
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemInt::Declaration
  * ********************************************************************************************* */
-ConfigIntItem::Declaration::Declaration(
+IntItem::Declaration::Declaration(
     qint64 min, qint64 max, bool mandatory, const QString &description)
-  : ConfigScalarItem::Declaration(mandatory, description), _min(min), _max(max)
+  : ScalarItem::Declaration(mandatory, description), _min(min), _max(max)
 {
-  // pass...
+  _name = "Int";
 }
 
 qint64
-ConfigIntItem::Declaration::mininum() const {
+IntItem::Declaration::mininum() const {
   return _min;
 }
 
 qint64
-ConfigIntItem::Declaration::maximum() const {
+IntItem::Declaration::maximum() const {
   return _max;
 }
 
 bool
-ConfigIntItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
-  if (! ConfigScalarItem::Declaration::verifyForm(node, ctx, msg))
+IntItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! ScalarItem::Declaration::verifyForm(node, ctx, msg))
     return false;
   qint64 val = node.as<qint64>();
   if ((val < _min) || (val>_max)) {
@@ -189,91 +224,109 @@ ConfigIntItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ct
   return true;
 }
 
-ConfigItem *
-ConfigIntItem::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigIntItem(0, this);
+Item *
+IntItem::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new IntItem(0, this);
 }
 bool
-ConfigIntItem::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+IntItem::Declaration::parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
   qint64 val = node.as<qint64>();
-  item->as<ConfigIntItem>()->setValue(val);
+  item->as<IntItem>()->setValue(val);
   return true;
+}
+
+YAML::Node
+IntItem::Declaration::generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const {
+  YAML::Node node;
+  node = item->as<IntItem>()->value();
+  return node;
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemInt
  * ********************************************************************************************* */
-ConfigIntItem::ConfigIntItem(qint64 value, const Declaration *declaration, QObject *parent)
-  : ConfigScalarItem(declaration, parent), _value(0)
+IntItem::IntItem(qint64 value, const Declaration *declaration, QObject *parent)
+  : ScalarItem(declaration, parent), _value(0)
 {
   setValue(value);
 }
 
 qint64
-ConfigIntItem::value() const {
+IntItem::value() const {
   return _value;
 }
 
 void
-ConfigIntItem::setValue(qint64 value) {
-  qint64 min = declaraion()->as<ConfigIntItem::Declaration>()->mininum(),
-      max = declaraion()->as<ConfigIntItem::Declaration>()->maximum();
+IntItem::setValue(qint64 value) {
+  qint64 min = declaraion()->as<IntItem::Declaration>()->mininum(),
+      max = declaraion()->as<IntItem::Declaration>()->maximum();
   _value = std::max(min, std::min(max, value));
 }
+
+QString
+IntItem::dump(const QString &prefix) const {
+  return QString("%1<Int %2>").arg(prefix).arg(_value);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemDMRId::Declaration
  * ********************************************************************************************* */
-ConfigDMRIdItem::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigIntItem::Declaration(0, 16777215, mandatory, description)
+DMRId::Declaration::Declaration(bool mandatory, const QString &description)
+  : IntItem::Declaration(0, 16777215, mandatory, description)
 {
-  // pass...
+  _name = "DMRId";
 }
 
-ConfigItem *
-ConfigDMRIdItem::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigDMRIdItem(0, this);
+Item *
+DMRId::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new DMRId(0, this);
 }
 
 bool
-ConfigDMRIdItem::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
-  item->as<ConfigDMRIdItem>()->setValue(node.as<quint32>());
+DMRId::Declaration::parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
+  item->as<DMRId>()->setValue(node.as<quint32>());
   return true;
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemDMRId
  * ********************************************************************************************* */
-ConfigDMRIdItem::ConfigDMRIdItem(uint32_t value, const Declaration *declaration, QObject *parent)
-  : ConfigIntItem(value, declaration, parent)
+DMRId::DMRId(uint32_t value, const Declaration *declaration, QObject *parent)
+  : IntItem(value, declaration, parent)
 {
   // pass...
+}
+
+QString
+DMRId::dump(const QString &prefix) const {
+  return QString("%1<DMR-ID %2>").arg(prefix).arg(_value);
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemFloat::Declaration
  * ********************************************************************************************* */
-ConfigFloatItem::Declaration::Declaration(
+FloatItem::Declaration::Declaration(
     double min, double max, bool mandatory, const QString &description)
-  : ConfigScalarItem::Declaration(mandatory, description), _min(min), _max(max)
+  : ScalarItem::Declaration(mandatory, description), _min(min), _max(max)
 {
-  // pass...
+  _name = "Float";
 }
 
 double
-ConfigFloatItem::Declaration::mininum() const {
+FloatItem::Declaration::mininum() const {
   return _min;
 }
 
 double
-ConfigFloatItem::Declaration::maximum() const {
+FloatItem::Declaration::maximum() const {
   return _max;
 }
 
 bool
-ConfigFloatItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
-  if (! ConfigScalarItem::Declaration::verifyForm(node, ctx, msg))
+FloatItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! ScalarItem::Declaration::verifyForm(node, ctx, msg))
     return false;
   double val = node.as<double>();
   if ((val < _min) || (val>_max)) {
@@ -284,95 +337,121 @@ ConfigFloatItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &
   return true;
 }
 
-ConfigItem *
-ConfigFloatItem::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigFloatItem(0, this);
+Item *
+FloatItem::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new FloatItem(0, this);
 }
+
 bool
-ConfigFloatItem::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
-  item->as<ConfigFloatItem>()->setValue(node.as<double>());
+FloatItem::Declaration::parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
+  item->as<FloatItem>()->setValue(node.as<double>());
   return true;
+}
+
+YAML::Node
+FloatItem::Declaration::generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const {
+  YAML::Node node;
+  node = item->as<FloatItem>()->value();
+  return node;
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemFloat
  * ********************************************************************************************* */
-ConfigFloatItem::ConfigFloatItem(double value, const Declaration *declaration, QObject *parent)
-  : ConfigScalarItem(declaration, parent), _value(value)
+FloatItem::FloatItem(double value, const Declaration *declaration, QObject *parent)
+  : ScalarItem(declaration, parent), _value(value)
 {
   // pass...
 }
 
 double
-ConfigFloatItem::value() const {
+FloatItem::value() const {
   return _value;
 }
 void
-ConfigFloatItem::setValue(double value) {
-  double min = declaraion()->as<ConfigFloatItem::Declaration>()->mininum(),
-      max = declaraion()->as<ConfigFloatItem::Declaration>()->maximum();
+FloatItem::setValue(double value) {
+  double min = declaraion()->as<FloatItem::Declaration>()->mininum(),
+      max = declaraion()->as<FloatItem::Declaration>()->maximum();
   _value = std::max(min, std::min(max, value));
+}
+
+QString
+FloatItem::dump(const QString &prefix) const {
+  return QString("%1<Float %2>").arg(prefix).arg(_value);
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemStr::Declaration
  * ********************************************************************************************* */
-ConfigStrItem::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigScalarItem::Declaration(mandatory, description)
+StringItem::Declaration::Declaration(bool mandatory, const QString &description)
+  : ScalarItem::Declaration(mandatory, description)
 {
-  // pass...
+  _name = "String";
 }
 
 bool
-ConfigStrItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
-  if (! ConfigScalarItem::Declaration::verifyForm(node, ctx, msg))
+StringItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! ScalarItem::Declaration::verifyForm(node, ctx, msg))
     return false;
   return true;
 }
 
-ConfigItem *
-ConfigStrItem::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigStrItem("", this);
+Item *
+StringItem::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new StringItem("", this);
 }
+
 bool
-ConfigStrItem::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem*> &ctx, QString &msg) const {
-  item->as<ConfigStrItem>()->setValue(QString::fromStdString(node.as<std::string>()));
+StringItem::Declaration::parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item*> &ctx, QString &msg) const {
+  item->as<StringItem>()->setValue(QString::fromStdString(node.as<std::string>()));
   return true;
+}
+
+YAML::Node
+StringItem::Declaration::generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const {
+  YAML::Node node;
+  node = item->as<StringItem>()->value().toStdString();
+  return node;
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemString
  * ********************************************************************************************* */
-ConfigStrItem::ConfigStrItem(const QString &value, const Declaration *declaration, QObject *parent)
-  : ConfigScalarItem(declaration, parent), _value(value)
+StringItem::StringItem(const QString &value, const Declaration *declaration, QObject *parent)
+  : ScalarItem(declaration, parent), _value(value)
 {
   // pass...
 }
 
 const QString &
-ConfigStrItem::value() const {
+StringItem::value() const {
   return _value;
 }
 
 void
-ConfigStrItem::setValue(const QString &value) {
+StringItem::setValue(const QString &value) {
   _value = value;
+}
+
+QString
+StringItem::dump(const QString &prefix) const {
+  return QString("%1<String '%2'>").arg(prefix).arg(_value);
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigDeclId
  * ********************************************************************************************* */
-ConfigIdDeclaration::ConfigIdDeclaration(bool mandatory, const QString &description)
-  : ConfigStrItem::Declaration(mandatory, description)
+IdDeclaration::IdDeclaration(bool mandatory, const QString &description)
+  : StringItem::Declaration(mandatory, description)
 {
-  // pass...
+  _name = "Id";
 }
 
 bool
-ConfigIdDeclaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
-  if (! ConfigStrItem::Declaration::verifyForm(node, ctx, msg))
+IdDeclaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! StringItem::Declaration::verifyForm(node, ctx, msg))
     return false;
   QString value = QString::fromStdString(node.as<std::string>());
   QRegExp pattern("^[a-zA-Z_]+[a-zA-Z0-9_]*$");
@@ -392,20 +471,20 @@ ConfigIdDeclaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QStr
 /* ********************************************************************************************* *
  * Implementation of ConfigReference::Declaration
  * ********************************************************************************************* */
-ConfigReference::Declaration::Declaration(bool mandatory, bool (*typeChk)(const ConfigItem *), const QString &description)
-  : ConfigStrItem::Declaration(mandatory, description), _ref_type_check(typeChk)
+Reference::Declaration::Declaration(bool mandatory, bool (*typeChk)(const Item *), const QString &description)
+  : StringItem::Declaration(mandatory, description), _ref_type_check(typeChk)
 {
-  // pass...
+  _name = "Reference";
 }
 
 bool
-ConfigReference::Declaration::isValidReference(const ConfigItem *item) const {
+Reference::Declaration::isValidReference(const Item *item) const {
   return _ref_type_check(item);
 }
 
 bool
-ConfigReference::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
-  if (! ConfigStrItem::Declaration::verifyForm(node, ctx, msg))
+Reference::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! StringItem::Declaration::verifyForm(node, ctx, msg))
     return false;
   QString value = QString::fromStdString(node.as<std::string>());
   QRegExp pattern("^[a-zA-Z_]+[a-zA-Z0-9_]*$");
@@ -417,7 +496,7 @@ ConfigReference::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &
 }
 
 bool
-ConfigReference::Declaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
+Reference::Declaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
   QString value = QString::fromStdString(node.as<std::string>());
   if (! ctx.contains(value)) {
     msg = tr("Reference '%1' is not defined.").arg(value);
@@ -426,100 +505,129 @@ ConfigReference::Declaration::verifyReferences(const YAML::Node &node, const QSe
   return true;
 }
 
-ConfigItem *
-ConfigReference::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigReference(this);
+Item *
+Reference::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new Reference(this);
 }
 
 bool
-ConfigReference::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+Reference::Declaration::parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
   return true;
 }
 
 bool
-ConfigReference::Declaration::parseLink(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+Reference::Declaration::parseLink(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
   QString id = QString::fromStdString(node.as<std::string>());
   if (! ctx.contains(id)) {
     msg = tr("Cannot resolve element '%1'.").arg(id);
     return false;
   }
   if (! isValidReference(ctx[id])) {
-    msg = tr("Referenced object '%1' is of wrong type.").arg(id);
+    msg = tr("Referenced object '%1' is of wrong type %3")
+        .arg(id).arg(ctx[id]->declaraion()->name());
     return false;
   }
-  item->as<ConfigReference>()->set(ctx.value(id, nullptr));
+  logDebug() << "Resolve " << id << " to 0x" << QString::number(ulong(ctx.value(id, nullptr)), 16);
+  item->as<Reference>()->set(ctx.value(id, nullptr));
   return true;
+}
+
+YAML::Node
+Reference::Declaration::generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const {
+  YAML::Node node;
+  if (! ctx.contains(item)) {
+    msg = tr("Cannot reference element 0x%1, no ID assigned.").arg(ulong(item),0,16);
+    return node;
+  }
+  node = ctx[item].toStdString();
+  return node;
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigReference
  * ********************************************************************************************* */
-ConfigReference::ConfigReference(const Declaration *declaraion, QObject *parent)
-  : ConfigItem(declaraion, parent), _reference(nullptr)
+Reference::Reference(const Declaration *declaraion, QObject *parent)
+  : Item(declaraion, parent), _reference(nullptr)
 {
   // pass...
 }
 
-ConfigReference::ConfigReference(ConfigObjItem *obj, const Declaration *declaraion, QObject *parent)
-  : ConfigItem(declaraion, parent), _reference(nullptr)
+Reference::Reference(Object *obj, const Declaration *declaraion, QObject *parent)
+  : Item(declaraion, parent), _reference(nullptr)
 {
   _reference = declaraion->isValidReference(obj) ? obj : nullptr;
 }
 
 bool
-ConfigReference::isNull() const {
+Reference::isNull() const {
   return nullptr == _reference;
 }
 
-ConfigItem *
-ConfigReference::get() const {
-  return _reference;
-}
-
-ConfigItem *
-ConfigReference::take() {
+Item *
+Reference::take() {
   if (nullptr == _reference)
     return nullptr;
   disconnect(_reference, SIGNAL(destroyed(QObject*)), this, SLOT(onReferenceDeleted(QObject*)));
-  ConfigItem *ref = _reference;
+  Item *ref = _reference;
   _reference = nullptr;
   return ref;
 }
 
-void
-ConfigReference::set(ConfigItem *item) {
+bool
+Reference::set(Item *item) {
   take();
-  if (! declaraion()->as<ConfigReference::Declaration>()->isValidReference(item))
-    return;
+  if (nullptr == item)
+    return true;
+
+  if (! declaraion()->as<Reference::Declaration>()->isValidReference(item)) {
+    logDebug() << "Cannot set reference, target is not of matching type.";
+    return false;
+  }
   _reference = item;
-  if (_reference)
-    connect(_reference, SIGNAL(destroyed(QObject*)), this, SLOT(onReferenceDeleted(QObject*)));
+  connect(_reference, SIGNAL(destroyed(QObject*)), this, SLOT(onReferenceDeleted(QObject*)));
+  return true;
 }
 
 void
-ConfigReference::onReferenceDeleted(QObject *obj) {
+Reference::onReferenceDeleted(QObject *obj) {
   if (_reference == obj)
     _reference = nullptr;
+}
+
+QString
+Reference::dump(const QString &prefix) const {
+  return QString("%1<Ref to 0x%2>").arg(prefix).arg(ulong(_reference),16,16,QChar('0'));
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemEnum::Declaration
  * ********************************************************************************************* */
-ConfigEnumItem::Declaration::Declaration(const QHash<QString, uint32_t> &values, bool mandatory, const QString &description)
-  : ConfigScalarItem::Declaration(mandatory, description), _values(values)
+Enum::Declaration::Declaration(const QHash<QString, uint32_t> &values, bool mandatory, const QString &description)
+  : ScalarItem::Declaration(mandatory, description), _values(values)
 {
-  // pass...
+  _name = "Enum";
 }
 
 const QHash<QString, uint32_t> &
-ConfigEnumItem::Declaration::possibleValues() const {
+Enum::Declaration::possibleValues() const {
   return _values;
 }
 
+QString
+Enum::Declaration::key(uint32_t value) const {
+  QString key="";
+  foreach (QString k, _values.keys()) {
+    if (_values[k] == value) {
+      key = k; break;
+    }
+  }
+  return key;
+}
+
 bool
-ConfigEnumItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
-  if (! ConfigScalarItem::Declaration::verifyForm(node, ctx, msg))
+Enum::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+  if (! ScalarItem::Declaration::verifyForm(node, ctx, msg))
     return false;
   QString value = QString::fromStdString(node.as<std::string>());
   if (! _values.contains(value)) {
@@ -533,48 +641,55 @@ ConfigEnumItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &c
   return true;
 }
 
-ConfigItem *
-ConfigEnumItem::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigEnumItem(this);
+Item *
+Enum::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new Enum(this);
 }
 bool
-ConfigEnumItem::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
-  return item->as<ConfigEnumItem>()->setKey(QString::fromStdString(node.as<std::string>()));
+Enum::Declaration::parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
+  return item->as<Enum>()->setKey(QString::fromStdString(node.as<std::string>()));
+}
+
+YAML::Node
+Enum::Declaration::generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const {
+  YAML::Node node;
+  node = key(item->as<Enum>()->value()).toStdString();
+  return node;
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemEnum
  * ********************************************************************************************* */
-ConfigEnumItem::ConfigEnumItem(const Declaration *declaration, QObject *parent)
-  : ConfigScalarItem(declaration, parent), _value(std::numeric_limits<uint32_t>::max())
+Enum::Enum(const Declaration *declaration, QObject *parent)
+  : ScalarItem(declaration, parent), _value(std::numeric_limits<uint32_t>::max())
 {
   // pass...
 }
 
-ConfigEnumItem::ConfigEnumItem(uint32_t value, const Declaration *declaration, QObject *parent)
-  : ConfigScalarItem(declaration, parent)
+Enum::Enum(uint32_t value, const Declaration *declaration, QObject *parent)
+  : ScalarItem(declaration, parent)
 {
   setValue(value);
 }
 
-uint32_t ConfigEnumItem::value(uint32_t default_value) const {
+uint32_t Enum::value(uint32_t default_value) const {
   if (std::numeric_limits<uint32_t>::max() == _value)
     return default_value;
   return _value;
 }
 
 bool
-ConfigEnumItem::setKey(const QString &key) {
-  if (! declaraion()->as<ConfigEnumItem::Declaration>()->possibleValues().contains(key))
+Enum::setKey(const QString &key) {
+  if (! declaraion()->as<Enum::Declaration>()->possibleValues().contains(key))
     return false;
-  _value = declaraion()->as<ConfigEnumItem::Declaration>()->possibleValues()[key];
+  _value = declaraion()->as<Enum::Declaration>()->possibleValues()[key];
   return true;
 }
 
 bool
-ConfigEnumItem::setValue(uint32_t value) {
+Enum::setValue(uint32_t value) {
   const QHash<QString, uint32_t> table =
-      declaraion()->as<ConfigEnumItem::Declaration>()->possibleValues();
+      declaraion()->as<Enum::Declaration>()->possibleValues();
   foreach (uint32_t x, table.values()) {
     if (value == x) {
       _value = value;
@@ -585,21 +700,30 @@ ConfigEnumItem::setValue(uint32_t value) {
   return false;
 }
 
+QString
+Enum::dump(const QString &prefix) const {
+  QString key = _declaration->as<Enum::Declaration>()->key(_value);
+  if (key.isEmpty())
+    key = "<unknown>";
+  return QString("%1<Enum %2 (%3)>").arg(prefix).arg(_value).arg(key);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ConfigDeclDispatch
  * ********************************************************************************************* */
-ConfigDispatchDeclaration::ConfigDispatchDeclaration(
-    const QHash<QString, ConfigItem::Declaration *> &elements, bool mandatory, const QString &description)
-  : ConfigItem::Declaration(mandatory, description), _elements()
+DispatchDeclaration::DispatchDeclaration(
+    const QHash<QString, Item::Declaration *> &elements, bool mandatory, const QString &description)
+  : Item::Declaration(mandatory, description), _elements()
 {
-  for (QHash<QString, ConfigItem::Declaration *>::const_iterator it=elements.begin(); it!=elements.end(); it++) {
+  _name = "Dispatch";
+  for (QHash<QString, Item::Declaration *>::const_iterator it=elements.begin(); it!=elements.end(); it++) {
     add(it.key(), it.value());
   }
 }
 
 bool
-ConfigDispatchDeclaration::add(const QString &name, Declaration *element) {
+DispatchDeclaration::add(const QString &name, Declaration *element) {
   if (nullptr == element)
     return false;
   if (_elements.contains(name))
@@ -609,7 +733,7 @@ ConfigDispatchDeclaration::add(const QString &name, Declaration *element) {
 }
 
 bool
-ConfigDispatchDeclaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+DispatchDeclaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
   if (! node.IsMap()) {
     msg = QString("Expected dispatch, got %1.").arg(nodeTypeName(node));
     return false;
@@ -635,7 +759,7 @@ ConfigDispatchDeclaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx
 }
 
 bool
-ConfigDispatchDeclaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
+DispatchDeclaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
   YAML::const_iterator it = node.begin();
   QString ename = QString::fromStdString(it->first.as<std::string>());
   if (! _elements[ename]->verifyReferences(it->second, ctx, msg)) {
@@ -646,36 +770,62 @@ ConfigDispatchDeclaration::verifyReferences(const YAML::Node &node, const QSet<Q
   return true;
 }
 
-ConfigItem *
-ConfigDispatchDeclaration::parseAllocate(YAML::Node &node, QString &msg) const {
+Item *
+DispatchDeclaration::parseAllocate(const YAML::Node &node, QString &msg) const {
   return nullptr;
 }
 bool
-ConfigDispatchDeclaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+DispatchDeclaration::parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
   return false;
 }
 
-ConfigItem *
-ConfigDispatchDeclaration::parseDefine(YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+Item *
+DispatchDeclaration::parseDefine(const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
   YAML::const_iterator it = node.begin();
   QString ename = QString::fromStdString(it->first.as<std::string>());
-  return _elements[ename]->parseDefine(node, ctx, msg);
+  return _elements[ename]->parseDefine(it->second, ctx, msg);
 }
+
+bool
+DispatchDeclaration::parseLink(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
+  YAML::const_iterator it = node.begin();
+  QString ename = QString::fromStdString(it->first.as<std::string>());
+  return _elements[ename]->parseLink(item, it->second, ctx, msg);
+}
+
+YAML::Node
+DispatchDeclaration::generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const {
+  YAML::Node node;
+  foreach (QString key, _elements.keys()) {
+    if (_elements[key] == item->declaraion()) {
+      YAML::Node element = _elements[key]->generate(item, ctx, msg);
+      if (element.IsNull()) {
+        msg = QString("'%1' -> %2").arg(key).arg(msg);
+        return element;
+      }
+      node[key.toStdString()] = element;
+      break;
+    }
+  }
+  return node;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ConfigItemMap::Declaration
  * ********************************************************************************************* */
-ConfigMapItem::Declaration::Declaration(
-    const QHash<QString, ConfigItem::Declaration *> &elements, bool mandatory, const QString &description)
-  : ConfigItem::Declaration(mandatory, description), _elements()
+Map::Declaration::Declaration(
+    const QHash<QString, Item::Declaration *> &elements, bool mandatory, const QString &description)
+  : Item::Declaration(mandatory, description), _elements()
 {
-  for (QHash<QString, ConfigItem::Declaration*>::const_iterator it=elements.begin(); it!=elements.end(); it++) {
+  _name = "Map";
+  for (QHash<QString, Item::Declaration*>::const_iterator it=elements.begin(); it!=elements.end(); it++) {
     add(it.key(), it.value());
   }
 }
 
 bool
-ConfigMapItem::Declaration::add(const QString &name, ConfigItem::Declaration *element) {
+Map::Declaration::add(const QString &name, Item::Declaration *element) {
   if (nullptr == element)
     return false;
   if (_elements.contains(name))
@@ -687,7 +837,17 @@ ConfigMapItem::Declaration::add(const QString &name, ConfigItem::Declaration *el
 }
 
 bool
-ConfigMapItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+Map::Declaration::has(const QString &name) const {
+  return _elements.contains(name);
+}
+
+Item::Declaration *
+Map::Declaration::get(const QString &name) const {
+  return _elements.value(name, nullptr);
+}
+
+bool
+Map::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
   if (! node.IsMap()) {
     msg = tr("Expected object, got %1.").arg(nodeTypeName(node));
     return false;
@@ -719,7 +879,7 @@ ConfigMapItem::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ct
 }
 
 bool
-ConfigMapItem::Declaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
+Map::Declaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
   for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
     QString ename = QString::fromStdString(it->first.as<std::string>());
     if (! _elements.contains(ename))
@@ -732,18 +892,23 @@ ConfigMapItem::Declaration::verifyReferences(const YAML::Node &node, const QSet<
   return true;
 }
 
-ConfigItem *
-ConfigMapItem::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigMapItem(this);
+Item *
+Map::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new Map(this);
 }
+
 bool
-ConfigMapItem::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+Map::Declaration::parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
   for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
     QString ename = QString::fromStdString(it->first.as<std::string>());
-    ConfigItem *citem = _elements[ename]->parseDefine(node, ctx, msg);
+    if (! _elements.contains(ename)) {
+      logWarn() << "Skip element '" << ename << "': Element name not defined in object.";
+      continue;
+    }
+    Item *citem = _elements[ename]->parseDefine(it->second, ctx, msg);
     if (nullptr == citem)
       return false;
-    if (! item->as<ConfigMapItem>()->add(ename, citem)) {
+    if (! item->as<Map>()->add(ename, citem)) {
       msg = tr("Cannot add item '%1' to map.").arg(ename);
       return false;
     }
@@ -751,68 +916,106 @@ ConfigMapItem::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QH
   return true;
 }
 
+bool
+Map::Declaration::parseLink(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
+  Map *map = item->as<Map>();
+  for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
+    QString ename = QString::fromStdString(it->first.as<std::string>());
+    if (! _elements.contains(ename)) {
+      logWarn() << "Skip element '" << ename << "': Element name not defined in object.";
+      continue;
+    }
+    if (! _elements[ename]->parseLink(map->get(ename), it->second, ctx, msg))
+      return false;
+  }
+  return true;
+}
+
+YAML::Node
+Map::Declaration::generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const {
+  YAML::Node node;
+  const Map *map = item->as<Map>();
+  foreach (QString key, map->_elements.keys()) {
+    Item *value = map->get(key);
+    while (value && value->is<Reference>())
+      value = value->as<Reference>()->get();
+    YAML::Node element = _elements[key]->generate(value, ctx, msg);
+    if (element.IsNull()) {
+      msg = tr("'%1' -> %2").arg(key).arg(msg);
+      return element;
+    }
+    node[key.toStdString()] = element;
+  }
+  return node;
+}
+
 /* ********************************************************************************************* *
  * Implementation of ConfigItemMap
  * ********************************************************************************************* */
-ConfigMapItem::ConfigMapItem(const Declaration *declaration, QObject *parent)
-  : ConfigItem(declaration, parent), _elements()
+Map::Map(const Declaration *declaration, QObject *parent)
+  : Item(declaration, parent), _elements()
 {
   // pass...
 }
 
 bool
-ConfigMapItem::has(const QString &name) const {
+Map::has(const QString &name) const {
   return _elements.contains(name);
 }
 
 bool
-ConfigMapItem::add(const QString &name, ConfigItem *element) {
+Map::add(const QString &name, Item *element) {
   if (_elements.contains(name))
     return false;
-  set(name, element);
+  return set(name, element);
   return true;
 }
 
-void
-ConfigMapItem::set(const QString &name, ConfigItem *element) {
-  if (_elements.contains(name) && _elements[name]) {
+bool
+Map::set(const QString &name, Item *element) {
+  if (nullptr == element) {
+    logDebug() << "Cannot set element '" << name
+               << "': to null.";
+    return false;
+  }
+  if (! declaraion()->as<Map::Declaration>()->has(name)) {
+    logDebug() << "Cannot set element '" << name
+               << "' in map. Element name is not defined in declaration.";
+    return false;
+  }
+  if (_elements.contains(name)) {
     disconnect(_elements[name], SIGNAL(destroyed(QObject*)), this, SLOT(onElementDeleted(QObject *)));
   }
   _elements[name] = element;
-  if (element) {
-    connect(element, SIGNAL(destroyed(QObject*)), this, SLOT(onElementDeleted(QObject *)));
-    element->setParent(this);
-  }
+  connect(element, SIGNAL(destroyed(QObject*)), this, SLOT(onElementDeleted(QObject *)));
+  element->setParent(this);
+  return true;
 }
 
-ConfigItem *
-ConfigMapItem::get(const QString &name) const {
-  return _elements.value(name, nullptr);
-}
-
-ConfigItem *
-ConfigMapItem::take(const QString &name) {
+Item *
+Map::take(const QString &name) {
   if (! _elements.contains(name))
     return nullptr;
-  ConfigItem *element = _elements.take(name);
+  Item *element = _elements.take(name);
   if (element) {
     disconnect(element, SIGNAL(destroyed(QObject*)), this, SLOT(onElementDeleted(QObject*)));
+    element->setParent(nullptr);
   }
   return element;
 }
 
 bool
-ConfigMapItem::del(const QString &name) {
+Map::del(const QString &name) {
   if (! _elements.contains(name))
     return false;
-  ConfigItem *element = take(name);
+  Item *element = take(name);
   if (element)
     element->deleteLater();
   return true;
 }
 
 void
-ConfigMapItem::onElementDeleted(QObject *element) {
+Map::onElementDeleted(QObject *element) {
   foreach (const QString &key, _elements.keys()) {
     if (element == _elements[key]) {
       _elements.remove(key);
@@ -821,31 +1024,55 @@ ConfigMapItem::onElementDeleted(QObject *element) {
   }
 }
 
-
-/* ********************************************************************************************* *
- * Implementation of ConfigItemObj::Declaration
- * ********************************************************************************************* */
-ConfigObjItem::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigMapItem::Declaration(QHash<QString, ConfigItem::Declaration *>(), mandatory, description)
-{
-  add("id", new ConfigIdDeclaration(true, QString("Specifies the ID of the object.")));
+bool
+Map::generateIds(QHash<const Item *, QString> &ctx, QString &message) const {
+  foreach (Item *item, _elements.values()) {
+    if (! item->generateIds(ctx, message))
+      return false;
+  }
+  return true;
 }
 
-ConfigItem *
-ConfigObjItem::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigObjItem(this);
+QString
+Map::dump(const QString &prefix) const {
+  QString rep = QString("%1<Map @0x%2").arg(prefix).arg(ulong(this),16,16,QChar('0'));
+  foreach (QString key, _elements.keys()) {
+    rep += QString("%1\n%2:\n%3").arg(prefix+"  ").arg(key).arg(_elements[key]->dump(prefix+"    "));
+  }
+  rep += ">";
+  return rep;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of Object::Declaration
+ * ********************************************************************************************* */
+Object::Declaration::Declaration(bool mandatory, const QString &description)
+  : Map::Declaration(QHash<QString, Item::Declaration *>(), mandatory, description)
+{
+  _name = "Object";
+  add("id", new IdDeclaration(true, QString("Specifies the ID of the object.")));
+}
+
+Item *
+Object::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new Object(this);
 }
 
 bool
-ConfigObjItem::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+Object::Declaration::parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
   for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
     QString ename = QString::fromStdString(it->first.as<std::string>());
     if ("id" == ename)
       continue;
-    ConfigItem *citem = _elements[ename]->parseDefine(node, ctx, msg);
+    if (! _elements.contains(ename)) {
+      logWarn() << "Skip element '" << ename << "': Element name not defined in object.";
+      continue;
+    }
+    Item *citem = _elements[ename]->parseDefine(it->second, ctx, msg);
     if (nullptr == citem)
       return false;
-    if (! item->as<ConfigMapItem>()->add(ename, citem)) {
+    if (! item->as<Map>()->add(ename, citem)) {
       msg = tr("Cannot add item '%1' to map.").arg(ename);
       return false;
     }
@@ -853,9 +1080,9 @@ ConfigObjItem::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QH
   return true;
 }
 
-ConfigItem *
-ConfigObjItem::Declaration::parseDefine(YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
-  ConfigItem *item = parseAllocate(node, msg);
+Item *
+Object::Declaration::parseDefine(const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
+  Item *item = parseAllocate(node, msg);
   if (nullptr == item)
     return nullptr;
   if (! parsePopulate(item, node, ctx, msg)) {
@@ -867,40 +1094,92 @@ ConfigObjItem::Declaration::parseDefine(YAML::Node &node, QHash<QString, ConfigI
   return item;
 }
 
+bool
+Object::Declaration::parseLink(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
+  Object *map = item->as<Object>();
+  for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
+    QString ename = QString::fromStdString(it->first.as<std::string>());
+    if ("id" == ename)
+      continue;
+    if (! _elements.contains(ename)) {
+      logWarn() << "Skip element '" << ename << "': Element name not defined in object.";
+      continue;
+    }
+    if (! _elements[ename]->parseLink(map->get(ename), it->second, ctx, msg))
+      return false;
+  }
+  return true;
+}
+
+YAML::Node
+Object::Declaration::generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const {
+  YAML::Node node = Map::Declaration::generate(item, ctx, msg);
+  if (node.IsNull())
+    return node;
+  if (! ctx.contains(item)) {
+    msg = "Cannot create object, no ID assigned to it.";
+    return YAML::Node();
+  }
+  node["id"] = ctx[item].toStdString();
+  return node;
+}
+
 /* ********************************************************************************************* *
- * Implementation of ConfigItemObj
+ * Implementation of Object
  * ********************************************************************************************* */
-ConfigObjItem::ConfigObjItem(const Declaration *declaration, QObject *parent)
-  : ConfigMapItem(declaration, parent)
+Object::Object(const Declaration *declaration, QObject *parent)
+  : Map(declaration, parent), _idTemplate("obj%1")
 {
   // pass...
+}
+
+bool
+Object::generateIds(QHash<const Item *, QString> &ctx, QString &message) const {
+  if (! Map::generateIds(ctx, message))
+    return false;
+
+  uint i=0;
+  for (; ctx.values().contains(_idTemplate.arg(i)); i++) { }
+  ctx[this] = _idTemplate.arg(i);
+
+  return true;
+}
+
+QString
+Object::dump(const QString &prefix) const {
+  QString rep = QString("%1<Object @0x%2").arg(prefix).arg(ulong(this),16,16,QChar('0'));
+  foreach (QString key, _elements.keys()) {
+    rep += QString("\n%1%2:\n%3").arg(prefix+"  ").arg(key).arg(_elements[key]->dump(prefix+"    "));
+  }
+  rep += ">";
+  return rep;
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigAbstractList::Declaration
  * ********************************************************************************************* */
-ConfigAbstractList::Declaration::Declaration(
-    ConfigItem::Declaration *element, bool (*typeChk)(const ConfigItem *),
+AbstractList::Declaration::Declaration(
+    Item::Declaration *element, bool (*typeChk)(const Item *),
     const QString &description)
-  : ConfigItem::Declaration(element->isMandatory(), description), _element(element),
+  : Item::Declaration(element->isMandatory(), description), _element(element),
     _element_type_check(typeChk)
 {
-  // pass...
+  _name = "AbstractList";
 }
 
 bool
-ConfigAbstractList::Declaration::isValidType(const ConfigItem *item) const {
+AbstractList::Declaration::isValidType(const Item *item) const {
   return _element_type_check(item);
 }
 
-ConfigItem::Declaration *
-ConfigAbstractList::Declaration::elementDeclaration() const {
+Item::Declaration *
+AbstractList::Declaration::elementDeclaration() const {
   return _element;
 }
 
 bool
-ConfigAbstractList::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
+AbstractList::Declaration::verifyForm(const YAML::Node &node, QSet<QString> &ctx, QString &msg) const {
   if (! node.IsSequence()) {
     msg = tr("Expected list, got %2.").arg(nodeTypeName(node));
     return false;
@@ -921,7 +1200,7 @@ ConfigAbstractList::Declaration::verifyForm(const YAML::Node &node, QSet<QString
 }
 
 bool
-ConfigAbstractList::Declaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
+AbstractList::Declaration::verifyReferences(const YAML::Node &node, const QSet<QString> &ctx, QString &msg) const {
   for (size_t i=0; i<node.size(); i++) {
     if (! _element->verifyReferences(node[i], ctx, msg)) {
       msg = tr("List element %1: %2").arg(i).arg(msg);
@@ -932,122 +1211,160 @@ ConfigAbstractList::Declaration::verifyReferences(const YAML::Node &node, const 
 }
 
 bool
-ConfigAbstractList::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+AbstractList::Declaration::parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
+  if (! node.IsSequence()) {
+    logError() << "Cannot parse list: Expected sequence, got " << nodeTypeName(node) << ".";
+    return false;
+  }
   for (size_t i=0; i<node.size(); i++) {
-    ConfigItem *element = _element->parseDefine(node, ctx, msg);
+    Item *element = _element->parseDefine(node[i], ctx, msg);
     if (nullptr == element)
       return false;
     if (! isValidType(element)) {
       msg = tr("Cannot create list: Elment %1 is of wrong type.").arg(i);
       return false;
     }
-    if (! item->as<ConfigAbstractList>()->add(element))
+    if (! item->as<AbstractList>()->add(element))
       return false;
   }
   return true;
 }
 
 bool
-ConfigAbstractList::Declaration::parseLink(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+AbstractList::Declaration::parseLink(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
   for (size_t i=0; i<node.size(); i++) {
-    if(! _element->parseLink(item->as<ConfigAbstractList>()->get(i), node, ctx, msg))
+    if(! _element->parseLink(item->as<AbstractList>()->get(i), node[i], ctx, msg))
       return false;
   }
   return true;
 }
 
+YAML::Node
+AbstractList::Declaration::generate(const Item *item, const QHash<const Item *, QString> &ctx, QString &msg) const {
+  YAML::Node node;
+  const AbstractList *list = item->as<AbstractList>();
+  for (int i=0; i<list->count(); i++) {
+    YAML::Node element = _element->generate(list->get(i), ctx, msg);
+    if (element.IsNull()) {
+      msg = tr("[%1] -> %2").arg(i).arg(msg);
+      return element;
+    }
+    node.push_back(element);
+  }
+  return node;
+}
+
 /* ********************************************************************************************* *
  * Implementation of ConfigAbstractList
  * ********************************************************************************************* */
-ConfigAbstractList::ConfigAbstractList(const Declaration *declaration, QObject *parent)
-  : ConfigItem(declaration, parent), _items()
+AbstractList::AbstractList(const Declaration *declaration, QObject *parent)
+  : Item(declaration, parent), _items()
 {
   // pass...
 }
 
-ConfigAbstractList::~ConfigAbstractList() {
+AbstractList::~AbstractList() {
   // pass...
 }
 
 int
-ConfigAbstractList::count() const {
+AbstractList::count() const {
   return _items.count();
 }
 
-bool ConfigAbstractList::add(ConfigItem *item) {
+bool AbstractList::add(Item *item) {
   if (nullptr == item)
     return false;
-  if (! declaraion()->as<ConfigAbstractList::Declaration>()->isValidType(item))
+  if (! declaraion()->as<AbstractList::Declaration>()->isValidType(item))
     return false;
   _items.append(item);
   connect(item, SIGNAL(destroyed(QObject*)), this, SLOT(onItemDeleted(QObject*)));
   return true;
 }
 
-ConfigItem *
-ConfigAbstractList::get(int i) const {
+Item *
+AbstractList::get(int i) const {
   if (i >= count())
     return nullptr;
   return _items[i];
 }
 
-ConfigItem *
-ConfigAbstractList::take(int i) {
+Item *
+AbstractList::take(int i) {
   if (i >= count())
     return nullptr;
-  ConfigItem *item = _items.takeAt(i);
+  Item *item = _items.takeAt(i);
   disconnect(item, SIGNAL(destroyed(QObject*)), this, SLOT(onItemDeleted(QObject*)));
   return item;
 }
 
 bool
-ConfigAbstractList::del(int i) {
-  ConfigItem *item = take(i);
+AbstractList::del(int i) {
+  Item *item = take(i);
   if (! item)
     return false;
   return true;
 }
 
 void
-ConfigAbstractList::onItemDeleted(QObject *item) {
-  _items.removeAll(qobject_cast<ConfigItem *>(item));
+AbstractList::onItemDeleted(QObject *item) {
+  _items.removeAll(qobject_cast<Item *>(item));
+}
+
+QString
+AbstractList::dump(const QString &prefix) const {
+  QString rep = QString("%1<List (#%2) @0x%3").arg(prefix).arg(count()).arg(ulong(this),16,16,QChar('0'));
+  foreach (Item *item, _items) {
+    rep += QString("\n%3").arg(item->dump(prefix+"  "));
+  }
+  rep += ">";
+  return rep;
+}
+
+bool
+AbstractList::generateIds(QHash<const Item *, QString> &ctx, QString &message) const {
+  for (int i=0; i<count(); i++) {
+    if (! _items[i]->generateIds(ctx, message))
+      return false;
+  }
+  return true;
 }
 
 
 /* ********************************************************************************************* *
- * Implementation of ConfigObjList::Declaration
+ * Implementation of List::Declaration
  * ********************************************************************************************* */
-ConfigList::Declaration::Declaration(ConfigItem::Declaration *element, bool (*typeChk)(const ConfigItem *), const QString &description)
-  : ConfigAbstractList::Declaration(element, typeChk, description)
+List::Declaration::Declaration(Item::Declaration *element, bool (*typeChk)(const Item *), const QString &description)
+  : AbstractList::Declaration(element, typeChk, description)
 {
-  // pass...
+  _name = "List";
 }
 
-ConfigItem *
-ConfigList::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigList(this);
+Item *
+List::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new List(this);
 }
 
 /* ********************************************************************************************* *
- * Implementation of ConfigObjList
+ * Implementation of List
  * ********************************************************************************************* */
-ConfigList::ConfigList(const Declaration *declaration, QObject *parent)
-  : ConfigAbstractList(declaration, parent)
+List::List(const Declaration *declaration, QObject *parent)
+  : AbstractList(declaration, parent)
 {
   // pass...
 }
 
 bool
-ConfigList::add(ConfigItem *item) {
-  if (! ConfigAbstractList::add(item))
+List::add(Item *item) {
+  if (! AbstractList::add(item))
     return false;
   item->setParent(this);
   return true;
 }
 
-ConfigItem *
-ConfigList::take(int i) {
-  ConfigItem *item = ConfigAbstractList::take(i);
+Item *
+List::take(int i) {
+  Item *item = AbstractList::take(i);
   if (nullptr == item)
     return nullptr;
   item->setParent(nullptr);
@@ -1055,8 +1372,8 @@ ConfigList::take(int i) {
 }
 
 bool
-ConfigList::del(int i) {
-  ConfigItem *item = take(i);
+List::del(int i) {
+  Item *item = take(i);
   if (nullptr == item)
     return false;
   item->deleteLater();
@@ -1067,25 +1384,25 @@ ConfigList::del(int i) {
 /* ********************************************************************************************* *
  * Implementation of ConfigRefList::Declaration
  * ********************************************************************************************* */
-ConfigRefList::Declaration::Declaration(ConfigItem::Declaration *element, bool (*typeChk)(const ConfigItem *), const QString &description)
-  : ConfigAbstractList::Declaration(element, typeChk, description)
+RefList::Declaration::Declaration(Item::Declaration *element, bool (*typeChk)(const Item *), const QString &description)
+  : AbstractList::Declaration(element, typeChk, description)
 {
-  // pass...
+  _name = "RefList";
 }
 
-ConfigItem *
-ConfigRefList::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigRefList(this);
+Item *
+RefList::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new RefList(this);
 }
 
 bool
-ConfigRefList::Declaration::parsePopulate(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+RefList::Declaration::parsePopulate(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
   // Polulation of list is delayed to link stage.
   return true;
 }
 
 bool
-ConfigRefList::Declaration::parseLink(ConfigItem *item, YAML::Node &node, QHash<QString, ConfigItem *> &ctx, QString &msg) const {
+RefList::Declaration::parseLink(Item *item, const YAML::Node &node, QHash<QString, Item *> &ctx, QString &msg) const {
   for (size_t i=0; i<node.size(); i++) {
     if (! node[i].IsScalar()) {
       msg = tr("Expected ID string, got '%1'").arg(nodeTypeName(node[i]));
@@ -1096,15 +1413,20 @@ ConfigRefList::Declaration::parseLink(ConfigItem *item, YAML::Node &node, QHash<
       msg = tr("Cannot resolve ID '%1'.").arg(id);
       return false;
     }
-    ConfigItem *element = ctx.value(id, nullptr);
-    if (nullptr == element)
-      return false;
-    if (! isValidType(element)) {
-      msg = tr("Cannot create list: Elment %1 is of wrong type.").arg(i);
+    Item *element = ctx.value(id, nullptr);
+    if (nullptr == element) {
+      msg = tr("Cannot create ref-list: %1-th element '%2' not defined.").arg(i).arg(id);
       return false;
     }
-    if (! item->as<ConfigAbstractList>()->add(element))
+    if (! isValidType(element)) {
+      msg = tr("Cannot create ref-list: %1-th element is of wrong type. Expected %2, got %3")
+          .arg(i).arg(_element->name()).arg(element->declaraion()->name());
       return false;
+    }
+    if (! item->as<RefList>()->add(element)) {
+      msg = tr("Cannot add %1-th element to list").arg(i);
+      return false;
+    }
   }
   return true;
 }
@@ -1112,32 +1434,43 @@ ConfigRefList::Declaration::parseLink(ConfigItem *item, YAML::Node &node, QHash<
 /* ********************************************************************************************* *
  * Implementation of ConfigRefList
  * ********************************************************************************************* */
-ConfigRefList::ConfigRefList(const Declaration *declaration, QObject *parent)
-  : ConfigAbstractList(declaration, parent)
+RefList::RefList(const Declaration *declaration, QObject *parent)
+  : AbstractList(declaration, parent)
 {
   // pass...
+}
+
+QString
+RefList::dump(const QString &prefix) const {
+  QString rep = QString("%1<RefList (#%2) @0x%3").arg(prefix).arg(count()).arg(ulong(this),16,16,QChar('0'));
+  foreach (Item *item, _items) {
+    rep += QString("\n%1<Ref to 0x%2>").arg(prefix+"  ").arg(ulong(item),16,16,QChar('0'));
+  }
+  rep += ">";
+  return rep;
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigDeclRadioId
  * ********************************************************************************************* */
-ConfigRadioId::Declaration *ConfigRadioId::Declaration::_instance = nullptr;
+RadioId::Declaration *RadioId::Declaration::_instance = nullptr;
 
-ConfigRadioId::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigObjItem::Declaration(mandatory, description)
+RadioId::Declaration::Declaration(bool mandatory, const QString &description)
+  : Object::Declaration(mandatory, description)
 {
-  add("name", new ConfigStrItem::Declaration(true, QString("Specifies the name of the radio ID.")));
-  add("number", new ConfigDMRIdItem::Declaration(true, QString("Specifies the radio/DMR id.")));
+  _name = "RadioId";
+  add("name", new StringItem::Declaration(true, QString("Specifies the name of the radio ID.")));
+  add("number", new DMRId::Declaration(true, QString("Specifies the radio/DMR id.")));
 }
 
-ConfigItem *
-ConfigRadioId::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigRadioId();
+Item *
+RadioId::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new RadioId();
 }
 
-ConfigRadioId::Declaration *
-ConfigRadioId::Declaration::get() {
+RadioId::Declaration *
+RadioId::Declaration::get() {
   if (nullptr == _instance)
     _instance = new Declaration(
           true, QString("Specifies a radio ID, that is a pair of DMR ID and name for the radio."));
@@ -1147,67 +1480,68 @@ ConfigRadioId::Declaration::get() {
 /* ********************************************************************************************* *
  * Implementation of ConfigRadioIdItem
  * ********************************************************************************************* */
-ConfigRadioId::ConfigRadioId(QObject *parent)
-  : ConfigObjItem(Declaration::get(), parent)
+RadioId::RadioId(QObject *parent)
+  : Object(Declaration::get(), parent)
 {
-  // pass...
+  _idTemplate = "id%1";
 }
 
 const QString &
-ConfigRadioId::name() const {
-  return get("name")->as<ConfigStrItem>()->value();
+RadioId::name() const {
+  return get("name")->as<StringItem>()->value();
 }
 
 uint32_t
-ConfigRadioId::number() const {
-  return get("number")->as<ConfigDMRIdItem>()->value();
+RadioId::number() const {
+  return get("number")->as<DMRId>()->value();
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigContactItem::Declaration
  * ********************************************************************************************* */
-ConfigContact::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigObjItem::Declaration(mandatory, description)
+Contact::Declaration::Declaration(bool mandatory, const QString &description)
+  : Object::Declaration(mandatory, description)
 {
-  add("name", new ConfigStrItem::Declaration(true, tr("Specifies the name of the contact.")));
-  add("ring", new ConfigBoolItem::Declaration(false, tr("Enables ring tone (optional).")));
+  _name = "Contact";
+  add("name", new StringItem::Declaration(true, tr("Specifies the name of the contact.")));
+  add("ring", new BoolItem::Declaration(false, tr("Enables ring tone (optional).")));
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigContactItem
  * ********************************************************************************************* */
-ConfigContact::ConfigContact(Declaration *declaraion, QObject *parent)
-  : ConfigObjItem(declaraion, parent)
+Contact::Contact(Declaration *declaraion, QObject *parent)
+  : Object(declaraion, parent)
 {
-  // pass...
+  _idTemplate = "con%1";
 }
 
 const QString &
-ConfigContact::name() const {
-  return get("name")->as<ConfigStrItem>()->value();
+Contact::name() const {
+  return get("name")->as<StringItem>()->value();
 }
 
 bool
-ConfigContact::ring() const {
-  return get("ring")->as<ConfigBoolItem>()->value();
+Contact::ring() const {
+  return get("ring")->as<BoolItem>()->value();
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigDigitalContactItem::Declaration
  * ********************************************************************************************* */
-ConfigDigitalContact::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigContact::Declaration(mandatory, description)
+Configuration::DigitalContact::Declaration::Declaration(bool mandatory, const QString &description)
+  : Contact::Declaration(mandatory, description)
 {
-  // pass...
+  _name = "DigitalContact";
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigDigitalContactItem
  * ********************************************************************************************* */
-ConfigDigitalContact::ConfigDigitalContact(Declaration *declaraion, QObject *parent)
-  : ConfigContact(declaraion, parent)
+Configuration::DigitalContact::DigitalContact(Declaration *declaraion, QObject *parent)
+  : Contact(declaraion, parent)
 {
   // pas...
 }
@@ -1216,22 +1550,23 @@ ConfigDigitalContact::ConfigDigitalContact(Declaration *declaraion, QObject *par
 /* ********************************************************************************************* *
  * Implementation of ConfigPrivateCallItem::Declaration
  * ********************************************************************************************* */
-ConfigPrivateCall::Declaration *ConfigPrivateCall::Declaration::_instance = nullptr;
+PrivateCall::Declaration *PrivateCall::Declaration::_instance = nullptr;
 
-ConfigPrivateCall::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigDigitalContact::Declaration(mandatory, description)
+PrivateCall::Declaration::Declaration(bool mandatory, const QString &description)
+  : DigitalContact::Declaration(mandatory, description)
 {
-  add("number", new ConfigDMRIdItem::Declaration(
+  _name = "PrivateCall";
+  add("number", new DMRId::Declaration(
         true, tr("Specifies the DMR ID of the private call.")));
 }
 
-ConfigItem *
-ConfigPrivateCall::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigPrivateCall();
+Item *
+PrivateCall::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new PrivateCall();
 }
 
-ConfigPrivateCall::Declaration *
-ConfigPrivateCall::Declaration::get() {
+PrivateCall::Declaration *
+PrivateCall::Declaration::get() {
   if (nullptr == _instance)
     _instance = new Declaration(true, tr("Specifies a private call."));
   return _instance;
@@ -1240,75 +1575,76 @@ ConfigPrivateCall::Declaration::get() {
 /* ********************************************************************************************* *
  * Implementation of ConfigPrivateCallItem
  * ********************************************************************************************* */
-ConfigPrivateCall::ConfigPrivateCall(QObject *parent)
-  : ConfigDigitalContact(Declaration::get(), parent)
+PrivateCall::PrivateCall(QObject *parent)
+  : DigitalContact(Declaration::get(), parent)
 {
   // pass...
 }
 
 uint32_t
-ConfigPrivateCall::number() const {
-  return get("number")->as<ConfigDMRIdItem>()->value();
+PrivateCall::number() const {
+  return get("number")->as<DMRId>()->value();
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigGroupCallItem::Declaration
  * ********************************************************************************************* */
-ConfigGroupCall::Declaration *ConfigGroupCall::Declaration::_instance = nullptr;
+GroupCall::Declaration *GroupCall::Declaration::_instance = nullptr;
 
-ConfigGroupCall::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigDigitalContact::Declaration(mandatory, description)
+GroupCall::Declaration::Declaration(bool mandatory, const QString &description)
+  : DigitalContact::Declaration(mandatory, description)
 {
-  add("number", new ConfigDMRIdItem::Declaration(
+  _name = "GroupCall";
+  add("number", new DMRId::Declaration(
         true, tr("Specifies the DMR ID of the private call.")));
 }
 
-ConfigItem *
-ConfigGroupCall::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigGroupCall();
+Item *
+GroupCall::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new GroupCall();
 }
 
-ConfigGroupCall::Declaration *
-ConfigGroupCall::Declaration::get() {
+GroupCall::Declaration *
+GroupCall::Declaration::get() {
   if (nullptr == _instance)
-    _instance = new ConfigGroupCall::Declaration(true, QString("Specifies a group call."));
+    _instance = new GroupCall::Declaration(true, QString("Specifies a group call."));
   return _instance;
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigGroupCallItem
  * ********************************************************************************************* */
-ConfigGroupCall::ConfigGroupCall(QObject *parent)
-  : ConfigDigitalContact(Declaration::get(), parent)
+GroupCall::GroupCall(QObject *parent)
+  : DigitalContact(Declaration::get(), parent)
 {
   // pass...
 }
 
 uint32_t
-ConfigGroupCall::number() const {
-  return get("number")->as<ConfigDMRIdItem>()->value();
+GroupCall::number() const {
+  return get("number")->as<DMRId>()->value();
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigAllCallItem::Declaration
  * ********************************************************************************************* */
-ConfigAllCall::Declaration *ConfigAllCall::Declaration::_instance = nullptr;
+AllCall::Declaration *AllCall::Declaration::_instance = nullptr;
 
-ConfigAllCall::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigDigitalContact::Declaration(mandatory, description)
+AllCall::Declaration::Declaration(bool mandatory, const QString &description)
+  : DigitalContact::Declaration(mandatory, description)
 {
-  // pass, no number of all call
+  _name = "AllCall";
 }
 
-ConfigItem *
-ConfigAllCall::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigAllCall();
+Item *
+AllCall::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new AllCall();
 }
 
-ConfigAllCall::Declaration *
-ConfigAllCall::Declaration::get() {
+AllCall::Declaration *
+AllCall::Declaration::get() {
   if (nullptr == _instance)
     _instance = new Declaration(true, tr("Specifies an all-call."));
   return _instance;
@@ -1317,8 +1653,8 @@ ConfigAllCall::Declaration::get() {
 /* ********************************************************************************************* *
  * Implementation of ConfigAllCallItem
  * ********************************************************************************************* */
-ConfigAllCall::ConfigAllCall(QObject *parent)
-  : ConfigDigitalContact(Declaration::get(), parent)
+AllCall::AllCall(QObject *parent)
+  : DigitalContact(Declaration::get(), parent)
 {
   // pass...
 }
@@ -1327,25 +1663,26 @@ ConfigAllCall::ConfigAllCall(QObject *parent)
 /* ********************************************************************************************* *
  * Implementation of ConfigGroupListItem::Declaration
  * ********************************************************************************************* */
-ConfigGroupList::Declaration *ConfigGroupList::Declaration::_instance = nullptr;
+GroupList::Declaration *GroupList::Declaration::_instance = nullptr;
 
-ConfigGroupList::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigObjItem::Declaration(mandatory, description)
+GroupList::Declaration::Declaration(bool mandatory, const QString &description)
+  : Object::Declaration(mandatory, description)
 {
-  add("name", new ConfigStrItem::Declaration(true, tr("Specifies the name of the contact.")));
+  _name = "GroupList";
+  add("name", new StringItem::Declaration(true, tr("Specifies the name of the contact.")));
   add("members",
-      ConfigRefList::Declaration::get<ConfigGroupCall>(
+      RefList::Declaration::get<DigitalContact>(
         false, tr("The list of group calls forming the group list.")));
 }
 
-ConfigItem *
-ConfigGroupList::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigGroupList();
+Item *
+GroupList::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new GroupList();
 }
 
 
-ConfigGroupList::Declaration *
-ConfigGroupList::Declaration::get() {
+GroupList::Declaration *
+GroupList::Declaration::get() {
   if (nullptr == _instance)
     _instance = new Declaration(true, tr("Defines a RX group list."));
   return _instance;
@@ -1354,124 +1691,127 @@ ConfigGroupList::Declaration::get() {
 /* ********************************************************************************************* *
  * Implementation of ConfigGroupListItem::Declaration
  * ********************************************************************************************* */
-ConfigGroupList::ConfigGroupList(QObject *parent)
-  : ConfigObjItem(Declaration::get(), parent)
+GroupList::GroupList(QObject *parent)
+  : Object(Declaration::get(), parent)
 {
-  // pass...
+  _idTemplate = "grp%1";
 }
 
 const QString &
-ConfigGroupList::name() const {
-  return get("name")->as<ConfigStrItem>()->value();
+GroupList::name() const {
+  return get("name")->as<StringItem>()->value();
 }
 
-ConfigAbstractList *
-ConfigGroupList::members() const {
-  return get("members")->as<ConfigAbstractList>();
+AbstractList *
+GroupList::members() const {
+  return get("members")->as<AbstractList>();
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigChannelItem::Declaration
  * ********************************************************************************************* */
-ConfigChannel::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigObjItem::Declaration(mandatory, description)
+Configuration::Channel::Declaration::Declaration(bool mandatory, const QString &description)
+  : Object::Declaration(mandatory, description)
 {
-  add("name", new ConfigStrItem::Declaration(true, tr("Specifies the name of the channel.")));
-  add("rx", new ConfigFloatItem::Declaration(0, 10e3, true, tr("Specifies the RX frequency of the channel in MHz.")));
-  add("tx", new ConfigFloatItem::Declaration(-10e3, 10e3, false, tr("Specifies the TX frequency of the channel or offset in MHz.")));
-  add("power", new ConfigEnumItem::Declaration(
-    { {"min", Channel::MinPower},
-      {"low", Channel::LowPower},
-      {"mid", Channel::MidPower},
-      {"high", Channel::HighPower},
-      {"max", Channel::MaxPower} }, true, tr("Specifies the transmit power on the channel.")));
-  add("tx-timeout", new ConfigIntItem::Declaration(
+  _name = "Channel";
+  add("name", new StringItem::Declaration(true, tr("Specifies the name of the channel.")));
+  add("rx", new FloatItem::Declaration(0, 10e3, true, tr("Specifies the RX frequency of the channel in MHz.")));
+  add("tx", new FloatItem::Declaration(-10e3, 10e3, false, tr("Specifies the TX frequency of the channel or offset in MHz.")));
+  add("power", new Enum::Declaration(
+    { {"min", ::Channel::MinPower},
+      {"low", ::Channel::LowPower},
+      {"mid", ::Channel::MidPower},
+      {"high", ::Channel::HighPower},
+      {"max", ::Channel::MaxPower} }, true, tr("Specifies the transmit power on the channel.")));
+  add("tx-timeout", new IntItem::Declaration(
         0, 10000, false, tr("Specifies the transmit timeout in seconds. None if 0 or omitted.")));
-  add("rx-only", new ConfigBoolItem::Declaration(
+  add("rx-only", new BoolItem::Declaration(
         false, tr("If true, TX is disabled for this channel.")));
-  add("scan-list", ConfigReference::Declaration::get<ConfigScanList>(
+  add("scan-list", Reference::Declaration::get<ScanList>(
         false, tr("References the scanlist associated with this channel.")));
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigChannelItem
  * ********************************************************************************************* */
-ConfigChannel::ConfigChannel(Declaration *declaraion, QObject *parent)
-  : ConfigObjItem(declaraion, parent)
+Configuration::Channel::Channel(Declaration *declaraion, QObject *parent)
+  : Object(declaraion, parent)
 {
-  // pass...
+  _idTemplate = "ch%1";
 }
 
 const QString &
-ConfigChannel::name() const {
-  return get("name")->as<ConfigStrItem>()->value();
+Configuration::Channel::name() const {
+  return get("name")->as<StringItem>()->value();
 }
 
 double
-ConfigChannel::rx() const {
-  return get("rx")->as<ConfigFloatItem>()->value();
+Configuration::Channel::rx() const {
+  return get("rx")->as<FloatItem>()->value();
 }
 
 double
-ConfigChannel::tx() const {
-  return get("tx")->as<ConfigFloatItem>()->value();
+Configuration::Channel::tx() const {
+  return get("tx")->as<FloatItem>()->value();
 }
 
-Channel::Power
-ConfigChannel::power() const {
-  return get("power")->as<ConfigEnumItem>()->as<Channel::Power>(Channel::MaxPower);
+::Channel::Power
+Configuration::Channel::power() const {
+  return get("power")->as<Enum>()->as<::Channel::Power>(::Channel::MaxPower);
 }
 
 qint64
-ConfigChannel::txTimeout() const {
-  return get("tx-timeout")->as<ConfigIntItem>()->value();
+Configuration::Channel::txTimeout() const {
+  return get("tx-timeout")->as<IntItem>()->value();
 }
 
 bool
-ConfigChannel::rxOnly() const {
-  return get("rx-only")->as<ConfigBoolItem>()->value();
+Configuration::Channel::rxOnly() const {
+  return get("rx-only")->as<BoolItem>()->value();
 }
 
-ConfigScanList *
-ConfigChannel::scanlist() const {
-  return get("scan-list")->as<ConfigScanList>();
+Configuration::ScanList *
+Configuration::Channel::scanlist() const {
+  return get("scan-list")->as<Configuration::ScanList>();
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigDigitalChannelItem::Declaration
  * ********************************************************************************************* */
-ConfigDigitalChannel::Declaration *ConfigDigitalChannel::Declaration::_instance = nullptr;
+Configuration::DigitalChannel::Declaration *
+Configuration::DigitalChannel::Declaration::_instance = nullptr;
 
-ConfigDigitalChannel::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigChannel::Declaration(mandatory, description)
+Configuration::DigitalChannel::Declaration::Declaration(bool mandatory, const QString &description)
+  : Channel::Declaration(mandatory, description)
 {
-  add("admit", new ConfigEnumItem::Declaration(
-    { {"always", DigitalChannel::AdmitNone},
-      {"free", DigitalChannel::AdmitFree},
-      {"color-code", DigitalChannel::AdmitColorCode} }, true, tr("Specifies the transmit admit criterion.")));
-  add("color-code", new ConfigIntItem::Declaration(1,16, true, tr("Specifies the color-code of the channel.")));
-  add("time-slot", new ConfigIntItem::Declaration(1,2, true, tr("Specifies the time-slot of the channel.")));
-  add("group-list", ConfigReference::Declaration::get<ConfigGroupList>(
+  _name = "DigitalChannel";
+  add("admit", new Enum::Declaration(
+    { {"always", ::DigitalChannel::AdmitNone},
+      {"free", ::DigitalChannel::AdmitFree},
+      {"color-code", ::DigitalChannel::AdmitColorCode} }, true, tr("Specifies the transmit admit criterion.")));
+  add("color-code", new IntItem::Declaration(1,16, true, tr("Specifies the color-code of the channel.")));
+  add("time-slot", new IntItem::Declaration(1,2, true, tr("Specifies the time-slot of the channel.")));
+  add("group-list", Reference::Declaration::get<GroupList>(
         true, tr("References the RX group list of the channel.")));
-  add("tx-contact", ConfigReference::Declaration::get<ConfigDigitalContact>(
+  add("tx-contact", Reference::Declaration::get<DigitalContact>(
         false, tr("References the default TX contact of the channel.")));
-  add("aprs", ConfigReference::Declaration::get<ConfigPositioning>(
+  add("aprs", Reference::Declaration::get<Positioning>(
         false, tr("References the positioning system used by this channel.")));
-  add("roaming-zone", ConfigReference::Declaration::get<ConfigRoamingZone>(
+  add("roaming-zone", Reference::Declaration::get<RoamingZone>(
         false, tr("References the roaming zone used by this channel.")));
-  add("dmr-id", ConfigReference::Declaration::get<ConfigRadioId>(
+  add("dmr-id", Reference::Declaration::get<RadioId>(
         false, tr("Specifies the DMR ID to use on this channel.")));
 }
 
-ConfigItem *
-ConfigDigitalChannel::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigDigitalChannel();
+Item *
+Configuration::DigitalChannel::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new DigitalChannel();
 }
 
-ConfigDigitalChannel::Declaration *
-ConfigDigitalChannel::Declaration::get() {
+Configuration::DigitalChannel::Declaration *
+Configuration::DigitalChannel::Declaration::get() {
   if (nullptr == _instance)
     _instance = new Declaration(true, tr("Specifies a digial channel."));
   return _instance;
@@ -1480,96 +1820,96 @@ ConfigDigitalChannel::Declaration::get() {
 /* ********************************************************************************************* *
  * Implementation of ConfigDigitalChannelItem
  * ********************************************************************************************* */
-ConfigDigitalChannel::ConfigDigitalChannel(QObject *parent)
-  : ConfigChannel(Declaration::get(), parent)
+Configuration::DigitalChannel::DigitalChannel(QObject *parent)
+  : Channel(Declaration::get(), parent)
 {
   // pass...
 }
 
-const QString &
-ConfigDigitalChannel::admit() const {
-  return get("admit")->as<ConfigStrItem>()->value();
+::DigitalChannel::Admit
+Configuration::DigitalChannel::admit() const {
+  return get("admit")->as<Enum>()->as<::DigitalChannel::Admit>(::DigitalChannel::AdmitColorCode);
 }
 
 uint8_t
-ConfigDigitalChannel::colorCode() const {
-  return get("color-code")->as<ConfigIntItem>()->value();
+Configuration::DigitalChannel::colorCode() const {
+  if (! has("color-code"))
+    return 1;
+  return get("color-code")->as<IntItem>()->value();
 }
 
-uint8_t
-ConfigDigitalChannel::timeSlot() const {
-  return get("time-slot")->as<ConfigIntItem>()->value();
+::DigitalChannel::TimeSlot
+Configuration::DigitalChannel::timeSlot() const {
+  if (! has("time-slot"))
+    return ::DigitalChannel::TimeSlot1;
+  return get("time-slot")->as<Enum>()->as<::DigitalChannel::TimeSlot>(::DigitalChannel::TimeSlot1);
 }
 
-ConfigGroupList *
-ConfigDigitalChannel::groupList() const {
-  return get("group-list")->as<ConfigGroupList>();
+GroupList *
+Configuration::DigitalChannel::groupList() const {
+  return getRef<GroupList>("group-list");
 }
 
-ConfigDigitalContact *
-ConfigDigitalChannel::txContact() const {
-  if (! has("tx-contact"))
-    return nullptr;
-  return get("tx-contact")->as<ConfigDigitalContact>();
+Configuration::DigitalContact *
+Configuration::DigitalChannel::txContact() const {
+  return getRef<Configuration::DigitalContact>("tx-contact");
 }
 
-ConfigPositioning *
-ConfigDigitalChannel::aprs() const {
+Configuration::Positioning *
+Configuration::DigitalChannel::aprs() const {
   if (! has("aprs"))
     return nullptr;
-  return get("aprs")->as<ConfigPositioning>();
+  return get("aprs")->as<Configuration::Positioning>();
 }
 
-ConfigRoamingZone *
-ConfigDigitalChannel::roamingZone() const {
-  if (! has("roaming-zone"))
-    return nullptr;
-  return get("roaming-zone")->as<ConfigRoamingZone>();
+Configuration::RoamingZone *
+Configuration::DigitalChannel::roamingZone() const {
+  return getRef<Configuration::RoamingZone>("roaming-zone");
 }
 
-ConfigRadioId *
-ConfigDigitalChannel::radioId() const {
-  if (! has("dmr-id"))
-    return nullptr;
-  return get("dmr-id")->as<ConfigRadioId>();
+RadioId *
+Configuration::DigitalChannel::radioId() const {
+  return getRef<RadioId>("dmr-id");
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigAnalogChannelItem::Declaration
  * ********************************************************************************************* */
-ConfigAnalogChannel::Declaration *ConfigAnalogChannel::Declaration::_instance = nullptr;
+Configuration::AnalogChannel::Declaration *
+Configuration::AnalogChannel::Declaration::_instance = nullptr;
 
-ConfigAnalogChannel::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigChannel::Declaration(mandatory, description)
+Configuration::AnalogChannel::Declaration::Declaration(bool mandatory, const QString &description)
+  : Channel::Declaration(mandatory, description)
 {
-  add("admit", new ConfigEnumItem::Declaration(
-    {{"always", AnalogChannel::AdmitNone},
-     {"free", AnalogChannel::AdmitFree},
-     {"tone", AnalogChannel::AdmitTone} }, false, tr("Specifies the transmit admit criterion.")));
-  add("squelch", new ConfigIntItem::Declaration(1,10, true, tr("Specifies the squelch level.")));
-  add("rx-tone", new ConfigDispatchDeclaration(
-  { {"ctcss", new ConfigFloatItem::Declaration(0,300, true, tr("Specifies the CTCSS frequency."))},
-    {"dcs", new ConfigIntItem::Declaration(-300,300, true, tr("Specifies the DCS code."))} },
+  _name = "AnalogChannel";
+  add("admit", new Enum::Declaration(
+    {{"always", ::AnalogChannel::AdmitNone},
+     {"free", ::AnalogChannel::AdmitFree},
+     {"tone", ::AnalogChannel::AdmitTone} }, false, tr("Specifies the transmit admit criterion.")));
+  add("squelch", new IntItem::Declaration(1,10, true, tr("Specifies the squelch level.")));
+  add("rx-tone", new DispatchDeclaration(
+  { {"ctcss", new FloatItem::Declaration(0,300, true, tr("Specifies the CTCSS frequency."))},
+    {"dcs", new IntItem::Declaration(-300,300, true, tr("Specifies the DCS code."))} },
         false, tr("Specifies the DCS/CTCSS signaling for RX.")));
-  add("tx-tone", new ConfigDispatchDeclaration(
-  { {"ctcss", new ConfigFloatItem::Declaration(0,300, true, tr("Specifies the CTCSS frequency."))},
-    {"dcs", new ConfigIntItem::Declaration(-300,300, true, tr("Specifies the DCS code."))} },
+  add("tx-tone", new DispatchDeclaration(
+  { {"ctcss", new FloatItem::Declaration(0,300, true, tr("Specifies the CTCSS frequency."))},
+    {"dcs", new IntItem::Declaration(-300,300, true, tr("Specifies the DCS code."))} },
         false, tr("Specifies the DCS/CTCSS signaling for TX.")));
-  add("band-width", new ConfigEnumItem::Declaration(
-    {{"narrow", AnalogChannel::BWNarrow},
-     {"wide", AnalogChannel::BWWide}}, true, tr("Specifies the bandwidth of the channel.")));
-  add("aprs", ConfigReference::Declaration::get<ConfigAPRSPositioning>(
+  add("band-width", new Enum::Declaration(
+    {{"narrow", ::AnalogChannel::BWNarrow},
+     {"wide", ::AnalogChannel::BWWide}}, true, tr("Specifies the bandwidth of the channel.")));
+  add("aprs", Reference::Declaration::get<APRSPositioning>(
         false, tr("References the APRS system used by this channel.")));
 }
 
-ConfigItem *
-ConfigAnalogChannel::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigAnalogChannel();
+Item *
+Configuration::AnalogChannel::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new AnalogChannel();
 }
 
-ConfigAnalogChannel::Declaration *
-ConfigAnalogChannel::Declaration::get() {
+Configuration::AnalogChannel::Declaration *
+Configuration::AnalogChannel::Declaration::get() {
   if (nullptr == _instance)
     _instance = new Declaration(true, tr("Specifies a digial channel."));
   return _instance;
@@ -1578,28 +1918,28 @@ ConfigAnalogChannel::Declaration::get() {
 /* ********************************************************************************************* *
  * Implementation of ConfigAnalogChannelItem
  * ********************************************************************************************* */
-ConfigAnalogChannel::ConfigAnalogChannel(QObject *parent)
-  : ConfigChannel(Declaration::get(), parent)
+Configuration::AnalogChannel::AnalogChannel(QObject *parent)
+  : Channel(Declaration::get(), parent)
 {
   // pass...
 }
 
-AnalogChannel::Admit
-ConfigAnalogChannel::admit() const {
-  return get("admit")->as<ConfigEnumItem>()->as<AnalogChannel::Admit>(AnalogChannel::AdmitNone);
+::AnalogChannel::Admit
+Configuration::AnalogChannel::admit() const {
+  return get("admit")->as<Enum>()->as<::AnalogChannel::Admit>(::AnalogChannel::AdmitNone);
 }
 
-Signaling::Code
-ConfigAnalogChannel::rxSignalling() const {
+::Signaling::Code
+Configuration::AnalogChannel::rxSignalling() const {
   if (! has("rx-tone"))
     return Signaling::SIGNALING_NONE;
 
-  if (get("rx-tone")->is<ConfigFloatItem>()) {
-    double f = get("rx-tone")->as<ConfigFloatItem>()->value();
+  if (get("rx-tone")->is<FloatItem>()) {
+    double f = get("rx-tone")->as<FloatItem>()->value();
     return Signaling::fromCTCSSFrequency(f);
-  } else if (get("rx-tone")->is<ConfigIntItem>()) {
+  } else if (get("rx-tone")->is<IntItem>()) {
     // handle as DCS
-    qint64 num = get("rx-tone")->as<ConfigIntItem>()->value();
+    qint64 num = get("rx-tone")->as<IntItem>()->value();
     return Signaling::fromDCSNumber(std::abs(num), num<0);
   }
 
@@ -1608,57 +1948,56 @@ ConfigAnalogChannel::rxSignalling() const {
 
 
 Signaling::Code
-ConfigAnalogChannel::txSignalling() const {
+Configuration::AnalogChannel::txSignalling() const {
   if (! has("rx-tone"))
-    return Signaling::SIGNALING_NONE;
-
-  if (get("rx-tone")->is<ConfigFloatItem>()) {
-    double f = get("rx-tone")->as<ConfigFloatItem>()->value();
+    return ::Signaling::SIGNALING_NONE;
+  if (get("rx-tone")->is<FloatItem>()) {
+    double f = get("rx-tone")->as<FloatItem>()->value();
     return Signaling::fromCTCSSFrequency(f);
-  } else if (get("rx-tone")->is<ConfigIntItem>()) {
+  } else if (get("rx-tone")->is<IntItem>()) {
     // handle as DCS
-    qint64 num = get("rx-tone")->as<ConfigIntItem>()->value();
+    qint64 num = get("rx-tone")->as<IntItem>()->value();
     return Signaling::fromDCSNumber(std::abs(num), num<0);
   }
-
   return Signaling::SIGNALING_NONE;
 }
 
-AnalogChannel::Bandwidth
-ConfigAnalogChannel::bandWidth() const {
-  return get("band-width")->as<ConfigEnumItem>()->as<AnalogChannel::Bandwidth>(AnalogChannel::BWNarrow);
+::AnalogChannel::Bandwidth
+Configuration::AnalogChannel::bandWidth() const {
+  return get("band-width")->as<Enum>()->as<::AnalogChannel::Bandwidth>(::AnalogChannel::BWNarrow);
 }
 
-ConfigAPRSPositioning *
-ConfigAnalogChannel::aprs() const {
+APRSPositioning *
+Configuration::AnalogChannel::aprs() const {
   if (! has("aprs"))
     return nullptr;
-  return get("aprs")->as<ConfigAPRSPositioning>();
+  return get("aprs")->as<APRSPositioning>();
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigZoneItem::Declaration
  * ********************************************************************************************* */
-ConfigZone::Declaration *ConfigZone::Declaration::_instance = nullptr;
+Zone::Declaration *Zone::Declaration::_instance = nullptr;
 
-ConfigZone::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigObjItem::Declaration(mandatory, description)
+Zone::Declaration::Declaration(bool mandatory, const QString &description)
+  : Object::Declaration(mandatory, description)
 {
-  add("name", new ConfigStrItem::Declaration(true, tr("Specifies the name of the zone.")));
+  _name = "Zone";
+  add("name", new StringItem::Declaration(true, tr("Specifies the name of the zone.")));
   add("A",
-      ConfigRefList::Declaration::get<ConfigChannel>(false, tr("Channel references.")));
+      RefList::Declaration::get<Channel>(false, tr("Channel references.")));
   add("B",
-      ConfigRefList::Declaration::get<ConfigChannel>(false, tr("Channel references.")));
+      RefList::Declaration::get<Channel>(false, tr("Channel references.")));
 }
 
-ConfigItem *
-ConfigZone::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigZone();
+Item *
+Zone::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new Zone();
 }
 
-ConfigZone::Declaration *
-ConfigZone::Declaration::get() {
+Zone::Declaration *
+Zone::Declaration::get() {
   if (nullptr == _instance)
     _instance = new Declaration(true, tr("Defines a zone within the codeplug."));
   return _instance;
@@ -1667,39 +2006,41 @@ ConfigZone::Declaration::get() {
 /* ********************************************************************************************* *
  * Implementation of ConfigZone
  * ********************************************************************************************* */
-ConfigZone::ConfigZone(QObject *parent)
-  : ConfigObjItem(Declaration::get(), parent)
+Zone::Zone(QObject *parent)
+  : Object(Declaration::get(), parent)
 {
-  // pass...
+  _idTemplate = "zone%1";
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigScanListItem::Declaration
  * ********************************************************************************************* */
-ConfigScanList::Declaration *ConfigScanList::Declaration::_instance = nullptr;
+Configuration::ScanList::Declaration *
+Configuration::ScanList::Declaration::_instance = nullptr;
 
-ConfigScanList::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigObjItem::Declaration(mandatory, description)
+Configuration::ScanList::Declaration::Declaration(bool mandatory, const QString &description)
+  : Object::Declaration(mandatory, description)
 {
-  add("name", new ConfigStrItem::Declaration(true, tr("Name of the scan list.")));
-  add("pimary", ConfigReference::Declaration::get<ConfigChannel>(
+  _name = "ScanList";
+  add("name", new StringItem::Declaration(true, tr("Name of the scan list.")));
+  add("pimary", Reference::Declaration::get<Channel>(
         false, tr("Reference to the primary priority channel.")));
-  add("secondary", ConfigReference::Declaration::get<ConfigChannel>(
+  add("secondary", Reference::Declaration::get<Channel>(
         false, tr("Reference to the secondary priority channel.")));
-  add("revert", ConfigReference::Declaration::get<ConfigChannel>(
+  add("revert", Reference::Declaration::get<Channel>(
         false, tr("Reference to the revert (transmit) channel.")));
-  add("channels", ConfigRefList::Declaration::get<ConfigChannel>(
+  add("channels", RefList::Declaration::get<Channel>(
         false, tr("Reference to a channel.")));
 }
 
-ConfigItem *
-ConfigScanList::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigScanList();
+Item *
+Configuration::ScanList::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new Configuration::ScanList();
 }
 
-ConfigScanList::Declaration *
-ConfigScanList::Declaration::get() {
+Configuration::ScanList::Declaration *
+Configuration::ScanList::Declaration::get() {
   if (nullptr == _instance)
     _instance = new Declaration(false, tr("Defines a scan list"));
   return _instance;
@@ -1708,97 +2049,91 @@ ConfigScanList::Declaration::get() {
 /* ********************************************************************************************* *
  * Implementation of ConfigScanListItem
  * ********************************************************************************************* */
-ConfigScanList::ConfigScanList(QObject *parent)
-  : ConfigObjItem(Declaration::get(), parent)
+Configuration::ScanList::ScanList(QObject *parent)
+  : Object(Declaration::get(), parent)
 {
-  // pass...
+  _idTemplate = "scan%1";
 }
 
 const QString &
-ConfigScanList::name() const {
-  return get("name")->as<ConfigStrItem>()->value();
+Configuration::ScanList::name() const {
+  return get("name")->as<StringItem>()->value();
 }
 
-ConfigChannel *
-ConfigScanList::primary() const {
-  if (! has("primary"))
-    return nullptr;
-  return get("primary")->as<ConfigChannel>();
+Configuration::Channel *
+Configuration::ScanList::primary() const {
+  return getRef<Configuration::Channel>("primary");
 }
 
-ConfigChannel *
-ConfigScanList::secondary() const {
-  if (! has("secondary"))
-    return nullptr;
-  return get("secondary")->as<ConfigChannel>();
+Configuration::Channel *
+Configuration::ScanList::secondary() const {
+  return getRef<Configuration::Channel>("secondary");
 }
 
-ConfigChannel *
-ConfigScanList::revert() const {
-  if (! has("revert"))
-    return nullptr;
-  return get("revert")->as<ConfigChannel>();
+Configuration::Channel *
+Configuration::ScanList::revert() const {
+  return getRef<Configuration::Channel>("revert");
 }
 
-ConfigAbstractList *
-ConfigScanList::channels() const {
-  if (! has("channels"))
-    return nullptr;
-  return get("channels")->as<ConfigAbstractList>();
+RefList *
+Configuration::ScanList::channels() const {
+  return get("channels")->as<RefList>();
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigPositioning::Declaration
  * ********************************************************************************************* */
-ConfigPositioning::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigObjItem::Declaration(mandatory, description)
+Positioning::Declaration::Declaration(bool mandatory, const QString &description)
+  : Object::Declaration(mandatory, description)
 {
-  add("name", new ConfigStrItem::Declaration(true, tr("Specifies the name of the positioning system.")));
-  add("period", new ConfigIntItem::Declaration(1, 1000, true, tr("Specifies the update period in seconds.")));
+  _name = "Positioning";
+  add("name", new StringItem::Declaration(true, tr("Specifies the name of the positioning system.")));
+  add("period", new IntItem::Declaration(1, 1000, true, tr("Specifies the update period in seconds.")));
 }
 
 /* ********************************************************************************************* *
  * Implementation of ConfigPositioning
  * ********************************************************************************************* */
-ConfigPositioning::ConfigPositioning(Declaration *declaraion, QObject *parent)
-  : ConfigObjItem(declaraion, parent)
+Positioning::Positioning(Declaration *declaraion, QObject *parent)
+  : Object(declaraion, parent)
 {
-  // pass...
+  _idTemplate = "pos%1";
 }
 
 const QString &
-ConfigPositioning::name() const {
-  return get("name")->as<ConfigStrItem>()->value();
+Positioning::name() const {
+  return get("name")->as<StringItem>()->value();
 }
 
 uint32_t
-ConfigPositioning::period() const {
-  return get("period")->as<ConfigIntItem>()->value();
+Positioning::period() const {
+  return get("period")->as<IntItem>()->value();
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigDMRPosItem::Declaration
  * ********************************************************************************************* */
-ConfigDMRPositioning::Declaration *ConfigDMRPositioning::Declaration::_instance = nullptr;
+DMRPositioning::Declaration *DMRPositioning::Declaration::_instance = nullptr;
 
-ConfigDMRPositioning::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigPositioning::Declaration(mandatory, description)
+DMRPositioning::Declaration::Declaration(bool mandatory, const QString &description)
+  : Positioning::Declaration(mandatory, description)
 {
-  add("destination", ConfigReference::Declaration::get<ConfigDigitalContact>(
+  _name = "DMRPositioning";
+  add("destination", Reference::Declaration::get<DigitalContact>(
         true, tr("Specifies the destination contact.")));
-  add("channel", ConfigReference::Declaration::get<ConfigDigitalChannel>(
+  add("channel", Reference::Declaration::get<DigitalChannel>(
         false, tr("Specifies the optional revert channel.")));
 }
 
-ConfigItem *
-ConfigDMRPositioning::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigDMRPositioning();
+Item *
+DMRPositioning::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new DMRPositioning();
 }
 
-ConfigDMRPositioning::Declaration *
-ConfigDMRPositioning::Declaration::get() {
+DMRPositioning::Declaration *
+DMRPositioning::Declaration::get() {
   if (nullptr == _instance)
     _instance = new Declaration(true, tr("Specifies a DMR positioning system."));
   return _instance;
@@ -1807,8 +2142,8 @@ ConfigDMRPositioning::Declaration::get() {
 /* ********************************************************************************************* *
  * Implementation of ConfigDMRPositioning
  * ********************************************************************************************* */
-ConfigDMRPositioning::ConfigDMRPositioning(QObject *parent)
-  : ConfigPositioning(Declaration::get(), parent)
+DMRPositioning::DMRPositioning(QObject *parent)
+  : Positioning(Declaration::get(), parent)
 {
   // pass...
 }
@@ -1817,29 +2152,30 @@ ConfigDMRPositioning::ConfigDMRPositioning(QObject *parent)
 /* ********************************************************************************************* *
  * Implementation of ConfigAPRSPosItem::Declaration
  * ********************************************************************************************* */
-ConfigAPRSPositioning::Declaration *ConfigAPRSPositioning::Declaration::_instance = nullptr;
+APRSPositioning::Declaration *APRSPositioning::Declaration::_instance = nullptr;
 
-ConfigAPRSPositioning::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigPositioning::Declaration(mandatory, description)
+APRSPositioning::Declaration::Declaration(bool mandatory, const QString &description)
+  : Positioning::Declaration(mandatory, description)
 {
-  add("source", new ConfigStrItem::Declaration(true, tr("Specifies the source call and SSID.")));
-  add("destination", new ConfigStrItem::Declaration(true, tr("Specifies the destination call and SSID.")));
-  add("channel", ConfigReference::Declaration::get<ConfigAnalogChannel>(
+  _name = "APRSPositioning";
+  add("source", new StringItem::Declaration(true, tr("Specifies the source call and SSID.")));
+  add("destination", new StringItem::Declaration(true, tr("Specifies the destination call and SSID.")));
+  add("channel", Reference::Declaration::get<AnalogChannel>(
         true, tr("Specifies the optional revert channel.")));
-  add("path", ConfigList::Declaration::get<ConfigStrItem>(
-        new ConfigStrItem::Declaration(false, tr("Specifies a path element of the APRS packet.")),
+  add("path", List::Declaration::get<StringItem>(
+        new StringItem::Declaration(false, tr("Specifies a path element of the APRS packet.")),
         tr("Specifies the APRS path as a list.")));
-  add("icon", new ConfigStrItem::Declaration(true, tr("Specifies the icon name.")));
-  add("message", new ConfigStrItem::Declaration(false, tr("Specifies the optional APRS message.")));
+  add("icon", new StringItem::Declaration(true, tr("Specifies the icon name.")));
+  add("message", new StringItem::Declaration(false, tr("Specifies the optional APRS message.")));
 }
 
-ConfigItem *
-ConfigAPRSPositioning::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigAPRSPositioning();
+Item *
+APRSPositioning::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new APRSPositioning();
 }
 
-ConfigAPRSPositioning::Declaration *
-ConfigAPRSPositioning::Declaration::get() {
+APRSPositioning::Declaration *
+APRSPositioning::Declaration::get() {
   if (nullptr == _instance)
     _instance = new Declaration(true, tr("Specifies an APRS positioning system."));
   return _instance;
@@ -1848,8 +2184,8 @@ ConfigAPRSPositioning::Declaration::get() {
 /* ********************************************************************************************* *
  * Implementation of ConfigAPRSPositioning
  * ********************************************************************************************* */
-ConfigAPRSPositioning::ConfigAPRSPositioning(QObject *parent)
-  : ConfigPositioning(Declaration::get(), parent)
+APRSPositioning::APRSPositioning(QObject *parent)
+  : Positioning(Declaration::get(), parent)
 {
   // pass...
 }
@@ -1858,23 +2194,25 @@ ConfigAPRSPositioning::ConfigAPRSPositioning(QObject *parent)
 /* ********************************************************************************************* *
  * Implementation of ConfigRoamingZoneItem::Declaration
  * ********************************************************************************************* */
-ConfigRoamingZone::Declaration *ConfigRoamingZone::Declaration::_instance = nullptr;
+Configuration::RoamingZone::Declaration *
+Configuration::RoamingZone::Declaration::_instance = nullptr;
 
-ConfigRoamingZone::Declaration::Declaration(bool mandatory, const QString &description)
-  : ConfigObjItem::Declaration(mandatory, description)
+Configuration::RoamingZone::Declaration::Declaration(bool mandatory, const QString &description)
+  : Object::Declaration(mandatory, description)
 {
-  add("name", new ConfigStrItem::Declaration(true, tr("Specifies name of the roaming zone.")));
-  add("channels", ConfigRefList::Declaration::get<ConfigDigitalChannel>(
+  _name = "RoamingZone";
+  add("name", new StringItem::Declaration(true, tr("Specifies name of the roaming zone.")));
+  add("channels", RefList::Declaration::get<Configuration::DigitalChannel>(
         false, tr("References a channel")));
 }
 
-ConfigItem *
-ConfigRoamingZone::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new ConfigRoamingZone();
+Item *
+Configuration::RoamingZone::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new Configuration::RoamingZone();
 }
 
-ConfigRoamingZone::Declaration *
-ConfigRoamingZone::Declaration::get() {
+Configuration::RoamingZone::Declaration *
+Configuration::RoamingZone::Declaration::get() {
   if (nullptr == _instance)
     _instance = new Declaration(false, tr("Specifies a roaming zone."));
   return _instance;
@@ -1883,71 +2221,73 @@ ConfigRoamingZone::Declaration::get() {
 /* ********************************************************************************************* *
  * Implementation of ConfigRoamingZone
  * ********************************************************************************************* */
-ConfigRoamingZone::ConfigRoamingZone(QObject *parent)
-  : ConfigObjItem(Declaration::get(), parent)
+Configuration::RoamingZone::RoamingZone(QObject *parent)
+  : Object(Declaration::get(), parent)
 {
-  // pass...
+  _idTemplate = "roam%1";
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of Configuration::Declaration
  * ********************************************************************************************* */
-Configuration::Declaration *Configuration::Declaration::_instance = nullptr;
+Configuration::Config::Declaration *
+Configuration::Config::Declaration::_instance = nullptr;
 
-Configuration::Declaration::Declaration()
-  : ConfigMapItem::Declaration(QHash<QString, ConfigItem::Declaration *>(), true, "")
+Configuration::Config::Declaration::Declaration()
+  : Map::Declaration(QHash<QString, Item::Declaration *>(), true, "")
 {
-  add("version", new ConfigStrItem::Declaration(false, tr("Specifies the optional version number of the config format.")));
-  add("intro-line1", new ConfigStrItem::Declaration(false, tr("Specifies the optional first boot display line.")));
-  add("intro-line2", new ConfigStrItem::Declaration(false, tr("Specifies the optional second boot display line.")));
+  _name = "Config";
+  add("version", new StringItem::Declaration(false, tr("Specifies the optional version number of the config format.")));
+  add("intro-line1", new StringItem::Declaration(false, tr("Specifies the optional first boot display line.")));
+  add("intro-line2", new StringItem::Declaration(false, tr("Specifies the optional second boot display line.")));
 
   add("radio-ids",
-      ConfigList::Declaration::get<ConfigRadioId>(
+      List::Declaration::get<RadioId>(
         tr("This list specifies the DMR IDs and names for the radio.")));
 
   add("channels",
-      ConfigList::Declaration::get<ConfigChannel>(
-        new ConfigDispatchDeclaration({ {"analog", ConfigAnalogChannel::Declaration::get()},
-                                        {"digital", ConfigDigitalChannel::Declaration::get()}},
-                                      true),
+      List::Declaration::get<Channel>(
+        new DispatchDeclaration({ {"analog", AnalogChannel::Declaration::get()},
+                                  {"digital", DigitalChannel::Declaration::get()}},
+                                true),
         tr("The list of all channels within the codeplug.")));
 
   add("zones",
-      ConfigList::Declaration::get<ConfigZone>(
+      List::Declaration::get<Zone>(
         tr("Defines the list of zones.")));
 
   add("scan-lists",
-      ConfigList::Declaration::get<ConfigScanList>(
+      List::Declaration::get<ScanList>(
         tr("Defines the list of all scan lists.")));
 
   add("contacts",
-      ConfigList::Declaration::get<ConfigContact>(
-        new ConfigDispatchDeclaration({ {"private", ConfigPrivateCall::Declaration::get()},
-                                        {"group", ConfigGroupCall::Declaration::get()},
-                                        {"all", ConfigAllCall::Declaration::get()} },
-                                      true, tr("One of the contact types, 'private', 'group', 'all'.")),
+      List::Declaration::get<Contact>(
+        new DispatchDeclaration({ {"private", PrivateCall::Declaration::get()},
+                                  {"group", GroupCall::Declaration::get()},
+                                  {"all", AllCall::Declaration::get()} },
+                                true, tr("One of the contact types, 'private', 'group', 'all'.")),
         tr("Specifies the list of contacts.")));
 
   add("group-lists",
-      ConfigList::Declaration::get<ConfigGroupList>(
+      List::Declaration::get<GroupList>(
         tr("Lists all RX group lists within the codeplug.")));
 
   add("positioning",
-      ConfigList::Declaration::get<ConfigPositioning>(
-        new ConfigDispatchDeclaration({ {"dmr", ConfigDMRPositioning::Declaration::get()},
-                                        {"aprs", ConfigAPRSPositioning::Declaration::get()} },
-                                      false),
+      List::Declaration::get<Positioning>(
+        new DispatchDeclaration({ {"dmr", DMRPositioning::Declaration::get()},
+                                  {"aprs", APRSPositioning::Declaration::get()} },
+                                false),
         tr("List of all positioning systems.")));
 
   add("roaming",
-      ConfigList::Declaration::get<ConfigRoamingZone>(
+      List::Declaration::get<RoamingZone>(
         tr("List of all roaming zones.")));
 
 }
 
 bool
-Configuration::Declaration::verify(const YAML::Node &doc, QString &message) {
+Configuration::Config::Declaration::verify(const YAML::Node &doc, QString &message) {
   QSet<QString> ctx;
   if (! this->verifyForm(doc, ctx, message))
     return false;
@@ -1956,23 +2296,57 @@ Configuration::Declaration::verify(const YAML::Node &doc, QString &message) {
   return true;
 }
 
-ConfigItem *
-Configuration::Declaration::parseAllocate(YAML::Node &node, QString &msg) const {
-  return new Configuration();
+bool
+Configuration::Config::Declaration::parse(Config *config, YAML::Node &doc, QString &message) {
+  if (! verify(doc, message))
+    return false;
+
+  QHash<QString, Config::Item *> ctx;
+  if (! parsePopulate(config, doc, ctx, message))
+    return false;
+  if (! parseLink(config, doc, ctx, message))
+    return false;
+
+  return true;
 }
 
-Configuration::Declaration *
-Configuration::Declaration::get() {
+Configuration::Config *
+Configuration::Config::Declaration::parse(YAML::Node &doc, QString &message) {
+  Item *item = parseAllocate(doc, message);
+  if (nullptr == item)
+    return nullptr;
+  if (! parse(item->as<Config>(), doc, message)) {
+    item->deleteLater();
+    return nullptr;
+  }
+  return item->as<Config>();
+}
+
+Item *
+Configuration::Config::Declaration::parseAllocate(const YAML::Node &node, QString &msg) const {
+  return new Config();
+}
+
+Configuration::Config::Declaration *
+Configuration::Config::Declaration::get() {
   if (nullptr == _instance)
-    _instance = new Configuration::Declaration();
+    _instance = new Config::Declaration();
   return _instance;
 }
 
 /* ********************************************************************************************* *
  * Implementation of Configuration
  * ********************************************************************************************* */
-Configuration::Configuration(QObject *parent)
-  : ConfigMapItem(Declaration::get(), parent)
+Configuration::Config::Config(QObject *parent)
+  : Map(Declaration::get(), parent)
 {
   // pass...
+}
+
+YAML::Node
+Configuration::Config::generate(QString &message) const {
+  QHash<const Item *, QString> ctx;
+  if (! this->generateIds(ctx, message))
+    return YAML::Node();
+  return this->generateNode(ctx, message);
 }

@@ -1,7 +1,9 @@
 version: "0.8.0"
 
 radio-ids:
-  - { name: "DM3MAT", number: 2621370, id: default_id }
+  -  name: "DM3MAT"
+     number: 2621370
+     id: default_id
 
 channels:
   - digital:
