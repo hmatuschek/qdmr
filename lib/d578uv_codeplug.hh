@@ -448,6 +448,7 @@ public:
   explicit D578UVCodeplug(QObject *parent = nullptr);
 
   void allocateUpdated();
+  void allocateHotKeySettings();
 
   bool encodeChannels(Config *config, const Flags &flags);
 

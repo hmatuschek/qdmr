@@ -45,6 +45,9 @@ static_assert(
   APRS_SET_EXT_SIZE == sizeof(D578UVCodeplug::aprs_setting_ext_t),
   "D578UVCodeplug::aprs_setting_ext_t size check failed.");
 
+#define ADDR_HOTKEY               0x025C0000
+#define HOTKEY_SIZE               0x00000970
+
 #define ADDR_UNKNOWN_SETTING      0x02500600 // Address of unknown settings
 #define UNKNOWN_SETTING_SIZE      0x00000030 // Size of unknown settings.
 
@@ -463,6 +466,10 @@ D578UVCodeplug::allocateUpdated() {
   image(0).addElement(ADDR_APRS_SET_EXT, APRS_SET_EXT_SIZE);
 }
 
+void
+D578UVCodeplug::allocateHotKeySettings() {
+  image(0).addElement(ADDR_HOTKEY, HOTKEY_SIZE);
+}
 
 bool
 D578UVCodeplug::encodeChannels(Config *config, const Flags &flags) {
