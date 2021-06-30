@@ -135,7 +135,7 @@ class GPSSystem;
  *  <tr><td>025C0B00</td> <td>000010</td> <td>Status message bitmap.</td>
  *  <tr><td>025C0100</td> <td>000400</td> <td>Upto 32 status messages.
  *    Length unknown, offset 0x20. ASCII 0x00 terminated and padded.</td>
- *  <tr><td>025C0500</td> <td>000360</td> <td>18 hot-key settings, see @c D868UVCodeplug::hotkey_t</td></tr>
+ *  <tr><td>025C0500</td> <td>000470</td> <td>24 hot-key settings, see @c D868UVCodeplug::hotkey_t</td></tr>
  *
  *  <tr><th colspan="3">Encryption keys</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
@@ -169,11 +169,14 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">Still unknown</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
+ *  <tr><td>024C1090</td> <td>000040</td> <td>Unknown, set to 0xff</td></tr>
  *  <tr><td>024C1440</td> <td>000030</td> <td>Unknown data.</td></tr>
  *  <tr><td>024C1700</td> <td>000040</td> <td>Unknown, 8bit indices.</td></tr>
  *  <tr><td>024C1800</td> <td>000500</td> <td>Empty, set to 0x00?</td></tr>
- *
  *  <tr><td>02500600</td> <td>000030</td> <td>Unknown, set to 0x00.</td></tr>
+ *  <tr><td>02BC0000</td> <td>000020</td> <td>Unknown, set to 0x00.</td></tr>
+ *  <tr><td>02BC0C60</td> <td>000020</td> <td>Unknown, set to 0x00.</td></tr>
+ *  <tr><td>02BC1000</td> <td>000060</td> <td>Unknown, set to 0x00.</td></tr>
  * </table>
  *
  * @ingroup d578uv */
