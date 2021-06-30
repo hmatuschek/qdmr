@@ -87,7 +87,7 @@ try:
          
       elif ( command == b'\x02' ):
          print("Device info requested.")
-         resp = b'ID578UV\x00\x00V100\x00\x00\x06'
+         resp = b'ID578UV\x00\x00V110\x00\x00\x06'
          serialPort.write(resp)
 
       elif ( command == b'R\x02\xfa\x00\x20\x10' ):
