@@ -77,7 +77,8 @@ D578UVCodeplug::channel_t::clear() {
   id_index = 0;
   squelch_mode = SQ_CARRIER;
   tx_permit = ADMIT_ALWAYS;
-
+  // Enable BT hands free by default.
+  bt_hands_free = 1;
 }
 
 bool
