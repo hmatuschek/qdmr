@@ -42,6 +42,9 @@ public:
 
   const Radio::Features &features() const;
 
+  VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
+                                 const VerifyFlags &flags=VerifyFlags());
+
 protected:
   /** Features of detected radio, variant and mode. */
   Radio::Features _features;

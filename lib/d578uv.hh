@@ -25,6 +25,9 @@ public:
 
   const Radio::Features &features() const;
 
+  VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
+                                 const VerifyFlags &flags=VerifyFlags());
+
 protected:
   /** Holds a copy of the specific radio features. */
   Radio::Features _features;

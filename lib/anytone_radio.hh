@@ -87,6 +87,8 @@ protected:
   AnytoneCodeplug *_codeplug;
   /** The actual binary callsign database representation. */
   CallsignDB *_callsigns;
+  /** Holds the hardware version of the radio. Used for codeplug compatibility. */
+  QString _version;
 };
 
 #endif // __D868UV_HH__
