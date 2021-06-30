@@ -10,7 +10,7 @@
  *  <tr><th colspan="3">Callsign database</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>04000000</td> <td>max. 186a00</th> <td>Index of callsign entries. Follows the same
- *   weird format as @c D878UVCodeplug::contact_map_t. Sorted by ID. Empty entries set to
+ *   weird format as @c D868UVCodeplug::contact_map_t. Sorted by ID. Empty entries set to
  *   0xffffffffffffffff.</td></tr>
  *  <tr><td>044c0000</td> <td>unknown</td>     <td>Database limits, see @c limits_t.</td></tr>
  *  <tr><td>04500000</td> <td>unknown</td>     <td>The actual DB entries, each entry is of

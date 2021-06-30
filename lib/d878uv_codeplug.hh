@@ -278,18 +278,18 @@ public:
     } APRSPTT;
 
 
-    // Bytes 0-7
+    // Bytes 00
     uint32_t rx_frequency;              ///< RX Frequency, 8 digits BCD, big-endian.
     uint32_t tx_offset;                 ///< TX Offset, 8 digits BCD, big-endian, sign in repeater_mode.
 
-    // Byte 8
+    // Byte 08
     uint8_t channel_mode    : 2,        ///< Mode: Analog or Digital, see @c Mode.
       power                 : 2,        ///< Power: Low, Middle, High, Turbo, see @c Power.
       bandwidth             : 1,        ///< Bandwidth: 12.5 or 25 kHz, see @c Bandwidth.
       _unused8              : 1,        ///< Unused, set to 0.
       repeater_mode         : 2;        ///< Sign of TX frequency offset, see @c RepeaterMode.
 
-    // Byte 9
+    // Byte 09
     uint8_t rx_ctcss        : 1,        ///< CTCSS decode enable.
       rx_dcs                : 1,        ///< DCS decode enable.
       tx_ctcss              : 1,        ///< CTCSS encode enable.
@@ -299,46 +299,46 @@ public:
       call_confirm          : 1,        ///< Call confirmation enable.
       talkaround            : 1;        ///< Talk-around enable.
 
-    // Bytes 10-15
+    // Bytes 0a
     uint8_t ctcss_transmit;             ///< TX CTCSS tone, 0=62.5, 50=254.1, 51=custom CTCSS tone.
     uint8_t ctcss_receive;              ///< RX CTCSS tone: 0=62.5, 50=254.1, 51=custom CTCSS tone.
     uint16_t dcs_transmit;              ///< TX DCS code: 0=D000N, 511=D777N, 512=D000I, 1023=D777I, DCS code-number in octal, little-endian.
     uint16_t dcs_receive;               ///< RX DCS code: 0=D000N, 511=D777N, 512=D000I, 1023=D777I, DCS code-number in octal, little-endian.
 
-    // Bytes 16-19
+    // Bytes 10
     uint16_t custom_ctcss;              ///< Custom CTCSS tone frequency: 0x09cf=251.1, 0x0a28=260, big-endian.
     uint8_t tone2_decode;               ///< 2-Tone decode: 0x00=1, 0x0f=16
     uint8_t _unused19;                  ///< Unused, set to 0.
 
-    // Bytes 20-23
+    // Bytes 14
     uint32_t contact_index;             ///< Contact index, zero-based, little-endian.
 
-    // Byte 24
+    // Byte 18
     uint8_t id_index;                   ///< Index to radio ID table.
 
-    // Byte 25
+    // Byte 19
     uint8_t ptt_id          : 2,        ///< PTT ID, see PTTId, unused in U868UV.
       _unused25_1           : 2,        ///< Unused, set to 0.
       squelch_mode          : 1,        ///< Squelch mode, see @c SquelchMode.
       _unused25_2           : 3;        ///< Unused, set to 0.
 
-    // Byte 26
+    // Byte 1a
     uint8_t tx_permit       : 2,        ///< TX permit, see @c Admit.
       _unused26_1           : 2,        ///< Unused, set to 0.
       opt_signal            : 2,        ///< Optional signaling, see @c OptSignaling.
       _unused26_2           : 2;        ///< Unused, set to 0.
 
-    // Bytes 27-31
+    // Bytes 1b
     uint8_t scan_list_index;            ///< Scan list index, 0xff=None, 0-based.
     uint8_t group_list_index;           ///< RX group-list, 0xff=None, 0-based.
     uint8_t id_2tone;                   ///< 2-Tone ID, 0=1, 0x17=24.
     uint8_t id_5tone;                   ///< 5-Tone ID, 0=1, 0x63=100.
     uint8_t id_dtmf;                    ///< DTMF ID, 0=1, 0x0f=16.
 
-    // Byte 32
+    // Byte 20
     uint8_t color_code;                 ///< Color code, 0-15
 
-    // Byte 33
+    // Byte 21
     uint8_t slot2           : 1,        ///< Timeslot, 0=TS1, 1=TS2.
       sms_confirm           : 1,        ///< Send SMS confirmation, 0=off, 1=on.
       simplex_tdma          : 1,        ///< Simplex TDMA enabled.
@@ -348,25 +348,25 @@ public:
       enh_encryption        : 1,        ///< Enable enhanced encryption.
       work_alone            : 1;        ///< Work alone, 0=off, 1=on.
 
-    // Byte 34
+    // Byte 22
     uint8_t aes_encryption;             ///< Digital AES encryption, 1-32, 0=off.
 
-    // Bytes 35-51
+    // Bytes 23
     uint8_t name[16];                   ///< Channel name, ASCII, zero filled.
     uint8_t _pad51;                     ///< Pad byte, set to 0.
 
-    // Byte 52
+    // Byte 34
     uint8_t ranging         : 1,        ///< Ranging enabled.
       through_mode          : 1,        ///< Through-mode enabled.
       excl_from_roaming     : 1,        ///< Exclude channel from roaming, data ACK forbit in D868UV.
       data_ack_disable      : 1,        ///< Data ACK disable.
       _unused52_4           : 4;        ///< Unused, set to 0.
 
-    // Byte 53
+    // Byte 35
     uint8_t aprs_report     : 2,        ///< Enable APRS report, see @c APRSReport.
       _unused53             : 6;        ///< Unused, set to 0.
 
-    // Bytes 54-63
+    // Bytes 36
     uint8_t analog_aprs_ptt;            ///< Enable analog APRS PTT, see @c APRSPTT, not used in D868UV.
     uint8_t digi_aprs_ptt;              ///< Enable digital APRS PTT, 0=off, 1=on.
     uint8_t gps_system;                 ///< Index of DMR GPS report system, 0-7;
