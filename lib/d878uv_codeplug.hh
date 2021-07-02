@@ -883,33 +883,33 @@ public:
    */
   struct __attribute__((packed)) aprs_setting_t {
     /** Possible signalling for APRS repeater.*/
-    typedef enum {
+    enum SignalingType: uint8_t {
       SIG_OFF = 0,                 ///< No signalling.
       SIG_CTCSS = 1,               ///< CTCSS signalling.
       SIG_DCS = 2                  ///< DCS signalling.
-    } SignalingType;
+    };
 
     /** Power setting for the APRS/GPS channel. */
-    typedef enum {
+    enum Power: uint8_t {
       POWER_LOW = 0,               ///< Low power (usually about 1W).
       POWER_MID = 1,               ///< Medium power (usually about 2W).
       POWER_HIGH = 2,              ///< High power (usually about 5W).
       POWER_TURBO = 3              ///< Highest power (upto 7W).
-    } Power;
+    };
 
     /** Hemisphere settings for the fixed location beacon. */
-    typedef enum {
+    enum Hemisphere: uint8_t {
       NORTH = 0,
       SOUTH = 1,
       EAST  = 0,
       WEST  = 1
-    } Hemisphere;
+    };
 
     // byte 0x00
     uint8_t _unknown0;             ///< Unknown, set to 0x00.
     uint32_t frequency;            ///< TX frequency, BCD encoded, little endian in 10Hz.
     uint8_t tx_delay;              ///< TX delay, multiples of 20ms, default=1200ms.
-    uint8_t sig_type;              ///< Signalling type, 0=off, 1=ctcss, 2=dcs, default=off.
+    SignalingType sig_type;        ///< Signalling type, 0=off, 1=ctcss, 2=dcs, default=off.
     uint8_t ctcss;                 ///< CTCSS tone-code, default=0.
     uint16_t dcs;                  ///< DCS code, little endian, default=0x0013.
     uint8_t manual_tx_interval;    ///< Global manual TX intervals in seconds.
@@ -921,11 +921,11 @@ public:
     uint8_t lat_deg;               ///< Latitude in degree.
     uint8_t lat_min;               ///< Latitude minutes.
     uint8_t lat_sec;               ///< Latitude seconds (1/100th of a minute).
-    uint8_t north_south;           ///< North or south flag, north=0, south=1.
+    Hemisphere north_south;        ///< North or south flag, north=0, south=1.
     uint8_t lon_deg;               ///< Longitude in degree.
     uint8_t lon_min;               ///< Longitude in minutes.
     uint8_t lon_sec;               ///< Longitude in seconds (1/100th of a minute).
-    uint8_t east_west;             ///< East or west flag, east=0, west=1.
+    Hemisphere east_west;          ///< East or west flag, east=0, west=1.
 
     uint8_t to_call[6];            ///< Destination call, 6 x ASCII, 0x20-padded.
     uint8_t to_ssid;               ///< Destination SSID, 0xff=None.
@@ -941,7 +941,7 @@ public:
     char table;                    ///< ASCII-char for APRS icon table, ie. '/' or '\' for primary
                                    ///  and alternate icon table respectively.
     char icon;                     ///< ASCII-char of APRS map icon.
-    uint8_t power;                 ///< Transmit power.
+    Power power;                   ///< Transmit power.
     uint8_t prewave_delay;         ///< Prewave delay in 10ms steps.
 
     // bytes 0x3d
@@ -1013,7 +1013,8 @@ public:
    * Memmory layout of APRS settings (0x60byte):
    * @verbinclude d878uvaprssettingext.txt */
   struct __attribute__((packed)) aprs_setting_ext_t {
-    uint8_t _unknown0000[8];            ///< Unknown settings block.
+    uint8_t _unknown0000[6];            ///< Unknown settings block.
+    uint16_t fixed_altitude;            ///< Fixed altitude in feet, little endian.
     uint8_t rep_position : 1,           ///< Report position flag.
       rep_mic_e          : 1,           ///< Report MIC-E flag.
       rep_object         : 1,           ///< Report object flag.
