@@ -52,8 +52,8 @@ public:
 
     uint8_t call_type;                  ///< Call type, see @c CallType.
     uint32_t id;                        ///< DMR ID, BCD encoded, big endian.
-    uint8_t ring;                       ///< Ring tone, see @c RingTone.
-
+    uint8_t ring       : 4,             ///< Ring tone, see @c RingTone.
+      is_friend        : 4;             ///< If 0x1, entry is marked as a "friend".
     uint8_t body[94];                   ///< Up to 94 bytes name, city, callsign, state, country and comment.
 
     /** Constructs a database entry from the given user.
