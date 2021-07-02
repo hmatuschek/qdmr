@@ -198,20 +198,33 @@ static_assert(
 
 #define ADDR_DTMF_SETTINGS        0x024C1080
 #define DTMF_SETTINGS_SIZE        0x00000050
+static_assert(
+  DTMF_SETTINGS_SIZE == sizeof(D868UVCodeplug::dtmf_settings_t),
+  "D868UVCodeplug::dtmf_settings_t size check failed.");
 
-#define NUM_TWO_TONE_ENC_FUNC     24
-#define TWO_TONE_ENC_BITMAP       0x024C1280
-#define TWO_TONE_ENC_BITMAP_SIZE  0x00000010
-#define ADDR_TWO_TONE_ENC_FUNC    0x024C1100
-#define TWO_TONE_ENC_FUNC_SIZE    0x00000010
-#define NUM_TWO_TONE_DEC_FUNC     24
-#define TWO_TONE_DEC_BITMAP       0x024c2600
-#define TWO_TONE_DEC_BITMAP_SIZE  0x00000010
-#define ADDR_TWO_TONE_DEC_FUNC    0x024c2400
-#define TWO_TONE_DEC_FUNC_SIZE    0x00000020
+#define NUM_TWO_TONE_IDS          24
+#define TWO_TONE_IDS_BITMAP       0x024C1280
+#define TWO_TONE_IDS_BITMAP_SIZE  0x00000010
+#define ADDR_TWO_TONE_IDS         0x024C1100
+#define TWO_TONE_ID_SIZE          0x00000010
+static_assert(
+  TWO_TONE_ID_SIZE == sizeof(D868UVCodeplug::two_tone_id_t),
+  "D868UVCodeplug::two_tone_settings_t size check failed.");
+
+#define NUM_TWO_TONE_FUNCTIONS    16
+#define TWO_TONE_FUNCTIONS_BITMAP 0x024c2600
+#define TWO_TONE_FUNC_BITMAP_SIZE 0x00000010
+#define ADDR_TWO_TONE_FUNCTIONS   0x024c2400
+#define TWO_TONE_FUNCTION_SIZE    0x00000020
+static_assert(
+  TWO_TONE_FUNCTION_SIZE == sizeof(D868UVCodeplug::two_tone_function_t),
+  "D868UVCodeplug::two_tone_settings_t size check failed.");
 
 #define ADDR_TWO_TONE_SETTINGS    0x024C1290
 #define TWO_TONE_SETTINGS_SIZE    0x00000010
+static_assert(
+  TWO_TONE_SETTINGS_SIZE == sizeof(D868UVCodeplug::two_tone_settings_t),
+  "D868UVCodeplug::two_tone_settings_t size check failed.");
 
 #define ADDR_DMR_ENCRYPTION_LIST  0x024C1700
 #define DMR_ENCRYPTION_LIST_SIZE  0x00000040
@@ -1334,8 +1347,8 @@ D868UVCodeplug::D868UVCodeplug(QObject *parent)
   // 5-Tone function bitmaps
   image(0).addElement(FIVE_TONE_ID_BITMAP, FIVE_TONE_ID_BITMAP_SIZE);
   // 2-Tone function bitmaps
-  image(0).addElement(TWO_TONE_ENC_BITMAP, TWO_TONE_ENC_BITMAP_SIZE);
-  image(0).addElement(TWO_TONE_DEC_BITMAP, TWO_TONE_DEC_BITMAP_SIZE);
+  image(0).addElement(TWO_TONE_IDS_BITMAP, TWO_TONE_IDS_BITMAP_SIZE);
+  image(0).addElement(TWO_TONE_FUNCTIONS_BITMAP, TWO_TONE_FUNC_BITMAP_SIZE);
 }
 
 void
@@ -1366,9 +1379,10 @@ D868UVCodeplug::allocateUpdated() {
   this->allocate5ToneSettings();
 
   this->allocate2ToneIDs();
-  image(0).addElement(ADDR_TWO_TONE_SETTINGS, TWO_TONE_SETTINGS_SIZE);
+  this->allocate2ToneFunctions();
+  this->allocate2ToneSettings();
 
-  image(0).addElement(ADDR_DTMF_SETTINGS, DTMF_SETTINGS_SIZE);
+  this->allocateDTMFSettings();
 
   image(0).addElement(ADDR_DMR_ENCRYPTION_LIST, DMR_ENCRYPTION_LIST_SIZE);
   image(0).addElement(ADDR_DMR_ENCRYPTION_KEYS, DMR_ENCRYPTION_KEYS_SIZE);
@@ -2203,19 +2217,35 @@ D868UVCodeplug::allocate5ToneSettings() {
 void
 D868UVCodeplug::allocate2ToneIDs() {
   // Allocate 2-tone encoding
-  uint8_t *enc_bitmap = data(TWO_TONE_ENC_BITMAP);
-  for (uint8_t i=0; i<NUM_TWO_TONE_ENC_FUNC; i++) {
+  uint8_t *enc_bitmap = data(TWO_TONE_IDS_BITMAP);
+  for (uint8_t i=0; i<NUM_TWO_TONE_IDS; i++) {
     uint16_t  bit = i%8, byte = i/8;
     if (0 == (enc_bitmap[byte] & (1<<bit)))
       continue;
-    image(0).addElement(ADDR_TWO_TONE_ENC_FUNC + i*TWO_TONE_ENC_FUNC_SIZE, TWO_TONE_ENC_FUNC_SIZE);
+    image(0).addElement(ADDR_TWO_TONE_IDS + i*TWO_TONE_ID_SIZE, TWO_TONE_ID_SIZE);
   }
+}
+
+
+void
+D868UVCodeplug::allocate2ToneFunctions() {
   // Allocate 2-tone decoding
-  uint8_t *dec_bitmap = data(TWO_TONE_DEC_BITMAP);
-  for (uint8_t i=0; i<NUM_TWO_TONE_DEC_FUNC; i++) {
+  uint8_t *dec_bitmap = data(TWO_TONE_FUNCTIONS_BITMAP);
+  for (uint8_t i=0; i<NUM_TWO_TONE_FUNCTIONS; i++) {
     uint16_t  bit = i%8, byte = i/8;
     if (0 == (dec_bitmap[byte] & (1<<bit)))
       continue;
-    image(0).addElement(ADDR_TWO_TONE_DEC_FUNC + i*TWO_TONE_DEC_FUNC_SIZE, TWO_TONE_DEC_FUNC_SIZE);
+    image(0).addElement(ADDR_TWO_TONE_FUNCTIONS + i*TWO_TONE_FUNCTION_SIZE, TWO_TONE_FUNCTION_SIZE);
   }
+}
+
+void
+D868UVCodeplug::allocate2ToneSettings() {
+  image(0).addElement(ADDR_TWO_TONE_SETTINGS, TWO_TONE_SETTINGS_SIZE);
+}
+
+
+void
+D868UVCodeplug::allocateDTMFSettings() {
+  image(0).addElement(ADDR_DTMF_SETTINGS, DTMF_SETTINGS_SIZE);
 }

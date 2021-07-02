@@ -155,7 +155,7 @@ class GPSSystem;
  *    see @c five_tone_function_t.</td></tr>
  *  <tr><td>024C1000</td> <td>000080</td> <td>5-tone settings,
  *    see @c five_tone_settings_t. </td></tr>
- *  <tr><td>024C1080</td> <td>000050</td> <td>DTMF settings.</td></tr>
+ *  <tr><td>024C1080</td> <td>000050</td> <td>DTMF settings, see @c dtmf_settings_t.</td></tr>
  *  <tr><td>024C1280</td> <td>000010</td> <td>2-tone encoding bitmap.</td></tr>
  *  <tr><td>024C1100</td> <td>000010</td> <td>2-tone encoding.</td></tr>
  *  <tr><td>024C1290</td> <td>000010</td> <td>2-tone settings.</td></tr>
@@ -1235,7 +1235,8 @@ public:
     uint8_t _unused12[14];         ///< Unused bytes, set to 0x00.
   };
 
-  /** Binary representation of a 5-tone id.
+  /** Binary representation of a 5-tone id, that is 5-tone codes being send.
+   *
    * Size 0x20 bytes. */
   struct __attribute__((packed)) five_tone_id_t {
     /** Possible 5-tone encoding standards. */
@@ -1253,14 +1254,17 @@ public:
     uint8_t _pad1f;                ///< Pad byte, set to 0.
   };
 
-  /** Binary representation of a 5-tone function.
+  /** Binary representation of a 5-tone function, that is actions being performed on decoding of
+   * 5-tone codes.
+   *
    * Size 0x20 bytes. */
   struct __attribute__((packed)) five_tone_function_t {
+    /** Possible function being performed on 5-tone decoding. */
     enum Function : uint8_t {
       OPEN_SQUELCH=0, CALL_ALL, EMERGENCY_ALARM, REMOTE_KILL, REMOTE_STUN, REMOTE_WAKEUP,
       GROUP_CALL,
     };
-
+    /** Possible responses to 5-tone decoding. */
     enum Response : uint8_t {
       RESP_NONE=0, RESP_TONE, RESP_TONE_RESPOND
     };
@@ -1277,10 +1281,11 @@ public:
   /** Binary representation of the 5-tone settings.
    * Size 0x80 bytes. */
   struct __attribute__((packed)) five_tone_settings_t {
+    /** Possible responses to decoded 5-tone codes. */
     enum Response : uint8_t {
       RESP_NONE = 0, RESP_TONE, RESP_TONE_RESPOND
     };
-
+    /** Possible 5-tone standards. */
     enum Standard : uint8_t {
       ZVEI1 = 0, ZVEI2, ZVEI3, PZVEI, DZVEI, PDZVEI, CCIR1, CCIR2, PCCIR, EEA, EURO_SIGNAL, NATEL,
       MODAT, CCITT, EIA
@@ -1323,6 +1328,68 @@ public:
     uint8_t eot_id[12];            ///< EOT PTT ID, up to 24 BCD chars.
 
     uint8_t _unused70[16];         ///< Unused, set to 0x00.
+  };
+
+  /** Digital representation of the 2-tone ID, that is 2-tone codes being send. */
+  struct __attribute__((packed)) two_tone_id_t {
+    uint16_t frequencies[2];       ///< Tone frequencies in 0.1Hz, little endian.
+    uint32_t _unused04;            ///< Unused, set to 0.
+    char name[7];                  ///< Name, upto 7 ASCII chars, 0-pad.
+    uint8_t _pad0f;                ///< Pad byte, set to 0x00.
+  };
+
+  /** Binary encoding of the 2-tone function, that is actions being performed on a particular
+   * 2-tone code. */
+  struct __attribute__((packed)) two_tone_function_t {
+    /** Possible responses to a DTMF decode. */
+    enum Response : uint8_t {
+      RESP_NONE = 0, RESP_TONE, RESP_TONE_RESPOND
+    };
+
+    uint16_t frequencies[2];       ///< Tone frequencies in 0.1Hz, little endian.
+    Response response;             ///< Decoding response.
+    char name[7];                  ///< Name, upto 7 ASCII chars, 0-padded.
+    uint32_t _unused0c;            ///< Unused, set to 0.
+    uint8_t _unused10[16];         ///< Unused, set to 0x00.
+  };
+
+  /** Binary representation of the 2-tone settings. */
+  struct __attribute__((packed)) two_tone_settings_t {
+    uint8_t _unused00[9];          ///< Unused, set to 0x00.
+    uint8_t tone1_dur;             ///< First tone duration in multiples of 100ms.
+    uint8_t tone2_dur;             ///< Second tone duration in multiples of 100ms.
+    uint8_t long_tone_dur;         ///< Long tone duration in multiples of 100ms.
+    uint8_t gap_time;              ///< Gap time in multiples of 10ms.
+    uint8_t auto_reset_time;       ///< Auto-reset time in multiples of 10s.
+    uint8_t sidetone_enable;       ///< Side-tone enable.
+    uint8_t _unused0f;             ///< Unused, set to 0x00.
+  };
+
+  /** Binary representation of the DTMF settings. */
+  struct __attribute__((packed)) dtmf_settings_t {
+    /** Possible responses to a DTMF decode. */
+    enum Response : uint8_t {
+      RESP_NONE=0, RESP_TONE, RESP_TONE_RESPOND
+    };
+
+    uint8_t interval_symb;         ///< Interval charater [0x0,0xf].
+    uint8_t group_code;            ///< Group code [0x0,0xf].
+    Response response;             ///< Decoding response.
+    uint8_t pre_time;              ///< Pretime in multiple of 10ms.
+    uint8_t first_digit_time;      ///< First digit duration in multiple of 10ms.
+    uint8_t auto_reset_time;       ///< Auto-reset time in multiple of 10s.
+    uint8_t my_id[3];              ///< Self-ID 3 chars [0x0,0xf].
+    uint8_t post_enc_delay;        ///< Post encoding delay in multiple of 10ms.
+    uint8_t ptt_id_pause;          ///< PTT ID pause time in seconds.
+    uint8_t ptt_id_enable;         ///< PTT ID enable.
+    uint8_t d_code_pause;          ///< D-code pause in seconds.
+    uint8_t sidetone_enable;       ///< Side-tone enable.
+    uint16_t _unused0e;            ///< Unused set 0.
+
+    uint8_t bot_id[16];            ///< BOT PTT ID, max 16 chars [0x0-0xf], pad=0xff.
+    uint8_t eot_id[16];            ///< EOT PTT ID, max 16 chars [0x0-0xf], pad=0xff.
+    uint8_t remote_kill_id[16];    ///< Remote kill id, max 16 chars [0x0-0xf], pad=0xff.
+    uint8_t remote_stun_id[16];    ///< Remote stun id, max 16 chars [0x0-0xf], pad=0xff.
   };
 
   /** Represents an entry in the DMR ID -> contact map within the binary code-plug. */
@@ -1487,8 +1554,15 @@ protected:
   /** Allocates 5-Tone settings. */
   virtual void allocate5ToneSettings();
 
-  /** Allocates all 2-Tone functions used. */
+  /** Allocates all 2-Tone IDs used. */
   virtual void allocate2ToneIDs();
+  /** Allocates 2-Tone functions. */
+  virtual void allocate2ToneFunctions();
+  /** Allocates 2-Tone settings. */
+  virtual void allocate2ToneSettings();
+
+  /** Allocates DTMF settings. */
+  virtual void allocateDTMFSettings();
 
   /** Internal used function to encode CTCSS frequencies. */
   static uint8_t ctcss_code2num(Signaling::Code code);
