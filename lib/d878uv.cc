@@ -76,6 +76,7 @@ D878UV::D878UV(AnytoneInterface *device, QObject *parent)
 {
   _codeplug = new D878UVCodeplug(this);
   _callsigns = new D868UVCallsignDB(this);
+  _supported_version = "V100";
 
   // Get device info and determine supported TX frequency bands
   AnytoneInterface::RadioInfo info; _dev->getInfo(info);
@@ -141,30 +142,11 @@ D878UV::D878UV(AnytoneInterface *device, QObject *parent)
   }
   logDebug() << "Got band-code " << QString::number(int(info.bands), 16)
              << ": Limit TX frequencies to " << bands.join(", ") << ".";
+
+  _version = info.version;
 }
 
 const Radio::Features &
 D878UV::features() const {
   return _features;
-}
-
-
-VerifyIssue::Type
-D878UV::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlags &flags) {
-  QString supported = "V100";
-  VerifyIssue::Type issue = AnytoneRadio::verifyConfig(config, issues, flags);
-  if (supported < _version) {
-    issues.append(VerifyIssue(
-                    VerifyIssue::WARNING,
-                    tr("You are likely running a newer firmware version (%1) than supported (%2) by qdmr. "
-                       "Notify the developers of qdmr about the new firmware version.").arg(_version, supported)));
-    issue = std::max(issue, VerifyIssue::WARNING);
-  } else if (supported > _version) {
-    issues.append(VerifyIssue(
-                    VerifyIssue::WARNING,
-                    tr("You are likely running an older firmware version (%1) than supported (%2) by qdmr. "
-                       "Condsider updating your firmware.").arg(_version, supported)));
-    issue = std::max(issue, VerifyIssue::WARNING);
-  }
-  return issue;
 }

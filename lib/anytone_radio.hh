@@ -46,6 +46,9 @@ public:
   const CodePlug &codeplug() const;
   CodePlug &codeplug();
 
+  VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
+                                 const VerifyFlags &flags=VerifyFlags());
+
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
   void run();
@@ -87,6 +90,8 @@ protected:
   AnytoneCodeplug *_codeplug;
   /** The actual binary callsign database representation. */
   CallsignDB *_callsigns;
+  /** Holds the hardware version supported by qdmr. Used for codeplug compatibility. */
+  QString _supported_version;
   /** Holds the hardware version of the radio. Used for codeplug compatibility. */
   QString _version;
 };
