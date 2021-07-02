@@ -134,7 +134,9 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">Misc</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C1400</td> <td>000020</td> <td>Alarm setting, see @c analog_alarm_setting_t.</td></tr>
+ *  <tr><td>024C1400</td> <td>000020</td> <td>Alarm setting, see @c alarm_setting_t.</td></tr>
+ *  <tr><td>024C1440</td> <td>000030</td> <td>Digital alarm settings extension,
+ *   see @c digital_alarm_settings_ext_t. </td></tr>
  *
  *  <tr><th colspan="3">FM Broadcast</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -157,11 +159,11 @@ class GPSSystem;
  *  <tr><td>024C2600</td> <td>000010</td> <td>2-tone decoding bitmap.</td></tr>
  *  <tr><td>024C2400</td> <td>000030</td> <td>2-tone decoding.</td></tr>
  *
- *  <tr><th colspan="3">Still unknown</th></tr>
+ *  <tr><th colspan="3">Encryption</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C1440</td> <td>000030</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C1700</td> <td>000040</td> <td>Unknown, 8bit indices.</td></tr>
- *  <tr><td>024C1800</td> <td>000500</td> <td>Empty, set to 0x00?</td></tr>
+ *  <tr><td>024C1700</td> <td>000040</td> <td>32 Encryption IDs, 0-based, 16bit big-endian.</td></tr>
+ *  <tr><td>024C1800</td> <td>000500</td> <td>32 DMR-Encryption keys, see @c dmr_encryption_key_t,
+ *    40b each.</td></tr>
  * </table>
  *
  * @ingroup d868uv */
@@ -1133,31 +1135,101 @@ public:
     uint8_t _unused9[39];          ///< Unused, set to 0x00.
   };
 
+  /** Alarm settings. */
+  struct __attribute__((packed)) alarm_settings_t {
+    /** Possible alarm channel selections. */
+    enum ChannelSelect : uint8_t {
+      ASSIGNED_CHANNEL = 0,        ///< The assigned channel.
+      CURRENT_CHANNEL = 1          ///< The current channel.
+    };
 
-  /** Binary representation of the analog alarm settings.
-   * Size 0x6 bytes. */
-  struct __attribute__((packed)) analog_alarm_setting_t {
-    /** Possible alarm types. */
-    typedef enum {
-      ALARM_AA_NONE = 0,           ///< No alarm at all.
-      ALARM_AA_TX_AND_BG = 1,      ///< Transmit and background.
-      ALARM_AA_TX_AND_ALARM = 2,   ///< Transmit and alarm
-      ALARM_AA_BOTH = 3,           ///< Both?
-    } Action;
+    /** Binary representation of the analog alarm settings.
+     * Size 0x6 bytes. */
+    struct __attribute__((packed)) analog_alarm_setting_t {
+      /** Possible alarm types. */
+      enum Action : uint8_t {
+        ALARM_AA_NONE = 0,           ///< No alarm at all.
+        ALARM_AA_TX_AND_BG = 1,      ///< Transmit and background.
+        ALARM_AA_TX_AND_ALARM = 2,   ///< Transmit and alarm
+        ALARM_AA_BOTH = 3,           ///< Both?
+      };
 
-    /** Possible alarm signalling types. */
-    typedef enum {
-      ALARM_ENI_NONE = 0,          ///< No alarm code signalling.
-      ALARM_ENI_DTMF = 1,          ///< Send alarm code as DTMF.
-      ALARM_ENI_5TONE = 2          ///< Send alarm code as 5-tone.
-    } ENIType;
+      /** Possible alarm signalling types. */
+      enum ENIType : uint8_t {
+        ALARM_ENI_NONE = 0,          ///< No alarm code signalling.
+        ALARM_ENI_DTMF = 1,          ///< Send alarm code as DTMF.
+        ALARM_ENI_5TONE = 2          ///< Send alarm code as 5-tone.
+      };
 
-    uint8_t action;                ///< Action to take, see @c Action.
-    uint8_t eni_type;              ///< ENI type, see @c ENIType.
-    uint8_t emergency_id_idx;      ///< Emergency ID index, 0-based.
-    uint8_t time;                  ///< Alarm time in seconds, default 10.
-    uint8_t tx_dur;                ///< TX duration in seconds, default 10.
-    uint8_t rx_dur;                ///< RX duration in seconds, default 60.
+      Action action;                 ///< Action to take, see @c Action.
+      ENIType eni_type;              ///< ENI type, see @c ENIType.
+      uint8_t emergency_id_idx;      ///< Emergency ID index, 0-based.
+      uint8_t time;                  ///< Alarm time in seconds, default 10.
+      uint8_t tx_dur;                ///< TX duration in seconds, default 10.
+      uint8_t rx_dur;                ///< RX duration in seconds, default 60.
+      uint16_t channel;              ///< Emergency channel index, 16bit little-endian, analog channels only.
+      ChannelSelect channel_select;  ///< ENI Channel select, 0=assigned, 1=current.
+      uint8_t alarm_repeat;          ///< Alarm repeat 0=Continuous, 1..255.
+    };
+
+    /** Encodes digital alarm settings.
+     * Size 12b. */
+    struct __attribute__((packed)) digital_alarm_settings_t {
+      /** Possible alarm types. */
+      enum Action : uint8_t {
+        ALARM_DA_NONE = 0,           ///< No alarm at all.
+        ALARM_DA_TX_AND_BG = 1,      ///< Transmit and background.
+        ALARM_DA_TX_AND_NLOC = 2,    ///< Transmit and non-local alarm.
+        ALARM_DA_TX_AND_LOC = 3,     ///< Transmit and local alarm.
+      };
+
+      /** Possible alarm PTT methods. */
+      enum MicBroadcast : uint8_t {
+        MIC_BC_PTT = 0,
+        MIC_BC_VOX = 1
+      };
+
+      Action action;                 ///< Action to take, see @c Action.
+      uint8_t time;                  ///< Alarm time in seconds, default 10.
+      uint8_t tx_dur;                ///< TX duration in seconds, default 10.
+      uint8_t rx_dur;                ///< RX duration in seconds, default 60.
+      uint16_t channel;              ///< Emergency channel index, 16bit little-endian, digital channels only.
+      ChannelSelect channel_select;  ///< ENI Channel select, 0=assigned, 1=current.
+      uint8_t alarm_repeat;          ///< Alarm repeat 0=Continuous, 1..255.
+      uint8_t voice_sw_bc;           ///< Voice switch broadcast, 0=1min, ..., 255=256min.
+      uint8_t area_sw_bc;            ///< Area switch broadcast, 0=1min, ..., 255=256min.
+      MicBroadcast mic_bc;           ///< Mic broadcast.
+      uint8_t rx_alarm;              ///< Receive alarm broadcasts, 0=off, 1=on.
+    };
+
+    analog_alarm_setting_t analog;    ///< Analog alarm settings.
+    digital_alarm_settings_t digital; ///< Digital alarm settings.
+    uint8_t _unused16[10];            ///< Unused, set to 0x00.
+  };
+
+  /** Some extension to the digital alarm settings. */
+  struct __attribute__((packed)) digital_alarm_settings_ext_t {
+    /** Represents the digital alarm call type. */
+    enum CallType : uint8_t {
+      PRIVATE_CALL = 0,            ///< A private call.
+      GROUP_CALL   = 1,            ///< A group call.
+      ALL_CALL     = 2             ///< An all call.
+    };
+
+    CallType call_type;            ///<The call type of the alaram.
+    uint8_t _unused01[15];         ///< Unused set to 0x00.
+    uint8_t _unused10[16];         ///< Unused set to 0x00.
+    uint8_t _unused20[3];          ///< Unused set to 0x00.
+    uint32_t destination;          ///< Alarm destination DMR ID, BCD encoded.
+    uint8_t _unused27[9];          ///< Unused, set to 0x00.
+  };
+
+  /** Binary representation of a dmr encryption key.
+   * Size 0x28 bytes. */
+  struct __attribute__((packed)) dmr_encryption_key_t {
+    uint8_t _unused00[16];         ///< Unused bytes, set to 0x00.
+    uint16_t key;                  ///< Key, 4-digit hex as BCD?!?
+    uint8_t _unused12[14];         ///< Unused bytes, set to 0x00.
   };
 
   /** Represents an entry in the DMR ID -> contact map within the binary code-plug. */

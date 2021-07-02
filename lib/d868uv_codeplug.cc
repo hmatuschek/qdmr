@@ -151,6 +151,15 @@ static_assert(
 
 #define ADDR_ALARM_SETTING        0x024C1400
 #define ALARM_SETTING_SIZE        0x00000020
+static_assert(
+  ALARM_SETTING_SIZE == sizeof(D868UVCodeplug::alarm_settings_t),
+  "D868UVCodeplug::alarm_settings_t size check failed.");
+
+#define ADDR_ALARM_SETTING_EXT    0x024c1440
+#define ALARM_SETTING_EXT_SIZE    0x00000030
+static_assert(
+  ALARM_SETTING_EXT_SIZE == sizeof(D868UVCodeplug::digital_alarm_settings_ext_t),
+  "D868UVCodeplug::digital_alarm_settings_ext_t size check failed.");
 
 #define FMBC_BITMAP               0x02480210
 #define FMBC_BITMAP_SIZE          0x00000020
@@ -189,6 +198,10 @@ static_assert(
 #define ADDR_TWO_TONE_SETTINGS    0x024C1290
 #define TWO_TONE_SETTINGS_SIZE    0x00000010
 
+#define ADDR_DMR_ENCRYPTION_LIST  0x024C1700
+#define DMR_ENCRYPTION_LIST_SIZE  0x00000040
+#define ADDR_DMR_ENCRYPTION_KEYS  0x024C1800
+#define DMR_ENCRYPTION_KEYS_SIZE  0x00000500
 
 using namespace Signaling;
 
@@ -1340,10 +1353,8 @@ D868UVCodeplug::allocateUpdated() {
   image(0).addElement(ADDR_DTMF_SETTINGS, DTMF_SETTINGS_SIZE);
   image(0).addElement(ADDR_TWO_TONE_SETTINGS, TWO_TONE_SETTINGS_SIZE);
 
-  // Unknown memory region
-  image(0).addElement(0x024C1440, 0x030);
-  image(0).addElement(0x024C1700, 0x040);
-  image(0).addElement(0x024C1800, 0x500);
+  image(0).addElement(ADDR_DMR_ENCRYPTION_LIST, DMR_ENCRYPTION_LIST_SIZE);
+  image(0).addElement(ADDR_DMR_ENCRYPTION_KEYS, DMR_ENCRYPTION_KEYS_SIZE);
 }
 
 void
@@ -2141,6 +2152,7 @@ void
 D868UVCodeplug::allocateAlarmSettings() {
   // Alarm settings
   image(0).addElement(ADDR_ALARM_SETTING, ALARM_SETTING_SIZE);
+  image(0).addElement(ADDR_ALARM_SETTING_EXT, ALARM_SETTING_EXT_SIZE);
 }
 
 void

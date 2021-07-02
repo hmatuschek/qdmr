@@ -173,15 +173,21 @@ class GPSSystem;
  *  <tr><td>025C0500</td> <td>000360</td> <td>18 hot-key settings, see
  *    @c D868UVCodeplug::hotkey_t</td></tr>
  *
- *  <tr><th colspan="3">Encryption keys</th></tr>
+ *  <tr><th colspan="3">Encryption</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
+ *  <tr><td>024C1700</td> <td>000040</td> <td>32 Encryption IDs, 0-based, 16bit big-endian.</td></tr>
+ *  <tr><td>024C1800</td> <td>000500</td> <td>32 DMR-Encryption keys,
+ *    see @c D868UVCodeplug::dmr_encryption_key_t,
+ *    40b each.</td></tr>
  *  <tr><td>024C4000</td> <td>004000</td> <td>Upto 256 AES encryption keys.
  *    See @c encryption_key_t.</td></tr>
  *
  *  <tr><th colspan="3">Misc</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C1400</td> <td>000020</td> <td>Alarm setting, see
- *    @c D868UVCodeplug::analog_alarm_setting_t.</td></tr>
+ *  <tr><td>024C1400</td> <td>000020</td> <td>Alarm setting,
+ *    see @c D868UVCodeplug::alarm_setting_t.</td></tr>
+ *  <tr><td>024C1440</td> <td>000030</td> <td>Digital alarm settings extension,
+ *    see @c D868UVCodeplug::digital_alarm_settings_ext_t. </td></tr>
  *
  *  <tr><th colspan="3">FM Broadcast</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -203,12 +209,6 @@ class GPSSystem;
  *  <tr><td>024C1290</td> <td>000010</td> <td>2-tone settings.</td></tr>
  *  <tr><td>024C2600</td> <td>000010</td> <td>2-tone decoding bitmap.</td></tr>
  *  <tr><td>024C2400</td> <td>000030</td> <td>2-tone decoding.</td></tr>
- *
- *  <tr><th colspan="3">Still unknown</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C1440</td> <td>000030</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C1700</td> <td>000040</td> <td>Unknown, 8bit indices.</td></tr>
- *  <tr><td>024C1800</td> <td>000500</td> <td>Empty, set to 0x00?</td></tr>
  *
  * </table>
  *
