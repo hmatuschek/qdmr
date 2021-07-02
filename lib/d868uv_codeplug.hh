@@ -148,10 +148,13 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">DTMF, 2-tone & 5-tone signaling.</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>024C0C80</td> <td>000010</td> <td>5-tone encoding bitmap.</td></tr>
- *  <tr><td>024C0000</td> <td>000020</td> <td>5-tone encoding.</td></tr>
- *  <tr><td>024C0D00</td> <td>000200</td> <td>5-tone ID list.</td></tr>
- *  <tr><td>024C1000</td> <td>000080</td> <td>5-tone settings.</td></tr>
+ *  <tr><td>024C0C80</td> <td>000010</td> <td>5-tone encoding bitmap for 100 IDs.</td></tr>
+ *  <tr><td>024C0000</td> <td>000020</td> <td>List of 100 5-tone IDs,
+ *    see @c five_tone_id_t</td></tr>
+ *  <tr><td>024C0D00</td> <td>000200</td> <td>List of 16 5-tone functions,
+ *    see @c five_tone_function_t.</td></tr>
+ *  <tr><td>024C1000</td> <td>000080</td> <td>5-tone settings,
+ *    see @c five_tone_settings_t. </td></tr>
  *  <tr><td>024C1080</td> <td>000050</td> <td>DTMF settings.</td></tr>
  *  <tr><td>024C1280</td> <td>000010</td> <td>2-tone encoding bitmap.</td></tr>
  *  <tr><td>024C1100</td> <td>000010</td> <td>2-tone encoding.</td></tr>
@@ -1232,6 +1235,96 @@ public:
     uint8_t _unused12[14];         ///< Unused bytes, set to 0x00.
   };
 
+  /** Binary representation of a 5-tone id.
+   * Size 0x20 bytes. */
+  struct __attribute__((packed)) five_tone_id_t {
+    /** Possible 5-tone encoding standards. */
+    enum EncStandard : uint8_t {
+      ZVEI1 = 0, ZVEI2, ZVEI3, PZVEI, DZVEI, PDZVEI, CCIR1, CCIR2, PCCIR, EEA, EURO_SIGNAL, NATEL,
+      MODAT, CCITT, EIA
+    };
+
+    uint8_t _unused00;             ///< Unused, set to 0x00.
+    EncStandard standard;          ///< Specifies the encoding standard.
+    uint8_t id_length;             ///< Length of ID in bytes.
+    uint8_t tone_dur;              ///< Tone duration in ms.
+    uint8_t id[20];                ///< ID, 40 BCD values (20 bytes).
+    uint8_t name[7];               ///< Name, 7 chars ASCII.
+    uint8_t _pad1f;                ///< Pad byte, set to 0.
+  };
+
+  /** Binary representation of a 5-tone function.
+   * Size 0x20 bytes. */
+  struct __attribute__((packed)) five_tone_function_t {
+    enum Function : uint8_t {
+      OPEN_SQUELCH=0, CALL_ALL, EMERGENCY_ALARM, REMOTE_KILL, REMOTE_STUN, REMOTE_WAKEUP,
+      GROUP_CALL,
+    };
+
+    enum Response : uint8_t {
+      RESP_NONE=0, RESP_TONE, RESP_TONE_RESPOND
+    };
+
+    Function function;             ///< The function to perform.
+    Response response;             ///< Response type.
+    uint8_t id_length;             ///< Length of ID.
+    uint8_t id[12];                ///< The ID, 1 byte per char ([0-9A-F]).
+    char    name[7];               ///< Function name, max 7 bytes ASCII.
+    uint8_t _pad17;                ///< Pad byte, set to 0.
+    uint8_t _unused18[9];          ///< Unused, set to 0x00.
+  };
+
+  /** Binary representation of the 5-tone settings.
+   * Size 0x80 bytes. */
+  struct __attribute__((packed)) five_tone_settings_t {
+    enum Response : uint8_t {
+      RESP_NONE = 0, RESP_TONE, RESP_TONE_RESPOND
+    };
+
+    enum Standard : uint8_t {
+      ZVEI1 = 0, ZVEI2, ZVEI3, PZVEI, DZVEI, PDZVEI, CCIR1, CCIR2, PCCIR, EEA, EURO_SIGNAL, NATEL,
+      MODAT, CCITT, EIA
+    };
+
+    uint8_t _unknown00[32];        ///< Unknown data.
+
+    uint8_t _unused20;             ///< Unused, set to 0x00.
+    Response response;             ///< The decoding response.
+    Standard decoding_standard;    ///< The decoding standard.
+    uint8_t self_id_length;        ///< Length of self ID.
+    uint8_t dec_tone_duration;     ///< Decoding tone duration in ms.
+    uint8_t self_id[7];            ///< Self ID, max 7 chars ([0-9A-F]).
+    uint8_t post_encode_delay;     ///< Post encoding delay in multiple of 10ms.
+    uint8_t ptt_id;                ///< PTT ID, 0=off, [5,75].
+    uint8_t auto_reset_time;       ///< Auto-reset time in multiples of 10s.
+    uint8_t first_delay;           ///< First delay in multiple of 10ms;
+
+    uint8_t sidetone_enable;       ///< Side-tone enable.
+    uint8_t _unknown31;            ///< Unknown byte.
+    uint8_t stop_code;             ///< Stop code [0x0, 0xf].
+    uint8_t stop_time;             ///< Stop time in multiple of 10ms.
+    uint8_t decode_time;           ///< Decode time in multiple of 10ms.
+    uint8_t first_delay_after_stop;///< First delay after stop, in multiple of 10ms.
+    uint8_t pre_time;              ///< Pre-time, in multiple of 10ms.
+    uint8_t _unused37[9];          ///< Unused, set to 0x00.
+
+    uint8_t _unused40;             ///< Unused, set to 0x00.
+    Standard bot_stardard;         ///< BOT encoding standard.
+    uint8_t bot_id_length;         ///< BOT PTT ID length.
+    uint8_t bot_tone_duration;     ///< BOT encoding tone duration in ms.
+    uint8_t bot_id[12];            ///< BOT PTT ID, up to 24 BCD chars.
+
+    uint8_t _unused50[16];         ///< Unused, set to 0x00.
+
+    uint8_t _unused60;             ///< Unused, set to 0x00.
+    Standard eot_stardard;         ///< EOT encoding standard.
+    uint8_t eot_id_length;         ///< EOT PTT ID length.
+    uint8_t eot_tone_duration;     ///< EOT encoding tone duration in ms.
+    uint8_t eot_id[12];            ///< EOT PTT ID, up to 24 BCD chars.
+
+    uint8_t _unused70[16];         ///< Unused, set to 0x00.
+  };
+
   /** Represents an entry in the DMR ID -> contact map within the binary code-plug. */
   struct __attribute__((packed)) contact_map_t {
     uint32_t id_group;             ///< Combined ID and group-call flag. The ID is encoded in
@@ -1386,10 +1479,16 @@ protected:
   virtual void allocateAlarmSettings();
   /** Allocates FM broadcast settings memory section. */
   virtual void allocateFMBroadcastSettings();
-  /** Allocates all 5-Tone functions used. */
+
+  /** Allocates all 5-Tone IDs used. */
+  virtual void allocate5ToneIDs();
+  /** Allocates 5-Tone functions. */
   virtual void allocate5ToneFunctions();
+  /** Allocates 5-Tone settings. */
+  virtual void allocate5ToneSettings();
+
   /** Allocates all 2-Tone functions used. */
-  virtual void allocate2ToneFunctions();
+  virtual void allocate2ToneIDs();
 
   /** Internal used function to encode CTCSS frequencies. */
   static uint8_t ctcss_code2num(Signaling::Code code);
