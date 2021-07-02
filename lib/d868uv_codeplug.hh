@@ -100,15 +100,15 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">GPS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02501000</td> <td>000030</td> <td>GPS settings, see @c gps_setting_t.</td>
+ *  <tr><td>02501000</td> <td>000030</td> <td>GPS settings, see @c gps_settings_t.</td>
  *  <tr><td>02501100</td> <td>000030</td> <td>GPS message.</td>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02500000</td> <td>0000D0</td> <td>General settings, see @c general_settings_t.</td></tr>
+ *  <tr><td>02500000</td> <td>0000D0</td> <td>General settings, see @c general_settings_base_t.</td></tr>
  *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
- *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings</td></tr>
+ *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings, see @c boot_settings_t.</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
  *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000. Default 0x00000000, 0x00 padded.</td></tr>
  *

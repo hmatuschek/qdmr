@@ -595,8 +595,12 @@ D878UVCodeplug::aprs_setting_t::getAutoTXInterval() const {
 }
 void
 D878UVCodeplug::aprs_setting_t::setAutoTxInterval(int sec) {
-  // round up to multiples of 30
-  auto_tx_interval = (sec+29)/30;
+  if (0 == sec)
+    auto_tx_interval = 0;
+  else if (30 >= sec)
+    auto_tx_interval = 1;
+  else
+    auto_tx_interval = (sec-16)/15;
 }
 
 int
@@ -605,7 +609,6 @@ D878UVCodeplug::aprs_setting_t::getManualTXInterval() const {
 }
 void
 D878UVCodeplug::aprs_setting_t::setManualTxInterval(int sec) {
-  // round up to multiples of 30
   manual_tx_interval = sec;
 }
 

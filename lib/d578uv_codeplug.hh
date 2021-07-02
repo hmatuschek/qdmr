@@ -102,17 +102,17 @@ class GPSSystem;
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings, see @c D878UVCodeplug::aprs_setting_t.</td>
  *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings, see @c D878UVCodeplug::gps_systems_t.</td>
- *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings, see @c aprs_setting_ext_t.</tr>
+ *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings, see @c D878UVCodeplug::aprs_setting_ext_t.</tr>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, upto 60 chars ASCII, 0-padded.</td>
  *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
- *    See @c aprs_rx_entry_t.</td></tr>
+ *    See @c D878UVCodeplug::aprs_rx_entry_t.</td></tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02500000</td> <td>000100</td> <td>General settings, see @c D878UVCodeplug::general_settings_base_t.</td></tr>
  *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
- *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings</td></tr>
+ *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings, see @c D868UVCodeplug::boot_settings_t.</td></tr>
  *  <tr><td>02501280</td> <td>000030</td> <td>General settings extension 1, see @c D878UVCodeplug::general_settings_ext1_t.</td></tr>
  *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2, see @c D878UVCodeplug::general_settings_ext2_t.</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
