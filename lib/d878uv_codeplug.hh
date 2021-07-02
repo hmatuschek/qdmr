@@ -123,13 +123,17 @@ class GPSSystem;
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings, see @c aprs_setting_t.</td>
  *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings, see @c gps_systems_t.</td>
+ *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings, see @c aprs_setting_ext_t.</tr>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, upto 60 chars ASCII, 0-padded.</td>
+ *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
+ *    See @c aprs_rx_entry_t.</td></tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02500000</td> <td>000100</td> <td>General settings, see @c general_settings_base_t.</td></tr>
  *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
+ *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings</td></tr>
  *  <tr><td>02501280</td> <td>000030</td> <td>General settings extension 1, see @c general_settings_ext1_t.</td></tr>
  *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2, see @c general_settings_ext2_t.</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
@@ -190,6 +194,7 @@ class GPSSystem;
  *  <tr><td>024C1440</td> <td>000030</td> <td>Unknown data.</td></tr>
  *  <tr><td>024C1700</td> <td>000040</td> <td>Unknown, 8bit indices.</td></tr>
  *  <tr><td>024C1800</td> <td>000500</td> <td>Empty, set to 0x00?</td></tr>
+ *
  * </table>
  *
  * @ingroup d878uv */
@@ -886,7 +891,7 @@ public:
     } Hemisphere;
 
     // byte 0x00
-    uint8_t _unknown0;             ///< Unknown, set to 0xff.
+    uint8_t _unknown0;             ///< Unknown, set to 0x00.
     uint32_t frequency;            ///< TX frequency, BCD encoded, little endian in 10Hz.
     uint8_t tx_delay;              ///< TX delay, multiples of 20ms, default=1200ms.
     uint8_t sig_type;              ///< Signalling type, 0=off, 1=ctcss, 2=dcs, default=off.
@@ -986,6 +991,41 @@ public:
     void linkAPRSSystem(APRSSystem *sys, CodeplugContext &ctx);
   };
 
+
+  /** Represents an extension to the APRS settings.
+   *
+   * Memmory layout of APRS settings (0x60byte):
+   * @verbinclude d878uvaprssettingext.txt */
+  struct __attribute__((packed)) aprs_setting_ext_t {
+    uint8_t _unknown0000[8];            ///< Unknown settings block.
+    uint8_t rep_position : 1,           ///< Report position flag.
+      rep_mic_e          : 1,           ///< Report MIC-E flag.
+      rep_object         : 1,           ///< Report object flag.
+      rep_item           : 1,           ///< Report item flag.
+      rep_message        : 1,           ///< Report message flag.
+      rep_wx             : 1,           ///< WX report flag.
+      rep_nmea           : 1,           ///< NMEA report flag.
+      rep_status         : 1;           ///< Report status flag.
+    uint8_t rep_other    : 1,           ///< Report "other" flag.
+      _unused0009_1      :7;            ///< Unused set to 0.
+    uint8_t _unknown000a[6];            ///< Unknown settings block.
+
+    uint8_t _unknown0010[16];           ///< Unknown settings block.
+    uint8_t _unknown0020[16];           ///< Unknown settings block.
+    uint8_t _unknown0030[16];           ///< Unknown settings block.
+    uint8_t _unknown0040[16];           ///< Unknown settings block.
+    uint8_t _unknown0050[16];           ///< Unknown settings block.
+  };
+
+  /** Represents an APRS RX entry.
+   *
+   * Memmory layout of APRS-RX entry (0x100byte):
+   * @verbinclude d878uvaprsexentry.txt */
+  struct __attribute__((packed)) aprs_rx_entry_t {
+    uint8_t enabled;                    ///< Enabled entry 0x01=on, 0x00=off.
+    char    call[6];                    ///< Callsign, 6x ASCII, 0-terminated.
+    uint8_t ssid;                       ///< SSID [0,15], 16=off.
+  };
 
   /** Represents the 8 GPS systems within the binary codeplug.
    *

@@ -32,33 +32,15 @@
 #define CONTACT_ID_MAP            0x04800000 // Address of ID->Contact index map
 #define CONTACT_ID_ENTRY_SIZE     sizeof(contact_map_t) // Size of each map entry
 
-#define NUM_APRS_RX_ENTRY         32
-#define ADDR_APRS_RX_ENTRY        0x02501800 // Address of APRS RX list
-#define APRS_RX_ENTRY_SIZE        0x00000008 // Size of each APRS RX entry
-static_assert(
-  APRS_RX_ENTRY_SIZE == sizeof(D578UVCodeplug::aprs_rx_entry_t),
-  "D578UVCodeplug::aprs_rx_entry_t size check failed.");
+#define ADDR_HOTKEY               0x025C0000 // Same address as D868UV::hotkey_settings_t
+#define HOTKEY_SIZE               0x00000970 // Different size.
 
-#define ADDR_APRS_SET_EXT         0x025010A0 // Address of APRS settings extension
-#define APRS_SET_EXT_SIZE         0x00000060 // Size of APRS settings extension
-static_assert(
-  APRS_SET_EXT_SIZE == sizeof(D578UVCodeplug::aprs_setting_ext_t),
-  "D578UVCodeplug::aprs_setting_ext_t size check failed.");
-
-#define ADDR_HOTKEY               0x025C0000
-#define HOTKEY_SIZE               0x00000970
-
-#define ADDR_UNKNOWN_SETTING      0x02500600 // Address of unknown settings
-#define UNKNOWN_SETTING_SIZE      0x00000030 // Size of unknown settings.
-
-#define ADDR_UNKNOWN_SETTING_2    0x02BC0000 // Address of unknown settings
+#define ADDR_UNKNOWN_SETTING_1    0x02BC0000 // Address of unknown settings
+#define UNKNOWN_SETTING_1_SIZE    0x00000020 // Size of unknown settings.
+#define ADDR_UNKNOWN_SETTING_2    0x02BC0C60 // Address of unknown settings
 #define UNKNOWN_SETTING_2_SIZE    0x00000020 // Size of unknown settings.
-
-#define ADDR_UNKNOWN_SETTING_3    0x02BC0C60 // Address of unknown settings
-#define UNKNOWN_SETTING_3_SIZE    0x00000020 // Size of unknown settings.
-
-#define ADDR_UNKNOWN_SETTING_4    0x02BC1000 // Address of unknown settings
-#define UNKNOWN_SETTING_4_SIZE    0x00000060 // Size of unknown settings.
+#define ADDR_UNKNOWN_SETTING_3    0x02BC1000 // Address of unknown settings
+#define UNKNOWN_SETTING_3_SIZE    0x00000060 // Size of unknown settings.
 
 
 /* ******************************************************************************************** *
@@ -455,16 +437,11 @@ D578UVCodeplug::D578UVCodeplug(QObject *parent)
 
 void
 D578UVCodeplug::allocateUpdated() {
-  // allocate everything from D878UV codeplug
-  D878UVCodeplug::allocateUpdated();
+  D868UVCodeplug::allocateUpdated();
 
-  // allocate unknown settings
-  image(0).addElement(ADDR_UNKNOWN_SETTING, UNKNOWN_SETTING_SIZE);
-
-  // allocate APRS RX list
-  image(0).addElement(ADDR_APRS_RX_ENTRY, NUM_APRS_RX_ENTRY*APRS_RX_ENTRY_SIZE);
-  // allocate APRS settings extension
-  image(0).addElement(ADDR_APRS_SET_EXT, APRS_SET_EXT_SIZE);
+  image(0).addElement(ADDR_UNKNOWN_SETTING_1, UNKNOWN_SETTING_1_SIZE);
+  image(0).addElement(ADDR_UNKNOWN_SETTING_2, UNKNOWN_SETTING_2_SIZE);
+  image(0).addElement(ADDR_UNKNOWN_SETTING_3, UNKNOWN_SETTING_3_SIZE);
 }
 
 void
