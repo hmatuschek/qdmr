@@ -17,6 +17,8 @@ Currently, there are only few radios that are supported
   * TYT MD-UV390 / Retevis RT3S
   * Anytone AT-D878UV (since version 0.5.0)
   * Anytone AT-D868UVE (since version 0.7.0)
+  * Anytone AT-D878UVII (since version 0.8.0)
+  * Anytone AT-D578UV (since version 0.8.0)
 
 A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available. 
 The limited amount of supported radios is due to the fact that I only
