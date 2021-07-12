@@ -27,7 +27,7 @@ class VerifyIssue {
 public:
   /** Issue type. */
 	typedef enum {
-    NONE,         ///< All ok.
+    NONE = 0,     ///< All ok.
     NOTIFICATION, ///< Inform user about changes made to the config to fit radio.
     WARNING,      ///< Verification warning, some configured fature is just ignored for the particular radio.
     ERROR         ///< Verification error, a consistent device specific configutation cannot be derived from the generic config.
@@ -220,8 +220,8 @@ public:
 
   /** Verifies the configuration against the radio features.
    * On exit, @c issues will contain the issues found and the maximum severity is returned. */
-  VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
-                                 const VerifyFlags &flags=VerifyFlags());
+  virtual VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
+                                         const VerifyFlags &flags=VerifyFlags());
 
   /** Returns the current status. */
   Status status() const;

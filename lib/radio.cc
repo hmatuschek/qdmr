@@ -8,6 +8,7 @@
 #include "d868uv.hh"
 #include "d878uv.hh"
 #include "d878uv2.hh"
+#include "d578uv.hh"
 #include "config.hh"
 #include "logger.hh"
 #include <QSet>
@@ -422,6 +423,8 @@ Radio::detect(QString &errorMessage, const QString &force) {
         return new D878UV(anytone);
       } else if (("D878UV2" == id) || ("D878UV2" == force.toUpper())) {
         return new D878UV2(anytone);
+      } else if (("D578UV" == id) || ("D578UV" == force.toUpper())) {
+        return new D578UV(anytone);
       } else {
         anytone->close();
         anytone->deleteLater();

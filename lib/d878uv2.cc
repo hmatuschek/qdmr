@@ -3,8 +3,7 @@
 #include "logger.hh"
 
 #include "d878uv2_codeplug.hh"
-// uses same callsign db as 878
-#include "d868uv_callsigndb.hh"
+#include "d878uv2_callsigndb.hh"
 
 #define RBSIZE 16
 #define WBSIZE 16
@@ -76,6 +75,7 @@ D878UV2::D878UV2(AnytoneInterface *device, QObject *parent)
 {
   _codeplug = new D878UV2Codeplug(this);
   _callsigns = new D878UV2CallsignDB(this);
+  _supported_version = "V100";
 
   // Get device info and determine supported TX frequency bands
   AnytoneInterface::RadioInfo info; _dev->getInfo(info);
@@ -141,6 +141,8 @@ D878UV2::D878UV2(AnytoneInterface *device, QObject *parent)
   }
   logDebug() << "Got band-code " << QString::number(int(info.bands), 16)
              << ": Limit TX frequencies to " << bands.join(", ") << ".";
+
+  _version = info.version;
 }
 
 const Radio::Features &

@@ -151,6 +151,15 @@ static_assert(
 
 #define ADDR_ALARM_SETTING        0x024C1400
 #define ALARM_SETTING_SIZE        0x00000020
+static_assert(
+  ALARM_SETTING_SIZE == sizeof(D868UVCodeplug::alarm_settings_t),
+  "D868UVCodeplug::alarm_settings_t size check failed.");
+
+#define ADDR_ALARM_SETTING_EXT    0x024c1440
+#define ALARM_SETTING_EXT_SIZE    0x00000030
+static_assert(
+  ALARM_SETTING_EXT_SIZE == sizeof(D868UVCodeplug::digital_alarm_settings_ext_t),
+  "D868UVCodeplug::digital_alarm_settings_ext_t size check failed.");
 
 #define FMBC_BITMAP               0x02480210
 #define FMBC_BITMAP_SIZE          0x00000020
@@ -159,36 +168,68 @@ static_assert(
 #define ADDR_FMBC_VFO             0x02480200
 #define FMBC_VFO_SIZE             0x00000010
 
-#define FIVE_TONE_BITMAP          0x024C0C80
-#define FIVE_TONE_BITMAP_SIZE     0x00000010
-#define NUM_FIVE_TONE_FUNCTIONS   100
-#define ADDR_FIVE_TONE_FUNCTIONS  0x024C0000
-#define FIVE_TONE_FUNCTION_SIZE   0x00000020
-
-#define NUM_FIVE_TONE_IDS         16
-#define ADDR_FIVE_TONE_ID_LIST    0x024C0D00
+#define FIVE_TONE_ID_BITMAP       0x024C0C80
+#define FIVE_TONE_ID_BITMAP_SIZE  0x00000010
+#define NUM_FIVE_TONE_IDS         100
+#define ADDR_FIVE_TONE_ID_LIST    0x024C0000
 #define FIVE_TONE_ID_SIZE         0x00000020
-#define FIVE_TONE_ID_LIST_SIZE    0x00000200
-
+#define FIVE_TONE_ID_LIST_SIZE    0x00000c80
+static_assert(
+  FIVE_TONE_ID_SIZE == sizeof(D868UVCodeplug::five_tone_id_t),
+  "D868UVCodeplug::five_tone_id_t size check failed.");
+static_assert(
+  FIVE_TONE_ID_LIST_SIZE == (NUM_FIVE_TONE_IDS*sizeof(D868UVCodeplug::five_tone_id_t)),
+  "D868UVCodeplug::five_tone_function_t list size check failed.");
+#define NUM_FIVE_TONE_FUNCTIONS   16
+#define ADDR_FIVE_TONE_FUNCTIONS  0x024C0D00
+#define FIVE_TONE_FUNCTION_SIZE   0x00000020
+#define FIVE_TONE_FUNCTIONS_SIZE  0x00000200
+static_assert(
+  FIVE_TONE_FUNCTION_SIZE == sizeof(D868UVCodeplug::five_tone_function_t),
+  "D868UVCodeplug::five_tone_function_t size check failed.");
+static_assert(
+  FIVE_TONE_FUNCTIONS_SIZE == (NUM_FIVE_TONE_FUNCTIONS*sizeof(D868UVCodeplug::five_tone_function_t)),
+  "D868UVCodeplug::five_tone_function_t list size check failed.");
 #define ADDR_FIVE_TONE_SETTINGS   0x024C1000
 #define FIVE_TONE_SETTINGS_SIZE   0x00000080
+static_assert(
+  FIVE_TONE_SETTINGS_SIZE == sizeof(D868UVCodeplug::five_tone_settings_t),
+  "D868UVCodeplug::five_tone_settings_t size check failed.");
+
 #define ADDR_DTMF_SETTINGS        0x024C1080
 #define DTMF_SETTINGS_SIZE        0x00000050
+static_assert(
+  DTMF_SETTINGS_SIZE == sizeof(D868UVCodeplug::dtmf_settings_t),
+  "D868UVCodeplug::dtmf_settings_t size check failed.");
 
-#define NUM_TWO_TONE_ENC_FUNC     24
-#define TWO_TONE_ENC_BITMAP       0x024C1280
-#define TWO_TONE_ENC_BITMAP_SIZE  0x00000010
-#define ADDR_TWO_TONE_ENC_FUNC    0x024C1100
-#define TWO_TONE_ENC_FUNC_SIZE    0x00000010
-#define NUM_TWO_TONE_DEC_FUNC     24
-#define TWO_TONE_DEC_BITMAP       0x024c2600
-#define TWO_TONE_DEC_BITMAP_SIZE  0x00000010
-#define ADDR_TWO_TONE_DEC_FUNC    0x024c2400
-#define TWO_TONE_DEC_FUNC_SIZE    0x00000020
+#define NUM_TWO_TONE_IDS          24
+#define TWO_TONE_IDS_BITMAP       0x024C1280
+#define TWO_TONE_IDS_BITMAP_SIZE  0x00000010
+#define ADDR_TWO_TONE_IDS         0x024C1100
+#define TWO_TONE_ID_SIZE          0x00000010
+static_assert(
+  TWO_TONE_ID_SIZE == sizeof(D868UVCodeplug::two_tone_id_t),
+  "D868UVCodeplug::two_tone_settings_t size check failed.");
+
+#define NUM_TWO_TONE_FUNCTIONS    16
+#define TWO_TONE_FUNCTIONS_BITMAP 0x024c2600
+#define TWO_TONE_FUNC_BITMAP_SIZE 0x00000010
+#define ADDR_TWO_TONE_FUNCTIONS   0x024c2400
+#define TWO_TONE_FUNCTION_SIZE    0x00000020
+static_assert(
+  TWO_TONE_FUNCTION_SIZE == sizeof(D868UVCodeplug::two_tone_function_t),
+  "D868UVCodeplug::two_tone_settings_t size check failed.");
 
 #define ADDR_TWO_TONE_SETTINGS    0x024C1290
 #define TWO_TONE_SETTINGS_SIZE    0x00000010
+static_assert(
+  TWO_TONE_SETTINGS_SIZE == sizeof(D868UVCodeplug::two_tone_settings_t),
+  "D868UVCodeplug::two_tone_settings_t size check failed.");
 
+#define ADDR_DMR_ENCRYPTION_LIST  0x024C1700
+#define DMR_ENCRYPTION_LIST_SIZE  0x00000040
+#define ADDR_DMR_ENCRYPTION_KEYS  0x024C1800
+#define DMR_ENCRYPTION_KEYS_SIZE  0x00000500
 
 using namespace Signaling;
 
@@ -1304,10 +1345,10 @@ D868UVCodeplug::D868UVCodeplug(QObject *parent)
   // FM Broadcast bitmaps
   image(0).addElement(FMBC_BITMAP, FMBC_BITMAP_SIZE);
   // 5-Tone function bitmaps
-  image(0).addElement(FIVE_TONE_BITMAP, FIVE_TONE_BITMAP_SIZE);
+  image(0).addElement(FIVE_TONE_ID_BITMAP, FIVE_TONE_ID_BITMAP_SIZE);
   // 2-Tone function bitmaps
-  image(0).addElement(TWO_TONE_ENC_BITMAP, TWO_TONE_ENC_BITMAP_SIZE);
-  image(0).addElement(TWO_TONE_DEC_BITMAP, TWO_TONE_DEC_BITMAP_SIZE);
+  image(0).addElement(TWO_TONE_IDS_BITMAP, TWO_TONE_IDS_BITMAP_SIZE);
+  image(0).addElement(TWO_TONE_FUNCTIONS_BITMAP, TWO_TONE_FUNC_BITMAP_SIZE);
 }
 
 void
@@ -1332,18 +1373,19 @@ D868UVCodeplug::allocateUpdated() {
   this->allocateRepeaterOffsetSettings();
   this->allocateAlarmSettings();
   this->allocateFMBroadcastSettings();
+
+  this->allocate5ToneIDs();
   this->allocate5ToneFunctions();
+  this->allocate5ToneSettings();
+
+  this->allocate2ToneIDs();
   this->allocate2ToneFunctions();
+  this->allocate2ToneSettings();
 
-  image(0).addElement(ADDR_FIVE_TONE_ID_LIST, FIVE_TONE_ID_LIST_SIZE);
-  image(0).addElement(ADDR_FIVE_TONE_SETTINGS, FIVE_TONE_SETTINGS_SIZE);
-  image(0).addElement(ADDR_DTMF_SETTINGS, DTMF_SETTINGS_SIZE);
-  image(0).addElement(ADDR_TWO_TONE_SETTINGS, TWO_TONE_SETTINGS_SIZE);
+  this->allocateDTMFSettings();
 
-  // Unknown memory region
-  image(0).addElement(0x024C1440, 0x030);
-  image(0).addElement(0x024C1700, 0x040);
-  image(0).addElement(0x024C1800, 0x500);
+  image(0).addElement(ADDR_DMR_ENCRYPTION_LIST, DMR_ENCRYPTION_LIST_SIZE);
+  image(0).addElement(ADDR_DMR_ENCRYPTION_KEYS, DMR_ENCRYPTION_KEYS_SIZE);
 }
 
 void
@@ -2141,6 +2183,7 @@ void
 D868UVCodeplug::allocateAlarmSettings() {
   // Alarm settings
   image(0).addElement(ADDR_ALARM_SETTING, ALARM_SETTING_SIZE);
+  image(0).addElement(ADDR_ALARM_SETTING_EXT, ALARM_SETTING_EXT_SIZE);
 }
 
 void
@@ -2150,33 +2193,59 @@ D868UVCodeplug::allocateFMBroadcastSettings() {
 }
 
 void
-D868UVCodeplug::allocate5ToneFunctions() {
+D868UVCodeplug::allocate5ToneIDs() {
   // Allocate 5-tone functions
-  uint8_t *bitmap = data(FIVE_TONE_BITMAP);
-  for (uint8_t i=0; i<NUM_FIVE_TONE_FUNCTIONS; i++) {
+  uint8_t *bitmap = data(FIVE_TONE_ID_BITMAP);
+  for (uint8_t i=0; i<NUM_FIVE_TONE_IDS; i++) {
     uint16_t  bit = i%8, byte = i/8;
     if (0 == (bitmap[byte] & (1<<bit)))
       continue;
-    image(0).addElement(ADDR_FIVE_TONE_FUNCTIONS + i*FIVE_TONE_FUNCTION_SIZE, FIVE_TONE_FUNCTION_SIZE);
+    image(0).addElement(ADDR_FIVE_TONE_ID_LIST + i*FIVE_TONE_ID_SIZE, FIVE_TONE_ID_SIZE);
   }
 }
 
 void
-D868UVCodeplug::allocate2ToneFunctions() {
+D868UVCodeplug::allocate5ToneFunctions() {
+  image(0).addElement(ADDR_FIVE_TONE_FUNCTIONS, FIVE_TONE_FUNCTIONS_SIZE);
+}
+
+void
+D868UVCodeplug::allocate5ToneSettings() {
+  image(0).addElement(ADDR_FIVE_TONE_SETTINGS, FIVE_TONE_SETTINGS_SIZE);
+}
+
+void
+D868UVCodeplug::allocate2ToneIDs() {
   // Allocate 2-tone encoding
-  uint8_t *enc_bitmap = data(TWO_TONE_ENC_BITMAP);
-  for (uint8_t i=0; i<NUM_TWO_TONE_ENC_FUNC; i++) {
+  uint8_t *enc_bitmap = data(TWO_TONE_IDS_BITMAP);
+  for (uint8_t i=0; i<NUM_TWO_TONE_IDS; i++) {
     uint16_t  bit = i%8, byte = i/8;
     if (0 == (enc_bitmap[byte] & (1<<bit)))
       continue;
-    image(0).addElement(ADDR_TWO_TONE_ENC_FUNC + i*TWO_TONE_ENC_FUNC_SIZE, TWO_TONE_ENC_FUNC_SIZE);
+    image(0).addElement(ADDR_TWO_TONE_IDS + i*TWO_TONE_ID_SIZE, TWO_TONE_ID_SIZE);
   }
+}
+
+
+void
+D868UVCodeplug::allocate2ToneFunctions() {
   // Allocate 2-tone decoding
-  uint8_t *dec_bitmap = data(TWO_TONE_DEC_BITMAP);
-  for (uint8_t i=0; i<NUM_TWO_TONE_DEC_FUNC; i++) {
+  uint8_t *dec_bitmap = data(TWO_TONE_FUNCTIONS_BITMAP);
+  for (uint8_t i=0; i<NUM_TWO_TONE_FUNCTIONS; i++) {
     uint16_t  bit = i%8, byte = i/8;
     if (0 == (dec_bitmap[byte] & (1<<bit)))
       continue;
-    image(0).addElement(ADDR_TWO_TONE_DEC_FUNC + i*TWO_TONE_DEC_FUNC_SIZE, TWO_TONE_DEC_FUNC_SIZE);
+    image(0).addElement(ADDR_TWO_TONE_FUNCTIONS + i*TWO_TONE_FUNCTION_SIZE, TWO_TONE_FUNCTION_SIZE);
   }
+}
+
+void
+D868UVCodeplug::allocate2ToneSettings() {
+  image(0).addElement(ADDR_TWO_TONE_SETTINGS, TWO_TONE_SETTINGS_SIZE);
+}
+
+
+void
+D868UVCodeplug::allocateDTMFSettings() {
+  image(0).addElement(ADDR_DTMF_SETTINGS, DTMF_SETTINGS_SIZE);
 }

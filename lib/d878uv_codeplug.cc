@@ -40,11 +40,25 @@ static_assert(
 
 #define ADDR_APRS_SETTING         0x02501000 // Address of APRS settings
 #define APRS_SETTING_SIZE         0x00000040 // Size of the APRS settings
+
+#define ADDR_APRS_SET_EXT         0x025010A0 // Address of APRS settings extension
+#define APRS_SET_EXT_SIZE         0x00000060 // Size of APRS settings extension
+static_assert(
+  APRS_SET_EXT_SIZE == sizeof(D878UVCodeplug::aprs_setting_ext_t),
+  "D878UVCodeplug::aprs_setting_ext_t size check failed.");
+
 #define ADDR_APRS_MESSAGE         0x02501200 // Address of APRS messages
 #define APRS_MESSAGE_SIZE         0x00000040 // Size of APRS messages
 static_assert(
   APRS_SETTING_SIZE == sizeof(D878UVCodeplug::aprs_setting_t),
   "D878UVCodeplug::aprs_setting_t size check failed.");
+
+#define NUM_APRS_RX_ENTRY         32
+#define ADDR_APRS_RX_ENTRY        0x02501800 // Address of APRS RX list
+#define APRS_RX_ENTRY_SIZE        0x00000008 // Size of each APRS RX entry
+static_assert(
+  APRS_RX_ENTRY_SIZE == sizeof(D878UVCodeplug::aprs_rx_entry_t),
+  "D878UVCodeplug::aprs_rx_entry_t size check failed.");
 
 #define NUM_GPS_SYSTEMS           8
 #define ADDR_GPS_SETTING          0x02501040 // Address of GPS settings
@@ -72,7 +86,6 @@ static_assert(
 #define ADDR_ENCRYPTION_KEYS      0x024C4000
 #define ENCRYPTION_KEY_SIZE       0x00000040
 #define ENCRYPTION_KEYS_SIZE      0x00004000
-
 
 
 /* ******************************************************************************************** *
@@ -582,8 +595,12 @@ D878UVCodeplug::aprs_setting_t::getAutoTXInterval() const {
 }
 void
 D878UVCodeplug::aprs_setting_t::setAutoTxInterval(int sec) {
-  // round up to multiples of 30
-  auto_tx_interval = (sec+29)/30;
+  if (0 == sec)
+    auto_tx_interval = 0;
+  else if (30 >= sec)
+    auto_tx_interval = 1;
+  else
+    auto_tx_interval = (sec-16)/15;
 }
 
 int
@@ -592,7 +609,6 @@ D878UVCodeplug::aprs_setting_t::getManualTXInterval() const {
 }
 void
 D878UVCodeplug::aprs_setting_t::setManualTxInterval(int sec) {
-  // round up to multiples of 30
   manual_tx_interval = sec;
 }
 
@@ -1004,8 +1020,15 @@ void
 D878UVCodeplug::allocateUpdated() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateUpdated();
+
   // Encryption keys
   image(0).addElement(ADDR_ENCRYPTION_KEYS, ENCRYPTION_KEYS_SIZE);
+
+  // allocate APRS settings extension
+  image(0).addElement(ADDR_APRS_SET_EXT, APRS_SET_EXT_SIZE);
+
+  // allocate APRS RX list
+  image(0).addElement(ADDR_APRS_RX_ENTRY, NUM_APRS_RX_ENTRY*APRS_RX_ENTRY_SIZE);
 }
 
 void
