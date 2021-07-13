@@ -67,10 +67,12 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">Roaming</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>01042000</td> <td>000020</td>      <td>Roaming channel bitmask, up to 250 bits, 0-padded, default 0.</td></tr>
+ *  <tr><td>01042000</td> <td>000020</td>      <td>Roaming channel bitmask, up to 250 bits,
+ *    0-padded, default 0.</td></tr>
  *  <tr><td>01040000</td> <td>max. 0x1f40</td> <td>Optional up to 250 roaming channels, of 32b each.
  *    See @c roaming_channel_t for details.</td></tr>
- *  <tr><td>01042080</td> <td>000010</td>      <td>Roaming zone bitmask, up to 64 bits, 0-padded, default 0.</td></tr>
+ *  <tr><td>01042080</td> <td>000010</td>      <td>Roaming zone bitmask, up to 64 bits, 0-padded,
+ *    default 0.</td></tr>
  *  <tr><td>01043000</td> <td>max. 0x2000</td> <td>Optional up to 64 roaming zones, of 128b each.
  *    See @c roaming_zone_t for details.</td></tr>
  *
@@ -78,25 +80,29 @@ class GPSSystem;
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>02600000</td> <td>max. 009C40</td> <td>Index list of valid contacts.
  *    10000 32bit indices, little endian, default 0xffffffff</td></tr>
- *  <tr><td>02640000</td> <td>000500</td>      <td>Contact bitmap, 10000 bit, inverted, default 0xff, 0x00 padded.</td></tr>
- *  <tr><td>02680000</td> <td>max. 0f4240</td> <td>10000 contacts, see @c contact_t.
+ *  <tr><td>02640000</td> <td>000500</td>      <td>Contact bitmap, 10000 bit, inverted,
+ *    default 0xff, 0x00 padded.</td></tr>
+ *  <tr><td>02680000</td> <td>max. 0f4240</td> <td>10000 contacts, see @c D868UVCodeplug::contact_t.
  *    As each contact is 100b, they do not align with the 16b blocks being transferred to the device.
  *    Hence contacts are organized internally in groups of 4 contacts forming a "bank". </td></tr>
- *  <tr><td>04340000</td> <td>max. 013880</td> <td>DMR ID to contact index map, see @c contact_map_t.
- *    Sorted by ID, empty entries set to 0xffffffffffffffff.</td>
+ *  <tr><td>04340000</td> <td>max. 013880</td> <td>DMR ID to contact index map,
+ *    see @c D868UVCodeplug::contact_map_t. Sorted by ID, empty entries set to
+ *    0xffffffffffffffff.</td>
  *
  *  <tr><th colspan="3">Analog Contacts</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>02900000</td> <td>000080</td>      <td>Index list of valid ananlog contacts.</td></tr>
  *  <tr><td>02900100</td> <td>000080</td>      <td>Bytemap for 128 analog contacts.</td></tr>
- *  <tr><td>02940000</td> <td>max. 000180</td> <td>128 analog contacts. See @c analog_contact_t.
- *    As each analog contact is 24b, they do not align with the 16b transfer block-size. Hence
- *    analog contacts are internally organized in groups of 2. </td></tr>
+ *  <tr><td>02940000</td> <td>max. 000180</td> <td>128 analog contacts.
+ *    See @c D868UVCodeplug::analog_contact_t. As each analog contact is 24b, they do not align with
+ *    the 16b transfer block-size. Hence analog contacts are internally organized in groups of 2. </td></tr>
  *
  *  <tr><th colspan="3">RX Group Lists</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>025C0B10</td> <td>000020</td>      <td>Bitmap of 250 RX group lists, default/padding 0x00.</td></tr>
- *  <tr><td>02980000</td> <td>max. 000120</td> <td>Grouplist 0, see @c grouplist_t.</td></tr>
+ *  <tr><td>025C0B10</td> <td>000020</td>      <td>Bitmap of 250 RX group lists,
+ *    default/padding 0x00.</td></tr>
+ *  <tr><td>02980000</td> <td>max. 000120</td> <td>Grouplist 0,
+ *    see @c D868UVCodeplug::grouplist_t.</td></tr>
  *  <tr><td>02980200</td> <td>max. 000120</td> <td>Grouplist 1</td></tr>
  *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
  *  <tr><td>0299f200</td> <td>max. 000120</td> <td>Grouplist 250</td></tr>
@@ -104,7 +110,8 @@ class GPSSystem;
  *  <tr><th colspan="3">Scan lists</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>024C1340</td> <td>000020</td> <td>Bitmap of 250 scan lists.</td></tr>
- *  <tr><td>01080000</td> <td>000090</td> <td>Bank 0, Scanlist 1, see @c scanlist_t. </td></tr>
+ *  <tr><td>01080000</td> <td>000090</td> <td>Bank 0, Scanlist 1,
+ *    see @c D868UVCodeplug::scanlist_t. </td></tr>
  *  <tr><td>01080200</td> <td>000090</td> <td>Bank 0, Scanlist 2</td></tr>
  *  <tr><td>...</td>      <td>...</td>    <td>...</td></tr>
  *  <tr><td>01081E00</td> <td>000090</td> <td>Bank 0, Scanlist 16</td></tr>
@@ -117,52 +124,70 @@ class GPSSystem;
  *  <tr><th colspan="3">Radio IDs</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>024C1320</td> <td>000020</td>      <td>Bitmap of 250 radio IDs.</td></tr>
- *  <tr><td>02580000</td> <td>max. 001f40</td> <td>250 Radio IDs. See @c radioid_t.</td></tr>
+ *  <tr><td>02580000</td> <td>max. 001f40</td> <td>250 Radio IDs.
+ *    See @c D868UVCodeplug::radioid_t.</td></tr>
  *
  *  <tr><th colspan="3">GPS/APRS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings, see @c aprs_setting_t.</td>
- *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings, see @c gps_systems_t.</td>
+ *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings, see @c D868UVCodeplug::gps_settings_t.</td>
+ *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings, see @c aprs_setting_ext_t.</tr>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, upto 60 chars ASCII, 0-padded.</td>
+ *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
+ *    See @c aprs_rx_entry_t.</td></tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02500000</td> <td>000100</td> <td>General settings, see @c general_settings_base_t.</td></tr>
  *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
- *  <tr><td>02501280</td> <td>000030</td> <td>General settings extension 1, see @c general_settings_ext1_t.</td></tr>
- *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2, see @c general_settings_ext2_t.</td></tr>
+ *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings,
+ *    see @c D868UVCodeplug::boot_settings_t.</td></tr>
+ *  <tr><td>02501280</td> <td>000030</td> <td>General settings extension 1,
+ *    see @c general_settings_ext1_t.</td></tr>
+ *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2,
+ *    see @c general_settings_ext2_t.</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
- *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000. Default 0x00000000, 0x00 padded.</td></tr>
+ *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000.
+ *    Default 0x00000000, 0x00 padded.</td></tr>
  *
  *  <tr><th colspan="3">Messages</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>01640000</td> <td>max. 000100</td> <td>Some kind of linked list of messages.
- *    See @c message_list_t. Each entry has a size of 0x10.</td></tr>
+ *    See @c D868UVCodeplug::message_list_t. Each entry has a size of 0x10.</td></tr>
  *  <tr><td>01640800</td> <td>000090</td>      <td>Bytemap of up to 100 valid messages.
  *    0x00=valid, 0xff=invalid, remaining 46b set to 0x00.</td></tr>
  *  <tr><td>02140000</td> <td>max. 000800</td> <td>Bank 0, Messages 1-8.
- *    Each message consumes 0x100b. See @c message_t. </td></tr>
+ *    Each message consumes 0x100b. See @c D868UVCodeplug::message_t. </td></tr>
  *  <tr><td>02180000</td> <td>max. 000800</td> <td>Bank 1, Messages 9-16</td></tr>
  *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
  *  <tr><td>02440000</td> <td>max. 000800</td> <td>Bank 12, Messages 97-100</td></tr>
  *
  *  <tr><th colspan="3">Hot Keys</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>025C0000</td> <td>000100</td> <td>4 analog quick-call settings. See @c analog_quick_call_t.</td>
+ *  <tr><td>025C0000</td> <td>000100</td> <td>4 analog quick-call settings.
+ *    See @c D868UVCodeplug::analog_quick_call_t.</td>
  *  <tr><td>025C0B00</td> <td>000010</td> <td>Status message bitmap.</td>
  *  <tr><td>025C0100</td> <td>000400</td> <td>Upto 32 status messages.
  *    Length unknown, offset 0x20. ASCII 0x00 terminated and padded.</td>
- *  <tr><td>025C0500</td> <td>000360</td> <td>18 hot-key settings, see @c hotkey_t</td></tr>
+ *  <tr><td>025C0500</td> <td>000360</td> <td>18 hot-key settings, see
+ *    @c D868UVCodeplug::hotkey_t</td></tr>
  *
- *  <tr><th colspan="3">Encryption keys</th></tr>
+ *  <tr><th colspan="3">Encryption</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
+ *  <tr><td>024C1700</td> <td>000040</td> <td>32 Encryption IDs, 0-based, 16bit big-endian.</td></tr>
+ *  <tr><td>024C1800</td> <td>000500</td> <td>32 DMR-Encryption keys,
+ *    see @c D868UVCodeplug::dmr_encryption_key_t,
+ *    40b each.</td></tr>
  *  <tr><td>024C4000</td> <td>004000</td> <td>Upto 256 AES encryption keys.
  *    See @c encryption_key_t.</td></tr>
  *
  *  <tr><th colspan="3">Misc</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C1400</td> <td>000020</td> <td>Alarm setting, see @c analog_alarm_setting_t.</td></tr>
+ *  <tr><td>024C1400</td> <td>000020</td> <td>Alarm setting,
+ *    see @c D868UVCodeplug::alarm_setting_t.</td></tr>
+ *  <tr><td>024C1440</td> <td>000030</td> <td>Digital alarm settings extension,
+ *    see @c D868UVCodeplug::digital_alarm_settings_ext_t. </td></tr>
  *
  *  <tr><th colspan="3">FM Broadcast</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -185,11 +210,6 @@ class GPSSystem;
  *  <tr><td>024C2600</td> <td>000010</td> <td>2-tone decoding bitmap.</td></tr>
  *  <tr><td>024C2400</td> <td>000030</td> <td>2-tone decoding.</td></tr>
  *
- *  <tr><th colspan="3">Still unknown</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C1440</td> <td>000030</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C1700</td> <td>000040</td> <td>Unknown, 8bit indices.</td></tr>
- *  <tr><td>024C1800</td> <td>000500</td> <td>Empty, set to 0x00?</td></tr>
  * </table>
  *
  * @ingroup d878uv */
@@ -278,18 +298,18 @@ public:
     } APRSPTT;
 
 
-    // Bytes 0-7
+    // Bytes 00
     uint32_t rx_frequency;              ///< RX Frequency, 8 digits BCD, big-endian.
     uint32_t tx_offset;                 ///< TX Offset, 8 digits BCD, big-endian, sign in repeater_mode.
 
-    // Byte 8
+    // Byte 08
     uint8_t channel_mode    : 2,        ///< Mode: Analog or Digital, see @c Mode.
       power                 : 2,        ///< Power: Low, Middle, High, Turbo, see @c Power.
       bandwidth             : 1,        ///< Bandwidth: 12.5 or 25 kHz, see @c Bandwidth.
       _unused8              : 1,        ///< Unused, set to 0.
       repeater_mode         : 2;        ///< Sign of TX frequency offset, see @c RepeaterMode.
 
-    // Byte 9
+    // Byte 09
     uint8_t rx_ctcss        : 1,        ///< CTCSS decode enable.
       rx_dcs                : 1,        ///< DCS decode enable.
       tx_ctcss              : 1,        ///< CTCSS encode enable.
@@ -299,46 +319,46 @@ public:
       call_confirm          : 1,        ///< Call confirmation enable.
       talkaround            : 1;        ///< Talk-around enable.
 
-    // Bytes 10-15
+    // Bytes 0a
     uint8_t ctcss_transmit;             ///< TX CTCSS tone, 0=62.5, 50=254.1, 51=custom CTCSS tone.
     uint8_t ctcss_receive;              ///< RX CTCSS tone: 0=62.5, 50=254.1, 51=custom CTCSS tone.
     uint16_t dcs_transmit;              ///< TX DCS code: 0=D000N, 511=D777N, 512=D000I, 1023=D777I, DCS code-number in octal, little-endian.
     uint16_t dcs_receive;               ///< RX DCS code: 0=D000N, 511=D777N, 512=D000I, 1023=D777I, DCS code-number in octal, little-endian.
 
-    // Bytes 16-19
+    // Bytes 10
     uint16_t custom_ctcss;              ///< Custom CTCSS tone frequency: 0x09cf=251.1, 0x0a28=260, big-endian.
     uint8_t tone2_decode;               ///< 2-Tone decode: 0x00=1, 0x0f=16
     uint8_t _unused19;                  ///< Unused, set to 0.
 
-    // Bytes 20-23
+    // Bytes 14
     uint32_t contact_index;             ///< Contact index, zero-based, little-endian.
 
-    // Byte 24
+    // Byte 18
     uint8_t id_index;                   ///< Index to radio ID table.
 
-    // Byte 25
+    // Byte 19
     uint8_t ptt_id          : 2,        ///< PTT ID, see PTTId, unused in U868UV.
       _unused25_1           : 2,        ///< Unused, set to 0.
       squelch_mode          : 1,        ///< Squelch mode, see @c SquelchMode.
       _unused25_2           : 3;        ///< Unused, set to 0.
 
-    // Byte 26
+    // Byte 1a
     uint8_t tx_permit       : 2,        ///< TX permit, see @c Admit.
       _unused26_1           : 2,        ///< Unused, set to 0.
       opt_signal            : 2,        ///< Optional signaling, see @c OptSignaling.
       _unused26_2           : 2;        ///< Unused, set to 0.
 
-    // Bytes 27-31
+    // Bytes 1b
     uint8_t scan_list_index;            ///< Scan list index, 0xff=None, 0-based.
     uint8_t group_list_index;           ///< RX group-list, 0xff=None, 0-based.
     uint8_t id_2tone;                   ///< 2-Tone ID, 0=1, 0x17=24.
     uint8_t id_5tone;                   ///< 5-Tone ID, 0=1, 0x63=100.
     uint8_t id_dtmf;                    ///< DTMF ID, 0=1, 0x0f=16.
 
-    // Byte 32
+    // Byte 20
     uint8_t color_code;                 ///< Color code, 0-15
 
-    // Byte 33
+    // Byte 21
     uint8_t slot2           : 1,        ///< Timeslot, 0=TS1, 1=TS2.
       sms_confirm           : 1,        ///< Send SMS confirmation, 0=off, 1=on.
       simplex_tdma          : 1,        ///< Simplex TDMA enabled.
@@ -348,25 +368,25 @@ public:
       enh_encryption        : 1,        ///< Enable enhanced encryption.
       work_alone            : 1;        ///< Work alone, 0=off, 1=on.
 
-    // Byte 34
+    // Byte 22
     uint8_t aes_encryption;             ///< Digital AES encryption, 1-32, 0=off.
 
-    // Bytes 35-51
+    // Bytes 23
     uint8_t name[16];                   ///< Channel name, ASCII, zero filled.
     uint8_t _pad51;                     ///< Pad byte, set to 0.
 
-    // Byte 52
+    // Byte 34
     uint8_t ranging         : 1,        ///< Ranging enabled.
       through_mode          : 1,        ///< Through-mode enabled.
       excl_from_roaming     : 1,        ///< Exclude channel from roaming, data ACK forbit in D868UV.
       data_ack_disable      : 1,        ///< Data ACK disable.
       _unused52_4           : 4;        ///< Unused, set to 0.
 
-    // Byte 53
+    // Byte 35
     uint8_t aprs_report     : 2,        ///< Enable APRS report, see @c APRSReport.
       _unused53             : 6;        ///< Unused, set to 0.
 
-    // Bytes 54-63
+    // Bytes 36
     uint8_t analog_aprs_ptt;            ///< Enable analog APRS PTT, see @c APRSPTT, not used in D868UV.
     uint8_t digi_aprs_ptt;              ///< Enable digital APRS PTT, 0=off, 1=on.
     uint8_t gps_system;                 ///< Index of DMR GPS report system, 0-7;
@@ -863,48 +883,49 @@ public:
    */
   struct __attribute__((packed)) aprs_setting_t {
     /** Possible signalling for APRS repeater.*/
-    typedef enum {
+    enum SignalingType: uint8_t {
       SIG_OFF = 0,                 ///< No signalling.
       SIG_CTCSS = 1,               ///< CTCSS signalling.
       SIG_DCS = 2                  ///< DCS signalling.
-    } SignalingType;
+    };
 
     /** Power setting for the APRS/GPS channel. */
-    typedef enum {
+    enum Power: uint8_t {
       POWER_LOW = 0,               ///< Low power (usually about 1W).
       POWER_MID = 1,               ///< Medium power (usually about 2W).
       POWER_HIGH = 2,              ///< High power (usually about 5W).
       POWER_TURBO = 3              ///< Highest power (upto 7W).
-    } Power;
+    };
 
     /** Hemisphere settings for the fixed location beacon. */
-    typedef enum {
+    enum Hemisphere: uint8_t {
       NORTH = 0,
       SOUTH = 1,
       EAST  = 0,
       WEST  = 1
-    } Hemisphere;
+    };
 
     // byte 0x00
-    uint8_t _unknown0;             ///< Unknown, set to 0xff.
+    uint8_t _unknown0;             ///< Unknown, set to 0x00.
     uint32_t frequency;            ///< TX frequency, BCD encoded, little endian in 10Hz.
     uint8_t tx_delay;              ///< TX delay, multiples of 20ms, default=1200ms.
-    uint8_t sig_type;              ///< Signalling type, 0=off, 1=ctcss, 2=dcs, default=off.
+    SignalingType sig_type;        ///< Signalling type, 0=off, 1=ctcss, 2=dcs, default=off.
     uint8_t ctcss;                 ///< CTCSS tone-code, default=0.
     uint16_t dcs;                  ///< DCS code, little endian, default=0x0013.
     uint8_t manual_tx_interval;    ///< Global manual TX intervals in seconds.
-    uint8_t auto_tx_interval;      ///< Global auto TX interval in multiples of 30s.
+    uint8_t auto_tx_interval;      ///< Global auto TX interval in multiples of 15s. That is
+                                   /// 0 = Off, 1 = 30s, n = 45s + (n-1) *15s.
     uint8_t tx_tone_enable;        ///< TX tone enable, 0=off, 1=on.
 
     uint8_t fixed_location;        ///< Fixed location data, 0=off, 1=on.
     uint8_t lat_deg;               ///< Latitude in degree.
     uint8_t lat_min;               ///< Latitude minutes.
     uint8_t lat_sec;               ///< Latitude seconds (1/100th of a minute).
-    uint8_t north_south;           ///< North or south flag, north=0, south=1.
+    Hemisphere north_south;        ///< North or south flag, north=0, south=1.
     uint8_t lon_deg;               ///< Longitude in degree.
     uint8_t lon_min;               ///< Longitude in minutes.
     uint8_t lon_sec;               ///< Longitude in seconds (1/100th of a minute).
-    uint8_t east_west;             ///< East or west flag, east=0, west=1.
+    Hemisphere east_west;          ///< East or west flag, east=0, west=1.
 
     uint8_t to_call[6];            ///< Destination call, 6 x ASCII, 0x20-padded.
     uint8_t to_ssid;               ///< Destination SSID, 0xff=None.
@@ -920,7 +941,7 @@ public:
     char table;                    ///< ASCII-char for APRS icon table, ie. '/' or '\' for primary
                                    ///  and alternate icon table respectively.
     char icon;                     ///< ASCII-char of APRS map icon.
-    uint8_t power;                 ///< Transmit power.
+    Power power;                   ///< Transmit power.
     uint8_t prewave_delay;         ///< Prewave delay in 10ms steps.
 
     // bytes 0x3d
@@ -986,6 +1007,42 @@ public:
     void linkAPRSSystem(APRSSystem *sys, CodeplugContext &ctx);
   };
 
+
+  /** Represents an extension to the APRS settings.
+   *
+   * Memmory layout of APRS settings (0x60byte):
+   * @verbinclude d878uvaprssettingext.txt */
+  struct __attribute__((packed)) aprs_setting_ext_t {
+    uint8_t _unknown0000[6];            ///< Unknown settings block.
+    uint16_t fixed_altitude;            ///< Fixed altitude in feet, little endian.
+    uint8_t rep_position : 1,           ///< Report position flag.
+      rep_mic_e          : 1,           ///< Report MIC-E flag.
+      rep_object         : 1,           ///< Report object flag.
+      rep_item           : 1,           ///< Report item flag.
+      rep_message        : 1,           ///< Report message flag.
+      rep_wx             : 1,           ///< WX report flag.
+      rep_nmea           : 1,           ///< NMEA report flag.
+      rep_status         : 1;           ///< Report status flag.
+    uint8_t rep_other    : 1,           ///< Report "other" flag.
+      _unused0009_1      :7;            ///< Unused set to 0.
+    uint8_t _unknown000a[6];            ///< Unknown settings block.
+
+    uint8_t _unknown0010[16];           ///< Unknown settings block.
+    uint8_t _unknown0020[16];           ///< Unknown settings block.
+    uint8_t _unknown0030[16];           ///< Unknown settings block.
+    uint8_t _unknown0040[16];           ///< Unknown settings block.
+    uint8_t _unknown0050[16];           ///< Unknown settings block.
+  };
+
+  /** Represents an APRS RX entry.
+   *
+   * Memmory layout of APRS-RX entry (0x100byte):
+   * @verbinclude d878uvaprsexentry.txt */
+  struct __attribute__((packed)) aprs_rx_entry_t {
+    uint8_t enabled;                    ///< Enabled entry 0x01=on, 0x00=off.
+    char    call[6];                    ///< Callsign, 6x ASCII, 0-terminated.
+    uint8_t ssid;                       ///< SSID [0,15], 16=off.
+  };
 
   /** Represents the 8 GPS systems within the binary codeplug.
    *

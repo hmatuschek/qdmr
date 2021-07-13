@@ -17,6 +17,8 @@ Currently, there are only few radios that are supported
   * TYT MD-UV390 / Retevis RT3S
   * Anytone AT-D878UV (since version 0.5.0)
   * Anytone AT-D868UVE (since version 0.7.0)
+  * Anytone AT-D878UVII (since version 0.8.0)
+  * Anytone AT-D578UV (since version 0.8.0)
 
 A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available. 
 The limited amount of supported radios is due to the fact that I only
@@ -28,7 +30,7 @@ own these radios to test the software with.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
 
- * **[Version 0.7.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.7.3)** -- Bugfix release.
+ * **[Version 0.8.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.8.0)** -- Added AT-D878UVII & AT-D578UV support and many bugfixes.
  * **[Version 0.7.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.7.0)** -- Added AT-D868UVE support and many bugfixes.
  * **[Version 0.6.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.6.4)** -- Added APRS & roaming for AT-D878UV.
  * **[Version 0.5.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.5.0)** -- Added support for Anytone AT-D878UV.

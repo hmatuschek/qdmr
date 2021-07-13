@@ -11,12 +11,15 @@ SET(libdmrconf_SOURCES
     radio.cc ${hid_SOURCES} hid_interface.cc dfu_libusb.cc usbserial.cc
     csvreader.cc dfufile.cc repeaterdatabase.cc userdatabase.cc logger.cc
     config.cc contact.cc rxgrouplist.cc channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc
-    roaming.cc callsigndb.cc talkgroupdatabase.cc radioid.cc
-    configitem.cc
-    rd5r.cc rd5r_codeplug.cc uv390.cc uv390_codeplug.cc uv390_callsigndb.cc gd77.cc gd77_codeplug.cc
+    roaming.cc callsigndb.cc talkgroupdatabase.cc radioid.cc configitem.cc
+    rd5r.cc rd5r_codeplug.cc
+    uv390.cc uv390_codeplug.cc uv390_callsigndb.cc
+    gd77.cc gd77_codeplug.cc
     opengd77.cc opengd77_interface.cc opengd77_codeplug.cc opengd77_callsigndb.cc
     anytone_interface.cc anytone_radio.cc anytone_codeplug.cc
-    d868uv.cc d868uv_codeplug.cc d868uv_callsigndb.cc d878uv.cc d878uv_codeplug.cc
+    d868uv.cc d868uv_codeplug.cc d868uv_callsigndb.cc
+    d878uv.cc d878uv_codeplug.cc
+    d578uv.cc d578uv_codeplug.cc
     d878uv2.cc d878uv2_codeplug.cc d878uv2_callsigndb.cc)
 SET(libdmrconf_MOC_HEADERS
     radio.hh ${hid_HEADERS} hid_interface.hh dfu_libusb.hh usbserial.hh
@@ -28,7 +31,9 @@ SET(libdmrconf_MOC_HEADERS
     rd5r.hh rd5r_codeplug.hh uv390.hh uv390_codeplug.hh uv390_callsigndb.hh gd77.hh gd77_codeplug.hh
     opengd77.hh opengd77_interface.hh opengd77_codeplug.hh opengd77_callsigndb.hh
     anytone_interface.hh anytone_radio.hh anytone_codeplug.hh
-    d868uv.hh d868uv_codeplug.hh d868uv_callsigndb.hh d878uv.hh d878uv_codeplug.hh
+    d868uv.hh d868uv_codeplug.hh d868uv_callsigndb.hh
+    d878uv.hh d878uv_codeplug.hh
+    d578uv.hh d578uv_codeplug.hh
     d878uv2.hh d878uv2_codeplug.hh d878uv2_callsigndb.hh)
 SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh
     utils.hh crc32.hh csvwriter.hh signaling.hh codeplugcontext.hh addressmap.hh)

@@ -10,7 +10,7 @@
  *  <tr><th colspan="3">Callsign database</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>04000000</td> <td>max. 186a00</th> <td>Index of callsign entries. Follows the same
- *   weird format as @c D878UVCodeplug::contact_map_t. Sorted by ID. Empty entries set to
+ *   weird format as @c D868UVCodeplug::contact_map_t. Sorted by ID. Empty entries set to
  *   0xffffffffffffffff.</td></tr>
  *  <tr><td>044c0000</td> <td>unknown</td>     <td>Database limits, see @c limits_t.</td></tr>
  *  <tr><td>04500000</td> <td>unknown</td>     <td>The actual DB entries, each entry is of
@@ -52,8 +52,8 @@ public:
 
     uint8_t call_type;                  ///< Call type, see @c CallType.
     uint32_t id;                        ///< DMR ID, BCD encoded, big endian.
-    uint8_t ring;                       ///< Ring tone, see @c RingTone.
-
+    uint8_t ring       : 4,             ///< Ring tone, see @c RingTone.
+      is_friend        : 4;             ///< If 0x1, entry is marked as a "friend".
     uint8_t body[94];                   ///< Up to 94 bytes name, city, callsign, state, country and comment.
 
     /** Constructs a database entry from the given user.

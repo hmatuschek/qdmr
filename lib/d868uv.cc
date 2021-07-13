@@ -74,6 +74,7 @@ D868UV::D868UV(AnytoneInterface *device, QObject *parent)
 {
   _codeplug = new D868UVCodeplug(this);
   _callsigns = new D868UVCallsignDB(this);
+  _supported_version = "V102";
 
   // Get device info and determine supported TX frequency bands
   AnytoneInterface::RadioInfo info; _dev->getInfo(info);
@@ -131,6 +132,9 @@ D868UV::D868UV(AnytoneInterface *device, QObject *parent)
   }
   logDebug() << "Got band-code " << QString::number(int(info.bands), 16)
              << ": Limit TX frequencies to " << bands.join(", ") << ".";
+
+  // Store HW version
+  _version = info.version;
 }
 
 const Radio::Features &
