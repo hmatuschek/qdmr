@@ -6,18 +6,47 @@
 #include <QDateTime>
 
 
-#define OFFSET_TIMESTMP     0x00088
 #define OFFSET_SETTINGS     0x000e0
 #define OFFSET_MSGTAB       0x00128
 #define OFFSET_SCANTAB      0x01790
+#define SCANLIST_SIZE       0x00058
+#define SCANTAB_SIZE        0x01640
 #define OFFSET_BANK_0       0x03780 // Channels 1-128
+#define CHANNEL_SIZE        0x00038
+#define BANK_SIZE           0x01c10
 #define OFFSET_INTRO        0x07540
 #define OFFSET_ZONETAB      0x08010
 #define OFFSET_BANK_1       0x0b1b0 // Channels 129-1024
 #define OFFSET_CONTACTS     0x17620
+#define CONTACT_SIZE        0x00018
 #define OFFSET_GROUPTAB     0x1d620
+#define GROUPLIST_SIZE      0x00050
+#define GROUPTAB_SIZE       0x01840
 
 #define GET_MSGTAB()        ((msgtab_t*) &radio_mem[OFFSET_MSGTAB])
+
+static_assert(
+  CHANNEL_SIZE == sizeof(GD77Codeplug::channel_t),
+  "GD77Codeplug::channel_t size check failed.");
+static_assert(
+  BANK_SIZE == sizeof(GD77Codeplug::bank_t),
+  "GD77Codeplug::bank_t size check failed.");
+static_assert(
+  CONTACT_SIZE == sizeof(GD77Codeplug::contact_t),
+  "GD77Codeplug::contact_t size check failed.");
+static_assert(
+  GROUPLIST_SIZE == sizeof(GD77Codeplug::grouplist_t),
+  "GD77Codeplug::grouplist_t size check failed.");
+static_assert(
+  GROUPTAB_SIZE == sizeof(GD77Codeplug::grouptab_t),
+  "GD77Codeplug::grouptab_t size check failed.");
+static_assert(
+  SCANLIST_SIZE == sizeof(GD77Codeplug::scanlist_t),
+  "GD77Codeplug::scanlist_t size check failed.");
+static_assert(
+  SCANTAB_SIZE == sizeof(GD77Codeplug::scantab_t),
+  "GD77Codeplug::scantab_t size check failed.");
+
 
 /* ******************************************************************************************** *
  * Implementation of GD77Codeplug::channel_t
@@ -32,32 +61,34 @@ void
 GD77Codeplug::channel_t::clear() {
   memset(this, 0, sizeof(channel_t));
   memset(name, 0xff, 16);
-  _unused25              = 0;
-  _unused30              = 0x50;
-  _unused36              = 0;
+  _unused0019            = 0;
+  _unused001e            = 0x50;
+  _unused0024            = 0;
   tx_signaling_syst      = 0;
-  _unused38              = 0;
+  _unused0026            = 0;
   rx_signaling_syst      = 0;
-  _unused40              = 0x16;
+  _unused0028            = 0x16;
   privacy_group          = PRIVGR_NONE;
   emergency_system_index = 0;
-  _unused48              = 0;
+  arts                   = ARTS_OFF;
+  _unused0030_2          = 0;
   emergency_alarm_ack    = 0;
   data_call_conf         = 0;
   private_call_conf      = 0;
-  _unused49_1            = 0;
+  _unused0031_1          = 0;
   privacy                = 0;
-  _unused49_5            = 0;
-  _unused49_7            = 0;
+  _unused0031_5          = 0;
+  _unused0031_7          = 0;
   dcdm                   = 0;
-  _unused50_1            = 0;
-  _unused50_6            = 0;
+  _unused0032_1          = 0;
+  pttid                  = PTTID_OFF;
+  _unused0032_4          = 0;
   squelch                = SQ_NORMAL;
   bandwidth              = BW_12_5_KHZ;
   talkaround             = 0;
-  _unused51_4            = 0;
+  _unused0033_4          = 0;
   vox                    = 0;
-  _unused52              = 0;
+  _unused0034            = 0;
 }
 
 double
@@ -268,12 +299,12 @@ GD77Codeplug::scanlist_t::scanlist_t() {
 
 void
 GD77Codeplug::scanlist_t::clear() {
-  memset(name, 0xff, 15);
+  memset(name, 0xff, sizeof(name));
   _unused = 1;
   channel_mark = 1;
   pl_type = PL_PRI_NONPRI;
   talkback = 1;
-  memset(member, 0x00, 64);
+  memset(member, 0x00, sizeof(member));
   sign_hold_time = 40;
   prio_sample_time = 8;
   tx_designated_ch = 0;
@@ -296,14 +327,18 @@ GD77Codeplug::scanlist_t::toScanListObj() const {
 
 bool
 GD77Codeplug::scanlist_t::linkScanListObj(ScanList *lst, const CodeplugContext &ctx) const {
-  if (1 == priority_ch1)
+  if (0 == priority_ch1)
+    lst->setPriorityChannel(nullptr);
+  else if (1 == priority_ch1)
     lst->setPriorityChannel(SelectedChannel::get());
   else if ((1<priority_ch1) && ctx.hasChannel(priority_ch1-1))
     lst->setPriorityChannel(ctx.getChannel(priority_ch1-1));
   else
     logWarn() << "Cannot deocde reference to priority channel index " << priority_ch1
                  << " in scan list '" << getName() << "'.";
-  if (1 == priority_ch2)
+  if (0 == priority_ch2)
+    lst->setSecPriorityChannel(nullptr);
+  else if (1 == priority_ch2)
     lst->setSecPriorityChannel(SelectedChannel::get());
   else if ((1<priority_ch2) && ctx.hasChannel(priority_ch2-1))
     lst->setSecPriorityChannel(ctx.getChannel(priority_ch2-1));
@@ -311,7 +346,7 @@ GD77Codeplug::scanlist_t::linkScanListObj(ScanList *lst, const CodeplugContext &
     logWarn() << "Cannot deocde reference to secondary priority channel index " << priority_ch2
               << " in scan list '" << getName() << "'.";
 
-  if (1 == tx_designated_ch)
+  if (0 == tx_designated_ch)
     lst->setTXChannel(SelectedChannel::get());
   else if ((1<priority_ch2) && ctx.hasChannel(tx_designated_ch-1))
     lst->setTXChannel(ctx.getChannel(tx_designated_ch-1));
@@ -440,10 +475,6 @@ GD77Codeplug::GD77Codeplug(QObject *parent)
 
 bool
 GD77Codeplug::encode(Config *config, const Flags &flags) {
-  // set timestamp
-  timestamp_t *ts = (timestamp_t *)data(OFFSET_TIMESTMP);
-  ts->setNow();
-
   // pack basic config
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
   if (! flags.updateCodePlug)

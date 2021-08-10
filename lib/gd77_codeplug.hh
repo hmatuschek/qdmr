@@ -17,6 +17,12 @@
  * and scan-lists swapped the addresses and the @c channel_t encoding analog and digital channels
  * for the codeplugs are identical except for the squelch settings. Thanks for that!
  *
+ * @section gd77ver Matching firmware versions
+ * This class implements the codeplug for the firmware version @b 4.03.06. The codeplug format usually
+ * does not change much with firmware revisions, in particular not with older radios. Unfortunately,
+ * it is not possible to detect the firmware version running on the device. Consequenly, only the
+ * newest firmware version is supported. However, older revisions may still work.
+ *
  * @section gd77cpl Codeplug structure within radio
  * The memory representation of the codeplug within the radio is divided into two segments.
  * The first segment starts at the address 0x00080 and ends at 0x07c00 while the second section
@@ -25,9 +31,7 @@
  * <table>
  *  <tr><th>Start</th>   <th>End</th>      <th>Size</th>    <th>Content</th></tr>
  *  <tr><th colspan="4">First segment 0x00080-0x07c00</th></tr>
- *  <tr><td>0x00080</td> <td>0x00088</td> <td>0x0008</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x00088</td> <td>0x0008e</td> <td>0x0006</td> <td>Timestamp, see @c GD77Codeplug::timestamp_t.</td></tr>
- *  <tr><td>0x0008e</td> <td>0x000e0</td> <td>0x0052</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x00080</td> <td>0x000e0</td> <td>0x0070</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x000e0</td> <td>0x000ec</td> <td>0x000c</td> <td>General settings, see @c GD77Codeplug::general_settings_t.</td></tr>
  *  <tr><td>0x000ec</td> <td>0x00128</td> <td>0x003c</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x00128</td> <td>0x01370</td> <td>0x1248</td> <td>32 message texts, see @c GD77Codeplug::msgtab_t</td></tr>
@@ -60,8 +64,12 @@ protected:
 	static const int NSCANL    = 64;    ///< The number of scan-lists.
 	static const int NMESSAGES = 32;    ///< The number of predefined text messages.
 
-	/** Channel representation within the binary codeplug. */
-	typedef struct __attribute__((packed)) {
+public:
+  /** Channel representation within the binary codeplug.
+   *
+   * Each channel requires 0x38b:
+   * @verbinclude gd77channel.txt */
+  struct __attribute__((packed)) channel_t {
     /** Possible channel types analog (FM) or digital (DMR). */
 		typedef enum {
 			MODE_ANALOG  = 0,               ///< An analog (FM) channel.
@@ -99,66 +107,84 @@ protected:
 			POWER_LOW  = 0                  ///< Low power = 1W.
 		} Power;
 
-		// Bytes 0-15
+    /** STE angle. */
+    typedef enum {
+      STE_FREQUENCY = 0,              ///< STE Frequency.
+      STE_120DEG    = 1,              ///< 120 degree.
+      STE_180DEG    = 2,              ///< 180 degree.
+      STE_240DEG    = 3               ///< 240 degree.
+    } STEAngle;
+
+    /** ARTS send. */
+    typedef enum {
+      ARTS_OFF      = 0,
+      ARTS_TX       = 1,
+      ARTS_RX       = 2,
+      ARTS_BOTH     = 3
+    } ARTS;
+
+    /** PTT ID send. */
+    typedef enum {
+      PTTID_OFF     = 0,
+      PTTID_START   = 1,
+      PTTID_END     = 2,
+      PTTID_BOTH    = 3
+    } PTTId;
+
+    // Byte 0x00
 		uint8_t name[16];                 ///< Channel Name
-		// Bytes 16-23
+
+    // Byte 0x10
 		uint32_t rx_frequency;            ///< RX Frequency: 8 digits BCD
 		uint32_t tx_frequency;            ///< TX Frequency: 8 digits BCD
-		// Byte 24
 		uint8_t channel_mode;             ///< Mode: Analog or Digital
-		// Bytes 25-26
-		uint16_t _unused25;               ///< Unused, set to 0.
-		// Bytes 27-28
+    uint16_t _unused0019;             ///< Unused, set to 0.
 		uint8_t tot;                      ///< TOT in 15sec steps: 0=Infinite.
 		uint8_t tot_rekey_delay;          ///< TOT Rekey Delay in seconds [0, 255]s
-		// Byte 29
 		uint8_t admit_criteria;           ///< Admit Criteria: Always, Channel Free or Color Code
-		// Bytes 30-31
-		uint8_t _unused30;                ///< Unused, set to @c 0x50.
+    uint8_t _unused001e;              ///< Unused, set to @c 0x50.
 		uint8_t scan_list_index;          ///< Scan List index: 0=None or index + 1.
-		// Bytes 32-35
-		uint16_t ctcss_dcs_receive;       ///< RX CTCSS/DCS setting, 4 digits BCD or 0xffff if disabled.
-		uint16_t ctcss_dcs_transmit;      ///< TX CTCSS/DCS setting, 4 digits BCD or 0xffff if disabled.
-		// Bytes 36-39
-		uint8_t _unused36;                ///< Unused set to @c 0x00.
+
+    // Bytes 0x20
+    uint16_t ctcss_dcs_receive;       ///< RX CTCSS/DCS setting, 4 digits BCD or 0xffff if disabled, little endian.
+    uint16_t ctcss_dcs_transmit;      ///< TX CTCSS/DCS setting, 4 digits BCD or 0xffff if disabled, little endian.
+    uint8_t _unused0024;              ///< Unused set to @c 0x00.
 		uint8_t tx_signaling_syst;        ///< Tx Signaling System: Off, DTMF
-		uint8_t _unused38;                ///< Unused set to @c 0x00.
+    uint8_t _unused0026;              ///< Unused set to @c 0x00.
 		uint8_t rx_signaling_syst;        ///< Rx Signaling System: Off, DTMF
-		// Bytes 40-43
-		uint8_t _unused40;                ///< Unknown set to @c 0x16.
+    uint8_t _unused0028;              ///< Unknown set to @c 0x16.
 		uint8_t privacy_group;            ///< Privacy Group 0=None, 1=53474c39
 		uint8_t colorcode_tx;             ///< TX Color Code [0,15].
 		uint8_t group_list_index;         ///< Group List index 0=None or index+1.
-		// Bytes 44-47
 		uint8_t colorcode_rx;             ///< RX Color Code: [0,15] (usually identical to TX colorcode).
 		uint8_t emergency_system_index;   ///< Emergency system index, 0=None or index + 1.
 		uint16_t contact_name_index;      ///< Contact index, 0=None or index+1.
-		// Byte 48
-		uint8_t _unused48          : 6,   ///< Unused set to @c 0x00.
+
+    // Byte 0x30
+    uint8_t arts               : 2,   ///< ARTS RX/TX enable.
+      _unused0030_2            : 4,   ///< Unused, set to 0.
 		  emergency_alarm_ack      : 1,   ///< Emergency alarm ack flag.
 		  data_call_conf           : 1;   ///< Data-call confirmed flag.
-		// Byte 49
 		uint8_t private_call_conf  : 1,   ///< Private call confirmed flag.
-		  _unused49_1              : 3,   ///< Unused set to @c 0b000.
+      _unused0031_1            : 3,   ///< Unused set to @c 0b000.
 		  privacy                  : 1,   ///< Privacy enabled flag.
-		  _unused49_5              : 1,   ///< Unused set to @c 0b0.
+      _unused0031_5            : 1,   ///< Unused set to @c 0b0.
 		  repeater_slot2           : 1,   ///< Repeater Slot 0=slot1 or 1=slot2.
-		  _unused49_7              : 1;   ///< Unused set to @c 0b0.
-		// Byte 50
+      _unused0031_7            : 1;   ///< Unused set to @c 0b0.
 		uint8_t dcdm               : 1,   ///< Dual capacity direct mode flag (do not use it).
-		  _unused50_1              : 4,   ///< Unused set to 0b0000.
+      _unused0032_1            : 1,   ///< Unused set to 0.
+      pttid                    : 2,   ///< PTT ID 0=off, 1=start, 2=end, 3=both.
+      _unused0032_4            : 1,   ///< Unused set to 0.
 		  non_ste_frequency        : 1,   ///< Non STE = Frequency?
-		  _unused50_6              : 2;   ///< Unused set to 0b00
-		// Byte 51
+      ste                      : 2;   ///< STE, 0=Frequency, 1=120deg, 2=180deg, 3=240deg.
 		uint8_t squelch            : 1,   ///< Squelch settings (tight or normal).
 		  bandwidth                : 1,   ///< Bandwidth 12.5 or 25 kHz.
 		  rx_only                  : 1,   ///< RX only flag.
 		  talkaround               : 1,   ///< Allow talkaround flag.
-		  _unused51_4              : 2,   ///< Unused set to 0b00.
+      _unused0033_4            : 2,   ///< Unused set to 0b00.
 		  vox                      : 1,   ///< VOX enable flag.
 		  power                    : 1;   ///< Power either Low or High.
-    // Bytes 52-55
-		uint32_t _unused52;               ///< Unused set to 0.
+    uint32_t _unused0034;             ///< Unused set to 0.
 
     /** Returns @c true if the channel is valid. */
     bool isValid() const;
@@ -192,17 +218,21 @@ protected:
     /** Links a previously constructed @c Channel object to other object within the generic
      * configuration, for example scan lists etc. */
     bool linkChannelObj(Channel *c, const CodeplugContext &ctx) const;
-	} channel_t;
+  };
 
-	/** A Bank of 128 channels. */
-	typedef struct __attribute__((packed)) {
+  /** A Bank of 128 channels.
+   *
+   * A channel bank consists of a bitmap (total 0x10b) and a list of 128 channels, each 0x32b.
+   * The total size of the bank is then 0x1c10b:
+   * @verbinclude gd77channelbank.txt */
+  struct __attribute__((packed)) bank_t {
 		uint8_t bitmap[16];               ///< Corresponding bit is set when channel is valid.
 		channel_t chan[128];              ///< The list of channels.
-	} bank_t;
+  };
 
   /** Specific codeplug representation of a DMR contact.
    *
-   * Memmory layout of the contact:
+   * Memmory layout of the contact (0x17b):
    * @verbinclude gd77contact.txt
    */
   struct __attribute__((packed)) contact_t {
@@ -213,13 +243,12 @@ protected:
       CALL_ALL     = 2                  ///< An all-call.
     } CallType;
 
-    // Bytes 0-15
+    // Bytes 00
     uint8_t name[16];                   ///< Contact name in ASCII, 0xff terminated.
-    // Bytes 16-19
-    uint8_t id[4];                      ///< BCD coded 8 digits DMR ID.
-    // Byte 20
+
+    // Bytes 10
+    uint8_t id[4];                      ///< BCD coded 8 digits DMR ID, big endian.
     uint8_t type;                       ///< Call Type, one of Group Call, Private Call or All Call.
-    // Bytes 21-23
     uint8_t receive_tone;               ///< Call Receive Tone, 0=Off, 1=On.
     uint8_t ring_style;                 ///< Ring style: [0,10]
     uint8_t valid;                      ///< Contact is valid, 0xff if valid, 0x00 otherwise.
@@ -253,8 +282,11 @@ protected:
    * Hence, it gets reused. */
   typedef RD5RCodeplug::zonetab_t zonetab_t;
 
-	/** Represents an RX group list within the codeplug. */
-	typedef struct __attribute__((packed)) {
+  /** Represents an RX group list within the codeplug.
+   *
+   * The group list is encoded as (size 0x50b):
+   * @verbinclude gd77grouplist.txt */
+  struct __attribute__((packed)) grouplist_t {
     // Bytes 0-15
     uint8_t name[16];                 ///< RX group list name, 16x ASCII, 0xff terminated.
     // Bytes 16-79
@@ -271,15 +303,26 @@ protected:
     bool linkRXGroupListObj(RXGroupList *lst, const CodeplugContext &ctx) const;
     /** Reset this codeplug representation from a @c RXGroupList object. */
     void fromRXGroupListObj(const RXGroupList *lst, const Config *conf);
-	} grouplist_t;
+  };
 
-	/** Table of RX group lists. */
-	typedef struct __attribute__((packed)) {
+  /** Table of RX group lists.
+   *
+   * The RX group list table constsis of a table of number of members per group list and the actual
+   * list of RX group lists. The former also acts as a byte map for valid RX group lists. If 0, the
+   * group list is disabled, if 1 the group list is empty, etc. So the entry is N+1, where N is the
+   * number of entries per group list.
+   *
+   * Encoding of group list table:
+   * @verbinclude gd77grouptab.txt*/
+  struct __attribute__((packed)) grouptab_t {
     uint8_t     nitems1[128];         ///< Number of members (N+1) for every group list, zero when disabled.
     grouplist_t grouplist[NGLISTS];   ///< The actual grouplists.
-	} grouptab_t;
+  };
 
-  /** Represents a sinle scan list within the codeplug. */
+  /** Represents a single scan list within the codeplug.
+   *
+   * Encoding of scan list (size: 0x58b):
+   * @verbinclude gd77scanlist.txt */
   struct __attribute__((packed)) scanlist_t {
     /** Possible priority channel types. */
     typedef enum {
@@ -289,22 +332,21 @@ protected:
       PL_PRI_NONPRI = 3           ///< Priority and non-priority channels.
     } PriorityType;
 
-    // Bytes 0-14
+    // Byte 00
     uint8_t name[15];             ///< Scan list name, ASCII, 0xff terminated.
-    // Byte 15
+    // Byte 0f
     uint8_t _unused       : 4,    ///< Unknown set to 1.
       channel_mark        : 1,    ///< Channel mark, default 1.
       pl_type             : 2,    ///< PL type, default 3.
       talkback            : 1;    ///< Talkback, default 1.
-    // Bytes 16-79
+
+    // Byte 10
     uint16_t member[32];          ///< Channel indices, 0=not used/EOL or channel index+2.
 
-    // Bytes 80-85
+    // Bytes 50
     uint16_t priority_ch1;        ///< Priority channel 1 index, index+2 or 0=None, 1=selected.
     uint16_t priority_ch2;        ///< Priority channel 2 index, index+2 or 0=None, 1=selected.
     uint16_t tx_designated_ch;    ///< Designated TX channel, channel index+1 or 0=last active channel.
-
-    // Bytes 86-87
     uint8_t sign_hold_time;       ///< Signaling Hold Time (x25 = msec) default 40=1000ms.
     uint8_t prio_sample_time;     ///< Priority Sample Time (x250 = msec) default 8=2000ms.
 
@@ -326,7 +368,10 @@ protected:
     void fromScanListObj(const ScanList *lst, const Config *conf);
   };
 
-  /** Table/Bank of scanlists. */
+  /** Table/Bank of scanlists.
+   *
+   * Encoding of scan list table (size 0x1640b):
+   * @verbinclude gd77scantab.txt */
   struct __attribute__((packed)) scantab_t {
     /** Byte-field to indicate which scanlist is valid. Set to 0x01 when valid, 0x00 otherwise. */
     uint8_t    valid[NSCANL];
@@ -345,10 +390,6 @@ protected:
   /** Represents the table of preset messages within the codeplug. This representation is identical to
 	 * the table of messages of the RD-5R codeplug. Hence, it gets reused here. */
 	typedef RD5RCodeplug::msgtab_t msgtab_t;
-
-  /** Represents the timestamp within the codeplug. This representation is identical to
-	 * the timestamp of the RD-5R codeplug. Hence, it gets reused here. */
-	typedef RD5RCodeplug::timestamp_t timestamp_t;
 
 
 public:
