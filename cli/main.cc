@@ -50,6 +50,11 @@ int main(int argc, char *argv[])
                      QCoreApplication::translate("main", "Up- and download codeplugs in binary format.")
                    });
   parser.addOption({
+                     {"m", "manufacturer"},
+                     QCoreApplication::translate("main", "Given file is manufacturer codeplug file. "
+                     " Can be used with 'decode'.")
+                   });
+  parser.addOption({
                      {"R", "radio"},
                      QCoreApplication::translate("main", "Specifies the radio. This option can also "
                      "be used to override the auto-detection of radios. Be careful using this "
