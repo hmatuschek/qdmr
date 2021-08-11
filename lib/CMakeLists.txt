@@ -12,7 +12,7 @@ SET(libdmrconf_SOURCES
     csvreader.cc dfufile.cc repeaterdatabase.cc userdatabase.cc logger.cc
     config.cc contact.cc rxgrouplist.cc channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc
     roaming.cc callsigndb.cc talkgroupdatabase.cc radioid.cc
-    rd5r.cc rd5r_codeplug.cc
+    rd5r.cc rd5r_codeplug.cc rd5r_filereader.cc
     uv390.cc uv390_codeplug.cc uv390_callsigndb.cc
     gd77.cc gd77_codeplug.cc gd77_filereader.cc
     opengd77.cc opengd77_interface.cc opengd77_codeplug.cc opengd77_callsigndb.cc
@@ -33,7 +33,7 @@ SET(libdmrconf_MOC_HEADERS
     d878uv.hh d878uv_codeplug.hh
     d578uv.hh d578uv_codeplug.hh
     d878uv2.hh d878uv2_codeplug.hh d878uv2_callsigndb.hh)
-SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh gd77_filereader.hh
+SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh gd77_filereader.hh rd5r_filereader.hh
     utils.hh crc32.hh csvwriter.hh signaling.hh codeplugcontext.hh addressmap.hh)
 
 configure_file(config.h.in ${PROJECT_BINARY_DIR}/lib/config.h)

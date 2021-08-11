@@ -9,6 +9,7 @@
 #include "config.hh"
 #include "uv390_codeplug.hh"
 #include "rd5r_codeplug.hh"
+#include "rd5r_filereader.hh"
 #include "gd77_codeplug.hh"
 #include "gd77_filereader.hh"
 #include "opengd77_codeplug.hh"
@@ -58,16 +59,19 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       config.writeCSV(stream, errorMessage);
     }
   } else if ("rd5r"==radio) {
-    if (parser.isSet("manufacturer")) {
-      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" << radio << "'.";
-      return -1;
-    }
     RD5RCodeplug codeplug;
-    if (! codeplug.read(filename)) {
+    if (parser.isSet("manufacturer")) {
+      if (! RD5RFileReader::read(filename, &codeplug, errorMessage)) {
+        logError() << "Cannot decode manufacturer codeplug file '" << filename
+                   << "': " << errorMessage;
+        return -1;
+      }
+    } else if (! codeplug.read(filename)) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "': " << codeplug.errorMessage();
       return -1;
     }
+
     Config config;
     if (! codeplug.decode(&config)) {
       logError() << "Cannot decode binary codeplug file '" << filename
