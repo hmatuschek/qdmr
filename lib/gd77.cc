@@ -101,8 +101,6 @@ GD77::startDownload(bool blocking) {
     return false;
 
   _task = StatusDownload;
-  _config->reset();
-
   if (blocking) {
     run();
     return (StatusIdle == _task);
