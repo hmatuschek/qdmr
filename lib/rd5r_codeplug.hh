@@ -725,7 +725,10 @@ public:
     void setIntroLine2(const QString &text);
   };
 
-  /** Represents the table of text messages within the codeplug. */
+  /** Represents the table of text messages within the codeplug.
+   *
+   * Encoding of messages (size: 0x1248b):
+   * @verbinclude rd5rmessagetab.txt */
   struct __attribute__((packed)) msgtab_t {
     uint8_t count;                      ///< Number of messages.
     uint8_t _unused1[7];                ///< Unknown, set to 0.
