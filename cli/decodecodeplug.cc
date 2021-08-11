@@ -8,6 +8,7 @@
 #include "logger.hh"
 #include "config.hh"
 #include "uv390_codeplug.hh"
+#include "uv390_filereader.hh"
 #include "rd5r_codeplug.hh"
 #include "rd5r_filereader.hh"
 #include "gd77_codeplug.hh"
@@ -28,12 +29,14 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   QString errorMessage;
   QString radio = parser.value("radio").toLower();
   if (("uv390"==radio) || ("rt3s"==radio)) {
-    if (parser.isSet("manufacturer")) {
-      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" << radio << "'.";
-      return -1;
-    }
     UV390Codeplug codeplug;
-    if (! codeplug.read(filename)) {
+    if (parser.isSet("manufacturer")) {
+      if (! UV390FileReader::read(filename, &codeplug, errorMessage)) {
+        logError() << "Cannot decode manufacturer codeplug file '" << filename
+                   << "': " << errorMessage;
+        return -1;
+      }
+    } else if (! codeplug.read(filename)) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "' : " << codeplug.errorMessage();
       return -1;
