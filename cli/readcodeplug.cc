@@ -38,7 +38,7 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   QString filename = parser.positionalArguments().at(1);
 
   if (!parser.isSet("csv") && !filename.endsWith(".conf") && !filename.endsWith(".csv") &&
-      !parser.isSet("cpl") && !filename.endsWith(".bin") && !filename.endsWith(".dfu")) {
+      !parser.isSet("bin") && !filename.endsWith(".bin") && !filename.endsWith(".dfu")) {
     logError() << "Cannot determine output filetype, consider using --csv or --bin options.";
     return -1;
   }

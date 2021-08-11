@@ -162,9 +162,9 @@ again:
     }
   }
 
-  if ((_nbytes_received == LIBUSB_ERROR_TIMEOUT) && (nretry < 1000)) {
+  if ((_nbytes_received == LIBUSB_ERROR_TIMEOUT) && (nretry < 100)) {
     nretry++;
-    logDebug() << "HID (libusb): timeout. Retry...";
+    logDebug() << "HID (libusb): timeout. Retry no " << nretry << "...";
     goto again;
   }
 
