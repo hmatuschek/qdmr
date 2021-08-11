@@ -575,7 +575,10 @@ public:
     void setRadioId(uint32_t num);
   };
 
-  /** Represents the button settings. */
+  /** Represents the button settings.
+   *
+   * Encoding of button settings (size 0x20b):
+   * @verbinclude rd5rbuttonsettings.txt */
   struct __attribute__((packed)) button_settings_t {
     /** Possible actions for each button on short and long press. */
     typedef enum {
@@ -618,8 +621,8 @@ public:
     uint8_t  sk1_long;            ///< Event on long-press on SK1.
     uint8_t  sk2_short;           ///< Event on short-press on SK2.
     uint8_t  sk2_long;            ///< Event on long-press on SK2.
-    uint8_t  _unknown6;           ///< Unknown set to 0x13.
-    uint8_t  _unknown7;           ///< Unknown set to 0x11.
+    uint8_t  tk_short;            ///< Event on short-press on TK (GD77 only).
+    uint8_t  tk_long;             ///< Event on long-press on TK (GD77 only).
     one_touch_t one_touch[6];     ///< 6 x one-touch actions.
 
     /** Constructor. */
@@ -631,7 +634,10 @@ public:
     void initDefault();
   };
 
-  /** Represents the menu settings. */
+  /** Represents the menu settings.
+   *
+   * Encoding of Menu settings (size 0x08b):
+   * @verbinclude rd5rmenusettings.txt */
   struct __attribute__((packed)) menu_settings_t {
     // Byte 0
     uint8_t hangtime;             ///< Menu hang-time in seconds [1,30], default 10.
@@ -692,7 +698,10 @@ public:
       double_wait          : 2;   ///< Double-wait (dual-watch) mode. 1=Double/Double, 2=Double/Single.
   };
 
-  /** Represents the boot settings within the binary codeplug. */
+  /** Represents the boot settings within the binary codeplug.
+   *
+   * Encoding of boot settings (size 0x20b):
+   * @verbinclude rd5rbootsettings.txt */
   struct __attribute__((packed)) boot_settings_t {
     uint8_t boot_text;                  ///< Shows intro lines at boot (see @c RD5RCodeplug::intro_text_t), 0=image, 1=text, default=1.
     uint8_t boot_password_enabled;      ///< Enables to boot-password, 0=disabled, 1=enabled, default=0.

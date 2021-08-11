@@ -679,8 +679,8 @@ RD5RCodeplug::button_settings_t::clear() {
   sk1_long       = 0x00;
   sk2_short      = 0x00;
   sk2_short      = 0x00;
-  _unknown6      = 0x13;
-  _unknown7      = 0x11;
+  tk_short       = 0x13;
+  tk_long        = 0x11;
   memset(one_touch, 0xff, 6*sizeof(one_touch_t));
 }
 

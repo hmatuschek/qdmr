@@ -33,13 +33,16 @@
  *  <tr><th colspan="4">First segment 0x00080-0x07c00</th></tr>
  *  <tr><td>0x00080</td> <td>0x000e0</td> <td>0x0070</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x000e0</td> <td>0x000ec</td> <td>0x000c</td> <td>General settings, see @c GD77Codeplug::general_settings_t.</td></tr>
- *  <tr><td>0x000ec</td> <td>0x00128</td> <td>0x003c</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x000ec</td> <td>0x00108</td> <td>0x0028</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x00108</td> <td>0x00128</td> <td>0x0020</td> <td>Button settings, see @c GD77Codeplug::button_settings_t.</td></tr>
  *  <tr><td>0x00128</td> <td>0x01370</td> <td>0x1248</td> <td>32 message texts, see @c GD77Codeplug::msgtab_t</td></tr>
  *  <tr><td>0x01370</td> <td>0x01790</td> <td>0x0420</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x01790</td> <td>0x02dd0</td> <td>0x1640</td> <td>64 scan lists, see @c GD77Codeplug::scanlist_t</td></tr>
  *  <tr><td>0x02dd0</td> <td>0x03780</td> <td>0x09b0</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c GD77Codeplug::bank_t</td></tr>
  *  <tr><td>0x05390</td> <td>0x07540</td> <td>0x21b0</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x07518</td> <td>0x07538</td> <td>0x0020</td> <td>Boot settings, see @c GD77Codeplug::boot_settings_t.</td></tr>
+ *  <tr><td>0x07538</td> <td>0x07540</td> <td>0x0008</td> <td>Menu settings, see @c GD77Codeplug::menu_settings_t</td></tr>
  *  <tr><td>0x07540</td> <td>0x07560</td> <td>0x0020</td> <td>2 intro lines, @c GD77Codeplug::intro_text_t</td></tr>
  *  <tr><td>0x07560</td> <td>0x07c00</td> <td>0x06a0</td> <td>??? Unknown ???</td></tr>
  *  <tr><th colspan="4">Second segment 0x08000-0x1e300</th></tr>
@@ -391,6 +394,12 @@ public:
 	 * the table of messages of the RD-5R codeplug. Hence, it gets reused here. */
 	typedef RD5RCodeplug::msgtab_t msgtab_t;
 
+  /** Represents the boot settings for the GD77 (same as RD5R). */
+  typedef RD5RCodeplug::boot_settings_t boot_settings_t;
+  /** Represents the menu settings for the GD77 (same as RD5R). */
+  typedef RD5RCodeplug::menu_settings_t menu_settings_t;
+  /** Represents the button settings for the GD77 (same as RD5R). */
+  typedef RD5RCodeplug::button_settings_t button_settings_t;
 
 public:
   /** Constructs an empty codeplug for the GD-77. */
