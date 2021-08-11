@@ -175,6 +175,7 @@ GD77::run() {
     }
 
     _task = StatusIdle;
+    _dev->read_finish();
     _dev->reboot();
     _dev->close();
     emit downloadFinished(this, &_codeplug);
@@ -193,6 +194,7 @@ GD77::run() {
     }
 
     _task = StatusIdle;
+    _dev->write_finish();
     _dev->reboot();
     _dev->close();
     emit uploadComplete(this);
@@ -234,8 +236,6 @@ GD77::download() {
     }
   }
 
-  _dev->read_finish();
-
   return true;
 }
 
@@ -274,7 +274,6 @@ GD77::upload() {
     }
   }
 
-  _dev->read_finish();
   logDebug() << "Encode config into binary codeplug.";
 
   // Encode config into codeplug
@@ -300,7 +299,6 @@ GD77::upload() {
   }
 
   _task = StatusIdle;
-  _dev->write_finish();
 
   return true;
 }
