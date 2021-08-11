@@ -165,6 +165,9 @@ GD77::run() {
       emit downloadError(this);
       return;
     }
+
+    emit downloadStarted();
+
     // try download
     if (! download()) {
       _task = StatusError;
@@ -174,16 +177,20 @@ GD77::run() {
       return;
     }
 
-    _task = StatusIdle;
     _dev->read_finish();
     _dev->reboot();
     _dev->close();
+
+    _task = StatusIdle;
     emit downloadFinished(this, &_codeplug);
+    _config = nullptr;
   } else if (StatusUpload == _task) {
     if (! connect()) {
       emit uploadError(this);
       return;
     }
+
+    emit uploadStarted();
 
     if (! upload()) {
       _task = StatusError;
@@ -193,10 +200,11 @@ GD77::run() {
       return;
     }
 
-    _task = StatusIdle;
     _dev->write_finish();
     _dev->reboot();
     _dev->close();
+
+    _task = StatusIdle;
     emit uploadComplete(this);
   }
 }
@@ -204,8 +212,6 @@ GD77::run() {
 
 bool
 GD77::download() {
-  emit downloadStarted();
-
   // Check every segment in the codeplug
   size_t totb = 0;
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
@@ -242,8 +248,6 @@ GD77::download() {
 
 bool
 GD77::upload() {
-  emit uploadStarted();
-
   // Check every segment in the codeplug
   size_t totb = 0;
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
@@ -297,8 +301,6 @@ GD77::upload() {
       emit uploadProgress(50+float(bcount*50)/totb);
     }
   }
-
-  _task = StatusIdle;
 
   return true;
 }
