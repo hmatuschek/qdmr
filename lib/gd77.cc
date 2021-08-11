@@ -275,9 +275,12 @@ GD77::upload() {
   }
 
   _dev->read_finish();
+  logDebug() << "Encode config into binary codeplug.";
 
   // Encode config into codeplug
   _codeplug.encode(_config);
+
+  logDebug() << "Write binary codeplug into device.";
 
   // then, upload modified codeplug
   bcount = 0;
@@ -285,8 +288,8 @@ GD77::upload() {
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();
     uint b0 = addr/BSIZE, nb = size/BSIZE;
-    for (size_t b=1; b<nb; b++,bcount++) {
-      if (! _dev->write(0, b*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
+    for (size_t b=0; b<nb; b++,bcount++) {
+      if (! _dev->write(0, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
         _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
         return false;
