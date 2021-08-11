@@ -4,7 +4,7 @@
 #include "config.hh"
 
 
-#define BSIZE 1024
+#define BSIZE 128
 
 static Radio::Features _gd77_features = {
   .betaWarning = true,
