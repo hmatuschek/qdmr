@@ -538,7 +538,9 @@ Application::onCodeplugDownloadError(Radio *radio) {
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
-  radio->deleteLater();
+  if (radio->wait(250))
+    radio->deleteLater();
+
   _mainWindow->setWindowModified(false);
 }
 
@@ -558,7 +560,9 @@ Application::onCodeplugDownloaded(Radio *radio, CodePlug *codeplug) {
           tr("Cannot decode code-plug: %2").arg(codeplug->errorMessage()));
   }
   _mainWindow->setEnabled(true);
-  radio->deleteLater();
+
+  if (radio->wait(250))
+    radio->deleteLater();
 }
 
 void
@@ -664,7 +668,8 @@ Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
-  radio->deleteLater();
+  if (radio->wait(250))
+    radio->deleteLater();
 }
 
 
@@ -674,7 +679,8 @@ Application::onCodeplugUploaded(Radio *radio) {
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
-  radio->deleteLater();
+  if (radio->wait(250))
+    radio->deleteLater();
 }
 
 
