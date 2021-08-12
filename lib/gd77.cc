@@ -22,18 +22,18 @@ static Radio::Features _gd77_features = {
   .maxChannelNameLength = 16,
   .allowChannelNoDefaultContact = true,
 
-  .maxZones = 32,
+  .maxZones = 250,
   .maxZoneNameLength = 16,
   .maxChannelsInZone = 16,
   .hasABZone = false,
 
   .hasScanlists = true,
   .maxScanlists = 64,
-  .maxScanlistNameLength = 16,
+  .maxScanlistNameLength = 15,
   .maxChannelsInScanlist = 32,
   .scanListNeedsPriority = true,
 
-  .maxContacts = 256,
+  .maxContacts = 1024,
   .maxContactNameLength = 16,
 
   .maxGrouplists = 76,
