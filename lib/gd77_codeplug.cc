@@ -217,6 +217,8 @@ GD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
   tot = c->txTimeout()/15;
   rx_only = c->rxOnly() ? 1 : 0;
   bandwidth = BW_12_5_KHZ;
+  if (c->scanList())
+    scan_list_index = conf->scanlists()->indexOf(c->scanList())+1;
 
   if (c->is<AnalogChannel>()) {
     const AnalogChannel *ac = c->as<const AnalogChannel>();
@@ -230,7 +232,6 @@ GD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
     squelch = SQ_NORMAL; //ac->squelch();
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
-    scan_list_index = conf->scanlists()->indexOf(ac->scanList())+1;
   } else if (c->is<DigitalChannel>()) {
     const DigitalChannel *dc = c->as<const DigitalChannel>();
     channel_mode = MODE_DIGITAL;
@@ -241,7 +242,6 @@ GD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
     }
     repeater_slot2 = (DigitalChannel::TimeSlot1 == dc->timeslot()) ? 0 : 1;
     colorcode_rx = colorcode_tx = dc->colorCode();
-    scan_list_index = conf->scanlists()->indexOf(dc->scanList()) + 1;
     group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList()) + 1;
     contact_name_index = conf->contacts()->indexOfDigital(dc->txContact()) + 1;
   }
