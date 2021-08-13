@@ -129,6 +129,7 @@ HIDevice::write_read(const unsigned char *data, unsigned length, unsigned char *
         LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN,
         reply, rlength, read_callback, this, TIMEOUT_MSEC);
 
+  size_t nretry = 0;
 again:
   _nbytes_received = 0;
   libusb_submit_transfer(_transfer);
@@ -161,8 +162,11 @@ again:
     }
   }
 
-  if (_nbytes_received == LIBUSB_ERROR_TIMEOUT)
+  if ((_nbytes_received == LIBUSB_ERROR_TIMEOUT) && (nretry < 100)) {
+    nretry++;
+    logDebug() << "HID (libusb): timeout. Retry no " << nretry << "...";
     goto again;
+  }
 
   return _nbytes_received;
 }

@@ -123,6 +123,12 @@
           on <filename>.bin</filename> or <filename>.dfu</filename>.</para></listitem>
       </varlistentry>
       <varlistentry>
+        <term><option>-m</option> or <option>--manufacturer</option></term>
+        <listitem><para>Specifies the file format for the input file
+          for the <command>decode</command> command to be the manufacturer
+          binary codeplug format.</para></listitem>
+      </varlistentry>
+      <varlistentry>
         <term><option>-R</option> or <option>--radio=</option>NAME</term>
         <listitem><para>Specifies the radio for the <command>verify</command>,
           <command>encode</command> or <command>decode</command> commands.
@@ -135,6 +141,12 @@
         <term><option>-I</option> or <option>--id=</option>DMR_ID</term>
         <listitem><para>Specifies the DMR ID for the <command>write-db</command> or
           <command>encode-db</command> commands.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-n</option> or <option>--limit=</option>N</term>
+        <listitem><para>Limits several amonuts, depending on the context. When
+        encoding/writing the callsign db, this option speicifies the maximum
+        number of callsigns to encode.</para></listitem>
       </varlistentry>
       <varlistentry>
         <term><option>--init-codeplug</option></term>
@@ -156,6 +168,18 @@
         <term><option>--ignore-limits</option></term>
         <listitem><para>Disables the enforement of limits. Warnings are atill show.</para></listitem>
       </varlistentry>
+      <varlistentry>
+        <term><option>-h</option> or <option>--help</option></term>
+        <listitem><para>Displays a short help message.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-v</option> or <option>--version</option></term>
+        <listitem><para>Displays the version number.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-V</option> or <option>--verbose</option></term>
+        <listitem><para>Enable debug messages.</para></listitem>
+      </varlistentry>
     </variablelist>
   </refsect1>
 
@@ -166,11 +190,23 @@
     <variablelist>
       <varlistentry>
         <term><option>opengd77</option></term>
-        <listitem><para>All radios running the Open GD77 firmeare</para></listitem>
+        <listitem><para>All radios running the Open GD77 firmware</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>d868uve</option></term>
+        <listitem><para>Anytone AT-D868UVE</para></listitem>
       </varlistentry>
       <varlistentry>
         <term><option>d878uv</option></term>
         <listitem><para>Anytone AT-D878UV</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>d878uv2</option></term>
+        <listitem><para>Anytone AT-D878UVII</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>d578uv</option></term>
+        <listitem><para>Anytone AT-D578UV</para></listitem>
       </varlistentry>
       <varlistentry>
         <term><option>md390</option></term>

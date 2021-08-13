@@ -1,0 +1,15 @@
+     0                               8                               16                              24
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+00 | Menu hang time in sec         |RMO|RCK|MND|ECN|CAL|ESL|SCS|MSG|INS|BKL|PWR|TON|TLK|PRG|RDI|REN|ANC|MIC|PLK|VOX|PRV|SQL|LED|KPL|
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+04 | 1   1   1   0   0 |DBL|DSM|OTC| Unknown, set to 0xff          |ChanDis| 0   0 |BKLTime|KeyLock|DblWait|KYT| 1 | 0   0   0   0 |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+RMO = Remote monitor menu enable, RCK = Radio check menu enable, MND = Manual dial menu enable, ECN = Edit contact menu enable,
+CAL = Call alert menu enable, ESL = Edit scan list enable, SCS = Scan start enable, MSG = Message menu enable,
+INS = Intro screen menu enable, BKL = Backlight menu enable, PWR = Power setting enable, TON = Tone menu enable,
+TLK = Talkaround menu enable, PRG = Program-password menu enable, RDI = Radio-disable menu, REN = Radio-enable menu,
+ANC = Answered calls menu enable, MIC = Missed calls menu enable, PLK = Password and lock menu enable, VOX = VOX menu enable,
+PRV = Privacy menu enable, SQL = Squelch menu enable, LED = LED indicator menu enable, KPL = Keyboard lock menu enable,
+DBL = Double-wait menu enable, DSM = Display mode menu enable, OTC = Outgoing calls menu enable, BKLTime = Backlight time,
+DblWait = Double wait mode, KYT = Key tone enable,

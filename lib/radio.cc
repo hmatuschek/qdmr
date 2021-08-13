@@ -270,12 +270,20 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                       tr("Number of channels %2 in zone '%1' B exceeds limit %3.")
                       .arg(zone->name()).arg(zone->A()->count()).arg(features().maxChannelsInZone)));
 
-    if ((0 < zone->B()->count()) && (! features().hasABZone))
+    if ((0 < zone->B()->count()) && (! features().hasABZone)) {
       issues.append(VerifyIssue(
                       VerifyIssue::NOTIFICATION,
                       tr("Radio does not support dual-zones. Zone '%1' will be split into two.")
                       .arg(zone->name())));
-
+      if (zone->name()+2 > features().maxZoneNameLength) {
+        issues.append(VerifyIssue(
+                        VerifyIssue::WARNING,
+                        tr("Zone '%1' will be split into two but its name is too long to "
+                           "differentiate the created zones (exceeding limit of %2 chars). "
+                           "Consider using a shorter zone name.")
+                        .arg(zone->name()).arg(features().maxZoneNameLength)));
+      }
+    }
   }
 
   /*

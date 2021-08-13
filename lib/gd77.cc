@@ -4,7 +4,7 @@
 #include "config.hh"
 
 
-#define BSIZE 1024
+#define BSIZE 128
 
 static Radio::Features _gd77_features = {
   .betaWarning = true,
@@ -22,18 +22,18 @@ static Radio::Features _gd77_features = {
   .maxChannelNameLength = 16,
   .allowChannelNoDefaultContact = true,
 
-  .maxZones = 32,
+  .maxZones = 250,
   .maxZoneNameLength = 16,
   .maxChannelsInZone = 16,
   .hasABZone = false,
 
   .hasScanlists = true,
   .maxScanlists = 64,
-  .maxScanlistNameLength = 16,
+  .maxScanlistNameLength = 15,
   .maxChannelsInScanlist = 32,
   .scanListNeedsPriority = true,
 
-  .maxContacts = 256,
+  .maxContacts = 1024,
   .maxContactNameLength = 16,
 
   .maxGrouplists = 76,
@@ -101,8 +101,6 @@ GD77::startDownload(bool blocking) {
     return false;
 
   _task = StatusDownload;
-  _config->reset();
-
   if (blocking) {
     run();
     return (StatusIdle == _task);
@@ -167,6 +165,9 @@ GD77::run() {
       emit downloadError(this);
       return;
     }
+
+    emit downloadStarted();
+
     // try download
     if (! download()) {
       _task = StatusError;
@@ -176,15 +177,20 @@ GD77::run() {
       return;
     }
 
-    _task = StatusIdle;
+    _dev->read_finish();
     _dev->reboot();
     _dev->close();
+
+    _task = StatusIdle;
     emit downloadFinished(this, &_codeplug);
+    _config = nullptr;
   } else if (StatusUpload == _task) {
     if (! connect()) {
       emit uploadError(this);
       return;
     }
+
+    emit uploadStarted();
 
     if (! upload()) {
       _task = StatusError;
@@ -194,9 +200,11 @@ GD77::run() {
       return;
     }
 
-    _task = StatusIdle;
+    _dev->write_finish();
     _dev->reboot();
     _dev->close();
+
+    _task = StatusIdle;
     emit uploadComplete(this);
   }
 }
@@ -204,8 +212,6 @@ GD77::run() {
 
 bool
 GD77::download() {
-  emit downloadStarted();
-
   // Check every segment in the codeplug
   size_t totb = 0;
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
@@ -236,16 +242,12 @@ GD77::download() {
     }
   }
 
-  _dev->read_finish();
-
   return true;
 }
 
 
 bool
 GD77::upload() {
-  emit uploadStarted();
-
   // Check every segment in the codeplug
   size_t totb = 0;
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
@@ -276,10 +278,12 @@ GD77::upload() {
     }
   }
 
-  _dev->read_finish();
+  logDebug() << "Encode config into binary codeplug.";
 
   // Encode config into codeplug
   _codeplug.encode(_config);
+
+  logDebug() << "Write binary codeplug into device.";
 
   // then, upload modified codeplug
   bcount = 0;
@@ -287,8 +291,9 @@ GD77::upload() {
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();
     uint b0 = addr/BSIZE, nb = size/BSIZE;
-    for (size_t b=1; b<nb; b++,bcount++) {
-      if (! _dev->write(0, b*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
+    for (size_t b=0; b<nb; b++,bcount++) {
+      logDebug() << "Write " << BSIZE << "bytes to 0x" << QString::number((b0+b)*BSIZE,16) << ".";
+      if (! _dev->write(0, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
         _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
         return false;
@@ -296,9 +301,6 @@ GD77::upload() {
       emit uploadProgress(50+float(bcount*50)/totb);
     }
   }
-
-  _task = StatusIdle;
-  _dev->write_finish();
 
   return true;
 }
