@@ -1322,6 +1322,14 @@ D868UVCodeplug::contact_map_t::setIndex(uint32_t index) {
 D868UVCodeplug::D868UVCodeplug(QObject *parent)
   : AnytoneCodeplug(parent)
 {
+  this->clear();
+}
+
+void
+D868UVCodeplug::clear() {
+  while (this->numImages())
+    remImage(0);
+
   addImage("Anytone AT-D868UV Codeplug");
 
   // Channel bitmap
@@ -1349,11 +1357,6 @@ D868UVCodeplug::D868UVCodeplug(QObject *parent)
   // 2-Tone function bitmaps
   image(0).addElement(TWO_TONE_IDS_BITMAP, TWO_TONE_IDS_BITMAP_SIZE);
   image(0).addElement(TWO_TONE_FUNCTIONS_BITMAP, TWO_TONE_FUNC_BITMAP_SIZE);
-}
-
-void
-D868UVCodeplug::clear() {
-  // NOOP
 }
 
 void

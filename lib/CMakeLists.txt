@@ -16,9 +16,9 @@ SET(libdmrconf_SOURCES
     uv390.cc uv390_codeplug.cc uv390_callsigndb.cc
     gd77.cc gd77_codeplug.cc
     opengd77.cc opengd77_interface.cc opengd77_codeplug.cc opengd77_callsigndb.cc
-    anytone_interface.cc anytone_radio.cc anytone_codeplug.cc
-    d868uv.cc d868uv_codeplug.cc d868uv_callsigndb.cc
-    d878uv.cc d878uv_codeplug.cc
+    anytone_interface.cc anytone_radio.cc anytone_codeplug.cc anytone_filereader.cc
+    d868uv.cc d868uv_codeplug.cc d868uv_callsigndb.cc d868uv_filereader.cc
+    d878uv.cc d878uv_codeplug.cc d878uv_filereader.cc
     d578uv.cc d578uv_codeplug.cc
     d878uv2.cc d878uv2_codeplug.cc d878uv2_callsigndb.cc)
 SET(libdmrconf_MOC_HEADERS
@@ -34,6 +34,7 @@ SET(libdmrconf_MOC_HEADERS
     d578uv.hh d578uv_codeplug.hh
     d878uv2.hh d878uv2_codeplug.hh d878uv2_callsigndb.hh)
 SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh
+    anytone_filereader.hh d868uv_filereader.hh d878uv_filereader.hh
     utils.hh crc32.hh csvwriter.hh signaling.hh codeplugcontext.hh addressmap.hh)
 
 configure_file(config.h.in ${PROJECT_BINARY_DIR}/lib/config.h)

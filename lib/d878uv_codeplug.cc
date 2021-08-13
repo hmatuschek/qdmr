@@ -1002,6 +1002,12 @@ D878UVCodeplug::roaming_zone_t::linkRoamingZone(RoamingZone *zone, CodeplugConte
 D878UVCodeplug::D878UVCodeplug(QObject *parent)
   : D868UVCodeplug(parent)
 {
+}
+
+void
+D878UVCodeplug::clear() {
+  D868UVCodeplug::clear();
+
   // Rename image
   image(0).setName("Anytone AT-D878UV Codeplug");
 
@@ -1009,11 +1015,6 @@ D878UVCodeplug::D878UVCodeplug(QObject *parent)
   image(0).addElement(ADDR_ROAMING_CHANNEL_BITMAP, ROAMING_CHANNEL_BITMAP_SIZE);
   // Roaming zone bitmaps
   image(0).addElement(ADDR_ROAMING_ZONE_BITMAP, ROAMING_ZONE_BITMAP_SIZE);
-}
-
-void
-D878UVCodeplug::clear() {
-  D868UVCodeplug::clear();
 }
 
 void
