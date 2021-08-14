@@ -13,6 +13,7 @@ The order of elements in the file is
   * Radio ID list
   * Zone list
   * List of scan lists
+  * List of analog contacts
 
 The format of each element is documented below.
 
@@ -124,21 +125,21 @@ Each channel is encoded in a variable size binary blob as
 ## RadioID list
 As usual, the radio ID list starts with the number of defined IDs (little endian) and is followed by the actual list of IDs.
 ```
- +---+---+---+---+---+---+ ... +
- | #IDs  | RadioID data    ... |
- +---+---+---+---+---+---+ ... +
+ +---+---+---+---+---+ ... +
+ |#ID| RadioID data    ... |
+ +---+---+---+---+---+ ... +
 ```
 
 ### Radio ID encoding
 ```
-+---+---+---+---+---+---+---+ ... +---+
-| Index | DMR ID    | Name          0 |
-+---+---+---+---+---+---+---+ ... +---+
++---+---+---+---+---+---+ ... +---+
+|IDX| DMR ID    | Name          0 |
++---+---+---+---+---+---+ ... +---+
 ```
 
 | Field  | Description |
 |---|---|
-| ChIdx | Specifies the radio ID index in little endian, 0-based. |
+| IDX | Specifies the radio ID index in little endian, 0-based. |
 | DMR ID | The DMR ID as a 24bit little endian integer. |
 | Name | Variable length radio ID name. ASCII, 0-terminated. |
 
@@ -179,17 +180,45 @@ As usual, the scan lists starts with the number of scan lists and is followed by
 ### Scan list encoding
 ```
 +---+---+---+ ... +---+---+---+---+---+---+---+---+---+---+---+---+
-|SLI| Name    ...   0 |                                           |
+|SLI| Name    ...   0 | 0 |PCS|  PC1  |  PC2  |RVC|LBA|LBB|DOD|DWT|
 +---+---+---+ ... +---+---+---+---+---+---+---+---+---+---+---+---+
-+---+
-|NCH| 
-+---+
++---+---+---+---+---+---+---+ ... + 
+|NCH| 0   0 | Ch00  | Ch01  | ... |
++---+---+---+---+---+---+---+ ... +
 ```
 
 | Field  | Description |
 |---|---|
 | SLI | Scan list index. |
 | Name | Name of the scan list, max 16 x ASCII, 0-terminated. |
+| PCS | Priority channel select, 0=Off, 1=PC1, 2=PC2, 3=Both |
+| PC1 | Priority channel 1, 0=Off, 1=Current, else channel index + 2, little endian. |
+| PC2 | Priority channel 2, 0=Off, 1=Current, else channel index + 2, little endian. |
+| RVC | Revert channel, 0=Selected, 1=Selected+Talkback, 2=Last called, 3=Last used. |
+| LBA | Look back time A in 100ms. |
+| LBB | Look back time B in 100ms. |
+| DOD | Dropout delay in 100ms. |
+| DWT | Dwell time in 100ms. |
 | NCH | Number of channels in scan list. |
 
+
+## Analog contacts
+As usual, the analog contact list starts with the number of contacts and is followed by the actual contact list.
+```
+ +---+---+---+---+---+---+ ... +
+ |#AC| Analog contact data ... |
+ +---+---+---+---+---+---+ ... +
+```
+
+### Analog contact encoding
+```
++---+---+---+---+ ... +---+---+ ... +---+
+|IDX|NoL| Number  ... | Name    ...   0 |
++---+---+---+---+ ... +---+---+ ... +---+
+```
+| Field  | Description |
+|---|---|
+| IDX | Analog contact index. |
+| NoL | Number length. |
+| Name | Name of the contact, max 16 x ASCII, 0-terminated. |
 

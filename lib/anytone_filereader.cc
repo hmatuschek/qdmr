@@ -49,17 +49,30 @@ AnytoneFileReader::read() {
 
   if (! this->readHeader())
     return false;
-
   if (! this->readChannels())
     return false;
-
   if (! this->readRadioIDs())
     return false;
-
   if (! this->readZones())
     return false;
-
   if (! this->readScanLists())
+    return false;
+  if (! this->readAnalogContacts())
+    return false;
+
+  // 2nd pass, link.
+  _data = _start;
+  if (! this->linkHeader())
+    return false;
+  if (! this->linkChannels())
+    return false;
+  if (! this->linkRadioIDs())
+    return false;
+  if (! this->linkZones())
+    return false;
+  if (! this->linkScanLists())
+    return false;
+  if (! this->linkAnalogContacts())
     return false;
 
   return true;

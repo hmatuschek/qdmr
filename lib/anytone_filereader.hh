@@ -33,11 +33,19 @@ public:
 
 protected:
   virtual bool read();
+
   virtual bool readHeader() = 0;
+  virtual bool linkHeader() = 0;
   virtual bool readChannels() = 0;
+  virtual bool linkChannels() = 0;
   virtual bool readRadioIDs() = 0;
+  virtual bool linkRadioIDs() = 0;
   virtual bool readZones() = 0;
+  virtual bool linkZones() = 0;
   virtual bool readScanLists() = 0;
+  virtual bool linkScanLists() = 0;
+  virtual bool readAnalogContacts() = 0;
+  virtual bool linkAnalogContacts() = 0;
 
 public:
   static bool read(const QString &filename, Config *config, QString &message);

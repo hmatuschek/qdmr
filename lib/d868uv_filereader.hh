@@ -39,7 +39,7 @@ public:
   public:
     RadioIDElement(const uint8_t *ptr);
 
-    uint16_t index() const;
+    uint8_t index() const;
     uint32_t id() const;
     QString name() const;
 
@@ -55,6 +55,8 @@ public:
     ZoneElement(const uint8_t *ptr);
 
     uint8_t index() const;
+    uint16_t channelA() const;
+    uint16_t channelB() const;
     uint8_t numChannels() const;
     uint16_t channel(uint8_t index) const;
     QString name() const;
@@ -66,19 +68,69 @@ public:
     size_t _nameLength;
   };
 
+  class ScanListElement: public AnytoneFileReader::Element
+  {
+  public:
+    ScanListElement(const uint8_t *ptr);
+
+    uint8_t index() const;
+    uint8_t numChannels() const;
+    D868UVCodeplug::scanlist_t::PriChannel prioChannelSelect() const;
+    uint16_t prioChannel1() const;
+    uint16_t prioChannel2() const;
+    uint16_t channel(uint8_t index) const;
+    QString name() const;
+
+    size_t size() const;
+
+  protected:
+    uint8_t _numChannels;
+    size_t _nameLength;
+  };
+
+  class AnalogContactElement: public AnytoneFileReader::Element
+  {
+  public:
+    AnalogContactElement(const uint8_t *ptr);
+
+    uint8_t index() const;
+    QString number() const;
+    QString name() const;
+
+    size_t size() const;
+
+  protected:
+    uint8_t _numberLength;
+    size_t _nameLength;
+  };
+
 
 public:
   D868UVFileReader(Config *config, const uint8_t *data, size_t size, QString &message);
 
+  bool linkHeader();
   bool readHeader();
+
   bool readChannels();
   virtual bool readChannel();
+  bool linkChannels();
+  virtual bool linkChannel();
+
   bool readRadioIDs();
   virtual bool readRadioID();
+  bool linkRadioIDs();
+
   bool readZones();
   virtual bool readZone();
+  bool linkZones();
+
   bool readScanLists();
   virtual bool readScanList();
+  bool linkScanLists();
+
+  bool readAnalogContacts();
+  virtual bool readAnalogContact();
+  bool linkAnalogContacts();
 };
 
 #endif // D868UVFILEREADER_HH
