@@ -225,11 +225,11 @@ HID::selectMemoryBank(MemoryBank bank) {
 
   // select memory bank
   if (! hid_send_recv(cmd, 8, &ack, 1)) {
-    _errorMessage = tr("Cannot select memory bank: %1").arg(_errorMessage);
+    _errorMessage = tr("Cannot send command: %1").arg(_errorMessage);
     return false;
   }
   if (ack != CMD_ACK[0]) {
-    _errorMessage = tr("Cannot select memory bank: Wrong acknowledge %3, expected %4.")
+    _errorMessage = tr("Cannot select memory bank: Wrong acknowledge %1, expected %2.")
         .arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
     return false;
   }
