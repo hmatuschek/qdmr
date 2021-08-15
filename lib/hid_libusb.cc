@@ -90,8 +90,9 @@ HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned cha
   nbytes += 4;
 
   reply_len = write_read(buf, sizeof(buf), reply, sizeof(reply));
-  if (reply_len < 0)
+  if (reply_len < 0) {
     return false;
+  }
 
   if (reply_len != sizeof(reply)) {
     _errorMessage = tr("Short read: %1 bytes instead of %2!")
