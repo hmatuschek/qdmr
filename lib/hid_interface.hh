@@ -19,11 +19,12 @@ class HID: public HIDevice, public RadioInterface
 	Q_OBJECT
 
 public:
+  /** Possible memory banks to select. */
   enum MemoryBank {
-    MEMBANK_NONE           = -1,
-    MEMBANK_CODEPLUG_LOWER =  0,
-    MEMBANK_CODEPLUG_UPPER =  1,
-    MEMBANK_CALLSIGN_DB    =  3
+    MEMBANK_NONE           = -1,    ///< No bank selected.
+    MEMBANK_CODEPLUG_LOWER =  0,    ///< Lower memory bank (EEPROM).
+    MEMBANK_CODEPLUG_UPPER =  1,    ///< Upper memory bank (FLASH).
+    MEMBANK_CALLSIGN_DB    =  3     ///< Callsign DB memory bank (also FLASH).
   };
 
 public:
@@ -68,9 +69,11 @@ public:
   inline const QString &errorMessage() const { return _errorMessage; }
 
 protected:
+  /** Internal used function to select a memory bank. */
   bool selectMemoryBank(MemoryBank bank);
 
 private:
+  /** The currently selected memory bank. */
   MemoryBank _current_bank;
 };
 
