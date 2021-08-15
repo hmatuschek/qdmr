@@ -14,9 +14,10 @@ static const unsigned char CMD_ENDR[]  = "ENDR";
 static const unsigned char CMD_ENDW[]  = "ENDW";
 static const unsigned char CMD_CWB0[]  = "CWB\4\0\0\0\0";
 static const unsigned char CMD_CWB1[]  = "CWB\4\0\1\0\0";
+static const unsigned char CMD_CWB3[]  = "CWB\4\0\3\0\0";
 
 HID::HID(int vid, int pid, QObject *parent)
-  : HIDevice(vid, pid, parent), _offset(0)
+  : HIDevice(vid, pid, parent), _current_bank(MEMBANK_NONE)
 {
   // pass...
 }
@@ -88,6 +89,11 @@ HID::identifier() {
 
 bool
 HID::read_start(uint32_t bank, uint32_t addr) {
+  if (! selectMemoryBank(MemoryBank(bank))) {
+    _errorMessage = tr("Cannot select memory bank %1: %2").arg(bank).arg(_errorMessage);
+    return false;
+  }
+
   return true;
 }
 
@@ -99,9 +105,8 @@ HID::read(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
   unsigned char cmd[4], reply[32+4];
   int n;
 
-  if (! selectMemoryBank(addr)) {
-    _errorMessage = tr("%1: Cannot read addr 0x%2 (n=%3): %4")
-        .arg(__func__).arg(addr,0,16).arg(nbytes);
+  if (! selectMemoryBank(MemoryBank(bank))) {
+    _errorMessage = tr("Cannot select memory bank %1: %2").arg(bank).arg(_errorMessage);
     return false;
   }
 
@@ -141,6 +146,11 @@ HID::read_finish()
 
 bool
 HID::write_start(uint32_t bank, uint32_t addr) {
+  if (! selectMemoryBank(MemoryBank(bank))) {
+    _errorMessage = tr("Cannot select memory bank %1: %2").arg(bank).arg(_errorMessage);
+    return false;
+  }
+
   return true;
 }
 
@@ -151,9 +161,8 @@ HID::write(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
 
   unsigned char ack, cmd[4+32];
 
-  if (! selectMemoryBank(addr)) {
-    _errorMessage = tr("%1: Cannot write addr 0x%2 (n=%3): %4")
-        .arg(__func__).arg(addr,0,16).arg(nbytes);
+  if (! selectMemoryBank(MemoryBank(bank))) {
+    _errorMessage = tr("Cannot select memory bank %1: %2").arg(bank).arg(_errorMessage);
     return false;
   }
 
@@ -195,35 +204,35 @@ HID::write_finish()
 }
 
 bool
-HID::selectMemoryBank(uint addr) {
+HID::selectMemoryBank(MemoryBank bank) {
   unsigned char ack;
+  const uint8_t *cmd = nullptr;
+
+  if (_current_bank == bank)
+    return true;
+
+  // Select command by memory bank
+  switch (bank) {
+  case MEMBANK_CODEPLUG_LOWER : cmd = CMD_CWB0; break;
+  case MEMBANK_CODEPLUG_UPPER : cmd = CMD_CWB1; break;
+  case MEMBANK_CALLSIGN_DB :    cmd = CMD_CWB3; break;
+  default:
+    _errorMessage = tr("Cannot set memory bank: Unknown bank %1").arg(bank);
+    return false;
+  }
 
   // select memory bank according to address
-  if ((addr < 0x10000) && (_offset != 0)) {
-    _offset = 0;
-    if (! hid_send_recv(CMD_CWB0, 8, &ack, 1)) {
-      _errorMessage = tr("%1: Cannot select memory bank for addr %2: %3").arg(__func__)
-          .arg(addr).arg(_errorMessage);
-      return false;
-    }
-    if (ack != CMD_ACK[0]) {
-      _errorMessage = tr("%1: Cannot select memory bank for addr %2: Wrong acknowledge %3, expected %4.")
-          .arg(__func__).arg(addr).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
-      return false;
-    }
-  } else if ((addr >= 0x10000) && (0 == _offset)) {
-    _offset = 0x00010000;
-    if (! hid_send_recv(CMD_CWB1, 8, &ack, 1)) {
-      _errorMessage = tr("%1: Cannot select memory bank for addr %2: %3").arg(__func__)
-          .arg(addr).arg(_errorMessage);
-      return false;
-    }
-    if (ack != CMD_ACK[0]) {
-      _errorMessage = tr("%1: Cannot select memory bank for addr %2: Wrong acknowledge %3, expected %4.")
-          .arg(__func__).arg(addr).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
-      return false;
-    }
+  if (! hid_send_recv(CMD_CWB0, 8, &ack, 1)) {
+    _errorMessage = tr("Cannot select memory bank: %1").arg(_errorMessage);
+    return false;
   }
+  if (ack != CMD_ACK[0]) {
+    _errorMessage = tr("Cannot select memory bank: Wrong acknowledge %3, expected %4.")
+        .arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
+    return false;
+  }
+
+  _current_bank = bank;
 
   return true;
 }

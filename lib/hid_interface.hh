@@ -19,6 +19,14 @@ class HID: public HIDevice, public RadioInterface
 	Q_OBJECT
 
 public:
+  enum MemoryBank {
+    MEMBANK_NONE           = -1,
+    MEMBANK_CODEPLUG_LOWER =  0,
+    MEMBANK_CODEPLUG_UPPER =  1,
+    MEMBANK_CALLSIGN_DB    =  3
+  };
+
+public:
   /** Connects to the radio with given vendor and product ID. */
 	explicit HID(int vid, int pid, QObject *parent = nullptr);
   /** Destructor. */
@@ -59,9 +67,11 @@ public:
   /** Retruns the last error message. */
   inline const QString &errorMessage() const { return _errorMessage; }
 
+protected:
+  bool selectMemoryBank(MemoryBank bank);
+
 private:
-  bool selectMemoryBank(uint addr);
-  uint32_t _offset;
+  MemoryBank _current_bank;
 };
 
 #endif // HIDINTERFACE_HH
