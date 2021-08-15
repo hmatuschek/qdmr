@@ -192,11 +192,13 @@ OpenGD77::run() {
     if (! download()) {
       _task = StatusError;
       _dev->read_finish();
+      _dev->reboot();
       _dev->close();
       emit downloadError(this);
       return;
     }
 
+    _dev->read_finish();
     _dev->reboot();
     _dev->close();
     _task = StatusIdle;
@@ -211,11 +213,13 @@ OpenGD77::run() {
     if (! upload()) {
       _task = StatusError;
       _dev->write_finish();
+      _dev->reboot();
       _dev->close();
       emit uploadError(this);
       return;
     }
 
+    _dev->write_finish();
     _dev->reboot();
     _dev->close();
     _task = StatusIdle;
@@ -229,11 +233,13 @@ OpenGD77::run() {
     if (! uploadCallsigns()) {
       _task = StatusError;
       _dev->write_finish();
+      _dev->reboot();
       _dev->close();
       emit uploadError(this);
       return;
     }
 
+    _dev->write_finish();
     _dev->reboot();
     _dev->close();
     _task = StatusIdle;
