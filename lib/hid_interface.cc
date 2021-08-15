@@ -17,9 +17,9 @@ static const unsigned char CMD_CWB1[]  = "CWB\4\0\1\0\0";
 static const unsigned char CMD_CWB3[]  = "CWB\4\0\3\0\0";
 
 HID::HID(int vid, int pid, QObject *parent)
-  : HIDevice(vid, pid, parent), _current_bank(MEMBANK_NONE)
+  : HIDevice(vid, pid, parent), _current_bank(MEMBANK_NONE), _identifier()
 {
-  // pass...
+  identifier();
 }
 
 HID::~HID() {
@@ -35,6 +35,7 @@ HID::isOpen() const {
 
 void
 HID::close() {
+  _identifier.clear();
   HIDevice::close();
 }
 
@@ -42,6 +43,9 @@ QString
 HID::identifier() {
   static unsigned char reply[38];
   unsigned char ack;
+
+  if (! _identifier.isEmpty())
+    return _identifier;
 
   logDebug() << "Radioddity HID interface: Enter program mode.";
 
@@ -86,8 +90,9 @@ HID::identifier() {
   if (p)
     *p = 0;
 
-  logDebug() << "Got radio ID '" << reply << "'.";
-  return (char*)reply;
+  _identifier = (char*)reply;
+  logDebug() << "Got device ID '" << _identifier << "'.";
+  return _identifier;
 }
 
 
@@ -141,6 +146,8 @@ HID::read_finish()
         .arg(__func__).arg(ack).arg(CMD_ACK[0]);
     return false;
   }
+
+  _identifier.clear();
 
   return true;
 }
@@ -199,6 +206,8 @@ HID::write_finish()
         .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
     return false;
   }
+
+  _identifier.clear();
 
   return true;
 }

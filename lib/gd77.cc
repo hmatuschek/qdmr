@@ -160,11 +160,13 @@ GD77::connect() {
     return true;
 
   // If not open -> reconnect
-  if (_dev)
+  if (_dev) {
+    logDebug() << "Device not open, reconnect.";
     _dev->deleteLater();
+  }
+
   // connect
   _dev = new HID(0x15a2, 0x0073);
-  _dev->identifier();
 
   if (! _dev->isOpen()) {
     _task = StatusError;

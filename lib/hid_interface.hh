@@ -75,6 +75,8 @@ protected:
 private:
   /** The currently selected memory bank. */
   MemoryBank _current_bank;
+  /** Identifier received when entering the prog mode. */
+  QString _identifier;
 };
 
 #endif // HIDINTERFACE_HH
