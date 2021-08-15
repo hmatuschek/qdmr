@@ -24,29 +24,27 @@ GD77CallsignDB::userdb_entry_t::clear() {
 
 uint32_t
 GD77CallsignDB::userdb_entry_t::getNumber() const {
-  return decode_dmr_id_bcd((uint8_t *)&number);
+  return decode_dmr_id_bcd_le((uint8_t *)&number);
 }
 void
 GD77CallsignDB::userdb_entry_t::setNumber(uint32_t number) {
-  encode_dmr_id_bcd((uint8_t *)&(this->number), number);
+  encode_dmr_id_bcd_le((uint8_t *)&(this->number), number);
 }
 
 QString
 GD77CallsignDB::userdb_entry_t::getName() const {
-  return decode_ascii((const uint8_t *)name, 8, 0x00);
+  return decode_ascii((const uint8_t *)name, 7, 0x00);
 }
 void
 GD77CallsignDB::userdb_entry_t::setName(const QString &name) {
-  encode_ascii((uint8_t *)(this->name), name, 8, 0x00);
+  encode_ascii((uint8_t *)(this->name), name, 7, 0x00);
 }
 
 void
 GD77CallsignDB::userdb_entry_t::fromEntry(const UserDatabase::User &user) {
+  clear();
   setNumber(user.id);
-  QString tmp = user.call;
-  if (!user.name.isEmpty())
-    tmp = tmp + " " + user.name;
-  setName(tmp);
+  setName(user.call);
 }
 
 
