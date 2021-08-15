@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
   // Instantiate core application
   QCoreApplication app(argc, argv);
   app.setApplicationName("dmrconf");
-  app.setOrganizationName("dm3mat");
+  app.setOrganizationName("DM3MAT");
   app.setOrganizationDomain("dm3mat.darc.de");
   app.setApplicationVersion(VERSION_STRING);
 
