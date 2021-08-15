@@ -221,8 +221,10 @@ HID::selectMemoryBank(MemoryBank bank) {
     return false;
   }
 
-  // select memory bank according to address
-  if (! hid_send_recv(CMD_CWB0, 8, &ack, 1)) {
+  logDebug() << "Selecting memory bank " << bank;
+
+  // select memory bank
+  if (! hid_send_recv(cmd, 8, &ack, 1)) {
     _errorMessage = tr("Cannot select memory bank: %1").arg(_errorMessage);
     return false;
   }
