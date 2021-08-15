@@ -219,10 +219,14 @@ RD5R::download() {
 
   uint bcount = 0;
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-    HID::MemoryBank bank = ( (0 == n) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
     int b0 = _codeplug.image(0).element(n).address()/BSIZE;
     int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
     for (int i=0; i<nb; i++, bcount++) {
+      // Select bank by addr
+      uint32_t addr = (b0+i)*BSIZE;
+      HID::MemoryBank bank = (
+            (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+      // read
       if (! _dev->read(bank, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
         _errorMessage = tr("%1: Cannot download codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
@@ -249,11 +253,15 @@ RD5R::upload() {
   if (_codeplugFlags.updateCodePlug) {
     // If codeplug gets updated, download codeplug from device first:
     for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-      HID::MemoryBank bank = ( (0 == n) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
       int b0 = _codeplug.image(0).element(n).address()/BSIZE;
       int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
       for (int i=0; i<nb; i++, bcount++) {
-        if (! _dev->read(bank, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+        // Select bank by addr
+        uint32_t addr = (b0+i)*BSIZE;
+        HID::MemoryBank bank = (
+              (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+        // read
+        if (! _dev->read(bank, addr, _codeplug.data(addr), BSIZE)) {
           _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
           return false;
@@ -273,11 +281,15 @@ RD5R::upload() {
   // then, upload modified codeplug
   bcount = 0;
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-    HID::MemoryBank bank = ( (0 == n) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
     int b0 = _codeplug.image(0).element(n).address()/BSIZE;
     int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
     for (int i=0; i<nb; i++, bcount++) {
-      if (! _dev->write(bank, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+      // Select bank by addr
+      uint32_t addr = (b0+i)*BSIZE;
+      HID::MemoryBank bank = (
+            (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+      // write block
+      if (! _dev->write(bank, addr, _codeplug.data(addr), BSIZE)) {
         _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
         return false;

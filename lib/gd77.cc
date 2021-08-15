@@ -266,12 +266,16 @@ GD77::download() {
   // Then download codeplug
   size_t bcount = 0;
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-    HID::MemoryBank bank = ( (0 == n) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();
     uint b0 = addr/BSIZE, nb = size/BSIZE;
     for (uint b=0; b<nb; b++, bcount++) {
-      if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
+      // Select bank by addr
+      uint32_t addr = (b0+b)*BSIZE;
+      HID::MemoryBank bank = (
+            (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+      // read
+      if (! _dev->read(bank, addr, _codeplug.data(addr), BSIZE)) {
         _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
         return false;
@@ -303,11 +307,15 @@ GD77::upload() {
   // First download codeplug from device:
   size_t bcount = 0;
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-    HID::MemoryBank bank = ( (0 == n) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();
     uint b0 = addr/BSIZE, nb = size/BSIZE;
     for (uint b=0; b<nb; b++, bcount++) {
+      // Select bank by addr
+      uint32_t addr = (b0+b)*BSIZE;
+      HID::MemoryBank bank = (
+            (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+      // read
       if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
         _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
@@ -328,13 +336,16 @@ GD77::upload() {
   // then, upload modified codeplug
   bcount = 0;
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-    HID::MemoryBank bank = ( (0 == n) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();
     uint b0 = addr/BSIZE, nb = size/BSIZE;
     for (size_t b=0; b<nb; b++,bcount++) {
-      logDebug() << "Write " << BSIZE << "bytes to 0x" << QString::number((b0+b)*BSIZE,16) << ".";
-      if (! _dev->write(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
+      // Select bank by addr
+      uint32_t addr = (b0+b)*BSIZE;
+      HID::MemoryBank bank = (
+            (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+      logDebug() << "Write " << BSIZE << "bytes to 0x" << QString::number(addr,16) << ".";
+      if (! _dev->write(bank, addr, _codeplug.data(addr), BSIZE)) {
         _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
         return false;

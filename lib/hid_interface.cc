@@ -100,8 +100,6 @@ HID::read_start(uint32_t bank, uint32_t addr) {
 bool
 HID::read(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
 {
-  Q_UNUSED(bank);
-
   unsigned char cmd[4], reply[32+4];
   int n;
 
@@ -157,8 +155,6 @@ HID::write_start(uint32_t bank, uint32_t addr) {
 bool
 HID::write(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
 {
-  Q_UNUSED(bank);
-
   unsigned char ack, cmd[4+32];
 
   if (! selectMemoryBank(MemoryBank(bank))) {
