@@ -78,7 +78,7 @@ bool
 UserDatabase::load(const QString &filename) {
   QFile file(filename);
   if (! file.open(QIODevice::ReadOnly)) {
-    QString msg = QString("Cannot open user list '%1': ").arg(filename).arg(file.errorString());
+    QString msg = QString("Cannot open user list '%1': %2").arg(filename).arg(file.errorString());
     logError() << msg;
     emit error(msg);
     return false;

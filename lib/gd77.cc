@@ -105,6 +105,7 @@ GD77::startDownload(bool blocking) {
     run();
     return (StatusIdle == _task);
   }
+
   start();
   return true;
 }
@@ -146,9 +147,6 @@ GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::S
     return (StatusIdle == _task);
   }
 
-  // If non-blocking -> move device to this thread
-  if (_dev && _dev->isOpen())
-    _dev->moveToThread(this);
   // start thread for upload
   start();
 
@@ -160,11 +158,14 @@ GD77::connect() {
   // If connected -> done
   if (_dev && _dev->isOpen())
     return true;
+
   // If not open -> reconnect
   if (_dev)
     _dev->deleteLater();
   // connect
   _dev = new HID(0x15a2, 0x0073);
+  _dev->identifier();
+
   if (! _dev->isOpen()) {
     _task = StatusError;
     _errorMessage = tr("%1(): Cannot connect to radio: %2").arg(__func__).arg(_dev->errorMessage());
@@ -172,6 +173,7 @@ GD77::connect() {
     _dev = nullptr;
     return false;
   }
+
   return true;
 }
 

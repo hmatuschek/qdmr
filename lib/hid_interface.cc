@@ -43,6 +43,8 @@ HID::identifier() {
   static unsigned char reply[38];
   unsigned char ack;
 
+  logDebug() << "Radioddity HID interface: Enter program mode.";
+
   if (! hid_send_recv(CMD_PRG, 7, &ack, 1)) {
     _errorMessage = tr("Cannot identify radio: %1").arg(_errorMessage);
     logError() << _errorMessage;
@@ -83,6 +85,8 @@ HID::identifier() {
   char *p = (char *)memchr(reply, 0xff, sizeof(reply));
   if (p)
     *p = 0;
+
+  logDebug() << "Got radio ID '" << reply << "'.";
   return (char*)reply;
 }
 
