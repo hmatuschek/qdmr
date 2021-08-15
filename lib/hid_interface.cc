@@ -35,6 +35,7 @@ HID::isOpen() const {
 
 void
 HID::close() {
+  logDebug() << "Close HID connection.";
   _identifier.clear();
   HIDevice::close();
 }
