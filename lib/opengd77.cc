@@ -68,10 +68,12 @@ OpenGD77::OpenGD77(OpenGD77Interface *device, QObject *parent)
 
 OpenGD77::~OpenGD77() {
   if (_dev && _dev->isOpen())  {
+    logDebug() << "Closing device.";
     _dev->reboot();
     _dev->close();
   }
   if (_dev) {
+    logDebug() << "Deleting device.";
     _dev->deleteLater();
     _dev = nullptr;
   }
@@ -211,6 +213,7 @@ OpenGD77::run() {
       _dev->write_finish();
       _dev->close();
       emit uploadError(this);
+      return;
     }
 
     _dev->reboot();
@@ -219,7 +222,7 @@ OpenGD77::run() {
     emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {
     if (! connect()) {
-      emit downloadError(this);
+      emit uploadError(this);
       return;
     }
 
@@ -228,6 +231,7 @@ OpenGD77::run() {
       _dev->write_finish();
       _dev->close();
       emit uploadError(this);
+      return;
     }
 
     _dev->reboot();
