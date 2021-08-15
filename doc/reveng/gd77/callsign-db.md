@@ -20,8 +20,8 @@ There is no index table written to the device.
 Each entry of the table is encoded into 12bytes as
 ``` 
 0                               8                               
-+---+---+---+---+---+---+---+---+---+---+---+
-| DMR ID        | Name, ASCII               |
-+---+---+---+---+---+---+---+---+---+---+---+
++---+---+---+---+---+---+---+---+---+---+---+---+
+| DMR ID        | Name, ASCII                   |
++---+---+---+---+---+---+---+---+---+---+---+---+
 ``` 
 where the DMR ID is encoded as 8 BCD numbers in litte-endian and the name is max 8 ASCII chars, 0-terminated and padded.

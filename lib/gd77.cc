@@ -53,7 +53,7 @@ static Radio::Features _gd77_features = {
 
   .hasCallsignDB = true,
   .callsignDBImplemented = false,
-  .maxCallsignsInDB = 0
+  .maxCallsignsInDB = 10920
 };
 
 
