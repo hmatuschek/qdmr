@@ -373,13 +373,6 @@ GD77::uploadCallsigns()
 
   size_t totb = _callsigns.memSize();
 
-  if (! _dev->write_start(1, 0)) {
-    _errorMessage = QString("in %1(), cannot start callsign DB upload:\n\t %2")
-        .arg(__func__).arg(_dev->errorMessage());
-    logError() << _errorMessage;
-    return false;
-  }
-
   uint bcount = 0;
   // Then upload callsign DB
   for (int n=0; n<_callsigns.image(0).numElements(); n++) {
