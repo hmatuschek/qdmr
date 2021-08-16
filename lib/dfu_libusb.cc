@@ -36,7 +36,6 @@ enum {
 DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
   : QObject(parent), RadioInterface(), _ctx(nullptr), _dev(nullptr), _ident(nullptr)
 {
-  //logDebug() << "Try to detect USB DFU interface " << Qt::hex << vid << ":" << pid << ".";
   logDebug() << "Try to detect USB DFU interface " << QString::number(vid,16)
              << ":" << QString::number(pid,16) << ".";
   int error = libusb_init(&_ctx);
