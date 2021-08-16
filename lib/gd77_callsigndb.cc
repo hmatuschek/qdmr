@@ -1,6 +1,7 @@
 #include "gd77_callsigndb.hh"
 #include "utils.hh"
 #include "userdatabase.hh"
+#include "logger.hh"
 #include <QtEndian>
 
 #define OFFSET_USERDB       0x00000
@@ -91,14 +92,17 @@ GD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection) {
     return true;
 
   // Select first n entries and sort them in ascending order of their IDs
+  logDebug() << "Select first " << n << " entries out off " << calldb->count() << ".";
   QVector<UserDatabase::User> users;
   for (uint i=0; i<n; i++)
     users.append(calldb->user(i));
+  logDebug() << "Sort selected w.r.t their ID.";
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
 
   // Allocate segment for user db if requested
   uint size = align_size(sizeof(userdb_t)+n*sizeof(userdb_entry_t), BLOCK_SIZE);
+  logDebug() << "Allocate " << size << "bytes for call-sign DB.";
   this->image(0).addElement(OFFSET_USERDB, size);
 
   // Encode user DB

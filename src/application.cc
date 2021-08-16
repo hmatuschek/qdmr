@@ -637,7 +637,8 @@ Application::uploadCallsignDB() {
 
   // Sort call-sign DB w.r.t. the current DMR ID in _config
   // this is part of the "auto-selection" of calls-signs for upload
-  _users->sortUsers(_config->radioIDs()->getId(0)->id());
+  logDebug() << "Sort callsign closest to ID=" << _config->radioIDs()->getDefaultId()->id() << ".";
+  _users->sortUsers(_config->radioIDs()->getDefaultId()->id());
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
   progress->setValue(0);
