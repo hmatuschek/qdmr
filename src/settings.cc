@@ -193,8 +193,7 @@ Settings::callSignDBPrefixes() {
   int num = beginReadArray("callSignDBPrefixes");
   for (int i=0; i<num; i++) {
     setArrayIndex(i);
-    bool ok;
-    uint prefix = value("prefix").toInt(&ok);
+    bool ok=true; uint prefix = value("prefix").toInt(&ok);
     if (ok)
       prefixes.insert(prefix);
   }
@@ -433,7 +432,7 @@ SettingsDialog::accept() {
   QStringList prefs_text = prefixes->text().split(",");
   QSet<uint> prefs;
   foreach (QString pref, prefs_text) {
-    bool ok; uint prefix = pref.toUInt(&ok);
+    bool ok=true; uint prefix = pref.toUInt(&ok);
     if (ok)
       prefs.insert(prefix);
   }
