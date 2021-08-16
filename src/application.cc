@@ -613,15 +613,19 @@ Application::uploadCallsignDB() {
   // Start upload
   QString errorMessage;
 
+  logDebug() << "Detect radio...";
   Radio *radio = Radio::detect(errorMessage);
   if (nullptr == radio) {
+    logDebug() << "No matching radio found.";
     QMessageBox::critical(nullptr, tr("No Radio found."),
                           tr("Can not upload call-sign DB to device: No radio found.\nError: ")
                           + errorMessage);
     return;
   }
+  logDebug() << "Found radio " << radio->name() << ".";
 
   if (! radio->features().hasCallsignDB) {
+    logDebug() << "Radio " << radio->name() << " does not support call-sign DB.";
     QMessageBox::information(nullptr, tr("Cannot upload call-sign DB."),
                              tr("The detected radio '%1' does not support "
                                 "the upload of a call-sign DB.")
@@ -629,6 +633,8 @@ Application::uploadCallsignDB() {
     return;
   }
   if (! radio->features().callsignDBImplemented) {
+    logDebug() << "Radio " << radio->name()
+               << " does support call-sign DB but it is not implemented yet.";
     QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
                           tr("The detected radio '%1' does support the upload of a call-sign DB. "
                              "This feature, however, is not implemented yet.").arg(radio->name()));
@@ -648,10 +654,13 @@ Application::uploadCallsignDB() {
   connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
+
   if (radio->startUploadCallsignDB(_users, false)) {
+    logDebug() << "Call-sign DB upload started.";
     _mainWindow->statusBar()->showMessage(tr("Upload User DB ..."));
     _mainWindow->setEnabled(false);
   } else {
+    logDebug() << "Cannot start call-sign DB upload.";
     QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
                           tr("Cannot upload call-sign DB: %1").arg(radio->errorMessage()));
     progress->setVisible(false);

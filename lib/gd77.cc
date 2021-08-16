@@ -148,6 +148,7 @@ GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::S
   }
 
   // start thread for upload
+  logDebug() << "Upload call-sign DB in separate thread.";
   start();
 
   return true;
@@ -375,8 +376,9 @@ GD77::uploadCallsigns()
     return false;
   }
 
-  size_t totb = _callsigns.memSize();
+  logDebug() << "Call-sign DB upload started...";
 
+  size_t totb = _callsigns.memSize();
   uint bcount = 0;
   // Then upload callsign DB
   for (int n=0; n<_callsigns.image(0).numElements(); n++) {
