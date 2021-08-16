@@ -19,7 +19,8 @@ static const unsigned char CMD_CWB3[]  = "CWB\4\0\3\0\0";
 HID::HID(int vid, int pid, QObject *parent)
   : HIDevice(vid, pid, parent), _current_bank(MEMBANK_NONE), _identifier()
 {
-  identifier();
+  if (isOpen())
+    identifier();
 }
 
 HID::~HID() {
