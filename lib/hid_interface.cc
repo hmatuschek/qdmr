@@ -149,6 +149,8 @@ HID::read_finish()
     return false;
   }
 
+  logDebug() << "Left program mode.";
+
   _identifier.clear();
 
   return true;
@@ -209,6 +211,7 @@ HID::write_finish()
     return false;
   }
 
+  logDebug() << "Left program mode.";
   _identifier.clear();
 
   return true;
@@ -232,7 +235,7 @@ HID::selectMemoryBank(MemoryBank bank) {
     return false;
   }
 
-  logDebug() << "Selecting memory bank " << bank;
+  logDebug() << "Selecting memory bank " << bank << "...";
 
   // select memory bank
   if (! hid_send_recv(cmd, 8, &ack, 1)) {
@@ -245,6 +248,7 @@ HID::selectMemoryBank(MemoryBank bank) {
     return false;
   }
 
+  logDebug() << "Memory bank " << bank << " selected.";
   _current_bank = bank;
 
   return true;

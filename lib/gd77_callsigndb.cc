@@ -96,7 +96,7 @@ GD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection) {
   QVector<UserDatabase::User> users;
   for (uint i=0; i<n; i++)
     users.append(calldb->user(i));
-  logDebug() << "Sort selected w.r.t their ID.";
+  logDebug() << "Sort selected w.r.t their ID in ascending order.";
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
 
