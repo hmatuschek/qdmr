@@ -5,6 +5,20 @@
 #include "userdatabase.hh"
 
 /** Represents and encodes the binary format for the call-sign database within the radio.
+ *
+ * The call-sign DB gets stored at a separate memory bank (no. 3) at address @c 0x0000. The encoded
+ * DB consists of the DB header followed by the DB entries. The number of entries is limited to
+ * 10920 leading to a max DB size of 0x20000 bytes.
+ *
+ * The header is encoded as:
+ * @verbinclude gd77callsigndb.txt
+ * The number of DB entries is encoded as a 32bit little-endian integer.
+ *
+ * Each DB entry is encoded as:
+ * @verbinclude gd77callsigndbentry.txt
+ * The DMR ID gets encoded a 8 BCD digits in little endian while the name is encoded as up-to 8
+ * ASCII bytes 0-terminated and padded.
+ *
  * @ingroup gd77 */
 class GD77CallsignDB : public CallsignDB
 {
