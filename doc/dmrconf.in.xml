@@ -139,7 +139,8 @@
       </varlistentry>
       <varlistentry>
         <term><option>-I</option> or <option>--id=</option>DMR_ID</term>
-        <listitem><para>Specifies the DMR ID for the <command>write-db</command> or
+        <listitem><para>Specifies the DMR ID or a comma separated list of DMR
+          ID prefixes for the <command>write-db</command> or
           <command>encode-db</command> commands.</para></listitem>
       </varlistentry>
       <varlistentry>
