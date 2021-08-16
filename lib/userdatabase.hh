@@ -72,6 +72,8 @@ public:
 
   /** Sorts users with respect to the distance to the given ID. */
   void sortUsers(uint id);
+  /** Sorts users with respect to the minimum distance to the given IDs. */
+  void sortUsers(const QSet<uint> &ids);
 
 	/** Returns the user with index @c idx. */
   const User &user(int idx) const;

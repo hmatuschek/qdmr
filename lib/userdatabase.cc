@@ -136,6 +136,24 @@ UserDatabase::sortUsers(uint id) {
 }
 
 void
+UserDatabase::sortUsers(const QSet<uint> &ids) {
+  if (0 == ids.count())
+    return;
+
+  // Sort repeater w.r.t. distance to each ID
+  std::stable_sort(_user.begin(), _user.end(), [ids](const User &a, const User &b){
+    QSet<uint>::const_iterator id=ids.begin();
+    uint min_a = a.distance(*id), min_b = b.distance(*id);
+    id++;
+    for (; id!=ids.end(); id++) {
+      min_a = std::min(min_a, a.distance(*id));
+      min_b = std::min(min_b, b.distance(*id));
+    }
+    return min_a < min_b;
+  });
+}
+
+void
 UserDatabase::download() {
   QUrl url("https://database.radioid.net/static/users.json");
   QNetworkRequest request(url);
