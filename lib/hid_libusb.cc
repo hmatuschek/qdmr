@@ -3,6 +3,7 @@
 
 #define HID_INTERFACE   0                   // interface index
 #define TIMEOUT_MSEC    500                 // receive timeout
+#define MAX_RETRY       100                 // Number of retries
 
 
 HIDevice::HIDevice(int vid, int pid, QObject *parent)
@@ -163,10 +164,13 @@ again:
     }
   }
 
-  if ((_nbytes_received == LIBUSB_ERROR_TIMEOUT) && (nretry < 100)) {
+  if ((_nbytes_received == LIBUSB_ERROR_TIMEOUT) && (nretry < MAX_RETRY)) {
+    if (0 == nretry)
+      logDebug() << "HID (libusb): timeout. Retry...";
     nretry++;
-    logDebug() << "HID (libusb): timeout. Retry no " << nretry << "...";
     goto again;
+  } else if (nretry >= MAX_RETRY) {
+    logError() << "HID (libusb): Retry limit of " << MAX_RETRY << " exceeded.";
   }
 
   return _nbytes_received;
