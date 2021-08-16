@@ -130,7 +130,7 @@ GD77::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
 
 bool
 GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
-  logDebug() << "Start upload to " << name() << "...";
+  logDebug() << "Start call-sign DB upload to " << name() << "...";
 
   if (StatusIdle != _task) {
     logError() << "Cannot upload to radio, radio is not idle.";
@@ -143,6 +143,7 @@ GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::S
 
   _task = StatusUploadCallsigns;
   if (blocking) {
+    logDebug() << "Upload call-sign DB in this thread (blocking).";
     run();
     return (StatusIdle == _task);
   }
