@@ -102,7 +102,7 @@ GD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection) {
 
   // Allocate segment for user db if requested
   uint size = align_size(sizeof(userdb_t)+n*sizeof(userdb_entry_t), BLOCK_SIZE);
-  logDebug() << "Allocate " << size << "bytes for call-sign DB.";
+  logDebug() << "Allocate 0x" << QString::number(size,16) << " bytes for call-sign DB.";
   this->image(0).addElement(OFFSET_USERDB, size);
 
   // Encode user DB
