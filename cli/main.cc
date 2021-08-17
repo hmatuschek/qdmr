@@ -63,13 +63,13 @@ int main(int argc, char *argv[])
                    });
   parser.addOption({
                      {"i", "id"},
-                     QCoreApplication::translate("main", "Specifes the DMR id."),
+                     QCoreApplication::translate("main", "Specifies the DMR id."),
                      QCoreApplication::translate("main", "ID")
                    });
   parser.addOption({
                      {"n", "limit"},
                      QCoreApplication::translate("main", "Limits several amonuts, depending on the "
-                     "context. When encoding/writing the callsign db, this option speicifies the "
+                     "context. When encoding/writing the callsign db, this option specifies the "
                      "maximum number of callsigns to encode."),
                      QCoreApplication::translate("main", "N")
                    });

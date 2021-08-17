@@ -58,9 +58,9 @@ class Package:
   def __init__(self, payload):
     self._type, self._length = struct.unpack("<HH", payload[:4])
     payload = payload[4:(4+self._length)]
-    if 0x52 == payload[0]:
+    if (0x52 == payload[0]) and len(payload)>=4:
       self._payload = ReadOperation(payload)
-    elif 0x57 == payload[0]:
+    elif (0x57 == payload[0]) and len(payload)>=4:
       self._payload = WriteOperation(payload)
     elif 0x41 == payload[0]:
       self._payload = ACK(payload)
@@ -114,11 +114,13 @@ class ACK:
 
 cap = pyshark.FileCapture(sys.argv[1], include_raw=True, use_json=True)
 for p in cap:
-  if isRequest(p):
+  if isRequest(p) and len(getData(p))>=4:
     P = Package(getData(p))
     print(P.dump(" > "))
     print("")
-  elif isResponse(p):
+  elif isResponse(p) and len(getData(p))>=4:
     P = Package(getData(p))
     print(P.dump(" < "))
     print("")
+  elif isRequest(p) or isResponse(p): 
+    print(hexDump(getData(p), "> "))

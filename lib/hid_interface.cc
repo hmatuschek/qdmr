@@ -15,6 +15,7 @@ static const unsigned char CMD_ENDW[]  = "ENDW";
 static const unsigned char CMD_CWB0[]  = "CWB\4\0\0\0\0";
 static const unsigned char CMD_CWB1[]  = "CWB\4\0\1\0\0";
 static const unsigned char CMD_CWB3[]  = "CWB\4\0\3\0\0";
+static const unsigned char CMD_CWB4[]  = "CWB\4\0\4\0\0";
 
 HID::HID(int vid, int pid, QObject *parent)
   : HIDevice(vid, pid, parent), _current_bank(MEMBANK_NONE), _identifier()
@@ -229,7 +230,8 @@ HID::selectMemoryBank(MemoryBank bank) {
   switch (bank) {
   case MEMBANK_CODEPLUG_LOWER : cmd = CMD_CWB0; break;
   case MEMBANK_CODEPLUG_UPPER : cmd = CMD_CWB1; break;
-  case MEMBANK_CALLSIGN_DB :    cmd = CMD_CWB3; break;
+  case MEMBANK_CALLSIGN_LOWER : cmd = CMD_CWB3; break;
+  case MEMBANK_CALLSIGN_UPPER : cmd = CMD_CWB4; break;
   default:
     _errorMessage = tr("Cannot set memory bank: Unknown bank %1").arg(bank);
     return false;

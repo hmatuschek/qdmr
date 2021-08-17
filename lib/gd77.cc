@@ -386,8 +386,10 @@ GD77::uploadCallsigns()
     uint addr = _callsigns.image(0).element(n).address();
     uint size = _callsigns.image(0).element(n).data().size();
     uint b0 = addr/BSIZE, nb = size/BSIZE;
+    HID::MemoryBank bank = (
+          (0x10000 > addr) ? HID::MEMBANK_CALLSIGN_LOWER : HID::MEMBANK_CALLSIGN_UPPER );
     for (uint b=0; b<nb; b++, bcount+=BSIZE) {
-      if (! _dev->write(HID::MEMBANK_CALLSIGN_DB, (b0+b)*BSIZE,
+      if (! _dev->write(bank, (b0+b)*BSIZE,
                         _callsigns.data((b0+b)*BSIZE, 0), BSIZE))
       {
         _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")

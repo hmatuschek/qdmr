@@ -167,7 +167,7 @@
       </varlistentry>
       <varlistentry>
         <term><option>--ignore-limits</option></term>
-        <listitem><para>Disables the enforement of limits. Warnings are atill show.</para></listitem>
+        <listitem><para>Disables the enforement of limits. Warnings are still show.</para></listitem>
       </varlistentry>
       <varlistentry>
         <term><option>-h</option> or <option>--help</option></term>

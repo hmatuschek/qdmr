@@ -24,7 +24,8 @@ public:
     MEMBANK_NONE           = -1,    ///< No bank selected.
     MEMBANK_CODEPLUG_LOWER =  0,    ///< Lower memory bank (EEPROM).
     MEMBANK_CODEPLUG_UPPER =  1,    ///< Upper memory bank (FLASH).
-    MEMBANK_CALLSIGN_DB    =  3     ///< Callsign DB memory bank (also FLASH).
+    MEMBANK_CALLSIGN_LOWER =  3,    ///< Callsign DB memory lower bank (also FLASH).
+    MEMBANK_CALLSIGN_UPPER =  4     ///< Callsign DB memory upper bank (also FLASH).
   };
 
 public:
