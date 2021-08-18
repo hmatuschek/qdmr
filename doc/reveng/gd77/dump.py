@@ -7,6 +7,8 @@ import struct
 import sys
 import binascii
 
+device = None # "1.13.0"
+
 def hexDump(s: bytes, prefix="", addr=0) -> str:
   """ Utility function to hex-dump binary data. """
   N = len(s)
@@ -30,13 +32,22 @@ def hexDump(s: bytes, prefix="", addr=0) -> str:
   return res[:-1]
 
 def isFromHost(p):
-  return "host" == p.usb.src
+  b = ("host" == p.usb.src)
+  if device:
+    b = b and (device == p.usb.dst)
+  return b
+
+def isFromDevice(p):
+  b = ("host" == p.usb.dst)
+  if device:
+    b = b and (device == p.usb.src)
+  return b
 
 def isRequest(p):
   return isFromHost(p) and ("SETUP DATA" == p.highest_layer) and (p.layers[-1].has_field("data_fragment"))
 
 def isResponse(p):
-  return (not isFromHost(p)) and ("USB.CAPDATA" in p) 
+  return isFromDevice(p) and ("USB.CAPDATA" in p) 
 
 def getData(p):
   if isRequest(p):
@@ -122,5 +133,7 @@ for p in cap:
     P = Package(getData(p))
     print(P.dump(" < "))
     print("")
-  elif isRequest(p) or isResponse(p): 
-    print(hexDump(getData(p), "> "))
+  elif isRequest(p): 
+    print(hexDump(getData(p), " > "))
+  elif isResponse(p):
+    print(hexDump(getData(p), " < "))

@@ -104,6 +104,9 @@ RD5R::startDownload(bool blocking) {
     return (StatusIdle == _task);
   }
 
+  //if (_dev && _dev->isOpen())
+  // _dev->moveToThread(this);
+
   start();
   return true;
 }
@@ -120,6 +123,8 @@ RD5R::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
     run();
     return (StatusIdle == _task);
   }
+
+  // _dev->moveToThread(this);
 
   start();
   return true;

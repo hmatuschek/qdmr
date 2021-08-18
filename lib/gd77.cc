@@ -106,6 +106,9 @@ GD77::startDownload(bool blocking) {
     return (StatusIdle == _task);
   }
 
+  //if (_dev && _dev->isOpen())
+  // _dev->moveToThread(this);
+
   start();
   return true;
 }
@@ -123,6 +126,9 @@ GD77::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
     run();
     return (StatusIdle == _task);
   }
+
+  //if (_dev && _dev->isOpen())
+  // _dev->moveToThread(this);
 
   start();
   return true;
@@ -147,6 +153,9 @@ GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::S
     run();
     return (StatusIdle == _task);
   }
+
+  //if (_dev && _dev->isOpen())
+  // _dev->moveToThread(this);
 
   // start thread for upload
   logDebug() << "Upload call-sign DB in separate thread.";
@@ -235,6 +244,8 @@ GD77::run() {
       emit uploadError(this);
       return;
     }
+
+    emit uploadStarted();
 
     if (! uploadCallsigns()) {
       _task = StatusError;

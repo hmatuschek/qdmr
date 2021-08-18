@@ -630,6 +630,7 @@ Application::uploadCallsignDB() {
                              tr("The detected radio '%1' does not support "
                                 "the upload of a call-sign DB.")
                              .arg(radio->name()));
+    radio->deleteLater();
     return;
   }
   if (! radio->features().callsignDBImplemented) {
@@ -638,6 +639,7 @@ Application::uploadCallsignDB() {
     QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
                           tr("The detected radio '%1' does support the upload of a call-sign DB. "
                              "This feature, however, is not implemented yet.").arg(radio->name()));
+    radio->deleteLater();
     return;
   }
 
@@ -646,27 +648,34 @@ Application::uploadCallsignDB() {
   Settings settings;
   if (settings.selectUsingUserDMRID()) {
     // Sort w.r.t users DMR ID
-    logDebug() << "Sort call-signs closest to ID=" << _config->radioIDs()->getDefaultId()->id() << ".";
-    _users->sortUsers(_config->radioIDs()->getDefaultId()->id());
+    uint id = _config->radioIDs()->getDefaultId()->id();
+    logDebug() << "Sort call-signs closest to ID=" << id << ".";
+    _users->sortUsers(id);
   } else {
     // sort w.r.t. chosen prefixes
-    QStringList prefs;
-    foreach (uint pref, settings.callSignDBPrefixes())
+    QSet<uint> ids=settings.callSignDBPrefixes(); QStringList prefs;
+    foreach (uint pref, ids)
       prefs.append(QString::number(pref));
     logDebug() << "Sort call-signs closest to IDs={" << prefs.join(", ") << "}.";
-    _users->sortUsers(settings.callSignDBPrefixes());
+    _users->sortUsers(ids);
+  }
+
+  // Assemble flags for callsign DB encoding
+  CallsignDB::Selection css;
+  if (settings.limitCallSignDBEntries()) {
+    logDebug() << "Limit callsign DB entries to " << settings.maxCallSignDBEntries() << ".";
+    css.setCountLimit(settings.maxCallSignDBEntries());
   }
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
-  progress->setValue(0);
-  progress->setMaximum(100);
+  progress->setRange(0, 100); progress->setValue(0);
   progress->setVisible(true);
 
   connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
-  if (radio->startUploadCallsignDB(_users, false)) {
+  if (radio->startUploadCallsignDB(_users, false, css)) {
     logDebug() << "Start call-sign DB upload...";
     _mainWindow->statusBar()->showMessage(tr("Upload call-sign DB ..."));
     _mainWindow->setEnabled(false);
