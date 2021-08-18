@@ -14,7 +14,7 @@ description: |
    * Retevis RT3S
    * Open GD77 firmware (GD77, RD-5R & DM-1801)
    * AnyTone AT-D878UV, AT-D868UVE
-   * Radioddity GD77 (untested)
+   * Radioddity GD77
 
 confinement: strict
 base: core18
