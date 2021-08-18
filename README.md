@@ -12,7 +12,7 @@ and **platform-independent** CPS for several types of (mainly Chinese) DMR radio
 Currently, there are only few radios that are supported
 
   * Open GD77 firmware (since version 0.4.0)
-  * Radioddity GD77 (untested)
+  * Radioddity GD77 (since version 0.8.1)
   * Baofeng/Radioddity RD-5R & RD-5R+
   * TYT MD-UV390 / Retevis RT3S
   * Anytone AT-D878UV (since version 0.5.0)
