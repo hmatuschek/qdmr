@@ -44,14 +44,27 @@ public:
     Element(const Element &other);
     virtual ~Element();
 
-    bool isValid() const;
+    virtual bool isValid() const;
+    virtual void clear();
 
     bool getBit(uint offset, uint bit) const;
     void setBit(uint offset, uint bit, bool value=true);
     void clearBit(uint offset, uint bit);
 
+    uint8_t getUInt2(uint offset, uint bit) const;
+    void setUInt2(uint offset, uint bit, uint8_t value);
+
+    uint8_t getUInt3(uint offset, uint bit) const;
+    void setUInt3(uint offset, uint bit, uint8_t value);
+
+    uint8_t getUInt4(uint offset, uint bit) const;
+    void setUInt4(uint offset, uint bit, uint8_t value);
+
+    uint8_t getUInt6(uint offset, uint bit) const;
+    void setUInt6(uint offset, uint bit, uint8_t value);
+
     uint8_t getUInt8(uint offset) const;
-    void setUInt8(uint offset, uint8_t value) const;
+    void setUInt8(uint offset, uint8_t value);
 
     uint16_t getUInt16_be(uint offset) const;
     uint16_t getUInt16_le(uint offset) const;
@@ -62,6 +75,14 @@ public:
     uint32_t getUInt32_le(uint offset) const;
     void setUInt32_be(uint offset, uint32_t value);
     void setUInt32_le(uint offset, uint32_t value);
+
+    uint32_t getBCD8_be(uint offset) const;
+    void setBCD8_be(uint offset, uint32_t value);
+    uint32_t getBCD8_le(uint offset) const;
+    void setBCD8_le(uint offset, uint32_t value);
+
+    QString readUnicode(uint offset, uint maxlen, uint16_t eos) const;
+    void writeUnicode(uint offset, const QString &txt, uint maxlen, uint16_t eos);
 
   protected:
     uint8_t *_data;
