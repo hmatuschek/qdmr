@@ -67,6 +67,16 @@ Radio::~Radio() {
   // pass...
 }
 
+const CallsignDB *
+Radio::callsignDB() const {
+  return nullptr;
+}
+
+CallsignDB *
+Radio::callsignDB() {
+  return nullptr;
+}
+
 VerifyIssue::Type
 Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlags &flags)
 {

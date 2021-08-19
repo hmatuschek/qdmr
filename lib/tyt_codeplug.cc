@@ -609,6 +609,40 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
 
 
 /* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::VFOChannelElement
+ * ******************************************************************************************** */
+TyTCodeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr)
+  : ChannelElement(ptr)
+{
+  // pass...
+}
+
+TyTCodeplug::VFOChannelElement::~VFOChannelElement() {
+  // pass...
+}
+
+QString
+TyTCodeplug::VFOChannelElement::name() const {
+  return "";
+}
+void
+TyTCodeplug::VFOChannelElement::name(const QString &txt) {
+  // pass...
+}
+
+uint
+TyTCodeplug::VFOChannelElement::stepSize() const {
+  return (getUInt8(32)+1)*2500;
+}
+void
+TyTCodeplug::VFOChannelElement::stepSize(uint ss_Hz) {
+  ss_Hz = std::min(50000U, std::max(ss_Hz, 2500U));
+  setUInt8(32, ss_Hz/2500-1);
+  setUInt8(33, 0xff);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of TyTCodeplug
  * ******************************************************************************************** */
 TyTCodeplug::TyTCodeplug(QObject *parent)

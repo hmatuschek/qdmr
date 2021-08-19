@@ -216,14 +216,18 @@ public:
     VFOChannelElement(uint8_t *ptr);
     virtual ~VFOChannelElement();
 
-    virtual uint8_t stepSize() const;
-    virtual void stepSize(uint8_t ss);
+    QString name() const;
+    void name(const QString &txt);
+
+    virtual uint stepSize() const;
+    virtual void stepSize(uint ss_hz);
   };
 
-
-public:
+protected:
   /** Empty constructor. */
   explicit TyTCodeplug(QObject *parent = nullptr);
+
+public:
   /** Destructor. */
   virtual ~TyTCodeplug();
 

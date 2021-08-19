@@ -18,7 +18,7 @@
  * callsign database of up to 100000 entries. This can be used to resolve amlost any DMR ID assigned
  * (at the time of this writing, there are about 140k IDs assigned) to name and callsign.
  *
- * @ingroup dsc */
+ * @ingroup tyt */
 #ifndef UV390_HH
 #define UV390_HH
 
