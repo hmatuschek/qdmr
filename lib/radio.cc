@@ -374,6 +374,8 @@ Radio::detect(QString &errorMessage, const QString &force) {
       id = dfu->identifier();
       if (("MD-UV380" == id) || ("MD-UV390" == id) || ("UV390" == force.toUpper())) {
         return new UV390(dfu);
+      } else if (("2017" == id) || ("MD2017" == force.toUpper())) {
+        return new UV390(dfu);
       } else {
         dfu->close();
         dfu->deleteLater();
