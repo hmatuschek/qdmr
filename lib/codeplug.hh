@@ -35,6 +35,38 @@ public:
     Flags();
   };
 
+  class Element
+  {
+  protected:
+    Element(uint8_t *ptr=nullptr);
+
+  public:
+    Element(const Element &other);
+    virtual ~Element();
+
+    bool isValid() const;
+
+    bool getBit(uint offset, uint bit) const;
+    void setBit(uint offset, uint bit, bool value=true);
+    void clearBit(uint offset, uint bit);
+
+    uint8_t getUInt8(uint offset) const;
+    void setUInt8(uint offset, uint8_t value) const;
+
+    uint16_t getUInt16_be(uint offset) const;
+    uint16_t getUInt16_le(uint offset) const;
+    void setUInt16_be(uint offset, uint16_t value);
+    void setUInt16_le(uint offset, uint16_t value);
+
+    uint32_t getUInt32_be(uint offset) const;
+    uint32_t getUInt32_le(uint offset) const;
+    void setUInt32_be(uint offset, uint32_t value);
+    void setUInt32_le(uint offset, uint32_t value);
+
+  protected:
+    uint8_t *_data;
+  };
+
 protected:
   /** Hidden default constructor. */
 	explicit CodePlug(QObject *parent=nullptr);
