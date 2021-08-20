@@ -1,14 +1,19 @@
-#ifndef DM2017CODEPLUG_HH
-#define DM2017CODEPLUG_HH
+#ifndef MD2017CODEPLUG_HH
+#define MD2017CODEPLUG_HH
 
 #include "tyt_codeplug.hh"
 
+/** Device specific implementation of the codeplug for the TyT MD-2017.
+ *
+ * @ingroup md2017 */
 class MD2017Codeplug : public TyTCodeplug
 {
   Q_OBJECT
 
 public:
+  /** Constructor. */
   explicit MD2017Codeplug(QObject *parent = nullptr);
+  /** Destructor. */
   virtual ~MD2017Codeplug();
 
 public:
@@ -18,4 +23,4 @@ public:
   bool linkChannels(Config *config, CodeplugContext &ctx);
 };
 
-#endif // DM2017CODEPLUG_HH
+#endif // MD2017CODEPLUG_HH

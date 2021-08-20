@@ -14,7 +14,7 @@ SET(libdmrconf_SOURCES
     roaming.cc callsigndb.cc talkgroupdatabase.cc radioid.cc
     rd5r.cc rd5r_codeplug.cc rd5r_filereader.cc
     tyt_radio.cc tyt_codeplug.cc tyt_callsigndb.cc
-    dm2017.cc dm2017_codeplug.cc dm2017_callsigndb.cc
+    md2017.cc md2017_codeplug.cc md2017_callsigndb.cc
     uv390.cc uv390_codeplug.cc uv390_callsigndb.cc uv390_filereader.cc
     gd77.cc gd77_codeplug.cc gd77_callsigndb.cc gd77_filereader.cc
     opengd77.cc opengd77_interface.cc opengd77_codeplug.cc opengd77_callsigndb.cc
@@ -30,7 +30,7 @@ SET(libdmrconf_MOC_HEADERS
     roaming.hh callsigndb.hh talkgroupdatabase.hh radioid.hh
     rd5r.hh rd5r_codeplug.hh
     tyt_radio.hh tyt_codeplug.hh tyt_callsigndb.hh
-    dm2017.hh dm2017_codeplug.hh dm2017_callsigndb.hh
+    md2017.hh md2017_codeplug.hh md2017_callsigndb.hh
     uv390.hh uv390_codeplug.hh uv390_callsigndb.hh
     gd77.hh gd77_codeplug.hh gd77_callsigndb.hh
     opengd77.hh opengd77_interface.hh opengd77_codeplug.hh opengd77_callsigndb.hh

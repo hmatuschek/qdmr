@@ -166,7 +166,7 @@ TyTCodeplug::ChannelElement::colorCode() const {
 }
 void
 TyTCodeplug::ChannelElement::colorCode(uint8_t cc) {
-  setUInt4(1,4, cc);
+  setUInt4(1,4, std::min(uint8_t(16), cc));
 }
 
 uint8_t

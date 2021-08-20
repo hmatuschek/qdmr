@@ -1,4 +1,4 @@
-#include "dm2017_callsigndb.hh"
+#include "md2017_callsigndb.hh"
 
 MD2017CallsignDB::MD2017CallsignDB(QObject *parent)
   : TyTCallsignDB(parent)

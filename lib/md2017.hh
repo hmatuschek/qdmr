@@ -2,7 +2,7 @@
  * Device specific classes for TYT MD-2017 and Retevis RT82.
  *
  * \image html md2017.jpg "MD-2017" width=200px
- * \image latex uv2017.jpg "MD-2017" width=200px
+ * \image latex md2017.jpg "MD-2017" width=200px
  *
  * <img src="sm2017.jpg" width="200px" align="left"/>
  * The TYT MD-2017 and the identical Retevis RT-82 are decent VHF/UHF FM and DMR handheld radios.
@@ -19,18 +19,17 @@
  * (at the time of this writing, there are about 140k IDs assigned) to name and callsign.
  *
  * @ingroup tyt */
-#ifndef DM2017_HH
-#define DM2017_HH
+#ifndef MD2017_HH
+#define MD2017_HH
 
 #include "tyt_radio.hh"
-#include "dm2017_codeplug.hh"
-#include "dm2017_callsigndb.hh"
+#include "md2017_codeplug.hh"
+#include "md2017_callsigndb.hh"
 
 /** Implements an USB interface to the TYT MD-2017 & Retevis RT82 VHF/UHF 5W DMR (Tier I&II) radios.
  *
- * The TYT MD-2017 and Retevis RT82 radios use a DFU-style communication protocol to read and write
- * codeplugs onto the radio (see @c DFUDevice). This class implements the communication details
- * using DFU protocol.
+ * The TYT MD-2017 and Retevis RT82 radios use the TyT typical DFU-style communication protocol
+ * to read and write codeplugs onto the radio (see @c TyTRadio).
  *
  * @ingroup md2017 */
 class MD2017 : public TyTRadio
@@ -38,7 +37,11 @@ class MD2017 : public TyTRadio
   Q_OBJECT
 
 public:
+  /** Constructor.
+   * @param device Specifies the DFU device to use for communication with the device.
+   * @param parent The QObject parent. */
   MD2017(DFUDevice *device=nullptr, QObject *parent=nullptr);
+  /** Desturctor. */
   virtual ~MD2017();
 
   const QString &name() const;
@@ -51,9 +54,12 @@ public:
   CallsignDB *callsignDB();
 
 private:
+  /** Holds the name of the device. */
   QString _name;
+  /** The codeplug object. */
   MD2017Codeplug _codeplug;
+  /** The callsign DB object. */
   MD2017CallsignDB _callsigndb;
 };
 
-#endif // DM2017_HH
+#endif // MD2017_HH

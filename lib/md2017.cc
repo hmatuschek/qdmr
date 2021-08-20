@@ -1,7 +1,7 @@
-#include "dm2017.hh"
+#include "md2017.hh"
 
 
-Radio::Features _dm2017_features = {
+Radio::Features _md2017_features = {
   .betaWarning = true,
 
   .hasDigital = true,
@@ -70,7 +70,7 @@ MD2017::name() const {
 
 const Radio::Features &
 MD2017::features() const {
-  return _dm2017_features;
+  return _md2017_features;
 }
 
 const CodePlug &

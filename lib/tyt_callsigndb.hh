@@ -3,12 +3,17 @@
 
 #include "callsigndb.hh"
 
+/** Base class for all call-sign DBs of TyT/Retevis devices.
+ * @ingroup tyt */
 class TyTCallsignDB : public CallsignDB
 {
   Q_OBJECT
 
-public:
+protected:
+  /** Hidden constructor. Use one of the device specific call-sign DB classes. */
   explicit TyTCallsignDB(QObject *parent=nullptr);
+
+public:
   virtual ~TyTCallsignDB();
 };
 
