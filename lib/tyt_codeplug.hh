@@ -6,6 +6,7 @@
 #include "codeplug.hh"
 #include "signaling.hh"
 #include "channel.hh"
+#include "contact.hh"
 
 class DigitalContact;
 class Zone;
@@ -327,6 +328,37 @@ public:
     virtual void stepSize(uint ss_hz);
   };
 
+  /** Represents a digital (DMR) contact within the codeplug.
+   *
+   * Memmory layout of encoded contact:
+   * @verbinclude tytcontact.txt */
+  class ContactElement: public CodePlug::Element
+  {
+  public:
+    /** Constructor. */
+    ContactElement(uint8_t *ptr, uint size=0x24);
+    /** Destructor. */
+    virtual ~ContactElement();
+
+    virtual void clear();
+    virtual bool isValid() const;
+
+    virtual uint32_t dmrId() const;
+    virtual void dmrId(uint32_t id);
+
+    virtual DigitalContact::Type callType() const;
+    virtual void callType(DigitalContact::Type type);
+
+    virtual bool ringTone() const;
+    virtual void ringTone(bool enable);
+
+    virtual QString name() const;
+    virtual void name(const QString &nm);
+
+    virtual DigitalContact *toContactObj() const;
+    virtual bool fromContactObj(const DigitalContact *contact);
+  };
+
 protected:
   /** Empty constructor. */
   explicit TyTCodeplug(QObject *parent = nullptr);
@@ -370,52 +402,52 @@ public:
   /** Encodes all digital contacts in the configuration into the codeplug. */
   virtual bool encodeContacts(Config *config, const Flags &flags);
   /** Adds a digital contact to the configuration for each one in the codeplug. */
-  virtual bool createContacts(Config *config, CodeplugContext &ctx);
+  virtual bool createContacts(CodeplugContext &ctx);
 
   /** Clears all RX group lists in the codeplug. */
   virtual void clearGroupLists();
   /** Encodes all group lists in the configuration into the codeplug. */
   virtual bool encodeGroupLists(Config *config, const Flags &flags);
   /** Adds a RX group list to the configuration for each one in the codeplug. */
-  virtual bool createGroupLists(Config *config, CodeplugContext &ctx);
+  virtual bool createGroupLists(CodeplugContext &ctx);
   /** Links all added RX group lists within the configuration. */
-  virtual bool linkGroupLists(Config *config, CodeplugContext &ctx);
+  virtual bool linkGroupLists(CodeplugContext &ctx);
 
   /** Clears all channels in the codeplug. */
   virtual void clearChannels();
   /** Encodes all channels in the configuration into the codeplug. */
   virtual bool encodeChannels(Config *config, const Flags &flags);
   /** Adds a channel to the configuration for each one in the codeplug. */
-  virtual bool createChannels(Config *config, CodeplugContext &ctx);
+  virtual bool createChannels(CodeplugContext &ctx);
   /** Links all added channels within the configuration. */
-  virtual bool linkChannels(Config *config, CodeplugContext &ctx);
+  virtual bool linkChannels(CodeplugContext &ctx);
 
   /** Clears all zones in the codeplug. */
   virtual void clearZones();
   /** Encodes all zones in the configuration into the codeplug. */
   virtual bool encodeZones(Config *config, const Flags &flags);
   /** Adds a zone to the configuration for each one in the codeplug. */
-  virtual bool createZones(Config *config, CodeplugContext &ctx);
+  virtual bool createZones(CodeplugContext &ctx);
   /** Links all added zones within the configuration. */
-  virtual bool linkZones(Config *config, CodeplugContext &ctx);
+  virtual bool linkZones(CodeplugContext &ctx);
 
   /** Clears all scan lists in the codeplug. */
   virtual void clearScanLists();
   /** Encodes all scan lists in the configuration into the codeplug. */
   virtual bool encodeScanLists(Config *config, const Flags &flags);
   /** Adds a scan list to the configuration for each one in the codeplug. */
-  virtual bool createScanLists(Config *config, CodeplugContext &ctx);
+  virtual bool createScanLists(CodeplugContext &ctx);
   /** Links all added scan lists within the configuration. */
-  virtual bool linkScanLists(Config *config, CodeplugContext &ctx);
+  virtual bool linkScanLists(CodeplugContext &ctx);
 
   /** Clears all positioning systems in the codeplug. */
   virtual void clearPositioningSystems();
   /** Encodes all DMR positioning systems in the configuration into the codeplug. */
   virtual bool encodePositioningSystems(Config *config, const Flags &flags);
   /** Adds a GPS positioning system to the configuration for each one in the codeplug. */
-  virtual bool createPositioningSystems(Config *config, CodeplugContext &ctx);
+  virtual bool createPositioningSystems(CodeplugContext &ctx);
   /** Links all added positioning systems within the configuration. */
-  virtual bool linkPositioningSystems(Config *config, CodeplugContext &ctx);
+  virtual bool linkPositioningSystems(CodeplugContext &ctx);
 
   /** Clears the menu settings in the codeplug. */
   virtual void clearMenuSettings();

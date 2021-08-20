@@ -98,6 +98,15 @@ public:
     /** Stores a 16bit little-endian integer at the given byte-offset. */
     void setUInt16_le(uint offset, uint16_t value);
 
+    /** Reads a 24bit big-endian integer at the given byte-offset. */
+    uint32_t getUInt24_be(uint offset) const;
+    /** Reads a 24bit little-endian integer at the given byte-offset. */
+    uint32_t getUInt24_le(uint offset) const;
+    /** Stores a 24bit big-endian integer at the given byte-offset. */
+    void setUInt24_be(uint offset, uint32_t value);
+    /** Stores a 24bit little-endian integer at the given byte-offset. */
+    void setUInt24_le(uint offset, uint32_t value);
+
     /** Reads a 32bit big-endian integer at the given byte-offset. */
     uint32_t getUInt32_be(uint offset) const;
     /** Reads a 32bit little-endian integer at the given byte-offset. */

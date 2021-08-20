@@ -134,6 +134,31 @@ CodePlug::Element::setUInt16_le(uint offset, uint16_t value) {
 }
 
 uint32_t
+CodePlug::Element::getUInt24_be(uint offset) const {
+  uint8_t *ptr = _data+offset;
+  return uint32_t(ptr[2]) + (uint32_t(ptr[1])<<8) + (uint32_t(ptr[0])<<16);
+}
+uint32_t
+CodePlug::Element::getUInt24_le(uint offset) const {
+  uint8_t *ptr = _data+offset;
+  return uint32_t(ptr[0]) + (uint32_t(ptr[1])<<8) + (uint32_t(ptr[2])<<16);
+}
+void
+CodePlug::Element::setUInt24_be(uint offset, uint32_t value) {
+  uint8_t *ptr = _data+offset;
+  ptr[0] = ((value >> 16) & 0xff);
+  ptr[1] = ((value >> 8)  & 0xff);
+  ptr[2] = ((value >> 0)  & 0xff);
+}
+void
+CodePlug::Element::setUInt24_le(uint offset, uint32_t value) {
+  uint8_t *ptr = _data+offset;
+  ptr[0] = ((value >> 0)  & 0xff);
+  ptr[1] = ((value >> 8)  & 0xff);
+  ptr[2] = ((value >> 16) & 0xff);
+}
+
+uint32_t
 CodePlug::Element::getUInt32_be(uint offset) const {
   uint32_t *ptr = (uint32_t *)(_data+offset);
   return qFromBigEndian(*ptr);
@@ -157,8 +182,9 @@ CodePlug::Element::setUInt32_le(uint offset, uint32_t value) {
 uint32_t
 CodePlug::Element::getBCD8_be(uint offset) const {
   uint32_t val = getUInt32_be(offset);
-  return (val & 0xf) + ((val>>4) & 0xf) + ((val>>8) & 0xf) + ((val>>12) & 0xf) +
-      ((val>>16) & 0xf) + ((val>>20) & 0xf) + ((val>>24) & 0xf) + ((val>>28) & 0xf);
+  return (val & 0xf) + ((val>>4) & 0xf)*10 + ((val>>8) & 0xf)*100 + ((val>>12) & 0xf)*1000 +
+      ((val>>16) & 0xf)*10000 + ((val>>20) & 0xf)*100000 + ((val>>24) & 0xf)*1000000 +
+      ((val>>28) & 0xf)*10000000;
 }
 void
 CodePlug::Element::setBCD8_be(uint offset, uint32_t val) {
@@ -175,8 +201,9 @@ CodePlug::Element::setBCD8_be(uint offset, uint32_t val) {
 uint32_t
 CodePlug::Element::getBCD8_le(uint offset) const {
   uint32_t val = getUInt32_le(offset);
-  return (val & 0xf) + ((val>>4) & 0xf) + ((val>>8) & 0xf) + ((val>>12) & 0xf) +
-      ((val>>16) & 0xf) + ((val>>20) & 0xf) + ((val>>24) & 0xf) + ((val>>28) & 0xf);
+  return (val & 0xf) + ((val>>4) & 0xf)*10 + ((val>>8) & 0xf)*100 + ((val>>12) & 0xf)*1000 +
+      ((val>>16) & 0xf)*10000 + ((val>>20) & 0xf)*100000 + ((val>>24) & 0xf)*1000000 +
+      ((val>>28) & 0xf)*10000000;
 }
 void
 CodePlug::Element::setBCD8_le(uint offset, uint32_t val) {

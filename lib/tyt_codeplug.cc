@@ -279,11 +279,11 @@ TyTCodeplug::ChannelElement::turnOffFreq(TurnOffFreq freq) {
 
 uint16_t
 TyTCodeplug::ChannelElement::contactIndex() const {
-  return getUInt16_be(6);
+  return getUInt16_le(6);
 }
 void
 TyTCodeplug::ChannelElement::contactIndex(uint16_t idx) {
-  setUInt16_be(6, idx);
+  setUInt16_le(6, idx);
 }
 
 uint TyTCodeplug::ChannelElement::txTimeOut() const {
@@ -359,38 +359,38 @@ TyTCodeplug::ChannelElement::squelch(uint value) {
 
 uint32_t
 TyTCodeplug::ChannelElement::rxFrequency() const {
-  return getBCD8_be(16)*10;
+  return getBCD8_le(16)*10;
 }
 void
 TyTCodeplug::ChannelElement::rxFrequency(uint32_t freq_Hz) {
-  return setBCD8_be(16, freq_Hz/10);
+  return setBCD8_le(16, freq_Hz/10);
 }
 
 uint32_t
 TyTCodeplug::ChannelElement::txFrequency() const {
-  return getBCD8_be(20)*10;
+  return getBCD8_le(20)*10;
 }
 void
 TyTCodeplug::ChannelElement::txFrequency(uint32_t freq_Hz) {
-  return setBCD8_be(20, freq_Hz/10);
+  return setBCD8_le(20, freq_Hz/10);
 }
 
 Signaling::Code
 TyTCodeplug::ChannelElement::rxSignaling() const {
-  return decode_ctcss_tone_table(getUInt16_be(24));
+  return decode_ctcss_tone_table(getUInt16_le(24));
 }
 void
 TyTCodeplug::ChannelElement::rxSignaling(Signaling::Code code) {
-  setUInt16_be(24, encode_ctcss_tone_table(code));
+  setUInt16_le(24, encode_ctcss_tone_table(code));
 }
 
 Signaling::Code
 TyTCodeplug::ChannelElement::txSignaling() const {
-  return decode_ctcss_tone_table(getUInt16_be(26));
+  return decode_ctcss_tone_table(getUInt16_le(26));
 }
 void
 TyTCodeplug::ChannelElement::txSignaling(Signaling::Code code) {
-  setUInt16_be(26, encode_ctcss_tone_table(code));
+  setUInt16_le(26, encode_ctcss_tone_table(code));
 }
 
 uint8_t
@@ -503,8 +503,9 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
       default: admit_crit = AnalogChannel::AdmitFree; break;
     }
 
-    return new AnalogChannel(name(), rxFrequency(), txFrequency(), power(), txTimeOut(), rxOnly(),
-                             admit_crit, squelch(), rxSignaling(), txSignaling(), bandwidth(), nullptr);
+    return new AnalogChannel(name(), double(rxFrequency())/1e6, double(txFrequency())/1e6,
+                             power(), txTimeOut(), rxOnly(), admit_crit, squelch(), rxSignaling(),
+                             txSignaling(), bandwidth(), nullptr);
   } else if (MODE_DIGITAL == mode()) {
     DigitalChannel::Admit admit_crit;
     switch(admitCriterion()) {
@@ -514,8 +515,8 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
       default: admit_crit = DigitalChannel::AdmitFree; break;
     }
 
-    return new DigitalChannel(name(), rxFrequency(), txFrequency(), power(), txTimeOut(),
-                              rxOnly(), admit_crit, colorCode(), timeSlot(),
+    return new DigitalChannel(name(), double(rxFrequency())/1e6, double(txFrequency())/1e6,
+                              power(), txTimeOut(), rxOnly(), admit_crit, colorCode(), timeSlot(),
                               nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
   }
 
@@ -528,22 +529,22 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, const CodeplugContext &c
   if (! isValid())
     return false;
 
-  if (scanListIndex() && ctx.hasScanList(scanListIndex()-1)) {
-    c->setScanList(ctx.getScanList(scanListIndex()-1));
+  if (scanListIndex() && ctx.hasScanList(scanListIndex())) {
+    c->setScanList(ctx.getScanList(scanListIndex()));
   }
 
   if (MODE_ANALOG == mode()) {
     return true;
   } else if ((MODE_DIGITAL == mode()) && (c->is<DigitalChannel>())){
     DigitalChannel *dc = c->as<DigitalChannel>();
-    if (contactIndex() && ctx.hasDigitalContact(contactIndex()-1)) {
-      dc->setTXContact(ctx.getDigitalContact(contactIndex()-1));
+    if (contactIndex() && ctx.hasDigitalContact(contactIndex())) {
+      dc->setTXContact(ctx.getDigitalContact(contactIndex()));
     }
-    if (groupListIndex() && ctx.hasGroupList(groupListIndex()-1)) {
-      dc->setRXGroupList(ctx.getGroupList(groupListIndex()-1));
+    if (groupListIndex() && ctx.hasGroupList(groupListIndex())) {
+      dc->setRXGroupList(ctx.getGroupList(groupListIndex()));
     }
-    if (positioningSystemIndex() && ctx.hasGPSSystem(positioningSystemIndex()-1)) {
-      dc->setPosSystem(ctx.getGPSSystem(positioningSystemIndex()-1));
+    if (positioningSystemIndex() && ctx.hasGPSSystem(positioningSystemIndex())) {
+      dc->setPosSystem(ctx.getGPSSystem(positioningSystemIndex()));
     }
     return true;
   }
@@ -639,6 +640,101 @@ TyTCodeplug::VFOChannelElement::stepSize(uint ss_Hz) {
   ss_Hz = std::min(50000U, std::max(ss_Hz, 2500U));
   setUInt8(32, ss_Hz/2500-1);
   setUInt8(33, 0xff);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::ContactElement
+ * ******************************************************************************************** */
+TyTCodeplug::ContactElement::ContactElement(uint8_t *ptr, uint size)
+  : CodePlug::Element(ptr)
+{
+  // pass...
+}
+
+TyTCodeplug::ContactElement::~ContactElement() {
+  // pass...
+}
+
+bool
+TyTCodeplug::ContactElement::isValid() const {
+  return Element::isValid() && (0 != getUInt2(3, 0))
+      && (0x0000 != getUInt16_be(4)) && (0xffff != getUInt16_be(4));
+}
+
+void
+TyTCodeplug::ContactElement::clear() {
+  memset(_data, 0xff, 3); // clear DMR ID
+  setUInt2(3, 0, 0);      // type=0
+  setBit(3,2, 0); setBit(3,3, 0); setBit(3,4, 0); // unused = 0
+  ringTone(false);
+  setBit(3,6, 1); setBit(3,7, 1); // unknown = 1
+  memset(_data+0x04, 0x00, 2*16);
+}
+
+uint32_t
+TyTCodeplug::ContactElement::dmrId() const {
+  return getUInt24_le(0);
+}
+
+void
+TyTCodeplug::ContactElement::dmrId(uint32_t id) {
+  setUInt24_le(0, id);
+}
+
+bool
+TyTCodeplug::ContactElement::ringTone() const {
+  return getBit(3, 5);
+}
+void
+TyTCodeplug::ContactElement::ringTone(bool enable) {
+  setBit(3, 5, enable);
+}
+
+DigitalContact::Type TyTCodeplug::ContactElement::callType() const {
+  switch(getUInt2(3,0)) {
+  case 1: return DigitalContact::GroupCall;
+  case 2: return DigitalContact::PrivateCall;
+  case 3: return DigitalContact::AllCall;
+  default:
+    break;
+  }
+  return DigitalContact::PrivateCall;
+}
+void
+TyTCodeplug::ContactElement::callType(DigitalContact::Type type) {
+  switch (type) {
+  case DigitalContact::GroupCall:   setUInt2(3,0, 1); break;
+  case DigitalContact::PrivateCall: setUInt2(3,0, 2); break;
+  case DigitalContact::AllCall:     setUInt2(3,0, 3); break;
+  }
+}
+
+QString
+TyTCodeplug::ContactElement::name() const {
+  return readUnicode(4, 16, 0x0000);
+}
+void
+TyTCodeplug::ContactElement::name(const QString &nm) {
+  writeUnicode(4, nm, 16, 0x0000);
+}
+
+DigitalContact *
+TyTCodeplug::ContactElement::toContactObj() const {
+  return new DigitalContact(callType(), name(), dmrId(), ringTone());
+}
+
+bool
+TyTCodeplug::ContactElement::fromContactObj(const DigitalContact *cont) {
+  if (nullptr == cont)
+    return false;
+
+  dmrId(cont->number());
+  name(cont->name());
+  callType(cont->type());
+  ringTone(cont->rxTone());
+
+  return true;
 }
 
 
@@ -761,67 +857,67 @@ TyTCodeplug::decode(Config *config) {
   }
 
   // Define Contacts
-  if (! this->createContacts(config, ctx)) {
+  if (! this->createContacts(ctx)) {
     _errorMessage = tr("Cannot create contacts: %1").arg(_errorMessage);
     return false;
   }
 
   // Define RX GroupLists
-  if (! this->createGroupLists(config, ctx)) {
+  if (! this->createGroupLists(ctx)) {
     _errorMessage = tr("Cannot create group lists: %1").arg(_errorMessage);
     return false;
   }
 
   // Define Channels
-  if (! this->createChannels(config, ctx)) {
+  if (! this->createChannels(ctx)) {
     _errorMessage = tr("Cannot create channels: %1").arg(_errorMessage);
     return false;
   }
 
   // Define Zones
-  if (! this->createZones(config, ctx)) {
+  if (! this->createZones(ctx)) {
     _errorMessage = tr("Cannot create zones: %1").arg(_errorMessage);
     return false;
   }
 
   // Define Scanlists
-  if (! this->createScanLists(config, ctx)) {
+  if (! this->createScanLists(ctx)) {
     _errorMessage = tr("Cannot create scan lists: %1").arg(_errorMessage);
     return false;
   }
 
   // Define GPS systems
-  if (! this->createPositioningSystems(config, ctx)) {
+  if (! this->createPositioningSystems(ctx)) {
     _errorMessage = tr("Cannot create positioning systems: %1").arg(_errorMessage);
     return false;
   }
 
   // Link RX GroupLists
-  if (! this->linkGroupLists(config, ctx)) {
+  if (! this->linkGroupLists(ctx)) {
     _errorMessage = tr("Cannot link group lists: %1").arg(_errorMessage);
     return false;
   }
 
   // Link Channels
-  if (! this->linkChannels(config, ctx)) {
+  if (! this->linkChannels(ctx)) {
     _errorMessage = tr("Cannot link channels: %1").arg(_errorMessage);
     return false;
   }
 
   // Link Zones
-  if (! this->linkZones(config, ctx)) {
+  if (! this->linkZones(ctx)) {
     _errorMessage = tr("Cannot link zones: %1").arg(_errorMessage);
     return false;
   }
 
   // Link Scanlists
-  if (! this->linkScanLists(config, ctx)) {
+  if (! this->linkScanLists(ctx)) {
     _errorMessage = tr("Cannot link scan lists: %1").arg(_errorMessage);
     return false;
   }
 
   // Link GPS systems
-  if (! this->linkPositioningSystems(config, ctx)) {
+  if (! this->linkPositioningSystems(ctx)) {
     _errorMessage = tr("Cannot link positioning systems: %1").arg(_errorMessage);
     return false;
   }
@@ -889,7 +985,7 @@ TyTCodeplug::encodeContacts(Config *config, const Flags &flags) {
 }
 
 bool
-TyTCodeplug::createContacts(Config *config, CodeplugContext &ctx) {
+TyTCodeplug::createContacts(CodeplugContext &ctx) {
   return true;
 }
 
@@ -905,12 +1001,12 @@ TyTCodeplug::encodeGroupLists(Config *config, const Flags &flags) {
 }
 
 bool
-TyTCodeplug::createGroupLists(Config *config, CodeplugContext &ctx) {
+TyTCodeplug::createGroupLists(CodeplugContext &ctx) {
   return true;
 }
 
 bool
-TyTCodeplug::linkGroupLists(Config *config, CodeplugContext &ctx) {
+TyTCodeplug::linkGroupLists(CodeplugContext &ctx) {
   return true;
 }
 
@@ -926,12 +1022,12 @@ TyTCodeplug::encodeChannels(Config *config, const Flags &flags) {
 }
 
 bool
-TyTCodeplug::createChannels(Config *config, CodeplugContext &ctx) {
+TyTCodeplug::createChannels(CodeplugContext &ctx) {
   return true;
 }
 
 bool
-TyTCodeplug::linkChannels(Config *config, CodeplugContext &ctx) {
+TyTCodeplug::linkChannels(CodeplugContext &ctx) {
   return true;
 }
 
@@ -947,12 +1043,12 @@ TyTCodeplug::encodeZones(Config *config, const Flags &flags) {
 }
 
 bool
-TyTCodeplug::createZones(Config *config, CodeplugContext &ctx) {
+TyTCodeplug::createZones(CodeplugContext &ctx) {
   return true;
 }
 
 bool
-TyTCodeplug::linkZones(Config *config, CodeplugContext &ctx) {
+TyTCodeplug::linkZones(CodeplugContext &ctx) {
   return true;
 }
 
@@ -968,12 +1064,12 @@ TyTCodeplug::encodeScanLists(Config *config, const Flags &flags) {
 }
 
 bool
-TyTCodeplug::createScanLists(Config *config, CodeplugContext &ctx) {
+TyTCodeplug::createScanLists(CodeplugContext &ctx) {
   return true;
 }
 
 bool
-TyTCodeplug::linkScanLists(Config *config, CodeplugContext &ctx) {
+TyTCodeplug::linkScanLists(CodeplugContext &ctx) {
   return true;
 }
 
@@ -989,12 +1085,12 @@ TyTCodeplug::encodePositioningSystems(Config *config, const Flags &flags) {
 }
 
 bool
-TyTCodeplug::createPositioningSystems(Config *config, CodeplugContext &ctx) {
+TyTCodeplug::createPositioningSystems(CodeplugContext &ctx) {
   return true;
 }
 
 bool
-TyTCodeplug::linkPositioningSystems(Config *config, CodeplugContext &ctx) {
+TyTCodeplug::linkPositioningSystems(CodeplugContext &ctx) {
   return true;
 }
 

@@ -19,8 +19,13 @@ public:
 public:
   void clearChannels();
   bool encodeChannels(Config *config, const Flags &flags);
-  bool createChannels(Config *config, CodeplugContext &ctx);
-  bool linkChannels(Config *config, CodeplugContext &ctx);
+  bool createChannels(CodeplugContext &ctx);
+  bool linkChannels(CodeplugContext &ctx);
+
+  void clearContacts();
+  bool encodeContacts(Config *config, const Flags &flags);
+  bool createContacts(CodeplugContext &ctx);
+
 };
 
 #endif // MD2017CODEPLUG_HH
