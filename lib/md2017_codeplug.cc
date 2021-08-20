@@ -10,6 +10,12 @@
 #define ADDR_CONTACTS    0x140000
 #define CONTACT_SIZE     0x000024
 
+#define NUM_ZONES             250
+#define ADDR_ZONES       0x0149e0
+#define ZONE_SIZE        0x000040
+#define ADDR_ZONEEXTS    0x031000
+#define ZONEEXT_SIZE     0x0000e0
+
 MD2017Codeplug::MD2017Codeplug(QObject *parent)
   : TyTCodeplug(parent)
 {
@@ -115,5 +121,72 @@ MD2017Codeplug::createContacts(CodeplugContext &ctx) {
       return false;
     }
   }
+  return true;
+}
+
+void
+MD2017Codeplug::clearZones() {
+  // Clear zones & zone extensions
+  for (int i=0; i<NUM_ZONES; i++) {
+    ZoneElement(data(ADDR_ZONES+i*ZONE_SIZE)).clear();
+    ZoneExtElement(data(ADDR_ZONEEXTS+i*ZONEEXT_SIZE)).clear();
+  }
+}
+
+bool
+MD2017Codeplug::encodeZones(Config *config, const Flags &flags) {
+  for (int i=0; i<NUM_ZONES; i++) {
+    ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
+    ZoneExtElement ext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
+    zone.clear();
+    ext.clear();
+    if (i < config->zones()->count()) {
+      zone.fromZoneObj(config->zones()->zone(i), config);
+      if (config->zones()->zone(i)->B()->count() || (16 < config->zones()->zone(i)->A()->count()))
+        ext.fromZoneObj(config->zones()->zone(i), config);
+    }
+  }
+  return true;
+}
+
+bool
+MD2017Codeplug::createZones(CodeplugContext &ctx) {
+  for (int i=0; i<NUM_ZONES; i++) {
+    ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
+    if (! zone.isValid())
+      break;
+    if (Zone *obj = zone.toZoneObj()) {
+      ctx.config()->zones()->addZone(obj);
+    } else {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid zone at index %2.")
+          .arg(__func__).arg(i);
+      logError() << _errorMessage;
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool
+MD2017Codeplug::linkZones(CodeplugContext &ctx) {
+  for (int i=0; i<NUM_ZONES; i++) {
+    ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
+    if (! zone.isValid())
+      break;
+    if (! zone.linkZone(ctx.config()->zones()->zone(i), ctx)) {
+      _errorMessage = QString("Cannot decode TyT codeplug: Cannot link zone at index %1.").arg(i);
+      logError() << _errorMessage;
+      return false;
+    }
+    ZoneExtElement zoneext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
+    if (! zoneext.linkZoneObj(ctx.config()->zones()->zone(i), ctx)) {
+      _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link zone extension at index %2.")
+          .arg(__func__).arg(i);
+      logError() << _errorMessage;
+      return false;
+    }
+  }
+
   return true;
 }

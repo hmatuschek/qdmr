@@ -340,8 +340,8 @@ public:
     /** Destructor. */
     virtual ~ContactElement();
 
-    virtual void clear();
-    virtual bool isValid() const;
+    void clear();
+    bool isValid() const;
 
     virtual uint32_t dmrId() const;
     virtual void dmrId(uint32_t id);
@@ -355,9 +355,79 @@ public:
     virtual QString name() const;
     virtual void name(const QString &nm);
 
-    virtual DigitalContact *toContactObj() const;
     virtual bool fromContactObj(const DigitalContact *contact);
+    virtual DigitalContact *toContactObj() const;
   };
+
+  /** Represents a zone within the codeplug.
+   * Please note that a zone consists of two elements the @c ZoneElement and the @c ZoneExtElement.
+   * The latter adds additional channels for VFO A and the channels for VFO B.
+   *
+   * Memmory layout of encoded zone:
+   * @verbinclude tytzone.txt
+   */
+  class ZoneElement: public CodePlug::Element
+  {
+  public:
+    /** Construtor. */
+    ZoneElement(uint8_t *ptr, uint size=0x40);
+    /** Desturctor. */
+    virtual ~ZoneElement();
+
+    void clear();
+    bool isValid() const;
+
+    /** Returns the name of the zone. */
+    virtual QString name() const;
+    /** Sets the name of the zone. */
+    virtual void name(const QString &name);
+
+    /** Returns the index (+1) of the @c n-th member. */
+    virtual uint16_t memberIndex(uint n) const;
+    /** Sets the index (+1) of the @c n-th member. */
+    virtual void memberIndex(uint n, uint16_t idx);
+
+    /** Encodes a given zone object. */
+    virtual bool fromZoneObj(const Zone *zone, const CodeplugContext &ctx);
+    /** Creates a zone. */
+    virtual Zone *toZoneObj() const;
+    /** Links the created zone to channels. */
+    virtual bool linkZone(Zone *zone, const CodeplugContext &ctx) const;
+  };
+
+  /** Extended zone data.
+   * The zone definition @c ZoneElement contains only a single set of 16 channels. For each zone
+   * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each.
+   *
+   * Memmory layout of encoded zone extension:
+   * @verbinclude tytzoneext.txt
+   */
+  class ZoneExtElement: public CodePlug::Element
+  {
+  public:
+    /** Constructor. */
+    ZoneExtElement(uint8_t *ptr, uint size=0xe0);
+    /** Destructor. */
+    virtual ~ZoneExtElement();
+
+    void clear();
+
+    /** Returns the n-th member index of the channel list for A. */
+    virtual uint16_t memberIndexA(uint n) const;
+    /** Sets the n-th member index of the channel list for A. */
+    virtual void memberIndexA(uint n, uint16_t idx);
+    /** Returns the n-th member index of the channel list for B. */
+    virtual uint16_t memberIndexB(uint n) const;
+    /** Returns the n-th member index of the channel list for B. */
+    virtual void memberIndexB(uint n, uint16_t idx);
+
+    /** Encodes the given zone. */
+    virtual bool fromZoneObj(const Zone *zone, const CodeplugContext &ctx);
+    /** Links the given zone object.
+     * Thant is, extends channel list A and populates channel list B. */
+    virtual bool linkZoneObj(Zone *zone, const CodeplugContext &ctx);
+  };
+
 
 protected:
   /** Empty constructor. */

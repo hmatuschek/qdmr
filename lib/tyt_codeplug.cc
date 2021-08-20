@@ -739,6 +739,163 @@ TyTCodeplug::ContactElement::fromContactObj(const DigitalContact *cont) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::ZoneElement
+ * ******************************************************************************************** */
+TyTCodeplug::ZoneElement::ZoneElement(uint8_t *ptr, uint size)
+  : CodePlug::Element(ptr)
+{
+  // pass...
+}
+
+TyTCodeplug::ZoneElement::~ZoneElement() {
+  // pass...
+}
+
+bool
+TyTCodeplug::ZoneElement::isValid() const {
+  return Element::isValid() && (0x0000 != getUInt16_be(0)) && (0xffff != getUInt16_be(0));
+}
+
+void
+TyTCodeplug::ZoneElement::clear() {
+  memset(_data, 0x00, 0x40);
+}
+
+QString
+TyTCodeplug::ZoneElement::name() const {
+  return readUnicode(0, 16);
+}
+void
+TyTCodeplug::ZoneElement::name(const QString &name) {
+  writeUnicode(0, name, 16);
+}
+
+uint16_t
+TyTCodeplug::ZoneElement::memberIndex(uint n) const {
+  return getUInt16_le(0x20 + n*2);
+}
+void
+TyTCodeplug::ZoneElement::memberIndex(uint n, uint16_t idx) {
+  setUInt16_le(0x20 + n*2, idx);
+}
+
+bool
+TyTCodeplug::ZoneElement::fromZoneObj(const Zone *zone, const CodeplugContext &ctx) {
+  name(zone->name());
+  for (int i=0; i<16; i++) {
+    if (i < zone->A()->count())
+      memberIndex(i, ctx.config()->channelList()->indexOf(zone->A()->channel(i))+1);
+    else
+      memberIndex(i, 0);
+  }
+  return true;
+}
+
+Zone *
+TyTCodeplug::ZoneElement::toZoneObj() const {
+  if (!isValid())
+    return nullptr;
+  return new Zone(name());
+}
+
+bool
+TyTCodeplug::ZoneElement::linkZone(Zone *zone, const CodeplugContext &ctx) const {
+  if (! isValid())
+    return false;
+
+  for (int i=0; ((i<16) && memberIndex(i)); i++) {
+    if (! ctx.hasChannel(memberIndex(i))) {
+      logWarn() << "Cannot link channel with index " << memberIndex(i) << " channel not defined.";
+      continue;
+    }
+    zone->A()->addChannel(ctx.getChannel(memberIndex(i)));
+  }
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::ZoneElement
+ * ******************************************************************************************** */
+TyTCodeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr, uint size)
+  : CodePlug::Element(ptr)
+{
+  // pass...
+}
+
+TyTCodeplug::ZoneExtElement::~ZoneExtElement() {
+  // pass...
+}
+
+void
+TyTCodeplug::ZoneExtElement::clear() {
+  memset(_data, 0x00, 0xe0);
+}
+
+uint16_t
+TyTCodeplug::ZoneExtElement::memberIndexA(uint n) const {
+  return getUInt16_le(0x00 + 2*n);
+}
+
+void
+TyTCodeplug::ZoneExtElement::memberIndexA(uint n, uint16_t idx) {
+  setUInt16_le(0x00 + 2*n, idx);
+}
+
+uint16_t
+TyTCodeplug::ZoneExtElement::memberIndexB(uint n) const {
+  return getUInt16_le(0x60 + 2*n);
+}
+
+void
+TyTCodeplug::ZoneExtElement::memberIndexB(uint n, uint16_t idx) {
+  setUInt16_le(0x60 + 2*n, idx);
+}
+
+bool
+TyTCodeplug::ZoneExtElement::fromZoneObj(const Zone *zone, const CodeplugContext &ctx) {
+  // Store remaining channels from list A
+  for (int i=16; i<64; i++) {
+    if (i < zone->A()->count())
+      memberIndexA(i-16, ctx.config()->channelList()->indexOf(zone->A()->channel(i))+1);
+    else
+      memberIndexA(i-16, 0);
+  }
+  // Store channel from list B
+  for (int i=0; i<64; i++) {
+    if (i < zone->B()->count())
+      memberIndexB(i, ctx.config()->channelList()->indexOf(zone->B()->channel(i))+1);
+    else
+      memberIndexB(i, 0);
+  }
+
+  return true;
+}
+
+bool
+TyTCodeplug::ZoneExtElement::linkZoneObj(Zone *zone, const CodeplugContext &ctx) {
+  for (int i=0; (i<48) && memberIndexA(i); i++) {
+    if (! ctx.hasChannel(memberIndexA(i))) {
+      logWarn() << "Cannot link zone: Channel index " << memberIndexA(i) << " not defined.";
+      return false;
+    }
+    zone->A()->addChannel(ctx.getChannel(memberIndexA(i)));
+  }
+
+  for (int i=0; (i<64) && memberIndexB(i); i++) {
+    if (! ctx.hasChannel(memberIndexB(i))) {
+      logWarn() << "Cannot link zone: Channel index " << memberIndexB(i) << " not defined.";
+      return false;
+    }
+    zone->B()->addChannel(ctx.getChannel(memberIndexB(i)));
+  }
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of TyTCodeplug
  * ******************************************************************************************** */
 TyTCodeplug::TyTCodeplug(QObject *parent)

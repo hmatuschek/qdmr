@@ -26,6 +26,10 @@ public:
   bool encodeContacts(Config *config, const Flags &flags);
   bool createContacts(CodeplugContext &ctx);
 
+  void clearZones();
+  bool encodeZones(Config *config, const Flags &flags);
+  bool createZones(CodeplugContext &ctx);
+  bool linkZones(CodeplugContext &ctx);
 };
 
 #endif // MD2017CODEPLUG_HH
