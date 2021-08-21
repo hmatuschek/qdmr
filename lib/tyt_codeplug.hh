@@ -428,6 +428,37 @@ public:
     virtual bool linkZoneObj(Zone *zone, const CodeplugContext &ctx);
   };
 
+  /** Representation of an RX group list within the codeplug.
+   *
+   * Memmory layout of encoded RX group list:
+   * @verbinclude tytgrouplist.txt
+   */
+  class GroupListElement: public CodePlug::Element
+  {
+  public:
+    /** Constructor. */
+    GroupListElement(uint8_t *ptr, uint size=0x60);
+    /** Destructor. */
+    virtual ~GroupListElement();
+
+    void clear();
+    bool isValid() const;
+
+    /** Returns the name of the group list. */
+    virtual QString name() const;
+    /** Sets the name of the group list. */
+    virtual void name(const QString &nm);
+
+    /** Returns the n-th member index. */
+    virtual uint16_t memberIndex(uint n) const;
+    /** Sets the n-th member index. */
+    virtual void memberIndex(uint n, uint16_t idx);
+
+    virtual bool fromGroupListObj(const RXGroupList *lst, const CodeplugContext &ctx);
+    virtual RXGroupList *toGroupListObj(const CodeplugContext &ctx);
+    virtual bool linkGroupListObj(RXGroupList *lst, const CodeplugContext &ctx);
+  };
+
 
 protected:
   /** Empty constructor. */

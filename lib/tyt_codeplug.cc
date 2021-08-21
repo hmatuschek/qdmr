@@ -896,6 +896,86 @@ TyTCodeplug::ZoneExtElement::linkZoneObj(Zone *zone, const CodeplugContext &ctx)
 
 
 /* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::GroupListElement
+ * ******************************************************************************************** */
+TyTCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, uint size)
+  : CodePlug::Element(ptr)
+{
+  // pass...
+}
+
+TyTCodeplug::GroupListElement::~GroupListElement() {
+  // pass...
+}
+
+bool
+TyTCodeplug::GroupListElement::isValid() const {
+  return Element::isValid() && (0x0000 != getUInt16_be(0));
+}
+
+void
+TyTCodeplug::GroupListElement::clear() {
+  memset(_data, 0x00, 0x60);
+}
+
+QString
+TyTCodeplug::GroupListElement::name() const {
+  return readUnicode(0, 16);
+}
+
+void
+TyTCodeplug::GroupListElement::name(const QString &nm) {
+  writeUnicode(0, nm, 16);
+}
+
+uint16_t
+TyTCodeplug::GroupListElement::memberIndex(uint n) const {
+  return getUInt16_le(0x20 + n*2);
+}
+
+void
+TyTCodeplug::GroupListElement::memberIndex(uint n, uint16_t idx) {
+  setUInt16_le(0x20 + 2*n, idx);
+}
+
+bool
+TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, const CodeplugContext &ctx) {
+  name(lst->name());
+  for (int i=0; i<32; i++) {
+    if (i<lst->count())
+      memberIndex(i, ctx.config()->contacts()->indexOfDigital(lst->contact(i)) + 1);
+    else
+      memberIndex(i, 0);
+  }
+  return true;
+}
+
+RXGroupList *
+TyTCodeplug::GroupListElement::toGroupListObj(const CodeplugContext &ctx) {
+  if (! isValid())
+    return nullptr;
+  return new RXGroupList(name());
+}
+
+bool
+TyTCodeplug::GroupListElement::linkGroupListObj(RXGroupList *lst, const CodeplugContext &ctx) {
+  if (! isValid())
+    return false;
+
+  for (int i=0; (i<32) && memberIndex(i); i++) {
+    if (! ctx.hasDigitalContact(memberIndex(i))) {
+      logWarn() << "Cannot link contact " << memberIndex(i) << " to group list '"
+                << name() << "': Invalid contact index. Ignored.";
+      continue;
+    }
+    lst->addContact(ctx.getDigitalContact(memberIndex(i)));
+  }
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of TyTCodeplug
  * ******************************************************************************************** */
 TyTCodeplug::TyTCodeplug(QObject *parent)

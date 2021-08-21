@@ -30,6 +30,11 @@ public:
   bool encodeZones(Config *config, const Flags &flags);
   bool createZones(CodeplugContext &ctx);
   bool linkZones(CodeplugContext &ctx);
+
+  void clearGroupLists();
+  bool encodeGroupLists(Config *config, const Flags &flags);
+  bool createGroupLists(CodeplugContext &ctx);
+  bool linkGroupLists(CodeplugContext &ctx);
 };
 
 #endif // MD2017CODEPLUG_HH

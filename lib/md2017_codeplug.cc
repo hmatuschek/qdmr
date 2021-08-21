@@ -16,6 +16,12 @@
 #define ADDR_ZONEEXTS    0x031000
 #define ZONEEXT_SIZE     0x0000e0
 
+#define NUM_GROUPLISTS        250
+#define ADDR_GROUPLISTS  0x00ec20
+#define GROUPLIST_SIZE   0x000060
+
+
+
 MD2017Codeplug::MD2017Codeplug(QObject *parent)
   : TyTCodeplug(parent)
 {
@@ -188,5 +194,55 @@ MD2017Codeplug::linkZones(CodeplugContext &ctx) {
     }
   }
 
+  return true;
+}
+
+void
+MD2017Codeplug::clearGroupLists() {
+  for (int i=0; i<NUM_GROUPLISTS; i++)
+    GroupListElement(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE)).clear();
+}
+
+bool
+MD2017Codeplug::encodeGroupLists(Config *config, const Flags &flags) {
+  for (int i=0; i<NUM_GROUPLISTS; i++) {
+    GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
+    if (i < config->rxGroupLists()->count())
+      glist.fromGroupListObj(config->rxGroupLists()->list(i), config);
+    else
+      glist.clear();
+  }
+  return true;
+}
+
+bool
+MD2017Codeplug::createGroupLists(CodeplugContext &ctx) {
+  for (int i=0; i<NUM_GROUPLISTS; i++) {
+    GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
+    if (! glist.isValid())
+      break;
+    if (RXGroupList *obj = glist.toGroupListObj(ctx))
+      ctx.addGroupList(obj, i+1);
+    else {
+      _errorMessage = QString("Cannot decode codeplug: Invlaid RX group list at index %1.").arg(i);
+      logError() << _errorMessage;
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+MD2017Codeplug::linkGroupLists(CodeplugContext &ctx) {
+  for (int i=0; i<NUM_GROUPLISTS; i++) {
+    GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
+    if (! glist.isValid())
+      break;
+    if (! glist.linkGroupListObj(ctx.getGroupList(i+1), ctx)) {
+      _errorMessage = QString("Cannot decode codeplug: Cannot link group-list at index %1.").arg(i);
+      logError() << _errorMessage;
+      return false;
+    }
+  }
   return true;
 }
