@@ -454,9 +454,72 @@ public:
     /** Sets the n-th member index. */
     virtual void memberIndex(uint n, uint16_t idx);
 
+    /** Encodes the given group list. */
     virtual bool fromGroupListObj(const RXGroupList *lst, const CodeplugContext &ctx);
+    /** Creates a group list object. */
     virtual RXGroupList *toGroupListObj(const CodeplugContext &ctx);
+    /** Links the given group list. */
     virtual bool linkGroupListObj(RXGroupList *lst, const CodeplugContext &ctx);
+  };
+
+
+  /** Represents a scan list within the codeplug.
+   *
+   * Memmory layout of encoded scan list:
+   * @verbinclude tytscanlist.txt
+   */
+  class ScanListElement: public CodePlug::Element
+  {
+  public:
+    /** Constructor. */
+    ScanListElement(uint8_t *ptr, uint size=0x68);
+    /** Destructor. */
+    virtual ~ScanListElement();
+
+    bool isValid() const;
+    void clear();
+
+    /** Retruns the name of the scan list. */
+    virtual QString name() const;
+    /** Sets the name of the scan list. */
+    virtual void name(const QString &nm);
+
+    /** Returns the index (+1) of the first priority channel. */
+    virtual uint16_t priorityChannel1Index() const;
+    /** Set the index (+1) of the first priority channel. */
+    virtual void priorityChannel1Index(uint16_t idx);
+
+    /** Returns the index (+1) of the second priority channel. */
+    virtual uint16_t priorityChannel2Index() const;
+    /** Set the index (+1) of the second priority channel. */
+    virtual void priorityChannel2Index(uint16_t idx);
+
+    /** Returns the index (+1) of the TX channel. 0=current, 0xffff=none. */
+    virtual uint16_t txChannelIndex() const;
+    /** Sets the index (+1) of the TX channel. 0=current, 0xffff=none. */
+    virtual void txChannelIndex(uint16_t idx);
+
+    /** Returns the hold time in ms. */
+    virtual uint holdTime() const;
+    /** Sets the hold time in ms. */
+    virtual void holdTime(uint time);
+
+    /** Returns the priority sample time in ms. */
+    virtual uint prioritySampleTime() const;
+    /** Sets the priority sample time in ms. */
+    virtual void prioritySampleTime(uint time);
+
+    /** Returns the n-th member index. */
+    virtual uint16_t memberIndex(uint n) const;
+    /** Sets the n-th member index. */
+    virtual void memberIndex(uint n, uint16_t idx);
+
+    /** Encodes the given scan list. */
+    virtual bool fromScanListObj(const ScanList *lst, const CodeplugContext &ctx);
+    /** Creates a scan list. */
+    virtual ScanList *toScanListObj(const CodeplugContext &ctx);
+    /** Links the scan list object. */
+    virtual bool linkScanListObj(ScanList *lst, const CodeplugContext &ctx);
   };
 
 

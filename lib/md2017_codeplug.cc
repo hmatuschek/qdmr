@@ -20,6 +20,10 @@
 #define ADDR_GROUPLISTS  0x00ec20
 #define GROUPLIST_SIZE   0x000060
 
+#define NUM_SCANLISTS         250
+#define ADDR_SCANLISTS   0x018860
+#define SCANLIST_SIZE    0x000068
+
 
 
 MD2017Codeplug::MD2017Codeplug(QObject *parent)
@@ -244,5 +248,59 @@ MD2017Codeplug::linkGroupLists(CodeplugContext &ctx) {
       return false;
     }
   }
+  return true;
+}
+
+void
+MD2017Codeplug::clearScanLists() {
+  // Clear scan lists
+  for (int i=0; i<NUM_SCANLISTS; i++)
+    ScanListElement(data(ADDR_SCANLISTS + i*SCANLIST_SIZE)).clear();
+}
+
+bool
+MD2017Codeplug::encodeScanLists(Config *config, const Flags &flags) {
+  // Define Scanlists
+  for (int i=0; i<NUM_SCANLISTS; i++) {
+    ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
+    if (i < config->scanlists()->count())
+      scan.fromScanListObj(config->scanlists()->scanlist(i), config);
+    else
+      scan.clear();
+  }
+  return true;
+}
+
+bool
+MD2017Codeplug::createScanLists(CodeplugContext &ctx) {
+  for (int i=0; i<NUM_SCANLISTS; i++) {
+    ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
+    if (! scan.isValid())
+      break;
+    if (ScanList *obj = scan.toScanListObj(ctx))
+      ctx.addScanList(obj, i+1);
+    else {
+      _errorMessage = QString("Cannot decode TyT codeplug: Invlaid scanlist at index %1.").arg(i);
+      logError() << _errorMessage;
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+MD2017Codeplug::linkScanLists(CodeplugContext &ctx) {
+  for (int i=0; i<NUM_SCANLISTS; i++) {
+    ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
+    if (! scan.isValid())
+      break;
+
+    if (! scan.linkScanListObj(ctx.getScanList(i+1), ctx)) {
+      _errorMessage = QString("Cannot decode codeplug: Cannot link scan-list at index %1.").arg(i);
+      logError() << _errorMessage;
+      return false;
+    }
+  }
+
   return true;
 }

@@ -35,6 +35,12 @@ public:
   bool encodeGroupLists(Config *config, const Flags &flags);
   bool createGroupLists(CodeplugContext &ctx);
   bool linkGroupLists(CodeplugContext &ctx);
+
+  void clearScanLists();
+  bool encodeScanLists(Config *config, const Flags &flags);
+  bool createScanLists(CodeplugContext &ctx);
+  bool linkScanLists(CodeplugContext &ctx);
+
 };
 
 #endif // MD2017CODEPLUG_HH

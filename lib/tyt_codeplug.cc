@@ -976,6 +976,200 @@ TyTCodeplug::GroupListElement::linkGroupListObj(RXGroupList *lst, const Codeplug
 
 
 /* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::ScanListElement
+ * ******************************************************************************************** */
+TyTCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, uint size)
+  : Element(ptr)
+{
+  // pass...
+}
+
+TyTCodeplug::ScanListElement::~ScanListElement() {
+  // pass...
+}
+
+bool
+TyTCodeplug::ScanListElement::isValid() const {
+  return Element::isValid() && (0x0000 != getUInt16_be(0));
+}
+
+void
+TyTCodeplug::ScanListElement::clear() {
+  memset(_data, 0, 2*16);
+  priorityChannel1Index(0xffff);
+  priorityChannel2Index(0xffff);
+  txChannelIndex(0xffff);
+  setUInt8(0x26, 0xf1);
+  holdTime(500);
+  prioritySampleTime(2000);
+  setUInt8(0x29, 0xff);
+  memset(_data+0x2a, 0, 2*31);
+}
+
+QString
+TyTCodeplug::ScanListElement::name() const {
+  return readUnicode(0, 16);
+}
+
+void
+TyTCodeplug::ScanListElement::name(const QString &name) {
+  writeUnicode(0, name, 16);
+}
+
+uint16_t
+TyTCodeplug::ScanListElement::priorityChannel1Index() const {
+  return getUInt16_le(0x20);
+}
+
+void
+TyTCodeplug::ScanListElement::priorityChannel1Index(uint16_t idx) {
+  setUInt16_le(0x20, idx);
+}
+
+uint16_t
+TyTCodeplug::ScanListElement::priorityChannel2Index() const {
+  return getUInt16_le(0x22);
+}
+
+void
+TyTCodeplug::ScanListElement::priorityChannel2Index(uint16_t idx) {
+  setUInt16_le(0x22, idx);
+}
+
+uint16_t
+TyTCodeplug::ScanListElement::txChannelIndex() const {
+  return getUInt16_le(0x24);
+}
+
+void
+TyTCodeplug::ScanListElement::txChannelIndex(uint16_t idx) {
+  setUInt16_le(0x24, idx);
+}
+
+uint
+TyTCodeplug::ScanListElement::holdTime() const {
+  return uint(getUInt8(0x27))*25;
+}
+
+void
+TyTCodeplug::ScanListElement::holdTime(uint time) {
+  setUInt8(0x27, time/25);
+}
+
+uint
+TyTCodeplug::ScanListElement::prioritySampleTime() const {
+  return uint(getUInt8(0x27))*250;
+}
+
+void
+TyTCodeplug::ScanListElement::prioritySampleTime(uint time) {
+  setUInt8(0x27, time/250);
+}
+
+uint16_t
+TyTCodeplug::ScanListElement::memberIndex(uint n) const {
+  return getUInt16_le(0x2a + 2*n);
+}
+
+void
+TyTCodeplug::ScanListElement::memberIndex(uint n, uint16_t idx) {
+  setUInt16_le(0x2a + 2*n, idx);
+}
+
+bool
+TyTCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, const CodeplugContext &ctx) {
+  // Set name
+  name(lst->name());
+
+  // Set priority channel 1
+  if (lst->priorityChannel() && (SelectedChannel::get() == lst->priorityChannel()))
+    priorityChannel1Index(0);
+  else if (lst->priorityChannel())
+    priorityChannel1Index(ctx.config()->channelList()->indexOf(lst->priorityChannel())+1);
+
+  // Set priority channel 2
+  if (lst->secPriorityChannel() && (SelectedChannel::get() == lst->secPriorityChannel()))
+    priorityChannel2Index(0);
+  else if (lst->secPriorityChannel())
+    priorityChannel2Index(ctx.config()->channelList()->indexOf(lst->secPriorityChannel())+1);
+
+  // Set transmit channel
+  if (lst->txChannel() && (SelectedChannel::get() == lst->txChannel()))
+    txChannelIndex(0);
+  else if (lst->txChannel())
+    txChannelIndex(ctx.config()->channelList()->indexOf(lst->txChannel())+1);
+
+  for (int i=0, j=0; i<31;) {
+    if (j >= lst->count()) {
+      memberIndex(i++, 0);
+    } else if (SelectedChannel::get() == lst->channel(j)) {
+      logInfo() << "Cannot encode '" << lst->channel(j) << "' for UV390: skip.";
+      j++;
+    } else {
+      memberIndex(i++, ctx.config()->channelList()->indexOf(lst->channel(j++))+1);
+    }
+  }
+
+  return true;
+}
+
+ScanList *
+TyTCodeplug::ScanListElement::toScanListObj(const CodeplugContext &ctx) {
+  if (! isValid())
+    return nullptr;
+  return new ScanList(name());
+}
+
+bool
+TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, const CodeplugContext &ctx) {
+  if (! isValid()) {
+    logDebug() << "Cannot link invalid scanlist.";
+    return false;
+  }
+
+  if (0 == priorityChannel1Index())
+    lst->setPriorityChannel(SelectedChannel::get());
+  else if (ctx.hasChannel(priorityChannel1Index()))
+    lst->setPriorityChannel(ctx.getChannel(priorityChannel1Index()));
+  else if (0xffff == priorityChannel1Index())
+    lst->setPriorityChannel(nullptr);
+  else
+    logWarn() << "Cannot deocde reference to priority channel index " << priorityChannel1Index()
+                 << " in scan list '" << name() << "'.";
+
+  if (0 == priorityChannel2Index())
+    lst->setSecPriorityChannel(SelectedChannel::get());
+  else if (ctx.hasChannel(priorityChannel2Index()))
+    lst->setSecPriorityChannel(ctx.getChannel(priorityChannel2Index()));
+  else if (0xffff == priorityChannel2Index())
+    lst->setSecPriorityChannel(nullptr);
+  else
+    logWarn() << "Cannot deocde reference to secondary priority channel index " << priorityChannel2Index()
+              << " in scan list '" << name() << "'.";
+
+  if (0 == txChannelIndex())
+    lst->setTXChannel(SelectedChannel::get());
+  else if (ctx.hasChannel(txChannelIndex()))
+    lst->setTXChannel(ctx.getChannel(txChannelIndex()));
+  else
+    logWarn() << "Cannot deocde reference to secondary priority channel index " << txChannelIndex()
+                << " in scan list '" << name() << "'.";
+
+  for (int i=0; ((i<31) && memberIndex(i)); i++) {
+    if (! ctx.hasChannel(memberIndex(i))) {
+      logDebug() << "Cannot link scanlist to channel idx " << memberIndex(i)
+                    << ". Uknown channel index.";
+      return false;
+    }
+    lst->addChannel(ctx.getChannel(memberIndex(i)));
+  }
+
+  return true;
+
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of TyTCodeplug
  * ******************************************************************************************** */
 TyTCodeplug::TyTCodeplug(QObject *parent)
