@@ -136,11 +136,11 @@ TyTCodeplug::ChannelElement::loneWorker(bool enable) {
 
 bool
 TyTCodeplug::ChannelElement::talkaround() const {
-  return getBit(1, 0);
+  return ! getBit(1, 0);
 }
 void
 TyTCodeplug::ChannelElement::talkaround(bool enable) {
-  setBit(1, 0, enable);
+  setBit(1, 0, !enable);
 }
 
 bool
@@ -231,11 +231,11 @@ TyTCodeplug::ChannelElement::emergencyAlarmACK(bool enable) {
 
 bool
 TyTCodeplug::ChannelElement::displayPTTId() const {
-  return getBit(3,7);
+  return ! getBit(3,7);
 }
 void
 TyTCodeplug::ChannelElement::displayPTTId(bool enable) {
-  setBit(3,7, enable);
+  setBit(3,7, !enable);
 }
 
 TyTCodeplug::ChannelElement::RefFrequency

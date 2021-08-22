@@ -561,6 +561,7 @@ public:
   class GeneralSettingsElement: CodePlug::Element
   {
   public:
+    /** Defines all possible transmit modes. */
     enum TransmitMode {
       LAST_CALL_CH = 0,
       LAST_CALL_AND_HAND_CH = 1,
@@ -568,6 +569,7 @@ public:
       DESIGNED_AND_HAND_CH = 3,
     };
 
+    /** Defines all possible squelch modes. */
     enum MonitorType {
       MONITOR_SILENT       = 0,
       MONITOR_OPEN_SQUELCH = 1
@@ -594,122 +596,216 @@ public:
     /** Sets the second intro line. */
     virtual void introLine2(const QString line);
 
+    /** Returns the transmit mode. */
     virtual TransmitMode transmitMode() const;
+    /** Sets the transmit mode. */
     virtual void transmitMode(TransmitMode mode);
 
+    /** Returns the monitor type. */
     virtual MonitorType monitorType() const;
+    /** Sets the monitor type. */
     virtual void monitorType(MonitorType type);
 
+    /** Returns @c true if all LEDs are disabled. */
     virtual bool allLEDsDisabled() const;
+    /** Enables/disables all LEDs. */
     virtual void disableAllLEDs(bool disable);
 
+    /** Returns @c true, if save preamble is enabled. */
     virtual bool savePreamble() const;
+    /** Enables/disables save preamble. */
     virtual void savePreamble(bool enable);
+    /** Returns @c true, if save RX mode is enabled. */
     virtual bool saveModeRX() const;
+    /** Enables/disables save mode RX. */
     virtual void saveModeRX(bool enable);
+    /** Returns @c true, if all tones are disabled. */
     virtual bool allTonesDisabled() const;
+    /** Enables/disables all tones. */
     virtual void disableAllTones(bool disable);
+    /** Returns @c true, if the channel free indication tone is enabled. */
     virtual bool chFreeIndicationTone() const;
+    /** Enables/disables the channel free indication tone. */
     virtual void chFreeIndicationTone(bool enable);
+    /** Returns @c true, if password and lock is enabled. */
     virtual bool passwdAndLock() const;
+    /** Enables/disables password and lock. */
     virtual void passwdAndLock(bool enable);
+    /** Returns @c true, if the talk permit tone is enabled for DMR channels. */
     virtual bool talkPermitToneDigital() const;
+    /** Enables/disables talk permit tone for DMR channels. */
     virtual void talkPermitToneDigital(bool enable);
+    /** Returns @c true, if the talk permit tone is enabled for analog channels. */
     virtual bool talkPermitToneAnalog() const;
+    /** Enables/disables talk permit tone for analog channels. */
     virtual void talkPermitToneAnalog(bool enable);
 
+    /** Returns @c true, if the speech synthesis is enabled. */
     virtual bool channelVoiceAnnounce() const;
+    /** Enables/disables the speech synthesis. */
     virtual void channelVoiceAnnounce(bool enable);
+    /** Returns @c true, if intro picture is enabled. */
     virtual bool introPicture() const;
+    /** Enables/disables the intro picture. */
     virtual void introPicture(bool enable);
+    /** Returns @c true, if keypad tones are enabled. */
     virtual bool keypadTones() const;
+    /** Enables/disables the keypad tones. */
     virtual void keypadTones(bool enable);
 
+    /** Returns @c true, if VFO A is in channel mode. */
     virtual bool channelModeA() const;
+    /** Enables/disables the channel mode for VFO A. */
     virtual void channelModeA(bool enable);
+    /** Returns @c true, if VFO B is in channel mode. */
     virtual bool channelModeB() const;
+    /** Enables/disables the channel mode for VFO B. */
     virtual void channelModeB(bool enable);
 
+    /** Returns the default DMR ID of the radio. */
     virtual uint32_t dmrID() const;
+    /** Sets the default DMR ID of the radio. */
     virtual void dmrID(uint32_t id);
 
+    /** Returns the TX preamble duration. */
     virtual uint txPreambleDuration() const;
+    /** Sets the TX preamble duration. */
     virtual void txPreambleDuration(uint ms);
+    /** Returns the group call hang time. */
     virtual uint groupCallHangTime() const;
+    /** Sets the group call hang time. */
     virtual void groupCallHangTime(uint ms);
+    /** Returns the private call hang time. */
     virtual uint privateCallHangTime() const;
+    /** Sets the private call hang time. */
     virtual void privateCallHangTime(uint ms);
+    /** Returns the VOX sensitivity. */
     virtual uint voxSesitivity() const;
+    /** Sets the group call hang time. */
     virtual void voxSesitivity(uint ms);
+    /** Returns the low-battery warning interval. */
     virtual uint lowBatteryInterval() const;
+    /** Sets the low-battery warning interval. */
     virtual void lowBatteryInterval(uint sec);
 
+    /** Returns @c true if the call-alert is continuous. */
     virtual bool callAlertToneIsContinuous() const;
+    /** Returns the call-alert tone duration. */
     virtual uint callAlertToneDuration() const;
+    /** Sets the call-alert tone duration. */
     virtual void callAlertToneDuration(uint sec);
+    /** Sets the call-alert tone continuous. */
     virtual void setCallAlertToneContinuous();
 
+    /** Returns the lone-worker response time. */
     virtual uint loneWorkerResponseTime() const;
+    /** Sets the lone-worker response time. */
     virtual void loneWorkerResponseTime(uint min);
+    /** Returns the lone-worker reminder time. */
     virtual uint loneWorkerReminderTime() const;
+    /** Sets the lone-worker reminder time. */
     virtual void loneWorkerReminderTime(uint min);
+    /** Returns the scan digital hang time. */
     virtual uint scanDigitalHangTime() const;
+    /** Sets the scan digital hang time. */
     virtual void scanDigitalHangTime(uint ms);
+    /** Returns the scan analog hang time. */
     virtual uint scanAnalogHangTime() const;
+    /** Sets the scan analog hang time. */
     virtual void scanAnalogHangTime(uint ms);
 
+    /** Retuns @c true if the backlight is always on. */
     virtual bool backlightIsAlways() const;
+    /** Returns the backlight time. */
     virtual uint backlightTime() const;
+    /** Sets the backlight time. */
     virtual void backlightTime(uint sec);
+    /** Turns the backlight always on. */
     virtual void backlightTimeSetAlways();
 
+    /** Retuns @c true if the keypad lock is manual. */
     virtual bool keypadLockIsManual() const;
+    /** Returns the keypad lock time. */
     virtual uint keypadLockTime() const;
+    /** Sets the keypad lock time. */
     virtual void keypadLockTime(uint sec);
+    /** Set keypad lock to manual. */
     virtual void keypadLockTimeSetManual();
 
+    /** Returns @c true, if the radio is in channel (and not VFO) mode. */
     virtual bool channelMode() const;
+    /** Enable/disable channel mode. */
     virtual void channelMode(bool enable);
 
+    /** Returns the 8-digit power-on password. */
     virtual uint32_t powerOnPassword() const;
+    /** Sets the 8-digit power-on password. */
     virtual void powerOnPassword(uint32_t passwd);
 
+    /** Returns @c true, if the radio programming password is enabled. */
     virtual bool radioProgPasswordEnabled() const;
+    /** Returns the 8-digit radio programming password. */
     virtual uint32_t radioProgPassword() const;
+    /** Sets the 8-digit radio programming password. */
     virtual void radioProgPassword(uint32_t passwd);
+    /** Disables the radio programming password. */
     virtual void radioProgPasswordDisable();
 
+    /** Returns @c true, if the PC programming password is enabled. */
     virtual bool pcProgPasswordEnabled() const;
+    /** Returns the PC programming password. */
     virtual QString pcProgPassword() const;
+    /** Sets the PC programming password. */
     virtual void pcProgPassword(const QString &pass);
+    /** Disables the PC programming password. */
     virtual void pcProgPasswordDisable();
 
+    /** Returns @c true if group-call match is enabled. */
     virtual bool groupCallMatch() const;
+    /** Enables/disables group-call match. */
     virtual void groupCallMatch(bool enable);
+    /** Returns @c true if private-call match is enabled. */
     virtual bool privateCallMatch() const;
+    /** Enables/disables private-call match. */
     virtual void privateCallMatch(bool enable);
 
+    /** Returns the time-zone. */
     virtual QTimeZone timeZone() const;
+    /** Sets the time-zone. */
     virtual void timeZone(const QTimeZone &zone);
 
+    /** Returns the radio name. */
     virtual QString radioName() const;
+    /** Sets the radio name. */
     virtual void radioName(const QString &name);
 
+    /** Returns the channel hang time. */
     virtual uint channelHangTime() const;
+    /** Sets the channel hang time. */
     virtual void channelHangTime(uint dur);
+    /** Returns @c true, if public zone is enabled. */
     virtual bool publicZone() const;
+    /** Enables/disables public zone. */
     virtual void publicZone(bool enable);
 
+    /** Returns the n-th DMR id. */
     virtual uint32_t additionalDMRId(uint n) const;
+    /** Sets the n-th DMR id. */
     virtual void additionalDMRId(uint n, uint32_t id);
 
+    /** Returns the microphone gain. */
     virtual uint micLevel() const;
+    /** Sets the microphone gain. */
     virtual void micLevel(uint val);
 
+    /** If @c true, radio ID editing is enabled. */
     virtual bool editRadioID() const;
+    /** Enable/disable radio ID editing. */
     virtual void editRadioID(bool enable);
 
+    /** Encodes the general settings. */
     virtual bool fromConfig(const Config *config);
+    /** Updates config from general settings. */
     virtual bool updateConfig(Config *config);
   };
 
@@ -720,19 +816,28 @@ public:
   class BootSettingsElement: CodePlug::Element
   {
   protected:
+    /** Hidden constructor. */
     BootSettingsElement(uint8_t *ptr, size_t size);
 
   public:
+    /** Constructor. */
     explicit BootSettingsElement(uint8_t *ptr);
+    /** Destructor. */
     virtual ~BootSettingsElement();
 
     void clear();
 
+    /** Returns the boot zone index. */
     virtual uint zoneIndex() const;
+    /** Sets the boot zone index. */
     virtual void zoneIndex(uint idx);
+    /** Returns the channel index (within zone) for VFO A. */
     virtual uint channelIndexA() const;
+    /** Sets the channel index (within zone) for VFO A. */
     virtual void channelIndexA(uint idx);
+    /** Returns the channel index (within zone) for VFO B. */
     virtual uint channelIndexB() const;
+    /** Sets the channel index (within zone) for VFO B. */
     virtual void channelIndexB(uint idx);
   };
 
@@ -743,17 +848,23 @@ public:
   class TimestampElement: public CodePlug::Element
   {
   protected:
+    /** Hidden constructor. */
     TimestampElement(uint8_t *ptr, size_t size);
 
   public:
+    /** Constructor. */
     explicit TimestampElement(uint8_t *ptr);
+    /** Destructor. */
     virtual ~TimestampElement();
 
     void clear();
 
+    /** Returns the time stamp. */
     virtual QDateTime timestamp() const;
+    /** Sets the time stamp. */
     virtual void timestamp(const QDateTime &ts);
 
+    /** Returns the CPS version. */
     virtual QString cpsVersion() const;
   };
 
@@ -761,36 +872,56 @@ public:
    *
    * Memmory layout of encoded GPS system:
    * @verbinclude tytgpssystem.txt */
-  class GPSSystemElement: public CodePlug::Element {
+  class GPSSystemElement: public CodePlug::Element
+  {
   protected:
+    /** Hidden constructor. */
     GPSSystemElement(uint8_t *ptr, size_t size);
 
   public:
+    /** Constructor. */
     explicit GPSSystemElement(uint8_t *ptr);
+    /** Destructor. */
     virtual ~GPSSystemElement();
 
     bool isValid() const;
     void clear();
 
+    /** Returns @c true if the revert channel is the current one. */
     virtual bool revertChannelIsSelected() const;
+    /** Returns the revert channel index (+1). */
     virtual uint16_t revertChannelIndex() const;
+    /** Sets the revert channel index (+1). */
     virtual void revertChannelIndex(uint16_t idx);
+    /** Sets the revert channel to the current one. */
     virtual void setRevertChannelSelected();
 
+    /** Returns @c true if the repeat interval is disabled. */
     virtual bool repeatIntervalDisabled() const;
+    /** Returns the repeat interval. */
     virtual uint repeatInterval() const;
+    /** Sets the repeat interval in seconds. */
     virtual void repeatInterval(uint sec);
+    /** Disables the GPS repeat interval. */
     virtual void disableRepeatInterval();
 
+    /** Returns @c true if the destination contact is disabled. */
     virtual bool destinationContactDisabled() const;
+    /** Returns the destination contact index (+1). */
     virtual uint16_t destinationContactIndex() const;
+    /** Sets the destination contact index (+1). */
     virtual void destinationContactIndex(uint16_t idx);
+    /** Disables the destination contact. */
     virtual void disableDestinationContact();
 
+    /** Encodes the given GPS system. */
     virtual bool fromGPSSystemObj(const GPSSystem *sys, const CodeplugContext &ctx);
+    /** Constructs a GPS system. */
     virtual GPSSystem *toGPSSystemObj();
+    /** Links the given GPS system. */
     virtual bool linkGPSSystemObj(GPSSystem *sys, const CodeplugContext &ctx);
   };
+
 
 protected:
   /** Empty constructor. */
