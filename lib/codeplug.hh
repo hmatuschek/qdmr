@@ -79,6 +79,11 @@ public:
     /** Stores a 4bit integer at the given byte- and bit-offset. */
     void setUInt4(uint offset, uint bit, uint8_t value);
 
+    /** Reads a 5bit integer at the given byte- and bit-offset. */
+    uint8_t getUInt5(uint offset, uint bit) const;
+    /** Stores a 5bit integer at the given byte- and bit-offset. */
+    void setUInt5(uint offset, uint bit, uint8_t value);
+
     /** Reads a 6bit integer at the given byte- and bit-offset. */
     uint8_t getUInt6(uint offset, uint bit) const;
     /** Stores a 6bit integer at the given byte- and bit-offset. */
@@ -124,6 +129,12 @@ public:
     uint32_t getBCD8_le(uint offset) const;
     /** Stores a 8-digit (4-byte/32bit) BDC value in little-endian at the given byte-offset. */
     void setBCD8_le(uint offset, uint32_t value);
+
+    /** Reads upto @c maxlen ASCII chars at the given byte-offset using @c eos as the string termination char. */
+    QString readASCII(uint offset, uint maxlen, uint8_t eos=0x00) const;
+    /** Stores upto @c maxlen ASCII chars at the given byte-offset using @c eos as the string termination char.
+     * The stored string gets padded with @c eos to @c maxlen. */
+    void writeASCII(uint offset, const QString &txt, uint maxlen, uint8_t eos=0x00);
 
     /** Reads upto @c maxlen unicode chars at the given byte-offset using @c eos as the string termination char. */
     QString readUnicode(uint offset, uint maxlen, uint16_t eos=0x0000) const;

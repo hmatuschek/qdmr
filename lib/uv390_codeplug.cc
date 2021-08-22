@@ -713,7 +713,8 @@ UV390Codeplug::general_settings_t::clear() {
   _unused65_3 = 1;
   ch_free_indication_tone = 1;
   pw_and_lock_enable = 1;
-  talk_permit_tone = 0;
+  talk_permit_tone_digital = 0;
+  talk_permit_tone_analog = 0;
 
   _unused66_0 = 0;
   channel_voice_announce = 0;

@@ -17,6 +17,10 @@ public:
   virtual ~MD2017Codeplug();
 
 public:
+  void clearGeneralSettings();
+  bool encodeGeneralSettings(Config *config, const Flags &flags);
+  bool decodeGeneralSettings(Config *config);
+
   void clearChannels();
   bool encodeChannels(Config *config, const Flags &flags);
   bool createChannels(CodeplugContext &ctx);

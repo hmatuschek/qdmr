@@ -94,6 +94,16 @@ CodePlug::Element::setUInt4(uint offset, uint bit, uint8_t value) {
 }
 
 uint8_t
+CodePlug::Element::getUInt5(uint offset, uint bit) const {
+  return (((*(_data+offset)) >> bit) & 0b11111);
+}
+void
+CodePlug::Element::setUInt5(uint offset, uint bit, uint8_t value) {
+  *(_data+offset) &= ~(0b11111 << bit);
+  *(_data+offset) |= ((value & 0b11111)<<bit);
+}
+
+uint8_t
 CodePlug::Element::getUInt6(uint offset, uint bit) const {
   return (((*(_data+offset)) >> bit) & 0b111111);
 }
@@ -216,6 +226,26 @@ CodePlug::Element::setBCD8_le(uint offset, uint32_t val) {
   uint32_t g  = (val /       10) % 10;
   uint32_t h  = (val /        1) % 10;
   setUInt32_le(offset, (a << 28) + (b << 24) + (c << 20) + (d << 16) + (e << 12) + (f << 8) + (g << 4) + h);
+}
+
+QString
+CodePlug::Element::readASCII(uint offset, uint maxlen, uint8_t eos) const {
+  QString txt;
+  uint8_t *ptr = (uint8_t *)(_data+offset);
+  for (uint i=0; (i<maxlen)&&(eos!=ptr[i]); i++) {
+    txt.append(QChar::fromLatin1(ptr[i]));
+  }
+  return txt;
+}
+void
+CodePlug::Element::writeASCII(uint offset, const QString &txt, uint maxlen, uint8_t eos) {
+  uint8_t *ptr = (uint8_t *)(_data+offset);
+  for (uint i=0; i<maxlen; i++) {
+    if (i < uint(txt.length()))
+      ptr[i] = txt.at(i).toLatin1();
+    else
+      ptr[i] = eos;
+  }
 }
 
 QString

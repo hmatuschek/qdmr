@@ -343,19 +343,29 @@ public:
     void clear();
     bool isValid() const;
 
+    /** Returns the DMR ID of the contact. */
     virtual uint32_t dmrId() const;
+    /** Sets the DMR ID of the contact. */
     virtual void dmrId(uint32_t id);
 
+    /** Returns the call-type of the contact. */
     virtual DigitalContact::Type callType() const;
+    /** Sets the call-type of the contact. */
     virtual void callType(DigitalContact::Type type);
 
+    /** Returns @c true if the ring-tone is enabled for this contact. */
     virtual bool ringTone() const;
+    /** Enables/disables the ring-tone for this contact. */
     virtual void ringTone(bool enable);
 
+    /** Returns the name of the contact. */
     virtual QString name() const;
+    /** Sets the name of the contact. */
     virtual void name(const QString &nm);
 
+    /** Encodes the give contact. */
     virtual bool fromContactObj(const DigitalContact *contact);
+    /** Creates a contact. */
     virtual DigitalContact *toContactObj() const;
   };
 
@@ -462,7 +472,6 @@ public:
     virtual bool linkGroupListObj(RXGroupList *lst, const CodeplugContext &ctx);
   };
 
-
   /** Represents a scan list within the codeplug.
    *
    * Memmory layout of encoded scan list:
@@ -522,6 +531,157 @@ public:
     virtual bool linkScanListObj(ScanList *lst, const CodeplugContext &ctx);
   };
 
+  /** Codeplug representation of the general settings.
+   *
+   * Memmory layout of encoded settings:
+   * @verbinclude tytsettings.txt
+   */
+  class GeneralSettingsElement: CodePlug::Element
+  {
+  public:
+    enum TransmitMode {
+      LAST_CALL_CH = 0,
+      LAST_CALL_AND_HAND_CH = 1,
+      DESIGNED_CH = 2,
+      DESIGNED_AND_HAND_CH = 3,
+    };
+
+    enum MonitorType {
+      MONITOR_SILENT       = 0,
+      MONITOR_OPEN_SQUELCH = 1
+    };
+
+  protected:
+    /** Hidden constructor. */
+    GeneralSettingsElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit GeneralSettingsElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~GeneralSettingsElement();
+
+    void clear();
+
+    /** Returns the first intro line. */
+    virtual QString introLine1() const;
+    /** Sets the first intro line. */
+    virtual void introLine1(const QString line);
+    /** Returns the second intro line. */
+    virtual QString introLine2() const;
+    /** Sets the second intro line. */
+    virtual void introLine2(const QString line);
+
+    virtual TransmitMode transmitMode() const;
+    virtual void transmitMode(TransmitMode mode);
+
+    virtual MonitorType monitorType() const;
+    virtual void monitorType(MonitorType type);
+
+    virtual bool allLEDsDisabled() const;
+    virtual void disableAllLEDs(bool disable);
+
+    virtual bool savePreamble() const;
+    virtual void savePreamble(bool enable);
+    virtual bool saveModeRX() const;
+    virtual void saveModeRX(bool enable);
+    virtual bool disableAllTones() const;
+    virtual void disableAllTones(bool disable);
+    virtual bool chFreeIndicationTone() const;
+    virtual void chFreeIndicationTone(bool enable);
+    virtual bool passwdAndLock() const;
+    virtual void passwdAndLock(bool enable);
+    virtual bool talkPermitDigital() const;
+    virtual void talkPermitDigital(bool enable);
+    virtual bool talkPermitAnalog() const;
+    virtual void talkPermitAnalog(bool enable);
+
+    virtual bool channelVoiceAnnounce() const;
+    virtual void channelVoiceAnnounce(bool enable);
+    virtual bool introPicture() const;
+    virtual void introPicture(bool enable);
+    virtual bool keypadTones() const;
+    virtual void keypadTones(bool enable);
+
+    virtual bool channelModeA() const;
+    virtual void channelModeA(bool enable);
+    virtual bool channelModeB() const;
+    virtual void channelModeB(bool enable);
+
+    virtual uint32_t dmrID() const;
+    virtual void dmrID(uint32_t id);
+
+    virtual uint txPreambleDuration() const;
+    virtual void txPreambleDuration(uint ms);
+    virtual uint groupCallHangTime() const;
+    virtual void groupCallHangTime(uint ms);
+    virtual uint privateCallHangTime() const;
+    virtual void privateCallHangTime(uint ms);
+    virtual uint voxSesitivity() const;
+    virtual void voxSesitivity(uint ms);
+    virtual uint lowBatteryInterval() const;
+    virtual void lowBatteryInterval(uint sec);
+    virtual uint callAlertToneDuration() const;
+    virtual void callAlertToneDuration(uint sec);
+    virtual uint loneWorkerResponseTime() const;
+    virtual void loneWorkerResponseTime(uint min);
+    virtual uint loneWorkerReminderTime() const;
+    virtual void loneWorkerReminderTime(uint min);
+    virtual uint scanDigitalHangTime() const;
+    virtual void scanDigitalHangTime(uint ms);
+    virtual uint scanAnalogHangTime() const;
+    virtual void scanAnalogHangTime(uint ms);
+
+    virtual uint backlightTime() const;
+    virtual void backlightTime(uint sec);
+    virtual void backlightTimeSetAlways();
+
+    virtual uint keypadLockTime() const;
+    virtual void keypadLockTime(uint sec);
+    virtual void keypadLockTimeSetManual();
+
+    virtual bool channelMode() const;
+    virtual void channelMode(bool enable);
+
+    virtual uint32_t powerOnPassword() const;
+    virtual void powerOnPassword(uint32_t passwd);
+    virtual uint32_t radioProgPassword() const;
+    virtual void radioProgPassword(uint32_t passwd);
+    virtual void radioProgPasswordDisable();
+
+    virtual bool pcProgPasswordEnabled() const;
+    virtual QString pcProgPassword() const;
+    virtual void pcProgPassword(const QString &pass);
+    virtual void pcProgPasswordDisable();
+
+    virtual bool groupCallMatch() const;
+    virtual void groupCallMatch(bool enable);
+    virtual bool privateCallMatch() const;
+    virtual void privateCallMatch(bool enable);
+
+    virtual QTimeZone timeZone() const;
+    virtual void timeZone(const QTimeZone &zone);
+
+    virtual QString radioName() const;
+    virtual void radioName(const QString &name);
+
+    virtual uint channelHangTime() const;
+    virtual void channelHangTime(uint dur);
+    virtual bool publicZone() const;
+    virtual void publicZone(bool enable);
+
+    virtual uint32_t additionalDMRId(uint n) const;
+    virtual void additionalDMRId(uint n, uint32_t id);
+
+    virtual uint micLevel() const;
+    virtual void micLevel(uint val);
+
+    virtual bool editRadioID() const;
+    virtual void editRadioID(bool enable);
+
+    virtual bool fromConfig(const Config *config);
+    virtual bool updateConfig(Config *config);
+  };
 
 protected:
   /** Empty constructor. */

@@ -1170,6 +1170,537 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, const CodeplugConte
 
 
 /* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::GeneralSettingsElement
+ * ******************************************************************************************** */
+TyTCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, uint size)
+  : Element(ptr)
+{
+  // pass...
+}
+
+TyTCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
+  : Element(ptr)
+{
+  // pass...
+}
+
+TyTCodeplug::GeneralSettingsElement::~GeneralSettingsElement() {
+  // pass...
+}
+
+void
+TyTCodeplug::GeneralSettingsElement::clear() {
+  introLine1("");
+  introLine2("");
+  memset(_data+0x26, 0xff, 0x1a);
+
+  setBit(0x40,0, 0); setBit(0,1, 1);
+  disableAllLEDs(false);
+  setBit(0x40,3, 1);
+  monitorType(MONITOR_OPEN_SQUELCH);
+  setBit(0x40,5, 1);
+  transmitMode(DESIGNED_AND_HAND_CH);
+
+  savePreamble(true);
+  saveModeRX(true);
+  disableAllTones(false);
+  setBit(0x41,3, 1);
+  chFreeIndicationTone(true);
+  passwdAndLock(true);
+  talkPermitDigital(false);
+  talkPermitAnalog(false);
+
+  setBit(0x42,0, 0);
+  channelVoiceAnnounce(false);
+  setBit(0x42,2, 0); setBit(0x42,3, 1);
+  introPicture(true);
+  keypadTones(false);
+  setBit(0x42,6, 1); setBit(0x42,7, 1);
+
+  setBit(0x43,0, 1); setBit(0x43,1, 1);
+  channelModeA(true);
+  setUInt4(0x43,3, 0xf);
+  channelModeB(true);
+
+  dmrID(0); setUInt8(0x47,0);
+
+  txPreambleDuration(600);
+  groupCallHangTime(3000);
+  privateCallHangTime(4000);
+  voxSesitivity(3);
+  setUInt8(0x4c, 0x00); setUInt8(0x4d, 0x00);
+  lowBatteryInterval(120);
+  callAlertToneDuration(0);
+  loneWorkerResponseTime(1);
+  loneWorkerReminderTime(10);
+  setUInt8(0x52, 0x00);
+  scanDigitalHangTime(1000);
+  scanAnalogHangTime(1000);
+
+  backlightTime(10);
+  setUInt6(0x55, 2, 0);
+  keypadLockTimeSetManual();
+  channelMode(true);
+
+  powerOnPassword(0);
+  radioProgPasswordDisable();
+  pcProgPasswordDisable();
+  setUInt24_le(0x68, 0xffffff);
+
+  groupCallMatch(false);
+  privateCallMatch(false);
+  setBit(0x6b, 2, 1);
+  timeZone(QTimeZone::systemTimeZone());
+  setUInt32_le(0x6c, 0xffffffff);
+
+  radioName("");
+
+  channelHangTime(3000);
+  setUInt8(0x91, 0xff); setUInt2(0x92, 0, 0x03);
+  publicZone(true);
+  setUInt5(0x92, 3, 0x1f);
+  setUInt8(0x93, 0xff);
+  additionalDMRId(0, 1); setUInt8(0x97, 0);
+  additionalDMRId(1, 2); setUInt8(0x9b, 0);
+  additionalDMRId(2, 3); setUInt8(0x9f, 0);
+  setUInt3(0xa0, 0, 0b111);
+  micLevel(2);
+  editRadioID(true);
+  setBit(0xa0, 7, true);
+  memset(_data+0xa1, 0xff, 15);
+}
+
+QString
+TyTCodeplug::GeneralSettingsElement::introLine1() const {
+  return readUnicode(0, 10);
+}
+void
+TyTCodeplug::GeneralSettingsElement::introLine1(const QString line) {
+  writeUnicode(0, line, 10);
+}
+
+QString
+TyTCodeplug::GeneralSettingsElement::introLine2() const {
+  return readUnicode(0x14, 10);
+}
+void
+TyTCodeplug::GeneralSettingsElement::introLine2(const QString line) {
+  writeUnicode(0x14, line, 10);
+}
+
+TyTCodeplug::GeneralSettingsElement::TransmitMode
+TyTCodeplug::GeneralSettingsElement::transmitMode() const {
+  return TransmitMode(getUInt2(0x40,6));
+}
+void
+TyTCodeplug::GeneralSettingsElement::transmitMode(TransmitMode mode) {
+  setUInt2(0x40,6, mode);
+}
+
+TyTCodeplug::GeneralSettingsElement::MonitorType
+TyTCodeplug::GeneralSettingsElement::monitorType() const {
+  return getBit(0x40,4) ? MONITOR_OPEN_SQUELCH : MONITOR_SILENT;
+}
+void
+TyTCodeplug::GeneralSettingsElement::monitorType(MonitorType type) {
+  setBit(0x40,4, MONITOR_OPEN_SQUELCH==type);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::allLEDsDisabled() const {
+  return getBit(0x40,2);
+}
+void
+TyTCodeplug::GeneralSettingsElement::disableAllLEDs(bool disable) {
+  setBit(0x40,2, disable);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::savePreamble() const {
+  return getBit(0x41,0);
+}
+void
+TyTCodeplug::GeneralSettingsElement::savePreamble(bool enable) {
+  setBit(0x41,0, enable);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::saveModeRX() const {
+  return getBit(0x41,1);
+}
+void
+TyTCodeplug::GeneralSettingsElement::saveModeRX(bool enable) {
+  setBit(0x41,1, enable);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::disableAllTones() const {
+  return getBit(0x41,2);
+}
+void
+TyTCodeplug::GeneralSettingsElement::disableAllTones(bool disable) {
+  setBit(0x41,2, disable);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::chFreeIndicationTone() const {
+  return getBit(0x41,4);
+}
+void
+TyTCodeplug::GeneralSettingsElement::chFreeIndicationTone(bool enable) {
+  setBit(0x41,4, enable);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::passwdAndLock() const {
+  return getBit(0x41,5);
+}
+void
+TyTCodeplug::GeneralSettingsElement::passwdAndLock(bool enable) {
+  setBit(0x41,5, enable);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::talkPermitDigital() const {
+  return getBit(0x41,6);
+}
+void
+TyTCodeplug::GeneralSettingsElement::talkPermitDigital(bool enable) {
+  setBit(0x41,6, enable);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::talkPermitAnalog() const {
+  return getBit(0x41,7);
+}
+void
+TyTCodeplug::GeneralSettingsElement::talkPermitAnalog(bool enable) {
+  setBit(0x41,7, enable);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::channelVoiceAnnounce() const {
+  return getBit(0x42,1);
+}
+void
+TyTCodeplug::GeneralSettingsElement::channelVoiceAnnounce(bool enable) {
+  setBit(0x42,1, enable);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::introPicture() const {
+  return getBit(0x42,4);
+}
+void
+TyTCodeplug::GeneralSettingsElement::introPicture(bool enable) {
+  setBit(0x42,4, enable);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::keypadTones() const {
+  return getBit(0x42,5);
+}
+void
+TyTCodeplug::GeneralSettingsElement::keypadTones(bool enable) {
+  setBit(0x42,5, enable);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::channelModeA() const {
+  return getBit(0x43,3);
+}
+void
+TyTCodeplug::GeneralSettingsElement::channelModeA(bool enable) {
+  setBit(0x43,3, enable);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::channelModeB() const {
+  return getBit(0x43,7);
+}
+void
+TyTCodeplug::GeneralSettingsElement::channelModeB(bool enable) {
+  setBit(0x43,7, enable);
+}
+
+uint32_t
+TyTCodeplug::GeneralSettingsElement::dmrID() const {
+  return getUInt24_le(0x44);
+}
+void
+TyTCodeplug::GeneralSettingsElement::dmrID(uint32_t id) {
+  setUInt24_le(0x44, id);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::txPreambleDuration() const {
+  return uint(getUInt8(0x48))*60;
+}
+void
+TyTCodeplug::GeneralSettingsElement::txPreambleDuration(uint dur) {
+  setUInt8(0x48, dur/60);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::groupCallHangTime() const {
+  return uint(getUInt8(0x49))*100;
+}
+void
+TyTCodeplug::GeneralSettingsElement::groupCallHangTime(uint dur) {
+  setUInt8(0x49, dur/100);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::privateCallHangTime() const {
+  return uint(getUInt8(0x4a))*100;
+}
+void
+TyTCodeplug::GeneralSettingsElement::privateCallHangTime(uint dur) {
+  setUInt8(0x4a, dur/100);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::voxSesitivity() const {
+  return getUInt8(0x4b);
+}
+void
+TyTCodeplug::GeneralSettingsElement::voxSesitivity(uint level) {
+  setUInt8(0x4b, level);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::lowBatteryInterval() const {
+  return uint(getUInt8(0x4e))*5;
+}
+void
+TyTCodeplug::GeneralSettingsElement::lowBatteryInterval(uint dur) {
+  setUInt8(0x4e, dur/5);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::callAlertToneDuration() const {
+  return uint(getUInt8(0x4f))*5;
+}
+void
+TyTCodeplug::GeneralSettingsElement::callAlertToneDuration(uint dur) {
+  setUInt8(0x4f, dur/5);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::loneWorkerResponseTime() const {
+  return getUInt8(0x50);
+}
+void
+TyTCodeplug::GeneralSettingsElement::loneWorkerResponseTime(uint dur) {
+  setUInt8(0x50, dur);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::loneWorkerReminderTime() const {
+  return getUInt8(0x51);
+}
+void
+TyTCodeplug::GeneralSettingsElement::loneWorkerReminderTime(uint dur) {
+  setUInt8(0x51, dur);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::scanDigitalHangTime() const {
+  return uint(getUInt8(0x53))*100;
+}
+void
+TyTCodeplug::GeneralSettingsElement::scanDigitalHangTime(uint dur) {
+  setUInt8(0x53, dur/100);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::scanAnalogHangTime() const {
+  return uint(getUInt8(0x54))*100;
+}
+void
+TyTCodeplug::GeneralSettingsElement::scanAnalogHangTime(uint dur) {
+  setUInt8(0x54, dur/100);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::backlightTime() const {
+  return getUInt2(0x55, 0)*5;
+}
+void
+TyTCodeplug::GeneralSettingsElement::backlightTime(uint sec) {
+  setUInt2(0x55, 0, sec/5);
+}
+void
+TyTCodeplug::GeneralSettingsElement::backlightTimeSetAlways() {
+  setUInt2(0x55, 0, 0);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::keypadLockTime() const {
+  return uint(getUInt8(0x56))*5;
+}
+void
+TyTCodeplug::GeneralSettingsElement::keypadLockTime(uint sec) {
+  setUInt8(0x56, sec/5);
+}
+void
+TyTCodeplug::GeneralSettingsElement::keypadLockTimeSetManual() {
+  setUInt8(0x56, 0xff);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::channelMode() const {
+  return 0xff == getUInt8(0x57);
+}
+void
+TyTCodeplug::GeneralSettingsElement::channelMode(bool enable) {
+  setUInt8(0x57, enable ? 0xff : 0x00);
+}
+
+uint32_t
+TyTCodeplug::GeneralSettingsElement::powerOnPassword() const {
+  return getBCD8_le(0x58);
+}
+void
+TyTCodeplug::GeneralSettingsElement::powerOnPassword(uint32_t pass) {
+  setBCD8_le(0x58, pass);
+}
+uint32_t
+TyTCodeplug::GeneralSettingsElement::radioProgPassword() const {
+  return getBCD8_le(0x5c);
+}
+void
+TyTCodeplug::GeneralSettingsElement::radioProgPassword(uint32_t passwd) {
+  setBCD8_le(0x5c, passwd);
+}
+void
+TyTCodeplug::GeneralSettingsElement::radioProgPasswordDisable() {
+  setUInt32_le(0x5c, 0xffffffff);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::pcProgPasswordEnabled() const {
+  return (0xff != getUInt8(0x60));
+}
+QString
+TyTCodeplug::GeneralSettingsElement::pcProgPassword() const {
+  return readASCII(0x60, 8);
+}
+void
+TyTCodeplug::GeneralSettingsElement::pcProgPassword(const QString &pass) {
+  writeASCII(0x60, pass, 8);
+}
+void
+TyTCodeplug::GeneralSettingsElement::pcProgPasswordDisable() {
+  memset(_data+0x60, 0xff, 8);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::groupCallMatch() const {
+  return getBit(0x6b, 0);
+}
+void
+TyTCodeplug::GeneralSettingsElement::groupCallMatch(bool enable) {
+  setBit(0x6b, 0, enable);
+}
+bool
+TyTCodeplug::GeneralSettingsElement::privateCallMatch() const {
+  return getBit(0x6b, 1);
+}
+void
+TyTCodeplug::GeneralSettingsElement::privateCallMatch(bool enable) {
+  setBit(0x6b, 1, enable);
+}
+
+QTimeZone
+TyTCodeplug::GeneralSettingsElement::timeZone() const {
+  return QTimeZone((int(getUInt5(0x6b, 3))-12)*3600);
+}
+void
+TyTCodeplug::GeneralSettingsElement::timeZone(const QTimeZone &zone) {
+  int idx = (zone.standardTimeOffset(QDateTime::currentDateTime())/3600)+12;
+  setUInt5(0x6b, 3, uint8_t(idx));
+}
+
+QString
+TyTCodeplug::GeneralSettingsElement::radioName() const {
+  return readUnicode(0x70, 16);
+}
+void
+TyTCodeplug::GeneralSettingsElement::radioName(const QString &name) {
+  writeUnicode(0x70, name, 16);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::channelHangTime() const {
+  return uint(getUInt8(0x90))*100;
+}
+void
+TyTCodeplug::GeneralSettingsElement::channelHangTime(uint dur) {
+  setUInt8(0x90, dur/100);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::publicZone() const {
+  return getBit(0x92, 2);
+}
+void
+TyTCodeplug::GeneralSettingsElement::publicZone(bool enable) {
+  setBit(0x92, 2, enable);
+}
+
+uint32_t
+TyTCodeplug::GeneralSettingsElement::additionalDMRId(uint n) const {
+  return getUInt24_le(0x94+4*n);
+}
+void
+TyTCodeplug::GeneralSettingsElement::additionalDMRId(uint n, uint32_t id) {
+  setUInt24_le(0x94+4*n, id);
+}
+
+uint
+TyTCodeplug::GeneralSettingsElement::micLevel() const {
+  return (uint(getUInt3(0xa0,3)+1)*100)/60;
+}
+void
+TyTCodeplug::GeneralSettingsElement::micLevel(uint level) {
+  setUInt3(0xa0,3, ((level-1)*60)/100);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::editRadioID() const {
+  return !getBit(0xa0, 6);
+}
+void
+TyTCodeplug::GeneralSettingsElement::editRadioID(bool enable) {
+  setBit(0xa0,6, !enable);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
+  radioName(config->name());
+  dmrID(config->radioIDs()->getDefaultId()->id());
+  introLine1(config->introLine1());
+  introLine2(config->introLine2());
+  timeZone(QTimeZone::systemTimeZone());
+  micLevel(config->micLevel());
+  channelVoiceAnnounce(config->speech());
+  return true;
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
+  config->radioIDs()->getDefaultId()->setId(dmrID());
+  config->setName(radioName());
+  config->setIntroLine1(introLine1());
+  config->setIntroLine2(introLine2());
+  config->setMicLevel(micLevel());
+  config->setSpeech(channelVoiceAnnounce());
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of TyTCodeplug
  * ******************************************************************************************** */
 TyTCodeplug::TyTCodeplug(QObject *parent)
@@ -1203,7 +1734,7 @@ TyTCodeplug::clear()
   this->clearGroupLists();
   // Clear zones & zone extensions
   this->clearZones();
-  // Clear scan lists
+  // Clear scan lists;
   this->clearScanLists();
   // Clear VFO A & B settings.
   this->clearVFOSettings();

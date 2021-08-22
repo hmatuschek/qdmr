@@ -478,7 +478,8 @@ public:
       _unused65_3            : 1,         ///< Reserved = 1
       ch_free_indication_tone: 1,         ///< Ch. free indication tone: 0 = Enabled, 1 = Disabled, default=1
       pw_and_lock_enable     : 1,         ///< Password and lock enable: 0 = Enabled, 1 = Disabled, default=1
-      talk_permit_tone       : 2;         ///< Talk permit tone: 0=None, 1=Digital, 2=Analog, 3=Analog+Digital, default=1
+      talk_permit_tone_digital: 1,        ///< Talk permit tone digital.
+      talk_permit_tone_analog: 1;         ///< Talk permit tone analog.
 
 
     uint8_t  _unused66_0     : 1,         ///< Reserved = 0

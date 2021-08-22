@@ -24,6 +24,8 @@
 #define ADDR_SCANLISTS   0x018860
 #define SCANLIST_SIZE    0x000068
 
+#define ADDR_SETTINGS    0x002040
+
 
 
 MD2017Codeplug::MD2017Codeplug(QObject *parent)
@@ -41,6 +43,20 @@ MD2017Codeplug::~MD2017Codeplug() {
   // pass...
 }
 
+void
+MD2017Codeplug::clearGeneralSettings() {
+  GeneralSettingsElement(data(ADDR_SETTINGS)).clear();
+}
+
+bool
+MD2017Codeplug::encodeGeneralSettings(Config *config, const Flags &flags) {
+  return GeneralSettingsElement(data(ADDR_SETTINGS)).fromConfig(config);
+}
+
+bool
+MD2017Codeplug::decodeGeneralSettings(Config *config) {
+  return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(config);
+}
 
 void
 MD2017Codeplug::clearChannels() {
