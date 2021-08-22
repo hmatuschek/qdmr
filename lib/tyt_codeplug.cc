@@ -1890,6 +1890,124 @@ TyTCodeplug::TimestampElement::cpsVersion() const {
 
 
 /* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::GPSSystemElement
+ * ******************************************************************************************** */
+TyTCodeplug::GPSSystemElement::GPSSystemElement(uint8_t *ptr, size_t size)
+  : CodePlug::Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::GPSSystemElement::GPSSystemElement(uint8_t *ptr)
+  : CodePlug::Element(ptr, 0x10)
+{
+  // pass...
+}
+
+TyTCodeplug::GPSSystemElement::~GPSSystemElement() {
+  // pass...
+}
+
+bool
+TyTCodeplug::GPSSystemElement::isValid() const {
+  return Element::isValid() && (! repeatIntervalDisabled()) &&
+      (0xffff != revertChannelIndex());
+}
+
+void
+TyTCodeplug::GPSSystemElement::clear() {
+  revertChannelIndex(0xffff);
+  disableRepeatInterval();
+  setUInt8(0x03, 0xff);
+  disableDestinationContact();
+  memset(_data + 0x06, 0xff, 10);
+}
+
+bool
+TyTCodeplug::GPSSystemElement::revertChannelIsSelected() const {
+  return 0 == getUInt16_le(0x00);
+}
+uint16_t
+TyTCodeplug::GPSSystemElement::revertChannelIndex() const {
+  return getUInt16_le(0x00);
+}
+void
+TyTCodeplug::GPSSystemElement::revertChannelIndex(uint16_t idx) {
+  setUInt16_le(0x00, idx);
+}
+void
+TyTCodeplug::GPSSystemElement::setRevertChannelSelected() {
+  setUInt16_le(0x00, 0);
+}
+
+bool
+TyTCodeplug::GPSSystemElement::repeatIntervalDisabled() const {
+  return 0 == getUInt8(0x02);
+}
+uint
+TyTCodeplug::GPSSystemElement::repeatInterval() const {
+  return uint(getUInt8(0x02))*30;
+}
+void
+TyTCodeplug::GPSSystemElement::repeatInterval(uint dur) {
+  setUInt8(0x02, dur/30);
+}
+void
+TyTCodeplug::GPSSystemElement::disableRepeatInterval() {
+  setUInt8(0x02, 0);
+}
+
+bool
+TyTCodeplug::GPSSystemElement::destinationContactDisabled() const {
+  return 0 == getUInt16_le(0x04);
+}
+uint16_t
+TyTCodeplug::GPSSystemElement::destinationContactIndex() const {
+  return getUInt16_le(0x04);
+}
+void
+TyTCodeplug::GPSSystemElement::destinationContactIndex(uint16_t idx) {
+  setUInt16_le(0x04, idx);
+}
+void
+TyTCodeplug::GPSSystemElement::disableDestinationContact() {
+  setUInt16_le(0x04, 0);
+}
+
+bool
+TyTCodeplug::GPSSystemElement::fromGPSSystemObj(const GPSSystem *sys, const CodeplugContext &ctx) {
+  clear();
+  if (sys->hasContact())
+    destinationContactIndex(ctx.config()->posSystems()->indexOfGPSSys(sys)+1);
+  if (sys->hasRevertChannel())
+    revertChannelIndex(ctx.config()->channelList()->indexOf(sys->revertChannel())+1);
+  repeatInterval(sys->period());
+  return true;
+}
+
+GPSSystem *
+TyTCodeplug::GPSSystemElement::toGPSSystemObj() {
+  return new GPSSystem("GPS System", nullptr, nullptr, repeatInterval());
+}
+
+bool
+TyTCodeplug::GPSSystemElement::linkGPSSystemObj(GPSSystem *sys, const CodeplugContext &ctx) {
+  if (! isValid())
+    return false;
+
+  if ((! destinationContactDisabled()) && (ctx.hasDigitalContact(destinationContactIndex())))
+    sys->setContact(ctx.getDigitalContact(destinationContactIndex()));
+
+  if (revertChannelIsSelected())
+    sys->setRevertChannel(nullptr);
+  else if (ctx.hasChannel(revertChannelIndex()) && ctx.getChannel(revertChannelIndex())->is<DigitalChannel>())
+    sys->setRevertChannel(ctx.getChannel(revertChannelIndex())->as<DigitalChannel>());
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of TyTCodeplug
  * ******************************************************************************************** */
 TyTCodeplug::TyTCodeplug(QObject *parent)
@@ -1940,7 +2058,7 @@ TyTCodeplug::clear()
 bool
 TyTCodeplug::encode(Config *config, const Flags &flags) {
   // Set timestamp
-  if (! this->encodeTimestamp(config, flags)) {
+  if (! this->encodeTimestamp()) {
     _errorMessage = tr("Cannot encode time-stamp: %1").arg(_errorMessage);
     return false;
   }
@@ -2079,12 +2197,7 @@ TyTCodeplug::clearTimestamp() {
 }
 
 bool
-TyTCodeplug::encodeTimestamp(Config *config, const Flags &flags) {
-  return true;
-}
-
-bool
-TyTCodeplug::decodeTimestamp(Config *config) {
+TyTCodeplug::encodeTimestamp() {
   return true;
 }
 

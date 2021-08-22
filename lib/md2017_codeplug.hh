@@ -17,6 +17,9 @@ public:
   virtual ~MD2017Codeplug();
 
 public:
+  void clearTimestamp();
+  bool encodeTimestamp();
+
   void clearGeneralSettings();
   bool encodeGeneralSettings(Config *config, const Flags &flags);
   bool decodeGeneralSettings(Config *config);
@@ -44,6 +47,11 @@ public:
   bool encodeScanLists(Config *config, const Flags &flags);
   bool createScanLists(CodeplugContext &ctx);
   bool linkScanLists(CodeplugContext &ctx);
+
+  void clearPositioningSystems();
+  bool encodePositioningSystems(Config *config, const Flags &flags);
+  bool createPositioningSystems(CodeplugContext &ctx);
+  bool linkPositioningSystems(CodeplugContext &ctx);
 
   void clearBootSettings();
 };

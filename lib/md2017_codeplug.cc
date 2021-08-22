@@ -24,8 +24,13 @@
 #define ADDR_SCANLISTS     0x018860
 #define SCANLIST_SIZE      0x000068
 
+#define ADDR_TIMESTAMP     0x002000
 #define ADDR_SETTINGS      0x002040
 #define ADDR_BOOTSETTINGS  0x02f000
+
+#define NUM_GPSSYSTEMS           16
+#define ADDR_GPSSYSTEMS    0x03ec40
+#define GPSSYSTEM_SIZE     0x000010
 
 
 
@@ -42,6 +47,18 @@ MD2017Codeplug::MD2017Codeplug(QObject *parent)
 
 MD2017Codeplug::~MD2017Codeplug() {
   // pass...
+}
+
+void
+MD2017Codeplug::clearTimestamp() {
+  TimestampElement(data(ADDR_TIMESTAMP)).clear();
+}
+
+bool
+MD2017Codeplug::encodeTimestamp() {
+  TimestampElement ts(data(ADDR_TIMESTAMP));
+  ts.timestamp(QDateTime::currentDateTime());
+  return true;
 }
 
 void
@@ -322,6 +339,58 @@ MD2017Codeplug::linkScanLists(CodeplugContext &ctx) {
   return true;
 }
 
+void
+MD2017Codeplug::clearPositioningSystems() {
+  // Clear GPS systems
+  for (int i=0; i<NUM_GPSSYSTEMS; i++)
+    GPSSystemElement(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE)).clear();
+}
+
+bool
+MD2017Codeplug::encodePositioningSystems(Config *config, const Flags &flags) {
+  for (int i=0; i<NUM_GPSSYSTEMS; i++) {
+    GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
+    if (i < config->posSystems()->gpsCount())
+      gps.fromGPSSystemObj(config->posSystems()->gpsSystem(i), config);
+    else
+      gps.clear();
+  }
+  return true;
+}
+
+bool
+MD2017Codeplug::createPositioningSystems(CodeplugContext &ctx) {
+  for (int i=0; i<NUM_GPSSYSTEMS; i++) {
+    GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
+    if (! gps.isValid())
+      break;
+    if (GPSSystem *obj = gps.toGPSSystemObj()) {
+      ctx.addGPSSystem(obj, i+1);
+    } else {
+      _errorMessage = QString("Cannot decode codeplug: Invlaid GPS system at index %1.").arg(i);
+      logError() << _errorMessage;
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool
+MD2017Codeplug::linkPositioningSystems(CodeplugContext &ctx) {
+  for (int i=0; i<NUM_GPSSYSTEMS; i++) {
+    GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
+    if (! gps.isValid())
+      break;
+    if (! gps.linkGPSSystemObj(ctx.config()->posSystems()->gpsSystem(i), ctx)) {
+      _errorMessage = QString("Cannot decode codeplug: Cannot link GPS system at index %1.").arg(i);
+      logError() << _errorMessage;
+      return false;
+    }
+  }
+
+  return true;
+}
 
 void
 MD2017Codeplug::clearBootSettings() {

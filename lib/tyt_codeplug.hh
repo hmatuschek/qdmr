@@ -29,8 +29,7 @@ public:
   /** Represents a single channel (analog or digital) within the TyT codeplug.
    *
    * Memmory layout of encoded channel:
-   * @verbinclude tytchannel.txt
-   */
+   * @verbinclude tytchannel.txt */
   class ChannelElement: public CodePlug::Element
   {
   public:
@@ -386,8 +385,7 @@ public:
    * The latter adds additional channels for VFO A and the channels for VFO B.
    *
    * Memmory layout of encoded zone:
-   * @verbinclude tytzone.txt
-   */
+   * @verbinclude tytzone.txt */
   class ZoneElement: public CodePlug::Element
   {
   protected:
@@ -426,8 +424,7 @@ public:
    * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each.
    *
    * Memmory layout of encoded zone extension:
-   * @verbinclude tytzoneext.txt
-   */
+   * @verbinclude tytzoneext.txt */
   class ZoneExtElement: public CodePlug::Element
   {
   protected:
@@ -461,8 +458,7 @@ public:
   /** Representation of an RX group list within the codeplug.
    *
    * Memmory layout of encoded RX group list:
-   * @verbinclude tytgrouplist.txt
-   */
+   * @verbinclude tytgrouplist.txt */
   class GroupListElement: public CodePlug::Element
   {
   protected:
@@ -499,8 +495,7 @@ public:
   /** Represents a scan list within the codeplug.
    *
    * Memmory layout of encoded scan list:
-   * @verbinclude tytscanlist.txt
-   */
+   * @verbinclude tytscanlist.txt */
   class ScanListElement: public CodePlug::Element
   {
   protected:
@@ -562,8 +557,7 @@ public:
   /** Codeplug representation of the general settings.
    *
    * Memmory layout of encoded settings:
-   * @verbinclude tytsettings.txt
-   */
+   * @verbinclude tytsettings.txt */
   class GeneralSettingsElement: CodePlug::Element
   {
   public:
@@ -745,8 +739,7 @@ public:
   /** Codeplug representation of programming time-stamp and CPS version.
    *
    * Memmory layout of encoded timestamp:
-   * @verbinclude tyttimestamp.txt
-   */
+   * @verbinclude tyttimestamp.txt */
   class TimestampElement: public CodePlug::Element
   {
   protected:
@@ -764,6 +757,40 @@ public:
     virtual QString cpsVersion() const;
   };
 
+  /** Represents a single GPS system within the codeplug.
+   *
+   * Memmory layout of encoded GPS system:
+   * @verbinclude tytgpssystem.txt */
+  class GPSSystemElement: public CodePlug::Element {
+  protected:
+    GPSSystemElement(uint8_t *ptr, size_t size);
+
+  public:
+    explicit GPSSystemElement(uint8_t *ptr);
+    virtual ~GPSSystemElement();
+
+    bool isValid() const;
+    void clear();
+
+    virtual bool revertChannelIsSelected() const;
+    virtual uint16_t revertChannelIndex() const;
+    virtual void revertChannelIndex(uint16_t idx);
+    virtual void setRevertChannelSelected();
+
+    virtual bool repeatIntervalDisabled() const;
+    virtual uint repeatInterval() const;
+    virtual void repeatInterval(uint sec);
+    virtual void disableRepeatInterval();
+
+    virtual bool destinationContactDisabled() const;
+    virtual uint16_t destinationContactIndex() const;
+    virtual void destinationContactIndex(uint16_t idx);
+    virtual void disableDestinationContact();
+
+    virtual bool fromGPSSystemObj(const GPSSystem *sys, const CodeplugContext &ctx);
+    virtual GPSSystem *toGPSSystemObj();
+    virtual bool linkGPSSystemObj(GPSSystem *sys, const CodeplugContext &ctx);
+  };
 
 protected:
   /** Empty constructor. */
@@ -785,9 +812,7 @@ public:
   /** Clears the time-stamp in the codeplug. */
   virtual void clearTimestamp();
   /** Sets the time-stamp. */
-  virtual bool encodeTimestamp(Config *config, const Flags &flags);
-  /** Decodes the time-stamp. This function does actually nothing as the time-stamp is of no use. */
-  virtual bool decodeTimestamp(Config *config);
+  virtual bool encodeTimestamp();
 
   /** Clears the general settings in the codeplug. */
   virtual void clearGeneralSettings();
