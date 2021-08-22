@@ -1249,8 +1249,8 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   setBit(0x41,3, 1);
   chFreeIndicationTone(true);
   passwdAndLock(true);
-  talkPermitDigital(false);
-  talkPermitAnalog(false);
+  talkPermitToneDigital(false);
+  talkPermitToneAnalog(false);
 
   setBit(0x42,0, 0);
   channelVoiceAnnounce(false);
@@ -1350,11 +1350,11 @@ TyTCodeplug::GeneralSettingsElement::monitorType(MonitorType type) {
 
 bool
 TyTCodeplug::GeneralSettingsElement::allLEDsDisabled() const {
-  return getBit(0x40,2);
+  return ! getBit(0x40,2);
 }
 void
 TyTCodeplug::GeneralSettingsElement::disableAllLEDs(bool disable) {
-  setBit(0x40,2, disable);
+  setBit(0x40,2, !disable);
 }
 
 bool
@@ -1376,47 +1376,47 @@ TyTCodeplug::GeneralSettingsElement::saveModeRX(bool enable) {
 }
 
 bool
-TyTCodeplug::GeneralSettingsElement::disableAllTones() const {
-  return getBit(0x41,2);
+TyTCodeplug::GeneralSettingsElement::allTonesDisabled() const {
+  return ! getBit(0x41,2);
 }
 void
 TyTCodeplug::GeneralSettingsElement::disableAllTones(bool disable) {
-  setBit(0x41,2, disable);
+  setBit(0x41,2, !disable);
 }
 
 bool
 TyTCodeplug::GeneralSettingsElement::chFreeIndicationTone() const {
-  return getBit(0x41,4);
+  return !getBit(0x41,4);
 }
 void
 TyTCodeplug::GeneralSettingsElement::chFreeIndicationTone(bool enable) {
-  setBit(0x41,4, enable);
+  setBit(0x41,4, !enable);
 }
 
 bool
 TyTCodeplug::GeneralSettingsElement::passwdAndLock() const {
-  return getBit(0x41,5);
+  return ! getBit(0x41,5);
 }
 void
 TyTCodeplug::GeneralSettingsElement::passwdAndLock(bool enable) {
-  setBit(0x41,5, enable);
+  setBit(0x41,5, !enable);
 }
 
 bool
-TyTCodeplug::GeneralSettingsElement::talkPermitDigital() const {
+TyTCodeplug::GeneralSettingsElement::talkPermitToneDigital() const {
   return getBit(0x41,6);
 }
 void
-TyTCodeplug::GeneralSettingsElement::talkPermitDigital(bool enable) {
+TyTCodeplug::GeneralSettingsElement::talkPermitToneDigital(bool enable) {
   setBit(0x41,6, enable);
 }
 
 bool
-TyTCodeplug::GeneralSettingsElement::talkPermitAnalog() const {
+TyTCodeplug::GeneralSettingsElement::talkPermitToneAnalog() const {
   return getBit(0x41,7);
 }
 void
-TyTCodeplug::GeneralSettingsElement::talkPermitAnalog(bool enable) {
+TyTCodeplug::GeneralSettingsElement::talkPermitToneAnalog(bool enable) {
   setBit(0x41,7, enable);
 }
 
@@ -1480,6 +1480,7 @@ TyTCodeplug::GeneralSettingsElement::txPreambleDuration() const {
 }
 void
 TyTCodeplug::GeneralSettingsElement::txPreambleDuration(uint dur) {
+  dur = std::min(8640U, dur);
   setUInt8(0x48, dur/60);
 }
 
@@ -1489,6 +1490,7 @@ TyTCodeplug::GeneralSettingsElement::groupCallHangTime() const {
 }
 void
 TyTCodeplug::GeneralSettingsElement::groupCallHangTime(uint dur) {
+  dur = std::min(7000U, dur);
   setUInt8(0x49, dur/100);
 }
 
@@ -1498,6 +1500,7 @@ TyTCodeplug::GeneralSettingsElement::privateCallHangTime() const {
 }
 void
 TyTCodeplug::GeneralSettingsElement::privateCallHangTime(uint dur) {
+  dur = std::min(7000U, dur);
   setUInt8(0x4a, dur/100);
 }
 
@@ -1507,6 +1510,7 @@ TyTCodeplug::GeneralSettingsElement::voxSesitivity() const {
 }
 void
 TyTCodeplug::GeneralSettingsElement::voxSesitivity(uint level) {
+  level = std::min(10U, std::max(1U, level));
   setUInt8(0x4b, level);
 }
 
@@ -1516,16 +1520,26 @@ TyTCodeplug::GeneralSettingsElement::lowBatteryInterval() const {
 }
 void
 TyTCodeplug::GeneralSettingsElement::lowBatteryInterval(uint dur) {
+  dur = std::min(635U, dur);
   setUInt8(0x4e, dur/5);
 }
 
+bool
+TyTCodeplug::GeneralSettingsElement::callAlertToneIsContinuous() const {
+  return 0==getUInt8(0x4f);
+}
 uint
 TyTCodeplug::GeneralSettingsElement::callAlertToneDuration() const {
   return uint(getUInt8(0x4f))*5;
 }
 void
 TyTCodeplug::GeneralSettingsElement::callAlertToneDuration(uint dur) {
+  dur = std::min(1200U, dur);
   setUInt8(0x4f, dur/5);
+}
+void
+TyTCodeplug::GeneralSettingsElement::setCallAlertToneContinuous() {
+  setUInt8(0x4f, 0);
 }
 
 uint
@@ -1552,6 +1566,7 @@ TyTCodeplug::GeneralSettingsElement::scanDigitalHangTime() const {
 }
 void
 TyTCodeplug::GeneralSettingsElement::scanDigitalHangTime(uint dur) {
+  dur = std::min(10000U, dur);
   setUInt8(0x53, dur/100);
 }
 
@@ -1561,15 +1576,21 @@ TyTCodeplug::GeneralSettingsElement::scanAnalogHangTime() const {
 }
 void
 TyTCodeplug::GeneralSettingsElement::scanAnalogHangTime(uint dur) {
+  dur = std::min(10000U, dur);
   setUInt8(0x54, dur/100);
 }
 
+bool
+TyTCodeplug::GeneralSettingsElement::backlightIsAlways() const {
+  return 0 == getUInt2(0x55, 0);
+}
 uint
 TyTCodeplug::GeneralSettingsElement::backlightTime() const {
   return getUInt2(0x55, 0)*5;
 }
 void
 TyTCodeplug::GeneralSettingsElement::backlightTime(uint sec) {
+  sec = std::min(15U, sec);
   setUInt2(0x55, 0, sec/5);
 }
 void
@@ -1577,12 +1598,17 @@ TyTCodeplug::GeneralSettingsElement::backlightTimeSetAlways() {
   setUInt2(0x55, 0, 0);
 }
 
+bool
+TyTCodeplug::GeneralSettingsElement::keypadLockIsManual() const {
+  return 0xff == getUInt8(0x56);
+}
 uint
 TyTCodeplug::GeneralSettingsElement::keypadLockTime() const {
   return uint(getUInt8(0x56))*5;
 }
 void
 TyTCodeplug::GeneralSettingsElement::keypadLockTime(uint sec) {
+  sec = std::max(1U, std::min(15U, sec));
   setUInt8(0x56, sec/5);
 }
 void
@@ -1606,6 +1632,11 @@ TyTCodeplug::GeneralSettingsElement::powerOnPassword() const {
 void
 TyTCodeplug::GeneralSettingsElement::powerOnPassword(uint32_t pass) {
   setBCD8_le(0x58, pass);
+}
+
+bool
+TyTCodeplug::GeneralSettingsElement::radioProgPasswordEnabled() const {
+  return 0xffffffff != getUInt32_le(0x5c);
 }
 uint32_t
 TyTCodeplug::GeneralSettingsElement::radioProgPassword() const {
@@ -1799,6 +1830,62 @@ TyTCodeplug::BootSettingsElement::channelIndexB() const {
 void
 TyTCodeplug::BootSettingsElement::channelIndexB(uint idx) {
   setUInt8(0x06, idx);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::TimestampElement
+ * ******************************************************************************************** */
+TyTCodeplug::TimestampElement::TimestampElement(uint8_t *ptr, size_t size)
+  : CodePlug::Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::TimestampElement::TimestampElement(uint8_t *ptr)
+  : CodePlug::Element(ptr, 0x0c)
+{
+  // pass...
+}
+
+TyTCodeplug::TimestampElement::~TimestampElement() {
+  // pass...
+}
+
+void
+TyTCodeplug::TimestampElement::clear() {
+  setUInt8(0x00, 0);
+  timestamp(QDateTime::currentDateTime());
+  setUInt32_be(0x08, 0x00010300);
+}
+
+QDateTime
+TyTCodeplug::TimestampElement::timestamp() const {
+  return QDateTime(QDate(getBCD4_le(0x01), getBCD2(0x03), getBCD2(0x04)),
+                   QTime(getBCD2(0x05), getBCD2(0x06), getBCD2(0x07)));
+}
+void
+TyTCodeplug::TimestampElement::timestamp(const QDateTime &ts) {
+  setBCD4_le(0x01, ts.date().year());
+  setBCD2(0x03, ts.date().month());
+  setBCD2(0x04, ts.date().day());
+  setBCD2(0x05, ts.time().hour());
+  setBCD2(0x06, ts.time().minute());
+  setBCD2(0x07, ts.time().second());
+}
+
+QString
+TyTCodeplug::TimestampElement::cpsVersion() const {
+  const char table[] = "0123456789:;<=>?";
+
+  QString v;
+  v.append(table[std::min(uint8_t(15), getUInt8(0x08))]);
+  v.append(table[std::min(uint8_t(15), getUInt8(0x09))]);
+  v.append(".");
+  v.append(table[std::min(uint8_t(15), getUInt8(0x0a))]);
+  v.append(table[std::min(uint8_t(15), getUInt8(0x0b))]);
+
+  return v;
 }
 
 

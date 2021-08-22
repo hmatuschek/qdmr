@@ -613,16 +613,16 @@ public:
     virtual void savePreamble(bool enable);
     virtual bool saveModeRX() const;
     virtual void saveModeRX(bool enable);
-    virtual bool disableAllTones() const;
+    virtual bool allTonesDisabled() const;
     virtual void disableAllTones(bool disable);
     virtual bool chFreeIndicationTone() const;
     virtual void chFreeIndicationTone(bool enable);
     virtual bool passwdAndLock() const;
     virtual void passwdAndLock(bool enable);
-    virtual bool talkPermitDigital() const;
-    virtual void talkPermitDigital(bool enable);
-    virtual bool talkPermitAnalog() const;
-    virtual void talkPermitAnalog(bool enable);
+    virtual bool talkPermitToneDigital() const;
+    virtual void talkPermitToneDigital(bool enable);
+    virtual bool talkPermitToneAnalog() const;
+    virtual void talkPermitToneAnalog(bool enable);
 
     virtual bool channelVoiceAnnounce() const;
     virtual void channelVoiceAnnounce(bool enable);
@@ -649,8 +649,12 @@ public:
     virtual void voxSesitivity(uint ms);
     virtual uint lowBatteryInterval() const;
     virtual void lowBatteryInterval(uint sec);
+
+    virtual bool callAlertToneIsContinuous() const;
     virtual uint callAlertToneDuration() const;
     virtual void callAlertToneDuration(uint sec);
+    virtual void setCallAlertToneContinuous();
+
     virtual uint loneWorkerResponseTime() const;
     virtual void loneWorkerResponseTime(uint min);
     virtual uint loneWorkerReminderTime() const;
@@ -660,10 +664,12 @@ public:
     virtual uint scanAnalogHangTime() const;
     virtual void scanAnalogHangTime(uint ms);
 
+    virtual bool backlightIsAlways() const;
     virtual uint backlightTime() const;
     virtual void backlightTime(uint sec);
     virtual void backlightTimeSetAlways();
 
+    virtual bool keypadLockIsManual() const;
     virtual uint keypadLockTime() const;
     virtual void keypadLockTime(uint sec);
     virtual void keypadLockTimeSetManual();
@@ -673,6 +679,8 @@ public:
 
     virtual uint32_t powerOnPassword() const;
     virtual void powerOnPassword(uint32_t passwd);
+
+    virtual bool radioProgPasswordEnabled() const;
     virtual uint32_t radioProgPassword() const;
     virtual void radioProgPassword(uint32_t passwd);
     virtual void radioProgPasswordDisable();
@@ -733,6 +741,29 @@ public:
     virtual uint channelIndexB() const;
     virtual void channelIndexB(uint idx);
   };
+
+  /** Codeplug representation of programming time-stamp and CPS version.
+   *
+   * Memmory layout of encoded timestamp:
+   * @verbinclude tyttimestamp.txt
+   */
+  class TimestampElement: public CodePlug::Element
+  {
+  protected:
+    TimestampElement(uint8_t *ptr, size_t size);
+
+  public:
+    explicit TimestampElement(uint8_t *ptr);
+    virtual ~TimestampElement();
+
+    void clear();
+
+    virtual QDateTime timestamp() const;
+    virtual void timestamp(const QDateTime &ts);
+
+    virtual QString cpsVersion() const;
+  };
+
 
 protected:
   /** Empty constructor. */

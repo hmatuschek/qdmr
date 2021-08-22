@@ -189,6 +189,45 @@ CodePlug::Element::setUInt32_le(uint offset, uint32_t value) {
   (*ptr) = qToLittleEndian(value);
 }
 
+uint8_t
+CodePlug::Element::getBCD2(uint offset) const {
+  uint8_t val = getUInt8(offset);
+  return (val & 0xf) + ((val>>4) & 0xf)*10;
+}
+void
+CodePlug::Element::setBCD2(uint offset, uint8_t val) {
+  uint8_t a  = (val / 10) % 10;
+  uint8_t b  = (val /  1) % 10;
+  setUInt8(offset, (a << 4) + b);
+}
+
+uint16_t
+CodePlug::Element::getBCD4_be(uint offset) const {
+  uint32_t val = getUInt16_be(offset);
+  return (val & 0xf) + ((val>>4) & 0xf)*10 + ((val>>8) & 0xf)*100 + ((val>>12) & 0xf)*1000;
+}
+void
+CodePlug::Element::setBCD4_be(uint offset, uint16_t val) {
+  uint32_t a  = (val / 1000) % 10;
+  uint32_t b  = (val /  100) % 10;
+  uint32_t c  = (val /   10) % 10;
+  uint32_t d  = (val /    1) % 10;
+  setUInt16_be(offset, (a << 12) + (b << 8) + (c << 4) + d);
+}
+uint16_t
+CodePlug::Element::getBCD4_le(uint offset) const {
+  uint32_t val = getUInt16_le(offset);
+  return (val & 0xf) + ((val>>4) & 0xf)*10 + ((val>>8) & 0xf)*100 + ((val>>12) & 0xf)*1000;
+}
+void
+CodePlug::Element::setBCD4_le(uint offset, uint16_t val) {
+  uint32_t a  = (val / 1000) % 10;
+  uint32_t b  = (val /  100) % 10;
+  uint32_t c  = (val /   10) % 10;
+  uint32_t d  = (val /    1) % 10;
+  setUInt16_le(offset, (a << 12) + (b << 8) + (c << 4) + d);
+}
+
 uint32_t
 CodePlug::Element::getBCD8_be(uint offset) const {
   uint32_t val = getUInt32_be(offset);

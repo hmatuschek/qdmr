@@ -122,6 +122,20 @@ public:
     /** Stores a 32bit little-endian integer at the given byte-offset. */
     void setUInt32_le(uint offset, uint32_t value);
 
+    /** Reads a 2-digit (1-byte/8bit) BDC value in big-endian at the given byte-offset. */
+    uint8_t getBCD2(uint offset) const;
+    /** Stores a 2-digit (1-byte/8bit) BDC value in big-endian at the given byte-offset. */
+    void setBCD2(uint offset, uint8_t value);
+
+    /** Reads a 4-digit (2-byte/16bit) BDC value in big-endian at the given byte-offset. */
+    uint16_t getBCD4_be(uint offset) const;
+    /** Stores a 4-digit (2-byte/16bit) BDC value in big-endian at the given byte-offset. */
+    void setBCD4_be(uint offset, uint16_t value);
+    /** Reads a 4-digit (2-byte/16bit) BDC value in little-endian at the given byte-offset. */
+    uint16_t getBCD4_le(uint offset) const;
+    /** Stores a 4-digit (1-byte/16bit) BDC value in little-endian at the given byte-offset. */
+    void setBCD4_le(uint offset, uint16_t value);
+
     /** Reads a 8-digit (4-byte/32bit) BDC value in big-endian at the given byte-offset. */
     uint32_t getBCD8_be(uint offset) const;
     /** Stores a 8-digit (4-byte/32bit) BDC value in big-endian at the given byte-offset. */
