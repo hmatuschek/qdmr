@@ -2,29 +2,30 @@
 #include "codeplugcontext.hh"
 #include "logger.hh"
 
-#define NUM_CHANNELS         3000
-#define ADDR_CHANNELS    0x110000
-#define CHANNEL_SIZE     0x000040
+#define NUM_CHANNELS           3000
+#define ADDR_CHANNELS      0x110000
+#define CHANNEL_SIZE       0x000040
 
-#define NUM_CONTACTS        10000
-#define ADDR_CONTACTS    0x140000
-#define CONTACT_SIZE     0x000024
+#define NUM_CONTACTS          10000
+#define ADDR_CONTACTS      0x140000
+#define CONTACT_SIZE       0x000024
 
-#define NUM_ZONES             250
-#define ADDR_ZONES       0x0149e0
-#define ZONE_SIZE        0x000040
-#define ADDR_ZONEEXTS    0x031000
-#define ZONEEXT_SIZE     0x0000e0
+#define NUM_ZONES               250
+#define ADDR_ZONES         0x0149e0
+#define ZONE_SIZE          0x000040
+#define ADDR_ZONEEXTS      0x031000
+#define ZONEEXT_SIZE       0x0000e0
 
 #define NUM_GROUPLISTS        250
-#define ADDR_GROUPLISTS  0x00ec20
-#define GROUPLIST_SIZE   0x000060
+#define ADDR_GROUPLISTS    0x00ec20
+#define GROUPLIST_SIZE     0x000060
 
-#define NUM_SCANLISTS         250
-#define ADDR_SCANLISTS   0x018860
-#define SCANLIST_SIZE    0x000068
+#define NUM_SCANLISTS           250
+#define ADDR_SCANLISTS     0x018860
+#define SCANLIST_SIZE      0x000068
 
-#define ADDR_SETTINGS    0x002040
+#define ADDR_SETTINGS      0x002040
+#define ADDR_BOOTSETTINGS  0x02f000
 
 
 
@@ -319,4 +320,10 @@ MD2017Codeplug::linkScanLists(CodeplugContext &ctx) {
   }
 
   return true;
+}
+
+
+void
+MD2017Codeplug::clearBootSettings() {
+  BootSettingsElement(data(ADDR_BOOTSETTINGS)).clear();
 }

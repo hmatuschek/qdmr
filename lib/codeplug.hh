@@ -42,8 +42,9 @@ public:
   {
   protected:
     /** Hidden constructor.
-     * @param ptr Specifies the pointer to the element within the codeplug. */
-    Element(uint8_t *ptr=nullptr);
+     * @param ptr Specifies the pointer to the element within the codeplug.
+     * @param size Specifies the size of the element in bytes. */
+    Element(uint8_t *ptr, size_t size);
 
   public:
     /** Copy constructor. */
@@ -145,6 +146,8 @@ public:
   protected:
     /** Holds the pointer to the element. */
     uint8_t *_data;
+    /** Holds the size of the element. */
+    size_t _size;
   };
 
 protected:

@@ -1,4 +1,4 @@
-     0                               8                               16                              24
+     7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 00 | Intro Line 1, 10 x 16bit unicode characters                                                                               ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -12,7 +12,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 3c  ...                                                                                                                            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-40 |  TXM  | 1 |MNT| 1 |DAL| 1   0 |TlkPerT|PWE|CIT| 1 |DAT|SMR|SPR| 1   1 |KPT|INP| 1   0 |CVN| 0 |MSB| 1   1   1   1 |MSA| 1   1 |
+40 |  TXM  | 1 |MNT| 1 |DAL| 1   0 |TPA|TPD|PWE|CIT| 1 |DAT|SMR|SPR| 1   1 |KPT|INP| 1   0 |CVN| 0 |MSB| 1   1   1   1 |MSA| 1   1 |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 44 | DMR ID binary form                                                                            | Unused 0x00                   |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -22,7 +22,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 50 | Lone Worker Resp. Time in sec | Lone Worker Rem. Time in sec  | Unused, set to 0x00           | Scan Dig. Hang Time N x 100ms |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-54 | Scan Anal. Hang Time N x 100ms|BcLTime| 0   0   0   0   0   0 | Keypad Lock Time N x 5s       | Mode                          |
+54 | Scan Anal. Hang Time N x 100ms| 0   0   0   0   0   0 |BcLTime| Keypad Lock Time N x 5s       | Mode                          |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 58 | Power-on password 8 x BCD numbers, 0x00000000=default                                                                         |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -53,9 +53,23 @@ a0 | 1 |ERI| MicLevel  | 1   1   1 | 15 reseved bytes filled with 0xff          
 ac  ...                                                                                                                            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 where
-TXM = TX Mode; MNT = Monitor type; DAL = Disable all LEDs; TlkPerT = Talk permit tone;
-PWE = Password and lock enable; CIT = Ch. free indication tone; DAT = Disable all tones;
-SMR = Save Mode Receive; SPR = Save Preamble; KPT = Keypad tones; INP = Intro Picture;
-CVN = Channel voice announce; MSB = Mode select B (VFO/MR); MSA = Mode select A (VFO/MR);
-BcLTime = Backlight time; PCM = Private call match; GCM = Group call match; PbZ = Public zone;
-ERI = Edit Radio ID
+TXM = TX Mode, 0=LastCallCH, 1=LastCallCH+HandCH, 2 = DesignedCH, 3 = DesignedCH+HandCH, default=3;
+MNT = Monitor type: 1 = Open Squelch, 0 = Silent, default=1;
+DAL = Disable all LEDs (inverted);
+TPD = Talk permit tone digital;
+TPA = Talk permit tone analog;
+PWE = Password and lock enable (inverted);
+CIT = Ch. free indication tone (inverted);
+DAT = Disable all tones (inverted);
+SMR = Save Mode Receive;
+SPR = Save Preamble;
+KPT = Keypad tones;
+INP = Intro Picture;
+CVN = Channel voice announce;
+MSB = Mode select B (0=VFO, 1=MR);
+MSA = Mode select A (0=VFO, 1=MR);
+BcLTime = Backlight time, 0=Always, t=n*5s;
+PCM = Private call match;
+GCM = Group call match;
+PbZ = Public zone;
+ERI = Edit Radio ID (inverted);

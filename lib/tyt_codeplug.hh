@@ -86,6 +86,10 @@ public:
     } TurnOffFreq;
 
 
+  protected:
+    /** Constructs a channel from the given memory. */
+    ChannelElement(uint8_t *ptr, size_t size);
+
   public:
     /** Constructs a channel from the given memory. */
     ChannelElement(uint8_t *ptr);
@@ -313,6 +317,10 @@ public:
    * to the normal channel. */
   class VFOChannelElement: public ChannelElement
   {
+  protected:
+    /** Constructor from pointer to memory. */
+    VFOChannelElement(uint8_t *ptr, size_t size);
+
   public:
     /** Constructor from pointer to memory. */
     VFOChannelElement(uint8_t *ptr);
@@ -334,9 +342,13 @@ public:
    * @verbinclude tytcontact.txt */
   class ContactElement: public CodePlug::Element
   {
+  protected:
+    /** Constructor. */
+    ContactElement(uint8_t *ptr, size_t size);
+
   public:
     /** Constructor. */
-    ContactElement(uint8_t *ptr, uint size=0x24);
+    ContactElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ContactElement();
 
@@ -378,9 +390,13 @@ public:
    */
   class ZoneElement: public CodePlug::Element
   {
+  protected:
+    /** Construtor. */
+    ZoneElement(uint8_t *ptr, size_t size);
+
   public:
     /** Construtor. */
-    ZoneElement(uint8_t *ptr, uint size=0x40);
+    ZoneElement(uint8_t *ptr);
     /** Desturctor. */
     virtual ~ZoneElement();
 
@@ -414,9 +430,13 @@ public:
    */
   class ZoneExtElement: public CodePlug::Element
   {
+  protected:
+    /** Constructor. */
+    ZoneExtElement(uint8_t *ptr, size_t size);
+
   public:
     /** Constructor. */
-    ZoneExtElement(uint8_t *ptr, uint size=0xe0);
+    ZoneExtElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ZoneExtElement();
 
@@ -445,9 +465,13 @@ public:
    */
   class GroupListElement: public CodePlug::Element
   {
+  protected:
+    /** Constructor. */
+    GroupListElement(uint8_t *ptr, size_t size);
+
   public:
     /** Constructor. */
-    GroupListElement(uint8_t *ptr, uint size=0x60);
+    GroupListElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~GroupListElement();
 
@@ -479,9 +503,13 @@ public:
    */
   class ScanListElement: public CodePlug::Element
   {
+  protected:
+    /** Constructor. */
+    ScanListElement(uint8_t *ptr, size_t size);
+
   public:
     /** Constructor. */
-    ScanListElement(uint8_t *ptr, uint size=0x68);
+    ScanListElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ScanListElement();
 
@@ -553,7 +581,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    GeneralSettingsElement(uint8_t *ptr, uint size);
+    GeneralSettingsElement(uint8_t *ptr, size_t size);
 
   public:
     /** Constructor. */
@@ -683,6 +711,29 @@ public:
     virtual bool updateConfig(Config *config);
   };
 
+  /** Represents the boot-time settings (selected zone and channels) within the code-plug.
+   *
+   * Memory layout of encoded boot settings:
+   * @verbinclude tytbootsettings.txt */
+  class BootSettingsElement: CodePlug::Element
+  {
+  protected:
+    BootSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    explicit BootSettingsElement(uint8_t *ptr);
+    virtual ~BootSettingsElement();
+
+    void clear();
+
+    virtual uint zoneIndex() const;
+    virtual void zoneIndex(uint idx);
+    virtual uint channelIndexA() const;
+    virtual void channelIndexA(uint idx);
+    virtual uint channelIndexB() const;
+    virtual void channelIndexB(uint idx);
+  };
+
 protected:
   /** Empty constructor. */
   explicit TyTCodeplug(QObject *parent = nullptr);
@@ -713,13 +764,6 @@ public:
   virtual bool encodeGeneralSettings(Config *config, const Flags &flags);
   /** Updates the given configuration from the general settings. */
   virtual bool decodeGeneralSettings(Config *config);
-
-  /** Clears the boot settings in the codeplug. */
-  virtual void clearBootSettings();
-  /** Updates the boot settings from the given configuration. */
-  virtual bool encodeBootSettings(Config *config, const Flags &flags);
-  /** Updates the given configuration from the boot settings. */
-  virtual bool decodeBootSettings(Config *config);
 
   /** Clears all contacts in the codeplug. */
   virtual void clearContacts();
@@ -773,6 +817,8 @@ public:
   /** Links all added positioning systems within the configuration. */
   virtual bool linkPositioningSystems(CodeplugContext &ctx);
 
+  /** Clears the boot settings in the codeplug. */
+  virtual void clearBootSettings();
   /** Clears the menu settings in the codeplug. */
   virtual void clearMenuSettings();
   /** Clears the button settings in the codeplug. */

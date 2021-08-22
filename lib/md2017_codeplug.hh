@@ -45,6 +45,7 @@ public:
   bool createScanLists(CodeplugContext &ctx);
   bool linkScanLists(CodeplugContext &ctx);
 
+  void clearBootSettings();
 };
 
 #endif // MD2017CODEPLUG_HH

@@ -13,8 +13,14 @@
 /* ******************************************************************************************** *
  * Implementation of TyTCodeplug::ChannelElement
  * ******************************************************************************************** */
+TyTCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
+  : CodePlug::Element(ptr, size)
+{
+  // pass...
+}
+
 TyTCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : CodePlug::Element(ptr)
+  : CodePlug::Element(ptr, 0x0040)
 {
   // pass...
 }
@@ -612,8 +618,14 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
 /* ******************************************************************************************** *
  * Implementation of TyTCodeplug::VFOChannelElement
  * ******************************************************************************************** */
+TyTCodeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr, size_t size)
+  : ChannelElement(ptr, size)
+{
+  // pass...
+}
+
 TyTCodeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr)
-  : ChannelElement(ptr)
+  : ChannelElement(ptr, 0x0040)
 {
   // pass...
 }
@@ -646,8 +658,14 @@ TyTCodeplug::VFOChannelElement::stepSize(uint ss_Hz) {
 /* ******************************************************************************************** *
  * Implementation of TyTCodeplug::ContactElement
  * ******************************************************************************************** */
-TyTCodeplug::ContactElement::ContactElement(uint8_t *ptr, uint size)
-  : CodePlug::Element(ptr)
+TyTCodeplug::ContactElement::ContactElement(uint8_t *ptr, size_t size)
+  : CodePlug::Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::ContactElement::ContactElement(uint8_t *ptr)
+  : CodePlug::Element(ptr, 0x0024)
 {
   // pass...
 }
@@ -741,8 +759,14 @@ TyTCodeplug::ContactElement::fromContactObj(const DigitalContact *cont) {
 /* ******************************************************************************************** *
  * Implementation of TyTCodeplug::ZoneElement
  * ******************************************************************************************** */
-TyTCodeplug::ZoneElement::ZoneElement(uint8_t *ptr, uint size)
-  : CodePlug::Element(ptr)
+TyTCodeplug::ZoneElement::ZoneElement(uint8_t *ptr, size_t size)
+  : CodePlug::Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::ZoneElement::ZoneElement(uint8_t *ptr)
+  : CodePlug::Element(ptr, 0x0040)
 {
   // pass...
 }
@@ -818,8 +842,14 @@ TyTCodeplug::ZoneElement::linkZone(Zone *zone, const CodeplugContext &ctx) const
 /* ******************************************************************************************** *
  * Implementation of TyTCodeplug::ZoneElement
  * ******************************************************************************************** */
-TyTCodeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr, uint size)
-  : CodePlug::Element(ptr)
+TyTCodeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr, size_t size)
+  : CodePlug::Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr)
+  : CodePlug::Element(ptr, 0x00e0)
 {
   // pass...
 }
@@ -898,8 +928,14 @@ TyTCodeplug::ZoneExtElement::linkZoneObj(Zone *zone, const CodeplugContext &ctx)
 /* ******************************************************************************************** *
  * Implementation of TyTCodeplug::GroupListElement
  * ******************************************************************************************** */
-TyTCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, uint size)
-  : CodePlug::Element(ptr)
+TyTCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, size_t size)
+  : CodePlug::Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::GroupListElement::GroupListElement(uint8_t *ptr)
+  : CodePlug::Element(ptr, 0x0060)
 {
   // pass...
 }
@@ -978,8 +1014,14 @@ TyTCodeplug::GroupListElement::linkGroupListObj(RXGroupList *lst, const Codeplug
 /* ******************************************************************************************** *
  * Implementation of TyTCodeplug::ScanListElement
  * ******************************************************************************************** */
-TyTCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, uint size)
-  : Element(ptr)
+TyTCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::ScanListElement::ScanListElement(uint8_t *ptr)
+  : Element(ptr, 0x0068)
 {
   // pass...
 }
@@ -1172,14 +1214,14 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, const CodeplugConte
 /* ******************************************************************************************** *
  * Implementation of TyTCodeplug::GeneralSettingsElement
  * ******************************************************************************************** */
-TyTCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, uint size)
-  : Element(ptr)
+TyTCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
 {
   // pass...
 }
 
 TyTCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : Element(ptr)
+  : Element(ptr, 0x00b0)
 {
   // pass...
 }
@@ -1701,6 +1743,66 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::BootSettingsElement
+ * ******************************************************************************************** */
+TyTCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr, size_t size)
+  : CodePlug::Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr)
+  : CodePlug::Element(ptr, 0x0010)
+{
+  // pass...
+}
+
+TyTCodeplug::BootSettingsElement::~BootSettingsElement() {
+  // pass...
+}
+
+void
+TyTCodeplug::BootSettingsElement::clear() {
+  setUInt24_le(0, 0xffffff);
+  zoneIndex(1);
+  channelIndexA(1);
+  setUInt8(0x05, 0xff);
+  channelIndexB(1);
+  setUInt16_le(0x07, 0xffff);
+  setUInt16_le(0x09, 0x0001);
+  setUInt8(0x0b, 0xff);
+  setUInt32_le(0x0c, 0xffffffff);
+}
+
+uint
+TyTCodeplug::BootSettingsElement::zoneIndex() const {
+  return getUInt8(0x03);
+}
+void
+TyTCodeplug::BootSettingsElement::zoneIndex(uint idx) {
+  setUInt8(0x03, idx);
+}
+
+uint
+TyTCodeplug::BootSettingsElement::channelIndexA() const {
+  return getUInt8(0x04);
+}
+void
+TyTCodeplug::BootSettingsElement::channelIndexA(uint idx) {
+  setUInt8(0x04, idx);
+}
+
+uint
+TyTCodeplug::BootSettingsElement::channelIndexB() const {
+  return getUInt8(0x06);
+}
+void
+TyTCodeplug::BootSettingsElement::channelIndexB(uint idx) {
+  setUInt8(0x06, idx);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of TyTCodeplug
  * ******************************************************************************************** */
 TyTCodeplug::TyTCodeplug(QObject *parent)
@@ -1720,6 +1822,8 @@ TyTCodeplug::clear()
   this->clearTimestamp();
   // Clear general config
   this->clearGeneralSettings();
+  // Clear boot settings
+  this->clearBootSettings();
   // Clear menu settings
   this->clearMenuSettings();
   // Clear button settings
@@ -1756,12 +1860,6 @@ TyTCodeplug::encode(Config *config, const Flags &flags) {
   // General config
   if (! this->encodeGeneralSettings(config, flags)) {
     _errorMessage = tr("Cannot encode general settings: %1").arg(_errorMessage);
-    return false;
-  }
-
-  // Boot time settings
-  if (! this->encodeBootSettings(config, flags)) {
-    _errorMessage = tr("Cannot encode boot settings: %1").arg(_errorMessage);
     return false;
   }
 
@@ -1921,22 +2019,6 @@ TyTCodeplug::decodeGeneralSettings(Config *config) {
 
 
 void
-TyTCodeplug::clearBootSettings() {
-  // pass...
-}
-
-bool
-TyTCodeplug::encodeBootSettings(Config *config, const Flags &flags) {
-  return true;
-}
-
-bool
-TyTCodeplug::decodeBootSettings(Config *config) {
-  return true;
-}
-
-
-void
 TyTCodeplug::clearContacts() {
   // pass...
 }
@@ -2056,6 +2138,11 @@ TyTCodeplug::linkPositioningSystems(CodeplugContext &ctx) {
   return true;
 }
 
+
+void
+TyTCodeplug::clearBootSettings() {
+  // pass...
+}
 
 void
 TyTCodeplug::clearMenuSettings() {

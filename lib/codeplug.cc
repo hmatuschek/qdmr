@@ -16,14 +16,14 @@ CodePlug::Flags::Flags()
 /* ********************************************************************************************* *
  * Implementation of CodePlug::Element
  * ********************************************************************************************* */
-CodePlug::Element::Element(uint8_t *ptr)
-  : _data(ptr)
+CodePlug::Element::Element(uint8_t *ptr, size_t size)
+  : _data(ptr), _size(size)
 {
   // pass...
 }
 
 CodePlug::Element::Element(const Element &other)
-  : _data(other._data)
+  : _data(other._data), _size(other._size)
 {
   // pass...
 }
