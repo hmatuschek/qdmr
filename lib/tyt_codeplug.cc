@@ -2573,6 +2573,202 @@ TyTCodeplug::OneTouchSettingElement::contactIndex(uint16_t idx) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::EmergencySettingsElement
+ * ******************************************************************************************** */
+TyTCodeplug::EmergencySettingsElement::EmergencySettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::EmergencySettingsElement::EmergencySettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x10)
+{
+  // pass...
+}
+
+TyTCodeplug::EmergencySettingsElement::~EmergencySettingsElement() {
+  // pass...
+}
+
+void
+TyTCodeplug::EmergencySettingsElement::clear() {
+  setUInt5(0x00, 3, 0b11111);
+  radioDisable(true);
+  remoteMonitor(false);
+  emergencyRemoteMonitor(true);
+  remoteMonitorDuration(10);
+  txTimeOut(125);
+  messageLimit(2);
+  memset(_data+0x04, 0xff, 12);
+}
+
+bool
+TyTCodeplug::EmergencySettingsElement::emergencyRemoteMonitor() const {
+  return getBit(0x00, 2);
+}
+void
+TyTCodeplug::EmergencySettingsElement::emergencyRemoteMonitor(bool enable) {
+  setBit(0x00, 2, enable);
+}
+
+bool
+TyTCodeplug::EmergencySettingsElement::remoteMonitor() const {
+  return getBit(0x00, 1);
+}
+void
+TyTCodeplug::EmergencySettingsElement::remoteMonitor(bool enable) {
+  setBit(0x00, 1, enable);
+}
+
+bool
+TyTCodeplug::EmergencySettingsElement::radioDisable() const {
+  return getBit(0x00, 0);
+}
+void
+TyTCodeplug::EmergencySettingsElement::radioDisable(bool enable) {
+  setBit(0x00, 0, enable);
+}
+
+uint
+TyTCodeplug::EmergencySettingsElement::remoteMonitorDuration() const {
+  return uint(getUInt8(0x01))*10;
+}
+void
+TyTCodeplug::EmergencySettingsElement::remoteMonitorDuration(uint sec) {
+  setUInt8(0x01, sec/10);
+}
+
+uint
+TyTCodeplug::EmergencySettingsElement::txTimeOut() const {
+  return uint(getUInt8(0x02))*25;
+}
+void
+TyTCodeplug::EmergencySettingsElement::txTimeOut(uint ms) {
+  setUInt8(0x02, ms/25);
+}
+
+uint
+TyTCodeplug::EmergencySettingsElement::messageLimit() const {
+  return uint(getUInt8(0x03));
+}
+void
+TyTCodeplug::EmergencySettingsElement::messageLimit(uint limit) {
+  setUInt8(0x03, limit);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::EmergencySystemElement
+ * ******************************************************************************************** */
+TyTCodeplug::EmergencySystemElement::EmergencySystemElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::EmergencySystemElement::EmergencySystemElement(uint8_t *ptr)
+  : Element(ptr, 0x28)
+{
+  // pass...
+}
+
+TyTCodeplug::EmergencySystemElement::~EmergencySystemElement() {
+  // pass...
+}
+
+bool
+TyTCodeplug::EmergencySystemElement::isValid() const {
+  return Element::isValid() && (0 != revertChannelIndex());
+}
+
+void
+TyTCodeplug::EmergencySystemElement::clear() {
+  name("");
+  alarmType(DISABLED);
+  setUInt2(0x00, 2, 3);
+  alarmMode(ALARM);
+  setUInt2(0x00, 6, 1);
+  impoliteRetries(15);
+  politeRetries(5);
+  hotMICDuration(100);
+  revertChannelIndex(0);
+  setUInt16_le(0x26, 0xffff);
+}
+
+QString
+TyTCodeplug::EmergencySystemElement::name() const {
+  return readUnicode(0x00, 16);
+}
+void
+TyTCodeplug::EmergencySystemElement::name(const QString &nm) {
+  writeUnicode(0x00, nm, 16);
+}
+
+TyTCodeplug::EmergencySystemElement::AlarmType
+TyTCodeplug::EmergencySystemElement::alarmType() const {
+  return AlarmType(getUInt2(0x20, 0));
+}
+void
+TyTCodeplug::EmergencySystemElement::alarmType(AlarmType type) {
+  setUInt2(0x20, 0, type);
+}
+
+TyTCodeplug::EmergencySystemElement::AlarmMode
+TyTCodeplug::EmergencySystemElement::alarmMode() const {
+  return AlarmMode(getUInt2(0x20, 4));
+}
+void
+TyTCodeplug::EmergencySystemElement::alarmMode(AlarmMode mode) {
+  setUInt2(0x20, 4, mode);
+}
+
+uint
+TyTCodeplug::EmergencySystemElement::impoliteRetries() const {
+  return getUInt8(0x21);
+}
+void
+TyTCodeplug::EmergencySystemElement::impoliteRetries(uint num) {
+  setUInt8(0x21, num);
+}
+
+uint
+TyTCodeplug::EmergencySystemElement::politeRetries() const {
+  return getUInt8(0x22);
+}
+void
+TyTCodeplug::EmergencySystemElement::politeRetries(uint num) {
+  setUInt8(0x22, num);
+}
+
+uint
+TyTCodeplug::EmergencySystemElement::hotMICDuration() const {
+  return uint(getUInt8(0x23))*10;
+}
+void
+TyTCodeplug::EmergencySystemElement::hotMICDuration(uint dur) {
+  setUInt8(0x23, dur/10);
+}
+
+bool
+TyTCodeplug::EmergencySystemElement::revertChannelIsSelected() const {
+  return 0xffff == getUInt16_le(0x24);
+}
+uint16_t
+TyTCodeplug::EmergencySystemElement::revertChannelIndex() const {
+  return getUInt16_le(0x24);
+}
+void
+TyTCodeplug::EmergencySystemElement::revertChannelIndex(uint16_t idx) {
+  setUInt16_le(0x24, idx);
+}
+void
+TyTCodeplug::EmergencySystemElement::revertChannelSelected() {
+  setUInt16_le(0x24, 0xffff);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of TyTCodeplug
  * ******************************************************************************************** */
 TyTCodeplug::TyTCodeplug(QObject *parent)

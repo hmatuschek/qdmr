@@ -1233,6 +1233,127 @@ public:
     virtual void contactIndex(uint16_t idx);
   };
 
+  /** Represents the emergency settings within the codeplug on the radio.
+   *
+   * Memory representation of the emergency settings:
+   * @verbinclude tytemergencysettings.txt */
+  class EmergencySettingsElement: public CodePlug::Element
+  {
+  protected:
+    /** Hidden constructor. */
+    EmergencySettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit EmergencySettingsElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~EmergencySettingsElement();
+
+    virtual void clear();
+
+    /** Returns @c true if emergency remote monitor is enabled. */
+    virtual bool emergencyRemoteMonitor() const;
+    /** Enables/disables emergency remote monitor. */
+    virtual void emergencyRemoteMonitor(bool enable);
+    /** Returns @c true if remote monitor is enabled. */
+    virtual bool remoteMonitor() const;
+    /** Enables/disables remote monitor. */
+    virtual void remoteMonitor(bool enable);
+    /** Returns @c true if radio disable is enabled. */
+    virtual bool radioDisable() const;
+    /** Enables/disables radio disable. */
+    virtual void radioDisable(bool enable);
+
+    /** Returns the remote monitor duration in seconds. */
+    virtual uint remoteMonitorDuration() const;
+    /** Sets the remote monitor duration in seconds. */
+    virtual void remoteMonitorDuration(uint sec);
+
+    /** Returns the TX time-out in ms. */
+    virtual uint txTimeOut() const;
+    /** Sets the TX time-out in ms. */
+    virtual void txTimeOut(uint ms);
+
+    /** Returns the message limit. */
+    virtual uint messageLimit() const;
+    /** Sets the message limit. */
+    virtual void messageLimit(uint limit);
+  };
+
+  /** Represents a single emergency system within the radio.
+   *
+   * Memory representation of emergency system:
+   * @verbinclude tytemergencysystem.txt */
+  class EmergencySystemElement: public CodePlug::Element
+  {
+  public:
+    /** Possible alarm type for the system. */
+    enum AlarmType {
+      DISABLED = 0,                     ///< No alarm at all
+      REGULAR = 1,                      ///< Regular alarm sound.
+      SILENT = 2,                       ///< Silent alarm.
+      SILENT_W_VOICE = 3                ///< silent alarm with voice.
+    };
+    /** Possible alarm modes for the system. */
+    enum AlarmMode {
+      ALARM = 0,                        ///< Just alarm.
+      ALARM_W_CALL = 1,                 ///< Alarm + call.
+      ALARM_W_VOICE = 2                 ///< Alarm + call + voice?
+    };
+
+  protected:
+    /** Hidden constructor. */
+    EmergencySystemElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit EmergencySystemElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~EmergencySystemElement();
+
+    bool isValid() const;
+    void clear();
+
+    /** Returns the name of the system. */
+    virtual QString name() const;
+    /** Sets the name of the system. */
+    virtual void name(const QString &name);
+
+    /** Returns the alarm type of the system. */
+    virtual AlarmType alarmType() const;
+    /** Sets the alarm type of the system. */
+    virtual void alarmType(AlarmType type);
+    /** Returns the alarm mode of the system. */
+    virtual AlarmMode alarmMode() const;
+    /** Sets the alarm mode of the system. */
+    virtual void alarmMode(AlarmMode mode);
+
+    /** Returns the number of impolite retries. */
+    virtual uint impoliteRetries() const;
+    /** Sets the number of impolite retries. */
+    virtual void impoliteRetries(uint num);
+
+    /** Returns the number of polite retries. */
+    virtual uint politeRetries() const;
+    /** Sets the number of polite retries. */
+    virtual void politeRetries(uint num);
+
+    /** Returns the hot MIC duration in seconds. */
+    virtual uint hotMICDuration() const;
+    /** Sets the hot MIC duration in seconds. */
+    virtual void hotMICDuration(uint sec);
+
+    /** Returns @c true if the revert channel is the selected one. */
+    virtual bool revertChannelIsSelected() const;
+    /** Returns the index of the revert channel. */
+    virtual uint16_t revertChannelIndex() const;
+    /** Sets the revert channel index. */
+    virtual void revertChannelIndex(uint16_t idx);
+    /** Sets revert channel to selected channel. */
+    virtual void revertChannelSelected();
+  };
+
+
 protected:
   /** Empty constructor. */
   explicit TyTCodeplug(QObject *parent = nullptr);
