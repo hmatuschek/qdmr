@@ -2425,6 +2425,154 @@ TyTCodeplug::MenuSettingsElement::newScanList(bool enable) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::ButtonSettingsElement
+ * ******************************************************************************************** */
+TyTCodeplug::ButtonSettingsElement::ButtonSettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::ButtonSettingsElement::ButtonSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x14) // <- size excluding one-touch settings
+{
+  // pass...
+}
+
+TyTCodeplug::ButtonSettingsElement::~ButtonSettingsElement() {
+  // pass...
+}
+
+void
+TyTCodeplug::ButtonSettingsElement::clear() {
+  setUInt16_le(0x00, 0);
+  sideButton1Short(Disabled);
+  sideButton1Long(Tone1750Hz);
+  sideButton2Short(MonitorToggle);
+  sideButton2Long(Disabled);
+  memset(_data+0x06, 0x00, 10);
+  setUInt8(0x10, 1);
+  longPressDuration(2000);
+  setUInt16_le(0x12, 0xffff);
+}
+
+TyTCodeplug::ButtonSettingsElement::ButtonAction
+TyTCodeplug::ButtonSettingsElement::sideButton1Short() const {
+  return ButtonAction(getUInt8(0x02));
+}
+void
+TyTCodeplug::ButtonSettingsElement::sideButton1Short(ButtonAction action) {
+  setUInt8(0x02, action);
+}
+
+TyTCodeplug::ButtonSettingsElement::ButtonAction
+TyTCodeplug::ButtonSettingsElement::sideButton1Long() const {
+  return ButtonAction(getUInt8(0x03));
+}
+void
+TyTCodeplug::ButtonSettingsElement::sideButton1Long(ButtonAction action) {
+  setUInt8(0x03, action);
+}
+
+TyTCodeplug::ButtonSettingsElement::ButtonAction
+TyTCodeplug::ButtonSettingsElement::sideButton2Short() const {
+  return ButtonAction(getUInt8(0x04));
+}
+void
+TyTCodeplug::ButtonSettingsElement::sideButton2Short(ButtonAction action) {
+  setUInt8(0x04, action);
+}
+
+TyTCodeplug::ButtonSettingsElement::ButtonAction
+TyTCodeplug::ButtonSettingsElement::sideButton2Long() const {
+  return ButtonAction(getUInt8(0x05));
+}
+void
+TyTCodeplug::ButtonSettingsElement::sideButton2Long(ButtonAction action) {
+  setUInt8(0x05, action);
+}
+
+uint
+TyTCodeplug::ButtonSettingsElement::longPressDuration() const {
+  return uint(getUInt8(0x11))*250;
+}
+void
+TyTCodeplug::ButtonSettingsElement::longPressDuration(uint ms) {
+  setUInt8(0x11, ms/250);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::OneTouchSettingElement
+ * ******************************************************************************************** */
+TyTCodeplug::OneTouchSettingElement::OneTouchSettingElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::OneTouchSettingElement::OneTouchSettingElement(uint8_t *ptr)
+  : Element(ptr, 0x04)
+{
+  // pass....
+}
+
+TyTCodeplug::OneTouchSettingElement::~OneTouchSettingElement() {
+  // pass...
+}
+
+bool
+TyTCodeplug::OneTouchSettingElement::isValid() const {
+  return Element::isValid() && (Disabled != actionType());
+}
+
+void
+TyTCodeplug::OneTouchSettingElement::clear() {
+  action(CALL);
+  actionType(Disabled);
+  setUInt2(0x00, 6, 3);
+  messageIndex(0);
+  contactIndex(0);
+}
+
+TyTCodeplug::OneTouchSettingElement::Action
+TyTCodeplug::OneTouchSettingElement::action() const {
+  return Action(getUInt4(0x00, 0));
+}
+void
+TyTCodeplug::OneTouchSettingElement::action(Action action) {
+  setUInt4(0x00, 0, action);
+}
+
+TyTCodeplug::OneTouchSettingElement::Type
+TyTCodeplug::OneTouchSettingElement::actionType() const {
+  return Type(getUInt2(0x00, 4));
+}
+void
+TyTCodeplug::OneTouchSettingElement::actionType(Type type) {
+  setUInt2(0x00, 4, type);
+}
+
+uint8_t
+TyTCodeplug::OneTouchSettingElement::messageIndex() const {
+  return getUInt8(0x01);
+}
+void
+TyTCodeplug::OneTouchSettingElement::messageIndex(uint8_t idx) {
+  setUInt8(0x01, idx);
+}
+
+uint16_t
+TyTCodeplug::OneTouchSettingElement::contactIndex() const {
+  return getUInt16_le(0x02);
+}
+void
+TyTCodeplug::OneTouchSettingElement::contactIndex(uint16_t idx) {
+  setUInt16_le(0x02, idx);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of TyTCodeplug
  * ******************************************************************************************** */
 TyTCodeplug::TyTCodeplug(QObject *parent)

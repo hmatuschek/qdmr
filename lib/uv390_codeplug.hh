@@ -825,9 +825,9 @@ public:
     uint8_t  side_button_2;               ///< Side button 2 short press, 0=disabled, see @c UV390Codeplug::buttons_t::ButtonAction.
     uint8_t  side_button_2_long;          ///< Side button 2 long press, 0=disabled, see @c UV390Codeplug::buttons_t::ButtonAction.
     uint8_t  _unused_6[10];               ///< Unknown set to 0x00.
+
     uint8_t  _unknown_16;                 ///< Unkown set to 0x01;
     uint8_t  long_press_dur;              ///< Long-press duration in 250ms steps, range [0x04,0x0f], default 0x04.
-
     uint16_t _unused_18;                  ///< Unused set to 0xffff;
 
     one_touch_t one_touch[6];             ///< One-touch settings 1-6.

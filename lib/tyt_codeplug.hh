@@ -1100,6 +1100,139 @@ public:
     virtual void newScanList(bool enable);
   };
 
+  /** Represents all button settings within the codeplug on the radio.
+   *
+   * Memory representation of the button settings:
+   * @verbinclude tytbuttonsettings.txt */
+  class ButtonSettingsElement: public CodePlug::Element
+  {
+  public:
+    /** Possible actions for the side-buttons. */
+    enum ButtonAction {
+      Disabled = 0,                       ///< Disabled side-button action.
+      ToggleAllAlertTones = 1,            ///< Toggle all alert tones.
+      EmergencyOn = 2,                    ///< Enable emergency.
+      EmergencyOff = 3,                   ///< Disable emergency.
+      PowerSelect = 4,                    ///< Select TX power.
+      MonitorToggle = 5,                  ///< Toggle monitor (promiscuous mode on digital channel, open squelch on analog channel).
+      OneTouch1 = 7,                      ///< Perform one-touch action 1.
+      OneTouch2 = 8,                      ///< Perform one-touch action 2.
+      OneTouch3 = 9,                      ///< Perform one-touch action 3.
+      OneTouch4 = 10,                     ///< Perform one-touch action 4.
+      OneTouch5 = 11,                     ///< Perform one-touch action 5.
+      OneTouch6 = 12,                     ///< Perform one-touch action 6.
+      RepeaterTalkaroundToggle = 13,      ///< Toggle repater mode / talkaround.
+      ScanToggle = 14,                    ///< Start/stop scan.
+      SquelchToggle = 21,                 ///< Enable/disable squelch.
+      PrivacyToggle = 22,                 ///< Enable/disable privacy system.
+      VoxToggle = 23,                     ///< Enable/disable VOX.
+      ZoneIncrement = 24,                 ///< Switch to next zone.
+      BatteryIndicator = 26,              ///< Show battery charge.
+      LoneWorkerToggle = 31,              ///< Toggle lone-worker.
+      RecordToggle = 34,                  ///< Enable/disable recording (dep. on firmware).
+      RecordPlayback = 35,                ///< Start/stop playback.
+      RecordDeleteAll = 36,               ///< Delete all recordings.
+      Tone1750Hz = 38,                    ///< Send 1750Hz tone.
+      SwitchUpDown = 47,                  ///< Switch Channel A/B.
+      RightKey = 48,                      ///< Who knows?
+      LeftKey = 49,                       ///< Who knows?
+      ZoneDecrement = 55                  ///< Switch to previous zone.
+    };
+
+  protected:
+    /** Hidden constructor. */
+    ButtonSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit ButtonSettingsElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~ButtonSettingsElement();
+
+    void clear();
+
+    /** Returns the action for a short press on side button 1. */
+    virtual ButtonAction sideButton1Short() const;
+    /** Sets the action for a short press on side button 1. */
+    virtual void sideButton1Short(ButtonAction action);
+    /** Returns the action for a long press on side button 1. */
+    virtual ButtonAction sideButton1Long() const;
+    /** Sets the action for a short press on side button 1. */
+    virtual void sideButton1Long(ButtonAction action);
+
+    /** Returns the action for a short press on side button 2. */
+    virtual ButtonAction sideButton2Short() const;
+    /** Sets the action for a short press on side button 2. */
+    virtual void sideButton2Short(ButtonAction action);
+    /** Returns the action for a long press on side button 2. */
+    virtual ButtonAction sideButton2Long() const;
+    /** Sets the action for a short press on side button 2. */
+    virtual void sideButton2Long(ButtonAction action);
+
+    /** Returns the long-press duration in ms. */
+    virtual uint longPressDuration() const;
+    /** Sets the long-press duration in ms. */
+    virtual void longPressDuration(uint ms);
+  };
+
+  /** Represents a single one-touch setting within the codeplug on the radio.
+   *
+   * Memory representation of a one-touch setting:
+   * @verbinclude tytonetouchsetting.txt */
+  class OneTouchSettingElement: public CodePlug::Element
+  {
+  public:
+    /** Possible one-touch actions. */
+    enum Action {
+      CALL    = 0b0000,                 ///< Call someone, see @c contact.
+      MESSAGE = 0b0001,                 ///< Send a message, see @c message.
+      DTMF1   = 0b1000,                 ///< Analog call DTMF system 1.
+      DTMF2   = 0b1001,                 ///< Analog call DTMF system 2.
+      DTMF3   = 0b1010,                 ///< Analog call DTMF system 3.
+      DTMF4   = 0b1011                  ///< Analog call DTMF system 4.
+    };
+
+    /** Possible one-touch action types. */
+    enum Type {
+      Disabled = 0b00,                  ///< Disabled one-touch.
+      Digital  = 0b01,                  ///< Digital call/message.
+      Analog   = 0b10                   ///< Analog call.
+    };
+
+  protected:
+    /** Hidden constructor. */
+    OneTouchSettingElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constuctor. */
+    explicit OneTouchSettingElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~OneTouchSettingElement();
+
+    bool isValid() const;
+    void clear();
+
+    /** Returns the action to perform. */
+    virtual Action action() const;
+    /** Sets the action to perform. */
+    virtual void action(Action action);
+
+    /** Returns the type of the action. */
+    virtual Type actionType() const;
+    /** Sets the type of the action. */
+    virtual void actionType(Type action);
+
+    /** Returns the message index +1. */
+    virtual uint8_t messageIndex() const;
+    /** Sets the message index +1. */
+    virtual void messageIndex(uint8_t idx);
+
+    /** Returns the contact index +1. */
+    virtual uint16_t contactIndex() const;
+    /** Sets the contact index +1. */
+    virtual void contactIndex(uint16_t idx);
+  };
+
 protected:
   /** Empty constructor. */
   explicit TyTCodeplug(QObject *parent = nullptr);
