@@ -1353,6 +1353,33 @@ public:
     virtual void revertChannelSelected();
   };
 
+  /** Represents all encryption keys and settings within the codeplug on the device.
+   *
+   * Memory representation of encryption settings:
+   * @verbinclude tytprivacy.txt */
+  class EncryptionElement: public CodePlug::Element
+  {
+  protected:
+    /** Hidden constructor. */
+    EncryptionElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit EncryptionElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~EncryptionElement();
+
+    void clear();
+
+    /** Returns the n-th "enhanced" key (128bit). */
+    virtual QByteArray enhancedKey(uint n);
+    /** Sets the n-th "enhanced" key (128bit). */
+    virtual void enhancedKey(uint n, const QByteArray &key);
+    /** Returns the n-th "basic" key (16bit). */
+    virtual QByteArray basicKey(uint n);
+    /** Sets the n-th "basic" key (16bit). */
+    virtual void basicKey(uint n, const QByteArray &key);
+  };
 
 protected:
   /** Empty constructor. */

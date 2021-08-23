@@ -2769,6 +2769,53 @@ TyTCodeplug::EmergencySystemElement::revertChannelSelected() {
 
 
 /* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::EncryptionElement
+ * ******************************************************************************************** */
+TyTCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr)
+  : Element(ptr, 0xb0)
+{
+  // pass...
+}
+
+TyTCodeplug::EncryptionElement::~EncryptionElement() {
+  // pass...
+}
+
+void
+TyTCodeplug::EncryptionElement::clear() {
+  memset(_data, 0xff, 0xb0);
+}
+
+QByteArray
+TyTCodeplug::EncryptionElement::enhancedKey(uint n) {
+  return QByteArray((char *)(_data+n*16), 16);
+}
+void
+TyTCodeplug::EncryptionElement::enhancedKey(uint n, const QByteArray &key) {
+  if (16 != key.size())
+    return;
+  memcpy(_data+n*16, key.constData(), 16);
+}
+
+QByteArray
+TyTCodeplug::EncryptionElement::basicKey(uint n) {
+  return QByteArray((char *)(_data+0x90+n*2), 2);
+}
+void
+TyTCodeplug::EncryptionElement::basicKey(uint n, const QByteArray &key) {
+  if (2 != key.size())
+    return;
+  memcpy(_data+0x90+n*16, key.constData(), 2);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of TyTCodeplug
  * ******************************************************************************************** */
 TyTCodeplug::TyTCodeplug(QObject *parent)
