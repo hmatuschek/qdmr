@@ -1,0 +1,18 @@
+     7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+00 | Menu hang time (sec)          |RDS|REN|RMO|RCK|MDL|CED|CAL|TXT|ToA|TlA|CLO|CLA|CLM|ESL|SCN| 1 |VOX| 0 |SQL|LED|KPL|INS|BKL|PWR|
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+04 | 1 | 1 |RSW|GPI|GPS|PRG|DSM|PWD|NWZ|ZNS|TXM|MHT|PCM|GCM| 1   1 | 1   1   1   1   1   1 |NSL|EDZ| Unused, set to 0xff        ...
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0c  ...                                                                                                                            |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+where:
+ RDS = Show radio disable; REN = Show radio enable; RMO = Show remote monitor; RCK = Show radio check; MDL = Show manual dial;
+ CED = Show contact edit; CAL = Show call alert; TXT = Show text message; ToA = Show tone or Alert; TlA = Show talkaround;
+ CLO = Show call-log outgoing, CLA = Show call-log answered; CLM = Show call-log missed; ESL = Show edit scan list;
+ SCN = Show scan menu; VOX = Show VOX settings; SQL = Show squelch settings; LED = Show LED indicator menu;
+ KPL = Show keypad lock; INS = Show intro screen; BKL = Show backlight; PWR = Show power settings; RSW = Show record switch;
+ GPI = Hide GPS information; GPS = Hide GPS settings; PRG = Hide radio program menu; DSM = Show Display mode settings;
+ PWD = Show password settings; NWZ = Show new zone menu; ZNS = Show zone settings; TXM = Show TX mode settings;
+ MHT = Show menu hang time; PCM = Show private-call match settings; GCM = Show group-call match settings;
+ NSL = Show new scan list menu; EDZ = Show edit zone menu;

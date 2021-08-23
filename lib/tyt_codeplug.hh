@@ -28,7 +28,7 @@ class TyTCodeplug : public CodePlug
 public:
   /** Represents a single channel (analog or digital) within the TyT codeplug.
    *
-   * Memmory layout of encoded channel:
+   * Memory layout of encoded channel:
    * @verbinclude tytchannel.txt */
   class ChannelElement: public CodePlug::Element
   {
@@ -337,7 +337,7 @@ public:
 
   /** Represents a digital (DMR) contact within the codeplug.
    *
-   * Memmory layout of encoded contact:
+   * Memory layout of encoded contact:
    * @verbinclude tytcontact.txt */
   class ContactElement: public CodePlug::Element
   {
@@ -384,7 +384,7 @@ public:
    * Please note that a zone consists of two elements the @c ZoneElement and the @c ZoneExtElement.
    * The latter adds additional channels for VFO A and the channels for VFO B.
    *
-   * Memmory layout of encoded zone:
+   * Memory layout of encoded zone:
    * @verbinclude tytzone.txt */
   class ZoneElement: public CodePlug::Element
   {
@@ -423,7 +423,7 @@ public:
    * The zone definition @c ZoneElement contains only a single set of 16 channels. For each zone
    * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each.
    *
-   * Memmory layout of encoded zone extension:
+   * Memory layout of encoded zone extension:
    * @verbinclude tytzoneext.txt */
   class ZoneExtElement: public CodePlug::Element
   {
@@ -457,7 +457,7 @@ public:
 
   /** Representation of an RX group list within the codeplug.
    *
-   * Memmory layout of encoded RX group list:
+   * Memory layout of encoded RX group list:
    * @verbinclude tytgrouplist.txt */
   class GroupListElement: public CodePlug::Element
   {
@@ -494,7 +494,7 @@ public:
 
   /** Represents a scan list within the codeplug.
    *
-   * Memmory layout of encoded scan list:
+   * Memory layout of encoded scan list:
    * @verbinclude tytscanlist.txt */
   class ScanListElement: public CodePlug::Element
   {
@@ -556,9 +556,9 @@ public:
 
   /** Codeplug representation of the general settings.
    *
-   * Memmory layout of encoded settings:
+   * Memory layout of encoded settings:
    * @verbinclude tytsettings.txt */
-  class GeneralSettingsElement: CodePlug::Element
+  class GeneralSettingsElement: public CodePlug::Element
   {
   public:
     /** Defines all possible transmit modes. */
@@ -813,7 +813,7 @@ public:
    *
    * Memory layout of encoded boot settings:
    * @verbinclude tytbootsettings.txt */
-  class BootSettingsElement: CodePlug::Element
+  class BootSettingsElement: public CodePlug::Element
   {
   protected:
     /** Hidden constructor. */
@@ -843,7 +843,7 @@ public:
 
   /** Codeplug representation of programming time-stamp and CPS version.
    *
-   * Memmory layout of encoded timestamp:
+   * Memory layout of encoded timestamp:
    * @verbinclude tyttimestamp.txt */
   class TimestampElement: public CodePlug::Element
   {
@@ -870,7 +870,7 @@ public:
 
   /** Represents a single GPS system within the codeplug.
    *
-   * Memmory layout of encoded GPS system:
+   * Memory layout of encoded GPS system:
    * @verbinclude tytgpssystem.txt */
   class GPSSystemElement: public CodePlug::Element
   {
@@ -922,6 +922,183 @@ public:
     virtual bool linkGPSSystemObj(GPSSystem *sys, const CodeplugContext &ctx);
   };
 
+  /** Represents all menu settings within the codeplug on the radio.
+   *
+   * Memory representaion of the menu settings:
+   * @verbinclude tytmenusettings.txt */
+  class MenuSettingsElement: public CodePlug::Element
+  {
+  protected:
+    /** Hidden constructor. */
+    MenuSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit MenuSettingsElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~MenuSettingsElement();
+
+    void clear();
+
+    /** Returns @c true if the menu hang time is infinite. */
+    virtual bool menuHangtimeIsInfinite() const;
+    /** Returns the menu hang time in seconds. */
+    virtual uint menuHangtime() const;
+    /** Sets the menu hang time in seconds. */
+    virtual void menuHangtime(uint sec);
+    /** Sets the menu hang time to be infinite. */
+    virtual void infiniteMenuHangtime();
+
+    /** Returns @c true if text message menu is enabled. */
+    virtual bool textMessage() const;
+    /** Enables/disables text message menu. */
+    virtual void textMessage(bool enable);
+    /** Returns @c true if call alert menu is enabled. */
+    virtual bool callAlert() const;
+    /** Enables/disables call alert menu. */
+    virtual void callAlert(bool enable);
+    /** Returns @c true if contact editing is enabled. */
+    virtual bool contactEditing() const;
+    /** Enables/disables contact editing. */
+    virtual void contactEditing(bool enable);
+    /** Returns @c true if manual dial is enabled. */
+    virtual bool manualDial() const;
+    /** Enables/disables manual dial. */
+    virtual void manualDial(bool enable);
+    /** Returns @c true if contact radio-check menu is enabled. */
+    virtual bool contactRadioCheck() const;
+    /** Enables/disables contact radio-check menu. */
+    virtual void contactRadioCheck(bool enable);
+    /** Returns @c true if remote monitor menu is enabled. */
+    virtual bool remoteMonitor() const;
+    /** Enables/disables remote monitor menu. */
+    virtual void remoteMonitor(bool enable);
+    /** Returns @c true if radio enable menu is enabled. */
+    virtual bool radioEnable() const;
+    /** Enables/disables radio enable menu. */
+    virtual void radioEnable(bool enable);
+    /** Returns @c true if radio disable menu is enabled. */
+    virtual bool radioDisable() const;
+    /** Enables/disables radio disable menu. */
+    virtual void radioDisable(bool enable);
+
+    /** Returns @c true if scan menu is enabled. */
+    virtual bool scan() const;
+    /** Enables/disables scan menu. */
+    virtual void scan(bool enable);
+    /** Returns @c true if edit scan-list menu is enabled. */
+    virtual bool editScanlist() const;
+    /** Enables/disables edit scan-list menu. */
+    virtual void editScanlist(bool enable);
+    /** Returns @c true if call-log missed menu is enabled. */
+    virtual bool callLogMissed() const;
+    /** Enables/disables call-log missed menu. */
+    virtual void callLogMissed(bool enable);
+    /** Returns @c true if call-log answered menu is enabled. */
+    virtual bool callLogAnswered() const;
+    /** Enables/disables call-log answered menu. */
+    virtual void callLogAnswered(bool enable);
+    /** Returns @c true if call-log outgoing menu is enabled. */
+    virtual bool callLogOutgoing() const;
+    /** Enables/disables call-log outgoing menu. */
+    virtual void callLogOutgoing(bool enable);
+    /** Returns @c true if talkaround menu is enabled. */
+    virtual bool talkaround() const;
+    /** Enables/disables talkaround menu. */
+    virtual void talkaround(bool enable);
+    /** Returns @c true if tone/alert menu is enabled. */
+    virtual bool toneAlert() const;
+    /** Enables/disables tone/alert  menu. */
+    virtual void toneAlert(bool enable);
+
+    /** Returns @c true if power menu is enabled. */
+    virtual bool power() const;
+    /** Enables/disables power menu. */
+    virtual void power(bool enable);
+    /** Returns @c true if backlight menu is enabled. */
+    virtual bool backlight() const;
+    /** Enables/disables backlight menu. */
+    virtual void backlight(bool enable);
+    /** Returns @c true if intro screen menu is enabled. */
+    virtual bool introScreen() const;
+    /** Enables/disables intro screen menu. */
+    virtual void introScreen(bool enable);
+    /** Returns @c true if keypad lock menu is enabled. */
+    virtual bool keypadLock() const;
+    /** Enables/disables keypad lock menu. */
+    virtual void keypadLock(bool enable);
+    /** Returns @c true if LED indicator menu is enabled. */
+    virtual bool ledIndicator() const;
+    /** Enables/disables LED indicator menu. */
+    virtual void ledIndicator(bool enable);
+    /** Returns @c true if squelch menu is enabled. */
+    virtual bool squelch() const;
+    /** Enables/disables squelch menu. */
+    virtual void squelch(bool enable);
+    /** Returns @c true if VOX menu is enabled. */
+    virtual bool vox() const;
+    /** Enables/disables VOX menu. */
+    virtual void vox(bool enable);
+
+    /** Returns @c true if password menu is enabled. */
+    virtual bool password() const;
+    /** Enables/disables password menu. */
+    virtual void password(bool enable);
+    /** Returns @c true if display mode menu is enabled. */
+    virtual bool displayMode() const;
+    /** Enables/disables display mode menu. */
+    virtual void displayMode(bool enable);
+    /** Returns @c true if program radio menu is enabled. */
+    virtual bool programRadio() const;
+    /** Enables/disables program radio menu. */
+    virtual void programRadio(bool enable);
+    /** Returns @c true if GPS settings menu is enabled. */
+    virtual bool gpsSettings() const;
+    /** Enables/disables GPS settings menu. */
+    virtual void gpsSettings(bool enable);
+    /** Returns @c true if GPS information is enabled. */
+    virtual bool gpsInformation() const;
+    /** Enables/disables GPS information menu. */
+    virtual void gpsInformation(bool enable);
+    /** Returns @c true if recording menu is enabled. */
+    virtual bool recording() const;
+    /** Enables/disables recording menu. */
+    virtual void recording(bool enable);
+
+    /** Returns @c true if group call match menu is enabled. */
+    virtual bool groupCallMatch() const;
+    /** Enables/disables group call match menu. */
+    virtual void groupCallMatch(bool enable);
+    /** Returns @c true if private call match menu is enabled. */
+    virtual bool privateCallMatch() const;
+    /** Enables/disables private call match menu. */
+    virtual void privateCallMatch(bool enable);
+    /** Returns @c true if menu hang time item is enabled. */
+    virtual bool menuHangtimeItem() const;
+    /** Enables/disables menu hang time item. */
+    virtual void menuHangtimeItem(bool enable);
+    /** Returns @c true if TX mode menu is enabled. */
+    virtual bool txMode() const;
+    /** Enables/disables TX mode menu. */
+    virtual void txMode(bool enable);
+    /** Returns @c true if zone settings menu is enabled. */
+    virtual bool zoneSettings() const;
+    /** Enables/disables zone settings menu. */
+    virtual void zoneSettings(bool enable);
+    /** Returns @c true if new zone menu is enabled. */
+    virtual bool newZone() const;
+    /** Enables/disables new zone menu. */
+    virtual void newZone(bool enable);
+
+    /** Returns @c true if edit zone menu is enabled. */
+    virtual bool editZone() const;
+    /** Enables/disables edit zone menu. */
+    virtual void editZone(bool enable);
+    /** Returns @c true if new scan list menu is enabled. */
+    virtual bool newScanList() const;
+    /** Enables/disables new scan list menu. */
+    virtual void newScanList(bool enable);
+  };
 
 protected:
   /** Empty constructor. */

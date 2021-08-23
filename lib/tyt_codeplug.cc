@@ -2008,6 +2008,423 @@ TyTCodeplug::GPSSystemElement::linkGPSSystemObj(GPSSystem *sys, const CodeplugCo
 
 
 /* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::MenuSettingsElement
+ * ******************************************************************************************** */
+TyTCodeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x10)
+{
+  // pass...
+}
+
+TyTCodeplug::MenuSettingsElement::~MenuSettingsElement() {
+  // pass...
+}
+
+void
+TyTCodeplug::MenuSettingsElement::clear() {
+  menuHangtime(0);
+
+  textMessage(true);
+  callAlert(true);
+  contactEditing(true);
+  manualDial(true);
+  contactRadioCheck(false);
+  remoteMonitor(false);
+  radioEnable(false);
+  radioDisable(false);
+
+  setBit(0x02, 0, false);
+  scan(true);
+  editScanlist(true);
+  callLogMissed(true);
+  callLogAnswered(true);
+  callLogOutgoing(true);
+  talkaround(false);
+  toneAlert(true);
+
+  power(true);
+  backlight(true);
+  introScreen(true);
+  keypadLock(true);
+  ledIndicator(true);
+  squelch(true);
+  setBit(0x03, 6, false);
+  vox(true);
+
+  password(false);
+  displayMode(true);
+  programRadio(true);
+  gpsSettings(true);
+  gpsInformation(true);
+  recording(true);
+  setBit(0x04, 6, true);
+  setBit(0x04, 7, true);
+
+  setBit(0x05, 0, true);
+  setBit(0x05, 1, true);
+  groupCallMatch(true);
+  privateCallMatch(true);
+  menuHangtimeItem(true);
+  txMode(true);
+  zoneSettings(true);
+  newZone(true);
+
+  editZone(true);
+  newScanList(true);
+  setUInt6(6, 2, 0b111111);
+
+  memset(_data+0x07, 0xff, 9);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::menuHangtimeIsInfinite() const {
+  return 0 == menuHangtime();
+}
+uint
+TyTCodeplug::MenuSettingsElement::menuHangtime() const {
+  return getUInt8(0x00);
+}
+void
+TyTCodeplug::MenuSettingsElement::menuHangtime(uint sec) {
+  setUInt8(0x00, sec);
+}
+void
+TyTCodeplug::MenuSettingsElement::infiniteMenuHangtime() {
+  setUInt8(0x00, 0x00);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::textMessage() const {
+  return getBit(0x01, 0);
+}
+void
+TyTCodeplug::MenuSettingsElement::textMessage(bool enable) {
+  setBit(0x01, 0, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::callAlert() const {
+  return getBit(0x01, 1);
+}
+void
+TyTCodeplug::MenuSettingsElement::callAlert(bool enable) {
+  setBit(0x01, 1, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::contactEditing() const {
+  return getBit(0x01, 2);
+}
+void
+TyTCodeplug::MenuSettingsElement::contactEditing(bool enable) {
+  setBit(0x01, 2, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::manualDial() const {
+  return getBit(0x01, 3);
+}
+void
+TyTCodeplug::MenuSettingsElement::manualDial(bool enable) {
+  setBit(0x01, 3, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::contactRadioCheck() const {
+  return getBit(0x01, 4);
+}
+void
+TyTCodeplug::MenuSettingsElement::contactRadioCheck(bool enable) {
+  setBit(0x01, 4, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::remoteMonitor() const {
+  return getBit(0x01, 5);
+}
+void
+TyTCodeplug::MenuSettingsElement::remoteMonitor(bool enable) {
+  setBit(0x01, 5, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::radioEnable() const {
+  return getBit(0x01, 6);
+}
+void
+TyTCodeplug::MenuSettingsElement::radioEnable(bool enable) {
+  setBit(0x01, 6, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::radioDisable() const {
+  return getBit(0x01, 7);
+}
+void
+TyTCodeplug::MenuSettingsElement::radioDisable(bool enable) {
+  setBit(0x01, 7, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::scan() const {
+  return getBit(0x02, 1);
+}
+void
+TyTCodeplug::MenuSettingsElement::scan(bool enable) {
+  setBit(0x02, 1, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::editScanlist() const {
+  return getBit(0x02, 2);
+}
+void
+TyTCodeplug::MenuSettingsElement::editScanlist(bool enable) {
+  setBit(0x02, 2, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::callLogMissed() const {
+  return getBit(0x02, 3);
+}
+void
+TyTCodeplug::MenuSettingsElement::callLogMissed(bool enable) {
+  setBit(0x02, 3, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::callLogAnswered() const {
+  return getBit(0x02, 4);
+}
+void
+TyTCodeplug::MenuSettingsElement::callLogAnswered(bool enable) {
+  setBit(0x02, 4, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::callLogOutgoing() const {
+  return getBit(0x02, 5);
+}
+void
+TyTCodeplug::MenuSettingsElement::callLogOutgoing(bool enable) {
+  setBit(0x02, 5, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::talkaround() const {
+  return getBit(0x02, 6);
+}
+void
+TyTCodeplug::MenuSettingsElement::talkaround(bool enable) {
+  setBit(0x02, 6, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::toneAlert() const {
+  return getBit(0x02, 7);
+}
+void
+TyTCodeplug::MenuSettingsElement::toneAlert(bool enable) {
+  setBit(0x02, 7, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::power() const {
+  return getBit(0x03, 0);
+}
+void
+TyTCodeplug::MenuSettingsElement::power(bool enable) {
+  setBit(0x03, 0, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::backlight() const {
+  return getBit(0x03, 1);
+}
+void
+TyTCodeplug::MenuSettingsElement::backlight(bool enable) {
+  setBit(0x03, 1, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::introScreen() const {
+  return getBit(0x03, 2);
+}
+void
+TyTCodeplug::MenuSettingsElement::introScreen(bool enable) {
+  setBit(0x03, 2, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::keypadLock() const {
+  return getBit(0x03, 3);
+}
+void
+TyTCodeplug::MenuSettingsElement::keypadLock(bool enable) {
+  setBit(0x03, 3, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::ledIndicator() const {
+  return getBit(0x03, 4);
+}
+void
+TyTCodeplug::MenuSettingsElement::ledIndicator(bool enable) {
+  setBit(0x03, 4, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::squelch() const {
+  return getBit(0x03, 5);
+}
+void
+TyTCodeplug::MenuSettingsElement::squelch(bool enable) {
+  setBit(0x03, 5, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::vox() const {
+  return getBit(0x03, 7);
+}
+void
+TyTCodeplug::MenuSettingsElement::vox(bool enable) {
+  setBit(0x03, 7, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::password() const {
+  return getBit(0x04, 0);
+}
+void
+TyTCodeplug::MenuSettingsElement::password(bool enable) {
+  setBit(0x04, 0, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::displayMode() const {
+  return getBit(0x04, 1);
+}
+void
+TyTCodeplug::MenuSettingsElement::displayMode(bool enable) {
+  setBit(0x04, 1, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::programRadio() const {
+  return ! getBit(0x04, 2);
+}
+void
+TyTCodeplug::MenuSettingsElement::programRadio(bool enable) {
+  setBit(0x04, 2, !enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::gpsSettings() const {
+  return !getBit(0x04, 3);
+}
+void
+TyTCodeplug::MenuSettingsElement::gpsSettings(bool enable) {
+  setBit(0x04, 3, !enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::gpsInformation() const {
+  return !getBit(0x04, 4);
+}
+void
+TyTCodeplug::MenuSettingsElement::gpsInformation(bool enable) {
+  setBit(0x04, 4, !enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::recording() const {
+  return getBit(0x04, 5);
+}
+void
+TyTCodeplug::MenuSettingsElement::recording(bool enable) {
+  setBit(0x04, 5, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::groupCallMatch() const {
+  return getBit(0x05, 2);
+}
+void
+TyTCodeplug::MenuSettingsElement::groupCallMatch(bool enable) {
+  setBit(0x05, 2, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::privateCallMatch() const {
+  return getBit(0x05, 3);
+}
+void
+TyTCodeplug::MenuSettingsElement::privateCallMatch(bool enable) {
+  setBit(0x05, 3, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::menuHangtimeItem() const {
+  return getBit(0x05, 4);
+}
+void
+TyTCodeplug::MenuSettingsElement::menuHangtimeItem(bool enable) {
+  setBit(0x05, 4, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::txMode() const {
+  return getBit(0x05, 5);
+}
+void
+TyTCodeplug::MenuSettingsElement::txMode(bool enable) {
+  setBit(0x05, 5, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::zoneSettings() const {
+  return getBit(0x05, 6);
+}
+void
+TyTCodeplug::MenuSettingsElement::zoneSettings(bool enable) {
+  setBit(0x05, 6, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::newZone() const {
+  return getBit(0x05, 7);
+}
+void
+TyTCodeplug::MenuSettingsElement::newZone(bool enable) {
+  setBit(0x05, 7, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::editZone() const {
+  return getBit(0x06, 0);
+}
+void
+TyTCodeplug::MenuSettingsElement::editZone(bool enable) {
+  setBit(0x06, 0, enable);
+}
+
+bool
+TyTCodeplug::MenuSettingsElement::newScanList() const {
+  return getBit(0x06, 1);
+}
+void
+TyTCodeplug::MenuSettingsElement::newScanList(bool enable) {
+  setBit(0x06, 1, enable);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of TyTCodeplug
  * ******************************************************************************************** */
 TyTCodeplug::TyTCodeplug(QObject *parent)
