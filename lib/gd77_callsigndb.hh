@@ -48,7 +48,7 @@ class GD77CallsignDB : public CallsignDB
     userdb_t();
     void clear();
 
-    void setSize(uint n);
+    void setSize(uint32_t n);
   };
 
 

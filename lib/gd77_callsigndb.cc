@@ -63,8 +63,8 @@ GD77CallsignDB::userdb_t::clear() {
 }
 
 void
-GD77CallsignDB::userdb_t::setSize(uint n) {
-  count = qToLittleEndian(std::min(n, uint(USERDB_MAX_ENTRIES)));
+GD77CallsignDB::userdb_t::setSize(uint32_t n) {
+  count = qToLittleEndian(std::min(n, uint32_t(USERDB_MAX_ENTRIES)));
 }
 
 
