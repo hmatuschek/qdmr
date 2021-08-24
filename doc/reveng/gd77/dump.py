@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 
+from json import dump
 from re import S
 import pyshark
 import struct
@@ -61,8 +62,11 @@ class RawPayload:
   def __init__(self, payload):
     self._payload = payload
 
-  def dump(self, prefix=""):
-    return hexDump(self._payload, prefix)
+  def __len__(self):
+    return len(self._payload)
+
+  def dump(self, prefix="", addr=0):
+    return hexDump(self._payload, prefix, addr)
   
 
 class Package:
@@ -77,6 +81,12 @@ class Package:
       self._payload = ACK(payload)
     else:
       self._payload = RawPayload(payload)
+
+  def type(self):
+    return self._type
+
+  def payload(self):
+    return self._payload
 
   def dump(self, prefix=""):
     s = ""
@@ -108,6 +118,11 @@ class WriteOperation:
     if 4 < len(payload):
       self._payload = RawPayload(payload[4:])
 
+  def payload(self):
+    return self._payload
+  def addr(self):
+    return self._addr
+
   def dump(self, prefix=""):
     s = prefix + "Write addr=0x{0:04X}, len=0x{1:02X}".format(self._addr, self._length)
     if None != self._payload:
@@ -122,18 +137,42 @@ class ACK:
   def dump(self, prefix=""):
     return prefix+"ACK"
 
+if 2 == len(sys.argv):
+  cap = pyshark.FileCapture(sys.argv[1], include_raw=True, use_json=True)
+  for p in cap:
+    if isRequest(p) and len(getData(p))>=4:
+      P = Package(getData(p))
+      print(P.dump(" > "))
+      print("")
+    elif isResponse(p) and len(getData(p))>=4:
+      P = Package(getData(p))
+      print(P.dump(" < "))
+      print("")
+    elif isRequest(p): 
+      print(hexDump(getData(p), " > "))
+    elif isResponse(p):
+      print(hexDump(getData(p), " < "))
 
-cap = pyshark.FileCapture(sys.argv[1], include_raw=True, use_json=True)
-for p in cap:
-  if isRequest(p) and len(getData(p))>=4:
-    P = Package(getData(p))
-    print(P.dump(" > "))
-    print("")
-  elif isResponse(p) and len(getData(p))>=4:
-    P = Package(getData(p))
-    print(P.dump(" < "))
-    print("")
-  elif isRequest(p): 
-    print(hexDump(getData(p), " > "))
-  elif isResponse(p):
-    print(hexDump(getData(p), " < "))
+elif (3 == len(sys.argv)) and ("write" == sys.argv[1]):
+  print("Dump written memory from file {0}:".format(sys.argv[2]))
+  cap = pyshark.FileCapture(sys.argv[2], include_raw=True, use_json=True)
+  addr = 0
+  for p in cap:
+    if isRequest(p) and len(getData(p))>=4:
+      P = Package(getData(p))
+      if isinstance(P.payload(), WriteOperation):
+        W = P.payload()
+        if (addr != W.addr()):
+          print("")
+          print ("-"*80)
+          print("")
+          addr = W.addr()
+        print(W.payload().dump(" ", addr))
+        addr += len(W.payload())
+      else:
+        print("")
+        print(P.dump(" > "))
+        print("")
+
+else:
+  print("oops")
