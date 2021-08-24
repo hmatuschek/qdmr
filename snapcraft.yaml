@@ -1,9 +1,9 @@
 name: qdmr
 
-version: git
-grade: devel
-#version: 0.8.1
-#grade: stable
+#version: git
+#grade: devel
+version: 0.8.1
+grade: stable
 
 summary: Graphical code-plug programming tool for DMR radios.
 description: |
@@ -13,7 +13,7 @@ description: |
    * TYT MD-UV390
    * Retevis RT3S
    * Open GD77 firmware (GD77, RD-5R & DM-1801)
-   * AnyTone AT-D878UV, AT-D868UVE
+   * AnyTone AT-D868UVE, AT-D878UV AT-D878UVII, AT-D578UV
    * Radioddity GD77
 
 confinement: strict
@@ -69,7 +69,7 @@ parts:
       - libusb-1.0-0
     source: https://github.com/hmatuschek/qdmr.git
     source-type: git
-    #source-tag: "v$SNAPCRAFT_PROJECT_VERSION"
+    source-tag: "v$SNAPCRAFT_PROJECT_VERSION"
     configflags:
       - "-DCMAKE_INSTALL_PREFIX=/usr"
       - "-DCMAKE_BUILD_TYPE=Release"
