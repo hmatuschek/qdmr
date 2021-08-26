@@ -74,9 +74,9 @@ UV390CallsignDB::callsign_db_t::callsign_t::fromUser(const UserDatabase::User &u
   setCall(user.call);
   QString name = user.name;
   if (! user.surname.isEmpty())
-    name += " " + user.surname;
+    name.append(" " + user.surname);
   if (! user.country.isEmpty())
-    name += ", " + user.country;
+    name.append(", " + user.country);
   setName(name);
 }
 
@@ -97,11 +97,11 @@ UV390CallsignDB::callsign_db_t::setN(uint N) {
 }
 
 void
-UV390CallsignDB::callsign_db_t::fromUserDB(const UserDatabase *db) {
+UV390CallsignDB::callsign_db_t::fromUserDB(const UserDatabase *db, uint N) {
   // Clear database and index
   clear();
   // Limit users to MAX_CALLSIGNS entries
-  uint N = std::min(qint64(MAX_CALLSIGNS), db->count());
+  N = std::min(uint(MAX_CALLSIGNS), N);
   setN(N);
 
   // If there are no entries -> done.
@@ -156,7 +156,7 @@ UV390CallsignDB::encode(UserDatabase *db, const Selection &selection) {
   memset(data(CALLSIGN_START), 0xff, size);
 
   // Encode call-sign DB
-  ((callsign_db_t *)data(CALLSIGN_START))->fromUserDB(db);
+  ((callsign_db_t *)data(CALLSIGN_START))->fromUserDB(db,n);
 
   return true;
 }

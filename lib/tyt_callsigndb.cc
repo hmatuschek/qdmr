@@ -14,7 +14,125 @@
 #define CALLSIGN_ENTRY_SIZE      0x00000078  // Size of a call-sign entry
 
 
+/* ********************************************************************************************* *
+ * Implementation of TyTCallsignDB::IndexElement
+ * ********************************************************************************************* */
+TyTCallsignDB::IndexElement::IndexElement(uint8_t *ptr, size_t size)
+  : CodePlug::Element(ptr, size)
+{
+  // pass...
+}
 
+TyTCallsignDB::IndexElement::IndexElement(uint8_t *ptr)
+  : CodePlug::Element(ptr, 0x0003 + NUM_INDEX_ENTRIES*INDEX_ENTRY_SIZE)
+{
+  // pass...
+}
+
+TyTCallsignDB::IndexElement::~IndexElement() {
+  // pass...
+}
+
+void
+TyTCallsignDB::IndexElement::clear() {
+  setNumEntries(0);
+  for (int i=0; i<NUM_INDEX_ENTRIES; i++)
+    Entry(_data+0x03 + i*INDEX_ENTRY_SIZE).clear();
+}
+
+void
+TyTCallsignDB::IndexElement::setNumEntries(uint n) {
+  uint8_t *ptr = (_data + 0x0000);
+  ptr[0] = ((n>>16) & 0xff);
+  ptr[1] = ((n>> 8) & 0xff);
+  ptr[2] = ((n>> 0) & 0xff);
+}
+
+void
+TyTCallsignDB::IndexElement::setIndexEntry(uint n, uint id, uint index) {
+  Entry(_data+0x03 + n*INDEX_ENTRY_SIZE).set(id, index);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of TyTCallsignDB::IndexElement::Entry
+ * ********************************************************************************************* */
+TyTCallsignDB::IndexElement::Entry::Entry(uint8_t *ptr, size_t size)
+  : CodePlug::Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCallsignDB::IndexElement::Entry::Entry(uint8_t *ptr)
+  : CodePlug::Element(ptr, INDEX_ENTRY_SIZE)
+{
+  // pass...
+}
+
+TyTCallsignDB::IndexElement::Entry::~Entry() {
+  // pass...
+}
+
+void
+TyTCallsignDB::IndexElement::Entry::clear() {
+  memset(_data, 0xff, INDEX_ENTRY_SIZE);
+}
+
+void
+TyTCallsignDB::IndexElement::Entry::set(uint id, uint index) {
+  _data[0] = id>>16;
+  _data[1] = ((id>>8)&0xf0) | ((index>>16) & 0xf);
+  _data[2] = index>>8;
+  _data[3] = index;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of TyTCallsignDB::EntryElement
+ * ********************************************************************************************* */
+TyTCallsignDB::EntryElement::EntryElement(uint8_t *ptr, size_t size)
+  : CodePlug::Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCallsignDB::EntryElement::EntryElement(uint8_t *ptr)
+  : CodePlug::Element(ptr, CALLSIGN_ENTRY_SIZE)
+{
+  // pass...
+}
+
+TyTCallsignDB::EntryElement::~EntryElement() {
+  // pass...
+}
+
+void
+TyTCallsignDB::EntryElement::clear() {
+  memset(_data, 0xff, CALLSIGN_ENTRY_SIZE);
+}
+
+void
+TyTCallsignDB::EntryElement::set(const UserDatabase::User &user) {
+  // Set id
+  *((uint32_t *)(_data + 0x0000)) = qToLittleEndian(user.id);
+  _data[3] = 0xff;
+
+  // Set call
+  encode_ascii(_data + 0x0004, user.call, 16);
+
+  // Set name
+  QString name = user.name;
+  if (! user.surname.isEmpty())
+    name += " " + user.surname;
+  if (! user.country.isEmpty())
+    name += ", " + user.country;
+  encode_ascii(_data + 0x0014, name, 100);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of TyTCallsignDB
+ * ********************************************************************************************* */
 TyTCallsignDB::TyTCallsignDB(QObject *parent)
   : CallsignDB(parent)
 {
@@ -33,6 +151,8 @@ TyTCallsignDB::encode(UserDatabase *db, const Selection &selection) {
   if (selection.hasCountLimit())
     n = std::min(n, selection.countLimit());
   alloate(n);
+
+  // Clear DB index
   clearIndex();
 
   // Select n users and sort them in ascending order of their IDs
@@ -41,6 +161,9 @@ TyTCallsignDB::encode(UserDatabase *db, const Selection &selection) {
     users.append(db->user(i));
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
+
+  // Store number of entries
+  setNumEntries(n);
 
   // First index entry
   int  j = 0;
@@ -73,46 +196,21 @@ TyTCallsignDB::alloate(uint n) {
 
 void
 TyTCallsignDB::clearIndex() {
-  setNumEntries(0);
-  for (int i=0; i<NUM_INDEX_ENTRIES; i++)
-    clearIndexEntry(i);
+  IndexElement(data(ADDR_CALLSIGN_INDEX)).clear();
 }
 
 void
 TyTCallsignDB::setNumEntries(uint n) {
-  uint8_t *ptr = data(ADDR_CALLSIGN_INDEX);
-  ptr[0] = ((n>>16) & 0xff);
-  ptr[1] = ((n>> 8) & 0xff);
-  ptr[3] = ((n>> 0) & 0xff);
-}
-
-void
-TyTCallsignDB::clearIndexEntry(uint n) {
-  uint8_t *ptr = data(ADDR_CALLSIGN_INDEX + 0x0003 + n*INDEX_ENTRY_SIZE);
-  memset(ptr, 0xff, INDEX_ENTRY_SIZE);
+  IndexElement(data(ADDR_CALLSIGN_INDEX)).setNumEntries(n);
 }
 
 void
 TyTCallsignDB::setIndexEntry(uint n, uint id, uint index) {
-  uint8_t *ptr = data(ADDR_CALLSIGN_INDEX + 0x0003 + n*INDEX_ENTRY_SIZE);
-  ptr[0] = id>>16;
-  ptr[1] = ((id>>8)&0xf0) | ((index>>16) & 0xf);
-  ptr[2] = index>>8;
-  ptr[3] = index;
+  IndexElement(data(ADDR_CALLSIGN_INDEX)).setIndexEntry(n, id, index);
 }
 
 void
 TyTCallsignDB::setEntry(uint n, const UserDatabase::User &user) {
-  // Set id
-  uint8_t *ptr = data(ADDR_CALLSIGNS + n*CALLSIGN_ENTRY_SIZE);
-  *((uint32_t *)(ptr + 0x0000)) = qToLittleEndian(user.id);
-  // Set call
-  encode_ascii(ptr + 0x0004, user.call, 16);
-  // Set name
-  QString name = user.name;
-  if (! user.surname.isEmpty())
-    name += " " + user.surname;
-  if (! user.country.isEmpty())
-    name += ", " + user.country;
-  encode_ascii(ptr + 0x0004, name, 16);
+  // Get pointer to entry
+  EntryElement(data(ADDR_CALLSIGNS + n*CALLSIGN_ENTRY_SIZE)).set(user);
 }

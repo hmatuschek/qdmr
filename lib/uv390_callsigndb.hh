@@ -88,7 +88,7 @@ public:
     /** Stets the number of entries in the call-sign DB. */
     void setN(uint N);
     /// Fills the callsign database from the given user db.
-    void fromUserDB(const UserDatabase *db);
+    void fromUserDB(const UserDatabase *db, uint N);
   };
 
 public:

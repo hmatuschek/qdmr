@@ -1,6 +1,7 @@
 #ifndef TYTCALLSIGNDB_HH
 #define TYTCALLSIGNDB_HH
 
+#include "codeplug.hh"
 #include "callsigndb.hh"
 #include "userdatabase.hh"
 
@@ -20,6 +21,79 @@ class TyTCallsignDB : public CallsignDB
 {
   Q_OBJECT
 
+public:
+  /** Represents a search index over the complete call-sign database.
+   *
+   * Memmory layout of encoded call-sign/user database:
+   * @verbinclude tytcallsigndbindex.txt
+   */
+  class IndexElement: public CodePlug::Element
+  {
+  public:
+    /** Represents an index entry, a pair of DMR ID and call-sign DB index.
+     *
+     * Memmory layout of encoded call-sign/user database index entry:
+     * @verbinclude tytcallsigndbindexentry.txt
+     */
+    class Entry: public CodePlug::Element
+    {
+    protected:
+      /** Hidden constructor. */
+      Entry(uint8_t *ptr, size_t size);
+
+    public:
+      /** Constructor. */
+      explicit Entry(uint8_t *ptr);
+      /** Destructor. */
+      virtual ~Entry();
+
+      void clear();
+
+      /** Sets the index entry. */
+      virtual void set(uint id, uint index);
+    };
+
+  protected:
+    /** Hidden constructor. */
+    IndexElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit IndexElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~IndexElement();
+
+    void clear();
+
+    /** Sets the number of entries in the DB. */
+    virtual void setNumEntries(uint n);
+    /** Sets the given index entry. */
+    virtual void setIndexEntry(uint n, uint id, uint index);
+  };
+
+  /** Represents an entry within the call-sign database.
+   * The call-sign DB entries must be ordered by their DMR IDs.
+   *
+   * Memmory layout of encoded call-sign/user database index entry:
+   * @verbinclude tytcallsigndbentry.txt
+   */
+  class EntryElement: public CodePlug::Element
+  {
+  protected:
+    /** Hidden constructor. */
+    EntryElement(uint8_t *ptr, size_t size);
+  public:
+    /** Constructor. */
+    explicit EntryElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~EntryElement();
+
+    void clear();
+
+    /** Encodes the given user. */
+    virtual void set(const UserDatabase::User &user);
+  };
+
 protected:
   /** Hidden constructor. Use one of the device specific call-sign DB classes. */
   explicit TyTCallsignDB(QObject *parent=nullptr);
@@ -38,8 +112,6 @@ protected:
   virtual void clearIndex();
   /** Sets the number of entries in the DB. */
   virtual void setNumEntries(uint n);
-  /** Clears the given index entry. */
-  virtual void clearIndexEntry(uint n);
   /** Sets the given index entry. */
   virtual void setIndexEntry(uint n, uint id, uint index);
   /** Sets a given call-sign entry. */

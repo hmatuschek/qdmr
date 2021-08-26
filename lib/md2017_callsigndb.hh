@@ -15,8 +15,6 @@ public:
   explicit MD2017CallsignDB(QObject *parent=nullptr);
   /** Destructor. */
   virtual ~MD2017CallsignDB();
-
-  bool encode(UserDatabase *db, const Selection &selection);
 };
 
 #endif // DM2017_CALLSIGNDB_HH
