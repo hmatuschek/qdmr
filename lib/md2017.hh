@@ -1,10 +1,11 @@
-/** @defgroup uv390 TYT MD-UV390, Retevis RT3S
- * Device specific classes for TyT MD-UV390 and Retevis RT3S.
+/** @defgroup md2017 TYT MD-2017, Retevis RT82
+ * Device specific classes for TYT MD-2017 and Retevis RT82.
  *
- * \image html uv390.jpg "MD-UV390" width=200px
- * \image latex uv390.jpg "MD-UV390" width=200px
+ * \image html md2017.jpg "MD-2017" width=200px
+ * \image latex md2017.jpg "MD-2017" width=200px
  *
- * The TYT MD-UV390 and the identical Retevis RT3S are decent VHF/UHF FM and DMR handheld radios.
+ * <img src="sm2017.jpg" width="200px" align="left"/>
+ * The TYT MD-2017 and the identical Retevis RT-82 are decent VHF/UHF FM and DMR handheld radios.
  * Both radios are available with and without an GPS option. @c libdmrconf will support that
  * feature. Non-GPS variants of that radio will simply ignore any GPS system settings.
  *
@@ -18,20 +19,20 @@
  * (at the time of this writing, there are about 140k IDs assigned) to name and callsign.
  *
  * @ingroup tyt */
-#ifndef UV390_HH
-#define UV390_HH
+#ifndef MD2017_HH
+#define MD2017_HH
 
 #include "tyt_radio.hh"
-#include "uv390_codeplug.hh"
-#include "uv390_callsigndb.hh"
+#include "md2017_codeplug.hh"
+#include "md2017_callsigndb.hh"
 
-/** Implements an USB interface to the TYT MD-UV390 & Retevis RT3S VHF/UHF 5W DMR (Tier I&II) radios.
+/** Implements an USB interface to the TYT MD-2017 & Retevis RT82 VHF/UHF 5W DMR (Tier I&II) radios.
  *
- * The TYT MD-UV390 and Retevis RT3S radios use the TyT typical DFU-style communication protocol
+ * The TYT MD-2017 and Retevis RT82 radios use the TyT typical DFU-style communication protocol
  * to read and write codeplugs onto the radio (see @c TyTRadio).
  *
- * @ingroup uv390 */
-class UV390 : public TyTRadio
+ * @ingroup md2017 */
+class MD2017 : public TyTRadio
 {
   Q_OBJECT
 
@@ -39,9 +40,9 @@ public:
   /** Constructor.
    * @param device Specifies the DFU device to use for communication with the device.
    * @param parent The QObject parent. */
-  UV390(DFUDevice *device=nullptr, QObject *parent=nullptr);
+  MD2017(DFUDevice *device=nullptr, QObject *parent=nullptr);
   /** Desturctor. */
-  virtual ~UV390();
+  virtual ~MD2017();
 
   const QString &name() const;
   const Features &features() const;
@@ -56,9 +57,9 @@ private:
   /** Holds the name of the device. */
   QString _name;
   /** The codeplug object. */
-  UV390Codeplug _codeplug;
+  MD2017Codeplug _codeplug;
   /** The callsign DB object. */
-  UV390CallsignDB _callsigndb;
+  MD2017CallsignDB _callsigndb;
 };
 
 #endif // MD2017_HH

@@ -1,0 +1,38 @@
+     7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+00 |LWK| 1   1 |ASC| BandW | ChMod |   ColorCode   |TimeSlt|RXO|ALT|DCC|PCC| PRIV  |   PrivIdx     |DPD| 0 |EAA| 1   1   0 |RXFreqR|
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+04 |AdimtCr| 1 |VOX| 0   1 |TXFreqR|TOffFre|InCallC| 0   0   0   0 | TX Contact name index + 1, little endian                      |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+08 | 0   0 |      Tx Timeout       |    Tx Timeout Rekey Delay     | Emergency System index + 1    | Scan List index + 1           |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0c | RX Group List index + 1       | GPS System index +1           | DTMF decode bitmap            | Squelch [0..9]                |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+10 | RX Frequency, 8 digits BCD, little endian                                                                                     |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+14 | TX Frequency, 8 digits BCD, little endian                                                                                     |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+18 | RX CTCSS/DCS                                                  | TX CTCSS/DCS                                                  |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+1c | RX Signaling System index +1  | TX Signaling System index +1  | 1   1   1   1   1   1 | Power | 1   1   1 |LMS|DCD|ALI|RXG|TXG|
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+20 | Name 16 x 16bit unicode characters / Stepsize (byte 0x20)                                                                  ...
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+3c  ...                                                                                                                            |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+where:
+ LWK = Lone Worker, default=0; ASC = Auto scan, default=0; BandW = Bandwidth, 0=12.5kHz, 1=20kHz or 2=25kHz, default = 0;
+ ChMod = Channel Mode, 1=Analog or 2=Digital, default=1; ColorCode = ColorCode [0..15], default=1;
+ TimeSlt = Repeater/time-slot, 2=TS2, 1=TS1, default=1; RXO = RX Only, 0=off, 1=on, default=0;
+ ALT = Allow Talkaround (inverted), default=1 (off); DCC = Data Call Confirmed, default=0; PCC = Private Call Confirmed, default=0;
+ PRIV = Privacy type, 0=None, 1=Basic or 2=Enhanced, default=0 (basic); PrivIdx = Privacy Index (+1), [1,16], 0=none, default=0.
+ DPD = Display PTT ID (inverted), default = 1; EAA = Emergency Alarm Ack, default = 0;
+ RXFreqR = RX reference frequency, 0=Low, 1=Medium, 2=High, default=0 (low);
+ AdimtCr = Admit Criterion, 0=Always, 1=Channel Free or 2=Correct CTS/DCS, 3=Colorcode, default=0.
+ VOX = VOX Enable, 0=Disable, 1=Enable, default = 0; TXFreqR = TX reference frequency: 0=Low, 1=Medium, 2=High, default=0;
+ TOffFre = Non-QT/DQT Turn-off Freq., 3=none, 0=259.2Hz, 1=55.2Hz, default=3;
+ InCallC = In Call Criteria, 0=Always, 1=Follow Admit Criteria, 2=TX Interrupt, default=0;
+ Tx Timeout = Tx Timeout x 15sec, 0-Infinite, 1=15s, etc, 37=555s, default=0;
+ Power = Power, 0=low, 1=middle, 2=high, default=high; LMS = Leader/MS: Leader or MS, default=1;
+ DCD = DCDM switch (inverted), default=1; ALI = Allow interrupt (inverted), 0=allow, 1=Disabled, default=1;
+ RXG = Receive GSP info (inverted), default=1; TXG = Send GSP info (inverted), default=1;
