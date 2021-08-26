@@ -439,7 +439,7 @@ Radio::detect(QString &errorMessage, const QString &force) {
     if (anytone->isOpen()) {
       id = anytone->identifier();
       if (("D6X2UV" == id) || ("D868UV" == id) || ("D868UVE" == id) || ("D868UV" == force.toUpper())) {
-              return new D868UV(anytone);
+        return new D868UV(anytone);
       } else if (("D878UV" == id) || ("D878UV" == force.toUpper())) {
         return new D878UV(anytone);
       } else if (("D878UV2" == id) || ("D878UV2" == force.toUpper())) {
