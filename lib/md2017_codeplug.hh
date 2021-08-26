@@ -1,15 +1,15 @@
-#ifndef UV390_CODEPLUG_HH
-#define UV390_CODEPLUG_HH
+#ifndef MD2017_CODEPLUG_HH
+#define MD2017_CODEPLUG_HH
 
 #include "tyt_codeplug.hh"
 
-/** Device specific implementation of the codeplug for the TyT MD-UV390.
+/** Device specific implementation of the codeplug for the TyT MD-2017.
  *
  * The codeplug consists of two segments. The first segment starts at address @c 0x002800 and ends at
  * address @c 0x040800. The second segment starts at address @c 0x110800 and ends at @c 0x1a0800. The
  * segments must align with @c 0x400 (1024 bytes).
  *
- * @section uv390cpl Codeplug structure within radio
+ * @section md2017cpl Codeplug structure within radio
  * The codeplug structure is reverse engineered almost completely and can be programmed from
  * scratch. That is, it is not neccessary to update an existing codeplug on the radio.
  * <table>
@@ -45,16 +45,16 @@
  *  <tr><td>0x197e40</td> <td>0x1a0000</td> <td>0x081c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
  * </table>
  *
- * @ingroup uv930 */
-class UV390Codeplug : public TyTCodeplug
+ * @ingroup md2017 */
+class MD2017Codeplug : public TyTCodeplug
 {
   Q_OBJECT
 
 public:
   /** Constructor. */
-  explicit UV390Codeplug(QObject *parent = nullptr);
+  explicit MD2017Codeplug(QObject *parent = nullptr);
   /** Destructor. */
-  virtual ~UV390Codeplug();
+  virtual ~MD2017Codeplug();
 
 public:
   void clearTimestamp();
@@ -103,4 +103,4 @@ public:
 
 };
 
-#endif // MD2017CODEPLUG_HH
+#endif // MD2017_CODEPLUG_HH

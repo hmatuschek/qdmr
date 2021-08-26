@@ -1,7 +1,7 @@
-#include "uv390.hh"
+#include "md2017.hh"
 
 
-Radio::Features _uv390_features = {
+Radio::Features _md2017_features = {
   .betaWarning = true,
 
   .hasDigital = true,
@@ -53,42 +53,42 @@ Radio::Features _uv390_features = {
 
 
 
-UV390::UV390(DFUDevice *device, QObject *parent)
-  : TyTRadio(device, parent), _name("TyT MD-UV390")
+MD2017::MD2017(DFUDevice *device, QObject *parent)
+  : TyTRadio(device, parent), _name("TyT DM-2017")
 {
-  // pass...
+  //_codeplug(nullptr), _callsigndb(nullptr);
 }
 
-UV390::~UV390() {
+MD2017::~MD2017() {
   // pass...
 }
 
 const QString &
-UV390::name() const {
+MD2017::name() const {
   return _name;
 }
 
 const Radio::Features &
-UV390::features() const {
-  return _uv390_features;
+MD2017::features() const {
+  return _md2017_features;
 }
 
 const CodePlug &
-UV390::codeplug() const {
+MD2017::codeplug() const {
   return _codeplug;
 }
 
 CodePlug &
-UV390::codeplug() {
+MD2017::codeplug() {
   return _codeplug;
 }
 
 const CallsignDB *
-UV390::callsignDB() const {
+MD2017::callsignDB() const {
   return &_callsigndb;
 }
 
 CallsignDB *
-UV390::callsignDB() {
+MD2017::callsignDB() {
   return &_callsigndb;
 }

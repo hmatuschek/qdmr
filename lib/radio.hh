@@ -218,6 +218,11 @@ public:
   /** Returns the codeplug instance. */
   virtual CodePlug &codeplug() = 0;
 
+  /** Returns the call-sign DB instance. */
+  virtual const CallsignDB *callsignDB() const;
+  /** Returns the call-sign DB instance. */
+  virtual CallsignDB *callsignDB();
+
   /** Verifies the configuration against the radio features.
    * On exit, @c issues will contain the issues found and the maximum severity is returned. */
   virtual VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,

@@ -1,4 +1,4 @@
-#include "uv390_codeplug.hh"
+#include "md2017_codeplug.hh"
 #include "codeplugcontext.hh"
 #include "logger.hh"
 
@@ -49,10 +49,10 @@
 
 
 
-UV390Codeplug::UV390Codeplug(QObject *parent)
+MD2017Codeplug::MD2017Codeplug(QObject *parent)
   : TyTCodeplug(parent)
 {
-  addImage("TYT MD-UV390 Codeplug");
+  addImage("TYT MD-2017 Codeplug");
   image(0).addElement(0x002000, 0x3e000);
   image(0).addElement(0x110000, 0x90000);
 
@@ -60,46 +60,46 @@ UV390Codeplug::UV390Codeplug(QObject *parent)
   clear();
 }
 
-UV390Codeplug::~UV390Codeplug() {
+MD2017Codeplug::~MD2017Codeplug() {
   // pass...
 }
 
 void
-UV390Codeplug::clearTimestamp() {
+MD2017Codeplug::clearTimestamp() {
   TimestampElement(data(ADDR_TIMESTAMP)).clear();
 }
 
 bool
-UV390Codeplug::encodeTimestamp() {
+MD2017Codeplug::encodeTimestamp() {
   TimestampElement ts(data(ADDR_TIMESTAMP));
   ts.timestamp(QDateTime::currentDateTime());
   return true;
 }
 
 void
-UV390Codeplug::clearGeneralSettings() {
+MD2017Codeplug::clearGeneralSettings() {
   GeneralSettingsElement(data(ADDR_SETTINGS)).clear();
 }
 
 bool
-UV390Codeplug::encodeGeneralSettings(Config *config, const Flags &flags) {
+MD2017Codeplug::encodeGeneralSettings(Config *config, const Flags &flags) {
   return GeneralSettingsElement(data(ADDR_SETTINGS)).fromConfig(config);
 }
 
 bool
-UV390Codeplug::decodeGeneralSettings(Config *config) {
+MD2017Codeplug::decodeGeneralSettings(Config *config) {
   return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(config);
 }
 
 void
-UV390Codeplug::clearChannels() {
+MD2017Codeplug::clearChannels() {
   // Clear channels
   for (int i=0; i<NUM_CHANNELS; i++)
     ChannelElement(data(ADDR_CHANNELS+i*CHANNEL_SIZE)).clear();
 }
 
 bool
-UV390Codeplug::encodeChannels(Config *config, const Flags &flags) {
+MD2017Codeplug::encodeChannels(Config *config, const Flags &flags) {
   CodeplugContext ctx(config);
 
   // Define Channels
@@ -115,7 +115,7 @@ UV390Codeplug::encodeChannels(Config *config, const Flags &flags) {
 }
 
 bool
-UV390Codeplug::createChannels(CodeplugContext &ctx) {
+MD2017Codeplug::createChannels(CodeplugContext &ctx) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
@@ -132,7 +132,7 @@ UV390Codeplug::createChannels(CodeplugContext &ctx) {
 }
 
 bool
-UV390Codeplug::linkChannels(CodeplugContext &ctx) {
+MD2017Codeplug::linkChannels(CodeplugContext &ctx) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
@@ -147,14 +147,14 @@ UV390Codeplug::linkChannels(CodeplugContext &ctx) {
 }
 
 void
-UV390Codeplug::clearContacts() {
+MD2017Codeplug::clearContacts() {
   // Clear contacts
   for (int i=0; i<NUM_CONTACTS; i++)
     ContactElement(data(ADDR_CONTACTS+i*CONTACT_SIZE)).clear();
 }
 
 bool
-UV390Codeplug::encodeContacts(Config *config, const Flags &flags) {
+MD2017Codeplug::encodeContacts(Config *config, const Flags &flags) {
   // Encode contacts
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
@@ -167,7 +167,7 @@ UV390Codeplug::encodeContacts(Config *config, const Flags &flags) {
 }
 
 bool
-UV390Codeplug::createContacts(CodeplugContext &ctx) {
+MD2017Codeplug::createContacts(CodeplugContext &ctx) {
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
     if (! cont.isValid())
@@ -184,7 +184,7 @@ UV390Codeplug::createContacts(CodeplugContext &ctx) {
 }
 
 void
-UV390Codeplug::clearZones() {
+MD2017Codeplug::clearZones() {
   // Clear zones & zone extensions
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement(data(ADDR_ZONES+i*ZONE_SIZE)).clear();
@@ -193,7 +193,7 @@ UV390Codeplug::clearZones() {
 }
 
 bool
-UV390Codeplug::encodeZones(Config *config, const Flags &flags) {
+MD2017Codeplug::encodeZones(Config *config, const Flags &flags) {
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
     ZoneExtElement ext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
@@ -209,7 +209,7 @@ UV390Codeplug::encodeZones(Config *config, const Flags &flags) {
 }
 
 bool
-UV390Codeplug::createZones(CodeplugContext &ctx) {
+MD2017Codeplug::createZones(CodeplugContext &ctx) {
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
@@ -228,7 +228,7 @@ UV390Codeplug::createZones(CodeplugContext &ctx) {
 }
 
 bool
-UV390Codeplug::linkZones(CodeplugContext &ctx) {
+MD2017Codeplug::linkZones(CodeplugContext &ctx) {
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
@@ -251,13 +251,13 @@ UV390Codeplug::linkZones(CodeplugContext &ctx) {
 }
 
 void
-UV390Codeplug::clearGroupLists() {
+MD2017Codeplug::clearGroupLists() {
   for (int i=0; i<NUM_GROUPLISTS; i++)
     GroupListElement(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE)).clear();
 }
 
 bool
-UV390Codeplug::encodeGroupLists(Config *config, const Flags &flags) {
+MD2017Codeplug::encodeGroupLists(Config *config, const Flags &flags) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (i < config->rxGroupLists()->count())
@@ -269,7 +269,7 @@ UV390Codeplug::encodeGroupLists(Config *config, const Flags &flags) {
 }
 
 bool
-UV390Codeplug::createGroupLists(CodeplugContext &ctx) {
+MD2017Codeplug::createGroupLists(CodeplugContext &ctx) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
@@ -286,7 +286,7 @@ UV390Codeplug::createGroupLists(CodeplugContext &ctx) {
 }
 
 bool
-UV390Codeplug::linkGroupLists(CodeplugContext &ctx) {
+MD2017Codeplug::linkGroupLists(CodeplugContext &ctx) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
@@ -301,14 +301,14 @@ UV390Codeplug::linkGroupLists(CodeplugContext &ctx) {
 }
 
 void
-UV390Codeplug::clearScanLists() {
+MD2017Codeplug::clearScanLists() {
   // Clear scan lists
   for (int i=0; i<NUM_SCANLISTS; i++)
     ScanListElement(data(ADDR_SCANLISTS + i*SCANLIST_SIZE)).clear();
 }
 
 bool
-UV390Codeplug::encodeScanLists(Config *config, const Flags &flags) {
+MD2017Codeplug::encodeScanLists(Config *config, const Flags &flags) {
   // Define Scanlists
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
@@ -321,7 +321,7 @@ UV390Codeplug::encodeScanLists(Config *config, const Flags &flags) {
 }
 
 bool
-UV390Codeplug::createScanLists(CodeplugContext &ctx) {
+MD2017Codeplug::createScanLists(CodeplugContext &ctx) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
@@ -338,7 +338,7 @@ UV390Codeplug::createScanLists(CodeplugContext &ctx) {
 }
 
 bool
-UV390Codeplug::linkScanLists(CodeplugContext &ctx) {
+MD2017Codeplug::linkScanLists(CodeplugContext &ctx) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
@@ -355,14 +355,14 @@ UV390Codeplug::linkScanLists(CodeplugContext &ctx) {
 }
 
 void
-UV390Codeplug::clearPositioningSystems() {
+MD2017Codeplug::clearPositioningSystems() {
   // Clear GPS systems
   for (int i=0; i<NUM_GPSSYSTEMS; i++)
     GPSSystemElement(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE)).clear();
 }
 
 bool
-UV390Codeplug::encodePositioningSystems(Config *config, const Flags &flags) {
+MD2017Codeplug::encodePositioningSystems(Config *config, const Flags &flags) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (i < config->posSystems()->gpsCount())
@@ -374,7 +374,7 @@ UV390Codeplug::encodePositioningSystems(Config *config, const Flags &flags) {
 }
 
 bool
-UV390Codeplug::createPositioningSystems(CodeplugContext &ctx) {
+MD2017Codeplug::createPositioningSystems(CodeplugContext &ctx) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
@@ -392,7 +392,7 @@ UV390Codeplug::createPositioningSystems(CodeplugContext &ctx) {
 }
 
 bool
-UV390Codeplug::linkPositioningSystems(CodeplugContext &ctx) {
+MD2017Codeplug::linkPositioningSystems(CodeplugContext &ctx) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
@@ -408,40 +408,40 @@ UV390Codeplug::linkPositioningSystems(CodeplugContext &ctx) {
 }
 
 void
-UV390Codeplug::clearBootSettings() {
+MD2017Codeplug::clearBootSettings() {
   BootSettingsElement(data(ADDR_BOOTSETTINGS)).clear();
 }
 
 void
-UV390Codeplug::clearMenuSettings() {
+MD2017Codeplug::clearMenuSettings() {
   MenuSettingsElement(data(ADDR_MENUSETTINGS)).clear();
 }
 
 void
-UV390Codeplug::clearButtonSettings() {
+MD2017Codeplug::clearButtonSettings() {
   ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).clear();
 }
 
 void
-UV390Codeplug::clearTextMessages() {
+MD2017Codeplug::clearTextMessages() {
   memset(data(ADDR_TEXTMESSAGES), 0, NUM_TEXTMESSAGES*TEXTMESSAGE_SIZE);
 }
 
 void
-UV390Codeplug::clearPrivacyKeys() {
+MD2017Codeplug::clearPrivacyKeys() {
   EncryptionElement(data(ADDR_PRIVACY_KEYS)).clear();
 
 }
 
 void
-UV390Codeplug::clearEmergencySystems() {
+MD2017Codeplug::clearEmergencySystems() {
   EmergencySettingsElement(data(ADDR_EMERGENCY_SETTINGS)).clear();
   for (int i=0; i<NUM_EMERGENCY_SYSTEMS; i++)
     EmergencySystemElement(data(ADDR_EMERGENCY_SYSTEMS + i*EMERGENCY_SYSTEM_SIZE)).clear();
 }
 
 void
-UV390Codeplug::clearVFOSettings() {
+MD2017Codeplug::clearVFOSettings() {
   VFOChannelElement(data(ADDR_VFO_CHANNEL_A)).clear();
   VFOChannelElement(data(ADDR_VFO_CHANNEL_B)).clear();
 }

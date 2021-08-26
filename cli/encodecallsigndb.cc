@@ -7,6 +7,7 @@
 #include "logger.hh"
 #include "config.hh"
 #include "uv390_callsigndb.hh"
+#include "md2017_callsigndb.hh"
 #include "opengd77_callsigndb.hh"
 #include "gd77_callsigndb.hh"
 #include "d868uv_callsigndb.hh"
@@ -79,6 +80,14 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
 
   if (("uv390"==parser.value("radio").toLower()) || ("rt3s"==parser.value("radio").toLower())) {
     UV390CallsignDB db;
+    db.encode(&userdb, selection);
+    if (! db.write(parser.positionalArguments().at(1))) {
+      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
+                 << "': " << db.errorMessage();
+      return -1;
+    }
+  } else if (("md2017"==parser.value("radio").toLower()) || ("rt82"==parser.value("radio").toLower())) {
+    MD2017CallsignDB db;
     db.encode(&userdb, selection);
     if (! db.write(parser.positionalArguments().at(1))) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)

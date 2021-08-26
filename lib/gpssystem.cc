@@ -322,8 +322,8 @@ PositioningSystems::gpsCount() const {
 }
 
 int
-PositioningSystems::indexOfGPSSys(GPSSystem *gps) const {
-  if (! _posSystems.contains(gps))
+PositioningSystems::indexOfGPSSys(const GPSSystem *gps) const {
+  if (! _posSystems.contains((GPSSystem * const)gps))
     return -1;
 
   int idx=0;
