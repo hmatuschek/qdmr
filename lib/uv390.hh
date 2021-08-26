@@ -1,11 +1,10 @@
 /** @defgroup uv390 TYT MD-UV390, Retevis RT3S
- * Device specific classes for TYT MD-UV390 and Retevis RT3S.
+ * Device specific classes for TyT MD-UV390 and Retevis RT3S.
  *
  * \image html uv390.jpg "MD-UV390" width=200px
  * \image latex uv390.jpg "MD-UV390" width=200px
  *
- * <img src="uv390.jpg" width="200px" align="left"/>
- * The TYT MD-UV390 and the identical Retevis RT-3S are decent VHF/UHF FM and DMR handheld radios.
+ * The TYT MD-UV390 and the identical Retevis RT3S are decent VHF/UHF FM and DMR handheld radios.
  * Both radios are available with and without an GPS option. @c libdmrconf will support that
  * feature. Non-GPS variants of that radio will simply ignore any GPS system settings.
  *
@@ -22,69 +21,44 @@
 #ifndef UV390_HH
 #define UV390_HH
 
-#include "radio.hh"
-#include "dfu_libusb.hh"
+#include "tyt_radio.hh"
 #include "uv390_codeplug.hh"
 #include "uv390_callsigndb.hh"
 
 /** Implements an USB interface to the TYT MD-UV390 & Retevis RT3S VHF/UHF 5W DMR (Tier I&II) radios.
  *
- * The TYT MD-UV390 and Retevis RT3S radios use a DFU-style communication protocol to read and write
- * codeplugs onto the radio (see @c DFUDevice). This class implements the communication details
- * using DFU protocol.
+ * The TYT MD-UV390 and Retevis RT3S radios use the TyT typical DFU-style communication protocol
+ * to read and write codeplugs onto the radio (see @c TyTRadio).
  *
  * @ingroup uv390 */
-class UV390: public Radio
+class UV390 : public TyTRadio
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-  /** Do not construct this class directly, rather use @c Radio::detect. */
-  explicit UV390(DFUDevice *device=nullptr, QObject *parent=nullptr);
-
+  /** Constructor.
+   * @param device Specifies the DFU device to use for communication with the device.
+   * @param parent The QObject parent. */
+  UV390(DFUDevice *device=nullptr, QObject *parent=nullptr);
+  /** Desturctor. */
   virtual ~UV390();
 
   const QString &name() const;
-  const Radio::Features &features() const;
+  const Features &features() const;
+
   const CodePlug &codeplug() const;
   CodePlug &codeplug();
 
-public slots:
-  /** Starts the download of the codeplug and derives the generic configuration from it. */
-  bool startDownload(bool blocking=false);
-  /** Derives the device-specific codeplug from the generic configuration and uploads that
-   * codeplug to the radio. */
-  bool startUpload(Config *config, bool blocking=false,
-                   const CodePlug::Flags &flags = CodePlug::Flags());
-  /** Encodes the given user-database and uploades it to the device. */
-  bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
-                             const CallsignDB::Selection &selection=CallsignDB::Selection());
-
-protected:
-  /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
-	void run();
+  const CallsignDB *callsignDB() const;
+  CallsignDB *callsignDB();
 
 private:
-  bool connect();
-  bool download();
-  bool upload();
-  bool uploadCallsigns();
-
-protected:
-  /** The device identifier. */
-	QString _name;
-  /** The interface to the radio. */
-	DFUDevice *_dev;
-  /** Holds the flags to controll assembly and upload of code-plugs. */
-  CodePlug::Flags _codeplugFlags;
-  /** The generic configuration. */
-	Config *_config;
-  /** A weak reference to the user-database. */
-  UserDatabase *_userDB;
-  /** The actual binary codeplug representation. */
-	UV390Codeplug _codeplug;
-  /** The acutal binary callsign-db representation. */
-  UV390CallsignDB _callsigns;
+  /** Holds the name of the device. */
+  QString _name;
+  /** The codeplug object. */
+  UV390Codeplug _codeplug;
+  /** The callsign DB object. */
+  UV390CallsignDB _callsigndb;
 };
 
-#endif // UV390_HH
+#endif // MD2017_HH

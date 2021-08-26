@@ -2,42 +2,57 @@
 #include "codeplugcontext.hh"
 #include "logger.hh"
 
-#define NUM_CHANNELS           3000
-#define ADDR_CHANNELS      0x110000
-#define CHANNEL_SIZE       0x000040
+#define NUM_CHANNELS                3000
+#define ADDR_CHANNELS           0x110000
+#define CHANNEL_SIZE            0x000040
 
-#define NUM_CONTACTS          10000
-#define ADDR_CONTACTS      0x140000
-#define CONTACT_SIZE       0x000024
+#define NUM_CONTACTS               10000
+#define ADDR_CONTACTS           0x140000
+#define CONTACT_SIZE            0x000024
 
-#define NUM_ZONES               250
-#define ADDR_ZONES         0x0149e0
-#define ZONE_SIZE          0x000040
-#define ADDR_ZONEEXTS      0x031000
-#define ZONEEXT_SIZE       0x0000e0
+#define NUM_ZONES                    250
+#define ADDR_ZONES              0x0149e0
+#define ZONE_SIZE               0x000040
+#define ADDR_ZONEEXTS           0x031000
+#define ZONEEXT_SIZE            0x0000e0
 
-#define NUM_GROUPLISTS        250
-#define ADDR_GROUPLISTS    0x00ec20
-#define GROUPLIST_SIZE     0x000060
+#define NUM_GROUPLISTS               250
+#define ADDR_GROUPLISTS         0x00ec20
+#define GROUPLIST_SIZE          0x000060
 
-#define NUM_SCANLISTS           250
-#define ADDR_SCANLISTS     0x018860
-#define SCANLIST_SIZE      0x000068
+#define NUM_SCANLISTS                250
+#define ADDR_SCANLISTS          0x018860
+#define SCANLIST_SIZE           0x000068
 
-#define ADDR_TIMESTAMP     0x002000
-#define ADDR_SETTINGS      0x002040
-#define ADDR_BOOTSETTINGS  0x02f000
+#define ADDR_TIMESTAMP          0x002000
+#define ADDR_SETTINGS           0x002040
+#define ADDR_BOOTSETTINGS       0x02f000
+#define ADDR_MENUSETTINGS       0x0020f0
+#define ADDR_BUTTONSETTINGS     0x002100
+#define ADDR_PRIVACY_KEYS       0x0059c0
 
-#define NUM_GPSSYSTEMS           16
-#define ADDR_GPSSYSTEMS    0x03ec40
-#define GPSSYSTEM_SIZE     0x000010
+#define NUM_GPSSYSTEMS                16
+#define ADDR_GPSSYSTEMS         0x03ec40
+#define GPSSYSTEM_SIZE          0x000010
+
+#define NUM_TEXTMESSAGES              50
+#define ADDR_TEXTMESSAGES       0x002180
+#define TEXTMESSAGE_SIZE        0x000120
+
+#define ADDR_EMERGENCY_SETTINGS 0x005a50
+#define NUM_EMERGENCY_SYSTEMS         32
+#define ADDR_EMERGENCY_SYSTEMS  0x005a60
+#define EMERGENCY_SYSTEM_SIZE   0x000028
+
+#define ADDR_VFO_CHANNEL_A      0x02ef00
+#define ADDR_VFO_CHANNEL_B      0x02ef40
 
 
 
 MD2017Codeplug::MD2017Codeplug(QObject *parent)
   : TyTCodeplug(parent)
 {
-  addImage("TYT MD-UV390 Codeplug");
+  addImage("TYT MD-2017 Codeplug");
   image(0).addElement(0x002000, 0x3e000);
   image(0).addElement(0x110000, 0x90000);
 
@@ -395,4 +410,38 @@ MD2017Codeplug::linkPositioningSystems(CodeplugContext &ctx) {
 void
 MD2017Codeplug::clearBootSettings() {
   BootSettingsElement(data(ADDR_BOOTSETTINGS)).clear();
+}
+
+void
+MD2017Codeplug::clearMenuSettings() {
+  MenuSettingsElement(data(ADDR_MENUSETTINGS)).clear();
+}
+
+void
+MD2017Codeplug::clearButtonSettings() {
+  ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).clear();
+}
+
+void
+MD2017Codeplug::clearTextMessages() {
+  memset(data(ADDR_TEXTMESSAGES), 0, NUM_TEXTMESSAGES*TEXTMESSAGE_SIZE);
+}
+
+void
+MD2017Codeplug::clearPrivacyKeys() {
+  EncryptionElement(data(ADDR_PRIVACY_KEYS)).clear();
+
+}
+
+void
+MD2017Codeplug::clearEmergencySystems() {
+  EmergencySettingsElement(data(ADDR_EMERGENCY_SETTINGS)).clear();
+  for (int i=0; i<NUM_EMERGENCY_SYSTEMS; i++)
+    EmergencySystemElement(data(ADDR_EMERGENCY_SYSTEMS + i*EMERGENCY_SYSTEM_SIZE)).clear();
+}
+
+void
+MD2017Codeplug::clearVFOSettings() {
+  VFOChannelElement(data(ADDR_VFO_CHANNEL_A)).clear();
+  VFOChannelElement(data(ADDR_VFO_CHANNEL_B)).clear();
 }

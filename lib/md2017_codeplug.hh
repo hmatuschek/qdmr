@@ -94,6 +94,13 @@ public:
   bool linkPositioningSystems(CodeplugContext &ctx);
 
   void clearBootSettings();
+  void clearMenuSettings();
+  void clearButtonSettings();
+  void clearTextMessages();
+  void clearPrivacyKeys();
+  void clearEmergencySystems();
+  void clearVFOSettings();
+
 };
 
 #endif // MD2017CODEPLUG_HH
