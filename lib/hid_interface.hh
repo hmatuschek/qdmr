@@ -19,6 +19,16 @@ class HID: public HIDevice, public RadioInterface
 	Q_OBJECT
 
 public:
+  /** Possible memory banks to select. */
+  enum MemoryBank {
+    MEMBANK_NONE           = -1,    ///< No bank selected.
+    MEMBANK_CODEPLUG_LOWER =  0,    ///< Lower memory bank (EEPROM).
+    MEMBANK_CODEPLUG_UPPER =  1,    ///< Upper memory bank (FLASH).
+    MEMBANK_CALLSIGN_LOWER =  3,    ///< Callsign DB memory lower bank (also FLASH).
+    MEMBANK_CALLSIGN_UPPER =  4     ///< Callsign DB memory upper bank (also FLASH).
+  };
+
+public:
   /** Connects to the radio with given vendor and product ID. */
 	explicit HID(int vid, int pid, QObject *parent = nullptr);
   /** Destructor. */
@@ -59,9 +69,15 @@ public:
   /** Retruns the last error message. */
   inline const QString &errorMessage() const { return _errorMessage; }
 
+protected:
+  /** Internal used function to select a memory bank. */
+  bool selectMemoryBank(MemoryBank bank);
+
 private:
-  bool selectMemoryBank(uint addr);
-  uint32_t _offset;
+  /** The currently selected memory bank. */
+  MemoryBank _current_bank;
+  /** Identifier received when entering the prog mode. */
+  QString _identifier;
 };
 
 #endif // HIDINTERFACE_HH

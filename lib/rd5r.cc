@@ -104,6 +104,9 @@ RD5R::startDownload(bool blocking) {
     return (StatusIdle == _task);
   }
 
+  //if (_dev && _dev->isOpen())
+  // _dev->moveToThread(this);
+
   start();
   return true;
 }
@@ -120,6 +123,8 @@ RD5R::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
     run();
     return (StatusIdle == _task);
   }
+
+  // _dev->moveToThread(this);
 
   start();
   return true;
@@ -222,7 +227,12 @@ RD5R::download() {
     int b0 = _codeplug.image(0).element(n).address()/BSIZE;
     int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
     for (int i=0; i<nb; i++, bcount++) {
-      if (! _dev->read(0, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+      // Select bank by addr
+      uint32_t addr = (b0+i)*BSIZE;
+      HID::MemoryBank bank = (
+            (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+      // read
+      if (! _dev->read(bank, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
         _errorMessage = tr("%1: Cannot download codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
         return false;
@@ -251,7 +261,12 @@ RD5R::upload() {
       int b0 = _codeplug.image(0).element(n).address()/BSIZE;
       int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
       for (int i=0; i<nb; i++, bcount++) {
-        if (! _dev->read(0, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+        // Select bank by addr
+        uint32_t addr = (b0+i)*BSIZE;
+        HID::MemoryBank bank = (
+              (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+        // read
+        if (! _dev->read(bank, addr, _codeplug.data(addr), BSIZE)) {
           _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
           return false;
@@ -274,7 +289,12 @@ RD5R::upload() {
     int b0 = _codeplug.image(0).element(n).address()/BSIZE;
     int nb = _codeplug.image(0).element(n).data().size()/BSIZE;
     for (int i=0; i<nb; i++, bcount++) {
-      if (! _dev->write(0, (b0+i)*BSIZE, _codeplug.data((b0+i)*BSIZE), BSIZE)) {
+      // Select bank by addr
+      uint32_t addr = (b0+i)*BSIZE;
+      HID::MemoryBank bank = (
+            (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+      // write block
+      if (! _dev->write(bank, addr, _codeplug.data(addr), BSIZE)) {
         _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
         return false;

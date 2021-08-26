@@ -12,7 +12,7 @@ and **platform-independent** CPS for several types of (mainly Chinese) DMR radio
 Currently, there are only few radios that are supported
 
   * Open GD77 firmware (since version 0.4.0)
-  * Radioddity GD77 (untested)
+  * Radioddity GD77 (since version 0.8.1)
   * Baofeng/Radioddity RD-5R & RD-5R+
   * TYT MD-UV390 / Retevis RT3S
   * Anytone AT-D878UV (since version 0.5.0)
@@ -30,7 +30,7 @@ own these radios to test the software with.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
 
- * **[Version 0.8.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.8.0)** -- Added AT-D878UVII & AT-D578UV support and many bugfixes.
+ * **[Version 0.8.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.8.1)** -- Fixed Radioddity GD-77 support (callsign db still buggy).
  * **[Version 0.7.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.7.0)** -- Added AT-D868UVE support and many bugfixes.
  * **[Version 0.6.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.6.4)** -- Added APRS & roaming for AT-D878UV.
  * **[Version 0.5.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.5.0)** -- Added support for Anytone AT-D878UV.

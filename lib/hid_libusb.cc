@@ -3,6 +3,7 @@
 
 #define HID_INTERFACE   0                   // interface index
 #define TIMEOUT_MSEC    500                 // receive timeout
+#define MAX_RETRY       100                 // Number of retries
 
 
 HIDevice::HIDevice(int vid, int pid, QObject *parent)
@@ -90,8 +91,9 @@ HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned cha
   nbytes += 4;
 
   reply_len = write_read(buf, sizeof(buf), reply, sizeof(reply));
-  if (reply_len < 0)
+  if (reply_len < 0) {
     return false;
+  }
 
   if (reply_len != sizeof(reply)) {
     _errorMessage = tr("Short read: %1 bytes instead of %2!")
@@ -129,6 +131,7 @@ HIDevice::write_read(const unsigned char *data, unsigned length, unsigned char *
         LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN,
         reply, rlength, read_callback, this, TIMEOUT_MSEC);
 
+  size_t nretry = 0;
 again:
   _nbytes_received = 0;
   libusb_submit_transfer(_transfer);
@@ -161,8 +164,14 @@ again:
     }
   }
 
-  if (_nbytes_received == LIBUSB_ERROR_TIMEOUT)
+  if ((_nbytes_received == LIBUSB_ERROR_TIMEOUT) && (nretry < MAX_RETRY)) {
+    if (0 == nretry)
+      logDebug() << "HID (libusb): timeout. Retry...";
+    nretry++;
     goto again;
+  } else if (nretry >= MAX_RETRY) {
+    logError() << "HID (libusb): Retry limit of " << MAX_RETRY << " exceeded.";
+  }
 
   return _nbytes_received;
 }
@@ -181,17 +190,21 @@ HIDevice::read_callback(struct libusb_transfer *t)
 
     case LIBUSB_TRANSFER_CANCELLED:
         self->_nbytes_received = LIBUSB_ERROR_INTERRUPTED;
+        self->_errorMessage = libusb_error_name(LIBUSB_ERROR_INTERRUPTED);
         return;
 
     case LIBUSB_TRANSFER_NO_DEVICE:
         self->_nbytes_received = LIBUSB_ERROR_NO_DEVICE;
+        self->_errorMessage = libusb_error_name(LIBUSB_ERROR_NO_DEVICE);
         return;
 
     case LIBUSB_TRANSFER_TIMED_OUT:
         self->_nbytes_received = LIBUSB_ERROR_TIMEOUT;
+        self->_errorMessage = libusb_error_name(LIBUSB_ERROR_TIMEOUT);
         break;
 
     default:
         self->_nbytes_received = LIBUSB_ERROR_IO;
+        self->_errorMessage = libusb_error_name(LIBUSB_ERROR_IO);
    }
 }

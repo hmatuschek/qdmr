@@ -538,7 +538,9 @@ Application::onCodeplugDownloadError(Radio *radio) {
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
-  radio->deleteLater();
+  if (radio->wait(250))
+    radio->deleteLater();
+
   _mainWindow->setWindowModified(false);
 }
 
@@ -558,7 +560,9 @@ Application::onCodeplugDownloaded(Radio *radio, CodePlug *codeplug) {
           tr("Cannot decode code-plug: %2").arg(codeplug->errorMessage()));
   }
   _mainWindow->setEnabled(true);
-  radio->deleteLater();
+
+  if (radio->wait(250))
+    radio->deleteLater();
 }
 
 void
@@ -609,44 +613,74 @@ Application::uploadCallsignDB() {
   // Start upload
   QString errorMessage;
 
+  logDebug() << "Detect radio...";
   Radio *radio = Radio::detect(errorMessage);
   if (nullptr == radio) {
+    logDebug() << "No matching radio found.";
     QMessageBox::critical(nullptr, tr("No Radio found."),
                           tr("Can not upload call-sign DB to device: No radio found.\nError: ")
                           + errorMessage);
     return;
   }
+  logDebug() << "Found radio " << radio->name() << ".";
 
   if (! radio->features().hasCallsignDB) {
+    logDebug() << "Radio " << radio->name() << " does not support call-sign DB.";
     QMessageBox::information(nullptr, tr("Cannot upload call-sign DB."),
                              tr("The detected radio '%1' does not support "
                                 "the upload of a call-sign DB.")
                              .arg(radio->name()));
+    radio->deleteLater();
     return;
   }
   if (! radio->features().callsignDBImplemented) {
+    logDebug() << "Radio " << radio->name()
+               << " does support call-sign DB but it is not implemented yet.";
     QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
                           tr("The detected radio '%1' does support the upload of a call-sign DB. "
                              "This feature, however, is not implemented yet.").arg(radio->name()));
+    radio->deleteLater();
     return;
   }
 
   // Sort call-sign DB w.r.t. the current DMR ID in _config
   // this is part of the "auto-selection" of calls-signs for upload
-  _users->sortUsers(_config->radioIDs()->getId(0)->id());
+  Settings settings;
+  if (settings.selectUsingUserDMRID()) {
+    // Sort w.r.t users DMR ID
+    uint id = _config->radioIDs()->getDefaultId()->id();
+    logDebug() << "Sort call-signs closest to ID=" << id << ".";
+    _users->sortUsers(id);
+  } else {
+    // sort w.r.t. chosen prefixes
+    QSet<uint> ids=settings.callSignDBPrefixes(); QStringList prefs;
+    foreach (uint pref, ids)
+      prefs.append(QString::number(pref));
+    logDebug() << "Sort call-signs closest to IDs={" << prefs.join(", ") << "}.";
+    _users->sortUsers(ids);
+  }
+
+  // Assemble flags for callsign DB encoding
+  CallsignDB::Selection css;
+  if (settings.limitCallSignDBEntries()) {
+    logDebug() << "Limit callsign DB entries to " << settings.maxCallSignDBEntries() << ".";
+    css.setCountLimit(settings.maxCallSignDBEntries());
+  }
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
-  progress->setValue(0);
-  progress->setMaximum(100);
+  progress->setRange(0, 100); progress->setValue(0);
   progress->setVisible(true);
 
   connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
-  if (radio->startUploadCallsignDB(_users, false)) {
-    _mainWindow->statusBar()->showMessage(tr("Upload User DB ..."));
+
+  if (radio->startUploadCallsignDB(_users, false, css)) {
+    logDebug() << "Start call-sign DB upload...";
+    _mainWindow->statusBar()->showMessage(tr("Upload call-sign DB ..."));
     _mainWindow->setEnabled(false);
   } else {
+    logDebug() << "Cannot start call-sign DB upload.";
     QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
                           tr("Cannot upload call-sign DB: %1").arg(radio->errorMessage()));
     progress->setVisible(false);
@@ -659,12 +693,14 @@ Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Upload error"));
   QMessageBox::critical(
         nullptr, tr("Upload error"),
-        tr("Cannot upload codeplug or user DB to device. "
+        tr("Cannot upload codeplug or call-sign DB to device. "
            "An error occurred during upload: %1").arg(radio->errorMessage()));
+  logError() << "Upload error: " << radio->errorMessage() << ".";
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
-  radio->deleteLater();
+  if (radio->wait(250))
+    radio->deleteLater();
 }
 
 
@@ -674,7 +710,10 @@ Application::onCodeplugUploaded(Radio *radio) {
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
-  radio->deleteLater();
+  logError() << "Upload complete.";
+
+  if (radio->wait(250))
+    radio->deleteLater();
 }
 
 

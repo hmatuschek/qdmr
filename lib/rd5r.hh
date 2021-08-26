@@ -80,6 +80,7 @@ private:
 	QString _name;
   /** HID interface to the radio. */
 	HID *_dev;
+  /** Flags contolling the creation of the binary codeplug. */
   CodePlug::Flags _codeplugFlags;
   /** Current generic configuration. */
 	Config *_config;

@@ -15,6 +15,7 @@
 #include "radio.hh"
 #include "hid_interface.hh"
 #include "gd77_codeplug.hh"
+#include "gd77_callsigndb.hh"
 
 
 /** Implements an USB interface to the Radioddity GD-77(S) VHF/UHF 5W DMR (Tier I&II) radios.
@@ -55,6 +56,8 @@ protected:
   bool download();
   /** Writes the codeplug to the device. */
   bool upload();
+  /** Implements the actual callsign DB upload process. */
+  bool uploadCallsigns();
 
 protected:
   /** The device identifier. */
@@ -65,6 +68,9 @@ protected:
 	Config *_config;
   /** The actual binary codeplug representation. */
 	GD77Codeplug _codeplug;
+  /** The acutal binary callsign DB representation. */
+  GD77CallsignDB _callsigns;
+
 };
 
 #endif // GD77_HH

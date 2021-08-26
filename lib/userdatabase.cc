@@ -78,7 +78,7 @@ bool
 UserDatabase::load(const QString &filename) {
   QFile file(filename);
   if (! file.open(QIODevice::ReadOnly)) {
-    QString msg = QString("Cannot open user list '%1': ").arg(filename).arg(file.errorString());
+    QString msg = QString("Cannot open user list '%1': %2").arg(filename).arg(file.errorString());
     logError() << msg;
     emit error(msg);
     return false;
@@ -132,6 +132,24 @@ UserDatabase::sortUsers(uint id) {
   // Sort repeater w.r.t. distance to ID
   std::stable_sort(_user.begin(), _user.end(), [id](const User &a, const User &b){
     return a.distance(id) < b.distance(id);
+  });
+}
+
+void
+UserDatabase::sortUsers(const QSet<uint> &ids) {
+  if (0 == ids.count())
+    return;
+
+  // Sort repeater w.r.t. distance to each ID
+  std::stable_sort(_user.begin(), _user.end(), [ids](const User &a, const User &b){
+    QSet<uint>::const_iterator id=ids.begin();
+    uint min_a = a.distance(*id), min_b = b.distance(*id);
+    id++;
+    for (; id!=ids.end(); id++) {
+      min_a = std::min(min_a, a.distance(*id));
+      min_b = std::min(min_b, b.distance(*id));
+    }
+    return min_a < min_b;
   });
 }
 

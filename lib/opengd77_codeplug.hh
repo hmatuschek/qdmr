@@ -254,22 +254,29 @@ protected:
    */
   struct __attribute__((packed)) contact_t {
     /** Possible call types. */
-    typedef enum {
+    enum CallType : uint8_t {
       CALL_GROUP   = 0,                 ///< A group call.
       CALL_PRIVATE = 1,                 ///< A private call.
       CALL_ALL     = 2                  ///< An all-call.
-    } CallType;
+    };
+
+    /** Possible values for the time-slot override option. */
+    enum TimeSlotOverride : uint8_t {
+      TSO_NONE = 0x01,                  ///< Do not override time-slot of channel.
+      TOS_TS1  = 0x00,                  ///< Force time-slot to TS1.
+      TOS_TS2  = 0x02                   ///< Force time-slot to TS2.
+    };
 
     // Bytes 0-15
     uint8_t name[16];                   ///< Contact name in ASCII, 0xff terminated.
     // Bytes 16-19
     uint8_t id[4];                      ///< BCD coded 8 digits DMR ID.
     // Byte 20
-    uint8_t type;                       ///< Call Type, one of Group Call, Private Call or All Call.
+    CallType type;                      ///< Call Type, one of Group Call, Private Call or All Call.
     // Bytes 21-23
     uint8_t receive_tone;               ///< Call Receive Tone, 0=Off, 1=On.
     uint8_t ring_style;                 ///< Ring style: [0,10]
-    uint8_t timeslot_override;          ///< Time-slot override, 0x00=Off, 0x01=TS1, 0x02=TS2.
+    TimeSlotOverride timeslot_override; ///< Time-slot override, 0x00=Off, 0x01=TS1, 0x02=TS2.
 
     /** Constructor. */
     contact_t();

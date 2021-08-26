@@ -250,7 +250,9 @@ void
 OpenGD77Codeplug::contact_t::clear() {
   memset(name, 0xff, 16);
   memset(id, 0x00, 4);
-  type = receive_tone = ring_style = timeslot_override = 0;
+  type = CALL_GROUP;
+  receive_tone = ring_style = 0;
+  timeslot_override = TSO_NONE;
 }
 
 bool
@@ -295,7 +297,7 @@ OpenGD77Codeplug::contact_t::toContactObj() const {
 void
 OpenGD77Codeplug::contact_t::fromContactObj(const DigitalContact *cont, const Config *conf) {
   Q_UNUSED(conf);
-  timeslot_override = 0x00;
+  timeslot_override = TSO_NONE;
   setName(cont->name());
   setId(cont->number());
   switch (cont->type()) {

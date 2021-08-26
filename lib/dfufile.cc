@@ -402,12 +402,12 @@ DFUFile::Element::dump(QTextStream &stream) const {
     stream << qSetFieldWidth(8) << (_address+i*16)
            << qSetFieldWidth(1) << "  ";
     for (int j=(i*16); j<(i*16+8); j++) {
-      stream << qSetFieldWidth(2) << uint8_t(_data.at(j))
+      stream << QString("%1").arg(uint8_t(_data.at(j)), 2, 16, QChar('0'))
              << qSetFieldWidth(1) << " ";
     }
     stream << " ";
     for (int j=(i*16+8); j<(i*16+16); j++) {
-      stream << qSetFieldWidth(2) << uint8_t(_data.at(j))
+      stream << QString("%1").arg(uint8_t(_data.at(j)), 2, 16, QChar('0'))
              << qSetFieldWidth(1) << " ";
     }
     stream << " |";

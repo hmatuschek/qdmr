@@ -43,6 +43,15 @@ public:
 
   CodePlug::Flags codePlugFlags() const;
 
+  bool limitCallSignDBEntries() const;
+  void setLimitCallSignDBEnties(bool enable);
+  uint maxCallSignDBEntries() const;
+  void  setMaxCallSignDBEntries(uint max);
+  bool selectUsingUserDMRID();
+  void setSelectUsingUserDMRID(bool enable);
+  QSet<uint> callSignDBPrefixes();
+  void setCallSignDBPrefixes(const QSet<uint> &prefixes);
+
   bool ignoreVerificationWarning() const;
   void setIgnoreVerificationWarning(bool ignore);
 
@@ -95,6 +104,8 @@ protected slots:
   void onSystemLocationToggled(bool enable);
   void positionUpdated(const QGeoPositionInfo &info);
   void onIgnoreFrequencyLimitsSet(bool enabled);
+  void onDBLimitToggled(bool enable);
+  void onUseUserDMRIdToggled(bool enable);
 
 protected:
   QGeoPositionInfoSource *_source;

@@ -125,7 +125,7 @@ encode_unicode(uint16_t *data, const QString &text, size_t size, uint16_t fill) 
 QString
 decode_ascii(const uint8_t *data, size_t size, uint16_t fill) {
   QString res; res.reserve(size);
-  for (size_t i=0; (i<size) && (fill!=data[i]); i++)
+  for (size_t i=0; (i<size) && (0!=data[i]) && (fill!=data[i]); i++)
     res.append(QChar(data[i]));
   return res;
 }

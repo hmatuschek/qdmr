@@ -259,7 +259,7 @@ public:
   int gpsCount() const;
   /** Returns the index of the GPS System.
    * This index in only within all defined GPS systems. */
-  int indexOfGPSSys(GPSSystem *gps) const;
+  int indexOfGPSSys(const GPSSystem *gps) const;
   /** Gets the GPS system at the specified index.
    * This index is only within all defined GPS systems. */
   GPSSystem *gpsSystem(int idx) const;

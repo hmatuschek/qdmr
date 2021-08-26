@@ -4,7 +4,7 @@
 #include "config.hh"
 
 
-#define BSIZE 1024
+#define BSIZE           32
 
 static Radio::Features _gd77_features = {
   .betaWarning = true,
@@ -22,18 +22,18 @@ static Radio::Features _gd77_features = {
   .maxChannelNameLength = 16,
   .allowChannelNoDefaultContact = true,
 
-  .maxZones = 32,
+  .maxZones = 250,
   .maxZoneNameLength = 16,
   .maxChannelsInZone = 16,
   .hasABZone = false,
 
   .hasScanlists = true,
   .maxScanlists = 64,
-  .maxScanlistNameLength = 16,
+  .maxScanlistNameLength = 15,
   .maxChannelsInScanlist = 32,
   .scanListNeedsPriority = true,
 
-  .maxContacts = 256,
+  .maxContacts = 1024,
   .maxContactNameLength = 16,
 
   .maxGrouplists = 76,
@@ -52,8 +52,8 @@ static Radio::Features _gd77_features = {
   .maxChannelsInRoamingZone = 0,
 
   .hasCallsignDB = true,
-  .callsignDBImplemented = false,
-  .maxCallsignsInDB = 0
+  .callsignDBImplemented = true,
+  .maxCallsignsInDB = 10920
 };
 
 
@@ -101,12 +101,14 @@ GD77::startDownload(bool blocking) {
     return false;
 
   _task = StatusDownload;
-  _config->reset();
-
   if (blocking) {
     run();
     return (StatusIdle == _task);
   }
+
+  //if (_dev && _dev->isOpen())
+  // _dev->moveToThread(this);
+
   start();
   return true;
 }
@@ -125,18 +127,41 @@ GD77::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
     return (StatusIdle == _task);
   }
 
+  //if (_dev && _dev->isOpen())
+  // _dev->moveToThread(this);
+
   start();
   return true;
 }
 
 bool
 GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
-  Q_UNUSED(db);
-  Q_UNUSED(blocking);
+  logDebug() << "Start call-sign DB upload to " << name() << "...";
 
-  _errorMessage = tr("Call-sign DB support for GD77 is not implemented yet.");
+  if (StatusIdle != _task) {
+    logError() << "Cannot upload to radio, radio is not idle.";
+    return false;
+  }
 
-  return false;
+  // Assemble call-sign db from user DB
+  logDebug() << "Encode call-signs into db.";
+  _callsigns.encode(db, selection);
+
+  _task = StatusUploadCallsigns;
+  if (blocking) {
+    logDebug() << "Upload call-sign DB in this thread (blocking).";
+    run();
+    return (StatusIdle == _task);
+  }
+
+  //if (_dev && _dev->isOpen())
+  // _dev->moveToThread(this);
+
+  // start thread for upload
+  logDebug() << "Upload call-sign DB in separate thread.";
+  start();
+
+  return true;
 }
 
 bool
@@ -144,11 +169,16 @@ GD77::connect() {
   // If connected -> done
   if (_dev && _dev->isOpen())
     return true;
+
   // If not open -> reconnect
-  if (_dev)
+  if (_dev) {
+    logDebug() << "Device not open, reconnect.";
     _dev->deleteLater();
+  }
+
   // connect
   _dev = new HID(0x15a2, 0x0073);
+
   if (! _dev->isOpen()) {
     _task = StatusError;
     _errorMessage = tr("%1(): Cannot connect to radio: %2").arg(__func__).arg(_dev->errorMessage());
@@ -156,6 +186,7 @@ GD77::connect() {
     _dev = nullptr;
     return false;
   }
+
   return true;
 }
 
@@ -167,6 +198,9 @@ GD77::run() {
       emit downloadError(this);
       return;
     }
+
+    emit downloadStarted();
+
     // try download
     if (! download()) {
       _task = StatusError;
@@ -176,15 +210,20 @@ GD77::run() {
       return;
     }
 
-    _task = StatusIdle;
+    _dev->read_finish();
     _dev->reboot();
     _dev->close();
+
+    _task = StatusIdle;
     emit downloadFinished(this, &_codeplug);
+    _config = nullptr;
   } else if (StatusUpload == _task) {
     if (! connect()) {
       emit uploadError(this);
       return;
     }
+
+    emit uploadStarted();
 
     if (! upload()) {
       _task = StatusError;
@@ -194,9 +233,33 @@ GD77::run() {
       return;
     }
 
-    _task = StatusIdle;
+    _dev->write_finish();
     _dev->reboot();
     _dev->close();
+
+    _task = StatusIdle;
+    emit uploadComplete(this);
+  } else if (StatusUploadCallsigns == _task) {
+    if (! connect()) {
+      emit uploadError(this);
+      return;
+    }
+
+    emit uploadStarted();
+
+    if (! uploadCallsigns()) {
+      _task = StatusError;
+      _dev->write_finish();
+      _dev->reboot();
+      _dev->close();
+      emit uploadError(this);
+      return;
+    }
+
+    _dev->write_finish();
+    _dev->reboot();
+    _dev->close();
+    _task = StatusIdle;
     emit uploadComplete(this);
   }
 }
@@ -204,8 +267,6 @@ GD77::run() {
 
 bool
 GD77::download() {
-  emit downloadStarted();
-
   // Check every segment in the codeplug
   size_t totb = 0;
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
@@ -226,7 +287,12 @@ GD77::download() {
     uint size = _codeplug.image(0).element(n).data().size();
     uint b0 = addr/BSIZE, nb = size/BSIZE;
     for (uint b=0; b<nb; b++, bcount++) {
-      if (! _dev->read(0, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
+      // Select bank by addr
+      uint32_t addr = (b0+b)*BSIZE;
+      HID::MemoryBank bank = (
+            (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+      // read
+      if (! _dev->read(bank, addr, _codeplug.data(addr), BSIZE)) {
         _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
         return false;
@@ -236,16 +302,12 @@ GD77::download() {
     }
   }
 
-  _dev->read_finish();
-
   return true;
 }
 
 
 bool
 GD77::upload() {
-  emit uploadStarted();
-
   // Check every segment in the codeplug
   size_t totb = 0;
   for (int n=0; n<_codeplug.image(0).numElements(); n++) {
@@ -266,7 +328,12 @@ GD77::upload() {
     uint size = _codeplug.image(0).element(n).data().size();
     uint b0 = addr/BSIZE, nb = size/BSIZE;
     for (uint b=0; b<nb; b++, bcount++) {
-      if (! _dev->read(0, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
+      // Select bank by addr
+      uint32_t addr = (b0+b)*BSIZE;
+      HID::MemoryBank bank = (
+            (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+      // read
+      if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
         _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
         _task = StatusError;
@@ -276,10 +343,12 @@ GD77::upload() {
     }
   }
 
-  _dev->read_finish();
+  logDebug() << "Encode config into binary codeplug.";
 
   // Encode config into codeplug
   _codeplug.encode(_config);
+
+  logDebug() << "Write binary codeplug into device.";
 
   // then, upload modified codeplug
   bcount = 0;
@@ -287,8 +356,13 @@ GD77::upload() {
     uint addr = _codeplug.image(0).element(n).address();
     uint size = _codeplug.image(0).element(n).data().size();
     uint b0 = addr/BSIZE, nb = size/BSIZE;
-    for (size_t b=1; b<nb; b++,bcount++) {
-      if (! _dev->write(0, b*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
+    for (size_t b=0; b<nb; b++,bcount++) {
+      // Select bank by addr
+      uint32_t addr = (b0+b)*BSIZE;
+      HID::MemoryBank bank = (
+            (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+      logDebug() << "Write " << BSIZE << "bytes to 0x" << QString::number(addr,16) << ".";
+      if (! _dev->write(bank, addr, _codeplug.data(addr), BSIZE)) {
         _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
         return false;
@@ -297,9 +371,49 @@ GD77::upload() {
     }
   }
 
-  _task = StatusIdle;
-  _dev->write_finish();
-
   return true;
 }
+
+
+bool
+GD77::uploadCallsigns()
+{
+  emit uploadStarted();
+
+  // Check every segment in the codeplug
+  if (! _callsigns.isAligned(BSIZE)) {
+    _errorMessage = QString("In %1(), cannot upload call-sign DB:\n\t "
+                            "Not aligned with block-size!").arg(__func__);
+    logError() << _errorMessage;
+    return false;
+  }
+
+  logDebug() << "Call-sign DB upload started...";
+
+  size_t totb = _callsigns.memSize();
+  uint bcount = 0;
+  // Then upload callsign DB
+  for (int n=0; n<_callsigns.image(0).numElements(); n++) {
+    uint addr = _callsigns.image(0).element(n).address();
+    uint size = _callsigns.image(0).element(n).data().size();
+    uint b0 = addr/BSIZE, nb = size/BSIZE;
+    HID::MemoryBank bank = (
+          (0x10000 > addr) ? HID::MEMBANK_CALLSIGN_LOWER : HID::MEMBANK_CALLSIGN_UPPER );
+    for (uint b=0; b<nb; b++, bcount+=BSIZE) {
+      if (! _dev->write(bank, (b0+b)*BSIZE,
+                        _callsigns.data((b0+b)*BSIZE, 0), BSIZE))
+      {
+        _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
+            .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
+        logError() << _errorMessage;
+        return false;
+      }
+      emit uploadProgress(float(bcount*100)/totb);
+    }
+  }
+
+  _dev->write_finish();
+  return true;
+}
+
 

@@ -7,7 +7,9 @@
 #include "logger.hh"
 #include "config.hh"
 #include "uv390_callsigndb.hh"
+#include "md2017_callsigndb.hh"
 #include "opengd77_callsigndb.hh"
+#include "gd77_callsigndb.hh"
 #include "d868uv_callsigndb.hh"
 #include "d878uv2_callsigndb.hh"
 #include "crc32.hh"
@@ -35,14 +37,24 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
   }
 
   if (parser.isSet("id")) {
-    bool ok=true;
-    uint32_t id = parser.value("id").toUInt(&ok);
-    if (! ok) {
-      logError() << "Please specify a valid DMR ID for --id option.";
+    QStringList prefixes_text = parser.value("id").split(",");
+    QSet<uint> prefixes;
+    foreach (QString prefix_text, prefixes_text) {
+      bool ok=true; uint32_t prefix = prefix_text.toUInt(&ok);
+      if (ok)
+        prefixes.insert(prefix);
+    }
+
+    if (prefixes.isEmpty()) {
+      logError() << "Please specify a valid DMR ID or a list of DMR prefixes for --id option.";
       return -1;
     }
-    logDebug() << "Sort call-sign DB w.r.t. DMR ID " << id << ".";
-    userdb.sortUsers(id);
+    prefixes_text.clear();
+    foreach (uint prefix, prefixes) {
+      prefixes_text.append(QString::number(prefix));
+    }
+    logDebug() << "Sort call-sign DB w.r.t. DMR ID(s) {" << prefixes_text.join(", ") << "}.";
+    userdb.sortUsers(prefixes);
   } else {
     logWarn() << "No ID is specified, a more or less random set of call-signs will be used "
               << "if the radio cannot hold the entire call-sign DB of " << userdb.count()
@@ -74,8 +86,24 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
                  << "': " << db.errorMessage();
       return -1;
     }
+  } else if (("md2017"==parser.value("radio").toLower()) || ("rt82"==parser.value("radio").toLower())) {
+    MD2017CallsignDB db;
+    db.encode(&userdb, selection);
+    if (! db.write(parser.positionalArguments().at(1))) {
+      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
+                 << "': " << db.errorMessage();
+      return -1;
+    }
   } else if ("opengd77"==parser.value("radio").toLower()) {
     OpenGD77CallsignDB db;
+    db.encode(&userdb, selection);
+    if (! db.write(parser.positionalArguments().at(1))) {
+      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
+                 << "': " << db.errorMessage();
+      return -1;
+    }
+  } else if ("gd77"==parser.value("radio").toLower()) {
+    GD77CallsignDB db;
     db.encode(&userdb, selection);
     if (! db.write(parser.positionalArguments().at(1))) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)

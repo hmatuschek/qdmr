@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
   // Instantiate core application
   QCoreApplication app(argc, argv);
   app.setApplicationName("dmrconf");
-  app.setOrganizationName("dm3mat");
+  app.setOrganizationName("DM3MAT");
   app.setOrganizationDomain("dm3mat.darc.de");
   app.setApplicationVersion(VERSION_STRING);
 
@@ -54,6 +54,11 @@ int main(int argc, char *argv[])
                      QCoreApplication::translate("main", "Up- and download codeplugs in binary format.")
                    });
   parser.addOption({
+                     {"m", "manufacturer"},
+                     QCoreApplication::translate("main", "Given file is manufacturer codeplug file. "
+                     " Can be used with 'decode'.")
+                   });
+  parser.addOption({
                      {"R", "radio"},
                      QCoreApplication::translate("main", "Specifies the radio. This option can also "
                      "be used to override the auto-detection of radios. Be careful using this "
@@ -62,13 +67,13 @@ int main(int argc, char *argv[])
                    });
   parser.addOption({
                      {"i", "id"},
-                     QCoreApplication::translate("main", "Specifes the DMR id."),
+                     QCoreApplication::translate("main", "Specifies the DMR id."),
                      QCoreApplication::translate("main", "ID")
                    });
   parser.addOption({
                      {"n", "limit"},
                      QCoreApplication::translate("main", "Limits several amonuts, depending on the "
-                     "context. When encoding/writing the callsign db, this option speicifies the "
+                     "context. When encoding/writing the callsign db, this option specifies the "
                      "maximum number of callsigns to encode."),
                      QCoreApplication::translate("main", "N")
                    });
