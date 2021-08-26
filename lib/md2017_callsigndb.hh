@@ -1,9 +1,11 @@
-#ifndef DM2017_CALLSIGNDB_HH
-#define DM2017_CALLSIGNDB_HH
+#ifndef MD2017_CALLSIGNDB_HH
+#define MD2017_CALLSIGNDB_HH
 
 #include "tyt_callsigndb.hh"
 
 /** Device specific implementation of the call-sign DB for the TyT MD-2017.
+ *
+ * In fact this callsign DB is identical to the generic @c TyTCallsignDB.
  *
  * @ingroup md2017 */
 class MD2017CallsignDB : public TyTCallsignDB
@@ -17,4 +19,4 @@ public:
   virtual ~MD2017CallsignDB();
 };
 
-#endif // DM2017_CALLSIGNDB_HH
+#endif // MD2017_CALLSIGNDB_HH

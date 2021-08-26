@@ -1,5 +1,5 @@
-#ifndef MD2017CODEPLUG_HH
-#define MD2017CODEPLUG_HH
+#ifndef MD2017_CODEPLUG_HH
+#define MD2017_CODEPLUG_HH
 
 #include "tyt_codeplug.hh"
 
@@ -103,4 +103,4 @@ public:
 
 };
 
-#endif // MD2017CODEPLUG_HH
+#endif // MD2017_CODEPLUG_HH
