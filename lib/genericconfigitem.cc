@@ -1225,7 +1225,7 @@ AbstractList::Declaration::Declaration(
 }
 
 bool
-AbstractList::Declaration::isValidType(const Item *item) const {
+AbstractList::Declaration::isValidElementType(const Item *item) const {
   return _element_type_check(item);
 }
 
@@ -1271,7 +1271,7 @@ AbstractList::Declaration::parsePopulate(Item *item, const YAML::Node &node, QHa
     Item *element = _element->parseDefine(node[i], ctx, msg);
     if (nullptr == element)
       return false;
-    if (! isValidType(element)) {
+    if (! isValidElementType(element)) {
       msg = tr("Cannot create list: Elment %1 is of wrong type.").arg(i);
       return false;
     }
@@ -1326,7 +1326,7 @@ AbstractList::count() const {
 bool AbstractList::add(Item *item) {
   if (nullptr == item)
     return false;
-  if (! declaraion()->as<AbstractList::Declaration>()->isValidType(item))
+  if (! declaraion()->as<AbstractList::Declaration>()->isValidElementType(item))
     return false;
   _items.append(item);
   connect(item, SIGNAL(destroyed(QObject*)), this, SLOT(onElementDeleted(QObject*)));
@@ -1524,7 +1524,7 @@ RefList::Declaration::parseLink(Item *item, const YAML::Node &node, QHash<QStrin
       msg = tr("Cannot create ref-list: %1-th element '%2' not defined.").arg(i).arg(id);
       return false;
     }
-    if (! isValidType(element)) {
+    if (! isValidElementType(element)) {
       msg = tr("Cannot create ref-list: %1-th element is of wrong type. Expected %2, got %3")
           .arg(i).arg(_element->name()).arg(element->declaraion()->name());
       return false;

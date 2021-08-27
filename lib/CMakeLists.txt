@@ -9,8 +9,8 @@ ENDIF(APPLE)
 SET(libdmrconf_SOURCES
     utils.cc crc32.cc csvwriter.cc signaling.cc codeplugcontext.cc addressmap.cc radiointerface.cc
     radio.cc ${hid_SOURCES} hid_interface.cc dfu_libusb.cc usbserial.cc
-    csvreader.cc dfufile.cc repeaterdatabase.cc userdatabase.cc logger.cc
-    config.cc contact.cc rxgrouplist.cc channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc
+    configreader.cc csvreader.cc dfufile.cc repeaterdatabase.cc userdatabase.cc logger.cc
+    configobject.cc config.cc contact.cc rxgrouplist.cc channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc
     roaming.cc callsigndb.cc talkgroupdatabase.cc radioid.cc genericconfigitem.cc configitem.cc
     rd5r.cc rd5r_codeplug.cc rd5r_filereader.cc
     tyt_radio.cc tyt_codeplug.cc tyt_callsigndb.cc
@@ -25,8 +25,8 @@ SET(libdmrconf_SOURCES
     d878uv2.cc d878uv2_codeplug.cc d878uv2_callsigndb.cc)
 SET(libdmrconf_MOC_HEADERS
     radio.hh ${hid_HEADERS} hid_interface.hh dfu_libusb.hh usbserial.hh
-    csvreader.hh dfufile.hh repeaterdatabase.hh userdatabase.hh logger.hh
-    config.hh contact.hh rxgrouplist.hh channel.hh zone.hh scanlist.hh gpssystem.hh codeplug.hh
+    configreader.hh csvreader.hh dfufile.hh repeaterdatabase.hh userdatabase.hh logger.hh
+    configobject.hh config.hh contact.hh rxgrouplist.hh channel.hh zone.hh scanlist.hh gpssystem.hh codeplug.hh
     roaming.hh callsigndb.hh talkgroupdatabase.hh radioid.hh genericconfigitem.hh configitem.hh
     rd5r.hh rd5r_codeplug.hh
     tyt_radio.hh tyt_codeplug.hh tyt_callsigndb.hh

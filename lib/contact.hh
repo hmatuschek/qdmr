@@ -1,7 +1,7 @@
 #ifndef CONTACT_HH
 #define CONTACT_HH
 
-#include <QObject>
+#include "configobject.hh"
 #include <QVector>
 #include <QAbstractTableModel>
 
@@ -11,7 +11,7 @@ class Config;
 /** Represents the base-class for all contact types, Analog (DTMF) or Digital (DMR).
  *
  * @ingroup conf */
-class Contact: public QObject
+class Contact: public ConfigObject
 {
 	Q_OBJECT
 

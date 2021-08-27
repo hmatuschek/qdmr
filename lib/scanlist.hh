@@ -1,7 +1,7 @@
 #ifndef SCANLIST_HH
 #define SCANLIST_HH
 
-#include <QObject>
+#include "configobject.hh"
 #include <QAbstractListModel>
 
 #include "channel.hh"

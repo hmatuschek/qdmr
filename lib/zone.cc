@@ -108,7 +108,7 @@ ZoneChannelList::onChannelDeleted(QObject *obj) {
  * Implementation of Zone
  * ********************************************************************************************* */
 Zone::Zone(const QString &name, QObject *parent)
-  : QObject(parent), _name(name),
+  : ConfigObject("zone", parent), _name(name),
     _A(new ZoneChannelList(this)), _B(new ZoneChannelList(this))
 {
   connect(_A, SIGNAL(modified()), this, SIGNAL(modified()));

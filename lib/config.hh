@@ -13,6 +13,7 @@
 
 #include <QTextStream>
 
+#include "configobject.hh"
 #include "contact.hh"
 #include "rxgrouplist.hh"
 #include "channel.hh"
@@ -32,7 +33,7 @@ class UserDatabase;
  * configuration.
  *
  * @ingroup conf */
-class Config : public QObject
+class Config : public ConfigObject
 {
 	Q_OBJECT
 

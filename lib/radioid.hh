@@ -1,12 +1,13 @@
 #ifndef RADIOID_HH
 #define RADIOID_HH
 
+#include "configobject.hh"
 #include <QAbstractListModel>
 
 /** Represents a DMR ID (radio ID) within the abstract config.
  *
  * @ingroup conf */
-class RadioID : public QObject
+class RadioID : public ConfigObject
 {
   Q_OBJECT
 

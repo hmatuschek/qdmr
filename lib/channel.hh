@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QAbstractTableModel>
 
+#include "configobject.hh"
 #include "signaling.hh"
 
 class Config;
@@ -22,7 +23,7 @@ class RadioID;
  * the name, RX and TX frequencies, output power, TOT and default scanlist properties.
  *
  * @ingroup conf */
-class Channel: public QObject
+class Channel: public ConfigObject
 {
 	Q_OBJECT
 

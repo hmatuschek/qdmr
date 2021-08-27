@@ -7,7 +7,7 @@
  * Implementation of Contact
  * ********************************************************************************************* */
 Contact::Contact(const QString &name, bool rxTone, QObject *parent)
-  : QObject(parent), _name(name), _rxTone(rxTone)
+  : ConfigObject("cont", parent), _name(name), _rxTone(rxTone)
 {
   // pass...
 }

@@ -238,7 +238,7 @@ public:
 
 /** Represents a list of references to digital (DMR) contacts.
  * @ingroup conf */
-class DigitalContactList: public RefList
+class DigitalContactRefList: public RefList
 {
   Q_OBJECT
 
@@ -260,11 +260,14 @@ public:
   };
 
 public:
-   /** Constructs an empty digital contact list. */
-   explicit DigitalContactList(QObject *parent=nullptr);
+  /** Constructs an empty digital contact list. */
+  explicit DigitalContactRefList(QObject *parent=nullptr);
 
-   /** Returns the i-th entry. */
-   DigitalContact *get(int i) const override;
+  /** Returns the i-th contact. */
+  virtual DigitalContact *getContact(int i) const;
+
+  /** Adds a contact to the list. */
+  bool add(Item *item) override;
 };
 
 
@@ -302,7 +305,7 @@ public:
   /** Returns the name of the group list. */
   const QString &name() const;
   /** Returns the list of members. */
-  DigitalContactList *members() const;
+  DigitalContactRefList *members() const;
 };
 
 

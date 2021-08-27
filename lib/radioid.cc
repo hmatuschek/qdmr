@@ -5,7 +5,7 @@
  * Implementation of RadioID
  * ********************************************************************************************* */
 RadioID::RadioID(uint32_t id, QObject *parent)
-  : QObject(parent), _id(id)
+  : ConfigObject("id", parent), _id(id)
 {
   // pass...
 }

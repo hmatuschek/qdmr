@@ -795,7 +795,7 @@ public:
 
   public:
     /** Returns @c true if the type of the given item is accepted by the list. */
-    bool isValidType(const Item *item) const;
+    bool isValidElementType(const Item *item) const;
     /** Returns the declaration of the elements of this list. */
     Item::Declaration *elementDeclaration() const;
 

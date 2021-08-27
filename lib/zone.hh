@@ -1,7 +1,7 @@
 #ifndef ZONE_HH
 #define ZONE_HH
 
-#include <QObject>
+#include "configobject.hh"
 #include <QAbstractListModel>
 #include <QVector>
 
@@ -56,7 +56,7 @@ protected:
 
 /** Represents a zone within the generic configuration.
  * @ingroup conf */
-class Zone : public QObject
+class Zone : public ConfigObject
 {
 	Q_OBJECT
 

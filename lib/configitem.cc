@@ -241,9 +241,9 @@ AllCall::AllCall(QObject *parent)
 /* ********************************************************************************************* *
  * Implementation of DigitalContactList::Declaration
  * ********************************************************************************************* */
-DigitalContactList::Declaration *DigitalContactList::Declaration::_instance = nullptr;
+DigitalContactRefList::Declaration *DigitalContactRefList::Declaration::_instance = nullptr;
 
-DigitalContactList::Declaration::Declaration()
+DigitalContactRefList::Declaration::Declaration()
   : RefList::Declaration(
       Reference::Declaration::get<DigitalContact>(),
       [](const Item *item)->bool { return (nullptr != dynamic_cast<const DigitalContact *>(item)); },
@@ -252,28 +252,35 @@ DigitalContactList::Declaration::Declaration()
   // pass...
 }
 
-DigitalContactList::Declaration *
-DigitalContactList::Declaration::get() {
+DigitalContactRefList::Declaration *
+DigitalContactRefList::Declaration::get() {
   if (nullptr == _instance)
-    _instance = new DigitalContactList::Declaration();
+    _instance = new DigitalContactRefList::Declaration();
   return _instance;
 }
 
 /* ********************************************************************************************* *
  * Implementation of DigitalContactList
  * ********************************************************************************************* */
-DigitalContactList::DigitalContactList(QObject *parent)
+DigitalContactRefList::DigitalContactRefList(QObject *parent)
   : RefList(Declaration::get(), parent)
 {
   // pass...
 }
 
 Configuration::DigitalContact *
-DigitalContactList::get(int i) const {
+DigitalContactRefList::getContact(int i) const {
   Item *item = RefList::get(i);
   if (item && item->is<DigitalContact>())
     return item->as<DigitalContact>();
   return nullptr;
+}
+
+bool
+DigitalContactRefList::add(Item *item) {
+  if (! item->is<DigitalContact>())
+    return false;
+  return RefList::add(item);
 }
 
 
@@ -287,7 +294,7 @@ GroupList::Declaration::Declaration()
 {
   _name = "GroupList";
   add("name", StringItem::Declaration::get(), true, tr("Specifies the name of the group list."));
-  add("members", DigitalContactList::Declaration::get(), true, tr("Specifies list of group calls."));
+  add("members", DigitalContactRefList::Declaration::get(), true, tr("Specifies list of group calls."));
 }
 
 Item *
@@ -317,11 +324,11 @@ GroupList::name() const {
   return get("name")->as<StringItem>()->value();
 }
 
-DigitalContactList *
+DigitalContactRefList *
 GroupList::members() const {
   if (! has("members"))
     return nullptr;
-  return get("members")->as<DigitalContactList>();
+  return get("members")->as<DigitalContactRefList>();
 }
 
 

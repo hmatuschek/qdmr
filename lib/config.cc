@@ -14,7 +14,7 @@
  * Implementation of Config
  * ********************************************************************************************* */
 Config::Config(QObject *parent)
-  : QObject(parent), _modified(false), _radioIDs(new RadioIDList(this)),
+  : ConfigObject("config", parent), _modified(false), _radioIDs(new RadioIDList(this)),
     _contacts(new ContactList(this)), _rxGroupLists(new RXGroupLists(this)),
     _channels(new ChannelList(this)), _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
     _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this)),

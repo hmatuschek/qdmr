@@ -1,7 +1,7 @@
 #ifndef GPSSYSTEM_H
 #define GPSSYSTEM_H
 
-#include <QObject>
+#include "configobject.hh"
 #include <QAbstractTableModel>
 
 
@@ -12,7 +12,7 @@ class AnalogChannel;
 
 /** Base class of the positioning systems, that is APRS and DMR position reporting system.
  * @ingroup conf */
-class PositioningSystem: public QObject
+class PositioningSystem: public ConfigObject
 {
   Q_OBJECT
 

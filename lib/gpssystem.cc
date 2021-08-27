@@ -7,7 +7,7 @@
  * Implementation of PositioningSystem
  * ********************************************************************************************* */
 PositioningSystem::PositioningSystem(const QString &name, uint period, QObject *parent)
-  : QObject(parent), _name(name), _period(period)
+  : ConfigObject("aprs", parent), _name(name), _period(period)
 {
   // pass...
 }

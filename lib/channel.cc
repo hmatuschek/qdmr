@@ -22,9 +22,9 @@
 /* ********************************************************************************************* *
  * Implementation of Channel
  * ********************************************************************************************* */
-Channel::Channel(const QString &name, double rx, double tx, Power power, uint txTimeout, bool rxOnly, ScanList *scanlist,
-                 QObject *parent)
-  : QObject(parent), _name(name), _rxFreq(rx), _txFreq(tx), _power(power), _txTimeOut(txTimeout),
+Channel::Channel(const QString &name, double rx, double tx, Power power, uint txTimeout,
+                 bool rxOnly, ScanList *scanlist, QObject *parent)
+  : ConfigObject("ch", parent), _name(name), _rxFreq(rx), _txFreq(tx), _power(power), _txTimeOut(txTimeout),
     _rxOnly(rxOnly), _scanlist(scanlist)
 {
   // pass..
