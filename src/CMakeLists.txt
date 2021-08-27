@@ -1,10 +1,12 @@
 SET(qdmr_SOURCES main.cc
+  configitemwrapper.cc
   application.cc settings.cc contactdialog.cc rxgrouplistdialog.cc channellistview.cc
 	analogchanneldialog.cc digitalchanneldialog.cc channelvalidator.cc channelcombobox.cc
 	channelselectiondialog.cc zonedialog.cc scanlistview.cc scanlistdialog.cc
   ctcssbox.cc verifydialog.cc gpssystemdialog.cc contactselectiondialog.cc
   aprssystemdialog.cc releasenotes.cc roamingzonedialog.cc searchpopup.cc)
 SET(qdmr_MOC_HEADERS
+  configitemwrapper.hh
   application.hh settings.hh contactdialog.hh rxgrouplistdialog.hh channellistview.hh
 	analogchanneldialog.hh digitalchanneldialog.hh channelvalidator.hh channelcombobox.hh
 	channelselectiondialog.hh zonedialog.hh scanlistview.hh scanlistdialog.hh

@@ -399,7 +399,7 @@ public:
   /** Finds an analog channel with the given frequeny. */
   AnalogChannel *findAnalogChannelByTxFreq(double freq) const;
   /** Adds a channel to the list at the specified row.
-   * If row<0 the channel gets appendet to the list.*/
+   * If row<0 the channel gets appended to the list.*/
 	int addChannel(Channel *channel, int row=-1);
   /** Removes the given channel from the list. */
 	bool remChannel(Channel *channel);
