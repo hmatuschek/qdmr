@@ -215,7 +215,7 @@ UV390Codeplug::createZones(CodeplugContext &ctx) {
     if (! zone.isValid())
       break;
     if (Zone *obj = zone.toZoneObj()) {
-      ctx.config()->zones()->addZone(obj);
+      ctx.config()->zones()->add(obj);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid zone at index %2.")
           .arg(__func__).arg(i);

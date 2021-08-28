@@ -731,7 +731,7 @@ GD77Codeplug::decode(Config *config) {
           .arg(__func__).arg(i);
       return false;
     }
-    config->zones()->addZone(zone);
+    config->zones()->add(zone);
   }
 
   /* Unpack Scan lists */

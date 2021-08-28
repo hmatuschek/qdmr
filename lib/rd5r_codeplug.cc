@@ -1059,7 +1059,7 @@ RD5RCodeplug::decode(Config *config)
             .arg(__func__).arg(i);
         return false;
       }
-      config->zones()->addZone(last_zone);
+      config->zones()->add(last_zone);
     } else {
       // when extending the last zone, chop its name to remove the "... A" part.
       last_zone->setName(last_zonebasename);

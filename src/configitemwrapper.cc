@@ -450,7 +450,6 @@ ContactListWrapper::headerData(int section, Qt::Orientation orientation, int rol
 }
 
 
-
 /* ********************************************************************************************* *
  * Implementation of RadioIdListWrapper
  * ********************************************************************************************* */
@@ -459,7 +458,6 @@ RadioIdListWrapper::RadioIdListWrapper(RadioIDList *list, QObject *parent)
 {
   // pass...
 }
-
 
 int
 RadioIdListWrapper::rowCount(const QModelIndex &parent) const {
@@ -477,3 +475,36 @@ RadioIdListWrapper::data(const QModelIndex &index, int role) const {
     return QVariant(id->id());
   return QVariant();
 }
+
+
+/* ********************************************************************************************* *
+ * Implementation of ZoneListWrapper
+ * ********************************************************************************************* */
+ZoneListWrapper::ZoneListWrapper(ZoneList *list, QObject *parent)
+  : GenericListWrapper(list, parent)
+{
+  // pass...
+}
+
+int
+ZoneListWrapper::rowCount(const QModelIndex &idx) const {
+  Q_UNUSED(idx);
+  return _list->count();
+}
+
+QVariant
+ZoneListWrapper::data(const QModelIndex &index, int role) const {
+  if ((Qt::DisplayRole!=role) || (index.row()>=_list->count()) || (0 != index.column()))
+    return QVariant();
+  Zone *zone = _list->get(index.row())->as<Zone>();
+  return zone->name();
+}
+
+QVariant
+ZoneListWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation) || (0 != section))
+    return QVariant();
+  return tr("Zone");
+}
+
+

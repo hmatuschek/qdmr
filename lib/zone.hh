@@ -94,7 +94,7 @@ protected:
 
 /** Represents the list of zones within the generic configuration.
  * @ingroup conf */
-class ZoneList : public QAbstractListModel
+class ZoneList : public ConfigObjectList
 {
 	Q_OBJECT
 
@@ -102,47 +102,10 @@ public:
   /** Constructs an empty list of zones. */
 	explicit ZoneList(QObject *parent = nullptr);
 
-  /** Returns the number of zones. */
-	int count() const;
-  /** Clears the zone list. */
-	void clear();
-
   /** Returns the zone at the given index. */
 	Zone *zone(int idx) const;
-  /** Adds a zone to the list at the given row. If row<0, the zone is appended to the list. */
-	bool addZone(Zone *zone, int row=-1);
-  /** Removes the zone at the given index. */
-	bool remZone(int idx);
-  /** Removes the given zone from the list. */
-	bool remZone(Zone *zone);
 
-  /** Moves the zone at the given row one up. */
-  bool moveUp(int row);
-  /** Moves the zones one up. */
-  bool moveUp(int first, int last);
-  /** Moves the zone at the given row one down. */
-  bool moveDown(int row);
-  /** Moves the zones one down. */
-  bool moveDown(int first, int last);
-
-	/** Implementation of QAbstractListModel, returns the number of rows. */
-	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  /** Implementation of QAbstractListModel, returns the item data at the given index. */
-	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-  /** Implementation of QAbstractListModel, returns the header data at the given section. */
-	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-
-signals:
-  /** Gets emitted whenever the zone list or any of its zones is modified. */
-	void modified();
-
-protected slots:
-  /** Internal used callback to handle deleted Zones. */
-	void onZoneDeleted(QObject *obj);
-
-protected:
-  /** The list of zones. */
-	QVector<Zone *> _zones;
+  int add(ConfigObject *obj, int row=-1);
 };
 
 

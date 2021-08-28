@@ -142,7 +142,7 @@ ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
         _errorMessage = tr("Cannot parse zone: %1").arg(reader.errorMessage());
         return false;
       }
-      config->zones()->addZone(zone);
+      config->zones()->add(zone);
     }
   } else {
     _errorMessage = "Element 'zones' missing or not a list.";

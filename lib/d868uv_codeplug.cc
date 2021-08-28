@@ -1953,7 +1953,7 @@ D868UVCodeplug::createZones(Config *config, CodeplugContext &ctx) {
     if (! extend_last_zone) {
       last_zone = new Zone(zonename);
       // add to config
-      config->zones()->addZone(last_zone);
+      config->zones()->add(last_zone);
     } else {
       // when extending the last zone, chop its name to remove the "... A" part.
       last_zone->setName(last_zonebasename);

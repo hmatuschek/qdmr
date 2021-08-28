@@ -681,7 +681,7 @@ OpenGD77Codeplug::decode(Config *config) {
         logError() << _errorMessage;
         return false;
       }
-      config->zones()->addZone(last_zone);
+      config->zones()->add(last_zone);
     } else {
       // when extending the last zone, chop its name to remove the "... A" part.
       last_zone->setName(last_zonebasename);

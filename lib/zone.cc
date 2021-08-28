@@ -152,140 +152,22 @@ Zone::B() {
  * Implementation of ZoneList
  * ********************************************************************************************* */
 ZoneList::ZoneList(QObject *parent)
-  : QAbstractListModel(parent), _zones()
+  : ConfigObjectList(parent)
 {
   // pass...
 }
 
-int
-ZoneList::count() const {
-  return _zones.size();
-}
-
-void
-ZoneList::clear() {
-  beginResetModel();
-  for (int i=0; i<count(); i++)
-    _zones[i]->deleteLater();
-  _zones.clear();
-  endResetModel();
-  emit modified();
-}
-
 Zone *
 ZoneList::zone(int idx) const {
-  if ((0>idx) || (idx>=_zones.size()))
-    return nullptr;
-  return _zones[idx];
-}
-
-bool
-ZoneList::addZone(Zone *zone, int row) {
-  if (_zones.contains(zone))
-    return false;
-  if ((row<0) || (row>=_zones.size()))
-    row = _zones.size();
-  beginInsertRows(QModelIndex(), row, row);
-  zone->setParent(this);
-  connect(zone, SIGNAL(destroyed(QObject*)), this, SLOT(onZoneDeleted(QObject*)));
-  connect(zone, SIGNAL(modified()), this, SIGNAL(modified()));
-  _zones.insert(row, zone);
-  endInsertRows();
-  emit modified();
-  return true;
-}
-
-bool
-ZoneList::remZone(int idx) {
-  if ((0>idx) || (idx>=_zones.size()))
-    return false;
-  Zone *zone = _zones[idx];
-  beginRemoveRows(QModelIndex(), idx, idx);
-  _zones.remove(idx);
-  zone->deleteLater();
-  endRemoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ZoneList::remZone(Zone *zone) {
-  if (! _zones.contains(zone))
-    return false;
-  int idx = _zones.indexOf(zone);
-  return remZone(idx);
-}
-
-bool
-ZoneList::moveUp(int row) {
-  if ((0>=row) || (row>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  std::swap(_zones[row], _zones[row-1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ZoneList::moveUp(int first, int last) {
-  if ((0>=first) || (last>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
-  for (int row=first; row<=last; row++)
-    std::swap(_zones[row], _zones[row-1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ZoneList::moveDown(int row) {
-  if ((0>row) || ((row+1)>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  std::swap(_zones[row], _zones[row+1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ZoneList::moveDown(int first, int last) {
-  if ((0>first) || ((last+1)>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
-  for (int row=last; row>=first; row--)
-    std::swap(_zones[row], _zones[row+1]);
-  endMoveRows();
-  emit modified();
-  return true;
+  if (ConfigObject *obj = get(idx))
+    return obj->as<Zone>();
+  return nullptr;
 }
 
 int
-ZoneList::rowCount(const QModelIndex &idx) const {
-  Q_UNUSED(idx);
-  return _zones.size();
+ZoneList::add(ConfigObject *obj, int row) {
+  if (obj && obj->is<Zone>())
+    return ConfigObjectList::add(obj, row);
+  return -1;
 }
-
-QVariant
-ZoneList::data(const QModelIndex &index, int role) const {
-  if ((Qt::DisplayRole!=role) || (index.row()>=_zones.size()) || (0 != index.column()))
-    return QVariant();
-  return _zones[index.row()]->name();
-}
-
-QVariant
-ZoneList::headerData(int section, Qt::Orientation orientation, int role) const {
-  if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation) || (0 != section))
-    return QVariant();
-  return tr("Zone");
-}
-
-void
-ZoneList::onZoneDeleted(QObject *obj) {
-  if (Zone *zone = reinterpret_cast<Zone *>(obj))
-    remZone(zone);
-}
-
 

@@ -260,7 +260,7 @@ Application::createMainWindow() {
   QPushButton *zoneDown = _mainWindow->findChild<QPushButton *>("zoneDown");
   QPushButton *addZone  = _mainWindow->findChild<QPushButton *>("addZone");
   QPushButton *remZone  = _mainWindow->findChild<QPushButton *>("remZone");
-  zones->setModel(_config->zones());
+  zones->setModel(new ZoneListWrapper(_config->zones(), zones));
   connect(addZone, SIGNAL(clicked()), this, SLOT(onAddZone()));
   connect(remZone, SIGNAL(clicked()), this, SLOT(onRemZone()));
   connect(zoneUp, SIGNAL(clicked()), this, SLOT(onZoneUp()));
@@ -1240,7 +1240,7 @@ Application::onAddZone() {
   int row=-1;
   if (list->selectionModel()->hasSelection())
     row = list->selectionModel()->selection().back().bottom()+1;
-  _config->zones()->addZone(dialog.zone(), row);
+  _config->zones()->add(dialog.zone(), row);
 }
 
 void
@@ -1273,7 +1273,7 @@ Application::onRemZone() {
     lists.push_back(_config->zones()->zone(row));
   // remove
   foreach (Zone *zone, lists)
-    _config->zones()->remZone(zone);
+    _config->zones()->del(zone);
 }
 
 void
@@ -1314,7 +1314,7 @@ Application::onZoneDown() {
 
 void
 Application::onEditZone(const QModelIndex &idx) {
-  if (idx.row() >= _config->zones()->rowCount(QModelIndex()))
+  if (idx.row() >= _config->zones()->count())
     return;
 
   ZoneDialog dialog(_config, _config->zones()->zone(idx.row()));

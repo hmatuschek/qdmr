@@ -2063,7 +2063,7 @@ CSVReader::handleZone(qint64 idx, const QString &name, bool a, const QList<qint6
   if (! _zones.contains(idx)) {
     Zone *zone = new Zone(name);
     _zones[idx] = zone;
-    _config->zones()->addZone(zone);
+    _config->zones()->add(zone);
   }
 
   return true;
