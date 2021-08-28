@@ -28,35 +28,22 @@ RadioID::setId(uint32_t id) {
  * Implementation of RadioIDList
  * ********************************************************************************************* */
 RadioIDList::RadioIDList(QObject *parent)
-  : QAbstractListModel(parent), _ids()
+  : ConfigObjectList(parent)
 {
-  _ids.append(new RadioID(0));
-  connect(_ids.at(0), SIGNAL(destroyed(QObject*)), this, SLOT(onIdDeleted(QObject*)));
+  add(new RadioID(0));
 }
 
 void
 RadioIDList::clear() {
-  beginResetModel();
-  foreach (RadioID *id, _ids) {
-    id->deleteLater();
-  }
-  _ids.clear();
-  _ids.push_back(new RadioID(0));
-  connect(_ids.at(0), SIGNAL(destroyed(QObject*)), this, SLOT(onIdDeleted(QObject*)));
-  endResetModel();
-  emit modified();
-}
-
-int
-RadioIDList::count() const {
-  return _ids.size();
+  ConfigObjectList::clear();
+  add(new RadioID(0));
 }
 
 RadioID *
-RadioIDList::getId(uint idx) const {
-  if (int(idx) >= _ids.count())
-    return nullptr;
-  return _ids.at(idx);
+RadioIDList::getId(int idx) const {
+  if (ConfigObject *obj = get(idx))
+    return obj->as<RadioID>();
+  return nullptr;
 }
 
 RadioID *
@@ -66,88 +53,37 @@ RadioIDList::getDefaultId() const {
 
 RadioID *
 RadioIDList::find(uint32_t id) const {
-  foreach (RadioID *item, _ids) {
-    if (id == item->id())
-      return item;
+  for (int i=0; i<count(); i++) {
+    if (id == getId(i)->id())
+      return getId(i);
   }
   return nullptr;
 }
 
 int
-RadioIDList::indexOf(RadioID *id) const {
-  return _ids.indexOf(id);
-}
-
-int
-RadioIDList::addId(RadioID *id) {
-  if (nullptr == id)
-    return -1;
-  int r = _ids.count();
-  beginInsertRows(QModelIndex(), r,r);
-  id->setParent(this);
-  _ids.append(id);
-  connect(id, SIGNAL(destroyed(QObject*)), this, SLOT(onIdDeleted(QObject*)));
-  endInsertRows();
-  emit modified();
-  return r;
+RadioIDList::add(ConfigObject *obj, int row) {
+  if (obj && obj->is<RadioID>())
+    return ConfigObjectList::add(obj, row);
+  return -1;
 }
 
 int
 RadioIDList::addId(uint32_t id) {
-  return addId(new RadioID(id, this));
+  return add(new RadioID(id, this));
 }
 
 bool
 RadioIDList::setDefault(uint idx) {
-  if (idx >= uint(count()))
+  RadioID *obj = getId(idx);
+  if (nullptr == obj)
     return false;
-  if (0 == idx)
-    return true;
-  beginMoveRows(QModelIndex(), idx, idx, QModelIndex(), 0);
-  RadioID *obj = _ids.at(idx);
-  _ids.removeAt(idx);
-  _ids.prepend(obj);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-RadioIDList::delId(RadioID *id) {
-  if ((nullptr == id) || (! _ids.contains(id)))
-    return false;
-  int idx = _ids.indexOf(id);
-  beginRemoveRows(QModelIndex(), idx, idx);
-  _ids.removeAt(idx);
-  disconnect(id, SIGNAL(destroyed(QObject*)), this, SLOT(onIdDeleted(QObject*)));
-  id->deleteLater();
-  endRemoveRows();
+  _items.removeAt(idx);
+  _items.prepend(obj);
   emit modified();
   return true;
 }
 
 bool
 RadioIDList::delId(uint32_t id) {
-  return delId(find(id));
-}
-
-void
-RadioIDList::onIdDeleted(QObject *obj) {
-  delId(qobject_cast<RadioID *>(obj));
-}
-
-int
-RadioIDList::rowCount(const QModelIndex &parent) const {
-  return count();
-}
-
-QVariant
-RadioIDList::data(const QModelIndex &index, int role) const {
-  if (index.row() >= count())
-    return QVariant();
-  if (Qt::DisplayRole == role)
-    return QVariant(QString::number(getId(index.row())->id()));
-  else if (Qt::EditRole == role)
-    return QVariant(getId(index.row())->id());
-  return QVariant();
+  return del(find(id));
 }

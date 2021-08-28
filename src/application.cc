@@ -180,7 +180,7 @@ Application::createMainWindow() {
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
 
-  dmrID->setModel(_config->radioIDs());
+  dmrID->setModel(new RadioIdListWrapper(_config->radioIDs(), dmrID));
   dmrID->setCurrentIndex(0);
 
   rname->setText(_config->name());
@@ -804,7 +804,7 @@ Application::onRemDMRID() {
           tr("The codeplug needs at least one valid DMR ID."));
     return;
   }
-  _config->radioIDs()->delId(_config->radioIDs()->getId(0));
+  _config->radioIDs()->del(_config->radioIDs()->getId(0));
 }
 
 void

@@ -448,3 +448,32 @@ ContactListWrapper::headerData(int section, Qt::Orientation orientation, int rol
   }
   return QVariant();
 }
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioIdListWrapper
+ * ********************************************************************************************* */
+RadioIdListWrapper::RadioIdListWrapper(RadioIDList *list, QObject *parent)
+  : GenericListWrapper(list, parent)
+{
+  // pass...
+}
+
+
+int
+RadioIdListWrapper::rowCount(const QModelIndex &parent) const {
+  return _list->count();
+}
+
+QVariant
+RadioIdListWrapper::data(const QModelIndex &index, int role) const {
+  if (index.row() >= _list->count())
+    return QVariant();
+  RadioID *id = _list->get(index.row())->as<RadioID>();
+  if (Qt::DisplayRole == role)
+    return QVariant(QString::number(id->id()));
+  else if (Qt::EditRole == role)
+    return QVariant(id->id());
+  return QVariant();
+}

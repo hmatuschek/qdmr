@@ -113,4 +113,19 @@ public:
 };
 
 
+class RadioIdListWrapper: public GenericListWrapper
+{
+  Q_OBJECT
+
+public:
+  RadioIdListWrapper(RadioIDList *list, QObject *parent=nullptr);
+
+public:
+  // Implementation of QAbstractListModel
+  /** Returns the number of rows, implements the QAbstractTableModel. */
+  int rowCount(const QModelIndex &index) const;
+  /** Returns the cell data at given index, implements the QAbstractTableModel. */
+  QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
+};
+
 #endif // CONFIG_ITEM_WRAPPER_HH

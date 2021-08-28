@@ -37,7 +37,7 @@ protected:
  * DMR ID of the radio.
  *
  * @ingroup conf */
-class RadioIDList: public QAbstractListModel
+class RadioIDList: public ConfigObjectList
 {
   Q_OBJECT
 
@@ -45,48 +45,23 @@ public:
   /** Contructor. */
   explicit RadioIDList(QObject *parent=nullptr);
 
-  /** Clears the list, a default DMR ID is set to 0. */
   void clear();
-
-  /** Returns the number of defined DMR IDs. */
-  int count() const;
+  /** Returns the radio ID at the given index. */
+  RadioID *getId(int idx) const;
   /** Returns the current default ID for the radio. */
   RadioID * getDefaultId() const;
-  /** Returns the DMR ID specified by the given index. */
-  RadioID * getId(uint idx) const;
   /** Searches the DMR ID object associated with the given DMR ID. */
   RadioID *find(uint32_t id) const;
-  /** Returns the index of the given DMR ID object. */
-  int indexOf(RadioID *id) const;
   /** Sets the default DMR ID. This changes the index of all IDs. */
   bool setDefault(uint idx);
 
-  /** Adds the given DMR ID object. */
-  int addId(RadioID *id);
+  int add(ConfigObject *obj, int row=-1);
+
   /** Adds the given DMR ID. */
-  int addId(uint32_t id);
-
-  /** Deletes and removes the given DMR ID object. */
-  bool delId(RadioID *id);
+  virtual int addId(uint32_t id);
   /** Deletes and removes the given DMR ID. */
-  bool delId(uint32_t id);
+  virtual bool delId(uint32_t id);
 
-  /** Returns the number of DMR IDs, implements the QAbstractListModel interface. */
-  int rowCount(const QModelIndex &parent) const;
-  /** Returns the DMR ID, implements the QAbstractListModel interface. */
-  QVariant data(const QModelIndex &index, int role) const;
-
-signals:
-  /** Gets emitted on any change of the list. */
-  void modified();
-
-protected slots:
-  /** Internal used callback whenever a DMR ID object gets deleted. */
-  void onIdDeleted(QObject *obj);
-
-protected:
-  /** Holds the list of DMR IDs. */
-  QList<RadioID *> _ids;
 };
 
 

@@ -1755,7 +1755,7 @@ CSVReader::handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, Q
   _radioIDs[1] = _config->radioIDs()->getId(0);
   for (int i=1; i<ids.count(); i++) {
     RadioID *id = new RadioID(ids.at(i));
-    _config->radioIDs()->addId(id);
+    _config->radioIDs()->add(id);
     _radioIDs[i+1] = id;
   }
 
