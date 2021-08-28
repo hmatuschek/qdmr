@@ -56,10 +56,8 @@ public:
   bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
 
 public:
-  /** Reads the given config. */
-  Config *read(YAML::Node &node);
   /** Reads the given config and updates the give context. */
-  bool read(Config *obj, YAML::Node &node);
+  bool read(Config *obj, const QString &filename);
 
 public:
   /** Adds an extension to the config parser. */

@@ -38,6 +38,25 @@ ConfigReader::addExtension(const QString &name, AbstractConfigReader *reader) {
   return true;
 }
 
+bool
+ConfigReader::read(Config *obj, const QString &filename) {
+  YAML::Node node = YAML::LoadFile(filename.toStdString());
+  if (! node) {
+    _errorMessage = tr("Cannot read YAML codeplug from file '%1'").arg(filename);
+  }
+
+  obj->reset();
+  ConfigObject::Context context;
+
+  if (! parse(obj, node, context))
+    return false;
+
+  if (! link(obj, node, context))
+    return false;
+
+  return true;
+}
+
 ConfigObject *
 ConfigReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
   Q_UNUSED(node); Q_UNUSED(ctx);

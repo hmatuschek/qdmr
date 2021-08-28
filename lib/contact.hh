@@ -50,10 +50,6 @@ public:
 		return dynamic_cast<const T *>(this);
 	}
 
-signals:
-  /** Gets emitted if the contact is modified. */
-	void modified();
-
 protected:
   /** Contact name. */
 	QString _name;

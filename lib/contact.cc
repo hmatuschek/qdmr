@@ -21,7 +21,7 @@ Contact::setName(const QString &name) {
   if (name.simplified().isEmpty())
     return false;
   _name = name;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -32,7 +32,7 @@ Contact::rxTone() const {
 void
 Contact::setRXTone(bool enable) {
   _rxTone = enable;
-  emit modified();
+  emit modified(this);
 }
 
 
@@ -60,7 +60,7 @@ DTMFContact::setNumber(const QString &number) {
   if (! validDTMFNumber(number))
     return false;
   _number = number.simplified();
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -92,7 +92,7 @@ DigitalContact::number() const {
 bool
 DigitalContact::setNumber(uint number) {
   _number = number;
-  emit modified();
+  emit modified(this);
   return true;
 }
 

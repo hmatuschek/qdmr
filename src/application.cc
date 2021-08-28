@@ -24,6 +24,7 @@
 #include "searchpopup.hh"
 #include "contactselectiondialog.hh"
 #include "configitemwrapper.hh"
+#include "configreader.hh"
 
 
 QPair<int, int>
@@ -359,14 +360,17 @@ Application::loadCodeplug() {
   }
 
   Settings settings;
-  QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open codeplug"), settings.lastDirectory().absolutePath(),
-                                                  tr("Codeplug Files (*.conf *.csv *.txt);;All Files (*)"));
+  QString filename = QFileDialog::getOpenFileName(
+        nullptr, tr("Open codeplug"),
+        settings.lastDirectory().absolutePath(),
+        tr("Codeplug Files (*.yaml *.conf *.csv *.txt);;All Files (*)"));
   if (filename.isEmpty())
     return;
   QFile file(filename);
   if (!file.open(QIODevice::ReadOnly)) {
-    QMessageBox::critical(nullptr, tr("Cannot open file"),
-                          tr("Cannot read codeplug from file '%1': %2").arg(filename).arg(file.errorString()));
+    QMessageBox::critical(
+          nullptr, tr("Cannot open file"),
+          tr("Cannot read codeplug from file '%1': %2").arg(filename).arg(file.errorString()));
     return;
   }
 
@@ -375,13 +379,26 @@ Application::loadCodeplug() {
   settings.setLastDirectoryDir(info.absoluteDir());
 
   QString errorMessage;
-  QTextStream stream(&file);
-  if (_config->readCSV(stream, errorMessage)) {
-    _mainWindow->setWindowModified(false);
+  if ("yaml" == info.suffix()){
+    ConfigReader reader;
+    if (reader.read(_config, filename)) {
+      _mainWindow->setWindowModified(false);
+    } else {
+      QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
+                            tr("Cannot read codeplug from file '%1': %2")
+                            .arg(filename).arg(reader.errorMessage()));
+      _config->reset();
+    }
   } else {
-    QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
-                          tr("Cannot read codeplug from file '%1': %2").arg(filename).arg(errorMessage));
-    _config->reset();
+    QTextStream stream(&file);
+    if (_config->readCSV(stream, errorMessage)) {
+      _mainWindow->setWindowModified(false);
+    } else {
+      QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
+                            tr("Cannot read codeplug from file '%1': %2")
+                            .arg(filename).arg(errorMessage));
+      _config->reset();
+    }
   }
 }
 
