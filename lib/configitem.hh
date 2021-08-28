@@ -321,7 +321,6 @@ public:
   {
   protected:
     /** Constructor.
-     * @param mandatory If @c true the field is mandatory.
      * @param description Specifies the optional field description. */
     Declaration(const QString &description="");
   };

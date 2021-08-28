@@ -1983,7 +1983,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
 
   DigitalChannel *chan = new DigitalChannel(name, rx, tx, power, tot, ro, admit, color, slot,
                                             nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
-  _config->channelList()->addChannel(chan);
+  _config->channelList()->add(chan);
   _channels[idx] = chan;
 
   return true;
@@ -2032,7 +2032,7 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
 
   AnalogChannel *chan = new AnalogChannel(name, rx, tx, power, tot, ro, admit, squelch, rxTone,
                                           txTone, bw, nullptr);
-  _config->channelList()->addChannel(chan);
+  _config->channelList()->add(chan);
   _channels[idx] = chan;
 
   return true;

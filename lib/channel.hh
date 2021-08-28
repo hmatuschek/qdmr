@@ -379,7 +379,7 @@ protected:
  * default QTableView instance.
  *
  * @ingroup conf */
-class ChannelList: public QAbstractTableModel
+class ChannelList: public ConfigObjectList
 {
 	Q_OBJECT
 
@@ -387,57 +387,14 @@ public:
   /** Constructs an empty channel list. */
 	explicit ChannelList(QObject *parent=nullptr);
 
-  /** Returns the number of channels in this list. */
-  int count() const;
-  /** Clears the list. */
-  void clear();
-  /** Returns the index of the channel. */
-  int indexOf(Channel *channel) const;
+  bool add(ConfigObject *obj, int row=-1);
+
   /** Gets the channel at the specified index. */
-	Channel *channel(int idx) const;
+  Channel *channel(int idx) const;
   /** Finds a digial channel with the given frequencies, time slot and color code. */
   DigitalChannel *findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, uint cc) const;
   /** Finds an analog channel with the given frequeny. */
   AnalogChannel *findAnalogChannelByTxFreq(double freq) const;
-  /** Adds a channel to the list at the specified row.
-   * If row<0 the channel gets appended to the list.*/
-	int addChannel(Channel *channel, int row=-1);
-  /** Removes the given channel from the list. */
-	bool remChannel(Channel *channel);
-  /** Removes the channel at the given index from the list. */
-	bool remChannel(int idx);
-  /** Moves the channel at index @c idx one step up. */
-  bool moveUp(int idx);
-  /** Moves the channels at one step up. */
-  bool moveUp(int first, int last);
-  /** Moves the channel at index @c idx one step down. */
-  bool moveDown(int idx);
-  /** Moves the channels one step down. */
-  bool moveDown(int first, int last);
-
-	// QAbstractTableModel interface
-  /** Implements QAbstractTableModel, returns number of rows. */
-	int rowCount(const QModelIndex &index) const;
-  /** Implements QAbstractTableModel, returns number of colums. */
-	int columnCount(const QModelIndex &index) const;
-  /** Implements QAbstractTableModel, returns data at cell. */
-	QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
-  /** Implements QAbstractTableModel, returns header at section. */
-	QVariant headerData(int section, Qt::Orientation orientation, int role=Qt::DisplayRole) const;
-
-signals:
-  /** Gets emitted once the table has been changed. */
-	void modified();
-
-protected slots:
-  /** Internal callback on deleted channels. */
-  void onChannelDeleted(QObject *obj);
-  /** Internal callback on modified channels. */
-  void onChannelEdited();
-
-protected:
-  /** Just the vector of channels. */
-	QVector<Channel *> _channels;
 };
 
 

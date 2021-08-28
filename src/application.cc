@@ -23,6 +23,7 @@
 #include "talkgroupdatabase.hh"
 #include "searchpopup.hh"
 #include "contactselectiondialog.hh"
+#include "configitemwrapper.hh"
 
 
 QPair<int, int>
@@ -243,7 +244,7 @@ Application::createMainWindow() {
           this, SLOT(loadChannelListSectionState()));
   connect(channels->horizontalHeader(), SIGNAL(sectionResized(int,int,int)),
           this, SLOT(storeChannelListSectionState()));
-  channels->setModel(_config->channelList());
+  channels->setModel(new ChannelListWrapper(_config->channelList(), channels));
   connect(addACh, SIGNAL(clicked()), this, SLOT(onAddAnalogChannel()));
   connect(addDCh, SIGNAL(clicked()), this, SLOT(onAddDigitalChannel()));
   connect(cloneCh, SIGNAL(clicked()), this, SLOT(onCloneChannel()));
@@ -1054,7 +1055,7 @@ Application::onAddAnalogChannel() {
   int row=-1;
   if (table->selectionModel()->hasSelection())
     row = table->selectionModel()->selection().back().bottom()+1;
-  _config->channelList()->addChannel(dialog.channel(), row);
+  _config->channelList()->add(dialog.channel(), row);
 }
 
 void
@@ -1067,7 +1068,7 @@ Application::onAddDigitalChannel() {
   int row=-1;
   if (table->selectionModel()->hasSelection())
     row = table->selectionModel()->selection().back().bottom()+1;
-  _config->channelList()->addChannel(dialog.channel(), row);
+  _config->channelList()->add(dialog.channel(), row);
 }
 
 void
@@ -1104,7 +1105,7 @@ Application::onCloneChannel() {
     // update channel
     dialog.channel();
     // add to list (below selected one)
-    _config->channelList()->addChannel(clone, selected.row()+1);
+    _config->channelList()->add(clone, selected.row()+1);
   } else {
     DigitalChannel *selch = channel->as<DigitalChannel>();
     // clone channel
@@ -1122,7 +1123,7 @@ Application::onCloneChannel() {
     // update channel
     dialog.channel();
     // add to list (below selected one)
-    _config->channelList()->addChannel(clone, selected.row()+1);
+    _config->channelList()->add(clone, selected.row()+1);
   }
 }
 
@@ -1156,7 +1157,7 @@ Application::onRemChannel() {
     channels.push_back(_config->channelList()->channel(row));
   // remove channels
   foreach (Channel *channel, channels)
-    _config->channelList()->remChannel(channel);
+    _config->channelList()->del(channel);
 }
 
 void

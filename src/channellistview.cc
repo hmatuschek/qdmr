@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include "analogchanneldialog.hh"
 #include "digitalchanneldialog.hh"
+#include "configitemwrapper.hh"
 
 
 /* ********************************************************************************************* *
@@ -21,7 +22,7 @@ ChannelListView::ChannelListView(Config *config, QWidget *parent)
   QPushButton *rem  = new QPushButton(tr("Delete Channel"));
 
   _view = new QTableView();
-  _view->setModel(_list);
+  _view->setModel(new ChannelListWrapper(_list, _view));
   _view->setColumnWidth(0, 60);
   _view->setColumnWidth(1, 120);
   _view->setColumnWidth(2, 80);
@@ -89,7 +90,7 @@ ChannelListView::onAddAnalogChannel() {
   if (QDialog::Accepted != dialog.exec())
     return;
 
-  _list->addChannel(dialog.channel());
+  _list->add(dialog.channel());
 }
 
 void
@@ -99,7 +100,7 @@ ChannelListView::onAddDigitalChannel() {
   if (QDialog::Accepted != dialog.exec())
     return;
 
-  _list->addChannel(dialog.channel());
+  _list->add(dialog.channel());
 }
 
 void
@@ -115,7 +116,7 @@ ChannelListView::onRemChannel() {
   if (QMessageBox::No == QMessageBox::question(nullptr, tr("Delete channel?"), tr("Delete channel %1?").arg(name)))
     return;
 
-  _list->remChannel(selected.row());
+  _list->del(_list->get(selected.row()));
 }
 
 void

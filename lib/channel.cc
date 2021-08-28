@@ -394,50 +394,35 @@ SelectedChannel::get() {
  * Implementation of ChannelList
  * ********************************************************************************************* */
 ChannelList::ChannelList(QObject *parent)
-  : QAbstractTableModel(parent), _channels()
+  : ConfigObjectList(parent)
 {
-  connect(this, SIGNAL(modified()), this, SLOT(onChannelEdited()));
+
 }
 
-int
-ChannelList::count() const {
-  return _channels.size();
-}
-
-void
-ChannelList::clear() {
-  beginResetModel();
-  for (int i=0; i<count(); i++)
-    _channels[i]->deleteLater();
-  _channels.clear();
-  endResetModel();
-  emit modified();
-}
-
-int
-ChannelList::indexOf(Channel *channel) const {
-  if (! _channels.contains(channel))
-    return -1;
-  return _channels.indexOf(channel);
+bool
+ChannelList::add(ConfigObject *obj, int row) {
+  if ((nullptr == obj) || (obj->is<Channel>()))
+    return false;
+  return ConfigObjectList::add(obj, row);
 }
 
 Channel *
 ChannelList::channel(int idx) const {
-  if ((0>idx) || (idx >= _channels.size()))
-    return nullptr;
-  return _channels.at(idx);
+  if (ConfigObject *obj = get(idx))
+    return obj->as<Channel>();
+  return nullptr;
 }
 
 DigitalChannel *
 ChannelList::findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, uint cc) const {
   for (int i=0; i<count(); i++) {
-    if (! _channels[i]->is<DigitalChannel>())
+    if (! _items[i]->is<DigitalChannel>())
       continue;
     /// @bug I should certainly change the frequency handling to integer values!
-    if ( (1e-6<std::abs(_channels[i]->txFrequency()-tx)) ||
-         (1e-6<std::abs(_channels[i]->rxFrequency()-rx)) )
+    if ( (1e-6<std::abs(channel(i)->txFrequency()-tx)) ||
+         (1e-6<std::abs(channel(i)->rxFrequency()-rx)) )
       continue;
-    DigitalChannel *digi = _channels[i]->as<DigitalChannel>();
+    DigitalChannel *digi = channel(i)->as<DigitalChannel>();
     if (digi->timeslot() != ts)
       continue;
     if (digi->colorCode() != cc)
@@ -450,330 +435,12 @@ ChannelList::findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot t
 AnalogChannel *
 ChannelList::findAnalogChannelByTxFreq(double freq) const {
   for (int i=0; i<count(); i++) {
-    if (! _channels[i]->is<AnalogChannel>())
+    if (! channel(i)->is<AnalogChannel>())
       continue;
-    if (1e-6 > std::abs(_channels[i]->txFrequency()-freq))
-      return _channels[i]->as<AnalogChannel>();
+    if (1e-6 > std::abs(channel(i)->txFrequency()-freq))
+      return channel(i)->as<AnalogChannel>();
   }
   return nullptr;
-}
-
-int
-ChannelList::addChannel(Channel *channel, int row) {
-  if (_channels.contains(channel))
-    return -1;
-  if ((row<0) || (row>_channels.size()))
-    row = _channels.size();
-  beginInsertRows(QModelIndex(), row, row);
-  connect(channel, SIGNAL(modified()), this, SIGNAL(modified()));
-  connect(channel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
-  _channels.insert(row, channel);
-  endInsertRows();
-  emit modified();
-  return row;
-}
-
-bool
-ChannelList::remChannel(int idx) {
-  if ((0>idx) || (idx >= _channels.size()))
-    return false;
-  beginRemoveRows(QModelIndex(), idx, idx);
-  Channel *channel = _channels.at(idx);
-  _channels.remove(idx);
-  channel->deleteLater();
-  endRemoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ChannelList::remChannel(Channel *channel) {
-  if (! _channels.contains(channel))
-    return false;
-  int idx = _channels.indexOf(channel);
-  return remChannel(idx);
-}
-
-bool
-ChannelList::moveUp(int row) {
-  if ((0>=row) || (row>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  std::swap(_channels[row], _channels[row-1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ChannelList::moveUp(int first, int last) {
-  if ((0>=first) || (last>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
-  for (int row=first; row<=last; row++)
-    std::swap(_channels[row], _channels[row-1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ChannelList::moveDown(int row) {
-  if ((0>row) || ((row+1)>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  std::swap(_channels[row], _channels[row+1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ChannelList::moveDown(int first, int last) {
-  if ((0>first) || ((last+1)>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
-  for (int row=last; row>=first; row--)
-    std::swap(_channels[row], _channels[row+1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-int
-ChannelList::rowCount(const QModelIndex &idx) const {
-  Q_UNUSED(idx);
-  return _channels.size();
-}
-int
-ChannelList::columnCount(const QModelIndex &idx) const {
-  Q_UNUSED(idx);
-  return 20;
-}
-
-inline QString formatFrequency(float f) {
-  int val = std::round(f*10000);
-  return QString::number(double(val)/10000, 'f', 4);
-}
-
-QVariant
-ChannelList::data(const QModelIndex &index, int role) const {
-  if ((! index.isValid()) || (index.row()>=_channels.size()))
-    return QVariant();
-  if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
-    return QVariant();
-
-  Channel *channel = _channels[index.row()];
-
-  switch (index.column()) {
-  case 0:
-    if (channel->is<AnalogChannel>())
-      return tr("Analog");
-    else
-      return tr("Digital");
-  case 1:
-    return channel->name();
-  case 2:
-    return formatFrequency(channel->rxFrequency());
-  case 3:
-    if (channel->txFrequency()<channel->rxFrequency())
-      return formatFrequency(channel->txFrequency()-channel->rxFrequency());
-    else
-      return formatFrequency(channel->txFrequency());
-  case 4:
-    switch (channel->power()) {
-    case Channel::MaxPower: return tr("Max");
-    case Channel::HighPower: return tr("High");
-    case Channel::MidPower: return tr("Mid");
-    case Channel::LowPower: return tr("Low");
-    case Channel::MinPower: return tr("Min");
-    }
-  case 5:
-    if (0 == channel->txTimeout())
-      return tr("-");
-    return QString::number(channel->txTimeout());
-  case 6:
-    return channel->rxOnly() ? tr("On") : tr("Off");
-  case 7:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      switch (digi->admit()) {
-      case DigitalChannel::AdmitNone: return tr("Always");
-      case DigitalChannel::AdmitFree: return tr("Free");
-      case DigitalChannel::AdmitColorCode: return tr("Color");
-      }
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      switch (analog->admit()) {
-      case AnalogChannel::AdmitNone: return tr("Always");
-      case AnalogChannel::AdmitFree: return tr("Free");
-      case AnalogChannel::AdmitTone: return tr("Tone");
-      }
-    }
-    break;
-  case 8:
-    if (channel->scanList()) {
-      return channel->scanList()->name();
-    } else {
-      return tr("-");
-    }
-  case 9:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      return digi->colorCode();
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
-  case 10:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      return (DigitalChannel::TimeSlot1 == digi->timeslot()) ? 1 : 2;
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
-  case 11:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->rxGroupList()) {
-        return digi->rxGroupList()->name();
-      } else {
-        return tr("-");
-      }
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
-  case 12:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->txContact())
-        return digi->txContact()->name();
-      else
-        return tr("-");
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
-  case 13:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->radioId())
-        return digi->radioId()->id();
-      else
-        return tr("[Default]");
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
-  case 14:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->posSystem())
-        return digi->posSystem()->name();
-      else
-        return tr("-");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (analog->aprsSystem())
-        return analog->aprsSystem()->name();
-      else
-        return tr("-");
-    }
-    break;
-  case 15:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->roaming())
-        return digi->roaming()->name();
-      else
-        return tr("-");
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
-  case 16:
-    if (channel->is<DigitalChannel>()) {
-      return tr("[None]");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (0 == analog->squelch()) {
-        return tr("Off");
-      } else
-        return analog->squelch();
-    }
-    break;
-  case 17:
-    if (channel->is<DigitalChannel>()) {
-      return tr("[None]");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (Signaling::SIGNALING_NONE == analog->rxTone()) {
-        return tr("Off");
-      } else
-        return Signaling::codeLabel(analog->rxTone());
-    }
-    break;
-  case 18:
-    if (channel->is<DigitalChannel>()) {
-      return tr("[None]");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (Signaling::SIGNALING_NONE == analog->txTone()) {
-        return tr("Off");
-      } else
-        return Signaling::codeLabel(analog->txTone());
-    }
-    break;
-  case 19:
-    if (channel->is<DigitalChannel>()) {
-      return tr("[None]");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (AnalogChannel::BWWide == analog->bandwidth()) {
-        return tr("Wide");
-      } else
-        return tr("Narrow");
-    }
-    break;
-
-  default:
-    break;
-  }
-
-  return QVariant();
-}
-
-QVariant
-ChannelList::headerData(int section, Qt::Orientation orientation, int role) const {
-  if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation))
-    return QVariant();
-  switch (section) {
-  case 0: return tr("Type");
-  case 1: return tr("Name");
-  case 2: return tr("Rx Frequency");
-  case 3: return tr("Tx Frequency");
-  case 4: return tr("Power");
-  case 5: return tr("Timeout");
-  case 6: return tr("Rx Only");
-  case 7: return tr("Admit");
-  case 8: return tr("Scanlist");
-  case 9: return tr("CC");
-  case 10: return tr("TS");
-  case 11: return tr("RX Group List");
-  case 12: return tr("TX Contact");
-  case 13: return tr("DMR ID");
-  case 14: return tr("GPS/APRS");
-  case 15: return tr("Roaming");
-  case 16: return tr("Squelch");
-  case 17: return tr("Rx Tone");
-  case 18: return tr("Tx Tone");
-  case 19: return tr("Bandwidth");
-    default:
-      break;
-  }
-  return QVariant();
-}
-
-void
-ChannelList::onChannelDeleted(QObject *obj) {
-  if (Channel *channel = reinterpret_cast<Channel *>(obj))
-    remChannel(channel);
-}
-
-void
-ChannelList::onChannelEdited() {
-  if (0 == count())
-    return;
-  QModelIndex tl = index(0,0), br = index(count()-1, columnCount(QModelIndex()));
-  emit dataChanged(tl, br);
 }
 
 

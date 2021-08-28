@@ -14,7 +14,7 @@ ChannelComboBox::ChannelComboBox(ChannelList *list, bool includeSelectedChannel,
   completer()->setCompletionMode(QCompleter::PopupCompletion);
   if (includeSelectedChannel)
     addItem(SelectedChannel::get()->name(), QVariant::fromValue(SelectedChannel::get()));
-  for (int i=0; i<list->rowCount(QModelIndex()); i++)
+  for (int i=0; i<list->count(); i++)
     addItem(list->channel(i)->name(), QVariant::fromValue(list->channel(i)));
 }
 

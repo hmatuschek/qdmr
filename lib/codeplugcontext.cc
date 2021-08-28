@@ -55,7 +55,7 @@ bool
 CodeplugContext::addChannel(Channel *ch, int index) {
   if (_channelTable.contains(index))
     return false;
-  int cidx = _config->channelList()->addChannel(ch);
+  int cidx = _config->channelList()->add(ch);
   if (0 > cidx)
     return false;
   _channelTable[index] = cidx;

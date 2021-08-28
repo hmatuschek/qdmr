@@ -1,7 +1,7 @@
 #ifndef CONFIG_ITEM_WRAPPER_HH
 #define CONFIG_ITEM_WRAPPER_HH
 
-#include "configitem.hh"
+#include "config.hh"
 #include <QAbstractTableModel>
 
 class GenericListWrapper: public QAbstractListModel
@@ -9,10 +9,19 @@ class GenericListWrapper: public QAbstractListModel
   Q_OBJECT
 
 protected:
-  GenericListWrapper(Configuration::List *list, QObject *parent=nullptr);
+  GenericListWrapper(AbstractConfigObjectList *list, QObject *parent=nullptr);
 
 public:
-  // QAbstractTableModel interface
+  /** Moves the channel at index @c idx one step up. */
+  virtual bool moveUp(int idx);
+  /** Moves the channels at one step up. */
+  virtual bool moveUp(int first, int last);
+  /** Moves the channel at index @c idx one step down. */
+  virtual bool moveDown(int idx);
+  /** Moves the channels one step down. */
+  virtual bool moveDown(int first, int last);
+
+  // QAbstractListModel interface
   /** Implements QAbstractTableModel, returns number of rows. */
   int rowCount(const QModelIndex &index) const;
   /** Implements QAbstractTableModel, returns number of colums. */
@@ -32,7 +41,7 @@ protected slots:
 
 protected:
   /** Holds a weak reference to the list object. */
-  Configuration::List *_list;
+  AbstractConfigObjectList *_list;
 };
 
 
@@ -41,7 +50,7 @@ class GenericTableWrapper: public QAbstractTableModel
   Q_OBJECT
 
 protected:
-  GenericTableWrapper(Configuration::List *list, QObject *parent=nullptr);
+  GenericTableWrapper(AbstractConfigObjectList *list, QObject *parent=nullptr);
 
 public:
   // QAbstractTableModel interface
@@ -62,7 +71,7 @@ protected slots:
 
 protected:
   /** Holds a weak reference to the list object. */
-  Configuration::List *_list;
+  AbstractConfigObjectList *_list;
 };
 
 
@@ -71,7 +80,7 @@ class ChannelListWrapper: public GenericTableWrapper
   Q_OBJECT
 
 public:
-  ChannelListWrapper(Configuration::ChannelList *list, QObject *parent=nullptr);
+  ChannelListWrapper(ChannelList *list, QObject *parent=nullptr);
 
 public:
   // QAbstractTableModel interface

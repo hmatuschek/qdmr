@@ -754,7 +754,7 @@ D878UVCodeplug::aprs_setting_t::linkAPRSSystem(APRSSystem *sys, CodeplugContext 
                            getSignaling(), AnalogChannel::BWWide, nullptr);
     logInfo() << "No matching APRS chanel found for TX frequency " << getFrequency()
               << ", create one as 'APRS Channel'";
-    ctx.config()->channelList()->addChannel(ch);
+    ctx.config()->channelList()->add(ch);
   }
   sys->setChannel(ch);
 }
@@ -945,7 +945,7 @@ D878UVCodeplug::roaming_channel_t::toChannel(CodeplugContext &ctx) {
                               getColorCode(), getTimeslot(), nullptr, nullptr, nullptr,
                               nullptr, nullptr, nullptr);
     logDebug() << "Create channel '" << digi->name() << "' as roaming channel.";
-    ctx.config()->channelList()->addChannel(digi);
+    ctx.config()->channelList()->add(digi);
   }
   return digi;
 }

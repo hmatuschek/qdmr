@@ -5,7 +5,7 @@
 /* ********************************************************************************************* *
  * Implementation of GenericListWrapper
  * ********************************************************************************************* */
-GenericListWrapper::GenericListWrapper(Configuration::List *list, QObject *parent)
+GenericListWrapper::GenericListWrapper(AbstractConfigObjectList *list, QObject *parent)
   : QAbstractListModel(parent), _list(list)
 {
   if (nullptr == _list)
@@ -31,6 +31,50 @@ GenericListWrapper::columnCount(const QModelIndex &index) const {
   return 1;
 }
 
+bool
+GenericListWrapper::moveUp(int row) {
+  if ((0>=row) || (row>=_list->count()))
+    return false;
+  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
+  _list->moveUp(row);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+GenericListWrapper::moveUp(int first, int last) {
+  if ((0>=first) || (last>=_list->count()))
+    return false;
+  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
+  _list->moveUp(first, last);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+GenericListWrapper::moveDown(int row) {
+  if ((0>row) || ((row+1)>=_list->count()))
+    return false;
+  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
+  _list->moveDown(row);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+GenericListWrapper::moveDown(int first, int last) {
+  if ((0>first) || ((last+1)>=_list->count()))
+    return false;
+  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
+  _list->moveDown(first, last);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
 
 void
 GenericListWrapper::onListDeleted() {
@@ -54,7 +98,7 @@ GenericListWrapper::onItemModified(int idx) {
 /* ********************************************************************************************* *
  * Implementation of GenericTableWrapper
  * ********************************************************************************************* */
-GenericTableWrapper::GenericTableWrapper(Configuration::List *list, QObject *parent)
+GenericTableWrapper::GenericTableWrapper(AbstractConfigObjectList *list, QObject *parent)
   : QAbstractTableModel(parent), _list(list)
 {
   if (nullptr == _list)
@@ -93,9 +137,9 @@ GenericTableWrapper::onItemModified(int idx) {
 
 
 /* ********************************************************************************************* *
- * Implementation of ChannelListWrapper
+ * Implementation of
  * ********************************************************************************************* */
-ChannelListWrapper::ChannelListWrapper(Configuration::ChannelList *list, QObject *parent)
+ChannelListWrapper::ChannelListWrapper(ChannelList *list, QObject *parent)
   : GenericTableWrapper(list, parent)
 {
   // pass...
@@ -122,25 +166,23 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
     return QVariant();
 
-  Configuration::Channel *channel = _list->get(index.row())->as<Configuration::Channel>();
-  if (nullptr == channel)
-    return QVariant();
+  Channel *channel = dynamic_cast<ChannelList *>(_list)->channel(index.row());
 
   switch (index.column()) {
   case 0:
-    if (channel->is<Configuration::AnalogChannel>())
+    if (channel->is<AnalogChannel>())
       return tr("Analog");
     else
       return tr("Digital");
   case 1:
     return channel->name();
   case 2:
-    return formatFrequency(channel->rx());
+    return formatFrequency(channel->rxFrequency());
   case 3:
-    if (channel->tx()<channel->rx())
-      return formatFrequency(channel->tx()-channel->rx());
+    if (channel->txFrequency()<channel->rxFrequency())
+      return formatFrequency(channel->txFrequency()-channel->rxFrequency());
     else
-      return formatFrequency(channel->tx());
+      return formatFrequency(channel->txFrequency());
   case 4:
     switch (channel->power()) {
     case Channel::MaxPower: return tr("Max");
@@ -156,13 +198,13 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 6:
     return channel->rxOnly() ? tr("On") : tr("Off");
   case 7:
-    if (Configuration::DigitalChannel *digi = channel->as<Configuration::DigitalChannel>()) {
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
       switch (digi->admit()) {
       case DigitalChannel::AdmitNone: return tr("Always");
       case DigitalChannel::AdmitFree: return tr("Free");
       case DigitalChannel::AdmitColorCode: return tr("Color");
       }
-    } else if (Configuration::AnalogChannel *analog = channel->as<Configuration::AnalogChannel>()) {
+    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
       switch (analog->admit()) {
       case AnalogChannel::AdmitNone: return tr("Always");
       case AnalogChannel::AdmitFree: return tr("Free");
@@ -177,77 +219,77 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       return tr("-");
     }
   case 9:
-    if (Configuration::DigitalChannel *digi = channel->as<Configuration::DigitalChannel>()) {
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
       return digi->colorCode();
     } else if (channel->is<AnalogChannel>()) {
       return tr("[None]");
     }
     break;
   case 10:
-    if (Configuration::DigitalChannel *digi = channel->as<Configuration::DigitalChannel>()) {
-      return (DigitalChannel::TimeSlot1 == digi->timeSlot()) ? 1 : 2;
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+      return (DigitalChannel::TimeSlot1 == digi->timeslot()) ? 1 : 2;
     } else if (channel->is<AnalogChannel>()) {
       return tr("[None]");
     }
     break;
   case 11:
-    if (Configuration::DigitalChannel *digi = channel->as<Configuration::DigitalChannel>()) {
-      if (digi->groupList()) {
-        return digi->groupList()->name();
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+      if (digi->rxGroupList()) {
+        return digi->rxGroupList()->name();
       } else {
         return tr("-");
       }
-    } else if (channel->is<Configuration::AnalogChannel>()) {
+    } else if (channel->is<AnalogChannel>()) {
       return tr("[None]");
     }
     break;
   case 12:
-    if (Configuration::DigitalChannel *digi = channel->as<Configuration::DigitalChannel>()) {
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
       if (digi->txContact())
         return digi->txContact()->name();
       else
         return tr("-");
-    } else if (channel->is<Configuration::AnalogChannel>()) {
+    } else if (channel->is<AnalogChannel>()) {
       return tr("[None]");
     }
     break;
   case 13:
-    if (Configuration::DigitalChannel *digi = channel->as<Configuration::DigitalChannel>()) {
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
       if (digi->radioId())
-        return digi->radioId()->number();
+        return digi->radioId()->id();
       else
         return tr("[Default]");
-    } else if (channel->is<Configuration::AnalogChannel>()) {
+    } else if (channel->is<AnalogChannel>()) {
       return tr("[None]");
     }
     break;
   case 14:
-    if (Configuration::DigitalChannel *digi = channel->as<Configuration::DigitalChannel>()) {
-      if (digi->aprs())
-        return digi->aprs()->name();
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+      if (digi->posSystem())
+        return digi->posSystem()->name();
       else
         return tr("-");
-    } else if (Configuration::AnalogChannel *analog = channel->as<Configuration::AnalogChannel>()) {
-      if (analog->aprs())
-        return analog->aprs()->name();
+    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+      if (analog->aprsSystem())
+        return analog->aprsSystem()->name();
       else
         return tr("-");
     }
     break;
   case 15:
-    if (Configuration::DigitalChannel *digi = channel->as<Configuration::DigitalChannel>()) {
-      if (digi->roamingZone())
-        return digi->roamingZone()->name();
+    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+      if (digi->roaming())
+        return digi->roaming()->name();
       else
         return tr("-");
-    } else if (channel->is<Configuration::AnalogChannel>()) {
+    } else if (channel->is<AnalogChannel>()) {
       return tr("[None]");
     }
     break;
   case 16:
-    if (channel->is<Configuration::DigitalChannel>()) {
+    if (channel->is<DigitalChannel>()) {
       return tr("[None]");
-    } else if (Configuration::AnalogChannel *analog = channel->as<Configuration::AnalogChannel>()) {
+    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
       if (0 == analog->squelch()) {
         return tr("Off");
       } else
@@ -255,30 +297,30 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     }
     break;
   case 17:
-    if (channel->is<Configuration::DigitalChannel>()) {
+    if (channel->is<DigitalChannel>()) {
       return tr("[None]");
-    } else if (Configuration::AnalogChannel *analog = channel->as<Configuration::AnalogChannel>()) {
-      if (Signaling::SIGNALING_NONE == analog->rxSignalling()) {
+    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+      if (Signaling::SIGNALING_NONE == analog->rxTone()) {
         return tr("Off");
       } else
-        return Signaling::codeLabel(analog->rxSignalling());
+        return Signaling::codeLabel(analog->rxTone());
     }
     break;
   case 18:
-    if (channel->is<Configuration::DigitalChannel>()) {
+    if (channel->is<DigitalChannel>()) {
       return tr("[None]");
-    } else if (Configuration::AnalogChannel *analog = channel->as<Configuration::AnalogChannel>()) {
-      if (Signaling::SIGNALING_NONE == analog->txSignalling()) {
+    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+      if (Signaling::SIGNALING_NONE == analog->txTone()) {
         return tr("Off");
       } else
-        return Signaling::codeLabel(analog->txSignalling());
+        return Signaling::codeLabel(analog->txTone());
     }
     break;
   case 19:
-    if (channel->is<Configuration::DigitalChannel>()) {
+    if (channel->is<DigitalChannel>()) {
       return tr("[None]");
-    } else if (Configuration::AnalogChannel *analog = channel->as<Configuration::AnalogChannel>()) {
-      if (AnalogChannel::BWWide == analog->bandWidth()) {
+    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+      if (AnalogChannel::BWWide == analog->bandwidth()) {
         return tr("Wide");
       } else
         return tr("Narrow");
