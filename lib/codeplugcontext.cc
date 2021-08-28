@@ -127,7 +127,7 @@ bool
 CodeplugContext::addGroupList(RXGroupList *grp, int index) {
   if (_groupListTable.contains(index))
     return false;
-  int cidx = _config->rxGroupLists()->addList(grp);
+  int cidx = _config->rxGroupLists()->add(grp);
   if (0 > cidx)
     return false;
   _groupListTable[index] = cidx;
@@ -231,7 +231,7 @@ CodeplugContext::addRoamingZone(RoamingZone *zone, int index) {
   if (_roamingZoneTable.contains(index))
     return false;
   int sidx = _config->roaming()->count();
-  if (! _config->roaming()->addZone(zone))
+  if (! _config->roaming()->add(zone))
     return false;
   _roamingZoneTable[index] = sidx;
   return true;

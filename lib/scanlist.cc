@@ -33,7 +33,7 @@ ScanList::clear() {
   _priorityChannel = nullptr;
   _secPriorityChannel = nullptr;
   _txChannel = nullptr;
-  emit modified();
+  emit modified(this);
 }
 
 const QString &
@@ -46,7 +46,7 @@ ScanList::setName(const QString &name) {
   if (name.simplified().isEmpty())
     return false;
   _name = name.simplified();
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -68,7 +68,7 @@ ScanList::addChannel(Channel *channel) {
     return false;
   connect(channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
   _channels.append(channel);
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -79,7 +79,7 @@ ScanList::remChannel(int idx) {
   Channel *channel = _channels[idx];
   _channels.remove(idx);
   disconnect(channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -104,7 +104,7 @@ ScanList::setPriorityChannel(Channel *channel) {
   _priorityChannel = channel;
   if (_priorityChannel)
     connect(_priorityChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
-  emit modified();
+  emit modified(this);
 }
 
 Channel *
@@ -120,7 +120,7 @@ ScanList::setSecPriorityChannel(Channel *channel) {
   _secPriorityChannel = channel;
   if (_secPriorityChannel)
     connect(_secPriorityChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
-  emit modified();
+  emit modified(this);
 }
 
 Channel *
@@ -135,7 +135,7 @@ ScanList::setTXChannel(Channel *channel) {
   _txChannel = channel;
   if (_txChannel)
     connect(_txChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
-  emit modified();
+  emit modified(this);
 }
 
 void
@@ -168,3 +168,9 @@ ScanLists::scanlist(int idx) const {
   return nullptr;
 }
 
+int
+ScanLists::add(ConfigObject *obj, int row) {
+  if (obj && obj->is<ScanList>())
+    return ConfigObjectList::add(obj, row);
+  return -1;
+}

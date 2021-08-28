@@ -53,7 +53,7 @@ RXGroupListDialog::construct() {
 
   if (_list) {
     groupListName->setText(_list->name());
-    for (int i=0; i<_list->rowCount(QModelIndex()); i++) {
+    for (int i=0; i<_list->count(); i++) {
       QListWidgetItem *item = new QListWidgetItem(_list->contact(i)->name());
       item->setData(Qt::UserRole, QVariant::fromValue(_list->contact(i)));
       groupListWidget->addItem(item);
@@ -130,7 +130,7 @@ RXGroupListBox::RXGroupListBox(RXGroupLists *groups, QWidget *parent)
 void
 populateRXGroupListBox(QComboBox *box, RXGroupLists *groups, RXGroupList *list) {
   box->addItem(QObject::tr("[None]"), QVariant::fromValue(nullptr));
-  for (int i=0; i<groups->rowCount(QModelIndex()); i++) {
+  for (int i=0; i<groups->count(); i++) {
     box->addItem(groups->list(i)->name(), QVariant::fromValue(groups->list(i)));
     if (groups->list(i) == list)
       box->setCurrentIndex(i+1);

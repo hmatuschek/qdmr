@@ -49,10 +49,6 @@ public:
   /** Sets the TX channel. */
   void setTXChannel(Channel *channel);
 
-signals:
-  /** Gets emitted whenever the scanlist is modified. */
-	void modified();
-
 protected slots:
   /** Internal used callback to handle deleted channels. */
 	void onChannelDeleted(QObject *obj);
@@ -84,6 +80,8 @@ public:
 
   /** Returns the scanlist at the given index. */
 	ScanList *scanlist(int idx) const;
+
+  int add(ConfigObject *obj, int row=-1);
 
 	/** Implementation of QAbstractListModel, returns the number of scanlists. */
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;

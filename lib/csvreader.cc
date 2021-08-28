@@ -1894,7 +1894,7 @@ CSVReader::handleGroupList(qint64 idx, const QString &name, const QList<qint64> 
   }
   // Create group list
   RXGroupList *lst = new RXGroupList(name);
-  _config->rxGroupLists()->addList(lst);
+  _config->rxGroupLists()->add(lst);
   _rxgroups[idx] = lst;
 
   return true;
@@ -2254,7 +2254,7 @@ CSVReader::handleRoamingZone(qint64 idx, const QString &name, const QList<qint64
   if (! _roamingZones.contains(idx)) {
     RoamingZone *zone = new RoamingZone(name);
     _roamingZones[idx] = zone;
-    _config->roaming()->addZone(zone);
+    _config->roaming()->add(zone);
   }
 
   return true;

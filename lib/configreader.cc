@@ -214,11 +214,20 @@ ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
   }
 
   if (node["group-lists"] && node["group-lists"].IsSequence()) {
+    GroupListReader reader;
     for (YAML::const_iterator it=node["group-lists"].begin(); it!=node["group-lists"].end(); it++) {
-      // pass...
+      RXGroupList *list = reader.allocate(*it, ctx)->as<RXGroupList>();
+      if (nullptr == list) {
+        _errorMessage = tr("Cannot allocate group list: %1").arg(reader.errorMessage());
+        return false;
+      }
+      if (! reader.parse(list, *it, ctx)) {
+        _errorMessage = tr("Cannot parse group list: %1").arg(reader.errorMessage());
+        return false;
+      }
     }
   } else {
-    _errorMessage = "Element 'contacts' missing or not a list.";
+    _errorMessage = "Element 'group-lists' missing or not a list.";
     return false;
   }
 
@@ -253,8 +262,18 @@ ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
   }
 
   if (node["roaming"] && node["roaming"].IsSequence()) {
+    RoamingReader reader;
     for (YAML::const_iterator it=node["roaming"].begin(); it!=node["roaming"].end(); it++) {
-
+      RoamingZone *zone = reader.allocate(*it, ctx)->as<RoamingZone>();
+      if (nullptr == zone) {
+        _errorMessage = tr("Cannot allocate roaming: ").arg(reader.errorMessage());
+        return false;
+      }
+      if (! reader.parse(zone, *it, ctx)) {
+        _errorMessage = tr("Cannot parse roaming: ").arg(reader.errorMessage());
+        return false;
+      }
+      config->roaming()->add(zone);
     }
   }
 
@@ -357,9 +376,15 @@ ConfigReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject
     }
   }
 
-  // link group lists
-  for (int i=0; i<config->rxGroupLists()->count(); i++) {
-    return false;
+  { // link group lists
+    GroupListReader reader;
+    for (int i=0; i<config->rxGroupLists()->count(); i++) {
+      if (! reader.link(config->rxGroupLists()->list(i), node["group-lists"][i], ctx)) {
+        _errorMessage = tr("Cannot link group list '%1': %2")
+            .arg(config->rxGroupLists()->list(i)->name()).arg(reader.errorMessage());
+        return false;
+      }
+    }
   }
 
   { // positioning
@@ -383,9 +408,15 @@ ConfigReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject
     }
   }
 
-  // roaming
-  for (int i=0; i<config->roaming()->count(); i++) {
-    return false;
+  { // roaming
+    RoamingReader reader;
+    for (int i=0; i<config->roaming()->count(); i++) {
+      if (reader.link(config->roaming()->zone(i), node["roaming"][i], ctx)) {
+        _errorMessage = tr("Cannot link roaming '%1': %2")
+            .arg(config->roaming()->zone(i)->name()).arg(reader.errorMessage());
+        return false;
+      }
+    }
   }
 
   // link extensions
@@ -1601,7 +1632,7 @@ ScanListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObje
   // link extensions
   foreach (QString name, list->extensionNames()) {
     if (! _extensions[name]->link(list->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link zone extension '%1': %2")
+      _errorMessage = tr("Cannot link scan-list extension '%1': %2")
           .arg(name).arg(_extensions[name]->errorMessage());
     }
   }
@@ -1609,4 +1640,180 @@ ScanListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObje
   return true;
 }
 
+
+/* ********************************************************************************************* *
+ * Implementation of GroupListReader
+ * ********************************************************************************************* */
+QHash<QString, AbstractConfigReader *> GroupListReader::_extensions;
+
+GroupListReader::GroupListReader(QObject *parent)
+  : ObjectReader(parent)
+{
+  // pass...
+}
+
+
+ConfigObject *
+GroupListReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return new RXGroupList("");
+}
+
+bool
+GroupListReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+  RXGroupList *list = qobject_cast<RXGroupList *>(obj);
+
+  if (! ObjectReader::parse(obj, node, ctx))
+    return false;
+
+  if (node["name"] && node["name"].IsScalar()) {
+    list->setName(QString::fromStdString(node["name"].as<std::string>()));
+  } else {
+    _errorMessage = tr("Cannot parse group list: No name defined");
+    return false;
+  }
+
+  // Parse extensions:
+  foreach (QString name, _extensions.keys()) {
+    if (node[name.toStdString()]) {
+      YAML::Node extNode = node[name.toStdString()];
+      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
+      if (!ext) {
+        _errorMessage = tr("Cannot parse group list extension: %1").arg(_extensions[name]->errorMessage());
+        return false;
+      }
+      if (! _extensions[name]->parse(ext, extNode, ctx)) {
+        _errorMessage = tr("Cannot parse group list extension: %1").arg(_extensions[name]->errorMessage());
+        return false;
+      }
+      list->addExtension(name, ext);
+    }
+  }
+
+  return true;
+}
+
+bool
+GroupListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  RXGroupList *list = qobject_cast<RXGroupList *>(obj);
+
+  // link group calls
+  if (node["members"] && node["members"].IsSequence()) {
+    for (YAML::const_iterator it=node["members"].begin(); it!=node["members"].end(); it++) {
+      if (!it->IsScalar()) {
+        _errorMessage = tr("Cannot link group list '%1': Contact reference of wrong type.")
+            .arg(list->name());
+        return false;
+      }
+      QString id = QString::fromStdString(it->as<std::string>());
+      if ((! ctx.contains(id)) || (ctx.getObj(id)->is<DigitalContact>())) {
+        _errorMessage = _errorMessage = tr("Cannot link group list '%1': '%2' does not refer to a digital contact.")
+            .arg(list->name()).arg(id);
+        return false;
+      }
+      list->addContact(ctx.getObj(id)->as<DigitalContact>());
+    }
+  } else {
+    _errorMessage = tr("Cannot link group list '%1': No member list defined.").arg(list->name());
+    return false;
+  }
+
+  // link extensions
+  foreach (QString name, list->extensionNames()) {
+    if (! _extensions[name]->link(list->extension(name), node, ctx)) {
+      _errorMessage = tr("Cannot link group list extension '%1': %2")
+          .arg(name).arg(_extensions[name]->errorMessage());
+    }
+  }
+
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of RoamingReader
+ * ********************************************************************************************* */
+QHash<QString, AbstractConfigReader *> RoamingReader::_extensions;
+
+RoamingReader::RoamingReader(QObject *parent)
+  : ObjectReader(parent)
+{
+  // pass...
+}
+
+
+ConfigObject *
+RoamingReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return new RoamingZone("");
+}
+
+bool
+RoamingReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+  RoamingZone *zone = qobject_cast<RoamingZone *>(obj);
+
+  if (! ObjectReader::parse(obj, node, ctx))
+    return false;
+
+  if (node["name"] && node["name"].IsScalar()) {
+    zone->setName(QString::fromStdString(node["name"].as<std::string>()));
+  } else {
+    _errorMessage = tr("Cannot parse roaming: No name defined");
+    return false;
+  }
+
+  // Parse extensions:
+  foreach (QString name, _extensions.keys()) {
+    if (node[name.toStdString()]) {
+      YAML::Node extNode = node[name.toStdString()];
+      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
+      if (!ext) {
+        _errorMessage = tr("Cannot parse roaming extension: %1").arg(_extensions[name]->errorMessage());
+        return false;
+      }
+      if (! _extensions[name]->parse(ext, extNode, ctx)) {
+        _errorMessage = tr("Cannot parse roaming extension: %1").arg(_extensions[name]->errorMessage());
+        return false;
+      }
+      zone->addExtension(name, ext);
+    }
+  }
+
+  return true;
+}
+
+bool
+RoamingReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  RoamingZone *zone = qobject_cast<RoamingZone *>(obj);
+
+  // link channels
+  if (node["channels"] && node["channels"].IsSequence()) {
+    for (YAML::const_iterator it=node["channels"].begin(); it!=node["channels"].end(); it++) {
+      if (!it->IsScalar()) {
+        _errorMessage = tr("Cannot link roaming '%1': Digital channel reference of wrong type.")
+            .arg(zone->name());
+        return false;
+      }
+      QString id = QString::fromStdString(it->as<std::string>());
+      if ((! ctx.contains(id)) || (ctx.getObj(id)->is<DigitalChannel>())) {
+        _errorMessage = _errorMessage = tr("Cannot link roaming '%1': '%2' does not refer to a digital channel.")
+            .arg(zone->name()).arg(id);
+        return false;
+      }
+      zone->addChannel(ctx.getObj(id)->as<DigitalChannel>());
+    }
+  } else {
+    _errorMessage = tr("Cannot link roaming '%1': No channel list defined.").arg(zone->name());
+    return false;
+  }
+
+  // link extensions
+  foreach (QString name, zone->extensionNames()) {
+    if (! _extensions[name]->link(zone->extension(name), node, ctx)) {
+      _errorMessage = tr("Cannot link roaming extension '%1': %2")
+          .arg(name).arg(_extensions[name]->errorMessage());
+    }
+  }
+
+  return true;
+}
 

@@ -10,7 +10,7 @@
  * repeater gets out of range, another one might be found automaticall from within the roaming zone.
  *
  * @ingroup config */
-class RoamingZone : public QAbstractListModel
+class RoamingZone : public ConfigObject
 {
   Q_OBJECT
 
@@ -22,6 +22,7 @@ public:
 
   /** Returns the number of zones. */
   int count() const;
+
   /** Clears the zone list. */
   void clear();
 
@@ -47,17 +48,6 @@ public:
   bool moveUp(int row);
   /** Moves the channel at the given row one down. */
   bool moveDown(int row);
-
-  /** Implementation of QAbstractListModel, returns the number of rows. */
-  int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  /** Implementation of QAbstractListModel, returns the item data at the given index. */
-  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-  /** Implementation of QAbstractListModel, returns the header data at the given section. */
-  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-
-signals:
-  /** Gets emitted whenever the zone list or any of its zones is modified. */
-  void modified();
 
 protected slots:
   /** Internal used callback to handle deleted channels. */
@@ -97,21 +87,13 @@ protected:
 /** Represents the list of roaming zones within the abstract device configuration.
  *
  * @ingroup config */
-class RoamingZoneList: public QAbstractListModel
+class RoamingZoneList: public ConfigObjectList
 {
   Q_OBJECT
 
 public:
   /** Constructor. */
   explicit RoamingZoneList(QObject *parent=nullptr);
-
-  /** Returns the number of roaming zones. */
-  int count() const;
-  /** Clears the roaming zone list. */
-  void clear();
-  /** Returns the index of the given roaming zone within this list.
-   * @returns Index or -1 if zone is not a member. */
-  int indexOf(RoamingZone *zone) const;
 
   /** Returns a set of unique channels used in all roaming zones. */
   QSet<DigitalChannel *> uniqueChannels() const;
@@ -120,22 +102,8 @@ public:
 
   /** Returns the roaming zone at the given index. */
   RoamingZone *zone(int idx) const;
-  /** Adds a roaming zone to the list at the given row.
-   * If row<0, the roaming zone is appended to the list. */
-  bool addZone(RoamingZone *zone, int row=-1);
-  /** Removes the roaming zone at the given index. */
-  bool remZone(int idx);
-  /** Removes the given roaming zone from the list. */
-  bool remZone(RoamingZone *zone);
 
-  /** Moves the roaming zone at the given row one up. */
-  bool moveUp(int row);
-  /** Moves the roaming zones one up. */
-  bool moveUp(int first, int last);
-  /** Moves the roaming zone at the given row one down. */
-  bool moveDown(int row);
-  /** Moves the roaming zones one down. */
-  bool moveDown(int first, int last);
+  int add(ConfigObject *obj, int row=-1);
 
   /** Implementation of QAbstractListModel, returns the number of rows. */
   int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -143,18 +111,6 @@ public:
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
   /** Implementation of QAbstractListModel, returns the header data at the given section. */
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-
-signals:
-  /** Gets emitted whenever the zone list or any of its zones is modified. */
-  void modified();
-
-protected slots:
-  /** Internal used callback to handle deleted roaming zones. */
-  void onZoneDeleted(QObject *obj);
-
-protected:
-  /** The list of roaming zones. */
-  QVector<RoamingZone *> _zones;
 };
 
 #endif // ROAMINGZONE_HH

@@ -174,4 +174,36 @@ public:
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 };
 
+
+class GroupListsWrapper: public GenericListWrapper
+{
+  Q_OBJECT
+
+public:
+  GroupListsWrapper(RXGroupLists *list, QObject *parent=nullptr);
+
+public:
+  // Implementation of QAbstractListModel
+  /** Returns the cell data at given index, implements the QAbstractTableModel. */
+  QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
+  /** Implementation of QAbstractListModel, returns the header data at the given section. */
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+};
+
+
+class RoamingListWrapper: public GenericListWrapper
+{
+  Q_OBJECT
+
+public:
+  RoamingListWrapper(RoamingZoneList *list, QObject *parent=nullptr);
+
+public:
+  // Implementation of QAbstractListModel
+  /** Returns the cell data at given index, implements the QAbstractTableModel. */
+  QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
+  /** Returns the header at given section, implements the QAbstractTableModel. */
+  QVariant headerData(int section, Qt::Orientation orientation, int role=Qt::DisplayRole) const;
+};
+
 #endif // CONFIG_ITEM_WRAPPER_HH

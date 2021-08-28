@@ -224,7 +224,7 @@ Application::createMainWindow() {
   QPushButton *grpDown = _mainWindow->findChild<QPushButton *>("rxGroupDown");
   QPushButton *addGrp  = _mainWindow->findChild<QPushButton *>("addRXGroup");
   QPushButton *remGrp  = _mainWindow->findChild<QPushButton *>("remRXGroup");
-  rxgroups->setModel(_config->rxGroupLists());
+  rxgroups->setModel(new GroupListsWrapper(_config->rxGroupLists(), rxgroups));
   connect(addGrp, SIGNAL(clicked()), this, SLOT(onAddRxGroup()));
   connect(remGrp, SIGNAL(clicked()), this, SLOT(onRemRxGroup()));
   connect(grpUp, SIGNAL(clicked()), this, SLOT(onRxGroupUp()));
@@ -314,7 +314,7 @@ Application::createMainWindow() {
   QPushButton *genRoamingZone  = _mainWindow->findChild<QPushButton *>("genRoamingZone");
   QPushButton *remRoamingZone  = _mainWindow->findChild<QPushButton *>("remRoamingZone");
   QLabel *roamingNote          = _mainWindow->findChild<QLabel*>("roamingNote");
-  roamingZones->setModel(_config->roaming());
+  roamingZones->setModel(new RoamingListWrapper(_config->roaming(), roamingZones));
   connect(addRoamingZone, SIGNAL(clicked()), this, SLOT(onAddRoamingZone()));
   connect(genRoamingZone, SIGNAL(clicked(bool)), this, SLOT(onGenRoamingZone()));
   connect(remRoamingZone, SIGNAL(clicked()), this, SLOT(onRemRoamingZone()));
@@ -956,7 +956,7 @@ Application::onAddRxGroup() {
   int row=-1;
   if (list->selectionModel()->hasSelection())
     row = list->selectionModel()->selection().back().bottom()+1;
-  _config->rxGroupLists()->addList(dialog.groupList(), row);
+  _config->rxGroupLists()->add(dialog.groupList(), row);
 }
 
 void
@@ -991,7 +991,7 @@ Application::onRemRxGroup() {
     lists.push_back(_config->rxGroupLists()->list(row));
   // remove list
   foreach (RXGroupList *list, lists)
-    _config->rxGroupLists()->remList(list);
+    _config->rxGroupLists()->del(list);
 }
 
 void
@@ -1569,7 +1569,7 @@ Application::onAddRoamingZone() {
   int row=-1;
   if (list->selectionModel()->hasSelection())
     row = list->selectionModel()->selection().back().bottom()+1;
-  _config->roaming()->addZone(dialog.zone(), row);
+  _config->roaming()->add(dialog.zone(), row);
 }
 
 void
@@ -1599,7 +1599,7 @@ Application::onGenRoamingZone() {
   int row=-1;
   if (list->selectionModel()->hasSelection())
     row = list->selectionModel()->selection().back().bottom()+1;
-  _config->roaming()->addZone(dialog.zone(), row);
+  _config->roaming()->add(dialog.zone(), row);
 }
 
 void
@@ -1631,7 +1631,7 @@ Application::onRemRoamingZone() {
     lists.push_back(_config->roaming()->zone(row));
   // remove
   foreach (RoamingZone *zone, lists)
-    _config->roaming()->remZone(zone);
+    _config->roaming()->add(zone);
 }
 
 void

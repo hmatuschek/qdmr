@@ -13,8 +13,8 @@ GenericListWrapper::GenericListWrapper(AbstractConfigObjectList *list, QObject *
 
   connect(_list, SIGNAL(modified()), this, SIGNAL(modified()));
   connect(_list, SIGNAL(destroyed(QObject*)), this, SLOT(onListDeleted(QObject*)));
-  connect(_list, SIGNAL(itemModified(int)), this, SLOT(onItemModified(int)));
-  connect(_list, SIGNAL(itemRemoved(int)), this, SLOT(onItemRemoved(int)));
+  connect(_list, SIGNAL(elementModified(int)), this, SLOT(onItemModified(int)));
+  connect(_list, SIGNAL(elementRemoved(int)), this, SLOT(onItemRemoved(int)));
 }
 
 int
@@ -105,9 +105,9 @@ GenericTableWrapper::GenericTableWrapper(AbstractConfigObjectList *list, QObject
     return;
 
   connect(_list, SIGNAL(modified()), this, SIGNAL(modified()));
-  connect(_list, SIGNAL(destroyed(QObject*)), this, SLOT(onListDeleted(QObject*)));
-  connect(_list, SIGNAL(itemModified(int)), this, SLOT(onItemModified(int)));
-  connect(_list, SIGNAL(itemRemoved(int)), this, SLOT(onItemRemoved(int)));
+  connect(_list, SIGNAL(destroyed(QObject*)), this, SLOT(onListDeleted()));
+  connect(_list, SIGNAL(elementModified(int)), this, SLOT(onItemModified(int)));
+  connect(_list, SIGNAL(elementRemoved(int)), this, SLOT(onItemRemoved(int)));
 }
 
 int
@@ -571,8 +571,6 @@ PositioningSystemListWrapper::headerData(int section, Qt::Orientation orientatio
 }
 
 
-
-
 /* ********************************************************************************************* *
  * Implementation of ScanListsWrapper
  * ********************************************************************************************* */
@@ -595,4 +593,54 @@ ScanListsWrapper::headerData(int section, Qt::Orientation orientation, int role)
     return QVariant();
   return tr("Scan-List");
 }
+
+
+/* ********************************************************************************************* *
+ * Implementation of GroupListsWrapper
+ * ********************************************************************************************* */
+GroupListsWrapper::GroupListsWrapper(RXGroupLists *list, QObject *parent)
+  : GenericListWrapper(list, parent)
+{
+  // pass...
+}
+
+QVariant
+GroupListsWrapper::data(const QModelIndex &index, int role) const {
+  if ((Qt::DisplayRole!=role) || (! index.isValid()) || (index.row()>=_list->count()))
+    return QVariant();
+  return _list->get(index.row())->as<RXGroupList>()->name();
+}
+
+QVariant
+GroupListsWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((0!=section) || (Qt::Horizontal!=orientation) || (Qt::DisplayRole!=role))
+    return QVariant();
+  return tr("RX Group Lists");
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RoamingListWrapper
+ * ********************************************************************************************* */
+RoamingListWrapper::RoamingListWrapper(RoamingZoneList *list, QObject *parent)
+  : GenericListWrapper(list, parent)
+{
+  // pass...
+}
+
+QVariant
+RoamingListWrapper::data(const QModelIndex &index, int role) const {
+  if ((Qt::DisplayRole!=role) || (index.row()>=_list->count()) || (0 != index.column()))
+    return QVariant();
+  RoamingZone *zone = _list->get(index.row())->as<RoamingZone>();
+  return tr("%1 (containing %2 channels)").arg(zone->name()).arg(zone->count());
+}
+
+QVariant
+RoamingListWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation) || (0 != section))
+    return QVariant();
+  return tr("Roaming zone");
+}
+
 

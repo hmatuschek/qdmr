@@ -22,6 +22,7 @@
         <file>userupload-4x.png</file>
         <file alias="close.png">circle-x-4x.png</file>
         <file>cloud-download-4x.png</file>
+        <file alias="splash.png">logo256.png</file>
     </qresource>
     <qresource prefix="/ui">
         <file>mainwindow.ui</file>
