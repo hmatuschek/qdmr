@@ -274,7 +274,7 @@ Application::createMainWindow() {
   QPushButton *slDown = _mainWindow->findChild<QPushButton *>("scanListDown");
   QPushButton *addSl  = _mainWindow->findChild<QPushButton *>("addScanList");
   QPushButton *remSl  = _mainWindow->findChild<QPushButton *>("remScanList");
-  scanLists->setModel(_config->scanlists());
+  scanLists->setModel(new ScanListsWrapper(_config->scanlists(), scanLists));
   connect(addSl, SIGNAL(clicked()), this, SLOT(onAddScanList()));
   connect(remSl, SIGNAL(clicked()), this, SLOT(onRemScanList()));
   connect(slUp, SIGNAL(clicked()), this, SLOT(onScanListUp()));
@@ -294,7 +294,7 @@ Application::createMainWindow() {
           this, SLOT(loadPositioningSectionState()));
   connect(gpsList->horizontalHeader(), SIGNAL(sectionResized(int,int,int)),
           this, SLOT(storePositioningSectionState()));
-  gpsList->setModel(_config->posSystems());
+  gpsList->setModel(new PositioningSystemListWrapper(_config->posSystems(), gpsList));
   if (settings.hideGSPNote())
     gpsNote->setVisible(false);
   connect(addGPS, SIGNAL(clicked()), this, SLOT(onAddGPS()));
@@ -1339,7 +1339,7 @@ Application::onAddScanList() {
   int row=-1;
   if (list->selectionModel()->hasSelection())
     row = list->selectionModel()->selection().back().bottom()+1;
-  _config->scanlists()->addScanList(dialog.scanlist(), row);
+  _config->scanlists()->add(dialog.scanlist(), row);
 }
 
 void
@@ -1370,7 +1370,7 @@ Application::onRemScanList() {
     lists.push_back(_config->scanlists()->scanlist(row));
   // remove
   foreach (ScanList *list, lists)
-    _config->scanlists()->remScanList(list);
+    _config->scanlists()->del(list);
 }
 
 void
@@ -1434,7 +1434,7 @@ Application::onAddGPS() {
   int row=-1;
   if (table->selectionModel()->hasSelection())
     row = table->selectionModel()->selection().back().bottom()+1;
-  _config->posSystems()->addSystem(dialog.gpsSystem(), row);
+  _config->posSystems()->add(dialog.gpsSystem(), row);
 }
 
 void
@@ -1448,7 +1448,7 @@ Application::onAddAPRS() {
   int row=-1;
   if (table->selectionModel()->hasSelection())
     row = table->selectionModel()->selection().back().bottom()+1;
-  _config->posSystems()->addSystem(dialog.aprsSystem(), row);
+  _config->posSystems()->add(dialog.aprsSystem(), row);
 }
 
 void
@@ -1479,7 +1479,7 @@ Application::onRemGPS() {
     systems.push_back(_config->posSystems()->system(row));
   // remove systems
   foreach (PositioningSystem *system, systems)
-    _config->posSystems()->remSystem(system);
+    _config->posSystems()->del(system);
 }
 
 void

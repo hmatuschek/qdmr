@@ -2,6 +2,7 @@
 
 #include "config.hh"
 #include "scanlistdialog.hh"
+#include "configitemwrapper.hh"
 #include <QMessageBox>
 #include <QPushButton>
 #include <QHBoxLayout>
@@ -14,7 +15,7 @@ ScanListsView::ScanListsView(Config *config, QWidget *parent)
   : QWidget(parent), _config(config)
 {
   _view = new QListView();
-  _view->setModel(_config->scanlists());
+  _view->setModel(new ScanListsWrapper(_config->scanlists()));
   connect(_view, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditScanList(const QModelIndex &)));
 
   QPushButton *add = new QPushButton(tr("Add Scanlist"));
@@ -41,7 +42,7 @@ ScanListsView::onAddScanList() {
     return;
 
   ScanList *scanlist = dialog.scanlist();
-  _config->scanlists()->addScanList(scanlist);
+  _config->scanlists()->add(scanlist);
 }
 
 void
@@ -57,7 +58,7 @@ ScanListsView::onRemScanList() {
   if (QMessageBox::No == QMessageBox::question(nullptr, tr("Delete scanlist?"), tr("Delete scanlist %1?").arg(name)))
     return;
 
-  _config->scanlists()->remScanList(idx.row());
+  _config->scanlists()->del(_config->scanlists()->scanlist(idx.row()));
 }
 
 void

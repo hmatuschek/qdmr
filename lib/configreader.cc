@@ -150,8 +150,18 @@ ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
   }
 
   if (node["scan-lists"] && node["scan-lists"].IsSequence()) {
+    ScanListReader reader;
     for (YAML::const_iterator it=node["scan-lists"].begin(); it!=node["scan-lists"].end(); it++) {
-      // TODO
+      ScanList *sl = reader.allocate(*it, ctx)->as<ScanList>();
+      if (nullptr == sl) {
+        _errorMessage = tr("Cannot allocate scan-list: %1").arg(reader.errorMessage());
+        return false;
+      }
+      if (! reader.parse(sl, *it, ctx)) {
+        _errorMessage = tr("Cannot parse scan-list: %1").arg(reader.errorMessage());
+        return false;
+      }
+      config->scanlists()->add(sl);
     }
   }
 
@@ -226,7 +236,7 @@ ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
           _errorMessage = tr("Cannot parse GPS system: %1").arg(dmr.errorMessage());
           return false;
         }
-        config->posSystems()->addSystem(sys);
+        config->posSystems()->add(sys);
       } else if ((*it)["aprs"]) {
         PositioningSystem *sys = aprs.allocate((*it)["dmr"], ctx)->as<PositioningSystem>();
         if (nullptr == sys) {
@@ -237,14 +247,14 @@ ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
           _errorMessage = tr("Cannot parse ARPS system: %1").arg(aprs.errorMessage());
           return false;
         }
-        config->posSystems()->addSystem(sys);
+        config->posSystems()->add(sys);
       }
     }
   }
 
   if (node["roaming"] && node["roaming"].IsSequence()) {
     for (YAML::const_iterator it=node["roaming"].begin(); it!=node["roaming"].end(); it++) {
-      return false;
+
     }
   }
 
@@ -311,9 +321,14 @@ ConfigReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject
     }
   }
 
-  // link scan-list
-  for (int i=0; i<config->scanlists()->count(); i++) {
-    return false;
+  { // link scan-list
+    ScanListReader reader;
+    for (int i=0; i<config->scanlists()->count(); i++) {
+      if (! reader.link(config->scanlists()->scanlist(i), node["scan-lists"][i], ctx)) {
+        _errorMessage = tr("Cannot link configuration: %1").arg(reader.errorMessage());
+        return false;
+      }
+    }
   }
 
   // link contacts
@@ -347,9 +362,25 @@ ConfigReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject
     return false;
   }
 
-  // positioning
-  for (int i=0; i<config->posSystems()->count(); i++) {
-    return false;
+  { // positioning
+    GPSSystemReader gps;
+    APRSSystemReader aprs;
+    for (int i=0; i<config->posSystems()->count(); i++) {
+      if (node["positioning"][i]["dmr"]) {
+        if (! gps.link(config->posSystems()->system(i), node["positioning"][i]["dmr"], ctx)) {
+          _errorMessage = tr("Cannot link GPS system '%1': %2")
+              .arg(config->posSystems()->system(i)->name()).arg(gps.errorMessage());
+          return false;
+        }
+      } else if (node["positioning"][i]["aprs"]) {
+        if (!aprs.link(config->posSystems()->system(i), node["positioning"][i]["aprs"], ctx)) {
+          _errorMessage = tr("Cannot link APRS system '%1': %2")
+              .arg(config->posSystems()->system(i)->name()).arg(gps.errorMessage());
+          return false;
+        }
+      }
+      return false;
+    }
   }
 
   // roaming
@@ -1469,3 +1500,113 @@ APRSSystemReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigOb
 
   return true;
 }
+
+
+/* ********************************************************************************************* *
+ * Implementation of ScanListReader
+ * ********************************************************************************************* */
+QHash<QString, AbstractConfigReader *> ScanListReader::_extensions;
+
+ScanListReader::ScanListReader(QObject *parent)
+  : ObjectReader(parent)
+{
+  // pass...
+}
+
+
+ConfigObject *
+ScanListReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return new ScanList("");
+}
+
+bool
+ScanListReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+  ScanList *list = qobject_cast<ScanList *>(obj);
+
+  if (! ObjectReader::parse(obj, node, ctx))
+    return false;
+
+  if (node["name"] && node["name"].IsScalar()) {
+    list->setName(QString::fromStdString(node["name"].as<std::string>()));
+  } else {
+    _errorMessage = tr("Cannot parse scan-list: No name defined");
+    return false;
+  }
+
+  // Parse extensions:
+  foreach (QString name, _extensions.keys()) {
+    if (node[name.toStdString()]) {
+      YAML::Node extNode = node[name.toStdString()];
+      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
+      if (!ext) {
+        _errorMessage = tr("Cannot parse scan-list extension: %1").arg(_extensions[name]->errorMessage());
+        return false;
+      }
+      if (! _extensions[name]->parse(ext, extNode, ctx)) {
+        _errorMessage = tr("Cannot parse scan-list extension: %1").arg(_extensions[name]->errorMessage());
+        return false;
+      }
+      list->addExtension(name, ext);
+    }
+  }
+
+  return true;
+}
+
+bool
+ScanListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  ScanList *list = qobject_cast<ScanList *>(obj);
+
+  // link priority channels if defined
+  if (node["priority"] && node["priority"].IsSequence()) {
+    uint n=0; YAML::const_iterator it=node["priority"].begin();
+    for(; (it!=node["priority"].end()) && (n<2); it++, n++) {
+      if (!it->IsScalar()) {
+        logWarn() << "Cannot link priority channel " << (n+1) << ": Not a reference.";
+        continue;
+      }
+      QString id = QString::fromStdString(it->as<std::string>());
+      if ((! ctx.contains(id)) || (ctx.getObj(id)->is<Channel>())) {
+        logWarn() << "Cannot link priority channel " << (n+1) << ": Not a reference to a channel.";
+        continue;
+      }
+      if (0 == n)
+        list->setPriorityChannel(ctx.getObj(id)->as<Channel>());
+      else
+        list->setSecPriorityChannel(ctx.getObj(id)->as<Channel>());
+    }
+  }
+
+  // link channels
+  if (node["channels"] && node["channels"].IsSequence()) {
+    for (YAML::const_iterator it=node["channels"].begin(); it!=node["channels"].end(); it++) {
+      if (!it->IsScalar()) {
+        _errorMessage = tr("Cannot link scan-list '%1': Channel reference of wrong type. Must be id.")
+            .arg(list->name());
+        return false;
+      }
+      QString id = QString::fromStdString(it->as<std::string>());
+      if ((! ctx.contains(id)) || (ctx.getObj(id)->is<Channel>())) {
+        _errorMessage = _errorMessage = tr("Cannot link scan-list '%1': '%2' does not refer to a channel.")
+            .arg(list->name()).arg(id);
+        return false;
+      }
+      list->addChannel(ctx.getObj(id)->as<Channel>());
+    }
+  } else {
+    _errorMessage = tr("Cannot link scan-list '%1': No A channel list defined.").arg(list->name());
+    return false;
+  }
+
+  // link extensions
+  foreach (QString name, list->extensionNames()) {
+    if (! _extensions[name]->link(list->extension(name), node, ctx)) {
+      _errorMessage = tr("Cannot link zone extension '%1': %2")
+          .arg(name).arg(_extensions[name]->errorMessage());
+    }
+  }
+
+  return true;
+}
+
+

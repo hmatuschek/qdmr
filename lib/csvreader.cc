@@ -2111,7 +2111,7 @@ CSVReader::handleGPSSystem(
 
   GPSSystem *gps = new GPSSystem(name, nullptr, nullptr, period);
   _posSystems[idx] = gps;
-  _config->posSystems()->addSystem(gps);
+  _config->posSystems()->add(gps);
 
   return true;
 }
@@ -2151,7 +2151,7 @@ CSVReader::handleAPRSSystem(
   APRSSystem *aprs = new APRSSystem(name, nullptr, dest, destSSID, src, srcSSID, path,
                                     icon, message, period);
   _posSystems[idx] = aprs;
-  _config->posSystems()->addSystem(aprs);
+  _config->posSystems()->add(aprs);
 
   return true;
 }
@@ -2223,7 +2223,7 @@ CSVReader::handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 p
 
   ScanList *lst = new ScanList(name);
   _scanlists[idx] = lst;
-  _config->scanlists()->addScanList(lst);
+  _config->scanlists()->add(lst);
 
   return true;
 }

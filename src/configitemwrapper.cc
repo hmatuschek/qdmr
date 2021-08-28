@@ -376,12 +376,6 @@ ContactListWrapper::ContactListWrapper(ContactList *list, QObject *parent)
 }
 
 int
-ContactListWrapper::rowCount(const QModelIndex &index) const {
-  Q_UNUSED(index);
-  return _list->count();
-}
-
-int
 ContactListWrapper::columnCount(const QModelIndex &index) const {
   Q_UNUSED(index);
   return 4;
@@ -459,11 +453,6 @@ RadioIdListWrapper::RadioIdListWrapper(RadioIDList *list, QObject *parent)
   // pass...
 }
 
-int
-RadioIdListWrapper::rowCount(const QModelIndex &parent) const {
-  return _list->count();
-}
-
 QVariant
 RadioIdListWrapper::data(const QModelIndex &index, int role) const {
   if (index.row() >= _list->count())
@@ -486,12 +475,6 @@ ZoneListWrapper::ZoneListWrapper(ZoneList *list, QObject *parent)
   // pass...
 }
 
-int
-ZoneListWrapper::rowCount(const QModelIndex &idx) const {
-  Q_UNUSED(idx);
-  return _list->count();
-}
-
 QVariant
 ZoneListWrapper::data(const QModelIndex &index, int role) const {
   if ((Qt::DisplayRole!=role) || (index.row()>=_list->count()) || (0 != index.column()))
@@ -507,4 +490,109 @@ ZoneListWrapper::headerData(int section, Qt::Orientation orientation, int role) 
   return tr("Zone");
 }
 
+
+/* ********************************************************************************************* *
+ * Implementation of PositioningSystemListWrapper
+ * ********************************************************************************************* */
+PositioningSystemListWrapper::PositioningSystemListWrapper(PositioningSystems *list, QObject *parent)
+  : GenericTableWrapper(list, parent)
+{
+  // pass...
+}
+
+int
+PositioningSystemListWrapper::columnCount(const QModelIndex &idx) const {
+  Q_UNUSED(idx);
+  return 6;
+}
+
+QVariant
+PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
+  if ((! index.isValid()) || (index.row()>=_list->count()))
+    return QVariant();
+  if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
+    return QVariant();
+
+  PositioningSystem *sys = _list->get(index.row())->as<PositioningSystem>();
+
+  switch (index.column()) {
+  case 0:
+    if (sys->is<GPSSystem>())
+      return tr("DMR");
+    else if (sys->is<APRSSystem>())
+      return tr("APRS");
+    else
+      return tr("OOps!");
+  case 1:
+    return sys->name();
+  case 2:
+    if (sys->is<GPSSystem>())
+      return sys->as<GPSSystem>()->contact()->name();
+    else if (sys->is<APRSSystem>())
+      return tr("%1-%2").arg(sys->as<APRSSystem>()->destination())
+          .arg(sys->as<APRSSystem>()->destSSID());
+  case 3:
+    return sys->period();
+  case 4:
+    if (sys->is<GPSSystem>())
+      return (sys->as<GPSSystem>()->hasRevertChannel() ?
+                sys->as<GPSSystem>()->revertChannel()->name() : tr("[Selected]"));
+    else if (sys->is<APRSSystem>())
+      return ((nullptr != sys->as<APRSSystem>()->channel()) ?
+                sys->as<APRSSystem>()->channel()->name() : tr("OOPS!"));
+  case 5:
+    if (sys->is<GPSSystem>())
+      return tr("[None]");
+    else if (sys->is<APRSSystem>())
+      return sys->as<APRSSystem>()->message();
+
+  default:
+    break;
+  }
+
+  return QVariant();
+}
+
+QVariant
+PositioningSystemListWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation))
+    return QVariant();
+  switch (section) {
+  case 0: return tr("Type");
+  case 1: return tr("Name");
+  case 2: return tr("Destination");
+  case 3: return tr("Period [s]");
+  case 4: return tr("Channel");
+  case 5: return tr("Message");
+  default:
+    break;
+  }
+  return QVariant();
+}
+
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of ScanListsWrapper
+ * ********************************************************************************************* */
+ScanListsWrapper::ScanListsWrapper(ScanLists *list, QObject *parent)
+  : GenericListWrapper(list, parent)
+{
+  // pass...
+}
+
+QVariant
+ScanListsWrapper::data(const QModelIndex &index, int role) const {
+  if ((Qt::DisplayRole!=role) || (index.row()>=_list->count()) || (0 != index.column()))
+    return QVariant();
+  return _list->get(index.row())->as<ScanList>()->name();
+}
+
+QVariant
+ScanListsWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation) || (0 != section))
+    return QVariant();
+  return tr("Scan-List");
+}
 

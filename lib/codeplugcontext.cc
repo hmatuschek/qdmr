@@ -159,7 +159,7 @@ CodeplugContext::addScanList(ScanList *lst, int index) {
   if (_scanListTable.contains(index))
     return false;
   int sidx = _config->scanlists()->count();
-  if (! _config->scanlists()->addScanList(lst))
+  if (! _config->scanlists()->add(lst))
     return false;
   _scanListTable[index] = sidx;
   return true;
@@ -183,7 +183,7 @@ CodeplugContext::addGPSSystem(GPSSystem *sys, int index) {
   if (_gpsSystemTable.contains(index))
     return false;
   int sidx = _config->posSystems()->gpsCount();
-  if (0 > _config->posSystems()->addSystem(sys))
+  if (0 > _config->posSystems()->add(sys))
     return false;
   _gpsSystemTable[index] = sidx;
   return true;
@@ -207,7 +207,7 @@ CodeplugContext::addAPRSSystem(APRSSystem *sys, int index) {
   if (_aprsSystemTable.contains(index))
     return false;
   int sidx = _config->posSystems()->aprsCount();
-  if (0 > _config->posSystems()->addSystem(sys))
+  if (0 > _config->posSystems()->add(sys))
     return false;
   _aprsSystemTable[index] = sidx;
   return true;

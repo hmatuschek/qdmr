@@ -230,7 +230,7 @@ protected:
 
 /** The list of positioning systems.
  * @ingroup conf */
-class PositioningSystems: public QAbstractTableModel
+class PositioningSystems: public ConfigObjectList
 {
 Q_OBJECT
 
@@ -238,22 +238,10 @@ public:
   /** Constructs an empty list of GPS systems. */
   explicit PositioningSystems(QObject *parent=nullptr);
 
-  /** Clears the list. */
-  void clear();
-
-  /** Returns the number of Positioning systems in this list. */
-  int count() const;
   /** Returns the positioning system at the specified index. */
   PositioningSystem *system(int idx) const;
-  /** Returns the index of given positioning system. */
-  int indexOf(PositioningSystem *sys) const;
-  /** Adds a positioning system to the list at the specified row.
-   * If row<0 the system gets appendet to the list.*/
-  int addSystem(PositioningSystem *sys, int row=-1);
-  /** Removes the given positioning system from the list. */
-  bool remSystem(PositioningSystem *gps);
-  /** Removes the positioning system at the given index from the list. */
-  bool remSystem(int idx);
+
+  int add(ConfigObject *obj, int row=-1);
 
   /** Returns the number of defined GPS systems. */
   int gpsCount() const;
@@ -273,15 +261,6 @@ public:
    * That index is only within all defined APRS systems. */
   APRSSystem *aprsSystem(int idx) const;
 
-  /** Moves the GPS system at index @c idx one step up. */
-  bool moveUp(int idx);
-  /** Moves the GPS systems one step up. */
-  bool moveUp(int first, int last);
-  /** Moves the GPS system at index @c idx one step down. */
-  bool moveDown(int idx);
-  /** Moves the GPS systems one step down. */
-  bool moveDown(int first, int last);
-
   // QAbstractTableModel interface
   /** Implements QAbstractTableModel, returns number of rows. */
   int rowCount(const QModelIndex &index) const;
@@ -291,20 +270,6 @@ public:
   QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
   /** Implements QAbstractTableModel, returns header at section. */
   QVariant headerData(int section, Qt::Orientation orientation, int role=Qt::DisplayRole) const;
-
-signals:
-  /** Gets emitted once the table has been changed. */
-  void modified();
-
-protected slots:
-  /** Internal callback on deleted positioning systems. */
-  void onSystemDeleted(QObject *obj);
-  /** Internal callback on modified positioning systems. */
-  void onSystemEdited();
-
-protected:
-  /** Just the vector of positioning systems. */
-  QVector<PositioningSystem *> _posSystems;
 };
 
 

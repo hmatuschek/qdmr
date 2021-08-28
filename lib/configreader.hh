@@ -373,4 +373,28 @@ protected:
 };
 
 
+/** Reads scan-list definitions.
+ * @ingroup yaml */
+class ScanListReader: public ObjectReader
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit ScanListReader(QObject *parent=nullptr);
+
+  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
+  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
+  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+
+public:
+  /** Adds an extension to the config parser. */
+  static bool addExtension(const QString &name, AbstractConfigReader *);
+
+protected:
+  /** Holds the exentions for the config parser. */
+  static QHash<QString, AbstractConfigReader *> _extensions;
+};
+
+
 #endif // CONFIGREADER_HH

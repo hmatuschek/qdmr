@@ -49,7 +49,7 @@ ScanListDialog::construct() {
     if (_scanlist->txChannel())
       transmitChannel->setCurrentIndex(_config->channelList()->indexOf(_scanlist->txChannel())+2);
     // fill channel list
-    for (int i=0; i<_scanlist->rowCount(QModelIndex()); i++) {
+    for (int i=0; i<_scanlist->count(); i++) {
       Channel *channel = _scanlist->channel(i);
       if (channel->is<AnalogChannel>()) {
         QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
