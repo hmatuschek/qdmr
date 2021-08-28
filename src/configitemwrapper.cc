@@ -137,7 +137,7 @@ GenericTableWrapper::onItemModified(int idx) {
 
 
 /* ********************************************************************************************* *
- * Implementation of
+ * Implementation of ChannelListWrapper
  * ********************************************************************************************* */
 ChannelListWrapper::ChannelListWrapper(ChannelList *list, QObject *parent)
   : GenericTableWrapper(list, parent)
@@ -361,6 +361,90 @@ ChannelListWrapper::headerData(int section, Qt::Orientation orientation, int rol
   case 19: return tr("Bandwidth");
     default:
       break;
+  }
+  return QVariant();
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of ContactListWrapper
+ * ********************************************************************************************* */
+ContactListWrapper::ContactListWrapper(ContactList *list, QObject *parent)
+  : GenericTableWrapper(list, parent)
+{
+  // pass...
+}
+
+int
+ContactListWrapper::rowCount(const QModelIndex &index) const {
+  Q_UNUSED(index);
+  return _list->count();
+}
+
+int
+ContactListWrapper::columnCount(const QModelIndex &index) const {
+  Q_UNUSED(index);
+  return 4;
+}
+
+QVariant
+ContactListWrapper::data(const QModelIndex &index, int role) const {
+  if ((!index.isValid()) || (index.row()>=_list->count()))
+    return QVariant();
+
+  if (Qt::DisplayRole == role) {
+    Contact *contact = _list->get(index.row())->as<Contact>();
+    if (contact->is<DTMFContact>()) {
+      DTMFContact *dtmf = contact->as<DTMFContact>();
+      switch (index.column()) {
+        case 0:
+          return tr("DTMF");
+        case 1:
+          return dtmf->name();
+        case 2:
+          return dtmf->number();
+        case 3:
+          return (dtmf->rxTone() ? tr("On") : tr("Off"));
+        default:
+          return QVariant();
+      }
+    } else if (contact->is<DigitalContact>()) {
+      DigitalContact *digi = contact->as<DigitalContact>();
+      switch (index.column()) {
+        case 0:
+          switch (digi->type()) {
+            case DigitalContact::PrivateCall: return tr("Private Call");
+            case DigitalContact::GroupCall: return tr("Group Call");
+            case DigitalContact::AllCall: return tr("All Call");
+          }
+        case 1:
+          return digi->name();
+        case 2:
+          return digi->number();
+        case 3:
+          return (digi->rxTone() ? tr("On") : tr("Off"));
+        default:
+          return QVariant();
+      }
+    }
+  }
+  return QVariant();
+}
+
+
+QVariant
+ContactListWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((Qt::DisplayRole != role) || (Qt::Horizontal != orientation)) {
+    return QVariant();
+  }
+  if (0 == section) {
+    return tr("Type");
+  } else if (1 == section) {
+    return tr("Name");
+  } else if (2 == section) {
+    return tr("Number");
+  } else if (3 == section) {
+    return tr("RX Tone");
   }
   return QVariant();
 }

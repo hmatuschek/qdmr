@@ -168,7 +168,7 @@ ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
           _errorMessage = tr("Cannot parse private call contact: %1").arg(reader.errorMessage());
           return false;
         }
-        config->contacts()->addContact(contact);
+        config->contacts()->add(contact);
       } else if ((*it)["group"] && ((*it)["group"].IsMap())) {
         GroupCallContactReader reader;
         Contact *contact = reader.allocate((*it)["group"], ctx)->as<Contact>();
@@ -180,7 +180,7 @@ ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
           _errorMessage = tr("Cannot parse group call contact: %1").arg(reader.errorMessage());
           return false;
         }
-        config->contacts()->addContact(contact);
+        config->contacts()->add(contact);
       } else if ((*it)["all"] && ((*it)["all"].IsMap())) {
         AllCallContactReader reader;
         Contact *contact = reader.allocate((*it)["all"], ctx)->as<Contact>();
@@ -192,7 +192,7 @@ ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
           _errorMessage = tr("Cannot parse all call contact: %1").arg(reader.errorMessage());
           return false;
         }
-        config->contacts()->addContact(contact);
+        config->contacts()->add(contact);
       } else {
         _errorMessage = tr("Cannot parse contact: Unknown type.");
         return false;

@@ -79,7 +79,7 @@ bool
 CodeplugContext::addDigitalContact(DigitalContact *con, int index) {
   if (_digitalContactTable.contains(index))
     return false;
-  int cidx = _config->contacts()->addContact(con);
+  int cidx = _config->contacts()->add(con);
   if (0 > cidx)
     return false;
   _digitalContactTable[index] = cidx;
@@ -103,7 +103,7 @@ bool
 CodeplugContext::addAnalogContact(DTMFContact *con, int index) {
   if (_analogContactTable.contains(index))
     return false;
-  int cidx = _config->contacts()->addContact(con);
+  int cidx = _config->contacts()->add(con);
   if (0 > cidx)
     return false;
   _analogContactTable[index] = cidx;

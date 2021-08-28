@@ -142,7 +142,7 @@ protected:
  * @c QTableView widget.
  *
  * @ingroup conf */
-class ContactList: public QAbstractTableModel
+class ContactList: public ConfigObjectList
 {
 	Q_OBJECT
 
@@ -150,15 +150,12 @@ public:
   /** Constructs an empty contact list. */
 	explicit ContactList(QObject *parent=nullptr);
 
-  /** Returns the number of contacts. */
-	int count() const;
+  int add(ConfigObject *obj, int row=-1);
+
   /** Returns the number of digital contacts. */
 	int digitalCount() const;
   /** Returns the number of DTMF contacts. */
 	int dtmfCount() const;
-
-  /** Clears the contact list. */
-  void clear();
 
   /** Returns the contact at index @c idx. */
   Contact *contact(int idx) const;
@@ -169,53 +166,10 @@ public:
   /** Returns the DTMF contact at index @c idx among DTMF contacts. */
   DTMFContact *dtmfContact(int idx) const;
 
-  /** Returns the index of the given contact. */
-  int indexOf(Contact *contact) const;
   /** Returns the index of the given digital contact within digital contacts. */
   int indexOfDigital(DigitalContact *contact) const;
   /** Returns the index of the given DTMF contact within DTMF contacts. */
   int indexOfDTMF(DTMFContact *contact) const;
-
-  /** Adds a contact to the list at the given @ç row.
-   * If row < 0, the contact gets appended to the list. */
-  int addContact(Contact *contact, int row=-1);
-  /** Removes the contact at the given index. */
-  bool remContact(int idx);
-  /** Removes the given contact from the list. */
-	bool remContact(Contact *contact);
-
-  /** Moves the contact at the given @c row one up. */
-  bool moveUp(int row);
-  /** Moves the contacts at the given @c rows one up. */
-  bool moveUp(int first, int last);
-  /** Moves the contact at the given @c row one down. */
-  bool moveDown(int row);
-  /** Moves the contacts at the given @c rows one down. */
-  bool moveDown(int first, int last);
-
-	// Implementation of QAbstractTableModel
-  /** Returns the number of rows, implements the QAbstractTableModel. */
-	int rowCount(const QModelIndex &index) const;
-  /** Returns the number of columns, implements the QAbstractTableModel. */
-	int columnCount(const QModelIndex &index) const;
-  /** Returns the cell data at given index, implements the QAbstractTableModel. */
-	QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
-  /** Returns the header at given section, implements the QAbstractTableModel. */
-	QVariant headerData(int section, Qt::Orientation orientation, int role=Qt::DisplayRole) const;
-
-signals:
-  /** Gets emitted if the list has changed or any contact in it. */
-	void modified();
-
-protected slots:
-  /** Internal callback on deleted contacts. */
-	void onContactDeleted(QObject *contact);
-  /** Internal callback on modified contacts. */
-  void onContactEdited();
-
-protected:
-  /** Just the vector of contacts. */
-	QVector<Contact *> _contacts;
 };
 
 #endif // CONTACT_HH

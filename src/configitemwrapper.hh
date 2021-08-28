@@ -93,4 +93,24 @@ public:
 };
 
 
+class ContactListWrapper: public GenericTableWrapper
+{
+  Q_OBJECT
+
+public:
+  ContactListWrapper(ContactList *list, QObject *parent=nullptr);
+
+public:
+  // Implementation of QAbstractTableModel
+  /** Returns the number of rows, implements the QAbstractTableModel. */
+  int rowCount(const QModelIndex &index) const;
+  /** Returns the number of columns, implements the QAbstractTableModel. */
+  int columnCount(const QModelIndex &index) const;
+  /** Returns the cell data at given index, implements the QAbstractTableModel. */
+  QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
+  /** Returns the header at given section, implements the QAbstractTableModel. */
+  QVariant headerData(int section, Qt::Orientation orientation, int role=Qt::DisplayRole) const;
+};
+
+
 #endif // CONFIG_ITEM_WRAPPER_HH

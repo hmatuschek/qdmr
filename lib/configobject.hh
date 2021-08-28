@@ -122,7 +122,7 @@ public:
   /** Returns the list element at the given index or @c nullptr if out of bounds. */
   virtual ConfigObject *get(int idx) const;
   /** Adds an element to the list. */
-  virtual bool add(ConfigObject *obj, int row=-1);
+  virtual int add(ConfigObject *obj, int row=-1);
   /** Removes an element from the list. */
   virtual bool take(ConfigObject *obj);
   /** Removes an element from the list (and deletes it if owned). */
@@ -170,7 +170,7 @@ protected:
   explicit ConfigObjectList(QObject *parent = nullptr);
 
 public:
-  bool add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1);
   bool take(ConfigObject *obj);
   bool del(ConfigObject *obj);
 };

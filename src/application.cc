@@ -210,7 +210,7 @@ Application::createMainWindow() {
           this, SLOT(loadContactListSectionState()));
   connect(contacts->horizontalHeader(), SIGNAL(sectionResized(int,int,int)),
           this, SLOT(storeContactListSectionState()));
-  contacts->setModel(_config->contacts());
+  contacts->setModel(new ContactListWrapper(_config->contacts(), contacts));
   connect(addCnt, SIGNAL(clicked()), this, SLOT(onAddContact()));
   connect(remCnt, SIGNAL(clicked()), this, SLOT(onRemContact()));
   connect(cntUp, SIGNAL(clicked()), this, SLOT(onContactUp()));
@@ -848,7 +848,7 @@ Application::onAddContact() {
   int row=-1;
   if (table->selectionModel()->hasSelection())
     row = table->selectionModel()->selection().back().bottom()+1;
-  _config->contacts()->addContact(dialog.contact(), row);
+  _config->contacts()->add(dialog.contact(), row);
 }
 
 void
@@ -881,7 +881,7 @@ Application::onRemContact() {
     contacts.push_back(_config->contacts()->contact(row));
   // remove contacts
   foreach (Contact *contact, contacts)
-    _config->contacts()->remContact(contact);
+    _config->contacts()->add(contact);
 }
 
 void

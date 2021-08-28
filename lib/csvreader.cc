@@ -1840,7 +1840,7 @@ CSVReader::handleDTMFContact(qint64 idx, const QString &name, const QString &num
   }
   DTMFContact *contact = new DTMFContact(name, num, rxTone);
   //_contacts[idx] = contact;
-  _config->contacts()->addContact(contact);
+  _config->contacts()->add(contact);
 
   return true;
 }
@@ -1862,7 +1862,7 @@ CSVReader::handleDigitalContact(qint64 idx, const QString &name, DigitalContact:
   }
   DigitalContact *contact = new DigitalContact(type, name, id, rxTone);
   _digital_contacts[idx] = contact;
-  _config->contacts()->addContact(contact);
+  _config->contacts()->add(contact);
 
   return true;
 }

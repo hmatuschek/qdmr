@@ -1257,7 +1257,7 @@ D868UVCodeplug::gps_settings_t::linkGPSSystem(uint8_t i, Config *config, Codeplu
   // Find matching contact, if not found -> create one.
   if (nullptr == (cont = config->contacts()->findDigitalContact(getTargetID()))) {
     cont = new DigitalContact(getTargetType(), QString("GPS target"), getTargetID());
-    config->contacts()->addContact(cont);
+    config->contacts()->add(cont);
   }
   ctx.getGPSSystem(i)->setContact(cont);
 

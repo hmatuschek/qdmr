@@ -399,10 +399,10 @@ ChannelList::ChannelList(QObject *parent)
 
 }
 
-bool
+int
 ChannelList::add(ConfigObject *obj, int row) {
   if ((nullptr == obj) || (obj->is<Channel>()))
-    return false;
+    return -1;
   return ConfigObjectList::add(obj, row);
 }
 

@@ -137,21 +137,22 @@ AbstractConfigObjectList::get(int idx) const {
   return _items.value(idx, nullptr);
 }
 
-bool
-AbstractConfigObjectList::add(ConfigObject *obj, int row) {
+int AbstractConfigObjectList::add(ConfigObject *obj, int row) {
   // Ignore nullptr
   if (nullptr == obj)
-    return false;
+    return -1;
   // If alread in list -> ignore
   if (0 <= indexOf(obj))
-    return false;
+    return -1;
+  if (-1 == row)
+    row = _items.size();
   _items.insert(row, obj);
   // Otherwise connect to object
   connect(obj, SIGNAL(destroyed(QObject*)), this, SLOT(onElementDeleted(QObject*)));
   connect(obj, SIGNAL(modified(ConfigObject*)), this, SLOT(onElementModified(ConfigObject*)));
   connect(obj, SIGNAL(modified(ConfigObject*)), this, SIGNAL(modified()));
   emit modified();
-  return true;
+  return row;
 }
 
 bool
@@ -237,11 +238,10 @@ ConfigObjectList::ConfigObjectList(QObject *parent)
   // pass...
 }
 
-bool
-ConfigObjectList::add(ConfigObject *obj, int row) {
-  if (AbstractConfigObjectList::add(obj, row))
+int ConfigObjectList::add(ConfigObject *obj, int row) {
+  if (0 <= (row = AbstractConfigObjectList::add(obj, row)))
     obj->setParent(this);
-  return true;
+  return row;
 }
 
 bool

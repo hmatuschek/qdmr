@@ -940,7 +940,7 @@ RD5RCodeplug::decode(Config *config)
     if (DTMFContact *cont = ct->toContactObj()) {
       logDebug() << "DTMF contact at index " << i+1 << " mapped to "
                  << config->contacts()->dtmfCount();
-      config->contacts()->addContact(cont);
+      config->contacts()->add(cont);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invalid DTMF contact at index %2.")
           .arg(__func__).arg(i);

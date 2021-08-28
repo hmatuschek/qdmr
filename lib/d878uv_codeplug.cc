@@ -861,7 +861,7 @@ D878UVCodeplug::gps_systems_t::linkGPSSystem(int idx, GPSSystem *sys, const Code
   if (nullptr == cont) {
     cont = new DigitalContact(getContactType(idx), tr("GPS #%1 Contact").arg(idx+1),
                               getContactId(idx), false);
-    ctx.config()->contacts()->addContact(cont);
+    ctx.config()->contacts()->add(cont);
   }
   // link contact to GPS system.
   sys->setContact(cont);
