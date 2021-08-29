@@ -64,6 +64,8 @@ public:
   /** Constructs an empty Zone with the given name. */
 	explicit Zone(const QString &name, QObject *parent = nullptr);
 
+  using ConfigObject::serialize;
+
   /** Returns the name of the zone. */
 	const QString &name() const;
   /** Sets the name of the zone. */
@@ -81,6 +83,9 @@ public:
 signals:
   /** Gets emitted whenever the zone gets modified. */
 	void modified();
+
+protected:
+  bool serialize(YAML::Node &node, const Context &context);
 
 protected:
   /** Holds the name of the zone. */

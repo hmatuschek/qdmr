@@ -1,4 +1,5 @@
 #include "config.hh"
+#include "config.h"
 #include "rxgrouplist.hh"
 #include "channel.hh"
 #include <QTextStream>
@@ -40,6 +41,89 @@ Config::setModified(bool modified) {
   _modified = modified;
   if (_modified)
     emit this->modified();
+}
+
+bool
+Config::label(Context &context) {
+  if (! ConfigObject::label(context))
+    return false;
+
+  if (! _radioIDs->label(context))
+    return false;
+  if (! _contacts->label(context))
+    return false;
+  if (! _rxGroupLists->label(context))
+    return false;
+  if (! _channels->label(context))
+    return false;
+  if (! _zones->label(context))
+    return false;
+  if (! _scanlists->label(context))
+    return false;
+  if (! _gpsSystems->label(context))
+    return false;
+  if (! _roaming->label(context))
+    return false;
+
+  return true;
+}
+
+bool
+Config::toYAML(QTextStream &stream) {
+  ConfigObject::Context context;
+  if (! this->label(context))
+    return false;
+  YAML::Node doc = serialize(context);
+  if (doc.IsNull())
+    return false;
+  YAML::Emitter emitter;
+  emitter << YAML::BeginDoc << doc << YAML::EndDoc;
+  stream << emitter.c_str();
+  return true;
+}
+
+bool
+Config::serialize(YAML::Node &node, const Context &context)
+{
+  node["version"] = VERSION_STRING;
+  node["mic-level"] = _mic_level;
+  node["speech"] = _speech;
+
+  if ((node["radio-ids"] = _radioIDs->serialize(context)).IsNull())
+    return false;
+
+  if ((node["contacts"] = _contacts->serialize(context)).IsNull())
+    return false;
+
+  if ((node["group-lists"] = _rxGroupLists->serialize(context)).IsNull())
+    return false;
+
+  if ((node["channels"] = _channels->serialize(context)).IsNull())
+    return false;
+
+  if ((node["zones"] = _zones->serialize(context)).IsNull())
+    return false;
+
+  if (_scanlists->count()) {
+    if ((node["scan-lists"] = _scanlists->serialize(context)).IsNull())
+      return false;
+  }
+
+  if (_gpsSystems->count()) {
+    if ((node["positioning"] = _gpsSystems->serialize(context)).IsNull())
+      return false;
+  }
+
+  if (_roaming->count()) {
+    if ((node["roaming"] = _roaming->serialize(context)).IsNull())
+      return false;
+  }
+
+  if (! ConfigObject::serialize(node, context))
+    return false;
+
+  node.remove("id");
+  return true;
 }
 
 RadioIDList *

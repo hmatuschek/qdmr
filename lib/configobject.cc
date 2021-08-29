@@ -76,6 +76,28 @@ ConfigObject::label(Context &context) {
   return context.add(id, this);
 }
 
+YAML::Node
+ConfigObject::serialize(const Context &context) {
+  YAML::Node node;
+  if (! serialize(node, context))
+    return YAML::Node();
+  return node;
+}
+
+bool
+ConfigObject::serialize(YAML::Node &node, const Context &context){
+  if (context.contains(this))
+    node["id"] = context.getId(this).toStdString();
+
+  foreach (QString name, _extensions.keys()) {
+    YAML::Node extNode = _extensions[name]->serialize(context);
+    if (extNode.IsNull())
+      return false;
+    node["name"] = extNode;
+  }
+  return true;
+}
+
 bool
 ConfigObject::hasExtension(const QString &name) const {
   return _extensions.contains(name);
@@ -238,6 +260,27 @@ ConfigObjectList::ConfigObjectList(QObject *parent)
   // pass...
 }
 
+bool
+ConfigObjectList::label(ConfigObject::Context &context) {
+  foreach (ConfigObject *obj, _items) {
+    if (! obj->label(context))
+      return false;
+  }
+  return true;
+}
+
+YAML::Node
+ConfigObjectList::serialize(const ConfigObject::Context &context) {
+  YAML::Node list(YAML::NodeType::Sequence);
+  foreach (ConfigObject *obj, _items) {
+    YAML::Node node = obj->serialize(context);
+    if (node.IsNull())
+      return node;
+    list.push_back(node);
+  }
+  return list;
+}
+
 int ConfigObjectList::add(ConfigObject *obj, int row) {
   if (0 <= (row = AbstractConfigObjectList::add(obj, row)))
     obj->setParent(this);
@@ -266,5 +309,22 @@ ConfigObjectRefList::ConfigObjectRefList(QObject *parent)
   : AbstractConfigObjectList(parent)
 {
   // pass...
+}
+
+bool
+ConfigObjectRefList::label(ConfigObject::Context &context) {
+  // pass...
+  return true;
+}
+
+YAML::Node
+ConfigObjectRefList::serialize(const ConfigObject::Context &context) {
+  YAML::Node list(YAML::NodeType::Sequence);
+  foreach (ConfigObject *obj, _items) {
+    if (! context.contains(obj))
+      return YAML::Node();
+    list.push_back(context.getId(obj).toStdString());
+  }
+  return list;
 }
 

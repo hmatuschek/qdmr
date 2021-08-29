@@ -29,6 +29,8 @@ public:
   /** Destructor. */
   virtual ~PositioningSystem();
 
+  using ConfigObject::serialize;
+
   /** Returns @c true if this positioning system is an instance of the specified system. */
   template <class System>
   bool is() const { return nullptr != dynamic_cast<const System *>(this); }
@@ -51,9 +53,8 @@ public:
   /** Sets the update period in seconds. */
   void setPeriod(uint period);
 
-signals:
-  /** Gets emitted if the GPS system is modified. */
-  void modified();
+protected:
+  bool serialize(YAML::Node &node, const ConfigObject::Context &context);
 
 protected:
   /** Holds the name of the GPS system. */
@@ -84,6 +85,8 @@ public:
             DigitalChannel *revertChannel = nullptr, uint period=300,
             QObject *parent = nullptr);
 
+  YAML::Node serialize(const Context &context);
+
   /** Returns @c true if a contact is set for the GPS system. */
   bool hasContact() const;
   /** Returns the destination contact for the GPS information or @c nullptr if not set. */
@@ -104,6 +107,9 @@ protected slots:
   void onContactDeleted();
   /** Internal used callback to get notified if the revert channel is deleted. */
   void onRevertChannelDeleted();
+
+protected:
+  bool serialize(YAML::Node &node, const Context &context);
 
 protected:
   /** Holds the destination contact for the GPS information. */
@@ -170,6 +176,8 @@ public:
                       const QString &path="", Icon icon=APRS_ICON_JOGGER,
                       const QString &message="", uint period=300, QObject *parent=nullptr);
 
+  YAML::Node serialize(const Context &context);
+
   /** Returns the transmit channel of the APRS system. */
   AnalogChannel *channel() const;
   /** Sets the transmit channel of the APRS system. */
@@ -207,6 +215,9 @@ public:
 protected slots:
   /** Internal call-back if the transmit channel gets deleted. */
   void onChannelDeleted(QObject *obj);
+
+protected:
+  bool serialize(YAML::Node &node, const Context &context);
 
 protected:
   /** A weak reference to the transmit channel. */
@@ -260,16 +271,6 @@ public:
   /** Returns the APRS system at index @c idx.
    * That index is only within all defined APRS systems. */
   APRSSystem *aprsSystem(int idx) const;
-
-  // QAbstractTableModel interface
-  /** Implements QAbstractTableModel, returns number of rows. */
-  int rowCount(const QModelIndex &index) const;
-  /** Implements QAbstractTableModel, returns number of colums. */
-  int columnCount(const QModelIndex &index) const;
-  /** Implements QAbstractTableModel, returns data at cell. */
-  QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
-  /** Implements QAbstractTableModel, returns header at section. */
-  QVariant headerData(int section, Qt::Orientation orientation, int role=Qt::DisplayRole) const;
 };
 
 

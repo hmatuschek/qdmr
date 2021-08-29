@@ -35,6 +35,15 @@ Contact::setRXTone(bool enable) {
   emit modified(this);
 }
 
+bool
+Contact::serialize(YAML::Node &node, const Context &context) {
+  if (! ConfigObject::serialize(node, context))
+    return false;
+  node["name"] = _name.toStdString();
+  node["ring"] = _rxTone;
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of DTMFContact
@@ -43,11 +52,6 @@ DTMFContact::DTMFContact(const QString &name, const QString &number, bool rxTone
   : Contact(name, rxTone, parent), _number(number.simplified())
 {
   // pass...
-}
-
-bool
-DTMFContact::isValid() const {
-  return validDTMFNumber(_number);
 }
 
 const QString &
@@ -61,6 +65,26 @@ DTMFContact::setNumber(const QString &number) {
     return false;
   _number = number.simplified();
   emit modified(this);
+  return true;
+}
+
+YAML::Node
+DTMFContact::serialize(const Context &context) {
+  YAML::Node node = ConfigObject::serialize(context);
+  if (node.IsNull())
+    return node;
+
+  YAML::Node type;
+  node.SetStyle(YAML::EmitterStyle::Flow);
+  type["dtmf"] = node;
+  return type;
+}
+
+bool
+DTMFContact::serialize(YAML::Node &node, const Context &context) {
+  if (! Contact::serialize(node, context))
+    return false;
+  node["number"] = _number.toStdString();
   return true;
 }
 
@@ -96,6 +120,32 @@ DigitalContact::setNumber(uint number) {
   return true;
 }
 
+YAML::Node
+DigitalContact::serialize(const Context &context) {
+  YAML::Node node = ConfigObject::serialize(context);
+  if (node.IsNull())
+    return node;
+
+  node.SetStyle(YAML::EmitterStyle::Flow);
+
+  YAML::Node type;
+  switch (_type) {
+  case PrivateCall: type["private"] = node; break;
+  case GroupCall: type["group"] = node; break;
+  case AllCall: type["all"] = node; break;
+  }
+  return type;
+}
+
+bool
+DigitalContact::serialize(YAML::Node &node, const Context &context) {
+  if (! Contact::serialize(node, context))
+    return false;
+  node["number"] = _number;
+  return true;
+}
+
+
 
 /* ********************************************************************************************* *
  * Implementation of ContactList
@@ -108,7 +158,7 @@ ContactList::ContactList(QObject *parent)
 
 int
 ContactList::add(ConfigObject *obj, int row) {
-  if ((nullptr == obj) || (obj->is<Contact>()))
+  if ((nullptr == obj) || (! obj->is<Contact>()))
     return -1;
   return ConfigObjectList::add(obj, row);
 }

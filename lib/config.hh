@@ -46,6 +46,11 @@ public:
   /** Sets the modified flag. */
   void setModified(bool modified);
 
+  bool label(Context &context);
+  using ConfigObject::serialize;
+  /** Serializes the configuration into the given stream as text. */
+  bool toYAML(QTextStream &stream);
+
   /** Returns the list of radio IDs. */
   RadioIDList *radioIDs() const;
   /** Returns the list of contacts. */
@@ -102,6 +107,9 @@ public:
   bool writeCSV(const QString &filename, QString &errorMessage);
   /** Exports the configuration to the given text stream in text format. */
   bool writeCSV(QTextStream &stream, QString &errorMessage);
+
+protected:
+  bool serialize(YAML::Node &node, const Context &context);
 
 signals:
   /** Gets emitted if the configuration gets changed. */

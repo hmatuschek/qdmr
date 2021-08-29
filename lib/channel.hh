@@ -52,6 +52,8 @@ protected:
           ScanList *scanlist, QObject *parent=nullptr);
 
 public:
+  using ConfigObject::serialize;
+
   /** Returns @c true if the channel is of type @c T. This can be used to text wheter this channel
    * is actuially an analog or digital channel: @c channel->is<AnalogChannel>(). */
   template<class T>
@@ -105,6 +107,9 @@ public:
   /** (Re-) Sets the default scan list for the channel. */
   bool setScanList(ScanList *list);
 
+protected:
+  bool serialize(YAML::Node &node, const Context &context);
+
 protected slots:
   /** Internal hander for deleted scan lists. */
   void onScanListDeleted(QObject *obj);
@@ -151,8 +156,6 @@ public:
     BWWide     ///< Wide bandwidth (25kHz).
 	} Bandwidth;
 
-
-
 public:
   /** Constructs a new analog channel.
    *
@@ -174,6 +177,8 @@ public:
                 bool rxOnly, Admit admit, uint squelch, Signaling::Code rxTone,
                 Signaling::Code txTone, Bandwidth bw, ScanList *list,
                 APRSSystem *aprsSys=nullptr, QObject *parent=nullptr);
+
+  YAML::Node serialize(const Context &context);
 
   /** Returns the admit criterion for the analog channel. */
 	Admit admit() const;
@@ -203,6 +208,9 @@ public:
   APRSSystem *aprsSystem() const;
   /** Sets the APRS system. */
   void setAPRSSystem(APRSSystem *sys);
+
+protected:
+  bool serialize(YAML::Node &node, const Context &context);
 
 protected slots:
   /** Internal call-back that gets called if the associated APRS gets deleted. */
@@ -272,6 +280,8 @@ public:
                  DigitalContact *txContact, PositioningSystem *posSystem, ScanList *list,
                  RoamingZone *roaming, RadioID *radioID, QObject *parent=nullptr);
 
+  YAML::Node serialize(const Context &context);
+
   /** Returns the admit criterion for the channel. */
 	Admit admit() const;
   /** (Re-)Sets the admit criterion for the channel. */
@@ -311,6 +321,9 @@ public:
   RadioID *radioId() const;
   /** Associates the given radio ID with this channel. Pass nullptr to set to default ID. */
   bool setRadioId(RadioID *id);
+
+protected:
+  bool serialize(YAML::Node &node, const Context &context);
 
 protected slots:
   /** Internal callback if RX group list is deleted. */

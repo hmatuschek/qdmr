@@ -118,6 +118,41 @@ Channel::onScanListDeleted(QObject *obj) {
     _scanlist = nullptr;
 }
 
+bool
+Channel::serialize(YAML::Node &node, const Context &context) {
+  if (! ConfigObject::serialize(node, context))
+    return false;
+
+  node["name"] = _name.toStdString();
+
+  node["rx"] = _rxFreq;
+
+  if (_rxFreq != _txFreq) {
+    if (std::abs(_rxFreq-_txFreq)<100)
+      node["tx-offset"] = std::round((_txFreq-_rxFreq)*1e6)/1e6;
+    else
+      node["tx"] = _txFreq;
+  }
+
+  switch (_power) {
+  case MinPower:  node["power"] = "min"; break;
+  case LowPower:  node["power"] = "low"; break;
+  case MidPower:  node["power"] = "mid"; break;
+  case HighPower: node["power"] = "high"; break;
+  case MaxPower:  node["power"] = "max"; break;
+  }
+
+  if (0 < _txTimeOut)
+    node["tot"] = _txTimeOut;
+  if (_rxOnly)
+    node["rx-only"] = _rxOnly;
+
+  if (_scanlist && context.contains(_scanlist))
+    node["scan-list"] = context.getId(_scanlist).toStdString();
+
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnalogChannel
@@ -130,6 +165,16 @@ AnalogChannel::AnalogChannel(const QString &name, double rxFreq, double txFreq, 
     _admit(admit), _squelch(squelch), _rxTone(rxTone), _txTone(txTone), _bw(bw), _aprsSystem(aprsSys)
 {
   // pass...
+}
+
+YAML::Node
+AnalogChannel::serialize(const Context &context) {
+  YAML::Node node = Channel::serialize(context);
+  if (node.IsNull())
+    return node;
+  YAML::Node type;
+  type["analog"] = node;
+  return type;
 }
 
 AnalogChannel::Admit
@@ -204,6 +249,48 @@ AnalogChannel::onAPRSSystemDeleted() {
   _aprsSystem = nullptr;
 }
 
+bool
+AnalogChannel::serialize(YAML::Node &node, const Context &context) {
+  if (! Channel::serialize(node, context))
+    return false;
+  switch (_admit) {
+  case AdmitNone: break;
+  case AdmitFree: node["admit"] = "free"; break;
+  case AdmitTone: node["admit"] = "tone"; break;
+  }
+  node["squelch"] = _squelch;
+  if (Signaling::SIGNALING_NONE != _rxTone) {
+    YAML::Node tone;
+    if (Signaling::isCTCSS(_rxTone))
+      tone["ctcss"] = Signaling::toCTCSSFrequency(_rxTone);
+    else if (Signaling::isDCSNormal(_rxTone))
+      tone["dcs"] = Signaling::toDCSNumber(_rxTone);
+    else if (Signaling::isDCSInverted(_rxTone))
+      tone["dcs"] = -Signaling::toDCSNumber(_rxTone);
+    tone.SetStyle(YAML::EmitterStyle::Flow);
+    node["rx-tone"] = tone;
+  }
+  if (Signaling::SIGNALING_NONE != _txTone) {
+    YAML::Node tone;
+    if (Signaling::isCTCSS(_txTone))
+      tone["ctcss"] = Signaling::toCTCSSFrequency(_txTone);
+    else if (Signaling::isDCSNormal(_txTone))
+      tone["dcs"] = Signaling::toDCSNumber(_txTone);
+    else if (Signaling::isDCSInverted(_txTone))
+      tone["dcs"] = -Signaling::toDCSNumber(_txTone);
+    tone.SetStyle(YAML::EmitterStyle::Flow);
+    node["tx-tone"] = tone;
+  }
+  if (BWWide == _bw)
+    node["band-width"] = "wide";
+  else
+    node["band-width"] = "narrow";
+  if (_aprsSystem && context.contains(_aprsSystem))
+    node["aprs"] = context.getId(_aprsSystem).toStdString();
+
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of DigitalChannel
@@ -211,7 +298,8 @@ AnalogChannel::onAPRSSystemDeleted() {
 DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power,
                                uint txto, bool rxOnly, Admit admit, uint colorCode,
                                TimeSlot timeslot, RXGroupList *rxGroup, DigitalContact *txContact,
-                               PositioningSystem *posSystem, ScanList *list, RoamingZone *roaming, RadioID *radioID, QObject *parent)
+                               PositioningSystem *posSystem, ScanList *list, RoamingZone *roaming,
+                               RadioID *radioID, QObject *parent)
   : Channel(name, rxFreq, txFreq, power, txto, rxOnly, list, parent), _admit(admit),
     _colorCode(colorCode), _timeSlot(timeslot), _rxGroup(rxGroup), _txContact(txContact),
     _posSystem(posSystem), _roaming(roaming), _radioId(radioID)
@@ -226,6 +314,16 @@ DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq
     connect(_roaming, SIGNAL(destroyed()), this, SLOT(onRoamingZoneDeleted()));
   if (_radioId)
     connect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
+}
+
+YAML::Node
+DigitalChannel::serialize(const Context &context) {
+  YAML::Node node = Channel::serialize(context);
+  if (node.IsNull())
+    return node;
+  YAML::Node type;
+  type["digital"] = node;
+  return type;
 }
 
 DigitalChannel::Admit
@@ -367,6 +465,42 @@ DigitalChannel::onRadioIdDeleted() {
   setRadioId(nullptr);
 }
 
+bool
+DigitalChannel::serialize(YAML::Node &node, const Context &context) {
+  if (! Channel::serialize(node, context))
+    return false;
+
+  if (_radioId && context.contains(_radioId))
+    node["radio-id"] = context.getId(_radioId).toStdString();
+
+  switch (_admit) {
+  case AdmitNone: break;
+  case AdmitFree: node["admit"] = "free"; break;
+  case AdmitColorCode: node["admit"] = "color-code"; break;
+  }
+
+  node["color-code"] = _colorCode;
+
+  switch(_timeSlot) {
+  case TimeSlot1: node["time-slot"] = 1; break;
+  case TimeSlot2: node["time-slot"] = 2; break;
+  }
+
+  if (_rxGroup && context.contains(_rxGroup))
+    node["group-list"] = context.getId(_rxGroup).toStdString();
+
+  if (_txContact && context.contains(_txContact))
+    node["tx-contact"] = context.getId(_txContact).toStdString();
+
+  if (_posSystem && context.contains(_posSystem))
+    node["aprs"] = context.getId(_posSystem).toStdString();
+
+  if (_roaming && context.contains(_roaming))
+    node["roaming"] = context.getId(_roaming).toStdString();
+
+  return true;
+}
+
 /* ********************************************************************************************* *
  * Implementation of SelectedChannel
  * ********************************************************************************************* */
@@ -401,7 +535,7 @@ ChannelList::ChannelList(QObject *parent)
 
 int
 ChannelList::add(ConfigObject *obj, int row) {
-  if ((nullptr == obj) || (obj->is<Channel>()))
+  if ((nullptr == obj) || (! obj->is<Channel>()))
     return -1;
   return ConfigObjectList::add(obj, row);
 }

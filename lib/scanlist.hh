@@ -54,6 +54,9 @@ protected slots:
 	void onChannelDeleted(QObject *obj);
 
 protected:
+  bool serialize(YAML::Node &node, const Context &context);
+
+protected:
   /** The scanlist name. */
 	QString _name;
   /** The channel list. */

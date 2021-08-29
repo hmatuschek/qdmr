@@ -1751,10 +1751,8 @@ CSVReader::handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, Q
   if (_link)
     return true;
   logDebug() << "Got " << ids.count() << " IDs...";
-  _config->radioIDs()->getId(0)->setId(ids.front());
-  _radioIDs[1] = _config->radioIDs()->getId(0);
-  for (int i=1; i<ids.count(); i++) {
-    RadioID *id = new RadioID(ids.at(i));
+  for (int i=0; i<ids.count(); i++) {
+    RadioID *id = new RadioID("", ids.at(i));
     _config->radioIDs()->add(id);
     _radioIDs[i+1] = id;
   }
@@ -1769,6 +1767,7 @@ CSVReader::handleRadioName(const QString &name, qint64 line, qint64 column, QStr
   Q_UNUSED(errorMessage);
 
   if (_link) {
+    _config->radioIDs()->getDefaultId()->setName(name);
     _config->setName(name);
   }
   return true;

@@ -37,6 +37,9 @@ public:
   /** Removes the contact from the list at the given position. */
 	bool remContact(int idx);
 
+protected:
+  bool serialize(YAML::Node &node, const Context &context);
+
 protected slots:
   /** Internal used callback to handle deleted contacts. */
 	void onContactDeleted(QObject *obj);

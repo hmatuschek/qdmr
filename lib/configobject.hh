@@ -6,6 +6,8 @@
 #include <QHash>
 #include <QVector>
 
+#include <yaml-cpp/yaml.h>
+
 
 /** Base class for configuration objects (channels, zones, contacts, etc).
  * @ingroup config */
@@ -59,6 +61,9 @@ protected:
 public:
   /** Recursively labels the config object. */
   virtual bool label(Context &context);
+  /** Recursively serializes the configuration to YAML nodes.
+   * The complete configuration must be labeled first. */
+  virtual YAML::Node serialize(const Context &context);
 
   /** Returns @c true if the config object has the given extension. */
   virtual bool hasExtension(const QString &name) const;
@@ -89,6 +94,11 @@ public:
     return qobject_cast<Object *>(this);
   }
 
+protected:
+  /** Recursively serializes the configuration to YAML nodes.
+   * The complete configuration must be labeled first. */
+  virtual bool serialize(YAML::Node &node, const Context &context);
+
 signals:
   /** Gets emitted once the config object is modified. */
   void modified(ConfigObject *obj);
@@ -112,6 +122,12 @@ protected:
   explicit AbstractConfigObjectList(QObject *parent = nullptr);
 
 public:
+  /** Recursively labels the config object. */
+  virtual bool label(ConfigObject::Context &context) = 0;
+  /** Recursively serializes the configuration to YAML nodes.
+   * The complete configuration must be labeled first. */
+  virtual YAML::Node serialize(const ConfigObject::Context &context) = 0;
+
   /** Returns the number of elements in the list. */
   virtual int count() const;
   /** Retunrs the index of the given object within the list. */
@@ -173,6 +189,9 @@ public:
   int add(ConfigObject *obj, int row=-1);
   bool take(ConfigObject *obj);
   bool del(ConfigObject *obj);
+
+  bool label(ConfigObject::Context &context);
+  YAML::Node serialize(const ConfigObject::Context &context);
 };
 
 
@@ -187,6 +206,10 @@ class ConfigObjectRefList: public AbstractConfigObjectList
 protected:
   /** Hidden constructor. */
   explicit ConfigObjectRefList(QObject *parent = nullptr);
+
+public:
+  bool label(ConfigObject::Context &context);
+  YAML::Node serialize(const ConfigObject::Context &context);
 };
 
 

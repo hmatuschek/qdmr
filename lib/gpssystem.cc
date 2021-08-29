@@ -2,6 +2,8 @@
 #include "contact.hh"
 #include "channel.hh"
 #include "logger.hh"
+#include "utils.hh"
+
 
 /* ********************************************************************************************* *
  * Implementation of PositioningSystem
@@ -24,7 +26,7 @@ PositioningSystem::name() const {
 void
 PositioningSystem::setName(const QString &name) {
   _name = name;
-  emit modified();
+  emit modified(this);
 }
 
 uint
@@ -35,8 +37,17 @@ PositioningSystem::period() const {
 void
 PositioningSystem::setPeriod(uint period) {
   _period = period;
+  emit modified(this);
 }
 
+bool
+PositioningSystem::serialize(YAML::Node &node, const ConfigObject::Context &context) {
+  if (! ConfigObject::serialize(node, context))
+    return false;
+  node["name"] = _name.toStdString();
+  node["period"] = _period;
+  return true;
+}
 
 /* ********************************************************************************************* *
  * Implementation of GPSSystem
@@ -50,6 +61,15 @@ GPSSystem::GPSSystem(const QString &name, DigitalContact *contact,
     connect(_contact, SIGNAL(destroyed(QObject*)), this, SLOT(onContactDeleted()));
   if (_revertChannel)
     connect(_revertChannel, SIGNAL(destroyed(QObject*)), this, SLOT(onRevertChannelDeleted()));
+}
+
+YAML::Node
+GPSSystem::serialize(const Context &context) {
+  YAML::Node node = PositioningSystem::serialize(context);
+  if (node.IsNull())
+    return node;
+  YAML::Node type; type["dmr"] = node;
+  return type;
 }
 
 bool
@@ -99,6 +119,20 @@ GPSSystem::onRevertChannelDeleted() {
   _revertChannel = nullptr;
 }
 
+bool
+GPSSystem::serialize(YAML::Node &node, const Context &context) {
+  if (! PositioningSystem::serialize(node, context))
+    return false;
+
+  if (_contact && context.contains(_contact))
+    node["destination"] = context.getId(_contact).toStdString();
+
+  if (_revertChannel && context.contains(_revertChannel))
+    node["revert"] = context.getId(_revertChannel).toStdString();
+
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of APRSSystem
@@ -111,6 +145,15 @@ APRSSystem::APRSSystem(const QString &name, AnalogChannel *channel, const QStrin
 {
   if (_channel)
     connect(_channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
+}
+
+YAML::Node
+APRSSystem::serialize(const Context &context) {
+  YAML::Node node = PositioningSystem::serialize(context);
+  if (node.IsNull())
+    return node;
+  YAML::Node type; type["aprs"] = node;
+  return type;
 }
 
 AnalogChannel *
@@ -186,6 +229,41 @@ void
 APRSSystem::onChannelDeleted(QObject *obj) {
   if (_channel == obj)
     _channel = nullptr;
+}
+
+bool
+APRSSystem::serialize(YAML::Node &node, const Context &context) {
+  if (! PositioningSystem::serialize(node, context))
+    return false;
+
+  if (_channel && context.contains(_channel))
+    node["channel"] = context.getId(_channel).toStdString();
+
+  node["destination"] = QString("%1-%2").arg(_destination).arg(_destSSID).toStdString();
+  node["source"] = QString("%1-%2").arg(_source).arg(_srcSSID).toStdString();
+
+  QStringList path;
+  QRegExp pattern("([A-Za-z0-9]+-[0-9]+)");
+  int idx = 0;
+  while (0 <= (idx = pattern.indexIn(_path, idx))) {
+    path.append(pattern.cap(1));
+    idx += pattern.matchedLength();
+  }
+
+  if (path.count()) {
+    YAML::Node list = YAML::Node(YAML::NodeType::Sequence);
+    list.SetStyle(YAML::EmitterStyle::Flow);
+    foreach (QString call, path) {
+      list.push_back(call.toStdString());
+    }
+    node["path"] = list;
+  }
+
+  node["icon"] = aprsicon2name(_icon).toStdString();
+
+  node["message"] = _message.toStdString();
+
+  return true;
 }
 
 

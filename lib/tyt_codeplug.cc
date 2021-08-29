@@ -907,7 +907,7 @@ bool
 TyTCodeplug::ZoneExtElement::linkZoneObj(Zone *zone, const CodeplugContext &ctx) {
   for (int i=0; (i<48) && memberIndexA(i); i++) {
     if (! ctx.hasChannel(memberIndexA(i))) {
-      logWarn() << "Cannot link zone: Channel index " << memberIndexA(i) << " not defined.";
+      logWarn() << "Cannot link zone extension: Channel index " << memberIndexA(i) << " not defined.";
       return false;
     }
     zone->A()->addChannel(ctx.getChannel(memberIndexA(i)));
@@ -915,7 +915,7 @@ TyTCodeplug::ZoneExtElement::linkZoneObj(Zone *zone, const CodeplugContext &ctx)
 
   for (int i=0; (i<64) && memberIndexB(i); i++) {
     if (! ctx.hasChannel(memberIndexB(i))) {
-      logWarn() << "Cannot link zone: Channel index " << memberIndexB(i) << " not defined.";
+      logWarn() << "Cannot link zone extension: Channel index " << memberIndexB(i) << " not defined.";
       return false;
     }
     zone->B()->addChannel(ctx.getChannel(memberIndexB(i)));
@@ -1193,6 +1193,8 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, const CodeplugConte
     lst->setTXChannel(SelectedChannel::get());
   else if (ctx.hasChannel(txChannelIndex()))
     lst->setTXChannel(ctx.getChannel(txChannelIndex()));
+  else if (0xffff == priorityChannel2Index())
+    lst->setSecPriorityChannel(nullptr);
   else
     logWarn() << "Cannot deocde reference to secondary priority channel index " << txChannelIndex()
                 << " in scan list '" << name() << "'.";
@@ -1763,7 +1765,7 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
 
 bool
 TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
-  config->radioIDs()->getDefaultId()->setId(dmrID());
+  config->radioIDs()->addId(radioName(),dmrID());
   config->setName(radioName());
   config->setIntroLine1(introLine1());
   config->setIntroLine2(introLine2());

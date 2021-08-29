@@ -77,6 +77,24 @@ RoamingZone::onChannelDeleted(QObject *obj) {
     remChannel(ch);
 }
 
+bool
+RoamingZone::serialize(YAML::Node &node, const Context &context) {
+  if (! ConfigObject::serialize(node, context))
+    return false;
+
+  node["name"] = _name.toStdString();
+
+  YAML::Node list = YAML::Node(YAML::NodeType::Sequence);
+  list.SetStyle(YAML::EmitterStyle::Flow);
+  foreach (DigitalChannel *ch, _channel) {
+    if (context.contains(ch))
+      list.push_back(context.getId(ch).toStdString());
+  }
+  node["channels"] = list;
+
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of DefaultRoamingZone

@@ -409,33 +409,43 @@ Application::saveCodeplug() {
     return;
 
   Settings settings;
-  QString filename = QFileDialog::getSaveFileName(nullptr, tr("Save codeplug"), settings.lastDirectory().absolutePath(),
-                                                  tr("Codeplug Files (*.conf *.csv *.txt)"));
+  QString filename = QFileDialog::getSaveFileName(
+        nullptr, tr("Save codeplug"), settings.lastDirectory().absolutePath(),
+        tr("Codeplug Files (*.yaml);;Codeplug Files (*.conf *.csv *.txt)"));
+
   if (filename.isEmpty())
     return;
 
-  // check for file suffix
-  QFileInfo info(filename);
-  if (("conf" != info.suffix()) && ("csv" != info.suffix()) && ("txt" != info.suffix()))
-    filename = filename + ".conf";
-
   QFile file(filename);
-  if (!file.open(QIODevice::WriteOnly)) {
+  if (! file.open(QIODevice::WriteOnly)) {
     QMessageBox::critical(nullptr, tr("Cannot open file"),
                           tr("Cannot save codeplug to file '%1': %2").arg(filename).arg(file.errorString()));
     return;
   }
 
-  QString errorMessage;
   QTextStream stream(&file);
-  if (_config->writeCSV(stream, errorMessage))
-    _mainWindow->setWindowModified(false);
-  else
-    QMessageBox::critical(nullptr, tr("Cannot save codeplug"),
-                          tr("Cannot save codeplug to file '%1': %2").arg(filename).arg(errorMessage));
+
+  // check for file suffix
+  QFileInfo info(filename);
+  if (("conf" == info.suffix()) || ("csv" == info.suffix())) {
+    QString errorMessage;
+    if (_config->writeCSV(stream, errorMessage))
+      _mainWindow->setWindowModified(false);
+    else
+      QMessageBox::critical(nullptr, tr("Cannot save codeplug"),
+                            tr("Cannot save codeplug to file '%1': %2").arg(filename).arg(errorMessage));
+  } else if ("yaml" == info.suffix()) {
+    if (_config->toYAML(stream)) {
+      _mainWindow->setWindowModified(false);
+    } else {
+      QMessageBox::critical(nullptr, tr("Cannot save codeplug"),
+                            tr("Cannot save codeplug to file '%1'.").arg(filename));
+    }
+  }
 
   file.flush();
   file.close();
+
   settings.setLastDirectoryDir(info.absoluteDir());
 }
 
@@ -807,7 +817,7 @@ Application::onDMRIDSelected(int idx) {
 
 void
 Application::onAddDMRID() {
-  int idx = _config->radioIDs()->addId(uint32_t(0));
+  int idx = _config->radioIDs()->addId("", uint32_t(0));
   _config->radioIDs()->setDefault(idx);
   QComboBox *dmrID  = _mainWindow->findChild<QComboBox *>("dmrID");
   dmrID->setCurrentIndex(0);

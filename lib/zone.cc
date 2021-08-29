@@ -146,6 +146,33 @@ Zone::B() {
   return _B;
 }
 
+bool
+Zone::serialize(YAML::Node &node, const Context &context) {
+  if (! ConfigObject::serialize(node, context))
+    return false;
+
+  node["name"] = _name.toStdString();
+
+  YAML::Node A = YAML::Node(YAML::NodeType::Sequence);
+  A.SetStyle(YAML::EmitterStyle::Flow);
+  for (int i=0; i<_A->count(); i++) {
+    if (context.contains(_A->channel(i)))
+      A.push_back(context.getId(_A->channel(i)).toStdString());
+  }
+  node["A"] = A;
+
+  if (_B->count()) {
+    YAML::Node B = YAML::Node(YAML::NodeType::Sequence);
+    B.SetStyle(YAML::EmitterStyle::Flow);
+    for (int i=0; i<_B->count(); i++) {
+      if (context.contains(_B->channel(i)))
+        B.push_back(context.getId(_B->channel(i)).toStdString());
+    }
+    node["B"] = B;
+  }
+
+  return true;
+}
 
 
 /* ********************************************************************************************* *

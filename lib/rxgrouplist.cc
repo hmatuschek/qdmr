@@ -87,6 +87,22 @@ RXGroupList::onContactDeleted(QObject *obj) {
     remContact(contact);
 }
 
+bool
+RXGroupList::serialize(YAML::Node &node, const Context &context) {
+  if (! ConfigObject::serialize(node, context))
+    return false;
+  node["name"] = _name.toStdString();
+  YAML::Node contacts = YAML::Node(YAML::NodeType::Sequence);
+  contacts.SetStyle(YAML::EmitterStyle::Flow);
+  foreach (DigitalContact *contact, _contacts) {
+    if (! context.contains(contact))
+      return false;
+    contacts.push_back(context.getId(contact).toStdString());
+  }
+  node["contacts"] = contacts;
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of RXGroupLists

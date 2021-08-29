@@ -15,18 +15,30 @@ public:
   /** Constructor.
    * @param id Specifies the DMR ID.
    * @param parent Specifies the parent QObject owning this object. */
-  explicit RadioID(uint32_t id, QObject *parent = nullptr);
+  explicit RadioID(const QString &name, uint32_t id, QObject *parent = nullptr);
+
+  /** Returns the name of the DMR ID. */
+  const QString &name() const;
+  /** Sets the name of the DMR ID. */
+  void setName(const QString &name);
 
   /** Returns the DMR ID. */
   uint32_t id() const;
   /** Sets the DMR ID. */
   void setId(uint32_t id);
 
+  YAML::Node serialize(const Context &context);
+
 signals:
   /** Gets emitted once the DMR is changed. */
   void modified();
 
 protected:
+  bool serialize(YAML::Node &node, const Context &context);
+
+protected:
+  /** Holds the name of the DMR ID. */
+  QString _name;
   /** Holds the DMR ID. */
   uint32_t _id;
 };
@@ -58,7 +70,7 @@ public:
   int add(ConfigObject *obj, int row=-1);
 
   /** Adds the given DMR ID. */
-  virtual int addId(uint32_t id);
+  virtual int addId(const QString &name, uint32_t id);
   /** Deletes and removes the given DMR ID. */
   virtual bool delId(uint32_t id);
 

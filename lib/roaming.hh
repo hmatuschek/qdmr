@@ -54,6 +54,9 @@ protected slots:
   void onChannelDeleted(QObject *obj);
 
 protected:
+  bool serialize(YAML::Node &node, const Context &context);
+
+protected:
   /** Holds the name of the roaming zone. */
   QString _name;
   /** Holds the actual channels of the roaming zone. */

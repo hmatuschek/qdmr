@@ -1,4 +1,6 @@
 #include "codeplugcontext.hh"
+#include "logger.hh"
+
 
 CodeplugContext::CodeplugContext(Config *config)
   : _config(config), _radioIDTable(), _channelTable(), _digitalContactTable(), _analogContactTable(),
@@ -28,10 +30,10 @@ CodeplugContext::setDefaultRadioId(uint32_t id, int index) {
 }
 
 bool
-CodeplugContext::addRadioId(uint32_t id, int index) {
+CodeplugContext::addRadioId(uint32_t id, int index, const QString &name) {
   if (_radioIDTable.contains(index))
     return false;
-  int cidx = _config->radioIDs()->addId(id);
+  int cidx = _config->radioIDs()->addId(name, id);
   if (cidx < 0)
     return false;
   _radioIDTable[index] = cidx;
@@ -55,6 +57,7 @@ bool
 CodeplugContext::addChannel(Channel *ch, int index) {
   if (_channelTable.contains(index))
     return false;
+  logDebug() << "Register channel '" << ch->name() << "' under idx=" << index << ".";
   int cidx = _config->channelList()->add(ch);
   if (0 > cidx)
     return false;
@@ -79,6 +82,7 @@ bool
 CodeplugContext::addDigitalContact(DigitalContact *con, int index) {
   if (_digitalContactTable.contains(index))
     return false;
+  logDebug() << "Register contact '" << con->name() << "' under idx=" << index << ".";
   int cidx = _config->contacts()->add(con);
   if (0 > cidx)
     return false;
@@ -159,7 +163,7 @@ CodeplugContext::addScanList(ScanList *lst, int index) {
   if (_scanListTable.contains(index))
     return false;
   int sidx = _config->scanlists()->count();
-  if (! _config->scanlists()->add(lst))
+  if (0 > _config->scanlists()->add(lst))
     return false;
   _scanListTable[index] = sidx;
   return true;

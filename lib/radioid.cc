@@ -4,10 +4,20 @@
 /* ********************************************************************************************* *
  * Implementation of RadioID
  * ********************************************************************************************* */
-RadioID::RadioID(uint32_t id, QObject *parent)
-  : ConfigObject("id", parent), _id(id)
+RadioID::RadioID(const QString &name, uint32_t id, QObject *parent)
+  : ConfigObject("id", parent), _name(name), _id(id)
 {
   // pass...
+}
+
+const QString &
+RadioID::name() const {
+  return _name;
+}
+
+void
+RadioID::setName(const QString &name) {
+  _name = name.simplified();
 }
 
 uint32_t
@@ -23,6 +33,25 @@ RadioID::setId(uint32_t id) {
   emit modified();
 }
 
+YAML::Node
+RadioID::serialize(const Context &context) {
+  YAML::Node node = ConfigObject::serialize(context);
+  if (node.IsNull())
+    return node;
+  YAML::Node type;
+  node.SetStyle(YAML::EmitterStyle::Flow);
+  type["dmr"] = node;
+  return type;
+}
+
+bool
+RadioID::serialize(YAML::Node &node, const Context &context) {
+  if (! ConfigObject::serialize(node, context))
+    return false;
+  node["name"] = _name.toStdString();
+  node["number"] = _id;
+  return true;
+}
 
 /* ********************************************************************************************* *
  * Implementation of RadioIDList
@@ -67,8 +96,8 @@ RadioIDList::add(ConfigObject *obj, int row) {
 }
 
 int
-RadioIDList::addId(uint32_t id) {
-  return add(new RadioID(id, this));
+RadioIDList::addId(const QString &name, uint32_t id) {
+  return add(new RadioID(name, id, this));
 }
 
 bool

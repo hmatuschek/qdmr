@@ -151,6 +151,42 @@ ScanList::onChannelDeleted(QObject *obj) {
   }
 }
 
+bool
+ScanList::serialize(YAML::Node &node, const Context &context) {
+  if (! ConfigObject::serialize(node, context))
+    return false;
+
+  node["name"] = _name.toStdString();
+
+  QStringList pchannels;
+  if (_priorityChannel && context.contains(_priorityChannel))
+    pchannels.append(context.getId(_priorityChannel));
+  if (_secPriorityChannel && context.contains(_secPriorityChannel))
+    pchannels.append(context.getId(_secPriorityChannel));
+  if (pchannels.count()) {
+    YAML::Node priority = YAML::Node(YAML::NodeType::Sequence);
+    priority.SetStyle(YAML::EmitterStyle::Flow);
+    foreach (QString id, pchannels) {
+      priority.push_back(id.toStdString());
+    }
+    node["priority"] = priority;
+  }
+
+  if (_txChannel && context.contains(_txChannel)) {
+    node["revert"] = context.getId(_txChannel).toStdString();
+  }
+
+  YAML::Node list = YAML::Node(YAML::NodeType::Sequence);
+  list.SetStyle(YAML::EmitterStyle::Flow);
+  foreach (Channel *channel, _channels) {
+    if (context.contains(channel))
+      list.push_back(context.getId(channel).toStdString());
+  }
+  node["channels"] = list;
+
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ScanLists

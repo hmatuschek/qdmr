@@ -51,6 +51,9 @@ public:
 	}
 
 protected:
+  bool serialize(YAML::Node &node, const Context &context);
+
+protected:
   /** Contact name. */
 	QString _name;
   /** Ringtone enabled? */
@@ -72,14 +75,16 @@ public:
    * @param parent Specifies the QObject parent. */
 	DTMFContact(const QString &name, const QString &number, bool rxTone=false, QObject *parent=nullptr);
 
-  /** Retruns @c true if the DTMF contact is valid (has a valid DTMF number). */
-  bool isValid() const;
+  YAML::Node serialize(const Context &context);
 
   /** Returns the DTMF number of this contact.
    * The number must consist of 0-9, a-f, * or #. */
 	const QString &number() const;
   /** (Re-)Sets the DTMF number of this contact. */
 	bool setNumber(const QString &number);
+
+protected:
+  bool serialize(YAML::Node &node, const Context &context);
 
 protected:
   /** The DTMF number. */
@@ -110,6 +115,8 @@ public:
    * @param parent Specifies the QObject parent. */
 	DigitalContact(Type type, const QString &name, uint number, bool rxTone=false, QObject *parent=nullptr);
 
+  YAML::Node serialize(const Context &context);
+
   /** Returns the call-type. */
 	Type type() const;
   /** (Re-)Sets the call-type. */
@@ -118,6 +125,9 @@ public:
 	uint number() const;
   /** (Re-)Sets the DMR number of the contact. */
 	bool setNumber(uint number);
+
+protected:
+  bool serialize(YAML::Node &node, const Context &context);
 
 protected:
   /** The call type. */

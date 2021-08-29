@@ -164,7 +164,7 @@ ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
   if (! parseScanLists(config, node["scan-lists"], ctx))
     return false;
 
-  if (! parsePositioningSystems(config, node["positionig"], ctx))
+  if (! parsePositioningSystems(config, node["positioning"], ctx))
     return false;
 
   if (! parseRoamingZones(config, node["roaming"], ctx))
@@ -1020,7 +1020,7 @@ RadioIdReader::addExtension(const QString &name, AbstractConfigReader *reader) {
 
 ConfigObject *
 RadioIdReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return new RadioID(0);
+  return new RadioID("", 0);
 }
 
 bool
@@ -1039,7 +1039,7 @@ RadioIdReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
   }
 
   if (node["name"] && node["name"].IsScalar()) {
-    //rid->setName(QString::fromStdString(radioIdNode["name"].to<std::string>()));
+    rid->setName(QString::fromStdString(node["name"].as<std::string>()));
   } else {
     _errorMessage = tr("%1:%2: Cannot parse radio id: No name defined.")
         .arg(node.Mark().line).arg(node.Mark().column);
@@ -1096,18 +1096,25 @@ ChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
 
   if (node["rx"] && node["rx"].IsScalar()) {
     channel->setRXFrequency(node["rx"].as<double>());
-    channel->setTXFrequency(node["rx"].as<double>());
   } else {
     _errorMessage = "Cannot parse channel: No RX frequency set.";
     return false;
   }
 
+  if (node["tx"] && node["tx-offset"]) {
+    _errorMessage = tr("%1,%2: Both 'tx' and 'tx-offset' specified. Only one can be defined per channel!")
+        .arg(node.Mark().line).arg(node.Mark().column);
+    return false;
+  }
+
+  channel->setTXFrequency(channel->rxFrequency());
   if (node["tx"] && node["tx"].IsScalar()) {
     channel->setTXFrequency(node["tx"].as<double>());
   } else if (node["tx-offset"] && node["tx-offset"].IsScalar()) {
     channel->setTXFrequency(channel->rxFrequency()+node["tx-offset"].as<double>());
   }
 
+  channel->setPower(Channel::HighPower);
   if (node["power"] && node["power"].IsScalar()) {
     QString power = QString::fromStdString(node["power"].as<std::string>());
     if ("min" == power) {
@@ -1125,16 +1132,14 @@ ChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
           .arg(channel->name()).arg(power);
       return false;
     }
-  } else {
-    _errorMessage = "Cannot parse channel: No RX frequency set.";
-    return false;
   }
 
-
+  channel->setTimeout(0);
   if (node["tx-timeout"] && node["tx-timeout"].IsScalar()) {
     channel->setTimeout(node["tx-timeout"].as<uint>());
   }
 
+  channel->setRXOnly(false);
   if (node["rx-only"] && node["rx-only"].IsScalar()) {
     channel->setTimeout(node["rx-only"].as<bool>());
   }
@@ -1151,7 +1156,7 @@ ChannelReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObjec
 
   if (node["scan-list"] && node["scan-list"].IsScalar()) {
     QString sl = QString::fromStdString(node["scan-list"].as<std::string>());
-    if ((! ctx.contains(sl)) || (ctx.getObj(sl)->is<ScanList>())) {
+    if ((! ctx.contains(sl)) || (! ctx.getObj(sl)->is<ScanList>())) {
       _errorMessage = tr("Cannot link channel '%1': Scan list with id='%2' unknown.")
           .arg(channel->name()).arg(sl);
       return false;
@@ -1260,7 +1265,7 @@ DigitalChannelReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
 
   if (node["group-list"] && node["group-list"].IsScalar()) {
     QString gl = QString::fromStdString(node["group-list"].as<std::string>());
-    if ((! ctx.contains(gl)) || (ctx.getObj(gl)->is<RXGroupList>())) {
+    if ((! ctx.contains(gl)) || (! ctx.getObj(gl)->is<RXGroupList>())) {
       _errorMessage = tr("Cannot link digital channel '%1': Group list with id='%2' is unknown.")
           .arg(channel->name()).arg(gl);
       return false;
@@ -1274,7 +1279,7 @@ DigitalChannelReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
 
   if (node["tx-contact"] && node["tx-contact"].IsScalar()) {
     QString c = QString::fromStdString(node["tx-contact"].as<std::string>());
-    if ((! ctx.contains(c)) || (ctx.getObj(c)->is<DigitalContact>())) {
+    if ((! ctx.contains(c)) || (! ctx.getObj(c)->is<DigitalContact>())) {
       _errorMessage = tr("Cannot link digital channel '%1': TX contact with id='%2' is unknown.")
           .arg(channel->name()).arg(c);
       return false;
@@ -1284,7 +1289,7 @@ DigitalChannelReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
 
   if (node["aprs"] && node["aprs"].IsScalar()) {
     QString aprs = QString::fromStdString(node["aprs"].as<std::string>());
-    if ((! ctx.contains(aprs)) || (ctx.getObj(aprs)->is<PositioningSystem>())) {
+    if ((! ctx.contains(aprs)) || (! ctx.getObj(aprs)->is<PositioningSystem>())) {
       _errorMessage = tr("Cannot link digital channel '%1': Positioning system with id='%2' is unknown.")
           .arg(channel->name()).arg(aprs);
       return false;
@@ -1294,7 +1299,7 @@ DigitalChannelReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
 
   if (node["roaming"] && node["roaming"].IsScalar()) {
     QString roaming = QString::fromStdString(node["roaming"].as<std::string>());
-    if ((! ctx.contains(roaming)) || (ctx.getObj(roaming)->is<RoamingZone>())) {
+    if ((! ctx.contains(roaming)) || (! ctx.getObj(roaming)->is<RoamingZone>())) {
       _errorMessage = tr("Cannot link digital channel '%1': Roaming zone with id='%2' is unknown.")
           .arg(channel->name()).arg(roaming);
       return false;
@@ -1304,7 +1309,7 @@ DigitalChannelReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
 
   if (node["radio-id"] && node["radio-id"].IsScalar()) {
     QString id = QString::fromStdString(node["dmr-id"].as<std::string>());
-    if ((! ctx.contains(id)) || (ctx.getObj(id)->is<RadioID>())) {
+    if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<RadioID>())) {
       _errorMessage = tr("Cannot link digital channel '%1': Radio ID with id='%2' is unknown.")
           .arg(channel->name()).arg(id);
       return false;
@@ -1353,10 +1358,12 @@ AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObje
     return false;
   }
 
+  channel->setSquelch(1);
   if (node["squelch"] && node["squelch"].IsScalar()) {
     channel->setSquelch(node["squelch"].as<int>());
   }
 
+  channel->setTXTone(Signaling::SIGNALING_NONE);
   if (node["rx-tone"] && node["rx-tone"].IsMap()) {
     if (node["rx-tone"]["ctcss"] && node["rx-tone"]["ctcss"].IsScalar()) {
       channel->setRXTone(Signaling::fromCTCSSFrequency(node["rx-tone"]["ctcss"].as<double>()));
@@ -1367,6 +1374,7 @@ AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObje
     }
   }
 
+  channel->setTXTone(Signaling::SIGNALING_NONE);
   if (node["tx-tone"] && node["tx-tone"].IsMap()) {
     if (node["tx-tone"]["ctcss"] && node["tx-tone"]["ctcss"].IsScalar()) {
       channel->setTXTone(Signaling::fromCTCSSFrequency(node["tx-tone"]["ctcss"].as<double>()));
@@ -1377,6 +1385,7 @@ AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObje
     }
   }
 
+  channel->setBandwidth(AnalogChannel::BWNarrow);
   if (node["band-width"] && node["band-width"].IsScalar()) {
     QString bw = QString::fromStdString(node["band-width"].as<std::string>());
     if ("narrow" == bw) {
@@ -1386,6 +1395,7 @@ AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObje
     }
   }
 
+  channel->setAdmit(AnalogChannel::AdmitNone);
   if (node["admit"] && node["admit"].IsScalar()) {
     QString admit = QString::fromStdString(node["admit"].as<std::string>());
     if ("always" == admit) {
@@ -1399,9 +1409,6 @@ AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObje
           .arg(channel->name()).arg(admit);
       return false;
     }
-  } else {
-    _errorMessage = "Cannot parse digital channel: No admit criterion set.";
-    return false;
   }
 
   if (! parseExtensions(_extensions, obj, node, ctx))
@@ -1419,7 +1426,7 @@ AnalogChannelReader::link(ConfigObject *obj, const YAML::Node &node, const Confi
 
   if (node["aprs"] && node["aprs"].IsScalar()) {
     QString aprs = QString::fromStdString(node["aprs"].as<std::string>());
-    if ((! ctx.contains(aprs)) || (ctx.getObj(aprs)->is<APRSSystem>())) {
+    if ((! ctx.contains(aprs)) || (! ctx.getObj(aprs)->is<APRSSystem>())) {
       _errorMessage = tr("Cannot link analog channel '%1': APRS system with id='%2' is unknown.")
           .arg(channel->name()).arg(aprs);
       return false;
@@ -2021,6 +2028,16 @@ ScanListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObje
     }
   }
 
+  if (node["revert"] && node["revert"].IsScalar()) {
+    QString id = QString::fromStdString(node["revert"].as<std::string>());
+    if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<Channel>())) {
+      _errorMessage = _errorMessage = tr("Cannot link scan-list '%1': '%2' does not refer to a channel.")
+          .arg(list->name()).arg(id);
+      return false;
+    }
+    list->setTXChannel(ctx.getObj(id)->as<Channel>());
+  }
+
   // link channels
   if (node["channels"] && node["channels"].IsSequence()) {
     for (YAML::const_iterator it=node["channels"].begin(); it!=node["channels"].end(); it++) {
@@ -2098,8 +2115,8 @@ GroupListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObj
   RXGroupList *list = qobject_cast<RXGroupList *>(obj);
 
   // link group calls
-  if (node["members"] && node["members"].IsSequence()) {
-    for (YAML::const_iterator it=node["members"].begin(); it!=node["members"].end(); it++) {
+  if (node["contacts"] && node["contacts"].IsSequence()) {
+    for (YAML::const_iterator it=node["contacts"].begin(); it!=node["contacts"].end(); it++) {
       if (!it->IsScalar()) {
         _errorMessage = tr("Cannot link group list '%1': Contact reference of wrong type.")
             .arg(list->name());

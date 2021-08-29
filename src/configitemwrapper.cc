@@ -12,7 +12,7 @@ GenericListWrapper::GenericListWrapper(AbstractConfigObjectList *list, QObject *
     return;
 
   connect(_list, SIGNAL(modified()), this, SIGNAL(modified()));
-  connect(_list, SIGNAL(destroyed(QObject*)), this, SLOT(onListDeleted(QObject*)));
+  connect(_list, SIGNAL(destroyed(QObject*)), this, SLOT(onListDeleted()));
   connect(_list, SIGNAL(elementModified(int)), this, SLOT(onItemModified(int)));
   connect(_list, SIGNAL(elementRemoved(int)), this, SLOT(onItemRemoved(int)));
 }

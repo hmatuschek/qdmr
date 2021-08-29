@@ -24,7 +24,7 @@ public:
   /** Stores the given ID at the specified index as the default radio ID. */
   bool setDefaultRadioId(uint32_t id, int index);
   /** Adds the given radio ID at the given index to the list. */
-  bool addRadioId(uint32_t id, int index);
+  bool addRadioId(uint32_t id, int index, const QString &name="");
   /** Maps the given index to the associated radio ID. */
   RadioID *getRadioId(int idx) const;
 
