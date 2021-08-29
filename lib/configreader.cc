@@ -86,9 +86,19 @@ ConfigReader::addExtension(const QString &name, AbstractConfigReader *reader) {
 
 bool
 ConfigReader::read(Config *obj, const QString &filename) {
-  YAML::Node node = YAML::LoadFile(filename.toStdString());
+  YAML::Node node;
+  try {
+     node = YAML::LoadFile(filename.toStdString());
+  } catch (const YAML::Exception &err) {
+    _errorMessage = tr("Cannot read YAML codeplug from file '%1': %2")
+        .arg(filename).arg(QString::fromStdString(err.msg));
+    return false;
+  }
+
   if (! node) {
-    _errorMessage = tr("Cannot read YAML codeplug from file '%1'").arg(filename);
+    _errorMessage = tr("Cannot read YAML codeplug from file '%1'")
+        .arg(filename);
+    return false;
   }
 
   obj->reset();
@@ -1000,6 +1010,14 @@ RadioIdReader::RadioIdReader(QObject *parent)
   // pass...
 }
 
+bool
+RadioIdReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = reader;
+  return true;
+}
+
 ConfigObject *
 RadioIdReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
   return new RadioID(0);
@@ -1052,6 +1070,15 @@ ChannelReader::ChannelReader(QObject *parent)
 {
   // pass...
 }
+
+bool
+ChannelReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = reader;
+  return true;
+}
+
 
 bool
 ChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
@@ -1147,6 +1174,14 @@ DigitalChannelReader::DigitalChannelReader(QObject *parent)
   : ChannelReader(parent)
 {
   // pass...
+}
+
+bool
+DigitalChannelReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = reader;
+  return true;
 }
 
 ConfigObject *
@@ -1295,6 +1330,14 @@ AnalogChannelReader::AnalogChannelReader(QObject *parent)
   // pass...
 }
 
+bool
+AnalogChannelReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = reader;
+  return true;
+}
+
 ConfigObject *
 AnalogChannelReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
   return new AnalogChannel("", 0,0, Channel::LowPower, -1, false, AnalogChannel::AdmitNone,
@@ -1402,6 +1445,14 @@ ZoneReader::ZoneReader(QObject *parent)
   // pass...
 }
 
+bool
+ZoneReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = reader;
+  return true;
+}
+
 ConfigObject *
 ZoneReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
   return new Zone("");
@@ -1489,6 +1540,14 @@ ContactReader::ContactReader(QObject *parent)
 }
 
 bool
+ContactReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = reader;
+  return true;
+}
+
+bool
 ContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
   Contact *contact = qobject_cast<Contact *>(obj);
 
@@ -1530,6 +1589,14 @@ DigitalContactReader::DigitalContactReader(QObject *parent)
   : ContactReader(parent)
 {
   // pass...
+}
+
+bool
+DigitalContactReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = reader;
+  return true;
 }
 
 bool
@@ -1653,6 +1720,14 @@ PositioningReader::PositioningReader(QObject *parent)
 }
 
 bool
+PositioningReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = reader;
+  return true;
+}
+
+bool
 PositioningReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
   PositioningSystem *system = qobject_cast<PositioningSystem *>(obj);
 
@@ -1694,6 +1769,14 @@ GPSSystemReader::GPSSystemReader(QObject *parent)
   : PositioningReader(parent)
 {
   // pass...
+}
+
+bool
+GPSSystemReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = reader;
+  return true;
 }
 
 ConfigObject *
@@ -1761,6 +1844,14 @@ APRSSystemReader::APRSSystemReader(QObject *parent)
   : PositioningReader(parent)
 {
   // pass...
+}
+
+bool
+APRSSystemReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = reader;
+  return true;
 }
 
 ConfigObject *
@@ -1873,6 +1964,13 @@ ScanListReader::ScanListReader(QObject *parent)
   // pass...
 }
 
+bool
+ScanListReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = reader;
+  return true;
+}
 
 ConfigObject *
 ScanListReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
@@ -1962,6 +2060,13 @@ GroupListReader::GroupListReader(QObject *parent)
   // pass...
 }
 
+bool
+GroupListReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = reader;
+  return true;
+}
 
 ConfigObject *
 GroupListReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
@@ -2032,6 +2137,13 @@ RoamingReader::RoamingReader(QObject *parent)
   // pass...
 }
 
+bool
+RoamingReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = reader;
+  return true;
+}
 
 ConfigObject *
 RoamingReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {

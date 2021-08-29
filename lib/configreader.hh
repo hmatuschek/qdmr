@@ -29,7 +29,7 @@ class APRSSystem;
 class RoamingZone;
 
 
-/** Base class for all extensible YAML reader.
+/** Base class for all extensible YAML parser.
  * @ingroup yaml */
 class AbstractConfigReader : public QObject
 {
@@ -64,7 +64,7 @@ protected:
 };
 
 
-/** Implements the config reader.
+/** Implements the config parser.
  * @ingroup yaml */
 class ConfigReader: public AbstractConfigReader
 {
@@ -193,11 +193,12 @@ protected:
   virtual bool linkRoamingZone(RoamingZone *zone, const YAML::Node &node, const ConfigObject::Context &ctx);
 
 public:
-  /** Reads the given config and updates the give context. */
+  /** Reads the given YAML file and updates the give config. */
   bool read(Config *obj, const QString &filename);
 
 public:
-  /** Adds an extension to the config parser. */
+  /** Adds an extension to the config parser.
+   * At this level, device specific codeplug elements and radio-wide settings can be added. */
   static bool addExtension(const QString &name, AbstractConfigReader *);
 
 protected:
@@ -262,7 +263,8 @@ public:
   bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
 
 public:
-  /** Adds an extension to the config parser. */
+  /** Adds an extension to the config parser.
+   * At this level, extensions for all channels can be added. */
   static bool addExtension(const QString &name, AbstractConfigReader *);
 
 protected:
@@ -286,7 +288,8 @@ public:
   bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
 
 public:
-  /** Adds an extension to the config parser. */
+  /** Adds an extension to the config parser.
+   * At this level, extensions to digital channels can be added. */
   static bool addExtension(const QString &name, AbstractConfigReader *);
 
 protected:
@@ -310,7 +313,8 @@ public:
   bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
 
 public:
-  /** Adds an extension to the config parser. */
+  /** Adds an extension to the config parser.
+   * At this level, extension to analog channels can be added. */
   static bool addExtension(const QString &name, AbstractConfigReader *);
 
 protected:
@@ -358,7 +362,8 @@ public:
   bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
 
 public:
-  /** Adds an extension to the config parser. */
+  /** Adds an extension to the config parser.
+   * At this level, extensions to all contact types can be added. */
   static bool addExtension(const QString &name, AbstractConfigReader *);
 
 protected:
@@ -382,7 +387,8 @@ public:
   bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
 
 public:
-  /** Adds an extension to the config parser. */
+  /** Adds an extension to the config parser.
+   * At this level, extensions to all digital contacts can be added. */
   static bool addExtension(const QString &name, AbstractConfigReader *);
 
 protected:
@@ -451,7 +457,8 @@ public:
   bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
 
 public:
-  /** Adds an extension to the config parser. */
+  /** Adds an extension to the config parser.
+   * At this level, extension to all positioning systems can be added. */
   static bool addExtension(const QString &name, AbstractConfigReader *);
 
 protected:
