@@ -5,34 +5,34 @@ speech: false
 radio-ids:
   - dmr: {id: id1, name: DM3MAT, number: 2621370}
 contacts:
-  - group: {id: cont1, name: WW, ring: false, number: 91}
-  - group: {id: cont2, name: EU, ring: false, number: 92}
-  - group: {id: cont3, name: DL, ring: false, number: 262}
-  - group: {id: cont4, name: DL MM, ring: false, number: 263}
-  - group: {id: cont5, name: Regional, ring: false, number: 8}
-  - group: {id: cont6, name: Lokal, ring: false, number: 9}
-  - group: {id: cont7, name: Bln/Brb, ring: false, number: 2621}
-  - group: {id: cont8, name: Sa/Th, ring: false, number: 2629}
-  - group: {id: cont9, name: SA/MV, ring: false, number: 2620}
-  - group: {id: cont10, name: Hessen, ring: false, number: 2626}
-  - group: {id: cont11, name: HamRadio Village, ring: false, number: 3177826}
-  - all: {id: cont12, name: All Call, ring: false, number: 16777215}
-  - group: {id: cont13, name: Simplex TG99, ring: false, number: 99}
-  - group: {id: cont14, name: Cl Brandenburg, ring: false, number: 26209}
-  - group: {id: cont15, name: Cl Berlin, ring: false, number: 26212}
-  - private: {id: cont16, name: Refl Brandenburg, ring: false, number: 4044}
-  - private: {id: cont17, name: Refl Berlin, ring: false, number: 4016}
-  - private: {id: cont18, name: BM SMS, ring: false, number: 262993}
-  - private: {id: cont19, name: BM DAPNET, ring: false, number: 262994}
-  - private: {id: cont20, name: BM Parrot, ring: false, number: 262997}
-  - private: {id: cont21, name: BM APRS, ring: false, number: 262999}
+  - group: {id: cont1, name: WW, number: 91}
+  - group: {id: cont2, name: EU, number: 92}
+  - group: {id: cont3, name: DL, number: 262}
+  - group: {id: cont4, name: DL MM, number: 263}
+  - group: {id: cont5, name: Regional, number: 8}
+  - group: {id: cont6, name: Lokal, number: 9}
+  - group: {id: cont7, name: Bln/Brb, number: 2621}
+  - group: {id: cont8, name: Sa/Th, number: 2629}
+  - group: {id: cont9, name: SA/MV, number: 2620}
+  - group: {id: cont10, name: Hessen, number: 2626}
+  - group: {id: cont11, name: HamRadio Village, number: 3177826}
+  - all: {id: cont12, name: All Call}
+  - group: {id: cont13, name: Simplex TG99, number: 99}
+  - group: {id: cont14, name: Cl Brandenburg, number: 26209}
+  - group: {id: cont15, name: Cl Berlin, number: 26212}
+  - private: {id: cont16, name: Refl Brandenburg, number: 4044}
+  - private: {id: cont17, name: Refl Berlin, number: 4016}
+  - private: {id: cont18, name: BM SMS, number: 262993}
+  - private: {id: cont19, name: BM DAPNET, number: 262994}
+  - private: {id: cont20, name: BM Parrot, number: 262997}
+  - private: {id: cont21, name: BM APRS, number: 262999}
   - private: {id: cont22, name: DG2RON Ronny, ring: true, number: 2621246}
   - private: {id: cont23, name: DM9KS Silvio, ring: true, number: 2621045}
   - private: {id: cont24, name: DM3MAT Hannes, ring: true, number: 2621370}
   - private: {id: cont25, name: DL2BQF Thomas, ring: true, number: 2621437}
   - private: {id: cont26, name: DL7JOM Olaf, ring: true, number: 2621004}
   - private: {id: cont27, name: DG1RPH Peter, ring: true, number: 2621528}
-  - private: {id: cont28, name: DO1RPH Richard, ring: false, number: 2634160}
+  - private: {id: cont28, name: DO1RPH Richard, number: 2634160}
 group-lists:
   - id: grp1
     name: DL

@@ -40,7 +40,8 @@ Contact::serialize(YAML::Node &node, const Context &context) {
   if (! ConfigObject::serialize(node, context))
     return false;
   node["name"] = _name.toStdString();
-  node["ring"] = _rxTone;
+  if (_rxTone)
+    node["ring"] = _rxTone;
   return true;
 }
 
@@ -141,7 +142,8 @@ bool
 DigitalContact::serialize(YAML::Node &node, const Context &context) {
   if (! Contact::serialize(node, context))
     return false;
-  node["number"] = _number;
+  if ((AllCall != _type) || (16777215 != _number))
+    node["number"] = _number;
   return true;
 }
 

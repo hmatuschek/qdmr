@@ -1711,6 +1711,20 @@ bool
 AllCallContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
   if (! DigitalContactReader::parse(obj, node, ctx))
     return false;
+
+  DigitalContact *contact = obj->as<DigitalContact>();
+
+  if (node["number"]) {
+    if (! node["number"].IsScalar()) {
+      _errorMessage = tr("%1,%2: Specified number is not scalar.")
+          .arg(node["number"].Mark().line).arg(node["number"].Mark().column);
+      return false;
+    }
+    contact->setNumber(node["number"].as<uint>());
+  } else {
+    contact->setNumber(16777215);
+  }
+
   return true;
 }
 
