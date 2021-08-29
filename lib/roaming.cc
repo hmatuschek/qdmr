@@ -47,7 +47,7 @@ RoamingZone::addChannel(DigitalChannel *ch, int row) {
   if (row <=0 || row>=count())
     row = count();
   connect(ch, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  connect(ch, SIGNAL(modified()), this, SIGNAL(modified()));
+  connect(ch, SIGNAL(modified(ConfigObject*)), this, SIGNAL(modified(ConfigObject*)));
   _channel.insert(row, ch);
   emit modified(this);
   return false;

@@ -13,6 +13,21 @@
 #include "configobject.hh"
 
 class Config;
+class RadioID;
+class Channel;
+class AnalogChannel;
+class DigitalChannel;
+class Zone;
+class ScanList;
+class Contact;
+class DigitalContact;
+class DTMFContact;
+class RXGroupList;
+class PositioningSystem;
+class GPSSystem;
+class APRSSystem;
+class RoamingZone;
+
 
 /** Base class for all extensible YAML reader.
  * @ingroup yaml */
@@ -36,6 +51,14 @@ public:
   virtual bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) = 0;
 
 protected:
+  /** Parses the given extensions for the given object. */
+  virtual bool parseExtensions(const QHash<QString, AbstractConfigReader *> &extensions, ConfigObject *obj,
+                               const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links the given extensions for the given object. */
+  virtual bool linkExtensions(const QHash<QString, AbstractConfigReader *> &extensions, ConfigObject *obj,
+                              const YAML::Node &node, const ConfigObject::Context &ctx);
+
+protected:
   /** Holds the error message. */
   QString _errorMessage;
 };
@@ -54,6 +77,120 @@ public:
   ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
   bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
   bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+
+protected:
+  /** Parses radio settings. */
+  virtual bool parseSettings(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links radio settings. */
+  virtual bool linkSettings(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+
+  /** Parses radio IDs. */
+  virtual bool parseRadioIDs(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links radio IDs. */
+  virtual bool linkRadioIDs(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses a single radio ID. */
+  virtual bool parseRadioID(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links a single radio ID. */
+  virtual bool linkRadioID(RadioID *id, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses a single DMR radio ID. */
+  virtual bool parseDMRRadioID(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links a single DMR radio ID. */
+  virtual bool linkDMRRadioID(RadioID *id, const YAML::Node &node, const ConfigObject::Context &ctx);
+
+  /** Parses channels. */
+  virtual bool parseChannels(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links channels. */
+  virtual bool linkChannels(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses single channel. */
+  virtual bool parseChannel(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links single channel. */
+  virtual bool linkChannel(Channel *channel, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses digital channel. */
+  virtual bool parseDigitalChannel(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links digital channel. */
+  virtual bool linkDigitalChannel(DigitalChannel *channel, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses analog channel. */
+  virtual bool parseAnalogChannel(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links analog channel. */
+  virtual bool linkAnalogChannel(AnalogChannel *channel, const YAML::Node &node, const ConfigObject::Context &ctx);
+
+  /** Parses zones. */
+  virtual bool parseZones(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links zones. */
+  virtual bool linkZones(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses single zone. */
+  virtual bool parseZone(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links single zone. */
+  virtual bool linkZone(Zone *zone, const YAML::Node &node, const ConfigObject::Context &ctx);
+
+  /** Parses scan lists. */
+  virtual bool parseScanLists(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links scan lists. */
+  virtual bool linkScanLists(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses single scan list. */
+  virtual bool parseScanList(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links single scan list. */
+  virtual bool linkScanList(ScanList *list, const YAML::Node &node, const ConfigObject::Context &ctx);
+
+  /** Parses contacts. */
+  virtual bool parseContacts(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links contacts. */
+  virtual bool linkContacts(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses single contact. */
+  virtual bool parseContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links single contact. */
+  virtual bool linkContact(Contact *contact, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses private-call contact. */
+  virtual bool parsePrivateCallContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links private-call contact. */
+  virtual bool linkPrivateCallContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses group-call contact. */
+  virtual bool parseGroupCallContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links group-call contact. */
+  virtual bool linkGroupCallContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses all-call contact. */
+  virtual bool parseAllCallContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Parses all-call contact. */
+  virtual bool linkAllCallContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses DTMF contact. */
+  virtual bool parseDTMFContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links DTMF contact. */
+  virtual bool linkDTMFContact(DTMFContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx);
+
+  /** Parses group lists. */
+  virtual bool parseGroupLists(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links group lists. */
+  virtual bool linkGroupLists(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses single group list. */
+  virtual bool parseGroupList(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links single group list. */
+  virtual bool linkGroupList(RXGroupList *list, const YAML::Node &node, const ConfigObject::Context &ctx);
+
+  /** Parses positioning systems. */
+  virtual bool parsePositioningSystems(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links positioning systems. */
+  virtual bool linkPositioningSystems(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses single positioning system. */
+  virtual bool parsePositioningSystem(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links single positioning system. */
+  virtual bool linkPositioningSystem(PositioningSystem *system, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses GPS positioning system. */
+  virtual bool parseGPSSystem(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links GPS positioning system. */
+  virtual bool linkGPSSystem(GPSSystem *system, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses APRS positioning system. */
+  virtual bool parseAPRSSystem(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links APRS positioning system. */
+  virtual bool linkAPRSSystem(APRSSystem *system, const YAML::Node &node, const ConfigObject::Context &ctx);
+
+  /** Parses roaming zones. */
+  virtual bool parseRoamingZones(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links roaming zones. */
+  virtual bool linkRoamingZones(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  /** Parses single roaming zone. */
+  virtual bool parseRoamingZone(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links single roaming zone. */
+  virtual bool linkRoamingZone(RoamingZone *zone, const YAML::Node &node, const ConfigObject::Context &ctx);
 
 public:
   /** Reads the given config and updates the give context. */

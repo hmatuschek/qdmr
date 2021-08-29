@@ -18,6 +18,52 @@ AbstractConfigReader::errorMessage() const {
   return _errorMessage;
 }
 
+bool
+AbstractConfigReader::parseExtensions(
+    const QHash<QString, AbstractConfigReader *> &extensions, ConfigObject *obj,
+    const YAML::Node &node, ConfigObject::Context &ctx)
+{
+  // Parse extensions:
+  foreach (QString name, extensions.keys()) {
+    if (node[name.toStdString()]) {
+      YAML::Node extNode = node[name.toStdString()];
+      ConfigObject *ext = extensions[name]->allocate(extNode, ctx);
+      if (!ext) {
+        _errorMessage = tr("%1:%2: Cannot allocate extension '%3': %1")
+            .arg(extNode.Mark().line).arg(extNode.Mark().column)
+            .arg(name).arg(extensions[name]->errorMessage());
+        return false;
+      }
+      if (! extensions[name]->parse(ext, extNode, ctx)) {
+        _errorMessage = tr("%1:%2: Cannot parse extension '%3': %1")
+            .arg(extNode.Mark().line).arg(extNode.Mark().column)
+            .arg(name).arg(extensions[name]->errorMessage());
+        return false;
+      }
+      obj->addExtension(name, ext);
+    }
+  }
+
+  return true;
+}
+
+bool
+AbstractConfigReader::linkExtensions(
+    const QHash<QString, AbstractConfigReader *> &extensions, ConfigObject *obj,
+    const YAML::Node &node, const ConfigObject::Context &ctx)
+{
+  foreach (QString name, obj->extensionNames()) {
+    YAML::Node extNode = node[name.toStdString()];
+    if (! extensions[name]->link(obj->extension(name), extNode, ctx)) {
+      _errorMessage = tr("%1:%2: Cannot link configuration extension '%3': %4")
+          .arg(extNode.Mark().line).arg(extNode.Mark().column)
+          .arg(name).arg(extensions[name]->errorMessage());
+      return false;
+    }
+  }
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ConfigReader
@@ -68,250 +114,54 @@ ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
 {
   Config *config = qobject_cast<Config *>(obj);
   if (nullptr == config) {
-    _errorMessage = tr("Cannot read configuration: passed object is not of type 'Config'.");
+    _errorMessage = tr("%1:%2: Cannot read configuration: passed object is not of type 'Config'.")
+        .arg(node.Mark().line).arg(node.Mark().column);
     return false;
   }
 
   if (! node.IsMap()) {
-    _errorMessage = tr("Cannot read configuration, element is not a map.");
+    _errorMessage = tr("%1:%2: Cannot read configuration, element is not a map.")
+        .arg(node.Mark().line).arg(node.Mark().column);
     return false;
   }
 
   if (node["version"] && node["version"].IsScalar()) {
     ctx.setVersion(QString::fromStdString(node["version"].as<std::string>()));
-  }
-
-  if (node["mic-level"] && node["mic-level"].IsScalar()) {
-    config->setMicLevel(node["mic-level"].as<uint>());
-  }
-
-  if (node["speech"] && node["speech"].IsScalar()) {
-    config->setSpeech(node["speech"].as<bool>());
-  }
-
-  if (node["radio-ids"] && node["radio-ids"].IsSequence()) {
-    RadioIdReader reader;
-    for (YAML::const_iterator it=node["radio-ids"].begin(); it!=node["radio-ids"].end(); it++) {
-      if ((*it)["dmr"] && (*it)["dmr"].IsMap()) {
-        RadioID *id = qobject_cast<RadioID*>(reader.allocate((*it)["dmr"], ctx));
-        if (nullptr == id) {
-          _errorMessage = tr("Cannot parse configuration: Cannot allocate radio-id: %1")
-              .arg(reader.errorMessage());
-          return false;
-        }
-        if (! reader.parse(id, (*it)["dmr"], ctx)) {
-          _errorMessage = tr("Cannot parse configuration: Cannot parse radio-id: %1")
-              .arg(reader.errorMessage());
-          return false;
-        }
-      } else {
-        _errorMessage = tr("Cannot parse radio id: unknown type.");
-      }
-    }
+    logDebug() << "Using format version " << ctx.version() << ".";
   } else {
-    _errorMessage = "Element 'radio-ids' missing or not a list.";
+    logWarn() << "No version string set, assuming 0.9.0.";
+    ctx.setVersion("0.9.0");
+  }
+
+  if (! parseSettings(config, node, ctx))
     return false;
-  }
 
-  if (node["channels"] && node["channels"].IsSequence()) {
-    for (YAML::const_iterator it=node["channels"].begin(); it!=node["channels"].end(); it++) {
-      if (node["channels"]["digital"] && node["channels"]["digital"].IsMap()) {
-        YAML::Node chNode = node["channels"]["digital"];
-        DigitalChannelReader reader;
-        DigitalChannel *ch = reader.allocate(chNode, ctx)->as<DigitalChannel>();
-        if (! ch) {
-          _errorMessage = tr("Cannot allocate digital channel: %1").arg(reader.errorMessage());
-          return false;
-        }
-        if (! reader.parse(ch, chNode, ctx)) {
-          _errorMessage = tr("Cannot parse digital channel: %1").arg(reader.errorMessage());
-          return false;
-        }
-      } else if (node["channels"]["analog"] && node["channels"]["analog"].IsMap()) {
-        YAML::Node chNode = node["channels"]["analog"];
-        AnalogChannelReader reader;
-        AnalogChannel *ch = reader.allocate(chNode, ctx)->as<AnalogChannel>();
-        if (! ch) {
-          _errorMessage = tr("Cannot allocate analog channel: %1").arg(reader.errorMessage());
-          return false;
-        }
-        if (! reader.parse(ch, chNode, ctx)) {
-          _errorMessage = tr("Cannot parse analog channel: %1").arg(reader.errorMessage());
-          return false;
-        }
-      } else {
-        _errorMessage = tr("Cannot parse channel: Uknown type.");
-        return false;
-      }
-    }
-  } else {
-    _errorMessage = "Element 'channels' missing or not a list.";
+  if (! parseRadioIDs(config, node["radio-ids"], ctx))
     return false;
-  }
 
-  if (node["zones"] && node["zones"].IsSequence()) {
-    ZoneReader reader;
-    for (YAML::const_iterator it=node["zones"].begin(); it!=node["zones"].end(); it++) {
-      Zone *zone = reader.allocate(*it, ctx)->as<Zone>();
-      if (nullptr == zone) {
-        _errorMessage = tr("Cannot allocate zone: %1").arg(reader.errorMessage());
-        return false;
-      }
-      if (! reader.parse(zone, node, ctx)) {
-        _errorMessage = tr("Cannot parse zone: %1").arg(reader.errorMessage());
-        return false;
-      }
-      config->zones()->add(zone);
-    }
-  } else {
-    _errorMessage = "Element 'zones' missing or not a list.";
+  if (! parseContacts(config, node["contacts"], ctx))
     return false;
-  }
 
-  if (node["scan-lists"] && node["scan-lists"].IsSequence()) {
-    ScanListReader reader;
-    for (YAML::const_iterator it=node["scan-lists"].begin(); it!=node["scan-lists"].end(); it++) {
-      ScanList *sl = reader.allocate(*it, ctx)->as<ScanList>();
-      if (nullptr == sl) {
-        _errorMessage = tr("Cannot allocate scan-list: %1").arg(reader.errorMessage());
-        return false;
-      }
-      if (! reader.parse(sl, *it, ctx)) {
-        _errorMessage = tr("Cannot parse scan-list: %1").arg(reader.errorMessage());
-        return false;
-      }
-      config->scanlists()->add(sl);
-    }
-  }
-
-  if (node["contacts"] && node["contacts"].IsSequence()) {
-    for (YAML::const_iterator it=node["contacts"].begin(); it!=node["contacts"].end(); it++) {
-      if ((*it)["private"] && ((*it)["private"].IsMap())) {
-        PrivateCallContactReader reader;
-        Contact *contact = reader.allocate((*it)["private"], ctx)->as<Contact>();
-        if (nullptr == contact) {
-          _errorMessage = tr("Cannot allocate private call contact: %1").arg(reader.errorMessage());
-          return false;
-        }
-        if (! reader.parse(contact, (*it)["private"], ctx)) {
-          _errorMessage = tr("Cannot parse private call contact: %1").arg(reader.errorMessage());
-          return false;
-        }
-        config->contacts()->add(contact);
-      } else if ((*it)["group"] && ((*it)["group"].IsMap())) {
-        GroupCallContactReader reader;
-        Contact *contact = reader.allocate((*it)["group"], ctx)->as<Contact>();
-        if (nullptr == contact) {
-          _errorMessage = tr("Cannot allocate group call contact: %1").arg(reader.errorMessage());
-          return false;
-        }
-        if (! reader.parse(contact, (*it)["group"], ctx)) {
-          _errorMessage = tr("Cannot parse group call contact: %1").arg(reader.errorMessage());
-          return false;
-        }
-        config->contacts()->add(contact);
-      } else if ((*it)["all"] && ((*it)["all"].IsMap())) {
-        AllCallContactReader reader;
-        Contact *contact = reader.allocate((*it)["all"], ctx)->as<Contact>();
-        if (nullptr == contact) {
-          _errorMessage = tr("Cannot allocate all call contact: %1").arg(reader.errorMessage());
-          return false;
-        }
-        if (! reader.parse(contact, (*it)["all"], ctx)) {
-          _errorMessage = tr("Cannot parse all call contact: %1").arg(reader.errorMessage());
-          return false;
-        }
-        config->contacts()->add(contact);
-      } else {
-        _errorMessage = tr("Cannot parse contact: Unknown type.");
-        return false;
-      }
-    }
-  } else {
-    _errorMessage = "Element 'contacts' missing or not a list.";
+  if (! parseGroupLists(config, node["group-lists"], ctx))
     return false;
-  }
 
-  if (node["group-lists"] && node["group-lists"].IsSequence()) {
-    GroupListReader reader;
-    for (YAML::const_iterator it=node["group-lists"].begin(); it!=node["group-lists"].end(); it++) {
-      RXGroupList *list = reader.allocate(*it, ctx)->as<RXGroupList>();
-      if (nullptr == list) {
-        _errorMessage = tr("Cannot allocate group list: %1").arg(reader.errorMessage());
-        return false;
-      }
-      if (! reader.parse(list, *it, ctx)) {
-        _errorMessage = tr("Cannot parse group list: %1").arg(reader.errorMessage());
-        return false;
-      }
-    }
-  } else {
-    _errorMessage = "Element 'group-lists' missing or not a list.";
+  if (! parseChannels(config, node["channels"], ctx))
     return false;
-  }
 
-  if (node["positioning"] && node["positioning"].IsSequence()) {
-    GPSSystemReader dmr;
-    APRSSystemReader aprs;
-    for (YAML::const_iterator it=node["positioning"].begin(); it!=node["positioning"].end(); it++) {
-      if ((*it)["dmr"]) {
-        PositioningSystem *sys = dmr.allocate((*it)["dmr"], ctx)->as<PositioningSystem>();
-        if (nullptr == sys) {
-          _errorMessage = tr("Cannot allocate GPS system: %1").arg(dmr.errorMessage());
-          return false;
-        }
-        if (! dmr.parse(sys, (*it)["dmr"], ctx)) {
-          _errorMessage = tr("Cannot parse GPS system: %1").arg(dmr.errorMessage());
-          return false;
-        }
-        config->posSystems()->add(sys);
-      } else if ((*it)["aprs"]) {
-        PositioningSystem *sys = aprs.allocate((*it)["dmr"], ctx)->as<PositioningSystem>();
-        if (nullptr == sys) {
-          _errorMessage = tr("Cannot allocate APRS system: %1").arg(aprs.errorMessage());
-          return false;
-        }
-        if (! aprs.parse(sys, (*it)["aprs"], ctx)) {
-          _errorMessage = tr("Cannot parse ARPS system: %1").arg(aprs.errorMessage());
-          return false;
-        }
-        config->posSystems()->add(sys);
-      }
-    }
-  }
+  if (! parseZones(config, node["zones"], ctx))
+    return false;
 
-  if (node["roaming"] && node["roaming"].IsSequence()) {
-    RoamingReader reader;
-    for (YAML::const_iterator it=node["roaming"].begin(); it!=node["roaming"].end(); it++) {
-      RoamingZone *zone = reader.allocate(*it, ctx)->as<RoamingZone>();
-      if (nullptr == zone) {
-        _errorMessage = tr("Cannot allocate roaming: ").arg(reader.errorMessage());
-        return false;
-      }
-      if (! reader.parse(zone, *it, ctx)) {
-        _errorMessage = tr("Cannot parse roaming: ").arg(reader.errorMessage());
-        return false;
-      }
-      config->roaming()->add(zone);
-    }
-  }
+  if (! parseScanLists(config, node["scan-lists"], ctx))
+    return false;
 
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot parse configuration: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse configuration: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      config->addExtension(name, ext);
-    }
-  }
+  if (! parsePositioningSystems(config, node["positionig"], ctx))
+    return false;
+
+  if (! parseRoamingZones(config, node["roaming"], ctx))
+    return false;
+
+  if (! parseExtensions(_extensions, config, node, ctx))
+    return false;
 
   return true;
 }
@@ -321,132 +171,788 @@ ConfigReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject
 {
   Config *config = qobject_cast<Config *>(obj);
 
-  { // link radio IDs
-    RadioIdReader reader;
-    for (int i=0; i<config->radioIDs()->count(); i++) {
-      if (! reader.link(config->radioIDs()->getId(i), node["radio-ids"][i]["dmr"], ctx)) {
-        _errorMessage = tr("Cannot link configuration: %1").arg(reader.errorMessage());
-        return false;
-      }
-    }
-  }
+  if (! linkSettings(config, node, ctx))
+    return false;
 
-  { // link channels
-    AnalogChannelReader ana;
-    DigitalChannelReader digi;
-    for (int i=0; i<config->channelList()->count(); i++) {
-      if (config->channelList()->channel(i)->is<DigitalChannel>()) {
-        if (! digi.link(config->channelList()->channel(i), node["channels"][i]["digital"], ctx)) {
-          _errorMessage = tr("Cannot link configuration: %1").arg(digi.errorMessage());
-          return false;
-        }
-      } else {
-        if (! ana.link(config->channelList()->channel(i), node["channels"][i]["analog"], ctx)) {
-          _errorMessage = tr("Cannot link configuration: %1").arg(digi.errorMessage());
-          return false;
-        }
-      }
-    }
-  }
+  if (! linkRadioIDs(config, node["radio-ids"], ctx))
+    return false;
 
-  { // link zones
-    ZoneReader reader;
-    for (int i=0; i<config->zones()->count(); i++) {
-      if (! reader.link(config->zones()->zone(i), node["zones"][i], ctx)) {
-        _errorMessage = tr("Cannot link configuration: %1").arg(reader.errorMessage());
-        return false;
-      }
-    }
-  }
+  if (! linkContacts(config, node["contacts"], ctx))
+    return false;
 
-  { // link scan-list
-    ScanListReader reader;
-    for (int i=0; i<config->scanlists()->count(); i++) {
-      if (! reader.link(config->scanlists()->scanlist(i), node["scan-lists"][i], ctx)) {
-        _errorMessage = tr("Cannot link configuration: %1").arg(reader.errorMessage());
-        return false;
-      }
-    }
-  }
+  if (! linkGroupLists(config, node["group-lists"], ctx))
+    return false;
 
-  // link contacts
-  for (int i=0; i<config->contacts()->count(); i++) {
-    if (node["contacts"][i]["private"]) {
-      PrivateCallContactReader reader;
-      if (! reader.link(config->contacts()->contact(i), node["contacts"][i]["private"], ctx)) {
-        _errorMessage = tr("Cannot link private call contact '%1': %2")
-            .arg(config->contacts()->contact(i)->name()).arg(reader.errorMessage());
-        return false;
-      }
-    } else if (node["contacts"][i]["group"]) {
-      GroupCallContactReader reader;
-      if (! reader.link(config->contacts()->contact(i), node["contacts"][i]["group"], ctx)) {
-        _errorMessage = tr("Cannot link group call contact '%1': %2")
-            .arg(config->contacts()->contact(i)->name()).arg(reader.errorMessage());
-        return false;
-      }
-    } else if (node["contacts"][i]["all"]) {
-      AllCallContactReader reader;
-      if (! reader.link(config->contacts()->contact(i), node["contacts"][i]["all"], ctx)) {
-        _errorMessage = tr("Cannot link all call contact '%1': %2")
-            .arg(config->contacts()->contact(i)->name()).arg(reader.errorMessage());
-        return false;
-      }
-    }
-  }
+  if (! linkChannels(config, node["channels"], ctx))
+    return false;
 
-  { // link group lists
-    GroupListReader reader;
-    for (int i=0; i<config->rxGroupLists()->count(); i++) {
-      if (! reader.link(config->rxGroupLists()->list(i), node["group-lists"][i], ctx)) {
-        _errorMessage = tr("Cannot link group list '%1': %2")
-            .arg(config->rxGroupLists()->list(i)->name()).arg(reader.errorMessage());
-        return false;
-      }
-    }
-  }
+  if (! linkZones(config, node["zones"], ctx))
+    return false;
 
-  { // positioning
-    GPSSystemReader gps;
-    APRSSystemReader aprs;
-    for (int i=0; i<config->posSystems()->count(); i++) {
-      if (node["positioning"][i]["dmr"]) {
-        if (! gps.link(config->posSystems()->system(i), node["positioning"][i]["dmr"], ctx)) {
-          _errorMessage = tr("Cannot link GPS system '%1': %2")
-              .arg(config->posSystems()->system(i)->name()).arg(gps.errorMessage());
-          return false;
-        }
-      } else if (node["positioning"][i]["aprs"]) {
-        if (!aprs.link(config->posSystems()->system(i), node["positioning"][i]["aprs"], ctx)) {
-          _errorMessage = tr("Cannot link APRS system '%1': %2")
-              .arg(config->posSystems()->system(i)->name()).arg(gps.errorMessage());
-          return false;
-        }
-      }
-      return false;
-    }
-  }
+  if (! linkScanLists(config, node["scan-lists"], ctx))
+    return false;
 
-  { // roaming
-    RoamingReader reader;
-    for (int i=0; i<config->roaming()->count(); i++) {
-      if (reader.link(config->roaming()->zone(i), node["roaming"][i], ctx)) {
-        _errorMessage = tr("Cannot link roaming '%1': %2")
-            .arg(config->roaming()->zone(i)->name()).arg(reader.errorMessage());
-        return false;
-      }
-    }
-  }
+  if (! linkPositioningSystems(config, node["positioning"], ctx))
+    return false;
+
+  if (! linkRoamingZones(config, node["roaming"], ctx))
+    return false;
 
   // link extensions
-  foreach (QString name, config->extensionNames()) {
-    if (! _extensions[name]->link(config->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link configuration extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
+  if (! linkExtensions(_extensions, config, node, ctx))
+    return false;
+
+  return true;
+}
+
+
+bool
+ConfigReader::parseSettings(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (node["mic-level"] && node["mic-level"].IsScalar()) {
+    config->setMicLevel(node["mic-level"].as<uint>());
+  }
+
+  if (node["speech"] && node["speech"].IsScalar()) {
+    config->setSpeech(node["speech"].as<bool>());
   }
 
   return true;
+}
+
+bool
+ConfigReader::linkSettings(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return true;
+}
+
+
+bool
+ConfigReader::parseRadioIDs(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (!node) {
+    _errorMessage = tr("No radio IDs defined.");
+    return false;
+  }
+
+  if (! node.IsSequence()) {
+    _errorMessage = tr("%1:%2: 'radio-ids' is not a sequence.");
+    return false;
+  }
+
+  for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
+    if (! parseRadioID(config, *it, ctx))
+      return false;
+  }
+
+  return true;
+}
+
+bool
+ConfigReader::parseRadioID(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  if ((! node.IsMap()) || (1 != node.size())) {
+    _errorMessage = tr("%1:%2: Radio ID must map with a single element specifying the type.")
+        .arg(node.Mark().line).arg(node.Mark().column);
+    return false;
+
+  }
+
+  std::string type = node.begin()->first.as<std::string>();
+  if ("dmr" == type) {
+    if (! parseDMRRadioID(config, node[type], ctx))
+      return false;
+  } else {
+    _errorMessage = tr("%1:%2: Cannot parse radio id: unknown type '%3'.")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(QString::fromStdString(type));
+  }
+
+  return true;
+}
+
+bool
+ConfigReader::parseDMRRadioID(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  RadioIdReader reader;
+  RadioID *id = qobject_cast<RadioID*>(reader.allocate(node, ctx));
+  if (nullptr == id) {
+    _errorMessage = tr("%1:%2: Cannot allocate radio-id: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+  if (! reader.parse(id, node, ctx)) {
+    _errorMessage = tr("%1:%2: Cannot parse radio-id: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+  config->radioIDs()->add(id);
+  return true;
+}
+
+bool
+ConfigReader::linkRadioIDs(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  YAML::const_iterator it=node.begin();
+  int i=0;
+  for (; (it!=node.end()) && (i<config->radioIDs()->count()); it++, i++) {
+    if (! linkRadioID(config->radioIDs()->getId(i), *it, ctx))
+      return false;
+  }
+  return true;
+}
+
+bool
+ConfigReader::linkRadioID(RadioID *id, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  std::string type = node.begin()->first.as<std::string>();
+  if ("dmr" == type) {
+    if (! linkDMRRadioID(id, node[type], ctx))
+      return false;
+  }
+  return true;
+}
+
+bool
+ConfigReader::linkDMRRadioID(RadioID *id, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return RadioIdReader().link(id, node, ctx);
+}
+
+
+bool
+ConfigReader::parseChannels(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node) {
+    _errorMessage = tr("No channels defined.");
+    return false;
+  }
+
+  if (! node.IsSequence()) {
+    _errorMessage = tr("%1:%2: 'channels' element is not a sequence.")
+        .arg(node.Mark().line).arg(node.Mark().column);
+    return false;
+  }
+
+  for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
+    if (! parseChannel(config, *it, ctx))
+      return false;
+  }
+
+  return true;
+}
+
+bool
+ConfigReader::parseChannel(Config *config, const YAML::Node &node, ConfigObject::Context &ctx)  {
+  if ((! node.IsMap()) || (1 != node.size())) {
+    _errorMessage = tr("%1:%2: Expected map with a single element.")
+        .arg(node.Mark().line, node.Mark().column);
+    return false;
+  }
+
+  std::string type = node.begin()->first.as<std::string>();
+  if ("analog" == type) {
+    if (! parseAnalogChannel(config, node[type], ctx))
+      return false;
+  } else if ("digital" == type) {
+    if (! parseDigitalChannel(config, node[type], ctx))
+      return false;
+  } else {
+    _errorMessage = tr("%1:%2: Uknown channel type '%3'")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(QString::fromStdString(type));
+    return false;
+  }
+
+  return true;
+}
+
+bool
+ConfigReader::parseDigitalChannel(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  DigitalChannelReader reader;
+  DigitalChannel *ch = reader.allocate(node, ctx)->as<DigitalChannel>();
+  if (! ch) {
+    _errorMessage = tr("%1:%2: Cannot allocate digital channel: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+  if (! reader.parse(ch, node, ctx)) {
+    _errorMessage = tr("%1:%2: Cannot parse digital channel: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+  config->channelList()->add(ch);
+  return true;
+}
+
+bool
+ConfigReader::parseAnalogChannel(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  AnalogChannelReader reader;
+  AnalogChannel *ch = reader.allocate(node, ctx)->as<AnalogChannel>();
+  if (! ch) {
+    _errorMessage = tr("%1:%2: Cannot allocate analog channel: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+  if (! reader.parse(ch, node, ctx)) {
+    _errorMessage = tr("%1:%2: Cannot parse analog channel: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+  config->channelList()->add(ch);
+  return true;
+}
+
+bool
+ConfigReader::linkChannels(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  YAML::const_iterator it=node.begin();
+  int i=0;
+  for (; (it!=node.end()) && (i<config->channelList()->count()); it++, i++) {
+    if (! linkChannel(config->channelList()->channel(i), *it, ctx))
+      return false;
+  }
+  return true;
+}
+
+bool
+ConfigReader::linkChannel(Channel *channel, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  std::string type = node.begin()->first.as<std::string>();
+  if ("analog" == type) {
+    if (! linkAnalogChannel(channel->as<AnalogChannel>(), node[type], ctx))
+      return false;
+  } else if ("digital" == type) {
+    if (! linkDigitalChannel(channel->as<DigitalChannel>(), node[type], ctx))
+      return false;
+  }
+  return true;
+}
+
+bool
+ConfigReader::linkAnalogChannel(AnalogChannel *channel, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return AnalogChannelReader().link(channel, node, ctx);
+}
+
+bool
+ConfigReader::linkDigitalChannel(DigitalChannel *channel, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return DigitalChannelReader().link(channel, node, ctx);
+}
+
+
+bool
+ConfigReader::parseZones(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node) {
+    _errorMessage = tr("No zones defined.");
+    return false;
+  }
+
+  if (! node.IsSequence()) {
+    _errorMessage = tr("%1:%2: 'zones' element is not a sequence.")
+        .arg(node.Mark().line).arg(node.Mark().column);
+    return false;
+  }
+
+  for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
+    if (! parseZone(config, *it, ctx))
+      return false;
+  }
+
+  return true;
+}
+
+bool
+ConfigReader::parseZone(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  ZoneReader reader;
+
+  Zone *zone = reader.allocate(node, ctx)->as<Zone>();
+  if (nullptr == zone) {
+    _errorMessage = tr("%1:%2: Cannot allocate zone: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  if (! reader.parse(zone, node, ctx)) {
+    _errorMessage = tr("%1:%2: Cannot parse zone: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  config->zones()->add(zone);
+
+  return true;
+}
+
+bool
+ConfigReader::linkZones(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  YAML::const_iterator it=node.begin();
+  int i=0;
+  for (; (it!=node.end()) && (i<config->zones()->count()); it++, i++) {
+    if (! linkZone(config->zones()->zone(i), *it, ctx))
+      return false;
+  }
+  return true;
+}
+
+bool
+ConfigReader::linkZone(Zone *zone, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return ZoneReader().link(zone, node, ctx);
+}
+
+
+bool
+ConfigReader::parseScanLists(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node)
+    return true;
+
+  if (! node.IsSequence()) {
+    _errorMessage = tr("%1:%2: 'scan-lists' element is not a sequence.")
+        .arg(node.Mark().line).arg(node.Mark().column);
+    return false;
+  }
+
+  for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
+    if (! parseScanList(config, *it, ctx))
+      return false;
+  }
+
+  return true;
+}
+
+bool
+ConfigReader::parseScanList(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  ScanListReader reader;
+
+  ScanList *list = reader.allocate(node, ctx)->as<ScanList>();
+  if (nullptr == list) {
+    _errorMessage = tr("%1:%2: Cannot allocate scan list: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  if (! reader.parse(list, node, ctx)) {
+    _errorMessage = tr("%1:%2: Cannot parse scan list: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  config->scanlists()->add(list);
+
+  return true;
+}
+
+bool
+ConfigReader::linkScanLists(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  YAML::const_iterator it=node.begin();
+  int i=0;
+  for (; (it!=node.end()) && (i<config->scanlists()->count()); it++, i++) {
+    if (! linkScanList(config->scanlists()->scanlist(i), *it, ctx))
+      return false;
+  }
+  return true;
+}
+
+bool
+ConfigReader::linkScanList(ScanList *list, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return ScanListReader().link(list, node, ctx);
+}
+
+
+bool
+ConfigReader::parseContacts(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node)
+    return true;
+
+  if (! node.IsSequence()) {
+    _errorMessage = tr("%1:%2: 'contacts' element is not a sequence.")
+        .arg(node.Mark().line).arg(node.Mark().column);
+    return false;
+  }
+
+  for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
+    if (! parseContact(config, *it, ctx))
+      return false;
+  }
+
+  return true;
+}
+
+bool
+ConfigReader::parseContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx)  {
+  if ((! node.IsMap()) || (1 != node.size())) {
+    _errorMessage = tr("%1:%2: Expected map with a single element.")
+        .arg(node.Mark().line, node.Mark().column);
+    return false;
+  }
+
+  std::string type = node.begin()->first.as<std::string>();
+  if ("private" == type) {
+    if (! parsePrivateCallContact(config, node[type], ctx))
+      return false;
+  } else if ("group" == type) {
+    if (! parseGroupCallContact(config, node[type], ctx))
+      return false;
+  } else if ("all" == type) {
+    if (! parseAllCallContact(config, node[type], ctx))
+      return false;
+  } else if ("dtmf" == type) {
+    if (! parseDTMFContact(config, node[type], ctx))
+      return false;
+  } else {
+    _errorMessage = tr("%1:%2: Uknown contact type '%3'")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(QString::fromStdString(type));
+    return false;
+  }
+
+  return true;
+}
+
+bool
+ConfigReader::parsePrivateCallContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  PrivateCallContactReader reader;
+  DigitalContact *cont = reader.allocate(node, ctx)->as<DigitalContact>();
+  if (nullptr == cont) {
+    _errorMessage = tr("%1:%2: Cannot allocate private call contact: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  if (! reader.parse(cont, node, ctx)) {
+    _errorMessage = tr("%1:%2: Cannot parse private call contact: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  config->contacts()->add(cont);
+
+  return true;
+}
+
+bool
+ConfigReader::parseGroupCallContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  GroupCallContactReader reader;
+  DigitalContact *cont = reader.allocate(node, ctx)->as<DigitalContact>();
+  if (nullptr == cont) {
+    _errorMessage = tr("%1:%2: Cannot allocate group call contact: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  if (! reader.parse(cont, node, ctx)) {
+    _errorMessage = tr("%1:%2: Cannot parse group call contact: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  config->contacts()->add(cont);
+
+  return true;
+}
+
+bool
+ConfigReader::parseAllCallContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  AllCallContactReader reader;
+  DigitalContact *cont = reader.allocate(node, ctx)->as<DigitalContact>();
+  if (nullptr == cont) {
+    _errorMessage = tr("%1:%2: Cannot allocate all call contact: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  if (! reader.parse(cont, node, ctx)) {
+    _errorMessage = tr("%1:%2: Cannot parse all call contact: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  config->contacts()->add(cont);
+
+  return true;
+}
+
+bool
+ConfigReader::parseDTMFContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  _errorMessage = tr("%1:%2: DTMF contact reader not implemented yet.")
+      .arg(node.Mark().line).arg(node.Mark().column);
+  return false;
+}
+
+bool
+ConfigReader::linkContacts(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  YAML::const_iterator it=node.begin();
+  int i=0;
+  for (; (it!=node.end()) && (i<config->contacts()->count()); it++, i++) {
+    if (! linkContact(config->contacts()->contact(i), *it, ctx))
+      return false;
+  }
+  return true;
+}
+
+bool
+ConfigReader::linkContact(Contact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  std::string type = node.begin()->first.as<std::string>();
+  if ("private" == type) {
+    if (! linkPrivateCallContact(contact->as<DigitalContact>(), node[type], ctx))
+      return false;
+  } else if ("group" == type) {
+    if (! linkGroupCallContact(contact->as<DigitalContact>(), node[type], ctx))
+      return false;
+  } else if ("all" == type) {
+    if (! linkAllCallContact(contact->as<DigitalContact>(), node[type], ctx))
+      return false;
+  } else if ("dtmf" == type) {
+    if (! linkDTMFContact(contact->as<DTMFContact>(), node[type], ctx))
+      return false;
+  }
+  return true;
+}
+
+bool
+ConfigReader::linkPrivateCallContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return PrivateCallContactReader().link(contact, node, ctx);
+}
+
+bool
+ConfigReader::linkGroupCallContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return GroupCallContactReader().link(contact, node, ctx);
+}
+
+bool
+ConfigReader::linkAllCallContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return AllCallContactReader().link(contact, node, ctx);
+}
+
+bool
+ConfigReader::linkDTMFContact(DTMFContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  _errorMessage = tr("%1:%2: DTMF contact not implemented yet.");
+  return false;
+}
+
+
+bool
+ConfigReader::parseGroupLists(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node) {
+    _errorMessage = tr("No group lists defined.");
+    return false;
+  }
+
+  if (! node.IsSequence()) {
+    _errorMessage = tr("%1:%2: 'group-lists' element is not a sequence.")
+        .arg(node.Mark().line).arg(node.Mark().column);
+    return false;
+  }
+
+  for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
+    if (! parseGroupList(config, *it, ctx))
+      return false;
+  }
+
+  return true;
+}
+
+bool
+ConfigReader::parseGroupList(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  GroupListReader reader;
+
+  RXGroupList *list = reader.allocate(node, ctx)->as<RXGroupList>();
+  if (nullptr == list) {
+    _errorMessage = tr("%1:%2: Cannot allocate group list: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  if (! reader.parse(list, node, ctx)) {
+    _errorMessage = tr("%1:%2: Cannot parse group list: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  config->rxGroupLists()->add(list);
+
+  return true;
+}
+
+bool
+ConfigReader::linkGroupLists(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  YAML::const_iterator it=node.begin();
+  int i=0;
+  for (; (it!=node.end()) && (i<config->rxGroupLists()->count()); it++, i++) {
+    if (! linkGroupList(config->rxGroupLists()->list(i), *it, ctx))
+      return false;
+  }
+  return true;
+}
+
+bool
+ConfigReader::linkGroupList(RXGroupList *list, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return GroupListReader().link(list, node, ctx);
+}
+
+
+bool
+ConfigReader::parsePositioningSystems(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node)
+    return true;
+
+  if (! node.IsSequence()) {
+    _errorMessage = tr("%1:%2: 'positioning' element is not a sequence.")
+        .arg(node.Mark().line).arg(node.Mark().column);
+    return false;
+  }
+
+  for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
+    if (! parsePositioningSystem(config, *it, ctx))
+      return false;
+  }
+
+  return true;
+}
+
+bool
+ConfigReader::parsePositioningSystem(Config *config, const YAML::Node &node, ConfigObject::Context &ctx)  {
+  if ((! node.IsMap()) || (1 != node.size())) {
+    _errorMessage = tr("%1:%2: Expected map with a single element.")
+        .arg(node.Mark().line, node.Mark().column);
+    return false;
+  }
+
+  std::string type = node.begin()->first.as<std::string>();
+  if ("dmr" == type) {
+    if (! parseGPSSystem(config, node[type], ctx))
+      return false;
+  } else if ("aprs" == type) {
+    if (! parseAPRSSystem(config, node[type], ctx))
+      return false;
+  } else {
+    _errorMessage = tr("%1:%2: Uknown positioning system type '%3'")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(QString::fromStdString(type));
+    return false;
+  }
+
+  return true;
+}
+
+bool
+ConfigReader::parseGPSSystem(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  GPSSystemReader reader;
+
+  GPSSystem *sys = reader.allocate(node, ctx)->as<GPSSystem>();
+  if (nullptr == sys) {
+    _errorMessage = tr("%1:%2: Cannot allocate GPS system: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  if (! reader.parse(sys, node, ctx)) {
+    _errorMessage = tr("%1:%2: Cannot parse GPS system: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  config->posSystems()->add(sys);
+
+  return true;
+}
+
+bool
+ConfigReader::parseAPRSSystem(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  APRSSystemReader reader;
+
+  APRSSystem *sys = reader.allocate(node, ctx)->as<APRSSystem>();
+  if (nullptr == sys) {
+    _errorMessage = tr("%1:%2: Cannot allocate APRS system: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  if (! reader.parse(sys, node, ctx)) {
+    _errorMessage = tr("%1:%2: Cannot parse APRS system: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  config->posSystems()->add(sys);
+
+  return true;
+}
+
+bool
+ConfigReader::linkPositioningSystems(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  YAML::const_iterator it=node.begin();
+  int i=0;
+  for (; (it!=node.end()) && (i<config->posSystems()->count()); it++, i++) {
+    if (! linkPositioningSystem(config->posSystems()->system(i), *it, ctx))
+      return false;
+  }
+  return true;
+}
+
+bool
+ConfigReader::linkPositioningSystem(PositioningSystem *system, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  std::string type = node.begin()->first.as<std::string>();
+  if ("dmr" == type) {
+    if (! linkGPSSystem(system->as<GPSSystem>(), node[type], ctx))
+      return false;
+  } else if ("aprs" == type) {
+    if (! linkAPRSSystem(system->as<APRSSystem>(), node[type], ctx))
+      return false;
+  }
+  return true;
+}
+
+bool
+ConfigReader::linkGPSSystem(GPSSystem *system, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return GPSSystemReader().link(system, node, ctx);
+}
+
+bool
+ConfigReader::linkAPRSSystem(APRSSystem *system, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return APRSSystemReader().link(system, node, ctx);
+}
+
+
+bool
+ConfigReader::parseRoamingZones(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node)
+    return true;
+
+  if (! node.IsSequence()) {
+    _errorMessage = tr("%1:%2: 'roaming' element is not a sequence.")
+        .arg(node.Mark().line).arg(node.Mark().column);
+    return false;
+  }
+
+  for (YAML::const_iterator it=node.begin(); it!=node.end(); it++) {
+    if (! parseRoamingZone(config, *it, ctx))
+      return false;
+  }
+
+  return true;
+}
+
+bool
+ConfigReader::parseRoamingZone(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  RoamingReader reader;
+
+  RoamingZone *zone = reader.allocate(node, ctx)->as<RoamingZone>();
+  if (nullptr == zone) {
+    _errorMessage = tr("%1:%2: Cannot allocate roaming zone: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  if (! reader.parse(zone, node, ctx)) {
+    _errorMessage = tr("%1:%2: Cannot parse roaming zone: %3")
+        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    return false;
+  }
+
+  config->roaming()->add(zone);
+
+  return true;
+}
+
+bool
+ConfigReader::linkRoamingZones(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  YAML::const_iterator it=node.begin();
+  int i=0;
+  for (; (it!=node.end()) && (i<config->roaming()->count()); it++, i++) {
+    if (! linkRoamingZone(config->roaming()->zone(i), *it, ctx))
+      return false;
+  }
+  return true;
+}
+
+bool
+ConfigReader::linkRoamingZone(RoamingZone *zone, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return RoamingReader().link(zone, node, ctx);
 }
 
 
@@ -470,9 +976,10 @@ ObjectReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
   if (node["id"] && node["id"].IsScalar()) {
     QString id = QString::fromStdString(node["id"].as<std::string>());
     if (ctx.contains(id)) {
-      _errorMessage = tr("Cannot parse radio-id '%1': ID already used.").arg(id);
+      _errorMessage = tr("Cannot parse object '%1': ID already used.").arg(id);
       return false;
     }
+    logDebug() << "Register object " << obj << " as '" << id << "'.";
     ctx.add(id, obj);
   } else {
     logWarn() << "No ID associated with object, it cannot be referenced later.";
@@ -508,47 +1015,28 @@ RadioIdReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
   if (node["number"] && node["number"].IsScalar()) {
     rid->setId(node["number"].as<uint>());
   } else {
-    _errorMessage = tr("Cannot parse radio id: No number defined.");
+    _errorMessage = tr("%1:%2: Cannot parse radio id: No number defined.")
+        .arg(node.Mark().line).arg(node.Mark().column);
     return false;
   }
 
   if (node["name"] && node["name"].IsScalar()) {
     //rid->setName(QString::fromStdString(radioIdNode["name"].to<std::string>()));
   } else {
-    _errorMessage = tr("Cannot parse radio id: No number defined.");
+    _errorMessage = tr("%1:%2: Cannot parse radio id: No name defined.")
+        .arg(node.Mark().line).arg(node.Mark().column);
   }
 
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot parse radio id extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse radio id extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      rid->addExtension(name, ext);
-    }
-  }
+  if (! parseExtensions(_extensions, rid, node, ctx))
+    return false;
 
   return true;
 }
 
 bool
 RadioIdReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  RadioID *rid = qobject_cast<RadioID *>(obj);
-
-  // link extensions
-  foreach (QString name, rid->extensionNames()) {
-    if (! _extensions[name]->link(rid->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link radio-id extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
-  }
+  if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -624,22 +1112,8 @@ ChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
     channel->setTimeout(node["rx-only"].as<bool>());
   }
 
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot parse radio id extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse radio id extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      channel->addExtension(name, ext);
-    }
-  }
+  if (! parseExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -657,13 +1131,8 @@ ChannelReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObjec
     }
   }
 
-  // link extensions
-  foreach (QString name, channel->extensionNames()) {
-    if (! _extensions[name]->link(channel->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link channel extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
-  }
+  if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -741,22 +1210,8 @@ DigitalChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
     return false;
   }
 
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot parse digital channel extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse digital channel extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      channel->addExtension(name, ext);
-    }
-  }
+  if (! parseExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -764,6 +1219,9 @@ DigitalChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
 bool
 DigitalChannelReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
   DigitalChannel *channel = qobject_cast<DigitalChannel *>(obj);
+
+  if (! ChannelReader::link(obj, node, ctx))
+    return false;
 
   if (node["group-list"] && node["group-list"].IsScalar()) {
     QString gl = QString::fromStdString(node["group-list"].as<std::string>());
@@ -819,13 +1277,8 @@ DigitalChannelReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
     channel->setRadioId(ctx.getObj(id)->as<RadioID>());
   }
 
-  // link extensions
-  foreach (QString name, channel->extensionNames()) {
-    if (! _extensions[name]->link(channel->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link digital channel extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
-  }
+  if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -908,23 +1361,8 @@ AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObje
     return false;
   }
 
-
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot parse analog channel extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse analog channel extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      channel->addExtension(name, ext);
-    }
-  }
+  if (! parseExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -932,6 +1370,9 @@ AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObje
 bool
 AnalogChannelReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
   AnalogChannel *channel = qobject_cast<AnalogChannel *>(obj);
+
+  if (! ChannelReader::link(obj, node, ctx))
+    return false;
 
   if (node["aprs"] && node["aprs"].IsScalar()) {
     QString aprs = QString::fromStdString(node["aprs"].as<std::string>());
@@ -943,22 +1384,8 @@ AnalogChannelReader::link(ConfigObject *obj, const YAML::Node &node, const Confi
     channel->setAPRSSystem(ctx.getObj(aprs)->as<APRSSystem>());
   }
 
-  /*if (node["radio-id"] && node["radio-id"].IsScalar()) {
-    QString id = QString::fromStdString(node["dmr-id"].as<std::string>());
-    if ((! ctx.contains(id)) || (ctx.getObj(id)->is<RadioID>())) {
-      _errorMessage = tr("Cannot link digital channel '%1': Radio ID with id='%2' is unknown.")
-          .arg(channel->name()).arg(id);
-      return false;
-    }
-  }*/
-
-  // link extensions
-  foreach (QString name, channel->extensionNames()) {
-    if (! _extensions[name]->link(channel->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link analog channel extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
-  }
+   if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -990,26 +1417,12 @@ ZoneReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Conte
   if (node["name"] && node["name"].IsScalar()) {
     zone->setName(QString::fromStdString(node["name"].as<std::string>()));
   } else {
-    _errorMessage = tr("Cannot parse zone: No name defined");
+    _errorMessage = tr("No name defined");
     return false;
   }
 
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot parse zone extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse zone extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      zone->addExtension(name, ext);
-    }
-  }
+  if (! parseExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1027,8 +1440,8 @@ ZoneReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::
         return false;
       }
       QString id = QString::fromStdString(it->as<std::string>());
-      if ((! ctx.contains(id)) || (ctx.getObj(id)->is<Channel>())) {
-        _errorMessage = _errorMessage = tr("Cannot link zone '%1': '%2' does not refer to a channel.")
+      if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<Channel>())) {
+        _errorMessage = _errorMessage = tr("Cannot link zone '%1' A: '%2' does not refer to a channel.")
             .arg(zone->name()).arg(id);
         return false;
       }
@@ -1043,13 +1456,13 @@ ZoneReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::
   if (node["B"] && node["B"].IsSequence()) {
     for (YAML::const_iterator it=node["B"].begin(); it!=node["B"].end(); it++) {
       if (!it->IsScalar()) {
-        _errorMessage = tr("Cannot link zone '%1': Channel reference of wrong type. Must be id.")
+        _errorMessage = tr("Cannot link zone '%1' B: Channel reference of wrong type. Must be id.")
             .arg(zone->name());
         return false;
       }
       QString id = QString::fromStdString(it->as<std::string>());
-      if ((! ctx.contains(id)) || (ctx.getObj(id)->is<Channel>())) {
-        _errorMessage = _errorMessage = tr("Cannot link zone '%1': '%2' does not refer to a channel.")
+      if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<Channel>())) {
+        _errorMessage = _errorMessage = tr("Cannot link zone '%1' B: '%2' does not refer to a channel.")
             .arg(zone->name()).arg(id);
         return false;
       }
@@ -1057,13 +1470,8 @@ ZoneReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::
     }
   }
 
-  // link extensions
-  foreach (QString name, zone->extensionNames()) {
-    if (! _extensions[name]->link(zone->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link zone extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
-  }
+  if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1098,37 +1506,16 @@ ContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
     contact->setRXTone(node["ring"].as<bool>());
   }
 
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot parse contact extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse contact extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      contact->addExtension(name, ext);
-    }
-  }
+  if (! parseExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
 
 bool
 ContactReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  Contact *contact = qobject_cast<Contact *>(obj);
-
-  // link extensions
-  foreach (QString name, contact->extensionNames()) {
-    if (! _extensions[name]->link(contact->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link contact extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
-  }
+  if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1147,42 +1534,22 @@ DigitalContactReader::DigitalContactReader(QObject *parent)
 
 bool
 DigitalContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
-  DigitalContact *contact = qobject_cast<DigitalContact *>(obj);
-
   if (! ContactReader::parse(obj, node, ctx))
     return false;
 
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot parse contact extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse contact extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      contact->addExtension(name, ext);
-    }
-  }
+  if (! parseExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
 
 bool
 DigitalContactReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  DigitalContact *contact = qobject_cast<DigitalContact *>(obj);
+  if (! ContactReader::link(obj, node, ctx))
+    return false;
 
-  // link extensions
-  foreach (QString name, contact->extensionNames()) {
-    if (! _extensions[name]->link(contact->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link contact extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
-  }
+  if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1303,39 +1670,16 @@ PositioningReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject
     system->setPeriod(node["period"].as<uint>());
   }
 
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot allocate positioning system extension: %1")
-            .arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse positioning system extension: %1")
-            .arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      system->addExtension(name, ext);
-    }
-  }
+  if (! parseExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
 
 bool
 PositioningReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  PositioningSystem *system = qobject_cast<PositioningSystem *>(obj);
-
-  // link extensions
-  foreach (QString name, system->extensionNames()) {
-    if (! _extensions[name]->link(system->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link positioning system extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
-  }
+  if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1359,27 +1703,11 @@ GPSSystemReader::allocate(const YAML::Node &node, const ConfigObject::Context &c
 
 bool
 GPSSystemReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
-  GPSSystem *system = qobject_cast<GPSSystem *>(obj);
-
   if (! PositioningReader::parse(obj, node, ctx))
     return false;
 
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot parse GPS system extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse GPS system extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      system->addExtension(name, ext);
-    }
-  }
+  if (! parseExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1387,6 +1715,9 @@ GPSSystemReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::
 bool
 GPSSystemReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
   GPSSystem *system = qobject_cast<GPSSystem *>(obj);
+
+  if (! PositioningReader::link(obj, node, ctx))
+    return false;
 
   // link destination contact
   if (node["destination"] && node["destination"].IsScalar()) {
@@ -1414,13 +1745,8 @@ GPSSystemReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObj
     system->setRevertChannel(ctx.getObj(ch)->as<DigitalChannel>());
   }
 
-  // link extensions
-  foreach (QString name, system->extensionNames()) {
-    if (! _extensions[name]->link(system->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link GPS system extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
-  }
+  if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1491,7 +1817,7 @@ APRSSystemReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject:
   if (node["icon"] && node["icon"].IsScalar()) {
     system->setIcon(
           name2aprsicon(
-            QString::fromStdString(node["node"].as<std::string>())));
+            QString::fromStdString(node["icon"].as<std::string>())));
   } else {
     _errorMessage = tr("Cannot parse APRS system '%1': No icon specified.").arg(system->name());
     return false;
@@ -1501,22 +1827,8 @@ APRSSystemReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject:
     system->setMessage(QString::fromStdString(node["message"].as<std::string>()));
   }
 
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot parse GPS system extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse GPS system extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      system->addExtension(name, ext);
-    }
-  }
+  if (! parseExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1524,6 +1836,9 @@ APRSSystemReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject:
 bool
 APRSSystemReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
   APRSSystem *system = qobject_cast<APRSSystem *>(obj);
+
+  if (! PositioningReader::link(obj, node, ctx))
+    return false;
 
   // link transmit channel
   if (node["channel"] && node["channel"].IsScalar()) {
@@ -1540,13 +1855,8 @@ APRSSystemReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigOb
     return false;
   }
 
-  // link extensions
-  foreach (QString name, system->extensionNames()) {
-    if (! _extensions[name]->link(system->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link GPS system extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
-  }
+  if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1583,22 +1893,8 @@ ScanListReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::C
     return false;
   }
 
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot parse scan-list extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse scan-list extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      list->addExtension(name, ext);
-    }
-  }
+  if (! parseExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1616,7 +1912,7 @@ ScanListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObje
         continue;
       }
       QString id = QString::fromStdString(it->as<std::string>());
-      if ((! ctx.contains(id)) || (ctx.getObj(id)->is<Channel>())) {
+      if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<Channel>())) {
         logWarn() << "Cannot link priority channel " << (n+1) << ": Not a reference to a channel.";
         continue;
       }
@@ -1636,7 +1932,7 @@ ScanListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObje
         return false;
       }
       QString id = QString::fromStdString(it->as<std::string>());
-      if ((! ctx.contains(id)) || (ctx.getObj(id)->is<Channel>())) {
+      if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<Channel>())) {
         _errorMessage = _errorMessage = tr("Cannot link scan-list '%1': '%2' does not refer to a channel.")
             .arg(list->name()).arg(id);
         return false;
@@ -1648,13 +1944,8 @@ ScanListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObje
     return false;
   }
 
-  // link extensions
-  foreach (QString name, list->extensionNames()) {
-    if (! _extensions[name]->link(list->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link scan-list extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
-  }
+  if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1691,22 +1982,8 @@ GroupListReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::
     return false;
   }
 
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot parse group list extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse group list extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      list->addExtension(name, ext);
-    }
-  }
+  if (! parseExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1724,7 +2001,7 @@ GroupListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObj
         return false;
       }
       QString id = QString::fromStdString(it->as<std::string>());
-      if ((! ctx.contains(id)) || (ctx.getObj(id)->is<DigitalContact>())) {
+      if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<DigitalContact>())) {
         _errorMessage = _errorMessage = tr("Cannot link group list '%1': '%2' does not refer to a digital contact.")
             .arg(list->name()).arg(id);
         return false;
@@ -1736,13 +2013,8 @@ GroupListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObj
     return false;
   }
 
-  // link extensions
-  foreach (QString name, list->extensionNames()) {
-    if (! _extensions[name]->link(list->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link group list extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
-  }
+  if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1780,22 +2052,8 @@ RoamingReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
     return false;
   }
 
-  // Parse extensions:
-  foreach (QString name, _extensions.keys()) {
-    if (node[name.toStdString()]) {
-      YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = _extensions[name]->allocate(extNode, ctx);
-      if (!ext) {
-        _errorMessage = tr("Cannot parse roaming extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      if (! _extensions[name]->parse(ext, extNode, ctx)) {
-        _errorMessage = tr("Cannot parse roaming extension: %1").arg(_extensions[name]->errorMessage());
-        return false;
-      }
-      zone->addExtension(name, ext);
-    }
-  }
+  if (! parseExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
@@ -1813,7 +2071,7 @@ RoamingReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObjec
         return false;
       }
       QString id = QString::fromStdString(it->as<std::string>());
-      if ((! ctx.contains(id)) || (ctx.getObj(id)->is<DigitalChannel>())) {
+      if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<DigitalChannel>())) {
         _errorMessage = _errorMessage = tr("Cannot link roaming '%1': '%2' does not refer to a digital channel.")
             .arg(zone->name()).arg(id);
         return false;
@@ -1825,14 +2083,8 @@ RoamingReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObjec
     return false;
   }
 
-  // link extensions
-  foreach (QString name, zone->extensionNames()) {
-    if (! _extensions[name]->link(zone->extension(name), node, ctx)) {
-      _errorMessage = tr("Cannot link roaming extension '%1': %2")
-          .arg(name).arg(_extensions[name]->errorMessage());
-    }
-  }
+  if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }
-

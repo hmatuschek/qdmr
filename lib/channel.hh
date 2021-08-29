@@ -105,10 +105,6 @@ public:
   /** (Re-) Sets the default scan list for the channel. */
   bool setScanList(ScanList *list);
 
-signals:
-  /** Is emitted if the channel gets modified. */
-  void modified();
-
 protected slots:
   /** Internal hander for deleted scan lists. */
   void onScanListDeleted(QObject *obj);

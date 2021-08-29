@@ -30,13 +30,12 @@ RadioID::setId(uint32_t id) {
 RadioIDList::RadioIDList(QObject *parent)
   : ConfigObjectList(parent)
 {
-  add(new RadioID(0));
+  // pass...
 }
 
 void
 RadioIDList::clear() {
   ConfigObjectList::clear();
-  add(new RadioID(0));
 }
 
 RadioID *

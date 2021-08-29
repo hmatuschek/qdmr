@@ -57,7 +57,7 @@ RXGroupList::addContact(DigitalContact *contact) {
   if (_contacts.contains(contact))
     return -1;
   int idx = _contacts.size();
-  connect(contact, SIGNAL(modified(ConfigObject*)), this, SIGNAL(modified()));
+  connect(contact, SIGNAL(modified(ConfigObject*)), this, SIGNAL(modified(ConfigObject*)));
   connect(contact, SIGNAL(destroyed(QObject*)), this, SLOT(onContactDeleted(QObject*)));
   _contacts.append(contact);
   emit modified(this);

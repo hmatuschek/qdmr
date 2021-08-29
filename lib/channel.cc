@@ -39,7 +39,7 @@ Channel::setName(const QString &name) {
   if (name.simplified().isEmpty())
     return false;
   _name = name;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -49,7 +49,7 @@ double Channel::rxFrequency() const {
 bool
 Channel::setRXFrequency(double freq) {
   _rxFreq = freq;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -60,7 +60,7 @@ Channel::txFrequency() const {
 bool
 Channel::setTXFrequency(double freq) {
   _txFreq = freq;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -71,7 +71,7 @@ Channel::power() const {
 void
 Channel::setPower(Power power) {
   _power = power;
-  emit modified();
+  emit modified(this);
 }
 
 uint
@@ -81,7 +81,7 @@ Channel::txTimeout() const {
 bool
 Channel::setTimeout(uint dur) {
   _txTimeOut = dur;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -92,7 +92,7 @@ Channel::rxOnly() const {
 bool
 Channel::setRXOnly(bool enable) {
   _rxOnly = enable;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -107,7 +107,7 @@ Channel::setScanList(ScanList *list) {
   _scanlist = list;
   if (_scanlist)
     connect(_scanlist, SIGNAL(destroyed(QObject *)), this, SLOT(onScanListDeleted(QObject *)));
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -139,7 +139,7 @@ AnalogChannel::admit() const {
 void
 AnalogChannel::setAdmit(Admit admit) {
   _admit = admit;
-  emit modified();
+  emit modified(this);
 }
 
 uint
@@ -149,7 +149,7 @@ AnalogChannel::squelch() const {
 bool
 AnalogChannel::setSquelch(uint val) {
   _squelch = val;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -160,7 +160,7 @@ AnalogChannel::rxTone() const {
 bool
 AnalogChannel::setRXTone(Signaling::Code code) {
   _rxTone = code;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -171,7 +171,7 @@ AnalogChannel::txTone() const {
 bool
 AnalogChannel::setTXTone(Signaling::Code code) {
   _txTone = code;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -182,7 +182,7 @@ AnalogChannel::bandwidth() const {
 bool
 AnalogChannel::setBandwidth(Bandwidth bw) {
   _bw = bw;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -235,7 +235,7 @@ DigitalChannel::admit() const {
 void
 DigitalChannel::setAdmit(Admit admit) {
   _admit = admit;
-  emit modified();
+  emit modified(this);
 }
 
 uint
@@ -245,7 +245,7 @@ DigitalChannel::colorCode() const {
 bool
 DigitalChannel::setColorCode(uint cc) {
   _colorCode = cc;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -256,7 +256,7 @@ DigitalChannel::timeslot() const {
 bool
 DigitalChannel::setTimeSlot(TimeSlot slot) {
   _timeSlot = slot;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -272,7 +272,7 @@ DigitalChannel::setRXGroupList(RXGroupList *g) {
   _rxGroup = g;
   if (_rxGroup)
     connect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -288,7 +288,7 @@ DigitalChannel::setTXContact(DigitalContact *c) {
   _txContact = c;
   if (_txContact)
     connect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -304,7 +304,7 @@ DigitalChannel::setPosSystem(PositioningSystem *sys) {
   _posSystem = sys;
   if (_posSystem)
     connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -321,7 +321,7 @@ DigitalChannel::setRoaming(RoamingZone *zone) {
   _roaming = zone;
   if (_roaming)
     connect(_roaming, SIGNAL(destroyed(QObject*)), this, SLOT(onRoamingZoneDeleted()));
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -337,7 +337,7 @@ DigitalChannel::setRadioId(RadioID *id) {
   _radioId = id;
   if (_radioId)
     connect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
-  emit modified();
+  emit modified(this);
   return true;
 }
 
