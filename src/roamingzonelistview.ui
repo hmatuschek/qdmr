@@ -43,7 +43,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_15">
      <item>
-      <widget class="QPushButton" name="addRoamingZone_2">
+      <widget class="QPushButton" name="addRoamingZone">
        <property name="text">
         <string>Add Roaming Zone</string>
        </property>
@@ -53,14 +53,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="genRoamingZone_2">
+      <widget class="QPushButton" name="genRoamingZone">
        <property name="text">
         <string>Generate Roaming Zone</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="remRoamingZone_2">
+      <widget class="QPushButton" name="remRoamingZone">
        <property name="text">
         <string>Delete Roaming Zone</string>
        </property>

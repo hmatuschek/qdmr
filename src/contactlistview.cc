@@ -50,6 +50,7 @@ ContactListView::onRemContact() {
           tr("Cannot delete contact: You have to select a contact first."));
     return;
   }
+
   // Get selection and ask for deletion
   QPair<int,int> rows = ui->listView->selection();
   int numrows = rows.second-rows.first+1;
@@ -71,7 +72,7 @@ ContactListView::onRemContact() {
     contacts.push_back(_config->contacts()->contact(i));
   // remove contacts
   foreach (Contact *contact, contacts)
-    _config->contacts()->add(contact);
+    _config->contacts()->del(contact);
 }
 
 void

@@ -17,11 +17,11 @@ RoamingZoneListView::RoamingZoneListView(Config *config, QWidget *parent)
 
   ui->listView->setModel(new RoamingListWrapper(_config->roaming(), ui->listView));
 
-  connect(ui->addRoamingZone_2, SIGNAL(clicked()), this, SLOT(onAddRoamingZone()));
-  connect(ui->genRoamingZone_2, SIGNAL(clicked(bool)), this, SLOT(onGenRoamingZone()));
-  connect(ui->remRoamingZone_2, SIGNAL(clicked()), this, SLOT(onRemRoamingZone()));
-  connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)),
-          this, SLOT(onEditRoamingZone(const QModelIndex &)));
+  connect(ui->addRoamingZone, SIGNAL(clicked()), this, SLOT(onAddRoamingZone()));
+  connect(ui->genRoamingZone, SIGNAL(clicked(bool)), this, SLOT(onGenRoamingZone()));
+  connect(ui->remRoamingZone, SIGNAL(clicked()), this, SLOT(onRemRoamingZone()));
+  connect(ui->listView, SIGNAL(doubleClicked(uint)),
+          this, SLOT(onEditRoamingZone(uint)));
   connect(ui->roamingNote, SIGNAL(linkActivated(QString)), this, SLOT(onHideRoamingNote()));
 
   if (settings.hideRoamingNote())
@@ -106,7 +106,7 @@ RoamingZoneListView::onRemRoamingZone() {
     lists.push_back(_config->roaming()->zone(row));
   // remove
   foreach (RoamingZone *zone, lists)
-    _config->roaming()->add(zone);
+    _config->roaming()->del(zone);
 }
 
 void
