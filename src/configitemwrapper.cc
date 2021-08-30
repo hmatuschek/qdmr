@@ -117,6 +117,50 @@ GenericTableWrapper::rowCount(const QModelIndex &index) const {
   return _list->count();
 }
 
+bool
+GenericTableWrapper::moveUp(int row) {
+  if ((0>=row) || (row>=_list->count()))
+    return false;
+  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
+  _list->moveUp(row);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+GenericTableWrapper::moveUp(int first, int last) {
+  if ((0>=first) || (last>=_list->count()))
+    return false;
+  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
+  _list->moveUp(first, last);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+GenericTableWrapper::moveDown(int row) {
+  if ((0>row) || ((row+1)>=_list->count()))
+    return false;
+  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
+  _list->moveDown(row);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
+bool
+GenericTableWrapper::moveDown(int first, int last) {
+  if ((0>first) || ((last+1)>=_list->count()))
+    return false;
+  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
+  _list->moveDown(first, last);
+  endMoveRows();
+  emit modified();
+  return true;
+}
+
 void
 GenericTableWrapper::onListDeleted() {
   beginResetModel();
@@ -445,28 +489,6 @@ ContactListWrapper::headerData(int section, Qt::Orientation orientation, int rol
 
 
 /* ********************************************************************************************* *
- * Implementation of RadioIdListWrapper
- * ********************************************************************************************* */
-RadioIdListWrapper::RadioIdListWrapper(RadioIDList *list, QObject *parent)
-  : GenericListWrapper(list, parent)
-{
-  // pass...
-}
-
-QVariant
-RadioIdListWrapper::data(const QModelIndex &index, int role) const {
-  if (index.row() >= _list->count())
-    return QVariant();
-  RadioID *id = _list->get(index.row())->as<RadioID>();
-  if (Qt::DisplayRole == role)
-    return QVariant(QString::number(id->id()));
-  else if (Qt::EditRole == role)
-    return QVariant(id->id());
-  return QVariant();
-}
-
-
-/* ********************************************************************************************* *
  * Implementation of ZoneListWrapper
  * ********************************************************************************************* */
 ZoneListWrapper::ZoneListWrapper(ZoneList *list, QObject *parent)
@@ -641,6 +663,59 @@ RoamingListWrapper::headerData(int section, Qt::Orientation orientation, int rol
   if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation) || (0 != section))
     return QVariant();
   return tr("Roaming zone");
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioIdListWrapper
+ * ********************************************************************************************* */
+RadioIdListWrapper::RadioIdListWrapper(RadioIDList *list, QObject *parent)
+  : GenericTableWrapper(list, parent)
+{
+  // pass...
+}
+
+int
+RadioIdListWrapper::columnCount(const QModelIndex &idx) const {
+  Q_UNUSED(idx);
+  return 3;
+}
+
+QVariant
+RadioIdListWrapper::data(const QModelIndex &index, int role) const {
+  if ((! index.isValid()) || (index.row()>=_list->count()))
+    return QVariant();
+  if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
+    return QVariant();
+
+  RadioID *id = _list->get(index.row())->as<RadioID>();
+
+  switch (index.column()) {
+  case 0:
+    return ("DMR");
+  case 1:
+    return id->name();
+  case 2:
+    return id->id();
+  default:
+    break;
+  }
+
+  return QVariant();
+}
+
+QVariant
+RadioIdListWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation))
+    return QVariant();
+  switch (section) {
+  case 0: return tr("Type");
+  case 1: return tr("Name");
+  case 2: return tr("Number");
+  default:
+    break;
+  }
+  return QVariant();
 }
 
 

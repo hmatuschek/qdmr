@@ -2,6 +2,7 @@
 #define APPLICATION_HH
 
 #include <QApplication>
+#include <QGroupBox>
 #include "config.hh"
 #include <QGeoPositionInfoSource>
 #include "releasenotes.hh"
@@ -65,6 +66,14 @@ private slots:
   void onMicLevelChanged();
   void onSpeechChanged();
 
+  void onAddRadioId();
+  void onRemRadioId();
+  void onEditRadioId(const QModelIndex &idx);
+  void onRadioIdUp();
+  void onRadioIdDown();
+  void loadRadioIdListSectionState();
+  void storeRadioIdListSectionState();
+
   void onAddContact();
   void onRemContact();
   void onEditContact(const QModelIndex &idx);
@@ -124,6 +133,9 @@ private slots:
 protected:
   Config *_config;
   QMainWindow *_mainWindow;
+  QGroupBox *_dmrIDBox;
+  QGroupBox *_defaultIDBox;
+  QWidget *_radioIdTab;
   RepeaterDatabase *_repeater;
   UserDatabase *_users;
   TalkGroupDatabase *_talkgroups;

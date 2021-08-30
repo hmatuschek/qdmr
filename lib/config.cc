@@ -86,8 +86,17 @@ bool
 Config::serialize(YAML::Node &node, const Context &context)
 {
   node["version"] = VERSION_STRING;
-  node["mic-level"] = _mic_level;
-  node["speech"] = _speech;
+
+  YAML::Node settings;
+  settings["mic-level"] = _mic_level;
+  settings["speech"] = _speech;
+  if (! _introLine1.isEmpty())
+    settings["intro-line1"] = _introLine1.toStdString();
+  if (! _introLine2.isEmpty())
+    settings["intro-line2"] = _introLine2.toStdString();
+  if (_radioIDs->getDefaultId() && context.contains(_radioIDs->getDefaultId()))
+    settings["default-id"] = context.getId(_radioIDs->getDefaultId()).toStdString();
+  node["settings"] = settings;
 
   if ((node["radio-ids"] = _radioIDs->serialize(context)).IsNull())
     return false;

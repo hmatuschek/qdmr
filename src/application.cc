@@ -171,34 +171,72 @@ Application::createMainWindow() {
   connect(upCP, SIGNAL(triggered()), this, SLOT(uploadCodeplug()));
   connect(upCDB, SIGNAL(triggered()), this, SLOT(uploadCallsignDB()));
 
+  QTabWidget *tabs = _mainWindow->findChild<QTabWidget*>("tabs");
+
   // Wire-up "General Settings" view
-  QComboBox *dmrID  = _mainWindow->findChild<QComboBox*>("dmrID");
-  QPushButton *addID = _mainWindow->findChild<QPushButton*>("addID");
-  QPushButton *remID = _mainWindow->findChild<QPushButton*>("remID");
+  _dmrIDBox = _mainWindow->findChild<QGroupBox*>("dmrIDBox");
+  QLineEdit *dmrID  = _mainWindow->findChild<QLineEdit*>("dmrID");
   QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
+  _defaultIDBox = _mainWindow->findChild<QGroupBox*>("defaultIDBox");
+  QComboBox *defaultID  = _mainWindow->findChild<QComboBox*>("defaultID");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
 
-  dmrID->setModel(new RadioIdListWrapper(_config->radioIDs(), dmrID));
-  dmrID->setCurrentIndex(0);
+  if (settings.showCommercialFeatures()) {
+    _dmrIDBox->setHidden(true);
+  } else {
+    _defaultIDBox->setHidden(true);
+  }
 
-  rname->setText(_config->name());
+  defaultID->setModel(new RadioIdListWrapper(_config->radioIDs(), dmrID));
+  defaultID->setModelColumn(1);
+  if (_config->radioIDs()->getDefaultId())
+    defaultID->setCurrentIndex(
+          _config->radioIDs()->indexOf(
+            _config->radioIDs()->getDefaultId()));
+  if (_config->radioIDs()->getDefaultId()) {
+    dmrID->setText(QString::number(_config->radioIDs()->getDefaultId()->id()));
+    rname->setText(_config->radioIDs()->getDefaultId()->name());
+  }
+
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
+
   mic->setValue(_config->micLevel());
   speech->setChecked(_config->speech());
 
-  connect(dmrID->lineEdit(), SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
-  connect(dmrID, SIGNAL(currentIndexChanged(int)), this, SLOT(onDMRIDSelected(int)));
-  connect(addID, SIGNAL(clicked(bool)), this, SLOT(onAddDMRID()));
-  connect(remID, SIGNAL(clicked(bool)), this, SLOT(onRemDMRID()));
+  connect(dmrID, SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
   connect(rname, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
+  connect(defaultID, SIGNAL(currentIndexChanged(int)), this, SLOT(onDMRIDSelected(int)));
   connect(intro1, SIGNAL(editingFinished()), this, SLOT(onIntroLine1Changed()));
   connect(intro2, SIGNAL(editingFinished()), this, SLOT(onIntroLine2Changed()));
   connect(mic, SIGNAL(valueChanged(int)), this, SLOT(onMicLevelChanged()));
   connect(speech, SIGNAL(toggled(bool)), this, SLOT(onSpeechChanged()));
+
+  // Wire-up "Radio IDs" view
+  _radioIdTab = _mainWindow->findChild<QWidget*>("tabRadioID");
+  if (! settings.showCommercialFeatures()) {
+    tabs->removeTab(tabs->indexOf(_radioIdTab));
+    _radioIdTab->setHidden(true);
+  }
+  QTableView *radioIDs = _mainWindow->findChild<QTableView*>("idsView");
+  SearchPopup::attach(radioIDs);
+  QPushButton *idUp = _mainWindow->findChild<QPushButton *>("idUp");
+  QPushButton *idDown = _mainWindow->findChild<QPushButton *>("idDown");
+  QPushButton *addRadioID = _mainWindow->findChild<QPushButton *>("addRadioID");
+  QPushButton *remRadioID = _mainWindow->findChild<QPushButton *>("remRadioID");
+  connect(radioIDs->horizontalHeader(), SIGNAL(sectionCountChanged(int,int)),
+          this, SLOT(loadRadioIdListSectionState()));
+  connect(radioIDs->horizontalHeader(), SIGNAL(sectionResized(int,int,int)),
+          this, SLOT(storeRadioIdListSectionState()));
+  radioIDs->setModel(new RadioIdListWrapper(_config->radioIDs(), this));
+  connect(addRadioID, SIGNAL(clicked()), this, SLOT(onAddRadioId()));
+  connect(remRadioID, SIGNAL(clicked()), this, SLOT(onRemRadioId()));
+  connect(idUp, SIGNAL(clicked()), this, SLOT(onRadioIdUp()));
+  connect(idDown, SIGNAL(clicked()), this, SLOT(onRadioIdDown()));
+  connect(radioIDs, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditRadioId(QModelIndex)));
 
   // Wire-up "Contact List" view
   QTableView *contacts = _mainWindow->findChild<QTableView *>("contactsView");
@@ -750,6 +788,7 @@ Application::showSettings() {
   SettingsDialog dialog;
   if (QDialog::Accepted == dialog.exec()) {
     Settings settings;
+    // Handle positioning
     if (! settings.queryPosition()) {
       if (_source)
         _source->stopUpdates();
@@ -757,6 +796,24 @@ Application::showSettings() {
     } else {
       if (_source)
         _source->startUpdates();
+    }
+    // Handle commercial features
+    QTabWidget *tabs = _mainWindow->findChild<QTabWidget*>("tabs");
+    if (settings.showCommercialFeatures()) {
+      if (-1 == tabs->indexOf(_radioIdTab)) {
+        QWidget *genSet = _mainWindow->findChild<QWidget*>("tabGeneral");
+        tabs->insertTab(tabs->indexOf(genSet)+1, _radioIdTab, tr("Radio IDs"));
+        _mainWindow->update();
+      }
+      _dmrIDBox->setHidden(true);
+      _defaultIDBox->setHidden(false);
+    } else if (! settings.showCommercialFeatures()) {
+      if (-1 != tabs->indexOf(_radioIdTab)) {
+        tabs->removeTab(tabs->indexOf(_radioIdTab));
+        _mainWindow->update();
+      }
+      _dmrIDBox->setHidden(false);
+      _defaultIDBox->setHidden(true);
     }
   }
 }
@@ -866,6 +923,68 @@ Application::onIntroLine2Changed() {
 
 
 void
+Application::onAddRadioId() {
+}
+
+void
+Application::onRemRadioId() {
+}
+
+void
+Application::onEditRadioId(const QModelIndex &idx) {
+}
+
+void
+Application::onRadioIdUp() {
+  QTableView *table = _mainWindow->findChild<QTableView *>("idsView");
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move radio IDs"),
+          tr("Cannot move radio IDs: You have to select at least one ID first."));
+    return;
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  qobject_cast<RadioIdListWrapper *>(table->model())->moveUp(rows.first, rows.second);
+}
+
+void
+Application::onRadioIdDown() {
+  QTableView *table = _mainWindow->findChild<QTableView *>("idsView");
+  // Check if there is a selection
+  if (! table->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move radio ID"),
+          tr("Cannot move radio ID: You have to select at least one ID first."));
+    return;
+  }
+  // Get selection range assuming only continious selection mode
+  QPair<int, int> rows = getSelectionRowRange(table->selectionModel()->selection().indexes());
+  if ((0>rows.first) || (0>rows.second))
+    return;
+  // Then move rows
+  qobject_cast<RadioIdListWrapper *>(table->model())->moveDown(rows.first, rows.second);
+}
+
+void
+Application::loadRadioIdListSectionState() {
+  Settings settings;
+  QTableView *contacts = _mainWindow->findChild<QTableView *>("idsView");
+  contacts->horizontalHeader()->restoreState(settings.radioIdListHeaderState());
+}
+void
+Application::storeRadioIdListSectionState() {
+  Settings settings;
+  QTableView *contacts = _mainWindow->findChild<QTableView *>("idsView");
+  settings.setRadioIdListHeaderState(contacts->horizontalHeader()->saveState());
+}
+
+
+void
 Application::onAddContact() {
   ContactDialog dialog(_users, _talkgroups);
   if (QDialog::Accepted != dialog.exec())
@@ -937,7 +1056,7 @@ Application::onContactUp() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->contacts()->moveUp(rows.first, rows.second);
+  qobject_cast<ContactListWrapper *>(table->model())->moveUp(rows.first, rows.second);
 }
 
 void
@@ -955,7 +1074,7 @@ Application::onContactDown() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->contacts()->moveDown(rows.first, rows.second);
+  qobject_cast<ContactListWrapper *>(table->model())->moveDown(rows.first, rows.second);
 }
 
 void
@@ -1051,7 +1170,7 @@ Application::onRxGroupUp() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->rxGroupLists()->moveUp(rows.first, rows.second);
+  qobject_cast<GroupListsWrapper *>(list->model())->moveUp(rows.first, rows.second);
 }
 
 void
@@ -1069,7 +1188,7 @@ Application::onRxGroupDown() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->rxGroupLists()->moveDown(rows.first, rows.second);
+  qobject_cast<GroupListsWrapper *>(list->model())->moveDown(rows.first, rows.second);
 }
 
 void
@@ -1220,7 +1339,7 @@ Application::onChannelUp() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->channelList()->moveUp(rows.first, rows.second);
+  qobject_cast<ChannelListWrapper *>(table->model())->moveUp(rows.first, rows.second);
 }
 
 void
@@ -1238,7 +1357,7 @@ Application::onChannelDown() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->channelList()->moveDown(rows.first, rows.second);
+  qobject_cast<ChannelListWrapper *>(table->model())->moveDown(rows.first, rows.second);
 }
 
 void
@@ -1318,7 +1437,7 @@ Application::onZoneUp() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->zones()->moveUp(rows.first, rows.second);
+  qobject_cast<ZoneListWrapper *>(list->model())->moveUp(rows.first, rows.second);
 }
 
 void
@@ -1336,7 +1455,7 @@ Application::onZoneDown() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->zones()->moveDown(rows.first, rows.second);
+  qobject_cast<ZoneListWrapper *>(list->model())->moveDown(rows.first, rows.second);
 }
 
 void
@@ -1415,7 +1534,7 @@ Application::onScanListUp() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->scanlists()->moveUp(rows.first, rows.second);
+  qobject_cast<ScanListsWrapper *>(list->model())->moveUp(rows.first, rows.second);
 }
 
 void
@@ -1433,7 +1552,7 @@ Application::onScanListDown() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->scanlists()->moveDown(rows.first, rows.second);
+  qobject_cast<ScanListsWrapper *>(list->model())->moveDown(rows.first, rows.second);
 }
 
 void
@@ -1524,7 +1643,7 @@ Application::onGPSUp() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->posSystems()->moveUp(rows.first, rows.second);
+  qobject_cast<PositioningSystemListWrapper *>(table->model())->moveUp(rows.first, rows.second);
 }
 
 void
@@ -1542,7 +1661,7 @@ Application::onGPSDown() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->posSystems()->moveDown(rows.first, rows.second);
+  qobject_cast<PositioningSystemListWrapper *>(table->model())->moveDown(rows.first, rows.second);
 }
 
 void
@@ -1676,7 +1795,7 @@ Application::onRoamingZoneUp() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->roaming()->moveUp(rows.first, rows.second);
+  qobject_cast<ZoneListWrapper *>(list->model())->moveUp(rows.first, rows.second);
 }
 
 void
@@ -1694,7 +1813,7 @@ Application::onRoamingZoneDown() {
   if ((0>rows.first) || (0>rows.second))
     return;
   // Then move rows
-  _config->roaming()->moveDown(rows.first, rows.second);
+  qobject_cast<ZoneListWrapper *>(list->model())->moveDown(rows.first, rows.second);
 }
 
 void

@@ -57,7 +57,7 @@ RadioID::serialize(YAML::Node &node, const Context &context) {
  * Implementation of RadioIDList
  * ********************************************************************************************* */
 RadioIDList::RadioIDList(QObject *parent)
-  : ConfigObjectList(parent)
+  : ConfigObjectList(parent), _default(nullptr)
 {
   // pass...
 }
@@ -76,7 +76,7 @@ RadioIDList::getId(int idx) const {
 
 RadioID *
 RadioIDList::getDefaultId() const {
-  return getId(0);
+  return _default;
 }
 
 RadioID *
@@ -90,8 +90,16 @@ RadioIDList::find(uint32_t id) const {
 
 int
 RadioIDList::add(ConfigObject *obj, int row) {
-  if (obj && obj->is<RadioID>())
-    return ConfigObjectList::add(obj, row);
+  if (obj && obj->is<RadioID>()) {
+    bool was_empty = (0 == count());
+    int idx = ConfigObjectList::add(obj, row);
+    if (0 > idx)
+      return idx;
+    // automatically select first added ID as default
+    if (was_empty && (nullptr == _default))
+      setDefault(idx);
+    return idx;
+  }
   return -1;
 }
 
@@ -102,11 +110,15 @@ RadioIDList::addId(const QString &name, uint32_t id) {
 
 bool
 RadioIDList::setDefault(uint idx) {
-  RadioID *obj = getId(idx);
-  if (nullptr == obj)
-    return false;
-  _items.removeAt(idx);
-  _items.prepend(obj);
+  if (_default)
+    disconnect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
+  if (0 > idx) {
+    _default = nullptr;
+    return true;
+  }
+  _default = getId(idx);
+  if (_default)
+    connect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
   emit modified();
   return true;
 }
@@ -114,4 +126,9 @@ RadioIDList::setDefault(uint idx) {
 bool
 RadioIDList::delId(uint32_t id) {
   return del(find(id));
+}
+
+void
+RadioIDList::onDefaultIdDeleted() {
+  _default = nullptr;
 }

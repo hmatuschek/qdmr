@@ -1,7 +1,11 @@
 ---
 version: 0.9.0
-mic-level: 6
-speech: false
+settings:
+  mic-level: 6
+  speech: false
+  intro-line1: qDMR
+  intro-line2: DM3MAT
+  default-id: id1
 radio-ids:
   - dmr: {id: id1, name: DM3MAT, number: 2621370}
 contacts:

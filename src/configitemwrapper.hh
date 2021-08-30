@@ -53,6 +53,15 @@ protected:
   GenericTableWrapper(AbstractConfigObjectList *list, QObject *parent=nullptr);
 
 public:
+  /** Moves the channel at index @c idx one step up. */
+  virtual bool moveUp(int idx);
+  /** Moves the channels at one step up. */
+  virtual bool moveUp(int first, int last);
+  /** Moves the channel at index @c idx one step down. */
+  virtual bool moveDown(int idx);
+  /** Moves the channels one step down. */
+  virtual bool moveDown(int first, int last);
+
   // QAbstractTableModel interface
   /** Implements QAbstractTableModel, returns number of rows. */
   int rowCount(const QModelIndex &index) const;
@@ -108,20 +117,6 @@ public:
   QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
   /** Returns the header at given section, implements the QAbstractTableModel. */
   QVariant headerData(int section, Qt::Orientation orientation, int role=Qt::DisplayRole) const;
-};
-
-
-class RadioIdListWrapper: public GenericListWrapper
-{
-  Q_OBJECT
-
-public:
-  RadioIdListWrapper(RadioIDList *list, QObject *parent=nullptr);
-
-public:
-  // Implementation of QAbstractListModel
-  /** Returns the cell data at given index, implements the QAbstractTableModel. */
-  QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
 };
 
 
@@ -205,5 +200,25 @@ public:
   /** Returns the header at given section, implements the QAbstractTableModel. */
   QVariant headerData(int section, Qt::Orientation orientation, int role=Qt::DisplayRole) const;
 };
+
+
+class RadioIdListWrapper: public GenericTableWrapper
+{
+  Q_OBJECT
+
+public:
+  RadioIdListWrapper(RadioIDList *list, QObject *parent=nullptr);
+
+public:
+  // Implementation of QAbstractTableModel
+  /** Returns the number of columns, implements the QAbstractTableModel. */
+  int columnCount(const QModelIndex &index) const;
+  /** Returns the cell data at given index, implements the QAbstractTableModel. */
+  QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
+  /** Returns the header at given section, implements the QAbstractTableModel. */
+  QVariant headerData(int section, Qt::Orientation orientation, int role=Qt::DisplayRole) const;
+};
+
+
 
 #endif // CONFIG_ITEM_WRAPPER_HH

@@ -143,7 +143,7 @@ ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
     ctx.setVersion("0.9.0");
   }
 
-  if (! parseSettings(config, node, ctx))
+  if (! parseSettings(config, node["settings"], ctx))
     return false;
 
   if (! parseRadioIDs(config, node["radio-ids"], ctx))
@@ -181,7 +181,7 @@ ConfigReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject
 {
   Config *config = qobject_cast<Config *>(obj);
 
-  if (! linkSettings(config, node, ctx))
+  if (! linkSettings(config, node["settings"], ctx))
     return false;
 
   if (! linkRadioIDs(config, node["radio-ids"], ctx))
@@ -226,11 +226,33 @@ ConfigReader::parseSettings(Config *config, const YAML::Node &node, ConfigObject
     config->setSpeech(node["speech"].as<bool>());
   }
 
+  if (node["intro-line1"] && node["intro-line1"].IsScalar()) {
+    config->setIntroLine1(QString::fromStdString(node["intro-line1"].as<std::string>()));
+  }
+  if (node["intro-line2"] && node["intro-line2"].IsScalar()) {
+    config->setIntroLine1(QString::fromStdString(node["intro-line2"].as<std::string>()));
+  }
+
   return true;
 }
 
 bool
 ConfigReader::linkSettings(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  if (node["default-id"] && node["default-id"].IsScalar()) {
+    QString id = QString::fromStdString(node["default-id"].as<std::string>());
+    if (ctx.contains(id) && ctx.getObj(id)->is<RadioID>()) {
+      RadioID *def = ctx.getObj(id)->as<RadioID>();
+      config->radioIDs()->setDefault(config->radioIDs()->indexOf(def));
+      logDebug() << "Set default radio ID to '" << def->name() << "'.";
+    } else {
+      _errorMessage = tr("%1:%2: Default radio ID '%3' does not refer to a radio ID.")
+          .arg(node["default-id"].Mark().line).arg(node["default-id"].Mark().column)
+          .arg(id);
+      return false;
+    }
+  } else {
+    logInfo() << "No default DMR radio ID specified, use first defined radio ID.";
+  }
   return true;
 }
 
@@ -989,7 +1011,7 @@ ObjectReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
       _errorMessage = tr("Cannot parse object '%1': ID already used.").arg(id);
       return false;
     }
-    logDebug() << "Register object " << obj << " as '" << id << "'.";
+    //logDebug() << "Register object " << obj << " as '" << id << "'.";
     ctx.add(id, obj);
   } else {
     logWarn() << "No ID associated with object, it cannot be referenced later.";

@@ -13,6 +13,7 @@ class RadioID : public ConfigObject
 
 public:
   /** Constructor.
+   * @param name Specifies the name of the ID.
    * @param id Specifies the DMR ID.
    * @param parent Specifies the parent QObject owning this object. */
   explicit RadioID(const QString &name, uint32_t id, QObject *parent = nullptr);
@@ -58,6 +59,7 @@ public:
   explicit RadioIDList(QObject *parent=nullptr);
 
   void clear();
+
   /** Returns the radio ID at the given index. */
   RadioID *getId(int idx) const;
   /** Returns the current default ID for the radio. */
@@ -74,6 +76,12 @@ public:
   /** Deletes and removes the given DMR ID. */
   virtual bool delId(uint32_t id);
 
+protected slots:
+  void onDefaultIdDeleted();
+
+protected:
+  /** Holds a weak reference to the default DMR radio ID. */
+  RadioID *_default;
 };
 
 

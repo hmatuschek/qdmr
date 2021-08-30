@@ -50,7 +50,7 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="tabs">
       <property name="accessibleName">
        <string>Tablist</string>
       </property>
@@ -72,165 +72,220 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_12">
         <item>
-         <layout class="QFormLayout" name="formLayout">
-          <item row="0" column="0">
-           <widget class="QLabel" name="dMRIDLabel">
-            <property name="text">
-             <string>DMR ID</string>
-            </property>
-           </widget>
+         <widget class="QGroupBox" name="dmrIDBox">
+          <property name="title">
+           <string>DMR Radio ID</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout_2">
+           <item row="0" column="0">
+            <widget class="QLabel" name="dMRIDLabel">
+             <property name="text">
+              <string>DMR ID</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="nameLabel">
+             <property name="text">
+              <string>Radio Name</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="radioName">
+             <property name="toolTip">
+              <string>Enter your name or callsign.</string>
+             </property>
+             <property name="accessibleName">
+              <string>Name/Callsign</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="dmrID"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="defaultIDBox">
+          <property name="title">
+           <string>DMR Radio ID</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout_3">
+           <item row="0" column="0">
+            <widget class="QLabel" name="defaultIDLabel">
+             <property name="text">
+              <string>Default DMR ID</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="defaultID">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The default DMR ID. &lt;/p&gt;&lt;p&gt;Usually, you will ever only need &lt;span style=&quot; font-weight:600;&quot;&gt;one&lt;/span&gt; DMR IDs for all your radios. In some rare cases, multiple DMR IDs are needed and can be added using the '+' button to the right.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="editable">
+              <bool>true</bool>
+             </property>
+             <property name="insertPolicy">
+              <enum>QComboBox::NoInsert</enum>
+             </property>
+             <property name="duplicatesEnabled">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="bootSettingsBox">
+          <property name="title">
+           <string>Boot Settings</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout_4">
+           <item row="0" column="0">
+            <widget class="QLabel" name="introLine1Label">
+             <property name="text">
+              <string>Intro Line 1</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="introLine1">
+             <property name="toolTip">
+              <string>First greeting line (if supported by the radio).</string>
+             </property>
+             <property name="accessibleName">
+              <string>Intro line 1</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="introLine2Label">
+             <property name="text">
+              <string>Intro Line 2</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="introLine2">
+             <property name="toolTip">
+              <string>Second greeting line (if supported by the radio).</string>
+             </property>
+             <property name="statusTip">
+              <string/>
+             </property>
+             <property name="accessibleName">
+              <string>Intro line 2</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="audioSettingsBox">
+          <property name="title">
+           <string>Audio Settings</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout_5">
+           <item row="0" column="0">
+            <widget class="QLabel" name="micLabel">
+             <property name="text">
+              <string>MIC Amp.</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QSpinBox" name="mic">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>10</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="speechLabel">
+             <property name="text">
+              <string>Speech Synthesis</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="speech">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabRadioID">
+       <attribute name="title">
+        <string>Radio IDs</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_22">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_16">
+          <item>
+           <widget class="QTableView" name="idsView"/>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="nameLabel">
-            <property name="text">
-             <string>Name</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="radioName">
-            <property name="toolTip">
-             <string>Enter your name or callsign.</string>
-            </property>
-            <property name="accessibleName">
-             <string>Name/Callsign</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="Line" name="line">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="introLine1Label">
-            <property name="text">
-             <string>Intro Line 1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="introLine1">
-            <property name="toolTip">
-             <string>First greeting line (if supported by the radio).</string>
-            </property>
-            <property name="accessibleName">
-             <string>Intro line 1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="introLine2Label">
-            <property name="text">
-             <string>Intro Line 2</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="introLine2">
-            <property name="toolTip">
-             <string>Second greeting line (if supported by the radio).</string>
-            </property>
-            <property name="statusTip">
-             <string/>
-            </property>
-            <property name="accessibleName">
-             <string>Intro line 2</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="Line" name="line_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="micLabel">
-            <property name="text">
-             <string>MIC Amp.</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QSpinBox" name="mic">
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>10</number>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="Line" name="line_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="speechLabel">
-            <property name="text">
-             <string>Speech Synthesis</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="QCheckBox" name="speech">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_15">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_23">
             <item>
-             <widget class="QComboBox" name="dmrID">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+             <widget class="QPushButton" name="idUp">
+              <property name="text">
+               <string/>
               </property>
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The default DMR ID. &lt;/p&gt;&lt;p&gt;Usually, you will ever only need &lt;span style=&quot; font-weight:600;&quot;&gt;one&lt;/span&gt; DMR IDs for all your radios. In some rare cases, multiple DMR IDs are needed and can be added using the '+' button to the right.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="editable">
-               <bool>true</bool>
-              </property>
-              <property name="insertPolicy">
-               <enum>QComboBox::NoInsert</enum>
-              </property>
-              <property name="duplicatesEnabled">
-               <bool>true</bool>
+              <property name="icon">
+               <iconset resource="resources.qrc">
+                <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="addID">
-              <property name="toolTip">
-               <string>Adds a DMR ID</string>
-              </property>
+             <widget class="QPushButton" name="idDown">
               <property name="text">
-               <string>+</string>
+               <string/>
               </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="remID">
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deletes the selected DMR ID.&lt;/p&gt;&lt;p&gt;All channes using the deleted ID will switch back to the default DMR ID selected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="text">
-               <string>-</string>
+              <property name="icon">
+               <iconset resource="resources.qrc">
+                <normaloff>:/icons/down.png</normaloff>:/icons/down.png</iconset>
               </property>
              </widget>
             </item>
            </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_17">
+          <item>
+           <widget class="QPushButton" name="addRadioID">
+            <property name="text">
+             <string>Add Radio ID</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="remRadioID">
+            <property name="text">
+             <string>Delete Radio ID</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -1246,10 +1301,7 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>tabWidget</tabstop>
-  <tabstop>radioName</tabstop>
-  <tabstop>introLine1</tabstop>
-  <tabstop>introLine2</tabstop>
+  <tabstop>tabs</tabstop>
   <tabstop>contactsView</tabstop>
   <tabstop>contactsView</tabstop>
   <tabstop>addContact</tabstop>
