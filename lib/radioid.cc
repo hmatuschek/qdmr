@@ -110,15 +110,23 @@ RadioIDList::addId(const QString &name, uint32_t id) {
 
 bool
 RadioIDList::setDefaultId(uint idx) {
-  if (_default)
+  if (_default) {
     disconnect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
+    if (0 <= indexOf(_default))
+      emit elementModified(indexOf(_default));
+  }
+
   if (0 > idx) {
     _default = nullptr;
     return true;
   }
+
   _default = getId(idx);
-  if (_default)
-    connect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
+  if (nullptr == _default)
+    return false;
+
+  connect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
+  emit elementModified(idx);
   return true;
 }
 
