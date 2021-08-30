@@ -63,11 +63,11 @@ public:
   /** Returns the radio ID at the given index. */
   RadioID *getId(int idx) const;
   /** Returns the current default ID for the radio. */
-  RadioID * getDefaultId() const;
+  RadioID * defaultId() const;
+  /** Sets the default DMR ID. This changes the index of all IDs. */
+  bool setDefaultId(uint idx);
   /** Searches the DMR ID object associated with the given DMR ID. */
   RadioID *find(uint32_t id) const;
-  /** Sets the default DMR ID. This changes the index of all IDs. */
-  bool setDefault(uint idx);
 
   int add(ConfigObject *obj, int row=-1);
 

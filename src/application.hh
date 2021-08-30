@@ -55,8 +55,10 @@ private slots:
   void onCodeplugUploaded(Radio *radio);
 
   void onConfigModifed();
+
   void onDMRIDChanged();
-  void onDMRIDSelected(int idx);
+
+  void onDefaultIDSelected(int idx);
   void onAddDMRID();
   void onRemDMRID();
 
@@ -134,7 +136,6 @@ protected:
   Config *_config;
   QMainWindow *_mainWindow;
   QGroupBox *_dmrIDBox;
-  QGroupBox *_defaultIDBox;
   QWidget *_radioIdTab;
   RepeaterDatabase *_repeater;
   UserDatabase *_users;

@@ -136,8 +136,8 @@ APRSSystemDialog::construct() {
   if (_aprs) {
     ui->source->setText(_aprs->source());
     ui->srcSSID->setValue(_aprs->srcSSID());
-  } else {
-    ui->source->setText(_config->name());
+  } else if (_config->radioIDs()->defaultId()) {
+    ui->source->setText(_config->radioIDs()->defaultId()->name());
   }
 
   // Setup dest

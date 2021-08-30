@@ -1753,20 +1753,24 @@ TyTCodeplug::GeneralSettingsElement::editRadioID(bool enable) {
 
 bool
 TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
-  radioName(config->name());
-  dmrID(config->radioIDs()->getDefaultId()->id());
+  if (nullptr == config->radioIDs()->defaultId())
+    return false;
+  radioName(config->radioIDs()->defaultId()->name());
+  dmrID(config->radioIDs()->defaultId()->id());
+
   introLine1(config->introLine1());
   introLine2(config->introLine2());
   timeZone(QTimeZone::systemTimeZone());
   micLevel(config->micLevel());
   channelVoiceAnnounce(config->speech());
+
   return true;
 }
 
 bool
 TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
-  config->radioIDs()->addId(radioName(),dmrID());
-  config->setName(radioName());
+  int idx = config->radioIDs()->addId(radioName(),dmrID());
+  config->radioIDs()->setDefaultId(idx);
   config->setIntroLine1(introLine1());
   config->setIntroLine2(introLine2());
   config->setMicLevel(micLevel());
@@ -2867,6 +2871,12 @@ TyTCodeplug::clear()
 
 bool
 TyTCodeplug::encode(Config *config, const Flags &flags) {
+  // Check if default DMR id is set.
+  if (nullptr == config->radioIDs()->defaultId()) {
+    _errorMessage = tr("Cannot encode TyT codeplug: No default radio ID specified.");
+    return false;
+  }
+
   // Set timestamp
   if (! this->encodeTimestamp()) {
     _errorMessage = tr("Cannot encode time-stamp: %1").arg(_errorMessage);

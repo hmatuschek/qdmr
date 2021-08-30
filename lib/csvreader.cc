@@ -1766,9 +1766,8 @@ CSVReader::handleRadioName(const QString &name, qint64 line, qint64 column, QStr
   Q_UNUSED(column);
   Q_UNUSED(errorMessage);
 
-  if (_link) {
-    _config->radioIDs()->getDefaultId()->setName(name);
-    _config->setName(name);
+  if (_link && _config->radioIDs()->defaultId()) {
+    _config->radioIDs()->defaultId()->setName(name);
   }
   return true;
 }

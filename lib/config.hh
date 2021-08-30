@@ -72,11 +72,6 @@ public:
   /** Returns @c true if one of the channels has a GPS or APRS system assigned. */
   bool requiresGPS() const;
 
-  /** Returns the name of the radio. */
-  const QString &name() const;
-  /** (Re-)Sets the name of the radio. */
-  void setName(const QString &name);
-
   /** Returns the first intro line. */
   const QString &introLine1() const;
   /** (Re-)Sets the first intro line. */
@@ -111,10 +106,6 @@ public:
 protected:
   bool serialize(YAML::Node &node, const Context &context);
 
-signals:
-  /** Gets emitted if the configuration gets changed. */
-	void modified();
-
 protected slots:
   /** Iternal callback. */
   void onConfigModified();
@@ -139,8 +130,6 @@ protected:
   /** The list of roaming zones. */
   RoamingZoneList *_roaming;
 
-  /** The name of the radio. */
-  QString _name;
   /** The fist intro line. */
   QString _introLine1;
   /** The second intro line. */

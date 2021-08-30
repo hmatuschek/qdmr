@@ -34,6 +34,8 @@ signals:
 protected slots:
   /** Internal used callback on deleted config. */
   void onListDeleted();
+  /** Internal callback on added items. */
+  void onItemAdded(int idx);
   /** Internal callback on deleted channels. */
   void onItemRemoved(int idx);
   /** Internal callback on modified channels. */
@@ -73,6 +75,8 @@ signals:
 protected slots:
   /** Internal used callback on deleted config. */
   void onListDeleted();
+  /** Internal used callback on adding an item. */
+  void onItemAdded(int idx);
   /** Internal callback on deleted channels. */
   void onItemRemoved(int idx);
   /** Internal callback on modified channels. */

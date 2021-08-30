@@ -519,7 +519,7 @@ D868UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
 
     // Link radio ID
     RadioID *rid = ctx.getRadioId(id_index);
-    if (rid == ctx.config()->radioIDs()->getDefaultId())
+    if (rid == ctx.config()->radioIDs()->defaultId())
       dc->setRadioId(nullptr);
     else
       dc->setRadioId(rid);
@@ -1779,11 +1779,8 @@ D868UVCodeplug::encodeRadioID(Config *config, const Flags &flags) {
   // Encode radio IDs
   for (int i=0; i<config->radioIDs()->count(); i++) {
     radioid_t *radio_id = (radioid_t *)data(ADDR_RADIOIDS + i*RADIOID_SIZE);
+    radio_id->setName(config->radioIDs()->getId(i)->name());
     radio_id->setId(config->radioIDs()->getId(i)->id());
-    if (0 == i)
-      radio_id->setName(config->name());
-    else
-      radio_id->setName(config->name()+" "+QString::number(i));
   }
   return true;
 }
@@ -1792,20 +1789,12 @@ bool
 D868UVCodeplug::setRadioID(Config *config, CodeplugContext &ctx) {
   // Find a valid RadioID
   uint8_t *radio_id_bitmap = data(RADIOID_BITMAP);
-  bool first = true;
   for (uint16_t i=0; i<NUM_RADIOIDS; i++) {
     if (0 == (radio_id_bitmap[i/8] & (1 << (i%8))))
       continue;
     radioid_t *id = (radioid_t *)data(ADDR_RADIOIDS + i*RADIOID_SIZE);
-    if (first) {
-      logDebug() << "Store id " << id->getId() << " at idx " << i << " as default ID.";
-      ctx.setDefaultRadioId(id->getId(), i);
-      config->setName(id->getName());
-      first = false;
-    } else {
-      logDebug() << "Store id " << id->getId() << " at idx " << i << ".";
-      ctx.addRadioId(id->getId(), i);
-    }
+    logDebug() << "Store id " << id->getId() << " at idx " << i << ".";
+    ctx.addRadioId(id->getId(), i, id->getName());
   }
   return true;
 }

@@ -21,9 +21,9 @@ static Radio::Features _d878uv2_features =
   .frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {220., 225.}, {400., 480.} },
 
   // general limits
-  .maxRadioIDs        = 250,
-  .maxNameLength      = 16,
-  .maxIntroLineLength = 14,
+  .maxRadioIDs         = 250,
+  .needsDefaultRadioID = false,
+  .maxIntroLineLength  = 14,
 
   // channel limits
   .maxChannels                  = 4000,

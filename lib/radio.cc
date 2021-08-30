@@ -98,23 +98,22 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
   /*
    *  Check general config
    */
-  if (config->name().size() > features().maxNameLength)
+  if ((nullptr == config->radioIDs()->defaultId()) && features().needsDefaultRadioID)
     issues.append(VerifyIssue(
-                    VerifyIssue::WARNING,
-                    tr("Radio name of length %1 exceeds limit of %2 characters.")
-                    .arg(config->name().size()).arg(features().maxNameLength)));
+                    VerifyIssue::ERROR,
+                    tr("Radio needs a default radio ID but none is set.")));
 
   if (config->introLine1().size() > features().maxIntroLineLength)
     issues.append(VerifyIssue(
                     VerifyIssue::WARNING,
                     tr("Intro line 1 of length %1 exceeds limit of %2 characters.")
-                    .arg(config->introLine1().size()).arg(features().maxNameLength)));
+                    .arg(config->introLine1().size()).arg(features().maxIntroLineLength)));
 
   if (config->introLine2().size() > features().maxIntroLineLength)
     issues.append(VerifyIssue(
                     VerifyIssue::WARNING,
                     tr("Intro line 2 of length %1 exceeds limit of %2 characters.")
-                    .arg(config->introLine2().size()).arg(features().maxNameLength)));
+                    .arg(config->introLine2().size()).arg(features().maxIntroLineLength)));
 
   /*
    *  Check contact list

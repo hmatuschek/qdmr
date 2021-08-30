@@ -1,4 +1,5 @@
 #include "configobject.hh"
+#include "logger.hh"
 
 /* ********************************************************************************************* *
  * Implementation of ConfigObject::Context
@@ -150,8 +151,10 @@ AbstractConfigObjectList::indexOf(ConfigObject *obj) const {
 
 void
 AbstractConfigObjectList::clear() {
-  _items.clear();
-  emit modified();
+  for (int i=(count()-1); i>=0; i--) {
+    _items.pop_back();
+    emit elementRemoved(i);
+  }
 }
 
 ConfigObject *
@@ -172,8 +175,7 @@ int AbstractConfigObjectList::add(ConfigObject *obj, int row) {
   // Otherwise connect to object
   connect(obj, SIGNAL(destroyed(QObject*)), this, SLOT(onElementDeleted(QObject*)));
   connect(obj, SIGNAL(modified(ConfigObject*)), this, SLOT(onElementModified(ConfigObject*)));
-  connect(obj, SIGNAL(modified(ConfigObject*)), this, SIGNAL(modified()));
-  emit modified();
+  emit elementAdded(row);
   return row;
 }
 
@@ -189,7 +191,6 @@ AbstractConfigObjectList::take(ConfigObject *obj) {
   emit elementRemoved(idx);
   // Otherwise disconnect from
   disconnect(obj, nullptr, this, nullptr);
-  emit modified();
   return true;
 }
 
@@ -203,7 +204,6 @@ AbstractConfigObjectList::moveUp(int row) {
   if ((row <= 0) || (row>=count()))
     return false;
   std::swap(_items[row-1], _items[row]);
-  emit modified();
   return true;
 }
 
@@ -213,7 +213,6 @@ AbstractConfigObjectList::moveUp(int first, int last) {
     return false;
   for (int row=first; row<=last; row++)
     std::swap(_items[row-1], _items[row]);
-  emit modified();
   return true;
 }
 
@@ -222,7 +221,6 @@ AbstractConfigObjectList::moveDown(int row) {
   if ((row >= (count()-1)) || (0 > row))
     return false;
   std::swap(_items[row+1], _items[row]);
-  emit modified();
   return true;
 }
 
@@ -232,7 +230,6 @@ AbstractConfigObjectList::moveDown(int first, int last) {
     return false;
   for (int row=last; row>=first; row--)
     std::swap(_items[row+1], _items[row]);
-  emit modified();
   return true;
 }
 
@@ -245,8 +242,9 @@ AbstractConfigObjectList::onElementModified(ConfigObject *obj) {
 
 void
 AbstractConfigObjectList::onElementDeleted(QObject *obj) {
+  logDebug() << "List item " << obj << " deleted";
   int idx = indexOf(qobject_cast<ConfigObject *>(obj));
-  if (0 >= idx)
+  if (0 <= idx)
     emit elementRemoved(idx);
 }
 

@@ -1,5 +1,6 @@
 #include "configitemwrapper.hh"
 #include <cmath>
+#include "logger.hh"
 
 
 /* ********************************************************************************************* *
@@ -11,8 +12,8 @@ GenericListWrapper::GenericListWrapper(AbstractConfigObjectList *list, QObject *
   if (nullptr == _list)
     return;
 
-  connect(_list, SIGNAL(modified()), this, SIGNAL(modified()));
   connect(_list, SIGNAL(destroyed(QObject*)), this, SLOT(onListDeleted()));
+  connect(_list, SIGNAL(elementAdded(int)), this, SLOT(onItemAdded(int)));
   connect(_list, SIGNAL(elementModified(int)), this, SLOT(onItemModified(int)));
   connect(_list, SIGNAL(elementRemoved(int)), this, SLOT(onItemRemoved(int)));
 }
@@ -84,14 +85,21 @@ GenericListWrapper::onListDeleted() {
 }
 
 void
+GenericListWrapper::onItemAdded(int idx) {
+  beginInsertRows(QModelIndex(), idx, idx);
+  endInsertRows();
+}
+
+void
 GenericListWrapper::onItemRemoved(int idx) {
   beginRemoveRows(QModelIndex(), idx, idx);
+  logDebug() << "Signal removal of item at idx=" << idx;
   endRemoveRows();
 }
 
 void
 GenericListWrapper::onItemModified(int idx) {
-  dataChanged(index(idx),index(idx));
+  emit dataChanged(index(idx),index(idx));
 }
 
 
@@ -104,8 +112,8 @@ GenericTableWrapper::GenericTableWrapper(AbstractConfigObjectList *list, QObject
   if (nullptr == _list)
     return;
 
-  connect(_list, SIGNAL(modified()), this, SIGNAL(modified()));
   connect(_list, SIGNAL(destroyed(QObject*)), this, SLOT(onListDeleted()));
+  connect(_list, SIGNAL(elementAdded(int)), this, SLOT(onItemAdded(int)));
   connect(_list, SIGNAL(elementModified(int)), this, SLOT(onItemModified(int)));
   connect(_list, SIGNAL(elementRemoved(int)), this, SLOT(onItemRemoved(int)));
 }
@@ -169,14 +177,21 @@ GenericTableWrapper::onListDeleted() {
 }
 
 void
+GenericTableWrapper::onItemAdded(int idx) {
+  beginInsertRows(QModelIndex(), idx, idx);
+  endInsertRows();
+}
+
+void
 GenericTableWrapper::onItemRemoved(int idx) {
   beginRemoveRows(QModelIndex(), idx, idx);
+  logDebug() << "Signal removal of item at idx=" << idx;
   endRemoveRows();
 }
 
 void
 GenericTableWrapper::onItemModified(int idx) {
-  dataChanged(index(idx,0),index(idx,columnCount()-1));
+  emit dataChanged(index(idx,0),index(idx,columnCount()-1));
 }
 
 

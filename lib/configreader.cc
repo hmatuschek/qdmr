@@ -242,7 +242,7 @@ ConfigReader::linkSettings(Config *config, const YAML::Node &node, const ConfigO
     QString id = QString::fromStdString(node["default-id"].as<std::string>());
     if (ctx.contains(id) && ctx.getObj(id)->is<RadioID>()) {
       RadioID *def = ctx.getObj(id)->as<RadioID>();
-      config->radioIDs()->setDefault(config->radioIDs()->indexOf(def));
+      config->radioIDs()->setDefaultId(config->radioIDs()->indexOf(def));
       logDebug() << "Set default radio ID to '" << def->name() << "'.";
     } else {
       _errorMessage = tr("%1:%2: Default radio ID '%3' does not refer to a radio ID.")

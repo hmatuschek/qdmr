@@ -75,7 +75,7 @@ RadioIDList::getId(int idx) const {
 }
 
 RadioID *
-RadioIDList::getDefaultId() const {
+RadioIDList::defaultId() const {
   return _default;
 }
 
@@ -97,7 +97,7 @@ RadioIDList::add(ConfigObject *obj, int row) {
       return idx;
     // automatically select first added ID as default
     if (was_empty && (nullptr == _default))
-      setDefault(idx);
+      setDefaultId(idx);
     return idx;
   }
   return -1;
@@ -109,7 +109,7 @@ RadioIDList::addId(const QString &name, uint32_t id) {
 }
 
 bool
-RadioIDList::setDefault(uint idx) {
+RadioIDList::setDefaultId(uint idx) {
   if (_default)
     disconnect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
   if (0 > idx) {
@@ -119,7 +119,6 @@ RadioIDList::setDefault(uint idx) {
   _default = getId(idx);
   if (_default)
     connect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
-  emit modified();
   return true;
 }
 

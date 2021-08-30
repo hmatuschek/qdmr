@@ -154,8 +154,8 @@ public:
   virtual bool moveDown(int first, int last);
 
 signals:
-  /** Gets emitted if the list or one of its objects gets modified. */
-  void modified();
+  /** Gets emitted if an element was added to the list. */
+  void elementAdded(int idx);
   /** Gets emitted if one of the lists elements gets modified. */
   void elementModified(int idx);
   /** Gets emitted if one of the lists elements gets deleted. */

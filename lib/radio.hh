@@ -121,9 +121,9 @@ public:
 
     /** Maximum number of radio IDs. */
     int maxRadioIDs;
+    /** If @c true, the radio requires a default radio ID. */
+    bool needsDefaultRadioID;
 
-    /** Maximum length of the radio name. */
-		int maxNameLength;
     /** Maximum length of boot messages. */
 		int maxIntroLineLength;
 

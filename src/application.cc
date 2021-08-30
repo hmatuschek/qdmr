@@ -95,7 +95,7 @@ Application::Application(int &argc, char *argv[])
   _releaseNotes.checkForUpdate();
 
   logDebug() << "Last known position: " << _currentPosition.toString();
-  connect(_config, SIGNAL(modified()), this, SLOT(onConfigModifed()));
+  connect(_config, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModifed()));
 }
 
 Application::~Application() {
@@ -177,39 +177,24 @@ Application::createMainWindow() {
   _dmrIDBox = _mainWindow->findChild<QGroupBox*>("dmrIDBox");
   QLineEdit *dmrID  = _mainWindow->findChild<QLineEdit*>("dmrID");
   QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
-  _defaultIDBox = _mainWindow->findChild<QGroupBox*>("defaultIDBox");
-  QComboBox *defaultID  = _mainWindow->findChild<QComboBox*>("defaultID");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
-
   if (settings.showCommercialFeatures()) {
     _dmrIDBox->setHidden(true);
-  } else {
-    _defaultIDBox->setHidden(true);
   }
-
-  defaultID->setModel(new RadioIdListWrapper(_config->radioIDs(), dmrID));
-  defaultID->setModelColumn(1);
-  if (_config->radioIDs()->getDefaultId())
-    defaultID->setCurrentIndex(
-          _config->radioIDs()->indexOf(
-            _config->radioIDs()->getDefaultId()));
-  if (_config->radioIDs()->getDefaultId()) {
-    dmrID->setText(QString::number(_config->radioIDs()->getDefaultId()->id()));
-    rname->setText(_config->radioIDs()->getDefaultId()->name());
+  if (_config->radioIDs()->defaultId()) {
+    dmrID->setText(QString::number(_config->radioIDs()->defaultId()->id()));
+    rname->setText(_config->radioIDs()->defaultId()->name());
   }
-
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
-
   mic->setValue(_config->micLevel());
   speech->setChecked(_config->speech());
 
   connect(dmrID, SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
   connect(rname, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
-  connect(defaultID, SIGNAL(currentIndexChanged(int)), this, SLOT(onDMRIDSelected(int)));
   connect(intro1, SIGNAL(editingFinished()), this, SLOT(onIntroLine1Changed()));
   connect(intro2, SIGNAL(editingFinished()), this, SLOT(onIntroLine2Changed()));
   connect(mic, SIGNAL(valueChanged(int)), this, SLOT(onMicLevelChanged()));
@@ -221,6 +206,7 @@ Application::createMainWindow() {
     tabs->removeTab(tabs->indexOf(_radioIdTab));
     _radioIdTab->setHidden(true);
   }
+  QComboBox *defaultID  = _mainWindow->findChild<QComboBox*>("defaultID");
   QTableView *radioIDs = _mainWindow->findChild<QTableView*>("idsView");
   SearchPopup::attach(radioIDs);
   QPushButton *idUp = _mainWindow->findChild<QPushButton *>("idUp");
@@ -231,6 +217,13 @@ Application::createMainWindow() {
           this, SLOT(loadRadioIdListSectionState()));
   connect(radioIDs->horizontalHeader(), SIGNAL(sectionResized(int,int,int)),
           this, SLOT(storeRadioIdListSectionState()));
+  connect(defaultID, SIGNAL(currentIndexChanged(int)), this, SLOT(onDefaultIDSelected(int)));
+  defaultID->setModel(new RadioIdListWrapper(_config->radioIDs(), dmrID));
+  defaultID->setModelColumn(1);
+  if (_config->radioIDs()->defaultId())
+    defaultID->setCurrentIndex(
+          _config->radioIDs()->indexOf(
+            _config->radioIDs()->defaultId()));
   radioIDs->setModel(new RadioIdListWrapper(_config->radioIDs(), this));
   connect(addRadioID, SIGNAL(clicked()), this, SLOT(onAddRadioId()));
   connect(remRadioID, SIGNAL(clicked()), this, SLOT(onRemRadioId()));
@@ -714,7 +707,7 @@ Application::uploadCallsignDB() {
   Settings settings;
   if (settings.selectUsingUserDMRID()) {
     // Sort w.r.t users DMR ID
-    uint id = _config->radioIDs()->getDefaultId()->id();
+    uint id = _config->radioIDs()->defaultId()->id();
     logDebug() << "Sort call-signs closest to ID=" << id << ".";
     _users->sortUsers(id);
   } else {
@@ -806,14 +799,12 @@ Application::showSettings() {
         _mainWindow->update();
       }
       _dmrIDBox->setHidden(true);
-      _defaultIDBox->setHidden(false);
     } else if (! settings.showCommercialFeatures()) {
       if (-1 != tabs->indexOf(_radioIdTab)) {
         tabs->removeTab(tabs->indexOf(_radioIdTab));
         _mainWindow->update();
       }
       _dmrIDBox->setHidden(false);
-      _defaultIDBox->setHidden(true);
     }
   }
 }
@@ -844,15 +835,23 @@ Application::onConfigModifed() {
   if (! _mainWindow)
     return;
 
+  QLineEdit *dmrID  = _mainWindow->findChild<QLineEdit*>("dmrID");
   QLineEdit *rname  = _mainWindow->findChild<QLineEdit*>("radioName");
-  QComboBox *dmrID  = _mainWindow->findChild<QComboBox*>("dmrID");
+  QComboBox *defaultID  = _mainWindow->findChild<QComboBox*>("defaultID");
   QLineEdit *intro1 = _mainWindow->findChild<QLineEdit*>("introLine1");
   QLineEdit *intro2 = _mainWindow->findChild<QLineEdit*>("introLine2");
   QSpinBox  *mic    = _mainWindow->findChild<QSpinBox *>("mic");
   QCheckBox *speech = _mainWindow->findChild<QCheckBox*>("speech");
 
-  rname->setText(_config->name());
-  dmrID->setCurrentIndex(0);
+  if (_config->radioIDs()->defaultId()) {
+    dmrID->setText(QString::number(_config->radioIDs()->defaultId()->id()));
+    rname->setText(_config->radioIDs()->defaultId()->name());
+    defaultID->setCurrentIndex(_config->radioIDs()->indexOf(_config->radioIDs()->defaultId()));
+  } else {
+    dmrID->setText("0");
+    rname->setText("");
+    defaultID->setCurrentIndex(-1);
+  }
   intro1->setText(_config->introLine1());
   intro2->setText(_config->introLine2());
   mic->setValue(_config->micLevel());
@@ -861,21 +860,45 @@ Application::onConfigModifed() {
   _mainWindow->setWindowModified(true);
 }
 
+
 void
 Application::onDMRIDChanged() {
-  QComboBox *dmrID  = _mainWindow->findChild<QComboBox *>("dmrID");
-  _config->radioIDs()->getId(0)->setId(dmrID->currentText().toUInt());
+  QLineEdit *dmrID  = _mainWindow->findChild<QLineEdit *>("dmrID");
+  if (0 == _config->radioIDs()->count()) {
+    int idx = _config->radioIDs()->addId("", dmrID->text().toUInt());
+    _config->radioIDs()->setDefaultId(idx);
+  } else if (nullptr == _config->radioIDs()->defaultId()) {
+    _config->radioIDs()->setDefaultId(0);
+    _config->radioIDs()->defaultId()->setId(dmrID->text().toUInt());
+  } else {
+    _config->radioIDs()->defaultId()->setId(dmrID->text().toUInt());
+  }
 }
 
 void
-Application::onDMRIDSelected(int idx) {
-  _config->radioIDs()->setDefault(idx);
+Application::onNameChanged() {
+  QLineEdit *rname = _mainWindow->findChild<QLineEdit*>("radioName");
+  if (0 == _config->radioIDs()->count()) {
+    int idx = _config->radioIDs()->addId(rname->text().simplified(), 0);
+    _config->radioIDs()->setDefaultId(idx);
+  } else if (nullptr == _config->radioIDs()->defaultId()) {
+    _config->radioIDs()->setDefaultId(0);
+    _config->radioIDs()->defaultId()->setName(rname->text().simplified());
+  } else {
+    _config->radioIDs()->defaultId()->setName(rname->text().simplified());
+  }
+}
+
+
+void
+Application::onDefaultIDSelected(int idx) {
+  _config->radioIDs()->setDefaultId(idx);
 }
 
 void
 Application::onAddDMRID() {
   int idx = _config->radioIDs()->addId("", uint32_t(0));
-  _config->radioIDs()->setDefault(idx);
+  _config->radioIDs()->setDefaultId(idx);
   QComboBox *dmrID  = _mainWindow->findChild<QComboBox *>("dmrID");
   dmrID->setCurrentIndex(0);
 }
@@ -889,12 +912,6 @@ Application::onRemDMRID() {
     return;
   }
   _config->radioIDs()->del(_config->radioIDs()->getId(0));
-}
-
-void
-Application::onNameChanged() {
-  QLineEdit *rname = _mainWindow->findChild<QLineEdit*>("radioName");
-  _config->setName(rname->text().simplified());
 }
 
 void

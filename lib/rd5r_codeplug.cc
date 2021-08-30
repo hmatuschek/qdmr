@@ -894,8 +894,9 @@ RD5RCodeplug::decode(Config *config)
     return false;
   }
 
-  config->radioIDs()->getId(0)->setId(gs->getRadioId());
-  config->setName(gs->getName());
+  int idx = config->radioIDs()->addId(gs->getName(), gs->getRadioId());
+  config->radioIDs()->setDefaultId(idx);
+
   intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
   config->setIntroLine1(it->getIntroLine1());
   config->setIntroLine2(it->getIntroLine2());
@@ -1148,8 +1149,13 @@ RD5RCodeplug::encode(Config *config, const Flags &flags)
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
   if (! flags.updateCodePlug)
     gs->initDefault();
-  gs->setName(config->name());
-  gs->setRadioId(config->radioIDs()->getId(0)->id());
+
+  if (nullptr == config->radioIDs()->defaultId()) {
+    _errorMessage = tr("Cannot encode RD-5R codeplug: No default radio ID specified.");
+    return false;
+  }
+  gs->setName(config->radioIDs()->defaultId()->name());
+  gs->setRadioId(config->radioIDs()->defaultId()->id());
 
   intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
   it->setIntroLine1(config->introLine1());
