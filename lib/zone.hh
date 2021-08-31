@@ -60,6 +60,7 @@ class Zone : public ConfigObject
 {
 	Q_OBJECT
 
+  /** The name of the zone. */
   Q_PROPERTY(QString name READ name WRITE setName)
 
 public:

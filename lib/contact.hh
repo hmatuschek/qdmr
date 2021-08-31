@@ -15,7 +15,9 @@ class Contact: public ConfigObject
 {
 	Q_OBJECT
 
+  /** The name of the contact. */
   Q_PROPERTY(QString name READ name WRITE setName)
+  /** If @c true and supported by radio, ring on call from this contact. */
   Q_PROPERTY(bool ring READ ring WRITE setRing)
 
 protected:
@@ -67,6 +69,7 @@ class DTMFContact: public Contact
 {
 	Q_OBJECT
 
+  /** The contact number. */
   Q_PROPERTY(QString number READ number WRITE setNumber)
 
 public:
@@ -97,7 +100,9 @@ class DigitalContact: public Contact
 {
 	Q_OBJECT
 
+  /** The type of the contact. */
   Q_PROPERTY(Type type READ type WRITE setType)
+  /** The number of the contact. */
   Q_PROPERTY(uint number READ number WRITE setNumber)
 
 public:

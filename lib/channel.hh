@@ -27,11 +27,17 @@ class Channel: public ConfigObject
 {
 	Q_OBJECT
 
+  /** The name of the channel. */
   Q_PROPERTY(QString name READ name WRITE setName)
+  /** The receive frequency of the channel. */
   Q_PROPERTY(double rxFrequency READ rxFrequency WRITE setRXFrequency)
+  /** The transmit frequency of the channel. */
   Q_PROPERTY(double txFrequency READ txFrequency WRITE setTXFrequency)
+  /** The transmit power. */
   Q_PROPERTY(Power power READ power WRITE setPower)
+  /** The transmit timeout in seconds. */
   Q_PROPERTY(uint timeout READ timeout WRITE setTimeout)
+  /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
 
 public:
@@ -52,7 +58,7 @@ protected:
    * @param rx        Sepcifies the RX freqeuncy in MHz.
    * @param tx        Specifies the TX frequency in MHz.
    * @param power     Specifies the power setting for the channel.
-   * @param txTimeout Specifies the transmit timeout in seconds (TOT).
+   * @param timeout   Specifies the transmit timeout in seconds (TOT).
    * @param rxOnly    Specifies whether the channel is RX only.
    * @param scanlist  Specifies the default scanlist for the channel.
    * @param parent    Specified the @c QObject parent object. */
@@ -150,8 +156,11 @@ class AnalogChannel: public Channel
 {
   Q_OBJECT
 
+  /** The admit criterion of the channel. */
   Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
+  /** The squelch level of the channel [1-10]. */
   Q_PROPERTY(uint squelch READ squelch WRITE setSquelch)
+  /** The band width of the channel. */
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
 
 public:
@@ -177,7 +186,7 @@ public:
    * @param rxFreq    Sepcifies the RX freqeuncy in MHz.
    * @param txFreq    Specifies the TX frequency in MHz.
    * @param power     Specifies the power setting for the channel.
-   * @param txTimeout Specifies the transmit timeout in seconds (TOT).
+   * @param timeout   Specifies the transmit timeout in seconds (TOT).
    * @param rxOnly    Specifies whether the channel is RX only.
    * @param admit     Specifies the admit criterion.
    * @param squelch   Specifies the squelch level [0,10].
@@ -256,8 +265,11 @@ class DigitalChannel: public Channel
 {
 	Q_OBJECT
 
+  /** The admit criterion of the channel. */
   Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
+  /** The color code of the channel. */
   Q_PROPERTY(uint colorCode READ colorCode WRITE setColorCode)
+  /** The time slot of the channel. */
   Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
 
 public:
@@ -283,11 +295,11 @@ public:
    * @param rxFreq    Sepcifies the RX freqeuncy in MHz.
    * @param txFreq    Specifies the TX frequency in MHz.
    * @param power     Specifies the power setting for the channel.
-   * @param txTimeout Specifies the transmit timeout in seconds (TOT).
+   * @param timeout   Specifies the transmit timeout in seconds (TOT).
    * @param rxOnly    Specifies whether the channel is RX only.
    * @param admit     Specifies the admit criterion.
    * @param colorCode Specifies the colorcode [1,15].
-   * @param timeslot  Specifies the time-slot.
+   * @param timeSlot  Specifies the time-slot.
    * @param rxGroup   Specifies the RX group list for the channel.
    * @param txContact Specifies the default TX contact to call on this channel.
    * @param posSystem Specifies the positioning system to use on this channel.

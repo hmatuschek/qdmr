@@ -13,6 +13,7 @@ class RXGroupList: public ConfigObject
 {
 	Q_OBJECT
 
+  /** The name of the group list. */
   Q_PROPERTY(QString name READ name WRITE setName)
 
 public:
