@@ -46,9 +46,9 @@ public:
   /** Allocates the @c ConfigObject depending on the parsed node. */
   virtual ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx) = 0;
   /** Parses the given YAML node, updates the given object and updates the given context (IDs). */
-  virtual bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) = 0;
+  virtual bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
   /** Links the given object to the rest of the codeplug using the given context. */
-  virtual bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) = 0;
+  virtual bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
 
 protected:
   /** Parses the given extensions for the given object. */
@@ -61,6 +61,20 @@ protected:
 protected:
   /** Holds the error message. */
   QString _errorMessage;
+};
+
+
+/** Base class for all extension parser.
+ * This class already implements the @c parse and @c link methods to read all QMetaProperties
+ * of the @c ExtensionObject.
+ * @ingroup yaml */
+class ExtensionReader: public AbstractConfigReader
+{
+  Q_OBJECT
+
+protected:
+  /** Hidden constructor. */
+  explicit ExtensionReader(QObject *parent=nullptr);
 };
 
 
@@ -141,17 +155,9 @@ protected:
   /** Links single contact. */
   virtual bool linkContact(Contact *contact, const YAML::Node &node, const ConfigObject::Context &ctx);
   /** Parses private-call contact. */
-  virtual bool parsePrivateCallContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseDMRContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
   /** Links private-call contact. */
-  virtual bool linkPrivateCallContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx);
-  /** Parses group-call contact. */
-  virtual bool parseGroupCallContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
-  /** Links group-call contact. */
-  virtual bool linkGroupCallContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx);
-  /** Parses all-call contact. */
-  virtual bool parseAllCallContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
-  /** Parses all-call contact. */
-  virtual bool linkAllCallContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkDMRContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx);
   /** Parses DTMF contact. */
   virtual bool parseDTMFContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
   /** Links DTMF contact. */
@@ -199,7 +205,7 @@ public:
 public:
   /** Adds an extension to the config parser.
    * At this level, device specific codeplug elements and radio-wide settings can be added. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static AbstractConfigReader *addExtension(const QString &name, AbstractConfigReader *reader);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -374,15 +380,15 @@ protected:
 
 /** Base class for digital contact readers.
  * @ingroup yaml */
-class DigitalContactReader: public ContactReader
+class DMRContactReader: public ContactReader
 {
   Q_OBJECT
 
-protected:
-  /** Hidden constructor. */
-  explicit DigitalContactReader(QObject *parent=nullptr);
-
 public:
+  /** Hidden constructor. */
+  explicit DMRContactReader(QObject *parent=nullptr);
+
+  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
   bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
   bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
 
@@ -394,51 +400,6 @@ public:
 protected:
   /** Holds the exentions for the config parser. */
   static QHash<QString, AbstractConfigReader *> _extensions;
-};
-
-
-/** Reads private call contact definitions.
- * @ingroup yaml */
-class PrivateCallContactReader: public DigitalContactReader
-{
-  Q_OBJECT
-
-public:
-  /** Constructor. */
-  explicit PrivateCallContactReader(QObject *parent=nullptr);
-
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-};
-
-
-/** Reads group call contact definitions.
- * @ingroup yaml */
-class GroupCallContactReader: public DigitalContactReader
-{
-  Q_OBJECT
-
-public:
-  /** Constructor. */
-  explicit GroupCallContactReader(QObject *parent=nullptr);
-
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-};
-
-
-/** Reads all call contact definitions.
- * @ingroup yaml */
-class AllCallContactReader: public DigitalContactReader
-{
-  Q_OBJECT
-
-public:
-  /** Constructor. */
-  explicit AllCallContactReader(QObject *parent=nullptr);
-
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
 };
 
 

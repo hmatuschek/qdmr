@@ -24,7 +24,7 @@ bool
 CodeplugContext::setDefaultRadioId(uint32_t id, int index) {
   if (_radioIDTable.contains(0))
     return false;
-  _config->radioIDs()->getId(0)->setId(id);
+  _config->radioIDs()->getId(0)->setNumber(id);
   _radioIDTable[index] = 0;
   return true;
 }
@@ -57,7 +57,7 @@ bool
 CodeplugContext::addChannel(Channel *ch, int index) {
   if (_channelTable.contains(index))
     return false;
-  logDebug() << "Register channel '" << ch->name() << "' under idx=" << index << ".";
+  //logDebug() << "Register channel '" << ch->name() << "' under idx=" << index << ".";
   int cidx = _config->channelList()->add(ch);
   if (0 > cidx)
     return false;
@@ -82,7 +82,7 @@ bool
 CodeplugContext::addDigitalContact(DigitalContact *con, int index) {
   if (_digitalContactTable.contains(index))
     return false;
-  logDebug() << "Register contact '" << con->name() << "' under idx=" << index << ".";
+  //logDebug() << "Register contact '" << con->name() << "' under idx=" << index << ".";
   int cidx = _config->contacts()->add(con);
   if (0 > cidx)
     return false;

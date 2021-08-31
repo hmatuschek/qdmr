@@ -422,6 +422,17 @@ MD2017Codeplug::clearButtonSettings() {
   ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).clear();
 }
 
+bool
+MD2017Codeplug::encodeButtonSettings(Config *config, const Flags &flags) {
+  // Encode settings
+  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(config);
+}
+
+bool
+MD2017Codeplug::decodeButtonSetttings(Config *config) {
+  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).updateConfig(config);
+}
+
 void
 MD2017Codeplug::clearTextMessages() {
   memset(data(ADDR_TEXTMESSAGES), 0, NUM_TEXTMESSAGES*TEXTMESSAGE_SIZE);

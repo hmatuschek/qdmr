@@ -251,9 +251,9 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     case Channel::MinPower: return tr("Min");
     }
   case 5:
-    if (0 == channel->txTimeout())
+    if (0 == channel->timeout())
       return tr("-");
-    return QString::number(channel->txTimeout());
+    return QString::number(channel->timeout());
   case 6:
     return channel->rxOnly() ? tr("On") : tr("Off");
   case 7:
@@ -286,7 +286,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 10:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      return (DigitalChannel::TimeSlot1 == digi->timeslot()) ? 1 : 2;
+      return (DigitalChannel::TimeSlot1 == digi->timeSlot()) ? 1 : 2;
     } else if (channel->is<AnalogChannel>()) {
       return tr("[None]");
     }
@@ -315,7 +315,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 13:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
       if (digi->radioId())
-        return digi->radioId()->id();
+        return digi->radioId()->number();
       else
         return tr("[Default]");
     } else if (channel->is<AnalogChannel>()) {
@@ -379,7 +379,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     if (channel->is<DigitalChannel>()) {
       return tr("[None]");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (AnalogChannel::BWWide == analog->bandwidth()) {
+      if (AnalogChannel::Wide == analog->bandwidth()) {
         return tr("Wide");
       } else
         return tr("Narrow");
@@ -457,7 +457,7 @@ ContactListWrapper::data(const QModelIndex &index, int role) const {
         case 2:
           return dtmf->number();
         case 3:
-          return (dtmf->rxTone() ? tr("On") : tr("Off"));
+          return (dtmf->ring() ? tr("On") : tr("Off"));
         default:
           return QVariant();
       }
@@ -475,7 +475,7 @@ ContactListWrapper::data(const QModelIndex &index, int role) const {
         case 2:
           return digi->number();
         case 3:
-          return (digi->rxTone() ? tr("On") : tr("Off"));
+          return (digi->ring() ? tr("On") : tr("Off"));
         default:
           return QVariant();
       }
@@ -711,7 +711,7 @@ RadioIdListWrapper::data(const QModelIndex &index, int role) const {
   case 1:
     return id->name();
   case 2:
-    return id->id();
+    return id->number();
   default:
     break;
   }

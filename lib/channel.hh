@@ -27,15 +27,23 @@ class Channel: public ConfigObject
 {
 	Q_OBJECT
 
+  Q_PROPERTY(QString name READ name WRITE setName)
+  Q_PROPERTY(double rxFrequency READ rxFrequency WRITE setRXFrequency)
+  Q_PROPERTY(double txFrequency READ txFrequency WRITE setTXFrequency)
+  Q_PROPERTY(Power power READ power WRITE setPower)
+  Q_PROPERTY(uint timeout READ timeout WRITE setTimeout)
+  Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
+
 public:
   /** Possible power settings. */
-	typedef enum {
+  enum Power {
     MaxPower,  ///< Highest power setting (e.g. > 5W, if available).
     HighPower, ///< High power setting (e.g, 5W).
     MidPower,  ///< Medium power setting (e.g., 2W, if avaliable)
     LowPower,  ///< Low power setting (e.g., 1W).
     MinPower   ///< Lowest power setting (e.g., <1W, if available).
-	} Power;
+  };
+  Q_ENUM(Power)
 
 protected:
   /** Hidden constructor.
@@ -48,7 +56,7 @@ protected:
    * @param rxOnly    Specifies whether the channel is RX only.
    * @param scanlist  Specifies the default scanlist for the channel.
    * @param parent    Specified the @c QObject parent object. */
-  Channel(const QString &name, double rx, double tx, Power power, uint txTimeout, bool rxOnly,
+  Channel(const QString &name, double rx, double tx, Power power, uint timeout, bool rxOnly,
           ScanList *scanlist, QObject *parent=nullptr);
 
 public:
@@ -93,7 +101,7 @@ public:
   void setPower(Power power);
 
   /** Returns the TX timeout (TOT) in seconds. */
-  uint txTimeout() const;
+  uint timeout() const;
   /** (Re-)Sets the TX timeout (TOT) in seconds. */
   bool setTimeout(uint dur);
 
@@ -142,6 +150,10 @@ class AnalogChannel: public Channel
 {
   Q_OBJECT
 
+  Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
+  Q_PROPERTY(uint squelch READ squelch WRITE setSquelch)
+  Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
+
 public:
   /** Admit criteria of analog channel. */
 	typedef enum {
@@ -149,12 +161,14 @@ public:
     AdmitFree,  ///< Allow when channel free.
     AdmitTone   ///< Allow when admit tone is present.
 	} Admit;
+  Q_ENUM(Admit)
 
   /** Possible bandwidth of an analog channel. */
 	typedef enum {
-		BWNarrow,  ///< Narrow bandwidth (12.5kHz).
-    BWWide     ///< Wide bandwidth (25kHz).
+    Narrow,  ///< Narrow bandwidth (12.5kHz).
+    Wide     ///< Wide bandwidth (25kHz).
 	} Bandwidth;
+  Q_ENUM(Bandwidth)
 
 public:
   /** Constructs a new analog channel.
@@ -173,7 +187,7 @@ public:
    * @param list      Specifies the default scanlist for the channel.
    * @param aprsSys   Specifies the APRS system for the channel.
    * @param parent    Specified the @c QObject parent object. */
-  AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
+  AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power, uint timeout,
                 bool rxOnly, Admit admit, uint squelch, Signaling::Code rxTone,
                 Signaling::Code txTone, Bandwidth bw, ScanList *list,
                 APRSSystem *aprsSys=nullptr, QObject *parent=nullptr);
@@ -242,6 +256,10 @@ class DigitalChannel: public Channel
 {
 	Q_OBJECT
 
+  Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
+  Q_PROPERTY(uint colorCode READ colorCode WRITE setColorCode)
+  Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
+
 public:
   /** Possible admit criteria of digital channels. */
 	typedef enum {
@@ -249,12 +267,14 @@ public:
     AdmitFree,      ///< Transmit only if channel is free.
     AdmitColorCode  ///< Transmit only if channel is free and matches given color code.
 	} Admit;
+  Q_ENUM(Admit)
 
   /** Possible timeslots for digital channels. */
 	typedef enum {
 		TimeSlot1, ///< Time/repeater slot 1
     TimeSlot2  ///< Time/repeater slot 2
 	} TimeSlot;
+  Q_ENUM(TimeSlot)
 
 public:
   /** Constructs a new digital (DMR) channel.
@@ -275,8 +295,8 @@ public:
    * @param roaming   Specifies the roaming zone for the channel.
    * @param radioID   Specifies the radio ID to use for this channel, @c nullptr is default ID.
    * @param parent    Specified the @c QObject parent object. */
-  DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
-	               bool rxOnly, Admit admit, uint colorCode, TimeSlot timeslot, RXGroupList *rxGroup,
+  DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power, uint timeout,
+                 bool rxOnly, Admit admit, uint colorCode, TimeSlot timeSlot, RXGroupList *rxGroup,
                  DigitalContact *txContact, PositioningSystem *posSystem, ScanList *list,
                  RoamingZone *roaming, RadioID *radioID, QObject *parent=nullptr);
 
@@ -293,7 +313,7 @@ public:
 	bool setColorCode(uint cc);
 
   /** Returns the time slot for the channel. */
-	TimeSlot timeslot() const;
+  TimeSlot timeSlot() const;
   /** (Re-)Sets the time slot for the channel. */
 	bool setTimeSlot(TimeSlot ts);
 

@@ -8,6 +8,9 @@
 
 #include <yaml-cpp/yaml.h>
 
+// Forward declaration
+class ConfigExtension;
+
 
 /** Base class for configuration objects (channels, zones, contacts, etc).
  * @ingroup config */
@@ -73,7 +76,8 @@ public:
   virtual const ConfigObject *extension(const QString &name) const;
   /** Returns the extension object. */
   virtual ConfigObject *extension(const QString &name);
-  /** Adds an extension to this object. */
+  /** Adds an extension to this object.
+   * A existing extension with the same name will be replaced.*/
   virtual void addExtension(const QString &name, ConfigObject *ext);
 
   /** Returns @c true if this object is of class @c Object. */
@@ -108,6 +112,22 @@ protected:
   QString _idBase;
   /** The table of extensions. */
   QHash<QString, ConfigObject *> _extensions;
+};
+
+
+/** Base class of all device/vendor specific confiuration extensions.
+ * This class already implements the serialization of all @c QMetaObject
+ * properties. */
+class ConfigExtension : public ConfigObject
+{
+Q_OBJECT
+
+protected:
+  /** Hidden constructor. */
+  explicit ConfigExtension(const QString &idBase, QObject *parent=nullptr);
+
+protected:
+  bool serialize(YAML::Node &node, const Context &context);
 };
 
 

@@ -151,8 +151,6 @@ Zone::serialize(YAML::Node &node, const Context &context) {
   if (! ConfigObject::serialize(node, context))
     return false;
 
-  node["name"] = _name.toStdString();
-
   YAML::Node A = YAML::Node(YAML::NodeType::Sequence);
   A.SetStyle(YAML::EmitterStyle::Flow);
   for (int i=0; i<_A->count(); i++) {

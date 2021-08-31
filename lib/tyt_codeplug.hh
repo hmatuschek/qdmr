@@ -7,6 +7,7 @@
 #include "signaling.hh"
 #include "channel.hh"
 #include "contact.hh"
+#include "tyt_extensions.hh"
 
 class DigitalContact;
 class Zone;
@@ -1107,37 +1108,8 @@ public:
   class ButtonSettingsElement: public CodePlug::Element
   {
   public:
-    /** Possible actions for the side-buttons. */
-    enum ButtonAction {
-      Disabled = 0,                       ///< Disabled side-button action.
-      ToggleAllAlertTones = 1,            ///< Toggle all alert tones.
-      EmergencyOn = 2,                    ///< Enable emergency.
-      EmergencyOff = 3,                   ///< Disable emergency.
-      PowerSelect = 4,                    ///< Select TX power.
-      MonitorToggle = 5,                  ///< Toggle monitor (promiscuous mode on digital channel, open squelch on analog channel).
-      OneTouch1 = 7,                      ///< Perform one-touch action 1.
-      OneTouch2 = 8,                      ///< Perform one-touch action 2.
-      OneTouch3 = 9,                      ///< Perform one-touch action 3.
-      OneTouch4 = 10,                     ///< Perform one-touch action 4.
-      OneTouch5 = 11,                     ///< Perform one-touch action 5.
-      OneTouch6 = 12,                     ///< Perform one-touch action 6.
-      RepeaterTalkaroundToggle = 13,      ///< Toggle repater mode / talkaround.
-      ScanToggle = 14,                    ///< Start/stop scan.
-      SquelchToggle = 21,                 ///< Enable/disable squelch.
-      PrivacyToggle = 22,                 ///< Enable/disable privacy system.
-      VoxToggle = 23,                     ///< Enable/disable VOX.
-      ZoneIncrement = 24,                 ///< Switch to next zone.
-      BatteryIndicator = 26,              ///< Show battery charge.
-      LoneWorkerToggle = 31,              ///< Toggle lone-worker.
-      RecordToggle = 34,                  ///< Enable/disable recording (dep. on firmware).
-      RecordPlayback = 35,                ///< Start/stop playback.
-      RecordDeleteAll = 36,               ///< Delete all recordings.
-      Tone1750Hz = 38,                    ///< Send 1750Hz tone.
-      SwitchUpDown = 47,                  ///< Switch Channel A/B.
-      RightKey = 48,                      ///< Who knows?
-      LeftKey = 49,                       ///< Who knows?
-      ZoneDecrement = 55                  ///< Switch to previous zone.
-    };
+    /** The possible button actions. */
+    typedef enum TyTButtonSettingsExtension::ButtonAction ButtonAction;
 
   protected:
     /** Hidden constructor. */
@@ -1154,25 +1126,30 @@ public:
     /** Returns the action for a short press on side button 1. */
     virtual ButtonAction sideButton1Short() const;
     /** Sets the action for a short press on side button 1. */
-    virtual void sideButton1Short(ButtonAction action);
+    virtual void setSideButton1Short(ButtonAction action);
     /** Returns the action for a long press on side button 1. */
     virtual ButtonAction sideButton1Long() const;
     /** Sets the action for a short press on side button 1. */
-    virtual void sideButton1Long(ButtonAction action);
+    virtual void setSideButton1Long(ButtonAction action);
 
     /** Returns the action for a short press on side button 2. */
     virtual ButtonAction sideButton2Short() const;
     /** Sets the action for a short press on side button 2. */
-    virtual void sideButton2Short(ButtonAction action);
+    virtual void setSideButton2Short(ButtonAction action);
     /** Returns the action for a long press on side button 2. */
     virtual ButtonAction sideButton2Long() const;
     /** Sets the action for a short press on side button 2. */
-    virtual void sideButton2Long(ButtonAction action);
+    virtual void setSideButton2Long(ButtonAction action);
 
     /** Returns the long-press duration in ms. */
     virtual uint longPressDuration() const;
     /** Sets the long-press duration in ms. */
-    virtual void longPressDuration(uint ms);
+    virtual void setLongPressDuration(uint ms);
+
+    /** Encodes the button settings. */
+    virtual bool fromConfig(const Config *config);
+    /** Updates config from button settings. */
+    virtual bool updateConfig(Config *config);
   };
 
   /** Represents a single one-touch setting within the codeplug on the radio.
@@ -1462,12 +1439,17 @@ public:
   /** Links all added positioning systems within the configuration. */
   virtual bool linkPositioningSystems(CodeplugContext &ctx);
 
+  /** Clears the button settings in the codeplug. */
+  virtual void clearButtonSettings();
+  /** Encodes the button settings. */
+  virtual bool encodeButtonSettings(Config *config, const Flags &flags);
+  /** Decodes the button settings. */
+  virtual bool decodeButtonSetttings(Config *config);
+
   /** Clears the boot settings in the codeplug. */
   virtual void clearBootSettings();
   /** Clears the menu settings in the codeplug. */
   virtual void clearMenuSettings();
-  /** Clears the button settings in the codeplug. */
-  virtual void clearButtonSettings();
   /** Clears all text messages in the codeplug. */
   virtual void clearTextMessages();
   /** Clears all encryption keys in the codeplug. */

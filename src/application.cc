@@ -565,7 +565,7 @@ Application::uploadCallsignDB() {
   Settings settings;
   if (settings.selectUsingUserDMRID()) {
     // Sort w.r.t users DMR ID
-    uint id = _config->radioIDs()->defaultId()->id();
+    uint id = _config->radioIDs()->defaultId()->number();
     logDebug() << "Sort call-signs closest to ID=" << id << ".";
     _users->sortUsers(id);
   } else {

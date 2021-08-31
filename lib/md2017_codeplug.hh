@@ -93,9 +93,12 @@ public:
   bool createPositioningSystems(CodeplugContext &ctx);
   bool linkPositioningSystems(CodeplugContext &ctx);
 
+  void clearButtonSettings();
+  bool encodeButtonSettings(Config *config, const Flags &flags);
+  bool decodeButtonSetttings(Config *config);
+
   void clearBootSettings();
   void clearMenuSettings();
-  void clearButtonSettings();
   void clearTextMessages();
   void clearPrivacyKeys();
   void clearEmergencySystems();

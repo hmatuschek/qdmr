@@ -273,6 +273,10 @@ Config::reset() {
   _mic_level = 2;
   _speech    = false;
 
+  foreach (ConfigObject *extension, _extensions) {
+    extension->deleteLater();
+  }
+
   emit modified(this);
 }
 

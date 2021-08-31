@@ -230,11 +230,11 @@ D578UVCodeplug::channel_t::toChannelObj() const {
     default:
       break;
     }
-    AnalogChannel::Bandwidth bw = AnalogChannel::BWNarrow;
+    AnalogChannel::Bandwidth bw = AnalogChannel::Narrow;
     if (BW_12_5_KHZ == bandwidth)
-      bw = AnalogChannel::BWNarrow;
+      bw = AnalogChannel::Narrow;
     else
-      bw = AnalogChannel::BWWide;
+      bw = AnalogChannel::Wide;
     ch = new AnalogChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           1, getRXTone(), getTXTone(), bw, nullptr);
@@ -374,7 +374,7 @@ D578UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     // set bandwidth
-    bandwidth = (AnalogChannel::BWNarrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
+    bandwidth = (AnalogChannel::Narrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
     // Set APRS system
     rx_gps = 0;
     if (nullptr != ac->aprsSystem()) {
@@ -394,7 +394,7 @@ D578UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     // set color code
     color_code = dc->colorCode();
     // set time-slot
-    slot2 = (DigitalChannel::TimeSlot2 == dc->timeslot()) ? 1 : 0;
+    slot2 = (DigitalChannel::TimeSlot2 == dc->timeSlot()) ? 1 : 0;
     // link transmit contact
     if (nullptr == dc->txContact()) {
       contact_index = 0;

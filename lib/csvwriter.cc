@@ -31,7 +31,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
 
   QStringList radio_ids;
   for (int i=0; i<config->radioIDs()->count(); i++)
-    radio_ids.append(QString::number(config->radioIDs()->getId(i)->id()));
+    radio_ids.append(QString::number(config->radioIDs()->getId(i)->number()));
 
   QString radioName;
   if (config->radioIDs()->defaultId())
@@ -81,11 +81,11 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     stream << qSetFieldWidth(6)  << power2string(digi->power())
            << qSetFieldWidth(5)  << ( nullptr != digi->scanList() ?
           QString::number(config->scanlists()->indexOf(digi->scanList())+1) : QString("-") )
-           << qSetFieldWidth(4)  << ( (0 == digi->txTimeout()) ? QString("-") : QString::number(digi->txTimeout()) )
+           << qSetFieldWidth(4)  << ( (0 == digi->timeout()) ? QString("-") : QString::number(digi->timeout()) )
            << qSetFieldWidth(3)  << (digi->rxOnly() ? '+' : '-')
            << qSetFieldWidth(7)  << ((DigitalChannel::AdmitNone==digi->admit()) ? "-" : ((DigitalChannel::AdmitFree==digi->admit()) ? "Free" : "Color"))
            << qSetFieldWidth(3)  << digi->colorCode()
-           << qSetFieldWidth(3)  << (DigitalChannel::TimeSlot1==digi->timeslot() ? "1" : "2");
+           << qSetFieldWidth(3)  << (DigitalChannel::TimeSlot1==digi->timeSlot() ? "1" : "2");
     if (nullptr == digi->rxGroupList())
       stream << qSetFieldWidth(5)  << '-';
     else
@@ -147,13 +147,13 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
       stream << qSetFieldWidth(11) << format_frequency(analog->txFrequency());
     stream << qSetFieldWidth(6)  << power2string(analog->power())
            << qSetFieldWidth(5)  << ( nullptr != analog->scanList() ? QString::number(config->scanlists()->indexOf(analog->scanList())+1) : QString("-") )
-           << qSetFieldWidth(4)  << ( (0 == analog->txTimeout()) ? QString("-") : QString::number(analog->txTimeout()) )
+           << qSetFieldWidth(4)  << ( (0 == analog->timeout()) ? QString("-") : QString::number(analog->timeout()) )
            << qSetFieldWidth(3)  << (analog->rxOnly() ? '+' : '-')
            << qSetFieldWidth(7)  << ((AnalogChannel::AdmitNone==analog->admit()) ? "-" : ((AnalogChannel::AdmitFree==analog->admit()) ? "Free" : "Tone"))
            << qSetFieldWidth(8)  << analog->squelch()
            << qSetFieldWidth(7)  << Signaling::configString(analog->rxTone())
            << qSetFieldWidth(7)  << Signaling::configString(analog->txTone())
-           << qSetFieldWidth(6) << (AnalogChannel::BWWide == analog->bandwidth() ? 25.0 : 12.5)
+           << qSetFieldWidth(6) << (AnalogChannel::Wide == analog->bandwidth() ? 25.0 : 12.5)
            << qSetFieldWidth(5)  << ( nullptr != analog->aprsSystem() ? QString::number(config->posSystems()->indexOf(analog->aprsSystem())+1) : QString("-"))
            << qSetFieldWidth(0) << "\n";
   }
@@ -301,7 +301,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
                    "Private" : (DigitalContact::GroupCall == contact->type() ?
                                   "Group" : "All"))
              << qSetFieldWidth(12)  << contact->number()
-             << qSetFieldWidth(6)  << (contact->rxTone() ? "+" : "-");
+             << qSetFieldWidth(6)  << (contact->ring() ? "+" : "-");
       stream << qSetFieldWidth(0) << "\n";
     } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
       DTMFContact *contact = config->contacts()->contact(i)->as<DTMFContact>();
@@ -309,7 +309,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
              << qSetFieldWidth(20) << ("\"" + contact->name() + "\"")
              << qSetFieldWidth(8)  << "DTMF"
              << qSetFieldWidth(12) << ("\""+contact->number()+"\"")
-             << qSetFieldWidth(6)  << (contact->rxTone() ? "+" : "-");
+             << qSetFieldWidth(6)  << (contact->ring() ? "+" : "-");
       stream << qSetFieldWidth(0) << "\n";
     }
   }

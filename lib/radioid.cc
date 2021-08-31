@@ -5,7 +5,7 @@
  * Implementation of RadioID
  * ********************************************************************************************* */
 RadioID::RadioID(const QString &name, uint32_t id, QObject *parent)
-  : ConfigObject("id", parent), _name(name), _id(id)
+  : ConfigObject("id", parent), _name(name), _number(id)
 {
   // pass...
 }
@@ -21,15 +21,15 @@ RadioID::setName(const QString &name) {
 }
 
 uint32_t
-RadioID::id() const {
-  return _id;
+RadioID::number() const {
+  return _number;
 }
 
 void
-RadioID::setId(uint32_t id) {
-  if (id == _id)
+RadioID::setNumber(uint32_t id) {
+  if (id == _number)
     return;
-  _id = id;
+  _number = id;
   emit modified();
 }
 
@@ -48,8 +48,6 @@ bool
 RadioID::serialize(YAML::Node &node, const Context &context) {
   if (! ConfigObject::serialize(node, context))
     return false;
-  node["name"] = _name.toStdString();
-  node["number"] = _id;
   return true;
 }
 
@@ -82,7 +80,7 @@ RadioIDList::defaultId() const {
 RadioID *
 RadioIDList::find(uint32_t id) const {
   for (int i=0; i<count(); i++) {
-    if (id == getId(i)->id())
+    if (id == getId(i)->number())
       return getId(i);
   }
   return nullptr;

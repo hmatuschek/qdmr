@@ -60,6 +60,8 @@ class Zone : public ConfigObject
 {
 	Q_OBJECT
 
+  Q_PROPERTY(QString name READ name WRITE setName)
+
 public:
   /** Constructs an empty Zone with the given name. */
 	explicit Zone(const QString &name, QObject *parent = nullptr);

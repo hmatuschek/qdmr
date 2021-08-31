@@ -80,7 +80,7 @@ ChannelListView::onCloneChannel() {
     // clone channel
     AnalogChannel *clone = new AnalogChannel(
           selch->name()+" clone", selch->rxFrequency(), selch->txFrequency(), selch->power(),
-          selch->txTimeout(), selch->rxOnly(), selch->admit(), selch->squelch(),
+          selch->timeout(), selch->rxOnly(), selch->admit(), selch->squelch(),
           selch->rxTone(), selch->txTone(), selch->bandwidth(), selch->scanList(),
           selch->aprsSystem());
     // open editor
@@ -99,8 +99,8 @@ ChannelListView::onCloneChannel() {
     // clone channel
     DigitalChannel *clone = new DigitalChannel(
           selch->name()+" clone", selch->rxFrequency(), selch->txFrequency(), selch->power(),
-          selch->txTimeout(), selch->rxOnly(), selch->admit(), selch->colorCode(),
-          selch->timeslot(), selch->rxGroupList(), selch->txContact(), selch->posSystem(),
+          selch->timeout(), selch->rxOnly(), selch->admit(), selch->colorCode(),
+          selch->timeSlot(), selch->rxGroupList(), selch->txContact(), selch->posSystem(),
           selch->scanList(), selch->roaming(), nullptr);
     // open editor
     DigitalChannelDialog dialog(_config, clone);

@@ -6,6 +6,7 @@
 #include "gpssystem.hh"
 #include "config.h"
 #include "logger.hh"
+#include "tyt_extensions.hh"
 #include <QTimeZone>
 #include <QtEndian>
 
@@ -39,7 +40,7 @@ TyTCodeplug::ChannelElement::clear() {
   Element::clear();
 
   mode(MODE_ANALOG);
-  bandwidth(AnalogChannel::BWNarrow);
+  bandwidth(AnalogChannel::Narrow);
   autoScan(0);
   setBit(0, 1); setBit(0,2);
   loneWorker(false);
@@ -105,12 +106,12 @@ TyTCodeplug::ChannelElement::mode(Mode mode) {
 AnalogChannel::Bandwidth
 TyTCodeplug::ChannelElement::bandwidth() const {
   if (0 == getUInt2(0, 2))
-    return AnalogChannel::BWNarrow;
-  return AnalogChannel::BWWide;
+    return AnalogChannel::Narrow;
+  return AnalogChannel::Wide;
 }
 void
 TyTCodeplug::ChannelElement::bandwidth(AnalogChannel::Bandwidth bw) {
-  if (AnalogChannel::BWNarrow == bw)
+  if (AnalogChannel::Narrow == bw)
     setUInt2(0, 2, BW_12_5_KHZ);
   else
     setUInt2(0, 2, BW_25_KHZ);
@@ -564,7 +565,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
   rxFrequency(chan->rxFrequency()*1e6);
   txFrequency(chan->txFrequency()*1e6);
   rxOnly(chan->rxOnly());
-  txTimeOut(chan->txTimeout());
+  txTimeOut(chan->timeout());
   if (chan->scanList())
     scanListIndex(ctx.config()->scanlists()->indexOf(chan->scanList())+1);
   else
@@ -582,7 +583,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
     case DigitalChannel::AdmitColorCode: admitCriterion(ADMIT_COLOR); break;
     }
     colorCode(dchan->colorCode());
-    timeSlot(dchan->timeslot());
+    timeSlot(dchan->timeSlot());
     if (dchan->rxGroupList())
       groupListIndex(ctx.config()->rxGroupLists()->indexOf(dchan->rxGroupList())+1);
     else
@@ -590,7 +591,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
     if (dchan->txContact())
       contactIndex(ctx.config()->contacts()->indexOfDigital(dchan->txContact())+1);
     squelch(0);
-    bandwidth(AnalogChannel::BWNarrow);
+    bandwidth(AnalogChannel::Narrow);
     rxSignaling(Signaling::SIGNALING_NONE);
     txSignaling(Signaling::SIGNALING_NONE);
     if (dchan->posSystem() && dchan->posSystem()->is<GPSSystem>()) {
@@ -750,7 +751,7 @@ TyTCodeplug::ContactElement::fromContactObj(const DigitalContact *cont) {
   dmrId(cont->number());
   name(cont->name());
   callType(cont->type());
-  ringTone(cont->rxTone());
+  ringTone(cont->ring());
 
   return true;
 }
@@ -1756,7 +1757,7 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
   if (nullptr == config->radioIDs()->defaultId())
     return false;
   radioName(config->radioIDs()->defaultId()->name());
-  dmrID(config->radioIDs()->defaultId()->id());
+  dmrID(config->radioIDs()->defaultId()->number());
 
   introLine1(config->introLine1());
   introLine2(config->introLine2());
@@ -2452,13 +2453,13 @@ TyTCodeplug::ButtonSettingsElement::~ButtonSettingsElement() {
 void
 TyTCodeplug::ButtonSettingsElement::clear() {
   setUInt16_le(0x00, 0);
-  sideButton1Short(Disabled);
-  sideButton1Long(Tone1750Hz);
-  sideButton2Short(MonitorToggle);
-  sideButton2Long(Disabled);
+  setSideButton1Short(ButtonAction::Disabled);
+  setSideButton1Long(ButtonAction::Tone1750Hz);
+  setSideButton2Short(ButtonAction::MonitorToggle);
+  setSideButton2Long(ButtonAction::Disabled);
   memset(_data+0x06, 0x00, 10);
   setUInt8(0x10, 1);
-  longPressDuration(2000);
+  setLongPressDuration(1000);
   setUInt16_le(0x12, 0xffff);
 }
 
@@ -2467,7 +2468,7 @@ TyTCodeplug::ButtonSettingsElement::sideButton1Short() const {
   return ButtonAction(getUInt8(0x02));
 }
 void
-TyTCodeplug::ButtonSettingsElement::sideButton1Short(ButtonAction action) {
+TyTCodeplug::ButtonSettingsElement::setSideButton1Short(ButtonAction action) {
   setUInt8(0x02, action);
 }
 
@@ -2476,7 +2477,7 @@ TyTCodeplug::ButtonSettingsElement::sideButton1Long() const {
   return ButtonAction(getUInt8(0x03));
 }
 void
-TyTCodeplug::ButtonSettingsElement::sideButton1Long(ButtonAction action) {
+TyTCodeplug::ButtonSettingsElement::setSideButton1Long(ButtonAction action) {
   setUInt8(0x03, action);
 }
 
@@ -2485,7 +2486,7 @@ TyTCodeplug::ButtonSettingsElement::sideButton2Short() const {
   return ButtonAction(getUInt8(0x04));
 }
 void
-TyTCodeplug::ButtonSettingsElement::sideButton2Short(ButtonAction action) {
+TyTCodeplug::ButtonSettingsElement::setSideButton2Short(ButtonAction action) {
   setUInt8(0x04, action);
 }
 
@@ -2494,7 +2495,7 @@ TyTCodeplug::ButtonSettingsElement::sideButton2Long() const {
   return ButtonAction(getUInt8(0x05));
 }
 void
-TyTCodeplug::ButtonSettingsElement::sideButton2Long(ButtonAction action) {
+TyTCodeplug::ButtonSettingsElement::setSideButton2Long(ButtonAction action) {
   setUInt8(0x05, action);
 }
 
@@ -2503,8 +2504,41 @@ TyTCodeplug::ButtonSettingsElement::longPressDuration() const {
   return uint(getUInt8(0x11))*250;
 }
 void
-TyTCodeplug::ButtonSettingsElement::longPressDuration(uint ms) {
+TyTCodeplug::ButtonSettingsElement::setLongPressDuration(uint ms) {
   setUInt8(0x11, ms/250);
+}
+
+bool
+TyTCodeplug::ButtonSettingsElement::fromConfig(const Config *config) {
+  // Skip if not defined
+  if (! config->hasExtension(TyTButtonSettingsExtension::staticMetaObject.className()))
+    return true;
+  // Check type
+  const TyTButtonSettingsExtension *ext =
+      config->extension(TyTButtonSettingsExtension::staticMetaObject.className())->as<TyTButtonSettingsExtension>();
+  if (nullptr == ext)
+    return false;
+
+  setSideButton1Short(ext->sideButton1Short());
+  setSideButton1Long(ext->sideButton1Long());
+  setSideButton2Short(ext->sideButton2Short());
+  setSideButton2Long(ext->sideButton2Long());
+  setLongPressDuration(ext->longPressDuration());
+
+  return true;
+}
+
+bool
+TyTCodeplug::ButtonSettingsElement::updateConfig(Config *config) {
+  TyTButtonSettingsExtension *ext = new TyTButtonSettingsExtension(config);
+  config->addExtension(TyTButtonSettingsExtension::staticMetaObject.className(), ext);
+
+  ext->setSideButton1Short(sideButton1Short());
+  ext->setSideButton1Long(sideButton1Long());
+  ext->setSideButton2Short(sideButton2Short());
+  ext->setSideButton2Long(sideButton2Long());
+  ext->setLongPressDuration(longPressDuration());
+  return true;
 }
 
 
@@ -2924,6 +2958,12 @@ TyTCodeplug::encode(Config *config, const Flags &flags) {
     return false;
   }
 
+  // Encode button settings
+  if (! this->encodeButtonSettings(config, flags)) {
+    _errorMessage = tr("Cannot encode button settings: %1").arg(_errorMessage);
+    return false;
+  }
+
   return true;
 }
 
@@ -2974,6 +3014,12 @@ TyTCodeplug::decode(Config *config) {
   // Define GPS systems
   if (! this->createPositioningSystems(ctx)) {
     _errorMessage = tr("Cannot create positioning systems: %1").arg(_errorMessage);
+    return false;
+  }
+
+  // Decode button settings
+  if (! this->decodeButtonSetttings(config)) {
+    _errorMessage = tr("Cannot decode button settings: %1").arg(_errorMessage);
     return false;
   }
 
@@ -3158,6 +3204,23 @@ TyTCodeplug::linkPositioningSystems(CodeplugContext &ctx) {
   return true;
 }
 
+void
+TyTCodeplug::clearButtonSettings() {
+  // pass...
+}
+
+bool
+TyTCodeplug::encodeButtonSettings(Config *config, const Flags &flags) {
+  // pass...
+  return true;
+}
+
+bool
+TyTCodeplug::decodeButtonSetttings(Config *config) {
+  // pass...
+  return true;
+}
+
 
 void
 TyTCodeplug::clearBootSettings() {
@@ -3166,11 +3229,6 @@ TyTCodeplug::clearBootSettings() {
 
 void
 TyTCodeplug::clearMenuSettings() {
-  // pass...
-}
-
-void
-TyTCodeplug::clearButtonSettings() {
   // pass...
 }
 

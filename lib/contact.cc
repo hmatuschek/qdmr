@@ -7,7 +7,7 @@
  * Implementation of Contact
  * ********************************************************************************************* */
 Contact::Contact(const QString &name, bool rxTone, QObject *parent)
-  : ConfigObject("cont", parent), _name(name), _rxTone(rxTone)
+  : ConfigObject("cont", parent), _name(name), _ring(rxTone)
 {
   // pass...
 }
@@ -26,23 +26,13 @@ Contact::setName(const QString &name) {
 }
 
 bool
-Contact::rxTone() const {
-  return _rxTone;
+Contact::ring() const {
+  return _ring;
 }
 void
-Contact::setRXTone(bool enable) {
-  _rxTone = enable;
+Contact::setRing(bool enable) {
+  _ring = enable;
   emit modified(this);
-}
-
-bool
-Contact::serialize(YAML::Node &node, const Context &context) {
-  if (! ConfigObject::serialize(node, context))
-    return false;
-  node["name"] = _name.toStdString();
-  if (_rxTone)
-    node["ring"] = _rxTone;
-  return true;
 }
 
 
@@ -75,18 +65,9 @@ DTMFContact::serialize(const Context &context) {
   if (node.IsNull())
     return node;
 
-  YAML::Node type;
   node.SetStyle(YAML::EmitterStyle::Flow);
-  type["dtmf"] = node;
+  YAML::Node type; type["dtmf"] = node;
   return type;
-}
-
-bool
-DTMFContact::serialize(YAML::Node &node, const Context &context) {
-  if (! Contact::serialize(node, context))
-    return false;
-  node["number"] = _number.toStdString();
-  return true;
 }
 
 
@@ -128,25 +109,9 @@ DigitalContact::serialize(const Context &context) {
     return node;
 
   node.SetStyle(YAML::EmitterStyle::Flow);
-
-  YAML::Node type;
-  switch (_type) {
-  case PrivateCall: type["private"] = node; break;
-  case GroupCall: type["group"] = node; break;
-  case AllCall: type["all"] = node; break;
-  }
+  YAML::Node type; type["dmr"] = node;
   return type;
 }
-
-bool
-DigitalContact::serialize(YAML::Node &node, const Context &context) {
-  if (! Contact::serialize(node, context))
-    return false;
-  if ((AllCall != _type) || (16777215 != _number))
-    node["number"] = _number;
-  return true;
-}
-
 
 
 /* ********************************************************************************************* *

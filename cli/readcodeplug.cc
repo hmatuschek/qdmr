@@ -37,12 +37,6 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
 
   QString filename = parser.positionalArguments().at(1);
 
-  if (!parser.isSet("csv") && !filename.endsWith(".conf") && !filename.endsWith(".csv") &&
-      !parser.isSet("bin") && !filename.endsWith(".bin") && !filename.endsWith(".dfu")) {
-    logError() << "Cannot determine output filetype, consider using --csv or --bin options.";
-    return -1;
-  }
-
   showProgress();
   QObject::connect(radio, &Radio::downloadProgress, updateProgress);
 
@@ -71,12 +65,39 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
       logError() << "Cannot write CSV file '" << filename << "': " << errorMessage;
       return -1;
     }
+  } else if (parser.isSet("yaml") || filename.endsWith(".yaml")) {
+    // decode codeplug
+    if (! radio->codeplug().decode(&config)) {
+      logError() << "Cannot decode codeplug: " << radio->errorMessage();
+      return -1;
+    }
 
-    return 0;
+    // try to write YAML file
+    QFile file(filename);
+    if (! file.open(QIODevice::WriteOnly)) {
+      logError() << "Cannot write YAML file '" << filename << "': " << file.errorString();
+      return -1;
+    }
+
+    QTextStream stream(&file);
+    if (! config.toYAML(stream)) {
+      logError() << "Cannot serialize config to YAML file '" << filename << "'.";
+      return -1;
+    }
+    stream.flush();
+    file.close();
+  } else if (parser.isSet("bin") || filename.endsWith(".bin") || filename.endsWith(".dfu")) {
+    // otherwise write binary code-plug
+    if (! radio->codeplug().write(filename)) {
+      logError() << "Cannot dump codplug into file '" << filename << "': "
+                 << radio->errorMessage();
+      return -1;
+    }
+  } else {
+    logError() << "Cannot determine file output type from '" << filename << "'. "
+               << "Consider using --csv, --yaml or --bin.";
+    return -1;
   }
-
-  // otherwise write binary code-plug
-  radio->codeplug().write(filename);
 
   return 0;
 }

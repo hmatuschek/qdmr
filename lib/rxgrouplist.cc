@@ -91,7 +91,7 @@ bool
 RXGroupList::serialize(YAML::Node &node, const Context &context) {
   if (! ConfigObject::serialize(node, context))
     return false;
-  node["name"] = _name.toStdString();
+
   YAML::Node contacts = YAML::Node(YAML::NodeType::Sequence);
   contacts.SetStyle(YAML::EmitterStyle::Flow);
   foreach (DigitalContact *contact, _contacts) {

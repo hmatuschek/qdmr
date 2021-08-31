@@ -2,6 +2,16 @@
 #include "config.hh"
 #include "logger.hh"
 #include "utils.hh"
+#include <QMetaProperty>
+#include <QMetaEnum>
+
+inline QStringList
+enumKeys(const QMetaEnum &e) {
+  QStringList lst;
+  for (int i=0; i<e.keyCount(); i++)
+    lst.push_back(e.key(i));
+  return lst;
+}
 
 
 /* ********************************************************************************************* *
@@ -17,6 +27,110 @@ const QString &
 AbstractConfigReader::errorMessage() const {
   return _errorMessage;
 }
+
+bool
+AbstractConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+  const QMetaObject *meta = obj->metaObject();
+  for (int p=QObject::staticMetaObject.propertyOffset(); p<meta->propertyCount(); p++) {
+    QMetaProperty prop = meta->property(p);
+    if (! prop.isValid())
+      continue;
+    if (prop.isEnumType()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check enum key
+      if (! node[prop.name()].IsScalar()) {
+        _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Expected enum key.")
+            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
+            .arg(prop.name()).arg(meta->className());
+        return false;
+      }
+      QMetaEnum e = prop.enumerator();
+      std::string key = node[prop.name()].as<std::string>();
+      bool ok=true; int value = e.keyToValue(key.c_str(), &ok);
+      if (! ok) {
+        _errorMessage = tr("%1:%2: Unknown key '%3' for enum '%4'. Expected one of %5.")
+            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
+            .arg(key.c_str()).arg(prop.name()).arg(enumKeys(e).join(", "));
+        return false;
+      }
+      // finally set property
+      prop.write(obj, value);
+    } else if (QString("bool") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Expected boolean value.")
+            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
+            .arg(prop.name()).arg(meta->className());
+        return false;
+      }
+      prop.write(obj, node[prop.name()].as<bool>());
+    } else if (QString("int") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Expected integer value.")
+            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
+            .arg(prop.name()).arg(meta->className());
+        return false;
+      }
+      prop.write(obj, node[prop.name()].as<int>());
+    } else if (QString("uint") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Expected unsigned integer value.")
+            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
+            .arg(prop.name()).arg(meta->className());
+        return false;
+      }
+      prop.write(obj, node[prop.name()].as<uint>());
+    } else if (QString("double") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Expected double value.")
+            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
+            .arg(prop.name()).arg(meta->className());
+        return false;
+      }
+      prop.write(obj, node[prop.name()].as<double>());
+    } else if (QString("QString") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Expected string.")
+            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
+            .arg(prop.name()).arg(meta->className());
+        return false;
+      }
+      prop.write(obj, QString::fromStdString(node[prop.name()].as<std::string>()));
+    } else {
+      logDebug() << "Unhandled property " << prop.name()
+                 << " of unhandled type " << prop.typeName() << ".";
+    }
+  }
+
+  return true;
+}
+
+bool
+AbstractConfigReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return true;
+}
+
 
 bool
 AbstractConfigReader::parseExtensions(
@@ -66,6 +180,16 @@ AbstractConfigReader::linkExtensions(
 
 
 /* ********************************************************************************************* *
+ * Implementation of ExtensionReader
+ * ********************************************************************************************* */
+ExtensionReader::ExtensionReader(QObject *parent)
+  : AbstractConfigReader(parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of ConfigReader
  * ********************************************************************************************* */
 QHash<QString, AbstractConfigReader *> ConfigReader::_extensions;
@@ -76,12 +200,12 @@ ConfigReader::ConfigReader(QObject *parent)
   // pass...
 }
 
-bool
+AbstractConfigReader *
 ConfigReader::addExtension(const QString &name, AbstractConfigReader *reader) {
   if (_extensions.contains(name))
-    return false;
+    return nullptr;
   _extensions[name] = reader;
-  return true;
+  return reader;
 }
 
 bool
@@ -605,14 +729,8 @@ ConfigReader::parseContact(Config *config, const YAML::Node &node, ConfigObject:
   }
 
   std::string type = node.begin()->first.as<std::string>();
-  if ("private" == type) {
-    if (! parsePrivateCallContact(config, node[type], ctx))
-      return false;
-  } else if ("group" == type) {
-    if (! parseGroupCallContact(config, node[type], ctx))
-      return false;
-  } else if ("all" == type) {
-    if (! parseAllCallContact(config, node[type], ctx))
+  if ("dmr" == type) {
+    if (! parseDMRContact(config, node[type], ctx))
       return false;
   } else if ("dtmf" == type) {
     if (! parseDTMFContact(config, node[type], ctx))
@@ -627,8 +745,8 @@ ConfigReader::parseContact(Config *config, const YAML::Node &node, ConfigObject:
 }
 
 bool
-ConfigReader::parsePrivateCallContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
-  PrivateCallContactReader reader;
+ConfigReader::parseDMRContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  DMRContactReader reader;
   DigitalContact *cont = reader.allocate(node, ctx)->as<DigitalContact>();
   if (nullptr == cont) {
     _errorMessage = tr("%1:%2: Cannot allocate private call contact: %3")
@@ -638,48 +756,6 @@ ConfigReader::parsePrivateCallContact(Config *config, const YAML::Node &node, Co
 
   if (! reader.parse(cont, node, ctx)) {
     _errorMessage = tr("%1:%2: Cannot parse private call contact: %3")
-        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
-    return false;
-  }
-
-  config->contacts()->add(cont);
-
-  return true;
-}
-
-bool
-ConfigReader::parseGroupCallContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
-  GroupCallContactReader reader;
-  DigitalContact *cont = reader.allocate(node, ctx)->as<DigitalContact>();
-  if (nullptr == cont) {
-    _errorMessage = tr("%1:%2: Cannot allocate group call contact: %3")
-        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
-    return false;
-  }
-
-  if (! reader.parse(cont, node, ctx)) {
-    _errorMessage = tr("%1:%2: Cannot parse group call contact: %3")
-        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
-    return false;
-  }
-
-  config->contacts()->add(cont);
-
-  return true;
-}
-
-bool
-ConfigReader::parseAllCallContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
-  AllCallContactReader reader;
-  DigitalContact *cont = reader.allocate(node, ctx)->as<DigitalContact>();
-  if (nullptr == cont) {
-    _errorMessage = tr("%1:%2: Cannot allocate all call contact: %3")
-        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
-    return false;
-  }
-
-  if (! reader.parse(cont, node, ctx)) {
-    _errorMessage = tr("%1:%2: Cannot parse all call contact: %3")
         .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
     return false;
   }
@@ -710,14 +786,8 @@ ConfigReader::linkContacts(Config *config, const YAML::Node &node, const ConfigO
 bool
 ConfigReader::linkContact(Contact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
   std::string type = node.begin()->first.as<std::string>();
-  if ("private" == type) {
-    if (! linkPrivateCallContact(contact->as<DigitalContact>(), node[type], ctx))
-      return false;
-  } else if ("group" == type) {
-    if (! linkGroupCallContact(contact->as<DigitalContact>(), node[type], ctx))
-      return false;
-  } else if ("all" == type) {
-    if (! linkAllCallContact(contact->as<DigitalContact>(), node[type], ctx))
+  if ("dmr" == type) {
+    if (! linkDMRContact(contact->as<DigitalContact>(), node[type], ctx))
       return false;
   } else if ("dtmf" == type) {
     if (! linkDTMFContact(contact->as<DTMFContact>(), node[type], ctx))
@@ -727,18 +797,8 @@ ConfigReader::linkContact(Contact *contact, const YAML::Node &node, const Config
 }
 
 bool
-ConfigReader::linkPrivateCallContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return PrivateCallContactReader().link(contact, node, ctx);
-}
-
-bool
-ConfigReader::linkGroupCallContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return GroupCallContactReader().link(contact, node, ctx);
-}
-
-bool
-ConfigReader::linkAllCallContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return AllCallContactReader().link(contact, node, ctx);
+ConfigReader::linkDMRContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return DMRContactReader().link(contact, node, ctx);
 }
 
 bool
@@ -1000,6 +1060,9 @@ ObjectReader::ObjectReader(QObject *parent)
 bool
 ObjectReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx)
 {
+  if (! AbstractConfigReader::parse(obj, node, ctx))
+    return false;
+
   if (! node.IsMap()) {
     _errorMessage = "Cannot parse object: Passed node is not a map.";
     return false;
@@ -1052,21 +1115,6 @@ RadioIdReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
 
-  if (node["number"] && node["number"].IsScalar()) {
-    rid->setId(node["number"].as<uint>());
-  } else {
-    _errorMessage = tr("%1:%2: Cannot parse radio id: No number defined.")
-        .arg(node.Mark().line).arg(node.Mark().column);
-    return false;
-  }
-
-  if (node["name"] && node["name"].IsScalar()) {
-    rid->setName(QString::fromStdString(node["name"].as<std::string>()));
-  } else {
-    _errorMessage = tr("%1:%2: Cannot parse radio id: No name defined.")
-        .arg(node.Mark().line).arg(node.Mark().column);
-  }
-
   if (! parseExtensions(_extensions, rid, node, ctx))
     return false;
 
@@ -1104,67 +1152,8 @@ ChannelReader::addExtension(const QString &name, AbstractConfigReader *reader) {
 
 bool
 ChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
-  Channel *channel = qobject_cast<Channel *>(obj);
-
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
-
-  if (node["name"] && node["name"].IsScalar()) {
-    channel->setName(QString::fromStdString(node["name"].as<std::string>()));
-  } else {
-    _errorMessage = "Cannot parse channel: No RX frequency set.";
-    return false;
-  }
-
-  if (node["rx"] && node["rx"].IsScalar()) {
-    channel->setRXFrequency(node["rx"].as<double>());
-  } else {
-    _errorMessage = "Cannot parse channel: No RX frequency set.";
-    return false;
-  }
-
-  if (node["tx"] && node["tx-offset"]) {
-    _errorMessage = tr("%1,%2: Both 'tx' and 'tx-offset' specified. Only one can be defined per channel!")
-        .arg(node.Mark().line).arg(node.Mark().column);
-    return false;
-  }
-
-  channel->setTXFrequency(channel->rxFrequency());
-  if (node["tx"] && node["tx"].IsScalar()) {
-    channel->setTXFrequency(node["tx"].as<double>());
-  } else if (node["tx-offset"] && node["tx-offset"].IsScalar()) {
-    channel->setTXFrequency(channel->rxFrequency()+node["tx-offset"].as<double>());
-  }
-
-  channel->setPower(Channel::HighPower);
-  if (node["power"] && node["power"].IsScalar()) {
-    QString power = QString::fromStdString(node["power"].as<std::string>());
-    if ("min" == power) {
-      channel->setPower(Channel::MinPower);
-    } else if ("low" == power) {
-      channel->setPower(Channel::LowPower);
-    } else if ("mid" == power) {
-      channel->setPower(Channel::MidPower);
-    } else if ("high" == power) {
-      channel->setPower(Channel::HighPower);
-    } else if ("max" == power) {
-      channel->setPower(Channel::MaxPower);
-    } else {
-      _errorMessage = tr("Cannot parse channel %1: Unknown power level '%2'")
-          .arg(channel->name()).arg(power);
-      return false;
-    }
-  }
-
-  channel->setTimeout(0);
-  if (node["tx-timeout"] && node["tx-timeout"].IsScalar()) {
-    channel->setTimeout(node["tx-timeout"].as<uint>());
-  }
-
-  channel->setRXOnly(false);
-  if (node["rx-only"] && node["rx-only"].IsScalar()) {
-    channel->setTimeout(node["rx-only"].as<bool>());
-  }
 
   if (! parseExtensions(_extensions, obj, node, ctx))
     return false;
@@ -1227,48 +1216,6 @@ DigitalChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
   DigitalChannel *channel = obj->as<DigitalChannel>();
   if (nullptr == channel) {
     _errorMessage = "Cannot parse digital channel: No DigitalChannel object passed.";
-    return false;
-  }
-
-  if (node["color-code"] && node["color-code"].IsScalar()) {
-    channel->setColorCode(node["color-code"].as<uint>());
-  } else {
-    _errorMessage = tr("Cannot parse digital channel '%1': No color-code set.")
-        .arg(channel->name());
-    return false;
-  }
-
-  if (node["admit"] && node["admit"].IsScalar()) {
-    QString admit = QString::fromStdString(node["admit"].as<std::string>());
-    if ("always" == admit) {
-      channel->setAdmit(DigitalChannel::AdmitNone);
-    } else if ("free" == admit) {
-      channel->setAdmit(DigitalChannel::AdmitFree);
-    } else if ("color-code" == admit) {
-      channel->setAdmit(DigitalChannel::AdmitColorCode);
-    } else {
-      _errorMessage = tr("Cannot parse digital channel %1: Unknown admit criterion '%2'")
-          .arg(channel->name()).arg(admit);
-      return false;
-    }
-  } else {
-    _errorMessage = "Cannot parse digital channel: No admit criterion set.";
-    return false;
-  }
-
-  if (node["time-slot"] && node["time-slot"].IsScalar()) {
-    uint ts = node["time-slot"].as<uint>();
-    if (1 == ts) {
-      channel->setTimeSlot(DigitalChannel::TimeSlot1);
-    } else if (2 == ts) {
-      channel->setTimeSlot(DigitalChannel::TimeSlot2);
-    } else {
-      _errorMessage = tr("Cannot parse digital channel %1: Unknown time-slot '%2'")
-          .arg(channel->name()).arg(ts);
-      return false;
-    }
-  } else {
-    _errorMessage = "Cannot parse digital channel: No time-slot set.";
     return false;
   }
 
@@ -1369,21 +1316,15 @@ ConfigObject *
 AnalogChannelReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
   return new AnalogChannel("", 0,0, Channel::LowPower, -1, false, AnalogChannel::AdmitNone,
                            1, Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE,
-                           AnalogChannel::BWNarrow, nullptr, nullptr);
+                           AnalogChannel::Narrow, nullptr, nullptr);
 }
 
 bool
 AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
   AnalogChannel *channel = obj->as<AnalogChannel>();
 
-  if (! ChannelReader::parse(obj, node, ctx)) {
+  if (! ChannelReader::parse(obj, node, ctx))
     return false;
-  }
-
-  channel->setSquelch(1);
-  if (node["squelch"] && node["squelch"].IsScalar()) {
-    channel->setSquelch(node["squelch"].as<int>());
-  }
 
   channel->setTXTone(Signaling::SIGNALING_NONE);
   if (node["rx-tone"] && node["rx-tone"].IsMap()) {
@@ -1404,32 +1345,6 @@ AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObje
       int code = node["tx-tone"]["dcs"].as<int>();
       bool inverted = (code < 0); code = std::abs(code);
       channel->setTXTone(Signaling::fromDCSNumber(code, inverted));
-    }
-  }
-
-  channel->setBandwidth(AnalogChannel::BWNarrow);
-  if (node["band-width"] && node["band-width"].IsScalar()) {
-    QString bw = QString::fromStdString(node["band-width"].as<std::string>());
-    if ("narrow" == bw) {
-      channel->setBandwidth(AnalogChannel::BWNarrow);
-    } else {
-      channel->setBandwidth(AnalogChannel::BWWide);
-    }
-  }
-
-  channel->setAdmit(AnalogChannel::AdmitNone);
-  if (node["admit"] && node["admit"].IsScalar()) {
-    QString admit = QString::fromStdString(node["admit"].as<std::string>());
-    if ("always" == admit) {
-      channel->setAdmit(AnalogChannel::AdmitNone);
-    } else if ("free" == admit) {
-      channel->setAdmit(AnalogChannel::AdmitFree);
-    } else if ("tone" == admit) {
-      channel->setAdmit(AnalogChannel::AdmitTone);
-    } else {
-      _errorMessage = tr("Cannot parse digital channel %1: Unknown admit criterion '%2'")
-          .arg(channel->name()).arg(admit);
-      return false;
     }
   }
 
@@ -1489,17 +1404,8 @@ ZoneReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
 
 bool
 ZoneReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
-  Zone *zone = qobject_cast<Zone *>(obj);
-
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
-
-  if (node["name"] && node["name"].IsScalar()) {
-    zone->setName(QString::fromStdString(node["name"].as<std::string>()));
-  } else {
-    _errorMessage = tr("No name defined");
-    return false;
-  }
 
   if (! parseExtensions(_extensions, obj, node, ctx))
     return false;
@@ -1578,21 +1484,8 @@ ContactReader::addExtension(const QString &name, AbstractConfigReader *reader) {
 
 bool
 ContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
-  Contact *contact = qobject_cast<Contact *>(obj);
-
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
-
-  if (node["name"] && node["name"].IsScalar()) {
-    contact->setName(QString::fromStdString(node["name"].as<std::string>()));
-  } else {
-    _errorMessage = tr("Cannot parse zone: No name defined");
-    return false;
-  }
-
-  if (node["ring"] && node["ring"].IsScalar()) {
-    contact->setRXTone(node["ring"].as<bool>());
-  }
 
   if (! parseExtensions(_extensions, obj, node, ctx))
     return false;
@@ -1612,24 +1505,29 @@ ContactReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObjec
 /* ********************************************************************************************* *
  * Implementation of DigitalContactReader
  * ********************************************************************************************* */
-QHash<QString, AbstractConfigReader *> DigitalContactReader::_extensions;
+QHash<QString, AbstractConfigReader *> DMRContactReader::_extensions;
 
-DigitalContactReader::DigitalContactReader(QObject *parent)
+DMRContactReader::DMRContactReader(QObject *parent)
   : ContactReader(parent)
 {
   // pass...
 }
 
 bool
-DigitalContactReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+DMRContactReader::addExtension(const QString &name, AbstractConfigReader *reader) {
   if (_extensions.contains(name))
     return false;
   _extensions[name] = reader;
   return true;
 }
 
+ConfigObject *
+DMRContactReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return new DigitalContact(DigitalContact::PrivateCall, "", 0);
+}
+
 bool
-DigitalContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+DMRContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
   if (! ContactReader::parse(obj, node, ctx))
     return false;
 
@@ -1640,112 +1538,12 @@ DigitalContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
 }
 
 bool
-DigitalContactReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+DMRContactReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
   if (! ContactReader::link(obj, node, ctx))
     return false;
 
   if (! linkExtensions(_extensions, obj, node, ctx))
     return false;
-
-  return true;
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of PrivateCallContactReader
- * ********************************************************************************************* */
-PrivateCallContactReader::PrivateCallContactReader(QObject *parent)
-  : DigitalContactReader(parent)
-{
-  // pass...
-}
-
-ConfigObject *
-PrivateCallContactReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return new DigitalContact(DigitalContact::PrivateCall, "", 0);
-}
-
-bool
-PrivateCallContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
-  DigitalContact *contact = qobject_cast<DigitalContact *>(obj);
-
-  if (! DigitalContactReader::parse(obj, node, ctx))
-    return false;
-
-  if (node["number"] && node["number"].IsScalar()) {
-    contact->setNumber(node["number"].as<uint>());
-  } else {
-    _errorMessage = tr("Cannot parse private call '%1': No number specified.").arg(contact->name());
-    return false;
-  }
-
-  return true;
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of GroupCallContactReader
- * ********************************************************************************************* */
-GroupCallContactReader::GroupCallContactReader(QObject *parent)
-  : DigitalContactReader(parent)
-{
-  // pass...
-}
-
-ConfigObject *
-GroupCallContactReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return new DigitalContact(DigitalContact::GroupCall, "", 0);
-}
-
-bool
-GroupCallContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
-  DigitalContact *contact = qobject_cast<DigitalContact *>(obj);
-
-  if (! DigitalContactReader::parse(obj, node, ctx))
-    return false;
-
-  if (node["number"] && node["number"].IsScalar()) {
-    contact->setNumber(node["number"].as<uint>());
-  } else {
-    _errorMessage = tr("Cannot parse group call '%1': No number specified.").arg(contact->name());
-    return false;
-  }
-
-  return true;
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of AllCallContactReader
- * ********************************************************************************************* */
-AllCallContactReader::AllCallContactReader(QObject *parent)
-  : DigitalContactReader(parent)
-{
-  // pass...
-}
-
-ConfigObject *
-AllCallContactReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return new DigitalContact(DigitalContact::AllCall, "", 16777215);
-}
-
-bool
-AllCallContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
-  if (! DigitalContactReader::parse(obj, node, ctx))
-    return false;
-
-  DigitalContact *contact = obj->as<DigitalContact>();
-
-  if (node["number"]) {
-    if (! node["number"].IsScalar()) {
-      _errorMessage = tr("%1,%2: Specified number is not scalar.")
-          .arg(node["number"].Mark().line).arg(node["number"].Mark().column);
-      return false;
-    }
-    contact->setNumber(node["number"].as<uint>());
-  } else {
-    contact->setNumber(16777215);
-  }
 
   return true;
 }
@@ -2128,17 +1926,8 @@ GroupListReader::allocate(const YAML::Node &node, const ConfigObject::Context &c
 
 bool
 GroupListReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
-  RXGroupList *list = qobject_cast<RXGroupList *>(obj);
-
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
-
-  if (node["name"] && node["name"].IsScalar()) {
-    list->setName(QString::fromStdString(node["name"].as<std::string>()));
-  } else {
-    _errorMessage = tr("Cannot parse group list: No name defined");
-    return false;
-  }
 
   if (! parseExtensions(_extensions, obj, node, ctx))
     return false;

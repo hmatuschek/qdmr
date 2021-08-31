@@ -75,7 +75,7 @@ Channel::setPower(Power power) {
 }
 
 uint
-Channel::txTimeout() const {
+Channel::timeout() const {
   return _txTimeOut;
 }
 bool
@@ -122,30 +122,6 @@ bool
 Channel::serialize(YAML::Node &node, const Context &context) {
   if (! ConfigObject::serialize(node, context))
     return false;
-
-  node["name"] = _name.toStdString();
-
-  node["rx"] = _rxFreq;
-
-  if (_rxFreq != _txFreq) {
-    if (std::abs(_rxFreq-_txFreq)<100)
-      node["tx-offset"] = std::round((_txFreq-_rxFreq)*1e6)/1e6;
-    else
-      node["tx"] = _txFreq;
-  }
-
-  switch (_power) {
-  case MinPower:  node["power"] = "min"; break;
-  case LowPower:  node["power"] = "low"; break;
-  case MidPower:  node["power"] = "mid"; break;
-  case HighPower: node["power"] = "high"; break;
-  case MaxPower:  node["power"] = "max"; break;
-  }
-
-  if (0 < _txTimeOut)
-    node["tot"] = _txTimeOut;
-  if (_rxOnly)
-    node["rx-only"] = _rxOnly;
 
   if (_scanlist && context.contains(_scanlist))
     node["scan-list"] = context.getId(_scanlist).toStdString();
@@ -253,12 +229,7 @@ bool
 AnalogChannel::serialize(YAML::Node &node, const Context &context) {
   if (! Channel::serialize(node, context))
     return false;
-  switch (_admit) {
-  case AdmitNone: break;
-  case AdmitFree: node["admit"] = "free"; break;
-  case AdmitTone: node["admit"] = "tone"; break;
-  }
-  node["squelch"] = _squelch;
+
   if (Signaling::SIGNALING_NONE != _rxTone) {
     YAML::Node tone;
     if (Signaling::isCTCSS(_rxTone))
@@ -270,6 +241,7 @@ AnalogChannel::serialize(YAML::Node &node, const Context &context) {
     tone.SetStyle(YAML::EmitterStyle::Flow);
     node["rx-tone"] = tone;
   }
+
   if (Signaling::SIGNALING_NONE != _txTone) {
     YAML::Node tone;
     if (Signaling::isCTCSS(_txTone))
@@ -281,10 +253,7 @@ AnalogChannel::serialize(YAML::Node &node, const Context &context) {
     tone.SetStyle(YAML::EmitterStyle::Flow);
     node["tx-tone"] = tone;
   }
-  if (BWWide == _bw)
-    node["band-width"] = "wide";
-  else
-    node["band-width"] = "narrow";
+
   if (_aprsSystem && context.contains(_aprsSystem))
     node["aprs"] = context.getId(_aprsSystem).toStdString();
 
@@ -348,7 +317,7 @@ DigitalChannel::setColorCode(uint cc) {
 }
 
 DigitalChannel::TimeSlot
-DigitalChannel::timeslot() const {
+DigitalChannel::timeSlot() const {
   return _timeSlot;
 }
 bool
@@ -473,19 +442,6 @@ DigitalChannel::serialize(YAML::Node &node, const Context &context) {
   if (_radioId && context.contains(_radioId))
     node["radio-id"] = context.getId(_radioId).toStdString();
 
-  switch (_admit) {
-  case AdmitNone: break;
-  case AdmitFree: node["admit"] = "free"; break;
-  case AdmitColorCode: node["admit"] = "color-code"; break;
-  }
-
-  node["color-code"] = _colorCode;
-
-  switch(_timeSlot) {
-  case TimeSlot1: node["time-slot"] = 1; break;
-  case TimeSlot2: node["time-slot"] = 2; break;
-  }
-
   if (_rxGroup && context.contains(_rxGroup))
     node["group-list"] = context.getId(_rxGroup).toStdString();
 
@@ -557,7 +513,7 @@ ChannelList::findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot t
          (1e-6<std::abs(channel(i)->rxFrequency()-rx)) )
       continue;
     DigitalChannel *digi = channel(i)->as<DigitalChannel>();
-    if (digi->timeslot() != ts)
+    if (digi->timeSlot() != ts)
       continue;
     if (digi->colorCode() != cc)
       continue;

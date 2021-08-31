@@ -55,8 +55,8 @@ AnalogChannelDialog::construct() {
   txAdmit->setItemData(2, uint(AnalogChannel::AdmitTone));
   populateCTCSSBox(rxTone, (nullptr != _channel ? _channel->rxTone() : Signaling::SIGNALING_NONE));
   populateCTCSSBox(txTone, (nullptr != _channel ? _channel->txTone() : Signaling::SIGNALING_NONE));
-  bandwidth->setItemData(0, uint(AnalogChannel::BWNarrow));
-  bandwidth->setItemData(1, uint(AnalogChannel::BWWide));
+  bandwidth->setItemData(0, uint(AnalogChannel::Narrow));
+  bandwidth->setItemData(1, uint(AnalogChannel::Wide));
   aprsList->addItem(tr("[None]"), QVariant::fromValue((APRSSystem *)nullptr));
   aprsList->setCurrentIndex(0);
   for (int i=0; i<_config->posSystems()->aprsCount(); i++) {
@@ -77,7 +77,7 @@ AnalogChannelDialog::construct() {
     case Channel::LowPower: power->setCurrentIndex(3); break;
     case Channel::MinPower: power->setCurrentIndex(4); break;
     }
-    txTimeout->setValue(_channel->txTimeout());
+    txTimeout->setValue(_channel->timeout());
     rxOnly->setChecked(_channel->rxOnly());
     switch (_channel->admit()) {
       case AnalogChannel::AdmitNone: txAdmit->setCurrentIndex(0); break;
@@ -85,9 +85,9 @@ AnalogChannelDialog::construct() {
       case AnalogChannel::AdmitTone: txAdmit->setCurrentIndex(2); break;
     }
     squelch->setValue(_channel->squelch());
-    if (AnalogChannel::BWNarrow == _channel->bandwidth())
+    if (AnalogChannel::Narrow == _channel->bandwidth())
       bandwidth->setCurrentIndex(0);
-    else if (AnalogChannel::BWWide == _channel->bandwidth())
+    else if (AnalogChannel::Wide == _channel->bandwidth())
       bandwidth->setCurrentIndex(1);
   }
 

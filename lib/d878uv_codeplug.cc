@@ -274,11 +274,11 @@ D878UVCodeplug::channel_t::toChannelObj() const {
     default:
       break;
     }
-    AnalogChannel::Bandwidth bw = AnalogChannel::BWNarrow;
+    AnalogChannel::Bandwidth bw = AnalogChannel::Narrow;
     if (BW_12_5_KHZ == bandwidth)
-      bw = AnalogChannel::BWNarrow;
+      bw = AnalogChannel::Narrow;
     else
-      bw = AnalogChannel::BWWide;
+      bw = AnalogChannel::Wide;
     ch = new AnalogChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           1, getRXTone(), getTXTone(), bw, nullptr);
@@ -418,7 +418,7 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     // set bandwidth
-    bandwidth = (AnalogChannel::BWNarrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
+    bandwidth = (AnalogChannel::Narrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
     // Set APRS system
     rx_gps = 0;
     if (nullptr != ac->aprsSystem()) {
@@ -438,7 +438,7 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     // set color code
     color_code = dc->colorCode();
     // set time-slot
-    slot2 = (DigitalChannel::TimeSlot2 == dc->timeslot()) ? 1 : 0;
+    slot2 = (DigitalChannel::TimeSlot2 == dc->timeSlot()) ? 1 : 0;
     // link transmit contact
     if (nullptr == dc->txContact()) {
       contact_index = 0;
@@ -751,7 +751,7 @@ D878UVCodeplug::aprs_setting_t::linkAPRSSystem(APRSSystem *sys, CodeplugContext 
     // If no channel is found, create one with the settings from APRS channel:
     ch = new AnalogChannel("APRS Channel", getFrequency(), getFrequency(), getPower(),
                            0, false, AnalogChannel::AdmitFree, 1, Signaling::SIGNALING_NONE,
-                           getSignaling(), AnalogChannel::BWWide, nullptr);
+                           getSignaling(), AnalogChannel::Wide, nullptr);
     logInfo() << "No matching APRS chanel found for TX frequency " << getFrequency()
               << ", create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);
@@ -929,7 +929,7 @@ D878UVCodeplug::roaming_channel_t::fromChannel(DigitalChannel *ch) {
   setRXFrequency(ch->rxFrequency());
   setTXFrequency(ch->txFrequency());
   setColorCode(ch->colorCode());
-  setTimeslot(ch->timeslot());
+  setTimeslot(ch->timeSlot());
 }
 
 DigitalChannel *

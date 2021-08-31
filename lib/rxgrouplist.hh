@@ -13,6 +13,8 @@ class RXGroupList: public ConfigObject
 {
 	Q_OBJECT
 
+  Q_PROPERTY(QString name READ name WRITE setName)
+
 public:
   /** Constructor.
    * @param name Specifies the name of the group list.
@@ -23,6 +25,7 @@ public:
   int count() const;
   /** Resets & clears this group list. */
   void clear();
+
   /** Returns the name of this group list. */
 	const QString &name() const;
   /** Sets the name of this group list. */

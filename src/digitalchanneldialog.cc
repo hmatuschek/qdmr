@@ -87,7 +87,7 @@ DigitalChannelDialog::construct() {
   dmrID->addItem(tr("[Default]"), QVariant::fromValue(nullptr));
   dmrID->setCurrentIndex(0);
   for (int i=0; i<_config->radioIDs()->count(); i++) {
-    dmrID->addItem(QString::number(_config->radioIDs()->getId(i)->id()),
+    dmrID->addItem(QString::number(_config->radioIDs()->getId(i)->number()),
                    QVariant::fromValue(_config->radioIDs()->getId(i)));
     if (_channel && (_config->radioIDs()->getId(i) == _channel->radioId())) {
       dmrID->setCurrentIndex(i+1);
@@ -105,7 +105,7 @@ DigitalChannelDialog::construct() {
     case Channel::LowPower: power->setCurrentIndex(3); break;
     case Channel::MinPower: power->setCurrentIndex(4); break;
     }
-    txTimeout->setValue(_channel->txTimeout());
+    txTimeout->setValue(_channel->timeout());
     rxOnly->setChecked(_channel->rxOnly());
     switch (_channel->admit()) {
       case DigitalChannel::AdmitNone: txAdmit->setCurrentIndex(0); break;
@@ -113,9 +113,9 @@ DigitalChannelDialog::construct() {
       case DigitalChannel::AdmitColorCode: txAdmit->setCurrentIndex(2); break;
     }
     colorCode->setValue(_channel->colorCode());
-    if (DigitalChannel::TimeSlot1 == _channel->timeslot())
+    if (DigitalChannel::TimeSlot1 == _channel->timeSlot())
       timeSlot->setCurrentIndex(0);
-    else if (DigitalChannel::TimeSlot2 == _channel->timeslot())
+    else if (DigitalChannel::TimeSlot2 == _channel->timeSlot())
       timeSlot->setCurrentIndex(1);
   }
 }

@@ -9,7 +9,7 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   ui->setupUi(this);
 
   if (_config->radioIDs()->defaultId()) {
-    ui->dmrID->setText(QString::number(_config->radioIDs()->defaultId()->id()));
+    ui->dmrID->setText(QString::number(_config->radioIDs()->defaultId()->number()));
     ui->radioName->setText(_config->radioIDs()->defaultId()->name());
   }
   ui->introLine1->setText(_config->introLine1());
@@ -38,7 +38,7 @@ GeneralSettingsView::hideDMRID(bool hidden) {
 void
 GeneralSettingsView::onConfigModified() {
   if (_config->radioIDs()->defaultId()) {
-    ui->dmrID->setText(QString::number(_config->radioIDs()->defaultId()->id()));
+    ui->dmrID->setText(QString::number(_config->radioIDs()->defaultId()->number()));
     ui->radioName->setText(_config->radioIDs()->defaultId()->name());
   } else {
     ui->dmrID->setText("0");
@@ -57,9 +57,9 @@ GeneralSettingsView::onDMRIDChanged() {
     _config->radioIDs()->setDefaultId(idx);
   } else if (nullptr == _config->radioIDs()->defaultId()) {
     _config->radioIDs()->setDefaultId(0);
-    _config->radioIDs()->defaultId()->setId(ui->dmrID->text().toUInt());
+    _config->radioIDs()->defaultId()->setNumber(ui->dmrID->text().toUInt());
   } else {
-    _config->radioIDs()->defaultId()->setId(ui->dmrID->text().toUInt());
+    _config->radioIDs()->defaultId()->setNumber(ui->dmrID->text().toUInt());
   }
 }
 

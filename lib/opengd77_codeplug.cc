@@ -137,7 +137,7 @@ OpenGD77Codeplug::channel_t::toChannelObj() const {
       logError() << "Unknwon admit criterion " << int(admit_criteria);
       return nullptr;
     }
-    AnalogChannel::Bandwidth bw = (BW_25_KHZ == bandwidth) ? AnalogChannel::BWWide : AnalogChannel::BWNarrow;
+    AnalogChannel::Bandwidth bw = (BW_25_KHZ == bandwidth) ? AnalogChannel::Wide : AnalogChannel::Narrow;
     return new AnalogChannel(
           name, rxF, txF, pwr, timeout, rxOnly, admit, squelch,  getRXTone(), getTXTone(),
           bw, nullptr);
@@ -205,7 +205,7 @@ OpenGD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf
     break;
   }
 
-  tot = c->txTimeout()/15;
+  tot = c->timeout()/15;
   rx_only = c->rxOnly() ? 1 : 0;
   bandwidth = BW_12_5_KHZ;
 
@@ -217,7 +217,7 @@ OpenGD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf
       case AnalogChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE; break;
       default: admit_criteria = ADMIT_CH_FREE; break;
     }
-    bandwidth = (AnalogChannel::BWWide == ac->bandwidth()) ? BW_25_KHZ : BW_12_5_KHZ;
+    bandwidth = (AnalogChannel::Wide == ac->bandwidth()) ? BW_25_KHZ : BW_12_5_KHZ;
     squelch = SQ_NORMAL; //ac->squelch();
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
@@ -230,7 +230,7 @@ OpenGD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf
       case DigitalChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE; break;
       case DigitalChannel::AdmitColorCode: admit_criteria = ADMIT_COLOR; break;
     }
-    repeater_slot2 = (DigitalChannel::TimeSlot1 == dc->timeslot()) ? 0 : 1;
+    repeater_slot2 = (DigitalChannel::TimeSlot1 == dc->timeSlot()) ? 0 : 1;
     colorcode_rx = colorcode_tx = dc->colorCode();
     scan_list_index = conf->scanlists()->indexOf(dc->scanList()) + 1;
     group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList()) + 1;
@@ -305,7 +305,7 @@ OpenGD77Codeplug::contact_t::fromContactObj(const DigitalContact *cont, const Co
     case DigitalContact::GroupCall:   type = CALL_GROUP; break;
     case DigitalContact::AllCall:     type = CALL_ALL; break;
   }
-  if (cont->rxTone())
+  if (cont->ring())
     receive_tone = ring_style = 1;
 }
 
@@ -423,7 +423,7 @@ OpenGD77Codeplug::encode(Config *config, const Flags &flags) {
     return false;
   }
   gs->setName(config->radioIDs()->defaultId()->name());
-  gs->setRadioId(config->radioIDs()->defaultId()->id());
+  gs->setRadioId(config->radioIDs()->defaultId()->number());
 
   intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO, EEPROM);
   it->setIntroLine1(config->introLine1());

@@ -11,12 +11,15 @@ class RadioID : public ConfigObject
 {
   Q_OBJECT
 
+  Q_PROPERTY(QString name READ name WRITE setName)
+  Q_PROPERTY(uint number READ number WRITE setNumber)
+
 public:
   /** Constructor.
    * @param name Specifies the name of the ID.
    * @param id Specifies the DMR ID.
    * @param parent Specifies the parent QObject owning this object. */
-  explicit RadioID(const QString &name, uint32_t id, QObject *parent = nullptr);
+  explicit RadioID(const QString &name, uint32_t number, QObject *parent = nullptr);
 
   /** Returns the name of the DMR ID. */
   const QString &name() const;
@@ -24,9 +27,9 @@ public:
   void setName(const QString &name);
 
   /** Returns the DMR ID. */
-  uint32_t id() const;
+  uint32_t number() const;
   /** Sets the DMR ID. */
-  void setId(uint32_t id);
+  void setNumber(uint32_t number);
 
   YAML::Node serialize(const Context &context);
 
@@ -41,7 +44,7 @@ protected:
   /** Holds the name of the DMR ID. */
   QString _name;
   /** Holds the DMR ID. */
-  uint32_t _id;
+  uint32_t _number;
 };
 
 
@@ -77,6 +80,7 @@ public:
   virtual bool delId(uint32_t id);
 
 protected slots:
+  /** Gets call whenever the default DMR ID gets deleted. */
   void onDefaultIdDeleted();
 
 protected:

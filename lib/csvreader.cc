@@ -1213,9 +1213,9 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   }
   AnalogChannel::Bandwidth bw;
   if (25 == token.value.toFloat()) {
-    bw = AnalogChannel::BWWide;
+    bw = AnalogChannel::Wide;
   } else if (12.5 == token.value.toFloat()) {
-    bw = AnalogChannel::BWNarrow;
+    bw = AnalogChannel::Narrow;
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected '12.5' or '25'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);

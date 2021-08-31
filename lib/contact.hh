@@ -15,12 +15,15 @@ class Contact: public ConfigObject
 {
 	Q_OBJECT
 
+  Q_PROPERTY(QString name READ name WRITE setName)
+  Q_PROPERTY(bool ring READ ring WRITE setRing)
+
 protected:
   /** Hidden constructor.
    * @param name   Specifies the name of the contact.
-   * @param rxTone Specifies whether a ring-tone for this contact is used.
+   * @param ring Specifies whether a ring-tone for this contact is used.
    * @param parent Specifies the QObject parent. */
-	Contact(const QString &name, bool rxTone=true, QObject *parent=nullptr);
+  Contact(const QString &name, bool ring=true, QObject *parent=nullptr);
 
 public:
   /** Returns the name of the contact. */
@@ -28,9 +31,9 @@ public:
   /** (Re)Sets the name of the contact. */
 	bool setName(const QString &name);
   /** Returns @c true if the ring-tone is enabled for this contact. */
-  bool rxTone() const;
+  bool ring() const;
   /** Enables/disables the ring-tone for this contact. */
-  void setRXTone(bool enable);
+  void setRing(bool enable);
 
   /** Typecheck contact.
    * For example, @c contact->is<DigitalContact>() returns @c true if @c contact is a
@@ -51,13 +54,10 @@ public:
 	}
 
 protected:
-  bool serialize(YAML::Node &node, const Context &context);
-
-protected:
   /** Contact name. */
 	QString _name;
   /** Ringtone enabled? */
-  bool _rxTone;
+  bool _ring;
 };
 
 
@@ -67,13 +67,15 @@ class DTMFContact: public Contact
 {
 	Q_OBJECT
 
+  Q_PROPERTY(QString number READ number WRITE setNumber)
+
 public:
   /** Constructs a DTMF (analog) contact.
    * @param name   Specifies the contact name.
    * @param number Specifies the DTMF number (0-9,A,B,C,D,*,#).
    * @param rxTone Specifies whether the ring-tone is enabled for this contact.
    * @param parent Specifies the QObject parent. */
-	DTMFContact(const QString &name, const QString &number, bool rxTone=false, QObject *parent=nullptr);
+  DTMFContact(const QString &name, const QString &number, bool ring=false, QObject *parent=nullptr);
 
   YAML::Node serialize(const Context &context);
 
@@ -82,9 +84,6 @@ public:
 	const QString &number() const;
   /** (Re-)Sets the DTMF number of this contact. */
 	bool setNumber(const QString &number);
-
-protected:
-  bool serialize(YAML::Node &node, const Context &context);
 
 protected:
   /** The DTMF number. */
@@ -98,6 +97,9 @@ class DigitalContact: public Contact
 {
 	Q_OBJECT
 
+  Q_PROPERTY(Type type READ type WRITE setType)
+  Q_PROPERTY(uint number READ number WRITE setNumber)
+
 public:
   /** Possible call types for a contact. */
 	typedef enum {
@@ -105,6 +107,7 @@ public:
     GroupCall,     ///< A group call.
     AllCall        ///< An all-call.
 	} Type;
+  Q_ENUM(Type)
 
 public:
   /** Constructs a DMR (digital) contact.
@@ -113,7 +116,7 @@ public:
    * @param number Specifies the DMR number for this contact.
    * @param rxTone Specifies whether the ring-tone is enabled for this contact.
    * @param parent Specifies the QObject parent. */
-	DigitalContact(Type type, const QString &name, uint number, bool rxTone=false, QObject *parent=nullptr);
+  DigitalContact(Type type, const QString &name, uint number, bool ring=false, QObject *parent=nullptr);
 
   YAML::Node serialize(const Context &context);
 
@@ -125,9 +128,6 @@ public:
 	uint number() const;
   /** (Re-)Sets the DMR number of the contact. */
 	bool setNumber(uint number);
-
-protected:
-  bool serialize(YAML::Node &node, const Context &context);
 
 protected:
   /** The call type. */

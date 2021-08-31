@@ -1,6 +1,10 @@
 #include "configobject.hh"
 #include "logger.hh"
 
+#include <QMetaProperty>
+#include <QMetaEnum>
+
+
 /* ********************************************************************************************* *
  * Implementation of ConfigObject::Context
  * ********************************************************************************************* */
@@ -90,11 +94,39 @@ ConfigObject::serialize(YAML::Node &node, const Context &context){
   if (context.contains(this))
     node["id"] = context.getId(this).toStdString();
 
+  // Serialize all properties
+  const QMetaObject *meta = metaObject();
+  for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
+    QMetaProperty prop = meta->property(p);
+    if (! prop.isValid())
+      continue;
+    if (prop.isEnumType()) {
+      QMetaEnum e = prop.enumerator();
+      QVariant value = prop.read(this);
+      const char *key = e.valueToKey(value.toInt());
+      node[prop.name()] = key;
+    } else if (QString("bool") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).toBool();
+    } else if (QString("int") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).toInt();
+    } else if (QString("uint") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).toUInt();
+    } else if (QString("double") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).toDouble();
+    } else if (QString("QString") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).toString().toStdString();
+    } else {
+      logDebug() << "Unhandled property " << prop.name()
+                 << " of unknown type " << prop.typeName() << ".";
+    }
+  }
+
+  // Serialize extensions
   foreach (QString name, _extensions.keys()) {
     YAML::Node extNode = _extensions[name]->serialize(context);
     if (extNode.IsNull())
       return false;
-    node["name"] = extNode;
+    node[name.toStdString()] = extNode;
   }
   return true;
 }
@@ -114,8 +146,7 @@ ConfigObject::extension(const QString &name) const {
   return _extensions.value(name, nullptr);
 }
 
-ConfigObject *
-ConfigObject::extension(const QString &name) {
+ConfigObject *ConfigObject::extension(const QString &name) {
   return _extensions.value(name, nullptr);
 }
 
@@ -127,6 +158,24 @@ ConfigObject::addExtension(const QString &name, ConfigObject *ext) {
     _extensions[name]->deleteLater();
   _extensions.insert(name, ext);
   ext->setParent(this);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of ConfigExtension
+ * ********************************************************************************************* */
+ConfigExtension::ConfigExtension(const QString &idBase, QObject *parent)
+  : ConfigObject(idBase, parent)
+{
+  // pass...
+}
+
+bool
+ConfigExtension::serialize(YAML::Node &node, const Context &context) {
+  // Call parent method
+  if (! ConfigObject::serialize(node, context))
+    return false;
+  return true;
 }
 
 
