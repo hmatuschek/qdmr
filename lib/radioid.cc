@@ -55,7 +55,7 @@ RadioID::serialize(YAML::Node &node, const Context &context) {
  * Implementation of RadioIDList
  * ********************************************************************************************* */
 RadioIDList::RadioIDList(QObject *parent)
-  : ConfigObjectList(parent), _default(nullptr)
+  : ConfigObjectList(RadioID::staticMetaObject, parent), _default(nullptr)
 {
   // pass...
 }

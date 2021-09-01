@@ -177,7 +177,7 @@ Zone::serialize(YAML::Node &node, const Context &context) {
  * Implementation of ZoneList
  * ********************************************************************************************* */
 ZoneList::ZoneList(QObject *parent)
-  : ConfigObjectList(parent)
+  : ConfigObjectList(Zone::staticMetaObject, parent)
 {
   // pass...
 }

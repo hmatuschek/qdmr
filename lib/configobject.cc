@@ -182,8 +182,8 @@ ConfigExtension::serialize(YAML::Node &node, const Context &context) {
 /* ********************************************************************************************* *
  * Implementation of AbstractConfigObjectList
  * ********************************************************************************************* */
-AbstractConfigObjectList::AbstractConfigObjectList(QObject *parent)
-  : QObject(parent), _items()
+AbstractConfigObjectList::AbstractConfigObjectList(const QMetaObject &elementType, QObject *parent)
+  : QObject(parent), _elementType(elementType), _items()
 {
   // pass...
 }
@@ -220,6 +220,12 @@ int AbstractConfigObjectList::add(ConfigObject *obj, int row) {
     return -1;
   if (-1 == row)
     row = _items.size();
+  // Check type
+  if (! obj->inherits(_elementType.className())) {
+    logDebug() << "Cannot add element of type " << obj->metaObject()->className()
+               << " to list, expected instances of " << _elementType.className();
+    return false;
+  }
   _items.insert(row, obj);
   // Otherwise connect to object
   connect(obj, SIGNAL(destroyed(QObject*)), this, SLOT(onElementDeleted(QObject*)));
@@ -301,8 +307,8 @@ AbstractConfigObjectList::onElementDeleted(QObject *obj) {
 /* ********************************************************************************************* *
  * Implementation of ConfigObjectList
  * ********************************************************************************************* */
-ConfigObjectList::ConfigObjectList(QObject *parent)
-  : AbstractConfigObjectList(parent)
+ConfigObjectList::ConfigObjectList(const QMetaObject &elementType, QObject *parent)
+  : AbstractConfigObjectList(elementType, parent)
 {
   // pass...
 }
@@ -352,8 +358,8 @@ ConfigObjectList::del(ConfigObject *obj) {
 /* ********************************************************************************************* *
  * Implementation of ConfigObjectRefList
  * ********************************************************************************************* */
-ConfigObjectRefList::ConfigObjectRefList(QObject *parent)
-  : AbstractConfigObjectList(parent)
+ConfigObjectRefList::ConfigObjectRefList(const QMetaObject &elementType, QObject *parent)
+  : AbstractConfigObjectList(elementType, parent)
 {
   // pass...
 }

@@ -108,7 +108,7 @@ RXGroupList::serialize(YAML::Node &node, const Context &context) {
  * Implementation of RXGroupLists
  * ********************************************************************************************* */
 RXGroupLists::RXGroupLists(QObject *parent)
-  : ConfigObjectList(parent)
+  : ConfigObjectList(RXGroupList::staticMetaObject, parent)
 {
   // pass...
 }

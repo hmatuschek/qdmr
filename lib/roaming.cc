@@ -117,7 +117,7 @@ DefaultRoamingZone::get() {
  * Implementation of RoamingZoneList
  * ********************************************************************************************* */
 RoamingZoneList::RoamingZoneList(QObject *parent)
-  : ConfigObjectList(parent)
+  : ConfigObjectList(RoamingZone::staticMetaObject, parent)
 {
   // pass...
 }

@@ -270,7 +270,7 @@ APRSSystem::serialize(YAML::Node &node, const Context &context) {
  * Implementation of GPSSystems table
  * ********************************************************************************************* */
 PositioningSystems::PositioningSystems(QObject *parent)
-  : ConfigObjectList(parent)
+  : ConfigObjectList(PositioningSystem::staticMetaObject, parent)
 {
   // pass...
 }

@@ -192,7 +192,7 @@ ScanList::serialize(YAML::Node &node, const Context &context) {
  * Implementation of ScanLists
  * ********************************************************************************************* */
 ScanLists::ScanLists(QObject *parent)
-  : ConfigObjectList(parent)
+  : ConfigObjectList(ScanList::staticMetaObject, parent)
 {
   // pass...
 }

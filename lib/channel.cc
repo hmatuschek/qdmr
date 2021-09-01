@@ -484,7 +484,7 @@ SelectedChannel::get() {
  * Implementation of ChannelList
  * ********************************************************************************************* */
 ChannelList::ChannelList(QObject *parent)
-  : ConfigObjectList(parent)
+  : ConfigObjectList(Channel::staticMetaObject, parent)
 {
 
 }

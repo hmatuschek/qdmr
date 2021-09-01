@@ -118,7 +118,7 @@ DigitalContact::serialize(const Context &context) {
  * Implementation of ContactList
  * ********************************************************************************************* */
 ContactList::ContactList(QObject *parent)
-  : ConfigObjectList(parent)
+  : ConfigObjectList(Contact::staticMetaObject, parent)
 {
   // pass...
 }

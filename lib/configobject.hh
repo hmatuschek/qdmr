@@ -139,7 +139,7 @@ class AbstractConfigObjectList: public QObject
 
 protected:
   /** Hidden constructor. */
-  explicit AbstractConfigObjectList(QObject *parent = nullptr);
+  explicit AbstractConfigObjectList(const QMetaObject &elementType=ConfigObject::staticMetaObject, QObject *parent = nullptr);
 
 public:
   /** Recursively labels the config object. */
@@ -188,6 +188,8 @@ private slots:
   void onElementDeleted(QObject *obj);
 
 protected:
+  /** Holds the static QMetaObject of the element type. */
+  QMetaObject _elementType;
   /** Holds the list items. */
   QVector<ConfigObject *> _items;
 };
@@ -203,7 +205,7 @@ class ConfigObjectList: public AbstractConfigObjectList
 
 protected:
   /** Hidden constructor. */
-  explicit ConfigObjectList(QObject *parent = nullptr);
+  explicit ConfigObjectList(const QMetaObject &elementType=ConfigObject::staticMetaObject, QObject *parent = nullptr);
 
 public:
   int add(ConfigObject *obj, int row=-1);
@@ -225,7 +227,7 @@ class ConfigObjectRefList: public AbstractConfigObjectList
 
 protected:
   /** Hidden constructor. */
-  explicit ConfigObjectRefList(QObject *parent = nullptr);
+  explicit ConfigObjectRefList(const QMetaObject &elementType=ConfigObject::staticMetaObject, QObject *parent = nullptr);
 
 public:
   bool label(ConfigObject::Context &context);
