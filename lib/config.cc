@@ -87,23 +87,23 @@ Config::serialize(YAML::Node &node, const Context &context)
   node["version"] = VERSION_STRING;
 
   YAML::Node settings;
-  settings["mic-level"] = _mic_level;
+  settings["micLevel"] = _mic_level;
   settings["speech"] = _speech;
   if (! _introLine1.isEmpty())
-    settings["intro-line1"] = _introLine1.toStdString();
+    settings["introLine1"] = _introLine1.toStdString();
   if (! _introLine2.isEmpty())
-    settings["intro-line2"] = _introLine2.toStdString();
+    settings["introLine2"] = _introLine2.toStdString();
   if (_radioIDs->defaultId() && context.contains(_radioIDs->defaultId()))
-    settings["default-id"] = context.getId(_radioIDs->defaultId()).toStdString();
+    settings["defaultID"] = context.getId(_radioIDs->defaultId()).toStdString();
   node["settings"] = settings;
 
-  if ((node["radio-ids"] = _radioIDs->serialize(context)).IsNull())
+  if ((node["radioIDs"] = _radioIDs->serialize(context)).IsNull())
     return false;
 
   if ((node["contacts"] = _contacts->serialize(context)).IsNull())
     return false;
 
-  if ((node["group-lists"] = _rxGroupLists->serialize(context)).IsNull())
+  if ((node["groupLists"] = _rxGroupLists->serialize(context)).IsNull())
     return false;
 
   if ((node["channels"] = _channels->serialize(context)).IsNull())
@@ -113,7 +113,7 @@ Config::serialize(YAML::Node &node, const Context &context)
     return false;
 
   if (_scanlists->count()) {
-    if ((node["scan-lists"] = _scanlists->serialize(context)).IsNull())
+    if ((node["scanLists"] = _scanlists->serialize(context)).IsNull())
       return false;
   }
 

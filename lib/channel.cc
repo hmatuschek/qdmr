@@ -124,7 +124,7 @@ Channel::serialize(YAML::Node &node, const Context &context) {
     return false;
 
   if (_scanlist && context.contains(_scanlist))
-    node["scan-list"] = context.getId(_scanlist).toStdString();
+    node["scanList"] = context.getId(_scanlist).toStdString();
 
   return true;
 }
@@ -239,7 +239,7 @@ AnalogChannel::serialize(YAML::Node &node, const Context &context) {
     else if (Signaling::isDCSInverted(_rxTone))
       tone["dcs"] = -Signaling::toDCSNumber(_rxTone);
     tone.SetStyle(YAML::EmitterStyle::Flow);
-    node["rx-tone"] = tone;
+    node["rxTone"] = tone;
   }
 
   if (Signaling::SIGNALING_NONE != _txTone) {
@@ -251,7 +251,7 @@ AnalogChannel::serialize(YAML::Node &node, const Context &context) {
     else if (Signaling::isDCSInverted(_txTone))
       tone["dcs"] = -Signaling::toDCSNumber(_txTone);
     tone.SetStyle(YAML::EmitterStyle::Flow);
-    node["tx-tone"] = tone;
+    node["txTone"] = tone;
   }
 
   if (_aprsSystem && context.contains(_aprsSystem))
@@ -440,13 +440,13 @@ DigitalChannel::serialize(YAML::Node &node, const Context &context) {
     return false;
 
   if (_radioId && context.contains(_radioId))
-    node["radio-id"] = context.getId(_radioId).toStdString();
+    node["radioID"] = context.getId(_radioId).toStdString();
 
   if (_rxGroup && context.contains(_rxGroup))
-    node["group-list"] = context.getId(_rxGroup).toStdString();
+    node["groupList"] = context.getId(_rxGroup).toStdString();
 
   if (_txContact && context.contains(_txContact))
-    node["tx-contact"] = context.getId(_txContact).toStdString();
+    node["txContact"] = context.getId(_txContact).toStdString();
 
   if (_posSystem && context.contains(_posSystem))
     node["aprs"] = context.getId(_posSystem).toStdString();

@@ -11,13 +11,15 @@ class RadioID : public ConfigObject
 {
   Q_OBJECT
 
+  /** The name of the radio ID. */
   Q_PROPERTY(QString name READ name WRITE setName)
+  /** The number of the radio ID. */
   Q_PROPERTY(uint number READ number WRITE setNumber)
 
 public:
   /** Constructor.
    * @param name Specifies the name of the ID.
-   * @param id Specifies the DMR ID.
+   * @param number Specifies the DMR ID.
    * @param parent Specifies the parent QObject owning this object. */
   explicit RadioID(const QString &name, uint32_t number, QObject *parent = nullptr);
 

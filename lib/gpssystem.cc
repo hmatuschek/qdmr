@@ -44,8 +44,6 @@ bool
 PositioningSystem::serialize(YAML::Node &node, const ConfigObject::Context &context) {
   if (! ConfigObject::serialize(node, context))
     return false;
-  node["name"] = _name.toStdString();
-  node["period"] = _period;
   return true;
 }
 
@@ -259,7 +257,8 @@ APRSSystem::serialize(YAML::Node &node, const Context &context) {
     node["path"] = list;
   }
 
-  node["icon"] = aprsicon2name(_icon).toStdString();
+  if (APRS_ICON_NO_SYMBOL != _icon)
+    node["icon"] = aprsicon2name(_icon).toStdString();
 
   node["message"] = _message.toStdString();
 

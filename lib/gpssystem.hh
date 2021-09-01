@@ -16,6 +16,11 @@ class PositioningSystem: public ConfigObject
 {
   Q_OBJECT
 
+  /** The name of the system. */
+  Q_PROPERTY(QString name READ name WRITE setName)
+  /** The update period in seconds. */
+  Q_PROPERTY(uint period READ period WRITE setPeriod)
+
 protected:
   /** Hidden constructor.
    * The PositioningSystem class is not instantiated directly, use either @c GPSSystem or

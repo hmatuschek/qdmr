@@ -278,7 +278,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
            << qSetFieldWidth(12) << QString("%1-%2").arg(aprs->source()).arg(aprs->srcSSID())
            << qSetFieldWidth(12) << QString("%1-%2").arg(aprs->destination()).arg(aprs->destSSID())
            << qSetFieldWidth(23) << ("\""+aprs->path()+"\"")
-           << qSetFieldWidth(12) << aprsicon2name(aprs->icon())
+           << qSetFieldWidth(12) << aprsicon2config(aprs->icon())
            << qSetFieldWidth(0) << ("\""+aprs->message()+"\"") << "\n";
    }
   stream << qSetFieldWidth(0) << "\n";

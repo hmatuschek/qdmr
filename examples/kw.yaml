@@ -1,43 +1,43 @@
 ---
 version: 0.9.0
 settings:
-  mic-level: 6
+  micLevel: 6
   speech: false
-  intro-line1: qDMR
-  intro-line2: DM3MAT
-  default-id: id1
-radio-ids:
+  introLine1: qDMR
+  introLine2: DM3MAT
+  defaultID: id1
+radioIDs:
   - dmr: {id: id1, name: DM3MAT, number: 2621370}
 contacts:
-  - group: {id: cont1, name: WW, number: 91}
-  - group: {id: cont2, name: EU, number: 92}
-  - group: {id: cont3, name: DL, number: 262}
-  - group: {id: cont4, name: DL MM, number: 263}
-  - group: {id: cont5, name: Regional, number: 8}
-  - group: {id: cont6, name: Lokal, number: 9}
-  - group: {id: cont7, name: Bln/Brb, number: 2621}
-  - group: {id: cont8, name: Sa/Th, number: 2629}
-  - group: {id: cont9, name: SA/MV, number: 2620}
-  - group: {id: cont10, name: Hessen, number: 2626}
-  - group: {id: cont11, name: HamRadio Village, number: 3177826}
-  - all: {id: cont12, name: All Call}
-  - group: {id: cont13, name: Simplex TG99, number: 99}
-  - group: {id: cont14, name: Cl Brandenburg, number: 26209}
-  - group: {id: cont15, name: Cl Berlin, number: 26212}
-  - private: {id: cont16, name: Refl Brandenburg, number: 4044}
-  - private: {id: cont17, name: Refl Berlin, number: 4016}
-  - private: {id: cont18, name: BM SMS, number: 262993}
-  - private: {id: cont19, name: BM DAPNET, number: 262994}
-  - private: {id: cont20, name: BM Parrot, number: 262997}
-  - private: {id: cont21, name: BM APRS, number: 262999}
-  - private: {id: cont22, name: DG2RON Ronny, ring: true, number: 2621246}
-  - private: {id: cont23, name: DM9KS Silvio, ring: true, number: 2621045}
-  - private: {id: cont24, name: DM3MAT Hannes, ring: true, number: 2621370}
-  - private: {id: cont25, name: DL2BQF Thomas, ring: true, number: 2621437}
-  - private: {id: cont26, name: DL7JOM Olaf, ring: true, number: 2621004}
-  - private: {id: cont27, name: DG1RPH Peter, ring: true, number: 2621528}
-  - private: {id: cont28, name: DO1RPH Richard, number: 2634160}
-group-lists:
+  - dmr: {id: cont1, name: WW, ring: false, type: GroupCall, number: 91}
+  - dmr: {id: cont2, name: EU, ring: false, type: GroupCall, number: 92}
+  - dmr: {id: cont3, name: DL, ring: false, type: GroupCall, number: 262}
+  - dmr: {id: cont4, name: DL MM, ring: false, type: GroupCall, number: 263}
+  - dmr: {id: cont5, name: Regional, ring: false, type: GroupCall, number: 8}
+  - dmr: {id: cont6, name: Lokal, ring: false, type: GroupCall, number: 9}
+  - dmr: {id: cont7, name: Bln/Brb, ring: false, type: GroupCall, number: 2621}
+  - dmr: {id: cont8, name: Sa/Th, ring: false, type: GroupCall, number: 2629}
+  - dmr: {id: cont9, name: SA/MV, ring: false, type: GroupCall, number: 2620}
+  - dmr: {id: cont10, name: Hessen, ring: false, type: GroupCall, number: 2626}
+  - dmr: {id: cont11, name: HamRadio Village, ring: false, type: GroupCall, number: 3177826}
+  - dmr: {id: cont12, name: All Call, ring: false, type: AllCall, number: 16777215}
+  - dmr: {id: cont13, name: Simplex TG99, ring: false, type: GroupCall, number: 99}
+  - dmr: {id: cont14, name: Cl Brandenburg, ring: false, type: GroupCall, number: 26209}
+  - dmr: {id: cont15, name: Cl Berlin, ring: false, type: GroupCall, number: 26212}
+  - dmr: {id: cont16, name: Refl Brandenburg, ring: false, type: PrivateCall, number: 4044}
+  - dmr: {id: cont17, name: Refl Berlin, ring: false, type: PrivateCall, number: 4016}
+  - dmr: {id: cont18, name: BM SMS, ring: false, type: PrivateCall, number: 262993}
+  - dmr: {id: cont19, name: BM DAPNET, ring: false, type: PrivateCall, number: 262994}
+  - dmr: {id: cont20, name: BM Parrot, ring: false, type: PrivateCall, number: 262997}
+  - dmr: {id: cont21, name: BM APRS, ring: false, type: PrivateCall, number: 262999}
+  - dmr: {id: cont22, name: DG2RON Ronny, ring: true, type: PrivateCall, number: 2621246}
+  - dmr: {id: cont23, name: DM9KS Silvio, ring: true, type: PrivateCall, number: 2621045}
+  - dmr: {id: cont24, name: DM3MAT Hannes, ring: true, type: PrivateCall, number: 2621370}
+  - dmr: {id: cont25, name: DL2BQF Thomas, ring: true, type: PrivateCall, number: 2621437}
+  - dmr: {id: cont26, name: DL7JOM Olaf, ring: true, type: PrivateCall, number: 2621004}
+  - dmr: {id: cont27, name: DG1RPH Peter, ring: true, type: PrivateCall, number: 2621528}
+  - dmr: {id: cont28, name: DO1RPH Richard, ring: false, type: PrivateCall, number: 2634160}
+groupLists:
   - id: grp1
     name: DL
     contacts: [cont1, cont2, cont3]
@@ -63,1276 +63,1606 @@ channels:
   - digital:
       id: ch1
       name: DB0LDS TS1
-      rx: 439.5625
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont6
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont6
   - digital:
       id: ch2
       name: Sa/Th DB0LDS TS1
-      rx: 439.5625
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp3
-      tx-contact: cont8
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp3
+      txContact: cont8
   - digital:
       id: ch3
       name: TG8 DB0LDS TS2
-      rx: 439.5625
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont5
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont5
   - digital:
       id: ch4
       name: TG9 DB0LDS TS2
-      rx: 439.5625
-      tx-offset: -7.6
-      power: high
-      scan-list: scan1
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      scanList: scan1
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch5
       name: BB DB0LDS TS2
-      rx: 439.5625
-      tx-offset: -7.6
-      power: high
-      scan-list: scan1
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      scanList: scan1
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch6
       name: HRV DB0LDS TS1
-      rx: 439.5625
-      tx-offset: -7.6
-      power: high
-      scan-list: scan1
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp7
-      tx-contact: cont11
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      scanList: scan1
+      groupList: grp7
+      txContact: cont11
   - digital:
       id: ch7
       name: DM0TZN TS1
-      rx: 438.825
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont1
+      rxFrequency: 438.825
+      txFrequency: 431.225
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont1
   - digital:
       id: ch8
       name: TG8 DM0TZN TS2
-      rx: 438.825
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont5
+      rxFrequency: 438.825
+      txFrequency: 431.225
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont5
   - digital:
       id: ch9
       name: TG9 DM0TZN TS2
-      rx: 438.825
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 438.825
+      txFrequency: 431.225
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch10
       name: BB DM0TZN TS2
-      rx: 438.825
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 438.825
+      txFrequency: 431.225
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch11
       name: DB0LOS TS1
-      rx: 438.475
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont6
+      rxFrequency: 438.475
+      txFrequency: 430.875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont6
   - digital:
       id: ch12
       name: R/TG9 DB0LOS TS2
-      rx: 438.475
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 438.475
+      txFrequency: 430.875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch13
       name: R/TG9 DM0TT TS1
-      rx: 439.0875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 439.0875
+      txFrequency: 431.4875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch14
       name: TG8 DM0TT TS2
-      rx: 439.0875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont5
+      rxFrequency: 439.0875
+      txFrequency: 431.4875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont5
   - digital:
       id: ch15
       name: TG9 DM0TT TS2
-      rx: 439.0875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 439.0875
+      txFrequency: 431.4875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch16
       name: BB DM0TT TS2
-      rx: 439.0875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 439.0875
+      txFrequency: 431.4875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch17
       name: TG9 DB0KK TS1
-      rx: 439.5375
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 439.5375
+      txFrequency: 431.9375
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch18
       name: BB DB0KK TS2
-      rx: 439.5375
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 439.5375
+      txFrequency: 431.9375
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch19
       name: DB0OUD TS1
-      rx: 438.625
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont1
+      rxFrequency: 438.625
+      txFrequency: 431.025
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont1
   - digital:
       id: ch20
       name: TG8 DB0OUD TS2
-      rx: 438.625
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont5
+      rxFrequency: 438.625
+      txFrequency: 431.025
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont5
   - digital:
       id: ch21
       name: TG9 DB0OUD TS2
-      rx: 438.625
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 438.625
+      txFrequency: 431.025
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch22
       name: BB DB0OUD TS2
-      rx: 438.625
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 438.625
+      txFrequency: 431.025
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch23
       name: TG9 DB0TU TS1
-      rx: 439.575
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 439.575
+      txFrequency: 431.975
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch24
       name: BB DB0TU TS2
-      rx: 439.575
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 439.575
+      txFrequency: 431.975
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch25
       name: DM0MOT TS1
-      rx: 439.525
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont1
+      rxFrequency: 439.525
+      txFrequency: 431.925
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont1
   - digital:
       id: ch26
       name: TG8 DM0MOT TS2
-      rx: 439.525
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont5
+      rxFrequency: 439.525
+      txFrequency: 431.925
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont5
   - digital:
       id: ch27
       name: TG9 DM0MOT TS2
-      rx: 439.525
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 439.525
+      txFrequency: 431.925
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch28
       name: BB DM0MOT TS2
-      rx: 439.525
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 439.525
+      txFrequency: 431.925
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch29
       name: DB0TA TS1
-      rx: 439.475
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont6
+      rxFrequency: 439.475
+      txFrequency: 431.875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont6
   - digital:
       id: ch30
       name: TG8 DB0TA TS2
-      rx: 439.475
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont5
+      rxFrequency: 439.475
+      txFrequency: 431.875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont5
   - digital:
       id: ch31
       name: TG9 DB0TA TS2
-      rx: 439.475
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 439.475
+      txFrequency: 431.875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch32
       name: BB DB0TA TS2
-      rx: 439.475
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 439.475
+      txFrequency: 431.875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch33
       name: DB0FX TS1
-      rx: 439.45
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont6
+      rxFrequency: 439.45
+      txFrequency: 431.85
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont6
   - digital:
       id: ch34
       name: TG8 DB0FX TS2
-      rx: 439.45
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont5
+      rxFrequency: 439.45
+      txFrequency: 431.85
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont5
   - digital:
       id: ch35
       name: TG9 DB0FX TS2
-      rx: 439.45
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 439.45
+      txFrequency: 431.85
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch36
       name: BB DB0FX TS2
-      rx: 439.45
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 439.45
+      txFrequency: 431.85
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch37
       name: DB0PDM TS1
-      rx: 438.4
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont6
+      rxFrequency: 438.4
+      txFrequency: 430.8
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont6
   - digital:
       id: ch38
       name: TG8 DB0PDM TS2
-      rx: 438.4
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont5
+      rxFrequency: 438.4
+      txFrequency: 430.8
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont5
   - digital:
       id: ch39
       name: TG9 DB0PDM TS2
-      rx: 438.4
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 438.4
+      txFrequency: 430.8
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch40
       name: BB DB0PDM TS2
-      rx: 438.4
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 438.4
+      txFrequency: 430.8
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch41
       name: DB0BRB TS1
-      rx: 439.4875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont6
+      rxFrequency: 439.4875
+      txFrequency: 431.8875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont6
   - digital:
       id: ch42
       name: TG8 DB0BRB TS2
-      rx: 439.4875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont5
+      rxFrequency: 439.4875
+      txFrequency: 431.8875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont5
   - digital:
       id: ch43
       name: TG9 DB0BRB TS2
-      rx: 439.4875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 439.4875
+      txFrequency: 431.8875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch44
       name: BB DB0BRB TS2
-      rx: 439.4875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 439.4875
+      txFrequency: 431.8875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch45
       name: DB0SPN TS1
-      rx: 439.4875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont6
+      rxFrequency: 439.4875
+      txFrequency: 431.8875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont6
   - digital:
       id: ch46
       name: R/TG9 DB0SPN TS2
-      rx: 439.4875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 439.4875
+      txFrequency: 431.8875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch47
       name: DB0NLS TS1
-      rx: 439.5125
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont6
+      rxFrequency: 439.5125
+      txFrequency: 431.9125
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont6
   - digital:
       id: ch48
       name: R/TG9 DB0NLS TS2
-      rx: 439.5125
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 439.5125
+      txFrequency: 431.9125
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch49
       name: DB0LS TS1
-      rx: 438.225
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont6
+      rxFrequency: 438.225
+      txFrequency: 430.625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont6
   - digital:
       id: ch50
       name: TG8 DB0LS TS2
-      rx: 438.225
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont5
+      rxFrequency: 438.225
+      txFrequency: 430.625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont5
   - digital:
       id: ch51
       name: TG9 DB0LS TS2
-      rx: 438.225
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont6
+      rxFrequency: 438.225
+      txFrequency: 430.625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont6
   - digital:
       id: ch52
       name: BB DB0LS TS2
-      rx: 438.225
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 438.225
+      txFrequency: 430.625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch53
       name: DM0LC TS1
-      rx: 439.3875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont6
+      rxFrequency: 439.3875
+      txFrequency: 431.7875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont6
   - digital:
       id: ch54
       name: TG8 DM0LC TS2
-      rx: 439.3875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp3
-      tx-contact: cont5
+      rxFrequency: 439.3875
+      txFrequency: 431.7875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp3
+      txContact: cont5
   - digital:
       id: ch55
       name: TG9 DM0LC TS2
-      rx: 439.3875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp3
-      tx-contact: cont6
+      rxFrequency: 439.3875
+      txFrequency: 431.7875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp3
+      txContact: cont6
   - digital:
       id: ch56
       name: Sa/Th DM0LC TS2
-      rx: 439.3875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp3
-      tx-contact: cont8
+      rxFrequency: 439.3875
+      txFrequency: 431.7875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp3
+      txContact: cont8
   - digital:
       id: ch57
       name: BB DM0LC TS1
-      rx: 439.3875
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 439.3875
+      txFrequency: 431.7875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch58
       name: DB0FLW TS1
-      rx: 439.5375
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont6
+      rxFrequency: 439.5375
+      txFrequency: 431.9375
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont6
   - digital:
       id: ch59
       name: TG8 DB0FLW TS2
-      rx: 439.5375
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp3
-      tx-contact: cont5
+      rxFrequency: 439.5375
+      txFrequency: 431.9375
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp3
+      txContact: cont5
   - digital:
       id: ch60
       name: TG9 DB0FLW TS2
-      rx: 439.5375
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp3
-      tx-contact: cont6
+      rxFrequency: 439.5375
+      txFrequency: 431.9375
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp3
+      txContact: cont6
   - digital:
       id: ch61
       name: Sa/Th DB0FLW TS2
-      rx: 439.5375
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp3
-      tx-contact: cont8
+      rxFrequency: 439.5375
+      txFrequency: 431.9375
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp3
+      txContact: cont8
   - digital:
       id: ch62
       name: DB0LE TS1
-      rx: 439.575
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont6
+      rxFrequency: 439.575
+      txFrequency: 431.975
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont6
   - digital:
       id: ch63
       name: R/TG9 DB0LE TS2
-      rx: 439.575
-      tx-offset: -7.6
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp3
-      tx-contact: cont6
+      rxFrequency: 439.575
+      txFrequency: 431.975
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp3
+      txContact: cont6
   - digital:
       id: ch64
       name: DL DB0AFZ TS1
-      rx: 439.975
-      tx-offset: -9.4
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp1
-      tx-contact: cont3
+      rxFrequency: 439.975
+      txFrequency: 430.575
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp1
+      txContact: cont3
   - digital:
       id: ch65
       name: BB DB0AFZ TS1
-      rx: 439.975
-      tx-offset: -9.4
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 1
-      group-list: grp2
-      tx-contact: cont7
+      rxFrequency: 439.975
+      txFrequency: 430.575
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp2
+      txContact: cont7
   - digital:
       id: ch66
       name: TG9 DB0AFZ TS2
-      rx: 439.975
-      tx-offset: -9.4
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp5
-      tx-contact: cont6
+      rxFrequency: 439.975
+      txFrequency: 430.575
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp5
+      txContact: cont6
   - digital:
       id: ch67
       name: Hes DB0AFZ TS2
-      rx: 439.975
-      tx-offset: -9.4
-      power: high
-      admit: color-code
-      color-code: 1
-      time-slot: 2
-      group-list: grp5
-      tx-contact: cont10
+      rxFrequency: 439.975
+      txFrequency: 430.575
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitColorCode
+      colorCode: 1
+      timeSlot: TimeSlot2
+      groupList: grp5
+      txContact: cont10
   - digital:
       id: ch68
       name: DMR S0
-      rx: 433.45
-      power: high
-      admit: free
-      color-code: 1
-      time-slot: 1
-      group-list: grp6
-      tx-contact: cont12
+      rxFrequency: 433.45
+      txFrequency: 433.45
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp6
+      txContact: cont12
   - digital:
       id: ch69
       name: DMR S1
-      rx: 433.612
-      power: high
-      admit: free
-      color-code: 1
-      time-slot: 1
-      group-list: grp6
-      tx-contact: cont12
+      rxFrequency: 433.612
+      txFrequency: 433.612
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp6
+      txContact: cont12
   - digital:
       id: ch70
       name: DMR S2
-      rx: 433.625
-      power: high
-      admit: free
-      color-code: 1
-      time-slot: 1
-      group-list: grp6
-      tx-contact: cont12
+      rxFrequency: 433.625
+      txFrequency: 433.625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp6
+      txContact: cont12
   - digital:
       id: ch71
       name: DMR S3
-      rx: 433.638
-      power: high
-      admit: free
-      color-code: 1
-      time-slot: 1
-      group-list: grp6
-      tx-contact: cont12
+      rxFrequency: 433.638
+      txFrequency: 433.638
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp6
+      txContact: cont12
   - digital:
       id: ch72
       name: DMR S4
-      rx: 433.65
-      power: high
-      admit: free
-      color-code: 1
-      time-slot: 1
-      group-list: grp6
-      tx-contact: cont12
+      rxFrequency: 433.65
+      txFrequency: 433.65
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp6
+      txContact: cont12
   - digital:
       id: ch73
       name: DMR S5
-      rx: 433.663
-      power: high
-      admit: free
-      color-code: 1
-      time-slot: 1
-      group-list: grp6
-      tx-contact: cont12
+      rxFrequency: 433.663
+      txFrequency: 433.663
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp6
+      txContact: cont12
   - digital:
       id: ch74
       name: DMR S6
-      rx: 433.675
-      power: high
-      admit: free
-      color-code: 1
-      time-slot: 1
-      group-list: grp6
-      tx-contact: cont12
+      rxFrequency: 433.675
+      txFrequency: 433.675
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp6
+      txContact: cont12
   - digital:
       id: ch75
       name: DMR S7
-      rx: 433.688
-      power: high
-      admit: free
-      color-code: 1
-      time-slot: 1
-      group-list: grp6
-      tx-contact: cont12
+      rxFrequency: 433.688
+      txFrequency: 433.688
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
+      colorCode: 1
+      timeSlot: TimeSlot1
+      groupList: grp6
+      txContact: cont12
   - analog:
       id: ch76
       name: DB0LDS
-      rx: 439.5625
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      rx-tone: {ctcss: 67}
-      tx-tone: {ctcss: 67}
-      band-width: narrow
+      bandwidth: Narrow
+      rxTone: {ctcss: 67}
+      txTone: {ctcss: 67}
   - analog:
       id: ch77
       name: DB0RAG
-      rx: 439.3
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 439.3
+      txFrequency: 431.7
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch78
       name: DB0LUD
-      rx: 438.575
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 438.575
+      txFrequency: 430.975
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      rx-tone: {ctcss: 67}
-      tx-tone: {ctcss: 67}
-      band-width: narrow
+      bandwidth: Narrow
+      rxTone: {ctcss: 67}
+      txTone: {ctcss: 67}
   - analog:
       id: ch79
       name: DB0SP-2
-      rx: 145.6
-      tx-offset: -0.6
-      power: high
+      rxFrequency: 145.6
+      txFrequency: 145
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch80
       name: DB0SP-70
-      rx: 439.425
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 439.425
+      txFrequency: 431.825
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch81
       name: DB0ZOD-2
-      rx: 145.6625
-      tx-offset: -0.6
-      power: high
+      rxFrequency: 145.6625
+      txFrequency: 145.0625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch82
       name: DB0ZOD-70
-      rx: 438.725
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 438.725
+      txFrequency: 431.125
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch83
       name: DB0BRL
-      rx: 145.725
-      tx-offset: -0.6
-      power: high
+      rxFrequency: 145.725
+      txFrequency: 145.125
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch84
       name: DB0BLO
-      rx: 439.275
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 439.275
+      txFrequency: 431.675
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch85
       name: DB0SX
-      rx: 439.05
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 439.05
+      txFrequency: 431.45
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch86
       name: DB0TA
-      rx: 439.125
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 439.125
+      txFrequency: 431.525
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch87
       name: DB0PDM
-      rx: 145.675
-      tx-offset: -0.6
-      power: high
+      rxFrequency: 145.675
+      txFrequency: 145.075
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch88
       name: DB0CBS
-      rx: 438.85
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 438.85
+      txFrequency: 431.25
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch89
       name: DB0AF
-      rx: 438.6375
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 438.6375
+      txFrequency: 431.0375
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch90
       name: DB0NFL
-      rx: 438.95
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 438.95
+      txFrequency: 431.35
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch91
       name: DB0LMM
-      rx: 439.3
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 439.3
+      txFrequency: 431.7
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch92
       name: DM0LEI
-      rx: 439.15
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 439.15
+      txFrequency: 431.55
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch93
       name: DB0LEI
-      rx: 145.775
-      tx-offset: -0.6
-      power: high
+      rxFrequency: 145.775
+      txFrequency: 145.175
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch94
       name: DB0SML
-      rx: 439.275
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 439.275
+      txFrequency: 431.675
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch95
       name: DB0LSA
-      rx: 145.6625
-      tx-offset: -0.6
-      power: high
+      rxFrequency: 145.6625
+      txFrequency: 145.0625
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch96
       name: DB0LE
-      rx: 438.7875
-      tx-offset: -7.6
-      power: high
+      rxFrequency: 438.7875
+      txFrequency: 431.1875
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch97
       name: DOK Y07
-      rx: 144.675
-      power: high
-      admit: free
+      rxFrequency: 144.675
+      txFrequency: 144.675
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch98
       name: DOK D20
-      rx: 144.65
-      power: high
-      admit: free
+      rxFrequency: 144.65
+      txFrequency: 144.65
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch99
       name: DOK D23
-      rx: 145.375
-      power: high
-      admit: free
+      rxFrequency: 145.375
+      txFrequency: 145.375
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch100
       name: DOK S31
-      rx: 144.725
-      power: high
-      admit: free
+      rxFrequency: 144.725
+      txFrequency: 144.725
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch101
       name: S20
-      rx: 145.3
-      power: high
-      admit: free
+      rxFrequency: 145.3
+      txFrequency: 145.3
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch102
       name: 2m Mobil
-      rx: 145.5
-      power: high
-      admit: free
+      rxFrequency: 145.5
+      txFrequency: 145.5
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch103
       name: 70cm Mobil
-      rx: 433.5
-      power: high
-      admit: free
+      rxFrequency: 433.5
+      txFrequency: 433.5
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch104
       name: APRS
-      rx: 144.8
-      power: high
-      admit: free
+      rxFrequency: 144.8
+      txFrequency: 144.8
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
       aprs: aprs2
   - analog:
       id: ch105
       name: ISS APRS
-      rx: 145.825
-      power: high
-      admit: free
+      rxFrequency: 145.825
+      txFrequency: 145.825
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch106
       name: ISS FM Rep
-      rx: 437.8
-      tx: 145.99
-      power: high
+      rxFrequency: 437.8
+      txFrequency: 145.99
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      tx-tone: {ctcss: 67}
-      band-width: narrow
+      bandwidth: Narrow
+      txTone: {ctcss: 67}
   - analog:
       id: ch107
       name: CAS-3H FM
-      rx: 437.2
-      tx: 144.35
-      power: high
+      rxFrequency: 437.2
+      txFrequency: 144.35
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch108
       name: PO-101 FM
-      rx: 145.9
-      tx: 437.5
-      power: high
+      rxFrequency: 145.9
+      txFrequency: 437.5
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch109
       name: SO-50 FM
-      rx: 436.79
-      tx: 145.85
-      power: high
+      rxFrequency: 436.79
+      txFrequency: 145.85
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      tx-tone: {ctcss: 67}
-      band-width: narrow
+      bandwidth: Narrow
+      txTone: {ctcss: 67}
   - analog:
       id: ch110
       name: AO-92 FM
-      rx: 145.88
-      tx: 435.35
-      power: high
+      rxFrequency: 145.88
+      txFrequency: 435.35
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      tx-tone: {ctcss: 67}
-      band-width: narrow
+      bandwidth: Narrow
+      txTone: {ctcss: 67}
   - analog:
       id: ch111
       name: AO-91 FM
-      rx: 145.96
-      tx: 435.25
-      power: high
+      rxFrequency: 145.96
+      txFrequency: 435.25
+      power: HighPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      tx-tone: {ctcss: 67}
-      band-width: narrow
+      bandwidth: Narrow
+      txTone: {ctcss: 67}
   - analog:
       id: ch112
       name: U0
-      rx: 430.2
-      power: low
+      rxFrequency: 430.2
+      txFrequency: 430.2
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch113
       name: U1
-      rx: 430.225
-      power: low
+      rxFrequency: 430.225
+      txFrequency: 430.225
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch114
       name: U2
-      rx: 430.25
-      power: low
+      rxFrequency: 430.25
+      txFrequency: 430.25
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch115
       name: U3
-      rx: 430.275
-      power: low
+      rxFrequency: 430.275
+      txFrequency: 430.275
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitNone
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch116
       name: PMR 1
-      rx: 446.00625
-      power: low
-      admit: free
+      rxFrequency: 446.00625
+      txFrequency: 446.00625
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch117
       name: PMR 2
-      rx: 446.01875
-      power: low
-      admit: free
+      rxFrequency: 446.01875
+      txFrequency: 446.01875
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch118
       name: PMR 3
-      rx: 446.03125
-      power: low
-      admit: free
+      rxFrequency: 446.03125
+      txFrequency: 446.03125
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch119
       name: PMR 4
-      rx: 446.04375
-      power: low
-      admit: free
+      rxFrequency: 446.04375
+      txFrequency: 446.04375
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch120
       name: PMR 5
-      rx: 446.05625
-      power: low
-      admit: free
+      rxFrequency: 446.05625
+      txFrequency: 446.05625
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch121
       name: PMR 6
-      rx: 446.06875
-      power: low
-      admit: free
+      rxFrequency: 446.06875
+      txFrequency: 446.06875
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch122
       name: PMR 7
-      rx: 446.08125
-      power: low
-      admit: free
+      rxFrequency: 446.08125
+      txFrequency: 446.08125
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch123
       name: PMR 8
-      rx: 446.09375
-      power: low
-      admit: free
+      rxFrequency: 446.09375
+      txFrequency: 446.09375
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch124
       name: PMR 9
-      rx: 446.10625
-      power: low
-      admit: free
+      rxFrequency: 446.10625
+      txFrequency: 446.10625
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch125
       name: PMR 10
-      rx: 446.11875
-      power: low
-      admit: free
+      rxFrequency: 446.11875
+      txFrequency: 446.11875
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch126
       name: PMR 11
-      rx: 446.13125
-      power: low
-      admit: free
+      rxFrequency: 446.13125
+      txFrequency: 446.13125
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch127
       name: PMR 12
-      rx: 446.14375
-      power: low
-      admit: free
+      rxFrequency: 446.14375
+      txFrequency: 446.14375
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch128
       name: PMR 13
-      rx: 446.15625
-      power: low
-      admit: free
+      rxFrequency: 446.15625
+      txFrequency: 446.15625
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch129
       name: PMR 14
-      rx: 446.16875
-      power: low
-      admit: free
+      rxFrequency: 446.16875
+      txFrequency: 446.16875
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch130
       name: PMR 15
-      rx: 446.18125
-      power: low
-      admit: free
+      rxFrequency: 446.18125
+      txFrequency: 446.18125
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
   - analog:
       id: ch131
       name: PMR 16
-      rx: 446.19375
-      power: low
-      admit: free
+      rxFrequency: 446.19375
+      txFrequency: 446.19375
+      power: LowPower
+      timeout: 0
+      rxOnly: false
+      admit: AdmitFree
       squelch: 1
-      band-width: narrow
+      bandwidth: Narrow
 zones:
   - id: zone1
     name: KW
@@ -1369,7 +1699,7 @@ zones:
     name: PMR
     A: [ch116, ch117, ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131]
     B: [ch116, ch117, ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131]
-scan-lists:
+scanLists:
   - id: scan1
     name: KW
     channels: [ch4, ch5, ch76, ch77, ch97, ch102, ch68, ch112]
@@ -1390,7 +1720,7 @@ positioning:
       destination: APAT81-0
       source: DM3MAT-7
       path: [WIDE1-1, WIDE2-1]
-      icon: "-"
+      icon: Jogger
       message: Y07, QRG 144.675
 roaming:
   - id: roam1

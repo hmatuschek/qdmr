@@ -82,8 +82,6 @@ RoamingZone::serialize(YAML::Node &node, const Context &context) {
   if (! ConfigObject::serialize(node, context))
     return false;
 
-  node["name"] = _name.toStdString();
-
   YAML::Node list = YAML::Node(YAML::NodeType::Sequence);
   list.SetStyle(YAML::EmitterStyle::Flow);
   foreach (DigitalChannel *ch, _channel) {

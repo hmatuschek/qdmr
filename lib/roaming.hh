@@ -14,6 +14,9 @@ class RoamingZone : public ConfigObject
 {
   Q_OBJECT
 
+  /** The name of the roaming zone. */
+  Q_PROPERTY(QString name READ name WRITE setName)
+
 public:
   /** Constructor.
    * @param name Specifies the name of the roaming zone.

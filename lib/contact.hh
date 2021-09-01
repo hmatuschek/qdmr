@@ -76,7 +76,7 @@ public:
   /** Constructs a DTMF (analog) contact.
    * @param name   Specifies the contact name.
    * @param number Specifies the DTMF number (0-9,A,B,C,D,*,#).
-   * @param rxTone Specifies whether the ring-tone is enabled for this contact.
+   * @param ring Specifies whether the ring-tone is enabled for this contact.
    * @param parent Specifies the QObject parent. */
   DTMFContact(const QString &name, const QString &number, bool ring=false, QObject *parent=nullptr);
 
@@ -119,7 +119,7 @@ public:
    * @param type   Specifies the call type (private, group, all-call).
    * @param name   Specifies the contact name.
    * @param number Specifies the DMR number for this contact.
-   * @param rxTone Specifies whether the ring-tone is enabled for this contact.
+   * @param ring Specifies whether the ring-tone is enabled for this contact.
    * @param parent Specifies the QObject parent. */
   DigitalContact(Type type, const QString &name, uint number, bool ring=false, QObject *parent=nullptr);
 
