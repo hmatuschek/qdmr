@@ -173,6 +173,9 @@ public:
   /** Moves the channels one step down. */
   virtual bool moveDown(int first, int last);
 
+  /** Returns the element type for this list. */
+  const QMetaObject &elementType() const;
+
 signals:
   /** Gets emitted if an element was added to the list. */
   void elementAdded(int idx);

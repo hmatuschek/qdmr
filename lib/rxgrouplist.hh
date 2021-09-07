@@ -7,6 +7,17 @@
 
 class Config;
 
+/** List of references to digital contacts. */
+class DigitalContactRefList: public ConfigObjectRefList
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit DigitalContactRefList(QObject *parent=nullptr);
+};
+
+
 /** Generic representation of a RX group list.
  * @ingroup conf */
 class RXGroupList: public ConfigObject
@@ -15,6 +26,7 @@ class RXGroupList: public ConfigObject
 
   /** The name of the group list. */
   Q_PROPERTY(QString name READ name WRITE setName)
+  Q_PROPERTY(DigitalContactRefList* contacts READ contacts)
 
 public:
   /** Constructor.
@@ -35,24 +47,24 @@ public:
   /** Returns the contact at the given list index. */
 	DigitalContact *contact(int idx) const;
   /** Adds a contect to the list. */
-	int addContact(DigitalContact *contact);
+  int addContact(DigitalContact *contact, int idx=-1);
   /** Removes the given contact from the list. */
 	bool remContact(DigitalContact *contact);
   /** Removes the contact from the list at the given position. */
 	bool remContact(int idx);
 
-protected:
-  bool serialize(YAML::Node &node, const Context &context);
+  const DigitalContactRefList *contacts() const;
+  DigitalContactRefList *contacts();
 
 protected slots:
-  /** Internal used callback to handle deleted contacts. */
-	void onContactDeleted(QObject *obj);
+  /** Internal used callback to handle list modifications. */
+  void onModified();
 
 protected:
   /** The group list name. */
 	QString _name;
   /** The list of contacts. */
-	QVector<DigitalContact *> _contacts;
+  DigitalContactRefList _contacts;
 };
 
 

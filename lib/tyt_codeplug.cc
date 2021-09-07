@@ -977,12 +977,15 @@ TyTCodeplug::GroupListElement::memberIndex(uint n, uint16_t idx) {
 
 bool
 TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, const CodeplugContext &ctx) {
+  logDebug() << "Encode group list '" << lst->name() << "' with " << lst->count() << " members.";
   name(lst->name());
   for (int i=0; i<32; i++) {
-    if (i<lst->count())
+    if (i<lst->count()) {
+      logDebug() << "Add contact " << lst->contact(i)->name() << " to list.";
       memberIndex(i, ctx.config()->contacts()->indexOfDigital(lst->contact(i)) + 1);
-    else
+    } else {
       memberIndex(i, 0);
+    }
   }
   return true;
 }
@@ -1005,7 +1008,12 @@ TyTCodeplug::GroupListElement::linkGroupListObj(RXGroupList *lst, const Codeplug
                 << name() << "': Invalid contact index. Ignored.";
       continue;
     }
-    lst->addContact(ctx.getDigitalContact(memberIndex(i)));
+    logDebug() << "Add contact idx=" << memberIndex(i) << " to group list " << lst->name() << ".";
+    if (0 > lst->addContact(ctx.getDigitalContact(memberIndex(i)))) {
+      logWarn() << "Cannot add contact '" << ctx.getDigitalContact(memberIndex(i))->name()
+                << "' at idx=" << memberIndex(i) << ".";
+      continue;
+    }
   }
 
   return true;

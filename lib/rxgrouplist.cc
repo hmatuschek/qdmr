@@ -13,17 +13,29 @@
 
 
 /* ********************************************************************************************* *
+ * Implementation of DigitalContactRefList
+ * ********************************************************************************************* */
+DigitalContactRefList::DigitalContactRefList(QObject *parent)
+  : ConfigObjectRefList(DigitalContact::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RXGroupList
  * ********************************************************************************************* */
 RXGroupList::RXGroupList(const QString &name, QObject *parent)
   : ConfigObject("grp", parent), _name(name), _contacts()
 {
-  // pass...
+  connect(&_contacts, SIGNAL(elementModified(int)), this, SLOT(onModified()));
+  connect(&_contacts, SIGNAL(elementRemoved(int)), this, SLOT(onModified()));
+  connect(&_contacts, SIGNAL(elementAdded(int)), this, SLOT(onModified()));
 }
 
 int
 RXGroupList::count() const {
-  return _contacts.size();
+  return _contacts.count();
 }
 
 void
@@ -47,60 +59,34 @@ RXGroupList::setName(const QString &name) {
 
 DigitalContact *
 RXGroupList::contact(int idx) const {
-  if (idx >= _contacts.size())
+  if (idx >= _contacts.count())
     return nullptr;
-  return _contacts.at(idx);
+  return _contacts.get(idx)->as<DigitalContact>();
 }
 
 int
-RXGroupList::addContact(DigitalContact *contact) {
-  if (_contacts.contains(contact))
-    return -1;
-  int idx = _contacts.size();
-  connect(contact, SIGNAL(modified(ConfigObject*)), this, SIGNAL(modified(ConfigObject*)));
-  connect(contact, SIGNAL(destroyed(QObject*)), this, SLOT(onContactDeleted(QObject*)));
-  _contacts.append(contact);
-  emit modified(this);
-  return idx;
+RXGroupList::addContact(DigitalContact *contact, int idx) {
+  return _contacts.add(contact, idx);
 }
 
 bool
 RXGroupList::remContact(int idx) {
-  if (idx >= _contacts.size())
-    return false;
-  _contacts.remove(idx);
-  emit modified(this);
-  return true;
+  return _contacts.del(_contacts.get(idx));
 }
 
-bool
-RXGroupList::remContact(DigitalContact *contact) {
-  if (! _contacts.contains(contact))
-    return false;
-  int idx = _contacts.indexOf(contact);
-  return remContact(idx);
+const DigitalContactRefList *
+RXGroupList::contacts() const {
+  return &_contacts;
+}
+
+DigitalContactRefList *
+RXGroupList::contacts() {
+  return &_contacts;
 }
 
 void
-RXGroupList::onContactDeleted(QObject *obj) {
-  if (DigitalContact *contact = reinterpret_cast<DigitalContact *>(obj))
-    remContact(contact);
-}
-
-bool
-RXGroupList::serialize(YAML::Node &node, const Context &context) {
-  if (! ConfigObject::serialize(node, context))
-    return false;
-
-  YAML::Node contacts = YAML::Node(YAML::NodeType::Sequence);
-  contacts.SetStyle(YAML::EmitterStyle::Flow);
-  foreach (DigitalContact *contact, _contacts) {
-    if (! context.contains(contact))
-      return false;
-    contacts.push_back(context.getId(contact).toStdString());
-  }
-  node["contacts"] = contacts;
-  return true;
+RXGroupList::onModified() {
+  emit modified(this);
 }
 
 

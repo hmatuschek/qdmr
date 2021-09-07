@@ -29,12 +29,15 @@ AbstractConfigReader::errorMessage() const {
 }
 
 bool
-AbstractConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+AbstractConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx)
+{
   const QMetaObject *meta = obj->metaObject();
+
   for (int p=QObject::staticMetaObject.propertyOffset(); p<meta->propertyCount(); p++) {
     QMetaProperty prop = meta->property(p);
     if (! prop.isValid())
       continue;
+
     if (prop.isEnumType()) {
       // If property is not set -> skip
       if (! node[prop.name()])
@@ -117,6 +120,10 @@ AbstractConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
         return false;
       }
       prop.write(obj, QString::fromStdString(node[prop.name()].as<std::string>()));
+    } else if (prop.read(obj).value<ConfigObjectRefList *>()) {
+      logDebug() << "Skip reference list " << prop.name() << ".";
+      // reference lists are linked later
+      continue;
     } else {
       logDebug() << "Unhandled property " << prop.name()
                  << " of unhandled type " << prop.typeName() << ".";
@@ -128,6 +135,50 @@ AbstractConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
 
 bool
 AbstractConfigReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  const QMetaObject *meta = obj->metaObject();
+
+  for (int p=QObject::staticMetaObject.propertyOffset(); p<meta->propertyCount(); p++) {
+    QMetaProperty prop = meta->property(p);
+    if (! prop.isValid())
+      continue;
+    QVariant val = prop.read(obj);
+    if (val.value<ConfigObjectRefList *>()) {
+      // If not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // check type
+      if (! node[prop.name()].IsSequence()) {
+        _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Expected sequence.")
+            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
+            .arg(prop.name()).arg(meta->className());
+        return false;
+      }
+      YAML::Node list = node[prop.name()];
+      ConfigObjectRefList *refs = prop.read(obj).value<ConfigObjectRefList *>();
+      for (YAML::const_iterator it=list.begin(); it!=list.end(); it++) {
+        if (! it->IsScalar()) {
+          _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Expected ID string.")
+              .arg(it->Mark().line).arg(it->Mark().column)
+              .arg(prop.name()).arg(meta->className());
+          return false;
+        }
+        QString id = QString::fromStdString(it->as<std::string>());
+        if (! ctx.contains(id)) {
+          _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Reference %5 is not defined.")
+              .arg(it->Mark().line).arg(it->Mark().column)
+              .arg(prop.name()).arg(meta->className()).arg(id);
+          return false;
+        }
+        if (0 > refs->add(ctx.getObj(id))) {
+          _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Cannot add reference %5 to list.")
+              .arg(it->Mark().line).arg(it->Mark().column)
+              .arg(prop.name()).arg(meta->className()).arg(id);
+          return false;
+        }
+      }
+    }
+  }
+
   return true;
 }
 
@@ -305,10 +356,11 @@ ConfigReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject
 {
   Config *config = qobject_cast<Config *>(obj);
 
-  if (! linkSettings(config, node["settings"], ctx))
+  // radio IDs must be linked before settings, as they may refer to the default DMR ID
+  if (! linkRadioIDs(config, node["radioIDs"], ctx))
     return false;
 
-  if (! linkRadioIDs(config, node["radioIDs"], ctx))
+  if (! linkSettings(config, node["settings"], ctx))
     return false;
 
   if (! linkContacts(config, node["contacts"], ctx))
@@ -448,6 +500,12 @@ ConfigReader::linkRadioIDs(Config *config, const YAML::Node &node, const ConfigO
     if (! linkRadioID(config->radioIDs()->getId(i), *it, ctx))
       return false;
   }
+
+  // If there is at least one radio ID -> set first one as default.
+  if (config->radioIDs()->count()) {
+    config->radioIDs()->setDefaultId(0);
+  }
+
   return true;
 }
 
@@ -1227,7 +1285,7 @@ DigitalChannelReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
     return false;
 
   if (node["groupList"] && node["groupList"].IsScalar()) {
-    QString gl = QString::fromStdString(node["group-list"].as<std::string>());
+    QString gl = QString::fromStdString(node["groupList"].as<std::string>());
     if ((! ctx.contains(gl)) || (! ctx.getObj(gl)->is<RXGroupList>())) {
       _errorMessage = tr("%1:%2: Cannot link digital channel '%3': Group list with id='%4' is unknown.")
           .arg(node["groupList"].Mark().line).arg(node["groupList"].Mark().column)
@@ -1924,29 +1982,10 @@ GroupListReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::
 }
 
 bool
-GroupListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  RXGroupList *list = qobject_cast<RXGroupList *>(obj);
-
-  // link group calls
-  if (node["contacts"] && node["contacts"].IsSequence()) {
-    for (YAML::const_iterator it=node["contacts"].begin(); it!=node["contacts"].end(); it++) {
-      if (!it->IsScalar()) {
-        _errorMessage = tr("Cannot link group list '%1': Contact reference of wrong type.")
-            .arg(list->name());
-        return false;
-      }
-      QString id = QString::fromStdString(it->as<std::string>());
-      if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<DigitalContact>())) {
-        _errorMessage = _errorMessage = tr("Cannot link group list '%1': '%2' does not refer to a digital contact.")
-            .arg(list->name()).arg(id);
-        return false;
-      }
-      list->addContact(ctx.getObj(id)->as<DigitalContact>());
-    }
-  } else {
-    _errorMessage = tr("Cannot link group list '%1': No member list defined.").arg(list->name());
+GroupListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx)
+{
+  if (! ObjectReader::link(obj, node, ctx))
     return false;
-  }
 
   if (! linkExtensions(_extensions, obj, node, ctx))
     return false;

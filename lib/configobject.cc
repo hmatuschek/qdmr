@@ -115,6 +115,21 @@ ConfigObject::serialize(YAML::Node &node, const Context &context){
       node[prop.name()] = this->property(prop.name()).toDouble();
     } else if (QString("QString") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).toString().toStdString();
+    } else if (prop.read(this).value<ConfigObjectRefList *>()) {
+      ConfigObjectRefList *refs = prop.read(this).value<ConfigObjectRefList *>();
+      logDebug() << "Serialize obj list w/ " << refs->count() << " elements." ;
+      YAML::Node list = YAML::Node(YAML::NodeType::Sequence);
+      list.SetStyle(YAML::EmitterStyle::Flow);
+      for (int i=0; i<refs->count(); i++) {
+        ConfigObject *obj = refs->get(i);
+        if (!context.contains(obj)) {
+          logError() << "Cannot reference object of type " << obj->metaObject()->className()
+                     << " object not labeled.";
+          return false;
+        }
+        list.push_back(context.getId(obj).toStdString());
+      }
+      node[prop.name()] = list;
     } else {
       logDebug() << "Unhandled property " << prop.name()
                  << " of unknown type " << prop.typeName() << ".";
@@ -222,7 +237,7 @@ int AbstractConfigObjectList::add(ConfigObject *obj, int row) {
     row = _items.size();
   // Check type
   if (! obj->inherits(_elementType.className())) {
-    logDebug() << "Cannot add element of type " << obj->metaObject()->className()
+    logError() << "Cannot add element of type " << obj->metaObject()->className()
                << " to list, expected instances of " << _elementType.className();
     return false;
   }
@@ -297,7 +312,6 @@ AbstractConfigObjectList::onElementModified(ConfigObject *obj) {
 
 void
 AbstractConfigObjectList::onElementDeleted(QObject *obj) {
-  logDebug() << "List item " << obj << " deleted";
   int idx = indexOf(qobject_cast<ConfigObject *>(obj));
   if (0 <= idx)
     emit elementRemoved(idx);
