@@ -4,6 +4,17 @@
 #include <QAbstractListModel>
 #include <channel.hh>
 
+/** Represents a list of references to some digital channels.
+ * @ingroup config */
+class DigitalChannelRefList: public ConfigObjectRefList
+{
+  Q_OBJECT
+
+public:
+  explicit DigitalChannelRefList(QObject *parent=nullptr);
+};
+
+
 /** Represents a RoamingZone within the abstract device configuration.
  *
  * A roaming zone collects a set of repeaters that act as alternatives to eachother. When a selected
@@ -16,6 +27,8 @@ class RoamingZone : public ConfigObject
 
   /** The name of the roaming zone. */
   Q_PROPERTY(QString name READ name WRITE setName)
+  /** The channels of the roaming zone. */
+  Q_PROPERTY(ConfigObjectRefList * channels READ channels)
 
 public:
   /** Constructor.
@@ -41,29 +54,20 @@ public:
    * @param ch Specifies the channel to add.
    * @param row Speicifies the index where to insert the channel
    *        (optional, default insert at end). */
-  bool addChannel(DigitalChannel *ch, int row=-1);
+  int addChannel(DigitalChannel *ch, int row=-1);
   /** Removes the channel from the roaming zone at index @c row. */
   bool remChannel(int row);
   /** Removes the given channel from the roaming zone. */
   bool remChannel(DigitalChannel *ch);
 
-  /** Moves the channel at the given row one up. */
-  bool moveUp(int row);
-  /** Moves the channel at the given row one down. */
-  bool moveDown(int row);
-
-protected slots:
-  /** Internal used callback to handle deleted channels. */
-  void onChannelDeleted(QObject *obj);
-
-protected:
-  bool serialize(YAML::Node &node, const Context &context);
+  const DigitalChannelRefList *channels() const;
+  DigitalChannelRefList *channels();
 
 protected:
   /** Holds the name of the roaming zone. */
   QString _name;
   /** Holds the actual channels of the roaming zone. */
-  QVector<DigitalChannel *> _channel;
+  DigitalChannelRefList _channel;
 };
 
 

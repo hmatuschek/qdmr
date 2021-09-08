@@ -26,6 +26,7 @@ class RXGroupList: public ConfigObject
 
   /** The name of the group list. */
   Q_PROPERTY(QString name READ name WRITE setName)
+  /** The list of contacts. */
   Q_PROPERTY(DigitalContactRefList* contacts READ contacts)
 
 public:
@@ -53,7 +54,9 @@ public:
   /** Removes the contact from the list at the given position. */
 	bool remContact(int idx);
 
+  /** Returns the contact list. */
   const DigitalContactRefList *contacts() const;
+  /** Returns the contact list. */
   DigitalContactRefList *contacts();
 
 protected slots:
@@ -78,7 +81,7 @@ public:
   /** Constructor. */
 	explicit RXGroupLists(QObject *parent=nullptr);
 
-  /** Returns the list at the given index. */
+  /** Returns the group list at the given index. */
 	RXGroupList *list(int idx) const;
 
   int add(ConfigObject *obj, int row=-1);

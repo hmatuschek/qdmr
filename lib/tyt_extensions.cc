@@ -68,7 +68,7 @@ TyTButtonSettingsExtension::setLongPressDuration(uint dur) {
 /* ******************************************************************************************** *
  * Implementation of TyTButtonSettingsReader
  * ******************************************************************************************** */
-// Gegister extension to config reader
+// Register extension to config reader
 AbstractConfigReader *
 TyTButtonSettingsReader::instance = ConfigReader::addExtension(
       TyTButtonSettingsExtension::staticMetaObject.className(), new TyTButtonSettingsReader());

@@ -1334,7 +1334,7 @@ DigitalChannelReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
   }
 
   if (node["radioID"] && node["radioID"].IsScalar()) {
-    QString id = QString::fromStdString(node["dmr-id"].as<std::string>());
+    QString id = QString::fromStdString(node["radioID"].as<std::string>());
     if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<RadioID>())) {
       _errorMessage = tr("%1:%2: Cannot link digital channel '%3': Radio ID with id='%4' is unknown.")
           .arg(node["radioID"].Mark().line).arg(node["radioID"].Mark().column)
@@ -2032,28 +2032,8 @@ RoamingReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
 
 bool
 RoamingReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  RoamingZone *zone = qobject_cast<RoamingZone *>(obj);
-
-  // link channels
-  if (node["channels"] && node["channels"].IsSequence()) {
-    for (YAML::const_iterator it=node["channels"].begin(); it!=node["channels"].end(); it++) {
-      if (!it->IsScalar()) {
-        _errorMessage = tr("Cannot link roaming '%1': Digital channel reference of wrong type.")
-            .arg(zone->name());
-        return false;
-      }
-      QString id = QString::fromStdString(it->as<std::string>());
-      if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<DigitalChannel>())) {
-        _errorMessage = _errorMessage = tr("Cannot link roaming '%1': '%2' does not refer to a digital channel.")
-            .arg(zone->name()).arg(id);
-        return false;
-      }
-      zone->addChannel(ctx.getObj(id)->as<DigitalChannel>());
-    }
-  } else {
-    _errorMessage = tr("Cannot link roaming '%1': No channel list defined.").arg(zone->name());
+  if (! ObjectReader::link(obj, node, ctx))
     return false;
-  }
 
   if (! linkExtensions(_extensions, obj, node, ctx))
     return false;

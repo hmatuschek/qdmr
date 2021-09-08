@@ -2,6 +2,16 @@
 #include <QSet>
 
 /* ********************************************************************************************* *
+ * Implementation of DigitalChannelRefList
+ * ********************************************************************************************* */
+DigitalChannelRefList::DigitalChannelRefList(QObject *parent)
+  : ConfigObjectRefList(DigitalChannel::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RoamingZone
  * ********************************************************************************************* */
 RoamingZone::RoamingZone(const QString &name, QObject *parent)
@@ -12,7 +22,7 @@ RoamingZone::RoamingZone(const QString &name, QObject *parent)
 
 int
 RoamingZone::count() const {
-  return _channel.size();
+  return _channel.count();
 }
 
 void
@@ -37,60 +47,36 @@ DigitalChannel *
 RoamingZone::channel(int idx) const {
   if ((idx < 0) || (idx >= count()))
     return nullptr;
-  return _channel.at(idx);
+  return _channel.get(idx)->as<DigitalChannel>();
 }
 
-bool
+int
 RoamingZone::addChannel(DigitalChannel *ch, int row) {
-  if ((nullptr==ch) || _channel.contains(ch))
-    return false;
-  if (row <=0 || row>=count())
-    row = count();
-  connect(ch, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  connect(ch, SIGNAL(modified(ConfigObject*)), this, SIGNAL(modified(ConfigObject*)));
-  _channel.insert(row, ch);
+  row = _channel.add(ch, row);
+  if (0 > row)
+    return row;
   emit modified(this);
-  return false;
+  return row;
 }
 
 bool
 RoamingZone::remChannel(int row) {
-  if (row<0 || row>=count())
-    return false;
-  DigitalChannel *ch = _channel[row];
-  _channel.removeAt(row);
-  disconnect(ch, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  emit modified(this);
-  return true;
+  return _channel.del(_channel.get(row));
 }
 
 bool
 RoamingZone::remChannel(DigitalChannel *ch) {
-  if (! _channel.contains(ch))
-    return false;
-  return remChannel(_channel.indexOf(ch));
+  return _channel.del(ch);
 }
 
-void
-RoamingZone::onChannelDeleted(QObject *obj) {
-  if (DigitalChannel *ch = reinterpret_cast<DigitalChannel *>(obj))
-    remChannel(ch);
+const DigitalChannelRefList *
+RoamingZone::channels() const {
+  return &_channel;
 }
 
-bool
-RoamingZone::serialize(YAML::Node &node, const Context &context) {
-  if (! ConfigObject::serialize(node, context))
-    return false;
-
-  YAML::Node list = YAML::Node(YAML::NodeType::Sequence);
-  list.SetStyle(YAML::EmitterStyle::Flow);
-  foreach (DigitalChannel *ch, _channel) {
-    if (context.contains(ch))
-      list.push_back(context.getId(ch).toStdString());
-  }
-  node["channels"] = list;
-
-  return true;
+DigitalChannelRefList *
+RoamingZone::channels() {
+  return &_channel;
 }
 
 
