@@ -1866,17 +1866,8 @@ ScanListReader::allocate(const YAML::Node &node, const ConfigObject::Context &ct
 
 bool
 ScanListReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
-  ScanList *list = qobject_cast<ScanList *>(obj);
-
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
-
-  if (node["name"] && node["name"].IsScalar()) {
-    list->setName(QString::fromStdString(node["name"].as<std::string>()));
-  } else {
-    _errorMessage = tr("Cannot parse scan-list: No name defined");
-    return false;
-  }
 
   if (! parseExtensions(_extensions, obj, node, ctx))
     return false;
@@ -1918,26 +1909,8 @@ ScanListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObje
     list->setTXChannel(ctx.getObj(id)->as<Channel>());
   }
 
-  // link channels
-  if (node["channels"] && node["channels"].IsSequence()) {
-    for (YAML::const_iterator it=node["channels"].begin(); it!=node["channels"].end(); it++) {
-      if (!it->IsScalar()) {
-        _errorMessage = tr("Cannot link scan-list '%1': Channel reference of wrong type. Must be id.")
-            .arg(list->name());
-        return false;
-      }
-      QString id = QString::fromStdString(it->as<std::string>());
-      if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<Channel>())) {
-        _errorMessage = _errorMessage = tr("Cannot link scan-list '%1': '%2' does not refer to a channel.")
-            .arg(list->name()).arg(id);
-        return false;
-      }
-      list->addChannel(ctx.getObj(id)->as<Channel>());
-    }
-  } else {
-    _errorMessage = tr("Cannot link scan-list '%1': No A channel list defined.").arg(list->name());
+  if (! ObjectReader::link(obj, node, ctx))
     return false;
-  }
 
   if (! linkExtensions(_extensions, obj, node, ctx))
     return false;

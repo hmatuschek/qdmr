@@ -23,7 +23,7 @@ ScanList::ScanList(const QString &name, QObject *parent)
 
 int
 ScanList::count() const {
-  return _channels.size();
+  return _channels.count();
 }
 
 void
@@ -52,43 +52,32 @@ ScanList::setName(const QString &name) {
 
 bool
 ScanList::contains(Channel *channel) const {
-  return _channels.contains(channel);
+  return (0 <= _channels.indexOf(channel));
 }
 
 Channel *
 ScanList::channel(int idx) const {
-  if ((0>idx) || (idx>=_channels.size()))
-    return nullptr;
-  return _channels[idx];
+  return _channels.get(idx)->as<Channel>();
 }
 
-bool
-ScanList::addChannel(Channel *channel) {
-  if (_channels.contains(channel) || (nullptr == channel))
-    return false;
-  connect(channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  _channels.append(channel);
-  emit modified(this);
-  return true;
+int
+ScanList::addChannel(Channel *channel, int idx) {
+  idx = _channels.add(channel, idx);
+  if (0 > idx)
+    return idx;
+  return idx;
 }
 
 bool
 ScanList::remChannel(int idx) {
-  if ((0>idx) || (idx>=_channels.size()))
-    return false;
-  Channel *channel = _channels[idx];
-  _channels.remove(idx);
-  disconnect(channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
+  return _channels.del(_channels.get(idx));
   emit modified(this);
   return true;
 }
 
 bool
 ScanList::remChannel(Channel *channel) {
-  if (! _channels.contains(channel))
-    return false;
-  int idx = _channels.indexOf(channel);
-  return remChannel(idx);
+  return _channels.del(channel);
 }
 
 Channel *
@@ -156,8 +145,6 @@ ScanList::serialize(YAML::Node &node, const Context &context) {
   if (! ConfigObject::serialize(node, context))
     return false;
 
-  node["name"] = _name.toStdString();
-
   QStringList pchannels;
   if (_priorityChannel && context.contains(_priorityChannel))
     pchannels.append(context.getId(_priorityChannel));
@@ -176,15 +163,17 @@ ScanList::serialize(YAML::Node &node, const Context &context) {
     node["revert"] = context.getId(_txChannel).toStdString();
   }
 
-  YAML::Node list = YAML::Node(YAML::NodeType::Sequence);
-  list.SetStyle(YAML::EmitterStyle::Flow);
-  foreach (Channel *channel, _channels) {
-    if (context.contains(channel))
-      list.push_back(context.getId(channel).toStdString());
-  }
-  node["channels"] = list;
-
   return true;
+}
+
+const ChannelRefList *
+ScanList::channels() const {
+  return &_channels;
+}
+
+ChannelRefList *
+ScanList::channels() {
+  return &_channels;
 }
 
 

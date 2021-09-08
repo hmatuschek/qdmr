@@ -2,16 +2,6 @@
 #include <QSet>
 
 /* ********************************************************************************************* *
- * Implementation of DigitalChannelRefList
- * ********************************************************************************************* */
-DigitalChannelRefList::DigitalChannelRefList(QObject *parent)
-  : ConfigObjectRefList(DigitalChannel::staticMetaObject, parent)
-{
-  // pass...
-}
-
-
-/* ********************************************************************************************* *
  * Implementation of RoamingZone
  * ********************************************************************************************* */
 RoamingZone::RoamingZone(const QString &name, QObject *parent)

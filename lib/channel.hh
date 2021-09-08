@@ -439,4 +439,32 @@ public:
 };
 
 
+/** Represents a list of weak references to channels (analog and digital). */
+class ChannelRefList: public ConfigObjectRefList
+{
+  Q_OBJECT
+
+protected:
+  /** Hidden constructor. */
+  explicit ChannelRefList(const QMetaObject &elementType, QObject *parent = nullptr);
+
+public:
+  /** Empty constructor. */
+  explicit ChannelRefList(QObject *parent=nullptr);
+};
+
+
+/** Represents a list of references to some digital channels.
+ * @ingroup config */
+class DigitalChannelRefList: public ChannelRefList
+{
+  Q_OBJECT
+
+public:
+  /** Empty constructor. */
+  explicit DigitalChannelRefList(QObject *parent=nullptr);
+};
+
+
+
 #endif // CHANNEL_HH

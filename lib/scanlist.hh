@@ -12,6 +12,11 @@ class ScanList : public ConfigObject
 {
 	Q_OBJECT
 
+  /** The name of the scan list. */
+  Q_PROPERTY(QString name READ name WRITE setName)
+  /** The list of channels. */
+  Q_PROPERTY(ChannelRefList * channels READ channels)
+
 public:
   /** Constructs a scan list with the given name. */
 	ScanList(const QString &name, QObject *parent=nullptr);
@@ -30,11 +35,16 @@ public:
   /** Returns the channel at the given index. */
 	Channel *channel(int idx) const;
   /** Adds a channel to the scan list. */
-	bool addChannel(Channel *channel);
+  int addChannel(Channel *channel, int idx=-1);
   /** Removes the channel at the given index. */
 	bool remChannel(int idx);
   /** Removes the given channel. */
 	bool remChannel(Channel *channel);
+
+  /** Returns the channels of the scan list. */
+  const ChannelRefList *channels() const;
+  /** Returns the channels of the scan list. */
+  ChannelRefList *channels();
 
   /** Returns the priority channel. */
   Channel *priorityChannel() const;
@@ -49,18 +59,17 @@ public:
   /** Sets the TX channel. */
   void setTXChannel(Channel *channel);
 
-protected slots:
-  /** Internal used callback to handle deleted channels. */
-	void onChannelDeleted(QObject *obj);
-
 protected:
   bool serialize(YAML::Node &node, const Context &context);
+
+protected slots:
+  void onChannelDeleted(QObject *obj);
 
 protected:
   /** The scanlist name. */
 	QString _name;
   /** The channel list. */
-	QVector<Channel *> _channels;
+  ChannelRefList _channels;
   /** The priority channel. */
   Channel *_priorityChannel;
   /** The secondary priority channel. */

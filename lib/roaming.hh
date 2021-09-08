@@ -4,17 +4,6 @@
 #include <QAbstractListModel>
 #include <channel.hh>
 
-/** Represents a list of references to some digital channels.
- * @ingroup config */
-class DigitalChannelRefList: public ConfigObjectRefList
-{
-  Q_OBJECT
-
-public:
-  explicit DigitalChannelRefList(QObject *parent=nullptr);
-};
-
-
 /** Represents a RoamingZone within the abstract device configuration.
  *
  * A roaming zone collects a set of repeaters that act as alternatives to eachother. When a selected
@@ -27,7 +16,7 @@ class RoamingZone : public ConfigObject
 
   /** The name of the roaming zone. */
   Q_PROPERTY(QString name READ name WRITE setName)
-  /** The channels of the roaming zone. */
+  /** The channels in the roaming zone. */
   Q_PROPERTY(ConfigObjectRefList * channels READ channels)
 
 public:
@@ -60,7 +49,9 @@ public:
   /** Removes the given channel from the roaming zone. */
   bool remChannel(DigitalChannel *ch);
 
+  /** Retruns the list of digital channels in this roaming zone. */
   const DigitalChannelRefList *channels() const;
+  /** Retruns the list of digital channels in this roaming zone. */
   DigitalChannelRefList *channels();
 
 protected:
@@ -114,13 +105,6 @@ public:
   RoamingZone *zone(int idx) const;
 
   int add(ConfigObject *obj, int row=-1);
-
-  /** Implementation of QAbstractListModel, returns the number of rows. */
-  int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  /** Implementation of QAbstractListModel, returns the item data at the given index. */
-  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-  /** Implementation of QAbstractListModel, returns the header data at the given section. */
-  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 };
 
 #endif // ROAMINGZONE_HH

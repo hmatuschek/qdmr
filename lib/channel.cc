@@ -486,7 +486,7 @@ SelectedChannel::get() {
 ChannelList::ChannelList(QObject *parent)
   : ConfigObjectList(Channel::staticMetaObject, parent)
 {
-
+  // pass...
 }
 
 int
@@ -531,6 +531,32 @@ ChannelList::findAnalogChannelByTxFreq(double freq) const {
       return channel(i)->as<AnalogChannel>();
   }
   return nullptr;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of ChannelRefList
+ * ********************************************************************************************* */
+ChannelRefList::ChannelRefList(const QMetaObject &elementType, QObject *parent)
+  : ConfigObjectRefList(elementType, parent)
+{
+  // pass...
+}
+
+ChannelRefList::ChannelRefList(QObject *parent)
+  : ConfigObjectRefList(Channel::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of DigitalChannelRefList
+ * ********************************************************************************************* */
+DigitalChannelRefList::DigitalChannelRefList(QObject *parent)
+  : ChannelRefList(DigitalChannel::staticMetaObject, parent)
+{
+  // pass...
 }
 
 
