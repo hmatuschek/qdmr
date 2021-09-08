@@ -1895,7 +1895,7 @@ D868UVCodeplug::encodeZones(Config *config, const Flags &flags) {
     for (int j=0; j<config->zones()->zone(i)->A()->count(); j++) {
       channels[j] = qToLittleEndian(
             config->channelList()->indexOf(
-              config->zones()->zone(i)->A()->channel(j)));
+              config->zones()->zone(i)->A()->get(j)));
     }
     zidx++;
     if (! config->zones()->zone(i)->B()->count())
@@ -1911,7 +1911,7 @@ D868UVCodeplug::encodeZones(Config *config, const Flags &flags) {
     for (int j=0; j<config->zones()->zone(i)->B()->count(); j++) {
       channels[j] = qToLittleEndian(
             config->channelList()->indexOf(
-              config->zones()->zone(i)->B()->channel(j)));
+              config->zones()->zone(i)->B()->get(j)));
     }
     zidx++;
   }
@@ -1960,9 +1960,9 @@ D868UVCodeplug::createZones(Config *config, CodeplugContext &ctx) {
         continue;
       // If defined -> add channel to zone obj
       if (extend_last_zone)
-        last_zone->B()->addChannel(ctx.getChannel(cidx));
+        last_zone->B()->add(ctx.getChannel(cidx));
       else
-        last_zone->A()->addChannel(ctx.getChannel(cidx));
+        last_zone->A()->add(ctx.getChannel(cidx));
     }
   }
   return true;

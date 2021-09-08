@@ -2049,9 +2049,9 @@ CSVReader::handleZone(qint64 idx, const QString &name, bool a, const QList<qint6
       }
       // link channels
       if (a)
-        _zones[idx]->A()->addChannel(_channels[i]);
+        _zones[idx]->A()->add(_channels[i]);
       else
-        _zones[idx]->B()->addChannel(_channels[i]);
+        _zones[idx]->B()->add(_channels[i]);
     }
     // done
     return true;

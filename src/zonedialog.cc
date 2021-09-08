@@ -33,7 +33,7 @@ ZoneDialog::construct() {
   if (_zone) {
     zoneName->setText(_zone->name());
     for (int i=0; i<_zone->A()->count(); i++) {
-      Channel *channel = _zone->A()->channel(i);
+      Channel *channel = _zone->A()->get(i)->as<Channel>();
       if (channel->is<AnalogChannel>()) {
         QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
         item->setData(Qt::UserRole, QVariant::fromValue(channel));
@@ -45,7 +45,7 @@ ZoneDialog::construct() {
       }
     }
     for (int i=0; i<_zone->B()->count(); i++) {
-      Channel *channel = _zone->B()->channel(i);
+      Channel *channel = _zone->B()->get(i)->as<Channel>();
       if (channel->is<AnalogChannel>()) {
         QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
         item->setData(Qt::UserRole, QVariant::fromValue(channel));
@@ -210,16 +210,16 @@ ZoneDialog::zone() {
     _zone->setName(zoneName->text().simplified());
     _zone->A()->clear();
     for (int i=0; i<channelListA->count(); i++)
-      _zone->A()->addChannel(channelListA->item(i)->data(Qt::UserRole).value<Channel*>());
+      _zone->A()->add(channelListA->item(i)->data(Qt::UserRole).value<Channel*>());
     _zone->B()->clear();
     for (int i=0; i<channelListB->count(); i++)
-      _zone->B()->addChannel(channelListB->item(i)->data(Qt::UserRole).value<Channel*>());
+      _zone->B()->add(channelListB->item(i)->data(Qt::UserRole).value<Channel*>());
     return _zone;
   }
   Zone *zone = new Zone(zoneName->text(), this);
   for (int i=0; i<channelListA->count(); i++)
-    zone->A()->addChannel(channelListA->item(i)->data(Qt::UserRole).value<Channel *>());
+    zone->A()->add(channelListA->item(i)->data(Qt::UserRole).value<Channel *>());
   for (int i=0; i<channelListB->count(); i++)
-    zone->B()->addChannel(channelListB->item(i)->data(Qt::UserRole).value<Channel *>());
+    zone->B()->add(channelListB->item(i)->data(Qt::UserRole).value<Channel *>());
   return zone;
 }

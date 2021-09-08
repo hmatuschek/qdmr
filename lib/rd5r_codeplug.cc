@@ -388,9 +388,9 @@ RD5RCodeplug::zone_t::linkZoneObj(Zone *zone, const CodeplugContext &ctx, bool p
   for (int i=0; (i<16) && member[i]; i++) {
     if (ctx.hasChannel(member[i])) {
       if (! putInB)
-        zone->A()->addChannel(ctx.getChannel(member[i]));
+        zone->A()->add(ctx.getChannel(member[i]));
       else
-        zone->B()->addChannel(ctx.getChannel(member[i]));
+        zone->B()->add(ctx.getChannel(member[i]));
     } else {
       logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
                 << member[i] << " out of bounds.";
@@ -408,7 +408,7 @@ RD5RCodeplug::zone_t::fromZoneObjA(const Zone *zone, const Config *conf) {
 
   for (int i=0; i<16; i++) {
     if (i < zone->A()->count())
-      member[i] = conf->channelList()->indexOf(zone->A()->channel(i))+1;
+      member[i] = conf->channelList()->indexOf(zone->A()->get(i))+1;
     else
       member[i] = 0;
   }
@@ -423,7 +423,7 @@ RD5RCodeplug::zone_t::fromZoneObjB(const Zone *zone, const Config *conf) {
 
   for (int i=0; i<16; i++) {
     if (i < zone->B()->count())
-      member[i] = conf->channelList()->indexOf(zone->B()->channel(i))+1;
+      member[i] = conf->channelList()->indexOf(zone->B()->get(i))+1;
     else
       member[i] = 0;
   }

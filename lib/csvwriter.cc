@@ -174,7 +174,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
              << qSetFieldWidth(4)  << "A";
       QStringList tmp;
       for (int j=0; j<zone->A()->count(); j++) {
-        tmp.append(QString::number(config->channelList()->indexOf(zone->A()->channel(j))+1));
+        tmp.append(QString::number(config->channelList()->indexOf(zone->A()->get(j))+1));
       }
       stream << qSetFieldWidth(0) << tmp.join(",") << "\n";
     }
@@ -184,7 +184,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
              << qSetFieldWidth(4)  << "B";
       QStringList tmp;
       for (int j=0; j<zone->B()->count(); j++) {
-        tmp.append(QString::number(config->channelList()->indexOf(zone->B()->channel(j))+1));
+        tmp.append(QString::number(config->channelList()->indexOf(zone->B()->get(j))+1));
       }
       stream << qSetFieldWidth(0) << tmp.join(",") << "\n";
     }

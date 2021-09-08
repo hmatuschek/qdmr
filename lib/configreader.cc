@@ -121,11 +121,9 @@ AbstractConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
       }
       prop.write(obj, QString::fromStdString(node[prop.name()].as<std::string>()));
     } else if (prop.read(obj).value<ConfigObjectRefList *>()) {
-      logDebug() << "Skip reference list " << prop.name() << ".";
       // reference lists are linked later
       continue;
     } else if (prop.read(obj).value<ConfigObjectReference *>()) {
-      logDebug() << "Skip reference " << prop.name() << ".";
       // references are linked later
       continue;
     } else {
@@ -1505,46 +1503,8 @@ ZoneReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Conte
 
 bool
 ZoneReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  Zone *zone = qobject_cast<Zone *>(obj);
-
-  // link A channels
-  if (node["A"] && node["A"].IsSequence()) {
-    for (YAML::const_iterator it=node["A"].begin(); it!=node["A"].end(); it++) {
-      if (!it->IsScalar()) {
-        _errorMessage = tr("Cannot link zone '%1': Channel reference of wrong type. Must be id.")
-            .arg(zone->name());
-        return false;
-      }
-      QString id = QString::fromStdString(it->as<std::string>());
-      if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<Channel>())) {
-        _errorMessage = _errorMessage = tr("Cannot link zone '%1' A: '%2' does not refer to a channel.")
-            .arg(zone->name()).arg(id);
-        return false;
-      }
-      zone->A()->addChannel(ctx.getObj(id)->as<Channel>());
-    }
-  } else {
-    _errorMessage = tr("Cannot link zone '%1': No A channel list defined.").arg(zone->name());
+  if (! ObjectReader::link(obj, node, ctx))
     return false;
-  }
-
-  // link optional B channels
-  if (node["B"] && node["B"].IsSequence()) {
-    for (YAML::const_iterator it=node["B"].begin(); it!=node["B"].end(); it++) {
-      if (!it->IsScalar()) {
-        _errorMessage = tr("Cannot link zone '%1' B: Channel reference of wrong type. Must be id.")
-            .arg(zone->name());
-        return false;
-      }
-      QString id = QString::fromStdString(it->as<std::string>());
-      if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<Channel>())) {
-        _errorMessage = _errorMessage = tr("Cannot link zone '%1' B: '%2' does not refer to a channel.")
-            .arg(zone->name()).arg(id);
-        return false;
-      }
-      zone->B()->addChannel(ctx.getObj(id)->as<Channel>());
-    }
-  }
 
   if (! linkExtensions(_extensions, obj, node, ctx))
     return false;

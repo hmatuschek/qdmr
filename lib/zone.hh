@@ -5,53 +5,8 @@
 #include <QAbstractListModel>
 #include <QVector>
 
-class Channel;
+#include "channel.hh"
 class Config;
-
-/** Represents a list of channels that are part of a zone.
- * @ingroup conf */
-class ZoneChannelList: public QAbstractListModel
-{
-  Q_OBJECT
-
-public:
-  /** Constructs an empty zone channel list. */
-  explicit ZoneChannelList(QObject *parent=nullptr);
-
-  /** Returns the number of channels within this zone. */
-	int count() const;
-  /** Clears the zone. */
-	void clear();
-
-  /** Returns the channel at the given index. */
-	Channel *channel(int idx) const;
-  /** Appends a channel to the zone. */
-	bool addChannel(Channel *channel);
-  /** Removes the channel at the given index from the zone. */
-	bool remChannel(int idx);
-  /** Removes the given channel from the zone. */
-	bool remChannel(Channel *channel);
-
-	/** Implementation of QAbstractListModel, returns the number of rows. */
-	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  /** Implementation of QAbstractListModel, returns the item data at the given index. */
-	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-  /** Implementation of QAbstractListModel, returns the header data at the given section. */
-	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-
-signals:
-  /** Gets emitted whenever the zone gets modified. */
-	void modified();
-
-protected slots:
-  /** Internal used callback to handle deleted channels. */
-	void onChannelDeleted(QObject *obj);
-
-protected:
-  /** The channel list. */
-	QVector<Channel *> _channels;
-};
-
 
 
 /** Represents a zone within the generic configuration.
@@ -62,6 +17,10 @@ class Zone : public ConfigObject
 
   /** The name of the zone. */
   Q_PROPERTY(QString name READ name WRITE setName)
+  /** The A channels. */
+  Q_PROPERTY(ChannelRefList* A READ A)
+  /** The B channels. */
+  Q_PROPERTY(ChannelRefList* B READ B)
 
 public:
   /** Constructs an empty Zone with the given name. */
@@ -75,28 +34,25 @@ public:
 	bool setName(const QString &name);
 
   /** Retruns the list of channels for VFO A in this zone. */
-  const ZoneChannelList *A() const;
+  const ChannelRefList *A() const;
   /** Retruns the list of channels for VFO A in this zone. */
-  ZoneChannelList* A();
+  ChannelRefList* A();
   /** Retruns the list of channels for VFO B in this zone. */
-  const ZoneChannelList *B() const;
+  const ChannelRefList *B() const;
   /** Retruns the list of channels for VFO B in this zone. */
-  ZoneChannelList* B();
+  ChannelRefList* B();
 
 signals:
   /** Gets emitted whenever the zone gets modified. */
 	void modified();
 
 protected:
-  bool serialize(YAML::Node &node, const Context &context);
-
-protected:
   /** Holds the name of the zone. */
 	QString _name;
   /** List of channels for VFO A. */
-  ZoneChannelList *_A;
+  ChannelRefList _A;
   /** List of channels for VFO B. */
-  ZoneChannelList *_B;
+  ChannelRefList _B;
 };
 
 

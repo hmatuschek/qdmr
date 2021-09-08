@@ -447,6 +447,7 @@ class ChannelReference: public ConfigObjectReference
   Q_OBJECT
 
 public:
+  /** Constructor. */
   explicit ChannelReference(QObject *parent=nullptr);
 };
 

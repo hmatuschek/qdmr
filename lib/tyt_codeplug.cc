@@ -809,7 +809,7 @@ TyTCodeplug::ZoneElement::fromZoneObj(const Zone *zone, const CodeplugContext &c
   name(zone->name());
   for (int i=0; i<16; i++) {
     if (i < zone->A()->count())
-      memberIndex(i, ctx.config()->channelList()->indexOf(zone->A()->channel(i))+1);
+      memberIndex(i, ctx.config()->channelList()->indexOf(zone->A()->get(i))+1);
     else
       memberIndex(i, 0);
   }
@@ -833,7 +833,7 @@ TyTCodeplug::ZoneElement::linkZone(Zone *zone, const CodeplugContext &ctx) const
       logWarn() << "Cannot link channel with index " << memberIndex(i) << " channel not defined.";
       continue;
     }
-    zone->A()->addChannel(ctx.getChannel(memberIndex(i)));
+    zone->A()->add(ctx.getChannel(memberIndex(i)));
   }
 
   return true;
@@ -889,14 +889,14 @@ TyTCodeplug::ZoneExtElement::fromZoneObj(const Zone *zone, const CodeplugContext
   // Store remaining channels from list A
   for (int i=16; i<64; i++) {
     if (i < zone->A()->count())
-      memberIndexA(i-16, ctx.config()->channelList()->indexOf(zone->A()->channel(i))+1);
+      memberIndexA(i-16, ctx.config()->channelList()->indexOf(zone->A()->get(i))+1);
     else
       memberIndexA(i-16, 0);
   }
   // Store channel from list B
   for (int i=0; i<64; i++) {
     if (i < zone->B()->count())
-      memberIndexB(i, ctx.config()->channelList()->indexOf(zone->B()->channel(i))+1);
+      memberIndexB(i, ctx.config()->channelList()->indexOf(zone->B()->get(i))+1);
     else
       memberIndexB(i, 0);
   }
@@ -911,7 +911,7 @@ TyTCodeplug::ZoneExtElement::linkZoneObj(Zone *zone, const CodeplugContext &ctx)
       logWarn() << "Cannot link zone extension: Channel index " << memberIndexA(i) << " not defined.";
       return false;
     }
-    zone->A()->addChannel(ctx.getChannel(memberIndexA(i)));
+    zone->A()->add(ctx.getChannel(memberIndexA(i)));
   }
 
   for (int i=0; (i<64) && memberIndexB(i); i++) {
@@ -919,7 +919,7 @@ TyTCodeplug::ZoneExtElement::linkZoneObj(Zone *zone, const CodeplugContext &ctx)
       logWarn() << "Cannot link zone extension: Channel index " << memberIndexB(i) << " not defined.";
       return false;
     }
-    zone->B()->addChannel(ctx.getChannel(memberIndexB(i)));
+    zone->B()->add(ctx.getChannel(memberIndexB(i)));
   }
 
   return true;
