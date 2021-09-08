@@ -184,7 +184,15 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       config.writeCSV(stream, errorMessage);
       outfile.close();
     } else if (("yaml" == info.suffix()) || parser.isSet("yaml")) {
-
+      QFile outfile(info.filePath());
+      if (! outfile.open(QIODevice::WriteOnly)) {
+        logError() << "Cannot write CSV codeplug file '" << outfile.fileName()
+                   << "': " << outfile.errorString();
+        return -1;
+      }
+      QTextStream stream(&outfile);
+      config.toYAML(stream);
+      outfile.close();
     } else {
       logError() << "Cannot determine codeplug output file format. Consider using --csv or --yaml.";
       return -1;
