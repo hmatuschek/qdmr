@@ -321,17 +321,17 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                         tr("Scan list name '%1' length %2 exceeds limit of %3 characters.")
                         .arg(list->name()).arg(list->name().size()).arg(features().maxScanlistNameLength)));
 
-      if (0 == list->priorityChannel())
+      if (0 == list->primaryChannel())
         issues.append(VerifyIssue(
                         VerifyIssue::WARNING,
                         tr("Scan list '%1' has no priority channel set.")
                         .arg(list->name())));
 
-      else if (! list->contains(list->priorityChannel()))
+      else if (! list->contains(list->primaryChannel()))
         issues.append(VerifyIssue(
                         VerifyIssue::WARNING,
                         tr("Scan list '%1' does not contain priority channel '%2'.")
-                        .arg(list->name()).arg(list->priorityChannel()->name())));
+                        .arg(list->name()).arg(list->primaryChannel()->name())));
     }
   }
 

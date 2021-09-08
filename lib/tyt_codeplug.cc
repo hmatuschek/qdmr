@@ -1133,22 +1133,22 @@ TyTCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, const Codeplu
   name(lst->name());
 
   // Set priority channel 1
-  if (lst->priorityChannel() && (SelectedChannel::get() == lst->priorityChannel()))
+  if (lst->primaryChannel() && (SelectedChannel::get() == lst->primaryChannel()))
     priorityChannel1Index(0);
-  else if (lst->priorityChannel())
-    priorityChannel1Index(ctx.config()->channelList()->indexOf(lst->priorityChannel())+1);
+  else if (lst->primaryChannel())
+    priorityChannel1Index(ctx.config()->channelList()->indexOf(lst->primaryChannel())+1);
 
   // Set priority channel 2
-  if (lst->secPriorityChannel() && (SelectedChannel::get() == lst->secPriorityChannel()))
+  if (lst->secondaryChannel() && (SelectedChannel::get() == lst->secondaryChannel()))
     priorityChannel2Index(0);
-  else if (lst->secPriorityChannel())
-    priorityChannel2Index(ctx.config()->channelList()->indexOf(lst->secPriorityChannel())+1);
+  else if (lst->secondaryChannel())
+    priorityChannel2Index(ctx.config()->channelList()->indexOf(lst->secondaryChannel())+1);
 
   // Set transmit channel
-  if (lst->txChannel() && (SelectedChannel::get() == lst->txChannel()))
+  if (lst->revertChannel() && (SelectedChannel::get() == lst->revertChannel()))
     txChannelIndex(0);
-  else if (lst->txChannel())
-    txChannelIndex(ctx.config()->channelList()->indexOf(lst->txChannel())+1);
+  else if (lst->revertChannel())
+    txChannelIndex(ctx.config()->channelList()->indexOf(lst->revertChannel())+1);
 
   for (int i=0, j=0; i<31;) {
     if (j >= lst->count()) {
@@ -1179,31 +1179,31 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, const CodeplugConte
   }
 
   if (0 == priorityChannel1Index())
-    lst->setPriorityChannel(SelectedChannel::get());
+    lst->setPrimaryChannel(SelectedChannel::get());
   else if (ctx.hasChannel(priorityChannel1Index()))
-    lst->setPriorityChannel(ctx.getChannel(priorityChannel1Index()));
+    lst->setPrimaryChannel(ctx.getChannel(priorityChannel1Index()));
   else if (0xffff == priorityChannel1Index())
-    lst->setPriorityChannel(nullptr);
+    lst->setPrimaryChannel(nullptr);
   else
     logWarn() << "Cannot deocde reference to priority channel index " << priorityChannel1Index()
                  << " in scan list '" << name() << "'.";
 
   if (0 == priorityChannel2Index())
-    lst->setSecPriorityChannel(SelectedChannel::get());
+    lst->setSecondaryChannel(SelectedChannel::get());
   else if (ctx.hasChannel(priorityChannel2Index()))
-    lst->setSecPriorityChannel(ctx.getChannel(priorityChannel2Index()));
+    lst->setSecondaryChannel(ctx.getChannel(priorityChannel2Index()));
   else if (0xffff == priorityChannel2Index())
-    lst->setSecPriorityChannel(nullptr);
+    lst->setSecondaryChannel(nullptr);
   else
     logWarn() << "Cannot deocde reference to secondary priority channel index " << priorityChannel2Index()
               << " in scan list '" << name() << "'.";
 
   if (0 == txChannelIndex())
-    lst->setTXChannel(SelectedChannel::get());
+    lst->setRevertChannel(SelectedChannel::get());
   else if (ctx.hasChannel(txChannelIndex()))
-    lst->setTXChannel(ctx.getChannel(txChannelIndex()));
+    lst->setRevertChannel(ctx.getChannel(txChannelIndex()));
   else if (0xffff == priorityChannel2Index())
-    lst->setSecPriorityChannel(nullptr);
+    lst->setSecondaryChannel(nullptr);
   else
     logWarn() << "Cannot deocde reference to secondary priority channel index " << txChannelIndex()
                 << " in scan list '" << name() << "'.";

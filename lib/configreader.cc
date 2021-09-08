@@ -124,6 +124,10 @@ AbstractConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
       logDebug() << "Skip reference list " << prop.name() << ".";
       // reference lists are linked later
       continue;
+    } else if (prop.read(obj).value<ConfigObjectReference *>()) {
+      logDebug() << "Skip reference " << prop.name() << ".";
+      // references are linked later
+      continue;
     } else {
       logDebug() << "Unhandled property " << prop.name()
                  << " of unhandled type " << prop.typeName() << ".";
@@ -175,6 +179,33 @@ AbstractConfigReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
               .arg(prop.name()).arg(meta->className()).arg(id);
           return false;
         }
+      }
+    } else if (val.value<ConfigObjectReference *>()) {
+      // If not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // check type
+      if (! node[prop.name()].IsScalar()) {
+        _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Expected ID string.")
+            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
+            .arg(prop.name()).arg(meta->className());
+        return false;
+      }
+      // get & check ID
+      QString id = QString::fromStdString(node[prop.name()].as<std::string>());
+      if (! ctx.contains(id)) {
+        _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Reference %5 is not defined.")
+            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
+            .arg(prop.name()).arg(meta->className()).arg(id);
+        return false;
+      }
+      // set reference
+      ConfigObjectReference *ref = prop.read(obj).value<ConfigObjectReference *>();
+      if (! ref->set(ctx.getObj(id))) {
+        _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Cannot set reference %5.")
+            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
+            .arg(prop.name()).arg(meta->className()).arg(id);
+        return false;
       }
     }
   }
@@ -1877,38 +1908,6 @@ ScanListReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::C
 
 bool
 ScanListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  ScanList *list = qobject_cast<ScanList *>(obj);
-
-  // link priority channels if defined
-  if (node["priority"] && node["priority"].IsSequence()) {
-    uint n=0; YAML::const_iterator it=node["priority"].begin();
-    for(; (it!=node["priority"].end()) && (n<2); it++, n++) {
-      if (!it->IsScalar()) {
-        logWarn() << "Cannot link priority channel " << (n+1) << ": Not a reference.";
-        continue;
-      }
-      QString id = QString::fromStdString(it->as<std::string>());
-      if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<Channel>())) {
-        logWarn() << "Cannot link priority channel " << (n+1) << ": Not a reference to a channel.";
-        continue;
-      }
-      if (0 == n)
-        list->setPriorityChannel(ctx.getObj(id)->as<Channel>());
-      else
-        list->setSecPriorityChannel(ctx.getObj(id)->as<Channel>());
-    }
-  }
-
-  if (node["revert"] && node["revert"].IsScalar()) {
-    QString id = QString::fromStdString(node["revert"].as<std::string>());
-    if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<Channel>())) {
-      _errorMessage = _errorMessage = tr("Cannot link scan-list '%1': '%2' does not refer to a channel.")
-          .arg(list->name()).arg(id);
-      return false;
-    }
-    list->setTXChannel(ctx.getObj(id)->as<Channel>());
-  }
-
   if (! ObjectReader::link(obj, node, ctx))
     return false;
 

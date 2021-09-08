@@ -115,6 +115,62 @@ protected:
 };
 
 
+/** Implements a reference to a config object.
+ * This class is only used to implement the automatic generation/parsing of the YAML codeplug files.
+ * @ingroup conf */
+class ConfigObjectReference: public QObject
+{
+  Q_OBJECT
+
+protected:
+  /** Hidden constructor. */
+  ConfigObjectReference(const QMetaObject &elementType=ConfigObject::staticMetaObject, QObject *parent = nullptr);
+
+public:
+  /** Returns @c true if the reference is null.
+   * That is, if there is no object referenced. */
+  bool isNull() const;
+
+  /** Resets the reference.
+   * Same as @c set(nullptr). */
+  virtual void clear();
+  /** Sets the reference.
+   * If set to @c nullptr, the reference gets cleared. */
+  virtual bool set(ConfigObject *object);
+
+  /** Returns the reference as the specified type. */
+  template <class Type>
+  Type *as() const {
+    if (nullptr == _object)
+      return nullptr;
+    return _object->as<Type>();
+  }
+
+  /** Returns @c true if the reference is of the specified type. */
+  template <class Type>
+  bool is() const {
+    if (nullptr == _object)
+      return false;
+    return _object->is<Type>();
+  }
+
+signals:
+  /** Gets emitted if the reference is changed.
+   * This signal is not emitted if the referenced object is modified. */
+  void modified();
+
+protected slots:
+  /** Internal call back whenever the referenced object gets deleted. */
+  void onReferenceDeleted(QObject *obj);
+
+protected:
+  /** Holds the static QMetaObject of the element type. */
+  QMetaObject _elementType;
+  /** The reference to the object. */
+  ConfigObject *_object;
+};
+
+
 /** Base class of all device/vendor specific confiuration extensions.
  * This class already implements the serialization of all @c QMetaObject
  * properties. */

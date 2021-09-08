@@ -115,6 +115,17 @@ ConfigObject::serialize(YAML::Node &node, const Context &context){
       node[prop.name()] = this->property(prop.name()).toDouble();
     } else if (QString("QString") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).toString().toStdString();
+    } else if (prop.read(this).value<ConfigObjectReference *>()) {
+      ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>();
+      ConfigObject *obj = ref->as<ConfigObject>();
+      if (nullptr == obj)
+        continue;
+      if (! context.contains(obj)) {
+        logError() << "Cannot reference object of type " << obj->metaObject()->className()
+                   << " object not labeled.";
+        return false;
+      }
+      node[prop.name()] = context.getId(obj).toStdString();
     } else if (prop.read(this).value<ConfigObjectRefList *>()) {
       ConfigObjectRefList *refs = prop.read(this).value<ConfigObjectRefList *>();
       logDebug() << "Serialize obj list w/ " << refs->count() << " elements." ;
@@ -173,6 +184,56 @@ ConfigObject::addExtension(const QString &name, ConfigObject *ext) {
     _extensions[name]->deleteLater();
   _extensions.insert(name, ext);
   ext->setParent(this);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of ConfigObjectReference
+ * ********************************************************************************************* */
+ConfigObjectReference::ConfigObjectReference(const QMetaObject &elementType, QObject *parent)
+  : QObject(parent), _elementType(elementType), _object(nullptr)
+{
+  // pass...
+}
+
+void
+ConfigObjectReference::clear() {
+  if (_object) {
+    disconnect(_object, SIGNAL(destroyed(QObject*)), this, SLOT(onReferenceDeleted(QObject*)));
+    emit modified();
+  }
+  _object = nullptr;
+}
+
+bool
+ConfigObjectReference::set(ConfigObject *object) {
+  if (_object)
+    disconnect(_object, SIGNAL(destroyed(QObject*)), this, SLOT(onReferenceDeleted(QObject*)));
+
+  if (nullptr == object) {
+    _object = nullptr;
+    return true;
+  }
+
+  // Check type
+  if (! object->inherits(_elementType.className())) {
+    logError() << "Cannot reference element of type " << object->metaObject()->className()
+               << ", expected instance of " << _elementType.className();
+    return false;
+  }
+
+  _object = object;
+  if (_object)
+    connect(_object, SIGNAL(destroyed(QObject*)), this, SLOT(onReferenceDeleted(QObject*)));
+
+  emit modified();
+  return true;
+}
+
+void
+ConfigObjectReference::onReferenceDeleted(QObject *obj) {
+  _object = nullptr;
+  emit modified();
 }
 
 

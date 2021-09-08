@@ -439,7 +439,20 @@ public:
 };
 
 
-/** Represents a list of weak references to channels (analog and digital). */
+/** Represents a reference to a channel.
+ * This class is only used to automate the parsing and generation of the YAML codeplug file.
+ * @ingroup config */
+class ChannelReference: public ConfigObjectReference
+{
+  Q_OBJECT
+
+public:
+  explicit ChannelReference(QObject *parent=nullptr);
+};
+
+
+/** Represents a list of weak references to channels (analog and digital).
+ * @ingroup config */
 class ChannelRefList: public ConfigObjectRefList
 {
   Q_OBJECT

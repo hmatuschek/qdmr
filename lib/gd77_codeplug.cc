@@ -328,28 +328,28 @@ GD77Codeplug::scanlist_t::toScanListObj() const {
 bool
 GD77Codeplug::scanlist_t::linkScanListObj(ScanList *lst, const CodeplugContext &ctx) const {
   if (0 == priority_ch1)
-    lst->setPriorityChannel(nullptr);
+    lst->setPrimaryChannel(nullptr);
   else if (1 == priority_ch1)
-    lst->setPriorityChannel(SelectedChannel::get());
+    lst->setPrimaryChannel(SelectedChannel::get());
   else if ((1<priority_ch1) && ctx.hasChannel(priority_ch1-1))
-    lst->setPriorityChannel(ctx.getChannel(priority_ch1-1));
+    lst->setPrimaryChannel(ctx.getChannel(priority_ch1-1));
   else
     logWarn() << "Cannot deocde reference to priority channel index " << priority_ch1
                  << " in scan list '" << getName() << "'.";
   if (0 == priority_ch2)
-    lst->setSecPriorityChannel(nullptr);
+    lst->setSecondaryChannel(nullptr);
   else if (1 == priority_ch2)
-    lst->setSecPriorityChannel(SelectedChannel::get());
+    lst->setSecondaryChannel(SelectedChannel::get());
   else if ((1<priority_ch2) && ctx.hasChannel(priority_ch2-1))
-    lst->setSecPriorityChannel(ctx.getChannel(priority_ch2-1));
+    lst->setSecondaryChannel(ctx.getChannel(priority_ch2-1));
   else
     logWarn() << "Cannot deocde reference to secondary priority channel index " << priority_ch2
               << " in scan list '" << getName() << "'.";
 
   if (0 == tx_designated_ch)
-    lst->setTXChannel(SelectedChannel::get());
+    lst->setRevertChannel(SelectedChannel::get());
   else if ((1<priority_ch2) && ctx.hasChannel(tx_designated_ch-1))
-    lst->setTXChannel(ctx.getChannel(tx_designated_ch-1));
+    lst->setRevertChannel(ctx.getChannel(tx_designated_ch-1));
   else
     logWarn() << "Cannot deocde reference to secondary priority channel index " << tx_designated_ch
                 << " in scan list '" << getName() << "'.";
@@ -369,18 +369,18 @@ GD77Codeplug::scanlist_t::linkScanListObj(ScanList *lst, const CodeplugContext &
 void
 GD77Codeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *conf) {
   setName(lst->name());
-  if (lst->priorityChannel() && (SelectedChannel::get() == lst->priorityChannel()))
+  if (lst->primaryChannel() && (SelectedChannel::get() == lst->primaryChannel()))
     priority_ch1 = 1;
-  else if (lst->priorityChannel())
-    priority_ch1 = conf->channelList()->indexOf(lst->priorityChannel())+2;
-  if (lst->secPriorityChannel() && (SelectedChannel::get() == lst->secPriorityChannel()))
+  else if (lst->primaryChannel())
+    priority_ch1 = conf->channelList()->indexOf(lst->primaryChannel())+2;
+  if (lst->secondaryChannel() && (SelectedChannel::get() == lst->secondaryChannel()))
     priority_ch2 = 1;
-  else if (lst->secPriorityChannel())
-    priority_ch2 = conf->channelList()->indexOf(lst->secPriorityChannel())+2;
-  if (lst->txChannel() && (SelectedChannel::get() == lst->txChannel()))
+  else if (lst->secondaryChannel())
+    priority_ch2 = conf->channelList()->indexOf(lst->secondaryChannel())+2;
+  if (lst->revertChannel() && (SelectedChannel::get() == lst->revertChannel()))
     tx_designated_ch = 1;
-  else if (lst->txChannel())
-    tx_designated_ch = conf->channelList()->indexOf(lst->txChannel())+2;
+  else if (lst->revertChannel())
+    tx_designated_ch = conf->channelList()->indexOf(lst->revertChannel())+2;
 
   for (int i=0; i<32; i++) {
     if (i >= lst->count())

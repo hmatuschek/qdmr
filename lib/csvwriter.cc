@@ -204,24 +204,24 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     ScanList *list = config->scanlists()->scanlist(i);
     stream << qSetFieldWidth(9)  << (i+1)
            << qSetFieldWidth(20) << ("\"" + list->name() + "\"");
-    if (nullptr == list->priorityChannel())
+    if (nullptr == list->primaryChannel())
       stream << qSetFieldWidth(5)  << "-";
-    else if (SelectedChannel::get() == list->priorityChannel())
+    else if (SelectedChannel::get() == list->primaryChannel())
       stream << qSetFieldWidth(5)  << "Sel";
     else
-      stream << qSetFieldWidth(5) << QString::number(config->channelList()->indexOf(list->priorityChannel())+1);
-    if (nullptr == list->secPriorityChannel())
+      stream << qSetFieldWidth(5) << QString::number(config->channelList()->indexOf(list->primaryChannel())+1);
+    if (nullptr == list->secondaryChannel())
       stream << qSetFieldWidth(5) << "-";
-    else if (SelectedChannel::get() == list->secPriorityChannel())
+    else if (SelectedChannel::get() == list->secondaryChannel())
       stream << qSetFieldWidth(5) << "Sel";
     else
-      stream << qSetFieldWidth(5) << QString::number(config->channelList()->indexOf(list->secPriorityChannel())+1);
-    if (nullptr == list->txChannel())
+      stream << qSetFieldWidth(5) << QString::number(config->channelList()->indexOf(list->secondaryChannel())+1);
+    if (nullptr == list->revertChannel())
       stream << qSetFieldWidth(5) << "-";
-    else if (SelectedChannel::get() == list->txChannel())
+    else if (SelectedChannel::get() == list->revertChannel())
       stream << qSetFieldWidth(5) << "Sel";
     else
-      stream << qSetFieldWidth(5) << QString::number(config->channelList()->indexOf(list->txChannel())+1);
+      stream << qSetFieldWidth(5) << QString::number(config->channelList()->indexOf(list->revertChannel())+1);
     QStringList tmp;
     for (int j=0; j<list->count(); j++) {
       if (SelectedChannel::get() == list->channel(j))

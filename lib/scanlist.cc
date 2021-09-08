@@ -15,26 +15,21 @@
  * Implementation of ScanList
  * ********************************************************************************************* */
 ScanList::ScanList(const QString &name, QObject *parent)
-  : ConfigObject("scan", parent), _name(name), _channels(), _priorityChannel(nullptr),
-    _secPriorityChannel(nullptr), _txChannel(nullptr)
+  : ConfigObject("scan", parent), _name(name), _channels(), _primary(), _secondary(), _revert()
 {
   // pass...
-}
-
-int
-ScanList::count() const {
-  return _channels.count();
 }
 
 void
 ScanList::clear() {
   _channels.clear();
   _name.clear();
-  _priorityChannel = nullptr;
-  _secPriorityChannel = nullptr;
-  _txChannel = nullptr;
+  _primary.clear();
+  _secondary.clear();
+  _revert.clear();
   emit modified(this);
 }
+
 
 const QString &
 ScanList::name() const {
@@ -48,6 +43,22 @@ ScanList::setName(const QString &name) {
   _name = name.simplified();
   emit modified(this);
   return true;
+}
+
+
+const ChannelRefList *
+ScanList::channels() const {
+  return &_channels;
+}
+
+ChannelRefList *
+ScanList::channels() {
+  return &_channels;
+}
+
+int
+ScanList::count() const {
+  return _channels.count();
 }
 
 bool
@@ -80,100 +91,70 @@ ScanList::remChannel(Channel *channel) {
   return _channels.del(channel);
 }
 
-Channel *
-ScanList::priorityChannel() const {
-  return _priorityChannel;
+
+const ChannelReference *
+ScanList::primary() const {
+  return &_primary;
 }
 
-void
-ScanList::setPriorityChannel(Channel *channel) {
-  if (_priorityChannel)
-    disconnect(_priorityChannel, SIGNAL(destroyed(QObject*)),
-               this, SLOT(onChannelDeleted(QObject*)));
-  _priorityChannel = channel;
-  if (_priorityChannel)
-    connect(_priorityChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
-  emit modified(this);
+ChannelReference *
+ScanList::primary() {
+  return &_primary;
 }
 
 Channel *
-ScanList::secPriorityChannel() const {
-  return _secPriorityChannel;
+ScanList::primaryChannel() const {
+  return _primary.as<Channel>();
 }
 
 void
-ScanList::setSecPriorityChannel(Channel *channel) {
-  if (_secPriorityChannel)
-    disconnect(_secPriorityChannel, SIGNAL(destroyed(QObject*)),
-               this, SLOT(onChannelDeleted(QObject*)));
-  _secPriorityChannel = channel;
-  if (_secPriorityChannel)
-    connect(_secPriorityChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
+ScanList::setPrimaryChannel(Channel *channel) {
+  _primary.set(channel);
   emit modified(this);
+}
+
+
+const ChannelReference *
+ScanList::secondary() const {
+  return &_secondary;
+}
+
+ChannelReference *
+ScanList::secondary() {
+  return &_secondary;
 }
 
 Channel *
-ScanList::txChannel() const {
-  return _txChannel;
+ScanList::secondaryChannel() const {
+  return _secondary.as<Channel>();
 }
 
 void
-ScanList::setTXChannel(Channel *channel) {
-  if (_txChannel)
-    disconnect(_txChannel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  _txChannel = channel;
-  if (_txChannel)
-    connect(_txChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
+ScanList::setSecondaryChannel(Channel *channel) {
+  _secondary.set(channel);
   emit modified(this);
 }
 
+
+const ChannelReference *
+ScanList::revert() const {
+  return &_revert;
+}
+
+ChannelReference *
+ScanList::revert() {
+  return &_revert;
+}
+
+Channel *
+ScanList::revertChannel() const {
+  return _revert.as<Channel>();
+}
+
 void
-ScanList::onChannelDeleted(QObject *obj) {
-  if (Channel *channel = dynamic_cast<Channel *>(obj)) {
-    remChannel(channel);
-    if (_priorityChannel == channel)
-      _priorityChannel = nullptr;
-    if (_secPriorityChannel == channel)
-      _secPriorityChannel = nullptr;
-    if (_txChannel == channel)
-      _txChannel = nullptr;
-  }
-}
-
-bool
-ScanList::serialize(YAML::Node &node, const Context &context) {
-  if (! ConfigObject::serialize(node, context))
-    return false;
-
-  QStringList pchannels;
-  if (_priorityChannel && context.contains(_priorityChannel))
-    pchannels.append(context.getId(_priorityChannel));
-  if (_secPriorityChannel && context.contains(_secPriorityChannel))
-    pchannels.append(context.getId(_secPriorityChannel));
-  if (pchannels.count()) {
-    YAML::Node priority = YAML::Node(YAML::NodeType::Sequence);
-    priority.SetStyle(YAML::EmitterStyle::Flow);
-    foreach (QString id, pchannels) {
-      priority.push_back(id.toStdString());
-    }
-    node["priority"] = priority;
-  }
-
-  if (_txChannel && context.contains(_txChannel)) {
-    node["revert"] = context.getId(_txChannel).toStdString();
-  }
-
-  return true;
-}
-
-const ChannelRefList *
-ScanList::channels() const {
-  return &_channels;
-}
-
-ChannelRefList *
-ScanList::channels() {
-  return &_channels;
+ScanList::setRevertChannel(Channel *channel) {
+  _revert.set(channel);
+  emit modified(this);
 }
 
 

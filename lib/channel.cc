@@ -535,6 +535,16 @@ ChannelList::findAnalogChannelByTxFreq(double freq) const {
 
 
 /* ********************************************************************************************* *
+ * Implementation of ChannelReference
+ * ********************************************************************************************* */
+ChannelReference::ChannelReference(QObject *parent)
+  : ConfigObjectReference(Channel::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of ChannelRefList
  * ********************************************************************************************* */
 ChannelRefList::ChannelRefList(const QMetaObject &elementType, QObject *parent)

@@ -41,13 +41,13 @@ ScanListDialog::construct() {
     // set name
     scanListName->setText(_scanlist->name());
     // set priority channel
-    if (_scanlist->priorityChannel())
-      priorityChannel1->setCurrentIndex(_config->channelList()->indexOf(_scanlist->priorityChannel())+2);
+    if (_scanlist->primaryChannel())
+      priorityChannel1->setCurrentIndex(_config->channelList()->indexOf(_scanlist->primaryChannel())+2);
     // set secondary priority channel
-    if (_scanlist->secPriorityChannel())
-      priorityChannel2->setCurrentIndex(_config->channelList()->indexOf(_scanlist->secPriorityChannel())+2);
-    if (_scanlist->txChannel())
-      transmitChannel->setCurrentIndex(_config->channelList()->indexOf(_scanlist->txChannel())+2);
+    if (_scanlist->secondaryChannel())
+      priorityChannel2->setCurrentIndex(_config->channelList()->indexOf(_scanlist->secondaryChannel())+2);
+    if (_scanlist->revertChannel())
+      transmitChannel->setCurrentIndex(_config->channelList()->indexOf(_scanlist->revertChannel())+2);
     // fill channel list
     for (int i=0; i<_scanlist->count(); i++) {
       Channel *channel = _scanlist->channel(i);
@@ -159,9 +159,9 @@ ScanListDialog::scanlist() {
     scanlist->addChannel(channelList->item(i)->data(Qt::UserRole).value<Channel*>());
 
   // Set priority and transmit channels
-  scanlist->setPriorityChannel(priorityChannel1->currentData(Qt::UserRole).value<Channel *>());
-  scanlist->setSecPriorityChannel(priorityChannel2->currentData(Qt::UserRole).value<Channel *>());
-  scanlist->setTXChannel(transmitChannel->currentData(Qt::UserRole).value<Channel *>());
+  scanlist->setPrimaryChannel(priorityChannel1->currentData(Qt::UserRole).value<Channel *>());
+  scanlist->setSecondaryChannel(priorityChannel2->currentData(Qt::UserRole).value<Channel *>());
+  scanlist->setRevertChannel(transmitChannel->currentData(Qt::UserRole).value<Channel *>());
 
   return scanlist;
 }

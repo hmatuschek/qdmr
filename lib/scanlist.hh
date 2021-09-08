@@ -14,6 +14,12 @@ class ScanList : public ConfigObject
 
   /** The name of the scan list. */
   Q_PROPERTY(QString name READ name WRITE setName)
+  /** The primary channel. */
+  Q_PROPERTY(ChannelReference* primary READ primary)
+  /** The secondary channel. */
+  Q_PROPERTY(ChannelReference* secondary READ secondary)
+  /** The revert channel. */
+  Q_PROPERTY(ChannelReference* revert READ revert)
   /** The list of channels. */
   Q_PROPERTY(ChannelRefList * channels READ channels)
 
@@ -46,24 +52,32 @@ public:
   /** Returns the channels of the scan list. */
   ChannelRefList *channels();
 
+  /** Returns the primary channel reference. */
+  const ChannelReference *primary() const;
+  /** Returns the primary channel reference. */
+  ChannelReference *primary();
   /** Returns the priority channel. */
-  Channel *priorityChannel() const;
+  Channel *primaryChannel() const;
   /** Sets the priority channel. */
-  void setPriorityChannel(Channel *channel);
+  void setPrimaryChannel(Channel *channel);
+
+  /** Returns the secondary channel reference. */
+  const ChannelReference *secondary() const;
+  /** Returns the secondary channel reference. */
+  ChannelReference *secondary();
   /** Returns the secondary priority channel. */
-  Channel *secPriorityChannel() const;
+  Channel *secondaryChannel() const;
   /** Sets the secondary priority channel. */
-  void setSecPriorityChannel(Channel *channel);
+  void setSecondaryChannel(Channel *channel);
+
+  /** Returns the revert channel reference. */
+  const ChannelReference *revert() const;
+  /** Returns the revert channel reference. */
+  ChannelReference *revert();
   /** Returns the TX channel. */
-  Channel *txChannel() const;
+  Channel *revertChannel() const;
   /** Sets the TX channel. */
-  void setTXChannel(Channel *channel);
-
-protected:
-  bool serialize(YAML::Node &node, const Context &context);
-
-protected slots:
-  void onChannelDeleted(QObject *obj);
+  void setRevertChannel(Channel *channel);
 
 protected:
   /** The scanlist name. */
@@ -71,11 +85,11 @@ protected:
   /** The channel list. */
   ChannelRefList _channels;
   /** The priority channel. */
-  Channel *_priorityChannel;
+  ChannelReference _primary;
   /** The secondary priority channel. */
-  Channel *_secPriorityChannel;
+  ChannelReference _secondary;
   /** The transmit channel. */
-  Channel *_txChannel;
+  ChannelReference _revert;
 };
 
 

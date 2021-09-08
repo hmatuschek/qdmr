@@ -877,7 +877,7 @@ D868UVCodeplug::scanlist_t::linkScanListObj(ScanList *lst, CodeplugContext &ctx)
                  << "', priority channel 1 index " << idx << " unknown.";
       // Ignore error, continue decoding
     } else {
-      lst->setPriorityChannel(ctx.getChannel(idx));
+      lst->setPrimaryChannel(ctx.getChannel(idx));
     }
   }
 
@@ -888,7 +888,7 @@ D868UVCodeplug::scanlist_t::linkScanListObj(ScanList *lst, CodeplugContext &ctx)
                  << "', priority channel 2 index " << idx << " unknown.";
       // Ignore error, continue decoding
     } else {
-      lst->setSecPriorityChannel(ctx.getChannel(idx));
+      lst->setSecondaryChannel(ctx.getChannel(idx));
     }
   }
 
@@ -911,22 +911,22 @@ D868UVCodeplug::scanlist_t::fromScanListObj(ScanList *lst, Config *config) {
   setName(lst->name());
   prio_ch_select = PRIO_CHAN_OFF;
 
-  if (lst->priorityChannel()) {
+  if (lst->primaryChannel()) {
     prio_ch_select |= PRIO_CHAN_SEL1;
-    if (SelectedChannel::get() == lst->priorityChannel())
+    if (SelectedChannel::get() == lst->primaryChannel())
       priority_ch1 = 0x0000;
     else
       priority_ch1 = qToLittleEndian(
-            config->channelList()->indexOf(lst->priorityChannel())+1);
+            config->channelList()->indexOf(lst->primaryChannel())+1);
   }
 
-  if (lst->secPriorityChannel()) {
+  if (lst->secondaryChannel()) {
     prio_ch_select |= PRIO_CHAN_SEL2;
-    if (SelectedChannel::get() == lst->secPriorityChannel())
+    if (SelectedChannel::get() == lst->secondaryChannel())
       priority_ch2 = 0x0000;
     else
       priority_ch2 = qToLittleEndian(
-            config->channelList()->indexOf(lst->secPriorityChannel())+1);
+            config->channelList()->indexOf(lst->secondaryChannel())+1);
   }
 
   for (int i=0; i<std::min(50, lst->count()); i++) {
