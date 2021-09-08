@@ -537,7 +537,7 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, const CodeplugContext &c
     return false;
 
   if (scanListIndex() && ctx.hasScanList(scanListIndex())) {
-    c->setScanList(ctx.getScanList(scanListIndex()));
+    c->setScanListObj(ctx.getScanList(scanListIndex()));
   }
 
   if (MODE_ANALOG == mode()) {
@@ -566,8 +566,8 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
   txFrequency(chan->txFrequency()*1e6);
   rxOnly(chan->rxOnly());
   txTimeOut(chan->timeout());
-  if (chan->scanList())
-    scanListIndex(ctx.config()->scanlists()->indexOf(chan->scanList())+1);
+  if (chan->scanListObj())
+    scanListIndex(ctx.config()->scanlists()->indexOf(chan->scanListObj())+1);
   else
     scanListIndex(0);
 

@@ -1,5 +1,7 @@
 #include "roaming.hh"
+#include "channel.hh"
 #include <QSet>
+
 
 /* ********************************************************************************************* *
  * Implementation of RoamingZone

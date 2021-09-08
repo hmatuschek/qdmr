@@ -1931,7 +1931,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(scan);
         return false;
       }
-      _channels[idx]->as<DigitalChannel>()->setScanList(_scanlists[scan]);
+      _channels[idx]->as<DigitalChannel>()->setScanListObj(_scanlists[scan]);
     }
 
     // Check GPS System
@@ -2001,7 +2001,7 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
             .arg(line).arg(column).arg(name).arg(scan);
         return false;
       }
-      _channels[idx]->as<AnalogChannel>()->setScanList(_scanlists[scan]);
+      _channels[idx]->as<AnalogChannel>()->setScanListObj(_scanlists[scan]);
     }
 
     // Check APRS system

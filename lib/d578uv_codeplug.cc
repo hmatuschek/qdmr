@@ -316,7 +316,7 @@ D578UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
 
   // If channel has scan list
   if ((0xff != scan_list_index) && ctx.hasScanList(scan_list_index))
-    c->setScanList(ctx.getScanList(scan_list_index));
+    c->setScanListObj(ctx.getScanList(scan_list_index));
 
   return true;
 }
@@ -353,10 +353,10 @@ D578UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
   rx_only = c->rxOnly() ? 1 : 0;
 
   // Link scan list if set
-  if (nullptr == c->scanList())
+  if (nullptr == c->scanListObj())
     scan_list_index = 0xff;
   else
-    scan_list_index = conf->scanlists()->indexOf(c->scanList());
+    scan_list_index = conf->scanlists()->indexOf(c->scanListObj());
 
   // Dispatch by channel type
   if (c->is<AnalogChannel>()) {

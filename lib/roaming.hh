@@ -2,7 +2,8 @@
 #define ROAMINGZONE_HH
 
 #include <QAbstractListModel>
-#include <channel.hh>
+#include "configreference.hh"
+
 
 /** Represents a RoamingZone within the abstract device configuration.
  *
@@ -17,7 +18,7 @@ class RoamingZone : public ConfigObject
   /** The name of the roaming zone. */
   Q_PROPERTY(QString name READ name WRITE setName)
   /** The channels in the roaming zone. */
-  Q_PROPERTY(ConfigObjectRefList * channels READ channels)
+  Q_PROPERTY(DigitalChannelRefList * channels READ channels)
 
 public:
   /** Constructor.

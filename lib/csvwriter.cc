@@ -79,8 +79,8 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     else
       stream << qSetFieldWidth(11) << format_frequency(digi->txFrequency());
     stream << qSetFieldWidth(6)  << power2string(digi->power())
-           << qSetFieldWidth(5)  << ( nullptr != digi->scanList() ?
-          QString::number(config->scanlists()->indexOf(digi->scanList())+1) : QString("-") )
+           << qSetFieldWidth(5)  << ( nullptr != digi->scanListObj() ?
+          QString::number(config->scanlists()->indexOf(digi->scanListObj())+1) : QString("-") )
            << qSetFieldWidth(4)  << ( (0 == digi->timeout()) ? QString("-") : QString::number(digi->timeout()) )
            << qSetFieldWidth(3)  << (digi->rxOnly() ? '+' : '-')
            << qSetFieldWidth(7)  << ((DigitalChannel::AdmitNone==digi->admit()) ? "-" : ((DigitalChannel::AdmitFree==digi->admit()) ? "Free" : "Color"))
@@ -146,7 +146,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     else
       stream << qSetFieldWidth(11) << format_frequency(analog->txFrequency());
     stream << qSetFieldWidth(6)  << power2string(analog->power())
-           << qSetFieldWidth(5)  << ( nullptr != analog->scanList() ? QString::number(config->scanlists()->indexOf(analog->scanList())+1) : QString("-") )
+           << qSetFieldWidth(5)  << ( nullptr != analog->scanListObj() ? QString::number(config->scanlists()->indexOf(analog->scanListObj())+1) : QString("-") )
            << qSetFieldWidth(4)  << ( (0 == analog->timeout()) ? QString("-") : QString::number(analog->timeout()) )
            << qSetFieldWidth(3)  << (analog->rxOnly() ? '+' : '-')
            << qSetFieldWidth(7)  << ((AnalogChannel::AdmitNone==analog->admit()) ? "-" : ((AnalogChannel::AdmitFree==analog->admit()) ? "Free" : "Tone"))

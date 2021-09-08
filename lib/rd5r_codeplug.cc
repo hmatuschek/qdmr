@@ -162,11 +162,11 @@ RD5RCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx) 
   if (c->is<AnalogChannel>()) {
     AnalogChannel *ac = c->as<AnalogChannel>();
     if (scan_list_index && ctx.hasScanList(scan_list_index))
-      ac->setScanList(ctx.getScanList(scan_list_index));
+      ac->setScanListObj(ctx.getScanList(scan_list_index));
   } else {
     DigitalChannel *dc = c->as<DigitalChannel>();
     if (scan_list_index && ctx.hasScanList(scan_list_index))
-      dc->setScanList(ctx.getScanList(scan_list_index));
+      dc->setScanListObj(ctx.getScanList(scan_list_index));
     if (group_list_index && ctx.hasGroupList(group_list_index))
       dc->setRXGroupList(ctx.getGroupList(group_list_index));
     if (contact_name_index && ctx.hasDigitalContact(contact_name_index))
@@ -208,7 +208,7 @@ RD5RCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
     squelch = ac->squelch();
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
-    scan_list_index = conf->scanlists()->indexOf(ac->scanList())+1;
+    scan_list_index = conf->scanlists()->indexOf(ac->scanListObj())+1;
   } else if (c->is<DigitalChannel>()) {
     const DigitalChannel *dc = c->as<const DigitalChannel>();
     channel_mode = MODE_DIGITAL;
@@ -219,7 +219,7 @@ RD5RCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
     }
     repeater_slot2 = (DigitalChannel::TimeSlot1 == dc->timeSlot()) ? 0 : 1;
     colorcode_rx = colorcode_tx = dc->colorCode();
-    scan_list_index = conf->scanlists()->indexOf(dc->scanList()) + 1;
+    scan_list_index = conf->scanlists()->indexOf(dc->scanListObj()) + 1;
     group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList()) + 1;
     contact_name_index = conf->contacts()->indexOfDigital(dc->txContact()) + 1;
   }

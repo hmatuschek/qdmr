@@ -9,17 +9,8 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QInputDialog>
+#include "contact.hh"
 #include "config.hh"
-
-
-/* ********************************************************************************************* *
- * Implementation of DigitalContactRefList
- * ********************************************************************************************* */
-DigitalContactRefList::DigitalContactRefList(QObject *parent)
-  : ConfigObjectRefList(DigitalContact::staticMetaObject, parent)
-{
-  // pass...
-}
 
 
 /* ********************************************************************************************* *

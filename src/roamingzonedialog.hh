@@ -5,6 +5,8 @@
 #include "roaming.hh"
 #include "ui_roamingzonedialog.h"
 
+class Config;
+
 class RoamingZoneDialog : public QDialog, private Ui_RoamingZoneDialog
 {
   Q_OBJECT

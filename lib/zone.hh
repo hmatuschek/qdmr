@@ -5,7 +5,7 @@
 #include <QAbstractListModel>
 #include <QVector>
 
-#include "channel.hh"
+#include "configreference.hh"
 class Config;
 
 

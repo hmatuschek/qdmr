@@ -4,7 +4,8 @@
 #include "configobject.hh"
 #include <QAbstractListModel>
 
-#include "channel.hh"
+class Channel;
+#include "configreference.hh"
 
 /** Generic representation of a scan list.
  * @ingroup conf */
@@ -91,7 +92,6 @@ protected:
   /** The transmit channel. */
   ChannelReference _revert;
 };
-
 
 
 /** Represents the list of scan lists.

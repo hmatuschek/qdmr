@@ -25,9 +25,9 @@
 Channel::Channel(const QString &name, double rx, double tx, Power power, uint txTimeout,
                  bool rxOnly, ScanList *scanlist, QObject *parent)
   : ConfigObject("ch", parent), _name(name), _rxFreq(rx), _txFreq(tx), _power(power), _txTimeOut(txTimeout),
-    _rxOnly(rxOnly), _scanlist(scanlist)
+    _rxOnly(rxOnly), _scanlist()
 {
-  // pass..
+  _scanlist.set(scanlist);
 }
 
 const QString &
@@ -96,36 +96,25 @@ Channel::setRXOnly(bool enable) {
   return true;
 }
 
-ScanList *
+const ScanListReference *
 Channel::scanList() const {
-  return _scanlist;
+  return &_scanlist;
+}
+
+ScanListReference *
+Channel::scanList() {
+  return &_scanlist;
+}
+
+ScanList *
+Channel::scanListObj() const {
+  return _scanlist.as<ScanList>();
 }
 bool
-Channel::setScanList(ScanList *list) {
-  if (nullptr == list)
+Channel::setScanListObj(ScanList *list) {
+  if (! _scanlist.set(list))
     return false;
-  _scanlist = list;
-  if (_scanlist)
-    connect(_scanlist, SIGNAL(destroyed(QObject *)), this, SLOT(onScanListDeleted(QObject *)));
   emit modified(this);
-  return true;
-}
-
-void
-Channel::onScanListDeleted(QObject *obj) {
-  ScanList *scanlist = reinterpret_cast<ScanList *>(obj);
-  if (_scanlist == scanlist)
-    _scanlist = nullptr;
-}
-
-bool
-Channel::serialize(YAML::Node &node, const Context &context) {
-  if (! ConfigObject::serialize(node, context))
-    return false;
-
-  if (_scanlist && context.contains(_scanlist))
-    node["scanList"] = context.getId(_scanlist).toStdString();
-
   return true;
 }
 
@@ -532,41 +521,4 @@ ChannelList::findAnalogChannelByTxFreq(double freq) const {
   }
   return nullptr;
 }
-
-
-/* ********************************************************************************************* *
- * Implementation of ChannelReference
- * ********************************************************************************************* */
-ChannelReference::ChannelReference(QObject *parent)
-  : ConfigObjectReference(Channel::staticMetaObject, parent)
-{
-  // pass...
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of ChannelRefList
- * ********************************************************************************************* */
-ChannelRefList::ChannelRefList(const QMetaObject &elementType, QObject *parent)
-  : ConfigObjectRefList(elementType, parent)
-{
-  // pass...
-}
-
-ChannelRefList::ChannelRefList(QObject *parent)
-  : ConfigObjectRefList(Channel::staticMetaObject, parent)
-{
-  // pass...
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of DigitalChannelRefList
- * ********************************************************************************************* */
-DigitalChannelRefList::DigitalChannelRefList(QObject *parent)
-  : ChannelRefList(DigitalChannel::staticMetaObject, parent)
-{
-  // pass...
-}
-
 

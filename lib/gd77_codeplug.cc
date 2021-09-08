@@ -180,11 +180,11 @@ GD77Codeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx) 
   if (c->is<AnalogChannel>()) {
     AnalogChannel *ac = c->as<AnalogChannel>();
     if (scan_list_index && ctx.hasScanList(scan_list_index))
-      ac->setScanList(ctx.getScanList(scan_list_index));
+      ac->setScanListObj(ctx.getScanList(scan_list_index));
   } else {
     DigitalChannel *dc = c->as<DigitalChannel>();
     if (scan_list_index && ctx.hasScanList(scan_list_index))
-      dc->setScanList(ctx.getScanList(scan_list_index));
+      dc->setScanListObj(ctx.getScanList(scan_list_index));
     if (group_list_index && ctx.hasGroupList(group_list_index))
       dc->setRXGroupList(ctx.getGroupList(group_list_index));
     if (contact_name_index && ctx.hasDigitalContact(contact_name_index))
@@ -217,8 +217,8 @@ GD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
   tot = c->timeout()/15;
   rx_only = c->rxOnly() ? 1 : 0;
   bandwidth = BW_12_5_KHZ;
-  if (c->scanList())
-    scan_list_index = conf->scanlists()->indexOf(c->scanList())+1;
+  if (c->scanListObj())
+    scan_list_index = conf->scanlists()->indexOf(c->scanListObj())+1;
 
   if (c->is<AnalogChannel>()) {
     const AnalogChannel *ac = c->as<const AnalogChannel>();

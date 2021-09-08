@@ -5,6 +5,7 @@
 #include <QAbstractTableModel>
 
 #include "configobject.hh"
+#include "configreference.hh"
 #include "signaling.hh"
 
 class Config;
@@ -39,6 +40,8 @@ class Channel: public ConfigObject
   Q_PROPERTY(uint timeout READ timeout WRITE setTimeout)
   /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
+  /** The scan list. */
+  Q_PROPERTY(ScanListReference* scanList READ scanList)
 
 public:
   /** Possible power settings. */
@@ -116,17 +119,15 @@ public:
   /** Set, whether the channel is RX only. */
   bool setRXOnly(bool enable);
 
+  /** Returns the reference to the scan list. */
+  const ScanListReference *scanList() const;
+  /** Returns the reference to the scan list. */
+  ScanListReference *scanList();
+
   /** Returns the default scan list for the channel. */
-  ScanList *scanList() const;
+  ScanList *scanListObj() const;
   /** (Re-) Sets the default scan list for the channel. */
-  bool setScanList(ScanList *list);
-
-protected:
-  bool serialize(YAML::Node &node, const Context &context);
-
-protected slots:
-  /** Internal hander for deleted scan lists. */
-  void onScanListDeleted(QObject *obj);
+  bool setScanListObj(ScanList *list);
 
 protected:
   /** The channel name. */
@@ -142,7 +143,7 @@ protected:
   /** RX only flag. */
   bool  _rxOnly;
   /** Default scan list of the channel. */
-  ScanList *_scanlist;
+  ScanListReference _scanlist;
 };
 
 
@@ -437,48 +438,6 @@ public:
   /** Finds an analog channel with the given frequeny. */
   AnalogChannel *findAnalogChannelByTxFreq(double freq) const;
 };
-
-
-/** Represents a reference to a channel.
- * This class is only used to automate the parsing and generation of the YAML codeplug file.
- * @ingroup config */
-class ChannelReference: public ConfigObjectReference
-{
-  Q_OBJECT
-
-public:
-  /** Constructor. */
-  explicit ChannelReference(QObject *parent=nullptr);
-};
-
-
-/** Represents a list of weak references to channels (analog and digital).
- * @ingroup config */
-class ChannelRefList: public ConfigObjectRefList
-{
-  Q_OBJECT
-
-protected:
-  /** Hidden constructor. */
-  explicit ChannelRefList(const QMetaObject &elementType, QObject *parent = nullptr);
-
-public:
-  /** Empty constructor. */
-  explicit ChannelRefList(QObject *parent=nullptr);
-};
-
-
-/** Represents a list of references to some digital channels.
- * @ingroup config */
-class DigitalChannelRefList: public ChannelRefList
-{
-  Q_OBJECT
-
-public:
-  /** Empty constructor. */
-  explicit DigitalChannelRefList(QObject *parent=nullptr);
-};
-
 
 
 #endif // CHANNEL_HH

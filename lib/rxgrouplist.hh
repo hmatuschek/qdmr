@@ -3,19 +3,10 @@
 
 #include <QObject>
 #include <QAbstractListModel>
-#include "contact.hh"
+#include "configreference.hh"
 
 class Config;
-
-/** List of references to digital contacts. */
-class DigitalContactRefList: public ConfigObjectRefList
-{
-  Q_OBJECT
-
-public:
-  /** Constructor. */
-  explicit DigitalContactRefList(QObject *parent=nullptr);
-};
+class DigitalContact;
 
 
 /** Generic representation of a RX group list.

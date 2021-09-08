@@ -1,4 +1,5 @@
 #include "configobject.hh"
+#include "configreference.hh"
 #include "logger.hh"
 
 #include <QMetaProperty>
@@ -184,56 +185,6 @@ ConfigObject::addExtension(const QString &name, ConfigObject *ext) {
     _extensions[name]->deleteLater();
   _extensions.insert(name, ext);
   ext->setParent(this);
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of ConfigObjectReference
- * ********************************************************************************************* */
-ConfigObjectReference::ConfigObjectReference(const QMetaObject &elementType, QObject *parent)
-  : QObject(parent), _elementType(elementType), _object(nullptr)
-{
-  // pass...
-}
-
-void
-ConfigObjectReference::clear() {
-  if (_object) {
-    disconnect(_object, SIGNAL(destroyed(QObject*)), this, SLOT(onReferenceDeleted(QObject*)));
-    emit modified();
-  }
-  _object = nullptr;
-}
-
-bool
-ConfigObjectReference::set(ConfigObject *object) {
-  if (_object)
-    disconnect(_object, SIGNAL(destroyed(QObject*)), this, SLOT(onReferenceDeleted(QObject*)));
-
-  if (nullptr == object) {
-    _object = nullptr;
-    return true;
-  }
-
-  // Check type
-  if (! object->inherits(_elementType.className())) {
-    logError() << "Cannot reference element of type " << object->metaObject()->className()
-               << ", expected instance of " << _elementType.className();
-    return false;
-  }
-
-  _object = object;
-  if (_object)
-    connect(_object, SIGNAL(destroyed(QObject*)), this, SLOT(onReferenceDeleted(QObject*)));
-
-  emit modified();
-  return true;
-}
-
-void
-ConfigObjectReference::onReferenceDeleted(QObject *obj) {
-  _object = nullptr;
-  emit modified();
 }
 
 

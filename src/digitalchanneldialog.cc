@@ -48,7 +48,7 @@ DigitalChannelDialog::construct() {
   for (int i=0; i<_config->scanlists()->count(); i++) {
     scanList->addItem(_config->scanlists()->scanlist(i)->name(),
                       QVariant::fromValue(_config->scanlists()->scanlist(i)));
-    if (_channel && (_channel->scanList() == _config->scanlists()->scanlist(i)) )
+    if (_channel && (_channel->scanListObj() == _config->scanlists()->scanlist(i)) )
       scanList->setCurrentIndex(i+1);
   }
   txAdmit->setItemData(0, uint(DigitalChannel::AdmitNone));
@@ -147,7 +147,7 @@ DigitalChannelDialog::channel() {
     _channel->setPower(pwr);
     _channel->setTimeout(timeout);
     _channel->setRXOnly(rxonly);
-    _channel->setScanList(scanlist);
+    _channel->setScanListObj(scanlist);
     _channel->setAdmit(admit);
     _channel->setColorCode(colorcode);
     _channel->setTimeSlot(ts);

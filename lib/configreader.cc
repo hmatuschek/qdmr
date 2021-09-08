@@ -191,6 +191,7 @@ AbstractConfigReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
       }
       // get & check ID
       QString id = QString::fromStdString(node[prop.name()].as<std::string>());
+      logDebug() << "Link reference to " << id << " as " << prop.name();
       if (! ctx.contains(id)) {
         _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Reference %5 is not defined.")
             .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
@@ -1250,17 +1251,8 @@ ChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
 
 bool
 ChannelReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  Channel *channel = qobject_cast<Channel *>(obj);
-
-  if (node["scanList"] && node["scanList"].IsScalar()) {
-    QString sl = QString::fromStdString(node["scanList"].as<std::string>());
-    if ((! ctx.contains(sl)) || (! ctx.getObj(sl)->is<ScanList>())) {
-      _errorMessage = tr("%1:%2: Cannot link channel '%3': Scan list with id='%2' unknown.")
-          .arg(node["scanList"].Mark().line).arg(node["scanList"].Mark().column)
-          .arg(channel->name()).arg(sl);
-      return false;
-    }
-  }
+  if (! ObjectReader::link(obj, node, ctx))
+    return false;
 
   if (! linkExtensions(_extensions, obj, node, ctx))
     return false;

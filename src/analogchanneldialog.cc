@@ -47,7 +47,7 @@ AnalogChannelDialog::construct() {
   for (int i=0; i<_config->scanlists()->count(); i++) {
     ScanList *lst = _config->scanlists()->scanlist(i);
     scanList->addItem(lst->name(),QVariant::fromValue(lst));
-    if (_channel && (_channel->scanList() == lst) )
+    if (_channel && (_channel->scanListObj() == lst) )
       scanList->setCurrentIndex(i+1);
   }
   txAdmit->setItemData(0, uint(AnalogChannel::AdmitNone));
@@ -124,7 +124,7 @@ AnalogChannelDialog::channel() {
     _channel->setRXTone(rxtone);
     _channel->setTXTone(txtone);
     _channel->setBandwidth(bw);
-    _channel->setScanList(scanlist);
+    _channel->setScanListObj(scanlist);
     _channel->setAPRSSystem(aprs);
     return _channel;
   } else {
