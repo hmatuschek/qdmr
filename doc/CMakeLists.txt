@@ -1,4 +1,3 @@
-
 #
 # man-page generation
 #
@@ -9,7 +8,7 @@ if(UNIX AND NOT APPLE)
   set(DOCBOOK2MAN_XSLT ${CMAKE_CURRENT_SOURCE_DIR}/docbook_man.debian.xsl)
 elseif(UNIX AND APPLE)
   set(DOCBOOK2MAN_XSLT ${CMAKE_CURRENT_SOURCE_DIR}/docbook_man.macports.xsl)
-endif(UNIX AND APPLE)
+endif(UNIX AND NOT APPLE)
 
 add_custom_command(
   OUTPUT dmrconf.1
@@ -44,7 +43,7 @@ if (${BUILD_DOCS})
   set(DOXYGEN_ENABLE_PREPROCESSING YES)
   set(DOXYGEN_MACRO_EXPANSION YES)
   set(DOXYGEN_EXPAND_ONLY_PREDEF YES)
-  set(DOXYGEN_PREDEFINED __attribute__(x)=)
+  set(DOXYGEN_PREDEFINED __attribute__(x) =)
   set(DOXYGEN_IMAGE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/fig")
   doxygen_add_docs(apidocs
     ALL
