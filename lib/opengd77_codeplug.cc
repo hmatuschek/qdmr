@@ -111,19 +111,19 @@ OpenGD77Codeplug::channel_t::toChannelObj() const {
   double rxF = getRXFrequency();
   double txF = getTXFrequency();
   // decode power setting
-  Channel::Power pwr = Channel::LowPower;
+  Channel::Power pwr = Channel::Power::Low;
   if (POWER_GLOBAL == power) {
-    pwr = Channel::LowPower;
+    pwr = Channel::Power::Low;
   } else if (POWER_50mW == power) {
-    pwr = Channel::MinPower;
+    pwr = Channel::Power::Min;
   } else if ((POWER_250mW == power) || (POWER_500mW == power) || (POWER_750mW == power) || (POWER_1W == power)){
-    pwr = Channel::LowPower;
+    pwr = Channel::Power::Low;
   } else if ((POWER_2W == power) || (POWER_3W == power)) {
-    pwr = Channel::MidPower;
+    pwr = Channel::Power::Mid;
   } else if ((POWER_4W == power) || (POWER_5W == power)) {
-    pwr = Channel::HighPower;
+    pwr = Channel::Power::High;
   } else if (POWER_MAX == power) {
-    pwr = Channel::MaxPower;
+    pwr = Channel::Power::Max;
   }
 
   uint timeout = tot*15;
@@ -131,28 +131,28 @@ OpenGD77Codeplug::channel_t::toChannelObj() const {
   if (MODE_ANALOG == channel_mode) {
     AnalogChannel::Admit admit;
     switch (admit_criteria) {
-    case ADMIT_ALWAYS: admit = AnalogChannel::AdmitNone; break;
-    case ADMIT_CH_FREE: admit = AnalogChannel::AdmitFree; break;
+    case ADMIT_ALWAYS: admit = AnalogChannel::Admit::Always; break;
+    case ADMIT_CH_FREE: admit = AnalogChannel::Admit::Free; break;
     default:
       logError() << "Unknwon admit criterion " << int(admit_criteria);
       return nullptr;
     }
-    AnalogChannel::Bandwidth bw = (BW_25_KHZ == bandwidth) ? AnalogChannel::BWWide : AnalogChannel::BWNarrow;
+    AnalogChannel::Bandwidth bw = (BW_25_KHZ == bandwidth) ? AnalogChannel::Bandwidth::Wide : AnalogChannel::Bandwidth::Narrow;
     return new AnalogChannel(
           name, rxF, txF, pwr, timeout, rxOnly, admit, squelch,  getRXTone(), getTXTone(),
           bw, nullptr);
   } else if(MODE_DIGITAL == channel_mode) {
     DigitalChannel::Admit admit;
     switch (admit_criteria) {
-    case ADMIT_ALWAYS: admit = DigitalChannel::AdmitNone; break;
-    case ADMIT_CH_FREE: admit = DigitalChannel::AdmitFree; break;
-    case ADMIT_COLOR: admit = DigitalChannel::AdmitColorCode; break;
+    case ADMIT_ALWAYS: admit = DigitalChannel::Admit::Always; break;
+    case ADMIT_CH_FREE: admit = DigitalChannel::Admit::Free; break;
+    case ADMIT_COLOR: admit = DigitalChannel::Admit::ColorCode; break;
     default:
       logError() << "Unknwon admit criterion " << int(admit_criteria);
       return nullptr;
     }
     DigitalChannel::TimeSlot slot = repeater_slot2 ?
-          DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1;
+          DigitalChannel::TimeSlot::TS2 : DigitalChannel::TimeSlot::TS1;
     return new DigitalChannel(
           name, rxF, txF, pwr, timeout, rxOnly, admit, colorcode_rx, slot,
           nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
@@ -168,15 +168,15 @@ OpenGD77Codeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &c
   if (c->is<AnalogChannel>()) {
     AnalogChannel *ac = c->as<AnalogChannel>();
     if (scan_list_index && ctx.hasScanList(scan_list_index))
-      ac->setScanList(ctx.getScanList(scan_list_index));
+      ac->setScanListObj(ctx.getScanList(scan_list_index));
   } else {
     DigitalChannel *dc = c->as<DigitalChannel>();
     if (scan_list_index && ctx.getScanList(scan_list_index))
-      dc->setScanList(ctx.getScanList(scan_list_index));
+      dc->setScanListObj(ctx.getScanList(scan_list_index));
     if (group_list_index && ctx.getGroupList(group_list_index))
-      dc->setRXGroupList(ctx.getGroupList(group_list_index));
+      dc->setGroupListObj(ctx.getGroupList(group_list_index));
     if (contact_name_index && ctx.hasDigitalContact(contact_name_index))
-      dc->setTXContact(ctx.getDigitalContact(contact_name_index));
+      dc->setTXContactObj(ctx.getDigitalContact(contact_name_index));
   }
   return true;
 }
@@ -191,21 +191,21 @@ OpenGD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf
 
   // encode power setting
   switch (c->power()) {
-  case Channel::MaxPower:
+  case Channel::Power::Max:
     power = POWER_MAX;
-  case Channel::HighPower:
+  case Channel::Power::High:
     power = POWER_5W;
     break;
-  case Channel::MidPower:
+  case Channel::Power::Mid:
     power = POWER_3W;
-  case Channel::LowPower:
+  case Channel::Power::Low:
     power = POWER_1W;
-  case Channel::MinPower:
+  case Channel::Power::Min:
     power = POWER_50mW;
     break;
   }
 
-  tot = c->txTimeout()/15;
+  tot = c->timeout()/15;
   rx_only = c->rxOnly() ? 1 : 0;
   bandwidth = BW_12_5_KHZ;
 
@@ -213,28 +213,28 @@ OpenGD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf
     const AnalogChannel *ac = c->as<const AnalogChannel>();
     channel_mode = MODE_ANALOG;
     switch (ac->admit()) {
-      case AnalogChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS; break;
-      case AnalogChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE; break;
+      case AnalogChannel::Admit::Always: admit_criteria = ADMIT_ALWAYS; break;
+      case AnalogChannel::Admit::Free: admit_criteria = ADMIT_CH_FREE; break;
       default: admit_criteria = ADMIT_CH_FREE; break;
     }
-    bandwidth = (AnalogChannel::BWWide == ac->bandwidth()) ? BW_25_KHZ : BW_12_5_KHZ;
+    bandwidth = (AnalogChannel::Bandwidth::Wide == ac->bandwidth()) ? BW_25_KHZ : BW_12_5_KHZ;
     squelch = SQ_NORMAL; //ac->squelch();
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
-    scan_list_index = conf->scanlists()->indexOf(ac->scanList())+1;
+    scan_list_index = conf->scanlists()->indexOf(ac->scanListObj())+1;
   } else if (c->is<DigitalChannel>()) {
     const DigitalChannel *dc = c->as<const DigitalChannel>();
     channel_mode = MODE_DIGITAL;
     switch (dc->admit()) {
-      case DigitalChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS; break;
-      case DigitalChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE; break;
-      case DigitalChannel::AdmitColorCode: admit_criteria = ADMIT_COLOR; break;
+      case DigitalChannel::Admit::Always: admit_criteria = ADMIT_ALWAYS; break;
+      case DigitalChannel::Admit::Free: admit_criteria = ADMIT_CH_FREE; break;
+      case DigitalChannel::Admit::ColorCode: admit_criteria = ADMIT_COLOR; break;
     }
-    repeater_slot2 = (DigitalChannel::TimeSlot1 == dc->timeslot()) ? 0 : 1;
+    repeater_slot2 = (DigitalChannel::TimeSlot::TS1 == dc->timeSlot()) ? 0 : 1;
     colorcode_rx = colorcode_tx = dc->colorCode();
-    scan_list_index = conf->scanlists()->indexOf(dc->scanList()) + 1;
-    group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList()) + 1;
-    contact_name_index = conf->contacts()->indexOfDigital(dc->txContact()) + 1;
+    scan_list_index = conf->scanlists()->indexOf(dc->scanListObj()) + 1;
+    group_list_index = conf->rxGroupLists()->indexOf(dc->groupListObj()) + 1;
+    contact_name_index = conf->contacts()->indexOfDigital(dc->txContactObj()) + 1;
   }
 }
 
@@ -305,7 +305,7 @@ OpenGD77Codeplug::contact_t::fromContactObj(const DigitalContact *cont, const Co
     case DigitalContact::GroupCall:   type = CALL_GROUP; break;
     case DigitalContact::AllCall:     type = CALL_ALL; break;
   }
-  if (cont->rxTone())
+  if (cont->ring())
     receive_tone = ring_style = 1;
 }
 
@@ -353,9 +353,9 @@ OpenGD77Codeplug::zone_t::linkZoneObj(Zone *zone, const CodeplugContext &ctx, bo
   for (int i=0; (i<80) && member[i]; i++) {
     if (ctx.hasChannel(member[i])) {
       if (! putInB)
-        zone->A()->addChannel(ctx.getChannel(member[i]));
+        zone->A()->add(ctx.getChannel(member[i]));
       else
-        zone->B()->addChannel(ctx.getChannel(member[i]));
+        zone->B()->add(ctx.getChannel(member[i]));
     } else {
       logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
                 << member[i] << " out of bounds.";
@@ -373,7 +373,7 @@ OpenGD77Codeplug::zone_t::fromZoneObjA(const Zone *zone, const Config *conf) {
 
   for (int i=0; i<80; i++) {
     if (i < zone->A()->count())
-      member[i] = conf->channelList()->indexOf(zone->A()->channel(i))+1;
+      member[i] = conf->channelList()->indexOf(zone->A()->get(i))+1;
     else
       member[i] = 0;
   }
@@ -388,7 +388,7 @@ OpenGD77Codeplug::zone_t::fromZoneObjB(const Zone *zone, const Config *conf) {
 
   for (int i=0; i<80; i++) {
     if (i < zone->B()->count())
-      member[i] = conf->channelList()->indexOf(zone->B()->channel(i))+1;
+      member[i] = conf->channelList()->indexOf(zone->B()->get(i))+1;
     else
       member[i] = 0;
   }
@@ -417,8 +417,13 @@ OpenGD77Codeplug::encode(Config *config, const Flags &flags) {
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS, EEPROM);
   if (! flags.updateCodePlug)
     gs->initDefault();
-  gs->setName(config->name());
-  gs->setRadioId(config->radioIDs()->getId(0)->id());
+
+  if (nullptr == config->radioIDs()->defaultId()) {
+    _errorMessage = tr("Cannot encode OpenGD77 codeplug: No default radio ID specified.");
+    return false;
+  }
+  gs->setName(config->radioIDs()->defaultId()->name());
+  gs->setRadioId(config->radioIDs()->defaultId()->number());
 
   intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO, EEPROM);
   it->setIntroLine1(config->introLine1());
@@ -537,8 +542,9 @@ OpenGD77Codeplug::decode(Config *config) {
     return false;
   }
 
-  config->radioIDs()->getId(0)->setId(gs->getRadioId());
-  config->setName(gs->getName());
+  int idx = config->radioIDs()->addId(gs->getName(), gs->getRadioId());
+  config->radioIDs()->setDefaultId(idx);
+
   intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO, EEPROM);
   config->setIntroLine1(it->getIntroLine1());
   config->setIntroLine2(it->getIntroLine2());
@@ -681,7 +687,7 @@ OpenGD77Codeplug::decode(Config *config) {
         logError() << _errorMessage;
         return false;
       }
-      config->zones()->addZone(last_zone);
+      config->zones()->add(last_zone);
     } else {
       // when extending the last zone, chop its name to remove the "... A" part.
       last_zone->setName(last_zonebasename);

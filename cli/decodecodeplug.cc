@@ -30,6 +30,8 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   QString filename = parser.positionalArguments().at(1);
   QString errorMessage;
   QString radio = parser.value("radio").toLower();
+  Config config;
+
   if (("uv390"==radio) || ("rt3s"==radio)) {
     UV390Codeplug codeplug;
     if (parser.isSet("manufacturer")) {
@@ -43,25 +45,9 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
                  << "' : " << codeplug.errorMessage();
       return -1;
     }
-    Config config;
     if (! codeplug.decode(&config)) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "': " << codeplug.errorMessage();
-    }
-
-    if (3 <= parser.positionalArguments().size()) {
-      QFile outfile(parser.positionalArguments().at(2));
-      if (! outfile.open(QIODevice::WriteOnly)) {
-        logError() << "Cannot write CSV codeplug file '" << outfile.fileName()
-                   << "': " << outfile.errorString();
-        return -1;
-      }
-      QTextStream stream(&outfile);
-      config.writeCSV(stream, errorMessage);
-      outfile.close();
-    } else {
-      QTextStream stream(stdout);
-      config.writeCSV(stream, errorMessage);
     }
   } else if (("md2017"==radio) || ("rt82"==radio)) {
     MD2017Codeplug codeplug;
@@ -76,26 +62,10 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
                  << "' : " << codeplug.errorMessage();
       return -1;
     }
-    Config config;
     if (! codeplug.decode(&config)) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "': " << codeplug.errorMessage();
       return -1;
-    }
-
-    if (3 <= parser.positionalArguments().size()) {
-      QFile outfile(parser.positionalArguments().at(2));
-      if (! outfile.open(QIODevice::WriteOnly)) {
-        logError() << "Cannot write CSV codeplug file '" << outfile.fileName()
-                   << "': " << outfile.errorString();
-        return -1;
-      }
-      QTextStream stream(&outfile);
-      config.writeCSV(stream, errorMessage);
-      outfile.close();
-    } else {
-      QTextStream stream(stdout);
-      config.writeCSV(stream, errorMessage);
     }
   } else if ("rd5r"==radio) {
     RD5RCodeplug codeplug;
@@ -110,27 +80,10 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
                  << "': " << codeplug.errorMessage();
       return -1;
     }
-
-    Config config;
     if (! codeplug.decode(&config)) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "': " << codeplug.errorMessage();
       return -1;
-    }
-
-    if (3 <= parser.positionalArguments().size()) {
-      QFile outfile(parser.positionalArguments().at(2));
-      if (! outfile.open(QIODevice::WriteOnly)) {
-        logError() << "Cannot write CSV codeplug file '" << outfile.fileName()
-                   << "': " << outfile.errorString();
-        return -1;
-      }
-      QTextStream stream(&outfile);
-      config.writeCSV(stream, errorMessage);
-      outfile.close();
-    } else {
-      QTextStream stream(stdout);
-      config.writeCSV(stream, errorMessage);
     }
   } else if ("gd77" == radio) {
     GD77Codeplug codeplug;
@@ -145,27 +98,10 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
                  << "': " << codeplug.errorMessage();
       return -1;
     }
-
-    Config config;
     if (! codeplug.decode(&config)) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "': " << codeplug.errorMessage();
       return -1;
-    }
-
-    if (3 <= parser.positionalArguments().size()) {
-      QFile outfile(parser.positionalArguments().at(2));
-      if (! outfile.open(QIODevice::WriteOnly)) {
-        logError() << "Cannot write CSV codeplug file '" << outfile.fileName()
-                   << "': " << outfile.errorString();
-        return -1;
-      }
-      QTextStream stream(&outfile);
-      config.writeCSV(stream, errorMessage);
-      outfile.close();
-    } else {
-      QTextStream stream(stdout);
-      config.writeCSV(stream, errorMessage);
     }
   } else if ("opengd77" == radio) {
     if (parser.isSet("manufacturer")) {
@@ -178,26 +114,10 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
                  << "': " << codeplug.errorMessage();
       return -1;
     }
-    Config config;
     if (! codeplug.decode(&config)) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "': " << codeplug.errorMessage();
       return -1;
-    }
-
-    if (3 <= parser.positionalArguments().size()) {
-      QFile outfile(parser.positionalArguments().at(2));
-      if (! outfile.open(QIODevice::WriteOnly)) {
-        logError() << "Cannot write CSV codeplug file '" << outfile.fileName()
-                   << "': " << outfile.errorString();
-        return -1;
-      }
-      QTextStream stream(&outfile);
-      config.writeCSV(stream, errorMessage);
-      outfile.close();
-    } else {
-      QTextStream stream(stdout);
-      config.writeCSV(stream, errorMessage);
     }
   } else if ("d878uv" == radio) {
     if (parser.isSet("manufacturer")) {
@@ -209,24 +129,9 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
       return -1;
     }
-    Config config;
     if (! codeplug.decode(&config)) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
       return -1;
-    }
-
-    if (3 <= parser.positionalArguments().size()) {
-      QFile outfile(parser.positionalArguments().at(2));
-      if (! outfile.open(QIODevice::WriteOnly)) {
-        logError() << "Cannot write CSV codeplug file '" << outfile.fileName() << "':" << outfile.errorString();
-        return -1;
-      }
-      QTextStream stream(&outfile);
-      config.writeCSV(stream, errorMessage);
-      outfile.close();
-    } else {
-      QTextStream stream(stdout);
-      config.writeCSV(stream, errorMessage);
     }
   } else if ("d878uv2" == radio) {
     D878UV2Codeplug codeplug;
@@ -234,24 +139,9 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
       return -1;
     }
-    Config config;
     if (! codeplug.decode(&config)) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
       return -1;
-    }
-
-    if (3 <= parser.positionalArguments().size()) {
-      QFile outfile(parser.positionalArguments().at(2));
-      if (! outfile.open(QIODevice::WriteOnly)) {
-        logError() << "Cannot write CSV codeplug file '" << outfile.fileName() << "':" << outfile.errorString();
-        return -1;
-      }
-      QTextStream stream(&outfile);
-      config.writeCSV(stream, errorMessage);
-      outfile.close();
-    } else {
-      QTextStream stream(stdout);
-      config.writeCSV(stream, errorMessage);
     }
   } else if ("d868uv" == radio) {
     D868UVCodeplug codeplug;
@@ -259,24 +149,9 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
       return -1;
     }
-    Config config;
     if (! codeplug.decode(&config)) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
       return -1;
-    }
-
-    if (3 <= parser.positionalArguments().size()) {
-      QFile outfile(parser.positionalArguments().at(2));
-      if (! outfile.open(QIODevice::WriteOnly)) {
-        logError() << "Cannot write CSV codeplug file '" << outfile.fileName() << "':" << outfile.errorString();
-        return -1;
-      }
-      QTextStream stream(&outfile);
-      config.writeCSV(stream, errorMessage);
-      outfile.close();
-    } else {
-      QTextStream stream(stdout);
-      config.writeCSV(stream, errorMessage);
     }
   } else if ("d578uv" == radio) {
     D578UVCodeplug codeplug;
@@ -284,24 +159,9 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
       return -1;
     }
-    Config config;
     if (! codeplug.decode(&config)) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
       return -1;
-    }
-
-    if (3 <= parser.positionalArguments().size()) {
-      QFile outfile(parser.positionalArguments().at(2));
-      if (! outfile.open(QIODevice::WriteOnly)) {
-        logError() << "Cannot write CSV codeplug file '" << outfile.fileName() << "':" << outfile.errorString();
-        return -1;
-      }
-      QTextStream stream(&outfile);
-      config.writeCSV(stream, errorMessage);
-      outfile.close();
-    } else {
-      QTextStream stream(stdout);
-      config.writeCSV(stream, errorMessage);
     }
   } else if (parser.isSet("radio")) {
     logError() << "Unknown radio type '" << parser.value("radio") << "'.";
@@ -309,6 +169,50 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   } else {
     logError() << "Cannot determine binary codeplug type. Consider specifying the radio type using --radio.";
     return -1;
+  }
+
+  if (3 <= parser.positionalArguments().size()) {
+    QFileInfo info(parser.positionalArguments().at(2));
+    if (("conf" == info.suffix()) || ("csv" == info.suffix()) || parser.isSet("csv")) {
+      QFile outfile(info.filePath());
+      if (! outfile.open(QIODevice::WriteOnly)) {
+        logError() << "Cannot write CSV codeplug file '" << outfile.fileName()
+                   << "': " << outfile.errorString();
+        return -1;
+      }
+      QTextStream stream(&outfile);
+      config.writeCSV(stream, errorMessage);
+      outfile.close();
+    } else if (("yaml" == info.suffix()) || parser.isSet("yaml")) {
+      QFile outfile(info.filePath());
+      if (! outfile.open(QIODevice::WriteOnly)) {
+        logError() << "Cannot write CSV codeplug file '" << outfile.fileName()
+                   << "': " << outfile.errorString();
+        return -1;
+      }
+      QTextStream stream(&outfile);
+      config.toYAML(stream);
+      outfile.close();
+    } else {
+      logError() << "Cannot determine codeplug output file format. Consider using --csv or --yaml.";
+      return -1;
+    }
+  } else {
+    QTextStream stream(stdout);
+    if (parser.isSet("csv")) {
+      if (! config.writeCSV(stream, errorMessage)) {
+        logError() << "Cannot serialize codeplug into CSV: " << errorMessage;
+        return -1;
+      }
+    } else if (parser.isSet("yaml")) {
+      if (! config.toYAML(stream)) {
+        logError() << "Cannot serialize codeplug into YAML.";
+        return -1;
+      }
+    } else {
+      logError() << "Cannot determine codeplug output file format. Consider using --csv or --yaml.";
+      return -1;
+    }
   }
 
   return 0;

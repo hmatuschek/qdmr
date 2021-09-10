@@ -23,7 +23,7 @@ GPSSystemDialog::construct() {
   for (int i=0; i<_config->contacts()->digitalCount(); i++) {
     destination->addItem(_config->contacts()->digitalContact(i)->name(),
                          QVariant::fromValue(_config->contacts()->digitalContact(i)));
-    if (_gpsSystem && (_gpsSystem->contact() == _config->contacts()->digitalContact(i)))
+    if (_gpsSystem && (_gpsSystem->contactObj() == _config->contacts()->digitalContact(i)))
       destination->setCurrentIndex(i);
   }
   // setup period

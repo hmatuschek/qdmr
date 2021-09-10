@@ -1,87 +1,38 @@
 #include "channellistview.hh"
-#include "config.hh"
-#include <QPushButton>
-#include <QMessageBox>
+#include "ui_channellistview.h"
+
 #include "analogchanneldialog.hh"
 #include "digitalchanneldialog.hh"
+#include "config.hh"
+#include "settings.hh"
+
+#include <QHeaderView>
+#include <QMessageBox>
 
 
-/* ********************************************************************************************* *
- * Implementation of ChannelListView
- * ********************************************************************************************* */
 ChannelListView::ChannelListView(Config *config, QWidget *parent)
-  : QWidget(parent), _config(config), _list(config->channelList()), _view(nullptr)
+  : QWidget(parent), ui(new Ui::ChannelListView), _config(config)
 {
-  QPushButton *up   = new QPushButton(QIcon("://icons/up.png"),"");
-  QPushButton *down = new QPushButton(QIcon("://icons/down.png"), "");
-  up->setToolTip(tr("Move channel up in list."));
-  down->setToolTip(tr("Move channel down in list."));
-  QPushButton *adda = new QPushButton(tr("Add Analog Channel"));
-  QPushButton *addd = new QPushButton(tr("Add Digital Channel"));
-  QPushButton *rem  = new QPushButton(tr("Delete Channel"));
+  ui->setupUi(this);
 
-  _view = new QTableView();
-  _view->setModel(_list);
-  _view->setColumnWidth(0, 60);
-  _view->setColumnWidth(1, 120);
-  _view->setColumnWidth(2, 80);
-  _view->setColumnWidth(3, 80);
-  _view->setColumnWidth(4, 50);
-  _view->setColumnWidth(5, 60);
-  _view->setColumnWidth(6, 50);
-  _view->setColumnWidth(7, 60);
-  _view->setColumnWidth(8, 120);
-  _view->setColumnWidth(9, 30);
-  _view->setColumnWidth(10, 30);
-  _view->setColumnWidth(11, 120);
-  _view->setColumnWidth(12, 120);
-  _view->setColumnWidth(13, 60);
-  _view->setColumnWidth(14, 60);
-  _view->setColumnWidth(15, 60);
-  _view->setColumnWidth(16, 60);
+  connect(ui->listView->header(), SIGNAL(sectionCountChanged(int,int)),
+          this, SLOT(loadChannelListSectionState()));
+  connect(ui->listView->header(), SIGNAL(sectionResized(int,int,int)),
+          this, SLOT(storeChannelListSectionState()));
 
-  QVBoxLayout *layout = new QVBoxLayout();
+  ui->listView->setModel(new ChannelListWrapper(_config->channelList(), ui->listView));
 
-  QHBoxLayout *hbox = new QHBoxLayout();
-  hbox->addWidget(_view,1);
-  QVBoxLayout *vbox = new QVBoxLayout();
-  vbox->addWidget(up);
-  vbox->addWidget(down);
-  hbox->addLayout(vbox);
-  layout->addLayout(hbox);
-
-  hbox = new QHBoxLayout();
-  hbox->addWidget(adda);
-  hbox->addWidget(addd);
-  hbox->addWidget(rem);
-  layout->addLayout(hbox);
-  setLayout(layout);
-
-  connect(up,   SIGNAL(clicked()), this, SLOT(onChannelUp()));
-  connect(down, SIGNAL(clicked()), this, SLOT(onChannelDown()));
-  connect(adda, SIGNAL(clicked()), this, SLOT(onAddAnalogChannel()));
-  connect(addd, SIGNAL(clicked()), this, SLOT(onAddDigitalChannel()));
-  connect(rem,  SIGNAL(clicked()), this, SLOT(onRemChannel()));
-  connect(_view, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onEditChannel(const QModelIndex &)));
+  connect(ui->addAnalogChannel, SIGNAL(clicked()), this, SLOT(onAddAnalogChannel()));
+  connect(ui->addDigitalChannel, SIGNAL(clicked()), this, SLOT(onAddDigitalChannel()));
+  connect(ui->cloneChannel, SIGNAL(clicked()), this, SLOT(onCloneChannel()));
+  connect(ui->remChannel, SIGNAL(clicked()), this, SLOT(onRemChannel()));
+  connect(ui->listView, SIGNAL(doubleClicked(uint)), this, SLOT(onEditChannel(uint)));
 }
 
-void
-ChannelListView::onChannelUp() {
-  QModelIndex selected =_view->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (0==selected.row()))
-    return;
-  if (_config->channelList()->moveUp(selected.row()))
-    _view->selectRow(selected.row()-1);
+ChannelListView::~ChannelListView() {
+  delete ui;
 }
 
-void
-ChannelListView::onChannelDown() {
-  QModelIndex selected =_view->selectionModel()->currentIndex();
-  if ((! selected.isValid()) || (_config->channelList()->count()==(selected.row()+1)))
-    return;
-  if (_config->channelList()->moveDown(selected.row()))
-    _view->selectRow(selected.row()+1);
-}
 
 void
 ChannelListView::onAddAnalogChannel() {
@@ -89,38 +40,117 @@ ChannelListView::onAddAnalogChannel() {
   if (QDialog::Accepted != dialog.exec())
     return;
 
-  _list->addChannel(dialog.channel());
+  int row=-1;
+  if (ui->listView->hasSelection())
+    row = ui->listView->selection().second+1;
+  _config->channelList()->add(dialog.channel(), row);
 }
 
 void
 ChannelListView::onAddDigitalChannel() {
   DigitalChannelDialog dialog(_config);
-
   if (QDialog::Accepted != dialog.exec())
     return;
 
-  _list->addChannel(dialog.channel());
+  int row=-1;
+  if (ui->listView->hasSelection())
+    row = ui->listView->selection().second+1;
+  _config->channelList()->add(dialog.channel(), row);
+}
+
+void
+ChannelListView::onCloneChannel() {
+  // get selection
+  int row = ui->listView->selection().first;
+  if ((! ui->listView->hasSelection()) || (row != ui->listView->selection().second)) {
+    QMessageBox::information(nullptr, tr("Select a single channel first"),
+                             tr("To clone a channel, please select a single channel to clone."),
+                             QMessageBox::Close);
+    return;
+  }
+
+  // Get selected channel
+  Channel *channel = _config->channelList()->channel(row);
+  if (! channel)
+    return;
+
+  // Dispatch by type
+  if (channel->is<AnalogChannel>()) {
+    AnalogChannel *selch = channel->as<AnalogChannel>();
+    // clone channel
+    AnalogChannel *clone = new AnalogChannel(
+          selch->name()+" clone", selch->rxFrequency(), selch->txFrequency(), selch->power(),
+          selch->timeout(), selch->rxOnly(), selch->admit(), selch->squelch(),
+          selch->rxTone(), selch->txTone(), selch->bandwidth(), selch->scanListObj(),
+          selch->aprsSystem());
+    // open editor
+    AnalogChannelDialog dialog(_config, clone);
+    if (QDialog::Accepted != dialog.exec()) {
+      // if rejected -> destroy clone
+      clone->deleteLater();
+      return;
+    }
+    // update channel
+    dialog.channel();
+    // add to list (below selected one)
+    _config->channelList()->add(clone, row+1);
+  } else {
+    DigitalChannel *selch = channel->as<DigitalChannel>();
+    // clone channel
+    DigitalChannel *clone = new DigitalChannel(
+          selch->name()+" clone", selch->rxFrequency(), selch->txFrequency(), selch->power(),
+          selch->timeout(), selch->rxOnly(), selch->admit(), selch->colorCode(),
+          selch->timeSlot(), selch->groupListObj(), selch->txContactObj(), selch->aprsObj(),
+          selch->scanListObj(), selch->roamingZone(), nullptr);
+    // open editor
+    DigitalChannelDialog dialog(_config, clone);
+    if (QDialog::Accepted != dialog.exec()) {
+      clone->deleteLater();
+      return;
+    }
+    // update channel
+    dialog.channel();
+    // add to list (below selected one)
+    _config->channelList()->add(clone, row+1);
+  }
 }
 
 void
 ChannelListView::onRemChannel() {
-  QModelIndex selected =_view->selectionModel()->currentIndex();
-  if (! selected.isValid()) {
-    QMessageBox::information(nullptr, tr("Cannot delete channel"),
-                             tr("Cannot delete channel: You have to select a channel first."));
+  if (! ui->listView->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot delete channel"),
+          tr("Cannot delete channel: You have to select a channel first."));
     return;
   }
 
-  QString name = _list->channel(selected.row())->name();
-  if (QMessageBox::No == QMessageBox::question(nullptr, tr("Delete channel?"), tr("Delete channel %1?").arg(name)))
-    return;
+  // Get selection and ask for deletion
+  QPair<int,int> rows = ui->listView->selection();
+  int rowcount = rows.second-rows.first+1;
+  if (rows.first == rows.second) {
+    QString name = _config->channelList()->channel(rows.first)->name();
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete channel?"), tr("Delete channel %1?").arg(name)))
+      return;
+  } else {
+    if (QMessageBox::No == QMessageBox::question(
+          nullptr, tr("Delete channel?"), tr("Delete %1 channels?").arg(rowcount)))
+      return;
+  }
 
-  _list->remChannel(selected.row());
+  // collect all selected channels
+  // need to collect them first as rows change when deleting channels
+  QList<Channel *> channels; channels.reserve(rowcount);
+  for(int row=rows.first; row<=rows.second; row++)
+    channels.push_back(_config->channelList()->channel(row));
+  // remove channels
+  foreach (Channel *channel, channels)
+    _config->channelList()->del(channel);
 }
 
 void
-ChannelListView::onEditChannel(const QModelIndex &index) {
-  Channel *channel = _config->channelList()->channel(index.row());
+ChannelListView::onEditChannel(uint row) {
+  Channel *channel = _config->channelList()->channel(row);
   if (! channel)
     return;
   if (channel->is<AnalogChannel>()) {
@@ -136,4 +166,14 @@ ChannelListView::onEditChannel(const QModelIndex &index) {
   }
 }
 
+void
+ChannelListView::loadChannelListSectionState() {
+  Settings settings;
+  ui->listView->header()->restoreState(settings.channelListHeaderState());
+}
+void
+ChannelListView::storeChannelListSectionState() {
+  Settings settings;
+  settings.setChannelListHeaderState(ui->listView->header()->saveState());
+}
 

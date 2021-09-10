@@ -215,7 +215,7 @@ MD2017Codeplug::createZones(CodeplugContext &ctx) {
     if (! zone.isValid())
       break;
     if (Zone *obj = zone.toZoneObj()) {
-      ctx.config()->zones()->addZone(obj);
+      ctx.config()->zones()->add(obj);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid zone at index %2.")
           .arg(__func__).arg(i);
@@ -420,6 +420,17 @@ MD2017Codeplug::clearMenuSettings() {
 void
 MD2017Codeplug::clearButtonSettings() {
   ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).clear();
+}
+
+bool
+MD2017Codeplug::encodeButtonSettings(Config *config, const Flags &flags) {
+  // Encode settings
+  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(config);
+}
+
+bool
+MD2017Codeplug::decodeButtonSetttings(Config *config) {
+  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).updateConfig(config);
 }
 
 void

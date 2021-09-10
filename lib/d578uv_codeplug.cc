@@ -197,19 +197,19 @@ D578UVCodeplug::channel_t::setTXTone(Signaling::Code code) {
 Channel *
 D578UVCodeplug::channel_t::toChannelObj() const {
   // Decode power setting
-  Channel::Power power = Channel::LowPower;
+  Channel::Power power = Channel::Power::Low;
   switch ((channel_t::Power) this->power) {
   case POWER_LOW:
-    power = Channel::LowPower;
+    power = Channel::Power::Low;
     break;
   case POWER_MIDDLE:
-    power = Channel::MidPower;
+    power = Channel::Power::Mid;
     break;
   case POWER_HIGH:
-    power = Channel::HighPower;
+    power = Channel::Power::High;
     break;
   case POWER_TURBO:
-    power = Channel::MaxPower;
+    power = Channel::Power::Max;
     break;
   }
   bool rxOnly = (1 == this->rx_only);
@@ -219,22 +219,22 @@ D578UVCodeplug::channel_t::toChannelObj() const {
     if (MODE_MIXED_A_D == channel_mode)
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << getName() <<"' as analog channel.";
-    AnalogChannel::Admit admit = AnalogChannel::AdmitNone;
+    AnalogChannel::Admit admit = AnalogChannel::Admit::Always;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
-      admit = AnalogChannel::AdmitNone;
+      admit = AnalogChannel::Admit::Always;
       break;
     case ADMIT_CH_FREE:
-      admit = AnalogChannel::AdmitFree;
+      admit = AnalogChannel::Admit::Free;
       break;
     default:
       break;
     }
-    AnalogChannel::Bandwidth bw = AnalogChannel::BWNarrow;
+    AnalogChannel::Bandwidth bw = AnalogChannel::Bandwidth::Narrow;
     if (BW_12_5_KHZ == bandwidth)
-      bw = AnalogChannel::BWNarrow;
+      bw = AnalogChannel::Bandwidth::Narrow;
     else
-      bw = AnalogChannel::BWWide;
+      bw = AnalogChannel::Bandwidth::Wide;
     ch = new AnalogChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           1, getRXTone(), getTXTone(), bw, nullptr);
@@ -242,20 +242,20 @@ D578UVCodeplug::channel_t::toChannelObj() const {
     if (MODE_MIXED_D_A == channel_mode)
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << getName() <<"' as digital channel.";
-    DigitalChannel::Admit admit = DigitalChannel::AdmitNone;
+    DigitalChannel::Admit admit = DigitalChannel::Admit::Always;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
-      admit = DigitalChannel::AdmitNone;
+      admit = DigitalChannel::Admit::Always;
       break;
     case ADMIT_CH_FREE:
-      admit = DigitalChannel::AdmitFree;
+      admit = DigitalChannel::Admit::Free;
       break;
     case ADMIT_CC_SAME:
     case ADMIT_CC_DIFF:
-      admit = DigitalChannel::AdmitColorCode;
+      admit = DigitalChannel::Admit::ColorCode;
       break;
     }
-    DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1);
+    DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot::TS2 : DigitalChannel::TimeSlot::TS1);
     ch = new DigitalChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
@@ -279,26 +279,30 @@ D578UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
     // Check if default contact is set, in fact a valid contact index is mandatory.
     uint32_t conIdx = qFromLittleEndian(contact_index);
     if ((0xffffffff != conIdx) && ctx.hasDigitalContact(conIdx))
-      dc->setTXContact(ctx.getDigitalContact(conIdx));
+      dc->setTXContactObj(ctx.getDigitalContact(conIdx));
 
     // Set if RX group list is set
     if ((0xff != group_list_index) && ctx.hasGroupList(group_list_index))
-      dc->setRXGroupList(ctx.getGroupList(group_list_index));
+      dc->setGroupListObj(ctx.getGroupList(group_list_index));
 
     // Link to GPS system
     if ((APRS_REPORT_DIGITAL == aprs_report) && ctx.hasGPSSystem(gps_system))
-      dc->setPosSystem(ctx.getGPSSystem(gps_system));
+      dc->aprsObj(ctx.getGPSSystem(gps_system));
     // Link APRS system if one is defined
     //  There can only be one active APRS system, hence the index is fixed to one.
     if ((APRS_REPORT_ANALOG == aprs_report) && ctx.hasAPRSSystem(0))
-      dc->setPosSystem(ctx.getAPRSSystem(0));
+      dc->aprsObj(ctx.getAPRSSystem(0));
 
     // If roaming is not disabled -> link to default roaming zone
     if (0 == excl_from_roaming)
-      dc->setRoaming(DefaultRoamingZone::get());
+      dc->setRoamingZone(DefaultRoamingZone::get());
 
     // Link radio ID
-    dc->setRadioId(ctx.getRadioId(id_index));
+    RadioID *rid = ctx.getRadioId(id_index);
+    if (rid == ctx.config()->radioIDs()->defaultId())
+      dc->setRadioIdObj(DefaultRadioID::get());
+    else
+      dc->setRadioIdObj(rid);
 
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
@@ -316,7 +320,7 @@ D578UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
 
   // If channel has scan list
   if ((0xff != scan_list_index) && ctx.hasScanList(scan_list_index))
-    c->setScanList(ctx.getScanList(scan_list_index));
+    c->setScanListObj(ctx.getScanList(scan_list_index));
 
   return true;
 }
@@ -334,17 +338,17 @@ D578UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
 
   // encode power setting
   switch (c->power()) {
-  case Channel::MaxPower:
+  case Channel::Power::Max:
     power = POWER_TURBO;
     break;
-  case Channel::HighPower:
+  case Channel::Power::High:
     power = POWER_HIGH;
     break;
-  case Channel::MidPower:
+  case Channel::Power::Mid:
     power = POWER_MIDDLE;
     break;
-  case Channel::LowPower:
-  case Channel::MinPower:
+  case Channel::Power::Low:
+  case Channel::Power::Min:
     power = POWER_LOW;
     break;
   }
@@ -353,10 +357,10 @@ D578UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
   rx_only = c->rxOnly() ? 1 : 0;
 
   // Link scan list if set
-  if (nullptr == c->scanList())
+  if (nullptr == c->scanListObj())
     scan_list_index = 0xff;
   else
-    scan_list_index = conf->scanlists()->indexOf(c->scanList());
+    scan_list_index = conf->scanlists()->indexOf(c->scanListObj());
 
   // Dispatch by channel type
   if (c->is<AnalogChannel>()) {
@@ -365,16 +369,16 @@ D578UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     // pack analog channel config
     // set admit criterion
     switch (ac->admit()) {
-    case AnalogChannel::AdmitNone: tx_permit = ADMIT_ALWAYS; break;
-    case AnalogChannel::AdmitFree: tx_permit = ADMIT_CH_FREE; break;
-    case AnalogChannel::AdmitTone: tx_permit = ADMIT_ALWAYS; break;
+    case AnalogChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
+    case AnalogChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
+    case AnalogChannel::Admit::Tone: tx_permit = ADMIT_ALWAYS; break;
     }
     // squelch mode
     squelch_mode = (Signaling::SIGNALING_NONE == ac->rxTone()) ? SQ_CARRIER : SQ_TONE;
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     // set bandwidth
-    bandwidth = (AnalogChannel::BWNarrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
+    bandwidth = (AnalogChannel::Bandwidth::Narrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
     // Set APRS system
     rx_gps = 0;
     if (nullptr != ac->aprsSystem()) {
@@ -387,39 +391,39 @@ D578UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     channel_mode = MODE_DIGITAL;
     // set admit criterion
     switch(dc->admit()) {
-    case DigitalChannel::AdmitNone: tx_permit = ADMIT_ALWAYS; break;
-    case DigitalChannel::AdmitFree: tx_permit = ADMIT_CH_FREE; break;
-    case DigitalChannel::AdmitColorCode: tx_permit = ADMIT_CC_SAME; break;
+    case DigitalChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
+    case DigitalChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
+    case DigitalChannel::Admit::ColorCode: tx_permit = ADMIT_CC_SAME; break;
     }
     // set color code
     color_code = dc->colorCode();
     // set time-slot
-    slot2 = (DigitalChannel::TimeSlot2 == dc->timeslot()) ? 1 : 0;
+    slot2 = (DigitalChannel::TimeSlot::TS2 == dc->timeSlot()) ? 1 : 0;
     // link transmit contact
-    if (nullptr == dc->txContact()) {
+    if (nullptr == dc->txContactObj()) {
       contact_index = 0;
     } else {
       contact_index = qToLittleEndian(
-            uint32_t(conf->contacts()->indexOfDigital(dc->txContact())));
+            uint32_t(conf->contacts()->indexOfDigital(dc->txContactObj())));
     }
     // link RX group list
-    if (nullptr == dc->rxGroupList())
+    if (nullptr == dc->groupListObj())
       group_list_index = 0xff;
     else
-      group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList());
+      group_list_index = conf->rxGroupLists()->indexOf(dc->groupListObj());
     // Set GPS system index
     rx_gps = 0;
-    if (dc->posSystem() && dc->posSystem()->is<GPSSystem>()) {
+    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
       aprs_report = APRS_REPORT_DIGITAL;
-      gps_system = conf->posSystems()->indexOfGPSSys(dc->posSystem()->as<GPSSystem>());
+      gps_system = conf->posSystems()->indexOfGPSSys(dc->aprsObj()->as<GPSSystem>());
       rx_gps = 1;
-    } else if (dc->posSystem() && dc->posSystem()->is<APRSSystem>()) {
+    } else if (dc->aprsObj() && dc->aprsObj()->is<APRSSystem>()) {
       aprs_report = APRS_REPORT_ANALOG;
       rx_gps = 1;
     }
     // Set radio ID
-    if (nullptr != dc->radioId())
-      id_index = conf->radioIDs()->indexOf(dc->radioId());
+    if (nullptr != dc->radioIdObj())
+      id_index = conf->radioIDs()->indexOf(dc->radioIdObj());
     else
       id_index = 0;
   }

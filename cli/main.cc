@@ -46,6 +46,10 @@ int main(int argc, char *argv[])
                      QCoreApplication::translate("main", "Up- and download codeplugs in CSV format.")
                    });
   parser.addOption({
+                     {"y", "yaml"},
+                     QCoreApplication::translate("main", "Up- and download codeplugs in extensible YAML format.")
+                   });
+  parser.addOption({
                      {"b", "bin"},
                      QCoreApplication::translate("main", "Up- and download codeplugs in binary format.")
                    });
@@ -99,8 +103,9 @@ int main(int argc, char *argv[])
 
   parser.addPositionalArgument(
         "file", QCoreApplication::translate(
-          "main", "The code-plug file. Either binary (extension .dfu) or text/csv (extension .conf "
-          "or .csv). The format can be forced using the --csc or --binary options."),
+          "main", "The code-plug file. Either binary (extension .dfu), text/csv (extension .conf "
+          "or .csv) or YAML format (extension .yaml). The format can be forced using the --csv, "
+          "--yaml or --binary options."),
         QCoreApplication::translate("main", "[filename]"));
 
   parser.process(app);

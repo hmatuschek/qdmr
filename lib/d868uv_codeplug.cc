@@ -424,19 +424,19 @@ D868UVCodeplug::channel_t::setTXTone(Code code) {
 Channel *
 D868UVCodeplug::channel_t::toChannelObj() const {
   // Decode power setting
-  Channel::Power power = Channel::LowPower;
+  Channel::Power power = Channel::Power::Low;
   switch ((channel_t::Power) this->power) {
   case POWER_LOW:
-    power = Channel::LowPower;
+    power = Channel::Power::Low;
     break;
   case POWER_MIDDLE:
-    power = Channel::MidPower;
+    power = Channel::Power::Mid;
     break;
   case POWER_HIGH:
-    power = Channel::HighPower;
+    power = Channel::Power::High;
     break;
   case POWER_TURBO:
-    power = Channel::MaxPower;
+    power = Channel::Power::Max;
     break;
   }
   bool rxOnly = (1 == this->rx_only);
@@ -446,22 +446,22 @@ D868UVCodeplug::channel_t::toChannelObj() const {
     if (MODE_MIXED_A_D == channel_mode)
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << getName() <<"' as analog channel.";
-    AnalogChannel::Admit admit = AnalogChannel::AdmitNone;
+    AnalogChannel::Admit admit = AnalogChannel::Admit::Always;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
-      admit = AnalogChannel::AdmitNone;
+      admit = AnalogChannel::Admit::Always;
       break;
     case ADMIT_CH_FREE:
-      admit = AnalogChannel::AdmitFree;
+      admit = AnalogChannel::Admit::Free;
       break;
     default:
       break;
     }
-    AnalogChannel::Bandwidth bw = AnalogChannel::BWNarrow;
+    AnalogChannel::Bandwidth bw = AnalogChannel::Bandwidth::Narrow;
     if (BW_12_5_KHZ == bandwidth)
-      bw = AnalogChannel::BWNarrow;
+      bw = AnalogChannel::Bandwidth::Narrow;
     else
-      bw = AnalogChannel::BWWide;
+      bw = AnalogChannel::Bandwidth::Wide;
     ch = new AnalogChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           1, getRXTone(), getTXTone(), bw, nullptr);
@@ -469,19 +469,19 @@ D868UVCodeplug::channel_t::toChannelObj() const {
     if (MODE_MIXED_A_D == channel_mode)
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << getName() <<"' as digital channel.";
-    DigitalChannel::Admit admit = DigitalChannel::AdmitNone;
+    DigitalChannel::Admit admit = DigitalChannel::Admit::Always;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
-      admit = DigitalChannel::AdmitNone;
+      admit = DigitalChannel::Admit::Always;
       break;
     case ADMIT_CH_FREE:
-      admit = DigitalChannel::AdmitFree;
+      admit = DigitalChannel::Admit::Free;
       break;
     case ADMIT_COLORCODE:
-      admit = DigitalChannel::AdmitColorCode;
+      admit = DigitalChannel::Admit::ColorCode;
       break;
     }
-    DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1);
+    DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot::TS2 : DigitalChannel::TimeSlot::TS1);
     ch = new DigitalChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
@@ -505,24 +505,24 @@ D868UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
     // Check if default contact is set, in fact a valid contact index is mandatory.
     uint32_t conIdx = qFromLittleEndian(contact_index);
     if ((0xffffffff != conIdx) && ctx.hasDigitalContact(conIdx))
-      dc->setTXContact(ctx.getDigitalContact(conIdx));
+      dc->setTXContactObj(ctx.getDigitalContact(conIdx));
 
     // Set if RX group list is set
     if ((0xff != group_list_index) && ctx.hasGroupList(group_list_index))
-      dc->setRXGroupList(ctx.getGroupList(group_list_index));
+      dc->setGroupListObj(ctx.getGroupList(group_list_index));
 
     // Link to GPS system
     if (aprs_report && (!ctx.hasGPSSystem(gps_system)))
       logWarn() << "Cannot link to GPS system index " << gps_system << ": undefined GPS system.";
     else if (ctx.hasGPSSystem(gps_system))
-      dc->setPosSystem(ctx.getGPSSystem(gps_system));
+      dc->aprsObj(ctx.getGPSSystem(gps_system));
 
     // Link radio ID
     RadioID *rid = ctx.getRadioId(id_index);
-    if (rid == ctx.config()->radioIDs()->getDefaultId())
-      dc->setRadioId(nullptr);
+    if (rid == ctx.config()->radioIDs()->defaultId())
+      dc->setRadioIdObj(DefaultRadioID::get());
     else
-      dc->setRadioId(rid);
+      dc->setRadioIdObj(rid);
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
     AnalogChannel *ac = c->as<AnalogChannel>();
@@ -534,7 +534,7 @@ D868UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
 
   // If channel has scan list
   if ((0xff != scan_list_index) && ctx.hasScanList(scan_list_index))
-    c->setScanList(ctx.getScanList(scan_list_index));
+    c->setScanListObj(ctx.getScanList(scan_list_index));
 
   return true;
 }
@@ -552,17 +552,17 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
 
   // encode power setting
   switch (c->power()) {
-  case Channel::MaxPower:
+  case Channel::Power::Max:
     power = POWER_TURBO;
     break;
-  case Channel::HighPower:
+  case Channel::Power::High:
     power = POWER_HIGH;
     break;
-  case Channel::MidPower:
+  case Channel::Power::Mid:
     power = POWER_MIDDLE;
     break;
-  case Channel::LowPower:
-  case Channel::MinPower:
+  case Channel::Power::Low:
+  case Channel::Power::Min:
     power = POWER_LOW;
     break;
   }
@@ -571,10 +571,10 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
   rx_only = c->rxOnly() ? 1 : 0;
 
   // Link scan list if set
-  if (nullptr == c->scanList())
+  if (nullptr == c->scanListObj())
     scan_list_index = 0xff;
   else
-    scan_list_index = conf->scanlists()->indexOf(c->scanList());
+    scan_list_index = conf->scanlists()->indexOf(c->scanListObj());
 
   // Dispatch by channel type
   if (c->is<AnalogChannel>()) {
@@ -583,49 +583,49 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     // pack analog channel config
     // set admit criterion
     switch (ac->admit()) {
-    case AnalogChannel::AdmitNone: tx_permit = ADMIT_ALWAYS; break;
-    case AnalogChannel::AdmitFree: tx_permit = ADMIT_CH_FREE; break;
-    case AnalogChannel::AdmitTone: tx_permit = ADMIT_ALWAYS; break;
+    case AnalogChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
+    case AnalogChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
+    case AnalogChannel::Admit::Tone: tx_permit = ADMIT_ALWAYS; break;
     }
     // squelch mode
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     // set bandwidth
-    bandwidth = (AnalogChannel::BWNarrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
+    bandwidth = (AnalogChannel::Bandwidth::Narrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
   } else if (c->is<DigitalChannel>()) {
     const DigitalChannel *dc = c->as<const DigitalChannel>();
     // pack digital channel config.
     channel_mode = MODE_DIGITAL;
     // set admit criterion
     switch(dc->admit()) {
-    case DigitalChannel::AdmitNone: tx_permit = ADMIT_ALWAYS; break;
-    case DigitalChannel::AdmitFree: tx_permit = ADMIT_CH_FREE; break;
-    case DigitalChannel::AdmitColorCode: tx_permit = ADMIT_COLORCODE; break;
+    case DigitalChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
+    case DigitalChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
+    case DigitalChannel::Admit::ColorCode: tx_permit = ADMIT_COLORCODE; break;
     }
     // set color code
     color_code = dc->colorCode();
     // set time-slot
-    slot2 = (DigitalChannel::TimeSlot2 == dc->timeslot()) ? 1 : 0;
+    slot2 = (DigitalChannel::TimeSlot::TS2 == dc->timeSlot()) ? 1 : 0;
     // link transmit contact
-    if (nullptr == dc->txContact()) {
+    if (nullptr == dc->txContactObj()) {
       contact_index = 0;
     } else {
       contact_index = qToLittleEndian(
-            uint32_t(conf->contacts()->indexOfDigital(dc->txContact())));
+            uint32_t(conf->contacts()->indexOfDigital(dc->txContactObj())));
     }
     // link RX group list
-    if (nullptr == dc->rxGroupList())
+    if (nullptr == dc->groupListObj())
       group_list_index = 0xff;
     else
-      group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList());
+      group_list_index = conf->rxGroupLists()->indexOf(dc->groupListObj());
     // Set GPS system index
-    if (dc->posSystem() && dc->posSystem()->is<GPSSystem>()) {
+    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
       aprs_report = 1;
-      gps_system = conf->posSystems()->indexOfGPSSys(dc->posSystem()->as<GPSSystem>());
+      gps_system = conf->posSystems()->indexOfGPSSys(dc->aprsObj()->as<GPSSystem>());
     }
     // Set radio ID
-    if (nullptr != dc->radioId())
-      id_index = conf->radioIDs()->indexOf(dc->radioId());
+    if (nullptr != dc->radioIdObj())
+      id_index = conf->radioIDs()->indexOf(dc->radioIdObj());
     else
       id_index = 0;
   }
@@ -711,7 +711,7 @@ D868UVCodeplug::contact_t::fromContactObj(const DigitalContact *contact) {
   setType(contact->type());
   setName(contact->name());
   setId(contact->number());
-  setAlert(contact->rxTone());
+  setAlert(contact->ring());
 }
 
 
@@ -877,7 +877,7 @@ D868UVCodeplug::scanlist_t::linkScanListObj(ScanList *lst, CodeplugContext &ctx)
                  << "', priority channel 1 index " << idx << " unknown.";
       // Ignore error, continue decoding
     } else {
-      lst->setPriorityChannel(ctx.getChannel(idx));
+      lst->setPrimaryChannel(ctx.getChannel(idx));
     }
   }
 
@@ -888,7 +888,7 @@ D868UVCodeplug::scanlist_t::linkScanListObj(ScanList *lst, CodeplugContext &ctx)
                  << "', priority channel 2 index " << idx << " unknown.";
       // Ignore error, continue decoding
     } else {
-      lst->setSecPriorityChannel(ctx.getChannel(idx));
+      lst->setSecondaryChannel(ctx.getChannel(idx));
     }
   }
 
@@ -911,22 +911,22 @@ D868UVCodeplug::scanlist_t::fromScanListObj(ScanList *lst, Config *config) {
   setName(lst->name());
   prio_ch_select = PRIO_CHAN_OFF;
 
-  if (lst->priorityChannel()) {
+  if (lst->primaryChannel()) {
     prio_ch_select |= PRIO_CHAN_SEL1;
-    if (SelectedChannel::get() == lst->priorityChannel())
+    if (SelectedChannel::get() == lst->primaryChannel())
       priority_ch1 = 0x0000;
     else
       priority_ch1 = qToLittleEndian(
-            config->channelList()->indexOf(lst->priorityChannel())+1);
+            config->channelList()->indexOf(lst->primaryChannel())+1);
   }
 
-  if (lst->secPriorityChannel()) {
+  if (lst->secondaryChannel()) {
     prio_ch_select |= PRIO_CHAN_SEL2;
-    if (SelectedChannel::get() == lst->secPriorityChannel())
+    if (SelectedChannel::get() == lst->secondaryChannel())
       priority_ch2 = 0x0000;
     else
       priority_ch2 = qToLittleEndian(
-            config->channelList()->indexOf(lst->secPriorityChannel())+1);
+            config->channelList()->indexOf(lst->secondaryChannel())+1);
   }
 
   for (int i=0; i<std::min(50, lst->count()); i++) {
@@ -1104,26 +1104,26 @@ D868UVCodeplug::gps_settings_t::setAutomaticTXIntervall(uint16_t period) {
 Channel::Power
 D868UVCodeplug::gps_settings_t::getTransmitPower() const {
   switch (transmit_power) {
-  case POWER_LOW: return Channel::LowPower;
-  case POWER_MID: return Channel::MidPower;
-  case POWER_HIGH: return Channel::HighPower;
-  case POWER_TURBO: return Channel::MaxPower;
+  case POWER_LOW: return Channel::Power::Low;
+  case POWER_MID: return Channel::Power::Mid;
+  case POWER_HIGH: return Channel::Power::High;
+  case POWER_TURBO: return Channel::Power::Max;
   }
 }
 void
 D868UVCodeplug::gps_settings_t::setTransmitPower(Channel::Power power) {
   switch(power) {
-  case Channel::MinPower:
-  case Channel::LowPower:
+  case Channel::Power::Min:
+  case Channel::Power::Low:
     transmit_power = POWER_LOW;
     break;
-  case Channel::MidPower:
+  case Channel::Power::Mid:
     transmit_power = POWER_MID;
     break;
-  case Channel::HighPower:
+  case Channel::Power::High:
     transmit_power = POWER_HIGH;
     break;
-  case Channel::MaxPower:
+  case Channel::Power::Max:
     transmit_power = POWER_TURBO;
     break;
   }
@@ -1232,8 +1232,8 @@ D868UVCodeplug::gps_settings_t::fromConfig(Config *config, const Flags &flags) {
   }
 
   GPSSystem *sys = config->posSystems()->gpsSystem(0);
-  setTargetID(sys->contact()->number());
-  setTargetType(sys->contact()->type());
+  setTargetID(sys->contactObj()->number());
+  setTargetType(sys->contactObj()->type());
   setManualTXIntervall(sys->period());
   setAutomaticTXIntervall(sys->period());
   if (SelectedChannel::get() == sys->revertChannel()->as<Channel>()) {
@@ -1257,7 +1257,7 @@ D868UVCodeplug::gps_settings_t::linkGPSSystem(uint8_t i, Config *config, Codeplu
   // Find matching contact, if not found -> create one.
   if (nullptr == (cont = config->contacts()->findDigitalContact(getTargetID()))) {
     cont = new DigitalContact(getTargetType(), QString("GPS target"), getTargetID());
-    config->contacts()->addContact(cont);
+    config->contacts()->add(cont);
   }
   ctx.getGPSSystem(i)->setContact(cont);
 
@@ -1779,11 +1779,8 @@ D868UVCodeplug::encodeRadioID(Config *config, const Flags &flags) {
   // Encode radio IDs
   for (int i=0; i<config->radioIDs()->count(); i++) {
     radioid_t *radio_id = (radioid_t *)data(ADDR_RADIOIDS + i*RADIOID_SIZE);
-    radio_id->setId(config->radioIDs()->getId(i)->id());
-    if (0 == i)
-      radio_id->setName(config->name());
-    else
-      radio_id->setName(config->name()+" "+QString::number(i));
+    radio_id->setName(config->radioIDs()->getId(i)->name());
+    radio_id->setId(config->radioIDs()->getId(i)->number());
   }
   return true;
 }
@@ -1792,21 +1789,14 @@ bool
 D868UVCodeplug::setRadioID(Config *config, CodeplugContext &ctx) {
   // Find a valid RadioID
   uint8_t *radio_id_bitmap = data(RADIOID_BITMAP);
-  bool first = true;
   for (uint16_t i=0; i<NUM_RADIOIDS; i++) {
     if (0 == (radio_id_bitmap[i/8] & (1 << (i%8))))
       continue;
     radioid_t *id = (radioid_t *)data(ADDR_RADIOIDS + i*RADIOID_SIZE);
-    if (first) {
-      logDebug() << "Store id " << id->getId() << " at idx " << i << " as default ID.";
-      ctx.setDefaultRadioId(id->getId(), i);
-      config->setName(id->getName());
-      first = false;
-    } else {
-      logDebug() << "Store id " << id->getId() << " at idx " << i << ".";
-      ctx.addRadioId(id->getId(), i);
-    }
+    logDebug() << "Store id " << id->getId() << " at idx " << i << ".";
+    ctx.addRadioId(id->getId(), i, id->getName());
   }
+
   return true;
 }
 
@@ -1906,7 +1896,7 @@ D868UVCodeplug::encodeZones(Config *config, const Flags &flags) {
     for (int j=0; j<config->zones()->zone(i)->A()->count(); j++) {
       channels[j] = qToLittleEndian(
             config->channelList()->indexOf(
-              config->zones()->zone(i)->A()->channel(j)));
+              config->zones()->zone(i)->A()->get(j)));
     }
     zidx++;
     if (! config->zones()->zone(i)->B()->count())
@@ -1922,7 +1912,7 @@ D868UVCodeplug::encodeZones(Config *config, const Flags &flags) {
     for (int j=0; j<config->zones()->zone(i)->B()->count(); j++) {
       channels[j] = qToLittleEndian(
             config->channelList()->indexOf(
-              config->zones()->zone(i)->B()->channel(j)));
+              config->zones()->zone(i)->B()->get(j)));
     }
     zidx++;
   }
@@ -1953,7 +1943,7 @@ D868UVCodeplug::createZones(Config *config, CodeplugContext &ctx) {
     if (! extend_last_zone) {
       last_zone = new Zone(zonename);
       // add to config
-      config->zones()->addZone(last_zone);
+      config->zones()->add(last_zone);
     } else {
       // when extending the last zone, chop its name to remove the "... A" part.
       last_zone->setName(last_zonebasename);
@@ -1971,9 +1961,9 @@ D868UVCodeplug::createZones(Config *config, CodeplugContext &ctx) {
         continue;
       // If defined -> add channel to zone obj
       if (extend_last_zone)
-        last_zone->B()->addChannel(ctx.getChannel(cidx));
+        last_zone->B()->add(ctx.getChannel(cidx));
       else
-        last_zone->A()->addChannel(ctx.getChannel(cidx));
+        last_zone->A()->add(ctx.getChannel(cidx));
     }
   }
   return true;

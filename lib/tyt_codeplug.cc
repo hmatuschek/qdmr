@@ -6,6 +6,7 @@
 #include "gpssystem.hh"
 #include "config.h"
 #include "logger.hh"
+#include "tyt_extensions.hh"
 #include <QTimeZone>
 #include <QtEndian>
 
@@ -39,13 +40,13 @@ TyTCodeplug::ChannelElement::clear() {
   Element::clear();
 
   mode(MODE_ANALOG);
-  bandwidth(AnalogChannel::BWNarrow);
+  bandwidth(AnalogChannel::Bandwidth::Narrow);
   autoScan(0);
   setBit(0, 1); setBit(0,2);
   loneWorker(false);
   talkaround(false);
   rxOnly(false);
-  timeSlot(DigitalChannel::TimeSlot1);
+  timeSlot(DigitalChannel::TimeSlot::TS1);
   colorCode(1);
   privacyIndex(0);
   privacyType(PRIV_NONE);
@@ -81,7 +82,7 @@ TyTCodeplug::ChannelElement::clear() {
   txSignaling(Signaling::SIGNALING_NONE);
   rxSignalingSystemIndex(0);
   txSignalingSystemIndex(0);
-  power(Channel::HighPower);
+  power(Channel::Power::High);
   setBit(30,2); setBit(30,3); setBit(30,4); setBit(30,5); setBit(30,6); setBit(30,7);
   txGPSInfo(true);
   rxGPSInfo(true);
@@ -105,12 +106,12 @@ TyTCodeplug::ChannelElement::mode(Mode mode) {
 AnalogChannel::Bandwidth
 TyTCodeplug::ChannelElement::bandwidth() const {
   if (0 == getUInt2(0, 2))
-    return AnalogChannel::BWNarrow;
-  return AnalogChannel::BWWide;
+    return AnalogChannel::Bandwidth::Narrow;
+  return AnalogChannel::Bandwidth::Wide;
 }
 void
 TyTCodeplug::ChannelElement::bandwidth(AnalogChannel::Bandwidth bw) {
-  if (AnalogChannel::BWNarrow == bw)
+  if (AnalogChannel::Bandwidth::Narrow == bw)
     setUInt2(0, 2, BW_12_5_KHZ);
   else
     setUInt2(0, 2, BW_25_KHZ);
@@ -155,12 +156,12 @@ TyTCodeplug::ChannelElement::rxOnly(bool enable) {
 DigitalChannel::TimeSlot
 TyTCodeplug::ChannelElement::timeSlot() const {
   if (2 == getUInt2(1,2))
-    return DigitalChannel::TimeSlot2;
-  return DigitalChannel::TimeSlot2;
+    return DigitalChannel::TimeSlot::TS2;
+  return DigitalChannel::TimeSlot::TS1;
 }
 void
 TyTCodeplug::ChannelElement::timeSlot(DigitalChannel::TimeSlot ts) {
-  if (DigitalChannel::TimeSlot1 == ts)
+  if (DigitalChannel::TimeSlot::TS1 == ts)
     setUInt2(1,2,1);
   else
     setUInt2(1,2,2);
@@ -420,25 +421,25 @@ TyTCodeplug::ChannelElement::txSignalingSystemIndex(uint8_t idx) {
 Channel::Power
 TyTCodeplug::ChannelElement::power() const {
   switch (getUInt2(30, 0)) {
-  case 0: return Channel::LowPower;
-  case 2: return Channel::MidPower;
-  case 3: return Channel::HighPower;
+  case 0: return Channel::Power::Low;
+  case 2: return Channel::Power::Mid;
+  case 3: return Channel::Power::High;
   default: break;
   }
-  return Channel::LowPower;
+  return Channel::Power::Low;
 }
 void
 TyTCodeplug::ChannelElement::power(Channel::Power pwr) {
   switch (pwr) {
-  case Channel::MinPower:
-  case Channel::LowPower:
+  case Channel::Power::Min:
+  case Channel::Power::Low:
     setUInt2(30,0, 0);
     break;
-  case Channel::MidPower:
+  case Channel::Power::Mid:
     setUInt2(30,0, 2);
     break;
-  case Channel::HighPower:
-  case Channel::MaxPower:
+  case Channel::Power::High:
+  case Channel::Power::Max:
     setUInt2(30,0, 3);
   }
 }
@@ -503,10 +504,10 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
   if (MODE_ANALOG == mode()) {
     AnalogChannel::Admit admit_crit;
     switch(admitCriterion()) {
-      case ADMIT_ALWAYS: admit_crit = AnalogChannel::AdmitNone; break;
-      case ADMIT_TONE: admit_crit = AnalogChannel::AdmitTone; break;
-      case ADMIT_CH_FREE: admit_crit = AnalogChannel::AdmitFree; break;
-      default: admit_crit = AnalogChannel::AdmitFree; break;
+      case ADMIT_ALWAYS: admit_crit = AnalogChannel::Admit::Always; break;
+      case ADMIT_TONE: admit_crit = AnalogChannel::Admit::Tone; break;
+      case ADMIT_CH_FREE: admit_crit = AnalogChannel::Admit::Free; break;
+      default: admit_crit = AnalogChannel::Admit::Free; break;
     }
 
     return new AnalogChannel(name(), double(rxFrequency())/1e6, double(txFrequency())/1e6,
@@ -515,10 +516,10 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
   } else if (MODE_DIGITAL == mode()) {
     DigitalChannel::Admit admit_crit;
     switch(admitCriterion()) {
-      case ADMIT_ALWAYS: admit_crit = DigitalChannel::AdmitNone; break;
-      case ADMIT_CH_FREE: admit_crit = DigitalChannel::AdmitFree; break;
-      case ADMIT_COLOR: admit_crit = DigitalChannel::AdmitColorCode; break;
-      default: admit_crit = DigitalChannel::AdmitFree; break;
+      case ADMIT_ALWAYS: admit_crit = DigitalChannel::Admit::Always; break;
+      case ADMIT_CH_FREE: admit_crit = DigitalChannel::Admit::Free; break;
+      case ADMIT_COLOR: admit_crit = DigitalChannel::Admit::ColorCode; break;
+      default: admit_crit = DigitalChannel::Admit::Free; break;
     }
 
     return new DigitalChannel(name(), double(rxFrequency())/1e6, double(txFrequency())/1e6,
@@ -536,7 +537,7 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, const CodeplugContext &c
     return false;
 
   if (scanListIndex() && ctx.hasScanList(scanListIndex())) {
-    c->setScanList(ctx.getScanList(scanListIndex()));
+    c->setScanListObj(ctx.getScanList(scanListIndex()));
   }
 
   if (MODE_ANALOG == mode()) {
@@ -544,13 +545,13 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, const CodeplugContext &c
   } else if ((MODE_DIGITAL == mode()) && (c->is<DigitalChannel>())){
     DigitalChannel *dc = c->as<DigitalChannel>();
     if (contactIndex() && ctx.hasDigitalContact(contactIndex())) {
-      dc->setTXContact(ctx.getDigitalContact(contactIndex()));
+      dc->setTXContactObj(ctx.getDigitalContact(contactIndex()));
     }
     if (groupListIndex() && ctx.hasGroupList(groupListIndex())) {
-      dc->setRXGroupList(ctx.getGroupList(groupListIndex()));
+      dc->setGroupListObj(ctx.getGroupList(groupListIndex()));
     }
     if (positioningSystemIndex() && ctx.hasGPSSystem(positioningSystemIndex())) {
-      dc->setPosSystem(ctx.getGPSSystem(positioningSystemIndex()));
+      dc->aprsObj(ctx.getGPSSystem(positioningSystemIndex()));
     }
     return true;
   }
@@ -564,9 +565,9 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
   rxFrequency(chan->rxFrequency()*1e6);
   txFrequency(chan->txFrequency()*1e6);
   rxOnly(chan->rxOnly());
-  txTimeOut(chan->txTimeout());
-  if (chan->scanList())
-    scanListIndex(ctx.config()->scanlists()->indexOf(chan->scanList())+1);
+  txTimeOut(chan->timeout());
+  if (chan->scanListObj())
+    scanListIndex(ctx.config()->scanlists()->indexOf(chan->scanListObj())+1);
   else
     scanListIndex(0);
 
@@ -577,24 +578,24 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
     const DigitalChannel *dchan = chan->as<const DigitalChannel>();
     mode(MODE_DIGITAL);
     switch (dchan->admit()) {
-    case DigitalChannel::AdmitNone: admitCriterion(ADMIT_ALWAYS); break;
-    case DigitalChannel::AdmitFree: admitCriterion(ADMIT_CH_FREE); break;
-    case DigitalChannel::AdmitColorCode: admitCriterion(ADMIT_COLOR); break;
+    case DigitalChannel::Admit::Always: admitCriterion(ADMIT_ALWAYS); break;
+    case DigitalChannel::Admit::Free: admitCriterion(ADMIT_CH_FREE); break;
+    case DigitalChannel::Admit::ColorCode: admitCriterion(ADMIT_COLOR); break;
     }
     colorCode(dchan->colorCode());
-    timeSlot(dchan->timeslot());
-    if (dchan->rxGroupList())
-      groupListIndex(ctx.config()->rxGroupLists()->indexOf(dchan->rxGroupList())+1);
+    timeSlot(dchan->timeSlot());
+    if (dchan->groupListObj())
+      groupListIndex(ctx.config()->rxGroupLists()->indexOf(dchan->groupListObj())+1);
     else
       groupListIndex(0);
-    if (dchan->txContact())
-      contactIndex(ctx.config()->contacts()->indexOfDigital(dchan->txContact())+1);
+    if (dchan->txContactObj())
+      contactIndex(ctx.config()->contacts()->indexOfDigital(dchan->txContactObj())+1);
     squelch(0);
-    bandwidth(AnalogChannel::BWNarrow);
+    bandwidth(AnalogChannel::Bandwidth::Narrow);
     rxSignaling(Signaling::SIGNALING_NONE);
     txSignaling(Signaling::SIGNALING_NONE);
-    if (dchan->posSystem() && dchan->posSystem()->is<GPSSystem>()) {
-      positioningSystemIndex(ctx.config()->posSystems()->indexOfGPSSys(dchan->posSystem()->as<GPSSystem>())+1);
+    if (dchan->aprsObj() && dchan->aprsObj()->is<GPSSystem>()) {
+      positioningSystemIndex(ctx.config()->posSystems()->indexOfGPSSys(dchan->aprsObj()->as<GPSSystem>())+1);
       txGPSInfo(true); rxGPSInfo(false);
     }
   } else if (chan->is<AnalogChannel>()) {
@@ -603,9 +604,9 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
     bandwidth(achan->bandwidth());
     squelch(achan->squelch());
     switch (achan->admit()) {
-    case AnalogChannel::AdmitNone: admitCriterion(ADMIT_ALWAYS); break;
-    case AnalogChannel::AdmitFree: admitCriterion(ADMIT_CH_FREE); break;
-    case AnalogChannel::AdmitTone: admitCriterion(ADMIT_TONE); break;
+    case AnalogChannel::Admit::Always: admitCriterion(ADMIT_ALWAYS); break;
+    case AnalogChannel::Admit::Free: admitCriterion(ADMIT_CH_FREE); break;
+    case AnalogChannel::Admit::Tone: admitCriterion(ADMIT_TONE); break;
     }
     rxSignaling(achan->rxTone());
     txSignaling(achan->txTone());
@@ -750,7 +751,7 @@ TyTCodeplug::ContactElement::fromContactObj(const DigitalContact *cont) {
   dmrId(cont->number());
   name(cont->name());
   callType(cont->type());
-  ringTone(cont->rxTone());
+  ringTone(cont->ring());
 
   return true;
 }
@@ -808,7 +809,7 @@ TyTCodeplug::ZoneElement::fromZoneObj(const Zone *zone, const CodeplugContext &c
   name(zone->name());
   for (int i=0; i<16; i++) {
     if (i < zone->A()->count())
-      memberIndex(i, ctx.config()->channelList()->indexOf(zone->A()->channel(i))+1);
+      memberIndex(i, ctx.config()->channelList()->indexOf(zone->A()->get(i))+1);
     else
       memberIndex(i, 0);
   }
@@ -832,7 +833,7 @@ TyTCodeplug::ZoneElement::linkZone(Zone *zone, const CodeplugContext &ctx) const
       logWarn() << "Cannot link channel with index " << memberIndex(i) << " channel not defined.";
       continue;
     }
-    zone->A()->addChannel(ctx.getChannel(memberIndex(i)));
+    zone->A()->add(ctx.getChannel(memberIndex(i)));
   }
 
   return true;
@@ -888,14 +889,14 @@ TyTCodeplug::ZoneExtElement::fromZoneObj(const Zone *zone, const CodeplugContext
   // Store remaining channels from list A
   for (int i=16; i<64; i++) {
     if (i < zone->A()->count())
-      memberIndexA(i-16, ctx.config()->channelList()->indexOf(zone->A()->channel(i))+1);
+      memberIndexA(i-16, ctx.config()->channelList()->indexOf(zone->A()->get(i))+1);
     else
       memberIndexA(i-16, 0);
   }
   // Store channel from list B
   for (int i=0; i<64; i++) {
     if (i < zone->B()->count())
-      memberIndexB(i, ctx.config()->channelList()->indexOf(zone->B()->channel(i))+1);
+      memberIndexB(i, ctx.config()->channelList()->indexOf(zone->B()->get(i))+1);
     else
       memberIndexB(i, 0);
   }
@@ -907,18 +908,18 @@ bool
 TyTCodeplug::ZoneExtElement::linkZoneObj(Zone *zone, const CodeplugContext &ctx) {
   for (int i=0; (i<48) && memberIndexA(i); i++) {
     if (! ctx.hasChannel(memberIndexA(i))) {
-      logWarn() << "Cannot link zone: Channel index " << memberIndexA(i) << " not defined.";
+      logWarn() << "Cannot link zone extension: Channel index " << memberIndexA(i) << " not defined.";
       return false;
     }
-    zone->A()->addChannel(ctx.getChannel(memberIndexA(i)));
+    zone->A()->add(ctx.getChannel(memberIndexA(i)));
   }
 
   for (int i=0; (i<64) && memberIndexB(i); i++) {
     if (! ctx.hasChannel(memberIndexB(i))) {
-      logWarn() << "Cannot link zone: Channel index " << memberIndexB(i) << " not defined.";
+      logWarn() << "Cannot link zone extension: Channel index " << memberIndexB(i) << " not defined.";
       return false;
     }
-    zone->B()->addChannel(ctx.getChannel(memberIndexB(i)));
+    zone->B()->add(ctx.getChannel(memberIndexB(i)));
   }
 
   return true;
@@ -976,12 +977,15 @@ TyTCodeplug::GroupListElement::memberIndex(uint n, uint16_t idx) {
 
 bool
 TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, const CodeplugContext &ctx) {
+  logDebug() << "Encode group list '" << lst->name() << "' with " << lst->count() << " members.";
   name(lst->name());
   for (int i=0; i<32; i++) {
-    if (i<lst->count())
+    if (i<lst->count()) {
+      logDebug() << "Add contact " << lst->contact(i)->name() << " to list.";
       memberIndex(i, ctx.config()->contacts()->indexOfDigital(lst->contact(i)) + 1);
-    else
+    } else {
       memberIndex(i, 0);
+    }
   }
   return true;
 }
@@ -1004,7 +1008,12 @@ TyTCodeplug::GroupListElement::linkGroupListObj(RXGroupList *lst, const Codeplug
                 << name() << "': Invalid contact index. Ignored.";
       continue;
     }
-    lst->addContact(ctx.getDigitalContact(memberIndex(i)));
+    logDebug() << "Add contact idx=" << memberIndex(i) << " to group list " << lst->name() << ".";
+    if (0 > lst->addContact(ctx.getDigitalContact(memberIndex(i)))) {
+      logWarn() << "Cannot add contact '" << ctx.getDigitalContact(memberIndex(i))->name()
+                << "' at idx=" << memberIndex(i) << ".";
+      continue;
+    }
   }
 
   return true;
@@ -1124,22 +1133,22 @@ TyTCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, const Codeplu
   name(lst->name());
 
   // Set priority channel 1
-  if (lst->priorityChannel() && (SelectedChannel::get() == lst->priorityChannel()))
+  if (lst->primaryChannel() && (SelectedChannel::get() == lst->primaryChannel()))
     priorityChannel1Index(0);
-  else if (lst->priorityChannel())
-    priorityChannel1Index(ctx.config()->channelList()->indexOf(lst->priorityChannel())+1);
+  else if (lst->primaryChannel())
+    priorityChannel1Index(ctx.config()->channelList()->indexOf(lst->primaryChannel())+1);
 
   // Set priority channel 2
-  if (lst->secPriorityChannel() && (SelectedChannel::get() == lst->secPriorityChannel()))
+  if (lst->secondaryChannel() && (SelectedChannel::get() == lst->secondaryChannel()))
     priorityChannel2Index(0);
-  else if (lst->secPriorityChannel())
-    priorityChannel2Index(ctx.config()->channelList()->indexOf(lst->secPriorityChannel())+1);
+  else if (lst->secondaryChannel())
+    priorityChannel2Index(ctx.config()->channelList()->indexOf(lst->secondaryChannel())+1);
 
   // Set transmit channel
-  if (lst->txChannel() && (SelectedChannel::get() == lst->txChannel()))
+  if (lst->revertChannel() && (SelectedChannel::get() == lst->revertChannel()))
     txChannelIndex(0);
-  else if (lst->txChannel())
-    txChannelIndex(ctx.config()->channelList()->indexOf(lst->txChannel())+1);
+  else if (lst->revertChannel())
+    txChannelIndex(ctx.config()->channelList()->indexOf(lst->revertChannel())+1);
 
   for (int i=0, j=0; i<31;) {
     if (j >= lst->count()) {
@@ -1170,29 +1179,31 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, const CodeplugConte
   }
 
   if (0 == priorityChannel1Index())
-    lst->setPriorityChannel(SelectedChannel::get());
+    lst->setPrimaryChannel(SelectedChannel::get());
   else if (ctx.hasChannel(priorityChannel1Index()))
-    lst->setPriorityChannel(ctx.getChannel(priorityChannel1Index()));
+    lst->setPrimaryChannel(ctx.getChannel(priorityChannel1Index()));
   else if (0xffff == priorityChannel1Index())
-    lst->setPriorityChannel(nullptr);
+    lst->setPrimaryChannel(nullptr);
   else
     logWarn() << "Cannot deocde reference to priority channel index " << priorityChannel1Index()
                  << " in scan list '" << name() << "'.";
 
   if (0 == priorityChannel2Index())
-    lst->setSecPriorityChannel(SelectedChannel::get());
+    lst->setSecondaryChannel(SelectedChannel::get());
   else if (ctx.hasChannel(priorityChannel2Index()))
-    lst->setSecPriorityChannel(ctx.getChannel(priorityChannel2Index()));
+    lst->setSecondaryChannel(ctx.getChannel(priorityChannel2Index()));
   else if (0xffff == priorityChannel2Index())
-    lst->setSecPriorityChannel(nullptr);
+    lst->setSecondaryChannel(nullptr);
   else
     logWarn() << "Cannot deocde reference to secondary priority channel index " << priorityChannel2Index()
               << " in scan list '" << name() << "'.";
 
   if (0 == txChannelIndex())
-    lst->setTXChannel(SelectedChannel::get());
+    lst->setRevertChannel(SelectedChannel::get());
   else if (ctx.hasChannel(txChannelIndex()))
-    lst->setTXChannel(ctx.getChannel(txChannelIndex()));
+    lst->setRevertChannel(ctx.getChannel(txChannelIndex()));
+  else if (0xffff == priorityChannel2Index())
+    lst->setSecondaryChannel(nullptr);
   else
     logWarn() << "Cannot deocde reference to secondary priority channel index " << txChannelIndex()
                 << " in scan list '" << name() << "'.";
@@ -1751,20 +1762,24 @@ TyTCodeplug::GeneralSettingsElement::editRadioID(bool enable) {
 
 bool
 TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
-  radioName(config->name());
-  dmrID(config->radioIDs()->getDefaultId()->id());
+  if (nullptr == config->radioIDs()->defaultId())
+    return false;
+  radioName(config->radioIDs()->defaultId()->name());
+  dmrID(config->radioIDs()->defaultId()->number());
+
   introLine1(config->introLine1());
   introLine2(config->introLine2());
   timeZone(QTimeZone::systemTimeZone());
   micLevel(config->micLevel());
   channelVoiceAnnounce(config->speech());
+
   return true;
 }
 
 bool
 TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
-  config->radioIDs()->getDefaultId()->setId(dmrID());
-  config->setName(radioName());
+  int idx = config->radioIDs()->addId(radioName(),dmrID());
+  config->radioIDs()->setDefaultId(idx);
   config->setIntroLine1(introLine1());
   config->setIntroLine2(introLine2());
   config->setMicLevel(micLevel());
@@ -2446,13 +2461,13 @@ TyTCodeplug::ButtonSettingsElement::~ButtonSettingsElement() {
 void
 TyTCodeplug::ButtonSettingsElement::clear() {
   setUInt16_le(0x00, 0);
-  sideButton1Short(Disabled);
-  sideButton1Long(Tone1750Hz);
-  sideButton2Short(MonitorToggle);
-  sideButton2Long(Disabled);
+  setSideButton1Short(ButtonAction::Disabled);
+  setSideButton1Long(ButtonAction::Tone1750Hz);
+  setSideButton2Short(ButtonAction::MonitorToggle);
+  setSideButton2Long(ButtonAction::Disabled);
   memset(_data+0x06, 0x00, 10);
   setUInt8(0x10, 1);
-  longPressDuration(2000);
+  setLongPressDuration(1000);
   setUInt16_le(0x12, 0xffff);
 }
 
@@ -2461,7 +2476,7 @@ TyTCodeplug::ButtonSettingsElement::sideButton1Short() const {
   return ButtonAction(getUInt8(0x02));
 }
 void
-TyTCodeplug::ButtonSettingsElement::sideButton1Short(ButtonAction action) {
+TyTCodeplug::ButtonSettingsElement::setSideButton1Short(ButtonAction action) {
   setUInt8(0x02, action);
 }
 
@@ -2470,7 +2485,7 @@ TyTCodeplug::ButtonSettingsElement::sideButton1Long() const {
   return ButtonAction(getUInt8(0x03));
 }
 void
-TyTCodeplug::ButtonSettingsElement::sideButton1Long(ButtonAction action) {
+TyTCodeplug::ButtonSettingsElement::setSideButton1Long(ButtonAction action) {
   setUInt8(0x03, action);
 }
 
@@ -2479,7 +2494,7 @@ TyTCodeplug::ButtonSettingsElement::sideButton2Short() const {
   return ButtonAction(getUInt8(0x04));
 }
 void
-TyTCodeplug::ButtonSettingsElement::sideButton2Short(ButtonAction action) {
+TyTCodeplug::ButtonSettingsElement::setSideButton2Short(ButtonAction action) {
   setUInt8(0x04, action);
 }
 
@@ -2488,7 +2503,7 @@ TyTCodeplug::ButtonSettingsElement::sideButton2Long() const {
   return ButtonAction(getUInt8(0x05));
 }
 void
-TyTCodeplug::ButtonSettingsElement::sideButton2Long(ButtonAction action) {
+TyTCodeplug::ButtonSettingsElement::setSideButton2Long(ButtonAction action) {
   setUInt8(0x05, action);
 }
 
@@ -2497,8 +2512,41 @@ TyTCodeplug::ButtonSettingsElement::longPressDuration() const {
   return uint(getUInt8(0x11))*250;
 }
 void
-TyTCodeplug::ButtonSettingsElement::longPressDuration(uint ms) {
+TyTCodeplug::ButtonSettingsElement::setLongPressDuration(uint ms) {
   setUInt8(0x11, ms/250);
+}
+
+bool
+TyTCodeplug::ButtonSettingsElement::fromConfig(const Config *config) {
+  // Skip if not defined
+  if (! config->hasExtension(TyTButtonSettingsExtension::staticMetaObject.className()))
+    return true;
+  // Check type
+  const TyTButtonSettingsExtension *ext =
+      config->extension(TyTButtonSettingsExtension::staticMetaObject.className())->as<TyTButtonSettingsExtension>();
+  if (nullptr == ext)
+    return false;
+
+  setSideButton1Short(ext->sideButton1Short());
+  setSideButton1Long(ext->sideButton1Long());
+  setSideButton2Short(ext->sideButton2Short());
+  setSideButton2Long(ext->sideButton2Long());
+  setLongPressDuration(ext->longPressDuration());
+
+  return true;
+}
+
+bool
+TyTCodeplug::ButtonSettingsElement::updateConfig(Config *config) {
+  TyTButtonSettingsExtension *ext = new TyTButtonSettingsExtension(config);
+  config->addExtension(TyTButtonSettingsExtension::staticMetaObject.className(), ext);
+
+  ext->setSideButton1Short(sideButton1Short());
+  ext->setSideButton1Long(sideButton1Long());
+  ext->setSideButton2Short(sideButton2Short());
+  ext->setSideButton2Long(sideButton2Long());
+  ext->setLongPressDuration(longPressDuration());
+  return true;
 }
 
 
@@ -2865,6 +2913,12 @@ TyTCodeplug::clear()
 
 bool
 TyTCodeplug::encode(Config *config, const Flags &flags) {
+  // Check if default DMR id is set.
+  if (nullptr == config->radioIDs()->defaultId()) {
+    _errorMessage = tr("Cannot encode TyT codeplug: No default radio ID specified.");
+    return false;
+  }
+
   // Set timestamp
   if (! this->encodeTimestamp()) {
     _errorMessage = tr("Cannot encode time-stamp: %1").arg(_errorMessage);
@@ -2909,6 +2963,12 @@ TyTCodeplug::encode(Config *config, const Flags &flags) {
   // Define GPS systems
   if (! this->encodePositioningSystems(config, flags)) {
     _errorMessage = tr("Cannot encode positioning systems: %1").arg(_errorMessage);
+    return false;
+  }
+
+  // Encode button settings
+  if (! this->encodeButtonSettings(config, flags)) {
+    _errorMessage = tr("Cannot encode button settings: %1").arg(_errorMessage);
     return false;
   }
 
@@ -2962,6 +3022,12 @@ TyTCodeplug::decode(Config *config) {
   // Define GPS systems
   if (! this->createPositioningSystems(ctx)) {
     _errorMessage = tr("Cannot create positioning systems: %1").arg(_errorMessage);
+    return false;
+  }
+
+  // Decode button settings
+  if (! this->decodeButtonSetttings(config)) {
+    _errorMessage = tr("Cannot decode button settings: %1").arg(_errorMessage);
     return false;
   }
 
@@ -3146,6 +3212,23 @@ TyTCodeplug::linkPositioningSystems(CodeplugContext &ctx) {
   return true;
 }
 
+void
+TyTCodeplug::clearButtonSettings() {
+  // pass...
+}
+
+bool
+TyTCodeplug::encodeButtonSettings(Config *config, const Flags &flags) {
+  // pass...
+  return true;
+}
+
+bool
+TyTCodeplug::decodeButtonSetttings(Config *config) {
+  // pass...
+  return true;
+}
+
 
 void
 TyTCodeplug::clearBootSettings() {
@@ -3154,11 +3237,6 @@ TyTCodeplug::clearBootSettings() {
 
 void
 TyTCodeplug::clearMenuSettings() {
-  // pass...
-}
-
-void
-TyTCodeplug::clearButtonSettings() {
   // pass...
 }
 

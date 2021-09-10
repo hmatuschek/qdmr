@@ -98,23 +98,22 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
   /*
    *  Check general config
    */
-  if (config->name().size() > features().maxNameLength)
+  if ((nullptr == config->radioIDs()->defaultId()) && features().needsDefaultRadioID)
     issues.append(VerifyIssue(
-                    VerifyIssue::WARNING,
-                    tr("Radio name of length %1 exceeds limit of %2 characters.")
-                    .arg(config->name().size()).arg(features().maxNameLength)));
+                    VerifyIssue::ERROR,
+                    tr("Radio needs a default radio ID but none is set.")));
 
   if (config->introLine1().size() > features().maxIntroLineLength)
     issues.append(VerifyIssue(
                     VerifyIssue::WARNING,
                     tr("Intro line 1 of length %1 exceeds limit of %2 characters.")
-                    .arg(config->introLine1().size()).arg(features().maxNameLength)));
+                    .arg(config->introLine1().size()).arg(features().maxIntroLineLength)));
 
   if (config->introLine2().size() > features().maxIntroLineLength)
     issues.append(VerifyIssue(
                     VerifyIssue::WARNING,
                     tr("Intro line 2 of length %1 exceeds limit of %2 characters.")
-                    .arg(config->introLine2().size()).arg(features().maxNameLength)));
+                    .arg(config->introLine2().size()).arg(features().maxIntroLineLength)));
 
   /*
    *  Check contact list
@@ -235,7 +234,7 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                       tr("Radio does not support analog channel'%1'")
                       .arg(channel->name())));
 
-    if (channel->is<DigitalChannel>() && (nullptr == channel->as<DigitalChannel>()->txContact())
+    if (channel->is<DigitalChannel>() && (nullptr == channel->as<DigitalChannel>()->txContactObj())
         && (! features().allowChannelNoDefaultContact))
       issues.append(VerifyIssue(
                       VerifyIssue::WARNING,
@@ -322,17 +321,17 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                         tr("Scan list name '%1' length %2 exceeds limit of %3 characters.")
                         .arg(list->name()).arg(list->name().size()).arg(features().maxScanlistNameLength)));
 
-      if (0 == list->priorityChannel())
+      if (0 == list->primaryChannel())
         issues.append(VerifyIssue(
                         VerifyIssue::WARNING,
                         tr("Scan list '%1' has no priority channel set.")
                         .arg(list->name())));
 
-      else if (! list->contains(list->priorityChannel()))
+      else if (! list->contains(list->primaryChannel()))
         issues.append(VerifyIssue(
                         VerifyIssue::WARNING,
                         tr("Scan list '%1' does not contain priority channel '%2'.")
-                        .arg(list->name()).arg(list->priorityChannel()->name())));
+                        .arg(list->name()).arg(list->primaryChannel()->name())));
     }
   }
 

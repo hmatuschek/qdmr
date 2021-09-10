@@ -1,6 +1,8 @@
 #include "uv390_codeplug.hh"
 #include "codeplugcontext.hh"
 #include "logger.hh"
+#include "tyt_extensions.hh"
+
 
 #define NUM_CHANNELS                3000
 #define ADDR_CHANNELS           0x110000
@@ -215,7 +217,7 @@ UV390Codeplug::createZones(CodeplugContext &ctx) {
     if (! zone.isValid())
       break;
     if (Zone *obj = zone.toZoneObj()) {
-      ctx.config()->zones()->addZone(obj);
+      ctx.config()->zones()->add(obj);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid zone at index %2.")
           .arg(__func__).arg(i);
@@ -408,6 +410,22 @@ UV390Codeplug::linkPositioningSystems(CodeplugContext &ctx) {
 }
 
 void
+UV390Codeplug::clearButtonSettings() {
+  ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).clear();
+}
+
+bool
+UV390Codeplug::encodeButtonSettings(Config *config, const Flags &flags) {
+  // Encode settings
+  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(config);
+}
+
+bool
+UV390Codeplug::decodeButtonSetttings(Config *config) {
+  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).updateConfig(config);
+}
+
+void
 UV390Codeplug::clearBootSettings() {
   BootSettingsElement(data(ADDR_BOOTSETTINGS)).clear();
 }
@@ -415,11 +433,6 @@ UV390Codeplug::clearBootSettings() {
 void
 UV390Codeplug::clearMenuSettings() {
   MenuSettingsElement(data(ADDR_MENUSETTINGS)).clear();
-}
-
-void
-UV390Codeplug::clearButtonSettings() {
-  ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).clear();
 }
 
 void

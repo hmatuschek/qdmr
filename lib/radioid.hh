@@ -1,33 +1,69 @@
 #ifndef RADIOID_HH
 #define RADIOID_HH
 
+#include "configobject.hh"
 #include <QAbstractListModel>
 
 /** Represents a DMR ID (radio ID) within the abstract config.
  *
  * @ingroup conf */
-class RadioID : public QObject
+class RadioID : public ConfigObject
 {
   Q_OBJECT
 
+  /** The name of the radio ID. */
+  Q_PROPERTY(QString name READ name WRITE setName)
+  /** The number of the radio ID. */
+  Q_PROPERTY(uint number READ number WRITE setNumber)
+
 public:
   /** Constructor.
-   * @param id Specifies the DMR ID.
+   * @param name Specifies the name of the ID.
+   * @param number Specifies the DMR ID.
    * @param parent Specifies the parent QObject owning this object. */
-  explicit RadioID(uint32_t id, QObject *parent = nullptr);
+  explicit RadioID(const QString &name, uint32_t number, QObject *parent = nullptr);
+
+  /** Returns the name of the DMR ID. */
+  const QString &name() const;
+  /** Sets the name of the DMR ID. */
+  void setName(const QString &name);
 
   /** Returns the DMR ID. */
-  uint32_t id() const;
+  uint32_t number() const;
   /** Sets the DMR ID. */
-  void setId(uint32_t id);
+  void setNumber(uint32_t number);
+
+  YAML::Node serialize(const Context &context);
 
 signals:
   /** Gets emitted once the DMR is changed. */
   void modified();
 
 protected:
+  /** Holds the name of the DMR ID. */
+  QString _name;
   /** Holds the DMR ID. */
-  uint32_t _id;
+  uint32_t _number;
+};
+
+
+/** A singleton radio ID representing the default DMR radio ID within the abstract config.
+ * @ingroup conf */
+class DefaultRadioID: public RadioID
+{
+  Q_OBJECT
+
+protected:
+  /** Contstructor. */
+  explicit DefaultRadioID(QObject *parent=nullptr);
+
+public:
+  /** Factory method returning the singleton instance. */
+  static DefaultRadioID *get();
+
+private:
+  /** The singleton instance. */
+  static DefaultRadioID *_instance;
 };
 
 
@@ -36,7 +72,7 @@ protected:
  * DMR ID of the radio.
  *
  * @ingroup conf */
-class RadioIDList: public QAbstractListModel
+class RadioIDList: public ConfigObjectList
 {
   Q_OBJECT
 
@@ -44,48 +80,31 @@ public:
   /** Contructor. */
   explicit RadioIDList(QObject *parent=nullptr);
 
-  /** Clears the list, a default DMR ID is set to 0. */
   void clear();
 
-  /** Returns the number of defined DMR IDs. */
-  int count() const;
+  /** Returns the radio ID at the given index. */
+  RadioID *getId(int idx) const;
   /** Returns the current default ID for the radio. */
-  RadioID * getDefaultId() const;
-  /** Returns the DMR ID specified by the given index. */
-  RadioID * getId(uint idx) const;
+  RadioID * defaultId() const;
+  /** Sets the default DMR ID. This changes the index of all IDs. */
+  bool setDefaultId(uint idx);
   /** Searches the DMR ID object associated with the given DMR ID. */
   RadioID *find(uint32_t id) const;
-  /** Returns the index of the given DMR ID object. */
-  int indexOf(RadioID *id) const;
-  /** Sets the default DMR ID. This changes the index of all IDs. */
-  bool setDefault(uint idx);
 
-  /** Adds the given DMR ID object. */
-  int addId(RadioID *id);
+  int add(ConfigObject *obj, int row=-1);
+
   /** Adds the given DMR ID. */
-  int addId(uint32_t id);
-
-  /** Deletes and removes the given DMR ID object. */
-  bool delId(RadioID *id);
+  virtual int addId(const QString &name, uint32_t id);
   /** Deletes and removes the given DMR ID. */
-  bool delId(uint32_t id);
-
-  /** Returns the number of DMR IDs, implements the QAbstractListModel interface. */
-  int rowCount(const QModelIndex &parent) const;
-  /** Returns the DMR ID, implements the QAbstractListModel interface. */
-  QVariant data(const QModelIndex &index, int role) const;
-
-signals:
-  /** Gets emitted on any change of the list. */
-  void modified();
+  virtual bool delId(uint32_t id);
 
 protected slots:
-  /** Internal used callback whenever a DMR ID object gets deleted. */
-  void onIdDeleted(QObject *obj);
+  /** Gets call whenever the default DMR ID gets deleted. */
+  void onDefaultIdDeleted();
 
 protected:
-  /** Holds the list of DMR IDs. */
-  QList<RadioID *> _ids;
+  /** Holds a weak reference to the default DMR radio ID. */
+  RadioID *_default;
 };
 
 

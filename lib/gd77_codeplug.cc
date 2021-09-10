@@ -141,32 +141,32 @@ GD77Codeplug::channel_t::toChannelObj() const {
   QString name = getName();
   double rxF = getRXFrequency();
   double txF = getTXFrequency();
-  Channel::Power pwr = (POWER_HIGH == power) ? Channel::HighPower : Channel::LowPower;
+  Channel::Power pwr = (POWER_HIGH == power) ? Channel::Power::High : Channel::Power::Low;
   uint timeout = tot*15;
   bool rxOnly = rx_only;
   if (MODE_ANALOG == channel_mode) {
     AnalogChannel::Admit admit;
     switch (admit_criteria) {
-      case ADMIT_ALWAYS: admit = AnalogChannel::AdmitNone; break;
-      case ADMIT_CH_FREE: admit = AnalogChannel::AdmitFree; break;
+      case ADMIT_ALWAYS: admit = AnalogChannel::Admit::Always; break;
+      case ADMIT_CH_FREE: admit = AnalogChannel::Admit::Free; break;
       default:
         return nullptr;
     }
-    AnalogChannel::Bandwidth bw = (BW_25_KHZ == bandwidth) ? AnalogChannel::BWWide : AnalogChannel::BWNarrow;
+    AnalogChannel::Bandwidth bw = (BW_25_KHZ == bandwidth) ? AnalogChannel::Bandwidth::Wide : AnalogChannel::Bandwidth::Narrow;
     return new AnalogChannel(
           name, rxF, txF, pwr, timeout, rxOnly, admit, squelch,  getRXTone(), getTXTone(),
           bw, nullptr);
   } else if(MODE_DIGITAL == channel_mode) {
     DigitalChannel::Admit admit;
     switch (admit_criteria) {
-      case ADMIT_ALWAYS: admit = DigitalChannel::AdmitNone; break;
-      case ADMIT_CH_FREE: admit = DigitalChannel::AdmitFree; break;
-      case ADMIT_COLOR: admit = DigitalChannel::AdmitColorCode; break;
+      case ADMIT_ALWAYS: admit = DigitalChannel::Admit::Always; break;
+      case ADMIT_CH_FREE: admit = DigitalChannel::Admit::Free; break;
+      case ADMIT_COLOR: admit = DigitalChannel::Admit::ColorCode; break;
       default:
         return nullptr;
     }
     DigitalChannel::TimeSlot slot = repeater_slot2 ?
-          DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1;
+          DigitalChannel::TimeSlot::TS2 : DigitalChannel::TimeSlot::TS1;
     return new DigitalChannel(
           name, rxF, txF, pwr, timeout, rxOnly, admit, colorcode_rx, slot,
           nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
@@ -180,15 +180,15 @@ GD77Codeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx) 
   if (c->is<AnalogChannel>()) {
     AnalogChannel *ac = c->as<AnalogChannel>();
     if (scan_list_index && ctx.hasScanList(scan_list_index))
-      ac->setScanList(ctx.getScanList(scan_list_index));
+      ac->setScanListObj(ctx.getScanList(scan_list_index));
   } else {
     DigitalChannel *dc = c->as<DigitalChannel>();
     if (scan_list_index && ctx.hasScanList(scan_list_index))
-      dc->setScanList(ctx.getScanList(scan_list_index));
+      dc->setScanListObj(ctx.getScanList(scan_list_index));
     if (group_list_index && ctx.hasGroupList(group_list_index))
-      dc->setRXGroupList(ctx.getGroupList(group_list_index));
+      dc->setGroupListObj(ctx.getGroupList(group_list_index));
     if (contact_name_index && ctx.hasDigitalContact(contact_name_index))
-      dc->setTXContact(ctx.getDigitalContact(contact_name_index));
+      dc->setTXContactObj(ctx.getDigitalContact(contact_name_index));
   }
   return true;
 }
@@ -203,32 +203,32 @@ GD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
 
   // encode power setting
   switch (c->power()) {
-  case Channel::MaxPower:
-  case Channel::HighPower:
+  case Channel::Power::Max:
+  case Channel::Power::High:
     power = POWER_HIGH;
     break;
-  case Channel::MidPower:
-  case Channel::LowPower:
-  case Channel::MinPower:
+  case Channel::Power::Mid:
+  case Channel::Power::Low:
+  case Channel::Power::Min:
     power = POWER_LOW;
     break;
   }
 
-  tot = c->txTimeout()/15;
+  tot = c->timeout()/15;
   rx_only = c->rxOnly() ? 1 : 0;
   bandwidth = BW_12_5_KHZ;
-  if (c->scanList())
-    scan_list_index = conf->scanlists()->indexOf(c->scanList())+1;
+  if (c->scanListObj())
+    scan_list_index = conf->scanlists()->indexOf(c->scanListObj())+1;
 
   if (c->is<AnalogChannel>()) {
     const AnalogChannel *ac = c->as<const AnalogChannel>();
     channel_mode = MODE_ANALOG;
     switch (ac->admit()) {
-      case AnalogChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS; break;
-      case AnalogChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE; break;
+      case AnalogChannel::Admit::Always: admit_criteria = ADMIT_ALWAYS; break;
+      case AnalogChannel::Admit::Free: admit_criteria = ADMIT_CH_FREE; break;
       default: admit_criteria = ADMIT_CH_FREE; break;
     }
-    bandwidth = (AnalogChannel::BWWide == ac->bandwidth()) ? BW_25_KHZ : BW_12_5_KHZ;
+    bandwidth = (AnalogChannel::Bandwidth::Wide == ac->bandwidth()) ? BW_25_KHZ : BW_12_5_KHZ;
     squelch = SQ_NORMAL; //ac->squelch();
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
@@ -236,14 +236,14 @@ GD77Codeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
     const DigitalChannel *dc = c->as<const DigitalChannel>();
     channel_mode = MODE_DIGITAL;
     switch (dc->admit()) {
-      case DigitalChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS; break;
-      case DigitalChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE; break;
-      case DigitalChannel::AdmitColorCode: admit_criteria = ADMIT_COLOR; break;
+      case DigitalChannel::Admit::Always: admit_criteria = ADMIT_ALWAYS; break;
+      case DigitalChannel::Admit::Free: admit_criteria = ADMIT_CH_FREE; break;
+      case DigitalChannel::Admit::ColorCode: admit_criteria = ADMIT_COLOR; break;
     }
-    repeater_slot2 = (DigitalChannel::TimeSlot1 == dc->timeslot()) ? 0 : 1;
+    repeater_slot2 = (DigitalChannel::TimeSlot::TS1 == dc->timeSlot()) ? 0 : 1;
     colorcode_rx = colorcode_tx = dc->colorCode();
-    group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList()) + 1;
-    contact_name_index = conf->contacts()->indexOfDigital(dc->txContact()) + 1;
+    group_list_index = conf->rxGroupLists()->indexOf(dc->groupListObj()) + 1;
+    contact_name_index = conf->contacts()->indexOfDigital(dc->txContactObj()) + 1;
   }
 }
 
@@ -328,28 +328,28 @@ GD77Codeplug::scanlist_t::toScanListObj() const {
 bool
 GD77Codeplug::scanlist_t::linkScanListObj(ScanList *lst, const CodeplugContext &ctx) const {
   if (0 == priority_ch1)
-    lst->setPriorityChannel(nullptr);
+    lst->setPrimaryChannel(nullptr);
   else if (1 == priority_ch1)
-    lst->setPriorityChannel(SelectedChannel::get());
+    lst->setPrimaryChannel(SelectedChannel::get());
   else if ((1<priority_ch1) && ctx.hasChannel(priority_ch1-1))
-    lst->setPriorityChannel(ctx.getChannel(priority_ch1-1));
+    lst->setPrimaryChannel(ctx.getChannel(priority_ch1-1));
   else
     logWarn() << "Cannot deocde reference to priority channel index " << priority_ch1
                  << " in scan list '" << getName() << "'.";
   if (0 == priority_ch2)
-    lst->setSecPriorityChannel(nullptr);
+    lst->setSecondaryChannel(nullptr);
   else if (1 == priority_ch2)
-    lst->setSecPriorityChannel(SelectedChannel::get());
+    lst->setSecondaryChannel(SelectedChannel::get());
   else if ((1<priority_ch2) && ctx.hasChannel(priority_ch2-1))
-    lst->setSecPriorityChannel(ctx.getChannel(priority_ch2-1));
+    lst->setSecondaryChannel(ctx.getChannel(priority_ch2-1));
   else
     logWarn() << "Cannot deocde reference to secondary priority channel index " << priority_ch2
               << " in scan list '" << getName() << "'.";
 
   if (0 == tx_designated_ch)
-    lst->setTXChannel(SelectedChannel::get());
+    lst->setRevertChannel(SelectedChannel::get());
   else if ((1<priority_ch2) && ctx.hasChannel(tx_designated_ch-1))
-    lst->setTXChannel(ctx.getChannel(tx_designated_ch-1));
+    lst->setRevertChannel(ctx.getChannel(tx_designated_ch-1));
   else
     logWarn() << "Cannot deocde reference to secondary priority channel index " << tx_designated_ch
                 << " in scan list '" << getName() << "'.";
@@ -369,18 +369,18 @@ GD77Codeplug::scanlist_t::linkScanListObj(ScanList *lst, const CodeplugContext &
 void
 GD77Codeplug::scanlist_t::fromScanListObj(const ScanList *lst, const Config *conf) {
   setName(lst->name());
-  if (lst->priorityChannel() && (SelectedChannel::get() == lst->priorityChannel()))
+  if (lst->primaryChannel() && (SelectedChannel::get() == lst->primaryChannel()))
     priority_ch1 = 1;
-  else if (lst->priorityChannel())
-    priority_ch1 = conf->channelList()->indexOf(lst->priorityChannel())+2;
-  if (lst->secPriorityChannel() && (SelectedChannel::get() == lst->secPriorityChannel()))
+  else if (lst->primaryChannel())
+    priority_ch1 = conf->channelList()->indexOf(lst->primaryChannel())+2;
+  if (lst->secondaryChannel() && (SelectedChannel::get() == lst->secondaryChannel()))
     priority_ch2 = 1;
-  else if (lst->secPriorityChannel())
-    priority_ch2 = conf->channelList()->indexOf(lst->secPriorityChannel())+2;
-  if (lst->txChannel() && (SelectedChannel::get() == lst->txChannel()))
+  else if (lst->secondaryChannel())
+    priority_ch2 = conf->channelList()->indexOf(lst->secondaryChannel())+2;
+  if (lst->revertChannel() && (SelectedChannel::get() == lst->revertChannel()))
     tx_designated_ch = 1;
-  else if (lst->txChannel())
-    tx_designated_ch = conf->channelList()->indexOf(lst->txChannel())+2;
+  else if (lst->revertChannel())
+    tx_designated_ch = conf->channelList()->indexOf(lst->revertChannel())+2;
 
   for (int i=0; i<32; i++) {
     if (i >= lst->count())
@@ -457,7 +457,7 @@ GD77Codeplug::contact_t::fromContactObj(const DigitalContact *cont, const Config
     case DigitalContact::GroupCall:   type = CALL_GROUP; break;
     case DigitalContact::AllCall:     type = CALL_ALL; break;
   }
-  if (cont->rxTone())
+  if (cont->ring())
     receive_tone = ring_style = 1;
 }
 
@@ -479,8 +479,13 @@ GD77Codeplug::encode(Config *config, const Flags &flags) {
   general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
   if (! flags.updateCodePlug)
     gs->initDefault();
-  gs->setName(config->name());
-  gs->setRadioId(config->radioIDs()->getId(0)->id());
+
+  if (nullptr == config->radioIDs()->defaultId()) {
+    _errorMessage = tr("Cannot encode GD-77 codeplug: No default radio ID specified.");
+    return false;
+  }
+  gs->setName(config->radioIDs()->defaultId()->name());
+  gs->setRadioId(config->radioIDs()->defaultId()->number());
 
   intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
   it->setIntroLine1(config->introLine1());
@@ -597,8 +602,9 @@ GD77Codeplug::decode(Config *config) {
     return false;
   }
 
-  config->radioIDs()->getId(0)->setId(gs->getRadioId());
-  config->setName(gs->getName());
+  int idx = config->radioIDs()->addId(gs->getName(),gs->getRadioId());
+  config->radioIDs()->setDefaultId(idx);
+
   intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
   config->setIntroLine1(it->getIntroLine1());
   config->setIntroLine2(it->getIntroLine2());
@@ -731,7 +737,7 @@ GD77Codeplug::decode(Config *config) {
           .arg(__func__).arg(i);
       return false;
     }
-    config->zones()->addZone(zone);
+    config->zones()->add(zone);
   }
 
   /* Unpack Scan lists */

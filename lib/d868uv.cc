@@ -21,7 +21,7 @@ static Radio::Features _d868uv_features =
 
   // general limits
   .maxRadioIDs        = 250,
-  .maxNameLength      = 16,
+  .needsDefaultRadioID = false,
   .maxIntroLineLength = 14,
 
   // channel limits

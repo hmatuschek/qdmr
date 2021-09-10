@@ -22,13 +22,9 @@ public:
 protected slots:
 	void onAddChannelA();
 	void onRemChannelA();
-	void onChannelAUp();
-	void onChannelADown();
 
   void onAddChannelB();
 	void onRemChannelB();
-	void onChannelBUp();
-	void onChannelBDown();
 
   void onHideZoneHint();
 
@@ -37,7 +33,8 @@ protected:
 
 protected:
 	Config *_config;
-	Zone *_zone;
+  Zone _zone;
+  Zone *_editZone;
 };
 
 

@@ -4,10 +4,12 @@
 #include <QString>
 #include <QFile>
 #include <QTextStream>
+#include <iostream>
 
 #include "logger.hh"
 #include "config.hh"
 #include "csvreader.hh"
+#include "configreader.hh"
 #include "dfufile.hh"
 #include "rd5r.hh"
 #include "uv390.hh"
@@ -15,6 +17,8 @@
 #include "opengd77.hh"
 #include "d868uv.hh"
 #include "d878uv.hh"
+#include "d878uv2.hh"
+#include "d578uv.hh"
 
 
 int verify(QCommandLineParser &parser, QCoreApplication &app)
@@ -45,6 +49,13 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
   } else if (parser.isSet("bin") || (filename.endsWith(".bin") || filename.endsWith(".dfu"))) {
     logError() << "Verification of binary code-plugs makes no sense.";
     return -1;
+  } else if (parser.isSet("yaml") || (filename.endsWith(".yaml") || filename.endsWith(".yml"))) {
+    Config config;
+    ConfigReader reader;
+    if (! reader.read(&config, filename)) {
+      logError() << "Cannot read config file '" << filename << ": " << reader.errorMessage();
+      return -1;
+    }
   } else {
     logError() << "Cannot determine filetype from filename '" << filename
                << "': Consider using --csv.";
@@ -60,7 +71,7 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
   QString radio = parser.value("radio").toLower();
   if ("rd5r" == radio) {
     RD5R radio; radio.verifyConfig(&config, issues);
-  } else if (("uv390" == radio) && ("rt3s" == radio)) {
+  } else if (("uv390" == radio) || ("rt3s" == radio)) {
     UV390 radio; radio.verifyConfig(&config, issues);
   } else if ("gd77" == radio) {
     GD77 radio; radio.verifyConfig(&config, issues);
@@ -70,6 +81,10 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     D868UV radio; radio.verifyConfig(&config, issues);
   } else if ("d878uv" == radio) {
     D878UV radio; radio.verifyConfig(&config, issues);
+  } else if ("d878uv2" == radio) {
+    D878UV2 radio; radio.verifyConfig(&config, issues);
+  } else if ("d578uv" == radio) {
+    D578UV radio; radio.verifyConfig(&config, issues);
   } else {
     logError() << "Cannot verify code-plug against unknown radio '" << radio << "'.";
     return -1;

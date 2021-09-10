@@ -58,6 +58,9 @@ public:
   bool ignoreFrequencyLimits() const;
   void setIgnoreFrequencyLimits(bool ignore);
 
+  bool showCommercialFeatures() const;
+  void setShowCommercialFeatures(bool show);
+
   bool hideGSPNote() const;
   void setHideGPSNote(bool hide);
 
@@ -73,11 +76,14 @@ public:
   QByteArray mainWindowState() const;
   void setMainWindowState(const QByteArray &state);
 
-  QByteArray channelListHeaderState() const;
-  void setChannelListHeaderState(const QByteArray &state);
+  QByteArray radioIdListHeaderState() const;
+  void setRadioIdListHeaderState(const QByteArray &state);
 
   QByteArray contactListHeaderState() const;
   void setContactListHeaderState(const QByteArray &state);
+
+  QByteArray channelListHeaderState() const;
+  void setChannelListHeaderState(const QByteArray &state);
 
   QByteArray positioningHeaderState() const;
   void setPositioningHeaderState(const QByteArray &state);

@@ -13,9 +13,9 @@ static Radio::Features _rd5r_features =
 
   .frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 470.} },
 
-  .maxRadioIDs        = 1,
-  .maxNameLength      = 8,
-  .maxIntroLineLength = 16,
+  .maxRadioIDs         = 1,
+  .needsDefaultRadioID = true,
+  .maxIntroLineLength  = 16,
 
   .maxChannels = 1024,
   .maxChannelNameLength = 16,

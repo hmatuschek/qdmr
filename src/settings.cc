@@ -231,6 +231,15 @@ Settings::setIgnoreFrequencyLimits(bool ignore) {
 }
 
 bool
+Settings::showCommercialFeatures() const {
+  return value("showCommercialFeatures", false).toBool();
+}
+void
+Settings::setShowCommercialFeatures(bool show) {
+  setValue("showCommercialFeatures", show);
+}
+
+bool
 Settings::hideGSPNote() const {
   return value("hideGPSNote", false).toBool();
 }
@@ -279,12 +288,12 @@ Settings::setMainWindowState(const QByteArray &state) {
 }
 
 QByteArray
-Settings::channelListHeaderState() const {
-  return value("channelListHeaderState", QByteArray()).toByteArray();
+Settings::radioIdListHeaderState() const {
+  return value("radioIdListHeaderState", QByteArray()).toByteArray();
 }
 void
-Settings::setChannelListHeaderState(const QByteArray &state) {
-  setValue("channelListHeaderState", state);
+Settings::setRadioIdListHeaderState(const QByteArray &state) {
+  setValue("radioIdListHeaderState", state);
 }
 
 QByteArray
@@ -294,6 +303,15 @@ Settings::contactListHeaderState() const {
 void
 Settings::setContactListHeaderState(const QByteArray &state) {
   setValue("contactListHeaderState", state);
+}
+
+QByteArray
+Settings::channelListHeaderState() const {
+  return value("channelListHeaderState", QByteArray()).toByteArray();
+}
+void
+Settings::setChannelListHeaderState(const QByteArray &state) {
+  setValue("channelListHeaderState", state);
 }
 
 QByteArray
@@ -365,6 +383,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   }
   Ui::SettingsDialog::prefixes->setText(prefs_text.join(", "));
 
+  Ui::SettingsDialog::commercialFeatures->setChecked(settings.showCommercialFeatures());
+
   connect(Ui::SettingsDialog::dbLimitEnable, SIGNAL(toggled(bool)), this, SLOT(onDBLimitToggled(bool)));
   connect(Ui::SettingsDialog::useUserId, SIGNAL(toggled(bool)), this, SLOT(onUseUserDMRIdToggled(bool)));
 }
@@ -429,6 +449,7 @@ SettingsDialog::accept() {
   settings.setLimitCallSignDBEnties(dbLimitEnable->isChecked());
   settings.setMaxCallSignDBEntries(dbLimit->value());
   settings.setSelectUsingUserDMRID(useUserId->isChecked());
+
   QStringList prefs_text = prefixes->text().split(",");
   QSet<uint> prefs;
   foreach (QString pref, prefs_text) {
@@ -437,6 +458,8 @@ SettingsDialog::accept() {
       prefs.insert(prefix);
   }
   settings.setCallSignDBPrefixes(prefs);
+
+  settings.setShowCommercialFeatures(commercialFeatures->isChecked());
 
   QDialog::accept();
 }

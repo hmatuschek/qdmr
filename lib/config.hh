@@ -13,6 +13,7 @@
 
 #include <QTextStream>
 
+#include "configobject.hh"
 #include "contact.hh"
 #include "rxgrouplist.hh"
 #include "channel.hh"
@@ -32,7 +33,7 @@ class UserDatabase;
  * configuration.
  *
  * @ingroup conf */
-class Config : public QObject
+class Config : public ConfigObject
 {
 	Q_OBJECT
 
@@ -44,6 +45,11 @@ public:
   bool isModified() const;
   /** Sets the modified flag. */
   void setModified(bool modified);
+
+  bool label(Context &context);
+  using ConfigObject::serialize;
+  /** Serializes the configuration into the given stream as text. */
+  bool toYAML(QTextStream &stream);
 
   /** Returns the list of radio IDs. */
   RadioIDList *radioIDs() const;
@@ -65,11 +71,6 @@ public:
   bool requiresRoaming() const;
   /** Returns @c true if one of the channels has a GPS or APRS system assigned. */
   bool requiresGPS() const;
-
-  /** Returns the name of the radio. */
-  const QString &name() const;
-  /** (Re-)Sets the name of the radio. */
-  void setName(const QString &name);
 
   /** Returns the first intro line. */
   const QString &introLine1() const;
@@ -102,9 +103,8 @@ public:
   /** Exports the configuration to the given text stream in text format. */
   bool writeCSV(QTextStream &stream, QString &errorMessage);
 
-signals:
-  /** Gets emitted if the configuration gets changed. */
-	void modified();
+protected:
+  bool populate(YAML::Node &node, const Context &context);
 
 protected slots:
   /** Iternal callback. */
@@ -130,8 +130,6 @@ protected:
   /** The list of roaming zones. */
   RoamingZoneList *_roaming;
 
-  /** The name of the radio. */
-  QString _name;
   /** The fist intro line. */
   QString _introLine1;
   /** The second intro line. */

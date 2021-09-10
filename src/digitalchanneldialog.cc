@@ -38,58 +38,58 @@ DigitalChannelDialog::construct() {
 
   rxFrequency->setValidator(new QDoubleValidator(0,500,5));
   txFrequency->setValidator(new QDoubleValidator(0,500,5));
-  power->setItemData(0, uint(Channel::MaxPower));
-  power->setItemData(1, uint(Channel::HighPower));
-  power->setItemData(2, uint(Channel::MidPower));
-  power->setItemData(3, uint(Channel::LowPower));
-  power->setItemData(4, uint(Channel::MinPower));
+  power->setItemData(0, uint(Channel::Power::Max));
+  power->setItemData(1, uint(Channel::Power::High));
+  power->setItemData(2, uint(Channel::Power::Mid));
+  power->setItemData(3, uint(Channel::Power::Low));
+  power->setItemData(4, uint(Channel::Power::Min));
   scanList->addItem(tr("[None]"), QVariant::fromValue((ScanList *)(nullptr)));
   scanList->setCurrentIndex(0);
   for (int i=0; i<_config->scanlists()->count(); i++) {
     scanList->addItem(_config->scanlists()->scanlist(i)->name(),
                       QVariant::fromValue(_config->scanlists()->scanlist(i)));
-    if (_channel && (_channel->scanList() == _config->scanlists()->scanlist(i)) )
+    if (_channel && (_channel->scanListObj() == _config->scanlists()->scanlist(i)) )
       scanList->setCurrentIndex(i+1);
   }
-  txAdmit->setItemData(0, uint(DigitalChannel::AdmitNone));
-  txAdmit->setItemData(1, uint(DigitalChannel::AdmitFree));
-  txAdmit->setItemData(2, uint(DigitalChannel::AdmitColorCode));
-  timeSlot->setItemData(0, uint(DigitalChannel::TimeSlot1));
-  timeSlot->setItemData(1, uint(DigitalChannel::TimeSlot2));
+  txAdmit->setItemData(0, uint(DigitalChannel::Admit::Always));
+  txAdmit->setItemData(1, uint(DigitalChannel::Admit::Free));
+  txAdmit->setItemData(2, uint(DigitalChannel::Admit::ColorCode));
+  timeSlot->setItemData(0, uint(DigitalChannel::TimeSlot::TS1));
+  timeSlot->setItemData(1, uint(DigitalChannel::TimeSlot::TS2));
   populateRXGroupListBox(rxGroupList, _config->rxGroupLists(),
-                         (nullptr != _channel ? _channel->rxGroupList() : nullptr));
+                         (nullptr != _channel ? _channel->groupListObj() : nullptr));
   txContact->addItem(tr("[None]"), QVariant::fromValue(nullptr));
-  if (_channel && (nullptr == _channel->txContact()))
+  if (_channel && (nullptr == _channel->txContactObj()))
     txContact->setCurrentIndex(0);
   for (int i=0; i<_config->contacts()->count(); i++) {
     txContact->addItem(_config->contacts()->contact(i)->name(),
                        QVariant::fromValue(_config->contacts()->contact(i)));
-    if (_channel && (_channel->txContact() == _config->contacts()->contact(i)) )
+    if (_channel && (_channel->txContactObj() == _config->contacts()->contact(i)) )
       txContact->setCurrentIndex(i+1);
   }
   gpsSystem->addItem(tr("[None]"), QVariant::fromValue((GPSSystem *)nullptr));
   for (int i=0; i<_config->posSystems()->count(); i++) {
     PositioningSystem *sys = _config->posSystems()->system(i);
     gpsSystem->addItem(sys->name(), QVariant::fromValue(sys));
-    if (_channel && (_channel->posSystem() == sys))
+    if (_channel && (_channel->aprsObj() == sys))
       gpsSystem->setCurrentIndex(i+1);
   }
   roaming->addItem(tr("[None]"), QVariant::fromValue((RoamingZone *)nullptr));
   roaming->addItem(tr("[Default]"), QVariant::fromValue(DefaultRoamingZone::get()));
-  if (_channel && (_channel->roaming() == DefaultRoamingZone::get()))
+  if (_channel && (_channel->roamingZone() == DefaultRoamingZone::get()))
     roaming->setCurrentIndex(1);
   for (int i=0; i<_config->roaming()->count(); i++) {
     RoamingZone *zone = _config->roaming()->zone(i);
     roaming->addItem(zone->name(), QVariant::fromValue(zone));
-    if (_channel && (_channel->roaming() == zone))
+    if (_channel && (_channel->roamingZone() == zone))
       roaming->setCurrentIndex(i+2);
   }
-  dmrID->addItem(tr("[Default]"), QVariant::fromValue(nullptr));
+  dmrID->addItem(tr("[Default]"), QVariant::fromValue(DefaultRadioID::get()));
   dmrID->setCurrentIndex(0);
   for (int i=0; i<_config->radioIDs()->count(); i++) {
-    dmrID->addItem(QString::number(_config->radioIDs()->getId(i)->id()),
+    dmrID->addItem(_config->radioIDs()->getId(i)->name(),
                    QVariant::fromValue(_config->radioIDs()->getId(i)));
-    if (_channel && (_config->radioIDs()->getId(i) == _channel->radioId())) {
+    if (_channel && (_config->radioIDs()->getId(i) == _channel->radioIdObj())) {
       dmrID->setCurrentIndex(i+1);
     }
   }
@@ -99,23 +99,23 @@ DigitalChannelDialog::construct() {
     rxFrequency->setText(format_frequency(_channel->rxFrequency()));
     txFrequency->setText(format_frequency(_channel->txFrequency()));
     switch (_channel->power()) {
-    case Channel::MaxPower: power->setCurrentIndex(0); break;
-    case Channel::HighPower: power->setCurrentIndex(1); break;
-    case Channel::MidPower: power->setCurrentIndex(2); break;
-    case Channel::LowPower: power->setCurrentIndex(3); break;
-    case Channel::MinPower: power->setCurrentIndex(4); break;
+    case Channel::Power::Max: power->setCurrentIndex(0); break;
+    case Channel::Power::High: power->setCurrentIndex(1); break;
+    case Channel::Power::Mid: power->setCurrentIndex(2); break;
+    case Channel::Power::Low: power->setCurrentIndex(3); break;
+    case Channel::Power::Min: power->setCurrentIndex(4); break;
     }
-    txTimeout->setValue(_channel->txTimeout());
+    txTimeout->setValue(_channel->timeout());
     rxOnly->setChecked(_channel->rxOnly());
     switch (_channel->admit()) {
-      case DigitalChannel::AdmitNone: txAdmit->setCurrentIndex(0); break;
-      case DigitalChannel::AdmitFree: txAdmit->setCurrentIndex(1); break;
-      case DigitalChannel::AdmitColorCode: txAdmit->setCurrentIndex(2); break;
+      case DigitalChannel::Admit::Always: txAdmit->setCurrentIndex(0); break;
+      case DigitalChannel::Admit::Free: txAdmit->setCurrentIndex(1); break;
+      case DigitalChannel::Admit::ColorCode: txAdmit->setCurrentIndex(2); break;
     }
     colorCode->setValue(_channel->colorCode());
-    if (DigitalChannel::TimeSlot1 == _channel->timeslot())
+    if (DigitalChannel::TimeSlot::TS1 == _channel->timeSlot())
       timeSlot->setCurrentIndex(0);
-    else if (DigitalChannel::TimeSlot2 == _channel->timeslot())
+    else if (DigitalChannel::TimeSlot::TS2 == _channel->timeSlot())
       timeSlot->setCurrentIndex(1);
   }
 }
@@ -140,21 +140,21 @@ DigitalChannelDialog::channel() {
   RadioID *id = dmrID->currentData().value<RadioID*>();
 
   if (_channel) {
-    _channel->setRadioId(id);
+    _channel->setRadioIdObj(id);
     _channel->setName(name);
     _channel->setRXFrequency(rx);
     _channel->setTXFrequency(tx);
     _channel->setPower(pwr);
     _channel->setTimeout(timeout);
     _channel->setRXOnly(rxonly);
-    _channel->setScanList(scanlist);
+    _channel->setScanListObj(scanlist);
     _channel->setAdmit(admit);
     _channel->setColorCode(colorcode);
     _channel->setTimeSlot(ts);
-    _channel->setRXGroupList(rxgroup);
-    _channel->setTXContact(contact);
-    _channel->setPosSystem(pos);
-    _channel->setRoaming(roamingZone);
+    _channel->setGroupListObj(rxgroup);
+    _channel->setTXContactObj(contact);
+    _channel->aprsObj(pos);
+    _channel->setRoamingZone(roamingZone);
     return _channel;
   }
 

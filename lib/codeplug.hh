@@ -4,8 +4,11 @@
 #include <QObject>
 #include "dfufile.hh"
 #include "userdatabase.hh"
+#include <QHash>
 
 class Config;
+class ConfigObject;
+
 
 /** This class defines the interface all device-specific code-plugs must implement.
  * Device-specific codeplugs are derived from the common configuration and implement the
@@ -15,8 +18,8 @@ class CodePlug: public DFUFile
 	Q_OBJECT
 
 public:
-  /** Certain flags passed to CodePlug::encode to controll the transfer and encoding of the
-   * code-plug. */
+  /** Certain flags passed to CodePlug::encode to control the transfer and encoding of the
+   * codeplug. */
   class Flags {
   public:
     /** If @c true, the codeplug will first be downloaded from the device, updated from the
@@ -162,6 +165,49 @@ public:
     uint8_t *_data;
     /** Holds the size of the element. */
     size_t _size;
+  };
+
+  /** Base class for all codeplug contexts.
+   * Each device specific codeplug may extend this class to allow for device specific elements to
+   * be indexed in a separate index. By default tables for @c DigitalContact, @c RXGroupList,
+   * @c Channel, @c Zone and @c ScanList are defined. For any other type, an additional table must
+   * be defined first using @c addTable. */
+  class Context
+  {
+  protected:
+    /** Hidden constrcutor. */
+    Context();
+
+    /** Resolves the given index for the specifies element type.
+     * @returns @c nullptr if the index is not defined or the type is unknown. */
+    ConfigObject *obj(const QMetaObject *elementType, uint idx);
+    /** Returns the index for the given object.
+     * @returns -1 if no index is associated with the object or its type is unknown. */
+    int index(ConfigObject *obj);
+    /** Associates the given object with the given index. */
+    bool add(ConfigObject *obj, uint idx);
+
+  protected:
+    /** Internal used table type to associate objects and indices. */
+    class Table {
+    public:
+      /** The index->object map. */
+      QHash<uint, ConfigObject *> objects;
+      /** The object->index map. */
+      QHash<ConfigObject *, uint> indices;
+    };
+
+  protected:
+    /** Returns @c true if a table is defined for the given type. */
+    bool hasTable(const QMetaObject *obj) const;
+    /** Returns a reference to the table for the given type. */
+    Table &getTable(const QMetaObject *obj);
+    /** Adds a table for the given type. */
+    bool addTable(const QMetaObject *obj);
+
+  protected:
+    /** Table of tables. */
+    QHash<QString, Table> _tables;
   };
 
 protected:

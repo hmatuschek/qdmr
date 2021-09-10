@@ -309,6 +309,72 @@ CodePlug::Element::writeUnicode(uint offset, const QString &txt, uint maxlen, ui
 
 
 /* ********************************************************************************************* *
+ * Implementation of CodePlug::Context
+ * ********************************************************************************************* */
+CodePlug::Context::Context()
+  : _tables()
+{
+  addTable(&DigitalContact::staticMetaObject);
+  addTable(&RXGroupList::staticMetaObject);
+  addTable(&Channel::staticMetaObject);
+  addTable(&Zone::staticMetaObject);
+  addTable(&ScanList::staticMetaObject);
+}
+
+bool
+CodePlug::Context::hasTable(const QMetaObject *obj) const {
+  // Find a matching table
+  if (_tables.contains(obj->className()))
+    return true;
+  else if (obj->superClass())
+    return hasTable(obj->superClass());
+  return false;
+}
+
+CodePlug::Context::Table &
+CodePlug::Context::getTable(const QMetaObject *obj) {
+  if (_tables.contains(obj->className()))
+    return _tables[obj->className()];
+  return getTable(obj->superClass());
+}
+
+bool
+CodePlug::Context::addTable(const QMetaObject *obj) {
+  if (hasTable(obj))
+    return false;
+  _tables.insert(obj->className(), Table());
+  return true;
+}
+
+ConfigObject *
+CodePlug::Context::obj(const QMetaObject *elementType, uint idx) {
+  if (! hasTable(elementType))
+    return nullptr;
+  return getTable(elementType).objects.value(idx, nullptr);
+}
+
+int
+CodePlug::Context::index(ConfigObject *obj) {
+  if (! hasTable(obj->metaObject()))
+    return -1;
+  return getTable(obj->metaObject()).indices.value(obj, -1);
+}
+
+bool
+CodePlug::Context::add(ConfigObject *obj, uint idx) {
+  if (!hasTable(obj->metaObject()))
+    return false;
+  if (getTable(obj->metaObject()).indices.contains(obj))
+    return false;
+  if (getTable(obj->metaObject()).objects.contains(idx))
+    return false;
+  getTable(obj->metaObject()).objects.insert(idx, obj);
+  getTable(obj->metaObject()).indices.insert(obj, idx);
+  return true;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of CodePlug
  * ********************************************************************************************* */
 CodePlug::CodePlug(QObject *parent)

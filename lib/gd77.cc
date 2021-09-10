@@ -15,7 +15,7 @@ static Radio::Features _gd77_features = {
   .frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 470.} },
 
   .maxRadioIDs        = 1,
-  .maxNameLength      = 8,
+  .needsDefaultRadioID = true,
   .maxIntroLineLength = 16,
 
   .maxChannels = 1024,
