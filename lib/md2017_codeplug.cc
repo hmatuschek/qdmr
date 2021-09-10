@@ -72,7 +72,7 @@ MD2017Codeplug::clearTimestamp() {
 bool
 MD2017Codeplug::encodeTimestamp() {
   TimestampElement ts(data(ADDR_TIMESTAMP));
-  ts.timestamp(QDateTime::currentDateTime());
+  ts.setTimestamp(QDateTime::currentDateTime());
   return true;
 }
 
