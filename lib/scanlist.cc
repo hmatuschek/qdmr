@@ -24,13 +24,25 @@ ScanList::ScanList(const QString &name, QObject *parent)
   Context::setTag(metaObject()->className(), "channels", "!selected", SelectedChannel::get());
 }
 
+ScanList &
+ScanList::operator =(const ScanList &other) {
+  clear();
+  _name = other._name;
+  _primary.set(other._primary.as<Channel>());
+  _secondary.set(other._secondary.as<Channel>());
+  _revert.set(other._revert.as<Channel>());
+  for (int i=0; i<other._channels.count(); i++)
+    _channels.add(other._channels.get(i));
+  return *this;
+}
+
 void
 ScanList::clear() {
-  _channels.clear();
   _name.clear();
   _primary.clear();
   _secondary.clear();
   _revert.clear();
+  _channels.clear();
   emit modified(this);
 }
 

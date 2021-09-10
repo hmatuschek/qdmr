@@ -8,14 +8,17 @@
  * Implementation of ScanListDialog
  * ********************************************************************************************* */
 ScanListDialog::ScanListDialog(Config *config, ScanList *scanlist, QWidget *parent)
-  : QDialog(parent), _config(config), _scanlist(scanlist)
+  : QDialog(parent), _config(config), _scanList(""), _editScanlist(scanlist)
 {
+  if (_editScanlist)
+    _scanList = *_editScanlist;
   construct();
 }
 
 ScanListDialog::ScanListDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _scanlist(nullptr)
+  : QDialog(parent), _config(config), _scanList(""), _editScanlist(nullptr)
 {
+  _scanList.clear();
   construct();
 }
 
@@ -37,40 +40,20 @@ ScanListDialog::construct() {
     transmitChannel->addItem(channel->name(), QVariant::fromValue(channel));
   }
 
-  if (_scanlist) {
-    // set name
-    scanListName->setText(_scanlist->name());
-    // set priority channel
-    if (_scanlist->primaryChannel())
-      priorityChannel1->setCurrentIndex(_config->channelList()->indexOf(_scanlist->primaryChannel())+2);
-    // set secondary priority channel
-    if (_scanlist->secondaryChannel())
-      priorityChannel2->setCurrentIndex(_config->channelList()->indexOf(_scanlist->secondaryChannel())+2);
-    if (_scanlist->revertChannel())
-      transmitChannel->setCurrentIndex(_config->channelList()->indexOf(_scanlist->revertChannel())+2);
-    // fill channel list
-    for (int i=0; i<_scanlist->count(); i++) {
-      Channel *channel = _scanlist->channel(i);
-      if (channel->is<AnalogChannel>()) {
-        QListWidgetItem *item = new QListWidgetItem(tr("%1 (Analog)").arg(channel->name()));
-        item->setData(Qt::UserRole, QVariant::fromValue(channel));
-        channelList->addItem(item);
-      } else if(channel->is<DigitalChannel>()) {
-        QListWidgetItem *item = new QListWidgetItem(tr("%1 (Digital)").arg(channel->name()));
-        item->setData(Qt::UserRole, QVariant::fromValue(channel));
-        channelList->addItem(item);
-      } else if (SelectedChannel::get() == channel) {
-        QListWidgetItem *item = new QListWidgetItem(tr("[Selected Channel]"));
-        item->setData(Qt::UserRole, QVariant::fromValue(channel));
-        channelList->addItem(item);
-      }
-    }
-  }
+  scanListName->setText(_scanList.name());
+  // set priority channel
+  if (_scanList.primaryChannel())
+    priorityChannel1->setCurrentIndex(_config->channelList()->indexOf(_scanList.primaryChannel())+2);
+  // set secondary priority channel
+  if (_scanList.secondaryChannel())
+    priorityChannel2->setCurrentIndex(_config->channelList()->indexOf(_scanList.secondaryChannel())+2);
+  if (_scanList.revertChannel())
+    transmitChannel->setCurrentIndex(_config->channelList()->indexOf(_scanList.revertChannel())+2);
+
+  channelListView->setModel(new ChannelRefListWrapper(_scanList.channels(), channelListView));
 
   connect(addChannel, SIGNAL(clicked()), this, SLOT(onAddChannel()));
   connect(remChannel, SIGNAL(clicked()), this, SLOT(onRemChannel()));
-  connect(channelUp, SIGNAL(clicked()), this, SLOT(onChannelUp()));
-  connect(channelDown, SIGNAL(clicked()), this, SLOT(onChannelDown()));
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
@@ -83,85 +66,39 @@ ScanListDialog::onAddChannel() {
 
   QList<Channel *> channels = dia.channel();
   foreach (Channel *channel, channels) {
-    if (channel->is<AnalogChannel>()) {
-      QString name = tr("%1 (Analog)").arg(channel->name());
-      if (channelList->findItems(name, Qt::MatchExactly).size())
-        continue;
-      QListWidgetItem *item = new QListWidgetItem(name);
-      item->setData(Qt::UserRole, QVariant::fromValue(channel));
-      channelList->addItem(item);
-    } else if (channel->is<DigitalChannel>()) {
-      QString name = tr("%1 (Digital)").arg(channel->name());
-      if (channelList->findItems(name, Qt::MatchExactly).size())
-        continue;
-      QListWidgetItem *item = new QListWidgetItem(name);
-      item->setData(Qt::UserRole, QVariant::fromValue(channel));
-      channelList->addItem(item);
-    } else if (SelectedChannel::get() == channel) {
-      QString name = tr("[Selected Channel]");
-      if (channelList->findItems(name, Qt::MatchExactly).size())
-        continue;
-      QListWidgetItem *item = new QListWidgetItem(name);
-      item->setData(Qt::UserRole, QVariant::fromValue(channel));
-      channelList->addItem(item);
-    }
+    if (0 <= _scanList.channels()->indexOf(channel))
+      continue;
+    _scanList.channels()->add(channel);
   }
 }
 
 void
 ScanListDialog::onRemChannel() {
-  QList<QListWidgetItem *> selection = channelList->selectedItems();
-  if (selection.isEmpty())
+  if (! channelListView->hasSelection())
     return;
 
-  foreach (QListWidgetItem *item, selection) {
-    int row = channelList->row(item);
-    channelList->takeItem(row);
-    delete item;
-  }
+  QPair<int,int> selection = channelListView->selection();
+  QList<Channel *> channels;
+  for (int i=selection.first; i<=selection.second; i++)
+    channels.push_back(_scanList.channels()->get(i)->as<Channel>());
+  foreach (Channel *channel, channels)
+    _scanList.channels()->del(channel);
 }
 
-void
-ScanListDialog::onChannelUp() {
-  if (0 == channelList->selectedItems().size())
-    return;
-  int idx = channelList->currentRow();
-  if (0 == idx)
-    return;
-  QListWidgetItem *item = channelList->takeItem(idx);
-  channelList->insertItem(idx-1, item);
-  channelList->setCurrentRow(idx-1);
-}
-
-void
-ScanListDialog::onChannelDown() {
-  if (0 == channelList->selectedItems().size())
-    return;
-  int idx = channelList->currentRow();
-  if ((channelList->count()-1) == idx)
-    return;
-  QListWidgetItem *item = channelList->takeItem(idx);
-  channelList->insertItem(idx+1, item);
-  channelList->setCurrentRow(idx+1);
-}
 
 ScanList *
 ScanListDialog::scanlist() {
-  ScanList *scanlist = _scanlist;
-  if (! scanlist) {
+  ScanList *scanlist = _editScanlist;
+  if (! scanlist)
     scanlist = new ScanList(scanListName->text().simplified(), this);
-  } else {
-    scanlist->clear();
-    scanlist->setName(scanListName->text().simplified());
-  }
 
-  for (int i=0; i<channelList->count(); i++)
-    scanlist->addChannel(channelList->item(i)->data(Qt::UserRole).value<Channel*>());
-
+  _scanList.setName(scanListName->text().simplified());
   // Set priority and transmit channels
-  scanlist->setPrimaryChannel(priorityChannel1->currentData(Qt::UserRole).value<Channel *>());
-  scanlist->setSecondaryChannel(priorityChannel2->currentData(Qt::UserRole).value<Channel *>());
-  scanlist->setRevertChannel(transmitChannel->currentData(Qt::UserRole).value<Channel *>());
+  _scanList.setPrimaryChannel(priorityChannel1->currentData(Qt::UserRole).value<Channel *>());
+  _scanList.setSecondaryChannel(priorityChannel2->currentData(Qt::UserRole).value<Channel *>());
+  _scanList.setRevertChannel(transmitChannel->currentData(Qt::UserRole).value<Channel *>());
+
+  (*scanlist) = _scanList;
 
   return scanlist;
 }

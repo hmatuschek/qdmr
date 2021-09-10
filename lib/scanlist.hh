@@ -28,6 +28,8 @@ public:
   /** Constructs a scan list with the given name. */
 	ScanList(const QString &name, QObject *parent=nullptr);
 
+  ScanList &operator= (const ScanList &other);
+
   /** Returns the number of channels within the scanlist. */
 	int count() const;
   /** Clears the scan list. */
