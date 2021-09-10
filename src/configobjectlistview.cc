@@ -23,8 +23,11 @@ ConfigObjectListView::ConfigObjectListView(QWidget *parent)
 
   connect(ui->itemUp, SIGNAL(clicked(bool)), this, SLOT(onMoveItemUp()));
   connect(ui->itemDown, SIGNAL(clicked(bool)), this, SLOT(onMoveItemDown()));
+  connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onDoubleClicked(QModelIndex)));
+
   ui->listView->setSelectionMode(QAbstractItemView::ContiguousSelection);
   ui->listView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
   SearchPopup::attach(ui->listView);
 }
 

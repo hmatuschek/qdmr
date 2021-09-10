@@ -677,6 +677,30 @@ GroupListsWrapper::headerData(int section, Qt::Orientation orientation, int role
 
 
 /* ********************************************************************************************* *
+ * Implementation of GroupListWrapper
+ * ********************************************************************************************* */
+GroupListWrapper::GroupListWrapper(RXGroupList *list, QObject *parent)
+  : GenericListWrapper(list->contacts(), parent)
+{
+  // pass...
+}
+
+QVariant
+GroupListWrapper::data(const QModelIndex &index, int role) const {
+  if ((Qt::DisplayRole!=role) || (! index.isValid()) || (index.row()>=_list->count()))
+    return QVariant();
+  return _list->get(index.row())->as<DigitalContact>()->name();
+}
+
+QVariant
+GroupListWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((0!=section) || (Qt::Horizontal!=orientation) || (Qt::DisplayRole!=role))
+    return QVariant();
+  return tr("Contact");
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RoamingListWrapper
  * ********************************************************************************************* */
 RoamingListWrapper::RoamingListWrapper(RoamingZoneList *list, QObject *parent)

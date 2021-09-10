@@ -94,7 +94,7 @@ ConfigObject::Context::getTag(const QString &className, const QString &property,
 
 void
 ConfigObject::Context::setTag(const QString &className, const QString &property, const QString &tag, ConfigObject *obj) {
-  logDebug() << "Register tag " << tag << " for " << property << " in " << className << ".";
+  //logDebug() << "Register tag " << tag << " for " << property << " in " << className << ".";
   QString qname = className+"::"+property;
   if (! _tagObjects.contains(qname))
     _tagObjects[qname] = QHash<QString, ConfigObject*>();

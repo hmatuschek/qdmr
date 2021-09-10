@@ -26,6 +26,9 @@ public:
    * @param parent @c QObject parent instance. */
 	explicit RXGroupList(const QString &name, QObject *parent=nullptr);
 
+  /** Copy from other group list. */
+  RXGroupList &operator =(const RXGroupList &other);
+
   /** Returns the number of contacts within the group list. */
   int count() const;
   /** Resets & clears this group list. */

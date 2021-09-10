@@ -24,6 +24,15 @@ RXGroupList::RXGroupList(const QString &name, QObject *parent)
   connect(&_contacts, SIGNAL(elementAdded(int)), this, SLOT(onModified()));
 }
 
+RXGroupList &
+RXGroupList::operator =(const RXGroupList &other) {
+  clear();
+  _name = other.name();
+  for (int i=0; i<other.count(); i++)
+    _contacts.add(other._contacts.get(i));
+  return *this;
+}
+
 int
 RXGroupList::count() const {
   return _contacts.count();
