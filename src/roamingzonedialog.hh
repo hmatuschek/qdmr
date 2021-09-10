@@ -21,12 +21,11 @@ protected slots:
 
   void onAddChannel();
   void onRemChannel();
-  void onChannelUp();
-  void onChannelDown();
 
 protected:
   Config *_config;
-  RoamingZone *_zone;
+  RoamingZone _zone;
+  RoamingZone *_editZone;
 };
 
 #endif // ROAMINGZONEDIALOG_HH

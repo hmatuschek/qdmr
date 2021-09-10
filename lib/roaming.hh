@@ -26,6 +26,9 @@ public:
    * @param parent Specifies the QObject parent of this zone. */
   explicit RoamingZone(const QString &name, QObject *parent = nullptr);
 
+  /** Copies the given zone. */
+  RoamingZone &operator =(const RoamingZone &other);
+
   /** Returns the number of zones. */
   int count() const;
 

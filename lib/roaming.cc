@@ -12,6 +12,15 @@ RoamingZone::RoamingZone(const QString &name, QObject *parent)
   // pass...
 }
 
+RoamingZone &
+RoamingZone::operator =(const RoamingZone &other) {
+  clear();
+  _name = other._name;
+  for (int i=0; i<other._channel.count(); i++)
+    _channel.add(other._channel.get(i));
+  return *this;
+}
+
 int
 RoamingZone::count() const {
   return _channel.count();

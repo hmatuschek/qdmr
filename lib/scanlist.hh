@@ -28,6 +28,7 @@ public:
   /** Constructs a scan list with the given name. */
 	ScanList(const QString &name, QObject *parent=nullptr);
 
+  /** Copies the given scan list. */
   ScanList &operator= (const ScanList &other);
 
   /** Returns the number of channels within the scanlist. */
