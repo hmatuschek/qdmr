@@ -26,7 +26,9 @@ public:
   /** Constructs an empty Zone with the given name. */
 	explicit Zone(const QString &name, QObject *parent = nullptr);
 
-  using ConfigObject::serialize;
+  Zone &operator =(const Zone &other);
+
+  void clear();
 
   /** Returns the name of the zone. */
 	const QString &name() const;

@@ -106,6 +106,22 @@ public:
 };
 
 
+class ChannelRefListWrapper: public GenericListWrapper
+{
+  Q_OBJECT
+
+public:
+  ChannelRefListWrapper(ChannelRefList *list, QObject *parent=nullptr);
+
+public:
+  // Implementation of QAbstractListModel
+  /** Returns the cell data at given index, implements the QAbstractTableModel. */
+  QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
+  /** Implementation of QAbstractListModel, returns the header data at the given section. */
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+};
+
+
 class ContactListWrapper: public GenericTableWrapper
 {
   Q_OBJECT

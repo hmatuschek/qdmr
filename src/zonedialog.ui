@@ -56,41 +56,14 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QListWidget" name="channelListA">
-            <property name="selectionMode">
-             <enum>QAbstractItemView::ExtendedSelection</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
-             <widget class="QPushButton" name="channelAUp">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../shared/resources.qrc">
-                <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="channelADown">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../shared/resources.qrc">
-                <normaloff>:/icons/down.png</normaloff>:/icons/down.png</iconset>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
+         <widget class="ConfigObjectListView" name="listAView" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -120,41 +93,14 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
-          <item>
-           <widget class="QListWidget" name="channelListB">
-            <property name="selectionMode">
-             <enum>QAbstractItemView::ExtendedSelection</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <item>
-             <widget class="QPushButton" name="channelBUp">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../shared/resources.qrc">
-                <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="channelBDown">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../shared/resources.qrc">
-                <normaloff>:/icons/down.png</normaloff>:/icons/down.png</iconset>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
+         <widget class="ConfigObjectListView" name="listBView" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -191,9 +137,15 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../shared/resources.qrc"/>
- </resources>
+ <customwidgets>
+  <customwidget>
+   <class>ConfigObjectListView</class>
+   <extends>QWidget</extends>
+   <header>configobjectlistview.hh</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>

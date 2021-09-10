@@ -443,6 +443,32 @@ ChannelListWrapper::headerData(int section, Qt::Orientation orientation, int rol
 
 
 /* ********************************************************************************************* *
+ * Implementation of ChannelRefListWrapper
+ * ********************************************************************************************* */
+ChannelRefListWrapper::ChannelRefListWrapper(ChannelRefList *list, QObject *parent)
+  : GenericListWrapper(list, parent)
+{
+  // pass...
+}
+
+QVariant
+ChannelRefListWrapper::data(const QModelIndex &index, int role) const {
+  if ((Qt::DisplayRole!=role) || (! index.isValid()) || (index.row()>=_list->count()))
+    return QVariant();
+  return _list->get(index.row())->as<Channel>()->name();
+}
+
+QVariant
+ChannelRefListWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((0!=section) || (Qt::Horizontal!=orientation) || (Qt::DisplayRole!=role))
+    return QVariant();
+  return tr("Channel");
+}
+
+
+
+
+/* ********************************************************************************************* *
  * Implementation of ContactListWrapper
  * ********************************************************************************************* */
 ContactListWrapper::ContactListWrapper(ContactList *list, QObject *parent)

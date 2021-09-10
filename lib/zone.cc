@@ -24,6 +24,24 @@ Zone::Zone(const QString &name, QObject *parent)
   connect(&_B, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
 }
 
+Zone &
+Zone::operator =(const Zone &other) {
+  clear();
+  _name = other._name;
+  for (int i=0; i<other._A.count(); i++)
+    _A.add(other._A.get(i));
+  for (int i=0; i<other._B.count(); i++)
+    _B.add(other._B.get(i));
+  return *this;
+}
+
+void
+Zone::clear() {
+  _name.clear();
+  _A.clear();
+  _B.clear();
+}
+
 const QString &
 Zone::name() const {
   return _name;
