@@ -26,8 +26,10 @@ public:
   /** Constructs an empty Zone with the given name. */
 	explicit Zone(const QString &name, QObject *parent = nullptr);
 
+  /** Copies the given zone. */
   Zone &operator =(const Zone &other);
 
+  /** Clears this zone. */
   void clear();
 
   /** Returns the name of the zone. */

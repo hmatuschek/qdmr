@@ -1793,11 +1793,11 @@ positioning:
       name: APRS APAT81
       period: 300
       revert: ch104
+      icon: Jogger
+      message: Y07, QRG 144.675
       destination: APAT81-0
       source: DM3MAT-7
       path: [WIDE1-1, WIDE2-1]
-      icon: Jogger
-      message: Y07, QRG 144.675
 roaming:
   - id: roam1
     name: Berlin/Brand
