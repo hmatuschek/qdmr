@@ -100,8 +100,8 @@ ChannelListView::onCloneChannel() {
     DigitalChannel *clone = new DigitalChannel(
           selch->name()+" clone", selch->rxFrequency(), selch->txFrequency(), selch->power(),
           selch->timeout(), selch->rxOnly(), selch->admit(), selch->colorCode(),
-          selch->timeSlot(), selch->rxGroupList(), selch->txContact(), selch->posSystem(),
-          selch->scanListObj(), selch->roaming(), nullptr);
+          selch->timeSlot(), selch->groupListObj(), selch->txContactObj(), selch->aprsObj(),
+          selch->scanListObj(), selch->roamingZone(), nullptr);
     // open editor
     DigitalChannelDialog dialog(_config, clone);
     if (QDialog::Accepted != dialog.exec()) {

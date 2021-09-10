@@ -69,8 +69,6 @@ protected:
           ScanList *scanlist, QObject *parent=nullptr);
 
 public:
-  using ConfigObject::serialize;
-
   /** Returns @c true if the channel is of type @c T. This can be used to text wheter this channel
    * is actuially an analog or digital channel: @c channel->is<AnalogChannel>(). */
   template<class T>
@@ -129,6 +127,10 @@ public:
   /** (Re-) Sets the default scan list for the channel. */
   bool setScanListObj(ScanList *list);
 
+protected slots:
+  /** Gets called whenever a referenced object is changed or deleted. */
+  void onReferenceModified();
+
 protected:
   /** The channel name. */
   QString _name;
@@ -163,6 +165,8 @@ class AnalogChannel: public Channel
   Q_PROPERTY(uint squelch READ squelch WRITE setSquelch)
   /** The band width of the channel. */
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
+  /** The APRS system. */
+  Q_PROPERTY(APRSSystemReference* aprs READ aprs)
 
 public:
   /** Admit criteria of analog channel. */
@@ -228,17 +232,17 @@ public:
   /** (Re-)Sets the bandwidth of the analog channel. */
 	bool setBandwidth(Bandwidth bw);
 
+  /** Returns the reference to the APRS system. */
+  const APRSSystemReference *aprs() const;
+  /** Returns the reference to the APRS system. */
+  APRSSystemReference *aprs();
   /** Returns the APRS system used for this channel or @c nullptr if disabled. */
   APRSSystem *aprsSystem() const;
   /** Sets the APRS system. */
   void setAPRSSystem(APRSSystem *sys);
 
 protected:
-  bool serialize(YAML::Node &node, const Context &context);
-
-protected slots:
-  /** Internal call-back that gets called if the associated APRS gets deleted. */
-  void onAPRSSystemDeleted();
+  bool populate(YAML::Node &node, const Context &context);
 
 protected:
   /** Holds the admit criterion. */
@@ -252,7 +256,7 @@ protected:
   /** The channel bandwidth. */
 	Bandwidth _bw;
   /** A reference to the APRS system used on the channel or @c nullptr if disabled. */
-  APRSSystem *_aprsSystem;
+  APRSSystemReference _aprsSystem;
 };
 
 
@@ -272,6 +276,16 @@ class DigitalChannel: public Channel
   Q_PROPERTY(uint colorCode READ colorCode WRITE setColorCode)
   /** The time slot of the channel. */
   Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
+  /** The radio ID. */
+  Q_PROPERTY(RadioIDReference* radioID READ radioID)
+  /** The rx group list. */
+  Q_PROPERTY(GroupListReference* groupList READ groupList)
+  /** The tx contact. */
+  Q_PROPERTY(DigitalContactReference* contact READ contact)
+  /** The positioning system. */
+  Q_PROPERTY(PositioningSystemReference* aprs READ aprs)
+  /** The roaming zone. */
+  Q_PROPERTY(RoamingZoneReference* roaming READ roaming)
 
 public:
   /** Possible admit criteria of digital channels. */
@@ -303,14 +317,14 @@ public:
    * @param timeSlot  Specifies the time-slot.
    * @param rxGroup   Specifies the RX group list for the channel.
    * @param txContact Specifies the default TX contact to call on this channel.
-   * @param posSystem Specifies the positioning system to use on this channel.
+   * @param aprs      Specifies the positioning system to use on this channel.
    * @param list      Specifies the default scanlist for the channel.
    * @param roaming   Specifies the roaming zone for the channel.
    * @param radioID   Specifies the radio ID to use for this channel, @c nullptr is default ID.
    * @param parent    Specified the @c QObject parent object. */
   DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power, uint timeout,
                  bool rxOnly, Admit admit, uint colorCode, TimeSlot timeSlot, RXGroupList *rxGroup,
-                 DigitalContact *txContact, PositioningSystem *posSystem, ScanList *list,
+                 DigitalContact *txContact, PositioningSystem *aprs, ScanList *list,
                  RoamingZone *roaming, RadioID *radioID, QObject *parent=nullptr);
 
   YAML::Node serialize(const Context &context);
@@ -330,45 +344,50 @@ public:
   /** (Re-)Sets the time slot for the channel. */
 	bool setTimeSlot(TimeSlot ts);
 
+  /** Returns a reference to the group list. */
+  const GroupListReference *groupList() const;
+  /** Returns a reference to the group list. */
+  GroupListReference *groupList();
   /** Retruns the RX group list for the channel. */
-	RXGroupList *rxGroupList() const;
+  RXGroupList *groupListObj() const;
   /** (Re-)Sets the RX group list for the channel. */
-	bool setRXGroupList(RXGroupList *rxg);
+  bool setGroupListObj(RXGroupList *rxg);
 
+  /** Returns a reference to the transmit contact. */
+  const DigitalContactReference *contact() const;
+  /** Returns a reference to the transmit contact. */
+  DigitalContactReference *contact();
   /** Returns the default TX contact to call on this channel. */
-	DigitalContact *txContact() const;
+  DigitalContact *txContactObj() const;
   /** (Re-) Sets the default TX contact for this channel. */
-	bool setTXContact(DigitalContact *c);
+  bool setTXContactObj(DigitalContact *c);
 
+  /** Returns a reference to the positioning system. */
+  const PositioningSystemReference *aprs() const;
+  /** Returns a reference to the positioning system. */
+  PositioningSystemReference *aprs();
   /** Returns the GPS system associated with this channel or @c nullptr if not set. */
-  PositioningSystem *posSystem() const;
+  PositioningSystem *aprsObj() const;
   /** Associates the GPS System with this channel. */
-  bool setPosSystem(PositioningSystem *sys);
+  bool aprsObj(PositioningSystem *sys);
 
+  /** Returns a reference to the roaming zone. */
+  const RoamingZoneReference *roaming() const;
+  /** Returns a reference to the roaming zone. */
+  RoamingZoneReference *roaming();
   /** Returns the roaming zone associated with this channel or @c nullptr if not set. */
-  RoamingZone *roaming() const;
+  RoamingZone *roamingZone() const;
   /** Associates the given roaming zone with this channel. */
-  bool setRoaming(RoamingZone *zone);
+  bool setRoamingZone(RoamingZone *zone);
 
+  /** Returns the reference to the radio ID. */
+  const RadioIDReference *radioID() const;
+  /** Returns the reference to the radio ID. */
+  RadioIDReference *radioID();
   /** Returns the radio ID associated with this channel or @c nullptr if the default ID is used. */
-  RadioID *radioId() const;
+  RadioID *radioIdObj() const;
   /** Associates the given radio ID with this channel. Pass nullptr to set to default ID. */
-  bool setRadioId(RadioID *id);
-
-protected:
-  bool serialize(YAML::Node &node, const Context &context);
-
-protected slots:
-  /** Internal callback if RX group list is deleted. */
-	void onRxGroupDeleted();
-  /** Internal callback if TX contact is deleted. */
-	void onTxContactDeleted();
-  /** Internal callback if GPS system is deleted. */
-  void onPosSystemDeleted();
-  /** Internal callback if roaming zone is deleted. */
-  void onRoamingZoneDeleted();
-  /** Internal used callback if radio ID is deleted. */
-  void onRadioIdDeleted();
+  bool setRadioIdObj(RadioID *id);
 
 protected:
   /** The admit criterion. */
@@ -378,15 +397,15 @@ protected:
   /** The time slot for the channel. */
 	TimeSlot _timeSlot;
   /** The RX group list for this channel. */
-	RXGroupList *_rxGroup;
+  GroupListReference _rxGroup;
   /** The default TX contact. */
-	DigitalContact *_txContact;
+  DigitalContactReference _txContact;
   /** The GPS system. */
-  PositioningSystem *_posSystem;
+  PositioningSystemReference _posSystem;
   /** Roaming zone for the channel. */
-  RoamingZone *_roaming;
+  RoamingZoneReference _roaming;
   /** Radio ID to use on this channel. @c nullptr if default ID is used. */
-  RadioID *_radioId;
+  RadioIDReference _radioId;
 };
 
 

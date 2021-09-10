@@ -545,13 +545,13 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, const CodeplugContext &c
   } else if ((MODE_DIGITAL == mode()) && (c->is<DigitalChannel>())){
     DigitalChannel *dc = c->as<DigitalChannel>();
     if (contactIndex() && ctx.hasDigitalContact(contactIndex())) {
-      dc->setTXContact(ctx.getDigitalContact(contactIndex()));
+      dc->setTXContactObj(ctx.getDigitalContact(contactIndex()));
     }
     if (groupListIndex() && ctx.hasGroupList(groupListIndex())) {
-      dc->setRXGroupList(ctx.getGroupList(groupListIndex()));
+      dc->setGroupListObj(ctx.getGroupList(groupListIndex()));
     }
     if (positioningSystemIndex() && ctx.hasGPSSystem(positioningSystemIndex())) {
-      dc->setPosSystem(ctx.getGPSSystem(positioningSystemIndex()));
+      dc->aprsObj(ctx.getGPSSystem(positioningSystemIndex()));
     }
     return true;
   }
@@ -584,18 +584,18 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
     }
     colorCode(dchan->colorCode());
     timeSlot(dchan->timeSlot());
-    if (dchan->rxGroupList())
-      groupListIndex(ctx.config()->rxGroupLists()->indexOf(dchan->rxGroupList())+1);
+    if (dchan->groupListObj())
+      groupListIndex(ctx.config()->rxGroupLists()->indexOf(dchan->groupListObj())+1);
     else
       groupListIndex(0);
-    if (dchan->txContact())
-      contactIndex(ctx.config()->contacts()->indexOfDigital(dchan->txContact())+1);
+    if (dchan->txContactObj())
+      contactIndex(ctx.config()->contacts()->indexOfDigital(dchan->txContactObj())+1);
     squelch(0);
     bandwidth(AnalogChannel::Narrow);
     rxSignaling(Signaling::SIGNALING_NONE);
     txSignaling(Signaling::SIGNALING_NONE);
-    if (dchan->posSystem() && dchan->posSystem()->is<GPSSystem>()) {
-      positioningSystemIndex(ctx.config()->posSystems()->indexOfGPSSys(dchan->posSystem()->as<GPSSystem>())+1);
+    if (dchan->aprsObj() && dchan->aprsObj()->is<GPSSystem>()) {
+      positioningSystemIndex(ctx.config()->posSystems()->indexOfGPSSys(dchan->aprsObj()->as<GPSSystem>())+1);
       txGPSInfo(true); rxGPSInfo(false);
     }
   } else if (chan->is<AnalogChannel>()) {

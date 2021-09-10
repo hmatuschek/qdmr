@@ -9,6 +9,11 @@
 /* ********************************************************************************************* *
  * Implementation of ConfigObject::Context
  * ********************************************************************************************* */
+QHash<QString, QHash<QString, ConfigObject *>> ConfigObject::Context::_tagObjects =
+    QHash<QString, QHash<QString, ConfigObject *>>();
+QHash<QString, QHash<ConfigObject *, QString>> ConfigObject::Context::_tagNames =
+    QHash<QString, QHash<ConfigObject *, QString>>();
+
 ConfigObject::Context::Context()
   : _version(), _objects(), _ids()
 {
@@ -57,6 +62,48 @@ ConfigObject::Context::add(const QString &id, ConfigObject *obj) {
   return true;
 }
 
+bool
+ConfigObject::Context::hasTag(const QString &className, const QString &property, const QString &tag) {
+  QString qname = className+"::"+property;
+  return _tagObjects.contains(qname) && _tagObjects[qname].contains(tag);
+}
+
+bool
+ConfigObject::Context::hasTag(const QString &className, const QString &property, ConfigObject *obj) {
+  QString qname = className+"::"+property;
+  return _tagNames.contains(qname) && _tagNames[qname].contains(obj);
+}
+
+ConfigObject *
+ConfigObject::Context::getTag(const QString &className, const QString &property, const QString &tag) {
+  //logDebug() << "Request " << tag << " for " << property << " in " << className << ".";
+  QString qname = className+"::"+property;
+  if (! _tagObjects.contains(qname))
+    return nullptr;
+  return _tagObjects[qname].value(tag, nullptr);
+}
+
+QString
+ConfigObject::Context::getTag(const QString &className, const QString &property, ConfigObject *obj) {
+  //logDebug() << "Request tag for " << property << " in " << className << ".";
+  QString qname = className+"::"+property;
+  if (! _tagNames.contains(qname))
+    return nullptr;
+  return _tagNames[qname].value(obj);
+}
+
+void
+ConfigObject::Context::setTag(const QString &className, const QString &property, const QString &tag, ConfigObject *obj) {
+  logDebug() << "Register tag " << tag << " for " << property << " in " << className << ".";
+  QString qname = className+"::"+property;
+  if (! _tagObjects.contains(qname))
+    _tagObjects[qname] = QHash<QString, ConfigObject*>();
+  _tagObjects[qname].insert(tag, obj);
+  if (! _tagNames.contains(qname))
+    _tagNames[qname] = QHash<ConfigObject*, QString>();
+  _tagNames[qname].insert(obj, tag);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ConfigObject
@@ -85,13 +132,13 @@ ConfigObject::label(Context &context) {
 YAML::Node
 ConfigObject::serialize(const Context &context) {
   YAML::Node node;
-  if (! serialize(node, context))
+  if (! populate(node, context))
     return YAML::Node();
   return node;
 }
 
 bool
-ConfigObject::serialize(YAML::Node &node, const Context &context){
+ConfigObject::populate(YAML::Node &node, const Context &context){
   if (context.contains(this))
     node["id"] = context.getId(this).toStdString();
 
@@ -121,7 +168,12 @@ ConfigObject::serialize(YAML::Node &node, const Context &context){
       ConfigObject *obj = ref->as<ConfigObject>();
       if (nullptr == obj)
         continue;
-      if (! context.contains(obj)) {
+      if (context.hasTag(prop.enclosingMetaObject()->className(), prop.name(), obj)) {
+        YAML::Node tag(YAML::NodeType::Scalar);
+        tag.SetTag(context.getTag(prop.enclosingMetaObject()->className(), prop.name(), obj).toStdString());
+        node[prop.name()] = tag;
+        continue;
+      } else if (! context.contains(obj)) {
         logError() << "Cannot reference object of type " << obj->metaObject()->className()
                    << " object not labeled.";
         return false;
@@ -129,12 +181,18 @@ ConfigObject::serialize(YAML::Node &node, const Context &context){
       node[prop.name()] = context.getId(obj).toStdString();
     } else if (prop.read(this).value<ConfigObjectRefList *>()) {
       ConfigObjectRefList *refs = prop.read(this).value<ConfigObjectRefList *>();
-      logDebug() << "Serialize obj list w/ " << refs->count() << " elements." ;
+      //logDebug() << "Serialize obj list w/ " << refs->count() << " elements." ;
       YAML::Node list = YAML::Node(YAML::NodeType::Sequence);
       list.SetStyle(YAML::EmitterStyle::Flow);
       for (int i=0; i<refs->count(); i++) {
         ConfigObject *obj = refs->get(i);
-        if (!context.contains(obj)) {
+        if (context.hasTag(prop.enclosingMetaObject()->className(), prop.name(), obj)) {
+          YAML::Node tag(YAML::NodeType::Scalar);
+          tag.SetTag(context.getTag(prop.enclosingMetaObject()->className(), prop.name(), obj).toStdString());
+          tag = tag.Tag().substr(1);
+          list.push_back(tag);
+          continue;
+        } else if (! context.contains(obj)) {
           logError() << "Cannot reference object of type " << obj->metaObject()->className()
                      << " object not labeled.";
           return false;
@@ -198,9 +256,9 @@ ConfigExtension::ConfigExtension(const QString &idBase, QObject *parent)
 }
 
 bool
-ConfigExtension::serialize(YAML::Node &node, const Context &context) {
+ConfigExtension::populate(YAML::Node &node, const Context &context) {
   // Call parent method
-  if (! ConfigObject::serialize(node, context))
+  if (! ConfigObject::populate(node, context))
     return false;
   return true;
 }

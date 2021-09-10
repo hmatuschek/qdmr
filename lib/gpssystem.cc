@@ -41,11 +41,17 @@ PositioningSystem::setPeriod(uint period) {
 }
 
 bool
-PositioningSystem::serialize(YAML::Node &node, const ConfigObject::Context &context) {
-  if (! ConfigObject::serialize(node, context))
+PositioningSystem::populate(YAML::Node &node, const ConfigObject::Context &context) {
+  if (! ConfigObject::populate(node, context))
     return false;
   return true;
 }
+
+void
+PositioningSystem::onReferenceModified() {
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of GPSSystem
@@ -53,12 +59,21 @@ PositioningSystem::serialize(YAML::Node &node, const ConfigObject::Context &cont
 GPSSystem::GPSSystem(const QString &name, DigitalContact *contact,
                      DigitalChannel *revertChannel, uint period,
                      QObject *parent)
-  : PositioningSystem(name, period, parent), _contact(contact), _revertChannel(revertChannel)
+  : PositioningSystem(name, period, parent), _contact(), _revertChannel()
 {
-  if (_contact)
-    connect(_contact, SIGNAL(destroyed(QObject*)), this, SLOT(onContactDeleted()));
-  if (_revertChannel)
-    connect(_revertChannel, SIGNAL(destroyed(QObject*)), this, SLOT(onRevertChannelDeleted()));
+  // Register '!selected' tag for revert channel
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+
+  // Set references.
+  _contact.set(contact);
+  _revertChannel.set(revertChannel);
+
+  // Allow revert channel to take a reference to the SelectedChannel singleton
+  _revertChannel.allow(SelectedChannel::get()->metaObject());
+
+  // Connect signals
+  connect(&_contact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_revertChannel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
 YAML::Node
@@ -72,63 +87,52 @@ GPSSystem::serialize(const Context &context) {
 
 bool
 GPSSystem::hasContact() const {
-  return nullptr != _contact;
+  return ! _contact.isNull();
 }
 
 DigitalContact *
-GPSSystem::contact() const {
-  return _contact;
+GPSSystem::contactObj() const {
+  return _contact.as<DigitalContact>();
 }
 
 void
 GPSSystem::setContact(DigitalContact *contact) {
-  if (_contact)
-    disconnect(_contact, SIGNAL(destroyed(QObject*)), this, SLOT(onContactDeleted()));
-  _contact = contact;
-  connect(_contact, SIGNAL(destroyed(QObject*)), this, SLOT(onContactDeleted()));
+  _contact.set(contact);
+}
+
+const DigitalContactReference *
+GPSSystem::contact() const {
+  return &_contact;
+}
+
+DigitalContactReference *
+GPSSystem::contact() {
+  return &_contact;
 }
 
 bool
 GPSSystem::hasRevertChannel() const {
-  return nullptr != _revertChannel;
+  return ! _revertChannel.isNull();
 }
 
 DigitalChannel *
 GPSSystem::revertChannel() const {
-  return _revertChannel;
+  return _revertChannel.as<DigitalChannel>();
 }
 
 void
 GPSSystem::setRevertChannel(DigitalChannel *channel) {
-  if (_revertChannel)
-    disconnect(_revertChannel, SIGNAL(destroyed(QObject*)), this, SLOT(onRevertChannelDeleted()));
-  _revertChannel = channel;
-  if (_revertChannel)
-    connect(_revertChannel, SIGNAL(destroyed(QObject*)), this, SLOT(onRevertChannelDeleted()));
+  _revertChannel.set(channel);
 }
 
-void
-GPSSystem::onContactDeleted() {
-  _contact = nullptr;
+const DigitalChannelReference*
+GPSSystem::revert() const {
+  return &_revertChannel;
 }
 
-void
-GPSSystem::onRevertChannelDeleted() {
-  _revertChannel = nullptr;
-}
-
-bool
-GPSSystem::serialize(YAML::Node &node, const Context &context) {
-  if (! PositioningSystem::serialize(node, context))
-    return false;
-
-  if (_contact && context.contains(_contact))
-    node["destination"] = context.getId(_contact).toStdString();
-
-  if (_revertChannel && context.contains(_revertChannel))
-    node["revert"] = context.getId(_revertChannel).toStdString();
-
-  return true;
+DigitalChannelReference*
+GPSSystem::revert() {
+  return &_revertChannel;
 }
 
 
@@ -138,11 +142,13 @@ GPSSystem::serialize(YAML::Node &node, const Context &context) {
 APRSSystem::APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, uint destSSID,
                        const QString &src, uint srcSSID, const QString &path, Icon icon, const QString &message,
                        uint period, QObject *parent)
-  : PositioningSystem(name, period, parent), _channel(channel), _destination(dest), _destSSID(destSSID),
+  : PositioningSystem(name, period, parent), _channel(), _destination(dest), _destSSID(destSSID),
     _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message)
 {
-  if (_channel)
-    connect(_channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
+  // Set channel reference
+  _channel.set(channel);
+  // Connect to channel reference
+  connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
 YAML::Node
@@ -155,16 +161,23 @@ APRSSystem::serialize(const Context &context) {
 }
 
 AnalogChannel *
-APRSSystem::channel() const {
-  return _channel;
+APRSSystem::revertChannel() const {
+  return _channel.as<AnalogChannel>();
 }
+
 void
-APRSSystem::setChannel(AnalogChannel *channel) {
-  if (_channel)
-    disconnect(_channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  _channel = channel;
-  if (_channel)
-    connect(_channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
+APRSSystem::setRevertChannel(AnalogChannel *channel) {
+  _channel.set(channel);
+}
+
+const AnalogChannelReference *
+APRSSystem::revert() const {
+  return &_channel;
+}
+
+AnalogChannelReference *
+APRSSystem::revert() {
+  return &_channel;
 }
 
 const QString &
@@ -221,21 +234,13 @@ APRSSystem::message() const {
 void
 APRSSystem::setMessage(const QString &msg) {
   _message = msg;
-}
-
-void
-APRSSystem::onChannelDeleted(QObject *obj) {
-  if (_channel == obj)
-    _channel = nullptr;
+  emit modified(this);
 }
 
 bool
-APRSSystem::serialize(YAML::Node &node, const Context &context) {
-  if (! PositioningSystem::serialize(node, context))
+APRSSystem::populate(YAML::Node &node, const Context &context) {
+  if (! PositioningSystem::populate(node, context))
     return false;
-
-  if (_channel && context.contains(_channel))
-    node["channel"] = context.getId(_channel).toStdString();
 
   node["destination"] = QString("%1-%2").arg(_destination).arg(_destSSID).toStdString();
   node["source"] = QString("%1-%2").arg(_source).arg(_srcSSID).toStdString();

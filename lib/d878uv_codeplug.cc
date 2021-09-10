@@ -323,27 +323,30 @@ D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
     // Check if default contact is set, in fact a valid contact index is mandatory.
     uint32_t conIdx = qFromLittleEndian(contact_index);
     if ((0xffffffff != conIdx) && ctx.hasDigitalContact(conIdx))
-      dc->setTXContact(ctx.getDigitalContact(conIdx));
+      dc->setTXContactObj(ctx.getDigitalContact(conIdx));
 
     // Set if RX group list is set
     if ((0xff != group_list_index) && ctx.hasGroupList(group_list_index))
-      dc->setRXGroupList(ctx.getGroupList(group_list_index));
+      dc->setGroupListObj(ctx.getGroupList(group_list_index));
 
     // Link to GPS system
     if ((APRS_REPORT_DIGITAL == aprs_report) && ctx.hasGPSSystem(gps_system))
-      dc->setPosSystem(ctx.getGPSSystem(gps_system));
+      dc->aprsObj(ctx.getGPSSystem(gps_system));
     // Link APRS system if one is defined
     //  There can only be one active APRS system, hence the index is fixed to one.
     if ((APRS_REPORT_ANALOG == aprs_report) && ctx.hasAPRSSystem(0))
-      dc->setPosSystem(ctx.getAPRSSystem(0));
+      dc->aprsObj(ctx.getAPRSSystem(0));
 
     // If roaming is not disabled -> link to default roaming zone
     if (0 == excl_from_roaming)
-      dc->setRoaming(DefaultRoamingZone::get());
+      dc->setRoamingZone(DefaultRoamingZone::get());
 
     // Link radio ID
-    dc->setRadioId(ctx.getRadioId(id_index));
-
+    RadioID *rid = ctx.getRadioId(id_index);
+    if (rid == ctx.config()->radioIDs()->defaultId())
+      dc->setRadioIdObj(DefaultRadioID::get());
+    else
+      dc->setRadioIdObj(rid);
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
     AnalogChannel *ac = c->as<AnalogChannel>();
@@ -440,30 +443,30 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     // set time-slot
     slot2 = (DigitalChannel::TimeSlot2 == dc->timeSlot()) ? 1 : 0;
     // link transmit contact
-    if (nullptr == dc->txContact()) {
+    if (nullptr == dc->txContactObj()) {
       contact_index = 0;
     } else {
       contact_index = qToLittleEndian(
-            uint32_t(conf->contacts()->indexOfDigital(dc->txContact())));
+            uint32_t(conf->contacts()->indexOfDigital(dc->txContactObj())));
     }
     // link RX group list
-    if (nullptr == dc->rxGroupList())
+    if (nullptr == dc->groupListObj())
       group_list_index = 0xff;
     else
-      group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList());
+      group_list_index = conf->rxGroupLists()->indexOf(dc->groupListObj());
     // Set GPS system index
     rx_gps = 0;
-    if (dc->posSystem() && dc->posSystem()->is<GPSSystem>()) {
+    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
       aprs_report = APRS_REPORT_DIGITAL;
-      gps_system = conf->posSystems()->indexOfGPSSys(dc->posSystem()->as<GPSSystem>());
+      gps_system = conf->posSystems()->indexOfGPSSys(dc->aprsObj()->as<GPSSystem>());
       rx_gps = 1;
-    } else if (dc->posSystem() && dc->posSystem()->is<APRSSystem>()) {
+    } else if (dc->aprsObj() && dc->aprsObj()->is<APRSSystem>()) {
       aprs_report = APRS_REPORT_ANALOG;
       rx_gps = 1;
     }
     // Set radio ID
-    if (nullptr != dc->radioId())
-      id_index = conf->radioIDs()->indexOf(dc->radioId());
+    if (nullptr != dc->radioIdObj())
+      id_index = conf->radioIDs()->indexOf(dc->radioIdObj());
     else
       id_index = 0;
   }
@@ -716,9 +719,9 @@ D878UVCodeplug::aprs_setting_t::setIcon(APRSSystem::Icon icon) {
 void
 D878UVCodeplug::aprs_setting_t::fromAPRSSystem(APRSSystem *sys) {
   _unknown0 = 0xff;
-  setFrequency(sys->channel()->txFrequency());
+  setFrequency(sys->revertChannel()->txFrequency());
   tx_delay = 0x03;
-  setSignaling(sys->channel()->txTone());
+  setSignaling(sys->revertChannel()->txTone());
   setManualTxInterval(sys->period());
   setAutoTxInterval(sys->period());
   tx_tone_enable = 0;
@@ -728,7 +731,7 @@ D878UVCodeplug::aprs_setting_t::fromAPRSSystem(APRSSystem *sys) {
   setPath(sys->path());
   _pad56 = 0;
   setIcon(sys->icon());
-  setPower(sys->channel()->power());
+  setPower(sys->revertChannel()->power());
   prewave_delay = 0;
   _unknown61 = 0x01;
   _unknown62 = 0x03;
@@ -756,7 +759,7 @@ D878UVCodeplug::aprs_setting_t::linkAPRSSystem(APRSSystem *sys, CodeplugContext 
               << ", create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);
   }
-  sys->setChannel(ch);
+  sys->setRevertChannel(ch);
 }
 
 
@@ -823,8 +826,8 @@ D878UVCodeplug::gps_systems_t::fromGPSSystemObj(GPSSystem *sys, const Config *co
   if ((idx < 0) || idx > 7)
     return;
   if (sys->hasContact()) {
-    setContactId(idx, sys->contact()->number());
-    setContactType(idx, sys->contact()->type());
+    setContactId(idx, sys->contactObj()->number());
+    setContactType(idx, sys->contactObj()->type());
   }
   if (sys->hasRevertChannel() && (SelectedChannel::get() != (Channel *)sys->revertChannel())) {
     digi_channels[idx] = conf->channelList()->indexOf(sys->revertChannel());
@@ -1365,7 +1368,7 @@ D878UVCodeplug::createRoaming(Config *config, CodeplugContext &ctx) {
     roaming_channel_t *ch = (roaming_channel_t *)data(addr);
     DigitalChannel *digi = ch->toChannel(ctx);
     if (digi) {
-      logDebug() << "Register channel '" << digi->name() << "' as roaming channel " << i+1;
+      //logDebug() << "Register channel '" << digi->name() << "' as roaming channel " << i+1;
       ctx.addRoamingChannel(digi, i);
     }
   }

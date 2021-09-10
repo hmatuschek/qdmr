@@ -3,15 +3,24 @@
 #include "contact.hh"
 #include "channel.hh"
 #include "scanlist.hh"
+#include "gpssystem.hh"
+#include "radioid.hh"
+#include "rxgrouplist.hh"
+#include "roaming.hh"
 
 
 /* ********************************************************************************************* *
  * Implementation of ConfigObjectReference
  * ********************************************************************************************* */
 ConfigObjectReference::ConfigObjectReference(const QMetaObject &elementType, QObject *parent)
-  : QObject(parent), _elementType(elementType), _object(nullptr)
+  : QObject(parent), _elementTypes(), _object(nullptr)
 {
-  // pass...
+  _elementTypes.append(elementType.className());
+}
+
+bool
+ConfigObjectReference::isNull() const {
+  return nullptr == _object;
 }
 
 void
@@ -34,9 +43,16 @@ ConfigObjectReference::set(ConfigObject *object) {
   }
 
   // Check type
-  if (! object->inherits(_elementType.className())) {
+  bool typeCheck = false;
+  foreach (const QString &cname, _elementTypes) {
+    if (object->inherits(cname.toLatin1().constData())) {
+      typeCheck = true;
+      break;
+    }
+  }
+  if (! typeCheck) {
     logError() << "Cannot reference element of type " << object->metaObject()->className()
-               << ", expected instance of " << _elementType.className();
+               << ", expected instance of " << _elementTypes.join(", ");
     return false;
   }
 
@@ -48,10 +64,43 @@ ConfigObjectReference::set(ConfigObject *object) {
   return true;
 }
 
+bool
+ConfigObjectReference::allow(const QMetaObject *elementType) {
+  if (! _elementTypes.contains(elementType->className()))
+    _elementTypes.append(elementType->className());
+  return true;
+}
+
 void
 ConfigObjectReference::onReferenceDeleted(QObject *obj) {
   _object = nullptr;
   emit modified();
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of ContactReference
+ * ********************************************************************************************* */
+ContactReference::ContactReference(const QMetaObject &elementType, QObject *parent)
+  : ConfigObjectReference(elementType, parent)
+{
+  // pass...
+}
+
+ContactReference::ContactReference(QObject *parent)
+  : ConfigObjectReference(Contact::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of DigitalContactReference
+ * ********************************************************************************************* */
+DigitalContactReference::DigitalContactReference(QObject *parent)
+  : ContactReference(DigitalContact::staticMetaObject, parent)
+{
+  // pass...
 }
 
 
@@ -68,8 +117,34 @@ DigitalContactRefList::DigitalContactRefList(QObject *parent)
 /* ********************************************************************************************* *
  * Implementation of ChannelReference
  * ********************************************************************************************* */
+ChannelReference::ChannelReference(const QMetaObject &elementType, QObject *parent)
+  : ConfigObjectReference(elementType, parent)
+{
+  // pass...
+}
+
 ChannelReference::ChannelReference(QObject *parent)
   : ConfigObjectReference(Channel::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of DigitalChannelReference
+ * ********************************************************************************************* */
+DigitalChannelReference::DigitalChannelReference(QObject *parent)
+  : ChannelReference(DigitalChannel::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnalogChannelReference
+ * ********************************************************************************************* */
+AnalogChannelReference::AnalogChannelReference(QObject *parent)
+  : ChannelReference(AnalogChannel::staticMetaObject, parent)
 {
   // pass...
 }
@@ -111,3 +186,67 @@ ScanListReference::ScanListReference(QObject *parent)
 }
 
 
+/* ********************************************************************************************* *
+ * Implementation of PositioningSystemReference
+ * ********************************************************************************************* */
+PositioningSystemReference::PositioningSystemReference(const QMetaObject &elementType, QObject *parent)
+  : ConfigObjectReference(elementType, parent)
+{
+  // pass...
+}
+
+PositioningSystemReference::PositioningSystemReference(QObject *parent)
+  : ConfigObjectReference(PositioningSystem::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of APRSSystemReference
+ * ********************************************************************************************* */
+APRSSystemReference::APRSSystemReference(QObject *parent)
+  : PositioningSystemReference(APRSSystem::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of GPSSystemReference
+ * ********************************************************************************************* */
+GPSSystemReference::GPSSystemReference(QObject *parent)
+  : PositioningSystemReference(APRSSystem::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioIDReference
+ * ********************************************************************************************* */
+RadioIDReference::RadioIDReference(QObject *parent)
+  : ConfigObjectReference(RadioID::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of GroupListReference
+ * ********************************************************************************************* */
+GroupListReference::GroupListReference(QObject *parent)
+  : ConfigObjectReference(RXGroupList::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RoamingZoneReference
+ * ********************************************************************************************* */
+RoamingZoneReference::RoamingZoneReference(QObject *parent)
+  : ConfigObjectReference(RoamingZone::staticMetaObject, parent)
+{
+  // pass...
+}

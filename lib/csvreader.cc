@@ -1911,7 +1911,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(gl);
         return false;
       }
-      _channels[idx]->as<DigitalChannel>()->setRXGroupList(_rxgroups[gl]);
+      _channels[idx]->as<DigitalChannel>()->setGroupListObj(_rxgroups[gl]);
     }
 
     // Check TX Contact
@@ -1921,7 +1921,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(contact);
         return false;
       }
-      _channels[idx]->as<DigitalChannel>()->setTXContact(_digital_contacts[contact]);
+      _channels[idx]->as<DigitalChannel>()->setTXContactObj(_digital_contacts[contact]);
     }
 
     // Check scanlist
@@ -1941,13 +1941,13 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(gps);
         return false;
       }
-      _channels[idx]->as<DigitalChannel>()->setPosSystem(_posSystems[gps]);
+      _channels[idx]->as<DigitalChannel>()->aprsObj(_posSystems[gps]);
     }
 
     // Check roaming zone
     if (0 == roam) {
       // index 0 mean default zone -> just set it
-      _channels[idx]->as<DigitalChannel>()->setRoaming(DefaultRoamingZone::get());
+      _channels[idx]->as<DigitalChannel>()->setRoamingZone(DefaultRoamingZone::get());
     } else if (0 < roam) {
       // positive index means reference to roaming specific roaming zone
       if (! _roamingZones.contains(roam)) {
@@ -1955,14 +1955,14 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(roam);
         return false;
       }
-      _channels[idx]->as<DigitalChannel>()->setRoaming(_roamingZones[roam]);
+      _channels[idx]->as<DigitalChannel>()->setRoamingZone(_roamingZones[roam]);
     }
 
     // check radio ID
     if (-1 == radioID) {
-      _channels[idx]->as<DigitalChannel>()->setRadioId(nullptr);
+      _channels[idx]->as<DigitalChannel>()->setRadioIdObj(nullptr);
     } else if ((0 < radioID) && (_radioIDs.contains(radioID))) {
-      _channels[idx]->as<DigitalChannel>()->setRadioId(_radioIDs[radioID]);
+      _channels[idx]->as<DigitalChannel>()->setRadioIdObj(_radioIDs[radioID]);
     } else {
       errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown radio ID index %4.")
           .arg(line).arg(column).arg(name).arg(radioID);
@@ -2133,7 +2133,7 @@ CSVReader::handleAPRSSystem(
           .arg(line).arg(column).arg(name).arg(channelIdx);
       return false;
     }
-    aprs->setChannel(_channels[channelIdx]->as<AnalogChannel>());
+    aprs->setRevertChannel(_channels[channelIdx]->as<AnalogChannel>());
 
     return true;
   }

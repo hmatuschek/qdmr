@@ -40,13 +40,30 @@ signals:
   void modified();
 
 protected:
-  bool serialize(YAML::Node &node, const Context &context);
-
-protected:
   /** Holds the name of the DMR ID. */
   QString _name;
   /** Holds the DMR ID. */
   uint32_t _number;
+};
+
+
+/** A singleton radio ID representing the default DMR radio ID within the abstract config.
+ * @ingroup conf */
+class DefaultRadioID: public RadioID
+{
+  Q_OBJECT
+
+protected:
+  /** Contstructor. */
+  explicit DefaultRadioID(QObject *parent=nullptr);
+
+public:
+  /** Factory method returning the singleton instance. */
+  static DefaultRadioID *get();
+
+private:
+  /** The singleton instance. */
+  static DefaultRadioID *_instance;
 };
 
 

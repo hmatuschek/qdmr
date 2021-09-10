@@ -293,8 +293,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 11:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->rxGroupList()) {
-        return digi->rxGroupList()->name();
+      if (digi->groupListObj()) {
+        return digi->groupListObj()->name();
       } else {
         return tr("-");
       }
@@ -304,8 +304,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 12:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->txContact())
-        return digi->txContact()->name();
+      if (digi->txContactObj())
+        return digi->txContactObj()->name();
       else
         return tr("-");
     } else if (channel->is<AnalogChannel>()) {
@@ -314,8 +314,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 13:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->radioId())
-        return digi->radioId()->number();
+      if (digi->radioIdObj())
+        return digi->radioIdObj()->number();
       else
         return tr("[Default]");
     } else if (channel->is<AnalogChannel>()) {
@@ -324,8 +324,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 14:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->posSystem())
-        return digi->posSystem()->name();
+      if (digi->aprsObj())
+        return digi->aprsObj()->name();
       else
         return tr("-");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
@@ -337,8 +337,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 15:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->roaming())
-        return digi->roaming()->name();
+      if (digi->roamingZone())
+        return digi->roamingZone()->name();
       else
         return tr("-");
     } else if (channel->is<AnalogChannel>()) {
@@ -564,7 +564,7 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
     return sys->name();
   case 2:
     if (sys->is<GPSSystem>())
-      return sys->as<GPSSystem>()->contact()->name();
+      return sys->as<GPSSystem>()->contactObj()->name();
     else if (sys->is<APRSSystem>())
       return tr("%1-%2").arg(sys->as<APRSSystem>()->destination())
           .arg(sys->as<APRSSystem>()->destSSID());
@@ -575,8 +575,8 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
       return (sys->as<GPSSystem>()->hasRevertChannel() ?
                 sys->as<GPSSystem>()->revertChannel()->name() : tr("[Selected]"));
     else if (sys->is<APRSSystem>())
-      return ((nullptr != sys->as<APRSSystem>()->channel()) ?
-                sys->as<APRSSystem>()->channel()->name() : tr("OOPS!"));
+      return ((nullptr != sys->as<APRSSystem>()->revertChannel()) ?
+                sys->as<APRSSystem>()->revertChannel()->name() : tr("OOPS!"));
   case 5:
     if (sys->is<GPSSystem>())
       return tr("[None]");

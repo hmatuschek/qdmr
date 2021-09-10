@@ -164,6 +164,17 @@ AbstractConfigReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
               .arg(prop.name()).arg(meta->className());
           return false;
         }
+        // check for tags
+        QString tag = QString::fromStdString(it->Tag());
+        if ((!it->Scalar().size()) && (!tag.isEmpty())) {
+          if (0>refs->add(ctx.getTag(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
+            _errorMessage = tr("%1:%2: Cannot set %3 for %4 of %5.")
+                .arg(it->Mark().line).arg(it->Mark().column).arg(tag).arg(prop.name()).arg(meta->className());
+            logError() << _errorMessage;
+            return false;
+          }
+          continue;
+        }
         QString id = QString::fromStdString(it->as<std::string>());
         if (! ctx.contains(id)) {
           _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Reference %5 is not defined.")
@@ -179,31 +190,43 @@ AbstractConfigReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
         }
       }
     } else if (val.value<ConfigObjectReference *>()) {
+      YAML::Node el = node[prop.name()];
       // If not set -> skip
-      if (! node[prop.name()])
+      if (! el)
         continue;
       // check type
-      if (! node[prop.name()].IsScalar()) {
+      if (! el.IsScalar()) {
         _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Expected ID string.")
-            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
-            .arg(prop.name()).arg(meta->className());
+            .arg(el.Mark().line).arg(el.Mark().column) .arg(prop.name()).arg(meta->className());
+        logError() << _errorMessage;
         return false;
       }
+      // get reference
+      ConfigObjectReference *ref = prop.read(obj).value<ConfigObjectReference *>();
+      // check for tags
+      QString tag = QString::fromStdString(el.Tag());
+      if ((!el.Scalar().size()) && (!tag.isEmpty())) {
+        if (! ref->set(ctx.getTag(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
+          _errorMessage = tr("%1:%2: Cannot set %3 for %4 of %5.")
+              .arg(el.Mark().line).arg(el.Mark().column).arg(tag).arg(prop.name()).arg(meta->className());
+          logError() << _errorMessage;
+          return false;
+        }
+        continue;
+      }
       // get & check ID
-      QString id = QString::fromStdString(node[prop.name()].as<std::string>());
-      logDebug() << "Link reference to " << id << " as " << prop.name();
+      QString id = QString::fromStdString(el.as<std::string>());
       if (! ctx.contains(id)) {
-        _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Reference %5 is not defined.")
-            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
-            .arg(prop.name()).arg(meta->className()).arg(id);
+        _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Reference '%5' is not defined.")
+            .arg(el.Mark().line).arg(el.Mark().column).arg(prop.name()).arg(meta->className()).arg(id);
+        logError() << _errorMessage;
         return false;
       }
       // set reference
-      ConfigObjectReference *ref = prop.read(obj).value<ConfigObjectReference *>();
       if (! ref->set(ctx.getObj(id))) {
         _errorMessage = tr("%1:%2: Cannot parse %3 of %4: Cannot set reference %5.")
-            .arg(node[prop.name()].Mark().line).arg(node[prop.name()].Mark().column)
-            .arg(prop.name()).arg(meta->className()).arg(id);
+            .arg(el.Mark().line).arg(el.Mark().column).arg(prop.name()).arg(meta->className()).arg(id);
+        logError() << _errorMessage;
         return false;
       }
     }
@@ -514,8 +537,7 @@ ConfigReader::parseDMRRadioID(Config *config, const YAML::Node &node, ConfigObje
     return false;
   }
   if (! reader.parse(id, node, ctx)) {
-    _errorMessage = tr("%1:%2: Cannot parse radio-id: %3")
-        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    _errorMessage = reader.errorMessage();
     return false;
   }
   config->radioIDs()->add(id);
@@ -551,7 +573,12 @@ ConfigReader::linkRadioID(RadioID *id, const YAML::Node &node, const ConfigObjec
 
 bool
 ConfigReader::linkDMRRadioID(RadioID *id, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return RadioIdReader().link(id, node, ctx);
+  RadioIdReader reader;
+  if (! reader.link(id, node, ctx)) {
+    _errorMessage = reader.errorMessage();
+    return false;
+  }
+  return true;
 }
 
 
@@ -610,8 +637,7 @@ ConfigReader::parseDigitalChannel(Config *config, const YAML::Node &node, Config
     return false;
   }
   if (! reader.parse(ch, node, ctx)) {
-    _errorMessage = tr("%1:%2: Cannot parse digital channel: %3")
-        .arg(node.Mark().line).arg(node.Mark().column).arg(reader.errorMessage());
+    _errorMessage = reader.errorMessage();
     return false;
   }
   config->channelList()->add(ch);
@@ -662,12 +688,22 @@ ConfigReader::linkChannel(Channel *channel, const YAML::Node &node, const Config
 
 bool
 ConfigReader::linkAnalogChannel(AnalogChannel *channel, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return AnalogChannelReader().link(channel, node, ctx);
+  AnalogChannelReader reader;
+  if (! reader.link(channel, node, ctx)) {
+    _errorMessage = reader.errorMessage();
+    return false;
+  }
+  return true;
 }
 
 bool
 ConfigReader::linkDigitalChannel(DigitalChannel *channel, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return DigitalChannelReader().link(channel, node, ctx);
+  DigitalChannelReader reader;
+  if (! reader.link(channel, node, ctx)) {
+    _errorMessage = reader.errorMessage();
+    return false;
+  }
+  return true;
 }
 
 
@@ -727,7 +763,12 @@ ConfigReader::linkZones(Config *config, const YAML::Node &node, const ConfigObje
 
 bool
 ConfigReader::linkZone(Zone *zone, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return ZoneReader().link(zone, node, ctx);
+  ZoneReader reader;
+  if(! reader.link(zone, node, ctx)) {
+    _errorMessage = reader.errorMessage();
+    return false;
+  }
+  return true;
 }
 
 
@@ -1300,70 +1341,8 @@ DigitalChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
 
 bool
 DigitalChannelReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  DigitalChannel *channel = qobject_cast<DigitalChannel *>(obj);
-
   if (! ChannelReader::link(obj, node, ctx))
     return false;
-
-  if (node["groupList"] && node["groupList"].IsScalar()) {
-    QString gl = QString::fromStdString(node["groupList"].as<std::string>());
-    if ((! ctx.contains(gl)) || (! ctx.getObj(gl)->is<RXGroupList>())) {
-      _errorMessage = tr("%1:%2: Cannot link digital channel '%3': Group list with id='%4' is unknown.")
-          .arg(node["groupList"].Mark().line).arg(node["groupList"].Mark().column)
-          .arg(channel->name()).arg(gl);
-      return false;
-    }
-    channel->setRXGroupList(ctx.getObj(gl)->as<RXGroupList>());
-  } else {
-    _errorMessage = tr("%1:%2: Cannot link digital channel '%3': No group list defined.")
-        .arg(node.Mark().line).arg(node.Mark().column)
-        .arg(channel->name());
-    return false;
-  }
-
-  if (node["txContact"] && node["txContact"].IsScalar()) {
-    QString c = QString::fromStdString(node["txContact"].as<std::string>());
-    if ((! ctx.contains(c)) || (! ctx.getObj(c)->is<DigitalContact>())) {
-      _errorMessage = tr("%1:%2: Cannot link digital channel '%3': TX contact with id='%4' is unknown.")
-          .arg(node["txContact"].Mark().line).arg(node["txContact"].Mark().column)
-          .arg(channel->name()).arg(c);
-      return false;
-    }
-    channel->setTXContact(ctx.getObj(c)->as<DigitalContact>());
-  }
-
-  if (node["aprs"] && node["aprs"].IsScalar()) {
-    QString aprs = QString::fromStdString(node["aprs"].as<std::string>());
-    if ((! ctx.contains(aprs)) || (! ctx.getObj(aprs)->is<PositioningSystem>())) {
-      _errorMessage = tr("%1:%2: Cannot link digital channel '%3': Positioning system with id='%4' is unknown.")
-          .arg(node["aprs"].Mark().line).arg(node["aprs"].Mark().column)
-          .arg(channel->name()).arg(aprs);
-      return false;
-    }
-    channel->setPosSystem(ctx.getObj(aprs)->as<PositioningSystem>());
-  }
-
-  if (node["roaming"] && node["roaming"].IsScalar()) {
-    QString roaming = QString::fromStdString(node["roaming"].as<std::string>());
-    if ((! ctx.contains(roaming)) || (! ctx.getObj(roaming)->is<RoamingZone>())) {
-      _errorMessage = tr("%1:%2: Cannot link digital channel '%3': Roaming zone with id='%3' is unknown.")
-          .arg(node["roaming"].Mark().line).arg(node["roaming"].Mark().column)
-          .arg(channel->name()).arg(roaming);
-      return false;
-    }
-    channel->setRoaming(ctx.getObj(roaming)->as<RoamingZone>());
-  }
-
-  if (node["radioID"] && node["radioID"].IsScalar()) {
-    QString id = QString::fromStdString(node["radioID"].as<std::string>());
-    if ((! ctx.contains(id)) || (! ctx.getObj(id)->is<RadioID>())) {
-      _errorMessage = tr("%1:%2: Cannot link digital channel '%3': Radio ID with id='%4' is unknown.")
-          .arg(node["radioID"].Mark().line).arg(node["radioID"].Mark().column)
-          .arg(channel->name()).arg(id);
-      return false;
-    }
-    channel->setRadioId(ctx.getObj(id)->as<RadioID>());
-  }
 
   if (! linkExtensions(_extensions, obj, node, ctx))
     return false;
@@ -1435,23 +1414,10 @@ AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObje
 
 bool
 AnalogChannelReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  AnalogChannel *channel = qobject_cast<AnalogChannel *>(obj);
-
   if (! ChannelReader::link(obj, node, ctx))
     return false;
 
-  if (node["aprs"] && node["aprs"].IsScalar()) {
-    QString aprs = QString::fromStdString(node["aprs"].as<std::string>());
-    if ((! ctx.contains(aprs)) || (! ctx.getObj(aprs)->is<APRSSystem>())) {
-      _errorMessage = tr("%1:%2: Cannot link analog channel '%3': APRS system with id='%4' is unknown.")
-          .arg(node["aprs"].Mark().line).arg(node["aprs"].Mark().column)
-          .arg(channel->name()).arg(aprs);
-      return false;
-    }
-    channel->setAPRSSystem(ctx.getObj(aprs)->as<APRSSystem>());
-  }
-
-   if (! linkExtensions(_extensions, obj, node, ctx))
+  if (! linkExtensions(_extensions, obj, node, ctx))
     return false;
 
   return true;
@@ -1667,36 +1633,8 @@ GPSSystemReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::
 
 bool
 GPSSystemReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  GPSSystem *system = qobject_cast<GPSSystem *>(obj);
-
   if (! PositioningReader::link(obj, node, ctx))
     return false;
-
-  // link destination contact
-  if (node["destination"] && node["destination"].IsScalar()) {
-    QString cont = QString::fromStdString(node["destination"].as<std::string>());
-    if ((! ctx.contains(cont)) || (! ctx.getObj(cont)->is<DigitalContact>())) {
-      _errorMessage = tr("Cannot link GPS system '%1': Destination contact '%2' not digital contact.")
-          .arg(system->name()).arg(cont);
-      return false;
-    }
-    system->setContact(ctx.getObj(cont)->as<DigitalContact>());
-  } else {
-    _errorMessage = tr("Cannot link GPS system '%1': No destination contact defined.")
-        .arg(system->name());
-    return false;
-  }
-
-  // link revert channel
-  if (node["channel"] && node["channel"].IsScalar()) {
-    QString ch = QString::fromStdString(node["channel"].as<std::string>());
-    if ((! ctx.contains(ch)) || (! ctx.getObj(ch)->is<DigitalChannel>())) {
-      _errorMessage = tr("Cannot link GPS system '%1': Revert channel '%2' not digital channel.")
-          .arg(system->name()).arg(ch);
-      return false;
-    }
-    system->setRevertChannel(ctx.getObj(ch)->as<DigitalChannel>());
-  }
 
   if (! linkExtensions(_extensions, obj, node, ctx))
     return false;
@@ -1796,25 +1734,8 @@ APRSSystemReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject:
 
 bool
 APRSSystemReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
-  APRSSystem *system = qobject_cast<APRSSystem *>(obj);
-
   if (! PositioningReader::link(obj, node, ctx))
     return false;
-
-  // link transmit channel
-  if (node["channel"] && node["channel"].IsScalar()) {
-    QString ch = QString::fromStdString(node["channel"].as<std::string>());
-    if ((! ctx.contains(ch)) || (! ctx.getObj(ch)->is<AnalogChannel>())) {
-      _errorMessage = tr("Cannot link APRS system '%1': Transmit channel '%2' not analog channel.")
-          .arg(system->name()).arg(ch);
-      return false;
-    }
-    system->setChannel(ctx.getObj(ch)->as<AnalogChannel>());
-  } else {
-    _errorMessage = tr("Cannot link APRS system '%1': Transmit channel not defined.")
-        .arg(system->name());
-    return false;
-  }
 
   if (! linkExtensions(_extensions, obj, node, ctx))
     return false;

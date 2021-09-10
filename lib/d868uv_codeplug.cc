@@ -505,24 +505,24 @@ D868UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
     // Check if default contact is set, in fact a valid contact index is mandatory.
     uint32_t conIdx = qFromLittleEndian(contact_index);
     if ((0xffffffff != conIdx) && ctx.hasDigitalContact(conIdx))
-      dc->setTXContact(ctx.getDigitalContact(conIdx));
+      dc->setTXContactObj(ctx.getDigitalContact(conIdx));
 
     // Set if RX group list is set
     if ((0xff != group_list_index) && ctx.hasGroupList(group_list_index))
-      dc->setRXGroupList(ctx.getGroupList(group_list_index));
+      dc->setGroupListObj(ctx.getGroupList(group_list_index));
 
     // Link to GPS system
     if (aprs_report && (!ctx.hasGPSSystem(gps_system)))
       logWarn() << "Cannot link to GPS system index " << gps_system << ": undefined GPS system.";
     else if (ctx.hasGPSSystem(gps_system))
-      dc->setPosSystem(ctx.getGPSSystem(gps_system));
+      dc->aprsObj(ctx.getGPSSystem(gps_system));
 
     // Link radio ID
     RadioID *rid = ctx.getRadioId(id_index);
     if (rid == ctx.config()->radioIDs()->defaultId())
-      dc->setRadioId(nullptr);
+      dc->setRadioIdObj(DefaultRadioID::get());
     else
-      dc->setRadioId(rid);
+      dc->setRadioIdObj(rid);
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
     AnalogChannel *ac = c->as<AnalogChannel>();
@@ -607,25 +607,25 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     // set time-slot
     slot2 = (DigitalChannel::TimeSlot2 == dc->timeSlot()) ? 1 : 0;
     // link transmit contact
-    if (nullptr == dc->txContact()) {
+    if (nullptr == dc->txContactObj()) {
       contact_index = 0;
     } else {
       contact_index = qToLittleEndian(
-            uint32_t(conf->contacts()->indexOfDigital(dc->txContact())));
+            uint32_t(conf->contacts()->indexOfDigital(dc->txContactObj())));
     }
     // link RX group list
-    if (nullptr == dc->rxGroupList())
+    if (nullptr == dc->groupListObj())
       group_list_index = 0xff;
     else
-      group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList());
+      group_list_index = conf->rxGroupLists()->indexOf(dc->groupListObj());
     // Set GPS system index
-    if (dc->posSystem() && dc->posSystem()->is<GPSSystem>()) {
+    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
       aprs_report = 1;
-      gps_system = conf->posSystems()->indexOfGPSSys(dc->posSystem()->as<GPSSystem>());
+      gps_system = conf->posSystems()->indexOfGPSSys(dc->aprsObj()->as<GPSSystem>());
     }
     // Set radio ID
-    if (nullptr != dc->radioId())
-      id_index = conf->radioIDs()->indexOf(dc->radioId());
+    if (nullptr != dc->radioIdObj())
+      id_index = conf->radioIDs()->indexOf(dc->radioIdObj());
     else
       id_index = 0;
   }
@@ -1232,8 +1232,8 @@ D868UVCodeplug::gps_settings_t::fromConfig(Config *config, const Flags &flags) {
   }
 
   GPSSystem *sys = config->posSystems()->gpsSystem(0);
-  setTargetID(sys->contact()->number());
-  setTargetType(sys->contact()->type());
+  setTargetID(sys->contactObj()->number());
+  setTargetType(sys->contactObj()->type());
   setManualTXIntervall(sys->period());
   setAutomaticTXIntervall(sys->period());
   if (SelectedChannel::get() == sys->revertChannel()->as<Channel>()) {
@@ -1796,6 +1796,7 @@ D868UVCodeplug::setRadioID(Config *config, CodeplugContext &ctx) {
     logDebug() << "Store id " << id->getId() << " at idx " << i << ".";
     ctx.addRadioId(id->getId(), i, id->getName());
   }
+
   return true;
 }
 

@@ -86,33 +86,33 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
            << qSetFieldWidth(7)  << ((DigitalChannel::AdmitNone==digi->admit()) ? "-" : ((DigitalChannel::AdmitFree==digi->admit()) ? "Free" : "Color"))
            << qSetFieldWidth(3)  << digi->colorCode()
            << qSetFieldWidth(3)  << (DigitalChannel::TimeSlot1==digi->timeSlot() ? "1" : "2");
-    if (nullptr == digi->rxGroupList())
+    if (nullptr == digi->groupListObj())
       stream << qSetFieldWidth(5)  << '-';
     else
-      stream << qSetFieldWidth(5) << (config->rxGroupLists()->indexOf(digi->rxGroupList())+1);
-    if (nullptr == digi->txContact())
+      stream << qSetFieldWidth(5) << (config->rxGroupLists()->indexOf(digi->groupListObj())+1);
+    if (nullptr == digi->txContactObj())
       stream << qSetFieldWidth(4) << '-';
     else
-      stream << qSetFieldWidth(4) << (config->contacts()->indexOf(digi->txContact())+1);
-    if (nullptr == digi->posSystem())
+      stream << qSetFieldWidth(4) << (config->contacts()->indexOf(digi->txContactObj())+1);
+    if (nullptr == digi->aprsObj())
       stream << qSetFieldWidth(4) << "-";
     else
-      stream << qSetFieldWidth(4) << config->posSystems()->indexOf(digi->posSystem())+1;
+      stream << qSetFieldWidth(4) << config->posSystems()->indexOf(digi->aprsObj())+1;
     // Write roaming
-    if (nullptr == digi->roaming())
+    if (nullptr == digi->roamingZone())
       stream << qSetFieldWidth(5) << "-";
-    else if (DefaultRoamingZone::get() == digi->roaming())
+    else if (DefaultRoamingZone::get() == digi->roamingZone())
       stream << qSetFieldWidth(5) << "+";
     else
-      stream << qSetFieldWidth(5) << (config->roaming()->indexOf(digi->roaming())+1);
+      stream << qSetFieldWidth(5) << (config->roaming()->indexOf(digi->roamingZone())+1);
     // Write radio ID
-    if (nullptr == digi->radioId())
+    if (nullptr == digi->radioIdObj())
       stream << qSetFieldWidth(3) << "-";
     else
-      stream << qSetFieldWidth(3) << (config->radioIDs()->indexOf(digi->radioId())+1);
+      stream << qSetFieldWidth(3) << (config->radioIDs()->indexOf(digi->radioIdObj())+1);
     // add contact name as comment
-    if (digi->txContact())
-      stream << qSetFieldWidth(0) << "# " << digi->txContact()->name();
+    if (digi->txContactObj())
+      stream << qSetFieldWidth(0) << "# " << digi->txContactObj()->name();
     stream << qSetFieldWidth(0) << "\n";
   }
   stream << qSetFieldWidth(0) << "\n";
@@ -247,7 +247,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     GPSSystem *gps = config->posSystems()->system(i)->as<GPSSystem>();
     stream << qSetFieldWidth(5)  << left << (i+1)
            << qSetFieldWidth(20) << ("\"" + gps->name() + "\"")
-           << qSetFieldWidth(5)  << config->contacts()->indexOfDigital(gps->contact())+1
+           << qSetFieldWidth(5)  << config->contacts()->indexOfDigital(gps->contactObj())+1
            << qSetFieldWidth(7)  << gps->period()
            << qSetFieldWidth(6)  << ( (gps->hasRevertChannel()) ?
                                         QString::number(config->channelList()->indexOf(gps->revertChannel())+1) : "-" )
@@ -273,7 +273,7 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
     APRSSystem *aprs = config->posSystems()->system(i)->as<APRSSystem>();
     stream << qSetFieldWidth(5) << (i+1)
            << qSetFieldWidth(20) << ("\""+aprs->name()+"\"")
-           << qSetFieldWidth(8) << (config->channelList()->indexOf(aprs->channel())+1)
+           << qSetFieldWidth(8) << (config->channelList()->indexOf(aprs->revertChannel())+1)
            << qSetFieldWidth(7) << aprs->period()
            << qSetFieldWidth(12) << QString("%1-%2").arg(aprs->source()).arg(aprs->srcSSID())
            << qSetFieldWidth(12) << QString("%1-%2").arg(aprs->destination()).arg(aprs->destSSID())

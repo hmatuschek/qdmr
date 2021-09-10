@@ -1,4 +1,5 @@
 #include "radioid.hh"
+#include "logger.hh"
 
 
 /* ********************************************************************************************* *
@@ -44,12 +45,25 @@ RadioID::serialize(const Context &context) {
   return type;
 }
 
-bool
-RadioID::serialize(YAML::Node &node, const Context &context) {
-  if (! ConfigObject::serialize(node, context))
-    return false;
-  return true;
+
+/* ********************************************************************************************* *
+ * Implementation of DefaultRadioID
+ * ********************************************************************************************* */
+DefaultRadioID *DefaultRadioID::_instance = nullptr;
+
+DefaultRadioID::DefaultRadioID(QObject *parent)
+  : RadioID(tr("[Default]"),0,parent)
+{
+  // pass...
 }
+
+DefaultRadioID *
+DefaultRadioID::get() {
+  if (nullptr == _instance)
+    _instance = new DefaultRadioID();
+  return _instance;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of RadioIDList
@@ -122,7 +136,7 @@ RadioIDList::setDefaultId(uint idx) {
   _default = getId(idx);
   if (nullptr == _default)
     return false;
-
+  logDebug() << "Set default radio id to " << _default->name() << ".";
   connect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
   emit elementModified(idx);
   return true;

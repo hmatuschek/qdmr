@@ -82,7 +82,7 @@ Config::toYAML(QTextStream &stream) {
 }
 
 bool
-Config::serialize(YAML::Node &node, const Context &context)
+Config::populate(YAML::Node &node, const Context &context)
 {
   node["version"] = VERSION_STRING;
 
@@ -127,7 +127,7 @@ Config::serialize(YAML::Node &node, const Context &context)
       return false;
   }
 
-  if (! ConfigObject::serialize(node, context))
+  if (! ConfigObject::populate(node, context))
     return false;
 
   node.remove("id");
@@ -182,7 +182,7 @@ Config::requiresRoaming() const {
     const DigitalChannel *digi = channelList()->channel(i)->as<const DigitalChannel>();
     if (nullptr == digi)
       continue;
-    if (nullptr != digi->roaming()) {
+    if (nullptr != digi->roamingZone()) {
       chHasRoaming = true;
       break;
     }
@@ -199,7 +199,7 @@ Config::requiresGPS() const {
     // For analog channels if APRS system is set or
     // for digital channels if any positioning system is set
     if ( (ch->is<AnalogChannel>() && ch->as<AnalogChannel>()->aprsSystem()) ||
-         (ch->is<DigitalChannel>() && ch->as<DigitalChannel>()->posSystem()) ) {
+         (ch->is<DigitalChannel>() && ch->as<DigitalChannel>()->aprsObj()) ) {
       chHasGPS = true;
       break;
     }

@@ -61,7 +61,7 @@ RoamingZoneListView::onGenRoamingZone() {
     DigitalChannel *dch = _config->channelList()->channel(i)->as<DigitalChannel>();
     if (nullptr == dch)
       continue;
-    if (contacts.contains(dch->txContact()))
+    if (contacts.contains(dch->txContactObj()))
       zone->addChannel(dch);
   }
 

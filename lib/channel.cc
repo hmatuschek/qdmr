@@ -27,7 +27,10 @@ Channel::Channel(const QString &name, double rx, double tx, Power power, uint tx
   : ConfigObject("ch", parent), _name(name), _rxFreq(rx), _txFreq(tx), _power(power), _txTimeOut(txTimeout),
     _rxOnly(rxOnly), _scanlist()
 {
+  // Set reference to scan list
   _scanlist.set(scanlist);
+  // Link scan list modification event (e.g., scan list gets deleted).
+  connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
 const QString &
@@ -112,10 +115,12 @@ Channel::scanListObj() const {
 }
 bool
 Channel::setScanListObj(ScanList *list) {
-  if (! _scanlist.set(list))
-    return false;
+  return _scanlist.set(list);
+}
+
+void
+Channel::onReferenceModified() {
   emit modified(this);
-  return true;
 }
 
 
@@ -127,9 +132,12 @@ AnalogChannel::AnalogChannel(const QString &name, double rxFreq, double txFreq, 
                              Signaling::Code rxTone, Signaling::Code txTone, Bandwidth bw,
                              ScanList *list, APRSSystem *aprsSys, QObject *parent)
   : Channel(name, rxFreq, txFreq, power, txTimeout, rxOnly, list, parent),
-    _admit(admit), _squelch(squelch), _rxTone(rxTone), _txTone(txTone), _bw(bw), _aprsSystem(aprsSys)
+    _admit(admit), _squelch(squelch), _rxTone(rxTone), _txTone(txTone), _bw(bw), _aprsSystem()
 {
-  // pass...
+  // Reference APRS system
+  _aprsSystem.set(aprsSys);
+  // Link APRS system reference
+  connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
 YAML::Node
@@ -196,27 +204,28 @@ AnalogChannel::setBandwidth(Bandwidth bw) {
   return true;
 }
 
+const APRSSystemReference *
+AnalogChannel::aprs() const {
+  return &_aprsSystem;
+}
+
+APRSSystemReference *
+AnalogChannel::aprs() {
+  return &_aprsSystem;
+}
+
 APRSSystem *
 AnalogChannel::aprsSystem() const {
-  return _aprsSystem;
+  return _aprsSystem.as<APRSSystem>();
 }
 void
 AnalogChannel::setAPRSSystem(APRSSystem *sys) {
-  if (_aprsSystem)
-    disconnect(_aprsSystem, SIGNAL(destroyed(QObject*)), this, SLOT(onAPRSSystemDeleted()));
-  _aprsSystem = sys;
-  if (_aprsSystem)
-    connect(_aprsSystem, SIGNAL(destroyed(QObject*)), this, SLOT(onAPRSSystemDeleted()));
-}
-
-void
-AnalogChannel::onAPRSSystemDeleted() {
-  _aprsSystem = nullptr;
+  _aprsSystem.set(sys);
 }
 
 bool
-AnalogChannel::serialize(YAML::Node &node, const Context &context) {
-  if (! Channel::serialize(node, context))
+AnalogChannel::populate(YAML::Node &node, const Context &context) {
+  if (! Channel::populate(node, context))
     return false;
 
   if (Signaling::SIGNALING_NONE != _rxTone) {
@@ -243,9 +252,6 @@ AnalogChannel::serialize(YAML::Node &node, const Context &context) {
     node["txTone"] = tone;
   }
 
-  if (_aprsSystem && context.contains(_aprsSystem))
-    node["aprs"] = context.getId(_aprsSystem).toStdString();
-
   return true;
 }
 
@@ -256,22 +262,31 @@ AnalogChannel::serialize(YAML::Node &node, const Context &context) {
 DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power,
                                uint txto, bool rxOnly, Admit admit, uint colorCode,
                                TimeSlot timeslot, RXGroupList *rxGroup, DigitalContact *txContact,
-                               PositioningSystem *posSystem, ScanList *list, RoamingZone *roaming,
+                               PositioningSystem *aprs, ScanList *list, RoamingZone *roaming,
                                RadioID *radioID, QObject *parent)
   : Channel(name, rxFreq, txFreq, power, txto, rxOnly, list, parent), _admit(admit),
-    _colorCode(colorCode), _timeSlot(timeslot), _rxGroup(rxGroup), _txContact(txContact),
-    _posSystem(posSystem), _roaming(roaming), _radioId(radioID)
+    _colorCode(colorCode), _timeSlot(timeslot),
+    _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
 {
-  if (_rxGroup)
-    connect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));
-  if (_txContact)
-    connect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
-  if (_posSystem)
-    connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
-  if (_roaming)
-    connect(_roaming, SIGNAL(destroyed()), this, SLOT(onRoamingZoneDeleted()));
-  if (_radioId)
-    connect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
+  // Register default tags
+  if (! ConfigObject::Context::hasTag(metaObject()->className(), "roaming", "!default"))
+    ConfigObject::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
+  if (! ConfigObject::Context::hasTag(metaObject()->className(), "radioID", "!default"))
+    ConfigObject::Context::setTag(metaObject()->className(), "radioID", "!default", DefaultRadioID::get());
+
+  // Set references
+  _rxGroup.set(rxGroup);
+  _txContact.set(txContact);
+  _posSystem.set(aprs);
+  _roaming.set(roaming);
+  _radioId.set(radioID);
+
+  // Connect signals of references
+  connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_txContact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_posSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_roaming, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_radioId, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
 YAML::Node
@@ -316,135 +331,120 @@ DigitalChannel::setTimeSlot(TimeSlot slot) {
   return true;
 }
 
+const GroupListReference *
+DigitalChannel::groupList() const {
+  return &_rxGroup;
+}
+
+GroupListReference *
+DigitalChannel::groupList() {
+  return &_rxGroup;
+}
+
 RXGroupList *
-DigitalChannel::rxGroupList() const {
-  return _rxGroup;
+DigitalChannel::groupListObj() const {
+  return _rxGroup.as<RXGroupList>();
 }
 
 bool
-DigitalChannel::setRXGroupList(RXGroupList *g) {
-  if (_rxGroup)
-    disconnect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));
-  _rxGroup = g;
-  if (_rxGroup)
-    connect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));
+DigitalChannel::setGroupListObj(RXGroupList *g) {
+  if(! _rxGroup.set(g))
+    return false;
   emit modified(this);
   return true;
+}
+
+const DigitalContactReference *
+DigitalChannel::contact() const {
+  return &_txContact;
+}
+
+DigitalContactReference *
+DigitalChannel::contact() {
+  return &_txContact;
 }
 
 DigitalContact *
-DigitalChannel::txContact() const {
-  return _txContact;
+DigitalChannel::txContactObj() const {
+  return _txContact.as<DigitalContact>();
 }
 
 bool
-DigitalChannel::setTXContact(DigitalContact *c) {
-  if (_txContact)
-    disconnect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
-  _txContact = c;
-  if (_txContact)
-    connect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
+DigitalChannel::setTXContactObj(DigitalContact *c) {
+  if(! _txContact.set(c))
+    return false;
   emit modified(this);
   return true;
+}
+
+const PositioningSystemReference *
+DigitalChannel::aprs() const {
+  return &_posSystem;
+}
+
+PositioningSystemReference *
+DigitalChannel::aprs() {
+  return &_posSystem;
 }
 
 PositioningSystem *
-DigitalChannel::posSystem() const {
-  return _posSystem;
+DigitalChannel::aprsObj() const {
+  return _posSystem.as<PositioningSystem>();
 }
 
 bool
-DigitalChannel::setPosSystem(PositioningSystem *sys) {
-  if (_posSystem)
-    disconnect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
-  _posSystem = sys;
-  if (_posSystem)
-    connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
+DigitalChannel::aprsObj(PositioningSystem *sys) {
+  if (! _posSystem.set(sys))
+    return false;
   emit modified(this);
   return true;
 }
 
+const RoamingZoneReference *
+DigitalChannel::roaming() const {
+  return &_roaming;
+}
+
+RoamingZoneReference *
+DigitalChannel::roaming() {
+  return &_roaming;
+}
 
 RoamingZone *
-DigitalChannel::roaming() const {
-  return _roaming;
+DigitalChannel::roamingZone() const {
+  return _roaming.as<RoamingZone>();
 }
 
 bool
-DigitalChannel::setRoaming(RoamingZone *zone) {
-  if (_roaming)
-    disconnect(_roaming, SIGNAL(destroyed(QObject*)), this, SLOT(onRoamingZoneDeleted()));
-  _roaming = zone;
-  if (_roaming)
-    connect(_roaming, SIGNAL(destroyed(QObject*)), this, SLOT(onRoamingZoneDeleted()));
+DigitalChannel::setRoamingZone(RoamingZone *zone) {
+  _roaming.set(zone);
   emit modified(this);
   return true;
+}
+
+const RadioIDReference *
+DigitalChannel::radioID() const {
+  return &_radioId;
+}
+
+RadioIDReference *
+DigitalChannel::radioID() {
+  return &_radioId;
 }
 
 RadioID *
-DigitalChannel::radioId() const {
-  return _radioId;
+DigitalChannel::radioIdObj() const {
+  return _radioId.as<RadioID>();
 }
 
 bool
-DigitalChannel::setRadioId(RadioID *id) {
-  if (_radioId)
-    disconnect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
-  _radioId = id;
-  if (_radioId)
-    connect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
+DigitalChannel::setRadioIdObj(RadioID *id) {
+  if (! _radioId.set(id))
+    return false;
   emit modified(this);
   return true;
 }
 
-
-void
-DigitalChannel::onRxGroupDeleted() {
-  setRXGroupList(nullptr);
-}
-
-void
-DigitalChannel::onTxContactDeleted() {
-  setTXContact(nullptr);
-}
-
-void
-DigitalChannel::onPosSystemDeleted() {
-  setPosSystem(nullptr);
-}
-
-void
-DigitalChannel::onRoamingZoneDeleted() {
-  setRoaming(nullptr);
-}
-
-void
-DigitalChannel::onRadioIdDeleted() {
-  setRadioId(nullptr);
-}
-
-bool
-DigitalChannel::serialize(YAML::Node &node, const Context &context) {
-  if (! Channel::serialize(node, context))
-    return false;
-
-  if (_radioId && context.contains(_radioId))
-    node["radioID"] = context.getId(_radioId).toStdString();
-
-  if (_rxGroup && context.contains(_rxGroup))
-    node["groupList"] = context.getId(_rxGroup).toStdString();
-
-  if (_txContact && context.contains(_txContact))
-    node["txContact"] = context.getId(_txContact).toStdString();
-
-  if (_posSystem && context.contains(_posSystem))
-    node["aprs"] = context.getId(_posSystem).toStdString();
-
-  if (_roaming && context.contains(_roaming))
-    node["roaming"] = context.getId(_roaming).toStdString();
-
-  return true;
-}
 
 /* ********************************************************************************************* *
  * Implementation of SelectedChannel

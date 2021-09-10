@@ -104,7 +104,7 @@ public:
   bool writeCSV(QTextStream &stream, QString &errorMessage);
 
 protected:
-  bool serialize(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context);
 
 protected slots:
   /** Iternal callback. */

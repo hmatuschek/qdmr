@@ -48,6 +48,17 @@ public:
     /** Associates the given object with the given ID. */
     virtual bool add(const QString &id, ConfigObject *);
 
+    /** Returns @c true if the property of the class has the specified tag associated. */
+    static bool hasTag(const QString &className, const QString &property, const QString &tag);
+    /** Returns @c true if the property of the class has the specified object as a tag associated. */
+    static bool hasTag(const QString &className, const QString &property, ConfigObject *obj);
+    /** Returns the object associated with the tag for the property of the class. */
+    static ConfigObject *getTag(const QString &className, const QString &property, const QString &tag);
+    /** Returns the tag associated with the object for the property of the class. */
+    static QString getTag(const QString &className, const QString &property, ConfigObject *obj);
+    /** Associates the given object with the tag for the property of the given class. */
+    static void setTag(const QString &className, const QString &property, const QString &tag, ConfigObject *obj);
+
   protected:
     /** The version string. */
     QString _version;
@@ -55,6 +66,10 @@ public:
     QHash<QString, ConfigObject*> _objects;
     /** OBJ->ID look-up table. */
     QHash<ConfigObject*, QString> _ids;
+    /** Maps tags to singleton objects. */
+    static QHash<QString, QHash<QString, ConfigObject *>> _tagObjects;
+    /** Maps singleton objects to tags. */
+    static QHash<QString, QHash<ConfigObject *, QString>> _tagNames;
   };
 
 protected:
@@ -101,7 +116,7 @@ public:
 protected:
   /** Recursively serializes the configuration to YAML nodes.
    * The complete configuration must be labeled first. */
-  virtual bool serialize(YAML::Node &node, const Context &context);
+  virtual bool populate(YAML::Node &node, const Context &context);
 
 signals:
   /** Gets emitted once the config object is modified. */
@@ -127,7 +142,7 @@ protected:
   explicit ConfigExtension(const QString &idBase, QObject *parent=nullptr);
 
 protected:
-  bool serialize(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context);
 };
 
 

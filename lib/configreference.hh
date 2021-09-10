@@ -2,6 +2,7 @@
 #define CONFIGREFERENCE_HH
 
 #include "configobject.hh"
+#include <QSet>
 
 class Channel;
 class DigitalChannel;
@@ -31,6 +32,8 @@ public:
   /** Sets the reference.
    * If set to @c nullptr, the reference gets cleared. */
   virtual bool set(ConfigObject *object);
+  /** Adds a possible type to this reference. */
+  virtual bool allow(const QMetaObject *elementType);
 
   /** Returns the reference as the specified type. */
   template <class Type>
@@ -58,10 +61,39 @@ protected slots:
   void onReferenceDeleted(QObject *obj);
 
 protected:
-  /** Holds the static QMetaObject of the element type. */
-  QMetaObject _elementType;
+  /** Holds the static QMetaObject of the possible element types. */
+  QStringList _elementTypes;
   /** The reference to the object. */
   ConfigObject *_object;
+};
+
+
+/** Represents a reference to a contact.
+ * This class is only used to automate the parsing and generation of the YAML codeplug file.
+ * @ingroup config */
+class ContactReference: public ConfigObjectReference
+{
+  Q_OBJECT
+
+protected:
+  /** Constructor. */
+  ContactReference(const QMetaObject &elementType, QObject *parent = nullptr);
+
+public:
+  /** Constructor. */
+  explicit ContactReference(QObject *parent=nullptr);
+};
+
+
+/** Represents a reference to a digital contact.
+ * @ingroup conf*/
+class DigitalContactReference: public ContactReference
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit DigitalContactReference(QObject *parent=nullptr);
 };
 
 
@@ -83,9 +115,37 @@ class ChannelReference: public ConfigObjectReference
 {
   Q_OBJECT
 
+protected:
+  /** Hidden constructor. */
+  ChannelReference(const QMetaObject &elementType, QObject *parent = nullptr);
+
 public:
   /** Constructor. */
   explicit ChannelReference(QObject *parent=nullptr);
+};
+
+
+/** Implements a reference to a digital channel.
+ * @ingroup conf */
+class DigitalChannelReference: public ChannelReference
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit DigitalChannelReference(QObject *parent=nullptr);
+};
+
+
+/** Implements a reference to a analog channel.
+ * @ingroup conf */
+class AnalogChannelReference: public ChannelReference
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit AnalogChannelReference(QObject *parent=nullptr);
 };
 
 
@@ -126,6 +186,76 @@ class ScanListReference: public ConfigObjectReference
 public:
   /** Constructor. */
   explicit ScanListReference(QObject *parent=nullptr);
+};
+
+
+/** Implements a reference to a positioning system.
+ * @ingroup conf */
+class PositioningSystemReference: public ConfigObjectReference {
+  Q_OBJECT
+
+protected:
+  /** Hidden constructor. */
+  PositioningSystemReference(const QMetaObject &elementType, QObject *parent = nullptr);
+
+public:
+  /** Constructor. */
+  explicit PositioningSystemReference(QObject *parent=nullptr);
+};
+
+
+/** Implements a reference to an APRS system.
+ * @ingroup conf */
+class APRSSystemReference: public PositioningSystemReference {
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit APRSSystemReference(QObject *parent=nullptr);
+};
+
+
+/** Implements a reference to a GPS system.
+ * @ingroup conf */
+class GPSSystemReference: public PositioningSystemReference {
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit GPSSystemReference(QObject *parent=nullptr);
+};
+
+
+/** Implements a reference to a radio ID.
+ * @ingroup conf */
+class RadioIDReference: public ConfigObjectReference {
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit RadioIDReference(QObject *parent=nullptr);
+};
+
+
+/** Implements a reference to a group list.
+ * @ingroup conf */
+class GroupListReference: public ConfigObjectReference {
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit GroupListReference(QObject *parent=nullptr);
+};
+
+
+/** Implements a reference to a roaming zone.
+ * @ingroup conf */
+class RoamingZoneReference: public ConfigObjectReference {
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit RoamingZoneReference(QObject *parent=nullptr);
 };
 
 

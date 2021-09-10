@@ -279,26 +279,30 @@ D578UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
     // Check if default contact is set, in fact a valid contact index is mandatory.
     uint32_t conIdx = qFromLittleEndian(contact_index);
     if ((0xffffffff != conIdx) && ctx.hasDigitalContact(conIdx))
-      dc->setTXContact(ctx.getDigitalContact(conIdx));
+      dc->setTXContactObj(ctx.getDigitalContact(conIdx));
 
     // Set if RX group list is set
     if ((0xff != group_list_index) && ctx.hasGroupList(group_list_index))
-      dc->setRXGroupList(ctx.getGroupList(group_list_index));
+      dc->setGroupListObj(ctx.getGroupList(group_list_index));
 
     // Link to GPS system
     if ((APRS_REPORT_DIGITAL == aprs_report) && ctx.hasGPSSystem(gps_system))
-      dc->setPosSystem(ctx.getGPSSystem(gps_system));
+      dc->aprsObj(ctx.getGPSSystem(gps_system));
     // Link APRS system if one is defined
     //  There can only be one active APRS system, hence the index is fixed to one.
     if ((APRS_REPORT_ANALOG == aprs_report) && ctx.hasAPRSSystem(0))
-      dc->setPosSystem(ctx.getAPRSSystem(0));
+      dc->aprsObj(ctx.getAPRSSystem(0));
 
     // If roaming is not disabled -> link to default roaming zone
     if (0 == excl_from_roaming)
-      dc->setRoaming(DefaultRoamingZone::get());
+      dc->setRoamingZone(DefaultRoamingZone::get());
 
     // Link radio ID
-    dc->setRadioId(ctx.getRadioId(id_index));
+    RadioID *rid = ctx.getRadioId(id_index);
+    if (rid == ctx.config()->radioIDs()->defaultId())
+      dc->setRadioIdObj(DefaultRadioID::get());
+    else
+      dc->setRadioIdObj(rid);
 
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
@@ -396,30 +400,30 @@ D578UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     // set time-slot
     slot2 = (DigitalChannel::TimeSlot2 == dc->timeSlot()) ? 1 : 0;
     // link transmit contact
-    if (nullptr == dc->txContact()) {
+    if (nullptr == dc->txContactObj()) {
       contact_index = 0;
     } else {
       contact_index = qToLittleEndian(
-            uint32_t(conf->contacts()->indexOfDigital(dc->txContact())));
+            uint32_t(conf->contacts()->indexOfDigital(dc->txContactObj())));
     }
     // link RX group list
-    if (nullptr == dc->rxGroupList())
+    if (nullptr == dc->groupListObj())
       group_list_index = 0xff;
     else
-      group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList());
+      group_list_index = conf->rxGroupLists()->indexOf(dc->groupListObj());
     // Set GPS system index
     rx_gps = 0;
-    if (dc->posSystem() && dc->posSystem()->is<GPSSystem>()) {
+    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
       aprs_report = APRS_REPORT_DIGITAL;
-      gps_system = conf->posSystems()->indexOfGPSSys(dc->posSystem()->as<GPSSystem>());
+      gps_system = conf->posSystems()->indexOfGPSSys(dc->aprsObj()->as<GPSSystem>());
       rx_gps = 1;
-    } else if (dc->posSystem() && dc->posSystem()->is<APRSSystem>()) {
+    } else if (dc->aprsObj() && dc->aprsObj()->is<APRSSystem>()) {
       aprs_report = APRS_REPORT_ANALOG;
       rx_gps = 1;
     }
     // Set radio ID
-    if (nullptr != dc->radioId())
-      id_index = conf->radioIDs()->indexOf(dc->radioId());
+    if (nullptr != dc->radioIdObj())
+      id_index = conf->radioIDs()->indexOf(dc->radioIdObj());
     else
       id_index = 0;
   }

@@ -72,7 +72,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch2
       name: Sa/Th DB0LDS TS1
@@ -85,7 +86,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp3
-      txContact: cont8
+      contact: cont8
+      roaming: !<!default> ""
   - digital:
       id: ch3
       name: TG8 DB0LDS TS2
@@ -98,7 +100,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont5
+      contact: cont5
+      roaming: !<!default> ""
   - digital:
       id: ch4
       name: TG9 DB0LDS TS2
@@ -107,12 +110,13 @@ channels:
       power: HighPower
       timeout: 0
       rxOnly: false
+      scanList: scan1
       admit: AdmitColorCode
       colorCode: 1
       timeSlot: TimeSlot2
-      scanList: scan1
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch5
       name: BB DB0LDS TS2
@@ -121,12 +125,13 @@ channels:
       power: HighPower
       timeout: 0
       rxOnly: false
+      scanList: scan1
       admit: AdmitColorCode
       colorCode: 1
       timeSlot: TimeSlot2
-      scanList: scan1
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch6
       name: HRV DB0LDS TS1
@@ -135,12 +140,13 @@ channels:
       power: HighPower
       timeout: 0
       rxOnly: false
+      scanList: scan1
       admit: AdmitColorCode
       colorCode: 1
       timeSlot: TimeSlot1
-      scanList: scan1
       groupList: grp7
-      txContact: cont11
+      contact: cont11
+      roaming: !<!default> ""
   - digital:
       id: ch7
       name: DM0TZN TS1
@@ -153,7 +159,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont1
+      contact: cont1
+      roaming: !<!default> ""
   - digital:
       id: ch8
       name: TG8 DM0TZN TS2
@@ -166,7 +173,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont5
+      contact: cont5
+      roaming: !<!default> ""
   - digital:
       id: ch9
       name: TG9 DM0TZN TS2
@@ -179,7 +187,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch10
       name: BB DM0TZN TS2
@@ -192,7 +201,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch11
       name: DB0LOS TS1
@@ -205,7 +215,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch12
       name: R/TG9 DB0LOS TS2
@@ -218,7 +229,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch13
       name: R/TG9 DM0TT TS1
@@ -231,7 +243,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch14
       name: TG8 DM0TT TS2
@@ -244,7 +257,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont5
+      contact: cont5
+      roaming: !<!default> ""
   - digital:
       id: ch15
       name: TG9 DM0TT TS2
@@ -257,7 +271,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch16
       name: BB DM0TT TS2
@@ -270,7 +285,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch17
       name: TG9 DB0KK TS1
@@ -283,7 +299,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch18
       name: BB DB0KK TS2
@@ -296,7 +313,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch19
       name: DB0OUD TS1
@@ -309,7 +327,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont1
+      contact: cont1
+      roaming: !<!default> ""
   - digital:
       id: ch20
       name: TG8 DB0OUD TS2
@@ -322,7 +341,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont5
+      contact: cont5
+      roaming: !<!default> ""
   - digital:
       id: ch21
       name: TG9 DB0OUD TS2
@@ -335,7 +355,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch22
       name: BB DB0OUD TS2
@@ -348,7 +369,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch23
       name: TG9 DB0TU TS1
@@ -361,7 +383,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch24
       name: BB DB0TU TS2
@@ -374,7 +397,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch25
       name: DM0MOT TS1
@@ -387,7 +411,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont1
+      contact: cont1
+      roaming: !<!default> ""
   - digital:
       id: ch26
       name: TG8 DM0MOT TS2
@@ -400,7 +425,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont5
+      contact: cont5
+      roaming: !<!default> ""
   - digital:
       id: ch27
       name: TG9 DM0MOT TS2
@@ -413,7 +439,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch28
       name: BB DM0MOT TS2
@@ -426,7 +453,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch29
       name: DB0TA TS1
@@ -439,7 +467,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch30
       name: TG8 DB0TA TS2
@@ -452,7 +481,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont5
+      contact: cont5
+      roaming: !<!default> ""
   - digital:
       id: ch31
       name: TG9 DB0TA TS2
@@ -465,7 +495,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch32
       name: BB DB0TA TS2
@@ -478,7 +509,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch33
       name: DB0FX TS1
@@ -491,7 +523,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch34
       name: TG8 DB0FX TS2
@@ -504,7 +537,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont5
+      contact: cont5
+      roaming: !<!default> ""
   - digital:
       id: ch35
       name: TG9 DB0FX TS2
@@ -517,7 +551,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch36
       name: BB DB0FX TS2
@@ -530,7 +565,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch37
       name: DB0PDM TS1
@@ -543,7 +579,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch38
       name: TG8 DB0PDM TS2
@@ -556,7 +593,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont5
+      contact: cont5
+      roaming: !<!default> ""
   - digital:
       id: ch39
       name: TG9 DB0PDM TS2
@@ -569,7 +607,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch40
       name: BB DB0PDM TS2
@@ -582,7 +621,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch41
       name: DB0BRB TS1
@@ -595,7 +635,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch42
       name: TG8 DB0BRB TS2
@@ -608,7 +649,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont5
+      contact: cont5
+      roaming: !<!default> ""
   - digital:
       id: ch43
       name: TG9 DB0BRB TS2
@@ -621,7 +663,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch44
       name: BB DB0BRB TS2
@@ -634,7 +677,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch45
       name: DB0SPN TS1
@@ -647,7 +691,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch46
       name: R/TG9 DB0SPN TS2
@@ -660,7 +705,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch47
       name: DB0NLS TS1
@@ -673,7 +719,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch48
       name: R/TG9 DB0NLS TS2
@@ -686,7 +733,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch49
       name: DB0LS TS1
@@ -699,7 +747,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch50
       name: TG8 DB0LS TS2
@@ -712,7 +761,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont5
+      contact: cont5
+      roaming: !<!default> ""
   - digital:
       id: ch51
       name: TG9 DB0LS TS2
@@ -725,7 +775,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch52
       name: BB DB0LS TS2
@@ -738,7 +789,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch53
       name: DM0LC TS1
@@ -751,7 +803,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch54
       name: TG8 DM0LC TS2
@@ -764,7 +817,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp3
-      txContact: cont5
+      contact: cont5
+      roaming: !<!default> ""
   - digital:
       id: ch55
       name: TG9 DM0LC TS2
@@ -777,7 +831,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp3
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch56
       name: Sa/Th DM0LC TS2
@@ -790,7 +845,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp3
-      txContact: cont8
+      contact: cont8
+      roaming: !<!default> ""
   - digital:
       id: ch57
       name: BB DM0LC TS1
@@ -803,7 +859,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch58
       name: DB0FLW TS1
@@ -816,7 +873,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch59
       name: TG8 DB0FLW TS2
@@ -829,7 +887,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp3
-      txContact: cont5
+      contact: cont5
+      roaming: !<!default> ""
   - digital:
       id: ch60
       name: TG9 DB0FLW TS2
@@ -842,7 +901,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp3
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch61
       name: Sa/Th DB0FLW TS2
@@ -855,7 +915,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp3
-      txContact: cont8
+      contact: cont8
+      roaming: !<!default> ""
   - digital:
       id: ch62
       name: DB0LE TS1
@@ -868,7 +929,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch63
       name: R/TG9 DB0LE TS2
@@ -881,7 +943,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp3
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch64
       name: DL DB0AFZ TS1
@@ -894,7 +957,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp1
-      txContact: cont3
+      contact: cont3
+      roaming: !<!default> ""
   - digital:
       id: ch65
       name: BB DB0AFZ TS1
@@ -907,7 +971,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp2
-      txContact: cont7
+      contact: cont7
+      roaming: !<!default> ""
   - digital:
       id: ch66
       name: TG9 DB0AFZ TS2
@@ -920,7 +985,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp5
-      txContact: cont6
+      contact: cont6
+      roaming: !<!default> ""
   - digital:
       id: ch67
       name: Hes DB0AFZ TS2
@@ -933,7 +999,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot2
       groupList: grp5
-      txContact: cont10
+      contact: cont10
+      roaming: !<!default> ""
   - digital:
       id: ch68
       name: DMR S0
@@ -946,7 +1013,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp6
-      txContact: cont12
+      contact: cont12
+      roaming: !<!default> ""
   - digital:
       id: ch69
       name: DMR S1
@@ -959,7 +1027,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp6
-      txContact: cont12
+      contact: cont12
+      roaming: !<!default> ""
   - digital:
       id: ch70
       name: DMR S2
@@ -972,7 +1041,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp6
-      txContact: cont12
+      contact: cont12
+      roaming: !<!default> ""
   - digital:
       id: ch71
       name: DMR S3
@@ -985,7 +1055,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp6
-      txContact: cont12
+      contact: cont12
+      roaming: !<!default> ""
   - digital:
       id: ch72
       name: DMR S4
@@ -998,7 +1069,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp6
-      txContact: cont12
+      contact: cont12
+      roaming: !<!default> ""
   - digital:
       id: ch73
       name: DMR S5
@@ -1011,7 +1083,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp6
-      txContact: cont12
+      contact: cont12
+      roaming: !<!default> ""
   - digital:
       id: ch74
       name: DMR S6
@@ -1024,7 +1097,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp6
-      txContact: cont12
+      contact: cont12
+      roaming: !<!default> ""
   - digital:
       id: ch75
       name: DMR S7
@@ -1037,7 +1111,8 @@ channels:
       colorCode: 1
       timeSlot: TimeSlot1
       groupList: grp6
-      txContact: cont12
+      contact: cont12
+      roaming: !<!default> ""
   - analog:
       id: ch76
       name: DB0LDS
@@ -1671,6 +1746,7 @@ zones:
   - id: zone2
     name: TH Wildau
     A: [ch112, ch113, ch114, ch115]
+    B: []
   - id: zone3
     name: Hessen
     A: [ch64, ch66, ch67]
@@ -1711,12 +1787,12 @@ positioning:
       id: aprs1
       name: BM ARPS
       period: 300
-      destination: cont21
+      contact: cont21
   - aprs:
       id: aprs2
       name: APRS APAT81
       period: 300
-      channel: ch104
+      revert: ch104
       destination: APAT81-0
       source: DM3MAT-7
       path: [WIDE1-1, WIDE2-1]

@@ -127,7 +127,7 @@ APRSSystemDialog::construct() {
       continue;
     AnalogChannel *ch = _config->channelList()->channel(i)->as<AnalogChannel>();
     ui->channel->addItem(ch->name(), QVariant::fromValue(ch));
-    if (_aprs && (_aprs->channel() == ch))
+    if (_aprs && (_aprs->revertChannel() == ch))
       ui->channel->setCurrentIndex(j);
     j++;
   }
@@ -172,7 +172,7 @@ APRSSystem *
 APRSSystemDialog::aprsSystem() {
   if (_aprs) {
     _aprs->setName(ui->name->text().simplified());
-    _aprs->setChannel(ui->channel->currentData().value<AnalogChannel*>());
+    _aprs->setRevertChannel(ui->channel->currentData().value<AnalogChannel*>());
     _aprs->setSource(ui->source->text().simplified(), ui->srcSSID->value());
     _aprs->setDestination(ui->destination->text().simplified(), ui->destSSID->value());
     _aprs->setIcon(APRSSystem::Icon(ui->icon->currentData().toUInt()));

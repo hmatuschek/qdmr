@@ -1,14 +1,14 @@
 #ifndef GPSSYSTEM_H
 #define GPSSYSTEM_H
 
-#include "configobject.hh"
+#include "configreference.hh"
 #include <QAbstractTableModel>
-
 
 class Config;
 class DigitalContact;
 class DigitalChannel;
 class AnalogChannel;
+
 
 /** Base class of the positioning systems, that is APRS and DMR position reporting system.
  * @ingroup conf */
@@ -59,7 +59,11 @@ public:
   void setPeriod(uint period);
 
 protected:
-  bool serialize(YAML::Node &node, const ConfigObject::Context &context);
+  bool populate(YAML::Node &node, const ConfigObject::Context &context);
+
+protected slots:
+  /** Gets called, whenever a reference is modified. */
+  void onReferenceModified();
 
 protected:
   /** Holds the name of the GPS system. */
@@ -74,6 +78,11 @@ protected:
 class GPSSystem : public PositioningSystem
 {
   Q_OBJECT
+
+  /** References the destination contact. */
+  Q_PROPERTY(DigitalContactReference* contact READ contact)
+  /** References the revert channel. */
+  Q_PROPERTY(DigitalChannelReference* revert READ revert)
 
 public:
   /** Constructor.
@@ -95,9 +104,13 @@ public:
   /** Returns @c true if a contact is set for the GPS system. */
   bool hasContact() const;
   /** Returns the destination contact for the GPS information or @c nullptr if not set. */
-  DigitalContact *contact() const;
+  DigitalContact *contactObj() const;
   /** Sets the destination contact for the GPS information. */
-  void setContact(DigitalContact *contact);
+  void setContact(DigitalContact *contactObj);
+  /** Returns the reference to the destination contact. */
+  const DigitalContactReference *contact() const;
+  /** Returns the reference to the destination contact. */
+  DigitalContactReference *contact();
 
   /** Returns @c true if the GPS system has a revert channel set. If not, the GPS information will
    * be send on the current channel. */
@@ -106,21 +119,16 @@ public:
   DigitalChannel *revertChannel() const;
   /** Sets the revert channel for the GPS information to be send on. */
   void setRevertChannel(DigitalChannel *channel);
-
-protected slots:
-  /** Internal used callback to get notified if the destination contact is deleted. */
-  void onContactDeleted();
-  /** Internal used callback to get notified if the revert channel is deleted. */
-  void onRevertChannelDeleted();
-
-protected:
-  bool serialize(YAML::Node &node, const Context &context);
+  /** Returns a reference to the revert channel. */
+  const DigitalChannelReference *revert() const;
+  /** Returns a reference to the revert channel. */
+  DigitalChannelReference *revert();
 
 protected:
   /** Holds the destination contact for the GPS information. */
-  DigitalContact *_contact;
+  DigitalContactReference _contact;
   /** Holds the revert channel on which the GPS information is send on. */
-  DigitalChannel *_revertChannel;
+  DigitalChannelReference _revertChannel;
 };
 
 
@@ -129,6 +137,9 @@ protected:
 class APRSSystem: public PositioningSystem
 {
   Q_OBJECT
+
+  /** The transmit channel. */
+  Q_PROPERTY(AnalogChannelReference* revert READ revert)
 
 public:
   static const uint PRIMARY_TABLE   = (0<<8);   ///< Primary icon table flag.
@@ -184,9 +195,13 @@ public:
   YAML::Node serialize(const Context &context);
 
   /** Returns the transmit channel of the APRS system. */
-  AnalogChannel *channel() const;
+  AnalogChannel *revertChannel() const;
   /** Sets the transmit channel of the APRS system. */
-  void setChannel(AnalogChannel *channel);
+  void setRevertChannel(AnalogChannel *revertChannel);
+  /** Returns a reference to the revert channel. */
+  const AnalogChannelReference *revert() const;
+  /** Returns a reference to the revert channel. */
+  AnalogChannelReference *revert();
 
   /** Retruns the destination call. */
   const QString &destination() const;
@@ -217,16 +232,12 @@ public:
   /** Sets the optional APRS message text. */
   void setMessage(const QString &msg);
 
-protected slots:
-  /** Internal call-back if the transmit channel gets deleted. */
-  void onChannelDeleted(QObject *obj);
-
 protected:
-  bool serialize(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context);
 
 protected:
   /** A weak reference to the transmit channel. */
-  AnalogChannel *_channel;
+  AnalogChannelReference _channel;
   /** Holds the destination call. */
   QString _destination;
   /** Holds the destination SSID. */

@@ -17,7 +17,11 @@
 ScanList::ScanList(const QString &name, QObject *parent)
   : ConfigObject("scan", parent), _name(name), _channels(), _primary(), _secondary(), _revert()
 {
-  // pass...
+  // Register "selected" channel tags for primary, secondary, revert and the channel list.
+  Context::setTag(metaObject()->className(), "primary", "!selected", SelectedChannel::get());
+  Context::setTag(metaObject()->className(), "secondary", "!selected", SelectedChannel::get());
+  Context::setTag(metaObject()->className(), "revert", "!selected", SelectedChannel::get());
+  Context::setTag(metaObject()->className(), "channels", "!selected", SelectedChannel::get());
 }
 
 void
