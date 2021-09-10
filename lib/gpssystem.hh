@@ -140,6 +140,10 @@ class APRSSystem: public PositioningSystem
 
   /** The transmit channel. */
   Q_PROPERTY(AnalogChannelReference* revert READ revert)
+  /** The APRS icon. */
+  Q_PROPERTY(Icon icon READ icon WRITE setIcon)
+  /** An optional text message. */
+  Q_PROPERTY(QString message READ message WRITE setMessage)
 
 public:
   static const uint PRIMARY_TABLE   = (0<<8);   ///< Primary icon table flag.
@@ -148,28 +152,19 @@ public:
   static const uint ICON_MASK       = 0x7f;     ///< Bitmask for the icon table entry.
 
   /** All implemented APRS icons. */
-  typedef enum {
-    APRS_ICON_POLICE_STN = (PRIMARY_TABLE | 0), APRS_ICON_NO_SYMBOL, APRS_ICON_DIGI, APRS_ICON_PHONE,
-    APRS_ICON_DX_CLUSTER, APRS_ICON_HF_GATEWAY, APRS_ICON_PLANE_SMALL, APRS_ICON_MOB_SAT_STN,
-    APRS_ICON_WHEEL_CHAIR, APRS_ICON_SNOWMOBILE, APRS_ICON_RED_CROSS, APRS_ICON_BOY_SCOUT,
-    APRS_ICON_HOME, APRS_ICON_X, APRS_ICON_RED_DOT, APRS_ICON_CIRCLE_0, APRS_ICON_CIRCLE_1,
-    APRS_ICON_CIRCLE_2, APRS_ICON_CIRCLE_3, APRS_ICON_CIRCLE_4, APRS_ICON_CIRCLE_5,
-    APRS_ICON_CIRCLE_6, APRS_ICON_CIRCLE_7, APRS_ICON_CIRCLE_8, APRS_ICON_CIRCLE_9,
-    APRS_ICON_FIRE, APRS_ICON_CAMPGROUND, APRS_ICON_MOTORCYCLE, APRS_ICON_RAIL_ENGINE,
-    APRS_ICON_CAR, APRS_ICON_FILE_SERVER, APRS_ICON_HC_FUTURE, APRS_ICON_AID_STN, APRS_ICON_BBS,
-    APRS_ICON_CANOE, APRS_ICON_EYEBALL = (PRIMARY_TABLE | 36), APRS_ICON_TRACTOR, APRS_ICON_GRID_SQ,
-    APRS_ICON_HOTEL, APRS_ICON_TCP_IP, APRS_ICON_SCHOOL = (PRIMARY_TABLE | 42),
-    APRS_ICON_USER_LOGON, APRS_ICON_MAC, APRS_ICON_NTS_STN, APRS_ICON_BALLOON, APRS_ICON_POLICE,
-    APRS_ICON_TBD, APRX_ICON_RV, APRS_ICON_SHUTTLE, APRS_ICON_SSTV, APRS_ICON_BUS, APRS_ICON_ATV,
-    APRS_ICON_WX_SERVICE, APRS_ICON_HELO, APRS_ICON_YACHT, APRS_ICON_WIN, APRS_ICON_JOGGER,
-    APRS_ICON_TRIANGLE, APRS_ICON_PBBS, APRS_ICON_PLANE_LARGE, APRS_ICON_WX_STN, APRS_ICON_DISH_ANT,
-    APRS_ICON_AMBULANCE, APRS_ICON_BIKE, APRS_ICON_ICP, APRS_ICON_FIRE_STATION, APRS_ICON_HORSE,
-    APRS_ICON_FIRE_TRUCK, APRS_ICON_GLIDER, APRS_ICON_HOSPITAL, APRS_ICON_IOTA, APRS_ICON_JEEP,
-    APRS_ICON_TRUCK_SMALL, APRS_ICON_LAPTOP, APRS_ICON_MIC_E, APRS_ICON_NODE, APRS_ICON_EOC,
-    APRS_ICON_ROVER, APRS_ICON_GRID, APRS_ICON_ANTENNA, APRS_ICON_POWER_BOAT, APRS_ICON_TRUCK_STOP,
-    APRS_ICON_TUCK_LARGE, APRS_ICON_VAN, APRS_ICON_WATER, APRS_ICON_XAPRS, APRS_ICON_YAGI,
-    APRS_ICON_SHELTER
-  } Icon;
+  enum class Icon {
+    PoliceStation = (PRIMARY_TABLE | 0), None, Digipeater, Phone, DXCluster, HFGateway, SmallPlane,
+    MobileSatelliteStation, WheelChair, Snowmobile, RedCross, BoyScout, Home, X, RedDot,
+    Circle0, Circle1, Circle2, Circle3, Circle4, Circle5, Circle6, Circle7, Circle8, Circle9,
+    Fire, Campground, Motorcycle, RailEngine, Car, FileServer, HCFuture, AidStation, BBS, Canoe,
+    Eyeball = (PRIMARY_TABLE | 36), Tractor, GridSquare, Hotel, TCPIP, School = (PRIMARY_TABLE | 42),
+    Logon, MacOS, NTSStation, Balloon, PoliceCar, TBD, RV, Shuttle, SSTV, Bus, ATV, WXService, Helo,
+    Yacht, Windows, Jogger, Triangle, PBBS, LargePlane, WXStation, DishAntenna, Ambulance, Bike,
+    ICP, FireStation, Horse, FireTruck, Glider, Hospital, IOTA, Jeep, SmallTruck, Laptop, MicE,
+    Node, EOC, Rover, Grid, Antenna, PowerBoat, TruckStop, TruckLarge, Van, Water, XAPRS, Yagi,
+    Shelter
+  };
+  Q_ENUM(Icon)
 
 public:
   /** Constructor for a APRS system.
@@ -189,7 +184,7 @@ public:
    * @param parent Specifies the QObject parent object. */
   explicit APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, uint destSSID,
                       const QString &src, uint srcSSID,
-                      const QString &path="", Icon icon=APRS_ICON_JOGGER,
+                      const QString &path="", Icon icon=Icon::Jogger,
                       const QString &message="", uint period=300, QObject *parent=nullptr);
 
   YAML::Node serialize(const Context &context);

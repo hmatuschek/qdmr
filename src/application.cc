@@ -54,15 +54,26 @@ Application::Application(int &argc, char *argv[])
   _config = new Config(this);
 
   if (argc>1) {
+    QFileInfo info(argv[1]);
     QFile file(argv[1]);
     if (! file.open(QIODevice::ReadOnly)) {
-
+      logError() << "Cannot open codeplug file '" << argv[1] << "': " << file.errorString();
       return;
     }
-    QString errorMessage;
-    QTextStream stream(&file);
-    if (! _config->readCSV(stream, errorMessage))
-      logError() << errorMessage;
+    if (("conf" == info.suffix()) || ("csv" == info.suffix())) {
+      QString errorMessage; QTextStream stream(&file);
+      if (! _config->readCSV(stream, errorMessage)) {
+        logError() << errorMessage;
+        return;
+      }
+    } else if ("yaml" == info.suffix()) {
+      ConfigReader reader;
+      if (! reader.read(_config, argv[1])) {
+        logError() << "Cannot read yaml codeplug file '" << argv[1]
+                   << "': " << reader.errorMessage();
+        return;
+      }
+    }
   }
 
   _currentPosition = settings.position();

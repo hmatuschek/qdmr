@@ -1,6 +1,7 @@
 #include "configitemwrapper.hh"
 #include <cmath>
 #include "logger.hh"
+#include <QColor>
 
 
 /* ********************************************************************************************* *
@@ -222,6 +223,22 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
 
   if ((! index.isValid()) || (index.row()>=_list->count()))
     return QVariant();
+  if (Qt::ForegroundRole == role) {
+    bool isDigital = dynamic_cast<ChannelList *>(_list)->channel(index.row())->is<DigitalChannel>();
+    switch(index.column()) {
+    case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+      return QColor(Qt::black);
+    case 9: case 10: case 11: case 12: case 13:
+      return (isDigital ? QColor(Qt::black) : QColor(Qt::lightGray));
+    case 14:
+      return QColor(Qt::black);
+    case 15:
+      return (isDigital ? QColor(Qt::black) : QColor(Qt::lightGray));
+    case 16: case 17: case 18: case 19:
+      return (isDigital ? QColor(Qt::lightGray) : QColor(Qt::black));
+    }
+  }
+
   if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
     return QVariant();
 
@@ -244,11 +261,11 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       return formatFrequency(channel->txFrequency());
   case 4:
     switch (channel->power()) {
-    case Channel::MaxPower: return tr("Max");
-    case Channel::HighPower: return tr("High");
-    case Channel::MidPower: return tr("Mid");
-    case Channel::LowPower: return tr("Low");
-    case Channel::MinPower: return tr("Min");
+    case Channel::Power::Max: return tr("Max");
+    case Channel::Power::High: return tr("High");
+    case Channel::Power::Mid: return tr("Mid");
+    case Channel::Power::Low: return tr("Low");
+    case Channel::Power::Min: return tr("Min");
     }
   case 5:
     if (0 == channel->timeout())
@@ -259,15 +276,15 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 7:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
       switch (digi->admit()) {
-      case DigitalChannel::AdmitNone: return tr("Always");
-      case DigitalChannel::AdmitFree: return tr("Free");
-      case DigitalChannel::AdmitColorCode: return tr("Color");
+      case DigitalChannel::Admit::Always: return tr("Always");
+      case DigitalChannel::Admit::Free: return tr("Free");
+      case DigitalChannel::Admit::ColorCode: return tr("Color");
       }
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
       switch (analog->admit()) {
-      case AnalogChannel::AdmitNone: return tr("Always");
-      case AnalogChannel::AdmitFree: return tr("Free");
-      case AnalogChannel::AdmitTone: return tr("Tone");
+      case AnalogChannel::Admit::Always: return tr("Always");
+      case AnalogChannel::Admit::Free: return tr("Free");
+      case AnalogChannel::Admit::Tone: return tr("Tone");
       }
     }
     break;
@@ -286,7 +303,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 10:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      return (DigitalChannel::TimeSlot1 == digi->timeSlot()) ? 1 : 2;
+      return (DigitalChannel::TimeSlot::TS1 == digi->timeSlot()) ? 1 : 2;
     } else if (channel->is<AnalogChannel>()) {
       return tr("[None]");
     }
@@ -314,10 +331,9 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 13:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->radioIdObj())
-        return digi->radioIdObj()->number();
-      else
+      if ((nullptr == digi->radioIdObj()) || (DefaultRadioID::get() == digi->radioIdObj()))
         return tr("[Default]");
+      return digi->radioIdObj()->name();
     } else if (channel->is<AnalogChannel>()) {
       return tr("[None]");
     }
@@ -337,10 +353,11 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 15:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->roamingZone())
-        return digi->roamingZone()->name();
-      else
+      if (nullptr == digi->roamingZone())
         return tr("-");
+      else if (DefaultRoamingZone::get() == digi->roamingZone())
+        return tr("[Default]");
+      return digi->roamingZone()->name();
     } else if (channel->is<AnalogChannel>()) {
       return tr("[None]");
     }
@@ -379,7 +396,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     if (channel->is<DigitalChannel>()) {
       return tr("[None]");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (AnalogChannel::Wide == analog->bandwidth()) {
+      if (AnalogChannel::Bandwidth::Wide == analog->bandwidth()) {
         return tr("Wide");
       } else
         return tr("Narrow");
@@ -563,18 +580,21 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
   case 1:
     return sys->name();
   case 2:
-    if (sys->is<GPSSystem>())
+    if (sys->is<GPSSystem>()) {
+      if (! sys->as<GPSSystem>()->hasContact())
+        return tr("[None]");
       return sys->as<GPSSystem>()->contactObj()->name();
-    else if (sys->is<APRSSystem>())
+    } else if (sys->is<APRSSystem>())
       return tr("%1-%2").arg(sys->as<APRSSystem>()->destination())
           .arg(sys->as<APRSSystem>()->destSSID());
   case 3:
     return sys->period();
   case 4:
-    if (sys->is<GPSSystem>())
-      return (sys->as<GPSSystem>()->hasRevertChannel() ?
-                sys->as<GPSSystem>()->revertChannel()->name() : tr("[Selected]"));
-    else if (sys->is<APRSSystem>())
+    if (sys->is<GPSSystem>()) {
+      if ((! sys->as<GPSSystem>()->hasRevertChannel()) || sys->as<GPSSystem>()->revert()->is<SelectedChannel>())
+        return tr("[Selected]");
+      return sys->as<GPSSystem>()->revertChannel()->name();
+    } else if (sys->is<APRSSystem>())
       return ((nullptr != sys->as<APRSSystem>()->revertChannel()) ?
                 sys->as<APRSSystem>()->revertChannel()->name() : tr("OOPS!"));
   case 5:

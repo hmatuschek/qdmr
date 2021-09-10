@@ -37,11 +37,11 @@ AnalogChannelDialog::construct() {
 
   rxFrequency->setValidator(new QDoubleValidator(0,500,5));
   txFrequency->setValidator(new QDoubleValidator(0,500,5));
-  power->setItemData(0, uint(Channel::MaxPower));
-  power->setItemData(1, uint(Channel::HighPower));
-  power->setItemData(2, uint(Channel::MidPower));
-  power->setItemData(3, uint(Channel::LowPower));
-  power->setItemData(4, uint(Channel::MinPower));
+  power->setItemData(0, uint(Channel::Power::Max));
+  power->setItemData(1, uint(Channel::Power::High));
+  power->setItemData(2, uint(Channel::Power::Mid));
+  power->setItemData(3, uint(Channel::Power::Low));
+  power->setItemData(4, uint(Channel::Power::Min));
   scanList->addItem(tr("[None]"), QVariant::fromValue((ScanList *)nullptr));
   scanList->setCurrentIndex(0);
   for (int i=0; i<_config->scanlists()->count(); i++) {
@@ -50,13 +50,13 @@ AnalogChannelDialog::construct() {
     if (_channel && (_channel->scanListObj() == lst) )
       scanList->setCurrentIndex(i+1);
   }
-  txAdmit->setItemData(0, uint(AnalogChannel::AdmitNone));
-  txAdmit->setItemData(1, uint(AnalogChannel::AdmitFree));
-  txAdmit->setItemData(2, uint(AnalogChannel::AdmitTone));
+  txAdmit->setItemData(0, uint(AnalogChannel::Admit::Always));
+  txAdmit->setItemData(1, uint(AnalogChannel::Admit::Free));
+  txAdmit->setItemData(2, uint(AnalogChannel::Admit::Tone));
   populateCTCSSBox(rxTone, (nullptr != _channel ? _channel->rxTone() : Signaling::SIGNALING_NONE));
   populateCTCSSBox(txTone, (nullptr != _channel ? _channel->txTone() : Signaling::SIGNALING_NONE));
-  bandwidth->setItemData(0, uint(AnalogChannel::Narrow));
-  bandwidth->setItemData(1, uint(AnalogChannel::Wide));
+  bandwidth->setItemData(0, uint(AnalogChannel::Bandwidth::Narrow));
+  bandwidth->setItemData(1, uint(AnalogChannel::Bandwidth::Wide));
   aprsList->addItem(tr("[None]"), QVariant::fromValue((APRSSystem *)nullptr));
   aprsList->setCurrentIndex(0);
   for (int i=0; i<_config->posSystems()->aprsCount(); i++) {
@@ -71,23 +71,23 @@ AnalogChannelDialog::construct() {
     rxFrequency->setText(format_frequency(_channel->rxFrequency()));
     txFrequency->setText(format_frequency(_channel->txFrequency()));
     switch (_channel->power()) {
-    case Channel::MaxPower: power->setCurrentIndex(0); break;
-    case Channel::HighPower: power->setCurrentIndex(1); break;
-    case Channel::MidPower: power->setCurrentIndex(2); break;
-    case Channel::LowPower: power->setCurrentIndex(3); break;
-    case Channel::MinPower: power->setCurrentIndex(4); break;
+    case Channel::Power::Max: power->setCurrentIndex(0); break;
+    case Channel::Power::High: power->setCurrentIndex(1); break;
+    case Channel::Power::Mid: power->setCurrentIndex(2); break;
+    case Channel::Power::Low: power->setCurrentIndex(3); break;
+    case Channel::Power::Min: power->setCurrentIndex(4); break;
     }
     txTimeout->setValue(_channel->timeout());
     rxOnly->setChecked(_channel->rxOnly());
     switch (_channel->admit()) {
-      case AnalogChannel::AdmitNone: txAdmit->setCurrentIndex(0); break;
-      case AnalogChannel::AdmitFree: txAdmit->setCurrentIndex(1); break;
-      case AnalogChannel::AdmitTone: txAdmit->setCurrentIndex(2); break;
+      case AnalogChannel::Admit::Always: txAdmit->setCurrentIndex(0); break;
+      case AnalogChannel::Admit::Free: txAdmit->setCurrentIndex(1); break;
+      case AnalogChannel::Admit::Tone: txAdmit->setCurrentIndex(2); break;
     }
     squelch->setValue(_channel->squelch());
-    if (AnalogChannel::Narrow == _channel->bandwidth())
+    if (AnalogChannel::Bandwidth::Narrow == _channel->bandwidth())
       bandwidth->setCurrentIndex(0);
-    else if (AnalogChannel::Wide == _channel->bandwidth())
+    else if (AnalogChannel::Bandwidth::Wide == _channel->bandwidth())
       bandwidth->setCurrentIndex(1);
   }
 

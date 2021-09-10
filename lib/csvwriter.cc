@@ -8,11 +8,11 @@
 
 inline QString power2string(Channel::Power power) {
   switch (power) {
-  case Channel::MaxPower:  return "Max";
-  case Channel::HighPower: return "High";
-  case Channel::MidPower:  return "Mid";
-  case Channel::LowPower:  return "Low";
-  case Channel::MinPower:  return "Min";
+  case Channel::Power::Max:  return "Max";
+  case Channel::Power::High: return "High";
+  case Channel::Power::Mid:  return "Mid";
+  case Channel::Power::Low:  return "Low";
+  case Channel::Power::Min:  return "Min";
   }
   return "Min";
 }
@@ -83,9 +83,9 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
           QString::number(config->scanlists()->indexOf(digi->scanListObj())+1) : QString("-") )
            << qSetFieldWidth(4)  << ( (0 == digi->timeout()) ? QString("-") : QString::number(digi->timeout()) )
            << qSetFieldWidth(3)  << (digi->rxOnly() ? '+' : '-')
-           << qSetFieldWidth(7)  << ((DigitalChannel::AdmitNone==digi->admit()) ? "-" : ((DigitalChannel::AdmitFree==digi->admit()) ? "Free" : "Color"))
+           << qSetFieldWidth(7)  << ((DigitalChannel::Admit::Always==digi->admit()) ? "-" : ((DigitalChannel::Admit::Free==digi->admit()) ? "Free" : "Color"))
            << qSetFieldWidth(3)  << digi->colorCode()
-           << qSetFieldWidth(3)  << (DigitalChannel::TimeSlot1==digi->timeSlot() ? "1" : "2");
+           << qSetFieldWidth(3)  << (DigitalChannel::TimeSlot::TS1==digi->timeSlot() ? "1" : "2");
     if (nullptr == digi->groupListObj())
       stream << qSetFieldWidth(5)  << '-';
     else
@@ -149,11 +149,11 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
            << qSetFieldWidth(5)  << ( nullptr != analog->scanListObj() ? QString::number(config->scanlists()->indexOf(analog->scanListObj())+1) : QString("-") )
            << qSetFieldWidth(4)  << ( (0 == analog->timeout()) ? QString("-") : QString::number(analog->timeout()) )
            << qSetFieldWidth(3)  << (analog->rxOnly() ? '+' : '-')
-           << qSetFieldWidth(7)  << ((AnalogChannel::AdmitNone==analog->admit()) ? "-" : ((AnalogChannel::AdmitFree==analog->admit()) ? "Free" : "Tone"))
+           << qSetFieldWidth(7)  << ((AnalogChannel::Admit::Always==analog->admit()) ? "-" : ((AnalogChannel::Admit::Free==analog->admit()) ? "Free" : "Tone"))
            << qSetFieldWidth(8)  << analog->squelch()
            << qSetFieldWidth(7)  << Signaling::configString(analog->rxTone())
            << qSetFieldWidth(7)  << Signaling::configString(analog->txTone())
-           << qSetFieldWidth(6) << (AnalogChannel::Wide == analog->bandwidth() ? 25.0 : 12.5)
+           << qSetFieldWidth(6) << (AnalogChannel::Bandwidth::Wide == analog->bandwidth() ? 25.0 : 12.5)
            << qSetFieldWidth(5)  << ( nullptr != analog->aprsSystem() ? QString::number(config->posSystems()->indexOf(analog->aprsSystem())+1) : QString("-"))
            << qSetFieldWidth(0) << "\n";
   }

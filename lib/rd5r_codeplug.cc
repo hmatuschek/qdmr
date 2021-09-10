@@ -122,32 +122,32 @@ RD5RCodeplug::channel_t::toChannelObj() const {
   QString name = getName();
   double rxF = getRXFrequency();
   double txF = getTXFrequency();
-  Channel::Power pwr = (POWER_HIGH == power) ? Channel::HighPower : Channel::LowPower;
+  Channel::Power pwr = (POWER_HIGH == power) ? Channel::Power::High : Channel::Power::Low;
   uint timeout = tot*15;
   bool rxOnly = rx_only;
   if (MODE_ANALOG == channel_mode) {
     AnalogChannel::Admit admit;
     switch (admit_criteria) {
-      case ADMIT_ALWAYS: admit = AnalogChannel::AdmitNone; break;
-      case ADMIT_CH_FREE: admit = AnalogChannel::AdmitFree; break;
+      case ADMIT_ALWAYS: admit = AnalogChannel::Admit::Always; break;
+      case ADMIT_CH_FREE: admit = AnalogChannel::Admit::Free; break;
       default:
-        admit = AnalogChannel::AdmitFree;
+        admit = AnalogChannel::Admit::Free;
     }
-    AnalogChannel::Bandwidth bw = (BW_25_KHZ == bandwidth) ? AnalogChannel::Wide : AnalogChannel::Narrow;
+    AnalogChannel::Bandwidth bw = (BW_25_KHZ == bandwidth) ? AnalogChannel::Bandwidth::Wide : AnalogChannel::Bandwidth::Narrow;
     return new AnalogChannel(
           name, rxF, txF, pwr, timeout, rxOnly, admit, squelch,  getRXTone(), getTXTone(),
           bw, nullptr);
   } else if(MODE_DIGITAL == channel_mode) {
     DigitalChannel::Admit admit;
     switch (admit_criteria) {
-      case ADMIT_ALWAYS: admit = DigitalChannel::AdmitNone; break;
-      case ADMIT_CH_FREE: admit = DigitalChannel::AdmitFree; break;
+      case ADMIT_ALWAYS: admit = DigitalChannel::Admit::Always; break;
+      case ADMIT_CH_FREE: admit = DigitalChannel::Admit::Free; break;
       case ADMIT_COLOR:
       default:
-        admit = DigitalChannel::AdmitColorCode; break;
+        admit = DigitalChannel::Admit::ColorCode; break;
     }
     DigitalChannel::TimeSlot slot = repeater_slot2 ?
-          DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1;
+          DigitalChannel::TimeSlot::TS2 : DigitalChannel::TimeSlot::TS1;
     return new DigitalChannel(
           name, rxF, txF, pwr, timeout, rxOnly, admit, colorcode_rx, slot,
           nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
@@ -183,13 +183,13 @@ RD5RCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
 
   // encode power setting
   switch (c->power()) {
-  case Channel::MaxPower:
-  case Channel::HighPower:
+  case Channel::Power::Max:
+  case Channel::Power::High:
     power = POWER_HIGH;
     break;
-  case Channel::MidPower:
-  case Channel::LowPower:
-  case Channel::MinPower:
+  case Channel::Power::Mid:
+  case Channel::Power::Low:
+  case Channel::Power::Min:
     power = POWER_LOW;
     break;
   }
@@ -200,11 +200,11 @@ RD5RCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
     const AnalogChannel *ac = c->as<const AnalogChannel>();
     channel_mode = MODE_ANALOG;
     switch (ac->admit()) {
-      case AnalogChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS; break;
-      case AnalogChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE; break;
+      case AnalogChannel::Admit::Always: admit_criteria = ADMIT_ALWAYS; break;
+      case AnalogChannel::Admit::Free: admit_criteria = ADMIT_CH_FREE; break;
       default: admit_criteria = ADMIT_CH_FREE; break;
     }
-    bandwidth = (AnalogChannel::Wide == ac->bandwidth()) ? BW_25_KHZ : BW_12_5_KHZ;
+    bandwidth = (AnalogChannel::Bandwidth::Wide == ac->bandwidth()) ? BW_25_KHZ : BW_12_5_KHZ;
     squelch = ac->squelch();
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
@@ -213,11 +213,11 @@ RD5RCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
     const DigitalChannel *dc = c->as<const DigitalChannel>();
     channel_mode = MODE_DIGITAL;
     switch (dc->admit()) {
-      case DigitalChannel::AdmitNone: admit_criteria = ADMIT_ALWAYS; break;
-      case DigitalChannel::AdmitFree: admit_criteria = ADMIT_CH_FREE; break;
-      case DigitalChannel::AdmitColorCode: admit_criteria = ADMIT_COLOR; break;
+      case DigitalChannel::Admit::Always: admit_criteria = ADMIT_ALWAYS; break;
+      case DigitalChannel::Admit::Free: admit_criteria = ADMIT_CH_FREE; break;
+      case DigitalChannel::Admit::ColorCode: admit_criteria = ADMIT_COLOR; break;
     }
-    repeater_slot2 = (DigitalChannel::TimeSlot1 == dc->timeSlot()) ? 0 : 1;
+    repeater_slot2 = (DigitalChannel::TimeSlot::TS1 == dc->timeSlot()) ? 0 : 1;
     colorcode_rx = colorcode_tx = dc->colorCode();
     scan_list_index = conf->scanlists()->indexOf(dc->scanListObj()) + 1;
     group_list_index = conf->rxGroupLists()->indexOf(dc->groupListObj()) + 1;

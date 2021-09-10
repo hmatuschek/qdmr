@@ -452,7 +452,7 @@ DigitalChannel::setRadioIdObj(RadioID *id) {
 SelectedChannel *SelectedChannel::_instance = nullptr;
 
 SelectedChannel::SelectedChannel()
-  : Channel("[Selected]", 0, 0, Channel::LowPower, 0, true, nullptr, nullptr)
+  : Channel("[Selected]", 0, 0, Channel::Power::Low, 0, true, nullptr, nullptr)
 {
   // pass...
 }

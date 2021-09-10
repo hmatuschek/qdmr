@@ -45,12 +45,12 @@ class Channel: public ConfigObject
 
 public:
   /** Possible power settings. */
-  enum Power {
-    MaxPower,  ///< Highest power setting (e.g. > 5W, if available).
-    HighPower, ///< High power setting (e.g, 5W).
-    MidPower,  ///< Medium power setting (e.g., 2W, if avaliable)
-    LowPower,  ///< Low power setting (e.g., 1W).
-    MinPower   ///< Lowest power setting (e.g., <1W, if available).
+  enum class Power {
+    Max,  ///< Highest power setting (e.g. > 5W, if available).
+    High, ///< High power setting (e.g, 5W).
+    Mid,  ///< Medium power setting (e.g., 2W, if avaliable)
+    Low,  ///< Low power setting (e.g., 1W).
+    Min   ///< Lowest power setting (e.g., <1W, if available).
   };
   Q_ENUM(Power)
 
@@ -170,18 +170,18 @@ class AnalogChannel: public Channel
 
 public:
   /** Admit criteria of analog channel. */
-	typedef enum {
-		AdmitNone,  ///< Allow always.
-    AdmitFree,  ///< Allow when channel free.
-    AdmitTone   ///< Allow when admit tone is present.
-	} Admit;
+  enum class Admit {
+    Always,  ///< Allow always.
+    Free,    ///< Allow when channel free.
+    Tone     ///< Allow when admit tone is present.
+  };
   Q_ENUM(Admit)
 
   /** Possible bandwidth of an analog channel. */
-	typedef enum {
+  enum class Bandwidth {
     Narrow,  ///< Narrow bandwidth (12.5kHz).
     Wide     ///< Wide bandwidth (25kHz).
-	} Bandwidth;
+  };
   Q_ENUM(Bandwidth)
 
 public:
@@ -289,18 +289,18 @@ class DigitalChannel: public Channel
 
 public:
   /** Possible admit criteria of digital channels. */
-	typedef enum {
-		AdmitNone,      ///< No admit criteria, allows to transmit any time.
-    AdmitFree,      ///< Transmit only if channel is free.
-    AdmitColorCode  ///< Transmit only if channel is free and matches given color code.
-	} Admit;
+  enum class Admit {
+    Always,      ///< No admit criteria, allows to transmit any time.
+    Free,        ///< Transmit only if channel is free.
+    ColorCode    ///< Transmit only if channel is free and matches given color code.
+  };
   Q_ENUM(Admit)
 
   /** Possible timeslots for digital channels. */
-	typedef enum {
-		TimeSlot1, ///< Time/repeater slot 1
-    TimeSlot2  ///< Time/repeater slot 2
-	} TimeSlot;
+  enum class TimeSlot {
+    TS1, ///< Time/repeater slot 1
+    TS2  ///< Time/repeater slot 2
+  };
   Q_ENUM(TimeSlot)
 
 public:

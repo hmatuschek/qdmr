@@ -241,19 +241,19 @@ D878UVCodeplug::channel_t::setTXTone(Signaling::Code code) {
 Channel *
 D878UVCodeplug::channel_t::toChannelObj() const {
   // Decode power setting
-  Channel::Power power = Channel::LowPower;
+  Channel::Power power = Channel::Power::Low;
   switch ((channel_t::Power) this->power) {
   case POWER_LOW:
-    power = Channel::LowPower;
+    power = Channel::Power::Low;
     break;
   case POWER_MIDDLE:
-    power = Channel::MidPower;
+    power = Channel::Power::Mid;
     break;
   case POWER_HIGH:
-    power = Channel::HighPower;
+    power = Channel::Power::High;
     break;
   case POWER_TURBO:
-    power = Channel::MaxPower;
+    power = Channel::Power::Max;
     break;
   }
   bool rxOnly = (1 == this->rx_only);
@@ -263,22 +263,22 @@ D878UVCodeplug::channel_t::toChannelObj() const {
     if (MODE_MIXED_A_D == channel_mode)
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << getName() <<"' as analog channel.";
-    AnalogChannel::Admit admit = AnalogChannel::AdmitNone;
+    AnalogChannel::Admit admit = AnalogChannel::Admit::Always;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
-      admit = AnalogChannel::AdmitNone;
+      admit = AnalogChannel::Admit::Always;
       break;
     case ADMIT_CH_FREE:
-      admit = AnalogChannel::AdmitFree;
+      admit = AnalogChannel::Admit::Free;
       break;
     default:
       break;
     }
-    AnalogChannel::Bandwidth bw = AnalogChannel::Narrow;
+    AnalogChannel::Bandwidth bw = AnalogChannel::Bandwidth::Narrow;
     if (BW_12_5_KHZ == bandwidth)
-      bw = AnalogChannel::Narrow;
+      bw = AnalogChannel::Bandwidth::Narrow;
     else
-      bw = AnalogChannel::Wide;
+      bw = AnalogChannel::Bandwidth::Wide;
     ch = new AnalogChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           1, getRXTone(), getTXTone(), bw, nullptr);
@@ -286,20 +286,20 @@ D878UVCodeplug::channel_t::toChannelObj() const {
     if (MODE_MIXED_D_A == channel_mode)
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << getName() <<"' as digital channel.";
-    DigitalChannel::Admit admit = DigitalChannel::AdmitNone;
+    DigitalChannel::Admit admit = DigitalChannel::Admit::Always;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
-      admit = DigitalChannel::AdmitNone;
+      admit = DigitalChannel::Admit::Always;
       break;
     case ADMIT_CH_FREE:
-      admit = DigitalChannel::AdmitFree;
+      admit = DigitalChannel::Admit::Free;
       break;
     case ADMIT_CC_SAME:
     case ADMIT_CC_DIFF:
-      admit = DigitalChannel::AdmitColorCode;
+      admit = DigitalChannel::Admit::ColorCode;
       break;
     }
-    DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1);
+    DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot::TS2 : DigitalChannel::TimeSlot::TS1);
     ch = new DigitalChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
@@ -381,17 +381,17 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
 
   // encode power setting
   switch (c->power()) {
-  case Channel::MaxPower:
+  case Channel::Power::Max:
     power = POWER_TURBO;
     break;
-  case Channel::HighPower:
+  case Channel::Power::High:
     power = POWER_HIGH;
     break;
-  case Channel::MidPower:
+  case Channel::Power::Mid:
     power = POWER_MIDDLE;
     break;
-  case Channel::LowPower:
-  case Channel::MinPower:
+  case Channel::Power::Low:
+  case Channel::Power::Min:
     power = POWER_LOW;
     break;
   }
@@ -412,16 +412,16 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     // pack analog channel config
     // set admit criterion
     switch (ac->admit()) {
-    case AnalogChannel::AdmitNone: tx_permit = ADMIT_ALWAYS; break;
-    case AnalogChannel::AdmitFree: tx_permit = ADMIT_CH_FREE; break;
-    case AnalogChannel::AdmitTone: tx_permit = ADMIT_ALWAYS; break;
+    case AnalogChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
+    case AnalogChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
+    case AnalogChannel::Admit::Tone: tx_permit = ADMIT_ALWAYS; break;
     }
     // squelch mode
     squelch_mode = (Signaling::SIGNALING_NONE == ac->rxTone()) ? SQ_CARRIER : SQ_TONE;
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     // set bandwidth
-    bandwidth = (AnalogChannel::Narrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
+    bandwidth = (AnalogChannel::Bandwidth::Narrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
     // Set APRS system
     rx_gps = 0;
     if (nullptr != ac->aprsSystem()) {
@@ -434,14 +434,14 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     channel_mode = MODE_DIGITAL;
     // set admit criterion
     switch(dc->admit()) {
-    case DigitalChannel::AdmitNone: tx_permit = ADMIT_ALWAYS; break;
-    case DigitalChannel::AdmitFree: tx_permit = ADMIT_CH_FREE; break;
-    case DigitalChannel::AdmitColorCode: tx_permit = ADMIT_CC_SAME; break;
+    case DigitalChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
+    case DigitalChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
+    case DigitalChannel::Admit::ColorCode: tx_permit = ADMIT_CC_SAME; break;
     }
     // set color code
     color_code = dc->colorCode();
     // set time-slot
-    slot2 = (DigitalChannel::TimeSlot2 == dc->timeSlot()) ? 1 : 0;
+    slot2 = (DigitalChannel::TimeSlot::TS2 == dc->timeSlot()) ? 1 : 0;
     // link transmit contact
     if (nullptr == dc->txContactObj()) {
       contact_index = 0;
@@ -678,29 +678,29 @@ D878UVCodeplug::aprs_setting_t::getSignaling() const {
 Channel::Power
 D878UVCodeplug::aprs_setting_t::getPower() const {
   switch (power) {
-  case POWER_LOW: return Channel::LowPower;
-  case POWER_MID: return Channel::MidPower;
-  case POWER_HIGH: return Channel::HighPower;
-  case POWER_TURBO: return Channel::MaxPower;
+  case POWER_LOW: return Channel::Power::Low;
+  case POWER_MID: return Channel::Power::Mid;
+  case POWER_HIGH: return Channel::Power::High;
+  case POWER_TURBO: return Channel::Power::Max;
   default: break;
   }
-  return Channel::HighPower;
+  return Channel::Power::High;
 }
 
 void
 D878UVCodeplug::aprs_setting_t::setPower(Channel::Power pwr) {
   switch (pwr) {
-  case Channel::MinPower:
-  case Channel::LowPower:
+  case Channel::Power::Min:
+  case Channel::Power::Low:
     power = aprs_setting_t::POWER_LOW;
     break;
-  case Channel::MidPower:
+  case Channel::Power::Mid:
     power = aprs_setting_t::POWER_MID;
     break;
-  case Channel::HighPower:
+  case Channel::Power::High:
     power = aprs_setting_t::POWER_HIGH;
     break;
-  case Channel::MaxPower:
+  case Channel::Power::Max:
     power = aprs_setting_t::POWER_TURBO;
     break;
   }
@@ -753,8 +753,8 @@ D878UVCodeplug::aprs_setting_t::linkAPRSSystem(APRSSystem *sys, CodeplugContext 
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
     ch = new AnalogChannel("APRS Channel", getFrequency(), getFrequency(), getPower(),
-                           0, false, AnalogChannel::AdmitFree, 1, Signaling::SIGNALING_NONE,
-                           getSignaling(), AnalogChannel::Wide, nullptr);
+                           0, false, AnalogChannel::Admit::Free, 1, Signaling::SIGNALING_NONE,
+                           getSignaling(), AnalogChannel::Bandwidth::Wide, nullptr);
     logInfo() << "No matching APRS chanel found for TX frequency " << getFrequency()
               << ", create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);
@@ -897,12 +897,12 @@ D878UVCodeplug::roaming_channel_t::setTXFrequency(double f) {
 DigitalChannel::TimeSlot
 D878UVCodeplug::roaming_channel_t::getTimeslot() const {
   if (0 == timeslot)
-    return DigitalChannel::TimeSlot1;
-  return DigitalChannel::TimeSlot2;
+    return DigitalChannel::TimeSlot::TS1;
+  return DigitalChannel::TimeSlot::TS2;
 }
 void
 D878UVCodeplug::roaming_channel_t::setTimeslot(DigitalChannel::TimeSlot ts) {
-  if (DigitalChannel::TimeSlot1 == ts)
+  if (DigitalChannel::TimeSlot::TS1 == ts)
     timeslot = 0;
   else
     timeslot = 1;
@@ -944,7 +944,7 @@ D878UVCodeplug::roaming_channel_t::toChannel(CodeplugContext &ctx) {
   if (nullptr == digi) {
     // If no matching channel can be found -> create one
     digi = new DigitalChannel(getName(), getRXFrequency(), getTXFrequency(),
-                              Channel::LowPower, 0, false, DigitalChannel::AdmitColorCode,
+                              Channel::Power::Low, 0, false, DigitalChannel::Admit::ColorCode,
                               getColorCode(), getTimeslot(), nullptr, nullptr, nullptr,
                               nullptr, nullptr, nullptr);
     logDebug() << "Create channel '" << digi->name() << "' as roaming channel.";

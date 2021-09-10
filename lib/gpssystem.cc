@@ -262,11 +262,6 @@ APRSSystem::populate(YAML::Node &node, const Context &context) {
     node["path"] = list;
   }
 
-  if (APRS_ICON_NO_SYMBOL != _icon)
-    node["icon"] = aprsicon2name(_icon).toStdString();
-
-  node["message"] = _message.toStdString();
-
   return true;
 }
 

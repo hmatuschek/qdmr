@@ -40,13 +40,13 @@ TyTCodeplug::ChannelElement::clear() {
   Element::clear();
 
   mode(MODE_ANALOG);
-  bandwidth(AnalogChannel::Narrow);
+  bandwidth(AnalogChannel::Bandwidth::Narrow);
   autoScan(0);
   setBit(0, 1); setBit(0,2);
   loneWorker(false);
   talkaround(false);
   rxOnly(false);
-  timeSlot(DigitalChannel::TimeSlot1);
+  timeSlot(DigitalChannel::TimeSlot::TS1);
   colorCode(1);
   privacyIndex(0);
   privacyType(PRIV_NONE);
@@ -82,7 +82,7 @@ TyTCodeplug::ChannelElement::clear() {
   txSignaling(Signaling::SIGNALING_NONE);
   rxSignalingSystemIndex(0);
   txSignalingSystemIndex(0);
-  power(Channel::HighPower);
+  power(Channel::Power::High);
   setBit(30,2); setBit(30,3); setBit(30,4); setBit(30,5); setBit(30,6); setBit(30,7);
   txGPSInfo(true);
   rxGPSInfo(true);
@@ -106,12 +106,12 @@ TyTCodeplug::ChannelElement::mode(Mode mode) {
 AnalogChannel::Bandwidth
 TyTCodeplug::ChannelElement::bandwidth() const {
   if (0 == getUInt2(0, 2))
-    return AnalogChannel::Narrow;
-  return AnalogChannel::Wide;
+    return AnalogChannel::Bandwidth::Narrow;
+  return AnalogChannel::Bandwidth::Wide;
 }
 void
 TyTCodeplug::ChannelElement::bandwidth(AnalogChannel::Bandwidth bw) {
-  if (AnalogChannel::Narrow == bw)
+  if (AnalogChannel::Bandwidth::Narrow == bw)
     setUInt2(0, 2, BW_12_5_KHZ);
   else
     setUInt2(0, 2, BW_25_KHZ);
@@ -156,12 +156,12 @@ TyTCodeplug::ChannelElement::rxOnly(bool enable) {
 DigitalChannel::TimeSlot
 TyTCodeplug::ChannelElement::timeSlot() const {
   if (2 == getUInt2(1,2))
-    return DigitalChannel::TimeSlot2;
-  return DigitalChannel::TimeSlot2;
+    return DigitalChannel::TimeSlot::TS2;
+  return DigitalChannel::TimeSlot::TS1;
 }
 void
 TyTCodeplug::ChannelElement::timeSlot(DigitalChannel::TimeSlot ts) {
-  if (DigitalChannel::TimeSlot1 == ts)
+  if (DigitalChannel::TimeSlot::TS1 == ts)
     setUInt2(1,2,1);
   else
     setUInt2(1,2,2);
@@ -421,25 +421,25 @@ TyTCodeplug::ChannelElement::txSignalingSystemIndex(uint8_t idx) {
 Channel::Power
 TyTCodeplug::ChannelElement::power() const {
   switch (getUInt2(30, 0)) {
-  case 0: return Channel::LowPower;
-  case 2: return Channel::MidPower;
-  case 3: return Channel::HighPower;
+  case 0: return Channel::Power::Low;
+  case 2: return Channel::Power::Mid;
+  case 3: return Channel::Power::High;
   default: break;
   }
-  return Channel::LowPower;
+  return Channel::Power::Low;
 }
 void
 TyTCodeplug::ChannelElement::power(Channel::Power pwr) {
   switch (pwr) {
-  case Channel::MinPower:
-  case Channel::LowPower:
+  case Channel::Power::Min:
+  case Channel::Power::Low:
     setUInt2(30,0, 0);
     break;
-  case Channel::MidPower:
+  case Channel::Power::Mid:
     setUInt2(30,0, 2);
     break;
-  case Channel::HighPower:
-  case Channel::MaxPower:
+  case Channel::Power::High:
+  case Channel::Power::Max:
     setUInt2(30,0, 3);
   }
 }
@@ -504,10 +504,10 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
   if (MODE_ANALOG == mode()) {
     AnalogChannel::Admit admit_crit;
     switch(admitCriterion()) {
-      case ADMIT_ALWAYS: admit_crit = AnalogChannel::AdmitNone; break;
-      case ADMIT_TONE: admit_crit = AnalogChannel::AdmitTone; break;
-      case ADMIT_CH_FREE: admit_crit = AnalogChannel::AdmitFree; break;
-      default: admit_crit = AnalogChannel::AdmitFree; break;
+      case ADMIT_ALWAYS: admit_crit = AnalogChannel::Admit::Always; break;
+      case ADMIT_TONE: admit_crit = AnalogChannel::Admit::Tone; break;
+      case ADMIT_CH_FREE: admit_crit = AnalogChannel::Admit::Free; break;
+      default: admit_crit = AnalogChannel::Admit::Free; break;
     }
 
     return new AnalogChannel(name(), double(rxFrequency())/1e6, double(txFrequency())/1e6,
@@ -516,10 +516,10 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
   } else if (MODE_DIGITAL == mode()) {
     DigitalChannel::Admit admit_crit;
     switch(admitCriterion()) {
-      case ADMIT_ALWAYS: admit_crit = DigitalChannel::AdmitNone; break;
-      case ADMIT_CH_FREE: admit_crit = DigitalChannel::AdmitFree; break;
-      case ADMIT_COLOR: admit_crit = DigitalChannel::AdmitColorCode; break;
-      default: admit_crit = DigitalChannel::AdmitFree; break;
+      case ADMIT_ALWAYS: admit_crit = DigitalChannel::Admit::Always; break;
+      case ADMIT_CH_FREE: admit_crit = DigitalChannel::Admit::Free; break;
+      case ADMIT_COLOR: admit_crit = DigitalChannel::Admit::ColorCode; break;
+      default: admit_crit = DigitalChannel::Admit::Free; break;
     }
 
     return new DigitalChannel(name(), double(rxFrequency())/1e6, double(txFrequency())/1e6,
@@ -578,9 +578,9 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
     const DigitalChannel *dchan = chan->as<const DigitalChannel>();
     mode(MODE_DIGITAL);
     switch (dchan->admit()) {
-    case DigitalChannel::AdmitNone: admitCriterion(ADMIT_ALWAYS); break;
-    case DigitalChannel::AdmitFree: admitCriterion(ADMIT_CH_FREE); break;
-    case DigitalChannel::AdmitColorCode: admitCriterion(ADMIT_COLOR); break;
+    case DigitalChannel::Admit::Always: admitCriterion(ADMIT_ALWAYS); break;
+    case DigitalChannel::Admit::Free: admitCriterion(ADMIT_CH_FREE); break;
+    case DigitalChannel::Admit::ColorCode: admitCriterion(ADMIT_COLOR); break;
     }
     colorCode(dchan->colorCode());
     timeSlot(dchan->timeSlot());
@@ -591,7 +591,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
     if (dchan->txContactObj())
       contactIndex(ctx.config()->contacts()->indexOfDigital(dchan->txContactObj())+1);
     squelch(0);
-    bandwidth(AnalogChannel::Narrow);
+    bandwidth(AnalogChannel::Bandwidth::Narrow);
     rxSignaling(Signaling::SIGNALING_NONE);
     txSignaling(Signaling::SIGNALING_NONE);
     if (dchan->aprsObj() && dchan->aprsObj()->is<GPSSystem>()) {
@@ -604,9 +604,9 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
     bandwidth(achan->bandwidth());
     squelch(achan->squelch());
     switch (achan->admit()) {
-    case AnalogChannel::AdmitNone: admitCriterion(ADMIT_ALWAYS); break;
-    case AnalogChannel::AdmitFree: admitCriterion(ADMIT_CH_FREE); break;
-    case AnalogChannel::AdmitTone: admitCriterion(ADMIT_TONE); break;
+    case AnalogChannel::Admit::Always: admitCriterion(ADMIT_ALWAYS); break;
+    case AnalogChannel::Admit::Free: admitCriterion(ADMIT_CH_FREE); break;
+    case AnalogChannel::Admit::Tone: admitCriterion(ADMIT_TONE); break;
     }
     rxSignaling(achan->rxTone());
     txSignaling(achan->txTone());

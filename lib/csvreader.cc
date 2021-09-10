@@ -861,15 +861,15 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   }
   Channel::Power pwr;
   if ("max" == token.value.toLower()) {
-    pwr = Channel::MaxPower;
+    pwr = Channel::Power::Max;
   } else if ("high" == token.value.toLower()) {
-    pwr = Channel::HighPower;
+    pwr = Channel::Power::High;
   } else if ("mid" == token.value.toLower()) {
-    pwr = Channel::MidPower;
+    pwr = Channel::Power::Mid;
   } else if ("low" == token.value.toLower()) {
-    pwr = Channel::LowPower;
+    pwr = Channel::Power::Low;
   } else if ("min" == token.value.toLower()) {
-    pwr = Channel::MinPower;
+    pwr = Channel::Power::Min;
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'High' or 'Low'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -911,12 +911,12 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   token = lexer.next();
   DigitalChannel::Admit admit;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
-    admit = DigitalChannel::AdmitNone;
+    admit = DigitalChannel::Admit::Always;
   } else if (CSVLexer::Token::T_KEYWORD == token.type) {
     if ("free" == token.value.toLower())
-      admit = DigitalChannel::AdmitFree;
+      admit = DigitalChannel::Admit::Free;
     else if ("color" == token.value.toLower())
-      admit = DigitalChannel::AdmitColorCode;
+      admit = DigitalChannel::Admit::ColorCode;
     else {
       _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'Free' or 'Color'.")
           .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -940,9 +940,9 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   DigitalChannel::TimeSlot slot;
   if (CSVLexer::Token::T_NUMBER == token.type) {
     if (1 == token.value.toInt()) {
-      slot = DigitalChannel::TimeSlot1;
+      slot = DigitalChannel::TimeSlot::TS1;
     } else if (2 == token.value.toInt()) {
-      slot = DigitalChannel::TimeSlot2;
+      slot = DigitalChannel::TimeSlot::TS2;
     } else {
       _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected '1' or '2'.")
           .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1098,15 +1098,15 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   }
   Channel::Power pwr;
   if ("max" == token.value.toLower()) {
-    pwr = Channel::MaxPower;
+    pwr = Channel::Power::Max;
   } else if ("high" == token.value.toLower()) {
-    pwr = Channel::HighPower;
+    pwr = Channel::Power::High;
   } else if ("mid" == token.value.toLower()) {
-    pwr = Channel::MidPower;
+    pwr = Channel::Power::Mid;
   } else if ("low" == token.value.toLower()) {
-    pwr = Channel::LowPower;
+    pwr = Channel::Power::Low;
   } else if ("min" == token.value.toLower()) {
-    pwr = Channel::MinPower;
+    pwr = Channel::Power::Min;
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'High' or 'Low'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1148,12 +1148,12 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   token = lexer.next();
   AnalogChannel::Admit admit;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
-    admit = AnalogChannel::AdmitNone;
+    admit = AnalogChannel::Admit::Always;
   } else if (CSVLexer::Token::T_KEYWORD == token.type) {
     if ("free" == token.value.toLower())
-      admit = AnalogChannel::AdmitFree;
+      admit = AnalogChannel::Admit::Free;
     else if ("tone" == token.value.toLower())
-      admit = AnalogChannel::AdmitTone;
+      admit = AnalogChannel::Admit::Tone;
     else {
       _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'Free', 'Tone'.")
           .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1213,9 +1213,9 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   }
   AnalogChannel::Bandwidth bw;
   if (25 == token.value.toFloat()) {
-    bw = AnalogChannel::Wide;
+    bw = AnalogChannel::Bandwidth::Wide;
   } else if (12.5 == token.value.toFloat()) {
-    bw = AnalogChannel::Narrow;
+    bw = AnalogChannel::Bandwidth::Narrow;
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected '12.5' or '25'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);

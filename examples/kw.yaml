@@ -65,12 +65,12 @@ channels:
       name: DB0LDS TS1
       rxFrequency: 439.5625
       txFrequency: 431.9625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -79,12 +79,12 @@ channels:
       name: Sa/Th DB0LDS TS1
       rxFrequency: 439.5625
       txFrequency: 431.9625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp3
       contact: cont8
       roaming: !<!default> ""
@@ -93,12 +93,12 @@ channels:
       name: TG8 DB0LDS TS2
       rxFrequency: 439.5625
       txFrequency: 431.9625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -107,13 +107,13 @@ channels:
       name: TG9 DB0LDS TS2
       rxFrequency: 439.5625
       txFrequency: 431.9625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
       scanList: scan1
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -122,13 +122,13 @@ channels:
       name: BB DB0LDS TS2
       rxFrequency: 439.5625
       txFrequency: 431.9625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
       scanList: scan1
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -137,13 +137,13 @@ channels:
       name: HRV DB0LDS TS1
       rxFrequency: 439.5625
       txFrequency: 431.9625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
       scanList: scan1
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp7
       contact: cont11
       roaming: !<!default> ""
@@ -152,12 +152,12 @@ channels:
       name: DM0TZN TS1
       rxFrequency: 438.825
       txFrequency: 431.225
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont1
       roaming: !<!default> ""
@@ -166,12 +166,12 @@ channels:
       name: TG8 DM0TZN TS2
       rxFrequency: 438.825
       txFrequency: 431.225
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -180,12 +180,12 @@ channels:
       name: TG9 DM0TZN TS2
       rxFrequency: 438.825
       txFrequency: 431.225
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -194,12 +194,12 @@ channels:
       name: BB DM0TZN TS2
       rxFrequency: 438.825
       txFrequency: 431.225
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -208,12 +208,12 @@ channels:
       name: DB0LOS TS1
       rxFrequency: 438.475
       txFrequency: 430.875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -222,12 +222,12 @@ channels:
       name: R/TG9 DB0LOS TS2
       rxFrequency: 438.475
       txFrequency: 430.875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -236,12 +236,12 @@ channels:
       name: R/TG9 DM0TT TS1
       rxFrequency: 439.0875
       txFrequency: 431.4875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -250,12 +250,12 @@ channels:
       name: TG8 DM0TT TS2
       rxFrequency: 439.0875
       txFrequency: 431.4875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -264,12 +264,12 @@ channels:
       name: TG9 DM0TT TS2
       rxFrequency: 439.0875
       txFrequency: 431.4875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -278,12 +278,12 @@ channels:
       name: BB DM0TT TS2
       rxFrequency: 439.0875
       txFrequency: 431.4875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -292,12 +292,12 @@ channels:
       name: TG9 DB0KK TS1
       rxFrequency: 439.5375
       txFrequency: 431.9375
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -306,12 +306,12 @@ channels:
       name: BB DB0KK TS2
       rxFrequency: 439.5375
       txFrequency: 431.9375
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -320,12 +320,12 @@ channels:
       name: DB0OUD TS1
       rxFrequency: 438.625
       txFrequency: 431.025
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont1
       roaming: !<!default> ""
@@ -334,12 +334,12 @@ channels:
       name: TG8 DB0OUD TS2
       rxFrequency: 438.625
       txFrequency: 431.025
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -348,12 +348,12 @@ channels:
       name: TG9 DB0OUD TS2
       rxFrequency: 438.625
       txFrequency: 431.025
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -362,12 +362,12 @@ channels:
       name: BB DB0OUD TS2
       rxFrequency: 438.625
       txFrequency: 431.025
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -376,12 +376,12 @@ channels:
       name: TG9 DB0TU TS1
       rxFrequency: 439.575
       txFrequency: 431.975
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -390,12 +390,12 @@ channels:
       name: BB DB0TU TS2
       rxFrequency: 439.575
       txFrequency: 431.975
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -404,12 +404,12 @@ channels:
       name: DM0MOT TS1
       rxFrequency: 439.525
       txFrequency: 431.925
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont1
       roaming: !<!default> ""
@@ -418,12 +418,12 @@ channels:
       name: TG8 DM0MOT TS2
       rxFrequency: 439.525
       txFrequency: 431.925
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -432,12 +432,12 @@ channels:
       name: TG9 DM0MOT TS2
       rxFrequency: 439.525
       txFrequency: 431.925
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -446,12 +446,12 @@ channels:
       name: BB DM0MOT TS2
       rxFrequency: 439.525
       txFrequency: 431.925
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -460,12 +460,12 @@ channels:
       name: DB0TA TS1
       rxFrequency: 439.475
       txFrequency: 431.875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -474,12 +474,12 @@ channels:
       name: TG8 DB0TA TS2
       rxFrequency: 439.475
       txFrequency: 431.875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -488,12 +488,12 @@ channels:
       name: TG9 DB0TA TS2
       rxFrequency: 439.475
       txFrequency: 431.875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -502,12 +502,12 @@ channels:
       name: BB DB0TA TS2
       rxFrequency: 439.475
       txFrequency: 431.875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -516,12 +516,12 @@ channels:
       name: DB0FX TS1
       rxFrequency: 439.45
       txFrequency: 431.85
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -530,12 +530,12 @@ channels:
       name: TG8 DB0FX TS2
       rxFrequency: 439.45
       txFrequency: 431.85
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -544,12 +544,12 @@ channels:
       name: TG9 DB0FX TS2
       rxFrequency: 439.45
       txFrequency: 431.85
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -558,12 +558,12 @@ channels:
       name: BB DB0FX TS2
       rxFrequency: 439.45
       txFrequency: 431.85
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -572,12 +572,12 @@ channels:
       name: DB0PDM TS1
       rxFrequency: 438.4
       txFrequency: 430.8
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -586,12 +586,12 @@ channels:
       name: TG8 DB0PDM TS2
       rxFrequency: 438.4
       txFrequency: 430.8
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -600,12 +600,12 @@ channels:
       name: TG9 DB0PDM TS2
       rxFrequency: 438.4
       txFrequency: 430.8
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -614,12 +614,12 @@ channels:
       name: BB DB0PDM TS2
       rxFrequency: 438.4
       txFrequency: 430.8
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -628,12 +628,12 @@ channels:
       name: DB0BRB TS1
       rxFrequency: 439.4875
       txFrequency: 431.8875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -642,12 +642,12 @@ channels:
       name: TG8 DB0BRB TS2
       rxFrequency: 439.4875
       txFrequency: 431.8875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -656,12 +656,12 @@ channels:
       name: TG9 DB0BRB TS2
       rxFrequency: 439.4875
       txFrequency: 431.8875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -670,12 +670,12 @@ channels:
       name: BB DB0BRB TS2
       rxFrequency: 439.4875
       txFrequency: 431.8875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -684,12 +684,12 @@ channels:
       name: DB0SPN TS1
       rxFrequency: 439.4875
       txFrequency: 431.8875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -698,12 +698,12 @@ channels:
       name: R/TG9 DB0SPN TS2
       rxFrequency: 439.4875
       txFrequency: 431.8875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -712,12 +712,12 @@ channels:
       name: DB0NLS TS1
       rxFrequency: 439.5125
       txFrequency: 431.9125
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -726,12 +726,12 @@ channels:
       name: R/TG9 DB0NLS TS2
       rxFrequency: 439.5125
       txFrequency: 431.9125
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -740,12 +740,12 @@ channels:
       name: DB0LS TS1
       rxFrequency: 438.225
       txFrequency: 430.625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -754,12 +754,12 @@ channels:
       name: TG8 DB0LS TS2
       rxFrequency: 438.225
       txFrequency: 430.625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -768,12 +768,12 @@ channels:
       name: TG9 DB0LS TS2
       rxFrequency: 438.225
       txFrequency: 430.625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -782,12 +782,12 @@ channels:
       name: BB DB0LS TS2
       rxFrequency: 438.225
       txFrequency: 430.625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -796,12 +796,12 @@ channels:
       name: DM0LC TS1
       rxFrequency: 439.3875
       txFrequency: 431.7875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -810,12 +810,12 @@ channels:
       name: TG8 DM0LC TS2
       rxFrequency: 439.3875
       txFrequency: 431.7875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp3
       contact: cont5
       roaming: !<!default> ""
@@ -824,12 +824,12 @@ channels:
       name: TG9 DM0LC TS2
       rxFrequency: 439.3875
       txFrequency: 431.7875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp3
       contact: cont6
       roaming: !<!default> ""
@@ -838,12 +838,12 @@ channels:
       name: Sa/Th DM0LC TS2
       rxFrequency: 439.3875
       txFrequency: 431.7875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp3
       contact: cont8
       roaming: !<!default> ""
@@ -852,12 +852,12 @@ channels:
       name: BB DM0LC TS1
       rxFrequency: 439.3875
       txFrequency: 431.7875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -866,12 +866,12 @@ channels:
       name: DB0FLW TS1
       rxFrequency: 439.5375
       txFrequency: 431.9375
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -880,12 +880,12 @@ channels:
       name: TG8 DB0FLW TS2
       rxFrequency: 439.5375
       txFrequency: 431.9375
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp3
       contact: cont5
       roaming: !<!default> ""
@@ -894,12 +894,12 @@ channels:
       name: TG9 DB0FLW TS2
       rxFrequency: 439.5375
       txFrequency: 431.9375
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp3
       contact: cont6
       roaming: !<!default> ""
@@ -908,12 +908,12 @@ channels:
       name: Sa/Th DB0FLW TS2
       rxFrequency: 439.5375
       txFrequency: 431.9375
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp3
       contact: cont8
       roaming: !<!default> ""
@@ -922,12 +922,12 @@ channels:
       name: DB0LE TS1
       rxFrequency: 439.575
       txFrequency: 431.975
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -936,12 +936,12 @@ channels:
       name: R/TG9 DB0LE TS2
       rxFrequency: 439.575
       txFrequency: 431.975
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp3
       contact: cont6
       roaming: !<!default> ""
@@ -950,12 +950,12 @@ channels:
       name: DL DB0AFZ TS1
       rxFrequency: 439.975
       txFrequency: 430.575
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp1
       contact: cont3
       roaming: !<!default> ""
@@ -964,12 +964,12 @@ channels:
       name: BB DB0AFZ TS1
       rxFrequency: 439.975
       txFrequency: 430.575
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -978,12 +978,12 @@ channels:
       name: TG9 DB0AFZ TS2
       rxFrequency: 439.975
       txFrequency: 430.575
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp5
       contact: cont6
       roaming: !<!default> ""
@@ -992,12 +992,12 @@ channels:
       name: Hes DB0AFZ TS2
       rxFrequency: 439.975
       txFrequency: 430.575
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitColorCode
+      admit: ColorCode
       colorCode: 1
-      timeSlot: TimeSlot2
+      timeSlot: TS2
       groupList: grp5
       contact: cont10
       roaming: !<!default> ""
@@ -1006,12 +1006,12 @@ channels:
       name: DMR S0
       rxFrequency: 433.45
       txFrequency: 433.45
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1020,12 +1020,12 @@ channels:
       name: DMR S1
       rxFrequency: 433.612
       txFrequency: 433.612
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1034,12 +1034,12 @@ channels:
       name: DMR S2
       rxFrequency: 433.625
       txFrequency: 433.625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1048,12 +1048,12 @@ channels:
       name: DMR S3
       rxFrequency: 433.638
       txFrequency: 433.638
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1062,12 +1062,12 @@ channels:
       name: DMR S4
       rxFrequency: 433.65
       txFrequency: 433.65
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1076,12 +1076,12 @@ channels:
       name: DMR S5
       rxFrequency: 433.663
       txFrequency: 433.663
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1090,12 +1090,12 @@ channels:
       name: DMR S6
       rxFrequency: 433.675
       txFrequency: 433.675
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1104,12 +1104,12 @@ channels:
       name: DMR S7
       rxFrequency: 433.688
       txFrequency: 433.688
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       colorCode: 1
-      timeSlot: TimeSlot1
+      timeSlot: TS1
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1118,10 +1118,10 @@ channels:
       name: DB0LDS
       rxFrequency: 439.5625
       txFrequency: 431.9625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
       rxTone: {ctcss: 67}
@@ -1131,10 +1131,10 @@ channels:
       name: DB0RAG
       rxFrequency: 439.3
       txFrequency: 431.7
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1142,10 +1142,10 @@ channels:
       name: DB0LUD
       rxFrequency: 438.575
       txFrequency: 430.975
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
       rxTone: {ctcss: 67}
@@ -1155,10 +1155,10 @@ channels:
       name: DB0SP-2
       rxFrequency: 145.6
       txFrequency: 145
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1166,10 +1166,10 @@ channels:
       name: DB0SP-70
       rxFrequency: 439.425
       txFrequency: 431.825
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1177,10 +1177,10 @@ channels:
       name: DB0ZOD-2
       rxFrequency: 145.6625
       txFrequency: 145.0625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1188,10 +1188,10 @@ channels:
       name: DB0ZOD-70
       rxFrequency: 438.725
       txFrequency: 431.125
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1199,10 +1199,10 @@ channels:
       name: DB0BRL
       rxFrequency: 145.725
       txFrequency: 145.125
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1210,10 +1210,10 @@ channels:
       name: DB0BLO
       rxFrequency: 439.275
       txFrequency: 431.675
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1221,10 +1221,10 @@ channels:
       name: DB0SX
       rxFrequency: 439.05
       txFrequency: 431.45
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1232,10 +1232,10 @@ channels:
       name: DB0TA
       rxFrequency: 439.125
       txFrequency: 431.525
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1243,10 +1243,10 @@ channels:
       name: DB0PDM
       rxFrequency: 145.675
       txFrequency: 145.075
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1254,10 +1254,10 @@ channels:
       name: DB0CBS
       rxFrequency: 438.85
       txFrequency: 431.25
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1265,10 +1265,10 @@ channels:
       name: DB0AF
       rxFrequency: 438.6375
       txFrequency: 431.0375
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1276,10 +1276,10 @@ channels:
       name: DB0NFL
       rxFrequency: 438.95
       txFrequency: 431.35
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1287,10 +1287,10 @@ channels:
       name: DB0LMM
       rxFrequency: 439.3
       txFrequency: 431.7
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1298,10 +1298,10 @@ channels:
       name: DM0LEI
       rxFrequency: 439.15
       txFrequency: 431.55
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1309,10 +1309,10 @@ channels:
       name: DB0LEI
       rxFrequency: 145.775
       txFrequency: 145.175
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1320,10 +1320,10 @@ channels:
       name: DB0SML
       rxFrequency: 439.275
       txFrequency: 431.675
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1331,10 +1331,10 @@ channels:
       name: DB0LSA
       rxFrequency: 145.6625
       txFrequency: 145.0625
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1342,10 +1342,10 @@ channels:
       name: DB0LE
       rxFrequency: 438.7875
       txFrequency: 431.1875
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1353,10 +1353,10 @@ channels:
       name: DOK Y07
       rxFrequency: 144.675
       txFrequency: 144.675
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1364,10 +1364,10 @@ channels:
       name: DOK D20
       rxFrequency: 144.65
       txFrequency: 144.65
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1375,10 +1375,10 @@ channels:
       name: DOK D23
       rxFrequency: 145.375
       txFrequency: 145.375
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1386,10 +1386,10 @@ channels:
       name: DOK S31
       rxFrequency: 144.725
       txFrequency: 144.725
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1397,10 +1397,10 @@ channels:
       name: S20
       rxFrequency: 145.3
       txFrequency: 145.3
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1408,10 +1408,10 @@ channels:
       name: 2m Mobil
       rxFrequency: 145.5
       txFrequency: 145.5
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1419,10 +1419,10 @@ channels:
       name: 70cm Mobil
       rxFrequency: 433.5
       txFrequency: 433.5
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1430,10 +1430,10 @@ channels:
       name: APRS
       rxFrequency: 144.8
       txFrequency: 144.8
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
       aprs: aprs2
@@ -1442,10 +1442,10 @@ channels:
       name: ISS APRS
       rxFrequency: 145.825
       txFrequency: 145.825
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1453,10 +1453,10 @@ channels:
       name: ISS FM Rep
       rxFrequency: 437.8
       txFrequency: 145.99
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
       txTone: {ctcss: 67}
@@ -1465,10 +1465,10 @@ channels:
       name: CAS-3H FM
       rxFrequency: 437.2
       txFrequency: 144.35
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1476,10 +1476,10 @@ channels:
       name: PO-101 FM
       rxFrequency: 145.9
       txFrequency: 437.5
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1487,10 +1487,10 @@ channels:
       name: SO-50 FM
       rxFrequency: 436.79
       txFrequency: 145.85
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
       txTone: {ctcss: 67}
@@ -1499,10 +1499,10 @@ channels:
       name: AO-92 FM
       rxFrequency: 145.88
       txFrequency: 435.35
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
       txTone: {ctcss: 67}
@@ -1511,10 +1511,10 @@ channels:
       name: AO-91 FM
       rxFrequency: 145.96
       txFrequency: 435.25
-      power: HighPower
+      power: High
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
       txTone: {ctcss: 67}
@@ -1523,10 +1523,10 @@ channels:
       name: U0
       rxFrequency: 430.2
       txFrequency: 430.2
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1534,10 +1534,10 @@ channels:
       name: U1
       rxFrequency: 430.225
       txFrequency: 430.225
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1545,10 +1545,10 @@ channels:
       name: U2
       rxFrequency: 430.25
       txFrequency: 430.25
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1556,10 +1556,10 @@ channels:
       name: U3
       rxFrequency: 430.275
       txFrequency: 430.275
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitNone
+      admit: Always
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1567,10 +1567,10 @@ channels:
       name: PMR 1
       rxFrequency: 446.00625
       txFrequency: 446.00625
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1578,10 +1578,10 @@ channels:
       name: PMR 2
       rxFrequency: 446.01875
       txFrequency: 446.01875
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1589,10 +1589,10 @@ channels:
       name: PMR 3
       rxFrequency: 446.03125
       txFrequency: 446.03125
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1600,10 +1600,10 @@ channels:
       name: PMR 4
       rxFrequency: 446.04375
       txFrequency: 446.04375
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1611,10 +1611,10 @@ channels:
       name: PMR 5
       rxFrequency: 446.05625
       txFrequency: 446.05625
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1622,10 +1622,10 @@ channels:
       name: PMR 6
       rxFrequency: 446.06875
       txFrequency: 446.06875
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1633,10 +1633,10 @@ channels:
       name: PMR 7
       rxFrequency: 446.08125
       txFrequency: 446.08125
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1644,10 +1644,10 @@ channels:
       name: PMR 8
       rxFrequency: 446.09375
       txFrequency: 446.09375
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1655,10 +1655,10 @@ channels:
       name: PMR 9
       rxFrequency: 446.10625
       txFrequency: 446.10625
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1666,10 +1666,10 @@ channels:
       name: PMR 10
       rxFrequency: 446.11875
       txFrequency: 446.11875
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1677,10 +1677,10 @@ channels:
       name: PMR 11
       rxFrequency: 446.13125
       txFrequency: 446.13125
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1688,10 +1688,10 @@ channels:
       name: PMR 12
       rxFrequency: 446.14375
       txFrequency: 446.14375
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1699,10 +1699,10 @@ channels:
       name: PMR 13
       rxFrequency: 446.15625
       txFrequency: 446.15625
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1710,10 +1710,10 @@ channels:
       name: PMR 14
       rxFrequency: 446.16875
       txFrequency: 446.16875
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1721,10 +1721,10 @@ channels:
       name: PMR 15
       rxFrequency: 446.18125
       txFrequency: 446.18125
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
   - analog:
@@ -1732,10 +1732,10 @@ channels:
       name: PMR 16
       rxFrequency: 446.19375
       txFrequency: 446.19375
-      power: LowPower
+      power: Low
       timeout: 0
       rxOnly: false
-      admit: AdmitFree
+      admit: Free
       squelch: 1
       bandwidth: Narrow
 zones:

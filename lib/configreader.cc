@@ -459,7 +459,7 @@ ConfigReader::parseSettings(Config *config, const YAML::Node &node, ConfigObject
     config->setIntroLine1(QString::fromStdString(node["introLine1"].as<std::string>()));
   }
   if (node["introLine2"] && node["introLine2"].IsScalar()) {
-    config->setIntroLine1(QString::fromStdString(node["introLine2"].as<std::string>()));
+    config->setIntroLine2(QString::fromStdString(node["introLine2"].as<std::string>()));
   }
 
   return true;
@@ -1323,8 +1323,8 @@ DigitalChannelReader::addExtension(const QString &name, AbstractConfigReader *re
 
 ConfigObject *
 DigitalChannelReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return new DigitalChannel("", 0,0, Channel::LowPower, -1, false, DigitalChannel::AdmitNone, 0,
-                            DigitalChannel::TimeSlot1, nullptr, nullptr, nullptr, nullptr, nullptr,
+  return new DigitalChannel("", 0,0, Channel::Power::Low, -1, false, DigitalChannel::Admit::Always, 0,
+                            DigitalChannel::TimeSlot::TS1, nullptr, nullptr, nullptr, nullptr, nullptr,
                             nullptr);
 }
 
@@ -1372,9 +1372,9 @@ AnalogChannelReader::addExtension(const QString &name, AbstractConfigReader *rea
 
 ConfigObject *
 AnalogChannelReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return new AnalogChannel("", 0,0, Channel::LowPower, -1, false, AnalogChannel::AdmitNone,
+  return new AnalogChannel("", 0,0, Channel::Power::Low, -1, false, AnalogChannel::Admit::Always,
                            1, Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE,
-                           AnalogChannel::Narrow, nullptr, nullptr);
+                           AnalogChannel::Bandwidth::Narrow, nullptr, nullptr);
 }
 
 bool
@@ -1589,6 +1589,9 @@ PositioningReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject
 
 bool
 PositioningReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  if (! ObjectReader::link(obj, node, ctx))
+    return false;
+
   if (! linkExtensions(_extensions, obj, node, ctx))
     return false;
 
@@ -1711,19 +1714,6 @@ APRSSystemReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject:
         path.append(QString::fromStdString(it->as<std::string>()));
     }
     system->setPath(path.join(""));
-  }
-
-  if (node["icon"] && node["icon"].IsScalar()) {
-    system->setIcon(
-          name2aprsicon(
-            QString::fromStdString(node["icon"].as<std::string>())));
-  } else {
-    _errorMessage = tr("Cannot parse APRS system '%1': No icon specified.").arg(system->name());
-    return false;
-  }
-
-  if (node["message"] && node["message"].IsScalar()) {
-    system->setMessage(QString::fromStdString(node["message"].as<std::string>()));
   }
 
   if (! parseExtensions(_extensions, obj, node, ctx))
