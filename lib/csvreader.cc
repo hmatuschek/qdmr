@@ -1960,7 +1960,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
 
     // check radio ID
     if (-1 == radioID) {
-      _channels[idx]->as<DigitalChannel>()->setRadioIdObj(nullptr);
+      _channels[idx]->as<DigitalChannel>()->setRadioIdObj(DefaultRadioID::get());
     } else if ((0 < radioID) && (_radioIDs.contains(radioID))) {
       _channels[idx]->as<DigitalChannel>()->setRadioIdObj(_radioIDs[radioID]);
     } else {

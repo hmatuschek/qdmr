@@ -38,27 +38,13 @@ contacts:
   - dmr: {id: cont27, name: DG1RPH Peter, ring: true, type: PrivateCall, number: 2621528}
   - dmr: {id: cont28, name: DO1RPH Richard, ring: false, type: PrivateCall, number: 2634160}
 groupLists:
-  - id: grp1
-    name: DL
-    contacts: [cont1, cont2, cont3]
-  - id: grp2
-    name: Berlin/Brand
-    contacts: [cont6, cont5, cont7]
-  - id: grp3
-    name: Sa/Th
-    contacts: [cont5, cont6, cont8]
-  - id: grp4
-    name: SA/MV
-    contacts: [cont5, cont6, cont9]
-  - id: grp5
-    name: Hessen
-    contacts: [cont5, cont6, cont10]
-  - id: grp6
-    name: Simplex
-    contacts: [cont6, cont13, cont12]
-  - id: grp7
-    name: Ham Radio Village
-    contacts: [cont11]
+  - {id: grp1, name: DL, contacts: [cont1, cont2, cont3]}
+  - {id: grp2, name: Berlin/Brand, contacts: [cont6, cont5, cont7]}
+  - {id: grp3, name: Sa/Th, contacts: [cont5, cont6, cont8]}
+  - {id: grp4, name: SA/MV, contacts: [cont5, cont6, cont9]}
+  - {id: grp5, name: Hessen, contacts: [cont5, cont6, cont10]}
+  - {id: grp6, name: Simplex, contacts: [cont6, cont13, cont12]}
+  - {id: grp7, name: Ham Radio Village, contacts: [cont11]}
 channels:
   - digital:
       id: ch1
@@ -71,6 +57,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -85,6 +72,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp3
       contact: cont8
       roaming: !<!default> ""
@@ -99,6 +87,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -114,6 +103,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -129,6 +119,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -144,6 +135,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp7
       contact: cont11
       roaming: !<!default> ""
@@ -158,6 +150,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont1
       roaming: !<!default> ""
@@ -172,6 +165,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -186,6 +180,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -200,6 +195,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -214,6 +210,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -228,6 +225,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -242,6 +240,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -256,6 +255,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -270,6 +270,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -284,6 +285,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -298,6 +300,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -312,6 +315,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -326,6 +330,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont1
       roaming: !<!default> ""
@@ -340,6 +345,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -354,6 +360,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -368,6 +375,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -382,6 +390,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -396,6 +405,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -410,6 +420,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont1
       roaming: !<!default> ""
@@ -424,6 +435,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -438,6 +450,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -452,6 +465,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -466,6 +480,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -480,6 +495,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -494,6 +510,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -508,6 +525,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -522,6 +540,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -536,6 +555,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -550,6 +570,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -564,6 +585,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -578,6 +600,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -592,6 +615,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -606,6 +630,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -620,6 +645,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -634,6 +660,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -648,6 +675,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -662,6 +690,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -676,6 +705,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -690,6 +720,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -704,6 +735,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -718,6 +750,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -732,6 +765,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -746,6 +780,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -760,6 +795,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
@@ -774,6 +810,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
@@ -788,6 +825,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -802,6 +840,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -816,6 +855,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp3
       contact: cont5
       roaming: !<!default> ""
@@ -830,6 +870,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp3
       contact: cont6
       roaming: !<!default> ""
@@ -844,6 +885,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp3
       contact: cont8
       roaming: !<!default> ""
@@ -858,6 +900,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -872,6 +915,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -886,6 +930,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp3
       contact: cont5
       roaming: !<!default> ""
@@ -900,6 +945,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp3
       contact: cont6
       roaming: !<!default> ""
@@ -914,6 +960,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp3
       contact: cont8
       roaming: !<!default> ""
@@ -928,6 +975,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
@@ -942,6 +990,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp3
       contact: cont6
       roaming: !<!default> ""
@@ -956,6 +1005,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp1
       contact: cont3
       roaming: !<!default> ""
@@ -970,6 +1020,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
@@ -984,6 +1035,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp5
       contact: cont6
       roaming: !<!default> ""
@@ -998,6 +1050,7 @@ channels:
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
+      radioID: !<!default> ""
       groupList: grp5
       contact: cont10
       roaming: !<!default> ""
@@ -1012,6 +1065,7 @@ channels:
       admit: Free
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1026,6 +1080,7 @@ channels:
       admit: Free
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1040,6 +1095,7 @@ channels:
       admit: Free
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1054,6 +1110,7 @@ channels:
       admit: Free
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1068,6 +1125,7 @@ channels:
       admit: Free
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1082,6 +1140,7 @@ channels:
       admit: Free
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1096,6 +1155,7 @@ channels:
       admit: Free
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""
@@ -1110,6 +1170,7 @@ channels:
       admit: Free
       colorCode: 1
       timeSlot: TS1
+      radioID: !<!default> ""
       groupList: grp6
       contact: cont12
       roaming: !<!default> ""

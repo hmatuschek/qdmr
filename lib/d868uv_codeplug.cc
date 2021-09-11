@@ -624,10 +624,16 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
       gps_system = conf->posSystems()->indexOfGPSSys(dc->aprsObj()->as<GPSSystem>());
     }
     // Set radio ID
-    if (nullptr != dc->radioIdObj())
+    if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
+      if (nullptr == conf->radioIDs()->defaultId()) {
+        logWarn() << "No default radio ID set: using index 0.";
+        id_index = 0;
+      } else {
+        id_index = conf->radioIDs()->indexOf(conf->radioIDs()->defaultId());
+      }
+    } else {
       id_index = conf->radioIDs()->indexOf(dc->radioIdObj());
-    else
-      id_index = 0;
+    }
   }
 }
 

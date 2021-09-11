@@ -115,6 +115,14 @@
           on <filename>.conf</filename> or <filename>.csv</filename>.</para></listitem>
       </varlistentry>
       <varlistentry>
+        <term><option>-y</option> or <option>--yaml</option></term>
+        <listitem><para>Specifies the file format for the input or output file
+          for the <command>verify</command>, <command>read</command> and
+          <command>write</command> commands. This option is not needed if the
+          filetype can be inferred from the filename. That is, if the file ends
+          on <filename>.yaml</filename>.</para></listitem>
+      </varlistentry>
+      <varlistentry>
         <term><option>-b</option> or <option>--bin</option></term>
         <listitem><para>Specifies the file format for the input or output file
           for the <command>verify</command>, <command>read</command> and

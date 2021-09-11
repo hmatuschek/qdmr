@@ -35,55 +35,55 @@ public:
   {
   public:
     /** Possible modes for the channel, i.e. analog and digital. */
-    typedef enum {
+    enum Mode {
       MODE_ANALOG  = 1,             ///< Analog channel.
       MODE_DIGITAL = 2              ///< Digital channel.
-    } Mode;
+    };
 
     /** Bandwidth of the channel. */
-    typedef enum {
+    enum Bandwidth {
       BW_12_5_KHZ = 0,              ///< 12.5 kHz narrow, (default for binary channels).
       BW_20_KHZ   = 1,              ///< 20 kHz (really?)
       BW_25_KHZ   = 2               ///< 25kHz wide.
-    } Bandwidth;
+    };
 
     /** Possible privacy types. */
-    typedef enum {
+    enum PrivacyType {
       PRIV_NONE = 0,                ///< No privacy.
       PRIV_BASIC = 1,               ///< Basic privacy.
       PRIV_ENHANCED = 2             ///< Enhenced privacy.
-    } PrivacyType;
+    };
 
     /** I have absolutely no idea what this means. */
-    typedef enum {
+    enum RefFrequency {
       REF_LOW = 0,
       REF_MEDIUM = 1,
       REF_HIGH = 2
-    } RefFrequency;
+    };
 
     /** TX Admit criterion. */
-    typedef enum {
+    enum Admit {
       ADMIT_ALWAYS = 0,             ///< Always allow TX.
       ADMIT_CH_FREE = 1,            ///< Allow TX if channel is free.
       ADMIT_TONE = 2,               ///< Allow TX if CTCSS tone matches.
       ADMIT_COLOR = 3,              ///< Allow TX if color-code matches.
-    } Admit;
+    };
 
     /** Again, I have no idea. */
-    typedef enum {
+    enum InCall {
       INCALL_ALWAYS = 0,
       INCALL_ADMIT = 1,
       INCALL_TXINT = 2
-    } InCall;
+    };
 
     /** Turn-off tone frequency.
      * This radio has a feature that allows to disable radios remotely by sending a specific tone.
      * Certainly not a feature used in ham-radio. */
-    typedef enum {
+    enum TurnOffFreq {
       TURNOFF_NONE = 3,             ///< Turn-off disabled. Default!
       TURNOFF_259_2HZ = 0,          ///< Turn-off on 259.2Hz tone.
       TURNOFF_55_2HZ = 1            ///< Turn-off on 55.2Hz tone.
-    } TurnOffFreq;
+    };
 
 
   protected:
