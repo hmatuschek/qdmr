@@ -178,6 +178,7 @@ public:
     /** Hidden constrcutor. */
     Context();
 
+  public:
     /** Resolves the given index for the specifies element type.
      * @returns @c nullptr if the index is not defined or the type is unknown. */
     ConfigObject *obj(const QMetaObject *elementType, uint idx);
@@ -186,6 +187,18 @@ public:
     int index(ConfigObject *obj);
     /** Associates the given object with the given index. */
     bool add(ConfigObject *obj, uint idx);
+
+    /** Returns the object associated by the given index and type. */
+    template <class T>
+    T* get(uint idx) {
+      return this->obj(&(T::staticMetaObject), idx)->template as<T>();
+    }
+
+    /** Returns @c true, if the given index is defined for the specified type. */
+    template <class T>
+    bool has(uint idx) {
+      return nullptr != this->obj(&(T::staticMetaObject), idx)->template as<T>();
+    }
 
   protected:
     /** Internal used table type to associate objects and indices. */
