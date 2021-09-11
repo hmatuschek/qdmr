@@ -1109,7 +1109,7 @@ public:
   {
   public:
     /** The possible button actions. */
-    typedef enum TyTButtonSettingsExtension::ButtonAction ButtonAction;
+    typedef enum TyTButtonSettings::ButtonAction ButtonAction;
 
   protected:
     /** Hidden constructor. */

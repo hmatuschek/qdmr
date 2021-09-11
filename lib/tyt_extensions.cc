@@ -2,9 +2,9 @@
 #include "logger.hh"
 
 /* ******************************************************************************************** *
- * Implementation of TyTButtonSettingsExtension
+ * Implementation of TyTButtonSettings
  * ******************************************************************************************** */
-TyTButtonSettingsExtension::TyTButtonSettingsExtension(QObject *parent)
+TyTButtonSettings::TyTButtonSettings(QObject *parent)
   : ConfigExtension("btn", parent)
 {
   _sideButton1Short = Disabled;
@@ -15,52 +15,52 @@ TyTButtonSettingsExtension::TyTButtonSettingsExtension(QObject *parent)
 }
 
 bool
-TyTButtonSettingsExtension::label(Context &context) {
+TyTButtonSettings::label(Context &context) {
   return true;
 }
 
-TyTButtonSettingsExtension::ButtonAction
-TyTButtonSettingsExtension::sideButton1Short() const {
+TyTButtonSettings::ButtonAction
+TyTButtonSettings::sideButton1Short() const {
   return _sideButton1Short;
 }
 void
-TyTButtonSettingsExtension::setSideButton1Short(ButtonAction action) {
+TyTButtonSettings::setSideButton1Short(ButtonAction action) {
   _sideButton1Short = action;
 }
 
-TyTButtonSettingsExtension::ButtonAction
-TyTButtonSettingsExtension::sideButton1Long() const {
+TyTButtonSettings::ButtonAction
+TyTButtonSettings::sideButton1Long() const {
   return _sideButton1Long;
 }
 void
-TyTButtonSettingsExtension::setSideButton1Long(ButtonAction action) {
+TyTButtonSettings::setSideButton1Long(ButtonAction action) {
   _sideButton1Long = action;
 }
 
-TyTButtonSettingsExtension::ButtonAction
-TyTButtonSettingsExtension::sideButton2Short() const {
+TyTButtonSettings::ButtonAction
+TyTButtonSettings::sideButton2Short() const {
   return _sideButton2Short;
 }
 void
-TyTButtonSettingsExtension::setSideButton2Short(ButtonAction action) {
+TyTButtonSettings::setSideButton2Short(ButtonAction action) {
   _sideButton2Short = action;
 }
 
-TyTButtonSettingsExtension::ButtonAction
-TyTButtonSettingsExtension::sideButton2Long() const {
+TyTButtonSettings::ButtonAction
+TyTButtonSettings::sideButton2Long() const {
   return _sideButton2Long;
 }
 void
-TyTButtonSettingsExtension::setSideButton2Long(ButtonAction action) {
+TyTButtonSettings::setSideButton2Long(ButtonAction action) {
   _sideButton2Long = action;
 }
 
 uint
-TyTButtonSettingsExtension::longPressDuration() const {
+TyTButtonSettings::longPressDuration() const {
   return _longPressDuration;
 }
 void
-TyTButtonSettingsExtension::setLongPressDuration(uint dur) {
+TyTButtonSettings::setLongPressDuration(uint dur) {
   _longPressDuration = dur;
 }
 
@@ -70,8 +70,7 @@ TyTButtonSettingsExtension::setLongPressDuration(uint dur) {
  * ******************************************************************************************** */
 // Register extension to config reader
 AbstractConfigReader *
-TyTButtonSettingsReader::instance = ConfigReader::addExtension(
-      TyTButtonSettingsExtension::staticMetaObject.className(), new TyTButtonSettingsReader());
+TyTButtonSettingsReader::instance = ConfigReader::addExtension(new TyTButtonSettingsReader());
 
 TyTButtonSettingsReader::TyTButtonSettingsReader(QObject *parent)
   : ExtensionReader(parent)
@@ -81,5 +80,5 @@ TyTButtonSettingsReader::TyTButtonSettingsReader(QObject *parent)
 
 ConfigObject *
 TyTButtonSettingsReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return new TyTButtonSettingsExtension();
+  return new TyTButtonSettings();
 }

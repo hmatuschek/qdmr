@@ -6,7 +6,7 @@
 
 /** Represents the TyT button settings extension.
  * @ingroup tyt */
-class TyTButtonSettingsExtension : public ConfigExtension
+class TyTButtonSettings : public ConfigExtension
 {
   Q_OBJECT
 
@@ -57,7 +57,7 @@ public:
 
 public:
   /** Constructor. */
-  explicit TyTButtonSettingsExtension(QObject *parent=nullptr);
+  explicit TyTButtonSettings(QObject *parent=nullptr);
 
   bool label(Context &context);
 
@@ -103,6 +103,7 @@ protected:
 class TyTButtonSettingsReader: public ExtensionReader
 {
   Q_OBJECT
+  Q_CLASSINFO("name", "tytButtonSettings")
 
 public:
   /** Constructor. */

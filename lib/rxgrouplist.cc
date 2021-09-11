@@ -84,6 +84,13 @@ RXGroupList::contacts() {
   return &_contacts;
 }
 
+YAML::Node
+RXGroupList::serialize(const Context &context) {
+  YAML::Node node = ConfigObject::serialize(context);
+  node.SetStyle(YAML::EmitterStyle::Flow);
+  return node;
+}
+
 void
 RXGroupList::onModified() {
   emit modified(this);

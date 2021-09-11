@@ -53,6 +53,8 @@ public:
   /** Returns the contact list. */
   DigitalContactRefList *contacts();
 
+  YAML::Node serialize(const Context &context);
+
 protected slots:
   /** Internal used callback to handle list modifications. */
   void onModified();

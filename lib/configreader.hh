@@ -205,7 +205,7 @@ public:
 public:
   /** Adds an extension to the config parser.
    * At this level, device specific codeplug elements and radio-wide settings can be added. */
-  static AbstractConfigReader *addExtension(const QString &name, AbstractConfigReader *reader);
+  static AbstractConfigReader *addExtension(ExtensionReader *reader);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -246,7 +246,7 @@ public:
 
 public:
   /** Adds an extension to the config parser. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static bool addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -271,7 +271,7 @@ public:
 public:
   /** Adds an extension to the config parser.
    * At this level, extensions for all channels can be added. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static bool addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -296,7 +296,7 @@ public:
 public:
   /** Adds an extension to the config parser.
    * At this level, extensions to digital channels can be added. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static bool addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -321,7 +321,7 @@ public:
 public:
   /** Adds an extension to the config parser.
    * At this level, extension to analog channels can be added. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static bool addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -345,7 +345,7 @@ public:
 
 public:
   /** Adds an extension to the config parser. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static bool addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -370,7 +370,7 @@ public:
 public:
   /** Adds an extension to the config parser.
    * At this level, extensions to all contact types can be added. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static bool addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -395,7 +395,7 @@ public:
 public:
   /** Adds an extension to the config parser.
    * At this level, extensions to all digital contacts can be added. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static bool addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -420,7 +420,7 @@ public:
 public:
   /** Adds an extension to the config parser.
    * At this level, extension to all positioning systems can be added. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static bool addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -444,7 +444,7 @@ public:
 
 public:
   /** Adds an extension to the config parser. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static bool addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -468,7 +468,7 @@ public:
 
 public:
   /** Adds an extension to the config parser. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static bool addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -492,7 +492,7 @@ public:
 
 public:
   /** Adds an extension to the config parser. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static bool addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -516,7 +516,7 @@ public:
 
 public:
   /** Adds an extension to the config parser. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static bool addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */
@@ -540,7 +540,7 @@ public:
 
 public:
   /** Adds an extension to the config parser. */
-  static bool addExtension(const QString &name, AbstractConfigReader *);
+  static bool addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */

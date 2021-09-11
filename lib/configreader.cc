@@ -305,9 +305,15 @@ ConfigReader::ConfigReader(QObject *parent)
 }
 
 AbstractConfigReader *
-ConfigReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+ConfigReader::addExtension(ExtensionReader *reader) {
+  QString name = reader->metaObject()->className();
+  if (0 <= reader->metaObject()->indexOfClassInfo("name")) {
+    name = reader->metaObject()->classInfo(reader->metaObject()->indexOfClassInfo("name")).value();
+  }
+
   if (_extensions.contains(name))
     return nullptr;
+
   _extensions[name] = reader;
   return reader;
 }
@@ -1225,10 +1231,14 @@ RadioIdReader::RadioIdReader(QObject *parent)
 }
 
 bool
-RadioIdReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+RadioIdReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
   if (_extensions.contains(name))
     return false;
-  _extensions[name] = reader;
+  _extensions[name] = ext;
   return true;
 }
 
@@ -1271,10 +1281,14 @@ ChannelReader::ChannelReader(QObject *parent)
 }
 
 bool
-ChannelReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+ChannelReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
   if (_extensions.contains(name))
     return false;
-  _extensions[name] = reader;
+  _extensions[name] = ext;
   return true;
 }
 
@@ -1314,10 +1328,14 @@ DigitalChannelReader::DigitalChannelReader(QObject *parent)
 }
 
 bool
-DigitalChannelReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+DigitalChannelReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
   if (_extensions.contains(name))
     return false;
-  _extensions[name] = reader;
+  _extensions[name] = ext;
   return true;
 }
 
@@ -1363,10 +1381,14 @@ AnalogChannelReader::AnalogChannelReader(QObject *parent)
 }
 
 bool
-AnalogChannelReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+AnalogChannelReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
   if (_extensions.contains(name))
     return false;
-  _extensions[name] = reader;
+  _extensions[name] = ext;
   return true;
 }
 
@@ -1436,10 +1458,14 @@ ZoneReader::ZoneReader(QObject *parent)
 }
 
 bool
-ZoneReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+ZoneReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
   if (_extensions.contains(name))
     return false;
-  _extensions[name] = reader;
+  _extensions[name] = ext;
   return true;
 }
 
@@ -1483,10 +1509,14 @@ ContactReader::ContactReader(QObject *parent)
 }
 
 bool
-ContactReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+ContactReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
   if (_extensions.contains(name))
     return false;
-  _extensions[name] = reader;
+  _extensions[name] = ext;
   return true;
 }
 
@@ -1522,10 +1552,14 @@ DMRContactReader::DMRContactReader(QObject *parent)
 }
 
 bool
-DMRContactReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+DMRContactReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
   if (_extensions.contains(name))
     return false;
-  _extensions[name] = reader;
+  _extensions[name] = ext;
   return true;
 }
 
@@ -1569,10 +1603,14 @@ PositioningReader::PositioningReader(QObject *parent)
 }
 
 bool
-PositioningReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+PositioningReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
   if (_extensions.contains(name))
     return false;
-  _extensions[name] = reader;
+  _extensions[name] = ext;
   return true;
 }
 
@@ -1611,10 +1649,14 @@ GPSSystemReader::GPSSystemReader(QObject *parent)
 }
 
 bool
-GPSSystemReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+GPSSystemReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
   if (_extensions.contains(name))
     return false;
-  _extensions[name] = reader;
+  _extensions[name] = ext;
   return true;
 }
 
@@ -1658,10 +1700,14 @@ APRSSystemReader::APRSSystemReader(QObject *parent)
 }
 
 bool
-APRSSystemReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+APRSSystemReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
   if (_extensions.contains(name))
     return false;
-  _extensions[name] = reader;
+  _extensions[name] = ext;
   return true;
 }
 
@@ -1746,10 +1792,14 @@ ScanListReader::ScanListReader(QObject *parent)
 }
 
 bool
-ScanListReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+ScanListReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
   if (_extensions.contains(name))
     return false;
-  _extensions[name] = reader;
+  _extensions[name] = ext;
   return true;
 }
 
@@ -1793,10 +1843,14 @@ GroupListReader::GroupListReader(QObject *parent)
 }
 
 bool
-GroupListReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+GroupListReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
   if (_extensions.contains(name))
     return false;
-  _extensions[name] = reader;
+  _extensions[name] = ext;
   return true;
 }
 
@@ -1842,10 +1896,14 @@ RoamingReader::RoamingReader(QObject *parent)
 }
 
 bool
-RoamingReader::addExtension(const QString &name, AbstractConfigReader *reader) {
+RoamingReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
   if (_extensions.contains(name))
     return false;
-  _extensions[name] = reader;
+  _extensions[name] = ext;
   return true;
 }
 
