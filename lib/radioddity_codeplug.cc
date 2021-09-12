@@ -1586,6 +1586,491 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &
 
 
 /* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::ButtonSettingsElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::ButtonSettingsElement::ButtonSettingsElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ButtonSettingsElement::ButtonSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x0020)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ButtonSettingsElement::~ButtonSettingsElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::ButtonSettingsElement::clear() {
+  setUInt8(0x0000, 0x01);
+  setLongPressDuration(1500);
+  setSK1ShortPress(Action::ZoneSelect);
+  setSK1LongPress(Action::ToggleFMRadio);
+  setSK2ShortPress(Action::ToggleMonitor);
+  setSK2LongPress(Action::ToggleFlashLight);
+  setTKShortPress(Action::BatteryIndicator);
+  setTKLongPress(Action::ToggleVox);
+  memset(_data+0x0008, 0xff, 6*4);
+}
+
+uint
+RadioddityCodeplug::ButtonSettingsElement::longPressDuration() const {
+  return uint(getUInt8(0x0001))*250;
+}
+void
+RadioddityCodeplug::ButtonSettingsElement::setLongPressDuration(uint ms) {
+  setUInt8(0x0001, ms/250);
+}
+
+RadioddityCodeplug::ButtonSettingsElement::Action
+RadioddityCodeplug::ButtonSettingsElement::sk1ShortPress() const {
+  return (Action) getUInt8(0x0002);
+}
+void
+RadioddityCodeplug::ButtonSettingsElement::setSK1ShortPress(Action action) {
+  setUInt8(0x0002, (uint)action);
+}
+RadioddityCodeplug::ButtonSettingsElement::Action
+RadioddityCodeplug::ButtonSettingsElement::sk1LongPress() const {
+  return (Action) getUInt8(0x0003);
+}
+void
+RadioddityCodeplug::ButtonSettingsElement::setSK1LongPress(Action action) {
+  setUInt8(0x0003, (uint)action);
+}
+
+RadioddityCodeplug::ButtonSettingsElement::Action
+RadioddityCodeplug::ButtonSettingsElement::sk2ShortPress() const {
+  return (Action) getUInt8(0x0004);
+}
+void
+RadioddityCodeplug::ButtonSettingsElement::setSK2ShortPress(Action action) {
+  setUInt8(0x0004, (uint)action);
+}
+RadioddityCodeplug::ButtonSettingsElement::Action
+RadioddityCodeplug::ButtonSettingsElement::sk2LongPress() const {
+  return (Action) getUInt8(0x0005);
+}
+void
+RadioddityCodeplug::ButtonSettingsElement::setSK2LongPress(Action action) {
+  setUInt8(0x0005, (uint)action);
+}
+
+RadioddityCodeplug::ButtonSettingsElement::Action
+RadioddityCodeplug::ButtonSettingsElement::tkShortPress() const {
+  return (Action) getUInt8(0x0006);
+}
+void
+RadioddityCodeplug::ButtonSettingsElement::setTKShortPress(Action action) {
+  setUInt8(0x0006, (uint)action);
+}
+RadioddityCodeplug::ButtonSettingsElement::Action
+RadioddityCodeplug::ButtonSettingsElement::tkLongPress() const {
+  return (Action) getUInt8(0x0007);
+}
+void
+RadioddityCodeplug::ButtonSettingsElement::setTKLongPress(Action action) {
+  setUInt8(0x0007, (uint)action);
+}
+
+RadioddityCodeplug::ButtonSettingsElement::OneTouchAction
+RadioddityCodeplug::ButtonSettingsElement::oneTouchAction(uint n) const {
+  return OneTouchAction(getUInt8(0x0008 + n*4 + 0));
+}
+uint
+RadioddityCodeplug::ButtonSettingsElement::oneTouchContact(uint n) const {
+  return getUInt16_be(0x0008 + n*4 + 1);
+}
+uint
+RadioddityCodeplug::ButtonSettingsElement::oneTouchMessage(uint n) const {
+  return getUInt16_be(0x0008 + n*4 + 3);
+}
+void
+RadioddityCodeplug::ButtonSettingsElement::disableOneTouch(uint n) {
+  setUInt8(0x0008 + n*4 + 0, (uint)OneTouchAction::None);
+}
+void
+RadioddityCodeplug::ButtonSettingsElement::setOneTouchDigitalCall(uint n, uint index) {
+  setUInt8(0x0008 + n*4 + 0, (uint)OneTouchAction::DigitalCall);
+  setUInt16_be(0x0008 + n*4 + 1, index);
+  setUInt16_be(0x0008 + n*4 + 3, 0);
+}
+void
+RadioddityCodeplug::ButtonSettingsElement::setOneTouchDigitalMessage(uint n, uint index) {
+  setUInt8(0x0008 + n*4 + 0, (uint)OneTouchAction::DigitalMessage);
+  setUInt16_be(0x0008 + n*4 + 1, 0);
+  setUInt16_be(0x0008 + n*4 + 3, index);
+}
+void
+RadioddityCodeplug::ButtonSettingsElement::setOneTouchAnalogCall(uint n) {
+  setUInt8(0x0008 + n*4 + 0, (uint)OneTouchAction::AnalogCall);
+  setUInt16_be(0x0008 + n*4 + 1, 0);
+  setUInt16_be(0x0008 + n*4 + 3, 0);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::MenuSettingsElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x0008)
+{
+  // pass...
+}
+
+RadioddityCodeplug::MenuSettingsElement::~MenuSettingsElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::MenuSettingsElement::clear() {
+  setMenuHangTime(10);
+
+  enableMessage(true);
+  enableScanStart(true);
+  enableCallAlert(true);
+  enableEditContact(true);
+  enableManualDial(true);
+  enableRadioCheck(true);
+  enableRemoteMonitor(true);
+
+  enableRadioEnable(true);
+  enableRadioDisable(true);
+  enableProgPassword(true);
+  enableTalkaround(true);
+  enableTone(true);
+  enablePower(true);
+  enableBacklight(true);
+  enableIntroScreen(true);
+
+  enableKeypadLock(true);
+  enableLEDIndicator(true);
+  enableSquelch(true);
+  enablePrivacy(true);
+  enableVOX(true);
+  enablePasswordLock(true);
+  enableMissedCalls(true);
+  enableAnsweredCalls(true);
+
+  enableOutgoingCalls(true);
+  enableChannelDisplay(true);
+  enableDualWatch(true);
+  setBit(0x0004, 3, 0); setBit(0x0004, 4, 0); setBit(0x0004, 5, 1); setBit(0x0004, 6, 1);
+  setBit(0x0004, 7, 1);
+
+  setUInt8(0x0005, 0xff);
+
+  setKeypadLockTime(0);
+  setBacklightTime(15);
+  setUInt2(0x0006, 4, 0);
+  setChannelDisplayMode(ChannelDisplayMode::Name);
+
+  setUInt4(0x0007, 0, 0);
+  setBit(0x0007, 4, 1);
+  enableKeyTone(true);
+  setDualWatchMode(DualWatchMode::DualDual);
+}
+
+uint
+RadioddityCodeplug::MenuSettingsElement::menuHangTime() const {
+  return getUInt8(0x0000);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::setMenuHangTime(uint sec) {
+  sec = std::min(10u, sec);
+  setUInt8(0x0000, sec);
+}
+
+bool
+RadioddityCodeplug::MenuSettingsElement::message() const {
+  return getBit(0x0001, 0);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableMessage(bool enable) {
+  setBit(0x0001, 0, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::scanStart() const {
+  return getBit(0x0001, 1);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableScanStart(bool enable) {
+  setBit(0x0001, 1, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::editScanList() const {
+  return getBit(0x0001, 2);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableEditScanList(bool enable) {
+  setBit(0x0001, 2, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::callAlert() const {
+  return getBit(0x0001, 3);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableCallAlert(bool enable) {
+  setBit(0x0001, 3, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::editContact() const {
+  return getBit(0x0001, 4);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableEditContact(bool enable) {
+  setBit(0x0001, 4, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::manualDial() const {
+  return getBit(0x0001, 5);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableManualDial(bool enable) {
+  setBit(0x0001, 5, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::radioCheck() const {
+  return getBit(0x0001, 6);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableRadioCheck(bool enable) {
+  setBit(0x0001, 6, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::remoteMonitor() const {
+  return getBit(0x0001, 7);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableRemoteMonitor(bool enable) {
+  setBit(0x0001, 7, enable);
+}
+
+bool
+RadioddityCodeplug::MenuSettingsElement::radioEnable() const {
+  return getBit(0x0002, 0);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableRadioEnable(bool enable) {
+  setBit(0x0002, 0, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::radioDisable() const {
+  return getBit(0x0002, 1);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableRadioDisable(bool enable) {
+  setBit(0x0002, 1, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::progPassword() const {
+  return getBit(0x0002, 2);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableProgPassword(bool enable) {
+  setBit(0x0002, 2, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::talkaround() const {
+  return getBit(0x0002, 3);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableTalkaround(bool enable) {
+  setBit(0x0002, 3, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::tone() const {
+  return getBit(0x0002, 4);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableTone(bool enable) {
+  setBit(0x0002, 4, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::power() const {
+  return getBit(0x0002, 5);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enablePower(bool enable) {
+  setBit(0x0002, 5, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::backlight() const {
+  return getBit(0x0002, 6);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableBacklight(bool enable) {
+  setBit(0x0002, 6, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::introScreen() const {
+  return getBit(0x0002, 7);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableIntroScreen(bool enable) {
+  setBit(0x0002, 7, enable);
+}
+
+bool
+RadioddityCodeplug::MenuSettingsElement::keypadLock() const {
+  return getBit(0x0003, 0);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableKeypadLock(bool enable) {
+  setBit(0x0003, 0, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::ledIndicator() const {
+  return getBit(0x0003, 1);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableLEDIndicator(bool enable) {
+  setBit(0x0003, 1, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::squelch() const {
+  return getBit(0x0003, 2);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableSquelch(bool enable) {
+  setBit(0x0003, 2, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::privacy() const {
+  return getBit(0x0003, 3);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enablePrivacy(bool enable) {
+  setBit(0x0003, 3, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::vox() const {
+  return getBit(0x0003, 4);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableVOX(bool enable) {
+  setBit(0x0003, 4, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::passwordLock() const {
+  return getBit(0x0003, 5);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enablePasswordLock(bool enable) {
+  setBit(0x0003, 5, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::missedCalls() const {
+  return getBit(0x0003, 6);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableMissedCalls(bool enable) {
+  setBit(0x0003, 6, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::answeredCalls() const {
+  return getBit(0x0003, 7);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableAnsweredCalls(bool enable) {
+  setBit(0x0003, 7, enable);
+}
+
+bool
+RadioddityCodeplug::MenuSettingsElement::outgoingCalls() const {
+  return getBit(0x0004, 0);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableOutgoingCalls(bool enable) {
+  setBit(0x0004, 0, enable);
+}
+
+bool
+RadioddityCodeplug::MenuSettingsElement::channelDisplay() const {
+  return getBit(0x0004, 1);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableChannelDisplay(bool enable) {
+  setBit(0x0004, 1, enable);
+}
+bool
+RadioddityCodeplug::MenuSettingsElement::dualWatch() const {
+  return getBit(0x0004, 2);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableDualWatch(bool enable) {
+  setBit(0x0004, 2, enable);
+}
+
+uint
+RadioddityCodeplug::MenuSettingsElement::keypadLockTime() const {
+  return getUInt2(0x0006, 0)*5;
+}
+void
+RadioddityCodeplug::MenuSettingsElement::setKeypadLockTime(uint sec) {
+  setUInt2(0x0006, 0, sec/5);
+}
+
+uint
+RadioddityCodeplug::MenuSettingsElement::backlightTime() const {
+  return getUInt2(0x0006, 2)*5;
+}
+void
+RadioddityCodeplug::MenuSettingsElement::setBacklightTime(uint sec) {
+  setUInt2(0x0006, 2, sec/5);
+}
+
+RadioddityCodeplug::MenuSettingsElement::ChannelDisplayMode
+RadioddityCodeplug::MenuSettingsElement::channelDisplayMode() const {
+  return (ChannelDisplayMode)getUInt2(0x0006, 6);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::setChannelDisplayMode(ChannelDisplayMode mode) {
+  setUInt2(0x0006, 6, (uint)mode);
+}
+
+bool
+RadioddityCodeplug::MenuSettingsElement::keyTone() const {
+  return getBit(0x0007, 5);
+}
+void
+RadioddityCodeplug::MenuSettingsElement::enableKeyTone(bool enable) {
+  setBit(0x0007, 5, enable);
+}
+
+RadioddityCodeplug::MenuSettingsElement::DualWatchMode
+RadioddityCodeplug::MenuSettingsElement::dualWatchMode() const {
+  return DualWatchMode(getUInt2(0x0007, 6));
+}
+void
+RadioddityCodeplug::MenuSettingsElement::setDualWatchMode(DualWatchMode mode) {
+  setUInt2(0x0007, 6, (uint)mode);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug
  * ********************************************************************************************* */
 RadioddityCodeplug::RadioddityCodeplug(QObject *parent)

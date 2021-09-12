@@ -817,6 +817,283 @@ public:
     virtual bool updateConfig(Config *conf, Context &ctx);
   };
 
+  /** Implements the base class of button settings for all Radioddity codeplugs.
+   *
+   * Encoding of button settings (size 0x20b):
+   * @verbinclude radioddity_buttonsettings.txt */
+  class ButtonSettingsElement: public Element
+  {
+  public:
+    /** Possible actions for each button on short and long press. */
+    enum class Action {
+      None                   = 0x00,  ///< Disables button.
+      ToggleAllAlertTones    = 0x01,
+      EmergencyOn            = 0x02,
+      EmergencyOff           = 0x03,
+      ToggleMonitor          = 0x05,  ///< Toggle monitor on channel.
+      NuiaceDelete           = 0x06,
+      OneTouch1              = 0x07,  ///< Performs the first of 6 user-programmable actions (call, message).
+      OneTouch2              = 0x08,  ///< Performs the second of 6 user-programmable actions (call, message).
+      OneTouch3              = 0x09,  ///< Performs the third of 6 user-programmable actions (call, message).
+      OneTouch4              = 0x0a,  ///< Performs the fourth of 6 user-programmable actions (call, message).
+      OneTouch5              = 0x0b,  ///< Performs the fifth of 6 user-programmable actions (call, message).
+      OneTouch6              = 0x0c,  ///< Performs the sixt of 6 user-programmable actions (call, message).
+      ToggleRepeatTalkaround = 0x0d,
+      ToggleScan             = 0x0e,
+      TogglePrivacy          = 0x10,
+      ToggleVox              = 0x11,
+      ZoneSelect             = 0x12,
+      BatteryIndicator       = 0x13,
+      ToggleLoneWorker       = 0x14,
+      PhoneExit              = 0x16,
+      ToggleFlashLight       = 0x1a,
+      ToggleFMRadio          = 0x1b
+    };
+
+    /** Possible one-touch actions. */
+    enum class OneTouchAction {
+      None                   = 0x00,  ///< Disabled.
+      DigitalCall            = 0x10,  ///< Calls a digital contact.
+      DigitalMessage         = 0x11,  ///< Sends a SMS.
+      AnalogCall             = 0x20   ///< Calls an analog contact.
+    };
+
+  protected:
+    /** Hidden constructor */
+    ButtonSettingsElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit ButtonSettingsElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~ButtonSettingsElement();
+
+    /** Clears the button settings. */
+    void clear();
+
+    /** Returns the long-press duration in ms. */
+    virtual uint longPressDuration() const;
+    /** Sets the long-press duration in ms. */
+    virtual void setLongPressDuration(uint ms);
+
+    /** Returns the side-key 1 short-press action. */
+    virtual Action sk1ShortPress() const;
+    /** Sets the side-key 1 short-press action. */
+    virtual void setSK1ShortPress(Action action);
+    /** Returns the side-key 1 long-press action. */
+    virtual Action sk1LongPress() const;
+    /** Sets the side-key 1 long-press action. */
+    virtual void setSK1LongPress(Action action);
+
+    /** Returns the side-key 2 short-press action. */
+    virtual Action sk2ShortPress() const;
+    /** Sets the side-key 2 short-press action. */
+    virtual void setSK2ShortPress(Action action);
+    /** Returns the side-key 2 long-press action. */
+    virtual Action sk2LongPress() const;
+    /** Sets the side-key 2 long-press action. */
+    virtual void setSK2LongPress(Action action);
+
+    /** Returns the top-key short-press action. */
+    virtual Action tkShortPress() const;
+    /** Sets the top-key short-press action. */
+    virtual void setTKShortPress(Action action);
+    /** Returns the top-key long-press action. */
+    virtual Action tkLongPress() const;
+    /** Sets the top-key long-press action. */
+    virtual void setTKLongPress(Action action);
+
+    /** Returns the n-th one-touch action. */
+    virtual OneTouchAction oneTouchAction(uint n) const;
+    /** Returns the n-th one-touch contact index (if action is @c OneTouchAction::DigitalCall). */
+    virtual uint oneTouchContact(uint n) const;
+    /** Returns the n-th one-touch message index (if action is @c OneTouchAction::DigitalMessage). */
+    virtual uint oneTouchMessage(uint n) const;
+    /** Disables the n-th one-touch action. */
+    virtual void disableOneTouch(uint n);
+    /** Configures n-th one-touch action as a digital call to contact index. */
+    virtual void setOneTouchDigitalCall(uint n, uint index);
+    /** Configures n-th one-touch action as a digital message using given index. */
+    virtual void setOneTouchDigitalMessage(uint n, uint index);
+    /** Configures n-th one-touch action as a analog call. */
+    virtual void setOneTouchAnalogCall(uint n);
+  };
+
+  /** Implements the base class of menu settings for all Radioddity codeplugs.
+   *
+   * Encoding of Menu settings (size 0x08b):
+   * @verbinclude radioddity_menusettings.txt */
+  class MenuSettingsElement: public Element
+  {
+  public:
+    /** Possible channel display modes. */
+    enum class ChannelDisplayMode {
+      Number    = 0,  ///< Show channel number.
+      Name      = 1,  ///< Show channel name.
+      Frequency = 2   ///< Show channel frequency.
+    };
+
+    /** Possible dual-watch modes. */
+    enum class DualWatchMode {
+      DualDual = 1,
+      DualSingle = 2
+    };
+
+  protected:
+    /** Hidden constructor. */
+    MenuSettingsElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit MenuSettingsElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~MenuSettingsElement();
+
+    /** Resets the menu settings. */
+    void clear();
+
+    /** Returns the menu hang-time in seconds. */
+    virtual uint menuHangTime() const;
+    /** Sets the menu hang time in seconds. */
+    virtual void setMenuHangTime(uint sec);
+
+    /** Returns @c true if the message menu is shown. */
+    virtual bool message() const;
+    /** Enables/disables the message menu. */
+    virtual void enableMessage(bool enable);
+    /** Returns @c true if the scan-start menu is shown. */
+    virtual bool scanStart() const;
+    /** Enables/disables the scan-start menu. */
+    virtual void enableScanStart(bool enable);
+    /** Returns @c true if the edit scan-list menu is shown. */
+    virtual bool editScanList() const;
+    /** Enables/disables the edit scan-list menu. */
+    virtual void enableEditScanList(bool enable);
+    /** Returns @c true if the call-alert menu is shown. */
+    virtual bool callAlert() const;
+    /** Enables/disables the call-alert menu. */
+    virtual void enableCallAlert(bool enable);
+    /** Returns @c true if the edit-contact menu is shown. */
+    virtual bool editContact() const;
+    /** Enables/disables the edit-contact menu. */
+    virtual void enableEditContact(bool enable);
+    /** Returns @c true if the manual-dial menu is shown. */
+    virtual bool manualDial() const;
+    /** Enables/disables the manual-dial menu. */
+    virtual void enableManualDial(bool enable);
+    /** Returns @c true if the radio-check menu is shown. */
+    virtual bool radioCheck() const;
+    /** Enables/disables the radioCheck menu. */
+    virtual void enableRadioCheck(bool enable);
+    /** Returns @c true if the remote-monitor menu is shown. */
+    virtual bool remoteMonitor() const;
+    /** Enables/disables the message menu. */
+    virtual void enableRemoteMonitor(bool enable);
+
+    /** Returns @c true if the radio-enable menu is shown. */
+    virtual bool radioEnable() const;
+    /** Enables/disables the radio-enable menu. */
+    virtual void enableRadioEnable(bool enable);
+    /** Returns @c true if the radio-disable menu is shown. */
+    virtual bool radioDisable() const;
+    /** Enables/disables the radio-disable menu. */
+    virtual void enableRadioDisable(bool enable);
+    /** Returns @c true if the programming-password menu is shown. */
+    virtual bool progPassword() const;
+    /** Enables/disables the programming-password menu. */
+    virtual void enableProgPassword(bool enable);
+    /** Returns @c true if the talkaround menu is shown. */
+    virtual bool talkaround() const;
+    /** Enables/disables the talkaround menu. */
+    virtual void enableTalkaround(bool enable);
+    /** Returns @c true if the tone menu is shown. */
+    virtual bool tone() const;
+    /** Enables/disables the tone menu. */
+    virtual void enableTone(bool enable);
+    /** Returns @c true if the power menu is shown. */
+    virtual bool power() const;
+    /** Enables/disables the power menu. */
+    virtual void enablePower(bool enable);
+    /** Returns @c true if the backlight menu is shown. */
+    virtual bool backlight() const;
+    /** Enables/disables the backlight menu. */
+    virtual void enableBacklight(bool enable);
+    /** Returns @c true if the intro-screen menu is shown. */
+    virtual bool introScreen() const;
+    /** Enables/disables the message menu. */
+    virtual void enableIntroScreen(bool enable);
+
+    /** Returns @c true if the keypad-lock menu is shown. */
+    virtual bool keypadLock() const;
+    /** Enables/disables the keypad-lock menu. */
+    virtual void enableKeypadLock(bool enable);
+    /** Returns @c true if the LED-indicator menu is shown. */
+    virtual bool ledIndicator() const;
+    /** Enables/disables the LED-indicator menu. */
+    virtual void enableLEDIndicator(bool enable);
+    /** Returns @c true if the squelch menu is shown. */
+    virtual bool squelch() const;
+    /** Enables/disables the squelch menu. */
+    virtual void enableSquelch(bool enable);
+    /** Returns @c true if the privacy menu is shown. */
+    virtual bool privacy() const;
+    /** Enables/disables the privacy menu. */
+    virtual void enablePrivacy(bool enable);
+    /** Returns @c true if the VOX menu is shown. */
+    virtual bool vox() const;
+    /** Enables/disables the VOX menu. */
+    virtual void enableVOX(bool enable);
+    /** Returns @c true if the password-lock menu is shown. */
+    virtual bool passwordLock() const;
+    /** Enables/disables the password-lock menu. */
+    virtual void enablePasswordLock(bool enable);
+    /** Returns @c true if the missed-calls menu is shown. */
+    virtual bool missedCalls() const;
+    /** Enables/disables the missed-calls menu. */
+    virtual void enableMissedCalls(bool enable);
+    /** Returns @c true if the answered-calls menu is shown. */
+    virtual bool answeredCalls() const;
+    /** Enables/disables the answered-calls menu. */
+    virtual void enableAnsweredCalls(bool enable);
+
+    /** Returns @c true if the outgoing-calls menu is shown. */
+    virtual bool outgoingCalls() const;
+    /** Enables/disables the outgoing-calls menu. */
+    virtual void enableOutgoingCalls(bool enable);
+    /** Returns @c true if the channel display-mode menu is shown. */
+    virtual bool channelDisplay() const;
+    /** Enables/disables the channel display mode menu. */
+    virtual void enableChannelDisplay(bool enable);
+    /** Returns @c true if the dual-watch menu is shown. */
+    virtual bool dualWatch() const;
+    /** Enables/disables the dual-watch menu. */
+    virtual void enableDualWatch(bool enable);
+
+    /** Returns the keypad lock time in seconds. */
+    virtual uint keypadLockTime() const;
+    /** Sets the keypad lock time in seconds. */
+    virtual void setKeypadLockTime(uint sec);
+
+    /** Retunrns the backlight time in seconds. */
+    virtual uint backlightTime() const;
+    /** Sets the backlight time in seconds. */
+    virtual void setBacklightTime(uint sec);
+
+    /** Returns the channel display mode. */
+    virtual ChannelDisplayMode channelDisplayMode() const;
+    /** Sets the channel display mode. */
+    virtual void setChannelDisplayMode(ChannelDisplayMode mode);
+
+    /** Returns @c true if the keytone is enabled. */
+    virtual bool keyTone() const;
+    /** Enables/disables the keytone. */
+    virtual void enableKeyTone(bool enable);
+
+    /** Returns the dual-watch mode. */
+    virtual DualWatchMode dualWatchMode() const;
+    /** Sets the dual-watch mode. */
+    virtual void setDualWatchMode(DualWatchMode mode);
+  };
 
 protected:
   /** Hidden constructor, use a device specific class to instantiate. */
