@@ -484,6 +484,148 @@ public:
     virtual uint8_t *get(uint n) const;
   };
 
+  /** Implements the base class for scan lists of all Radioddity codeplugs.
+   *
+   * Memmory layout of the scan list.
+   * @verbinclude radioddity_scanlist.txt
+   */
+  class ScanListElement: public Element
+  {
+  public:
+    /** Possible priority channel types. */
+    enum Mode {
+      PL_NONPRI = 0,              ///< Only non-priority channels.
+      PL_DISABLE = 1,             ///< Disable priority channels.
+      PL_PRI = 2,                 ///< Only priority channels.
+      PL_PRI_NONPRI = 3           ///< Priority and non-priority channels.
+    };
+
+  protected:
+    /** Hidden constructor. */
+    ScanListElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit ScanListElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~ScanListElement();
+
+    /** Resets the scan list. */
+    void clear();
+
+    /** Returns the name of the scan list. */
+    virtual QString name() const;
+    /** Sets the name of the scan list. */
+    virtual void setName(const QString &name);
+
+    /** Returns @c true if channel mark is enabled. */
+    virtual bool channelMark() const;
+    /** Enables/disables channel mark. */
+    virtual void enableChannelMark(bool enable);
+
+    /** Returns the scan mode. */
+    virtual Mode mode() const;
+    /** Sets the scan mode. */
+    virtual void setMode(Mode mode);
+
+    /** Returns @c true if talk back is enabled. */
+    virtual bool talkback() const;
+    /** Enables/disables talk back. */
+    virtual void enableTalkback(bool enable);
+
+    /** Returns @c true if the n-th member is set. */
+    virtual bool hasMember(uint n) const;
+    /** Returns @c true if the n-th member is selected channel. */
+    virtual bool isSelected(uint n) const;
+    /** Retunrs the n-th member index. */
+    virtual uint member(uint n) const;
+    /** Sets the n-th member index. */
+    virtual void setMember(uint n, uint idx);
+    /** Sets the n-th member to be the selected channel. */
+    virtual void setSelected(uint n);
+    /** Clears the n-th member. */
+    virtual void clearMember(uint n);
+
+    /** Returns @c true if the primary priority channel is set. */
+    virtual bool hasPrimary() const;
+    /** Returns @c true if the primary priority channel is the selected channel. */
+    virtual bool primaryIsSelected() const;
+    /** Return the channel index for the primary priority channel. */
+    virtual uint primary() const;
+    /** Sets the primary priority channel index. */
+    virtual void setPrimary(uint idx);
+    /** Sets the primary priority channel to be the selected channel. */
+    virtual void setPrimarySelected();
+    /** Clears the primary priority channel. */
+    virtual void clearPrimary();
+
+    /** Returns @c true if the secondary priority channel is set. */
+    virtual bool hasSecondary() const;
+    /** Returns @c true if the secondary priority channel is the selected channel. */
+    virtual bool secondaryIsSelected() const;
+    /** Return the channel index for the secondary priority channel. */
+    virtual uint secondary() const;
+    /** Sets the secondary priority channel index. */
+    virtual void setSecondary(uint idx);
+    /** Sets the secondary priority channel to be the selected channel. */
+    virtual void setSecondarySelected();
+    /** Clears the secondary priority channel. */
+    virtual void clearSecondary();
+
+    /** Returns @c true if the revert channel is set. */
+    virtual bool hasRevert() const;
+    /** Return the channel index for the revert channel. */
+    virtual uint revert() const;
+    /** Sets the revert channel index. */
+    virtual void setRevert(uint idx);
+    /** Clears the revert channel. */
+    virtual void clearRevert();
+
+    /** Returns the hold time in ms. */
+    virtual uint holdTime() const;
+    /** Sets the hold time in ms. */
+    virtual void setHoldTime(uint ms);
+
+    /** Retunrs the priority sample time in ms. */
+    virtual uint prioritySampleTime() const;
+    /** Sets the priority sample time in ms. */
+    virtual void setPrioritySampleTime(uint ms);
+
+    /** Constrcuts a @c ScanList object from this codeplug representation. */
+    virtual ScanList *toScanListObj(Context &ctx) const;
+    /** Links a previously constructed @c ScanList object to the rest of the generic configuration. */
+    virtual bool linkScanListObj(ScanList *lst, Context &ctx) const;
+    /** Initializes this codeplug representation from the given @c ScanList object. */
+    virtual void fromScanListObj(const ScanList *lst, Context &ctx);
+  };
+
+  /** Implements the base class of scan lists banks for all Radioddity codeplugs.
+   *
+   * Memmory layout of the scan list table.
+   * @verbinclude radioddity_scanlistbank.txt
+   */
+  class ScanListBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ScanListBankElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit ScanListBankElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~ScanListBankElement();
+
+    /** Resets the scan list bank. */
+    void clear();
+
+    /** Retruns @c true if the n-th scan list is enabled. */
+    virtual bool isEnabled(uint n) const;
+    /** Enable/disable n-th scan list. */
+    virtual void enable(uint n, bool enabled);
+    /** Retunrs a pointer to the n-th scan list. */
+    virtual uint8_t *get(uint n) const;
+  };
 
 protected:
   /** Hidden constructor, use a device specific class to instantiate. */

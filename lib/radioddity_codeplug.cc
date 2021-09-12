@@ -936,6 +936,285 @@ RadioddityCodeplug::GroupListBankElement::get(uint n) const {
 
 
 /* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::ScanListElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ScanListElement::ScanListElement(uint8_t *ptr)
+  : Element(ptr, 0x0058)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ScanListElement::~ScanListElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::ScanListElement::clear() {
+  setName("");
+  setUInt8(0x000f, 0xff);
+  // Clear member
+  memset(_data+0x0010, 0x00, 2*32);
+  clearPrimary();
+  clearSecondary();
+  clearRevert();
+  setHoldTime(1000);
+  setPrioritySampleTime(2000);
+}
+
+QString
+RadioddityCodeplug::ScanListElement::name() const {
+  return readASCII(0x0000, 15, 0xff);
+}
+void
+RadioddityCodeplug::ScanListElement::setName(const QString &name) {
+  writeASCII(0x0000, name, 15, 0xff);
+}
+
+bool
+RadioddityCodeplug::ScanListElement::channelMark() const {
+  return getBit(0x000f, 4);
+}
+void
+RadioddityCodeplug::ScanListElement::enableChannelMark(bool enable) {
+  setBit(0x000f, 4, enable);
+}
+
+RadioddityCodeplug::ScanListElement::Mode
+RadioddityCodeplug::ScanListElement::mode() const {
+  return (Mode) getUInt2(0x000f, 5);
+}
+void
+RadioddityCodeplug::ScanListElement::setMode(Mode mode) {
+  setUInt2(0x000f, 5, (uint)mode);
+}
+
+bool
+RadioddityCodeplug::ScanListElement::talkback() const {
+  return getBit(0x000f, 7);
+}
+void
+RadioddityCodeplug::ScanListElement::enableTalkback(bool enable) {
+  setBit(0x000f, 7, enable);
+}
+
+bool
+RadioddityCodeplug::ScanListElement::hasMember(uint n) const {
+  return 0 != getUInt16_be(0x0010+2*n);
+}
+bool
+RadioddityCodeplug::ScanListElement::isSelected(uint n) const {
+  return 1 == getUInt16_be(0x0010+2*n);
+}
+uint
+RadioddityCodeplug::ScanListElement::member(uint n) const {
+  return getUInt16_be(0x0010 + 2*n)-1;
+}
+void
+RadioddityCodeplug::ScanListElement::setMember(uint n, uint idx) {
+  setUInt16_be(0x0010+2*n, idx+1);
+}
+void
+RadioddityCodeplug::ScanListElement::setSelected(uint n) {
+  setUInt16_be(0x0010+2*n, 1);
+}
+void
+RadioddityCodeplug::ScanListElement::clearMember(uint n) {
+  setUInt16_be(0x0010+2*n, 0);
+}
+
+bool
+RadioddityCodeplug::ScanListElement::hasPrimary() const {
+  return 0 != getUInt16_be(0x0050);
+}
+bool
+RadioddityCodeplug::ScanListElement::primaryIsSelected() const {
+  return 1 == getUInt16_be(0x0050);
+}
+uint
+RadioddityCodeplug::ScanListElement::primary() const {
+  return getUInt16_be(0x0050)-1;
+}
+void
+RadioddityCodeplug::ScanListElement::setPrimary(uint idx) {
+  setUInt16_be(0x0050, idx+1);
+}
+void
+RadioddityCodeplug::ScanListElement::setPrimarySelected() {
+  setUInt16_be(0x0050, 1);
+}
+void
+RadioddityCodeplug::ScanListElement::clearPrimary() {
+  setUInt16_be(0x0050, 0);
+}
+
+bool
+RadioddityCodeplug::ScanListElement::hasSecondary() const {
+  return 0 != getUInt16_be(0x0052);
+}
+bool
+RadioddityCodeplug::ScanListElement::secondaryIsSelected() const {
+  return 1 == getUInt16_be(0x0052);
+}
+uint
+RadioddityCodeplug::ScanListElement::secondary() const {
+  return getUInt16_be(0x0052)-1;
+}
+void
+RadioddityCodeplug::ScanListElement::setSecondary(uint idx) {
+  setUInt16_be(0x0052, idx+1);
+}
+void
+RadioddityCodeplug::ScanListElement::setSecondarySelected() {
+  setUInt16_be(0x0052, 1);
+}
+void
+RadioddityCodeplug::ScanListElement::clearSecondary() {
+  setUInt16_be(0x0052, 0);
+}
+
+bool
+RadioddityCodeplug::ScanListElement::hasRevert() const {
+  return 0 != getUInt16_be(0x0054);
+}
+uint
+RadioddityCodeplug::ScanListElement::revert() const {
+  return getUInt16_be(0x0054);
+}
+void
+RadioddityCodeplug::ScanListElement::setRevert(uint idx) {
+  setUInt16_be(0x0054, idx);
+}
+void
+RadioddityCodeplug::ScanListElement::clearRevert() {
+  setUInt16_be(0x0054, 0);
+}
+
+uint
+RadioddityCodeplug::ScanListElement::holdTime() const {
+  return uint(getUInt8(0x0056))*25;
+}
+void
+RadioddityCodeplug::ScanListElement::setHoldTime(uint ms) {
+  setUInt8(0x0056, ms/25);
+}
+
+uint
+RadioddityCodeplug::ScanListElement::prioritySampleTime() const {
+  return uint(getUInt8(0x0057))*250;
+}
+void
+RadioddityCodeplug::ScanListElement::setPrioritySampleTime(uint ms) {
+  setUInt8(0x0057, ms/250);
+}
+
+ScanList *
+RadioddityCodeplug::ScanListElement::toScanListObj(Context &ctx) const {
+  return new ScanList(name());
+}
+
+bool
+RadioddityCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) const {
+  if (primaryIsSelected())
+    lst->setPrimaryChannel(SelectedChannel::get());
+  else if (hasPrimary())
+    lst->setPrimaryChannel(ctx.get<Channel>(primary()));
+
+  if (secondaryIsSelected())
+    lst->setSecondaryChannel(SelectedChannel::get());
+  else if (hasSecondary())
+    lst->setSecondaryChannel(ctx.get<Channel>(secondary()));
+
+  if (! hasRevert())
+    lst->setRevertChannel(SelectedChannel::get());
+  else
+    lst->setRevertChannel(ctx.get<Channel>(revert()));
+
+  for (int i=0; (i<32) && hasMember(i); i++) {
+    if (isSelected(i))
+      lst->addChannel(SelectedChannel::get());
+    else if (hasMember(i))
+      lst->addChannel(ctx.get<Channel>(member(i)));
+  }
+  return true;
+}
+
+void
+RadioddityCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, Context &ctx) {
+  if (lst->primaryChannel() && (SelectedChannel::get() == lst->primaryChannel()))
+    setPrimarySelected();
+  else if (lst->primaryChannel())
+    setPrimary(ctx.index(lst->primaryChannel()));
+
+  if (lst->secondaryChannel() && (SelectedChannel::get() == lst->secondaryChannel()))
+    setSecondarySelected();
+  else if (lst->secondaryChannel())
+    setSecondary(ctx.index(lst->secondaryChannel()));
+
+  if (lst->revertChannel() && (SelectedChannel::get() == lst->revertChannel()))
+    clearRevert();
+  else if (lst->revertChannel())
+    setRevert(ctx.index(lst->revertChannel()));
+
+  for (int i=0; i<32; i++) {
+    if (i >= lst->count())
+      clearMember(i);
+    else if (SelectedChannel::get() == lst->channel(i))
+      setSelected(i);
+    else
+      setMember(i, ctx.index(lst->channel(i)));
+  }
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::ScanListBankElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr)
+  : Element(ptr, 0x56f0)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ScanListBankElement::~ScanListBankElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::ScanListBankElement::clear() {
+  memset(_data, 0, 256);
+}
+
+bool
+RadioddityCodeplug::ScanListBankElement::isEnabled(uint n) const {
+  return 0x00 != getUInt8(n);
+}
+void
+RadioddityCodeplug::ScanListBankElement::enable(uint n, bool enabled) {
+  if (enabled)
+    setUInt8(n, 0x01);
+  else
+    setUInt8(n, 0x00);
+}
+
+uint8_t *
+RadioddityCodeplug::ScanListBankElement::get(uint n) const {
+  return _data+0x0100 + n*0x0058;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug
  * ********************************************************************************************* */
 RadioddityCodeplug::RadioddityCodeplug(QObject *parent)
