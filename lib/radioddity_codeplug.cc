@@ -1,9 +1,12 @@
 #include "radioddity_codeplug.hh"
 #include "utils.hh"
+#include "logger.hh"
 #include "scanlist.hh"
 #include "radioid.hh"
 #include "contact.hh"
 #include "rxgrouplist.hh"
+#include "zone.hh"
+
 
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::ChannelElement
@@ -48,7 +51,10 @@ RadioddityCodeplug::ChannelElement::clear() {
   setGroupListIndex(0);
   setRXColorCode(0);
   setEmergencySystemIndex(0);
+  setContactIndex(0);
+  setUInt32_be(0x0030, 0); // clear all bitfields at once.
   setUInt8(0x0034, 0); setUInt8(0x0035, 0); setUInt8(0x0036, 0);
+  setSquelch(0);
 }
 
 QString
@@ -432,6 +438,500 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
       setContactIndex(ctx.index(dc->txContactObj()));
   }
   return true;
+}
+
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::ChannelBankElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::ChannelBankElement::ChannelBankElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ChannelBankElement::ChannelBankElement(uint8_t *ptr)
+  : Element(ptr, 0x1c10)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ChannelBankElement::~ChannelBankElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::ChannelBankElement::clear() {
+  memset(_data, 0, 0x10);
+}
+
+bool
+RadioddityCodeplug::ChannelBankElement::isEnabled(uint idx) const {
+  uint byte = idx/8, bit = idx%8;
+  return getBit(byte, bit);
+}
+void
+RadioddityCodeplug::ChannelBankElement::enable(uint idx, bool enabled) {
+  uint byte = idx/8, bit = idx%8;
+  return setBit(byte, bit, enabled);
+}
+
+uint8_t *
+RadioddityCodeplug::ChannelBankElement::get(uint idx) const {
+  return (_data+0x10)+idx*0x38;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::ContactElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::ContactElement::ContactElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ContactElement::ContactElement(uint8_t *ptr)
+  : Element(ptr, 0x18)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ContactElement::~ContactElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::ContactElement::clear() {
+  setName("");
+  setNumber(0);
+  setType(DigitalContact::GroupCall);
+  enableRing(0);
+  setRingStyle(0);
+  setUInt8(0x017, 0x00);
+}
+
+bool
+RadioddityCodeplug::ContactElement::isValid() const {
+  return (! name().isEmpty());
+}
+
+QString
+RadioddityCodeplug::ContactElement::name() const {
+  return readASCII(0x0000, 16, 0xff);
+}
+void
+RadioddityCodeplug::ContactElement::setName(const QString name) {
+  writeASCII(0x0000, name, 16, 0xff);
+}
+
+uint
+RadioddityCodeplug::ContactElement::number() const {
+  return getBCD8_be(0x0010);
+}
+void
+RadioddityCodeplug::ContactElement::setNumber(uint id) {
+  setBCD8_be(0x0010, id);
+}
+
+DigitalContact::Type
+RadioddityCodeplug::ContactElement::type() const {
+  switch (getUInt8(0x0014)) {
+  case 0: return DigitalContact::GroupCall;
+  case 1: return DigitalContact::PrivateCall;
+  case 2: return DigitalContact::AllCall;
+  default: break;
+  }
+  return DigitalContact::PrivateCall;
+}
+void
+RadioddityCodeplug::ContactElement::setType(DigitalContact::Type type) {
+  switch (type) {
+  case DigitalContact::GroupCall: setUInt8(0x0014, 0); break;
+  case DigitalContact::PrivateCall: setUInt8(0x0014, 1); break;
+  case DigitalContact::AllCall: setUInt8(0x0014, 2); break;
+  }
+}
+
+bool
+RadioddityCodeplug::ContactElement::ring() const {
+  return 0x00 != getUInt8(0x0015);
+}
+void
+RadioddityCodeplug::ContactElement::enableRing(bool enable) {
+  if (enable)
+    setUInt8(0x0015, 1);
+  else
+    setUInt8(0x0015, 0);
+}
+
+uint
+RadioddityCodeplug::ContactElement::ringStyle() const {
+  return getUInt8(0x0016);
+}
+void
+RadioddityCodeplug::ContactElement::setRingStyle(uint style) {
+  style = std::min(style, 10u);
+  setUInt8(0x0016, style);
+}
+
+DigitalContact *
+RadioddityCodeplug::ContactElement::toContactObj(Context &ctx) const {
+  if (! isValid())
+    return nullptr;
+  return new DigitalContact(type(), name(), number(), ring());
+}
+
+void
+RadioddityCodeplug::ContactElement::fromContactObj(const DigitalContact *cont, Context &ctx) {
+  setName(cont->name());
+  setNumber(cont->number());
+  setType(cont->type());
+  if (cont->ring()) {
+    enableRing(true);
+    setRingStyle(1);
+  } else {
+    enableRing(false);
+  }
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::DTMFContactElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr)
+  : Element(ptr, 0x20)
+{
+  // pass...
+}
+
+RadioddityCodeplug::DTMFContactElement::~DTMFContactElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::DTMFContactElement::clear() {
+  memset(_data, 0xff, 0x20);
+}
+bool
+RadioddityCodeplug::DTMFContactElement::isValid() const {
+  return (! name().isEmpty());
+}
+
+QString
+RadioddityCodeplug::DTMFContactElement::name() const {
+  return readASCII(0x0000, 16, 0xff);
+}
+void
+RadioddityCodeplug::DTMFContactElement::setName(const QString &name) {
+  writeASCII(0x0000, name, 16, 0xff);
+}
+
+QString
+RadioddityCodeplug::DTMFContactElement::number() const {
+  return readASCII(0x0010, 16, 0xff);
+}
+void
+RadioddityCodeplug::DTMFContactElement::setNumber(const QString &number) {
+  writeASCII(0x0010, number, 16, 0xff);
+}
+
+DTMFContact *
+RadioddityCodeplug::DTMFContactElement::toContactObj(Context &ctx) const {
+  if (! isValid())
+    return nullptr;
+  return new DTMFContact(name(), number());
+}
+
+void
+RadioddityCodeplug::DTMFContactElement::fromContactObj(const DTMFContact *cont, Context &ctx) {
+  setName(cont->name());
+  setNumber(cont->number());
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::ZoneElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::ZoneElement::ZoneElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ZoneElement::ZoneElement(uint8_t *ptr)
+  : Element(ptr, 0x0030)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ZoneElement::~ZoneElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::ZoneElement::clear() {
+  memset(_data+0x0000, 0xff, 0x0010);
+  memset(_data+0x0010, 0x00, 0x0020);
+}
+bool
+RadioddityCodeplug::ZoneElement::isValid() const {
+  return (! name().isEmpty());
+}
+
+QString
+RadioddityCodeplug::ZoneElement::name() const {
+  return readASCII(0x0000, 16, 0xff);
+}
+void
+RadioddityCodeplug::ZoneElement::setName(const QString &name) {
+  writeASCII(0x0000, name, 16, 0xff);
+}
+
+bool
+RadioddityCodeplug::ZoneElement::hasMember(uint n) const {
+  return (0 == member(n));
+}
+uint
+RadioddityCodeplug::ZoneElement::member(uint n) const {
+  return getUInt16_be(0x0010+2*n);
+}
+void
+RadioddityCodeplug::ZoneElement::setMember(uint n, uint idx) {
+  setUInt16_be(0x0010+n*2, idx);
+}
+void
+RadioddityCodeplug::ZoneElement::clearMember(uint n) {
+  setMember(n, 0);
+}
+
+Zone *
+RadioddityCodeplug::ZoneElement::toZoneObj(Context &ctx) const {
+  if (! isValid())
+    return nullptr;
+  return new Zone(name());
+}
+
+bool
+RadioddityCodeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putInB) const {
+  if (! isValid()) {
+    logWarn() << "Cannot link zone: Zone is invalid.";
+    return false;
+  }
+
+  for (int i=0; (i<16) && hasMember(i); i++) {
+    if (ctx.has<Channel>(member(i))) {
+      if (! putInB)
+        zone->A()->add(ctx.get<Channel>(member(i)));
+      else
+        zone->B()->add(ctx.get<Channel>(member(i)));
+    } else {
+      logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
+                << member(i) << " out of bounds.";
+    }
+  }
+  return true;
+}
+
+void
+RadioddityCodeplug::ZoneElement::fromZoneObjA(const Zone *zone, Context &ctx) {
+  if (zone->A()->count() && zone->B()->count())
+    setName(zone->name() + " A");
+  else
+    setName(zone->name());
+
+  for (int i=0; i<16; i++) {
+    if (i < zone->A()->count())
+      setMember(i, ctx.index(zone->A()->get(i)));
+    else
+      clearMember(i);
+  }
+}
+
+void
+RadioddityCodeplug::ZoneElement::fromZoneObjB(const Zone *zone, Context &ctx) {
+  if (zone->A()->count() && zone->B()->count())
+    setName(zone->name() + " B");
+  else
+    setName(zone->name());
+
+  for (int i=0; i<16; i++) {
+    if (i < zone->B()->count())
+      setMember(i, ctx.index(zone->B()->get(i)));
+    else
+      clearMember(i);
+  }
+}
+
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::ZoneBankElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr)
+  : Element(ptr, 0x2f00)
+{
+  // pass...
+}
+
+RadioddityCodeplug::ZoneBankElement::~ZoneBankElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::ZoneBankElement::clear() {
+  memset(_data, 0, 0x0020);
+}
+
+bool
+RadioddityCodeplug::ZoneBankElement::isEnabled(uint idx) const {
+  uint byte=idx/8, bit = idx%8;
+  return getBit(byte, bit);
+}
+void
+RadioddityCodeplug::ZoneBankElement::enable(uint idx, bool enabled) {
+  uint byte=idx/8, bit = idx%8;
+  setBit(byte, bit, enabled);
+}
+uint8_t *
+RadioddityCodeplug::ZoneBankElement::get(uint idx) const {
+  return _data + 0x0020 + idx*0x0030;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::GroupListElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::GroupListElement::GroupListElement(uint8_t *ptr)
+  : Element(ptr, 0x0030)
+{
+  // pass...
+}
+
+RadioddityCodeplug::GroupListElement::~GroupListElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::GroupListElement::clear() {
+  setName("");
+  memset(_data+0x0010, 0, 2*16);
+}
+
+QString
+RadioddityCodeplug::GroupListElement::name() const {
+  return readASCII(0x0000, 16, 0xff);
+}
+void
+RadioddityCodeplug::GroupListElement::setName(const QString &name) {
+  writeASCII(0x0000, name, 16, 0xff);
+}
+
+bool
+RadioddityCodeplug::GroupListElement::hasMember(uint n) const {
+  return 0!=member(n);
+}
+uint
+RadioddityCodeplug::GroupListElement::member(uint n) const {
+  return getUInt16_be(0x0010 + 2*n);
+}
+void
+RadioddityCodeplug::GroupListElement::setMember(uint n, uint idx) {
+  return setUInt16_be(0x0010+2*n, idx);
+}
+void
+RadioddityCodeplug::GroupListElement::clearMember(uint n) {
+  setMember(n,0);
+}
+
+RXGroupList *
+RadioddityCodeplug::GroupListElement::toRXGroupListObj(Context &ctx) {
+  return new RXGroupList(name());
+}
+
+bool
+RadioddityCodeplug::GroupListElement::linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx) const {
+  for (int i=0; (i<16) && (i<ncnt); i++) {
+    if (ctx.has<DigitalContact>(member(i)))
+      lst->addContact(ctx.get<DigitalContact>(member(i)));
+    else
+      return false;
+  }
+  return true;
+}
+
+void
+RadioddityCodeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx) {
+  setName(lst->name());
+  for (int i=0; i<15; i++) {
+    if (lst->count() > i) {
+      setMember(i, ctx.index(lst->contact(i)));
+    } else {
+      clearMember(i);
+    }
+  }
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::GroupListBankElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr)
+  : Element(ptr, 0x0c80)
+{
+  // pass...
+}
+
+RadioddityCodeplug::GroupListBankElement::~GroupListBankElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::GroupListBankElement::clear() {
+  memset(_data, 0, 128);
+}
+
+bool
+RadioddityCodeplug::GroupListBankElement::isEnabled(uint n) const {
+  return 0 != getUInt8(n);
+}
+uint
+RadioddityCodeplug::GroupListBankElement::contactCount(uint n) const {
+  return getUInt8(n)-1;
+}
+void
+RadioddityCodeplug::GroupListBankElement::setContactCount(uint n, uint size) {
+  setUInt8(n, size+1);
+}
+void
+RadioddityCodeplug::GroupListBankElement::disable(uint n) {
+  setUInt8(n, 0);
+}
+
+uint8_t *
+RadioddityCodeplug::GroupListBankElement::get(uint n) const {
+  return _data + 0x80 + n*0x30;
 }
 
 

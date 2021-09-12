@@ -55,7 +55,7 @@ public:
 
   public:
     /** Constructs a channel from the given memory. */
-    ChannelElement(uint8_t *ptr);
+    explicit ChannelElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ChannelElement();
 
@@ -213,6 +213,275 @@ public:
     virtual bool linkChannelObj(Channel *c, Context &ctx) const;
     /** Initializes this codeplug channel from the given generic configuration. */
     virtual bool fromChannelObj(const Channel *c, Context &ctx);
+  };
+
+  /** Implements the base for channel banks in Radioddity codeplugs.
+   *
+   * Memory layout of a channel bank:
+   * @verbinclude radioddity_channelbank.txt */
+  class ChannelBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ChannelBankElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constrcutor. */
+    explicit ChannelBankElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~ChannelBankElement();
+
+    /** Clears the bank. */
+    void clear();
+
+    /** Retruns @c true if the channel is enabled. */
+    virtual bool isEnabled(uint idx) const ;
+    /** Enable/disable a channel in the bank. */
+    virtual void enable(uint idx, bool enabled);
+    /** Returns a pointer to the channel at the given index. */
+    virtual uint8_t *get(uint idx) const;
+  };
+
+  /** Implements the base for digital contacts in Radioddity codeplugs.
+   *
+   * Memory layout of a digital contact:
+   * @verbinclude radioddity_contact.txt */
+  class ContactElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ContactElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit ContactElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~ContactElement();
+
+    /** Resets the contact. */
+    void clear();
+    /** Returns @c true if the contact is valid. */
+    bool isValid() const;
+
+    /** Returns the name of the contact. */
+    virtual QString name() const;
+    /** Sets the name of the contact. */
+    virtual void setName(const QString name);
+
+    /** Returns the DMR number of the contact. */
+    virtual uint number() const;
+    /** Sets the DMR number of the contact. */
+    virtual void setNumber(uint id);
+
+    /** Returns the call type. */
+    virtual DigitalContact::Type type() const;
+    /** Sets the call type. */
+    virtual void setType(DigitalContact::Type type);
+
+    /** Returns @c true if the ring tone is enabled for this contact. */
+    virtual bool ring() const;
+    /** Enables/disables ring tone for this contact. */
+    virtual void enableRing(bool enable);
+
+    /** Returns the ring tone style for this contact [0-10]. */
+    virtual uint ringStyle() const;
+    /** Sets the ring tone style for this contact [0-10]. */
+    virtual void setRingStyle(uint style);
+
+    /** Constructs a @c DigitalContact instance from this codeplug contact. */
+    virtual DigitalContact *toContactObj(Context &ctx) const;
+    /** Resets this codeplug contact from the given @c DigitalContact. */
+    virtual void fromContactObj(const DigitalContact *obj, Context &ctx);
+  };
+
+  /** Implements a base DTMF (analog) contact for Radioddity codeplugs.
+   *
+   * Memmory layout of the DTMF contact:
+   * @verbinclude radioddity_dtmfcontact.txt
+   */
+  class DTMFContactElement: Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFContactElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit DTMFContactElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~DTMFContactElement();
+
+    /** Resets the contact. */
+    void clear();
+    /** Returns @c true if the contact is valid. */
+    bool isValid() const;
+
+    /** Returns the name of the contact. */
+    virtual QString name() const;
+    /** Sets the name of the conact. */
+    virtual void setName(const QString &name);
+
+    /** Returns the number of the contact. */
+    virtual QString number() const;
+    /** Sets the number of the contact. */
+    virtual void setNumber(const QString &number);
+
+    /** Constructs a @c DTMFContact instance from this codeplug contact. */
+    virtual DTMFContact *toContactObj(Context &ctx) const;
+    /** Resets this codeplug contact from the given @c DTMFContact. */
+    virtual void fromContactObj(const DTMFContact *obj, Context &ctx);
+  };
+
+  /** Represents a zone within Radioddity codeplugs.
+   *
+   * Memmory layout of the zone:
+   * @verbinclude radioddity_zone.txt
+   */
+  class ZoneElement: Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ZoneElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit ZoneElement(uint8_t *ptr);
+    virtual ~ZoneElement();
+
+    /** Resets the zone. */
+    void clear();
+    /** Returns @c true if the zone is valid. */
+    bool isValid() const;
+
+    /** Returns the name of the zone. */
+    virtual QString name() const;
+    /** Sets the name of the zone. */
+    virtual void setName(const QString &name);
+
+    /** Returns @c true if a member is stored at the given index.
+     * That is, if the index is not 0. */
+    virtual bool hasMember(uint n) const;
+    /** Returns the n-th member index (+1). */
+    virtual uint member(uint n) const;
+    /** Sets the n-th member index (+1). */
+    virtual void setMember(uint n, uint idx);
+    /** Clears the n-th member index. */
+    virtual void clearMember(uint n);
+
+    /** Constructs a generic @c Zone object from this codeplug zone. */
+    virtual Zone *toZoneObj(Context &ctx) const;
+    /** Links a previously constructed @c Zone object to the rest of the configuration. That is
+     * linking to the referred channels. */
+    virtual bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
+    /** Resets this codeplug zone representation from the given generic @c Zone object. */
+    virtual void fromZoneObjA(const Zone *zone, Context &ctx);
+    /** Resets this codeplug zone representation from the given generic @c Zone object. */
+    virtual void fromZoneObjB(const Zone *zone, Context &ctx);
+  };
+
+  /** Implements the base class for all zone banks of Radioddity codeplugs.
+   *
+   * Memmory layout of the zone table/bank:
+   * @verbinclude radioddity_zonebank.txt
+   */
+  class ZoneBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ZoneBankElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constuctor. */
+    explicit ZoneBankElement(uint8_t *ptr);
+    /** Destructor. */
+    ~ZoneBankElement();
+
+    /** Resets the bank. */
+    void clear();
+
+    /** Retruns @c true if the channel is enabled. */
+    virtual bool isEnabled(uint idx) const ;
+    /** Enable/disable a channel in the bank. */
+    virtual void enable(uint idx, bool enabled);
+    /** Returns a pointer to the channel at the given index. */
+    virtual uint8_t *get(uint idx) const;
+  };
+
+  /** Represents a base class for all group lists within Radioddity codeplugs.
+   *
+   * Memmory layout of the RX group list:
+   * @verbinclude radioddity_grouplist.txt
+   */
+  class GroupListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit GroupListElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~GroupListElement();
+
+    /** Resets the group list. */
+    void clear();
+
+    /** Returns the name of the group list. */
+    virtual QString name() const;
+    /** Sets the name of the group list. */
+    virtual void setName(const QString &name);
+
+    /** Returns @c true if the group list has an n-th member.
+     * That is if the n-th index is not 0. */
+    virtual bool hasMember(uint n) const;
+    /** Returns the n-th member index (+1). */
+    virtual uint member(uint n) const;
+    /** Sets the n-th member index (+1). */
+    virtual void setMember(uint n, uint idx);
+    /** Clears the n-th member index. */
+    virtual void clearMember(uint n);
+
+    /** Constructs a @c RXGroupList object from the codeplug representation. */
+    virtual RXGroupList *toRXGroupListObj(Context &ctx);
+    /** Links a previously constructed @c RXGroupList to the rest of the generic configuration. */
+    virtual bool linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx) const;
+    /** Reset this codeplug representation from a @c RXGroupList object. */
+    virtual void fromRXGroupListObj(const RXGroupList *lst, Context &ctx);
+  };
+
+  /** Implements a base class of group list memory banks for all Radioddity codeplugs.
+   *
+   * Memmory layout of the group list table:
+   * @verbinclude radioddity_grouplistbank.txt
+   */
+  class GroupListBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListBankElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit GroupListBankElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~GroupListBankElement();
+
+    /** Resets the bank. */
+    void clear();
+
+    /** Returns @c true if the n-th group list is enabled. */
+    virtual bool isEnabled(uint n) const;
+    /** Returns the number of contacts in the n-th group list. */
+    virtual uint contactCount(uint n) const;
+    /** Sets the number of contacts in the n-th group list.
+     * This also enables the n-th group list. */
+    virtual void setContactCount(uint n, uint size);
+    /** Disables the n-th group list. */
+    virtual void disable(uint n);
+
+    /** Returns a pointer to the n-th group list. */
+    virtual uint8_t *get(uint n) const;
   };
 
 
