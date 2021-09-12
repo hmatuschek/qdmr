@@ -545,7 +545,8 @@ public:
       inh_quickkey_ovr     : 1,     ///< Inhibit quick-key override, default=0.
       _unknown38_7         : 1;     ///< Unknown, set to 1.
 
-    uint8_t tx_exit_tone   : 4,     ///< TX exit tone, 0x0=off, 0x8=on, default off.
+    uint8_t _reserved29_0  : 3,     ///< Reserved to to 0b000.
+      tx_exit_tone         : 1,     ///< TX exit tone, 0=off, 1=on, default off.
       dblwait_tx_active    : 1,     ///< Always TX on active channel on double-wait, not selected, default=1.
       animation            : 1,     ///< Enable animation, default 0.
       scan_mode            : 2;     ///< Scan mode 0b00=time, 0b01=carrier, 0b10=search, default time.

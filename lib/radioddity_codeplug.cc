@@ -6,6 +6,7 @@
 #include "contact.hh"
 #include "rxgrouplist.hh"
 #include "zone.hh"
+#include "config.hh"
 
 
 /* ********************************************************************************************* *
@@ -1211,6 +1212,376 @@ RadioddityCodeplug::ScanListBankElement::enable(uint n, bool enabled) {
 uint8_t *
 RadioddityCodeplug::ScanListBankElement::get(uint n) const {
   return _data+0x0100 + n*0x0058;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::GeneralSettingsElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pas...
+}
+
+RadioddityCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x0028)
+{
+  // pass...
+}
+
+RadioddityCodeplug::GeneralSettingsElement::~GeneralSettingsElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::GeneralSettingsElement::clear() {
+  memset(_data+0x0000, 0xff, 8);
+  memset(_data+0x0008, 0x00, 4);
+  setUInt32_be(0x000c, 0);
+  setUInt8(0x0010, 0);
+
+  setPreambleDuration(360);
+  setMonitorType(SILENT_MONITOR);
+  setVOXSensitivity(3);
+  setLowBatteryWarnInterval(30);
+  setCallAlertDuration(120);
+  setLoneWorkerResponsePeriod(1);
+  setLoneWorkerReminderPeriod(10);
+  setGroupCallHangTime(3000);
+  setPrivateCallHangTime(3000);
+
+  enableDownChannelModeVFO(false);
+  enableUpChannelModeVFO(false);
+  enableResetTone(false);
+  enableUnknownNumberTone(false);
+  setARTSToneMode(ARTS_ONCE);
+
+  enableDigitalTalkPermitTone(false);
+  enableAnalogTalkPermitTone(false);
+  enableSelftestTone(true);
+  enableFrequencyIndicationTone(false);
+  setBit(0x001b, 4, false);
+  disableAllTones(false);
+  enableBatsaveRX(true);
+  enableBatsavePreamble(true);
+
+  setUInt5(0x001c, 0, 0);
+  disableAllLEDs(false);
+  inhibitQuickKeyOverride(false);
+  setBit(0x001c, 7, true);
+
+  setUInt3(0x001d, 0, 0);
+  enableTXExitTone(false);
+  enableTXOnActiveChannel(true);
+  enableAnimation(false);
+  setScanMode(SCANMODE_TIME);
+
+  setRepeaterEndDelay(0);
+  setRepeaterSTE(0);
+
+  setUInt8(0x001f, 0);
+  memset(_data+0x0020, 0xff, 8);
+}
+
+QString
+RadioddityCodeplug::GeneralSettingsElement::name() const {
+  return readASCII(0x0000, 8, 0xff);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setName(const QString &name) {
+  writeASCII(0x0000, name, 8, 0xff);
+}
+
+uint
+RadioddityCodeplug::GeneralSettingsElement::radioID() const {
+  return getBCD8_be(0x0008);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setRadioID(uint id) {
+  setBCD8_be(0x0008, id);
+}
+
+uint
+RadioddityCodeplug::GeneralSettingsElement::preambleDuration() const {
+  return uint(getUInt8(0x0011)*60);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setPreambleDuration(uint ms) {
+  setUInt8(0x0011, ms/60);
+}
+
+RadioddityCodeplug::GeneralSettingsElement::MonitorType
+RadioddityCodeplug::GeneralSettingsElement::monitorType() const {
+  return MonitorType(getUInt8(0x0012));
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setMonitorType(MonitorType type) {
+  setUInt8(0x0012, (uint)type);
+}
+
+uint
+RadioddityCodeplug::GeneralSettingsElement::voxSensitivity() const {
+  return getUInt8(0x0013);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setVOXSensitivity(uint value) {
+  value = std::min(10u, std::max(1u, value));
+  setUInt8(0x0013, value);
+}
+
+uint
+RadioddityCodeplug::GeneralSettingsElement::lowBatteryWarnInterval() const {
+  return uint(getUInt8(0x0014))*5;
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setLowBatteryWarnInterval(uint sec) {
+  setUInt8(0x0014, sec/5);
+}
+
+uint
+RadioddityCodeplug::GeneralSettingsElement::callAlertDuration() const {
+  return uint(getUInt8(0x0015))*5;
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setCallAlertDuration(uint sec) {
+  setUInt8(0x0015, sec/5);
+}
+
+uint
+RadioddityCodeplug::GeneralSettingsElement::loneWorkerResponsePeriod() const {
+  return getUInt8(0x0016);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setLoneWorkerResponsePeriod(uint min) {
+  setUInt8(0x0016, min);
+}
+uint
+RadioddityCodeplug::GeneralSettingsElement::loneWorkerReminderPeriod() const {
+  return getUInt8(0x0017);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setLoneWorkerReminderPeriod(uint sec) {
+  setUInt8(0x0017, sec);
+}
+
+uint
+RadioddityCodeplug::GeneralSettingsElement::groupCallHangTime() const {
+  return uint(getUInt8(0x0018))*500;
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setGroupCallHangTime(uint ms) {
+  setUInt8(0x0018, ms/500);
+}
+uint
+RadioddityCodeplug::GeneralSettingsElement::privateCallHangTime() const {
+  return uint(getUInt8(0x0019))*500;
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setPrivateCallHangTime(uint ms) {
+  setUInt8(0x0019, ms/500);
+}
+
+bool
+RadioddityCodeplug::GeneralSettingsElement::downChannelModeVFO() const {
+  return getBit(0x001a, 0);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::enableDownChannelModeVFO(bool enable) {
+  setBit(0x001a, 0, enable);
+}
+bool
+RadioddityCodeplug::GeneralSettingsElement::upChannelModeVFO() const {
+  return getBit(0x001a, 1);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::enableUpChannelModeVFO(bool enable) {
+  setBit(0x001a, 1, enable);
+}
+
+bool
+RadioddityCodeplug::GeneralSettingsElement::resetTone() const {
+  return getBit(0x001a, 2);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::enableResetTone(bool enable) {
+  setBit(0x001a, 2, enable);
+}
+bool
+RadioddityCodeplug::GeneralSettingsElement::unknownNumberTone() const {
+  return getBit(0x001a, 3);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::enableUnknownNumberTone(bool enable) {
+  setBit(0x001a, 3, enable);
+}
+
+RadioddityCodeplug::GeneralSettingsElement::ARTSTone
+RadioddityCodeplug::GeneralSettingsElement::artsToneMode() const {
+  return ARTSTone(getUInt4(0x001a, 4));
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setARTSToneMode(ARTSTone mode) {
+  setUInt4(0x001a, 4, (uint) mode);
+}
+
+bool
+RadioddityCodeplug::GeneralSettingsElement::digitalTalkPermitTone() const {
+  return getBit(0x001b, 0);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::enableDigitalTalkPermitTone(bool enable) {
+  setBit(0x001b, 0, enable);
+}
+bool
+RadioddityCodeplug::GeneralSettingsElement::analogTalkPermitTone() const {
+  return getBit(0x001b, 1);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::enableAnalogTalkPermitTone(bool enable) {
+  setBit(0x001b, 1, enable);
+}
+bool
+RadioddityCodeplug::GeneralSettingsElement::selftestTone() const {
+  return getBit(0x001b, 2);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::enableSelftestTone(bool enable) {
+  setBit(0x001b, 2, enable);
+}
+bool
+RadioddityCodeplug::GeneralSettingsElement::frequencyIndicationTone() const {
+  return getBit(0x001b, 3);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::enableFrequencyIndicationTone(bool enable) {
+  setBit(0x001b, 3, enable);
+}
+bool
+RadioddityCodeplug::GeneralSettingsElement::allTonesDisabled() const {
+  return getBit(0x001b, 5);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::disableAllTones(bool disable) {
+  setBit(0x001b, 5, disable);
+}
+bool
+RadioddityCodeplug::GeneralSettingsElement::batsaveRX() const {
+  return getBit(0x001b, 6);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::enableBatsaveRX(bool enable) {
+  setBit(0x001b, 6, enable);
+}
+bool
+RadioddityCodeplug::GeneralSettingsElement::batsavePreamble() const {
+  return getBit(0x001b, 7);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::enableBatsavePreamble(bool enable) {
+  setBit(0x001b, 7, enable);
+}
+
+bool
+RadioddityCodeplug::GeneralSettingsElement::allLEDsDisabled() const {
+  return getBit(0x001c, 5);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::disableAllLEDs(bool disable) {
+  setBit(0x001c, 5, disable);
+}
+bool
+RadioddityCodeplug::GeneralSettingsElement::quickKeyOverrideInhibited() const {
+  return getBit(0x001c, 6);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::inhibitQuickKeyOverride(bool inhibit) {
+  setBit(0x001c, 6, inhibit);
+}
+
+bool
+RadioddityCodeplug::GeneralSettingsElement::txExitTone() const {
+  return getBit(0x001d, 3);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::enableTXExitTone(bool enable) {
+  setBit(0x001d, 3, enable);
+}
+bool
+RadioddityCodeplug::GeneralSettingsElement::txOnActiveChannel() const {
+  return getBit(0x001d, 4);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::enableTXOnActiveChannel(bool enable) {
+  setBit(0x001d, 4, enable);
+}
+bool
+RadioddityCodeplug::GeneralSettingsElement::animation() const {
+  return getBit(0x001d, 5);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::enableAnimation(bool enable) {
+  setBit(0x001d, 5, enable);
+}
+RadioddityCodeplug::GeneralSettingsElement::ScanMode
+RadioddityCodeplug::GeneralSettingsElement::scanMode() const {
+  return ScanMode(getUInt2(0x001d, 6));
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setScanMode(ScanMode mode) {
+  setUInt2(0x001d, 6, uint(mode));
+}
+
+uint
+RadioddityCodeplug::GeneralSettingsElement::repeaterEndDelay() const {
+  return getUInt4(0x001e, 0);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setRepeaterEndDelay(uint delay) {
+  setUInt4(0x001e, 0, delay);
+}
+uint
+RadioddityCodeplug::GeneralSettingsElement::repeaterSTE() const {
+  return getUInt4(0x001e, 4);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setRepeaterSTE(uint ste) {
+  setUInt4(0x001e, 4, ste);
+}
+
+QString
+RadioddityCodeplug::GeneralSettingsElement::progPassword() const {
+  return readASCII(0x0020, 8, 0xff);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::setProgPassword(const QString &pwd) {
+  writeASCII(0x0020, pwd, 8, 0xff);
+}
+
+bool
+RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Context &ctx) {
+  if (conf->radioIDs()->defaultId()) {
+    setName(conf->radioIDs()->defaultId()->name());
+    setRadioID(conf->radioIDs()->defaultId()->number());
+  } else if (conf->radioIDs()->count()) {
+    setName(conf->radioIDs()->getId(0)->name());
+    setRadioID(conf->radioIDs()->getId(0)->number());
+  } else {
+    logError() << "Cannot encode radioddity codeplug: No radio ID defined.";
+    return false;
+  }
+  return true;
+}
+
+bool
+RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &ctx) {
+  if (! conf->radioIDs()->defaultId()) {
+    int idx = conf->radioIDs()->add(new RadioID(name(), radioID()));
+    conf->radioIDs()->setDefaultId(idx);
+  }
+  conf->radioIDs()->defaultId()->setName(name());
+  conf->radioIDs()->defaultId()->setNumber(radioID());
+  return true;
 }
 
 

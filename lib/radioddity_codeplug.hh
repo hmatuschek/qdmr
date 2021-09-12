@@ -627,6 +627,197 @@ public:
     virtual uint8_t *get(uint n) const;
   };
 
+  /** Implements the base class of general settings for all Radioddity codeplugs.
+   *
+   * Memmory layout of the general settings
+   * @verbinclude radioddity_generalsettings.txt
+   */
+  class GeneralSettingsElement: public Element
+  {
+  public:
+    /** Possible monitor types. */
+    enum MonitorType {
+      OPEN_SQUELCH = 0,            ///< Monitoring by opening the squelch.
+      SILENT_MONITOR = 1           ///< Silent monitoring.
+    };
+
+    /** Possible ARTS tone settings. */
+    enum ARTSTone {
+      ARTS_DISABLED = 0,           ///< ARTS tone is disabled.
+      ARTS_ONCE     = 4,           ///< ARTS tone once.
+      ARTS_ALWAYS   = 8            ///< ARTS tone always.
+    };
+
+    /** Possible scan modes. */
+    enum ScanMode {
+      SCANMODE_TIME    = 0,
+      SCANMODE_CARRIER = 1,
+      SCANMODE_SEARCH  = 2
+    };
+
+  protected:
+    /** Hidden constructor. */
+    GeneralSettingsElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit GeneralSettingsElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~GeneralSettingsElement();
+
+    /** Resets the general settings. */
+    void clear();
+
+    /** Returns the radio name. */
+    virtual QString name() const;
+    /** Sets the radio name. */
+    virtual void setName(const QString &name);
+
+    /** Returns the DMR radio ID. */
+    virtual uint radioID() const;
+    /** Sets the DMR radio ID. */
+    virtual void setRadioID(uint id);
+
+    /** Returns the preamble duration in ms. */
+    virtual uint preambleDuration() const;
+    /** Sets the preamble duration in ms. */
+    virtual void setPreambleDuration(uint ms);
+
+    /** Returns the monitor type. */
+    virtual MonitorType monitorType() const;
+    /** Sets the monitor type. */
+    virtual void setMonitorType(MonitorType type);
+
+    /** Returns the VOX sensitivity [1-10], 0=disabled. */
+    virtual uint voxSensitivity() const;
+    /** Sets the VOX sensitivity. */
+    virtual void setVOXSensitivity(uint value);
+
+    /** Returns the low-battery warn interval in seconds. */
+    virtual uint lowBatteryWarnInterval() const;
+    /** Sets the low-battery warn interval in seconds. */
+    virtual void setLowBatteryWarnInterval(uint sec);
+
+    /** Returns the call-alert duration in seconds. */
+    virtual uint callAlertDuration() const;
+    /** Sets the call-allert duration in seconds. */
+    virtual void setCallAlertDuration(uint sec);
+
+    /** Returns the lone-worker response period in minutes. */
+    virtual uint loneWorkerResponsePeriod() const;
+    /** Sets the lone-worker response period in minutes. */
+    virtual void setLoneWorkerResponsePeriod(uint min);
+    /** Returns the lone-worker reminder period in seconds. */
+    virtual uint loneWorkerReminderPeriod() const;
+    /** Sets the lone-worker reminder period in seconds. */
+    virtual void setLoneWorkerReminderPeriod(uint sec);
+
+    /** Returns the group call hang time in ms. */
+    virtual uint groupCallHangTime() const;
+    /** Sets the group call hang time in ms. */
+    virtual void setGroupCallHangTime(uint ms);
+    /** Returns the private call hang time in ms. */
+    virtual uint privateCallHangTime() const;
+    /** Sets the private call hang time in ms. */
+    virtual void setPrivateCallHangTime(uint ms);
+
+    /** Returns @c true if the down-channel mode is VFO. */
+    virtual bool downChannelModeVFO() const;
+    /** Enables/disables down-channel mode is VFO. */
+    virtual void enableDownChannelModeVFO(bool enable);
+    /** Returns @c true if the up-channel mode is VFO. */
+    virtual bool upChannelModeVFO() const;
+    /** Enables/disables up-channel mode is VFO. */
+    virtual void enableUpChannelModeVFO(bool enable);
+    /** Returns @c true if the reset tone is enabled. */
+    virtual bool resetTone() const;
+    /** Enables/disables reset tone. */
+    virtual void enableResetTone(bool enable);
+    /** Returns @c true if the uknown number tone is enabled. */
+    virtual bool unknownNumberTone() const;
+    /** Enables/disables reset tone. */
+    virtual void enableUnknownNumberTone(bool enable);
+    /** Returns the ARTS tone mode. */
+    virtual ARTSTone artsToneMode() const;
+    /** Sets the ARTS tone mode. */
+    virtual void setARTSToneMode(ARTSTone mode);
+
+    /** Returns @c true if the digital channel talk permit tone is enabled. */
+    virtual bool digitalTalkPermitTone() const;
+    /** Enables/disables digital channel talk permit tone. */
+    virtual void enableDigitalTalkPermitTone(bool enable);
+    /** Returns @c true if the analog channel talk permit tone is enabled. */
+    virtual bool analogTalkPermitTone() const;
+    /** Enables/disables analog channel talk permit tone. */
+    virtual void enableAnalogTalkPermitTone(bool enable);
+    /** Returns @c true if the reset tone is enabled. */
+    virtual bool selftestTone() const;
+    /** Enables/disables reset tone. */
+    virtual void enableSelftestTone(bool enable);
+    /** Returns @c true if the frequency indication tone is enabled. */
+    virtual bool frequencyIndicationTone() const;
+    /** Enables/disables frequency indication tone. */
+    virtual void enableFrequencyIndicationTone(bool enable);
+    /** Returns @c true if all tones are disabled. */
+    virtual bool allTonesDisabled() const;
+    /** Disables/enables all tones. */
+    virtual void disableAllTones(bool disable);
+    /** Returns @c true if reception is disabled for battery saveing. */
+    virtual bool batsaveRX() const;
+    /** Enables/disables battery saveing by disabling RX. */
+    virtual void enableBatsaveRX(bool enable);
+    /** Returns @c true if preable is disabled for battery saveing. */
+    virtual bool batsavePreamble() const;
+    /** Enables/disables battery saveing by disabling preamble. */
+    virtual void enableBatsavePreamble(bool enable);
+
+    /** Returns @c true if all LEDs are disabled. */
+    virtual bool allLEDsDisabled() const;
+    /** Disables/enables all LEDs. */
+    virtual void disableAllLEDs(bool disable);
+    /** Returns true if quick-key override is inhibited. */
+    virtual bool quickKeyOverrideInhibited() const;
+    /** Inhibits quick-key override. */
+    virtual void inhibitQuickKeyOverride(bool inhibit);
+
+    /** Returns @c true if the TX exit tone is enabled. */
+    virtual bool txExitTone() const;
+    /** Enables/disables TX exit tone. */
+    virtual void enableTXExitTone(bool enable);
+    /** Returns @c true if the radio transmits on the active channel on double monitor. */
+    virtual bool txOnActiveChannel() const;
+    /** Enables/disables transmission on active channel on double monitor. */
+    virtual void enableTXOnActiveChannel(bool enable);
+    /** Returns @c true if animation is enabled. */
+    virtual bool animation() const;
+    /** Enables/disables animation. */
+    virtual void enableAnimation(bool enable);
+    /** Returns the scan mode. */
+    virtual ScanMode scanMode() const;
+    /** Sets the scan mode. */
+    virtual void setScanMode(ScanMode mode);
+
+    /** Returns the repeater end delay in [0-10]. */
+    virtual uint repeaterEndDelay() const;
+    /** Sets the repeater end delay in [0-10]. */
+    virtual void setRepeaterEndDelay(uint delay);
+    /** Returns the repeater STE in [0-10]. */
+    virtual uint repeaterSTE() const;
+    /** Sets the repeater STE in [0-10]. */
+    virtual void setRepeaterSTE(uint ste);
+
+    /** Returns the programming password. */
+    virtual QString progPassword() const;
+    /** Sets the programming password. */
+    virtual void setProgPassword(const QString &pwd);
+
+    /** Encodes the general setting from the given config. */
+    virtual bool fromConfig(const Config *conf, Context &ctx);
+    /** Updates the given config from this settings. */
+    virtual bool updateConfig(Config *conf, Context &ctx);
+  };
+
+
 protected:
   /** Hidden constructor, use a device specific class to instantiate. */
   explicit RadioddityCodeplug(QObject *parent=nullptr);
