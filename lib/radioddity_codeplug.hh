@@ -571,13 +571,18 @@ public:
     /** Clears the secondary priority channel. */
     virtual void clearSecondary();
 
-    /** Returns @c true if the revert channel is set. */
+    /** Returns @c true if the revert channel is set, if @c false the radio will transmit on the
+     * last active channel during scan. */
     virtual bool hasRevert() const;
+    /** Returns @c true if the revert channel is the selected channel. */
+    virtual bool revertIsSelected() const;
     /** Return the channel index for the revert channel. */
     virtual uint revert() const;
     /** Sets the revert channel index. */
     virtual void setRevert(uint idx);
-    /** Clears the revert channel. */
+    /** Sets the revert channel to be the selected one. */
+    virtual void setRevertSelected();
+    /** Clears the revert channel, sets it to last active. */
     virtual void clearRevert();
 
     /** Returns the hold time in ms. */

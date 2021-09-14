@@ -69,19 +69,19 @@ RadioddityCodeplug::ChannelElement::setName(const QString &n) {
 
 uint32_t
 RadioddityCodeplug::ChannelElement::rxFrequency() const {
-  return getBCD8_be(0x0010);
+  return getBCD8_le(0x0010)*10;
 }
 void
 RadioddityCodeplug::ChannelElement::setRXFrequency(uint32_t freq) {
-  setBCD8_be(0x0010, freq);
+  setBCD8_le(0x0010, freq/10);
 }
 uint32_t
 RadioddityCodeplug::ChannelElement::txFrequency() const {
-  return getBCD8_be(0x0014);
+  return getBCD8_le(0x0014)*10;
 }
 void
 RadioddityCodeplug::ChannelElement::setTXFrequency(uint32_t freq) {
-  setBCD8_be(0x0014, freq);
+  setBCD8_le(0x0014, freq/10);
 }
 
 RadioddityCodeplug::ChannelElement::Mode
@@ -130,19 +130,19 @@ RadioddityCodeplug::ChannelElement::setScanListIndex(uint index) {
 
 Signaling::Code
 RadioddityCodeplug::ChannelElement::rxTone() const {
-  return decode_ctcss_tone_table(getUInt16_be(0x0020));
+  return decode_ctcss_tone_table(getUInt16_le(0x0020));
 }
 void
 RadioddityCodeplug::ChannelElement::setRXTone(Signaling::Code code) {
-  setUInt16_be(0x0020, encode_ctcss_tone_table(code));
+  setUInt16_le(0x0020, encode_ctcss_tone_table(code));
 }
 Signaling::Code
 RadioddityCodeplug::ChannelElement::txTone() const {
-  return decode_ctcss_tone_table(getUInt16_be(0x0022));
+  return decode_ctcss_tone_table(getUInt16_le(0x0022));
 }
 void
 RadioddityCodeplug::ChannelElement::setTXTone(Signaling::Code code) {
-  setUInt16_be(0x0022, encode_ctcss_tone_table(code));
+  setUInt16_le(0x0022, encode_ctcss_tone_table(code));
 }
 
 uint
@@ -209,11 +209,11 @@ RadioddityCodeplug::ChannelElement::setEmergencySystemIndex(uint index) {
 
 uint
 RadioddityCodeplug::ChannelElement::contactIndex() const {
-  return getUInt8(0x002e);
+  return getUInt16_le(0x002e);
 }
 void
 RadioddityCodeplug::ChannelElement::setContactIndex(uint index) {
-  setUInt8(0x002e, index);
+  setUInt16_le(0x002e, index);
 }
 
 bool
@@ -364,6 +364,7 @@ RadioddityCodeplug::ChannelElement::toChannelObj(CodePlug::Context &ctx) const {
     default: dch->setAdmit(DigitalChannel::Admit::Always); break;
     }
     dch->setTimeSlot(timeSlot());
+    dch->setColorCode(txColorCode());
   }
 
   // Apply common settings
@@ -696,15 +697,15 @@ RadioddityCodeplug::ZoneElement::setName(const QString &name) {
 
 bool
 RadioddityCodeplug::ZoneElement::hasMember(uint n) const {
-  return (0 == member(n));
+  return (0 != member(n));
 }
 uint
 RadioddityCodeplug::ZoneElement::member(uint n) const {
-  return getUInt16_be(0x0010+2*n);
+  return getUInt16_le(0x0010+2*n);
 }
 void
 RadioddityCodeplug::ZoneElement::setMember(uint n, uint idx) {
-  setUInt16_be(0x0010+n*2, idx);
+  setUInt16_le(0x0010+n*2, idx);
 }
 void
 RadioddityCodeplug::ZoneElement::clearMember(uint n) {
@@ -849,11 +850,11 @@ RadioddityCodeplug::GroupListElement::hasMember(uint n) const {
 }
 uint
 RadioddityCodeplug::GroupListElement::member(uint n) const {
-  return getUInt16_be(0x0010 + 2*n);
+  return getUInt16_le(0x0010 + 2*n);
 }
 void
 RadioddityCodeplug::GroupListElement::setMember(uint n, uint idx) {
-  return setUInt16_be(0x0010+2*n, idx);
+  return setUInt16_le(0x0010+2*n, idx);
 }
 void
 RadioddityCodeplug::GroupListElement::clearMember(uint n) {
@@ -868,10 +869,13 @@ RadioddityCodeplug::GroupListElement::toRXGroupListObj(Context &ctx) {
 bool
 RadioddityCodeplug::GroupListElement::linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx) const {
   for (int i=0; (i<16) && (i<ncnt); i++) {
-    if (ctx.has<DigitalContact>(member(i)))
+    if (ctx.has<DigitalContact>(member(i))) {
       lst->addContact(ctx.get<DigitalContact>(member(i)));
-    else
+    } else {
+      logWarn() << "Cannot link group list '" << lst->name()
+                << "': Member index " << member(i) << " does not refer to a digital contact.";
       return false;
+    }
   }
   return true;
 }
@@ -1006,94 +1010,102 @@ RadioddityCodeplug::ScanListElement::enableTalkback(bool enable) {
 
 bool
 RadioddityCodeplug::ScanListElement::hasMember(uint n) const {
-  return 0 != getUInt16_be(0x0010+2*n);
+  return 0 != getUInt16_le(0x0010+2*n);
 }
 bool
 RadioddityCodeplug::ScanListElement::isSelected(uint n) const {
-  return 1 == getUInt16_be(0x0010+2*n);
+  return 1 == getUInt16_le(0x0010+2*n);
 }
 uint
 RadioddityCodeplug::ScanListElement::member(uint n) const {
-  return getUInt16_be(0x0010 + 2*n)-1;
+  return getUInt16_le(0x0010 + 2*n)-1;
 }
 void
 RadioddityCodeplug::ScanListElement::setMember(uint n, uint idx) {
-  setUInt16_be(0x0010+2*n, idx+1);
+  setUInt16_le(0x0010+2*n, idx+1);
 }
 void
 RadioddityCodeplug::ScanListElement::setSelected(uint n) {
-  setUInt16_be(0x0010+2*n, 1);
+  setUInt16_le(0x0010+2*n, 1);
 }
 void
 RadioddityCodeplug::ScanListElement::clearMember(uint n) {
-  setUInt16_be(0x0010+2*n, 0);
+  setUInt16_le(0x0010+2*n, 0);
 }
 
 bool
 RadioddityCodeplug::ScanListElement::hasPrimary() const {
-  return 0 != getUInt16_be(0x0050);
+  return 0 != getUInt16_le(0x0050);
 }
 bool
 RadioddityCodeplug::ScanListElement::primaryIsSelected() const {
-  return 1 == getUInt16_be(0x0050);
+  return 1 == getUInt16_le(0x0050);
 }
 uint
 RadioddityCodeplug::ScanListElement::primary() const {
-  return getUInt16_be(0x0050)-1;
+  return getUInt16_le(0x0050)-1;
 }
 void
 RadioddityCodeplug::ScanListElement::setPrimary(uint idx) {
-  setUInt16_be(0x0050, idx+1);
+  setUInt16_le(0x0050, idx+1);
 }
 void
 RadioddityCodeplug::ScanListElement::setPrimarySelected() {
-  setUInt16_be(0x0050, 1);
+  setUInt16_le(0x0050, 1);
 }
 void
 RadioddityCodeplug::ScanListElement::clearPrimary() {
-  setUInt16_be(0x0050, 0);
+  setUInt16_le(0x0050, 0);
 }
 
 bool
 RadioddityCodeplug::ScanListElement::hasSecondary() const {
-  return 0 != getUInt16_be(0x0052);
+  return 0 != getUInt16_le(0x0052);
 }
 bool
 RadioddityCodeplug::ScanListElement::secondaryIsSelected() const {
-  return 1 == getUInt16_be(0x0052);
+  return 1 == getUInt16_le(0x0052);
 }
 uint
 RadioddityCodeplug::ScanListElement::secondary() const {
-  return getUInt16_be(0x0052)-1;
+  return getUInt16_le(0x0052)-1;
 }
 void
 RadioddityCodeplug::ScanListElement::setSecondary(uint idx) {
-  setUInt16_be(0x0052, idx+1);
+  setUInt16_le(0x0052, idx+1);
 }
 void
 RadioddityCodeplug::ScanListElement::setSecondarySelected() {
-  setUInt16_be(0x0052, 1);
+  setUInt16_le(0x0052, 1);
 }
 void
 RadioddityCodeplug::ScanListElement::clearSecondary() {
-  setUInt16_be(0x0052, 0);
+  setUInt16_le(0x0052, 0);
 }
 
 bool
 RadioddityCodeplug::ScanListElement::hasRevert() const {
-  return 0 != getUInt16_be(0x0054);
+  return 0 != getUInt16_le(0x0054);
+}
+bool
+RadioddityCodeplug::ScanListElement::revertIsSelected() const {
+  return 1 == getUInt16_le(0x0054);
 }
 uint
 RadioddityCodeplug::ScanListElement::revert() const {
-  return getUInt16_be(0x0054);
+  return getUInt16_le(0x0054)-1;
 }
 void
 RadioddityCodeplug::ScanListElement::setRevert(uint idx) {
-  setUInt16_be(0x0054, idx);
+  setUInt16_le(0x0054, idx+1);
+}
+void
+RadioddityCodeplug::ScanListElement::setRevertSelected() {
+  setUInt16_le(0x0054, 1);
 }
 void
 RadioddityCodeplug::ScanListElement::clearRevert() {
-  setUInt16_be(0x0054, 0);
+  setUInt16_le(0x0054, 0);
 }
 
 uint
@@ -1131,9 +1143,9 @@ RadioddityCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx
   else if (hasSecondary())
     lst->setSecondaryChannel(ctx.get<Channel>(secondary()));
 
-  if (! hasRevert())
+  if (revertIsSelected())
     lst->setRevertChannel(SelectedChannel::get());
-  else
+  else if (hasRevert())
     lst->setRevertChannel(ctx.get<Channel>(revert()));
 
   for (int i=0; (i<32) && hasMember(i); i++) {
@@ -1147,6 +1159,8 @@ RadioddityCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx
 
 void
 RadioddityCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, Context &ctx) {
+  clear();
+  setName(lst->name());
   if (lst->primaryChannel() && (SelectedChannel::get() == lst->primaryChannel()))
     setPrimarySelected();
   else if (lst->primaryChannel())
@@ -1158,7 +1172,7 @@ RadioddityCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, Contex
     setSecondary(ctx.index(lst->secondaryChannel()));
 
   if (lst->revertChannel() && (SelectedChannel::get() == lst->revertChannel()))
-    clearRevert();
+    setRevertSelected();
   else if (lst->revertChannel())
     setRevert(ctx.index(lst->revertChannel()));
 
@@ -2288,6 +2302,22 @@ RadioddityCodeplug::clear() {
   //clearEmergencySystems();
   // Clear contacts
   clearContacts();
+  // clear DTMF contacts
+  clearDTMFContacts();
+  // clear boot settings
+  clearBootSettings();
+  // clear menu settings
+  clearMenuSettings();
+  // clear boot text
+  clearBootText();
+  // clear VFO settings
+  clearVFOSettings();
+  // clear zones
+  clearZones();
+  // clear scan lists
+  clearScanLists();
+  // clear group lists
+  clearGroupLists();
 }
 
 bool
@@ -2369,7 +2399,37 @@ RadioddityCodeplug::encode(Config *config, const Flags &flags) {
     return false;
   }
 
-  return false;
+  if (! this->encodeDTMFContacts(config, flags, ctx)) {
+    _errorMessage = tr("Cannot encode DTMF contacts: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->encodeChannels(config, flags, ctx)) {
+    _errorMessage = tr("Cannot encode channels: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->encodeBootText(config, flags, ctx)) {
+    _errorMessage = tr("Cannot encode boot text: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->encodeZones(config, flags, ctx)) {
+    _errorMessage = tr("Cannot encode zones: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->encodeScanLists(config, flags, ctx)) {
+    _errorMessage = tr("Cannot encode scan lists: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->encodeGroupLists(config, flags, ctx)) {
+    _errorMessage = tr("Cannot encode group lists: %1").arg(_errorMessage);
+    return false;
+  }
+
+  return true;
 }
 
 bool
@@ -2380,17 +2440,65 @@ RadioddityCodeplug::decode(Config *config) {
   // Clear config object
   config->reset();
 
-  // General config
   if (! this->decodeGeneralSettings(config, ctx)) {
     _errorMessage = tr("Cannot decode general settings: %1").arg(_errorMessage);
     return false;
   }
 
-  // Define Contacts
   if (! this->createContacts(config, ctx)) {
     _errorMessage = tr("Cannot create contacts: %1").arg(_errorMessage);
     return false;
   }
 
-  return false;
+  if (! this->createDTMFContacts(config, ctx)) {
+    _errorMessage = tr("Cannot create DTMF contacts: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->createChannels(config, ctx)) {
+    _errorMessage = tr("Cannot create channels: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->decodeBootText(config, ctx)) {
+    _errorMessage = tr("Cannot decode boot text: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->createZones(config, ctx)) {
+    _errorMessage = tr("Cannot create zones: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->createScanLists(config, ctx)) {
+    _errorMessage = tr("Cannot create scan lists: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->createGroupLists(config, ctx)) {
+    _errorMessage = tr("Cannot create group lists: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->linkChannels(config, ctx)) {
+    _errorMessage = tr("Cannot link channels: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->linkZones(config, ctx)) {
+    _errorMessage = tr("Cannot link zones: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->linkScanLists(config, ctx)) {
+    _errorMessage = tr("Cannot link scan lists: %1").arg(_errorMessage);
+    return false;
+  }
+
+  if (! this->linkGroupLists(config, ctx)) {
+    _errorMessage = tr("Cannot link group lists: %1").arg(_errorMessage);
+    return false;
+  }
+
+  return true;
 }

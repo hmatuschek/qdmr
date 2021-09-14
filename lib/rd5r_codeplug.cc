@@ -359,7 +359,8 @@ RD5RCodeplug::linkZones(Config *config, Context &ctx) {
     // Create zone obj
     if (! extend_last_zone) {
       last_zone = ctx.get<Zone>(i+1);
-    } else if (! z.linkZoneObj(last_zone, ctx, extend_last_zone)) {
+    }
+    if (! z.linkZoneObj(last_zone, ctx, extend_last_zone)) {
       _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
           .arg(__func__).arg(i);
       return false;
@@ -454,8 +455,12 @@ RD5RCodeplug::linkGroupLists(Config *config, Context &ctx) {
     if (! bank.isEnabled(i))
       continue;
     GroupListElement el(bank.get(i));
-    if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx))
+    /*logDebug() << "Link " << bank.contactCount(i) << " members of group list '"
+               << ctx.get<RXGroupList>(i+1)->name() << "'.";*/
+    if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx)) {
+      _errorMessage = tr("Cannot link group list '%1'.").arg(ctx.get<RXGroupList>(i+1)->name());
       return false;
+    }
   }
   return true;
 }

@@ -4,15 +4,15 @@
      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 000c  ...                                                                                            | 0   0   0   0 |ChM|  PLT  |TKB|
      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-0010 | Channel 00 index +1, 0 end of list                            | Channel 01 index +1                                           |
+0010 | Channel 00 index +1, 0=EOL, little-endian                     | Channel 01 index +1, little-endian                            |
      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
       ...
      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-004c | Channel 30 index +1                                           | Channel 31 index +1                                           |
+004c | Channel 30 index +1, little-endian                            | Channel 31 index +1, little-endian                            |
      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-0050 | Priority Channel 1, index+2, 0=None, 1=Current                | Priority Channel 2, index+2, 0=None, 1=Current                |
+0050 | Priority Channel 1, index+2, 0=None, 1=Current, little-endian | Priority Channel 2, index+2, 0=None, 1=Current, little-endian |
      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-0054 | TX Channel, index+1, 0=last active                            | Sig. hold time N x 25ms       | Pri. sample time N x 250ms    |
+0054 | TX Channel, index+2, 0=last active, 1=Current, little-endian  | Sig. hold time N x 25ms       | Pri. sample time N x 250ms    |
      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 where
 ChM = Channel mark; PLT = PL type; TKB = Talkback
