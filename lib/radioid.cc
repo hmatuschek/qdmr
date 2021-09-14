@@ -102,17 +102,19 @@ RadioIDList::find(uint32_t id) const {
 
 int
 RadioIDList::add(ConfigObject *obj, int row) {
-  if (obj && obj->is<RadioID>()) {
-    bool was_empty = (0 == count());
-    int idx = ConfigObjectList::add(obj, row);
-    if (0 > idx)
-      return idx;
-    // automatically select first added ID as default
-    if (was_empty && (nullptr == _default))
-      setDefaultId(idx);
+  if ((nullptr == obj) || (! obj->is<RadioID>()))
+    return -1;
+
+  bool was_empty = (0 == count());
+  int idx = ConfigObjectList::add(obj, row);
+  if (0 > idx)
     return idx;
+  // automatically select first added ID as default
+  if (was_empty && (nullptr == _default)) {
+    logDebug() << "Automatically set default radio id to " << obj->as<RadioID>()->name() << ".";
+    setDefaultId(idx);
   }
-  return -1;
+  return idx;
 }
 
 int
@@ -136,7 +138,6 @@ RadioIDList::setDefaultId(uint idx) {
   _default = getId(idx);
   if (nullptr == _default)
     return false;
-  logDebug() << "Set default radio id to " << _default->name() << ".";
   connect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
   emit elementModified(idx);
   return true;
