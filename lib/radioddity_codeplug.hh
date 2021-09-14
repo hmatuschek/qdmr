@@ -11,7 +11,6 @@ class Zone;
 class RXGroupList;
 class ScanList;
 
-
 /** Base class of all Radioddity codeplugs. This class implements the majority of all codeplug
  * elements present in all Radioddity codeplugs (also some derivatives like OpenGD77). This eases
  * the support of several Radioddity radios, as only the differences in the codeplug to this base
@@ -1095,6 +1094,126 @@ public:
     virtual void setDualWatchMode(DualWatchMode mode);
   };
 
+  /** Implements the base class of boot settings for all Radioddity codeplugs.
+   *
+   * Encoding of boot settings (size 0x20b):
+   * @verbinclude radioddity_bootsettings.txt */
+  class BootSettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    BootSettingsElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit BootSettingsElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~BootSettingsElement();
+
+    /** Resets the settings. */
+    void clear();
+
+    /** Returns @c true if the text is shown on boot, other wise an image is shown. */
+    virtual bool bootText() const;
+    /** Enables/disables boot text. */
+    virtual void enableBootText(bool enable);
+
+    /** Returns @c true if the boot passowrd is enabled. */
+    virtual bool bootPasswordEnabled() const;
+    /** Enables/disables the boot password. */
+    virtual void enableBootPassword(bool enable);
+    /** Returns the boot password (6 digit). */
+    virtual uint bootPassword() const;
+    /** Sets the boot password (6 digit). */
+    virtual void setBootPassword(uint passwd);
+  };
+
+  /** Implements the base class of boot messages for all Radioddity codeplugs.
+   *
+   * Encoding of boot messages (size 0x20b):
+   * @verbinclude radioddity_boottext.txt */
+  class BootTextElement: public Element
+  {
+  protected:
+    /** Hiddden constructor. */
+    BootTextElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit BootTextElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~BootTextElement();
+
+    /** Resets the intro text. */
+    void clear();
+
+    /** Returns the first line. */
+    virtual QString line1() const;
+    /** Sets the first line. */
+    virtual void setLine1(const QString &text);
+    /** Returns the Second line. */
+    virtual QString line2() const;
+    /** Sets the second line. */
+    virtual void setLine2(const QString &text);
+
+    /** Encodes boot text settings from configuration. */
+    virtual void fromConfig(Config *conf);
+    /** Updates the configuration with the boot text settings. */
+    virtual void updateConfig(Config *conf);
+  };
+
+  /** Implements the base class of a message bank for all Radioddity message banks.
+   *
+   * Encoding of messages (size: 0x1248b):
+   * @verbinclude radioddity_messagebank.txt */
+  class MessageBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    MessageBankElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit MessageBankElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~MessageBankElement();
+
+    /** Resets all messages. */
+    void clear();
+
+    /** Returns the number of messages. */
+    virtual uint numMessages() const;
+    /** Returns the n-th message. */
+    virtual QString message(uint n) const;
+    /** Appends a message to the list. */
+    virtual void appendMessage(const QString msg);
+  };
+
+  /** Implements the base class of a timestamp for all Radioddity codeplugs.
+   *
+   * Encoding of messages (size: 0x0006b):
+   * @verbinclude radioddity_timestamp.txt */
+  class TimestampElement: Element
+  {
+  protected:
+    /** Hidden constructor. */
+    TimestampElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit TimestampElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~TimestampElement();
+
+    /** Resets the timestamp. */
+    void clear();
+
+    /** Returns the time stamp. */
+    virtual QDateTime get() const;
+    /** Sets the time stamp. */
+    virtual void set(const QDateTime &ts=QDateTime::currentDateTime());
+  };
+
 protected:
   /** Hidden constructor, use a device specific class to instantiate. */
   explicit RadioddityCodeplug(QObject *parent=nullptr);
@@ -1106,13 +1225,97 @@ public:
   /** Clears and resets the complete codeplug to some default values. */
   virtual void clear();
 
+  bool index(Config *config, Context &ctx) const;
+
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
   bool decode(Config *config);
   /** Encodes the given generic configuration as a binary codeplug. */
   bool encode(Config *config, const Flags &flags = Flags());
 
 public:
+  /** Clears the time-stamp in the codeplug. */
+  virtual void clearTimestamp() = 0;
+  /** Sets the time-stamp. */
+  virtual bool encodeTimestamp() = 0;
 
+  /** Clears the general settings in the codeplug. */
+  virtual void clearGeneralSettings() = 0;
+  /** Updates the general settings from the given configuration. */
+  virtual bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) = 0;
+  /** Updates the given configuration from the general settings. */
+  virtual bool decodeGeneralSettings(Config *config, Context &ctx) = 0;
+
+  /** Clears the button settings. */
+  virtual void clearButtonSettings() = 0;
+
+  /** Clears the messages. */
+  virtual void clearMessages() = 0;
+
+  /** Clears all contacts in the codeplug. */
+  virtual void clearContacts() = 0;
+  /** Encodes all digital contacts in the configuration into the codeplug. */
+  virtual bool encodeContacts(Config *config, const Flags &flags, Context &ctx) = 0;
+  /** Adds a digital contact to the configuration for each one in the codeplug. */
+  virtual bool createContacts(Config *config, Context &ctx) = 0;
+
+  /** Clears all DTMF contacts in the codeplug. */
+  virtual void clearDTMFContacts() = 0;
+  /** Encodes all DTMF contacts. */
+  virtual bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx) = 0;
+  /** Adds all DTMF contacts to the configuration. */
+  virtual bool createDTMFContacts(Config *config, Context &ctx) = 0;
+
+  /** Clear all channels. */
+  virtual void clearChannels() = 0;
+  /** Encode all channels. */
+  virtual bool encodeChannels(Config *config, const Flags &flags, Context &ctx) = 0;
+  /** Adds all defined channels to the configuration. */
+  virtual bool createChannels(Config *config, Context &ctx) = 0;
+  /** Links all channels. */
+  virtual bool linkChannels(Config *config, Context &ctx) = 0;
+
+  /** Clear boot settings. */
+  virtual void clearBootSettings() = 0;
+
+  /** Clears menu settings. */
+  virtual void clearMenuSettings() = 0;
+
+  /** Clears boot text. */
+  virtual void clearBootText() = 0;
+  /** Encodes boot text. */
+  virtual bool encodeBootText(Config *config, const Flags &flags, Context &ctx) = 0;
+  /** Updates the given configuration from the boot text settings. */
+  virtual bool decodeBootText(Config *config, Context &ctx) = 0;
+
+  /** Clears the VFO settings. */
+  virtual void clearVFOSettings() = 0;
+
+  /** Clears all zones. */
+  virtual void clearZones() = 0;
+  /** Encodes zones. */
+  virtual bool encodeZones(Config *config, const Flags &flags, Context &ctx) = 0;
+  /** Adds zones to the configuration. */
+  virtual bool createZones(Config *config, Context &ctx) = 0;
+  /** Links all zones within the configuration. */
+  virtual bool linkZones(Config *config, Context &ctx) = 0;
+
+  /** Clears all scan lists. */
+  virtual void clearScanLists() = 0;
+  /** Encodes all scan lists. */
+  virtual bool encodeScanLists(Config *config, const Flags &flags, Context &ctx) = 0;
+  /** Creates all scan lists. */
+  virtual bool createScanLists(Config *config, Context &ctx) = 0;
+  /** Links all scan lists. */
+  virtual bool linkScanLists(Config *config, Context &ctx) = 0;
+
+  /** Clears all group lists. */
+  virtual void clearGroupLists() = 0;
+  /** Encodes all group lists. */
+  virtual bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx) = 0;
+  /** Creates all group lists. */
+  virtual bool createGroupLists(Config *config, Context &ctx) = 0;
+  /** Links all group lists. */
+  virtual bool linkGroupLists(Config *config, Context &ctx) = 0;
 };
 
 #endif // RADIODDITYCODEPLUG_HH

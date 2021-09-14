@@ -25,6 +25,8 @@ public:
   /** Clears and resets the complete codeplug to some default values. */
   virtual void clear() = 0;
 
+  virtual bool index(Config *config, Context &ctx) const;
+
   /** Sets all bitmaps for the given config. */
   virtual void setBitmaps(Config *config) = 0;
   /** Allocate all code-plug elements that must be downloaded for decoding. All code-plug elements

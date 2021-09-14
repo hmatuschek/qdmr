@@ -492,7 +492,7 @@ RadioddityCodeplug::ContactElement::ContactElement(uint8_t *ptr, uint size)
 }
 
 RadioddityCodeplug::ContactElement::ContactElement(uint8_t *ptr)
-  : Element(ptr, 0x18)
+  : Element(ptr, 0x0018)
 {
   // pass...
 }
@@ -606,7 +606,7 @@ RadioddityCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr, uint si
 }
 
 RadioddityCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr)
-  : Element(ptr, 0x20)
+  : Element(ptr, 0x0020)
 {
   // pass...
 }
@@ -2058,16 +2058,207 @@ RadioddityCodeplug::MenuSettingsElement::setDualWatchMode(DualWatchMode mode) {
 }
 
 
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::BootSettingsElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x20)
+{
+  // pass...
+}
+
+RadioddityCodeplug::BootSettingsElement::~BootSettingsElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::BootSettingsElement::clear() {
+  enableBootText(true);
+  enableBootPassword(false);
+  setBCD8_be(0x0002, 0);
+  setUInt8(0x0007, 0);
+  memset(_data+0x0008, 0, 24);
+}
+
+bool
+RadioddityCodeplug::BootSettingsElement::bootText() const {
+  return (1 == getUInt8(0x0000));
+}
+void
+RadioddityCodeplug::BootSettingsElement::enableBootText(bool enable) {
+  setUInt8(0x0000, (enable ? 1 :0));
+}
+
+bool
+RadioddityCodeplug::BootSettingsElement::bootPasswordEnabled() const {
+  return (1 == getUInt8(0x0001));
+}
+void
+RadioddityCodeplug::BootSettingsElement::enableBootPassword(bool enable) {
+  setUInt8(0x0001, (enable ? 1 : 0));
+}
+
+uint
+RadioddityCodeplug::BootSettingsElement::bootPassword() const {
+  return getBCD8_be(0x0002);
+}
+void
+RadioddityCodeplug::BootSettingsElement::setBootPassword(uint passwd) {
+  setBCD8_be(0x0002, passwd);
+}
+
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::BootTextElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::BootTextElement::BootTextElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::BootTextElement::BootTextElement(uint8_t *ptr)
+  : Element(ptr, 0x0020)
+{
+  // pass...
+}
+
+RadioddityCodeplug::BootTextElement::~BootTextElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::BootTextElement::clear() {
+  setLine1("");
+  setLine2("");
+}
+
+QString
+RadioddityCodeplug::BootTextElement::line1() const {
+  return readASCII(0x0000, 16, 0xff);
+}
+void
+RadioddityCodeplug::BootTextElement::setLine1(const QString &text) {
+  writeASCII(0x0000, text, 16, 0xff);
+}
+
+QString
+RadioddityCodeplug::BootTextElement::line2() const {
+  return readASCII(0x0010, 16, 0xff);
+}
+void
+RadioddityCodeplug::BootTextElement::setLine2(const QString &text) {
+  writeASCII(0x0010, text, 16, 0xff);
+}
+
+void
+RadioddityCodeplug::BootTextElement::fromConfig(Config *conf) {
+  setLine1(conf->introLine1());
+  setLine2(conf->introLine2());
+}
+
+void
+RadioddityCodeplug::BootTextElement::updateConfig(Config *conf) {
+  conf->setIntroLine1(line1());
+  conf->setIntroLine2(line2());
+}
 
 
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::MessageBankElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::MessageBankElement::MessageBankElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::MessageBankElement::MessageBankElement(uint8_t *ptr)
+  : Element(ptr, 0x1248)
+{
+  // pass...
+}
+
+RadioddityCodeplug::MessageBankElement::~MessageBankElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::MessageBankElement::clear() {
+  setUInt8(0x0000, 0); // set count to 0
+  memset(_data+0x0001, 0x00, 7); // Fill unused
+  memset(_data+0x0008, 0x00, 32); // Set message lengths to 0
+  memset(_data+0x0028, 0x00, 32); // Fill unused
+  memset(_data+0x0048, 0xff, 32*144); // Clear all messages
+}
+
+uint
+RadioddityCodeplug::MessageBankElement::numMessages() const {
+  return getUInt8(0x0000);
+}
+QString
+RadioddityCodeplug::MessageBankElement::message(uint n) const {
+  if (n >= numMessages())
+    return QString();
+  return readASCII(0x0048+n*144, 144, 0xff);
+}
+void
+RadioddityCodeplug::MessageBankElement::appendMessage(const QString msg) {
+  uint idx = numMessages();
+  if (idx >= 32)
+    return;
+  uint len = std::min(msg.size(), 144);
+  // increment counter
+  setUInt8(0x0000, idx+1);
+  // store length
+  setUInt8(0x0008+idx, len);
+  // store string
+  writeASCII(0x0048+144*len, msg, 144, 0xff);
+}
 
 
+/* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::TimestampElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::TimestampElement::TimestampElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
 
+RadioddityCodeplug::TimestampElement::TimestampElement(uint8_t *ptr)
+  : Element(ptr, 0x0006)
+{
+  // pass...
+}
 
+RadioddityCodeplug::TimestampElement::~TimestampElement() {
+  // pass...
+}
 
+void
+RadioddityCodeplug::TimestampElement::clear() {
+  set();
+}
 
-
-
+QDateTime
+RadioddityCodeplug::TimestampElement::get() const {
+  return QDateTime(QDate(getBCD4_be(0x0000), getBCD2(0x0002), getBCD2(0x0003)),
+                   QTime(getBCD2(0x0004), getBCD2(0x0005)));
+}
+void
+RadioddityCodeplug::TimestampElement::set(const QDateTime &ts) {
+  setBCD4_be(0x0000, ts.date().year());
+  setBCD2(0x0002, ts.date().month());
+  setBCD2(0x0003, ts.date().day());
+  setBCD2(0x0004, ts.time().hour());
+  setBCD2(0x0005, ts.time().minute());
+}
 
 
 /* ********************************************************************************************* *
@@ -2085,15 +2276,121 @@ RadioddityCodeplug::~RadioddityCodeplug() {
 
 void
 RadioddityCodeplug::clear() {
-  // pass...
+  // Clear timestamp
+  clearTimestamp();
+  // Clear general config
+  clearGeneralSettings();
+  // Clear button settings
+  clearButtonSettings();
+  // Clear messsages
+  clearMessages();
+  // Clear emergency systems
+  //clearEmergencySystems();
+  // Clear contacts
+  clearContacts();
+}
+
+bool
+RadioddityCodeplug::index(Config *config, Context &ctx) const {
+  // All indices as 1-based. That is, the first channel gets index 1.
+
+  // Map radio IDs
+  for (int i=0; i<config->radioIDs()->count(); i++)
+    ctx.add(config->radioIDs()->getId(i), i+1);
+
+  // Map digital and DTMF contacts
+  for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
+    if (config->contacts()->contact(i)->is<DigitalContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DigitalContact>(), d+1); d++;
+    } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a+1); a++;
+    }
+  }
+
+  // Map rx group lists
+  for (int i=0; i<config->rxGroupLists()->count(); i++)
+    ctx.add(config->rxGroupLists()->list(i), i+1);
+
+  // Map channels
+  for (int i=0; i<config->channelList()->count(); i++)
+    ctx.add(config->channelList()->channel(i), i+1);
+
+  // Map zones
+  for (int i=0; i<config->zones()->count(); i++)
+    ctx.add(config->zones()->zone(i), i+1);
+
+  // Map scan lists
+  for (int i=0; i<config->scanlists()->count(); i++)
+    ctx.add(config->scanlists()->scanlist(i), i+1);
+
+  // Map DMR APRS systems
+  for (int i=0,a=0,d=0; i<config->posSystems()->count(); i++) {
+    if (config->posSystems()->system(i)->is<GPSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<GPSSystem>(), d+1); d++;
+    } else if (config->posSystems()->system(i)->is<APRSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<APRSSystem>(), a+1); a++;
+    }
+  }
+
+  // Map roaming
+  for (int i=0; i<config->roaming()->count(); i++)
+    ctx.add(config->roaming()->zone(i), i+1);
+
+  return true;
 }
 
 bool
 RadioddityCodeplug::encode(Config *config, const Flags &flags) {
+  // Check if default DMR id is set.
+  if (nullptr == config->radioIDs()->defaultId()) {
+    _errorMessage = tr("Cannot encode TyT codeplug: No default radio ID specified.");
+    return false;
+  }
+
+  // Create index<->object table.
+  Context ctx;
+  if (! index(config, ctx))
+    return false;
+
+  // Set timestamp
+  if (! this->encodeTimestamp()) {
+    _errorMessage = tr("Cannot encode time-stamp: %1").arg(_errorMessage);
+    return false;
+  }
+  // General config
+  if (! this->encodeGeneralSettings(config, flags, ctx)) {
+    _errorMessage = tr("Cannot encode general settings: %1").arg(_errorMessage);
+    return false;
+  }
+
+  // Define Contacts
+  if (! this->encodeContacts(config, flags, ctx)) {
+    _errorMessage = tr("Cannot encode contacts: %1").arg(_errorMessage);
+    return false;
+  }
+
   return false;
 }
 
 bool
 RadioddityCodeplug::decode(Config *config) {
+  // Create index<->object table.
+  Context ctx;
+
+  // Clear config object
+  config->reset();
+
+  // General config
+  if (! this->decodeGeneralSettings(config, ctx)) {
+    _errorMessage = tr("Cannot decode general settings: %1").arg(_errorMessage);
+    return false;
+  }
+
+  // Define Contacts
+  if (! this->createContacts(config, ctx)) {
+    _errorMessage = tr("Cannot create contacts: %1").arg(_errorMessage);
+    return false;
+  }
+
   return false;
 }

@@ -291,6 +291,91 @@ GD77Codeplug::grouplist_t::fromRXGroupListObj(const RXGroupList *lst, const Conf
 
 
 /* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::zone_t
+ * ******************************************************************************************** */
+GD77Codeplug::zone_t::zone_t() {
+  clear();
+}
+
+bool
+GD77Codeplug::zone_t::isValid() const {
+  return 0xff != name[0];
+}
+void
+GD77Codeplug::zone_t::clear() {
+  memset(name, 0xff, sizeof(name));
+  memset(member, 0x00, sizeof(member));
+}
+
+QString
+GD77Codeplug::zone_t::getName() const {
+  return decode_ascii(name, 16, 0xff);
+}
+void
+GD77Codeplug::zone_t::setName(const QString &n) {
+  encode_ascii(name, n, 16, 0xff);
+}
+
+Zone *
+GD77Codeplug::zone_t::toZoneObj() const {
+  if (! isValid())
+    return nullptr;
+  return new Zone(getName());
+}
+
+bool
+GD77Codeplug::zone_t::linkZoneObj(Zone *zone, const CodeplugContext &ctx, bool putInB) const {
+  if (! isValid()) {
+    logDebug() << "Cannot link zone: Zone is invalid.";
+    return false;
+  }
+
+  for (int i=0; (i<16) && member[i]; i++) {
+    if (ctx.hasChannel(member[i])) {
+      if (! putInB)
+        zone->A()->add(ctx.getChannel(member[i]));
+      else
+        zone->B()->add(ctx.getChannel(member[i]));
+    } else {
+      logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
+                << member[i] << " out of bounds.";
+    }
+  }
+  return true;
+}
+
+void
+GD77Codeplug::zone_t::fromZoneObjA(const Zone *zone, const Config *conf) {
+  if (zone->A()->count() && zone->B()->count())
+    setName(zone->name() + " A");
+  else
+    setName(zone->name());
+
+  for (int i=0; i<16; i++) {
+    if (i < zone->A()->count())
+      member[i] = conf->channelList()->indexOf(zone->A()->get(i))+1;
+    else
+      member[i] = 0;
+  }
+}
+
+void
+GD77Codeplug::zone_t::fromZoneObjB(const Zone *zone, const Config *conf) {
+  if (zone->A()->count() && zone->B()->count())
+    setName(zone->name() + " B");
+  else
+    setName(zone->name());
+
+  for (int i=0; i<16; i++) {
+    if (i < zone->B()->count())
+      member[i] = conf->channelList()->indexOf(zone->B()->get(i))+1;
+    else
+      member[i] = 0;
+  }
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of GD77Codeplug::scanlist_t
  * ******************************************************************************************** */
 GD77Codeplug::scanlist_t::scanlist_t() {
@@ -463,6 +548,270 @@ GD77Codeplug::contact_t::fromContactObj(const DigitalContact *cont, const Config
 
 
 /* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::dtmf_contact_t
+ * ******************************************************************************************** */
+GD77Codeplug::dtmf_contact_t::dtmf_contact_t() {
+  clear();
+}
+
+void
+GD77Codeplug::dtmf_contact_t::clear() {
+  memset(name, 0xff, 16);
+  memset(number, 0xff, 16);
+}
+
+bool
+GD77Codeplug::dtmf_contact_t::isValid() const {
+  return 0xff != name[0];
+}
+
+QString
+GD77Codeplug::dtmf_contact_t::getNumber() const {
+  return decode_dtmf_bin(number, 16, 0xff);
+}
+bool
+GD77Codeplug::dtmf_contact_t::setNumber(const QString &num) {
+  return encode_dtmf_bin(num, number, 16, 0xff);
+}
+
+QString
+GD77Codeplug::dtmf_contact_t::getName() const {
+  return decode_ascii(name, 16, 0xff);
+}
+void
+GD77Codeplug::dtmf_contact_t::setName(const QString &n) {
+  encode_ascii(name, n, 16, 0xff);
+}
+
+DTMFContact *
+GD77Codeplug::dtmf_contact_t::toContactObj() const {
+  if (! isValid())
+    return nullptr;
+  return new DTMFContact(getName(), getNumber());
+}
+
+void
+GD77Codeplug::dtmf_contact_t::fromContactObj(const DTMFContact *cont, const Config *conf) {
+  Q_UNUSED(conf);
+  setName(cont->name());
+  setNumber(cont->number());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::general_settings_t
+ * ******************************************************************************************** */
+GD77Codeplug::general_settings_t::general_settings_t() {
+  clear();
+  initDefault();
+}
+
+void
+GD77Codeplug::general_settings_t::clear() {
+  memset(radio_name, 0xff, 8);
+  memset(radio_id, 0x00, 4);
+  _reserved12   = 0;
+  _reserved16   = 0;
+  _reserved27_4 = 0;
+  _reserved28_0 = 0;
+  _unknown38_7  = 1;
+  _reserved31   = 0;
+  memset(prog_password, 0xff, 8);
+}
+
+void
+GD77Codeplug::general_settings_t::initDefault() {
+  clear();
+  tx_preamble          = 6;
+  monitor_type         = OPEN_SQUELCH; // 0x00
+  vox_sensitivity      = 3;
+  lowbat_intervall     = 6;
+  call_alert_dur       = 24; // 0x18
+  lone_worker_response = 1;
+  lone_worker_reminder = 10; //0x0a
+  grp_hang  = 6;
+  priv_hang = 6;
+
+  // default value 0x40
+  downch_mode_vfo      = 0;
+  upch_mode_vfo        = 0;
+  reset_tone           = 0;
+  unknown_number_tone  = 0;
+  arts_tone            = 4;
+
+  // default value 0xc4
+  permit_digital       = 0;
+  permit_ananlog       = 0;
+  selftest_tone        = 1;
+  freq_ind_tone        = 0;
+  disable_all_tones    = 0;
+  savebat_receive      = 1;
+  savebet_preamble     = 1;
+
+  // default value 0x80
+  disable_all_leds     = 0;
+  inh_quickkey_ovr     = 0;
+
+  // default value 0x10
+  tx_exit_tone         = 0;
+  dblwait_tx_active    = 1;
+  animation            = 0;
+  scan_mode            = SCANMODE_TIME;
+
+  // default value 0x00
+  repeater_end_delay   = 0;
+  repeater_ste         = 0;
+}
+
+QString
+GD77Codeplug::general_settings_t::getName() const {
+  return decode_ascii(radio_name, 8, 0xff);
+}
+void
+GD77Codeplug::general_settings_t::setName(const QString &n) {
+  return encode_ascii(radio_name, n, 8, 0xff);
+}
+
+uint32_t
+GD77Codeplug::general_settings_t::getRadioId() const {
+  return decode_dmr_id_bcd(radio_id);
+}
+void
+GD77Codeplug::general_settings_t::setRadioId(uint32_t num) {
+  encode_dmr_id_bcd(radio_id, num);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::button_settings_t
+ * ******************************************************************************************** */
+GD77Codeplug::button_settings_t::button_settings_t() {
+  clear();
+  initDefault();
+}
+
+void
+GD77Codeplug::button_settings_t::clear() {
+  _unknown0      = 0x01;
+  long_press_dur = 0x06;
+  sk1_short      = 0x00;
+  sk1_long       = 0x00;
+  sk2_short      = 0x00;
+  sk2_short      = 0x00;
+  tk_short       = 0x13;
+  tk_long        = 0x11;
+  memset(one_touch, 0xff, 6*sizeof(one_touch_t));
+}
+
+void
+GD77Codeplug::button_settings_t::initDefault() {
+  clear();
+  long_press_dur = 0x06;
+  sk1_short      = ZoneSelect;
+  sk1_long       = ToggleFMRadio;
+  sk2_short      = ToggleMonitor;
+  sk2_long       = ToggleFlashLight;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::intro_text_t
+ * ******************************************************************************************** */
+GD77Codeplug::intro_text_t::intro_text_t() {
+  clear();
+}
+
+void
+GD77Codeplug::intro_text_t::clear() {
+  memset(intro_line1, 0xff, 16);
+  memset(intro_line2, 0xff, 16);
+}
+
+QString
+GD77Codeplug::intro_text_t::getIntroLine1() const {
+  return decode_ascii(intro_line1, 16, 0xff);
+}
+void
+GD77Codeplug::intro_text_t::setIntroLine1(const QString &text) {
+  encode_ascii(intro_line1, text, 16, 0xff);
+}
+
+QString
+GD77Codeplug::intro_text_t::getIntroLine2() const {
+  return decode_ascii(intro_line2, 16, 0xff);
+}
+void
+GD77Codeplug::intro_text_t::setIntroLine2(const QString &text) {
+  encode_ascii(intro_line2, text, 16, 0xff);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::msgtab_t
+ * ******************************************************************************************** */
+GD77Codeplug::msgtab_t::msgtab_t() {
+  clear();
+}
+
+void
+GD77Codeplug::msgtab_t::clear() {
+  count = 0;
+  memset(_unused1, 0, 7);
+  memset(len, 0, NMESSAGES);
+  memset(_unused2, 0, NMESSAGES);
+  memset(message, 0, NMESSAGES*144);
+}
+
+QString
+GD77Codeplug::msgtab_t::getMessage(int i) const {
+  if (i >= count)
+    return "";
+  return decode_ascii(message[i], len[i], 0xff);
+}
+
+bool
+GD77Codeplug::msgtab_t::addMessage(const QString &msg) {
+  if (count == 144)
+    return false;
+  len[count] = std::min(msg.size(), 144);
+  encode_ascii(message[count], msg, 144, 0xff);
+  count++;
+  return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::timestamp_t
+ * ******************************************************************************************** */
+QDateTime
+GD77Codeplug::timestamp_t::get() const {
+  uint16_t year = (year_bcd & 0x0f) + 10*((year_bcd>>4) & 0x0f) + 100*((year_bcd>>8) & 0x0f)
+      + 1000*((year_bcd>>12) & 0x0f);
+  uint8_t month = (month_bcd & 0x0f) + 10*((month_bcd>>4) & 0x0f);
+  uint8_t day = (day_bcd & 0x0f) + 10*((day_bcd>>4) & 0x0f);
+  uint8_t hour = (hour_bcd & 0x0f) + 10*((hour_bcd>>4) & 0x0f);
+  uint8_t minute = (minute_bcd & 0x0f) + 10*((minute_bcd>>4) & 0x0f);
+  return QDateTime(QDate(year, month, day), QTime(hour, minute));
+}
+
+void
+GD77Codeplug::timestamp_t::setNow() {
+  set(QDateTime::currentDateTime());
+}
+
+void
+GD77Codeplug::timestamp_t::set(const QDateTime &dt) {
+  uint16_t year = dt.date().year();
+  uint8_t month = dt.date().month(), day = dt.date().day(), hour = dt.time().hour(), minute = dt.time().minute();
+  year_bcd = (year % 10) | ((year/10) % 10)<<4 | ((year/100) % 10) << 8 | ((year/100) % 10) << 12;
+  month_bcd = (month % 10) | ((month/10) % 10) << 4;
+  day_bcd = (day % 10) | ((day/10) % 10) << 4;
+  hour_bcd = (hour % 10) | ((hour/10) % 10) << 4;
+  minute_bcd = (minute % 10) | ((minute/10) % 10) << 4;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of GD77Codeplug
  * ******************************************************************************************** */
 GD77Codeplug::GD77Codeplug(QObject *parent)
@@ -471,6 +820,11 @@ GD77Codeplug::GD77Codeplug(QObject *parent)
   addImage("Radioddity GD77 Codeplug");
   image(0).addElement(0x00080, 0x07b80);
   image(0).addElement(0x08000, 0x16300);
+}
+
+bool
+GD77Codeplug::index(Config *config, Context &ctx) const {
+  return true;
 }
 
 bool

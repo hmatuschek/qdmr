@@ -278,12 +278,85 @@ public:
     void fromContactObj(const DigitalContact *obj, const Config *conf);
   };
 
-  /** Represents a single zone within the codeplug. This representation is identical to the
-   * zone representation within the RD-5R codeplug. Hence, it gets reused. */
-  typedef  RD5RCodeplug::zone_t zone_t;
-  /** Table of zones. This representation is identical to the zone table within the RD-5R codeplug.
-   * Hence, it gets reused. */
-  typedef RD5RCodeplug::zonetab_t zonetab_t;
+  /** Specific codeplug representation of a DTMF (analog) contact.
+   *
+   * Memmory layout of the DTMF contact:
+   * @verbinclude rd5rdtmfcontact.txt
+   */
+  struct __attribute__((packed)) dtmf_contact_t {
+    // Bytes 0-15
+    uint8_t name[16];                   ///< Contact name in ASCII, 0xff terminated.
+    // Bytes 16-24
+    uint8_t number[16];                 ///< DTMF number {0-9,a-d,*,#}, 0xff terminated.
+
+    /** Constructor. */
+    dtmf_contact_t();
+
+    /** Resets an invalidates the contact entry. */
+    void clear();
+    /** Returns @c true, if the contact is valid. */
+    bool isValid() const;
+    /** Returns the DTMF number of the contact. */
+    QString getNumber() const;
+    /** Sets the DTMF number of the contact. */
+    bool setNumber(const QString &number);
+    /** Returns the name of the contact. */
+    QString getName() const;
+    /** Sets the name of the contact. */
+    void setName(const QString &name);
+
+    /** Constructs a @c DTMFContact instance from this codeplug contact. */
+    DTMFContact *toContactObj() const;
+    /** Resets this codeplug contact from the given @c DTMFContact. */
+    void fromContactObj(const DTMFContact *obj, const Config *conf);
+  };
+
+  /** Represents a single zone within the codeplug.
+   *
+   * Memmory layout of the zone:
+   * @verbinclude rd5rzone.txt
+   */
+  struct __attribute__((packed)) zone_t {
+    // Bytes 0-15
+    uint8_t name[16];                   ///< Zone name ASCII, 0xff terminated.
+    // Bytes 16-47
+    uint16_t member[16];                ///< Member channel indices+1, 0=empty/not used.
+
+    /** Constructor. */
+    zone_t();
+
+    /** Returns @c true if the zone entry is valid. */
+    bool isValid() const;
+    /** Resets and invalidates the zone entry. */
+    void clear();
+    /** Retruns the zone name. */
+    QString getName() const;
+    /** Sets the zone name. */
+    void setName(const QString &name);
+
+    /** Constructs a generic @c Zone object from this codeplug zone. */
+    Zone *toZoneObj() const;
+    /** Links a previously constructed @c Zone object to the rest of the configuration. That is
+     * linking to the referred channels. */
+    bool linkZoneObj(Zone *zone, const CodeplugContext &ctx, bool putInB) const;
+    /** Resets this codeplug zone representation from the given generic @c Zone object. */
+    void fromZoneObjA(const Zone *zone, const Config *conf);
+    /** Resets this codeplug zone representation from the given generic @c Zone object. */
+    void fromZoneObjB(const Zone *zone, const Config *conf);
+  };
+
+  /** Table of zones.
+   *
+   * Memmory layout of the zone table/bank:
+   * @verbinclude rd5rzonetab.txt
+   */
+  struct __attribute__((packed)) zonetab_t {
+    /** A bit representing the validity of every zone. If a bit is set, the corresponding zone in
+     * @c zone ist valid. */
+    uint8_t bitmap[32];
+    /** The list of zones. */
+    zone_t  zone[NZONES];
+  };
 
   /** Represents an RX group list within the codeplug.
    *
@@ -382,28 +455,302 @@ public:
     scanlist_t scanlist[NSCANL];
   };
 
-	/** Represents the general settings within the codeplug. This representation is identical to
-	 * the general settings of the RD-5R codeplug. Hence, it gets reused here. */
-	typedef RD5RCodeplug::general_settings_t general_settings_t;
+  /** Represents the general settings within the codeplug.
+   *
+   * Memmory layout of the general settings
+   * @verbinclude rd5rgeneralsettings.txt
+   */
+  struct __attribute__((packed))  general_settings_t{
+    /** Possible monitor types. */
+    typedef enum {
+      OPEN_SQUELCH = 0,            ///< Monitoring by opening the squelch.
+      SILENT_MONITOR = 1           ///< Silent monitoring.
+    } MonitorType;
 
-  /** Represents the intro lines within the codeplug. This representation is identical to
-	 * the intro lines of the RD-5R codeplug. Hence, it gets reused here. */
-	typedef RD5RCodeplug::intro_text_t intro_text_t;
+    /** Possible ARTS tone settings. */
+    typedef enum {
+      ARTS_DISABLED = 0,           ///< ARTS tone is disabled.
+      ARTS_ONCE     = 4,           ///< ARTS tone once.
+      ARTS_ALWAYS   = 8            ///< ARTS tone always.
+    } ARTSTone;
 
-  /** Represents the table of preset messages within the codeplug. This representation is identical to
-	 * the table of messages of the RD-5R codeplug. Hence, it gets reused here. */
-	typedef RD5RCodeplug::msgtab_t msgtab_t;
+    /** Possible scan modes. */
+    typedef enum {
+      SCANMODE_TIME    = 0,
+      SCANMODE_CARRIER = 1,
+      SCANMODE_SEARCH  = 2
+    } ScanMode;
 
-  /** Represents the boot settings for the GD77 (same as RD5R). */
-  typedef RD5RCodeplug::boot_settings_t boot_settings_t;
-  /** Represents the menu settings for the GD77 (same as RD5R). */
-  typedef RD5RCodeplug::menu_settings_t menu_settings_t;
-  /** Represents the button settings for the GD77 (same as RD5R). */
-  typedef RD5RCodeplug::button_settings_t button_settings_t;
+    uint8_t radio_name[8];         ///< The radio name in ASCII, 0xff terminated.
+    uint8_t radio_id[4];           ///< The radio DMR ID in BCD.
+
+    uint32_t _reserved12;          ///< Reserved, set to 0x00000000.
+    uint8_t _reserved16;           ///< Unknown, set to 0x00.
+
+    uint8_t tx_preamble;           ///< TX preamble duration in 60ms steps 0=0ms, 1=60ms, default=360ms (0x06).
+    uint8_t monitor_type;          ///< Monitor type, 0x00 = open squelch, 0x01 = silent.
+    uint8_t vox_sensitivity;       ///< VOX sensitivity [1,10], default 0x03.
+    uint8_t lowbat_intervall;      ///< Low-battery interfvall in 5sec setps, 0=0s, 1=5s, default 30s (0x06).
+    uint8_t call_alert_dur;        ///< Call-alert tone duration in 5sec steps, 0=infinity, 1=5s, etc, default 0x18=120s.
+    uint8_t lone_worker_response;  ///< Lone-worker response timer in minutes [1,255], default 1.
+    uint8_t lone_worker_reminder;  ///< Lone-worker reminder timer in seconds [1,255], default 10.
+    uint8_t grp_hang;              ///< Group-call hang-time in 500ms setps 0=0ms, 1=500ms, default=3000ms (0x06).
+    uint8_t priv_hang;             ///< Private-call hang-time in 500ms setps 0=0ms, 1=500ms, default=3000ms (0x06).
+
+    uint8_t downch_mode_vfo: 1,    ///< Down-channel mode=VFO, default 0.
+      upch_mode_vfo        : 1,    ///< Up-channel mode=VFO, default 0.
+      reset_tone           : 1,    ///< Reset tone, default 0.
+      unknown_number_tone  : 1,    ///< Unknown number tone, default 0.
+      arts_tone            : 4;    ///< ARTS tone, 0x0=disabled, 0x4=once, 0x8=always, default=once.
+
+    uint8_t permit_digital : 1,     ///< Talk permit tone digital, default=0.
+      permit_ananlog       : 1,     ///< Talk permit tone ananlog, default=0.
+      selftest_tone        : 1,     ///< Self-test pass tone, default=1.
+      freq_ind_tone        : 1,     ///< Channel frequency indication tone, default=0 (off).
+      _reserved27_4        : 1,     ///< Unknown, set to 0.
+      disable_all_tones    : 1,     ///< Disables all tones, default 0.
+      savebat_receive      : 1,     ///< Save battery by disable receive, default=1.
+      savebet_preamble     : 1;     ///< Save battery by disable preamble, default=1.
+
+    uint8_t _reserved28_0  : 5,     ///< Unknown, set to 0b00000.
+      disable_all_leds     : 1,     ///< Disables all LEDs, default=0.
+      inh_quickkey_ovr     : 1,     ///< Inhibit quick-key override, default=0.
+      _unknown38_7         : 1;     ///< Unknown, set to 1.
+
+    uint8_t _reserved29_0  : 3,     ///< Reserved to to 0b000.
+      tx_exit_tone         : 1,     ///< TX exit tone, 0=off, 1=on, default off.
+      dblwait_tx_active    : 1,     ///< Always TX on active channel on double-wait, not selected, default=1.
+      animation            : 1,     ///< Enable animation, default 0.
+      scan_mode            : 2;     ///< Scan mode 0b00=time, 0b01=carrier, 0b10=search, default time.
+
+    uint8_t repeater_end_delay : 4, ///< Repeater-end delay [0,10], default 0.
+      repeater_ste             : 4; ///< Repeater STE [0,10], default 0.
+
+    uint8_t _reserved31;            ///< Unknown, set to 0x00.
+    uint8_t prog_password[8];       ///< Programming password, 8 x ASCII 0xff terminated.
+
+    /** Constructor. */
+    general_settings_t();
+
+    /** Resets the general settings. */
+    void clear();
+    /** Resets the general settings to their default values. */
+    void initDefault();
+
+    /** Returns the name of the radio. */
+    QString getName() const;
+    /** Sets the name of the radio. */
+    void setName(const QString &n);
+
+    /** Returns the DMR ID of the radio. */
+    uint32_t getRadioId() const;
+    /** Sets the DMR ID of the radio. */
+    void setRadioId(uint32_t num);
+  };
+
+  /** Represents the button settings.
+   *
+   * Encoding of button settings (size 0x20b):
+   * @verbinclude rd5rbuttonsettings.txt */
+  struct __attribute__((packed)) button_settings_t {
+    /** Possible actions for each button on short and long press. */
+    typedef enum {
+      None                   = 0x00,  ///< Disables button.
+      ToggleAllAlertTones    = 0x01,
+      EmergencyOn            = 0x02,
+      EmergencyOff           = 0x03,
+      ToggleMonitor          = 0x05,  ///< Toggle monitor on channel.
+      NuiaceDelete           = 0x06,
+      OneTouch1              = 0x07,  ///< Performs the first of 6 user-programmable actions (call, message).
+      OneTouch2              = 0x08,  ///< Performs the second of 6 user-programmable actions (call, message).
+      OneTouch3              = 0x09,  ///< Performs the third of 6 user-programmable actions (call, message).
+      OneTouch4              = 0x0a,  ///< Performs the fourth of 6 user-programmable actions (call, message).
+      OneTouch5              = 0x0b,  ///< Performs the fifth of 6 user-programmable actions (call, message).
+      OneTouch6              = 0x0c,  ///< Performs the sixt of 6 user-programmable actions (call, message).
+      ToggleRepeatTalkaround = 0x0d,
+      ToggleScan             = 0x0e,
+      TogglePrivacy          = 0x10,
+      ToggleVox              = 0x11,
+      ZoneSelect             = 0x12,
+      BatteryIndicator       = 0x13,
+      ToggleLoneWorker       = 0x14,
+      PhoneExit              = 0x16,
+      ToggleFlashLight       = 0x1a,
+      ToggleFMRadio          = 0x1b
+    } ButtonEvent;
+
+    /** Binary representation of one-touch actions (calls & messages). */
+    struct __attribute__((packed)) one_touch_t {
+      uint8_t type;               ///< Specifies the type of the action, 0x00=disabled, 0x10 = digital call, 0x11 = digital message, 0x20 = analog call.
+      uint16_t contact_idx;       ///< Specifies the contact index, 0x00=none or index+1.
+      uint8_t message_idx;        ///< Specifies the message index, 0x00=none, index+1 or 0xff if call.
+      /** Resets the one-touch settings. */
+      void clear();
+    };
+
+    uint8_t  _unknown0;           ///< Unknown set to 0x01.
+    uint8_t  long_press_dur;      ///< Specifies the duration for a long-press in 250ms [4,16], default=6 (1500ms).
+    uint8_t  sk1_short;           ///< Event on short-press on SK1.
+    uint8_t  sk1_long;            ///< Event on long-press on SK1.
+    uint8_t  sk2_short;           ///< Event on short-press on SK2.
+    uint8_t  sk2_long;            ///< Event on long-press on SK2.
+    uint8_t  tk_short;            ///< Event on short-press on TK (GD77 only).
+    uint8_t  tk_long;             ///< Event on long-press on TK (GD77 only).
+    one_touch_t one_touch[6];     ///< 6 x one-touch actions.
+
+    /** Constructor. */
+    button_settings_t();
+
+    /** Resets the button settings. */
+    void clear();
+    /** Resets the button settings to their default values. */
+    void initDefault();
+  };
+
+  /** Represents the menu settings.
+   *
+   * Encoding of Menu settings (size 0x08b):
+   * @verbinclude rd5rmenusettings.txt */
+  struct __attribute__((packed)) menu_settings_t {
+    // Byte 0
+    uint8_t hangtime;             ///< Menu hang-time in seconds [1,30], default 10.
+
+    // Byte 1
+    uint8_t message        : 1,   ///< Show text message menu entry, default=1.
+      scan_start           : 1,   ///< Show start-scan menu entry, default=1.
+      edit_scanlist        : 1,   ///< Show edit-scanlist menu entry, default=1.
+      call_alert           : 1,   ///< Show call-alert menu entry, default=1.
+      edit_contact         : 1,   ///< Show edit-contact menu entry, default=1.
+      manual_dial          : 1,   ///< Show manual-dial menu entry, default=1.
+      radio_check          : 1,   ///< Show radio-check menu entry, default=1.
+      remote_monitor       : 1;   ///< Show remote-monitor menu entry, default=1.
+
+    // Byte 2
+    uint8_t radio_enable   : 1,   ///< Show radio-enable menu entry, default=1.
+      radio_disable        : 1,   ///< Show radio-disable menu entry, default=1.
+      prog_passwd          : 1,   ///< Show programming-password menu entry, default=1.
+      talkaround           : 1,   ///< Show talkaround menu entry, default=1.
+      tone                 : 1,   ///< Show tone menu entry, default=1.
+      power                : 1,   ///< Show power-settings menu entry, default=1.
+      backlight            : 1,   ///< Show backlight menu entry, default=1.
+      introscreen          : 1;   ///< Show intro-screen menu entry, default=1.
+
+    // Byte 3
+    uint8_t keypadlock     : 1,   ///< Show key-pad lock menu entry, default=1.
+      led_indicator        : 1,   ///< Show LED indicator menu entry, default=1.
+      squelch              : 1,   ///< Show squelch menu entry, default=1.
+      privacy              : 1,   ///< Show privacy settings menu entry, default=1.
+      vox                  : 1,   ///< Show VOX menu entry, default=1.
+      passwd_lock          : 1,   ///< Show password and lock menu entry, default=1.
+      missed_calls         : 1,   ///< Show missed calles menu entry, default=1.
+      answered_calls       : 1;   ///< Show answered calls menu entry, default=1.
+
+    // Byte 4
+    uint8_t outgoing_calls : 1,   ///< Show outgoing calls menu entry, default=1.
+      ch_display_mode      : 1,   ///< Show channel display mode menu entry, default=1.
+      dbl_standby          : 1,   ///< Show double-standby (dual-watch) menu entry, default=1.
+      _unknown4_3          : 1,   ///< Unknown set to 0.
+      _unknown4_4          : 1,   ///< Unknown set to 0.
+      _unknown4_5          : 1,   ///< Unknown set to 1.
+      _unknown4_6          : 1,   ///< Unknown set to 1.
+      _unknown4_7          : 1;   ///< Unknown set to 1.
+
+    // Byte 5
+    uint8_t  _unknown5;           ///< Unknown set to 0xff.
+
+    // Byte 6
+    uint8_t key_lock_time  : 2,   ///< Keypad auto-lock time, 0=manual, 1=5s, 2=10s, 3=15s, default=manual.
+      backlight_time       : 2,   ///< Backlight on-time, 0=always, 1=5s, 2=10s, 3=15s, default=15s.
+      _unknown6_4          : 2,   ///< Unknown, default=0.
+      channel_display      : 2;   ///< Channel display type, 0=number, 1=name, 2=frequency, default=name.
+
+    // Byte 7
+    uint8_t  _unknown7_0   : 4,   ///< Unknown set to 0.
+      _unknown7_4          : 1,   ///< Unknown set to 1.
+      keytone              : 1,   ///< Enable key-tone, default=0.
+      double_wait          : 2;   ///< Double-wait (dual-watch) mode. 1=Double/Double, 2=Double/Single.
+  };
+
+  /** Represents the boot settings within the binary codeplug.
+   *
+   * Encoding of boot settings (size 0x20b):
+   * @verbinclude rd5rbootsettings.txt */
+  struct __attribute__((packed)) boot_settings_t {
+    uint8_t boot_text;                  ///< Shows intro lines at boot (see @c RD5RCodeplug::intro_text_t), 0=image, 1=text, default=1.
+    uint8_t boot_password_enabled;      ///< Enables to boot-password, 0=disabled, 1=enabled, default=0.
+    uint32_t password;                  ///< Boot password 6 x BCD number.
+    uint8_t _unknown7;                  ///< Unkown, set to 0.
+    uint8_t empty[24];                  ///< Unkown (boot image?), set to 0.
+  };
+
+  /** Represents the intro messages within the codeplug. */
+  struct __attribute__((packed)) intro_text_t {
+    // Bytes 7540-754f
+    uint8_t intro_line1[16];       ///< The first intro line, ASCII, 0xff terminated.
+    // Bytes 7550-755f
+    uint8_t intro_line2[16];       ///< The second intro line, ASCII, 0xff terminated.
+
+    /** Constructor. */
+    intro_text_t();
+    /** Clear intro text. */
+    void clear();
+
+    /** Returns the first intro line. */
+    QString getIntroLine1() const;
+    /** Set the first intro line. */
+    void setIntroLine1(const QString &text);
+    /** Returns the second intro line. */
+    QString getIntroLine2() const;
+    /** Sets the second intro line. */
+    void setIntroLine2(const QString &text);
+  };
+
+  /** Represents the table of text messages within the codeplug.
+   *
+   * Encoding of messages (size: 0x1248b):
+   * @verbinclude rd5rmessagetab.txt */
+  struct __attribute__((packed)) msgtab_t {
+    // byte 0x0000
+    uint8_t count;                      ///< Number of messages.
+    uint8_t _unused1[7];                ///< Unknown, set to 0.
+    // byte 0x0008
+    uint8_t len[NMESSAGES];             ///< Message lengths.
+    // byte 0x0028
+    uint8_t _unused2[NMESSAGES];        ///< Unknown, set to 0.
+    // byte 0x0048
+    uint8_t message[NMESSAGES][144];    ///< The actual messages, ASCII
+
+    /** Constructor. */
+    msgtab_t();
+    /** Clears all messages. */
+    void clear();
+    /** Gets a particular message. */
+    QString getMessage(int i) const;
+    /** Adds particular message to the list. */
+    bool addMessage(const QString &text);
+  };
+
+  /** Represents the codeplug time-stamp within the codeplug. */
+  struct __attribute__((packed)) timestamp_t {
+    uint16_t year_bcd;                  ///< The year in 4 x BCD
+    uint8_t month_bcd;                  ///< The month in 2 x BCD
+    uint8_t day_bcd;                    ///< The day in 2 x BCD.
+    uint8_t hour_bcd;                   ///< The hour in 2 x BCD.
+    uint8_t minute_bcd;                 ///< The minute in 2 x BCD.
+
+    /** Returns the timestamp. */
+    QDateTime get() const;
+    /** Set the time-stamp to now. */
+    void setNow();
+    /** Set the time-stamp to the given date and time. */
+    void set(const QDateTime &dt);
+  };
 
 public:
   /** Constructs an empty codeplug for the GD-77. */
 	explicit GD77Codeplug(QObject *parent=nullptr);
+
+  bool index(Config *config, Context &ctx) const;
 
 	/** Decodes the binary codeplug and stores its content in the given generic configuration. */
 	bool decode(Config *config);

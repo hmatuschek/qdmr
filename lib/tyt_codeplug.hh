@@ -1369,6 +1369,8 @@ public:
   /** Clears and resets the complete codeplug to some default values. */
   virtual void clear();
 
+  bool index(Config *config, Context &ctx) const;
+
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
 	bool decode(Config *config);
   /** Encodes the given generic configuration as a binary codeplug. */

@@ -1,5 +1,5 @@
 #include "radio.hh"
-#include "hid_interface.hh"
+#include "radioddity_interface.hh"
 #include "dfu_libusb.hh"
 #include "rd5r.hh"
 #include "gd77.hh"
@@ -398,7 +398,7 @@ Radio::detect(QString &errorMessage, const QString &force) {
 
   // Try Radioddity/Baofeng RD5R & GD-77
   {
-    HID *hid = new HID(0x15a2, 0x0073);
+    RadioddityInterface *hid = new RadioddityInterface(0x15a2, 0x0073);
     if (hid->isOpen()) {
       id = hid->identifier();
       if (("BF-5R" == id) || ("RD5R" == force.toUpper())) {

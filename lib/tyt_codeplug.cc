@@ -2876,6 +2876,55 @@ TyTCodeplug::~TyTCodeplug() {
   // pass...
 }
 
+bool
+TyTCodeplug::index(Config *config, Context &ctx) const {
+  // All indices as 1-based. That is, the first channel gets index 1.
+
+  // Map radio IDs
+  for (int i=0; i<config->radioIDs()->count(); i++)
+    ctx.add(config->radioIDs()->getId(i), i+1);
+
+  // Map digital and DTMF contacts
+  for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
+    if (config->contacts()->contact(i)->is<DigitalContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DigitalContact>(), d+1); d++;
+    } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a+1); a++;
+    }
+  }
+
+  // Map rx group lists
+  for (int i=0; i<config->rxGroupLists()->count(); i++)
+    ctx.add(config->rxGroupLists()->list(i), i+1);
+
+  // Map channels
+  for (int i=0; i<config->channelList()->count(); i++)
+    ctx.add(config->channelList()->channel(i), i+1);
+
+  // Map zones
+  for (int i=0; i<config->zones()->count(); i++)
+    ctx.add(config->zones()->zone(i), i+1);
+
+  // Map scan lists
+  for (int i=0; i<config->scanlists()->count(); i++)
+    ctx.add(config->scanlists()->scanlist(i), i+1);
+
+  // Map DMR APRS systems
+  for (int i=0,a=0,d=0; i<config->posSystems()->count(); i++) {
+    if (config->posSystems()->system(i)->is<GPSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<GPSSystem>(), d+1); d++;
+    } else if (config->posSystems()->system(i)->is<APRSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<APRSSystem>(), a+1); a++;
+    }
+  }
+
+  // Map roaming
+  for (int i=0; i<config->roaming()->count(); i++)
+    ctx.add(config->roaming()->zone(i), i+1);
+
+  return true;
+}
+
 void
 TyTCodeplug::clear()
 {

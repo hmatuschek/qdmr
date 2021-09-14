@@ -5,8 +5,9 @@
 #include "dfufile.hh"
 #include "userdatabase.hh"
 #include <QHash>
+#include "config.hh"
 
-class Config;
+//class Config;
 class ConfigObject;
 
 
@@ -174,11 +175,10 @@ public:
    * be defined first using @c addTable. */
   class Context
   {
-  protected:
-    /** Hidden constrcutor. */
+  public:
+    /** Empty constructor. */
     Context();
 
-  public:
     /** Resolves the given index for the specifies element type.
      * @returns @c nullptr if the index is not defined or the type is unknown. */
     ConfigObject *obj(const QMetaObject *elementType, uint idx);
@@ -187,6 +187,9 @@ public:
     int index(ConfigObject *obj);
     /** Associates the given object with the given index. */
     bool add(ConfigObject *obj, uint idx);
+
+    /** Adds a table for the given type. */
+    bool addTable(const QMetaObject *obj);
 
     /** Returns the object associated by the given index and type. */
     template <class T>
@@ -215,8 +218,6 @@ public:
     bool hasTable(const QMetaObject *obj) const;
     /** Returns a reference to the table for the given type. */
     Table &getTable(const QMetaObject *obj);
-    /** Adds a table for the given type. */
-    bool addTable(const QMetaObject *obj);
 
   protected:
     /** Table of tables. */
@@ -230,6 +231,12 @@ protected:
 public:
   /** Destructor. */
 	virtual ~CodePlug();
+
+  /** Indexes all elements of the codeplug.
+   * This method must be implemented by any device or vendor specific codeplug to map config
+   * objects to indices used within the binary codeplug to address each element (e.g., channels,
+   * contacts etc.). */
+  virtual bool index(Config *config, Context &ctx) const = 0;
 
   /** Decodes a binary codeplug to the given abstract configuration @c config.
    * This must be implemented by the device-specific codeplug. */

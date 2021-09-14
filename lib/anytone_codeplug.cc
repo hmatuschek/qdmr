@@ -10,4 +10,9 @@ AnytoneCodeplug::~AnytoneCodeplug() {
   // pass...
 }
 
+bool
+AnytoneCodeplug::index(Config *config, Context &ctx) const {
+  return true;
+}
+
 

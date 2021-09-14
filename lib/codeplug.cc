@@ -314,11 +314,17 @@ CodePlug::Element::writeUnicode(uint offset, const QString &txt, uint maxlen, ui
 CodePlug::Context::Context()
   : _tables()
 {
+  // Add tables for common elements
+  addTable(&RadioID::staticMetaObject);
   addTable(&DigitalContact::staticMetaObject);
+  addTable(&DTMFContact::staticMetaObject);
   addTable(&RXGroupList::staticMetaObject);
   addTable(&Channel::staticMetaObject);
   addTable(&Zone::staticMetaObject);
   addTable(&ScanList::staticMetaObject);
+  addTable(&GPSSystem::staticMetaObject);
+  addTable(&APRSSystem::staticMetaObject);
+  addTable(&RoamingZone::staticMetaObject);
 }
 
 bool

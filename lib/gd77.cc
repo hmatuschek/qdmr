@@ -57,7 +57,7 @@ static Radio::Features _gd77_features = {
 };
 
 
-GD77::GD77(HID *device, QObject *parent)
+GD77::GD77(RadioddityInterface *device, QObject *parent)
   : Radio(parent), _name("Radioddity GD-77"), _dev(device), _config(nullptr)
 {
   if (! connect())
@@ -177,7 +177,7 @@ GD77::connect() {
   }
 
   // connect
-  _dev = new HID(0x15a2, 0x0073);
+  _dev = new RadioddityInterface(0x15a2, 0x0073);
 
   if (! _dev->isOpen()) {
     _task = StatusError;
@@ -289,8 +289,8 @@ GD77::download() {
     for (uint b=0; b<nb; b++, bcount++) {
       // Select bank by addr
       uint32_t addr = (b0+b)*BSIZE;
-      HID::MemoryBank bank = (
-            (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+      RadioddityInterface::MemoryBank bank = (
+            (0x10000 > addr) ? RadioddityInterface::MEMBANK_CODEPLUG_LOWER : RadioddityInterface::MEMBANK_CODEPLUG_UPPER );
       // read
       if (! _dev->read(bank, addr, _codeplug.data(addr), BSIZE)) {
         _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
@@ -330,8 +330,8 @@ GD77::upload() {
     for (uint b=0; b<nb; b++, bcount++) {
       // Select bank by addr
       uint32_t addr = (b0+b)*BSIZE;
-      HID::MemoryBank bank = (
-            (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+      RadioddityInterface::MemoryBank bank = (
+            (0x10000 > addr) ? RadioddityInterface::MEMBANK_CODEPLUG_LOWER : RadioddityInterface::MEMBANK_CODEPLUG_UPPER );
       // read
       if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
         _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
@@ -359,8 +359,8 @@ GD77::upload() {
     for (size_t b=0; b<nb; b++,bcount++) {
       // Select bank by addr
       uint32_t addr = (b0+b)*BSIZE;
-      HID::MemoryBank bank = (
-            (0x10000 > addr) ? HID::MEMBANK_CODEPLUG_LOWER : HID::MEMBANK_CODEPLUG_UPPER );
+      RadioddityInterface::MemoryBank bank = (
+            (0x10000 > addr) ? RadioddityInterface::MEMBANK_CODEPLUG_LOWER : RadioddityInterface::MEMBANK_CODEPLUG_UPPER );
       logDebug() << "Write " << BSIZE << "bytes to 0x" << QString::number(addr,16) << ".";
       if (! _dev->write(bank, addr, _codeplug.data(addr), BSIZE)) {
         _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
@@ -397,8 +397,8 @@ GD77::uploadCallsigns()
     uint addr = _callsigns.image(0).element(n).address();
     uint size = _callsigns.image(0).element(n).data().size();
     uint b0 = addr/BSIZE, nb = size/BSIZE;
-    HID::MemoryBank bank = (
-          (0x10000 > addr) ? HID::MEMBANK_CALLSIGN_LOWER : HID::MEMBANK_CALLSIGN_UPPER );
+    RadioddityInterface::MemoryBank bank = (
+          (0x10000 > addr) ? RadioddityInterface::MEMBANK_CALLSIGN_LOWER : RadioddityInterface::MEMBANK_CALLSIGN_UPPER );
     for (uint b=0; b<nb; b++, bcount+=BSIZE) {
       if (! _dev->write(bank, (b0+b)*BSIZE,
                         _callsigns.data((b0+b)*BSIZE, 0), BSIZE))

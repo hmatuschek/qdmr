@@ -1,4 +1,4 @@
-#include "hid_interface.hh"
+#include "radioddity_interface.hh"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,33 +17,33 @@ static const unsigned char CMD_CWB1[]  = "CWB\4\0\1\0\0";
 static const unsigned char CMD_CWB3[]  = "CWB\4\0\3\0\0";
 static const unsigned char CMD_CWB4[]  = "CWB\4\0\4\0\0";
 
-HID::HID(int vid, int pid, QObject *parent)
+RadioddityInterface::RadioddityInterface(int vid, int pid, QObject *parent)
   : HIDevice(vid, pid, parent), _current_bank(MEMBANK_NONE), _identifier()
 {
   if (isOpen())
     identifier();
 }
 
-HID::~HID() {
+RadioddityInterface::~RadioddityInterface() {
   if (isOpen())
     close();
 }
 
 
 bool
-HID::isOpen() const {
+RadioddityInterface::isOpen() const {
   return HIDevice::isOpen();
 }
 
 void
-HID::close() {
+RadioddityInterface::close() {
   logDebug() << "Close HID connection.";
   _identifier.clear();
   HIDevice::close();
 }
 
 QString
-HID::identifier() {
+RadioddityInterface::identifier() {
   static unsigned char reply[38];
   unsigned char ack;
 
@@ -100,7 +100,7 @@ HID::identifier() {
 
 
 bool
-HID::read_start(uint32_t bank, uint32_t addr) {
+RadioddityInterface::read_start(uint32_t bank, uint32_t addr) {
   if (! selectMemoryBank(MemoryBank(bank))) {
     _errorMessage = tr("Cannot select memory bank %1: %2").arg(bank).arg(_errorMessage);
     return false;
@@ -110,7 +110,7 @@ HID::read_start(uint32_t bank, uint32_t addr) {
 }
 
 bool
-HID::read(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
+RadioddityInterface::read(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
 {
   unsigned char cmd[4], reply[32+4];
   int n;
@@ -136,7 +136,7 @@ HID::read(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
 }
 
 bool
-HID::read_finish()
+RadioddityInterface::read_finish()
 {
   unsigned char ack;
 
@@ -159,7 +159,7 @@ HID::read_finish()
 
 
 bool
-HID::write_start(uint32_t bank, uint32_t addr) {
+RadioddityInterface::write_start(uint32_t bank, uint32_t addr) {
   if (! selectMemoryBank(MemoryBank(bank))) {
     _errorMessage = tr("Cannot select memory bank %1: %2").arg(bank).arg(_errorMessage);
     return false;
@@ -169,7 +169,7 @@ HID::write_start(uint32_t bank, uint32_t addr) {
 }
 
 bool
-HID::write(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
+RadioddityInterface::write(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
 {
   unsigned char ack, cmd[4+32];
 
@@ -198,7 +198,7 @@ HID::write(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
 }
 
 bool
-HID::write_finish()
+RadioddityInterface::write_finish()
 {
   unsigned char ack;
 
@@ -219,7 +219,7 @@ HID::write_finish()
 }
 
 bool
-HID::selectMemoryBank(MemoryBank bank) {
+RadioddityInterface::selectMemoryBank(MemoryBank bank) {
   unsigned char ack;
   const uint8_t *cmd = nullptr;
 

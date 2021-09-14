@@ -13,7 +13,7 @@
 #define GD77_HH
 
 #include "radio.hh"
-#include "hid_interface.hh"
+#include "radioddity_interface.hh"
 #include "gd77_codeplug.hh"
 #include "gd77_callsigndb.hh"
 
@@ -27,7 +27,7 @@ class GD77 : public Radio
 
 public:
 	/** Do not construct this class directly, rather use @c Radio::detect. */
-  explicit GD77(HID *device=nullptr, QObject *parent=nullptr);
+  explicit GD77(RadioddityInterface *device=nullptr, QObject *parent=nullptr);
 
   virtual ~GD77();
 
@@ -63,7 +63,7 @@ protected:
   /** The device identifier. */
 	QString _name;
   /** The interface to the radio. */
-	HID *_dev;
+	RadioddityInterface *_dev;
   /** The generic configuration. */
 	Config *_config;
   /** The actual binary codeplug representation. */

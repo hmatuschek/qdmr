@@ -1,5 +1,5 @@
-#ifndef HIDINTERFACE_HH
-#define HIDINTERFACE_HH
+#ifndef RADIODDITY_INTERFACE_HH
+#define RADIODDITY_INTERFACE_HH
 
 #include <QtGlobal>
 #include <QObject>
@@ -11,10 +11,10 @@
 #include "hid_libusb.hh"
 #endif
 
-/** Implements a radio interface for radios using the HID USB schema.
+/** Implements a radio interface for radios using the HID USB schema (i.e. Radioddity devices).
  *
- * @ingroup rif */
-class HID: public HIDevice, public RadioInterface
+ * @ingroup radioddity */
+class RadioddityInterface: public HIDevice, public RadioInterface
 {
 	Q_OBJECT
 
@@ -30,9 +30,9 @@ public:
 
 public:
   /** Connects to the radio with given vendor and product ID. */
-	explicit HID(int vid, int pid, QObject *parent = nullptr);
+  explicit RadioddityInterface(int vid, int pid, QObject *parent = nullptr);
   /** Destructor. */
-	virtual ~HID();
+  virtual ~RadioddityInterface();
 
   /** Returns @c true if the connection was established. */
 	bool isOpen() const;
@@ -80,4 +80,4 @@ private:
   QString _identifier;
 };
 
-#endif // HIDINTERFACE_HH
+#endif // RADIODDITY_INTERFACE_HH
