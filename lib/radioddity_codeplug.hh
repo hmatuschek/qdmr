@@ -201,11 +201,6 @@ public:
     /** Sets the power setting of the channel. */
     virtual void setPower(Channel::Power pwr);
 
-    /** Returns the squelch level. */
-    virtual uint squelch() const;
-    /** Sets the squelch level. */
-    virtual void setSquelch(uint level);
-
     /** Constructs a generic @c Channel object from the codeplug channel. */
     virtual Channel *toChannelObj(Context &ctx) const;
     /** Links a previously constructed channel to the rest of the configuration. */
@@ -1194,31 +1189,6 @@ public:
     virtual void appendMessage(const QString msg);
   };
 
-  /** Implements the base class of a timestamp for all Radioddity codeplugs.
-   *
-   * Encoding of messages (size: 0x0006b):
-   * @verbinclude radioddity_timestamp.txt */
-  class TimestampElement: Element
-  {
-  protected:
-    /** Hidden constructor. */
-    TimestampElement(uint8_t *ptr, uint size);
-
-  public:
-    /** Constructor. */
-    explicit TimestampElement(uint8_t *ptr);
-    /** Destructor. */
-    virtual ~TimestampElement();
-
-    /** Resets the timestamp. */
-    void clear();
-
-    /** Returns the time stamp. */
-    virtual QDateTime get() const;
-    /** Sets the time stamp. */
-    virtual void set(const QDateTime &ts=QDateTime::currentDateTime());
-  };
-
 protected:
   /** Hidden constructor, use a device specific class to instantiate. */
   explicit RadioddityCodeplug(QObject *parent=nullptr);
@@ -1238,10 +1208,11 @@ public:
   bool encode(Config *config, const Flags &flags = Flags());
 
 public:
-  /** Clears the time-stamp in the codeplug. */
-  virtual void clearTimestamp() = 0;
-  /** Sets the time-stamp. */
-  virtual bool encodeTimestamp() = 0;
+  /** Decodes the binary codeplug and stores its content in the given generic configuration using
+   * the given context. */
+  virtual bool decodeElements(Config *config, Context &ctx);
+  /** Encodes the given generic configuration as a binary codeplug using the given context. */
+  virtual bool encodeElements(Config *config, const Flags &flags, Context &ctx);
 
   /** Clears the general settings in the codeplug. */
   virtual void clearGeneralSettings() = 0;

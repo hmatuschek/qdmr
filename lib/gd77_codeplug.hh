@@ -1,8 +1,7 @@
 #ifndef GD77_CODEPLUG_HH
 #define GD77_CODEPLUG_HH
 
-#include "codeplug.hh"
-#include "rd5r_codeplug.hh"
+#include "radioddity_codeplug.hh"
 #include "signaling.hh"
 #include "codeplugcontext.hh"
 
@@ -32,18 +31,18 @@
  *  <tr><th>Start</th>   <th>End</th>      <th>Size</th>    <th>Content</th></tr>
  *  <tr><th colspan="4">First segment 0x00080-0x07c00</th></tr>
  *  <tr><td>0x00080</td> <td>0x000e0</td> <td>0x0070</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x000e0</td> <td>0x000ec</td> <td>0x000c</td> <td>General settings, see @c GD77Codeplug::general_settings_t.</td></tr>
+ *  <tr><td>0x000e0</td> <td>0x000ec</td> <td>0x000c</td> <td>General settings, see @c Radioddity::GeneralSettingsElement.</td></tr>
  *  <tr><td>0x000ec</td> <td>0x00108</td> <td>0x0028</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x00108</td> <td>0x00128</td> <td>0x0020</td> <td>Button settings, see @c GD77Codeplug::button_settings_t.</td></tr>
- *  <tr><td>0x00128</td> <td>0x01370</td> <td>0x1248</td> <td>32 message texts, see @c GD77Codeplug::msgtab_t</td></tr>
+ *  <tr><td>0x00108</td> <td>0x00128</td> <td>0x0020</td> <td>Button settings, see @c Radioddity::ButtonSettingsElement.</td></tr>
+ *  <tr><td>0x00128</td> <td>0x01370</td> <td>0x1248</td> <td>32 preset message texts, see @c RadioddityCodeplug::MessageBankElement.</td></tr>
  *  <tr><td>0x01370</td> <td>0x01790</td> <td>0x0420</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x01790</td> <td>0x02dd0</td> <td>0x1640</td> <td>64 scan lists, see @c GD77Codeplug::scanlist_t</td></tr>
+ *  <tr><td>0x01790</td> <td>0x02dd0</td> <td>0x1640</td> <td>64 scan lists, see @c GD77Codeplug::ScanListBankElement</td></tr>
  *  <tr><td>0x02dd0</td> <td>0x03780</td> <td>0x09b0</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c GD77Codeplug::bank_t</td></tr>
+ *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c GD77Codeplug::ChannelBankElement</td></tr>
  *  <tr><td>0x05390</td> <td>0x07540</td> <td>0x21b0</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x07518</td> <td>0x07538</td> <td>0x0020</td> <td>Boot settings, see @c GD77Codeplug::boot_settings_t.</td></tr>
- *  <tr><td>0x07538</td> <td>0x07540</td> <td>0x0008</td> <td>Menu settings, see @c GD77Codeplug::menu_settings_t</td></tr>
- *  <tr><td>0x07540</td> <td>0x07560</td> <td>0x0020</td> <td>2 intro lines, @c GD77Codeplug::intro_text_t</td></tr>
+ *  <tr><td>0x07518</td> <td>0x07538</td> <td>0x0020</td> <td>Boot settings, see @c RadioddityCodeplug::BootSettingsElement.</td></tr>
+ *  <tr><td>0x07538</td> <td>0x07540</td> <td>0x0008</td> <td>Menu settings, see @c RadioddityCodeplug::MenuSettingsElement.</td></tr>
+ *  <tr><td>0x07540</td> <td>0x07560</td> <td>0x0020</td> <td>2 intro lines, @c RadioddityCodeplug::BootTextElement.</td></tr>
  *  <tr><td>0x07560</td> <td>0x07c00</td> <td>0x06a0</td> <td>??? Unknown ???</td></tr>
  *  <tr><th colspan="4">Second segment 0x08000-0x1e300</th></tr>
  *  <tr><td>0x08000</td> <td>0x08010</td> <td>0x0010</td> <td>??? Unknown ???</td></tr>
@@ -55,7 +54,7 @@
  *  <tr><td>0x1e2a0</td> <td>0x1e300</td> <td>0x0060</td> <td>??? Unknown ???</td></tr>
  * </table>
  * @ingroup gd77 */
-class GD77Codeplug: public CodePlug
+class GD77Codeplug: public RadioddityCodeplug
 {
 	Q_OBJECT
 
@@ -229,8 +228,79 @@ public:
    * The total size of the bank is then 0x1c10b:
    * @verbinclude gd77channelbank.txt */
   struct __attribute__((packed)) bank_t {
-		uint8_t bitmap[16];               ///< Corresponding bit is set when channel is valid.
-		channel_t chan[128];              ///< The list of channels.
+    uint8_t bitmap[16];               ///< Corresponding bit is set when channel is valid.
+    channel_t chan[128];              ///< The list of channels.
+  };
+
+  /** Channel representation within the binary codeplug.
+   *
+   * Each channel requires 0x38b:
+   * @verbinclude gd77_channel.txt */
+  class ChannelElement: public RadioddityCodeplug::ChannelElement
+  {
+  public:
+    /** ARTS send. */
+    enum ARTSMode {
+      ARTS_OFF      = 0,
+      ARTS_TX       = 1,
+      ARTS_RX       = 2,
+      ARTS_BOTH     = 3
+    };
+
+    /** STE angle. */
+    enum STEAngle {
+      STE_FREQUENCY = 0,              ///< STE Frequency.
+      STE_120DEG    = 1,              ///< 120 degree.
+      STE_180DEG    = 2,              ///< 180 degree.
+      STE_240DEG    = 3               ///< 240 degree.
+    };
+
+    /** PTT ID send. */
+    enum PTTId {
+      PTTID_OFF     = 0,
+      PTTID_START   = 1,
+      PTTID_END     = 2,
+      PTTID_BOTH    = 3
+    };
+
+  protected:
+    /** Hidden Constructor. */
+    ChannelElement(uint8_t *ptr, size_t size);
+
+  public:
+    explicit ChannelElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Retruns the ARTS mode. */
+    virtual ARTSMode artsMode() const;
+    /** Sets the ARTS mode. */
+    virtual void setARTSMode(ARTSMode mode);
+
+    /** Retunrs the STE angle. */
+    virtual STEAngle steAngle() const;
+    /** Sets the STE angle. */
+    virtual void setSTEAngle(STEAngle angle);
+
+    /** Returns the PTT ID mode. */
+    virtual PTTId pttIDMode() const;
+    /** Sets the PTT ID mode. */
+    virtual void setPTTIDMode(PTTId mode);
+
+    /** Returns @c true if the squech type is tight. */
+    virtual bool squelchIsTight() const;
+    /** Enables/disables tight squelch. */
+    virtual void enableTightSquelch(bool enable);
+
+    /** Returns @c true if lone worker is enabled. */
+    virtual bool loneWorker() const;
+    /** Enables/disables lone worker. */
+    virtual void enableLoneWorker(bool enable);
+
+    /** Returns @c true if auto scan is enabled. */
+    virtual bool autoscan() const;
+    /** Enables/disables auto scan. */
+    virtual void enableAutoscan(bool enable);
   };
 
   /** Specific codeplug representation of a DMR contact.
@@ -395,10 +465,6 @@ public:
     grouplist_t grouplist[NGLISTS];   ///< The actual grouplists.
   };
 
-  /** Represents a single scan list within the codeplug.
-   *
-   * Encoding of scan list (size: 0x58b):
-   * @verbinclude gd77scanlist.txt */
   struct __attribute__((packed)) scanlist_t {
     /** Possible priority channel types. */
     typedef enum {
@@ -444,16 +510,48 @@ public:
     void fromScanListObj(const ScanList *lst, const Config *conf);
   };
 
-  /** Table/Bank of scanlists.
-   *
-   * Encoding of scan list table (size 0x1640b):
-   * @verbinclude gd77scantab.txt */
   struct __attribute__((packed)) scantab_t {
     /** Byte-field to indicate which scanlist is valid. Set to 0x01 when valid, 0x00 otherwise. */
     uint8_t    valid[NSCANL];
     /** The scanlists. */
     scanlist_t scanlist[NSCANL];
   };
+
+  /** Represents a single scan list within the GD77 codeplug.
+   *
+   * Encoding of scan list (size: 0x58b):
+   * @verbinclude gd77scanlist.txt */
+  class ScanListElement: public RadioddityCodeplug::ScanListElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ScanListElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    ScanListElement(uint8_t *ptr);
+
+    void clear();
+  };
+
+  /** Bank of scan lists for the GD77.
+   *
+   * Encoding of scan list table (size 0x1640b):
+   * @verbinclude gd77_scanlistbank.txt */
+  class ScanListBankElement: public RadioddityCodeplug::ScanListBankElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ScanListBankElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    ScanListBankElement(uint8_t *ptr);
+
+    void clear();
+    uint8_t *get(uint n) const;
+  };
+
 
   /** Represents the general settings within the codeplug.
    *
@@ -730,32 +828,59 @@ public:
     bool addMessage(const QString &text);
   };
 
-  /** Represents the codeplug time-stamp within the codeplug. */
-  struct __attribute__((packed)) timestamp_t {
-    uint16_t year_bcd;                  ///< The year in 4 x BCD
-    uint8_t month_bcd;                  ///< The month in 2 x BCD
-    uint8_t day_bcd;                    ///< The day in 2 x BCD.
-    uint8_t hour_bcd;                   ///< The hour in 2 x BCD.
-    uint8_t minute_bcd;                 ///< The minute in 2 x BCD.
-
-    /** Returns the timestamp. */
-    QDateTime get() const;
-    /** Set the time-stamp to now. */
-    void setNow();
-    /** Set the time-stamp to the given date and time. */
-    void set(const QDateTime &dt);
-  };
-
 public:
   /** Constructs an empty codeplug for the GD-77. */
 	explicit GD77Codeplug(QObject *parent=nullptr);
-
-  bool index(Config *config, Context &ctx) const;
 
 	/** Decodes the binary codeplug and stores its content in the given generic configuration. */
 	bool decode(Config *config);
   /** Encodes the given generic configuration as a binary codeplug. */
   bool encode(Config *config, const Flags &flags = Flags());
+
+public:
+  void clearGeneralSettings();
+  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx);
+  bool decodeGeneralSettings(Config *config, Context &ctx);
+
+  void clearButtonSettings();
+  void clearMessages();
+
+  void clearScanLists();
+  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx);
+  bool createScanLists(Config *config, Context &ctx);
+  bool linkScanLists(Config *config, Context &ctx);
+
+  void clearContacts();
+  bool encodeContacts(Config *config, const Flags &flags, Context &ctx);
+  bool createContacts(Config *config, Context &ctx);
+
+  void clearDTMFContacts();
+  bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx);
+  bool createDTMFContacts(Config *config, Context &ctx);
+
+  void clearChannels();
+  bool encodeChannels(Config *config, const Flags &flags, Context &ctx);
+  bool createChannels(Config *config, Context &ctx);
+  bool linkChannels(Config *config, Context &ctx);
+
+  void clearBootSettings();
+  void clearMenuSettings();
+
+  void clearBootText();
+  bool encodeBootText(Config *config, const Flags &flags, Context &ctx);
+  bool decodeBootText(Config *config, Context &ctx);
+
+  void clearVFOSettings();
+
+  void clearZones();
+  bool encodeZones(Config *config, const Flags &flags, Context &ctx);
+  bool createZones(Config *config, Context &ctx);
+  bool linkZones(Config *config, Context &ctx);
+
+  void clearGroupLists();
+  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx);
+  bool createGroupLists(Config *config, Context &ctx);
+  bool linkGroupLists(Config *config, Context &ctx);
 };
 
 #endif // GD77_CODEPLUG_HH

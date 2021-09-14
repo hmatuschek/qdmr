@@ -79,13 +79,70 @@ class RD5RCodeplug : public RadioddityCodeplug
 {
   Q_OBJECT
 
+  /** Implements the specialization of the Radioddity channel for the RD5R radio.
+   *
+   * Memory layout of encoded channel:
+   * @verbinclude rd5r_channel.txt */
+  class ChannelElement: public RadioddityCodeplug::ChannelElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ChannelElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit ChannelElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Returns the squelch level. */
+    virtual uint squelch() const;
+    /** Sets the squelch level. */
+    virtual void setSquelch(uint level);
+
+    bool fromChannelObj(const Channel *c, Context &ctx);
+    Channel *toChannelObj(Context &ctx) const;
+  };
+
+  /** Implements the base class of a timestamp for all Radioddity codeplugs.
+   *
+   * Encoding of messages (size: 0x0006b):
+   * @verbinclude rd5r_timestamp.txt */
+  class TimestampElement: Element
+  {
+  protected:
+    /** Hidden constructor. */
+    TimestampElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit TimestampElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~TimestampElement();
+
+    /** Resets the timestamp. */
+    void clear();
+
+    /** Returns the time stamp. */
+    virtual QDateTime get() const;
+    /** Sets the time stamp. */
+    virtual void set(const QDateTime &ts=QDateTime::currentDateTime());
+  };
+
 public:
   /** Empty constructor. */
   RD5RCodeplug(QObject *parent=0);
 
+  void clear();
+
 public:
-  void clearTimestamp();
-  bool encodeTimestamp();
+  bool encodeElements(Config *config, const Flags &flags, Context &ctx);
+  bool decodeElements(Config *config, Context &ctx);
+
+  /** Clears the time-stamp in the codeplug. */
+  virtual void clearTimestamp();
+  /** Sets the time-stamp. */
+  virtual bool encodeTimestamp();
 
   void clearGeneralSettings();
   bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx);

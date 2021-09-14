@@ -55,7 +55,6 @@ RadioddityCodeplug::ChannelElement::clear() {
   setContactIndex(0);
   setUInt32_be(0x0030, 0); // clear all bitfields at once.
   setUInt8(0x0034, 0); setUInt8(0x0035, 0); setUInt8(0x0036, 0);
-  setSquelch(0);
 }
 
 QString
@@ -218,19 +217,19 @@ RadioddityCodeplug::ChannelElement::setContactIndex(uint index) {
 
 bool
 RadioddityCodeplug::ChannelElement::dataCallConfirm() const {
-  return getBit(0x0030, 6);
-}
-void
-RadioddityCodeplug::ChannelElement::enableDataCallConfirm(bool enable) {
-  setBit(0x0030, 6, enable);
-}
-bool
-RadioddityCodeplug::ChannelElement::emergencyAlarmACK() const {
   return getBit(0x0030, 7);
 }
 void
-RadioddityCodeplug::ChannelElement::enableEmergencyAlarmACK(bool enable) {
+RadioddityCodeplug::ChannelElement::enableDataCallConfirm(bool enable) {
   setBit(0x0030, 7, enable);
+}
+bool
+RadioddityCodeplug::ChannelElement::emergencyAlarmACK() const {
+  return getBit(0x0030, 6);
+}
+void
+RadioddityCodeplug::ChannelElement::enableEmergencyAlarmACK(bool enable) {
+  setBit(0x0030, 6, enable);
 }
 bool
 RadioddityCodeplug::ChannelElement::privateCallConfirm() const {
@@ -328,16 +327,6 @@ RadioddityCodeplug::ChannelElement::setPower(Channel::Power pwr) {
   }
 }
 
-uint
-RadioddityCodeplug::ChannelElement::squelch() const {
-  return std::min(getUInt8(0x0037), uint8_t(9))+1;
-}
-void
-RadioddityCodeplug::ChannelElement::setSquelch(uint level) {
-  level = std::max(std::min(10u, level), 1u);
-  setUInt8(0x0037, level-1);
-}
-
 Channel *
 RadioddityCodeplug::ChannelElement::toChannelObj(CodePlug::Context &ctx) const {
   Channel *ch = nullptr;
@@ -420,7 +409,6 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
     default: setAdmitCriterion(ADMIT_ALWAYS);
     }
     setBandwidth(ac->bandwidth());
-    setSquelch(ac->squelch());
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
   } else if (c->is<DigitalChannel>()) {
@@ -2237,45 +2225,6 @@ RadioddityCodeplug::MessageBankElement::appendMessage(const QString msg) {
 
 
 /* ********************************************************************************************* *
- * Implementation of RadioddityCodeplug::TimestampElement
- * ********************************************************************************************* */
-RadioddityCodeplug::TimestampElement::TimestampElement(uint8_t *ptr, uint size)
-  : Element(ptr, size)
-{
-  // pass...
-}
-
-RadioddityCodeplug::TimestampElement::TimestampElement(uint8_t *ptr)
-  : Element(ptr, 0x0006)
-{
-  // pass...
-}
-
-RadioddityCodeplug::TimestampElement::~TimestampElement() {
-  // pass...
-}
-
-void
-RadioddityCodeplug::TimestampElement::clear() {
-  set();
-}
-
-QDateTime
-RadioddityCodeplug::TimestampElement::get() const {
-  return QDateTime(QDate(getBCD4_be(0x0000), getBCD2(0x0002), getBCD2(0x0003)),
-                   QTime(getBCD2(0x0004), getBCD2(0x0005)));
-}
-void
-RadioddityCodeplug::TimestampElement::set(const QDateTime &ts) {
-  setBCD4_be(0x0000, ts.date().year());
-  setBCD2(0x0002, ts.date().month());
-  setBCD2(0x0003, ts.date().day());
-  setBCD2(0x0004, ts.time().hour());
-  setBCD2(0x0005, ts.time().minute());
-}
-
-
-/* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug
  * ********************************************************************************************* */
 RadioddityCodeplug::RadioddityCodeplug(QObject *parent)
@@ -2290,8 +2239,6 @@ RadioddityCodeplug::~RadioddityCodeplug() {
 
 void
 RadioddityCodeplug::clear() {
-  // Clear timestamp
-  clearTimestamp();
   // Clear general config
   clearGeneralSettings();
   // Clear button settings
@@ -2382,11 +2329,11 @@ RadioddityCodeplug::encode(Config *config, const Flags &flags) {
   if (! index(config, ctx))
     return false;
 
-  // Set timestamp
-  if (! this->encodeTimestamp()) {
-    _errorMessage = tr("Cannot encode time-stamp: %1").arg(_errorMessage);
-    return false;
-  }
+  return this->encodeElements(config, flags, ctx);
+}
+
+bool
+RadioddityCodeplug::encodeElements(Config *config, const Flags &flags, Context &ctx) {
   // General config
   if (! this->encodeGeneralSettings(config, flags, ctx)) {
     _errorMessage = tr("Cannot encode general settings: %1").arg(_errorMessage);
@@ -2440,6 +2387,11 @@ RadioddityCodeplug::decode(Config *config) {
   // Clear config object
   config->reset();
 
+  return this->decodeElements(config, ctx);
+}
+
+bool
+RadioddityCodeplug::decodeElements(Config *config, Context &ctx) {
   if (! this->decodeGeneralSettings(config, ctx)) {
     _errorMessage = tr("Cannot decode general settings: %1").arg(_errorMessage);
     return false;

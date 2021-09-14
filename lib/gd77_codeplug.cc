@@ -6,30 +6,39 @@
 #include <QDateTime>
 
 
-#define OFFSET_SETTINGS     0x000e0
-#define OFFSET_MSGTAB       0x00128
-#define OFFSET_SCANTAB      0x01790
-#define SCANLIST_SIZE       0x00058
-#define SCANTAB_SIZE        0x01640
-#define OFFSET_BANK_0       0x03780 // Channels 1-128
-#define CHANNEL_SIZE        0x00038
-#define BANK_SIZE           0x01c10
-#define OFFSET_INTRO        0x07540
+#define ADDR_SETTINGS             0x0000e0
+#define ADDR_BUTTONS              0x000108
+#define ADDR_MESSAGE_BANK         0x000128
+
+#define NUM_SCAN_LISTS                  64
+#define ADDR_SCAN_LIST_BANK       0x001790
+#define SCAN_LIST_SIZE            0x000058
+#define SCAN_LIST_BANK_SIZE       0x001640
+
+#define NUM_CHANNELS                  1024
+#define NUM_CHANNEL_BANKS                8
+#define NUM_CHANNELS_PER_BANK          128
+#define ADDR_CHANNEL_BANK_0       0x003780 // Channels 1-128
+#define ADDR_CHANNEL_BANK_1       0x00b1b0 // Channels 129-1024
+#define CHANNEL_SIZE              0x000038
+#define CHANNEL_BANK_SIZE         0x001c10
+
+#define ADDR_BOOTSETTINGS         0x007518
+#define ADDR_MENU_SETTINGS        0x007538
+#define ADDR_BOOT_TEXT            0x007540
+
 #define OFFSET_ZONETAB      0x08010
-#define OFFSET_BANK_1       0x0b1b0 // Channels 129-1024
 #define OFFSET_CONTACTS     0x17620
 #define CONTACT_SIZE        0x00018
 #define OFFSET_GROUPTAB     0x1d620
 #define GROUPLIST_SIZE      0x00050
 #define GROUPTAB_SIZE       0x01840
 
-#define GET_MSGTAB()        ((msgtab_t*) &radio_mem[OFFSET_MSGTAB])
-
 static_assert(
   CHANNEL_SIZE == sizeof(GD77Codeplug::channel_t),
   "GD77Codeplug::channel_t size check failed.");
 static_assert(
-  BANK_SIZE == sizeof(GD77Codeplug::bank_t),
+  CHANNEL_BANK_SIZE == sizeof(GD77Codeplug::bank_t),
   "GD77Codeplug::bank_t size check failed.");
 static_assert(
   CONTACT_SIZE == sizeof(GD77Codeplug::contact_t),
@@ -41,10 +50,10 @@ static_assert(
   GROUPTAB_SIZE == sizeof(GD77Codeplug::grouptab_t),
   "GD77Codeplug::grouptab_t size check failed.");
 static_assert(
-  SCANLIST_SIZE == sizeof(GD77Codeplug::scanlist_t),
+  SCAN_LIST_SIZE == sizeof(GD77Codeplug::scanlist_t),
   "GD77Codeplug::scanlist_t size check failed.");
 static_assert(
-  SCANTAB_SIZE == sizeof(GD77Codeplug::scantab_t),
+  SCAN_LIST_BANK_SIZE == sizeof(GD77Codeplug::scantab_t),
   "GD77Codeplug::scantab_t size check failed.");
 
 
@@ -781,33 +790,128 @@ GD77Codeplug::msgtab_t::addMessage(const QString &msg) {
 
 
 /* ******************************************************************************************** *
- * Implementation of GD77Codeplug::timestamp_t
+ * Implementation of GD77Codeplug::ChannelElement
  * ******************************************************************************************** */
-QDateTime
-GD77Codeplug::timestamp_t::get() const {
-  uint16_t year = (year_bcd & 0x0f) + 10*((year_bcd>>4) & 0x0f) + 100*((year_bcd>>8) & 0x0f)
-      + 1000*((year_bcd>>12) & 0x0f);
-  uint8_t month = (month_bcd & 0x0f) + 10*((month_bcd>>4) & 0x0f);
-  uint8_t day = (day_bcd & 0x0f) + 10*((day_bcd>>4) & 0x0f);
-  uint8_t hour = (hour_bcd & 0x0f) + 10*((hour_bcd>>4) & 0x0f);
-  uint8_t minute = (minute_bcd & 0x0f) + 10*((minute_bcd>>4) & 0x0f);
-  return QDateTime(QDate(year, month, day), QTime(hour, minute));
+GD77Codeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
+  : RadioddityCodeplug::ChannelElement(ptr, size)
+{
+  // pass...
+}
+
+GD77Codeplug::ChannelElement::ChannelElement(uint8_t *ptr)
+  : RadioddityCodeplug::ChannelElement(ptr)
+{
+  // pass...
 }
 
 void
-GD77Codeplug::timestamp_t::setNow() {
-  set(QDateTime::currentDateTime());
+GD77Codeplug::ChannelElement::clear() {
+  RadioddityCodeplug::ChannelElement::clear();
+  setUInt8(0x0028, 0x00);
+  setARTSMode(ARTS_OFF);
+  setSTEAngle(STE_FREQUENCY);
+}
+
+GD77Codeplug::ChannelElement::ARTSMode
+GD77Codeplug::ChannelElement::artsMode() const {
+  return ARTSMode(getUInt2(0x0030,0));
+}
+void
+GD77Codeplug::ChannelElement::setARTSMode(ARTSMode mode) {
+  setUInt2(0x0030, 0, (uint)mode);
+}
+
+GD77Codeplug::ChannelElement::STEAngle
+GD77Codeplug::ChannelElement::steAngle() const {
+  return STEAngle(getUInt2(0x0032,6));
+}
+void
+GD77Codeplug::ChannelElement::setSTEAngle(STEAngle angle) {
+  setUInt2(0x0032, 6, (uint)angle);
+}
+
+GD77Codeplug::ChannelElement::PTTId
+GD77Codeplug::ChannelElement::pttIDMode() const {
+  return PTTId(getUInt2(0x0032, 2));
+}
+void
+GD77Codeplug::ChannelElement::setPTTIDMode(PTTId mode) {
+  setUInt2(0x0032, 2, (uint)mode);
+}
+
+bool
+GD77Codeplug::ChannelElement::squelchIsTight() const {
+  return getBit(0x0033, 0);
+}
+void
+GD77Codeplug::ChannelElement::enableTightSquelch(bool enable) {
+  setBit(0x0033, 0, enable);
+}
+
+bool
+GD77Codeplug::ChannelElement::loneWorker() const {
+  return getBit(0x0033, 4);
+}
+void
+GD77Codeplug::ChannelElement::enableLoneWorker(bool enable) {
+  setBit(0x0033, 4, enable);
+}
+
+bool
+GD77Codeplug::ChannelElement::autoscan() const {
+  return getBit(0x0033, 5);
+}
+void
+GD77Codeplug::ChannelElement::enableAutoscan(bool enable) {
+  setBit(0x0033, 5, enable);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::ScanListElement
+ * ******************************************************************************************** */
+GD77Codeplug::ScanListElement::ScanListElement(uint8_t *ptr, uint size)
+  : RadioddityCodeplug::ScanListElement(ptr, size)
+{
+  // pass...
+}
+
+GD77Codeplug::ScanListElement::ScanListElement(uint8_t *ptr)
+  : RadioddityCodeplug::ScanListElement(ptr)
+{
+  // pass...
 }
 
 void
-GD77Codeplug::timestamp_t::set(const QDateTime &dt) {
-  uint16_t year = dt.date().year();
-  uint8_t month = dt.date().month(), day = dt.date().day(), hour = dt.time().hour(), minute = dt.time().minute();
-  year_bcd = (year % 10) | ((year/10) % 10)<<4 | ((year/100) % 10) << 8 | ((year/100) % 10) << 12;
-  month_bcd = (month % 10) | ((month/10) % 10) << 4;
-  day_bcd = (day % 10) | ((day/10) % 10) << 4;
-  hour_bcd = (hour % 10) | ((hour/10) % 10) << 4;
-  minute_bcd = (minute % 10) | ((minute/10) % 10) << 4;
+GD77Codeplug::ScanListElement::clear() {
+  RadioddityCodeplug::ScanListElement::clear();
+  setBit(0x0f, 0, true);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::ScanListBankElement
+ * ******************************************************************************************** */
+GD77Codeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr, uint size)
+  : RadioddityCodeplug::ScanListBankElement(ptr, size)
+{
+  // pass...
+}
+
+GD77Codeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr)
+  : RadioddityCodeplug::ScanListBankElement(ptr, 0x1640)
+{
+  // pass...
+}
+
+void
+GD77Codeplug::ScanListBankElement::clear() {
+  memset(_data, 0, 0x0040);
+}
+
+uint8_t *
+GD77Codeplug::ScanListBankElement::get(uint n) const {
+  return _data+0x0040 + n*0x0058;
 }
 
 
@@ -815,7 +919,7 @@ GD77Codeplug::timestamp_t::set(const QDateTime &dt) {
  * Implementation of GD77Codeplug
  * ******************************************************************************************** */
 GD77Codeplug::GD77Codeplug(QObject *parent)
-  : CodePlug(parent)
+  : RadioddityCodeplug(parent)
 {
   addImage("Radioddity GD77 Codeplug");
   image(0).addElement(0x00080, 0x07b80);
@@ -823,14 +927,9 @@ GD77Codeplug::GD77Codeplug(QObject *parent)
 }
 
 bool
-GD77Codeplug::index(Config *config, Context &ctx) const {
-  return true;
-}
-
-bool
 GD77Codeplug::encode(Config *config, const Flags &flags) {
   // pack basic config
-  general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
+  general_settings_t *gs = (general_settings_t*) data(ADDR_SETTINGS);
   if (! flags.updateCodePlug)
     gs->initDefault();
 
@@ -841,7 +940,7 @@ GD77Codeplug::encode(Config *config, const Flags &flags) {
   gs->setName(config->radioIDs()->defaultId()->name());
   gs->setRadioId(config->radioIDs()->defaultId()->number());
 
-  intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
+  intro_text_t *it = (intro_text_t*) data(ADDR_BOOT_TEXT);
   it->setIntroLine1(config->introLine1());
   it->setIntroLine2(config->introLine2());
 
@@ -850,9 +949,9 @@ GD77Codeplug::encode(Config *config, const Flags &flags) {
     // First, get bank
     bank_t *b;
     if ((i>>7) == 0)
-      b = (bank_t*) data(OFFSET_BANK_0);
+      b = (bank_t*) data(ADDR_CHANNEL_BANK_0);
     else
-      b = (((i>>7)-1) + (bank_t *) data(OFFSET_BANK_1));
+      b = (((i>>7)-1) + (bank_t *) data(ADDR_CHANNEL_BANK_1));
     channel_t *ch = &b->chan[i % 128];
 
     // Disable channel if not used
@@ -905,7 +1004,7 @@ next:
 
   // Pack Scanlists
   for (int i=0; i<NSCANL; i++) {
-    scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB);
+    scantab_t *st = (scantab_t*) data(ADDR_SCAN_LIST_BANK);
     scanlist_t *sl = &st->scanlist[i];
 
     if (i >= config->scanlists()->count()) {
@@ -949,7 +1048,7 @@ GD77Codeplug::decode(Config *config) {
   config->reset();
 
   /* Unpack general config */
-  general_settings_t *gs = (general_settings_t*) data(OFFSET_SETTINGS);
+  general_settings_t *gs = (general_settings_t*) data(ADDR_SETTINGS);
   if (nullptr == gs) {
     _errorMessage = QString("%1(): Cannot access general settings memory!")
         .arg(__func__);
@@ -959,7 +1058,7 @@ GD77Codeplug::decode(Config *config) {
   int idx = config->radioIDs()->addId(gs->getName(),gs->getRadioId());
   config->radioIDs()->setDefaultId(idx);
 
-  intro_text_t *it = (intro_text_t*) data(OFFSET_INTRO);
+  intro_text_t *it = (intro_text_t*) data(ADDR_BOOT_TEXT);
   config->setIntroLine1(it->getIntroLine1());
   config->setIntroLine2(it->getIntroLine2());
 
@@ -1030,9 +1129,9 @@ GD77Codeplug::decode(Config *config) {
     // First, get bank
     bank_t *b;
     if ((i>>7) == 0)
-      b = (bank_t*) data(OFFSET_BANK_0);
+      b = (bank_t*) data(ADDR_CHANNEL_BANK_0);
     else
-      b = (((i>>7)-1) + (bank_t*) data(OFFSET_BANK_1));
+      b = (((i>>7)-1) + (bank_t*) data(ADDR_CHANNEL_BANK_1));
     if (nullptr == b) {
       _errorMessage = QString("%1(): Cannot access channel bank at index %2!")
           .arg(__func__).arg(i);
@@ -1096,7 +1195,7 @@ GD77Codeplug::decode(Config *config) {
 
   /* Unpack Scan lists */
   for (int i=0; i<NSCANL; i++) {
-    scantab_t *st = (scantab_t*) data(OFFSET_SCANTAB);
+    scantab_t *st = (scantab_t*) data(ADDR_SCAN_LIST_BANK);
     if (! st){
       _errorMessage = QString("%1(): Cannot access scanlist table memory!")
           .arg(__func__);
@@ -1137,9 +1236,9 @@ GD77Codeplug::decode(Config *config) {
     // First, get bank
     bank_t *b;
     if ((i>>7) == 0)
-      b = (bank_t*) data(OFFSET_BANK_0);
+      b = (bank_t*) data(ADDR_CHANNEL_BANK_0);
     else
-      b = (((i>>7)-1) + (bank_t*) data(OFFSET_BANK_1));
+      b = (((i>>7)-1) + (bank_t*) data(ADDR_CHANNEL_BANK_1));
     // If channel is disabled
     if (! ((b->bitmap[i % 128 / 8] >> (i & 7)) & 1) )
       continue;
@@ -1155,3 +1254,166 @@ GD77Codeplug::decode(Config *config) {
 
   return true;
 }
+
+
+void
+GD77Codeplug::clearGeneralSettings() {
+  GeneralSettingsElement(data(ADDR_SETTINGS)).clear();
+}
+
+bool
+GD77Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) {
+  GeneralSettingsElement el(data(ADDR_SETTINGS));
+  if (! flags.updateCodePlug)
+    el.clear();
+  return el.fromConfig(config, ctx);
+}
+
+bool
+GD77Codeplug::decodeGeneralSettings(Config *config, Context &ctx) {
+  return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(config, ctx);
+}
+
+void
+GD77Codeplug::clearButtonSettings() {
+  ButtonSettingsElement(data(ADDR_BUTTONS)).clear();
+}
+
+void
+GD77Codeplug::clearMessages() {
+  MessageBankElement(data(ADDR_MESSAGE_BANK)).clear();
+}
+
+void
+GD77Codeplug::clearScanLists() {
+  ScanListBankElement bank(data(ADDR_SCAN_LIST_BANK)); bank.clear();
+  for (int i=0; i<NUM_SCAN_LISTS; i++)
+    ScanListElement(bank.get(i)).clear();
+}
+
+bool
+GD77Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx) {
+  ScanListBankElement bank(data(ADDR_SCAN_LIST_BANK));
+  for (int i=0; i<NUM_SCAN_LISTS; i++) {
+    if (i >= config->scanlists()->count()) {
+      bank.enable(i, false); continue;
+    }
+    ScanListElement(bank.get(i)).fromScanListObj(config->scanlists()->scanlist(i), ctx);
+    bank.enable(i, true);
+  }
+  return true;
+}
+
+bool
+GD77Codeplug::createScanLists(Config *config, Context &ctx) {
+  ScanListBankElement bank(data(ADDR_SCAN_LIST_BANK));
+  for (int i=0; i<NUM_SCAN_LISTS; i++) {
+    if (! bank.isEnabled(i))
+      continue;
+    ScanListElement el(bank.get(i));
+    ScanList *scan = el.toScanListObj(ctx);
+    config->scanlists()->add(scan); ctx.add(scan, i+1);
+  }
+  return true;
+}
+
+void
+GD77Codeplug::clearChannels() {
+  for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
+    uint8_t *ptr = nullptr;
+    if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0);
+    else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE);
+    ChannelBankElement bank(ptr); bank.clear();
+    for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++)
+      ChannelElement(bank.get(i)).clear();
+  }
+}
+
+bool
+GD77Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) {
+  for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
+    uint8_t *ptr = nullptr;
+    if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0);
+    else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE);
+    ChannelBankElement bank(ptr); bank.clear();
+    for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
+      ChannelElement el(bank.get(i));
+      if (c < config->channelList()->count()) {
+        if (! el.fromChannelObj(config->channelList()->channel(c), ctx)) {
+          logError() << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
+          return false;
+        }
+        bank.enable(i,true);
+      } else {
+        el.clear();
+        bank.enable(i, false);
+      }
+    }
+  }
+  return true;
+}
+
+bool
+GD77Codeplug::createChannels(Config *config, Context &ctx) {
+  for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
+    uint8_t *ptr = nullptr;
+    if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0);
+    else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE);
+    ChannelBankElement bank(ptr);
+    for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
+      if (! bank.isEnabled(i))
+        continue;
+      Channel *ch = ChannelElement(bank.get(i)).toChannelObj(ctx);
+      config->channelList()->add(ch); ctx.add(ch, c+1);
+    }
+  }
+  return true;
+}
+
+bool
+GD77Codeplug::linkChannels(Config *config, Context &ctx) {
+  for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
+    uint8_t *ptr = nullptr;
+    if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0);
+    else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE);
+    ChannelBankElement bank(ptr);
+    for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
+      if (! bank.isEnabled(i))
+        continue;
+      if (!ChannelElement(bank.get(i)).linkChannelObj(ctx.get<Channel>(c+1), ctx))
+        return false;
+    }
+  }
+  return true;
+}
+
+void
+GD77Codeplug::clearBootSettings() {
+  BootSettingsElement(data(ADDR_BOOTSETTINGS)).clear();
+}
+
+void
+GD77Codeplug::clearMenuSettings() {
+  MenuSettingsElement(data(ADDR_MENU_SETTINGS)).clear();
+}
+
+void
+GD77Codeplug::clearBootText() {
+  BootTextElement(data(ADDR_BOOT_TEXT)).clear();
+}
+
+bool
+GD77Codeplug::encodeBootText(Config *config, const Flags &flags, Context &ctx) {
+  BootTextElement(data(ADDR_BOOT_TEXT)).fromConfig(config);
+  return true;
+}
+
+bool
+GD77Codeplug::decodeBootText(Config *config, Context &ctx) {
+  BootTextElement(data(ADDR_BOOT_TEXT)).updateConfig(config);
+  return true;
+}
+
+
+
+

@@ -43,6 +43,103 @@
 #define NUM_GROUP_LISTS                 64
 
 
+/* ******************************************************************************************** *
+ * Implementation of RD5RCodeplug::ChannelElement
+ * ******************************************************************************************** */
+RD5RCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
+  : RadioddityCodeplug::ChannelElement(ptr, size)
+{
+  // pass...
+}
+
+RD5RCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
+  : RadioddityCodeplug::ChannelElement(ptr)
+{
+  // pass...
+}
+
+void
+RD5RCodeplug::ChannelElement::clear() {
+  RadioddityCodeplug::ChannelElement::clear();
+  setSquelch(0);
+}
+
+uint
+RD5RCodeplug::ChannelElement::squelch() const {
+  return std::min(getUInt8(0x0037), uint8_t(9))+1;
+}
+void
+RD5RCodeplug::ChannelElement::setSquelch(uint level) {
+  level = std::max(std::min(10u, level), 1u);
+  setUInt8(0x0037, level-1);
+}
+
+bool
+RD5RCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
+  if (! RadioddityCodeplug::ChannelElement::fromChannelObj(c, ctx))
+    return false;
+
+  if (c->is<AnalogChannel>()) {
+    const AnalogChannel *ac = c->as<AnalogChannel>();
+    setSquelch(ac->squelch());
+  }
+
+  return true;
+}
+
+Channel *
+RD5RCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
+  Channel *ch = RadioddityCodeplug::ChannelElement::toChannelObj(ctx);
+  if (nullptr == ch)
+    return nullptr;
+
+  if (ch->is<AnalogChannel>()) {
+    AnalogChannel *ac = ch->as<AnalogChannel>();
+    ac->setSquelch(squelch());
+  }
+
+  return ch;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RD5RCodeplug::TimestampElement
+ * ********************************************************************************************* */
+RD5RCodeplug::TimestampElement::TimestampElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+RD5RCodeplug::TimestampElement::TimestampElement(uint8_t *ptr)
+  : Element(ptr, 0x0006)
+{
+  // pass...
+}
+
+RD5RCodeplug::TimestampElement::~TimestampElement() {
+  // pass...
+}
+
+void
+RD5RCodeplug::TimestampElement::clear() {
+  set();
+}
+
+QDateTime
+RD5RCodeplug::TimestampElement::get() const {
+  return QDateTime(QDate(getBCD4_be(0x0000), getBCD2(0x0002), getBCD2(0x0003)),
+                   QTime(getBCD2(0x0004), getBCD2(0x0005)));
+}
+void
+RD5RCodeplug::TimestampElement::set(const QDateTime &ts) {
+  setBCD4_be(0x0000, ts.date().year());
+  setBCD2(0x0002, ts.date().month());
+  setBCD2(0x0003, ts.date().day());
+  setBCD2(0x0004, ts.time().hour());
+  setBCD2(0x0005, ts.time().minute());
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of RD5RCodeplug
@@ -53,6 +150,33 @@ RD5RCodeplug::RD5RCodeplug(QObject *parent)
   addImage("Radioddity RD5R Codeplug");
   image(0).addElement(0x00080, 0x07b80);
   image(0).addElement(0x08000, 0x16300);
+}
+
+void
+RD5RCodeplug::clear() {
+  RadioddityCodeplug::clear();
+  this->clearTimestamp();
+}
+
+bool
+RD5RCodeplug::encodeElements(Config *config, const Flags &flags, Context &ctx) {
+  if (! RadioddityCodeplug::encodeElements(config, flags, ctx))
+    return false;
+
+  // Set timestamp
+  if (! this->encodeTimestamp()) {
+    _errorMessage = tr("Cannot encode time-stamp: %1").arg(_errorMessage);
+    return false;
+  }
+
+  return true;
+}
+
+bool
+RD5RCodeplug::decodeElements(Config *config, Context &ctx) {
+  if (! RadioddityCodeplug::decodeElements(config, ctx))
+    return false;
+  return true;
 }
 
 void
