@@ -1280,16 +1280,16 @@ ChannelReader::ChannelReader(QObject *parent)
   // pass...
 }
 
-bool
+AbstractConfigReader *
 ChannelReader::addExtension(ExtensionReader *ext) {
   QString name = ext->metaObject()->className();
   if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
     name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
   }
   if (_extensions.contains(name))
-    return false;
+    return nullptr;
   _extensions[name] = ext;
-  return true;
+  return ext;
 }
 
 

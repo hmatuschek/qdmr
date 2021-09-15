@@ -1,0 +1,39 @@
+#include "opengd77_extension.hh"
+
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77ChannelExtension
+ * ******************************************************************************************** */
+OpenGD77ChannelExtension::OpenGD77ChannelExtension(QObject *parent)
+  : ConfigExtension("ex", parent), _power(Power::Global)
+{
+  // pass...
+}
+
+OpenGD77ChannelExtension::Power
+OpenGD77ChannelExtension::power() const {
+  return _power;
+}
+
+void
+OpenGD77ChannelExtension::setPower(Power power) {
+  _power = power;
+  emit modified(this);
+}
+
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77ChannelExtensionReader
+ * ******************************************************************************************** */
+// Register extension to config reader
+AbstractConfigReader *
+OpenGD77ChannelExtensionReader::instance = ChannelReader::addExtension(new OpenGD77ChannelExtensionReader());
+
+OpenGD77ChannelExtensionReader::OpenGD77ChannelExtensionReader(QObject *parent)
+  : ExtensionReader(parent)
+{
+  // pass...
+}
+
+ConfigObject *
+OpenGD77ChannelExtensionReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return new OpenGD77ChannelExtension();
+}

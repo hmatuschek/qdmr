@@ -62,18 +62,18 @@ public:
   {
   public:
     /** All possible power settings. */
-    enum Power {
-      POWER_GLOBAL =  0,              ///< Use global power setting.
-      POWER_50mW   =  1,              ///< About 50mW.
-      POWER_250mW  =  2,              ///< About 250mW.
-      POWER_500mW  =  3,              ///< About 500mW.
-      POWER_750mW  =  4,              ///< About 750mW.
-      POWER_1W     =  5,              ///< About 1W.
-      POWER_2W     =  6,              ///< About 2W.
-      POWER_3W     =  7,              ///< About 3W.
-      POWER_4W     =  8,              ///< About 4W.
-      POWER_5W     =  9,              ///< About 5W.
-      POWER_MAX    = 10,              ///< Maximum power (5.5W on UHF, 7W on VHF).
+    enum class Power {
+      Global  =  0,              ///< Use global power setting.
+      P50mW   =  1,              ///< About 50mW.
+      P250mW  =  2,              ///< About 250mW.
+      P500mW  =  3,              ///< About 500mW.
+      P750mW  =  4,              ///< About 750mW.
+      P1W     =  5,              ///< About 1W.
+      P2W     =  6,              ///< About 2W.
+      P3W     =  7,              ///< About 3W.
+      P4W     =  8,              ///< About 4W.
+      P5W     =  9,              ///< About 5W.
+      Max     = 10,              ///< Maximum power (5.5W on UHF, 7W on VHF).
     };
 
   public:
@@ -82,12 +82,16 @@ public:
 
     void clear();
 
-    /** Retuns @c true if the channel power is determined by the radio settings. */
-    virtual bool isDefaultPower() const;
     Channel::Power power() const;
     void setPower(Channel::Power power);
-    /** Sets the power to be specified in the radio settings. */
-    virtual void setDefaultPower();
+
+    /** Returns extended power settings. */
+    virtual Power extendedPower() const;
+    /** Sets extended power. */
+    virtual void setExtendedPower(Power power);
+
+    Channel *toChannelObj(Context &ctx) const;
+    bool fromChannelObj(const Channel *c, Context &ctx);
   };
 
   /** Implements the OpenGD77 specific zone.

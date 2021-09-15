@@ -5,6 +5,8 @@
 #include "logger.hh"
 #include <QDateTime>
 #include <QtEndian>
+#include "opengd77_extension.hh"
+
 
 // Stored in EEPROM
 #define IMAGE_SETTINGS                   0
@@ -55,33 +57,28 @@ OpenGD77Codeplug::ChannelElement::ChannelElement(uint8_t *ptr)
 
 void
 OpenGD77Codeplug::ChannelElement::clear() {
-  // pass...
-}
-
-bool
-OpenGD77Codeplug::ChannelElement::isDefaultPower() const {
-  return POWER_GLOBAL == (Power)getUInt8(0x0019);
+  setExtendedPower(Power::Global);
 }
 
 Channel::Power
 OpenGD77Codeplug::ChannelElement::power() const {
-  switch ((Power)getUInt8(0x0019)) {
-  case POWER_GLOBAL:
+  switch (extendedPower()) {
+  case Power::Global:
     return Channel::Power::Low;
-  case POWER_50mW:
+  case Power::P50mW:
     return Channel::Power::Min;
-  case POWER_250mW:
-  case POWER_500mW:
-  case POWER_750mW:
-  case POWER_1W:
+  case Power::P250mW:
+  case Power::P500mW:
+  case Power::P750mW:
+  case Power::P1W:
     return Channel::Power::Low;
-  case POWER_2W:
-  case POWER_3W:
+  case Power::P2W:
+  case Power::P3W:
     return Channel::Power::Mid;
-  case POWER_4W:
-  case POWER_5W:
+  case Power::P4W:
+  case Power::P5W:
     return Channel::Power::High;
-  case POWER_MAX:
+  case Power::Max:
     return Channel::Power::Max;
   }
   return Channel::Power::Low;
@@ -90,17 +87,47 @@ OpenGD77Codeplug::ChannelElement::power() const {
 void
 OpenGD77Codeplug::ChannelElement::setPower(Channel::Power power) {
   switch (power) {
-  case Channel::Power::Max:  setUInt8(0x0019, (uint)POWER_MAX); break;
-  case Channel::Power::High: setUInt8(0x0019, (uint)POWER_5W); break;
-  case Channel::Power::Mid:  setUInt8(0x0019, (uint)POWER_3W); break;
-  case Channel::Power::Low:  setUInt8(0x0019, (uint)POWER_1W); break;
-  case Channel::Power::Min:  setUInt8(0x0019, (uint)POWER_50mW); break;
+  case Channel::Power::Max:  setExtendedPower(Power::Max); break;
+  case Channel::Power::High: setExtendedPower(Power::P5W); break;
+  case Channel::Power::Mid:  setExtendedPower(Power::P3W); break;
+  case Channel::Power::Low:  setExtendedPower(Power::P1W); break;
+  case Channel::Power::Min:  setExtendedPower(Power::P50mW); break;
   }
 }
 
+OpenGD77Codeplug::ChannelElement::Power
+OpenGD77Codeplug::ChannelElement::extendedPower() const {
+  return (Power)getUInt8(0x0019);
+}
 void
-OpenGD77Codeplug::ChannelElement::setDefaultPower() {
-  setUInt8(0x0019, (uint)POWER_GLOBAL);
+OpenGD77Codeplug::ChannelElement::setExtendedPower(Power power) {
+  setUInt8(0x0019, (uint)(power));
+}
+
+Channel *
+OpenGD77Codeplug::ChannelElement::toChannelObj(Context &ctx) const {
+  Channel *ch = GD77Codeplug::ChannelElement::toChannelObj(ctx);
+  if (nullptr == ch)
+    return nullptr;
+
+  OpenGD77ChannelExtension *ext = new OpenGD77ChannelExtension(ch);
+  ext->setPower(extendedPower());
+
+  ch->addExtension("openGD77", ext);
+  return ch;
+}
+
+bool
+OpenGD77Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
+  if (! GD77Codeplug::ChannelElement::fromChannelObj(c, ctx))
+    return false;
+  if (! c->hasExtension("openGD77"))
+    return true;
+
+  const OpenGD77ChannelExtension *ext = c->extension("openGD77")->as<OpenGD77ChannelExtension>();
+  setExtendedPower(ext->power());
+
+  return true;
 }
 
 
