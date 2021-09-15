@@ -15,6 +15,10 @@
 #define SCAN_LIST_SIZE            0x000058
 #define SCAN_LIST_BANK_SIZE       0x001640
 
+#define NUM_DTMF_CONTACTS               32
+#define ADDR_DTMF_CONTACTS        0x002f88
+#define DTMF_CONTACT_SIZE         0x000020
+
 #define NUM_CHANNELS                  1024
 #define NUM_CHANNEL_BANKS                8
 #define NUM_CHANNELS_PER_BANK          128
@@ -27,35 +31,17 @@
 #define ADDR_MENU_SETTINGS        0x007538
 #define ADDR_BOOT_TEXT            0x007540
 
-#define OFFSET_ZONETAB      0x08010
-#define OFFSET_CONTACTS     0x17620
-#define CONTACT_SIZE        0x00018
-#define OFFSET_GROUPTAB     0x1d620
-#define GROUPLIST_SIZE      0x00050
-#define GROUPTAB_SIZE       0x01840
+#define NUM_ZONES                      250
+#define ADDR_ZONE_BANK            0x008010
 
-static_assert(
-  CHANNEL_SIZE == sizeof(GD77Codeplug::channel_t),
-  "GD77Codeplug::channel_t size check failed.");
-static_assert(
-  CHANNEL_BANK_SIZE == sizeof(GD77Codeplug::bank_t),
-  "GD77Codeplug::bank_t size check failed.");
-static_assert(
-  CONTACT_SIZE == sizeof(GD77Codeplug::contact_t),
-  "GD77Codeplug::contact_t size check failed.");
-static_assert(
-  GROUPLIST_SIZE == sizeof(GD77Codeplug::grouplist_t),
-  "GD77Codeplug::grouplist_t size check failed.");
-static_assert(
-  GROUPTAB_SIZE == sizeof(GD77Codeplug::grouptab_t),
-  "GD77Codeplug::grouptab_t size check failed.");
-static_assert(
-  SCAN_LIST_SIZE == sizeof(GD77Codeplug::scanlist_t),
-  "GD77Codeplug::scanlist_t size check failed.");
-static_assert(
-  SCAN_LIST_BANK_SIZE == sizeof(GD77Codeplug::scantab_t),
-  "GD77Codeplug::scantab_t size check failed.");
+#define NUM_CONTACTS                  1024
+#define ADDR_CONTACTS             0x017620
+#define CONTACT_SIZE              0x000018
 
+#define NUM_GROUP_LISTS                 76
+#define ADDR_GROUP_LIST_BANK      0x01d620
+#define GROUPLIST_SIZE            0x000050
+#define GROUP_LIST_BANK_SIZE      0x001840
 
 /* ******************************************************************************************** *
  * Implementation of GD77Codeplug::channel_t
@@ -868,6 +854,44 @@ GD77Codeplug::ChannelElement::enableAutoscan(bool enable) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::ContactElement
+ * ******************************************************************************************** */
+GD77Codeplug::ContactElement::ContactElement(uint8_t *ptr, uint size)
+  : RadioddityCodeplug::ContactElement(ptr, size)
+{
+  // pass...
+}
+
+GD77Codeplug::ContactElement::ContactElement(uint8_t *ptr)
+  : RadioddityCodeplug::ContactElement(ptr)
+{
+  // pass...
+}
+
+void
+GD77Codeplug::ContactElement::clear() {
+  markValid(false);
+}
+
+bool
+GD77Codeplug::ContactElement::isValid() const {
+  return RadioddityCodeplug::ContactElement::isValid() && (0x00 != getUInt8(0x0017));
+}
+void
+GD77Codeplug::ContactElement::markValid(bool valid) {
+  if (valid)
+    setUInt8(0x0017, 0xff);
+  else
+    setUInt8(0x0017, 0x00);
+}
+void
+GD77Codeplug::ContactElement::fromContactObj(const DigitalContact *obj, Context &ctx) {
+  RadioddityCodeplug::ContactElement::fromContactObj(obj, ctx);
+  markValid();
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of GD77Codeplug::ScanListElement
  * ******************************************************************************************** */
 GD77Codeplug::ScanListElement::ScanListElement(uint8_t *ptr, uint size)
@@ -916,6 +940,43 @@ GD77Codeplug::ScanListBankElement::get(uint n) const {
 
 
 /* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::GroupListElement
+ * ******************************************************************************************** */
+GD77Codeplug::GroupListElement::GroupListElement(uint8_t *ptr, uint size)
+  : RadioddityCodeplug::GroupListElement(ptr, size)
+{
+  // pass...
+}
+
+GD77Codeplug::GroupListElement::GroupListElement(uint8_t *ptr)
+  : RadioddityCodeplug::GroupListElement(ptr, 0x0050)
+{
+  // pass...
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::GroupListBankElement
+ * ******************************************************************************************** */
+GD77Codeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr, uint size)
+  : RadioddityCodeplug::GroupListBankElement(ptr, size)
+{
+  // pass...
+}
+
+GD77Codeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr)
+  : RadioddityCodeplug::GroupListBankElement(ptr, 0x1840)
+{
+  // pass...
+}
+
+uint8_t *
+GD77Codeplug::GroupListBankElement::get(uint n) const {
+  return _data + 0x80 + n*GROUPLIST_SIZE;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of GD77Codeplug
  * ******************************************************************************************** */
 GD77Codeplug::GD77Codeplug(QObject *parent)
@@ -925,336 +986,6 @@ GD77Codeplug::GD77Codeplug(QObject *parent)
   image(0).addElement(0x00080, 0x07b80);
   image(0).addElement(0x08000, 0x16300);
 }
-
-bool
-GD77Codeplug::encode(Config *config, const Flags &flags) {
-  // pack basic config
-  general_settings_t *gs = (general_settings_t*) data(ADDR_SETTINGS);
-  if (! flags.updateCodePlug)
-    gs->initDefault();
-
-  if (nullptr == config->radioIDs()->defaultId()) {
-    _errorMessage = tr("Cannot encode GD-77 codeplug: No default radio ID specified.");
-    return false;
-  }
-  gs->setName(config->radioIDs()->defaultId()->name());
-  gs->setRadioId(config->radioIDs()->defaultId()->number());
-
-  intro_text_t *it = (intro_text_t*) data(ADDR_BOOT_TEXT);
-  it->setIntroLine1(config->introLine1());
-  it->setIntroLine2(config->introLine2());
-
-  // Pack channels
-  for (int i=0; i<NCHAN; i++) {
-    // First, get bank
-    bank_t *b;
-    if ((i>>7) == 0)
-      b = (bank_t*) data(ADDR_CHANNEL_BANK_0);
-    else
-      b = (((i>>7)-1) + (bank_t *) data(ADDR_CHANNEL_BANK_1));
-    channel_t *ch = &b->chan[i % 128];
-
-    // Disable channel if not used
-    if (i >= config->channelList()->count()) {
-      b->bitmap[(i % 128) / 8] &= ~(1 << (i & 7));
-      continue;
-    }
-
-    // Construct from Channel object
-    ch->clear();
-    ch->fromChannelObj(config->channelList()->channel(i), config);
-
-    // Set valid bit.
-    b->bitmap[(i % 128) / 8] |= (1 << (i & 7));
-  }
-
-  // Pack Zones
-  bool pack_zone_a = true;
-  for (int i=0, j=0; i<NZONES; i++) {
-    zonetab_t *zt = (zonetab_t*) data(OFFSET_ZONETAB);
-    zone_t *z = &zt->zone[i];
-
-next:
-    if (j >= config->zones()->count()) {
-      // Clear valid bit.
-      zt->bitmap[i / 8] &= ~(1 << (i & 7));
-      continue;
-    }
-
-    // Construct from Zone obj
-    Zone *zone = config->zones()->zone(j);
-    if (pack_zone_a) {
-      pack_zone_a = false;
-      if (zone->A()->count())
-        z->fromZoneObjA(zone, config);
-      else
-        goto next;
-    } else {
-      pack_zone_a = true;
-      j++;
-      if (zone->B()->count())
-        z->fromZoneObjB(zone, config);
-      else
-        goto next;
-    }
-
-    // Set valid bit.
-    zt->bitmap[i / 8] |= (1 << (i & 7));
-  }
-
-  // Pack Scanlists
-  for (int i=0; i<NSCANL; i++) {
-    scantab_t *st = (scantab_t*) data(ADDR_SCAN_LIST_BANK);
-    scanlist_t *sl = &st->scanlist[i];
-
-    if (i >= config->scanlists()->count()) {
-      // Clear valid bit.
-      st->valid[i] = 0;
-      continue;
-    }
-
-    sl->fromScanListObj(config->scanlists()->scanlist(i), config);
-    st->valid[i] = 1;
-  }
-
-  // Pack contacts
-  for (int i=0; i<NCONTACTS; i++) {
-    contact_t *ct = (contact_t*) data(OFFSET_CONTACTS + (i)*sizeof(contact_t));
-    ct->clear();
-    if (i >= config->contacts()->digitalCount())
-      continue;
-    ct->fromContactObj(config->contacts()->digitalContact(i), config);
-  }
-
-  // Pack Grouplists:
-  for (int i=0; i<NGLISTS; i++) {
-    grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB);
-    grouplist_t *gl = &gt->grouplist[i];
-    if (i >= config->rxGroupLists()->count()) {
-      gt->nitems1[i] = 0;
-      continue;
-    }
-    // Enable group list
-    gt->nitems1[i] = std::min(15,config->rxGroupLists()->list(i)->count()) + 1;
-    gl->fromRXGroupListObj(config->rxGroupLists()->list(i), config);
-  }
-
-  return true;
-}
-
-bool
-GD77Codeplug::decode(Config *config) {
-  // Clear config object
-  config->reset();
-
-  /* Unpack general config */
-  general_settings_t *gs = (general_settings_t*) data(ADDR_SETTINGS);
-  if (nullptr == gs) {
-    _errorMessage = QString("%1(): Cannot access general settings memory!")
-        .arg(__func__);
-    return false;
-  }
-
-  int idx = config->radioIDs()->addId(gs->getName(),gs->getRadioId());
-  config->radioIDs()->setDefaultId(idx);
-
-  intro_text_t *it = (intro_text_t*) data(ADDR_BOOT_TEXT);
-  config->setIntroLine1(it->getIntroLine1());
-  config->setIntroLine2(it->getIntroLine2());
-
-  CodeplugContext ctx(config);
-
-  /* Unpack Contacts */
-  for (int i=0; i<NCONTACTS; i++) {
-    contact_t *ct = (contact_t *) data(OFFSET_CONTACTS+i*sizeof(contact_t));
-    if (nullptr == ct) {
-      _errorMessage = QString("%1(): Cannot access contact memory at index %2!")
-          .arg(__func__).arg(i);
-      return false;
-    }
-    // If contact is disabled
-    if (! ct->isValid())
-      continue;
-    logDebug() << "Contact " << i << " enabled.";
-    if (DigitalContact *cont = ct->toContactObj()) {
-      logDebug() << "Contact at index " << i+1 << " mapped to "
-                 << config->contacts()->count();
-      ctx.addDigitalContact(cont, i+1);
-    } else {
-      _errorMessage = QString("%1(): Cannot decode codeplug: Invalid contact at index %2.")
-          .arg(__func__).arg(i);
-      return false;
-    }
-  }
-
-  /* Unpack RX Group Lists */
-  for (int i=0; i<NGLISTS; i++) {
-    grouptab_t *gt = (grouptab_t*) data(OFFSET_GROUPTAB);
-    if (nullptr == gt) {
-      _errorMessage = QString("%1(): Cannot access group list table memory!")
-          .arg(__func__);
-      return false;
-    }
-
-    if (0 == gt->nitems1[i])
-      continue;
-
-    grouplist_t *gl = &gt->grouplist[i];
-    if (nullptr == gl) {
-      _errorMessage = QString("%1(): Cannot access group list memory at index %2!")
-          .arg(__func__).arg(i);
-      return false;
-    }
-
-    RXGroupList *list = gl->toRXGroupListObj();
-    if (list) {
-      logDebug() << "RX group list at index " << i+1 << " mapped to "
-                 << config->rxGroupLists()->count();
-      ctx.addGroupList(list, i+1);
-    } else {
-      _errorMessage = QString("%1(): Cannot decode codeplug: Invalid RX group-list at index %2.")
-          .arg(__func__).arg(i);
-      return false;
-    }
-
-    if(! gl->linkRXGroupListObj(list, ctx)) {
-      _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link RX group list at index %2.")
-          .arg(__func__).arg(i);
-      return false;
-    }
-  }
-
-  /* Unpack Channels */
-  for (int i=0; i<NCHAN; i++) {
-    // First, get bank
-    bank_t *b;
-    if ((i>>7) == 0)
-      b = (bank_t*) data(ADDR_CHANNEL_BANK_0);
-    else
-      b = (((i>>7)-1) + (bank_t*) data(ADDR_CHANNEL_BANK_1));
-    if (nullptr == b) {
-      _errorMessage = QString("%1(): Cannot access channel bank at index %2!")
-          .arg(__func__).arg(i);
-      return false;
-    }
-    // If channel is disabled -> skip
-    if (! ((b->bitmap[i % 128 / 8] >> (i & 7)) & 1) )
-      continue;
-
-    // finally, get channel
-    channel_t *ch = &b->chan[i % 128];
-    if (! ch){
-      _errorMessage = QString("%1(): Cannot access channel at index %2!")
-          .arg(__func__).arg(i);
-      return false;
-    }
-
-    if (Channel *chan = ch->toChannelObj()) {
-      logDebug() << "Map channel index " << i << " to " << config->channelList()->count();
-      ctx.addChannel(chan, i+1);
-    } else {
-      _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid channel at index %2!")
-          .arg(__func__).arg(i);
-      return false;
-    }
-  }
-
-  /* Unpack Zones */
-  for (int i=0; i<NZONES; i++) {
-    zonetab_t *zt = (zonetab_t*) data(OFFSET_ZONETAB);
-    if (! zt){
-      _errorMessage = QString("%1(): Cannot access zone table memory.")
-          .arg(__func__);
-      return false;
-    }
-    // if zone is disabled
-    if (! (zt->bitmap[i / 8] >> (i & 7) & 1) )
-      continue;
-    // get zone_t
-    zone_t *z = &zt->zone[i];
-    if (! z) {
-      _errorMessage = QString("%1(): Cannot access zone at index %2")
-          .arg(__func__).arg(i);
-      return false;
-    }
-
-    // Create & link zone obj
-    Zone *zone = z->toZoneObj();
-    if (nullptr == zone) {
-      _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid zone at index %2")
-          .arg(__func__).arg(i);
-      return false;
-    }
-    if (! z->linkZoneObj(zone, ctx, false)) {
-      _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
-          .arg(__func__).arg(i);
-      return false;
-    }
-    config->zones()->add(zone);
-  }
-
-  /* Unpack Scan lists */
-  for (int i=0; i<NSCANL; i++) {
-    scantab_t *st = (scantab_t*) data(ADDR_SCAN_LIST_BANK);
-    if (! st){
-      _errorMessage = QString("%1(): Cannot access scanlist table memory!")
-          .arg(__func__);
-      return false;
-    }
-    if (! st->valid[i])
-      continue;
-
-    scanlist_t *sl = &st->scanlist[i];
-    if (! sl){
-      _errorMessage = QString("%1(): Cannot access scan list at index %2")
-          .arg(__func__).arg(i);
-      return false;
-    }
-
-    ScanList *scan = sl->toScanListObj();
-    if (nullptr == scan) {
-      _errorMessage = QString("%1(): Cannot unpack codeplug: Invalid scanlist at index %2")
-          .arg(__func__).arg(i);
-      return false;
-    }
-
-    if (! sl->linkScanListObj(scan, ctx)) {
-      _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link scanlist at index %2")
-          .arg(__func__).arg(i);
-      return false;
-    }
-
-    logDebug() << "Scan list at index " << i+1 << " mapped to "
-               << config->scanlists()->count();
-    ctx.addScanList(scan, i+1);
-  }
-
-  /*
-   * Link Channels -> ScanLists
-   */
-  for (int i=0; i<NCHAN; i++) {
-    // First, get bank
-    bank_t *b;
-    if ((i>>7) == 0)
-      b = (bank_t*) data(ADDR_CHANNEL_BANK_0);
-    else
-      b = (((i>>7)-1) + (bank_t*) data(ADDR_CHANNEL_BANK_1));
-    // If channel is disabled
-    if (! ((b->bitmap[i % 128 / 8] >> (i & 7)) & 1) )
-      continue;
-    // finally, get channel
-    channel_t *ch = &b->chan[i % 128];
-    if (! ch->linkChannelObj(ctx.getChannel(i+1), ctx))
-    {
-      _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link channel at index %2")
-          .arg(__func__).arg(i);
-      return false;
-    }
-  }
-
-  return true;
-}
-
 
 void
 GD77Codeplug::clearGeneralSettings() {
@@ -1313,6 +1044,18 @@ GD77Codeplug::createScanLists(Config *config, Context &ctx) {
     ScanListElement el(bank.get(i));
     ScanList *scan = el.toScanListObj(ctx);
     config->scanlists()->add(scan); ctx.add(scan, i+1);
+  }
+  return true;
+}
+
+bool
+GD77Codeplug::linkScanLists(Config *config, Context &ctx) {
+  ScanListBankElement bank(data(ADDR_SCAN_LIST_BANK));
+  for (int i=0; i<NUM_SCAN_LISTS; i++) {
+    if (! bank.isEnabled(i))
+      continue;
+    if (! ScanListElement(bank.get(i)).linkScanListObj(ctx.get<ScanList>(i+1), ctx))
+      return false;
   }
   return true;
 }
@@ -1414,6 +1157,230 @@ GD77Codeplug::decodeBootText(Config *config, Context &ctx) {
   return true;
 }
 
+void
+GD77Codeplug::clearVFOSettings() {
+  /// @bug Search for VFO channels in GD77 codeplug!
+}
 
+void
+GD77Codeplug::clearZones() {
+  ZoneBankElement bank(data(ADDR_ZONE_BANK));
+  bank.clear();
+  for (int i=0; i<NUM_ZONES; i++)
+    ZoneElement(bank.get(i)).clear();
+}
 
+bool
+GD77Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
+  ZoneBankElement bank(data(ADDR_ZONE_BANK));
 
+  // Pack Zones
+  bool pack_zone_a = true;
+  for (int i=0, j=0; i<NUM_ZONES; i++) {
+    ZoneElement z(bank.get(i));
+next:
+    if (j >= config->zones()->count()) {
+      bank.enable(i, false);
+      continue;
+    }
+
+    // Construct from Zone obj
+    Zone *zone = config->zones()->zone(j);
+    if (pack_zone_a) {
+      pack_zone_a = false;
+      if (zone->A()->count())
+        z.fromZoneObjA(zone, ctx);
+      else
+        goto next;
+    } else {
+      pack_zone_a = true;
+      j++;
+      if (zone->B()->count())
+        z.fromZoneObjB(zone, ctx);
+      else
+        goto next;
+    }
+    bank.enable(i, true);
+  }
+  return true;
+}
+
+bool
+GD77Codeplug::createZones(Config *config, Context &ctx) {
+  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
+  bool extend_last_zone = false;
+  ZoneBankElement bank(data(ADDR_ZONE_BANK));
+
+  for (int i=0; i<NUM_ZONES; i++) {
+    if (! bank.isEnabled(i))
+      continue;
+    ZoneElement z(bank.get(i));
+
+    // Determine whether this zone should be combined with the previous one
+    QString zonename = z.name();
+    QString zonebasename = zonename; zonebasename.chop(2);
+    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
+                         && (zonebasename == last_zonebasename)
+                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
+    last_zonename = zonename;
+    last_zonebasename = zonebasename;
+
+    // Create zone obj
+    if (! extend_last_zone) {
+      last_zone = z.toZoneObj(ctx);
+      config->zones()->add(last_zone);
+      ctx.add(last_zone, i+1);
+    } else {
+      // when extending the last zone, chop its name to remove the "... A" part.
+      last_zone->setName(last_zonebasename);
+    }
+  }
+  return true;
+}
+
+bool
+GD77Codeplug::linkZones(Config *config, Context &ctx) {
+  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
+  bool extend_last_zone = false;
+  ZoneBankElement bank(data(ADDR_ZONE_BANK));
+
+  for (int i=0; i<NUM_ZONES; i++) {
+    if (! bank.isEnabled(i))
+      continue;
+    ZoneElement z(bank.get(i));
+
+    // Determine whether this zone should be combined with the previous one
+    QString zonename = z.name();
+    QString zonebasename = zonename; zonebasename.chop(2);
+    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
+                         && (zonebasename == last_zonebasename)
+                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
+    last_zonename = zonename;
+    last_zonebasename = zonebasename;
+
+    // Create zone obj
+    if (! extend_last_zone) {
+      last_zone = ctx.get<Zone>(i+1);
+    }
+    if (! z.linkZoneObj(last_zone, ctx, extend_last_zone)) {
+      _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
+          .arg(__func__).arg(i);
+      return false;
+    }
+  }
+
+  return true;
+}
+
+void
+GD77Codeplug::clearContacts() {
+  for (int i=0; i<NUM_CONTACTS; i++)
+    ContactElement(data(ADDR_CONTACTS + i*CONTACT_SIZE)).clear();
+}
+
+bool
+GD77Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) {
+  for (int i=0; i<NUM_CONTACTS; i++) {
+    ContactElement el(data(ADDR_CONTACTS + i*CONTACT_SIZE));
+    el.clear();
+    if (i >= config->contacts()->digitalCount())
+      continue;
+    el.fromContactObj(config->contacts()->digitalContact(i), ctx);
+  }
+  return true;
+}
+
+bool
+GD77Codeplug::createContacts(Config *config, Context &ctx) {
+  /* Unpack Contacts */
+  for (int i=0; i<NUM_CONTACTS; i++) {
+    ContactElement el(data(ADDR_CONTACTS + i*CONTACT_SIZE));
+    if (!el.isValid())
+      continue;
+
+    DigitalContact *cont = el.toContactObj(ctx);
+    ctx.add(cont, i+1); config->contacts()->add(cont);
+  }
+  return true;
+}
+
+void
+GD77Codeplug::clearDTMFContacts() {
+  for (int i=0; i<NUM_DTMF_CONTACTS; i++)
+    DTMFContactElement(data(ADDR_DTMF_CONTACTS + i*DTMF_CONTACT_SIZE)).clear();
+}
+
+bool
+GD77Codeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx) {
+  for (int i=0; i<NUM_DTMF_CONTACTS; i++) {
+    DTMFContactElement el(data(ADDR_DTMF_CONTACTS + i*DTMF_CONTACT_SIZE));
+    el.clear();
+    if (i >= config->contacts()->dtmfCount())
+      continue;
+    el.fromContactObj(config->contacts()->dtmfContact(i), ctx);
+  }
+  return true;
+}
+
+bool
+GD77Codeplug::createDTMFContacts(Config *config, Context &ctx) {
+  for (int i=0; i<NUM_DTMF_CONTACTS; i++) {
+    DTMFContactElement el(data(ADDR_DTMF_CONTACTS+i*DTMF_CONTACT_SIZE));
+    // If contact is disabled
+    if (! el.isValid())
+      continue;
+    DTMFContact *cont = el.toContactObj(ctx);
+    ctx.add(cont, i+1); config->contacts()->add(cont);
+  }
+  return true;
+}
+
+void
+GD77Codeplug::clearGroupLists() {
+  GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK)); bank.clear();
+  for (int i=0; i<NUM_GROUP_LISTS; i++)
+    GroupListElement(bank.get(i)).clear();
+}
+
+bool
+GD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx) {
+  GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK)); bank.clear();
+  for (int i=0; i<NUM_GROUP_LISTS; i++) {
+    if (i >= config->rxGroupLists()->count())
+      continue;
+    GroupListElement el(bank.get(i));
+    el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx);
+    bank.setContactCount(i, config->rxGroupLists()->list(i)->count());
+  }
+  return true;
+}
+
+bool
+GD77Codeplug::createGroupLists(Config *config, Context &ctx) {
+  GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK));
+  for (int i=0; i<NUM_GROUP_LISTS; i++) {
+    if (! bank.isEnabled(i))
+      continue;
+    GroupListElement el(bank.get(i));
+    RXGroupList *list = el.toRXGroupListObj(ctx);
+    config->rxGroupLists()->add(list); ctx.add(list, i+1);
+  }
+  return true;
+}
+
+bool
+GD77Codeplug::linkGroupLists(Config *config, Context &ctx) {
+  GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK));
+  for (int i=0; i<NUM_GROUP_LISTS; i++) {
+    if (! bank.isEnabled(i))
+      continue;
+    GroupListElement el(bank.get(i));
+    /*logDebug() << "Link " << bank.contactCount(i) << " members of group list '"
+               << ctx.get<RXGroupList>(i+1)->name() << "'.";*/
+    if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx)) {
+      _errorMessage = tr("Cannot link group list '%1'.").arg(ctx.get<RXGroupList>(i+1)->name());
+      return false;
+    }
+  }
+  return true;
+}

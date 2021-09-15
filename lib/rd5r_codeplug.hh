@@ -6,11 +6,6 @@
 #include "signaling.hh"
 
 class Channel;
-class Zone;
-class ScanList;
-class DigitalContact;
-class DTMFContact;
-class RXGroupList;
 
 /** Represents, encodes and decodes the device specific codeplug for a Baofeng/Radioddity RD-5R.
  *

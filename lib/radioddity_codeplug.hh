@@ -94,6 +94,8 @@ public:
     /** Sets the admit criterion. */
     virtual void setAdmitCriterion(Admit admit);
 
+    /** Returns @c true if a scan list is set. */
+    virtual bool hasScanList() const;
     /** Returns the scan list index (+1). */
     virtual uint scanListIndex() const;
     /** Sets the scan list index (+1). */
@@ -127,6 +129,8 @@ public:
     /** Sets the TX color code. */
     virtual void setTXColorCode(uint cc);
 
+    /** Returns @c true if a group list is set. */
+    virtual bool hasGroupList() const;
     /** Returns the group-list index (+1). */
     virtual uint groupListIndex() const;
     /** Sets the group-list index (+1). */
@@ -137,11 +141,15 @@ public:
     /** Sets the RX color code. */
     virtual void setRXColorCode(uint cc);
 
+    /** Returns @c true if an emergency system is set. */
+    virtual bool hasEmergencySystem() const;
     /** Returns the emergency system index (+1). */
     virtual uint emergencySystemIndex() const;
     /** Sets the emergency system index (+1). */
     virtual void setEmergencySystemIndex(uint index);
 
+    /** Returns @c true if a TX contact is set. */
+    virtual bool hasContact() const;
     /** Returns the transmit contact index (+1). */
     virtual uint contactIndex() const;
     /** Sets the transmit contact index (+1). */

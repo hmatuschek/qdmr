@@ -118,6 +118,10 @@ RadioddityCodeplug::ChannelElement::setAdmitCriterion(Admit admit) {
   setUInt8(0x001d, (uint)admit);
 }
 
+bool
+RadioddityCodeplug::ChannelElement::hasScanList() const {
+  return 0!=scanListIndex();
+}
 uint
 RadioddityCodeplug::ChannelElement::scanListIndex() const {
   return getUInt8(0x001f);
@@ -179,6 +183,10 @@ RadioddityCodeplug::ChannelElement::setTXColorCode(uint cc) {
   setUInt8(0x002a, cc);
 }
 
+bool
+RadioddityCodeplug::ChannelElement::hasGroupList() const {
+  return 0!=groupListIndex();
+}
 uint
 RadioddityCodeplug::ChannelElement::groupListIndex() const {
   return getUInt8(0x002b);
@@ -197,6 +205,10 @@ RadioddityCodeplug::ChannelElement::setRXColorCode(uint cc) {
   setUInt8(0x002c, cc);
 }
 
+bool
+RadioddityCodeplug::ChannelElement::hasEmergencySystem() const {
+  return 0!=emergencySystemIndex();
+}
 uint
 RadioddityCodeplug::ChannelElement::emergencySystemIndex() const {
   return getUInt8(0x002d);
@@ -206,6 +218,10 @@ RadioddityCodeplug::ChannelElement::setEmergencySystemIndex(uint index) {
   setUInt8(0x002d, index);
 }
 
+bool
+RadioddityCodeplug::ChannelElement::hasContact() const {
+  return 0!=contactIndex();
+}
 uint
 RadioddityCodeplug::ChannelElement::contactIndex() const {
   return getUInt16_le(0x002e);
@@ -341,6 +357,8 @@ RadioddityCodeplug::ChannelElement::toChannelObj(CodePlug::Context &ctx) const {
     default: ach->setAdmit(AnalogChannel::Admit::Always); break;
     }
     ach->setBandwidth(bandwidth());
+    ach->setRXTone(rxTone());
+    ach->setTXTone(txTone());
   } else {
     DigitalChannel *dch = new DigitalChannel(
           "", 0, 0, Channel::Power::Low, 0, false, DigitalChannel::Admit::Always, 0,
@@ -363,9 +381,6 @@ RadioddityCodeplug::ChannelElement::toChannelObj(CodePlug::Context &ctx) const {
   ch->setPower(power());
   ch->setTimeout(txTimeOut());
   ch->setRXOnly(rxOnly());
-  if (0 < scanListIndex()) {
-    ch->setScanListObj(ctx.get<ScanList>(scanListIndex()));
-  }
   // done.
   return ch;
 }
@@ -373,14 +388,14 @@ RadioddityCodeplug::ChannelElement::toChannelObj(CodePlug::Context &ctx) const {
 bool
 RadioddityCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
   // Link common
-  if (scanListIndex() && ctx.has<ScanList>(scanListIndex()))
+  if (hasScanList() && ctx.has<ScanList>(scanListIndex()))
     c->setScanListObj(ctx.get<ScanList>(scanListIndex()));
   // Link digital channel
   if (c->is<DigitalChannel>()) {
     DigitalChannel *dc = c->as<DigitalChannel>();
-    if (groupListIndex() && ctx.has<RXGroupList>(groupListIndex()))
+    if (hasGroupList() && ctx.has<RXGroupList>(groupListIndex()))
       dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
-    if (contactIndex() && ctx.has<DigitalContact>(contactIndex()))
+    if (hasContact() && ctx.has<DigitalContact>(contactIndex()))
       dc->setTXContactObj(ctx.get<DigitalContact>(contactIndex()));
   }
   return true;

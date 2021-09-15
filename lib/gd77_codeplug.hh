@@ -31,13 +31,15 @@
  *  <tr><th>Start</th>   <th>End</th>      <th>Size</th>    <th>Content</th></tr>
  *  <tr><th colspan="4">First segment 0x00080-0x07c00</th></tr>
  *  <tr><td>0x00080</td> <td>0x000e0</td> <td>0x0070</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x000e0</td> <td>0x000ec</td> <td>0x000c</td> <td>General settings, see @c Radioddity::GeneralSettingsElement.</td></tr>
+ *  <tr><td>0x000e0</td> <td>0x000ec</td> <td>0x000c</td> <td>General settings, see @c RadioddityCodeplug::GeneralSettingsElement.</td></tr>
  *  <tr><td>0x000ec</td> <td>0x00108</td> <td>0x0028</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x00108</td> <td>0x00128</td> <td>0x0020</td> <td>Button settings, see @c Radioddity::ButtonSettingsElement.</td></tr>
+ *  <tr><td>0x00108</td> <td>0x00128</td> <td>0x0020</td> <td>Button settings, see @c RadioddityCodeplug::ButtonSettingsElement.</td></tr>
  *  <tr><td>0x00128</td> <td>0x01370</td> <td>0x1248</td> <td>32 preset message texts, see @c RadioddityCodeplug::MessageBankElement.</td></tr>
  *  <tr><td>0x01370</td> <td>0x01790</td> <td>0x0420</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x01790</td> <td>0x02dd0</td> <td>0x1640</td> <td>64 scan lists, see @c GD77Codeplug::ScanListBankElement</td></tr>
- *  <tr><td>0x02dd0</td> <td>0x03780</td> <td>0x09b0</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x02dd0</td> <td>0x02f88</td> <td>0x01b8</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x02f88</td> <td>0x03388</td> <td>0x0400</td> <td>DTMF contacts, see RadioddityCodeplug::DTMFContactElement.</td></tr>
+ *  <tr><td>0x03388</td> <td>0x03780</td> <td>0x03f8</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c GD77Codeplug::ChannelBankElement</td></tr>
  *  <tr><td>0x05390</td> <td>0x07540</td> <td>0x21b0</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x07518</td> <td>0x07538</td> <td>0x0020</td> <td>Boot settings, see @c RadioddityCodeplug::BootSettingsElement.</td></tr>
@@ -46,9 +48,9 @@
  *  <tr><td>0x07560</td> <td>0x07c00</td> <td>0x06a0</td> <td>??? Unknown ???</td></tr>
  *  <tr><th colspan="4">Second segment 0x08000-0x1e300</th></tr>
  *  <tr><td>0x08000</td> <td>0x08010</td> <td>0x0010</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x08010</td> <td>0x0af10</td> <td>0x2f00</td> <td>68 zones of 80 channels each, see @c GD77Codeplug::zonetab_t</td></tr>
+ *  <tr><td>0x08010</td> <td>0x0af10</td> <td>0x2f00</td> <td>68 zones of 80 channels each, see @c GD77Codeplug::ZoneBankElement.</td></tr>
  *  <tr><td>0x0af10</td> <td>0x0b1b0</td> <td>0x02a0</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x0b1b0</td> <td>0x17620</td> <td>0xc470</td> <td>Remaining 896 chanels (bank 1-7), see @c GD77Codeplug::bank_t</td></tr>
+ *  <tr><td>0x0b1b0</td> <td>0x17620</td> <td>0xc470</td> <td>Remaining 896 chanels (bank 1-7), see @c GD77Codeplug::ChannelBankElement.</td></tr>
  *  <tr><td>0x17620</td> <td>0x1d620</td> <td>0x6000</td> <td>1024 contacts, see @c GD77Codeplug::contact_t.</td></tr>
  *  <tr><td>0x1d620</td> <td>0x1e2a0</td> <td>0x0c80</td> <td>64 RX group lists, see @c GD77Codeplug::grouptab_t</td></tr>
  *  <tr><td>0x1e2a0</td> <td>0x1e300</td> <td>0x0060</td> <td>??? Unknown ???</td></tr>
@@ -70,7 +72,7 @@ public:
   /** Channel representation within the binary codeplug.
    *
    * Each channel requires 0x38b:
-   * @verbinclude gd77channel.txt */
+   * @verbinclude gd77_channel.txt */
   struct __attribute__((packed)) channel_t {
     /** Possible channel types analog (FM) or digital (DMR). */
 		typedef enum {
@@ -268,6 +270,7 @@ public:
     ChannelElement(uint8_t *ptr, size_t size);
 
   public:
+    /** Constructor. */
     explicit ChannelElement(uint8_t *ptr);
 
     void clear();
@@ -303,11 +306,6 @@ public:
     virtual void enableAutoscan(bool enable);
   };
 
-  /** Specific codeplug representation of a DMR contact.
-   *
-   * Memmory layout of the contact (0x17b):
-   * @verbinclude gd77contact.txt
-   */
   struct __attribute__((packed)) contact_t {
     /** Possible call types. */
     typedef enum {
@@ -346,6 +344,31 @@ public:
     DigitalContact *toContactObj() const;
     /** Resets this codeplug contact from the given @c DigitalContact. */
     void fromContactObj(const DigitalContact *obj, const Config *conf);
+  };
+
+  /** Specific codeplug representation of a DMR contact for the GD77.
+   *
+   * Memmory layout of the contact (0x18b):
+   * @verbinclude gd77_contact.txt
+   */
+  class ContactElement: public RadioddityCodeplug::ContactElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ContactElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    ContactElement(uint8_t *ptr);
+
+    /** Resets the contact. */
+    void clear();
+    /** Returns @c true if the contact is valid. */
+    bool isValid() const;
+
+    /** Marks the entry as valid/invalid. */
+    virtual void markValid(bool valid=true);
+    void fromContactObj(const DigitalContact *obj, Context &ctx);
   };
 
   /** Specific codeplug representation of a DTMF (analog) contact.
@@ -428,10 +451,6 @@ public:
     zone_t  zone[NZONES];
   };
 
-  /** Represents an RX group list within the codeplug.
-   *
-   * The group list is encoded as (size 0x50b):
-   * @verbinclude gd77grouplist.txt */
   struct __attribute__((packed)) grouplist_t {
     // Bytes 0-15
     uint8_t name[16];                 ///< RX group list name, 16x ASCII, 0xff terminated.
@@ -451,6 +470,21 @@ public:
     void fromRXGroupListObj(const RXGroupList *lst, const Config *conf);
   };
 
+  /** Represents an RX group list within the codeplug.
+   *
+   * The group list is encoded as (size 0x50b):
+   * @verbinclude gd77_grouplist.txt */
+  class GroupListElement: public RadioddityCodeplug::GroupListElement
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    GroupListElement(uint8_t *ptr);
+  };
+
   /** Table of RX group lists.
    *
    * The RX group list table constsis of a table of number of members per group list and the actual
@@ -459,7 +493,20 @@ public:
    * number of entries per group list.
    *
    * Encoding of group list table:
-   * @verbinclude gd77grouptab.txt*/
+   * @verbinclude gd77_grouplistbank.txt*/
+  class GroupListBankElement: public RadioddityCodeplug::GroupListBankElement
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListBankElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    GroupListBankElement(uint8_t *ptr);
+
+    uint8_t *get(uint n) const;
+  };
+
   struct __attribute__((packed)) grouptab_t {
     uint8_t     nitems1[128];         ///< Number of members (N+1) for every group list, zero when disabled.
     grouplist_t grouplist[NGLISTS];   ///< The actual grouplists.
@@ -520,7 +567,7 @@ public:
   /** Represents a single scan list within the GD77 codeplug.
    *
    * Encoding of scan list (size: 0x58b):
-   * @verbinclude gd77scanlist.txt */
+   * @verbinclude gd77_scanlist.txt */
   class ScanListElement: public RadioddityCodeplug::ScanListElement
   {
   protected:
@@ -548,6 +595,7 @@ public:
     /** Constructor. */
     ScanListBankElement(uint8_t *ptr);
 
+    /** Clears the scan list bank. */
     void clear();
     uint8_t *get(uint n) const;
   };
@@ -831,11 +879,6 @@ public:
 public:
   /** Constructs an empty codeplug for the GD-77. */
 	explicit GD77Codeplug(QObject *parent=nullptr);
-
-	/** Decodes the binary codeplug and stores its content in the given generic configuration. */
-	bool decode(Config *config);
-  /** Encodes the given generic configuration as a binary codeplug. */
-  bool encode(Config *config, const Flags &flags = Flags());
 
 public:
   void clearGeneralSettings();
