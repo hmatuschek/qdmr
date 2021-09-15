@@ -196,6 +196,43 @@ OpenGD77Codeplug::ContactElement::disableTimeSlotOverride() {
   setUInt8(0x0017, (uint)TimeSlotOverride::None);
 }
 
+DigitalContact *
+OpenGD77Codeplug::ContactElement::toContactObj(Context &ctx) const {
+  DigitalContact *c = GD77Codeplug::ContactElement::toContactObj(ctx);
+  if (nullptr == c)
+    return nullptr;
+
+  OpenGD77ContactExtension *ext = new OpenGD77ContactExtension(c);
+  if (overridesTimeSlot()) {
+    if (DigitalChannel::TimeSlot::TS1 == timeSlot())
+      ext->setTimeSlotOverride(OpenGD77ContactExtension::TimeSlotOverride::TS1);
+    else
+      ext->setTimeSlotOverride(OpenGD77ContactExtension::TimeSlotOverride::TS2);
+  } else {
+    ext->setTimeSlotOverride(OpenGD77ContactExtension::TimeSlotOverride::None);
+  }
+
+  c->addExtension("openGD77", ext);
+  return c;
+}
+
+void
+OpenGD77Codeplug::ContactElement::fromContactObj(const DigitalContact *c, Context &ctx) {
+  GD77Codeplug::ContactElement::fromContactObj(c, ctx);
+  if (! c->hasExtension("openGD77"))
+    return;
+
+  const OpenGD77ContactExtension *ext = c->extension("openGD77")->as<OpenGD77ContactExtension>();
+  if (OpenGD77ContactExtension::TimeSlotOverride::None != ext->timeSlotOverride()) {
+    if (OpenGD77ContactExtension::TimeSlotOverride::TS1 == ext->timeSlotOverride())
+      setTimeSlot(DigitalChannel::TimeSlot::TS1);
+    else
+      setTimeSlot(DigitalChannel::TimeSlot::TS2);
+  } else {
+    disableTimeSlotOverride();
+  }
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of OpenGD77Codeplug

@@ -151,6 +151,9 @@ public:
     virtual void setTimeSlot(DigitalChannel::TimeSlot ts);
     /** Disables time slot override feature. */
     virtual void disableTimeSlotOverride();
+
+    DigitalContact *toContactObj(Context &ctx) const;
+    void fromContactObj(const DigitalContact *c, Context &ctx);
   };
 
 public:

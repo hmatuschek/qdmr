@@ -395,7 +395,7 @@ public:
 public:
   /** Adds an extension to the config parser.
    * At this level, extensions to all digital contacts can be added. */
-  static bool addExtension(ExtensionReader *ext);
+  static AbstractConfigReader *addExtension(ExtensionReader *ext);
 
 protected:
   /** Holds the exentions for the config parser. */
