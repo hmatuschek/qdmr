@@ -16,6 +16,10 @@
 #define ADDR_MESSAGE_BANK         0x000128
 
 //#define ADDR_SCANTAB      0x01790
+#define NUM_DTMF_CONTACTS               32
+#define IMAGE_DTMF_CONTACTS              0
+#define ADDR_DTMF_CONTACTS        0x002f88
+#define DTMF_CONTACT_SIZE         0x000020
 
 #define NUM_CHANNEL_BANKS                8
 #define NUM_CHANNELS_PER_BANK          128
@@ -27,8 +31,16 @@
 #define CHANNEL_SIZE              0x000038
 #define CHANNEL_BANK_SIZE         0x001c10
 
+#define IMAGE_BOOT_SETTINGS              0
+#define ADDR_BOOT_SETTINGS        0x007518
+#define IMAGE_MENU_SETTINGS              0
+#define ADDR_MENU_SETTINGS        0x007538
 #define IMAGE_BOOT_TEXT                  0
 #define ADDR_BOOT_TEXT            0x007540
+#define IMAGE_VFO_A                      0
+#define ADDR_VFO_A                0x007590
+#define IMAGE_VFO_B                      0
+#define ADDR_VFO_B                0x0075c8
 
 #define NUM_ZONES                       68
 #define IMAGE_ZONE_BANK                  0
@@ -58,6 +70,7 @@ OpenGD77Codeplug::ChannelElement::ChannelElement(uint8_t *ptr)
 void
 OpenGD77Codeplug::ChannelElement::clear() {
   setExtendedPower(Power::Global);
+  setSquelchDefault();
 }
 
 Channel::Power
@@ -104,11 +117,36 @@ OpenGD77Codeplug::ChannelElement::setExtendedPower(Power power) {
   setUInt8(0x0019, (uint)(power));
 }
 
+bool
+OpenGD77Codeplug::ChannelElement::squelchIsDefault() const {
+  return 0 == getUInt8(0x0037);
+}
+uint
+OpenGD77Codeplug::ChannelElement::squelch() const {
+  return (getUInt8(0x0037)-1)/2;
+}
+void
+OpenGD77Codeplug::ChannelElement::setSquelch(uint squelch) {
+  setUInt8(0x0037, (squelch*2)+1);
+}
+void
+OpenGD77Codeplug::ChannelElement::setSquelchDefault() {
+  setUInt8(0x0037, 0);
+}
+
 Channel *
 OpenGD77Codeplug::ChannelElement::toChannelObj(Context &ctx) const {
   Channel *ch = GD77Codeplug::ChannelElement::toChannelObj(ctx);
   if (nullptr == ch)
     return nullptr;
+
+  if (ch->is<AnalogChannel>()) {
+    AnalogChannel *ac = ch->as<AnalogChannel>();
+    if (squelchIsDefault())
+      ac->setSquelch(1);
+    else
+      ac->setSquelch(squelch());
+  }
 
   OpenGD77ChannelExtension *ext = new OpenGD77ChannelExtension(ch);
   ext->setPower(extendedPower());
@@ -121,6 +159,12 @@ bool
 OpenGD77Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   if (! GD77Codeplug::ChannelElement::fromChannelObj(c, ctx))
     return false;
+
+  if (c->is<AnalogChannel>()) {
+    const AnalogChannel *ac = c->as<AnalogChannel>();
+    setSquelch(ac->squelch());
+  }
+
   if (! c->hasExtension("openGD77"))
     return true;
 
@@ -175,6 +219,12 @@ bool
 OpenGD77Codeplug::ContactElement::isValid() const {
   // The GD77 uses byte 0x17 as a valid flag, the OpenGD77 uses it to override the time-slot.
   return RadioddityCodeplug::ContactElement::isValid();
+}
+void
+OpenGD77Codeplug::ContactElement::markValid(bool valid) {
+  // The valid flag of the GD77 codeplug is reused
+  if (! valid)
+    setName("");
 }
 
 bool
@@ -339,16 +389,32 @@ OpenGD77Codeplug::createContacts(Config *config, Context &ctx) {
 
 void
 OpenGD77Codeplug::clearDTMFContacts() {
-  /// @bug Find DTMF contacts in OpenGD77 codeplug.
+  for (int i=0; i<NUM_DTMF_CONTACTS; i++)
+    DTMFContactElement(data(ADDR_DTMF_CONTACTS + i*DTMF_CONTACT_SIZE, IMAGE_DTMF_CONTACTS)).clear();
 }
+
 bool
 OpenGD77Codeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx) {
-  /// @bug Find DTMF contacts in OpenGD77 codeplug.
+  for (int i=0; i<NUM_DTMF_CONTACTS; i++) {
+    DTMFContactElement el(data(ADDR_DTMF_CONTACTS + i*DTMF_CONTACT_SIZE, IMAGE_DTMF_CONTACTS));
+    el.clear();
+    if (i >= config->contacts()->dtmfCount())
+      continue;
+    el.fromContactObj(config->contacts()->dtmfContact(i), ctx);
+  }
   return true;
 }
+
 bool
 OpenGD77Codeplug::createDTMFContacts(Config *config, Context &ctx) {
-  /// @bug Find DTMF contacts in OpenGD77 codeplug.
+  for (int i=0; i<NUM_DTMF_CONTACTS; i++) {
+    DTMFContactElement el(data(ADDR_DTMF_CONTACTS+i*DTMF_CONTACT_SIZE, IMAGE_DTMF_CONTACTS));
+    // If contact is disabled
+    if (! el.isValid())
+      continue;
+    DTMFContact *cont = el.toContactObj(ctx);
+    ctx.add(cont, i+1); config->contacts()->add(cont);
+  }
   return true;
 }
 
@@ -424,12 +490,12 @@ OpenGD77Codeplug::linkChannels(Config *config, Context &ctx) {
 
 void
 OpenGD77Codeplug::clearBootSettings() {
-  /// @bug Find BootSettings in OpenGD77 codeplug.
+  BootSettingsElement(data(ADDR_BOOT_SETTINGS, IMAGE_BOOT_SETTINGS)).clear();
 }
 
 void
 OpenGD77Codeplug::clearMenuSettings() {
-  /// @bug Find MenuSettings in OpenGD77 codeplug.
+  MenuSettingsElement(data(ADDR_MENU_SETTINGS, IMAGE_MENU_SETTINGS)).clear();
 }
 
 void
@@ -451,7 +517,8 @@ OpenGD77Codeplug::decodeBootText(Config *config, Context &ctx) {
 
 void
 OpenGD77Codeplug::clearVFOSettings() {
-  /// @bug Search for VFO channels in OpenGD77 codeplug!
+  ChannelElement(data(ADDR_VFO_A, IMAGE_VFO_A)).clear();
+  ChannelElement(data(ADDR_VFO_B, IMAGE_VFO_B)).clear();
 }
 
 void

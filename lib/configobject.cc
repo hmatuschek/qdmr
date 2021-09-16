@@ -120,6 +120,10 @@ ConfigObject::label(Context &context) {
     _extensions[name]->label(context);
   }
 
+  // With empty ID base, skip labeling.
+  if (_idBase.isEmpty())
+    return true;
+
   uint n=1;
   QString id=QString("%1%2").arg(_idBase).arg(n);
   while (context.contains(id)) {

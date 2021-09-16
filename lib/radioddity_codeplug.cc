@@ -423,6 +423,7 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
     case AnalogChannel::Admit::Free: setAdmitCriterion(ADMIT_CH_FREE); break;
     default: setAdmitCriterion(ADMIT_ALWAYS);
     }
+
     setBandwidth(ac->bandwidth());
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());

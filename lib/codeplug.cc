@@ -271,7 +271,7 @@ QString
 CodePlug::Element::readASCII(uint offset, uint maxlen, uint8_t eos) const {
   QString txt;
   uint8_t *ptr = (uint8_t *)(_data+offset);
-  for (uint i=0; (i<maxlen)&&(eos!=ptr[i]); i++) {
+  for (uint i=0; (i<maxlen)&&(ptr[i])&&(eos!=ptr[i]); i++) {
     txt.append(QChar::fromLatin1(ptr[i]));
   }
   return txt;

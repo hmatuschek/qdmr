@@ -5,7 +5,7 @@
  * Implementation of TyTButtonSettings
  * ******************************************************************************************** */
 TyTButtonSettings::TyTButtonSettings(QObject *parent)
-  : ConfigExtension("btn", parent)
+  : ConfigExtension("", parent)
 {
   _sideButton1Short = Disabled;
   _sideButton1Long  = Tone1750Hz;

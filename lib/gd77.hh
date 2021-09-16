@@ -4,9 +4,6 @@
  * \image html gd77.jpg "GD-77" width=200px
  * \image latex gd77.jpg "GD-77" width=200px
  *
- * @warning This device and its codplug are implemented based on the code by Serge and has not been
- * tested! I do not own a GD-77 or GD-77S, hence I cannot test and verify the implementation!
- *
  * @ingroup radioddity */
 
 #ifndef GD77_HH

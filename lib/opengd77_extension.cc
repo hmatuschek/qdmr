@@ -4,7 +4,7 @@
  * Implementation of OpenGD77ChannelExtension
  * ******************************************************************************************** */
 OpenGD77ChannelExtension::OpenGD77ChannelExtension(QObject *parent)
-  : ConfigExtension("ex", parent), _power(Power::Global)
+  : ConfigExtension("", parent), _power(Power::Global)
 {
   // pass...
 }
@@ -43,7 +43,7 @@ OpenGD77ChannelExtensionReader::allocate(const YAML::Node &node, const ConfigObj
  * Implementation of OpenGD77ContactExtension
  * ******************************************************************************************** */
 OpenGD77ContactExtension::OpenGD77ContactExtension(QObject *parent)
-  : ConfigExtension("ex", parent), _timeSlotOverride(TimeSlotOverride::None)
+  : ConfigExtension("", parent), _timeSlotOverride(TimeSlotOverride::None)
 {
   // pass...
 }

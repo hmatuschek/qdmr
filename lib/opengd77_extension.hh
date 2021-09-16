@@ -3,7 +3,6 @@
 
 #include "configobject.hh"
 #include "configreader.hh"
-#include "opengd77_codeplug.hh"
 
 /** Implements the channel extensions for the OpenGD77 radios.
  * @ingroup opengd77 */
@@ -15,8 +14,20 @@ class OpenGD77ChannelExtension: public ConfigExtension
   Q_PROPERTY(Power power READ power WRITE setPower)
 
 public:
-  /** Use same enum as codeplug element. */
-  typedef OpenGD77Codeplug::ChannelElement::Power Power;
+  /** All possible power settings. */
+  enum class Power {
+    Global  =  0,              ///< Use global power setting.
+    P50mW   =  1,              ///< About 50mW.
+    P250mW  =  2,              ///< About 250mW.
+    P500mW  =  3,              ///< About 500mW.
+    P750mW  =  4,              ///< About 750mW.
+    P1W     =  5,              ///< About 1W.
+    P2W     =  6,              ///< About 2W.
+    P3W     =  7,              ///< About 3W.
+    P4W     =  8,              ///< About 4W.
+    P5W     =  9,              ///< About 5W.
+    Max     = 10,              ///< Maximum power (5.5W on UHF, 7W on VHF).
+  };
   Q_ENUM(Power)
 
 public:
@@ -62,8 +73,12 @@ class OpenGD77ContactExtension: public ConfigExtension
   Q_PROPERTY(TimeSlotOverride timeSlotOverride READ timeSlotOverride WRITE setTimeSlotOverride)
 
 public:
-  /** Reuse enum from codeplug. */
-  typedef OpenGD77Codeplug::ContactElement::TimeSlotOverride TimeSlotOverride;
+  /** Possible values for the time-slot override option. */
+  enum class TimeSlotOverride {
+    None = 0x01,                  ///< Do not override time-slot of channel.
+    TS1  = 0x00,                  ///< Force time-slot to TS1.
+    TS2  = 0x02                   ///< Force time-slot to TS2.
+  };
   Q_ENUM(TimeSlotOverride)
 
 public:

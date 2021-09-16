@@ -29,6 +29,8 @@
 #define ADDR_BOOTSETTINGS         0x007518
 #define ADDR_MENU_SETTINGS        0x007538
 #define ADDR_BOOT_TEXT            0x007540
+#define ADDR_VFO_A                0x007590
+#define ADDR_VFO_B                0x0075c8
 
 #define NUM_ZONES                      250
 #define ADDR_ZONE_BANK            0x008010
@@ -428,7 +430,8 @@ GD77Codeplug::decodeBootText(Config *config, Context &ctx) {
 
 void
 GD77Codeplug::clearVFOSettings() {
-  /// @bug Search for VFO channels in GD77 codeplug!
+  ChannelElement(data(ADDR_VFO_A)).clear();
+  ChannelElement(data(ADDR_VFO_B)).clear();
 }
 
 void
