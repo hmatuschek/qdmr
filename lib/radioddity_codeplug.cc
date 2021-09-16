@@ -487,6 +487,92 @@ RadioddityCodeplug::ChannelBankElement::get(uint idx) const {
 }
 
 
+/* ******************************************************************************************** *
+ * Implementation of RadioddityCodeplug::VFOChannelElement
+ * ******************************************************************************************** */
+RadioddityCodeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr, uint size)
+  : ChannelElement(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr)
+  : ChannelElement(ptr)
+{
+  // pass...
+}
+
+void
+RadioddityCodeplug::VFOChannelElement::clear() {
+  ChannelElement::clear();
+  setStepSize(12.5);
+  setOffsetMode(OffsetMode::Off);
+  setTXOffset(10.0);
+}
+
+QString
+RadioddityCodeplug::VFOChannelElement::name() const {
+  return QString();
+}
+void
+RadioddityCodeplug::VFOChannelElement::setName(const QString &name) {
+  Q_UNUSED(name);
+  ChannelElement::setName("");
+}
+
+double
+RadioddityCodeplug::VFOChannelElement::stepSize() const {
+  switch (StepSize(getUInt4(0x0036, 4))) {
+  case StepSize::SS2_5kHz: return 2.5;
+  case StepSize::SS5kHz: return 5;
+  case StepSize::SS6_25kHz: return 6.25;
+  case StepSize::SS10kHz: return 10.0;
+  case StepSize::SS12_5kHz: return 12.5;
+  case StepSize::SS20kHz: return 20;
+  case StepSize::SS30kHz: return 30;
+  case StepSize::SS50kHz: return 50;
+  }
+  return 12.5;
+}
+
+void
+RadioddityCodeplug::VFOChannelElement::setStepSize(double kHz) {
+  if (2.5 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS2_5kHz);
+  else if (5.0 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS5kHz);
+  else if (6.25 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS6_25kHz);
+  else if (10.0 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS10kHz);
+  else if (12.5 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS12_5kHz);
+  else if (20.0 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS20kHz);
+  else if (30.0 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS30kHz);
+  else
+    setUInt4(0x0036, 4, (uint)StepSize::SS50kHz);
+}
+
+RadioddityCodeplug::VFOChannelElement::OffsetMode
+RadioddityCodeplug::VFOChannelElement::offsetMode() const {
+  return (OffsetMode)getUInt2(0x0036, 2);
+}
+void
+RadioddityCodeplug::VFOChannelElement::setOffsetMode(OffsetMode mode) {
+  setUInt2(0x0036, 2, (uint)mode);
+}
+double
+RadioddityCodeplug::VFOChannelElement::txOffset() const {
+  return ((double)getBCD4_le(0x0034))/100;
+}
+void
+RadioddityCodeplug::VFOChannelElement::setTXOffset(double f) {
+  setBCD4_le(0x0034, (f*100));
+}
+
+
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::ContactElement
  * ********************************************************************************************* */
