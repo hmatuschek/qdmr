@@ -1,3 +1,8 @@
+/** @defgroup ogd77ex OpenGD77 Extensions
+ * This module collects classes that implement the firmware specific extensions to the common
+ * codeplug configuration for radios running the OpenGD77 firmware.
+ *
+ * @ingroup ogd77 */
 #ifndef OPENGD77EXTENSION_HH
 #define OPENGD77EXTENSION_HH
 
@@ -5,7 +10,8 @@
 #include "configreader.hh"
 
 /** Implements the channel extensions for the OpenGD77 radios.
- * @ingroup opengd77 */
+ * @since 0.9.0
+ * @ingroup ogd77ex */
 class OpenGD77ChannelExtension: public ConfigExtension
 {
   Q_OBJECT
@@ -45,7 +51,9 @@ protected:
   Power _power;
 };
 
-/** Implements the config reader for OpenGD77 channel extensions. */
+/** Implements the config reader for OpenGD77 channel extensions.
+ * @since 0.9.0
+ * @ingroup ogd77ex */
 class OpenGD77ChannelExtensionReader: public ExtensionReader
 {
   Q_OBJECT
@@ -64,7 +72,8 @@ private:
 
 
 /** Implements the contact extensions for the OpenGD77 radios.
- * @ingroup opengd77 */
+ * @since 0.9.0
+ * @ingroup ogd77ex */
 class OpenGD77ContactExtension: public ConfigExtension
 {
   Q_OBJECT
@@ -95,7 +104,9 @@ protected:
   TimeSlotOverride _timeSlotOverride;
 };
 
-/** Implements the config reader for OpenGD77 contact extensions. */
+/** Implements the config reader for OpenGD77 contact extensions.
+ * @since 0.9.0
+ * @ingroup ogd77ex */
 class OpenGD77ContactExtensionReader: public ExtensionReader
 {
   Q_OBJECT

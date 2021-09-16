@@ -41,7 +41,8 @@ public:
 
   /** Represents the abstract base class of all codeplug elements. That is a memory region within
    * the codeplug that encodes a specific element. E.g., channels, contacts, zones, etc.
-   * This class provies some helper methods to access specific members of the element. */
+   * This class provies some helper methods to access specific members of the element.
+   * @since 0.9.0 */
   class Element
   {
   protected:
@@ -172,7 +173,8 @@ public:
    * Each device specific codeplug may extend this class to allow for device specific elements to
    * be indexed in a separate index. By default tables for @c DigitalContact, @c RXGroupList,
    * @c Channel, @c Zone and @c ScanList are defined. For any other type, an additional table must
-   * be defined first using @c addTable. */
+   * be defined first using @c addTable.
+   * @since 0.9.0 */
   class Context
   {
   public:

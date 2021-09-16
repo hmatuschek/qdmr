@@ -46,8 +46,8 @@
  *  <tr><td>0x07538</td> <td>0x07540</td> <td>0x0008</td> <td>Menu settings, see @c RadioddityCodeplug::MenuSettingsElement.</td></tr>
  *  <tr><td>0x07540</td> <td>0x07560</td> <td>0x0020</td> <td>2 intro lines, @c RadioddityCodeplug::BootTextElement.</td></tr>
  *  <tr><td>0x07560</td> <td>0x07590</td> <td>0x0030</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x07590</td> <td>0x075c8</td> <td>0x0038</td> <td>VFO A settings @c GD77Codeplug::ChannelElement</td></tr>
- *  <tr><td>0x075c8</td> <td>0x07600</td> <td>0x0038</td> <td>VFO B settings @c GD77Codeplug::ChannelElement</td></tr>
+ *  <tr><td>0x07590</td> <td>0x075c8</td> <td>0x0038</td> <td>VFO A settings @c GD77Codeplug::VFOChannelElement</td></tr>
+ *  <tr><td>0x075c8</td> <td>0x07600</td> <td>0x0038</td> <td>VFO B settings @c GD77Codeplug::VFOChannelElement</td></tr>
  *  <tr><td>0x07600</td> <td>0x07c00</td> <td>0x0600</td> <td>??? Unknown ???</td></tr>
  *
  *  <tr><th colspan="4">Second segment 0x08000-0x1e300</th></tr>
@@ -135,6 +135,62 @@ public:
     virtual bool autoscan() const;
     /** Enables/disables auto scan. */
     virtual void enableAutoscan(bool enable);
+  };
+
+  /** VFO Channel representation within the binary codeplug.
+   *
+   * Each channel requires 0x38b:
+   * @verbinclude gd77_vfochannel.txt */
+  class VFOChannelElement: public ChannelElement
+  {
+  public:
+    /** Possible offset frequency modes. */
+    enum class OffsetMode {
+      Off = 0,       ///< Disables transmit frequency offset.
+      Positive = 1,  ///< Transmit offset frequency is positive (TX above RX).
+      Negative = 2   ///< Transmit offset frequency is negative (TX below RX).
+    };
+
+    /** Possible tuning step sizes. */
+    enum class StepSize {
+      SS2_5kHz = 0,  ///< 2.5kHz
+      SS5kHz = 1,    ///< 5kHz
+      SS6_25kHz = 2, ///< 6.25kHz
+      SS10kHz = 3,   ///< 10kHz
+      SS12_5kHz = 4, ///< 12.5kHz
+      SS20kHz = 5,   ///< 20kHz
+      SS30kHz = 6,   ///< 30kHz
+      SS50kHz = 7    ///< 50kHz
+    };
+
+  protected:
+    /** Hidden constructor. */
+    VFOChannelElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit VFOChannelElement(uint8_t *ptr);
+
+    void clear();
+
+    /** The VFO channel has no name. */
+    QString name() const;
+    /** The VFO channel has no name. */
+    void setName(const QString &name);
+
+    /** Returns the tuning step-size in kHz. */
+    virtual double stepSize() const;
+    /** Sets the tuning step-size in kHz. */
+    virtual void setStepSize(double kHz);
+
+    /** Returns the transmit frequency offset mode. */
+    virtual OffsetMode offsetMode() const;
+    /** Returns the transmit frequency offset. */
+    virtual double txOffset() const;
+    /** Sets the transmit frequency offset in MHz. */
+    virtual void setTXOffset(double f);
+    /** Sets the transmit frequency offset mode. */
+    virtual void setOffsetMode(OffsetMode mode);
   };
 
   /** Specific codeplug representation of a DMR contact for the GD77.

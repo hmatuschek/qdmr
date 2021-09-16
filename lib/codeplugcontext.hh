@@ -9,6 +9,8 @@
  * of channels etc. Hence an codeplug index to config object mapping is needed. This class
  * provides this mapping.
  *
+ * @deprecated With version 0.9.0, there is an extensible codeplug context @c CodePlug::Context.
+ *             This class will be phased out and replaced with the new one.
  * @ingroup util */
 class CodeplugContext
 {

@@ -124,6 +124,92 @@ GD77Codeplug::ChannelElement::enableAutoscan(bool enable) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of GD77Codeplug::VFOChannelElement
+ * ******************************************************************************************** */
+GD77Codeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr, uint size)
+  : ChannelElement(ptr, size)
+{
+  // pass...
+}
+
+GD77Codeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr)
+  : ChannelElement(ptr)
+{
+  // pass...
+}
+
+void
+GD77Codeplug::VFOChannelElement::clear() {
+  ChannelElement::clear();
+  setStepSize(12.5);
+  setOffsetMode(OffsetMode::Off);
+  setTXOffset(10.0);
+}
+
+QString
+GD77Codeplug::VFOChannelElement::name() const {
+  return QString();
+}
+void
+GD77Codeplug::VFOChannelElement::setName(const QString &name) {
+  Q_UNUSED(name);
+  GD77Codeplug::ChannelElement::setName("");
+}
+
+double
+GD77Codeplug::VFOChannelElement::stepSize() const {
+  switch (StepSize(getUInt4(0x0036, 4))) {
+  case StepSize::SS2_5kHz: return 2.5;
+  case StepSize::SS5kHz: return 5;
+  case StepSize::SS6_25kHz: return 6.25;
+  case StepSize::SS10kHz: return 10.0;
+  case StepSize::SS12_5kHz: return 12.5;
+  case StepSize::SS20kHz: return 20;
+  case StepSize::SS30kHz: return 30;
+  case StepSize::SS50kHz: return 50;
+  }
+  return 12.5;
+}
+
+void
+GD77Codeplug::VFOChannelElement::setStepSize(double kHz) {
+  if (2.5 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS2_5kHz);
+  else if (5.0 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS5kHz);
+  else if (6.25 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS6_25kHz);
+  else if (10.0 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS10kHz);
+  else if (12.5 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS12_5kHz);
+  else if (20.0 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS20kHz);
+  else if (30.0 >= kHz)
+    setUInt4(0x0036, 4, (uint)StepSize::SS30kHz);
+  else
+    setUInt4(0x0036, 4, (uint)StepSize::SS50kHz);
+}
+
+GD77Codeplug::VFOChannelElement::OffsetMode
+GD77Codeplug::VFOChannelElement::offsetMode() const {
+  return (OffsetMode)getUInt2(0x0036, 2);
+}
+void
+GD77Codeplug::VFOChannelElement::setOffsetMode(OffsetMode mode) {
+  setUInt2(0x0036, 2, (uint)mode);
+}
+double
+GD77Codeplug::VFOChannelElement::txOffset() const {
+  return ((double)getBCD4_le(0x0034))/100;
+}
+void
+GD77Codeplug::VFOChannelElement::setTXOffset(double f) {
+  setBCD4_le(0x0034, (f*100));
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of GD77Codeplug::ContactElement
  * ******************************************************************************************** */
 GD77Codeplug::ContactElement::ContactElement(uint8_t *ptr, uint size)

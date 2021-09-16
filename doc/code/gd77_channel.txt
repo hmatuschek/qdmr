@@ -10,15 +10,15 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 18 | Mode (Analog/Digital)         | Unused, set to 0x00                                           | Transmit timeout              |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-1c | Transmit timeout rekey        | Admit criterion               | Unknown, set to 0x50          | Scan list index               |
+1c | Transmit timeout rekey        | Admit criterion               | Unknown, set to 0x50          | Scan list index (+1)          |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 20 | CTCSS/DCS RX                                                  | CTCSS/DCS TX                                                  |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-24 | Unused, set to 0x00           | TX DTMF system index          | Unused set to 0x00            | RX DTMF system index          |
+24 | Unused, set to 0x00           | TX DTMF system index (+1)     | Unused set to 0x00            | RX DTMF system index (+1)     |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-28 | Unused, set to 0x00           | Privacy group index           | TX color-code                 | RX group list index           |
+28 | Unused, set to 0x00           | Privacy group index           | TX color-code                 | RX group list index (+1)      |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-2c | RX color code                 | Emergency system index        | Contact index                                                 |
+2c | RX color code                 | Emergency system index (+1)   | Contact index (+1), little endian                             |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 30 |DCC|EAA| 0   0   0   0 | ARTS  | 0 |SLT| 0 |PRV| 0   0   0 |PCC|  STE  |NFS| 0 | PTTId | 0 |DCD|PWR|VOX|ASE|LWK|TLK|RXO|BW |SQT|
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+

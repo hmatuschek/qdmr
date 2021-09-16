@@ -142,6 +142,7 @@ public:
 
     /** Resets the contact. */
     void clear();
+    /** Returns @c true if the contact is valid. I.e., has a name. */
     bool isValid() const;
     void markValid(bool valid=true);
 
