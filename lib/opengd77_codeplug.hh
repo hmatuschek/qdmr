@@ -139,6 +139,7 @@ public:
 
     /** Resets the contact. */
     void clear();
+    bool isValid() const;
 
     /** Returns @c true if this contact overrides the channel time slot. */
     virtual bool overridesTimeSlot() const;

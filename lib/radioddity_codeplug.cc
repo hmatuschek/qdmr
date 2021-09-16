@@ -875,7 +875,7 @@ RadioddityCodeplug::GroupListElement::linkRXGroupListObj(int ncnt, RXGroupList *
     if (ctx.has<DigitalContact>(member(i))) {
       lst->addContact(ctx.get<DigitalContact>(member(i)));
     } else {
-      logWarn() << "Cannot link group list '" << lst->name()
+      logError() << "Cannot link group list '" << lst->name()
                 << "': Member index " << member(i) << " does not refer to a digital contact.";
       return false;
     }

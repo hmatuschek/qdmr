@@ -143,7 +143,8 @@ GD77Codeplug::ContactElement::clear() {
 
 bool
 GD77Codeplug::ContactElement::isValid() const {
-  return RadioddityCodeplug::ContactElement::isValid() && (0x00 != getUInt8(0x0017));
+  uint8_t validFlag = getUInt8(0x0017);
+  return RadioddityCodeplug::ContactElement::isValid() && (0x00 != validFlag);
 }
 void
 GD77Codeplug::ContactElement::markValid(bool valid) {

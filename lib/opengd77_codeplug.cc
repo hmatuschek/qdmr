@@ -172,6 +172,12 @@ OpenGD77Codeplug::ContactElement::clear() {
 }
 
 bool
+OpenGD77Codeplug::ContactElement::isValid() const {
+  // The GD77 uses byte 0x17 as a valid flag, the OpenGD77 uses it to override the time-slot.
+  return RadioddityCodeplug::ContactElement::isValid();
+}
+
+bool
 OpenGD77Codeplug::ContactElement::overridesTimeSlot() const {
   return TimeSlotOverride::None != (TimeSlotOverride)getUInt8(0x0017);
 }
@@ -323,7 +329,7 @@ OpenGD77Codeplug::createContacts(Config *config, Context &ctx) {
   /* Unpack Contacts */
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement el(data(ADDR_CONTACTS + i*CONTACT_SIZE, IMAGE_CONTACTS));
-    if (!el.isValid())
+    if (! el.isValid())
       continue;
     DigitalContact *cont = el.toContactObj(ctx);
     ctx.add(cont, i+1); config->contacts()->add(cont);
