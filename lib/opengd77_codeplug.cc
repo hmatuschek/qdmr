@@ -517,8 +517,8 @@ OpenGD77Codeplug::decodeBootText(Config *config, Context &ctx) {
 
 void
 OpenGD77Codeplug::clearVFOSettings() {
-  ChannelElement(data(ADDR_VFO_A, IMAGE_VFO_A)).clear();
-  ChannelElement(data(ADDR_VFO_B, IMAGE_VFO_B)).clear();
+  VFOChannelElement(data(ADDR_VFO_A, IMAGE_VFO_A)).clear();
+  VFOChannelElement(data(ADDR_VFO_B, IMAGE_VFO_B)).clear();
 }
 
 void

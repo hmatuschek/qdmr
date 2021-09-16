@@ -37,8 +37,8 @@
  *  <tr><td>0x07538</td> <td>0x07540</td> <td>0x0008</td> <td>Menu settings, see @c RadioddityCodeplug::MenuSettingsElement.</td></tr>
  *  <tr><td>0x07540</td> <td>0x07560</td> <td>0x0020</td> <td>2 intro lines, @c RadioddityCodeplug::BootTextElement.</td></tr>
  *  <tr><td>0x07560</td> <td>0x07590</td> <td>0x0030</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x07590</td> <td>0x075c8</td> <td>0x0038</td> <td>VFO A settings @c GD77Codeplug::ChannelElement</td></tr>
- *  <tr><td>0x075c8</td> <td>0x07600</td> <td>0x0038</td> <td>VFO B settings @c GD77Codeplug::ChannelElement</td></tr>
+ *  <tr><td>0x07590</td> <td>0x075c8</td> <td>0x0038</td> <td>VFO A settings @c OpenGD77Codeplug::VFOChannelElement</td></tr>
+ *  <tr><td>0x075c8</td> <td>0x07600</td> <td>0x0038</td> <td>VFO B settings @c OpenGD77Codeplug::VFOChannelElement</td></tr>
  *  <tr><td>0x07600</td> <td>0x08010</td> <td>0x0a10</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x08010</td> <td>0x12c10</td> <td>0xac00</td> <td>250 zones, see @c OpenGD77Codeplug::ZoneBankElement, @c OpenGD77Codeplug::ZoneElement.</td></tr>
  *  <tr><td>0x12c10</td> <td>0x13000</td> <td>0x03f0</td> <td>??? Unknown ???</td></tr>

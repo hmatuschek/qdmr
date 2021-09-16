@@ -516,8 +516,8 @@ GD77Codeplug::decodeBootText(Config *config, Context &ctx) {
 
 void
 GD77Codeplug::clearVFOSettings() {
-  ChannelElement(data(ADDR_VFO_A)).clear();
-  ChannelElement(data(ADDR_VFO_B)).clear();
+  VFOChannelElement(data(ADDR_VFO_A)).clear();
+  VFOChannelElement(data(ADDR_VFO_B)).clear();
 }
 
 void
