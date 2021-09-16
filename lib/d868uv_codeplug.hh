@@ -3,7 +3,7 @@
 
 #include <QDateTime>
 
-#include "codeplug.hh"
+#include "anytone_codeplug.hh"
 #include "signaling.hh"
 #include "codeplugcontext.hh"
 
@@ -100,15 +100,15 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">GPS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02501000</td> <td>000030</td> <td>GPS settings, see @c gps_setting_t.</td>
+ *  <tr><td>02501000</td> <td>000030</td> <td>GPS settings, see @c gps_settings_t.</td>
  *  <tr><td>02501100</td> <td>000030</td> <td>GPS message.</td>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02500000</td> <td>0000D0</td> <td>General settings, see @c general_settings_t.</td></tr>
- *  <tr><td>02500100</td> <td>000500</td> <td>Zone A & B channel list.</td></tr>
+ *  <tr><td>02500000</td> <td>0000D0</td> <td>General settings, see @c general_settings_base_t.</td></tr>
+ *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
- *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings</td></tr>
+ *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings, see @c boot_settings_t.</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
  *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000. Default 0x00000000, 0x00 padded.</td></tr>
  *
@@ -134,7 +134,9 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">Misc</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C1400</td> <td>000020</td> <td>Alarm setting, see @c analog_alarm_setting_t.</td></tr>
+ *  <tr><td>024C1400</td> <td>000020</td> <td>Alarm setting, see @c alarm_setting_t.</td></tr>
+ *  <tr><td>024C1440</td> <td>000030</td> <td>Digital alarm settings extension,
+ *   see @c digital_alarm_settings_ext_t. </td></tr>
  *
  *  <tr><th colspan="3">FM Broadcast</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -146,26 +148,29 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">DTMF, 2-tone & 5-tone signaling.</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>024C0C80</td> <td>000010</td> <td>5-tone encoding bitmap.</td></tr>
- *  <tr><td>024C0000</td> <td>000020</td> <td>5-tone encoding.</td></tr>
- *  <tr><td>024C0D00</td> <td>000200</td> <td>5-tone ID list.</td></tr>
- *  <tr><td>024C1000</td> <td>000080</td> <td>5-tone settings.</td></tr>
- *  <tr><td>024C1080</td> <td>000050</td> <td>DTMF settings.</td></tr>
+ *  <tr><td>024C0C80</td> <td>000010</td> <td>5-tone encoding bitmap for 100 IDs.</td></tr>
+ *  <tr><td>024C0000</td> <td>000020</td> <td>List of 100 5-tone IDs,
+ *    see @c five_tone_id_t</td></tr>
+ *  <tr><td>024C0D00</td> <td>000200</td> <td>List of 16 5-tone functions,
+ *    see @c five_tone_function_t.</td></tr>
+ *  <tr><td>024C1000</td> <td>000080</td> <td>5-tone settings,
+ *    see @c five_tone_settings_t. </td></tr>
+ *  <tr><td>024C1080</td> <td>000050</td> <td>DTMF settings, see @c dtmf_settings_t.</td></tr>
  *  <tr><td>024C1280</td> <td>000010</td> <td>2-tone encoding bitmap.</td></tr>
  *  <tr><td>024C1100</td> <td>000010</td> <td>2-tone encoding.</td></tr>
  *  <tr><td>024C1290</td> <td>000010</td> <td>2-tone settings.</td></tr>
  *  <tr><td>024C2600</td> <td>000010</td> <td>2-tone decoding bitmap.</td></tr>
  *  <tr><td>024C2400</td> <td>000030</td> <td>2-tone decoding.</td></tr>
  *
- *  <tr><th colspan="3">Still unknown</th></tr>
+ *  <tr><th colspan="3">Encryption</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C1440</td> <td>000030</td> <td>Unknown data.</td></tr>
- *  <tr><td>024C1700</td> <td>000040</td> <td>Unknown, 8bit indices.</td></tr>
- *  <tr><td>024C1800</td> <td>000500</td> <td>Empty, set to 0x00?</td></tr>
+ *  <tr><td>024C1700</td> <td>000040</td> <td>32 Encryption IDs, 0-based, 16bit big-endian.</td></tr>
+ *  <tr><td>024C1800</td> <td>000500</td> <td>32 DMR-Encryption keys, see @c dmr_encryption_key_t,
+ *    40b each.</td></tr>
  * </table>
  *
  * @ingroup d868uv */
-class D868UVCodeplug : public CodePlug
+class D868UVCodeplug : public AnytoneCodeplug
 {
   Q_OBJECT
 
@@ -444,6 +449,22 @@ public:
     uint8_t digits;                     ///< Number of digits.
     uint8_t name[15];                   ///< Name, ASCII, upto 15 chars, 0-terminated & padded.
     uint8_t pad47;                      ///< Pad byte set to 0x00.
+
+    /** Clears the analog contact entry. */
+    void clear();
+    /** Returns the DTMF number. */
+    QString getNumber() const;
+    /** Sets the DTMF number. */
+    bool setNumber(const QString &num);
+    /** Returns the name. */
+    QString getName() const;
+    /** Sets the name. */
+    void setName(const QString &name);
+
+    /** Encodes an analog contact from the given one. */
+    void fromContact(const DTMFContact *contact);
+    /** Creates an analog contact from the entry. */
+    DTMFContact *toContact() const;
   };
 
   /** Represents the actual RX group list encoded within the binary code-plug.
@@ -1117,31 +1138,258 @@ public:
     uint8_t _unused9[39];          ///< Unused, set to 0x00.
   };
 
+  /** Alarm settings. */
+  struct __attribute__((packed)) alarm_settings_t {
+    /** Possible alarm channel selections. */
+    enum ChannelSelect : uint8_t {
+      ASSIGNED_CHANNEL = 0,        ///< The assigned channel.
+      CURRENT_CHANNEL = 1          ///< The current channel.
+    };
 
-  /** Binary representation of the analog alarm settings.
-   * Size 0x6 bytes. */
-  struct __attribute__((packed)) analog_alarm_setting_t {
-    /** Possible alarm types. */
-    typedef enum {
-      ALARM_AA_NONE = 0,           ///< No alarm at all.
-      ALARM_AA_TX_AND_BG = 1,      ///< Transmit and background.
-      ALARM_AA_TX_AND_ALARM = 2,   ///< Transmit and alarm
-      ALARM_AA_BOTH = 3,           ///< Both?
-    } Action;
+    /** Binary representation of the analog alarm settings.
+     * Size 0x6 bytes. */
+    struct __attribute__((packed)) analog_alarm_setting_t {
+      /** Possible alarm types. */
+      enum Action : uint8_t {
+        ALARM_AA_NONE = 0,           ///< No alarm at all.
+        ALARM_AA_TX_AND_BG = 1,      ///< Transmit and background.
+        ALARM_AA_TX_AND_ALARM = 2,   ///< Transmit and alarm
+        ALARM_AA_BOTH = 3,           ///< Both?
+      };
 
-    /** Possible alarm signalling types. */
-    typedef enum {
-      ALARM_ENI_NONE = 0,          ///< No alarm code signalling.
-      ALARM_ENI_DTMF = 1,          ///< Send alarm code as DTMF.
-      ALARM_ENI_5TONE = 2          ///< Send alarm code as 5-tone.
-    } ENIType;
+      /** Possible alarm signalling types. */
+      enum ENIType : uint8_t {
+        ALARM_ENI_NONE = 0,          ///< No alarm code signalling.
+        ALARM_ENI_DTMF = 1,          ///< Send alarm code as DTMF.
+        ALARM_ENI_5TONE = 2          ///< Send alarm code as 5-tone.
+      };
 
-    uint8_t action;                ///< Action to take, see @c Action.
-    uint8_t eni_type;              ///< ENI type, see @c ENIType.
-    uint8_t emergency_id_idx;      ///< Emergency ID index, 0-based.
-    uint8_t time;                  ///< Alarm time in seconds, default 10.
-    uint8_t tx_dur;                ///< TX duration in seconds, default 10.
-    uint8_t rx_dur;                ///< RX duration in seconds, default 60.
+      Action action;                 ///< Action to take, see @c Action.
+      ENIType eni_type;              ///< ENI type, see @c ENIType.
+      uint8_t emergency_id_idx;      ///< Emergency ID index, 0-based.
+      uint8_t time;                  ///< Alarm time in seconds, default 10.
+      uint8_t tx_dur;                ///< TX duration in seconds, default 10.
+      uint8_t rx_dur;                ///< RX duration in seconds, default 60.
+      uint16_t channel;              ///< Emergency channel index, 16bit little-endian, analog channels only.
+      ChannelSelect channel_select;  ///< ENI Channel select, 0=assigned, 1=current.
+      uint8_t alarm_repeat;          ///< Alarm repeat 0=Continuous, 1..255.
+    };
+
+    /** Encodes digital alarm settings.
+     * Size 12b. */
+    struct __attribute__((packed)) digital_alarm_settings_t {
+      /** Possible alarm types. */
+      enum Action : uint8_t {
+        ALARM_DA_NONE = 0,           ///< No alarm at all.
+        ALARM_DA_TX_AND_BG = 1,      ///< Transmit and background.
+        ALARM_DA_TX_AND_NLOC = 2,    ///< Transmit and non-local alarm.
+        ALARM_DA_TX_AND_LOC = 3,     ///< Transmit and local alarm.
+      };
+
+      /** Possible alarm PTT methods. */
+      enum MicBroadcast : uint8_t {
+        MIC_BC_PTT = 0,
+        MIC_BC_VOX = 1
+      };
+
+      Action action;                 ///< Action to take, see @c Action.
+      uint8_t time;                  ///< Alarm time in seconds, default 10.
+      uint8_t tx_dur;                ///< TX duration in seconds, default 10.
+      uint8_t rx_dur;                ///< RX duration in seconds, default 60.
+      uint16_t channel;              ///< Emergency channel index, 16bit little-endian, digital channels only.
+      ChannelSelect channel_select;  ///< ENI Channel select, 0=assigned, 1=current.
+      uint8_t alarm_repeat;          ///< Alarm repeat 0=Continuous, 1..255.
+      uint8_t voice_sw_bc;           ///< Voice switch broadcast, 0=1min, ..., 255=256min.
+      uint8_t area_sw_bc;            ///< Area switch broadcast, 0=1min, ..., 255=256min.
+      MicBroadcast mic_bc;           ///< Mic broadcast.
+      uint8_t rx_alarm;              ///< Receive alarm broadcasts, 0=off, 1=on.
+    };
+
+    analog_alarm_setting_t analog;    ///< Analog alarm settings.
+    digital_alarm_settings_t digital; ///< Digital alarm settings.
+    uint8_t _unused16[10];            ///< Unused, set to 0x00.
+  };
+
+  /** Some extension to the digital alarm settings. */
+  struct __attribute__((packed)) digital_alarm_settings_ext_t {
+    /** Represents the digital alarm call type. */
+    enum CallType : uint8_t {
+      PRIVATE_CALL = 0,            ///< A private call.
+      GROUP_CALL   = 1,            ///< A group call.
+      ALL_CALL     = 2             ///< An all call.
+    };
+
+    CallType call_type;            ///<The call type of the alaram.
+    uint8_t _unused01[15];         ///< Unused set to 0x00.
+    uint8_t _unused10[16];         ///< Unused set to 0x00.
+    uint8_t _unused20[3];          ///< Unused set to 0x00.
+    uint32_t destination;          ///< Alarm destination DMR ID, BCD encoded.
+    uint8_t _unused27[9];          ///< Unused, set to 0x00.
+  };
+
+  /** Binary representation of a dmr encryption key.
+   * Size 0x28 bytes. */
+  struct __attribute__((packed)) dmr_encryption_key_t {
+    uint8_t _unused00[16];         ///< Unused bytes, set to 0x00.
+    uint16_t key;                  ///< Key, 4-digit hex as BCD?!?
+    uint8_t _unused12[14];         ///< Unused bytes, set to 0x00.
+  };
+
+  /** Binary representation of a 5-tone id, that is 5-tone codes being send.
+   *
+   * Size 0x20 bytes. */
+  struct __attribute__((packed)) five_tone_id_t {
+    /** Possible 5-tone encoding standards. */
+    enum EncStandard : uint8_t {
+      ZVEI1 = 0, ZVEI2, ZVEI3, PZVEI, DZVEI, PDZVEI, CCIR1, CCIR2, PCCIR, EEA, EURO_SIGNAL, NATEL,
+      MODAT, CCITT, EIA
+    };
+
+    uint8_t _unused00;             ///< Unused, set to 0x00.
+    EncStandard standard;          ///< Specifies the encoding standard.
+    uint8_t id_length;             ///< Length of ID in bytes.
+    uint8_t tone_dur;              ///< Tone duration in ms.
+    uint8_t id[20];                ///< ID, 40 BCD values (20 bytes).
+    uint8_t name[7];               ///< Name, 7 chars ASCII.
+    uint8_t _pad1f;                ///< Pad byte, set to 0.
+  };
+
+  /** Binary representation of a 5-tone function, that is actions being performed on decoding of
+   * 5-tone codes.
+   *
+   * Size 0x20 bytes. */
+  struct __attribute__((packed)) five_tone_function_t {
+    /** Possible function being performed on 5-tone decoding. */
+    enum Function : uint8_t {
+      OPEN_SQUELCH=0, CALL_ALL, EMERGENCY_ALARM, REMOTE_KILL, REMOTE_STUN, REMOTE_WAKEUP,
+      GROUP_CALL,
+    };
+    /** Possible responses to 5-tone decoding. */
+    enum Response : uint8_t {
+      RESP_NONE=0, RESP_TONE, RESP_TONE_RESPOND
+    };
+
+    Function function;             ///< The function to perform.
+    Response response;             ///< Response type.
+    uint8_t id_length;             ///< Length of ID.
+    uint8_t id[12];                ///< The ID, 1 byte per char ([0-9A-F]).
+    char    name[7];               ///< Function name, max 7 bytes ASCII.
+    uint8_t _pad17;                ///< Pad byte, set to 0.
+    uint8_t _unused18[9];          ///< Unused, set to 0x00.
+  };
+
+  /** Binary representation of the 5-tone settings.
+   * Size 0x80 bytes. */
+  struct __attribute__((packed)) five_tone_settings_t {
+    /** Possible responses to decoded 5-tone codes. */
+    enum Response : uint8_t {
+      RESP_NONE = 0, RESP_TONE, RESP_TONE_RESPOND
+    };
+    /** Possible 5-tone standards. */
+    enum Standard : uint8_t {
+      ZVEI1 = 0, ZVEI2, ZVEI3, PZVEI, DZVEI, PDZVEI, CCIR1, CCIR2, PCCIR, EEA, EURO_SIGNAL, NATEL,
+      MODAT, CCITT, EIA
+    };
+
+    uint8_t _unknown00[32];        ///< Unknown data.
+
+    uint8_t _unused20;             ///< Unused, set to 0x00.
+    Response response;             ///< The decoding response.
+    Standard decoding_standard;    ///< The decoding standard.
+    uint8_t self_id_length;        ///< Length of self ID.
+    uint8_t dec_tone_duration;     ///< Decoding tone duration in ms.
+    uint8_t self_id[7];            ///< Self ID, max 7 chars ([0-9A-F]).
+    uint8_t post_encode_delay;     ///< Post encoding delay in multiple of 10ms.
+    uint8_t ptt_id;                ///< PTT ID, 0=off, [5,75].
+    uint8_t auto_reset_time;       ///< Auto-reset time in multiples of 10s.
+    uint8_t first_delay;           ///< First delay in multiple of 10ms;
+
+    uint8_t sidetone_enable;       ///< Side-tone enable.
+    uint8_t _unknown31;            ///< Unknown byte.
+    uint8_t stop_code;             ///< Stop code [0x0, 0xf].
+    uint8_t stop_time;             ///< Stop time in multiple of 10ms.
+    uint8_t decode_time;           ///< Decode time in multiple of 10ms.
+    uint8_t first_delay_after_stop;///< First delay after stop, in multiple of 10ms.
+    uint8_t pre_time;              ///< Pre-time, in multiple of 10ms.
+    uint8_t _unused37[9];          ///< Unused, set to 0x00.
+
+    uint8_t _unused40;             ///< Unused, set to 0x00.
+    Standard bot_stardard;         ///< BOT encoding standard.
+    uint8_t bot_id_length;         ///< BOT PTT ID length.
+    uint8_t bot_tone_duration;     ///< BOT encoding tone duration in ms.
+    uint8_t bot_id[12];            ///< BOT PTT ID, up to 24 BCD chars.
+
+    uint8_t _unused50[16];         ///< Unused, set to 0x00.
+
+    uint8_t _unused60;             ///< Unused, set to 0x00.
+    Standard eot_stardard;         ///< EOT encoding standard.
+    uint8_t eot_id_length;         ///< EOT PTT ID length.
+    uint8_t eot_tone_duration;     ///< EOT encoding tone duration in ms.
+    uint8_t eot_id[12];            ///< EOT PTT ID, up to 24 BCD chars.
+
+    uint8_t _unused70[16];         ///< Unused, set to 0x00.
+  };
+
+  /** Digital representation of the 2-tone ID, that is 2-tone codes being send. */
+  struct __attribute__((packed)) two_tone_id_t {
+    uint16_t frequencies[2];       ///< Tone frequencies in 0.1Hz, little endian.
+    uint32_t _unused04;            ///< Unused, set to 0.
+    char name[7];                  ///< Name, upto 7 ASCII chars, 0-pad.
+    uint8_t _pad0f;                ///< Pad byte, set to 0x00.
+  };
+
+  /** Binary encoding of the 2-tone function, that is actions being performed on a particular
+   * 2-tone code. */
+  struct __attribute__((packed)) two_tone_function_t {
+    /** Possible responses to a DTMF decode. */
+    enum Response : uint8_t {
+      RESP_NONE = 0, RESP_TONE, RESP_TONE_RESPOND
+    };
+
+    uint16_t frequencies[2];       ///< Tone frequencies in 0.1Hz, little endian.
+    Response response;             ///< Decoding response.
+    char name[7];                  ///< Name, upto 7 ASCII chars, 0-padded.
+    uint32_t _unused0c;            ///< Unused, set to 0.
+    uint8_t _unused10[16];         ///< Unused, set to 0x00.
+  };
+
+  /** Binary representation of the 2-tone settings. */
+  struct __attribute__((packed)) two_tone_settings_t {
+    uint8_t _unused00[9];          ///< Unused, set to 0x00.
+    uint8_t tone1_dur;             ///< First tone duration in multiples of 100ms.
+    uint8_t tone2_dur;             ///< Second tone duration in multiples of 100ms.
+    uint8_t long_tone_dur;         ///< Long tone duration in multiples of 100ms.
+    uint8_t gap_time;              ///< Gap time in multiples of 10ms.
+    uint8_t auto_reset_time;       ///< Auto-reset time in multiples of 10s.
+    uint8_t sidetone_enable;       ///< Side-tone enable.
+    uint8_t _unused0f;             ///< Unused, set to 0x00.
+  };
+
+  /** Binary representation of the DTMF settings. */
+  struct __attribute__((packed)) dtmf_settings_t {
+    /** Possible responses to a DTMF decode. */
+    enum Response : uint8_t {
+      RESP_NONE=0, RESP_TONE, RESP_TONE_RESPOND
+    };
+
+    uint8_t interval_symb;         ///< Interval charater [0x0,0xf].
+    uint8_t group_code;            ///< Group code [0x0,0xf].
+    Response response;             ///< Decoding response.
+    uint8_t pre_time;              ///< Pretime in multiple of 10ms.
+    uint8_t first_digit_time;      ///< First digit duration in multiple of 10ms.
+    uint8_t auto_reset_time;       ///< Auto-reset time in multiple of 10s.
+    uint8_t my_id[3];              ///< Self-ID 3 chars [0x0,0xf].
+    uint8_t post_enc_delay;        ///< Post encoding delay in multiple of 10ms.
+    uint8_t ptt_id_pause;          ///< PTT ID pause time in seconds.
+    uint8_t ptt_id_enable;         ///< PTT ID enable.
+    uint8_t d_code_pause;          ///< D-code pause in seconds.
+    uint8_t sidetone_enable;       ///< Side-tone enable.
+    uint16_t _unused0e;            ///< Unused set 0.
+
+    uint8_t bot_id[16];            ///< BOT PTT ID, max 16 chars [0x0-0xf], pad=0xff.
+    uint8_t eot_id[16];            ///< EOT PTT ID, max 16 chars [0x0-0xf], pad=0xff.
+    uint8_t remote_kill_id[16];    ///< Remote kill id, max 16 chars [0x0-0xf], pad=0xff.
+    uint8_t remote_stun_id[16];    ///< Remote stun id, max 16 chars [0x0-0xf], pad=0xff.
   };
 
   /** Represents an entry in the DMR ID -> contact map within the binary code-plug. */
@@ -1169,7 +1417,6 @@ public:
     /** Sets the contact index of the entry. */
     void setIndex(uint32_t index);
   };
-
 
 public:
   /** Empty constructor. */
@@ -1221,6 +1468,10 @@ protected:
 
   /** Allocate analog contacts from bitmaps. */
   virtual void allocateAnalogContacts();
+  /** Encode analog contacts into codeplug. */
+  virtual bool encodeAnalogContacts(Config *config, const Flags &flags);
+  /** Create analog contacts from codeplug. */
+  virtual bool createAnalogContacts(Config *config, CodeplugContext &ctx);
 
   /** Allocate radio IDs from bitmaps. */
   virtual void allocateRadioIDs();
@@ -1295,10 +1546,23 @@ protected:
   virtual void allocateAlarmSettings();
   /** Allocates FM broadcast settings memory section. */
   virtual void allocateFMBroadcastSettings();
-  /** Allocates all 5-Tone functions used. */
+
+  /** Allocates all 5-Tone IDs used. */
+  virtual void allocate5ToneIDs();
+  /** Allocates 5-Tone functions. */
   virtual void allocate5ToneFunctions();
-  /** Allocates all 2-Tone functions used. */
+  /** Allocates 5-Tone settings. */
+  virtual void allocate5ToneSettings();
+
+  /** Allocates all 2-Tone IDs used. */
+  virtual void allocate2ToneIDs();
+  /** Allocates 2-Tone functions. */
   virtual void allocate2ToneFunctions();
+  /** Allocates 2-Tone settings. */
+  virtual void allocate2ToneSettings();
+
+  /** Allocates DTMF settings. */
+  virtual void allocateDTMFSettings();
 
   /** Internal used function to encode CTCSS frequencies. */
   static uint8_t ctcss_code2num(Signaling::Code code);

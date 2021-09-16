@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
   // Instantiate core application
   QCoreApplication app(argc, argv);
   app.setApplicationName("dmrconf");
-  app.setOrganizationName("dm3mat");
+  app.setOrganizationName("DM3MAT");
   app.setOrganizationDomain("dm3mat.darc.de");
   app.setApplicationVersion(VERSION_STRING);
 
@@ -46,8 +46,17 @@ int main(int argc, char *argv[])
                      QCoreApplication::translate("main", "Up- and download codeplugs in CSV format.")
                    });
   parser.addOption({
+                     {"y", "yaml"},
+                     QCoreApplication::translate("main", "Up- and download codeplugs in extensible YAML format.")
+                   });
+  parser.addOption({
                      {"b", "bin"},
                      QCoreApplication::translate("main", "Up- and download codeplugs in binary format.")
+                   });
+  parser.addOption({
+                     {"m", "manufacturer"},
+                     QCoreApplication::translate("main", "Given file is manufacturer codeplug file. "
+                     " Can be used with 'decode'.")
                    });
   parser.addOption({
                      {"R", "radio"},
@@ -58,13 +67,13 @@ int main(int argc, char *argv[])
                    });
   parser.addOption({
                      {"i", "id"},
-                     QCoreApplication::translate("main", "Specifes the DMR id."),
+                     QCoreApplication::translate("main", "Specifies the DMR id."),
                      QCoreApplication::translate("main", "ID")
                    });
   parser.addOption({
                      {"n", "limit"},
                      QCoreApplication::translate("main", "Limits several amonuts, depending on the "
-                     "context. When encoding/writing the callsign db, this option speicifies the "
+                     "context. When encoding/writing the callsign db, this option specifies the "
                      "maximum number of callsigns to encode."),
                      QCoreApplication::translate("main", "N")
                    });
@@ -81,6 +90,10 @@ int main(int argc, char *argv[])
                      "auto-enable-roaming",
                      QCoreApplication::translate("main", "Automatically enables roaming if there is a "
                                                          "roaming zone used by any channel.")));
+  parser.addOption(QCommandLineOption(
+                     "ignore-limits",
+                     QCoreApplication::translate("main", "Disables some limit checks.")));
+
   parser.addPositionalArgument(
         "command", QCoreApplication::translate(
           "main", "Specifies the command to perform. Either detect, verify, read, write, "
@@ -90,8 +103,9 @@ int main(int argc, char *argv[])
 
   parser.addPositionalArgument(
         "file", QCoreApplication::translate(
-          "main", "The code-plug file. Either binary (extension .dfu) or text/csv (extension .conf "
-          "or .csv). The format can be forced using the --csc or --binary options."),
+          "main", "The code-plug file. Either binary (extension .dfu), text/csv (extension .conf "
+          "or .csv) or YAML format (extension .yaml). The format can be forced using the --csv, "
+          "--yaml or --binary options."),
         QCoreApplication::translate("main", "[filename]"));
 
   parser.process(app);

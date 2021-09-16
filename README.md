@@ -12,11 +12,13 @@ and **platform-independent** CPS for several types of (mainly Chinese) DMR radio
 Currently, there are only few radios that are supported
 
   * Open GD77 firmware (since version 0.4.0)
-  * Radioddity GD77 (untested)
+  * Radioddity GD77 (since version 0.8.1)
   * Baofeng/Radioddity RD-5R & RD-5R+
   * TYT MD-UV390 / Retevis RT3S
   * Anytone AT-D878UV (since version 0.5.0)
   * Anytone AT-D868UVE (since version 0.7.0)
+  * Anytone AT-D878UVII (since version 0.8.0)
+  * Anytone AT-D578UV (since version 0.8.0)
 
 A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available. 
 The limited amount of supported radios is due to the fact that I only
@@ -28,122 +30,16 @@ own these radios to test the software with.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
 
- * **[Version 0.6.4](https://github.com/hmatuschek/qdmr/releases/tag/v0.6.4)** -- A lot of bugfixes and minor improvements.
- * **[Version 0.6.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.6.0)** -- Added APRS & roaming.
- * **[Version 0.5.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.5.3)** -- Fixed detection of TYT MD-UV390 radios.
- * **[Version 0.5.2](https://github.com/hmatuschek/qdmr/releases/tag/v0.5.2)** -- Added call-sign database support for OpenGD77.
+ * **[Version 0.8.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.8.1)** -- Fixed Radioddity GD-77 support (callsign db still buggy).
+ * **[Version 0.7.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.7.0)** -- Added AT-D868UVE support and many bugfixes.
+ * **[Version 0.6.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.6.4)** -- Added APRS & roaming for AT-D878UV.
  * **[Version 0.5.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.5.0)** -- Added support for Anytone AT-D878UV.
- * **[Version 0.4.7](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.7)** -- Feature release.
  * **[Version 0.4.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.4.0)** -- Added Open GD77 support.
  * **[Version 0.2.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.2.1)** -- First public release.
 
 
 ## Install
-There currently are only binaries for MacOS X and Ubuntu Linux. The MacOS X binary can be downloaded
-from the [current release](https://github.com/hmatuschek/qdmr/releases/).
-
-Under Ubuntu Linux (bionic and later), you may add my
-[PPA](https://launchpad.net/~hmatuschek/+archive/ubuntu/ppa) to your list of software repositories with
-
-    sudo add-apt-repository ppa:hmatuschek/ppa
-    sudo apt-get update
-
-after this, you may install the GUI application with
-
-    sudo apt-get install qdmr
-
-or the command line tool with
-
-    sudo apt-get install dmrconf
-
-[![qdmr](https://snapcraft.io//qdmr/badge.svg)](https://snapcraft.io/qdmr)
-
-Under Debian and Rasbpian, you may also use my PPA. However, the PPA must be added differently
-
-    echo "deb http://ppa.launchpad.net/hmatuschek/ppa/ubuntu bionic main" | sudo tee /etc/apt/sources.list.d/qdmr.list
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6DA8548661C080AF76E4F4E1AA2AC2E559564524
-
-The first line adds the PPA (using is *bionic* version) to your package sources while the second
-adds the PPA public key to your package-keyring. After this, the install is straigt forward.
-
-    sudo apt-get install qdmr
-
-### Permissions
-When running *qdmr* or *dmrconf* under Linux, you may need to change the permissions for accessing USB devices.  
-Create a file /etc/udev/rules.d/99-dmr.rules with the following content:
-
-    # TYT MD-UV380
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", MODE="666"
-    
-    # Baofeng RD-5R, TD-5R
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="15a2", ATTRS{idProduct}=="0073", MODE="666"
-
-Finally execute `sudo udevadm control --reload-rules` to activate these new rules.
-
-### Snap package and USB interface
-If you use the snap image of *qdmr*, you must (for now) grant access to the raw USB interface for
-*qdmr*. Otherwise, *qdmr* will not find any USB devices. That is, execute
-
-    snap connect qdmr:raw-usb
-
-in a terminal. I will request an auto-connect for this snap image, so that this step will not be necessary in
-the future. For the time being, however, you have to do that manually.
-
-### Snap package and serial interface
-Please note that it is very hard to gain access to a serial port for a snap image, hence it is 
-(for now) *impossible to access OpenGD77 and AnyTone devices using the snap 
-package of qdmr*. Please resort to the DEB package from my PPA. Any other direct USB (non-serial) 
-interface should work (i.e., RD5-R, GD77 and Retevis/TyT).
-
-## Building from sources
-To build the lastest development version of QDMR, you may build it and the command line tool `dmrconf` from 
-sources.
-
-First install git, the compiler and all needed dependencies. These package names may differ between 
-Linux distributions.  
-#### Ubuntu
-Under Ubuntu run
-```
-$ sudo apt-get install build-essential git cmake 
-$ sudo apt-get install libusb-1.0-0-dev qtbase5-dev qttools5-dev qttools5-dev-tools qtpositioning5-dev libqt5serialport5-dev
-```
-#### Arch Linux
-Under Arch Linux run
-```
-$ sudo pacman -S git base-devel cmake libusb qt5-tools qt5-serialport qt5-location
-```
-
-#### Fedora
-Under Fedora Linux run
-```
-$ sudo dnf install libusb-devel qt5-qtlocation-devel qt5-qtserialport-devel qt5-qttools-static qt5-qttools-devel qt5-qtbase-devel gcc-c++ git
-```
-
-Then clone the repository with
-```
-$ git clone https://github.com/hmatuschek/qdmr.git
-```
-If you have already cloned that repository, you can update the sources to the latest version with
-```
-$ git pull
-```
-from within the `qdmr` directory.
- 
-This should create a new directory named `qdmr`. Enter this directory, create and enter a build directory and configure the build with
-```
-$ cd qdmr
-$ mkdir build
-$ cd build
-$ cmake .. -DCMAKE_INSTALL_PREFIX=/usr/
-```
-The last call configures CMAKE to install everything under the system path `/usr/`. The previous steps has to be done only once.
-
-Finally, to build and install the binaries, run
-```
-$ make
-$ sudo make install
-```
-after every update.
+There are several ways to install qdmr on your system ranging from simple app-package downloads to building qdmr from its sources. For a detailed list of instructions for your system, read the [install instructions](https://dm3mat.darc.de/qdmr/install.html). Some distributions (see badge above) already added qdmr, thus easing the install using the system package manager.
 
 ## License
 qdmr - A GUI application and command-line-tool to program DMR radios.

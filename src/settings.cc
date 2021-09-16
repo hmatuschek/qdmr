@@ -160,6 +160,59 @@ Settings::codePlugFlags() const {
 }
 
 bool
+Settings::limitCallSignDBEntries() const {
+  return value("limitCallSignDBEntries", false).toBool();
+}
+void
+Settings::setLimitCallSignDBEnties(bool enable) {
+  setValue("limitCallSignDBEntries", enable);
+}
+
+uint
+Settings::maxCallSignDBEntries() const {
+  return value("maxCallSignDBEntries", 1).toInt();
+}
+void
+Settings::setMaxCallSignDBEntries(uint max) {
+  setValue("maxCallSignDBEntries", max);
+}
+
+bool
+Settings::selectUsingUserDMRID() {
+  int num = beginReadArray("callSignDBPrefixes"); endArray();
+  return value("selectCallSignDBUsingUserDMRID", true).toBool() || (0 == num);
+}
+void
+Settings::setSelectUsingUserDMRID(bool enable) {
+  setValue("selectCallSignDBUsingUserDMRID", enable);
+}
+
+QSet<uint>
+Settings::callSignDBPrefixes() {
+  QSet<uint> prefixes;
+  int num = beginReadArray("callSignDBPrefixes");
+  for (int i=0; i<num; i++) {
+    setArrayIndex(i);
+    bool ok=true; uint prefix = value("prefix").toInt(&ok);
+    if (ok)
+      prefixes.insert(prefix);
+  }
+  endArray();
+  return prefixes;
+}
+void
+Settings::setCallSignDBPrefixes(const QSet<uint> &prefixes) {
+  beginWriteArray("callSignDBPrefixes");
+  uint i = 0;
+  foreach (uint prefix, prefixes) {
+    setArrayIndex(i);
+    setValue("prefix", prefix);
+    i++;
+  }
+  endArray();
+}
+
+bool
 Settings::ignoreVerificationWarning() const {
   return value("ignoreVerificationWarning", true).toBool();
 }
@@ -175,6 +228,15 @@ Settings::ignoreFrequencyLimits() const {
 void
 Settings::setIgnoreFrequencyLimits(bool ignore) {
   setValue("ignoreFrequencyLimits", ignore);
+}
+
+bool
+Settings::showCommercialFeatures() const {
+  return value("showCommercialFeatures", false).toBool();
+}
+void
+Settings::setShowCommercialFeatures(bool show) {
+  setValue("showCommercialFeatures", show);
 }
 
 bool
@@ -226,12 +288,12 @@ Settings::setMainWindowState(const QByteArray &state) {
 }
 
 QByteArray
-Settings::channelListHeaderState() const {
-  return value("channelListHeaderState", QByteArray()).toByteArray();
+Settings::radioIdListHeaderState() const {
+  return value("radioIdListHeaderState", QByteArray()).toByteArray();
 }
 void
-Settings::setChannelListHeaderState(const QByteArray &state) {
-  setValue("channelListHeaderState", state);
+Settings::setRadioIdListHeaderState(const QByteArray &state) {
+  setValue("radioIdListHeaderState", state);
 }
 
 QByteArray
@@ -241,6 +303,15 @@ Settings::contactListHeaderState() const {
 void
 Settings::setContactListHeaderState(const QByteArray &state) {
   setValue("contactListHeaderState", state);
+}
+
+QByteArray
+Settings::channelListHeaderState() const {
+  return value("channelListHeaderState", QByteArray()).toByteArray();
+}
+void
+Settings::setChannelListHeaderState(const QByteArray &state) {
+  setValue("channelListHeaderState", state);
 }
 
 QByteArray
@@ -297,6 +368,25 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   Ui::SettingsDialog::ignoreVerificationWarnings->setChecked(settings.ignoreVerificationWarning());
   Ui::SettingsDialog::ignoreFrequencyLimits->setChecked(settings.ignoreFrequencyLimits());
 
+
+  Ui::SettingsDialog::dbLimitEnable->setChecked(settings.limitCallSignDBEntries());
+  if (! settings.limitCallSignDBEntries())
+    Ui::SettingsDialog::dbLimit->setEnabled(false);
+  Ui::SettingsDialog::dbLimit->setValue(settings.maxCallSignDBEntries());
+  Ui::SettingsDialog::useUserId->setChecked(settings.selectUsingUserDMRID());
+  if (settings.selectUsingUserDMRID())
+    Ui::SettingsDialog::prefixes->setEnabled(false);
+  QSet<uint> prefs = settings.callSignDBPrefixes();
+  QStringList prefs_text;
+  foreach (uint prefix, prefs) {
+    prefs_text.append(QString::number(prefix));
+  }
+  Ui::SettingsDialog::prefixes->setText(prefs_text.join(", "));
+
+  Ui::SettingsDialog::commercialFeatures->setChecked(settings.showCommercialFeatures());
+
+  connect(Ui::SettingsDialog::dbLimitEnable, SIGNAL(toggled(bool)), this, SLOT(onDBLimitToggled(bool)));
+  connect(Ui::SettingsDialog::useUserId, SIGNAL(toggled(bool)), this, SLOT(onUseUserDMRIdToggled(bool)));
 }
 
 bool
@@ -336,6 +426,17 @@ SettingsDialog::positionUpdated(const QGeoPositionInfo &info) {
 }
 
 void
+SettingsDialog::onDBLimitToggled(bool enable) {
+  Ui::SettingsDialog::dbLimit->setEnabled(! enable);
+}
+
+void
+SettingsDialog::onUseUserDMRIdToggled(bool enable) {
+  Ui::SettingsDialog::prefixes->setEnabled(! enable);
+}
+
+
+void
 SettingsDialog::accept() {
   Settings settings;
   settings.setQueryPosition(queryLocation->isChecked());
@@ -345,6 +446,21 @@ SettingsDialog::accept() {
   settings.setAutoEnableRoaming(autoEnableRoaming->isChecked());
   settings.setIgnoreVerificationWarning(ignoreVerificationWarnings->isChecked());
   settings.setIgnoreFrequencyLimits(ignoreFrequencyLimits->isChecked());
+  settings.setLimitCallSignDBEnties(dbLimitEnable->isChecked());
+  settings.setMaxCallSignDBEntries(dbLimit->value());
+  settings.setSelectUsingUserDMRID(useUserId->isChecked());
+
+  QStringList prefs_text = prefixes->text().split(",");
+  QSet<uint> prefs;
+  foreach (QString pref, prefs_text) {
+    bool ok=true; uint prefix = pref.toUInt(&ok);
+    if (ok)
+      prefs.insert(prefix);
+  }
+  settings.setCallSignDBPrefixes(prefs);
+
+  settings.setShowCommercialFeatures(commercialFeatures->isChecked());
+
   QDialog::accept();
 }
 

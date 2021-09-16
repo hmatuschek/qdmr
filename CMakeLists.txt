@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(qdmr VERSION 0.7.0)
+project(qdmr VERSION 0.9.0)
 
 option(BUILD_TESTS "Build test programs" OFF)
 option(BUILD_DOCS  "Build API documentation" OFF)
@@ -14,8 +14,8 @@ find_package(Qt5Network REQUIRED)
 find_package(Qt5SerialPort REQUIRED)
 find_package(Qt5Positioning REQUIRED)
 find_package(Qt5LinguistTools REQUIRED)
-find_package(Qt5Test REQUIRED)
 find_package(LIBUSB_1 REQUIRED)
+find_package(YAML-CPP REQUIRED)
 
 if (${BUILD_MAN})
   find_program(XSLTPROC_EXECUTABLE xsltproc DOC "xsltproc for man-page generation." REQUIRED)
@@ -25,6 +25,9 @@ if (${BUILD_DOCS})
   find_package(Doxygen REQUIRED dot)
 endif(${BUILD_DOCS})
 
+if (${BUILD_TESTS})
+  find_package(Qt5Test REQUIRED)
+endif(${BUILD_TESTS})
 
 ADD_DEFINITIONS(${Qt5Widgets_DEFINITIONS})
 #add_definitions("-DQT_EVENT_DISPATCHER_CORE_FOUNDATION=1")
@@ -40,6 +43,7 @@ INCLUDE_DIRECTORIES(${Qt5SerialPort_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${Qt5Positioning_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${Qt5Test_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${LIBUSB_1_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${YAML_CPP_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/lib)
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/lib)
@@ -47,7 +51,8 @@ LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/src)
 
 set(LIBS ${Qt5Core_LIBRARIES} ${Qt5Core_QTMAIN_LIBRARIES} ${Qt5Widgets_LIBRARIES}
 	${Qt5UiTools_LIBRARIES} ${Qt5Network_LIBRARIES} ${Qt5Positioning_LIBRARIES}
-  ${Qt5Test_LIBRARIES} ${Qt5SerialPort_LIBRARIES} ${LIBUSB_1_LIBRARIES})
+  ${Qt5Test_LIBRARIES} ${Qt5SerialPort_LIBRARIES} ${LIBUSB_1_LIBRARIES}
+  ${YAML_CPP_LIBRARIES})
 
 IF (UNIX AND APPLE)
  SET(LIBS ${LIBS} "-framework IOKit -framework CoreFoundation")
@@ -58,7 +63,7 @@ message(STATUS "Build version ${PROJECT_VERSION}")
 
 # Set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -Wall -Wsign-compare")
-set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}  -O0 -ggdb")
+set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}  -O0 -ggdb -fstack-protector")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 
@@ -86,6 +91,7 @@ add_subdirectory(lib)
 add_subdirectory(cli)
 add_subdirectory(src)
 add_subdirectory(doc)
+add_subdirectory(dist)
 
 if(BUILD_TESTS)
  enable_testing()

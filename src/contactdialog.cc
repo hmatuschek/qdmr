@@ -73,7 +73,7 @@ ContactDialog::construct() {
     }
     contactName->setText(_contact->name());
     contactName->setCompleter(nullptr);
-    contactRxTone->setChecked(_contact->rxTone());
+    contactRxTone->setChecked(_contact->ring());
   } else {
     contactType->addItem(tr("Private Call"));
     contactType->addItem(tr("Group Call"));
@@ -146,7 +146,7 @@ ContactDialog::contact()
 {
   if (_contact) {
     _contact->setName(contactName->text());
-    _contact->setRXTone(contactRxTone->isChecked());
+    _contact->setRing(contactRxTone->isChecked());
     if (_contact->is<DTMFContact>()) {
       _contact->as<DTMFContact>()->setNumber(contactNumber->text());
     } else {

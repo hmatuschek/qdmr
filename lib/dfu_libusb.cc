@@ -36,8 +36,8 @@ enum {
 DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
   : QObject(parent), RadioInterface(), _ctx(nullptr), _dev(nullptr), _ident(nullptr)
 {
-  //logDebug() << "Try to detect USB DFU interface " << Qt::hex << vid << ":" << pid << ".";
-  logDebug() << "Try to detect USB DFU interface " << vid << ":" << pid << ".";
+  logDebug() << "Try to detect USB DFU interface " << QString::number(vid,16)
+             << ":" << QString::number(pid,16) << ".";
   int error = libusb_init(&_ctx);
   if (error < 0) {
     _errorMessage = tr("%1 Libusb init failed: %2 %3").arg(__func__).arg(error)
@@ -46,7 +46,7 @@ DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
   }
 
   if (! (_dev = libusb_open_device_with_vid_pid(_ctx, vid, pid))) {
-    _errorMessage = tr("%1 Cannot open device %2, %3: %4 %5").arg(__func__).arg(vid).arg(pid)
+    _errorMessage = tr("%1 Cannot open device %2, %3: %4 %5").arg(__func__).arg(vid,0,16).arg(pid,0,16)
         .arg(error).arg(libusb_strerror((enum libusb_error) error));
     libusb_exit(_ctx);
     _ctx = 0;
@@ -298,6 +298,7 @@ DFUDevice::identify()
     return nullptr;
   }
   get_status();
+
   return (const char*) data;
 }
 

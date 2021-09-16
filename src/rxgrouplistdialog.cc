@@ -11,32 +11,33 @@
  * Implementation of RXGroupListDialog
  * ********************************************************************************************* */
 RXGroupListDialog::RXGroupListDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _list(nullptr)
+  : QDialog(parent), _config(config), _groupList(""), _list(nullptr)
 {
   construct();
 }
 
 RXGroupListDialog::RXGroupListDialog(Config *config, RXGroupList *list, QWidget *parent)
-  : QDialog(parent), _config(config), _list(list)
+  : QDialog(parent), _config(config), _groupList(""), _list(list)
 {
+  if (_list)
+    _groupList = *_list;
   construct();
 }
 
 RXGroupList *
 RXGroupListDialog::groupList() {
-  if (_list) {
-    _list->setName(groupListName->text());
-    _list->clear();
-    for (int i=0; i<groupListWidget->count(); i++) {
-      _list->addContact(groupListWidget->item(i)->data(Qt::UserRole).value<DigitalContact*>());
-    }
-    return _list;
-  }
+  // Select which list to modify
+  RXGroupList *list = _list;
+  if (nullptr == list)
+    list = new RXGroupList(groupListName->text().simplified());
 
-  RXGroupList *list = new RXGroupList(groupListName->text());
-  for (int i=0; i<groupListWidget->count(); i++) {
-    list->addContact(groupListWidget->item(i)->data(Qt::UserRole).value<DigitalContact*>());
-  }
+  // Apply changes to group list
+  _groupList.setName(groupListName->text().simplified());
+
+  // Copy group list to target (either new or edited group list).
+  (*list) = _groupList;
+
+  // Return modified list.
   return list;
 }
 
@@ -48,17 +49,9 @@ RXGroupListDialog::construct() {
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(addContact, SIGNAL(clicked()), this, SLOT(onAddGroup()));
   connect(remContact, SIGNAL(clicked()), this, SLOT(onRemGroup()));
-  connect(groupUp, SIGNAL(clicked(bool)), this, SLOT(onGroupUp()));
-  connect(groupDown, SIGNAL(clicked(bool)), this, SLOT(onGroupDown()));
 
-  if (_list) {
-    groupListName->setText(_list->name());
-    for (int i=0; i<_list->rowCount(QModelIndex()); i++) {
-      QListWidgetItem *item = new QListWidgetItem(_list->contact(i)->name());
-      item->setData(Qt::UserRole, QVariant::fromValue(_list->contact(i)));
-      groupListWidget->addItem(item);
-    }
-  }
+  groupListName->setText(_groupList.name());
+  contactListView->setModel(new GroupListWrapper(&_groupList, contactListView));
 }
 
 
@@ -70,53 +63,30 @@ RXGroupListDialog::onAddGroup() {
 
   QList<DigitalContact *> contacts = dialog.contacts();
   foreach (DigitalContact *contact, contacts) {
-    if (groupListWidget->findItems(contact->name(), Qt::MatchExactly).size())
+    if (0 <= _groupList.contacts()->indexOf(contact))
       continue;
-    QListWidgetItem *item = new QListWidgetItem(contact->name());
-    item->setData(Qt::UserRole, QVariant::fromValue(contact));
-    groupListWidget->addItem(item);
+    _groupList.addContact(contact);
   }
 }
 
 void
 RXGroupListDialog::onRemGroup() {
-  if (0 == groupListWidget->selectedItems().size()) {
+  if (!contactListView->hasSelection()) {
     QMessageBox::information(nullptr, tr("Cannot remove group call"),
                              tr("Cannot remove group call: You have to select at least one group call first."));
     return;
   }
-
-  QList<QListWidgetItem *> selection = groupListWidget->selectedItems();
-  foreach (QListWidgetItem *item, selection) {
-    int row = groupListWidget->row(item);
-    groupListWidget->takeItem(row);
-    delete item;
-  }
+  QPair<int,int> selection = contactListView->selection();
+  // collect all selected group lists
+  // need to collect them first as rows change when deleting
+  QList<DigitalContact *> lists;
+  for (int row=selection.first; row<=selection.second; row++)
+    lists.push_back(_groupList.contact(row));
+  // remove list
+  foreach (DigitalContact *cont, lists)
+    _groupList.contacts()->del(cont);
 }
 
-void
-RXGroupListDialog::onGroupUp() {
-  if (1 != groupListWidget->selectedItems().size())
-    return;
-  int idx = groupListWidget->currentRow();
-  if (0 == idx)
-    return;
-  QListWidgetItem *item = groupListWidget->takeItem(idx);
-  groupListWidget->insertItem(idx-1, item);
-  groupListWidget->setCurrentRow(idx-1);
-}
-
-void
-RXGroupListDialog::onGroupDown() {
-  if (1 != groupListWidget->selectedItems().size())
-    return;
-  int idx = groupListWidget->currentRow();
-  if ((groupListWidget->count()-1) <= idx)
-    return;
-  QListWidgetItem *item = groupListWidget->takeItem(idx);
-  groupListWidget->insertItem(idx+1, item);
-  groupListWidget->setCurrentRow(idx+1);
-}
 
 /* ********************************************************************************************* *
  * Implementation of RXGroupListBox
@@ -130,7 +100,7 @@ RXGroupListBox::RXGroupListBox(RXGroupLists *groups, QWidget *parent)
 void
 populateRXGroupListBox(QComboBox *box, RXGroupLists *groups, RXGroupList *list) {
   box->addItem(QObject::tr("[None]"), QVariant::fromValue(nullptr));
-  for (int i=0; i<groups->rowCount(QModelIndex()); i++) {
+  for (int i=0; i<groups->count(); i++) {
     box->addItem(groups->list(i)->name(), QVariant::fromValue(groups->list(i)));
     if (groups->list(i) == list)
       box->setCurrentIndex(i+1);

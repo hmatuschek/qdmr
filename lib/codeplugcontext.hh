@@ -9,6 +9,8 @@
  * of channels etc. Hence an codeplug index to config object mapping is needed. This class
  * provides this mapping.
  *
+ * @deprecated With version 0.9.0, there is an extensible codeplug context @c CodePlug::Context.
+ *             This class will be phased out and replaced with the new one.
  * @ingroup util */
 class CodeplugContext
 {
@@ -18,6 +20,15 @@ public:
 
   /** Returns the wrapped config. */
   Config *config() const;
+
+  /** Returns @c true if the radio DMR ID of given index is set.*/
+  bool hasRadioId(int index) const;
+  /** Stores the given ID at the specified index as the default radio ID. */
+  bool setDefaultRadioId(uint32_t id, int index);
+  /** Adds the given radio ID at the given index to the list. */
+  bool addRadioId(uint32_t id, int index, const QString &name="");
+  /** Maps the given index to the associated radio ID. */
+  RadioID *getRadioId(int idx) const;
 
   /** Returns @c true, if the given channel index has been defined before. */
   bool hasChannel(int index) const;
@@ -32,6 +43,13 @@ public:
   bool addDigitalContact(DigitalContact *con, int index);
   /** Gets a digital contact for the specified index or @c nullptr if not defined. */
   DigitalContact *getDigitalContact(int index) const;
+
+  /** Returns @c true, if the given analog contact index has been defined before. */
+  bool hasAnalogContact(int index) const;
+  /** Adds a analog contact to the config and maps the given index to that contact. */
+  bool addAnalogContact(DTMFContact *con, int index);
+  /** Gets a analog contact for the specified index or @c nullptr if not defined. */
+  DTMFContact *getAnalogContact(int index) const;
 
   /** Returns @c true, if the given RX group list index has been defined before. */
   bool hasGroupList(int index) const;
@@ -77,10 +95,14 @@ public:
 protected:
   /** The wrapped radio config (aka abstract code-plug). */
   Config *_config;
+  /** Maps a code-plug radio ID index to the radio ID index within the wrapped radio config. */
+  QHash<int, int> _radioIDTable;
   /** Maps a code-plug channel index to the channel index within the wrapped radio config. */
   QHash<int, int> _channelTable;
   /** Maps a code-plug digital-contact index to the contact index within the wrapped radio config. */
   QHash<int, int> _digitalContactTable;
+  /** Maps a code-plug analog-contact index to the contact index within the wrapped radio config. */
+  QHash<int, int> _analogContactTable;
   /** Maps a code-plug RX group-list index to the group-list index within the wrapped radio config. */
   QHash<int, int> _groupListTable;
   /** Maps a code-plug scan-list index to the scan-list index within the wrapped radio config. */

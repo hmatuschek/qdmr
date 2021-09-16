@@ -4,7 +4,7 @@
 #include "config.hh"
 
 
-#define BSIZE 1024
+#define BSIZE           32
 
 static Radio::Features _gd77_features = {
   .betaWarning = true,
@@ -12,28 +12,28 @@ static Radio::Features _gd77_features = {
   .hasDigital = true,
   .hasAnalog = true,
 
-  .vhfLimits = {136., 174.},
-  .uhfLimits = {400., 470.},
+  .frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 470.} },
 
-  .maxNameLength = 8,
+  .maxRadioIDs        = 1,
+  .needsDefaultRadioID = true,
   .maxIntroLineLength = 16,
 
   .maxChannels = 1024,
   .maxChannelNameLength = 16,
   .allowChannelNoDefaultContact = true,
 
-  .maxZones = 32,
+  .maxZones = 250,
   .maxZoneNameLength = 16,
   .maxChannelsInZone = 16,
   .hasABZone = false,
 
   .hasScanlists = true,
   .maxScanlists = 64,
-  .maxScanlistNameLength = 16,
+  .maxScanlistNameLength = 15,
   .maxChannelsInScanlist = 32,
   .scanListNeedsPriority = true,
 
-  .maxContacts = 256,
+  .maxContacts = 1024,
   .maxContactNameLength = 16,
 
   .maxGrouplists = 76,
@@ -52,13 +52,13 @@ static Radio::Features _gd77_features = {
   .maxChannelsInRoamingZone = 0,
 
   .hasCallsignDB = true,
-  .callsignDBImplemented = false,
-  .maxCallsignsInDB = 0
+  .callsignDBImplemented = true,
+  .maxCallsignsInDB = 10920
 };
 
 
-GD77::GD77(QObject *parent)
-  : Radio(parent), _name("Radioddity GD-77"), _dev(nullptr), _config(nullptr)
+GD77::GD77(RadioddityInterface *device, QObject *parent)
+  : RadioddityRadio(device, parent), _name("Radioddity GD-77"), _codeplug(), _callsigns()
 {
   // pass...
 }
@@ -83,189 +83,76 @@ GD77::codeplug() {
   return _codeplug;
 }
 
-bool
-GD77::startDownload(bool blocking) {
-  if (StatusIdle != _task)
-    return false;
-
-  _dev = new HID(0x0483, 0xdf11, this);
-  if (! _dev->isOpen()) {
-    _dev->deleteLater();
-    return false;
-  }
-
-  _task = StatusDownload;
-  _config->reset();
-
-  if (blocking) {
-    run();
-    return (StatusIdle == _task);
-  }
-  start();
-  return true;
-}
-
-bool
-GD77::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
-  if (StatusIdle != _task)
-    return false;
-
-  if (! (_config = config))
-    return false;
-
-  _dev = new HID(0x15a2, 0x0073, this);
-  if (!_dev->isOpen()) {
-    _dev->deleteLater();
-    return false;
-  }
-
-  _task = StatusUpload;
-  if (blocking) {
-    run();
-    return (StatusIdle == _task);
-  }
-
-  start();
-  return true;
-}
 
 bool
 GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
-  Q_UNUSED(db);
-  Q_UNUSED(blocking);
+  logDebug() << "Start call-sign DB upload to " << name() << "...";
 
-  _errorMessage = tr("Call-sign DB support for GD77 is not implemented yet.");
-
-  return false;
-}
-
-void
-GD77::run() {
-  if (StatusDownload == _task) {
-    emit downloadStarted();
-
-    // Check every segment in the codeplug
-    size_t totb = 0;
-    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-      if (! _codeplug.image(0).element(n).isAligned(BSIZE)) {
-        _errorMessage = QString("%1 Cannot download codeplug: Codeplug element %2 (addr=%3, size=%4) "
-                                "is not aligned with blocksize %5.").arg(__func__)
-            .arg(n).arg(_codeplug.image(0).element(n).address())
-            .arg(_codeplug.image(0).element(n).data().size()).arg(BSIZE);
-        _task = StatusError;
-        _dev->close();
-        _dev->deleteLater();
-        emit downloadError(this);
-        return;
-      }
-      totb += _codeplug.image(0).element(n).data().size()/BSIZE;
-    }
-
-    // Then download codeplug
-    size_t bcount = 0;
-    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-      uint addr = _codeplug.image(0).element(n).address();
-      uint size = _codeplug.image(0).element(n).data().size();
-      uint b0 = addr/BSIZE, nb = size/BSIZE;
-      for (uint b=0; b<nb; b++, bcount++) {
-        if (! _dev->read(0, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
-          _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
-              .arg(_dev->errorMessage());
-          _task = StatusError;
-          _dev->read_finish();
-          _dev->close();
-          _dev->deleteLater();
-          emit downloadError(this);
-          return;
-        }
-        logDebug() << "Read block " << (b0+b) << ".";
-        emit downloadProgress(float(bcount*100)/totb);
-      }
-    }
-    _dev->read_finish();
-
-    _task = StatusIdle;
-    _dev->reboot();
-    _dev->close();
-    _dev->deleteLater();
-    emit downloadFinished(this, &_codeplug);
-    _config = nullptr;
-  } else if (StatusUpload == _task) {
-    emit uploadStarted();
-
-    // Check every segment in the codeplug
-    size_t totb = 0;
-    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-      if (! _codeplug.image(0).element(n).isAligned(BSIZE)) {
-        _errorMessage = QString("%1 Cannot upload codeplug: Codeplug element %2 (addr=%3, size=%4) "
-                                "is not aligned with blocksize %5.").arg(__func__)
-            .arg(n).arg(_codeplug.image(0).element(n).address())
-            .arg(_codeplug.image(0).element(n).data().size()).arg(BSIZE);
-        _task = StatusError;
-        _dev->read_finish();
-        _dev->close();
-        _dev->deleteLater();
-        emit downloadError(this);
-        return;
-      }
-      totb += _codeplug.image(0).element(n).data().size()/BSIZE;
-    }
-    _dev->read_finish();
-
-    // First download codeplug from device:
-    size_t bcount = 0;
-    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-      uint addr = _codeplug.image(0).element(n).address();
-      uint size = _codeplug.image(0).element(n).data().size();
-      uint b0 = addr/BSIZE, nb = size/BSIZE;
-      for (uint b=0; b<nb; b++, bcount++) {
-        if (! _dev->read(0, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
-          _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
-              .arg(_dev->errorMessage());
-          _task = StatusError;
-          _dev->read_finish();
-          _dev->close();
-          _dev->deleteLater();
-          emit downloadError(this);
-          return;
-        }
-        emit uploadProgress(float(bcount*50)/totb);
-      }
-    }
-
-    // Encode config into codeplug
-    _codeplug.encode(_config);
-
-    // then, upload modified codeplug
-    bcount = 0;
-    for (int n=0; n<_codeplug.image(0).numElements(); n++) {
-      uint addr = _codeplug.image(0).element(n).address();
-      uint size = _codeplug.image(0).element(n).data().size();
-      uint b0 = addr/BSIZE, nb = size/BSIZE;
-      for (size_t b=1; b<nb; b++,bcount++) {
-        if (! _dev->write(0, b*BSIZE, _codeplug.data((b0+b)*BSIZE), BSIZE)) {
-          _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
-              .arg(_dev->errorMessage());
-          _task = StatusError;
-          _dev->write_finish();
-          _dev->close();
-          _dev->deleteLater();
-          emit uploadError(this);
-          return;
-        }
-        emit uploadProgress(50+float(bcount*50)/totb);
-      }
-    }
-
-    _task = StatusIdle;
-    _dev->write_finish();
-    _dev->reboot();
-    _dev->close();
-    _dev->deleteLater();
-
-    emit uploadComplete(this);
+  if (StatusIdle != _task) {
+    logError() << "Cannot upload to radio, radio is not idle.";
+    return false;
   }
+
+  // Assemble call-sign db from user DB
+  logDebug() << "Encode call-signs into db.";
+  _callsigns.encode(db, selection);
+
+  _task = StatusUploadCallsigns;
+  if (blocking) {
+    logDebug() << "Upload call-sign DB in this thread (blocking).";
+    run();
+    return (StatusIdle == _task);
+  }
+
+  //if (_dev && _dev->isOpen())
+  // _dev->moveToThread(this);
+
+  // start thread for upload
+  logDebug() << "Upload call-sign DB in separate thread.";
+  start();
+
+  return true;
 }
 
+bool
+GD77::uploadCallsigns()
+{
+  emit uploadStarted();
+
+  // Check every segment in the codeplug
+  if (! _callsigns.isAligned(BSIZE)) {
+    _errorMessage = QString("In %1(), cannot upload call-sign DB:\n\t "
+                            "Not aligned with block-size!").arg(__func__);
+    logError() << _errorMessage;
+    return false;
+  }
+
+  logDebug() << "Call-sign DB upload started...";
+
+  size_t totb = _callsigns.memSize();
+  uint bcount = 0;
+  // Then upload callsign DB
+  for (int n=0; n<_callsigns.image(0).numElements(); n++) {
+    uint addr = _callsigns.image(0).element(n).address();
+    uint size = _callsigns.image(0).element(n).data().size();
+    uint b0 = addr/BSIZE, nb = size/BSIZE;
+    RadioddityInterface::MemoryBank bank = (
+          (0x10000 > addr) ? RadioddityInterface::MEMBANK_CALLSIGN_LOWER : RadioddityInterface::MEMBANK_CALLSIGN_UPPER );
+    for (uint b=0; b<nb; b++, bcount+=BSIZE) {
+      if (! _dev->write(bank, (b0+b)*BSIZE,
+                        _callsigns.data((b0+b)*BSIZE, 0), BSIZE))
+      {
+        _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
+            .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
+        logError() << _errorMessage;
+        return false;
+      }
+      emit uploadProgress(float(bcount*100)/totb);
+    }
+  }
+
+  _dev->write_finish();
+  return true;
+}
 
 

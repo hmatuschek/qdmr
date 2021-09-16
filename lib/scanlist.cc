@@ -15,28 +15,37 @@
  * Implementation of ScanList
  * ********************************************************************************************* */
 ScanList::ScanList(const QString &name, QObject *parent)
-  : QAbstractListModel(parent), _name(name), _channels(), _priorityChannel(nullptr),
-    _secPriorityChannel(nullptr), _txChannel(nullptr)
+  : ConfigObject("scan", parent), _name(name), _channels(), _primary(), _secondary(), _revert()
 {
-  // pass...
+  // Register "selected" channel tags for primary, secondary, revert and the channel list.
+  Context::setTag(metaObject()->className(), "primary", "!selected", SelectedChannel::get());
+  Context::setTag(metaObject()->className(), "secondary", "!selected", SelectedChannel::get());
+  Context::setTag(metaObject()->className(), "revert", "!selected", SelectedChannel::get());
+  Context::setTag(metaObject()->className(), "channels", "!selected", SelectedChannel::get());
 }
 
-int
-ScanList::count() const {
-  return _channels.size();
+ScanList &
+ScanList::operator =(const ScanList &other) {
+  clear();
+  _name = other._name;
+  _primary.set(other._primary.as<Channel>());
+  _secondary.set(other._secondary.as<Channel>());
+  _revert.set(other._revert.as<Channel>());
+  for (int i=0; i<other._channels.count(); i++)
+    _channels.add(other._channels.get(i));
+  return *this;
 }
 
 void
 ScanList::clear() {
-  beginResetModel();
-  _channels.clear();
-  endResetModel();
   _name.clear();
-  _priorityChannel = nullptr;
-  _secPriorityChannel = nullptr;
-  _txChannel = nullptr;
-  emit modified();
+  _primary.clear();
+  _secondary.clear();
+  _revert.clear();
+  _channels.clear();
+  emit modified(this);
 }
+
 
 const QString &
 ScanList::name() const {
@@ -48,134 +57,120 @@ ScanList::setName(const QString &name) {
   if (name.simplified().isEmpty())
     return false;
   _name = name.simplified();
-  emit modified();
+  emit modified(this);
   return true;
+}
+
+
+const ChannelRefList *
+ScanList::channels() const {
+  return &_channels;
+}
+
+ChannelRefList *
+ScanList::channels() {
+  return &_channels;
+}
+
+int
+ScanList::count() const {
+  return _channels.count();
 }
 
 bool
 ScanList::contains(Channel *channel) const {
-  return _channels.contains(channel);
+  return (0 <= _channels.indexOf(channel));
 }
 
 Channel *
 ScanList::channel(int idx) const {
-  if ((0>idx) || (idx>=_channels.size()))
-    return nullptr;
-  return _channels[idx];
+  return _channels.get(idx)->as<Channel>();
 }
 
-bool
-ScanList::addChannel(Channel *channel) {
-  if (_channels.contains(channel) || (nullptr == channel))
-    return false;
-  int idx = _channels.size();
-  beginInsertRows(QModelIndex(), idx, idx);
-  connect(channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  _channels.append(channel);
-  endInsertRows();
-  emit modified();
-  return true;
+int
+ScanList::addChannel(Channel *channel, int idx) {
+  idx = _channels.add(channel, idx);
+  if (0 > idx)
+    return idx;
+  return idx;
 }
 
 bool
 ScanList::remChannel(int idx) {
-  if ((0>idx) || (idx>=_channels.size()))
-    return false;
-  Channel *channel = _channels[idx];
-  beginRemoveRows(QModelIndex(), idx, idx);
-  _channels.remove(idx);
-  disconnect(channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  endRemoveRows();
-  emit modified();
+  return _channels.del(_channels.get(idx));
+  emit modified(this);
   return true;
 }
 
 bool
 ScanList::remChannel(Channel *channel) {
-  if (! _channels.contains(channel))
-    return false;
-  int idx = _channels.indexOf(channel);
-  return remChannel(idx);
+  return _channels.del(channel);
+}
+
+
+const ChannelReference *
+ScanList::primary() const {
+  return &_primary;
+}
+
+ChannelReference *
+ScanList::primary() {
+  return &_primary;
 }
 
 Channel *
-ScanList::priorityChannel() const {
-  return _priorityChannel;
+ScanList::primaryChannel() const {
+  return _primary.as<Channel>();
 }
 
 void
-ScanList::setPriorityChannel(Channel *channel) {
-  if (_priorityChannel)
-    disconnect(_priorityChannel, SIGNAL(destroyed(QObject*)),
-               this, SLOT(onChannelDeleted(QObject*)));
-  _priorityChannel = channel;
-  if (_priorityChannel)
-    connect(_priorityChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
-  emit modified();
+ScanList::setPrimaryChannel(Channel *channel) {
+  _primary.set(channel);
+  emit modified(this);
+}
+
+
+const ChannelReference *
+ScanList::secondary() const {
+  return &_secondary;
+}
+
+ChannelReference *
+ScanList::secondary() {
+  return &_secondary;
 }
 
 Channel *
-ScanList::secPriorityChannel() const {
-  return _secPriorityChannel;
+ScanList::secondaryChannel() const {
+  return _secondary.as<Channel>();
 }
 
 void
-ScanList::setSecPriorityChannel(Channel *channel) {
-  if (_secPriorityChannel)
-    disconnect(_secPriorityChannel, SIGNAL(destroyed(QObject*)),
-               this, SLOT(onChannelDeleted(QObject*)));
-  _secPriorityChannel = channel;
-  if (_secPriorityChannel)
-    connect(_secPriorityChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
-  emit modified();
+ScanList::setSecondaryChannel(Channel *channel) {
+  _secondary.set(channel);
+  emit modified(this);
+}
+
+
+const ChannelReference *
+ScanList::revert() const {
+  return &_revert;
+}
+
+ChannelReference *
+ScanList::revert() {
+  return &_revert;
 }
 
 Channel *
-ScanList::txChannel() const {
-  return _txChannel;
+ScanList::revertChannel() const {
+  return _revert.as<Channel>();
 }
 
 void
-ScanList::setTXChannel(Channel *channel) {
-  if (_txChannel)
-    disconnect(_txChannel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  _txChannel = channel;
-  if (_txChannel)
-    connect(_txChannel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
-  emit modified();
-}
-
-int
-ScanList::rowCount(const QModelIndex &idx) const {
-  Q_UNUSED(idx);
-  return _channels.size();
-}
-
-QVariant
-ScanList::data(const QModelIndex &index, int role) const {
-  if ((Qt::DisplayRole!=role) || (index.row()>=_channels.size()) || (0 != index.column()))
-    return QVariant();
-  return _channels[index.row()]->name();
-}
-
-QVariant
-ScanList::headerData(int section, Qt::Orientation orientation, int role) const {
-  if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation) || (0 != section))
-    return QVariant();
-  return tr("Channel");
-}
-
-void
-ScanList::onChannelDeleted(QObject *obj) {
-  if (Channel *channel = dynamic_cast<Channel *>(obj)) {
-    remChannel(channel);
-    if (_priorityChannel == channel)
-      _priorityChannel = nullptr;
-    if (_secPriorityChannel == channel)
-      _secPriorityChannel = nullptr;
-    if (_txChannel == channel)
-      _txChannel = nullptr;
-  }
+ScanList::setRevertChannel(Channel *channel) {
+  _revert.set(channel);
+  emit modified(this);
 }
 
 
@@ -183,145 +178,21 @@ ScanList::onChannelDeleted(QObject *obj) {
  * Implementation of ScanLists
  * ********************************************************************************************* */
 ScanLists::ScanLists(QObject *parent)
-  : QAbstractListModel(parent), _scanlists()
+  : ConfigObjectList(ScanList::staticMetaObject, parent)
 {
   // pass...
 }
 
-int
-ScanLists::count() const {
-  return _scanlists.size();
-}
-
-int
-ScanLists::indexOf(ScanList *list) const {
-  if (! _scanlists.contains(list))
-    return -1;
-  return _scanlists.indexOf(list);
-}
-
-void
-ScanLists::clear() {
-  beginResetModel();
-  for (int i=0; i<count(); i++)
-    _scanlists[i]->deleteLater();
-  _scanlists.clear();
-  endResetModel();
-  emit modified();
-}
-
 ScanList *
 ScanLists::scanlist(int idx) const {
-  if ((0>idx) || (idx>=_scanlists.size()))
-    return nullptr;
-  return _scanlists[idx];
-}
-
-bool
-ScanLists::addScanList(ScanList *list, int row) {
-  if (_scanlists.contains(list))
-    return false;
-  if ((row<=0) || (row>_scanlists.size()))
-    row = _scanlists.size();
-  beginInsertRows(QModelIndex(), row, row);
-  list->setParent(this);
-  connect(list, SIGNAL(destroyed(QObject*)), this, SLOT(onScanListDeleted(QObject*)));
-  connect(list, SIGNAL(modified()), this, SIGNAL(modified()));
-  _scanlists.insert(row, list);
-  endInsertRows();
-  emit modified();
-  return true;
-}
-
-bool
-ScanLists::remScanList(int idx) {
-  if ((0>idx) || (idx>=_scanlists.size()))
-    return false;
-  ScanList *scanlist = _scanlists[idx];
-  beginRemoveRows(QModelIndex(), idx, idx);
-  _scanlists.remove(idx);
-  scanlist->deleteLater();
-  endRemoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ScanLists::remScanList(ScanList *scanlist) {
-  if (! _scanlists.contains(scanlist))
-    return false;
-  int idx = _scanlists.indexOf(scanlist);
-  return remScanList(idx);
-}
-
-bool
-ScanLists::moveUp(int row) {
-  if ((0>=row) || (row>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  std::swap(_scanlists[row], _scanlists[row-1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ScanLists::moveUp(int first, int last) {
-  if ((0>=first) || (last>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
-  for (int row=first; row<=last; row++)
-    std::swap(_scanlists[row], _scanlists[row-1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ScanLists::moveDown(int row) {
-  if ((0>row) || ((row+1)>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  std::swap(_scanlists[row], _scanlists[row+1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ScanLists::moveDown(int first, int last) {
-  if ((0>first) || ((last+1)>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
-  for (int row=last; row>=first; row--)
-    std::swap(_scanlists[row], _scanlists[row+1]);
-  endMoveRows();
-  emit modified();
-  return true;
+  if (ConfigObject *obj = get(idx))
+    return obj->as<ScanList>();
+  return nullptr;
 }
 
 int
-ScanLists::rowCount(const QModelIndex &idx) const {
-  Q_UNUSED(idx);
-  return _scanlists.size();
-}
-
-QVariant
-ScanLists::data(const QModelIndex &index, int role) const {
-  if ((Qt::DisplayRole!=role) || (index.row()>=_scanlists.size()) || (0 != index.column()))
-    return QVariant();
-  return _scanlists[index.row()]->name();
-}
-
-QVariant
-ScanLists::headerData(int section, Qt::Orientation orientation, int role) const {
-  if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation) || (0 != section))
-    return QVariant();
-  return tr("Scan-List");
-}
-
-void
-ScanLists::onScanListDeleted(QObject *obj) {
-  if (ScanList *scanlist = reinterpret_cast<ScanList *>(obj))
-    remScanList(scanlist);
+ScanLists::add(ConfigObject *obj, int row) {
+  if (obj && obj->is<ScanList>())
+    return ConfigObjectList::add(obj, row);
+  return -1;
 }

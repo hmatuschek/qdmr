@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QAbstractTableModel>
 
+#include "configobject.hh"
+#include "configreference.hh"
 #include "signaling.hh"
 
 class Config;
@@ -13,6 +15,7 @@ class ScanList;
 class APRSSystem;
 class PositioningSystem;
 class RoamingZone;
+class RadioID;
 
 
 /** The base class of all channels (analog and digital) of a codeplug configuration.
@@ -21,19 +24,35 @@ class RoamingZone;
  * the name, RX and TX frequencies, output power, TOT and default scanlist properties.
  *
  * @ingroup conf */
-class Channel: public QObject
+class Channel: public ConfigObject
 {
 	Q_OBJECT
 
+  /** The name of the channel. */
+  Q_PROPERTY(QString name READ name WRITE setName)
+  /** The receive frequency of the channel. */
+  Q_PROPERTY(double rxFrequency READ rxFrequency WRITE setRXFrequency)
+  /** The transmit frequency of the channel. */
+  Q_PROPERTY(double txFrequency READ txFrequency WRITE setTXFrequency)
+  /** The transmit power. */
+  Q_PROPERTY(Power power READ power WRITE setPower)
+  /** The transmit timeout in seconds. */
+  Q_PROPERTY(uint timeout READ timeout WRITE setTimeout)
+  /** If true, the channel is receive only. */
+  Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
+  /** The scan list. */
+  Q_PROPERTY(ScanListReference* scanList READ scanList)
+
 public:
   /** Possible power settings. */
-	typedef enum {
-    MaxPower,  ///< Highest power setting (e.g. > 5W, if available).
-    HighPower, ///< High power setting (e.g, 5W).
-    MidPower,  ///< Medium power setting (e.g., 2W, if avaliable)
-    LowPower,  ///< Low power setting (e.g., 1W).
-    MinPower   ///< Lowest power setting (e.g., <1W, if available).
-	} Power;
+  enum class Power {
+    Max,  ///< Highest power setting (e.g. > 5W, if available).
+    High, ///< High power setting (e.g, 5W).
+    Mid,  ///< Medium power setting (e.g., 2W, if avaliable)
+    Low,  ///< Low power setting (e.g., 1W).
+    Min   ///< Lowest power setting (e.g., <1W, if available).
+  };
+  Q_ENUM(Power)
 
 protected:
   /** Hidden constructor.
@@ -42,11 +61,11 @@ protected:
    * @param rx        Sepcifies the RX freqeuncy in MHz.
    * @param tx        Specifies the TX frequency in MHz.
    * @param power     Specifies the power setting for the channel.
-   * @param txTimeout Specifies the transmit timeout in seconds (TOT).
+   * @param timeout   Specifies the transmit timeout in seconds (TOT).
    * @param rxOnly    Specifies whether the channel is RX only.
    * @param scanlist  Specifies the default scanlist for the channel.
    * @param parent    Specified the @c QObject parent object. */
-  Channel(const QString &name, double rx, double tx, Power power, uint txTimeout, bool rxOnly,
+  Channel(const QString &name, double rx, double tx, Power power, uint timeout, bool rxOnly,
           ScanList *scanlist, QObject *parent=nullptr);
 
 public:
@@ -89,7 +108,7 @@ public:
   void setPower(Power power);
 
   /** Returns the TX timeout (TOT) in seconds. */
-  uint txTimeout() const;
+  uint timeout() const;
   /** (Re-)Sets the TX timeout (TOT) in seconds. */
   bool setTimeout(uint dur);
 
@@ -98,18 +117,19 @@ public:
   /** Set, whether the channel is RX only. */
   bool setRXOnly(bool enable);
 
-  /** Returns the default scan list for the channel. */
-  ScanList *scanList() const;
-  /** (Re-) Sets the default scan list for the channel. */
-  bool setScanList(ScanList *list);
+  /** Returns the reference to the scan list. */
+  const ScanListReference *scanList() const;
+  /** Returns the reference to the scan list. */
+  ScanListReference *scanList();
 
-signals:
-  /** Is emitted if the channel gets modified. */
-  void modified();
+  /** Returns the default scan list for the channel. */
+  ScanList *scanListObj() const;
+  /** (Re-) Sets the default scan list for the channel. */
+  bool setScanListObj(ScanList *list);
 
 protected slots:
-  /** Internal hander for deleted scan lists. */
-  void onScanListDeleted(QObject *obj);
+  /** Gets called whenever a referenced object is changed or deleted. */
+  void onReferenceModified();
 
 protected:
   /** The channel name. */
@@ -125,7 +145,7 @@ protected:
   /** RX only flag. */
   bool  _rxOnly;
   /** Default scan list of the channel. */
-  ScanList *_scanlist;
+  ScanListReference _scanlist;
 };
 
 
@@ -139,21 +159,30 @@ class AnalogChannel: public Channel
 {
   Q_OBJECT
 
+  /** The admit criterion of the channel. */
+  Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
+  /** The squelch level of the channel [1-10]. */
+  Q_PROPERTY(uint squelch READ squelch WRITE setSquelch)
+  /** The band width of the channel. */
+  Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
+  /** The APRS system. */
+  Q_PROPERTY(APRSSystemReference* aprs READ aprs)
+
 public:
   /** Admit criteria of analog channel. */
-	typedef enum {
-		AdmitNone,  ///< Allow always.
-    AdmitFree,  ///< Allow when channel free.
-    AdmitTone   ///< Allow when admit tone is present.
-	} Admit;
+  enum class Admit {
+    Always,  ///< Allow always.
+    Free,    ///< Allow when channel free.
+    Tone     ///< Allow when admit tone is present.
+  };
+  Q_ENUM(Admit)
 
   /** Possible bandwidth of an analog channel. */
-	typedef enum {
-		BWNarrow,  ///< Narrow bandwidth (12.5kHz).
-    BWWide     ///< Wide bandwidth (25kHz).
-	} Bandwidth;
-
-
+  enum class Bandwidth {
+    Narrow,  ///< Narrow bandwidth (12.5kHz).
+    Wide     ///< Wide bandwidth (25kHz).
+  };
+  Q_ENUM(Bandwidth)
 
 public:
   /** Constructs a new analog channel.
@@ -162,7 +191,7 @@ public:
    * @param rxFreq    Sepcifies the RX freqeuncy in MHz.
    * @param txFreq    Specifies the TX frequency in MHz.
    * @param power     Specifies the power setting for the channel.
-   * @param txTimeout Specifies the transmit timeout in seconds (TOT).
+   * @param timeout   Specifies the transmit timeout in seconds (TOT).
    * @param rxOnly    Specifies whether the channel is RX only.
    * @param admit     Specifies the admit criterion.
    * @param squelch   Specifies the squelch level [0,10].
@@ -172,10 +201,12 @@ public:
    * @param list      Specifies the default scanlist for the channel.
    * @param aprsSys   Specifies the APRS system for the channel.
    * @param parent    Specified the @c QObject parent object. */
-  AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
+  AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power, uint timeout,
                 bool rxOnly, Admit admit, uint squelch, Signaling::Code rxTone,
                 Signaling::Code txTone, Bandwidth bw, ScanList *list,
                 APRSSystem *aprsSys=nullptr, QObject *parent=nullptr);
+
+  YAML::Node serialize(const Context &context);
 
   /** Returns the admit criterion for the analog channel. */
 	Admit admit() const;
@@ -201,14 +232,17 @@ public:
   /** (Re-)Sets the bandwidth of the analog channel. */
 	bool setBandwidth(Bandwidth bw);
 
+  /** Returns the reference to the APRS system. */
+  const APRSSystemReference *aprs() const;
+  /** Returns the reference to the APRS system. */
+  APRSSystemReference *aprs();
   /** Returns the APRS system used for this channel or @c nullptr if disabled. */
   APRSSystem *aprsSystem() const;
   /** Sets the APRS system. */
   void setAPRSSystem(APRSSystem *sys);
 
-protected slots:
-  /** Internal call-back that gets called if the associated APRS gets deleted. */
-  void onAPRSSystemDeleted();
+protected:
+  bool populate(YAML::Node &node, const Context &context);
 
 protected:
   /** Holds the admit criterion. */
@@ -222,7 +256,7 @@ protected:
   /** The channel bandwidth. */
 	Bandwidth _bw;
   /** A reference to the APRS system used on the channel or @c nullptr if disabled. */
-  APRSSystem *_aprsSystem;
+  APRSSystemReference _aprsSystem;
 };
 
 
@@ -236,19 +270,38 @@ class DigitalChannel: public Channel
 {
 	Q_OBJECT
 
+  /** The admit criterion of the channel. */
+  Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
+  /** The color code of the channel. */
+  Q_PROPERTY(uint colorCode READ colorCode WRITE setColorCode)
+  /** The time slot of the channel. */
+  Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
+  /** The radio ID. */
+  Q_PROPERTY(RadioIDReference* radioID READ radioID)
+  /** The rx group list. */
+  Q_PROPERTY(GroupListReference* groupList READ groupList)
+  /** The tx contact. */
+  Q_PROPERTY(DigitalContactReference* contact READ contact)
+  /** The positioning system. */
+  Q_PROPERTY(PositioningSystemReference* aprs READ aprs)
+  /** The roaming zone. */
+  Q_PROPERTY(RoamingZoneReference* roaming READ roaming)
+
 public:
   /** Possible admit criteria of digital channels. */
-	typedef enum {
-		AdmitNone,      ///< No admit criteria, allows to transmit any time.
-    AdmitFree,      ///< Transmit only if channel is free.
-    AdmitColorCode  ///< Transmit only if channel is free and matches given color code.
-	} Admit;
+  enum class Admit {
+    Always,      ///< No admit criteria, allows to transmit any time.
+    Free,        ///< Transmit only if channel is free.
+    ColorCode    ///< Transmit only if channel is free and matches given color code.
+  };
+  Q_ENUM(Admit)
 
   /** Possible timeslots for digital channels. */
-	typedef enum {
-		TimeSlot1, ///< Time/repeater slot 1
-    TimeSlot2  ///< Time/repeater slot 2
-	} TimeSlot;
+  enum class TimeSlot {
+    TS1, ///< Time/repeater slot 1
+    TS2  ///< Time/repeater slot 2
+  };
+  Q_ENUM(TimeSlot)
 
 public:
   /** Constructs a new digital (DMR) channel.
@@ -257,21 +310,24 @@ public:
    * @param rxFreq    Sepcifies the RX freqeuncy in MHz.
    * @param txFreq    Specifies the TX frequency in MHz.
    * @param power     Specifies the power setting for the channel.
-   * @param txTimeout Specifies the transmit timeout in seconds (TOT).
+   * @param timeout   Specifies the transmit timeout in seconds (TOT).
    * @param rxOnly    Specifies whether the channel is RX only.
    * @param admit     Specifies the admit criterion.
    * @param colorCode Specifies the colorcode [1,15].
-   * @param timeslot  Specifies the time-slot.
+   * @param timeSlot  Specifies the time-slot.
    * @param rxGroup   Specifies the RX group list for the channel.
    * @param txContact Specifies the default TX contact to call on this channel.
-   * @param posSystem Specifies the positioning system to use on this channel.
+   * @param aprs      Specifies the positioning system to use on this channel.
    * @param list      Specifies the default scanlist for the channel.
-   * @param roaming   Specified the roaming zone for the channel.
+   * @param roaming   Specifies the roaming zone for the channel.
+   * @param radioID   Specifies the radio ID to use for this channel, @c nullptr is default ID.
    * @param parent    Specified the @c QObject parent object. */
-  DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power, uint txTimeout,
-	               bool rxOnly, Admit admit, uint colorCode, TimeSlot timeslot, RXGroupList *rxGroup,
-                 DigitalContact *txContact, PositioningSystem *posSystem, ScanList *list,
-                 RoamingZone *roaming, QObject *parent=nullptr);
+  DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power, uint timeout,
+                 bool rxOnly, Admit admit, uint colorCode, TimeSlot timeSlot, RXGroupList *rxGroup,
+                 DigitalContact *txContact, PositioningSystem *aprs, ScanList *list,
+                 RoamingZone *roaming, RadioID *radioID, QObject *parent=nullptr);
+
+  YAML::Node serialize(const Context &context);
 
   /** Returns the admit criterion for the channel. */
 	Admit admit() const;
@@ -284,39 +340,54 @@ public:
 	bool setColorCode(uint cc);
 
   /** Returns the time slot for the channel. */
-	TimeSlot timeslot() const;
+  TimeSlot timeSlot() const;
   /** (Re-)Sets the time slot for the channel. */
 	bool setTimeSlot(TimeSlot ts);
 
+  /** Returns a reference to the group list. */
+  const GroupListReference *groupList() const;
+  /** Returns a reference to the group list. */
+  GroupListReference *groupList();
   /** Retruns the RX group list for the channel. */
-	RXGroupList *rxGroupList() const;
+  RXGroupList *groupListObj() const;
   /** (Re-)Sets the RX group list for the channel. */
-	bool setRXGroupList(RXGroupList *rxg);
+  bool setGroupListObj(RXGroupList *rxg);
 
+  /** Returns a reference to the transmit contact. */
+  const DigitalContactReference *contact() const;
+  /** Returns a reference to the transmit contact. */
+  DigitalContactReference *contact();
   /** Returns the default TX contact to call on this channel. */
-	DigitalContact *txContact() const;
+  DigitalContact *txContactObj() const;
   /** (Re-) Sets the default TX contact for this channel. */
-	bool setTXContact(DigitalContact *c);
+  bool setTXContactObj(DigitalContact *c);
 
+  /** Returns a reference to the positioning system. */
+  const PositioningSystemReference *aprs() const;
+  /** Returns a reference to the positioning system. */
+  PositioningSystemReference *aprs();
   /** Returns the GPS system associated with this channel or @c nullptr if not set. */
-  PositioningSystem *posSystem() const;
+  PositioningSystem *aprsObj() const;
   /** Associates the GPS System with this channel. */
-  bool setPosSystem(PositioningSystem *sys);
+  bool aprsObj(PositioningSystem *sys);
 
+  /** Returns a reference to the roaming zone. */
+  const RoamingZoneReference *roaming() const;
+  /** Returns a reference to the roaming zone. */
+  RoamingZoneReference *roaming();
   /** Returns the roaming zone associated with this channel or @c nullptr if not set. */
-  RoamingZone *roaming() const;
+  RoamingZone *roamingZone() const;
   /** Associates the given roaming zone with this channel. */
-  bool setRoaming(RoamingZone *zone);
+  bool setRoamingZone(RoamingZone *zone);
 
-protected slots:
-  /** Internal callback if RX group list is deleted. */
-	void onRxGroupDeleted();
-  /** Internal callback if TX contact is deleted. */
-	void onTxContactDeleted();
-  /** Internal callback if GPS system is deleted. */
-  void onPosSystemDeleted();
-  /** Internal callback if roaming zone is deleted. */
-  void onRoamingZoneDeleted();
+  /** Returns the reference to the radio ID. */
+  const RadioIDReference *radioID() const;
+  /** Returns the reference to the radio ID. */
+  RadioIDReference *radioID();
+  /** Returns the radio ID associated with this channel or @c nullptr if the default ID is used. */
+  RadioID *radioIdObj() const;
+  /** Associates the given radio ID with this channel. Pass nullptr to set to default ID. */
+  bool setRadioIdObj(RadioID *id);
 
 protected:
   /** The admit criterion. */
@@ -326,13 +397,15 @@ protected:
   /** The time slot for the channel. */
 	TimeSlot _timeSlot;
   /** The RX group list for this channel. */
-	RXGroupList *_rxGroup;
+  GroupListReference _rxGroup;
   /** The default TX contact. */
-	DigitalContact *_txContact;
+  DigitalContactReference _txContact;
   /** The GPS system. */
-  PositioningSystem *_posSystem;
+  PositioningSystemReference _posSystem;
   /** Roaming zone for the channel. */
-  RoamingZone *_roaming;
+  RoamingZoneReference _roaming;
+  /** Radio ID to use on this channel. @c nullptr if default ID is used. */
+  RadioIDReference _radioId;
 };
 
 
@@ -367,7 +440,7 @@ protected:
  * default QTableView instance.
  *
  * @ingroup conf */
-class ChannelList: public QAbstractTableModel
+class ChannelList: public ConfigObjectList
 {
 	Q_OBJECT
 
@@ -375,57 +448,14 @@ public:
   /** Constructs an empty channel list. */
 	explicit ChannelList(QObject *parent=nullptr);
 
-  /** Returns the number of channels in this list. */
-  int count() const;
-  /** Clears the list. */
-  void clear();
-  /** Returns the index of the channel. */
-  int indexOf(Channel *channel) const;
+  int add(ConfigObject *obj, int row=-1);
+
   /** Gets the channel at the specified index. */
-	Channel *channel(int idx) const;
+  Channel *channel(int idx) const;
   /** Finds a digial channel with the given frequencies, time slot and color code. */
   DigitalChannel *findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, uint cc) const;
   /** Finds an analog channel with the given frequeny. */
   AnalogChannel *findAnalogChannelByTxFreq(double freq) const;
-  /** Adds a channel to the list at the specified row.
-   * If row<0 the channel gets appendet to the list.*/
-	int addChannel(Channel *channel, int row=-1);
-  /** Removes the given channel from the list. */
-	bool remChannel(Channel *channel);
-  /** Removes the channel at the given index from the list. */
-	bool remChannel(int idx);
-  /** Moves the channel at index @c idx one step up. */
-  bool moveUp(int idx);
-  /** Moves the channels at one step up. */
-  bool moveUp(int first, int last);
-  /** Moves the channel at index @c idx one step down. */
-  bool moveDown(int idx);
-  /** Moves the channels one step down. */
-  bool moveDown(int first, int last);
-
-	// QAbstractTableModel interface
-  /** Implements QAbstractTableModel, returns number of rows. */
-	int rowCount(const QModelIndex &index) const;
-  /** Implements QAbstractTableModel, returns number of colums. */
-	int columnCount(const QModelIndex &index) const;
-  /** Implements QAbstractTableModel, returns data at cell. */
-	QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
-  /** Implements QAbstractTableModel, returns header at section. */
-	QVariant headerData(int section, Qt::Orientation orientation, int role=Qt::DisplayRole) const;
-
-signals:
-  /** Gets emitted once the table has been changed. */
-	void modified();
-
-protected slots:
-  /** Internal callback on deleted channels. */
-  void onChannelDeleted(QObject *obj);
-  /** Internal callback on modified channels. */
-  void onChannelEdited();
-
-protected:
-  /** Just the vector of channels. */
-	QVector<Channel *> _channels;
 };
 
 

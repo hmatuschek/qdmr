@@ -27,7 +27,7 @@ class VerifyIssue {
 public:
   /** Issue type. */
 	typedef enum {
-    NONE,         ///< All ok.
+    NONE = 0,     ///< All ok.
     NOTIFICATION, ///< Inform user about changes made to the config to fit radio.
     WARNING,      ///< Verification warning, some configured fature is just ignored for the particular radio.
     ERROR         ///< Verification error, a consistent device specific configutation cannot be derived from the generic config.
@@ -92,7 +92,19 @@ public:
       double max; ///< Upper frequency limit.
       /** Constructs a frequency range from limits. */
       FrequencyRange(double lower, double upper);
+      /** Constructs a frequency range from limits. */
+      FrequencyRange(double limits[2]);
       /** Returns @c true if @c f is inside this limit. */
+      bool contains(double f) const;
+    };
+
+    /** A list of frequency limits. */
+    struct FrequencyLimits {
+      /** The actual list of frequency limits. */
+      QVector <FrequencyRange> ranges;
+      /** Constructs a list of frequency limits. */
+      FrequencyLimits(const QVector<FrequencyRange> &frequency_ranges);
+      /** Check if the given frequency is within one of the frequency limits. */
       bool contains(double f) const;
     };
 
@@ -104,13 +116,14 @@ public:
     /** If @c true, the device supports FM. */
 		bool hasAnalog;
 
-    /** VHF frequency limits. */
-    FrequencyRange vhfLimits;
-    /** UHF frequency limits. */
-    FrequencyRange uhfLimits;
+    /** The frequency limits of the radio. */
+    FrequencyLimits frequencyLimits;
 
-    /** Maximum length of the radio name. */
-		int maxNameLength;
+    /** Maximum number of radio IDs. */
+    int maxRadioIDs;
+    /** If @c true, the radio requires a default radio ID. */
+    bool needsDefaultRadioID;
+
     /** Maximum length of boot messages. */
 		int maxIntroLineLength;
 
@@ -192,6 +205,8 @@ public:
   /** Default constructor. */
 	explicit Radio(QObject *parent = nullptr);
 
+  virtual ~Radio();
+
   /** Returns the name of the radio (e.g., device identifier). */
 	virtual const QString &name() const = 0;
 
@@ -203,10 +218,15 @@ public:
   /** Returns the codeplug instance. */
   virtual CodePlug &codeplug() = 0;
 
+  /** Returns the call-sign DB instance. */
+  virtual const CallsignDB *callsignDB() const;
+  /** Returns the call-sign DB instance. */
+  virtual CallsignDB *callsignDB();
+
   /** Verifies the configuration against the radio features.
    * On exit, @c issues will contain the issues found and the maximum severity is returned. */
-  VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
-                                 const VerifyFlags &flags=VerifyFlags());
+  virtual VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
+                                         const VerifyFlags &flags=VerifyFlags());
 
   /** Returns the current status. */
   Status status() const;

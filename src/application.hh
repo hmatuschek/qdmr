@@ -2,6 +2,7 @@
 #define APPLICATION_HH
 
 #include <QApplication>
+#include <QGroupBox>
 #include "config.hh"
 #include <QGeoPositionInfoSource>
 #include "releasenotes.hh"
@@ -11,6 +12,15 @@ class QMainWindow;
 class RepeaterDatabase;
 class UserDatabase;
 class TalkGroupDatabase;
+class RadioIDListView;
+class GeneralSettingsView;
+class ContactListView;
+class GroupListsView;
+class ChannelListView;
+class ZoneListView;
+class ScanListsView;
+class PositioningSystemListView;
+class RoamingZoneListView;
 
 
 class Application : public QApplication
@@ -22,7 +32,11 @@ public:
   virtual ~Application();
 
   QMainWindow *mainWindow();
+
+  UserDatabase *user() const;
   RepeaterDatabase *repeater() const;
+  TalkGroupDatabase *talkgroup() const;
+
   bool hasPosition() const;
   QGeoCoordinate position() const;
 
@@ -54,77 +68,30 @@ private slots:
   void onCodeplugUploaded(Radio *radio);
 
   void onConfigModifed();
-  void onDMRIDChanged();
-  void onNameChanged();
-  void onIntroLine1Changed();
-  void onIntroLine2Changed();
-  void onMicLevelChanged();
-  void onSpeechChanged();
-
-  void onAddContact();
-  void onRemContact();
-  void onEditContact(const QModelIndex &idx);
-  void onContactUp();
-  void onContactDown();
-  void loadContactListSectionState();
-  void storeContactListSectionState();
-
-  void onAddRxGroup();
-  void onRemRxGroup();
-  void onRxGroupUp();
-  void onRxGroupDown();
-  void onEditRxGroup(const QModelIndex &index);
-
-  void onAddAnalogChannel();
-  void onAddDigitalChannel();
-  void onCloneChannel();
-  void onRemChannel();
-  void onChannelUp();
-  void onChannelDown();
-  void onEditChannel(const QModelIndex &index);
-  void loadChannelListSectionState();
-  void storeChannelListSectionState();
-
-  void onAddZone();
-  void onRemZone();
-  void onZoneUp();
-  void onZoneDown();
-  void onEditZone(const QModelIndex &index);
-
-  void onAddScanList();
-  void onRemScanList();
-  void onScanListUp();
-  void onScanListDown();
-  void onEditScanList(const QModelIndex &index);
-
-  void onAddGPS();
-  void onAddAPRS();
-  void onRemGPS();
-  void onGPSUp();
-  void onGPSDown();
-  void onEditGPS(const QModelIndex &index);
-  void onHideGPSNote();
-  void loadPositioningSectionState();
-  void storePositioningSectionState();
-
-  void onAddRoamingZone();
-  void onGenRoamingZone();
-  void onRemRoamingZone();
-  void onRoamingZoneUp();
-  void onRoamingZoneDown();
-  void onEditRoamingZone(const QModelIndex &index);
-  void onHideRoamingNote();
 
   void positionUpdated(const QGeoPositionInfo &info);
 
 protected:
   Config *_config;
   QMainWindow *_mainWindow;
+
+  GeneralSettingsView *_generalSettings;
+  RadioIDListView *_radioIdTab;
+  ContactListView *_contactList;
+  GroupListsView *_groupLists;
+  ChannelListView *_channelList;
+  ZoneListView *_zoneList;
+  ScanListsView *_scanLists;
+  PositioningSystemListView *_posSysList;
+  RoamingZoneListView *_roamingZoneList;
+
   RepeaterDatabase *_repeater;
   UserDatabase *_users;
   TalkGroupDatabase *_talkgroups;
+
   QGeoPositionInfoSource *_source;
   QGeoCoordinate _currentPosition;
+
   ReleaseNotes _releaseNotes;
 };
 

@@ -9,8 +9,8 @@ using namespace Signaling;
 /** Internal used translation table between CTCSS frequencies and AnalogChannel::Signaling codes. */
 static QHash<float, Code> CTCSS_freq2code {
   {  0.0, SIGNALING_NONE},
-  { 67.0,  CTCSS_67_0Hz}, { 71.0,  CTCSS_71_0Hz}, { 74.4,  CTCSS_74_4Hz}, { 77.0,  CTCSS_77_0Hz},
-  { 79.9,  CTCSS_79_9Hz}, { 82.5,  CTCSS_82_5Hz}, { 85.4,  CTCSS_85_4Hz}, { 88.5,  CTCSS_88_5Hz},
+  { 67.0,  CTCSS_67_0Hz}, { 71.9,  CTCSS_71_9Hz}, { 74.4,  CTCSS_74_4Hz}, { 77.0,  CTCSS_77_0Hz},
+  { 79.9,  CTCSS_79_7Hz}, { 82.5,  CTCSS_82_5Hz}, { 85.4,  CTCSS_85_4Hz}, { 88.5,  CTCSS_88_5Hz},
   { 91.5,  CTCSS_91_5Hz}, { 94.8,  CTCSS_94_8Hz}, { 97.4,  CTCSS_97_4Hz}, {100.0, CTCSS_100_0Hz},
   {103.5, CTCSS_103_5Hz}, {107.2, CTCSS_107_2Hz}, {110.9, CTCSS_110_9Hz}, {114.8, CTCSS_114_8Hz},
   {118.8, CTCSS_118_8Hz}, {123.0, CTCSS_123_0Hz}, {127.3, CTCSS_127_3Hz}, {131.8, CTCSS_131_8Hz},
@@ -24,8 +24,8 @@ static QHash<float, Code> CTCSS_freq2code {
 /** Internal used translation table between CTCSS frequencies and AnalogChannel::Signaling codes. */
 static QHash<Code, float> CTCSS_code2freq {
   {SIGNALING_NONE,   0.0},
-  {CTCSS_67_0Hz,   67.0}, {CTCSS_71_0Hz,   71.0}, {CTCSS_74_4Hz,   74.4}, {CTCSS_77_0Hz,   77.0},
-  {CTCSS_79_9Hz,   79.9}, {CTCSS_82_5Hz,   82.5}, {CTCSS_85_4Hz,   85.4}, {CTCSS_88_5Hz,   88.5},
+  {CTCSS_67_0Hz,   67.0}, {CTCSS_71_9Hz,   71.9}, {CTCSS_74_4Hz,   74.4}, {CTCSS_77_0Hz,   77.0},
+  {CTCSS_79_7Hz,   79.9}, {CTCSS_82_5Hz,   82.5}, {CTCSS_85_4Hz,   85.4}, {CTCSS_88_5Hz,   88.5},
   {CTCSS_91_5Hz,   91.5}, {CTCSS_94_8Hz,   94.8}, {CTCSS_97_4Hz,   97.4}, {CTCSS_100_0Hz, 100.0},
   {CTCSS_103_5Hz, 103.5}, {CTCSS_107_2Hz, 107.2}, {CTCSS_110_9Hz, 110.9}, {CTCSS_114_8Hz, 114.8},
   {CTCSS_118_8Hz, 118.8}, {CTCSS_123_0Hz, 123.0}, {CTCSS_127_3Hz, 127.3}, {CTCSS_131_8Hz, 131.8},

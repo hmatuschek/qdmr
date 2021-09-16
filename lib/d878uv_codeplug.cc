@@ -40,11 +40,25 @@ static_assert(
 
 #define ADDR_APRS_SETTING         0x02501000 // Address of APRS settings
 #define APRS_SETTING_SIZE         0x00000040 // Size of the APRS settings
+
+#define ADDR_APRS_SET_EXT         0x025010A0 // Address of APRS settings extension
+#define APRS_SET_EXT_SIZE         0x00000060 // Size of APRS settings extension
+static_assert(
+  APRS_SET_EXT_SIZE == sizeof(D878UVCodeplug::aprs_setting_ext_t),
+  "D878UVCodeplug::aprs_setting_ext_t size check failed.");
+
 #define ADDR_APRS_MESSAGE         0x02501200 // Address of APRS messages
 #define APRS_MESSAGE_SIZE         0x00000040 // Size of APRS messages
 static_assert(
   APRS_SETTING_SIZE == sizeof(D878UVCodeplug::aprs_setting_t),
   "D878UVCodeplug::aprs_setting_t size check failed.");
+
+#define NUM_APRS_RX_ENTRY         32
+#define ADDR_APRS_RX_ENTRY        0x02501800 // Address of APRS RX list
+#define APRS_RX_ENTRY_SIZE        0x00000008 // Size of each APRS RX entry
+static_assert(
+  APRS_RX_ENTRY_SIZE == sizeof(D878UVCodeplug::aprs_rx_entry_t),
+  "D878UVCodeplug::aprs_rx_entry_t size check failed.");
 
 #define NUM_GPS_SYSTEMS           8
 #define ADDR_GPS_SETTING          0x02501040 // Address of GPS settings
@@ -72,7 +86,6 @@ static_assert(
 #define ADDR_ENCRYPTION_KEYS      0x024C4000
 #define ENCRYPTION_KEY_SIZE       0x00000040
 #define ENCRYPTION_KEYS_SIZE      0x00004000
-
 
 
 /* ******************************************************************************************** *
@@ -228,19 +241,19 @@ D878UVCodeplug::channel_t::setTXTone(Signaling::Code code) {
 Channel *
 D878UVCodeplug::channel_t::toChannelObj() const {
   // Decode power setting
-  Channel::Power power = Channel::LowPower;
+  Channel::Power power = Channel::Power::Low;
   switch ((channel_t::Power) this->power) {
   case POWER_LOW:
-    power = Channel::LowPower;
+    power = Channel::Power::Low;
     break;
   case POWER_MIDDLE:
-    power = Channel::MidPower;
+    power = Channel::Power::Mid;
     break;
   case POWER_HIGH:
-    power = Channel::HighPower;
+    power = Channel::Power::High;
     break;
   case POWER_TURBO:
-    power = Channel::MaxPower;
+    power = Channel::Power::Max;
     break;
   }
   bool rxOnly = (1 == this->rx_only);
@@ -250,22 +263,22 @@ D878UVCodeplug::channel_t::toChannelObj() const {
     if (MODE_MIXED_A_D == channel_mode)
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << getName() <<"' as analog channel.";
-    AnalogChannel::Admit admit = AnalogChannel::AdmitNone;
+    AnalogChannel::Admit admit = AnalogChannel::Admit::Always;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
-      admit = AnalogChannel::AdmitNone;
+      admit = AnalogChannel::Admit::Always;
       break;
     case ADMIT_CH_FREE:
-      admit = AnalogChannel::AdmitFree;
+      admit = AnalogChannel::Admit::Free;
       break;
     default:
       break;
     }
-    AnalogChannel::Bandwidth bw = AnalogChannel::BWNarrow;
+    AnalogChannel::Bandwidth bw = AnalogChannel::Bandwidth::Narrow;
     if (BW_12_5_KHZ == bandwidth)
-      bw = AnalogChannel::BWNarrow;
+      bw = AnalogChannel::Bandwidth::Narrow;
     else
-      bw = AnalogChannel::BWWide;
+      bw = AnalogChannel::Bandwidth::Wide;
     ch = new AnalogChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           1, getRXTone(), getTXTone(), bw, nullptr);
@@ -273,23 +286,23 @@ D878UVCodeplug::channel_t::toChannelObj() const {
     if (MODE_MIXED_D_A == channel_mode)
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << getName() <<"' as digital channel.";
-    DigitalChannel::Admit admit = DigitalChannel::AdmitNone;
+    DigitalChannel::Admit admit = DigitalChannel::Admit::Always;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
-      admit = DigitalChannel::AdmitNone;
+      admit = DigitalChannel::Admit::Always;
       break;
     case ADMIT_CH_FREE:
-      admit = DigitalChannel::AdmitFree;
+      admit = DigitalChannel::Admit::Free;
       break;
     case ADMIT_CC_SAME:
     case ADMIT_CC_DIFF:
-      admit = DigitalChannel::AdmitColorCode;
+      admit = DigitalChannel::Admit::ColorCode;
       break;
     }
-    DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1);
+    DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot::TS2 : DigitalChannel::TimeSlot::TS1);
     ch = new DigitalChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
-          color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr);
+          color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
   } else {
     logError() << "Cannot create channel '" << getName()
                << "': Channel type " << channel_mode << "not supported.";
@@ -310,23 +323,30 @@ D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
     // Check if default contact is set, in fact a valid contact index is mandatory.
     uint32_t conIdx = qFromLittleEndian(contact_index);
     if ((0xffffffff != conIdx) && ctx.hasDigitalContact(conIdx))
-      dc->setTXContact(ctx.getDigitalContact(conIdx));
+      dc->setTXContactObj(ctx.getDigitalContact(conIdx));
 
     // Set if RX group list is set
     if ((0xff != group_list_index) && ctx.hasGroupList(group_list_index))
-      dc->setRXGroupList(ctx.getGroupList(group_list_index));
+      dc->setGroupListObj(ctx.getGroupList(group_list_index));
 
     // Link to GPS system
     if ((APRS_REPORT_DIGITAL == aprs_report) && ctx.hasGPSSystem(gps_system))
-      dc->setPosSystem(ctx.getGPSSystem(gps_system));
+      dc->aprsObj(ctx.getGPSSystem(gps_system));
     // Link APRS system if one is defined
     //  There can only be one active APRS system, hence the index is fixed to one.
     if ((APRS_REPORT_ANALOG == aprs_report) && ctx.hasAPRSSystem(0))
-      dc->setPosSystem(ctx.getAPRSSystem(0));
+      dc->aprsObj(ctx.getAPRSSystem(0));
 
     // If roaming is not disabled -> link to default roaming zone
     if (0 == excl_from_roaming)
-      dc->setRoaming(DefaultRoamingZone::get());
+      dc->setRoamingZone(DefaultRoamingZone::get());
+
+    // Link radio ID
+    RadioID *rid = ctx.getRadioId(id_index);
+    if (rid == ctx.config()->radioIDs()->defaultId())
+      dc->setRadioIdObj(DefaultRadioID::get());
+    else
+      dc->setRadioIdObj(rid);
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
     AnalogChannel *ac = c->as<AnalogChannel>();
@@ -343,7 +363,7 @@ D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
 
   // If channel has scan list
   if ((0xff != scan_list_index) && ctx.hasScanList(scan_list_index))
-    c->setScanList(ctx.getScanList(scan_list_index));
+    c->setScanListObj(ctx.getScanList(scan_list_index));
 
   return true;
 }
@@ -361,17 +381,17 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
 
   // encode power setting
   switch (c->power()) {
-  case Channel::MaxPower:
+  case Channel::Power::Max:
     power = POWER_TURBO;
     break;
-  case Channel::HighPower:
+  case Channel::Power::High:
     power = POWER_HIGH;
     break;
-  case Channel::MidPower:
+  case Channel::Power::Mid:
     power = POWER_MIDDLE;
     break;
-  case Channel::LowPower:
-  case Channel::MinPower:
+  case Channel::Power::Low:
+  case Channel::Power::Min:
     power = POWER_LOW;
     break;
   }
@@ -380,10 +400,10 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
   rx_only = c->rxOnly() ? 1 : 0;
 
   // Link scan list if set
-  if (nullptr == c->scanList())
+  if (nullptr == c->scanListObj())
     scan_list_index = 0xff;
   else
-    scan_list_index = conf->scanlists()->indexOf(c->scanList());
+    scan_list_index = conf->scanlists()->indexOf(c->scanListObj());
 
   // Dispatch by channel type
   if (c->is<AnalogChannel>()) {
@@ -392,52 +412,70 @@ D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     // pack analog channel config
     // set admit criterion
     switch (ac->admit()) {
-    case AnalogChannel::AdmitNone: tx_permit = ADMIT_ALWAYS; break;
-    case AnalogChannel::AdmitFree: tx_permit = ADMIT_CH_FREE; break;
-    case AnalogChannel::AdmitTone: tx_permit = ADMIT_ALWAYS; break;
+    case AnalogChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
+    case AnalogChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
+    case AnalogChannel::Admit::Tone: tx_permit = ADMIT_ALWAYS; break;
     }
     // squelch mode
     squelch_mode = (Signaling::SIGNALING_NONE == ac->rxTone()) ? SQ_CARRIER : SQ_TONE;
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     // set bandwidth
-    bandwidth = (AnalogChannel::BWNarrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
+    bandwidth = (AnalogChannel::Bandwidth::Narrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
     // Set APRS system
-    if (nullptr != ac->aprsSystem())
+    rx_gps = 0;
+    if (nullptr != ac->aprsSystem()) {
       aprs_report = APRS_REPORT_ANALOG;
+      rx_gps = 1;
+    }
   } else if (c->is<DigitalChannel>()) {
     const DigitalChannel *dc = c->as<const DigitalChannel>();
     // pack digital channel config.
     channel_mode = MODE_DIGITAL;
     // set admit criterion
     switch(dc->admit()) {
-    case DigitalChannel::AdmitNone: tx_permit = ADMIT_ALWAYS; break;
-    case DigitalChannel::AdmitFree: tx_permit = ADMIT_CH_FREE; break;
-    case DigitalChannel::AdmitColorCode: tx_permit = ADMIT_CC_SAME; break;
+    case DigitalChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
+    case DigitalChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
+    case DigitalChannel::Admit::ColorCode: tx_permit = ADMIT_CC_SAME; break;
     }
     // set color code
     color_code = dc->colorCode();
     // set time-slot
-    slot2 = (DigitalChannel::TimeSlot2 == dc->timeslot()) ? 1 : 0;
+    slot2 = (DigitalChannel::TimeSlot::TS2 == dc->timeSlot()) ? 1 : 0;
     // link transmit contact
-    if (nullptr == dc->txContact()) {
+    if (nullptr == dc->txContactObj()) {
       contact_index = 0;
     } else {
       contact_index = qToLittleEndian(
-            uint32_t(conf->contacts()->indexOfDigital(dc->txContact())));
+            uint32_t(conf->contacts()->indexOfDigital(dc->txContactObj())));
     }
     // link RX group list
-    if (nullptr == dc->rxGroupList())
+    if (nullptr == dc->groupListObj())
       group_list_index = 0xff;
     else
-      group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList());
+      group_list_index = conf->rxGroupLists()->indexOf(dc->groupListObj());
     // Set GPS system index
-    if (dc->posSystem() && dc->posSystem()->is<GPSSystem>()) {
+    rx_gps = 0;
+    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
       aprs_report = APRS_REPORT_DIGITAL;
-      gps_system = conf->posSystems()->indexOfGPSSys(dc->posSystem()->as<GPSSystem>());
-    } else if (dc->posSystem() && dc->posSystem()->is<APRSSystem>()) {
+      gps_system = conf->posSystems()->indexOfGPSSys(dc->aprsObj()->as<GPSSystem>());
+      rx_gps = 1;
+    } else if (dc->aprsObj() && dc->aprsObj()->is<APRSSystem>()) {
       aprs_report = APRS_REPORT_ANALOG;
+      rx_gps = 1;
     }
+    // Set radio ID
+    if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
+      if (nullptr == conf->radioIDs()->defaultId()) {
+        logWarn() << "No default radio ID set: using index 0.";
+        id_index = 0;
+      } else {
+        id_index = conf->radioIDs()->indexOf(conf->radioIDs()->defaultId());
+      }
+    } else {
+      id_index = conf->radioIDs()->indexOf(dc->radioIdObj());
+    }
+
   }
 }
 
@@ -512,6 +550,10 @@ D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const 
 void
 D878UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
   config->setMicLevel(getMicGain());
+  // Check if default roaming zone is defined
+  if (roam_default_zone >= config->roaming()->count()) {
+    roam_default_zone = 0;
+  }
 }
 
 
@@ -563,8 +605,12 @@ D878UVCodeplug::aprs_setting_t::getAutoTXInterval() const {
 }
 void
 D878UVCodeplug::aprs_setting_t::setAutoTxInterval(int sec) {
-  // round up to multiples of 30
-  auto_tx_interval = (sec+29)/30;
+  if (0 == sec)
+    auto_tx_interval = 0;
+  else if (30 >= sec)
+    auto_tx_interval = 1;
+  else
+    auto_tx_interval = (sec-16)/15;
 }
 
 int
@@ -573,7 +619,6 @@ D878UVCodeplug::aprs_setting_t::getManualTXInterval() const {
 }
 void
 D878UVCodeplug::aprs_setting_t::setManualTxInterval(int sec) {
-  // round up to multiples of 30
   manual_tx_interval = sec;
 }
 
@@ -640,29 +685,29 @@ D878UVCodeplug::aprs_setting_t::getSignaling() const {
 Channel::Power
 D878UVCodeplug::aprs_setting_t::getPower() const {
   switch (power) {
-  case POWER_LOW: return Channel::LowPower;
-  case POWER_MID: return Channel::MidPower;
-  case POWER_HIGH: return Channel::HighPower;
-  case POWER_TURBO: return Channel::MaxPower;
+  case POWER_LOW: return Channel::Power::Low;
+  case POWER_MID: return Channel::Power::Mid;
+  case POWER_HIGH: return Channel::Power::High;
+  case POWER_TURBO: return Channel::Power::Max;
   default: break;
   }
-  return Channel::HighPower;
+  return Channel::Power::High;
 }
 
 void
 D878UVCodeplug::aprs_setting_t::setPower(Channel::Power pwr) {
   switch (pwr) {
-  case Channel::MinPower:
-  case Channel::LowPower:
+  case Channel::Power::Min:
+  case Channel::Power::Low:
     power = aprs_setting_t::POWER_LOW;
     break;
-  case Channel::MidPower:
+  case Channel::Power::Mid:
     power = aprs_setting_t::POWER_MID;
     break;
-  case Channel::HighPower:
+  case Channel::Power::High:
     power = aprs_setting_t::POWER_HIGH;
     break;
-  case Channel::MaxPower:
+  case Channel::Power::Max:
     power = aprs_setting_t::POWER_TURBO;
     break;
   }
@@ -681,9 +726,9 @@ D878UVCodeplug::aprs_setting_t::setIcon(APRSSystem::Icon icon) {
 void
 D878UVCodeplug::aprs_setting_t::fromAPRSSystem(APRSSystem *sys) {
   _unknown0 = 0xff;
-  setFrequency(sys->channel()->txFrequency());
+  setFrequency(sys->revertChannel()->txFrequency());
   tx_delay = 0x03;
-  setSignaling(sys->channel()->txTone());
+  setSignaling(sys->revertChannel()->txTone());
   setManualTxInterval(sys->period());
   setAutoTxInterval(sys->period());
   tx_tone_enable = 0;
@@ -693,7 +738,7 @@ D878UVCodeplug::aprs_setting_t::fromAPRSSystem(APRSSystem *sys) {
   setPath(sys->path());
   _pad56 = 0;
   setIcon(sys->icon());
-  setPower(sys->channel()->power());
+  setPower(sys->revertChannel()->power());
   prewave_delay = 0;
   _unknown61 = 0x01;
   _unknown62 = 0x03;
@@ -715,13 +760,13 @@ D878UVCodeplug::aprs_setting_t::linkAPRSSystem(APRSSystem *sys, CodeplugContext 
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
     ch = new AnalogChannel("APRS Channel", getFrequency(), getFrequency(), getPower(),
-                           0, false, AnalogChannel::AdmitFree, 1, Signaling::SIGNALING_NONE,
-                           getSignaling(), AnalogChannel::BWWide, nullptr);
+                           0, false, AnalogChannel::Admit::Free, 1, Signaling::SIGNALING_NONE,
+                           getSignaling(), AnalogChannel::Bandwidth::Wide, nullptr);
     logInfo() << "No matching APRS chanel found for TX frequency " << getFrequency()
               << ", create one as 'APRS Channel'";
-    ctx.config()->channelList()->addChannel(ch);
+    ctx.config()->channelList()->add(ch);
   }
-  sys->setChannel(ch);
+  sys->setRevertChannel(ch);
 }
 
 
@@ -788,8 +833,8 @@ D878UVCodeplug::gps_systems_t::fromGPSSystemObj(GPSSystem *sys, const Config *co
   if ((idx < 0) || idx > 7)
     return;
   if (sys->hasContact()) {
-    setContactId(idx, sys->contact()->number());
-    setContactType(idx, sys->contact()->type());
+    setContactId(idx, sys->contactObj()->number());
+    setContactType(idx, sys->contactObj()->type());
   }
   if (sys->hasRevertChannel() && (SelectedChannel::get() != (Channel *)sys->revertChannel())) {
     digi_channels[idx] = conf->channelList()->indexOf(sys->revertChannel());
@@ -826,7 +871,7 @@ D878UVCodeplug::gps_systems_t::linkGPSSystem(int idx, GPSSystem *sys, const Code
   if (nullptr == cont) {
     cont = new DigitalContact(getContactType(idx), tr("GPS #%1 Contact").arg(idx+1),
                               getContactId(idx), false);
-    ctx.config()->contacts()->addContact(cont);
+    ctx.config()->contacts()->add(cont);
   }
   // link contact to GPS system.
   sys->setContact(cont);
@@ -859,12 +904,12 @@ D878UVCodeplug::roaming_channel_t::setTXFrequency(double f) {
 DigitalChannel::TimeSlot
 D878UVCodeplug::roaming_channel_t::getTimeslot() const {
   if (0 == timeslot)
-    return DigitalChannel::TimeSlot1;
-  return DigitalChannel::TimeSlot2;
+    return DigitalChannel::TimeSlot::TS1;
+  return DigitalChannel::TimeSlot::TS2;
 }
 void
 D878UVCodeplug::roaming_channel_t::setTimeslot(DigitalChannel::TimeSlot ts) {
-  if (DigitalChannel::TimeSlot1 == ts)
+  if (DigitalChannel::TimeSlot::TS1 == ts)
     timeslot = 0;
   else
     timeslot = 1;
@@ -894,7 +939,7 @@ D878UVCodeplug::roaming_channel_t::fromChannel(DigitalChannel *ch) {
   setRXFrequency(ch->rxFrequency());
   setTXFrequency(ch->txFrequency());
   setColorCode(ch->colorCode());
-  setTimeslot(ch->timeslot());
+  setTimeslot(ch->timeSlot());
 }
 
 DigitalChannel *
@@ -906,11 +951,11 @@ D878UVCodeplug::roaming_channel_t::toChannel(CodeplugContext &ctx) {
   if (nullptr == digi) {
     // If no matching channel can be found -> create one
     digi = new DigitalChannel(getName(), getRXFrequency(), getTXFrequency(),
-                              Channel::LowPower, 0, false, DigitalChannel::AdmitColorCode,
+                              Channel::Power::Low, 0, false, DigitalChannel::Admit::ColorCode,
                               getColorCode(), getTimeslot(), nullptr, nullptr, nullptr,
-                              nullptr, nullptr);
+                              nullptr, nullptr, nullptr);
     logDebug() << "Create channel '" << digi->name() << "' as roaming channel.";
-    ctx.config()->channelList()->addChannel(digi);
+    ctx.config()->channelList()->add(digi);
   }
   return digi;
 }
@@ -985,8 +1030,15 @@ void
 D878UVCodeplug::allocateUpdated() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateUpdated();
+
   // Encryption keys
   image(0).addElement(ADDR_ENCRYPTION_KEYS, ENCRYPTION_KEYS_SIZE);
+
+  // allocate APRS settings extension
+  image(0).addElement(ADDR_APRS_SET_EXT, APRS_SET_EXT_SIZE);
+
+  // allocate APRS RX list
+  image(0).addElement(ADDR_APRS_RX_ENTRY, NUM_APRS_RX_ENTRY*APRS_RX_ENTRY_SIZE);
 }
 
 void
@@ -1031,7 +1083,8 @@ bool
 D878UVCodeplug::encode(Config *config, const Flags &flags)
 {
   // Encode everything common between d868uv and d878uv radios.
-  D868UVCodeplug::encode(config, flags);
+  if (! D868UVCodeplug::encode(config, flags))
+    return false;
 
   if (! this->encodeRoaming(config, flags))
     return false;
@@ -1044,6 +1097,7 @@ D878UVCodeplug::decode(Config *config)
 {
   // Maps code-plug indices to objects
   CodeplugContext ctx(config);
+
   return this->decode(config, ctx);
 }
 
@@ -1161,6 +1215,8 @@ D878UVCodeplug::decodeGeneralSettings(Config *config) {
 
 void
 D878UVCodeplug::allocateGPSSystems() {
+  // replaces D868UVCodeplug::allocateGPSSystems
+
   // APRS settings
   image(0).addElement(ADDR_APRS_SETTING, APRS_SETTING_SIZE);
   image(0).addElement(ADDR_APRS_MESSAGE, APRS_MESSAGE_SIZE);
@@ -1169,6 +1225,8 @@ D878UVCodeplug::allocateGPSSystems() {
 
 bool
 D878UVCodeplug::encodeGPSSystems(Config *config, const Flags &flags) {
+  // replaces D868UVCodeplug::encodeGPSSystems
+
   // Encode APRS system (there can only be one)
   if (0 < config->posSystems()->aprsCount()) {
     ((aprs_setting_t *)data(ADDR_APRS_SETTING))->fromAPRSSystem(config->posSystems()->aprsSystem(0));
@@ -1191,6 +1249,8 @@ D878UVCodeplug::encodeGPSSystems(Config *config, const Flags &flags) {
 
 bool
 D878UVCodeplug::createGPSSystems(Config *config, CodeplugContext &ctx) {
+  // replaces D868UVCodeplug::createGPSSystems
+
   // Before creating any GPS/APRS systems, get global auto TX intervall
   uint pos_intervall = ((aprs_setting_t *)data(ADDR_APRS_SETTING))->getAutoTXInterval();
 
@@ -1220,6 +1280,8 @@ D878UVCodeplug::createGPSSystems(Config *config, CodeplugContext &ctx) {
 
 bool
 D878UVCodeplug::linkGPSSystems(Config *config, CodeplugContext &ctx) {
+  // replaces D868UVCodeplug::linkGPSSystems
+
   // Link APRS system
   aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
   if (aprs->isValid()) {
@@ -1313,7 +1375,7 @@ D878UVCodeplug::createRoaming(Config *config, CodeplugContext &ctx) {
     roaming_channel_t *ch = (roaming_channel_t *)data(addr);
     DigitalChannel *digi = ch->toChannel(ctx);
     if (digi) {
-      logDebug() << "Register channel '" << digi->name() << "' as roaming channel " << i+1;
+      //logDebug() << "Register channel '" << digi->name() << "' as roaming channel " << i+1;
       ctx.addRoamingChannel(digi, i);
     }
   }

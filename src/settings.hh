@@ -43,11 +43,23 @@ public:
 
   CodePlug::Flags codePlugFlags() const;
 
+  bool limitCallSignDBEntries() const;
+  void setLimitCallSignDBEnties(bool enable);
+  uint maxCallSignDBEntries() const;
+  void  setMaxCallSignDBEntries(uint max);
+  bool selectUsingUserDMRID();
+  void setSelectUsingUserDMRID(bool enable);
+  QSet<uint> callSignDBPrefixes();
+  void setCallSignDBPrefixes(const QSet<uint> &prefixes);
+
   bool ignoreVerificationWarning() const;
   void setIgnoreVerificationWarning(bool ignore);
 
   bool ignoreFrequencyLimits() const;
   void setIgnoreFrequencyLimits(bool ignore);
+
+  bool showCommercialFeatures() const;
+  void setShowCommercialFeatures(bool show);
 
   bool hideGSPNote() const;
   void setHideGPSNote(bool hide);
@@ -64,11 +76,14 @@ public:
   QByteArray mainWindowState() const;
   void setMainWindowState(const QByteArray &state);
 
-  QByteArray channelListHeaderState() const;
-  void setChannelListHeaderState(const QByteArray &state);
+  QByteArray radioIdListHeaderState() const;
+  void setRadioIdListHeaderState(const QByteArray &state);
 
   QByteArray contactListHeaderState() const;
   void setContactListHeaderState(const QByteArray &state);
+
+  QByteArray channelListHeaderState() const;
+  void setChannelListHeaderState(const QByteArray &state);
 
   QByteArray positioningHeaderState() const;
   void setPositioningHeaderState(const QByteArray &state);
@@ -95,6 +110,8 @@ protected slots:
   void onSystemLocationToggled(bool enable);
   void positionUpdated(const QGeoPositionInfo &info);
   void onIgnoreFrequencyLimitsSet(bool enabled);
+  void onDBLimitToggled(bool enable);
+  void onUseUserDMRIdToggled(bool enable);
 
 protected:
   QGeoPositionInfoSource *_source;

@@ -1,5 +1,5 @@
 #include "radio.hh"
-#include "hid_interface.hh"
+#include "radioddity_interface.hh"
 #include "dfu_libusb.hh"
 #include "rd5r.hh"
 #include "gd77.hh"
@@ -7,6 +7,8 @@
 #include "opengd77.hh"
 #include "d868uv.hh"
 #include "d878uv.hh"
+#include "d878uv2.hh"
+#include "d578uv.hh"
 #include "config.hh"
 #include "logger.hh"
 #include <QSet>
@@ -21,9 +23,34 @@ Radio::Features::FrequencyRange::FrequencyRange(double lower, double upper)
   // pass..
 }
 
+Radio::Features::FrequencyRange::FrequencyRange(double limits[2])
+  : min(limits[0]), max(limits[1])
+{
+  // pass..
+}
+
 bool
 Radio::Features::FrequencyRange::contains(double f) const {
   return (min<=f) && (max>=f);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of Radio::Featrues::FrequencyLimits
+ * ******************************************************************************************** */
+Radio::Features::FrequencyLimits::FrequencyLimits(const QVector<FrequencyRange> &frequency_ranges)
+  : ranges(frequency_ranges)
+{
+  // pass...
+}
+
+bool
+Radio::Features::FrequencyLimits::contains(double f) const {
+  for (int i=0; i<ranges.size(); i++) {
+    if (ranges[i].contains(f))
+      return true;
+  }
+  return false;
 }
 
 
@@ -36,6 +63,20 @@ Radio::Radio(QObject *parent)
   // pass...
 }
 
+Radio::~Radio() {
+  // pass...
+}
+
+const CallsignDB *
+Radio::callsignDB() const {
+  return nullptr;
+}
+
+CallsignDB *
+Radio::callsignDB() {
+  return nullptr;
+}
+
 VerifyIssue::Type
 Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlags &flags)
 {
@@ -46,26 +87,33 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                     tr("Support for this radio is still new and not well tested. "
                        "The code-plug might be incomplete, non-functional or even harmful.")));
 
+  // Check radio IDs
+  if (config->radioIDs()->count() > features().maxRadioIDs) {
+    issues.append(VerifyIssue(
+                    VerifyIssue::ERROR,
+                    tr("This radio only supports %1 DMR IDs, %2 are set.")
+                    .arg(features().maxRadioIDs).arg(config->radioIDs()->count())));
+  }
+
   /*
    *  Check general config
    */
-  if (config->name().size() > features().maxNameLength)
+  if ((nullptr == config->radioIDs()->defaultId()) && features().needsDefaultRadioID)
     issues.append(VerifyIssue(
-                    VerifyIssue::WARNING,
-                    tr("Radio name of length %1 exceeds limit of %2 characters.")
-                    .arg(config->name().size()).arg(features().maxNameLength)));
+                    VerifyIssue::ERROR,
+                    tr("Radio needs a default radio ID but none is set.")));
 
   if (config->introLine1().size() > features().maxIntroLineLength)
     issues.append(VerifyIssue(
                     VerifyIssue::WARNING,
                     tr("Intro line 1 of length %1 exceeds limit of %2 characters.")
-                    .arg(config->introLine1().size()).arg(features().maxNameLength)));
+                    .arg(config->introLine1().size()).arg(features().maxIntroLineLength)));
 
   if (config->introLine2().size() > features().maxIntroLineLength)
     issues.append(VerifyIssue(
                     VerifyIssue::WARNING,
                     tr("Intro line 2 of length %1 exceeds limit of %2 characters.")
-                    .arg(config->introLine2().size()).arg(features().maxNameLength)));
+                    .arg(config->introLine2().size()).arg(features().maxIntroLineLength)));
 
   /*
    *  Check contact list
@@ -156,15 +204,13 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                       tr("Duplicate channel name '%1'.").arg(channel->name())));
     names.insert(channel->name());
 
-    if ((!features().vhfLimits.contains(channel->rxFrequency())) &&
-        (!features().uhfLimits.contains(channel->rxFrequency()))) {
+    /*if (!features().frequencyLimits.contains(channel->rxFrequency())) {
       VerifyIssue::Type type = flags.ignoreFrequencyLimits ? VerifyIssue::WARNING : VerifyIssue::ERROR;
       issues.append(VerifyIssue(type,tr("RX frequency %1 of channel '%2' is out of range.")
                                 .arg(channel->rxFrequency()).arg(channel->name())));
-    }
+    }*/
 
-    if ((!features().vhfLimits.contains(channel->txFrequency())) &&
-        (!features().uhfLimits.contains(channel->txFrequency()))) {
+    if (!features().frequencyLimits.contains(channel->txFrequency())) {
       VerifyIssue::Type type = flags.ignoreFrequencyLimits ? VerifyIssue::WARNING : VerifyIssue::ERROR;
       issues.append(VerifyIssue(type,tr("TX frequency %1 of channel '%2' is out of range.")
                                 .arg(channel->txFrequency()).arg(channel->name())));
@@ -188,7 +234,7 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                       tr("Radio does not support analog channel'%1'")
                       .arg(channel->name())));
 
-    if (channel->is<DigitalChannel>() && (nullptr == channel->as<DigitalChannel>()->txContact())
+    if (channel->is<DigitalChannel>() && (nullptr == channel->as<DigitalChannel>()->txContactObj())
         && (! features().allowChannelNoDefaultContact))
       issues.append(VerifyIssue(
                       VerifyIssue::WARNING,
@@ -233,12 +279,20 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                       tr("Number of channels %2 in zone '%1' B exceeds limit %3.")
                       .arg(zone->name()).arg(zone->A()->count()).arg(features().maxChannelsInZone)));
 
-    if ((0 < zone->B()->count()) && (! features().hasABZone))
+    if ((0 < zone->B()->count()) && (! features().hasABZone)) {
       issues.append(VerifyIssue(
                       VerifyIssue::NOTIFICATION,
                       tr("Radio does not support dual-zones. Zone '%1' will be split into two.")
                       .arg(zone->name())));
-
+      if (zone->name()+2 > features().maxZoneNameLength) {
+        issues.append(VerifyIssue(
+                        VerifyIssue::WARNING,
+                        tr("Zone '%1' will be split into two but its name is too long to "
+                           "differentiate the created zones (exceeding limit of %2 chars). "
+                           "Consider using a shorter zone name.")
+                        .arg(zone->name()).arg(features().maxZoneNameLength)));
+      }
+    }
   }
 
   /*
@@ -267,17 +321,17 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                         tr("Scan list name '%1' length %2 exceeds limit of %3 characters.")
                         .arg(list->name()).arg(list->name().size()).arg(features().maxScanlistNameLength)));
 
-      if (0 == list->priorityChannel())
+      if (0 == list->primaryChannel())
         issues.append(VerifyIssue(
                         VerifyIssue::WARNING,
                         tr("Scan list '%1' has no priority channel set.")
                         .arg(list->name())));
 
-      else if (! list->contains(list->priorityChannel()))
+      else if (! list->contains(list->primaryChannel()))
         issues.append(VerifyIssue(
                         VerifyIssue::WARNING,
                         tr("Scan list '%1' does not contain priority channel '%2'.")
-                        .arg(list->name()).arg(list->priorityChannel()->name())));
+                        .arg(list->name()).arg(list->primaryChannel()->name())));
     }
   }
 
@@ -322,71 +376,90 @@ Radio *
 Radio::detect(QString &errorMessage, const QString &force) {
   QString id;
 
-  // Try TYT MD Family
+  // Try TYT UV Family
   {
-    DFUDevice dfu(0x0483, 0xdf11);
-    if (dfu.isOpen()) {
-      id = dfu.identifier();
-      goto found;
+    DFUDevice *dfu = new DFUDevice(0x0483, 0xdf11);
+    if (dfu->isOpen()) {
+      id = dfu->identifier();
+      if (("MD-UV380" == id) || ("MD-UV390" == id) || ("UV390" == force.toUpper())) {
+        return new UV390(dfu);
+      } else if (("2017" == id) || ("MD2017" == force.toUpper())) {
+        return new UV390(dfu);
+      } else {
+        dfu->close();
+        dfu->deleteLater();
+        errorMessage = tr("%1(): Unsupported TyT/Retevis device '%2'.").arg(__func__).arg(id);
+      }
+    } else {
+      errorMessage = tr("%1(): Cannot connect to TyT/Retevis device '%2'.").arg(__func__).arg(id);
+      dfu->deleteLater();
     }
   }
 
   // Try Radioddity/Baofeng RD5R & GD-77
   {
-    HID hid(0x15a2, 0x0073);
-    if (hid.isOpen()) {
-      id = hid.identifier();
-      hid.close();
-      goto found;
+    RadioddityInterface *hid = new RadioddityInterface(0x15a2, 0x0073);
+    if (hid->isOpen()) {
+      id = hid->identifier();
+      if (("BF-5R" == id) || ("RD5R" == force.toUpper())) {
+        return new RD5R(hid);
+      } else if (("MD-760P" == id) || ("GD77" == force.toUpper())) {
+        return new GD77(hid);
+      } else {
+        errorMessage = tr("%1(): Unsupported Baofeng/Radioddity device '%2'.").arg(__func__).arg(id);
+        hid->close();
+        hid->deleteLater();
+      }
+    } else {
+      hid->deleteLater();
     }
   }
 
   // Try Open GD77 firmware
   {
-    OpenGD77Interface ogd77;
-    if (ogd77.isOpen()) {
-      id = ogd77.identifier();
-      ogd77.close();
-      goto found;
+    OpenGD77Interface *ogd77 = new OpenGD77Interface();
+    if (ogd77->isOpen()) {
+      id = ogd77->identifier();
+      if (("OpenGD77" == id) || ("OpenGD77" == force.toUpper())) {
+        return new OpenGD77(ogd77);
+      } else {
+        errorMessage = tr("%1(): Unsupported OpenGD77 radio '%1'.").arg(__func__).arg(id);
+        ogd77->close();
+        ogd77->deleteLater();
+      }
+    } else {
+      ogd77->deleteLater();
     }
   }
 
   // Try Anytone USB-serial devices
   {
-    AnytoneInterface anytone;
-    if (anytone.isOpen()) {
-      id = anytone.identifier();
-      anytone.close();
-      goto found;
+    AnytoneInterface *anytone = new AnytoneInterface();
+    if (anytone->isOpen()) {
+      id = anytone->identifier();
+      if (("D6X2UV" == id) || ("D868UV" == id) || ("D868UVE" == id) || ("D868UV" == force.toUpper())) {
+        return new D868UV(anytone);
+      } else if (("D878UV" == id) || ("D878UV" == force.toUpper())) {
+        return new D878UV(anytone);
+      } else if (("D878UV2" == id) || ("D878UV2" == force.toUpper())) {
+        return new D878UV2(anytone);
+      } else if (("D578UV" == id) || ("D578UV" == force.toUpper())) {
+        return new D578UV(anytone);
+      } else {
+        anytone->close();
+        anytone->deleteLater();
+        errorMessage = tr("%1(): Unsupported AnyTone radio %2.").arg(__func__).arg(id);
+        return nullptr;
+      }
+    } else {
+      anytone->deleteLater();
     }
   }
 
-  errorMessage = QString("%1(): No matching radio found.").arg(__func__);
-  return nullptr;
-
-found:
-  if (id.isEmpty()) {
-    errorMessage = QString("%1(): Cannot detect radio: Radio returned no identifier!").arg(__func__);
-    return nullptr;
-  }
-
-  logDebug() << "Found Radio: " << id;
-
-  if (("BF-5R" == id) || ("RD5R" == force.toUpper())) {
-    return new RD5R();
-  } else if (("MD-760P" == id) || ("GD77" == force.toUpper())) {
-    return new GD77();
-  } else if (("MD-UV380" == id) || ("MD-UV390" == id) || ("UV390" == force.toUpper())) {
-    return new UV390();
-  } else if (("OpenGD77" == id) || ("OpenGD77" == force.toUpper())) {
-    return new OpenGD77();
-  } else if (("D6X2UV" == id) || ("D878UV" == id) || ("D878UV" == force.toUpper())) {
-    return new D878UV();
-  } else if (("D868UV" == id) || ("D868UVE" == id) || ("D868UV" == force.toUpper())) {
-    return new D868UV();
-  }
-
-  errorMessage = QString("%1(): Unknown radio identifier '%2'.").arg(__func__, id);
+  if (errorMessage.isEmpty())
+    errorMessage = QString("%1(): No matching radio found.").arg(__func__);
+  else
+    errorMessage = QString("%1(): Cannot connect to radio: %2").arg(__func__).arg(errorMessage);
   return nullptr;
 }
 

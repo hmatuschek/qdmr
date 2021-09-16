@@ -1,18 +1,29 @@
 #include "roaming.hh"
+#include "channel.hh"
 #include <QSet>
+
 
 /* ********************************************************************************************* *
  * Implementation of RoamingZone
  * ********************************************************************************************* */
 RoamingZone::RoamingZone(const QString &name, QObject *parent)
-  : QAbstractListModel(parent), _name(name), _channel()
+  : ConfigObject("roam", parent), _name(name), _channel()
 {
   // pass...
 }
 
+RoamingZone &
+RoamingZone::operator =(const RoamingZone &other) {
+  clear();
+  _name = other._name;
+  for (int i=0; i<other._channel.count(); i++)
+    _channel.add(other._channel.get(i));
+  return *this;
+}
+
 int
 RoamingZone::count() const {
-  return _channel.size();
+  return _channel.count();
 }
 
 void
@@ -29,7 +40,7 @@ RoamingZone::name() const {
 void
 RoamingZone::setName(const QString &name) {
   _name = name;
-  emit modified();
+  emit modified(this);
 }
 
 
@@ -37,69 +48,36 @@ DigitalChannel *
 RoamingZone::channel(int idx) const {
   if ((idx < 0) || (idx >= count()))
     return nullptr;
-  return _channel.at(idx);
+  return _channel.get(idx)->as<DigitalChannel>();
 }
 
-bool
+int
 RoamingZone::addChannel(DigitalChannel *ch, int row) {
-  if ((nullptr==ch) || _channel.contains(ch))
-    return false;
-  if (row <=0 || row>=count())
-    row = count();
-  beginInsertRows(QModelIndex(), row, row);
-  connect(ch, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  connect(ch, SIGNAL(modified()), this, SIGNAL(modified()));
-  _channel.insert(row, ch);
-  endInsertRows();
-  emit modified();
-  return false;
+  row = _channel.add(ch, row);
+  if (0 > row)
+    return row;
+  emit modified(this);
+  return row;
 }
 
 bool
 RoamingZone::remChannel(int row) {
-  if (row<0 || row>=count())
-    return false;
-  DigitalChannel *ch = _channel[row];
-  beginRemoveRows(QModelIndex(), row, row);
-  _channel.removeAt(row);
-  endRemoveRows();
-  disconnect(ch, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  emit modified();
-  return true;
+  return _channel.del(_channel.get(row));
 }
 
 bool
 RoamingZone::remChannel(DigitalChannel *ch) {
-  if (! _channel.contains(ch))
-    return false;
-  return remChannel(_channel.indexOf(ch));
+  return _channel.del(ch);
 }
 
-
-int
-RoamingZone::rowCount(const QModelIndex &parent) const {
-  Q_UNUSED(parent);
-  return count();
+const DigitalChannelRefList *
+RoamingZone::channels() const {
+  return &_channel;
 }
 
-QVariant
-RoamingZone::data(const QModelIndex &index, int role) const {
-  if ((Qt::DisplayRole!=role) || (index.row()>=_channel.size()) || (0 != index.column()))
-    return QVariant();
-  return _channel[index.row()]->name();
-}
-
-QVariant
-RoamingZone::headerData(int section, Qt::Orientation orientation, int role) const {
-  if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation) || (0 != section))
-    return QVariant();
-  return tr("Channel");
-}
-
-void
-RoamingZone::onChannelDeleted(QObject *obj) {
-  if (DigitalChannel *ch = reinterpret_cast<DigitalChannel *>(obj))
-    remChannel(ch);
+DigitalChannelRefList *
+RoamingZone::channels() {
+  return &_channel;
 }
 
 
@@ -126,31 +104,9 @@ DefaultRoamingZone::get() {
  * Implementation of RoamingZoneList
  * ********************************************************************************************* */
 RoamingZoneList::RoamingZoneList(QObject *parent)
-  : QAbstractListModel(parent), _zones()
+  : ConfigObjectList(RoamingZone::staticMetaObject, parent)
 {
   // pass...
-}
-
-int
-RoamingZoneList::count() const {
-  return _zones.size();
-}
-
-void
-RoamingZoneList::clear() {
-  beginResetModel();
-  for (int i=0; i<count(); i++)
-    _zones[i]->deleteLater();
-  _zones.clear();
-  endResetModel();
-  emit modified();
-}
-
-int
-RoamingZoneList::indexOf(RoamingZone *zone) const {
-  if (! _zones.contains(zone))
-    return -1;
-  return _zones.indexOf(zone);
 }
 
 QSet<DigitalChannel *>
@@ -163,7 +119,7 @@ RoamingZoneList::uniqueChannels() const {
 void
 RoamingZoneList::uniqueChannels(QSet<DigitalChannel *> &channels) const {
   for (int i=0; i<count(); i++) {
-    RoamingZone *zone = _zones[i];
+    RoamingZone *zone = this->zone(i);
     for (int j=0; j<zone->count(); j++) {
       channels.insert(zone->channel(j));
     }
@@ -172,119 +128,14 @@ RoamingZoneList::uniqueChannels(QSet<DigitalChannel *> &channels) const {
 
 RoamingZone *
 RoamingZoneList::zone(int idx) const {
-  if ((0>idx) || (idx>=_zones.size()))
-    return nullptr;
-  return _zones[idx];
-}
-
-bool
-RoamingZoneList::addZone(RoamingZone *zone, int row) {
-  if (DefaultRoamingZone::get() == zone)
-    return false;
-  if (_zones.contains(zone))
-    return false;
-  if ((row<0) || (row>=_zones.size()))
-    row = _zones.size();
-  beginInsertRows(QModelIndex(), row, row);
-  zone->setParent(this);
-  connect(zone, SIGNAL(destroyed(QObject*)), this, SLOT(onZoneDeleted(QObject*)));
-  connect(zone, SIGNAL(modified()), this, SIGNAL(modified()));
-  _zones.insert(row, zone);
-  endInsertRows();
-  emit modified();
-  return true;
-}
-
-bool
-RoamingZoneList::remZone(int idx) {
-  if ((0>idx) || (idx>=_zones.size()))
-    return false;
-  RoamingZone *zone = _zones[idx];
-  beginRemoveRows(QModelIndex(), idx, idx);
-  _zones.remove(idx);
-  zone->deleteLater();
-  endRemoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-RoamingZoneList::remZone(RoamingZone *zone) {
-  if (! _zones.contains(zone))
-    return false;
-  int idx = _zones.indexOf(zone);
-  return remZone(idx);
-}
-
-bool
-RoamingZoneList::moveUp(int row) {
-  if ((0>=row) || (row>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  std::swap(_zones[row], _zones[row-1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-RoamingZoneList::moveUp(int first, int last) {
-  if ((0>=first) || (last>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
-  for (int row=first; row<=last; row++)
-    std::swap(_zones[row], _zones[row-1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-RoamingZoneList::moveDown(int row) {
-  if ((0>row) || ((row-1)>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  std::swap(_zones[row], _zones[row+1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-RoamingZoneList::moveDown(int first, int last) {
-  if ((0>first) || ((last+1)>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
-  for (int row=last; row>=first; row--)
-    std::swap(_zones[row], _zones[row+1]);
-  endMoveRows();
-  emit modified();
-  return true;
+  if (ConfigObject *obj = get(idx))
+    return obj->as<RoamingZone>();
+  return nullptr;
 }
 
 int
-RoamingZoneList::rowCount(const QModelIndex &idx) const {
-  Q_UNUSED(idx);
-  return _zones.size();
-}
-
-QVariant
-RoamingZoneList::data(const QModelIndex &index, int role) const {
-  if ((Qt::DisplayRole!=role) || (index.row()>=_zones.size()) || (0 != index.column()))
-    return QVariant();
-  RoamingZone *zone = _zones[index.row()];
-  return tr("%1 (containing %2 channels)").arg(zone->name()).arg(zone->count());
-}
-
-QVariant
-RoamingZoneList::headerData(int section, Qt::Orientation orientation, int role) const {
-  if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation) || (0 != section))
-    return QVariant();
-  return tr("Roaming zone");
-}
-
-void
-RoamingZoneList::onZoneDeleted(QObject *obj) {
-  if (RoamingZone *zone = reinterpret_cast<RoamingZone *>(obj))
-    remZone(zone);
+RoamingZoneList::add(ConfigObject *obj, int row) {
+  if (obj && obj->is<RoamingZone>())
+    return ConfigObjectList::add(obj, row);
+  return -1;
 }

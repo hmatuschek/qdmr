@@ -55,6 +55,9 @@ void encode_dmr_id_bcd_le(uint8_t *id, uint32_t num);
 QString decode_dtmf_bin(const uint8_t *num, int size=16, uint8_t fill=0xff);
 bool encode_dtmf_bin(const QString &number, uint8_t *num, int size=16, uint8_t fill=0xff);
 
+QString decode_dtmf_bcd_be(const uint8_t *num, int digits);
+bool encode_dtmf_bcd_be(const QString &number, uint8_t *num, int size, uint8_t fill);
+
 /** Decodes the CTCSS tone or DCS code to @c Signaling::Code. */
 Signaling::Code decode_ctcss_tone_table(uint16_t data);
 /** Encodes the CTCSS tone or DCS code from @c Signaling::Code. */
@@ -74,13 +77,14 @@ bool validDTMFNumber(const QString &text);
 /** Formats a frequency in MHz passed as double. */
 QString format_frequency(double MHz);
 
+QString aprsicon2config(APRSSystem::Icon icon);
 QString aprsicon2name(APRSSystem::Icon icon);
 APRSSystem::Icon name2aprsicon(const QString &name);
 char aprsicon2iconcode(APRSSystem::Icon icon);
 char aprsicon2tablecode(APRSSystem::Icon icon);
 APRSSystem::Icon code2aprsicon(char table, char icon);
 
-/** Implements the Levenshteim distance between two strings.
+/** Implements the Levenshtein distance between two strings.
  * That is, the number of edits (insert, delete or replace operations) needed to turn source
  * into target. */
 int levDist(const QString &source, const QString &target,

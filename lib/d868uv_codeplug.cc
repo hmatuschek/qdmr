@@ -6,6 +6,7 @@
 #include "userdatabase.hh"
 #include "config.h"
 #include "logger.hh"
+#include <cmath>
 
 #include <QTimeZone>
 #include <QtEndian>
@@ -44,9 +45,13 @@
 #define ANALOGCONTACT_BANK_0      0x02940000
 #define ANALOGCONTACT_BANK_SIZE   0x00000030
 #define ANALOGCONTACT_INDEX_LIST  0x02900000 // Address of analog contact index list
-#define ANALOGCONTACT_LIST_SIZE   0x00000080 // Address of analog contact index list
-#define ANALOGCONTACT_BITMAP      0x02900100 // Address of contact bytemap
-#define ANALOGCONTACT_BITMAP_SIZE 0x00000080 // Size of contact bytemap
+#define ANALOGCONTACT_LIST_SIZE   0x00000080 // Size of analog contact index list
+#define ANALOGCONTACT_BYTEMAP     0x02900100 // Address of contact bytemap
+#define ANALOGCONTACT_BYTEMAP_SIZE 0x00000080 // Size of contact bytemap
+#define ANALOGCONTACT_SIZE        0x00000018 // Size of analog contact
+static_assert(
+  ANALOGCONTACT_SIZE == sizeof(D868UVCodeplug::analog_contact_t),
+  "D868UVCodeplug::analog_contact_t size check failed.");
 
 #define NUM_RXGRP                 250        // Total number of RX group lists
 #define ADDR_RXGRP_0              0x02980000 // Address of the first RX group list.
@@ -146,6 +151,15 @@ static_assert(
 
 #define ADDR_ALARM_SETTING        0x024C1400
 #define ALARM_SETTING_SIZE        0x00000020
+static_assert(
+  ALARM_SETTING_SIZE == sizeof(D868UVCodeplug::alarm_settings_t),
+  "D868UVCodeplug::alarm_settings_t size check failed.");
+
+#define ADDR_ALARM_SETTING_EXT    0x024c1440
+#define ALARM_SETTING_EXT_SIZE    0x00000030
+static_assert(
+  ALARM_SETTING_EXT_SIZE == sizeof(D868UVCodeplug::digital_alarm_settings_ext_t),
+  "D868UVCodeplug::digital_alarm_settings_ext_t size check failed.");
 
 #define FMBC_BITMAP               0x02480210
 #define FMBC_BITMAP_SIZE          0x00000020
@@ -154,42 +168,75 @@ static_assert(
 #define ADDR_FMBC_VFO             0x02480200
 #define FMBC_VFO_SIZE             0x00000010
 
-#define FIVE_TONE_BITMAP          0x024C0C80
-#define FIVE_TONE_BITMAP_SIZE     0x00000010
-#define NUM_FIVE_TONE_FUNCTIONS   100
-#define ADDR_FIVE_TONE_FUNCTIONS  0x024C0000
-#define FIVE_TONE_FUNCTION_SIZE   0x00000020
-
-#define NUM_FIVE_TONE_IDS         16
-#define ADDR_FIVE_TONE_ID_LIST    0x024C0D00
+#define FIVE_TONE_ID_BITMAP       0x024C0C80
+#define FIVE_TONE_ID_BITMAP_SIZE  0x00000010
+#define NUM_FIVE_TONE_IDS         100
+#define ADDR_FIVE_TONE_ID_LIST    0x024C0000
 #define FIVE_TONE_ID_SIZE         0x00000020
-#define FIVE_TONE_ID_LIST_SIZE    0x00000200
-
+#define FIVE_TONE_ID_LIST_SIZE    0x00000c80
+static_assert(
+  FIVE_TONE_ID_SIZE == sizeof(D868UVCodeplug::five_tone_id_t),
+  "D868UVCodeplug::five_tone_id_t size check failed.");
+static_assert(
+  FIVE_TONE_ID_LIST_SIZE == (NUM_FIVE_TONE_IDS*sizeof(D868UVCodeplug::five_tone_id_t)),
+  "D868UVCodeplug::five_tone_function_t list size check failed.");
+#define NUM_FIVE_TONE_FUNCTIONS   16
+#define ADDR_FIVE_TONE_FUNCTIONS  0x024C0D00
+#define FIVE_TONE_FUNCTION_SIZE   0x00000020
+#define FIVE_TONE_FUNCTIONS_SIZE  0x00000200
+static_assert(
+  FIVE_TONE_FUNCTION_SIZE == sizeof(D868UVCodeplug::five_tone_function_t),
+  "D868UVCodeplug::five_tone_function_t size check failed.");
+static_assert(
+  FIVE_TONE_FUNCTIONS_SIZE == (NUM_FIVE_TONE_FUNCTIONS*sizeof(D868UVCodeplug::five_tone_function_t)),
+  "D868UVCodeplug::five_tone_function_t list size check failed.");
 #define ADDR_FIVE_TONE_SETTINGS   0x024C1000
 #define FIVE_TONE_SETTINGS_SIZE   0x00000080
+static_assert(
+  FIVE_TONE_SETTINGS_SIZE == sizeof(D868UVCodeplug::five_tone_settings_t),
+  "D868UVCodeplug::five_tone_settings_t size check failed.");
+
 #define ADDR_DTMF_SETTINGS        0x024C1080
 #define DTMF_SETTINGS_SIZE        0x00000050
+static_assert(
+  DTMF_SETTINGS_SIZE == sizeof(D868UVCodeplug::dtmf_settings_t),
+  "D868UVCodeplug::dtmf_settings_t size check failed.");
 
-#define NUM_TWO_TONE_ENC_FUNC     24
-#define TWO_TONE_ENC_BITMAP       0x024C1280
-#define TWO_TONE_ENC_BITMAP_SIZE  0x00000010
-#define ADDR_TWO_TONE_ENC_FUNC    0x024C1100
-#define TWO_TONE_ENC_FUNC_SIZE    0x00000010
-#define NUM_TWO_TONE_DEC_FUNC     24
-#define TWO_TONE_DEC_BITMAP       0x024c2600
-#define TWO_TONE_DEC_BITMAP_SIZE  0x00000010
-#define ADDR_TWO_TONE_DEC_FUNC    0x024c2400
-#define TWO_TONE_DEC_FUNC_SIZE    0x00000020
+#define NUM_TWO_TONE_IDS          24
+#define TWO_TONE_IDS_BITMAP       0x024C1280
+#define TWO_TONE_IDS_BITMAP_SIZE  0x00000010
+#define ADDR_TWO_TONE_IDS         0x024C1100
+#define TWO_TONE_ID_SIZE          0x00000010
+static_assert(
+  TWO_TONE_ID_SIZE == sizeof(D868UVCodeplug::two_tone_id_t),
+  "D868UVCodeplug::two_tone_settings_t size check failed.");
+
+#define NUM_TWO_TONE_FUNCTIONS    16
+#define TWO_TONE_FUNCTIONS_BITMAP 0x024c2600
+#define TWO_TONE_FUNC_BITMAP_SIZE 0x00000010
+#define ADDR_TWO_TONE_FUNCTIONS   0x024c2400
+#define TWO_TONE_FUNCTION_SIZE    0x00000020
+static_assert(
+  TWO_TONE_FUNCTION_SIZE == sizeof(D868UVCodeplug::two_tone_function_t),
+  "D868UVCodeplug::two_tone_settings_t size check failed.");
 
 #define ADDR_TWO_TONE_SETTINGS    0x024C1290
 #define TWO_TONE_SETTINGS_SIZE    0x00000010
+static_assert(
+  TWO_TONE_SETTINGS_SIZE == sizeof(D868UVCodeplug::two_tone_settings_t),
+  "D868UVCodeplug::two_tone_settings_t size check failed.");
 
+#define ADDR_DMR_ENCRYPTION_LIST  0x024C1700
+#define DMR_ENCRYPTION_LIST_SIZE  0x00000040
+#define ADDR_DMR_ENCRYPTION_KEYS  0x024C1800
+#define DMR_ENCRYPTION_KEYS_SIZE  0x00000500
 
 using namespace Signaling;
 
 Code _ctcss_num2code[52] = {
   SIGNALING_NONE, // 62.5 not supported
-  CTCSS_67_0Hz,  CTCSS_71_0Hz,  CTCSS_74_4Hz,  CTCSS_77_0Hz,  CTCSS_79_9Hz,  CTCSS_82_5Hz,
+  CTCSS_67_0Hz,  SIGNALING_NONE, // 69.3 not supported
+  CTCSS_71_9Hz,  CTCSS_74_4Hz,  CTCSS_77_0Hz,  CTCSS_79_7Hz,  CTCSS_82_5Hz,
   CTCSS_85_4Hz,  CTCSS_88_5Hz,  CTCSS_91_5Hz,  CTCSS_94_8Hz,  CTCSS_97_4Hz,  CTCSS_100_0Hz,
   CTCSS_103_5Hz, CTCSS_107_2Hz, CTCSS_110_9Hz, CTCSS_114_8Hz, CTCSS_118_8Hz, CTCSS_123_0Hz,
   CTCSS_127_3Hz, CTCSS_131_8Hz, CTCSS_136_5Hz, CTCSS_141_3Hz, CTCSS_146_2Hz, CTCSS_151_4Hz,
@@ -233,7 +280,7 @@ D868UVCodeplug::ctcss_num2code(uint8_t num) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::channel_t
+ * Implementation of D868UVCodeplug::channel_t
  * ******************************************************************************************** */
 D868UVCodeplug::channel_t::channel_t() {
   clear();
@@ -377,19 +424,19 @@ D868UVCodeplug::channel_t::setTXTone(Code code) {
 Channel *
 D868UVCodeplug::channel_t::toChannelObj() const {
   // Decode power setting
-  Channel::Power power = Channel::LowPower;
+  Channel::Power power = Channel::Power::Low;
   switch ((channel_t::Power) this->power) {
   case POWER_LOW:
-    power = Channel::LowPower;
+    power = Channel::Power::Low;
     break;
   case POWER_MIDDLE:
-    power = Channel::MidPower;
+    power = Channel::Power::Mid;
     break;
   case POWER_HIGH:
-    power = Channel::HighPower;
+    power = Channel::Power::High;
     break;
   case POWER_TURBO:
-    power = Channel::MaxPower;
+    power = Channel::Power::Max;
     break;
   }
   bool rxOnly = (1 == this->rx_only);
@@ -399,22 +446,22 @@ D868UVCodeplug::channel_t::toChannelObj() const {
     if (MODE_MIXED_A_D == channel_mode)
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << getName() <<"' as analog channel.";
-    AnalogChannel::Admit admit = AnalogChannel::AdmitNone;
+    AnalogChannel::Admit admit = AnalogChannel::Admit::Always;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
-      admit = AnalogChannel::AdmitNone;
+      admit = AnalogChannel::Admit::Always;
       break;
     case ADMIT_CH_FREE:
-      admit = AnalogChannel::AdmitFree;
+      admit = AnalogChannel::Admit::Free;
       break;
     default:
       break;
     }
-    AnalogChannel::Bandwidth bw = AnalogChannel::BWNarrow;
+    AnalogChannel::Bandwidth bw = AnalogChannel::Bandwidth::Narrow;
     if (BW_12_5_KHZ == bandwidth)
-      bw = AnalogChannel::BWNarrow;
+      bw = AnalogChannel::Bandwidth::Narrow;
     else
-      bw = AnalogChannel::BWWide;
+      bw = AnalogChannel::Bandwidth::Wide;
     ch = new AnalogChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
           1, getRXTone(), getTXTone(), bw, nullptr);
@@ -422,22 +469,22 @@ D868UVCodeplug::channel_t::toChannelObj() const {
     if (MODE_MIXED_A_D == channel_mode)
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << getName() <<"' as digital channel.";
-    DigitalChannel::Admit admit = DigitalChannel::AdmitNone;
+    DigitalChannel::Admit admit = DigitalChannel::Admit::Always;
     switch ((channel_t::Admit) tx_permit) {
     case ADMIT_ALWAYS:
-      admit = DigitalChannel::AdmitNone;
+      admit = DigitalChannel::Admit::Always;
       break;
     case ADMIT_CH_FREE:
-      admit = DigitalChannel::AdmitFree;
+      admit = DigitalChannel::Admit::Free;
       break;
     case ADMIT_COLORCODE:
-      admit = DigitalChannel::AdmitColorCode;
+      admit = DigitalChannel::Admit::ColorCode;
       break;
     }
-    DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot2 : DigitalChannel::TimeSlot1);
+    DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot::TS2 : DigitalChannel::TimeSlot::TS1);
     ch = new DigitalChannel(
           getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
-          color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr);
+          color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
   } else {
     logError() << "Cannot create channel '" << getName()
                << "': Channel type " << channel_mode << "not supported.";
@@ -458,17 +505,24 @@ D868UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
     // Check if default contact is set, in fact a valid contact index is mandatory.
     uint32_t conIdx = qFromLittleEndian(contact_index);
     if ((0xffffffff != conIdx) && ctx.hasDigitalContact(conIdx))
-      dc->setTXContact(ctx.getDigitalContact(conIdx));
+      dc->setTXContactObj(ctx.getDigitalContact(conIdx));
 
     // Set if RX group list is set
     if ((0xff != group_list_index) && ctx.hasGroupList(group_list_index))
-      dc->setRXGroupList(ctx.getGroupList(group_list_index));
+      dc->setGroupListObj(ctx.getGroupList(group_list_index));
 
     // Link to GPS system
     if (aprs_report && (!ctx.hasGPSSystem(gps_system)))
       logWarn() << "Cannot link to GPS system index " << gps_system << ": undefined GPS system.";
     else if (ctx.hasGPSSystem(gps_system))
-      dc->setPosSystem(ctx.getGPSSystem(gps_system));
+      dc->aprsObj(ctx.getGPSSystem(gps_system));
+
+    // Link radio ID
+    RadioID *rid = ctx.getRadioId(id_index);
+    if (rid == ctx.config()->radioIDs()->defaultId())
+      dc->setRadioIdObj(DefaultRadioID::get());
+    else
+      dc->setRadioIdObj(rid);
   } else if (MODE_ANALOG == channel_mode) {
     // If channel is analog
     AnalogChannel *ac = c->as<AnalogChannel>();
@@ -480,7 +534,7 @@ D868UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx
 
   // If channel has scan list
   if ((0xff != scan_list_index) && ctx.hasScanList(scan_list_index))
-    c->setScanList(ctx.getScanList(scan_list_index));
+    c->setScanListObj(ctx.getScanList(scan_list_index));
 
   return true;
 }
@@ -498,17 +552,17 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
 
   // encode power setting
   switch (c->power()) {
-  case Channel::MaxPower:
+  case Channel::Power::Max:
     power = POWER_TURBO;
     break;
-  case Channel::HighPower:
+  case Channel::Power::High:
     power = POWER_HIGH;
     break;
-  case Channel::MidPower:
+  case Channel::Power::Mid:
     power = POWER_MIDDLE;
     break;
-  case Channel::LowPower:
-  case Channel::MinPower:
+  case Channel::Power::Low:
+  case Channel::Power::Min:
     power = POWER_LOW;
     break;
   }
@@ -517,10 +571,10 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
   rx_only = c->rxOnly() ? 1 : 0;
 
   // Link scan list if set
-  if (nullptr == c->scanList())
+  if (nullptr == c->scanListObj())
     scan_list_index = 0xff;
   else
-    scan_list_index = conf->scanlists()->indexOf(c->scanList());
+    scan_list_index = conf->scanlists()->indexOf(c->scanListObj());
 
   // Dispatch by channel type
   if (c->is<AnalogChannel>()) {
@@ -529,52 +583,63 @@ D868UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) 
     // pack analog channel config
     // set admit criterion
     switch (ac->admit()) {
-    case AnalogChannel::AdmitNone: tx_permit = ADMIT_ALWAYS; break;
-    case AnalogChannel::AdmitFree: tx_permit = ADMIT_CH_FREE; break;
-    case AnalogChannel::AdmitTone: tx_permit = ADMIT_ALWAYS; break;
+    case AnalogChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
+    case AnalogChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
+    case AnalogChannel::Admit::Tone: tx_permit = ADMIT_ALWAYS; break;
     }
     // squelch mode
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     // set bandwidth
-    bandwidth = (AnalogChannel::BWNarrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
+    bandwidth = (AnalogChannel::Bandwidth::Narrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
   } else if (c->is<DigitalChannel>()) {
     const DigitalChannel *dc = c->as<const DigitalChannel>();
     // pack digital channel config.
     channel_mode = MODE_DIGITAL;
     // set admit criterion
     switch(dc->admit()) {
-    case DigitalChannel::AdmitNone: tx_permit = ADMIT_ALWAYS; break;
-    case DigitalChannel::AdmitFree: tx_permit = ADMIT_CH_FREE; break;
-    case DigitalChannel::AdmitColorCode: tx_permit = ADMIT_COLORCODE; break;
+    case DigitalChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
+    case DigitalChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
+    case DigitalChannel::Admit::ColorCode: tx_permit = ADMIT_COLORCODE; break;
     }
     // set color code
     color_code = dc->colorCode();
     // set time-slot
-    slot2 = (DigitalChannel::TimeSlot2 == dc->timeslot()) ? 1 : 0;
+    slot2 = (DigitalChannel::TimeSlot::TS2 == dc->timeSlot()) ? 1 : 0;
     // link transmit contact
-    if (nullptr == dc->txContact()) {
+    if (nullptr == dc->txContactObj()) {
       contact_index = 0;
     } else {
       contact_index = qToLittleEndian(
-            uint32_t(conf->contacts()->indexOfDigital(dc->txContact())));
+            uint32_t(conf->contacts()->indexOfDigital(dc->txContactObj())));
     }
     // link RX group list
-    if (nullptr == dc->rxGroupList())
+    if (nullptr == dc->groupListObj())
       group_list_index = 0xff;
     else
-      group_list_index = conf->rxGroupLists()->indexOf(dc->rxGroupList());
+      group_list_index = conf->rxGroupLists()->indexOf(dc->groupListObj());
     // Set GPS system index
-    if (dc->posSystem() && dc->posSystem()->is<GPSSystem>()) {
+    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
       aprs_report = 1;
-      gps_system = conf->posSystems()->indexOfGPSSys(dc->posSystem()->as<GPSSystem>());
+      gps_system = conf->posSystems()->indexOfGPSSys(dc->aprsObj()->as<GPSSystem>());
+    }
+    // Set radio ID
+    if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
+      if (nullptr == conf->radioIDs()->defaultId()) {
+        logWarn() << "No default radio ID set: using index 0.";
+        id_index = 0;
+      } else {
+        id_index = conf->radioIDs()->indexOf(conf->radioIDs()->defaultId());
+      }
+    } else {
+      id_index = conf->radioIDs()->indexOf(dc->radioIdObj());
     }
   }
 }
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::contact_t
+ * Implementation of D868UVCodeplug::contact_t
  * ******************************************************************************************** */
 D868UVCodeplug::contact_t::contact_t() {
   clear();
@@ -652,12 +717,58 @@ D868UVCodeplug::contact_t::fromContactObj(const DigitalContact *contact) {
   setType(contact->type());
   setName(contact->name());
   setId(contact->number());
-  setAlert(contact->rxTone());
+  setAlert(contact->ring());
 }
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::grouplist_t
+ * Implementation of D868UVCodeplug::analog_contact_t
+ * ******************************************************************************************** */
+void
+D868UVCodeplug::analog_contact_t::clear() {
+  memset(number, 0, sizeof(number));
+  digits = 0;
+  memset(name, 0, sizeof(name));
+  pad47 = 0;
+}
+
+QString
+D868UVCodeplug::analog_contact_t::getNumber() const {
+  return decode_dtmf_bcd_be(number, digits);
+}
+
+bool
+D868UVCodeplug::analog_contact_t::setNumber(const QString &num) {
+  if (! validDTMFNumber(num))
+    return false;
+  digits = num.length();
+  return encode_dtmf_bcd_be(num, number, sizeof(number), 0);
+}
+
+QString
+D868UVCodeplug::analog_contact_t::getName() const {
+  return decode_ascii(name, sizeof(name), 0);
+}
+
+void
+D868UVCodeplug::analog_contact_t::setName(const QString &name) {
+  encode_ascii(this->name, name, sizeof(this->name), 0);
+}
+
+void
+D868UVCodeplug::analog_contact_t::fromContact(const DTMFContact *contact) {
+  setNumber(contact->number());
+  setName(contact->name());
+}
+
+DTMFContact *
+D868UVCodeplug::analog_contact_t::toContact() const {
+  return new DTMFContact(getName(), getNumber());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D868UVCodeplug::grouplist_t
  * ******************************************************************************************** */
 D868UVCodeplug::grouplist_t::grouplist_t() {
   clear();
@@ -725,7 +836,7 @@ D868UVCodeplug::grouplist_t::fromGroupListObj(const RXGroupList *lst, const Conf
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::scanlist_t
+ * Implementation of D868UVCodeplug::scanlist_t
  * ******************************************************************************************** */
 D868UVCodeplug::scanlist_t::scanlist_t() {
   clear();
@@ -772,7 +883,7 @@ D868UVCodeplug::scanlist_t::linkScanListObj(ScanList *lst, CodeplugContext &ctx)
                  << "', priority channel 1 index " << idx << " unknown.";
       // Ignore error, continue decoding
     } else {
-      lst->setPriorityChannel(ctx.getChannel(idx));
+      lst->setPrimaryChannel(ctx.getChannel(idx));
     }
   }
 
@@ -783,7 +894,7 @@ D868UVCodeplug::scanlist_t::linkScanListObj(ScanList *lst, CodeplugContext &ctx)
                  << "', priority channel 2 index " << idx << " unknown.";
       // Ignore error, continue decoding
     } else {
-      lst->setSecPriorityChannel(ctx.getChannel(idx));
+      lst->setSecondaryChannel(ctx.getChannel(idx));
     }
   }
 
@@ -806,22 +917,22 @@ D868UVCodeplug::scanlist_t::fromScanListObj(ScanList *lst, Config *config) {
   setName(lst->name());
   prio_ch_select = PRIO_CHAN_OFF;
 
-  if (lst->priorityChannel()) {
+  if (lst->primaryChannel()) {
     prio_ch_select |= PRIO_CHAN_SEL1;
-    if (SelectedChannel::get() == lst->priorityChannel())
+    if (SelectedChannel::get() == lst->primaryChannel())
       priority_ch1 = 0x0000;
     else
       priority_ch1 = qToLittleEndian(
-            config->channelList()->indexOf(lst->priorityChannel())+1);
+            config->channelList()->indexOf(lst->primaryChannel())+1);
   }
 
-  if (lst->secPriorityChannel()) {
+  if (lst->secondaryChannel()) {
     prio_ch_select |= PRIO_CHAN_SEL2;
-    if (SelectedChannel::get() == lst->secPriorityChannel())
+    if (SelectedChannel::get() == lst->secondaryChannel())
       priority_ch2 = 0x0000;
     else
       priority_ch2 = qToLittleEndian(
-            config->channelList()->indexOf(lst->secPriorityChannel())+1);
+            config->channelList()->indexOf(lst->secondaryChannel())+1);
   }
 
   for (int i=0; i<std::min(50, lst->count()); i++) {
@@ -836,7 +947,7 @@ D868UVCodeplug::scanlist_t::fromScanListObj(ScanList *lst, Config *config) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::radioid_t
+ * Implementation of D868UVCodeplug::radioid_t
  * ******************************************************************************************** */
 D868UVCodeplug::radioid_t::radioid_t() {
   clear();
@@ -914,7 +1025,7 @@ D868UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::boot_settings_t
+ * Implementation of D868UVCodeplug::boot_settings_t
  * ******************************************************************************************** */
 void
 D868UVCodeplug::boot_settings_t::clear() {
@@ -999,26 +1110,26 @@ D868UVCodeplug::gps_settings_t::setAutomaticTXIntervall(uint16_t period) {
 Channel::Power
 D868UVCodeplug::gps_settings_t::getTransmitPower() const {
   switch (transmit_power) {
-  case POWER_LOW: return Channel::LowPower;
-  case POWER_MID: return Channel::MidPower;
-  case POWER_HIGH: return Channel::HighPower;
-  case POWER_TURBO: return Channel::MaxPower;
+  case POWER_LOW: return Channel::Power::Low;
+  case POWER_MID: return Channel::Power::Mid;
+  case POWER_HIGH: return Channel::Power::High;
+  case POWER_TURBO: return Channel::Power::Max;
   }
 }
 void
 D868UVCodeplug::gps_settings_t::setTransmitPower(Channel::Power power) {
   switch(power) {
-  case Channel::MinPower:
-  case Channel::LowPower:
+  case Channel::Power::Min:
+  case Channel::Power::Low:
     transmit_power = POWER_LOW;
     break;
-  case Channel::MidPower:
+  case Channel::Power::Mid:
     transmit_power = POWER_MID;
     break;
-  case Channel::HighPower:
+  case Channel::Power::High:
     transmit_power = POWER_HIGH;
     break;
-  case Channel::MaxPower:
+  case Channel::Power::Max:
     transmit_power = POWER_TURBO;
     break;
   }
@@ -1127,8 +1238,8 @@ D868UVCodeplug::gps_settings_t::fromConfig(Config *config, const Flags &flags) {
   }
 
   GPSSystem *sys = config->posSystems()->gpsSystem(0);
-  setTargetID(sys->contact()->number());
-  setTargetType(sys->contact()->type());
+  setTargetID(sys->contactObj()->number());
+  setTargetType(sys->contactObj()->type());
   setManualTXIntervall(sys->period());
   setAutomaticTXIntervall(sys->period());
   if (SelectedChannel::get() == sys->revertChannel()->as<Channel>()) {
@@ -1152,7 +1263,7 @@ D868UVCodeplug::gps_settings_t::linkGPSSystem(uint8_t i, Config *config, Codeplu
   // Find matching contact, if not found -> create one.
   if (nullptr == (cont = config->contacts()->findDigitalContact(getTargetID()))) {
     cont = new DigitalContact(getTargetType(), QString("GPS target"), getTargetID());
-    config->contacts()->addContact(cont);
+    config->contacts()->add(cont);
   }
   ctx.getGPSSystem(i)->setContact(cont);
 
@@ -1166,7 +1277,7 @@ D868UVCodeplug::gps_settings_t::linkGPSSystem(uint8_t i, Config *config, Codeplu
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::contact_map_t
+ * Implementation of D868UVCodeplug::contact_map_t
  * ******************************************************************************************** */
 D868UVCodeplug::contact_map_t::contact_map_t() {
   clear();
@@ -1215,7 +1326,7 @@ D868UVCodeplug::contact_map_t::setIndex(uint32_t index) {
  * Implementation of D868UVCodeplug
  * ******************************************************************************************** */
 D868UVCodeplug::D868UVCodeplug(QObject *parent)
-  : CodePlug(parent)
+  : AnytoneCodeplug(parent)
 {
   addImage("Anytone AT-D868UV Codeplug");
 
@@ -1225,8 +1336,8 @@ D868UVCodeplug::D868UVCodeplug(QObject *parent)
   image(0).addElement(ZONE_BITMAPS, ZONE_BITMAPS_SIZE);
   // Contacts bitmap
   image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
-  // Analog contacts bitmap
-  image(0).addElement(ANALOGCONTACT_BITMAP, ANALOGCONTACT_BITMAP_SIZE);
+  // Analog contacts bytemap
+  image(0).addElement(ANALOGCONTACT_BYTEMAP, ANALOGCONTACT_BYTEMAP_SIZE);
   // RX group list bitmaps
   image(0).addElement(RXGRP_BITMAP, RXGRP_BITMAP_SIZE);
   // Scan list bitmaps
@@ -1240,10 +1351,10 @@ D868UVCodeplug::D868UVCodeplug(QObject *parent)
   // FM Broadcast bitmaps
   image(0).addElement(FMBC_BITMAP, FMBC_BITMAP_SIZE);
   // 5-Tone function bitmaps
-  image(0).addElement(FIVE_TONE_BITMAP, FIVE_TONE_BITMAP_SIZE);
+  image(0).addElement(FIVE_TONE_ID_BITMAP, FIVE_TONE_ID_BITMAP_SIZE);
   // 2-Tone function bitmaps
-  image(0).addElement(TWO_TONE_ENC_BITMAP, TWO_TONE_ENC_BITMAP_SIZE);
-  image(0).addElement(TWO_TONE_DEC_BITMAP, TWO_TONE_DEC_BITMAP_SIZE);
+  image(0).addElement(TWO_TONE_IDS_BITMAP, TWO_TONE_IDS_BITMAP_SIZE);
+  image(0).addElement(TWO_TONE_FUNCTIONS_BITMAP, TWO_TONE_FUNC_BITMAP_SIZE);
 }
 
 void
@@ -1262,25 +1373,25 @@ D868UVCodeplug::allocateUpdated() {
   this->allocateBootSettings();
 
   this->allocateGPSSystems();
-  this->allocateAnalogContacts();
 
   this->allocateSMSMessages();
   this->allocateHotKeySettings();
   this->allocateRepeaterOffsetSettings();
   this->allocateAlarmSettings();
   this->allocateFMBroadcastSettings();
+
+  this->allocate5ToneIDs();
   this->allocate5ToneFunctions();
+  this->allocate5ToneSettings();
+
+  this->allocate2ToneIDs();
   this->allocate2ToneFunctions();
+  this->allocate2ToneSettings();
 
-  image(0).addElement(ADDR_FIVE_TONE_ID_LIST, FIVE_TONE_ID_LIST_SIZE);
-  image(0).addElement(ADDR_FIVE_TONE_SETTINGS, FIVE_TONE_SETTINGS_SIZE);
-  image(0).addElement(ADDR_DTMF_SETTINGS, DTMF_SETTINGS_SIZE);
-  image(0).addElement(ADDR_TWO_TONE_SETTINGS, TWO_TONE_SETTINGS_SIZE);
+  this->allocateDTMFSettings();
 
-  // Unknown memory region
-  image(0).addElement(0x024C1440, 0x030);
-  image(0).addElement(0x024C1700, 0x040);
-  image(0).addElement(0x024C1800, 0x500);
+  image(0).addElement(ADDR_DMR_ENCRYPTION_LIST, DMR_ENCRYPTION_LIST_SIZE);
+  image(0).addElement(ADDR_DMR_ENCRYPTION_KEYS, DMR_ENCRYPTION_KEYS_SIZE);
 }
 
 void
@@ -1288,6 +1399,7 @@ D868UVCodeplug::allocateForEncoding() {
   this->allocateChannels();
   this->allocateZones();
   this->allocateContacts();
+  this->allocateAnalogContacts();
   this->allocateRXGroupLists();
   this->allocateScanLists();
   this->allocateRadioIDs();
@@ -1318,12 +1430,14 @@ D868UVCodeplug::setBitmaps(Config *config)
 {
   // Mark first radio ID as valid
   uint8_t *radioid_bitmap = data(RADIOID_BITMAP);
-  radioid_bitmap[0] |= 1;
+  memset(radioid_bitmap, 0, RADIOID_BITMAP_SIZE);
+  for (int i=0; i<std::min(NUM_RADIOIDS, config->radioIDs()->count()); i++)
+    radioid_bitmap[i/8] |= (1 << (i%8));
 
   // Mark valid channels (set bit)
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
   memset(channel_bitmap, 0, CHANNEL_BITMAP_SIZE);
-  for (int i=0; i<config->channelList()->count(); i++) {
+  for (int i=0; i<std::min(NUM_CHANNELS, config->channelList()->count()); i++) {
     channel_bitmap[i/8] |= (1 << (i%8));
   }
 
@@ -1331,14 +1445,21 @@ D868UVCodeplug::setBitmaps(Config *config)
   uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
   memset(contact_bitmap, 0x00, CONTACTS_BITMAP_SIZE);
   memset(contact_bitmap, 0xff, NUM_CONTACTS/8+1);
-  for (int i=0; i<config->contacts()->digitalCount(); i++) {
+  for (int i=0; i<std::min(NUM_CONTACTS, config->contacts()->digitalCount()); i++) {
     contact_bitmap[i/8] &= ~(1 << (i%8));
+  }
+
+  // Mark valid analog contacts (clear bytes)
+  uint8_t *analog_contact_bitmap = data(ANALOGCONTACT_BYTEMAP);
+  memset(analog_contact_bitmap, 0xff, ANALOGCONTACT_BYTEMAP_SIZE);
+  for (int i=0; i<std::min(NUM_ANALOGCONTACTS, config->contacts()->dtmfCount()); i++) {
+    analog_contact_bitmap[i] = 0x00;
   }
 
   // Mark valid zones (set bits)
   uint8_t *zone_bitmap = data(ZONE_BITMAPS);
   memset(zone_bitmap, 0x00, ZONE_BITMAPS_SIZE);
-  for (int i=0,z=0; i<config->zones()->count(); i++) {
+  for (int i=0,z=0; i<std::min(NUM_ZONES, config->zones()->count()); i++) {
     zone_bitmap[z/8] |= (1 << (z%8)); z++;
     if (config->zones()->zone(i)->B()->count()) {
       zone_bitmap[z/8] |= (1 << (z%8)); z++;
@@ -1348,13 +1469,13 @@ D868UVCodeplug::setBitmaps(Config *config)
   // Mark group lists
   uint8_t *group_bitmap = data(RXGRP_BITMAP);
   memset(group_bitmap, 0x00, RXGRP_BITMAP_SIZE);
-  for (int i=0; i<config->rxGroupLists()->count(); i++)
+  for (int i=0; i<std::min(NUM_RXGRP, config->rxGroupLists()->count()); i++)
     group_bitmap[i/8] |= (1 << (i%8));
 
   // Mark scan lists
   uint8_t *scan_bitmap = data(SCAN_BITMAP);
   memset(scan_bitmap, 0x00, SCAN_BITMAP_SIZE);
-  for (int i=0; i<config->scanlists()->count(); i++) {
+  for (int i=0; i<std::min(NUM_SCAN_LISTS, config->scanlists()->count()); i++) {
     scan_bitmap[i/8] |= (1<<(i%8));
   }
 }
@@ -1376,6 +1497,8 @@ D868UVCodeplug::encode(Config *config, const Flags &flags)
     return false;
 
   if (! this->encodeContacts(config, flags))
+    return false;
+  if (! this->encodeAnalogContacts(config, flags))
     return false;
 
   if (! this->encodeRXGroupLists(config, flags))
@@ -1414,6 +1537,8 @@ D868UVCodeplug::decode(Config *config, CodeplugContext &ctx)
     return false;
 
   if (! this->createContacts(config, ctx))
+    return false;
+  if (! this->createAnalogContacts(config, ctx))
     return false;
 
   if (! this->createRXGroupLists(config, ctx))
@@ -1594,10 +1719,10 @@ D868UVCodeplug::createContacts(Config *config, CodeplugContext &ctx) {
 void
 D868UVCodeplug::allocateAnalogContacts() {
   /* Allocate analog contacts */
-  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BITMAP);
-  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
+  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BYTEMAP);
+  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i+=2) {
     // if disabled -> skip
-    if (0 == analog_contact_bytemap[i])
+    if (0xff == analog_contact_bytemap[i])
       continue;
     uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
     if (nullptr == data(addr, 0)) {
@@ -1605,6 +1730,35 @@ D868UVCodeplug::allocateAnalogContacts() {
     }
   }
   image(0).addElement(ANALOGCONTACT_INDEX_LIST, ANALOGCONTACT_LIST_SIZE);
+}
+
+bool
+D868UVCodeplug::encodeAnalogContacts(Config *config, const Flags &flags) {
+  uint8_t *idxlst = data(ANALOGCONTACT_INDEX_LIST);
+  memset(idxlst, 0xff, ANALOGCONTACT_LIST_SIZE);
+  for (int i=0; i<config->contacts()->dtmfCount(); i++) {
+    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
+        + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
+    analog_contact_t *cont = (analog_contact_t *)data(addr);
+    cont->fromContact(config->contacts()->dtmfContact(i));
+    idxlst[i] = i;
+  }
+  return true;
+}
+
+bool
+D868UVCodeplug::createAnalogContacts(Config *config, CodeplugContext &ctx) {
+  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BYTEMAP);
+  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
+    // if disabled -> skip
+    if (0xff == analog_contact_bytemap[i])
+      continue;
+    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
+        + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
+    analog_contact_t *cont = (analog_contact_t *)data(addr);
+    ctx.addAnalogContact(cont->toContact(), i);
+  }
+  return true;
 }
 
 
@@ -1629,24 +1783,26 @@ D868UVCodeplug::allocateRadioIDs() {
 bool
 D868UVCodeplug::encodeRadioID(Config *config, const Flags &flags) {
   // Encode radio IDs
-  radioid_t *radio_ids = (radioid_t *)data(ADDR_RADIOIDS);
-  radio_ids[0].setId(config->id());
-  radio_ids[0].setName(config->name());
+  for (int i=0; i<config->radioIDs()->count(); i++) {
+    radioid_t *radio_id = (radioid_t *)data(ADDR_RADIOIDS + i*RADIOID_SIZE);
+    radio_id->setName(config->radioIDs()->getId(i)->name());
+    radio_id->setId(config->radioIDs()->getId(i)->number());
+  }
   return true;
 }
 
 bool
 D868UVCodeplug::setRadioID(Config *config, CodeplugContext &ctx) {
   // Find a valid RadioID
-  uint8_t *radio_ids = data(ADDR_RADIOIDS);
+  uint8_t *radio_id_bitmap = data(RADIOID_BITMAP);
   for (uint16_t i=0; i<NUM_RADIOIDS; i++) {
-    radioid_t *id = (radioid_t *)(radio_ids+i*sizeof(radioid_t));
-    if (id->isValid()) {
-      config->setId(id->getId());
-      config->setName(id->getName());
-      return true;
-    }
+    if (0 == (radio_id_bitmap[i/8] & (1 << (i%8))))
+      continue;
+    radioid_t *id = (radioid_t *)data(ADDR_RADIOIDS + i*RADIOID_SIZE);
+    logDebug() << "Store id " << id->getId() << " at idx " << i << ".";
+    ctx.addRadioId(id->getId(), i, id->getName());
   }
+
   return true;
 }
 
@@ -1746,7 +1902,7 @@ D868UVCodeplug::encodeZones(Config *config, const Flags &flags) {
     for (int j=0; j<config->zones()->zone(i)->A()->count(); j++) {
       channels[j] = qToLittleEndian(
             config->channelList()->indexOf(
-              config->zones()->zone(i)->A()->channel(j)));
+              config->zones()->zone(i)->A()->get(j)));
     }
     zidx++;
     if (! config->zones()->zone(i)->B()->count())
@@ -1762,7 +1918,7 @@ D868UVCodeplug::encodeZones(Config *config, const Flags &flags) {
     for (int j=0; j<config->zones()->zone(i)->B()->count(); j++) {
       channels[j] = qToLittleEndian(
             config->channelList()->indexOf(
-              config->zones()->zone(i)->B()->channel(j)));
+              config->zones()->zone(i)->B()->get(j)));
     }
     zidx++;
   }
@@ -1793,7 +1949,7 @@ D868UVCodeplug::createZones(Config *config, CodeplugContext &ctx) {
     if (! extend_last_zone) {
       last_zone = new Zone(zonename);
       // add to config
-      config->zones()->addZone(last_zone);
+      config->zones()->add(last_zone);
     } else {
       // when extending the last zone, chop its name to remove the "... A" part.
       last_zone->setName(last_zonebasename);
@@ -1811,9 +1967,9 @@ D868UVCodeplug::createZones(Config *config, CodeplugContext &ctx) {
         continue;
       // If defined -> add channel to zone obj
       if (extend_last_zone)
-        last_zone->B()->addChannel(ctx.getChannel(cidx));
+        last_zone->B()->add(ctx.getChannel(cidx));
       else
-        last_zone->A()->addChannel(ctx.getChannel(cidx));
+        last_zone->A()->add(ctx.getChannel(cidx));
     }
   }
   return true;
@@ -2023,6 +2179,7 @@ void
 D868UVCodeplug::allocateAlarmSettings() {
   // Alarm settings
   image(0).addElement(ADDR_ALARM_SETTING, ALARM_SETTING_SIZE);
+  image(0).addElement(ADDR_ALARM_SETTING_EXT, ALARM_SETTING_EXT_SIZE);
 }
 
 void
@@ -2032,33 +2189,59 @@ D868UVCodeplug::allocateFMBroadcastSettings() {
 }
 
 void
-D868UVCodeplug::allocate5ToneFunctions() {
+D868UVCodeplug::allocate5ToneIDs() {
   // Allocate 5-tone functions
-  uint8_t *bitmap = data(FIVE_TONE_BITMAP);
-  for (uint8_t i=0; i<NUM_FIVE_TONE_FUNCTIONS; i++) {
+  uint8_t *bitmap = data(FIVE_TONE_ID_BITMAP);
+  for (uint8_t i=0; i<NUM_FIVE_TONE_IDS; i++) {
     uint16_t  bit = i%8, byte = i/8;
     if (0 == (bitmap[byte] & (1<<bit)))
       continue;
-    image(0).addElement(ADDR_FIVE_TONE_FUNCTIONS + i*FIVE_TONE_FUNCTION_SIZE, FIVE_TONE_FUNCTION_SIZE);
+    image(0).addElement(ADDR_FIVE_TONE_ID_LIST + i*FIVE_TONE_ID_SIZE, FIVE_TONE_ID_SIZE);
   }
 }
 
 void
-D868UVCodeplug::allocate2ToneFunctions() {
+D868UVCodeplug::allocate5ToneFunctions() {
+  image(0).addElement(ADDR_FIVE_TONE_FUNCTIONS, FIVE_TONE_FUNCTIONS_SIZE);
+}
+
+void
+D868UVCodeplug::allocate5ToneSettings() {
+  image(0).addElement(ADDR_FIVE_TONE_SETTINGS, FIVE_TONE_SETTINGS_SIZE);
+}
+
+void
+D868UVCodeplug::allocate2ToneIDs() {
   // Allocate 2-tone encoding
-  uint8_t *enc_bitmap = data(TWO_TONE_ENC_BITMAP);
-  for (uint8_t i=0; i<NUM_TWO_TONE_ENC_FUNC; i++) {
+  uint8_t *enc_bitmap = data(TWO_TONE_IDS_BITMAP);
+  for (uint8_t i=0; i<NUM_TWO_TONE_IDS; i++) {
     uint16_t  bit = i%8, byte = i/8;
     if (0 == (enc_bitmap[byte] & (1<<bit)))
       continue;
-    image(0).addElement(ADDR_TWO_TONE_ENC_FUNC + i*TWO_TONE_ENC_FUNC_SIZE, TWO_TONE_ENC_FUNC_SIZE);
+    image(0).addElement(ADDR_TWO_TONE_IDS + i*TWO_TONE_ID_SIZE, TWO_TONE_ID_SIZE);
   }
+}
+
+
+void
+D868UVCodeplug::allocate2ToneFunctions() {
   // Allocate 2-tone decoding
-  uint8_t *dec_bitmap = data(TWO_TONE_DEC_BITMAP);
-  for (uint8_t i=0; i<NUM_TWO_TONE_DEC_FUNC; i++) {
+  uint8_t *dec_bitmap = data(TWO_TONE_FUNCTIONS_BITMAP);
+  for (uint8_t i=0; i<NUM_TWO_TONE_FUNCTIONS; i++) {
     uint16_t  bit = i%8, byte = i/8;
     if (0 == (dec_bitmap[byte] & (1<<bit)))
       continue;
-    image(0).addElement(ADDR_TWO_TONE_DEC_FUNC + i*TWO_TONE_DEC_FUNC_SIZE, TWO_TONE_DEC_FUNC_SIZE);
+    image(0).addElement(ADDR_TWO_TONE_FUNCTIONS + i*TWO_TONE_FUNCTION_SIZE, TWO_TONE_FUNCTION_SIZE);
   }
+}
+
+void
+D868UVCodeplug::allocate2ToneSettings() {
+  image(0).addElement(ADDR_TWO_TONE_SETTINGS, TWO_TONE_SETTINGS_SIZE);
+}
+
+
+void
+D868UVCodeplug::allocateDTMFSettings() {
+  image(0).addElement(ADDR_DTMF_SETTINGS, DTMF_SETTINGS_SIZE);
 }
