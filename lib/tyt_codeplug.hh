@@ -306,9 +306,9 @@ public:
     /** Constructs a generic @c Channel object from the codeplug channel. */
     virtual Channel *toChannelObj() const;
     /** Links a previously constructed channel to the rest of the configuration. */
-    virtual bool linkChannelObj(Channel *c, const CodeplugContext &ctx) const;
+    virtual bool linkChannelObj(Channel *c, Context &ctx) const;
     /** Initializes this codeplug channel from the given generic configuration. */
-    virtual void fromChannelObj(const Channel *c, const CodeplugContext &ctx);
+    virtual void fromChannelObj(const Channel *c, Context &ctx);
   };
 
   /** Implements a VFO channel for TyT radios.
@@ -413,11 +413,11 @@ public:
     virtual void setMemberIndex(uint n, uint16_t idx);
 
     /** Encodes a given zone object. */
-    virtual bool fromZoneObj(const Zone *zone, const CodeplugContext &ctx);
+    virtual bool fromZoneObj(const Zone *zone, Context &ctx);
     /** Creates a zone. */
     virtual Zone *toZoneObj() const;
     /** Links the created zone to channels. */
-    virtual bool linkZone(Zone *zone, const CodeplugContext &ctx) const;
+    virtual bool linkZone(Zone *zone, Context &ctx) const;
   };
 
   /** Extended zone data.
@@ -450,10 +450,10 @@ public:
     virtual void setMemberIndexB(uint n, uint16_t idx);
 
     /** Encodes the given zone. */
-    virtual bool fromZoneObj(const Zone *zone, const CodeplugContext &ctx);
+    virtual bool fromZoneObj(const Zone *zone, Context &ctx);
     /** Links the given zone object.
      * Thant is, extends channel list A and populates channel list B. */
-    virtual bool linkZoneObj(Zone *zone, const CodeplugContext &ctx);
+    virtual bool linkZoneObj(Zone *zone, Context &ctx);
   };
 
   /** Representation of an RX group list within the codeplug.
@@ -486,11 +486,11 @@ public:
     virtual void setMemberIndex(uint n, uint16_t idx);
 
     /** Encodes the given group list. */
-    virtual bool fromGroupListObj(const RXGroupList *lst, const CodeplugContext &ctx);
+    virtual bool fromGroupListObj(const RXGroupList *lst, Context &ctx);
     /** Creates a group list object. */
-    virtual RXGroupList *toGroupListObj(const CodeplugContext &ctx);
+    virtual RXGroupList *toGroupListObj(Context &ctx);
     /** Links the given group list. */
-    virtual bool linkGroupListObj(RXGroupList *lst, const CodeplugContext &ctx);
+    virtual bool linkGroupListObj(RXGroupList *lst, Context &ctx);
   };
 
   /** Represents a scan list within the codeplug.
@@ -548,11 +548,11 @@ public:
     virtual void setMemberIndex(uint n, uint16_t idx);
 
     /** Encodes the given scan list. */
-    virtual bool fromScanListObj(const ScanList *lst, const CodeplugContext &ctx);
+    virtual bool fromScanListObj(const ScanList *lst, Context &ctx);
     /** Creates a scan list. */
-    virtual ScanList *toScanListObj(const CodeplugContext &ctx);
+    virtual ScanList *toScanListObj(Context &ctx);
     /** Links the scan list object. */
-    virtual bool linkScanListObj(ScanList *lst, const CodeplugContext &ctx);
+    virtual bool linkScanListObj(ScanList *lst, Context &ctx);
   };
 
   /** Codeplug representation of the general settings.
@@ -916,11 +916,11 @@ public:
     virtual void disableDestinationContact();
 
     /** Encodes the given GPS system. */
-    virtual bool fromGPSSystemObj(const GPSSystem *sys, const CodeplugContext &ctx);
+    virtual bool fromGPSSystemObj(GPSSystem *sys, Context &ctx);
     /** Constructs a GPS system. */
     virtual GPSSystem *toGPSSystemObj();
     /** Links the given GPS system. */
-    virtual bool linkGPSSystemObj(GPSSystem *sys, const CodeplugContext &ctx);
+    virtual bool linkGPSSystemObj(GPSSystem *sys, Context &ctx);
   };
 
   /** Represents all menu settings within the codeplug on the radio.
@@ -1377,89 +1377,95 @@ public:
   bool encode(Config *config, const Flags &flags = Flags());
 
 public:
+  /** Decodes the binary codeplug and stores its content in the given generic configuration using
+   * the given context. */
+  virtual bool decodeElements(Config *config, Context &ctx);
+  /** Encodes the given generic configuration as a binary codeplug using the given context. */
+  virtual bool encodeElements(Config *config, const Flags &flags, Context &ctx);
+
   /** Clears the time-stamp in the codeplug. */
-  virtual void clearTimestamp();
+  virtual void clearTimestamp() = 0;
   /** Sets the time-stamp. */
-  virtual bool encodeTimestamp();
+  virtual bool encodeTimestamp() = 0;
 
   /** Clears the general settings in the codeplug. */
-  virtual void clearGeneralSettings();
+  virtual void clearGeneralSettings() = 0;
   /** Updates the general settings from the given configuration. */
-  virtual bool encodeGeneralSettings(Config *config, const Flags &flags);
+  virtual bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) = 0;
   /** Updates the given configuration from the general settings. */
-  virtual bool decodeGeneralSettings(Config *config);
+  virtual bool decodeGeneralSettings(Config *config) = 0;
 
   /** Clears all contacts in the codeplug. */
-  virtual void clearContacts();
+  virtual void clearContacts() = 0;
   /** Encodes all digital contacts in the configuration into the codeplug. */
-  virtual bool encodeContacts(Config *config, const Flags &flags);
+  virtual bool encodeContacts(Config *config, const Flags &flags, Context &ctx) = 0;
   /** Adds a digital contact to the configuration for each one in the codeplug. */
-  virtual bool createContacts(CodeplugContext &ctx);
+  virtual bool createContacts(Config *config, Context &ctx) = 0;
 
   /** Clears all RX group lists in the codeplug. */
-  virtual void clearGroupLists();
+  virtual void clearGroupLists() = 0;
   /** Encodes all group lists in the configuration into the codeplug. */
-  virtual bool encodeGroupLists(Config *config, const Flags &flags);
+  virtual bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx) = 0;
   /** Adds a RX group list to the configuration for each one in the codeplug. */
-  virtual bool createGroupLists(CodeplugContext &ctx);
+  virtual bool createGroupLists(Config *config, Context &ctx) = 0;
   /** Links all added RX group lists within the configuration. */
-  virtual bool linkGroupLists(CodeplugContext &ctx);
+  virtual bool linkGroupLists(Context &ctx) = 0;
 
   /** Clears all channels in the codeplug. */
-  virtual void clearChannels();
+  virtual void clearChannels() = 0;
   /** Encodes all channels in the configuration into the codeplug. */
-  virtual bool encodeChannels(Config *config, const Flags &flags);
+  virtual bool encodeChannels(Config *config, const Flags &flags, Context &ctx) = 0;
   /** Adds a channel to the configuration for each one in the codeplug. */
-  virtual bool createChannels(CodeplugContext &ctx);
+  virtual bool createChannels(Config *config, Context &ctx) = 0;
   /** Links all added channels within the configuration. */
-  virtual bool linkChannels(CodeplugContext &ctx);
+  virtual bool linkChannels(Context &ctx) = 0;
 
   /** Clears all zones in the codeplug. */
-  virtual void clearZones();
+  virtual void clearZones() = 0;
   /** Encodes all zones in the configuration into the codeplug. */
-  virtual bool encodeZones(Config *config, const Flags &flags);
+  virtual bool encodeZones(Config *config, const Flags &flags, Context &ctx) = 0;
   /** Adds a zone to the configuration for each one in the codeplug. */
-  virtual bool createZones(CodeplugContext &ctx);
+  virtual bool createZones(Config *config, Context &ctx) = 0;
   /** Links all added zones within the configuration. */
-  virtual bool linkZones(CodeplugContext &ctx);
+  virtual bool linkZones(Context &ctx) = 0;
 
   /** Clears all scan lists in the codeplug. */
-  virtual void clearScanLists();
+  virtual void clearScanLists() = 0;
   /** Encodes all scan lists in the configuration into the codeplug. */
-  virtual bool encodeScanLists(Config *config, const Flags &flags);
+  virtual bool encodeScanLists(Config *config, const Flags &flags, Context &ctx) = 0;
   /** Adds a scan list to the configuration for each one in the codeplug. */
-  virtual bool createScanLists(CodeplugContext &ctx);
+  virtual bool createScanLists(Config *config, Context &ctx) = 0;
   /** Links all added scan lists within the configuration. */
-  virtual bool linkScanLists(CodeplugContext &ctx);
+  virtual bool linkScanLists(Context &ctx) = 0;
 
   /** Clears all positioning systems in the codeplug. */
-  virtual void clearPositioningSystems();
+  virtual void clearPositioningSystems() = 0;
   /** Encodes all DMR positioning systems in the configuration into the codeplug. */
-  virtual bool encodePositioningSystems(Config *config, const Flags &flags);
+  virtual bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx) = 0;
   /** Adds a GPS positioning system to the configuration for each one in the codeplug. */
-  virtual bool createPositioningSystems(CodeplugContext &ctx);
+  virtual bool createPositioningSystems(Config *config, Context &ctx) = 0;
   /** Links all added positioning systems within the configuration. */
-  virtual bool linkPositioningSystems(CodeplugContext &ctx);
+  virtual bool linkPositioningSystems(Context &ctx) = 0;
 
   /** Clears the button settings in the codeplug. */
-  virtual void clearButtonSettings();
+  virtual void clearButtonSettings() = 0;
   /** Encodes the button settings. */
-  virtual bool encodeButtonSettings(Config *config, const Flags &flags);
+  virtual bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx) = 0;
   /** Decodes the button settings. */
-  virtual bool decodeButtonSetttings(Config *config);
+  virtual bool decodeButtonSetttings(Config *config) = 0;
 
   /** Clears the boot settings in the codeplug. */
-  virtual void clearBootSettings();
+  virtual void clearBootSettings() = 0;
   /** Clears the menu settings in the codeplug. */
-  virtual void clearMenuSettings();
+  virtual void clearMenuSettings() = 0;
   /** Clears all text messages in the codeplug. */
-  virtual void clearTextMessages();
+  virtual void clearTextMessages() = 0;
   /** Clears all encryption keys in the codeplug. */
-  virtual void clearPrivacyKeys();
+  virtual void clearPrivacyKeys() = 0;
   /** Clears all emergency systems in the codeplug. */
-  virtual void clearEmergencySystems();
+  virtual void clearEmergencySystems() = 0;
   /** Clears the VFO settings in the codeplug. */
-  virtual void clearVFOSettings();
+  virtual void clearVFOSettings() = 0;
 };
 
 #endif // TYT_CODEPLUG_HH

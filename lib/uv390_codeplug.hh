@@ -61,40 +61,40 @@ public:
   bool encodeTimestamp();
 
   void clearGeneralSettings();
-  bool encodeGeneralSettings(Config *config, const Flags &flags);
+  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx);
   bool decodeGeneralSettings(Config *config);
 
   void clearChannels();
-  bool encodeChannels(Config *config, const Flags &flags);
-  bool createChannels(CodeplugContext &ctx);
-  bool linkChannels(CodeplugContext &ctx);
+  bool encodeChannels(Config *config, const Flags &flags, Context &ctx);
+  bool createChannels(Config *config, Context &ctx);
+  bool linkChannels(Context &ctx);
 
   void clearContacts();
-  bool encodeContacts(Config *config, const Flags &flags);
-  bool createContacts(CodeplugContext &ctx);
+  bool encodeContacts(Config *config, const Flags &flags, Context &ctx);
+  bool createContacts(Config *config, Context &ctx);
 
   void clearZones();
-  bool encodeZones(Config *config, const Flags &flags);
-  bool createZones(CodeplugContext &ctx);
-  bool linkZones(CodeplugContext &ctx);
+  bool encodeZones(Config *config, const Flags &flags, Context &ctx);
+  bool createZones(Config *config, Context &ctx);
+  bool linkZones(Context &ctx);
 
   void clearGroupLists();
-  bool encodeGroupLists(Config *config, const Flags &flags);
-  bool createGroupLists(CodeplugContext &ctx);
-  bool linkGroupLists(CodeplugContext &ctx);
+  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx);
+  bool createGroupLists(Config *config, Context &ctx);
+  bool linkGroupLists(Context &ctx);
 
   void clearScanLists();
-  bool encodeScanLists(Config *config, const Flags &flags);
-  bool createScanLists(CodeplugContext &ctx);
-  bool linkScanLists(CodeplugContext &ctx);
+  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx);
+  bool createScanLists(Config *config, Context &ctx);
+  bool linkScanLists(Context &ctx);
 
   void clearPositioningSystems();
-  bool encodePositioningSystems(Config *config, const Flags &flags);
-  bool createPositioningSystems(CodeplugContext &ctx);
-  bool linkPositioningSystems(CodeplugContext &ctx);
+  bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx);
+  bool createPositioningSystems(Config *config, Context &ctx);
+  bool linkPositioningSystems(Context &ctx);
 
   void clearButtonSettings();
-  bool encodeButtonSettings(Config *config, const Flags &flags);
+  bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx);
   bool decodeButtonSetttings(Config *config);
 
   void clearBootSettings();

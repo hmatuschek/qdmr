@@ -84,7 +84,7 @@ UV390Codeplug::clearGeneralSettings() {
 }
 
 bool
-UV390Codeplug::encodeGeneralSettings(Config *config, const Flags &flags) {
+UV390Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) {
   return GeneralSettingsElement(data(ADDR_SETTINGS)).fromConfig(config);
 }
 
@@ -101,9 +101,7 @@ UV390Codeplug::clearChannels() {
 }
 
 bool
-UV390Codeplug::encodeChannels(Config *config, const Flags &flags) {
-  CodeplugContext ctx(config);
-
+UV390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) {
   // Define Channels
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
@@ -117,14 +115,14 @@ UV390Codeplug::encodeChannels(Config *config, const Flags &flags) {
 }
 
 bool
-UV390Codeplug::createChannels(CodeplugContext &ctx) {
+UV390Codeplug::createChannels(Config *config, Context &ctx) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
       break;
-    if (Channel *obj = chan.toChannelObj())
-      ctx.addChannel(obj, i+1);
-    else {
+    if (Channel *obj = chan.toChannelObj()) {
+      config->channelList()->add(obj); ctx.add(obj, i+1);
+    } else {
       _errorMessage = QString("Cannot decode codeplug: Invlaid channel at index %1.").arg(i);
       logError() << _errorMessage;
       return false;
@@ -134,12 +132,12 @@ UV390Codeplug::createChannels(CodeplugContext &ctx) {
 }
 
 bool
-UV390Codeplug::linkChannels(CodeplugContext &ctx) {
+UV390Codeplug::linkChannels(Context &ctx) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
       break;
-    if (! chan.linkChannelObj(ctx.getChannel(i+1), ctx)) {
+    if (! chan.linkChannelObj(ctx.get<Channel>(i+1), ctx)) {
       _errorMessage = QString("Cannot decode TyT codeplug: Cannot link channel at index %1.").arg(i);
       logError() << _errorMessage;
       return false;
@@ -156,7 +154,7 @@ UV390Codeplug::clearContacts() {
 }
 
 bool
-UV390Codeplug::encodeContacts(Config *config, const Flags &flags) {
+UV390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) {
   // Encode contacts
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
@@ -169,14 +167,14 @@ UV390Codeplug::encodeContacts(Config *config, const Flags &flags) {
 }
 
 bool
-UV390Codeplug::createContacts(CodeplugContext &ctx) {
+UV390Codeplug::createContacts(Config *config, Context &ctx) {
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
     if (! cont.isValid())
       break;
-    if (DigitalContact *obj = cont.toContactObj())
-      ctx.addDigitalContact(obj, i+1);
-    else {
+    if (DigitalContact *obj = cont.toContactObj()) {
+      config->contacts()->add(obj); ctx.add(obj, i+1);
+    } else {
       _errorMessage = QString("Cannot decode TyT codeplug: Invlaid contact at index %1.").arg(i);
       logError() << _errorMessage;
       return false;
@@ -195,29 +193,29 @@ UV390Codeplug::clearZones() {
 }
 
 bool
-UV390Codeplug::encodeZones(Config *config, const Flags &flags) {
+UV390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
     ZoneExtElement ext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
     zone.clear();
     ext.clear();
     if (i < config->zones()->count()) {
-      zone.fromZoneObj(config->zones()->zone(i), config);
+      zone.fromZoneObj(config->zones()->zone(i), ctx);
       if (config->zones()->zone(i)->B()->count() || (16 < config->zones()->zone(i)->A()->count()))
-        ext.fromZoneObj(config->zones()->zone(i), config);
+        ext.fromZoneObj(config->zones()->zone(i), ctx);
     }
   }
   return true;
 }
 
 bool
-UV390Codeplug::createZones(CodeplugContext &ctx) {
+UV390Codeplug::createZones(Config *config, Context &ctx) {
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
       break;
     if (Zone *obj = zone.toZoneObj()) {
-      ctx.config()->zones()->add(obj);
+      config->zones()->add(obj); ctx.add(obj, i+1);
     } else {
       _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid zone at index %2.")
           .arg(__func__).arg(i);
@@ -230,18 +228,18 @@ UV390Codeplug::createZones(CodeplugContext &ctx) {
 }
 
 bool
-UV390Codeplug::linkZones(CodeplugContext &ctx) {
+UV390Codeplug::linkZones(Context &ctx) {
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
       break;
-    if (! zone.linkZone(ctx.config()->zones()->zone(i), ctx)) {
+    if (! zone.linkZone(ctx.get<Zone>(i+1), ctx)) {
       _errorMessage = QString("Cannot decode TyT codeplug: Cannot link zone at index %1.").arg(i);
       logError() << _errorMessage;
       return false;
     }
     ZoneExtElement zoneext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
-    if (! zoneext.linkZoneObj(ctx.config()->zones()->zone(i), ctx)) {
+    if (! zoneext.linkZoneObj(ctx.get<Zone>(i+1), ctx)) {
       _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link zone extension at index %2.")
           .arg(__func__).arg(i);
       logError() << _errorMessage;
@@ -259,11 +257,11 @@ UV390Codeplug::clearGroupLists() {
 }
 
 bool
-UV390Codeplug::encodeGroupLists(Config *config, const Flags &flags) {
+UV390Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (i < config->rxGroupLists()->count())
-      glist.fromGroupListObj(config->rxGroupLists()->list(i), config);
+      glist.fromGroupListObj(config->rxGroupLists()->list(i), ctx);
     else
       glist.clear();
   }
@@ -271,14 +269,14 @@ UV390Codeplug::encodeGroupLists(Config *config, const Flags &flags) {
 }
 
 bool
-UV390Codeplug::createGroupLists(CodeplugContext &ctx) {
+UV390Codeplug::createGroupLists(Config *config, Context &ctx) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
       break;
-    if (RXGroupList *obj = glist.toGroupListObj(ctx))
-      ctx.addGroupList(obj, i+1);
-    else {
+    if (RXGroupList *obj = glist.toGroupListObj(ctx)) {
+      config->rxGroupLists()->add(obj); ctx.add(obj, i+1);
+    } else {
       _errorMessage = QString("Cannot decode codeplug: Invlaid RX group list at index %1.").arg(i);
       logError() << _errorMessage;
       return false;
@@ -288,12 +286,12 @@ UV390Codeplug::createGroupLists(CodeplugContext &ctx) {
 }
 
 bool
-UV390Codeplug::linkGroupLists(CodeplugContext &ctx) {
+UV390Codeplug::linkGroupLists(Context &ctx) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
       break;
-    if (! glist.linkGroupListObj(ctx.getGroupList(i+1), ctx)) {
+    if (! glist.linkGroupListObj(ctx.get<RXGroupList>(i+1), ctx)) {
       _errorMessage = QString("Cannot decode codeplug: Cannot link group-list at index %1.").arg(i);
       logError() << _errorMessage;
       return false;
@@ -310,12 +308,12 @@ UV390Codeplug::clearScanLists() {
 }
 
 bool
-UV390Codeplug::encodeScanLists(Config *config, const Flags &flags) {
+UV390Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx) {
   // Define Scanlists
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (i < config->scanlists()->count())
-      scan.fromScanListObj(config->scanlists()->scanlist(i), config);
+      scan.fromScanListObj(config->scanlists()->scanlist(i), ctx);
     else
       scan.clear();
   }
@@ -323,14 +321,14 @@ UV390Codeplug::encodeScanLists(Config *config, const Flags &flags) {
 }
 
 bool
-UV390Codeplug::createScanLists(CodeplugContext &ctx) {
+UV390Codeplug::createScanLists(Config *config, Context &ctx) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
       break;
-    if (ScanList *obj = scan.toScanListObj(ctx))
-      ctx.addScanList(obj, i+1);
-    else {
+    if (ScanList *obj = scan.toScanListObj(ctx)) {
+      config->scanlists()->add(obj); ctx.add(obj, i+1);
+    } else {
       _errorMessage = QString("Cannot decode TyT codeplug: Invlaid scanlist at index %1.").arg(i);
       logError() << _errorMessage;
       return false;
@@ -340,13 +338,13 @@ UV390Codeplug::createScanLists(CodeplugContext &ctx) {
 }
 
 bool
-UV390Codeplug::linkScanLists(CodeplugContext &ctx) {
+UV390Codeplug::linkScanLists(Context &ctx) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
       break;
 
-    if (! scan.linkScanListObj(ctx.getScanList(i+1), ctx)) {
+    if (! scan.linkScanListObj(ctx.get<ScanList>(i+1), ctx)) {
       _errorMessage = QString("Cannot decode codeplug: Cannot link scan-list at index %1.").arg(i);
       logError() << _errorMessage;
       return false;
@@ -364,11 +362,11 @@ UV390Codeplug::clearPositioningSystems() {
 }
 
 bool
-UV390Codeplug::encodePositioningSystems(Config *config, const Flags &flags) {
+UV390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (i < config->posSystems()->gpsCount())
-      gps.fromGPSSystemObj(config->posSystems()->gpsSystem(i), config);
+      gps.fromGPSSystemObj(config->posSystems()->gpsSystem(i), ctx);
     else
       gps.clear();
   }
@@ -376,13 +374,13 @@ UV390Codeplug::encodePositioningSystems(Config *config, const Flags &flags) {
 }
 
 bool
-UV390Codeplug::createPositioningSystems(CodeplugContext &ctx) {
+UV390Codeplug::createPositioningSystems(Config *config, Context &ctx) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
       break;
     if (GPSSystem *obj = gps.toGPSSystemObj()) {
-      ctx.addGPSSystem(obj, i+1);
+      config->posSystems()->add(obj); ctx.add(obj, i+1);
     } else {
       _errorMessage = QString("Cannot decode codeplug: Invlaid GPS system at index %1.").arg(i);
       logError() << _errorMessage;
@@ -394,12 +392,12 @@ UV390Codeplug::createPositioningSystems(CodeplugContext &ctx) {
 }
 
 bool
-UV390Codeplug::linkPositioningSystems(CodeplugContext &ctx) {
+UV390Codeplug::linkPositioningSystems(Context &ctx) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
       break;
-    if (! gps.linkGPSSystemObj(ctx.config()->posSystems()->gpsSystem(i), ctx)) {
+    if (! gps.linkGPSSystemObj(ctx.get<GPSSystem>(i+1), ctx)) {
       _errorMessage = QString("Cannot decode codeplug: Cannot link GPS system at index %1.").arg(i);
       logError() << _errorMessage;
       return false;
@@ -415,7 +413,7 @@ UV390Codeplug::clearButtonSettings() {
 }
 
 bool
-UV390Codeplug::encodeButtonSettings(Config *config, const Flags &flags) {
+UV390Codeplug::encodeButtonSettings(Config *config, const Flags &flags, Context &ctx) {
   // Encode settings
   return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(config);
 }

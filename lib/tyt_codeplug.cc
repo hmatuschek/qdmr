@@ -531,27 +531,27 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
 }
 
 bool
-TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, const CodeplugContext &ctx) const
+TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
 {
   if (! isValid())
     return false;
 
-  if (scanListIndex() && ctx.hasScanList(scanListIndex())) {
-    c->setScanListObj(ctx.getScanList(scanListIndex()));
+  if (scanListIndex() && ctx.has<ScanList>(scanListIndex())) {
+    c->setScanListObj(ctx.get<ScanList>(scanListIndex()));
   }
 
   if (MODE_ANALOG == mode()) {
     return true;
   } else if ((MODE_DIGITAL == mode()) && (c->is<DigitalChannel>())){
     DigitalChannel *dc = c->as<DigitalChannel>();
-    if (contactIndex() && ctx.hasDigitalContact(contactIndex())) {
-      dc->setTXContactObj(ctx.getDigitalContact(contactIndex()));
+    if (contactIndex() && ctx.has<DigitalContact>(contactIndex())) {
+      dc->setTXContactObj(ctx.get<DigitalContact>(contactIndex()));
     }
-    if (groupListIndex() && ctx.hasGroupList(groupListIndex())) {
-      dc->setGroupListObj(ctx.getGroupList(groupListIndex()));
+    if (groupListIndex() && ctx.has<RXGroupList>(groupListIndex())) {
+      dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
     }
-    if (positioningSystemIndex() && ctx.hasGPSSystem(positioningSystemIndex())) {
-      dc->aprsObj(ctx.getGPSSystem(positioningSystemIndex()));
+    if (positioningSystemIndex() && ctx.has<GPSSystem>(positioningSystemIndex())) {
+      dc->aprsObj(ctx.get<GPSSystem>(positioningSystemIndex()));
     }
     return true;
   }
@@ -560,14 +560,14 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, const CodeplugContext &c
 }
 
 void
-TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugContext &ctx) {
+TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
   setName(chan->name());
   setRXFrequency(chan->rxFrequency()*1e6);
   setTXFrequency(chan->txFrequency()*1e6);
   enableRXOnly(chan->rxOnly());
   setTXTimeOut(chan->timeout());
   if (chan->scanListObj())
-    setScanListIndex(ctx.config()->scanlists()->indexOf(chan->scanListObj())+1);
+    setScanListIndex(ctx.index(chan->scanListObj()));
   else
     setScanListIndex(0);
 
@@ -585,17 +585,17 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, const CodeplugC
     setColorCode(dchan->colorCode());
     setTimeSlot(dchan->timeSlot());
     if (dchan->groupListObj())
-      setGroupListIndex(ctx.config()->rxGroupLists()->indexOf(dchan->groupListObj())+1);
+      setGroupListIndex(ctx.index(dchan->groupListObj()));
     else
       setGroupListIndex(0);
     if (dchan->txContactObj())
-      setContactIndex(ctx.config()->contacts()->indexOfDigital(dchan->txContactObj())+1);
+      setContactIndex(ctx.index(dchan->txContactObj()));
     setSquelch(0);
     setBandwidth(AnalogChannel::Bandwidth::Narrow);
     setRXSignaling(Signaling::SIGNALING_NONE);
     setTXSignaling(Signaling::SIGNALING_NONE);
     if (dchan->aprsObj() && dchan->aprsObj()->is<GPSSystem>()) {
-      setPositioningSystemIndex(ctx.config()->posSystems()->indexOfGPSSys(dchan->aprsObj()->as<GPSSystem>())+1);
+      setPositioningSystemIndex(ctx.index(dchan->aprsObj()->as<GPSSystem>()));
       enableTXGPSInfo(true); enableRXGPSInfo(false);
     }
   } else if (chan->is<AnalogChannel>()) {
@@ -805,11 +805,11 @@ TyTCodeplug::ZoneElement::setMemberIndex(uint n, uint16_t idx) {
 }
 
 bool
-TyTCodeplug::ZoneElement::fromZoneObj(const Zone *zone, const CodeplugContext &ctx) {
+TyTCodeplug::ZoneElement::fromZoneObj(const Zone *zone, Context &ctx) {
   setName(zone->name());
   for (int i=0; i<16; i++) {
     if (i < zone->A()->count())
-      setMemberIndex(i, ctx.config()->channelList()->indexOf(zone->A()->get(i))+1);
+      setMemberIndex(i, ctx.index(zone->A()->get(i)));
     else
       setMemberIndex(i, 0);
   }
@@ -824,16 +824,16 @@ TyTCodeplug::ZoneElement::toZoneObj() const {
 }
 
 bool
-TyTCodeplug::ZoneElement::linkZone(Zone *zone, const CodeplugContext &ctx) const {
+TyTCodeplug::ZoneElement::linkZone(Zone *zone, Context &ctx) const {
   if (! isValid())
     return false;
 
   for (int i=0; ((i<16) && memberIndex(i)); i++) {
-    if (! ctx.hasChannel(memberIndex(i))) {
+    if (! ctx.has<Channel>(memberIndex(i))) {
       logWarn() << "Cannot link channel with index " << memberIndex(i) << " channel not defined.";
       continue;
     }
-    zone->A()->add(ctx.getChannel(memberIndex(i)));
+    zone->A()->add(ctx.get<Channel>(memberIndex(i)));
   }
 
   return true;
@@ -885,18 +885,18 @@ TyTCodeplug::ZoneExtElement::setMemberIndexB(uint n, uint16_t idx) {
 }
 
 bool
-TyTCodeplug::ZoneExtElement::fromZoneObj(const Zone *zone, const CodeplugContext &ctx) {
+TyTCodeplug::ZoneExtElement::fromZoneObj(const Zone *zone, Context &ctx) {
   // Store remaining channels from list A
   for (int i=16; i<64; i++) {
     if (i < zone->A()->count())
-      setMemberIndexA(i-16, ctx.config()->channelList()->indexOf(zone->A()->get(i))+1);
+      setMemberIndexA(i-16, ctx.index(zone->A()->get(i)));
     else
       setMemberIndexA(i-16, 0);
   }
   // Store channel from list B
   for (int i=0; i<64; i++) {
     if (i < zone->B()->count())
-      setMemberIndexB(i, ctx.config()->channelList()->indexOf(zone->B()->get(i))+1);
+      setMemberIndexB(i, ctx.index(zone->B()->get(i)));
     else
       setMemberIndexB(i, 0);
   }
@@ -905,21 +905,21 @@ TyTCodeplug::ZoneExtElement::fromZoneObj(const Zone *zone, const CodeplugContext
 }
 
 bool
-TyTCodeplug::ZoneExtElement::linkZoneObj(Zone *zone, const CodeplugContext &ctx) {
+TyTCodeplug::ZoneExtElement::linkZoneObj(Zone *zone, Context &ctx) {
   for (int i=0; (i<48) && memberIndexA(i); i++) {
-    if (! ctx.hasChannel(memberIndexA(i))) {
+    if (! ctx.has<Channel>(memberIndexA(i))) {
       logWarn() << "Cannot link zone extension: Channel index " << memberIndexA(i) << " not defined.";
       return false;
     }
-    zone->A()->add(ctx.getChannel(memberIndexA(i)));
+    zone->A()->add(ctx.get<Channel>(memberIndexA(i)));
   }
 
   for (int i=0; (i<64) && memberIndexB(i); i++) {
-    if (! ctx.hasChannel(memberIndexB(i))) {
+    if (! ctx.has<Channel>(memberIndexB(i))) {
       logWarn() << "Cannot link zone extension: Channel index " << memberIndexB(i) << " not defined.";
       return false;
     }
-    zone->B()->add(ctx.getChannel(memberIndexB(i)));
+    zone->B()->add(ctx.get<Channel>(memberIndexB(i)));
   }
 
   return true;
@@ -976,13 +976,13 @@ TyTCodeplug::GroupListElement::setMemberIndex(uint n, uint16_t idx) {
 }
 
 bool
-TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, const CodeplugContext &ctx) {
-  logDebug() << "Encode group list '" << lst->name() << "' with " << lst->count() << " members.";
+TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context &ctx) {
+  //logDebug() << "Encode group list '" << lst->name() << "' with " << lst->count() << " members.";
   setName(lst->name());
   for (int i=0; i<32; i++) {
     if (i<lst->count()) {
       logDebug() << "Add contact " << lst->contact(i)->name() << " to list.";
-      setMemberIndex(i, ctx.config()->contacts()->indexOfDigital(lst->contact(i)) + 1);
+      setMemberIndex(i, ctx.index(lst->contact(i)));
     } else {
       setMemberIndex(i, 0);
     }
@@ -991,26 +991,26 @@ TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, const Co
 }
 
 RXGroupList *
-TyTCodeplug::GroupListElement::toGroupListObj(const CodeplugContext &ctx) {
+TyTCodeplug::GroupListElement::toGroupListObj(Context &ctx) {
   if (! isValid())
     return nullptr;
   return new RXGroupList(name());
 }
 
 bool
-TyTCodeplug::GroupListElement::linkGroupListObj(RXGroupList *lst, const CodeplugContext &ctx) {
+TyTCodeplug::GroupListElement::linkGroupListObj(RXGroupList *lst, Context &ctx) {
   if (! isValid())
     return false;
 
   for (int i=0; (i<32) && memberIndex(i); i++) {
-    if (! ctx.hasDigitalContact(memberIndex(i))) {
+    if (! ctx.has<DigitalContact>(memberIndex(i))) {
       logWarn() << "Cannot link contact " << memberIndex(i) << " to group list '"
                 << name() << "': Invalid contact index. Ignored.";
       continue;
     }
     logDebug() << "Add contact idx=" << memberIndex(i) << " to group list " << lst->name() << ".";
-    if (0 > lst->addContact(ctx.getDigitalContact(memberIndex(i)))) {
-      logWarn() << "Cannot add contact '" << ctx.getDigitalContact(memberIndex(i))->name()
+    if (0 > lst->addContact(ctx.get<DigitalContact>(memberIndex(i)))) {
+      logWarn() << "Cannot add contact '" << ctx.get<DigitalContact>(memberIndex(i))->name()
                 << "' at idx=" << memberIndex(i) << ".";
       continue;
     }
@@ -1128,7 +1128,7 @@ TyTCodeplug::ScanListElement::setMemberIndex(uint n, uint16_t idx) {
 }
 
 bool
-TyTCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, const CodeplugContext &ctx) {
+TyTCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, Context &ctx) {
   // Set name
   setName(lst->name());
 
@@ -1136,19 +1136,25 @@ TyTCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, const Codeplu
   if (lst->primaryChannel() && (SelectedChannel::get() == lst->primaryChannel()))
     setPriorityChannel1Index(0);
   else if (lst->primaryChannel())
-    setPriorityChannel1Index(ctx.config()->channelList()->indexOf(lst->primaryChannel())+1);
+    setPriorityChannel1Index(ctx.index(lst->primaryChannel()));
+  else
+    setPriorityChannel1Index(0xffff);
 
   // Set priority channel 2
   if (lst->secondaryChannel() && (SelectedChannel::get() == lst->secondaryChannel()))
     setPriorityChannel2Index(0);
   else if (lst->secondaryChannel())
-    setPriorityChannel2Index(ctx.config()->channelList()->indexOf(lst->secondaryChannel())+1);
+    setPriorityChannel2Index(ctx.index(lst->secondaryChannel()));
+  else
+    setPriorityChannel2Index(0xffff);
 
   // Set transmit channel
   if (lst->revertChannel() && (SelectedChannel::get() == lst->revertChannel()))
     setTXChannelIndex(0);
   else if (lst->revertChannel())
-    setTXChannelIndex(ctx.config()->channelList()->indexOf(lst->revertChannel())+1);
+    setTXChannelIndex(ctx.index(lst->revertChannel()));
+  else
+    setTXChannelIndex(0xffff);
 
   for (int i=0, j=0; i<31;) {
     if (j >= lst->count()) {
@@ -1157,7 +1163,7 @@ TyTCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, const Codeplu
       logInfo() << "Cannot encode '" << lst->channel(j) << "' for UV390: skip.";
       j++;
     } else {
-      setMemberIndex(i++, ctx.config()->channelList()->indexOf(lst->channel(j++))+1);
+      setMemberIndex(i++, ctx.index(lst->channel(j++)));
     }
   }
 
@@ -1165,14 +1171,14 @@ TyTCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, const Codeplu
 }
 
 ScanList *
-TyTCodeplug::ScanListElement::toScanListObj(const CodeplugContext &ctx) {
+TyTCodeplug::ScanListElement::toScanListObj(Context &ctx) {
   if (! isValid())
     return nullptr;
   return new ScanList(name());
 }
 
 bool
-TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, const CodeplugContext &ctx) {
+TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) {
   if (! isValid()) {
     logDebug() << "Cannot link invalid scanlist.";
     return false;
@@ -1180,8 +1186,8 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, const CodeplugConte
 
   if (0 == priorityChannel1Index())
     lst->setPrimaryChannel(SelectedChannel::get());
-  else if (ctx.hasChannel(priorityChannel1Index()))
-    lst->setPrimaryChannel(ctx.getChannel(priorityChannel1Index()));
+  else if (ctx.has<Channel>(priorityChannel1Index()))
+    lst->setPrimaryChannel(ctx.get<Channel>(priorityChannel1Index()));
   else if (0xffff == priorityChannel1Index())
     lst->setPrimaryChannel(nullptr);
   else
@@ -1190,8 +1196,8 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, const CodeplugConte
 
   if (0 == priorityChannel2Index())
     lst->setSecondaryChannel(SelectedChannel::get());
-  else if (ctx.hasChannel(priorityChannel2Index()))
-    lst->setSecondaryChannel(ctx.getChannel(priorityChannel2Index()));
+  else if (ctx.has<Channel>(priorityChannel2Index()))
+    lst->setSecondaryChannel(ctx.get<Channel>(priorityChannel2Index()));
   else if (0xffff == priorityChannel2Index())
     lst->setSecondaryChannel(nullptr);
   else
@@ -1200,8 +1206,8 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, const CodeplugConte
 
   if (0 == txChannelIndex())
     lst->setRevertChannel(SelectedChannel::get());
-  else if (ctx.hasChannel(txChannelIndex()))
-    lst->setRevertChannel(ctx.getChannel(txChannelIndex()));
+  else if (ctx.has<Channel>(txChannelIndex()))
+    lst->setRevertChannel(ctx.get<Channel>(txChannelIndex()));
   else if (0xffff == priorityChannel2Index())
     lst->setSecondaryChannel(nullptr);
   else
@@ -1209,12 +1215,12 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, const CodeplugConte
                 << " in scan list '" << name() << "'.";
 
   for (int i=0; ((i<31) && memberIndex(i)); i++) {
-    if (! ctx.hasChannel(memberIndex(i))) {
+    if (! ctx.has<Channel>(memberIndex(i))) {
       logDebug() << "Cannot link scanlist to channel idx " << memberIndex(i)
                     << ". Uknown channel index.";
       return false;
     }
-    lst->addChannel(ctx.getChannel(memberIndex(i)));
+    lst->addChannel(ctx.get<Channel>(memberIndex(i)));
   }
 
   return true;
@@ -1990,12 +1996,12 @@ TyTCodeplug::GPSSystemElement::disableDestinationContact() {
 }
 
 bool
-TyTCodeplug::GPSSystemElement::fromGPSSystemObj(const GPSSystem *sys, const CodeplugContext &ctx) {
+TyTCodeplug::GPSSystemElement::fromGPSSystemObj(GPSSystem *sys, Context &ctx) {
   clear();
   if (sys->hasContact())
-    setDestinationContactIndex(ctx.config()->posSystems()->indexOfGPSSys(sys)+1);
+    setDestinationContactIndex(ctx.index(sys));
   if (sys->hasRevertChannel())
-    setRevertChannelIndex(ctx.config()->channelList()->indexOf(sys->revertChannel())+1);
+    setRevertChannelIndex(ctx.index(sys->revertChannel()));
   setRepeatInterval(sys->period());
   return true;
 }
@@ -2006,17 +2012,17 @@ TyTCodeplug::GPSSystemElement::toGPSSystemObj() {
 }
 
 bool
-TyTCodeplug::GPSSystemElement::linkGPSSystemObj(GPSSystem *sys, const CodeplugContext &ctx) {
+TyTCodeplug::GPSSystemElement::linkGPSSystemObj(GPSSystem *sys, Context &ctx) {
   if (! isValid())
     return false;
 
-  if ((! destinationContactDisabled()) && (ctx.hasDigitalContact(destinationContactIndex())))
-    sys->setContact(ctx.getDigitalContact(destinationContactIndex()));
+  if ((! destinationContactDisabled()) && (ctx.has<DigitalContact>(destinationContactIndex())))
+    sys->setContact(ctx.get<DigitalContact>(destinationContactIndex()));
 
   if (revertChannelIsSelected())
     sys->setRevertChannel(nullptr);
-  else if (ctx.hasChannel(revertChannelIndex()) && ctx.getChannel(revertChannelIndex())->is<DigitalChannel>())
-    sys->setRevertChannel(ctx.getChannel(revertChannelIndex())->as<DigitalChannel>());
+  else if (ctx.has<Channel>(revertChannelIndex()) && ctx.get<Channel>(revertChannelIndex())->is<DigitalChannel>())
+    sys->setRevertChannel(ctx.get<Channel>(revertChannelIndex())->as<DigitalChannel>());
 
   return true;
 }
@@ -2968,55 +2974,77 @@ TyTCodeplug::encode(Config *config, const Flags &flags) {
     return false;
   }
 
+  // Create index<->object table.
+  Context ctx;
+  if (! index(config, ctx))
+    return false;
+
+  return this->encodeElements(config, flags, ctx);
+}
+
+bool
+TyTCodeplug::decode(Config *config) {
+  // Create index<->object table.
+  Context ctx;
+
+  // Clear config object
+  config->reset();
+
+  return this->decodeElements(config, ctx);
+}
+
+bool
+TyTCodeplug::encodeElements(Config *config, const Flags &flags, Context &ctx)
+{
   // Set timestamp
   if (! this->encodeTimestamp()) {
     _errorMessage = tr("Cannot encode time-stamp: %1").arg(_errorMessage);
     return false;
   }
   // General config
-  if (! this->encodeGeneralSettings(config, flags)) {
+  if (! this->encodeGeneralSettings(config, flags, ctx)) {
     _errorMessage = tr("Cannot encode general settings: %1").arg(_errorMessage);
     return false;
   }
 
   // Define Contacts
-  if (! this->encodeContacts(config, flags)) {
+  if (! this->encodeContacts(config, flags, ctx)) {
     _errorMessage = tr("Cannot encode contacts: %1").arg(_errorMessage);
     return false;
   }
 
   // Define RX GroupLists
-  if (! this->encodeGroupLists(config, flags)) {
+  if (! this->encodeGroupLists(config, flags, ctx)) {
     _errorMessage = tr("Cannot encode group lists: %1").arg(_errorMessage);
     return false;
   }
 
   // Define Channels
-  if (! this->encodeChannels(config, flags)) {
+  if (! this->encodeChannels(config, flags, ctx)) {
     _errorMessage = tr("Cannot encode channels: %1").arg(_errorMessage);
     return false;
   }
 
   // Define Zones
-  if (! this->encodeZones(config, flags)) {
+  if (! this->encodeZones(config, flags, ctx)) {
     _errorMessage = tr("Cannot encode zones: %1").arg(_errorMessage);
     return false;
   }
 
   // Define Scanlists
-  if (! this->encodeScanLists(config, flags)) {
+  if (! this->encodeScanLists(config, flags, ctx)) {
     _errorMessage = tr("Cannot encode scan lists: %1").arg(_errorMessage);
     return false;
   }
 
   // Define GPS systems
-  if (! this->encodePositioningSystems(config, flags)) {
+  if (! this->encodePositioningSystems(config, flags, ctx)) {
     _errorMessage = tr("Cannot encode positioning systems: %1").arg(_errorMessage);
     return false;
   }
 
   // Encode button settings
-  if (! this->encodeButtonSettings(config, flags)) {
+  if (! this->encodeButtonSettings(config, flags, ctx)) {
     _errorMessage = tr("Cannot encode button settings: %1").arg(_errorMessage);
     return false;
   }
@@ -3025,13 +3053,7 @@ TyTCodeplug::encode(Config *config, const Flags &flags) {
 }
 
 bool
-TyTCodeplug::decode(Config *config) {
-  // Create index<->object table.
-  CodeplugContext ctx(config);
-
-  // Clear config object
-  config->reset();
-
+TyTCodeplug::decodeElements(Config *config, Context &ctx) {
   // General config
   if (! this->decodeGeneralSettings(config)) {
     _errorMessage = tr("Cannot decode general settings: %1").arg(_errorMessage);
@@ -3039,37 +3061,37 @@ TyTCodeplug::decode(Config *config) {
   }
 
   // Define Contacts
-  if (! this->createContacts(ctx)) {
+  if (! this->createContacts(config, ctx)) {
     _errorMessage = tr("Cannot create contacts: %1").arg(_errorMessage);
     return false;
   }
 
   // Define RX GroupLists
-  if (! this->createGroupLists(ctx)) {
+  if (! this->createGroupLists(config, ctx)) {
     _errorMessage = tr("Cannot create group lists: %1").arg(_errorMessage);
     return false;
   }
 
   // Define Channels
-  if (! this->createChannels(ctx)) {
+  if (! this->createChannels(config, ctx)) {
     _errorMessage = tr("Cannot create channels: %1").arg(_errorMessage);
     return false;
   }
 
   // Define Zones
-  if (! this->createZones(ctx)) {
+  if (! this->createZones(config, ctx)) {
     _errorMessage = tr("Cannot create zones: %1").arg(_errorMessage);
     return false;
   }
 
   // Define Scanlists
-  if (! this->createScanLists(ctx)) {
+  if (! this->createScanLists(config, ctx)) {
     _errorMessage = tr("Cannot create scan lists: %1").arg(_errorMessage);
     return false;
   }
 
   // Define GPS systems
-  if (! this->createPositioningSystems(ctx)) {
+  if (! this->createPositioningSystems(config, ctx)) {
     _errorMessage = tr("Cannot create positioning systems: %1").arg(_errorMessage);
     return false;
   }
@@ -3113,198 +3135,3 @@ TyTCodeplug::decode(Config *config) {
   return true;
 }
 
-
-void
-TyTCodeplug::clearTimestamp() {
-  // pass...
-}
-
-bool
-TyTCodeplug::encodeTimestamp() {
-  return true;
-}
-
-
-void
-TyTCodeplug::clearGeneralSettings() {
-  // pass...
-}
-
-bool
-TyTCodeplug::encodeGeneralSettings(Config *config, const Flags &flags) {
-  return true;
-}
-
-bool
-TyTCodeplug::decodeGeneralSettings(Config *config) {
-  return true;
-}
-
-
-void
-TyTCodeplug::clearContacts() {
-  // pass...
-}
-
-bool
-TyTCodeplug::encodeContacts(Config *config, const Flags &flags) {
-  return true;
-}
-
-bool
-TyTCodeplug::createContacts(CodeplugContext &ctx) {
-  return true;
-}
-
-
-void
-TyTCodeplug::clearGroupLists() {
-  // pass...
-}
-
-bool
-TyTCodeplug::encodeGroupLists(Config *config, const Flags &flags) {
-  return true;
-}
-
-bool
-TyTCodeplug::createGroupLists(CodeplugContext &ctx) {
-  return true;
-}
-
-bool
-TyTCodeplug::linkGroupLists(CodeplugContext &ctx) {
-  return true;
-}
-
-
-void
-TyTCodeplug::clearChannels() {
-  // pass...
-}
-
-bool
-TyTCodeplug::encodeChannels(Config *config, const Flags &flags) {
-  return true;
-}
-
-bool
-TyTCodeplug::createChannels(CodeplugContext &ctx) {
-  return true;
-}
-
-bool
-TyTCodeplug::linkChannels(CodeplugContext &ctx) {
-  return true;
-}
-
-
-void
-TyTCodeplug::clearZones() {
-  // pass...
-}
-
-bool
-TyTCodeplug::encodeZones(Config *config, const Flags &flags) {
-  return true;
-}
-
-bool
-TyTCodeplug::createZones(CodeplugContext &ctx) {
-  return true;
-}
-
-bool
-TyTCodeplug::linkZones(CodeplugContext &ctx) {
-  return true;
-}
-
-
-void
-TyTCodeplug::clearScanLists() {
-  // pass...
-}
-
-bool
-TyTCodeplug::encodeScanLists(Config *config, const Flags &flags) {
-  return true;
-}
-
-bool
-TyTCodeplug::createScanLists(CodeplugContext &ctx) {
-  return true;
-}
-
-bool
-TyTCodeplug::linkScanLists(CodeplugContext &ctx) {
-  return true;
-}
-
-
-void
-TyTCodeplug::clearPositioningSystems() {
-  // pass...
-}
-
-bool
-TyTCodeplug::encodePositioningSystems(Config *config, const Flags &flags) {
-  return true;
-}
-
-bool
-TyTCodeplug::createPositioningSystems(CodeplugContext &ctx) {
-  return true;
-}
-
-bool
-TyTCodeplug::linkPositioningSystems(CodeplugContext &ctx) {
-  return true;
-}
-
-void
-TyTCodeplug::clearButtonSettings() {
-  // pass...
-}
-
-bool
-TyTCodeplug::encodeButtonSettings(Config *config, const Flags &flags) {
-  // pass...
-  return true;
-}
-
-bool
-TyTCodeplug::decodeButtonSetttings(Config *config) {
-  // pass...
-  return true;
-}
-
-
-void
-TyTCodeplug::clearBootSettings() {
-  // pass...
-}
-
-void
-TyTCodeplug::clearMenuSettings() {
-  // pass...
-}
-
-void
-TyTCodeplug::clearTextMessages() {
-  // pass...
-}
-
-void
-TyTCodeplug::clearPrivacyKeys() {
-  // pass...
-}
-
-void
-TyTCodeplug::clearEmergencySystems() {
-  // pass...
-}
-
-void
-TyTCodeplug::clearVFOSettings() {
-  // pass...
-}
