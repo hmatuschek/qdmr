@@ -399,6 +399,146 @@ public:
     virtual void setName(const QString &name);
   };
 
+  /** Represents the base class for group lists in all AnyTone codeplugs.
+   *
+   * Encoding of a group list (0x120 bytes):
+   * @verbinclude anytone_grouplist.txt */
+  class GroupListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    GroupListElement(uint8_t *ptr);
+
+    /** Clears the group list. */
+    void clear();
+    /** Returns @c true if the group list is valid. */
+    bool isValid() const;
+
+    /** Returns the name of the group list. */
+    virtual QString name() const;
+    /** Sets the name of the group list. */
+    virtual void setName(const QString &name);
+
+    /** Returns @c true if the n-th member index is valid. */
+    virtual bool hasMemberIndex(uint n) const;
+    /** Returns the n-th member index. */
+    virtual uint memberIndex(uint n) const;
+    /** Sets the n-th member index. */
+    virtual void setMemberIndex(uint n, uint idx);
+    /** Clears the n-th member index. */
+    virtual void clearMemberIndex(uint n);
+  };
+
+  /** Represents the base class for scan lists in all AnyTone codeplugs.
+   *
+   * Memmory layout of encoded scanlist (0x90 bytes):
+   * @verbinclude anytone_scanlist.txt */
+  class ScanListElement: public Element
+  {
+  public:
+    /** Defines all possible priority channel selections. */
+    enum class PriChannel {
+      Off = 0,                   ///< Off.
+      Primary = 1,               ///< Priority Channel Select 1.
+      Secondary = 2,             ///< Priority Channel Select 2.
+      Both = 3                   ///< Priority Channel Select 1 + Priority Channel Select 2.
+    };
+
+    /** Defines all possible reply channel selections. */
+    enum class RevertChannel {
+      Selected = 0,              ///< Selected channel.
+      SelectedActive = 1,        ///< Selected + active channel.
+      Primary = 2,               ///< Primary channel.
+      Secondary = 3,             ///< Secondary channel.
+      LastCalled = 4,            ///< Last Called.
+      LastUsed = 5,              ///< Last Used.
+      PrimaryActive = 6,         ///< Primary + active channel.
+      SecondaryActive = 7        ///< Secondary + active channel.
+    };
+
+  protected:
+    /** Hidden constructor. */
+    ScanListElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    ScanListElement(uint8_t *ptr);
+
+    /** Resets the scan list. */
+    void clear();
+
+    /** Returns the priority channel selection. */
+    virtual PriChannel priorityChannels() const;
+    /** Sets the priority channel selection. */
+    virtual void setPriorityChannels(PriChannel sel);
+
+    /** Returns @c true if the primary channel is set. */
+    virtual bool hasPrimary() const;
+    /** Returns @c true if the primary channel is set to the selected channel. */
+    virtual bool primaryIsSelected() const;
+    /** Returns the primary channel index. */
+    virtual uint primary() const;
+    /** Sets the primary channel index. */
+    virtual void setPrimary(uint idx);
+    /** Sets the primary channel to be selected channel. */
+    virtual void setPrimarySelected();
+    /** Clears the primary channel index. */
+    virtual void clearPrimaryChannel();
+
+    /** Returns @c true if the secondary channel is set. */
+    virtual bool hasSecondary() const;
+    /** Returns @c true if the secondary channel is set to the selected channel. */
+    virtual bool secondaryIsSelected() const;
+    /** Returns the secondary channel index. */
+    virtual uint secondary() const;
+    /** Sets the secondary channel index. */
+    virtual void setSecondary(uint idx);
+    /** Sets the secondary channel to be selected channel. */
+    virtual void setSecondarySelected();
+    /** Clears the secondary channel index. */
+    virtual void clearSecondaryChannel();
+
+    /** Returns the look back time A in seconds. */
+    virtual uint lookBackTimeA() const;
+    /** Sets the look back time A in seconds. */
+    virtual void setLookBackTimeA(uint sec);
+    /** Returns the look back time B in seconds. */
+    virtual uint lookBackTimeB() const;
+    /** Sets the look back time B in seconds. */
+    virtual void setLookBackTimeB(uint sec);
+    /** Returns the drop out delay in seconds. */
+    virtual uint dropOutDelay() const;
+    /** Sets the drop out delay in seconds. */
+    virtual void setDropOutDelay(uint sec);
+    /** Returns the dwell time in seconds. */
+    virtual uint dwellTime() const;
+    /** Sets the dwell time in seconds. */
+    virtual void setDwellTime(uint sec);
+
+    /** Returns the revert channel type. */
+    virtual RevertChannel revertChannel() const;
+    /** Sets the revert channel type. */
+    virtual void setRevertChannel(RevertChannel type);
+
+    /** Retunrs the name of the scan list. */
+    virtual QString name() const;
+    /** Sets the name of the scan list. */
+    virtual void setName(const QString &name);
+
+    /** Returns @c true if the n-th member index is set. */
+    virtual bool hasMemberIndex(uint n) const;
+    /** Returns the n-th member index. */
+    virtual uint memberIndex(uint n) const;
+    /** Sets the n-th member index. */
+    virtual void setMemberIndex(uint n, uint idx);
+    /** Clears the n-th member index. */
+    virtual void clearMemberIndex(uint n);
+  };
+
 protected:
   /** Hidden constructor. */
   explicit AnytoneCodeplug(QObject *parent=nullptr);

@@ -717,6 +717,218 @@ AnytoneCodeplug::DTMFContactElement::setName(const QString &name) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::GroupListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::GroupListElement::GroupListElement(uint8_t *ptr)
+  : Element(ptr, 0x120)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::GroupListElement::clear() {
+  memset(_data, 0x00, _size);
+  // set member indices to 0xffffffff
+  memset(_data, 0xff, 4*64);
+}
+
+bool
+AnytoneCodeplug::GroupListElement::isValid() const {
+  return !name().isEmpty();
+}
+
+QString
+AnytoneCodeplug::GroupListElement::name() const {
+  return readASCII(0x0100, 16, 0x00);
+}
+void
+AnytoneCodeplug::GroupListElement::setName(const QString &name) {
+  writeASCII(0x0100, name, 16, 0x00);
+}
+
+bool
+AnytoneCodeplug::GroupListElement::hasMemberIndex(uint n) const {
+  return 0xffffffff != memberIndex(n);
+}
+uint
+AnytoneCodeplug::GroupListElement::memberIndex(uint n) const {
+  return getUInt32_le(0x0000 + 4*n);
+}
+void
+AnytoneCodeplug::GroupListElement::setMemberIndex(uint n, uint idx) {
+  setUInt32_le(0x0000 + 4*n, idx);
+}
+void
+AnytoneCodeplug::GroupListElement::clearMemberIndex(uint n) {
+  setMemberIndex(n, 0xffffffff);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ScanListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::ScanListElement::ScanListElement(uint8_t *ptr)
+  : Element(ptr, 0x0090)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::ScanListElement::clear() {
+  memset(_data, 0, _size);
+  setPriorityChannels(PriChannel::Off);
+  clearPrimaryChannel();
+  clearSecondaryChannel();
+  setLookBackTimeA(150);
+  setLookBackTimeB(250);
+  setDropOutDelay(290);
+  setDwellTime(290);
+  setRevertChannel(RevertChannel::Selected);
+  // clear members
+  memset(_data+0x0020, 0xff, 2*50);
+}
+
+AnytoneCodeplug::ScanListElement::PriChannel
+AnytoneCodeplug::ScanListElement::priorityChannels() const {
+  return (PriChannel) getUInt8(0x0001);
+}
+void
+AnytoneCodeplug::ScanListElement::setPriorityChannels(PriChannel sel) {
+  setUInt8(0x0001, (uint)sel);
+}
+
+bool
+AnytoneCodeplug::ScanListElement::hasPrimary() const {
+  return 0xffff != getUInt16_le(0x0002);
+}
+bool
+AnytoneCodeplug::ScanListElement::primaryIsSelected() const {
+  return 0 == getUInt16_le(0x0002);
+}
+uint
+AnytoneCodeplug::ScanListElement::primary() const {
+  return ((uint)getUInt16_le(0x0002))-1;
+}
+void
+AnytoneCodeplug::ScanListElement::setPrimary(uint idx) {
+  setUInt16_le(0x0002, idx+1);
+}
+void
+AnytoneCodeplug::ScanListElement::setPrimarySelected() {
+  setUInt16_le(0x0002, 0);
+}
+void
+AnytoneCodeplug::ScanListElement::clearPrimaryChannel() {
+  setUInt16_le(0x0002, 0xffff);
+}
+
+bool
+AnytoneCodeplug::ScanListElement::hasSecondary() const {
+  return 0xffff != getUInt16_le(0x0004);
+}
+bool
+AnytoneCodeplug::ScanListElement::secondaryIsSelected() const {
+  return 0 == getUInt16_le(0x0004);
+}
+uint
+AnytoneCodeplug::ScanListElement::secondary() const {
+  return ((uint)getUInt16_le(0x0002))-1;
+}
+void
+AnytoneCodeplug::ScanListElement::setSecondary(uint idx) {
+  setUInt16_le(0x0004, idx+1);
+}
+void
+AnytoneCodeplug::ScanListElement::setSecondarySelected() {
+  setUInt16_le(0x0004, 0);
+}
+void
+AnytoneCodeplug::ScanListElement::clearSecondaryChannel() {
+  setUInt16_le(0x0004, 0xffff);
+}
+
+uint
+AnytoneCodeplug::ScanListElement::lookBackTimeA() const {
+  return ((uint)getUInt16_le(0x0006))*10;
+}
+void
+AnytoneCodeplug::ScanListElement::setLookBackTimeA(uint sec) {
+  setUInt16_le(0x0006, sec/10);
+}
+uint
+AnytoneCodeplug::ScanListElement::lookBackTimeB() const {
+  return ((uint)getUInt16_le(0x0008))*10;
+}
+void
+AnytoneCodeplug::ScanListElement::setLookBackTimeB(uint sec) {
+  setUInt16_le(0x0008, sec/10);
+}
+uint
+AnytoneCodeplug::ScanListElement::dropOutDelay() const {
+  return ((uint)getUInt16_le(0x000a))*10;
+}
+void
+AnytoneCodeplug::ScanListElement::setDropOutDelay(uint sec) {
+  setUInt16_le(0x000a, sec/10);
+}
+uint
+AnytoneCodeplug::ScanListElement::dwellTime() const {
+  return ((uint)getUInt16_le(0x000c))*10;
+}
+void
+AnytoneCodeplug::ScanListElement::setDwellTime(uint sec) {
+  setUInt16_le(0x000c, sec/10);
+}
+
+AnytoneCodeplug::ScanListElement::RevertChannel
+AnytoneCodeplug::ScanListElement::revertChannel() const {
+  return (RevertChannel)getUInt8(0x000e);
+}
+void
+AnytoneCodeplug::ScanListElement::setRevertChannel(RevertChannel type) {
+  setUInt8(0x000e, (uint)type);
+}
+
+QString
+AnytoneCodeplug::ScanListElement::name() const {
+  return readASCII(0x000f, 16, 0x00);
+}
+void
+AnytoneCodeplug::ScanListElement::setName(const QString &name) {
+  writeASCII(0x000f, name, 16, 0x00);
+}
+
+bool
+AnytoneCodeplug::ScanListElement::hasMemberIndex(uint n) const {
+  return 0xffff != memberIndex(n);
+}
+uint
+AnytoneCodeplug::ScanListElement::memberIndex(uint n) const {
+  return getUInt16_le(0x0020+2*n);
+}
+void
+AnytoneCodeplug::ScanListElement::setMemberIndex(uint n, uint idx) {
+  setUInt16_le(0x0020+2*n, idx);
+}
+void
+AnytoneCodeplug::ScanListElement::clearMemberIndex(uint n) {
+  setMemberIndex(n, 0xffff);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug
  * ********************************************************************************************* */
 AnytoneCodeplug::AnytoneCodeplug(QObject *parent)
