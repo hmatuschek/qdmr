@@ -344,7 +344,7 @@ RadioddityCodeplug::ChannelElement::setPower(Channel::Power pwr) {
 }
 
 Channel *
-RadioddityCodeplug::ChannelElement::toChannelObj(CodePlug::Context &ctx) const {
+RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx) const {
   Channel *ch = nullptr;
   if (MODE_ANALOG == mode()) {
     AnalogChannel *ach = new AnalogChannel(
@@ -2330,7 +2330,7 @@ RadioddityCodeplug::MessageBankElement::appendMessage(const QString msg) {
  * Implementation of RadioddityCodeplug
  * ********************************************************************************************* */
 RadioddityCodeplug::RadioddityCodeplug(QObject *parent)
-  : CodePlug(parent)
+  : Codeplug(parent)
 {
   // pass...
 }

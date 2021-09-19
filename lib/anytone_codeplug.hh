@@ -10,14 +10,14 @@
  * are heavily segmented and only valid sections are read from a written to the device.
  *
  * @ingroup anytone */
-class AnytoneCodeplug : public CodePlug
+class AnytoneCodeplug : public Codeplug
 {
   Q_OBJECT
 
 public:
   /** Represents the base class for channel encodings in all AnyTone codeplugs.
    *
-   * Memmory layout of encoded channel (64byte):
+   * Memmory layout of encoded channel (0x40 bytes):
    * @verbinclude anytone_channel.txt
    */
   class ChannelElement: public Element
@@ -316,6 +316,87 @@ public:
     virtual bool sms() const;
     /** Enables/disables SMS. */
     virtual void enableSMS(bool enable);
+  };
+
+  /** Represents the base class for conacts in all AnyTone codeplugs.
+   *
+   * Memmory layout of encoded contact (0x64 bytes):
+   * @verbinclude anytone_contact.txt
+   */
+  class ContactElement: public Element
+  {
+  public:
+    /** Possible ring-tone types. */
+    enum class AlertType {
+      None = 0,                   ///< Alert disabled.
+      Ring = 1,                   ///< Ring tone.
+      Online = 2                  ///< WTF?
+    };
+
+  protected:
+    /** Hidden constructor. */
+    ContactElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit ContactElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~ContactElement();
+
+    /** Resets the contact element. */
+    void clear();
+    /** Returns @c true if the element is valid. */
+    bool isValid() const;
+
+    /** Returns the contact type. */
+    virtual DigitalContact::Type type() const;
+    /** Sets the contact type. */
+    virtual void setType(DigitalContact::Type type);
+
+    /** Returns the name of the contact. */
+    virtual QString name() const;
+    /** Sets the name of the contact. */
+    virtual void setName(const QString &name);
+
+    /** Returns the contact number. */
+    virtual uint number() const;
+    /** Sets the contact number. */
+    virtual void setNumber(uint number);
+
+    /** Returns the alert type. */
+    virtual AlertType alertType() const;
+    /** Sets the alert type. */
+    virtual void setAlertType(AlertType type);
+  };
+
+  /** Represents the base class for analog (DTMF) contacts in all AnyTone codeplugs.
+   *
+   * Encoding of the DTMF contact (0x30 bytes):
+   * @verbinclude anytone_dtmfcontact.txt */
+  class DTMFContactElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFContactElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit DTMFContactElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~DTMFContactElement();
+
+    /** Resets the contact element. */
+    void clear();
+
+    /** Returns the number of the contact. */
+    virtual QString number() const;
+    /** Sets the number of the contact. */
+    virtual void setNumber(const QString &number);
+
+    /** Returns the name of the contact. */
+    virtual QString name() const;
+    /** Sets the name of the contact. */
+    virtual void setName(const QString &name);
   };
 
 protected:

@@ -18,13 +18,13 @@
  * Implementation of TyTCallsignDB::IndexElement
  * ********************************************************************************************* */
 TyTCallsignDB::IndexElement::IndexElement(uint8_t *ptr, size_t size)
-  : CodePlug::Element(ptr, size)
+  : Codeplug::Element(ptr, size)
 {
   // pass...
 }
 
 TyTCallsignDB::IndexElement::IndexElement(uint8_t *ptr)
-  : CodePlug::Element(ptr, 0x0003 + NUM_INDEX_ENTRIES*INDEX_ENTRY_SIZE)
+  : Codeplug::Element(ptr, 0x0003 + NUM_INDEX_ENTRIES*INDEX_ENTRY_SIZE)
 {
   // pass...
 }
@@ -58,13 +58,13 @@ TyTCallsignDB::IndexElement::setIndexEntry(uint n, uint id, uint index) {
  * Implementation of TyTCallsignDB::IndexElement::Entry
  * ********************************************************************************************* */
 TyTCallsignDB::IndexElement::Entry::Entry(uint8_t *ptr, size_t size)
-  : CodePlug::Element(ptr, size)
+  : Codeplug::Element(ptr, size)
 {
   // pass...
 }
 
 TyTCallsignDB::IndexElement::Entry::Entry(uint8_t *ptr)
-  : CodePlug::Element(ptr, INDEX_ENTRY_SIZE)
+  : Codeplug::Element(ptr, INDEX_ENTRY_SIZE)
 {
   // pass...
 }
@@ -91,13 +91,13 @@ TyTCallsignDB::IndexElement::Entry::set(uint id, uint index) {
  * Implementation of TyTCallsignDB::EntryElement
  * ********************************************************************************************* */
 TyTCallsignDB::EntryElement::EntryElement(uint8_t *ptr, size_t size)
-  : CodePlug::Element(ptr, size)
+  : Codeplug::Element(ptr, size)
 {
   // pass...
 }
 
 TyTCallsignDB::EntryElement::EntryElement(uint8_t *ptr)
-  : CodePlug::Element(ptr, CALLSIGN_ENTRY_SIZE)
+  : Codeplug::Element(ptr, CALLSIGN_ENTRY_SIZE)
 {
   // pass...
 }

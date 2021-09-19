@@ -43,8 +43,8 @@ public:
   virtual ~AnytoneRadio();
 
   const QString &name() const;
-  const CodePlug &codeplug() const;
-  CodePlug &codeplug();
+  const Codeplug &codeplug() const;
+  Codeplug &codeplug();
 
   VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
                                  const VerifyFlags &flags=VerifyFlags());
@@ -58,7 +58,7 @@ protected:
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   bool startUpload(Config *config, bool blocking=false,
-                   const CodePlug::Flags &flags = CodePlug::Flags());
+                   const Codeplug::Flags &flags = Codeplug::Flags());
   /** Encodes the given user-database and uploades it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
                              const CallsignDB::Selection &selection=CallsignDB::Selection());
@@ -81,7 +81,7 @@ protected:
   AnytoneInterface *_dev;
   /** If @c true, the codeplug on the radio gets updated upon upload. If @c false, it gets
    * overridden. */
-  CodePlug::Flags _codeplugFlags;
+  Codeplug::Flags _codeplugFlags;
   /** The generic configuration. */
   Config *_config;
   /** A weak reference to the user-database. */

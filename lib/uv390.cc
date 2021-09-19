@@ -73,12 +73,12 @@ UV390::features() const {
   return _uv390_features;
 }
 
-const CodePlug &
+const Codeplug &
 UV390::codeplug() const {
   return _codeplug;
 }
 
-CodePlug &
+Codeplug &
 UV390::codeplug() {
   return _codeplug;
 }

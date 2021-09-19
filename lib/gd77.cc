@@ -73,12 +73,12 @@ GD77::features() const {
   return _gd77_features;
 }
 
-const CodePlug &
+const Codeplug &
 GD77::codeplug() const {
   return _codeplug;
 }
 
-CodePlug &
+Codeplug &
 GD77::codeplug() {
   return _codeplug;
 }

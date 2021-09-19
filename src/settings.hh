@@ -41,7 +41,7 @@ public:
   QDir lastDirectory() const;
   void setLastDirectoryDir(const QDir &dir);
 
-  CodePlug::Flags codePlugFlags() const;
+  Codeplug::Flags codePlugFlags() const;
 
   bool limitCallSignDBEntries() const;
   void setLimitCallSignDBEnties(bool enable);

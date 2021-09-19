@@ -446,7 +446,7 @@ Application::downloadCodeplug() {
   progress->setValue(0); progress->setMaximum(100); progress->setVisible(true);
   connect(radio, SIGNAL(downloadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(downloadError(Radio *)), this, SLOT(onCodeplugDownloadError(Radio *)));
-  connect(radio, SIGNAL(downloadFinished(Radio *, CodePlug *)), this, SLOT(onCodeplugDownloaded(Radio *, CodePlug *)));
+  connect(radio, SIGNAL(downloadFinished(Radio *, Codeplug *)), this, SLOT(onCodeplugDownloaded(Radio *, Codeplug *)));
   if (radio->startDownload(false)) {
     _mainWindow->statusBar()->showMessage(tr("Download ..."));
     _mainWindow->setEnabled(false);
@@ -474,7 +474,7 @@ Application::onCodeplugDownloadError(Radio *radio) {
 
 
 void
-Application::onCodeplugDownloaded(Radio *radio, CodePlug *codeplug) {
+Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
   _config->reset();
   _mainWindow->setWindowModified(false);
   if (codeplug->decode(_config)) {

@@ -76,12 +76,12 @@ RD5R::features() const {
   return _rd5r_features;
 }
 
-const CodePlug &
+const Codeplug &
 RD5R::codeplug() const {
   return _codeplug;
 }
 
-CodePlug &
+Codeplug &
 RD5R::codeplug() {
   return _codeplug;
 }

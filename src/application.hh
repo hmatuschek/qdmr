@@ -62,7 +62,7 @@ private slots:
   QMainWindow *createMainWindow();
 
   void onCodeplugDownloadError(Radio *radio);
-  void onCodeplugDownloaded(Radio *radio, CodePlug *codeplug);
+  void onCodeplugDownloaded(Radio *radio, Codeplug *codeplug);
 
   void onCodeplugUploadError(Radio *radio);
   void onCodeplugUploaded(Radio *radio);

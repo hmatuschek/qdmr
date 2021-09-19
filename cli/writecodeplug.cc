@@ -62,7 +62,7 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   showProgress();
   QObject::connect(radio, &Radio::uploadProgress, updateProgress);
 
-  CodePlug::Flags flags;
+  Codeplug::Flags flags;
   if (parser.isSet("init-codeplug"))
     flags.updateCodePlug = false;
   if (parser.isSet("auto-enable-gps"))

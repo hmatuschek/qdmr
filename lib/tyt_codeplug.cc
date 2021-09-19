@@ -15,13 +15,13 @@
  * Implementation of TyTCodeplug::ChannelElement
  * ******************************************************************************************** */
 TyTCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
-  : CodePlug::Element(ptr, size)
+  : Codeplug::Element(ptr, size)
 {
   // pass...
 }
 
 TyTCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : CodePlug::Element(ptr, 0x0040)
+  : Codeplug::Element(ptr, 0x0040)
 {
   // pass...
 }
@@ -660,13 +660,13 @@ TyTCodeplug::VFOChannelElement::setStepSize(uint ss_Hz) {
  * Implementation of TyTCodeplug::ContactElement
  * ******************************************************************************************** */
 TyTCodeplug::ContactElement::ContactElement(uint8_t *ptr, size_t size)
-  : CodePlug::Element(ptr, size)
+  : Codeplug::Element(ptr, size)
 {
   // pass...
 }
 
 TyTCodeplug::ContactElement::ContactElement(uint8_t *ptr)
-  : CodePlug::Element(ptr, 0x0024)
+  : Codeplug::Element(ptr, 0x0024)
 {
   // pass...
 }
@@ -761,13 +761,13 @@ TyTCodeplug::ContactElement::fromContactObj(const DigitalContact *cont) {
  * Implementation of TyTCodeplug::ZoneElement
  * ******************************************************************************************** */
 TyTCodeplug::ZoneElement::ZoneElement(uint8_t *ptr, size_t size)
-  : CodePlug::Element(ptr, size)
+  : Codeplug::Element(ptr, size)
 {
   // pass...
 }
 
 TyTCodeplug::ZoneElement::ZoneElement(uint8_t *ptr)
-  : CodePlug::Element(ptr, 0x0040)
+  : Codeplug::Element(ptr, 0x0040)
 {
   // pass...
 }
@@ -844,13 +844,13 @@ TyTCodeplug::ZoneElement::linkZone(Zone *zone, Context &ctx) const {
  * Implementation of TyTCodeplug::ZoneElement
  * ******************************************************************************************** */
 TyTCodeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr, size_t size)
-  : CodePlug::Element(ptr, size)
+  : Codeplug::Element(ptr, size)
 {
   // pass...
 }
 
 TyTCodeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr)
-  : CodePlug::Element(ptr, 0x00e0)
+  : Codeplug::Element(ptr, 0x00e0)
 {
   // pass...
 }
@@ -930,13 +930,13 @@ TyTCodeplug::ZoneExtElement::linkZoneObj(Zone *zone, Context &ctx) {
  * Implementation of TyTCodeplug::GroupListElement
  * ******************************************************************************************** */
 TyTCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, size_t size)
-  : CodePlug::Element(ptr, size)
+  : Codeplug::Element(ptr, size)
 {
   // pass...
 }
 
 TyTCodeplug::GroupListElement::GroupListElement(uint8_t *ptr)
-  : CodePlug::Element(ptr, 0x0060)
+  : Codeplug::Element(ptr, 0x0060)
 {
   // pass...
 }
@@ -1798,13 +1798,13 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
  * Implementation of TyTCodeplug::BootSettingsElement
  * ******************************************************************************************** */
 TyTCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr, size_t size)
-  : CodePlug::Element(ptr, size)
+  : Codeplug::Element(ptr, size)
 {
   // pass...
 }
 
 TyTCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr)
-  : CodePlug::Element(ptr, 0x0010)
+  : Codeplug::Element(ptr, 0x0010)
 {
   // pass...
 }
@@ -1858,13 +1858,13 @@ TyTCodeplug::BootSettingsElement::setChannelIndexB(uint idx) {
  * Implementation of TyTCodeplug::TimestampElement
  * ******************************************************************************************** */
 TyTCodeplug::TimestampElement::TimestampElement(uint8_t *ptr, size_t size)
-  : CodePlug::Element(ptr, size)
+  : Codeplug::Element(ptr, size)
 {
   // pass...
 }
 
 TyTCodeplug::TimestampElement::TimestampElement(uint8_t *ptr)
-  : CodePlug::Element(ptr, 0x0c)
+  : Codeplug::Element(ptr, 0x0c)
 {
   // pass...
 }
@@ -1914,13 +1914,13 @@ TyTCodeplug::TimestampElement::cpsVersion() const {
  * Implementation of TyTCodeplug::GPSSystemElement
  * ******************************************************************************************** */
 TyTCodeplug::GPSSystemElement::GPSSystemElement(uint8_t *ptr, size_t size)
-  : CodePlug::Element(ptr, size)
+  : Codeplug::Element(ptr, size)
 {
   // pass...
 }
 
 TyTCodeplug::GPSSystemElement::GPSSystemElement(uint8_t *ptr)
-  : CodePlug::Element(ptr, 0x10)
+  : Codeplug::Element(ptr, 0x10)
 {
   // pass...
 }
@@ -2873,7 +2873,7 @@ TyTCodeplug::EncryptionElement::setBasicKey(uint n, const QByteArray &key) {
  * Implementation of TyTCodeplug
  * ******************************************************************************************** */
 TyTCodeplug::TyTCodeplug(QObject *parent)
-  : CodePlug(parent)
+  : Codeplug(parent)
 {
   // pass...
 }

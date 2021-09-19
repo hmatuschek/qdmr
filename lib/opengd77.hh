@@ -25,8 +25,8 @@ public:
 
 	const QString &name() const;
   const Radio::Features &features() const;
-  const CodePlug &codeplug() const;
-  CodePlug &codeplug();
+  const Codeplug &codeplug() const;
+  Codeplug &codeplug();
 
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
@@ -34,7 +34,7 @@ public slots:
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   bool startUpload(Config *config, bool blocking=false,
-                   const CodePlug::Flags &flags = CodePlug::Flags());
+                   const Codeplug::Flags &flags = Codeplug::Flags());
   /** Encodes the given user-database and uploades it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
                              const CallsignDB::Selection &selection=CallsignDB::Selection());

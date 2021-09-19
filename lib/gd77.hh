@@ -28,8 +28,8 @@ public:
 
 	const QString &name() const;
   const Radio::Features &features() const;
-  const CodePlug &codeplug() const;
-  CodePlug &codeplug();
+  const Codeplug &codeplug() const;
+  Codeplug &codeplug();
 
 public slots:
   /** Encodes the given user-database and uploades it to the device. */

@@ -73,12 +73,12 @@ MD2017::features() const {
   return _md2017_features;
 }
 
-const CodePlug &
+const Codeplug &
 MD2017::codeplug() const {
   return _codeplug;
 }
 
-CodePlug &
+Codeplug &
 MD2017::codeplug() {
   return _codeplug;
 }

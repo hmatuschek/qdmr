@@ -214,9 +214,9 @@ public:
 	virtual const Features &features() const = 0;
 
   /** Returns the codeplug instance. */
-  virtual const CodePlug &codeplug() const = 0;
+  virtual const Codeplug &codeplug() const = 0;
   /** Returns the codeplug instance. */
-  virtual CodePlug &codeplug() = 0;
+  virtual Codeplug &codeplug() = 0;
 
   /** Returns the call-sign DB instance. */
   virtual const CallsignDB *callsignDB() const;
@@ -249,7 +249,7 @@ public slots:
    * codeplug to the radio. */
   virtual bool startUpload(
       Config *config, bool blocking=false,
-      const CodePlug::Flags &flags = CodePlug::Flags()) = 0;
+      const Codeplug::Flags &flags = Codeplug::Flags()) = 0;
   /** Assembles the callsign DB from the given one and uploads it to the device. */
   virtual bool startUploadCallsignDB(
       UserDatabase *db, bool blocking=false,
@@ -261,7 +261,7 @@ signals:
   /** Gets emitted on download progress (e.g., for progress bars). */
 	void downloadProgress(int percent);
   /** Gets emitted once the codeplug download has been finished. */
-  void downloadFinished(Radio *radio, CodePlug *codeplug);
+  void downloadFinished(Radio *radio, Codeplug *codeplug);
   /** Gets emitted if there was an error during the codeplug download. */
 	void downloadError(Radio *radio);
 

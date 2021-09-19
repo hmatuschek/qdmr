@@ -17,7 +17,7 @@ class ScanList;
  * class must be implemented.
  *
  * @ingroup radioddity */
-class RadioddityCodeplug : public CodePlug
+class RadioddityCodeplug : public Codeplug
 {
   Q_OBJECT
 
@@ -26,7 +26,7 @@ public:
    *
    * Memory layout of encoded channel:
    * @verbinclude radioddity_channel.txt */
-  class ChannelElement: public CodePlug::Element
+  class ChannelElement: public Codeplug::Element
   {
   public:
     /** Possible channel types. */

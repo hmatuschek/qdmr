@@ -35,12 +35,12 @@ AnytoneRadio::name() const {
   return _name;
 }
 
-const CodePlug &
+const Codeplug &
 AnytoneRadio::codeplug() const {
   return *_codeplug;
 }
 
-CodePlug &
+Codeplug &
 AnytoneRadio::codeplug() {
   return *_codeplug;
 }
@@ -93,7 +93,7 @@ AnytoneRadio::startDownload(bool blocking) {
 }
 
 bool
-AnytoneRadio::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
+AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags) {
   if (StatusIdle != _task)
     return false;
 

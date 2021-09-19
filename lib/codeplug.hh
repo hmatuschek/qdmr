@@ -14,7 +14,7 @@ class ConfigObject;
 /** This class defines the interface all device-specific code-plugs must implement.
  * Device-specific codeplugs are derived from the common configuration and implement the
  * construction/parsing of the device specific binary configuration. */
-class CodePlug: public DFUFile
+class Codeplug: public DFUFile
 {
 	Q_OBJECT
 
@@ -228,11 +228,11 @@ public:
 
 protected:
   /** Hidden default constructor. */
-	explicit CodePlug(QObject *parent=nullptr);
+	explicit Codeplug(QObject *parent=nullptr);
 
 public:
   /** Destructor. */
-	virtual ~CodePlug();
+	virtual ~Codeplug();
 
   /** Indexes all elements of the codeplug.
    * This method must be implemented by any device or vendor specific codeplug to map config

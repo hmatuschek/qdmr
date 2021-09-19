@@ -47,6 +47,10 @@ ctcss_num2code(uint8_t num) {
   return _anytone_ctcss_num2code[num];
 }
 
+QVector<char> _anytone_bin_dtmf_tab = {
+  '0','1','2','3','4','5','6','7','8','9','A','B','C','D','*','#'
+};
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::ChannelElement
@@ -577,10 +581,146 @@ AnytoneCodeplug::ChannelElement::enableSMS(bool enable) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ContactElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ContactElement::ContactElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::ContactElement::ContactElement(uint8_t *ptr)
+  : Element(ptr, 0x0064)
+{
+  // pass...
+}
+
+AnytoneCodeplug::ContactElement::~ContactElement() {
+  // pass...
+}
+
+void
+AnytoneCodeplug::ContactElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+AnytoneCodeplug::ContactElement::isValid() const {
+  return !name().isEmpty();
+}
+
+DigitalContact::Type
+AnytoneCodeplug::ContactElement::type() const {
+  switch (getUInt8(0x0000)) {
+  case 0: return DigitalContact::PrivateCall;
+  case 1: return DigitalContact::GroupCall;
+  case 2: return DigitalContact::AllCall;
+  }
+  return DigitalContact::PrivateCall;
+}
+void
+AnytoneCodeplug::ContactElement::setType(DigitalContact::Type type) {
+  switch (type) {
+  case DigitalContact::PrivateCall: setUInt8(0x0000, 0); break;
+  case DigitalContact::GroupCall: setUInt8(0x0000, 1); break;
+  case DigitalContact::AllCall: setUInt8(0x0000, 2); break;
+  }
+}
+
+QString
+AnytoneCodeplug::ContactElement::name() const {
+  return readASCII(0x0001, 16, 0x00);
+}
+void
+AnytoneCodeplug::ContactElement::setName(const QString &name) {
+  writeASCII(0x0001, name, 16, 0x00);
+}
+
+uint
+AnytoneCodeplug::ContactElement::number() const {
+  return getBCD8_le(0x0023);
+}
+void
+AnytoneCodeplug::ContactElement::setNumber(uint number) {
+  setBCD8_le(0x0023, number);
+}
+
+AnytoneCodeplug::ContactElement::AlertType
+AnytoneCodeplug::ContactElement::alertType() const {
+  return (AlertType) getUInt8(0x0027);
+}
+void
+AnytoneCodeplug::ContactElement::setAlertType(AlertType type) {
+  setUInt8(0x0027, (uint)type);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DTMFContactElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr)
+  : Element(ptr, 0x30)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DTMFContactElement::~DTMFContactElement() {
+  // pass...
+}
+
+void
+AnytoneCodeplug::DTMFContactElement::clear() {
+  memset(_data, 0, _size);
+}
+
+QString
+AnytoneCodeplug::DTMFContactElement::number() const {
+  QString number;
+  int n = getUInt8(0x0013);
+  for (int i=0; i<n; i++) {
+    uint8_t byte = _data[i/2];
+    if (0 == (i%2))
+      number.append(_anytone_bin_dtmf_tab[(byte>>4)&0xf]);
+    else
+      number.append(_anytone_bin_dtmf_tab[(byte>>0)&0xf]);
+  }
+  return number;
+}
+void
+AnytoneCodeplug::DTMFContactElement::setNumber(const QString &number) {
+  if (! validDTMFNumber(number))
+    return;
+  memset(_data+0x0000, 0, 7);
+  setUInt8(0x0013, number.length());
+  for (int i=0; i<number.length(); i++) {
+    if (0 == (i%2))
+      _data[i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<4);
+    else
+      _data[i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<0);
+  }
+}
+
+QString
+AnytoneCodeplug::DTMFContactElement::name() const {
+  return readASCII(0x0020, 15, 0x00);
+}
+void
+AnytoneCodeplug::DTMFContactElement::setName(const QString &name) {
+  writeASCII(0x0020, name, 15, 0x00);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug
  * ********************************************************************************************* */
 AnytoneCodeplug::AnytoneCodeplug(QObject *parent)
-  : CodePlug(parent)
+  : Codeplug(parent)
 {
   // pass...
 }

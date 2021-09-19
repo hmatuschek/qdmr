@@ -27,7 +27,7 @@ public:
    * Memmory layout of encoded call-sign/user database:
    * @verbinclude tytcallsigndbindex.txt
    */
-  class IndexElement: public CodePlug::Element
+  class IndexElement: public Codeplug::Element
   {
   public:
     /** Represents an index entry, a pair of DMR ID and call-sign DB index.
@@ -35,7 +35,7 @@ public:
      * Memmory layout of encoded call-sign/user database index entry:
      * @verbinclude tytcallsigndbindexentry.txt
      */
-    class Entry: public CodePlug::Element
+    class Entry: public Codeplug::Element
     {
     protected:
       /** Hidden constructor. */
@@ -77,7 +77,7 @@ public:
    * Memmory layout of encoded call-sign/user database index entry:
    * @verbinclude tytcallsigndbentry.txt
    */
-  class EntryElement: public CodePlug::Element
+  class EntryElement: public Codeplug::Element
   {
   protected:
     /** Hidden constructor. */
