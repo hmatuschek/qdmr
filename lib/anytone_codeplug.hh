@@ -53,6 +53,21 @@ public:
       DCS = 2                        ///< Use DCS codes.
     };
 
+    /** Defines all possible admit criteria. */
+    enum class Admit {
+      Always = 0,                 ///< Admit TX always.
+      Colorcode = 1,              ///< Admit TX on matching color-code.
+      Free = 2,                   ///< Admit TX on channel free.
+    };
+
+    /** Defines all possible optional signalling settings. */
+    enum class OptSignaling {
+      Off = 0,                    ///< None.
+      DTMF = 1,                   ///< Use DTMF.
+      TwoTone = 2,                ///< Use 2-tone.
+      FiveTone = 3                ///< Use 5-tone.
+    };
+
   protected:
     /** Hidden constructor. */
     ChannelElement(uint8_t *ptr, uint size);
@@ -79,6 +94,11 @@ public:
      * This method accepts unsigned values, the sign of the offset frequency is stored in
      * @c repeaterMode(). */
     virtual void setTXOffset(uint hz);
+    /** Returns the TX frequency in Hz. */
+    virtual uint txFrequency() const;
+    /** Sets the TX frequency indirectly. That is, relative to the RX frequency which must be set
+     * first. This method also updates the @c repeaterMode. */
+    virtual void setTXFrequency(uint hz);
 
     /** Returns the channel mode (analog, digtital, etc). */
     virtual Mode mode() const;
@@ -126,7 +146,176 @@ public:
     /** Enables/disables talkaround. */
     virtual void enableTalkaround(bool enable);
 
+    /** Returns the TX CTCSS tone. */
+    virtual Signaling::Code txCTCSS() const;
+    /** Sets the TX CTCSS tone. */
+    virtual void setTXCTCSS(Signaling::Code tone);
+    /** Returns the RX CTCSS tone. */
+    virtual Signaling::Code rxCTCSS() const;
+    /** Sets the RX CTCSS tone. */
+    virtual void setRXCTCSS(Signaling::Code tone);
+    /** Returns the TX DCS code. */
+    virtual Signaling::Code txDCS() const;
+    /** Sets the TX DCS code. */
+    virtual void setTXDCS(Signaling::Code code);
+    /** Returns the RX DCS code. */
+    virtual Signaling::Code rxDCS() const;
+    /** Sets the RX DCS code. */
+    virtual void setRXDCS(Signaling::Code code);
 
+    /** Returns the custom CTCSS frequency in Hz. */
+    virtual double customCTCSSFrequency() const;
+    /** Sets the custom CTCSS frequency in Hz. */
+    virtual void setCustomCTCSSFrequency(double hz);
+
+    /** Returns the 2-tone decode index (0-based). */
+    virtual uint twoToneDecodeIndex() const;
+    /** Sets the 2-tone decode index (0-based). */
+    virtual void setTwoToneDecodeIndex(uint idx);
+
+    /** Retunrs the transmit contact index (0-based). */
+    virtual uint contactIndex() const;
+    /** Sets the transmit contact index (0-based). */
+    virtual void setContactIndex(uint idx);
+
+    /** Retunrs the radio ID index (0-based). */
+    virtual uint radioIDIndex() const;
+    /** Sets the radio ID index (0-based). */
+    virtual void setRadioIDIndex(uint idx);
+
+    /** Returns @c true if the sequelch is silent and @c false if open. */
+    virtual bool silentSquelch() const;
+    /** Enables/disables silent squelch. */
+    virtual void enableSilentSquelch(bool enable);
+
+    /** Returns the admit criterion. */
+    virtual Admit admit() const;
+    /** Sets the admit criterion. */
+    virtual void setAdmit(Admit admit);
+
+    /** Returns the optional signalling type. */
+    virtual OptSignaling optionalSignaling() const;
+    /** Sets the optional signaling type. */
+    virtual void setOptionalSignaling(OptSignaling sig);
+
+    /** Returns @c true, if a scan list index is set. */
+    virtual bool hasScanListIndex() const;
+    /** Returns the scan list index (0-based). */
+    virtual uint scanListIndex() const;
+    /** Sets the scan list index (0-based). */
+    virtual void setScanListIndex(uint idx);
+    /** Clears the scan list index. */
+    virtual void clearScanListIndex();
+
+    /** Returns @c true, if a group list index is set. */
+    virtual bool hasGroupListIndex() const;
+    /** Returns the scan list index (0-based). */
+    virtual uint groupListIndex() const;
+    /** Sets the group list index (0-based). */
+    virtual void setGroupListIndex(uint idx);
+    /** Clears the group list index. */
+    virtual void clearGroupListIndex();
+
+    /** Returns the two-tone ID index (0-based). */
+    virtual uint twoToneIDIndex() const;
+    /** Sets the two-tone ID index (0-based). */
+    virtual void setTwoToneIDIndex(uint idx);
+    /** Returns the five-tone ID index (0-based). */
+    virtual uint fiveToneIDIndex() const;
+    /** Sets the five-tone ID index (0-based). */
+    virtual void setFiveToneIDIndex(uint idx);
+    /** Returns the DTFM ID index (0-based). */
+    virtual uint dtmfIDIndex() const;
+    /** Sets the DTMF ID index (0-based). */
+    virtual void setDTMFIDIndex(uint idx);
+
+    /** Returns the color code. */
+    virtual uint colorCode() const;
+    /** Sets the color code. */
+    virtual void setColorCode(uint code);
+
+    /** Returns the time slot. */
+    virtual DigitalChannel::TimeSlot timeSlot() const;
+    /** Sets the time slot. */
+    virtual void setTimeSlot(DigitalChannel::TimeSlot ts);
+
+    /** Returns @c true if SMS confirmation is enabled. */
+    virtual bool smsConfirm() const;
+    /** Enables/disables SMS confirmation. */
+    virtual void enableSMSConfirm(bool enable);
+    /** Returns @c true if simplex TDMA is enabled. */
+    virtual bool simplexTDMA() const;
+    /** Enables/disables simplex TDMA confirmation. */
+    virtual void enableSimplexTDMA(bool enable);
+    /** Returns @c true if adaptive TDMA is enabled. */
+    virtual bool adaptiveTDMA() const;
+    /** Enables/disables adaptive TDMA. */
+    virtual void enableAdaptiveTDMA(bool enable);
+    /** Returns @c true if RX APRS is enabled. */
+    virtual bool rxAPRS() const;
+    /** Enables/disables RX APRS. */
+    virtual void enableRXAPRS(bool enable);
+    /** Returns @c true if enhanced encryption is enabled. */
+    virtual bool enhancedEncryption() const;
+    /** Enables/disables enhanced encryption. */
+    virtual void enableEnhancedEncryption(bool enable);
+    /** Returns @c true if lone worker is enabled. */
+    virtual bool loneWorker() const;
+    /** Enables/disables lone worker. */
+    virtual void enableLoneWorker(bool enable);
+
+    /** Returns @c true if an encryption key is set. */
+    virtual bool hasEncryptionKeyIndex() const;
+    /** Returns the AES (enhanced) encryption key index (0-based). */
+    virtual uint encryptionKeyIndex() const;
+    /** Sets the AES (enahnced) encryption key index (0-based). */
+    virtual void setEncryptionKeyIndex(uint idx);
+    /** Clears the encryption key index. */
+    virtual void clearEncryptionKeyIndex();
+
+    /** Returns the channel name. */
+    virtual QString name() const;
+    /** Sets the channel name. */
+    virtual void setName(const QString &name);
+
+    /** Returns @c true if ranging is enabled. */
+    virtual bool ranging() const;
+    /** Enables/disables ranging. */
+    virtual void enableRanging(bool enable);
+    /** Returns @c true if through mode is enabled. */
+    virtual bool throughMode() const;
+    /** Enables/disables though mode. */
+    virtual void enableThroughMode(bool enable);
+    /** Returns @c true if data ACK is enabled. */
+    virtual bool dataACK() const;
+    /** Enables/disables data ACK. */
+    virtual void enableDataACK(bool enable);
+
+    /** Returns @c true if TX APRS is enabled. */
+    virtual bool txAPRS() const;
+    /** Enables/disables TX APRS. */
+    virtual void enableTXAPRS(bool enable);
+    /** Returns the DMR APRS system index. */
+    virtual uint dmrAPRSSystemIndex() const;
+    /** Sets the DMR APRS system index. */
+    virtual void setDMRAPRSSystemIndex(uint idx);
+
+    /** Returns the DMR encryption key index (+1), 0=Off. */
+    virtual uint dmrEncryptionKeyIndex() const;
+    /** Sets the DMR encryption key index (+1), 0=Off. */
+    virtual void setDMREncryptionKeyIndex(uint idx);
+    /** Returns @c true if multiple key encryption is enabled. */
+    virtual bool multipleKeyEncryption() const;
+    /** Enables/disables multiple key encryption. */
+    virtual void enableMultipleKeyEncryption(bool enable);
+    /** Returns @c true if random key is enabled. */
+    virtual bool randomKey() const;
+    /** Enables/disables random key. */
+    virtual void enableRandomKey(bool enable);
+    /** Returns @c true if SMS is enabled. */
+    virtual bool sms() const;
+    /** Enables/disables SMS. */
+    virtual void enableSMS(bool enable);
   };
 
 protected:

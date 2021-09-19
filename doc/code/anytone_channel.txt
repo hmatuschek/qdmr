@@ -8,11 +8,11 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 0c | DCS transmit code, little endian                              | DCS receive code, little endian                               |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-10 | Custom CTCSS                                                  | 2-tone decode                 | Unused, set to 0x00           |
+10 | Custom CTCSS frequency in 0.1Hz, little endian                | 2-tone decode index, 0-based, little endian                   |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 14 | Contact index 0-based, little endian                                                                                          |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-18 | Radio ID table index.         | 0   0   0 |SQM| 0   0 |PTT-ID | 0   0 |OptSig | 0   0 | TxPer | Scan list index               |
+18 | Radio ID table index.         | 0   0   0 |SQM| 0   0   0   0 | 0   0 |OptSig | 0   0 | TxPer | Scan list index               |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 1c | RX Group list index           | 2-tone ID                     | 5-tone ID                     | DTMF ID                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -20,16 +20,17 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 30  ...                                                                                            | Unused set to 0x00            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-34 | 0   0   0   0   0 |XFR|ETM|RNG| 0   0   0   0   0   0 |APRSRep| Analog APRS PTT               | Digital APRS PTT              |
+34 | 0   0   0   0   0 |XFR|ETM|RNG| 0   0   0   0   0   0   0 |TAP| DMR APRS IDX (0-based)        | Unused set to 0x00            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-38 | GPS System Index              | Frequency correction signed   | DMR encryption                | 0   0   0   0   0 |MuK|RnK|SMF|
+38 | Unused set to 0x00            | Unused set to 0x00            | DMR encryption idx +1, 0=off  | 0   0   0   0   0 |SMF|RnK|Muk|
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 3c | Unused set to 0x00000000                                                                                                      |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 with
 RMode = Repater mode, BWd = Band width, PWR = Power, CMode = Channel mode, TAr=Talkaround, CaC = Call confirm, RXO = RX only,
-CTR = CTCSS phase reversal, TDC = TX DCS code, TCT = TX CTCSS tone, RDC = RX DCS code, RCT = RX CTCSS tone, SQM = Squelch mode,
-OptSig = Optional signalling, TxPer = TX permit, LWK = Lone worker, EEE = Enable enhanced encryption, RGP = Enable RX GPS,
-EAT = Enable adative TDMA, EST = Enable simplex TDMA, SMC = SMS confirmation, TSL = Time slot, XFR = Exlcude from roaming,
-ETM = Enable through mode, RNG = Ranging, APRSRep = Enable APRS/GPS report, MuK = Multiple keys, RnK = Random key, SMF = SMS forbid.
+CTR = CTCSS phase reversal, TDC = TX DCS code, TCT = TX CTCSS tone, RDC = RX DCS code, RCT = RX CTCSS tone,
+SQM = Squelch mode 0=open, 1=silent, OptSig = Optional signalling, TxPer = TX permit, LWK = Lone worker,
+EEE = Enable enhanced encryption, RGP = Enable RX GPS, EAT = Enable adative TDMA, EST = Enable simplex TDMA, SMC = SMS confirmation,
+TSL = Time slot, XFR = Exlcude from roaming, ETM = Enable through mode, RNG = Ranging, APRSRep = Enable APRS/GPS report,
+TAP = TX APRS enable, MuK = Multiple keys, RnK = Random key, SMF = SMS forbid.
