@@ -1,5 +1,7 @@
 #include "anytone_codeplug.hh"
 #include "utils.hh"
+#include <QTimeZone>
+
 using namespace Signaling;
 
 Code _anytone_ctcss_num2code[52] = {
@@ -925,6 +927,944 @@ AnytoneCodeplug::ScanListElement::setMemberIndex(uint n, uint idx) {
 void
 AnytoneCodeplug::ScanListElement::clearMemberIndex(uint n) {
   setMemberIndex(n, 0xffff);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::RadioIDElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::RadioIDElement::RadioIDElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::RadioIDElement::RadioIDElement(uint8_t *ptr)
+  : Element(ptr, 0x0020)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::RadioIDElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+uint
+AnytoneCodeplug::RadioIDElement::number() const {
+  return getBCD8_le(0x0000);
+}
+void
+AnytoneCodeplug::RadioIDElement::setNumber(uint number) {
+  setBCD8_le(0x0000, number);
+}
+
+QString
+AnytoneCodeplug::RadioIDElement::name() const {
+  return readASCII(0x0005, 16, 0x00);
+}
+void
+AnytoneCodeplug::RadioIDElement::setName(const QString &name) {
+  writeASCII(0x0005, name, 16, 0x00);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::GeneralSettingsElement::Melody
+ * ********************************************************************************************* */
+AnytoneCodeplug::GeneralSettingsElement::Melody::Melody()
+{
+  for (int i=0; i<5; i++)
+    notes[i] = Note{0,0};
+}
+
+AnytoneCodeplug::GeneralSettingsElement::Melody::Melody(const Melody &other)
+{
+  for (int i=0; i<5; i++)
+    notes[i] = other.notes[i];
+}
+
+AnytoneCodeplug::GeneralSettingsElement::Melody &
+AnytoneCodeplug::GeneralSettingsElement::Melody::operator =(const Melody &other) {
+  for (int i=0; i<5; i++)
+    notes[i] = other.notes[i];
+  return *this;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::GeneralSettingsElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x00d0)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::GeneralSettingsElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::keyTone() const {
+  return 0!=getUInt8(0x0000);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
+  setUInt8(0x0000, (enable ? 0x01 : 0x00));
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::displayFrequency() const {
+  return 0!=getUInt8(0x0001);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableDisplayFrequency(bool enable) {
+  setUInt8(0x0001, (enable ? 0x01 : 0x00));
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::autoKeyLock() const {
+  return 0!=getUInt8(0x0002);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableAutoKeyLock(bool enable) {
+  setUInt8(0x0002, (enable ? 0x01 : 0x00));
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::autoShutdownDelay() const {
+  switch ((AutoShutdown) getUInt8(0x0003)) {
+  case AutoShutdown::Off: return 0;
+  case AutoShutdown::After10min: return 10;
+  case AutoShutdown::After30min: return 30;
+  case AutoShutdown::After60min: return 60;
+  case AutoShutdown::After120min: return 120;
+  }
+  return 0;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setAutoShutdownDelay(uint min) {
+  if (0 == min) {
+    setUInt8(0x0003, (uint)AutoShutdown::Off);
+  } else if (min <= 10) {
+    setUInt8(0x0003, (uint)AutoShutdown::After10min);
+  } else if (min <= 30) {
+    setUInt8(0x0003, (uint)AutoShutdown::After30min);
+  } else if (min <= 60) {
+    setUInt8(0x0003, (uint)AutoShutdown::After60min);
+  } else {
+    setUInt8(0x0003, (uint)AutoShutdown::After120min);
+  }
+}
+
+AnytoneCodeplug::GeneralSettingsElement::BootDisplay
+AnytoneCodeplug::GeneralSettingsElement::bootDisplay() const {
+  return (BootDisplay) getUInt8(0x0006);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setBootDisplay(BootDisplay mode) {
+  setUInt8(0x0006, (uint)mode);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::bootPassword() const {
+  return getUInt8(0x0007);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableBootPassword(bool enable) {
+  setUInt8(0x0006, (enable ? 0x01 : 0x00));
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::squelchLevelA() const {
+  return getUInt8(0x0009);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelA(uint level) {
+  setUInt8(0x0009, level);
+}
+uint
+AnytoneCodeplug::GeneralSettingsElement::squelchLevelB() const {
+  return getUInt8(0x000a);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelB(uint level) {
+  setUInt8(0x000a, level);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::PowerSave
+AnytoneCodeplug::GeneralSettingsElement::powerSave() const {
+  return (PowerSave) getUInt8(0x000b);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setPowerSave(PowerSave mode) {
+  setUInt8(0x000b, (uint)mode);
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::voxLevel() const {
+  return ((uint)getUInt8(0x000c))*3;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setVOXLevel(uint level) {
+  setUInt8(0x000c, level/3);
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::voxDelay() const {
+  return 100 + 500*((uint)getUInt8(0x000d));
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setVOXDelay(uint ms) {
+  if (ms < 100)
+    ms = 100;
+  setUInt8(0x000d, (ms-100)/500);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::VFOScanType
+AnytoneCodeplug::GeneralSettingsElement::vfoScanType() const {
+  return (VFOScanType) getUInt8(0x000e);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setVFOScanType(VFOScanType type) {
+  setUInt8(0x000e, (uint)type);
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::micGain() const {
+  return (((uint)getUInt8(0x000f))*10)/4;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setMICGain(uint gain) {
+  setUInt8(0x000f, (gain*4)/10);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneCodeplug::GeneralSettingsElement::progFuncKey1Short() const {
+  return (KeyFunction)getUInt8(0x0010);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey1Short(KeyFunction func) {
+  setUInt8(0x0010, (uint)func);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneCodeplug::GeneralSettingsElement::progFuncKey2Short() const {
+  return (KeyFunction)getUInt8(0x0011);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey2Short(KeyFunction func) {
+  setUInt8(0x0011, (uint)func);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneCodeplug::GeneralSettingsElement::progFuncKey3Short() const {
+  return (KeyFunction)getUInt8(0x0012);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey3Short(KeyFunction func) {
+  setUInt8(0x0012, (uint)func);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneCodeplug::GeneralSettingsElement::funcKey1Short() const {
+  return (KeyFunction)getUInt8(0x0013);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setFuncKey1Short(KeyFunction func) {
+  setUInt8(0x0013, (uint)func);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneCodeplug::GeneralSettingsElement::funcKey2Short() const {
+  return (KeyFunction)getUInt8(0x0014);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setFuncKey2Short(KeyFunction func) {
+  setUInt8(0x0014, (uint)func);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::vfoModeB() const {
+  return getUInt8(0x0015);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableVFOModeB(bool enable) {
+  setUInt8(0x0015, (enable ? 0x01 : 0x00));
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::vfoModeA() const {
+  return getUInt8(0x0016);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableVFOModeA(bool enable) {
+  setUInt8(0x0016, (enable ? 0x01 : 0x00));
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::memoryZoneA() const {
+  return getUInt8(0x001f);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setMemoryZoneA(uint zone) {
+  setUInt8(0x001f, zone);
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::memoryZoneB() const {
+  return getUInt8(0x0020);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setMemoryZoneB(uint zone) {
+  setUInt8(0x0020, zone);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::recording() const {
+  return getUInt8(0x0022);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableRecording(bool enable) {
+  setUInt8(0x0022, (enable ? 0x01 : 0x00));
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::brightness() const {
+  return (getUInt8(0x0026)*10)/4;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setBrightness(uint level) {
+  setUInt8(0x0026, (level*4)/10);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::backlightPermanent() const {
+  return 0 == backlightDuration();
+}
+uint
+AnytoneCodeplug::GeneralSettingsElement::backlightDuration() const {
+  return 5*((uint)getUInt8(0x0027));
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setBacklightDuration(uint sec) {
+  setUInt8(0x0027, sec/5);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableBacklightPermanent() {
+  setBacklightDuration(0);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::gps() const {
+  return getUInt8(0x0028);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableGPS(bool enable) {
+  setUInt8(0x0028, (enable ? 0x01 : 0x00));
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::smsAlert() const {
+  return getUInt8(0x0029);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableSMSAlert(bool enable) {
+  setUInt8(0x0029, (enable ? 0x01 : 0x00));
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::activeChannelB() const {
+  return getUInt8(0x002c);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableActiveChannelB(bool enable) {
+  setUInt8(0x002c, (enable ? 0x01 : 0x00));
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::subChannel() const {
+  return getUInt8(0x002d);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableSubChannel(bool enable) {
+  setUInt8(0x002d, (enable ? 0x01 : 0x00));
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::callAlert() const {
+  return getUInt8(0x002f);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableCallAlert(bool enable) {
+  setUInt8(0x002f, (enable ? 0x01 : 0x00));
+}
+
+QTimeZone
+AnytoneCodeplug::GeneralSettingsElement::gpsTimeZone() const {
+  return QTimeZone((((int)getUInt8(0x0030))-12)*3600);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setGPSTimeZone(const QTimeZone &zone) {
+  int offset = zone.offsetFromUtc(QDateTime::currentDateTime());
+  setUInt8(0x0030, (12 + offset/3600));
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::talkPermitDigital() const {
+  return getBit(0x0031, 0);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableTalkPermitDigital(bool enable) {
+  return setBit(0x0031, 0, enable);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::talkPermitAnalog() const {
+  return getBit(0x0031, 1);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableTalkPermitAnalog(bool enable) {
+  return setBit(0x0031, 1, enable);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::digitalResetTone() const {
+  return getUInt8(0x0032);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableDigitalResetTone(bool enable) {
+  return setUInt8(0x0032, (enable ? 0x01 : 0x00));
+}
+
+AnytoneCodeplug::GeneralSettingsElement::VoxSource
+AnytoneCodeplug::GeneralSettingsElement::voxSource() const {
+  return (VoxSource)getUInt8(0x0033);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setVOXSource(VoxSource source) {
+  setUInt8(0x0033, (uint)source);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::idleChannelTone() const {
+  return getUInt8(0x0036);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableIdleChannelTone(bool enable) {
+  return setUInt8(0x0036, (enable ? 0x01 : 0x00));
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::menuExitTime() const {
+  return 5 + 5*((uint) getUInt8(0x0037));
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setMenuExitTime(uint sec) {
+  if (sec < 5)
+    sec = 5;
+  setUInt8(0x0037, (sec-5)/5);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::startupTone() const {
+  return getUInt8(0x0039);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableStartupTone(bool enable) {
+  return setUInt8(0x0039, (enable ? 0x01 : 0x00));
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::callEndPrompt() const {
+  return getUInt8(0x003a);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableCallEndPrompt(bool enable) {
+  return setUInt8(0x003a, (enable ? 0x01 : 0x00));
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::maxVolume() const {
+  return (((uint)getUInt8(0x003b))*10)/8;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setMaxVolume(uint level) {
+  setUInt8(0x003b, (level*8)/10);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::getGPSPosition() const {
+  return getUInt8(0x003f);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableGetGPSPosition(bool enable) {
+  return setUInt8(0x003f, (enable ? 0x01 : 0x00));
+}
+
+AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneCodeplug::GeneralSettingsElement::progFuncKey1Long() const {
+  return (KeyFunction)getUInt8(0x0041);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey1Long(KeyFunction func) {
+  setUInt8(0x0041, (uint)func);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneCodeplug::GeneralSettingsElement::progFuncKey2Long() const {
+  return (KeyFunction)getUInt8(0x0042);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey2Long(KeyFunction func) {
+  setUInt8(0x0042, (uint)func);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneCodeplug::GeneralSettingsElement::progFuncKey3Long() const {
+  return (KeyFunction)getUInt8(0x0043);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey3Long(KeyFunction func) {
+  setUInt8(0x0043, (uint)func);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneCodeplug::GeneralSettingsElement::funcKey1Long() const {
+  return (KeyFunction)getUInt8(0x0044);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setFuncKey1Long(KeyFunction func) {
+  setUInt8(0x0044, (uint)func);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneCodeplug::GeneralSettingsElement::funcKey2Long() const {
+  return (KeyFunction)getUInt8(0x0045);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setFuncKey2Long(KeyFunction func) {
+  setUInt8(0x0045, (uint)func);
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::longPressDuration() const {
+  return (((uint)getUInt8(0x0046))+1)*1000;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setLongPressDuration(uint ms) {
+  if (ms < 1000)
+    ms = 1000;
+  setUInt8(0x0046, ms/1000-1);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::volumeChangePrompt() const {
+  return getUInt8(0x0047);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {
+  setUInt8(0x0047, (enable ? 0x01 : 0x01));
+}
+
+AnytoneCodeplug::GeneralSettingsElement::AutoRepDir
+AnytoneCodeplug::GeneralSettingsElement::autoRepeaterDirectionA() const {
+  return (AutoRepDir) getUInt8(0x0048);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionA(AutoRepDir dir) {
+  setUInt8(0x0048, (uint)dir);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::LastCallerDisplayMode
+AnytoneCodeplug::GeneralSettingsElement::lastCallerDisplayMode() const {
+  return (LastCallerDisplayMode)getUInt8(0x004d);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setLastCallerDisplayMode(LastCallerDisplayMode mode) {
+  setUInt8(0x004d, (uint)mode);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::displayClock() const {
+  return getUInt8(0x0051);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableDisplayClock(bool enable) {
+  setUInt8(0x0051, (enable ? 0x01 : 0x00));
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::maxHeadphoneVolume() const {
+  return (((uint)getUInt8(0x0052))*10)/8;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setMaxHeadPhoneVolume(uint max) {
+  setUInt8(0x0052, (max*8)/10);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::enhanceAudio() const {
+  return getUInt8(0x0057);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableEnhancedAudio(bool enable) {
+  setUInt8(0x0057, (enable ? 0x01 : 0x00));
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::minVFOScanFrequencyUHF() const {
+  return ((uint)getBCD8_le(0x0058))*10;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyUHF(uint hz) {
+  setBCD8_le(0x0058, hz/10);
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::maxVFOScanFrequencyUHF() const {
+  return ((uint)getBCD8_le(0x005c))*10;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyUHF(uint hz) {
+  setBCD8_le(0x005c, hz/10);
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::minVFOScanFrequencyVHF() const {
+  return ((uint)getBCD8_le(0x0060))*10;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyVHF(uint hz) {
+  setBCD8_le(0x0060, hz/10);
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::maxVFOScanFrequencyVHF() const {
+  return ((uint)getBCD8_le(0x0064))*10;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyVHF(uint hz) {
+  setBCD8_le(0x0064, hz/10);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::hasAutoRepeaterOffsetFrequencyIndexUHF() const {
+  return 0xff != autoRepeaterOffsetFrequencyIndexUHF();
+}
+uint
+AnytoneCodeplug::GeneralSettingsElement::autoRepeaterOffsetFrequencyIndexUHF() const {
+  return getUInt8(0x0068);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterOffsetFrequenyIndexUHF(uint idx) {
+  setUInt8(0x0068, idx);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::clearAutoRepeaterOffsetFrequencyIndexUHF() {
+  setAutoRepeaterOffsetFrequenyIndexUHF(0xff);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::hasAutoRepeaterOffsetFrequencyIndexVHF() const {
+  return 0xff != autoRepeaterOffsetFrequencyIndexVHF();
+}
+uint
+AnytoneCodeplug::GeneralSettingsElement::autoRepeaterOffsetFrequencyIndexVHF() const {
+  return getUInt8(0x0069);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterOffsetFrequenyIndexVHF(uint idx) {
+  setUInt8(0x0069, idx);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::clearAutoRepeaterOffsetFrequencyIndexVHF() {
+  setAutoRepeaterOffsetFrequenyIndexVHF(0xff);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::Melody
+AnytoneCodeplug::GeneralSettingsElement::callToneMelody() const {
+  Melody melody;
+  for (int i=0; i<5; i++) {
+    melody.notes[i].frequency = getUInt16_le(0x0072+2*i);
+    melody.notes[i].duration  = getUInt16_le(0x007c+2*i);
+  }
+  return melody;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setCallToneMelody(const Melody &melody) {
+  for (int i=0; i<5; i++) {
+    setUInt16_le(0x0072+2*i, melody.notes[i].frequency);
+    setUInt16_le(0x007c+2*i, melody.notes[i].duration);
+  }
+}
+
+AnytoneCodeplug::GeneralSettingsElement::Melody
+AnytoneCodeplug::GeneralSettingsElement::idleToneMelody() const {
+  Melody melody;
+  for (int i=0; i<5; i++) {
+    melody.notes[i].frequency = getUInt16_le(0x0086+2*i);
+    melody.notes[i].duration  = getUInt16_le(0x0090+2*i);
+  }
+  return melody;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setIdleToneMelody(const Melody &melody) {
+  for (int i=0; i<5; i++) {
+    setUInt16_le(0x0086+2*i, melody.notes[i].frequency);
+    setUInt16_le(0x0090+2*i, melody.notes[i].duration);
+  }
+}
+
+AnytoneCodeplug::GeneralSettingsElement::Melody
+AnytoneCodeplug::GeneralSettingsElement::resetToneMelody() const {
+  Melody melody;
+  for (int i=0; i<5; i++) {
+    melody.notes[i].frequency = getUInt16_le(0x009a+2*i);
+    melody.notes[i].duration  = getUInt16_le(0x00a4+2*i);
+  }
+  return melody;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setResetToneMelody(const Melody &melody) {
+  for (int i=0; i<5; i++) {
+    setUInt16_le(0x009a+2*i, melody.notes[i].frequency);
+    setUInt16_le(0x00a4+2*i, melody.notes[i].duration);
+  }
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::recordingDelay() const {
+  return ((uint)getUInt8(0x00ae))*200;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setRecodringDelay(uint ms) {
+  setUInt8(0x00ae, ms/200);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::displayCall() const {
+  return getUInt8(0x00af);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableDisplayCall(bool enable) {
+  setUInt8(0x00af, (enable ? 0x01 : 0x00));
+}
+
+AnytoneCodeplug::GeneralSettingsElement::Color
+AnytoneCodeplug::GeneralSettingsElement::callDisplayColor() const {
+  return (Color)getUInt8(0x00b0);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setCallDisplayColor(Color color) {
+  setUInt8(0x00b0, (uint)color);
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::gpsUpdatePeriod() const {
+  return getUInt8(0x00b1);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(uint sec) {
+  setUInt8(0x00b1, sec);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::showZoneAndContact() const {
+  return getUInt8(0x00b2);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableShowZoneAndContact(bool enable) {
+  setUInt8(0x00b2, (enable ? 0x01 : 0x00));
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
+  return 0 == keyToneLevel();
+}
+uint
+AnytoneCodeplug::GeneralSettingsElement::keyToneLevel() const {
+  return ((uint)getUInt8(0x00b3))*10/15;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setKeyToneLevel(uint level) {
+  setUInt8(0x00b3, level*10/15);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
+  setUInt8(0x00b3, 0);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::gpsUnitsImperial() const {
+  return getUInt8(0x00b4);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableGPSUnitsImperial(bool enable) {
+  setUInt8(0x00b4, (enable ? 0x01 : 0x00));
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::knobLock() const {
+  return getBit(0x00b5, 0);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableKnobLock(bool enable) {
+  setBit(0x00b5, 0, enable);
+}
+bool
+AnytoneCodeplug::GeneralSettingsElement::keypadLock() const {
+  return getBit(0x00b5, 1);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableKeypadLock(bool enable) {
+  setBit(0x00b5, 1, enable);
+}
+bool
+AnytoneCodeplug::GeneralSettingsElement::sidekeysLock() const {
+  return getBit(0x00b5, 3);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableSidekeysLock(bool enable) {
+  setBit(0x00b5, 3, enable);
+}
+bool
+AnytoneCodeplug::GeneralSettingsElement::professionalKeyLock() const {
+  return getBit(0x00b5, 4);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableProfessionalKeyLock(bool enable) {
+  setBit(0x00b5, 4, enable);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::showLastHeard() const {
+  return getUInt8(0x00b6);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
+  setUInt8(0x00b6, (enable ? 0x01 : 0x00));
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
+  return getBCD8_le(0x00b8)*10;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(uint Hz) {
+  setBCD8_le(0x00b8, Hz/10);
+}
+uint
+AnytoneCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyVHF() const {
+  return getBCD8_le(0x00bc)*10;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(uint Hz) {
+  setBCD8_le(0x00bc, Hz/10);
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyUHF() const {
+  return getBCD8_le(0x00c0)*10;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(uint Hz) {
+  setBCD8_le(0x00c0, Hz/10);
+}
+uint
+AnytoneCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyUHF() const {
+  return getBCD8_le(0x00c4)*10;
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(uint Hz) {
+  setBCD8_le(0x00c4, Hz/10);
+}
+
+AnytoneCodeplug::GeneralSettingsElement::AutoRepDir
+AnytoneCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
+  return (AutoRepDir)getUInt8(0x00c8);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AutoRepDir dir) {
+  setUInt8(0x00c8, (uint)dir);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::defaultChannel() const {
+  return getUInt8(0x00ca);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableDefaultChannel(bool enable) {
+  setUInt8(0x00ca, (enable ? 0x01 : 0x00));
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::defaultZoneIndexA() const {
+  return getUInt8(0x00cb);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setDefaultZoneIndexA(uint idx) {
+  setUInt8(0x00cb, idx);
+}
+
+uint
+AnytoneCodeplug::GeneralSettingsElement::defaultZoneIndexB() const {
+  return getUInt8(0x00cc);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setDefaultZoneIndexB(uint idx) {
+  setUInt8(0x00cc, idx);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::defaultChannelAIsVFO() const {
+  return 0xff == defaultChannelAIndex();
+}
+uint
+AnytoneCodeplug::GeneralSettingsElement::defaultChannelAIndex() const {
+  return getUInt8(0x00cd);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setDefaultChannelAIndex(uint idx) {
+  setUInt8(0x00cd, idx);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setDefaultChannelAToVFO() {
+  setDefaultChannelAIndex(0xff);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::defaultChannelBIsVFO() const {
+  return 0xff == defaultChannelBIndex();
+}
+uint
+AnytoneCodeplug::GeneralSettingsElement::defaultChannelBIndex() const {
+  return getUInt8(0x00ce);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setDefaultChannelBIndex(uint idx) {
+  setUInt8(0x00ce, idx);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::setDefaultChannelBToVFO() {
+  setDefaultChannelBIndex(0xff);
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::keepLastCaller() const {
+  return getUInt8(0x00cf);
+}
+void
+AnytoneCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
+  setUInt8(0x00cf, (enable ? 0x01 : 0x00));
 }
 
 
