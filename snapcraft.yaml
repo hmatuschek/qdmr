@@ -57,6 +57,7 @@ parts:
       - qtpositioning5-dev
       - libqt5serialport5-dev
       - libusb-1.0-0-dev
+      - libyaml-cpp-dev
       - xsltproc
       - docbook-xsl
     stage-packages:
@@ -67,6 +68,7 @@ parts:
       - libqt5serialport5
       - libqt5widgets5
       - libusb-1.0-0
+      - libyaml-cpp0.6
     source: https://github.com/hmatuschek/qdmr.git
     source-type: git
     #source-tag: "v$SNAPCRAFT_PROJECT_VERSION"
