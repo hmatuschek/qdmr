@@ -1039,6 +1039,741 @@ public:
     virtual void enableKeepLastCaller(bool enable);
   };
 
+  /** Represets the base class for zone channel list for all AnyTone codeplugs.
+   * Zone channel lists assign a default channel to each zone for VFO A and B.
+   *
+   * Memory layout of ecoded zone channel lists (size 0x400 bytes):
+   * @verbinclude anytone_zonechannellist.txt */
+  class ZoneChannelListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ZoneChannelListElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    ZoneChannelListElement(uint8_t *ptr);
+
+    /** Resets the zone channel list. */
+    void clear();
+
+    /** Returns @c true if the channel index for VFO A is set for the n-th zone. */
+    virtual bool hasChannelA(uint n) const;
+    /** Returns the channel index (0-based) for VFO A for the n-th zone. */
+    virtual uint channelIndexA(uint n) const;
+    /** Sets the channel index (0-based) for VFO A for the n-th zone. */
+    virtual void setChannelIndexA(uint n, uint idx);
+    /** Clears the channel index (0-based) for VFO A for the n-th zone. */
+    virtual void clearChannelIndexA(uint n);
+
+    /** Returns @c true if the channel index for VFO B is set for the n-th zone. */
+    virtual bool hasChannelB(uint n) const;
+    /** Returns the channel index (0-based) for VFO B for the n-th zone. */
+    virtual uint channelIndexB(uint n) const;
+    /** Sets the channel index (0-based) for VFO B for the n-th zone. */
+    virtual void setChannelIndexB(uint n, uint idx);
+    /** Clears the channel index (0-based) for VFO B for the n-th zone. */
+    virtual void clearChannelIndexB(uint n);
+  };
+
+  /** Represents the base class of the boot settings for all AnyTone codeplug.
+   *
+   * Memory layout of encoded boot settings (size 0x0030):
+   * @verbinclude anytone_bootsettings.txt */
+  class BootSettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    BootSettingsElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    BootSettingsElement(uint8_t *ptr);
+
+    /** Resets the boot settings. */
+    void clear();
+
+    /** Returns the first intro line. */
+    virtual QString introLine1() const;
+    /** Sets the first intro line. */
+    virtual void setIntroLine1(const QString &txt);
+    /** Returns the second intro line. */
+    virtual QString introLine2() const;
+    /** Sets the second intro line. */
+    virtual void setIntroLine2(const QString &txt);
+
+    /** Returns the password. */
+    virtual QString password() const;
+    /** Sets the password. */
+    virtual void setPassword(const QString &txt);
+  };
+
+  /** Represents the base class of DMR APRS settings for all AnyTone codeplugs.
+   *
+   * Memory encoding of the DMR APRS settings (size 0x0030 bytes):
+   * @verbinclude anytone_dmraprssettings.txt */
+  class DMRAPRSSettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DMRAPRSSettingsElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit DMRAPRSSettingsElement(uint8_t *ptr);
+
+    /** Resets the APRS settings. */
+    void clear();
+
+    /** Returns the Manual TX interval in seconds. */
+    virtual uint manualInterval() const;
+    /** Sets the manual TX interval in seconds. */
+    virtual void setManualInterval(uint sec);
+
+    /** Returns @c true if the automatic APRS is enabled. */
+    virtual bool automatic() const;
+    /** Retunrs the automatic transmit interval in seconds. */
+    virtual uint automaticInterval() const;
+    /** Sets the automatic transmit interval in seconds. */
+    virtual void setAutomaticInterval(uint sec);
+    /** Disables the automatic APRS. To enable it, set an interval. */
+    virtual void disableAutomatic();
+
+    /** Returns @c true if the fixed location beacon is enabled. */
+    virtual bool fixedLocation() const;
+    /** Retunrs the location of the fixed position. */
+    virtual QGeoCoordinate location() const;
+    /** Sets the location of the fixed position. */
+    virtual void setLocation(const QGeoCoordinate &pos);
+    /** Enables/disables fixed location beacon. */
+    virtual void enableFixedLocation(bool enable);
+
+    /** Returns the transmit power. */
+    virtual Channel::Power power() const;
+    /** Sets the transmit power. */
+    virtual void setPower(Channel::Power power);
+
+    /** Returns @c true if the n-th channel is set. */
+    virtual bool hasChannel(uint n) const;
+    /** Returns @c true if the n-th channle is VFO A. */
+    virtual bool channelIsVFOA(uint n) const;
+    /** Returns @c true if the n-th channle is VFO B. */
+    virtual bool channelIsVFOB(uint n) const;
+    /** Returns @c true if the n-th channle is selected channel. */
+    virtual bool channelIsSelected(uint n) const;
+    /** Returns the index of the n-th channel. */
+    virtual uint channelIndex(uint n) const;
+    /** Sets the n-th channel index. */
+    virtual void setChannelIndex(uint n, uint idx);
+    /** Sets the n-th channel to VFO A. */
+    virtual void setChannelVFOA(uint n);
+    /** Sets the n-th channel to VFO B. */
+    virtual void setChannelVFOB(uint n);
+    /** Sets the n-th channel to selected channel. */
+    virtual void setChannelSelected(uint n);
+    /** Resets the n-th channel. */
+    virtual void clearChannel(uint n);
+
+    /** Retuns the destination DMR ID to send the APRS information to. */
+    virtual uint destination() const;
+    /** Sets the destination DMR ID to send the APRS information to. */
+    virtual void setDestination(uint id);
+
+    /** Returns the call type. */
+    virtual DigitalContact::Type callType() const;
+    /** Sets the call type. */
+    virtual void setCallType(DigitalContact::Type type);
+
+    /** Returns @c true if the timeslot of the channel is overridden. */
+    virtual bool timeSlotOverride() const;
+    /** Returns the timeslot (only valid if @c timeSlotOverride returns @c true). */
+    virtual DigitalChannel::TimeSlot timeslot() const;
+    /** Sets the timeslot. */
+    virtual void overrideTimeSlot(DigitalChannel::TimeSlot ts);
+    /** Disables TS override. */
+    virtual void disableTimeSlotOverride();
+  };
+
+  /** Represents the base class of prefabricated message linked list for all AnyTone codeplugs.
+   * This element is some weird linked list that determines some order for the prefabricated
+   * SMS messages.
+   *
+   * Memory encoding of the message list (size 0x0010 bytes):
+   * @verbinclude anytone_messagelist.txt */
+  class MessageListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    MessageListElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit MessageListElement(uint8_t *ptr);
+
+    /** Clears the message list item. */
+    void clear();
+
+    /** Returns @c true if there is a next message (EOL otherwise). */
+    virtual bool hasNext() const;
+    /** Returns the index of the next message in list. */
+    virtual uint next() const;
+    /** Sets the index of the next message in list. */
+    virtual void setNext(uint idx);
+    /** Clears the next message index. */
+    virtual void clearNext();
+
+    /** Returns @c true if there is a message index. */
+    virtual bool hasIndex() const;
+    /** Returns the index of the message. */
+    virtual uint index() const;
+    /** Sets the index of the message. */
+    virtual void setIndex(uint idx);
+    /** Clears the index of the message. */
+    virtual void clearIndex();
+  };
+
+  /** Represents base class of a preset message for all AnyTone codeplugs.
+   *
+   * Memory encoding of the message (0x100 bytes):
+   * @verbinclude anytone_message.txt */
+  class MessageElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    MessageElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    MessageElement(uint8_t *ptr);
+
+    /** Resets the message. */
+    void clear();
+
+    /** Returns the message text. */
+    virtual QString message() const;
+    /** Sets the message text. */
+    virtual void setMessage(const QString &msg);
+  };
+
+  /** Represents base class of a analog quick call entry for all AnyTone codeplugs.
+   *
+   * Memory encoding of the message (0x0002 bytes):
+   * @verbinclude anytone_analogquickcall.txt */
+  class AnalogQuickCallElement: public Element
+  {
+  public:
+    /** Analog quick-call types. */
+    enum class Type {
+      None     = 0,                ///< None, quick-call disabled.
+      DTMF     = 1,                ///< DTMF call.
+      TwoTone  = 2,                ///< 2-tone call.
+      FiveTone = 3                 ///< 5-tone call
+    };
+
+  protected:
+    /** Hidden constructor. */
+    AnalogQuickCallElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit AnalogQuickCallElement(uint8_t *ptr);
+
+    /** Resets the quick call entry. */
+    void clear();
+
+    /** Returns the call type. */
+    virtual Type type() const;
+    /** Sets the type of the quick call. */
+    virtual void setType(Type type);
+
+    /** Retunrs @c true if an analog contact index is set. */
+    virtual bool hasContactIndex() const;
+    /** Retunrs the analog contact index. */
+    virtual uint contactIndex() const;
+    /** Sets the analog contact index. */
+    virtual void setContactIndex(uint idx);
+    /** Clears the contact index. */
+    virtual void clearContactIndex();
+  };
+
+  /** Represents the base class of a hot-key setting entry for all AnyTone codeplugs.
+   *
+   * Memory encoding of a hot-key setting (size 0x0030 bytes):
+   * @verbinclude anytone_hotkey.txt */
+  class HotKeyElement: public Element
+  {
+  public:
+    /** Hot-key types. */
+    enum class Type {
+      Call = 0,             ///< Perform a call.
+      Menu = 1              ///< Show a menu item.
+    };
+
+    /** Possible menu items. */
+    enum class MenuItem {
+      SMS = 1,          ///< Show SMS menu.
+      NewSMS = 2,       ///< Create new SMS.
+      HotText = 3,      ///< Send a hot-text.
+      Inbox = 4,        ///< Show SMS inbox.
+      Outbox = 5,       ///< Show SMS outbox.
+      Contacts = 6,     ///< Show contact list.
+      ManualDial = 7,   ///< Show manual dial.
+      CallLog = 8       ///< Show call log.
+    };
+
+    /** Possible call types. */
+    enum class CallType {
+      Analog = 0,       ///< Perform an analog call.
+      Digital = 1       ///< Perform a digital call.
+    };
+
+    /** Possible digital call sub-types. */
+    enum class DigiCallType {
+      Off = 0xff,          ///< Call disabled.
+      GroupCall = 0,       ///< Perform a group call.
+      PrivateCall= 1,      ///< Perform private call.
+      AllCall = 2,         ///< Perform all call.
+      HotText = 3,         ///< Send a text message.
+      CallTip = 4,         ///< Send a call tip (?).
+      StatusMessage = 5    ///< Send a state message.
+    };
+
+  protected:
+    /** Hidden constructor. */
+    HotKeyElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit HotKeyElement(uint8_t *ptr);
+
+    /** Resets the hot-key entry. */
+    void clear();
+
+    /** Returns the type of the hot-key entry. */
+    virtual Type type() const;
+    /** Sets the type of the hot-key entry. */
+    virtual void setType(Type type);
+
+    /** If @c type returns @c Type::Menu, returns the menu item. */
+    virtual MenuItem menuItem() const;
+    /** Sets the menu item. For this setting to have an effect, the @c type must be set to
+     * @c Type::Menu. */
+    virtual void setMenuItem(MenuItem item);
+
+    /** If @c type returns @c Type::Call, returns the type of the call. */
+    virtual CallType callType() const;
+    /** Sets the call type. For this settings to have an effect, the type must be set to
+     * @c Type::Call. */
+    virtual void setCallType(CallType type);
+
+    /** If @c type returns @c Type::Call and @c callType @c CalLType::Digital, retuns the digital
+     * call type. */
+    virtual DigiCallType digiCallType() const;
+    /** Sets the digital call type. For this setting to have an effect, the @c type must be
+     * @c Type::Call and @c callType must be @c CallType::Digital. */
+    virtual void setDigiCallType(DigiCallType type);
+
+    /** Retruns @c true if the contact index is set. */
+    virtual bool hasContactIndex() const;
+    /** If @c type is @c Type::Call, returns the contact index. This is either an index of an
+     * analog quick call if @c callType is CallType::Analog or a contact index if @c callType is
+     * @c CallType::Digital. If set to 0xffffffff the index is invalid. */
+    virtual uint contactIndex() const;
+    /** Sets the contact index. This can either be an index of an analog quick-call or a contact
+     * index. */
+    virtual void setContactIndex(uint idx);
+    /** Clears the contact index. */
+    virtual void clearContactIndex();
+
+    /** Returns @c true if a message index is set. */
+    virtual bool hasMessageIndex() const;
+    /** Returns the message index. This can either be an index of an SMS or an index of a status
+     * message. */
+    virtual uint messageIndex() const;
+    /** Sets the message index. */
+    virtual void setMessageIndex(uint idx);
+    /** Clears the message index. */
+    virtual void clearMessageIndex();
+  };
+
+  /** Represents the base class of alarm setting entry for all AnyTone codeplugs.
+   *
+   * Memory encoding of an alarm setting (size 0x0020 bytes):
+   * @verbinclude anytone_alarmsetting.txt */
+  class AlarmSettingElement: public Element
+  {
+  public:
+    /** Represents the base class of an analog alarm setting for all AnyTone codeplugs.
+     *
+     * Memory representation of an analog alarm setting (size 0x000a bytes):
+     * @verbinclude anytone_analogalarm.txt */
+    class AnalogAlarm: public Element
+    {
+    public:
+      /** Possible analog alarm types. */
+      enum class Action {
+        None = 0,            ///< No alarm at all.
+        Background = 1,      ///< Transmit and background.
+        TXAlarm = 2,         ///< Transmit and alarm
+        Both = 3,            ///< Both?
+      };
+
+      /** Possible alarm signalling types. */
+      enum class ENIType {
+        None = 0,            ///< No alarm code signalling.
+        DTMF = 1,            ///< Send alarm code as DTMF.
+        FiveTone = 2         ///< Send alarm code as 5-tone.
+      };
+
+    protected:
+      /** Hidden constructor. */
+      AnalogAlarm(uint8_t *ptr, uint size);
+
+    public:
+      /** Constructor. */
+      AnalogAlarm(uint8_t *ptr);
+
+      /** Resets the alarm. */
+      void clear();
+
+      /** Returns the alarm action. */
+      virtual Action action() const;
+      /** Sets the alarm action. */
+      virtual void setAction(Action action);
+
+      /** Returns the encoding type. */
+      virtual ENIType encodingType() const;
+      /** Sets the encoding type. */
+      virtual void setEncodingType(ENIType type);
+
+      /** Returns the emergency ID index. */
+      virtual uint emergencyIndex() const;
+      /** Sets the emergency ID index. */
+      virtual void setEmergencyIndex(uint idx);
+
+      /** Returns the alarm duration in seconds. */
+      virtual uint duration() const;
+      /** Sets the alarm duration in seconds. */
+      virtual void setDuration(uint sec);
+      /** Returns the TX duration in seconds. */
+      virtual uint txDuration() const;
+      /** Sets the TX duration in seconds. */
+      virtual void setTXDuration(uint sec);
+      /** Returns the RX duration in seconds. */
+      virtual uint rxDuration() const;
+      /** Sets the RX duration in seconds. */
+      virtual void setRXDuration(uint sec);
+
+      /** Returns @c true if the alarm channel is the selected channel. */
+      virtual bool channelIsSelected() const;
+      /** Returns the channel index. */
+      virtual uint channelIndex() const;
+      /** Sets the channel index. */
+      virtual void setChannelIndex(uint idx);
+      /** Sets the alarm channel to the selected channel. */
+      virtual void setChannelSelected();
+
+      /** Returns @c true if the alarm is repeated continuously. */
+      virtual bool repeatContinuously() const;
+      /** Returns the number of alarm repetitions. */
+      virtual uint repetitions() const;
+      /** Sets the number of alarm repetitions. */
+      virtual void setRepetitions(uint num);
+      /** Sets the alarm to be repeated continuously. */
+      virtual void setRepatContinuously();
+    };
+
+    /** Represents the base class of an digital alarm setting for all AnyTone codeplugs.
+     *
+     * Memory representation of a digital alarm setting (size 0x000c bytes):
+     * @verbinclude anytone_digitalalarm.txt */
+    class DigitalAlarm: public Element
+    {
+    public:
+      /** Possible alarm types. */
+      enum class Action {
+        None = 0,           ///< No alarm at all.
+        Background = 1,     ///< Transmit and background.
+        NonLocal = 2,       ///< Transmit and non-local alarm.
+        Local = 3,          ///< Transmit and local alarm.
+      };
+
+    protected:
+      /** Hidden constructor. */
+      DigitalAlarm(uint8_t *ptr, uint size);
+
+    public:
+      /** Constructor. */
+      explicit DigitalAlarm(uint8_t *ptr);
+
+      /** Resets the digital alarm settings. */
+      void clear();
+
+      /** Returns the alarm action. */
+      virtual Action action() const;
+      /** Sets the alarm action. */
+      virtual void setAction(Action action);
+
+      /** Returns the alarm duration in seconds. */
+      virtual uint duration() const;
+      /** Sets the alarm duration in seconds. */
+      virtual void setDuration(uint sec);
+      /** Returns the TX duration in seconds. */
+      virtual uint txDuration() const;
+      /** Sets the TX duration in seconds. */
+      virtual void setTXDuration(uint sec);
+      /** Returns the RX duration in seconds. */
+      virtual uint rxDuration() const;
+      /** Sets the RX duration in seconds. */
+      virtual void setRXDuration(uint sec);
+
+      /** Returns @c true if the alarm channel is the selected channel. */
+      virtual bool channelIsSelected() const;
+      /** Returns the channel index. */
+      virtual uint channelIndex() const;
+      /** Sets the channel index. */
+      virtual void setChannelIndex(uint idx);
+      /** Sets the alarm channel to the selected channel. */
+      virtual void setChannelSelected();
+
+      /** Returns @c true if the alarm is repeated continuously. */
+      virtual bool repeatContinuously() const;
+      /** Returns the number of alarm repetitions. */
+      virtual uint repetitions() const;
+      /** Sets the number of alarm repetitions. */
+      virtual void setRepetitions(uint num);
+      /** Sets the alarm to be repeated continuously. */
+      virtual void setRepatContinuously();
+
+      /** Returns voice broadcast duration in minutes. */
+      virtual uint voiceBroadcastDuration() const;
+      /** Sets voice broadcast duration in minutes. */
+      virtual void setVoiceBroadcastDuration(uint min);
+      /** Returns area broadcast duration in minutes. */
+      virtual uint areaBroadcastDuration() const;
+      /** Sets area broadcast duration in minutes. */
+      virtual void setAreaBroadcastDuration(uint min);
+
+      /** Returns @c true if the VOX gets enabled. */
+      virtual bool vox() const;
+      /** Enables/disables the VOX for alarms. */
+      virtual void enableVOX(bool enable);
+      /** Returns @c true if alarms gets received enabled. */
+      virtual bool rxAlarm() const;
+      /** Enables/disables the reception of alarms. */
+      virtual void enableRXAlarm(bool enable);
+    };
+
+  protected:
+    /** Hidden constructor. */
+    AlarmSettingElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    AlarmSettingElement(uint8_t *ptr);
+
+    /** Clears the alarm settings. */
+    void clear();
+
+    /** Returns a pointer to the analog alarm settings. */
+    virtual uint8_t *analog() const;
+    /** Returns a pointer to the digital alarm settings. */
+    virtual uint8_t *digital() const;
+  };
+
+  /** Represents the base class of digital alarm setting extension for all AnyTone codeplugs.
+   *
+   * Memory encoding of a digital alarm setting extension (size 0x0030 bytes):
+   * @verbinclude anytone_digitalalarmextension.txt */
+  class DigitalAlarmExtensionElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DigitalAlarmExtensionElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    DigitalAlarmExtensionElement(uint8_t *ptr);
+
+    /** Clears the settings. */
+    void clear();
+
+    /** Returns the call type. */
+    virtual DigitalContact::Type callType() const;
+    /** Sets the call type. */
+    virtual void setCallType(DigitalContact::Type type);
+
+    /** Returns the destination DMR number. */
+    virtual uint destination() const;
+    /** Sets the destination DMR number. */
+    virtual void setDestination(uint number);
+  };
+
+  /** Represents the base-class for 5Tone IDs for all AnyTone codeplugs.
+   *
+   * Memory encoding of the ID (size 0x0020 bytes):
+   * @verbinclude anytone_5toneid.txt */
+  class FiveToneIDElement: public Element
+  {
+  public:
+    /** Possible 5-tone encoding standards. */
+    enum class Standard {
+      ZVEI1 = 0, ZVEI2, ZVEI3, PZVEI, DZVEI, PDZVEI, CCIR1, CCIR2, PCCIR, EEA, EuroSignal, NATEL,
+      MODAT, CCITT, EIA
+    };
+
+  protected:
+    /** Hidden constructor. */
+    FiveToneIDElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    FiveToneIDElement(uint8_t *ptr);
+
+    /** Clears the ID. */
+    void clear();
+
+    /** Retunrs the 5Tone encoding standard. */
+    virtual Standard standard() const;
+    /** Sets the encoding standard. */
+    virtual void setStandard(Standard std);
+
+    /** Retunrs the tone duration in ms. */
+    virtual uint toneDuration() const;
+    /** Sets the tone duration in ms. */
+    virtual void setToneDuration(uint ms);
+
+    /** Returns the ID. */
+    virtual QString id() const;
+    /** Sets the ID. */
+    virtual void setID(const QString &id);
+
+    /** Returns the name. */
+    virtual QString name() const;
+    /** Sets the name. */
+    virtual void setName(const QString &name);
+  };
+
+  /** Represents the base-class for 5Tone function for all AnyTone codeplugs.
+   *
+   * Memory encoding of the function (size 0x0020 bytes):
+   * @verbinclude anytone_5tonefunction.txt */
+  class FiveToneFunctionElement: public Element
+  {
+  public:
+    /** Possible function being performed on 5-tone decoding. */
+    enum class Function {
+      OpenSquelch=0, CallAll, EmergencyAlarm, RemoteKill, RemoteStun, RemoteWakeup,
+      GroupCall
+    };
+
+    /** Possible responses to 5-tone decoding. */
+    enum class Response {
+      None=0, Tone, ToneRespond
+    };
+
+  protected:
+    /** Hidden constructor. */
+    FiveToneFunctionElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit FiveToneFunctionElement(uint8_t *ptr);
+
+    /** Clears the function settings. */
+    void clear();
+
+    /** Returns the function. */
+    virtual Function function() const;
+    /** Sets the function. */
+    virtual void setFunction(Function function);
+    /** Returns the response. */
+    virtual Response response() const;
+    /** Sets the response. */
+    virtual void setResponse(Response response);
+
+    /** Returns the ID. */
+    virtual QString id() const;
+    /** Sets the ID. */
+    virtual void setID(const QString &id);
+
+    /** Returns the name. */
+    virtual QString name() const;
+    /** Sets the name. */
+    virtual void setName(const QString &name);
+  };
+
+  /** Represents the base-class for 5Tone settings for all AnyTone codeplugs.
+   *
+   * Memory encoding of the settings (size 0x0080 bytes):
+   * @verbinclude anytone_5tonesettings.txt */
+  class FiveToneSettingsElement: public Element
+  {
+  public:
+    /** Possible responses to decoded 5-tone codes. */
+    enum class Response {
+      None = 0, Tone, ToneRespond
+    };
+    /** Possible 5-tone encoding standards. */
+    typedef enum FiveToneIDElement::Standard Standard;
+
+  protected:
+    /** Hidden constructor. */
+    FiveToneSettingsElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    FiveToneSettingsElement(uint8_t *ptr);
+
+    /** Resets the 5tone settings. */
+    void clear();
+
+    /** Returns the decoding response. */
+    virtual Response decodingResponse() const;
+    /** Sets the decoding response. */
+    virtual void setDecodingResponse(Response response);
+
+    /** Returns the decoding standard. */
+    virtual Standard decodingStandard() const;
+    /** Sets the decoding standard. */
+    virtual void setDecodingStandard(Standard standard);
+
+    /** Returns the decoding tone duration in ms. */
+    virtual uint decodingToneDuration() const;
+    /** Sets the decoding tone duration in ms. */
+    virtual void setDecodingToneDuration(uint ms);
+
+    /** Returns the 5tone radio ID. */
+    virtual QString id() const;
+    /** Sets the 5tone radio ID. */
+    virtual void setID(const QString &id);
+
+    /** Returns the post-encode delay in ms. */
+    virtual uint postEncodeDelay() const;
+    /** Sets the post-encode delay in ms. */
+    virtual void setPostEncodeDelay(uint ms);
+
+    /** Returns @c true if the PTT ID is set. */
+    virtual bool hasPTTID() const;
+    /** Returns the PTT ID. */
+    virtual uint pttID() const;
+    /** Sets the PTT ID [5,75]. */
+    virtual void setPTTID(uint id);
+    /** Clears the PTT ID. */
+    virtual void clearPTTID();
+
+    /** Returns the auto-reset time in seconds. */
+    virtual uint autoResetTime() const;
+    /** Sets the auto-reset time in seconds. */
+    virtual void setAutoResetTime(uint s);
+
+    /** Returns the first delay in ms. */
+    virtual uint firstDelay() const;
+    /** Sets the first delay in ms. */
+    virtual void setFirstDelay(uint ms);
+
+  };
+
 protected:
   /** Hidden constructor. */
   explicit AnytoneCodeplug(QObject *parent=nullptr);

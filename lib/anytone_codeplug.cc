@@ -1869,6 +1869,1134 @@ AnytoneCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ZoneChannelListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ZoneChannelListElement::ZoneChannelListElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pas...
+}
+
+AnytoneCodeplug::ZoneChannelListElement::ZoneChannelListElement(uint8_t *ptr)
+  : Element(ptr, 0x0400)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::ZoneChannelListElement::clear() {
+  memset(_data, 0x00, _size);
+  memset(_data, 0xff, 2*250);
+  memset(_data+0x200, 0xff, 2*250);
+}
+
+bool
+AnytoneCodeplug::ZoneChannelListElement::hasChannelA(uint n) const {
+  return 0xffff == channelIndexA(n);
+}
+uint
+AnytoneCodeplug::ZoneChannelListElement::channelIndexA(uint n) const {
+  return getUInt16_le(0x0000 + 2*n);
+}
+void
+AnytoneCodeplug::ZoneChannelListElement::setChannelIndexA(uint n, uint idx) {
+  setUInt16_le(0x0000 + 2*n, idx);
+}
+void
+AnytoneCodeplug::ZoneChannelListElement::clearChannelIndexA(uint n) {
+  setChannelIndexA(n, 0xffff);
+}
+
+bool
+AnytoneCodeplug::ZoneChannelListElement::hasChannelB(uint n) const {
+  return 0xffff == channelIndexB(n);
+}
+uint
+AnytoneCodeplug::ZoneChannelListElement::channelIndexB(uint n) const {
+  return getUInt16_le(0x0200 + 2*n);
+}
+void
+AnytoneCodeplug::ZoneChannelListElement::setChannelIndexB(uint n, uint idx) {
+  setUInt16_le(0x0200 + 2*n, idx);
+}
+void
+AnytoneCodeplug::ZoneChannelListElement::clearChannelIndexB(uint n) {
+  setChannelIndexB(n, 0xffff);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::BootSettingsElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x0030)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::BootSettingsElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+QString
+AnytoneCodeplug::BootSettingsElement::introLine1() const {
+  return readASCII(0x0000, 16, 0x00);
+}
+void
+AnytoneCodeplug::BootSettingsElement::setIntroLine1(const QString &txt) {
+  writeASCII(0x0000, txt, 16, 0x00);
+}
+QString
+AnytoneCodeplug::BootSettingsElement::introLine2() const {
+  return readASCII(0x0010, 16, 0x00);
+}
+void
+AnytoneCodeplug::BootSettingsElement::setIntroLine2(const QString &txt) {
+  writeASCII(0x0010, txt, 16, 0x00);
+}
+
+QString
+AnytoneCodeplug::BootSettingsElement::password() const {
+  return readASCII(0x0020, 16, 0x00);
+}
+void
+AnytoneCodeplug::BootSettingsElement::setPassword(const QString &txt) {
+  writeASCII(0x0020, txt, 16, 0x00);
+}
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DMRAPRSSettingsElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DMRAPRSSettingsElement::DMRAPRSSettingsElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DMRAPRSSettingsElement::DMRAPRSSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x0030)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+uint
+AnytoneCodeplug::DMRAPRSSettingsElement::manualInterval() const {
+  return getUInt8(0x0000);
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::setManualInterval(uint sec) {
+  setUInt8(0x0000, sec);
+}
+
+bool
+AnytoneCodeplug::DMRAPRSSettingsElement::automatic() const {
+  return 0!=getUInt8(0x0001);
+}
+uint
+AnytoneCodeplug::DMRAPRSSettingsElement::automaticInterval() const {
+  return 45 + 15*((uint)getUInt8(0x0001));
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::setAutomaticInterval(uint sec) {
+  if (sec<60)
+    sec = 60;
+  setUInt8(0x0001, (sec-45)/15);
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::disableAutomatic() {
+  setUInt8(0x0001, 0x00);
+}
+
+bool
+AnytoneCodeplug::DMRAPRSSettingsElement::fixedLocation() const {
+  return getUInt8(0x0002);
+}
+QGeoCoordinate
+AnytoneCodeplug::DMRAPRSSettingsElement::location() const {
+  double latitude  = getUInt8(0x0003) + double(getUInt8(0x0004))/60 + double(getUInt8(0x0005))/3600;
+  if (getUInt8(0x0006)) latitude *= -1;
+  double longitude = getUInt8(0x0007) + double(getUInt8(0x0008))/60 + double(getUInt8(0x0009))/3600;
+  if (getUInt8(0x000a)) longitude *= -1;
+  return QGeoCoordinate(latitude, longitude);
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::setLocation(const QGeoCoordinate &pos) {
+  double latitude = pos.latitude();
+  bool south = (0 > latitude); latitude = std::abs(latitude);
+  uint lat_deg = int(latitude); latitude -= lat_deg; latitude *= 60;
+  uint lat_min = int(latitude); latitude -= lat_min; latitude *= 60;
+  uint lat_sec = int(latitude);
+  double longitude = pos.longitude();
+  bool west = (0 > longitude); longitude = std::abs(longitude);
+  uint lon_deg = int(longitude); longitude -= lon_deg; longitude *= 60;
+  uint lon_min = int(longitude); longitude -= lon_min; longitude *= 60;
+  uint lon_sec = int(longitude);
+  setUInt8(0x0003, lat_deg); setUInt8(0x0004, lat_min); setUInt8(0x0005, lat_sec); setUInt8(0x0006, (south ? 0x01 : 0x00));
+  setUInt8(0x0007, lon_deg); setUInt8(0x0008, lon_min); setUInt8(0x0009, lon_sec); setUInt8(0x000a, (west ? 0x01 : 0x00));
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::enableFixedLocation(bool enable) {
+  setUInt8(0x0002, (enable ? 0x01 : 0x00));
+}
+
+Channel::Power
+AnytoneCodeplug::DMRAPRSSettingsElement::power() const {
+  switch (getUInt8(0x000b)) {
+  case 0x00: return Channel::Power::Low;
+  case 0x01: return Channel::Power::Mid;
+  case 0x02: return Channel::Power::High;
+  case 0x03: return Channel::Power::Max;
+  }
+  return Channel::Power::Low;
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::setPower(Channel::Power power) {
+  switch (power) {
+  case Channel::Power::Min:
+  case Channel::Power::Low:
+    setUInt8(0x000b, 0x00);
+    break;
+  case Channel::Power::Mid:
+    setUInt8(0x000b, 0x01);
+    break;
+  case Channel::Power::High:
+    setUInt8(0x000b, 0x02);
+    break;
+  case Channel::Power::Max:
+    setUInt8(0x000b, 0x03);
+    break;
+  }
+}
+
+bool
+AnytoneCodeplug::DMRAPRSSettingsElement::hasChannel(uint n) const {
+  return 0xffff != channelIndex(n);
+}
+bool
+AnytoneCodeplug::DMRAPRSSettingsElement::channelIsVFOA(uint n) const {
+  return 0x0fa0 == channelIndex(n);
+}
+bool
+AnytoneCodeplug::DMRAPRSSettingsElement::channelIsVFOB(uint n) const {
+  return 0x0fa1 == channelIndex(n);
+}
+bool
+AnytoneCodeplug::DMRAPRSSettingsElement::channelIsSelected(uint n) const {
+  return 0x0fa2 == channelIndex(n);
+}
+uint
+AnytoneCodeplug::DMRAPRSSettingsElement::channelIndex(uint n) const {
+  return getUInt16_le(0x000c + 2*n);
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::setChannelIndex(uint n, uint idx) {
+  setUInt16_le(0x000c + 2*n, idx);
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::setChannelVFOA(uint n) {
+  setChannelIndex(n, 0x0fa0);
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::setChannelVFOB(uint n) {
+  setChannelIndex(n, 0x0fa1);
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::setChannelSelected(uint n) {
+  setChannelIndex(n, 0x0fa2);
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::clearChannel(uint n) {
+  setChannelIndex(n, 0xffff);
+}
+
+uint
+AnytoneCodeplug::DMRAPRSSettingsElement::destination() const {
+  return getBCD8_le(0x001c);
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::setDestination(uint id) {
+  setBCD8_le(0x001c, id);
+}
+
+DigitalContact::Type
+AnytoneCodeplug::DMRAPRSSettingsElement::callType() const {
+  switch (getUInt8(0x0020)) {
+  case 0x00: return DigitalContact::PrivateCall;
+  case 0x01: return DigitalContact::GroupCall;
+  case 0x02: return DigitalContact::AllCall;
+  }
+  return DigitalContact::PrivateCall;
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::setCallType(DigitalContact::Type type) {
+  switch (type) {
+  case DigitalContact::PrivateCall: setUInt8(0x0020, 0x00); break;
+  case DigitalContact::GroupCall: setUInt8(0x0020, 0x01); break;
+  case DigitalContact::AllCall: setUInt8(0x0020, 0x02); break;
+  }
+}
+
+bool
+AnytoneCodeplug::DMRAPRSSettingsElement::timeSlotOverride() const {
+  return 0 != getUInt8(0x0021);
+}
+DigitalChannel::TimeSlot
+AnytoneCodeplug::DMRAPRSSettingsElement::timeslot() const {
+  if (1 == getUInt8(0x0021))
+    return DigitalChannel::TimeSlot::TS1;
+  else if (2 == getUInt8(0x0021))
+    return DigitalChannel::TimeSlot::TS2;
+  return DigitalChannel::TimeSlot::TS1;
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::overrideTimeSlot(DigitalChannel::TimeSlot ts) {
+  if (DigitalChannel::TimeSlot::TS1 == ts)
+    setUInt8(0x0021, 0x01);
+  else
+    setUInt8(0x0021, 0x02);
+}
+void
+AnytoneCodeplug::DMRAPRSSettingsElement::disableTimeSlotOverride() {
+  setUInt8(0x0021, 0x00);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::MessageListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::MessageListElement::MessageListElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::MessageListElement::MessageListElement(uint8_t *ptr)
+  : Element(ptr, 0x0010)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::MessageListElement::clear() {
+  memset(_data, 0x00, _size);
+  clearNext();
+  clearIndex();
+}
+
+bool
+AnytoneCodeplug::MessageListElement::hasNext() const {
+  return 0xff != next();
+}
+uint
+AnytoneCodeplug::MessageListElement::next() const {
+  return getUInt8(0x0002);
+}
+void
+AnytoneCodeplug::MessageListElement::setNext(uint idx) {
+  setUInt8(0x0002, idx);
+}
+void
+AnytoneCodeplug::MessageListElement::clearNext() {
+  setNext(0xff);
+}
+
+bool
+AnytoneCodeplug::MessageListElement::hasIndex() const {
+  return 0xff != index();
+}
+uint
+AnytoneCodeplug::MessageListElement::index() const {
+  return getUInt8(0x0003);
+}
+void
+AnytoneCodeplug::MessageListElement::setIndex(uint idx) {
+  setUInt8(0x0003, idx);
+}
+void
+AnytoneCodeplug::MessageListElement::clearIndex() {
+  setIndex(0xff);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::MessageElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::MessageElement::MessageElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::MessageElement::MessageElement(uint8_t *ptr)
+  : Element(ptr, 0x0100)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::MessageElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+QString
+AnytoneCodeplug::MessageElement::message() const {
+  return readASCII(0x0000, 99, 0x00);
+}
+void
+AnytoneCodeplug::MessageElement::setMessage(const QString &msg) {
+  writeASCII(0x0000, msg, 99, 0x00);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::AnalogQuickCallElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::AnalogQuickCallElement::AnalogQuickCallElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::AnalogQuickCallElement::AnalogQuickCallElement(uint8_t *ptr)
+  : Element(ptr, 0x0002)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::AnalogQuickCallElement::clear() {
+  memset(_data, 0x00, _size);
+  clearContactIndex();
+}
+
+AnytoneCodeplug::AnalogQuickCallElement::Type
+AnytoneCodeplug::AnalogQuickCallElement::type() const {
+  return (Type)getUInt8(0x0000);
+}
+void
+AnytoneCodeplug::AnalogQuickCallElement::setType(Type type) {
+  setUInt8(0x0000, (uint)type);
+}
+
+bool
+AnytoneCodeplug::AnalogQuickCallElement::hasContactIndex() const {
+  return 0xff != contactIndex();
+}
+uint
+AnytoneCodeplug::AnalogQuickCallElement::contactIndex() const {
+  return getUInt8(0x0001);
+}
+void
+AnytoneCodeplug::AnalogQuickCallElement::setContactIndex(uint idx) {
+  setUInt8(0x0001, idx);
+}
+void
+AnytoneCodeplug::AnalogQuickCallElement::clearContactIndex() {
+  setContactIndex(0xff);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::HotKeyElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::HotKeyElement::HotKeyElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::HotKeyElement::HotKeyElement(uint8_t *ptr)
+  : Element(ptr, 0x0030)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::HotKeyElement::clear() {
+  memset(_data, 0x00, _size);
+  clearContactIndex();
+  clearMessageIndex();
+}
+
+AnytoneCodeplug::HotKeyElement::Type
+AnytoneCodeplug::HotKeyElement::type() const {
+  return (Type)getUInt8(0x0000);
+}
+void
+AnytoneCodeplug::HotKeyElement::setType(Type type) {
+  setUInt8(0x0000, (uint)type);
+}
+
+AnytoneCodeplug::HotKeyElement::MenuItem
+AnytoneCodeplug::HotKeyElement::menuItem() const {
+  return (MenuItem) getUInt8(0x0001);
+}
+void
+AnytoneCodeplug::HotKeyElement::setMenuItem(MenuItem item) {
+  setUInt8(0x0001, (uint)item);
+}
+
+AnytoneCodeplug::HotKeyElement::CallType
+AnytoneCodeplug::HotKeyElement::callType() const {
+  return (CallType)getUInt8(0x0002);
+}
+void
+AnytoneCodeplug::HotKeyElement::setCallType(CallType type) {
+  setUInt8(0x0002, (uint)type);
+}
+
+AnytoneCodeplug::HotKeyElement::DigiCallType
+AnytoneCodeplug::HotKeyElement::digiCallType() const {
+  return (DigiCallType)getUInt8(0x0003);
+}
+void
+AnytoneCodeplug::HotKeyElement::setDigiCallType(DigiCallType type) {
+  setUInt8(0x0003, (uint)type);
+}
+
+bool
+AnytoneCodeplug::HotKeyElement::hasContactIndex() const {
+  return 0xffffffff != contactIndex();
+}
+uint
+AnytoneCodeplug::HotKeyElement::contactIndex() const {
+  return getUInt32_le(0x0004);
+}
+void
+AnytoneCodeplug::HotKeyElement::setContactIndex(uint idx) {
+  setUInt32_le(0x0004, idx);
+}
+void
+AnytoneCodeplug::HotKeyElement::clearContactIndex() {
+  setContactIndex(0xffffffff);
+}
+
+bool
+AnytoneCodeplug::HotKeyElement::hasMessageIndex() const {
+  return 0xff != messageIndex();
+}
+uint
+AnytoneCodeplug::HotKeyElement::messageIndex() const {
+  return getUInt8(0x0008);
+}
+void
+AnytoneCodeplug::HotKeyElement::setMessageIndex(uint idx) {
+  setUInt8(0x0008, idx);
+}
+void
+AnytoneCodeplug::HotKeyElement::clearMessageIndex() {
+  setMessageIndex(0xff);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::AlarmSettingElement::AnalogAlarm
+ * ********************************************************************************************* */
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::AnalogAlarm(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::AnalogAlarm(uint8_t *ptr)
+  : Element(ptr, 0x000a)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::clear() {
+  memset(_data, 0x00, _size);
+  setChannelSelected();
+}
+
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::Action
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::action() const {
+  return (Action) getUInt8(0x0000);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setAction(Action action) {
+  setUInt8(0x0000, (uint)action);
+}
+
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::ENIType
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::encodingType() const {
+  return (ENIType) getUInt8(0x0001);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setEncodingType(ENIType type) {
+  setUInt8(0x0001, (uint)type);
+}
+
+uint
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::emergencyIndex() const {
+  return getUInt8(0x0002);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setEmergencyIndex(uint idx) {
+  setUInt8(0x0002, idx);
+}
+
+uint
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::duration() const {
+  return getUInt8(0x0003);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setDuration(uint sec) {
+  setUInt8(0x0003, sec);
+}
+
+uint
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::txDuration() const {
+  return getUInt8(0x0004);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setTXDuration(uint sec) {
+  setUInt8(0x0004, sec);
+}
+
+uint
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::rxDuration() const {
+  return getUInt8(0x0005);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setRXDuration(uint sec) {
+  setUInt8(0x0005, sec);
+}
+
+bool
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::channelIsSelected() const {
+  return getUInt8(0x0008);
+}
+uint
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::channelIndex() const {
+  return getUInt16_le(0x0006);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setChannelIndex(uint idx) {
+  setUInt16_le(0x0006, idx);
+  setUInt8(0x0008, 0x00);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setChannelSelected() {
+  setUInt8(0x0008, 0x01);
+}
+
+bool
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::repeatContinuously() const {
+  return 0 == repetitions();
+}
+uint
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::repetitions() const {
+  return getUInt8(0x0009);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setRepetitions(uint num) {
+  setUInt8(0x0009, num);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setRepatContinuously() {
+  setRepetitions(0x00);
+}
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::AlarmSettingElement::DigitalAlarm
+ * ********************************************************************************************* */
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::DigitalAlarm(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::DigitalAlarm(uint8_t *ptr)
+  : Element(ptr, 0x000c)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::clear() {
+  memset(_data, 0x00, _size);
+  setChannelSelected();
+}
+
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::Action
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::action() const {
+  return (Action) getUInt8(0x0000);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setAction(Action action) {
+  setUInt8(0x0000, (uint)action);
+}
+
+uint
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::duration() const {
+  return getUInt8(0x0001);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setDuration(uint sec) {
+  setUInt8(0x0001, sec);
+}
+
+uint
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::txDuration() const {
+  return getUInt8(0x0002);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setTXDuration(uint sec) {
+  setUInt8(0x0002, sec);
+}
+
+uint
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::rxDuration() const {
+  return getUInt8(0x0003);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setRXDuration(uint sec) {
+  setUInt8(0x0003, sec);
+}
+
+bool
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::channelIsSelected() const {
+  return getUInt8(0x0006);
+}
+uint
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::channelIndex() const {
+  return getUInt16_le(0x0004);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setChannelIndex(uint idx) {
+  setUInt16_le(0x0004, idx);
+  setUInt8(0x0006, 0x00);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setChannelSelected() {
+  setUInt8(0x0006, 0x01);
+}
+
+bool
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::repeatContinuously() const {
+  return 0 == repetitions();
+}
+uint
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::repetitions() const {
+  return getUInt8(0x0007);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setRepetitions(uint num) {
+  setUInt8(0x0007, num);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setRepatContinuously() {
+  setRepetitions(0x00);
+}
+
+uint
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::voiceBroadcastDuration() const {
+  return getUInt8(0x0008)+1;
+}
+void
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setVoiceBroadcastDuration(uint min) {
+  if (1 > min) min = 1;
+  setUInt8(0x0008, min-1);
+}
+
+uint
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::areaBroadcastDuration() const {
+  return getUInt8(0x0009)+1;
+}
+void
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setAreaBroadcastDuration(uint min) {
+  if (1 > min) min = 1;
+  setUInt8(0x0009, min-1);
+}
+
+bool
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::vox() const {
+  return getUInt8(0x000a);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::enableVOX(bool enable) {
+  setUInt8(0x000a, (enable ? 0x01 : 0x00));
+}
+
+bool
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::rxAlarm() const {
+  return getUInt8(0x000b);
+}
+void
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::enableRXAlarm(bool enable) {
+  setUInt8(0x000b, (enable ? 0x01 : 0x00));
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::AlarmSettingElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::AlarmSettingElement::AlarmSettingElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::AlarmSettingElement::AlarmSettingElement(uint8_t *ptr)
+  : Element(ptr, 0x0020)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::AlarmSettingElement::clear() {
+  AnalogAlarm(analog()).clear();
+  DigitalAlarm(digital()).clear();
+}
+
+uint8_t *
+AnytoneCodeplug::AlarmSettingElement::analog() const {
+  return _data + 0x0000;
+}
+uint8_t *
+AnytoneCodeplug::AlarmSettingElement::digital() const {
+  return _data + 0x000a;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DigitalAlarmExtensionElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DigitalAlarmExtensionElement::DigitalAlarmExtensionElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DigitalAlarmExtensionElement::DigitalAlarmExtensionElement(uint8_t *ptr)
+  : Element(ptr, 0x0030)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::DigitalAlarmExtensionElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+DigitalContact::Type
+AnytoneCodeplug::DigitalAlarmExtensionElement::callType() const {
+  switch (getUInt8(0x0000)) {
+  case 0x00: return DigitalContact::PrivateCall;
+  case 0x01: return DigitalContact::GroupCall;
+  case 0x02: return DigitalContact::AllCall;
+  }
+  return DigitalContact::PrivateCall;
+}
+void
+AnytoneCodeplug::DigitalAlarmExtensionElement::setCallType(DigitalContact::Type type) {
+  switch (type) {
+  case DigitalContact::PrivateCall: setUInt8(0x0000, 0x00); break;
+  case DigitalContact::GroupCall: setUInt8(0x0000, 0x01); break;
+  case DigitalContact::AllCall: setUInt8(0x0000, 0x02); break;
+  }
+}
+
+uint
+AnytoneCodeplug::DigitalAlarmExtensionElement::destination() const {
+  return getBCD8_le(0x0023);
+}
+void
+AnytoneCodeplug::DigitalAlarmExtensionElement::setDestination(uint number) {
+  setBCD8_le(0x0023, number);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::FiveToneIDElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::FiveToneIDElement::FiveToneIDElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::FiveToneIDElement::FiveToneIDElement(uint8_t *ptr)
+  : Element(ptr, 0x0020)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::FiveToneIDElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+AnytoneCodeplug::FiveToneIDElement::Standard
+AnytoneCodeplug::FiveToneIDElement::standard() const {
+  return (Standard) getUInt8(0x0001);
+}
+void
+AnytoneCodeplug::FiveToneIDElement::setStandard(Standard std) {
+  setUInt8(0x0001, (uint)std);
+}
+
+uint
+AnytoneCodeplug::FiveToneIDElement::toneDuration() const {
+  return getUInt8(0x0003);
+}
+void
+AnytoneCodeplug::FiveToneIDElement::setToneDuration(uint ms) {
+  setUInt8(0x0003, ms);
+}
+
+QString
+AnytoneCodeplug::FiveToneIDElement::id() const {
+  uint len = getUInt8(0x0002);
+  QString id;
+  for (uint i=0; i<len; i++) {
+    uint8_t b = getUInt8(0x0004+(i/2));
+    if (0 == (i%2))
+      id.append(QString::number((b>>4)&0xf,16));
+    else
+      id.append(QString::number((b>>0)&0xf,16));
+  }
+  return id;
+}
+void
+AnytoneCodeplug::FiveToneIDElement::setID(const QString &id) {
+  uint len = 0;
+  for (int i=0; i<id.length(); i++) {
+    bool ok;
+    if (0 == (len%2)) {
+      setUInt4(0x0004+len/2, 4, id.mid(i, 1).toUInt(&ok, 16));
+    } else {
+      setUInt4(0x0004+len/2, 0, id.mid(i, 1).toUInt(&ok, 16));
+    }
+    len++;
+  }
+  setUInt8(0x0002, len);
+}
+
+QString
+AnytoneCodeplug::FiveToneIDElement::name() const {
+  return readASCII(0x0018, 7, 0x00);
+}
+void
+AnytoneCodeplug::FiveToneIDElement::setName(const QString &name) {
+  writeASCII(0x0018, name, 7, 0x00);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::FiveToneFunctionElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::FiveToneFunctionElement::FiveToneFunctionElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::FiveToneFunctionElement::FiveToneFunctionElement(uint8_t *ptr)
+  : Element(ptr, 0x0020)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::FiveToneFunctionElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+AnytoneCodeplug::FiveToneFunctionElement::Function
+AnytoneCodeplug::FiveToneFunctionElement::function() const {
+  return (Function) getUInt8(0x0000);
+}
+void
+AnytoneCodeplug::FiveToneFunctionElement::setFunction(Function function) {
+  setUInt8(0x0000, (uint)function);
+}
+
+AnytoneCodeplug::FiveToneFunctionElement::Response
+AnytoneCodeplug::FiveToneFunctionElement::response() const {
+  return (Response) getUInt8(0x0001);
+}
+void
+AnytoneCodeplug::FiveToneFunctionElement::setResponse(Response response) {
+  setUInt8(0x0001, (uint)response);
+}
+
+QString
+AnytoneCodeplug::FiveToneFunctionElement::id() const {
+  uint len = getUInt8(0x0002);
+  QString id;
+  for (uint i=0; i<len; i++) {
+    uint8_t b = getUInt8(0x0003+(i/2));
+    if (0 == (i%2))
+      id.append(QString::number((b>>4)&0xf, 16));
+    else
+      id.append(QString::number((b>>0)&0xf, 16));
+  }
+  return id;
+}
+void
+AnytoneCodeplug::FiveToneFunctionElement::setID(const QString &id) {
+  uint len = 0;
+  for (int i=0; i<id.length(); i++) {
+    bool ok;
+    if (0 == (len%2)) {
+      setUInt4(0x0003+len/2, 4, id.mid(i, 1).toUInt(&ok, 16));
+    } else {
+      setUInt4(0x0003+len/2, 0, id.mid(i, 1).toUInt(&ok, 16));
+    }
+    len++;
+  }
+  setUInt8(0x0002, len);
+}
+
+QString
+AnytoneCodeplug::FiveToneFunctionElement::name() const {
+  return readASCII(0x000f, 7, 0x00);
+}
+void
+AnytoneCodeplug::FiveToneFunctionElement::setName(const QString &name) {
+  writeASCII(0x000f, name, 7, 0x00);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::FiveToneSettingsElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::FiveToneSettingsElement::FiveToneSettingsElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::FiveToneSettingsElement::FiveToneSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x0080)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::FiveToneSettingsElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+AnytoneCodeplug::FiveToneSettingsElement::Response
+AnytoneCodeplug::FiveToneSettingsElement::decodingResponse() const {
+  return (Response) getUInt8(0x0021);
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setDecodingResponse(Response response) {
+  setUInt8(0x0021, (uint)response);
+}
+
+AnytoneCodeplug::FiveToneSettingsElement::Standard
+AnytoneCodeplug::FiveToneSettingsElement::decodingStandard() const {
+  return (Standard) getUInt8(0x0022);
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setDecodingStandard(Standard standard) {
+  setUInt8(0x0022, (uint)standard);
+}
+
+uint
+AnytoneCodeplug::FiveToneSettingsElement::decodingToneDuration() const {
+  return getUInt8(0x0024);
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setDecodingToneDuration(uint ms) {
+  setUInt8(0x0024, ms);
+}
+
+QString
+AnytoneCodeplug::FiveToneSettingsElement::id() const {
+  uint len = getUInt8(0x0023);
+  QString id;
+  for (uint i=0; i<len; i++) {
+    uint8_t b = getUInt8(0x0025+(i/2));
+    if (0 == (i%2))
+      id.append(QString::number((b>>4)&0xf, 16));
+    else
+      id.append(QString::number((b>>0)&0xf, 16));
+  }
+  return id;
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setID(const QString &id) {
+  uint len = 0;
+  for (int i=0; i<id.length(); i++) {
+    bool ok;
+    if (0 == (len%2)) {
+      setUInt4(0x0025+len/2, 4, id.mid(i, 1).toUInt(&ok, 16));
+    } else {
+      setUInt4(0x0025+len/2, 0, id.mid(i, 1).toUInt(&ok, 16));
+    }
+    len++;
+  }
+  setUInt8(0x0023, len);
+}
+
+uint
+AnytoneCodeplug::FiveToneSettingsElement::postEncodeDelay() const {
+  return ((uint)getUInt8(0x002c))*10;
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setPostEncodeDelay(uint ms) {
+  setUInt8(0x002c, ms/10);
+}
+
+bool
+AnytoneCodeplug::FiveToneSettingsElement::hasPTTID() const {
+  return 0 != pttID();
+}
+uint
+AnytoneCodeplug::FiveToneSettingsElement::pttID() const {
+  return getUInt8(0x002d);
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setPTTID(uint id) {
+  setUInt8(0x002d, id);
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::clearPTTID() {
+  setPTTID(0);
+}
+
+uint
+AnytoneCodeplug::FiveToneSettingsElement::autoResetTime() const {
+  return ((uint)getUInt8(0x002e))*10;
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setAutoResetTime(uint s) {
+  setUInt8(0x002e, s/10);
+}
+
+uint
+AnytoneCodeplug::FiveToneSettingsElement::firstDelay() const {
+  return ((uint)getUInt8(0x002f))*10;
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setFirstDelay(uint ms) {
+  setUInt8(0x002f, ms/10);
+}
+
+
+
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug
  * ********************************************************************************************* */
 AnytoneCodeplug::AnytoneCodeplug(QObject *parent)
