@@ -3522,6 +3522,59 @@ AnytoneCodeplug::DTMFSettingsElement::setRemoteStunID(const QString &id) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ContactMapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ContactMapElement::ContactMapElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::ContactMapElement::ContactMapElement(uint8_t *ptr)
+  : Element(ptr, 0x0008)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::ContactMapElement::clear() {
+  memset(_data, 0xff, _size);
+}
+
+bool
+AnytoneCodeplug::ContactMapElement::isValid() const {
+  return (0xffffffff!=getUInt32_le(0x0000)) && (0xffffffff!=getUInt32_le(0x0004));
+}
+
+bool
+AnytoneCodeplug::ContactMapElement::isGroup() const {
+  uint32_t tmp = getUInt32_le(0x0000);
+  return tmp & 0x01;
+}
+uint
+AnytoneCodeplug::ContactMapElement::id() const {
+  uint32_t tmp = getUInt32_le(0x0000);
+  tmp = tmp>>1;
+  return decode_dmr_id_bcd_le((uint8_t *)&tmp);
+}
+void
+AnytoneCodeplug::ContactMapElement::setID(uint id, bool group) {
+  uint32_t tmp; encode_dmr_id_bcd_le((uint8_t *)&tmp, id);
+  tmp = ( (tmp << 1) | (group ? 1 : 0) );
+  setUInt32_le(0x0000, tmp);
+}
+
+uint
+AnytoneCodeplug::ContactMapElement::index() const {
+  return getUInt32_le(0x0004);
+}
+void
+AnytoneCodeplug::ContactMapElement::setIndex(uint idx) {
+  setUInt32_le(0x0004, idx);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug
  * ********************************************************************************************* */
 AnytoneCodeplug::AnytoneCodeplug(QObject *parent)

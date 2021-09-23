@@ -2053,6 +2053,36 @@ public:
     virtual void setRemoteStunID(const QString &id);
   };
 
+  /** Represents the base class for entries to the contact indices in all AnyTone codeplugs.
+   *
+   * Memory representation of the entry (size 0x0008):
+   * @verbinclude anytone_contactmapentry.txt */
+  class ContactMapElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ContactMapElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    ContactMapElement(uint8_t *ptr);
+
+    /** Clears the entry. */
+    void clear();
+    bool isValid() const;
+
+    /** Returns @c true if the entry is a group call. */
+    virtual bool isGroup() const;
+    /** Returns the id. */
+    virtual uint id() const;
+    /** Encodes ID and group call flag. */
+    virtual void setID(uint id, bool group=false);
+    /** Returns the index. */
+    virtual uint index() const;
+    /** Sets the index. */
+    virtual void setIndex(uint idx);
+  };
+
 protected:
   /** Hidden constructor. */
   explicit AnytoneCodeplug(QObject *parent=nullptr);
