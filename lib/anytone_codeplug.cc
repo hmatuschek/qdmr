@@ -2992,6 +2992,157 @@ AnytoneCodeplug::FiveToneSettingsElement::setFirstDelay(uint ms) {
   setUInt8(0x002f, ms/10);
 }
 
+bool
+AnytoneCodeplug::FiveToneSettingsElement::sidetoneEnabled() const {
+  return getUInt8(0x0030);
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::enableSidetone(bool enable) {
+  setUInt8(0x0030, (enable ? 0x01 : 0x00));
+}
+
+uint
+AnytoneCodeplug::FiveToneSettingsElement::stopCode() const {
+  return getUInt8(0x0032);
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setStopCode(uint code) {
+  setUInt8(0x0032, code);
+}
+
+uint
+AnytoneCodeplug::FiveToneSettingsElement::stopTime() const {
+  return ((uint)getUInt8(0x0033))*10;
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setStopTime(uint ms) {
+  setUInt8(0x0033, ms/10);
+}
+
+uint
+AnytoneCodeplug::FiveToneSettingsElement::decodeTime() const {
+  return ((uint)getUInt8(0x0034))*10;
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setDecodeTime(uint ms) {
+  setUInt8(0x0034, ms/10);
+}
+
+uint
+AnytoneCodeplug::FiveToneSettingsElement::delayAfterStop() const {
+  return ((uint)getUInt8(0x0035))*10;
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setDelayAfterStop(uint ms) {
+  setUInt8(0x0035, ms/10);
+}
+
+uint
+AnytoneCodeplug::FiveToneSettingsElement::preTime() const {
+  return ((uint)getUInt8(0x0036))*10;
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setPreTime(uint ms) {
+  setUInt8(0x0036, ms/10);
+}
+
+AnytoneCodeplug::FiveToneSettingsElement::Standard
+AnytoneCodeplug::FiveToneSettingsElement::botStandard() const {
+  return (Standard) getUInt8(0x0041);
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setBOTStandard(Standard standard) {
+  setUInt8(0x0041, (uint)standard);
+}
+
+uint
+AnytoneCodeplug::FiveToneSettingsElement::botToneDuration() const {
+  return getUInt8(0x0043);
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setBOTToneDuration(uint ms) {
+  setUInt8(0x0043, ms);
+}
+
+QString
+AnytoneCodeplug::FiveToneSettingsElement::botID() const {
+  uint len = getUInt8(0x0042);
+  QString id;
+  for (uint i=0; i<len; i++) {
+    uint8_t b = getUInt8(0x0044+(i/2));
+    if (0 == (i%2))
+      id.append(QString::number((b>>4)&0xf, 16));
+    else
+      id.append(QString::number((b>>0)&0xf, 16));
+  }
+  return id;
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setBOTID(const QString &id) {
+  uint len = 0;
+  for (int i=0; i<id.length(); i++) {
+    bool ok;
+    if (0 == (len%2)) {
+      setUInt4(0x0044+len/2, 4, id.mid(i, 1).toUInt(&ok, 16));
+    } else {
+      setUInt4(0x0044+len/2, 0, id.mid(i, 1).toUInt(&ok, 16));
+    }
+    len++;
+  }
+  setUInt8(0x0042, len);
+}
+
+AnytoneCodeplug::FiveToneSettingsElement::Standard
+AnytoneCodeplug::FiveToneSettingsElement::eotStandard() const {
+  return (Standard) getUInt8(0x0061);
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setEOTStandard(Standard standard) {
+  setUInt8(0x0061, (uint)standard);
+}
+
+uint
+AnytoneCodeplug::FiveToneSettingsElement::eotToneDuration() const {
+  return getUInt8(0x0063);
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setEOTToneDuration(uint ms) {
+  setUInt8(0x0063, ms);
+}
+
+QString
+AnytoneCodeplug::FiveToneSettingsElement::eotID() const {
+  uint len = getUInt8(0x0062);
+  QString id;
+  for (uint i=0; i<len; i++) {
+    uint8_t b = getUInt8(0x0064+(i/2));
+    if (0 == (i%2))
+      id.append(QString::number((b>>4)&0xf, 16));
+    else
+      id.append(QString::number((b>>0)&0xf, 16));
+  }
+  return id;
+}
+void
+AnytoneCodeplug::FiveToneSettingsElement::setEOTID(const QString &id) {
+  uint len = 0;
+  for (int i=0; i<id.length(); i++) {
+    bool ok;
+    if (0 == (len%2)) {
+      setUInt4(0x0064+len/2, 4, id.mid(i, 1).toUInt(&ok, 16));
+    } else {
+      setUInt4(0x0064+len/2, 0, id.mid(i, 1).toUInt(&ok, 16));
+    }
+    len++;
+  }
+  setUInt8(0x0062, len);
+}
+
+
+
+
+
+
 
 
 

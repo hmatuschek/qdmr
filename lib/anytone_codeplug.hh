@@ -1772,6 +1772,56 @@ public:
     /** Sets the first delay in ms. */
     virtual void setFirstDelay(uint ms);
 
+    /** Returns @c true if the sidetone is enabled. */
+    virtual bool sidetoneEnabled() const;
+    /** Enables/disables side tone. */
+    virtual void enableSidetone(bool enable);
+    /** Returns the stop code [0,15]. */
+    virtual uint stopCode() const;
+    /** Sets the stop code. */
+    virtual void setStopCode(uint code);
+    /** Returns the stop time in ms. */
+    virtual uint stopTime() const;
+    /** Sets the stop time in ms. */
+    virtual void setStopTime(uint ms);
+    /** Returns the decode time in ms. */
+    virtual uint decodeTime() const;
+    /** Sets the decode time in ms. */
+    virtual void setDecodeTime(uint ms);
+    /** Returns the delay after stop in ms. */
+    virtual uint delayAfterStop() const;
+    /** Sets the delay after stop in ms. */
+    virtual void setDelayAfterStop(uint ms);
+    /** Returns the pre time in ms. */
+    virtual uint preTime() const;
+    /** Sets the pre time in ms. */
+    virtual void setPreTime(uint ms);
+
+    /** Returns the BOT standard. */
+    virtual Standard botStandard() const;
+    /** Sets the BOT standard. */
+    virtual void setBOTStandard(Standard standard);
+    /** Returns the BOT tone duration in ms. */
+    virtual uint botToneDuration() const;
+    /** Sets the BOT tone duration in ms. */
+    virtual void setBOTToneDuration(uint ms);
+    /** Returns the 5tone BOT ID. */
+    virtual QString botID() const;
+    /** Sets the 5tone BOT ID. */
+    virtual void setBOTID(const QString &id);
+
+    /** Returns the EOT standard. */
+    virtual Standard eotStandard() const;
+    /** Sets the EOT standard. */
+    virtual void setEOTStandard(Standard standard);
+    /** Returns the EOT tone duration in ms. */
+    virtual uint eotToneDuration() const;
+    /** Sets the EOT tone duration in ms. */
+    virtual void setEOTToneDuration(uint ms);
+    /** Returns the 5tone EOT ID. */
+    virtual QString eotID() const;
+    /** Sets the 5tone EOT ID. */
+    virtual void setEOTID(const QString &id);
   };
 
 protected:
