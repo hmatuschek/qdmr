@@ -1824,6 +1824,235 @@ public:
     virtual void setEOTID(const QString &id);
   };
 
+  /** Represents the base-class for a 2-tone ID for all AnyTone codeplugs.
+   *
+   * Memory encoding of the ID (size 0x0020 bytes):
+   * @verbinclude anytone_2toneid.txt */
+  class TwoToneIDElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    TwoToneIDElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    TwoToneIDElement(uint8_t *ptr);
+
+    /** Resets the ID. */
+    void clear();
+
+    /** Returns the first tone of the sequence. */
+    virtual double firstTone() const;
+    /** Sets the first tone of the sequence. */
+    virtual void setFirstTone(double f);
+
+    /** Returns the second tone of the sequence. */
+    virtual double secondTone() const;
+    /** Sets the second tone of the sequence. */
+    virtual void setSecondTone(double f);
+
+    /** Returns the name of the function. */
+    virtual QString name() const;
+    /** Sets the name of the function. */
+    virtual void setName(const QString &name);
+  };
+
+  /** Represents the base-class for a 2-tone function for all AnyTone codeplugs.
+   *
+   * Memory encoding of the function (size 0x0020 bytes):
+   * @verbinclude anytone_2tonefunction.txt */
+  class TwoToneFunctionElement: public Element
+  {
+  public:
+    /** Possible responses to a decode. */
+    enum class Response {
+      None = 0, Tone, ToneRespond
+    };
+
+  protected:
+    /** Hidden constructor. */
+    TwoToneFunctionElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    TwoToneFunctionElement(uint8_t *ptr);
+
+    /** Resets the function. */
+    void clear();
+
+    /** Returns the first tone of the sequence. */
+    virtual double firstTone() const;
+    /** Sets the first tone of the sequence. */
+    virtual void setFirstTone(double f);
+
+    /** Returns the second tone of the sequence. */
+    virtual double secondTone() const;
+    /** Sets the second tone of the sequence. */
+    virtual void setSecondTone(double f);
+
+    /** Returns the response. */
+    virtual Response response() const;
+    /** Sets the response. */
+    virtual void setResponse(Response resp);
+
+    /** Returns the name of the function. */
+    virtual QString name() const;
+    /** Sets the name of the function. */
+    virtual void setName(const QString &name);
+  };
+
+  /** Represents the base class of 2-tone settings for all AnyTone codeplugs.
+   *
+   * Memory encoding of the settings (size 0x0010 bytes):
+   * @verbinclude anytone_2tonesettings.txt */
+  class TwoToneSettingsElement : public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    TwoToneSettingsElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    TwoToneSettingsElement(uint8_t *ptr);
+
+    /** Resets the settings. */
+    void clear();
+
+    /** Returns the first tone duration in ms. */
+    virtual uint firstToneDuration() const;
+    /** Sets the first tone duration in ms. */
+    virtual void setFirstToneDuration(uint ms);
+
+    /** Returns the second tone duration in ms. */
+    virtual uint secondToneDuration() const;
+    /** Sets the second tone duration in ms. */
+    virtual void setSecondToneDuration(uint ms);
+
+    /** Returns the long tone duration in ms. */
+    virtual uint longToneDuration() const;
+    /** Sets the long tone duration in ms. */
+    virtual void setLongToneDuration(uint ms);
+
+    /** Returns the gap duration in ms. */
+    virtual uint gapDuration() const;
+    /** Sets the gap duration in ms. */
+    virtual void setGapDuration(uint ms);
+
+    /** Returns the auto-reset time in seconds. */
+    virtual uint autoResetTime() const;
+    /** Sets the auto-reset time in seconds. */
+    virtual void setAutoResetTime(uint sec);
+
+    /** Returns @c true if the sidetone is enabled. */
+    virtual bool sidetone() const;
+    /** Enables/disables the sidetone. */
+    virtual void enableSidetone(bool enable);
+  };
+
+  /** Represents the base class of DTMF settings for all AnyTone codeplugs.
+   *
+   * Memory representation of the settings (size 0x0050):
+   * @verbinclude anytone_dtmfsettings.txt */
+  class DTMFSettingsElement: public Element
+  {
+  public:
+    /** Possible responses to a DTMF decode. */
+    enum Response {
+      None=0, Tone, ToneRespond
+    };
+
+  protected:
+    /** Hidden constructor. */
+    DTMFSettingsElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit DTMFSettingsElement(uint8_t *ptr);
+
+    /** Resets the settings. */
+    void clear();
+
+    /** Returns the interval/repeat symbol [0,15]. */
+    virtual uint intervalSymbol() const;
+    /** Sets the interval/repeat symbol [0,15]. */
+    virtual void setIntervalSymbol(uint symb);
+
+    /** Returns the group code [0,15]. */
+    virtual uint groupCode() const;
+    /** Sets the group code [0,15]. */
+    virtual void setGroupCode(uint symb);
+
+    /** Returns the response to a DMTF decode. */
+    virtual Response response() const;
+    /** Sets the response to a DTMF decode. */
+    virtual void setResponse(Response resp);
+
+    /** Returns the pre time in ms. */
+    virtual uint preTime() const;
+    /** Sets the pre time in ms. */
+    virtual void setPreTime(uint ms);
+
+    /** Returns the first digit duration in ms. */
+    virtual uint firstDigitDuration() const;
+    /** Sets the first digit duration in ms. */
+    virtual void setFirstDigitDuration(uint ms);
+
+    /** Returns the auto reset time in seconds. */
+    virtual uint autoResetTime() const;
+    /** Sets the auto reset time in seconds. */
+    virtual void setAutoResetTime(uint sec);
+
+    /** Returns the radio ID. */
+    virtual QString id() const;
+    /** Sets the radio ID. */
+    virtual void setID(const QString &id);
+
+    /** Returns the post encoding delay in ms. */
+    virtual uint postEncodingDelay() const;
+    /** Sets the post encoding delay in ms. */
+    virtual void setPostEncodingDelay(uint ms);
+
+    /** Returns the PTT ID pause in seconds. */
+    virtual uint pttIDPause() const;
+    /** Sets the PTT ID pause in seconds. */
+    virtual void setPTTIDPause(uint sec);
+
+    /** Returns @c true if the PTT ID is enabled. */
+    virtual bool pttIDEnabled() const;
+    /** Enables/disables the PTT ID. */
+    virtual void enablePTTID(bool enable);
+
+    /** Returns the D-code pause in seconds. */
+    virtual uint dCodePause() const;
+    /** Sets the D-code pause in seconds. */
+    virtual void setDCodePause(uint sec);
+
+    /** Returns @c true if the sidetone is enabled. */
+    virtual bool sidetone() const;
+    /** Enables/disables the sidetone. */
+    virtual void enableSidetone(bool enable);
+
+    /** Returns the BOT ID. */
+    virtual QString botID() const;
+    /** Sets the BOT ID. */
+    virtual void setBOTID(const QString &id);
+
+    /** Returns the EOT ID. */
+    virtual QString eotID() const;
+    /** Sets the EOT ID. */
+    virtual void setEOTID(const QString &id);
+
+    /** Returns the remote kill ID. */
+    virtual QString remoteKillID() const;
+    /** Sets the remote kill ID. */
+    virtual void setRemoteKillID(const QString &id);
+
+    /** Returns the remote stun ID. */
+    virtual QString remoteStunID() const;
+    /** Sets the remote stun ID. */
+    virtual void setRemoteStunID(const QString &id);
+  };
+
 protected:
   /** Hidden constructor. */
   explicit AnytoneCodeplug(QObject *parent=nullptr);

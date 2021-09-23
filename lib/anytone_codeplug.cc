@@ -3139,12 +3139,386 @@ AnytoneCodeplug::FiveToneSettingsElement::setEOTID(const QString &id) {
 }
 
 
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::TwoToneIDElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::TwoToneIDElement::TwoToneIDElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::TwoToneIDElement::TwoToneIDElement(uint8_t *ptr)
+  : Element(ptr, 0x0010)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::TwoToneIDElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+double
+AnytoneCodeplug::TwoToneIDElement::firstTone() const {
+  return ((double)getUInt16_le(0x0000))/10;
+}
+void
+AnytoneCodeplug::TwoToneIDElement::setFirstTone(double f) {
+  setUInt16_le(0x0000, f*10);
+}
+
+double
+AnytoneCodeplug::TwoToneIDElement::secondTone() const {
+  return ((double)getUInt16_le(0x0002))/10;
+}
+void
+AnytoneCodeplug::TwoToneIDElement::setSecondTone(double f) {
+  setUInt16_le(0x0002, f*10);
+}
+
+QString
+AnytoneCodeplug::TwoToneIDElement::name() const {
+  return readASCII(0x0008, 7, 0x00);
+}
+void
+AnytoneCodeplug::TwoToneIDElement::setName(const QString &name) {
+  writeASCII(0x0008, name, 7, 0x00);
+}
 
 
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::TwoToneFunctionElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::TwoToneFunctionElement::TwoToneFunctionElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::TwoToneFunctionElement::TwoToneFunctionElement(uint8_t *ptr)
+  : Element(ptr, 0x0020)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::TwoToneFunctionElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+double
+AnytoneCodeplug::TwoToneFunctionElement::firstTone() const {
+  return ((double)getUInt16_le(0x0000))/10;
+}
+void
+AnytoneCodeplug::TwoToneFunctionElement::setFirstTone(double f) {
+  setUInt16_le(0x0000, f*10);
+}
+
+double
+AnytoneCodeplug::TwoToneFunctionElement::secondTone() const {
+  return ((double)getUInt16_le(0x0002))/10;
+}
+void
+AnytoneCodeplug::TwoToneFunctionElement::setSecondTone(double f) {
+  setUInt16_le(0x0002, f*10);
+}
+
+AnytoneCodeplug::TwoToneFunctionElement::Response
+AnytoneCodeplug::TwoToneFunctionElement::response() const {
+  return (Response) getUInt8(0x0004);
+}
+void
+AnytoneCodeplug::TwoToneFunctionElement::setResponse(Response resp) {
+  setUInt8(0x0004, (uint)resp);
+}
+
+QString
+AnytoneCodeplug::TwoToneFunctionElement::name() const {
+  return readASCII(0x0005, 7, 0x00);
+}
+void
+AnytoneCodeplug::TwoToneFunctionElement::setName(const QString &name) {
+  writeASCII(0x0005, name, 7, 0x00);
+}
 
 
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::TwoToneSettingsElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::TwoToneSettingsElement::TwoToneSettingsElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::TwoToneSettingsElement::TwoToneSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x0010)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::TwoToneSettingsElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+uint
+AnytoneCodeplug::TwoToneSettingsElement::firstToneDuration() const {
+  return ((uint)getUInt8(0x0009))*100;
+}
+void
+AnytoneCodeplug::TwoToneSettingsElement::setFirstToneDuration(uint ms) {
+  setUInt8(0x0009, ms/100);
+}
+
+uint
+AnytoneCodeplug::TwoToneSettingsElement::secondToneDuration() const {
+  return ((uint)getUInt8(0x000a))*100;
+}
+void
+AnytoneCodeplug::TwoToneSettingsElement::setSecondToneDuration(uint ms) {
+  setUInt8(0x000a, ms/100);
+}
+
+uint
+AnytoneCodeplug::TwoToneSettingsElement::longToneDuration() const {
+  return ((uint)getUInt8(0x000b))*100;
+}
+void
+AnytoneCodeplug::TwoToneSettingsElement::setLongToneDuration(uint ms) {
+  setUInt8(0x000b, ms/100);
+}
+
+uint
+AnytoneCodeplug::TwoToneSettingsElement::gapDuration() const {
+  return ((uint)getUInt8(0x000c))*100;
+}
+void
+AnytoneCodeplug::TwoToneSettingsElement::setGapDuration(uint ms) {
+  setUInt8(0x000c, ms/100);
+}
+
+uint
+AnytoneCodeplug::TwoToneSettingsElement::autoResetTime() const {
+  return ((uint)getUInt8(0x000d))*10;
+}
+void
+AnytoneCodeplug::TwoToneSettingsElement::setAutoResetTime(uint sec) {
+  setUInt8(0x000d, sec/10);
+}
+
+bool
+AnytoneCodeplug::TwoToneSettingsElement::sidetone() const {
+  return getUInt8(0x000e);
+}
+void
+AnytoneCodeplug::TwoToneSettingsElement::enableSidetone(bool enable) {
+  setUInt8(0x000e, (enable ? 0x01 : 0x00));
+}
 
 
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DTMFSettingsElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DTMFSettingsElement::DTMFSettingsElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DTMFSettingsElement::DTMFSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x0050)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::DTMFSettingsElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+
+uint
+AnytoneCodeplug::DTMFSettingsElement::intervalSymbol() const {
+  return getUInt8(0x0000);
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setIntervalSymbol(uint symb) {
+  setUInt8(0x0000, symb);
+}
+
+uint
+AnytoneCodeplug::DTMFSettingsElement::groupCode() const {
+  return getUInt8(0x0001);
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setGroupCode(uint symb) {
+  setUInt8(0x0001, symb);
+}
+
+AnytoneCodeplug::DTMFSettingsElement::Response
+AnytoneCodeplug::DTMFSettingsElement::response() const {
+  return (Response)getUInt8(0x0002);
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setResponse(Response resp) {
+  setUInt8(0x0002, (uint)resp);
+}
+
+uint
+AnytoneCodeplug::DTMFSettingsElement::preTime() const {
+  return ((uint)getUInt8(0x0003)*10);
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setPreTime(uint ms) {
+  setUInt8(0x0003, ms/10);
+}
+
+uint
+AnytoneCodeplug::DTMFSettingsElement::firstDigitDuration() const {
+  return ((uint)getUInt8(0x0004)*10);
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setFirstDigitDuration(uint ms) {
+  setUInt8(0x0004, ms/10);
+}
+
+uint
+AnytoneCodeplug::DTMFSettingsElement::autoResetTime() const {
+  return ((uint)getUInt8(0x0005)*10);
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setAutoResetTime(uint sec) {
+  setUInt8(0x0005, sec/10);
+}
+
+QString
+AnytoneCodeplug::DTMFSettingsElement::id() const {
+  QString id;
+  for (int i=0; (i<3)&&(0xff!=getUInt8(0x0006+i)); i++) {
+    id.append(QString::number(getUInt8(0x0006+i),16));
+  }
+  return id;
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setID(const QString &id) {
+  int len = std::min(3, id.length());
+  bool ok;
+  for (int i=0; i<len; i++)
+    setUInt8(0x0006+i, id.mid(i,1).toUInt(&ok, 16));
+}
+
+uint
+AnytoneCodeplug::DTMFSettingsElement::postEncodingDelay() const {
+  return ((uint)getUInt8(0x0009)*10);
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setPostEncodingDelay(uint ms) {
+  setUInt8(0x0009, ms/10);
+}
+
+uint
+AnytoneCodeplug::DTMFSettingsElement::pttIDPause() const {
+  return ((uint)getUInt8(0x000a)*10);
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setPTTIDPause(uint sec) {
+  setUInt8(0x000a, sec/10);
+}
+
+bool
+AnytoneCodeplug::DTMFSettingsElement::pttIDEnabled() const {
+  return getUInt8(0x000b);
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::enablePTTID(bool enable) {
+  setUInt8(0x000b, (enable ? 0x01 : 0x00));
+}
+
+uint
+AnytoneCodeplug::DTMFSettingsElement::dCodePause() const {
+  return ((uint)getUInt8(0x000c));
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setDCodePause(uint sec) {
+  setUInt8(0x000c, sec);
+}
+
+bool
+AnytoneCodeplug::DTMFSettingsElement::sidetone() const {
+  return getUInt8(0x000d);
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::enableSidetone(bool enable) {
+  setUInt8(0x000d, (enable ? 0x01 : 0x00));
+}
+
+QString
+AnytoneCodeplug::DTMFSettingsElement::botID() const {
+  QString id;
+  for (int i=0; (i<16)&&(0xff!=getUInt8(0x0010+i)); i++) {
+    id.append(QString::number(getUInt8(0x0010+i),16));
+  }
+  return id;
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setBOTID(const QString &id) {
+  int len = std::min(16, id.length());
+  bool ok;
+  for (int i=0; i<len; i++)
+    setUInt8(0x0010+i, id.mid(i,1).toUInt(&ok, 16));
+}
+
+QString
+AnytoneCodeplug::DTMFSettingsElement::eotID() const {
+  QString id;
+  for (int i=0; (i<16)&&(0xff!=getUInt8(0x0020+i)); i++) {
+    id.append(QString::number(getUInt8(0x0020+i),16));
+  }
+  return id;
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setEOTID(const QString &id) {
+  int len = std::min(16, id.length());
+  bool ok;
+  for (int i=0; i<len; i++)
+    setUInt8(0x0020+i, id.mid(i,1).toUInt(&ok, 16));
+}
+
+QString
+AnytoneCodeplug::DTMFSettingsElement::remoteKillID() const {
+  QString id;
+  for (int i=0; (i<16)&&(0xff!=getUInt8(0x0030+i)); i++) {
+    id.append(QString::number(getUInt8(0x0030+i),16));
+  }
+  return id;
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setRemoteKillID(const QString &id) {
+  int len = std::min(16, id.length());
+  bool ok;
+  for (int i=0; i<len; i++)
+    setUInt8(0x0030+i, id.mid(i,1).toUInt(&ok, 16));
+}
+
+
+QString
+AnytoneCodeplug::DTMFSettingsElement::remoteStunID() const {
+  QString id;
+  for (int i=0; (i<16)&&(0xff!=getUInt8(0x0040+i)); i++) {
+    id.append(QString::number(getUInt8(0x0040+i),16));
+  }
+  return id;
+}
+void
+AnytoneCodeplug::DTMFSettingsElement::setRemoteStunID(const QString &id) {
+  int len = std::min(16, id.length());
+  bool ok;
+  for (int i=0; i<len; i++)
+    setUInt8(0x0040+i, id.mid(i,1).toUInt(&ok, 16));
+}
 
 
 /* ********************************************************************************************* *
