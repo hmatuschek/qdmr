@@ -1275,9 +1275,9 @@ public:
 public:
   /** Decodes the binary codeplug and stores its content in the given generic configuration using
    * the given context. */
-  virtual bool decodeElements(Config *config, Context &ctx);
+  virtual bool decodeElements(Context &ctx);
   /** Encodes the given generic configuration as a binary codeplug using the given context. */
-  virtual bool encodeElements(Config *config, const Flags &flags, Context &ctx);
+  virtual bool encodeElements(const Flags &flags, Context &ctx);
 
   /** Clears the general settings in the codeplug. */
   virtual void clearGeneralSettings() = 0;

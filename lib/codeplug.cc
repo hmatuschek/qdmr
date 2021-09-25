@@ -311,8 +311,8 @@ Codeplug::Element::writeUnicode(uint offset, const QString &txt, uint maxlen, ui
 /* ********************************************************************************************* *
  * Implementation of CodePlug::Context
  * ********************************************************************************************* */
-Codeplug::Context::Context()
-  : _tables()
+Codeplug::Context::Context(Config *config)
+  : _config(config), _tables()
 {
   // Add tables for common elements
   addTable(&RadioID::staticMetaObject);
@@ -325,6 +325,11 @@ Codeplug::Context::Context()
   addTable(&GPSSystem::staticMetaObject);
   addTable(&APRSSystem::staticMetaObject);
   addTable(&RoamingZone::staticMetaObject);
+}
+
+Config  *
+Codeplug::Context::config() const {
+  return _config;
 }
 
 bool

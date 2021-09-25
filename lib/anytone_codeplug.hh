@@ -124,15 +124,25 @@ public:
     virtual SignalingMode rxSignalingMode() const;
     /** Sets the RX signaling mode */
     virtual void setRXSignalingMode(SignalingMode mode);
+    /** Simplified access to RX signaling (tone). */
+    virtual Signaling::Code rxTone() const;
+    /** Sets the RX signaling (tone). */
+    virtual void setRXTone(Signaling::Code code);
     /** Returns the TX signaling mode */
+
     virtual SignalingMode txSignalingMode() const;
     /** Sets the TX signaling mode */
     virtual void setTXSignalingMode(SignalingMode mode);
+    /** Simplified access to TX signaling (tone). */
+    virtual Signaling::Code txTone() const;
+    /** Sets the RX signaling (tone). */
+    virtual void setTXTone(Signaling::Code code);
 
     /** Returns @c true if the CTCSS phase reversal is enabled. */
     virtual bool ctcssPhaseReversal() const;
     /** Enables/disables CTCSS phase reversal. */
     virtual void enableCTCSSPhaseReversal(bool enable);
+
     /** Returns @c true if the RX only is enabled. */
     virtual bool rxOnly() const;
     /** Enables/disables RX only. */
@@ -316,6 +326,13 @@ public:
     virtual bool sms() const;
     /** Enables/disables SMS. */
     virtual void enableSMS(bool enable);
+
+    /** Constructs a generic @c Channel object from the codeplug channel. */
+    virtual Channel *toChannelObj(Context &ctx) const;
+    /** Links a previously constructed channel to the rest of the configuration. */
+    virtual bool linkChannelObj(Channel *c, Context &ctx) const;
+    /** Initializes this codeplug channel from the given generic configuration. */
+    virtual bool fromChannelObj(const Channel *c, Context &ctx);
   };
 
   /** Represents the base class for conacts in all AnyTone codeplugs.
@@ -367,6 +384,11 @@ public:
     virtual AlertType alertType() const;
     /** Sets the alert type. */
     virtual void setAlertType(AlertType type);
+
+    /** Assembles a @c DigitalContact from this contact. */
+    virtual DigitalContact *toContactObj(Context &ctx) const;
+    /** Constructs this contact from the give @c DigitalContact. */
+    virtual bool fromContactObj(const DigitalContact *contact, Context &ctx);
   };
 
   /** Represents the base class for analog (DTMF) contacts in all AnyTone codeplugs.
@@ -397,6 +419,11 @@ public:
     virtual QString name() const;
     /** Sets the name of the contact. */
     virtual void setName(const QString &name);
+
+    /** Creates an DTMF contact from the entry. */
+    virtual DTMFContact *toContact() const;
+    /** Encodes an DTMF contact from the given one. */
+    virtual bool fromContact(const DTMFContact *contact);
   };
 
   /** Represents the base class for group lists in all AnyTone codeplugs.
@@ -431,6 +458,16 @@ public:
     virtual void setMemberIndex(uint n, uint idx);
     /** Clears the n-th member index. */
     virtual void clearMemberIndex(uint n);
+
+    /** Constructs a new @c RXGroupList from this group list.
+     * None of the members are added yet. Call @c linkGroupList
+     * to do that. */
+    virtual RXGroupList *toGroupListObj() const;
+    /** Populates the @c RXGroupList from this group list. The CodeplugContext
+     * is used to map the member indices. */
+    virtual bool linkGroupList(RXGroupList *lst, Context &ctx) const;
+    /** Constructs this group list from the given @c RXGroupList. */
+    virtual bool fromGroupListObj(const RXGroupList *lst, Context &ctx);
   };
 
   /** Represents the base class for scan lists in all AnyTone codeplugs.
@@ -537,6 +574,14 @@ public:
     virtual void setMemberIndex(uint n, uint idx);
     /** Clears the n-th member index. */
     virtual void clearMemberIndex(uint n);
+
+    /** Constructs a ScanList object from this definition. This only sets the properties of
+     * the scan list. To associate all members with the scan list object, call @c linkScanListObj. */
+    virtual ScanList *toScanListObj() const;
+    /** Links all channels (members and primary channels) with the given scan-list object. */
+    virtual bool linkScanListObj(ScanList *lst, Context &ctx) const;
+    /** Constructs the binary representation from the give config. */
+    virtual bool fromScanListObj(ScanList *lst, Context &ctx);
   };
 
   /** Represents the base class for radio IDs in all AnyTone codeplugs.
@@ -565,6 +610,11 @@ public:
     virtual QString name() const;
     /** Sets the name of the radio ID. */
     virtual void setName(const QString &name);
+
+    /** Encodes the given RadioID. */
+    virtual bool fromRadioID(RadioID *id);
+    /** Constructs a new radio id. */
+    virtual RadioID *toRadioID() const;
   };
 
   /** Represents the base class for the settings element in all AnyTone codeplugs.
@@ -1037,6 +1087,11 @@ public:
     virtual bool keepLastCaller() const;
     /** Enables/disables keeping the last caller when changeing the channel. */
     virtual void enableKeepLastCaller(bool enable);
+
+    /** Encodes the general settings. */
+    virtual bool fromConfig(const Flags &flags, Context &ctx);
+    /** Updates the abstract config from general settings. */
+    virtual bool updateConfig(Context &ctx);
   };
 
   /** Represets the base class for zone channel list for all AnyTone codeplugs.
@@ -1106,6 +1161,11 @@ public:
     virtual QString password() const;
     /** Sets the password. */
     virtual void setPassword(const QString &txt);
+
+    /** Updates the general settings from the given abstract configuration. */
+    virtual bool fromConfig(const Flags &flags, Context &ctx);
+    /** Updates the abstract configuration from this general settings. */
+    virtual bool updateConfig(Context &ctx);
   };
 
   /** Represents the base class of DMR APRS settings for all AnyTone codeplugs.
@@ -1192,6 +1252,13 @@ public:
     virtual void overrideTimeSlot(DigitalChannel::TimeSlot ts);
     /** Disables TS override. */
     virtual void disableTimeSlotOverride();
+
+    /** Updates the GPS settings from the given config. */
+    virtual bool fromConfig(const Flags &flags, Context &ctx);
+    /** Creates GPS system from this GPS settings. */
+    virtual bool createGPSSystem(uint8_t i, Context &ctx);
+    /** Links GPS system from this GPS settings. */
+    virtual bool linkGPSSystem(uint8_t i, Context &ctx);
   };
 
   /** Represents the base class of prefabricated message linked list for all AnyTone codeplugs.

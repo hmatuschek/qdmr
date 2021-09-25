@@ -23,6 +23,7 @@
 #define CHANNEL_BANK_OFFSET       0x00040000
 #define CHANNEL_BITMAP            0x024c1500
 #define CHANNEL_BITMAP_SIZE       0x00000200
+#define CHANNEL_SIZE              0x00000040
 
 #define VFO_A_ADDR                0x00fc0800 // Address of VFO A settings (channel_t)
 #define VFO_B_ADDR                0x00fc0840 // Address of VFO B settings (channel_t)
@@ -36,8 +37,9 @@
 #define CONTACT_INDEX_LIST        0x02600000 // Address of contact index list
 #define CONTACTS_BITMAP           0x02640000 // Address of contact bitmap
 #define CONTACTS_BITMAP_SIZE      0x00000500 // Size of contact bitmap
+#define CONTACT_SIZE              0x00000064 // Size of contact element
 #define CONTACT_ID_MAP            0x04340000 // Address of ID->Contact index map
-#define CONTACT_ID_ENTRY_SIZE     sizeof(contact_map_t) // Size of each map entry
+#define CONTACT_ID_ENTRY_SIZE     0x00000008 // Size of each map entry
 
 
 #define NUM_ANALOGCONTACTS        128
@@ -1481,37 +1483,46 @@ D868UVCodeplug::setBitmaps(Config *config)
   }
 }
 
+bool
+D868UVCodeplug::encode(Config *config, const Flags &flags) {
+  Context ctx(config);
+  if (! index(config, ctx))
+    return false;
+
+  return encode(flags, ctx);
+}
 
 bool
-D868UVCodeplug::encode(Config *config, const Flags &flags)
+D868UVCodeplug::encode(const Flags &flags, Context &ctx)
 {
-  if (! this->encodeRadioID(config, flags))
+  if (! this->encodeRadioID(flags, ctx))
     return false;
 
-  // Encode general config
-  if (! this->encodeGeneralSettings(config, flags))
-    return false;
-  if (! this->encodeBootSettings(config, flags))
+  if (! this->encodeGeneralSettings(flags, ctx))
     return false;
 
-  if (! this->encodeChannels(config, flags))
+  if (! this->encodeBootSettings(flags, ctx))
     return false;
 
-  if (! this->encodeContacts(config, flags))
-    return false;
-  if (! this->encodeAnalogContacts(config, flags))
+  if (! this->encodeChannels(flags, ctx))
     return false;
 
-  if (! this->encodeRXGroupLists(config, flags))
+  if (! this->encodeContacts(flags, ctx))
     return false;
 
-  if (! this->encodeZones(config, flags))
+  if (! this->encodeAnalogContacts(flags, ctx))
     return false;
 
-  if (! this->encodeScanLists(config, flags))
+  if (! this->encodeRXGroupLists(flags, ctx))
     return false;
 
-  if (! this->encodeGPSSystems(config, flags))
+  if (! this->encodeZones(flags, ctx))
+    return false;
+
+  if (! this->encodeScanLists(flags, ctx))
+    return false;
+
+  if (! this->encodeGPSSystems(flags, ctx))
     return false;
 
   return true;
@@ -1519,51 +1530,56 @@ D868UVCodeplug::encode(Config *config, const Flags &flags)
 
 bool D868UVCodeplug::decode(Config *config) {
   // Maps code-plug indices to objects
-  CodeplugContext ctx(config);
-  return decode(config, ctx);
+  Context ctx(config);
+  return decode(ctx);
 }
 
 bool
-D868UVCodeplug::decode(Config *config, CodeplugContext &ctx)
+D868UVCodeplug::decode(Context &ctx)
 {
-  if (! this->setRadioID(config, ctx))
+  if (! this->setRadioID(ctx))
     return false;
 
-  if (! this->decodeGeneralSettings(config))
-    return false;
-  if (! this->decodeBootSettings(config))
+  if (! this->decodeGeneralSettings(ctx))
     return false;
 
-  if (! this->createChannels(config, ctx))
+  if (! this->decodeBootSettings(ctx))
     return false;
 
-  if (! this->createContacts(config, ctx))
-    return false;
-  if (! this->createAnalogContacts(config, ctx))
+  if (! this->createChannels(ctx))
     return false;
 
-  if (! this->createRXGroupLists(config, ctx))
-    return false;
-  if (! this->linkRXGroupLists(config, ctx))
+  if (! this->createContacts(ctx))
     return false;
 
-  if (! this->createZones(config, ctx))
-    return false;
-  if (! this->linkZones(config, ctx))
+  if (! this->createAnalogContacts(ctx))
     return false;
 
-  if (! this->createScanLists(config, ctx))
-    return false;
-  if (! this->linkScanLists(config, ctx))
+  if (! this->createRXGroupLists(ctx))
     return false;
 
-  if (! this->createGPSSystems(config, ctx))
+  if (! this->linkRXGroupLists(ctx))
     return false;
 
-  if (! this->linkChannels(config, ctx))
+  if (! this->createZones(ctx))
     return false;
 
-  if (! this->linkGPSSystems(config, ctx))
+  if (! this->linkZones(ctx))
+    return false;
+
+  if (! this->createScanLists(ctx))
+    return false;
+
+  if (! this->linkScanLists(ctx))
+    return false;
+
+  if (! this->createGPSSystems(ctx))
+    return false;
+
+  if (! this->linkChannels(ctx))
+    return false;
+
+  if (! this->linkGPSSystems(ctx))
     return false;
 
   return true;
@@ -1583,29 +1599,28 @@ D868UVCodeplug::allocateChannels() {
     // compute address for channel
     uint32_t addr = CHANNEL_BANK_0
         + bank*CHANNEL_BANK_OFFSET
-        + idx*sizeof(channel_t);
+        + idx*CHANNEL_SIZE;
     if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, sizeof(channel_t));
+      image(0).addElement(addr, CHANNEL_SIZE);
     }
   }
 }
 
 bool
-D868UVCodeplug::encodeChannels(Config *config, const Flags &flags) {
+D868UVCodeplug::encodeChannels(const Flags &flags, Context &ctx) {
   // Encode channels
-  for (int i=0; i<config->channelList()->count(); i++) {
+  for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
     uint16_t bank = i/128, idx = i%128;
-    channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
-                                      + bank*CHANNEL_BANK_OFFSET
-                                      + idx*sizeof(channel_t));
-    ch->fromChannelObj(config->channelList()->channel(i), config);
+    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    if (! ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx))
+      return false;
   }
   return true;
 }
 
 bool
-D868UVCodeplug::createChannels(Config *config, CodeplugContext &ctx) {
+D868UVCodeplug::createChannels(Context &ctx) {
   // Create channels
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
@@ -1613,29 +1628,24 @@ D868UVCodeplug::createChannels(Config *config, CodeplugContext &ctx) {
     uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
     if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
       continue;
-    channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
-                                      +bank*CHANNEL_BANK_OFFSET
-                                      +idx*sizeof(channel_t));
-    if (Channel *obj = ch->toChannelObj())
-      ctx.addChannel(obj, i);
+    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    if (Channel *obj = ch.toChannelObj(ctx))
+      ctx.add(obj, i);
   }
   return true;
 }
 
 bool
-D868UVCodeplug::linkChannels(Config *config, CodeplugContext &ctx) {
+D868UVCodeplug::linkChannels(Context &ctx) {
   // Link channel objects
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
     // Check if channel is enabled:
     uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
     if (0 == (((*data(CHANNEL_BITMAP+byte))>>bit) & 0x01))
       continue;
-    channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
-                                      +bank*CHANNEL_BANK_OFFSET
-                                      +idx*sizeof(channel_t));
-
-    if (ctx.hasChannel(i))
-      ch->linkChannelObj(ctx.getChannel(i), ctx);
+    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    if (ctx.has<Channel>(i))
+      ch.linkChannelObj(ctx.get<Channel>(i), ctx);
   }
   return true;
 }
@@ -1675,33 +1685,32 @@ D868UVCodeplug::allocateContacts() {
 }
 
 bool
-D868UVCodeplug::encodeContacts(Config *config, const Flags &flags) {
-  // Encode contacts
-  QVector<contact_map_t> contact_id_map;
-  contact_id_map.reserve(config->contacts()->digitalCount());
-  for (int i=0; i<config->contacts()->digitalCount(); i++) {
-    contact_t *con = (contact_t *)data(CONTACT_BANK_0+i*sizeof(contact_t));
-    con->fromContactObj(config->contacts()->digitalContact(i));
+D868UVCodeplug::encodeContacts(const Flags &flags, Context &ctx) {
+  QVector<DigitalContact*> contacts;
+  // Encode contacts and also collect id<->index map
+  for (int i=0; i<ctx.config()->contacts()->digitalCount(); i++) {
+    ContactElement con(data(CONTACT_BANK_0+i*CONTACT_SIZE));
+    DigitalContact *contact = ctx.config()->contacts()->digitalContact(i);
+    if(! con.fromContactObj(contact, ctx))
+      return false;
     ((uint32_t *)data(CONTACT_INDEX_LIST))[i] = qToLittleEndian(i);
-    contact_map_t entry;
-    entry.setID(config->contacts()->digitalContact(i)->number(),
-                DigitalContact::GroupCall == config->contacts()->digitalContact(i)->type());
-    entry.setIndex(i);
-    contact_id_map.append(entry);
+    contacts.append(contact);
   }
   // encode index map for contacts
-  std::sort(contact_id_map.begin(), contact_id_map.end(),
-            [](const contact_map_t &a, const contact_map_t &b) {
-    return a.ID() < b.ID();
+  std::sort(contacts.begin(), contacts.end(),
+            [](DigitalContact *a, DigitalContact *b) {
+    return a->number() < b->number();
   });
-  for (int i=0; i<contact_id_map.size(); i++) {
-    ((contact_map_t *)data(CONTACT_ID_MAP))[i] = contact_id_map[i];
+  for (int i=0; i<contacts.size(); i++) {
+    ContactMapElement el(data(CONTACT_ID_MAP + i*CONTACT_ID_ENTRY_SIZE));
+    el.setID(contacts[i]->number(), (DigitalContact::GroupCall==contacts[i]->type()));
+    el.setIndex(ctx.index(contacts[i]));
   }
   return true;
 }
 
 bool
-D868UVCodeplug::createContacts(Config *config, CodeplugContext &ctx) {
+D868UVCodeplug::createContacts(Context &ctx) {
   // Create digital contacts
   uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
   for (uint16_t i=0; i<NUM_CONTACTS; i++) {
@@ -1710,8 +1719,9 @@ D868UVCodeplug::createContacts(Config *config, CodeplugContext &ctx) {
     if (1 == ((contact_bitmap[byte]>>bit) & 0x01))
       continue;
     contact_t *con = (contact_t *)data(CONTACT_BANK_0+i*sizeof(contact_t));
-    if (DigitalContact *obj = con->toContactObj())
-      ctx.addDigitalContact(obj, i);
+    if (DigitalContact *obj = con->toContactObj()) {
+      ctx.config()->contacts()->add(obj); ctx.add(obj, i);
+    }
   }
   return true;
 }
@@ -1734,21 +1744,21 @@ D868UVCodeplug::allocateAnalogContacts() {
 }
 
 bool
-D868UVCodeplug::encodeAnalogContacts(Config *config, const Flags &flags) {
+D868UVCodeplug::encodeAnalogContacts(const Flags &flags, Context &ctx) {
   uint8_t *idxlst = data(ANALOGCONTACT_INDEX_LIST);
   memset(idxlst, 0xff, ANALOGCONTACT_LIST_SIZE);
-  for (int i=0; i<config->contacts()->dtmfCount(); i++) {
+  for (int i=0; i<ctx.config()->contacts()->dtmfCount(); i++) {
     uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
         + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
-    analog_contact_t *cont = (analog_contact_t *)data(addr);
-    cont->fromContact(config->contacts()->dtmfContact(i));
+    DTMFContactElement cont(data(addr));
+    cont.fromContact(ctx.config()->contacts()->dtmfContact(i));
     idxlst[i] = i;
   }
   return true;
 }
 
 bool
-D868UVCodeplug::createAnalogContacts(Config *config, CodeplugContext &ctx) {
+D868UVCodeplug::createAnalogContacts(Context &ctx) {
   uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BYTEMAP);
   for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
     // if disabled -> skip
@@ -1756,8 +1766,9 @@ D868UVCodeplug::createAnalogContacts(Config *config, CodeplugContext &ctx) {
       continue;
     uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
         + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
-    analog_contact_t *cont = (analog_contact_t *)data(addr);
-    ctx.addAnalogContact(cont->toContact(), i);
+    DTMFContactElement cont(data(addr));
+    DTMFContact *dtmf = cont.toContact();
+    ctx.config()->contacts()->add(dtmf); ctx.add(dtmf, i);
   }
   return true;
 }
@@ -1782,28 +1793,27 @@ D868UVCodeplug::allocateRadioIDs() {
 }
 
 bool
-D868UVCodeplug::encodeRadioID(Config *config, const Flags &flags) {
+D868UVCodeplug::encodeRadioID(const Flags &flags, Context &ctx) {
   // Encode radio IDs
-  for (int i=0; i<config->radioIDs()->count(); i++) {
-    radioid_t *radio_id = (radioid_t *)data(ADDR_RADIOIDS + i*RADIOID_SIZE);
-    radio_id->setName(config->radioIDs()->getId(i)->name());
-    radio_id->setId(config->radioIDs()->getId(i)->number());
+  for (int i=0; i<ctx.config()->radioIDs()->count(); i++) {
+    RadioIDElement(data(ADDR_RADIOIDS + i*RADIOID_SIZE)).fromRadioID(
+          ctx.config()->radioIDs()->getId(i));
   }
   return true;
 }
 
 bool
-D868UVCodeplug::setRadioID(Config *config, CodeplugContext &ctx) {
+D868UVCodeplug::setRadioID(Context &ctx) {
   // Find a valid RadioID
   uint8_t *radio_id_bitmap = data(RADIOID_BITMAP);
   for (uint16_t i=0; i<NUM_RADIOIDS; i++) {
     if (0 == (radio_id_bitmap[i/8] & (1 << (i%8))))
       continue;
-    radioid_t *id = (radioid_t *)data(ADDR_RADIOIDS + i*RADIOID_SIZE);
-    logDebug() << "Store id " << id->getId() << " at idx " << i << ".";
-    ctx.addRadioId(id->getId(), i, id->getName());
+    RadioIDElement id(data(ADDR_RADIOIDS + i*RADIOID_SIZE));
+    logDebug() << "Store id " << id.number() << " at idx " << i << ".";
+    RadioID *rid = id.toRadioID();
+    ctx.config()->radioIDs()->add(rid); ctx.add(rid, i);
   }
-
   return true;
 }
 
@@ -1831,17 +1841,17 @@ D868UVCodeplug::allocateRXGroupLists() {
 }
 
 bool
-D868UVCodeplug::encodeRXGroupLists(Config *config, const Flags &flags) {
+D868UVCodeplug::encodeRXGroupLists(const Flags &flags, Context &ctx) {
   // Encode RX group-lists
-  for (int i=0; i<config->rxGroupLists()->count(); i++) {
-    grouplist_t *grp = (grouplist_t *)data(ADDR_RXGRP_0 + i*RXGRP_OFFSET);
-    grp->fromGroupListObj(config->rxGroupLists()->list(i), config);
+  for (int i=0; i<ctx.config()->rxGroupLists()->count(); i++) {
+    GroupListElement grp(data(ADDR_RXGRP_0 + i*RXGRP_OFFSET));
+    grp.fromGroupListObj(ctx.config()->rxGroupLists()->list(i), ctx);
   }
   return true;
 }
 
 bool
-D868UVCodeplug::createRXGroupLists(Config *config, CodeplugContext &ctx) {
+D868UVCodeplug::createRXGroupLists(Context &ctx) {
   // Create RX group lists
   uint8_t *grouplist_bitmap = data(RXGRP_BITMAP);
   for (uint16_t i=0; i<NUM_RXGRP; i++) {
@@ -1850,28 +1860,35 @@ D868UVCodeplug::createRXGroupLists(Config *config, CodeplugContext &ctx) {
     if (0 == ((grouplist_bitmap[byte]>>bit) & 0x01))
       continue;
     // construct RXGroupList from definition
-    grouplist_t *grp = (grouplist_t *)data(ADDR_RXGRP_0+i*RXGRP_OFFSET);
-    if (RXGroupList *obj = grp->toGroupListObj()) {
-      ctx.addGroupList(obj, i);
-      // Link group list immediately, all contacts are defined allready.
-      grp->linkGroupList(obj, ctx);
+    GroupListElement grp(data(ADDR_RXGRP_0+i*RXGRP_OFFSET));
+    if (RXGroupList *obj = grp.toGroupListObj()) {
+      ctx.config()->rxGroupLists()->add(obj); ctx.add(obj, i);
     }
   }
   return true;
 }
 
 bool
-D868UVCodeplug::linkRXGroupLists(Config *config, CodeplugContext &ctx) {
-  // pass, already linked during creation.
+D868UVCodeplug::linkRXGroupLists(Context &ctx) {
+  uint8_t *grouplist_bitmap = data(RXGRP_BITMAP);
+  for (uint16_t i=0; i<NUM_RXGRP; i++) {
+    // check if group list is enabled
+    uint16_t  bit = i%8, byte = i/8;
+    if (0 == ((grouplist_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // link group list
+    GroupListElement grp(data(ADDR_RXGRP_0+i*RXGRP_OFFSET));
+    if (! grp.linkGroupList(ctx.get<RXGroupList>(i), ctx)) {
+      logError() << "Cannot link RX group list idx=" << i;
+      return false;
+    }
+  }
   return true;
 }
 
 
 void
 D868UVCodeplug::allocateZones() {
-  /*
-   *  Allocate zones
-   */
   uint8_t *zone_bitmap = data(ZONE_BITMAPS);
   for (uint16_t i=0; i<NUM_ZONES; i++) {
     // Get byte and bit for zone
@@ -1886,27 +1903,25 @@ D868UVCodeplug::allocateZones() {
 }
 
 bool
-D868UVCodeplug::encodeZones(Config *config, const Flags &flags) {
+D868UVCodeplug::encodeZones(const Flags &flags, Context &ctx) {
   // Encode zones
   uint zidx = 0;
-  for (int i=0; i<config->zones()->count(); i++) {
+  for (int i=0; i<ctx.config()->zones()->count(); i++) {
     // Clear name and channel list
     uint8_t  *name     = (uint8_t *)data(ADDR_ZONE_NAME + zidx*ZONE_NAME_OFFSET);
     uint16_t *channels = (uint16_t *)data(ADDR_ZONE + zidx*ZONE_OFFSET);
     memset(name, 0, ZONE_NAME_SIZE);
     memset(channels, 0xff, ZONE_SIZE);
-    if (config->zones()->zone(i)->B()->count())
-      encode_ascii(name, config->zones()->zone(i)->name()+" A", 16, 0);
+    if (ctx.config()->zones()->zone(i)->B()->count())
+      encode_ascii(name, ctx.config()->zones()->zone(i)->name()+" A", 16, 0);
     else
-      encode_ascii(name, config->zones()->zone(i)->name(), 16, 0);
+      encode_ascii(name, ctx.config()->zones()->zone(i)->name(), 16, 0);
     // Handle list A
-    for (int j=0; j<config->zones()->zone(i)->A()->count(); j++) {
-      channels[j] = qToLittleEndian(
-            config->channelList()->indexOf(
-              config->zones()->zone(i)->A()->get(j)));
+    for (int j=0; j<ctx.config()->zones()->zone(i)->A()->count(); j++) {
+      channels[j] = qToLittleEndian(ctx.index(ctx.config()->zones()->zone(i)->A()->get(j)));
     }
     zidx++;
-    if (! config->zones()->zone(i)->B()->count())
+    if (! ctx.config()->zones()->zone(i)->B()->count())
       continue;
 
     // Process list B if present
@@ -1914,12 +1929,10 @@ D868UVCodeplug::encodeZones(Config *config, const Flags &flags) {
     channels = (uint16_t *)data(ADDR_ZONE+zidx*ZONE_OFFSET);
     memset(name, 0, ZONE_NAME_SIZE);
     memset(channels, 0xff, ZONE_SIZE);
-    encode_ascii(name, config->zones()->zone(i)->name()+" B", 16, 0);
+    encode_ascii(name, ctx.config()->zones()->zone(i)->name()+" B", 16, 0);
     // Handle list B
-    for (int j=0; j<config->zones()->zone(i)->B()->count(); j++) {
-      channels[j] = qToLittleEndian(
-            config->channelList()->indexOf(
-              config->zones()->zone(i)->B()->get(j)));
+    for (int j=0; j<ctx.config()->zones()->zone(i)->B()->count(); j++) {
+      channels[j] = qToLittleEndian(ctx.index(ctx.config()->zones()->zone(i)->B()->get(j)));
     }
     zidx++;
   }
@@ -1927,7 +1940,7 @@ D868UVCodeplug::encodeZones(Config *config, const Flags &flags) {
 }
 
 bool
-D868UVCodeplug::createZones(Config *config, CodeplugContext &ctx) {
+D868UVCodeplug::createZones(Context &ctx) {
   // Create zones
   uint8_t *zone_bitmap = data(ZONE_BITMAPS);
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
@@ -1950,7 +1963,7 @@ D868UVCodeplug::createZones(Config *config, CodeplugContext &ctx) {
     if (! extend_last_zone) {
       last_zone = new Zone(zonename);
       // add to config
-      config->zones()->add(last_zone);
+      ctx.config()->zones()->add(last_zone);
     } else {
       // when extending the last zone, chop its name to remove the "... A" part.
       last_zone->setName(last_zonebasename);
@@ -1964,21 +1977,63 @@ D868UVCodeplug::createZones(Config *config, CodeplugContext &ctx) {
         continue;
       // Get channel index and check if defined
       uint16_t cidx = qFromLittleEndian(*channels);
-      if (! ctx.hasChannel(cidx))
+      if (! ctx.has<Channel>(cidx))
         continue;
       // If defined -> add channel to zone obj
       if (extend_last_zone)
-        last_zone->B()->add(ctx.getChannel(cidx));
+        last_zone->B()->add(ctx.get<Channel>(cidx));
       else
-        last_zone->A()->add(ctx.getChannel(cidx));
+        last_zone->A()->add(ctx.get<Channel>(cidx));
     }
   }
   return true;
 }
 
 bool
-D868UVCodeplug::linkZones(Config *config, CodeplugContext &ctx) {
-  // Zones are linked during creation.
+D868UVCodeplug::linkZones(Context &ctx) {
+  // Create zones
+  uint8_t *zone_bitmap = data(ZONE_BITMAPS);
+  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
+  bool extend_last_zone = false;
+  for (uint16_t i=0; i<NUM_ZONES; i++) {
+    // Check if zone is enabled:
+    uint16_t bit = i%8, byte = i/8;
+    if (0 == ((zone_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Determine whether this zone should be combined with the previous one
+    QString zonename = decode_ascii(data(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET), 16, 0);
+    QString zonebasename = zonename; zonebasename.chop(2);
+    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
+                         && (zonebasename == last_zonebasename)
+                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
+    last_zonename = zonename;
+    last_zonebasename = zonebasename;
+
+    // If enabled, get zone
+    if (! extend_last_zone) {
+      last_zone = ctx.get<Zone>(i);
+    } else {
+      // when extending the last zone, chop its name to remove the "... A" part.
+      last_zone->setName(last_zonebasename);
+    }
+
+    // link zone
+    uint16_t *channels = (uint16_t *)data(ADDR_ZONE+i*ZONE_OFFSET);
+    for (uint8_t i=0; i<NUM_CH_PER_ZONE; i++, channels++) {
+      // If not enabled -> continue
+      if (0xffff == *channels)
+        continue;
+      // Get channel index and check if defined
+      uint16_t cidx = qFromLittleEndian(*channels);
+      if (! ctx.has<Channel>(cidx))
+        continue;
+      // If defined -> add channel to zone obj
+      if (extend_last_zone)
+        last_zone->B()->add(ctx.get<Channel>(cidx));
+      else
+        last_zone->A()->add(ctx.get<Channel>(cidx));
+    }
+  }
   return true;
 }
 
@@ -2006,19 +2061,18 @@ D868UVCodeplug::allocateScanLists() {
 }
 
 bool
-D868UVCodeplug::encodeScanLists(Config *config, const Flags &flags) {
+D868UVCodeplug::encodeScanLists(const Flags &flags, Context &ctx) {
   // Encode scan lists
-  for (int i=0; i<config->scanlists()->count(); i++) {
+  for (int i=0; i<ctx.config()->scanlists()->count(); i++) {
     uint8_t bank = i/NUM_SCANLISTS_PER_BANK, idx = i%NUM_SCANLISTS_PER_BANK;
-    scanlist_t *scan = (scanlist_t *)data(
-          SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + idx*SCAN_LIST_OFFSET);
-    scan->fromScanListObj(config->scanlists()->scanlist(i), config);
+    ScanListElement scan(data(SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + idx*SCAN_LIST_OFFSET));
+    scan.fromScanListObj(ctx.config()->scanlists()->scanlist(i), ctx);
   }
   return true;
 }
 
 bool
-D868UVCodeplug::createScanLists(Config *config, CodeplugContext &ctx) {
+D868UVCodeplug::createScanLists(Context &ctx) {
   // Create scan lists
   uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
   for (uint i=0; i<NUM_SCAN_LISTS; i++) {
@@ -2027,19 +2081,29 @@ D868UVCodeplug::createScanLists(Config *config, CodeplugContext &ctx) {
       continue;
     uint8_t bank = i/NUM_SCANLISTS_PER_BANK, bank_idx = i%NUM_SCANLISTS_PER_BANK;
     uint32_t addr = SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + bank_idx*SCAN_LIST_OFFSET;
-    scanlist_t *scanl = (scanlist_t *)data(addr);
+    ScanListElement scanl(data(addr));
     // Create scanlist
-    ScanList *obj = scanl->toScanListObj();
-    ctx.addScanList(obj, i);
-    // Link scanlists immediately, all channels are defined allready
-    scanl->linkScanListObj(obj, ctx);
+    ScanList *obj = scanl.toScanListObj();
+    ctx.config()->scanlists()->add(obj); ctx.add(obj, i);
   }
   return true;
 }
 
 bool
-D868UVCodeplug::linkScanLists(Config *config, CodeplugContext &ctx) {
-  // already linked during creation
+D868UVCodeplug::linkScanLists(Context &ctx) {
+  uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
+  for (uint i=0; i<NUM_SCAN_LISTS; i++) {
+    uint8_t byte=i/8, bit=i%8;
+    if (0 == ((scanlist_bitmap[byte]>>bit) & 0x01))
+      continue;
+    uint8_t bank = i/NUM_SCANLISTS_PER_BANK, bank_idx = i%NUM_SCANLISTS_PER_BANK;
+    uint32_t addr = SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + bank_idx*SCAN_LIST_OFFSET;
+    ScanListElement scanl(data(addr));
+    // Create scanlist
+    ScanList *obj = ctx.get<ScanList>(i);
+    // Link scanlists immediately, all channels are defined allready
+    ctx.config()->scanlists()->add(obj); scanl.linkScanListObj(obj, ctx);
+  }
   return true;
 }
 
@@ -2050,15 +2114,13 @@ D868UVCodeplug::allocateGeneralSettings() {
 }
 
 bool
-D868UVCodeplug::encodeGeneralSettings(Config *config, const Flags &flags) {
-  ((general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->fromConfig(config, flags);
-  return true;
+D868UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx) {
+  return GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).fromConfig(flags, ctx);
 }
 
 bool
-D868UVCodeplug::decodeGeneralSettings(Config *config) {
-  ((general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->updateConfig(config);
-  return true;
+D868UVCodeplug::decodeGeneralSettings(Context &ctx) {
+  return GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx);
 }
 
 
@@ -2080,15 +2142,13 @@ D868UVCodeplug::allocateBootSettings() {
 }
 
 bool
-D868UVCodeplug::encodeBootSettings(Config *config, const Flags &flags) {
-  ((boot_settings_t *)data(ADDR_BOOT_SETTINGS))->fromConfig(config, flags);
-  return true;
+D868UVCodeplug::encodeBootSettings(const Flags &flags, Context &ctx) {
+  return BootSettingsElement(data(ADDR_BOOT_SETTINGS)).fromConfig(flags, ctx);
 }
 
 bool
-D868UVCodeplug::decodeBootSettings(Config *config) {
-  ((boot_settings_t *)data(ADDR_BOOT_SETTINGS))->updateConfig(config);
-  return true;
+D868UVCodeplug::decodeBootSettings(Context &ctx) {
+  return BootSettingsElement(data(ADDR_BOOT_SETTINGS)).updateConfig(ctx);
 }
 
 
@@ -2099,14 +2159,13 @@ D868UVCodeplug::allocateGPSSystems() {
 }
 
 bool
-D868UVCodeplug::encodeGPSSystems(Config *config, const Flags &flags) {
-  gps_settings_t *gps = (gps_settings_t *)data(ADDR_GPS_SETTINGS);
-  gps->fromConfig(config, flags);
-  return true;
+D868UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx) {
+  DMRAPRSSettingsElement gps(data(ADDR_GPS_SETTINGS));
+  return gps.fromConfig(flags, ctx);
 }
 
 bool
-D868UVCodeplug::createGPSSystems(Config *config, CodeplugContext &ctx) {
+D868UVCodeplug::createGPSSystems(Context &ctx) {
   QSet<uint8_t> systems;
   // First find all GPS systems linked, that is referenced by any channel
   // Create channels
@@ -2116,29 +2175,27 @@ D868UVCodeplug::createGPSSystems(Config *config, CodeplugContext &ctx) {
     uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
     if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
       continue;
-    if (ctx.getChannel(i)->is<AnalogChannel>())
+    if (ctx.get<Channel>(i)->is<AnalogChannel>())
       continue;
-    channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
-                                      +bank*CHANNEL_BANK_OFFSET
-                                      +idx*sizeof(channel_t));
-    if (ch->aprs_report)
-      systems.insert(ch->gps_system);
+    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    if (ch.txAPRS())
+      systems.insert(ch.dmrAPRSSystemIndex());
   }
   // Then create all referenced GPS systems
-  gps_settings_t *gps = (gps_settings_t *)data(ADDR_GPS_SETTINGS);
+  DMRAPRSSettingsElement gps(data(ADDR_GPS_SETTINGS));
   for (QSet<uint8_t>::iterator idx=systems.begin(); idx!=systems.end(); idx++)
-    gps->createGPSSystem(*idx, config, ctx);
+    gps.createGPSSystem(*idx, ctx);
   return true;
 }
 
 bool
-D868UVCodeplug::linkGPSSystems(Config *config, CodeplugContext &ctx) {
-  gps_settings_t *gps = (gps_settings_t *)data(ADDR_GPS_SETTINGS);
+D868UVCodeplug::linkGPSSystems(Context &ctx) {
+  DMRAPRSSettingsElement gps(data(ADDR_GPS_SETTINGS));
   // Then link all referenced GPS systems
   for (uint8_t i=0; i<8; i++) {
-    if (! ctx.hasGPSSystem(i))
+    if (! ctx.has<GPSSystem>(i))
       continue;
-    gps->linkGPSSystem(i, config, ctx);
+    gps.linkGPSSystem(i, ctx);
   }
   return true;
 }

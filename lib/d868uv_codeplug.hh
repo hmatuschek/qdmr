@@ -883,7 +883,6 @@ public:
     uint8_t default_b_ch_idx;      ///< Boot channel B index within selected default zone, 0xff=VFO.
     uint8_t keep_last_caller;      ///< Keep last caller when changing channel.
 
-
     /** Encodes the general settings. */
     void fromConfig(Config *config, const Flags &flags);
     /** Updates the abstract config from general settings. */
@@ -1444,17 +1443,19 @@ public:
   bool encode(Config *config, const Flags &flags = Flags());
 
 protected:
+  /** Encodes the given config (via context) to the binary codeplug. */
+  virtual bool encode(const Flags &flags, Context &ctx);
   /** Decodes the downloaded codeplug. */
-  virtual bool decode(Config *config, CodeplugContext &ctx);
+  virtual bool decode(Context &ctx);
 
   /** Allocate channels from bitmap. */
   virtual void allocateChannels();
   /** Encode channels into codeplug. */
-  virtual bool encodeChannels(Config *config, const Flags &flags);
+  virtual bool encodeChannels(const Flags &flags, Context &ctx);
   /** Create channels from codeplug. */
-  virtual bool createChannels(Config *config, CodeplugContext &ctx);
+  virtual bool createChannels(Context &ctx);
   /** Link channels. */
-  virtual bool linkChannels(Config *config, CodeplugContext &ctx);
+  virtual bool linkChannels(Context &ctx);
 
   /** Allocate VFO settings. */
   virtual void allocateVFOSettings();
@@ -1462,57 +1463,57 @@ protected:
   /** Allocate contacts from bitmaps. */
   virtual void allocateContacts();
   /** Encode contacts into codeplug. */
-  virtual bool encodeContacts(Config *config, const Flags &flags);
+  virtual bool encodeContacts(const Flags &flags, Context &ctx);
   /** Create contacts from codeplug. */
-  virtual bool createContacts(Config *config, CodeplugContext &ctx);
+  virtual bool createContacts(Context &ctx);
 
   /** Allocate analog contacts from bitmaps. */
   virtual void allocateAnalogContacts();
   /** Encode analog contacts into codeplug. */
-  virtual bool encodeAnalogContacts(Config *config, const Flags &flags);
+  virtual bool encodeAnalogContacts(const Flags &flags, Context &ctx);
   /** Create analog contacts from codeplug. */
-  virtual bool createAnalogContacts(Config *config, CodeplugContext &ctx);
+  virtual bool createAnalogContacts(Context &ctx);
 
   /** Allocate radio IDs from bitmaps. */
   virtual void allocateRadioIDs();
   /** Encode radio ID into codeplug. */
-  virtual bool encodeRadioID(Config *config, const Flags &flags);
+  virtual bool encodeRadioID(const Flags &flags, Context &ctx);
   /** Set radio ID from codeplug. */
-  virtual bool setRadioID(Config *config, CodeplugContext &ctx);
+  virtual bool setRadioID(Context &ctx);
 
   /** Allocates RX group lists from bitmaps. */
   virtual void allocateRXGroupLists();
   /** Encode RX group lists into codeplug. */
-  virtual bool encodeRXGroupLists(Config *config, const Flags &flags);
+  virtual bool encodeRXGroupLists(const Flags &flags, Context &ctx);
   /** Create RX group lists from codeplug. */
-  virtual bool createRXGroupLists(Config *config, CodeplugContext &ctx);
+  virtual bool createRXGroupLists(Context &ctx);
   /** Link RX group lists. */
-  virtual bool linkRXGroupLists(Config *config, CodeplugContext &ctx);
+  virtual bool linkRXGroupLists(Context &ctx);
 
   /** Allocate zones from bitmaps. */
   virtual void allocateZones();
   /** Encode zones into codeplug. */
-  virtual bool encodeZones(Config *config, const Flags &flags);
+  virtual bool encodeZones(const Flags &flags, Context &ctx);
   /** Create zones from codeplug. */
-  virtual bool createZones(Config *config, CodeplugContext &ctx);
+  virtual bool createZones(Context &ctx);
   /** Link zones. */
-  virtual bool linkZones(Config *config, CodeplugContext &ctx);
+  virtual bool linkZones(Context &ctx);
 
   /** Allocate scanlists from bitmaps. */
   virtual void allocateScanLists();
   /** Encode scan lists into codeplug. */
-  virtual bool encodeScanLists(Config *config, const Flags &flags);
+  virtual bool encodeScanLists(const Flags &flags, Context &ctx);
   /** Create scan lists from codeplug. */
-  virtual bool createScanLists(Config *config, CodeplugContext &ctx);
+  virtual bool createScanLists(Context &ctx);
   /** Link scan lists. */
-  virtual bool linkScanLists(Config *config, CodeplugContext &ctx);
+  virtual bool linkScanLists(Context &ctx);
 
   /** Allocates general settings memory section. */
   virtual void allocateGeneralSettings();
   /** Encodes the general settings section. */
-  virtual bool encodeGeneralSettings(Config *config, const Flags &flags);
+  virtual bool encodeGeneralSettings(const Flags &flags, Context &ctx);
   /** Decodes the general settings section. */
-  virtual bool decodeGeneralSettings(Config *config);
+  virtual bool decodeGeneralSettings(Context &ctx);
 
   /** Allocates zone channel list memory section. */
   virtual void allocateZoneChannelList();
@@ -1523,18 +1524,18 @@ protected:
   /** Allocates boot settings memory section. */
   virtual void allocateBootSettings();
   /** Encodes the boot settings section. */
-  virtual bool encodeBootSettings(Config *config, const Flags &flags);
+  virtual bool encodeBootSettings(const Flags &flags, Context &ctx);
   /** Decodes the boot settings section. */
-  virtual bool decodeBootSettings(Config *config);
+  virtual bool decodeBootSettings(Context &ctx);
 
   /** Allocates GPS settings memory section. */
   virtual void allocateGPSSystems();
   /** Encodes the GPS settings section. */
-  virtual bool encodeGPSSystems(Config *config, const Flags &flags);
+  virtual bool encodeGPSSystems(const Flags &flags, Context &ctx);
   /** Create GPS systems from codeplug. */
-  virtual bool createGPSSystems(Config *config, CodeplugContext &ctx);
+  virtual bool createGPSSystems(Context &ctx);
   /** Link GPS systems. */
-  virtual bool linkGPSSystems(Config *config, CodeplugContext &ctx);
+  virtual bool linkGPSSystems(Context &ctx);
 
   /** Allocate refab SMS messages. */
   virtual void allocateSMSMessages();

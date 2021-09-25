@@ -1,5 +1,6 @@
 #include "anytone_codeplug.hh"
 #include "utils.hh"
+#include "logger.hh"
 #include <QTimeZone>
 
 using namespace Signaling;
@@ -192,6 +193,29 @@ AnytoneCodeplug::ChannelElement::setRXSignalingMode(SignalingMode mode) {
   setUInt2(0x0009, 0, (uint)mode);
 }
 
+Signaling::Code
+AnytoneCodeplug::ChannelElement::rxTone() const {
+  if (SignalingMode::None == rxSignalingMode())
+    return Signaling::SIGNALING_NONE;
+  else if (SignalingMode::CTCSS == rxSignalingMode())
+    return rxCTCSS();
+  else if (SignalingMode::DCS == rxSignalingMode())
+    return rxDCS();
+  return Signaling::SIGNALING_NONE;
+}
+void
+AnytoneCodeplug::ChannelElement::setRXTone(Code code) {
+  if (Signaling::SIGNALING_NONE == code) {
+    setRXSignalingMode(SignalingMode::None);
+  } else if (Signaling::isCTCSS(code)) {
+    setRXSignalingMode(SignalingMode::CTCSS);
+    setRXCTCSS(code);
+  } else if (Signaling::isDCSInverted(code) || Signaling::isDCSNormal(code)) {
+    setRXSignalingMode(SignalingMode::DCS);
+    setRXDCS(code);
+  }
+}
+
 AnytoneCodeplug::ChannelElement::SignalingMode
 AnytoneCodeplug::ChannelElement::txSignalingMode() const {
   return (SignalingMode)getUInt2(0x0009, 2);
@@ -199,6 +223,29 @@ AnytoneCodeplug::ChannelElement::txSignalingMode() const {
 void
 AnytoneCodeplug::ChannelElement::setTXSignalingMode(SignalingMode mode) {
   setUInt2(0x0009, 2, (uint)mode);
+}
+
+Signaling::Code
+AnytoneCodeplug::ChannelElement::txTone() const {
+  if (SignalingMode::None == txSignalingMode())
+    return Signaling::SIGNALING_NONE;
+  else if (SignalingMode::CTCSS == txSignalingMode())
+    return txCTCSS();
+  else if (SignalingMode::DCS == txSignalingMode())
+    return txDCS();
+  return Signaling::SIGNALING_NONE;
+}
+void
+AnytoneCodeplug::ChannelElement::setTXTone(Code code) {
+  if (Signaling::SIGNALING_NONE == code) {
+    setTXSignalingMode(SignalingMode::None);
+  } else if (Signaling::isCTCSS(code)) {
+    setTXSignalingMode(SignalingMode::CTCSS);
+    setTXCTCSS(code);
+  } else if (Signaling::isDCSInverted(code) || Signaling::isDCSNormal(code)) {
+    setTXSignalingMode(SignalingMode::DCS);
+    setTXDCS(code);
+  }
 }
 
 bool
@@ -582,6 +629,170 @@ AnytoneCodeplug::ChannelElement::enableSMS(bool enable) {
 }
 
 
+Channel *
+AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
+  Channel *ch;
+  if ((Mode::Analog == mode()) || (Mode::MixedAnalog == mode())) {
+    if (Mode::MixedAnalog == mode())
+      logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
+                << name() <<"' as analog channel.";
+    AnalogChannel::Admit admit = ((Admit::Free == this->admit()) ?
+                                    AnalogChannel::Admit::Free : AnalogChannel::Admit::Always);
+    ch = new AnalogChannel(
+          name(), rxFrequency(), txFrequency(), power(), 0.0, rxOnly(), admit,
+          1, rxTone(), txTone(), bandwidth(), nullptr);
+  } else if ((Mode::Digital == mode()) || (Mode::MixedDigital == mode())) {
+    if (Mode::MixedDigital == mode())
+      logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
+                << name() <<"' as digital channel.";
+    DigitalChannel::Admit admit = DigitalChannel::Admit::Always;
+    switch (this->admit()) {
+    case Admit::Always: admit = DigitalChannel::Admit::Always; break;
+    case Admit::Free: admit = DigitalChannel::Admit::Free; break;
+    case Admit::Colorcode: admit = DigitalChannel::Admit::ColorCode; break;
+    }
+    ch = new DigitalChannel(
+          name(), rxFrequency(), txFrequency(), power(), 0.0, rxOnly(), admit,
+          colorCode(), timeSlot(), nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+  } else {
+    logError() << "Cannot create channel '" << name()
+               << "': Channel type " << (uint)mode() << "not supported.";
+    return nullptr;
+  }
+
+  return ch;
+
+}
+
+bool
+AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
+  if (Mode::Digital == mode()) {
+    // If channel is digital
+    DigitalChannel *dc = c->as<DigitalChannel>();
+    if (nullptr == dc)
+      return false;
+
+    // Check if default contact is set, in fact a valid contact index is mandatory.
+    if (! ctx.has<DigitalContact>(contactIndex())) {
+      logError() << "Cannot resolve contact index " << contactIndex() << " for channel '"
+                 << c->name() << "'.";
+      return false;
+    }
+    dc->setTXContactObj(ctx.get<DigitalContact>(contactIndex()));
+
+    // Set if RX group list is set
+    if (hasGroupListIndex() && ctx.has<RXGroupList>(groupListIndex()))
+      dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+
+    // Link to GPS system
+    if (txAPRS() && (! ctx.has<GPSSystem>(dmrAPRSSystemIndex())))
+      logWarn() << "Cannot link to DMR APRS system index " << dmrAPRSSystemIndex() << ": undefined DMR APRS system.";
+    else if (ctx.has<GPSSystem>(dmrAPRSSystemIndex()))
+      dc->aprsObj(ctx.get<GPSSystem>(dmrAPRSSystemIndex()));
+
+    // Link radio ID
+    RadioID *rid = ctx.get<RadioID>(radioIDIndex());
+    if (rid == ctx.config()->radioIDs()->defaultId())
+      dc->setRadioIdObj(DefaultRadioID::get());
+    else
+      dc->setRadioIdObj(rid);
+  } else if (Mode::Analog == mode()) {
+    // If channel is analog
+    AnalogChannel *ac = c->as<AnalogChannel>();
+    if (nullptr == ac)
+      return false;
+  }
+
+  // For both, analog and digital channels:
+
+  // If channel has scan list
+  if (hasScanListIndex() && ctx.has<ScanList>(scanListIndex()))
+    c->setScanListObj(ctx.get<ScanList>(scanListIndex()));
+
+  return true;
+}
+
+bool
+AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
+  // Clear channel element
+  clear();
+
+  // set channel name
+  setName(c->name());
+  // set rx and tx frequencies
+  setRXFrequency(c->rxFrequency());
+  setTXFrequency(c->txFrequency());
+  setPower(c->power());
+  // set tx-enable
+  enableRXOnly(c->rxOnly());
+  if (nullptr == c->scanListObj())
+    clearScanListIndex();
+  else
+    setScanListIndex(ctx.index(c->scanListObj()));
+
+  // Dispatch by channel type
+  if (c->is<AnalogChannel>()) {
+    const AnalogChannel *ac = c->as<const AnalogChannel>();
+    setMode(Mode::Analog);
+    // set admit criterion
+    switch (ac->admit()) {
+    case AnalogChannel::Admit::Always: setAdmit(Admit::Always); break;
+    case AnalogChannel::Admit::Free: setAdmit(Admit::Free); break;
+    case AnalogChannel::Admit::Tone: setAdmit(Admit::Free); break;
+    }
+    // squelch mode
+    setRXTone(ac->rxTone());
+    setTXTone(ac->txTone());
+    // set bandwidth
+    setBandwidth(ac->bandwidth());
+  } else if (c->is<DigitalChannel>()) {
+    const DigitalChannel *dc = c->as<const DigitalChannel>();
+    // pack digital channel config.
+    setMode(Mode::Digital);
+    // set admit criterion
+    switch(dc->admit()) {
+    case DigitalChannel::Admit::Always: setAdmit(Admit::Always); break;
+    case DigitalChannel::Admit::Free: setAdmit(Admit::Free); break;
+    case DigitalChannel::Admit::ColorCode: setAdmit(Admit::Colorcode); break;
+    }
+    // set color code
+    setColorCode(dc->colorCode());
+    // set time-slot
+    setTimeSlot(dc->timeSlot());
+    // link transmit contact
+    if (nullptr == dc->txContactObj())
+      setContactIndex(0);
+    else
+      setContactIndex(ctx.index(dc->txContactObj()));
+    // link RX group list
+    if (nullptr == dc->groupListObj())
+      clearGroupListIndex();
+    else
+      setGroupListIndex(ctx.index(dc->groupListObj()));
+    // Set GPS system index
+    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
+      setDMRAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
+      enableTXAPRS(true);
+    } else {
+      enableTXAPRS(false);
+    }
+    // Set radio ID
+    if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
+      if (nullptr == ctx.config()->radioIDs()->defaultId()) {
+        logWarn() << "No default radio ID set: using index 0.";
+        setRadioIDIndex(0);
+      } else {
+        setRadioIDIndex(ctx.index(ctx.config()->radioIDs()->defaultId()));
+      }
+    } else {
+      setRadioIDIndex(ctx.index(dc->radioIdObj()));
+    }
+  }
+
+  return true;
+}
+
+
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::ContactElement
  * ********************************************************************************************* */
@@ -656,6 +867,24 @@ AnytoneCodeplug::ContactElement::setAlertType(AlertType type) {
   setUInt8(0x0027, (uint)type);
 }
 
+DigitalContact *
+AnytoneCodeplug::ContactElement::toContactObj(Context &ctx) const {
+  Q_UNUSED(ctx);
+  return new DigitalContact(type(), name(), number(), AlertType::None != alertType());
+}
+
+bool
+AnytoneCodeplug::ContactElement::fromContactObj(const DigitalContact *contact, Context &ctx) {
+  clear();
+
+  setType(contact->type());
+  setName(contact->name());
+  setNumber(contact->number());
+  setAlertType(contact->ring() ? AlertType::Ring : AlertType::None);
+
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::DTMFContactElement
@@ -717,6 +946,18 @@ AnytoneCodeplug::DTMFContactElement::setName(const QString &name) {
   writeASCII(0x0020, name, 15, 0x00);
 }
 
+DTMFContact *
+AnytoneCodeplug::DTMFContactElement::toContact() const {
+  return new DTMFContact(name(), number());
+}
+
+bool
+AnytoneCodeplug::DTMFContactElement::fromContact(const DTMFContact *contact) {
+  setNumber(contact->number());
+  setName(contact->name());
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::GroupListElement
@@ -769,6 +1010,43 @@ AnytoneCodeplug::GroupListElement::setMemberIndex(uint n, uint idx) {
 void
 AnytoneCodeplug::GroupListElement::clearMemberIndex(uint n) {
   setMemberIndex(n, 0xffffffff);
+}
+
+RXGroupList *
+AnytoneCodeplug::GroupListElement::toGroupListObj() const {
+  return new RXGroupList(name());
+}
+
+bool
+AnytoneCodeplug::GroupListElement::linkGroupList(RXGroupList *lst, Context &ctx) const {
+  for (uint8_t i=0; i<64; i++) {
+    // Disabled contact -> continue
+    if (! hasMemberIndex(i))
+      continue;
+    // Missing contact ignore.
+    if (! ctx.has<DigitalContact>(memberIndex(i))) {
+      logWarn() << "Cannot link contact " << memberIndex(i) << " to group list '"
+                << this->name() << "': Invalid contact index. Ignored.";
+      continue;
+    }
+    lst->addContact(ctx.get<DigitalContact>(memberIndex(i)));
+  }
+  return true;
+}
+
+bool
+AnytoneCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context &ctx) {
+  clear();
+  // set name of group list
+  setName(lst->name());
+  // set members
+  for (uint8_t i=0; i<64; i++) {
+    if (i < lst->count())
+      setMemberIndex(i, ctx.index(lst->contact(i)));
+    else
+      clearMemberIndex(i);
+  }
+  return true;
 }
 
 
@@ -929,6 +1207,78 @@ AnytoneCodeplug::ScanListElement::clearMemberIndex(uint n) {
   setMemberIndex(n, 0xffff);
 }
 
+ScanList *
+AnytoneCodeplug::ScanListElement::toScanListObj() const {
+  return new ScanList(name());
+}
+
+bool
+AnytoneCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) const {
+  if (((PriChannel::Both == priorityChannels()) || (PriChannel::Primary==priorityChannels())) && hasPrimary()) {
+    if (primaryIsSelected())
+      lst->setPrimaryChannel(SelectedChannel::get());
+    else if (ctx.has<Channel>(primary()))
+      lst->setPrimaryChannel(ctx.get<Channel>(primary()));
+  }
+
+  if (((PriChannel::Both == priorityChannels()) || (PriChannel::Secondary==priorityChannels())) && hasSecondary()) {
+    if (secondaryIsSelected())
+      lst->setSecondaryChannel(SelectedChannel::get());
+    else if (ctx.has<Channel>(secondary()))
+      lst->setSecondaryChannel(ctx.get<Channel>(secondary()));
+  }
+
+  for (uint16_t i=0; i<50; i++) {
+    if (! hasMemberIndex(i))
+      continue;
+    if (! ctx.has<Channel>(memberIndex(i))) {
+      logError() << "Cannot link scanlist '" << name() << "', channel index "
+                 << memberIndex(i) << " unknown.";
+      continue;
+    }
+    lst->addChannel(ctx.get<Channel>(memberIndex(i)));
+  }
+
+  return true;
+}
+
+bool
+AnytoneCodeplug::ScanListElement::fromScanListObj(ScanList *lst, Context &ctx) {
+  clear();
+
+  setName(lst->name());
+
+  if (lst->primaryChannel() && lst->secondaryChannel()) {
+    setPriorityChannels(PriChannel::Both);
+  } else if (lst->primaryChannel()) {
+    setPriorityChannels(PriChannel::Primary);
+  } else if (lst->secondaryChannel()) {
+    setPriorityChannels(PriChannel::Secondary);
+  }
+
+  if (lst->primaryChannel()) {
+    if (SelectedChannel::get() == lst->primaryChannel())
+      setPrimarySelected();
+    else
+      setPrimary(ctx.index(lst->primaryChannel()));
+  }
+
+  if (lst->secondaryChannel()) {
+    if (SelectedChannel::get() == lst->secondaryChannel())
+      setSecondarySelected();
+    else
+      setSecondary(ctx.index(lst->secondaryChannel()));
+  }
+
+  for (int i=0; i<std::min(50, lst->count()); i++) {
+    if (SelectedChannel::get() == lst->channel(i))
+      continue;
+    setMemberIndex(i, ctx.index(lst->channel(i)));
+  }
+
+  return false;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::RadioIDElement
@@ -966,6 +1316,17 @@ AnytoneCodeplug::RadioIDElement::name() const {
 void
 AnytoneCodeplug::RadioIDElement::setName(const QString &name) {
   writeASCII(0x0005, name, 16, 0x00);
+}
+
+RadioID *
+AnytoneCodeplug::RadioIDElement::toRadioID() const {
+  return new RadioID(name(), number());
+}
+bool
+AnytoneCodeplug::RadioIDElement::fromRadioID(RadioID *id) {
+  setName(id->name());
+  setNumber(id->number());
+  return true;
 }
 
 
@@ -1867,6 +2228,37 @@ AnytoneCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
   setUInt8(0x00cf, (enable ? 0x01 : 0x00));
 }
 
+bool
+AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+  // Set microphone gain
+  setMICGain(ctx.config()->micLevel());
+  // If auto-enable GPS is enabled
+  if (flags.autoEnableGPS) {
+    // Check if GPS is required -> enable
+    if (ctx.config()->requiresGPS()) {
+      enableGPS(true);
+      // Set time zone based on system time zone.
+      setGPSTimeZone(QTimeZone::systemTimeZone());
+      enableGetGPSPosition(false);
+      setGPSUpdatePeriod(0x05);
+      // Set measurement system based on system locale (0x00==Metric)
+      enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
+    } else {
+      enableGPS(false);
+    }
+  }
+  return true;
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
+  // get microphone gain
+  ctx.config()->setMicLevel(micGain());
+  // D868UV does not support speech synthesis?
+  ctx.config()->setSpeech(false);
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::ZoneChannelListElement
@@ -1970,6 +2362,21 @@ void
 AnytoneCodeplug::BootSettingsElement::setPassword(const QString &txt) {
   writeASCII(0x0020, txt, 16, 0x00);
 }
+
+bool
+AnytoneCodeplug::BootSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+  setIntroLine1(ctx.config()->introLine1());
+  setIntroLine2(ctx.config()->introLine2());
+  return true;
+}
+
+bool
+AnytoneCodeplug::BootSettingsElement::updateConfig(Context &ctx) {
+  ctx.config()->setIntroLine1(introLine1());
+  ctx.config()->setIntroLine2(introLine2());
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::DMRAPRSSettingsElement
@@ -2170,6 +2577,53 @@ AnytoneCodeplug::DMRAPRSSettingsElement::overrideTimeSlot(DigitalChannel::TimeSl
 void
 AnytoneCodeplug::DMRAPRSSettingsElement::disableTimeSlotOverride() {
   setUInt8(0x0021, 0x00);
+}
+
+bool
+AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+  if (1 < ctx.config()->posSystems()->gpsCount()) {
+    logDebug() << "D868UV only supports a single independent GPS positioning system.";
+  } else if (0 == ctx.config()->posSystems()->gpsCount()) {
+    return true;
+  }
+
+  GPSSystem *sys = ctx.config()->posSystems()->gpsSystem(0);
+  setDestination(sys->contactObj()->number());
+  setCallType(sys->contactObj()->type());
+  setManualInterval(sys->period());
+  setAutomaticInterval(sys->period());
+  disableTimeSlotOverride();
+  if (SelectedChannel::get() == sys->revertChannel()->as<Channel>()) {
+    setChannelSelected(0);
+  } else {
+    setChannelIndex(0, ctx.index(sys->revertChannel()));
+  }
+  return true;
+}
+
+bool
+AnytoneCodeplug::DMRAPRSSettingsElement::createGPSSystem(uint8_t i, Context &ctx) {
+  GPSSystem *sys = new GPSSystem(QString("GPS sys %1").arg(i+1), nullptr, nullptr, automaticInterval());
+  ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
+  return true;
+}
+
+bool
+AnytoneCodeplug::DMRAPRSSettingsElement::linkGPSSystem(uint8_t i, Context &ctx) {
+  DigitalContact *cont = nullptr;
+  // Find matching contact, if not found -> create one.
+  if (nullptr == (cont = ctx.config()->contacts()->findDigitalContact(destination()))) {
+    cont = new DigitalContact(callType(), QString("GPS target"), destination());
+    ctx.config()->contacts()->add(cont);
+  }
+  ctx.get<GPSSystem>(i)->setContact(cont);
+
+  // Check if there is a revert channel set
+  if ((! channelIsSelected(i)) && (ctx.has<Channel>(channelIndex(i))) && (ctx.get<Channel>(channelIndex(i)))->is<DigitalChannel>()) {
+    DigitalChannel *ch = ctx.get<Channel>(channelIndex(i))->as<DigitalChannel>();
+    ctx.get<GPSSystem>(i)->setRevertChannel(ch);
+  }
+  return true;
 }
 
 

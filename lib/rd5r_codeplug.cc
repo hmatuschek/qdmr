@@ -159,8 +159,8 @@ RD5RCodeplug::clear() {
 }
 
 bool
-RD5RCodeplug::encodeElements(Config *config, const Flags &flags, Context &ctx) {
-  if (! RadioddityCodeplug::encodeElements(config, flags, ctx))
+RD5RCodeplug::encodeElements(const Flags &flags, Context &ctx) {
+  if (! RadioddityCodeplug::encodeElements(flags, ctx))
     return false;
 
   // Set timestamp
@@ -173,8 +173,8 @@ RD5RCodeplug::encodeElements(Config *config, const Flags &flags, Context &ctx) {
 }
 
 bool
-RD5RCodeplug::decodeElements(Config *config, Context &ctx) {
-  if (! RadioddityCodeplug::decodeElements(config, ctx))
+RD5RCodeplug::decodeElements(Context &ctx) {
+  if (! RadioddityCodeplug::decodeElements(ctx))
     return false;
   return true;
 }

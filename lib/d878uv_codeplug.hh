@@ -218,11 +218,25 @@ class D878UVCodeplug : public D868UVCodeplug
   Q_OBJECT
 
 public:
-  /** Represents the actual channel encoded within the binary code-plug.
+  /** Represents the actual channel encoded within the binary D878UV codeplug.
    *
    * Memmory layout of encoded channel (64byte):
-   * @verbinclude d878uvchannel.txt
+   * @verbinclude d878uv_channel.txt
    */
+  class ChannelElement: public D868UVCodeplug::ChannelElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ChannelElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit ChannelElement(uint8_t *ptr);
+
+    void clear();
+
+  };
+
   struct __attribute__((packed)) channel_t {
     /** Defines all possible channel modes, see @c channel_mode. */
     typedef enum {

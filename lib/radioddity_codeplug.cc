@@ -2427,53 +2427,53 @@ RadioddityCodeplug::encode(Config *config, const Flags &flags) {
   }
 
   // Create index<->object table.
-  Context ctx;
+  Context ctx(config);
   if (! index(config, ctx))
     return false;
 
-  return this->encodeElements(config, flags, ctx);
+  return this->encodeElements(flags, ctx);
 }
 
 bool
-RadioddityCodeplug::encodeElements(Config *config, const Flags &flags, Context &ctx) {
+RadioddityCodeplug::encodeElements(const Flags &flags, Context &ctx) {
   // General config
-  if (! this->encodeGeneralSettings(config, flags, ctx)) {
+  if (! this->encodeGeneralSettings(ctx.config(), flags, ctx)) {
     _errorMessage = tr("Cannot encode general settings: %1").arg(_errorMessage);
     return false;
   }
 
   // Define Contacts
-  if (! this->encodeContacts(config, flags, ctx)) {
+  if (! this->encodeContacts(ctx.config(), flags, ctx)) {
     _errorMessage = tr("Cannot encode contacts: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->encodeDTMFContacts(config, flags, ctx)) {
+  if (! this->encodeDTMFContacts(ctx.config(), flags, ctx)) {
     _errorMessage = tr("Cannot encode DTMF contacts: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->encodeChannels(config, flags, ctx)) {
+  if (! this->encodeChannels(ctx.config(), flags, ctx)) {
     _errorMessage = tr("Cannot encode channels: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->encodeBootText(config, flags, ctx)) {
+  if (! this->encodeBootText(ctx.config(), flags, ctx)) {
     _errorMessage = tr("Cannot encode boot text: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->encodeZones(config, flags, ctx)) {
+  if (! this->encodeZones(ctx.config(), flags, ctx)) {
     _errorMessage = tr("Cannot encode zones: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->encodeScanLists(config, flags, ctx)) {
+  if (! this->encodeScanLists(ctx.config(), flags, ctx)) {
     _errorMessage = tr("Cannot encode scan lists: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->encodeGroupLists(config, flags, ctx)) {
+  if (! this->encodeGroupLists(ctx.config(), flags, ctx)) {
     _errorMessage = tr("Cannot encode group lists: %1").arg(_errorMessage);
     return false;
   }
@@ -2483,73 +2483,73 @@ RadioddityCodeplug::encodeElements(Config *config, const Flags &flags, Context &
 
 bool
 RadioddityCodeplug::decode(Config *config) {
-  // Create index<->object table.
-  Context ctx;
-
   // Clear config object
   config->reset();
 
-  return this->decodeElements(config, ctx);
+  // Create index<->object table.
+  Context ctx(config);
+
+  return this->decodeElements(ctx);
 }
 
 bool
-RadioddityCodeplug::decodeElements(Config *config, Context &ctx) {
-  if (! this->decodeGeneralSettings(config, ctx)) {
+RadioddityCodeplug::decodeElements(Context &ctx) {
+  if (! this->decodeGeneralSettings(ctx.config(), ctx)) {
     _errorMessage = tr("Cannot decode general settings: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->createContacts(config, ctx)) {
+  if (! this->createContacts(ctx.config(), ctx)) {
     _errorMessage = tr("Cannot create contacts: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->createDTMFContacts(config, ctx)) {
+  if (! this->createDTMFContacts(ctx.config(), ctx)) {
     _errorMessage = tr("Cannot create DTMF contacts: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->createChannels(config, ctx)) {
+  if (! this->createChannels(ctx.config(), ctx)) {
     _errorMessage = tr("Cannot create channels: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->decodeBootText(config, ctx)) {
+  if (! this->decodeBootText(ctx.config(), ctx)) {
     _errorMessage = tr("Cannot decode boot text: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->createZones(config, ctx)) {
+  if (! this->createZones(ctx.config(), ctx)) {
     _errorMessage = tr("Cannot create zones: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->createScanLists(config, ctx)) {
+  if (! this->createScanLists(ctx.config(), ctx)) {
     _errorMessage = tr("Cannot create scan lists: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->createGroupLists(config, ctx)) {
+  if (! this->createGroupLists(ctx.config(), ctx)) {
     _errorMessage = tr("Cannot create group lists: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->linkChannels(config, ctx)) {
+  if (! this->linkChannels(ctx.config(), ctx)) {
     _errorMessage = tr("Cannot link channels: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->linkZones(config, ctx)) {
+  if (! this->linkZones(ctx.config(), ctx)) {
     _errorMessage = tr("Cannot link zones: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->linkScanLists(config, ctx)) {
+  if (! this->linkScanLists(ctx.config(), ctx)) {
     _errorMessage = tr("Cannot link scan lists: %1").arg(_errorMessage);
     return false;
   }
 
-  if (! this->linkGroupLists(config, ctx)) {
+  if (! this->linkGroupLists(ctx.config(), ctx)) {
     _errorMessage = tr("Cannot link group lists: %1").arg(_errorMessage);
     return false;
   }

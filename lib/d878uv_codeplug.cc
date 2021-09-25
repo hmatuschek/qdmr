@@ -1105,7 +1105,7 @@ bool
 D878UVCodeplug::decode(Config *config, CodeplugContext &ctx)
 {
   // Decode everything commong between d868uv and d878uv codeplugs.
-  if (! D868UVCodeplug::decode(config, ctx))
+  if (! D868UVCodeplug::decode(config))
     return false;
 
   if (! this->createRoaming(config, ctx))

@@ -131,8 +131,8 @@ public:
   void clear();
 
 public:
-  bool encodeElements(Config *config, const Flags &flags, Context &ctx);
-  bool decodeElements(Config *config, Context &ctx);
+  bool encodeElements(const Flags &flags, Context &ctx);
+  bool decodeElements(Context &ctx);
 
   /** Clears the time-stamp in the codeplug. */
   virtual void clearTimestamp();

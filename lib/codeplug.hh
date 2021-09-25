@@ -179,7 +179,10 @@ public:
   {
   public:
     /** Empty constructor. */
-    Context();
+    Context(Config *config);
+
+    /** Returns the reference to the config object. */
+    Config *config() const;
 
     /** Resolves the given index for the specifies element type.
      * @returns @c nullptr if the index is not defined or the type is unknown. */
@@ -222,6 +225,8 @@ public:
     Table &getTable(const QMetaObject *obj);
 
   protected:
+    /** A weak reference to the config object. */
+    Config *_config;
     /** Table of tables. */
     QHash<QString, Table> _tables;
   };

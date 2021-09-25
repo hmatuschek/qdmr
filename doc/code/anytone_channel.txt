@@ -27,8 +27,9 @@
 3c | Unused set to 0x00000000                                                                                                      |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-with
-RMode = Repater mode, BWd = Band width, PWR = Power, CMode = Channel mode, TAr=Talkaround, CaC = Call confirm, RXO = RX only,
+Field description:
+ - RMode: Repater mode,
+ - BWd: Band width, PWR = Power, CMode = Channel mode, TAr=Talkaround, CaC = Call confirm, RXO = RX only,
 CTR = CTCSS phase reversal, TDC = TX DCS code, TCT = TX CTCSS tone, RDC = RX DCS code, RCT = RX CTCSS tone,
 SQM = Squelch mode 0=open, 1=silent, OptSig = Optional signalling, TxPer = TX permit, LWK = Lone worker,
 EEE = Enable enhanced encryption, RGP = Enable RX GPS, EAT = Enable adative TDMA, EST = Enable simplex TDMA, SMC = SMS confirmation,
