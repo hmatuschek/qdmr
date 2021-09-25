@@ -577,19 +577,19 @@ AnytoneCodeplug::ChannelElement::enableDataACK(bool enable) {
 }
 
 bool
-AnytoneCodeplug::ChannelElement::txAPRS() const {
+AnytoneCodeplug::ChannelElement::txDigitalAPRS() const {
   return getBit(0x0035, 0);
 }
 void
-AnytoneCodeplug::ChannelElement::enableTXAPRS(bool enable) {
+AnytoneCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
   setBit(0x0035, 0, enable);
 }
 uint
-AnytoneCodeplug::ChannelElement::dmrAPRSSystemIndex() const {
+AnytoneCodeplug::ChannelElement::digitalAPRSSystemIndex() const {
   return getUInt8(0x0036);
 }
 void
-AnytoneCodeplug::ChannelElement::setDMRAPRSSystemIndex(uint idx) {
+AnytoneCodeplug::ChannelElement::setDigitalAPRSSystemIndex(uint idx) {
   setUInt8(0x0036, idx);
 }
 
@@ -685,10 +685,10 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
       dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
 
     // Link to GPS system
-    if (txAPRS() && (! ctx.has<GPSSystem>(dmrAPRSSystemIndex())))
-      logWarn() << "Cannot link to DMR APRS system index " << dmrAPRSSystemIndex() << ": undefined DMR APRS system.";
-    else if (ctx.has<GPSSystem>(dmrAPRSSystemIndex()))
-      dc->aprsObj(ctx.get<GPSSystem>(dmrAPRSSystemIndex()));
+    if (txDigitalAPRS() && (! ctx.has<GPSSystem>(digitalAPRSSystemIndex())))
+      logWarn() << "Cannot link to DMR APRS system index " << digitalAPRSSystemIndex() << ": undefined DMR APRS system.";
+    else if (ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
+      dc->aprsObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
 
     // Link radio ID
     RadioID *rid = ctx.get<RadioID>(radioIDIndex());
@@ -771,10 +771,10 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       setGroupListIndex(ctx.index(dc->groupListObj()));
     // Set GPS system index
     if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
-      setDMRAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
-      enableTXAPRS(true);
+      setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
+      enableTXDigitalAPRS(true);
     } else {
-      enableTXAPRS(false);
+      enableTXDigitalAPRS(false);
     }
     // Set radio ID
     if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
@@ -4043,6 +4043,50 @@ AnytoneCodeplug::~AnytoneCodeplug() {
 
 bool
 AnytoneCodeplug::index(Config *config, Context &ctx) const {
+  // All indices as 0-based. That is, the first channel gets index 0 etc.
+
+  // Map radio IDs
+  for (int i=0; i<config->radioIDs()->count(); i++)
+    ctx.add(config->radioIDs()->getId(i), i);
+
+  // Map digital and DTMF contacts
+  for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
+    if (config->contacts()->contact(i)->is<DigitalContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DigitalContact>(), d); d++;
+    } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a); a++;
+    }
+  }
+
+  // Map rx group lists
+  for (int i=0; i<config->rxGroupLists()->count(); i++)
+    ctx.add(config->rxGroupLists()->list(i), i);
+
+  // Map channels
+  for (int i=0; i<config->channelList()->count(); i++)
+    ctx.add(config->channelList()->channel(i), i);
+
+  // Map zones
+  for (int i=0; i<config->zones()->count(); i++)
+    ctx.add(config->zones()->zone(i), i);
+
+  // Map scan lists
+  for (int i=0; i<config->scanlists()->count(); i++)
+    ctx.add(config->scanlists()->scanlist(i), i);
+
+  // Map DMR APRS systems
+  for (int i=0,a=0,d=0; i<config->posSystems()->count(); i++) {
+    if (config->posSystems()->system(i)->is<GPSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<GPSSystem>(), d); d++;
+    } else if (config->posSystems()->system(i)->is<APRSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<APRSSystem>(), a); a++;
+    }
+  }
+
+  // Map roaming
+  for (int i=0; i<config->roaming()->count(); i++)
+    ctx.add(config->roaming()->zone(i), i);
+
   return true;
 }
 

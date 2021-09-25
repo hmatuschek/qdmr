@@ -20,7 +20,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 30  ...                                                                                            | Unused set to 0x00            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-34 | 0   0   0   0   0 |XFR|ETM|RNG| 0   0   0   0   0   0   0 |TAP| DMR APRS IDX (0-based)        | Unused set to 0x00            |
+34 | 0   0   0   0   0 |DAD|ETM|RNG| 0   0   0   0   0   0   0 |TAP| DMR APRS IDX (0-based)        | Unused set to 0x00            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 38 | Unused set to 0x00            | Unused set to 0x00            | DMR encryption idx +1, 0=off  | 0   0   0   0   0 |SMF|RnK|Muk|
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -28,10 +28,33 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 Field description:
- - RMode: Repater mode,
- - BWd: Band width, PWR = Power, CMode = Channel mode, TAr=Talkaround, CaC = Call confirm, RXO = RX only,
-CTR = CTCSS phase reversal, TDC = TX DCS code, TCT = TX CTCSS tone, RDC = RX DCS code, RCT = RX CTCSS tone,
-SQM = Squelch mode 0=open, 1=silent, OptSig = Optional signalling, TxPer = TX permit, LWK = Lone worker,
-EEE = Enable enhanced encryption, RGP = Enable RX GPS, EAT = Enable adative TDMA, EST = Enable simplex TDMA, SMC = SMS confirmation,
-TSL = Time slot, XFR = Exlcude from roaming, ETM = Enable through mode, RNG = Ranging, APRSRep = Enable APRS/GPS report,
-TAP = TX APRS enable, MuK = Multiple keys, RnK = Random key, SMF = SMS forbid.
+ - RMode: Repater mode where 0=simplex, 1=positive TX offset, 2=negative TX offset.
+ - BWd: Band width where 0=narrow (12.5kHz), 1=wide (25kHz).
+ - PWR: Power where 0=low, 1=mid, 2=heigh, 3=turbo.
+ - CMode: Channel mode, 0=analog, 1=digital, 2=analog + digi RX, 3=digital + analog RX.
+ - TAr: Enable talkaround.
+ - CaC: Enable call confirm.
+ - RXO: Enable RX only.
+ - CTR: Enable CTCSS phase reversal.
+ - TDC: Enable TX DCS code.
+ - TCT: Enable TX CTCSS tone.
+ - RDC: Enable RX DCS code.
+ - RCT: Enable RX CTCSS tone.
+ - SQM: Squelch mode 0=open, 1=silent.
+ - OptSig: Optional signalling where 0=off, 1=DTMF, 2=2-tone, 3=5-tone
+ - TxPer: TX permit/admit criterion, 0=always, 1=colorcode, 2=channel free.
+ - LWK: Enable lone worker.
+ - EEE: Enable enhanced encryption
+ - RGP: Enable RX GPS:
+ - EAT: Enable adative TDMA
+ - EST: Enable simplex TDMA,
+ - SMC: SMS confirmation,
+ - TSL: Time slot where 0=TS1, 1=TS2
+ - DAD: Data ACK disable (inverted!)
+ - ETM: Enable through mode
+ - RNG: Ranging
+ - APRSRep: Enable APRS/GPS report,
+ - TAP: TX APRS enable
+ - MuK: Multiple keys
+ - RnK: Random key
+ - SMF: SMS forbid.

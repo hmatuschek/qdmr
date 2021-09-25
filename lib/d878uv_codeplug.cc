@@ -17,6 +17,7 @@
 #define CHANNEL_BANK_31           0x00fc0000
 #define CHANNEL_BANK_31_SIZE      0x00000800
 #define CHANNEL_BANK_OFFSET       0x00040000
+#define CHANNEL_SIZE              0x00000040
 #define CHANNEL_BITMAP            0x024c1500
 #define CHANNEL_BITMAP_SIZE       0x00000200
 
@@ -86,398 +87,6 @@ static_assert(
 #define ADDR_ENCRYPTION_KEYS      0x024C4000
 #define ENCRYPTION_KEY_SIZE       0x00000040
 #define ENCRYPTION_KEYS_SIZE      0x00004000
-
-
-/* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::channel_t
- * ******************************************************************************************** */
-D878UVCodeplug::channel_t::channel_t() {
-  clear();
-}
-
-void
-D878UVCodeplug::channel_t::clear() {
-  memset(this, 0, sizeof(D878UVCodeplug::channel_t));
-  custom_ctcss = qToLittleEndian(0x09cf); // some value
-  scan_list_index  = 0xff; // None
-  group_list_index = 0xff; // None
-  id_index = 0;
-  squelch_mode = SQ_CARRIER;
-  tx_permit = ADMIT_ALWAYS;
-
-}
-
-bool
-D878UVCodeplug::channel_t::isValid() const {
-  return (0 != name[0]) && (0xff != name[0]);
-}
-
-double
-D878UVCodeplug::channel_t::getRXFrequency() const {
-  return decode_frequency(qFromBigEndian(rx_frequency));
-}
-
-void
-D878UVCodeplug::channel_t::setRXFrequency(double f) {
-  rx_frequency = qToBigEndian(encode_frequency(f));
-}
-
-double
-D878UVCodeplug::channel_t::getTXFrequency() const {
-  double f = decode_frequency(qFromBigEndian(rx_frequency));
-  switch ((RepeaterMode) repeater_mode) {
-  case RM_SIMPLEX:
-    break;
-  case RM_TXNEG:
-    f -= decode_frequency(qFromBigEndian(tx_offset));
-    break;
-  case RM_TXPOS:
-    f += decode_frequency(qFromBigEndian(tx_offset));
-    break;
-  }
-  return f;
-}
-
-void
-D878UVCodeplug::channel_t::setTXFrequency(double f) {
-  if (getRXFrequency() == f) {
-    tx_offset = encode_frequency(0);
-    repeater_mode = RM_SIMPLEX;
-  } else if (getRXFrequency() > f) {
-    tx_offset = qToBigEndian(encode_frequency(getRXFrequency()-f));
-    repeater_mode = RM_TXNEG;
-  } else {
-    tx_offset = qToBigEndian(encode_frequency(f-getRXFrequency()));
-    repeater_mode = RM_TXPOS;
-  }
-}
-
-QString
-D878UVCodeplug::channel_t::getName() const {
-  return decode_ascii(name, 16, 0);
-}
-
-void
-D878UVCodeplug::channel_t::setName(const QString &name) {
-  encode_ascii(this->name, name, 16, 0);
-}
-
-Signaling::Code
-D878UVCodeplug::channel_t::getRXTone() const {
-  // If squelch is not SQ_TONE -> RX tone is ignored
-  if (SQ_TONE != squelch_mode)
-    return Signaling::SIGNALING_NONE;
-
-  if (rx_ctcss && (ctcss_receive < 52))
-    return ctcss_num2code(ctcss_receive);
-  else if (rx_dcs && (qFromLittleEndian(dcs_receive) < 512))
-    return Signaling::fromDCSNumber(dec_to_oct(qFromLittleEndian(dcs_receive)), false);
-  else if (rx_dcs && (qFromLittleEndian(dcs_receive) >= 512))
-    return Signaling::fromDCSNumber(dec_to_oct(qFromLittleEndian(dcs_receive)-512), true);
-  return Signaling::SIGNALING_NONE;
-}
-
-void
-D878UVCodeplug::channel_t::setRXTone(Signaling::Code code) {
-  if (Signaling::SIGNALING_NONE == code) {
-    squelch_mode = SQ_CARRIER;
-    rx_ctcss = rx_dcs = 0;
-    ctcss_receive = dcs_receive = 0;
-  } else if (Signaling::isCTCSS(code)) {
-    squelch_mode = SQ_TONE;
-    rx_ctcss = 1;
-    rx_dcs = 0;
-    ctcss_receive = ctcss_code2num(code);
-    dcs_receive = 0;
-  } else if (Signaling::isDCSNormal(code)) {
-    squelch_mode = SQ_TONE;
-    rx_ctcss = 0;
-    rx_dcs = 1;
-    ctcss_receive = 0;
-    dcs_receive = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code)));
-  } else if (Signaling::isDCSInverted(code)) {
-    squelch_mode = SQ_TONE;
-    rx_ctcss = 0;
-    rx_dcs = 1;
-    ctcss_receive = 0;
-    dcs_receive = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code))+512);
-  }
-}
-
-Signaling::Code
-D878UVCodeplug::channel_t::getTXTone() const {
-  if (tx_ctcss && (ctcss_transmit < 52))
-    return ctcss_num2code(ctcss_transmit);
-  else if (tx_dcs && (qFromLittleEndian(dcs_transmit) < 512))
-    return Signaling::fromDCSNumber(dec_to_oct(qFromLittleEndian(dcs_transmit)), false);
-  else if (tx_dcs && (qFromLittleEndian(dcs_transmit) >= 512))
-    return Signaling::fromDCSNumber(dec_to_oct(qFromLittleEndian(dcs_transmit)-512), true);
-  return Signaling::SIGNALING_NONE;
-}
-
-void
-D878UVCodeplug::channel_t::setTXTone(Signaling::Code code) {
-  if (Signaling::SIGNALING_NONE == code) {
-    tx_ctcss = tx_dcs = 0;
-    ctcss_transmit = dcs_transmit = 0;
-  } else if (Signaling::isCTCSS(code)) {
-    tx_ctcss = 1;
-    tx_dcs = 0;
-    ctcss_transmit = ctcss_code2num(code);
-    dcs_transmit = 0;
-  } else if (Signaling::isDCSNormal(code)) {
-    tx_ctcss = 0;
-    tx_dcs = 1;
-    ctcss_transmit = 0;
-    dcs_transmit = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code)));
-  } else if (Signaling::isDCSInverted(code)) {
-    tx_ctcss = 0;
-    tx_dcs = 1;
-    ctcss_transmit = 0;
-    dcs_transmit = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code))+512);
-  }
-}
-
-Channel *
-D878UVCodeplug::channel_t::toChannelObj() const {
-  // Decode power setting
-  Channel::Power power = Channel::Power::Low;
-  switch ((channel_t::Power) this->power) {
-  case POWER_LOW:
-    power = Channel::Power::Low;
-    break;
-  case POWER_MIDDLE:
-    power = Channel::Power::Mid;
-    break;
-  case POWER_HIGH:
-    power = Channel::Power::High;
-    break;
-  case POWER_TURBO:
-    power = Channel::Power::Max;
-    break;
-  }
-  bool rxOnly = (1 == this->rx_only);
-
-  Channel *ch;
-  if ((MODE_ANALOG == channel_mode) || (MODE_MIXED_A_D == channel_mode)) {
-    if (MODE_MIXED_A_D == channel_mode)
-      logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
-                << getName() <<"' as analog channel.";
-    AnalogChannel::Admit admit = AnalogChannel::Admit::Always;
-    switch ((channel_t::Admit) tx_permit) {
-    case ADMIT_ALWAYS:
-      admit = AnalogChannel::Admit::Always;
-      break;
-    case ADMIT_CH_FREE:
-      admit = AnalogChannel::Admit::Free;
-      break;
-    default:
-      break;
-    }
-    AnalogChannel::Bandwidth bw = AnalogChannel::Bandwidth::Narrow;
-    if (BW_12_5_KHZ == bandwidth)
-      bw = AnalogChannel::Bandwidth::Narrow;
-    else
-      bw = AnalogChannel::Bandwidth::Wide;
-    ch = new AnalogChannel(
-          getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
-          1, getRXTone(), getTXTone(), bw, nullptr);
-  } else if ((MODE_DIGITAL == channel_mode) || (MODE_MIXED_D_A == channel_mode)) {
-    if (MODE_MIXED_D_A == channel_mode)
-      logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
-                << getName() <<"' as digital channel.";
-    DigitalChannel::Admit admit = DigitalChannel::Admit::Always;
-    switch ((channel_t::Admit) tx_permit) {
-    case ADMIT_ALWAYS:
-      admit = DigitalChannel::Admit::Always;
-      break;
-    case ADMIT_CH_FREE:
-      admit = DigitalChannel::Admit::Free;
-      break;
-    case ADMIT_CC_SAME:
-    case ADMIT_CC_DIFF:
-      admit = DigitalChannel::Admit::ColorCode;
-      break;
-    }
-    DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot::TS2 : DigitalChannel::TimeSlot::TS1);
-    ch = new DigitalChannel(
-          getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
-          color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
-  } else {
-    logError() << "Cannot create channel '" << getName()
-               << "': Channel type " << channel_mode << "not supported.";
-    return nullptr;
-  }
-
-  return ch;
-}
-
-bool
-D878UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx) const {
-  if (MODE_DIGITAL == channel_mode) {
-    // If channel is digital
-    DigitalChannel *dc = c->as<DigitalChannel>();
-    if (nullptr == dc)
-      return false;
-
-    // Check if default contact is set, in fact a valid contact index is mandatory.
-    uint32_t conIdx = qFromLittleEndian(contact_index);
-    if ((0xffffffff != conIdx) && ctx.hasDigitalContact(conIdx))
-      dc->setTXContactObj(ctx.getDigitalContact(conIdx));
-
-    // Set if RX group list is set
-    if ((0xff != group_list_index) && ctx.hasGroupList(group_list_index))
-      dc->setGroupListObj(ctx.getGroupList(group_list_index));
-
-    // Link to GPS system
-    if ((APRS_REPORT_DIGITAL == aprs_report) && ctx.hasGPSSystem(gps_system))
-      dc->aprsObj(ctx.getGPSSystem(gps_system));
-    // Link APRS system if one is defined
-    //  There can only be one active APRS system, hence the index is fixed to one.
-    if ((APRS_REPORT_ANALOG == aprs_report) && ctx.hasAPRSSystem(0))
-      dc->aprsObj(ctx.getAPRSSystem(0));
-
-    // If roaming is not disabled -> link to default roaming zone
-    if (0 == excl_from_roaming)
-      dc->setRoamingZone(DefaultRoamingZone::get());
-
-    // Link radio ID
-    RadioID *rid = ctx.getRadioId(id_index);
-    if (rid == ctx.config()->radioIDs()->defaultId())
-      dc->setRadioIdObj(DefaultRadioID::get());
-    else
-      dc->setRadioIdObj(rid);
-  } else if (MODE_ANALOG == channel_mode) {
-    // If channel is analog
-    AnalogChannel *ac = c->as<AnalogChannel>();
-    if (nullptr == ac)
-      return false;
-
-    // Link APRS system if one is defined
-    //  There can only be one active APRS system, hence the index is fixed to one.
-    if ((APRS_REPORT_ANALOG == aprs_report) && ctx.hasAPRSSystem(0))
-      ac->setAPRSSystem(ctx.getAPRSSystem(0));
-  }
-
-  // For both, analog and digital channels:
-
-  // If channel has scan list
-  if ((0xff != scan_list_index) && ctx.hasScanList(scan_list_index))
-    c->setScanListObj(ctx.getScanList(scan_list_index));
-
-  return true;
-}
-
-void
-D878UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
-  clear();
-
-  // set channel name
-  setName(c->name());
-
-  // set rx and tx frequencies
-  setRXFrequency(c->rxFrequency());
-  setTXFrequency(c->txFrequency());
-
-  // encode power setting
-  switch (c->power()) {
-  case Channel::Power::Max:
-    power = POWER_TURBO;
-    break;
-  case Channel::Power::High:
-    power = POWER_HIGH;
-    break;
-  case Channel::Power::Mid:
-    power = POWER_MIDDLE;
-    break;
-  case Channel::Power::Low:
-  case Channel::Power::Min:
-    power = POWER_LOW;
-    break;
-  }
-
-  // set tx-enable
-  rx_only = c->rxOnly() ? 1 : 0;
-
-  // Link scan list if set
-  if (nullptr == c->scanListObj())
-    scan_list_index = 0xff;
-  else
-    scan_list_index = conf->scanlists()->indexOf(c->scanListObj());
-
-  // Dispatch by channel type
-  if (c->is<AnalogChannel>()) {
-    const AnalogChannel *ac = c->as<const AnalogChannel>();
-    channel_mode = MODE_ANALOG;
-    // pack analog channel config
-    // set admit criterion
-    switch (ac->admit()) {
-    case AnalogChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
-    case AnalogChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
-    case AnalogChannel::Admit::Tone: tx_permit = ADMIT_ALWAYS; break;
-    }
-    // squelch mode
-    squelch_mode = (Signaling::SIGNALING_NONE == ac->rxTone()) ? SQ_CARRIER : SQ_TONE;
-    setRXTone(ac->rxTone());
-    setTXTone(ac->txTone());
-    // set bandwidth
-    bandwidth = (AnalogChannel::Bandwidth::Narrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
-    // Set APRS system
-    rx_gps = 0;
-    if (nullptr != ac->aprsSystem()) {
-      aprs_report = APRS_REPORT_ANALOG;
-      rx_gps = 1;
-    }
-  } else if (c->is<DigitalChannel>()) {
-    const DigitalChannel *dc = c->as<const DigitalChannel>();
-    // pack digital channel config.
-    channel_mode = MODE_DIGITAL;
-    // set admit criterion
-    switch(dc->admit()) {
-    case DigitalChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
-    case DigitalChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
-    case DigitalChannel::Admit::ColorCode: tx_permit = ADMIT_CC_SAME; break;
-    }
-    // set color code
-    color_code = dc->colorCode();
-    // set time-slot
-    slot2 = (DigitalChannel::TimeSlot::TS2 == dc->timeSlot()) ? 1 : 0;
-    // link transmit contact
-    if (nullptr == dc->txContactObj()) {
-      contact_index = 0;
-    } else {
-      contact_index = qToLittleEndian(
-            uint32_t(conf->contacts()->indexOfDigital(dc->txContactObj())));
-    }
-    // link RX group list
-    if (nullptr == dc->groupListObj())
-      group_list_index = 0xff;
-    else
-      group_list_index = conf->rxGroupLists()->indexOf(dc->groupListObj());
-    // Set GPS system index
-    rx_gps = 0;
-    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
-      aprs_report = APRS_REPORT_DIGITAL;
-      gps_system = conf->posSystems()->indexOfGPSSys(dc->aprsObj()->as<GPSSystem>());
-      rx_gps = 1;
-    } else if (dc->aprsObj() && dc->aprsObj()->is<APRSSystem>()) {
-      aprs_report = APRS_REPORT_ANALOG;
-      rx_gps = 1;
-    }
-    // Set radio ID
-    if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
-      if (nullptr == conf->radioIDs()->defaultId()) {
-        logWarn() << "No default radio ID set: using index 0.";
-        id_index = 0;
-      } else {
-        id_index = conf->radioIDs()->indexOf(conf->radioIDs()->defaultId());
-      }
-    } else {
-      id_index = conf->radioIDs()->indexOf(dc->radioIdObj());
-    }
-
-  }
-}
 
 
 /* ******************************************************************************************** *
@@ -881,78 +490,269 @@ D878UVCodeplug::gps_systems_t::linkGPSSystem(int idx, GPSSystem *sys, const Code
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::roaming_channel_t
+ * Implementation of D878UVCodeplug::ChannelElement
  * ******************************************************************************************** */
-double
-D878UVCodeplug::roaming_channel_t::getRXFrequency() const {
-  return decode_frequency(qFromBigEndian(rx_frequency));
-}
-void
-D878UVCodeplug::roaming_channel_t::setRXFrequency(double f) {
-  rx_frequency = qToBigEndian(encode_frequency(f));
+D878UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, uint size)
+  : D868UVCodeplug::ChannelElement(ptr, size)
+{
+  // pass...
 }
 
-double
-D878UVCodeplug::roaming_channel_t::getTXFrequency() const {
-  return decode_frequency(qFromBigEndian(tx_frequency));
-}
-void
-D878UVCodeplug::roaming_channel_t::setTXFrequency(double f) {
-  tx_frequency = qToBigEndian(encode_frequency(f));
+D878UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
+  : D868UVCodeplug::ChannelElement(ptr, 0x0040)
+{
+  // pass...
 }
 
-DigitalChannel::TimeSlot
-D878UVCodeplug::roaming_channel_t::getTimeslot() const {
-  if (0 == timeslot)
-    return DigitalChannel::TimeSlot::TS1;
-  return DigitalChannel::TimeSlot::TS2;
+void
+D878UVCodeplug::ChannelElement::clear() {
+  D868UVCodeplug::ChannelElement::clear();
+  setPTTIDSetting(PTTId::Off);
+}
+
+D878UVCodeplug::ChannelElement::PTTId
+D878UVCodeplug::ChannelElement::pttIDSetting() const {
+  return (PTTId)getUInt2(0x0019, 0);
 }
 void
-D878UVCodeplug::roaming_channel_t::setTimeslot(DigitalChannel::TimeSlot ts) {
-  if (DigitalChannel::TimeSlot::TS1 == ts)
-    timeslot = 0;
-  else
-    timeslot = 1;
+D878UVCodeplug::ChannelElement::setPTTIDSetting(PTTId ptt) {
+  setUInt2(0x0019, 0, (uint)ptt);
+}
+
+bool
+D878UVCodeplug::ChannelElement::roamingEnabled() const {
+  // inverted
+  return !getBit(0x0034, 2);
+}
+void
+D878UVCodeplug::ChannelElement::enableRoaming(bool enable) {
+  // inverted
+  setBit(0x0034, 2, !enable);
+}
+bool
+D878UVCodeplug::ChannelElement::dataACK() const {
+  // inverted
+  return !getBit(0x0034, 3);
+}
+void
+D878UVCodeplug::ChannelElement::enableDataACK(bool enable) {
+  // inverted
+  setBit(0x0034, 3, !enable);
+}
+
+bool
+D878UVCodeplug::ChannelElement::txDigitalAPRS() const {
+  return 1 == getUInt2(0x0035, 0);
+}
+void
+D878UVCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
+  setUInt2(0x0035, 0, (enable ? 0x01 : 0x00));
+}
+bool
+D878UVCodeplug::ChannelElement::txAnalogAPRS() const {
+  return 2 == getUInt2(0x0035, 0);
+}
+void
+D878UVCodeplug::ChannelElement::enableTXAnalogAPRS(bool enable) {
+  setUInt2(0x0035, 0, (enable ? 0x02 : 0x00));
+}
+
+D878UVCodeplug::ChannelElement::APRSPTT
+D878UVCodeplug::ChannelElement::analogAPRSPTTSetting() const {
+  return (APRSPTT)getUInt8(0x0036);
+}
+void
+D878UVCodeplug::ChannelElement::setAnalogAPRSPTTSetting(APRSPTT ptt) {
+  setUInt8(0x0036, (uint)ptt);
+}
+
+D878UVCodeplug::ChannelElement::APRSPTT
+D878UVCodeplug::ChannelElement::digitalAPRSPTTSetting() const {
+  return (APRSPTT)getUInt8(0x0037);
+}
+void
+D878UVCodeplug::ChannelElement::setDigitalAPRSPTTSetting(APRSPTT ptt) {
+  setUInt8(0x0037, (uint)ptt);
 }
 
 uint
-D878UVCodeplug::roaming_channel_t::getColorCode() const {
-  return std::min(uint8_t(15), colorcode);
+D878UVCodeplug::ChannelElement::digitalAPRSSystemIndex() const {
+  return getUInt8(0x0038);
 }
 void
-D878UVCodeplug::roaming_channel_t::setColorCode(uint8_t cc) {
-  colorcode = std::min(uint8_t(15), cc);
+D878UVCodeplug::ChannelElement::setDigitalAPRSSystemIndex(uint idx) {
+  setUInt8(0x0038, idx);
+}
+
+int
+D878UVCodeplug::ChannelElement::frequenyCorrection() const {
+  return ((int)getInt8(0x0039))*10;
+}
+void
+D878UVCodeplug::ChannelElement::setFrequencyCorrection(int corr) {
+  setInt8(0x0039, corr/10);
+}
+
+Channel *
+D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
+  Channel *ch = AnytoneCodeplug::ChannelElement::toChannelObj(ctx);
+  if (nullptr == ch)
+    return nullptr;
+  // Nothing else to do
+  return ch;
+}
+
+bool
+D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
+  if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
+    return false;
+
+  if (c->is<DigitalChannel>()) {
+    DigitalChannel *dc = c->as<DigitalChannel>();
+    // Link to GPS system
+    if (txDigitalAPRS() && ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
+      dc->aprsObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
+    // Link APRS system if one is defined
+    //  There can only be one active APRS system, hence the index is fixed to one.
+    if (txAnalogAPRS() && ctx.has<APRSSystem>(0))
+      dc->aprsObj(ctx.get<APRSSystem>(0));
+    // If roaming is not disabled -> link to default roaming zone
+    if (roamingEnabled())
+      dc->setRoamingZone(DefaultRoamingZone::get());
+  } else if (c->is<AnalogChannel>()) {
+    AnalogChannel *ac = c->as<AnalogChannel>();
+    // Link APRS system if one is defined
+    //  There can only be one active APRS system, hence the index is fixed to one.
+    if (txAnalogAPRS() && ctx.has<APRSSystem>(0))
+      ac->setAPRSSystem(ctx.get<APRSSystem>(0));
+  }
+
+  return true;
+}
+
+bool
+D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
+  if (! AnytoneCodeplug::ChannelElement::fromChannelObj(c, ctx))
+    return false;
+
+  if (const DigitalChannel *dc = c->as<DigitalChannel>()) {
+    // Set GPS system index
+    enableRXAPRS(false);
+    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
+      enableRXAPRS(true);
+      enableTXDigitalAPRS(true);
+      setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
+    } else if (dc->aprsObj() && dc->aprsObj()->is<APRSSystem>()) {
+      enableRXAPRS(true);
+      enableTXAnalogAPRS(true);
+    }
+    // Enable roaming
+    if (dc->roaming())
+      enableRoaming(true);
+  } else if (const AnalogChannel *ac = c->as<AnalogChannel>()) {
+    // Set APRS system
+    enableRXAPRS(false);
+    if (nullptr != ac->aprsSystem()) {
+      enableTXAnalogAPRS(true);
+      enableRXAPRS(true);
+    }
+  }
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::RoamingChannelElement
+ * ******************************************************************************************** */
+D878UVCodeplug::RoamingChannelElement::RoamingChannelElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::RoamingChannelElement::RoamingChannelElement(uint8_t *ptr)
+  : Element(ptr, 0x0020)
+{
+  // pass...
+}
+
+void
+D878UVCodeplug::RoamingChannelElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+uint
+D878UVCodeplug::RoamingChannelElement::rxFrequency() const {
+  return getBCD8_le(0x0000)*10;
+}
+void
+D878UVCodeplug::RoamingChannelElement::setRXFrequency(uint hz) {
+  setBCD8_le(0x0000, hz/10);
+}
+uint
+D878UVCodeplug::RoamingChannelElement::txFrequency() const {
+  return getBCD8_le(0x0004)*10;
+}
+void
+D878UVCodeplug::RoamingChannelElement::setTXFrequency(uint hz) {
+  setBCD8_le(0x0004, hz/10);
+}
+uint
+D878UVCodeplug::RoamingChannelElement::colorCode() const {
+  return getUInt8(0x0008);
+}
+void
+D878UVCodeplug::RoamingChannelElement::setColorCode(uint cc) {
+  setUInt8(0x0008, cc);
+}
+
+DigitalChannel::TimeSlot
+D878UVCodeplug::RoamingChannelElement::timeSlot() const {
+  switch (getUInt8(0x0009)) {
+  case 0x00: return DigitalChannel::TimeSlot::TS1;
+  case 0x01: return DigitalChannel::TimeSlot::TS2;
+  }
+  return DigitalChannel::TimeSlot::TS1;
+}
+void
+D878UVCodeplug::RoamingChannelElement::setTimeSlot(DigitalChannel::TimeSlot ts) {
+  switch (ts) {
+  case DigitalChannel::TimeSlot::TS1: setUInt8(0x0009, 0x00); break;
+  case DigitalChannel::TimeSlot::TS2: setUInt8(0x0009, 0x01); break;
+  }
 }
 
 QString
-D878UVCodeplug::roaming_channel_t::getName() const {
-  return decode_ascii(name, 16, 0x00);
+D878UVCodeplug::RoamingChannelElement::name() const {
+  return readASCII(0x000a, 16, 0x00);
 }
 void
-D878UVCodeplug::roaming_channel_t::setName(const QString &name) {
-  encode_ascii(this->name, name, 16, 0x00);
+D878UVCodeplug::RoamingChannelElement::setName(const QString &name) {
+  writeASCII(0x000a, name, 16, 0x00);
 }
 
-void
-D878UVCodeplug::roaming_channel_t::fromChannel(DigitalChannel *ch) {
+bool
+D878UVCodeplug::RoamingChannelElement::fromChannel(const DigitalChannel *ch) {
   setName(ch->name());
   setRXFrequency(ch->rxFrequency());
   setTXFrequency(ch->txFrequency());
   setColorCode(ch->colorCode());
-  setTimeslot(ch->timeSlot());
+  setTimeSlot(ch->timeSlot());
+  return true;
 }
 
 DigitalChannel *
-D878UVCodeplug::roaming_channel_t::toChannel(CodeplugContext &ctx) {
+D878UVCodeplug::RoamingChannelElement::toChannel(Context &ctx) {
   // Find matching channel for RX, TX frequency, TS and CC
-  double rx = getRXFrequency(), tx = getTXFrequency();
+  double rx = rxFrequency(), tx = txFrequency();
   DigitalChannel *digi = ctx.config()->channelList()->findDigitalChannel(
-        rx, tx, getTimeslot(), getColorCode());
+        rx, tx, timeSlot(), colorCode());
   if (nullptr == digi) {
     // If no matching channel can be found -> create one
-    digi = new DigitalChannel(getName(), getRXFrequency(), getTXFrequency(),
+    digi = new DigitalChannel(name(), rxFrequency(), txFrequency(),
                               Channel::Power::Low, 0, false, DigitalChannel::Admit::ColorCode,
-                              getColorCode(), getTimeslot(), nullptr, nullptr, nullptr,
+                              colorCode(), timeSlot(), nullptr, nullptr, nullptr,
                               nullptr, nullptr, nullptr);
     logDebug() << "Create channel '" << digi->name() << "' as roaming channel.";
     ctx.config()->channelList()->add(digi);
@@ -960,48 +760,87 @@ D878UVCodeplug::roaming_channel_t::toChannel(CodeplugContext &ctx) {
   return digi;
 }
 
+
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::roaming_zone_t
+ * Implementation of D878UVCodeplug::RoamingZoneElement
  * ******************************************************************************************** */
-QString
-D878UVCodeplug::roaming_zone_t::getName() const {
-  return decode_ascii(name, 16, 0x00);
+D878UVCodeplug::RoamingZoneElement::RoamingZoneElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
 }
-void
-D878UVCodeplug::roaming_zone_t::setName(const QString &name) {
-  encode_ascii(this->name, name, 16, 0x00);
+
+D878UVCodeplug::RoamingZoneElement::RoamingZoneElement(uint8_t *ptr)
+  : Element(ptr, 0x0080)
+{
+  // pass...
 }
 
 void
-D878UVCodeplug::roaming_zone_t::fromRoamingZone(RoamingZone *zone, const QHash<DigitalChannel *,int> &map) {
-  memset(channels, 0xff, sizeof(channels));
-  setName(zone->name());
-  memset(_unused80, 0x00, sizeof(_unused80));
-  for (int i=0; i<std::min(64, zone->count()); i++) {
-    channels[i] = map.value(zone->channel(i), 0xff);
-  }
-}
-
-RoamingZone *
-D878UVCodeplug::roaming_zone_t::toRoamingZone() {
-  return new RoamingZone(getName());
+D878UVCodeplug::RoamingZoneElement::clear() {
+  memset(_data, 0x00, _size);
+  memset(_data+0x000, 0xff, NUM_CH_PER_ROAMINGZONE);
 }
 
 bool
-D878UVCodeplug::roaming_zone_t::linkRoamingZone(RoamingZone *zone, CodeplugContext &ctx) {
-  for (uint8_t i=0; (i<NUM_CH_PER_ROAMINGZONE)&&(0xff!=channels[i]); i++) {
+D878UVCodeplug::RoamingZoneElement::hasMember(uint n) const {
+  return (0xff != member(n));
+}
+uint
+D878UVCodeplug::RoamingZoneElement::member(uint n) const {
+  return getUInt8(0x0000 + n);
+}
+void
+D878UVCodeplug::RoamingZoneElement::setMember(uint n, uint idx) {
+  setUInt8(0x0000 + n, idx);
+}
+void
+D878UVCodeplug::RoamingZoneElement::clearMember(uint n) {
+  setMember(n, 0xff);
+}
+
+QString
+D878UVCodeplug::RoamingZoneElement::name() const {
+  return readASCII(0x0040, 16, 0x00);
+}
+void
+D878UVCodeplug::RoamingZoneElement::setName(const QString &name) {
+  writeASCII(0x0040, name, 16, 0x00);
+}
+
+bool
+D878UVCodeplug::RoamingZoneElement::fromRoamingZone(
+    RoamingZone *zone, const QHash<DigitalChannel *, uint> &map)
+{
+  clear();
+  setName(zone->name());
+  for (int i=0; i<std::min(NUM_CH_PER_ROAMINGZONE, zone->count()); i++) {
+    setMember(i, map.value(zone->channel(i), 0xff));
+  }
+  return true;
+}
+
+RoamingZone *
+D878UVCodeplug::RoamingZoneElement::toRoamingZone() const {
+  return new RoamingZone(name());
+}
+
+bool
+D878UVCodeplug::RoamingZoneElement::linkRoamingZone(
+    RoamingZone *zone, const QHash<uint, DigitalChannel*> &map)
+{
+  for (uint8_t i=0; (i<NUM_CH_PER_ROAMINGZONE)&&hasMember(i); i++) {
     DigitalChannel *digi = nullptr;
-    if (ctx.hasRoamingChannel(channels[i])) {
+    if (map.contains(member(i))) {
       // If matching index is known -> resolve directly
-      digi = ctx.getRoamingChannel(channels[i]);
+      digi = map.value(member(i));
     } else {
       logError() << "Cannot link roaming zone '" << zone->name()
-                 << "', unknown roaming channel index " << channels[i];
+                 << "', unknown roaming channel index " << member(i);
       return false;
     }
     zone->addChannel(digi);
   }
-
   return true;
 }
 
@@ -1080,38 +919,30 @@ D878UVCodeplug::setBitmaps(Config *config)
 
 
 bool
-D878UVCodeplug::encode(Config *config, const Flags &flags)
+D878UVCodeplug::encodeElements(const Flags &flags, Context &ctx)
 {
   // Encode everything common between d868uv and d878uv radios.
-  if (! D868UVCodeplug::encode(config, flags))
+  if (! D868UVCodeplug::encodeElements(flags, ctx))
     return false;
 
-  if (! this->encodeRoaming(config, flags))
+  if (! this->encodeRoaming(flags, ctx))
     return false;
 
   return true;
 }
 
-bool
-D878UVCodeplug::decode(Config *config)
-{
-  // Maps code-plug indices to objects
-  CodeplugContext ctx(config);
-
-  return this->decode(config, ctx);
-}
 
 bool
-D878UVCodeplug::decode(Config *config, CodeplugContext &ctx)
+D878UVCodeplug::decodeElements(Context &ctx)
 {
   // Decode everything commong between d868uv and d878uv codeplugs.
-  if (! D868UVCodeplug::decode(config))
+  if (! D868UVCodeplug::decodeElements(ctx))
     return false;
 
-  if (! this->createRoaming(config, ctx))
+  if (! this->createRoaming(ctx))
     return false;
 
-  if (! this->linkRoaming(config, ctx))
+  if (! this->linkRoaming(ctx))
     return false;
 
   return true;
@@ -1130,33 +961,31 @@ D878UVCodeplug::allocateChannels() {
     // compute address for channel
     uint32_t addr = CHANNEL_BANK_0
         + bank*CHANNEL_BANK_OFFSET
-        + idx*sizeof(channel_t);
+        + idx*CHANNEL_SIZE;
     if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, sizeof(channel_t));      
+      image(0).addElement(addr, CHANNEL_SIZE);
     }
     if (nullptr == data(addr+0x2000, 0)) {
-      image(0).addElement(addr+0x2000, sizeof(channel_t));
-      memset(data(addr+0x2000), 0x00, sizeof(channel_t));
+      image(0).addElement(addr+0x2000, CHANNEL_SIZE);
+      memset(data(addr+0x2000), 0x00, CHANNEL_SIZE);
     }
   }
 }
 
 bool
-D878UVCodeplug::encodeChannels(Config *config, const Flags &flags) {
+D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx) {
   // Encode channels
-  for (int i=0; i<config->channelList()->count(); i++) {
+  for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
     uint16_t bank = i/128, idx = i%128;
-    channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
-                                      + bank*CHANNEL_BANK_OFFSET
-                                      + idx*sizeof(channel_t));
-    ch->fromChannelObj(config->channelList()->channel(i), config);
+    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
   }
   return true;
 }
 
 bool
-D878UVCodeplug::createChannels(Config *config, CodeplugContext &ctx) {
+D878UVCodeplug::createChannels(Context &ctx) {
   // Create channels
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
@@ -1164,29 +993,25 @@ D878UVCodeplug::createChannels(Config *config, CodeplugContext &ctx) {
     uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
     if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
       continue;
-    channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
-                                      +bank*CHANNEL_BANK_OFFSET
-                                      +idx*sizeof(channel_t));
-    if (Channel *obj = ch->toChannelObj())
-      ctx.addChannel(obj, i);
+    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    if (Channel *obj = ch.toChannelObj(ctx)) {
+      ctx.config()->channelList()->add(obj); ctx.add(obj, i);
+    }
   }
   return true;
 }
 
 bool
-D878UVCodeplug::linkChannels(Config *config, CodeplugContext &ctx) {
+D878UVCodeplug::linkChannels(Context &ctx) {
   // Link channel objects
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
     // Check if channel is enabled:
     uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
     if (0 == (((*data(CHANNEL_BITMAP+byte))>>bit) & 0x01))
       continue;
-    channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
-                                      +bank*CHANNEL_BANK_OFFSET
-                                      +idx*sizeof(channel_t));
-
-    if (ctx.hasChannel(i))
-      ch->linkChannelObj(ctx.getChannel(i), ctx);
+    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    if (ctx.has<Channel>(i))
+      ch.linkChannelObj(ctx.get<Channel>(i), ctx);
   }
   return true;
 }
@@ -1334,37 +1159,38 @@ D878UVCodeplug::allocateRoaming() {
 }
 
 bool
-D878UVCodeplug::encodeRoaming(Config *config, const Flags &flags) {
+D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx) {
   // Encode roaming channels
-  QHash<DigitalChannel *, int> roaming_ch_map;
+  QHash<DigitalChannel *, uint> roaming_ch_map;
   {
     // Get set of unique roaming channels
     QSet<DigitalChannel*> roaming_channels;
-    config->roaming()->uniqueChannels(roaming_channels);
+    ctx.config()->roaming()->uniqueChannels(roaming_channels);
     // Encode channels and store in index<->channel map
     int i=0; QSet<DigitalChannel*>::iterator ch=roaming_channels.begin();
     for(; ch != roaming_channels.end(); ch++, i++) {
       roaming_ch_map[*ch] = i;
       uint32_t addr = ADDR_ROAMING_CHANNEL_0+i*ROAMING_CHANNEL_OFFSET;
-      roaming_channel_t *rch = (roaming_channel_t *)data(addr);
-      rch->fromChannel(*ch);
+      RoamingChannelElement rch(data(addr));
+      rch.fromChannel(*ch);
     }
   }
 
   // Encode roaming zones
-  for (int i=0; i<config->roaming()->count(); i++){
+  for (int i=0; i<ctx.config()->roaming()->count(); i++){
     uint32_t addr = ADDR_ROAMING_ZONE_0+i*ROAMING_ZONE_OFFSET;
-    roaming_zone_t *zone = (roaming_zone_t *)data(addr);
-    logDebug() << "Encode roaming zone " << config->roaming()->zone(i)->name() << " (" << (i+1)
-               << ") at " << hex << addr;
-    zone->fromRoamingZone(config->roaming()->zone(i), roaming_ch_map);
+    RoamingZoneElement zone(data(addr));
+    logDebug() << "Encode roaming zone " << ctx.config()->roaming()->zone(i)->name()
+               << " (" << (i+1) << ") at " << QString::number(addr, 16);
+    zone.fromRoamingZone(ctx.config()->roaming()->zone(i), roaming_ch_map);
   }
 
   return true;
 }
 
 bool
-D878UVCodeplug::createRoaming(Config *config, CodeplugContext &ctx) {
+D878UVCodeplug::createRoaming(Context &ctx) {
+  QHash<uint, DigitalChannel*> map;
   // Create or find roaming channels
   uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
   for (int i=0; i<NUM_ROAMING_CHANNEL; i++) {
@@ -1372,12 +1198,9 @@ D878UVCodeplug::createRoaming(Config *config, CodeplugContext &ctx) {
     if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
       continue;
     uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
-    roaming_channel_t *ch = (roaming_channel_t *)data(addr);
-    DigitalChannel *digi = ch->toChannel(ctx);
-    if (digi) {
-      //logDebug() << "Register channel '" << digi->name() << "' as roaming channel " << i+1;
-      ctx.addRoamingChannel(digi, i);
-    }
+    RoamingChannelElement ch(data(addr));
+    if (DigitalChannel *digi = ch.toChannel(ctx))
+      map.insert(i, digi);
   }
 
   // Create and link roaming zones
@@ -1387,17 +1210,17 @@ D878UVCodeplug::createRoaming(Config *config, CodeplugContext &ctx) {
     if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
       continue;
     uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
-    roaming_zone_t *z = (roaming_zone_t *)data(addr);
-    RoamingZone *zone = z->toRoamingZone();
-    ctx.addRoamingZone(zone, i+1);
-    z->linkRoamingZone(zone, ctx);
+    RoamingZoneElement z(data(addr));
+    RoamingZone *zone = z.toRoamingZone();
+    ctx.config()->roaming()->add(zone); ctx.add(zone, i);
+    z.linkRoamingZone(zone, map);
   }
 
   return true;
 }
 
 bool
-D878UVCodeplug::linkRoaming(Config *config, CodeplugContext &ctx) {
+D878UVCodeplug::linkRoaming(Context &ctx) {
   // Pass, no need to link roaming channels.
   return true;
 }

@@ -122,6 +122,15 @@ Codeplug::Element::setUInt8(uint offset, uint8_t value) {
   _data[offset] = value;
 }
 
+int8_t
+Codeplug::Element::getInt8(uint offset) const {
+  return ((int8_t *)_data)[offset];
+}
+void
+Codeplug::Element::setInt8(uint offset, int8_t value) {
+  ((int8_t *)_data)[offset] = value;
+}
+
 uint16_t
 Codeplug::Element::getUInt16_be(uint offset) const {
   uint16_t *ptr = (uint16_t *)(_data+offset);

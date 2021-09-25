@@ -70,61 +70,65 @@ public:
     /** Clears a specific bit at the given byte-offset. */
     void clearBit(uint offset, uint bit);
 
-    /** Reads a 2bit integer at the given byte- and bit-offset. */
+    /** Reads a 2bit unsinged integer at the given byte- and bit-offset. */
     uint8_t getUInt2(uint offset, uint bit) const;
-    /** Stores a 2bit integer at the given byte- and bit-offset. */
+    /** Stores a 2bit unsinged integer at the given byte- and bit-offset. */
     void setUInt2(uint offset, uint bit, uint8_t value);
 
-    /** Reads a 3bit integer at the given byte- and bit-offset. */
+    /** Reads a 3bit unsinged integer at the given byte- and bit-offset. */
     uint8_t getUInt3(uint offset, uint bit) const;
-    /** Stores a 3bit integer at the given byte- and bit-offset. */
+    /** Stores a 3bit unsinged integer at the given byte- and bit-offset. */
     void setUInt3(uint offset, uint bit, uint8_t value);
 
-    /** Reads a 4bit integer at the given byte- and bit-offset. */
+    /** Reads a 4bit unsinged integer at the given byte- and bit-offset. */
     uint8_t getUInt4(uint offset, uint bit) const;
-    /** Stores a 4bit integer at the given byte- and bit-offset. */
+    /** Stores a 4bit unsinged integer at the given byte- and bit-offset. */
     void setUInt4(uint offset, uint bit, uint8_t value);
 
-    /** Reads a 5bit integer at the given byte- and bit-offset. */
+    /** Reads a 5bit unsinged integer at the given byte- and bit-offset. */
     uint8_t getUInt5(uint offset, uint bit) const;
-    /** Stores a 5bit integer at the given byte- and bit-offset. */
+    /** Stores a 5bit iunsinged nteger at the given byte- and bit-offset. */
     void setUInt5(uint offset, uint bit, uint8_t value);
 
-    /** Reads a 6bit integer at the given byte- and bit-offset. */
+    /** Reads a 6bit unsinged integer at the given byte- and bit-offset. */
     uint8_t getUInt6(uint offset, uint bit) const;
-    /** Stores a 6bit integer at the given byte- and bit-offset. */
+    /** Stores a 6bit unsinged integer at the given byte- and bit-offset. */
     void setUInt6(uint offset, uint bit, uint8_t value);
 
-    /** Reads a 8bit integer at the given byte- and bit-offset. */
+    /** Reads a 8bit unsinged integer at the given byte- and bit-offset. */
     uint8_t getUInt8(uint offset) const;
-    /** Reads a 8bit integer at the given byte- and bit-offset. */
+    /** Reads a 8bit unsinged integer at the given byte- and bit-offset. */
     void setUInt8(uint offset, uint8_t value);
+    /** Reads a 8bit signed integer at the given byte- and bit-offset. */
+    int8_t getInt8(uint offset) const;
+    /** Reads a 8bit signed integer at the given byte- and bit-offset. */
+    void setInt8(uint offset, int8_t value);
 
-    /** Reads a 16bit big-endian integer at the given byte-offset. */
+    /** Reads a 16bit big-endian unsinged integer at the given byte-offset. */
     uint16_t getUInt16_be(uint offset) const;
-    /** Reads a 16bit little-endian integer at the given byte-offset. */
+    /** Reads a 16bit little-endian unsinged integer at the given byte-offset. */
     uint16_t getUInt16_le(uint offset) const;
-    /** Stores a 16bit big-endian integer at the given byte-offset. */
+    /** Stores a 16bit big-endian unsinged integer at the given byte-offset. */
     void setUInt16_be(uint offset, uint16_t value);
-    /** Stores a 16bit little-endian integer at the given byte-offset. */
+    /** Stores a 16bit little-endian unsinged integer at the given byte-offset. */
     void setUInt16_le(uint offset, uint16_t value);
 
-    /** Reads a 24bit big-endian integer at the given byte-offset. */
+    /** Reads a 24bit big-endian unsinged integer at the given byte-offset. */
     uint32_t getUInt24_be(uint offset) const;
-    /** Reads a 24bit little-endian integer at the given byte-offset. */
+    /** Reads a 24bit little-endian unsinged integer at the given byte-offset. */
     uint32_t getUInt24_le(uint offset) const;
-    /** Stores a 24bit big-endian integer at the given byte-offset. */
+    /** Stores a 24bit big-endian unsinged integer at the given byte-offset. */
     void setUInt24_be(uint offset, uint32_t value);
-    /** Stores a 24bit little-endian integer at the given byte-offset. */
+    /** Stores a 24bit little-endian unsinged integer at the given byte-offset. */
     void setUInt24_le(uint offset, uint32_t value);
 
-    /** Reads a 32bit big-endian integer at the given byte-offset. */
+    /** Reads a 32bit big-endian unsinged integer at the given byte-offset. */
     uint32_t getUInt32_be(uint offset) const;
-    /** Reads a 32bit little-endian integer at the given byte-offset. */
+    /** Reads a 32bit little-endian unsinged integer at the given byte-offset. */
     uint32_t getUInt32_le(uint offset) const;
-    /** Stores a 32bit big-endian integer at the given byte-offset. */
+    /** Stores a 32bit big-endian unsinged integer at the given byte-offset. */
     void setUInt32_be(uint offset, uint32_t value);
-    /** Stores a 32bit little-endian integer at the given byte-offset. */
+    /** Stores a 32bit little-endian unsinged integer at the given byte-offset. */
     void setUInt32_le(uint offset, uint32_t value);
 
     /** Reads a 2-digit (1-byte/8bit) BDC value in big-endian at the given byte-offset. */
@@ -179,7 +183,7 @@ public:
   {
   public:
     /** Empty constructor. */
-    Context(Config *config);
+    explicit Context(Config *config);
 
     /** Returns the reference to the config object. */
     Config *config() const;

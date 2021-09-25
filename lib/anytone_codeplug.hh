@@ -302,13 +302,13 @@ public:
     virtual void enableDataACK(bool enable);
 
     /** Returns @c true if TX APRS is enabled. */
-    virtual bool txAPRS() const;
+    virtual bool txDigitalAPRS() const;
     /** Enables/disables TX APRS. */
-    virtual void enableTXAPRS(bool enable);
+    virtual void enableTXDigitalAPRS(bool enable);
     /** Returns the DMR APRS system index. */
-    virtual uint dmrAPRSSystemIndex() const;
+    virtual uint digitalAPRSSystemIndex() const;
     /** Sets the DMR APRS system index. */
-    virtual void setDMRAPRSSystemIndex(uint idx);
+    virtual void setDigitalAPRSSystemIndex(uint idx);
 
     /** Returns the DMR encryption key index (+1), 0=Off. */
     virtual uint dmrEncryptionKeyIndex() const;

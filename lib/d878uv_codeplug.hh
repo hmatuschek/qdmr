@@ -220,11 +220,30 @@ class D878UVCodeplug : public D868UVCodeplug
 public:
   /** Represents the actual channel encoded within the binary D878UV codeplug.
    *
-   * Memmory layout of encoded channel (64byte):
+   * This class implements only the differences to the generic @c AnytoneCodeplug::ChannelElement
+   * (i.e. D868UVII).
+   *
+   * Memmory layout of encoded channel (size 0x40 bytes):
    * @verbinclude d878uv_channel.txt
    */
   class ChannelElement: public D868UVCodeplug::ChannelElement
   {
+  public:
+    /** Possible PTT ID settings. */
+    enum class PTTId {
+      Off = 0,                    ///< Never send PTT-ID.
+      Start = 1,                  ///< Send PTT-ID at start.
+      End = 2,                    ///< Send PTT-ID at end.
+      Both = 3                    ///< Send PTT-ID at start and end.
+    };
+
+    /** Defines all possible APRS PTT settings. */
+    enum class APRSPTT {
+      Off   = 0,                  ///< Do not send APRS on PTT.
+      Start = 1,                  ///< Send APRS at start of transmission.
+      End   = 2                   ///< Send APRS at end of transmission.
+    };
+
   protected:
     /** Hidden constructor. */
     ChannelElement(uint8_t *ptr, uint size);
@@ -233,226 +252,50 @@ public:
     /** Constructor. */
     explicit ChannelElement(uint8_t *ptr);
 
+    /** Resets the channel. */
     void clear();
 
-  };
+    /** Returns the PTT ID settings. */
+    virtual PTTId pttIDSetting() const;
+    /** Sets the PTT ID setting. */
+    virtual void setPTTIDSetting(PTTId ptt);
 
-  struct __attribute__((packed)) channel_t {
-    /** Defines all possible channel modes, see @c channel_mode. */
-    typedef enum {
-      MODE_ANALOG    = 0,               ///< Analog channel.
-      MODE_DIGITAL   = 1,               ///< Digital (DMR) channel.
-      MODE_MIXED_A_D = 2,               ///< Mixed, analog channel with digital RX.
-      MODE_MIXED_D_A = 3                ///< Mixed, digital channel with analog RX.
-    } Mode;
+    /** Returns @c true if roaming is enabled. */
+    virtual bool roamingEnabled() const;
+    /** Enables/disables roaming. */
+    virtual void enableRoaming(bool enable);
+    bool dataACK() const;
+    void enableDataACK(bool enable);
 
-    /** Defines all possible power settings.*/
-    typedef enum {
-      POWER_LOW = 0,                    ///< Low power, usually 1W.
-      POWER_MIDDLE = 1,                 ///< Medium power, usually 2.5W.
-      POWER_HIGH = 2,                   ///< High power, usually 5W.
-      POWER_TURBO = 3                   ///< Higher power, usually 7W on VHF and 6W on UHF.
-    } Power;
+    bool txDigitalAPRS() const;
+    void enableTXDigitalAPRS(bool enable);
+    /** Returns @c true if the analog APRS reporing (TX) is enabled. */
+    virtual bool txAnalogAPRS() const;
+    /** Enables/disables analog APRS reporting. */
+    virtual void enableTXAnalogAPRS(bool enable);
 
-    /** Defines all band-width settings for analog channel.*/
-    typedef enum {
-      BW_12_5_KHZ = 0,                  ///< Narrow band-width (12.5kHz).
-      BW_25_KHZ = 1                     ///< High band-width (25kHz).
-    } Bandwidth;
+    /** Returns the analog APRS PTT setting. */
+    virtual APRSPTT analogAPRSPTTSetting() const;
+    /** Sets the analog APRS PTT setting. */
+    virtual void setAnalogAPRSPTTSetting(APRSPTT ptt);
+    /** Returns the digital APRS PTT setting. */
+    virtual APRSPTT digitalAPRSPTTSetting() const;
+    /** Sets the digital APRS PTT setting. */
+    virtual void setDigitalAPRSPTTSetting(APRSPTT ptt);
 
-    /** Defines all possible repeater modes. */
-    typedef enum {
-      RM_SIMPLEX = 0,                   ///< Simplex mode, that is TX frequency = RX frequency. @c tx_offset is ignored.
-      RM_TXPOS = 1,                     ///< Repeater mode with positive @c tx_offset.
-      RM_TXNEG = 2                      ///< Repeater mode with negative @c tx_offset.
-    } RepeaterMode;
+    /** Returns the DMR APRS system index. */
+    virtual uint digitalAPRSSystemIndex() const;
+    /** Sets the DMR APRS system index. */
+    virtual void setDigitalAPRSSystemIndex(uint idx);
 
-    /** Defines all possible PTT-ID settings. */
-    typedef enum {
-      PTTID_OFF = 0,                    ///< Never send PTT-ID.
-      PTTID_START = 1,                  ///< Send PTT-ID at start.
-      PTTID_END = 2,                    ///< Send PTT-ID at end.
-      PTTID_START_END = 3               ///< Send PTT-ID at start and end.
-    } PTTId;
+    /** Returns the frequency correction in ???. */
+    virtual int frequenyCorrection() const;
+    /** Sets the frequency correction in ???. */
+    virtual void setFrequencyCorrection(int corr);
 
-    /** Defines all possible squelch settings. */
-    typedef enum {
-      SQ_CARRIER = 0,                   ///< Open squelch on carrier.
-      SQ_TONE = 1                       ///< Open squelch on matching CTCSS tone or DCS code.
-    } SquelchMode;
-
-    /** Defines all possible admit criteria. */
-    typedef enum {
-      ADMIT_ALWAYS = 0,                 ///< Admit TX always.
-      ADMIT_CH_FREE = 1,                ///< Admit TX on channel free.
-      ADMIT_CC_DIFF = 2,                ///< Admit TX on mismatching color-code.
-      ADMIT_CC_SAME = 3                 ///< Admit TX on matching color-code.
-    } Admit;
-
-    /** Defines all possible optional signalling settings. */
-    typedef enum {
-      OPTSIG_OFF = 0,                   ///< None.
-      OPTSIG_DTMF = 1,                  ///< Use DTMF.
-      OPTSIG_2TONE = 2,                 ///< Use 2-tone.
-      OPTSIG_5TONE = 3                  ///< Use 5-tone.
-    } OptSignaling;
-
-    /** Defines all possible APRS reporting modes. */
-    typedef enum {
-      APRS_REPORT_OFF = 0,              ///< No APRS (GPS) reporting at all.
-      APRS_REPORT_ANALOG = 1,           ///< Use analog, actual APRS reporting.
-      APRS_REPORT_DIGITAL = 2           ///< Use digital reporting.
-    } APRSReport;
-
-    /** Defines all possible APRS PTT settings. */
-    typedef enum {
-      APRS_PTT_OFF   = 0,               ///< Do not send APRS on PTT.
-      APRS_PTT_START = 1,               ///< Send APRS at start of transmission.
-      APRS_PTT_END   = 2                ///< Send APRS at end of transmission.
-    } APRSPTT;
-
-
-    // Bytes 00
-    uint32_t rx_frequency;              ///< RX Frequency, 8 digits BCD, big-endian.
-    uint32_t tx_offset;                 ///< TX Offset, 8 digits BCD, big-endian, sign in repeater_mode.
-
-    // Byte 08
-    uint8_t channel_mode    : 2,        ///< Mode: Analog or Digital, see @c Mode.
-      power                 : 2,        ///< Power: Low, Middle, High, Turbo, see @c Power.
-      bandwidth             : 1,        ///< Bandwidth: 12.5 or 25 kHz, see @c Bandwidth.
-      _unused8              : 1,        ///< Unused, set to 0.
-      repeater_mode         : 2;        ///< Sign of TX frequency offset, see @c RepeaterMode.
-
-    // Byte 09
-    uint8_t rx_ctcss        : 1,        ///< CTCSS decode enable.
-      rx_dcs                : 1,        ///< DCS decode enable.
-      tx_ctcss              : 1,        ///< CTCSS encode enable.
-      tx_dcs                : 1,        ///< DCS encode enable
-      reverse               : 1,        ///< CTCSS phase-reversal.
-      rx_only               : 1,        ///< TX prohibit.
-      call_confirm          : 1,        ///< Call confirmation enable.
-      talkaround            : 1;        ///< Talk-around enable.
-
-    // Bytes 0a
-    uint8_t ctcss_transmit;             ///< TX CTCSS tone, 0=62.5, 50=254.1, 51=custom CTCSS tone.
-    uint8_t ctcss_receive;              ///< RX CTCSS tone: 0=62.5, 50=254.1, 51=custom CTCSS tone.
-    uint16_t dcs_transmit;              ///< TX DCS code: 0=D000N, 511=D777N, 512=D000I, 1023=D777I, DCS code-number in octal, little-endian.
-    uint16_t dcs_receive;               ///< RX DCS code: 0=D000N, 511=D777N, 512=D000I, 1023=D777I, DCS code-number in octal, little-endian.
-
-    // Bytes 10
-    uint16_t custom_ctcss;              ///< Custom CTCSS tone frequency: 0x09cf=251.1, 0x0a28=260, big-endian.
-    uint8_t tone2_decode;               ///< 2-Tone decode: 0x00=1, 0x0f=16
-    uint8_t _unused19;                  ///< Unused, set to 0.
-
-    // Bytes 14
-    uint32_t contact_index;             ///< Contact index, zero-based, little-endian.
-
-    // Byte 18
-    uint8_t id_index;                   ///< Index to radio ID table.
-
-    // Byte 19
-    uint8_t ptt_id          : 2,        ///< PTT ID, see PTTId, unused in U868UV.
-      _unused25_1           : 2,        ///< Unused, set to 0.
-      squelch_mode          : 1,        ///< Squelch mode, see @c SquelchMode.
-      _unused25_2           : 3;        ///< Unused, set to 0.
-
-    // Byte 1a
-    uint8_t tx_permit       : 2,        ///< TX permit, see @c Admit.
-      _unused26_1           : 2,        ///< Unused, set to 0.
-      opt_signal            : 2,        ///< Optional signaling, see @c OptSignaling.
-      _unused26_2           : 2;        ///< Unused, set to 0.
-
-    // Bytes 1b
-    uint8_t scan_list_index;            ///< Scan list index, 0xff=None, 0-based.
-    uint8_t group_list_index;           ///< RX group-list, 0xff=None, 0-based.
-    uint8_t id_2tone;                   ///< 2-Tone ID, 0=1, 0x17=24.
-    uint8_t id_5tone;                   ///< 5-Tone ID, 0=1, 0x63=100.
-    uint8_t id_dtmf;                    ///< DTMF ID, 0=1, 0x0f=16.
-
-    // Byte 20
-    uint8_t color_code;                 ///< Color code, 0-15
-
-    // Byte 21
-    uint8_t slot2           : 1,        ///< Timeslot, 0=TS1, 1=TS2.
-      sms_confirm           : 1,        ///< Send SMS confirmation, 0=off, 1=on.
-      simplex_tdma          : 1,        ///< Simplex TDMA enabled.
-      _unused33_2           : 1,        ///< Unused, set to 0.
-      tdma_adaptive         : 1,        ///< TDMA adaptive enable.
-      rx_gps                : 1,        ///< Receive digital GPS messages.
-      enh_encryption        : 1,        ///< Enable enhanced encryption.
-      work_alone            : 1;        ///< Work alone, 0=off, 1=on.
-
-    // Byte 22
-    uint8_t aes_encryption;             ///< Digital AES encryption, 1-32, 0=off.
-
-    // Bytes 23
-    uint8_t name[16];                   ///< Channel name, ASCII, zero filled.
-    uint8_t _pad51;                     ///< Pad byte, set to 0.
-
-    // Byte 34
-    uint8_t ranging         : 1,        ///< Ranging enabled.
-      through_mode          : 1,        ///< Through-mode enabled.
-      excl_from_roaming     : 1,        ///< Exclude channel from roaming, data ACK forbit in D868UV.
-      data_ack_disable      : 1,        ///< Data ACK disable.
-      _unused52_4           : 4;        ///< Unused, set to 0.
-
-    // Byte 35
-    uint8_t aprs_report     : 2,        ///< Enable APRS report, see @c APRSReport.
-      _unused53             : 6;        ///< Unused, set to 0.
-
-    // Bytes 36
-    uint8_t analog_aprs_ptt;            ///< Enable analog APRS PTT, see @c APRSPTT, not used in D868UV.
-    uint8_t digi_aprs_ptt;              ///< Enable digital APRS PTT, 0=off, 1=on.
-    uint8_t gps_system;                 ///< Index of DMR GPS report system, 0-7;
-    int8_t  freq_correction;            ///< Signed int in 10Hz.
-    uint8_t dmr_encryption;             ///< Digital encryption, 1-32, 0=off.
-    uint8_t multiple_keys   : 1,        ///< Enable multiple keys.
-      random_key            : 1,        ///< Enable random key.
-      sms_forbid            : 1,        ///< Forbit SMS tramsission.
-      _unused59_3           : 5;        ///< Unused, set to 0.
-    uint32_t _unused60;                 ///< Unused, set to 0.
-
-    /** Constructor, also clears the struct. */
-    channel_t();
-
-    /** Clears and invalidates the channel. */
-    void clear();
-
-    /** Returns @c true if the channel is valid. */
-    bool isValid() const;
-
-    /** Returns the RX frequency in MHz. */
-    double getRXFrequency() const;
-    /** Sets the RX frequency in MHz. */
-    void setRXFrequency(double f);
-
-    /** Returns the TX frequency in MHz. */
-    double getTXFrequency() const;
-    /** Sets the TX frequency in MHz.
-     * @note As the TX frequency is stored as difference to the RX frequency, the RX frequency
-     * should be set first. */
-    void setTXFrequency(double f);
-
-    /** Returns the name of the radio. */
-    QString getName() const;
-    /** Sets the name of the radio. */
-    void setName(const QString &name);
-
-    /** Returns the RX CTCSS/DCS tone. */
-    Signaling::Code getRXTone() const;
-    /** Sets the RX CTCSS/DCS tone. */
-    void setRXTone(Signaling::Code code);
-    /** Returns the TX CTCSS/DCS tone. */
-    Signaling::Code getTXTone() const;
-    /** Sets the TX CTCSS/DCS tone. */
-    void setTXTone(Signaling::Code code);
-
-    /** Constructs a generic @c Channel object from the codeplug channel. */
-    Channel *toChannelObj() const;
-    /** Links a previously constructed channel to the rest of the configuration. */
-    bool linkChannelObj(Channel *c, const CodeplugContext &ctx) const;
-    /** Initializes this codeplug channel from the given generic configuration. */
-    void fromChannelObj(const Channel *c, const Config *conf);
+    Channel *toChannelObj(Context &ctx) const;
+    bool linkChannelObj(Channel *c, Context &ctx) const;
+    bool fromChannelObj(const Channel *c, Context &ctx);
   };
 
   /** Represents the general config of the radio within the binary codeplug.
@@ -1111,63 +954,88 @@ public:
 
   /** Implements the binary representation of a roaming channel within the codeplug.
    *
-   * Memmory layout of roaming channel (0x20byte):
-   * @verbinclude d878uvroamingchannel.txt */
-  struct __attribute__((packed)) roaming_channel_t {
-    uint32_t rx_frequency;         ///< RX frequency 8-digit BCD big-endian as MMMkkkHH.
-    uint32_t tx_frequency;         ///< TX frequency 8-digit BCD big-endian as MMMkkkHH.
-    uint8_t colorcode;             ///< Colorcode 1-16.
-    uint8_t timeslot;              ///< Timeslot, 0=TS1, 1=TS2.
-    uint8_t name[16];              ///< Channel name, 16byte ASCII 0-terminated.
-    uint8_t _unused26[6];          ///< Unused, set to 0x00
+   * Memmory layout of roaming channel (size 0x0020 bytes):
+   * @verbinclude d878uv_roamingchannel.txt */
+  class RoamingChannelElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    RoamingChannelElement(uint8_t *ptr, uint size);
 
-    /** Decodes the RX frequency. */
-    double getRXFrequency() const;
-    /** Encodes the given RX frequency. */
-    void setRXFrequency(double f);
-    /** Decodes the TX frequency. */
-    double getTXFrequency() const;
-    /** Encodes the given TX frequency. */
-    void setTXFrequency(double f);
-    /** Returns the time-slot of the roaming channel. */
-    DigitalChannel::TimeSlot getTimeslot() const;
-    /** Sets the time-slot of the roaming channel. */
-    void setTimeslot(DigitalChannel::TimeSlot ts);
-    /** Returns the color-code [0-15] of the roaming channel. */
-    uint getColorCode() const;
-    /** Sets the color-code [0-15] of the roaming channel. */
-    void setColorCode(uint8_t cc);
-    /** Decodes the name of the roaming channel. */
-    QString getName() const;
-    /** Encodes the name of the roaming channel. */
-    void setName(const QString &name);
+  public:
+    /** Constructor. */
+    RoamingChannelElement(uint8_t *ptr);
+
+    /** Resets the roaming channel. */
+    void clear();
+
+    /** Retruns the RX frequency in Hz. */
+    virtual uint rxFrequency() const;
+    /** Sets the RX frequeny in Hz. */
+    virtual void setRXFrequency(uint hz);
+    /** Retruns the TX frequency in Hz. */
+    virtual uint txFrequency() const;
+    /** Sets the TX frequeny in Hz. */
+    virtual void setTXFrequency(uint hz);
+
+    /** Retunrs the color code. */
+    virtual uint colorCode() const;
+    /** Sets the color code. */
+    virtual void setColorCode(uint cc);
+
+    /** Returns the time slot. */
+    virtual DigitalChannel::TimeSlot timeSlot() const;
+    /** Sets the time slot. */
+    virtual void setTimeSlot(DigitalChannel::TimeSlot ts);
+
+    /** Returns the name of the channel. */
+    virtual QString name() const;
+    /** Sets the name of the channel. */
+    virtual void setName(const QString &name);
 
     /** Constructs a roaming channel from the given digital channel. */
-    void fromChannel(DigitalChannel *ch);
+    virtual bool fromChannel(const DigitalChannel *ch);
     /** Constructs/Searches a matching DigitalChannel for this roaming channel. */
-    DigitalChannel *toChannel(CodeplugContext &ctx);
+    virtual DigitalChannel *toChannel(Context &ctx);
   };
 
   /** Represents a roaming zone within the binary codeplug.
    *
    * Memmory layout of roaming zone (0x80byte):
-   * @verbinclude d878uvroamingzone.txt */
-  struct __attribute__((packed)) roaming_zone_t {
-    uint8_t channels[64];          ///< List of roaming channel indices 0-based, 0xff=unused/end-of-list.
-    uint8_t name[16];              ///< Roaming zone name, 16b ASCII 0x00 padded.
-    uint8_t _unused80[48];         ///< Unused, set to 0x00.
+   * @verbinclude d878uv_roamingzone.txt */
+  class RoamingZoneElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    RoamingZoneElement(uint8_t *ptr, uint size);
 
-    /** Returns the name of the roaming zone. */
-    QString getName() const;
-    /** Sets the name of the roaming zone. */
-    void setName(const QString &name);
+  public:
+    /** Constructor. */
+    RoamingZoneElement(uint8_t *ptr);
+
+    /** Clears the roaming zone. */
+    void clear();
+
+    /** Returns @c true if the n-th member is set. */
+    virtual bool hasMember(uint n) const;
+    /** Returns the n-th member index. */
+    virtual uint member(uint n) const;
+    /** Sets the n-th member index. */
+    virtual void setMember(uint n, uint idx);
+    /** Clears the n-th member. */
+    virtual void clearMember(uint n);
+
+    /** Returns the name of the zone. */
+    virtual QString name() const;
+    /** Sets the name of the zone. */
+    virtual void setName(const QString &name);
 
     /** Assembles a binary representation of the given RoamingZone instance.*/
-    void fromRoamingZone(RoamingZone *zone, const QHash<DigitalChannel *, int> &map);
+    virtual bool fromRoamingZone(RoamingZone *zone, const QHash<DigitalChannel *, uint> &map);
     /** Constructs a @c RoamingZone instance from this configuration. */
-    RoamingZone *toRoamingZone();
+    virtual RoamingZone *toRoamingZone() const;
     /** Links the given RoamingZone. */
-    bool linkRoamingZone(RoamingZone *zone, CodeplugContext &ctx);
+    virtual bool linkRoamingZone(RoamingZone *zone, const QHash<uint, DigitalChannel *> &map);
   };
 
   /** Represents an encryption key.
@@ -1267,18 +1135,14 @@ public:
   /** Allocate all code-plug elements that are defined through the common Config. */
   void allocateForEncoding();
 
-  /** Decodes the binary codeplug and stores its content in the given generic configuration. */
-	bool decode(Config *config);
-  /** Decodes the binary codeplug and stores its content in the given generic configuration. */
-  bool decode(Config *config, CodeplugContext &ctx);
-  /** Encodes the given generic configuration as a binary codeplug. */
-  bool encode(Config *config, const Flags &flags = Flags());
-
 protected:
+  bool decodeElements(Context &ctx);
+  bool encodeElements(const Flags &flags, Context &ctx);
+
   void allocateChannels();
-  bool encodeChannels(Config *config, const Flags &flags);
-  bool createChannels(Config *config, CodeplugContext &ctx);
-  bool linkChannels(Config *config, CodeplugContext &ctx);
+  bool encodeChannels(const Flags &flags, Context &ctx);
+  bool createChannels(Context &ctx);
+  bool linkChannels(Context &ctx);
 
   void allocateGeneralSettings();
   bool encodeGeneralSettings(Config *config, const Flags &flags);
@@ -1292,11 +1156,11 @@ protected:
   /** Allocates memory to store all roaming channels and zones. */
   virtual void allocateRoaming();
   /** Encodes the roaming channels and zones. */
-  virtual bool encodeRoaming(Config *config, const Flags &flags);
+  virtual bool encodeRoaming(const Flags &flags, Context &ctx);
   /** Creates roaming channels and zones from codeplug. */
-  virtual bool createRoaming(Config *config, CodeplugContext &ctx);
+  virtual bool createRoaming(Context &ctx);
   /** Links roaming channels and zones. */
-  virtual bool linkRoaming(Config *config, CodeplugContext &ctx);
+  virtual bool linkRoaming(Context &ctx);
 };
 
 #endif // D878UVCODEPLUG_HH
