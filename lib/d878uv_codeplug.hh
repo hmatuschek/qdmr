@@ -298,40 +298,24 @@ public:
     bool fromChannelObj(const Channel *c, Context &ctx);
   };
 
-  /** Represents the general config of the radio within the binary codeplug.
+  /** Represents the general config of the radio within the D878UV binary codeplug.
    *
-   * At 0x02500000, size 0x100. */
-  struct __attribute__((packed)) general_settings_base_t {
-    /** Possible power-on display settings. */
-    enum PowerOnDisplay : uint8_t {
-      PWR_ON_DEFAULT = 0,           ///< Default.
-      PWR_ON_CUSTOM_TEXT = 1,       ///< Custom text.
-      PWR_ON_CUSTOM_IMG = 2         ///< Custom image.
-    };
-
-    /** Possible display modes. */
-    enum DisplayMode : uint8_t {
-      DISPLAY_CHANNEL = 0,         ///< Display channel name.
-      DISPLAY_FREQUENCY = 1        ///< Display channel frequency.
-    };
-
-    /** Controlls the automatic shut down. */
-    enum AutoShutdown : uint8_t {
-      AUTO_SHUTDOWN_OFF = 0,       ///< Automatic shut down disabled.
-      AUTO_SHUTDOWN_10min = 1,     ///< Automatic shut down after 10min.
-      AUTO_SHUTDOWN_30min = 2,     ///< Automatic shut down after 30min.
-      AUTO_SHUTDOWN_60min = 3,     ///< Automatic shut down after 60min.
-      AUTO_SHUTDOWN_120min = 4     ///< Automatic shut down after 120min.
-    };
-
+   * This class implements only the differences to the generic
+   * @c AnytonCodeplug::GeneralSettingsElement.
+   *
+   * Binary encoding of the general settings (size 0x0100 bytes):
+   * @verbinclude d878uv_generalsettings.txt */
+  class GeneralSettingsElement: public AnytoneCodeplug::GeneralSettingsElement
+  {
+  public:
     /** Possible UI languages. */
-    enum Language : uint8_t {
-      LANG_ENGLISH = 0,                 ///< UI Language is english.
-      LANG_GERMAN  = 1                  ///< UI Language is german.
+    enum class Language {
+      English = 0,                 ///< UI Language is english.
+      German  = 1                  ///< UI Language is german.
     };
 
     /** Possible VFO frequency steps. */
-    enum FreqStep : uint8_t {
+    enum FreqStep {
       FREQ_STEP_2_5kHz = 0,             ///< 2.5kHz
       FREQ_STEP_5kHz = 1,               ///< 5kHz
       FREQ_STEP_6_25kHz = 2,            ///< 6.25kHz
@@ -342,615 +326,768 @@ public:
       FREQ_STEP_50kHz = 7               ///< 50kHz
     };
 
-    /** Possible power-save modes. */
-    enum PowerSave : uint8_t {
-      PWR_SAVE_OFF = 0,                ///< Power save disabled.
-      PWR_SAVE_1_TO_1 = 1,             ///< Power save 1:1.
-      PWR_SAVE_2_TO_1 = 2              ///< Power save 2:1.
-    };
-
-    /** All possible scan types. */
-    enum VFOScanType : uint8_t {
-      SCAN_TYPE_TO = 0,
-      SCAN_TYPE_CO = 1,
-      SCAN_TYPE_SE = 2
-    };
-
-    /** All possible key functions. */
-    enum KeyFunction : uint8_t {
-      KF_OFF = 0x00, KF_VOLTAGE = 0x01, KF_POWER = 0x02, KF_REPEATER = 0x03, KF_REVERSE = 0x04,
-      KF_DIGITAL_ENCRYPTION = 0x05, KF_CALL = 0x06, KF_VOX = 0x07, KF_VFO_CHANNEL = 0x08,
-      KF_SUB_PTT = 0x09, KF_SCAN = 0x0a, KF_FM = 0x0b, KF_ALARM = 0x0c, KF_RECORD_SWITCH = 0x0d,
-      KF_RECORD = 0x0e, KF_SMS = 0x0f, KF_DIAL = 0x10, KF_GPS_INFORMATION = 0x11, KF_MONITOR = 0x12,
-      KF_MAIN_CHANNEL_SWITCH = 0x13, KF_HOT_KEY_1 = 0x14, KF_HOT_KEY_2 = 0x15, KF_HOT_KEY_3 = 0x16,
-      KF_HOT_KEY_4 = 0x17, KF_HOT_KEY_5 = 0x18, KF_HOT_KEY_6 = 0x19, KF_WORK_ALONE = 0x1a,
-      KF_NUISANCE_DELETE = 0x1b, KF_DIGITAL_MONITOR = 0x1c, KF_SUB_CH_SWITCH = 0x1d,
-      KF_PRIORITY_ZONE = 0x1e, KF_VFO_SCAN = 0x1f, KF_MIC_SOUND_QUALITY = 0x20,
-      KF_LAST_CALL_REPLY = 0x21, KF_CHANNEL_TYPE_SWITCH = 0x22, KF_RANGING = 0x23,
-      KF_ROAMING = 0x24, KF_CHANEL_RANGING = 0x25, KF_MAX_VOLUME = 0x26, KF_SLOT_SWITCH = 0x27,
-      KF_APRS_TYPE_SWITCH = 0x28, KF_ZONE_SELECT = 0x29, KF_TIMED_ROAMING_SET = 0x2a,
-      KF_APRS_SET = 0x2b, KF_MUTE_TIMEING = 0x2c, KF_CTCSS_DCS_SET = 0x2d, KF_TBST_SEND = 0x2e,
-      KF_BLUETOOTH = 0x2f, KF_GPS = 0x30, KF_CHANNEL_NAME = 0x31, KF_CDT_SCAN = 0x32
-    };
-
     /** All possible STE types. */
-    enum STEType : uint8_t {
-      STE_TYPE_OFF     = 0,
-      STE_TYPE_SILENT  = 1,
-      STE_TYPE_DEG_120 = 2,
-      STE_TYPE_DEG_180 = 3,
-      STE_TYPE_DEG_240 = 4
+    enum class STEType {
+      Off = 0, Silent = 1, Deg120 = 2, Deg180 = 3, Deg240 = 4
     };
 
     /** All possible STE frequencies. */
-    enum STEFrequency : uint8_t {
-      STE_FREQ_OFF = 0,
-      STE_FREQ_STE_55_2Hz = 1,
-      STE_FREQ_STE_259_2Hz = 2
+    enum class STEFrequency {
+      Off     = 0, Hz55_2  = 1, Hz259_2 = 2
     };
 
     /** DTMF signalling durations. */
-    enum DTMFDuration : uint8_t {
-      DTMF_DUR_50ms = 0,
-      DTMF_DUR_100ms = 1,
-      DTMF_DUR_200ms = 2,
-      DTMF_DUR_300ms = 3,
-      DTMF_DUR_500ms = 4
-    };
-
-    /** Backlight durations. */
-    enum BackLightDur : uint8_t {
-      BACKLIGHT_ALWAYS = 0,
-      BACKLIGHT_5s = 1,
-      BACKLIGHT_10s = 2,
-      BACKLIGHT_15s = 3,
-      BACKLIGHT_20s = 4,
-      BACKLIGHT_25s = 5,
-      BACKLIGHT_30s = 6,
-      BACKLIGHT_1min = 7,
-      BACKLIGHT_2min = 8,
-      BACKLIGHT_3min = 9,
-      BACKLIGHT_4min = 10,
-      BACKLIGHT_5min = 11,
-      BACKLIGHT_15min = 12,
-      BACKLIGHT_30min = 13,
-      BACKLIGHT_45min = 14,
-      BACKLIGHT_60min = 15,
+    enum DTMFDuration {
+      DTMF_DUR_50ms = 0, DTMF_DUR_100ms = 1, DTMF_DUR_200ms = 2, DTMF_DUR_300ms = 3, DTMF_DUR_500ms = 4
     };
 
     /** TBST (open repeater) frequencies. */
-    enum TBSTFrequency : uint8_t {
-      TBST_1000Hz = 0,
-      TBST_1450Hz = 1,
-      TBST_1750Hz = 2,
-      TBST_2100Hz = 3
+    enum class TBSTFrequency {
+      Hz1000 = 0, Hz1450 = 1, Hz1750 = 2, Hz2100 = 3
     };
 
-    /** Permit tone combinations. */
-    enum PermitTone : uint8_t {
-      PERMIT_OFF = 0,
-      PERMIT_DIGITAL = 1,
-      PERMIT_ANALOG = 2,
-      PERMIT_BOTH = 3
+    /** Possible monitor slot matches. */
+    enum class SlotMatch {
+      Off = 0, Single = 1, Both = 2
     };
 
-    /** VOX sources. */
-    enum VOXSource : uint8_t {
-      VOXSRC_BUILT_IN = 0,
-      VOXSRC_EXTERNAL = 1,
-      VOXSRC_BOTH     = 2
+    /** Possible SMS formats. */
+    enum class SMSFormat {
+      M = 0, H = 1, DMR = 2,
     };
 
-    /** Text and background colors. */
-    enum Color : uint8_t {
-      COL_ORANGE    = 0,
-      COL_RED       = 1,
-      COL_YELLOW    = 2,
-      COL_GREEN     = 3,
-      COL_TURQUOISE = 4,
-      COL_BLUE      = 5,
-      COL_WHITE     = 6
+    /** Possible roaming start conditions. */
+    enum class RoamStart {
+      Periodic=0, OutOfRange=1
     };
 
-    /** SMS formats. */
-    enum SMSFormat : uint8_t {
-      SMS_FMT_M = 0,
-      SMS_FMT_H = 1,
-      SMS_FMT_DMR = 2,
-    };
+  protected:
+    /** Hidden constructor. */
+    GeneralSettingsElement(uint8_t *ptr, uint size);
 
-    // Bytes 0x00-0x0f.
-    uint8_t keytone;               ///< Enable key tones, Off=0x00, On=0x01.
-    DisplayMode display_mode;      ///< Display channel or frequency, see @c DisplayMode, default channel=0x00.
-    uint8_t auto_keylock;          ///< Enables auto key-lock.
-    AutoShutdown auto_shutdown;    ///< Automatic shutdown timer, see @c AutoShutdown, default off=0x00.
-    uint8_t transmit_timeout;      ///< Transmit timeout (TOT) in multiples of 30s, default 0=off.
-    Language language;             ///< UI Language, see @c Language, default english.
-    PowerOnDisplay power_on;       ///< Power-on display, see @c PowerOnDisplay, default=PWRON_DEFAULT.
-    uint8_t pwron_passwd;          ///< Boot password enabled, Off=0x00, On=0x01.
-    FreqStep freq_step;            ///< VFO Frequency step, see FreqStep.
-    uint8_t sql_level_a;           ///< Squelch level VFO A [0,5], 0=off.
-    uint8_t sql_level_b;           ///< Squelch level VFO B [0,5], 0=off.
-    PowerSave power_save;          ///< Power-save settings, @c see PowerSave.
-    uint8_t vox_level;             ///< Vox/BT level [1,3], 0=off.
-    uint8_t vox_delay;             ///< Delay in 0.1s steps + 0.5s offset, value [0, 25].
-    VFOScanType vfo_scan_type;     ///< Sets the VFO scan type.
-    uint8_t mic_gain;              ///< Microphone gain value in [0,4], default 2.
+  public:
+    /** Constructor. */
+    GeneralSettingsElement(uint8_t *ptr);
 
-    // Bytes 0x10-0x1f.
-    KeyFunction pf1_short;         ///< Programmable function key 1 short press function.
-    KeyFunction pf2_short;         ///< Programmable function key 2 short press function.
-    KeyFunction pf3_short;         ///< Programmable function key 3 short press function.
-    KeyFunction p1_short;          ///< P1 function key short press function.
-    KeyFunction p2_short;          ///< P1 function key short press function.
-    uint8_t vfo_mode_a;            ///< Enables VFO mode for VFO A, default memory mode = 0x00.
-    uint8_t vfo_mode_b;            ///< Enables VFO mode for VFO B, default memory mode = 0x00.
-    STEType ste_type;              ///< STE type of CTCSS.
-    STEFrequency ste_freq_no_sig;  ///< STE when no signal.
-    uint8_t grpcall_hang_time;     ///< Group call hang time [1,30] = 1..30s, 0x1f=30min, 0x20=infinite.
-    uint8_t privcall_hang_time;    ///< Private call hang time [1,30] = 1..30s, 0x1f=30min, 0x20=infinite.
-    uint8_t prewave_time;          ///< Prewave delay in multiples of 20ms, values [0,50].
-    uint8_t wake_head_period;      ///< Wake head period in multiples of 20ms, values [0,50].
-    uint8_t fm_channel_index;      ///< Index of current FM channel, 0-based.
-    uint8_t fm_vfo_mode;           ///< Enabled FM (broadcast) VFO mode, default channel mode=0x00.
-    uint8_t current_zone_a;        ///< Zone index 0-based.
-
-    // Bytes 0x20-0x2f.
-    uint8_t current_zone_b;        ///< Zone index 0-based.
-    uint8_t _unused0021;           ///< Unused, set to 0x00.
-    uint8_t record_enable;         ///< Enable recording function, default off=0x00.
-    DTMFDuration dtmf_duration;    ///< DTMF transmit duration.
-    uint8_t enable_man_down;       ///< Enable man down alarm, default off=0x00.
-    uint8_t _unused0025;           ///< Unused, set to 0x00.
-    uint8_t display_brightness;    ///< Display brightness value [0,4].
-    BackLightDur backlight_dur;    ///< Specifies backlight duration, see @c BackLightDur.
-    uint8_t gps_enable;            ///< Enable GPS, Off=0x00, On=0x01.
-    uint8_t enable_sms_alert;      ///< Enables SMS alert, default Off=0x00.
-    uint8_t _unknown002a;          ///< Unknown, set to 0x01.
-    uint8_t enable_fm_monitor;     ///< Enables FM (broadcast) monitor, default off=0x00.
-    uint8_t main_ch_set_b;         ///< Set main channel is B, A if 0x00.
-    uint8_t enable_sub_ch_mode;    ///< Enable sub-channel mode, default off=0x00.
-    TBSTFrequency tbst_frequency;  ///< Sets the TBST frquency.
-    uint8_t call_alert;            ///< Enable call tone, default=1, Off=0x00, On=0x01.
-
-    // Byte 0x30-3f
-    uint8_t timezone;              ///< Time zone, GMT-12=0x00, GMT=0x0c, GMT+1=0x0d, GMT+13=0x19.
-    PermitTone talk_permit_tone;   ///< Enable talk permit, Off=0x00, Digi=0x01, Analog=0x02, Both=0x03.
-    uint8_t enable_idle_tone;      ///< Enable digi-call idle tone, Off=0x00, On=0x01.
-    VOXSource vox_source;          ///< Specifies the VOX source, default external = 0x01.
-    uint8_t enable_pro_mode;       ///< Select amateur mode (0x00) or professional mode (0x01).
-    uint8_t _unused0035;           ///< Unused set to 0x00
-    uint8_t ch_idle_tone;          ///< Enable channel idle tone, Off=0x00, On=0x01.
-    uint8_t menu_exit_time;        ///< Menu exit time in multiples of 5s + 5s offset.
-    uint8_t filter_own_missed;     ///< Enable filter own ID in missed calls, default off=0x00.
-    uint8_t startup_tone;          ///< Enable Startup tone, Off=0x00, On=0x01.
-    uint8_t call_end_box;          ///< Show call end prompt box, default off=0x00.
-    uint8_t max_sp_volume;         ///< Maximum speaker volume, value in [1,8], default 5.
-    uint8_t remote_stun;           ///< Enable remote stun and kill, default off=0x00.
-    uint8_t _unused003d;           ///< Unused, set to 0x00.
-    uint8_t remote_monitor;        ///< Enable remote monitor, default off = 0x00.
-    uint8_t gps_sms_enable;        ///< Enable GPS SMS reporting, Off=0x00, On=0x01.
-
-    // Bytes 0x40-0x4f
-    uint8_t _unknown0040;          ///< Unknown settings, default set to 0x01;
-    KeyFunction pf1_long;          ///< Programmable function key 1 long press function.
-    KeyFunction pf2_long;          ///< Programmable function key 2 long press function.
-    KeyFunction pf3_long;          ///< Programmable function key 3 long press function.
-    KeyFunction p1_long;           ///< P1 function key long press function.
-    KeyFunction p2_long;           ///< P1 function key long press function.
-    uint8_t long_key_time;         ///< Specifies the long-press time in seconds + 1s offset, value in [0,4].
-    uint8_t show_volume_change;    ///< Display volume change promt.
-    uint8_t autorep_vfo_a;         ///< Auto repeater offset direction VFO A, Off=0x00, positive=0x01, negative=0x02, default=off.
-    uint8_t digi_mon_slot;         ///< Digital monitor slot, default off=0x00, single slot=0x01, both slots=0x02.
-    uint8_t digi_mon_cc;           ///< Digital monitor match color code, default any=0x00, match=0x01.
-    uint8_t digi_mon_id;           ///< Digital monitor match ID, default any=0x00, match=0x01.
-    uint8_t mon_slot_hold;         ///< Digital monitor slot hold, default off=0x00.
-    uint8_t show_last_caller;      ///< Show last caller, off=0x00, show ID=0x01, show call sign=0x02, show both=0x03.
-    uint8_t _unused003e;           ///< Unused, set to 0x00.
-    uint8_t man_down_delay;        ///< Man down alarm delay in seconds [0,255].
-
-    // Bytes 0x50-0x5f
-    uint8_t analog_call_hold;      ///< Analog call hold time in seconds [0,30].
-    uint8_t enable_time_display;   ///< Show time on display, default on=0x01.
-    uint8_t max_hp_volume;         ///< Maximum headphone volume, value in [0,8], default 0.
-    uint8_t gps_message_enable;    ///< Enable GPS text message, Off=0x00, On=0x01
-    uint8_t _unknown0054[3];       ///< Unknown settings block;
-    uint8_t enh_mic_sound;         ///< Enhanced mic sound quality, Off=0x00, On=0x01.
-    uint32_t vfo_scan_uhf_start;   ///< Start frequency of UHF VFO scan, in multiples of 10Hz, little-endian.
-    uint32_t vfo_scan_uhf_stop;    ///< End frequency of UHF VFO scan, in multiples of 10Hz, little-endian.
-
-    // Bytes 0x60-0x6f
-    uint32_t vfo_scan_vhf_start;   ///< Start frequency of VHF VFO scan, in multiples of 10Hz, little-endian.
-    uint32_t vfo_scan_vhf_stop;    ///< End frequency of VHF VFO scan, in multiples of 10Hz, little-endian.
-    uint8_t autorep_uhf1_off;      ///< Auto repeater offset UHF1 index, 0-based, disabled=0xff.
-    uint8_t autorep_vhf1_off;      ///< Auto repeater offset VHF1 index, 0-based, disabled=0xff.
-    uint8_t _unknown0069[4];       ///< Unknown settings block;
-    uint8_t maintain_call_ch;      ///< Call channel is maintained, default on=0x01.
-    uint8_t pri_zone_a;            ///< Priority zone index VFO A, index of zone 0-based.
-
-    // Bytes 0x70-0xaf
-    uint8_t pri_zone_b;            ///< Priority zone index VFO B, index of zone 0-based.
-    uint8_t _unused0071;           ///< Unused, set to 0x00.
-    uint16_t call_tone_freq[5];    ///< Sequence of frequencies for call tone in Hz, little-endian.
-    uint16_t call_tone_dur[5];     ///< Sequence of druations for call tone in Hz, little-endian.
-    uint16_t idle_tone_freq[5];    ///< Sequence of frequencies for channel idle tone in Hz, little-endian.
-    uint16_t idle_tone_dur[5];     ///< Sequence of druations for channel idle tone in Hz, little-endian.
-    uint16_t callend_tone_freq[5]; ///< Sequence of frequencies for call end tone in Hz, little-endian.
-    uint16_t callend_tone_dur[5];  ///< Sequence of druations for call end tone in Hz, little-endian.
-    uint8_t  record_delay;         ///< Record delay in multiple of 0.2 seconds.
-    uint8_t  call_disp_mode;       ///< Call display mode, off=0x00, 0x01=call sign, 0x02=name.
-
-    // Bytes 0xb0-0xbf
-    uint8_t _unknown00b0[5];       ///< Unknown settings block.
-    uint8_t gps_sms_interval;      ///< GPS ranging SMS interval in seconds [5,255], default=5.
-    uint8_t _unknown00b6[2];       ///< Unknown settings block.
-    uint8_t disp_channel_number;   ///< Display channel number, default on=0x01.
-    uint8_t disp_contact;          ///< Display current contact, default on=0x01.
-    uint8_t roam_period;           ///< Auto roaming period in minutes -1, 1min=0x00, 2m=0x01, 256min=0xff, default=1min.
-    uint8_t key_tone_adj;          ///< Key tone adjust, fixed 0x01-0x0f, or 0x00=variable.
-    Color callsign_color;          ///< Call sign display color.
-    uint8_t gps_unit;              ///< GPS units Metric=0x00, Imperial=0x01.
-    uint8_t key_lock_knob : 1,     ///< Lock knowb.
-      key_lock_keyboard   : 1,     ///< Lock keyboard.
-      _unused00be_2       : 1,     ///< Unused, set to 0.
-      key_lock_sidekey    : 1,     ///< Lock side keys.
-      key_lock_forced     : 1,     ///< Forced lock.
-      _unknown00be_5      : 3;     ///< Unused, set to 0.
-    uint8_t roam_wait;             ///< Auto roaming wait time in seconds off=0x00, 1s=0x01, 30s=0x1e, default=off.
-
-    // Bytes 0xc0-0xcf
-    Color standby_text_color;      ///< Standby text color.
-    Color standby_img_color;       ///< Standby background image color.
-    uint8_t show_last_call_launch; ///< Show last call on launch.
-    SMSFormat sms_format;          ///< SMS format.
-    uint32_t autorep_vhf1_min;     ///< Auto repeater VHF1 minimum frequency, in 10Hz, little endian.
-    uint32_t autorep_vhf1_max;     ///< Auto repeater VHF1 maximum frequency, in 10Hz, little endian.
-    uint32_t autorep_uhf1_min;     ///< Auto repeater UHF1 minimum frequency, in 10Hz, little endian.
-
-    // Bytes 0xd0-0xdf
-    uint32_t autorep_uhf1_max;     ///< Auto repeater UHF1 maximum frequency, in 10Hz, little endian.
-    uint8_t autorep_vfo_b;         ///< Auto repeater offset direction VFO B, Off=0x00, positive=0x01, negative=0x02, default=off.
-    uint8_t _unknown00d5;          ///< Unknown setting.
-    uint8_t _unknown00d6;          ///< Unused set to 0x00.
-    uint8_t boot_ch;               ///< Enable default channel on boot, Off=0x00, On=0x01.
-    uint8_t vfo_a_zone_index;      ///< Index of default zone for VFO A, 0-based, default=0.
-    uint8_t vfo_b_zone_index;      ///< Index of default zone for VFO B, 0-based, default=0.
-    uint8_t vfo_a_ch_index;        ///< Default channel index (within selected zone) for VFO A, 0-based, default=0, 0xff=VFO.
-    uint8_t vfo_b_ch_index;        ///< Default channel index (within selected zone) for VFO B, 0-based, default=0, 0xff=VFO.
-    uint8_t roam_default_zone;     ///< Roaming default zone index, 0-based.
-    uint8_t repchk_enable;         ///< Repeater range check enable, Off=0x00, On=0x01.
-    uint8_t repchk_interval;       ///< Repeater range check interval in multiple of 5 seconds, 30s=0x05, 35s=0x06, default=30s.
-    uint8_t repchk_recon;          ///< Number of reconnections 3=0x00, 4=0x01, 5=0x02, default=5.
-
-    // Bytes 0x0e0-0x0ef
-    uint8_t roam_start_cond;       ///< Auto roaming start condition, Periodic=0x00, Out-of-range=0x01.
-    uint8_t backlight_delay_tx;    ///< Backlight delay during TX in seconds [0,30].
-    uint8_t separate_display;      ///< Separate display default off=0x00.
-    uint8_t keep_last_caller;      ///< Keep last caller on channel switch, default off=0x00.
-    Color channel_name_color;      ///< Color of channel name.
-    uint8_t repchk_notify;         ///< Repeater range check notification Off=0x00, Beep=0x01, Voice=0x02, default=Voice.
-    uint8_t backlight_delay_rx;    ///< Backlight delay during RX in seconds always=0x00.
-    uint8_t roam_enable;           ///< Enable roaming, Off=0x00, On=0x01.
-    uint8_t _unused00e8;           ///< Unused, set to 0x00.
-    uint8_t mute_delay;            ///< Mute delay in minutes -1 [0,255].
-    uint8_t repchk_num_notify;     ///< Number of repeater out-of-range notifications, 1=0x00, 2=0x01, 3=0x02, 10=0x0b, default=3.
-    uint8_t startup_gps_test;      ///< Test GPS on boot, default off=0x00.
-    uint8_t startup_reset;         ///< Startup reset.
-    uint8_t _unknown00ed[3];       ///< Unused set to 0x00.
-
-    // Bytes 0x0f0-0x0ff
-    uint8_t  _unknown00f0[16];     ///< Unknown settings block.
-
-    /** Constructs an empty general settings. */
-    general_settings_base_t();
-    /** Clears the general setting. */
+    /** Resets the general settings. */
     void clear();
 
-    /** Decodes the microphone gain. */
-    uint getMicGain() const;
-    /** Encodes the microphone gain. */
-    void setMicGain(uint gain);
+    /** Returns the transmit timeout in seconds. */
+    virtual uint transmitTimeout() const;
+    /** Sets the transmit timeout in seconds. */
+    virtual void setTransmitTimeout(uint tot);
 
-    /** Updates the general settings from the given abstract configuration. */
-    void fromConfig(const Config *config, const Flags &flags);
-    /** Updates the abstract configuration from this general settings. */
-    void updateConfig(Config *config);
+    /** Returns the UI language. */
+    virtual Language language() const;
+    /** Sets the UI language. */
+    virtual void setLanguage(Language lang);
+
+    /** Returns the VFO frequency step in kHz. */
+    virtual double vfoFrequencyStep() const;
+    /** Sets the VFO frequency step in kHz. */
+    virtual void setVFOFrequencyStep(double kHz);
+
+    /** Returns the STE type. */
+    virtual STEType steType() const;
+    /** Sets the STE type. */
+    virtual void setSTEType(STEType type);
+    /** Returns the STE frequency setting. */
+    virtual STEFrequency steFrequency() const;
+    /** Sets the STE frequency setting. */
+    virtual void setSTEFrequency(STEFrequency freq);
+
+    /** Returns the group call hang time in seconds. */
+    virtual uint groupCallHangTime() const;
+    /** Sets the group call hang time in seconds. */
+    virtual void setGroupCallHangTime(uint sec);
+    /** Returns the private call hang time in seconds. */
+    virtual uint privateCallHangTime() const;
+    /** Sets the private call hang time in seconds. */
+    virtual void setPrivateCallHangTime(uint sec);
+
+    /** Returns the pre-wave time in ms. */
+    virtual uint preWaveDelay() const;
+    /** Sets the pre-wave time in ms. */
+    virtual void setPreWaveDelay(uint ms);
+    /** Returns the wake head-period in ms. */
+    virtual uint wakeHeadPeriod() const;
+    /** Sets the wake head-period in ms. */
+    virtual void setWakeHeadPeriod(uint ms);
+
+    /** Retunrs the wide-FM (broadcast) channel index. */
+    virtual uint wfmChannelIndex() const;
+    /** Sets the wide-FM (broadcast) channel index. */
+    virtual void setWFMChannelIndex(uint idx);
+    /** Returns @c true if the WFM RX is in VFO mode. */
+    virtual bool wfmVFOEnabled() const;
+    /** Enables/disables VFO mode for WFM RX. */
+    virtual void enableWFMVFO(bool enable);
+
+    /** Returns the DTMF tone duration in ms. */
+    virtual uint dtmfToneDuration() const;
+    /** Sets the DTMF tone duration in ms. */
+    virtual void setDTMFToneDuration(uint ms);
+
+    /** Returns @c true if "man down" is enabled. */
+    virtual bool manDown() const;
+    /** Enables/disables "man down". */
+    virtual void enableManDown(bool enable);
+
+    /** Returns @c true if WFM monitor is enabled. */
+    virtual bool wfmMonitor() const;
+    /** Enables/disables WFM monitor. */
+    virtual void enableWFMMonitor(bool enable);
+
+    /** Returns the TBST frequency. */
+    virtual TBSTFrequency tbstFrequency() const;
+    /** Sets the TBST frequency. */
+    virtual void setTBSTFrequency(TBSTFrequency freq);
+
+    /** Returns @c true if the "pro mode" is enabled. */
+    virtual bool proMode() const;
+    /** Enables/disables the "pro mode". */
+    virtual void enableProMode(bool enable);
+
+    /** Retuns @c true if the own ID is filtered in call lists. */
+    virtual bool filterOwnID() const;
+    /** Enables/disables filter of own ID in call lists. */
+    virtual void enableFilterOwnID(bool enable);
+    /** Retuns @c true remote stun/kill is enabled. */
+    virtual bool remoteStunKill() const;
+    /** Enables/disables remote stun/kill. */
+    virtual void enableRemoteStunKill(bool enable);
+    /** Retuns @c true remote monitor is enabled. */
+    virtual bool remoteMonitor() const;
+    /** Enables/disables remote monitor. */
+    virtual void enableRemoteMonitor(bool enable);
+
+    /** Returns the monitor slot match. */
+    virtual SlotMatch monitorSlotMatch() const;
+    /** Sets the monitor slot match. */
+    virtual void setMonitorSlotMatch(SlotMatch match);
+    /** Retuns @c true if the monitor matches color code. */
+    virtual bool monitorColorCodeMatch() const;
+    /** Enables/disables monitor color code match. */
+    virtual void enableMonitorColorCodeMatch(bool enable);
+    /** Retuns @c true if the monitor matches ID. */
+    virtual bool monitorIDMatch() const;
+    /** Enables/disables monitor ID match. */
+    virtual void enableMonitorIDMatch(bool enable);
+    /** Retuns @c true if the monitor holds the time slot. */
+    virtual bool monitorTimeSlotHold() const;
+    /** Enables/disables monitor time slot hold. */
+    virtual void enableMonitorTimeSlotHold(bool enable);
+
+    /** Retunrs the "man down" delay in seconds. */
+    virtual uint manDownDelay() const;
+    /** Sets the "man down" delay in seconds. */
+    virtual void setManDownDelay(uint sec);
+    /** Returns the analog call hold in seconds. */
+    virtual uint analogCallHold() const;
+    /** Sets the analog call hold in seconds. */
+    virtual void setAnalogCallHold(uint sec);
+
+    /** Returns @c true if the GPS range reporting is enabled. */
+    virtual bool gpsRangReporting() const;
+    /** Enables/disables GPS range reporting. */
+    virtual void enableGPSRangeReporting(bool enable);
+
+    /** Returns @c true if the call channel is maintained. */
+    virtual bool maintainCallChannel() const;
+    /** Enables/disables maintaining the call channel. */
+    virtual void enableMaintainCalLChannel(bool enable);
+
+    /** Retruns the priority Zone A index. */
+    virtual uint priorityZoneAIndex() const;
+    /** Sets the priority zone A index. */
+    virtual void setPriorityZoneAIndex(uint idx);
+    /** Retruns the priority Zone B index. */
+    virtual uint priorityZoneBIndex() const;
+    /** Sets the priority zone B index. */
+    virtual void setPriorityZoneBIndex(uint idx);
+
+    /** Returns the GPS ranging interval in seconds. */
+    virtual uint gpsRangingInterval() const;
+    /** Sets the GPS ranging interval in seconds. */
+    virtual void setGPSRangingInterval(uint sec);
+
+    /** Returns @c true if the channel number is displayed. */
+    virtual bool displayChannelNumber() const;
+    /** Enables/disables display of channel number. */
+    virtual void enableDisplayChannelNumber(bool enable);
+    /** Returns @c true if the contact is displayed. */
+    virtual bool displayContact() const;
+    /** Enables/disables display of contact. */
+    virtual void enableDisplayContact(bool enable);
+
+    /** Returns the auto roaming period in minutes. */
+    virtual uint autoRoamPeriod() const;
+    /** Sets the auto roaming period in minutes. */
+    virtual void setAutoRoamPeriod(uint min);
+
+    /** Returns @c true if the key-tone level is adjustable. */
+    virtual bool keyToneLevelAdjustable() const;
+    /** Returns the key-tone level (0=adjustable). */
+    virtual uint keyToneLevel() const;
+    /** Sets the key-tone level. */
+    virtual void setKeyToneLevel(uint level);
+    /** Sets the key-tone level adjustable. */
+    virtual void setKeyToneLevelAdjustable();
+
+    /** Returns the display color for callsigns. */
+    virtual Color callDisplayColor() const;
+    /** Sets the display color for callsigns. */
+    virtual void setCallDisplayColor(Color color);
+
+    /** Returns @c true if the GPS units are imperical. */
+    virtual bool gpsUnitsImperial() const;
+    /** Enables/disables imperical GPS units. */
+    virtual void enableGPSUnitsImperial(bool enable);
+
+    /** Returns @c true if the knob is locked. */
+    virtual bool knobLock() const;
+    /** Enables/disables the knob lock. */
+    virtual void enableKnobLock(bool enable);
+    /** Returns @c true if the keypad is locked. */
+    virtual bool keypadLock() const;
+    /** Enables/disables the keypad lock. */
+    virtual void enableKeypadLock(bool enable);
+    /** Returns @c true if the sidekeys are locked. */
+    virtual bool sidekeysLock() const;
+    /** Enables/disables the sidekeys lock. */
+    virtual void enableSidekeysLock(bool enable);
+    /** Returns @c true if the "professional" key is locked. */
+    virtual bool keyLockForced() const;
+    /** Enables/disables the "professional" key lock. */
+    virtual void enableKeyLockForced(bool enable);
+
+    /** Returns the auto-roam delay in seconds. */
+    virtual uint autoRoamDelay() const;
+    /** Sets the auto-roam delay in seconds. */
+    virtual void setAutoRoamDelay(uint sec);
+
+    /** Retruns the standby text color. */
+    virtual Color standbyTextColor() const;
+    /** Sets the standby text color. */
+    virtual void setStandbyTextColor(Color color);
+    /** Retruns the standby image color. */
+    virtual Color standbyImageColor() const;
+    /** Sets the standby image color. */
+    virtual void setStandbyImageColor(Color color);
+
+    /** Returns @c true if the last heard is shown. */
+    virtual bool showLastHeard() const;
+    /** Enables/disables the knob lock. */
+    virtual void enableShowLastHeard(bool enable);
+
+    /** Retuns the SMS format. */
+    virtual SMSFormat smsFormat() const;
+    /** Sets the SMS format. */
+    virtual void setSMSFormat(SMSFormat fmt);
+
+    /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
+    virtual uint autoRepeaterMinFrequencyVHF() const;
+    /** Sets the minimum frequency in Hz for the auto-repeater range in VHF band. */
+    virtual void setAutoRepeaterMinFrequencyVHF(uint Hz);
+    /** Returns the maximum frequency in Hz for the auto-repeater range in VHF band. */
+    virtual uint autoRepeaterMaxFrequencyVHF() const;
+    /** Sets the maximum frequency in Hz for the auto-repeater range in VHF band. */
+    virtual void setAutoRepeaterMaxFrequencyVHF(uint Hz);
+
+    /** Returns the minimum frequency in Hz for the auto-repeater range in UHF band. */
+    virtual uint autoRepeaterMinFrequencyUHF() const;
+    /** Sets the minimum frequency in Hz for the auto-repeater range in UHF band. */
+    virtual void setAutoRepeaterMinFrequencyUHF(uint Hz);
+    /** Returns the maximum frequency in Hz for the auto-repeater range in UHF band. */
+    virtual uint autoRepeaterMaxFrequencyUHF() const;
+    /** Sets the maximum frequency in Hz for the auto-repeater range in UHF band. */
+    virtual void setAutoRepeaterMaxFrequencyUHF(uint Hz);
+
+    /** Returns the auto-repeater direction for VFO B. */
+    virtual AutoRepDir autoRepeaterDirectionB() const;
+    /** Sets the auto-repeater direction for VFO B. */
+    virtual void setAutoRepeaterDirectionB(AutoRepDir dir);
+
+    /** Returns @c true if a boot channel is set. */
+    virtual bool defaultChannel() const;
+    /** Enables/disables the boot channel. */
+    virtual void enableDefaultChannel(bool enable);
+    /** Returns the default zone index (0-based) for VFO A. */
+    virtual uint defaultZoneIndexA() const;
+    /** Sets the default zone (0-based) for VFO A. */
+    virtual void setDefaultZoneIndexA(uint idx);
+    /** Returns the default zone index (0-based) for VFO B. */
+    virtual uint defaultZoneIndexB() const;
+    /** Sets the default zone (0-based) for VFO B. */
+    virtual void setDefaultZoneIndexB(uint idx);
+    /** Returns @c true if the default channel for VFO A is VFO. */
+    virtual bool defaultChannelAIsVFO() const;
+    /** Returns the default channel index for VFO A.
+     * Must be within default zone. If 0xff, default channel is VFO. */
+    virtual uint defaultChannelAIndex() const;
+    /** Sets the default channel index for VFO A. */
+    virtual void setDefaultChannelAIndex(uint idx);
+    /** Sets the default channel for VFO A to be VFO. */
+    virtual void setDefaultChannelAToVFO();
+    /** Returns @c true if the default channel for VFO B is VFO. */
+    virtual bool defaultChannelBIsVFO() const;
+    /** Returns the default channel index for VFO B.
+     * Must be within default zone. If 0xff, default channel is VFO. */
+    virtual uint defaultChannelBIndex() const;
+    /** Sets the default channel index for VFO B. */
+    virtual void setDefaultChannelBIndex(uint idx);
+    /** Sets the default channel for VFO B to be VFO. */
+    virtual void setDefaultChannelBToVFO();
+
+    /** Returns the default roaming zone index. */
+    virtual uint defaultRoamingZoneIndex() const;
+    /** Sets the default roaming zone index. */
+    virtual void setDefaultRoamingZoneIndex(uint idx);
+
+    /** Returns @c true if repeater range check is enabled. */
+    virtual bool repeaterRangeCheck() const;
+    /** Enables/disables repeater range check. */
+    virtual void enableRepeaterRangeCheck(bool enable);
+    /** Returns the repeater range check period in seconds. */
+    virtual uint repeaterRangeCheckInterval() const;
+    /** Sets the repeater range check interval in seconds. */
+    virtual void setRepeaterRangeCheckInterval(uint sec);
+    /** Returns the number of repeater range checks. */
+    virtual uint repeaterRangeCheckCount() const;
+    /** Sets the number of repeater range checks. */
+    virtual void setRepeaterRangeCheckCount(uint n);
+
+    /** Returns the roaming start condition. */
+    virtual RoamStart roamingStartCondition() const;
+    /** Sets the roaming start condition. */
+    virtual void setRoamingStartCondition(RoamStart cond);
+
+    /** Returns the backlight duration during TX in seconds. */
+    virtual uint backlightTXDuration() const;
+    /** Sets the backlight duration during TX in seconds. */
+    virtual void setBacklightTXDuration(uint sec);
+
+    /** Retruns @c true if the "separate display" is enabled. */
+    virtual bool separateDisplay() const;
+    /** Enables/disables "separate display. */
+    virtual void enableSeparateDisplay(bool enable);
+
+    /** Retruns @c true if keep caller is enabled. */
+    virtual bool keepCaller() const;
+    /** Enables/disables keep caller. */
+    virtual void enableKeepCaller(bool enable);
+
+    /** Returns the channel name color. */
+    virtual Color channelNameColor() const;
+    /** Sets the channel name color. */
+    virtual void setChannelNameColor(Color color);
+
+    /** Retruns @c true if repeater check notification is enabled. */
+    virtual bool repeaterCheckNotification() const;
+    /** Enables/disables repeater check notification. */
+    virtual void enableRepeaterCheckNotification(bool enable);
+
+    /** Returns the backlight duration during RX in seconds. */
+    virtual uint backlightRXDuration() const;
+    /** Sets the backlight duration during RX in seconds. */
+    virtual void setBacklightRXDuration(uint sec);
+
+    /** Retruns @c true if roaming is enabled. */
+    virtual bool roaming() const;
+    /** Enables/disables repeater check notification. */
+    virtual void enableRoaming(bool enable);
+
+    /** Returns the mute delay in minutes. */
+    virtual uint muteDelay() const;
+    /** Sets the mute delay in minutes. */
+    virtual void setMuteDelay(uint min);
+
+    /** Returns the number of repeater check notifications. */
+    virtual uint repeaterCheckNumNotifications() const;
+    /** Sets the number of repeater check notifications. */
+    virtual void setRepeaterCheckNumNotifications(uint num);
+
+    /** Retruns @c true if boot GPS check is enabled. */
+    virtual bool bootGPSCheck() const;
+    /** Enables/disables boot GPS check. */
+    virtual void enableBootGPSCheck(bool enable);
+    /** Retruns @c true if boot reset is enabled. */
+    virtual bool bootReset() const;
+    /** Enables/disables boot reset. */
+    virtual void enableBootReset(bool enable);
+
+    bool fromConfig(const Flags &flags, Context &ctx);
+    bool updateConfig(Context &ctx);
   };
 
-  /** General settings extension 1.
+  /** Implements the GPS message settings (part of general settings).
    *
-   * At 0x02501280, size 0x30 bytes. */
-  struct __attribute__((packed)) general_settings_ext1_t {
-    uint8_t gps_message[32];       ///< GPS message text, upto 32b ASCII text, 0x00 padded.
-    uint8_t _unkown0020[16];       ///< Unknown settings block.
+   * Memory layout of the encoded GPS message (size 0x0030 bytes):
+   * @verbinclude d878uv_gpsmessage.txt */
+  class GPSMessageElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    GPSMessageElement(uint8_t *ptr, uint size);
 
-    /** Derives the general settings from the given abstact configuration. */
-    void fromConfig(const Config *conf, const Flags &flags);
+  public:
+    /** Constructor. */
+    GPSMessageElement(uint8_t *ptr);
+
+    /** Resets the message. */
+    void clear();
+
+    /** Returns the GPS message. */
+    virtual QString message() const;
+    /** Sets the message. */
+    virtual void setMessage(const QString &message);
+
+    /** Encodes GPS message from config object. */
+    virtual bool fromConfig(const Flags &flags, Context &ctx);
+    /** Updates config. */
+    virtual bool updateConfig(Context &ctx) const;
   };
 
-  /** General settings extension 2.
+  /** General settings extension element for the D878UV.
    *
-   * At 0x02501400, size 0x100 bytes. */
-  struct __attribute__((packed)) general_settings_ext2_t {
+   * Memory representation of the encoded settings element (size 0x100 bytes):
+   * @verbinclude d878uv_generalsettingsextension.txt */
+  class GeneralSettingsExtensionElement: public Element
+  {
+  public:
     /** Talker alias display preference. */
-    enum TalkerAliasDisplay : uint8_t {
-      TA_DISPLAY_OFF = 0,
-      TA_DISPLAY_CONTACTS = 1,
-      TA_DISPLAY_AIR = 2
+    enum class TalkerAliasDisplay {
+      Off = 0, Conctact = 1, Air = 2
     };
+
     /** Talker alias encoding. */
-    enum TalkerAliasEncoding : uint8_t {
-      TA_ENCODING_ISO8 = 0,
-      TA_ENCODING_ISO7 = 1,
-      TA_ENCODING_UNICODE = 2,
+    enum class TalkerAliasEncoding {
+      ISO8 = 0, ISO7 = 1, Unicode = 2,
     };
 
-    // Byte 0x00
-    uint8_t send_alias;            ///< Send talker alias, 0=off, 1=on.
-    uint8_t _unknown0001[15];      ///< Unused, filled with 0x00.
-    // Byte 0x10
-    uint8_t _unknown0010[14];      ///< Unknown.
-    TalkerAliasDisplay ta_display; ///< Talker alias display priority, see @c TalkerAliasDisplay.
-    TalkerAliasEncoding ta_enc;    ///< Talker alias encoding, see @c TalkerAliasEncoding.
-    // Byte 0x20
-    uint8_t _unknown0020[2];       ///< Unused, set to 0x00.
-    uint8_t autorep_uhf2_off;      ///< Auto repeater offset UHF2 index, 0-based, disabled=0xff.
-    uint8_t autorep_vhf2_off;      ///< Auto repeater offset VHF2 index, 0-based, disabled=0xff.
-    uint32_t autorep_vhf2_min;     ///< Auto repeater VHF2 minimum frequency, in 10Hz, little endian.
-    uint32_t autorep_vfh2_max;     ///< Auto repeater VHF2 maximum frequency, in 10Hz, little endian.
-    uint32_t autorep_uhf2_min;     ///< Auto repeater UHF2 minimum frequency, in 10Hz, little endian.
-    // Byte 0x30
-    uint32_t autorep_uhf2_max;     ///< Auto repeater UHF2 maximum frequency, in 10Hz, little endian.
-    uint8_t _unknown0034;          ///< Unknown.
-    uint8_t gps_mode;              ///< GPS mode, GPS=0x00, BDS=0x01, GPS+BDS=0x02.
-    uint8_t _unknown0036[10];      ///< Unknown.
-    // Byte 0x40
-    uint8_t _unknown0040[16];      ///< Unknown.
-    // Byte 0x50
-    uint8_t _unknown0050[16];      ///< Unknown.
-    // Byte 0x60
-    uint8_t _unknown0060[16];      ///< Unknown.
-    // Byte 0x70
-    uint8_t _unknown0070[16];      ///< Unknown.
-    // Byte 0x80
-    uint8_t _unknown0080[16];      ///< Unknown.
-    // Byte 0x90
-    uint8_t _unknown0090[16];      ///< Unknown.
-    // Byte 0xa0
-    uint8_t _unknown00a0[16];      ///< Unknown.
-    // Byte 0xb0
-    uint8_t _unknown00b0[16];      ///< Unknown.
-    // Byte 0xc0
-    uint8_t _unknown00c0[16];      ///< Unknown.
-    // Byte 0xd0
-    uint8_t _unknown00d0[16];      ///< Unknown.
-    // Byte 0xe0
-    uint8_t _unknown00e0[16];      ///< Unknown.
-    // Byte 0xf0
-    uint8_t _unknown00f0[16];      ///< Unknown.
+    /** Possible GPS modes. */
+    enum class GPSMode {
+      GPS=0, BDS=1, Both=2
+    };
 
-    /** Derives the general settings from the given abstact configuration. */
-    void fromConfig(const Config *conf, const Flags &flags);
+  protected:
+    /** Hidden Constructor. */
+    GeneralSettingsExtensionElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit GeneralSettingsExtensionElement(uint8_t *ptr);
+
+    /** Resets the settings. */
+    void clear();
+
+    /** Retruns @c true if talker alias is send. */
+    virtual bool sendTalkerAlias() const;
+    /** Enables/disables sending talker alias. */
+    virtual void enableSendTalkerAlias(bool enable);
+
+    /** Returns the talker alias display mode. */
+    virtual TalkerAliasDisplay talkerAliasDisplay() const;
+    /** Sets the talker alias display mode. */
+    virtual void setTalkerAliasDisplay(TalkerAliasDisplay mode);
+
+    /** Returns the talker alias encoding. */
+    virtual TalkerAliasEncoding talkerAliasEncoding() const;
+    /** Sets the talker alias encoding. */
+    virtual void setTalkerAliasEncoding(TalkerAliasEncoding encoding);
+
+    /** Returns @c true if the auto repeater UHF 2 offset index is set. */
+    virtual bool hasAutoRepeaterUHF2OffsetIndex() const;
+    /** Retunrs the index of the UHF 2 offset frequency. */
+    virtual uint autoRepeaterUHF2OffsetIndex() const;
+    /** Sets the index of the UHF 2 offset frequency. */
+    virtual void setAutoRepeaterUHF2OffsetIndex(uint idx);
+    /** Clears the auto repeater UHF 2 offset frequency index. */
+    virtual void clearAutoRepeaterUHF2OffsetIndex();
+
+    /** Returns @c true if the auto repeater VHF 2 offset index is set. */
+    virtual bool hasAutoRepeaterVHF2OffsetIndex() const;
+    /** Retunrs the index of the VHF 2 offset frequency. */
+    virtual uint autoRepeaterVHF2OffsetIndex() const;
+    /** Sets the index of the VHF 2 offset frequency. */
+    virtual void setAutoRepeaterVHF2OffsetIndex(uint idx);
+    /** Clears the auto repeater VHF 2 offset frequency index. */
+    virtual void clearAutoRepeaterVHF2OffsetIndex();
+
+    /** Returns the minimum frequency in Hz for the auto-repeater VHF 2 band. */
+    virtual uint autoRepeaterVHF2MinFrequency() const;
+    /** Sets the minimum frequency in Hz for the auto-repeater VHF 2 band. */
+    virtual void setAutoRepeaterVHF2MinFrequency(uint hz);
+    /** Returns the maximum frequency in Hz for the auto-repeater VHF 2 band. */
+    virtual uint autoRepeaterVHF2MaxFrequency() const;
+    /** Sets the maximum frequency in Hz for the auto-repeater VHF 2 band. */
+    virtual void setAutoRepeaterVHF2MaxFrequency(uint hz);
+    /** Returns the minimum frequency in Hz for the auto-repeater UHF 2 band. */
+    virtual uint autoRepeaterUHF2MinFrequency() const;
+    /** Sets the minimum frequency in Hz for the auto-repeater UHF 2 band. */
+    virtual void setAutoRepeaterUHF2MinFrequency(uint hz);
+    /** Returns the maximum frequency in Hz for the auto-repeater UHF 2 band. */
+    virtual uint autoRepeaterUHF2MaxFrequency() const;
+    /** Sets the maximum frequency in Hz for the auto-repeater UHF 2 band. */
+    virtual void setAutoRepeaterUHF2MaxFrequency(uint hz);
+
+    /** Retuns the GPS mode. */
+    virtual GPSMode gpsMode() const;
+    /** Sets the GPS mode. */
+    virtual void setGPSMode(GPSMode mode);
+
+    /** Encodes the settings from the config. */
+    virtual bool fromConfig(const Flags &flags, Context &ctx);
+    /** Update config from settings. */
+    virtual bool updateConfig(Context &ctx);
   };
 
-  /** Represents the APRS settings within the binary codeplug.
+
+  /** Represents the APRS settings within the binary D878UV codeplug.
    *
-   * Memmory layout of APRS settings (0x40byte):
-   * @verbinclude d878uvaprssetting.txt
+   * Memmory layout of APRS settings (size 0x0040 bytes):
+   * @verbinclude d878uv_aprssetting.txt
    */
-  struct __attribute__((packed)) aprs_setting_t {
-    /** Possible signalling for APRS repeater.*/
-    enum SignalingType: uint8_t {
-      SIG_OFF = 0,                 ///< No signalling.
-      SIG_CTCSS = 1,               ///< CTCSS signalling.
-      SIG_DCS = 2                  ///< DCS signalling.
-    };
+  class AnalogAPRSSettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    AnalogAPRSSettingsElement(uint8_t *ptr, uint size);
 
-    /** Power setting for the APRS/GPS channel. */
-    enum Power: uint8_t {
-      POWER_LOW = 0,               ///< Low power (usually about 1W).
-      POWER_MID = 1,               ///< Medium power (usually about 2W).
-      POWER_HIGH = 2,              ///< High power (usually about 5W).
-      POWER_TURBO = 3              ///< Highest power (upto 7W).
-    };
+  public:
+    /** Constructor. */
+    explicit AnalogAPRSSettingsElement(uint8_t *ptr);
 
-    /** Hemisphere settings for the fixed location beacon. */
-    enum Hemisphere: uint8_t {
-      NORTH = 0,
-      SOUTH = 1,
-      EAST  = 0,
-      WEST  = 1
-    };
+    /** Resets the settings. */
+    void clear();
 
-    // byte 0x00
-    uint8_t _unknown0;             ///< Unknown, set to 0x00.
-    uint32_t frequency;            ///< TX frequency, BCD encoded, little endian in 10Hz.
-    uint8_t tx_delay;              ///< TX delay, multiples of 20ms, default=1200ms.
-    SignalingType sig_type;        ///< Signalling type, 0=off, 1=ctcss, 2=dcs, default=off.
-    uint8_t ctcss;                 ///< CTCSS tone-code, default=0.
-    uint16_t dcs;                  ///< DCS code, little endian, default=0x0013.
-    uint8_t manual_tx_interval;    ///< Global manual TX intervals in seconds.
-    uint8_t auto_tx_interval;      ///< Global auto TX interval in multiples of 15s. That is
-                                   /// 0 = Off, 1 = 30s, n = 45s + (n-1) *15s.
-    uint8_t tx_tone_enable;        ///< TX tone enable, 0=off, 1=on.
+    /** Returns the transmit frequency in Hz. */
+    virtual uint frequency() const;
+    /** Sets the transmit frequency in Hz. */
+    virtual void setFrequency(uint hz);
 
-    uint8_t fixed_location;        ///< Fixed location data, 0=off, 1=on.
-    uint8_t lat_deg;               ///< Latitude in degree.
-    uint8_t lat_min;               ///< Latitude minutes.
-    uint8_t lat_sec;               ///< Latitude seconds (1/100th of a minute).
-    Hemisphere north_south;        ///< North or south flag, north=0, south=1.
-    uint8_t lon_deg;               ///< Longitude in degree.
-    uint8_t lon_min;               ///< Longitude in minutes.
-    uint8_t lon_sec;               ///< Longitude in seconds (1/100th of a minute).
-    Hemisphere east_west;          ///< East or west flag, east=0, west=1.
+    /** Retruns the TX delay in ms. */
+    virtual uint txDelay() const;
+    /** Sets the TX delay in ms. */
+    virtual void setTXDelay(uint ms);
 
-    uint8_t to_call[6];            ///< Destination call, 6 x ASCII, 0x20-padded.
-    uint8_t to_ssid;               ///< Destination SSID, 0xff=None.
+    /** Retruns the sub tone settings. */
+    virtual Signaling::Code txTone() const;
+    /** Sets the sub tone settings. */
+    virtual void setTXTone(Signaling::Code code);
 
-    uint8_t from_call[6];          ///< Source call, 6 x ASCII, 0x20-padded.
-    uint8_t from_ssid;             ///< Source SSID, 0xff=None.
+    /** Retruns the manual TX interval in seconds. */
+    virtual uint manualTXInterval() const;
+    /** Sets the manual TX interval in seconds. */
+    virtual void setManualTXInterval(uint sec);
 
-    // byte 0x24
-    uint8_t path[20];              ///< Path string, upto 20 ASCII chars, 0-padded.
-    uint8_t _pad56;                ///< Pad-byte 0x00.
+    /** Returns @c true if the auto transmit is enabled. */
+    virtual bool autoTX() const;
+    /** Retruns the auto TX interval in seconds. */
+    virtual uint autoTXInterval() const;
+    /** Sets the auto TX interval in seconds. */
+    virtual void setAutoTXInterval(uint sec);
+    /** Disables auto tx. */
+    virtual void disableAutoTX();
 
-    // byte 0x39
-    char table;                    ///< ASCII-char for APRS icon table, ie. '/' or '\' for primary
-                                   ///  and alternate icon table respectively.
-    char icon;                     ///< ASCII-char of APRS map icon.
-    Power power;                   ///< Transmit power.
-    uint8_t prewave_delay;         ///< Prewave delay in 10ms steps.
+    /** Returns @c true if a fixed location is send. */
+    virtual bool fixedLocationEnabled() const;
+    /** Returns the fixed location send. */
+    virtual QGeoCoordinate fixedLocation() const;
+    /** Sets the fixed location to send. */
+    virtual void setFixedLocation(QGeoCoordinate &loc);
+    /** Disables sending a fixed location. */
+    virtual void disableFixedLocation();
 
-    // bytes 0x3d
-    uint8_t _unknown61;            ///< Unknown, set to 01.
-    uint8_t _unknown62;            ///< Unknown, set to 03.
-    uint8_t _unknown63;            ///< Unknown, set to ff.
+    /** Retunrs the destination call. */
+    virtual QString destination() const;
+    /** Returns the destination SSID. */
+    virtual uint destinationSSID() const;
+    /** Sets the destination call & SSID. */
+    virtual void setDestination(const QString &call, uint ssid);
+    /** Retunrs the source call. */
+    virtual QString source() const;
+    /** Returns the source SSID. */
+    virtual uint sourceSSID() const;
+    /** Sets the source call & SSID. */
+    virtual void setSource(const QString &call, uint ssid);
 
-    /** Returns @c true, if the APRS setting is vaild. That is, it has a valid frequency,
-     * destination and source calls. */
-    bool isValid() const;
+    /** Returns the path string. */
+    virtual QString path() const;
+    /** Sets the path string. */
+    virtual void setPath(const QString &path);
 
-    /** Decodes the transmit frequency. */
-    double getFrequency() const;
-    /** Encodes the given frequency. */
-    void setFrequency(double freq);
+    /** Retunrs the APRS icon. */
+    virtual APRSSystem::Icon icon() const;
+    /** Sets the APRS icon. */
+    virtual void setIcon(APRSSystem::Icon icon);
 
-    /** Decodes the auto TX period. */
-    int getAutoTXInterval() const;
-    /** Encodes the auto TX period. */
-    void setAutoTxInterval(int sec);
+    /** Returns the transmit power. */
+    virtual Channel::Power power() const;
+    /** Sets the transmit power. */
+    virtual void setPower(Channel::Power power);
 
-    /** Decodes the manual TX interval in seconds. */
-    int getManualTXInterval() const;
-    /** Encodes the manual TX interval in seconds. */
-    void setManualTxInterval(int sec);
-
-    /** Decodes the destination call. */
-    QString getDestination() const;
-    /** Encodes the given destination call. */
-    void setDestination(const QString &call, uint8_t ssid);
-
-    /** Decodes the destination SSID. */
-    QString getSource() const;
-    /** Encodes the destination SSID. */
-    void setSource(const QString &call, uint8_t ssid);
-
-    /** Decodes the APRS path. */
-    QString getPath() const;
-    /** Encodes the given APRS path. */
-    void setPath(const QString &path);
-
-    /** Decodes the TX signaling. */
-    Signaling::Code getSignaling() const;
-    /** Encodes the TX signaling. */
-    void setSignaling(Signaling::Code signaling);
-
-    /** Decodes the transmit power. */
-    Channel::Power getPower() const;
-    /** Encodes the given transmit power. */
-    void setPower(Channel::Power pwr);
-
-    /** Decodes the APRS map icon. */
-    APRSSystem::Icon getIcon() const;
-    /** Encodes the specified map icon. */
-    void setIcon(APRSSystem::Icon icon);
+    /** Retunrs the pre-wave delay in ms. */
+    virtual uint preWaveDelay() const;
+    /** Sets the pre-wave delay in ms. */
+    virtual void setPreWaveDelay(uint ms);
 
     /** Configures this APRS system from the given generic config. */
-    void fromAPRSSystem(APRSSystem *sys);
+    virtual bool fromAPRSSystem(const APRSSystem *sys, Context &ctx);
     /** Constructs a generic APRS system configuration from this APRS system. */
-    APRSSystem *toAPRSSystem();
+    virtual APRSSystem *toAPRSSystem();
     /** Links the transmit channel within the generic APRS system based on the transmit frequency
      * defined within this APRS system. */
-    void linkAPRSSystem(APRSSystem *sys, CodeplugContext &ctx);
-  };
+    virtual bool linkAPRSSystem(APRSSystem *sys, Context &ctx);
 
+  };
 
   /** Represents an extension to the APRS settings.
    *
    * Memmory layout of APRS settings (0x60byte):
-   * @verbinclude d878uvaprssettingext.txt */
-  struct __attribute__((packed)) aprs_setting_ext_t {
-    uint8_t _unknown0000[6];            ///< Unknown settings block.
-    uint16_t fixed_altitude;            ///< Fixed altitude in feet, little endian.
-    uint8_t rep_position : 1,           ///< Report position flag.
-      rep_mic_e          : 1,           ///< Report MIC-E flag.
-      rep_object         : 1,           ///< Report object flag.
-      rep_item           : 1,           ///< Report item flag.
-      rep_message        : 1,           ///< Report message flag.
-      rep_wx             : 1,           ///< WX report flag.
-      rep_nmea           : 1,           ///< NMEA report flag.
-      rep_status         : 1;           ///< Report status flag.
-    uint8_t rep_other    : 1,           ///< Report "other" flag.
-      _unused0009_1      :7;            ///< Unused set to 0.
-    uint8_t _unknown000a[6];            ///< Unknown settings block.
+   * @verbinclude d878uv_aprssettingext.txt */
+  class AnalogAPRSSettingsExtensionElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    AnalogAPRSSettingsExtensionElement(uint8_t *ptr, uint size);
 
-    uint8_t _unknown0010[16];           ///< Unknown settings block.
-    uint8_t _unknown0020[16];           ///< Unknown settings block.
-    uint8_t _unknown0030[16];           ///< Unknown settings block.
-    uint8_t _unknown0040[16];           ///< Unknown settings block.
-    uint8_t _unknown0050[16];           ///< Unknown settings block.
-  };
+  public:
+    /** Constructor. */
+    AnalogAPRSSettingsExtensionElement(uint8_t *ptr);
 
-  /** Represents an APRS RX entry.
-   *
-   * Memmory layout of APRS-RX entry (0x100byte):
-   * @verbinclude d878uvaprsexentry.txt */
-  struct __attribute__((packed)) aprs_rx_entry_t {
-    uint8_t enabled;                    ///< Enabled entry 0x01=on, 0x00=off.
-    char    call[6];                    ///< Callsign, 6x ASCII, 0-terminated.
-    uint8_t ssid;                       ///< SSID [0,15], 16=off.
-  };
-
-  /** Represents the 8 GPS systems within the binary codeplug.
-   *
-   * Memmory layout of GPS systems (0x60byte):
-   * @verbinclude d878uvgpssetting.txt
-   */
-  struct __attribute__((packed)) gps_systems_t {
-    // byte 0x00
-    uint16_t digi_channels[8];     ///< 8 16bit channel indices in little-endian. VFO A=4000,
-                                   ///< VFO B=4001, Current=4002.
-    // bytes 0x10-0x2f
-    uint32_t talkgroups[8];        ///< Talkgroup IDs for all digi APRS channels, BCD encoded, big-endian.
-    // bytes 0x30-0x4f
-    uint8_t calltypes[8];          ///< Calltype for all digi APRS chanels, 0=private, 1=group, 3=all call.
-    uint8_t roaming_support;       ///< Roaming support. 0=off, 1=on.
-    uint8_t timeslots[8];          ///< Timeslots for all digi APRS channels. 0=Ch sel, 1=TS1, 2=TS2.
-    uint8_t rep_act_delay;         ///< Repeater activation delay in multiples of 100ms.
-                                   /// Default 0, range 0-1000ms.
-    uint8_t _unknown66[30];        ///< Unknown, set to 0.
-
-    /** Constructor, resets the GPS systems. */
-    gps_systems_t();
-    /** Reset the GPS systems. */
+    /** Resets the settings. */
     void clear();
-    /** Returns @c true if the specified GPS system is valid. */
-    bool isValid(int idx) const;
 
-    /** Returns the contact ID to send GPS information to for the idx-th system. */
-    uint32_t getContactId(int idx) const;
-    /** Sets the contact ID for the idx-th GPS system. */
-    void setContactId(int idx, uint32_t number);
-    /** Returns the call type for the idx-th GPS system. */
-    DigitalContact::Type getContactType(int idx) const;
-    /** Set the call type for the idx-th GPS system. */
-    void setContactType(int idx, DigitalContact::Type type);
+    /** Returns the fixed altitude in meter. */
+    virtual uint fixedAltitude() const;
+    /** Sets the fixed altitude in meter. */
+    virtual void setFixedAltitude(uint m);
 
-    /** Retruns the channel index for the idx-th GPS system. */
-    uint16_t getChannelIndex(int idx) const;
-    /** Sets the channel idx for th idx-th GPS system. */
-    void setChannelIndex(int idx, uint16_t ch_index);
+    /** Returns @c true if the report position flag is set. */
+    virtual bool reportPosition() const;
+    /** Enables/disables report position flag. */
+    virtual void enableReportPosition(bool enable);
+    /** Returns @c true if the report Mic-E flag is set. */
+    virtual bool reportMicE() const;
+    /** Enables/disables report Mic-E flag. */
+    virtual void enableReportMicE(bool enable);
+    /** Returns @c true if the report object flag is set. */
+    virtual bool reportObject() const;
+    /** Enables/disables report object flag. */
+    virtual void enableReportObject(bool enable);
+    /** Returns @c true if the report item flag is set. */
+    virtual bool reportItem() const;
+    /** Enables/disables report item flag. */
+    virtual void enableReportItem(bool enable);
+    /** Returns @c true if the report message flag is set. */
+    virtual bool reportMessage() const;
+    /** Enables/disables report message flag. */
+    virtual void enableReportMessage(bool enable);
+    /** Returns @c true if the report weather flag is set. */
+    virtual bool reportWeather() const;
+    /** Enables/disables report weather flag. */
+    virtual void enableReportWeather(bool enable);
+    /** Returns @c true if the report NMEA flag is set. */
+    virtual bool reportNMEA() const;
+    /** Enables/disables report NMEA flag. */
+    virtual void enableReportNMEA(bool enable);
+    /** Returns @c true if the report status flag is set. */
+    virtual bool reportStatus() const;
+    /** Enables/disables report status flag. */
+    virtual void enableReportStatus(bool enable);
+    /** Returns @c true if the report other flag is set. */
+    virtual bool reportOther() const;
+    /** Enables/disables report other flag. */
+    virtual void enableReportOther(bool enable);
+  };
+
+  /** Represents an analog APRS RX entry.
+   *
+   * Memmory layout of analog APRS RX entry (size 0x0008 bytes):
+   * @verbinclude d878uv_aprsrxentry.txt */
+  class AnalogAPRSRXEntryElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    AnalogAPRSRXEntryElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    AnalogAPRSRXEntryElement(uint8_t *ptr);
+
+    /** Resets the entry. */
+    void clear();
+    bool isValid() const;
+
+    /** Returns the call sign. */
+    virtual QString call() const;
+    /** Returns the SSID. */
+    virtual uint ssid() const;
+    /** Sets the call, SSID and enables the entry. */
+    virtual void setCall(const QString &call, uint ssid);
+  };
+
+  /** Represents the 8 DMR-APRS systems within the binary codeplug.
+   *
+   * Memmory layout of encoded DMR-APRS systems (size 0x0060 bytes):
+   * @verbinclude d878uv_dmraprssystems.txt */
+  class DMRAPRSSystemsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DMRAPRSSystemsElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    DMRAPRSSystemsElement(uint8_t *ptr);
+
+    /** Resets the systems. */
+    void clear();
+
+    /** Returns the digital channel index for the n-th system. */
+    virtual uint channelIndex(uint n) const;
+    /** Sets the digital channel index for the n-th system. */
+    virtual void setChannelIndex(uint n, uint idx);
+
+    /** Returns the destination contact for the n-th system. */
+    virtual uint destination(uint n) const;
+    /** Sets the destination contact for the n-th system. */
+    virtual void setDestination(uint n, uint idx);
+
+    /** Returns the call type for the n-th system. */
+    virtual DigitalContact::Type callType(uint n) const;
+    /** Sets the call type for the n-th system. */
+    virtual void setCallType(uint n, DigitalContact::Type type);
+
+    /** Returns @c true if the n-th system overrides the channel time-slot. */
+    virtual bool timeSlotOverride(uint n);
+    /** Retunrs the time slot if overriden (only valid if @c timeSlot returns true). */
+    virtual DigitalChannel::TimeSlot timeSlot(uint n) const;
+    /** Overrides the time slot of the n-th selected channel. */
+    virtual void setTimeSlot(uint n, DigitalChannel::TimeSlot ts);
+    /** Clears the time-slot override. */
+    virtual void clearTimeSlotOverride(uint n);
+
+    /** Returns @c true if the roaming is enabled. */
+    virtual bool roaming() const;
+    /** Enables/disables roaming. */
+    virtual void enableRoaming(bool enable);
+
+    /** Returns the the repeater activation delay in ms. */
+    virtual uint repeaterActivationDelay() const;
+    /** Sets the repeater activation delay in ms. */
+    virtual void setRepeaterActivationDelay(uint ms);
 
     /** Constructs all GPS system from the generic configuration. */
-    void fromGPSSystems(const Config *conf);
+    virtual bool fromGPSSystems(Context &ctx);
     /** Encodes the given GPS system. */
-    void fromGPSSystemObj(GPSSystem *sys, const Config *conf);
+    virtual bool fromGPSSystemObj(GPSSystem *sys, Context &ctx);
     /** Constructs a generic GPS system from the idx-th encoded GPS system. */
-    GPSSystem *toGPSSystemObj(int idx) const;
+    virtual GPSSystem *toGPSSystemObj(int idx) const;
     /** Links the specified generic GPS system. */
-    bool linkGPSSystem(int idx, GPSSystem *sys, const CodeplugContext &ctx) const;
+    virtual bool linkGPSSystem(int idx, GPSSystem *sys, Context &ctx) const;
   };
-
 
   /** Implements the binary representation of a roaming channel within the codeplug.
    *
@@ -1038,83 +1175,129 @@ public:
     virtual bool linkRoamingZone(RoamingZone *zone, const QHash<uint, DigitalChannel *> &map);
   };
 
-  /** Represents an encryption key.
-   * Size is 64b. */
-  struct __attribute__((packed)) encryption_key_t {
-    uint8_t index;                 ///< Index/number of excryption key, off=0x00.
-    uint8_t key[32];               ///< Binary encryption key.
-    uint8_t _unused34;             ///< Unused, set to 0x00;
-    uint8_t _unknown35;            ///< Fixed to 0x40.
-    uint8_t _unused36[28];         ///< Unused, set to 0x00;
+  /** Represents an AES encryption key.
+   *
+   * Binary representation of the key (size 0x0040 bytes):
+   * @verbinclude d878uv_aeskey.txt */
+  class AESEncryptionKeyElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    AESEncryptionKeyElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    AESEncryptionKeyElement(uint8_t *ptr);
+
+    /** Resets the key. */
+    void clear();
+
+    bool isValid() const;
+
+    /** Returns the key index. */
+    virtual uint index() const;
+    /** Sets the key index. */
+    virtual void setIndex(uint idx);
+
+    /** Returns the actual key. */
+    virtual QByteArray key() const;
+    /** Sets the key. */
+    virtual void setKey(const QByteArray &key);
   };
 
   /** Encodes some information about the radio and firmware.
    *
-   * At 0x02fa0000, size 0x100.
-   *
-   * @verbinclude d878uvradioinfo.txt */
-  struct __attribute__((packed)) radio_info_t {
+   * Binary encoding of the info, size 0x0100 bytes:
+   * @verbinclude d878uv_radioinfo.txt */
+  class RadioInfoElement: public Element
+  {
+  public:
     /** Possible frequency ranges for the AT-D878UV. */
-    enum FrequencyRange : uint8_t {
-      FR_RX_400_480_136_174_TX_400_480_136_174 = 0,
-      FR_RX_400_480_136_174_TX_400_480_136_174_STEP_12_5kHz = 1,
-      FR_RX_430_440_136_174_TX_430_440_136_174 = 2,
-      FR_RX_400_480_136_174_TX_430_440_144_146 = 3,
-      FR_RX_440_480_136_174_TX_440_480_136_174 = 4,
-      FR_RX_440_480_144_146_TX_440_480_144_146 = 5,
-      FR_RX_446_447_136_174_TX_446_447_136_174 = 6,
-      FR_RX_400_480_136_174_TX_420_450_136_174 = 7,
-      FR_RX_400_470_136_174_TX_400_470_136_174 = 8,
-      FR_RX_430_432_144_146_TX_430_432_144_146 = 9,
-      FR_RX_400_480_136_174_TX_430_450_144_148 = 10,
-      FR_RX_400_520_136_174_TX_400_520_136_174 = 11,
-      FR_RX_400_490_136_174_TX_400_490_136_174 = 12,
-      FR_RX_400_480_136_174_TX_403_470_136_174 = 13,
-      FR_RX_400_520_220_225_136_174_TX_400_520_220_225_136_174 = 14,
-      FR_RX_420_520_144_148_TX_420_520_144_148 = 15,
-      FR_RX_430_440_144_147_TX_430_440_144_147 = 16,
-      FR_RX_430_440_136_174_TX_136_174 = 17
+    enum FrequencyRange {
+      RX_400_480_136_174_TX_400_480_136_174 = 0,
+      RX_400_480_136_174_TX_400_480_136_174_STEP_12_5kHz = 1,
+      RX_430_440_136_174_TX_430_440_136_174 = 2,
+      RX_400_480_136_174_TX_430_440_144_146 = 3,
+      RX_440_480_136_174_TX_440_480_136_174 = 4,
+      RX_440_480_144_146_TX_440_480_144_146 = 5,
+      RX_446_447_136_174_TX_446_447_136_174 = 6,
+      RX_400_480_136_174_TX_420_450_136_174 = 7,
+      RX_400_470_136_174_TX_400_470_136_174 = 8,
+      RX_430_432_144_146_TX_430_432_144_146 = 9,
+      RX_400_480_136_174_TX_430_450_144_148 = 10,
+      RX_400_520_136_174_TX_400_520_136_174 = 11,
+      RX_400_490_136_174_TX_400_490_136_174 = 12,
+      RX_400_480_136_174_TX_403_470_136_174 = 13,
+      RX_400_520_220_225_136_174_TX_400_520_220_225_136_174 = 14,
+      RX_420_520_144_148_TX_420_520_144_148 = 15,
+      RX_430_440_144_147_TX_430_440_144_147 = 16,
+      RX_430_440_136_174_TX_136_174 = 17
     };
 
-    uint16_t _unknown00;           ///< Uknown informaion, usually 0x0000.
-    uint8_t  enable_full_test;     ///< Enables full test mode. DO NOT SET, MAY BRICK DEVICE.
-    FrequencyRange freq_range;     ///< Specifies the frequency range of the radio.
-    uint8_t enable_internat;       ///< None Chinese?!?
-    uint8_t _unknown05;            ///< Unknown information, usually set to 0x01.
-    uint8_t enable_band_select;    ///< Enable band select.
-    uint8_t _unknown07[4];         ///< Unknown information usually 0x00000101.
-    char band_select_passwd[4];    ///< Band select password. Set to 4 x 0x20 (space) by default.
-    uint8_t _unknown0f;            ///< Unknown information usually 0xff.
+  protected:
+    /** Hidden constructor. */
+    RadioInfoElement(uint8_t *ptr, uint size);
 
-    char radio_type[7];            ///< Radiotype as 0-terminated ASCII string.
-    uint16_t _unknown17;           ///< Unknown information usually 0x0001 LE.
-    uint8_t _unknown19[7];         ///< Unknown, usually filled with 0xff.
+  public:
+    /** Constructor. */
+    explicit RadioInfoElement(uint8_t *ptr);
 
-    uint8_t _unkown20[8];          ///< Unknown, usually filled with 0xff.
-    char prog_passwd[4];           ///< Program password, 0-terminated ASCII string.
-    char area_code[4];             ///< Area code, 0-terminated ASCII string.
+    /** Resets the info. */
+    void clear();
 
-    char serial_number[16];        ///< Serial number, 0-terminated ASCII string.
+    /** Returns @c true if full test is enabled.
+     * @warning Do not enable, may brick device! */
+    virtual bool fullTest() const;
 
-    char production_date[10];      ///< Production date, 0-terminated ASCII string.
-    uint8_t _unused4a[6];          ///< Unused, filled with 0x00.
+    /** Returns the frequency range. */
+    virtual FrequencyRange frequencyRange() const;
+    /** Sets the frequency range. */
+    virtual void setFrequencyRange(FrequencyRange range);
 
-    char maunfacture[8];           ///< Manufacture code, 0-terminated ASCII string.
-    uint8_t _unused58[8];          ///< Unused, filled with 0x00.
-    // 0x60
-    char maintained_date[16];      ///< Maintained date, 0-terminated ASCII string.
-    // 0x70
-    char dealer_code[16];          ///< Dealer code, 0-terminated ASCII string.
-    // 0x80
-    char stock_date[16];           ///< Stock date, 0-terminated ASCII string.
-    // 0x90
-    char sell_date[16];            ///< Sell date, 0-terminated ASCII string.
-    // 0xa0
-    char seller[16];               ///< Seller, 0-terminated ASCII string.
-    // 0xb0
-    char maintained_desc[0x80];    ///< Maintained date, 0-terminated ASCII string.
+    /** Returns @c true if "international" is enabled. */
+    virtual bool international() const;
+    /** Enables/disables "international". */
+    virtual void enableInternational(bool enable);
+
+    /** Returns @c true if band select is enabled. */
+    virtual bool bandSelect() const;
+    /** Enables/disables band select. */
+    virtual void enableBandSelect(bool enable);
+
+    /** Retuns the band-select password. */
+    virtual QString bandSelectPassword() const;
+    /** Sets the band-select password. */
+    virtual void setBandSelectPassword(const QString &passwd);
+
+    /** Retuns the radio type. */
+    virtual QString radioType() const;
+
+    /** Retuns the program password. */
+    virtual QString programPassword() const;
+    /** Sets the program password. */
+    virtual void setProgramPassword(const QString &passwd);
+
+    /** Retuns the area code. */
+    virtual QString areaCode() const;
+    /** Retuns the serial number. */
+    virtual QString serialNumber() const;
+    /** Retuns the production date. */
+    virtual QString productionDate() const;
+    /** Retuns the manufacturer code. */
+    virtual QString manufacturerCode() const;
+    /** Retuns the maintained date. */
+    virtual QString maintainedDate() const;
+    /** Retuns the dealer code. */
+    virtual QString dealerCode() const;
+    /** Retuns the stock date. */
+    virtual QString stockDate() const;
+    /** Retuns the sell date. */
+    virtual QString sellDate() const;
+    /** Retuns the seller. */
+    virtual QString seller() const;
+    /** Retuns the maintainer note. */
+    virtual QString maintainerNote() const;
   };
-
 
 public:
   /** Empty constructor. */
@@ -1145,13 +1328,13 @@ protected:
   bool linkChannels(Context &ctx);
 
   void allocateGeneralSettings();
-  bool encodeGeneralSettings(Config *config, const Flags &flags);
-  bool decodeGeneralSettings(Config *config);
+  bool encodeGeneralSettings(const Flags &flags, Context &ctx);
+  bool decodeGeneralSettings(Context &ctx);
 
   void allocateGPSSystems();
-  bool encodeGPSSystems(Config *config, const Flags &flags);
-  bool createGPSSystems(Config *config, CodeplugContext &ctx);
-  bool linkGPSSystems(Config *config, CodeplugContext &ctx);
+  bool encodeGPSSystems(const Flags &flags, Context &ctx);
+  bool createGPSSystems(Context &ctx);
+  bool linkGPSSystems(Context &ctx);
 
   /** Allocates memory to store all roaming channels and zones. */
   virtual void allocateRoaming();

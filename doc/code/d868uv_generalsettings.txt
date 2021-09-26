@@ -1,4 +1,4 @@
-    0                               8                               16                              24
+     7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 00 | Enable key tone               | Display mode                  | Enable automatic key lock     | Automatic shutdown time       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -6,11 +6,11 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 08 | Unknown                       | Squelch level VFO A           | Squelch level VFO B           | Power save mode               |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-0c | VOX sensitivity               | VOX delay                     | VFO scan type                 | MIC gain                      |
+0c | VOX sensitivity               | VOX delay in 100+500*n ms     | VFO scan type                 | MIC gain                      |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 10 | PF1 short press function      | PF2 short press function      | PF3 short press function      | P1 short press function       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-14 | P2 short press function       | Work mode B                   | Work mode A                   | Unknown                    ...
+14 | P2 short press function       | Work mode A                   | Work mode B                   | Unknown                    ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 18  ...                                                                                                                         ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -44,13 +44,13 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 54 |                                                                                               | Enable enhanced audio         |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-58 | VFO Scan UHF minimum frequency in 10Hz, BCD, little endian                                                                    |
+58 | VFO Scan UHF minimum frequency in 10Hz, 8-digit BCD, little endian                                                            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-5c | VFO Scan UHF maximum frequency in 10Hz, BCD, little endian                                                                    |
+5c | VFO Scan UHF maximum frequency in 10Hz, 8-digit BCD,  little endian                                                           |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-60 | VFO Scan VHF minimum frequency in 10Hz, BCD, little endian                                                                    |
+60 | VFO Scan VHF minimum frequency in 10Hz, 8-digit BCD,  little endian                                                           |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-64 | VFO Scan VHF maximum frequency in 10Hz, BCD, little endian                                                                    |
+64 | VFO Scan VHF maximum frequency in 10Hz, 8-digit BCD,  little endian                                                           |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 68 | Auto rep. offset index UHF    | Auto rep. offset index VHF    | Unknown                                                    ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -60,7 +60,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 74 | Call tone frequency 2 in Hz, little endian                    | Call tone frequency 3 in Hz, little endian                    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-78 | Call tone frequency 5 in Hz, little endian                    | Call tone frequency 5 in Hz, little endian                    |
+78 | Call tone frequency 4 in Hz, little endian                    | Call tone frequency 5 in Hz, little endian                    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 7c | Call tone duration 1 in ms, little endian                     | Call tone duration 2 in ms, little endian                     |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -86,11 +86,11 @@ a4 | Reset tone duration 1 in ms, little endian                    | Reset tone 
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 a8 | Reset tone duration 3 in ms, little endian                    | Reset tone duration 4 in ms, little endian                    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-ac | Reset tone duration 5 in ms, little endian                    | Recod delay                   | Call display mode             |
+ac | Reset tone duration 5 in ms, little endian                    | Record delay in 200ms         | Call display mode             |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 b0 | Call display color            | GPS update period             | Show zone talkgroup           | Key tone level                |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-b4 | GPS units                     |EKN|EKB| 0 |ESK|EPK| 0 | 0 | 0 | Show last heard               | Unknown                       |
+b4 | GPS units                     | 0 | 0 | 0 |EPK|ESK| 0 |EKB|ENK| Show last heard               | Unknown                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 b8 | Auto repeater VHF minimum frequency in 10Hz, little endian                                                                    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -105,4 +105,8 @@ c8 | Auto rep. direction           | Unknown                       | Enable defa
 cc | Default zone VFO B            | Default channel A             | Default channel B             | Keep last caller              |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-EKN = Enable knob lock, EKB = Enable keyboard lock, ESK = Enable side key lock, EPK = Enable "professional key" lock.
+Field description:
+ - EKN: Enable knob lock.
+ - EKB: Enable keyboard lock.
+ - ESK: Enable side key lock.
+ - EPK: Enable "professional key" lock.

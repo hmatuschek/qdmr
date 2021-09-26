@@ -1554,20 +1554,20 @@ AnytoneCodeplug::GeneralSettingsElement::setFuncKey2Short(KeyFunction func) {
 }
 
 bool
-AnytoneCodeplug::GeneralSettingsElement::vfoModeB() const {
+AnytoneCodeplug::GeneralSettingsElement::vfoModeA() const {
   return getUInt8(0x0015);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::enableVFOModeB(bool enable) {
+AnytoneCodeplug::GeneralSettingsElement::enableVFOModeA(bool enable) {
   setUInt8(0x0015, (enable ? 0x01 : 0x00));
 }
 
 bool
-AnytoneCodeplug::GeneralSettingsElement::vfoModeA() const {
+AnytoneCodeplug::GeneralSettingsElement::vfoModeB() const {
   return getUInt8(0x0016);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::enableVFOModeA(bool enable) {
+AnytoneCodeplug::GeneralSettingsElement::enableVFOModeB(bool enable) {
   setUInt8(0x0016, (enable ? 0x01 : 0x00));
 }
 
@@ -2020,214 +2020,6 @@ AnytoneCodeplug::GeneralSettingsElement::enableDisplayCall(bool enable) {
   setUInt8(0x00af, (enable ? 0x01 : 0x00));
 }
 
-AnytoneCodeplug::GeneralSettingsElement::Color
-AnytoneCodeplug::GeneralSettingsElement::callDisplayColor() const {
-  return (Color)getUInt8(0x00b0);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setCallDisplayColor(Color color) {
-  setUInt8(0x00b0, (uint)color);
-}
-
-uint
-AnytoneCodeplug::GeneralSettingsElement::gpsUpdatePeriod() const {
-  return getUInt8(0x00b1);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(uint sec) {
-  setUInt8(0x00b1, sec);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::showZoneAndContact() const {
-  return getUInt8(0x00b2);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableShowZoneAndContact(bool enable) {
-  setUInt8(0x00b2, (enable ? 0x01 : 0x00));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
-  return 0 == keyToneLevel();
-}
-uint
-AnytoneCodeplug::GeneralSettingsElement::keyToneLevel() const {
-  return ((uint)getUInt8(0x00b3))*10/15;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setKeyToneLevel(uint level) {
-  setUInt8(0x00b3, level*10/15);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
-  setUInt8(0x00b3, 0);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::gpsUnitsImperial() const {
-  return getUInt8(0x00b4);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableGPSUnitsImperial(bool enable) {
-  setUInt8(0x00b4, (enable ? 0x01 : 0x00));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::knobLock() const {
-  return getBit(0x00b5, 0);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableKnobLock(bool enable) {
-  setBit(0x00b5, 0, enable);
-}
-bool
-AnytoneCodeplug::GeneralSettingsElement::keypadLock() const {
-  return getBit(0x00b5, 1);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableKeypadLock(bool enable) {
-  setBit(0x00b5, 1, enable);
-}
-bool
-AnytoneCodeplug::GeneralSettingsElement::sidekeysLock() const {
-  return getBit(0x00b5, 3);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableSidekeysLock(bool enable) {
-  setBit(0x00b5, 3, enable);
-}
-bool
-AnytoneCodeplug::GeneralSettingsElement::professionalKeyLock() const {
-  return getBit(0x00b5, 4);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableProfessionalKeyLock(bool enable) {
-  setBit(0x00b5, 4, enable);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::showLastHeard() const {
-  return getUInt8(0x00b6);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
-  setUInt8(0x00b6, (enable ? 0x01 : 0x00));
-}
-
-uint
-AnytoneCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
-  return getBCD8_le(0x00b8)*10;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(uint Hz) {
-  setBCD8_le(0x00b8, Hz/10);
-}
-uint
-AnytoneCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyVHF() const {
-  return getBCD8_le(0x00bc)*10;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(uint Hz) {
-  setBCD8_le(0x00bc, Hz/10);
-}
-
-uint
-AnytoneCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyUHF() const {
-  return getBCD8_le(0x00c0)*10;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(uint Hz) {
-  setBCD8_le(0x00c0, Hz/10);
-}
-uint
-AnytoneCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyUHF() const {
-  return getBCD8_le(0x00c4)*10;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(uint Hz) {
-  setBCD8_le(0x00c4, Hz/10);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::AutoRepDir
-AnytoneCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
-  return (AutoRepDir)getUInt8(0x00c8);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AutoRepDir dir) {
-  setUInt8(0x00c8, (uint)dir);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::defaultChannel() const {
-  return getUInt8(0x00ca);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableDefaultChannel(bool enable) {
-  setUInt8(0x00ca, (enable ? 0x01 : 0x00));
-}
-
-uint
-AnytoneCodeplug::GeneralSettingsElement::defaultZoneIndexA() const {
-  return getUInt8(0x00cb);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setDefaultZoneIndexA(uint idx) {
-  setUInt8(0x00cb, idx);
-}
-
-uint
-AnytoneCodeplug::GeneralSettingsElement::defaultZoneIndexB() const {
-  return getUInt8(0x00cc);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setDefaultZoneIndexB(uint idx) {
-  setUInt8(0x00cc, idx);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::defaultChannelAIsVFO() const {
-  return 0xff == defaultChannelAIndex();
-}
-uint
-AnytoneCodeplug::GeneralSettingsElement::defaultChannelAIndex() const {
-  return getUInt8(0x00cd);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setDefaultChannelAIndex(uint idx) {
-  setUInt8(0x00cd, idx);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setDefaultChannelAToVFO() {
-  setDefaultChannelAIndex(0xff);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::defaultChannelBIsVFO() const {
-  return 0xff == defaultChannelBIndex();
-}
-uint
-AnytoneCodeplug::GeneralSettingsElement::defaultChannelBIndex() const {
-  return getUInt8(0x00ce);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setDefaultChannelBIndex(uint idx) {
-  setUInt8(0x00ce, idx);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setDefaultChannelBToVFO() {
-  setDefaultChannelBIndex(0xff);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::keepLastCaller() const {
-  return getUInt8(0x00cf);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
-  setUInt8(0x00cf, (enable ? 0x01 : 0x00));
-}
-
 bool
 AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
   // Set microphone gain
@@ -2240,9 +2032,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
       // Set time zone based on system time zone.
       setGPSTimeZone(QTimeZone::systemTimeZone());
       enableGetGPSPosition(false);
-      setGPSUpdatePeriod(0x05);
-      // Set measurement system based on system locale (0x00==Metric)
-      enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
     } else {
       enableGPS(false);
     }

@@ -1,24 +1,24 @@
-     0                               8                               16                              24
+     7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-00 | Unknown, set to 0xff          | TX frequency as 8 digit BDC, little-endian in 10Hz                                         ...
+00 | Digital channel index 0, 16bit little-endian                  |                                                            ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-04  ...                            | TX delay                      | Signalling type               | CTCSS tone                    |
+0c  ...                                                            | Digital channel index 7, 16bit little-endian                  |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-08 | DCS code, little-endian                                       | Manual TX interval in seconds | Auto TX interval mult. of 30s |
+10 | Destination DMR ID 0, 32bit BCD big-endian                                                                                    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-0c | Fixed location flag           | Latitude degrees              | Latitude minutes              | Latitude seconds              |
+    ...                                                                                                                         ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-10 | North/South flag              | Longitude degrees             | Longitude minutes             | Longitude seconds             |
+2c | Destination DMR ID 7, 32bit BCD big-endian                                                                                    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-14 | East/West flag                | Destination call, 6 x ASCII, 0-padded                                                      ...
+30 | Calltype channel 0            | Calltype channel 1            | Calltype channel 2            | Calltype channel 3            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-18  ...                                                                                            | Destination SSID              |
+34 | Calltype channel 4            | Calltype channel 5            | Calltype channel 6            | Calltype channel 7            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-1c | Source call, 6 x ASCII, 0-padded                                                                                           ...
+38 | Roaming support               | Timeslot channel 0            | Timeslot channel 1            | Timeslot channel 2            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-20  ...                                                            | Source SSID                   | Path, 20 x ASCII, 0-padded ...
+4c | Timeslot channel 3            | Timeslot channel 4            | Timeslot channel 5            | Timeslot channel 6            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-38 | Unused set to 0x00            | ASCII APRS Symbol             | ASCII APRS Map Icon           | Transmit power                |
+40 | Timeslot channel 7            | Rep.activation delay in 100ms | 30 unused bytes set to 0                                   ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-3c | Prewave delay in 10ms         | Unknown set to 0x01           | Unkown set to 0x03            | Unknown set to 0xff           |
+5c  ...                                                                                                                            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+

@@ -23,50 +23,29 @@
 
 #define ADDR_GENERAL_CONFIG       0x02500000
 #define GENERAL_CONFIG_SIZE       0x00000100
-static_assert(
-  GENERAL_CONFIG_SIZE == sizeof(D878UVCodeplug::general_settings_base_t),
-  "D878UVCodeplug::general_settings_base_t size check failed.");
 
 #define ADDR_GENERAL_CONFIG_EXT1  0x02501280
 #define GENERAL_CONFIG_EXT1_SIZE  0x00000030
-static_assert(
-  GENERAL_CONFIG_EXT1_SIZE == sizeof(D878UVCodeplug::general_settings_ext1_t),
-  "D878UVCodeplug::general_settings_ext1_t size check failed.");
 
 #define ADDR_GENERAL_CONFIG_EXT2  0x02501400
 #define GENERAL_CONFIG_EXT2_SIZE  0x00000100
-static_assert(
-  GENERAL_CONFIG_EXT2_SIZE == sizeof(D878UVCodeplug::general_settings_ext2_t),
-  "D878UVCodeplug::general_settings_ext2_t size check failed.");
 
 #define ADDR_APRS_SETTING         0x02501000 // Address of APRS settings
 #define APRS_SETTING_SIZE         0x00000040 // Size of the APRS settings
 
 #define ADDR_APRS_SET_EXT         0x025010A0 // Address of APRS settings extension
 #define APRS_SET_EXT_SIZE         0x00000060 // Size of APRS settings extension
-static_assert(
-  APRS_SET_EXT_SIZE == sizeof(D878UVCodeplug::aprs_setting_ext_t),
-  "D878UVCodeplug::aprs_setting_ext_t size check failed.");
 
 #define ADDR_APRS_MESSAGE         0x02501200 // Address of APRS messages
 #define APRS_MESSAGE_SIZE         0x00000040 // Size of APRS messages
-static_assert(
-  APRS_SETTING_SIZE == sizeof(D878UVCodeplug::aprs_setting_t),
-  "D878UVCodeplug::aprs_setting_t size check failed.");
 
 #define NUM_APRS_RX_ENTRY         32
 #define ADDR_APRS_RX_ENTRY        0x02501800 // Address of APRS RX list
 #define APRS_RX_ENTRY_SIZE        0x00000008 // Size of each APRS RX entry
-static_assert(
-  APRS_RX_ENTRY_SIZE == sizeof(D878UVCodeplug::aprs_rx_entry_t),
-  "D878UVCodeplug::aprs_rx_entry_t size check failed.");
 
 #define NUM_GPS_SYSTEMS           8
 #define ADDR_GPS_SETTING          0x02501040 // Address of GPS settings
 #define GPS_SETTING_SIZE          0x00000060 // Size of the GPS settings
-static_assert(
-  GPS_SETTING_SIZE == sizeof(D878UVCodeplug::gps_systems_t),
-  "D878UVCodeplug::gps_systems_t size check failed.");
 
 #define NUM_ROAMING_CHANNEL         250
 #define ADDR_ROAMING_CHANNEL_BITMAP 0x01042000
@@ -87,406 +66,6 @@ static_assert(
 #define ADDR_ENCRYPTION_KEYS      0x024C4000
 #define ENCRYPTION_KEY_SIZE       0x00000040
 #define ENCRYPTION_KEYS_SIZE      0x00004000
-
-
-/* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::general_settings_t
- * ******************************************************************************************** */
-D878UVCodeplug::general_settings_base_t::general_settings_base_t() {
-  clear();
-}
-
-void
-D878UVCodeplug::general_settings_base_t::clear() {
-  mic_gain = 2;
-}
-
-uint
-D878UVCodeplug::general_settings_base_t::getMicGain() const {
-  return (mic_gain+1)*2;
-}
-void
-D878UVCodeplug::general_settings_base_t::setMicGain(uint gain) {
-  mic_gain = (gain-1)/2;
-}
-
-void
-D878UVCodeplug::general_settings_base_t::fromConfig(const Config *config, const Flags &flags) {
-  setMicGain(config->micLevel());
-
-  // Set SMS format
-  sms_format = SMS_FMT_DMR;
-  // Enable "amateur mode", this enables all menu items.
-  enable_pro_mode = 0x00;
-
-  // If auto-enable roaming is enabled
-  if (flags.autoEnableRoaming) {
-    // Check if roaming is required -> configure & enable
-    if (config->requiresRoaming()) {
-      repchk_enable     = 0x01;
-      repchk_interval   = 0x05; // 0x05 == 30s
-      repchk_recon      = 0x02; // 0x02 == 3 times
-      repchk_notify     = 0x00; // 0x00 == no notification
-      roam_enable       = 0x01;
-      roam_default_zone = 0x00; // Default roaming zone index
-      roam_start_cond   = 0x01; // Start condition == out-of-range
-    } else {
-      // If roaming is not required -> disable repeater check and roaming
-      repchk_enable = 0x00;
-      roam_enable   = 0x00;
-    }
-  }
-
-  // If auto-enable GPS is enabled
-  if (flags.autoEnableGPS) {
-    // Check if GPS is required -> enable
-    if (config->requiresGPS()) {
-      gps_enable = 0x01;
-      // Set time zone based on system time zone.
-      int offset = QTimeZone::systemTimeZone().offsetFromUtc(QDateTime::currentDateTime());
-      timezone = 12 + offset/3600;
-      gps_sms_enable = 0x00;
-      gps_message_enable = 0x00;
-      gps_sms_interval = 0x05;
-      // Set measurement system based on system locale (0x00==Metric)
-      gps_unit = (QLocale::MetricSystem == QLocale::system().measurementSystem()) ? 0x00 : 0x01;
-    } else {
-      gps_enable = 0x00;
-    }
-  }
-}
-
-void
-D878UVCodeplug::general_settings_base_t::updateConfig(Config *config) {
-  config->setMicLevel(getMicGain());
-  // Check if default roaming zone is defined
-  if (roam_default_zone >= config->roaming()->count()) {
-    roam_default_zone = 0;
-  }
-}
-
-
-/* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::general_settings_ext1_t
- * ******************************************************************************************** */
-void
-D878UVCodeplug::general_settings_ext1_t::fromConfig(const Config *conf, const Flags &flags) {
-  Q_UNUSED(conf)
-  Q_UNUSED(flags)
-  memset(gps_message, 0, sizeof(gps_message));
-}
-
-
-/* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::general_settings_ext1_t
- * ******************************************************************************************** */
-void
-D878UVCodeplug::general_settings_ext2_t::fromConfig(const Config *conf, const Flags &flags) {
-  Q_UNUSED(conf)
-  Q_UNUSED(flags)
-  // Do not send talker alias
-  send_alias = 0x00;
-  // Enable only GPS here.
-  gps_mode = 0x00;
-}
-
-
-/* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::aprs_system_t
- * ******************************************************************************************** */
-bool
-D878UVCodeplug::aprs_setting_t::isValid() const {
-  return getFrequency() && (! getDestination().isEmpty()) && (! getSource().isEmpty());
-}
-
-double
-D878UVCodeplug::aprs_setting_t::getFrequency() const {
-  return decode_frequency(qFromBigEndian(frequency));
-}
-void
-D878UVCodeplug::aprs_setting_t::setFrequency(double freq) {
-  frequency = qToBigEndian(encode_frequency(freq));
-}
-
-int
-D878UVCodeplug::aprs_setting_t::getAutoTXInterval() const {
-  return int(auto_tx_interval)*30;
-}
-void
-D878UVCodeplug::aprs_setting_t::setAutoTxInterval(int sec) {
-  if (0 == sec)
-    auto_tx_interval = 0;
-  else if (30 >= sec)
-    auto_tx_interval = 1;
-  else
-    auto_tx_interval = (sec-16)/15;
-}
-
-int
-D878UVCodeplug::aprs_setting_t::getManualTXInterval() const {
-  return manual_tx_interval;
-}
-void
-D878UVCodeplug::aprs_setting_t::setManualTxInterval(int sec) {
-  manual_tx_interval = sec;
-}
-
-QString
-D878UVCodeplug::aprs_setting_t::getDestination() const {
-  return decode_ascii(to_call, 6, 0x20);
-}
-void
-D878UVCodeplug::aprs_setting_t::setDestination(const QString &call, uint8_t ssid) {
-  encode_ascii(to_call, call, 6, 0x20);
-  to_ssid = std::min(uint8_t(16), ssid);
-}
-
-QString
-D878UVCodeplug::aprs_setting_t::getSource() const {
-  return decode_ascii(from_call, 6, 0x20);
-}
-void
-D878UVCodeplug::aprs_setting_t::setSource(const QString &call, uint8_t ssid) {
-  encode_ascii(from_call, call, 6, 0x20);
-  from_ssid = ssid;
-}
-
-QString
-D878UVCodeplug::aprs_setting_t::getPath() const {
-  return decode_ascii(path, 20, 0x00);
-}
-void
-D878UVCodeplug::aprs_setting_t::setPath(const QString &path) {
-  encode_ascii(this->path, path, 20, 0x00);
-}
-
-void
-D878UVCodeplug::aprs_setting_t::setSignaling(Signaling::Code code) {
-  if (Signaling::SIGNALING_NONE == code) {
-    sig_type = SIG_OFF;
-    ctcss = dcs = 0;
-  } else if (Signaling::isCTCSS(code)) {
-    sig_type = SIG_CTCSS;
-    ctcss = ctcss_code2num(code);
-    dcs = 0;
-  } else if (Signaling::isDCSNormal(code)) {
-    sig_type = SIG_DCS;
-    ctcss = 0;
-    dcs = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code)));
-  } else if (Signaling::isDCSInverted(code)) {
-    sig_type = SIG_DCS;
-    dcs = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code))+512);
-  }
-}
-Signaling::Code
-D878UVCodeplug::aprs_setting_t::getSignaling() const {
-  if (SIG_CTCSS == sig_type) {
-    return ctcss_num2code((ctcss<52) ? ctcss : 0);
-  } else if (SIG_DCS == sig_type) {
-    uint16_t dcsnum = dec_to_oct(qFromLittleEndian(dcs));
-    if (512 <= dcsnum)
-      return Signaling::fromDCSNumber(dcsnum-512, true);
-    return Signaling::fromDCSNumber(dcsnum, false);
-  }
-  return Signaling::SIGNALING_NONE;
-}
-
-Channel::Power
-D878UVCodeplug::aprs_setting_t::getPower() const {
-  switch (power) {
-  case POWER_LOW: return Channel::Power::Low;
-  case POWER_MID: return Channel::Power::Mid;
-  case POWER_HIGH: return Channel::Power::High;
-  case POWER_TURBO: return Channel::Power::Max;
-  default: break;
-  }
-  return Channel::Power::High;
-}
-
-void
-D878UVCodeplug::aprs_setting_t::setPower(Channel::Power pwr) {
-  switch (pwr) {
-  case Channel::Power::Min:
-  case Channel::Power::Low:
-    power = aprs_setting_t::POWER_LOW;
-    break;
-  case Channel::Power::Mid:
-    power = aprs_setting_t::POWER_MID;
-    break;
-  case Channel::Power::High:
-    power = aprs_setting_t::POWER_HIGH;
-    break;
-  case Channel::Power::Max:
-    power = aprs_setting_t::POWER_TURBO;
-    break;
-  }
-}
-
-APRSSystem::Icon
-D878UVCodeplug::aprs_setting_t::getIcon() const {
-  return code2aprsicon(table, icon);
-}
-void
-D878UVCodeplug::aprs_setting_t::setIcon(APRSSystem::Icon icon) {
-  this->table = aprsicon2tablecode(icon);
-  this->icon = aprsicon2iconcode(icon);
-}
-
-void
-D878UVCodeplug::aprs_setting_t::fromAPRSSystem(APRSSystem *sys) {
-  _unknown0 = 0xff;
-  setFrequency(sys->revertChannel()->txFrequency());
-  tx_delay = 0x03;
-  setSignaling(sys->revertChannel()->txTone());
-  setManualTxInterval(sys->period());
-  setAutoTxInterval(sys->period());
-  tx_tone_enable = 0;
-
-  setDestination(sys->destination(), sys->destSSID());
-  setSource(sys->source(), sys->srcSSID());
-  setPath(sys->path());
-  _pad56 = 0;
-  setIcon(sys->icon());
-  setPower(sys->revertChannel()->power());
-  prewave_delay = 0;
-  _unknown61 = 0x01;
-  _unknown62 = 0x03;
-  _unknown63 = 0xff;
-}
-
-APRSSystem *
-D878UVCodeplug::aprs_setting_t::toAPRSSystem() {
-  return new APRSSystem(
-        tr("APRS %1").arg(getDestination()), nullptr,
-        getDestination(), to_ssid, getSource(), from_ssid,
-        getPath(), getIcon(), "", getAutoTXInterval());
-}
-
-void
-D878UVCodeplug::aprs_setting_t::linkAPRSSystem(APRSSystem *sys, CodeplugContext &ctx) {
-  // First, try to find a matching analog channel in list
-  AnalogChannel *ch = ctx.config()->channelList()->findAnalogChannelByTxFreq(getFrequency());
-  if (! ch) {
-    // If no channel is found, create one with the settings from APRS channel:
-    ch = new AnalogChannel("APRS Channel", getFrequency(), getFrequency(), getPower(),
-                           0, false, AnalogChannel::Admit::Free, 1, Signaling::SIGNALING_NONE,
-                           getSignaling(), AnalogChannel::Bandwidth::Wide, nullptr);
-    logInfo() << "No matching APRS chanel found for TX frequency " << getFrequency()
-              << ", create one as 'APRS Channel'";
-    ctx.config()->channelList()->add(ch);
-  }
-  sys->setRevertChannel(ch);
-}
-
-
-/* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::gps_systems_t
- * ******************************************************************************************** */
-D878UVCodeplug::gps_systems_t::gps_systems_t() {
-  clear();
-}
-
-void
-D878UVCodeplug::gps_systems_t::clear() {
-  //memset(this, 0, sizeof(gps_systems_t));
-  for (int i=0; i<8; i++)
-    setChannelIndex(i, 4002);
-}
-
-bool
-D878UVCodeplug::gps_systems_t::isValid(int idx) const {
-  if ((idx<0)||(idx>7))
-    return false;
-  return 0 != this->getContactId(idx);
-}
-
-uint32_t
-D878UVCodeplug::gps_systems_t::getContactId(int idx) const {
-  return decode_dmr_id_bcd((uint8_t *)&(talkgroups[idx]));
-}
-void
-D878UVCodeplug::gps_systems_t::setContactId(int idx, uint32_t number) {
-  encode_dmr_id_bcd((uint8_t *)&(talkgroups[idx]), number);
-}
-
-DigitalContact::Type
-D878UVCodeplug::gps_systems_t::getContactType(int idx) const {
-  switch (calltypes[idx]) {
-  case 1: return DigitalContact::GroupCall;
-  case 2: return DigitalContact::AllCall;
-  default:
-    return DigitalContact::PrivateCall;
-  }
-}
-void
-D878UVCodeplug::gps_systems_t::setContactType(int idx, DigitalContact::Type type) {
-  switch (type) {
-  case DigitalContact::PrivateCall: calltypes[idx]  = 0; break;
-  case DigitalContact::GroupCall: calltypes[idx]  = 1; break;
-  case DigitalContact::AllCall: calltypes[idx]  = 2; break;
-  }
-}
-
-uint16_t
-D878UVCodeplug::gps_systems_t::getChannelIndex(int idx) const {
-  return qFromLittleEndian(digi_channels[idx]);
-}
-void
-D878UVCodeplug::gps_systems_t::setChannelIndex(int idx, uint16_t ch_index) {
-  digi_channels[idx] = qToLittleEndian(ch_index);
-}
-
-void
-D878UVCodeplug::gps_systems_t::fromGPSSystemObj(GPSSystem *sys, const Config *conf) {
-  int idx = conf->posSystems()->indexOfGPSSys(sys);
-  if ((idx < 0) || idx > 7)
-    return;
-  if (sys->hasContact()) {
-    setContactId(idx, sys->contactObj()->number());
-    setContactType(idx, sys->contactObj()->type());
-  }
-  if (sys->hasRevertChannel() && (SelectedChannel::get() != (Channel *)sys->revertChannel())) {
-    digi_channels[idx] = conf->channelList()->indexOf(sys->revertChannel());
-    timeslots[idx] = 0; // Use TS of channel
-  }
-}
-
-void
-D878UVCodeplug::gps_systems_t::fromGPSSystems(const Config *conf) {
-  if (conf->posSystems()->gpsCount() > 8)
-    return;
-  for (int i=0; i<conf->posSystems()->gpsCount(); i++)
-    fromGPSSystemObj(conf->posSystems()->gpsSystem(i), conf);
-}
-
-GPSSystem *
-D878UVCodeplug::gps_systems_t::toGPSSystemObj(int idx) const {
-  if (! isValid(idx))
-    return nullptr;
-  return new GPSSystem(tr("GPS Sys #%1").arg(idx+1));
-}
-
-bool
-D878UVCodeplug::gps_systems_t::linkGPSSystem(int idx, GPSSystem *sys, const CodeplugContext &ctx) const {
-  // Clear revert channel from GPS system
-  sys->setRevertChannel(nullptr);
-  // if a revert channel is defined -> link to it
-  if (ctx.hasChannel(getChannelIndex(idx)) && ctx.getChannel(getChannelIndex(idx))->is<DigitalChannel>())
-    sys->setRevertChannel(ctx.getChannel(getChannelIndex(idx))->as<DigitalChannel>());
-
-  // Search for a matching contact in contacts
-  DigitalContact *cont = ctx.config()->contacts()->findDigitalContact(getContactId(idx));
-  // If no matching contact is found, create one
-  if (nullptr == cont) {
-    cont = new DigitalContact(getContactType(idx), tr("GPS #%1 Contact").arg(idx+1),
-                              getContactId(idx), false);
-    ctx.config()->contacts()->add(cont);
-  }
-  // link contact to GPS system.
-  sys->setContact(cont);
-
-  return true;
-}
 
 
 /* ******************************************************************************************** *
@@ -846,6 +425,1648 @@ D878UVCodeplug::RoamingZoneElement::linkRoamingZone(
 
 
 /* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::GeneralSettingsElement
+ * ******************************************************************************************** */
+D878UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, uint size)
+  : AnytoneCodeplug::GeneralSettingsElement(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
+  : AnytoneCodeplug::GeneralSettingsElement(ptr, 0x0100)
+{
+  // pass...
+}
+
+void
+D878UVCodeplug::GeneralSettingsElement::clear() {
+  AnytoneCodeplug::GeneralSettingsElement::clear();
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::transmitTimeout() const {
+  return ((uint)getUInt8(0x0004))*30;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setTransmitTimeout(uint tot) {
+  setUInt8(0x0004, tot/30);
+}
+
+D878UVCodeplug::GeneralSettingsElement::Language
+D878UVCodeplug::GeneralSettingsElement::language() const {
+  return (Language)getUInt8(0x0005);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setLanguage(Language lang) {
+  setUInt8(0x0005, (uint)lang);
+}
+
+double
+D878UVCodeplug::GeneralSettingsElement::vfoFrequencyStep() const {
+  switch (getUInt8(0x0008)) {
+  case FREQ_STEP_2_5kHz: return 2.5;
+  case FREQ_STEP_5kHz: return 5;
+  case FREQ_STEP_6_25kHz: return 6.25;
+  case FREQ_STEP_10kHz: return 10;
+  case FREQ_STEP_12_5kHz: return 12.5;
+  case FREQ_STEP_20kHz: return 20;
+  case FREQ_STEP_25kHz: return 25;
+  case FREQ_STEP_50kHz: return 50;
+  }
+  return 2.5;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setVFOFrequencyStep(double kHz) {
+  if (kHz <= 2.5)
+    setUInt8(0x0008, FREQ_STEP_2_5kHz);
+  else if (kHz <= 5)
+    setUInt8(0x0008, FREQ_STEP_5kHz);
+  else if (kHz <= 6.25)
+    setUInt8(0x0008, FREQ_STEP_6_25kHz);
+  else if (kHz <= 10)
+    setUInt8(0x0008, FREQ_STEP_10kHz);
+  else if (kHz <= 12.5)
+    setUInt8(0x0008, FREQ_STEP_12_5kHz);
+  else if (kHz <= 20)
+    setUInt8(0x0008, FREQ_STEP_20kHz);
+  else if (kHz <= 25)
+    setUInt8(0x0008, FREQ_STEP_25kHz);
+  else
+    setUInt8(0x0008, FREQ_STEP_50kHz);
+}
+
+D878UVCodeplug::GeneralSettingsElement::STEType
+D878UVCodeplug::GeneralSettingsElement::steType() const {
+  return (STEType)getUInt8(0x0017);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setSTEType(STEType type) {
+  setUInt8(0x0017, (uint)type);
+}
+D878UVCodeplug::GeneralSettingsElement::STEFrequency
+D878UVCodeplug::GeneralSettingsElement::steFrequency() const {
+  return (STEFrequency)getUInt8(0x0018);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setSTEFrequency(STEFrequency freq) {
+  setUInt8(0x0018, (uint)freq);
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::groupCallHangTime() const {
+  return getUInt8(0x0019);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setGroupCallHangTime(uint sec) {
+  setUInt8(0x0019, sec);
+}
+uint
+D878UVCodeplug::GeneralSettingsElement::privateCallHangTime() const {
+  return getUInt8(0x001a);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setPrivateCallHangTime(uint sec) {
+  setUInt8(0x001a, sec);
+}
+uint
+D878UVCodeplug::GeneralSettingsElement::preWaveDelay() const {
+  return ((uint)getUInt8(0x001b))*20;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setPreWaveDelay(uint ms) {
+  setUInt8(0x001b, ms/20);
+}
+uint
+D878UVCodeplug::GeneralSettingsElement::wakeHeadPeriod() const {
+  return ((uint)getUInt8(0x001c))*20;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setWakeHeadPeriod(uint ms) {
+  setUInt8(0x001c, ms/20);
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::wfmChannelIndex() const {
+  return getUInt8(0x001d);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setWFMChannelIndex(uint idx) {
+  setUInt8(0x001d, idx);
+}
+bool
+D878UVCodeplug::GeneralSettingsElement::wfmVFOEnabled() const {
+  return getUInt8(0x001e);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableWFMVFO(bool enable) {
+  setUInt8(0x001e, (enable ? 0x01 : 0x00));
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::dtmfToneDuration() const {
+  switch (getUInt8(0x0023)) {
+  case DTMF_DUR_50ms:  return 50;
+  case DTMF_DUR_100ms: return 100;
+  case DTMF_DUR_200ms: return 200;
+  case DTMF_DUR_300ms: return 300;
+  case DTMF_DUR_500ms: return 500;
+  }
+  return 50;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setDTMFToneDuration(uint ms) {
+  if (ms<=50) {
+    setUInt8(0x0023, DTMF_DUR_50ms);
+  } else if (ms<=100) {
+    setUInt8(0x0023, DTMF_DUR_100ms);
+  } else if (ms<=200) {
+    setUInt8(0x0023, DTMF_DUR_200ms);
+  } else if (ms<=300) {
+    setUInt8(0x0023, DTMF_DUR_300ms);
+  } else {
+    setUInt8(0x0023, DTMF_DUR_500ms);
+  }
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::manDown() const {
+  return getUInt8(0x0024);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableManDown(bool enable) {
+  setUInt8(0x0024, (enable ? 0x01 : 0x00));
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::wfmMonitor() const {
+  return getUInt8(0x002b);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableWFMMonitor(bool enable) {
+  setUInt8(0x002b, (enable ? 0x01 : 0x00));
+}
+
+D878UVCodeplug::GeneralSettingsElement::TBSTFrequency
+D878UVCodeplug::GeneralSettingsElement::tbstFrequency() const {
+  return (TBSTFrequency)getUInt8(0x002e);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setTBSTFrequency(TBSTFrequency freq) {
+  setUInt8(0x002e, (uint)freq);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::proMode() const {
+  return getUInt8(0x0034);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableProMode(bool enable) {
+  setUInt8(0x0034, (enable ? 0x01 : 0x00));
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::filterOwnID() const {
+  return getUInt8(0x0038);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableFilterOwnID(bool enable) {
+  setUInt8(0x0038, (enable ? 0x01 : 0x00));
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::remoteStunKill() const {
+  return getUInt8(0x003c);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableRemoteStunKill(bool enable) {
+  setUInt8(0x003c, (enable ? 0x01 : 0x00));
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::remoteMonitor() const {
+  return getUInt8(0x003e);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableRemoteMonitor(bool enable) {
+  setUInt8(0x003e, (enable ? 0x01 : 0x00));
+}
+
+D878UVCodeplug::GeneralSettingsElement::SlotMatch
+D878UVCodeplug::GeneralSettingsElement::monitorSlotMatch() const {
+  return (SlotMatch)getUInt8(0x0049);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setMonitorSlotMatch(SlotMatch match) {
+  setUInt8(0x0049, (uint)match);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::monitorColorCodeMatch() const {
+  return getUInt8(0x004a);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableMonitorColorCodeMatch(bool enable) {
+  setUInt8(0x004a, (enable ? 0x01 : 0x00));
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::monitorIDMatch() const {
+  return getUInt8(0x004b);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableMonitorIDMatch(bool enable) {
+  setUInt8(0x004b, (enable ? 0x01 : 0x00));
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::monitorTimeSlotHold() const {
+  return getUInt8(0x004c);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableMonitorTimeSlotHold(bool enable) {
+  setUInt8(0x004c, (enable ? 0x01 : 0x00));
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::manDownDelay() const {
+  return getUInt8(0x004f);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setManDownDelay(uint sec) {
+  setUInt8(0x004f, sec);
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::analogCallHold() const {
+  return getUInt8(0x0050);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setAnalogCallHold(uint sec) {
+  setUInt8(0x0050, sec);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::gpsRangReporting() const {
+  return getUInt8(0x0053);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableGPSRangeReporting(bool enable) {
+  setUInt8(0x0053, (enable ? 0x01 : 0x00));
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::maintainCallChannel() const {
+  return getUInt8(0x006e);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableMaintainCalLChannel(bool enable) {
+  setUInt8(0x0063, (enable ? 0x01 : 0x00));
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::priorityZoneAIndex() const {
+  return getUInt8(0x006f);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setPriorityZoneAIndex(uint idx) {
+  setUInt8(0x006f, idx);
+}
+uint
+D878UVCodeplug::GeneralSettingsElement::priorityZoneBIndex() const {
+  return getUInt8(0x0070);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setPriorityZoneBIndex(uint idx) {
+  setUInt8(0x0070, idx);
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::gpsRangingInterval() const {
+  return getUInt8(0x00b5);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setGPSRangingInterval(uint sec) {
+  setUInt8(0x00b5, sec);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::displayChannelNumber() const {
+  return getUInt8(0x00b8);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableDisplayChannelNumber(bool enable) {
+  setUInt8(0x00b8, (enable ? 0x01 : 0x00));
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::displayContact() const {
+  return getUInt8(0x00b9);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableDisplayContact(bool enable) {
+  setUInt8(0x00b8, (enable ? 0x01 : 0x00));
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::autoRoamPeriod() const {
+  return getUInt8(0x00ba);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setAutoRoamPeriod(uint min) {
+  setUInt8(0x00ba, min);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
+  return 0 == keyToneLevel();
+}
+uint
+D878UVCodeplug::GeneralSettingsElement::keyToneLevel() const {
+  return ((uint)getUInt8(0x00bb))*10/15;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setKeyToneLevel(uint level) {
+  setUInt8(0x00bb, level*10/15);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
+  setUInt8(0x00bb, 0);
+}
+
+D878UVCodeplug::GeneralSettingsElement::Color
+D878UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
+  return (Color)getUInt8(0x00bc);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setCallDisplayColor(Color color) {
+  setUInt8(0x00bc, (uint)color);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::gpsUnitsImperial() const {
+  return getUInt8(0x00bd);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableGPSUnitsImperial(bool enable) {
+  setUInt8(0x00bd, (enable ? 0x01 : 0x00));
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::knobLock() const {
+  return getBit(0x00be, 0);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableKnobLock(bool enable) {
+  setBit(0x00be, 0, enable);
+}
+bool
+D878UVCodeplug::GeneralSettingsElement::keypadLock() const {
+  return getBit(0x00be, 1);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableKeypadLock(bool enable) {
+  setBit(0x00be, 1, enable);
+}
+bool
+D878UVCodeplug::GeneralSettingsElement::sidekeysLock() const {
+  return getBit(0x00be, 3);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableSidekeysLock(bool enable) {
+  setBit(0x00be, 3, enable);
+}
+bool
+D878UVCodeplug::GeneralSettingsElement::keyLockForced() const {
+  return getBit(0x00be, 4);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableKeyLockForced(bool enable) {
+  setBit(0x00be, 4, enable);
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::autoRoamDelay() const {
+  return getUInt8(0x00bf);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setAutoRoamDelay(uint sec) {
+  setUInt8(0x00bf, sec);
+}
+
+D878UVCodeplug::GeneralSettingsElement::Color
+D878UVCodeplug::GeneralSettingsElement::standbyTextColor() const {
+  return (Color)getUInt8(0x00c0);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setStandbyTextColor(Color color) {
+  setUInt8(0x00c0, (uint)color);
+}
+
+D878UVCodeplug::GeneralSettingsElement::Color
+D878UVCodeplug::GeneralSettingsElement::standbyImageColor() const {
+  return (Color)getUInt8(0x00c1);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setStandbyImageColor(Color color) {
+  setUInt8(0x00c1, (uint)color);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::showLastHeard() const {
+  return getUInt8(0x00c2);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
+  setUInt8(0x00c2, (enable ? 0x01 : 0x00));
+}
+
+D878UVCodeplug::GeneralSettingsElement::SMSFormat
+D878UVCodeplug::GeneralSettingsElement::smsFormat() const {
+  return (SMSFormat) getUInt8(0x00c3);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setSMSFormat(SMSFormat fmt) {
+  setUInt8(0x00c3, (uint)fmt);
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
+  return getBCD8_le(0x00c4)*10;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(uint Hz) {
+  setBCD8_le(0x00c4, Hz/10);
+}
+uint
+D878UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyVHF() const {
+  return getBCD8_le(0x00c8)*10;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(uint Hz) {
+  setBCD8_le(0x00c8, Hz/10);
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyUHF() const {
+  return getBCD8_le(0x00cc)*10;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(uint Hz) {
+  setBCD8_le(0x00cc, Hz/10);
+}
+uint
+D878UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyUHF() const {
+  return getBCD8_le(0x00d0)*10;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(uint Hz) {
+  setBCD8_le(0x00d0, Hz/10);
+}
+
+D878UVCodeplug::GeneralSettingsElement::AutoRepDir
+D878UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
+  return (AutoRepDir)getUInt8(0x00d4);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AutoRepDir dir) {
+  setUInt8(0x00d4, (uint)dir);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::defaultChannel() const {
+  return getUInt8(0x00d7);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableDefaultChannel(bool enable) {
+  setUInt8(0x00d7, (enable ? 0x01 : 0x00));
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::defaultZoneIndexA() const {
+  return getUInt8(0x00d8);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexA(uint idx) {
+  setUInt8(0x00d8, idx);
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::defaultZoneIndexB() const {
+  return getUInt8(0x00d9);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexB(uint idx) {
+  setUInt8(0x00d9, idx);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::defaultChannelAIsVFO() const {
+  return 0xff == defaultChannelAIndex();
+}
+uint
+D878UVCodeplug::GeneralSettingsElement::defaultChannelAIndex() const {
+  return getUInt8(0x00da);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setDefaultChannelAIndex(uint idx) {
+  setUInt8(0x00da, idx);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setDefaultChannelAToVFO() {
+  setDefaultChannelAIndex(0xff);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::defaultChannelBIsVFO() const {
+  return 0xff == defaultChannelBIndex();
+}
+uint
+D878UVCodeplug::GeneralSettingsElement::defaultChannelBIndex() const {
+  return getUInt8(0x00db);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setDefaultChannelBIndex(uint idx) {
+  setUInt8(0x00db, idx);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setDefaultChannelBToVFO() {
+  setDefaultChannelBIndex(0xff);
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::defaultRoamingZoneIndex() const {
+  return getUInt8(0x00dc);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setDefaultRoamingZoneIndex(uint idx) {
+  setUInt8(0x00dc, idx);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::repeaterRangeCheck() const {
+  return getUInt8(0x00dd);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableRepeaterRangeCheck(bool enable) {
+  setUInt8(0x00dd, (enable ? 0x01 : 0x00));
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::repeaterRangeCheckInterval() const {
+  return ((uint)getUInt8(0x00de))*5;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setRepeaterRangeCheckInterval(uint sec) {
+  setUInt8(0x00de, sec/5);
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::repeaterRangeCheckCount() const {
+  return getUInt8(0x00df);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setRepeaterRangeCheckCount(uint n) {
+  setUInt8(0x00df, n);
+}
+
+D878UVCodeplug::GeneralSettingsElement::RoamStart
+D878UVCodeplug::GeneralSettingsElement::roamingStartCondition() const {
+  return (RoamStart)getUInt8(0x00e0);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setRoamingStartCondition(RoamStart cond) {
+  setUInt8(0x00e0, (uint)cond);
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::backlightTXDuration() const {
+  return getUInt8(0x00e1);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setBacklightTXDuration(uint sec) {
+  setUInt8(0x00e1, sec);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::separateDisplay() const {
+  return getUInt8(0x00e2);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableSeparateDisplay(bool enable) {
+  setUInt8(0x00e2, (enable ? 0x01 : 0x00));
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::keepCaller() const {
+  return getUInt8(0x00e3);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableKeepCaller(bool enable) {
+  setUInt8(0x00e3, (enable ? 0x01 : 0x00));
+}
+
+D878UVCodeplug::GeneralSettingsElement::Color
+D878UVCodeplug::GeneralSettingsElement::channelNameColor() const {
+  return (Color) getUInt8(0x00e4);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setChannelNameColor(Color color) {
+  setUInt8(0x00e4, (uint)color);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::repeaterCheckNotification() const {
+  return getUInt8(0x00e5);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableRepeaterCheckNotification(bool enable) {
+  setUInt8(0x00e5, (enable ? 0x01 : 0x00));
+}
+
+
+uint
+D878UVCodeplug::GeneralSettingsElement::backlightRXDuration() const {
+  return getUInt8(0x00e6);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setBacklightRXDuration(uint sec) {
+  setUInt8(0x00e6, sec);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::roaming() const {
+  return getUInt8(0x00e7);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableRoaming(bool enable) {
+  setUInt8(0x00e7, (enable ? 0x01 : 0x00));
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::muteDelay() const {
+  return getUInt8(0x00e9)+1;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setMuteDelay(uint min) {
+  if (1>min) min = 1;
+  setUInt8(0x00e9, min-1);
+}
+
+uint
+D878UVCodeplug::GeneralSettingsElement::repeaterCheckNumNotifications() const {
+  return getUInt8(0x00ea);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setRepeaterCheckNumNotifications(uint num) {
+  setUInt8(0x00ea, num);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::bootGPSCheck() const {
+  return getUInt8(0x00eb);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableBootGPSCheck(bool enable) {
+  setUInt8(0x00eb, (enable ? 0x01 : 0x00));
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::bootReset() const {
+  return getUInt8(0x00ec);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableBootReset(bool enable) {
+  setUInt8(0x00ec, (enable ? 0x01 : 0x00));
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
+    return false;
+
+  // Set measurement system based on system locale (0x00==Metric)
+  enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
+
+  return true;
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx))
+    return false;
+  return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::GPSMessageElement
+ * ******************************************************************************************** */
+D878UVCodeplug::GPSMessageElement::GPSMessageElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::GPSMessageElement::GPSMessageElement(uint8_t *ptr)
+  : Element(ptr, 0x0030)
+{
+  // pass...
+}
+
+void
+D878UVCodeplug::GPSMessageElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+QString
+D878UVCodeplug::GPSMessageElement::message() const {
+  return readASCII(0x0000, 32, 0x00);
+}
+void
+D878UVCodeplug::GPSMessageElement::setMessage(const QString &message) {
+  writeASCII(0x0000, message, 32, 0x00);
+}
+
+bool
+D878UVCodeplug::GPSMessageElement::fromConfig(const Flags &flags, Context &ctx) {
+  return true;
+}
+
+bool
+D878UVCodeplug::GPSMessageElement::updateConfig(Context &ctx) const {
+  return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::GeneralSettingsExtensionElement
+ * ******************************************************************************************** */
+D878UVCodeplug::GeneralSettingsExtensionElement::GeneralSettingsExtensionElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::GeneralSettingsExtensionElement::GeneralSettingsExtensionElement(uint8_t *ptr)
+  : Element(ptr, 0x0100)
+{
+  // pass...
+}
+
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsExtensionElement::sendTalkerAlias() const {
+  return getUInt8(0x0000);
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::enableSendTalkerAlias(bool enable) {
+  setUInt8(0x0000, (enable ? 0x01 : 0x00));
+}
+
+D878UVCodeplug::GeneralSettingsExtensionElement::TalkerAliasDisplay
+D878UVCodeplug::GeneralSettingsExtensionElement::talkerAliasDisplay() const {
+  return (TalkerAliasDisplay)getUInt8(0x001e);
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setTalkerAliasDisplay(TalkerAliasDisplay mode) {
+  setUInt8(0x001e, (uint)mode);
+}
+
+D878UVCodeplug::GeneralSettingsExtensionElement::TalkerAliasEncoding
+D878UVCodeplug::GeneralSettingsExtensionElement::talkerAliasEncoding() const {
+  return (TalkerAliasEncoding)getUInt8(0x001f);
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setTalkerAliasEncoding(TalkerAliasEncoding enc) {
+  setUInt8(0x001f, (uint)enc);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsExtensionElement::hasAutoRepeaterUHF2OffsetIndex() const {
+  return 0xff != autoRepeaterUHF2OffsetIndex();
+}
+uint
+D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterUHF2OffsetIndex() const {
+  return getUInt8(0x0022);
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2OffsetIndex(uint idx) {
+  setUInt8(0x0022, idx);
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::clearAutoRepeaterUHF2OffsetIndex() {
+  setAutoRepeaterUHF2OffsetIndex(0xff);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsExtensionElement::hasAutoRepeaterVHF2OffsetIndex() const {
+  return 0xff != autoRepeaterVHF2OffsetIndex();
+}
+uint
+D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterVHF2OffsetIndex() const {
+  return getUInt8(0x0023);
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2OffsetIndex(uint idx) {
+  setUInt8(0x0023, idx);
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::clearAutoRepeaterVHF2OffsetIndex() {
+  setAutoRepeaterVHF2OffsetIndex(0xff);
+}
+
+uint
+D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterVHF2MinFrequency() const {
+  return ((uint)getBCD8_le(0x0024))*10;
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2MinFrequency(uint hz) {
+  setBCD8_le(0x0024, hz/10);
+}
+uint
+D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterVHF2MaxFrequency() const {
+  return ((uint)getBCD8_le(0x0028))*10;
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2MaxFrequency(uint hz) {
+  setBCD8_le(0x0028, hz/10);
+}
+uint
+D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterUHF2MinFrequency() const {
+  return ((uint)getBCD8_le(0x002c))*10;
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MinFrequency(uint hz) {
+  setBCD8_le(0x002c, hz/10);
+}
+uint
+D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterUHF2MaxFrequency() const {
+  return ((uint)getBCD8_le(0x0030))*10;
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MaxFrequency(uint hz) {
+  setBCD8_le(0x0030, hz/10);
+}
+
+D878UVCodeplug::GeneralSettingsExtensionElement::GPSMode
+D878UVCodeplug::GeneralSettingsExtensionElement::gpsMode() const {
+  return (GPSMode)getUInt8(0x0035);
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setGPSMode(GPSMode mode) {
+  setUInt8(0x0035, (uint)mode);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsExtensionElement::fromConfig(const Flags &flags, Context &ctx) {
+  return true;
+}
+
+bool
+D878UVCodeplug::GeneralSettingsExtensionElement::updateConfig(Context &ctx) {
+  return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::AnalogAPRSSettingsElement
+ * ******************************************************************************************** */
+D878UVCodeplug::AnalogAPRSSettingsElement::AnalogAPRSSettingsElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::AnalogAPRSSettingsElement::AnalogAPRSSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x0040)
+{
+  // pass...
+}
+
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::clear() {
+  memset(_data, 0x00, _size);
+  setUInt8(0x0000, 0xff);
+  setTXDelay(60);
+  setUInt8(0x003d, 0x01); setUInt8(0x003e, 0x03); setUInt8(0x003f, 0xff);
+}
+
+uint
+D878UVCodeplug::AnalogAPRSSettingsElement::frequency() const {
+  return ((uint)getBCD8_le(0x0001))*10;
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::setFrequency(uint hz) {
+  setBCD8_le(0x0001, hz/10);
+}
+
+uint
+D878UVCodeplug::AnalogAPRSSettingsElement::txDelay() const {
+  return ((uint)getUInt8(0x0005))*20;
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::setTXDelay(uint ms) {
+  setUInt8(0x0005, ms/20);
+}
+
+Signaling::Code
+D878UVCodeplug::AnalogAPRSSettingsElement::txTone() const {
+  if (0 == getUInt8(0x0006)) { // none
+    return Signaling::SIGNALING_NONE;
+  } else if (1 == getUInt8(0x0006)) { // CTCSS
+    return ctcss_num2code(getUInt8(0x0007));
+  } else if (2 == getUInt8(0x0006)) { // DCS
+    uint16_t code = getUInt16_le(0x0008);
+    if (512 < code)
+      return Signaling::fromDCSNumber(dec_to_oct(code), false);
+    return Signaling::fromDCSNumber(dec_to_oct(code-512), true);
+  }
+
+  return Signaling::SIGNALING_NONE;
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::setTXTone(Signaling::Code code) {
+  if (Signaling::SIGNALING_NONE == code) {
+    setUInt8(0x0006, 0x00);
+  } else if (Signaling::isCTCSS(code)) {
+    setUInt8(0x0006, 0x01);
+    setUInt8(0x0007, ctcss_code2num(code));
+  } else if (Signaling::isDCSNormal(code)) {
+    setUInt8(0x0006, 0x02);
+    setUInt16_le(0x0008, oct_to_dec(Signaling::toDCSNumber(code)));
+  } else if (Signaling::isDCSInverted(code)) {
+    setUInt8(0x0006, 0x02);
+    setUInt16_le(0x0008, oct_to_dec(Signaling::toDCSNumber(code))+512);
+  }
+}
+
+uint
+D878UVCodeplug::AnalogAPRSSettingsElement::manualTXInterval() const {
+  return getUInt8(0x000a);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::setManualTXInterval(uint sec) {
+  setUInt8(0x000a, sec);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsElement::autoTX() const {
+  return 0!=getUInt8(0x000b);
+}
+uint
+D878UVCodeplug::AnalogAPRSSettingsElement::autoTXInterval() const {
+  return 15+((uint)getUInt8(0x000b))*15;
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::setAutoTXInterval(uint sec) {
+  if (30 > sec) sec = 30;
+  setUInt8(0x000b, (sec-15)/15);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::disableAutoTX() {
+  setUInt8(0x000b, 0x00);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsElement::fixedLocationEnabled() const {
+  return getUInt8(0x000c);
+}
+QGeoCoordinate
+D878UVCodeplug::AnalogAPRSSettingsElement::fixedLocation() const {
+  double latitude  = getUInt8(0x000d) + double(getUInt8(0x000e))/60 + double(getUInt8(0x000f))/3600;
+  if (getUInt8(0x0010)) latitude *= -1;
+  double longitude = getUInt8(0x0011) + double(getUInt8(0x0012))/60 + double(getUInt8(0x0013))/3600;
+  if (getUInt8(0x0014)) longitude *= -1;
+  return QGeoCoordinate(latitude, longitude);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::setFixedLocation(QGeoCoordinate &loc) {
+  double latitude = loc.latitude();
+  bool south = (0 > latitude); latitude = std::abs(latitude);
+  uint lat_deg = int(latitude); latitude -= lat_deg; latitude *= 60;
+  uint lat_min = int(latitude); latitude -= lat_min; latitude *= 60;
+  uint lat_sec = int(latitude);
+  double longitude = loc.longitude();
+  bool west = (0 > longitude); longitude = std::abs(longitude);
+  uint lon_deg = int(longitude); longitude -= lon_deg; longitude *= 60;
+  uint lon_min = int(longitude); longitude -= lon_min; longitude *= 60;
+  uint lon_sec = int(longitude);
+  setUInt8(0x000d, lat_deg); setUInt8(0x000e, lat_min); setUInt8(0x000f, lat_sec); setUInt8(0x0010, (south ? 0x01 : 0x00));
+  setUInt8(0x0011, lon_deg); setUInt8(0x0012, lon_min); setUInt8(0x0013, lon_sec); setUInt8(0x0014, (west ? 0x01 : 0x00));
+  // enable fixed location.
+  setUInt8(0x000c, 0x01);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::disableFixedLocation() {
+  setUInt8(0x000c, 0x00);
+}
+
+QString
+D878UVCodeplug::AnalogAPRSSettingsElement::destination() const {
+  return readASCII(0x0015, 6, 0x00);
+}
+uint
+D878UVCodeplug::AnalogAPRSSettingsElement::destinationSSID() const {
+  return getUInt8(0x001b);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::setDestination(const QString &call, uint ssid) {
+  writeASCII(0x0015, call, 6, 0x00);
+  setUInt8(0x001b, ssid);
+}
+QString
+D878UVCodeplug::AnalogAPRSSettingsElement::source() const {
+  return readASCII(0x001c, 6, 0x00);
+}
+uint
+D878UVCodeplug::AnalogAPRSSettingsElement::sourceSSID() const {
+  return getUInt8(0x0022);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::setSource(const QString &call, uint ssid) {
+  writeASCII(0x001c, call, 6, 0x00);
+  setUInt8(0x0022, ssid);
+}
+
+QString
+D878UVCodeplug::AnalogAPRSSettingsElement::path() const {
+  return readASCII(0x0023, 20, 0x00);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::setPath(const QString &path) {
+  writeASCII(0x0023, path, 20, 0x00);
+}
+
+APRSSystem::Icon
+D878UVCodeplug::AnalogAPRSSettingsElement::icon() const {
+  return code2aprsicon(getUInt8(0x0039), getUInt8(0x003a));
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::setIcon(APRSSystem::Icon icon) {
+  setUInt8(0x0039, aprsicon2tablecode(icon));
+  setUInt8(0x003a, aprsicon2iconcode(icon));
+}
+
+Channel::Power
+D878UVCodeplug::AnalogAPRSSettingsElement::power() const {
+  switch (getUInt8(0x003b)) {
+  case 0: return Channel::Power::Low;
+  case 1: return Channel::Power::Mid;
+  case 2: return Channel::Power::High;
+  case 3: return Channel::Power::Max;
+  }
+  return Channel::Power::Low;
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::setPower(Channel::Power power) {
+  switch (power) {
+  case Channel::Power::Min:
+  case Channel::Power::Low:  setUInt8(0x003b, 0x00); break;
+  case Channel::Power::Mid:  setUInt8(0x003b, 0x01); break;
+  case Channel::Power::High: setUInt8(0x003b, 0x02); break;
+  case Channel::Power::Max:  setUInt8(0x003b, 0x03); break;
+  }
+}
+
+uint
+D878UVCodeplug::AnalogAPRSSettingsElement::preWaveDelay() const {
+  return ((uint)getUInt8(0x003c))*10;
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsElement::setPreWaveDelay(uint ms) {
+  setUInt8(0x003c, ms/10);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsElement::fromAPRSSystem(const APRSSystem *sys, Context &ctx) {
+  clear();
+  setFrequency(sys->revertChannel()->txFrequency());
+  setTXTone(sys->revertChannel()->txTone());
+  setManualTXInterval(sys->period());
+  setAutoTXInterval(sys->period());
+  setDestination(sys->destination(), sys->destSSID());
+  setSource(sys->source(), sys->srcSSID());
+  setPath(sys->path());
+  setIcon(sys->icon());
+  setPower(sys->revertChannel()->power());
+  setPreWaveDelay(0);
+  return true;
+}
+
+APRSSystem *
+D878UVCodeplug::AnalogAPRSSettingsElement::toAPRSSystem() {
+  return new APRSSystem(
+        tr("APRS %1").arg(destination()), nullptr,
+        destination(), destinationSSID(), source(), sourceSSID(),
+        path(), icon(), "", autoTXInterval());
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsElement::linkAPRSSystem(APRSSystem *sys, Context &ctx) {
+  // First, try to find a matching analog channel in list
+  AnalogChannel *ch = ctx.config()->channelList()->findAnalogChannelByTxFreq(frequency());
+  if (! ch) {
+    // If no channel is found, create one with the settings from APRS channel:
+    ch = new AnalogChannel("APRS Channel", frequency(), frequency(), power(),
+                           0, false, AnalogChannel::Admit::Free, 1, Signaling::SIGNALING_NONE,
+                           txTone(), AnalogChannel::Bandwidth::Wide, nullptr);
+    logInfo() << "No matching APRS chanel found for TX frequency " << frequency()
+              << ", create one as 'APRS Channel'";
+    ctx.config()->channelList()->add(ch);
+  }
+  sys->setRevertChannel(ch);
+  return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::AnalogAPRSSettingsExtensionElement
+ * ******************************************************************************************** */
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::AnalogAPRSSettingsExtensionElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::AnalogAPRSSettingsExtensionElement(uint8_t *ptr)
+  : Element(ptr, 0x0060)
+{
+  // pass...
+}
+
+void
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+uint
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::fixedAltitude() const {
+  return getUInt16_le(0x0006)/3.28;
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::setFixedAltitude(uint m) {
+  setUInt16_le(0x0006, m*3.28);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportPosition() const {
+  return getBit(0x0008, 0);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportPosition(bool enable) {
+  setBit(0x0008, 0, enable);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportMicE() const {
+  return getBit(0x0008, 1);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportMicE(bool enable) {
+  setBit(0x0008, 1, enable);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportObject() const {
+  return getBit(0x0008, 2);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportObject(bool enable) {
+  setBit(0x0008, 2, enable);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportItem() const {
+  return getBit(0x0008, 3);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportItem(bool enable) {
+  setBit(0x0008, 3, enable);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportMessage() const {
+  return getBit(0x0008, 4);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportMessage(bool enable) {
+  setBit(0x0008, 4, enable);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportWeather() const {
+  return getBit(0x0008, 5);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportWeather(bool enable) {
+  setBit(0x0008, 5, enable);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportNMEA() const {
+  return getBit(0x0008, 6);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportNMEA(bool enable) {
+  setBit(0x0008, 6, enable);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportStatus() const {
+  return getBit(0x0008, 7);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportStatus(bool enable) {
+  setBit(0x0008, 7, enable);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportOther() const {
+  return getBit(0x0009, 0);
+}
+void
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportOther(bool enable) {
+  setBit(0x0009, 0, enable);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::AnalogAPRSRXEntryElement
+ * ******************************************************************************************** */
+D878UVCodeplug::AnalogAPRSRXEntryElement::AnalogAPRSRXEntryElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::AnalogAPRSRXEntryElement::AnalogAPRSRXEntryElement(uint8_t *ptr)
+  : Element(ptr, 0x0008)
+{
+  // pass...
+}
+
+void
+D878UVCodeplug::AnalogAPRSRXEntryElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSRXEntryElement::isValid() const {
+  return Element::isValid() && (0 != getUInt8(0x0000));
+}
+
+QString
+D878UVCodeplug::AnalogAPRSRXEntryElement::call() const {
+  return readASCII(0x0001, 6, 0x00);
+}
+uint
+D878UVCodeplug::AnalogAPRSRXEntryElement::ssid() const {
+  return getUInt8(0x0007);
+}
+void
+D878UVCodeplug::AnalogAPRSRXEntryElement::setCall(const QString &call, uint ssid) {
+  writeASCII(0x0001, call, 6, 0x00); // Store call
+  setUInt8(0x0007, ssid);            // Store SSID
+  setUInt8(0x0000, 0x01);            // Enable entry.
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::DMRAPRSSystemsElement
+ * ******************************************************************************************** */
+D878UVCodeplug::DMRAPRSSystemsElement::DMRAPRSSystemsElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::DMRAPRSSystemsElement::DMRAPRSSystemsElement(uint8_t *ptr)
+  : Element(ptr, 0x0060)
+{
+  // pass...
+}
+
+void
+D878UVCodeplug::DMRAPRSSystemsElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+uint
+D878UVCodeplug::DMRAPRSSystemsElement::channelIndex(uint n) const {
+  return getUInt16_le(0x0000 + n*2);
+}
+void
+D878UVCodeplug::DMRAPRSSystemsElement::setChannelIndex(uint n, uint idx) {
+  setUInt16_le(0x0000 + 2*n, idx);
+}
+
+uint
+D878UVCodeplug::DMRAPRSSystemsElement::destination(uint n) const {
+  return getBCD8_le(0x0010 + 4*n);
+}
+void
+D878UVCodeplug::DMRAPRSSystemsElement::setDestination(uint n, uint idx) {
+  setBCD8_le(0x0010 + 4*n, idx);
+}
+
+DigitalContact::Type
+D878UVCodeplug::DMRAPRSSystemsElement::callType(uint n) const {
+  switch(getUInt8(0x0030 + n)) {
+  case 0: return DigitalContact::PrivateCall;
+  case 1: return DigitalContact::GroupCall;
+  case 2: return DigitalContact::AllCall;
+  }
+  return DigitalContact::PrivateCall;
+}
+void
+D878UVCodeplug::DMRAPRSSystemsElement::setCallType(uint n, DigitalContact::Type type) {
+  switch(type) {
+  case DigitalContact::PrivateCall: setUInt8(0x0030+n, 0x00); break;
+  case DigitalContact::GroupCall: setUInt8(0x0030+n, 0x01); break;
+  case DigitalContact::AllCall: setUInt8(0x0030+n, 0x02); break;
+  }
+}
+
+bool
+D878UVCodeplug::DMRAPRSSystemsElement::timeSlotOverride(uint n) {
+  return 0x00 != getUInt8(0x0039 + n);
+}
+DigitalChannel::TimeSlot
+D878UVCodeplug::DMRAPRSSystemsElement::timeSlot(uint n) const {
+  switch (getUInt8(0x0039 + n)) {
+  case 1: return DigitalChannel::TimeSlot::TS1;
+  case 2: return DigitalChannel::TimeSlot::TS2;
+  }
+  return DigitalChannel::TimeSlot::TS1;
+}
+void
+D878UVCodeplug::DMRAPRSSystemsElement::setTimeSlot(uint n, DigitalChannel::TimeSlot ts) {
+  switch (ts) {
+  case DigitalChannel::TimeSlot::TS1: setUInt8(0x0039+n, 0x01); break;
+  case DigitalChannel::TimeSlot::TS2: setUInt8(0x0039+n, 0x02); break;
+  }
+}
+void
+D878UVCodeplug::DMRAPRSSystemsElement::clearTimeSlotOverride(uint n) {
+  setUInt8(0x0039+n, 0);
+}
+
+bool
+D878UVCodeplug::DMRAPRSSystemsElement::roaming() const {
+  return getUInt8(0x0038);
+}
+void
+D878UVCodeplug::DMRAPRSSystemsElement::enableRoaming(bool enable) {
+  setUInt8(0x0038, (enable ? 0x01 : 0x00));
+}
+
+uint
+D878UVCodeplug::DMRAPRSSystemsElement::repeaterActivationDelay() const {
+  return ((uint)getUInt8(0x0041))*100;
+}
+void
+D878UVCodeplug::DMRAPRSSystemsElement::setRepeaterActivationDelay(uint ms) {
+  setUInt8(0x0041, ms/100);
+}
+
+bool
+D878UVCodeplug::DMRAPRSSystemsElement::fromGPSSystems(Context &ctx) {
+  if (ctx.config()->posSystems()->gpsCount() > 8)
+    return false;
+  for (int i=0; i<ctx.config()->posSystems()->gpsCount(); i++)
+    fromGPSSystemObj(ctx.config()->posSystems()->gpsSystem(i), ctx);
+  return true;
+}
+
+bool
+D878UVCodeplug::DMRAPRSSystemsElement::fromGPSSystemObj(GPSSystem *sys, Context &ctx) {
+  int idx = ctx.config()->posSystems()->indexOfGPSSys(sys);
+  if ((idx < 0) || idx > 7)
+    return false;
+  if (sys->hasContact()) {
+    setDestination(idx, sys->contactObj()->number());
+    setCallType(idx, sys->contactObj()->type());
+  }
+  if (sys->hasRevertChannel() && (SelectedChannel::get() != (Channel *)sys->revertChannel())) {
+    setChannelIndex(idx, ctx.index(sys->revertChannel()));
+    clearTimeSlotOverride(idx);
+  }
+  return true;
+}
+
+GPSSystem *
+D878UVCodeplug::DMRAPRSSystemsElement::toGPSSystemObj(int idx) const {
+  if (0 == destination(idx))
+    return nullptr;
+  return new GPSSystem(tr("GPS Sys #%1").arg(idx+1));
+}
+
+bool
+D878UVCodeplug::DMRAPRSSystemsElement::linkGPSSystem(int idx, GPSSystem *sys, Context &ctx) const {
+  // Clear revert channel from GPS system
+  sys->setRevertChannel(nullptr);
+  // if a revert channel is defined -> link to it
+  if (ctx.has<Channel>(channelIndex(idx)) && ctx.get<Channel>(channelIndex(idx))->is<DigitalChannel>())
+    sys->setRevertChannel(ctx.get<Channel>(channelIndex(idx))->as<DigitalChannel>());
+
+  // Search for a matching contact in contacts
+  DigitalContact *cont = ctx.config()->contacts()->findDigitalContact(destination(idx));
+  // If no matching contact is found, create one
+  if (nullptr == cont) {
+    cont = new DigitalContact(callType(idx), tr("GPS #%1 Contact").arg(idx+1),
+                              destination(idx), false);
+    ctx.config()->contacts()->add(cont);
+  }
+  // link contact to GPS system.
+  sys->setContact(cont);
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::AESEncryptionKeyElement
+ * ******************************************************************************************** */
+D878UVCodeplug::AESEncryptionKeyElement::AESEncryptionKeyElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::AESEncryptionKeyElement::AESEncryptionKeyElement(uint8_t *ptr)
+  : Element(ptr, 0x0040)
+{
+  // pass...
+}
+
+void
+D878UVCodeplug::AESEncryptionKeyElement::clear() {
+  memset(_data, 0x00, _size);
+  setIndex(0xff);
+  setUInt8(0x0022, 0x40);
+}
+
+bool
+D878UVCodeplug::AESEncryptionKeyElement::isValid() const {
+  return Element::isValid() && (0xff != index());
+}
+
+uint
+D878UVCodeplug::AESEncryptionKeyElement::index() const {
+  return getUInt8(0x0000);
+}
+void
+D878UVCodeplug::AESEncryptionKeyElement::setIndex(uint idx) {
+  setUInt8(0x0000, idx);
+}
+
+QByteArray
+D878UVCodeplug::AESEncryptionKeyElement::key() const {
+  QByteArray ar(32, 0); memcpy(ar.data(), _data+0x0001, 32);
+  return ar;
+}
+
+void
+D878UVCodeplug::AESEncryptionKeyElement::setKey(const QByteArray &key) {
+  if (32 != key.size())
+    return;
+  memcpy(_data+0x0001, key.constData(), 32);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::RadioInfoElement
+ * ******************************************************************************************** */
+D878UVCodeplug::RadioInfoElement::RadioInfoElement(uint8_t *ptr, uint size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::RadioInfoElement::RadioInfoElement(uint8_t *ptr)
+  : Element(ptr, 0x0100)
+{
+  // pass...
+}
+
+void
+D878UVCodeplug::RadioInfoElement::clear() {
+  setBandSelectPassword("");
+  setProgramPassword("");
+}
+
+bool
+D878UVCodeplug::RadioInfoElement::fullTest() const {
+  return getUInt8(0x0002);
+}
+
+D878UVCodeplug::RadioInfoElement::FrequencyRange
+D878UVCodeplug::RadioInfoElement::frequencyRange() const {
+  return (FrequencyRange)getUInt8(0x0003);
+}
+void
+D878UVCodeplug::RadioInfoElement::setFrequencyRange(FrequencyRange range) {
+  setUInt8(0x0003, (uint)range);
+}
+
+bool
+D878UVCodeplug::RadioInfoElement::international() const {
+  return getUInt8(0x0004);
+}
+void
+D878UVCodeplug::RadioInfoElement::enableInternational(bool enable) {
+  setUInt8(0x0004, (enable ? 0x01 : 0x00));
+}
+
+bool
+D878UVCodeplug::RadioInfoElement::bandSelect() const {
+  return getUInt8(0x0006);
+}
+void
+D878UVCodeplug::RadioInfoElement::enableBandSelect(bool enable) {
+  setUInt8(0x0006, (enable ? 0x01 : 0x00));
+}
+
+QString
+D878UVCodeplug::RadioInfoElement::bandSelectPassword() const {
+  return readASCII(0x000b, 4, 0x00);
+}
+void
+D878UVCodeplug::RadioInfoElement::setBandSelectPassword(const QString &passwd) {
+  writeASCII(0x000b, passwd, 4, 0x00);
+}
+
+QString
+D878UVCodeplug::RadioInfoElement::radioType() const {
+  return readASCII(0x0010, 7, 0x00);
+}
+
+QString
+D878UVCodeplug::RadioInfoElement::programPassword() const {
+  return readASCII(0x0028, 4, 0x00);
+}
+void
+D878UVCodeplug::RadioInfoElement::setProgramPassword(const QString &passwd) {
+  writeASCII(0x0028, passwd, 4, 0x00);
+}
+
+QString
+D878UVCodeplug::RadioInfoElement::areaCode() const {
+  return readASCII(0x002c, 4, 0x00);
+}
+
+QString
+D878UVCodeplug::RadioInfoElement::serialNumber() const {
+  return readASCII(0x0030, 16, 0x00);
+}
+
+QString
+D878UVCodeplug::RadioInfoElement::productionDate() const {
+  return readASCII(0x0040, 10, 0x00);
+}
+
+QString
+D878UVCodeplug::RadioInfoElement::manufacturerCode() const {
+  return readASCII(0x0050, 8, 0x00);
+}
+
+QString
+D878UVCodeplug::RadioInfoElement::maintainedDate() const {
+  return readASCII(0x0060, 16, 0x00);
+}
+
+QString
+D878UVCodeplug::RadioInfoElement::dealerCode() const {
+  return readASCII(0x0070, 16, 0x00);
+}
+
+QString
+D878UVCodeplug::RadioInfoElement::stockDate() const {
+  return readASCII(0x0080, 16, 0x00);
+}
+
+QString
+D878UVCodeplug::RadioInfoElement::sellDate() const {
+  return readASCII(0x0090, 16, 0x00);
+}
+
+QString
+D878UVCodeplug::RadioInfoElement::seller() const {
+  return readASCII(0x00a0, 16, 0x00);
+}
+
+QString
+D878UVCodeplug::RadioInfoElement::maintainerNote() const {
+  return readASCII(0x00b0, 128, 0x00);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug
  * ******************************************************************************************** */
 D878UVCodeplug::D878UVCodeplug(QObject *parent)
@@ -1026,15 +2247,17 @@ D878UVCodeplug::allocateGeneralSettings() {
 
 }
 bool
-D878UVCodeplug::encodeGeneralSettings(Config *config, const Flags &flags) {
-  ((D878UVCodeplug::general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->fromConfig(config, flags);
-  ((general_settings_ext1_t *)data(ADDR_GENERAL_CONFIG_EXT1))->fromConfig(config, flags);
-  ((general_settings_ext2_t *)data(ADDR_GENERAL_CONFIG_EXT2))->fromConfig(config, flags);
+D878UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx) {
+  GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).fromConfig(flags, ctx);
+  GPSMessageElement(data(ADDR_GENERAL_CONFIG_EXT1)).fromConfig(flags, ctx);
+  GeneralSettingsExtensionElement(data(ADDR_GENERAL_CONFIG_EXT2)).fromConfig(flags, ctx);
   return true;
 }
 bool
-D878UVCodeplug::decodeGeneralSettings(Config *config) {
-  ((D878UVCodeplug::general_settings_base_t *)data(ADDR_GENERAL_CONFIG))->updateConfig(config);
+D878UVCodeplug::decodeGeneralSettings(Context &ctx) {
+  GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx);
+  GPSMessageElement(data(ADDR_GENERAL_CONFIG_EXT1)).updateConfig(ctx);
+  GeneralSettingsElement(data(ADDR_GENERAL_CONFIG_EXT2)).updateConfig(ctx);
   return true;
 }
 
@@ -1049,76 +2272,78 @@ D878UVCodeplug::allocateGPSSystems() {
 }
 
 bool
-D878UVCodeplug::encodeGPSSystems(Config *config, const Flags &flags) {
+D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx) {
   // replaces D868UVCodeplug::encodeGPSSystems
 
   // Encode APRS system (there can only be one)
-  if (0 < config->posSystems()->aprsCount()) {
-    ((aprs_setting_t *)data(ADDR_APRS_SETTING))->fromAPRSSystem(config->posSystems()->aprsSystem(0));
+  if (0 < ctx.config()->posSystems()->aprsCount()) {
+    AnalogAPRSSettingsElement(data(ADDR_APRS_SETTING))
+        .fromAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
     uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
-    encode_ascii(aprsmsg, config->posSystems()->aprsSystem(0)->message(), 60, 0x00);
+    encode_ascii(aprsmsg, ctx.config()->posSystems()->aprsSystem(0)->message(), 60, 0x00);
   }
 
   // Encode GPS systems
-  gps_systems_t *gps = (gps_systems_t *)data(ADDR_GPS_SETTING);
-  gps->fromGPSSystems(config);
-  if (0 < config->posSystems()->gpsCount()) {
+  DMRAPRSSystemsElement gps(data(ADDR_GPS_SETTING));
+  if (! gps.fromGPSSystems(ctx))
+    return false;
+  if (0 < ctx.config()->posSystems()->gpsCount()) {
     // If there is at least one GPS system defined -> set auto TX interval.
     //  This setting might be overridden by any analog APRS system below
-    aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
-    aprs->setAutoTxInterval(config->posSystems()->gpsSystem(0)->period());
-    aprs->setManualTxInterval(config->posSystems()->gpsSystem(0)->period());
+    AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTING));
+    aprs.setAutoTXInterval(ctx.config()->posSystems()->gpsSystem(0)->period());
+    aprs.setManualTXInterval(ctx.config()->posSystems()->gpsSystem(0)->period());
   }
   return true;
 }
 
 bool
-D878UVCodeplug::createGPSSystems(Config *config, CodeplugContext &ctx) {
+D878UVCodeplug::createGPSSystems(Context &ctx) {
   // replaces D868UVCodeplug::createGPSSystems
 
   // Before creating any GPS/APRS systems, get global auto TX intervall
-  uint pos_intervall = ((aprs_setting_t *)data(ADDR_APRS_SETTING))->getAutoTXInterval();
+  AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTING));
+  uint pos_intervall = aprs.autoTXInterval();
 
   // Create APRS system (if enabled)
-  aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
   uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
-  if (aprs->isValid()) {
-    APRSSystem *sys = aprs->toAPRSSystem();
+  if (aprs.isValid()) {
+    APRSSystem *sys = aprs.toAPRSSystem();
     sys->setPeriod(pos_intervall);
     sys->setMessage(decode_ascii(aprsmsg, 60, 0x00));
-    ctx.addAPRSSystem(sys,0);
+    ctx.config()->posSystems()->add(sys); ctx.add(sys,0);
   }
 
   // Create GPS systems
-  gps_systems_t *gps_systems = (gps_systems_t *)data(ADDR_GPS_SETTING);
+  DMRAPRSSystemsElement gps_systems(data(ADDR_GPS_SETTING));
   for (int i=0; i<NUM_GPS_SYSTEMS; i++) {
-    if (! gps_systems->isValid(i))
+    if (0 != gps_systems.destination(i))
       continue;
-    GPSSystem *sys = gps_systems->toGPSSystemObj(i);
+    GPSSystem *sys = gps_systems.toGPSSystemObj(i);
     if (sys)
       logDebug() << "Create GPS sys '" << sys->name() << "' at idx " << i << ".";
     sys->setPeriod(pos_intervall);
-    ctx.addGPSSystem(sys, i);
+    ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
   }
   return true;
 }
 
 bool
-D878UVCodeplug::linkGPSSystems(Config *config, CodeplugContext &ctx) {
+D878UVCodeplug::linkGPSSystems(Context &ctx) {
   // replaces D868UVCodeplug::linkGPSSystems
 
   // Link APRS system
-  aprs_setting_t *aprs = (aprs_setting_t *)data(ADDR_APRS_SETTING);
-  if (aprs->isValid()) {
-    aprs->linkAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
+  AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTING));
+  if (aprs.isValid()) {
+    aprs.linkAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
   }
 
   // Link GPS systems
-  gps_systems_t *gps_systems = (gps_systems_t *)data(ADDR_GPS_SETTING);
+  DMRAPRSSystemsElement gps_systems(data(ADDR_GPS_SETTING));
   for (int i=0; i<NUM_GPS_SYSTEMS; i++) {
-    if (! gps_systems->isValid(i))
+    if (0 != gps_systems.destination(i))
       continue;
-    gps_systems->linkGPSSystem(i, ctx.getGPSSystem(i), ctx);
+    gps_systems.linkGPSSystem(i, ctx.get<GPSSystem>(i), ctx);
   }
 
   return true;

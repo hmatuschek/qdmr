@@ -967,6 +967,254 @@ D868UVCodeplug::contact_map_t::setIndex(uint32_t index) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of D868UVCodeplug::GeneralSettingsElement
+ * ******************************************************************************************** */
+D868UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, uint size)
+  : AnytoneCodeplug::GeneralSettingsElement(ptr, size)
+{
+  // pass....
+}
+
+D868UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
+  : D868UVCodeplug::GeneralSettingsElement(ptr, 0x00d0)
+{
+  // pass...
+}
+
+void
+D868UVCodeplug::GeneralSettingsElement::clear() {
+  AnytoneCodeplug::GeneralSettingsElement::clear();
+}
+
+D868UVCodeplug::GeneralSettingsElement::Color
+D868UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
+  return (Color)getUInt8(0x00b0);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setCallDisplayColor(Color color) {
+  setUInt8(0x00b0, (uint)color);
+}
+
+uint
+D868UVCodeplug::GeneralSettingsElement::gpsUpdatePeriod() const {
+  return getUInt8(0x00b1);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(uint sec) {
+  setUInt8(0x00b1, sec);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::showZoneAndContact() const {
+  return getUInt8(0x00b2);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableShowZoneAndContact(bool enable) {
+  setUInt8(0x00b2, (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
+  return 0 == keyToneLevel();
+}
+uint
+D868UVCodeplug::GeneralSettingsElement::keyToneLevel() const {
+  return ((uint)getUInt8(0x00b3))*10/15;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setKeyToneLevel(uint level) {
+  setUInt8(0x00b3, level*10/15);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
+  setUInt8(0x00b3, 0);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::gpsUnitsImperial() const {
+  return getUInt8(0x00b4);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableGPSUnitsImperial(bool enable) {
+  setUInt8(0x00b4, (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::knobLock() const {
+  return getBit(0x00b5, 0);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableKnobLock(bool enable) {
+  setBit(0x00b5, 0, enable);
+}
+bool
+D868UVCodeplug::GeneralSettingsElement::keypadLock() const {
+  return getBit(0x00b5, 1);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableKeypadLock(bool enable) {
+  setBit(0x00b5, 1, enable);
+}
+bool
+D868UVCodeplug::GeneralSettingsElement::sidekeysLock() const {
+  return getBit(0x00b5, 3);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableSidekeysLock(bool enable) {
+  setBit(0x00b5, 3, enable);
+}
+bool
+D868UVCodeplug::GeneralSettingsElement::keyLockForced() const {
+  return getBit(0x00b5, 4);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableKeyLockForced(bool enable) {
+  setBit(0x00b5, 4, enable);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::showLastHeard() const {
+  return getUInt8(0x00b6);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
+  setUInt8(0x00b6, (enable ? 0x01 : 0x00));
+}
+
+uint
+D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
+  return getBCD8_le(0x00b8)*10;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(uint Hz) {
+  setBCD8_le(0x00b8, Hz/10);
+}
+uint
+D868UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyVHF() const {
+  return getBCD8_le(0x00bc)*10;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(uint Hz) {
+  setBCD8_le(0x00bc, Hz/10);
+}
+
+uint
+D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyUHF() const {
+  return getBCD8_le(0x00c0)*10;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(uint Hz) {
+  setBCD8_le(0x00c0, Hz/10);
+}
+uint
+D868UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyUHF() const {
+  return getBCD8_le(0x00c4)*10;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(uint Hz) {
+  setBCD8_le(0x00c4, Hz/10);
+}
+
+D868UVCodeplug::GeneralSettingsElement::AutoRepDir
+D868UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
+  return (AutoRepDir)getUInt8(0x00c8);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AutoRepDir dir) {
+  setUInt8(0x00c8, (uint)dir);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::defaultChannel() const {
+  return getUInt8(0x00ca);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableDefaultChannel(bool enable) {
+  setUInt8(0x00ca, (enable ? 0x01 : 0x00));
+}
+
+uint
+D868UVCodeplug::GeneralSettingsElement::defaultZoneIndexA() const {
+  return getUInt8(0x00cb);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexA(uint idx) {
+  setUInt8(0x00cb, idx);
+}
+
+uint
+D868UVCodeplug::GeneralSettingsElement::defaultZoneIndexB() const {
+  return getUInt8(0x00cc);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexB(uint idx) {
+  setUInt8(0x00cc, idx);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::defaultChannelAIsVFO() const {
+  return 0xff == defaultChannelAIndex();
+}
+uint
+D868UVCodeplug::GeneralSettingsElement::defaultChannelAIndex() const {
+  return getUInt8(0x00cd);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setDefaultChannelAIndex(uint idx) {
+  setUInt8(0x00cd, idx);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setDefaultChannelAToVFO() {
+  setDefaultChannelAIndex(0xff);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::defaultChannelBIsVFO() const {
+  return 0xff == defaultChannelBIndex();
+}
+uint
+D868UVCodeplug::GeneralSettingsElement::defaultChannelBIndex() const {
+  return getUInt8(0x00ce);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setDefaultChannelBIndex(uint idx) {
+  setUInt8(0x00ce, idx);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setDefaultChannelBToVFO() {
+  setDefaultChannelBIndex(0xff);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::keepLastCaller() const {
+  return getUInt8(0x00cf);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
+  setUInt8(0x00cf, (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
+    return false;
+
+  setGPSUpdatePeriod(0x05);
+  // Set measurement system based on system locale (0x00==Metric)
+  enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
+
+  return true;
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx))
+    return false;
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D868UVCodeplug
  * ******************************************************************************************** */
 D868UVCodeplug::D868UVCodeplug(QObject *parent)
