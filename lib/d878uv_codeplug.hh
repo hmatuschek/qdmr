@@ -264,6 +264,7 @@ public:
     virtual bool roamingEnabled() const;
     /** Enables/disables roaming. */
     virtual void enableRoaming(bool enable);
+    // Moved
     bool dataACK() const;
     void enableDataACK(bool enable);
 

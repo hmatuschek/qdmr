@@ -191,7 +191,7 @@ public:
   explicit D878UV2Codeplug(QObject *parent = nullptr);
 
   void allocateContacts();
-  bool encodeContacts(Config *config, const Flags &flags);
+  bool encodeContacts(const Flags &flags, Context &ctx);
 };
 
 #endif // D878UVCODEPLUG_HH

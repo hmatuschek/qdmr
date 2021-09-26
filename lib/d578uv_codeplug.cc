@@ -19,7 +19,7 @@
 #define CHANNEL_BANK_OFFSET       0x00040000
 #define CHANNEL_BITMAP            0x024c1500
 #define CHANNEL_BITMAP_SIZE       0x00000200
-
+#define CHANNEL_SIZE              0x00000040
 
 #define NUM_CONTACTS              10000      // Total number of contacts
 #define NUM_CONTACT_BANKS         2500       // Number of contact banks
@@ -29,8 +29,9 @@
 #define CONTACT_INDEX_LIST        0x02600000 // Address of contact index list
 #define CONTACTS_BITMAP           0x02640000 // Address of contact bitmap
 #define CONTACTS_BITMAP_SIZE      0x00000500 // Size of contact bitmap
+#define CONTACT_SIZE              0x00000064 // Size of contact element
 #define CONTACT_ID_MAP            0x04800000 // Address of ID->Contact index map
-#define CONTACT_ID_ENTRY_SIZE     sizeof(contact_map_t) // Size of each map entry
+#define CONTACT_ID_ENTRY_SIZE     0x00000008 // Size of each map entry
 
 #define ADDR_HOTKEY               0x025C0000 // Same address as D868UV::hotkey_settings_t
 #define HOTKEY_SIZE               0x00000970 // Different size.
@@ -44,395 +45,67 @@
 
 
 /* ******************************************************************************************** *
- * Implementation of D578UVCodeplug::channel_t
+ * Implementation of D578UVCodeplug::ChannelElement
  * ******************************************************************************************** */
-D578UVCodeplug::channel_t::channel_t() {
-  clear();
+D578UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, uint size)
+  : D878UVCodeplug::ChannelElement(ptr, size)
+{
+  // pass...
 }
 
-void
-D578UVCodeplug::channel_t::clear() {
-  memset(this, 0, sizeof(D578UVCodeplug::channel_t));
-  custom_ctcss = qToLittleEndian(0x09cf); // some value
-  scan_list_index  = 0xff; // None
-  group_list_index = 0xff; // None
-  id_index = 0;
-  squelch_mode = SQ_CARRIER;
-  tx_permit = ADMIT_ALWAYS;
-  // Enable BT hands free by default.
-  bt_hands_free = 1;
+D578UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
+  : D878UVCodeplug::ChannelElement(ptr)
+{
+  // pass...
 }
 
 bool
-D578UVCodeplug::channel_t::isValid() const {
-  return (0 != name[0]) && (0xff != name[0]);
+D578UVCodeplug::ChannelElement::handsFree() const {
+  return getBit(0x0034, 2);
 }
-
-double
-D578UVCodeplug::channel_t::getRXFrequency() const {
-  return decode_frequency(qFromBigEndian(rx_frequency));
-}
-
 void
-D578UVCodeplug::channel_t::setRXFrequency(double f) {
-  rx_frequency = qToBigEndian(encode_frequency(f));
-}
-
-double
-D578UVCodeplug::channel_t::getTXFrequency() const {
-  double f = decode_frequency(qFromBigEndian(rx_frequency));
-  switch ((RepeaterMode) repeater_mode) {
-  case RM_SIMPLEX:
-    break;
-  case RM_TXNEG:
-    f -= decode_frequency(qFromBigEndian(tx_offset));
-    break;
-  case RM_TXPOS:
-    f += decode_frequency(qFromBigEndian(tx_offset));
-    break;
-  }
-  return f;
-}
-
-void
-D578UVCodeplug::channel_t::setTXFrequency(double f) {
-  if (getRXFrequency() == f) {
-    tx_offset = encode_frequency(0);
-    repeater_mode = RM_SIMPLEX;
-  } else if (getRXFrequency() > f) {
-    tx_offset = qToBigEndian(encode_frequency(getRXFrequency()-f));
-    repeater_mode = RM_TXNEG;
-  } else {
-    tx_offset = qToBigEndian(encode_frequency(f-getRXFrequency()));
-    repeater_mode = RM_TXPOS;
-  }
-}
-
-QString
-D578UVCodeplug::channel_t::getName() const {
-  return decode_ascii(name, 16, 0);
-}
-
-void
-D578UVCodeplug::channel_t::setName(const QString &name) {
-  encode_ascii(this->name, name, 16, 0);
-}
-
-Signaling::Code
-D578UVCodeplug::channel_t::getRXTone() const {
-  // If squelch is not SQ_TONE -> RX tone is ignored
-  if (SQ_TONE != squelch_mode)
-    return Signaling::SIGNALING_NONE;
-
-  if (rx_ctcss && (ctcss_receive < 52))
-    return ctcss_num2code(ctcss_receive);
-  else if (rx_dcs && (qFromLittleEndian(dcs_receive) < 512))
-    return Signaling::fromDCSNumber(dec_to_oct(qFromLittleEndian(dcs_receive)), false);
-  else if (rx_dcs && (qFromLittleEndian(dcs_receive) >= 512))
-    return Signaling::fromDCSNumber(dec_to_oct(qFromLittleEndian(dcs_receive)-512), true);
-  return Signaling::SIGNALING_NONE;
-}
-
-void
-D578UVCodeplug::channel_t::setRXTone(Signaling::Code code) {
-  if (Signaling::SIGNALING_NONE == code) {
-    squelch_mode = SQ_CARRIER;
-    rx_ctcss = rx_dcs = 0;
-    ctcss_receive = dcs_receive = 0;
-  } else if (Signaling::isCTCSS(code)) {
-    squelch_mode = SQ_TONE;
-    rx_ctcss = 1;
-    rx_dcs = 0;
-    ctcss_receive = ctcss_code2num(code);
-    dcs_receive = 0;
-  } else if (Signaling::isDCSNormal(code)) {
-    squelch_mode = SQ_TONE;
-    rx_ctcss = 0;
-    rx_dcs = 1;
-    ctcss_receive = 0;
-    dcs_receive = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code)));
-  } else if (Signaling::isDCSInverted(code)) {
-    squelch_mode = SQ_TONE;
-    rx_ctcss = 0;
-    rx_dcs = 1;
-    ctcss_receive = 0;
-    dcs_receive = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code))+512);
-  }
-}
-
-Signaling::Code
-D578UVCodeplug::channel_t::getTXTone() const {
-  if (tx_ctcss && (ctcss_transmit < 52))
-    return ctcss_num2code(ctcss_transmit);
-  else if (tx_dcs && (qFromLittleEndian(dcs_transmit) < 512))
-    return Signaling::fromDCSNumber(dec_to_oct(qFromLittleEndian(dcs_transmit)), false);
-  else if (tx_dcs && (qFromLittleEndian(dcs_transmit) >= 512))
-    return Signaling::fromDCSNumber(dec_to_oct(qFromLittleEndian(dcs_transmit)-512), true);
-  return Signaling::SIGNALING_NONE;
-}
-
-void
-D578UVCodeplug::channel_t::setTXTone(Signaling::Code code) {
-  if (Signaling::SIGNALING_NONE == code) {
-    tx_ctcss = tx_dcs = 0;
-    ctcss_transmit = dcs_transmit = 0;
-  } else if (Signaling::isCTCSS(code)) {
-    tx_ctcss = 1;
-    tx_dcs = 0;
-    ctcss_transmit = ctcss_code2num(code);
-    dcs_transmit = 0;
-  } else if (Signaling::isDCSNormal(code)) {
-    tx_ctcss = 0;
-    tx_dcs = 1;
-    ctcss_transmit = 0;
-    dcs_transmit = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code)));
-  } else if (Signaling::isDCSInverted(code)) {
-    tx_ctcss = 0;
-    tx_dcs = 1;
-    ctcss_transmit = 0;
-    dcs_transmit = qToLittleEndian(oct_to_dec(Signaling::toDCSNumber(code))+512);
-  }
-}
-
-Channel *
-D578UVCodeplug::channel_t::toChannelObj() const {
-  // Decode power setting
-  Channel::Power power = Channel::Power::Low;
-  switch ((channel_t::Power) this->power) {
-  case POWER_LOW:
-    power = Channel::Power::Low;
-    break;
-  case POWER_MIDDLE:
-    power = Channel::Power::Mid;
-    break;
-  case POWER_HIGH:
-    power = Channel::Power::High;
-    break;
-  case POWER_TURBO:
-    power = Channel::Power::Max;
-    break;
-  }
-  bool rxOnly = (1 == this->rx_only);
-
-  Channel *ch;
-  if ((MODE_ANALOG == channel_mode) || (MODE_MIXED_A_D == channel_mode)) {
-    if (MODE_MIXED_A_D == channel_mode)
-      logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
-                << getName() <<"' as analog channel.";
-    AnalogChannel::Admit admit = AnalogChannel::Admit::Always;
-    switch ((channel_t::Admit) tx_permit) {
-    case ADMIT_ALWAYS:
-      admit = AnalogChannel::Admit::Always;
-      break;
-    case ADMIT_CH_FREE:
-      admit = AnalogChannel::Admit::Free;
-      break;
-    default:
-      break;
-    }
-    AnalogChannel::Bandwidth bw = AnalogChannel::Bandwidth::Narrow;
-    if (BW_12_5_KHZ == bandwidth)
-      bw = AnalogChannel::Bandwidth::Narrow;
-    else
-      bw = AnalogChannel::Bandwidth::Wide;
-    ch = new AnalogChannel(
-          getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
-          1, getRXTone(), getTXTone(), bw, nullptr);
-  } else if ((MODE_DIGITAL == channel_mode) || (MODE_MIXED_D_A == channel_mode)) {
-    if (MODE_MIXED_D_A == channel_mode)
-      logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
-                << getName() <<"' as digital channel.";
-    DigitalChannel::Admit admit = DigitalChannel::Admit::Always;
-    switch ((channel_t::Admit) tx_permit) {
-    case ADMIT_ALWAYS:
-      admit = DigitalChannel::Admit::Always;
-      break;
-    case ADMIT_CH_FREE:
-      admit = DigitalChannel::Admit::Free;
-      break;
-    case ADMIT_CC_SAME:
-    case ADMIT_CC_DIFF:
-      admit = DigitalChannel::Admit::ColorCode;
-      break;
-    }
-    DigitalChannel::TimeSlot ts = (slot2 ? DigitalChannel::TimeSlot::TS2 : DigitalChannel::TimeSlot::TS1);
-    ch = new DigitalChannel(
-          getName(), getRXFrequency(), getTXFrequency(), power, 0.0, rxOnly, admit,
-          color_code, ts, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
-  } else {
-    logError() << "Cannot create channel '" << getName()
-               << "': Channel type " << channel_mode << "not supported.";
-    return nullptr;
-  }
-
-  return ch;
+D578UVCodeplug::ChannelElement::enableHandsFree(bool enable) {
+  setBit(0x0034, 2, enable);
 }
 
 bool
-D578UVCodeplug::channel_t::linkChannelObj(Channel *c, const CodeplugContext &ctx) const {
-  if (MODE_DIGITAL == channel_mode) {
-    // If channel is digital
-    DigitalChannel *dc = c->as<DigitalChannel>();
-    if (nullptr == dc)
-      return false;
-
-    // Check if default contact is set, in fact a valid contact index is mandatory.
-    uint32_t conIdx = qFromLittleEndian(contact_index);
-    if ((0xffffffff != conIdx) && ctx.hasDigitalContact(conIdx))
-      dc->setTXContactObj(ctx.getDigitalContact(conIdx));
-
-    // Set if RX group list is set
-    if ((0xff != group_list_index) && ctx.hasGroupList(group_list_index))
-      dc->setGroupListObj(ctx.getGroupList(group_list_index));
-
-    // Link to GPS system
-    if ((APRS_REPORT_DIGITAL == aprs_report) && ctx.hasGPSSystem(gps_system))
-      dc->aprsObj(ctx.getGPSSystem(gps_system));
-    // Link APRS system if one is defined
-    //  There can only be one active APRS system, hence the index is fixed to one.
-    if ((APRS_REPORT_ANALOG == aprs_report) && ctx.hasAPRSSystem(0))
-      dc->aprsObj(ctx.getAPRSSystem(0));
-
-    // If roaming is not disabled -> link to default roaming zone
-    if (0 == excl_from_roaming)
-      dc->setRoamingZone(DefaultRoamingZone::get());
-
-    // Link radio ID
-    RadioID *rid = ctx.getRadioId(id_index);
-    if (rid == ctx.config()->radioIDs()->defaultId())
-      dc->setRadioIdObj(DefaultRadioID::get());
-    else
-      dc->setRadioIdObj(rid);
-
-  } else if (MODE_ANALOG == channel_mode) {
-    // If channel is analog
-    AnalogChannel *ac = c->as<AnalogChannel>();
-    if (nullptr == ac)
-      return false;
-
-    // Link APRS system if one is defined
-    //  There can only be one active APRS system, hence the index is fixed to one.
-    if ((APRS_REPORT_ANALOG == aprs_report) && ctx.hasAPRSSystem(0))
-      ac->setAPRSSystem(ctx.getAPRSSystem(0));
-  }
-
-  // For both, analog and digital channels:
-
-  // If channel has scan list
-  if ((0xff != scan_list_index) && ctx.hasScanList(scan_list_index))
-    c->setScanListObj(ctx.getScanList(scan_list_index));
-
-  return true;
+D578UVCodeplug::ChannelElement::roamingEnabled() const {
+  // inverted!
+  return !getBit(0x0034,3);
+}
+void
+D578UVCodeplug::ChannelElement::enableRoaming(bool enable) {
+  // inverted!
+  setBit(0x0034, 3, !enable);
 }
 
+bool
+D578UVCodeplug::ChannelElement::dataACK() const {
+  // inverted!
+  return !getBit(0x003d,3);
+}
 void
-D578UVCodeplug::channel_t::fromChannelObj(const Channel *c, const Config *conf) {
-  clear();
+D578UVCodeplug::ChannelElement::enableDataACK(bool enable) {
+  // inverted!
+  setBit(0x003d, 3, !enable);
+}
 
-  // set channel name
-  setName(c->name());
+uint
+D578UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
+  return 0;
+}
+void
+D578UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(uint idx) {
+  // pass...
+}
 
-  // set rx and tx frequencies
-  setRXFrequency(c->rxFrequency());
-  setTXFrequency(c->txFrequency());
-
-  // encode power setting
-  switch (c->power()) {
-  case Channel::Power::Max:
-    power = POWER_TURBO;
-    break;
-  case Channel::Power::High:
-    power = POWER_HIGH;
-    break;
-  case Channel::Power::Mid:
-    power = POWER_MIDDLE;
-    break;
-  case Channel::Power::Low:
-  case Channel::Power::Min:
-    power = POWER_LOW;
-    break;
-  }
-
-  // set tx-enable
-  rx_only = c->rxOnly() ? 1 : 0;
-
-  // Link scan list if set
-  if (nullptr == c->scanListObj())
-    scan_list_index = 0xff;
-  else
-    scan_list_index = conf->scanlists()->indexOf(c->scanListObj());
-
-  // Dispatch by channel type
-  if (c->is<AnalogChannel>()) {
-    const AnalogChannel *ac = c->as<const AnalogChannel>();
-    channel_mode = MODE_ANALOG;
-    // pack analog channel config
-    // set admit criterion
-    switch (ac->admit()) {
-    case AnalogChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
-    case AnalogChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
-    case AnalogChannel::Admit::Tone: tx_permit = ADMIT_ALWAYS; break;
-    }
-    // squelch mode
-    squelch_mode = (Signaling::SIGNALING_NONE == ac->rxTone()) ? SQ_CARRIER : SQ_TONE;
-    setRXTone(ac->rxTone());
-    setTXTone(ac->txTone());
-    // set bandwidth
-    bandwidth = (AnalogChannel::Bandwidth::Narrow == ac->bandwidth()) ? BW_12_5_KHZ : BW_25_KHZ;
-    // Set APRS system
-    rx_gps = 0;
-    if (nullptr != ac->aprsSystem()) {
-      aprs_report = APRS_REPORT_ANALOG;
-      rx_gps = 1;
-    }
-  } else if (c->is<DigitalChannel>()) {
-    const DigitalChannel *dc = c->as<const DigitalChannel>();
-    // pack digital channel config.
-    channel_mode = MODE_DIGITAL;
-    // set admit criterion
-    switch(dc->admit()) {
-    case DigitalChannel::Admit::Always: tx_permit = ADMIT_ALWAYS; break;
-    case DigitalChannel::Admit::Free: tx_permit = ADMIT_CH_FREE; break;
-    case DigitalChannel::Admit::ColorCode: tx_permit = ADMIT_CC_SAME; break;
-    }
-    // set color code
-    color_code = dc->colorCode();
-    // set time-slot
-    slot2 = (DigitalChannel::TimeSlot::TS2 == dc->timeSlot()) ? 1 : 0;
-    // link transmit contact
-    if (nullptr == dc->txContactObj()) {
-      contact_index = 0;
-    } else {
-      contact_index = qToLittleEndian(
-            uint32_t(conf->contacts()->indexOfDigital(dc->txContactObj())));
-    }
-    // link RX group list
-    if (nullptr == dc->groupListObj())
-      group_list_index = 0xff;
-    else
-      group_list_index = conf->rxGroupLists()->indexOf(dc->groupListObj());
-    // Set GPS system index
-    rx_gps = 0;
-    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
-      aprs_report = APRS_REPORT_DIGITAL;
-      gps_system = conf->posSystems()->indexOfGPSSys(dc->aprsObj()->as<GPSSystem>());
-      rx_gps = 1;
-    } else if (dc->aprsObj() && dc->aprsObj()->is<APRSSystem>()) {
-      aprs_report = APRS_REPORT_ANALOG;
-      rx_gps = 1;
-    }
-    // Set radio ID
-    if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
-      if (nullptr == conf->radioIDs()->defaultId()) {
-        logWarn() << "No default radio ID set: using index 0.";
-        id_index = 0;
-      } else {
-        id_index = conf->radioIDs()->indexOf(conf->radioIDs()->defaultId());
-      }
-    } else {
-      id_index = conf->radioIDs()->indexOf(dc->radioIdObj());
-    }
-  }
+bool
+D578UVCodeplug::ChannelElement::analogScambler() const {
+  return getUInt8(0x003a);
+}
+void
+D578UVCodeplug::ChannelElement::enableAnalogScamber(bool enable) {
+  setUInt8(0x003a, (enable ? 0x01 : 0x00));
 }
 
 
@@ -460,15 +133,13 @@ D578UVCodeplug::allocateHotKeySettings() {
 }
 
 bool
-D578UVCodeplug::encodeChannels(Config *config, const Flags &flags) {
+D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx) {
   // Encode channels
-  for (int i=0; i<config->channelList()->count(); i++) {
+  for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
     uint16_t bank = i/128, idx = i%128;
-    channel_t *ch = (channel_t *)data(CHANNEL_BANK_0
-                                      + bank*CHANNEL_BANK_OFFSET
-                                      + idx*sizeof(channel_t));
-    ch->fromChannelObj(config->channelList()->channel(i), config);
+    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
   }
   return true;
 }
@@ -500,27 +171,26 @@ D578UVCodeplug::allocateContacts() {
 
 
 bool
-D578UVCodeplug::encodeContacts(Config *config, const Flags &flags) {
-  // Encode contacts
-  QVector<contact_map_t> contact_id_map;
-  contact_id_map.reserve(config->contacts()->digitalCount());
-  for (int i=0; i<config->contacts()->digitalCount(); i++) {
-    contact_t *con = (contact_t *)data(CONTACT_BANK_0+i*sizeof(contact_t));
-    con->fromContactObj(config->contacts()->digitalContact(i));
+D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx) {
+  QVector<DigitalContact*> contacts;
+  // Encode contacts and also collect id<->index map
+  for (int i=0; i<ctx.config()->contacts()->digitalCount(); i++) {
+    ContactElement con(data(CONTACT_BANK_0+i*CONTACT_SIZE));
+    DigitalContact *contact = ctx.config()->contacts()->digitalContact(i);
+    if(! con.fromContactObj(contact, ctx))
+      return false;
     ((uint32_t *)data(CONTACT_INDEX_LIST))[i] = qToLittleEndian(i);
-    contact_map_t entry;
-    entry.setID(config->contacts()->digitalContact(i)->number(),
-                DigitalContact::GroupCall == config->contacts()->digitalContact(i)->type());
-    entry.setIndex(i);
-    contact_id_map.append(entry);
+    contacts.append(contact);
   }
   // encode index map for contacts
-  std::sort(contact_id_map.begin(), contact_id_map.end(),
-            [](const contact_map_t &a, const contact_map_t &b) {
-    return a.ID() < b.ID();
+  std::sort(contacts.begin(), contacts.end(),
+            [](DigitalContact *a, DigitalContact *b) {
+    return a->number() < b->number();
   });
-  for (int i=0; i<contact_id_map.size(); i++) {
-    ((contact_map_t *)data(CONTACT_ID_MAP))[i] = contact_id_map[i];
+  for (int i=0; i<contacts.size(); i++) {
+    ContactMapElement el(data(CONTACT_ID_MAP + i*CONTACT_ID_ENTRY_SIZE));
+    el.setID(contacts[i]->number(), (DigitalContact::GroupCall==contacts[i]->type()));
+    el.setIndex(ctx.index(contacts[i]));
   }
   return true;
 }

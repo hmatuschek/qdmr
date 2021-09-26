@@ -18,8 +18,9 @@
 #define CONTACT_INDEX_LIST        0x02600000 // Address of contact index list
 #define CONTACTS_BITMAP           0x02640000 // Address of contact bitmap
 #define CONTACTS_BITMAP_SIZE      0x00000500 // Size of contact bitmap
+#define CONTACT_SIZE              0x00000064 // Size of contact element
 #define CONTACT_ID_MAP            0x04800000 // Address of ID->Contact index map
-#define CONTACT_ID_ENTRY_SIZE     sizeof(contact_map_t) // Size of each map entry
+#define CONTACT_ID_ENTRY_SIZE     0x00000008 // Size of each map entry
 
 
 
@@ -32,7 +33,8 @@ D878UV2Codeplug::D878UV2Codeplug(QObject *parent)
   // pass...
 }
 
-
+/* The address of the contact ID<->Index table has changed hence allocation and encoding must
+ * be reimplemented. Otherwise, everything remains the same. */
 void
 D878UV2Codeplug::allocateContacts() {
   /* Allocate contacts */
@@ -58,27 +60,26 @@ D878UV2Codeplug::allocateContacts() {
 }
 
 bool
-D878UV2Codeplug::encodeContacts(Config *config, const Flags &flags) {
-  // Encode contacts
-  QVector<contact_map_t> contact_id_map;
-  contact_id_map.reserve(config->contacts()->digitalCount());
-  for (int i=0; i<config->contacts()->digitalCount(); i++) {
-    contact_t *con = (contact_t *)data(CONTACT_BANK_0+i*sizeof(contact_t));
-    con->fromContactObj(config->contacts()->digitalContact(i));
+D878UV2Codeplug::encodeContacts(const Flags &flags, Context &ctx) {
+  QVector<DigitalContact*> contacts;
+  // Encode contacts and also collect id<->index map
+  for (int i=0; i<ctx.config()->contacts()->digitalCount(); i++) {
+    ContactElement con(data(CONTACT_BANK_0+i*CONTACT_SIZE));
+    DigitalContact *contact = ctx.config()->contacts()->digitalContact(i);
+    if(! con.fromContactObj(contact, ctx))
+      return false;
     ((uint32_t *)data(CONTACT_INDEX_LIST))[i] = qToLittleEndian(i);
-    contact_map_t entry;
-    entry.setID(config->contacts()->digitalContact(i)->number(),
-                DigitalContact::GroupCall == config->contacts()->digitalContact(i)->type());
-    entry.setIndex(i);
-    contact_id_map.append(entry);
+    contacts.append(contact);
   }
   // encode index map for contacts
-  std::sort(contact_id_map.begin(), contact_id_map.end(),
-            [](const contact_map_t &a, const contact_map_t &b) {
-    return a.ID() < b.ID();
+  std::sort(contacts.begin(), contacts.end(),
+            [](DigitalContact *a, DigitalContact *b) {
+    return a->number() < b->number();
   });
-  for (int i=0; i<contact_id_map.size(); i++) {
-    ((contact_map_t *)data(CONTACT_ID_MAP))[i] = contact_id_map[i];
+  for (int i=0; i<contacts.size(); i++) {
+    ContactMapElement el(data(CONTACT_ID_MAP + i*CONTACT_ID_ENTRY_SIZE));
+    el.setID(contacts[i]->number(), (DigitalContact::GroupCall==contacts[i]->type()));
+    el.setIndex(ctx.index(contacts[i]));
   }
   return true;
 }
