@@ -42,6 +42,8 @@ class Channel: public ConfigObject
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
   /** The scan list. */
   Q_PROPERTY(ScanListReference* scanList READ scanList)
+  /** The VOX setting. */
+  Q_PROPERTY(uint vox READ vox WRITE setVOX)
 
 public:
   /** Possible power settings. */
@@ -102,20 +104,45 @@ public:
   /** (Re-)Sets the TX frequency of the channel in MHz. */
   bool setTXFrequency(double freq);
 
-  /** Returns the power setting of the channel. */
+  /** Retunrs @c true if the channel uses the global default power setting. */
+  bool defaultPower() const;
+  /** Returns the power setting of the channel if the channel does not use the default power. */
   Power power() const;
-  /** (Re-)Sets the power setting of the channel. */
+  /** (Re-)Sets the power setting of the channel, overrides default power. */
   void setPower(Power power);
+  /** Sets the channel to use the default power setting. */
+  void setDefaultPower();
 
+  /** Returns @c true if the transmit timeout is specified by the global default value. */
+  bool defaultTimeout() const;
+  /** Returns @c true if the transmit timeout is disabled. */
+  bool timeoutDisabled() const;
   /** Returns the TX timeout (TOT) in seconds. */
   uint timeout() const;
   /** (Re-)Sets the TX timeout (TOT) in seconds. */
   bool setTimeout(uint dur);
+  /** Disables the transmit timeout. */
+  void disableTimeout();
+  /** Sets the timeout to the global default timeout. */
+  void setDefaultTimeout();
 
   /** Returns @c true, if the channel is RX only. */
   bool rxOnly() const;
   /** Set, whether the channel is RX only. */
   bool setRXOnly(bool enable);
+
+  /** Returns @c true if the VOX is disabled. */
+  bool voxDisabled() const;
+  /** Retunrs @c true if the VOX is specified by the global default value. */
+  bool defaultVOX() const;
+  /** Returns the VOX level [0-10]. */
+  uint vox() const;
+  /** Sets the VOX level [0-10]. */
+  void setVOX(uint level);
+  /** Sets the VOX level to the default value. */
+  void setVOXDefault();
+  /** Disables the VOX. */
+  void disableVOX();
 
   /** Returns the reference to the scan list. */
   const ScanListReference *scanList() const;
@@ -138,12 +165,16 @@ protected:
   double _rxFreq;
   /** The TX frequency in MHz. */
   double _txFreq;
+  /** If @c true, the channel uses the global power setting. */
+  bool _defaultPower;
   /** The transmit power setting. */
   Power _power;
   /** Transmit timeout in seconds. */
   uint  _txTimeOut;
   /** RX only flag. */
   bool  _rxOnly;
+  /** Holds the VOX level. */
+  uint _vox;
   /** Default scan list of the channel. */
   ScanListReference _scanlist;
 };
@@ -213,10 +244,18 @@ public:
   /** (Re-)Sets the admit criterion for the analog channel. */
 	void setAdmit(Admit admit);
 
+  /** Returns @c true if the global default squelch level is used. */
+  bool defaultSquelch() const;
+  /** Returns @c true if the squelch is disabled. */
+  bool squelchDisabled() const;
   /** Returns the squelch level [0,10]. */
 	uint squelch() const;
   /** (Re-)Sets the squelch level [0,10]. 0 Disables squelch (on some radios). */
 	bool setSquelch(uint squelch);
+  /** Disables the quelch. */
+  void disableSquelch();
+  /** Sets the squelch to the global default value. */
+  void setSquelchDefault();
 
   /** Returns the CTCSS/DCS RX tone, @c SIGNALING_NONE means disabled. */
   Signaling::Code rxTone() const;

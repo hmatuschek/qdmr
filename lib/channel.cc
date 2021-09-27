@@ -24,8 +24,8 @@
  * ********************************************************************************************* */
 Channel::Channel(const QString &name, double rx, double tx, Power power, uint txTimeout,
                  bool rxOnly, ScanList *scanlist, QObject *parent)
-  : ConfigObject("ch", parent), _name(name), _rxFreq(rx), _txFreq(tx), _power(power), _txTimeOut(txTimeout),
-    _rxOnly(rxOnly), _scanlist()
+  : ConfigObject("ch", parent), _name(name), _rxFreq(rx), _txFreq(tx), _defaultPower(false),
+    _power(power), _txTimeOut(txTimeout), _rxOnly(rxOnly), _vox(0), _scanlist()
 {
   // Set reference to scan list
   _scanlist.set(scanlist);
@@ -67,6 +67,10 @@ Channel::setTXFrequency(double freq) {
   return true;
 }
 
+bool
+Channel::defaultPower() const {
+  return _defaultPower;
+}
 Channel::Power
 Channel::power() const {
   return _power;
@@ -74,9 +78,22 @@ Channel::power() const {
 void
 Channel::setPower(Power power) {
   _power = power;
+  _defaultPower = false;
   emit modified(this);
 }
+void
+Channel::setDefaultPower() {
+  _defaultPower = true;
+}
 
+bool
+Channel::defaultTimeout() const {
+  return std::numeric_limits<uint>::max() == timeout();
+}
+bool
+Channel::timeoutDisabled() const {
+  return 0 == timeout();
+}
 uint
 Channel::timeout() const {
   return _txTimeOut;
@@ -86,6 +103,14 @@ Channel::setTimeout(uint dur) {
   _txTimeOut = dur;
   emit modified(this);
   return true;
+}
+void
+Channel::setDefaultTimeout() {
+  setTimeout(std::numeric_limits<uint>::max());
+}
+void
+Channel::disableTimeout() {
+  setTimeout(0);
 }
 
 bool
@@ -97,6 +122,32 @@ Channel::setRXOnly(bool enable) {
   _rxOnly = enable;
   emit modified(this);
   return true;
+}
+
+bool
+Channel::voxDisabled() const {
+  return 0==vox();
+}
+bool
+Channel::defaultVOX() const {
+  return std::numeric_limits<uint>::max() == vox();
+}
+uint
+Channel::vox() const {
+  return _vox;
+}
+void
+Channel::setVOX(uint level) {
+  _vox = level;
+  emit modified(this);
+}
+void
+Channel::setVOXDefault() {
+  setVOX(std::numeric_limits<uint>::max());
+}
+void
+Channel::disableVOX() {
+  setVOX(0);
 }
 
 const ScanListReference *
@@ -160,6 +211,14 @@ AnalogChannel::setAdmit(Admit admit) {
   emit modified(this);
 }
 
+bool
+AnalogChannel::defaultSquelch() const {
+  return std::numeric_limits<uint>::max()==squelch();
+}
+bool
+AnalogChannel::squelchDisabled() const {
+  return 0==squelch();
+}
 uint
 AnalogChannel::squelch() const {
   return _squelch;
@@ -169,6 +228,14 @@ AnalogChannel::setSquelch(uint val) {
   _squelch = val;
   emit modified(this);
   return true;
+}
+void
+AnalogChannel::disableSquelch() {
+  setSquelch(0);
+}
+void
+AnalogChannel::setSquelchDefault() {
+  setSquelch(std::numeric_limits<uint>::max());
 }
 
 Signaling::Code
