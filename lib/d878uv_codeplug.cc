@@ -314,8 +314,8 @@ D878UVCodeplug::RoamingChannelElement::setName(const QString &name) {
 bool
 D878UVCodeplug::RoamingChannelElement::fromChannel(const DigitalChannel *ch) {
   setName(ch->name());
-  setRXFrequency(ch->rxFrequency());
-  setTXFrequency(ch->txFrequency());
+  setRXFrequency(ch->rxFrequency()*1e6);
+  setTXFrequency(ch->txFrequency()*1e6);
   setColorCode(ch->colorCode());
   setTimeSlot(ch->timeSlot());
   return true;
@@ -324,16 +324,16 @@ D878UVCodeplug::RoamingChannelElement::fromChannel(const DigitalChannel *ch) {
 DigitalChannel *
 D878UVCodeplug::RoamingChannelElement::toChannel(Context &ctx) {
   // Find matching channel for RX, TX frequency, TS and CC
-  double rx = rxFrequency(), tx = txFrequency();
   DigitalChannel *digi = ctx.config()->channelList()->findDigitalChannel(
-        rx, tx, timeSlot(), colorCode());
+        rxFrequency()/1e6, txFrequency()/1e6, timeSlot(), colorCode());
   if (nullptr == digi) {
     // If no matching channel can be found -> create one
-    digi = new DigitalChannel(name(), rxFrequency(), txFrequency(),
+    digi = new DigitalChannel(name(), rxFrequency()/1e6, txFrequency()/1e6,
                               Channel::Power::Low, 0, false, DigitalChannel::Admit::ColorCode,
                               colorCode(), timeSlot(), nullptr, nullptr, nullptr,
                               nullptr, nullptr, nullptr);
-    logDebug() << "Create channel '" << digi->name() << "' as roaming channel.";
+    logDebug() << "No matching roaming channel found: Create channel '"
+               << digi->name() << "' as roaming channel.";
     ctx.config()->channelList()->add(digi);
   }
   return digi;
@@ -1545,7 +1545,7 @@ D878UVCodeplug::AnalogAPRSSettingsElement::setPreWaveDelay(uint ms) {
 bool
 D878UVCodeplug::AnalogAPRSSettingsElement::fromAPRSSystem(const APRSSystem *sys, Context &ctx) {
   clear();
-  setFrequency(sys->revertChannel()->txFrequency());
+  setFrequency(sys->revertChannel()->txFrequency()*1e6);
   setTXTone(sys->revertChannel()->txTone());
   setManualTXInterval(sys->period());
   setAutoTXInterval(sys->period());
@@ -1569,14 +1569,14 @@ D878UVCodeplug::AnalogAPRSSettingsElement::toAPRSSystem() {
 bool
 D878UVCodeplug::AnalogAPRSSettingsElement::linkAPRSSystem(APRSSystem *sys, Context &ctx) {
   // First, try to find a matching analog channel in list
-  AnalogChannel *ch = ctx.config()->channelList()->findAnalogChannelByTxFreq(frequency());
+  AnalogChannel *ch = ctx.config()->channelList()->findAnalogChannelByTxFreq(frequency()/1e6);
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
-    ch = new AnalogChannel("APRS Channel", frequency(), frequency(), power(),
+    ch = new AnalogChannel("APRS Channel", frequency()/1e6, frequency()/1e6, power(),
                            0, false, AnalogChannel::Admit::Free, 1, Signaling::SIGNALING_NONE,
                            txTone(), AnalogChannel::Bandwidth::Wide, nullptr);
-    logInfo() << "No matching APRS chanel found for TX frequency " << frequency()
-              << ", create one as 'APRS Channel'";
+    logInfo() << "No matching APRS chanel found for TX frequency " << frequency()/1e6
+              << "MHz, create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);
   }
   sys->setRevertChannel(ch);
@@ -2421,7 +2421,8 @@ D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx) {
     uint32_t addr = ADDR_ROAMING_ZONE_0+i*ROAMING_ZONE_OFFSET;
     RoamingZoneElement zone(data(addr));
     logDebug() << "Encode roaming zone " << ctx.config()->roaming()->zone(i)->name()
-               << " (" << (i+1) << ") at " << QString::number(addr, 16);
+               << " (" << (i+1) << ") at " << QString::number(addr, 16)
+               << " with " << ctx.config()->roaming()->zone(i)->count() << " elements.";
     zone.fromRoamingZone(ctx.config()->roaming()->zone(i), roaming_ch_map);
   }
 
