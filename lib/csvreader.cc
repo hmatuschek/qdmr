@@ -1941,7 +1941,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(gps);
         return false;
       }
-      _channels[idx]->as<DigitalChannel>()->aprsObj(_posSystems[gps]);
+      _channels[idx]->as<DigitalChannel>()->setAPRSObj(_posSystems[gps]);
     }
 
     // Check roaming zone

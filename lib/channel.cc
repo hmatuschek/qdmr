@@ -393,7 +393,7 @@ DigitalChannel::aprsObj() const {
 }
 
 bool
-DigitalChannel::aprsObj(PositioningSystem *sys) {
+DigitalChannel::setAPRSObj(PositioningSystem *sys) {
   if (! _posSystem.set(sys))
     return false;
   emit modified(this);

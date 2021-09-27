@@ -190,11 +190,11 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
     DigitalChannel *dc = c->as<DigitalChannel>();
     // Link to GPS system
     if (txDigitalAPRS() && ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
-      dc->aprsObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
+      dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
     // Link APRS system if one is defined
     //  There can only be one active APRS system, hence the index is fixed to one.
     if (txAnalogAPRS() && ctx.has<APRSSystem>(0))
-      dc->aprsObj(ctx.get<APRSSystem>(0));
+      dc->setAPRSObj(ctx.get<APRSSystem>(0));
     // If roaming is not disabled -> link to default roaming zone
     if (roamingEnabled())
       dc->setRoamingZone(DefaultRoamingZone::get());

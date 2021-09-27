@@ -688,7 +688,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
     if (txDigitalAPRS() && (! ctx.has<GPSSystem>(digitalAPRSSystemIndex())))
       logWarn() << "Cannot link to DMR APRS system index " << digitalAPRSSystemIndex() << ": undefined DMR APRS system.";
     else if (ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
-      dc->aprsObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
+      dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
 
     // Link radio ID
     RadioID *rid = ctx.get<RadioID>(radioIDIndex());

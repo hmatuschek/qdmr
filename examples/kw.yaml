@@ -122,6 +122,7 @@ channels:
       radioID: !<!default> ""
       groupList: grp2
       contact: cont7
+      aprs: aprs1
       roaming: !<!default> ""
   - digital:
       id: ch6

@@ -551,7 +551,7 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
       dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
     }
     if (positioningSystemIndex() && ctx.has<GPSSystem>(positioningSystemIndex())) {
-      dc->aprsObj(ctx.get<GPSSystem>(positioningSystemIndex()));
+      dc->setAPRSObj(ctx.get<GPSSystem>(positioningSystemIndex()));
     }
     return true;
   }

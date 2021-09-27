@@ -153,7 +153,7 @@ DigitalChannelDialog::channel() {
     _channel->setTimeSlot(ts);
     _channel->setGroupListObj(rxgroup);
     _channel->setTXContactObj(contact);
-    _channel->aprsObj(pos);
+    _channel->setAPRSObj(pos);
     _channel->setRoamingZone(roamingZone);
     return _channel;
   }
