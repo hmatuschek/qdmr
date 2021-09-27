@@ -1063,10 +1063,14 @@ public:
     /** Resets the systems. */
     void clear();
 
+    /** Retunrs @c true if the channel points to the current/selected channel. */
+    virtual bool channelIsSelected(uint n) const;
     /** Returns the digital channel index for the n-th system. */
     virtual uint channelIndex(uint n) const;
     /** Sets the digital channel index for the n-th system. */
     virtual void setChannelIndex(uint n, uint idx);
+    /** Sets the channel to the current/selected channel. */
+    virtual void setChannelSelected(uint n);
 
     /** Returns the destination contact for the n-th system. */
     virtual uint destination(uint n) const;

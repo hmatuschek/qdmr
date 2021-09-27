@@ -1756,6 +1756,10 @@ D878UVCodeplug::DMRAPRSSystemsElement::clear() {
   memset(_data, 0x00, _size);
 }
 
+bool
+D878UVCodeplug::DMRAPRSSystemsElement::channelIsSelected(uint n) const {
+  return 0xfa2 == channelIndex(n);
+}
 uint
 D878UVCodeplug::DMRAPRSSystemsElement::channelIndex(uint n) const {
   return getUInt16_le(0x0000 + n*2);
@@ -1763,6 +1767,10 @@ D878UVCodeplug::DMRAPRSSystemsElement::channelIndex(uint n) const {
 void
 D878UVCodeplug::DMRAPRSSystemsElement::setChannelIndex(uint n, uint idx) {
   setUInt16_le(0x0000 + 2*n, idx);
+}
+void
+D878UVCodeplug::DMRAPRSSystemsElement::setChannelSelected(uint n) {
+  setChannelIndex(n, 0xfa2);
 }
 
 uint
@@ -1855,6 +1863,8 @@ D878UVCodeplug::DMRAPRSSystemsElement::fromGPSSystemObj(GPSSystem *sys, Context 
   if (sys->hasRevertChannel() && (SelectedChannel::get() != (Channel *)sys->revertChannel())) {
     setChannelIndex(idx, ctx.index(sys->revertChannel()));
     clearTimeSlotOverride(idx);
+  } else { // no revert channel specified or "selected channel":
+    setChannelSelected(idx);
   }
   return true;
 }
@@ -1870,8 +1880,11 @@ bool
 D878UVCodeplug::DMRAPRSSystemsElement::linkGPSSystem(int idx, GPSSystem *sys, Context &ctx) const {
   // Clear revert channel from GPS system
   sys->setRevertChannel(nullptr);
+
   // if a revert channel is defined -> link to it
-  if (ctx.has<Channel>(channelIndex(idx)) && ctx.get<Channel>(channelIndex(idx))->is<DigitalChannel>())
+  if (channelIsSelected(idx))
+    sys->setRevertChannel(nullptr);
+  else if (ctx.has<Channel>(channelIndex(idx)) && ctx.get<Channel>(channelIndex(idx))->is<DigitalChannel>())
     sys->setRevertChannel(ctx.get<Channel>(channelIndex(idx))->as<DigitalChannel>());
 
   // Search for a matching contact in contacts
@@ -2317,13 +2330,15 @@ D878UVCodeplug::createGPSSystems(Context &ctx) {
   // Create GPS systems
   DMRAPRSSystemsElement gps_systems(data(ADDR_GPS_SETTING));
   for (int i=0; i<NUM_GPS_SYSTEMS; i++) {
-    if (0 != gps_systems.destination(i))
+    if (0 == gps_systems.destination(i))
       continue;
-    GPSSystem *sys = gps_systems.toGPSSystemObj(i);
-    if (sys)
+    if (GPSSystem *sys = gps_systems.toGPSSystemObj(i)) {
       logDebug() << "Create GPS sys '" << sys->name() << "' at idx " << i << ".";
-    sys->setPeriod(pos_intervall);
-    ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
+      sys->setPeriod(pos_intervall);
+      ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
+    } else {
+      return false;
+    }
   }
   return true;
 }
@@ -2341,7 +2356,7 @@ D878UVCodeplug::linkGPSSystems(Context &ctx) {
   // Link GPS systems
   DMRAPRSSystemsElement gps_systems(data(ADDR_GPS_SETTING));
   for (int i=0; i<NUM_GPS_SYSTEMS; i++) {
-    if (0 != gps_systems.destination(i))
+    if (0 == gps_systems.destination(i))
       continue;
     gps_systems.linkGPSSystem(i, ctx.get<GPSSystem>(i), ctx);
   }
