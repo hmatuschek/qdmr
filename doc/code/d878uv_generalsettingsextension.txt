@@ -6,13 +6,13 @@
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 20  | Unused set to 0x00                                            | AutoRep UHF 2 offset index    | AutoRep VHF 2 offset index    |
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-24  | AutoRep VHF 2 minimum frequency in 10Hz, 8-digit BCD, litte-endian.                                                           |
+24  | AutoRep VHF 2 minimum frequency in 10Hz, 8-digit BCD, big-endian.                                                             |
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-28  | AutoRep VHF 2 maximum frequency in 10Hz, 8-digit BCD, litte-endian.                                                           |
+28  | AutoRep VHF 2 maximum frequency in 10Hz, 8-digit BCD, big-endian.                                                             |
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-2c  | AutoRep UHF 2 minimum frequency in 10Hz, 8-digit BCD, litte-endian.                                                           |
+2c  | AutoRep UHF 2 minimum frequency in 10Hz, 8-digit BCD, big-endian.                                                             |
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-30  | AutoRep UHF 2 maximum frequency in 10Hz, 8-digit BCD, litte-endian.                                                           |
+30  | AutoRep UHF 2 maximum frequency in 10Hz, 8-digit BCD, big-endian.                                                             |
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 34  | Unknown                       | GPS mode                      | Unknown settings                                           ...
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+

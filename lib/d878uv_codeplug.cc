@@ -263,19 +263,19 @@ D878UVCodeplug::RoamingChannelElement::clear() {
 
 uint
 D878UVCodeplug::RoamingChannelElement::rxFrequency() const {
-  return getBCD8_le(0x0000)*10;
+  return getBCD8_be(0x0000)*10;
 }
 void
 D878UVCodeplug::RoamingChannelElement::setRXFrequency(uint hz) {
-  setBCD8_le(0x0000, hz/10);
+  setBCD8_be(0x0000, hz/10);
 }
 uint
 D878UVCodeplug::RoamingChannelElement::txFrequency() const {
-  return getBCD8_le(0x0004)*10;
+  return getBCD8_be(0x0004)*10;
 }
 void
 D878UVCodeplug::RoamingChannelElement::setTXFrequency(uint hz) {
-  setBCD8_le(0x0004, hz/10);
+  setBCD8_be(0x0004, hz/10);
 }
 uint
 D878UVCodeplug::RoamingChannelElement::colorCode() const {
@@ -892,36 +892,36 @@ D878UVCodeplug::GeneralSettingsElement::setSMSFormat(SMSFormat fmt) {
 
 uint
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
-  return getBCD8_le(0x00c4)*10;
+  return getBCD8_be(0x00c4)*10;
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(uint Hz) {
-  setBCD8_le(0x00c4, Hz/10);
+  setBCD8_be(0x00c4, Hz/10);
 }
 uint
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyVHF() const {
-  return getBCD8_le(0x00c8)*10;
+  return getBCD8_be(0x00c8)*10;
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(uint Hz) {
-  setBCD8_le(0x00c8, Hz/10);
+  setBCD8_be(0x00c8, Hz/10);
 }
 
 uint
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyUHF() const {
-  return getBCD8_le(0x00cc)*10;
+  return getBCD8_be(0x00cc)*10;
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(uint Hz) {
-  setBCD8_le(0x00cc, Hz/10);
+  setBCD8_be(0x00cc, Hz/10);
 }
 uint
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyUHF() const {
-  return getBCD8_le(0x00d0)*10;
+  return getBCD8_be(0x00d0)*10;
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(uint Hz) {
-  setBCD8_le(0x00d0, Hz/10);
+  setBCD8_be(0x00d0, Hz/10);
 }
 
 D878UVCodeplug::GeneralSettingsElement::AutoRepDir
@@ -1282,35 +1282,35 @@ D878UVCodeplug::GeneralSettingsExtensionElement::clearAutoRepeaterVHF2OffsetInde
 
 uint
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterVHF2MinFrequency() const {
-  return ((uint)getBCD8_le(0x0024))*10;
+  return ((uint)getBCD8_be(0x0024))*10;
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2MinFrequency(uint hz) {
-  setBCD8_le(0x0024, hz/10);
+  setBCD8_be(0x0024, hz/10);
 }
 uint
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterVHF2MaxFrequency() const {
-  return ((uint)getBCD8_le(0x0028))*10;
+  return ((uint)getBCD8_be(0x0028))*10;
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2MaxFrequency(uint hz) {
-  setBCD8_le(0x0028, hz/10);
+  setBCD8_be(0x0028, hz/10);
 }
 uint
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterUHF2MinFrequency() const {
-  return ((uint)getBCD8_le(0x002c))*10;
+  return ((uint)getBCD8_be(0x002c))*10;
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MinFrequency(uint hz) {
-  setBCD8_le(0x002c, hz/10);
+  setBCD8_be(0x002c, hz/10);
 }
 uint
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterUHF2MaxFrequency() const {
-  return ((uint)getBCD8_le(0x0030))*10;
+  return ((uint)getBCD8_be(0x0030))*10;
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MaxFrequency(uint hz) {
-  setBCD8_le(0x0030, hz/10);
+  setBCD8_be(0x0030, hz/10);
 }
 
 D878UVCodeplug::GeneralSettingsExtensionElement::GPSMode
@@ -1358,11 +1358,11 @@ D878UVCodeplug::AnalogAPRSSettingsElement::clear() {
 
 uint
 D878UVCodeplug::AnalogAPRSSettingsElement::frequency() const {
-  return ((uint)getBCD8_le(0x0001))*10;
+  return ((uint)getBCD8_be(0x0001))*10;
 }
 void
 D878UVCodeplug::AnalogAPRSSettingsElement::setFrequency(uint hz) {
-  setBCD8_le(0x0001, hz/10);
+  setBCD8_be(0x0001, hz/10);
 }
 
 uint
@@ -1416,32 +1416,31 @@ D878UVCodeplug::AnalogAPRSSettingsElement::setManualTXInterval(uint sec) {
 
 bool
 D878UVCodeplug::AnalogAPRSSettingsElement::autoTX() const {
-  return 0!=getUInt8(0x000b);
+  return 0!=autoTXInterval();
 }
 uint
 D878UVCodeplug::AnalogAPRSSettingsElement::autoTXInterval() const {
-  return 15+((uint)getUInt8(0x000b))*15;
+  return ((uint)getUInt8(0x000b))*30;
 }
 void
 D878UVCodeplug::AnalogAPRSSettingsElement::setAutoTXInterval(uint sec) {
-  if (30 > sec) sec = 30;
-  setUInt8(0x000b, (sec-15)/15);
+  setUInt8(0x000b, sec/30);
 }
 void
 D878UVCodeplug::AnalogAPRSSettingsElement::disableAutoTX() {
-  setUInt8(0x000b, 0x00);
+  setAutoTXInterval(0);
 }
 
 bool
 D878UVCodeplug::AnalogAPRSSettingsElement::fixedLocationEnabled() const {
-  return getUInt8(0x000c);
+  return getUInt8(0x000d);
 }
 QGeoCoordinate
 D878UVCodeplug::AnalogAPRSSettingsElement::fixedLocation() const {
-  double latitude  = getUInt8(0x000d) + double(getUInt8(0x000e))/60 + double(getUInt8(0x000f))/3600;
-  if (getUInt8(0x0010)) latitude *= -1;
-  double longitude = getUInt8(0x0011) + double(getUInt8(0x0012))/60 + double(getUInt8(0x0013))/3600;
-  if (getUInt8(0x0014)) longitude *= -1;
+  double latitude  = getUInt8(0x000e) + double(getUInt8(0x000f))/60 + double(getUInt8(0x0010))/3600;
+  if (getUInt8(0x0011)) latitude *= -1;
+  double longitude = getUInt8(0x0012) + double(getUInt8(0x0013))/60 + double(getUInt8(0x0014))/3600;
+  if (getUInt8(0x0015)) longitude *= -1;
   return QGeoCoordinate(latitude, longitude);
 }
 void
@@ -1456,50 +1455,50 @@ D878UVCodeplug::AnalogAPRSSettingsElement::setFixedLocation(QGeoCoordinate &loc)
   uint lon_deg = int(longitude); longitude -= lon_deg; longitude *= 60;
   uint lon_min = int(longitude); longitude -= lon_min; longitude *= 60;
   uint lon_sec = int(longitude);
-  setUInt8(0x000d, lat_deg); setUInt8(0x000e, lat_min); setUInt8(0x000f, lat_sec); setUInt8(0x0010, (south ? 0x01 : 0x00));
-  setUInt8(0x0011, lon_deg); setUInt8(0x0012, lon_min); setUInt8(0x0013, lon_sec); setUInt8(0x0014, (west ? 0x01 : 0x00));
+  setUInt8(0x000e, lat_deg); setUInt8(0x000f, lat_min); setUInt8(0x0010, lat_sec); setUInt8(0x0011, (south ? 0x01 : 0x00));
+  setUInt8(0x0012, lon_deg); setUInt8(0x0013, lon_min); setUInt8(0x0014, lon_sec); setUInt8(0x0015, (west ? 0x01 : 0x00));
   // enable fixed location.
-  setUInt8(0x000c, 0x01);
+  setUInt8(0x000d, 0x01);
 }
 void
 D878UVCodeplug::AnalogAPRSSettingsElement::disableFixedLocation() {
-  setUInt8(0x000c, 0x00);
+  setUInt8(0x000d, 0x00);
 }
 
 QString
 D878UVCodeplug::AnalogAPRSSettingsElement::destination() const {
-  return readASCII(0x0015, 6, 0x00);
+  return readASCII(0x0016, 6, 0x00);
 }
 uint
 D878UVCodeplug::AnalogAPRSSettingsElement::destinationSSID() const {
-  return getUInt8(0x001b);
+  return getUInt8(0x001c);
 }
 void
 D878UVCodeplug::AnalogAPRSSettingsElement::setDestination(const QString &call, uint ssid) {
-  writeASCII(0x0015, call, 6, 0x00);
-  setUInt8(0x001b, ssid);
+  writeASCII(0x0016, call, 6, 0x00);
+  setUInt8(0x001c, ssid);
 }
 QString
 D878UVCodeplug::AnalogAPRSSettingsElement::source() const {
-  return readASCII(0x001c, 6, 0x00);
+  return readASCII(0x001d, 6, 0x00);
 }
 uint
 D878UVCodeplug::AnalogAPRSSettingsElement::sourceSSID() const {
-  return getUInt8(0x0022);
+  return getUInt8(0x0023);
 }
 void
 D878UVCodeplug::AnalogAPRSSettingsElement::setSource(const QString &call, uint ssid) {
-  writeASCII(0x001c, call, 6, 0x00);
-  setUInt8(0x0022, ssid);
+  writeASCII(0x001d, call, 6, 0x00);
+  setUInt8(0x0023, ssid);
 }
 
 QString
 D878UVCodeplug::AnalogAPRSSettingsElement::path() const {
-  return readASCII(0x0023, 20, 0x00);
+  return readASCII(0x0024, 20, 0x00);
 }
 void
 D878UVCodeplug::AnalogAPRSSettingsElement::setPath(const QString &path) {
-  writeASCII(0x0023, path, 20, 0x00);
+  writeASCII(0x0024, path, 20, 0x00);
 }
 
 APRSSystem::Icon
@@ -1775,11 +1774,11 @@ D878UVCodeplug::DMRAPRSSystemsElement::setChannelSelected(uint n) {
 
 uint
 D878UVCodeplug::DMRAPRSSystemsElement::destination(uint n) const {
-  return getBCD8_le(0x0010 + 4*n);
+  return getBCD8_be(0x0010 + 4*n);
 }
 void
 D878UVCodeplug::DMRAPRSSystemsElement::setDestination(uint n, uint idx) {
-  setBCD8_le(0x0010 + 4*n, idx);
+  setBCD8_be(0x0010 + 4*n, idx);
 }
 
 DigitalContact::Type

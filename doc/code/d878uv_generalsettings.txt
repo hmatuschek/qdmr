@@ -98,13 +98,13 @@ bc | Callsign color                | GPS unit                      | 0   0   0 |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 c0 | Standby text color            | Standby image color           | Show last heard               | SMS format                    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-c4 | Auto repeater VHF min frequency in 10Hz, 8-digit BCD, little endian                                                           |
+c4 | Auto repeater VHF min frequency in 10Hz, 8-digit BCD, big endian                                                              |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-c8 | Auto repeater VHF max frequency in 10Hz, 8-digit BCD, little endian                                                           |
+c8 | Auto repeater VHF max frequency in 10Hz, 8-digit BCD, big endian                                                              |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-cc | Auto repeater UHF min frequency in 10Hz, 8-digit BCD, little endian                                                           |
+cc | Auto repeater UHF min frequency in 10Hz, 8-digit BCD, big endian                                                              |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-d0 | Auto repeater UHF max frequency in 10Hz, 8-digit BCD, little endian                                                           |
+d0 | Auto repeater UHF max frequency in 10Hz, 8-digit BCD, big endian                                                              |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 d4 | Auto rep. VFO B direction     | Uknown                        | Unused set to 0x00            | Boot channel enable           |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+

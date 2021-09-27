@@ -851,11 +851,11 @@ AnytoneCodeplug::ContactElement::setName(const QString &name) {
 
 uint
 AnytoneCodeplug::ContactElement::number() const {
-  return getBCD8_le(0x0023);
+  return getBCD8_be(0x0023);
 }
 void
 AnytoneCodeplug::ContactElement::setNumber(uint number) {
-  setBCD8_le(0x0023, number);
+  setBCD8_be(0x0023, number);
 }
 
 AnytoneCodeplug::ContactElement::AlertType
@@ -1302,11 +1302,11 @@ AnytoneCodeplug::RadioIDElement::clear() {
 
 uint
 AnytoneCodeplug::RadioIDElement::number() const {
-  return getBCD8_le(0x0000);
+  return getBCD8_be(0x0000);
 }
 void
 AnytoneCodeplug::RadioIDElement::setNumber(uint number) {
-  setBCD8_le(0x0000, number);
+  setBCD8_be(0x0000, number);
 }
 
 QString
@@ -1883,38 +1883,38 @@ AnytoneCodeplug::GeneralSettingsElement::enableEnhancedAudio(bool enable) {
 
 uint
 AnytoneCodeplug::GeneralSettingsElement::minVFOScanFrequencyUHF() const {
-  return ((uint)getBCD8_le(0x0058))*10;
+  return ((uint)getBCD8_be(0x0058))*10;
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyUHF(uint hz) {
-  setBCD8_le(0x0058, hz/10);
+  setBCD8_be(0x0058, hz/10);
 }
 
 uint
 AnytoneCodeplug::GeneralSettingsElement::maxVFOScanFrequencyUHF() const {
-  return ((uint)getBCD8_le(0x005c))*10;
+  return ((uint)getBCD8_be(0x005c))*10;
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyUHF(uint hz) {
-  setBCD8_le(0x005c, hz/10);
+  setBCD8_be(0x005c, hz/10);
 }
 
 uint
 AnytoneCodeplug::GeneralSettingsElement::minVFOScanFrequencyVHF() const {
-  return ((uint)getBCD8_le(0x0060))*10;
+  return ((uint)getBCD8_be(0x0060))*10;
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyVHF(uint hz) {
-  setBCD8_le(0x0060, hz/10);
+  setBCD8_be(0x0060, hz/10);
 }
 
 uint
 AnytoneCodeplug::GeneralSettingsElement::maxVFOScanFrequencyVHF() const {
-  return ((uint)getBCD8_le(0x0064))*10;
+  return ((uint)getBCD8_be(0x0064))*10;
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyVHF(uint hz) {
-  setBCD8_le(0x0064, hz/10);
+  setBCD8_be(0x0064, hz/10);
 }
 
 bool
@@ -2319,11 +2319,11 @@ AnytoneCodeplug::DMRAPRSSettingsElement::clearChannel(uint n) {
 
 uint
 AnytoneCodeplug::DMRAPRSSettingsElement::destination() const {
-  return getBCD8_le(0x001c);
+  return getBCD8_be(0x001c);
 }
 void
 AnytoneCodeplug::DMRAPRSSettingsElement::setDestination(uint id) {
-  setBCD8_le(0x001c, id);
+  setBCD8_be(0x001c, id);
 }
 
 DigitalContact::Type
@@ -2958,11 +2958,11 @@ AnytoneCodeplug::DigitalAlarmExtensionElement::setCallType(DigitalContact::Type 
 
 uint
 AnytoneCodeplug::DigitalAlarmExtensionElement::destination() const {
-  return getBCD8_le(0x0023);
+  return getBCD8_be(0x0023);
 }
 void
 AnytoneCodeplug::DigitalAlarmExtensionElement::setDestination(uint number) {
-  setBCD8_le(0x0023, number);
+  setBCD8_be(0x0023, number);
 }
 
 
