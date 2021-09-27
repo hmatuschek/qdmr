@@ -375,6 +375,8 @@ Codeplug::Context::obj(const QMetaObject *elementType, uint idx) {
 
 int
 Codeplug::Context::index(ConfigObject *obj) {
+  if (nullptr == obj)
+    return -1;
   if (! hasTable(obj->metaObject()))
     return -1;
   return getTable(obj->metaObject()).indices.value(obj, -1);

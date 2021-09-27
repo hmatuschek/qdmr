@@ -639,7 +639,7 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     AnalogChannel::Admit admit = ((Admit::Free == this->admit()) ?
                                     AnalogChannel::Admit::Free : AnalogChannel::Admit::Always);
     ch = new AnalogChannel(
-          name(), rxFrequency(), txFrequency(), power(), 0.0, rxOnly(), admit,
+          name(), rxFrequency()/1e6, txFrequency()/1e6, power(), 0.0, rxOnly(), admit,
           1, rxTone(), txTone(), bandwidth(), nullptr);
   } else if ((Mode::Digital == mode()) || (Mode::MixedDigital == mode())) {
     if (Mode::MixedDigital == mode())
@@ -652,7 +652,7 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     case Admit::Colorcode: admit = DigitalChannel::Admit::ColorCode; break;
     }
     ch = new DigitalChannel(
-          name(), rxFrequency(), txFrequency(), power(), 0.0, rxOnly(), admit,
+          name(), rxFrequency()/1e6, txFrequency()/1e6, power(), 0.0, rxOnly(), admit,
           colorCode(), timeSlot(), nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
   } else {
     logError() << "Cannot create channel '" << name()
@@ -720,8 +720,8 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
   // set channel name
   setName(c->name());
   // set rx and tx frequencies
-  setRXFrequency(c->rxFrequency());
-  setTXFrequency(c->txFrequency());
+  setRXFrequency(c->rxFrequency()*1e6);
+  setTXFrequency(c->txFrequency()*1e6);
   setPower(c->power());
   // set tx-enable
   enableRXOnly(c->rxOnly());
@@ -2384,8 +2384,10 @@ AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context 
   disableTimeSlotOverride();
   if (SelectedChannel::get() == sys->revertChannel()->as<Channel>()) {
     setChannelSelected(0);
-  } else {
+  } else if (sys->revert()->is<DigitalChannel>()) {
     setChannelIndex(0, ctx.index(sys->revertChannel()));
+  } else {
+    clearChannel(0);
   }
   return true;
 }

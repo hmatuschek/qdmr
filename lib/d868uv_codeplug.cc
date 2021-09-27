@@ -220,52 +220,6 @@ D868UVCodeplug::ctcss_num2code(uint8_t num) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D868UVCodeplug::contact_map_t
- * ******************************************************************************************** */
-D868UVCodeplug::contact_map_t::contact_map_t() {
-  clear();
-}
-
-void
-D868UVCodeplug::contact_map_t::clear() {
-  memset(this, 0xff, sizeof(contact_map_t));
-}
-
-bool
-D868UVCodeplug::contact_map_t::isValid() const {
-  return (0xffffffff != id_group) && (0xffffffff != contact_index);
-}
-
-bool
-D868UVCodeplug::contact_map_t::isGroup() const {
-  uint32_t tmp = qFromLittleEndian(id_group);
-  return tmp & 0x01;
-}
-uint32_t
-D868UVCodeplug::contact_map_t::ID() const {
-  uint32_t tmp = qFromLittleEndian(id_group);
-  tmp = tmp>>1;
-  return decode_dmr_id_bcd_le((uint8_t *)&tmp);
-}
-void
-D868UVCodeplug::contact_map_t::setID(uint32_t id, bool group) {
-  uint32_t tmp; encode_dmr_id_bcd_le((uint8_t *)&tmp, id);
-  tmp = ( (tmp << 1) | (group ? 1 : 0) );
-  id_group = qToLittleEndian(tmp);
-}
-
-
-uint32_t
-D868UVCodeplug::contact_map_t::index() const {
-  return qFromLittleEndian(contact_index);
-}
-void
-D868UVCodeplug::contact_map_t::setIndex(uint32_t index) {
-  contact_index = qToLittleEndian(index);
-}
-
-
-/* ******************************************************************************************** *
  * Implementation of D868UVCodeplug::GeneralSettingsElement
  * ******************************************************************************************** */
 D868UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, uint size)
@@ -817,8 +771,9 @@ D868UVCodeplug::createChannels(Context &ctx) {
     if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
       continue;
     ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
-    if (Channel *obj = ch.toChannelObj(ctx))
-      ctx.add(obj, i);
+    if (Channel *obj = ch.toChannelObj(ctx)) {
+      ctx.config()->channelList()->add(obj); ctx.add(obj, i);
+    }
   }
   return true;
 }
@@ -955,8 +910,10 @@ D868UVCodeplug::createAnalogContacts(Context &ctx) {
     uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
         + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
     DTMFContactElement cont(data(addr));
-    DTMFContact *dtmf = cont.toContact();
-    ctx.config()->contacts()->add(dtmf); ctx.add(dtmf, i);
+    if (DTMFContact *dtmf = cont.toContact()) {
+      ctx.config()->contacts()->add(dtmf);
+      ctx.add(dtmf, i);
+    }
   }
   return true;
 }
@@ -999,8 +956,9 @@ D868UVCodeplug::setRadioID(Context &ctx) {
       continue;
     RadioIDElement id(data(ADDR_RADIOIDS + i*RADIOID_SIZE));
     logDebug() << "Store id " << id.number() << " at idx " << i << ".";
-    RadioID *rid = id.toRadioID();
-    ctx.config()->radioIDs()->add(rid); ctx.add(rid, i);
+    if (RadioID *rid = id.toRadioID()) {
+      ctx.config()->radioIDs()->add(rid);  ctx.add(rid, i);
+    }
   }
   return true;
 }
@@ -1151,27 +1109,10 @@ D868UVCodeplug::createZones(Context &ctx) {
     if (! extend_last_zone) {
       last_zone = new Zone(zonename);
       // add to config
-      ctx.config()->zones()->add(last_zone);
+      ctx.config()->zones()->add(last_zone); ctx.add(last_zone, i);
     } else {
       // when extending the last zone, chop its name to remove the "... A" part.
       last_zone->setName(last_zonebasename);
-    }
-
-    // link zone
-    uint16_t *channels = (uint16_t *)data(ADDR_ZONE+i*ZONE_OFFSET);
-    for (uint8_t i=0; i<NUM_CH_PER_ZONE; i++, channels++) {
-      // If not enabled -> continue
-      if (0xffff == *channels)
-        continue;
-      // Get channel index and check if defined
-      uint16_t cidx = qFromLittleEndian(*channels);
-      if (! ctx.has<Channel>(cidx))
-        continue;
-      // If defined -> add channel to zone obj
-      if (extend_last_zone)
-        last_zone->B()->add(ctx.get<Channel>(cidx));
-      else
-        last_zone->A()->add(ctx.get<Channel>(cidx));
     }
   }
   return true;
@@ -1207,7 +1148,7 @@ D868UVCodeplug::linkZones(Context &ctx) {
 
     // link zone
     uint16_t *channels = (uint16_t *)data(ADDR_ZONE+i*ZONE_OFFSET);
-    for (uint8_t i=0; i<NUM_CH_PER_ZONE; i++, channels++) {
+    for (uint8_t j=0; j<NUM_CH_PER_ZONE; j++, channels++) {
       // If not enabled -> continue
       if (0xffff == *channels)
         continue;

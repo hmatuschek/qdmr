@@ -144,6 +144,38 @@ D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx) {
   return true;
 }
 
+bool
+D578UVCodeplug::createChannels(Context &ctx) {
+  // Create channels
+  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
+  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+    // Check if channel is enabled:
+    uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
+    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
+      continue;
+    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    if (Channel *obj = ch.toChannelObj(ctx)) {
+      ctx.config()->channelList()->add(obj); ctx.add(obj, i);
+    }
+  }
+  return true;
+}
+
+bool
+D578UVCodeplug::linkChannels(Context &ctx) {
+  // Link channel objects
+  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+    // Check if channel is enabled:
+    uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
+    if (0 == (((*data(CHANNEL_BITMAP+byte))>>bit) & 0x01))
+      continue;
+    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    if (ctx.has<Channel>(i))
+      ch.linkChannelObj(ctx.get<Channel>(i), ctx);
+  }
+  return true;
+}
+
 
 void
 D578UVCodeplug::allocateContacts() {

@@ -243,6 +243,8 @@ public:
   void allocateHotKeySettings();
 
   bool encodeChannels(const Flags &flags, Context &ctx);
+  bool createChannels(Context &ctx);
+  bool linkChannels(Context &ctx);
 
   void allocateContacts();
   bool encodeContacts(const Flags &flags, Context &ctx);
