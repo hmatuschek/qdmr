@@ -49,10 +49,7 @@ public:
   VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
                                  const VerifyFlags &flags=VerifyFlags());
 
-protected:
-  /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
-  void run();
-
+public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
   bool startDownload(bool blocking=false);
   /** Derives the device-specific codeplug from the generic configuration and uploads that
@@ -63,16 +60,21 @@ protected:
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
                              const CallsignDB::Selection &selection=CallsignDB::Selection());
 
+protected:
+  /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
+  void run();
+
+private:
   /** Connects to the radio, if a radio interface is passed to the constructor, this interface
    * instance is used. */
-  bool connect();
+  virtual bool connect();
   /** Downloads the codeplug from the radio. This method block until the download is complete. */
-  bool download();
+  virtual bool download();
   /** Uploads the encoded codeplug to the radio. This method block until the upload is complete. */
-  bool upload();
+  virtual bool upload();
   /** Uploads the encoded callsign database to the radio.
    * This method block until the upload is complete. */
-  bool uploadCallsigns();
+  virtual bool uploadCallsigns();
 
 protected:
   /** The device identifier. */

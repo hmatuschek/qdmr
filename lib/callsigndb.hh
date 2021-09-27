@@ -6,13 +6,16 @@
 // Forward decl.
 class UserDatabase;
 
-/** Abstract base class of all callsign database implementations. */
+/** Abstract base class of all callsign database implementations.
+ * This class defines the interface for all device-specific binary encodings of call sign
+ * databases. The interface is particularily simple: reimplement the @c encode method.
+ * @ingroup conf */
 class CallsignDB : public DFUFile
 {
   Q_OBJECT
 
 public:
-  /** Controlls the selection of callsigns from the @c UserDatabase to be encoded into the
+  /** Controls the selection of callsigns from the @c UserDatabase to be encoded into the
    * callsign db. */
   class Selection {
   public:
@@ -39,7 +42,6 @@ public:
 protected:
   /** Hidden constructor. */
   explicit CallsignDB(QObject *parent=nullptr);
-
 
 public:
   /** Destructor. */

@@ -2048,6 +2048,10 @@ public:
     virtual uint index() const;
     /** Sets the index. */
     virtual void setIndex(uint idx);
+
+  public:
+    /** Retuns the size of this entry. */
+    static uint size();
   };
 
 protected:

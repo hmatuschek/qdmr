@@ -3816,6 +3816,11 @@ AnytoneCodeplug::ContactMapElement::setIndex(uint idx) {
   setUInt32_le(0x0004, idx);
 }
 
+uint
+AnytoneCodeplug::ContactMapElement::size() {
+  return 0x0008;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug
