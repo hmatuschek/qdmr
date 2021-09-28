@@ -373,7 +373,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       if (analog->defaultSquelch())
         return tr("[Default]");
       if (analog->squelchDisabled())
-        return tr("Off");
+        return tr("Open");
       else
         return analog->squelch();
     }
