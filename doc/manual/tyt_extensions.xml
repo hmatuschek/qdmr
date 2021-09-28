@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<chapter>
+<title>TyT Codeplug Extensions</title>
+<para></para>
+<section>
+<title>Button settings extension</title>
+<para>
+  This extension to the codeplug allows to specify the function for each of the programmable 
+  buttons on the radio. Please note that not all Radioddity radios have all buttons described 
+  here. 
+</para>
+<example>
+  <title></title>
+  <programlisting><![CDATA[tytButtonSettings:
+  sideButton1Short: Disabled
+  sideButton1Long: Tone1750Hz
+  sideButton2Short: MonitorToggle
+  sideButton2Long: Disabled
+  longPressDuration: 1000 
+]]></programlisting>
+</example>
+<section>
+<title>Attributes</title>
+<table>
+  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
+  <tbody>
+    <tr>
+      <td><token>sideButton1Short</token>, <token>sideButton1Long</token>, 
+        <token>sideButton2Short</token>, <token>sideButton2Long</token></td>
+      <td>Specifies the different functions for each button press. Must be one of:
+        <token>Disabled</token>, <token>ToggleAllAlertTones</token>, <token>EmergencyOn</token>, 
+        <token>EmergencyOff</token>, <token>PowerSelect</token>, <token>MonitorToggle</token>, 
+        <token>OneTouch1</token>-<token>OneTouch6</token>, <token>RepeaterTalkaroundToggle</token>, 
+        <token>ScanToggle</token>, <token>SquelchToggle</token>, <token>PrivacyToggle</token>,
+        <token>VoxToggle</token>, <token>ZoneIncrement</token>, <token>BatteryIndicator</token>,
+        <token>LoneWorkerToggle</token>, <token>RecordToggle</token>, <token>RecordPlayback</token>,
+        <token>RecordDeleteAll</token>, <token>Tone1750Hz</token>, <token>SwitchUpDown</token>,
+        <token>RightKey</token>, <token>LeftKey</token> or <token>ZoneDecrement</token>. </td>
+    </tr>
+    <tr>
+      <td><token>longPressDuration</token></td>
+      <td>Specifies the long-press duration in milliseconds.</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+</section>
+</chapter>
