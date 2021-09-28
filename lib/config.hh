@@ -74,25 +74,6 @@ public:
   /** Returns @c true if one of the channels has a GPS or APRS system assigned. */
   bool requiresGPS() const;
 
-  /** Returns the first intro line. */
-  const QString &introLine1() const;
-  /** (Re-)Sets the first intro line. */
-  void setIntroLine1(const QString &line);
-  /** Returns the second intro line. */
-  const QString &introLine2() const;
-  /** (Re-)Sets the second intro line. */
-  void setIntroLine2(const QString &line);
-
-  /** Returns the MIC amplification level [1,10]. */
-  uint micLevel() const;
-  /** (Re-)Sets the MIC amplification level [1,10]. */
-  void setMicLevel(uint value);
-
-  /** Returns @c true if the speech synthesis is enabled. */
-  bool speech() const;
-  /** Enables/disables the speech synthesis. */
-  void setSpeech(bool enabled);
-
   /** Clears the complete configuration. */
   void reset();
 

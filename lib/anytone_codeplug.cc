@@ -728,7 +728,11 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
   // set rx and tx frequencies
   setRXFrequency(c->rxFrequency()*1e6);
   setTXFrequency(c->txFrequency()*1e6);
-  setPower(c->power());
+  // set power
+  if (c->defaultPower())
+    setPower(ctx.config()->settings()->power());
+  else
+    setPower(c->power());
   // set tx-enable
   enableRXOnly(c->rxOnly());
   if (nullptr == c->scanListObj())
@@ -2167,15 +2171,15 @@ AnytoneCodeplug::BootSettingsElement::setPassword(const QString &txt) {
 
 bool
 AnytoneCodeplug::BootSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
-  setIntroLine1(ctx.config()->introLine1());
-  setIntroLine2(ctx.config()->introLine2());
+  setIntroLine1(ctx.config()->settings()->introLine1());
+  setIntroLine2(ctx.config()->settings()->introLine2());
   return true;
 }
 
 bool
 AnytoneCodeplug::BootSettingsElement::updateConfig(Context &ctx) {
-  ctx.config()->setIntroLine1(introLine1());
-  ctx.config()->setIntroLine2(introLine2());
+  ctx.config()->settings()->setIntroLine1(introLine1());
+  ctx.config()->settings()->setIntroLine2(introLine2());
   return true;
 }
 

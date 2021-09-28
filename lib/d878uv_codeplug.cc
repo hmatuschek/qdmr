@@ -1147,6 +1147,8 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
   // Set measurement system based on system locale (0x00==Metric)
   enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
+  // Set transmit timeout
+  setTransmitTimeout(ctx.config()->settings()->tot());
 
   return true;
 }
@@ -1155,6 +1157,7 @@ bool
 D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx))
     return false;
+  ctx.config()->settings()->setTOT(transmitTimeout());
   return true;
 }
 

@@ -148,6 +148,9 @@ OpenGD77Codeplug::ChannelElement::toChannelObj(Context &ctx) const {
       ac->setSquelch(squelch());
   }
 
+  if (Power::Global == extendedPower())
+    ch->setDefaultPower();
+
   OpenGD77ChannelExtension *ext = new OpenGD77ChannelExtension(ch);
   ext->setPower(extendedPower());
 
@@ -167,6 +170,9 @@ OpenGD77Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
     else
       setSquelch(ac->squelch());
   }
+
+  if (c->defaultPower())
+    setExtendedPower(Power::Global);
 
   if (! c->hasExtension("openGD77"))
     return true;

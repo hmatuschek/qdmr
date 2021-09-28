@@ -579,9 +579,13 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
     setScanListIndex(ctx.index(chan->scanListObj()));
   else
     setScanListIndex(0);
+  // Enable vox
   enableVOX((chan->defaultVOX() && (!ctx.config()->settings()->voxDisabled())) || (!chan->voxDisabled()));
   // encode power setting
-  setPower(chan->power());
+  if (chan->defaultPower())
+    setPower(ctx.config()->settings()->power());
+  else
+    setPower(chan->power());
 
   if (chan->is<const DigitalChannel>()) {
     const DigitalChannel *dchan = chan->as<const DigitalChannel>();

@@ -41,12 +41,12 @@ CSVWriter::write(const Config *config, QTextStream &stream, QString &errorMessag
          << "ID: " << radio_ids.join(", ") << "\n"
          << "Name: \"" << radioName << "\"\n\n"
          << "# Text displayed when the radio powers up (quoted).\n"
-         << "IntroLine1: \"" << config->introLine1() << "\"\n"
-         << "IntroLine2: \"" << config->introLine2() << "\"\n\n"
+         << "IntroLine1: \"" << config->settings()->introLine1() << "\"\n"
+         << "IntroLine2: \"" << config->settings()->introLine2() << "\"\n\n"
          << "# Microphone amplification, value 1..10:\n"
-         << "MICLevel: " << config->micLevel() << "\n\n"
+         << "MICLevel: " << config->settings()->micLevel() << "\n\n"
          << "# Speech-synthesis ('On' or 'Off'):\n"
-         << "Speech: " << (config->speech() ? "On" : "Off") << "\n\n";
+         << "Speech: " << (config->settings()->speech() ? "On" : "Off") << "\n\n";
 
   stream << "# Table of digital channels.\n"
             "# 1) Channel number.\n"

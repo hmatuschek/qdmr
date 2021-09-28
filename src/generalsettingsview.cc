@@ -12,10 +12,10 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
     ui->dmrID->setText(QString::number(_config->radioIDs()->defaultId()->number()));
     ui->radioName->setText(_config->radioIDs()->defaultId()->name());
   }
-  ui->introLine1->setText(_config->introLine1());
-  ui->introLine2->setText(_config->introLine2());
-  ui->mic->setValue(_config->micLevel());
-  ui->speech->setChecked(_config->speech());
+  ui->introLine1->setText(_config->settings()->introLine1());
+  ui->introLine2->setText(_config->settings()->introLine2());
+  ui->mic->setValue(_config->settings()->micLevel());
+  ui->speech->setChecked(_config->settings()->speech());
 
   ui->powerValue->setItemData(0, (uint)Channel::Power::Max);
   ui->powerValue->setItemData(1, (uint)Channel::Power::High);

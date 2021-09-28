@@ -1779,7 +1779,7 @@ CSVReader::handleIntroLine1(const QString &text, qint64 line, qint64 column, QSt
   Q_UNUSED(errorMessage);
 
   if (_link) {
-    _config->setIntroLine1(text);
+    _config->settings()->setIntroLine1(text);
   }
   return true;
 }
@@ -1791,7 +1791,7 @@ CSVReader::handleIntroLine2(const QString &text, qint64 line, qint64 column, QSt
   Q_UNUSED(errorMessage);
 
   if (_link) {
-    _config->setIntroLine2(text);
+    _config->settings()->setIntroLine2(text);
   }
   return true;
 }
@@ -1803,7 +1803,7 @@ CSVReader::handleMicLevel(uint level, qint64 line, qint64 column, QString &error
   Q_UNUSED(errorMessage);
 
   if (_link) {
-    _config->setMicLevel(level);
+    _config->settings()->setMicLevel(level);
   }
   return true;
 }
@@ -1816,7 +1816,7 @@ CSVReader::handleSpeech(bool speech, qint64 line, qint64 column, QString &errorM
   Q_UNUSED(errorMessage);
 
   if (_link) {
-    _config->setSpeech(speech);
+    _config->settings()->enableSpeech(speech);
   }
   return true;
 }

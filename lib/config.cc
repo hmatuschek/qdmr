@@ -232,41 +232,6 @@ Config::requiresGPS() const {
 }
 
 
-const QString &
-Config::introLine1() const {
-  return _settings->introLine1();
-}
-void
-Config::setIntroLine1(const QString &line) {
-  _settings->setIntroLine1(line);
-}
-const QString &
-Config::introLine2() const {
-  return _settings->introLine2();
-}
-void
-Config::setIntroLine2(const QString &line) {
-  _settings->setIntroLine2(line);
-}
-
-uint
-Config::micLevel() const {
-  return _settings->micLevel();
-}
-void
-Config::setMicLevel(uint level) {
-  _settings->setMicLevel(level);
-}
-
-bool
-Config::speech() const {
-  return _settings->speech();
-}
-void
-Config::setSpeech(bool enabled) {
-  _settings->enableSpeech(enabled);
-}
-
 void
 Config::reset() {
   // Reset lists
