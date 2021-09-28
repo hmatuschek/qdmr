@@ -202,7 +202,7 @@ Channel::populate(YAML::Node &node, const Context &context) {
     return false;
 
   if (defaultPower()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("default");
+    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
     node["power"] = def;
   } else {
     QMetaEnum metaEnum = QMetaEnum::fromType<Power>();
@@ -210,14 +210,14 @@ Channel::populate(YAML::Node &node, const Context &context) {
   }
 
   if (defaultTimeout()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("default");
+    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
     node["timeout"] = def;
   } else {
     node["timeout"] = timeout();
   }
 
   if (defaultVOX()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("default");
+    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
     node["vox"] = def;
   } else {
     node["vox"] = vox();
@@ -386,7 +386,7 @@ AnalogChannel::populate(YAML::Node &node, const Context &context) {
   }
 
   if (defaultSquelch()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("default");
+    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
     node["squelch"] = def;
   } else {
     node["squelch"] = squelch();

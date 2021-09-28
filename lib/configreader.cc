@@ -1350,7 +1350,6 @@ ChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
   if ((!node["timeout"].IsDefined()) || ("!default" == node["timeout"].Tag())) {
     channel->setDefaultTimeout();
   } else if (node["timeout"].IsDefined() && node["timeout"].IsScalar()) {
-    logDebug() << "Has tag: " << node["timeout"].Tag().c_str();
     channel->setTimeout(node["timeout"].as<uint>());
   }
 
