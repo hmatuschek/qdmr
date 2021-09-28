@@ -1,0 +1,14 @@
+     7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+00 | Call type                     | DMR ID, 8-digit BCD, big-endian                                                            ...
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+04  ...                            | Ring                              | Body, up to 94 bytes, string list, 0-terminated        ...
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    ...                                                                                                                            |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+Field description:
+  - Call type: The call type of the entry, 0=Private, 1=Group and 2=All call.
+  - Ring: Ring tone settings, 0=Off, 1=Tone, 2=Online(?).
+  - Body: String list variable size. Each string in list 0-terminated. List is [Name, City, Call, State, Country, Comment].
+    Maximum length is 96 including 0 bytes.

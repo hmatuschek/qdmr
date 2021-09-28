@@ -27,7 +27,7 @@ public slots:
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   bool startUpload(Config *config, bool blocking=false,
-                   const CodePlug::Flags &flags = CodePlug::Flags());
+                   const Codeplug::Flags &flags = Codeplug::Flags());
   /** Encodes the given user-database and uploades it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
                              const CallsignDB::Selection &selection=CallsignDB::Selection());
@@ -46,7 +46,7 @@ protected:
   /** The interface to the radio. */
   RadioddityInterface *_dev;
   /** Holds the flags to controll assembly and upload of code-plugs. */
-  CodePlug::Flags _codeplugFlags;
+  Codeplug::Flags _codeplugFlags;
   /** The generic configuration. */
 	Config *_config;
   /** A weak reference to the user-database. */

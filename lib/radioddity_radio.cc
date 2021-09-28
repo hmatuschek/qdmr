@@ -42,7 +42,7 @@ RadioddityRadio::startDownload(bool blocking) {
 }
 
 bool
-RadioddityRadio::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
+RadioddityRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags) {
   if (StatusIdle != _task)
     return false;
 

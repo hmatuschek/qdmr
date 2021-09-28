@@ -43,36 +43,38 @@ public:
   virtual ~AnytoneRadio();
 
   const QString &name() const;
-  const CodePlug &codeplug() const;
-  CodePlug &codeplug();
+  const Codeplug &codeplug() const;
+  Codeplug &codeplug();
 
   VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
                                  const VerifyFlags &flags=VerifyFlags());
 
-protected:
-  /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
-  void run();
-
+public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
   bool startDownload(bool blocking=false);
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   bool startUpload(Config *config, bool blocking=false,
-                   const CodePlug::Flags &flags = CodePlug::Flags());
+                   const Codeplug::Flags &flags = Codeplug::Flags());
   /** Encodes the given user-database and uploades it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
                              const CallsignDB::Selection &selection=CallsignDB::Selection());
 
+protected:
+  /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
+  void run();
+
+private:
   /** Connects to the radio, if a radio interface is passed to the constructor, this interface
    * instance is used. */
-  bool connect();
+  virtual bool connect();
   /** Downloads the codeplug from the radio. This method block until the download is complete. */
-  bool download();
+  virtual bool download();
   /** Uploads the encoded codeplug to the radio. This method block until the upload is complete. */
-  bool upload();
+  virtual bool upload();
   /** Uploads the encoded callsign database to the radio.
    * This method block until the upload is complete. */
-  bool uploadCallsigns();
+  virtual bool uploadCallsigns();
 
 protected:
   /** The device identifier. */
@@ -81,7 +83,7 @@ protected:
   AnytoneInterface *_dev;
   /** If @c true, the codeplug on the radio gets updated upon upload. If @c false, it gets
    * overridden. */
-  CodePlug::Flags _codeplugFlags;
+  Codeplug::Flags _codeplugFlags;
   /** The generic configuration. */
   Config *_config;
   /** A weak reference to the user-database. */

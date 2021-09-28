@@ -1,4 +1,4 @@
-     0                               8                               16                              24
+     7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 00 | RX Frequency 32bit BCD encoded in big-endian as MMMkkkhh                                                                      |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -6,9 +6,9 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 08 | RMode | 0 |BWd|  PWR  | CMode |TAr|CaC|RXO|CTR|TDC|TCT|RDC|RCT| CTCSS transmit                | CTCSS receive                 |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-0c | DCS transmit                                                  | DCS receive                                                   |
+0c | DCS transmit code, little endian                              | DCS receive code, little endian                               |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-10 | Custom CTCSS                                                  | 2-tone decode                 | Unused, set to 0x00           |
+10 | Custom CTCSS frequency in 0.1Hz, little endian                | 2-tone decode index, 0-based, little endian                   |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 14 | Contact index 0-based, little endian                                                                                          |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -20,16 +20,43 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 30  ...                                                                                            | Unused set to 0x00            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-34 | 0   0   0   0   0 |XFR|ETM|RNG| 0   0   0   0   0   0 |APRSRep| Analog APRS PTT               | Digital APRS PTT              |
+34 | 0   0   0   0 |EXR|BTE|ETM|RNG| 0   0   0   0   0   0 |APRSRep| Analog APRS PTT               | Digital APRS PTT              |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-38 | GPS System Index              | Frequency correction signed   | DMR encryption                | 0   0   0   0   0 |MuK|RnK|SMF|
+38 | GPS System Index              | Freq. corr. signed in 10Hz    | Analog crambler enable        | 0   0   0   0   0 |SMF|RnK|Muk|
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-3c | Unused set to 0x00000000                                                                                                      |
+3c | Unused set to 0x00            | 0   0   0   0 |DAD| 0   0   0 | Unused set to 0x00                                            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-with
-RMode = Repater mode, BWd = Band width, PWR = Power, CMode = Channel mode, TAr=Talkaround, CaC = Call confirm, RXO = RX only,
-CTR = CTCSS phase reversal, TDC = TX DCS code, TCT = TX CTCSS tone, RDC = RX DCS code, RCT = RX CTCSS tone, SQM = Squelch mode,
-OptSig = Optional signalling, TxPer = TX permit, LWK = Lone worker, EEE = Enable enhanced encryption, RGP = Enable RX GPS,
-EAT = Enable adative TDMA, EST = Enable simplex TDMA, SMC = SMS confirmation, TSL = Time slot, XFR = Exlcude from roaming,
-ETM = Enable through mode, RNG = Ranging, APRSRep = Enable APRS/GPS report, MuK = Multiple keys, RnK = Random key, SMF = SMS forbid.
+Field description:
+ - RMode: Repater mode where 0=simplex, 1=positive TX offset, 2=negative TX offset.
+ - BWd: Band width where 0=narrow (12.5kHz), 1=wide (25kHz).
+ - PWR: Power where 0=low, 1=mid, 2=heigh, 3=turbo.
+ - CMode: Channel mode, 0=analog, 1=digital, 2=analog + digi RX, 3=digital + analog RX.
+ - TAr: Enable talkaround.
+ - CaC: Enable call confirm.
+ - RXO: Enable RX only.
+ - CTR: Enable CTCSS phase reversal.
+ - TDC: Enable TX DCS code.
+ - TCT: Enable TX CTCSS tone.
+ - RDC: Enable RX DCS code.
+ - RCT: Enable RX CTCSS tone.
+ - SQM: Squelch mode 0=open, 1=silent.
+ - PTT-ID: When to send the PTT-ID, where 0=off, 1=start, 2=end, 3=both.
+ - OptSig: Optional signalling where 0=off, 1=DTMF, 2=2-tone, 3=5-tone
+ - TxPer: TX permit/admit criterion, 0=always, 1=colorcode, 2=channel free.
+ - LWK: Enable lone worker.
+ - EEE: Enable enhanced encryption
+ - RGP: Enable RX digital (DMR) APRS
+ - EAT: Enable adative TDMA
+ - EST: Enable simplex TDMA,
+ - SMC: SMS confirmation,
+ - TSL: Time slot where 0=TS1, 1=TS2
+ - XFR: Exlcude from roaming
+ - DAD: Data ACK disable.
+ - ETM: Enable through mode
+ - BTE: BlueTooth hands free enabled
+ - EXR: Exclude from roaming
+ - APRSRep: Enable APRS/GPS report,
+ - MuK: Multiple keys
+ - RnK: Random key
+ - SMF: SMS forbid.

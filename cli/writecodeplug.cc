@@ -2,11 +2,13 @@
 
 #include <QCoreApplication>
 #include <QCommandLineParser>
+#include <QFileInfo>
 
 #include "logger.hh"
 #include "radio.hh"
 #include "config.hh"
 #include "progressbar.hh"
+#include "configreader.hh"
 
 
 int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
@@ -16,12 +18,21 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     parser.showHelp(-1);
 
   QString filename = parser.positionalArguments().at(1);
+  QFileInfo fileinfo(filename);
 
   QString errorMessage;
   Config config;
-  if (! config.readCSV(filename, errorMessage)) {
-    logError() << "Cannot read CSV file '" << filename << "': " << errorMessage;
-    return -1;
+  if (parser.isSet("csv") || ("csv" == fileinfo.suffix()) || ("conf"==fileinfo.suffix())) {
+    if (! config.readCSV(filename, errorMessage)) {
+      logError() << "Cannot read CSV file '" << filename << "': " << errorMessage;
+      return -1;
+    }
+  } else if (parser.isSet("yaml") || ("yaml" == fileinfo.suffix())) {
+    ConfigReader reader;
+    if (! reader.read(&config, fileinfo.canonicalFilePath())) {
+      logError() << "Cannot parse YAML codeplug '" << fileinfo.fileName() << "': " << reader.errorMessage();
+      return -1;
+    }
   }
   logDebug() << "Read codeplug from '" << filename << "'.";
 
@@ -62,7 +73,7 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   showProgress();
   QObject::connect(radio, &Radio::uploadProgress, updateProgress);
 
-  CodePlug::Flags flags;
+  Codeplug::Flags flags;
   if (parser.isSet("init-codeplug"))
     flags.updateCodePlug = false;
   if (parser.isSet("auto-enable-gps"))

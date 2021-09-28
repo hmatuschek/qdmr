@@ -22,7 +22,7 @@ class CodeplugContext;
  * differences in the codeplug to this base class must be implemented.
  *
  * @ingroup tyt */
-class TyTCodeplug : public CodePlug
+class TyTCodeplug : public Codeplug
 {
   Q_OBJECT
 
@@ -31,7 +31,7 @@ public:
    *
    * Memory layout of encoded channel:
    * @verbinclude tytchannel.txt */
-  class ChannelElement: public CodePlug::Element
+  class ChannelElement: public Codeplug::Element
   {
   public:
     /** Possible modes for the channel, i.e. analog and digital. */
@@ -340,7 +340,7 @@ public:
    *
    * Memory layout of encoded contact:
    * @verbinclude tytcontact.txt */
-  class ContactElement: public CodePlug::Element
+  class ContactElement: public Codeplug::Element
   {
   protected:
     /** Constructor. */
@@ -387,7 +387,7 @@ public:
    *
    * Memory layout of encoded zone:
    * @verbinclude tytzone.txt */
-  class ZoneElement: public CodePlug::Element
+  class ZoneElement: public Codeplug::Element
   {
   protected:
     /** Construtor. */
@@ -426,7 +426,7 @@ public:
    *
    * Memory layout of encoded zone extension:
    * @verbinclude tytzoneext.txt */
-  class ZoneExtElement: public CodePlug::Element
+  class ZoneExtElement: public Codeplug::Element
   {
   protected:
     /** Constructor. */
@@ -460,7 +460,7 @@ public:
    *
    * Memory layout of encoded RX group list:
    * @verbinclude tytgrouplist.txt */
-  class GroupListElement: public CodePlug::Element
+  class GroupListElement: public Codeplug::Element
   {
   protected:
     /** Constructor. */
@@ -497,7 +497,7 @@ public:
    *
    * Memory layout of encoded scan list:
    * @verbinclude tytscanlist.txt */
-  class ScanListElement: public CodePlug::Element
+  class ScanListElement: public Codeplug::Element
   {
   protected:
     /** Constructor. */
@@ -559,7 +559,7 @@ public:
    *
    * Memory layout of encoded settings:
    * @verbinclude tytsettings.txt */
-  class GeneralSettingsElement: public CodePlug::Element
+  class GeneralSettingsElement: public Codeplug::Element
   {
   public:
     /** Defines all possible transmit modes. */
@@ -814,7 +814,7 @@ public:
    *
    * Memory layout of encoded boot settings:
    * @verbinclude tytbootsettings.txt */
-  class BootSettingsElement: public CodePlug::Element
+  class BootSettingsElement: public Codeplug::Element
   {
   protected:
     /** Hidden constructor. */
@@ -846,7 +846,7 @@ public:
    *
    * Memory layout of encoded timestamp:
    * @verbinclude tyttimestamp.txt */
-  class TimestampElement: public CodePlug::Element
+  class TimestampElement: public Codeplug::Element
   {
   protected:
     /** Hidden constructor. */
@@ -873,7 +873,7 @@ public:
    *
    * Memory layout of encoded GPS system:
    * @verbinclude tytgpssystem.txt */
-  class GPSSystemElement: public CodePlug::Element
+  class GPSSystemElement: public Codeplug::Element
   {
   protected:
     /** Hidden constructor. */
@@ -927,7 +927,7 @@ public:
    *
    * Memory representaion of the menu settings:
    * @verbinclude tytmenusettings.txt */
-  class MenuSettingsElement: public CodePlug::Element
+  class MenuSettingsElement: public Codeplug::Element
   {
   protected:
     /** Hidden constructor. */
@@ -1105,7 +1105,7 @@ public:
    *
    * Memory representation of the button settings:
    * @verbinclude tytbuttonsettings.txt */
-  class ButtonSettingsElement: public CodePlug::Element
+  class ButtonSettingsElement: public Codeplug::Element
   {
   public:
     /** The possible button actions. */
@@ -1156,7 +1156,7 @@ public:
    *
    * Memory representation of a one-touch setting:
    * @verbinclude tytonetouchsetting.txt */
-  class OneTouchSettingElement: public CodePlug::Element
+  class OneTouchSettingElement: public Codeplug::Element
   {
   public:
     /** Possible one-touch actions. */
@@ -1214,7 +1214,7 @@ public:
    *
    * Memory representation of the emergency settings:
    * @verbinclude tytemergencysettings.txt */
-  class EmergencySettingsElement: public CodePlug::Element
+  class EmergencySettingsElement: public Codeplug::Element
   {
   protected:
     /** Hidden constructor. */
@@ -1261,7 +1261,7 @@ public:
    *
    * Memory representation of emergency system:
    * @verbinclude tytemergencysystem.txt */
-  class EmergencySystemElement: public CodePlug::Element
+  class EmergencySystemElement: public Codeplug::Element
   {
   public:
     /** Possible alarm type for the system. */
@@ -1334,7 +1334,7 @@ public:
    *
    * Memory representation of encryption settings:
    * @verbinclude tytprivacy.txt */
-  class EncryptionElement: public CodePlug::Element
+  class EncryptionElement: public Codeplug::Element
   {
   protected:
     /** Hidden constructor. */
@@ -1379,9 +1379,9 @@ public:
 public:
   /** Decodes the binary codeplug and stores its content in the given generic configuration using
    * the given context. */
-  virtual bool decodeElements(Config *config, Context &ctx);
+  virtual bool decodeElements(Context &ctx);
   /** Encodes the given generic configuration as a binary codeplug using the given context. */
-  virtual bool encodeElements(Config *config, const Flags &flags, Context &ctx);
+  virtual bool encodeElements(const Flags &flags, Context &ctx);
 
   /** Clears the time-stamp in the codeplug. */
   virtual void clearTimestamp() = 0;

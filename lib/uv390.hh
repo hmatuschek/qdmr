@@ -46,8 +46,8 @@ public:
   const QString &name() const;
   const Features &features() const;
 
-  const CodePlug &codeplug() const;
-  CodePlug &codeplug();
+  const Codeplug &codeplug() const;
+  Codeplug &codeplug();
 
   const CallsignDB *callsignDB() const;
   CallsignDB *callsignDB();

@@ -4,7 +4,8 @@
 #include "callsigndb.hh"
 #include "d868uv_codeplug.hh"
 
-/** Represents and encodes the binary format for the call-sign database within the radio.
+/** Represents and encodes the binary format for the call-sign database within a AnyTone AT-D868UV
+ * radio.
  *
  * <table>
  *  <tr><th colspan="3">Callsign database</th></tr>
@@ -32,59 +33,81 @@ public:
    * Max lenghth for name is 16, city is 16, callsign is 8, state is 16, country is 16 and
    * comment is 16, excluding terminating 0x00.
    *
-   * Memmory layout of encoded Callsign/User database entry:
-   * @verbinclude d878uvcallsigndbentry.txt
+   * Memmory layout of encoded Callsign/User database entry (variable size, min 0x000c-0x0064):
+   * @verbinclude d868uv_callsigndbentry.txt
    */
-  struct __attribute__((packed)) entry_t {
-    /** Possible call types for each entry of the callsign db. */
-    typedef enum {
-      PRIVATE_CALL = 0,                 ///< A private call entry.
-      GROUP_CALL   = 1,                 ///< A group call entry.
-      ALL_CALL     = 2                  ///< An all-call entry.
-    } CallType;
-
+  class EntryElement: public Codeplug::Element
+  {
+  public:
     /** Notification tones for callsign entry. */
-    typedef enum {
-      RING_NONE = 0,
-      RING_TONE = 1,
-      RING_ONLINE = 2
-    } RingTone;
+    enum class RingTone {
+      Off = 0,
+      Tone = 1,
+      Online = 2
+    };
 
-    uint8_t call_type;                  ///< Call type, see @c CallType.
-    uint32_t id;                        ///< DMR ID, BCD encoded, big endian.
-    uint8_t ring       : 4,             ///< Ring tone, see @c RingTone.
-      is_friend        : 4;             ///< If 0x1, entry is marked as a "friend".
-    uint8_t body[94];                   ///< Up to 94 bytes name, city, callsign, state, country and comment.
+  protected:
+    /** Hidden constructor. */
+    EntryElement(uint8_t *ptr, uint size);
+
+  public:
+    /** Constructor. */
+    explicit EntryElement(uint8_t *ptr);
+
+    /** Sets the call type. */
+    virtual void setCallType(DigitalContact::Type type);
+    /** Sets the DMR ID number. */
+    virtual void setNumber(uint num);
+    /** Sets the ring tone. */
+    virtual void setRingTone(RingTone tone);
+    /** Sets the entry content. */
+    virtual void setContent(const QString &name, const QString &city, const QString &call,
+                            const QString &state, const QString &country, const QString &comment);
 
     /** Constructs a database entry from the given user.
      * @returns The size of the entry. */
-    size_t fromUser(const UserDatabase::User &user);
-    /** Computes the size of the database entry for the given user. */
-    static size_t getSize(const UserDatabase::User &user);
-  };
+    virtual uint fromUser(const UserDatabase::User &user);
 
+    /** Computes the size of the database entry for the given user. */
+    static uint size(const UserDatabase::User &user);
+  };
 
   /** Same index entry used by the codeplug to map normal digital contacts to an contact index. Here
    * it maps to the byte offset within the database entries. */
-  typedef D868UVCodeplug::contact_map_t index_entry_t;
+  typedef D868UVCodeplug::ContactMapElement IndexEntryElement;
 
   /** Stores some basic limits of the callsign db.
    *
-   * Memmory layout of encoded Callsign/User database entry:
-   * @verbinclude d878uvcallsigndblimit.txt */
-  struct __attribute__((packed)) limits_t {
-    uint32_t count;                     ///< Number of db entries, little-endian.
-    uint32_t end_of_db;                 ///< Memory address of end of entries, or where to insert
-                                        ///  the next entry, little endian.
-    uint32_t _unused8;                  ///< Unused? Set to 0x000000.
-    uint32_t _unused12;                 ///< Unused? Set to 0x000000.
+   * Memmory layout of encoded Callsign/User database entry (size 0x0010 bytes):
+   * @verbinclude d868uv_callsigndblimit.txt */
+  class LimitsElement: public Codeplug::Element
+  {
+  protected:
+    /** Hidden constructor. */
+    LimitsElement(uint8_t *ptr, uint size);
 
-    /** Clear the db limits. */
+  public:
+    /** Constructor. */
+    LimitsElement(uint8_t *ptr);
+
+    /** Resets the limits. */
     void clear();
-    /** Sets the total amount of database entries. */
-    void setCount(uint32_t n);
-    /** Sets the total size of the db (only the entry section, not index). */
-    void setTotalSize(uint32_t size);
+
+    /** Retuns the number of entries in the DB. */
+    virtual uint count() const;
+    /** Sets the number of entries. */
+    virtual void setCount(uint count);
+
+    /** Retunrs the end-of-db address. */
+    virtual uint endOfDB() const;
+    /** Sets the end-of-db address. */
+    virtual void setEndOfDB(uint addr);
+    /** Sets the total size of the DB (updated end-of-db address). */
+    virtual void setTotalSize(uint size);
+
+  public:
+    /** Returns the size of the encoded element. */
+    static uint size();
   };
 
 

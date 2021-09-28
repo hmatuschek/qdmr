@@ -150,9 +150,9 @@ Settings::setLastDirectoryDir(const QDir &dir) {
   setValue("lastDir", dir.absolutePath());
 }
 
-CodePlug::Flags
+Codeplug::Flags
 Settings::codePlugFlags() const {
-  CodePlug::Flags flags;
+  Codeplug::Flags flags;
   flags.updateCodePlug = updateCodeplug();
   flags.autoEnableGPS  = autoEnableGPS();
   flags.autoEnableRoaming = autoEnableRoaming();

@@ -44,8 +44,8 @@ public:
 
   const QString &name() const;
   const Radio::Features &features() const;
-  const CodePlug &codeplug() const;
-  CodePlug &codeplug();
+  const Codeplug &codeplug() const;
+  Codeplug &codeplug();
 
 protected:
   /** The device identifier. */

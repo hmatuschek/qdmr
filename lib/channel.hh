@@ -408,7 +408,7 @@ public:
   /** Returns the GPS system associated with this channel or @c nullptr if not set. */
   PositioningSystem *aprsObj() const;
   /** Associates the GPS System with this channel. */
-  bool aprsObj(PositioningSystem *sys);
+  bool setAPRSObj(PositioningSystem *sys);
 
   /** Returns a reference to the roaming zone. */
   const RoamingZoneReference *roaming() const;

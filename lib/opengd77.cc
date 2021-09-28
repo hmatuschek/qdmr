@@ -89,12 +89,12 @@ OpenGD77::features() const {
   return _open_gd77_features;
 }
 
-const CodePlug &
+const Codeplug &
 OpenGD77::codeplug() const {
   return _codeplug;
 }
 
-CodePlug &
+Codeplug &
 OpenGD77::codeplug() {
   return _codeplug;
 }
@@ -124,7 +124,7 @@ OpenGD77::startDownload(bool blocking) {
 
 
 bool
-OpenGD77::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
+OpenGD77::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags) {
   logDebug() << "Start upload to " << name() << "...";
 
   if (StatusIdle != _task) {

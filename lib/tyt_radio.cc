@@ -42,7 +42,7 @@ TyTRadio::startDownload(bool blocking) {
 }
 
 bool
-TyTRadio::startUpload(Config *config, bool blocking, const CodePlug::Flags &flags) {
+TyTRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags) {
   if (StatusIdle != _task)
     return false;
 

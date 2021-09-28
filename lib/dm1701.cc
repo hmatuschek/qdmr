@@ -72,12 +72,12 @@ DM1701::features() const {
   return _dm1701_features;
 }
 
-const CodePlug &
+const Codeplug &
 DM1701::codeplug() const {
   return _codeplug;
 }
 
-CodePlug &
+Codeplug &
 DM1701::codeplug() {
   return _codeplug;
 }

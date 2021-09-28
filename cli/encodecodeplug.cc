@@ -32,7 +32,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     parser.showHelp(-1);
   }
 
-  CodePlug::Flags flags;
+  Codeplug::Flags flags;
   if (parser.isSet("init-codeplug"))
     flags.updateCodePlug = false;
   if (parser.isSet("auto-enable-gps"))

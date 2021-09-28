@@ -460,7 +460,7 @@ DigitalChannel::aprsObj() const {
 }
 
 bool
-DigitalChannel::aprsObj(PositioningSystem *sys) {
+DigitalChannel::setAPRSObj(PositioningSystem *sys) {
   if (! _posSystem.set(sys))
     return false;
   emit modified(this);
@@ -583,7 +583,7 @@ ChannelList::findAnalogChannelByTxFreq(double freq) const {
   for (int i=0; i<count(); i++) {
     if (! channel(i)->is<AnalogChannel>())
       continue;
-    if (1e-6 > std::abs(channel(i)->txFrequency()-freq))
+    if (1e-5 > std::abs(channel(i)->txFrequency()-freq))
       return channel(i)->as<AnalogChannel>();
   }
   return nullptr;
