@@ -641,6 +641,8 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     ch = new AnalogChannel(
           name(), rxFrequency()/1e6, txFrequency()/1e6, power(), 0.0, rxOnly(), admit,
           1, rxTone(), txTone(), bandwidth(), nullptr);
+    // no per channel squelch settings
+    ch->as<AnalogChannel>()->setSquelchDefault();
   } else if ((Mode::Digital == mode()) || (Mode::MixedDigital == mode())) {
     if (Mode::MixedDigital == mode())
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
@@ -659,6 +661,10 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
                << "': Channel type " << (uint)mode() << "not supported.";
     return nullptr;
   }
+
+  // No per channel vox & tot setting
+  ch->setVOXDefault();
+  ch->setDefaultTimeout();
 
   return ch;
 
@@ -2023,7 +2029,7 @@ AnytoneCodeplug::GeneralSettingsElement::enableDisplayCall(bool enable) {
 bool
 AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
   // Set microphone gain
-  setMICGain(ctx.config()->micLevel());
+  setMICGain(ctx.config()->settings()->micLevel());
   // If auto-enable GPS is enabled
   if (flags.autoEnableGPS) {
     // Check if GPS is required -> enable
@@ -2036,15 +2042,22 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
       enableGPS(false);
     }
   }
+  // Set default VOX sensitivity
+  setVOXLevel(ctx.config()->settings()->vox());
+  // Set squelch level
+  setSquelchLevelA(ctx.config()->settings()->squelch());
+  setSquelchLevelB(ctx.config()->settings()->squelch());
   return true;
 }
 
 bool
 AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   // get microphone gain
-  ctx.config()->setMicLevel(micGain());
+  ctx.config()->settings()->setMicLevel(micGain());
   // D868UV does not support speech synthesis?
-  ctx.config()->setSpeech(false);
+  ctx.config()->settings()->enableSpeech(false);
+  ctx.config()->settings()->setVOX(voxLevel());
+  ctx.config()->settings()->setSquelch(squelchLevelA());
   return true;
 }
 

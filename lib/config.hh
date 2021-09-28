@@ -22,7 +22,7 @@
 #include "gpssystem.hh"
 #include "roaming.hh"
 #include "radioid.hh"
-
+#include "radiosettings.hh"
 
 // Forward declaration
 class UserDatabase;
@@ -51,6 +51,8 @@ public:
   /** Serializes the configuration into the given stream as text. */
   bool toYAML(QTextStream &stream);
 
+  /** Returns the radio wide settings. */
+  RadioSettings *settings() const;
   /** Returns the list of radio IDs. */
   RadioIDList *radioIDs() const;
   /** Returns the list of contacts. */
@@ -113,6 +115,8 @@ protected slots:
 protected:
   /** If @c true, the configuration was modified. */
   bool _modified;
+  /** Radio wide settings. */
+  RadioSettings *_settings;
   /** The list of radio IDs. */
   RadioIDList *_radioIDs;
   /** The list of contacts. */
@@ -129,15 +133,6 @@ protected:
   PositioningSystems *_gpsSystems;
   /** The list of roaming zones. */
   RoamingZoneList *_roaming;
-
-  /** The fist intro line. */
-  QString _introLine1;
-  /** The second intro line. */
-  QString _introLine2;
-  /** The MIC amplification level [1-10]. */
-  uint _mic_level;
-  /** If @c true, speech synthesis is enabled. */
-  bool _speech;
 };
 
 #endif // CONFIG_HH

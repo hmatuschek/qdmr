@@ -499,7 +499,7 @@ Channel *
 TyTCodeplug::ChannelElement::toChannelObj() const {
   if (! isValid())
     return nullptr;
-
+  Channel *ch = nullptr;
   // decode power setting
   if (MODE_ANALOG == mode()) {
     AnalogChannel::Admit admit_crit;
@@ -510,9 +510,9 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
       default: admit_crit = AnalogChannel::Admit::Free; break;
     }
 
-    return new AnalogChannel(name(), double(rxFrequency())/1e6, double(txFrequency())/1e6,
-                             power(), txTimeOut(), rxOnly(), admit_crit, squelch(), rxSignaling(),
-                             txSignaling(), bandwidth(), nullptr);
+    ch = new AnalogChannel(name(), double(rxFrequency())/1e6, double(txFrequency())/1e6,
+                           power(), txTimeOut(), rxOnly(), admit_crit, squelch(), rxSignaling(),
+                           txSignaling(), bandwidth(), nullptr);
   } else if (MODE_DIGITAL == mode()) {
     DigitalChannel::Admit admit_crit;
     switch(admitCriterion()) {
@@ -522,10 +522,16 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
       default: admit_crit = DigitalChannel::Admit::Free; break;
     }
 
-    return new DigitalChannel(name(), double(rxFrequency())/1e6, double(txFrequency())/1e6,
-                              power(), txTimeOut(), rxOnly(), admit_crit, colorCode(), timeSlot(),
-                              nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+    ch = new DigitalChannel(name(), double(rxFrequency())/1e6, double(txFrequency())/1e6,
+                            power(), txTimeOut(), rxOnly(), admit_crit, colorCode(), timeSlot(),
+                            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
   }
+
+  // Common settings
+  if (vox())
+    ch->setVOXDefault();
+  else
+    ch->disableVOX();
 
   return nullptr;
 }
@@ -565,12 +571,15 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
   setRXFrequency(chan->rxFrequency()*1e6);
   setTXFrequency(chan->txFrequency()*1e6);
   enableRXOnly(chan->rxOnly());
-  setTXTimeOut(chan->timeout());
+  if (chan->defaultTimeout())
+    setTXTimeOut(ctx.config()->settings()->tot());
+  else
+    setTXTimeOut(chan->timeout());
   if (chan->scanListObj())
     setScanListIndex(ctx.index(chan->scanListObj()));
   else
     setScanListIndex(0);
-
+  enableVOX((chan->defaultVOX() && (!ctx.config()->settings()->voxDisabled())) || (!chan->voxDisabled()));
   // encode power setting
   setPower(chan->power());
 
@@ -602,7 +611,10 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
     const AnalogChannel *achan = chan->as<const AnalogChannel>();
     setMode(MODE_ANALOG);
     setBandwidth(achan->bandwidth());
-    setSquelch(achan->squelch());
+    if (achan->defaultSquelch())
+      setSquelch(ctx.config()->settings()->squelch());
+    else
+      setSquelch(achan->squelch());
     switch (achan->admit()) {
     case AnalogChannel::Admit::Always: setAdmitCriterion(ADMIT_ALWAYS); break;
     case AnalogChannel::Admit::Free: setAdmitCriterion(ADMIT_CH_FREE); break;
@@ -1008,7 +1020,7 @@ TyTCodeplug::GroupListElement::linkGroupListObj(RXGroupList *lst, Context &ctx) 
                 << name() << "': Invalid contact index. Ignored.";
       continue;
     }
-    logDebug() << "Add contact idx=" << memberIndex(i) << " to group list " << lst->name() << ".";
+    //logDebug() << "Add contact idx=" << memberIndex(i) << " to group list " << lst->name() << ".";
     if (0 > lst->addContact(ctx.get<DigitalContact>(memberIndex(i)))) {
       logWarn() << "Cannot add contact '" << ctx.get<DigitalContact>(memberIndex(i))->name()
                 << "' at idx=" << memberIndex(i) << ".";
@@ -1773,12 +1785,12 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
   setRadioName(config->radioIDs()->defaultId()->name());
   setDMRId(config->radioIDs()->defaultId()->number());
 
-  setIntroLine1(config->introLine1());
-  setIntroLine2(config->introLine2());
+  setIntroLine1(config->settings()->introLine1());
+  setIntroLine2(config->settings()->introLine2());
   setTimeZone(QTimeZone::systemTimeZone());
-  setMICLevel(config->micLevel());
-  enableChannelVoiceAnnounce(config->speech());
-
+  setMICLevel(config->settings()->micLevel());
+  enableChannelVoiceAnnounce(config->settings()->speech());
+  setVOXSesitivity(config->settings()->vox());
   return true;
 }
 
@@ -1786,10 +1798,11 @@ bool
 TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   int idx = config->radioIDs()->addId(radioName(),dmrId());
   config->radioIDs()->setDefaultId(idx);
-  config->setIntroLine1(introLine1());
-  config->setIntroLine2(introLine2());
-  config->setMicLevel(micLevel());
-  config->setSpeech(channelVoiceAnnounce());
+  config->settings()->setIntroLine1(introLine1());
+  config->settings()->setIntroLine2(introLine2());
+  config->settings()->setMicLevel(micLevel());
+  config->settings()->enableSpeech(channelVoiceAnnounce());
+  config->settings()->setVOX(voxSesitivity());
   return true;
 }
 

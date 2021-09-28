@@ -15,20 +15,37 @@
  * Implementation of Config
  * ********************************************************************************************* */
 Config::Config(QObject *parent)
-  : ConfigObject("config", parent), _modified(false), _radioIDs(new RadioIDList(this)),
-    _contacts(new ContactList(this)), _rxGroupLists(new RXGroupLists(this)),
-    _channels(new ChannelList(this)), _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
-    _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this)),
-    _introLine1(), _introLine2(), _mic_level(2), _speech(false)
+  : ConfigObject("", parent), _modified(false), _settings(new RadioSettings(this)),
+    _radioIDs(new RadioIDList(this)), _contacts(new ContactList(this)),
+    _rxGroupLists(new RXGroupLists(this)), _channels(new ChannelList(this)),
+    _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
+    _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this))
 {
-  /*connect(_radioIDs, SIGNAL(modified()), this, SLOT(onConfigModified()));
-  connect(_contacts, SIGNAL(modified()), this, SLOT(onConfigModified()));
-  connect(_rxGroupLists, SIGNAL(modified()), this, SLOT(onConfigModified()));
-  connect(_channels, SIGNAL(modified()), this, SLOT(onConfigModified()));
-  connect(_zones, SIGNAL(modified()), this, SLOT(onConfigModified()));
-  connect(_scanlists, SIGNAL(modified()), this, SLOT(onConfigModified()));
-  connect(_gpsSystems, SIGNAL(modified()), this, SLOT(onConfigModified()));
-  connect(_roaming, SIGNAL(modified()), this, SLOT(onConfigModified()));*/
+  connect(_settings, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModified()));
+  connect(_radioIDs, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
+  connect(_radioIDs, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
+  connect(_radioIDs, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
+  connect(_contacts, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
+  connect(_contacts, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
+  connect(_contacts, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
+  connect(_rxGroupLists, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
+  connect(_rxGroupLists, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
+  connect(_rxGroupLists, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
+  connect(_channels, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
+  connect(_channels, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
+  connect(_channels, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
+  connect(_zones, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
+  connect(_zones, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
+  connect(_zones, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
+  connect(_scanlists, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
+  connect(_scanlists, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
+  connect(_scanlists, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
+  connect(_gpsSystems, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
+  connect(_gpsSystems, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
+  connect(_gpsSystems, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
+  connect(_roaming, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
+  connect(_roaming, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
+  connect(_roaming, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
 }
 
 bool
@@ -47,6 +64,8 @@ Config::label(Context &context) {
   if (! ConfigObject::label(context))
     return false;
 
+  if (! _settings->label(context))
+    return false;
   if (! _radioIDs->label(context))
     return false;
   if (! _contacts->label(context))
@@ -86,16 +105,17 @@ Config::populate(YAML::Node &node, const Context &context)
 {
   node["version"] = VERSION_STRING;
 
-  YAML::Node settings;
-  settings["micLevel"] = _mic_level;
+  if ((node["settings"]= _settings->serialize(context)).IsNull())
+    return false;
+
+  /*settings["micLevel"] = _mic_level;
   settings["speech"] = _speech;
   if (! _introLine1.isEmpty())
     settings["introLine1"] = _introLine1.toStdString();
   if (! _introLine2.isEmpty())
     settings["introLine2"] = _introLine2.toStdString();
   if (_radioIDs->defaultId() && context.contains(_radioIDs->defaultId()))
-    settings["defaultID"] = context.getId(_radioIDs->defaultId()).toStdString();
-  node["settings"] = settings;
+    settings["defaultID"] = context.getId(_radioIDs->defaultId()).toStdString();*/
 
   if ((node["radioIDs"] = _radioIDs->serialize(context)).IsNull())
     return false;
@@ -130,8 +150,12 @@ Config::populate(YAML::Node &node, const Context &context)
   if (! ConfigObject::populate(node, context))
     return false;
 
-  node.remove("id");
   return true;
+}
+
+RadioSettings *
+Config::settings() const {
+  return _settings;
 }
 
 RadioIDList *
@@ -210,55 +234,43 @@ Config::requiresGPS() const {
 
 const QString &
 Config::introLine1() const {
-  return _introLine1;
+  return _settings->introLine1();
 }
 void
 Config::setIntroLine1(const QString &line) {
-  if (line == _introLine1)
-    return;
-  _introLine1 = line;
-  emit modified(this);
+  _settings->setIntroLine1(line);
 }
 const QString &
 Config::introLine2() const {
-  return _introLine2;
+  return _settings->introLine2();
 }
 void
 Config::setIntroLine2(const QString &line) {
-  if (line == _introLine2)
-    return;
-  _introLine2 = line;
-  emit modified(this);
+  _settings->setIntroLine2(line);
 }
 
 uint
 Config::micLevel() const {
-  return _mic_level;
+  return _settings->micLevel();
 }
 void
 Config::setMicLevel(uint level) {
-  level = std::min(10u, std::max(1u, level));
-  if (level == _mic_level)
-    return;
-  _mic_level = level;
-  emit modified(this);
+  _settings->setMicLevel(level);
 }
 
 bool
 Config::speech() const {
-  return _speech;
+  return _settings->speech();
 }
 void
 Config::setSpeech(bool enabled) {
-  if (enabled == _speech)
-    return;
-  _speech = enabled;
-  emit modified(this);
+  _settings->enableSpeech(enabled);
 }
 
 void
 Config::reset() {
   // Reset lists
+  _settings->clear();
   _radioIDs->clear();
   _contacts->clear();
   _rxGroupLists->clear();
@@ -267,11 +279,6 @@ Config::reset() {
   _scanlists->clear();
   _gpsSystems->clear();
   _roaming->clear();
-
-  _introLine1.clear();
-  _introLine2.clear();
-  _mic_level = 2;
-  _speech    = false;
 
   foreach (ConfigObject *extension, _extensions) {
     extension->deleteLater();

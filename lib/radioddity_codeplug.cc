@@ -359,6 +359,7 @@ RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx) const {
     ach->setBandwidth(bandwidth());
     ach->setRXTone(rxTone());
     ach->setTXTone(txTone());
+    ach->setSquelchDefault(); // There is no per-channel squelch setting
   } else {
     DigitalChannel *dch = new DigitalChannel(
           "", 0, 0, Channel::Power::Low, 0, false, DigitalChannel::Admit::Always, 0,
@@ -381,6 +382,10 @@ RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx) const {
   ch->setPower(power());
   ch->setTimeout(txTimeOut());
   ch->setRXOnly(rxOnly());
+  if (vox())
+    ch->setVOXDefault();
+  else
+    ch->disableVOX();
   // done.
   return ch;
 }
@@ -409,9 +414,17 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
   setName(c->name());
   setRXFrequency(c->rxFrequency()*1e6);
   setTXFrequency(c->txFrequency()*1e6);
-  setPower(c->power());
-  setTXTimeOut(c->timeout());
+  if (c->defaultPower())
+    setPower(ctx.config()->settings()->power());
+  else
+    setPower(c->power());
+  if (c->defaultTimeout())
+    setTXTimeOut(ctx.config()->settings()->tot());
+  else
+    setTXTimeOut(c->timeout());
   enableRXOnly(c->rxOnly());
+  enableVOX((c->defaultVOX() && (!ctx.config()->settings()->voxDisabled())) || (!c->voxDisabled()));
+
   if (c->scanListObj())
     setScanListIndex(ctx.index(c->scanListObj()));
 
@@ -1674,6 +1687,9 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Conte
     logError() << "Cannot encode radioddity codeplug: No radio ID defined.";
     return false;
   }
+
+  setVOXSensitivity(ctx.config()->settings()->vox());
+  // There is no global squelch settings either...
   return true;
 }
 
@@ -1685,6 +1701,7 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &
   }
   conf->radioIDs()->defaultId()->setName(name());
   conf->radioIDs()->defaultId()->setNumber(radioID());
+  conf->settings()->setVOX(voxSensitivity());
   return true;
 }
 
@@ -2262,14 +2279,14 @@ RadioddityCodeplug::BootTextElement::setLine2(const QString &text) {
 
 void
 RadioddityCodeplug::BootTextElement::fromConfig(Config *conf) {
-  setLine1(conf->introLine1());
-  setLine2(conf->introLine2());
+  setLine1(conf->settings()->introLine1());
+  setLine2(conf->settings()->introLine2());
 }
 
 void
 RadioddityCodeplug::BootTextElement::updateConfig(Config *conf) {
-  conf->setIntroLine1(line1());
-  conf->setIntroLine2(line2());
+  conf->settings()->setIntroLine1(line1());
+  conf->settings()->setIntroLine2(line2());
 }
 
 

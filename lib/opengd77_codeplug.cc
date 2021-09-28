@@ -143,7 +143,7 @@ OpenGD77Codeplug::ChannelElement::toChannelObj(Context &ctx) const {
   if (ch->is<AnalogChannel>()) {
     AnalogChannel *ac = ch->as<AnalogChannel>();
     if (squelchIsDefault())
-      ac->setSquelch(1);
+      ac->setSquelchDefault();
     else
       ac->setSquelch(squelch());
   }
@@ -162,7 +162,10 @@ OpenGD77Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
 
   if (c->is<AnalogChannel>()) {
     const AnalogChannel *ac = c->as<AnalogChannel>();
-    setSquelch(ac->squelch());
+    if (ac->defaultSquelch())
+      setSquelchDefault();
+    else
+      setSquelch(ac->squelch());
   }
 
   if (! c->hasExtension("openGD77"))

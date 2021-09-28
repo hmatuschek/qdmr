@@ -28,6 +28,9 @@ public:
   /** Default constructor. */
   explicit RadioSettings(QObject *parent=nullptr);
 
+  /** Resets the settings. */
+  void clear();
+
   /** Returns the first intro line. */
   const QString &introLine1() const;
   /** (Re-)Sets the first intro line. */

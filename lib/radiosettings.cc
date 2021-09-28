@@ -7,6 +7,18 @@ RadioSettings::RadioSettings(QObject *parent)
   // pass
 }
 
+void
+RadioSettings::clear() {
+  _introLine1.clear();
+  _introLine2.clear();
+  _micLevel = 3;
+  _speech = false;
+  _squelch = 1;
+  _power = Channel::Power::High;
+  disableVOX();
+  disableTOT();
+}
+
 const QString &
 RadioSettings::introLine1() const {
   return _introLine1;
