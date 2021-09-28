@@ -21,6 +21,10 @@ protected:
 
 protected slots:
   void onRepeaterSelected(const QModelIndex &index);
+  void onPowerDefaultToggled(bool checked);
+  void onTimeoutDefaultToggled(bool checked);
+  void onSquelchDefaultToggled(bool checked);
+  void onVOXDefaultToggled(bool checked);
 
 protected:
   Config *_config;

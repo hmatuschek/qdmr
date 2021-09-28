@@ -38,11 +38,13 @@ DigitalChannelDialog::construct() {
 
   rxFrequency->setValidator(new QDoubleValidator(0,500,5));
   txFrequency->setValidator(new QDoubleValidator(0,500,5));
-  power->setItemData(0, uint(Channel::Power::Max));
-  power->setItemData(1, uint(Channel::Power::High));
-  power->setItemData(2, uint(Channel::Power::Mid));
-  power->setItemData(3, uint(Channel::Power::Low));
-  power->setItemData(4, uint(Channel::Power::Min));
+  powerValue->setItemData(0, uint(Channel::Power::Max));
+  powerValue->setItemData(1, uint(Channel::Power::High));
+  powerValue->setItemData(2, uint(Channel::Power::Mid));
+  powerValue->setItemData(3, uint(Channel::Power::Low));
+  powerValue->setItemData(4, uint(Channel::Power::Min));
+  powerDefault->setChecked(true); powerValue->setCurrentIndex(1); powerValue->setEnabled(false);
+  totDefault->setChecked(true); totValue->setValue(0); totValue->setEnabled(false);
   scanList->addItem(tr("[None]"), QVariant::fromValue((ScanList *)(nullptr)));
   scanList->setCurrentIndex(0);
   for (int i=0; i<_config->scanlists()->count(); i++) {
@@ -93,19 +95,26 @@ DigitalChannelDialog::construct() {
       dmrID->setCurrentIndex(i+1);
     }
   }
+  voxDefault->setChecked(true); voxValue->setValue(0); voxValue->setEnabled(false);
 
   if (_channel) {
     channelName->setText(_channel->name());
     rxFrequency->setText(format_frequency(_channel->rxFrequency()));
     txFrequency->setText(format_frequency(_channel->txFrequency()));
-    switch (_channel->power()) {
-    case Channel::Power::Max: power->setCurrentIndex(0); break;
-    case Channel::Power::High: power->setCurrentIndex(1); break;
-    case Channel::Power::Mid: power->setCurrentIndex(2); break;
-    case Channel::Power::Low: power->setCurrentIndex(3); break;
-    case Channel::Power::Min: power->setCurrentIndex(4); break;
+    if (! _channel->defaultPower()) {
+      powerDefault->setChecked(false); powerValue->setEnabled(true);
+      switch (_channel->power()) {
+      case Channel::Power::Max: powerValue->setCurrentIndex(0); break;
+      case Channel::Power::High: powerValue->setCurrentIndex(1); break;
+      case Channel::Power::Mid: powerValue->setCurrentIndex(2); break;
+      case Channel::Power::Low: powerValue->setCurrentIndex(3); break;
+      case Channel::Power::Min: powerValue->setCurrentIndex(4); break;
+      }
     }
-    txTimeout->setValue(_channel->timeout());
+    if (! _channel->defaultTimeout()) {
+      totDefault->setChecked(false); totValue->setEnabled(true);
+      totValue->setValue(_channel->timeout());
+    }
     rxOnly->setChecked(_channel->rxOnly());
     switch (_channel->admit()) {
       case DigitalChannel::Admit::Always: txAdmit->setCurrentIndex(0); break;
@@ -117,49 +126,57 @@ DigitalChannelDialog::construct() {
       timeSlot->setCurrentIndex(0);
     else if (DigitalChannel::TimeSlot::TS2 == _channel->timeSlot())
       timeSlot->setCurrentIndex(1);
+    if (! _channel->defaultVOX()) {
+      voxDefault->setChecked(false); voxValue->setEnabled(true);
+      voxValue->setValue(_channel->vox());
+    }
   }
+
+  connect(powerDefault, SIGNAL(toggled(bool)), this, SLOT(onPowerDefaultToggled(bool)));
+  connect(totDefault, SIGNAL(toggled(bool)), this, SLOT(onTimeoutDefaultToggled(bool)));
+  connect(voxDefault, SIGNAL(toggled(bool)), this, SLOT(onVOXDefaultToggled(bool)));
 }
 
 DigitalChannel *
-DigitalChannelDialog::channel() {
-  bool ok = false;
-  QString name = channelName->text();
-  double rx = rxFrequency->text().toDouble(&ok);
-  double tx = txFrequency->text().toDouble(&ok);
-  Channel::Power pwr = Channel::Power(power->currentData().toUInt(&ok));
-  uint timeout = txTimeout->text().toUInt(&ok);
-  bool rxonly = rxOnly->isChecked();
-  DigitalChannel::Admit admit = DigitalChannel::Admit(txAdmit->currentData().toUInt(&ok));
-  uint colorcode = colorCode->value();
-  DigitalChannel::TimeSlot ts = DigitalChannel::TimeSlot(timeSlot->currentData().toUInt(&ok));
-  RXGroupList *rxgroup = rxGroupList->currentData().value<RXGroupList *>();
-  DigitalContact *contact = txContact->currentData().value<DigitalContact *>();
-  ScanList *scanlist = scanList->currentData().value<ScanList *>();
-  PositioningSystem *pos = gpsSystem->currentData().value<PositioningSystem *>();
-  RoamingZone *roamingZone = roaming->currentData().value<RoamingZone *>();
-  RadioID *id = dmrID->currentData().value<RadioID*>();
-
+DigitalChannelDialog::channel()
+{
+  DigitalChannel *channel = nullptr;
   if (_channel) {
-    _channel->setRadioIdObj(id);
-    _channel->setName(name);
-    _channel->setRXFrequency(rx);
-    _channel->setTXFrequency(tx);
-    _channel->setPower(pwr);
-    _channel->setTimeout(timeout);
-    _channel->setRXOnly(rxonly);
-    _channel->setScanListObj(scanlist);
-    _channel->setAdmit(admit);
-    _channel->setColorCode(colorcode);
-    _channel->setTimeSlot(ts);
-    _channel->setGroupListObj(rxgroup);
-    _channel->setTXContactObj(contact);
-    _channel->setAPRSObj(pos);
-    _channel->setRoamingZone(roamingZone);
-    return _channel;
+    channel = _channel;
+  } else {
+    channel = new DigitalChannel(
+          "", 0, 0, Channel::Power::Low, 0, false, DigitalChannel::Admit::Always, 1,
+          DigitalChannel::TimeSlot::TS1, nullptr, nullptr, nullptr, nullptr, nullptr,
+          DefaultRadioID::get());
   }
 
-  return new DigitalChannel(name, rx, tx, pwr, timeout, rxonly, admit, colorcode, ts, rxgroup,
-                            contact, pos, scanlist, roamingZone, id);
+  channel->setRadioIdObj(dmrID->currentData().value<RadioID*>());
+  channel->setName(channelName->text());
+  channel->setRXFrequency(rxFrequency->text().toDouble());
+  channel->setTXFrequency(txFrequency->text().toDouble());
+  if (powerDefault->isChecked())
+    channel->setDefaultPower();
+  else
+    channel->setPower(Channel::Power(powerValue->currentData().toUInt()));
+  if (totDefault->isChecked())
+    channel->setDefaultTimeout();
+  else
+    channel->setTimeout(totValue->value());
+  channel->setRXOnly(rxOnly->isChecked());
+  channel->setScanListObj(scanList->currentData().value<ScanList *>());
+  channel->setAdmit(DigitalChannel::Admit(txAdmit->currentData().toUInt()));
+  channel->setColorCode(colorCode->value());
+  channel->setTimeSlot(DigitalChannel::TimeSlot(timeSlot->currentData().toUInt()));
+  channel->setGroupListObj(rxGroupList->currentData().value<RXGroupList *>());
+  channel->setTXContactObj(txContact->currentData().value<DigitalContact *>());
+  channel->setAPRSObj(gpsSystem->currentData().value<PositioningSystem *>());
+  channel->setRoamingZone(roaming->currentData().value<RoamingZone *>());
+  if (voxDefault->isChecked())
+    channel->setVOXDefault();
+  else
+    channel->setVOX(voxValue->value());
+
+  return _channel;
 }
 
 void
@@ -176,4 +193,18 @@ DigitalChannelDialog::onRepeaterSelected(const QModelIndex &index) {
   rxFrequency->setText(QString::number(rx, 'f'));
 }
 
+void
+DigitalChannelDialog::onPowerDefaultToggled(bool checked) {
+  powerValue->setEnabled(!checked);
+}
+
+void
+DigitalChannelDialog::onTimeoutDefaultToggled(bool checked) {
+  totValue->setEnabled(!checked);
+}
+
+void
+DigitalChannelDialog::onVOXDefaultToggled(bool checked) {
+  voxValue->setEnabled(! checked);
+}
 

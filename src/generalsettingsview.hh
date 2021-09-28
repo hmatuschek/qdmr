@@ -27,6 +27,10 @@ protected slots:
   void onIntroLine2Changed();
   void onMicLevelChanged();
   void onSpeechChanged();
+  void onPowerChanged();
+  void onSquelchChanged();
+  void onTOTChanged();
+  void onVOXChanged();
 
 private:
   Ui::GeneralSettingsView *ui;

@@ -19,7 +19,9 @@ class RadioSettings : public ConfigObject
   Q_PROPERTY(bool speech READ speech WRITE enableSpeech)
   /** The default channel power */
   Q_PROPERTY(Channel::Power power READ power WRITE setPower)
-  /** The default vox level */
+  /** The squelch level. */
+  Q_PROPERTY(uint squelch READ squelch WRITE setSquelch)
+  /** The default vox sensitivity */
   Q_PROPERTY(uint vox READ vox WRITE setVOX)
   /** The default transmit timeout */
   Q_PROPERTY(uint tot READ tot WRITE setTOT)

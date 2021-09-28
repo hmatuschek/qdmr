@@ -229,6 +229,28 @@ public:
   bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
 };
 
+/** Reads the global radio settings.
+ * @ingroup yaml */
+class RadioSettingsReader: public AbstractConfigReader
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit RadioSettingsReader(QObject *parent=nullptr);
+
+  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
+  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
+  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+
+public:
+  /** Adds an extension to the config parser. */
+  static bool addExtension(ExtensionReader *ext);
+
+protected:
+  /** Holds the exentions for the config parser. */
+  static QHash<QString, AbstractConfigReader *> _extensions;
+};
 
 /** Reads radio ID definitions.
  * @ingroup yaml */

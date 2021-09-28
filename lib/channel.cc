@@ -25,7 +25,8 @@
 Channel::Channel(const QString &name, double rx, double tx, Power power, uint txTimeout,
                  bool rxOnly, ScanList *scanlist, QObject *parent)
   : ConfigObject("ch", parent), _name(name), _rxFreq(rx), _txFreq(tx), _defaultPower(false),
-    _power(power), _txTimeOut(txTimeout), _rxOnly(rxOnly), _vox(0), _scanlist()
+    _power(power), _txTimeOut(txTimeout), _rxOnly(rxOnly), _vox(std::numeric_limits<uint>::max()),
+    _scanlist()
 {
   // Set reference to scan list
   _scanlist.set(scanlist);

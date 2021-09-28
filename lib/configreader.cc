@@ -453,21 +453,11 @@ ConfigReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject
 
 bool
 ConfigReader::parseSettings(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
-  if (node["micLevel"] && node["micLevel"].IsScalar()) {
-    config->setMicLevel(node["micLevel"].as<uint>());
+  RadioSettingsReader reader;
+  if (! reader.parse(config->settings(), node, ctx)) {
+    _errorMessage = reader.errorMessage();
+    return false;
   }
-
-  if (node["speech"] && node["speech"].IsScalar()) {
-    config->setSpeech(node["speech"].as<bool>());
-  }
-
-  if (node["introLine1"] && node["introLine1"].IsScalar()) {
-    config->setIntroLine1(QString::fromStdString(node["introLine1"].as<std::string>()));
-  }
-  if (node["introLine2"] && node["introLine2"].IsScalar()) {
-    config->setIntroLine2(QString::fromStdString(node["introLine2"].as<std::string>()));
-  }
-
   return true;
 }
 
@@ -1214,6 +1204,56 @@ ObjectReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
   } else {
     logWarn() << "No ID associated with object, it cannot be referenced later.";
   }
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioSettingsReader
+ * ********************************************************************************************* */
+QHash<QString, AbstractConfigReader *> RadioSettingsReader::_extensions;
+
+RadioSettingsReader::RadioSettingsReader(QObject *parent)
+  : AbstractConfigReader(parent)
+{
+  // pass...
+}
+
+bool
+RadioSettingsReader::addExtension(ExtensionReader *ext) {
+  QString name = ext->metaObject()->className();
+  if (0 <= ext->metaObject()->indexOfClassInfo("name")) {
+    name = ext->metaObject()->classInfo(ext->metaObject()->indexOfClassInfo("name")).value();
+  }
+  if (_extensions.contains(name))
+    return false;
+  _extensions[name] = ext;
+  return true;
+}
+
+ConfigObject *
+RadioSettingsReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  return new RadioSettings();
+}
+
+bool
+RadioSettingsReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+  RadioID *rid = qobject_cast<RadioID *>(obj);
+
+  if (! AbstractConfigReader::parse(obj, node, ctx))
+    return false;
+
+  if (! parseExtensions(_extensions, rid, node, ctx))
+    return false;
+
+  return true;
+}
+
+bool
+RadioSettingsReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  if (! linkExtensions(_extensions, obj, node, ctx))
+    return false;
 
   return true;
 }

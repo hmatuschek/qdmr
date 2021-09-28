@@ -62,55 +62,10 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QComboBox" name="power">
-         <property name="currentText">
-          <string>High</string>
-         </property>
-         <property name="currentIndex">
-          <number>1</number>
-         </property>
-         <item>
-          <property name="text">
-           <string>Max</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>High</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Mid</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Low</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Min</string>
-          </property>
-         </item>
-        </widget>
-       </item>
        <item row="4" column="0">
         <widget class="QLabel" name="txTimeoutLabel">
          <property name="text">
           <string>Tx Timeout</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QSpinBox" name="txTimeout">
-         <property name="maximum">
-          <number>555</number>
-         </property>
-         <property name="singleStep">
-          <number>15</number>
          </property>
         </widget>
        </item>
@@ -133,6 +88,70 @@
        </item>
        <item row="6" column="1">
         <widget class="QComboBox" name="scanList"/>
+       </item>
+       <item row="4" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QSpinBox" name="totValue">
+           <property name="specialValueText">
+            <string>Off</string>
+           </property>
+           <property name="suffix">
+            <string extracomment="Transmit time out (TOT) in seconds. A value of 0 means disabled."> s</string>
+           </property>
+           <property name="maximum">
+            <number>9999</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="totDefault">
+           <property name="text">
+            <string>Default</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QComboBox" name="powerValue">
+           <item>
+            <property name="text">
+             <string>Max</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>High</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Mid</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Low</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Min</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="powerDefault">
+           <property name="text">
+            <string>Default</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -168,13 +187,6 @@
         <widget class="QLabel" name="squelchLabel">
          <property name="text">
           <string>Squelch</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="squelch">
-         <property name="maximum">
-          <number>9</number>
          </property>
         </widget>
        </item>
@@ -228,6 +240,55 @@
        </item>
        <item row="5" column="1">
         <widget class="QComboBox" name="aprsList"/>
+       </item>
+       <item row="1" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QSpinBox" name="squelchValue">
+           <property name="specialValueText">
+            <string>Open</string>
+           </property>
+           <property name="maximum">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="squelchDefault">
+           <property name="text">
+            <string>Default</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="vOXLevelLabel">
+         <property name="text">
+          <string>VOX Level</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QSpinBox" name="voxValue">
+           <property name="specialValueText">
+            <string>Off</string>
+           </property>
+           <property name="maximum">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="voxDefault">
+           <property name="text">
+            <string>Default</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>

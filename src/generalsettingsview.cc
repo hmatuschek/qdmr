@@ -17,6 +17,24 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   ui->mic->setValue(_config->micLevel());
   ui->speech->setChecked(_config->speech());
 
+  ui->powerValue->setItemData(0, (uint)Channel::Power::Max);
+  ui->powerValue->setItemData(1, (uint)Channel::Power::High);
+  ui->powerValue->setItemData(2, (uint)Channel::Power::Mid);
+  ui->powerValue->setItemData(3, (uint)Channel::Power::Low);
+  ui->powerValue->setItemData(4, (uint)Channel::Power::Min);
+
+  switch(_config->settings()->power()) {
+  case Channel::Power::Max: ui->powerValue->setCurrentIndex(0); break;
+  case Channel::Power::High: ui->powerValue->setCurrentIndex(1); break;
+  case Channel::Power::Mid: ui->powerValue->setCurrentIndex(2); break;
+  case Channel::Power::Low: ui->powerValue->setCurrentIndex(3); break;
+  case Channel::Power::Min: ui->powerValue->setCurrentIndex(4); break;
+  }
+
+  ui->squelchValue->setValue(config->settings()->squelch());
+  ui->totValue->setValue(config->settings()->tot());
+  ui->voxValue->setValue(config->settings()->vox());
+
   connect(_config, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModified()));
   connect(ui->dmrID, SIGNAL(textEdited(QString)), this, SLOT(onDMRIDChanged()));
   connect(ui->radioName, SIGNAL(textEdited(QString)), this, SLOT(onNameChanged()));
@@ -24,6 +42,10 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   connect(ui->introLine2, SIGNAL(textEdited(QString)), this, SLOT(onIntroLine2Changed()));
   connect(ui->mic, SIGNAL(valueChanged(int)), this, SLOT(onMicLevelChanged()));
   connect(ui->speech, SIGNAL(stateChanged(int)), this, SLOT(onSpeechChanged()));
+  connect(ui->powerValue, SIGNAL(currentIndexChanged(int)), this, SLOT(onPowerChanged()));
+  connect(ui->squelchValue, SIGNAL(valueChanged(int)), this, SLOT(onSquelchChanged()));
+  connect(ui->totValue, SIGNAL(valueChanged(int)), this, SLOT(onTOTChanged()));
+  connect(ui->voxValue, SIGNAL(valueChanged(int)), this, SLOT(onVOXChanged()));
 }
 
 GeneralSettingsView::~GeneralSettingsView() {
@@ -44,10 +66,10 @@ GeneralSettingsView::onConfigModified() {
     ui->dmrID->setText("0");
     ui->radioName->setText("");
   }
-  ui->introLine1->setText(_config->introLine1());
-  ui->introLine2->setText(_config->introLine2());
-  ui->mic->setValue(_config->micLevel());
-  ui->speech->setChecked(_config->speech());
+  ui->introLine1->setText(_config->settings()->introLine1());
+  ui->introLine2->setText(_config->settings()->introLine2());
+  ui->mic->setValue(_config->settings()->micLevel());
+  ui->speech->setChecked(_config->settings()->speech());
 }
 
 void
@@ -78,21 +100,37 @@ GeneralSettingsView::onNameChanged() {
 
 void
 GeneralSettingsView::onIntroLine1Changed() {
-  _config->setIntroLine1(ui->introLine1->text().simplified());
+  _config->settings()->setIntroLine1(ui->introLine1->text().simplified());
 }
 
 void
 GeneralSettingsView::onIntroLine2Changed() {
-  _config->setIntroLine2(ui->introLine2->text().simplified());
+  _config->settings()->setIntroLine2(ui->introLine2->text().simplified());
 }
 
 void
 GeneralSettingsView::onMicLevelChanged() {
-  _config->setMicLevel(ui->mic->value());
+  _config->settings()->setMicLevel(ui->mic->value());
 }
 
 void
 GeneralSettingsView::onSpeechChanged() {
-  _config->setSpeech(ui->speech->isChecked());
+  _config->settings()->enableSpeech(ui->speech->isChecked());
 }
 
+void
+GeneralSettingsView::onPowerChanged() {
+  _config->settings()->setPower(Channel::Power(ui->powerValue->currentData().toUInt()));
+}
+void
+GeneralSettingsView::onSquelchChanged() {
+  _config->settings()->setSquelch(ui->squelchValue->value());
+}
+void
+GeneralSettingsView::onTOTChanged() {
+  _config->settings()->setTOT(ui->totValue->value());
+}
+void
+GeneralSettingsView::onVOXChanged() {
+  _config->settings()->setVOX(ui->voxValue->value());
+}

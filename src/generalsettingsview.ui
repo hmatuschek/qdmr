@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>494</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -130,6 +130,105 @@
        <widget class="QCheckBox" name="speech">
         <property name="text">
          <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Channel Default Values</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="powerLabel">
+        <property name="text">
+         <string>Power</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="powerValue">
+        <item>
+         <property name="text">
+          <string>Max</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>High</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Mid</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Low</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Min</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="squelchLabel">
+        <property name="text">
+         <string>Squelch</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="squelchValue">
+        <property name="specialValueText">
+         <string>Open</string>
+        </property>
+        <property name="maximum">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="transmitTimeoutLabel">
+        <property name="text">
+         <string>Transmit Timeout</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="totValue">
+        <property name="specialValueText">
+         <string>Off</string>
+        </property>
+        <property name="suffix">
+         <string> s</string>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="voxLevelLabel">
+        <property name="text">
+         <string>VOX Level</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QSpinBox" name="voxValue">
+        <property name="specialValueText">
+         <string>Off</string>
+        </property>
+        <property name="maximum">
+         <number>10</number>
         </property>
        </widget>
       </item>
