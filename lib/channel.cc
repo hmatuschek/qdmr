@@ -16,20 +16,41 @@
 #include "application.hh"
 #include <QCompleter>
 #include <QAbstractProxyModel>
+#include <QMetaEnum>
 
 #include <QDebug>
 
 /* ********************************************************************************************* *
  * Implementation of Channel
  * ********************************************************************************************* */
-Channel::Channel(const QString &name, double rx, double tx, Power power, uint txTimeout,
-                 bool rxOnly, ScanList *scanlist, QObject *parent)
-  : ConfigObject("ch", parent), _name(name), _rxFreq(rx), _txFreq(tx), _defaultPower(false),
-    _power(power), _txTimeOut(txTimeout), _rxOnly(rxOnly), _vox(std::numeric_limits<uint>::max()),
-    _scanlist()
+Channel::Channel(QObject *parent)
+  : ConfigObject("ch", parent), _name(""), _rxFreq(0), _txFreq(0), _defaultPower(true),
+    _power(Power::Low), _txTimeOut(std::numeric_limits<uint>::max()), _rxOnly(false),
+    _vox(std::numeric_limits<uint>::max()), _scanlist()
 {
-  // Set reference to scan list
-  _scanlist.set(scanlist);
+  // Link scan list modification event (e.g., scan list gets deleted).
+  connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+Channel::Channel(const Channel &other, QObject *parent)
+  : ConfigObject("ch", parent), _scanlist()
+{
+  setName(other.name());
+  setRXFrequency(other.rxFrequency());
+  setTXFrequency(other.txFrequency());
+  if (other.defaultPower())
+    setDefaultPower();
+  else
+    setPower(other.power());
+  if (other.defaultTimeout())
+    setDefaultTimeout();
+  else
+    setTimeout(other.timeout());
+  setRXOnly(other.rxOnly());
+  if (other.defaultVOX())
+    setVOXDefault();
+  setScanListObj(other.scanListObj());
+
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
@@ -175,19 +196,63 @@ Channel::onReferenceModified() {
   emit modified(this);
 }
 
+bool
+Channel::populate(YAML::Node &node, const Context &context) {
+  if (!ConfigObject::populate(node, context))
+    return false;
+
+  if (defaultPower()) {
+    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("default");
+    node["power"] = def;
+  } else {
+    QMetaEnum metaEnum = QMetaEnum::fromType<Power>();
+    node["power"] = metaEnum.valueToKey((uint)power());
+  }
+
+  if (defaultTimeout()) {
+    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("default");
+    node["timeout"] = def;
+  } else {
+    node["timeout"] = timeout();
+  }
+
+  if (defaultVOX()) {
+    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("default");
+    node["vox"] = def;
+  } else {
+    node["vox"] = vox();
+  }
+
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnalogChannel
  * ********************************************************************************************* */
-AnalogChannel::AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power,
-                             uint txTimeout, bool rxOnly, Admit admit, uint squelch,
-                             Signaling::Code rxTone, Signaling::Code txTone, Bandwidth bw,
-                             ScanList *list, APRSSystem *aprsSys, QObject *parent)
-  : Channel(name, rxFreq, txFreq, power, txTimeout, rxOnly, list, parent),
-    _admit(admit), _squelch(squelch), _rxTone(rxTone), _txTone(txTone), _bw(bw), _aprsSystem()
+AnalogChannel::AnalogChannel(QObject *parent)
+  : Channel(parent),
+    _admit(Admit::Always), _squelch(std::numeric_limits<uint>::max()),
+    _rxTone(Signaling::SIGNALING_NONE), _txTone(Signaling::SIGNALING_NONE), _bw(Bandwidth::Narrow),
+    _aprsSystem()
 {
-  // Reference APRS system
-  _aprsSystem.set(aprsSys);
+  // Link APRS system reference
+  connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
+  : Channel(parent), _aprsSystem()
+{
+  setAdmit(other.admit());
+  if (other.defaultSquelch())
+    setSquelchDefault();
+  else
+    setSquelch(other.squelch());
+  setRXTone(other.rxTone());
+  setTXTone(other.txTone());
+  setBandwidth(other.bandwidth());
+  setAPRSSystem(other.aprsSystem());
+
   // Link APRS system reference
   connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
@@ -320,6 +385,13 @@ AnalogChannel::populate(YAML::Node &node, const Context &context) {
     node["txTone"] = tone;
   }
 
+  if (defaultSquelch()) {
+    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("default");
+    node["squelch"] = def;
+  } else {
+    node["squelch"] = squelch();
+  }
+
   return true;
 }
 
@@ -327,13 +399,9 @@ AnalogChannel::populate(YAML::Node &node, const Context &context) {
 /* ********************************************************************************************* *
  * Implementation of DigitalChannel
  * ********************************************************************************************* */
-DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power,
-                               uint txto, bool rxOnly, Admit admit, uint colorCode,
-                               TimeSlot timeslot, RXGroupList *rxGroup, DigitalContact *txContact,
-                               PositioningSystem *aprs, ScanList *list, RoamingZone *roaming,
-                               RadioID *radioID, QObject *parent)
-  : Channel(name, rxFreq, txFreq, power, txto, rxOnly, list, parent), _admit(admit),
-    _colorCode(colorCode), _timeSlot(timeslot),
+DigitalChannel::DigitalChannel(QObject *parent)
+  : Channel(parent), _admit(Admit::Always),
+    _colorCode(1), _timeSlot(TimeSlot::TS1),
     _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
 {
   // Register default tags
@@ -342,12 +410,30 @@ DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq
   if (! ConfigObject::Context::hasTag(metaObject()->className(), "radioID", "!default"))
     ConfigObject::Context::setTag(metaObject()->className(), "radioID", "!default", DefaultRadioID::get());
 
-  // Set references
-  _rxGroup.set(rxGroup);
-  _txContact.set(txContact);
-  _posSystem.set(aprs);
-  _roaming.set(roaming);
-  _radioId.set(radioID);
+  // Connect signals of references
+  connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_txContact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_posSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_roaming, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_radioId, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
+  : Channel(parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
+{
+  // Register default tags
+  if (! ConfigObject::Context::hasTag(metaObject()->className(), "roaming", "!default"))
+    ConfigObject::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
+  if (! ConfigObject::Context::hasTag(metaObject()->className(), "radioID", "!default"))
+    ConfigObject::Context::setTag(metaObject()->className(), "radioID", "!default", DefaultRadioID::get());
+
+  setColorCode(other.colorCode());
+  setTimeSlot(other.timeSlot());
+  setGroupListObj(other.groupListObj());
+  setTXContactObj(other.txContactObj());
+  setAPRSObj(other.aprsObj());
+  setRoamingZone(other.roamingZone());
+  setRadioIdObj(other.radioIdObj());
 
   // Connect signals of references
   connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -520,9 +606,9 @@ DigitalChannel::setRadioIdObj(RadioID *id) {
 SelectedChannel *SelectedChannel::_instance = nullptr;
 
 SelectedChannel::SelectedChannel()
-  : Channel("[Selected]", 0, 0, Channel::Power::Low, 0, true, nullptr, nullptr)
+  : Channel()
 {
-  // pass...
+  setName("[Selected]");
 }
 
 SelectedChannel::~SelectedChannel() {

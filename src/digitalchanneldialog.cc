@@ -144,10 +144,7 @@ DigitalChannelDialog::channel()
   if (_channel) {
     channel = _channel;
   } else {
-    channel = new DigitalChannel(
-          "", 0, 0, Channel::Power::Low, 0, false, DigitalChannel::Admit::Always, 1,
-          DigitalChannel::TimeSlot::TS1, nullptr, nullptr, nullptr, nullptr, nullptr,
-          DefaultRadioID::get());
+    channel = new DigitalChannel();
   }
 
   channel->setRadioIdObj(dmrID->currentData().value<RadioID*>());

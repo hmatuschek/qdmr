@@ -328,10 +328,12 @@ D878UVCodeplug::RoamingChannelElement::toChannel(Context &ctx) {
         rxFrequency()/1e6, txFrequency()/1e6, timeSlot(), colorCode());
   if (nullptr == digi) {
     // If no matching channel can be found -> create one
-    digi = new DigitalChannel(name(), rxFrequency()/1e6, txFrequency()/1e6,
-                              Channel::Power::Low, 0, false, DigitalChannel::Admit::ColorCode,
-                              colorCode(), timeSlot(), nullptr, nullptr, nullptr,
-                              nullptr, nullptr, nullptr);
+    digi = new DigitalChannel();
+    digi->setName(name());
+    digi->setRXFrequency(rxFrequency()/1e6);
+    digi->setTXFrequency(txFrequency()/1e6);
+    digi->setColorCode(colorCode());
+    digi->setTimeSlot(timeSlot());
     logDebug() << "No matching roaming channel found: Create channel '"
                << digi->name() << "' as roaming channel.";
     ctx.config()->channelList()->add(digi);
@@ -1574,9 +1576,13 @@ D878UVCodeplug::AnalogAPRSSettingsElement::linkAPRSSystem(APRSSystem *sys, Conte
   AnalogChannel *ch = ctx.config()->channelList()->findAnalogChannelByTxFreq(frequency()/1e6);
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
-    ch = new AnalogChannel("APRS Channel", frequency()/1e6, frequency()/1e6, power(),
-                           0, false, AnalogChannel::Admit::Free, 1, Signaling::SIGNALING_NONE,
-                           txTone(), AnalogChannel::Bandwidth::Wide, nullptr);
+    ch = new AnalogChannel();
+    ch->setName("APRS Channel");
+    ch->setRXFrequency(frequency()/1e6);
+    ch->setTXFrequency(frequency()/1e6);
+    ch->setPower(power());
+    ch->setTXTone(txTone());
+    ch->setBandwidth(AnalogChannel::Bandwidth::Wide);
     logInfo() << "No matching APRS chanel found for TX frequency " << frequency()/1e6
               << "MHz, create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);

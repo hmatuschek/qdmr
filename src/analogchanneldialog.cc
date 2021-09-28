@@ -123,10 +123,7 @@ AnalogChannelDialog::channel()
   if (_channel) {
     channel = _channel;
   } else {
-    channel = new AnalogChannel("", 0, 0, Channel::Power::Low, 0, false,
-                                AnalogChannel::Admit::Always, 0,
-                                Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE,
-                                AnalogChannel::Bandwidth::Narrow, nullptr, nullptr);
+    channel = new AnalogChannel();
   }
 
   channel->setName(channelName->text());

@@ -76,13 +76,8 @@ ChannelListView::onCloneChannel() {
 
   // Dispatch by type
   if (channel->is<AnalogChannel>()) {
-    AnalogChannel *selch = channel->as<AnalogChannel>();
     // clone channel
-    AnalogChannel *clone = new AnalogChannel(
-          selch->name()+" clone", selch->rxFrequency(), selch->txFrequency(), selch->power(),
-          selch->timeout(), selch->rxOnly(), selch->admit(), selch->squelch(),
-          selch->rxTone(), selch->txTone(), selch->bandwidth(), selch->scanListObj(),
-          selch->aprsSystem());
+    AnalogChannel *clone = new AnalogChannel(*(channel->as<AnalogChannel>()));
     // open editor
     AnalogChannelDialog dialog(_config, clone);
     if (QDialog::Accepted != dialog.exec()) {
@@ -95,13 +90,8 @@ ChannelListView::onCloneChannel() {
     // add to list (below selected one)
     _config->channelList()->add(clone, row+1);
   } else {
-    DigitalChannel *selch = channel->as<DigitalChannel>();
     // clone channel
-    DigitalChannel *clone = new DigitalChannel(
-          selch->name()+" clone", selch->rxFrequency(), selch->txFrequency(), selch->power(),
-          selch->timeout(), selch->rxOnly(), selch->admit(), selch->colorCode(),
-          selch->timeSlot(), selch->groupListObj(), selch->txContactObj(), selch->aprsObj(),
-          selch->scanListObj(), selch->roamingZone(), nullptr);
+    DigitalChannel *clone = new DigitalChannel(*(channel->as<DigitalChannel>()));
     // open editor
     DigitalChannelDialog dialog(_config, clone);
     if (QDialog::Accepted != dialog.exec()) {

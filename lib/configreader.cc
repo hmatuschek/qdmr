@@ -1338,6 +1338,28 @@ ChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
 
+  Channel *channel = obj->as<Channel>();
+
+  if ((!node["power"].IsDefined()) || ("!default" == node["power"].Tag())) {
+    channel->setDefaultPower();
+  } else if (node["power"].IsDefined() && node["power"].IsScalar()) {
+    QMetaEnum meta = QMetaEnum::fromType<Channel::Power>();
+    channel->setPower((Channel::Power)meta.keyToValue(node["power"].as<std::string>().c_str()));
+  }
+
+  if ((!node["timeout"].IsDefined()) || ("!default" == node["timeout"].Tag())) {
+    channel->setDefaultTimeout();
+  } else if (node["timeout"].IsDefined() && node["timeout"].IsScalar()) {
+    logDebug() << "Has tag: " << node["timeout"].Tag().c_str();
+    channel->setTimeout(node["timeout"].as<uint>());
+  }
+
+  if ((!node["vox"].IsDefined()) || ("!default" == node["vox"].Tag())) {
+    channel->setVOXDefault();
+  } else if (node["vox"].IsDefined() && node["vox"].IsScalar()) {
+    channel->setVOX(node["vox"].as<uint>());
+  }
+
   if (! parseExtensions(_extensions, obj, node, ctx))
     return false;
 
@@ -1381,9 +1403,7 @@ DigitalChannelReader::addExtension(ExtensionReader *ext) {
 
 ConfigObject *
 DigitalChannelReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return new DigitalChannel("", 0,0, Channel::Power::Low, -1, false, DigitalChannel::Admit::Always, 0,
-                            DigitalChannel::TimeSlot::TS1, nullptr, nullptr, nullptr, nullptr, nullptr,
-                            nullptr);
+  return new DigitalChannel();
 }
 
 bool
@@ -1434,9 +1454,7 @@ AnalogChannelReader::addExtension(ExtensionReader *ext) {
 
 ConfigObject *
 AnalogChannelReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
-  return new AnalogChannel("", 0,0, Channel::Power::Low, -1, false, AnalogChannel::Admit::Always,
-                           1, Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE,
-                           AnalogChannel::Bandwidth::Narrow, nullptr, nullptr);
+  return new AnalogChannel();
 }
 
 bool
@@ -1466,6 +1484,12 @@ AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObje
       bool inverted = (code < 0); code = std::abs(code);
       channel->setTXTone(Signaling::fromDCSNumber(code, inverted));
     }
+  }
+
+  if ((!node["squelch"].IsDefined()) || ("!default" == node["squelch"].Tag())) {
+    channel->setSquelchDefault();
+  } else if (node["squelch"].IsDefined() && node["squelch"].IsScalar()) {
+    channel->setSquelch(node["squelch"].as<uint>());
   }
 
   if (! parseExtensions(_extensions, obj, node, ctx))

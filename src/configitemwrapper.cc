@@ -260,6 +260,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     else
       return formatFrequency(channel->txFrequency());
   case 4:
+    if (channel->defaultPower())
+      return tr("[Default]");
     switch (channel->power()) {
     case Channel::Power::Max: return tr("Max");
     case Channel::Power::High: return tr("High");
@@ -268,8 +270,10 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     case Channel::Power::Min: return tr("Min");
     }
   case 5:
-    if (0 == channel->timeout())
-      return tr("-");
+    if (channel->defaultTimeout())
+      return tr("[Default]");
+    if (channel->timeoutDisabled())
+      return tr("Off");
     return QString::number(channel->timeout());
   case 6:
     return channel->rxOnly() ? tr("On") : tr("Off");
@@ -366,9 +370,11 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     if (channel->is<DigitalChannel>()) {
       return tr("[None]");
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (0 == analog->squelch()) {
+      if (analog->defaultSquelch())
+        return tr("[Default]");
+      if (analog->squelchDisabled())
         return tr("Off");
-      } else
+      else
         return analog->squelch();
     }
     break;

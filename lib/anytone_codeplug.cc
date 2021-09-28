@@ -632,17 +632,22 @@ AnytoneCodeplug::ChannelElement::enableSMS(bool enable) {
 Channel *
 AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   Channel *ch;
+
   if ((Mode::Analog == mode()) || (Mode::MixedAnalog == mode())) {
     if (Mode::MixedAnalog == mode())
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << name() <<"' as analog channel.";
     AnalogChannel::Admit admit = ((Admit::Free == this->admit()) ?
                                     AnalogChannel::Admit::Free : AnalogChannel::Admit::Always);
-    ch = new AnalogChannel(
-          name(), rxFrequency()/1e6, txFrequency()/1e6, power(), 0.0, rxOnly(), admit,
-          1, rxTone(), txTone(), bandwidth(), nullptr);
+    AnalogChannel *ach = new AnalogChannel();
+    ach->setAdmit(admit);
+    ach->setSquelchDefault();
+    ach->setRXTone(rxTone());
+    ach->setTXTone(txTone());
+    ach->setBandwidth(bandwidth());
     // no per channel squelch settings
-    ch->as<AnalogChannel>()->setSquelchDefault();
+    ach->setSquelchDefault();
+    ch = ach;
   } else if ((Mode::Digital == mode()) || (Mode::MixedDigital == mode())) {
     if (Mode::MixedDigital == mode())
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
@@ -653,21 +658,29 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     case Admit::Free: admit = DigitalChannel::Admit::Free; break;
     case Admit::Colorcode: admit = DigitalChannel::Admit::ColorCode; break;
     }
-    ch = new DigitalChannel(
-          name(), rxFrequency()/1e6, txFrequency()/1e6, power(), 0.0, rxOnly(), admit,
-          colorCode(), timeSlot(), nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+    DigitalChannel *dch = new DigitalChannel();
+    dch->setAdmit(admit);
+    dch->setColorCode(colorCode());
+    dch->setTimeSlot(timeSlot());
+    ch = dch;
   } else {
     logError() << "Cannot create channel '" << name()
                << "': Channel type " << (uint)mode() << "not supported.";
     return nullptr;
   }
 
+  ch->setName(name());
+  ch->setRXFrequency(rxFrequency()/1e6);
+  ch->setTXFrequency(txFrequency()/1e6);
+  ch->setPower(power());
+  ch->setDefaultTimeout();
+  ch->setRXOnly(rxOnly());
+
   // No per channel vox & tot setting
   ch->setVOXDefault();
   ch->setDefaultTimeout();
 
   return ch;
-
 }
 
 bool

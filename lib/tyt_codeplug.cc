@@ -499,7 +499,9 @@ Channel *
 TyTCodeplug::ChannelElement::toChannelObj() const {
   if (! isValid())
     return nullptr;
+
   Channel *ch = nullptr;
+
   // decode power setting
   if (MODE_ANALOG == mode()) {
     AnalogChannel::Admit admit_crit;
@@ -509,10 +511,13 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
       case ADMIT_CH_FREE: admit_crit = AnalogChannel::Admit::Free; break;
       default: admit_crit = AnalogChannel::Admit::Free; break;
     }
-
-    ch = new AnalogChannel(name(), double(rxFrequency())/1e6, double(txFrequency())/1e6,
-                           power(), txTimeOut(), rxOnly(), admit_crit, squelch(), rxSignaling(),
-                           txSignaling(), bandwidth(), nullptr);
+    AnalogChannel *ach = new AnalogChannel();
+    ach->setAdmit(admit_crit);
+    ach->setSquelch(squelch());
+    ach->setRXTone(rxSignaling());
+    ach->setTXTone(txSignaling());
+    ach->setBandwidth(bandwidth());
+    ch = ach;
   } else if (MODE_DIGITAL == mode()) {
     DigitalChannel::Admit admit_crit;
     switch(admitCriterion()) {
@@ -521,13 +526,21 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
       case ADMIT_COLOR: admit_crit = DigitalChannel::Admit::ColorCode; break;
       default: admit_crit = DigitalChannel::Admit::Free; break;
     }
-
-    ch = new DigitalChannel(name(), double(rxFrequency())/1e6, double(txFrequency())/1e6,
-                            power(), txTimeOut(), rxOnly(), admit_crit, colorCode(), timeSlot(),
-                            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+    DigitalChannel *dch = new DigitalChannel();
+    dch->setAdmit(admit_crit);
+    dch->setColorCode(colorCode());
+    dch->setTimeSlot(timeSlot());
+    ch = dch;
   }
 
   // Common settings
+  ch->setName(name());
+  ch->setRXFrequency(double(rxFrequency())/1e6);
+  ch->setTXFrequency(double(txFrequency())/1e6);
+  ch->setPower(power());
+  ch->setTimeout(txTimeOut());
+  ch->setRXOnly(rxOnly());
+
   if (vox())
     ch->setVOXDefault();
   else

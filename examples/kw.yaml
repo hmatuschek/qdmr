@@ -52,7 +52,7 @@ channels:
       rxFrequency: 439.5625
       txFrequency: 431.9625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -67,7 +67,7 @@ channels:
       rxFrequency: 439.5625
       txFrequency: 431.9625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -82,7 +82,7 @@ channels:
       rxFrequency: 439.5625
       txFrequency: 431.9625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -97,7 +97,7 @@ channels:
       rxFrequency: 439.5625
       txFrequency: 431.9625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       scanList: scan1
       admit: ColorCode
@@ -113,7 +113,7 @@ channels:
       rxFrequency: 439.5625
       txFrequency: 431.9625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       scanList: scan1
       admit: ColorCode
@@ -130,7 +130,7 @@ channels:
       rxFrequency: 439.5625
       txFrequency: 431.9625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       scanList: scan1
       admit: ColorCode
@@ -146,7 +146,7 @@ channels:
       rxFrequency: 438.825
       txFrequency: 431.225
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -161,7 +161,7 @@ channels:
       rxFrequency: 438.825
       txFrequency: 431.225
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -176,7 +176,7 @@ channels:
       rxFrequency: 438.825
       txFrequency: 431.225
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -191,7 +191,7 @@ channels:
       rxFrequency: 438.825
       txFrequency: 431.225
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -206,7 +206,7 @@ channels:
       rxFrequency: 438.475
       txFrequency: 430.875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -221,7 +221,7 @@ channels:
       rxFrequency: 438.475
       txFrequency: 430.875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -236,7 +236,7 @@ channels:
       rxFrequency: 439.0875
       txFrequency: 431.4875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -251,7 +251,7 @@ channels:
       rxFrequency: 439.0875
       txFrequency: 431.4875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -266,7 +266,7 @@ channels:
       rxFrequency: 439.0875
       txFrequency: 431.4875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -281,7 +281,7 @@ channels:
       rxFrequency: 439.0875
       txFrequency: 431.4875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -296,7 +296,7 @@ channels:
       rxFrequency: 439.5375
       txFrequency: 431.9375
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -311,7 +311,7 @@ channels:
       rxFrequency: 439.5375
       txFrequency: 431.9375
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -326,7 +326,7 @@ channels:
       rxFrequency: 438.625
       txFrequency: 431.025
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -341,7 +341,7 @@ channels:
       rxFrequency: 438.625
       txFrequency: 431.025
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -356,7 +356,7 @@ channels:
       rxFrequency: 438.625
       txFrequency: 431.025
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -371,7 +371,7 @@ channels:
       rxFrequency: 438.625
       txFrequency: 431.025
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -386,7 +386,7 @@ channels:
       rxFrequency: 439.575
       txFrequency: 431.975
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -401,7 +401,7 @@ channels:
       rxFrequency: 439.575
       txFrequency: 431.975
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -416,7 +416,7 @@ channels:
       rxFrequency: 439.525
       txFrequency: 431.925
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -431,7 +431,7 @@ channels:
       rxFrequency: 439.525
       txFrequency: 431.925
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -446,7 +446,7 @@ channels:
       rxFrequency: 439.525
       txFrequency: 431.925
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -461,7 +461,7 @@ channels:
       rxFrequency: 439.525
       txFrequency: 431.925
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -476,7 +476,7 @@ channels:
       rxFrequency: 439.475
       txFrequency: 431.875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -491,7 +491,7 @@ channels:
       rxFrequency: 439.475
       txFrequency: 431.875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -506,7 +506,7 @@ channels:
       rxFrequency: 439.475
       txFrequency: 431.875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -521,7 +521,7 @@ channels:
       rxFrequency: 439.475
       txFrequency: 431.875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -536,7 +536,7 @@ channels:
       rxFrequency: 439.45
       txFrequency: 431.85
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -551,7 +551,7 @@ channels:
       rxFrequency: 439.45
       txFrequency: 431.85
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -566,7 +566,7 @@ channels:
       rxFrequency: 439.45
       txFrequency: 431.85
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -581,7 +581,7 @@ channels:
       rxFrequency: 439.45
       txFrequency: 431.85
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -596,7 +596,7 @@ channels:
       rxFrequency: 438.4
       txFrequency: 430.8
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -611,7 +611,7 @@ channels:
       rxFrequency: 438.4
       txFrequency: 430.8
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -626,7 +626,7 @@ channels:
       rxFrequency: 438.4
       txFrequency: 430.8
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -641,7 +641,7 @@ channels:
       rxFrequency: 438.4
       txFrequency: 430.8
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -656,7 +656,7 @@ channels:
       rxFrequency: 439.4875
       txFrequency: 431.8875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -671,7 +671,7 @@ channels:
       rxFrequency: 439.4875
       txFrequency: 431.8875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -686,7 +686,7 @@ channels:
       rxFrequency: 439.4875
       txFrequency: 431.8875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -701,7 +701,7 @@ channels:
       rxFrequency: 439.4875
       txFrequency: 431.8875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -716,7 +716,7 @@ channels:
       rxFrequency: 439.4875
       txFrequency: 431.8875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -731,7 +731,7 @@ channels:
       rxFrequency: 439.4875
       txFrequency: 431.8875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -746,7 +746,7 @@ channels:
       rxFrequency: 439.5125
       txFrequency: 431.9125
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -761,7 +761,7 @@ channels:
       rxFrequency: 439.5125
       txFrequency: 431.9125
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -776,7 +776,7 @@ channels:
       rxFrequency: 438.225
       txFrequency: 430.625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -791,7 +791,7 @@ channels:
       rxFrequency: 438.225
       txFrequency: 430.625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -806,7 +806,7 @@ channels:
       rxFrequency: 438.225
       txFrequency: 430.625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -821,7 +821,7 @@ channels:
       rxFrequency: 438.225
       txFrequency: 430.625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -836,7 +836,7 @@ channels:
       rxFrequency: 439.3875
       txFrequency: 431.7875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -851,7 +851,7 @@ channels:
       rxFrequency: 439.3875
       txFrequency: 431.7875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -866,7 +866,7 @@ channels:
       rxFrequency: 439.3875
       txFrequency: 431.7875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -881,7 +881,7 @@ channels:
       rxFrequency: 439.3875
       txFrequency: 431.7875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -896,7 +896,7 @@ channels:
       rxFrequency: 439.3875
       txFrequency: 431.7875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -911,7 +911,7 @@ channels:
       rxFrequency: 439.5375
       txFrequency: 431.9375
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -926,7 +926,7 @@ channels:
       rxFrequency: 439.5375
       txFrequency: 431.9375
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -941,7 +941,7 @@ channels:
       rxFrequency: 439.5375
       txFrequency: 431.9375
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -956,7 +956,7 @@ channels:
       rxFrequency: 439.5375
       txFrequency: 431.9375
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -971,7 +971,7 @@ channels:
       rxFrequency: 439.575
       txFrequency: 431.975
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -986,7 +986,7 @@ channels:
       rxFrequency: 439.575
       txFrequency: 431.975
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1001,7 +1001,7 @@ channels:
       rxFrequency: 439.975
       txFrequency: 430.575
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1016,7 +1016,7 @@ channels:
       rxFrequency: 439.975
       txFrequency: 430.575
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1031,7 +1031,7 @@ channels:
       rxFrequency: 439.975
       txFrequency: 430.575
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1046,7 +1046,7 @@ channels:
       rxFrequency: 439.975
       txFrequency: 430.575
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1061,7 +1061,7 @@ channels:
       rxFrequency: 433.45
       txFrequency: 433.45
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1076,7 +1076,7 @@ channels:
       rxFrequency: 433.612
       txFrequency: 433.612
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1091,7 +1091,7 @@ channels:
       rxFrequency: 433.625
       txFrequency: 433.625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1106,7 +1106,7 @@ channels:
       rxFrequency: 433.638
       txFrequency: 433.638
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1121,7 +1121,7 @@ channels:
       rxFrequency: 433.65
       txFrequency: 433.65
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1136,7 +1136,7 @@ channels:
       rxFrequency: 433.663
       txFrequency: 433.663
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1151,7 +1151,7 @@ channels:
       rxFrequency: 433.675
       txFrequency: 433.675
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1166,7 +1166,7 @@ channels:
       rxFrequency: 433.688
       txFrequency: 433.688
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1181,10 +1181,10 @@ channels:
       rxFrequency: 439.5625
       txFrequency: 431.9625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
       rxTone: {ctcss: 67}
       txTone: {ctcss: 67}
@@ -1194,10 +1194,10 @@ channels:
       rxFrequency: 439.3
       txFrequency: 431.7
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch78
@@ -1205,10 +1205,10 @@ channels:
       rxFrequency: 438.575
       txFrequency: 430.975
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
       rxTone: {ctcss: 67}
       txTone: {ctcss: 67}
@@ -1218,10 +1218,10 @@ channels:
       rxFrequency: 145.6
       txFrequency: 145
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch80
@@ -1229,10 +1229,10 @@ channels:
       rxFrequency: 439.425
       txFrequency: 431.825
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch81
@@ -1240,10 +1240,10 @@ channels:
       rxFrequency: 145.6625
       txFrequency: 145.0625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch82
@@ -1251,10 +1251,10 @@ channels:
       rxFrequency: 438.725
       txFrequency: 431.125
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch83
@@ -1262,10 +1262,10 @@ channels:
       rxFrequency: 145.725
       txFrequency: 145.125
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch84
@@ -1273,10 +1273,10 @@ channels:
       rxFrequency: 439.275
       txFrequency: 431.675
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch85
@@ -1284,10 +1284,10 @@ channels:
       rxFrequency: 439.05
       txFrequency: 431.45
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch86
@@ -1295,10 +1295,10 @@ channels:
       rxFrequency: 439.125
       txFrequency: 431.525
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch87
@@ -1306,10 +1306,10 @@ channels:
       rxFrequency: 145.675
       txFrequency: 145.075
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch88
@@ -1317,10 +1317,10 @@ channels:
       rxFrequency: 438.85
       txFrequency: 431.25
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch89
@@ -1328,10 +1328,10 @@ channels:
       rxFrequency: 438.6375
       txFrequency: 431.0375
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch90
@@ -1339,10 +1339,10 @@ channels:
       rxFrequency: 438.95
       txFrequency: 431.35
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch91
@@ -1350,10 +1350,10 @@ channels:
       rxFrequency: 439.3
       txFrequency: 431.7
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch92
@@ -1361,10 +1361,10 @@ channels:
       rxFrequency: 439.15
       txFrequency: 431.55
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch93
@@ -1372,10 +1372,10 @@ channels:
       rxFrequency: 145.775
       txFrequency: 145.175
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch94
@@ -1383,10 +1383,10 @@ channels:
       rxFrequency: 439.275
       txFrequency: 431.675
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch95
@@ -1394,10 +1394,10 @@ channels:
       rxFrequency: 145.6625
       txFrequency: 145.0625
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch96
@@ -1405,10 +1405,10 @@ channels:
       rxFrequency: 438.7875
       txFrequency: 431.1875
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch97
@@ -1416,10 +1416,10 @@ channels:
       rxFrequency: 144.675
       txFrequency: 144.675
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch98
@@ -1427,10 +1427,10 @@ channels:
       rxFrequency: 144.65
       txFrequency: 144.65
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch99
@@ -1438,10 +1438,10 @@ channels:
       rxFrequency: 145.375
       txFrequency: 145.375
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch100
@@ -1449,10 +1449,10 @@ channels:
       rxFrequency: 144.725
       txFrequency: 144.725
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch101
@@ -1460,10 +1460,10 @@ channels:
       rxFrequency: 145.3
       txFrequency: 145.3
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch102
@@ -1471,10 +1471,10 @@ channels:
       rxFrequency: 145.5
       txFrequency: 145.5
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch103
@@ -1482,10 +1482,10 @@ channels:
       rxFrequency: 433.5
       txFrequency: 433.5
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch104
@@ -1493,10 +1493,10 @@ channels:
       rxFrequency: 144.8
       txFrequency: 144.8
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
       aprs: aprs2
   - analog:
@@ -1505,10 +1505,10 @@ channels:
       rxFrequency: 145.825
       txFrequency: 145.825
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch106
@@ -1516,10 +1516,10 @@ channels:
       rxFrequency: 437.8
       txFrequency: 145.99
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
       txTone: {ctcss: 67}
   - analog:
@@ -1528,10 +1528,10 @@ channels:
       rxFrequency: 437.2
       txFrequency: 144.35
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch108
@@ -1539,10 +1539,10 @@ channels:
       rxFrequency: 145.9
       txFrequency: 437.5
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch109
@@ -1550,10 +1550,10 @@ channels:
       rxFrequency: 436.79
       txFrequency: 145.85
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
       txTone: {ctcss: 67}
   - analog:
@@ -1562,10 +1562,10 @@ channels:
       rxFrequency: 145.88
       txFrequency: 435.35
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
       txTone: {ctcss: 67}
   - analog:
@@ -1574,10 +1574,10 @@ channels:
       rxFrequency: 145.96
       txFrequency: 435.25
       power: High
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
       txTone: {ctcss: 67}
   - analog:
@@ -1586,10 +1586,10 @@ channels:
       rxFrequency: 430.2
       txFrequency: 430.2
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch113
@@ -1597,10 +1597,10 @@ channels:
       rxFrequency: 430.225
       txFrequency: 430.225
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch114
@@ -1608,10 +1608,10 @@ channels:
       rxFrequency: 430.25
       txFrequency: 430.25
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch115
@@ -1619,10 +1619,10 @@ channels:
       rxFrequency: 430.275
       txFrequency: 430.275
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Always
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch116
@@ -1630,10 +1630,10 @@ channels:
       rxFrequency: 446.00625
       txFrequency: 446.00625
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch117
@@ -1641,10 +1641,10 @@ channels:
       rxFrequency: 446.01875
       txFrequency: 446.01875
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch118
@@ -1652,10 +1652,10 @@ channels:
       rxFrequency: 446.03125
       txFrequency: 446.03125
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch119
@@ -1663,10 +1663,10 @@ channels:
       rxFrequency: 446.04375
       txFrequency: 446.04375
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch120
@@ -1674,10 +1674,10 @@ channels:
       rxFrequency: 446.05625
       txFrequency: 446.05625
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch121
@@ -1685,10 +1685,10 @@ channels:
       rxFrequency: 446.06875
       txFrequency: 446.06875
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch122
@@ -1696,10 +1696,10 @@ channels:
       rxFrequency: 446.08125
       txFrequency: 446.08125
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch123
@@ -1707,10 +1707,10 @@ channels:
       rxFrequency: 446.09375
       txFrequency: 446.09375
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch124
@@ -1718,10 +1718,10 @@ channels:
       rxFrequency: 446.10625
       txFrequency: 446.10625
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch125
@@ -1729,10 +1729,10 @@ channels:
       rxFrequency: 446.11875
       txFrequency: 446.11875
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch126
@@ -1740,10 +1740,10 @@ channels:
       rxFrequency: 446.13125
       txFrequency: 446.13125
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch127
@@ -1751,10 +1751,10 @@ channels:
       rxFrequency: 446.14375
       txFrequency: 446.14375
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch128
@@ -1762,10 +1762,10 @@ channels:
       rxFrequency: 446.15625
       txFrequency: 446.15625
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch129
@@ -1773,10 +1773,10 @@ channels:
       rxFrequency: 446.16875
       txFrequency: 446.16875
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch130
@@ -1784,10 +1784,10 @@ channels:
       rxFrequency: 446.18125
       txFrequency: 446.18125
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
   - analog:
       id: ch131
@@ -1795,10 +1795,10 @@ channels:
       rxFrequency: 446.19375
       txFrequency: 446.19375
       power: Low
-      timeout: 0
+      timeout: !<!default> ""
       rxOnly: false
       admit: Free
-      squelch: 1
+      squelch: !<!default> ""
       bandwidth: Narrow
 zones:
   - id: zone1

@@ -34,16 +34,16 @@ class Channel: public ConfigObject
   Q_PROPERTY(double rxFrequency READ rxFrequency WRITE setRXFrequency)
   /** The transmit frequency of the channel. */
   Q_PROPERTY(double txFrequency READ txFrequency WRITE setTXFrequency)
-  /** The transmit power. */
-  Q_PROPERTY(Power power READ power WRITE setPower)
-  /** The transmit timeout in seconds. */
-  Q_PROPERTY(uint timeout READ timeout WRITE setTimeout)
+  // /** The transmit power. */
+  //Q_PROPERTY(Power power READ power WRITE setPower)
+  // /** The transmit timeout in seconds. */
+  //Q_PROPERTY(uint timeout READ timeout WRITE setTimeout)
   /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
   /** The scan list. */
   Q_PROPERTY(ScanListReference* scanList READ scanList)
-  /** The VOX setting. */
-  Q_PROPERTY(uint vox READ vox WRITE setVOX)
+  // /** The VOX setting. */
+  //Q_PROPERTY(uint vox READ vox WRITE setVOX)
 
 public:
   /** Possible power settings. */
@@ -58,17 +58,10 @@ public:
 
 protected:
   /** Hidden constructor.
-   * Constructs a new base channel.
-   * @param name      Specifies the name of the channel.
-   * @param rx        Sepcifies the RX freqeuncy in MHz.
-   * @param tx        Specifies the TX frequency in MHz.
-   * @param power     Specifies the power setting for the channel.
-   * @param timeout   Specifies the transmit timeout in seconds (TOT).
-   * @param rxOnly    Specifies whether the channel is RX only.
-   * @param scanlist  Specifies the default scanlist for the channel.
-   * @param parent    Specified the @c QObject parent object. */
-  Channel(const QString &name, double rx, double tx, Power power, uint timeout, bool rxOnly,
-          ScanList *scanlist, QObject *parent=nullptr);
+   * Constructs a new empty channel. */
+  explicit Channel(QObject *parent=nullptr);
+  /** Copy constructor. */
+  Channel(const Channel &other, QObject *parent=nullptr);
 
 public:
   /** Returns @c true if the channel is of type @c T. This can be used to text wheter this channel
@@ -154,6 +147,9 @@ public:
   /** (Re-) Sets the default scan list for the channel. */
   bool setScanListObj(ScanList *list);
 
+protected:
+  bool populate(YAML::Node &node, const Context &context);
+
 protected slots:
   /** Gets called whenever a referenced object is changed or deleted. */
   void onReferenceModified();
@@ -192,8 +188,8 @@ class AnalogChannel: public Channel
 
   /** The admit criterion of the channel. */
   Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
-  /** The squelch level of the channel [1-10]. */
-  Q_PROPERTY(uint squelch READ squelch WRITE setSquelch)
+  // /** The squelch level of the channel [1-10]. */
+  // Q_PROPERTY(uint squelch READ squelch WRITE setSquelch)
   /** The band width of the channel. */
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
   /** The APRS system. */
@@ -216,26 +212,10 @@ public:
   Q_ENUM(Bandwidth)
 
 public:
-  /** Constructs a new analog channel.
-   *
-   * @param name      Specifies the name of the channel.
-   * @param rxFreq    Sepcifies the RX freqeuncy in MHz.
-   * @param txFreq    Specifies the TX frequency in MHz.
-   * @param power     Specifies the power setting for the channel.
-   * @param timeout   Specifies the transmit timeout in seconds (TOT).
-   * @param rxOnly    Specifies whether the channel is RX only.
-   * @param admit     Specifies the admit criterion.
-   * @param squelch   Specifies the squelch level [0,10].
-   * @param rxTone    Specifies CTCSS/DCS RX tone/code.
-   * @param txTone    Specifies CTCSS/DCS TX tone/code.
-   * @param bw        Specifies the bandwidth.
-   * @param list      Specifies the default scanlist for the channel.
-   * @param aprsSys   Specifies the APRS system for the channel.
-   * @param parent    Specified the @c QObject parent object. */
-  AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power, uint timeout,
-                bool rxOnly, Admit admit, uint squelch, Signaling::Code rxTone,
-                Signaling::Code txTone, Bandwidth bw, ScanList *list,
-                APRSSystem *aprsSys=nullptr, QObject *parent=nullptr);
+  /** Constructs a new empty analog channel. */
+  explicit AnalogChannel(QObject *parent=nullptr);
+  /** Copy constructor. */
+  AnalogChannel(const AnalogChannel &other, QObject *parent=nullptr);
 
   YAML::Node serialize(const Context &context);
 
@@ -343,28 +323,10 @@ public:
   Q_ENUM(TimeSlot)
 
 public:
-  /** Constructs a new digital (DMR) channel.
-   *
-   * @param name      Specifies the name of the channel.
-   * @param rxFreq    Sepcifies the RX freqeuncy in MHz.
-   * @param txFreq    Specifies the TX frequency in MHz.
-   * @param power     Specifies the power setting for the channel.
-   * @param timeout   Specifies the transmit timeout in seconds (TOT).
-   * @param rxOnly    Specifies whether the channel is RX only.
-   * @param admit     Specifies the admit criterion.
-   * @param colorCode Specifies the colorcode [1,15].
-   * @param timeSlot  Specifies the time-slot.
-   * @param rxGroup   Specifies the RX group list for the channel.
-   * @param txContact Specifies the default TX contact to call on this channel.
-   * @param aprs      Specifies the positioning system to use on this channel.
-   * @param list      Specifies the default scanlist for the channel.
-   * @param roaming   Specifies the roaming zone for the channel.
-   * @param radioID   Specifies the radio ID to use for this channel, @c nullptr is default ID.
-   * @param parent    Specified the @c QObject parent object. */
-  DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power, uint timeout,
-                 bool rxOnly, Admit admit, uint colorCode, TimeSlot timeSlot, RXGroupList *rxGroup,
-                 DigitalContact *txContact, PositioningSystem *aprs, ScanList *list,
-                 RoamingZone *roaming, RadioID *radioID, QObject *parent=nullptr);
+  /** Constructs a new empty digital (DMR) channel. */
+  DigitalChannel(QObject *parent=nullptr);
+  /** Copy constructor. */
+  DigitalChannel(const DigitalChannel &other, QObject *parent=nullptr);
 
   YAML::Node serialize(const Context &context);
 

@@ -347,10 +347,7 @@ Channel *
 RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx) const {
   Channel *ch = nullptr;
   if (MODE_ANALOG == mode()) {
-    AnalogChannel *ach = new AnalogChannel(
-          "", 0, 0, Channel::Power::Low, 0, false, AnalogChannel::Admit::Always, 0,
-          Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE, AnalogChannel::Bandwidth::Wide,
-          nullptr, nullptr, nullptr); ch = ach;
+    AnalogChannel *ach = new AnalogChannel(); ch = ach;
     switch (admitCriterion()) {
     case ADMIT_ALWAYS: ach->setAdmit(AnalogChannel::Admit::Always); break;
     case ADMIT_CH_FREE: ach->setAdmit(AnalogChannel::Admit::Free); break;
@@ -361,10 +358,7 @@ RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx) const {
     ach->setTXTone(txTone());
     ach->setSquelchDefault(); // There is no per-channel squelch setting
   } else {
-    DigitalChannel *dch = new DigitalChannel(
-          "", 0, 0, Channel::Power::Low, 0, false, DigitalChannel::Admit::Always, 0,
-          DigitalChannel::TimeSlot::TS1, nullptr, nullptr, nullptr, nullptr, nullptr,
-          DefaultRadioID::get(), nullptr); ch = dch;
+    DigitalChannel *dch = new DigitalChannel(); ch = dch;
     switch (admitCriterion()) {
     case ADMIT_ALWAYS: dch->setAdmit(DigitalChannel::Admit::Always); break;
     case ADMIT_CH_FREE: dch->setAdmit(DigitalChannel::Admit::Free); break;
