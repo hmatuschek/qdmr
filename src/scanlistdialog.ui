@@ -29,7 +29,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="priorityChannel50Label">
        <property name="text">
-        <string>Priority Channel (50%)</string>
+        <string>Primary Channel (50%)</string>
        </property>
       </widget>
      </item>
@@ -39,7 +39,7 @@
      <item row="2" column="0">
       <widget class="QLabel" name="priorityChannel25Label">
        <property name="text">
-        <string>Priority Channel (25%)</string>
+        <string>Secondary Channel (25%)</string>
        </property>
       </widget>
      </item>

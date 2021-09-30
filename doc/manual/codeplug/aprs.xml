@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="cpAPRS"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Positioning Systems</title>
+</info>
+
+<para>
+  Some radios allow to send the current position using DMR or analog APRS. Consequently, there are 
+  two types of positioning systems <token>dmr</token> and <token>aprs</token>. 
+</para>
+
+<para>
+  As an example, consider these two position reporting systems:
+</para>
+
+<example pgwide="1">
+  <title></title>
+  <programlisting><![CDATA[positioning:
+  - dmr:
+      id: aprs1
+      name: BM ARPS
+      period: 300
+      contact: cont21
+  - aprs:
+      id: aprs2
+      name: APRS APAT81
+      period: 300
+      revert: ch104
+      icon: Jogger
+      message: Y07, QRG 144.675
+      destination: APAT81-0
+      source: DM3MAT-7
+      path: [WIDE1-1, WIDE2-1] 
+]]></programlisting>
+</example>
+
+<para>
+  The first specifies a digital (DMR) positioning system while the latter defines a APRS system.
+</para>
+
+
+<section>
+<info>
+  <title>Common attributes</title>
+</info>
+
+<para>
+  The following attributes apply to both, analog APRS and digital position reporting systems.
+</para>
+
+<table>
+  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
+  <tbody>
+    <tr>
+      <td><token>id</token></td>
+      <td>Specifies the ID of the system. This can be used reference this system in 
+        <xref linkend="cpChannels"/>. Any unique string is valid here.</td>
+    </tr>
+    <tr>
+      <td><token>name</token></td>
+      <td>Specifies the name of the position reporting system. Any string is valid here.</td>
+    </tr>
+    <tr>
+      <td><token>period</token></td>
+      <td>Specifies the update period in seconds. If omitted or set to <token>0</token>, the 
+      system will not send any updates periodically.</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+
+
+<section>
+<info>
+  <title>DMR positioning system attributes</title>
+</info>
+
+<para>
+  The following attributes apply only to digital (DMR) position reporting systems.
+</para>
+
+<table>
+  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
+  <tbody>
+    <tr>
+      <td><token>contact</token></td>
+      <td>Specifies the digital contact, the GPS information is send to. This must be a 
+        reference to a digital contact.</td>
+    </tr>
+    <tr>
+      <td><token>revert</token></td>
+      <td>Specifies the revert channel. That is, the channel the data is send on. If set, 
+        it must be a reference to a digital channel. If omitted or set to <token>!selected</token>,
+        the currently active channel will be used to send the GPS information.</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+
+
+<section>
+<info>
+  <title>APRS attributes</title>
+</info>
+
+<para>
+  The following attributes apply only for APRS position reporting systems.
+</para>
+
+<table>
+  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
+  <tbody>
+    <tr>
+      <td><token>revert</token></td>
+      <td>Specifies the revert channel. That is, the channel the APRS information is send on.
+        This must be a reference to an analog channel.</td>
+    </tr>
+    <tr>
+      <td><token>destination</token></td>
+      <td>Specifies the destination call and SSID, the information is set to. This must be a
+        string in the form <token>CALL-SSID</token>.</td>
+    </tr>
+    <tr>
+      <td><token>source</token></td>
+      <td>Specifies the source call and SSID. See <token>destination</token> for details.</td>
+    </tr>
+    <tr>
+      <td><token>path</token></td>
+      <td>Specifies the optional packet path. If set, this must be a list of <token>CALL-SSID</token> 
+      strings.</td>
+    </tr>
+    <tr>
+      <td><token>icon</token></td>
+      <td>Specifies the icon name to use. The icon name will be fuzzy matched. See 
+        <link xlink:href="https://dm3mat.darc.de/qdmr/libdmrconf/classAPRSSystem.html">
+        for a complete list</link> of icon names.</td>
+    </tr>
+    <tr>
+      <td><token>message</token></td>
+      <td>Specifies an optional message send along with the position information.</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+
+</section>

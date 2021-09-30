@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<chapter xml:id="cpTableFormat"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+         
+<info>
+  <title>Table Based Codeplug Format</title>
+</info>        
+
+<warning>
+  <para>
+    This chapter describes the old and deprecated table based <filename>conf</filename> text-file
+    format. This format is already incomplete and will remains so. This documentation is maintained
+    for the sake of completeness but you should not use that format in future.
+  </para> 
+  <para>
+    <application>qdmr</application> will still be able to import this format but it will not save 
+    codeplugs in that format anymore. The new codeplug format is documented in 
+    <xref linkend="codeplug"/>.
+  </para>
+</warning>
+
+
+</chapter>

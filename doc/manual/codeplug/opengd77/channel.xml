@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xmlid="extOpenGD77Channel"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Channel extension</title>
+</info>
+
+<para>
+  This extension allows to specify some channel settings specific for devices running the 
+  OpenGD77 firmware. This extension can be added to any channel, analog and digital.
+  For now, this extension only allows to specify the power for the channel in more detail.
+</para>
+
+<example>
+  <title></title>
+  <programlisting><![CDATA[channels:
+  - digital:
+      id: ch1
+      name: Example channel 
+      # all the other channel settings
+      openGD77:
+        power: P750mW 
+]]></programlisting>
+</example>
+
+<para> 
+  The OpenGD77 channel extension is a mapping named <token>openGD77</token>. It contains the 
+  device specific settings for that channel. 
+</para>
+
+
+<section>
+<info>
+  <title>Attributes</title>
+</info>
+
+<para>
+  For now, there is only one attribute specifying the more detailed power settings for the 
+  channel.
+</para>
+
+<table>
+  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
+  <tbody>
+    <tr>
+      <td><token>power</token></td>
+      <td>Specifies the detailed power settings for the channel. This is one of the following 
+        strings <token>Global</token>, <token>P50mW</token>, <token>P250mW</token>, <token>P500mW</token>, 
+        <token>P750mW</token>, <token>P1W</token>, <token>P2W</token>, <token>P3W</token>, 
+        <token>P4W</token>, , <token>P5W</token>, <token>Max</token>. Where <token>Global</token> 
+        implies that the global power settings is used and <token>Max</token> the maximal possible 
+        power is used (usually 7W on VHF and 5.5W on UHF). This power setting overrides the 
+        common channel power setting.</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+
+</section>
+        

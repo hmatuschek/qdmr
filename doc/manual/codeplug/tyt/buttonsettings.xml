@@ -1,15 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
-<chapter>
-<title>TyT Codeplug Extensions</title>
-<para></para>
-<section>
-<title>Button settings extension</title>
+<section xmlid="extTyTButtonSettings"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Button settings extension</title>  
+</info>
+
 <para>
   This extension to the codeplug allows to specify the function for each of the programmable 
   buttons on the radio. Please note that not all Radioddity radios have all buttons described 
   here. 
 </para>
+
 <example>
   <title></title>
   <programlisting><![CDATA[tytButtonSettings:
@@ -20,8 +26,13 @@
   longPressDuration: 1000 
 ]]></programlisting>
 </example>
+
+
 <section>
-<title>Attributes</title>
+<info>
+  <title>Attributes</title>
+</info>
+
 <table>
   <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
   <tbody>
@@ -45,5 +56,5 @@
   </tbody>
 </table>
 </section>
+
 </section>
-</chapter>

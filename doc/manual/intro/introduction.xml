@@ -8,7 +8,7 @@
     mode. I have also written 
     <link xlink:href="https://dm3mat.darc.de/qdmr/manual/script_de.pdf">a brief introduction into 
     <acronym>DMR</acronym></link> in german. This manual only describes how program your radio using 
-    <acronym>qdmr</acronym>, not how <acronym>DMR</acronym> works and what all these weird 
+    <application>qdmr</application>, not how <acronym>DMR</acronym> works and what all these weird 
     terms mean.
   </para>
   <para>
@@ -36,7 +36,7 @@
     operation. Moreover, the CPSs provided by the vendors usually only run under Windows.
   </para>
   <para>
-    The aim of the <acronym>qdmr</acronym>project is to overcome these shortcomings of typical CPSs. It has a
+    The aim of the <application>qdmr</application>project is to overcome these shortcomings of typical CPSs. It has a
     reduced feature set only supporting those options necessary of amateur radio usage. It tries
     to be user-friendly by finding repeaters nearby and importing their input and output
     frequencies. Moreover, it stores the final codeplug not in a device-specific binary format but
@@ -45,6 +45,6 @@
   </para>
   <para>
     Finally, I try to keep the application well documented. This manual is part of this effort. It
-    is a guide on how a codeplug is set up using <acronym>qdmr</acronym>.
+    is a guide on how a codeplug is set up using <application>qdmr</application>.
   </para>
 </chapter>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="guiProgram"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Programming the radio</title>
+</info>
+  
+<para>
+  Once the <glossterm>Codeplug</glossterm> is finished, it can be programmed onto the radio. Just select the
+  <guibutton>Upload Codplug</guibutton> button in the tool-bar at the top of the window or by 
+  selecting <guimenuitem>Upload</guimenuitem> from the <guimenu>Device</guimenu> menu.
+</para>
+
+<para>
+  In a first step, <application>qdmr</application> will try to detect a connected radio. Once a 
+  radio is  found it will verify the codeplug with that radio. That is, it will check whether any 
+  limit are  exceeded. For example the number of channels, contacts, group lists, etc. 
+</para>
+
+<para>
+  There are several levels of issues that can be detected when verifying a codeplug with a radio. 
+  The lowest level is the <quote>Information</quote>. These are just messages generated to inform 
+  you about minor changes made to the codeplug to fit it into the specific radio. For example when 
+  zones are split. These information are usually ignored and <application>qdmr</application> will 
+  proceed with the upload. 
+</para>
+
+<para>
+  <quote>Warnings</quote> are one level more severe. They are issued if changes are made that 
+  change the behavior of the codeplug. The result will still be a working codeplug. They are 
+  usually issued when names are too long. When warnings are issued, <application>qdmr</application>
+  will not automatically proceed with the upload. The user, however, can ignore the warnings and 
+  continue with the upload. In the application settings (see <xref linkend="guiSettingsDialog"/>), 
+  you may chose to always ignore verification warnings. In this case, 
+  <application>qdmr</application> will continue with the upload automatically even if there were 
+  some warnings.
+</para>
+
+<para>
+  Finally <quote>Errors</quote> are the most severe verification issues. They simply prevent the 
+  upload. The user cannot ignore errors as they would result in invalid and even damaging 
+  codeplugs being written to the device.
+</para>
+
+<para>
+  If, however, everything fits into the radio, <application>qdmr</application> will start the 
+  upload.
+</para>
+
+<para>
+  The code-plug upload is a two-step process. First, the current codeplug is downloaded from the
+  radio. This includes all settings. Then the device-specific codeplug is updated and then
+  re-uploaded to the device. This two-step process will maintain all device-specific settings made
+  earlier.
+</para>
+
+<para>
+  During the up- and download, the <application>qdmr</application> GUI will turn gray (inactive) to
+  prevent any changes to the codeplug during upload/download. However, a progress-bar is shown in the
+  bottom-right to indicate the up- and download progress.
+</para>
+
+
+<section>
+<info>
+  <title>Permissions</title>
+</info>
+
+<para>
+  When running <application>qdmr</application> or <command>dmrconf</command> under Linux, you may 
+  need to change the permissions to access USB devices. Create a file
+  <filename>/etc/udev/rules.d/99-qdmr.rules</filename> with the following contents:
+</para>
+
+<informalexample pgwide="1">
+  <programlisting>
+<![CDATA[ 
+# TYT MD-UV380
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", MODE="666"
+
+# Baofeng RD-5R, TD-5R
+SUBSYSTEM=="usb", ATTRS{idVendor}=="15a2", ATTRS{idProduct}=="0073", MODE="666"
+]]>
+  </programlisting>
+</informalexample>
+
+<para>
+  Finally execute <command>sudo udevadm control --reload-rules</command> to activate these new 
+  rules.
+</para>
+</section>
+
+</section>

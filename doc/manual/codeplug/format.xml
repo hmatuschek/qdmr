@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<chapter xml:id="codeplug"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Extensible Codeplug File Format</title>
+</info>
+
+<tip>
+  <para>
+    This document describes the extensible codeplug file format using YAML. If you are unfamiliar
+    with YAML, consider reading a 
+    <link xlink:href="https://learn.getgrav.org/16/advanced/yaml">YAML introduction</link> first.
+    The documentation for the <emphasis>old</emphasis> table based <filename>conf</filename>-file format, can
+    be found in section <xref linkend="cpTableFormat"/>.
+  </para>
+</tip>
+
+<para>
+  The introduction of device specific settings (with version 0.9.0) required an extensible codeplug
+  file format. The <emphasis>old</emphasis> table based format did not allow for any extension without braking 
+  backward compatibility. The new YAML based format allows for exactly that: Some means to extend 
+  the format for device specific settings without breaking the format while maintaining some degree 
+  of readability. (Yes, some users use the command line tool and edit their codeplug in a text 
+  editor.)
+</para>
+
+<para>
+  There are several levels, at which device specific extensions may appear within the codeplug. 
+  There are global extensions that apply to the entire codeplug. These extensions are located at 
+  the top level. There might also be extensions to single channels, contacts, zones, etc. These 
+  extensions are then located under the specific element that gets extended. 
+</para>
+
+<xi:include href="radiosettings.xml"/>
+<xi:include href="radioids.xml"/>
+<xi:include href="contacts.xml"/>
+<xi:include href="grouplists.xml"/>
+<xi:include href="channels.xml"/>
+<xi:include href="zones.xml"/>
+<xi:include href="scanlists.xml"/>
+<xi:include href="aprs.xml"/>
+<xi:include href="roaming.xml"/>
+
+</chapter>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<section xmlid="extTyT"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>TyT Codeplug Extensions</title>
+</info>
+
+<para></para>
+
+<xi:include href="buttonsettings.xml"/>
+
+</section>

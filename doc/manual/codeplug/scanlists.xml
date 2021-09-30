@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="cpScanLists"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Scan lists</title>
+</info>
+
+<para>
+  Scan lists are simple lists of channels to scan. A scan list might be associated with a channel.
+</para>
+
+<para>
+  As an example, consider the following scan list:
+</para>
+
+<example pgwide="1">
+  <title></title>
+  <programlisting><![CDATA[scanLists:
+  - id: scan1
+    name: KW
+    channels: [ch4, ch5, ch76, ch77, ch97, ch102, ch68, ch112] 
+]]></programlisting>
+</example>
+
+<para>
+  This scan list has the ID <emphasis>scan1</emphasis>, the name <emphasis>KW</emphasis> and contains several channels 
+  (both analog and digital).
+</para>
+
+<table>
+  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
+  <tbody>
+    <tr>
+      <td><token>id</token></td>
+      <td>Specifies the ID of the scan list. This ID can then be used to reference this scan 
+        list in <xref linkend="cpChannels"/>.</td>
+    </tr>
+    <tr>
+      <td><token>name</token></td>
+      <td>Specifies the name of the scan list. Any string is valid here.</td>
+    </tr>
+    <tr>
+      <td><token>primary</token></td>
+      <td>Specifies the primary priority channel. Usually this channel is scanned very frequently. 
+        If set, this must be a reference to a channel. If the tag <token>!selected</token> is used here,
+        the channel from which the scan got started is used as the primary priority channel.</td>
+    </tr>
+    <tr>
+      <td><token>secondary</token></td>
+      <td>Specifies the secondary priority channel. Usually this channel is scanned frequently. 
+        If set, this must be a reference to a channel. If the tag <token>!selected</token> is used here,
+        the channel from which the scan got started is used as the secondary priority channel.</td>
+    </tr>
+    <tr>
+      <td><token>revert</token></td>
+      <td>Specifies the revert channel. That is, the channel to transmit on irrespective of the 
+        current channel being scanned. If set, this must be a reference to a channel. If the tag 
+        <token>!selected</token> is used here, the channel from which the scan got started is used 
+        as the transmit channel. If omitted the radio will transmit on the currently scanned 
+        channel.</td>
+    </tr>
+    <tr>
+      <td><token>channels</token></td>
+      <td>Specifies the list of channels to scan. Must be a list of reference to channels.</td>
+    </tr>
+  </tbody>
+</table>
+</section>

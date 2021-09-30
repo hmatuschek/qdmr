@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="cpZones"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Zones</title>
+</info>
+
+<para>
+  The <token>zones</token> element collects all zones defined within the codeplug. It is just a 
+  list of zone definitions. Each zone has an ID (not needed), name and one or two lists of channels. 
+  One for VFO A and one for VFO B. Depending on the radio, a zone will be split into two lists (if 
+  defined) if the radio handles separate zones for each VFO. 
+</para>  
+
+<para>
+  As an example, consider the following zone:
+</para>
+
+<example pgwide="1">
+  <title>Zone definition</title>
+  <programlisting><![CDATA[zones:
+  - id: zone1
+    name: KW
+    A: [ch1, ch4, ch5, ch2, ch6, ch11, ch12, ch13, ch15, ch16, ch76, ch77, ch78, ch79]
+    B: [ch97, ch101, ch102, ch103, ch68, ch69, ch70, ch71, ch72, ch73, ch74, ch75]
+]]></programlisting>
+</example>
+
+<para>
+  This zone has the name <emphasis>KW</emphasis> and contains two lists of channels. One for each VFO. On radios, 
+  where each VFO is assigned a zone individually, this zone will be split into two: <emphasis>KW A</emphasis> and 
+  <emphasis>KW B</emphasis> to match the radios configuration. 
+</para>
+
+<table>
+  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
+  <tbody>
+    <tr>
+      <td><token>id</token></td>
+      <td>Specifies the ID of the zone. For now, there are no codeplug elements that refer to zones.</td>
+    </tr>
+    <tr>
+      <td><token>name</token></td>
+      <td>Specifies the name of the zone. Any string is valid here.</td>
+    </tr>
+    <tr>
+      <td><token>A</token></td>
+      <td>Specifies the channel list for VFO A. This must be a list of references to channels.</td>
+    </tr>
+    <tr>
+      <td><token>B</token></td>
+      <td>Optional channel list for VFO B. If present, must be a list of references to channels.</td>
+    </tr>
+  </tbody>
+</table>
+
+</section>

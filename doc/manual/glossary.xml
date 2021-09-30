@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<glossary  xmlns="http://docbook.org/ns/docbook" 
+           xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Glossary</title>
+  
+  <glossentry>
+    <glossterm>Admit Criterion</glossterm>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>All Call</glossterm>
+    <glossdef>
+      <para>
+        An all-call is a special type of an DMR call to a special number (<emphasis>16777215</emphasis>). 
+        All radios are supposed to receive this call irrespective of their particular configuration. This
+        call type is usually used in emergency situations or on simplex channels.
+      </para>
+      <para>
+        Unfortunately, the local talk group (number 9) is frequently used on simplex channel although only 
+        those radios will receive calls to this talk group if it is in the group list assigned to the 
+        simplex channel. To be on the save side, use the all-call for simplex calls.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Automatic Packet Reporting System</glossterm> <acronym>APRS</acronym>
+    <glossdef>
+      <para>
+        The Automatic Packet Reporting System is a protocol that uses single broadcast frequencies 
+        to transmit small amounts of information though a network of repeaters. Usually but not 
+        limited to position reports. This allows other services (e.g.,
+        <link xlink:href="https://aprs.fi">aprs.fi</link> to display that information on a map. The
+        usual APRS frequencies are 144.390 MHz (North America), 144.800 MHz (Europe) and 
+        145.175 MHz (Australia).
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Codeplug</glossterm>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Color Code</glossterm>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>EchoLink</glossterm>
+    <glossdef>
+      <para>
+        EchoLink is a network of analog FM repeaters that allows to link repeaters within this 
+        network temporarily. That is, two FM repeaters that are linked via EchoLink behave like 
+        a single repeater irrespective of their location. This network also allows to access
+        the repeaters directly though the internet. This is particularly helpful if one cannot 
+        reach any repeater.  
+      </para>  
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Group Call</glossterm>
+  </glossentry>
+  
+  <glossentry>
+    <glossterm>Group List</glossterm>
+  </glossentry>
+  
+  <glossentry>
+    <glossterm>Maidenhead Locator</glossterm>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Private Call</glossterm>
+  </glossentry>
+  
+  <glossentry>
+    <glossterm>Revert Channel</glossterm>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Roaming Zone</glossterm>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>SSID</glossterm>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Talkgroup</glossterm>
+  </glossentry>
+  
+  <glossentry>
+    <glossterm>Time Slot</glossterm>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Transmit Contact</glossterm>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Transmit Timeout</glossterm> <acronym>TOT</acronym>
+    <glossdef>
+      <para>
+        Specifies the time of continuos transmission, after which the transmission is interrupted 
+        automatically. This prevents the accidental blocking of a repeater or talk group by 
+        transmitting continuously. 
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Scan List</glossterm>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Zone</glossterm>
+  </glossentry>
+</glossary>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="yamlRadioSettings"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+<info>
+  <title>Radio settings</title>
+</info>         
+
+<para>
+  The radio settings section contains all radio-wide settings. For example the microphone level, 
+  boot text etc. For now, there aren't many.
+</para>
+
+<para>
+  As an example, consider the following general settings
+</para>
+
+<example pgwide="1">
+  <title>General radio-wide settings.</title>
+  <programlisting language="yaml"><![CDATA[settings:
+  micLevel: 6
+  speech: false
+  introLine1: qDMR
+  introLine2: DM3MAT
+  defaultID: id1 
+  squelch: 1
+  vox: 0
+  power: High
+]]></programlisting>
+</example>
+
+<para>
+  Here, the microphone amplification is set to 6, the speech synthesis is disabled, the two boot
+  text lines are set to <quote>qDMR</quote> and <quote>DM3MAT</quote> respectively and the default 
+  DMR radio ID is set to <quote>id1</quote>. The latter is the id of a radio ID defined below. 
+</para>
+
+<para>
+  Also, the radio-wide default squelch, VOX and power level is set. These values can be referenced
+  later in channels. Also, some radios do not allow for these settings to be applied on a 
+  per-channel basis. For these radios, these values are used. 
+</para>
+
+<table>
+  <caption>Radio settings</caption>
+  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
+  <tbody>
+    <tr>
+      <td><token>micLevel</token></td>
+      <td>Specifies the microphone amplification. Must be an integer between 1 and 10.</td>
+    </tr>
+    <tr>
+      <td><token>speech</token></td>
+      <td>Enables/disables the speech synthesis. Some radios can announce the current 
+        channel etc for the visually impaired. To enable that feature (if supported by the radio)
+        set this field to <token>true</token>. Must be a boolean value.</td>
+    </tr>
+    <tr>
+      <td><token>introLine1</token>, <token>introLine2</token></td>
+      <td>Sets the two boot text lines (if supported by the radio). These text lines will show up 
+        on the boot of the radio. If the radio is set to show a picture during boot, these lines are 
+        not shown. </td>
+    </tr>
+    <tr>
+      <td><token>defaultID</token></td>
+      <td>Specifies which radio ID will be used as the default DMR ID (see 
+        <xref linkend="cpRadioIDs"/> below). If none is specified, the first 
+        defined DMR radio ID will be used.</td>
+    </tr>
+  </tbody>
+</table>
+
+</section>
+
+  

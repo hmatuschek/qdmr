@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="guiScanLists"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Assembling Scan Lists</title>
+</info>
+
+<para>
+  Scan lists are simple lists of channels that are scanned sequentially, when scanning is stated. A
+  <glossterm>ScanList</glossterm> may be associated with an channel.
+</para>
+
+<note>
+  <para> 
+    For many radios, you need to associate a scan list with a channel (see 
+    <xref linkend="guiChannels"/> above) in the analog or digital channel edit dialog. This determines 
+    which scan list is used when a scan is started on a particular channel.
+  </para>
+</note>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-scan-lists.png" width="13cm" align="center"/></imageobject>
+    <textobject>Screen-shot of the list of scan lists.</textobject>
+  </mediaobject>
+ <title>The list of scan lists.</title>
+</screenshot>
+
+<para>
+  A new scan list can be created by clicking on the <guibutton>Add Scan List</guibutton> button. A 
+  scan list can be deleted by selecting the scan list and clicking on the <guibutton>Delete Scan 
+  List</guibutton> button. The order of the scan list can be changed by selecting a list an moving 
+  it up/down using the <guibutton>up</guibutton> and <guibutton>down</guibutton> buttons on the 
+  right.
+</para>
+
+<para>
+  Double-clicking on a scan list or clicking the <guibutton>Add Scan List</guibutton> button will 
+  open the scan-list edit-dialog. This dialog allows to alter/assemble the scan by adding, 
+  removing or reordering the channels in the scan list.
+</para>
+
+
+<section>
+<info>
+  <title>Edit Scan Lists</title>
+</info>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-edit-scanlist.png" width="5cm" align="center"/></imageobject>
+    <textobject>Screen shot of the edit scan-list dialog.</textobject>
+  </mediaobject>
+  <title>The scan-list editor.</title>
+</screenshot>
+
+<para>
+  By double-clicking an existing scan list or clicking on the <guibutton>Add Scan 
+  List</guibutton> button, the scan-list dialog opens. The <guilabel>Name</guilabel> field allows 
+  to specify the name of the scan list.
+</para>
+
+<para>
+  The optional <guilabel>Primary</guilabel> and <guilabel>Secondary Channel</guilabel> fields allow
+  to specify channels that are visited more frequently. The <guilabel>Primary Channel</guilabel> will
+  be visited 50% of the time. That is, after a channel of the scan list was visited, the primary 
+  channel is visited again, and after that, the next channel from the scan list is visited. In the end,
+  the primary channel is scanned half of the time. The secondary channel is similar but gets visited only
+  25% of the time. The drop down list allows to select none, any channel or the <guilabel>Selected</guilabel> 
+  channel. The latter refers to the channel, the scan started on. 
+</para>
+
+<para>
+  The optional <guilabel>Transmit Channel</guilabel> or <glossterm>Revert Channel</glossterm>specifies 
+  the channel to transmit on during a scan. Here none, any channel, the selected channel and also the 
+  <guilabel>Last</guilabel> channel can be chosen. The <guilabel>Last</guilabel> channel refers to 
+  the last active channel on the scan list. This allows to answer a call heard during a scan.
+</para>
+
+<para>
+  Channels can be added to the scan list by clicking on the <guibutton>Add Channel</guibutton> 
+  button at the bottom. Similarly, channels can be removed by selecting them and clicking on the 
+  <guibutton>Remove Channel</guibutton> button. Like for all other lists, the channels can be moved 
+  around within the list by selecting channels and using the <guibutton>up</guibutton> and 
+  <guibutton>down</guibutton> buttons to the right.
+</para>
+</section>
+
+</section>

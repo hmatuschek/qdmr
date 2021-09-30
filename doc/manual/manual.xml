@@ -3,22 +3,24 @@
 <book xmlns="http://docbook.org/ns/docbook" 
       xmlns:xlink="http://www.w3.org/1999/xlink" 
       xmlns:xi="http://www.w3.org/2001/XInclude"
-      verion="5.0" xml:lang="en">
+      version="5.0" xml:lang="en">
   <info>
     <title>qdmr - User Manual</title>
     <subtitle>A universal codeplug programming tool for Linux and MacOS X.</subtitle>
+    
     <author>
       <personname>
         <firstname>Hannes</firstname>
         <surname>Matuschek</surname>
       </personname>
+      <email>dm3mat@darc.de</email>
       <affiliation>
         <shortaffil>University of Potsdam</shortaffil>
         <orgname>University of Potsdam</orgname>
         <orgdiv>Department of Mathematics</orgdiv>
         <address>
           <otheraddr>Campus Golm, Haus 9</otheraddr>
-          <street> Karl-Liebknecht-Str. 24-25</street>
+          <street>Karl-Liebknecht-Str. 24-25</street>
           <postcode>D-14476</postcode>
           <city>Potsdam OT Golm</city>
           <state>Brandenburg</state>
@@ -26,22 +28,42 @@
         </address>
       </affiliation>
     </author>  
+    
+    <date>October 1st, 2021</date>
+    
     <copyright>
       <year>2021</year>
       <holder>Hannes Matuschek</holder>
     </copyright>
+    
+    <releaseinfo>
+      <para>
+        This document covers <application>qdmr</application> version 0.9.0.
+      </para>
+    </releaseinfo>
+    
+    <legalnotice>
+      <para>
+        This document is released under the conditions of the 
+        <link xlink:href="https://creativecommons.org/licenses/by-sa/2.0/">Creative Commons 
+          Attribution-ShareAlike 2.0</link>.
+      </para>
+    </legalnotice>
+
     <xi:include  href="preface.xml"/> 
   </info>
   
-  <xi:include  href="introduction.xml"/> 
-  <xi:include  href="gui.xml"/> 
-  <xi:include  href="extensible_codeplug.xml"/>
-  <xi:include  href="opengd77_extensions.xml"/>
-  <xi:include  href="radioddity_extensions.xml"/>
-  <xi:include  href="tyt_extensions.xml"/>
-  <xi:include  href="anytone_extensions.xml"/>
+  <xi:include  href="intro/introduction.xml"/> 
+  <xi:include  href="gui/gui.xml"/> 
+  <xi:include  href="codeplug/format.xml"/>
+  <xi:include  href="codeplug/extensions.xml"/>
+  <xi:include  href="codeplug/tableformat.xml"/>
+
   <chapter>
     <title>The <command>dmrconf</command> command line tool</title>
     <xi:include  href="../dmrconf.in.xml"/>
   </chapter>
+
+  <xi:include  href="glossary.xml"/>
+
 </book>
