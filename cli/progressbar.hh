@@ -2,7 +2,7 @@
 #define PROGRESSBAR_HH
 
 #include <iostream>
-#include <cinttypes>
+#include <sys/types.h>
 
 void showProgress(uint percent=0);
 void updateProgress(uint percent);
