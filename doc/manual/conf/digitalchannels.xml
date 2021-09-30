@@ -20,17 +20,17 @@
 </para>
 
 <informalexample pgwide="1">
-  <programlisting><![CDATA[  Digital Name             Receive   Transmit  Power Scan TOT RO Admit  CC TS RxGL TxC GPS Roam ID
-11      "DM0TT Ref"      439.0870  -7.6000   High  1    -   -  Free   1  1  7    12  -   +    -  #    Regional
-12      "DM0TT BB"       439.0875  -7.6000   High  -    -   -  Free   1  2  7    15  1   +    -  #    Berlin/Brand
-84      "DMR_S0"         433.4500  433.4500  High  2    -   -  Free   1  1  6    9   -   +    -  #    Simplex TG99
-85      "DMR_S1"         433.6120  433.6120  High  2    -   -  Free   1  1  6    9   -   +    -  #    Simplex TG99
-86      "DMR_S2"         433.6250  433.6250  High  2    -   -  Free   1  1  6    9   -   +    -  #    Simplex TG99
-87      "DMR_S3"         433.6380  433.6380  High  2    -   -  Free   1  1  6    9   -   +    -  #    Simplex TG99
-88      "DMR_S4"         433.6500  433.6500  High  2    -   -  Free   1  1  6    9   -   +    -  #    Simplex TG99
-89      "DMR_S5"         433.6630  433.6630  High  2    -   -  Free   1  1  6    9   -   +    -  #    Simplex TG99
-90      "DMR_S6"         433.6750  433.6750  High  2    -   -  Free   1  1  6    9   -   +    -  #    Simplex TG99
-91      "DMR_S7"         433.6880  433.6880  High  2    -   -  Free   1  1  6    9   -   +    -  #    Simplex TG99   
+  <programlisting><![CDATA[Digital Name             Receive   Transmit  Power Scan TOT RO Admit  CC TS RxGL TxC GPS Roam ID
+11      "DM0TT Ref"      439.0870  -7.6000   High  1    -   -  Free   1  1  7    12  -   +    -  
+12      "DM0TT BB"       439.0875  -7.6000   High  -    -   -  Free   1  2  7    15  1   +    -  
+84      "DMR_S0"         433.4500  433.4500  High  2    -   -  Free   1  1  6    9   -   +    -  
+85      "DMR_S1"         433.6120  433.6120  High  2    -   -  Free   1  1  6    9   -   +    -  
+86      "DMR_S2"         433.6250  433.6250  High  2    -   -  Free   1  1  6    9   -   +    -  
+87      "DMR_S3"         433.6380  433.6380  High  2    -   -  Free   1  1  6    9   -   +    -  
+88      "DMR_S4"         433.6500  433.6500  High  2    -   -  Free   1  1  6    9   -   +    -  
+89      "DMR_S5"         433.6630  433.6630  High  2    -   -  Free   1  1  6    9   -   +    -  
+90      "DMR_S6"         433.6750  433.6750  High  2    -   -  Free   1  1  6    9   -   +    -  
+91      "DMR_S7"         433.6880  433.6880  High  2    -   -  Free   1  1  6    9   -   +    -  
 ]]></programlisting>
 </informalexample>
 

@@ -22,7 +22,7 @@
   share the same DMR ID. The DMR ID is specified using the "ID" keyword as
 </para>
 
-<informalexample pgwide="1">
+<informalexample>
   <programlisting language="ini"><![CDATA[ID: 12345678
 ]]></programlisting>
 </informalexample>
@@ -39,7 +39,7 @@
   call-sign. For example:
 </para>
 
-<informalexample pgwide="1">
+<informalexample>
   <programlisting><![CDATA[Name: "DM3MAT" 
 ]]></programlisting>
 </informalexample>
@@ -50,7 +50,7 @@
   your radio. For example
 </para>
 
-<informalexample pgwide="1">
+<informalexample>
   <programlisting><![CDATA[IntroLine1: "Hello"
 IntroLine2: "MY0CALL"   
 ]]></programlisting>
@@ -62,7 +62,7 @@ IntroLine2: "MY0CALL"
   microphone amplification. This value may vary heavily from model to model.
 </para>
 
-<informalexample pgwide="1">
+<informalexample>
   <programlisting><![CDATA[MicLevel: 2
 ]]></programlisting>
 </informalexample>
@@ -72,7 +72,7 @@ IntroLine2: "MY0CALL"
   are "on" and "off".
 </para>
 
-<informalexample pgwide="1">
+<informalexample>
   <programlisting><![CDATA[# Speech-synthesis ('On' or 'Off'):
 Speech: Off 
 ]]></programlisting>

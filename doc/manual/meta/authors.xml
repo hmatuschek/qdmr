@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<authorgroup xmlns="http://docbook.org/ns/docbook" 
+             xmlns:xlink="http://www.w3.org/1999/xlink" 
+             xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<author>
+  <personname>
+    <firstname>Hannes</firstname>
+    <surname>Matuschek</surname>
+  </personname>
+  <email>dm3mat@darc.de</email>
+  <affiliation>
+    <shortaffil>University of Potsdam</shortaffil>
+    <orgname>University of Potsdam</orgname>
+    <orgdiv>Department of Mathematics</orgdiv>
+    <address>
+      <otheraddr>Campus Golm, Haus 9</otheraddr>
+      <street>Karl-Liebknecht-Str. 24-25</street>
+      <postcode>D-14476</postcode>
+      <city>Potsdam OT Golm</city>
+      <state>Brandenburg</state>
+      <country>Germany</country>
+    </address>
+  </affiliation>
+</author>  
+
+</authorgroup>

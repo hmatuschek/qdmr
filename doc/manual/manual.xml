@@ -4,31 +4,13 @@
       xmlns:xlink="http://www.w3.org/1999/xlink" 
       xmlns:xi="http://www.w3.org/2001/XInclude"
       version="5.0" xml:lang="en">
+      
   <info>
     <title>qdmr - User Manual</title>
     <subtitle>A universal codeplug programming tool for Linux and MacOS X.</subtitle>
     
-    <author>
-      <personname>
-        <firstname>Hannes</firstname>
-        <surname>Matuschek</surname>
-      </personname>
-      <email>dm3mat@darc.de</email>
-      <affiliation>
-        <shortaffil>University of Potsdam</shortaffil>
-        <orgname>University of Potsdam</orgname>
-        <orgdiv>Department of Mathematics</orgdiv>
-        <address>
-          <otheraddr>Campus Golm, Haus 9</otheraddr>
-          <street>Karl-Liebknecht-Str. 24-25</street>
-          <postcode>D-14476</postcode>
-          <city>Potsdam OT Golm</city>
-          <state>Brandenburg</state>
-          <country>Germany</country>
-        </address>
-      </affiliation>
-    </author>  
-    
+    <xi:include href="meta/authors.xml"/>    
+
     <date>October 1st, 2021</date>
     
     <copyright>
@@ -50,20 +32,19 @@
       </para>
     </legalnotice>
 
-    <xi:include  href="preface.xml"/> 
+    <xi:include  href="meta/abstract.xml"/> 
   </info>
   
   <xi:include  href="intro/introduction.xml"/> 
+
   <xi:include  href="gui/gui.xml"/> 
+  
   <xi:include  href="codeplug/format.xml"/>
   <xi:include  href="codeplug/extensions.xml"/>
   <xi:include  href="conf/format.xml"/>
 
-  <chapter>
-    <title>The <command>dmrconf</command> command line tool</title>
-    <xi:include  href="../dmrconf.in.xml"/>
-  </chapter>
+  <xi:include href="cli/commandline.xml"/>
 
-  <xi:include  href="glossary.xml"/>
+  <xi:include  href="meta/glossary.xml"/>
 
 </book>

@@ -12,7 +12,7 @@
   The contact table is a list of DMR contacts like
 </para>
 
-<informalexample pgwide="1">
+<informalexample>
   <programlisting><![CDATA[Contact Name             Type    ID       RxTone
 1       "DM3MAT"         Private 2621370  +
 2       "DMR All Call"   All     16777215 -

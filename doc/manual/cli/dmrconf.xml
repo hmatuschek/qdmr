@@ -1,0 +1,243 @@
+<?xml version="1.0"?>
+
+<refentry xml:id="dmrconf"
+  xmlns="http://docbook.org/ns/docbook"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <refmeta>
+    <refentrytitle>dmrconf</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="source">dmrconf</refmiscinfo>
+    <refmiscinfo class="version">${PROJECT_VERSION}</refmiscinfo>
+    <refmiscinfo class="manual">User Commands</refmiscinfo>
+  </refmeta>
+
+  <info>
+    <author>
+      <personname><firstname>Hannes</firstname> <surname>Matuschek</surname></personname>
+      <email>dm3mat@darc.de</email>
+      <contrib>Main author</contrib>
+    </author>
+  </info>
+
+  <refnamediv>
+    <refname>dmrconf</refname>
+    <refpurpose>Command-line tool for programming DMR radios.</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>dmrconf</command>
+      <arg choice="opt"><option>OPTIONS</option></arg>
+      <arg><option>COMMAND</option></arg>
+      <arg choice="opt">file</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+    <para><command>dmrconf</command> is a command-line tool to programm DMR radios. That is,
+    generating and uploading codeplugs to these radios. To this end, <command>dmrconf</command>
+    uses a common human-readable text format to describe the codeplug for all supported radios (see
+    below). This allows to share codeplugs between different radios.</para>
+
+    <para>Additionally, <command>dmrconf</command> also allows to download codeplugs from the radio
+    and to store it in the human-readable text format. </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Commands</title>
+    <variablelist>
+      <varlistentry>
+        <term><command>detect</command></term>
+        <listitem><para>Detects a connected radio. This command does not take any
+        additional options.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>read</command></term>
+        <listitem><para>Reads a codeplug from the radio and stores it into the given file. This
+          command may need the <option>-c</option> or <option>-b</option> options if the file type
+          cannot be inferred from the filename.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>write</command></term>
+        <listitem><para>Writes the specified codeplug to the radio. This command may need the
+          <option>-c</option> or <option>-b</option> options if the file type cannot be inferred
+          from the filename.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>write-db</command></term>
+        <listitem><para>Writes the call-sign database to the device. This command may need the
+          <option>--id</option> option to select call-signs if the complete database does not 
+          fit into the device. If specified, all callsigns closest to the specified ID are 
+          used. </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>verify</command></term>
+        <listitem><para>Verifies the codeplug with the connected radio or the specified
+          radio passed with the <option>--radio</option> option. This command may also need the
+          <option>-c</option> or <option>-b</option> options if the file type cannot be inferred
+          from the filename.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>encode</command></term>
+        <listitem><para>Encodes a CSV codeplug as a binary one for the connected or
+          specified radio using the <option>--radio</option> option. </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>encode-db</command></term>
+        <listitem><para>Encodes the call-sign datavase as a binary one for the connected or
+          specified radio using the <option>--radio</option> option. This command may need the
+          <option>--id</option> option to select call-signs if the complete database does not 
+          fit into the device. If specified, all callsigns closest to the specified ID are 
+          used. </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>decode</command></term>
+        <listitem><para>Decodes a binary codeplug and stores the result in
+          human-readable form.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>info</command></term>
+        <listitem><para>Prints some information about the given file.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+    <variablelist>
+      <varlistentry>
+        <term><option>-c</option> or <option>--csv</option></term>
+        <listitem><para>Specifies the file format for the input or output file
+          for the <command>verify</command>, <command>read</command> and
+          <command>write</command> commands. This option is not needed if the
+          filetype can be inferred from the filename. That is, if the file ends
+          on <filename>.conf</filename> or <filename>.csv</filename>.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-y</option> or <option>--yaml</option></term>
+        <listitem><para>Specifies the file format for the input or output file
+          for the <command>verify</command>, <command>read</command> and
+          <command>write</command> commands. This option is not needed if the
+          filetype can be inferred from the filename. That is, if the file ends
+          on <filename>.yaml</filename>.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-b</option> or <option>--bin</option></term>
+        <listitem><para>Specifies the file format for the input or output file
+          for the <command>verify</command>, <command>read</command> and
+          <command>write</command> commands. This option is not needed if the
+          filetype can be inferred from the filename. That is, if the file ends
+          on <filename>.bin</filename> or <filename>.dfu</filename>.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-m</option> or <option>--manufacturer</option></term>
+        <listitem><para>Specifies the file format for the input file
+          for the <command>decode</command> command to be the manufacturer
+          binary codeplug format.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-R</option> or <option>--radio=</option>NAME</term>
+        <listitem><para>Specifies the radio for the <command>verify</command>,
+          <command>encode</command> or <command>decode</command> commands.
+          This option can also be used to override the automatic radio detection
+          for the <command>read</command> and <command>write</command> 
+          commands. Be careful using this option when writing to the device.
+          An incompatible code-plug might be written.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-I</option> or <option>--id=</option>DMR_ID</term>
+        <listitem><para>Specifies the DMR ID or a comma separated list of DMR
+          ID prefixes for the <command>write-db</command> or
+          <command>encode-db</command> commands.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-n</option> or <option>--limit=</option>N</term>
+        <listitem><para>Limits several amonuts, depending on the context. When
+        encoding/writing the callsign db, this option speicifies the maximum
+        number of callsigns to encode.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--init-codeplug</option></term>
+        <listitem><para>Initializes the code-plug from scratch. If omitted (default)
+        the code-plug on the device gets updated. This maintains all settings made 
+        earlier via the manufacturer CPS or on the radio itself.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--auto-enable-gps</option></term>
+        <listitem><para>Automatically enables GPS/APRS if at least one GPS/APRS 
+        system is defined and used by any channel. </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--auto-enable-roaming</option></term>
+        <listitem><para>Automatically enables roaming if at least one roaming 
+        zone is defined and used by any channel. </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--ignore-limits</option></term>
+        <listitem><para>Disables the enforement of limits. Warnings are still show.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-h</option> or <option>--help</option></term>
+        <listitem><para>Displays a short help message.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-v</option> or <option>--version</option></term>
+        <listitem><para>Displays the version number.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-V</option> or <option>--verbose</option></term>
+        <listitem><para>Enable debug messages.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1>
+    <title>Supported Radios</title>
+    <para>The following list contains all supported radios and their names for the
+      <option>--radio</option> option.</para>
+    <variablelist>
+      <varlistentry>
+        <term><option>opengd77</option></term>
+        <listitem><para>All radios running the Open GD77 firmware</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>d868uve</option></term>
+        <listitem><para>Anytone AT-D868UVE</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>d878uv</option></term>
+        <listitem><para>Anytone AT-D878UV</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>d878uv2</option></term>
+        <listitem><para>Anytone AT-D878UVII</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>d578uv</option></term>
+        <listitem><para>Anytone AT-D578UV</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>md390</option></term>
+        <listitem><para>TYT MD-390 or Retevis RT3S</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>gd77</option></term>
+        <listitem><para>Retevis GD-77</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>rd5r</option></term>
+        <listitem><para>Baofeng/Radioddity RD-5R</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1>
+    <title>Bugs</title>
+    <para>This programm is still under development and may contain bugs that
+      may cause harm to the radios and may even destroy them. Hence you may
+      use this software on your own risk. I you want to have guaranties,
+      consider using the CPS (code-plug programming software) supplied with
+      your radio.</para>
+  </refsect1>
+</refentry>

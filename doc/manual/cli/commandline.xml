@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<chapter xml:id="commandLine"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>The <command>dmrconf</command> command line tool</title>
+</info>
+
+<para>
+
+</para>
+
+<xi:include  href="dmrconf.xml"/>
+
+</chapter>

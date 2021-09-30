@@ -19,7 +19,7 @@
   RX group lists are defined within the config file like
 </para>
 
-<informalexample pgwide="1">
+<informalexample>
   <programlisting><![CDATA[Grouplist Name            Contacts
 1         "Lokal"          7,9
 2         "Deutschland"    8

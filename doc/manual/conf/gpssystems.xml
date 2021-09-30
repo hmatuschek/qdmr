@@ -13,8 +13,8 @@
   (which usually gets forwarded to the APRS system) and at which period this information is send.
 </para>
 
-<informalexample pgwide="1">
-  <programlisting pgwide="1"><![CDATA[GPS  Name                Dest Period Revert
+<informalexample>
+  <programlisting><![CDATA[GPS  Name                Dest Period Revert
 1    "BM APRS"           20   300    -
 ]]></programlisting>  
 </informalexample>

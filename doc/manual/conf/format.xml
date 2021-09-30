@@ -50,7 +50,7 @@
   character <code>#</code> and end at the end-of-line.
 </para>
 
-<informalexample pgwide="1">
+<informalexample>
   <programlisting language="ini"><![CDATA[# A comment, everything in this line is ignored
 ID: 12345678   # Another comment
 ]]></programlisting>

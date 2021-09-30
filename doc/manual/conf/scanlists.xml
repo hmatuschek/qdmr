@@ -18,7 +18,7 @@
   The list of scan lists has the following form
 </para>
 
-<informalexample pgwide="1">
+<informalexample>
   <programlisting><![CDATA[Scanlist Name            PCh1 PCh2 TxCh Channels
 1        "KW"            1    84   Sel  1,84,2,9,11,8,14,4,5,20,21,19,6
 2        "DMR Simplex"   84   -    Sel  84,85,86,87,88,89,90,91
