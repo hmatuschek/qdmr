@@ -304,11 +304,11 @@ OpenGD77::download()
     uint32_t bank = (0 == image) ? OpenGD77Codeplug::EEPROM : OpenGD77Codeplug::FLASH;
 
     for (int n=0; n<_codeplug.image(image).numElements(); n++) {
-      uint addr = _codeplug.image(image).element(n).address();
-      uint size = _codeplug.image(image).element(n).data().size();
-      uint b0 = addr/BSIZE, nb = size/BSIZE;
+      unsigned addr = _codeplug.image(image).element(n).address();
+      unsigned size = _codeplug.image(image).element(n).data().size();
+      unsigned b0 = addr/BSIZE, nb = size/BSIZE;
 
-      for (uint b=0; b<nb; b++, bcount+=BSIZE) {
+      for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
         if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
           _errorMessage = QString("In %1(), cannot read block %2:\n\t %3")
               .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
@@ -361,10 +361,10 @@ OpenGD77::upload()
     uint32_t bank = ( (0 == image) ? OpenGD77Codeplug::EEPROM : OpenGD77Codeplug::FLASH );
 
     for (int n=0; n<_codeplug.image(image).numElements(); n++) {
-      uint addr = _codeplug.image(image).element(n).address();
-      uint size = _codeplug.image(image).element(n).data().size();
-      uint b0 = addr/BSIZE, nb = size/BSIZE;
-      for (uint b=0; b<nb; b++, bcount+=BSIZE) {
+      unsigned addr = _codeplug.image(image).element(n).address();
+      unsigned size = _codeplug.image(image).element(n).data().size();
+      unsigned b0 = addr/BSIZE, nb = size/BSIZE;
+      for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
         if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
           _errorMessage = QString("In %1(), cannot read block %2:\n\t %3")
               .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
@@ -393,11 +393,11 @@ OpenGD77::upload()
     uint32_t bank = (0 == image) ? OpenGD77Codeplug::EEPROM : OpenGD77Codeplug::FLASH;
 
     for (int n=0; n<_codeplug.image(image).numElements(); n++) {
-      uint addr = _codeplug.image(image).element(n).address();
-      uint size = _codeplug.image(image).element(n).data().size();
-      uint b0 = addr/BSIZE, nb = size/BSIZE;
+      unsigned addr = _codeplug.image(image).element(n).address();
+      unsigned size = _codeplug.image(image).element(n).data().size();
+      unsigned b0 = addr/BSIZE, nb = size/BSIZE;
 
-      for (uint b=0; b<nb; b++, bcount+=BSIZE) {
+      for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
         if (! _dev->write(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
           _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
               .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
@@ -437,13 +437,13 @@ OpenGD77::uploadCallsigns()
     return false;
   }
 
-  uint bcount = 0;
+  unsigned bcount = 0;
   // Then upload callsign DB
   for (int n=0; n<_callsigns.image(0).numElements(); n++) {
-    uint addr = _callsigns.image(0).element(n).address();
-    uint size = _callsigns.image(0).element(n).data().size();
-    uint b0 = addr/BSIZE, nb = size/BSIZE;
-    for (uint b=0; b<nb; b++, bcount+=BSIZE) {
+    unsigned addr = _callsigns.image(0).element(n).address();
+    unsigned size = _callsigns.image(0).element(n).data().size();
+    unsigned b0 = addr/BSIZE, nb = size/BSIZE;
+    for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
       if (! _dev->write(OpenGD77Codeplug::FLASH, (b0+b)*BSIZE,
                         _callsigns.data((b0+b)*BSIZE, 0), BSIZE))
       {

@@ -47,7 +47,7 @@
 /* ******************************************************************************************** *
  * Implementation of D578UVCodeplug::ChannelElement
  * ******************************************************************************************** */
-D578UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, uint size)
+D578UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
   : D878UVCodeplug::ChannelElement(ptr, size)
 {
   // pass...
@@ -90,12 +90,12 @@ D578UVCodeplug::ChannelElement::enableDataACK(bool enable) {
   setBit(0x003d, 3, !enable);
 }
 
-uint
+unsigned
 D578UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
   return 0;
 }
 void
-D578UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(uint idx) {
+D578UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
   // pass...
 }
 
@@ -181,7 +181,7 @@ void
 D578UVCodeplug::allocateContacts() {
   /* Allocate contacts */
   uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
-  uint contactCount=0;
+  unsigned contactCount=0;
   for (uint16_t i=0; i<NUM_CONTACTS; i++) {
     // enabled if false (ass hole)
     if (1 == ((contact_bitmap[i/8]>>(i%8)) & 0x01))

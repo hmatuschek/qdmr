@@ -37,13 +37,13 @@ class Channel: public ConfigObject
   // /** The transmit power. */
   //Q_PROPERTY(Power power READ power WRITE setPower)
   // /** The transmit timeout in seconds. */
-  //Q_PROPERTY(uint timeout READ timeout WRITE setTimeout)
+  //Q_PROPERTY(unsigned timeout READ timeout WRITE setTimeout)
   /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
   /** The scan list. */
   Q_PROPERTY(ScanListReference* scanList READ scanList)
   // /** The VOX setting. */
-  //Q_PROPERTY(uint vox READ vox WRITE setVOX)
+  //Q_PROPERTY(unsigned vox READ vox WRITE setVOX)
 
 public:
   /** Possible power settings. */
@@ -111,9 +111,9 @@ public:
   /** Returns @c true if the transmit timeout is disabled. */
   bool timeoutDisabled() const;
   /** Returns the TX timeout (TOT) in seconds. */
-  uint timeout() const;
+  unsigned timeout() const;
   /** (Re-)Sets the TX timeout (TOT) in seconds. */
-  bool setTimeout(uint dur);
+  bool setTimeout(unsigned dur);
   /** Disables the transmit timeout. */
   void disableTimeout();
   /** Sets the timeout to the global default timeout. */
@@ -129,9 +129,9 @@ public:
   /** Retunrs @c true if the VOX is specified by the global default value. */
   bool defaultVOX() const;
   /** Returns the VOX level [0-10]. */
-  uint vox() const;
+  unsigned vox() const;
   /** Sets the VOX level [0-10]. */
-  void setVOX(uint level);
+  void setVOX(unsigned level);
   /** Sets the VOX level to the default value. */
   void setVOXDefault();
   /** Disables the VOX. */
@@ -166,11 +166,11 @@ protected:
   /** The transmit power setting. */
   Power _power;
   /** Transmit timeout in seconds. */
-  uint  _txTimeOut;
+  unsigned _txTimeOut;
   /** RX only flag. */
-  bool  _rxOnly;
+  bool _rxOnly;
   /** Holds the VOX level. */
-  uint _vox;
+  unsigned _vox;
   /** Default scan list of the channel. */
   ScanListReference _scanlist;
 };
@@ -189,7 +189,7 @@ class AnalogChannel: public Channel
   /** The admit criterion of the channel. */
   Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
   // /** The squelch level of the channel [1-10]. */
-  // Q_PROPERTY(uint squelch READ squelch WRITE setSquelch)
+  // Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch)
   /** The band width of the channel. */
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
   /** The APRS system. */
@@ -229,9 +229,9 @@ public:
   /** Returns @c true if the squelch is disabled. */
   bool squelchDisabled() const;
   /** Returns the squelch level [0,10]. */
-	uint squelch() const;
+	unsigned squelch() const;
   /** (Re-)Sets the squelch level [0,10]. 0 Disables squelch (on some radios). */
-	bool setSquelch(uint squelch);
+	bool setSquelch(unsigned squelch);
   /** Disables the quelch. */
   void disableSquelch();
   /** Sets the squelch to the global default value. */
@@ -267,7 +267,7 @@ protected:
   /** Holds the admit criterion. */
 	Admit _admit;
   /** Holds the squelch level [0,10]. */
-	uint  _squelch;
+  unsigned _squelch;
   /** The RX CTCSS tone. */
   Signaling::Code _rxTone;
   /** The TX CTCSS tone. */
@@ -292,7 +292,7 @@ class DigitalChannel: public Channel
   /** The admit criterion of the channel. */
   Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
   /** The color code of the channel. */
-  Q_PROPERTY(uint colorCode READ colorCode WRITE setColorCode)
+  Q_PROPERTY(unsigned colorCode READ colorCode WRITE setColorCode)
   /** The time slot of the channel. */
   Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
   /** The radio ID. */
@@ -336,9 +336,9 @@ public:
 	void setAdmit(Admit admit);
 
   /** Returns the color code for the channel. */
-	uint colorCode() const;
+	unsigned colorCode() const;
   /** (Re-)Sets the color code for the channel. */
-	bool setColorCode(uint cc);
+	bool setColorCode(unsigned cc);
 
   /** Returns the time slot for the channel. */
   TimeSlot timeSlot() const;
@@ -394,7 +394,7 @@ protected:
   /** The admit criterion. */
 	Admit _admit;
   /** The channel color code. */
-	uint _colorCode;
+	unsigned _colorCode;
   /** The time slot for the channel. */
 	TimeSlot _timeSlot;
   /** The RX group list for this channel. */
@@ -454,7 +454,7 @@ public:
   /** Gets the channel at the specified index. */
   Channel *channel(int idx) const;
   /** Finds a digial channel with the given frequencies, time slot and color code. */
-  DigitalChannel *findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, uint cc) const;
+  DigitalChannel *findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, unsigned cc) const;
   /** Finds an analog channel with the given frequeny. */
   AnalogChannel *findAnalogChannelByTxFreq(double freq) const;
 };

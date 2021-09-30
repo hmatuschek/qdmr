@@ -123,7 +123,7 @@ RadioIDList::addId(const QString &name, uint32_t id) {
 }
 
 bool
-RadioIDList::setDefaultId(uint idx) {
+RadioIDList::setDefaultId(unsigned idx) {
   if (_default) {
     disconnect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
     if (0 <= indexOf(_default))

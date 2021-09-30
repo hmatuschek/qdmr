@@ -23,7 +23,7 @@ public:
   QPair<int,int> selection() const;
 
 signals:
-  void doubleClicked(uint row);
+  void doubleClicked(unsigned row);
 
 protected slots:
   void onMoveItemUp();

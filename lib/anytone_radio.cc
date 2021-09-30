@@ -238,8 +238,8 @@ AnytoneRadio::download() {
 
   // Download bitmaps
   for (int n=0; n<_codeplug->image(0).numElements(); n++) {
-    uint addr = _codeplug->image(0).element(n).address();
-    uint size = _codeplug->image(0).element(n).data().size();
+    unsigned addr = _codeplug->image(0).element(n).address();
+    unsigned size = _codeplug->image(0).element(n).data().size();
     if (! _dev->read(0, addr, _codeplug->data(addr), size)) {
       _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
           .arg(_dev->errorMessage());
@@ -250,7 +250,7 @@ AnytoneRadio::download() {
   }
 
   // Allocate remaining memory sections
-  uint nstart = _codeplug->image(0).numElements();
+  unsigned nstart = _codeplug->image(0).numElements();
   _codeplug->allocateForDecoding();
 
   // Check every segment in the remaining codeplug
@@ -267,8 +267,8 @@ AnytoneRadio::download() {
 
   // Download remaining memory sections
   for (int n=nstart; n<_codeplug->image(0).numElements(); n++) {
-    uint addr = _codeplug->image(0).element(n).address();
-    uint size = _codeplug->image(0).element(n).data().size();
+    unsigned addr = _codeplug->image(0).element(n).address();
+    unsigned size = _codeplug->image(0).element(n).data().size();
     if (! _dev->read(0, addr, _codeplug->data(addr), size)) {
       _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
           .arg(_dev->errorMessage());
@@ -291,8 +291,8 @@ AnytoneRadio::upload() {
   // Download bitmaps first
   size_t nbitmaps = _codeplug->numImages();
   for (int n=0; n<_codeplug->image(0).numElements(); n++) {
-    uint addr = _codeplug->image(0).element(n).address();
-    uint size = _codeplug->image(0).element(n).data().size();
+    unsigned addr = _codeplug->image(0).element(n).address();
+    unsigned size = _codeplug->image(0).element(n).data().size();
     if (! _dev->read(0, addr, _codeplug->data(addr), size)) {
       _errorMessage = QString("%1 Cannot read codeplug for update: %2").arg(__func__)
           .arg(_dev->errorMessage());
@@ -308,8 +308,8 @@ AnytoneRadio::upload() {
 
   // Download new memory sections for update
   for (int n=nbitmaps; n<_codeplug->image(0).numElements(); n++) {
-    uint addr = _codeplug->image(0).element(n).address();
-    uint size = _codeplug->image(0).element(n).data().size();
+    unsigned addr = _codeplug->image(0).element(n).address();
+    unsigned size = _codeplug->image(0).element(n).data().size();
     if (! _dev->read(0, addr, _codeplug->data(addr), size)) {
       _errorMessage = QString("%1 Cannot read codeplug for update: %2").arg(__func__)
           .arg(_dev->errorMessage());
@@ -336,8 +336,8 @@ AnytoneRadio::upload() {
 
   // Upload all elements back to the device
   for (int n=0; n<_codeplug->image(0).numElements(); n++) {
-    uint addr = _codeplug->image(0).element(n).address();
-    uint size = _codeplug->image(0).element(n).data().size();
+    unsigned addr = _codeplug->image(0).element(n).address();
+    unsigned size = _codeplug->image(0).element(n).data().size();
     if (! _dev->write(0, addr, _codeplug->data(addr), size)) {
       _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
           .arg(_dev->errorMessage());
@@ -360,10 +360,10 @@ AnytoneRadio::uploadCallsigns() {
   size_t blkWritten  = 0;
   // Upload all elements back to the device
   for (int n=0; n<_callsigns->image(0).numElements(); n++) {
-    uint addr = _callsigns->image(0).element(n).address();
-    uint size = _callsigns->image(0).element(n).data().size();
-    uint nblks = size/WBSIZE;
-    for (uint i=0; i<nblks; i++) {
+    unsigned addr = _callsigns->image(0).element(n).address();
+    unsigned size = _callsigns->image(0).element(n).data().size();
+    unsigned nblks = size/WBSIZE;
+    for (unsigned i=0; i<nblks; i++) {
       if (! _dev->write(0, addr+i*WBSIZE, _callsigns->data(addr)+i*WBSIZE, WBSIZE)) {
         _errorMessage = QString("%1 Cannot upload callsign db: %2").arg(__func__)
             .arg(_dev->errorMessage());

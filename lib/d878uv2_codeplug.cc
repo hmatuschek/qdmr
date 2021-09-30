@@ -39,7 +39,7 @@ void
 D878UV2Codeplug::allocateContacts() {
   /* Allocate contacts */
   uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
-  uint contactCount=0;
+  unsigned contactCount=0;
   for (uint16_t i=0; i<NUM_CONTACTS; i++) {
     // enabled if false (ass hole)
     if (1 == ((contact_bitmap[i/8]>>(i%8)) & 0x01))

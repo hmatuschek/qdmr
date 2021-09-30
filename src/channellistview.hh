@@ -21,7 +21,7 @@ protected slots:
   void onAddDigitalChannel();
   void onCloneChannel();
   void onRemChannel();
-  void onEditChannel(uint row);
+  void onEditChannel(unsigned row);
   void loadChannelListSectionState();
   void storeChannelListSectionState();
 

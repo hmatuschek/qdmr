@@ -100,7 +100,7 @@ DFUFile::remImage(int i) {
 }
 
 bool
-DFUFile::isAligned(uint blocksize) const {
+DFUFile::isAligned(unsigned blocksize) const {
   for (int i=0; i<_images.size(); i++)
     if (! _images.at(i).isAligned(blocksize))
       return false;
@@ -178,8 +178,8 @@ DFUFile::read(QFile &file)
 
   if (crc.get() != suffix.crc) {
     _errorMessage = tr("Cannot read DFU file '%1': Invalid checksum got %2 expected %3")
-        .arg(file.fileName()).arg(uint(suffix.crc), 8, 16, QChar('0'))
-        .arg(uint(crc.get()), 8, 16, QChar('0'));
+        .arg(file.fileName()).arg(unsigned(suffix.crc), 8, 16, QChar('0'))
+        .arg(unsigned(crc.get()), 8, 16, QChar('0'));
     //return false;
   }
   return true;
@@ -314,7 +314,7 @@ DFUFile::Element::setAddress(uint32_t addr) {
 }
 
 bool
-DFUFile::Element::isAligned(uint blocksize) const {
+DFUFile::Element::isAligned(unsigned blocksize) const {
   return (0 == (_address % blocksize)) && (0 == (_data.size() % blocksize));
 }
 
@@ -538,7 +538,7 @@ DFUFile::Image::remElement(int i) {
 }
 
 bool
-DFUFile::Image::isAligned(uint blocksize) const {
+DFUFile::Image::isAligned(unsigned blocksize) const {
   for (int i=0; i<_elements.count(); i++)
     if (! _elements.at(i).isAligned(blocksize))
       return false;

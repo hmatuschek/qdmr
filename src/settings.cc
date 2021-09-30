@@ -80,7 +80,7 @@ Settings::repeaterUpdated() {
 }
 
 bool
-Settings::repeaterUpdateNeeded(uint period) const {
+Settings::repeaterUpdateNeeded(unsigned period) const {
   QDateTime last = lastRepeaterUpdate();
   if (! last.isValid())
     return true;
@@ -168,12 +168,12 @@ Settings::setLimitCallSignDBEnties(bool enable) {
   setValue("limitCallSignDBEntries", enable);
 }
 
-uint
+unsigned
 Settings::maxCallSignDBEntries() const {
   return value("maxCallSignDBEntries", 1).toInt();
 }
 void
-Settings::setMaxCallSignDBEntries(uint max) {
+Settings::setMaxCallSignDBEntries(unsigned max) {
   setValue("maxCallSignDBEntries", max);
 }
 
@@ -187,13 +187,13 @@ Settings::setSelectUsingUserDMRID(bool enable) {
   setValue("selectCallSignDBUsingUserDMRID", enable);
 }
 
-QSet<uint>
+QSet<unsigned>
 Settings::callSignDBPrefixes() {
-  QSet<uint> prefixes;
+  QSet<unsigned> prefixes;
   int num = beginReadArray("callSignDBPrefixes");
   for (int i=0; i<num; i++) {
     setArrayIndex(i);
-    bool ok=true; uint prefix = value("prefix").toInt(&ok);
+    bool ok=true; unsigned prefix = value("prefix").toInt(&ok);
     if (ok)
       prefixes.insert(prefix);
   }
@@ -201,10 +201,10 @@ Settings::callSignDBPrefixes() {
   return prefixes;
 }
 void
-Settings::setCallSignDBPrefixes(const QSet<uint> &prefixes) {
+Settings::setCallSignDBPrefixes(const QSet<unsigned> &prefixes) {
   beginWriteArray("callSignDBPrefixes");
-  uint i = 0;
-  foreach (uint prefix, prefixes) {
+  unsigned i = 0;
+  foreach (unsigned prefix, prefixes) {
     setArrayIndex(i);
     setValue("prefix", prefix);
     i++;
@@ -376,9 +376,9 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   Ui::SettingsDialog::useUserId->setChecked(settings.selectUsingUserDMRID());
   if (settings.selectUsingUserDMRID())
     Ui::SettingsDialog::prefixes->setEnabled(false);
-  QSet<uint> prefs = settings.callSignDBPrefixes();
+  QSet<unsigned> prefs = settings.callSignDBPrefixes();
   QStringList prefs_text;
-  foreach (uint prefix, prefs) {
+  foreach (unsigned prefix, prefs) {
     prefs_text.append(QString::number(prefix));
   }
   Ui::SettingsDialog::prefixes->setText(prefs_text.join(", "));
@@ -451,9 +451,9 @@ SettingsDialog::accept() {
   settings.setSelectUsingUserDMRID(useUserId->isChecked());
 
   QStringList prefs_text = prefixes->text().split(",");
-  QSet<uint> prefs;
+  QSet<unsigned> prefs;
   foreach (QString pref, prefs_text) {
-    bool ok=true; uint prefix = pref.toUInt(&ok);
+    bool ok=true; unsigned prefix = pref.toUInt(&ok);
     if (ok)
       prefs.insert(prefix);
   }

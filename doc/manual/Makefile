@@ -1,4 +1,5 @@
-SRC = manual.xml $(shell find meta/ *.*) $(shell find intro/ *.*) $(shell find gui/ *.*) $(shell find codeplug/ *.*) $(shell find conf/ *.*) $(shell find cli/ *.*) 
+SRC = manual.xml $(shell find meta/ -name "*.*") $(shell find intro/ -name "*.*") $(shell find gui/ -name "*.*"")\
+      $(shell find codeplug/ -name "*.*") $(shell find conf/ -name "*.*") $(shell find cli/ -name "*.*") 
 
 all: images manual.pdf manual.epub html 
 

@@ -48,7 +48,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    EntryElement(uint8_t *ptr, uint size);
+    EntryElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -57,7 +57,7 @@ public:
     /** Sets the call type. */
     virtual void setCallType(DigitalContact::Type type);
     /** Sets the DMR ID number. */
-    virtual void setNumber(uint num);
+    virtual void setNumber(unsigned num);
     /** Sets the ring tone. */
     virtual void setRingTone(RingTone tone);
     /** Sets the entry content. */
@@ -66,10 +66,10 @@ public:
 
     /** Constructs a database entry from the given user.
      * @returns The size of the entry. */
-    virtual uint fromUser(const UserDatabase::User &user);
+    virtual unsigned fromUser(const UserDatabase::User &user);
 
     /** Computes the size of the database entry for the given user. */
-    static uint size(const UserDatabase::User &user);
+    static unsigned size(const UserDatabase::User &user);
   };
 
   /** Same index entry used by the codeplug to map normal digital contacts to an contact index. Here
@@ -84,7 +84,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    LimitsElement(uint8_t *ptr, uint size);
+    LimitsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -94,20 +94,20 @@ public:
     void clear();
 
     /** Retuns the number of entries in the DB. */
-    virtual uint count() const;
+    virtual unsigned count() const;
     /** Sets the number of entries. */
-    virtual void setCount(uint count);
+    virtual void setCount(unsigned count);
 
     /** Retunrs the end-of-db address. */
-    virtual uint endOfDB() const;
+    virtual unsigned endOfDB() const;
     /** Sets the end-of-db address. */
-    virtual void setEndOfDB(uint addr);
+    virtual void setEndOfDB(unsigned addr);
     /** Sets the total size of the DB (updated end-of-db address). */
-    virtual void setTotalSize(uint size);
+    virtual void setTotalSize(unsigned size);
 
   public:
     /** Returns the size of the encoded element. */
-    static uint size();
+    static unsigned size();
   };
 
 

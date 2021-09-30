@@ -201,7 +201,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    ChannelElement(uint8_t *ptr, uint size);
+    ChannelElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -224,9 +224,9 @@ public:
     // Replaced by analog scrambler settings
     /** The D578UV does not support the weak DMR encryption, hence this function returns always
      * 0. */
-    uint dmrEncryptionKeyIndex() const;
+    unsigned dmrEncryptionKeyIndex() const;
     /** The D578UV does not support the weak DMR encryption, hence this function has not effect. */
-    void setDMREncryptionKeyIndex(uint idx);
+    void setDMREncryptionKeyIndex(unsigned idx);
 
     /** Returns @c true if the analog scambler is enabled. */
     virtual bool analogScambler() const;

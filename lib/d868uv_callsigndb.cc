@@ -18,7 +18,7 @@
 /* ********************************************************************************************* *
  * Implementation of D868UVCallsignDB::EntryElement
  * ********************************************************************************************* */
-D868UVCallsignDB::EntryElement::EntryElement(uint8_t *ptr, uint size)
+D868UVCallsignDB::EntryElement::EntryElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -40,13 +40,13 @@ D868UVCallsignDB::EntryElement::setCallType(DigitalContact::Type type) {
 }
 
 void
-D868UVCallsignDB::EntryElement::setNumber(uint num) {
+D868UVCallsignDB::EntryElement::setNumber(unsigned num) {
   setBCD8_be(0x0001, num);
 }
 
 void
 D868UVCallsignDB::EntryElement::setRingTone(RingTone tone) {
-  setUInt8(0x0005, (uint)tone);
+  setUInt8(0x0005, (unsigned)tone);
 }
 
 void
@@ -54,7 +54,7 @@ D868UVCallsignDB::EntryElement::setContent(
     const QString &name, const QString &city, const QString &call, const QString &state,
     const QString &country, const QString &comment)
 {
-  uint addr = 0x0006;
+  unsigned addr = 0x0006;
   writeASCII(addr, name, 16, 0x00); addr += std::min(16, name.size()); setUInt8(addr, 0); addr++;
   writeASCII(addr, city, 16, 0x00); addr += std::min(16, city.size()); setUInt8(addr, 0); addr++;
   writeASCII(addr, call, 8, 0x00); addr += std::min(8, call.size()); setUInt8(addr, 0); addr++;
@@ -63,7 +63,7 @@ D868UVCallsignDB::EntryElement::setContent(
   writeASCII(addr, comment, 16, 0x00); addr += std::min(16, comment.size()); setUInt8(addr, 0); addr++;
 }
 
-uint
+unsigned
 D868UVCallsignDB::EntryElement::fromUser(const UserDatabase::User &user) {
   setCallType(DigitalContact::PrivateCall);
   setNumber(user.id);
@@ -72,7 +72,7 @@ D868UVCallsignDB::EntryElement::fromUser(const UserDatabase::User &user) {
   return size(user);
 }
 
-uint
+unsigned
 D868UVCallsignDB::EntryElement::size(const UserDatabase::User &user) {
   return 6 // header
       + std::min(16, user.name.size())+1 // name
@@ -88,7 +88,7 @@ D868UVCallsignDB::EntryElement::size(const UserDatabase::User &user) {
 /* ********************************************************************************************* *
  * Implementation of D868UVCallsignDB::LimitsElement
  * ********************************************************************************************* */
-D868UVCallsignDB::LimitsElement::LimitsElement(uint8_t *ptr, uint size)
+D868UVCallsignDB::LimitsElement::LimitsElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -106,29 +106,29 @@ D868UVCallsignDB::LimitsElement::clear() {
   setTotalSize(0);
 }
 
-uint
+unsigned
 D868UVCallsignDB::LimitsElement::count() const {
   return getUInt32_le(0x0000);
 }
 void
-D868UVCallsignDB::LimitsElement::setCount(uint count) {
+D868UVCallsignDB::LimitsElement::setCount(unsigned count) {
   setUInt32_le(0x0000, count);
 }
 
-uint
+unsigned
 D868UVCallsignDB::LimitsElement::endOfDB() const {
   return getUInt32_le(0x0004);
 }
 void
-D868UVCallsignDB::LimitsElement::setEndOfDB(uint addr) {
+D868UVCallsignDB::LimitsElement::setEndOfDB(unsigned addr) {
   setUInt32_le(0x0004, addr);
 }
 void
-D868UVCallsignDB::LimitsElement::setTotalSize(uint size) {
+D868UVCallsignDB::LimitsElement::setTotalSize(unsigned size) {
   setEndOfDB(CALLSIGN_BANK0 + size);
 }
 
-uint
+unsigned
 D868UVCallsignDB::LimitsElement::size() {
   return 0x0010;
 }
@@ -154,7 +154,7 @@ bool D868UVCallsignDB::encode(UserDatabase *db, const Selection &selection) {
   // Select n users and sort them in ascending order of their IDs
   QVector<UserDatabase::User> users;
   users.reserve(n);
-  for (uint i=0; i<n; i++)
+  for (unsigned i=0; i<n; i++)
     users.append(db->user(i));
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });

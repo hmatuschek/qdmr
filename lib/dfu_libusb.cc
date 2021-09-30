@@ -304,7 +304,7 @@ DFUDevice::identify()
 
 
 bool
-DFUDevice::erase(uint start, uint size, void(*progress)(uint, void *), void *ctx) {
+DFUDevice::erase(unsigned start, unsigned size, void(*progress)(unsigned, void *), void *ctx) {
   int error;
   // Enter Programming Mode.
   if ((error = get_status()))
@@ -315,12 +315,12 @@ DFUDevice::erase(uint start, uint size, void(*progress)(uint, void *), void *ctx
     return false;
   usleep(100000);
 
-  uint end = start+size;
+  unsigned end = start+size;
   start = align_addr(start, 0x10000);
   end = align_size(end, 0x10000);
   size = end-start;
 
-  for (uint i=0; i<size; i+=0x10000) {
+  for (unsigned i=0; i<size; i+=0x10000) {
     erase_block(start+i);
     if (progress)
       progress((i*100)/size, ctx);

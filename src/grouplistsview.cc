@@ -16,7 +16,7 @@ GroupListsView::GroupListsView(Config *config, QWidget *parent)
 
   connect(ui->addRXGroup, SIGNAL(clicked()), this, SLOT(onAddRxGroup()));
   connect(ui->remRXGroup, SIGNAL(clicked()), this, SLOT(onRemRxGroup()));
-  connect(ui->listView, SIGNAL(doubleClicked(uint)), this, SLOT(onEditRxGroup(uint)));
+  connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditRxGroup(unsigned)));
 
 }
 
@@ -71,7 +71,7 @@ GroupListsView::onRemRxGroup() {
 }
 
 void
-GroupListsView::onEditRxGroup(uint row) {
+GroupListsView::onEditRxGroup(unsigned row) {
   RXGroupListDialog dialog(_config, _config->rxGroupLists()->list(row));
   if (QDialog::Accepted != dialog.exec())
     return;

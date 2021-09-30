@@ -39,12 +39,12 @@ RadioSettings::setIntroLine2(const QString &line) {
   emit modified(this);
 }
 
-uint
+unsigned
 RadioSettings::micLevel() const {
   return _micLevel;
 }
 void
-RadioSettings::setMicLevel(uint value) {
+RadioSettings::setMicLevel(unsigned value) {
   _micLevel = value;
   emit modified(this);
 }
@@ -59,12 +59,12 @@ RadioSettings::enableSpeech(bool enabled) {
   emit modified(this);
 }
 
-uint
+unsigned
 RadioSettings::squelch() const {
   return _squelch;
 }
 void
-RadioSettings::setSquelch(uint squelch) {
+RadioSettings::setSquelch(unsigned squelch) {
   squelch = std::min(10u, squelch);
   _squelch = squelch;
   emit modified(this);
@@ -84,12 +84,12 @@ bool
 RadioSettings::voxDisabled() const {
   return 0 == vox();
 }
-uint
+unsigned
 RadioSettings::vox() const {
   return _vox;
 }
 void
-RadioSettings::setVOX(uint level) {
+RadioSettings::setVOX(unsigned level) {
   _vox = level;
   emit modified(this);
 }
@@ -102,12 +102,12 @@ bool
 RadioSettings::totDisabled() const {
   return 0==tot();
 }
-uint
+unsigned
 RadioSettings::tot() const {
   return _transmitTimeOut;
 }
 void
-RadioSettings::setTOT(uint sec) {
+RadioSettings::setTOT(unsigned sec) {
   _transmitTimeOut = sec;
   emit modified(this);
 }

@@ -26,7 +26,7 @@ public:
   QHeaderView *header() const;
 
 signals:
-  void doubleClicked(uint row);
+  void doubleClicked(unsigned row);
 
 protected slots:
   void onMoveItemUp();

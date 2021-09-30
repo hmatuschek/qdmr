@@ -84,7 +84,7 @@ AbstractConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
         return false;
       }
       prop.write(obj, node[prop.name()].as<int>());
-    } else if (QString("uint") == prop.typeName()) {
+    } else if (QString("unsigned") == prop.typeName()) {
       // If property is not set -> skip
       if (! node[prop.name()])
         continue;
@@ -95,7 +95,7 @@ AbstractConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
             .arg(prop.name()).arg(meta->className());
         return false;
       }
-      prop.write(obj, node[prop.name()].as<uint>());
+      prop.write(obj, node[prop.name()].as<unsigned>());
     } else if (QString("double") == prop.typeName()) {
       // If property is not set -> skip
       if (! node[prop.name()])
@@ -1350,13 +1350,13 @@ ChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
   if ((!node["timeout"].IsDefined()) || ("!default" == node["timeout"].Tag())) {
     channel->setDefaultTimeout();
   } else if (node["timeout"].IsDefined() && node["timeout"].IsScalar()) {
-    channel->setTimeout(node["timeout"].as<uint>());
+    channel->setTimeout(node["timeout"].as<unsigned>());
   }
 
   if ((!node["vox"].IsDefined()) || ("!default" == node["vox"].Tag())) {
     channel->setVOXDefault();
   } else if (node["vox"].IsDefined() && node["vox"].IsScalar()) {
-    channel->setVOX(node["vox"].as<uint>());
+    channel->setVOX(node["vox"].as<unsigned>());
   }
 
   if (! parseExtensions(_extensions, obj, node, ctx))
@@ -1488,7 +1488,7 @@ AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObje
   if ((!node["squelch"].IsDefined()) || ("!default" == node["squelch"].Tag())) {
     channel->setSquelchDefault();
   } else if (node["squelch"].IsDefined() && node["squelch"].IsScalar()) {
-    channel->setSquelch(node["squelch"].as<uint>());
+    channel->setSquelch(node["squelch"].as<unsigned>());
   }
 
   if (! parseExtensions(_extensions, obj, node, ctx))

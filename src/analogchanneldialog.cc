@@ -37,11 +37,11 @@ AnalogChannelDialog::construct() {
 
   rxFrequency->setValidator(new QDoubleValidator(0,500,5));
   txFrequency->setValidator(new QDoubleValidator(0,500,5));
-  powerValue->setItemData(0, uint(Channel::Power::Max));
-  powerValue->setItemData(1, uint(Channel::Power::High));
-  powerValue->setItemData(2, uint(Channel::Power::Mid));
-  powerValue->setItemData(3, uint(Channel::Power::Low));
-  powerValue->setItemData(4, uint(Channel::Power::Min));
+  powerValue->setItemData(0, unsigned(Channel::Power::Max));
+  powerValue->setItemData(1, unsigned(Channel::Power::High));
+  powerValue->setItemData(2, unsigned(Channel::Power::Mid));
+  powerValue->setItemData(3, unsigned(Channel::Power::Low));
+  powerValue->setItemData(4, unsigned(Channel::Power::Min));
   powerDefault->setChecked(true); powerValue->setEnabled(false); powerValue->setCurrentIndex(1);
   totDefault->setChecked(true); totValue->setValue(0); totValue->setEnabled(false);
   scanList->addItem(tr("[None]"), QVariant::fromValue((ScanList *)nullptr));
@@ -52,14 +52,14 @@ AnalogChannelDialog::construct() {
     if (_channel && (_channel->scanListObj() == lst) )
       scanList->setCurrentIndex(i+1);
   }
-  txAdmit->setItemData(0, uint(AnalogChannel::Admit::Always));
-  txAdmit->setItemData(1, uint(AnalogChannel::Admit::Free));
-  txAdmit->setItemData(2, uint(AnalogChannel::Admit::Tone));
+  txAdmit->setItemData(0, unsigned(AnalogChannel::Admit::Always));
+  txAdmit->setItemData(1, unsigned(AnalogChannel::Admit::Free));
+  txAdmit->setItemData(2, unsigned(AnalogChannel::Admit::Tone));
   squelchDefault->setChecked(true); squelchValue->setValue(1); squelchValue->setEnabled(false);
   populateCTCSSBox(rxTone, (nullptr != _channel ? _channel->rxTone() : Signaling::SIGNALING_NONE));
   populateCTCSSBox(txTone, (nullptr != _channel ? _channel->txTone() : Signaling::SIGNALING_NONE));
-  bandwidth->setItemData(0, uint(AnalogChannel::Bandwidth::Narrow));
-  bandwidth->setItemData(1, uint(AnalogChannel::Bandwidth::Wide));
+  bandwidth->setItemData(0, unsigned(AnalogChannel::Bandwidth::Narrow));
+  bandwidth->setItemData(1, unsigned(AnalogChannel::Bandwidth::Wide));
   aprsList->addItem(tr("[None]"), QVariant::fromValue((APRSSystem *)nullptr));
   aprsList->setCurrentIndex(0);
   for (int i=0; i<_config->posSystems()->aprsCount(); i++) {

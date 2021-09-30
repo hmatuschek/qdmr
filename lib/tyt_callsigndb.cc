@@ -41,7 +41,7 @@ TyTCallsignDB::IndexElement::clear() {
 }
 
 void
-TyTCallsignDB::IndexElement::setNumEntries(uint n) {
+TyTCallsignDB::IndexElement::setNumEntries(unsigned n) {
   uint8_t *ptr = (_data + 0x0000);
   ptr[0] = ((n>>16) & 0xff);
   ptr[1] = ((n>> 8) & 0xff);
@@ -49,7 +49,7 @@ TyTCallsignDB::IndexElement::setNumEntries(uint n) {
 }
 
 void
-TyTCallsignDB::IndexElement::setIndexEntry(uint n, uint id, uint index) {
+TyTCallsignDB::IndexElement::setIndexEntry(unsigned n, unsigned id, unsigned index) {
   Entry(_data+0x03 + n*INDEX_ENTRY_SIZE).set(id, index);
 }
 
@@ -79,7 +79,7 @@ TyTCallsignDB::IndexElement::Entry::clear() {
 }
 
 void
-TyTCallsignDB::IndexElement::Entry::set(uint id, uint index) {
+TyTCallsignDB::IndexElement::Entry::set(unsigned id, unsigned index) {
   _data[0] = id>>16;
   _data[1] = ((id>>8)&0xf0) | ((index>>16) & 0xf);
   _data[2] = index>>8;
@@ -157,7 +157,7 @@ TyTCallsignDB::encode(UserDatabase *db, const Selection &selection) {
 
   // Select n users and sort them in ascending order of their IDs
   QVector<UserDatabase::User> users;
-  for (uint i=0; i<n; i++)
+  for (unsigned i=0; i<n; i++)
     users.append(db->user(i));
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
@@ -168,12 +168,12 @@ TyTCallsignDB::encode(UserDatabase *db, const Selection &selection) {
   // First index entry
   int  j = 0;
   setIndexEntry(j++, users[0].id, 1);
-  uint cidh = (users[0].id >> 12);
+  unsigned cidh = (users[0].id >> 12);
 
   // Store users and update index
-  for (uint i=0; i<n; i++) {
+  for (unsigned i=0; i<n; i++) {
     setEntry(i, users[i]);
-    uint idh = (users[i].id >> 12);
+    unsigned idh = (users[i].id >> 12);
     if (idh != cidh) {
       setIndexEntry(j++,users[i].id, i+1);
       cidh = idh;
@@ -184,8 +184,8 @@ TyTCallsignDB::encode(UserDatabase *db, const Selection &selection) {
 }
 
 void
-TyTCallsignDB::alloate(uint n) {
-  n = std::min(n, uint(MAX_CALLSIGNS));
+TyTCallsignDB::alloate(unsigned n) {
+  n = std::min(n, unsigned(MAX_CALLSIGNS));
   qint64 size = align_size(0x0003 + INDEX_ENTRY_SIZE*NUM_INDEX_ENTRIES + CALLSIGN_ENTRY_SIZE*n, 1024);
 
   // allocate & clear memory
@@ -200,17 +200,17 @@ TyTCallsignDB::clearIndex() {
 }
 
 void
-TyTCallsignDB::setNumEntries(uint n) {
+TyTCallsignDB::setNumEntries(unsigned n) {
   IndexElement(data(ADDR_CALLSIGN_INDEX)).setNumEntries(n);
 }
 
 void
-TyTCallsignDB::setIndexEntry(uint n, uint id, uint index) {
+TyTCallsignDB::setIndexEntry(unsigned n, unsigned id, unsigned index) {
   IndexElement(data(ADDR_CALLSIGN_INDEX)).setIndexEntry(n, id, index);
 }
 
 void
-TyTCallsignDB::setEntry(uint n, const UserDatabase::User &user) {
+TyTCallsignDB::setEntry(unsigned n, const UserDatabase::User &user) {
   // Get pointer to entry
   EntryElement(data(ADDR_CALLSIGNS + n*CALLSIGN_ENTRY_SIZE)).set(user);
 }

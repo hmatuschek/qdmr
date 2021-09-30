@@ -576,13 +576,13 @@ Application::uploadCallsignDB() {
   Settings settings;
   if (settings.selectUsingUserDMRID()) {
     // Sort w.r.t users DMR ID
-    uint id = _config->radioIDs()->defaultId()->number();
+    unsigned id = _config->radioIDs()->defaultId()->number();
     logDebug() << "Sort call-signs closest to ID=" << id << ".";
     _users->sortUsers(id);
   } else {
     // sort w.r.t. chosen prefixes
-    QSet<uint> ids=settings.callSignDBPrefixes(); QStringList prefs;
-    foreach (uint pref, ids)
+    QSet<unsigned> ids=settings.callSignDBPrefixes(); QStringList prefs;
+    foreach (unsigned pref, ids)
       prefs.append(QString::number(pref));
     logDebug() << "Sort call-signs closest to IDs={" << prefs.join(", ") << "}.";
     _users->sortUsers(ids);

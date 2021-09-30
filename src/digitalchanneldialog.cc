@@ -38,11 +38,11 @@ DigitalChannelDialog::construct() {
 
   rxFrequency->setValidator(new QDoubleValidator(0,500,5));
   txFrequency->setValidator(new QDoubleValidator(0,500,5));
-  powerValue->setItemData(0, uint(Channel::Power::Max));
-  powerValue->setItemData(1, uint(Channel::Power::High));
-  powerValue->setItemData(2, uint(Channel::Power::Mid));
-  powerValue->setItemData(3, uint(Channel::Power::Low));
-  powerValue->setItemData(4, uint(Channel::Power::Min));
+  powerValue->setItemData(0, unsigned(Channel::Power::Max));
+  powerValue->setItemData(1, unsigned(Channel::Power::High));
+  powerValue->setItemData(2, unsigned(Channel::Power::Mid));
+  powerValue->setItemData(3, unsigned(Channel::Power::Low));
+  powerValue->setItemData(4, unsigned(Channel::Power::Min));
   powerDefault->setChecked(true); powerValue->setCurrentIndex(1); powerValue->setEnabled(false);
   totDefault->setChecked(true); totValue->setValue(0); totValue->setEnabled(false);
   scanList->addItem(tr("[None]"), QVariant::fromValue((ScanList *)(nullptr)));
@@ -53,11 +53,11 @@ DigitalChannelDialog::construct() {
     if (_channel && (_channel->scanListObj() == _config->scanlists()->scanlist(i)) )
       scanList->setCurrentIndex(i+1);
   }
-  txAdmit->setItemData(0, uint(DigitalChannel::Admit::Always));
-  txAdmit->setItemData(1, uint(DigitalChannel::Admit::Free));
-  txAdmit->setItemData(2, uint(DigitalChannel::Admit::ColorCode));
-  timeSlot->setItemData(0, uint(DigitalChannel::TimeSlot::TS1));
-  timeSlot->setItemData(1, uint(DigitalChannel::TimeSlot::TS2));
+  txAdmit->setItemData(0, unsigned(DigitalChannel::Admit::Always));
+  txAdmit->setItemData(1, unsigned(DigitalChannel::Admit::Free));
+  txAdmit->setItemData(2, unsigned(DigitalChannel::Admit::ColorCode));
+  timeSlot->setItemData(0, unsigned(DigitalChannel::TimeSlot::TS1));
+  timeSlot->setItemData(1, unsigned(DigitalChannel::TimeSlot::TS2));
   populateRXGroupListBox(rxGroupList, _config->rxGroupLists(),
                          (nullptr != _channel ? _channel->groupListObj() : nullptr));
   txContact->addItem(tr("[None]"), QVariant::fromValue(nullptr));

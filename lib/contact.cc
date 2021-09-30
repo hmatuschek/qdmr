@@ -74,7 +74,7 @@ DTMFContact::serialize(const Context &context) {
 /* ********************************************************************************************* *
  * Implementation of DigitalContact
  * ********************************************************************************************* */
-DigitalContact::DigitalContact(Type type, const QString &name, uint number, bool rxTone, QObject *parent)
+DigitalContact::DigitalContact(Type type, const QString &name, unsigned number, bool rxTone, QObject *parent)
   : Contact(name, rxTone, parent), _type(type), _number(number)
 {
   // pass...
@@ -90,13 +90,13 @@ DigitalContact::setType(DigitalContact::Type type) {
   _type = type;
 }
 
-uint
+unsigned
 DigitalContact::number() const {
   return _number;
 }
 
 bool
-DigitalContact::setNumber(uint number) {
+DigitalContact::setNumber(unsigned number) {
   _number = number;
   emit modified(this);
   return true;
@@ -194,7 +194,7 @@ ContactList::digitalContact(int idx) const {
 }
 
 DigitalContact *
-ContactList::findDigitalContact(uint number) const {
+ContactList::findDigitalContact(unsigned number) const {
   for (int i=0; i<_items.size(); i++) {
     if (! _items.at(i)->is<DigitalContact>())
       continue;

@@ -17,11 +17,11 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   ui->mic->setValue(_config->settings()->micLevel());
   ui->speech->setChecked(_config->settings()->speech());
 
-  ui->powerValue->setItemData(0, (uint)Channel::Power::Max);
-  ui->powerValue->setItemData(1, (uint)Channel::Power::High);
-  ui->powerValue->setItemData(2, (uint)Channel::Power::Mid);
-  ui->powerValue->setItemData(3, (uint)Channel::Power::Low);
-  ui->powerValue->setItemData(4, (uint)Channel::Power::Min);
+  ui->powerValue->setItemData(0, (unsigned)Channel::Power::Max);
+  ui->powerValue->setItemData(1, (unsigned)Channel::Power::High);
+  ui->powerValue->setItemData(2, (unsigned)Channel::Power::Mid);
+  ui->powerValue->setItemData(3, (unsigned)Channel::Power::Low);
+  ui->powerValue->setItemData(4, (unsigned)Channel::Power::Min);
 
   switch(_config->settings()->power()) {
   case Channel::Power::Max: ui->powerValue->setCurrentIndex(0); break;

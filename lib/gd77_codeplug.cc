@@ -74,7 +74,7 @@ GD77Codeplug::ChannelElement::artsMode() const {
 }
 void
 GD77Codeplug::ChannelElement::setARTSMode(ARTSMode mode) {
-  setUInt2(0x0030, 0, (uint)mode);
+  setUInt2(0x0030, 0, (unsigned)mode);
 }
 
 GD77Codeplug::ChannelElement::STEAngle
@@ -83,7 +83,7 @@ GD77Codeplug::ChannelElement::steAngle() const {
 }
 void
 GD77Codeplug::ChannelElement::setSTEAngle(STEAngle angle) {
-  setUInt2(0x0032, 6, (uint)angle);
+  setUInt2(0x0032, 6, (unsigned)angle);
 }
 
 GD77Codeplug::ChannelElement::PTTId
@@ -92,7 +92,7 @@ GD77Codeplug::ChannelElement::pttIDMode() const {
 }
 void
 GD77Codeplug::ChannelElement::setPTTIDMode(PTTId mode) {
-  setUInt2(0x0032, 2, (uint)mode);
+  setUInt2(0x0032, 2, (unsigned)mode);
 }
 
 bool
@@ -126,7 +126,7 @@ GD77Codeplug::ChannelElement::enableAutoscan(bool enable) {
 /* ******************************************************************************************** *
  * Implementation of GD77Codeplug::ContactElement
  * ******************************************************************************************** */
-GD77Codeplug::ContactElement::ContactElement(uint8_t *ptr, uint size)
+GD77Codeplug::ContactElement::ContactElement(uint8_t *ptr, unsigned size)
   : RadioddityCodeplug::ContactElement(ptr, size)
 {
   // pass...
@@ -165,7 +165,7 @@ GD77Codeplug::ContactElement::fromContactObj(const DigitalContact *obj, Context 
 /* ******************************************************************************************** *
  * Implementation of GD77Codeplug::ScanListElement
  * ******************************************************************************************** */
-GD77Codeplug::ScanListElement::ScanListElement(uint8_t *ptr, uint size)
+GD77Codeplug::ScanListElement::ScanListElement(uint8_t *ptr, unsigned size)
   : RadioddityCodeplug::ScanListElement(ptr, size)
 {
   // pass...
@@ -187,7 +187,7 @@ GD77Codeplug::ScanListElement::clear() {
 /* ******************************************************************************************** *
  * Implementation of GD77Codeplug::ScanListBankElement
  * ******************************************************************************************** */
-GD77Codeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr, uint size)
+GD77Codeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr, unsigned size)
   : RadioddityCodeplug::ScanListBankElement(ptr, size)
 {
   // pass...
@@ -205,7 +205,7 @@ GD77Codeplug::ScanListBankElement::clear() {
 }
 
 uint8_t *
-GD77Codeplug::ScanListBankElement::get(uint n) const {
+GD77Codeplug::ScanListBankElement::get(unsigned n) const {
   return _data+0x0040 + n*0x0058;
 }
 
@@ -213,7 +213,7 @@ GD77Codeplug::ScanListBankElement::get(uint n) const {
 /* ******************************************************************************************** *
  * Implementation of GD77Codeplug::GroupListElement
  * ******************************************************************************************** */
-GD77Codeplug::GroupListElement::GroupListElement(uint8_t *ptr, uint size)
+GD77Codeplug::GroupListElement::GroupListElement(uint8_t *ptr, unsigned size)
   : RadioddityCodeplug::GroupListElement(ptr, size)
 {
   // pass...
@@ -229,7 +229,7 @@ GD77Codeplug::GroupListElement::GroupListElement(uint8_t *ptr)
 /* ******************************************************************************************** *
  * Implementation of GD77Codeplug::GroupListBankElement
  * ******************************************************************************************** */
-GD77Codeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr, uint size)
+GD77Codeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr, unsigned size)
   : RadioddityCodeplug::GroupListBankElement(ptr, size)
 {
   // pass...
@@ -242,7 +242,7 @@ GD77Codeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr)
 }
 
 uint8_t *
-GD77Codeplug::GroupListBankElement::get(uint n) const {
+GD77Codeplug::GroupListBankElement::get(unsigned n) const {
   return _data + 0x80 + n*GROUPLIST_SIZE;
 }
 

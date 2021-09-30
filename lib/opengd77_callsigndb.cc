@@ -68,8 +68,8 @@ OpenGD77CallsignDB::userdb_t::clear() {
 }
 
 void
-OpenGD77CallsignDB::userdb_t::setSize(uint n) {
-  count = qToLittleEndian(std::min(n, uint(USERDB_NUM_ENTRIES)));
+OpenGD77CallsignDB::userdb_t::setSize(unsigned n) {
+  count = qToLittleEndian(std::min(n, unsigned(USERDB_NUM_ENTRIES)));
 }
 
 
@@ -98,20 +98,20 @@ OpenGD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection) {
 
   // Select first n entries and sort them in ascending order of their IDs
   QVector<UserDatabase::User> users;
-  for (uint i=0; i<n; i++)
+  for (unsigned i=0; i<n; i++)
     users.append(calldb->user(i));
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
 
   // Allocate segment for user db if requested
-  uint size = align_size(sizeof(userdb_t)+n*sizeof(userdb_entry_t), BLOCK_SIZE);
+  unsigned size = align_size(sizeof(userdb_t)+n*sizeof(userdb_entry_t), BLOCK_SIZE);
   this->image(0).addElement(OFFSET_USERDB, size);
 
   // Encode user DB
   userdb_t *userdb = (userdb_t *)this->data(OFFSET_USERDB);
   userdb->clear(); userdb->setSize(n);
   userdb_entry_t *db = (userdb_entry_t *)this->data(OFFSET_USERDB+sizeof(userdb_t));
-  for (uint i=0; i<n; i++) {
+  for (unsigned i=0; i<n; i++) {
     db[i].fromEntry(users[i]);
   }
 

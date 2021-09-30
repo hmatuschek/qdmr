@@ -20,8 +20,8 @@ RoamingZoneListView::RoamingZoneListView(Config *config, QWidget *parent)
   connect(ui->addRoamingZone, SIGNAL(clicked()), this, SLOT(onAddRoamingZone()));
   connect(ui->genRoamingZone, SIGNAL(clicked(bool)), this, SLOT(onGenRoamingZone()));
   connect(ui->remRoamingZone, SIGNAL(clicked()), this, SLOT(onRemRoamingZone()));
-  connect(ui->listView, SIGNAL(doubleClicked(uint)),
-          this, SLOT(onEditRoamingZone(uint)));
+  connect(ui->listView, SIGNAL(doubleClicked(unsigned)),
+          this, SLOT(onEditRoamingZone(unsigned)));
   connect(ui->roamingNote, SIGNAL(linkActivated(QString)), this, SLOT(onHideRoamingNote()));
 
   if (settings.hideRoamingNote())
@@ -110,7 +110,7 @@ RoamingZoneListView::onRemRoamingZone() {
 }
 
 void
-RoamingZoneListView::onEditRoamingZone(uint row) {
+RoamingZoneListView::onEditRoamingZone(unsigned row) {
   RoamingZoneDialog dialog(_config, _config->roaming()->zone(row));
   if (QDialog::Accepted != dialog.exec())
     return;

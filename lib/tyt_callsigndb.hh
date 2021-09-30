@@ -50,7 +50,7 @@ public:
       void clear();
 
       /** Sets the index entry. */
-      virtual void set(uint id, uint index);
+      virtual void set(unsigned id, unsigned index);
     };
 
   protected:
@@ -66,9 +66,9 @@ public:
     void clear();
 
     /** Sets the number of entries in the DB. */
-    virtual void setNumEntries(uint n);
+    virtual void setNumEntries(unsigned n);
     /** Sets the given index entry. */
-    virtual void setIndexEntry(uint n, uint id, uint index);
+    virtual void setIndexEntry(unsigned n, unsigned id, unsigned index);
   };
 
   /** Represents an entry within the call-sign database.
@@ -106,16 +106,16 @@ public:
 
 protected:
   /** Allocates required space for index and @c n call-signs. */
-  virtual void alloate(uint n);
+  virtual void alloate(unsigned n);
 
   /** Clears the call-sign DB index. */
   virtual void clearIndex();
   /** Sets the number of entries in the DB. */
-  virtual void setNumEntries(uint n);
+  virtual void setNumEntries(unsigned n);
   /** Sets the given index entry. */
-  virtual void setIndexEntry(uint n, uint id, uint index);
+  virtual void setIndexEntry(unsigned n, unsigned id, unsigned index);
   /** Sets a given call-sign entry. */
-  virtual void setEntry(uint n, const UserDatabase::User &user);
+  virtual void setEntry(unsigned n, const UserDatabase::User &user);
 };
 
 #endif // TYTCALLSIGNDB_HH

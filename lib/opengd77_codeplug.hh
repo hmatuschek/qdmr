@@ -91,9 +91,9 @@ public:
     /** Returns @c true if the squelch is set to radio wide default. */
     virtual bool squelchIsDefault() const;
     /** Returns the quelch value [0-10]. 0=open, 10=closed. */
-    virtual uint squelch() const;
+    virtual unsigned squelch() const;
     /** Sets the squelch value. */
-    virtual void setSquelch(uint squelch);
+    virtual void setSquelch(unsigned squelch);
     /** Sets the squelch to radio wide default. */
     virtual void setSquelchDefault();
 
@@ -122,7 +122,7 @@ public:
     /** Constructor. */
     explicit ZoneBankElement(uint8_t *ptr);
 
-    uint8_t *get(uint n) const;
+    uint8_t *get(unsigned n) const;
   };
 
   /** Implements the OpenGD77 specific DMR contact.

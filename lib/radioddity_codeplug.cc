@@ -89,23 +89,23 @@ RadioddityCodeplug::ChannelElement::mode() const {
 }
 void
 RadioddityCodeplug::ChannelElement::setMode(Mode mode) {
-  setUInt8(0x0018, (uint)mode);
+  setUInt8(0x0018, (unsigned)mode);
 }
 
-uint
+unsigned
 RadioddityCodeplug::ChannelElement::txTimeOut() const {
   return getUInt8(0x001b)*15;
 }
 void
-RadioddityCodeplug::ChannelElement::setTXTimeOut(uint tot) {
+RadioddityCodeplug::ChannelElement::setTXTimeOut(unsigned tot) {
   setUInt8(0x001b, tot/15);
 }
-uint
+unsigned
 RadioddityCodeplug::ChannelElement::txTimeOutRekeyDelay() const {
   return getUInt8(0x001c);
 }
 void
-RadioddityCodeplug::ChannelElement::setTXTimeOutRekeyDelay(uint delay) {
+RadioddityCodeplug::ChannelElement::setTXTimeOutRekeyDelay(unsigned delay) {
   setUInt8(0x001c, delay);
 }
 
@@ -115,19 +115,19 @@ RadioddityCodeplug::ChannelElement::admitCriterion() const {
 }
 void
 RadioddityCodeplug::ChannelElement::setAdmitCriterion(Admit admit) {
-  setUInt8(0x001d, (uint)admit);
+  setUInt8(0x001d, (unsigned)admit);
 }
 
 bool
 RadioddityCodeplug::ChannelElement::hasScanList() const {
   return 0!=scanListIndex();
 }
-uint
+unsigned
 RadioddityCodeplug::ChannelElement::scanListIndex() const {
   return getUInt8(0x001f);
 }
 void
-RadioddityCodeplug::ChannelElement::setScanListIndex(uint index) {
+RadioddityCodeplug::ChannelElement::setScanListIndex(unsigned index) {
   setUInt8(0x001f, index);
 }
 
@@ -148,20 +148,20 @@ RadioddityCodeplug::ChannelElement::setTXTone(Signaling::Code code) {
   setUInt16_le(0x0022, encode_ctcss_tone_table(code));
 }
 
-uint
+unsigned
 RadioddityCodeplug::ChannelElement::txSignalingIndex() const {
   return getUInt8(0x0025);
 }
 void
-RadioddityCodeplug::ChannelElement::setTXSignalingIndex(uint index) {
+RadioddityCodeplug::ChannelElement::setTXSignalingIndex(unsigned index) {
   setUInt8(0x0025, index);
 }
-uint
+unsigned
 RadioddityCodeplug::ChannelElement::rxSignalingIndex() const {
   return getUInt8(0x0027);
 }
 void
-RadioddityCodeplug::ChannelElement::setRXSignalingIndex(uint index) {
+RadioddityCodeplug::ChannelElement::setRXSignalingIndex(unsigned index) {
   setUInt8(0x0027, index);
 }
 
@@ -171,15 +171,15 @@ RadioddityCodeplug::ChannelElement::privacyGroup() const {
 }
 void
 RadioddityCodeplug::ChannelElement::setPrivacyGroup(PrivacyGroup grp) {
-  setUInt8(0x0029, (uint)grp);
+  setUInt8(0x0029, (unsigned)grp);
 }
 
-uint
+unsigned
 RadioddityCodeplug::ChannelElement::txColorCode() const {
   return getUInt8(0x002a);
 }
 void
-RadioddityCodeplug::ChannelElement::setTXColorCode(uint cc) {
+RadioddityCodeplug::ChannelElement::setTXColorCode(unsigned cc) {
   setUInt8(0x002a, cc);
 }
 
@@ -187,21 +187,21 @@ bool
 RadioddityCodeplug::ChannelElement::hasGroupList() const {
   return 0!=groupListIndex();
 }
-uint
+unsigned
 RadioddityCodeplug::ChannelElement::groupListIndex() const {
   return getUInt8(0x002b);
 }
 void
-RadioddityCodeplug::ChannelElement::setGroupListIndex(uint index) {
+RadioddityCodeplug::ChannelElement::setGroupListIndex(unsigned index) {
   setUInt8(0x002b, index);
 }
 
-uint
+unsigned
 RadioddityCodeplug::ChannelElement::rxColorCode() const {
   return getUInt8(0x002c);
 }
 void
-RadioddityCodeplug::ChannelElement::setRXColorCode(uint cc) {
+RadioddityCodeplug::ChannelElement::setRXColorCode(unsigned cc) {
   setUInt8(0x002c, cc);
 }
 
@@ -209,12 +209,12 @@ bool
 RadioddityCodeplug::ChannelElement::hasEmergencySystem() const {
   return 0!=emergencySystemIndex();
 }
-uint
+unsigned
 RadioddityCodeplug::ChannelElement::emergencySystemIndex() const {
   return getUInt8(0x002d);
 }
 void
-RadioddityCodeplug::ChannelElement::setEmergencySystemIndex(uint index) {
+RadioddityCodeplug::ChannelElement::setEmergencySystemIndex(unsigned index) {
   setUInt8(0x002d, index);
 }
 
@@ -222,12 +222,12 @@ bool
 RadioddityCodeplug::ChannelElement::hasContact() const {
   return 0!=contactIndex();
 }
-uint
+unsigned
 RadioddityCodeplug::ChannelElement::contactIndex() const {
   return getUInt16_le(0x002e);
 }
 void
-RadioddityCodeplug::ChannelElement::setContactIndex(uint index) {
+RadioddityCodeplug::ChannelElement::setContactIndex(unsigned index) {
   setUInt16_le(0x002e, index);
 }
 
@@ -456,7 +456,7 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::ChannelBankElement
  * ********************************************************************************************* */
-RadioddityCodeplug::ChannelBankElement::ChannelBankElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::ChannelBankElement::ChannelBankElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -478,18 +478,18 @@ RadioddityCodeplug::ChannelBankElement::clear() {
 }
 
 bool
-RadioddityCodeplug::ChannelBankElement::isEnabled(uint idx) const {
-  uint byte = idx/8, bit = idx%8;
+RadioddityCodeplug::ChannelBankElement::isEnabled(unsigned idx) const {
+  unsigned byte = idx/8, bit = idx%8;
   return getBit(byte, bit);
 }
 void
-RadioddityCodeplug::ChannelBankElement::enable(uint idx, bool enabled) {
-  uint byte = idx/8, bit = idx%8;
+RadioddityCodeplug::ChannelBankElement::enable(unsigned idx, bool enabled) {
+  unsigned byte = idx/8, bit = idx%8;
   return setBit(byte, bit, enabled);
 }
 
 uint8_t *
-RadioddityCodeplug::ChannelBankElement::get(uint idx) const {
+RadioddityCodeplug::ChannelBankElement::get(unsigned idx) const {
   return (_data+0x10)+idx*0x38;
 }
 
@@ -497,7 +497,7 @@ RadioddityCodeplug::ChannelBankElement::get(uint idx) const {
 /* ******************************************************************************************** *
  * Implementation of RadioddityCodeplug::VFOChannelElement
  * ******************************************************************************************** */
-RadioddityCodeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr, unsigned size)
   : ChannelElement(ptr, size)
 {
   // pass...
@@ -545,21 +545,21 @@ RadioddityCodeplug::VFOChannelElement::stepSize() const {
 void
 RadioddityCodeplug::VFOChannelElement::setStepSize(double kHz) {
   if (2.5 >= kHz)
-    setUInt4(0x0036, 4, (uint)StepSize::SS2_5kHz);
+    setUInt4(0x0036, 4, (unsigned)StepSize::SS2_5kHz);
   else if (5.0 >= kHz)
-    setUInt4(0x0036, 4, (uint)StepSize::SS5kHz);
+    setUInt4(0x0036, 4, (unsigned)StepSize::SS5kHz);
   else if (6.25 >= kHz)
-    setUInt4(0x0036, 4, (uint)StepSize::SS6_25kHz);
+    setUInt4(0x0036, 4, (unsigned)StepSize::SS6_25kHz);
   else if (10.0 >= kHz)
-    setUInt4(0x0036, 4, (uint)StepSize::SS10kHz);
+    setUInt4(0x0036, 4, (unsigned)StepSize::SS10kHz);
   else if (12.5 >= kHz)
-    setUInt4(0x0036, 4, (uint)StepSize::SS12_5kHz);
+    setUInt4(0x0036, 4, (unsigned)StepSize::SS12_5kHz);
   else if (20.0 >= kHz)
-    setUInt4(0x0036, 4, (uint)StepSize::SS20kHz);
+    setUInt4(0x0036, 4, (unsigned)StepSize::SS20kHz);
   else if (30.0 >= kHz)
-    setUInt4(0x0036, 4, (uint)StepSize::SS30kHz);
+    setUInt4(0x0036, 4, (unsigned)StepSize::SS30kHz);
   else
-    setUInt4(0x0036, 4, (uint)StepSize::SS50kHz);
+    setUInt4(0x0036, 4, (unsigned)StepSize::SS50kHz);
 }
 
 RadioddityCodeplug::VFOChannelElement::OffsetMode
@@ -568,7 +568,7 @@ RadioddityCodeplug::VFOChannelElement::offsetMode() const {
 }
 void
 RadioddityCodeplug::VFOChannelElement::setOffsetMode(OffsetMode mode) {
-  setUInt2(0x0036, 2, (uint)mode);
+  setUInt2(0x0036, 2, (unsigned)mode);
 }
 double
 RadioddityCodeplug::VFOChannelElement::txOffset() const {
@@ -583,7 +583,7 @@ RadioddityCodeplug::VFOChannelElement::setTXOffset(double f) {
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::ContactElement
  * ********************************************************************************************* */
-RadioddityCodeplug::ContactElement::ContactElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::ContactElement::ContactElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -623,12 +623,12 @@ RadioddityCodeplug::ContactElement::setName(const QString name) {
   writeASCII(0x0000, name, 16, 0xff);
 }
 
-uint
+unsigned
 RadioddityCodeplug::ContactElement::number() const {
   return getBCD8_be(0x0010);
 }
 void
-RadioddityCodeplug::ContactElement::setNumber(uint id) {
+RadioddityCodeplug::ContactElement::setNumber(unsigned id) {
   setBCD8_be(0x0010, id);
 }
 
@@ -663,12 +663,12 @@ RadioddityCodeplug::ContactElement::enableRing(bool enable) {
     setUInt8(0x0015, 0);
 }
 
-uint
+unsigned
 RadioddityCodeplug::ContactElement::ringStyle() const {
   return getUInt8(0x0016);
 }
 void
-RadioddityCodeplug::ContactElement::setRingStyle(uint style) {
+RadioddityCodeplug::ContactElement::setRingStyle(unsigned style) {
   style = std::min(style, 10u);
   setUInt8(0x0016, style);
 }
@@ -697,7 +697,7 @@ RadioddityCodeplug::ContactElement::fromContactObj(const DigitalContact *cont, C
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::DTMFContactElement
  * ********************************************************************************************* */
-RadioddityCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -757,7 +757,7 @@ RadioddityCodeplug::DTMFContactElement::fromContactObj(const DTMFContact *cont, 
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::ZoneElement
  * ********************************************************************************************* */
-RadioddityCodeplug::ZoneElement::ZoneElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::ZoneElement::ZoneElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -793,19 +793,19 @@ RadioddityCodeplug::ZoneElement::setName(const QString &name) {
 }
 
 bool
-RadioddityCodeplug::ZoneElement::hasMember(uint n) const {
+RadioddityCodeplug::ZoneElement::hasMember(unsigned n) const {
   return (0 != member(n));
 }
-uint
-RadioddityCodeplug::ZoneElement::member(uint n) const {
+unsigned
+RadioddityCodeplug::ZoneElement::member(unsigned n) const {
   return getUInt16_le(0x0010+2*n);
 }
 void
-RadioddityCodeplug::ZoneElement::setMember(uint n, uint idx) {
+RadioddityCodeplug::ZoneElement::setMember(unsigned n, unsigned idx) {
   setUInt16_le(0x0010+n*2, idx);
 }
 void
-RadioddityCodeplug::ZoneElement::clearMember(uint n) {
+RadioddityCodeplug::ZoneElement::clearMember(unsigned n) {
   setMember(n, 0);
 }
 
@@ -870,7 +870,7 @@ RadioddityCodeplug::ZoneElement::fromZoneObjB(const Zone *zone, Context &ctx) {
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::ZoneBankElement
  * ********************************************************************************************* */
-RadioddityCodeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -892,17 +892,17 @@ RadioddityCodeplug::ZoneBankElement::clear() {
 }
 
 bool
-RadioddityCodeplug::ZoneBankElement::isEnabled(uint idx) const {
-  uint byte=idx/8, bit = idx%8;
+RadioddityCodeplug::ZoneBankElement::isEnabled(unsigned idx) const {
+  unsigned byte=idx/8, bit = idx%8;
   return getBit(byte, bit);
 }
 void
-RadioddityCodeplug::ZoneBankElement::enable(uint idx, bool enabled) {
-  uint byte=idx/8, bit = idx%8;
+RadioddityCodeplug::ZoneBankElement::enable(unsigned idx, bool enabled) {
+  unsigned byte=idx/8, bit = idx%8;
   setBit(byte, bit, enabled);
 }
 uint8_t *
-RadioddityCodeplug::ZoneBankElement::get(uint idx) const {
+RadioddityCodeplug::ZoneBankElement::get(unsigned idx) const {
   return _data + 0x0020 + idx*0x0030;
 }
 
@@ -910,7 +910,7 @@ RadioddityCodeplug::ZoneBankElement::get(uint idx) const {
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::GroupListElement
  * ********************************************************************************************* */
-RadioddityCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -942,19 +942,19 @@ RadioddityCodeplug::GroupListElement::setName(const QString &name) {
 }
 
 bool
-RadioddityCodeplug::GroupListElement::hasMember(uint n) const {
+RadioddityCodeplug::GroupListElement::hasMember(unsigned n) const {
   return 0!=member(n);
 }
-uint
-RadioddityCodeplug::GroupListElement::member(uint n) const {
+unsigned
+RadioddityCodeplug::GroupListElement::member(unsigned n) const {
   return getUInt16_le(0x0010 + 2*n);
 }
 void
-RadioddityCodeplug::GroupListElement::setMember(uint n, uint idx) {
+RadioddityCodeplug::GroupListElement::setMember(unsigned n, unsigned idx) {
   return setUInt16_le(0x0010+2*n, idx);
 }
 void
-RadioddityCodeplug::GroupListElement::clearMember(uint n) {
+RadioddityCodeplug::GroupListElement::clearMember(unsigned n) {
   setMember(n,0);
 }
 
@@ -993,7 +993,7 @@ RadioddityCodeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst,
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::GroupListBankElement
  * ********************************************************************************************* */
-RadioddityCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -1015,24 +1015,24 @@ RadioddityCodeplug::GroupListBankElement::clear() {
 }
 
 bool
-RadioddityCodeplug::GroupListBankElement::isEnabled(uint n) const {
+RadioddityCodeplug::GroupListBankElement::isEnabled(unsigned n) const {
   return 0 != getUInt8(n);
 }
-uint
-RadioddityCodeplug::GroupListBankElement::contactCount(uint n) const {
+unsigned
+RadioddityCodeplug::GroupListBankElement::contactCount(unsigned n) const {
   return getUInt8(n)-1;
 }
 void
-RadioddityCodeplug::GroupListBankElement::setContactCount(uint n, uint size) {
+RadioddityCodeplug::GroupListBankElement::setContactCount(unsigned n, unsigned size) {
   setUInt8(n, size+1);
 }
 void
-RadioddityCodeplug::GroupListBankElement::disable(uint n) {
+RadioddityCodeplug::GroupListBankElement::disable(unsigned n) {
   setUInt8(n, 0);
 }
 
 uint8_t *
-RadioddityCodeplug::GroupListBankElement::get(uint n) const {
+RadioddityCodeplug::GroupListBankElement::get(unsigned n) const {
   return _data + 0x80 + n*0x30;
 }
 
@@ -1040,7 +1040,7 @@ RadioddityCodeplug::GroupListBankElement::get(uint n) const {
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::ScanListElement
  * ********************************************************************************************* */
-RadioddityCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -1093,7 +1093,7 @@ RadioddityCodeplug::ScanListElement::mode() const {
 }
 void
 RadioddityCodeplug::ScanListElement::setMode(Mode mode) {
-  setUInt2(0x000f, 5, (uint)mode);
+  setUInt2(0x000f, 5, (unsigned)mode);
 }
 
 bool
@@ -1106,27 +1106,27 @@ RadioddityCodeplug::ScanListElement::enableTalkback(bool enable) {
 }
 
 bool
-RadioddityCodeplug::ScanListElement::hasMember(uint n) const {
+RadioddityCodeplug::ScanListElement::hasMember(unsigned n) const {
   return 0 != getUInt16_le(0x0010+2*n);
 }
 bool
-RadioddityCodeplug::ScanListElement::isSelected(uint n) const {
+RadioddityCodeplug::ScanListElement::isSelected(unsigned n) const {
   return 1 == getUInt16_le(0x0010+2*n);
 }
-uint
-RadioddityCodeplug::ScanListElement::member(uint n) const {
+unsigned
+RadioddityCodeplug::ScanListElement::member(unsigned n) const {
   return getUInt16_le(0x0010 + 2*n)-1;
 }
 void
-RadioddityCodeplug::ScanListElement::setMember(uint n, uint idx) {
+RadioddityCodeplug::ScanListElement::setMember(unsigned n, unsigned idx) {
   setUInt16_le(0x0010+2*n, idx+1);
 }
 void
-RadioddityCodeplug::ScanListElement::setSelected(uint n) {
+RadioddityCodeplug::ScanListElement::setSelected(unsigned n) {
   setUInt16_le(0x0010+2*n, 1);
 }
 void
-RadioddityCodeplug::ScanListElement::clearMember(uint n) {
+RadioddityCodeplug::ScanListElement::clearMember(unsigned n) {
   setUInt16_le(0x0010+2*n, 0);
 }
 
@@ -1138,12 +1138,12 @@ bool
 RadioddityCodeplug::ScanListElement::primaryIsSelected() const {
   return 1 == getUInt16_le(0x0050);
 }
-uint
+unsigned
 RadioddityCodeplug::ScanListElement::primary() const {
   return getUInt16_le(0x0050)-1;
 }
 void
-RadioddityCodeplug::ScanListElement::setPrimary(uint idx) {
+RadioddityCodeplug::ScanListElement::setPrimary(unsigned idx) {
   setUInt16_le(0x0050, idx+1);
 }
 void
@@ -1163,12 +1163,12 @@ bool
 RadioddityCodeplug::ScanListElement::secondaryIsSelected() const {
   return 1 == getUInt16_le(0x0052);
 }
-uint
+unsigned
 RadioddityCodeplug::ScanListElement::secondary() const {
   return getUInt16_le(0x0052)-1;
 }
 void
-RadioddityCodeplug::ScanListElement::setSecondary(uint idx) {
+RadioddityCodeplug::ScanListElement::setSecondary(unsigned idx) {
   setUInt16_le(0x0052, idx+1);
 }
 void
@@ -1188,12 +1188,12 @@ bool
 RadioddityCodeplug::ScanListElement::revertIsSelected() const {
   return 1 == getUInt16_le(0x0054);
 }
-uint
+unsigned
 RadioddityCodeplug::ScanListElement::revert() const {
   return getUInt16_le(0x0054)-1;
 }
 void
-RadioddityCodeplug::ScanListElement::setRevert(uint idx) {
+RadioddityCodeplug::ScanListElement::setRevert(unsigned idx) {
   setUInt16_le(0x0054, idx+1);
 }
 void
@@ -1205,21 +1205,21 @@ RadioddityCodeplug::ScanListElement::clearRevert() {
   setUInt16_le(0x0054, 0);
 }
 
-uint
+unsigned
 RadioddityCodeplug::ScanListElement::holdTime() const {
-  return uint(getUInt8(0x0056))*25;
+  return unsigned(getUInt8(0x0056))*25;
 }
 void
-RadioddityCodeplug::ScanListElement::setHoldTime(uint ms) {
+RadioddityCodeplug::ScanListElement::setHoldTime(unsigned ms) {
   setUInt8(0x0056, ms/25);
 }
 
-uint
+unsigned
 RadioddityCodeplug::ScanListElement::prioritySampleTime() const {
-  return uint(getUInt8(0x0057))*250;
+  return unsigned(getUInt8(0x0057))*250;
 }
 void
-RadioddityCodeplug::ScanListElement::setPrioritySampleTime(uint ms) {
+RadioddityCodeplug::ScanListElement::setPrioritySampleTime(unsigned ms) {
   setUInt8(0x0057, ms/250);
 }
 
@@ -1287,7 +1287,7 @@ RadioddityCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, Contex
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::ScanListBankElement
  * ********************************************************************************************* */
-RadioddityCodeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -1309,11 +1309,11 @@ RadioddityCodeplug::ScanListBankElement::clear() {
 }
 
 bool
-RadioddityCodeplug::ScanListBankElement::isEnabled(uint n) const {
+RadioddityCodeplug::ScanListBankElement::isEnabled(unsigned n) const {
   return 0x00 != getUInt8(n);
 }
 void
-RadioddityCodeplug::ScanListBankElement::enable(uint n, bool enabled) {
+RadioddityCodeplug::ScanListBankElement::enable(unsigned n, bool enabled) {
   if (enabled)
     setUInt8(n, 0x01);
   else
@@ -1321,7 +1321,7 @@ RadioddityCodeplug::ScanListBankElement::enable(uint n, bool enabled) {
 }
 
 uint8_t *
-RadioddityCodeplug::ScanListBankElement::get(uint n) const {
+RadioddityCodeplug::ScanListBankElement::get(unsigned n) const {
   return _data+0x0100 + n*0x0058;
 }
 
@@ -1329,7 +1329,7 @@ RadioddityCodeplug::ScanListBankElement::get(uint n) const {
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::GeneralSettingsElement
  * ********************************************************************************************* */
-RadioddityCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pas...
@@ -1404,21 +1404,21 @@ RadioddityCodeplug::GeneralSettingsElement::setName(const QString &name) {
   writeASCII(0x0000, name, 8, 0xff);
 }
 
-uint
+unsigned
 RadioddityCodeplug::GeneralSettingsElement::radioID() const {
   return getBCD8_be(0x0008);
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setRadioID(uint id) {
+RadioddityCodeplug::GeneralSettingsElement::setRadioID(unsigned id) {
   setBCD8_be(0x0008, id);
 }
 
-uint
+unsigned
 RadioddityCodeplug::GeneralSettingsElement::preambleDuration() const {
-  return uint(getUInt8(0x0011)*60);
+  return unsigned(getUInt8(0x0011)*60);
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setPreambleDuration(uint ms) {
+RadioddityCodeplug::GeneralSettingsElement::setPreambleDuration(unsigned ms) {
   setUInt8(0x0011, ms/60);
 }
 
@@ -1428,68 +1428,68 @@ RadioddityCodeplug::GeneralSettingsElement::monitorType() const {
 }
 void
 RadioddityCodeplug::GeneralSettingsElement::setMonitorType(MonitorType type) {
-  setUInt8(0x0012, (uint)type);
+  setUInt8(0x0012, (unsigned)type);
 }
 
-uint
+unsigned
 RadioddityCodeplug::GeneralSettingsElement::voxSensitivity() const {
   return getUInt8(0x0013);
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setVOXSensitivity(uint value) {
+RadioddityCodeplug::GeneralSettingsElement::setVOXSensitivity(unsigned value) {
   value = std::min(10u, std::max(1u, value));
   setUInt8(0x0013, value);
 }
 
-uint
+unsigned
 RadioddityCodeplug::GeneralSettingsElement::lowBatteryWarnInterval() const {
-  return uint(getUInt8(0x0014))*5;
+  return unsigned(getUInt8(0x0014))*5;
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setLowBatteryWarnInterval(uint sec) {
+RadioddityCodeplug::GeneralSettingsElement::setLowBatteryWarnInterval(unsigned sec) {
   setUInt8(0x0014, sec/5);
 }
 
-uint
+unsigned
 RadioddityCodeplug::GeneralSettingsElement::callAlertDuration() const {
-  return uint(getUInt8(0x0015))*5;
+  return unsigned(getUInt8(0x0015))*5;
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setCallAlertDuration(uint sec) {
+RadioddityCodeplug::GeneralSettingsElement::setCallAlertDuration(unsigned sec) {
   setUInt8(0x0015, sec/5);
 }
 
-uint
+unsigned
 RadioddityCodeplug::GeneralSettingsElement::loneWorkerResponsePeriod() const {
   return getUInt8(0x0016);
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setLoneWorkerResponsePeriod(uint min) {
+RadioddityCodeplug::GeneralSettingsElement::setLoneWorkerResponsePeriod(unsigned min) {
   setUInt8(0x0016, min);
 }
-uint
+unsigned
 RadioddityCodeplug::GeneralSettingsElement::loneWorkerReminderPeriod() const {
   return getUInt8(0x0017);
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setLoneWorkerReminderPeriod(uint sec) {
+RadioddityCodeplug::GeneralSettingsElement::setLoneWorkerReminderPeriod(unsigned sec) {
   setUInt8(0x0017, sec);
 }
 
-uint
+unsigned
 RadioddityCodeplug::GeneralSettingsElement::groupCallHangTime() const {
-  return uint(getUInt8(0x0018))*500;
+  return unsigned(getUInt8(0x0018))*500;
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setGroupCallHangTime(uint ms) {
+RadioddityCodeplug::GeneralSettingsElement::setGroupCallHangTime(unsigned ms) {
   setUInt8(0x0018, ms/500);
 }
-uint
+unsigned
 RadioddityCodeplug::GeneralSettingsElement::privateCallHangTime() const {
-  return uint(getUInt8(0x0019))*500;
+  return unsigned(getUInt8(0x0019))*500;
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setPrivateCallHangTime(uint ms) {
+RadioddityCodeplug::GeneralSettingsElement::setPrivateCallHangTime(unsigned ms) {
   setUInt8(0x0019, ms/500);
 }
 
@@ -1533,7 +1533,7 @@ RadioddityCodeplug::GeneralSettingsElement::artsToneMode() const {
 }
 void
 RadioddityCodeplug::GeneralSettingsElement::setARTSToneMode(ARTSTone mode) {
-  setUInt4(0x001a, 4, (uint) mode);
+  setUInt4(0x001a, 4, (unsigned) mode);
 }
 
 bool
@@ -1640,23 +1640,23 @@ RadioddityCodeplug::GeneralSettingsElement::scanMode() const {
 }
 void
 RadioddityCodeplug::GeneralSettingsElement::setScanMode(ScanMode mode) {
-  setUInt2(0x001d, 6, uint(mode));
+  setUInt2(0x001d, 6, unsigned(mode));
 }
 
-uint
+unsigned
 RadioddityCodeplug::GeneralSettingsElement::repeaterEndDelay() const {
   return getUInt4(0x001e, 0);
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setRepeaterEndDelay(uint delay) {
+RadioddityCodeplug::GeneralSettingsElement::setRepeaterEndDelay(unsigned delay) {
   setUInt4(0x001e, 0, delay);
 }
-uint
+unsigned
 RadioddityCodeplug::GeneralSettingsElement::repeaterSTE() const {
   return getUInt4(0x001e, 4);
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setRepeaterSTE(uint ste) {
+RadioddityCodeplug::GeneralSettingsElement::setRepeaterSTE(unsigned ste) {
   setUInt4(0x001e, 4, ste);
 }
 
@@ -1703,7 +1703,7 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::ButtonSettingsElement
  * ********************************************************************************************* */
-RadioddityCodeplug::ButtonSettingsElement::ButtonSettingsElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::ButtonSettingsElement::ButtonSettingsElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -1732,12 +1732,12 @@ RadioddityCodeplug::ButtonSettingsElement::clear() {
   memset(_data+0x0008, 0xff, 6*4);
 }
 
-uint
+unsigned
 RadioddityCodeplug::ButtonSettingsElement::longPressDuration() const {
-  return uint(getUInt8(0x0001))*250;
+  return unsigned(getUInt8(0x0001))*250;
 }
 void
-RadioddityCodeplug::ButtonSettingsElement::setLongPressDuration(uint ms) {
+RadioddityCodeplug::ButtonSettingsElement::setLongPressDuration(unsigned ms) {
   setUInt8(0x0001, ms/250);
 }
 
@@ -1747,7 +1747,7 @@ RadioddityCodeplug::ButtonSettingsElement::sk1ShortPress() const {
 }
 void
 RadioddityCodeplug::ButtonSettingsElement::setSK1ShortPress(Action action) {
-  setUInt8(0x0002, (uint)action);
+  setUInt8(0x0002, (unsigned)action);
 }
 RadioddityCodeplug::ButtonSettingsElement::Action
 RadioddityCodeplug::ButtonSettingsElement::sk1LongPress() const {
@@ -1755,7 +1755,7 @@ RadioddityCodeplug::ButtonSettingsElement::sk1LongPress() const {
 }
 void
 RadioddityCodeplug::ButtonSettingsElement::setSK1LongPress(Action action) {
-  setUInt8(0x0003, (uint)action);
+  setUInt8(0x0003, (unsigned)action);
 }
 
 RadioddityCodeplug::ButtonSettingsElement::Action
@@ -1764,7 +1764,7 @@ RadioddityCodeplug::ButtonSettingsElement::sk2ShortPress() const {
 }
 void
 RadioddityCodeplug::ButtonSettingsElement::setSK2ShortPress(Action action) {
-  setUInt8(0x0004, (uint)action);
+  setUInt8(0x0004, (unsigned)action);
 }
 RadioddityCodeplug::ButtonSettingsElement::Action
 RadioddityCodeplug::ButtonSettingsElement::sk2LongPress() const {
@@ -1772,7 +1772,7 @@ RadioddityCodeplug::ButtonSettingsElement::sk2LongPress() const {
 }
 void
 RadioddityCodeplug::ButtonSettingsElement::setSK2LongPress(Action action) {
-  setUInt8(0x0005, (uint)action);
+  setUInt8(0x0005, (unsigned)action);
 }
 
 RadioddityCodeplug::ButtonSettingsElement::Action
@@ -1781,7 +1781,7 @@ RadioddityCodeplug::ButtonSettingsElement::tkShortPress() const {
 }
 void
 RadioddityCodeplug::ButtonSettingsElement::setTKShortPress(Action action) {
-  setUInt8(0x0006, (uint)action);
+  setUInt8(0x0006, (unsigned)action);
 }
 RadioddityCodeplug::ButtonSettingsElement::Action
 RadioddityCodeplug::ButtonSettingsElement::tkLongPress() const {
@@ -1789,40 +1789,40 @@ RadioddityCodeplug::ButtonSettingsElement::tkLongPress() const {
 }
 void
 RadioddityCodeplug::ButtonSettingsElement::setTKLongPress(Action action) {
-  setUInt8(0x0007, (uint)action);
+  setUInt8(0x0007, (unsigned)action);
 }
 
 RadioddityCodeplug::ButtonSettingsElement::OneTouchAction
-RadioddityCodeplug::ButtonSettingsElement::oneTouchAction(uint n) const {
+RadioddityCodeplug::ButtonSettingsElement::oneTouchAction(unsigned n) const {
   return OneTouchAction(getUInt8(0x0008 + n*4 + 0));
 }
-uint
-RadioddityCodeplug::ButtonSettingsElement::oneTouchContact(uint n) const {
+unsigned
+RadioddityCodeplug::ButtonSettingsElement::oneTouchContact(unsigned n) const {
   return getUInt16_be(0x0008 + n*4 + 1);
 }
-uint
-RadioddityCodeplug::ButtonSettingsElement::oneTouchMessage(uint n) const {
+unsigned
+RadioddityCodeplug::ButtonSettingsElement::oneTouchMessage(unsigned n) const {
   return getUInt16_be(0x0008 + n*4 + 3);
 }
 void
-RadioddityCodeplug::ButtonSettingsElement::disableOneTouch(uint n) {
-  setUInt8(0x0008 + n*4 + 0, (uint)OneTouchAction::None);
+RadioddityCodeplug::ButtonSettingsElement::disableOneTouch(unsigned n) {
+  setUInt8(0x0008 + n*4 + 0, (unsigned)OneTouchAction::None);
 }
 void
-RadioddityCodeplug::ButtonSettingsElement::setOneTouchDigitalCall(uint n, uint index) {
-  setUInt8(0x0008 + n*4 + 0, (uint)OneTouchAction::DigitalCall);
+RadioddityCodeplug::ButtonSettingsElement::setOneTouchDigitalCall(unsigned n, unsigned index) {
+  setUInt8(0x0008 + n*4 + 0, (unsigned)OneTouchAction::DigitalCall);
   setUInt16_be(0x0008 + n*4 + 1, index);
   setUInt16_be(0x0008 + n*4 + 3, 0);
 }
 void
-RadioddityCodeplug::ButtonSettingsElement::setOneTouchDigitalMessage(uint n, uint index) {
-  setUInt8(0x0008 + n*4 + 0, (uint)OneTouchAction::DigitalMessage);
+RadioddityCodeplug::ButtonSettingsElement::setOneTouchDigitalMessage(unsigned n, unsigned index) {
+  setUInt8(0x0008 + n*4 + 0, (unsigned)OneTouchAction::DigitalMessage);
   setUInt16_be(0x0008 + n*4 + 1, 0);
   setUInt16_be(0x0008 + n*4 + 3, index);
 }
 void
-RadioddityCodeplug::ButtonSettingsElement::setOneTouchAnalogCall(uint n) {
-  setUInt8(0x0008 + n*4 + 0, (uint)OneTouchAction::AnalogCall);
+RadioddityCodeplug::ButtonSettingsElement::setOneTouchAnalogCall(unsigned n) {
+  setUInt8(0x0008 + n*4 + 0, (unsigned)OneTouchAction::AnalogCall);
   setUInt16_be(0x0008 + n*4 + 1, 0);
   setUInt16_be(0x0008 + n*4 + 3, 0);
 }
@@ -1831,7 +1831,7 @@ RadioddityCodeplug::ButtonSettingsElement::setOneTouchAnalogCall(uint n) {
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::MenuSettingsElement
  * ********************************************************************************************* */
-RadioddityCodeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -1896,12 +1896,12 @@ RadioddityCodeplug::MenuSettingsElement::clear() {
   setDualWatchMode(DualWatchMode::DualDual);
 }
 
-uint
+unsigned
 RadioddityCodeplug::MenuSettingsElement::menuHangTime() const {
   return getUInt8(0x0000);
 }
 void
-RadioddityCodeplug::MenuSettingsElement::setMenuHangTime(uint sec) {
+RadioddityCodeplug::MenuSettingsElement::setMenuHangTime(unsigned sec) {
   sec = std::min(10u, sec);
   setUInt8(0x0000, sec);
 }
@@ -2127,21 +2127,21 @@ RadioddityCodeplug::MenuSettingsElement::enableDualWatch(bool enable) {
   setBit(0x0004, 2, enable);
 }
 
-uint
+unsigned
 RadioddityCodeplug::MenuSettingsElement::keypadLockTime() const {
   return getUInt2(0x0006, 0)*5;
 }
 void
-RadioddityCodeplug::MenuSettingsElement::setKeypadLockTime(uint sec) {
+RadioddityCodeplug::MenuSettingsElement::setKeypadLockTime(unsigned sec) {
   setUInt2(0x0006, 0, sec/5);
 }
 
-uint
+unsigned
 RadioddityCodeplug::MenuSettingsElement::backlightTime() const {
   return getUInt2(0x0006, 2)*5;
 }
 void
-RadioddityCodeplug::MenuSettingsElement::setBacklightTime(uint sec) {
+RadioddityCodeplug::MenuSettingsElement::setBacklightTime(unsigned sec) {
   setUInt2(0x0006, 2, sec/5);
 }
 
@@ -2151,7 +2151,7 @@ RadioddityCodeplug::MenuSettingsElement::channelDisplayMode() const {
 }
 void
 RadioddityCodeplug::MenuSettingsElement::setChannelDisplayMode(ChannelDisplayMode mode) {
-  setUInt2(0x0006, 6, (uint)mode);
+  setUInt2(0x0006, 6, (unsigned)mode);
 }
 
 bool
@@ -2169,14 +2169,14 @@ RadioddityCodeplug::MenuSettingsElement::dualWatchMode() const {
 }
 void
 RadioddityCodeplug::MenuSettingsElement::setDualWatchMode(DualWatchMode mode) {
-  setUInt2(0x0007, 6, (uint)mode);
+  setUInt2(0x0007, 6, (unsigned)mode);
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::BootSettingsElement
  * ********************************************************************************************* */
-RadioddityCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -2219,19 +2219,19 @@ RadioddityCodeplug::BootSettingsElement::enableBootPassword(bool enable) {
   setUInt8(0x0001, (enable ? 1 : 0));
 }
 
-uint
+unsigned
 RadioddityCodeplug::BootSettingsElement::bootPassword() const {
   return getBCD8_be(0x0002);
 }
 void
-RadioddityCodeplug::BootSettingsElement::setBootPassword(uint passwd) {
+RadioddityCodeplug::BootSettingsElement::setBootPassword(unsigned passwd) {
   setBCD8_be(0x0002, passwd);
 }
 
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::BootTextElement
  * ********************************************************************************************* */
-RadioddityCodeplug::BootTextElement::BootTextElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::BootTextElement::BootTextElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -2287,7 +2287,7 @@ RadioddityCodeplug::BootTextElement::updateConfig(Config *conf) {
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::MessageBankElement
  * ********************************************************************************************* */
-RadioddityCodeplug::MessageBankElement::MessageBankElement(uint8_t *ptr, uint size)
+RadioddityCodeplug::MessageBankElement::MessageBankElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -2312,22 +2312,22 @@ RadioddityCodeplug::MessageBankElement::clear() {
   memset(_data+0x0048, 0xff, 32*144); // Clear all messages
 }
 
-uint
+unsigned
 RadioddityCodeplug::MessageBankElement::numMessages() const {
   return getUInt8(0x0000);
 }
 QString
-RadioddityCodeplug::MessageBankElement::message(uint n) const {
+RadioddityCodeplug::MessageBankElement::message(unsigned n) const {
   if (n >= numMessages())
     return QString();
   return readASCII(0x0048+n*144, 144, 0xff);
 }
 void
 RadioddityCodeplug::MessageBankElement::appendMessage(const QString msg) {
-  uint idx = numMessages();
+  unsigned idx = numMessages();
   if (idx >= 32)
     return;
-  uint len = std::min(msg.size(), 144);
+  unsigned len = std::min(msg.size(), 144);
   // increment counter
   setUInt8(0x0000, idx+1);
   // store length

@@ -25,8 +25,8 @@
  * ********************************************************************************************* */
 Channel::Channel(QObject *parent)
   : ConfigObject("ch", parent), _name(""), _rxFreq(0), _txFreq(0), _defaultPower(true),
-    _power(Power::Low), _txTimeOut(std::numeric_limits<uint>::max()), _rxOnly(false),
-    _vox(std::numeric_limits<uint>::max()), _scanlist()
+    _power(Power::Low), _txTimeOut(std::numeric_limits<unsigned>::max()), _rxOnly(false),
+    _vox(std::numeric_limits<unsigned>::max()), _scanlist()
 {
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -110,25 +110,25 @@ Channel::setDefaultPower() {
 
 bool
 Channel::defaultTimeout() const {
-  return std::numeric_limits<uint>::max() == timeout();
+  return std::numeric_limits<unsigned>::max() == timeout();
 }
 bool
 Channel::timeoutDisabled() const {
   return 0 == timeout();
 }
-uint
+unsigned
 Channel::timeout() const {
   return _txTimeOut;
 }
 bool
-Channel::setTimeout(uint dur) {
+Channel::setTimeout(unsigned dur) {
   _txTimeOut = dur;
   emit modified(this);
   return true;
 }
 void
 Channel::setDefaultTimeout() {
-  setTimeout(std::numeric_limits<uint>::max());
+  setTimeout(std::numeric_limits<unsigned>::max());
 }
 void
 Channel::disableTimeout() {
@@ -152,20 +152,20 @@ Channel::voxDisabled() const {
 }
 bool
 Channel::defaultVOX() const {
-  return std::numeric_limits<uint>::max() == vox();
+  return std::numeric_limits<unsigned>::max() == vox();
 }
-uint
+unsigned
 Channel::vox() const {
   return _vox;
 }
 void
-Channel::setVOX(uint level) {
+Channel::setVOX(unsigned level) {
   _vox = level;
   emit modified(this);
 }
 void
 Channel::setVOXDefault() {
-  setVOX(std::numeric_limits<uint>::max());
+  setVOX(std::numeric_limits<unsigned>::max());
 }
 void
 Channel::disableVOX() {
@@ -206,7 +206,7 @@ Channel::populate(YAML::Node &node, const Context &context) {
     node["power"] = def;
   } else {
     QMetaEnum metaEnum = QMetaEnum::fromType<Power>();
-    node["power"] = metaEnum.valueToKey((uint)power());
+    node["power"] = metaEnum.valueToKey((unsigned)power());
   }
 
   if (defaultTimeout()) {
@@ -232,7 +232,7 @@ Channel::populate(YAML::Node &node, const Context &context) {
  * ********************************************************************************************* */
 AnalogChannel::AnalogChannel(QObject *parent)
   : Channel(parent),
-    _admit(Admit::Always), _squelch(std::numeric_limits<uint>::max()),
+    _admit(Admit::Always), _squelch(std::numeric_limits<unsigned>::max()),
     _rxTone(Signaling::SIGNALING_NONE), _txTone(Signaling::SIGNALING_NONE), _bw(Bandwidth::Narrow),
     _aprsSystem()
 {
@@ -279,18 +279,18 @@ AnalogChannel::setAdmit(Admit admit) {
 
 bool
 AnalogChannel::defaultSquelch() const {
-  return std::numeric_limits<uint>::max()==squelch();
+  return std::numeric_limits<unsigned>::max()==squelch();
 }
 bool
 AnalogChannel::squelchDisabled() const {
   return 0==squelch();
 }
-uint
+unsigned
 AnalogChannel::squelch() const {
   return _squelch;
 }
 bool
-AnalogChannel::setSquelch(uint val) {
+AnalogChannel::setSquelch(unsigned val) {
   _squelch = val;
   emit modified(this);
   return true;
@@ -301,7 +301,7 @@ AnalogChannel::disableSquelch() {
 }
 void
 AnalogChannel::setSquelchDefault() {
-  setSquelch(std::numeric_limits<uint>::max());
+  setSquelch(std::numeric_limits<unsigned>::max());
 }
 
 Signaling::Code
@@ -463,12 +463,12 @@ DigitalChannel::setAdmit(Admit admit) {
   emit modified(this);
 }
 
-uint
+unsigned
 DigitalChannel::colorCode() const {
   return _colorCode;
 }
 bool
-DigitalChannel::setColorCode(uint cc) {
+DigitalChannel::setColorCode(unsigned cc) {
   _colorCode = cc;
   emit modified(this);
   return true;
@@ -647,7 +647,7 @@ ChannelList::channel(int idx) const {
 }
 
 DigitalChannel *
-ChannelList::findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, uint cc) const {
+ChannelList::findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, unsigned cc) const {
   for (int i=0; i<count(); i++) {
     if (! _items[i]->is<DigitalChannel>())
       continue;

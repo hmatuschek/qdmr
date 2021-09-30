@@ -14,17 +14,17 @@ class RadioSettings : public ConfigObject
   /** The scond intro line. */
   Q_PROPERTY(QString introLine2 READ introLine2 WRITE setIntroLine2)
   /** The mic amplification level. */
-  Q_PROPERTY(uint micLevel READ micLevel WRITE setMicLevel)
+  Q_PROPERTY(unsigned micLevel READ micLevel WRITE setMicLevel)
   /** Speech synthesis flag. */
   Q_PROPERTY(bool speech READ speech WRITE enableSpeech)
   /** The default channel power */
   Q_PROPERTY(Channel::Power power READ power WRITE setPower)
   /** The squelch level. */
-  Q_PROPERTY(uint squelch READ squelch WRITE setSquelch)
+  Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch)
   /** The default vox sensitivity */
-  Q_PROPERTY(uint vox READ vox WRITE setVOX)
+  Q_PROPERTY(unsigned vox READ vox WRITE setVOX)
   /** The default transmit timeout */
-  Q_PROPERTY(uint tot READ tot WRITE setTOT)
+  Q_PROPERTY(unsigned tot READ tot WRITE setTOT)
 
 public:
   /** Default constructor. */
@@ -44,9 +44,9 @@ public:
   void setIntroLine2(const QString &line);
 
   /** Returns the MIC amplification level [1,10]. */
-  uint micLevel() const;
+  unsigned micLevel() const;
   /** (Re-)Sets the MIC amplification level [1,10]. */
-  void setMicLevel(uint value);
+  void setMicLevel(unsigned value);
 
   /** Returns @c true if the speech synthesis is enabled. */
   bool speech() const;
@@ -54,9 +54,9 @@ public:
   void enableSpeech(bool enabled);
 
   /** Returns the default squelch level [0-10]. */
-  uint squelch() const;
+  unsigned squelch() const;
   /** Sets the default squelch level. */
-  void setSquelch(uint squelch);
+  void setSquelch(unsigned squelch);
 
   /** Returns the default channel power. */
   Channel::Power power() const;
@@ -66,18 +66,18 @@ public:
   /** Retuns @c true if VOX is disabled by default. */
   bool voxDisabled() const;
   /** Returns the default VOX level [0-10], 0=disabled. */
-  uint vox() const;
+  unsigned vox() const;
   /** Sets the default VOX level [0-10], 0=disabled. */
-  void setVOX(uint level);
+  void setVOX(unsigned level);
   /** Disables VOX by default. */
   void disableVOX();
 
   /** Returns @c true if the transmit timeout (TOT) is disabled. */
   bool totDisabled() const;
   /** Returns the default transmit timeout (TOT) in seconds, 0=disabled. */
-  uint tot() const;
+  unsigned tot() const;
   /** Sets the default transmit timeout (TOT) in seconds, 0=disabled. */
-  void setTOT(uint sec);
+  void setTOT(unsigned sec);
   /** Disables the transmit timeout (TOT). */
   void disableTOT();
 
@@ -87,17 +87,17 @@ protected:
   /** Holds the second intro line. */
   QString _introLine2;
   /** Holds the mic amplification level. */
-  uint _micLevel;
+  unsigned _micLevel;
   /** Holds the speech synthesis flag. */
   bool _speech;
   /** Holds the global squelch setting. */
-  uint _squelch;
+  unsigned _squelch;
   /** Holds the global power setting. */
   Channel::Power _power;
   /** Holds the global VOX level. */
-  uint _vox;
+  unsigned _vox;
   /** Holds the global transmit timeout. */
-  uint _transmitTimeOut;
+  unsigned _transmitTimeOut;
 };
 
 #endif // RADIOCONFIG_HH

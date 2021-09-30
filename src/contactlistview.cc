@@ -21,7 +21,7 @@ ContactListView::ContactListView(Config *config, QWidget *parent)
 
   connect(ui->addContact, SIGNAL(clicked()), this, SLOT(onAddContact()));
   connect(ui->remContact, SIGNAL(clicked()), this, SLOT(onRemContact()));
-  connect(ui->listView, SIGNAL(doubleClicked(uint)), this, SLOT(onEditContact(uint)));
+  connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditContact(unsigned)));
 }
 
 ContactListView::~ContactListView() {
@@ -76,7 +76,7 @@ ContactListView::onRemContact() {
 }
 
 void
-ContactListView::onEditContact(uint row) {
+ContactListView::onEditContact(unsigned row) {
   ContactDialog dialog(_config->contacts()->contact(row));
   if (QDialog::Accepted != dialog.exec())
     return;

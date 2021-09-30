@@ -130,15 +130,15 @@ GD77::uploadCallsigns()
   logDebug() << "Call-sign DB upload started...";
 
   size_t totb = _callsigns.memSize();
-  uint bcount = 0;
+  unsigned bcount = 0;
   // Then upload callsign DB
   for (int n=0; n<_callsigns.image(0).numElements(); n++) {
-    uint addr = _callsigns.image(0).element(n).address();
-    uint size = _callsigns.image(0).element(n).data().size();
-    uint b0 = addr/BSIZE, nb = size/BSIZE;
+    unsigned addr = _callsigns.image(0).element(n).address();
+    unsigned size = _callsigns.image(0).element(n).data().size();
+    unsigned b0 = addr/BSIZE, nb = size/BSIZE;
     RadioddityInterface::MemoryBank bank = (
           (0x10000 > addr) ? RadioddityInterface::MEMBANK_CALLSIGN_LOWER : RadioddityInterface::MEMBANK_CALLSIGN_UPPER );
-    for (uint b=0; b<nb; b++, bcount+=BSIZE) {
+    for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
       if (! _dev->write(bank, (b0+b)*BSIZE,
                         _callsigns.data((b0+b)*BSIZE, 0), BSIZE))
       {

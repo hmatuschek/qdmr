@@ -81,13 +81,13 @@ public:
     virtual void setMode(Mode mode);
 
     /** Returns the TX timeout in seconds. A value of 0 means disabled. */
-    virtual uint txTimeOut() const;
+    virtual unsigned txTimeOut() const;
     /** Sets the TX timeout in seconds. Setting it to 0 disables the timeout. */
-    virtual void setTXTimeOut(uint tot);
+    virtual void setTXTimeOut(unsigned tot);
     /** Returns the transmit time-out re-key delay in seconds. */
-    virtual uint txTimeOutRekeyDelay() const;
+    virtual unsigned txTimeOutRekeyDelay() const;
     /** Sets the transmit time-out re-key delay in seconds. */
-    virtual void setTXTimeOutRekeyDelay(uint delay);
+    virtual void setTXTimeOutRekeyDelay(unsigned delay);
 
     /** Retunrs the admit criterion. */
     virtual Admit admitCriterion() const;
@@ -97,9 +97,9 @@ public:
     /** Returns @c true if a scan list is set. */
     virtual bool hasScanList() const;
     /** Returns the scan list index (+1). */
-    virtual uint scanListIndex() const;
+    virtual unsigned scanListIndex() const;
     /** Sets the scan list index (+1). */
-    virtual void setScanListIndex(uint index);
+    virtual void setScanListIndex(unsigned index);
 
     /** Returns the RX subtone. */
     virtual Signaling::Code rxTone() const;
@@ -111,13 +111,13 @@ public:
     virtual void setTXTone(Signaling::Code code);
 
     /** Returns TX signaling index (+1). */
-    virtual uint txSignalingIndex() const;
+    virtual unsigned txSignalingIndex() const;
     /** Sets TX signaling index (+1). */
-    virtual void setTXSignalingIndex(uint index);
+    virtual void setTXSignalingIndex(unsigned index);
     /** Returns RX signaling index (+1). */
-    virtual uint rxSignalingIndex() const;
+    virtual unsigned rxSignalingIndex() const;
     /** Sets RX signaling index (+1). */
-    virtual void setRXSignalingIndex(uint index);
+    virtual void setRXSignalingIndex(unsigned index);
 
     /** Returns the privacy group. */
     virtual PrivacyGroup privacyGroup() const;
@@ -125,35 +125,35 @@ public:
     virtual void setPrivacyGroup(PrivacyGroup grp);
 
     /** Returns the TX color code. */
-    virtual uint txColorCode() const;
+    virtual unsigned txColorCode() const;
     /** Sets the TX color code. */
-    virtual void setTXColorCode(uint cc);
+    virtual void setTXColorCode(unsigned cc);
 
     /** Returns @c true if a group list is set. */
     virtual bool hasGroupList() const;
     /** Returns the group-list index (+1). */
-    virtual uint groupListIndex() const;
+    virtual unsigned groupListIndex() const;
     /** Sets the group-list index (+1). */
-    virtual void setGroupListIndex(uint index);
+    virtual void setGroupListIndex(unsigned index);
 
     /** Returns the RX color code. */
-    virtual uint rxColorCode() const;
+    virtual unsigned rxColorCode() const;
     /** Sets the RX color code. */
-    virtual void setRXColorCode(uint cc);
+    virtual void setRXColorCode(unsigned cc);
 
     /** Returns @c true if an emergency system is set. */
     virtual bool hasEmergencySystem() const;
     /** Returns the emergency system index (+1). */
-    virtual uint emergencySystemIndex() const;
+    virtual unsigned emergencySystemIndex() const;
     /** Sets the emergency system index (+1). */
-    virtual void setEmergencySystemIndex(uint index);
+    virtual void setEmergencySystemIndex(unsigned index);
 
     /** Returns @c true if a TX contact is set. */
     virtual bool hasContact() const;
     /** Returns the transmit contact index (+1). */
-    virtual uint contactIndex() const;
+    virtual unsigned contactIndex() const;
     /** Sets the transmit contact index (+1). */
-    virtual void setContactIndex(uint index);
+    virtual void setContactIndex(unsigned index);
 
     /** Returns @c true if data-call-confirm is enabled. */
     virtual bool dataCallConfirm() const;
@@ -225,7 +225,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    ChannelBankElement(uint8_t *ptr, uint size);
+    ChannelBankElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constrcutor. */
@@ -237,11 +237,11 @@ public:
     void clear();
 
     /** Retruns @c true if the channel is enabled. */
-    virtual bool isEnabled(uint idx) const ;
+    virtual bool isEnabled(unsigned idx) const ;
     /** Enable/disable a channel in the bank. */
-    virtual void enable(uint idx, bool enabled);
+    virtual void enable(unsigned idx, bool enabled);
     /** Returns a pointer to the channel at the given index. */
-    virtual uint8_t *get(uint idx) const;
+    virtual uint8_t *get(unsigned idx) const;
   };
 
   /** VFO Channel representation within the binary codeplug.
@@ -272,7 +272,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    VFOChannelElement(uint8_t *ptr, uint size);
+    VFOChannelElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -309,7 +309,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    ContactElement(uint8_t *ptr, uint size);
+    ContactElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -328,9 +328,9 @@ public:
     virtual void setName(const QString name);
 
     /** Returns the DMR number of the contact. */
-    virtual uint number() const;
+    virtual unsigned number() const;
     /** Sets the DMR number of the contact. */
-    virtual void setNumber(uint id);
+    virtual void setNumber(unsigned id);
 
     /** Returns the call type. */
     virtual DigitalContact::Type type() const;
@@ -343,9 +343,9 @@ public:
     virtual void enableRing(bool enable);
 
     /** Returns the ring tone style for this contact [0-10]. */
-    virtual uint ringStyle() const;
+    virtual unsigned ringStyle() const;
     /** Sets the ring tone style for this contact [0-10]. */
-    virtual void setRingStyle(uint style);
+    virtual void setRingStyle(unsigned style);
 
     /** Constructs a @c DigitalContact instance from this codeplug contact. */
     virtual DigitalContact *toContactObj(Context &ctx) const;
@@ -362,7 +362,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    DTMFContactElement(uint8_t *ptr, uint size);
+    DTMFContactElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -400,7 +400,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    ZoneElement(uint8_t *ptr, uint size);
+    ZoneElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -419,13 +419,13 @@ public:
 
     /** Returns @c true if a member is stored at the given index.
      * That is, if the index is not 0. */
-    virtual bool hasMember(uint n) const;
+    virtual bool hasMember(unsigned n) const;
     /** Returns the n-th member index (+1). */
-    virtual uint member(uint n) const;
+    virtual unsigned member(unsigned n) const;
     /** Sets the n-th member index (+1). */
-    virtual void setMember(uint n, uint idx);
+    virtual void setMember(unsigned n, unsigned idx);
     /** Clears the n-th member index. */
-    virtual void clearMember(uint n);
+    virtual void clearMember(unsigned n);
 
     /** Constructs a generic @c Zone object from this codeplug zone. */
     virtual Zone *toZoneObj(Context &ctx) const;
@@ -447,7 +447,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    ZoneBankElement(uint8_t *ptr, uint size);
+    ZoneBankElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constuctor. */
@@ -459,11 +459,11 @@ public:
     void clear();
 
     /** Retruns @c true if the channel is enabled. */
-    virtual bool isEnabled(uint idx) const ;
+    virtual bool isEnabled(unsigned idx) const ;
     /** Enable/disable a channel in the bank. */
-    virtual void enable(uint idx, bool enabled);
+    virtual void enable(unsigned idx, bool enabled);
     /** Returns a pointer to the channel at the given index. */
-    virtual uint8_t *get(uint idx) const;
+    virtual uint8_t *get(unsigned idx) const;
   };
 
   /** Represents a base class for all group lists within Radioddity codeplugs.
@@ -475,7 +475,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    GroupListElement(uint8_t *ptr, uint size);
+    GroupListElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -493,13 +493,13 @@ public:
 
     /** Returns @c true if the group list has an n-th member.
      * That is if the n-th index is not 0. */
-    virtual bool hasMember(uint n) const;
+    virtual bool hasMember(unsigned n) const;
     /** Returns the n-th member index (+1). */
-    virtual uint member(uint n) const;
+    virtual unsigned member(unsigned n) const;
     /** Sets the n-th member index (+1). */
-    virtual void setMember(uint n, uint idx);
+    virtual void setMember(unsigned n, unsigned idx);
     /** Clears the n-th member index. */
-    virtual void clearMember(uint n);
+    virtual void clearMember(unsigned n);
 
     /** Constructs a @c RXGroupList object from the codeplug representation. */
     virtual RXGroupList *toRXGroupListObj(Context &ctx);
@@ -518,7 +518,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    GroupListBankElement(uint8_t *ptr, uint size);
+    GroupListBankElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -530,17 +530,17 @@ public:
     void clear();
 
     /** Returns @c true if the n-th group list is enabled. */
-    virtual bool isEnabled(uint n) const;
+    virtual bool isEnabled(unsigned n) const;
     /** Returns the number of contacts in the n-th group list. */
-    virtual uint contactCount(uint n) const;
+    virtual unsigned contactCount(unsigned n) const;
     /** Sets the number of contacts in the n-th group list.
      * This also enables the n-th group list. */
-    virtual void setContactCount(uint n, uint size);
+    virtual void setContactCount(unsigned n, unsigned size);
     /** Disables the n-th group list. */
-    virtual void disable(uint n);
+    virtual void disable(unsigned n);
 
     /** Returns a pointer to the n-th group list. */
-    virtual uint8_t *get(uint n) const;
+    virtual uint8_t *get(unsigned n) const;
   };
 
   /** Implements the base class for scan lists of all Radioddity codeplugs.
@@ -561,7 +561,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    ScanListElement(uint8_t *ptr, uint size);
+    ScanListElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -593,26 +593,26 @@ public:
     virtual void enableTalkback(bool enable);
 
     /** Returns @c true if the n-th member is set. */
-    virtual bool hasMember(uint n) const;
+    virtual bool hasMember(unsigned n) const;
     /** Returns @c true if the n-th member is selected channel. */
-    virtual bool isSelected(uint n) const;
+    virtual bool isSelected(unsigned n) const;
     /** Retunrs the n-th member index. */
-    virtual uint member(uint n) const;
+    virtual unsigned member(unsigned n) const;
     /** Sets the n-th member index. */
-    virtual void setMember(uint n, uint idx);
+    virtual void setMember(unsigned n, unsigned idx);
     /** Sets the n-th member to be the selected channel. */
-    virtual void setSelected(uint n);
+    virtual void setSelected(unsigned n);
     /** Clears the n-th member. */
-    virtual void clearMember(uint n);
+    virtual void clearMember(unsigned n);
 
     /** Returns @c true if the primary priority channel is set. */
     virtual bool hasPrimary() const;
     /** Returns @c true if the primary priority channel is the selected channel. */
     virtual bool primaryIsSelected() const;
     /** Return the channel index for the primary priority channel. */
-    virtual uint primary() const;
+    virtual unsigned primary() const;
     /** Sets the primary priority channel index. */
-    virtual void setPrimary(uint idx);
+    virtual void setPrimary(unsigned idx);
     /** Sets the primary priority channel to be the selected channel. */
     virtual void setPrimarySelected();
     /** Clears the primary priority channel. */
@@ -623,9 +623,9 @@ public:
     /** Returns @c true if the secondary priority channel is the selected channel. */
     virtual bool secondaryIsSelected() const;
     /** Return the channel index for the secondary priority channel. */
-    virtual uint secondary() const;
+    virtual unsigned secondary() const;
     /** Sets the secondary priority channel index. */
-    virtual void setSecondary(uint idx);
+    virtual void setSecondary(unsigned idx);
     /** Sets the secondary priority channel to be the selected channel. */
     virtual void setSecondarySelected();
     /** Clears the secondary priority channel. */
@@ -637,23 +637,23 @@ public:
     /** Returns @c true if the revert channel is the selected channel. */
     virtual bool revertIsSelected() const;
     /** Return the channel index for the revert channel. */
-    virtual uint revert() const;
+    virtual unsigned revert() const;
     /** Sets the revert channel index. */
-    virtual void setRevert(uint idx);
+    virtual void setRevert(unsigned idx);
     /** Sets the revert channel to be the selected one. */
     virtual void setRevertSelected();
     /** Clears the revert channel, sets it to last active. */
     virtual void clearRevert();
 
     /** Returns the hold time in ms. */
-    virtual uint holdTime() const;
+    virtual unsigned holdTime() const;
     /** Sets the hold time in ms. */
-    virtual void setHoldTime(uint ms);
+    virtual void setHoldTime(unsigned ms);
 
     /** Retunrs the priority sample time in ms. */
-    virtual uint prioritySampleTime() const;
+    virtual unsigned prioritySampleTime() const;
     /** Sets the priority sample time in ms. */
-    virtual void setPrioritySampleTime(uint ms);
+    virtual void setPrioritySampleTime(unsigned ms);
 
     /** Constrcuts a @c ScanList object from this codeplug representation. */
     virtual ScanList *toScanListObj(Context &ctx) const;
@@ -672,7 +672,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    ScanListBankElement(uint8_t *ptr, uint size);
+    ScanListBankElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -684,11 +684,11 @@ public:
     void clear();
 
     /** Retruns @c true if the n-th scan list is enabled. */
-    virtual bool isEnabled(uint n) const;
+    virtual bool isEnabled(unsigned n) const;
     /** Enable/disable n-th scan list. */
-    virtual void enable(uint n, bool enabled);
+    virtual void enable(unsigned n, bool enabled);
     /** Retunrs a pointer to the n-th scan list. */
-    virtual uint8_t *get(uint n) const;
+    virtual uint8_t *get(unsigned n) const;
   };
 
   /** Implements the base class of general settings for all Radioddity codeplugs.
@@ -721,7 +721,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    GeneralSettingsElement(uint8_t *ptr, uint size);
+    GeneralSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -738,14 +738,14 @@ public:
     virtual void setName(const QString &name);
 
     /** Returns the DMR radio ID. */
-    virtual uint radioID() const;
+    virtual unsigned radioID() const;
     /** Sets the DMR radio ID. */
-    virtual void setRadioID(uint id);
+    virtual void setRadioID(unsigned id);
 
     /** Returns the preamble duration in ms. */
-    virtual uint preambleDuration() const;
+    virtual unsigned preambleDuration() const;
     /** Sets the preamble duration in ms. */
-    virtual void setPreambleDuration(uint ms);
+    virtual void setPreambleDuration(unsigned ms);
 
     /** Returns the monitor type. */
     virtual MonitorType monitorType() const;
@@ -753,37 +753,37 @@ public:
     virtual void setMonitorType(MonitorType type);
 
     /** Returns the VOX sensitivity [1-10], 0=disabled. */
-    virtual uint voxSensitivity() const;
+    virtual unsigned voxSensitivity() const;
     /** Sets the VOX sensitivity. */
-    virtual void setVOXSensitivity(uint value);
+    virtual void setVOXSensitivity(unsigned value);
 
     /** Returns the low-battery warn interval in seconds. */
-    virtual uint lowBatteryWarnInterval() const;
+    virtual unsigned lowBatteryWarnInterval() const;
     /** Sets the low-battery warn interval in seconds. */
-    virtual void setLowBatteryWarnInterval(uint sec);
+    virtual void setLowBatteryWarnInterval(unsigned sec);
 
     /** Returns the call-alert duration in seconds. */
-    virtual uint callAlertDuration() const;
+    virtual unsigned callAlertDuration() const;
     /** Sets the call-allert duration in seconds. */
-    virtual void setCallAlertDuration(uint sec);
+    virtual void setCallAlertDuration(unsigned sec);
 
     /** Returns the lone-worker response period in minutes. */
-    virtual uint loneWorkerResponsePeriod() const;
+    virtual unsigned loneWorkerResponsePeriod() const;
     /** Sets the lone-worker response period in minutes. */
-    virtual void setLoneWorkerResponsePeriod(uint min);
+    virtual void setLoneWorkerResponsePeriod(unsigned min);
     /** Returns the lone-worker reminder period in seconds. */
-    virtual uint loneWorkerReminderPeriod() const;
+    virtual unsigned loneWorkerReminderPeriod() const;
     /** Sets the lone-worker reminder period in seconds. */
-    virtual void setLoneWorkerReminderPeriod(uint sec);
+    virtual void setLoneWorkerReminderPeriod(unsigned sec);
 
     /** Returns the group call hang time in ms. */
-    virtual uint groupCallHangTime() const;
+    virtual unsigned groupCallHangTime() const;
     /** Sets the group call hang time in ms. */
-    virtual void setGroupCallHangTime(uint ms);
+    virtual void setGroupCallHangTime(unsigned ms);
     /** Returns the private call hang time in ms. */
-    virtual uint privateCallHangTime() const;
+    virtual unsigned privateCallHangTime() const;
     /** Sets the private call hang time in ms. */
-    virtual void setPrivateCallHangTime(uint ms);
+    virtual void setPrivateCallHangTime(unsigned ms);
 
     /** Returns @c true if the down-channel mode is VFO. */
     virtual bool downChannelModeVFO() const;
@@ -862,13 +862,13 @@ public:
     virtual void setScanMode(ScanMode mode);
 
     /** Returns the repeater end delay in [0-10]. */
-    virtual uint repeaterEndDelay() const;
+    virtual unsigned repeaterEndDelay() const;
     /** Sets the repeater end delay in [0-10]. */
-    virtual void setRepeaterEndDelay(uint delay);
+    virtual void setRepeaterEndDelay(unsigned delay);
     /** Returns the repeater STE in [0-10]. */
-    virtual uint repeaterSTE() const;
+    virtual unsigned repeaterSTE() const;
     /** Sets the repeater STE in [0-10]. */
-    virtual void setRepeaterSTE(uint ste);
+    virtual void setRepeaterSTE(unsigned ste);
 
     /** Returns the programming password. */
     virtual QString progPassword() const;
@@ -924,7 +924,7 @@ public:
 
   protected:
     /** Hidden constructor */
-    ButtonSettingsElement(uint8_t *ptr, uint size);
+    ButtonSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -936,9 +936,9 @@ public:
     void clear();
 
     /** Returns the long-press duration in ms. */
-    virtual uint longPressDuration() const;
+    virtual unsigned longPressDuration() const;
     /** Sets the long-press duration in ms. */
-    virtual void setLongPressDuration(uint ms);
+    virtual void setLongPressDuration(unsigned ms);
 
     /** Returns the side-key 1 short-press action. */
     virtual Action sk1ShortPress() const;
@@ -968,19 +968,19 @@ public:
     virtual void setTKLongPress(Action action);
 
     /** Returns the n-th one-touch action. */
-    virtual OneTouchAction oneTouchAction(uint n) const;
+    virtual OneTouchAction oneTouchAction(unsigned n) const;
     /** Returns the n-th one-touch contact index (if action is @c OneTouchAction::DigitalCall). */
-    virtual uint oneTouchContact(uint n) const;
+    virtual unsigned oneTouchContact(unsigned n) const;
     /** Returns the n-th one-touch message index (if action is @c OneTouchAction::DigitalMessage). */
-    virtual uint oneTouchMessage(uint n) const;
+    virtual unsigned oneTouchMessage(unsigned n) const;
     /** Disables the n-th one-touch action. */
-    virtual void disableOneTouch(uint n);
+    virtual void disableOneTouch(unsigned n);
     /** Configures n-th one-touch action as a digital call to contact index. */
-    virtual void setOneTouchDigitalCall(uint n, uint index);
+    virtual void setOneTouchDigitalCall(unsigned n, unsigned index);
     /** Configures n-th one-touch action as a digital message using given index. */
-    virtual void setOneTouchDigitalMessage(uint n, uint index);
+    virtual void setOneTouchDigitalMessage(unsigned n, unsigned index);
     /** Configures n-th one-touch action as a analog call. */
-    virtual void setOneTouchAnalogCall(uint n);
+    virtual void setOneTouchAnalogCall(unsigned n);
   };
 
   /** Implements the base class of menu settings for all Radioddity codeplugs.
@@ -1005,7 +1005,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    MenuSettingsElement(uint8_t *ptr, uint size);
+    MenuSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1017,9 +1017,9 @@ public:
     void clear();
 
     /** Returns the menu hang-time in seconds. */
-    virtual uint menuHangTime() const;
+    virtual unsigned menuHangTime() const;
     /** Sets the menu hang time in seconds. */
-    virtual void setMenuHangTime(uint sec);
+    virtual void setMenuHangTime(unsigned sec);
 
     /** Returns @c true if the message menu is shown. */
     virtual bool message() const;
@@ -1134,14 +1134,14 @@ public:
     virtual void enableDualWatch(bool enable);
 
     /** Returns the keypad lock time in seconds. */
-    virtual uint keypadLockTime() const;
+    virtual unsigned keypadLockTime() const;
     /** Sets the keypad lock time in seconds. */
-    virtual void setKeypadLockTime(uint sec);
+    virtual void setKeypadLockTime(unsigned sec);
 
     /** Retunrns the backlight time in seconds. */
-    virtual uint backlightTime() const;
+    virtual unsigned backlightTime() const;
     /** Sets the backlight time in seconds. */
-    virtual void setBacklightTime(uint sec);
+    virtual void setBacklightTime(unsigned sec);
 
     /** Returns the channel display mode. */
     virtual ChannelDisplayMode channelDisplayMode() const;
@@ -1167,7 +1167,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    BootSettingsElement(uint8_t *ptr, uint size);
+    BootSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1188,9 +1188,9 @@ public:
     /** Enables/disables the boot password. */
     virtual void enableBootPassword(bool enable);
     /** Returns the boot password (6 digit). */
-    virtual uint bootPassword() const;
+    virtual unsigned bootPassword() const;
     /** Sets the boot password (6 digit). */
-    virtual void setBootPassword(uint passwd);
+    virtual void setBootPassword(unsigned passwd);
   };
 
   /** Implements the base class of boot messages for all Radioddity codeplugs.
@@ -1201,7 +1201,7 @@ public:
   {
   protected:
     /** Hiddden constructor. */
-    BootTextElement(uint8_t *ptr, uint size);
+    BootTextElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1235,7 +1235,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    MessageBankElement(uint8_t *ptr, uint size);
+    MessageBankElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1247,9 +1247,9 @@ public:
     void clear();
 
     /** Returns the number of messages. */
-    virtual uint numMessages() const;
+    virtual unsigned numMessages() const;
     /** Returns the n-th message. */
-    virtual QString message(uint n) const;
+    virtual QString message(unsigned n) const;
     /** Appends a message to the list. */
     virtual void appendMessage(const QString msg);
   };

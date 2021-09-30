@@ -19,7 +19,7 @@ public:
 protected slots:
   void onAddScanList();
   void onRemScanList();
-  void onEditScanList(uint row);
+  void onEditScanList(unsigned row);
 
 private:
   Ui::ScanListsView *ui;

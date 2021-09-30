@@ -146,7 +146,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    ContactElement(uint8_t *ptr, uint size);
+    ContactElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -170,7 +170,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    GroupListElement(uint8_t *ptr, uint size);
+    GroupListElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -190,13 +190,13 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    GroupListBankElement(uint8_t *ptr, uint size);
+    GroupListBankElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
     GroupListBankElement(uint8_t *ptr);
 
-    uint8_t *get(uint n) const;
+    uint8_t *get(unsigned n) const;
   };
 
   /** Represents a single scan list within the GD77 codeplug.
@@ -207,7 +207,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    ScanListElement(uint8_t *ptr, uint size);
+    ScanListElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -225,7 +225,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    ScanListBankElement(uint8_t *ptr, uint size);
+    ScanListBankElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -233,7 +233,7 @@ public:
 
     /** Clears the scan list bank. */
     void clear();
-    uint8_t *get(uint n) const;
+    uint8_t *get(unsigned n) const;
   };
 
 public:

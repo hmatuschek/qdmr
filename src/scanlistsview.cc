@@ -15,7 +15,7 @@ ScanListsView::ScanListsView(Config *config, QWidget *parent)
   ui->listView->setModel(new ScanListsWrapper(_config->scanlists(), ui->listView));
   connect(ui->addScanList, SIGNAL(clicked()), this, SLOT(onAddScanList()));
   connect(ui->remScanList, SIGNAL(clicked()), this, SLOT(onRemScanList()));
-  connect(ui->listView, SIGNAL(doubleClicked(uint)), this, SLOT(onEditScanList(uint)));
+  connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditScanList(unsigned)));
 }
 
 ScanListsView::~ScanListsView() {
@@ -69,7 +69,7 @@ ScanListsView::onRemScanList() {
 }
 
 void
-ScanListsView::onEditScanList(uint row) {
+ScanListsView::onEditScanList(unsigned row) {
   ScanListDialog dialog(_config, _config->scanlists()->scanlist(row));
   if (QDialog::Accepted != dialog.exec())
     return;

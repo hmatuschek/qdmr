@@ -103,7 +103,7 @@ class DigitalContact: public Contact
   /** The type of the contact. */
   Q_PROPERTY(Type type READ type WRITE setType)
   /** The number of the contact. */
-  Q_PROPERTY(uint number READ number WRITE setNumber)
+  Q_PROPERTY(unsigned number READ number WRITE setNumber)
 
 public:
   /** Possible call types for a contact. */
@@ -121,7 +121,7 @@ public:
    * @param number Specifies the DMR number for this contact.
    * @param ring Specifies whether the ring-tone is enabled for this contact.
    * @param parent Specifies the QObject parent. */
-  DigitalContact(Type type, const QString &name, uint number, bool ring=false, QObject *parent=nullptr);
+  DigitalContact(Type type, const QString &name, unsigned number, bool ring=false, QObject *parent=nullptr);
 
   YAML::Node serialize(const Context &context);
 
@@ -130,15 +130,15 @@ public:
   /** (Re-)Sets the call-type. */
   void setType(Type type);
   /** Returns the DMR number. */
-	uint number() const;
+	unsigned number() const;
   /** (Re-)Sets the DMR number of the contact. */
-	bool setNumber(uint number);
+	bool setNumber(unsigned number);
 
 protected:
   /** The call type. */
 	Type _type;
   /** The DMR number of the contact. */
-	uint _number;
+	unsigned _number;
 };
 
 
@@ -173,7 +173,7 @@ public:
   /** Returns the digital contact at index @c idx among digital contacts. */
   DigitalContact *digitalContact(int idx) const;
   /** Searches for a digital contact with the given number. */
-  DigitalContact *findDigitalContact(uint number) const;
+  DigitalContact *findDigitalContact(unsigned number) const;
   /** Returns the DTMF contact at index @c idx among DTMF contacts. */
   DTMFContact *dtmfContact(int idx) const;
 

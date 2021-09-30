@@ -124,7 +124,7 @@ ConfigObject::label(Context &context) {
   if (_idBase.isEmpty())
     return true;
 
-  uint n=1;
+  unsigned n=1;
   QString id=QString("%1%2").arg(_idBase).arg(n);
   while (context.contains(id)) {
     id=QString("%1%2").arg(_idBase).arg(++n);
@@ -161,7 +161,7 @@ ConfigObject::populate(YAML::Node &node, const Context &context){
       node[prop.name()] = this->property(prop.name()).toBool();
     } else if (QString("int") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).toInt();
-    } else if (QString("uint") == prop.typeName()) {
+    } else if (QString("unsigned") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).toUInt();
     } else if (QString("double") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).toDouble();

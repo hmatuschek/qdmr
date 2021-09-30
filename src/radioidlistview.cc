@@ -25,7 +25,7 @@ RadioIDListView::RadioIDListView(Config *config, QWidget *parent)
   connect(_config, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModified()));
   connect(ui->addID, SIGNAL(clicked(bool)), this, SLOT(onAddID()));
   connect(ui->delID, SIGNAL(clicked(bool)), this, SLOT(onDeleteID()));
-  connect(ui->listView, SIGNAL(doubleClicked(uint)), this, SLOT(onEditID(uint)));
+  connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditID(unsigned)));
   connect(ui->defaultID, SIGNAL(currentIndexChanged(int)), this, SLOT(onDefaultIDSelected(int)));
 }
 
@@ -87,7 +87,7 @@ RadioIDListView::onDeleteID() {
 }
 
 void
-RadioIDListView::onEditID(uint row) {
+RadioIDListView::onEditID(unsigned row) {
 
 }
 

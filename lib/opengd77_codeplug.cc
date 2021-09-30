@@ -114,19 +114,19 @@ OpenGD77Codeplug::ChannelElement::extendedPower() const {
 }
 void
 OpenGD77Codeplug::ChannelElement::setExtendedPower(Power power) {
-  setUInt8(0x0019, (uint)(power));
+  setUInt8(0x0019, (unsigned)(power));
 }
 
 bool
 OpenGD77Codeplug::ChannelElement::squelchIsDefault() const {
   return 0 == getUInt8(0x0037);
 }
-uint
+unsigned
 OpenGD77Codeplug::ChannelElement::squelch() const {
   return (getUInt8(0x0037)-1)/2;
 }
 void
-OpenGD77Codeplug::ChannelElement::setSquelch(uint squelch) {
+OpenGD77Codeplug::ChannelElement::setSquelch(unsigned squelch) {
   setUInt8(0x0037, (squelch*2)+1);
 }
 void
@@ -204,7 +204,7 @@ OpenGD77Codeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr)
 }
 
 uint8_t *
-OpenGD77Codeplug::ZoneBankElement::get(uint n) const {
+OpenGD77Codeplug::ZoneBankElement::get(unsigned n) const {
   return (_data+0x20 + n*ZONE_SIZE);
 }
 
@@ -252,13 +252,13 @@ OpenGD77Codeplug::ContactElement::timeSlot() const {
 void
 OpenGD77Codeplug::ContactElement::setTimeSlot(DigitalChannel::TimeSlot ts) {
   if (DigitalChannel::TimeSlot::TS1 == ts)
-    setUInt8(0x0017, (uint)TimeSlotOverride::TS1);
+    setUInt8(0x0017, (unsigned)TimeSlotOverride::TS1);
   else
-    setUInt8(0x0017, (uint)TimeSlotOverride::TS2);
+    setUInt8(0x0017, (unsigned)TimeSlotOverride::TS2);
 }
 void
 OpenGD77Codeplug::ContactElement::disableTimeSlotOverride() {
-  setUInt8(0x0017, (uint)TimeSlotOverride::None);
+  setUInt8(0x0017, (unsigned)TimeSlotOverride::None);
 }
 
 DigitalContact *

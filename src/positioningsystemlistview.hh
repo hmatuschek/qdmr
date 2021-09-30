@@ -22,7 +22,7 @@ protected slots:
   void onAddGPS();
   void onAddAPRS();
   void onRemGPS();
-  void onEditGPS(uint);
+  void onEditGPS(unsigned);
   void onHideGPSNote();
   void loadPositioningSectionState();
   void storePositioningSectionState();

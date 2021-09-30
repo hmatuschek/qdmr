@@ -19,7 +19,7 @@ public:
 	explicit Settings(QObject *parent=nullptr);
 
 	QDateTime lastRepeaterUpdate() const;
-	bool repeaterUpdateNeeded(uint period=7) const;
+	bool repeaterUpdateNeeded(unsigned period=7) const;
 	void repeaterUpdated();
 
   bool queryPosition() const;
@@ -45,12 +45,12 @@ public:
 
   bool limitCallSignDBEntries() const;
   void setLimitCallSignDBEnties(bool enable);
-  uint maxCallSignDBEntries() const;
-  void  setMaxCallSignDBEntries(uint max);
+  unsigned maxCallSignDBEntries() const;
+  void  setMaxCallSignDBEntries(unsigned max);
   bool selectUsingUserDMRID();
   void setSelectUsingUserDMRID(bool enable);
-  QSet<uint> callSignDBPrefixes();
-  void setCallSignDBPrefixes(const QSet<uint> &prefixes);
+  QSet<unsigned> callSignDBPrefixes();
+  void setCallSignDBPrefixes(const QSet<unsigned> &prefixes);
 
   bool ignoreVerificationWarning() const;
   void setIgnoreVerificationWarning(bool ignore);

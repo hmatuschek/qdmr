@@ -71,7 +71,7 @@
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::ChannelElement
  * ******************************************************************************************** */
-D878UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, uint size)
+D878UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
   : D868UVCodeplug::ChannelElement(ptr, size)
 {
   // pass...
@@ -95,7 +95,7 @@ D878UVCodeplug::ChannelElement::pttIDSetting() const {
 }
 void
 D878UVCodeplug::ChannelElement::setPTTIDSetting(PTTId ptt) {
-  setUInt2(0x0019, 0, (uint)ptt);
+  setUInt2(0x0019, 0, (unsigned)ptt);
 }
 
 bool
@@ -142,7 +142,7 @@ D878UVCodeplug::ChannelElement::analogAPRSPTTSetting() const {
 }
 void
 D878UVCodeplug::ChannelElement::setAnalogAPRSPTTSetting(APRSPTT ptt) {
-  setUInt8(0x0036, (uint)ptt);
+  setUInt8(0x0036, (unsigned)ptt);
 }
 
 D878UVCodeplug::ChannelElement::APRSPTT
@@ -151,15 +151,15 @@ D878UVCodeplug::ChannelElement::digitalAPRSPTTSetting() const {
 }
 void
 D878UVCodeplug::ChannelElement::setDigitalAPRSPTTSetting(APRSPTT ptt) {
-  setUInt8(0x0037, (uint)ptt);
+  setUInt8(0x0037, (unsigned)ptt);
 }
 
-uint
+unsigned
 D878UVCodeplug::ChannelElement::digitalAPRSSystemIndex() const {
   return getUInt8(0x0038);
 }
 void
-D878UVCodeplug::ChannelElement::setDigitalAPRSSystemIndex(uint idx) {
+D878UVCodeplug::ChannelElement::setDigitalAPRSSystemIndex(unsigned idx) {
   setUInt8(0x0038, idx);
 }
 
@@ -244,7 +244,7 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::RoamingChannelElement
  * ******************************************************************************************** */
-D878UVCodeplug::RoamingChannelElement::RoamingChannelElement(uint8_t *ptr, uint size)
+D878UVCodeplug::RoamingChannelElement::RoamingChannelElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -261,28 +261,28 @@ D878UVCodeplug::RoamingChannelElement::clear() {
   memset(_data, 0x00, _size);
 }
 
-uint
+unsigned
 D878UVCodeplug::RoamingChannelElement::rxFrequency() const {
   return getBCD8_be(0x0000)*10;
 }
 void
-D878UVCodeplug::RoamingChannelElement::setRXFrequency(uint hz) {
+D878UVCodeplug::RoamingChannelElement::setRXFrequency(unsigned hz) {
   setBCD8_be(0x0000, hz/10);
 }
-uint
+unsigned
 D878UVCodeplug::RoamingChannelElement::txFrequency() const {
   return getBCD8_be(0x0004)*10;
 }
 void
-D878UVCodeplug::RoamingChannelElement::setTXFrequency(uint hz) {
+D878UVCodeplug::RoamingChannelElement::setTXFrequency(unsigned hz) {
   setBCD8_be(0x0004, hz/10);
 }
-uint
+unsigned
 D878UVCodeplug::RoamingChannelElement::colorCode() const {
   return getUInt8(0x0008);
 }
 void
-D878UVCodeplug::RoamingChannelElement::setColorCode(uint cc) {
+D878UVCodeplug::RoamingChannelElement::setColorCode(unsigned cc) {
   setUInt8(0x0008, cc);
 }
 
@@ -345,7 +345,7 @@ D878UVCodeplug::RoamingChannelElement::toChannel(Context &ctx) {
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::RoamingZoneElement
  * ******************************************************************************************** */
-D878UVCodeplug::RoamingZoneElement::RoamingZoneElement(uint8_t *ptr, uint size)
+D878UVCodeplug::RoamingZoneElement::RoamingZoneElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -364,19 +364,19 @@ D878UVCodeplug::RoamingZoneElement::clear() {
 }
 
 bool
-D878UVCodeplug::RoamingZoneElement::hasMember(uint n) const {
+D878UVCodeplug::RoamingZoneElement::hasMember(unsigned n) const {
   return (0xff != member(n));
 }
-uint
-D878UVCodeplug::RoamingZoneElement::member(uint n) const {
+unsigned
+D878UVCodeplug::RoamingZoneElement::member(unsigned n) const {
   return getUInt8(0x0000 + n);
 }
 void
-D878UVCodeplug::RoamingZoneElement::setMember(uint n, uint idx) {
+D878UVCodeplug::RoamingZoneElement::setMember(unsigned n, unsigned idx) {
   setUInt8(0x0000 + n, idx);
 }
 void
-D878UVCodeplug::RoamingZoneElement::clearMember(uint n) {
+D878UVCodeplug::RoamingZoneElement::clearMember(unsigned n) {
   setMember(n, 0xff);
 }
 
@@ -391,7 +391,7 @@ D878UVCodeplug::RoamingZoneElement::setName(const QString &name) {
 
 bool
 D878UVCodeplug::RoamingZoneElement::fromRoamingZone(
-    RoamingZone *zone, const QHash<DigitalChannel *, uint> &map)
+    RoamingZone *zone, const QHash<DigitalChannel *, unsigned> &map)
 {
   clear();
   setName(zone->name());
@@ -408,7 +408,7 @@ D878UVCodeplug::RoamingZoneElement::toRoamingZone() const {
 
 bool
 D878UVCodeplug::RoamingZoneElement::linkRoamingZone(
-    RoamingZone *zone, const QHash<uint, DigitalChannel*> &map)
+    RoamingZone *zone, const QHash<unsigned, DigitalChannel*> &map)
 {
   for (uint8_t i=0; (i<NUM_CH_PER_ROAMINGZONE)&&hasMember(i); i++) {
     DigitalChannel *digi = nullptr;
@@ -429,7 +429,7 @@ D878UVCodeplug::RoamingZoneElement::linkRoamingZone(
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::GeneralSettingsElement
  * ******************************************************************************************** */
-D878UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, uint size)
+D878UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
   : AnytoneCodeplug::GeneralSettingsElement(ptr, size)
 {
   // pass...
@@ -446,12 +446,12 @@ D878UVCodeplug::GeneralSettingsElement::clear() {
   AnytoneCodeplug::GeneralSettingsElement::clear();
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::transmitTimeout() const {
-  return ((uint)getUInt8(0x0004))*30;
+  return ((unsigned)getUInt8(0x0004))*30;
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setTransmitTimeout(uint tot) {
+D878UVCodeplug::GeneralSettingsElement::setTransmitTimeout(unsigned tot) {
   setUInt8(0x0004, tot/30);
 }
 
@@ -461,7 +461,7 @@ D878UVCodeplug::GeneralSettingsElement::language() const {
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setLanguage(Language lang) {
-  setUInt8(0x0005, (uint)lang);
+  setUInt8(0x0005, (unsigned)lang);
 }
 
 double
@@ -504,7 +504,7 @@ D878UVCodeplug::GeneralSettingsElement::steType() const {
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setSTEType(STEType type) {
-  setUInt8(0x0017, (uint)type);
+  setUInt8(0x0017, (unsigned)type);
 }
 D878UVCodeplug::GeneralSettingsElement::STEFrequency
 D878UVCodeplug::GeneralSettingsElement::steFrequency() const {
@@ -512,48 +512,48 @@ D878UVCodeplug::GeneralSettingsElement::steFrequency() const {
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setSTEFrequency(STEFrequency freq) {
-  setUInt8(0x0018, (uint)freq);
+  setUInt8(0x0018, (unsigned)freq);
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::groupCallHangTime() const {
   return getUInt8(0x0019);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setGroupCallHangTime(uint sec) {
+D878UVCodeplug::GeneralSettingsElement::setGroupCallHangTime(unsigned sec) {
   setUInt8(0x0019, sec);
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::privateCallHangTime() const {
   return getUInt8(0x001a);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setPrivateCallHangTime(uint sec) {
+D878UVCodeplug::GeneralSettingsElement::setPrivateCallHangTime(unsigned sec) {
   setUInt8(0x001a, sec);
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::preWaveDelay() const {
-  return ((uint)getUInt8(0x001b))*20;
+  return ((unsigned)getUInt8(0x001b))*20;
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setPreWaveDelay(uint ms) {
+D878UVCodeplug::GeneralSettingsElement::setPreWaveDelay(unsigned ms) {
   setUInt8(0x001b, ms/20);
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::wakeHeadPeriod() const {
-  return ((uint)getUInt8(0x001c))*20;
+  return ((unsigned)getUInt8(0x001c))*20;
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setWakeHeadPeriod(uint ms) {
+D878UVCodeplug::GeneralSettingsElement::setWakeHeadPeriod(unsigned ms) {
   setUInt8(0x001c, ms/20);
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::wfmChannelIndex() const {
   return getUInt8(0x001d);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setWFMChannelIndex(uint idx) {
+D878UVCodeplug::GeneralSettingsElement::setWFMChannelIndex(unsigned idx) {
   setUInt8(0x001d, idx);
 }
 bool
@@ -565,7 +565,7 @@ D878UVCodeplug::GeneralSettingsElement::enableWFMVFO(bool enable) {
   setUInt8(0x001e, (enable ? 0x01 : 0x00));
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::dtmfToneDuration() const {
   switch (getUInt8(0x0023)) {
   case DTMF_DUR_50ms:  return 50;
@@ -577,7 +577,7 @@ D878UVCodeplug::GeneralSettingsElement::dtmfToneDuration() const {
   return 50;
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setDTMFToneDuration(uint ms) {
+D878UVCodeplug::GeneralSettingsElement::setDTMFToneDuration(unsigned ms) {
   if (ms<=50) {
     setUInt8(0x0023, DTMF_DUR_50ms);
   } else if (ms<=100) {
@@ -615,7 +615,7 @@ D878UVCodeplug::GeneralSettingsElement::tbstFrequency() const {
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setTBSTFrequency(TBSTFrequency freq) {
-  setUInt8(0x002e, (uint)freq);
+  setUInt8(0x002e, (unsigned)freq);
 }
 
 bool
@@ -660,7 +660,7 @@ D878UVCodeplug::GeneralSettingsElement::monitorSlotMatch() const {
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setMonitorSlotMatch(SlotMatch match) {
-  setUInt8(0x0049, (uint)match);
+  setUInt8(0x0049, (unsigned)match);
 }
 
 bool
@@ -690,21 +690,21 @@ D878UVCodeplug::GeneralSettingsElement::enableMonitorTimeSlotHold(bool enable) {
   setUInt8(0x004c, (enable ? 0x01 : 0x00));
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::manDownDelay() const {
   return getUInt8(0x004f);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setManDownDelay(uint sec) {
+D878UVCodeplug::GeneralSettingsElement::setManDownDelay(unsigned sec) {
   setUInt8(0x004f, sec);
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::analogCallHold() const {
   return getUInt8(0x0050);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAnalogCallHold(uint sec) {
+D878UVCodeplug::GeneralSettingsElement::setAnalogCallHold(unsigned sec) {
   setUInt8(0x0050, sec);
 }
 
@@ -726,29 +726,29 @@ D878UVCodeplug::GeneralSettingsElement::enableMaintainCalLChannel(bool enable) {
   setUInt8(0x0063, (enable ? 0x01 : 0x00));
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::priorityZoneAIndex() const {
   return getUInt8(0x006f);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setPriorityZoneAIndex(uint idx) {
+D878UVCodeplug::GeneralSettingsElement::setPriorityZoneAIndex(unsigned idx) {
   setUInt8(0x006f, idx);
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::priorityZoneBIndex() const {
   return getUInt8(0x0070);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setPriorityZoneBIndex(uint idx) {
+D878UVCodeplug::GeneralSettingsElement::setPriorityZoneBIndex(unsigned idx) {
   setUInt8(0x0070, idx);
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::gpsRangingInterval() const {
   return getUInt8(0x00b5);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setGPSRangingInterval(uint sec) {
+D878UVCodeplug::GeneralSettingsElement::setGPSRangingInterval(unsigned sec) {
   setUInt8(0x00b5, sec);
 }
 
@@ -770,12 +770,12 @@ D878UVCodeplug::GeneralSettingsElement::enableDisplayContact(bool enable) {
   setUInt8(0x00b8, (enable ? 0x01 : 0x00));
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::autoRoamPeriod() const {
   return getUInt8(0x00ba);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAutoRoamPeriod(uint min) {
+D878UVCodeplug::GeneralSettingsElement::setAutoRoamPeriod(unsigned min) {
   setUInt8(0x00ba, min);
 }
 
@@ -783,12 +783,12 @@ bool
 D878UVCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
   return 0 == keyToneLevel();
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::keyToneLevel() const {
-  return ((uint)getUInt8(0x00bb))*10/15;
+  return ((unsigned)getUInt8(0x00bb))*10/15;
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setKeyToneLevel(uint level) {
+D878UVCodeplug::GeneralSettingsElement::setKeyToneLevel(unsigned level) {
   setUInt8(0x00bb, level*10/15);
 }
 void
@@ -802,7 +802,7 @@ D878UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setCallDisplayColor(Color color) {
-  setUInt8(0x00bc, (uint)color);
+  setUInt8(0x00bc, (unsigned)color);
 }
 
 bool
@@ -847,12 +847,12 @@ D878UVCodeplug::GeneralSettingsElement::enableKeyLockForced(bool enable) {
   setBit(0x00be, 4, enable);
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::autoRoamDelay() const {
   return getUInt8(0x00bf);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAutoRoamDelay(uint sec) {
+D878UVCodeplug::GeneralSettingsElement::setAutoRoamDelay(unsigned sec) {
   setUInt8(0x00bf, sec);
 }
 
@@ -862,7 +862,7 @@ D878UVCodeplug::GeneralSettingsElement::standbyTextColor() const {
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setStandbyTextColor(Color color) {
-  setUInt8(0x00c0, (uint)color);
+  setUInt8(0x00c0, (unsigned)color);
 }
 
 D878UVCodeplug::GeneralSettingsElement::Color
@@ -871,7 +871,7 @@ D878UVCodeplug::GeneralSettingsElement::standbyImageColor() const {
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setStandbyImageColor(Color color) {
-  setUInt8(0x00c1, (uint)color);
+  setUInt8(0x00c1, (unsigned)color);
 }
 
 bool
@@ -889,40 +889,40 @@ D878UVCodeplug::GeneralSettingsElement::smsFormat() const {
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setSMSFormat(SMSFormat fmt) {
-  setUInt8(0x00c3, (uint)fmt);
+  setUInt8(0x00c3, (unsigned)fmt);
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
   return getBCD8_be(0x00c4)*10;
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(uint Hz) {
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(unsigned Hz) {
   setBCD8_be(0x00c4, Hz/10);
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyVHF() const {
   return getBCD8_be(0x00c8)*10;
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(uint Hz) {
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(unsigned Hz) {
   setBCD8_be(0x00c8, Hz/10);
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyUHF() const {
   return getBCD8_be(0x00cc)*10;
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(uint Hz) {
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(unsigned Hz) {
   setBCD8_be(0x00cc, Hz/10);
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyUHF() const {
   return getBCD8_be(0x00d0)*10;
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(uint Hz) {
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(unsigned Hz) {
   setBCD8_be(0x00d0, Hz/10);
 }
 
@@ -932,7 +932,7 @@ D878UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AutoRepDir dir) {
-  setUInt8(0x00d4, (uint)dir);
+  setUInt8(0x00d4, (unsigned)dir);
 }
 
 bool
@@ -944,21 +944,21 @@ D878UVCodeplug::GeneralSettingsElement::enableDefaultChannel(bool enable) {
   setUInt8(0x00d7, (enable ? 0x01 : 0x00));
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::defaultZoneIndexA() const {
   return getUInt8(0x00d8);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexA(uint idx) {
+D878UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexA(unsigned idx) {
   setUInt8(0x00d8, idx);
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::defaultZoneIndexB() const {
   return getUInt8(0x00d9);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexB(uint idx) {
+D878UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexB(unsigned idx) {
   setUInt8(0x00d9, idx);
 }
 
@@ -966,12 +966,12 @@ bool
 D878UVCodeplug::GeneralSettingsElement::defaultChannelAIsVFO() const {
   return 0xff == defaultChannelAIndex();
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::defaultChannelAIndex() const {
   return getUInt8(0x00da);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setDefaultChannelAIndex(uint idx) {
+D878UVCodeplug::GeneralSettingsElement::setDefaultChannelAIndex(unsigned idx) {
   setUInt8(0x00da, idx);
 }
 void
@@ -983,12 +983,12 @@ bool
 D878UVCodeplug::GeneralSettingsElement::defaultChannelBIsVFO() const {
   return 0xff == defaultChannelBIndex();
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::defaultChannelBIndex() const {
   return getUInt8(0x00db);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setDefaultChannelBIndex(uint idx) {
+D878UVCodeplug::GeneralSettingsElement::setDefaultChannelBIndex(unsigned idx) {
   setUInt8(0x00db, idx);
 }
 void
@@ -996,12 +996,12 @@ D878UVCodeplug::GeneralSettingsElement::setDefaultChannelBToVFO() {
   setDefaultChannelBIndex(0xff);
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::defaultRoamingZoneIndex() const {
   return getUInt8(0x00dc);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setDefaultRoamingZoneIndex(uint idx) {
+D878UVCodeplug::GeneralSettingsElement::setDefaultRoamingZoneIndex(unsigned idx) {
   setUInt8(0x00dc, idx);
 }
 
@@ -1014,21 +1014,21 @@ D878UVCodeplug::GeneralSettingsElement::enableRepeaterRangeCheck(bool enable) {
   setUInt8(0x00dd, (enable ? 0x01 : 0x00));
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::repeaterRangeCheckInterval() const {
-  return ((uint)getUInt8(0x00de))*5;
+  return ((unsigned)getUInt8(0x00de))*5;
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setRepeaterRangeCheckInterval(uint sec) {
+D878UVCodeplug::GeneralSettingsElement::setRepeaterRangeCheckInterval(unsigned sec) {
   setUInt8(0x00de, sec/5);
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::repeaterRangeCheckCount() const {
   return getUInt8(0x00df);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setRepeaterRangeCheckCount(uint n) {
+D878UVCodeplug::GeneralSettingsElement::setRepeaterRangeCheckCount(unsigned n) {
   setUInt8(0x00df, n);
 }
 
@@ -1038,15 +1038,15 @@ D878UVCodeplug::GeneralSettingsElement::roamingStartCondition() const {
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setRoamingStartCondition(RoamStart cond) {
-  setUInt8(0x00e0, (uint)cond);
+  setUInt8(0x00e0, (unsigned)cond);
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::backlightTXDuration() const {
   return getUInt8(0x00e1);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setBacklightTXDuration(uint sec) {
+D878UVCodeplug::GeneralSettingsElement::setBacklightTXDuration(unsigned sec) {
   setUInt8(0x00e1, sec);
 }
 
@@ -1074,7 +1074,7 @@ D878UVCodeplug::GeneralSettingsElement::channelNameColor() const {
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setChannelNameColor(Color color) {
-  setUInt8(0x00e4, (uint)color);
+  setUInt8(0x00e4, (unsigned)color);
 }
 
 bool
@@ -1087,12 +1087,12 @@ D878UVCodeplug::GeneralSettingsElement::enableRepeaterCheckNotification(bool ena
 }
 
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::backlightRXDuration() const {
   return getUInt8(0x00e6);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setBacklightRXDuration(uint sec) {
+D878UVCodeplug::GeneralSettingsElement::setBacklightRXDuration(unsigned sec) {
   setUInt8(0x00e6, sec);
 }
 
@@ -1105,22 +1105,22 @@ D878UVCodeplug::GeneralSettingsElement::enableRoaming(bool enable) {
   setUInt8(0x00e7, (enable ? 0x01 : 0x00));
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::muteDelay() const {
   return getUInt8(0x00e9)+1;
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setMuteDelay(uint min) {
+D878UVCodeplug::GeneralSettingsElement::setMuteDelay(unsigned min) {
   if (1>min) min = 1;
   setUInt8(0x00e9, min-1);
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsElement::repeaterCheckNumNotifications() const {
   return getUInt8(0x00ea);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setRepeaterCheckNumNotifications(uint num) {
+D878UVCodeplug::GeneralSettingsElement::setRepeaterCheckNumNotifications(unsigned num) {
   setUInt8(0x00ea, num);
 }
 
@@ -1167,7 +1167,7 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::GPSMessageElement
  * ******************************************************************************************** */
-D878UVCodeplug::GPSMessageElement::GPSMessageElement(uint8_t *ptr, uint size)
+D878UVCodeplug::GPSMessageElement::GPSMessageElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -1207,7 +1207,7 @@ D878UVCodeplug::GPSMessageElement::updateConfig(Context &ctx) const {
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::GeneralSettingsExtensionElement
  * ******************************************************************************************** */
-D878UVCodeplug::GeneralSettingsExtensionElement::GeneralSettingsExtensionElement(uint8_t *ptr, uint size)
+D878UVCodeplug::GeneralSettingsExtensionElement::GeneralSettingsExtensionElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -1239,7 +1239,7 @@ D878UVCodeplug::GeneralSettingsExtensionElement::talkerAliasDisplay() const {
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setTalkerAliasDisplay(TalkerAliasDisplay mode) {
-  setUInt8(0x001e, (uint)mode);
+  setUInt8(0x001e, (unsigned)mode);
 }
 
 D878UVCodeplug::GeneralSettingsExtensionElement::TalkerAliasEncoding
@@ -1248,19 +1248,19 @@ D878UVCodeplug::GeneralSettingsExtensionElement::talkerAliasEncoding() const {
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setTalkerAliasEncoding(TalkerAliasEncoding enc) {
-  setUInt8(0x001f, (uint)enc);
+  setUInt8(0x001f, (unsigned)enc);
 }
 
 bool
 D878UVCodeplug::GeneralSettingsExtensionElement::hasAutoRepeaterUHF2OffsetIndex() const {
   return 0xff != autoRepeaterUHF2OffsetIndex();
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterUHF2OffsetIndex() const {
   return getUInt8(0x0022);
 }
 void
-D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2OffsetIndex(uint idx) {
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2OffsetIndex(unsigned idx) {
   setUInt8(0x0022, idx);
 }
 void
@@ -1272,12 +1272,12 @@ bool
 D878UVCodeplug::GeneralSettingsExtensionElement::hasAutoRepeaterVHF2OffsetIndex() const {
   return 0xff != autoRepeaterVHF2OffsetIndex();
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterVHF2OffsetIndex() const {
   return getUInt8(0x0023);
 }
 void
-D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2OffsetIndex(uint idx) {
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2OffsetIndex(unsigned idx) {
   setUInt8(0x0023, idx);
 }
 void
@@ -1285,36 +1285,36 @@ D878UVCodeplug::GeneralSettingsExtensionElement::clearAutoRepeaterVHF2OffsetInde
   setAutoRepeaterVHF2OffsetIndex(0xff);
 }
 
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterVHF2MinFrequency() const {
-  return ((uint)getBCD8_be(0x0024))*10;
+  return ((unsigned)getBCD8_be(0x0024))*10;
 }
 void
-D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2MinFrequency(uint hz) {
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2MinFrequency(unsigned hz) {
   setBCD8_be(0x0024, hz/10);
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterVHF2MaxFrequency() const {
-  return ((uint)getBCD8_be(0x0028))*10;
+  return ((unsigned)getBCD8_be(0x0028))*10;
 }
 void
-D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2MaxFrequency(uint hz) {
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2MaxFrequency(unsigned hz) {
   setBCD8_be(0x0028, hz/10);
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterUHF2MinFrequency() const {
-  return ((uint)getBCD8_be(0x002c))*10;
+  return ((unsigned)getBCD8_be(0x002c))*10;
 }
 void
-D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MinFrequency(uint hz) {
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MinFrequency(unsigned hz) {
   setBCD8_be(0x002c, hz/10);
 }
-uint
+unsigned
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterUHF2MaxFrequency() const {
-  return ((uint)getBCD8_be(0x0030))*10;
+  return ((unsigned)getBCD8_be(0x0030))*10;
 }
 void
-D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MaxFrequency(uint hz) {
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MaxFrequency(unsigned hz) {
   setBCD8_be(0x0030, hz/10);
 }
 
@@ -1324,7 +1324,7 @@ D878UVCodeplug::GeneralSettingsExtensionElement::gpsMode() const {
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setGPSMode(GPSMode mode) {
-  setUInt8(0x0035, (uint)mode);
+  setUInt8(0x0035, (unsigned)mode);
 }
 
 bool
@@ -1341,7 +1341,7 @@ D878UVCodeplug::GeneralSettingsExtensionElement::updateConfig(Context &ctx) {
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::AnalogAPRSSettingsElement
  * ******************************************************************************************** */
-D878UVCodeplug::AnalogAPRSSettingsElement::AnalogAPRSSettingsElement(uint8_t *ptr, uint size)
+D878UVCodeplug::AnalogAPRSSettingsElement::AnalogAPRSSettingsElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -1361,21 +1361,21 @@ D878UVCodeplug::AnalogAPRSSettingsElement::clear() {
   setUInt8(0x003d, 0x01); setUInt8(0x003e, 0x03); setUInt8(0x003f, 0xff);
 }
 
-uint
+unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::frequency() const {
-  return ((uint)getBCD8_be(0x0001))*10;
+  return ((unsigned)getBCD8_be(0x0001))*10;
 }
 void
-D878UVCodeplug::AnalogAPRSSettingsElement::setFrequency(uint hz) {
+D878UVCodeplug::AnalogAPRSSettingsElement::setFrequency(unsigned hz) {
   setBCD8_be(0x0001, hz/10);
 }
 
-uint
+unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::txDelay() const {
-  return ((uint)getUInt8(0x0005))*20;
+  return ((unsigned)getUInt8(0x0005))*20;
 }
 void
-D878UVCodeplug::AnalogAPRSSettingsElement::setTXDelay(uint ms) {
+D878UVCodeplug::AnalogAPRSSettingsElement::setTXDelay(unsigned ms) {
   setUInt8(0x0005, ms/20);
 }
 
@@ -1410,12 +1410,12 @@ D878UVCodeplug::AnalogAPRSSettingsElement::setTXTone(Signaling::Code code) {
   }
 }
 
-uint
+unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::manualTXInterval() const {
   return getUInt8(0x000a);
 }
 void
-D878UVCodeplug::AnalogAPRSSettingsElement::setManualTXInterval(uint sec) {
+D878UVCodeplug::AnalogAPRSSettingsElement::setManualTXInterval(unsigned sec) {
   setUInt8(0x000a, sec);
 }
 
@@ -1423,12 +1423,12 @@ bool
 D878UVCodeplug::AnalogAPRSSettingsElement::autoTX() const {
   return 0!=autoTXInterval();
 }
-uint
+unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::autoTXInterval() const {
-  return ((uint)getUInt8(0x000b))*30;
+  return ((unsigned)getUInt8(0x000b))*30;
 }
 void
-D878UVCodeplug::AnalogAPRSSettingsElement::setAutoTXInterval(uint sec) {
+D878UVCodeplug::AnalogAPRSSettingsElement::setAutoTXInterval(unsigned sec) {
   setUInt8(0x000b, sec/30);
 }
 void
@@ -1452,14 +1452,14 @@ void
 D878UVCodeplug::AnalogAPRSSettingsElement::setFixedLocation(QGeoCoordinate &loc) {
   double latitude = loc.latitude();
   bool south = (0 > latitude); latitude = std::abs(latitude);
-  uint lat_deg = int(latitude); latitude -= lat_deg; latitude *= 60;
-  uint lat_min = int(latitude); latitude -= lat_min; latitude *= 60;
-  uint lat_sec = int(latitude);
+  unsigned lat_deg = int(latitude); latitude -= lat_deg; latitude *= 60;
+  unsigned lat_min = int(latitude); latitude -= lat_min; latitude *= 60;
+  unsigned lat_sec = int(latitude);
   double longitude = loc.longitude();
   bool west = (0 > longitude); longitude = std::abs(longitude);
-  uint lon_deg = int(longitude); longitude -= lon_deg; longitude *= 60;
-  uint lon_min = int(longitude); longitude -= lon_min; longitude *= 60;
-  uint lon_sec = int(longitude);
+  unsigned lon_deg = int(longitude); longitude -= lon_deg; longitude *= 60;
+  unsigned lon_min = int(longitude); longitude -= lon_min; longitude *= 60;
+  unsigned lon_sec = int(longitude);
   setUInt8(0x000e, lat_deg); setUInt8(0x000f, lat_min); setUInt8(0x0010, lat_sec); setUInt8(0x0011, (south ? 0x01 : 0x00));
   setUInt8(0x0012, lon_deg); setUInt8(0x0013, lon_min); setUInt8(0x0014, lon_sec); setUInt8(0x0015, (west ? 0x01 : 0x00));
   // enable fixed location.
@@ -1474,12 +1474,12 @@ QString
 D878UVCodeplug::AnalogAPRSSettingsElement::destination() const {
   return readASCII(0x0016, 6, 0x00);
 }
-uint
+unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::destinationSSID() const {
   return getUInt8(0x001c);
 }
 void
-D878UVCodeplug::AnalogAPRSSettingsElement::setDestination(const QString &call, uint ssid) {
+D878UVCodeplug::AnalogAPRSSettingsElement::setDestination(const QString &call, unsigned ssid) {
   writeASCII(0x0016, call, 6, 0x00);
   setUInt8(0x001c, ssid);
 }
@@ -1487,12 +1487,12 @@ QString
 D878UVCodeplug::AnalogAPRSSettingsElement::source() const {
   return readASCII(0x001d, 6, 0x00);
 }
-uint
+unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::sourceSSID() const {
   return getUInt8(0x0023);
 }
 void
-D878UVCodeplug::AnalogAPRSSettingsElement::setSource(const QString &call, uint ssid) {
+D878UVCodeplug::AnalogAPRSSettingsElement::setSource(const QString &call, unsigned ssid) {
   writeASCII(0x001d, call, 6, 0x00);
   setUInt8(0x0023, ssid);
 }
@@ -1537,12 +1537,12 @@ D878UVCodeplug::AnalogAPRSSettingsElement::setPower(Channel::Power power) {
   }
 }
 
-uint
+unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::preWaveDelay() const {
-  return ((uint)getUInt8(0x003c))*10;
+  return ((unsigned)getUInt8(0x003c))*10;
 }
 void
-D878UVCodeplug::AnalogAPRSSettingsElement::setPreWaveDelay(uint ms) {
+D878UVCodeplug::AnalogAPRSSettingsElement::setPreWaveDelay(unsigned ms) {
   setUInt8(0x003c, ms/10);
 }
 
@@ -1595,7 +1595,7 @@ D878UVCodeplug::AnalogAPRSSettingsElement::linkAPRSSystem(APRSSystem *sys, Conte
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::AnalogAPRSSettingsExtensionElement
  * ******************************************************************************************** */
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::AnalogAPRSSettingsExtensionElement(uint8_t *ptr, uint size)
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::AnalogAPRSSettingsExtensionElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -1612,12 +1612,12 @@ D878UVCodeplug::AnalogAPRSSettingsExtensionElement::clear() {
   memset(_data, 0x00, _size);
 }
 
-uint
+unsigned
 D878UVCodeplug::AnalogAPRSSettingsExtensionElement::fixedAltitude() const {
   return getUInt16_le(0x0006)/3.28;
 }
 void
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::setFixedAltitude(uint m) {
+D878UVCodeplug::AnalogAPRSSettingsExtensionElement::setFixedAltitude(unsigned m) {
   setUInt16_le(0x0006, m*3.28);
 }
 
@@ -1706,7 +1706,7 @@ D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportOther(bool enabl
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::AnalogAPRSRXEntryElement
  * ******************************************************************************************** */
-D878UVCodeplug::AnalogAPRSRXEntryElement::AnalogAPRSRXEntryElement(uint8_t *ptr, uint size)
+D878UVCodeplug::AnalogAPRSRXEntryElement::AnalogAPRSRXEntryElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -1732,12 +1732,12 @@ QString
 D878UVCodeplug::AnalogAPRSRXEntryElement::call() const {
   return readASCII(0x0001, 6, 0x00);
 }
-uint
+unsigned
 D878UVCodeplug::AnalogAPRSRXEntryElement::ssid() const {
   return getUInt8(0x0007);
 }
 void
-D878UVCodeplug::AnalogAPRSRXEntryElement::setCall(const QString &call, uint ssid) {
+D878UVCodeplug::AnalogAPRSRXEntryElement::setCall(const QString &call, unsigned ssid) {
   writeASCII(0x0001, call, 6, 0x00); // Store call
   setUInt8(0x0007, ssid);            // Store SSID
   setUInt8(0x0000, 0x01);            // Enable entry.
@@ -1747,7 +1747,7 @@ D878UVCodeplug::AnalogAPRSRXEntryElement::setCall(const QString &call, uint ssid
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::DMRAPRSSystemsElement
  * ******************************************************************************************** */
-D878UVCodeplug::DMRAPRSSystemsElement::DMRAPRSSystemsElement(uint8_t *ptr, uint size)
+D878UVCodeplug::DMRAPRSSystemsElement::DMRAPRSSystemsElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -1765,33 +1765,33 @@ D878UVCodeplug::DMRAPRSSystemsElement::clear() {
 }
 
 bool
-D878UVCodeplug::DMRAPRSSystemsElement::channelIsSelected(uint n) const {
+D878UVCodeplug::DMRAPRSSystemsElement::channelIsSelected(unsigned n) const {
   return 0xfa2 == channelIndex(n);
 }
-uint
-D878UVCodeplug::DMRAPRSSystemsElement::channelIndex(uint n) const {
+unsigned
+D878UVCodeplug::DMRAPRSSystemsElement::channelIndex(unsigned n) const {
   return getUInt16_le(0x0000 + n*2);
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setChannelIndex(uint n, uint idx) {
+D878UVCodeplug::DMRAPRSSystemsElement::setChannelIndex(unsigned n, unsigned idx) {
   setUInt16_le(0x0000 + 2*n, idx);
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setChannelSelected(uint n) {
+D878UVCodeplug::DMRAPRSSystemsElement::setChannelSelected(unsigned n) {
   setChannelIndex(n, 0xfa2);
 }
 
-uint
-D878UVCodeplug::DMRAPRSSystemsElement::destination(uint n) const {
+unsigned
+D878UVCodeplug::DMRAPRSSystemsElement::destination(unsigned n) const {
   return getBCD8_be(0x0010 + 4*n);
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setDestination(uint n, uint idx) {
+D878UVCodeplug::DMRAPRSSystemsElement::setDestination(unsigned n, unsigned idx) {
   setBCD8_be(0x0010 + 4*n, idx);
 }
 
 DigitalContact::Type
-D878UVCodeplug::DMRAPRSSystemsElement::callType(uint n) const {
+D878UVCodeplug::DMRAPRSSystemsElement::callType(unsigned n) const {
   switch(getUInt8(0x0030 + n)) {
   case 0: return DigitalContact::PrivateCall;
   case 1: return DigitalContact::GroupCall;
@@ -1800,7 +1800,7 @@ D878UVCodeplug::DMRAPRSSystemsElement::callType(uint n) const {
   return DigitalContact::PrivateCall;
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setCallType(uint n, DigitalContact::Type type) {
+D878UVCodeplug::DMRAPRSSystemsElement::setCallType(unsigned n, DigitalContact::Type type) {
   switch(type) {
   case DigitalContact::PrivateCall: setUInt8(0x0030+n, 0x00); break;
   case DigitalContact::GroupCall: setUInt8(0x0030+n, 0x01); break;
@@ -1809,11 +1809,11 @@ D878UVCodeplug::DMRAPRSSystemsElement::setCallType(uint n, DigitalContact::Type 
 }
 
 bool
-D878UVCodeplug::DMRAPRSSystemsElement::timeSlotOverride(uint n) {
+D878UVCodeplug::DMRAPRSSystemsElement::timeSlotOverride(unsigned n) {
   return 0x00 != getUInt8(0x0039 + n);
 }
 DigitalChannel::TimeSlot
-D878UVCodeplug::DMRAPRSSystemsElement::timeSlot(uint n) const {
+D878UVCodeplug::DMRAPRSSystemsElement::timeSlot(unsigned n) const {
   switch (getUInt8(0x0039 + n)) {
   case 1: return DigitalChannel::TimeSlot::TS1;
   case 2: return DigitalChannel::TimeSlot::TS2;
@@ -1821,14 +1821,14 @@ D878UVCodeplug::DMRAPRSSystemsElement::timeSlot(uint n) const {
   return DigitalChannel::TimeSlot::TS1;
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setTimeSlot(uint n, DigitalChannel::TimeSlot ts) {
+D878UVCodeplug::DMRAPRSSystemsElement::setTimeSlot(unsigned n, DigitalChannel::TimeSlot ts) {
   switch (ts) {
   case DigitalChannel::TimeSlot::TS1: setUInt8(0x0039+n, 0x01); break;
   case DigitalChannel::TimeSlot::TS2: setUInt8(0x0039+n, 0x02); break;
   }
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::clearTimeSlotOverride(uint n) {
+D878UVCodeplug::DMRAPRSSystemsElement::clearTimeSlotOverride(unsigned n) {
   setUInt8(0x0039+n, 0);
 }
 
@@ -1841,12 +1841,12 @@ D878UVCodeplug::DMRAPRSSystemsElement::enableRoaming(bool enable) {
   setUInt8(0x0038, (enable ? 0x01 : 0x00));
 }
 
-uint
+unsigned
 D878UVCodeplug::DMRAPRSSystemsElement::repeaterActivationDelay() const {
-  return ((uint)getUInt8(0x0041))*100;
+  return ((unsigned)getUInt8(0x0041))*100;
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setRepeaterActivationDelay(uint ms) {
+D878UVCodeplug::DMRAPRSSystemsElement::setRepeaterActivationDelay(unsigned ms) {
   setUInt8(0x0041, ms/100);
 }
 
@@ -1913,7 +1913,7 @@ D878UVCodeplug::DMRAPRSSystemsElement::linkGPSSystem(int idx, GPSSystem *sys, Co
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::AESEncryptionKeyElement
  * ******************************************************************************************** */
-D878UVCodeplug::AESEncryptionKeyElement::AESEncryptionKeyElement(uint8_t *ptr, uint size)
+D878UVCodeplug::AESEncryptionKeyElement::AESEncryptionKeyElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -1937,12 +1937,12 @@ D878UVCodeplug::AESEncryptionKeyElement::isValid() const {
   return Element::isValid() && (0xff != index());
 }
 
-uint
+unsigned
 D878UVCodeplug::AESEncryptionKeyElement::index() const {
   return getUInt8(0x0000);
 }
 void
-D878UVCodeplug::AESEncryptionKeyElement::setIndex(uint idx) {
+D878UVCodeplug::AESEncryptionKeyElement::setIndex(unsigned idx) {
   setUInt8(0x0000, idx);
 }
 
@@ -1963,7 +1963,7 @@ D878UVCodeplug::AESEncryptionKeyElement::setKey(const QByteArray &key) {
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::RadioInfoElement
  * ******************************************************************************************** */
-D878UVCodeplug::RadioInfoElement::RadioInfoElement(uint8_t *ptr, uint size)
+D878UVCodeplug::RadioInfoElement::RadioInfoElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
@@ -1992,7 +1992,7 @@ D878UVCodeplug::RadioInfoElement::frequencyRange() const {
 }
 void
 D878UVCodeplug::RadioInfoElement::setFrequencyRange(FrequencyRange range) {
-  setUInt8(0x0003, (uint)range);
+  setUInt8(0x0003, (unsigned)range);
 }
 
 bool
@@ -2324,7 +2324,7 @@ D878UVCodeplug::createGPSSystems(Context &ctx) {
 
   // Before creating any GPS/APRS systems, get global auto TX intervall
   AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTING));
-  uint pos_intervall = aprs.autoTXInterval();
+  unsigned pos_intervall = aprs.autoTXInterval();
 
   // Create APRS system (if enabled)
   uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
@@ -2409,7 +2409,7 @@ D878UVCodeplug::allocateRoaming() {
 bool
 D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx) {
   // Encode roaming channels
-  QHash<DigitalChannel *, uint> roaming_ch_map;
+  QHash<DigitalChannel *, unsigned> roaming_ch_map;
   {
     // Get set of unique roaming channels
     QSet<DigitalChannel*> roaming_channels;
@@ -2439,7 +2439,7 @@ D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx) {
 
 bool
 D878UVCodeplug::createRoaming(Context &ctx) {
-  QHash<uint, DigitalChannel*> map;
+  QHash<unsigned, DigitalChannel*> map;
   // Create or find roaming channels
   uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
   for (int i=0; i<NUM_ROAMING_CHANNEL; i++) {

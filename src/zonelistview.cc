@@ -13,7 +13,7 @@ ZoneListView::ZoneListView(Config *config, QWidget *parent)
   ui->listView->setModel(new ZoneListWrapper(_config->zones(), ui->listView));
   connect(ui->addZone, SIGNAL(clicked()), this, SLOT(onAddZone()));
   connect(ui->remZone, SIGNAL(clicked()), this, SLOT(onRemZone()));
-  connect(ui->listView, SIGNAL(doubleClicked(uint)), this, SLOT(onEditZone(uint)));
+  connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditZone(unsigned)));
 }
 
 ZoneListView::~ZoneListView() {
@@ -68,7 +68,7 @@ ZoneListView::onRemZone() {
 }
 
 void
-ZoneListView::onEditZone(uint row) {
+ZoneListView::onEditZone(unsigned row) {
   ZoneDialog dialog(_config, _config->zones()->zone(row));
   if (QDialog::Accepted != dialog.exec())
     return;

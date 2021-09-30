@@ -17,7 +17,7 @@ TalkGroupDatabase::TalkGroup::TalkGroup()
   // pass...
 }
 
-TalkGroupDatabase::TalkGroup::TalkGroup(const QString &name, uint number)
+TalkGroupDatabase::TalkGroup::TalkGroup(const QString &name, unsigned number)
 {
   this->id   = number;
   this->name = name;
@@ -27,7 +27,7 @@ TalkGroupDatabase::TalkGroup::TalkGroup(const QString &name, uint number)
 /* ********************************************************************************************* *
  * Implementation of TalkGroupDatabase
  * ********************************************************************************************* */
-TalkGroupDatabase::TalkGroupDatabase(uint updatePeriodDays, QObject *parent)
+TalkGroupDatabase::TalkGroupDatabase(unsigned updatePeriodDays, QObject *parent)
   : QAbstractTableModel(parent), _talkgroups(), _network()
 {
   connect(&_network, SIGNAL(finished(QNetworkReply*)),
@@ -42,7 +42,7 @@ TalkGroupDatabase::count() const {
   return _talkgroups.count();
 }
 
-uint
+unsigned
 TalkGroupDatabase::dbAge() const {
   QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/talkgroups.json";
   QFileInfo info(path);

@@ -14,7 +14,7 @@ class RadioID : public ConfigObject
   /** The name of the radio ID. */
   Q_PROPERTY(QString name READ name WRITE setName)
   /** The number of the radio ID. */
-  Q_PROPERTY(uint number READ number WRITE setNumber)
+  Q_PROPERTY(unsigned number READ number WRITE setNumber)
 
 public:
   /** Constructor.
@@ -87,7 +87,7 @@ public:
   /** Returns the current default ID for the radio. */
   RadioID * defaultId() const;
   /** Sets the default DMR ID. This changes the index of all IDs. */
-  bool setDefaultId(uint idx);
+  bool setDefaultId(unsigned idx);
   /** Searches the DMR ID object associated with the given DMR ID. */
   RadioID *find(uint32_t id) const;
 

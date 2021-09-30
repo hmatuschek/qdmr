@@ -35,7 +35,7 @@ public:
 	void close();
 
   /** Erases a memory section at @c start of size @c size. */
-  bool erase(uint start, uint size, void (*progress)(uint, void *)=nullptr, void *ctx=nullptr);
+  bool erase(unsigned start, unsigned size, void (*progress)(unsigned, void *)=nullptr, void *ctx=nullptr);
 
   bool read_start(uint32_t bank, uint32_t addr);
   bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);

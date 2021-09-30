@@ -189,7 +189,7 @@ public:
     /** If true, the callsign DB of the radio is implemented. */
     bool callsignDBImplemented;
     /** Maximum number of entries in callsign DB. */
-    uint maxCallsignsInDB;
+    unsigned maxCallsignsInDB;
   };
 
   /** Possible states of the radio object. */

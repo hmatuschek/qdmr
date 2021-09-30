@@ -38,7 +38,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
 
   if (parser.isSet("id")) {
     QStringList prefixes_text = parser.value("id").split(",");
-    QSet<uint> prefixes;
+    QSet<unsigned> prefixes;
     foreach (QString prefix_text, prefixes_text) {
       bool ok=true; uint32_t prefix = prefix_text.toUInt(&ok);
       if (ok)
@@ -50,7 +50,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
     prefixes_text.clear();
-    foreach (uint prefix, prefixes) {
+    foreach (unsigned prefix, prefixes) {
       prefixes_text.append(QString::number(prefix));
     }
     logDebug() << "Sort call-sign DB w.r.t. DMR ID(s) {" << prefixes_text.join(", ") << "}.";

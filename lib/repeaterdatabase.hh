@@ -22,7 +22,7 @@ public:
 	 * downloaded yet or the downloaded database is older than @c updatePeriodDays days.
 	 *
 	 * The repeater database will be sorted with respect to the distance to the specified QTH. */
-	explicit RepeaterDatabase(const QGeoCoordinate &qth, uint updatePeriodDays=5, QObject *parent=nullptr);
+	explicit RepeaterDatabase(const QGeoCoordinate &qth, unsigned updatePeriodDays=5, QObject *parent=nullptr);
 
 	/** Loads the downloaded repeater database. */
 	bool load();
@@ -33,7 +33,7 @@ public:
   const QJsonObject &repeater(int idx) const;
 
 	/** Returns the age of the downloaded repeater database in days. */
-	uint dbAge() const;
+	unsigned dbAge() const;
 
 	/** Implements the QAbstractTableModel, return the number of rows (entries). */
   int rowCount(const QModelIndex &parent=QModelIndex()) const;
@@ -56,7 +56,7 @@ private:
 	/** All repeaters sorted with respect to the distance to QTH. */
 	QVector<QJsonObject>  _repeater;
 	/** Table of callsigns. */
-	QHash<QString, uint>  _callsigns;
+	QHash<QString, unsigned>  _callsigns;
 	/** Network access. */
 	QNetworkAccessManager _network;
 };

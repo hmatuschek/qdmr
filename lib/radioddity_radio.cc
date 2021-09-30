@@ -157,12 +157,12 @@ bool
 RadioddityRadio::download() {
   emit downloadStarted();
 
-  uint btot = 0;
+  unsigned btot = 0;
   for (int n=0; n<codeplug().image(0).numElements(); n++) {
     btot += codeplug().image(0).element(n).data().size()/BSIZE;
   }
 
-  uint bcount = 0;
+  unsigned bcount = 0;
   for (int n=0; n<codeplug().image(0).numElements(); n++) {
     int b0 = codeplug().image(0).element(n).address()/BSIZE;
     int nb = codeplug().image(0).element(n).data().size()/BSIZE;
@@ -189,12 +189,12 @@ bool
 RadioddityRadio::upload() {
   emit uploadStarted();
 
-  uint btot = 0;
+  unsigned btot = 0;
   for (int n=0; n<codeplug().image(0).numElements(); n++) {
     btot += codeplug().image(0).element(n).data().size()/BSIZE;
   }
 
-  uint bcount = 0;
+  unsigned bcount = 0;
   if (_codeplugFlags.updateCodePlug) {
     // If codeplug gets updated, download codeplug from device first:
     for (int n=0; n<codeplug().image(0).numElements(); n++) {

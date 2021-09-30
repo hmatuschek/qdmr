@@ -19,7 +19,7 @@ public:
 protected slots:
   void onAddContact();
   void onRemContact();
-  void onEditContact(uint row);
+  void onEditContact(unsigned row);
 
   void loadHeaderState();
   void storeHeaderState();

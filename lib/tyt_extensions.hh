@@ -19,7 +19,7 @@ class TyTButtonSettings : public ConfigExtension
   /** The action to perform on a long press on side button 2. */
   Q_PROPERTY(ButtonAction sideButton2Long MEMBER _sideButton2Long READ sideButton2Long WRITE setSideButton2Long)
   /** The duration of a long press in msec. */
-  Q_PROPERTY(uint longPressDuration MEMBER _longPressDuration READ longPressDuration WRITE setLongPressDuration)
+  Q_PROPERTY(unsigned longPressDuration MEMBER _longPressDuration READ longPressDuration WRITE setLongPressDuration)
 
 public:
   /** Possible actions for the side-buttons. */
@@ -80,9 +80,9 @@ public:
   void setSideButton2Long(ButtonAction action);
 
   /** Returns the long-press duration in msec. */
-  uint longPressDuration() const;
+  unsigned longPressDuration() const;
   /** Sets the long-press duration in msec. */
-  void setLongPressDuration(uint dur);
+  void setLongPressDuration(unsigned dur);
 
 protected:
   /** Holds the side button 1 short-press action. */
@@ -94,7 +94,7 @@ protected:
   /** Holds the side button 2 long-press action. */
   ButtonAction _sideButton2Long;
   /** Holds the long-press duration in ms. */
-  uint _longPressDuration;
+  unsigned _longPressDuration;
 };
 
 

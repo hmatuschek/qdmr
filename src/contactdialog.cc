@@ -59,9 +59,9 @@ ContactDialog::construct() {
       contactType->addItem(tr("Private Call"));
       contactType->addItem(tr("Group Call"));
       contactType->addItem(tr("All Call"));
-      contactType->setItemData(0, uint(DigitalContact::PrivateCall));
-      contactType->setItemData(1, uint(DigitalContact::GroupCall));
-      contactType->setItemData(2, uint(DigitalContact::AllCall));
+      contactType->setItemData(0, unsigned(DigitalContact::PrivateCall));
+      contactType->setItemData(1, unsigned(DigitalContact::GroupCall));
+      contactType->setItemData(2, unsigned(DigitalContact::AllCall));
       contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
       if (DigitalContact::PrivateCall == digi->type())
         contactType->setCurrentIndex(0);
@@ -79,9 +79,9 @@ ContactDialog::construct() {
     contactType->addItem(tr("Group Call"));
     contactType->addItem(tr("All Call"));
     contactType->addItem(tr("DTMF"));
-    contactType->setItemData(0, uint(DigitalContact::PrivateCall));
-    contactType->setItemData(1, uint(DigitalContact::GroupCall));
-    contactType->setItemData(2, uint(DigitalContact::AllCall));
+    contactType->setItemData(0, unsigned(DigitalContact::PrivateCall));
+    contactType->setItemData(1, unsigned(DigitalContact::GroupCall));
+    contactType->setItemData(2, unsigned(DigitalContact::AllCall));
     contactType->setCurrentIndex(0);
     contactNumber->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
     contactName->setCompleter(_user_completer);

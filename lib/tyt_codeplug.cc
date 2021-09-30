@@ -293,11 +293,11 @@ TyTCodeplug::ChannelElement::setContactIndex(uint16_t idx) {
   setUInt16_le(6, idx);
 }
 
-uint TyTCodeplug::ChannelElement::txTimeOut() const {
+unsigned TyTCodeplug::ChannelElement::txTimeOut() const {
   return getUInt6(8, 0)*15;
 }
 void
-TyTCodeplug::ChannelElement::setTXTimeOut(uint tot) {
+TyTCodeplug::ChannelElement::setTXTimeOut(unsigned tot) {
   return setUInt6(8, 0, tot/15);
 }
 
@@ -355,12 +355,12 @@ TyTCodeplug::ChannelElement::setDTMFDecode(uint8_t idx, bool enable) {
   setBit(14, idx, enable);
 }
 
-uint TyTCodeplug::ChannelElement::squelch() const {
+unsigned TyTCodeplug::ChannelElement::squelch() const {
   return getUInt8(15);
 }
 void
-TyTCodeplug::ChannelElement::setSquelch(uint value) {
-  value = std::min(uint(10), value);
+TyTCodeplug::ChannelElement::setSquelch(unsigned value) {
+  value = std::min(unsigned(10), value);
   return setUInt8(15, value);
 }
 
@@ -673,12 +673,12 @@ TyTCodeplug::VFOChannelElement::setName(const QString &txt) {
   // pass...
 }
 
-uint
+unsigned
 TyTCodeplug::VFOChannelElement::stepSize() const {
   return (getUInt8(32)+1)*2500;
 }
 void
-TyTCodeplug::VFOChannelElement::setStepSize(uint ss_Hz) {
+TyTCodeplug::VFOChannelElement::setStepSize(unsigned ss_Hz) {
   ss_Hz = std::min(50000U, std::max(ss_Hz, 2500U));
   setUInt8(32, ss_Hz/2500-1);
   setUInt8(33, 0xff);
@@ -825,11 +825,11 @@ TyTCodeplug::ZoneElement::setName(const QString &name) {
 }
 
 uint16_t
-TyTCodeplug::ZoneElement::memberIndex(uint n) const {
+TyTCodeplug::ZoneElement::memberIndex(unsigned n) const {
   return getUInt16_le(0x20 + n*2);
 }
 void
-TyTCodeplug::ZoneElement::setMemberIndex(uint n, uint16_t idx) {
+TyTCodeplug::ZoneElement::setMemberIndex(unsigned n, uint16_t idx) {
   setUInt16_le(0x20 + n*2, idx);
 }
 
@@ -894,22 +894,22 @@ TyTCodeplug::ZoneExtElement::clear() {
 }
 
 uint16_t
-TyTCodeplug::ZoneExtElement::memberIndexA(uint n) const {
+TyTCodeplug::ZoneExtElement::memberIndexA(unsigned n) const {
   return getUInt16_le(0x00 + 2*n);
 }
 
 void
-TyTCodeplug::ZoneExtElement::setMemberIndexA(uint n, uint16_t idx) {
+TyTCodeplug::ZoneExtElement::setMemberIndexA(unsigned n, uint16_t idx) {
   setUInt16_le(0x00 + 2*n, idx);
 }
 
 uint16_t
-TyTCodeplug::ZoneExtElement::memberIndexB(uint n) const {
+TyTCodeplug::ZoneExtElement::memberIndexB(unsigned n) const {
   return getUInt16_le(0x60 + 2*n);
 }
 
 void
-TyTCodeplug::ZoneExtElement::setMemberIndexB(uint n, uint16_t idx) {
+TyTCodeplug::ZoneExtElement::setMemberIndexB(unsigned n, uint16_t idx) {
   setUInt16_le(0x60 + 2*n, idx);
 }
 
@@ -995,12 +995,12 @@ TyTCodeplug::GroupListElement::setName(const QString &nm) {
 }
 
 uint16_t
-TyTCodeplug::GroupListElement::memberIndex(uint n) const {
+TyTCodeplug::GroupListElement::memberIndex(unsigned n) const {
   return getUInt16_le(0x20 + n*2);
 }
 
 void
-TyTCodeplug::GroupListElement::setMemberIndex(uint n, uint16_t idx) {
+TyTCodeplug::GroupListElement::setMemberIndex(unsigned n, uint16_t idx) {
   setUInt16_le(0x20 + 2*n, idx);
 }
 
@@ -1126,33 +1126,33 @@ TyTCodeplug::ScanListElement::setTXChannelIndex(uint16_t idx) {
   setUInt16_le(0x24, idx);
 }
 
-uint
+unsigned
 TyTCodeplug::ScanListElement::holdTime() const {
-  return uint(getUInt8(0x27))*25;
+  return unsigned(getUInt8(0x27))*25;
 }
 
 void
-TyTCodeplug::ScanListElement::setHoldTime(uint time) {
+TyTCodeplug::ScanListElement::setHoldTime(unsigned time) {
   setUInt8(0x27, time/25);
 }
 
-uint
+unsigned
 TyTCodeplug::ScanListElement::prioritySampleTime() const {
-  return uint(getUInt8(0x27))*250;
+  return unsigned(getUInt8(0x27))*250;
 }
 
 void
-TyTCodeplug::ScanListElement::setPrioritySampleTime(uint time) {
+TyTCodeplug::ScanListElement::setPrioritySampleTime(unsigned time) {
   setUInt8(0x27, time/250);
 }
 
 uint16_t
-TyTCodeplug::ScanListElement::memberIndex(uint n) const {
+TyTCodeplug::ScanListElement::memberIndex(unsigned n) const {
   return getUInt16_le(0x2a + 2*n);
 }
 
 void
-TyTCodeplug::ScanListElement::setMemberIndex(uint n, uint16_t idx) {
+TyTCodeplug::ScanListElement::setMemberIndex(unsigned n, uint16_t idx) {
   setUInt16_le(0x2a + 2*n, idx);
 }
 
@@ -1520,52 +1520,52 @@ TyTCodeplug::GeneralSettingsElement::setDMRId(uint32_t id) {
   setUInt24_le(0x44, id);
 }
 
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::txPreambleDuration() const {
-  return uint(getUInt8(0x48))*60;
+  return unsigned(getUInt8(0x48))*60;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setTXPreambleDuration(uint dur) {
+TyTCodeplug::GeneralSettingsElement::setTXPreambleDuration(unsigned dur) {
   dur = std::min(8640U, dur);
   setUInt8(0x48, dur/60);
 }
 
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::groupCallHangTime() const {
-  return uint(getUInt8(0x49))*100;
+  return unsigned(getUInt8(0x49))*100;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setGroupCallHangTime(uint dur) {
+TyTCodeplug::GeneralSettingsElement::setGroupCallHangTime(unsigned dur) {
   dur = std::min(7000U, dur);
   setUInt8(0x49, dur/100);
 }
 
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::privateCallHangTime() const {
-  return uint(getUInt8(0x4a))*100;
+  return unsigned(getUInt8(0x4a))*100;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setPrivateCallHangTime(uint dur) {
+TyTCodeplug::GeneralSettingsElement::setPrivateCallHangTime(unsigned dur) {
   dur = std::min(7000U, dur);
   setUInt8(0x4a, dur/100);
 }
 
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::voxSesitivity() const {
   return getUInt8(0x4b);
 }
 void
-TyTCodeplug::GeneralSettingsElement::setVOXSesitivity(uint level) {
+TyTCodeplug::GeneralSettingsElement::setVOXSesitivity(unsigned level) {
   level = std::min(10U, std::max(1U, level));
   setUInt8(0x4b, level);
 }
 
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::lowBatteryInterval() const {
-  return uint(getUInt8(0x4e))*5;
+  return unsigned(getUInt8(0x4e))*5;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setLowBatteryInterval(uint dur) {
+TyTCodeplug::GeneralSettingsElement::setLowBatteryInterval(unsigned dur) {
   dur = std::min(635U, dur);
   setUInt8(0x4e, dur/5);
 }
@@ -1574,12 +1574,12 @@ bool
 TyTCodeplug::GeneralSettingsElement::callAlertToneIsContinuous() const {
   return 0==getUInt8(0x4f);
 }
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::callAlertToneDuration() const {
-  return uint(getUInt8(0x4f))*5;
+  return unsigned(getUInt8(0x4f))*5;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setCallAlertToneDuration(uint dur) {
+TyTCodeplug::GeneralSettingsElement::setCallAlertToneDuration(unsigned dur) {
   dur = std::min(1200U, dur);
   setUInt8(0x4f, dur/5);
 }
@@ -1588,40 +1588,40 @@ TyTCodeplug::GeneralSettingsElement::setCallAlertToneContinuous() {
   setUInt8(0x4f, 0);
 }
 
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::loneWorkerResponseTime() const {
   return getUInt8(0x50);
 }
 void
-TyTCodeplug::GeneralSettingsElement::setLoneWorkerResponseTime(uint dur) {
+TyTCodeplug::GeneralSettingsElement::setLoneWorkerResponseTime(unsigned dur) {
   setUInt8(0x50, dur);
 }
 
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::loneWorkerReminderTime() const {
   return getUInt8(0x51);
 }
 void
-TyTCodeplug::GeneralSettingsElement::setLoneWorkerReminderTime(uint dur) {
+TyTCodeplug::GeneralSettingsElement::setLoneWorkerReminderTime(unsigned dur) {
   setUInt8(0x51, dur);
 }
 
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::scanDigitalHangTime() const {
-  return uint(getUInt8(0x53))*100;
+  return unsigned(getUInt8(0x53))*100;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setCcanDigitalHangTime(uint dur) {
+TyTCodeplug::GeneralSettingsElement::setCcanDigitalHangTime(unsigned dur) {
   dur = std::min(10000U, dur);
   setUInt8(0x53, dur/100);
 }
 
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::scanAnalogHangTime() const {
-  return uint(getUInt8(0x54))*100;
+  return unsigned(getUInt8(0x54))*100;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setScanAnalogHangTime(uint dur) {
+TyTCodeplug::GeneralSettingsElement::setScanAnalogHangTime(unsigned dur) {
   dur = std::min(10000U, dur);
   setUInt8(0x54, dur/100);
 }
@@ -1630,12 +1630,12 @@ bool
 TyTCodeplug::GeneralSettingsElement::backlightIsAlways() const {
   return 0 == getUInt2(0x55, 0);
 }
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::backlightTime() const {
   return getUInt2(0x55, 0)*5;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setBacklightTime(uint sec) {
+TyTCodeplug::GeneralSettingsElement::setBacklightTime(unsigned sec) {
   sec = std::min(15U, sec);
   setUInt2(0x55, 0, sec/5);
 }
@@ -1648,12 +1648,12 @@ bool
 TyTCodeplug::GeneralSettingsElement::keypadLockIsManual() const {
   return 0xff == getUInt8(0x56);
 }
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::keypadLockTime() const {
-  return uint(getUInt8(0x56))*5;
+  return unsigned(getUInt8(0x56))*5;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setKeypadLockTime(uint sec) {
+TyTCodeplug::GeneralSettingsElement::setKeypadLockTime(unsigned sec) {
   sec = std::max(1U, std::min(15U, sec));
   setUInt8(0x56, sec/5);
 }
@@ -1750,12 +1750,12 @@ TyTCodeplug::GeneralSettingsElement::setRadioName(const QString &name) {
   writeUnicode(0x70, name, 16);
 }
 
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::channelHangTime() const {
-  return uint(getUInt8(0x90))*100;
+  return unsigned(getUInt8(0x90))*100;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setChannelHangTime(uint dur) {
+TyTCodeplug::GeneralSettingsElement::setChannelHangTime(unsigned dur) {
   setUInt8(0x90, dur/100);
 }
 
@@ -1769,20 +1769,20 @@ TyTCodeplug::GeneralSettingsElement::enablePublicZone(bool enable) {
 }
 
 uint32_t
-TyTCodeplug::GeneralSettingsElement::additionalDMRId(uint n) const {
+TyTCodeplug::GeneralSettingsElement::additionalDMRId(unsigned n) const {
   return getUInt24_le(0x94+4*n);
 }
 void
-TyTCodeplug::GeneralSettingsElement::setAdditionalDMRId(uint n, uint32_t id) {
+TyTCodeplug::GeneralSettingsElement::setAdditionalDMRId(unsigned n, uint32_t id) {
   setUInt24_le(0x94+4*n, id);
 }
 
-uint
+unsigned
 TyTCodeplug::GeneralSettingsElement::micLevel() const {
-  return (uint(getUInt3(0xa0,3)+1)*100)/60;
+  return (unsigned(getUInt3(0xa0,3)+1)*100)/60;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setMICLevel(uint level) {
+TyTCodeplug::GeneralSettingsElement::setMICLevel(unsigned level) {
   setUInt3(0xa0,3, ((level-1)*60)/100);
 }
 
@@ -1856,30 +1856,30 @@ TyTCodeplug::BootSettingsElement::clear() {
   setUInt32_le(0x0c, 0xffffffff);
 }
 
-uint
+unsigned
 TyTCodeplug::BootSettingsElement::zoneIndex() const {
   return getUInt8(0x03);
 }
 void
-TyTCodeplug::BootSettingsElement::setZoneIndex(uint idx) {
+TyTCodeplug::BootSettingsElement::setZoneIndex(unsigned idx) {
   setUInt8(0x03, idx);
 }
 
-uint
+unsigned
 TyTCodeplug::BootSettingsElement::channelIndexA() const {
   return getUInt8(0x04);
 }
 void
-TyTCodeplug::BootSettingsElement::setChannelIndexA(uint idx) {
+TyTCodeplug::BootSettingsElement::setChannelIndexA(unsigned idx) {
   setUInt8(0x04, idx);
 }
 
-uint
+unsigned
 TyTCodeplug::BootSettingsElement::channelIndexB() const {
   return getUInt8(0x06);
 }
 void
-TyTCodeplug::BootSettingsElement::setChannelIndexB(uint idx) {
+TyTCodeplug::BootSettingsElement::setChannelIndexB(unsigned idx) {
   setUInt8(0x06, idx);
 }
 
@@ -1995,12 +1995,12 @@ bool
 TyTCodeplug::GPSSystemElement::repeatIntervalDisabled() const {
   return 0 == getUInt8(0x02);
 }
-uint
+unsigned
 TyTCodeplug::GPSSystemElement::repeatInterval() const {
-  return uint(getUInt8(0x02))*30;
+  return unsigned(getUInt8(0x02))*30;
 }
 void
-TyTCodeplug::GPSSystemElement::setRepeatInterval(uint dur) {
+TyTCodeplug::GPSSystemElement::setRepeatInterval(unsigned dur) {
   setUInt8(0x02, dur/30);
 }
 void
@@ -2137,12 +2137,12 @@ bool
 TyTCodeplug::MenuSettingsElement::menuHangtimeIsInfinite() const {
   return 0 == menuHangtime();
 }
-uint
+unsigned
 TyTCodeplug::MenuSettingsElement::menuHangtime() const {
   return getUInt8(0x00);
 }
 void
-TyTCodeplug::MenuSettingsElement::setMenuHangtime(uint sec) {
+TyTCodeplug::MenuSettingsElement::setMenuHangtime(unsigned sec) {
   setUInt8(0x00, sec);
 }
 void
@@ -2543,12 +2543,12 @@ TyTCodeplug::ButtonSettingsElement::setSideButton2Long(ButtonAction action) {
   setUInt8(0x05, action);
 }
 
-uint
+unsigned
 TyTCodeplug::ButtonSettingsElement::longPressDuration() const {
-  return uint(getUInt8(0x11))*250;
+  return unsigned(getUInt8(0x11))*250;
 }
 void
-TyTCodeplug::ButtonSettingsElement::setLongPressDuration(uint ms) {
+TyTCodeplug::ButtonSettingsElement::setLongPressDuration(unsigned ms) {
   setUInt8(0x11, ms/250);
 }
 
@@ -2714,30 +2714,30 @@ TyTCodeplug::EmergencySettingsElement::enableRadioDisable(bool enable) {
   setBit(0x00, 0, enable);
 }
 
-uint
+unsigned
 TyTCodeplug::EmergencySettingsElement::remoteMonitorDuration() const {
-  return uint(getUInt8(0x01))*10;
+  return unsigned(getUInt8(0x01))*10;
 }
 void
-TyTCodeplug::EmergencySettingsElement::setRemoteMonitorDuration(uint sec) {
+TyTCodeplug::EmergencySettingsElement::setRemoteMonitorDuration(unsigned sec) {
   setUInt8(0x01, sec/10);
 }
 
-uint
+unsigned
 TyTCodeplug::EmergencySettingsElement::txTimeOut() const {
-  return uint(getUInt8(0x02))*25;
+  return unsigned(getUInt8(0x02))*25;
 }
 void
-TyTCodeplug::EmergencySettingsElement::setTXTimeOut(uint ms) {
+TyTCodeplug::EmergencySettingsElement::setTXTimeOut(unsigned ms) {
   setUInt8(0x02, ms/25);
 }
 
-uint
+unsigned
 TyTCodeplug::EmergencySettingsElement::messageLimit() const {
-  return uint(getUInt8(0x03));
+  return unsigned(getUInt8(0x03));
 }
 void
-TyTCodeplug::EmergencySettingsElement::setMessageLimit(uint limit) {
+TyTCodeplug::EmergencySettingsElement::setMessageLimit(unsigned limit) {
   setUInt8(0x03, limit);
 }
 
@@ -2807,30 +2807,30 @@ TyTCodeplug::EmergencySystemElement::setAlarmMode(AlarmMode mode) {
   setUInt2(0x20, 4, mode);
 }
 
-uint
+unsigned
 TyTCodeplug::EmergencySystemElement::impoliteRetries() const {
   return getUInt8(0x21);
 }
 void
-TyTCodeplug::EmergencySystemElement::setImpoliteRetries(uint num) {
+TyTCodeplug::EmergencySystemElement::setImpoliteRetries(unsigned num) {
   setUInt8(0x21, num);
 }
 
-uint
+unsigned
 TyTCodeplug::EmergencySystemElement::politeRetries() const {
   return getUInt8(0x22);
 }
 void
-TyTCodeplug::EmergencySystemElement::setPoliteRetries(uint num) {
+TyTCodeplug::EmergencySystemElement::setPoliteRetries(unsigned num) {
   setUInt8(0x22, num);
 }
 
-uint
+unsigned
 TyTCodeplug::EmergencySystemElement::hotMICDuration() const {
-  return uint(getUInt8(0x23))*10;
+  return unsigned(getUInt8(0x23))*10;
 }
 void
-TyTCodeplug::EmergencySystemElement::setHotMICDuration(uint dur) {
+TyTCodeplug::EmergencySystemElement::setHotMICDuration(unsigned dur) {
   setUInt8(0x23, dur/10);
 }
 
@@ -2877,22 +2877,22 @@ TyTCodeplug::EncryptionElement::clear() {
 }
 
 QByteArray
-TyTCodeplug::EncryptionElement::enhancedKey(uint n) {
+TyTCodeplug::EncryptionElement::enhancedKey(unsigned n) {
   return QByteArray((char *)(_data+n*16), 16);
 }
 void
-TyTCodeplug::EncryptionElement::setEnhancedKey(uint n, const QByteArray &key) {
+TyTCodeplug::EncryptionElement::setEnhancedKey(unsigned n, const QByteArray &key) {
   if (16 != key.size())
     return;
   memcpy(_data+n*16, key.constData(), 16);
 }
 
 QByteArray
-TyTCodeplug::EncryptionElement::basicKey(uint n) {
+TyTCodeplug::EncryptionElement::basicKey(unsigned n) {
   return QByteArray((char *)(_data+0x90+n*2), 2);
 }
 void
-TyTCodeplug::EncryptionElement::setBasicKey(uint n, const QByteArray &key) {
+TyTCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
   if (2 != key.size())
     return;
   memcpy(_data+0x90+n*16, key.constData(), 2);

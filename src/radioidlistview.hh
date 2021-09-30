@@ -22,7 +22,7 @@ protected slots:
   void onConfigModified();
   void onAddID();
   void onDeleteID();
-  void onEditID(uint row);
+  void onEditID(unsigned row);
   void onDefaultIDSelected(int idx);
   void loadHeaderState();
   void storeHeaderState();

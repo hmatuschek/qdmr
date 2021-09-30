@@ -205,9 +205,9 @@ public:
     virtual void setContactIndex(uint16_t idx);
 
     /** Returns the transmit time-out in seconds. */
-    virtual uint txTimeOut() const;
+    virtual unsigned txTimeOut() const;
     /** Sets the transmit time-out in seconds. */
-    virtual void setTXTimeOut(uint tot);
+    virtual void setTXTimeOut(unsigned tot);
     /** Returns the transmit time-out re-key delay in seconds. */
     virtual uint8_t txTimeOutRekeyDelay() const;
     /** Sets the transmit time-out re-key delay in seconds. */
@@ -239,9 +239,9 @@ public:
     virtual void setDTMFDecode(uint8_t idx, bool enable);
 
     /** Returns the squelch level [0-10]. */
-    virtual uint squelch() const;
+    virtual unsigned squelch() const;
     /** Sets the squelch level [0-10]. */
-    virtual void setSquelch(uint value);
+    virtual void setSquelch(unsigned value);
 
     /** Returns the RX frequency in Hz. */
     virtual uint32_t rxFrequency() const;
@@ -331,9 +331,9 @@ public:
     void setName(const QString &txt);
 
     /** Returns the step-size for the VFO channel. */
-    virtual uint stepSize() const;
+    virtual unsigned stepSize() const;
     /** Sets the step-size for the VFO channel in Hz. */
-    virtual void setStepSize(uint ss_hz);
+    virtual void setStepSize(unsigned ss_hz);
   };
 
   /** Represents a digital (DMR) contact within the codeplug.
@@ -408,9 +408,9 @@ public:
     virtual void setName(const QString &setName);
 
     /** Returns the index (+1) of the @c n-th member. */
-    virtual uint16_t memberIndex(uint n) const;
+    virtual uint16_t memberIndex(unsigned n) const;
     /** Sets the index (+1) of the @c n-th member. */
-    virtual void setMemberIndex(uint n, uint16_t idx);
+    virtual void setMemberIndex(unsigned n, uint16_t idx);
 
     /** Encodes a given zone object. */
     virtual bool fromZoneObj(const Zone *zone, Context &ctx);
@@ -441,13 +441,13 @@ public:
     void clear();
 
     /** Returns the n-th member index of the channel list for A. */
-    virtual uint16_t memberIndexA(uint n) const;
+    virtual uint16_t memberIndexA(unsigned n) const;
     /** Sets the n-th member index of the channel list for A. */
-    virtual void setMemberIndexA(uint n, uint16_t idx);
+    virtual void setMemberIndexA(unsigned n, uint16_t idx);
     /** Returns the n-th member index of the channel list for B. */
-    virtual uint16_t memberIndexB(uint n) const;
+    virtual uint16_t memberIndexB(unsigned n) const;
     /** Returns the n-th member index of the channel list for B. */
-    virtual void setMemberIndexB(uint n, uint16_t idx);
+    virtual void setMemberIndexB(unsigned n, uint16_t idx);
 
     /** Encodes the given zone. */
     virtual bool fromZoneObj(const Zone *zone, Context &ctx);
@@ -481,9 +481,9 @@ public:
     virtual void setName(const QString &nm);
 
     /** Returns the n-th member index. */
-    virtual uint16_t memberIndex(uint n) const;
+    virtual uint16_t memberIndex(unsigned n) const;
     /** Sets the n-th member index. */
-    virtual void setMemberIndex(uint n, uint16_t idx);
+    virtual void setMemberIndex(unsigned n, uint16_t idx);
 
     /** Encodes the given group list. */
     virtual bool fromGroupListObj(const RXGroupList *lst, Context &ctx);
@@ -533,19 +533,19 @@ public:
     virtual void setTXChannelIndex(uint16_t idx);
 
     /** Returns the hold time in ms. */
-    virtual uint holdTime() const;
+    virtual unsigned holdTime() const;
     /** Sets the hold time in ms. */
-    virtual void setHoldTime(uint time);
+    virtual void setHoldTime(unsigned time);
 
     /** Returns the priority sample time in ms. */
-    virtual uint prioritySampleTime() const;
+    virtual unsigned prioritySampleTime() const;
     /** Sets the priority sample time in ms. */
-    virtual void setPrioritySampleTime(uint time);
+    virtual void setPrioritySampleTime(unsigned time);
 
     /** Returns the n-th member index. */
-    virtual uint16_t memberIndex(uint n) const;
+    virtual uint16_t memberIndex(unsigned n) const;
     /** Sets the n-th member index. */
-    virtual void setMemberIndex(uint n, uint16_t idx);
+    virtual void setMemberIndex(unsigned n, uint16_t idx);
 
     /** Encodes the given scan list. */
     virtual bool fromScanListObj(const ScanList *lst, Context &ctx);
@@ -669,67 +669,67 @@ public:
     virtual void setDMRId(uint32_t id);
 
     /** Returns the TX preamble duration. */
-    virtual uint txPreambleDuration() const;
+    virtual unsigned txPreambleDuration() const;
     /** Sets the TX preamble duration. */
-    virtual void setTXPreambleDuration(uint ms);
+    virtual void setTXPreambleDuration(unsigned ms);
     /** Returns the group call hang time. */
-    virtual uint groupCallHangTime() const;
+    virtual unsigned groupCallHangTime() const;
     /** Sets the group call hang time. */
-    virtual void setGroupCallHangTime(uint ms);
+    virtual void setGroupCallHangTime(unsigned ms);
     /** Returns the private call hang time. */
-    virtual uint privateCallHangTime() const;
+    virtual unsigned privateCallHangTime() const;
     /** Sets the private call hang time. */
-    virtual void setPrivateCallHangTime(uint ms);
+    virtual void setPrivateCallHangTime(unsigned ms);
     /** Returns the VOX sensitivity. */
-    virtual uint voxSesitivity() const;
+    virtual unsigned voxSesitivity() const;
     /** Sets the group call hang time. */
-    virtual void setVOXSesitivity(uint ms);
+    virtual void setVOXSesitivity(unsigned ms);
     /** Returns the low-battery warning interval. */
-    virtual uint lowBatteryInterval() const;
+    virtual unsigned lowBatteryInterval() const;
     /** Sets the low-battery warning interval. */
-    virtual void setLowBatteryInterval(uint sec);
+    virtual void setLowBatteryInterval(unsigned sec);
 
     /** Returns @c true if the call-alert is continuous. */
     virtual bool callAlertToneIsContinuous() const;
     /** Returns the call-alert tone duration. */
-    virtual uint callAlertToneDuration() const;
+    virtual unsigned callAlertToneDuration() const;
     /** Sets the call-alert tone duration. */
-    virtual void setCallAlertToneDuration(uint sec);
+    virtual void setCallAlertToneDuration(unsigned sec);
     /** Sets the call-alert tone continuous. */
     virtual void setCallAlertToneContinuous();
 
     /** Returns the lone-worker response time. */
-    virtual uint loneWorkerResponseTime() const;
+    virtual unsigned loneWorkerResponseTime() const;
     /** Sets the lone-worker response time. */
-    virtual void setLoneWorkerResponseTime(uint min);
+    virtual void setLoneWorkerResponseTime(unsigned min);
     /** Returns the lone-worker reminder time. */
-    virtual uint loneWorkerReminderTime() const;
+    virtual unsigned loneWorkerReminderTime() const;
     /** Sets the lone-worker reminder time. */
-    virtual void setLoneWorkerReminderTime(uint min);
+    virtual void setLoneWorkerReminderTime(unsigned min);
     /** Returns the scan digital hang time. */
-    virtual uint scanDigitalHangTime() const;
+    virtual unsigned scanDigitalHangTime() const;
     /** Sets the scan digital hang time. */
-    virtual void setCcanDigitalHangTime(uint ms);
+    virtual void setCcanDigitalHangTime(unsigned ms);
     /** Returns the scan analog hang time. */
-    virtual uint scanAnalogHangTime() const;
+    virtual unsigned scanAnalogHangTime() const;
     /** Sets the scan analog hang time. */
-    virtual void setScanAnalogHangTime(uint ms);
+    virtual void setScanAnalogHangTime(unsigned ms);
 
     /** Retuns @c true if the backlight is always on. */
     virtual bool backlightIsAlways() const;
     /** Returns the backlight time. */
-    virtual uint backlightTime() const;
+    virtual unsigned backlightTime() const;
     /** Sets the backlight time. */
-    virtual void setBacklightTime(uint sec);
+    virtual void setBacklightTime(unsigned sec);
     /** Turns the backlight always on. */
     virtual void backlightTimeSetAlways();
 
     /** Retuns @c true if the keypad lock is manual. */
     virtual bool keypadLockIsManual() const;
     /** Returns the keypad lock time. */
-    virtual uint keypadLockTime() const;
+    virtual unsigned keypadLockTime() const;
     /** Sets the keypad lock time. */
-    virtual void setKeypadLockTime(uint sec);
+    virtual void setKeypadLockTime(unsigned sec);
     /** Set keypad lock to manual. */
     virtual void keypadLockTimeSetManual();
 
@@ -781,23 +781,23 @@ public:
     virtual void setRadioName(const QString &name);
 
     /** Returns the channel hang time. */
-    virtual uint channelHangTime() const;
+    virtual unsigned channelHangTime() const;
     /** Sets the channel hang time. */
-    virtual void setChannelHangTime(uint dur);
+    virtual void setChannelHangTime(unsigned dur);
     /** Returns @c true, if public zone is enabled. */
     virtual bool publicZone() const;
     /** Enables/disables public zone. */
     virtual void enablePublicZone(bool enable);
 
     /** Returns the n-th DMR id. */
-    virtual uint32_t additionalDMRId(uint n) const;
+    virtual uint32_t additionalDMRId(unsigned n) const;
     /** Sets the n-th DMR id. */
-    virtual void setAdditionalDMRId(uint n, uint32_t id);
+    virtual void setAdditionalDMRId(unsigned n, uint32_t id);
 
     /** Returns the microphone gain. */
-    virtual uint micLevel() const;
+    virtual unsigned micLevel() const;
     /** Sets the microphone gain. */
-    virtual void setMICLevel(uint val);
+    virtual void setMICLevel(unsigned val);
 
     /** If @c true, radio ID editing is enabled. */
     virtual bool editRadioID() const;
@@ -829,17 +829,17 @@ public:
     void clear();
 
     /** Returns the boot zone index. */
-    virtual uint zoneIndex() const;
+    virtual unsigned zoneIndex() const;
     /** Sets the boot zone index. */
-    virtual void setZoneIndex(uint idx);
+    virtual void setZoneIndex(unsigned idx);
     /** Returns the channel index (within zone) for VFO A. */
-    virtual uint channelIndexA() const;
+    virtual unsigned channelIndexA() const;
     /** Sets the channel index (within zone) for VFO A. */
-    virtual void setChannelIndexA(uint idx);
+    virtual void setChannelIndexA(unsigned idx);
     /** Returns the channel index (within zone) for VFO B. */
-    virtual uint channelIndexB() const;
+    virtual unsigned channelIndexB() const;
     /** Sets the channel index (within zone) for VFO B. */
-    virtual void setChannelIndexB(uint idx);
+    virtual void setChannelIndexB(unsigned idx);
   };
 
   /** Codeplug representation of programming time-stamp and CPS version.
@@ -900,9 +900,9 @@ public:
     /** Returns @c true if the repeat interval is disabled. */
     virtual bool repeatIntervalDisabled() const;
     /** Returns the repeat interval. */
-    virtual uint repeatInterval() const;
+    virtual unsigned repeatInterval() const;
     /** Sets the repeat interval in seconds. */
-    virtual void setRepeatInterval(uint sec);
+    virtual void setRepeatInterval(unsigned sec);
     /** Disables the GPS repeat interval. */
     virtual void disableRepeatInterval();
 
@@ -944,9 +944,9 @@ public:
     /** Returns @c true if the menu hang time is infinite. */
     virtual bool menuHangtimeIsInfinite() const;
     /** Returns the menu hang time in seconds. */
-    virtual uint menuHangtime() const;
+    virtual unsigned menuHangtime() const;
     /** Sets the menu hang time in seconds. */
-    virtual void setMenuHangtime(uint sec);
+    virtual void setMenuHangtime(unsigned sec);
     /** Sets the menu hang time to be infinite. */
     virtual void infiniteMenuHangtime();
 
@@ -1142,9 +1142,9 @@ public:
     virtual void setSideButton2Long(ButtonAction action);
 
     /** Returns the long-press duration in ms. */
-    virtual uint longPressDuration() const;
+    virtual unsigned longPressDuration() const;
     /** Sets the long-press duration in ms. */
-    virtual void setLongPressDuration(uint ms);
+    virtual void setLongPressDuration(unsigned ms);
 
     /** Encodes the button settings. */
     virtual bool fromConfig(const Config *config);
@@ -1242,19 +1242,19 @@ public:
     virtual void enableRadioDisable(bool enable);
 
     /** Returns the remote monitor duration in seconds. */
-    virtual uint remoteMonitorDuration() const;
+    virtual unsigned remoteMonitorDuration() const;
     /** Sets the remote monitor duration in seconds. */
-    virtual void setRemoteMonitorDuration(uint sec);
+    virtual void setRemoteMonitorDuration(unsigned sec);
 
     /** Returns the TX time-out in ms. */
-    virtual uint txTimeOut() const;
+    virtual unsigned txTimeOut() const;
     /** Sets the TX time-out in ms. */
-    virtual void setTXTimeOut(uint ms);
+    virtual void setTXTimeOut(unsigned ms);
 
     /** Returns the message limit. */
-    virtual uint messageLimit() const;
+    virtual unsigned messageLimit() const;
     /** Sets the message limit. */
-    virtual void setMessageLimit(uint limit);
+    virtual void setMessageLimit(unsigned limit);
   };
 
   /** Represents a single emergency system within the radio.
@@ -1306,19 +1306,19 @@ public:
     virtual void setAlarmMode(AlarmMode mode);
 
     /** Returns the number of impolite retries. */
-    virtual uint impoliteRetries() const;
+    virtual unsigned impoliteRetries() const;
     /** Sets the number of impolite retries. */
-    virtual void setImpoliteRetries(uint num);
+    virtual void setImpoliteRetries(unsigned num);
 
     /** Returns the number of polite retries. */
-    virtual uint politeRetries() const;
+    virtual unsigned politeRetries() const;
     /** Sets the number of polite retries. */
-    virtual void setPoliteRetries(uint num);
+    virtual void setPoliteRetries(unsigned num);
 
     /** Returns the hot MIC duration in seconds. */
-    virtual uint hotMICDuration() const;
+    virtual unsigned hotMICDuration() const;
     /** Sets the hot MIC duration in seconds. */
-    virtual void setHotMICDuration(uint sec);
+    virtual void setHotMICDuration(unsigned sec);
 
     /** Returns @c true if the revert channel is the selected one. */
     virtual bool revertChannelIsSelected() const;
@@ -1349,13 +1349,13 @@ public:
     void clear();
 
     /** Returns the n-th "enhanced" key (128bit). */
-    virtual QByteArray enhancedKey(uint n);
+    virtual QByteArray enhancedKey(unsigned n);
     /** Sets the n-th "enhanced" key (128bit). */
-    virtual void setEnhancedKey(uint n, const QByteArray &key);
+    virtual void setEnhancedKey(unsigned n, const QByteArray &key);
     /** Returns the n-th "basic" key (16bit). */
-    virtual QByteArray basicKey(uint n);
+    virtual QByteArray basicKey(unsigned n);
     /** Sets the n-th "basic" key (16bit). */
-    virtual void setBasicKey(uint n, const QByteArray &key);
+    virtual void setBasicKey(unsigned n, const QByteArray &key);
   };
 
 protected:

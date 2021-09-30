@@ -222,7 +222,7 @@ D868UVCodeplug::ctcss_num2code(uint8_t num) {
 /* ******************************************************************************************** *
  * Implementation of D868UVCodeplug::GeneralSettingsElement
  * ******************************************************************************************** */
-D868UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, uint size)
+D868UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
   : AnytoneCodeplug::GeneralSettingsElement(ptr, size)
 {
   // pass....
@@ -245,15 +245,15 @@ D868UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setCallDisplayColor(Color color) {
-  setUInt8(0x00b0, (uint)color);
+  setUInt8(0x00b0, (unsigned)color);
 }
 
-uint
+unsigned
 D868UVCodeplug::GeneralSettingsElement::gpsUpdatePeriod() const {
   return getUInt8(0x00b1);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(uint sec) {
+D868UVCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(unsigned sec) {
   setUInt8(0x00b1, sec);
 }
 
@@ -270,12 +270,12 @@ bool
 D868UVCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
   return 0 == keyToneLevel();
 }
-uint
+unsigned
 D868UVCodeplug::GeneralSettingsElement::keyToneLevel() const {
-  return ((uint)getUInt8(0x00b3))*10/15;
+  return ((unsigned)getUInt8(0x00b3))*10/15;
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setKeyToneLevel(uint level) {
+D868UVCodeplug::GeneralSettingsElement::setKeyToneLevel(unsigned level) {
   setUInt8(0x00b3, level*10/15);
 }
 void
@@ -334,37 +334,37 @@ D868UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
   setUInt8(0x00b6, (enable ? 0x01 : 0x00));
 }
 
-uint
+unsigned
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
   return getBCD8_be(0x00b8)*10;
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(uint Hz) {
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(unsigned Hz) {
   setBCD8_be(0x00b8, Hz/10);
 }
-uint
+unsigned
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyVHF() const {
   return getBCD8_be(0x00bc)*10;
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(uint Hz) {
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(unsigned Hz) {
   setBCD8_be(0x00bc, Hz/10);
 }
 
-uint
+unsigned
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyUHF() const {
   return getBCD8_be(0x00c0)*10;
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(uint Hz) {
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(unsigned Hz) {
   setBCD8_be(0x00c0, Hz/10);
 }
-uint
+unsigned
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyUHF() const {
   return getBCD8_be(0x00c4)*10;
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(uint Hz) {
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(unsigned Hz) {
   setBCD8_be(0x00c4, Hz/10);
 }
 
@@ -374,7 +374,7 @@ D868UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AutoRepDir dir) {
-  setUInt8(0x00c8, (uint)dir);
+  setUInt8(0x00c8, (unsigned)dir);
 }
 
 bool
@@ -386,21 +386,21 @@ D868UVCodeplug::GeneralSettingsElement::enableDefaultChannel(bool enable) {
   setUInt8(0x00ca, (enable ? 0x01 : 0x00));
 }
 
-uint
+unsigned
 D868UVCodeplug::GeneralSettingsElement::defaultZoneIndexA() const {
   return getUInt8(0x00cb);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexA(uint idx) {
+D868UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexA(unsigned idx) {
   setUInt8(0x00cb, idx);
 }
 
-uint
+unsigned
 D868UVCodeplug::GeneralSettingsElement::defaultZoneIndexB() const {
   return getUInt8(0x00cc);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexB(uint idx) {
+D868UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexB(unsigned idx) {
   setUInt8(0x00cc, idx);
 }
 
@@ -408,12 +408,12 @@ bool
 D868UVCodeplug::GeneralSettingsElement::defaultChannelAIsVFO() const {
   return 0xff == defaultChannelAIndex();
 }
-uint
+unsigned
 D868UVCodeplug::GeneralSettingsElement::defaultChannelAIndex() const {
   return getUInt8(0x00cd);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setDefaultChannelAIndex(uint idx) {
+D868UVCodeplug::GeneralSettingsElement::setDefaultChannelAIndex(unsigned idx) {
   setUInt8(0x00cd, idx);
 }
 void
@@ -425,12 +425,12 @@ bool
 D868UVCodeplug::GeneralSettingsElement::defaultChannelBIsVFO() const {
   return 0xff == defaultChannelBIndex();
 }
-uint
+unsigned
 D868UVCodeplug::GeneralSettingsElement::defaultChannelBIndex() const {
   return getUInt8(0x00ce);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setDefaultChannelBIndex(uint idx) {
+D868UVCodeplug::GeneralSettingsElement::setDefaultChannelBIndex(unsigned idx) {
   setUInt8(0x00ce, idx);
 }
 void
@@ -807,7 +807,7 @@ void
 D868UVCodeplug::allocateContacts() {
   /* Allocate contacts */
   uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
-  uint contactCount=0;
+  unsigned contactCount=0;
   for (uint16_t i=0; i<NUM_CONTACTS; i++) {
     // enabled if false (ass hole)
     if (1 == ((contact_bitmap[i/8]>>(i%8)) & 0x01))
@@ -1051,7 +1051,7 @@ D868UVCodeplug::allocateZones() {
 bool
 D868UVCodeplug::encodeZones(const Flags &flags, Context &ctx) {
   // Encode zones
-  uint zidx = 0;
+  unsigned zidx = 0;
   for (int i=0; i<ctx.config()->zones()->count(); i++) {
     // Clear name and channel list
     uint8_t  *name     = (uint8_t *)data(ADDR_ZONE_NAME + zidx*ZONE_NAME_OFFSET);
@@ -1204,7 +1204,7 @@ bool
 D868UVCodeplug::createScanLists(Context &ctx) {
   // Create scan lists
   uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
-  for (uint i=0; i<NUM_SCAN_LISTS; i++) {
+  for (unsigned i=0; i<NUM_SCAN_LISTS; i++) {
     uint8_t byte=i/8, bit=i%8;
     if (0 == ((scanlist_bitmap[byte]>>bit) & 0x01))
       continue;
@@ -1221,7 +1221,7 @@ D868UVCodeplug::createScanLists(Context &ctx) {
 bool
 D868UVCodeplug::linkScanLists(Context &ctx) {
   uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
-  for (uint i=0; i<NUM_SCAN_LISTS; i++) {
+  for (unsigned i=0; i<NUM_SCAN_LISTS; i++) {
     uint8_t byte=i/8, bit=i%8;
     if (0 == ((scanlist_bitmap[byte]>>bit) & 0x01))
       continue;
@@ -1334,7 +1334,7 @@ void
 D868UVCodeplug::allocateSMSMessages() {
   // Prefab. SMS messages
   uint8_t *messages_bytemap = data(MESSAGE_BYTEMAP);
-  uint message_count = 0;
+  unsigned message_count = 0;
   for (uint8_t i=0; i<NUM_MESSAGES; i++) {
     uint8_t bank = i/NUM_MESSAGES_PER_BANK;
     if (0xff == messages_bytemap[i])

@@ -8,7 +8,7 @@
 /* ********************************************************************************************* *
  * Implementation of PositioningSystem
  * ********************************************************************************************* */
-PositioningSystem::PositioningSystem(const QString &name, uint period, QObject *parent)
+PositioningSystem::PositioningSystem(const QString &name, unsigned period, QObject *parent)
   : ConfigObject("aprs", parent), _name(name), _period(period)
 {
   // pass...
@@ -29,13 +29,13 @@ PositioningSystem::setName(const QString &name) {
   emit modified(this);
 }
 
-uint
+unsigned
 PositioningSystem::period() const {
   return _period;
 }
 
 void
-PositioningSystem::setPeriod(uint period) {
+PositioningSystem::setPeriod(unsigned period) {
   _period = period;
   emit modified(this);
 }
@@ -57,7 +57,7 @@ PositioningSystem::onReferenceModified() {
  * Implementation of GPSSystem
  * ********************************************************************************************* */
 GPSSystem::GPSSystem(const QString &name, DigitalContact *contact,
-                     DigitalChannel *revertChannel, uint period,
+                     DigitalChannel *revertChannel, unsigned period,
                      QObject *parent)
   : PositioningSystem(name, period, parent), _contact(), _revertChannel()
 {
@@ -139,9 +139,9 @@ GPSSystem::revert() {
 /* ********************************************************************************************* *
  * Implementation of APRSSystem
  * ********************************************************************************************* */
-APRSSystem::APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, uint destSSID,
-                       const QString &src, uint srcSSID, const QString &path, Icon icon, const QString &message,
-                       uint period, QObject *parent)
+APRSSystem::APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, unsigned destSSID,
+                       const QString &src, unsigned srcSSID, const QString &path, Icon icon, const QString &message,
+                       unsigned period, QObject *parent)
   : PositioningSystem(name, period, parent), _channel(), _destination(dest), _destSSID(destSSID),
     _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message)
 {
@@ -184,12 +184,12 @@ const QString &
 APRSSystem::destination() const {
   return _destination;
 }
-uint
+unsigned
 APRSSystem::destSSID() const {
   return _destSSID;
 }
 void
-APRSSystem::setDestination(const QString &call, uint ssid) {
+APRSSystem::setDestination(const QString &call, unsigned ssid) {
   _destination = call;
   _destSSID = ssid;
 }
@@ -198,12 +198,12 @@ const QString &
 APRSSystem::source() const {
   return _source;
 }
-uint
+unsigned
 APRSSystem::srcSSID() const {
   return _srcSSID;
 }
 void
-APRSSystem::setSource(const QString &call, uint ssid) {
+APRSSystem::setSource(const QString &call, unsigned ssid) {
   _source = call;
   _srcSSID = ssid;
 }

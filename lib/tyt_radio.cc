@@ -186,10 +186,10 @@ TyTRadio::download() {
   // Then download codeplug
   size_t bcount = 0;
   for (int n=0; n<codeplug().image(0).numElements(); n++) {
-    uint addr = codeplug().image(0).element(n).address();
-    uint size = codeplug().image(0).element(n).data().size();
-    uint b0 = addr/BSIZE, nb = size/BSIZE;
-    for (uint b=0; b<nb; b++, bcount++) {
+    unsigned addr = codeplug().image(0).element(n).address();
+    unsigned size = codeplug().image(0).element(n).data().size();
+    unsigned b0 = addr/BSIZE, nb = size/BSIZE;
+    for (unsigned b=0; b<nb; b++, bcount++) {
       if (! _dev->read(0, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE), BSIZE)) {
         _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
             .arg(_dev->errorMessage());
@@ -221,10 +221,10 @@ TyTRadio::upload() {
   // If codeplug gets updated, download codeplug from device first:
   if (_codeplugFlags.updateCodePlug) {
     for (int n=0; n<codeplug().image(0).numElements(); n++) {
-      uint addr = codeplug().image(0).element(n).address();
-      uint size = codeplug().image(0).element(n).data().size();
-      uint b0 = addr/BSIZE, nb = size/BSIZE;
-      for (uint b=0; b<nb; b++, bcount+=BSIZE) {
+      unsigned addr = codeplug().image(0).element(n).address();
+      unsigned size = codeplug().image(0).element(n).data().size();
+      unsigned b0 = addr/BSIZE, nb = size/BSIZE;
+      for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
         if (! _dev->read(0, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE), BSIZE)) {
           _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
               .arg(_dev->errorMessage());
@@ -248,9 +248,9 @@ TyTRadio::upload() {
   // then, upload modified codeplug
   bcount = 0;
   for (int n=0; n<codeplug().image(0).numElements(); n++) {
-    uint addr = codeplug().image(0).element(n).address();
-    uint size = codeplug().image(0).element(n).memSize();
-    uint b0 = addr/BSIZE, nb = size/BSIZE;
+    unsigned addr = codeplug().image(0).element(n).address();
+    unsigned size = codeplug().image(0).element(n).memSize();
+    unsigned b0 = addr/BSIZE, nb = size/BSIZE;
     for (size_t b=0; b<nb; b++,bcount+=BSIZE) {
       if (! _dev->write(0, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE), BSIZE)) {
         _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
@@ -281,15 +281,15 @@ TyTRadio::uploadCallsigns() {
   logDebug() << "Erase memory section for call-sign DB.";
   _dev->erase(callsignDB()->image(0).element(0).address(),
               callsignDB()->image(0).element(0).memSize(),
-              [](uint percent, void *ctx) { emit ((TyTRadio *)ctx)->uploadProgress(percent/2); }, this);
+              [](unsigned percent, void *ctx) { emit ((TyTRadio *)ctx)->uploadProgress(percent/2); }, this);
 
   logDebug() << "Upload " << callsignDB()->image(0).numElements() << " elements.";
   // Total amount of data to transfer
   size_t totb = callsignDB()->memSize();
   // Upload callsign DB
-  uint addr = callsignDB()->image(0).element(0).address();
-  uint size = callsignDB()->image(0).element(0).memSize();
-  uint b0 = addr/BSIZE, nb = size/BSIZE;
+  unsigned addr = callsignDB()->image(0).element(0).address();
+  unsigned size = callsignDB()->image(0).element(0).memSize();
+  unsigned b0 = addr/BSIZE, nb = size/BSIZE;
   for (size_t b=0, bcount=0; b<nb; b++,bcount+=BSIZE) {
     if (! _dev->write(0, (b0+b)*BSIZE, callsignDB()->data((b0+b)*BSIZE), BSIZE)) {
       _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)

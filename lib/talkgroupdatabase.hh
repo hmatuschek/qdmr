@@ -17,9 +17,9 @@ class TalkGroupDatabase : public QAbstractTableModel
     /** Empty constructor. */
     TalkGroup();
     /** Constructor form name and DMR ID. */
-    TalkGroup(const QString &name, uint number);
+    TalkGroup(const QString &name, unsigned number);
     /** The DMR ID of the talk group. */
-    uint id;
+    unsigned id;
     /** The Name of the talk group. */
     QString name;
   };
@@ -28,12 +28,12 @@ public:
   /** Constructs a talk group database.
    * @param updatePeriodDays Specifies the update period of the DB in days.
    * @param parent Specifies the QObject parent. */
-  TalkGroupDatabase(uint updatePeriodDays=30, QObject *parent=nullptr);
+  TalkGroupDatabase(unsigned updatePeriodDays=30, QObject *parent=nullptr);
 
   /** Returns the number of talk groups. */
   qint64 count() const;
   /** Returns the age of the database in days. */
-  uint dbAge() const;
+  unsigned dbAge() const;
 
   /** Returns the talk group entry at the given index. */
   TalkGroup talkgroup(int index) const;

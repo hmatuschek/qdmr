@@ -19,7 +19,7 @@ class PositioningSystem: public ConfigObject
   /** The name of the system. */
   Q_PROPERTY(QString name READ name WRITE setName)
   /** The update period in seconds. */
-  Q_PROPERTY(uint period READ period WRITE setPeriod)
+  Q_PROPERTY(unsigned period READ period WRITE setPeriod)
 
 protected:
   /** Hidden constructor.
@@ -28,7 +28,7 @@ protected:
    * @param name Specifies the name of the system.
    * @param period Specifies the auto-update period in seconds.
    * @param parent Specified the QObject parent object. */
-  explicit PositioningSystem(const QString &name, uint period=300, QObject *parent=nullptr);
+  explicit PositioningSystem(const QString &name, unsigned period=300, QObject *parent=nullptr);
 
 public:
   /** Destructor. */
@@ -54,9 +54,9 @@ public:
   void setName(const QString &name);
 
   /** Returns the update period in seconds. */
-  uint period() const;
+  unsigned period() const;
   /** Sets the update period in seconds. */
-  void setPeriod(uint period);
+  void setPeriod(unsigned period);
 
 protected:
   bool populate(YAML::Node &node, const ConfigObject::Context &context);
@@ -69,7 +69,7 @@ protected:
   /** Holds the name of the GPS system. */
   QString _name;
   /** Holds the update period in seconds. */
-  uint _period;
+  unsigned _period;
 };
 
 
@@ -96,7 +96,7 @@ public:
    * @param period Specifies the update period in seconds.
    * @param parent Specifies the QObject parent object. */
   GPSSystem(const QString &name, DigitalContact *contact=nullptr,
-            DigitalChannel *revertChannel = nullptr, uint period=300,
+            DigitalChannel *revertChannel = nullptr, unsigned period=300,
             QObject *parent = nullptr);
 
   YAML::Node serialize(const Context &context);
@@ -146,10 +146,10 @@ class APRSSystem: public PositioningSystem
   Q_PROPERTY(QString message READ message WRITE setMessage)
 
 public:
-  static const uint PRIMARY_TABLE   = (0<<8);   ///< Primary icon table flag.
-  static const uint SECONDARY_TABLE = (1<<8);   ///< Secondary icon table flag.
-  static const uint TABLE_MASK      = (3<<8);   ///< Bitmask for icon table flags.
-  static const uint ICON_MASK       = 0x7f;     ///< Bitmask for the icon table entry.
+  static const unsigned PRIMARY_TABLE   = (0<<8);   ///< Primary icon table flag.
+  static const unsigned SECONDARY_TABLE = (1<<8);   ///< Secondary icon table flag.
+  static const unsigned TABLE_MASK      = (3<<8);   ///< Bitmask for icon table flags.
+  static const unsigned ICON_MASK       = 0x7f;     ///< Bitmask for the icon table entry.
 
   /** All implemented APRS icons. */
   enum class Icon {
@@ -182,10 +182,10 @@ public:
    * @param message An optional message to send.
    * @param period Specifies the auto-update period in seconds.
    * @param parent Specifies the QObject parent object. */
-  explicit APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, uint destSSID,
-                      const QString &src, uint srcSSID,
+  explicit APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, unsigned destSSID,
+                      const QString &src, unsigned srcSSID,
                       const QString &path="", Icon icon=Icon::Jogger,
-                      const QString &message="", uint period=300, QObject *parent=nullptr);
+                      const QString &message="", unsigned period=300, QObject *parent=nullptr);
 
   YAML::Node serialize(const Context &context);
 
@@ -201,16 +201,16 @@ public:
   /** Retruns the destination call. */
   const QString &destination() const;
   /** Returns the destination SSID. */
-  uint destSSID() const;
+  unsigned destSSID() const;
   /** Sets the destination call and SSID. */
-  void setDestination(const QString &call, uint ssid);
+  void setDestination(const QString &call, unsigned ssid);
 
   /** Returns the source call. */
   const QString &source() const;
   /** Returns the source SSID. */
-  uint srcSSID() const;
+  unsigned srcSSID() const;
   /** Sets the source call and SSID. */
-  void setSource(const QString &call, uint ssid);
+  void setSource(const QString &call, unsigned ssid);
 
   /** Retruns the APRS path. */
   const QString &path() const;
@@ -236,11 +236,11 @@ protected:
   /** Holds the destination call. */
   QString _destination;
   /** Holds the destination SSID. */
-  uint _destSSID;
+  unsigned _destSSID;
   /** Holds the source call. */
   QString _source;
   /** Holds the source SSID. */
-  uint _srcSSID;
+  unsigned _srcSSID;
   /** Holds the APRS path string. */
   QString _path;
   /** Holds the map icon. */

@@ -70,7 +70,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    ChannelElement(uint8_t *ptr, uint size);
+    ChannelElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -82,23 +82,23 @@ public:
     void clear();
 
     /** Returns the RX frequency in Hz. */
-    virtual uint rxFrequency() const;
+    virtual unsigned rxFrequency() const;
     /** Sets the RX frequency in Hz. */
-    virtual void setRXFrequency(uint hz);
+    virtual void setRXFrequency(unsigned hz);
 
     /** Returns the TX frequency offset in Hz.
      * This method returns an unsigned value, the sign of the offset frequency is stored in
      * @c repeaterMode(). */
-    virtual uint txOffset() const;
+    virtual unsigned txOffset() const;
     /** Sets the TX frequency offset in Hz.
      * This method accepts unsigned values, the sign of the offset frequency is stored in
      * @c repeaterMode(). */
-    virtual void setTXOffset(uint hz);
+    virtual void setTXOffset(unsigned hz);
     /** Returns the TX frequency in Hz. */
-    virtual uint txFrequency() const;
+    virtual unsigned txFrequency() const;
     /** Sets the TX frequency indirectly. That is, relative to the RX frequency which must be set
      * first. This method also updates the @c repeaterMode. */
-    virtual void setTXFrequency(uint hz);
+    virtual void setTXFrequency(unsigned hz);
 
     /** Returns the channel mode (analog, digtital, etc). */
     virtual Mode mode() const;
@@ -179,19 +179,19 @@ public:
     virtual void setCustomCTCSSFrequency(double hz);
 
     /** Returns the 2-tone decode index (0-based). */
-    virtual uint twoToneDecodeIndex() const;
+    virtual unsigned twoToneDecodeIndex() const;
     /** Sets the 2-tone decode index (0-based). */
-    virtual void setTwoToneDecodeIndex(uint idx);
+    virtual void setTwoToneDecodeIndex(unsigned idx);
 
     /** Retunrs the transmit contact index (0-based). */
-    virtual uint contactIndex() const;
+    virtual unsigned contactIndex() const;
     /** Sets the transmit contact index (0-based). */
-    virtual void setContactIndex(uint idx);
+    virtual void setContactIndex(unsigned idx);
 
     /** Retunrs the radio ID index (0-based). */
-    virtual uint radioIDIndex() const;
+    virtual unsigned radioIDIndex() const;
     /** Sets the radio ID index (0-based). */
-    virtual void setRadioIDIndex(uint idx);
+    virtual void setRadioIDIndex(unsigned idx);
 
     /** Returns @c true if the sequelch is silent and @c false if open. */
     virtual bool silentSquelch() const;
@@ -211,38 +211,38 @@ public:
     /** Returns @c true, if a scan list index is set. */
     virtual bool hasScanListIndex() const;
     /** Returns the scan list index (0-based). */
-    virtual uint scanListIndex() const;
+    virtual unsigned scanListIndex() const;
     /** Sets the scan list index (0-based). */
-    virtual void setScanListIndex(uint idx);
+    virtual void setScanListIndex(unsigned idx);
     /** Clears the scan list index. */
     virtual void clearScanListIndex();
 
     /** Returns @c true, if a group list index is set. */
     virtual bool hasGroupListIndex() const;
     /** Returns the scan list index (0-based). */
-    virtual uint groupListIndex() const;
+    virtual unsigned groupListIndex() const;
     /** Sets the group list index (0-based). */
-    virtual void setGroupListIndex(uint idx);
+    virtual void setGroupListIndex(unsigned idx);
     /** Clears the group list index. */
     virtual void clearGroupListIndex();
 
     /** Returns the two-tone ID index (0-based). */
-    virtual uint twoToneIDIndex() const;
+    virtual unsigned twoToneIDIndex() const;
     /** Sets the two-tone ID index (0-based). */
-    virtual void setTwoToneIDIndex(uint idx);
+    virtual void setTwoToneIDIndex(unsigned idx);
     /** Returns the five-tone ID index (0-based). */
-    virtual uint fiveToneIDIndex() const;
+    virtual unsigned fiveToneIDIndex() const;
     /** Sets the five-tone ID index (0-based). */
-    virtual void setFiveToneIDIndex(uint idx);
+    virtual void setFiveToneIDIndex(unsigned idx);
     /** Returns the DTFM ID index (0-based). */
-    virtual uint dtmfIDIndex() const;
+    virtual unsigned dtmfIDIndex() const;
     /** Sets the DTMF ID index (0-based). */
-    virtual void setDTMFIDIndex(uint idx);
+    virtual void setDTMFIDIndex(unsigned idx);
 
     /** Returns the color code. */
-    virtual uint colorCode() const;
+    virtual unsigned colorCode() const;
     /** Sets the color code. */
-    virtual void setColorCode(uint code);
+    virtual void setColorCode(unsigned code);
 
     /** Returns the time slot. */
     virtual DigitalChannel::TimeSlot timeSlot() const;
@@ -277,9 +277,9 @@ public:
     /** Returns @c true if an encryption key is set. */
     virtual bool hasEncryptionKeyIndex() const;
     /** Returns the AES (enhanced) encryption key index (0-based). */
-    virtual uint encryptionKeyIndex() const;
+    virtual unsigned encryptionKeyIndex() const;
     /** Sets the AES (enahnced) encryption key index (0-based). */
-    virtual void setEncryptionKeyIndex(uint idx);
+    virtual void setEncryptionKeyIndex(unsigned idx);
     /** Clears the encryption key index. */
     virtual void clearEncryptionKeyIndex();
 
@@ -306,14 +306,14 @@ public:
     /** Enables/disables TX APRS. */
     virtual void enableTXDigitalAPRS(bool enable);
     /** Returns the DMR APRS system index. */
-    virtual uint digitalAPRSSystemIndex() const;
+    virtual unsigned digitalAPRSSystemIndex() const;
     /** Sets the DMR APRS system index. */
-    virtual void setDigitalAPRSSystemIndex(uint idx);
+    virtual void setDigitalAPRSSystemIndex(unsigned idx);
 
     /** Returns the DMR encryption key index (+1), 0=Off. */
-    virtual uint dmrEncryptionKeyIndex() const;
+    virtual unsigned dmrEncryptionKeyIndex() const;
     /** Sets the DMR encryption key index (+1), 0=Off. */
-    virtual void setDMREncryptionKeyIndex(uint idx);
+    virtual void setDMREncryptionKeyIndex(unsigned idx);
     /** Returns @c true if multiple key encryption is enabled. */
     virtual bool multipleKeyEncryption() const;
     /** Enables/disables multiple key encryption. */
@@ -352,7 +352,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    ContactElement(uint8_t *ptr, uint size);
+    ContactElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -376,9 +376,9 @@ public:
     virtual void setName(const QString &name);
 
     /** Returns the contact number. */
-    virtual uint number() const;
+    virtual unsigned number() const;
     /** Sets the contact number. */
-    virtual void setNumber(uint number);
+    virtual void setNumber(unsigned number);
 
     /** Returns the alert type. */
     virtual AlertType alertType() const;
@@ -399,7 +399,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    DTMFContactElement(uint8_t *ptr, uint size);
+    DTMFContactElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -434,7 +434,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    GroupListElement(uint8_t *ptr, uint size);
+    GroupListElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -451,13 +451,13 @@ public:
     virtual void setName(const QString &name);
 
     /** Returns @c true if the n-th member index is valid. */
-    virtual bool hasMemberIndex(uint n) const;
+    virtual bool hasMemberIndex(unsigned n) const;
     /** Returns the n-th member index. */
-    virtual uint memberIndex(uint n) const;
+    virtual unsigned memberIndex(unsigned n) const;
     /** Sets the n-th member index. */
-    virtual void setMemberIndex(uint n, uint idx);
+    virtual void setMemberIndex(unsigned n, unsigned idx);
     /** Clears the n-th member index. */
-    virtual void clearMemberIndex(uint n);
+    virtual void clearMemberIndex(unsigned n);
 
     /** Constructs a new @c RXGroupList from this group list.
      * None of the members are added yet. Call @c linkGroupList
@@ -499,7 +499,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    ScanListElement(uint8_t *ptr, uint size);
+    ScanListElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -518,9 +518,9 @@ public:
     /** Returns @c true if the primary channel is set to the selected channel. */
     virtual bool primaryIsSelected() const;
     /** Returns the primary channel index. */
-    virtual uint primary() const;
+    virtual unsigned primary() const;
     /** Sets the primary channel index. */
-    virtual void setPrimary(uint idx);
+    virtual void setPrimary(unsigned idx);
     /** Sets the primary channel to be selected channel. */
     virtual void setPrimarySelected();
     /** Clears the primary channel index. */
@@ -531,30 +531,30 @@ public:
     /** Returns @c true if the secondary channel is set to the selected channel. */
     virtual bool secondaryIsSelected() const;
     /** Returns the secondary channel index. */
-    virtual uint secondary() const;
+    virtual unsigned secondary() const;
     /** Sets the secondary channel index. */
-    virtual void setSecondary(uint idx);
+    virtual void setSecondary(unsigned idx);
     /** Sets the secondary channel to be selected channel. */
     virtual void setSecondarySelected();
     /** Clears the secondary channel index. */
     virtual void clearSecondaryChannel();
 
     /** Returns the look back time A in seconds. */
-    virtual uint lookBackTimeA() const;
+    virtual unsigned lookBackTimeA() const;
     /** Sets the look back time A in seconds. */
-    virtual void setLookBackTimeA(uint sec);
+    virtual void setLookBackTimeA(unsigned sec);
     /** Returns the look back time B in seconds. */
-    virtual uint lookBackTimeB() const;
+    virtual unsigned lookBackTimeB() const;
     /** Sets the look back time B in seconds. */
-    virtual void setLookBackTimeB(uint sec);
+    virtual void setLookBackTimeB(unsigned sec);
     /** Returns the drop out delay in seconds. */
-    virtual uint dropOutDelay() const;
+    virtual unsigned dropOutDelay() const;
     /** Sets the drop out delay in seconds. */
-    virtual void setDropOutDelay(uint sec);
+    virtual void setDropOutDelay(unsigned sec);
     /** Returns the dwell time in seconds. */
-    virtual uint dwellTime() const;
+    virtual unsigned dwellTime() const;
     /** Sets the dwell time in seconds. */
-    virtual void setDwellTime(uint sec);
+    virtual void setDwellTime(unsigned sec);
 
     /** Returns the revert channel type. */
     virtual RevertChannel revertChannel() const;
@@ -567,13 +567,13 @@ public:
     virtual void setName(const QString &name);
 
     /** Returns @c true if the n-th member index is set. */
-    virtual bool hasMemberIndex(uint n) const;
+    virtual bool hasMemberIndex(unsigned n) const;
     /** Returns the n-th member index. */
-    virtual uint memberIndex(uint n) const;
+    virtual unsigned memberIndex(unsigned n) const;
     /** Sets the n-th member index. */
-    virtual void setMemberIndex(uint n, uint idx);
+    virtual void setMemberIndex(unsigned n, unsigned idx);
     /** Clears the n-th member index. */
-    virtual void clearMemberIndex(uint n);
+    virtual void clearMemberIndex(unsigned n);
 
     /** Constructs a ScanList object from this definition. This only sets the properties of
      * the scan list. To associate all members with the scan list object, call @c linkScanListObj. */
@@ -592,7 +592,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    RadioIDElement(uint8_t *ptr, uint size);
+    RadioIDElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -602,9 +602,9 @@ public:
     void clear();
 
     /** Returns the number of the radio ID. */
-    virtual uint number() const;
+    virtual unsigned number() const;
     /** Sets the number of the radio ID. */
-    virtual void setNumber(uint number);
+    virtual void setNumber(unsigned number);
 
     /** Returns the name of the radio ID. */
     virtual QString name() const;
@@ -681,8 +681,8 @@ public:
     struct Melody {
       /** Represents a note of the melody. */
       struct Note {
-        uint frequency; ///< Tone frequency in Hz.
-        uint duration;  ///< Tone duration in ms.
+        unsigned frequency; ///< Tone frequency in Hz.
+        unsigned duration;  ///< Tone duration in ms.
       };
 
       /** Holds the 5 notes of the melody. */
@@ -703,7 +703,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    GeneralSettingsElement(uint8_t *ptr, uint size);
+    GeneralSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -725,9 +725,9 @@ public:
     /** Enables/disables auto key-lock. */
     virtual void enableAutoKeyLock(bool enable);
     /** Returns the auto-shutdown delay in minutes. */
-    virtual uint autoShutdownDelay() const;
+    virtual unsigned autoShutdownDelay() const;
     /** Sets the auto-shutdown delay in minutes. */
-    virtual void setAutoShutdownDelay(uint min);
+    virtual void setAutoShutdownDelay(unsigned min);
     /** Returns the boot display mode. */
     virtual BootDisplay bootDisplay() const;
     /** Sets the boot display mode. */
@@ -737,33 +737,33 @@ public:
     /** Enables/disables boot password. */
     virtual void enableBootPassword(bool enable);
     /** Squelch level of VFO A, (0=off). */
-    virtual uint squelchLevelA() const;
+    virtual unsigned squelchLevelA() const;
     /** Returns the squelch level for VFO A, (0=off). */
-    virtual void setSquelchLevelA(uint level);
+    virtual void setSquelchLevelA(unsigned level);
     /** Squelch level of VFO B, (0=off). */
-    virtual uint squelchLevelB() const;
+    virtual unsigned squelchLevelB() const;
     /** Returns the squelch level for VFO B, (0=off). */
-    virtual void setSquelchLevelB(uint level);
+    virtual void setSquelchLevelB(unsigned level);
     /** Returns the power-save mode. */
     virtual PowerSave powerSave() const;
     /** Sets the power-save mode. */
     virtual void setPowerSave(PowerSave mode);
     /** Returns the VOX level. */
-    virtual uint voxLevel() const;
+    virtual unsigned voxLevel() const;
     /** Sets the VOX level. */
-    virtual void setVOXLevel(uint level);
+    virtual void setVOXLevel(unsigned level);
     /** Returns the VOX delay in ms. */
-    virtual uint voxDelay() const;
+    virtual unsigned voxDelay() const;
     /** Sets the VOX delay in ms. */
-    virtual void setVOXDelay(uint ms);
+    virtual void setVOXDelay(unsigned ms);
     /** Retuns the VFO scan type. */
     virtual VFOScanType vfoScanType() const;
     /** Sets the VFO scan type. */
     virtual void setVFOScanType(VFOScanType type);
     /** Returns the mirophone gain. */
-    virtual uint micGain() const;
+    virtual unsigned micGain() const;
     /** Sets the microphone gain. */
-    virtual void setMICGain(uint gain);
+    virtual void setMICGain(unsigned gain);
 
     /** Retruns the key function for a short press on the programmable function key 1. */
     virtual KeyFunction progFuncKey1Short() const;
@@ -794,28 +794,28 @@ public:
     /** Enables/disables VFO mode for VFO B. */
     virtual void enableVFOModeB(bool enable);
     /** Returns the memory zone for VFO A. */
-    virtual uint memoryZoneA() const;
+    virtual unsigned memoryZoneA() const;
     /** Sets the memory zone for VFO A. */
-    virtual void setMemoryZoneA(uint zone);
+    virtual void setMemoryZoneA(unsigned zone);
 
     /** Returns the memory zone for VFO B. */
-    virtual uint memoryZoneB() const;
+    virtual unsigned memoryZoneB() const;
     /** Sets the memory zone for VFO B. */
-    virtual void setMemoryZoneB(uint zone);
+    virtual void setMemoryZoneB(unsigned zone);
     /** Returns @c true if recording is enabled. */
     virtual bool recording() const;
     /** Enables/disables recording. */
     virtual void enableRecording(bool enable);
     /** Retruns the display brightness. */
-    virtual uint brightness() const;
+    virtual unsigned brightness() const;
     /** Sets the display brightness. */
-    virtual void setBrightness(uint level);
+    virtual void setBrightness(unsigned level);
     /** Returns @c true if the backlight is always on. */
     virtual bool backlightPermanent() const;
     /** Retunrs the backlight duration in seconds. */
-    virtual uint backlightDuration() const;
+    virtual unsigned backlightDuration() const;
     /** Sets the backlight duration in seconds. */
-    virtual void setBacklightDuration(uint sec);
+    virtual void setBacklightDuration(unsigned sec);
     /** Sets the backlight to permanent (always on). */
     virtual void enableBacklightPermanent();
     /** Returns @c true if GPS is enabled. */
@@ -864,9 +864,9 @@ public:
     /** Enables/disables the idle channel tone. */
     virtual void enableIdleChannelTone(bool enable);
     /** Returns the menu exit time in seconds. */
-    virtual uint menuExitTime() const;
+    virtual unsigned menuExitTime() const;
     /** Sets the menu exit time in seconds. */
-    virtual void setMenuExitTime(uint sec);
+    virtual void setMenuExitTime(unsigned sec);
     /** Returns @c true if the startup tone is enabled. */
     virtual bool startupTone() const;
     /** Enables/disables the startup tone. */
@@ -876,9 +876,9 @@ public:
     /** Enables/disables the call-end prompt. */
     virtual void enableCallEndPrompt(bool enable);
     /** Returns the maximum volume. */
-    virtual uint maxVolume() const;
+    virtual unsigned maxVolume() const;
     /** Sets the maximum volume. */
-    virtual void setMaxVolume(uint level);
+    virtual void setMaxVolume(unsigned level);
     /** Returns @c true if get GPS position is enabled. */
     virtual bool getGPSPosition() const;
     /** Enables/disables get GPS position. */
@@ -905,9 +905,9 @@ public:
     /** Sets the key function for a long press on the function key 2. */
     virtual void setFuncKey2Long(KeyFunction func);
     /** Returns the long-press duration in ms. */
-    virtual uint longPressDuration() const;
+    virtual unsigned longPressDuration() const;
     /** Sets the long-press duration in ms. */
-    virtual void setLongPressDuration(uint ms);
+    virtual void setLongPressDuration(unsigned ms);
     /** Returns @c true if the volume change prompt is enabled. */
     virtual bool volumeChangePrompt() const;
     /** Enables/disables the volume change prompt. */
@@ -926,44 +926,44 @@ public:
     /** Enables/disables clock display. */
     virtual void enableDisplayClock(bool enable);
     /** Retuns the maximum headphone volume. */
-    virtual uint maxHeadphoneVolume() const;
+    virtual unsigned maxHeadphoneVolume() const;
     /** Sets the maximum headphone volume. */
-    virtual void setMaxHeadPhoneVolume(uint max);
+    virtual void setMaxHeadPhoneVolume(unsigned max);
     /** Returns @c true if the audio is "enhanced". */
     virtual bool enhanceAudio() const;
     /** Enables/disables "enhanced" audio. */
     virtual void enableEnhancedAudio(bool enable);
     /** Retruns the minimum VFO scan frequency for the UHF band in Hz. */
-    virtual uint minVFOScanFrequencyUHF() const;
+    virtual unsigned minVFOScanFrequencyUHF() const;
     /** Sets the minimum VFO scan frequency for the UHF band in Hz. */
-    virtual void setMinVFOScanFrequencyUHF(uint hz);
+    virtual void setMinVFOScanFrequencyUHF(unsigned hz);
     /** Retruns the maximum VFO scan frequency for the UHF band in Hz. */
-    virtual uint maxVFOScanFrequencyUHF() const;
+    virtual unsigned maxVFOScanFrequencyUHF() const;
     /** Sets the maximum VFO scan frequency for the UHF band in Hz. */
-    virtual void setMaxVFOScanFrequencyUHF(uint hz);
+    virtual void setMaxVFOScanFrequencyUHF(unsigned hz);
 
     /** Retruns the minimum VFO scan frequency for the VHF band in Hz. */
-    virtual uint minVFOScanFrequencyVHF() const;
+    virtual unsigned minVFOScanFrequencyVHF() const;
     /** Sets the minimum VFO scan frequency for the VHF band in Hz. */
-    virtual void setMinVFOScanFrequencyVHF(uint hz);
+    virtual void setMinVFOScanFrequencyVHF(unsigned hz);
     /** Retruns the maximum VFO scan frequency for the VHF band in Hz. */
-    virtual uint maxVFOScanFrequencyVHF() const;
+    virtual unsigned maxVFOScanFrequencyVHF() const;
     /** Sets the maximum VFO scan frequency for the VHF band in Hz. */
-    virtual void setMaxVFOScanFrequencyVHF(uint hz);
+    virtual void setMaxVFOScanFrequencyVHF(unsigned hz);
     /** Returns @c true if the auto-repeater offset frequency for UHF is set. */
     virtual bool hasAutoRepeaterOffsetFrequencyIndexUHF() const;
     /** Returns the auto-repeater offset frequency index for UHF. */
-    virtual uint autoRepeaterOffsetFrequencyIndexUHF() const;
+    virtual unsigned autoRepeaterOffsetFrequencyIndexUHF() const;
     /** Sets the auto-repeater offset frequency index for UHF. */
-    virtual void setAutoRepeaterOffsetFrequenyIndexUHF(uint idx);
+    virtual void setAutoRepeaterOffsetFrequenyIndexUHF(unsigned idx);
     /** Clears the auto-repeater offset frequency index for UHF. */
     virtual void clearAutoRepeaterOffsetFrequencyIndexUHF();
     /** Returns @c true if the auto-repeater offset frequency for VHF is set. */
     virtual bool hasAutoRepeaterOffsetFrequencyIndexVHF() const;
     /** Returns the auto-repeater offset frequency index for UHF. */
-    virtual uint autoRepeaterOffsetFrequencyIndexVHF() const;
+    virtual unsigned autoRepeaterOffsetFrequencyIndexVHF() const;
     /** Sets the auto-repeater offset frequency index for VHF. */
-    virtual void setAutoRepeaterOffsetFrequenyIndexVHF(uint idx);
+    virtual void setAutoRepeaterOffsetFrequenyIndexVHF(unsigned idx);
     /** Clears the auto-repeater offset frequency index for VHF. */
     virtual void clearAutoRepeaterOffsetFrequencyIndexVHF();
 
@@ -980,9 +980,9 @@ public:
     /** Sets the reset-tone melody. */
     virtual void setResetToneMelody(const Melody &melody);
     /** Returns the recording delay in ms. */
-    virtual uint recordingDelay() const;
+    virtual unsigned recordingDelay() const;
     /** Sets the recording delay in ms. */
-    virtual void setRecodringDelay(uint ms);
+    virtual void setRecodringDelay(unsigned ms);
     /** Returns @c true if the call is displayed instead of the name. */
     virtual bool displayCall() const;
     /** Enables/disables call display. */
@@ -1003,7 +1003,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    ZoneChannelListElement(uint8_t *ptr, uint size);
+    ZoneChannelListElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1013,22 +1013,22 @@ public:
     void clear();
 
     /** Returns @c true if the channel index for VFO A is set for the n-th zone. */
-    virtual bool hasChannelA(uint n) const;
+    virtual bool hasChannelA(unsigned n) const;
     /** Returns the channel index (0-based) for VFO A for the n-th zone. */
-    virtual uint channelIndexA(uint n) const;
+    virtual unsigned channelIndexA(unsigned n) const;
     /** Sets the channel index (0-based) for VFO A for the n-th zone. */
-    virtual void setChannelIndexA(uint n, uint idx);
+    virtual void setChannelIndexA(unsigned n, unsigned idx);
     /** Clears the channel index (0-based) for VFO A for the n-th zone. */
-    virtual void clearChannelIndexA(uint n);
+    virtual void clearChannelIndexA(unsigned n);
 
     /** Returns @c true if the channel index for VFO B is set for the n-th zone. */
-    virtual bool hasChannelB(uint n) const;
+    virtual bool hasChannelB(unsigned n) const;
     /** Returns the channel index (0-based) for VFO B for the n-th zone. */
-    virtual uint channelIndexB(uint n) const;
+    virtual unsigned channelIndexB(unsigned n) const;
     /** Sets the channel index (0-based) for VFO B for the n-th zone. */
-    virtual void setChannelIndexB(uint n, uint idx);
+    virtual void setChannelIndexB(unsigned n, unsigned idx);
     /** Clears the channel index (0-based) for VFO B for the n-th zone. */
-    virtual void clearChannelIndexB(uint n);
+    virtual void clearChannelIndexB(unsigned n);
   };
 
   /** Represents the base class of the boot settings for all AnyTone codeplug.
@@ -1039,7 +1039,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    BootSettingsElement(uint8_t *ptr, uint size);
+    BootSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1076,7 +1076,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    DMRAPRSSettingsElement(uint8_t *ptr, uint size);
+    DMRAPRSSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1086,16 +1086,16 @@ public:
     void clear();
 
     /** Returns the Manual TX interval in seconds. */
-    virtual uint manualInterval() const;
+    virtual unsigned manualInterval() const;
     /** Sets the manual TX interval in seconds. */
-    virtual void setManualInterval(uint sec);
+    virtual void setManualInterval(unsigned sec);
 
     /** Returns @c true if the automatic APRS is enabled. */
     virtual bool automatic() const;
     /** Retunrs the automatic transmit interval in seconds. */
-    virtual uint automaticInterval() const;
+    virtual unsigned automaticInterval() const;
     /** Sets the automatic transmit interval in seconds. */
-    virtual void setAutomaticInterval(uint sec);
+    virtual void setAutomaticInterval(unsigned sec);
     /** Disables the automatic APRS. To enable it, set an interval. */
     virtual void disableAutomatic();
 
@@ -1114,30 +1114,30 @@ public:
     virtual void setPower(Channel::Power power);
 
     /** Returns @c true if the n-th channel is set. */
-    virtual bool hasChannel(uint n) const;
+    virtual bool hasChannel(unsigned n) const;
     /** Returns @c true if the n-th channle is VFO A. */
-    virtual bool channelIsVFOA(uint n) const;
+    virtual bool channelIsVFOA(unsigned n) const;
     /** Returns @c true if the n-th channle is VFO B. */
-    virtual bool channelIsVFOB(uint n) const;
+    virtual bool channelIsVFOB(unsigned n) const;
     /** Returns @c true if the n-th channle is selected channel. */
-    virtual bool channelIsSelected(uint n) const;
+    virtual bool channelIsSelected(unsigned n) const;
     /** Returns the index of the n-th channel. */
-    virtual uint channelIndex(uint n) const;
+    virtual unsigned channelIndex(unsigned n) const;
     /** Sets the n-th channel index. */
-    virtual void setChannelIndex(uint n, uint idx);
+    virtual void setChannelIndex(unsigned n, unsigned idx);
     /** Sets the n-th channel to VFO A. */
-    virtual void setChannelVFOA(uint n);
+    virtual void setChannelVFOA(unsigned n);
     /** Sets the n-th channel to VFO B. */
-    virtual void setChannelVFOB(uint n);
+    virtual void setChannelVFOB(unsigned n);
     /** Sets the n-th channel to selected channel. */
-    virtual void setChannelSelected(uint n);
+    virtual void setChannelSelected(unsigned n);
     /** Resets the n-th channel. */
-    virtual void clearChannel(uint n);
+    virtual void clearChannel(unsigned n);
 
     /** Retuns the destination DMR ID to send the APRS information to. */
-    virtual uint destination() const;
+    virtual unsigned destination() const;
     /** Sets the destination DMR ID to send the APRS information to. */
-    virtual void setDestination(uint id);
+    virtual void setDestination(unsigned id);
 
     /** Returns the call type. */
     virtual DigitalContact::Type callType() const;
@@ -1171,7 +1171,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    MessageListElement(uint8_t *ptr, uint size);
+    MessageListElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1183,18 +1183,18 @@ public:
     /** Returns @c true if there is a next message (EOL otherwise). */
     virtual bool hasNext() const;
     /** Returns the index of the next message in list. */
-    virtual uint next() const;
+    virtual unsigned next() const;
     /** Sets the index of the next message in list. */
-    virtual void setNext(uint idx);
+    virtual void setNext(unsigned idx);
     /** Clears the next message index. */
     virtual void clearNext();
 
     /** Returns @c true if there is a message index. */
     virtual bool hasIndex() const;
     /** Returns the index of the message. */
-    virtual uint index() const;
+    virtual unsigned index() const;
     /** Sets the index of the message. */
-    virtual void setIndex(uint idx);
+    virtual void setIndex(unsigned idx);
     /** Clears the index of the message. */
     virtual void clearIndex();
   };
@@ -1207,7 +1207,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    MessageElement(uint8_t *ptr, uint size);
+    MessageElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1239,7 +1239,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    AnalogQuickCallElement(uint8_t *ptr, uint size);
+    AnalogQuickCallElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1256,9 +1256,9 @@ public:
     /** Retunrs @c true if an analog contact index is set. */
     virtual bool hasContactIndex() const;
     /** Retunrs the analog contact index. */
-    virtual uint contactIndex() const;
+    virtual unsigned contactIndex() const;
     /** Sets the analog contact index. */
-    virtual void setContactIndex(uint idx);
+    virtual void setContactIndex(unsigned idx);
     /** Clears the contact index. */
     virtual void clearContactIndex();
   };
@@ -1307,7 +1307,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    HotKeyElement(uint8_t *ptr, uint size);
+    HotKeyElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1345,10 +1345,10 @@ public:
     /** If @c type is @c Type::Call, returns the contact index. This is either an index of an
      * analog quick call if @c callType is CallType::Analog or a contact index if @c callType is
      * @c CallType::Digital. If set to 0xffffffff the index is invalid. */
-    virtual uint contactIndex() const;
+    virtual unsigned contactIndex() const;
     /** Sets the contact index. This can either be an index of an analog quick-call or a contact
      * index. */
-    virtual void setContactIndex(uint idx);
+    virtual void setContactIndex(unsigned idx);
     /** Clears the contact index. */
     virtual void clearContactIndex();
 
@@ -1356,9 +1356,9 @@ public:
     virtual bool hasMessageIndex() const;
     /** Returns the message index. This can either be an index of an SMS or an index of a status
      * message. */
-    virtual uint messageIndex() const;
+    virtual unsigned messageIndex() const;
     /** Sets the message index. */
-    virtual void setMessageIndex(uint idx);
+    virtual void setMessageIndex(unsigned idx);
     /** Clears the message index. */
     virtual void clearMessageIndex();
   };
@@ -1394,7 +1394,7 @@ public:
 
     protected:
       /** Hidden constructor. */
-      AnalogAlarm(uint8_t *ptr, uint size);
+      AnalogAlarm(uint8_t *ptr, unsigned size);
 
     public:
       /** Constructor. */
@@ -1414,38 +1414,38 @@ public:
       virtual void setEncodingType(ENIType type);
 
       /** Returns the emergency ID index. */
-      virtual uint emergencyIndex() const;
+      virtual unsigned emergencyIndex() const;
       /** Sets the emergency ID index. */
-      virtual void setEmergencyIndex(uint idx);
+      virtual void setEmergencyIndex(unsigned idx);
 
       /** Returns the alarm duration in seconds. */
-      virtual uint duration() const;
+      virtual unsigned duration() const;
       /** Sets the alarm duration in seconds. */
-      virtual void setDuration(uint sec);
+      virtual void setDuration(unsigned sec);
       /** Returns the TX duration in seconds. */
-      virtual uint txDuration() const;
+      virtual unsigned txDuration() const;
       /** Sets the TX duration in seconds. */
-      virtual void setTXDuration(uint sec);
+      virtual void setTXDuration(unsigned sec);
       /** Returns the RX duration in seconds. */
-      virtual uint rxDuration() const;
+      virtual unsigned rxDuration() const;
       /** Sets the RX duration in seconds. */
-      virtual void setRXDuration(uint sec);
+      virtual void setRXDuration(unsigned sec);
 
       /** Returns @c true if the alarm channel is the selected channel. */
       virtual bool channelIsSelected() const;
       /** Returns the channel index. */
-      virtual uint channelIndex() const;
+      virtual unsigned channelIndex() const;
       /** Sets the channel index. */
-      virtual void setChannelIndex(uint idx);
+      virtual void setChannelIndex(unsigned idx);
       /** Sets the alarm channel to the selected channel. */
       virtual void setChannelSelected();
 
       /** Returns @c true if the alarm is repeated continuously. */
       virtual bool repeatContinuously() const;
       /** Returns the number of alarm repetitions. */
-      virtual uint repetitions() const;
+      virtual unsigned repetitions() const;
       /** Sets the number of alarm repetitions. */
-      virtual void setRepetitions(uint num);
+      virtual void setRepetitions(unsigned num);
       /** Sets the alarm to be repeated continuously. */
       virtual void setRepatContinuously();
     };
@@ -1467,7 +1467,7 @@ public:
 
     protected:
       /** Hidden constructor. */
-      DigitalAlarm(uint8_t *ptr, uint size);
+      DigitalAlarm(uint8_t *ptr, unsigned size);
 
     public:
       /** Constructor. */
@@ -1482,44 +1482,44 @@ public:
       virtual void setAction(Action action);
 
       /** Returns the alarm duration in seconds. */
-      virtual uint duration() const;
+      virtual unsigned duration() const;
       /** Sets the alarm duration in seconds. */
-      virtual void setDuration(uint sec);
+      virtual void setDuration(unsigned sec);
       /** Returns the TX duration in seconds. */
-      virtual uint txDuration() const;
+      virtual unsigned txDuration() const;
       /** Sets the TX duration in seconds. */
-      virtual void setTXDuration(uint sec);
+      virtual void setTXDuration(unsigned sec);
       /** Returns the RX duration in seconds. */
-      virtual uint rxDuration() const;
+      virtual unsigned rxDuration() const;
       /** Sets the RX duration in seconds. */
-      virtual void setRXDuration(uint sec);
+      virtual void setRXDuration(unsigned sec);
 
       /** Returns @c true if the alarm channel is the selected channel. */
       virtual bool channelIsSelected() const;
       /** Returns the channel index. */
-      virtual uint channelIndex() const;
+      virtual unsigned channelIndex() const;
       /** Sets the channel index. */
-      virtual void setChannelIndex(uint idx);
+      virtual void setChannelIndex(unsigned idx);
       /** Sets the alarm channel to the selected channel. */
       virtual void setChannelSelected();
 
       /** Returns @c true if the alarm is repeated continuously. */
       virtual bool repeatContinuously() const;
       /** Returns the number of alarm repetitions. */
-      virtual uint repetitions() const;
+      virtual unsigned repetitions() const;
       /** Sets the number of alarm repetitions. */
-      virtual void setRepetitions(uint num);
+      virtual void setRepetitions(unsigned num);
       /** Sets the alarm to be repeated continuously. */
       virtual void setRepatContinuously();
 
       /** Returns voice broadcast duration in minutes. */
-      virtual uint voiceBroadcastDuration() const;
+      virtual unsigned voiceBroadcastDuration() const;
       /** Sets voice broadcast duration in minutes. */
-      virtual void setVoiceBroadcastDuration(uint min);
+      virtual void setVoiceBroadcastDuration(unsigned min);
       /** Returns area broadcast duration in minutes. */
-      virtual uint areaBroadcastDuration() const;
+      virtual unsigned areaBroadcastDuration() const;
       /** Sets area broadcast duration in minutes. */
-      virtual void setAreaBroadcastDuration(uint min);
+      virtual void setAreaBroadcastDuration(unsigned min);
 
       /** Returns @c true if the VOX gets enabled. */
       virtual bool vox() const;
@@ -1533,7 +1533,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    AlarmSettingElement(uint8_t *ptr, uint size);
+    AlarmSettingElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1556,7 +1556,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    DigitalAlarmExtensionElement(uint8_t *ptr, uint size);
+    DigitalAlarmExtensionElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1571,9 +1571,9 @@ public:
     virtual void setCallType(DigitalContact::Type type);
 
     /** Returns the destination DMR number. */
-    virtual uint destination() const;
+    virtual unsigned destination() const;
     /** Sets the destination DMR number. */
-    virtual void setDestination(uint number);
+    virtual void setDestination(unsigned number);
   };
 
   /** Represents the base-class for 5Tone IDs for all AnyTone codeplugs.
@@ -1591,7 +1591,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    FiveToneIDElement(uint8_t *ptr, uint size);
+    FiveToneIDElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1606,9 +1606,9 @@ public:
     virtual void setStandard(Standard std);
 
     /** Retunrs the tone duration in ms. */
-    virtual uint toneDuration() const;
+    virtual unsigned toneDuration() const;
     /** Sets the tone duration in ms. */
-    virtual void setToneDuration(uint ms);
+    virtual void setToneDuration(unsigned ms);
 
     /** Returns the ID. */
     virtual QString id() const;
@@ -1641,7 +1641,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    FiveToneFunctionElement(uint8_t *ptr, uint size);
+    FiveToneFunctionElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1686,7 +1686,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    FiveToneSettingsElement(uint8_t *ptr, uint size);
+    FiveToneSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1706,9 +1706,9 @@ public:
     virtual void setDecodingStandard(Standard standard);
 
     /** Returns the decoding tone duration in ms. */
-    virtual uint decodingToneDuration() const;
+    virtual unsigned decodingToneDuration() const;
     /** Sets the decoding tone duration in ms. */
-    virtual void setDecodingToneDuration(uint ms);
+    virtual void setDecodingToneDuration(unsigned ms);
 
     /** Returns the 5tone radio ID. */
     virtual QString id() const;
@@ -1716,62 +1716,62 @@ public:
     virtual void setID(const QString &id);
 
     /** Returns the post-encode delay in ms. */
-    virtual uint postEncodeDelay() const;
+    virtual unsigned postEncodeDelay() const;
     /** Sets the post-encode delay in ms. */
-    virtual void setPostEncodeDelay(uint ms);
+    virtual void setPostEncodeDelay(unsigned ms);
 
     /** Returns @c true if the PTT ID is set. */
     virtual bool hasPTTID() const;
     /** Returns the PTT ID. */
-    virtual uint pttID() const;
+    virtual unsigned pttID() const;
     /** Sets the PTT ID [5,75]. */
-    virtual void setPTTID(uint id);
+    virtual void setPTTID(unsigned id);
     /** Clears the PTT ID. */
     virtual void clearPTTID();
 
     /** Returns the auto-reset time in seconds. */
-    virtual uint autoResetTime() const;
+    virtual unsigned autoResetTime() const;
     /** Sets the auto-reset time in seconds. */
-    virtual void setAutoResetTime(uint s);
+    virtual void setAutoResetTime(unsigned s);
 
     /** Returns the first delay in ms. */
-    virtual uint firstDelay() const;
+    virtual unsigned firstDelay() const;
     /** Sets the first delay in ms. */
-    virtual void setFirstDelay(uint ms);
+    virtual void setFirstDelay(unsigned ms);
 
     /** Returns @c true if the sidetone is enabled. */
     virtual bool sidetoneEnabled() const;
     /** Enables/disables side tone. */
     virtual void enableSidetone(bool enable);
     /** Returns the stop code [0,15]. */
-    virtual uint stopCode() const;
+    virtual unsigned stopCode() const;
     /** Sets the stop code. */
-    virtual void setStopCode(uint code);
+    virtual void setStopCode(unsigned code);
     /** Returns the stop time in ms. */
-    virtual uint stopTime() const;
+    virtual unsigned stopTime() const;
     /** Sets the stop time in ms. */
-    virtual void setStopTime(uint ms);
+    virtual void setStopTime(unsigned ms);
     /** Returns the decode time in ms. */
-    virtual uint decodeTime() const;
+    virtual unsigned decodeTime() const;
     /** Sets the decode time in ms. */
-    virtual void setDecodeTime(uint ms);
+    virtual void setDecodeTime(unsigned ms);
     /** Returns the delay after stop in ms. */
-    virtual uint delayAfterStop() const;
+    virtual unsigned delayAfterStop() const;
     /** Sets the delay after stop in ms. */
-    virtual void setDelayAfterStop(uint ms);
+    virtual void setDelayAfterStop(unsigned ms);
     /** Returns the pre time in ms. */
-    virtual uint preTime() const;
+    virtual unsigned preTime() const;
     /** Sets the pre time in ms. */
-    virtual void setPreTime(uint ms);
+    virtual void setPreTime(unsigned ms);
 
     /** Returns the BOT standard. */
     virtual Standard botStandard() const;
     /** Sets the BOT standard. */
     virtual void setBOTStandard(Standard standard);
     /** Returns the BOT tone duration in ms. */
-    virtual uint botToneDuration() const;
+    virtual unsigned botToneDuration() const;
     /** Sets the BOT tone duration in ms. */
-    virtual void setBOTToneDuration(uint ms);
+    virtual void setBOTToneDuration(unsigned ms);
     /** Returns the 5tone BOT ID. */
     virtual QString botID() const;
     /** Sets the 5tone BOT ID. */
@@ -1782,9 +1782,9 @@ public:
     /** Sets the EOT standard. */
     virtual void setEOTStandard(Standard standard);
     /** Returns the EOT tone duration in ms. */
-    virtual uint eotToneDuration() const;
+    virtual unsigned eotToneDuration() const;
     /** Sets the EOT tone duration in ms. */
-    virtual void setEOTToneDuration(uint ms);
+    virtual void setEOTToneDuration(unsigned ms);
     /** Returns the 5tone EOT ID. */
     virtual QString eotID() const;
     /** Sets the 5tone EOT ID. */
@@ -1799,7 +1799,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    TwoToneIDElement(uint8_t *ptr, uint size);
+    TwoToneIDElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1838,7 +1838,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    TwoToneFunctionElement(uint8_t *ptr, uint size);
+    TwoToneFunctionElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1876,7 +1876,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    TwoToneSettingsElement(uint8_t *ptr, uint size);
+    TwoToneSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1886,29 +1886,29 @@ public:
     void clear();
 
     /** Returns the first tone duration in ms. */
-    virtual uint firstToneDuration() const;
+    virtual unsigned firstToneDuration() const;
     /** Sets the first tone duration in ms. */
-    virtual void setFirstToneDuration(uint ms);
+    virtual void setFirstToneDuration(unsigned ms);
 
     /** Returns the second tone duration in ms. */
-    virtual uint secondToneDuration() const;
+    virtual unsigned secondToneDuration() const;
     /** Sets the second tone duration in ms. */
-    virtual void setSecondToneDuration(uint ms);
+    virtual void setSecondToneDuration(unsigned ms);
 
     /** Returns the long tone duration in ms. */
-    virtual uint longToneDuration() const;
+    virtual unsigned longToneDuration() const;
     /** Sets the long tone duration in ms. */
-    virtual void setLongToneDuration(uint ms);
+    virtual void setLongToneDuration(unsigned ms);
 
     /** Returns the gap duration in ms. */
-    virtual uint gapDuration() const;
+    virtual unsigned gapDuration() const;
     /** Sets the gap duration in ms. */
-    virtual void setGapDuration(uint ms);
+    virtual void setGapDuration(unsigned ms);
 
     /** Returns the auto-reset time in seconds. */
-    virtual uint autoResetTime() const;
+    virtual unsigned autoResetTime() const;
     /** Sets the auto-reset time in seconds. */
-    virtual void setAutoResetTime(uint sec);
+    virtual void setAutoResetTime(unsigned sec);
 
     /** Returns @c true if the sidetone is enabled. */
     virtual bool sidetone() const;
@@ -1930,7 +1930,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    DTMFSettingsElement(uint8_t *ptr, uint size);
+    DTMFSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1940,14 +1940,14 @@ public:
     void clear();
 
     /** Returns the interval/repeat symbol [0,15]. */
-    virtual uint intervalSymbol() const;
+    virtual unsigned intervalSymbol() const;
     /** Sets the interval/repeat symbol [0,15]. */
-    virtual void setIntervalSymbol(uint symb);
+    virtual void setIntervalSymbol(unsigned symb);
 
     /** Returns the group code [0,15]. */
-    virtual uint groupCode() const;
+    virtual unsigned groupCode() const;
     /** Sets the group code [0,15]. */
-    virtual void setGroupCode(uint symb);
+    virtual void setGroupCode(unsigned symb);
 
     /** Returns the response to a DMTF decode. */
     virtual Response response() const;
@@ -1955,19 +1955,19 @@ public:
     virtual void setResponse(Response resp);
 
     /** Returns the pre time in ms. */
-    virtual uint preTime() const;
+    virtual unsigned preTime() const;
     /** Sets the pre time in ms. */
-    virtual void setPreTime(uint ms);
+    virtual void setPreTime(unsigned ms);
 
     /** Returns the first digit duration in ms. */
-    virtual uint firstDigitDuration() const;
+    virtual unsigned firstDigitDuration() const;
     /** Sets the first digit duration in ms. */
-    virtual void setFirstDigitDuration(uint ms);
+    virtual void setFirstDigitDuration(unsigned ms);
 
     /** Returns the auto reset time in seconds. */
-    virtual uint autoResetTime() const;
+    virtual unsigned autoResetTime() const;
     /** Sets the auto reset time in seconds. */
-    virtual void setAutoResetTime(uint sec);
+    virtual void setAutoResetTime(unsigned sec);
 
     /** Returns the radio ID. */
     virtual QString id() const;
@@ -1975,14 +1975,14 @@ public:
     virtual void setID(const QString &id);
 
     /** Returns the post encoding delay in ms. */
-    virtual uint postEncodingDelay() const;
+    virtual unsigned postEncodingDelay() const;
     /** Sets the post encoding delay in ms. */
-    virtual void setPostEncodingDelay(uint ms);
+    virtual void setPostEncodingDelay(unsigned ms);
 
     /** Returns the PTT ID pause in seconds. */
-    virtual uint pttIDPause() const;
+    virtual unsigned pttIDPause() const;
     /** Sets the PTT ID pause in seconds. */
-    virtual void setPTTIDPause(uint sec);
+    virtual void setPTTIDPause(unsigned sec);
 
     /** Returns @c true if the PTT ID is enabled. */
     virtual bool pttIDEnabled() const;
@@ -1990,9 +1990,9 @@ public:
     virtual void enablePTTID(bool enable);
 
     /** Returns the D-code pause in seconds. */
-    virtual uint dCodePause() const;
+    virtual unsigned dCodePause() const;
     /** Sets the D-code pause in seconds. */
-    virtual void setDCodePause(uint sec);
+    virtual void setDCodePause(unsigned sec);
 
     /** Returns @c true if the sidetone is enabled. */
     virtual bool sidetone() const;
@@ -2028,7 +2028,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    ContactMapElement(uint8_t *ptr, uint size);
+    ContactMapElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -2041,17 +2041,17 @@ public:
     /** Returns @c true if the entry is a group call. */
     virtual bool isGroup() const;
     /** Returns the id. */
-    virtual uint id() const;
+    virtual unsigned id() const;
     /** Encodes ID and group call flag. */
-    virtual void setID(uint id, bool group=false);
+    virtual void setID(unsigned id, bool group=false);
     /** Returns the index. */
-    virtual uint index() const;
+    virtual unsigned index() const;
     /** Sets the index. */
-    virtual void setIndex(uint idx);
+    virtual void setIndex(unsigned idx);
 
   public:
     /** Retuns the size of this entry. */
-    static uint size();
+    static unsigned size();
   };
 
 protected:

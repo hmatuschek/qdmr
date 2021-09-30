@@ -20,7 +20,7 @@ public:
 protected slots:
   void onAddRxGroup();
   void onRemRxGroup();
-  void onEditRxGroup(uint row);
+  void onEditRxGroup(unsigned row);
 
 private:
   Ui::GroupListsView *ui;

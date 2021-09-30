@@ -89,7 +89,7 @@ public:
     /** Returns the memory size of the element. */
     uint32_t memSize() const;
     /** Checks if the element address and size is aligned with the given block size. */
-    bool isAligned(uint blocksize) const;
+    bool isAligned(unsigned blocksize) const;
     /** Returns a reference to the data. */
 		const QByteArray &data() const;
     /** Returns a reference to the data. */
@@ -155,7 +155,7 @@ public:
     /** Removes the i-th element from this image. */
 		void remElement(int i);
     /** Checks if all element addresses and sizes is aligned with the given block size. */
-    bool isAligned(uint blocksize) const;
+    bool isAligned(unsigned blocksize) const;
 
     /** Reads an image from the given file and updates the CRC. */
 		bool read(QFile &file, CRC32 &crc, QString &errorMessage);
@@ -207,7 +207,7 @@ public:
 	void remImage(int i);
 
   /** Checks if all image addresses and sizes is aligned with the given block size. */
-  bool isAligned(uint blocksize) const;
+  bool isAligned(unsigned blocksize) const;
 
   /** Returns the error message in case of an error. */
 	const QString &errorMessage() const;

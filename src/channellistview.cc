@@ -26,7 +26,7 @@ ChannelListView::ChannelListView(Config *config, QWidget *parent)
   connect(ui->addDigitalChannel, SIGNAL(clicked()), this, SLOT(onAddDigitalChannel()));
   connect(ui->cloneChannel, SIGNAL(clicked()), this, SLOT(onCloneChannel()));
   connect(ui->remChannel, SIGNAL(clicked()), this, SLOT(onRemChannel()));
-  connect(ui->listView, SIGNAL(doubleClicked(uint)), this, SLOT(onEditChannel(uint)));
+  connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditChannel(unsigned)));
 }
 
 ChannelListView::~ChannelListView() {
@@ -139,7 +139,7 @@ ChannelListView::onRemChannel() {
 }
 
 void
-ChannelListView::onEditChannel(uint row) {
+ChannelListView::onEditChannel(unsigned row) {
   Channel *channel = _config->channelList()->channel(row);
   if (! channel)
     return;

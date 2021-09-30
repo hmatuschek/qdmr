@@ -35,7 +35,7 @@ D878UV2CallsignDB::encode(UserDatabase *db, const Selection &selection) {
   // Select n users and sort them in ascending order of their IDs
   QVector<UserDatabase::User> users;
   users.reserve(n);
-  for (uint i=0; i<n; i++)
+  for (unsigned i=0; i<n; i++)
     users.append(db->user(i));
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });

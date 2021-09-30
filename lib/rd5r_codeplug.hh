@@ -91,9 +91,9 @@ class RD5RCodeplug : public RadioddityCodeplug
     void clear();
 
     /** Returns the squelch level. */
-    virtual uint squelch() const;
+    virtual unsigned squelch() const;
     /** Sets the squelch level. */
-    virtual void setSquelch(uint level);
+    virtual void setSquelch(unsigned level);
 
     bool fromChannelObj(const Channel *c, Context &ctx);
     Channel *toChannelObj(Context &ctx) const;
@@ -107,7 +107,7 @@ class RD5RCodeplug : public RadioddityCodeplug
   {
   protected:
     /** Hidden constructor. */
-    TimestampElement(uint8_t *ptr, uint size);
+    TimestampElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */

@@ -203,7 +203,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    GeneralSettingsElement(uint8_t *ptr, uint size);
+    GeneralSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -217,9 +217,9 @@ public:
     /** Sets the display color for callsigns. */
     virtual void setCallDisplayColor(Color color);
     /** Returns the GPS update preriod in seconds. */
-    virtual uint gpsUpdatePeriod() const;
+    virtual unsigned gpsUpdatePeriod() const;
     /** Sets the GPS update period in seconds. */
-    virtual void setGPSUpdatePeriod(uint sec);
+    virtual void setGPSUpdatePeriod(unsigned sec);
     /** Returns @c true if the zone and contact are shown. */
     virtual bool showZoneAndContact() const;
     /** Enables/disables @c true the zone and contact display. */
@@ -227,9 +227,9 @@ public:
     /** Returns @c true if the key-tone level is adjustable. */
     virtual bool keyToneLevelAdjustable() const;
     /** Returns the key-tone level (0=adjustable). */
-    virtual uint keyToneLevel() const;
+    virtual unsigned keyToneLevel() const;
     /** Sets the key-tone level. */
-    virtual void setKeyToneLevel(uint level);
+    virtual void setKeyToneLevel(unsigned level);
     /** Sets the key-tone level adjustable. */
     virtual void setKeyToneLevelAdjustable();
     /** Returns @c true if the GPS units are imperical. */
@@ -257,22 +257,22 @@ public:
     /** Enables/disables showing last heard. */
     virtual void enableShowLastHeard(bool enable);
     /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual uint autoRepeaterMinFrequencyVHF() const;
+    virtual unsigned autoRepeaterMinFrequencyVHF() const;
     /** Sets the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMinFrequencyVHF(uint Hz);
+    virtual void setAutoRepeaterMinFrequencyVHF(unsigned Hz);
     /** Returns the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual uint autoRepeaterMaxFrequencyVHF() const;
+    virtual unsigned autoRepeaterMaxFrequencyVHF() const;
     /** Sets the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMaxFrequencyVHF(uint Hz);
+    virtual void setAutoRepeaterMaxFrequencyVHF(unsigned Hz);
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual uint autoRepeaterMinFrequencyUHF() const;
+    virtual unsigned autoRepeaterMinFrequencyUHF() const;
     /** Sets the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMinFrequencyUHF(uint Hz);
+    virtual void setAutoRepeaterMinFrequencyUHF(unsigned Hz);
     /** Returns the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual uint autoRepeaterMaxFrequencyUHF() const;
+    virtual unsigned autoRepeaterMaxFrequencyUHF() const;
     /** Sets the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMaxFrequencyUHF(uint Hz);
+    virtual void setAutoRepeaterMaxFrequencyUHF(unsigned Hz);
     /** Returns the auto-repeater direction for VFO B. */
     virtual AutoRepDir autoRepeaterDirectionB() const;
     /** Sets the auto-repeater direction for VFO B. */
@@ -282,29 +282,29 @@ public:
     /** Enables/disables default boot channel. */
     virtual void enableDefaultChannel(bool enable);
     /** Returns the default zone index (0-based) for VFO A. */
-    virtual uint defaultZoneIndexA() const;
+    virtual unsigned defaultZoneIndexA() const;
     /** Sets the default zone (0-based) for VFO A. */
-    virtual void setDefaultZoneIndexA(uint idx);
+    virtual void setDefaultZoneIndexA(unsigned idx);
     /** Returns the default zone index (0-based) for VFO B. */
-    virtual uint defaultZoneIndexB() const;
+    virtual unsigned defaultZoneIndexB() const;
     /** Sets the default zone (0-based) for VFO B. */
-    virtual void setDefaultZoneIndexB(uint idx);
+    virtual void setDefaultZoneIndexB(unsigned idx);
     /** Returns @c true if the default channel for VFO A is VFO. */
     virtual bool defaultChannelAIsVFO() const;
     /** Returns the default channel index for VFO A.
      * Must be within default zone. If 0xff, default channel is VFO. */
-    virtual uint defaultChannelAIndex() const;
+    virtual unsigned defaultChannelAIndex() const;
     /** Sets the default channel index for VFO A. */
-    virtual void setDefaultChannelAIndex(uint idx);
+    virtual void setDefaultChannelAIndex(unsigned idx);
     /** Sets the default channel for VFO A to be VFO. */
     virtual void setDefaultChannelAToVFO();
     /** Returns @c true if the default channel for VFO B is VFO. */
     virtual bool defaultChannelBIsVFO() const;
     /** Returns the default channel index for VFO B.
      * Must be within default zone. If 0xff, default channel is VFO. */
-    virtual uint defaultChannelBIndex() const;
+    virtual unsigned defaultChannelBIndex() const;
     /** Sets the default channel index for VFO B. */
-    virtual void setDefaultChannelBIndex(uint idx);
+    virtual void setDefaultChannelBIndex(unsigned idx);
     /** Sets the default channel for VFO B to be VFO. */
     virtual void setDefaultChannelBToVFO();
     /** Returns @c true if the last caller is kept when changeing channel. */

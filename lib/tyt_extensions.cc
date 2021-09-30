@@ -55,12 +55,12 @@ TyTButtonSettings::setSideButton2Long(ButtonAction action) {
   _sideButton2Long = action;
 }
 
-uint
+unsigned
 TyTButtonSettings::longPressDuration() const {
   return _longPressDuration;
 }
 void
-TyTButtonSettings::setLongPressDuration(uint dur) {
+TyTButtonSettings::setLongPressDuration(unsigned dur) {
   _longPressDuration = dur;
 }
 

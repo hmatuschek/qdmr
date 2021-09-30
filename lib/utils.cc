@@ -13,95 +13,95 @@ static QVector<char> aprsIconCodeTable{
   'a','b','c','d','e','f', 'g','h','i','j','k','l','m','n','o','p',
   'q','r','s','t','u','v','w','x','y','z','{','|','}','~'};
 
-static QHash<uint, QString> aprsIconNameTable{
-  {(uint)APRSSystem::Icon::None, ""},
-  {(uint)APRSSystem::Icon::PoliceStation, "Police station"},
-  {(uint)APRSSystem::Icon::Digipeater, "Digipeater"},
-  {(uint)APRSSystem::Icon::Phone, "Phone"},
-  {(uint)APRSSystem::Icon::DXCluster, "DX cluster"},
-  {(uint)APRSSystem::Icon::HFGateway, "HF gateway"},
-  {(uint)APRSSystem::Icon::SmallPlane, "Small plane"},
-  {(uint)APRSSystem::Icon::MobileSatelliteStation, "Mobile Satellite station"},
-  {(uint)APRSSystem::Icon::WheelChair, "Wheel chair"},
-  {(uint)APRSSystem::Icon::Snowmobile, "Snowmobile"},
-  {(uint)APRSSystem::Icon::RedCross, "Red cross"},
-  {(uint)APRSSystem::Icon::BoyScout, "Boy scout"},
-  {(uint)APRSSystem::Icon::Home,  "Home"},
-  {(uint)APRSSystem::Icon::X, "X"},
-  {(uint)APRSSystem::Icon::RedDot, "Red dot"},
-  {(uint)APRSSystem::Icon::Circle0, "Circle 0"},
-  {(uint)APRSSystem::Icon::Circle1, "Circle 1"},
-  {(uint)APRSSystem::Icon::Circle2, "Circle 2"},
-  {(uint)APRSSystem::Icon::Circle3, "Circle 3"},
-  {(uint)APRSSystem::Icon::Circle4, "Circle 4"},
-  {(uint)APRSSystem::Icon::Circle5, "Circle 5"},
-  {(uint)APRSSystem::Icon::Circle6, "Circle 6"},
-  {(uint)APRSSystem::Icon::Circle7, "Circle 7"},
-  {(uint)APRSSystem::Icon::Circle8, "Circle 8"},
-  {(uint)APRSSystem::Icon::Circle9, "Circle 9"},
-  {(uint)APRSSystem::Icon::Fire, "Fire"},
-  {(uint)APRSSystem::Icon::Campground, "Campground"},
-  {(uint)APRSSystem::Icon::Motorcycle, "Motorcycle"},
-  {(uint)APRSSystem::Icon::RailEngine, "Rail engine"},
-  {(uint)APRSSystem::Icon::Car, "Car"},
-  {(uint)APRSSystem::Icon::FileServer, "File server"},
-  {(uint)APRSSystem::Icon::HCFuture, "HC future"},
-  {(uint)APRSSystem::Icon::AidStation, "Aid station"},
-  {(uint)APRSSystem::Icon::BBS, "BBS"},
-  {(uint)APRSSystem::Icon::Canoe, "Canoe"},
-  {(uint)APRSSystem::Icon::Eyeball, "Eyeball"},
-  {(uint)APRSSystem::Icon::Tractor, "Tractor"},
-  {(uint)APRSSystem::Icon::GridSquare, "Grid square"},
-  {(uint)APRSSystem::Icon::Hotel, "Hotel"},
-  {(uint)APRSSystem::Icon::TCPIP, "TCP/IP"},
-  {(uint)APRSSystem::Icon::School, "School"},
-  {(uint)APRSSystem::Icon::Logon, "Logon"},
-  {(uint)APRSSystem::Icon::MacOS, "MacOS"},
-  {(uint)APRSSystem::Icon::NTSStation, "NTS station"},
-  {(uint)APRSSystem::Icon::Balloon, "Balloon"},
-  {(uint)APRSSystem::Icon::PoliceCar, "Police car"},
-  {(uint)APRSSystem::Icon::TBD, "TBD"},
-  {(uint)APRSSystem::Icon::RV, "RV"},
-  {(uint)APRSSystem::Icon::Shuttle, "Shuttle"},
-  {(uint)APRSSystem::Icon::SSTV, "SSTV"},
-  {(uint)APRSSystem::Icon::Bus, "Bus"},
-  {(uint)APRSSystem::Icon::ATV, "ATV"},
-  {(uint)APRSSystem::Icon::WXService, "WX service"},
-  {(uint)APRSSystem::Icon::Helo, "Helo"},
-  {(uint)APRSSystem::Icon::Yacht, "Yacht"},
-  {(uint)APRSSystem::Icon::Windows, "Windows"},
-  {(uint)APRSSystem::Icon::Jogger, "Jogger"},
-  {(uint)APRSSystem::Icon::Triangle, "Triangle"},
-  {(uint)APRSSystem::Icon::PBBS, "PBBS"},
-  {(uint)APRSSystem::Icon::LargePlane, "Large plane"},
-  {(uint)APRSSystem::Icon::WXStation, "WX station"},
-  {(uint)APRSSystem::Icon::DishAntenna, "Dish antenna"},
-  {(uint)APRSSystem::Icon::Ambulance, "Ambulance"},
-  {(uint)APRSSystem::Icon::Bike, "Bike"},
-  {(uint)APRSSystem::Icon::ICP, "ICP"},
-  {(uint)APRSSystem::Icon::FireStation, "Fire station"},
-  {(uint)APRSSystem::Icon::Horse, "Horse"},
-  {(uint)APRSSystem::Icon::FireTruck, "Fire truck"},
-  {(uint)APRSSystem::Icon::Glider, "Glider"},
-  {(uint)APRSSystem::Icon::Hospital, "Hospital"},
-  {(uint)APRSSystem::Icon::IOTA, "IOTA"},
-  {(uint)APRSSystem::Icon::Jeep, "Jeep"},
-  {(uint)APRSSystem::Icon::SmallTruck, "Small truck"},
-  {(uint)APRSSystem::Icon::Laptop, "Laptop"},
-  {(uint)APRSSystem::Icon::MicE, "Mic-E"},
-  {(uint)APRSSystem::Icon::Node, "Node"},
-  {(uint)APRSSystem::Icon::EOC, "EOC"},
-  {(uint)APRSSystem::Icon::Rover, "Rover"},
-  {(uint)APRSSystem::Icon::Grid, "Grid"},
-  {(uint)APRSSystem::Icon::Antenna, "Antenna"},
-  {(uint)APRSSystem::Icon::PowerBoat, "Power boat"},
-  {(uint)APRSSystem::Icon::TruckStop, "Truck stop"},
-  {(uint)APRSSystem::Icon::TruckLarge, "Truck large"},
-  {(uint)APRSSystem::Icon::Van, "Van"},
-  {(uint)APRSSystem::Icon::Water, "Water"},
-  {(uint)APRSSystem::Icon::XAPRS, "XAPRS"},
-  {(uint)APRSSystem::Icon::Yagi, "Yagi"},
-  {(uint)APRSSystem::Icon::Shelter, "Shelter"}};
+static QHash<unsigned, QString> aprsIconNameTable{
+  {(unsigned)APRSSystem::Icon::None, ""},
+  {(unsigned)APRSSystem::Icon::PoliceStation, "Police station"},
+  {(unsigned)APRSSystem::Icon::Digipeater, "Digipeater"},
+  {(unsigned)APRSSystem::Icon::Phone, "Phone"},
+  {(unsigned)APRSSystem::Icon::DXCluster, "DX cluster"},
+  {(unsigned)APRSSystem::Icon::HFGateway, "HF gateway"},
+  {(unsigned)APRSSystem::Icon::SmallPlane, "Small plane"},
+  {(unsigned)APRSSystem::Icon::MobileSatelliteStation, "Mobile Satellite station"},
+  {(unsigned)APRSSystem::Icon::WheelChair, "Wheel chair"},
+  {(unsigned)APRSSystem::Icon::Snowmobile, "Snowmobile"},
+  {(unsigned)APRSSystem::Icon::RedCross, "Red cross"},
+  {(unsigned)APRSSystem::Icon::BoyScout, "Boy scout"},
+  {(unsigned)APRSSystem::Icon::Home,  "Home"},
+  {(unsigned)APRSSystem::Icon::X, "X"},
+  {(unsigned)APRSSystem::Icon::RedDot, "Red dot"},
+  {(unsigned)APRSSystem::Icon::Circle0, "Circle 0"},
+  {(unsigned)APRSSystem::Icon::Circle1, "Circle 1"},
+  {(unsigned)APRSSystem::Icon::Circle2, "Circle 2"},
+  {(unsigned)APRSSystem::Icon::Circle3, "Circle 3"},
+  {(unsigned)APRSSystem::Icon::Circle4, "Circle 4"},
+  {(unsigned)APRSSystem::Icon::Circle5, "Circle 5"},
+  {(unsigned)APRSSystem::Icon::Circle6, "Circle 6"},
+  {(unsigned)APRSSystem::Icon::Circle7, "Circle 7"},
+  {(unsigned)APRSSystem::Icon::Circle8, "Circle 8"},
+  {(unsigned)APRSSystem::Icon::Circle9, "Circle 9"},
+  {(unsigned)APRSSystem::Icon::Fire, "Fire"},
+  {(unsigned)APRSSystem::Icon::Campground, "Campground"},
+  {(unsigned)APRSSystem::Icon::Motorcycle, "Motorcycle"},
+  {(unsigned)APRSSystem::Icon::RailEngine, "Rail engine"},
+  {(unsigned)APRSSystem::Icon::Car, "Car"},
+  {(unsigned)APRSSystem::Icon::FileServer, "File server"},
+  {(unsigned)APRSSystem::Icon::HCFuture, "HC future"},
+  {(unsigned)APRSSystem::Icon::AidStation, "Aid station"},
+  {(unsigned)APRSSystem::Icon::BBS, "BBS"},
+  {(unsigned)APRSSystem::Icon::Canoe, "Canoe"},
+  {(unsigned)APRSSystem::Icon::Eyeball, "Eyeball"},
+  {(unsigned)APRSSystem::Icon::Tractor, "Tractor"},
+  {(unsigned)APRSSystem::Icon::GridSquare, "Grid square"},
+  {(unsigned)APRSSystem::Icon::Hotel, "Hotel"},
+  {(unsigned)APRSSystem::Icon::TCPIP, "TCP/IP"},
+  {(unsigned)APRSSystem::Icon::School, "School"},
+  {(unsigned)APRSSystem::Icon::Logon, "Logon"},
+  {(unsigned)APRSSystem::Icon::MacOS, "MacOS"},
+  {(unsigned)APRSSystem::Icon::NTSStation, "NTS station"},
+  {(unsigned)APRSSystem::Icon::Balloon, "Balloon"},
+  {(unsigned)APRSSystem::Icon::PoliceCar, "Police car"},
+  {(unsigned)APRSSystem::Icon::TBD, "TBD"},
+  {(unsigned)APRSSystem::Icon::RV, "RV"},
+  {(unsigned)APRSSystem::Icon::Shuttle, "Shuttle"},
+  {(unsigned)APRSSystem::Icon::SSTV, "SSTV"},
+  {(unsigned)APRSSystem::Icon::Bus, "Bus"},
+  {(unsigned)APRSSystem::Icon::ATV, "ATV"},
+  {(unsigned)APRSSystem::Icon::WXService, "WX service"},
+  {(unsigned)APRSSystem::Icon::Helo, "Helo"},
+  {(unsigned)APRSSystem::Icon::Yacht, "Yacht"},
+  {(unsigned)APRSSystem::Icon::Windows, "Windows"},
+  {(unsigned)APRSSystem::Icon::Jogger, "Jogger"},
+  {(unsigned)APRSSystem::Icon::Triangle, "Triangle"},
+  {(unsigned)APRSSystem::Icon::PBBS, "PBBS"},
+  {(unsigned)APRSSystem::Icon::LargePlane, "Large plane"},
+  {(unsigned)APRSSystem::Icon::WXStation, "WX station"},
+  {(unsigned)APRSSystem::Icon::DishAntenna, "Dish antenna"},
+  {(unsigned)APRSSystem::Icon::Ambulance, "Ambulance"},
+  {(unsigned)APRSSystem::Icon::Bike, "Bike"},
+  {(unsigned)APRSSystem::Icon::ICP, "ICP"},
+  {(unsigned)APRSSystem::Icon::FireStation, "Fire station"},
+  {(unsigned)APRSSystem::Icon::Horse, "Horse"},
+  {(unsigned)APRSSystem::Icon::FireTruck, "Fire truck"},
+  {(unsigned)APRSSystem::Icon::Glider, "Glider"},
+  {(unsigned)APRSSystem::Icon::Hospital, "Hospital"},
+  {(unsigned)APRSSystem::Icon::IOTA, "IOTA"},
+  {(unsigned)APRSSystem::Icon::Jeep, "Jeep"},
+  {(unsigned)APRSSystem::Icon::SmallTruck, "Small truck"},
+  {(unsigned)APRSSystem::Icon::Laptop, "Laptop"},
+  {(unsigned)APRSSystem::Icon::MicE, "Mic-E"},
+  {(unsigned)APRSSystem::Icon::Node, "Node"},
+  {(unsigned)APRSSystem::Icon::EOC, "EOC"},
+  {(unsigned)APRSSystem::Icon::Rover, "Rover"},
+  {(unsigned)APRSSystem::Icon::Grid, "Grid"},
+  {(unsigned)APRSSystem::Icon::Antenna, "Antenna"},
+  {(unsigned)APRSSystem::Icon::PowerBoat, "Power boat"},
+  {(unsigned)APRSSystem::Icon::TruckStop, "Truck stop"},
+  {(unsigned)APRSSystem::Icon::TruckLarge, "Truck large"},
+  {(unsigned)APRSSystem::Icon::Van, "Van"},
+  {(unsigned)APRSSystem::Icon::Water, "Water"},
+  {(unsigned)APRSSystem::Icon::XAPRS, "XAPRS"},
+  {(unsigned)APRSSystem::Icon::Yagi, "Yagi"},
+  {(unsigned)APRSSystem::Icon::Shelter, "Shelter"}};
 
 QString
 decode_unicode(const uint16_t *data, size_t size, uint16_t fill) {
@@ -383,16 +383,16 @@ format_frequency(double MHz) {
 
 QString
 aprsicon2config(APRSSystem::Icon icon) {
-  if ((APRSSystem::Icon::None == icon) || (! aprsIconCodeTable.contains(uint(icon))))
+  if ((APRSSystem::Icon::None == icon) || (! aprsIconCodeTable.contains(unsigned(icon))))
     return "-";
-  return QString("\"%1\"").arg(aprsIconNameTable.value((uint)icon));
+  return QString("\"%1\"").arg(aprsIconNameTable.value((unsigned)icon));
 }
 
 QString
 aprsicon2name(APRSSystem::Icon icon) {
-  if ((APRSSystem::Icon::None == icon) || (! aprsIconCodeTable.contains(uint(icon))))
+  if ((APRSSystem::Icon::None == icon) || (! aprsIconCodeTable.contains(unsigned(icon))))
     return "";
-  return aprsIconNameTable.value((uint)icon);
+  return aprsIconNameTable.value((unsigned)icon);
 }
 
 APRSSystem::Icon
@@ -403,7 +403,7 @@ name2aprsicon(const QString &name) {
   APRSSystem::Icon icon = APRSSystem::Icon::None;
   int best = levDist(name, "");
 
-  QHash<uint, QString>::const_iterator item=aprsIconNameTable.constBegin();
+  QHash<unsigned, QString>::const_iterator item=aprsIconNameTable.constBegin();
   for(; item != aprsIconNameTable.constEnd(); item++) {
     int dist = levDist(name, item.value());
     if (dist < best) {
@@ -417,15 +417,15 @@ name2aprsicon(const QString &name) {
 
 char
 aprsicon2iconcode(APRSSystem::Icon icon) {
- uint num = uint(APRSSystem::ICON_MASK & uint(icon));
- if (num >= uint(aprsIconCodeTable.size()))
+ unsigned num = unsigned(APRSSystem::ICON_MASK & unsigned(icon));
+ if (num >= unsigned(aprsIconCodeTable.size()))
    return '"';
  return aprsIconCodeTable[num];
 }
 
 char
 aprsicon2tablecode(APRSSystem::Icon icon) {
-  uint tab = (APRSSystem::TABLE_MASK & uint(icon));
+  unsigned tab = (APRSSystem::TABLE_MASK & unsigned(icon));
   switch (tab) {
   case APRSSystem::SECONDARY_TABLE: return '\\';
   case APRSSystem::PRIMARY_TABLE: return '/';
@@ -435,7 +435,7 @@ aprsicon2tablecode(APRSSystem::Icon icon) {
 
 APRSSystem::Icon
 code2aprsicon(char table, char icon) {
-  uint num = (APRSSystem::ICON_MASK & uint(APRSSystem::Icon::None));
+  unsigned num = (APRSSystem::ICON_MASK & unsigned(APRSSystem::Icon::None));
   if (aprsIconCodeTable.contains(icon))
     num = aprsIconCodeTable.indexOf(icon);
   if ('/' == table)

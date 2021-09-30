@@ -154,7 +154,7 @@ APRSSystemDialog::construct() {
   // Setup icons
   for (int i=0; i<aprsIconTable.size(); i++) {
     const QPair<APRSSystem::Icon, QString> &item = aprsIconTable[i];
-    ui->icon->addItem(aprsIcon(item.first), item.second, uint(item.first));
+    ui->icon->addItem(aprsIcon(item.first), item.second, unsigned(item.first));
     if (_aprs && (_aprs->icon() == item.first))
       ui->icon->setCurrentIndex(i);
   }
@@ -192,9 +192,9 @@ APRSSystemDialog::aprsSystem() {
 
 QIcon
 APRSSystemDialog::aprsIcon(APRSSystem::Icon icon) {
-  uint table = (APRSSystem::TABLE_MASK & (uint)icon);
-  uint idx   = (APRSSystem::ICON_MASK & (uint)icon);
-  uint row   = idx/16, col = idx % 16;
+  unsigned table = (APRSSystem::TABLE_MASK & (unsigned)icon);
+  unsigned idx   = (APRSSystem::ICON_MASK & (unsigned)icon);
+  unsigned row   = idx/16, col = idx % 16;
 
   if (APRSSystem::PRIMARY_TABLE == table) {
     return QPixmap::fromImage(_icons0.copy(24*col, 24*row, 24,24));

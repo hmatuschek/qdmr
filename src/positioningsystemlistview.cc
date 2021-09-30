@@ -29,7 +29,7 @@ PositioningSystemListView::PositioningSystemListView(Config *config, QWidget *pa
   connect(ui->addGPS, SIGNAL(clicked()), this, SLOT(onAddGPS()));
   connect(ui->addAPRS, SIGNAL(clicked()), this, SLOT(onAddAPRS()));
   connect(ui->remGPS, SIGNAL(clicked()), this, SLOT(onRemGPS()));
-  connect(ui->listView, SIGNAL(doubleClicked(uint)), this, SLOT(onEditGPS(uint)));
+  connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditGPS(unsigned)));
   connect(ui->gpsNote, SIGNAL(linkActivated(QString)), this, SLOT(onHideGPSNote()));
 
 
@@ -99,7 +99,7 @@ PositioningSystemListView::onRemGPS() {
 }
 
 void
-PositioningSystemListView::onEditGPS(uint row) {
+PositioningSystemListView::onEditGPS(unsigned row) {
   PositioningSystem *sys = _config->posSystems()->system(row);
 
   if (sys->is<GPSSystem>()) {

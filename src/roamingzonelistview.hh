@@ -23,7 +23,7 @@ protected slots:
   void onAddRoamingZone();
   void onGenRoamingZone();
   void onRemRoamingZone();
-  void onEditRoamingZone(uint row);
+  void onEditRoamingZone(unsigned row);
   void onHideRoamingNote();
 
 private:

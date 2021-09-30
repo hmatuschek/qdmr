@@ -257,7 +257,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    ChannelElement(uint8_t *ptr, uint size);
+    ChannelElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -300,9 +300,9 @@ public:
     virtual void setDigitalAPRSPTTSetting(APRSPTT ptt);
 
     /** Returns the DMR APRS system index. */
-    virtual uint digitalAPRSSystemIndex() const;
+    virtual unsigned digitalAPRSSystemIndex() const;
     /** Sets the DMR APRS system index. */
-    virtual void setDigitalAPRSSystemIndex(uint idx);
+    virtual void setDigitalAPRSSystemIndex(unsigned idx);
 
     /** Returns the frequency correction in ???. */
     virtual int frequenyCorrection() const;
@@ -382,7 +382,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    GeneralSettingsElement(uint8_t *ptr, uint size);
+    GeneralSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -392,9 +392,9 @@ public:
     void clear();
 
     /** Returns the transmit timeout in seconds. */
-    virtual uint transmitTimeout() const;
+    virtual unsigned transmitTimeout() const;
     /** Sets the transmit timeout in seconds. */
-    virtual void setTransmitTimeout(uint tot);
+    virtual void setTransmitTimeout(unsigned tot);
 
     /** Returns the UI language. */
     virtual Language language() const;
@@ -416,36 +416,36 @@ public:
     virtual void setSTEFrequency(STEFrequency freq);
 
     /** Returns the group call hang time in seconds. */
-    virtual uint groupCallHangTime() const;
+    virtual unsigned groupCallHangTime() const;
     /** Sets the group call hang time in seconds. */
-    virtual void setGroupCallHangTime(uint sec);
+    virtual void setGroupCallHangTime(unsigned sec);
     /** Returns the private call hang time in seconds. */
-    virtual uint privateCallHangTime() const;
+    virtual unsigned privateCallHangTime() const;
     /** Sets the private call hang time in seconds. */
-    virtual void setPrivateCallHangTime(uint sec);
+    virtual void setPrivateCallHangTime(unsigned sec);
 
     /** Returns the pre-wave time in ms. */
-    virtual uint preWaveDelay() const;
+    virtual unsigned preWaveDelay() const;
     /** Sets the pre-wave time in ms. */
-    virtual void setPreWaveDelay(uint ms);
+    virtual void setPreWaveDelay(unsigned ms);
     /** Returns the wake head-period in ms. */
-    virtual uint wakeHeadPeriod() const;
+    virtual unsigned wakeHeadPeriod() const;
     /** Sets the wake head-period in ms. */
-    virtual void setWakeHeadPeriod(uint ms);
+    virtual void setWakeHeadPeriod(unsigned ms);
 
     /** Retunrs the wide-FM (broadcast) channel index. */
-    virtual uint wfmChannelIndex() const;
+    virtual unsigned wfmChannelIndex() const;
     /** Sets the wide-FM (broadcast) channel index. */
-    virtual void setWFMChannelIndex(uint idx);
+    virtual void setWFMChannelIndex(unsigned idx);
     /** Returns @c true if the WFM RX is in VFO mode. */
     virtual bool wfmVFOEnabled() const;
     /** Enables/disables VFO mode for WFM RX. */
     virtual void enableWFMVFO(bool enable);
 
     /** Returns the DTMF tone duration in ms. */
-    virtual uint dtmfToneDuration() const;
+    virtual unsigned dtmfToneDuration() const;
     /** Sets the DTMF tone duration in ms. */
-    virtual void setDTMFToneDuration(uint ms);
+    virtual void setDTMFToneDuration(unsigned ms);
 
     /** Returns @c true if "man down" is enabled. */
     virtual bool manDown() const;
@@ -498,13 +498,13 @@ public:
     virtual void enableMonitorTimeSlotHold(bool enable);
 
     /** Retunrs the "man down" delay in seconds. */
-    virtual uint manDownDelay() const;
+    virtual unsigned manDownDelay() const;
     /** Sets the "man down" delay in seconds. */
-    virtual void setManDownDelay(uint sec);
+    virtual void setManDownDelay(unsigned sec);
     /** Returns the analog call hold in seconds. */
-    virtual uint analogCallHold() const;
+    virtual unsigned analogCallHold() const;
     /** Sets the analog call hold in seconds. */
-    virtual void setAnalogCallHold(uint sec);
+    virtual void setAnalogCallHold(unsigned sec);
 
     /** Returns @c true if the GPS range reporting is enabled. */
     virtual bool gpsRangReporting() const;
@@ -517,18 +517,18 @@ public:
     virtual void enableMaintainCalLChannel(bool enable);
 
     /** Retruns the priority Zone A index. */
-    virtual uint priorityZoneAIndex() const;
+    virtual unsigned priorityZoneAIndex() const;
     /** Sets the priority zone A index. */
-    virtual void setPriorityZoneAIndex(uint idx);
+    virtual void setPriorityZoneAIndex(unsigned idx);
     /** Retruns the priority Zone B index. */
-    virtual uint priorityZoneBIndex() const;
+    virtual unsigned priorityZoneBIndex() const;
     /** Sets the priority zone B index. */
-    virtual void setPriorityZoneBIndex(uint idx);
+    virtual void setPriorityZoneBIndex(unsigned idx);
 
     /** Returns the GPS ranging interval in seconds. */
-    virtual uint gpsRangingInterval() const;
+    virtual unsigned gpsRangingInterval() const;
     /** Sets the GPS ranging interval in seconds. */
-    virtual void setGPSRangingInterval(uint sec);
+    virtual void setGPSRangingInterval(unsigned sec);
 
     /** Returns @c true if the channel number is displayed. */
     virtual bool displayChannelNumber() const;
@@ -540,16 +540,16 @@ public:
     virtual void enableDisplayContact(bool enable);
 
     /** Returns the auto roaming period in minutes. */
-    virtual uint autoRoamPeriod() const;
+    virtual unsigned autoRoamPeriod() const;
     /** Sets the auto roaming period in minutes. */
-    virtual void setAutoRoamPeriod(uint min);
+    virtual void setAutoRoamPeriod(unsigned min);
 
     /** Returns @c true if the key-tone level is adjustable. */
     virtual bool keyToneLevelAdjustable() const;
     /** Returns the key-tone level (0=adjustable). */
-    virtual uint keyToneLevel() const;
+    virtual unsigned keyToneLevel() const;
     /** Sets the key-tone level. */
-    virtual void setKeyToneLevel(uint level);
+    virtual void setKeyToneLevel(unsigned level);
     /** Sets the key-tone level adjustable. */
     virtual void setKeyToneLevelAdjustable();
 
@@ -581,9 +581,9 @@ public:
     virtual void enableKeyLockForced(bool enable);
 
     /** Returns the auto-roam delay in seconds. */
-    virtual uint autoRoamDelay() const;
+    virtual unsigned autoRoamDelay() const;
     /** Sets the auto-roam delay in seconds. */
-    virtual void setAutoRoamDelay(uint sec);
+    virtual void setAutoRoamDelay(unsigned sec);
 
     /** Retruns the standby text color. */
     virtual Color standbyTextColor() const;
@@ -605,22 +605,22 @@ public:
     virtual void setSMSFormat(SMSFormat fmt);
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual uint autoRepeaterMinFrequencyVHF() const;
+    virtual unsigned autoRepeaterMinFrequencyVHF() const;
     /** Sets the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMinFrequencyVHF(uint Hz);
+    virtual void setAutoRepeaterMinFrequencyVHF(unsigned Hz);
     /** Returns the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual uint autoRepeaterMaxFrequencyVHF() const;
+    virtual unsigned autoRepeaterMaxFrequencyVHF() const;
     /** Sets the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMaxFrequencyVHF(uint Hz);
+    virtual void setAutoRepeaterMaxFrequencyVHF(unsigned Hz);
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual uint autoRepeaterMinFrequencyUHF() const;
+    virtual unsigned autoRepeaterMinFrequencyUHF() const;
     /** Sets the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMinFrequencyUHF(uint Hz);
+    virtual void setAutoRepeaterMinFrequencyUHF(unsigned Hz);
     /** Returns the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual uint autoRepeaterMaxFrequencyUHF() const;
+    virtual unsigned autoRepeaterMaxFrequencyUHF() const;
     /** Sets the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMaxFrequencyUHF(uint Hz);
+    virtual void setAutoRepeaterMaxFrequencyUHF(unsigned Hz);
 
     /** Returns the auto-repeater direction for VFO B. */
     virtual AutoRepDir autoRepeaterDirectionB() const;
@@ -632,49 +632,49 @@ public:
     /** Enables/disables the boot channel. */
     virtual void enableDefaultChannel(bool enable);
     /** Returns the default zone index (0-based) for VFO A. */
-    virtual uint defaultZoneIndexA() const;
+    virtual unsigned defaultZoneIndexA() const;
     /** Sets the default zone (0-based) for VFO A. */
-    virtual void setDefaultZoneIndexA(uint idx);
+    virtual void setDefaultZoneIndexA(unsigned idx);
     /** Returns the default zone index (0-based) for VFO B. */
-    virtual uint defaultZoneIndexB() const;
+    virtual unsigned defaultZoneIndexB() const;
     /** Sets the default zone (0-based) for VFO B. */
-    virtual void setDefaultZoneIndexB(uint idx);
+    virtual void setDefaultZoneIndexB(unsigned idx);
     /** Returns @c true if the default channel for VFO A is VFO. */
     virtual bool defaultChannelAIsVFO() const;
     /** Returns the default channel index for VFO A.
      * Must be within default zone. If 0xff, default channel is VFO. */
-    virtual uint defaultChannelAIndex() const;
+    virtual unsigned defaultChannelAIndex() const;
     /** Sets the default channel index for VFO A. */
-    virtual void setDefaultChannelAIndex(uint idx);
+    virtual void setDefaultChannelAIndex(unsigned idx);
     /** Sets the default channel for VFO A to be VFO. */
     virtual void setDefaultChannelAToVFO();
     /** Returns @c true if the default channel for VFO B is VFO. */
     virtual bool defaultChannelBIsVFO() const;
     /** Returns the default channel index for VFO B.
      * Must be within default zone. If 0xff, default channel is VFO. */
-    virtual uint defaultChannelBIndex() const;
+    virtual unsigned defaultChannelBIndex() const;
     /** Sets the default channel index for VFO B. */
-    virtual void setDefaultChannelBIndex(uint idx);
+    virtual void setDefaultChannelBIndex(unsigned idx);
     /** Sets the default channel for VFO B to be VFO. */
     virtual void setDefaultChannelBToVFO();
 
     /** Returns the default roaming zone index. */
-    virtual uint defaultRoamingZoneIndex() const;
+    virtual unsigned defaultRoamingZoneIndex() const;
     /** Sets the default roaming zone index. */
-    virtual void setDefaultRoamingZoneIndex(uint idx);
+    virtual void setDefaultRoamingZoneIndex(unsigned idx);
 
     /** Returns @c true if repeater range check is enabled. */
     virtual bool repeaterRangeCheck() const;
     /** Enables/disables repeater range check. */
     virtual void enableRepeaterRangeCheck(bool enable);
     /** Returns the repeater range check period in seconds. */
-    virtual uint repeaterRangeCheckInterval() const;
+    virtual unsigned repeaterRangeCheckInterval() const;
     /** Sets the repeater range check interval in seconds. */
-    virtual void setRepeaterRangeCheckInterval(uint sec);
+    virtual void setRepeaterRangeCheckInterval(unsigned sec);
     /** Returns the number of repeater range checks. */
-    virtual uint repeaterRangeCheckCount() const;
+    virtual unsigned repeaterRangeCheckCount() const;
     /** Sets the number of repeater range checks. */
-    virtual void setRepeaterRangeCheckCount(uint n);
+    virtual void setRepeaterRangeCheckCount(unsigned n);
 
     /** Returns the roaming start condition. */
     virtual RoamStart roamingStartCondition() const;
@@ -682,9 +682,9 @@ public:
     virtual void setRoamingStartCondition(RoamStart cond);
 
     /** Returns the backlight duration during TX in seconds. */
-    virtual uint backlightTXDuration() const;
+    virtual unsigned backlightTXDuration() const;
     /** Sets the backlight duration during TX in seconds. */
-    virtual void setBacklightTXDuration(uint sec);
+    virtual void setBacklightTXDuration(unsigned sec);
 
     /** Retruns @c true if the "separate display" is enabled. */
     virtual bool separateDisplay() const;
@@ -707,9 +707,9 @@ public:
     virtual void enableRepeaterCheckNotification(bool enable);
 
     /** Returns the backlight duration during RX in seconds. */
-    virtual uint backlightRXDuration() const;
+    virtual unsigned backlightRXDuration() const;
     /** Sets the backlight duration during RX in seconds. */
-    virtual void setBacklightRXDuration(uint sec);
+    virtual void setBacklightRXDuration(unsigned sec);
 
     /** Retruns @c true if roaming is enabled. */
     virtual bool roaming() const;
@@ -717,14 +717,14 @@ public:
     virtual void enableRoaming(bool enable);
 
     /** Returns the mute delay in minutes. */
-    virtual uint muteDelay() const;
+    virtual unsigned muteDelay() const;
     /** Sets the mute delay in minutes. */
-    virtual void setMuteDelay(uint min);
+    virtual void setMuteDelay(unsigned min);
 
     /** Returns the number of repeater check notifications. */
-    virtual uint repeaterCheckNumNotifications() const;
+    virtual unsigned repeaterCheckNumNotifications() const;
     /** Sets the number of repeater check notifications. */
-    virtual void setRepeaterCheckNumNotifications(uint num);
+    virtual void setRepeaterCheckNumNotifications(unsigned num);
 
     /** Retruns @c true if boot GPS check is enabled. */
     virtual bool bootGPSCheck() const;
@@ -747,7 +747,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    GPSMessageElement(uint8_t *ptr, uint size);
+    GPSMessageElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -791,7 +791,7 @@ public:
 
   protected:
     /** Hidden Constructor. */
-    GeneralSettingsExtensionElement(uint8_t *ptr, uint size);
+    GeneralSettingsExtensionElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -818,37 +818,37 @@ public:
     /** Returns @c true if the auto repeater UHF 2 offset index is set. */
     virtual bool hasAutoRepeaterUHF2OffsetIndex() const;
     /** Retunrs the index of the UHF 2 offset frequency. */
-    virtual uint autoRepeaterUHF2OffsetIndex() const;
+    virtual unsigned autoRepeaterUHF2OffsetIndex() const;
     /** Sets the index of the UHF 2 offset frequency. */
-    virtual void setAutoRepeaterUHF2OffsetIndex(uint idx);
+    virtual void setAutoRepeaterUHF2OffsetIndex(unsigned idx);
     /** Clears the auto repeater UHF 2 offset frequency index. */
     virtual void clearAutoRepeaterUHF2OffsetIndex();
 
     /** Returns @c true if the auto repeater VHF 2 offset index is set. */
     virtual bool hasAutoRepeaterVHF2OffsetIndex() const;
     /** Retunrs the index of the VHF 2 offset frequency. */
-    virtual uint autoRepeaterVHF2OffsetIndex() const;
+    virtual unsigned autoRepeaterVHF2OffsetIndex() const;
     /** Sets the index of the VHF 2 offset frequency. */
-    virtual void setAutoRepeaterVHF2OffsetIndex(uint idx);
+    virtual void setAutoRepeaterVHF2OffsetIndex(unsigned idx);
     /** Clears the auto repeater VHF 2 offset frequency index. */
     virtual void clearAutoRepeaterVHF2OffsetIndex();
 
     /** Returns the minimum frequency in Hz for the auto-repeater VHF 2 band. */
-    virtual uint autoRepeaterVHF2MinFrequency() const;
+    virtual unsigned autoRepeaterVHF2MinFrequency() const;
     /** Sets the minimum frequency in Hz for the auto-repeater VHF 2 band. */
-    virtual void setAutoRepeaterVHF2MinFrequency(uint hz);
+    virtual void setAutoRepeaterVHF2MinFrequency(unsigned hz);
     /** Returns the maximum frequency in Hz for the auto-repeater VHF 2 band. */
-    virtual uint autoRepeaterVHF2MaxFrequency() const;
+    virtual unsigned autoRepeaterVHF2MaxFrequency() const;
     /** Sets the maximum frequency in Hz for the auto-repeater VHF 2 band. */
-    virtual void setAutoRepeaterVHF2MaxFrequency(uint hz);
+    virtual void setAutoRepeaterVHF2MaxFrequency(unsigned hz);
     /** Returns the minimum frequency in Hz for the auto-repeater UHF 2 band. */
-    virtual uint autoRepeaterUHF2MinFrequency() const;
+    virtual unsigned autoRepeaterUHF2MinFrequency() const;
     /** Sets the minimum frequency in Hz for the auto-repeater UHF 2 band. */
-    virtual void setAutoRepeaterUHF2MinFrequency(uint hz);
+    virtual void setAutoRepeaterUHF2MinFrequency(unsigned hz);
     /** Returns the maximum frequency in Hz for the auto-repeater UHF 2 band. */
-    virtual uint autoRepeaterUHF2MaxFrequency() const;
+    virtual unsigned autoRepeaterUHF2MaxFrequency() const;
     /** Sets the maximum frequency in Hz for the auto-repeater UHF 2 band. */
-    virtual void setAutoRepeaterUHF2MaxFrequency(uint hz);
+    virtual void setAutoRepeaterUHF2MaxFrequency(unsigned hz);
 
     /** Retuns the GPS mode. */
     virtual GPSMode gpsMode() const;
@@ -870,7 +870,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    AnalogAPRSSettingsElement(uint8_t *ptr, uint size);
+    AnalogAPRSSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -880,14 +880,14 @@ public:
     void clear();
 
     /** Returns the transmit frequency in Hz. */
-    virtual uint frequency() const;
+    virtual unsigned frequency() const;
     /** Sets the transmit frequency in Hz. */
-    virtual void setFrequency(uint hz);
+    virtual void setFrequency(unsigned hz);
 
     /** Retruns the TX delay in ms. */
-    virtual uint txDelay() const;
+    virtual unsigned txDelay() const;
     /** Sets the TX delay in ms. */
-    virtual void setTXDelay(uint ms);
+    virtual void setTXDelay(unsigned ms);
 
     /** Retruns the sub tone settings. */
     virtual Signaling::Code txTone() const;
@@ -895,16 +895,16 @@ public:
     virtual void setTXTone(Signaling::Code code);
 
     /** Retruns the manual TX interval in seconds. */
-    virtual uint manualTXInterval() const;
+    virtual unsigned manualTXInterval() const;
     /** Sets the manual TX interval in seconds. */
-    virtual void setManualTXInterval(uint sec);
+    virtual void setManualTXInterval(unsigned sec);
 
     /** Returns @c true if the auto transmit is enabled. */
     virtual bool autoTX() const;
     /** Retruns the auto TX interval in seconds. */
-    virtual uint autoTXInterval() const;
+    virtual unsigned autoTXInterval() const;
     /** Sets the auto TX interval in seconds. */
-    virtual void setAutoTXInterval(uint sec);
+    virtual void setAutoTXInterval(unsigned sec);
     /** Disables auto tx. */
     virtual void disableAutoTX();
 
@@ -920,15 +920,15 @@ public:
     /** Retunrs the destination call. */
     virtual QString destination() const;
     /** Returns the destination SSID. */
-    virtual uint destinationSSID() const;
+    virtual unsigned destinationSSID() const;
     /** Sets the destination call & SSID. */
-    virtual void setDestination(const QString &call, uint ssid);
+    virtual void setDestination(const QString &call, unsigned ssid);
     /** Retunrs the source call. */
     virtual QString source() const;
     /** Returns the source SSID. */
-    virtual uint sourceSSID() const;
+    virtual unsigned sourceSSID() const;
     /** Sets the source call & SSID. */
-    virtual void setSource(const QString &call, uint ssid);
+    virtual void setSource(const QString &call, unsigned ssid);
 
     /** Returns the path string. */
     virtual QString path() const;
@@ -946,9 +946,9 @@ public:
     virtual void setPower(Channel::Power power);
 
     /** Retunrs the pre-wave delay in ms. */
-    virtual uint preWaveDelay() const;
+    virtual unsigned preWaveDelay() const;
     /** Sets the pre-wave delay in ms. */
-    virtual void setPreWaveDelay(uint ms);
+    virtual void setPreWaveDelay(unsigned ms);
 
     /** Configures this APRS system from the given generic config. */
     virtual bool fromAPRSSystem(const APRSSystem *sys, Context &ctx);
@@ -968,7 +968,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    AnalogAPRSSettingsExtensionElement(uint8_t *ptr, uint size);
+    AnalogAPRSSettingsExtensionElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -978,9 +978,9 @@ public:
     void clear();
 
     /** Returns the fixed altitude in meter. */
-    virtual uint fixedAltitude() const;
+    virtual unsigned fixedAltitude() const;
     /** Sets the fixed altitude in meter. */
-    virtual void setFixedAltitude(uint m);
+    virtual void setFixedAltitude(unsigned m);
 
     /** Returns @c true if the report position flag is set. */
     virtual bool reportPosition() const;
@@ -1028,7 +1028,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    AnalogAPRSRXEntryElement(uint8_t *ptr, uint size);
+    AnalogAPRSRXEntryElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1041,9 +1041,9 @@ public:
     /** Returns the call sign. */
     virtual QString call() const;
     /** Returns the SSID. */
-    virtual uint ssid() const;
+    virtual unsigned ssid() const;
     /** Sets the call, SSID and enables the entry. */
-    virtual void setCall(const QString &call, uint ssid);
+    virtual void setCall(const QString &call, unsigned ssid);
   };
 
   /** Represents the 8 DMR-APRS systems within the binary codeplug.
@@ -1054,7 +1054,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    DMRAPRSSystemsElement(uint8_t *ptr, uint size);
+    DMRAPRSSystemsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1064,32 +1064,32 @@ public:
     void clear();
 
     /** Retunrs @c true if the channel points to the current/selected channel. */
-    virtual bool channelIsSelected(uint n) const;
+    virtual bool channelIsSelected(unsigned n) const;
     /** Returns the digital channel index for the n-th system. */
-    virtual uint channelIndex(uint n) const;
+    virtual unsigned channelIndex(unsigned n) const;
     /** Sets the digital channel index for the n-th system. */
-    virtual void setChannelIndex(uint n, uint idx);
+    virtual void setChannelIndex(unsigned n, unsigned idx);
     /** Sets the channel to the current/selected channel. */
-    virtual void setChannelSelected(uint n);
+    virtual void setChannelSelected(unsigned n);
 
     /** Returns the destination contact for the n-th system. */
-    virtual uint destination(uint n) const;
+    virtual unsigned destination(unsigned n) const;
     /** Sets the destination contact for the n-th system. */
-    virtual void setDestination(uint n, uint idx);
+    virtual void setDestination(unsigned n, unsigned idx);
 
     /** Returns the call type for the n-th system. */
-    virtual DigitalContact::Type callType(uint n) const;
+    virtual DigitalContact::Type callType(unsigned n) const;
     /** Sets the call type for the n-th system. */
-    virtual void setCallType(uint n, DigitalContact::Type type);
+    virtual void setCallType(unsigned n, DigitalContact::Type type);
 
     /** Returns @c true if the n-th system overrides the channel time-slot. */
-    virtual bool timeSlotOverride(uint n);
+    virtual bool timeSlotOverride(unsigned n);
     /** Retunrs the time slot if overriden (only valid if @c timeSlot returns true). */
-    virtual DigitalChannel::TimeSlot timeSlot(uint n) const;
+    virtual DigitalChannel::TimeSlot timeSlot(unsigned n) const;
     /** Overrides the time slot of the n-th selected channel. */
-    virtual void setTimeSlot(uint n, DigitalChannel::TimeSlot ts);
+    virtual void setTimeSlot(unsigned n, DigitalChannel::TimeSlot ts);
     /** Clears the time-slot override. */
-    virtual void clearTimeSlotOverride(uint n);
+    virtual void clearTimeSlotOverride(unsigned n);
 
     /** Returns @c true if the roaming is enabled. */
     virtual bool roaming() const;
@@ -1097,9 +1097,9 @@ public:
     virtual void enableRoaming(bool enable);
 
     /** Returns the the repeater activation delay in ms. */
-    virtual uint repeaterActivationDelay() const;
+    virtual unsigned repeaterActivationDelay() const;
     /** Sets the repeater activation delay in ms. */
-    virtual void setRepeaterActivationDelay(uint ms);
+    virtual void setRepeaterActivationDelay(unsigned ms);
 
     /** Constructs all GPS system from the generic configuration. */
     virtual bool fromGPSSystems(Context &ctx);
@@ -1119,7 +1119,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    RoamingChannelElement(uint8_t *ptr, uint size);
+    RoamingChannelElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1129,18 +1129,18 @@ public:
     void clear();
 
     /** Retruns the RX frequency in Hz. */
-    virtual uint rxFrequency() const;
+    virtual unsigned rxFrequency() const;
     /** Sets the RX frequeny in Hz. */
-    virtual void setRXFrequency(uint hz);
+    virtual void setRXFrequency(unsigned hz);
     /** Retruns the TX frequency in Hz. */
-    virtual uint txFrequency() const;
+    virtual unsigned txFrequency() const;
     /** Sets the TX frequeny in Hz. */
-    virtual void setTXFrequency(uint hz);
+    virtual void setTXFrequency(unsigned hz);
 
     /** Retunrs the color code. */
-    virtual uint colorCode() const;
+    virtual unsigned colorCode() const;
     /** Sets the color code. */
-    virtual void setColorCode(uint cc);
+    virtual void setColorCode(unsigned cc);
 
     /** Returns the time slot. */
     virtual DigitalChannel::TimeSlot timeSlot() const;
@@ -1166,7 +1166,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    RoamingZoneElement(uint8_t *ptr, uint size);
+    RoamingZoneElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1176,13 +1176,13 @@ public:
     void clear();
 
     /** Returns @c true if the n-th member is set. */
-    virtual bool hasMember(uint n) const;
+    virtual bool hasMember(unsigned n) const;
     /** Returns the n-th member index. */
-    virtual uint member(uint n) const;
+    virtual unsigned member(unsigned n) const;
     /** Sets the n-th member index. */
-    virtual void setMember(uint n, uint idx);
+    virtual void setMember(unsigned n, unsigned idx);
     /** Clears the n-th member. */
-    virtual void clearMember(uint n);
+    virtual void clearMember(unsigned n);
 
     /** Returns the name of the zone. */
     virtual QString name() const;
@@ -1190,11 +1190,11 @@ public:
     virtual void setName(const QString &name);
 
     /** Assembles a binary representation of the given RoamingZone instance.*/
-    virtual bool fromRoamingZone(RoamingZone *zone, const QHash<DigitalChannel *, uint> &map);
+    virtual bool fromRoamingZone(RoamingZone *zone, const QHash<DigitalChannel *, unsigned> &map);
     /** Constructs a @c RoamingZone instance from this configuration. */
     virtual RoamingZone *toRoamingZone() const;
     /** Links the given RoamingZone. */
-    virtual bool linkRoamingZone(RoamingZone *zone, const QHash<uint, DigitalChannel *> &map);
+    virtual bool linkRoamingZone(RoamingZone *zone, const QHash<unsigned, DigitalChannel *> &map);
   };
 
   /** Represents an AES encryption key.
@@ -1205,7 +1205,7 @@ public:
   {
   protected:
     /** Hidden constructor. */
-    AESEncryptionKeyElement(uint8_t *ptr, uint size);
+    AESEncryptionKeyElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
@@ -1217,9 +1217,9 @@ public:
     bool isValid() const;
 
     /** Returns the key index. */
-    virtual uint index() const;
+    virtual unsigned index() const;
     /** Sets the key index. */
-    virtual void setIndex(uint idx);
+    virtual void setIndex(unsigned idx);
 
     /** Returns the actual key. */
     virtual QByteArray key() const;
@@ -1258,7 +1258,7 @@ public:
 
   protected:
     /** Hidden constructor. */
-    RadioInfoElement(uint8_t *ptr, uint size);
+    RadioInfoElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */

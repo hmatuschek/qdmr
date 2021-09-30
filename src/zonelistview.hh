@@ -19,7 +19,7 @@ public:
 protected slots:
   void onAddZone();
   void onRemZone();
-  void onEditZone(uint row);
+  void onEditZone(unsigned row);
 
 private:
   Ui::ZoneListView *ui;

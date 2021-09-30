@@ -36,10 +36,10 @@ public:
 		inline bool isValid() const { return 0 != id; }
 
     /** Returns the "distance" between this user and the given ID. */
-    uint distance(uint id) const;
+    unsigned distance(unsigned id) const;
 
 		/** The DMR ID of the user. */
-		uint id;
+		unsigned id;
 		/** The callsign of the user. */
 		QString call;
 		/** The name of the user. */
@@ -60,7 +60,7 @@ public:
 	/** Constructs the user-database.
 	 * The constructor will download the current user database if it was not downloaded yet or
 	 * if the downloaded version is older than @c updatePeriodDays days. */
-	explicit UserDatabase(uint updatePeriodDays=30, QObject *parent=nullptr);
+	explicit UserDatabase(unsigned updatePeriodDays=30, QObject *parent=nullptr);
 
   /** Returns the number of users. */
   qint64 count() const;
@@ -71,15 +71,15 @@ public:
 	bool load(const QString &filename);
 
   /** Sorts users with respect to the distance to the given ID. */
-  void sortUsers(uint id);
+  void sortUsers(unsigned id);
   /** Sorts users with respect to the minimum distance to the given IDs. */
-  void sortUsers(const QSet<uint> &ids);
+  void sortUsers(const QSet<unsigned> &ids);
 
 	/** Returns the user with index @c idx. */
   const User &user(int idx) const;
 
 	/** Returns the age of the database in days. */
-	uint dbAge() const;
+	unsigned dbAge() const;
 
 	/** Implements the QAbstractTableModel interface, returns the number of rows (number of entries). */
   int rowCount(const QModelIndex &parent=QModelIndex()) const;

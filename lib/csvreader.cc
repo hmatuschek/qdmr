@@ -138,7 +138,7 @@ CSVHandler::handleIntroLine2(const QString &text, qint64 line, qint64 column, QS
 }
 
 bool
-CSVHandler::handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage) {
+CSVHandler::handleMicLevel(unsigned level, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(level);
   Q_UNUSED(line);
   Q_UNUSED(column);
@@ -281,7 +281,7 @@ CSVHandler::handleGPSSystem(
 
 bool
 CSVHandler::handleAPRSSystem(qint64 idx, const QString &name, qint64 channelIdx, qint64 period,
-    const QString &src, uint srcSSID, const QString &dest, uint destSSID, const QString &path,
+    const QString &src, unsigned srcSSID, const QString &dest, unsigned destSSID, const QString &path,
     const QString &icon, const QString &message, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
@@ -1457,7 +1457,7 @@ CSVParser::_parse_aprs_system(qint64 id, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  QString src=""; uint srcSSID=0;
+  QString src=""; unsigned srcSSID=0;
   if (CSVLexer::Token::T_APRSCALL == token.type) {
     QStringList lst = token.value.split('-');
     src = lst.first(); srcSSID = lst.last().toInt();
@@ -1470,7 +1470,7 @@ CSVParser::_parse_aprs_system(qint64 id, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  QString dest=""; uint destSSID=0;
+  QString dest=""; unsigned destSSID=0;
   if (CSVLexer::Token::T_APRSCALL == token.type) {
     QStringList lst = token.value.split('-');
     dest = lst.first(); destSSID = lst.last().toInt();
@@ -1797,7 +1797,7 @@ CSVReader::handleIntroLine2(const QString &text, qint64 line, qint64 column, QSt
 }
 
 bool
-CSVReader::handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage) {
+CSVReader::handleMicLevel(unsigned level, qint64 line, qint64 column, QString &errorMessage) {
   Q_UNUSED(line);
   Q_UNUSED(column);
   Q_UNUSED(errorMessage);
@@ -2137,7 +2137,7 @@ CSVReader::handleGPSSystem(
 bool
 CSVReader::handleAPRSSystem(
     qint64 idx, const QString &name, qint64 channelIdx, qint64 period,
-    const QString &src, uint srcSSID, const QString &dest, uint destSSID,
+    const QString &src, unsigned srcSSID, const QString &dest, unsigned destSSID,
     const QString &path, const QString &iconname, const QString &message,
     qint64 line, qint64 column, QString &errorMessage)
 {

@@ -31,7 +31,7 @@ private:
 /// @endcond
 
 
-RepeaterDatabase::RepeaterDatabase(const QGeoCoordinate &qth, uint updatePeriodDays, QObject *parent)
+RepeaterDatabase::RepeaterDatabase(const QGeoCoordinate &qth, unsigned updatePeriodDays, QObject *parent)
   : QAbstractTableModel(parent), _qth(qth), _repeater(), _callsigns(), _network()
 {
   connect(&_network, SIGNAL(finished(QNetworkReply*)),
@@ -132,7 +132,7 @@ RepeaterDatabase::downloadFinished(QNetworkReply *reply) {
   reply->deleteLater();
 }
 
-uint
+unsigned
 RepeaterDatabase::dbAge() const {
   QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/repeater.json";
   QFileInfo info(path);
