@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="confGPS"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>GPS Systems</title>
+</info>
+
+<para>
+  The GPS system list just specifies the contact to which some positional information is send to
+  (which usually gets forwarded to the APRS system) and at which period this information is send.
+</para>
+
+<informalexample pgwide="1">
+  <programlisting pgwide="1"><![CDATA[GPS  Name                Dest Period Revert
+1    "BM APRS"           20   300    -
+]]></programlisting>  
+</informalexample>
+
+<para>
+  The first column specifies the ID of the GPS system. This can be any number >0. The second column
+  (Name) specifies the name of the GPS system. The third column specifies the destination contact
+  ID (see Contacts above), the position information is send to. The fourth column (Period) specifies
+  the update period in seconds. The fifth column (Revert) specifies the revert channel. In amateur
+  radio, this can be left blank ("-").
+</para> 
+
+</section>

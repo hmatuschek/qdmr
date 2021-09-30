@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="confContacts"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Contact table</title>
+</info>
+
+<para>
+  The contact table is a list of DMR contacts like
+</para>
+
+<informalexample pgwide="1">
+  <programlisting><![CDATA[Contact Name             Type    ID       RxTone
+1       "DM3MAT"         Private 2621370  +
+2       "DMR All Call"   All     16777215 -
+3       "Simplex TG99"   Group   99       -
+4       "Global"         Group   91       -
+5       "EU"             Group   92       -
+6       "Regional"       Group   8        -
+7       "Lokal"          Group   9        -
+8       "Deutschland"    Group   262      -
+9       "Berlin/Brand"   Group   2621     -
+10      "Berlin City"    Group   26212    -
+11      "Brandenburg"    Group   26209    -
+12      "Sachs/Thu"      Group   2629     -
+13      "R Brandenburg"  Private 4044     -  
+]]></programlisting>
+</informalexample>
+
+<para>
+  These contacts can be personal contacts like DM3MAT, so-called all-calls and group calls.
+  The contact table starts with the "Contact" keyword and ends with an empty line. The remaining
+  keywords ("Name", "Type", "ID", "RxTone") are ignored, however, they are part of the
+  self-documentation of the config file.
+</para>
+
+<para>
+  Following the "Contact" keyword, each line
+  represents a single contact in the contact list. The first column represents a unique
+  internal ID for the contact. It must not necessarily be in ascending order, any unique number
+  will do. The second column is the name of the contact. Any string can be used here. The third
+  column specifies the type of the contact. This must be one of the keywords "Private", "Group"
+  or "All", meaning private, group or all-calls, respectively. The fourth column specifies the DMR ID
+  for the contact. Please note, that an all-call requires the specific DMR ID 16777215 to work
+  as an all-call. The last colum specifies, whether an incoming call from this contact will cause a
+  ring-tone. Here "+" means enabled/yes and "-" disabled/no.
+</para>
+
+</section>

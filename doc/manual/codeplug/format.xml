@@ -15,7 +15,7 @@
     with YAML, consider reading a 
     <link xlink:href="https://learn.getgrav.org/16/advanced/yaml">YAML introduction</link> first.
     The documentation for the <emphasis>old</emphasis> table based <filename>conf</filename>-file format, can
-    be found in section <xref linkend="cpTableFormat"/>.
+    be found in section <xref linkend="confFormat"/>.
   </para>
 </tip>
 

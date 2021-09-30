@@ -1,4 +1,4 @@
-SRC = manual.xml $(shell find gui/ *.*) $(shell find intro/ *.*)
+SRC = manual.xml $(shell find intro/ *.*) $(shell find gui/ *.*) $(shell find codeplug/ *.*) $(shell find conf/ *.*)
 
 all: manual.pdf
 

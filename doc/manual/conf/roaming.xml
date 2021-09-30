@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="confRoaming"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Roaming Zones</title>
+</info>
+
+<para>
+  Roaming zones allow to stay in contact with a particular talk group when moving round and the current repeater 
+  gets out of range. In this case, the radio will search for the strongest repeater in a list (the so-called 
+  <emphasis>roaming zone</emphasis>) and switch to this repeater. 
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[Roaming Name                Channels
+1       "Berlin/Brand"      3,7,13,17,19,23,25,29,33,37,41,49 
+]]></programlisting>
+</informalexample>
+
+<para>
+  Therefore, a roaming zone is a simple channel list. The first column specifies the ID of the zone. This 
+  ID can be used in the digital channel table to associate a channel with a specific roaming zone.
+  The second column specifies the name of the zone and the third column holds the comma-separated list of 
+  channel in each zone.
+</para>
+
+</section>

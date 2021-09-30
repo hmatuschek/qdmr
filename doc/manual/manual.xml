@@ -57,7 +57,7 @@
   <xi:include  href="gui/gui.xml"/> 
   <xi:include  href="codeplug/format.xml"/>
   <xi:include  href="codeplug/extensions.xml"/>
-  <xi:include  href="codeplug/tableformat.xml"/>
+  <xi:include  href="conf/format.xml"/>
 
   <chapter>
     <title>The <command>dmrconf</command> command line tool</title>
