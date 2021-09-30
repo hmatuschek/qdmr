@@ -11,3 +11,4 @@ all: $(IMG)
 
 clean:
 	rm -f $(IMG)
+	rm -f *.aux *.log

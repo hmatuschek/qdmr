@@ -13,4 +13,17 @@
 
   <xsl:param name="paper.type" select="'A4'"/>
   <xsl:param name="highlight.source" select="1"/>
+  <xsl:param name="generate.toc">
+    appendix  nop
+    article   toc,title
+    book      toc,title
+    chapter   toc
+    part      nop
+    preface   nop
+    qandadiv  nop
+    qandaset  nop
+    reference toc,title
+    section   nop
+    set       toc
+  </xsl:param>
 </xsl:stylesheet>
