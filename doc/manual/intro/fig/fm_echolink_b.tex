@@ -1,0 +1,15 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+\input{repeater}
+\begin{document}
+ \begin{tikzpicture}[every node/.style={scale=.8}]
+  \activeuser{U1}{0,0}{DM3MAT};
+  \activerepeater{R1}{3,1}{DB0SP};
+  \activerepeater{R2}{6,1}{DB0LDS};
+  \user{U2}{9,0}{DL2XYZ};
+  \path[->] (U1) edge node[above,rotate=17] {$431.825 MHz$} (R1) ;
+  \path[->,dashed] (R1) edge node[above] {via Echolink} (R2) ;	
+  \path[->] (R2) edge node[above,rotate=-17] {$439.150 MHz$} (U2) ;
+ \end{tikzpicture}
+\end{document}

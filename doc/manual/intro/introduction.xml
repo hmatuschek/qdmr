@@ -1,50 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<chapter xml:id="intro" xmlns:xlink="http://www.w3.org/1999/xlink">
+<chapter xml:id="introduction" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
   <title>Introduction</title>
-  <para>
-    Before you start with programming your <acronym>DMR</acronym> radio, 
-    <link xlink:href="https://www.dmrfordummies.com/">get familiar</link> with this digital 
-    mode. I have also written 
-    <link xlink:href="https://dm3mat.darc.de/qdmr/manual/script_de.pdf">a brief introduction into 
-    <acronym>DMR</acronym></link> in german. This manual only describes how program your radio using 
-    <application>qdmr</application>, not how <acronym>DMR</acronym> works and what all these weird 
-    terms mean.
-  </para>
-  <para>
-    Digital mobile radio (DMR) was not invented for the use in amateur radio. It was rather designed
-    to be a radio standard for commercial applications in large companies (e.g., airports etc.).
-    Therefore many features of this standard are of no use for ham radio or are even illegal
-    (e.g., encryption). This complexity of the standard makes the programming of the radios
-    cumbersome.
-  </para>
-  <para>
-    Moreover, the resulting configuration (codeplug) is highly device-dependent. These
-    codeplugs cannot be shared between different devices let alone between different vendors. For
-    commercial applications, this is not a big problem as a company will most likely buy identical
-    radios at once from one company. Thus codeplug can be shared between all radios.
-  </para>
-  <para>
-    For ham radio applications, this incompatibility is a real issue. Since assembling a decent
-    codeplug for one region is hard enough, doing the same work all over again for different models
-    of different vendors is not manageable.
-  </para>
-  <para>
-    Finally, the typical code-plug programming software (CPS), particularly those for cheap Chinese
-    DMR radios, is by no means user-friendly and seldom documented completely. Many options are
-    named cryptic and it is not possible to identify which options are necessary for basic DMR
-    operation. Moreover, the CPSs provided by the vendors usually only run under Windows.
-  </para>
-  <para>
-    The aim of the <application>qdmr</application>project is to overcome these shortcomings of typical CPSs. It has a
-    reduced feature set only supporting those options necessary of amateur radio usage. It tries
-    to be user-friendly by finding repeaters nearby and importing their input and output
-    frequencies. Moreover, it stores the final codeplug not in a device-specific binary format but
-    in a human-readable text format that is device independent and can therefore be shared across
-    multiple device and even across vendors.
-  </para>
-  <para>
-    Finally, I try to keep the application well documented. This manual is part of this effort. It
-    is a guide on how a codeplug is set up using <application>qdmr</application>.
-  </para>
+
+  <abstract>
+    <para>
+      The chapter tries to provide an introduction to <acronym>DMR</acronym>
+      (digital mobile radio) targeted at the unexperienced operator and anyone
+      interested in this topic. I try to hide details until it gets absolutely 
+      necessary to explain them. The majority of DMR introductions I've found, 
+      are more or less extensive glossaries (if you are interested in that, see 
+      <xref linkend="glossary"/>). They are hard to comprehend, unless one has at 
+      least some experience with DMR. 
+    </para>
+    <para>
+      The perceived complexity of DMR comes from its origin as a radio standard
+      for commercial applications at large events and companies (i.e., 
+      <link xlink:href="https://en.wikipedia.org/wiki/Trunked_radio_system">trunked
+      radio</link>. Therefore, I will first describe an example how DMR is used commercially
+      before I describe how it is used in amateur radio. I hope that this approach will make some
+      of the weird terms and concepts of DMR clearer.
+    </para>
+  </abstract>
+</info>
+
+<xi:include href="foreknowledge.xml"/>
+<xi:include href="origin.xml"/>
+
 </chapter>

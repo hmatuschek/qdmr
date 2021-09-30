@@ -3,8 +3,8 @@
 <book xmlns="http://docbook.org/ns/docbook" 
       xmlns:xlink="http://www.w3.org/1999/xlink" 
       xmlns:xi="http://www.w3.org/2001/XInclude"
-      version="5.0" xml:lang="en">
-      
+      version="5.1" xml:lang="en">
+
   <info>
     <title>qdmr - User Manual</title>
     <subtitle>A universal codeplug programming tool for Linux and MacOS X.</subtitle>
@@ -34,6 +34,8 @@
 
     <xi:include  href="meta/abstract.xml"/> 
   </info>
+  
+  <xi:include  href="meta/preface.xml"/>
   
   <xi:include  href="intro/introduction.xml"/> 
 

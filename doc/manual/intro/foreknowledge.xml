@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="introForeknowledge" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Basics: Repeater operations</title>
+</info>
+
+<para>
+  This section briefly describes the common amateur radio FM-repeater operation. The majority of all
+  licensed operators will be familiar with this topic. 
+</para>
+
+<para>
+  If you are not yet licensed and interested into amateur radio, consider reading this section. 
+  Otherwise, skip right to the next section <xref linkend="introOrigin"/>
+</para>
+
+<para>
+  The majority of connections between HAM operators are made in the so-called simplex mode. That 
+  is, the two operators transmit and receive alternately on the same frequency<footnote><para>
+    This is actually called <emphasis>semi-duplex</emphasis>, however the term 
+    <quote>simplex</quote> stuck. The term simplex actually refers to the situation, where 
+    there is only one transmitter and possibly many receivers (e.g., broadcast).</para></footnote> 
+  and the connection is direct. This works very well on HF where world-wide direct connections can 
+  be made.
+</para>
+
+<example>
+  <title>Typical FM simplex operation</title>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/fm_simplex_a.png" width="7cm" align="center"/></imageobject>
+  </mediaobject>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/fm_simplex_b.png" width="7cm" align="center"/></imageobject>
+  </mediaobject>
+</example>
+
+<para>
+  For this example, DM3MAT transmits directly to DL2XYZ on the frequency 144.500 MHz. The latter 
+  then also answers directly on the same frequency.
+</para>
+
+<para>
+  On higher frequencies, however, radio waves behave more like light and it gets increasingly more
+  difficult<footnote><para>Also on VHF and UHF, larger distances can be bridged using an elevated 
+    location and larger antennas.</para></footnote> to bridge significantly higher distances than 
+  to the horizon. This fact limits the operating range of simple hand-held radios. To still cover 
+  a large area, repeaters can be used.
+</para>
+
+<para>
+  Repeater or relais are autonomous amateur radio stations that are usually located on a mountain,
+  hill or high tower. This allows them to easily cover a large area. They receive signals from
+  HAM operators and retransmit them at the same time. To do that, they cannot send and receive on 
+  the same frequency (otherwise they would interfere with themselves). Therefore, repeater operate
+  in the so-called duplex mode. That is, the repeater receives on one frequency (the so-called 
+  input frequency) and simultaneously transmits the received signal on another frequency (the 
+  output frequency).
+</para>
+
+<example xml:id="figIntroFMRepeater">
+  <title>Simple FM repeater operation</title>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/fm_duplex_a.png" width="7cm" align="center"/></imageobject>
+  </mediaobject>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/fm_duplex_b.png" width="7cm" align="center"/></imageobject>
+  </mediaobject>
+</example>
+
+<para>
+  For this example, DM3MAT sends on the input frequency 431.9625 MHz to the repeater DB0LDS. The 
+  repeater transmits the received singal on the output frequency 439.5625 MHz. On that frequency,
+  DL2XYZ receives the original call.
+</para>
+
+<para>
+  The <xref linkend="figIntroFMRepeater"/> shows a common repeater operation on UHF. Here, the 
+  operator DM3MAT transmits its call to DL2XYZ not directly but on the input frequency of the 
+  repeater DL0LDS (431.9625 MHz). The repeater recevies the call and transmits it simultaneously
+  on its output frequency (439.5625 MHz). This signal is then received by DL2XYZ. Consequently, 
+  the call has reached its destination, although DM3MAT and DL2XYZ may not be able to communicate 
+  directly. The reply of DL2XYZ to DM3MAT follows the same path. Here DL2XYZ transmits on the
+  repeater input frequency, and DM3MAT receives that call on the repeater output frequency. This 
+  way the two operators can communicate with each other even if they are not able to reach 
+  each other directly.
+</para>
+
+
+<section>
+<info>
+  <title>Echolink</title>
+</info>
+<para>
+  However, there are situations, where two operators are war away and they cannot reach the same
+  repeater. For these cases, it is possible to connect two repeaters via the 
+  <link xlink:href="http://www.echolink.org/">EchoLink</link> network.
+</para>
+
+<example xml:id="figIntroEchoLink">
+  <title>Repeater operation with Echolink</title>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/fm_echolink_a.png" width="10cm" align="center"/></imageobject>
+  </mediaobject>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/fm_echolink_b.png" width="10cm" align="center"/></imageobject>
+  </mediaobject>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/fm_echolink_c.png" width="10cm" align="center"/></imageobject>
+  </mediaobject>
+</example>
+<para>
+  DM3MAT connects repeaters DB0SP (near Berlin) and DB0LEI (near Leipzig) via EchoLink. Now, they 
+  are able to communicate with each other.
+</para>
+
+<para>
+  This network allows to link FM repeaters via <trademark class="trade">internet</trademark> or to 
+  connect directly to a remote repeater via internet. Many FM repeaters are connected to the 
+  EchoLink network, allowing for world-wide communication with simple hand-held radios. 
+</para>
+
+<para>
+  Frequently, it is also possible to control a repeater over-the-air and to connect that repeater 
+  to some other repeater via EchoLink. Usually, this can be done by sending the EchoLink number of 
+  the destination repeater you want to link to using DTMF to the local repeater. This is shown in 
+  <xref linkend="figIntroEchoLink"/> above. There, DM3MAT sends the EchoLink number 662699 of the 
+  repeater DB0LEI near Leipzig to his local repeater DB0SP near Berlin. Then the local repeater
+  (DB0SP) will link with the destination repeater (DB0LEI) via the EchoLink network. For some 
+  limited time, both repeaters will act like one logical repeater. That is, everything that is 
+  received by one repeater will also be transmitted by the other. This way, the two operators 
+  DM3MAT and DL2XYZ can communicate although they cannot reach a common repeater.
+</para>
+
+<note>
+  <para>
+    Once two repeaters are linked via EchoLink, they behave like a single repeater.
+  </para>
+</note>
+
+<para>
+  All over the world, there are FM repeater that are part of the EchoLink network. Therefore, it
+  is possible to communicate world-wide at any time using simple hand-held radios that are as cheap as 
+  40€ or even less.
+</para>
+</section>
+
+</section>
