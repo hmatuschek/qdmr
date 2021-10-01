@@ -10,7 +10,16 @@
 </info>
 
 <para>
+  Beside the graphical user interface provided by <application>qdmr</application> (see 
+  <xref linkend="gui"/>), there is also a command line tool allowing to read/write codeplugs to the
+  radios. It is based on the same library called 
+  <link xlink:href="https://dm3mat.darc.de/qdmr/libdmrconf">libdmrconf</link> and thus provides the
+  same features like <application>qdmr</application>.
+</para>
 
+<para>
+  This chapter will briefly describe the command line tool and how it can be used to handle 
+  codeplugs.
 </para>
 
 <xi:include  href="dmrconf.xml"/>

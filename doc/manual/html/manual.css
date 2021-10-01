@@ -1,0 +1,41 @@
+main > nav {
+  margin-top:20px;
+}
+
+dl.variablelist {
+  margin-left: 2em;
+}
+
+dl.toc {
+  margin-left: 2em;
+  margin-right: 2em;
+  background-color: #f2f2f2;
+  overflow: auto; 
+  padding: 1em;
+  border: 0px solid black;
+  border-radius: 5px;
+  font-weight: bolder;
+}
+
+pre.programlisting {
+  background-color: #f2f2f2;
+  overflow-x: auto;
+  padding: 1em;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+table {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+thead td {
+  font-weight: bold;
+}
+tbody td {
+  vertical-align: top;
+}
+
+.token {
+  font-family: 'Courier New', Courier, monospace;
+}
