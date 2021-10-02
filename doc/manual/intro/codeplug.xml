@@ -9,83 +9,111 @@
   <title>Codeplug Assembly</title>
 </info>
 
-Nachdem Sie sich mit den Konzepten und dem technischen Hintergrund von DMR auseinandergesetzt 
-haben, geht es nun an die Konfiguration Ihres Funkgerätes. Dies geschieht üblicherweise nicht über 
-das Bedienfeld des Funkgerätes, sonder mit Hilfe einer separaten Software, der sogenannten 
-\adef{CPS} oder \emph{codeplug programming software}. 
+<para>
+  After the basic concepts and technical details of the DMR mode has been discussed, it is time to 
+  consider the actual configuration of the RMD radios. This usually not node via the keypad of the 
+  radio but with the help of a separate software. The so-called <glossterm>CPS</glossterm> or 
+  codeplug programming software. 
+</para>
 
-Doch bevor Sie loslegen können benötigen Sie wie alle DMR Teilnehmer eine eindeutige Nummer, die 
-DMR ID.
-\begin{hinweis}
- Ihre persönliche und eindeutige DMR ID erhalten Sie unter \url{https://register.ham-digital.org/}. 
- Da Sie nachweisen müssen, dass Sie lizenzierter Funkamateur sind, müssen Sie bei der Anmeldung ihre 
- eingescannte \emph{Zulassung zum Amateurfunkdienst} hochladen.
-\end{hinweis}
-Ihre DMR ID erhalten Sie in der Regel innerhalb von 24 Stunden per Mail. Sobald Sie eine DMR ID 
-erhalten haben kann es los gehen.
+<para>
+  Before we can start, we need like any other participant in the DMR network a unique number, the 
+  DMR ID.
+</para>
 
-Da dieses Script für Einsteiger gedacht ist, ist es wahrscheinlich, dass Sie kein top-shelf Motorola 
-Gerät sondern eher ein günstiges Gerät der einschlägig bekannten chinesischen Hersteller besitzen. 
+<note>
+  <para>
+    You can get your personal and unique DMR ID from 
+    <link xlink:href="https://www.radioid.net/">radioid.net</link>. There you need to verify that
+    you are a licensed ham operator.
+  </para>
+</note>
 
-\begin{achtung}
- Falls Sie noch kein DMR fähiges Funkgerät besitzen und mit dem Gedanken spielen eines zu kaufen, 
- achten Sie unbedingt darauf, dass es DMR \textbf{Tier I &amp; II}\footnote{Wie so häufig ist DMR nicht 
-  ein Standard sondern eine ganze Familie von aufeinander aufbauenden Standards. DMR Tier I beschreibt 
-  im wesentlichen den DMR Simplexbetrieb und Tier II dann den Repeaterbetrieb mit zwei Zeitschlitzen. 
-  Sie benötigen also unbedingt Tier II für den Repeaterbetrieb.} unterstützt. Ignorieren Sie etwaiges 
-  Marketing-Bla-Bla der Hersteller und schauen Sie in den technischen Details nach, ob dort DMR 
-  \textbf{Tier I &amp; II} erwähnt wird. Falls nicht oder nicht eindeutig, lassen Sie die Finger von diesem 
-  Gerät! Dies gilt vor allem für das Baofeng MD-5R aber nicht für das Baofeng/Radioddity 
-  RD-5R\footnote{Manchmal sind es die kleinen Unterschiede die entscheidend sind.}. 
-\end{achtung}
+<para>
+  You will receive your personal DMR ID usually within 24h per Mail. Once you've got your ID, 
+  you can start.
+</para>
 
-Der Hersteller Ihres Gerätes wird auf seiner Webseite die Software die Sie zur Konfiguration benötigen, 
-zum Download bereitstellen. Diese Software wird \emph{CPS} oder \emph{codeplug programming software} 
-genannt. Gegebenenfalls finden Sie dort auch Firmwareupdates für Ihr Gerät. Viele Hersteller bieten für 
-jedes einzelne Modell eine separate CPS an oder gar für jede Variation eines Modells. Achten Sie also 
-genau darauf welche CPS Sie herunterladen. Die Konfiguration dieser Geräte unterscheidet sich von Gerät 
-zu Gerät und mehr noch von Hersteller zu Hersteller. Jedoch sind die wesentlichen Einstellungen für Geräte 
-dieser Klasse sehr ähnlich.
+<para>
+  As this script is intended for the beginners, it is very likely that you do not own a top-shelf 
+  Motorola device but rather one of the cheap devices of the common manufacturers.
+</para>
 
-Wenn Sie die CPS zum ersten mal starten, werden Sie wahrscheinlich zwei Dinge feststellen. Erstens, das 
-Bedienkonzept dieser Software ist aus dem letzten Jahrtausend (Windows 3.11) und Zweitens, es gibt eine 
-Unmenge an obskuren Optionen deren Funktion nicht ersichtlich ist und die größtenteils nicht Dokumentiert 
-sind. Wenn Sie des Englischen nicht mächtig sind, werden Sie auch eine deutsche Übersetzung des Programms 
-vermissen. Aber keine sorge, die englische Übersetzung ist meist auch so schlecht, dass es keinen 
-Unterschied macht ob sie Englisch lesen können oder nicht.
+<warning>
+  <para>
+    If you do not own a DMR device yet but consider to by one, you should explicitly check whether 
+    it supports DMR Tier I and II<footnote><para>As usual, DMR is not a single standard but a 
+      family of standards. Tier I describes the simplex operation while Tier II considers the 
+      repeater operation and time-slots. You will therefore need a device that also implements 
+      Tier II to be able to work with repeaters.</para></footnote>. Ignore any marketing BS and
+      check the technical description of the product for Tier I &amp; II. If it is not mentioned
+      there, simply skip that product. This is particularly true for the Baofeng MD-5R but not 
+      the RD-5R. 
+  </para>
+</warning>
 
-Die Konfiguration Ihres Funkgerätes erfolgt in 5-6 Schritten:
-\begin{enumerate}
- \item Allgemeine Einstellungen,
- \item Kontakte anlegen,
- \item Empfangsgruppen festlegen,
- \item alle Kanäle anlegen,
- \item Kanäle in Zonen einteilen und
- \item optional Scanlisten anlegen.
-\end{enumerate}
+<para>
+  The manufacturer of the device of your choice will provide the CPS for download you need to program
+  your radio. Usually you will also find there firmware updates for your device. The manufacturers 
+  usually provide a separate CPS version for every device and even firmware revision. So please check
+  whether you've got the correct CPS version. The configuration of the device differs from device to
+  device and even more from manufacturer to manufacturer. The basic setup, however, remains the same.
+</para>
 
-In den folgenden Abschnitten möchte ich die einzelnen Konfigurationsschritte im Detail beschreiben.
+<para>
+  When you start the CPS for the first time, you will likely note two things. First, that the user 
+  experience stems from the last millennium (about Windows 3.11). And second, that there are a tone
+  of obscure and badly translated options for your device. These options are usually named cryptic
+  and are not documented. 
+</para>
 
-\subsection{Allgemeine Konfiguration} \label{sec:cp:basic}
-Die wichtigsten allgemeinen Einstellungen die Sie vornehmen müssen, ist das setzen der DMR ID und ihres 
-Rufzeichens. Diese Optionen finden Sie meist unter der Rubrik (linke Seite) \emph{Radio Settings} oder 
-\emph{General Settings}\footnote{Die exakten Namen der Rubriken und Felder kann sich von Hersteller zu 
-  Hersteller unterscheiden. Üblicherweise sind sie aber den hier erwähnten Namen sehr ähnlich.}. Ihre DMR 
-  ID tragen Sie dann in das Feld \emph{Radio ID} ein. Es ist durchaus möglich, dass Ihr Funkgerät mehrere 
-  DMR IDs unterstützt. Dieses Feature wird aber üblicherweise nicht verwendet. Im Gegenteil: Es stehen nur
-  eine begrenzte Anzahl von DMR IDs sehr vielen Funkamateuren gegenüber. Beantragen sie deshalb niemals 
-  eine DMR ID für jedes Funkgerät oder jeden Accesspoint. Eine \textbf{einzige} persönliche DMR Nummer 
-  reicht völlig! 
+<para>
+  The configuration of your device usually happens in five-six steps:
+</para>
+<orderedlist>
+  <listitem><para>General settings, </para></listitem>
+  <listitem><para>creating contacts, </para></listitem>
+  <listitem><para>assembling group lists, </para></listitem>
+  <listitem><para>creating channels, </para></listitem>
+  <listitem><para>assembling zones and </para></listitem>
+  <listitem><para>optionally assembling scan lists.</para></listitem>
+</orderedlist>
 
-Ihr Rufzeichen tragen Sie bitte in das Feld \emph{Radio Name} ebenfalls in der Rubrik \emph{Radio Settings} ein.  
+<para>
+  Within the following sections, I want to guide you through these steps.
+</para>
 
-\subsection{Kontakte Anlegen} \label{sec:cp:contact}
-Nachdem Sie die grundlegenden Einstellungen vorgenommen haben, können Sie Ihre Kontaktliste zusammenstellen. 
-Diese sollte alle Sprechgruppen enthalten die Sie interessieren könnten, ihre persönlichen Kontakte wie OMs 
-aus dem OV und einige Servicenummern wie Echo, die SMS Dienste und den All Call. Eine Beispiel für Deutschland 
-ist in Tabelle \ref{tab:contacts} angegeben.
 
-<table xml:ns="tabIntroContacts">
+<section xml:id="introCPGeneral">
+<info><title>General radio-wide settings.</title></info>
+
+<para>
+  The single most options within the general settings is your DMR ID and your call sign. These 
+  options are usually located under the label <guilabel>Radio Settings</guilabel> or 
+  <guilabel>General Settings</guilabel><footnote><para>The actual name may vary from manufacturer
+    to manufactuer.</para></footnote>.
+  Your DMR ID is entered in the field name <guilabel>Radio ID</guilabel>. Many radios support to 
+  enter several DMR IDs. This feature is usually not used in ham radio. In fact you will only always
+  need a single DMR ID even with several radios.
+</para>
+
+<para>
+  Your call can be entered in the <guilabel>Radio Name</guilabel> field.
+</para>
+</section>
+
+
+<section xml:id="introCPContact">
+<info><title>Creating Contacts</title></info>
+
+<para>
+  Once you have made the basic settings, you may create some contacts in your contact list. This 
+  list should contain all talk groups you are interested in, some private contacts to OM you know
+  as well as some <quote>service numbers</quote> for the <quote>echo</quote>-service, SMS service 
+  etc. A sample is shown in <xref linkend="tabIntroContacts"/>.
+</para>
+
+<table xml:id="tabIntroContacts">
   <title>Example contacts for germany</title>
   <thead>
     <tr><td>Name</td> <td>Typ</td> <td>Nummer</td>  <td>Name</td> <td>Typ</td> <td>Nummer</td></tr>
@@ -108,32 +136,50 @@ ist in Tabelle \ref{tab:contacts} angegeben.
   </tbody>
 </table>
 
-Natürlich gibt es noch viele weitere Sprechgruppen auch zu spezifischen Themen, die nicht unbedingt regional 
-beschränkt sind. Eine recht vollständige Liste finden Sie unter \url{https://www.pistar.uk/dmr_bm_talkgroups.php}.
+<para>
+  Of cause there are much more talk groups. There are also talk groups for specific topics which 
+  are not necessarily targeted at a specific region. A rather complete list can be found in the 
+  <link xlink:href="https://wiki.brandmeister.network/index.php/TalkGroups">Brandmeister Wiki</link>.
+</para>
+</section>
 
 
-\subsection{Empfangsgruppen Zusammenstellen} \label{sec:cp:grouplist}
-Im nächsten Schritt stellen Sie sogenannte \adef{Empfangsgruppen} zusammen. Dies sind Listen von Gruppenrufen, 
-die Sie auf bestimmten Kanälen empfangen wollen. Wie schon bei der Einführung in Abschnitt \ref{sec:ursprung} 
-erwähnt, weiß das DMR Netz nicht, für welche Sprechgruppen Sie sich interessieren. Dies kann nur Ihr Funkgerät 
-wissen. Mit den Empfangsgruppen definieren Sie genau das. Sie werden mindestens drei Empfangsgruppen benötigen. 
-Eine für den Simplexbetrieb, eine für die überregionale Kommunikation und je eine für regionale Kommunikation 
-in all jenen Regionen, in denen Sie unterwegs sind.
+<section xml:id="introCPGroupList">
+<info><title>Assemble group lists</title></info>
 
-Die Simplex Empfangsgruppe ist eigentlich nicht notwendig, da Simplexrufe eigentlich immer den sog. \aref{All Call} 
-(Rundumruf) verwenden sollten. Häufig wird aber auch die Sprechgruppe TG99, TG9 oder auch TG8 verwendet. Daher ist 
-es ratsam eine Empfangsgruppe mit diesen Gruppenrufen anzulegen. 
+<para>
+  The next step is to assemble so-called <glossterm>Group List</glossterm>s. These are simple lists of 
+  talk groups that you want to receive on a particular channel. As mentioned in the introduction, the 
+  network does not know which talk groups you are interested in. This must be programmed into the radio.
+  Group lists do exactly that: The specify which talk groups you want to receive. All others are ignored.
+</para>
 
-Für die überregionale Kommunikation sollte eine Empfangsgruppe erstellt werden, die die Sprechgruppen für weltweite, 
-innereuropäische und deutschlandweite Kommunikation enthalten. Dieser Gruppe können Sie dann noch die Sprechgruppe 
-\emph{EMCOM EU} für europäischen Notfunk hinzufügen, damit Sie ggf. Notrufe hören und darauf reagieren können. 
+<para>
+  You should at least create two group lists. One for the simplex operation, one for regional communication
+  and optionally one for the trans-regional communication. You should also create one for each region you 
+  frequently visit.
+</para>
 
-Zuletzt sollte die Sprechgruppen für lokale/regionale Kommunikation angelegt werde. Diese sollte jeweils die 
-Sprechgruppen TG8 und TG9 sowie die Sprechgruppe der jeweiligen Region enthalten. Für mich, der in der Berlin/Brandenburg 
-Region lebt, aber häufig auch in Sachsen unterwegs ist, habe ich insgesamt 4 Empfangsgruppen zusammengestellt 
-(siehe Tab. \ref{tab:grouplist}).
+<para>
+  The simplex group list is theoretically not necessary as simplex calls should always use the so-called 
+  <glossterm>All Call</glossterm>. Frequently, however, also the talkgroups TG99, TG9 and TG8 are used 
+  in simplex operation. Hence a group list with these talk groups is needed for the simplex operation.
+</para>
+
+<para>
+  Your trans-regional talk group should include the talk groups for the entire world TG91, your 
+  continent (e.g., Europe TG92), your country (e.g., Germany TG262) and also the emergency talk 
+  group (e.g., 9112 in Europe).
+</para>
+
+<para>
+  Finally the talk group for the local/regional communication should contain the local TG9, 
+  regional TG8 and the talk group for your region (e.g., TG 2621 for my region Berlin/Brandenbug).
+  As I am also frequently in saxony, I also created a group list for that region. My sample 
+  group lists are shown in <xref linkend="tabIntroGroupLists"/>.
+</para>
   
-<table>
+<table xml:id="tabIntroGroupLists">
   <title>Example group lists</title>
   <thead>
     <tr><td>Name</td> <td>Group calls</td></tr>
@@ -145,8 +191,17 @@ Region lebt, aber häufig auch in Sachsen unterwegs ist, habe ich insgesamt 4 Em
     <tr><td>Sa/Th</td> <td>Local, Regional, Sa/Th</td></tr>
   </tbody>
 </table>
+</section>
 
-\subsection{Kanäle Anlegen} \label{sec:cp:channel}
+
+<section xml:id="introCPChannel">
+<info><title>Creating channels</title></info>
+
+<para>
+
+</para>
+</section>
+
 Bevor es los geht, sollte ich erwähnen, dass die meisten DMR Funkgeräte auch analoges FM unterstützen. Das heißt, 
 Sie können mit ihrem DMR Funkgerät auch normalen analogen FM Simplex und Repeaterbetrieb durchführen. In diesem 
 Abschnitt beschreibe ich aber nur die Konfiguration von DMR Kanälen (meist \emph{Digital Channel} genannt), die 

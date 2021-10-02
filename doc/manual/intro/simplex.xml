@@ -38,7 +38,7 @@
   number of DM3MAT in his address book. The direct answering to calls is only possible for several
   seconds after the end of the initial call. After that period (called <glossterm>Hang 
   Time</glossterm>) a press on the PTT will start a call to the default contact (see 
-  <xref linkend="introChannel"/>) associated with the simplex channel. 
+  <xref linkend="introCPChannel"/>) associated with the simplex channel.
 </para>
 
 <example xml:id="figIntroSplxGc">
