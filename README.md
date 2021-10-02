@@ -13,12 +13,14 @@ Currently, there are only few radios that are supported
 
   * Open GD77 firmware (since version 0.4.0)
   * Radioddity GD77 (since version 0.8.1)
-  * Baofeng/Radioddity RD-5R & RD-5R+
-  * TYT MD-UV390 / Retevis RT3S
+  * Baofeng/Radioddity RD-5R & RD-5R+ (since version 0.2.0)
+  * TYT MD-UV390 / Retevis RT3S (since version 0.3.0)
+  * TYT MD-2017 / Retevis RT82 (since version 0.9.0)
   * Anytone AT-D878UV (since version 0.5.0)
   * Anytone AT-D868UVE (since version 0.7.0)
   * Anytone AT-D878UVII (since version 0.8.0)
   * Anytone AT-D578UV (since version 0.8.0)
+  * BTECH DMR-6x2 (since version 0.5.0)
 
 A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available. 
 The limited amount of supported radios is due to the fact that I only
@@ -29,7 +31,8 @@ own these radios to test the software with.
 <a href="https://repology.org/project/qdmr/versions">
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
-
+ 
+ * **[Version 0.9.0-alpha](https://github.com/hmatuschek/qdmr/releases/tag/v0.9.0-alpha)** -- Reworked core library, added support for TyT MD-2017/Retevis RT82.
  * **[Version 0.8.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.8.1)** -- Fixed Radioddity GD-77 support (callsign db still buggy).
  * **[Version 0.7.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.7.0)** -- Added AT-D868UVE support and many bugfixes.
  * **[Version 0.6.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.6.4)** -- Added APRS & roaming for AT-D878UV.
