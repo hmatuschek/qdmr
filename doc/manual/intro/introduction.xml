@@ -37,6 +37,8 @@
 <xi:include href="textmessages.xml"/>
 <xi:include href="talkgroup.xml"/>
 <xi:include href="roaming.xml"/>
+<xi:include href="technicalbackground.xml"/>
+<xi:include href="codeplug.xml"/>
 <xi:include href="networks.xml"/>
 
 </chapter>

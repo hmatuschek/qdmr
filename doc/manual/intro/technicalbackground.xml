@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="introTech" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Technical background</title>
+</info>
+
+<para>
+  In the previous sections, I tried to explain the basic concepts of the DMR operation. That is the
+  repeater independent private and group calls. This section concerns the more technical 
+  details of the DMR mode. In particular the <glossterm>Time Slot</glossterm> and <glossterm>Color 
+  Code</glossterm>.
+</para>
+
+
+<section xml:id="introTimeSlot"> 
+<info><title>Time Slots</title></info>
+<para>
+  As mentioned before, DMR is a digital mode. The speech signal is first digitized and compressed 
+  with a lossy compression codec. The latter is also called <glossterm>VOCODER</glossterm>. Modern 
+  codecs are very efficient and allow to transfer two independent speech signals within a single 
+  12.5kHz wide channel. This is exploited in DMR using a technique called 
+  <glossterm>TDMA</glossterm>.
+</para>
+
+<informalfigure>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/timeslot.png" width="7cm" align="center"/></imageobject>
+  </mediaobject>
+</informalfigure>
+
+<para>
+  <glossterm>TDMA</glossterm> means <quote>time-division media access</quote> and means that two 
+  independent calls can happen simultaneously on one physical channel. To achieve this, each call
+  is assigned a <glossterm>Time Slot</glossterm> (time slot 1 &amp; 2) and both are transmitting 
+  and receiving only within their assigned time slot. These time slots are very short. For DMR they
+  are only 30ms long. This short time, however, is sufficient to transfer audio for at least 60ms.
+  DMR therefore allows for two independent and simultaneous calls on a single channel.
+</para>
+
+<para>
+  Who or better when time slot 1 or 2 happens, is determined by the repeater. The repeater defines
+  the beat. This also implies that time slots are irrelevant for the simplex operation. Thus you 
+  can ignore the time slot settings when programming simplex channels. (see 
+  <xref linkend="introCodeplug"/>).
+</para>
+
+<note>
+  <para>
+    What happens on each time slot, is a convention defied by the repeater. A general suggestion is
+    that regional communication happens on the time slot 2 while trans-regional communication 
+    should happen on time slot 1.
+  </para>
+</note>
+</section>
+
+
+<section xml:id="introColorCode">
+<info><title>Color Codes</title></info>
+
+<para>
+  <glossterm>Color Code</glossterm>s are a technical tool to avoid conflicts between repeaters 
+  operating on the same frequency. This usually happens in commercial applications of DMR. One 
+  company usually gets only a small number of frequencies assigned. To cover the entire campus, 
+  much more repeaters are needed than frequencies are available. Consequently, overlapping 
+  repeater ranges on the same frequency will occur and two repeaters may receive the call of a 
+  participant. Then, the color code allows the repeater to detect whether a call was intended 
+  for it. Only if the color code of a call matches the color code of the repeater, the repeater
+  will react on that call. 
+</para>
+
+<para>
+  This issue usually does not arise in amateur radio applications. We just have enough channels.
+  Hence the color code is usually set to 1. In very densely populated areas, however, overlapping 
+  repeater ranges may still occur and different color codes might be used there.
+</para>
+
+<note>
+  <para>
+    To use a repeater, you not only need to know the input and output frequencies but also the 
+    color code of the repeater.
+  </para>
+</note>
+</section>
+
+</section>

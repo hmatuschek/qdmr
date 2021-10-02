@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="introCodeplug" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Codeplug Assembly</title>
+</info>
+
+Nachdem Sie sich mit den Konzepten und dem technischen Hintergrund von DMR auseinandergesetzt 
+haben, geht es nun an die Konfiguration Ihres Funkgerätes. Dies geschieht üblicherweise nicht über 
+das Bedienfeld des Funkgerätes, sonder mit Hilfe einer separaten Software, der sogenannten 
+\adef{CPS} oder \emph{codeplug programming software}. 
+
+Doch bevor Sie loslegen können benötigen Sie wie alle DMR Teilnehmer eine eindeutige Nummer, die 
+DMR ID.
+\begin{hinweis}
+ Ihre persönliche und eindeutige DMR ID erhalten Sie unter \url{https://register.ham-digital.org/}. 
+ Da Sie nachweisen müssen, dass Sie lizenzierter Funkamateur sind, müssen Sie bei der Anmeldung ihre 
+ eingescannte \emph{Zulassung zum Amateurfunkdienst} hochladen.
+\end{hinweis}
+Ihre DMR ID erhalten Sie in der Regel innerhalb von 24 Stunden per Mail. Sobald Sie eine DMR ID 
+erhalten haben kann es los gehen.
+
+Da dieses Script für Einsteiger gedacht ist, ist es wahrscheinlich, dass Sie kein top-shelf Motorola 
+Gerät sondern eher ein günstiges Gerät der einschlägig bekannten chinesischen Hersteller besitzen. 
+
+\begin{achtung}
+ Falls Sie noch kein DMR fähiges Funkgerät besitzen und mit dem Gedanken spielen eines zu kaufen, 
+ achten Sie unbedingt darauf, dass es DMR \textbf{Tier I &amp; II}\footnote{Wie so häufig ist DMR nicht 
+  ein Standard sondern eine ganze Familie von aufeinander aufbauenden Standards. DMR Tier I beschreibt 
+  im wesentlichen den DMR Simplexbetrieb und Tier II dann den Repeaterbetrieb mit zwei Zeitschlitzen. 
+  Sie benötigen also unbedingt Tier II für den Repeaterbetrieb.} unterstützt. Ignorieren Sie etwaiges 
+  Marketing-Bla-Bla der Hersteller und schauen Sie in den technischen Details nach, ob dort DMR 
+  \textbf{Tier I &amp; II} erwähnt wird. Falls nicht oder nicht eindeutig, lassen Sie die Finger von diesem 
+  Gerät! Dies gilt vor allem für das Baofeng MD-5R aber nicht für das Baofeng/Radioddity 
+  RD-5R\footnote{Manchmal sind es die kleinen Unterschiede die entscheidend sind.}. 
+\end{achtung}
+
+Der Hersteller Ihres Gerätes wird auf seiner Webseite die Software die Sie zur Konfiguration benötigen, 
+zum Download bereitstellen. Diese Software wird \emph{CPS} oder \emph{codeplug programming software} 
+genannt. Gegebenenfalls finden Sie dort auch Firmwareupdates für Ihr Gerät. Viele Hersteller bieten für 
+jedes einzelne Modell eine separate CPS an oder gar für jede Variation eines Modells. Achten Sie also 
+genau darauf welche CPS Sie herunterladen. Die Konfiguration dieser Geräte unterscheidet sich von Gerät 
+zu Gerät und mehr noch von Hersteller zu Hersteller. Jedoch sind die wesentlichen Einstellungen für Geräte 
+dieser Klasse sehr ähnlich.
+
+Wenn Sie die CPS zum ersten mal starten, werden Sie wahrscheinlich zwei Dinge feststellen. Erstens, das 
+Bedienkonzept dieser Software ist aus dem letzten Jahrtausend (Windows 3.11) und Zweitens, es gibt eine 
+Unmenge an obskuren Optionen deren Funktion nicht ersichtlich ist und die größtenteils nicht Dokumentiert 
+sind. Wenn Sie des Englischen nicht mächtig sind, werden Sie auch eine deutsche Übersetzung des Programms 
+vermissen. Aber keine sorge, die englische Übersetzung ist meist auch so schlecht, dass es keinen 
+Unterschied macht ob sie Englisch lesen können oder nicht.
+
+Die Konfiguration Ihres Funkgerätes erfolgt in 5-6 Schritten:
+\begin{enumerate}
+ \item Allgemeine Einstellungen,
+ \item Kontakte anlegen,
+ \item Empfangsgruppen festlegen,
+ \item alle Kanäle anlegen,
+ \item Kanäle in Zonen einteilen und
+ \item optional Scanlisten anlegen.
+\end{enumerate}
+
+In den folgenden Abschnitten möchte ich die einzelnen Konfigurationsschritte im Detail beschreiben.
+
+\subsection{Allgemeine Konfiguration} \label{sec:cp:basic}
+Die wichtigsten allgemeinen Einstellungen die Sie vornehmen müssen, ist das setzen der DMR ID und ihres 
+Rufzeichens. Diese Optionen finden Sie meist unter der Rubrik (linke Seite) \emph{Radio Settings} oder 
+\emph{General Settings}\footnote{Die exakten Namen der Rubriken und Felder kann sich von Hersteller zu 
+  Hersteller unterscheiden. Üblicherweise sind sie aber den hier erwähnten Namen sehr ähnlich.}. Ihre DMR 
+  ID tragen Sie dann in das Feld \emph{Radio ID} ein. Es ist durchaus möglich, dass Ihr Funkgerät mehrere 
+  DMR IDs unterstützt. Dieses Feature wird aber üblicherweise nicht verwendet. Im Gegenteil: Es stehen nur
+  eine begrenzte Anzahl von DMR IDs sehr vielen Funkamateuren gegenüber. Beantragen sie deshalb niemals 
+  eine DMR ID für jedes Funkgerät oder jeden Accesspoint. Eine \textbf{einzige} persönliche DMR Nummer 
+  reicht völlig! 
+
+Ihr Rufzeichen tragen Sie bitte in das Feld \emph{Radio Name} ebenfalls in der Rubrik \emph{Radio Settings} ein.  
+
+\subsection{Kontakte Anlegen} \label{sec:cp:contact}
+Nachdem Sie die grundlegenden Einstellungen vorgenommen haben, können Sie Ihre Kontaktliste zusammenstellen. 
+Diese sollte alle Sprechgruppen enthalten die Sie interessieren könnten, ihre persönlichen Kontakte wie OMs 
+aus dem OV und einige Servicenummern wie Echo, die SMS Dienste und den All Call. Eine Beispiel für Deutschland 
+ist in Tabelle \ref{tab:contacts} angegeben.
+
+<table xml:ns="tabIntroContacts">
+  <title>Example contacts for germany</title>
+  <thead>
+    <tr><td>Name</td> <td>Typ</td> <td>Nummer</td>  <td>Name</td> <td>Typ</td> <td>Nummer</td></tr>
+  </thead>
+  <tbody>
+    <tr><td>Local</td>       <td>group call</td> <td>9</td>     <td>Ham/SlHo</td>  <td>group call</td> <td>2622</td></tr>
+    <tr><td>Regional</td>    <td>group call</td> <td>8</td>     <td>NiSa/Bre</td>  <td>group call</td> <td>2623</td></tr>
+    <tr><td>TG99</td>        <td>group call</td> <td>99</td>    <td>NRW</td>       <td>group call</td> <td>2624</td></tr>
+    <tr><td>All call</td>    <td>all call</td> <td>16777215</td> <td>RhPf/Saar</td> <td>group call</td> <td>2625</td></tr>
+    <tr><td>World wide</td>  <td>group call</td> <td>91</td>    <td>Hessen</td>    <td>group call</td> <td>2626</td></tr>
+    <tr><td>Europe</td>      <td>group call</td> <td>92</td>    <td>BaWü</td>      <td>group call</td> <td>2627</td></tr>
+    <tr><td>D-A-CH</td>      <td>group call</td> <td>920</td>   <td>Bay</td>       <td>group call</td> <td>2628</td></tr>
+    <tr><td>Germany</td>     <td>group call</td> <td>262</td>   <td>Sa/Th</td>     <td>group call</td> <td>629</td></tr>
+    <tr><td>Austria</td>     <td>group call</td> <td>232</td>   <td>Echo Test</td> <td>private call</td> <td>262997</td></tr>
+    <tr><td>Switzerland</td> <td>group call</td> <td>228</td>   <td>SMS Serv.</td> <td>private call</td> <td>262993</td></tr>
+    <tr><td>EMCOM EU</td>    <td>group call</td> <td>9112</td>  <td>DAPNET</td>    <td>private call</td> <td>262994</td></tr>
+    <tr><td>EMCOM WW</td>    <td>group call</td> <td>9911</td>  <td>APRS GW</td>   <td>private call</td> <td>262999</td></tr>
+    <tr><td>MeVo/SaAn</td>   <td>group call</td> <td>2620</td>  <td>DM3MAT</td>    <td>private call</td> <td>2621370</td></tr>
+    <tr><td>Ber/Bra</td>     <td>group call</td> <td>2621</td>  <td>...</td>       <td>...</td>          <td>...</td></tr>
+  </tbody>
+</table>
+
+Natürlich gibt es noch viele weitere Sprechgruppen auch zu spezifischen Themen, die nicht unbedingt regional 
+beschränkt sind. Eine recht vollständige Liste finden Sie unter \url{https://www.pistar.uk/dmr_bm_talkgroups.php}.
+
+
+\subsection{Empfangsgruppen Zusammenstellen} \label{sec:cp:grouplist}
+Im nächsten Schritt stellen Sie sogenannte \adef{Empfangsgruppen} zusammen. Dies sind Listen von Gruppenrufen, 
+die Sie auf bestimmten Kanälen empfangen wollen. Wie schon bei der Einführung in Abschnitt \ref{sec:ursprung} 
+erwähnt, weiß das DMR Netz nicht, für welche Sprechgruppen Sie sich interessieren. Dies kann nur Ihr Funkgerät 
+wissen. Mit den Empfangsgruppen definieren Sie genau das. Sie werden mindestens drei Empfangsgruppen benötigen. 
+Eine für den Simplexbetrieb, eine für die überregionale Kommunikation und je eine für regionale Kommunikation 
+in all jenen Regionen, in denen Sie unterwegs sind.
+
+Die Simplex Empfangsgruppe ist eigentlich nicht notwendig, da Simplexrufe eigentlich immer den sog. \aref{All Call} 
+(Rundumruf) verwenden sollten. Häufig wird aber auch die Sprechgruppe TG99, TG9 oder auch TG8 verwendet. Daher ist 
+es ratsam eine Empfangsgruppe mit diesen Gruppenrufen anzulegen. 
+
+Für die überregionale Kommunikation sollte eine Empfangsgruppe erstellt werden, die die Sprechgruppen für weltweite, 
+innereuropäische und deutschlandweite Kommunikation enthalten. Dieser Gruppe können Sie dann noch die Sprechgruppe 
+\emph{EMCOM EU} für europäischen Notfunk hinzufügen, damit Sie ggf. Notrufe hören und darauf reagieren können. 
+
+Zuletzt sollte die Sprechgruppen für lokale/regionale Kommunikation angelegt werde. Diese sollte jeweils die 
+Sprechgruppen TG8 und TG9 sowie die Sprechgruppe der jeweiligen Region enthalten. Für mich, der in der Berlin/Brandenburg 
+Region lebt, aber häufig auch in Sachsen unterwegs ist, habe ich insgesamt 4 Empfangsgruppen zusammengestellt 
+(siehe Tab. \ref{tab:grouplist}).
+  
+<table>
+  <title>Example group lists</title>
+  <thead>
+    <tr><td>Name</td> <td>Group calls</td></tr>
+  </thead>
+  <tbody>
+    <tr><td>Simplex</td> <td>Local, Regional, TG99</td></tr>
+    <tr><td>WW/EU/DL</td> <td>World wide, Europe, D-A-CH, Germany, EMCOM EU</td></tr>
+    <tr><td>Ber/Bra</td> <td>Local, Regional, Ber/Bra</td></tr>
+    <tr><td>Sa/Th</td> <td>Local, Regional, Sa/Th</td></tr>
+  </tbody>
+</table>
+
+\subsection{Kanäle Anlegen} \label{sec:cp:channel}
+Bevor es los geht, sollte ich erwähnen, dass die meisten DMR Funkgeräte auch analoges FM unterstützen. Das heißt, 
+Sie können mit ihrem DMR Funkgerät auch normalen analogen FM Simplex und Repeaterbetrieb durchführen. In diesem 
+Abschnitt beschreibe ich aber nur die Konfiguration von DMR Kanälen (meist \emph{Digital Channel} genannt), die 
+Konfiguration von sogenannten \emph{analogen} Kanälen wird hier nicht beschrieben. Um einen DMR Kanal anzulegen, 
+müssen Sie im Feld \emph{Channel Type} den Wert \emph{digital} auswählen, für einen FM Kanal dann \emph{analog}.
+
+Wenn Sie schon Erfahrung mit dem \emph{klassischen} FM-Relaisbetrieb haben, wird Ihnen das Anlegen der Kanäle 
+recht seltsam vorkommen. Im analogen FM-Relaisbetrieb haben Sie für jeden Repeater und Simplex-Kanal genau einen 
+Kanal im Funkgerät konfiguriert. Für den DMR Betrieb werden Sie für jeden Repeater mindestens zwei 
+(für Zeitschlitz 1 &amp; 2), meist aber deutlich mehr Kanäle programmieren. Lange Rede kurzer Sinn. Lassen Sie 
+mich das an konkreten Beispielen erläutern.
+
+<!-- \subsubsection{Simplexkanäle Anlegen}
+\begin{table}[!ht]
+ \begin{tabular}{|l|p{2.5cm}|p{2.5cm}|c|c|c|c|} \hline
+ Name       & RX Freq. (Ausgabe) & TX Freq. (Eingabe) & TS\footnote{Seteht für \emph{Time Slot} also Zeitschlitz.} & CC\footnote{Steht für \emph{Color Code} also Farbcode.} & TX Kontakt & Empf.gr. \\ \hline
+ DMR S0     & $433.4500 MHz$     & $433.4500 MHz$     & 1           & 1        & Rundumruf  & Simplex \\
+ DMR S1     & $433.6125 MHz$     & $433.6125 MHz$     & 1           & 1        & Rundumruf  & Simplex \\
+ ...        & ...                & ...                & ...         & ...      & ...        & ... \\ \hline
+ \end{tabular}
+ \caption{Beispieltabelle für die DMR Simplexkanäle.} \label{tab:ch:simplex}
+\end{table}-->
+
+In Tabelle \ref{tab:ch:simplex} sind exemplarisch die Einstellungen der ersten 2 DMR Simplexkanäle aufgeführt. 
+Sie sollten diese natürlich auf alle 8 DMR Simplexkanäle erweitern. Die erste Spalte gibt einfach den Namen 
+des Kanals an. 
+
+Die zweite und dritte Spalte geben die Sende- (TX) und Empfangsfrequenz (RX) des Kanals an. Da es sich hier um 
+Simplexkanäle handelt werden natürlich jeweils die gleichen Frequenzen für RX und TX eingetragen. 
+
+Im \aref{Simplexbetrieb} gibt es keinen Repeater, der den Takt angeben könnte. Daher ist die Wahl des 
+Zeitschlitzes für Simplexkanäle egal. Üblicherweise wird hier einfach der Zeitschlitz 1 ausgewählt.
+
+Der Farbcode (Spalte 5) ist aber nicht egal. Repeater sowie auch Ihr Funkgerät akzeptieren nur dann eine 
+Aussendung, wenn der Farbcode der Aussendung mit der Einstellung für den Kanal übereinstimmt. Bei Simplexkanälen 
+hat man sich daher auf den Farbcode 1 geeinigt. 
+
+Die sechste Spalte gibt den Standardkontakt für diesen Kanal an. Bei Simplexkanälen sollte hier immer der sogenannte. 
+\aref{Rundumruf} (All Call) eingetragen werden. Das bedeutet, dieser \emph{Kontakt} wird immer angerufen, wenn sie 
+diesen Kanal auf dem Funkgerät eingestellt haben und auf die PTT Taste drücken. Eine Ausnahme bildet das Antworten 
+auf einen Ruf. Wenn Sie zum Beispiel einen Gruppenruf zur Sprechgruppe TG99 auf dem Simplexkanal empfangen und innerhalb 
+der kurzen \aref{Hangtime} darauf antworten, werden sie nicht mit dem voreingestellten Rundumruf antworten, sondern 
+mit dem Gruppenruf zur Sprechgruppe TG99. Dieses Verhalten ist sehr erwünscht, da es Ihnen ermöglicht auf auf 
+Direktrufe an Sie mit einem Direktruf zu Antworten.  
+
+Die letzte Spalte gibt die Empfangsgruppe des Kanals an. Damit wird festgelegt welche Sprechgruppen auf diesem Kanal 
+empfangen werden sollen. Wie oben schon erwähnt, wäre hier eigentlich keine Eintragung nötig wenn alle Teilnehmer 
+auf den Simplexkanälen den Rundumruf verwenden würden. Es werden aber durchaus sehr unterschiedliche Sprechgruppen 
+auf den Simplexkanälen verwendet. Für diese Fälle hatten wir ja die Empfangsgruppe \emph{Simplex} zusammengestellt. 
+
+In Ihrer CPS finden sie noch sehr viel mehr Optionen zu den Kanälen. Die Meisten können auf den Standardwerten 
+belassen werden. Am Ende dieses Abschnittes beschreibe ich noch eine Reihe weiterer Optionen. Viele dieser Optionen 
+betreffen Funktionen, die im Amateurfunk aber keine Verwendung finden. 
+
+Die Option \adef{Admit Criterion} definiert unter welchen Umständen das senden auf dem Kanal vom Funkgerät erlaubt 
+wird. Hier stellen Sie bitte \emph{Channel Free} ein. Dies bedeutet, dass sie nur senden dürfen, wenn der Simplexkanal frei ist.  
+
+\subsubsection{Repeaterkanäle Anlegen}
+Das Anlegen von Repeater Kanälen ist etwas aufwendiger als das Anlegen von Simplexkanälen, da für jeden Repeater 
+gleich mehrere Kanäle definiert werden. Bevor Sie anfangen können Repeaterkanäle anzulegen, müssen Sie natürlich erst 
+herausfinden welche Repeater sich in Ihrer Nähe befinden. Eine gute Übersicht bietet Ihnen die Seite 
+\url{https://repeatermap.de/}. Sie können dort unter Filter die Anzeige auf DMR Repeater beschränken. Dort finden Sie 
+auch alle wichtigen Information zu den jeweiligen Repeatern. Das heißt deren Eingabe- und Ausgabefrequenzen und Farbcodes. 
+Diese Informationen benötigen Sie unbedingt um Kanäle für diesen Repeater anlegen zu können.
+
+<!-- \begin{sidewaystable}[p]
+ \centering
+ \begin{tabular}{|l|c|c|c|c|c|c|} \hline
+  Name             & RX Freq. (Ausgabe) & TX Freq. (Eingabe) & TS\footnote{Seteht für \emph{Time Slot} also Zeitschlitz.} & CC\footnote{Steht für \emph{Color Code} also Farbcode.} & TX Kontakt & Empf.gr. \\ \hline
+  DB0LDS TS1       & $439.5625 MHz$ & $431.9625 MHz$ & 1 & 1 & -         & WW/EU/DL \\
+  DB0LDS DL TS1    & $439.5625 MHz$ & $431.9625 MHz$ & 1 & 1 & Deutschland & WW/EU/DL \\
+  DB0LDS Sa/Th TS1 & $439.5625 MHz$ & $431.9625 MHz$ & 1 & 1 & Sa/Th       & Sa/Th \\
+  DB0LDS TG9 TS2    & $439.5625 MHz$ & $431.9625 MHz$ & 2 & 1 & L9          & Ber/Bra \\
+  DB0LDS TG8 TS2    & $439.5625 MHz$ & $431.9625 MHz$ & 2 & 1 & L8          & Ber/Bra \\
+  DB0LDS BB TS2    & $439.5625 MHz$ & $431.9625 MHz$ & 2 & 1 & Ber/Bra     & Ber/Bra \\ \hline
+ \end{tabular}
+ \caption{Beispielkonfiguration der Kanäle für den Repeater DB0LDS in Wildau bei Berlin.} \label{tab:ch:repeater}
+\end{sidewaystable} //-->
+
+Ich denke, es ist am einfachsten Ihnen am Beispiel meiner eigenen Kanalliste (Tab. \ref{tab:ch:repeater}) für 
+\textbf{einen} Repeater in meiner Nähe das Anlegen von Repeaterkanälen zu beschreiben. Der Repeater heißt DB0LDS und 
+hat die Eingabe Frequenz $431.9625 MHz$ und die Ausgabe Frequenz $439.5625 MHz$. Des Weiteren erwartet er den 
+Farbcode 1. Dies sind die elementaren Informationen zu diesem Repeater, die Sie von diversen Repeaterlisten und Karten 
+erhalten. Diese Informationen müssen sie natürlich für alle Kanäle die diesen Repeater betreffen, eintragen.
+
+Am Ende des Abschnitts \ref{sec:timeslot} hatte ich erwähnt, dass überregionaler Funkverkehr auf Zeitschlitz 1 und 
+Regionaler auf Zeitschlitz 2 stattfinden. Dies wurde in dieser Konfiguration umgesetzt. 
+
+Der Erste Kanal \emph{DL0LDS TS1} ist ein generischer Kanal für den Zeitschlitz eins. Er besitzt keinen Standardkontakt 
+aber eine Empfangsgruppe für die Sprechgruppen Welt, Europa und Deutschland. Dieser Kanal dient dazu, beliebige (überregionale) 
+Gruppen- und Direktrufe aus der Kontaktliste heraus zu führen. Das heißt, um auf diesem Kanal ein QSO zu starten, kann nicht 
+einfach die PTT Taste gedrückt werden. Denn dazu fehlt dem Kanal der Standardkontakt. Es muss erst ein Kontakt aus der 
+Kontaktliste ausgewählt werden, der angerufen werden soll. 
+
+Der zweite Kanal (\emph{DL0LDS DL TS1}) ist identisch zum Ersten bis auf den Standardkontakt\index{Kanal!Standardkontakt}. 
+Hier ist die Sprechgruppe \emph{Deutschland} (TG262) eingetragen. Das bedeutet, wenn dieser Kanal im Funkgerät ausgewählt ist 
+und die PTT Taste gedrückt wird, wird direkt ein Gruppenruf an diese Sprechgruppe gestartet. Einen extra Kanal für diese 
+Sprechgruppe anzulegen, erlaubt es diesen Gruppenruf zu starten ohne ihn erst in der Kontaktliste auswählen zu müssen. Auch ist 
+es so möglich, diese Sprechgruppe schnell temporär auf diesem Repeater zu abonnieren\footnote{Die Sprechgruppe TG262 
+  (Deutschland) ist für diesen Repeater nicht permanent auf Zeitschlitz 1 abonniert.} indem kurz die PTT Taste gedrückt wird 
+  (siehe Abschnitt \ref{sec:talkgroup}).
+
+\begin{merke}
+ Auf jedem Kanal kann auf einen eingehenden Ruf innerhalb der sogenannten \aref{Hangtime} geantwortet werden, egal welcher 
+ Standardkontakt für diesen Kanal festgelegt wurde. 
+\end{merke} 
+
+Ähnlich verhält es sich mit dem dritten Kanal (\emph{DB0LDS Sa/Th TS1}). Hier ist als Standardkontakt die Sprechgruppe 
+\emph{Sachsen/Thüringen} (TG2629) eingestellt um diese schnell und leicht über diesen Repeater erreichen und temporär 
+abonnieren zu können. Bitte beachten Sie, das für diesen Kanal der Zeitschlitz 1 verwendet wird. Der Repeater befindet sich 
+in Brandenburg. Somit sollte die Kommunikation mit Sachsen oder Thüringen im Zeitschlitz für überregionale QSOs geführt werden. 
+Des weiteren ist als Empfangsgruppe die regionale Empfangsgruppe für Sachsen &amp; Thüringen angegeben. Das bedeutet, dass 
+Gruppenrufe an die überregionalen Sprechgruppen wie \emph{Deutschland} (TG262) auf diesem Kanal nicht empfangen werden, auch
+ wenn er auf Zeitschlitz TS1 liegt.
+
+Kanäle vier, fünf und sechs sind für die lokale (TG9, nur auf diesem Repeater), regionale (TG8, im regionalen Repeaterverbund) 
+und Berlin-Brandenburg-weite Kommunikation (TG2621). All diese Kanäle sind auf Zeitschlitz 2, da es sich um regionale 
+Kommunikation handelt und haben als Empfangsgruppe \emph{Ber/Bra} gesetzt. Das heißt, auf diesen Kanälen werden die Sprechgruppen 
+TG8, TG9 und TG2621 empfangen. Als Standardkontakt wurde die entsprechenden Sprechgruppen gesetzt. Wird auf dem Funkgerät nun der
+ Kanal \emph{DB0LDS TG9 TS2} ausgewählt, so wird beim drücken der PTT Taste ein Gruppenruf an die lokale Sprechgruppe (TG9) von 
+ nur diesem Repeater ausgesandt. Wird jedoch der Kanal \emph{DB0LDS BB TS2} ausgewählt, wird beim Drücken der PTT Taste ein 
+ Gruppenruf an die Sprachgruppe \emph{Berlin/Brandenburg} (TG2621) gestartet und somit fast überall in Berlin und Brandenburg gehört.
+
+\begin{merke}
+ Auf jedem Kanal kann ein beliebiger Ruf (Gruppen, Direkt, Rundum) gestartet werden indem entweder der entsprechende Kontakt in 
+ der Kontaktliste ausgewählt wird oder die DMR Nummer eingegeben wird. Dies ist unabhängig vom Standardkontakt des Kanals. 
+ Letztendlich dient der Standardkontakt eines Kanals der Bequemlichkeit. So können dedizierte Kanäle für häufig getätigte Rufe 
+ definiert werden.
+\end{merke}
+
+Das sogenannte \emph{Admit Criterion} sollte für alle Repeaterkanäle auf \emph{Color Code} gesetzt werden. Dies bedeutet, dass Ihr 
+Funkgerät nur dann sendet, wenn der Kanal frei ist und der Farbcode des Repeaters mit dem Farbcode des Kanals übereinstimmt.
+
+\subsubsection{Weitere Kanaloptionen}
+Die Maske, mit der Sie Kanäle konfigurieren ist recht umfangreich. Es gibt eine Vielzahl an Optionen die das Verhalten dieses Kanals 
+beeinflussen. Die meisten dieser Optionen werden im Amateurfunk aber nicht verwendet. Dennoch möchte ich diese hier kurz erklären.
+
+Die \aref{Admit Criterion} Option hatte ich zuvor schon erwähnt. Sie liegt fest, unter welchen Umständen das Funkgerät ihnen erlaubt 
+auf dem Kanal zu senden. Meist stehen hier drei Möglichkeiten zu Verfügung. \emph{Always} bedeutet, dass Sie immer senden dürfen. 
+\emph{Channel Free} bedeutet, dass der Kanal frei sein muss, damit Sie senden dürfen. Und \emph{Color Code} bedeutet, dass nicht nur 
+der Kanal frei sein muss, sonder auch der Farbcode des Repeaters stimmen muss. Daher macht es Sinn \emph{Channel Free} für 
+Simplexkanäle und \emph{Color Code} für Repeaterkanäle zu wählen.
+
+Die Option \adef{TOT} oder auch \adef{TX Timeout} legt die maximale Dauer einer Aussendung fest. Das heißt, wenn Sie die PTT Taste 
+länger als diese Zeitspanne drücken, wird das Funkgerät Ihre Aussendung unterbrechen. Dies ist eine Funktion für den kommerziellen 
+Einsatz, die verhindert, dass eine Fehlbedienung das DMR Netz oder auch einen Repeater blockiert. Im Amateurfunk macht dies wenig 
+Sinn. Daher können Sie diese Option auf \emph{unendlich} stellen.
+
+Die Option \adef{Emergency System} legt das Alarm- oder Notrufsystem für diesen Kanal fest. Auch dies ist eine Funktion für den 
+kommerziellen Einsatz und wird im Amateurfunk nicht verwendet.
+
+Die Option \adef{Privacy Group} legt die Verschlüsselung der Aussendungen für diesen Kanal fest. Diese Funktion darf im Amateurfunk 
+gar nicht verwendet werden.
+
+Die Optionen \adef{Emergency Alarm Confirmed}, \adef{Private Call Confirmed} und \adef{Data Call Confirmed}, legen fest, wie das 
+Funkgerät Alarme, Direktrufe und Datenübermittlung durchführt. Sind diese Optionen angewählt, versucht das Funkgerät erst eine Verbindung 
+zum Ziel herzustellen, bevor Sie sprechen dürfen. Das heißt, das Funkgerät sendet zunächst eine Anfrage an das Ziel. Erst wenn diese 
+Anfrage vom Ziel positiv beantwortet wurde, ertönt ein Ton und Sie können sprechen. Wenn diese Optionen nicht angewählt sind, fangen Sie 
+sofort an Sprachdaten an das Ziel zu senden. Ich empfehle Ihnen diese Option nicht anzuwählen.
+
+Die Option \adef{Talkaround} erlaubt es Ihnen auf einem Repeaterkanal Simplexbetrieb zu fahren. Das heißt, Sie werden auf der 
+Repeaterausgabefrequenz senden und empfangen. Dabei umgehen sie natürlich den Repeater selbst. Daher wird dieses Feature im 
+Amateurfunk nicht verwendet.
+
+Wenn die Option \adef{RX Only} angewählt ist, können Sie auf diesen Kanal nicht senden.
+
+Die Option \adef{VOX} bedeutet \altdef{Voice Operated Switch}{VOX} und erlaubt es Ihnen automatisch von Empfang auf Senden 
+umzuschalten sobald sie in das Mikrofon sprechen. Dies lässt sich bei einigen Funkgeräten pro Kanal oder aber auch in den 
+allgemeinen Einstellungen aktivieren.
+
+Die Option \adef{Power} legt die Sendeleistung auf diesen Kanal fest. Wenn Sie sich direkter Nähe des Repeaters befinden, 
+können Sie die Sendeleistung reduzieren um die Batterielaufzeit bei Handfunkgeräten zu erhöhen. 
+
+Diese optionale Kanaleinstellung \aref{Scanlist} definiert welche Liste von Kanälen gescannt werden, wenn der Scan auf diesem 
+Kanal gestartet wird. Es ist nicht zwingend notwendig, dass der Kanal selbst in dieser Scanliste enthalten ist.
+
+
+\subsection{Zonen Zusammenstellen} \label{sec:zone} \index{Zone}
+Wenn Sie nun alle für Sie interessanten Kanäle erstellt haben, werden Sie feststellen, dass die Liste doch schon recht lang und 
+unübersichtlich ist. Alle DMR Funkgeräte organisieren daher die Kanäle in sogenannten Zonen. Diese Zonen sind einfach nur Listen 
+von Kanälen. Wie Sie diese Listen zusammenstellen, ist allein Ihnen überlassen. Sie können die Kanäle nach Region zusammenfassen 
+wie \emph{Zu Hause}, \emph{Arbeit}, \emph{Urlaub} etc.. 
+
+Sie können sie auch nach Sprechgruppen sortieren. So können Sie ein quasi händisches Roaming für eine bestimmte Sprechgruppe 
+realisieren. Wenn Sie dann im Auto unterwegs sind, können Sie im Funkgerät immer jenen Repeater aus der Zone auswählen, den Sie 
+gerade erreichen können. Somit bleiben Sie immer mit dieser Sprechgruppe verbunden. Einige (eher teurere) Funkgeräte unterstützen 
+dies mit einer automatischen Roamingfunktion, bei der der jeweils stärkste Repeater an Ihrem Standort ausgewählt wird.
+
+\begin{hinweis}
+ Kanäle, die keiner Zone zugeordnet wurden, können nicht im Funkgerät ausgewählt werden. Es ist aber problemlos möglich, einen 
+ Kanal mehreren Zonen zuzuordnen.
+\end{hinweis}
+
+\subsection{Scanlisten Zusammenstellen}
+Scanlisten sind einfach Listen von Kanälen, die beim Starten der Scanfunktion sequenziell beobachtet werden. Wird ein Signal 
+auf einem der Kanäle empfangen, wird der Scan unterbrochen und es kann dann auf diesen empfangenen Ruf geantwortet werden. Diese 
+Funktion erlaubt es mehrere Kanäle zu beobachten. Zusätzlich können Sie bei vielen Geräten ein oder zwei Prioritätskanäle definieren 
+werden, die während des Scans häufiger \emph{besucht} und somit \emph{intensiver} beobachtet werden.
+
+</section>
