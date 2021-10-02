@@ -53,11 +53,14 @@ public:
       DCS = 2                        ///< Use DCS codes.
     };
 
-    /** Defines all possible admit criteria. */
+    /** Defines possible admit criteria. */
     enum class Admit {
-      Always = 0,                 ///< Admit TX always.
-      Colorcode = 1,              ///< Admit TX on matching color-code.
-      Free = 2,                   ///< Admit TX on channel free.
+      Always = 0,                  ///< For both channel types.
+      Free = 1,                    ///< For digital channels.
+      DifferentColorCode = 2,      ///< For digital channels.
+      ColorCode = 3,               ///< For digital channels.
+      Tone = 1,                    ///< For analog channels
+      Busy = 2                     ///< For analog channels.
     };
 
     /** Defines all possible optional signalling settings. */

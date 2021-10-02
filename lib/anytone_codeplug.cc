@@ -637,11 +637,13 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     if (Mode::MixedAnalog == mode())
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << name() <<"' as analog channel.";
-    AnalogChannel::Admit admit = ((Admit::Free == this->admit()) ?
-                                    AnalogChannel::Admit::Free : AnalogChannel::Admit::Always);
     AnalogChannel *ach = new AnalogChannel();
-    ach->setAdmit(admit);
-    ach->setSquelchDefault();
+    switch(this->admit()) {
+    case Admit::Always: ach->setAdmit(AnalogChannel::Admit::Always); break;
+    case Admit::Busy: ach->setAdmit(AnalogChannel::Admit::Free); break;
+    case Admit::Tone: ach->setAdmit(AnalogChannel::Admit::Tone); break;
+    default: ach->setAdmit(AnalogChannel::Admit::Always); break;
+    }
     ach->setRXTone(rxTone());
     ach->setTXTone(txTone());
     ach->setBandwidth(bandwidth());
@@ -652,14 +654,16 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     if (Mode::MixedDigital == mode())
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << name() <<"' as digital channel.";
-    DigitalChannel::Admit admit = DigitalChannel::Admit::Always;
-    switch (this->admit()) {
-    case Admit::Always: admit = DigitalChannel::Admit::Always; break;
-    case Admit::Free: admit = DigitalChannel::Admit::Free; break;
-    case Admit::Colorcode: admit = DigitalChannel::Admit::ColorCode; break;
-    }
     DigitalChannel *dch = new DigitalChannel();
-    dch->setAdmit(admit);
+    switch (this->admit()) {
+    case Admit::Always: dch->setAdmit(DigitalChannel::Admit::Always); break;
+    case Admit::Free: dch->setAdmit(DigitalChannel::Admit::Free); break;
+    case Admit::ColorCode: dch->setAdmit(DigitalChannel::Admit::ColorCode); break;
+    case Admit::DifferentColorCode:
+      logWarn() << "Cannot decode admit cirit. 'different CC', use 'same CC' instead.";
+      dch->setAdmit(DigitalChannel::Admit::ColorCode);
+      break;
+    }
     dch->setColorCode(colorCode());
     dch->setTimeSlot(timeSlot());
     ch = dch;
@@ -760,8 +764,8 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     // set admit criterion
     switch (ac->admit()) {
     case AnalogChannel::Admit::Always: setAdmit(Admit::Always); break;
-    case AnalogChannel::Admit::Free: setAdmit(Admit::Free); break;
-    case AnalogChannel::Admit::Tone: setAdmit(Admit::Free); break;
+    case AnalogChannel::Admit::Free: setAdmit(Admit::Busy); break;
+    case AnalogChannel::Admit::Tone: setAdmit(Admit::Tone); break;
     }
     // squelch mode
     setRXTone(ac->rxTone());
@@ -776,7 +780,7 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     switch(dc->admit()) {
     case DigitalChannel::Admit::Always: setAdmit(Admit::Always); break;
     case DigitalChannel::Admit::Free: setAdmit(Admit::Free); break;
-    case DigitalChannel::Admit::ColorCode: setAdmit(Admit::Colorcode); break;
+    case DigitalChannel::Admit::ColorCode: setAdmit(Admit::ColorCode); break;
     }
     // set color code
     setColorCode(dc->colorCode());
