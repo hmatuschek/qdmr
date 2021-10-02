@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(qdmr VERSION 0.9.0)
 
+set(RELEASE_SUFFIX "-alpha")
+
 option(BUILD_TESTS "Build test programs" OFF)
 option(BUILD_DOCS  "Build API documentation" OFF)
 option(BUILD_MAN   "Build man page for dmrconf" OFF)
@@ -101,7 +103,7 @@ endif(BUILD_TESTS)
 # Source distribution packages:
 set(CPACK_SOURCE_GENERATOR "TGZ")
 set(CPACK_SOURCE_PACKAGE_FILE_NAME
-  "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
+  "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}${RELEASE_SUFFIX}")
 set(CPACK_SOURCE_IGNORE_FILES
   "/build/;/doc/html;/doc/latex;/doc/reveng;/doc/dmr-intro;/examples/*.dfu;/.git/;~$;.qm;*.user$;${CPACK_SOURCE_IGNORE_FILES}")
 
