@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="introSimplex" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>DMR Simplex Operation</title>
+</info>
+
+<para>
+  The most simple form of a DMR QSO<footnote><para>QSO is a code for call or connection between two 
+    amateur radio stations.</para></footnote> is the simplex QSO. That is a direct connection between 
+    two two DMR radios. Like for the DMR repeater operations, this could be a private, group or 
+    so-called <glossterm>All Call</glossterm>. 
+</para>
+
+<example xml:id="figIntroSplxPc">
+  <title>Simplex private call.</title>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/simplex_privatecall.png" width="7cm" align="center"/></imageobject>
+  </mediaobject>
+</example>
+
+<para>
+  In <xref linkend="figIntroSplxPc"/> a simple simplex private call from DM3MAT to DL1XYZ is shown 
+  as well its reply. Both operators transmit and receive on the same frequency (here the DMR calling
+  channel at 433.450 MHz). Although other operators are in the area (DL2XYZ &amp; DL3XYZ) which 
+  receive the signal, their radios remain silent. This is because this is a private call to a 
+  specific operator and only the radio of that operator will receive the call. All other ignore the
+  call. The channel, however, remains occupied during that call. 
+</para>
+
+<para>
+  At that point it is worth mentioning, that if DL1XYZ answers directly to the initial call by 
+  pressing the PTT, he will answer with a private call to DM3MAT. He does not need to search for
+  number of DM3MAT in his address book. The direct answering to calls is only possible for several
+  seconds after the end of the initial call. After that period (called <glossterm>Hang 
+  Time</glossterm>) a press on the PTT will start a call to the default contact (see 
+  <xref linkend="introChannel"/>) associated with the simplex channel. 
+</para>
+
+<example xml:id="figIntroSplxGc">
+  <title>Simplex group call</title>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/simplex_groupcall.png" width="7cm" align="center"/></imageobject>
+  </mediaobject>
+</example>
+
+<para>
+  It is not only possible to call single operators in simplex mode. Also groups can be called using
+  group calls. A common talk group for the simplex mode has the number 99, (TG99, for <quote>talk 
+  group 99</quote>). These group calls are then received by all radios that are configured 
+  accordingly. Like for the repeater operation, also in simplex mode, the radio needs to know which 
+  groups the operator belongs to and therefore which talk groups to receive on which channels. This 
+  is done using so-called <glossterm>Group List</glossterm>s, which are discussed later.
+</para>
+
+<para>
+  In <xref linkend="figIntroSplxGc"/> such a simplex group call is shown. There DM3MAT calls the 
+  talk group TG99. As DL1XYZ as well as DL2XYZ configured their radios to receive that call on 
+  simplex channels, they do so. DL3XZY did not, so he does not receive the call. DL1XYZ &amp; 
+  DL2XYZ can now respond to that call by pressing on the PTT within the hang time irrespective of 
+  their default contact for the channel. 
+</para>
+
+<example xml:id="figIntroSplxAc">
+  <title>Simplex all call</title>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/simplex_allcall.png" width="7cm" align="center"/></imageobject>
+  </mediaobject>
+</example>
+
+<para>
+  To be sure that a simplex call gets received by all operators in the area, a so-called 
+  <glossterm>All Call</glossterm> should be used. This is a special call type to the reserved 
+  number 16777215, that gets received by all radios irrespective of their configuration. For the 
+  <xref linkend="figIntroSplxAc"/>, the all call by DM3MAT gets received by all operators including 
+  DL3XYZ. By directly answering within the hang time, all participants are able to respond to that 
+  call with an all call as well. 
+</para>
+
+<note>
+  <para>
+    In short: A DMR channel consists of a transmit and receive frequency (identical on simplex channels), 
+    a default contact that gets called whenever the PTT button is pressed and a list of group calls 
+    the radio will receive on that channel. 
+  </para>
+</note>
+
+<table xml:id="tabIntroSimplexFreq">
+  <title>DMR simplex frequencies</title>
+  <caption>The list of eight common DMR simplex channels. The channel S0 is the calling channel.</caption>
+  <thead>
+    <tr><td>Name</td><td>Frequency</td><td>Name</td><td>Frequency</td></tr>
+  </thead>
+  <tbody>
+    <tr> <td>S0 (call)</td><td>433.4500 MHz</td> <td>S4</td><td>433.6500 MHz</td></tr>
+    <tr> <td>S1</td><td>433.6125 MHz</td> <td>S5</td><td>433.6625 MHz</td></tr>
+    <tr> <td>S2</td><td>433.6250 MHz</td> <td>S6</td><td>433.6750 MHz</td></tr>
+    <tr> <td>S3</td><td>433.6375 MHz</td> <td>S7</td><td>433.6875 MHz</td></tr>
+  </tbody>
+</table>
+
+<para>
+  <xref linkend="tabIntroSimplexFreq"/> lists the common simplex channel frequencies. The channel 
+  S0 is the calling channel. Especially in densely populated areas, you should switch to another 
+  channel for the actual QSO and use S0 only for the initial call.
+</para>
+</section>

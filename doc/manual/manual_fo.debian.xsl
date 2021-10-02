@@ -6,12 +6,12 @@
   <xsl:import href="file:///usr/share/xml/docbook/stylesheet/docbook-xsl/fo/docbook.xsl"/>
 
   <xsl:attribute-set name="monospace.verbatim.properties">
-    <!--<xsl:attribute name="font-family">Lucida Sans Typewriter</xsl:attribute>//-->
     <xsl:attribute name="font-size">7pt</xsl:attribute>
     <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
   </xsl:attribute-set>
 
   <xsl:param name="paper.type" select="'A4'"/>
+  <xsl:param name="double.sided" select="1"/>
   <xsl:param name="highlight.source" select="1"/>
   <xsl:param name="generate.toc">
     appendix  nop
@@ -26,4 +26,8 @@
     section   nop
     set       toc
   </xsl:param>
+
+  <xsl:template match="token">
+    <xsl:call-template name="inline.monoseq"/>
+  </xsl:template>
 </xsl:stylesheet>

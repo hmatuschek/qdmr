@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="introNetworks" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>DMR Networks</title>
+</info>
+
+Sie kennen nun alle wichtigen Konzepte des DMR-Betriebs und auch einige der technischen Details dazu, 
+wie das Erstellen von Codeplugs. Diese Konzepte gelten jedoch nur uneingeschränkt im sogenannten 
+Brandmeisternetz. Dies ist jenes Netz im Hintergrund, dass ihre Direkt- oder Gruppenrufe vermittelt und 
+Repeater miteinander verbindet. In Deutschland ist dies das dominierende Netz. Auch Weltweit sind die 
+meisten DMR Repeater (c.a., 1500) im Brandmeisternetz miteinander verbunden. Es gibt aber auch andere 
+DMR Netze. Zum Einen DMR-MARC (c.a., 500 Repeater) und zum Anderen DMR+ (c.a. 150 Repeater). Welches 
+Netz wo häufiger verwendet wird, hängt stark vom Land ab. So sind in Frankreich, Spanien, den BeNeLux 
+Staaten, Polen, Tschechien und der Slowakei fasst ausschließlich Brandmeister Repeater im Betrieb. 
+Während in Dänemark DMR+ deutlich mehr Repeater vernetzt. In Großbritannien, den USA und Österreich 
+sind DMR-MARC Repeater nicht selten. All diese Netze unterscheiden sich aber nicht technisch voneinander. 
+Das heißt, die Ihnen zugewiesene DMR-ID ist in allen Netzen gültig und sie können jedes Tier-II DMR 
+Funkgerät in allen Netzen verwenden. 
+
+Lediglich die Konzepte der einzelnen Netze, vor allem wie Gruppenrufe realisiert werden, ist von Netz 
+zu Netz verschieden. Das heißt, Sie müssen die Kanäle zu einem DMR+ Repeater leicht anders konfigurieren 
+als Kanäle zu einem Brandmeister Repeater. 
+
+\subsection{Reflektoren} \label{sec:reflector} \index{Reflektor}
+Im DMR+ Netz spielen sogenannte Reflektoren eine zentrale Rolle. Sie entsprechen in etwa den 
+Sprechgruppen, wie sie im Brandmeisternetz verwendet werden. 
+
+Der wesentliche Unterschied zu Sprechgruppen im Brandmeister Netz ist, dass diese Reflektoren nicht 
+einfach per Gruppenruf angerufen werden können, sondern zunächst per Direktruf an einem Repeater 
+temporär abonniert werden müssen. Danach verhalten sich alle Repeater, die diesen Reflektor abonniert 
+haben, wie eine Gruppe zusammen geschalteter FM Repeater. Das heißt, ein Gruppenruf zur lokalen 
+Sprechgruppe TG9 wird dann nicht nur lokal ausgesandt, sondern auch über alle Repeater die diesen 
+Reflektor abonniert haben.
+
+Dies hat den Vorteil, dass die Konfiguration des Funkgerätes viel einfacher ist: Es müssen lediglich 
+zwei Kanäle für jeden Repeater angelegt werden. Je einen für jeden Zeitschlitz und jeweils mit dem 
+Standardkontakt zur TG9. Um einen Reflektor am aktuellen Repeater zu abonnieren, wird einfach ein 
+Direktruf zu dem Reflektor aus der Kontaktliste heraus gestartet. Dieses Konzept ist auch näher an 
+den \emph{alten} Konzepten aus dem FM Repeaterbetrieb mit Echolink. Jedoch gehen dadurch modernere 
+Fähigkeiten des Netzes wie Roaming verloren. Dieses Konzept hat aber auch den Nachteil, dass die 
+Repeatertransparenz verloren geht. Anstatt einfach einen Gruppenruf zu der gewünschten Sprechgruppe 
+zu starten, muss zunächst der lokale Repeater \emph{konfiguriert} werden. Erst danach erfolgt alle 
+Kommunikation über die lokale Sprechgruppe TG9, auch wenn diese Kommunikation alles andere als lokal ist. 
+
+</section>

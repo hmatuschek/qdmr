@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="introRoaming" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Roaming</title>
+</info>
+
+<para>
+  Usually all repeater within a region will subscribe the same talk groups. This allows to operate in 
+  these talk groups a repeater transparent way. It therefore does not matter which repeater is being 
+  used within the region, the same talk group remains reachable. In the region Berlin &amp; 
+  Brandenburg, this it the TG2621.
+</para>
+
+<para>
+  It therefore makes sense to enter all repeaters into one list that have the same talk groups 
+  subscribed. If the radio now would automatically select a reachable repeater, one could drive around
+  in the region and would stay connected to these talk groups irrespective of the own position in the 
+  region. This feature exists and is called <glossterm>Roaming</glossterm>. Many of the slightly more 
+  expensive devices support this feature (e.g., AnyTone). The cheapest ones usually do not. 
+</para>
+
+<para>
+  To use this feature, all channels with a certain talk group should be added to a list. The so-called
+  <glossterm>Roaming Zone</glossterm>. This could actually be done automatically, but the programming 
+  software for these devices is usually not very user friendly.
+</para>
+
+<para>
+  If the signal strength of the currently selected repeater falls below a certain threshold (usually 
+  -105dBm), the radio will start to search the roaming zone for a repeater which is stronger than
+  this threshold. This only happens if the radio is in standby. That is, if neither something is received
+  nor transmitted.
+</para>
+
+<para>
+  Did the radio find a stronger repeater in the roaming zone, it automatically changes to that repeater.
+  The new repeater does not neccessarily needs to be the strongest in the zone. It only needs to be 
+  stronger than the threshold. If no stronger repeater is found, the radio remains on the currently 
+  selected one.
+</para>
+
+<para>
+  This roaming can also be set to <quote>manual</quote>. This is, the roaming search will only 
+  start if signal strength is lower than the threshold and the PTT is pressed or the search is 
+  started from the menu.
+</para>
+</section>

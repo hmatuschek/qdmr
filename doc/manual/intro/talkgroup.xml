@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="introTalkGroup" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Talk Group Operation</title>
+</info>
+
+<para>
+  As mentioned in <xref linkend="introPrivateCalls"/>, DMR aims at being repeater transparent. That
+  is, it does not matter which repeater is used for the operation. This is also true for talk 
+  groups. In this section, I'll continue with the example of a OM at his holiday location who wants
+  to participate in his afternoon net. For example, the afternoon net is happening on the talk 
+  group 2621 (Berlin/Brandenbug, BB). This talk group is usually statically subscribed on all 
+  repeaters in the states Berlin and Brandenbug. That means that the local afternoon net can be 
+  performed in this talk group without any additional action in this area. (see 
+  <xref linkend="figIntroTG"/> top image).
+</para>
+
+<example xml:id="figIntroTG">
+  <title>Talk group operation between countries</title>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/talkgroup_ex1a.png" width="10cm" align="center"/></imageobject>
+  </mediaobject>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/talkgroup_ex1b.png" width="10cm" align="center"/></imageobject>
+  </mediaobject>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/talkgroup_ex1c.png" width="10cm" align="center"/></imageobject>
+  </mediaobject>
+</example>
+
+<para>
+  For the OM at his holiday location, this it not true. An italian repeater will certainly not 
+  subscribe the BB talk group statically. Therefore, the OM at the holiday location will not hear 
+  his afternoon net. He knows when this net starts. So he can perform a group call to the that TG 
+  shortly before the net starts (see <xref linkend="figIntroTG"/> second image). This will 
+  subscribe the BB talk group temporarily at the holiday repeater (I0ABC). Now, the OM can hear and
+  participate in the afternoon net. The subscription will be renewed whenever he starts a group 
+  call to that TG.
+</para>
+
+<para>
+  Once the OM subscribed the TG to the holiday repeater, he can participate normally at his 
+  afternoon net. All other participants will not even notice that he is not in the area and is 
+  participating from an italien repeater.
+</para>
+
+<table xml:id="tabIntroTG">
+  <thead>
+    <tr><td>Name</td> <td>Talk group number</td></tr>
+  </thead>
+  <tbody>
+    <tr><td>Global</td> <td>91</td></tr>
+    <tr><td>Europe</td> <td>92</td></tr>
+    <tr><td>Germany</td> <td>262</td></tr>
+    <tr><td>Mecklenburg-Vorpommern &amp; Sachsen-Anhalt</td> <td>2620</td></tr>
+    <tr><td>Berlin &amp; Brandenburg</td> <td>2621</td></tr>
+    <tr><td>Hamburg &amp; Schleswig-Holstein</td> <td>2622</td></tr>
+    <tr><td>Niedersachsen &amp; Bremen</td> <td>2623</td></tr>
+    <tr><td>Nordrhein-Westfalen</td> <td>2624</td></tr>
+    <tr><td>Rheinland-Pfalz &amp; Saarland</td> <td>2625</td></tr>
+    <tr><td>Hessen</td> <td>2626</td></tr>
+    <tr><td>Baden-Württemberg</td> <td>2627</td></tr>
+    <tr><td>Bayern</td> <td>2628</td></tr>
+    <tr><td>Sachsen &amp; Thüringen</td> <td>2629</td></tr>
+  </tbody>
+  <title>Some talk groups</title>
+</table>
+
+<section>
+<info><title>Cluster</title></info>
+<para>
+  In contrast to the regional talk group TG8, all other talk groups are reachable from everywhere 
+  in the DMR network. This means, that the OM at his holiday location can easily participate in 
+  his afternoon net from everywhere as described above. 
+</para>
+
+<para>
+  If the net, however, is happening in the regional TG8, the OM at his holiday location cannot 
+  participate. This talk group is only reachable from within the region. If the OM starts a call to
+  TG8, he would only reach the region in italy and not the region at home.
+</para>
+
+<para>
+  For this reason, some regional <emphasis>clusters</emphasis> of repeaters are linked to 
+  so-called <quote>Cluster</quote>. These cluster provide <quote>normal</quote> talk groups for the 
+  repeater within a region. These talk groups are then also reachable from the outside. A list of 
+  regional clusters and their associated talk group numbers can be obtained under 
+  <link xlink:href="http://bm262.de/cluster/">bm262.de/cluster/</link>.
+</para>
+</section>
+
+</section>

@@ -1,0 +1,24 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+\input{repeater}
+\begin{document}
+ \begin{tikzpicture}[every node/.style={scale=.8}]
+  \activeuser{r1}{ 0,0}{Reinigung 1};
+  \user{r2}{ 2,0}{Reinigung 2};	
+  \draw[dotted] (3,4) -- (3,-1);
+  \activeuser{s1}{ 4,0}{Sicherheit 1};
+  \activeuser{z} { 6,0}{Zentrale};
+  \draw[dotted] (7,4) -- (7,-1);
+  \user{s2}{ 8,0}{Sicherheit 2};
+  \activeuser{r3}{10,0}{Reinigung 3};
+  \activerepeater{R1}{1,3.5}{Terminal 1, TG: R,S};
+  \activerepeater{R2}{5,3.5}{Terminal 2, TG: R,S};
+  \activerepeater{R3}{9,3.5}{Vorfeld, TG: S};
+  \draw[->] (r1) -- node[above,rotate=74] {PC: Reinigung 3} (R1);
+  \path[->,dashed] (R1) edge [bend left] node[above] {via Netzwerk} (R3);
+  \draw[->] (R3) -- node[above,rotate=-74] {PC: Reinigung 3} (r3);
+  \draw[->] (z) -- node[above,rotate=-74] {PC: Sicherheit 1} (R2);
+  \draw[->] (R2) -- node[above,rotate=74] {PC: Sicherheit 1} (s1);
+ \end{tikzpicture}
+\end{document}

@@ -31,5 +31,12 @@
 
 <xi:include href="foreknowledge.xml"/>
 <xi:include href="origin.xml"/>
+<xi:include href="simplex.xml"/>
+<xi:include href="local.xml"/>
+<xi:include href="private.xml"/>
+<xi:include href="textmessages.xml"/>
+<xi:include href="talkgroup.xml"/>
+<xi:include href="roaming.xml"/>
+<xi:include href="networks.xml"/>
 
 </chapter>

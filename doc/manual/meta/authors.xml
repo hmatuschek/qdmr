@@ -11,17 +11,8 @@
   </personname>
   <email>dm3mat@darc.de</email>
   <affiliation>
-    <shortaffil>University of Potsdam</shortaffil>
-    <orgname>University of Potsdam</orgname>
-    <orgdiv>Department of Mathematics</orgdiv>
-    <address>
-      <otheraddr>Campus Golm, Haus 9</otheraddr>
-      <street>Karl-Liebknecht-Str. 24-25</street>
-      <postcode>D-14476</postcode>
-      <city>Potsdam OT Golm</city>
-      <state>Brandenburg</state>
-      <country>Germany</country>
-    </address>
+    <shortaffil>OV Y07</shortaffil>
+    <orgname>OV Y07, DARC</orgname>
   </affiliation>
 </author>  
 

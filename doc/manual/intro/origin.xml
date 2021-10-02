@@ -9,4 +9,204 @@
   <title>DMR Introduction &amp; Origin</title>
 </info>
 
+<para>
+  <acronym>DMR</acronym> (digital mobile radio) is a digital radio standard to transmit speech 
+  and data. That is, the speech is not directly modulated on the carrier but digitalized and 
+  compressed first using a lossy compression codec (VOCODER). The speech is then transmitted as 
+  data packets. The latter allows to attach meta-information to the data packet like source and
+  destination of the packet. 
+</para> 
+
+<para>
+  <acronym>DMR</acronym> was designed to be the digital replacement for analog trunking 
+  networks in commercial applications. A classic example for such a commercial application
+  of DMR would be a civil air port. With this, I do not mean the air-traffic radio but all 
+  the communication of the ground staff in and around the actual air port buildings.
+</para>
+
+<para>
+  At such an imaginary air port, there is a huge staff with a wide variety of tasks. For example 
+  (without any claim of completeness):
+</para>
+
+<itemizedlist>
+  <listitem><para>The cleaning crew,</para></listitem>
+  <listitem><para>technicians,</para></listitem>
+  <listitem><para>security staff,</para></listitem>
+  <listitem><para>apron staff for refueling, luggage and catering,</para></listitem>
+  <listitem><para>the fire brigade and </para></listitem>
+  <listitem><para>the headquarters.</para></listitem>
+</itemizedlist>
+
+<para>
+  All these people carry a radio and should be able to 
+</para>
+<itemizedlist>
+  <listitem><para>Directly call the headquarters. All staff should be able to call the headquarters
+    directly.</para></listitem>
+  <listitem><para>Direct communication between members of the same group, without interfering with
+    other groups. For example, the cleaning staff should be able to communicate with each other, 
+    without interfering with the fire brigade.</para></listitem>
+  <listitem><para>Each person should be able to call a complete group. For example, the headquarters 
+    may call the entire fire brigade or one member of the security staff may call the entire security
+    for help.</para></listitem>
+</itemizedlist>
+
+<para>
+  An air port, however, is a rather large area. Consequently, not all staff members are able to 
+  reach all others. Therefore, some repeaters must be installed to cover the entire air port 
+  including all interiors.
+</para>
+
+<para>
+  If you compare this scenario with the classic FM repeater networks (see 
+  <xref linkend="introForeknowledge"/>), it gets clear that is hard to implement these concepts 
+  using analog FM repeaters. Especially, if several repeaters are connected though a network. In 
+  this case, a single call on one repeater may block the entire network<footnote><para>
+    There are means to implement this concept on analog repeater networks using tone-signaling 
+    techniques (e.g., DTMF, five-tone etc.).</para></footnote>.
+</para>
+
+<para>
+  Certainly, it would be much better if only those repeaters get activated that are actually 
+  required for the communication between two parties. Then, the remaining repeaters are still 
+  available for the rest of the staff. This routing, however, should happen automatically. An 
+  operator may not know, which repeater to use to reach a particular person.
+</para>
+
+<para> 
+  DMR was designed to implements such complex communication networks without requiring from every
+  participant to have detailed knowledge about the structure of the network. That is, the knowledge 
+  about where every repeater is installed and which participants are reachable on wich repeater.
+</para>
+
+<note>
+  <para>
+    DMR is more similar to a phone network that to classic FM repeater networks.
+  </para>
+</note>
+
+<para>
+  Speaking of phone networks: Each participant and thus his/her radio is uniquely identified by a 
+  number. The DMR-ID. This is a number between 1 and 16777215. And like for any other phone network,
+  each participant may call any other directly using this number. This call is called 
+  <glossterm>Private Call</glossterm>. 
+</para>
+
+<para>
+  An there are groups. Each of these so-called <glossterm>Talk Group</glossterm>s is also assigned 
+  a unique number. A talk group can be used to group all staff with a specific task (e.g., the 
+  security, fire brigade, etc.). It is then possible to reach all members of this group at once 
+  by performing a <glossterm>Group Call</glossterm> to that talk group. The network, however, 
+  does not know which participant is member of which group. Consequently, the radio of the participant 
+  needs to know which group calls to accept and which to ignore.
+</para>
+
+<note>
+  <para>
+    This point is important to remember: The DMR network does not know which participant is member of 
+    which group. The radio needs to be configured to react on specific group calls.
+  </para>
+</note>
+
+<example xml:id="figIntroExNet1">
+  <title>Simplified air-port network</title>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/trunk_net_ex1.png" width="10cm" align="center"/></imageobject>
+  </mediaobject>
+</example>
+
+<para>
+  There are 3 cleaning staff, two security and one headquarters. To cover the entire area, three 
+  repeaters are required. One in terminal 1, one in Terminal 2 and one on the apron.
+</para>
+
+<para>
+  <xref linkend="figIntroExNet1"/> is a simplified air port network (in reality, it is much larger 
+  and way more complex). Consider the situation, where a cleaning stuff 1 &amp; 2 want to communicate.
+  At the same time, the headquarters want to talk to security 1. In an simple analog network, the 
+  call between cleaning 1 &amp; 2 would block the entire network and therefore the call between 
+  the headquarters and security 1. 
+</para>
+
+<example xml:id="figIntroExNet2">
+  <title>Simultaneous calls</title>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/trunk_net_ex2.png" width="10cm" align="center"/></imageobject>
+  </mediaobject>
+</example>
+<para>
+  Two Simultaneous private calls in the example network between cleaning 1 &amp; 3 as well as between 
+  headquarters and security 1.
+</para>
+
+<para>
+  Private calls in DMR networks only use those repeaters, that are actually required to establish 
+  the communication. This is shown in <xref linkend="figIntroExNet2"/>: Cleaning 1 starts a private
+  call to cleaning 3. As the DMR network knows that cleaning 3 was last active on the apron repeater, 
+  this call gets routed only though repeaters terminal 1 and apron. The repeater in terminal 2, however, 
+  is not affected. Consequently, this repeater remains available for the call between the headquarters
+  and security 1.  
+</para>  
+
+<note>
+  <para>
+    The network only knows at which repeater each participant was last active. The network will therefore
+    try to establish a connection though that repeater to the participant.
+  </para>
+</note>
+
+<para>
+  During the call between cleaning 1 &amp; 3, the repeaters in terminal 1 and apron are blocked. 
+  This means, that the headquarters may not be able to reach cleaning 2 and security 2 immediately. 
+  This sounds worse than it actually is. In contrast to classic phone networks, a direct call is 
+  considered interrupted, once the calling participant releases the PTT button. To this end, the 
+  headquarters may use the pauses between calls to reach the other participants. 
+</para>
+
+<para>
+  In the next <xref linkend="figIntroExNet3"/>, the headquarters want to reach all cleaning staff. 
+  Therefore, they start a group call to the talk group <quote>cleaning</quote> (<emphasis>C</emphasis> 
+  for <quote>cleaning</quote> and <emphasis>S</emphasis> for <quote>security</quote>). With this 
+  call, it can reach cleaning 1 &amp; 2 immediately. However, cleaning 3 does not receive that call.
+</para>
+
+<para>
+  This is due to the fact, that the DMR network does not know wich participants are members of 
+  which groups. As the cleaning crew is usually not on the apron, the apron repeater has not 
+  subscribed the talk group <quote>cleaning</quote>. Therefore, it does not forward group calls 
+  to that talk group.
+</para>
+
+<example xml:id="figIntroExNet3">
+  <title>Temporary subscription of talk groups.</title>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/trunk_net_ex3.png" width="10cm" align="center"/></imageobject>
+  </mediaobject>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/trunk_net_ex4a.png" width="10cm" align="center"/></imageobject>
+  </mediaobject>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/trunk_net_ex4b.png" width="10cm" align="center"/></imageobject>
+  </mediaobject>
+</example>
+
+<para>
+  To remain reachable for group calls, cleaning 3 needs to temporarily subscribe the apron repeater
+  to the <quote>cleaning</quote> talk group. This can be done by starting a group call to that talk
+  group on the apron repeater. Then the repeater will temporarily subscribe to that talk group for
+  a limited amount of time (usually between 10-30min). During that time, the repeater will forward 
+  group calls to that talk group and cleaning 3 remains reachable via that repeater.
+</para>
+
+<para>
+  This temporary subscription will be renewed every time a participant starts a group call to that 
+  talk group on this repeater. 
+</para>
+
+<para>
+  With these examples, the most basic terms of DMR (DMR-ID, talk group, private and group calls as 
+  well ass talk group subscriptions where introduced and explained on an example network. The 
+  following sections will concern the use DMR in ham radio.
+</para>
 </section>
