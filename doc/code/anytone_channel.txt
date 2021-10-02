@@ -12,7 +12,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 14 | Contact index 0-based, little endian                                                                                          |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-18 | Radio ID table index.         | 0   0   0 |SQM| 0   0   0   0 | 0   0 |OptSig | 0   0 | TxPer | Scan list index               |
+18 | Radio ID table index.         | 0 |SquelchMode| 0   0   0   0 | 0   0 |OptSig | 0   0 | TxPer | Scan list index               |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 1c | RX Group list index           | 2-tone ID                     | 5-tone ID                     | DTMF ID                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -40,7 +40,8 @@ Field description:
  - TCT: Enable TX CTCSS tone.
  - RDC: Enable RX DCS code.
  - RCT: Enable RX CTCSS tone.
- - SQM: Squelch mode 0=open, 1=silent.
+ - SquelchMode: Squelch mode 0=Carrier, 1=CTCSS/DCS, 2=Optional Signaling, 3=CTCSS/DCS and Optional Signaling,
+   4 = CTCSS/DCS or Optional Signaling
  - OptSig: Optional signalling where 0=off, 1=DTMF, 2=2-tone, 3=5-tone
  - TxPer: TX permit/admit criterion, 0=always, 1=colorcode, 2=channel free.
  - LWK: Enable lone worker.

@@ -367,13 +367,13 @@ AnytoneCodeplug::ChannelElement::setRadioIDIndex(unsigned idx) {
   return setUInt8(0x0018, idx);
 }
 
-bool
-AnytoneCodeplug::ChannelElement::silentSquelch() const {
-  return getBit(0x0019, 4);
+AnytoneCodeplug::ChannelElement::SquelchMode
+AnytoneCodeplug::ChannelElement::squelchMode() const {
+  return (SquelchMode)getUInt3(0x0019, 4);
 }
 void
-AnytoneCodeplug::ChannelElement::enableSilentSquelch(bool enable) {
-  setBit(0x0019, 4, enable);
+AnytoneCodeplug::ChannelElement::setSquelchMode(SquelchMode mode) {
+  setUInt3(0x0019, 4, (unsigned)mode);
 }
 
 AnytoneCodeplug::ChannelElement::Admit
@@ -770,6 +770,10 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     // squelch mode
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
+    if (Signaling::SIGNALING_NONE != ac->rxTone())
+      setSquelchMode(SquelchMode::SubTone);
+    else
+      setSquelchMode(SquelchMode::Carrier);
     // set bandwidth
     setBandwidth(ac->bandwidth());
   } else if (c->is<DigitalChannel>()) {
