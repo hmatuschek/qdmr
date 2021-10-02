@@ -84,7 +84,7 @@ AbstractConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
         return false;
       }
       prop.write(obj, node[prop.name()].as<int>());
-    } else if (QString("unsigned") == prop.typeName()) {
+    } else if (QString("uint") == prop.typeName()) {
       // If property is not set -> skip
       if (! node[prop.name()])
         continue;

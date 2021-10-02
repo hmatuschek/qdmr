@@ -161,7 +161,7 @@ ConfigObject::populate(YAML::Node &node, const Context &context){
       node[prop.name()] = this->property(prop.name()).toBool();
     } else if (QString("int") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).toInt();
-    } else if (QString("unsigned") == prop.typeName()) {
+    } else if (QString("uint") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).toUInt();
     } else if (QString("double") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).toDouble();
