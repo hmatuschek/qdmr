@@ -417,7 +417,10 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
   else
     setTXTimeOut(c->timeout());
   enableRXOnly(c->rxOnly());
-  enableVOX((c->defaultVOX() && (!ctx.config()->settings()->voxDisabled())) || (!c->voxDisabled()));
+  // Enable vox
+  bool defaultVOXEnabled = (c->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));
+  bool channelVOXEnabled = (! (c->voxDisabled()||c->defaultVOX()));
+  enableVOX(defaultVOXEnabled || channelVOXEnabled);
 
   if (c->scanListObj())
     setScanListIndex(ctx.index(c->scanListObj()));

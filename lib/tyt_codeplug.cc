@@ -254,6 +254,8 @@ TyTCodeplug::ChannelElement::vox() const {
 }
 void
 TyTCodeplug::ChannelElement::enableVOX(bool enable) {
+  if (enable)
+    logDebug() << "Enable VOX!";
   setBit(4,4, enable);
 }
 
@@ -593,7 +595,9 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
   else
     setScanListIndex(0);
   // Enable vox
-  enableVOX((chan->defaultVOX() && (!ctx.config()->settings()->voxDisabled())) || (!chan->voxDisabled()));
+  bool defaultVOXEnabled = (chan->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));
+  bool channelVOXEnabled = (! (chan->voxDisabled()||chan->defaultVOX()));
+  enableVOX(defaultVOXEnabled || channelVOXEnabled);
   // encode power setting
   if (chan->defaultPower())
     setPower(ctx.config()->settings()->power());
