@@ -32,34 +32,34 @@
 
 
 <section>
-<info>
-  <title>DMR Radio IDs (<token>dmr</token>)</title>
-</info>
+<info><title>DMR Radio IDs (<token>dmr</token>)</title></info>
 
 <para>
   The DMR radio ID definition consist of an optional <token>id</token> (necessary to reference 
   that ID later), a <token>name</token> and the DMR ID <token>number</token>. 
 </para>
 
-<table>
-  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
-  <tbody>
-    <tr>
-      <td><token>id</token></td>
-      <td>Specifies the identifier of the radio ID. This identifier can later be used to 
-        associate the radio ID to channels. Any unique string is valid.</td>
-    </tr>
-    <tr>
-      <td><token>name</token></td>
-      <td>Specifies the name of the radio ID. This name may also be used as the radio name. 
-        Any non-empty string is valid.</td>
-    </tr>
-    <tr>
-      <td><token>number</token></td>
-      <td>Specifies the DMR ID for this radio ID. That is any integer between 0 and 16777215.</td>
-    </tr>
-  </tbody>
-</table>
+<variablelist>
+  <title>DMR Radio ID Fields</title>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>Specifies the identifier of the radio ID. This identifier can later be used to 
+      associate the radio ID to channels. Any unique string is valid.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>Specifies the name of the radio ID. This name may also be used as the radio name. 
+        Any non-empty string is valid.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>number</token></term>
+    <listitem><para>Specifies the DMR ID for this radio ID. That is any integer between 0 and 16777215.</para></listitem>
+  </varlistentry>
+</variablelist>
 </section>
 
 </section>

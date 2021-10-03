@@ -42,38 +42,46 @@
   codeplug (e.g., in channels, group lists, etc.). 
 </para>
 
-<table>
-  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
-  <tbody>
-    <tr>
-      <td><token>id</token></td>
-      <td>Specifies the identifier of the contact. This identifier can later be used to 
-        reference the contact. Any unique string is valid.</td>
-    </tr>
-    <tr>
-      <td><token>name</token></td>
-      <td>Specifies the name of the contact. Any string is valid.</td>
-    </tr>
-    <tr>
-      <td><token>type</token></td>
-      <td>Specifies the type of the contact. Must be one of <token>PrivateCall</token>,
-      <token>GroupCall</token> or <token>AllCall</token>.</td>
-    </tr>
-    <tr>
-      <td><token>number</token></td>
-      <td>Specifies the DMR ID for this contact. That is any integer between 0 and 
+<variablelist>
+  <title>DMR Contact Fields</title>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>Specifies the identifier of the contact. This identifier can later be used to 
+        reference the contact. Any unique string is valid.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>Specifies the name of the contact. Any string is valid.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>type</token></term>
+    <listitem>
+      <para>Specifies the type of the contact. Must be one of <token>PrivateCall</token>,
+        <token>GroupCall</token> or <token>AllCall</token>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>number</token></term>
+    <listitem>
+      <para>Specifies the DMR ID for this contact. That is any integer between 0 and 
         16777215. This element is mandatory for all types except for the 
         <token>all</token>-call. For the all-call, the default number 16777215 will be 
-        used if omitted.</td>
-    </tr>
-    <tr>
-      <td><token>ring</token></td>
-      <td>If <token>true</token>, the radio will ring whenever a call from this contact 
-      is received (if supported by the radio). Optional, if omitted set to 
-      <token>false</token>.</td>
-    </tr>
-  </tbody>
-</table>
+        used if omitted.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ring</token></term>
+    <listitem>
+      <para>If <token>true</token>, the radio will ring whenever a call from this contact 
+        is received (if supported by the radio). Optional, if omitted set to 
+        <token>false</token>.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
 </section>
 
 
@@ -87,32 +95,37 @@
   used to control the <emphasis>EchoLink</emphasis> feature of a repeater.
 </para>
 
-<table>
-  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
-  <tbody>
-    <tr>
-      <td><token>id</token></td>
-      <td>Specifies the identifier of the contact. This identifier can later be used to 
-        reference the contact. Any unique string is valid.</td>
-    </tr>
-    <tr>
-      <td><token>name</token></td>
-      <td>Specifies the name of the contact. Any string is valid.</td>
-    </tr>
-    <tr>
-      <td><token>number</token></td>
-      <td>Specifies the DTMF ID for this contact. That is any combination of numbers 
+<variablelist>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>Specifies the identifier of the contact. This identifier can later be used to 
+        reference the contact. Any unique string is valid.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>Specifies the name of the contact. Any string is valid.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>number</token></term>
+    <listitem>
+      <para>Specifies the DTMF ID for this contact. That is any combination of numbers 
         <token>0-9</token> and symbols <token>A-D</token>, <token>*</token>, <token>#</token>.
-      used.</td>
-    </tr>
-    <tr>
-      <td><token>ring</token></td>
-      <td>If <token>true</token>, the radio will ring whenever a call from this contact 
-      is received (if supported by the radio). Optional, if omitted set to 
-      <token>false</token>.</td>
-    </tr>
-  </tbody>
-</table>
+        used.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ring</token></term>
+    <listitem>
+      <para>If <token>true</token>, the radio will ring whenever a call from this contact 
+        is received (if supported by the radio). Optional, if omitted set to 
+        <token>false</token>.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
 </section>
 
 </section> 

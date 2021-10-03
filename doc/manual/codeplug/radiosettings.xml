@@ -41,34 +41,67 @@
   per-channel basis. For these radios, these values are used. 
 </para>
 
-<table>
-  <caption>Radio settings</caption>
-  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
-  <tbody>
-    <tr>
-      <td><token>micLevel</token></td>
-      <td>Specifies the microphone amplification. Must be an integer between 1 and 10.</td>
-    </tr>
-    <tr>
-      <td><token>speech</token></td>
-      <td>Enables/disables the speech synthesis. Some radios can announce the current 
+<variablelist>
+  <title>Radio-wide Setting Fields</title>
+  <varlistentry>
+    <term><token>micLevel</token></term>
+    <listitem>
+      <para>Specifies the microphone amplification. Must be an integer between 1 and 10.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>speech</token></term>
+    <listitem>
+      <para>Enables/disables the speech synthesis. Some radios can announce the current 
         channel etc for the visually impaired. To enable that feature (if supported by the radio)
-        set this field to <token>true</token>. Must be a boolean value.</td>
-    </tr>
-    <tr>
-      <td><token>introLine1</token>, <token>introLine2</token></td>
-      <td>Sets the two boot text lines (if supported by the radio). These text lines will show up 
+        set this field to <token>true</token>. Must be a boolean value.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>introLine1</token></term>
+    <term><token>introLine2</token></term>
+    <listitem>
+      <para>Sets the two boot text lines (if supported by the radio). These text lines will show up 
         on the boot of the radio. If the radio is set to show a picture during boot, these lines are 
-        not shown. </td>
-    </tr>
-    <tr>
-      <td><token>defaultID</token></td>
-      <td>Specifies which radio ID will be used as the default DMR ID (see 
+        not shown.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>defaultID</token></term>
+    <listitem>
+      <para>Specifies which radio ID will be used as the default DMR ID (see 
         <xref linkend="cpRadioIDs"/> below). If none is specified, the first 
-        defined DMR radio ID will be used.</td>
-    </tr>
-  </tbody>
-</table>
+        defined DMR radio ID will be used.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>squelch</token></term>
+    <listitem>
+      <para>Specifies the default squelch level. This value may be referenced in channels or 
+        represent the radio-wide squelch setting. Any value in [0-10] is valid, where 0 implies 
+        an open squelch (if supported by the radio).
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>vox</token></term>
+    <listitem>
+      <para>Specifies the default VOX sensitivity. This value may be referenced in channels or 
+        represent the radio-wide VOX sensitivity. Any value in [0-10] is valid here, where 0 
+        disables the VOX.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>power</token></term>
+    <listitem>
+      <para>Specifies the default transmit power. This value may be referenced in channels or 
+        represent the radio-wide power setting. Possible values are <token>Min</token>, 
+        <token>Low</token>, <token>Mid</token>, <token>High</token> and <token>Max</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
 
 </section>
 
