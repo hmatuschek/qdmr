@@ -198,207 +198,313 @@
 <info><title>Creating channels</title></info>
 
 <para>
+  Before we start assembling any channels, I should mention that DMR radios are also able to 
+  transmit and receive analog FM. You can also use them for classic FM simplex and repeater 
+  operation. In this section, I describe the configuration of digital DMR channels usually called 
+  <quote>digital channels</quote>. The configuration of analog FM channels is not described. To 
+  create a DMR channel, you have to select <guilabel>digital</guilabel> for the <guilabel>channel 
+  type</guilabel>, for FM channels <guilabel>analog</guilabel>.
+</para>
 
+<para>
+  When you already have some experience with the analog FM repeater operation, the configuration 
+  of DMR channels may appear quiet weird. For analog FM repeaters, you usually configure exactly 
+  one channel. For DMR repeaters you will configure at least two (one for each time slot) but 
+  usually many more. To cut a long story short, let me explain it with a concrete example.
+</para>
+
+
+<section>
+<info><title>Creating Simplex Channels</title></info>
+<table xml:id="tabIntroCPSimplexChannels">
+  <title>Example simplex channel configuration</title>
+  <thead>
+    <tr><td>Name</td> <td>RX Freq.</td> <td>TX Freq.</td> <td>TS</td> <td>CC</td> <td>TX Contact</td> <td>Grp.List</td></tr>
+  </thead>
+  <tbody>
+    <tr><td>DMR S0</td> <td>433.4500 MHz</td> <td>433.4500 MHz</td> <td>1</td> <td>1</td> <td>all call</td> <td>simplex</td></tr>
+    <tr><td>DMR S1</td> <td>433.6125 MHz</td> <td>433.6125 MHz</td> <td>1</td> <td>1</td> <td>all call</td> <td>simplex</td></tr>
+    <tr><td>...</td> <td>...</td> <td>...</td> <td>...</td> <td>...</td> <td>...</td> <td>...</td></tr>
+  </tbody>
+</table>
+
+<para>
+  In <xref linkend="tabIntroCPSimplexChannels"/> an example for a simplex channel configuration is 
+  shown. You should of cause extend it to all 8 simplex channels. The first column simply specifies
+  the name of the channel.
+</para>
+
+<para>
+  The second and third columns specifies the transmit and receive frequencies for these channels.
+  For simplex channels, these frequencies are the same.
+</para>  
+
+<para>
+  In simplex operation, there is no repeater. That is, no instance that dictates a beat. To this 
+  end the choise of the time slot (TS) is irrelevant and usually TS1 is chosen.
+</para>
+
+<para>
+  The color code, however, matters. Repeater as well as your radio will ignore calls with a mismatching
+  color code. For simplex channels, the color code 1 has been established.
+</para>
+
+<para>
+  The sixth column specifies the default transmit contact. For simplex channels, the so-called 
+  <glossterm>All Call</glossterm> should be chosen to ensure that really everyone can receive the 
+  call irrespective of the receivers group list settings. The default transmit contact specifies 
+  the contact (private, group or all call) that is called whenever the PTT is pressed. As mentioned
+  earlier, there is an exception to that rule. Whenever you directly answer a call within in the 
+  so-called <glossterm>Hang Time</glossterm>, you will answer with the same call you received. 
+</para>
+
+<para>
+  The last column specifies the to so-called <glossterm>Group List</glossterm>. This list specifies
+  which talk groups are received on that channel. As mentioned earlier, no entry should be needed 
+  here as the all-call should be used as the transmit contact on simplex channels. Unfortunately,
+  it is not uncommon to find several talk groups being used as transmit contacts on simplex 
+  channels like TG9, TG8, TG99. For these cases, a group list <quote>simplex</quote> was created 
+  earlier.
+</para>
+
+<para>
+  Within your CPS, you will find many more options for channels. The majority can be left 
+  untouched. At the end of this section, I will describe some of these settings briefly. Many of 
+  these settings are quite uncommon in amateur radio or even straight illegal.
+</para>
+
+<para>
+  The <glossterm>Admit Criterion</glossterm> specifies under which conditions your radio is 
+  allowed to transmit. For simplex channels, the option <guilabel>channel free</guilabel> should be
+  chosen. This configures the radio to only transmit if the channel is currently free.
 </para>
 </section>
 
-Bevor es los geht, sollte ich erwähnen, dass die meisten DMR Funkgeräte auch analoges FM unterstützen. Das heißt, 
-Sie können mit ihrem DMR Funkgerät auch normalen analogen FM Simplex und Repeaterbetrieb durchführen. In diesem 
-Abschnitt beschreibe ich aber nur die Konfiguration von DMR Kanälen (meist \emph{Digital Channel} genannt), die 
-Konfiguration von sogenannten \emph{analogen} Kanälen wird hier nicht beschrieben. Um einen DMR Kanal anzulegen, 
-müssen Sie im Feld \emph{Channel Type} den Wert \emph{digital} auswählen, für einen FM Kanal dann \emph{analog}.
+<section>
+<info><title>Creating repeater channels</title></info>
 
-Wenn Sie schon Erfahrung mit dem \emph{klassischen} FM-Relaisbetrieb haben, wird Ihnen das Anlegen der Kanäle 
-recht seltsam vorkommen. Im analogen FM-Relaisbetrieb haben Sie für jeden Repeater und Simplex-Kanal genau einen 
-Kanal im Funkgerät konfiguriert. Für den DMR Betrieb werden Sie für jeden Repeater mindestens zwei 
-(für Zeitschlitz 1 &amp; 2), meist aber deutlich mehr Kanäle programmieren. Lange Rede kurzer Sinn. Lassen Sie 
-mich das an konkreten Beispielen erläutern.
+<para>
+  Creating repeater channels is slightly more complex than creating simplex channels, as we need to
+  create several channels per repeater. Before you can create any channels, you need to know which 
+  DMR repeaters are near to you. A good overview provides the
+  <link xlink:href="https://repeaterbook.com">repater book</link>. There you can also filter for
+  DMR repeaters and you get all information you need to configure the DMR repater channels. That 
+  is input and output frequencies and the color code of the repeater.
+</para>
 
-<!-- \subsubsection{Simplexkanäle Anlegen}
-\begin{table}[!ht]
- \begin{tabular}{|l|p{2.5cm}|p{2.5cm}|c|c|c|c|} \hline
- Name       & RX Freq. (Ausgabe) & TX Freq. (Eingabe) & TS\footnote{Seteht für \emph{Time Slot} also Zeitschlitz.} & CC\footnote{Steht für \emph{Color Code} also Farbcode.} & TX Kontakt & Empf.gr. \\ \hline
- DMR S0     & $433.4500 MHz$     & $433.4500 MHz$     & 1           & 1        & Rundumruf  & Simplex \\
- DMR S1     & $433.6125 MHz$     & $433.6125 MHz$     & 1           & 1        & Rundumruf  & Simplex \\
- ...        & ...                & ...                & ...         & ...      & ...        & ... \\ \hline
- \end{tabular}
- \caption{Beispieltabelle für die DMR Simplexkanäle.} \label{tab:ch:simplex}
-\end{table}-->
+<table orient="port" xml:id="tabIntroCPRepeaterChannels">
+  <title>Example channels for a single repeater DB0LDS</title>
+  <thead>
+    <tr><td>Name</td> <td>RX Freq. (output)</td> <td>TX Freq. (input)</td> <td>TS</td> <td>CC</td> <td>TX Contact</td> <td>Grp.List</td></tr>
+  </thead>
+  <tbody>
+    <tr><td>DB0LDS TS1</td> <td>439.5625 MHz</td> <td>431.9625 MHz</td> <td>1</td> <td>1</td> <td>-</td> <td>WW/EU/DL</td></tr>
+    <tr><td>DB0LDS DL TS1</td> <td>439.5625 MHz</td> <td>431.9625 MHz</td> <td>1</td> <td>1</td> <td>Germany</td> <td>WW/EU/DL</td></tr>
+    <tr><td>DB0LDS Sa/Th TS1</td> <td>439.5625 MHz</td> <td>431.9625 MHz</td> <td>1</td> <td>1</td> <td>Sa/Th</td> <td>Sa/Th</td></tr>
+    <tr><td>DB0LDS TG9 TS2</td> <td>439.5625 MHz</td> <td>431.9625 MHz</td> <td>2</td> <td>1</td> <td>TG9</td> <td>Ber/Bra</td></tr>
+    <tr><td>DB0LDS TG8 TS2</td> <td>439.5625 MHz</td> <td>431.9625 MHz</td> <td>2</td> <td>1</td> <td>TG8</td> <td>Ber/Bra</td></tr>
+    <tr><td>DB0LDS BB TS2</td> <td>439.5625 MHz</td> <td>431.9625 MHz</td> <td>2</td> <td>1</td> <td>Ber/Bra</td> <td>Ber/Bra</td></tr>
+  </tbody>
+</table>
 
-In Tabelle \ref{tab:ch:simplex} sind exemplarisch die Einstellungen der ersten 2 DMR Simplexkanäle aufgeführt. 
-Sie sollten diese natürlich auf alle 8 DMR Simplexkanäle erweitern. Die erste Spalte gibt einfach den Namen 
-des Kanals an. 
+<para>
+  I think, it is the best to explain the creation of repeater channels using a concrete example for
+  a repeater near to me shown in <xref linkend="tabIntroCPRepeaterChannels"/>. This repeater has 
+  the call DB0LDS and has the input frequency 431.9625 MHz and output frequency 439.5625 MHz. 
+  According to repeater book, this repeater expects the color code 1. These are the elementary 
+  information you need to set for all channels using this repeater. Many CPSs allow to copy or 
+  clone channels. This way you only need to enter this basic information once.
+</para>
 
-Die zweite und dritte Spalte geben die Sende- (TX) und Empfangsfrequenz (RX) des Kanals an. Da es sich hier um 
-Simplexkanäle handelt werden natürlich jeweils die gleichen Frequenzen für RX und TX eingetragen. 
+<para>
+  At the end of <xref linkend="introTimeSlot"/>, I mentioned that trans-regional communication is 
+  happening on time slot 1 while regional communication is happening on time slot 2. This is 
+  visible in this example. The repeater is located in the region Berlin/Brandenbug (Ber/Bra),
+  consequently all channels with within-region talk-groups have the time slot 2, all others have
+  the time slot 1.
+</para>
 
-Im \aref{Simplexbetrieb} gibt es keinen Repeater, der den Takt angeben könnte. Daher ist die Wahl des 
-Zeitschlitzes für Simplexkanäle egal. Üblicherweise wird hier einfach der Zeitschlitz 1 ausgewählt.
+<para>
+  The first channel <quote>DB0LDS TS1</quote> is a generic channel for the time slot 1. There is no
+  default transmit contact defined for this channel. This channel can be used to perform arbitrary 
+  direct and group calls by selecting a contact or talk group from the contact list. This means, 
+  that a call cannot be started by simply pressing PTT on that channel. First, a contact must be 
+  selected that should get called.
+</para>
 
-Der Farbcode (Spalte 5) ist aber nicht egal. Repeater sowie auch Ihr Funkgerät akzeptieren nur dann eine 
-Aussendung, wenn der Farbcode der Aussendung mit der Einstellung für den Kanal übereinstimmt. Bei Simplexkanälen 
-hat man sich daher auf den Farbcode 1 geeinigt. 
+<para>
+  The second channel <quote>DB0LDA DL TS1</quote> is almost identical to the first except for the 
+  default transmit contact. Here <quote>Germany</quote> (TG262) is selected. This means, if this 
+  channel is selected and the PTT is pressed, the talk group 262 is called. By configuring a 
+  separate channel for this talk group allows to start a call to it without having to search for 
+  it in the contact list. This also allows to temporarily subscribe this talk group on a repeater
+  easily by simply pressing PTT briefly. 
+</para>
 
-Die sechste Spalte gibt den Standardkontakt für diesen Kanal an. Bei Simplexkanälen sollte hier immer der sogenannte. 
-\aref{Rundumruf} (All Call) eingetragen werden. Das bedeutet, dieser \emph{Kontakt} wird immer angerufen, wenn sie 
-diesen Kanal auf dem Funkgerät eingestellt haben und auf die PTT Taste drücken. Eine Ausnahme bildet das Antworten 
-auf einen Ruf. Wenn Sie zum Beispiel einen Gruppenruf zur Sprechgruppe TG99 auf dem Simplexkanal empfangen und innerhalb 
-der kurzen \aref{Hangtime} darauf antworten, werden sie nicht mit dem voreingestellten Rundumruf antworten, sondern 
-mit dem Gruppenruf zur Sprechgruppe TG99. Dieses Verhalten ist sehr erwünscht, da es Ihnen ermöglicht auf auf 
-Direktrufe an Sie mit einem Direktruf zu Antworten.  
+<note>
+  <para>
+    Irrespective of the default transmit contact, you can always answer to a call within the hang 
+    time.
+  </para>
+</note>
 
-Die letzte Spalte gibt die Empfangsgruppe des Kanals an. Damit wird festgelegt welche Sprechgruppen auf diesem Kanal 
-empfangen werden sollen. Wie oben schon erwähnt, wäre hier eigentlich keine Eintragung nötig wenn alle Teilnehmer 
-auf den Simplexkanälen den Rundumruf verwenden würden. Es werden aber durchaus sehr unterschiedliche Sprechgruppen 
-auf den Simplexkanälen verwendet. Für diese Fälle hatten wir ja die Empfangsgruppe \emph{Simplex} zusammengestellt. 
+<para>
+  The third channel <quote>DB0LDS Sa/Th TS1</quote> is also similar to the first two. Here the 
+  default transmit contact is the talk group for Saxony/Thuringia (TG2629) to be able to 
+  subscribe that talk group at my local repeater and call it easily. Please not that for this 
+  channel the time slot 1 is used. The repeater is located in Brandenburg and therefore any 
+  communication with Saxony is inter-regional and should happen on the time slot 1. The group list
+  contains only the talk group for Saxony/Thuringia and thus other inter-regional talk groups 
+  are not received on that channel.
+</para>
 
-In Ihrer CPS finden sie noch sehr viel mehr Optionen zu den Kanälen. Die Meisten können auf den Standardwerten 
-belassen werden. Am Ende dieses Abschnittes beschreibe ich noch eine Reihe weiterer Optionen. Viele dieser Optionen 
-betreffen Funktionen, die im Amateurfunk aber keine Verwendung finden. 
+<para>
+  Channels four, five and six are for repeater-local (TG9), regional (TG8) and the talk group 
+  Berlin/Brandenburg (TG2621) calls. As this is all regional communication, it happens on the 
+  time slot 2. Also they all have the group list <quote>Ber/Bra</quote> set (see 
+  <xref linkend="tabIntroGroupLists"/>). Therefore, all regional talk groups (TG8, TG9, TG2621)
+  are received on that channel. As the default transmit contact, the corresponding talk group
+  is set. If the channel <quote>DB0LDS TG9 TS2</quote> is selected and the PTT is pressed, 
+  a call to TG9 is repeated only by the repeater DB0LDS. If the channel <quote>DB0LDS BB 
+  TS2</quote> is selected and the PTT is pressed, a call to TG2621 is repeater by almost all 
+  repeaters in the region Berlin/Brandenbug. Therefor, chose a talk group that is sufficient
+  for you intended communication. 
+</para>
 
-Die Option \adef{Admit Criterion} definiert unter welchen Umständen das senden auf dem Kanal vom Funkgerät erlaubt 
-wird. Hier stellen Sie bitte \emph{Channel Free} ein. Dies bedeutet, dass sie nur senden dürfen, wenn der Simplexkanal frei ist.  
+<note>
+  <para>
+    On any channel, you can start an arbitrary call (group, privat, all) by either selecting 
+    the contact from the contact list of even simply entering the DMR number into the keypad
+    of the radio. This is independent from the default contact on the current channel. In the
+    end, the default transmit contact is a convenience feature. With the default contact, 
+    channels for frequently used contacts can be created.
+  </para>
+</note>
 
-\subsubsection{Repeaterkanäle Anlegen}
-Das Anlegen von Repeater Kanälen ist etwas aufwendiger als das Anlegen von Simplexkanälen, da für jeden Repeater 
-gleich mehrere Kanäle definiert werden. Bevor Sie anfangen können Repeaterkanäle anzulegen, müssen Sie natürlich erst 
-herausfinden welche Repeater sich in Ihrer Nähe befinden. Eine gute Übersicht bietet Ihnen die Seite 
-\url{https://repeatermap.de/}. Sie können dort unter Filter die Anzeige auf DMR Repeater beschränken. Dort finden Sie 
-auch alle wichtigen Information zu den jeweiligen Repeatern. Das heißt deren Eingabe- und Ausgabefrequenzen und Farbcodes. 
-Diese Informationen benötigen Sie unbedingt um Kanäle für diesen Repeater anlegen zu können.
+<para>
+  The so-called <glossterm>Admit Criterion</glossterm> should be set to <guilabel>Color 
+  Code</guilabel> for DMR repeater channel. This means, that the radio will only transmit if the 
+  channel is free and the color code of the repeater matches the color code of the channel.
+</para>
+</section>
 
-<!-- \begin{sidewaystable}[p]
- \centering
- \begin{tabular}{|l|c|c|c|c|c|c|} \hline
-  Name             & RX Freq. (Ausgabe) & TX Freq. (Eingabe) & TS\footnote{Seteht für \emph{Time Slot} also Zeitschlitz.} & CC\footnote{Steht für \emph{Color Code} also Farbcode.} & TX Kontakt & Empf.gr. \\ \hline
-  DB0LDS TS1       & $439.5625 MHz$ & $431.9625 MHz$ & 1 & 1 & -         & WW/EU/DL \\
-  DB0LDS DL TS1    & $439.5625 MHz$ & $431.9625 MHz$ & 1 & 1 & Deutschland & WW/EU/DL \\
-  DB0LDS Sa/Th TS1 & $439.5625 MHz$ & $431.9625 MHz$ & 1 & 1 & Sa/Th       & Sa/Th \\
-  DB0LDS TG9 TS2    & $439.5625 MHz$ & $431.9625 MHz$ & 2 & 1 & L9          & Ber/Bra \\
-  DB0LDS TG8 TS2    & $439.5625 MHz$ & $431.9625 MHz$ & 2 & 1 & L8          & Ber/Bra \\
-  DB0LDS BB TS2    & $439.5625 MHz$ & $431.9625 MHz$ & 2 & 1 & Ber/Bra     & Ber/Bra \\ \hline
- \end{tabular}
- \caption{Beispielkonfiguration der Kanäle für den Repeater DB0LDS in Wildau bei Berlin.} \label{tab:ch:repeater}
-\end{sidewaystable} //-->
+<section>
+<info><title>Other channel options</title></info>
 
-Ich denke, es ist am einfachsten Ihnen am Beispiel meiner eigenen Kanalliste (Tab. \ref{tab:ch:repeater}) für 
-\textbf{einen} Repeater in meiner Nähe das Anlegen von Repeaterkanälen zu beschreiben. Der Repeater heißt DB0LDS und 
-hat die Eingabe Frequenz $431.9625 MHz$ und die Ausgabe Frequenz $439.5625 MHz$. Des Weiteren erwartet er den 
-Farbcode 1. Dies sind die elementaren Informationen zu diesem Repeater, die Sie von diversen Repeaterlisten und Karten 
-erhalten. Diese Informationen müssen sie natürlich für alle Kanäle die diesen Repeater betreffen, eintragen.
+<para>
+  The user interface of the manufacturer CPS where you configure the channels is usually very 
+  extensiv. There are a huge amount of options that control the behavior of the channel. The 
+  majority of these options are not used in ham radio applications. Some of these, however, I want
+  to describe here briefly.
+</para>
 
-Am Ende des Abschnitts \ref{sec:timeslot} hatte ich erwähnt, dass überregionaler Funkverkehr auf Zeitschlitz 1 und 
-Regionaler auf Zeitschlitz 2 stattfinden. Dies wurde in dieser Konfiguration umgesetzt. 
+<para>
+  The <glossterm>Admit Criterion</glossterm> was mentioned before. It controls under which 
+  conditions the radios can transmit. There are usually three options. <guilabel>Always</guilabel>
+  does exactly what it says: it allows to transmit always. This option should be chosen for 
+  analog FM repeater channels. <guilabel>Channel free</guilabel> means that the radio will only 
+  transmit if the current channel is free. This option should be choses for simplex channels.
+  When <guilabel>Color code</guilabel> is selected, the radio will only transmit if the channel is
+  free and the color code of the repeater matches the color code of the channel. This option should
+  be chosen for DMR repeater channels.
+</para>
 
-Der Erste Kanal \emph{DL0LDS TS1} ist ein generischer Kanal für den Zeitschlitz eins. Er besitzt keinen Standardkontakt 
-aber eine Empfangsgruppe für die Sprechgruppen Welt, Europa und Deutschland. Dieser Kanal dient dazu, beliebige (überregionale) 
-Gruppen- und Direktrufe aus der Kontaktliste heraus zu führen. Das heißt, um auf diesem Kanal ein QSO zu starten, kann nicht 
-einfach die PTT Taste gedrückt werden. Denn dazu fehlt dem Kanal der Standardkontakt. Es muss erst ein Kontakt aus der 
-Kontaktliste ausgewählt werden, der angerufen werden soll. 
+<para>
+  The <glossterm>TOT</glossterm> setting or <quote>transmit timeout</quote> secifies the maximum 
+  duration of continuous transmission. After that period of continuous transmission, the radio 
+  will stop the transmission automatically. The feature is used in commercial applications to avoid
+  the blocking of a channel or talk group by a participant. This option has little sense in amateur 
+  radio and can be set to infinity.
+</para>
 
-Der zweite Kanal (\emph{DL0LDS DL TS1}) ist identisch zum Ersten bis auf den Standardkontakt\index{Kanal!Standardkontakt}. 
-Hier ist die Sprechgruppe \emph{Deutschland} (TG262) eingetragen. Das bedeutet, wenn dieser Kanal im Funkgerät ausgewählt ist 
-und die PTT Taste gedrückt wird, wird direkt ein Gruppenruf an diese Sprechgruppe gestartet. Einen extra Kanal für diese 
-Sprechgruppe anzulegen, erlaubt es diesen Gruppenruf zu starten ohne ihn erst in der Kontaktliste auswählen zu müssen. Auch ist 
-es so möglich, diese Sprechgruppe schnell temporär auf diesem Repeater zu abonnieren\footnote{Die Sprechgruppe TG262 
-  (Deutschland) ist für diesen Repeater nicht permanent auf Zeitschlitz 1 abonniert.} indem kurz die PTT Taste gedrückt wird 
-  (siehe Abschnitt \ref{sec:talkgroup}).
+<para>
+  The <glossterm>Emergency System</glossterm> is a method to signal an alarm or an emergency 
+  situation. Also this feature is not used in amateur radio. 
+</para>
 
-\begin{merke}
- Auf jedem Kanal kann auf einen eingehenden Ruf innerhalb der sogenannten \aref{Hangtime} geantwortet werden, egal welcher 
- Standardkontakt für diesen Kanal festgelegt wurde. 
-\end{merke} 
+<para>
+  The option <glossterm>Privacy Group</glossterm> or <glossterm>Encryption Key</glossterm> revers
+  to a build-in method of encrypting the traffic. This is actually forbidden in amateur radio.
+</para>
 
-Ähnlich verhält es sich mit dem dritten Kanal (\emph{DB0LDS Sa/Th TS1}). Hier ist als Standardkontakt die Sprechgruppe 
-\emph{Sachsen/Thüringen} (TG2629) eingestellt um diese schnell und leicht über diesen Repeater erreichen und temporär 
-abonnieren zu können. Bitte beachten Sie, das für diesen Kanal der Zeitschlitz 1 verwendet wird. Der Repeater befindet sich 
-in Brandenburg. Somit sollte die Kommunikation mit Sachsen oder Thüringen im Zeitschlitz für überregionale QSOs geführt werden. 
-Des weiteren ist als Empfangsgruppe die regionale Empfangsgruppe für Sachsen &amp; Thüringen angegeben. Das bedeutet, dass 
-Gruppenrufe an die überregionalen Sprechgruppen wie \emph{Deutschland} (TG262) auf diesem Kanal nicht empfangen werden, auch
- wenn er auf Zeitschlitz TS1 liegt.
+<para> 
+  The flags <quote>Emergency Alarm Confirmed</quote>, <quote>Private Call Confirmed</quote> and 
+  <quote>Data Call Confirmed</quote> specify how the radio starts these calls. The radio will first
+  establish a call to the destination and will signal once the call is <quote>confirmed</quote>. 
+  Once the confirmation is received, the actual call starts. This options are not used in amateur
+  radio and should be disabled as they may interfere with the normal operation.
+</para>
 
-Kanäle vier, fünf und sechs sind für die lokale (TG9, nur auf diesem Repeater), regionale (TG8, im regionalen Repeaterverbund) 
-und Berlin-Brandenburg-weite Kommunikation (TG2621). All diese Kanäle sind auf Zeitschlitz 2, da es sich um regionale 
-Kommunikation handelt und haben als Empfangsgruppe \emph{Ber/Bra} gesetzt. Das heißt, auf diesen Kanälen werden die Sprechgruppen 
-TG8, TG9 und TG2621 empfangen. Als Standardkontakt wurde die entsprechenden Sprechgruppen gesetzt. Wird auf dem Funkgerät nun der
- Kanal \emph{DB0LDS TG9 TS2} ausgewählt, so wird beim drücken der PTT Taste ein Gruppenruf an die lokale Sprechgruppe (TG9) von 
- nur diesem Repeater ausgesandt. Wird jedoch der Kanal \emph{DB0LDS BB TS2} ausgewählt, wird beim Drücken der PTT Taste ein 
- Gruppenruf an die Sprachgruppe \emph{Berlin/Brandenburg} (TG2621) gestartet und somit fast überall in Berlin und Brandenburg gehört.
+<para>
+  The option <glossterm>Talkaround</glossterm> allows to operate simplex on a repeater channel. 
+  That is the radio transmits and receives on the repeater input frequency. This allows to bypass
+  the repeater and to communicate directly with other participants on the same repeater channel.
+  Also this option make litte sense in amateur radio.
+</para>
 
-\begin{merke}
- Auf jedem Kanal kann ein beliebiger Ruf (Gruppen, Direkt, Rundum) gestartet werden indem entweder der entsprechende Kontakt in 
- der Kontaktliste ausgewählt wird oder die DMR Nummer eingegeben wird. Dies ist unabhängig vom Standardkontakt des Kanals. 
- Letztendlich dient der Standardkontakt eines Kanals der Bequemlichkeit. So können dedizierte Kanäle für häufig getätigte Rufe 
- definiert werden.
-\end{merke}
+<para>
+  When the <glossterm>RX Only</glossterm> flag is enabled, the radio cannot transmit on that 
+  channel. This may be useful for out-of-band monitoring channels where you are not allowed 
+  to transmit.
+</para>
 
-Das sogenannte \emph{Admit Criterion} sollte für alle Repeaterkanäle auf \emph{Color Code} gesetzt werden. Dies bedeutet, dass Ihr 
-Funkgerät nur dann sendet, wenn der Kanal frei ist und der Farbcode des Repeaters mit dem Farbcode des Kanals übereinstimmt.
+<para>
+  The <glossterm>VOX</glossterm> feature is actually used in ham radio. It stands for <quote>voice 
+  operated switch</quote> and allows to start a call using the voice without the need to press PTT.
+  Some radios allow to enable this option on a per-channel bases others only radio-wide.
+</para>
 
-\subsubsection{Weitere Kanaloptionen}
-Die Maske, mit der Sie Kanäle konfigurieren ist recht umfangreich. Es gibt eine Vielzahl an Optionen die das Verhalten dieses Kanals 
-beeinflussen. Die meisten dieser Optionen werden im Amateurfunk aber nicht verwendet. Dennoch möchte ich diese hier kurz erklären.
+<para>
+  The <quote>Power</quote> option allows to specify the transmit power level. This can usually 
+  be set in predefined steps like <guilabel>Low</guilabel>, <guilabel>Middle</guilabel>, 
+  <guilabel>High</guilabel>. Some radios may also allow a fine grained setting of the power level.
+</para>
 
-Die \aref{Admit Criterion} Option hatte ich zuvor schon erwähnt. Sie liegt fest, unter welchen Umständen das Funkgerät ihnen erlaubt 
-auf dem Kanal zu senden. Meist stehen hier drei Möglichkeiten zu Verfügung. \emph{Always} bedeutet, dass Sie immer senden dürfen. 
-\emph{Channel Free} bedeutet, dass der Kanal frei sein muss, damit Sie senden dürfen. Und \emph{Color Code} bedeutet, dass nicht nur 
-der Kanal frei sein muss, sonder auch der Farbcode des Repeaters stimmen muss. Daher macht es Sinn \emph{Channel Free} für 
-Simplexkanäle und \emph{Color Code} für Repeaterkanäle zu wählen.
-
-Die Option \adef{TOT} oder auch \adef{TX Timeout} legt die maximale Dauer einer Aussendung fest. Das heißt, wenn Sie die PTT Taste 
-länger als diese Zeitspanne drücken, wird das Funkgerät Ihre Aussendung unterbrechen. Dies ist eine Funktion für den kommerziellen 
-Einsatz, die verhindert, dass eine Fehlbedienung das DMR Netz oder auch einen Repeater blockiert. Im Amateurfunk macht dies wenig 
-Sinn. Daher können Sie diese Option auf \emph{unendlich} stellen.
-
-Die Option \adef{Emergency System} legt das Alarm- oder Notrufsystem für diesen Kanal fest. Auch dies ist eine Funktion für den 
-kommerziellen Einsatz und wird im Amateurfunk nicht verwendet.
-
-Die Option \adef{Privacy Group} legt die Verschlüsselung der Aussendungen für diesen Kanal fest. Diese Funktion darf im Amateurfunk 
-gar nicht verwendet werden.
-
-Die Optionen \adef{Emergency Alarm Confirmed}, \adef{Private Call Confirmed} und \adef{Data Call Confirmed}, legen fest, wie das 
-Funkgerät Alarme, Direktrufe und Datenübermittlung durchführt. Sind diese Optionen angewählt, versucht das Funkgerät erst eine Verbindung 
-zum Ziel herzustellen, bevor Sie sprechen dürfen. Das heißt, das Funkgerät sendet zunächst eine Anfrage an das Ziel. Erst wenn diese 
-Anfrage vom Ziel positiv beantwortet wurde, ertönt ein Ton und Sie können sprechen. Wenn diese Optionen nicht angewählt sind, fangen Sie 
-sofort an Sprachdaten an das Ziel zu senden. Ich empfehle Ihnen diese Option nicht anzuwählen.
-
-Die Option \adef{Talkaround} erlaubt es Ihnen auf einem Repeaterkanal Simplexbetrieb zu fahren. Das heißt, Sie werden auf der 
-Repeaterausgabefrequenz senden und empfangen. Dabei umgehen sie natürlich den Repeater selbst. Daher wird dieses Feature im 
-Amateurfunk nicht verwendet.
-
-Wenn die Option \adef{RX Only} angewählt ist, können Sie auf diesen Kanal nicht senden.
-
-Die Option \adef{VOX} bedeutet \altdef{Voice Operated Switch}{VOX} und erlaubt es Ihnen automatisch von Empfang auf Senden 
-umzuschalten sobald sie in das Mikrofon sprechen. Dies lässt sich bei einigen Funkgeräten pro Kanal oder aber auch in den 
-allgemeinen Einstellungen aktivieren.
-
-Die Option \adef{Power} legt die Sendeleistung auf diesen Kanal fest. Wenn Sie sich direkter Nähe des Repeaters befinden, 
-können Sie die Sendeleistung reduzieren um die Batterielaufzeit bei Handfunkgeräten zu erhöhen. 
-
-Diese optionale Kanaleinstellung \aref{Scanlist} definiert welche Liste von Kanälen gescannt werden, wenn der Scan auf diesem 
-Kanal gestartet wird. Es ist nicht zwingend notwendig, dass der Kanal selbst in dieser Scanliste enthalten ist.
+<para>
+  The <glossterm>Scan List</glossterm> specifies a list of channel that are scanned if a scan is
+  started on that channel. This feature might be used as an alternative to a missing roaming 
+  feature (see <xref linkend="introRoaming"/>). 
+</para>
+</section>
+</section>
 
 
-\subsection{Zonen Zusammenstellen} \label{sec:zone} \index{Zone}
-Wenn Sie nun alle für Sie interessanten Kanäle erstellt haben, werden Sie feststellen, dass die Liste doch schon recht lang und 
-unübersichtlich ist. Alle DMR Funkgeräte organisieren daher die Kanäle in sogenannten Zonen. Diese Zonen sind einfach nur Listen 
-von Kanälen. Wie Sie diese Listen zusammenstellen, ist allein Ihnen überlassen. Sie können die Kanäle nach Region zusammenfassen 
-wie \emph{Zu Hause}, \emph{Arbeit}, \emph{Urlaub} etc.. 
+<section xml:id="itroCPZone">
+<info><title>Assembling zones</title></info>
 
-Sie können sie auch nach Sprechgruppen sortieren. So können Sie ein quasi händisches Roaming für eine bestimmte Sprechgruppe 
-realisieren. Wenn Sie dann im Auto unterwegs sind, können Sie im Funkgerät immer jenen Repeater aus der Zone auswählen, den Sie 
-gerade erreichen können. Somit bleiben Sie immer mit dieser Sprechgruppe verbunden. Einige (eher teurere) Funkgeräte unterstützen 
-dies mit einer automatischen Roamingfunktion, bei der der jeweils stärkste Repeater an Ihrem Standort ausgewählt wird.
+<para>
+  Once you have assembled all channels of interest, you may notice that the list is quite large. 
+  Hence all DMR radios organize the channels in so-called <glossterm>Zone</glossterm>s. Zones are 
+  simple lists of channels that group them into relevant sets usually based on the location. You 
+  may therefore collect all channels for <quote>Home</quote>, <quote>Work</quote> and 
+  <quote>Holidays</quote> into one zone each. How you organize your zones is up to you.
+</para>
 
-\begin{hinweis}
- Kanäle, die keiner Zone zugeordnet wurden, können nicht im Funkgerät ausgewählt werden. Es ist aber problemlos möglich, einen 
- Kanal mehreren Zonen zuzuordnen.
-\end{hinweis}
+<para>
+  You may also organize these channels by talk groups. This way you may implement some kind of a 
+  manual roaming. Once you left the range of a repeater you may search for another one in the same
+  zone. This way you stay connected to a particular talk group. In contrast to the automatic roaming,
+  you have to select the repeater by hand.
+</para>
 
-\subsection{Scanlisten Zusammenstellen}
-Scanlisten sind einfach Listen von Kanälen, die beim Starten der Scanfunktion sequenziell beobachtet werden. Wird ein Signal 
-auf einem der Kanäle empfangen, wird der Scan unterbrochen und es kann dann auf diesen empfangenen Ruf geantwortet werden. Diese 
-Funktion erlaubt es mehrere Kanäle zu beobachten. Zusätzlich können Sie bei vielen Geräten ein oder zwei Prioritätskanäle definieren 
-werden, die während des Scans häufiger \emph{besucht} und somit \emph{intensiver} beobachtet werden.
+<note>
+  <para>
+    Channels that are not assigned to any zone are usually not selectable by the radio. It is, 
+    however, perfectly fine to assign a channel to several zones.
+  </para>
+</note>
+</section>
 
+
+<section xml:id="introCPScanList">
+<info><title>Assmbling scan lists</title></info>
+<para>
+  <glossterm>Scan List</glossterm>s are simple lists of channels. When the scan is started on a 
+  particular channel, the channels scan list is used. The radio will then step though that list
+  and may stop on a channel that shows activity. It is then possible to answer the received call.
+  This function allows to observe several channels. Additionally, it is usually possible to specify
+  one or more <quote>priority channels</quote> for a scan list. This channel is then visited more 
+  frequently and thus monitored more intensively.
+</para>
+</section>
 </section>
