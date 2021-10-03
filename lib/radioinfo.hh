@@ -21,8 +21,8 @@ public:
     UV390, RT3S = UV390,
     MD2017, RT82 = MD2017,
     // Anytone devices
-    D868UV,
     D868UVE,
+    D868UV = D868UVE, // Actually a different device. Implement!
     DMR6X2 = D868UVE, // Actually a D868UV, implement latter!
     D878UV,
     D878UVII,

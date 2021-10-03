@@ -20,24 +20,24 @@ RadioInfo::_radiosByName = QHash<QString, RadioInfo::Radio>{
 QHash<unsigned, RadioInfo>
 RadioInfo::_radiosById= QHash<unsigned, RadioInfo>{
   {RadioInfo::OpenGD77, RadioInfo(RadioInfo::OpenGD77, "OpenGD77", "OpenGD77 Project")},
-  {RadioInfo::RD5R, RadioInfo(RadioInfo::RD5R, "RD5R", "Radioddity")},
-  {RadioInfo::GD77, RadioInfo(RadioInfo::GD77, "GD77", "Radioddity")},
-  {RadioInfo::UV390, RadioInfo(RadioInfo::UV390, "UV390", "TyT",
+  {RadioInfo::RD5R, RadioInfo(RadioInfo::RD5R, "rd5r", "RD-5R", "Radioddity")},
+  {RadioInfo::GD77, RadioInfo(RadioInfo::GD77, "gd77", "GD-77", "Radioddity")},
+  {RadioInfo::UV390, RadioInfo(RadioInfo::UV390, "uv390", "MD-UV390", "TyT",
                                QList<RadioInfo>{
                                  RadioInfo(RadioInfo::RT3S, "RT3S", "Retevis")
                                })},
-  {RadioInfo::MD2017, RadioInfo(RadioInfo::MD2017, "MD2017", "TyT",
+  {RadioInfo::MD2017, RadioInfo(RadioInfo::MD2017, "md2017", "MD-2017", "TyT",
                                 QList<RadioInfo>{
                                   RadioInfo(RadioInfo::RT82, "RT82", "Retevis")
                                 })},
-  {RadioInfo::D868UV, RadioInfo(RadioInfo::D868UV, "D868UV", "AnyTone")},
-  {RadioInfo::D868UVE, RadioInfo(RadioInfo::D868UVE, "D868UVE", "AnyTone",
+  {RadioInfo::D868UVE, RadioInfo(RadioInfo::D868UVE, "d868uve", "AT-D868UVE", "AnyTone",
                                  QList<RadioInfo>{
-                                   RadioInfo(RadioInfo::DMR6X2, "DMR6X2", "BTech")
+                                   RadioInfo(RadioInfo::DMR6X2, "dmr6x2", "DMR-6X2", "BTech"),
+                                   RadioInfo(RadioInfo::D868UV, "d868uv", "AT-D868UV", "AnyTone")
                                  })},
-  {RadioInfo::D878UV, RadioInfo(RadioInfo::D878UV, "D878UV", "AnyTone")},
-  {RadioInfo::D878UVII, RadioInfo(RadioInfo::D878UVII, "D878UV2", "AnyTone")},
-  {RadioInfo::D578UV, RadioInfo(RadioInfo::D578UV, "D578UV", "AnyTone")}
+  {RadioInfo::D878UV, RadioInfo(RadioInfo::D878UV, "d878uv", "AT-D878UV", "AnyTone")},
+  {RadioInfo::D878UVII, RadioInfo(RadioInfo::D878UVII, "d878uv2", "AT-D878UVII", "AnyTone")},
+  {RadioInfo::D578UV, RadioInfo(RadioInfo::D578UV, "d578uv", "AT-D578UV", "AnyTone")}
 };
 
 RadioInfo::RadioInfo(

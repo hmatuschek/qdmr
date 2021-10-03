@@ -6,6 +6,7 @@
 #include "config.h"
 #include "detect.hh"
 #include "verify.hh"
+#include "radioinfo.hh"
 #include "readcodeplug.hh"
 #include "writecodeplug.hh"
 #include "writecallsigndb.hh"
@@ -93,7 +94,10 @@ int main(int argc, char *argv[])
   parser.addOption(QCommandLineOption(
                      "ignore-limits",
                      QCoreApplication::translate("main", "Disables some limit checks.")));
-
+  parser.addOption(QCommandLineOption(
+                     "list-radios",
+                     QCoreApplication::translate("main", "Lists all supported radios including the "
+                                                 "keys to be used with the --radio option.")));
   parser.addPositionalArgument(
         "command", QCoreApplication::translate(
           "main", "Specifies the command to perform. Either detect, verify, read, write, "
@@ -110,8 +114,41 @@ int main(int argc, char *argv[])
 
   parser.process(app);
 
+  if (parser.isSet("list-radios")) {
+    QList<RadioInfo> radios = RadioInfo::allRadios();
+    QTextStream out(stdout);
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << " Key";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << "Name";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(60); out << "Manufacturer";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "\n";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(18); out << "-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "+-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(18); out << "-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "+-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(60); out << "-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "\n";
+    foreach (RadioInfo radio, radios) {
+      out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << (" " +radio.key());
+      out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
+      out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << radio.name();
+      out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
+      out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << radio.manufactuer() << "\n";
+    }
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(18); out << "-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "+-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(18); out << "-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "+-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(60); out << "-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "\n";
+    out.flush();
+    return 0;
+  }
+
   if (1 > parser.positionalArguments().size())
     parser.showHelp(-1);
+
   if (parser.isSet("verbose"))
     handler->setMinLevel(LogMessage::DEBUG);
 

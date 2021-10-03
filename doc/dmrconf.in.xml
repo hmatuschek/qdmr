@@ -182,6 +182,10 @@
         <listitem><para>Displays a short help message.</para></listitem>
       </varlistentry>
       <varlistentry>
+        <term><option>--list-radios</option></term>
+        <listitem><para>Lists all supported radios.</para></listitem>
+      </varlistentry>
+      <varlistentry>
         <term><option>-v</option> or <option>--version</option></term>
         <listitem><para>Displays the version number.</para></listitem>
       </varlistentry>
