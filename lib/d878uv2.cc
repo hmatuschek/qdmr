@@ -149,3 +149,9 @@ const Radio::Features &
 D878UV2::features() const {
   return _features;
 }
+
+RadioInfo
+D878UV2::defaultRadioInfo() {
+  return RadioInfo(
+        RadioInfo::D878UVII, "d878uv2", "AT-D878UVII", "AnyTone");
+}

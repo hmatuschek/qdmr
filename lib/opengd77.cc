@@ -99,6 +99,12 @@ OpenGD77::codeplug() {
   return _codeplug;
 }
 
+RadioInfo
+OpenGD77::defaultRadioInfo() {
+  return RadioInfo(
+        RadioInfo::OpenGD77, "opengd77", "OpenGD77", "OpenGD77 Project");
+}
+
 
 bool
 OpenGD77::startDownload(bool blocking) {

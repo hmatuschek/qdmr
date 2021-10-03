@@ -83,6 +83,12 @@ GD77::codeplug() {
   return _codeplug;
 }
 
+RadioInfo
+GD77::defaultRadioInfo() {
+  return RadioInfo(
+        RadioInfo::GD77, "gd77", "GD-77", "Radioddity");
+}
+
 
 bool
 GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {

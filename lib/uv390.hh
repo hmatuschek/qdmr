@@ -52,6 +52,10 @@ public:
   const CallsignDB *callsignDB() const;
   CallsignDB *callsignDB();
 
+  /** Returns the default radio information. The actual instance may have different properties
+   * due to variants of the same radio. */
+  static RadioInfo defaultRadioInfo();
+
 private:
   /** Holds the name of the device. */
   QString _name;

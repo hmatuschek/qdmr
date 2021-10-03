@@ -92,3 +92,12 @@ CallsignDB *
 UV390::callsignDB() {
   return &_callsigndb;
 }
+
+RadioInfo
+UV390::defaultRadioInfo() {
+  return RadioInfo(
+        RadioInfo::UV390, "uv390", "MD-UV390", "TyT",
+        QList<RadioInfo>{
+          RadioInfo(RadioInfo::RT3S, "RT3S", "Retevis")
+        });
+}

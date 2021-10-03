@@ -548,7 +548,7 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
   else
     ch->disableVOX();
 
-  return nullptr;
+  return ch;
 }
 
 bool

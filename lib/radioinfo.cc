@@ -1,44 +1,46 @@
 #include "radioinfo.hh"
 
+#include "opengd77.hh"
+#include "gd77.hh"
+#include "rd5r.hh"
+#include "uv390.hh"
+#include "md2017.hh"
+#include "d868uv.hh"
+#include "d878uv.hh"
+#include "d878uv2.hh"
+#include "d578uv.hh"
+
+
 QHash<QString, RadioInfo::Radio>
 RadioInfo::_radiosByName = QHash<QString, RadioInfo::Radio>{
   {"opengd77", RadioInfo::OpenGD77},
-  {"rd5r", RadioInfo::RD5R},
-  {"gd77", RadioInfo::GD77},
-  {"uv390", RadioInfo::UV390},
-  {"rt3s", RadioInfo::RT3S},
-  {"md2017", RadioInfo::MD2017},
-  {"rt82", RadioInfo::RT82},
-  {"d868uv", RadioInfo::D868UV},
-  {"d868uve", RadioInfo::D868UVE},
-  {"dmr6x2", RadioInfo::DMR6X2},
-  {"d878uv", RadioInfo::D878UV},
-  {"d878uv2", RadioInfo::D878UVII},
-  {"d578uv", RadioInfo::D578UV},
+  {"rd5r",     RadioInfo::RD5R},
+  {"gd77",     RadioInfo::GD77},
+  {"uv390",    RadioInfo::UV390},
+  {"rt3s",     RadioInfo::RT3S},
+  {"md2017",   RadioInfo::MD2017},
+  {"rt82",     RadioInfo::RT82},
+  {"d868uv",   RadioInfo::D868UV},
+  {"d868uve",  RadioInfo::D868UVE},
+  {"dmr6x2",   RadioInfo::DMR6X2},
+  {"d878uv",   RadioInfo::D878UV},
+  {"d878uv2",  RadioInfo::D878UVII},
+  {"d578uv",   RadioInfo::D578UV},
 };
 
 QHash<unsigned, RadioInfo>
-RadioInfo::_radiosById= QHash<unsigned, RadioInfo>{
-  {RadioInfo::OpenGD77, RadioInfo(RadioInfo::OpenGD77, "OpenGD77", "OpenGD77 Project")},
-  {RadioInfo::RD5R, RadioInfo(RadioInfo::RD5R, "rd5r", "RD-5R", "Radioddity")},
-  {RadioInfo::GD77, RadioInfo(RadioInfo::GD77, "gd77", "GD-77", "Radioddity")},
-  {RadioInfo::UV390, RadioInfo(RadioInfo::UV390, "uv390", "MD-UV390", "TyT",
-                               QList<RadioInfo>{
-                                 RadioInfo(RadioInfo::RT3S, "RT3S", "Retevis")
-                               })},
-  {RadioInfo::MD2017, RadioInfo(RadioInfo::MD2017, "md2017", "MD-2017", "TyT",
-                                QList<RadioInfo>{
-                                  RadioInfo(RadioInfo::RT82, "RT82", "Retevis")
-                                })},
-  {RadioInfo::D868UVE, RadioInfo(RadioInfo::D868UVE, "d868uve", "AT-D868UVE", "AnyTone",
-                                 QList<RadioInfo>{
-                                   RadioInfo(RadioInfo::DMR6X2, "dmr6x2", "DMR-6X2", "BTech"),
-                                   RadioInfo(RadioInfo::D868UV, "d868uv", "AT-D868UV", "AnyTone")
-                                 })},
-  {RadioInfo::D878UV, RadioInfo(RadioInfo::D878UV, "d878uv", "AT-D878UV", "AnyTone")},
-  {RadioInfo::D878UVII, RadioInfo(RadioInfo::D878UVII, "d878uv2", "AT-D878UVII", "AnyTone")},
-  {RadioInfo::D578UV, RadioInfo(RadioInfo::D578UV, "d578uv", "AT-D578UV", "AnyTone")}
+RadioInfo::_radiosById = QHash<unsigned, RadioInfo>{
+  {RadioInfo::OpenGD77, OpenGD77::defaultRadioInfo()},
+  {RadioInfo::RD5R,     RD5R::defaultRadioInfo()},
+  {RadioInfo::GD77,     GD77::defaultRadioInfo()},
+  {RadioInfo::UV390,    UV390::defaultRadioInfo()},
+  {RadioInfo::MD2017,   MD2017::defaultRadioInfo()},
+  {RadioInfo::D868UVE,  D868UV::defaultRadioInfo()},
+  {RadioInfo::D878UV,   D878UV::defaultRadioInfo()},
+  {RadioInfo::D878UVII, D878UV2::defaultRadioInfo()},
+  {RadioInfo::D578UV,   D578UV::defaultRadioInfo()}
 };
+
 
 RadioInfo::RadioInfo(
     Radio radio, const QString &name, const QString manufacturer, const QList<RadioInfo> &alias)
