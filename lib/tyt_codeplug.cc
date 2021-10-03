@@ -1818,7 +1818,13 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
 bool
 TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   int idx = config->radioIDs()->addId(radioName(),dmrId());
-  config->radioIDs()->setDefaultId(idx);
+  if (0 <= idx) {
+    logDebug() << "Explicitly set default ID to index=" << idx << ".";
+    config->radioIDs()->setDefaultId(idx);
+  } else {
+    logError() << "Cannot add radio DMR ID & cannot set default ID.";
+    return false;
+  }
   config->settings()->setIntroLine1(introLine1());
   config->settings()->setIntroLine2(introLine2());
   config->settings()->setMicLevel(micLevel());

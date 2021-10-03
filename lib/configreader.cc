@@ -1239,7 +1239,7 @@ RadioSettingsReader::allocate(const YAML::Node &node, const ConfigObject::Contex
 
 bool
 RadioSettingsReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
-  RadioID *rid = qobject_cast<RadioID *>(obj);
+  RadioSettings *rid = qobject_cast<RadioSettings *>(obj);
 
   if (! AbstractConfigReader::parse(obj, node, ctx))
     return false;

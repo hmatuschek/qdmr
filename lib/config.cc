@@ -108,14 +108,8 @@ Config::populate(YAML::Node &node, const Context &context)
   if ((node["settings"]= _settings->serialize(context)).IsNull())
     return false;
 
-  /*settings["micLevel"] = _mic_level;
-  settings["speech"] = _speech;
-  if (! _introLine1.isEmpty())
-    settings["introLine1"] = _introLine1.toStdString();
-  if (! _introLine2.isEmpty())
-    settings["introLine2"] = _introLine2.toStdString();
   if (_radioIDs->defaultId() && context.contains(_radioIDs->defaultId()))
-    settings["defaultID"] = context.getId(_radioIDs->defaultId()).toStdString();*/
+    node["settings"]["defaultID"] = context.getId(_radioIDs->defaultId()).toStdString();
 
   if ((node["radioIDs"] = _radioIDs->serialize(context)).IsNull())
     return false;
