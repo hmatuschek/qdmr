@@ -77,7 +77,7 @@ D868UV::D868UV(AnytoneInterface *device, QObject *parent)
   _supported_version = "V102";
 
   // Get device info and determine supported TX frequency bands
-  AnytoneInterface::RadioInfo info; _dev->getInfo(info);
+  AnytoneInterface::RadioVariant info; _dev->getInfo(info);
   switch (info.bands) {
   case 0x00:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 480.} };

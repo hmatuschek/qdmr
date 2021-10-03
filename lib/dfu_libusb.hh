@@ -31,7 +31,7 @@ public:
 	virtual ~DFUDevice();
 
 	bool isOpen() const;
-	QString identifier();
+  RadioInfo identifier();
 	void close();
 
   /** Erases a memory section at @c start of size @c size. */
@@ -79,7 +79,7 @@ protected:
   /** Device status. */
 	status_t _status;
   /** Read identifier. */
-  const char *_ident;
+  RadioInfo _ident;
   /** Holds the last error message. */
   QString _errorMessage;
 };

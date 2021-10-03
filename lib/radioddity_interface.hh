@@ -40,7 +40,7 @@ public:
   void close();
 
   /** Returns radio identifier string. */
-	QString identifier();
+  RadioInfo identifier();
 
   bool read_start(uint32_t bank, uint32_t addr);
 
@@ -77,7 +77,7 @@ private:
   /** The currently selected memory bank. */
   MemoryBank _current_bank;
   /** Identifier received when entering the prog mode. */
-  QString _identifier;
+  RadioInfo _identifier;
 };
 
 #endif // RADIODDITY_INTERFACE_HH

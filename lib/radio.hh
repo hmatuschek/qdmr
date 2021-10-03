@@ -9,6 +9,7 @@
 #define RADIO_HH
 
 #include <QThread>
+#include "radioinfo.hh"
 #include "codeplug.hh"
 #include "callsigndb.hh"
 
@@ -238,7 +239,7 @@ public:
 
 public:
   /** Detects a radio and returns the corresponding device specific radio instance. */
-  static Radio *detect(QString &errorMessage, const QString &force="");
+  static Radio *detect(QString &errorMessage, const RadioInfo &force=RadioInfo());
 
 public slots:
   /** Starts the download of the codeplug.

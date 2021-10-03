@@ -171,12 +171,12 @@ OpenGD77Interface::close() {
     USBSerial::close();
 }
 
-QString
+RadioInfo
 OpenGD77Interface::identifier() {
   if (isOpen())
-    return "OpenGD77";
+    return RadioInfo::byID(RadioInfo::OpenGD77);
   else
-    return "";
+    return RadioInfo();
 }
 
 bool

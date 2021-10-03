@@ -4,6 +4,7 @@
 #include "rd5r.hh"
 #include "gd77.hh"
 #include "uv390.hh"
+#include "md2017.hh"
 #include "opengd77.hh"
 #include "d868uv.hh"
 #include "d878uv.hh"
@@ -373,25 +374,26 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
 
 
 Radio *
-Radio::detect(QString &errorMessage, const QString &force) {
-  QString id;
+Radio::detect(QString &errorMessage, const RadioInfo &force) {
+  RadioInfo id;
 
   // Try TYT UV Family
   {
     DFUDevice *dfu = new DFUDevice(0x0483, 0xdf11);
     if (dfu->isOpen()) {
       id = dfu->identifier();
-      if (("MD-UV380" == id) || ("MD-UV390" == id) || ("UV390" == force.toUpper())) {
-        return new UV390(dfu);
-      } else if (("2017" == id) || ("MD2017" == force.toUpper())) {
-        return new UV390(dfu);
-      } else {
+      if (! id.isValid()) {
+        errorMessage = tr("Cannot identify TyT radio: %1").arg(dfu->errorMessage());
         dfu->close();
         dfu->deleteLater();
-        errorMessage = tr("%1(): Unsupported TyT/Retevis device '%2'.").arg(__func__).arg(id);
+        return nullptr;
+      }
+      if ((RadioInfo::UV390 == id.id()) || (force.isValid() && (RadioInfo::UV390 == force.id()))) {
+        return new UV390(dfu);
+      } else if ((RadioInfo::MD2017 == id.id()) || (force.isValid() && (RadioInfo::MD2017 == force.id()))) {
+        return new MD2017(dfu);
       }
     } else {
-      errorMessage = tr("%1(): Cannot connect to TyT/Retevis device '%2'.").arg(__func__).arg(id);
       dfu->deleteLater();
     }
   }
@@ -401,14 +403,16 @@ Radio::detect(QString &errorMessage, const QString &force) {
     RadioddityInterface *hid = new RadioddityInterface(0x15a2, 0x0073);
     if (hid->isOpen()) {
       id = hid->identifier();
-      if (("BF-5R" == id) || ("RD5R" == force.toUpper())) {
-        return new RD5R(hid);
-      } else if (("MD-760P" == id) || ("GD77" == force.toUpper())) {
-        return new GD77(hid);
-      } else {
-        errorMessage = tr("%1(): Unsupported Baofeng/Radioddity device '%2'.").arg(__func__).arg(id);
+      if (! id.isValid()) {
+        errorMessage = tr("Cannot identify Radioddity radio: %1").arg(hid->errorMessage());
         hid->close();
         hid->deleteLater();
+        return nullptr;
+      }
+      if ((RadioInfo::RD5R == id.id()) || (force.isValid() && (RadioInfo::RD5R == force.id()))) {
+        return new RD5R(hid);
+      } else if ((RadioInfo::GD77 == id.id()) || (force.isValid() && (RadioInfo::GD77 == force.id()))) {
+        return new GD77(hid);
       }
     } else {
       hid->deleteLater();
@@ -420,12 +424,14 @@ Radio::detect(QString &errorMessage, const QString &force) {
     OpenGD77Interface *ogd77 = new OpenGD77Interface();
     if (ogd77->isOpen()) {
       id = ogd77->identifier();
-      if (("OpenGD77" == id) || ("OpenGD77" == force.toUpper())) {
-        return new OpenGD77(ogd77);
-      } else {
-        errorMessage = tr("%1(): Unsupported OpenGD77 radio '%1'.").arg(__func__).arg(id);
+      if (! id.isValid()) {
+        errorMessage = tr("Cannot identify OpenGD77 radio: %1").arg(ogd77->errorMessage());
         ogd77->close();
         ogd77->deleteLater();
+        return nullptr;
+      }
+      if ((RadioInfo::OpenGD77 == id.id()) || (force.isValid() && (RadioInfo::OpenGD77 == force.id()))) {
+        return new OpenGD77(ogd77);
       }
     } else {
       ogd77->deleteLater();
@@ -437,19 +443,20 @@ Radio::detect(QString &errorMessage, const QString &force) {
     AnytoneInterface *anytone = new AnytoneInterface();
     if (anytone->isOpen()) {
       id = anytone->identifier();
-      if (("D6X2UV" == id) || ("D868UV" == id) || ("D868UVE" == id) || ("D868UV" == force.toUpper())) {
-        return new D868UV(anytone);
-      } else if (("D878UV" == id) || ("D878UV" == force.toUpper())) {
-        return new D878UV(anytone);
-      } else if (("D878UV2" == id) || ("D878UV2" == force.toUpper())) {
-        return new D878UV2(anytone);
-      } else if (("D578UV" == id) || ("D578UV" == force.toUpper())) {
-        return new D578UV(anytone);
-      } else {
+      if (! id.isValid()) {
+        errorMessage = tr("Cannot identify OpenGD77 radio: %1").arg(anytone->errorMessage());
         anytone->close();
         anytone->deleteLater();
-        errorMessage = tr("%1(): Unsupported AnyTone radio %2.").arg(__func__).arg(id);
         return nullptr;
+      }
+      if ((RadioInfo::D868UVE == id.id()) || (force.isValid() && (RadioInfo::D868UVE == force.id()))) {
+        return new D868UV(anytone);
+      } else if ((RadioInfo::D878UV == id.id()) || (force.isValid() && (RadioInfo::D878UV == force.id()))) {
+        return new D878UV(anytone);
+      } else if ((RadioInfo::D878UVII == id.id()) || (force.isValid() && (RadioInfo::D878UVII == force.id()))) {
+        return new D878UV2(anytone);
+      } else if ((RadioInfo::D578UV == id.id()) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
+        return new D578UV(anytone);
       }
     } else {
       anytone->deleteLater();

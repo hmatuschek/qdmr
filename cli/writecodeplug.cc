@@ -36,11 +36,19 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   }
   logDebug() << "Read codeplug from '" << filename << "'.";
 
-  QString forceRadio="";
+  RadioInfo forceRadio;
   if (parser.isSet("radio")) {
     logWarn() << "You force the radio type to be '" << parser.value("radio").toUpper()
               << "' this is generally a very bad idea! You have been warned.";
-    forceRadio = parser.value("radio");
+    forceRadio = RadioInfo::byKey(parser.value("radio").toLower());
+    if (! forceRadio.isValid()) {
+      QStringList radios;
+      foreach (RadioInfo info, RadioInfo::allRadios())
+        radios.append(info.key());
+      logError() << "Known radio key '" << parser.value("radio").toLower() << "'.";
+      logError() << "Known radios " << radios.join(", ") << ".";
+      return -1;
+    }
   }
 
   Radio *radio = Radio::detect(errorMessage, forceRadio);

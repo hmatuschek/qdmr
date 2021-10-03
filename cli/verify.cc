@@ -13,6 +13,7 @@
 #include "dfufile.hh"
 #include "rd5r.hh"
 #include "uv390.hh"
+#include "md2017.hh"
 #include "gd77.hh"
 #include "opengd77.hh"
 #include "d868uv.hh"
@@ -73,6 +74,8 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     RD5R radio; radio.verifyConfig(&config, issues);
   } else if (("uv390" == radio) || ("rt3s" == radio)) {
     UV390 radio; radio.verifyConfig(&config, issues);
+  } else if (("md2017" == radio) || ("rt82" == radio)) {
+    MD2017 radio; radio.verifyConfig(&config, issues);
   } else if ("gd77" == radio) {
     GD77 radio; radio.verifyConfig(&config, issues);
   } else if ("opengd77" == radio) {

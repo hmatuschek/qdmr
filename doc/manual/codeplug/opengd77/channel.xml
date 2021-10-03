@@ -44,22 +44,22 @@
   channel.
 </para>
 
-<table>
-  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
-  <tbody>
-    <tr>
-      <td><token>power</token></td>
-      <td>Specifies the detailed power settings for the channel. This is one of the following 
+<variablelist>
+  <title>Channel extension fields</title>
+  <varlistentry>
+    <term><token>power</token></term>
+    <listitem>
+      <para>Specifies the detailed power settings for the channel. This is one of the following 
         strings <token>Global</token>, <token>P50mW</token>, <token>P250mW</token>, <token>P500mW</token>, 
         <token>P750mW</token>, <token>P1W</token>, <token>P2W</token>, <token>P3W</token>, 
         <token>P4W</token>, , <token>P5W</token>, <token>Max</token>. Where <token>Global</token> 
         implies that the global power settings is used and <token>Max</token> the maximal possible 
         power is used (usually 7W on VHF and 5.5W on UHF). This power setting overrides the 
-        common channel power setting.</td>
-    </tr>
-  </tbody>
-</table>
-</section>
+        common channel power setting.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
 
+</section>
 </section>
         

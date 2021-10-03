@@ -32,25 +32,28 @@
   This zone has the ID <emphasis>roam1</emphasis> and the name <emphasis>Berlin/Brand</emphasis>. This group collects 
 all channels that provide access to the <emphasis>Berlin/Brandenburg</emphasis> talk group.
 </para>
-
-<table>
-  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
-  <tbody>
-    <tr>
-      <td><token>id</token></td>
-      <td>Specifies the ID of the roaming zone. This ID can then be used to refer to this 
-        zone. Any unique string is valid here.</td>
-    </tr>
-    <tr>
-      <td><token>name</token></td>
-      <td>Specifies the name of the roaming zone. Any string is valid here.</td>
-    </tr>
-    <tr>
-      <td><token>channels</token></td>
-      <td>Specifies the member channels for this roaming zone. This must be a list of 
-        references to digital channels.</td>
-    </tr>
-  </tbody>
-</table>
+<variablelist>
+  <title>Roaming zone fields</title>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>Specifies the ID of the roaming zone. This ID can then be used to refer to this 
+        zone. Any unique string is valid here.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>Specifies the name of the roaming zone. Any string is valid here.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>channels</token></term>
+    <listitem>
+      <para>Specifies the member channels for this roaming zone. This must be a list of 
+        references to digital channels.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
 
 </section>

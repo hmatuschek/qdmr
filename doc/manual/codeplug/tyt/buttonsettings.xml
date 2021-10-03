@@ -27,19 +27,15 @@
 ]]></programlisting>
 </example>
 
-
-<section>
-<info>
-  <title>Attributes</title>
-</info>
-
-<table>
-  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
-  <tbody>
-    <tr>
-      <td><token>sideButton1Short</token>, <token>sideButton1Long</token>, 
-        <token>sideButton2Short</token>, <token>sideButton2Long</token></td>
-      <td>Specifies the different functions for each button press. Must be one of:
+<variablelist>
+  <title>Button settings fields</title>
+  <varlistentry>
+    <term><token>sideButton1Short</token></term>
+    <term><token>sideButton1Long</token></term>
+    <term><token>sideButton2Short</token></term>
+    <term><token>sideButton2Long</token></term>
+    <listitem>
+      <para>Specifies the different functions for each button press. Must be one of:
         <token>Disabled</token>, <token>ToggleAllAlertTones</token>, <token>EmergencyOn</token>, 
         <token>EmergencyOff</token>, <token>PowerSelect</token>, <token>MonitorToggle</token>, 
         <token>OneTouch1</token>-<token>OneTouch6</token>, <token>RepeaterTalkaroundToggle</token>, 
@@ -47,14 +43,15 @@
         <token>VoxToggle</token>, <token>ZoneIncrement</token>, <token>BatteryIndicator</token>,
         <token>LoneWorkerToggle</token>, <token>RecordToggle</token>, <token>RecordPlayback</token>,
         <token>RecordDeleteAll</token>, <token>Tone1750Hz</token>, <token>SwitchUpDown</token>,
-        <token>RightKey</token>, <token>LeftKey</token> or <token>ZoneDecrement</token>. </td>
-    </tr>
-    <tr>
-      <td><token>longPressDuration</token></td>
-      <td>Specifies the long-press duration in milliseconds.</td>
-    </tr>
-  </tbody>
-</table>
-</section>
+        <token>RightKey</token>, <token>LeftKey</token> or <token>ZoneDecrement</token>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>longPressDuration</token></term>
+    <listitem>
+      <para>Specifies the long-press duration in milliseconds.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
 
 </section>

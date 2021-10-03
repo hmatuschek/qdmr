@@ -218,8 +218,14 @@
         <listitem><para>Anytone AT-D578UV</para></listitem>
       </varlistentry>
       <varlistentry>
-        <term><option>md390</option></term>
-        <listitem><para>TYT MD-390 or Retevis RT3S</para></listitem>
+        <term><option>uv390</option></term>
+        <term><option>rt3s</option></term>
+        <listitem><para>TYT MD-UV390 or Retevis RT3S</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>md2017</option></term>
+        <term><option>rt82</option></term>
+        <listitem><para>TYT MD-2017 or Retevis RT82</para></listitem>
       </varlistentry>
       <varlistentry>
         <term><option>gd77</option></term>

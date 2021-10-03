@@ -292,7 +292,7 @@
   is input and output frequencies and the color code of the repeater.
 </para>
 
-<table orient="port" xml:id="tabIntroCPRepeaterChannels">
+<table orient="land" xml:id="tabIntroCPRepeaterChannels">
   <title>Example channels for a single repeater DB0LDS</title>
   <thead>
     <tr><td>Name</td> <td>RX Freq. (output)</td> <td>TX Freq. (input)</td> <td>TS</td> <td>CC</td> <td>TX Contact</td> <td>Grp.List</td></tr>
@@ -497,7 +497,7 @@
 
 
 <section xml:id="introCPScanList">
-<info><title>Assmbling scan lists</title></info>
+<info><title>Assembling scan lists</title></info>
 <para>
   <glossterm>Scan List</glossterm>s are simple lists of channels. When the scan is started on a 
   particular channel, the channels scan list is used. The radio will then step though that list

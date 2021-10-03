@@ -17,7 +17,7 @@ class AnytoneInterface : public USBSerial
 
 public:
   /** Collects information about the particular radio being accessed. */
-  struct RadioInfo {
+  struct RadioVariant {
     /** The name of the radio. */
     QString name;
     /** A code for which bands are supported. */
@@ -26,7 +26,7 @@ public:
     QString version;
 
     /** Empty constructor. */
-    RadioInfo();
+    RadioVariant();
     /** Returns @c true if the radio info is valid. */
     bool isValid() const;
   };
@@ -42,11 +42,11 @@ public:
   void close();
 
   /** Returns an identifier of the radio. */
-  QString identifier();
+  RadioInfo identifier();
 
   /** Reads the radio info from the device and returns it.
    * The information is only read once. */
-  bool getInfo(RadioInfo &info);
+  bool getInfo(RadioVariant &info);
 
   bool read_start(uint32_t bank, uint32_t addr);
   bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
@@ -62,7 +62,7 @@ protected:
   /** Send command message to radio to ender program state. */
   bool enter_program_mode();
   /** Sends a request to radio to identify itself. */
-  bool request_identifier(RadioInfo &info);
+  bool request_identifier(RadioVariant &info);
   /** Sends a command message to radio to leave program state and reboot. */
   bool leave_program_mode();
   /** Internal used method to send messages to and receive responses from radio. */
@@ -129,7 +129,7 @@ protected:
   /** Holds the state of the interface. */
   State _state;
   /** Holds the radio info. */
-  RadioInfo _info;
+  RadioVariant _info;
 };
 
 #endif // ANYTONEINTERFACE_HH

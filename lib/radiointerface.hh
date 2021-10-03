@@ -5,7 +5,7 @@
 #define RADIOINFERFACE_HH
 
 #include <QString>
-
+#include "radioinfo.hh"
 
 /** Abstract radio interface.
  * A radion interface must provide means to communicate with the device. That is, open a connection
@@ -31,7 +31,7 @@ public:
 	virtual void close() = 0;
 
   /** Returns a device identifier. */
-	virtual QString identifier() = 0;
+  virtual RadioInfo identifier() = 0;
 
   /** Starts the write process into the specified bank and at the given address.
    * @param bank Specifies the memory bank to write to. Usually there is only one bank. Some radios,

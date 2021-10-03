@@ -32,7 +32,7 @@ public:
   void close();
 
   /** Returns an identifier of the radio. */
-  QString identifier();
+  RadioInfo identifier();
 
   bool read_start(uint32_t bank, uint32_t addr);
   bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);

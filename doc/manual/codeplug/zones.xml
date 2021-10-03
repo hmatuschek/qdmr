@@ -35,26 +35,32 @@
   <emphasis>KW B</emphasis> to match the radios configuration. 
 </para>
 
-<table>
-  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
-  <tbody>
-    <tr>
-      <td><token>id</token></td>
-      <td>Specifies the ID of the zone. For now, there are no codeplug elements that refer to zones.</td>
-    </tr>
-    <tr>
-      <td><token>name</token></td>
-      <td>Specifies the name of the zone. Any string is valid here.</td>
-    </tr>
-    <tr>
-      <td><token>A</token></td>
-      <td>Specifies the channel list for VFO A. This must be a list of references to channels.</td>
-    </tr>
-    <tr>
-      <td><token>B</token></td>
-      <td>Optional channel list for VFO B. If present, must be a list of references to channels.</td>
-    </tr>
-  </tbody>
-</table>
+<variablelist>
+  <title>Zone fields</title>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>Specifies the ID of the zone. For now, there are no codeplug elements that refer to zones.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>Specifies the name of the zone. Any string is valid here.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>A</token></term>
+    <listitem>
+      <para>Specifies the channel list for VFO A. This must be a list of references to channels.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>B</token></term>
+    <listitem>
+      <para>Optional channel list for VFO B. If present, must be a list of references to channels.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
 
 </section>

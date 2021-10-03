@@ -67,14 +67,14 @@ AnytoneInterface::WriteRequest::WriteRequest(uint32_t addr, const char *data) {
 /* ********************************************************************************************* *
  * Implementation of AnytoneInterface::RadioInfo
  * ********************************************************************************************* */
-AnytoneInterface::RadioInfo::RadioInfo()
+AnytoneInterface::RadioVariant::RadioVariant()
   : name(""), bands(0x00), version("")
 {
   // pass...
 }
 
 bool
-AnytoneInterface::RadioInfo::isValid() const {
+AnytoneInterface::RadioVariant::isValid() const {
   return ! name.isEmpty();
 }
 
@@ -97,7 +97,7 @@ AnytoneInterface::AnytoneInterface(QObject *parent)
     return;
   // identify device
   if (! this->request_identifier(_info)) {
-    _info = RadioInfo();
+    _info = RadioVariant();
     _state = STATE_ERROR;
   }
 }
@@ -123,13 +123,28 @@ AnytoneInterface::close() {
   }
 }
 
-QString
+RadioInfo
 AnytoneInterface::identifier() {
-  return _info.name;
+  if (! _info.isValid())
+    return RadioInfo();
+  if ("D868UVE" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D868UVE);
+  } else if ("D6X2UV" == _info.name) {
+    return RadioInfo::byID(RadioInfo::DMR6X2);
+  } else if ("D878UV" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D878UV);
+  } else if ("D878UV2" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D878UVII);
+  } else if ("D578UV" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D578UV);
+  }
+
+  logError() << "Unsupported AnyTone radio '" << _info.name << "'.";
+  return RadioInfo();
 }
 
 bool
-AnytoneInterface::getInfo(RadioInfo &info) {
+AnytoneInterface::getInfo(RadioVariant &info) {
   if (_info.isValid()) {
     info = _info;
     return true;
@@ -294,7 +309,7 @@ AnytoneInterface::enter_program_mode() {
 }
 
 bool
-AnytoneInterface::request_identifier(RadioInfo &info) {
+AnytoneInterface::request_identifier(RadioVariant &info) {
   if (STATE_PROGRAM != _state) {
       _errorMessage = tr("Anytone: Cannot request identifier. "
                          "Device not in program mode, is in state %1.").arg(_state);

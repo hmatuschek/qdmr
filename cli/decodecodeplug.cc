@@ -7,6 +7,7 @@
 
 #include "logger.hh"
 #include "config.hh"
+#include "radioinfo.hh"
 #include "uv390_codeplug.hh"
 #include "uv390_filereader.hh"
 #include "md2017_codeplug.hh"
@@ -29,10 +30,25 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
 
   QString filename = parser.positionalArguments().at(1);
   QString errorMessage;
-  QString radio = parser.value("radio").toLower();
+
+  if (! parser.isSet("radio")) {
+    logError() << "No radio type is specified! Use the --radio option.";
+    return -1;
+  }
+
+  if (! RadioInfo::hasRadioKey(parser.value("radio").toLower())) {
+    QStringList radios;
+    foreach (RadioInfo info, RadioInfo::allRadios())
+      radios.append(info.key());
+    logError() << "Unknown radio '" << parser.value("radio").toLower() << ".";
+    logError() << "Known radios " << radios.join(", ") << ".";
+    return -1;
+  }
+
+  RadioInfo::Radio radio = RadioInfo::byKey(parser.value("radio").toLower()).id();
   Config config;
 
-  if (("uv390"==radio) || ("rt3s"==radio)) {
+  if (RadioInfo::UV390 == radio) {
     UV390Codeplug codeplug;
     if (parser.isSet("manufacturer")) {
       if (! UV390FileReader::read(filename, &codeplug, errorMessage)) {
@@ -49,7 +65,7 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "': " << codeplug.errorMessage();
     }
-  } else if (("md2017"==radio) || ("rt82"==radio)) {
+  } else if (RadioInfo::MD2017 == radio) {
     MD2017Codeplug codeplug;
     if (parser.isSet("manufacturer")) {
       if (! MD2017FileReader::read(filename, &codeplug, errorMessage)) {
@@ -67,7 +83,7 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
                  << "': " << codeplug.errorMessage();
       return -1;
     }
-  } else if ("rd5r"==radio) {
+  } else if (RadioInfo::RD5R == radio) {
     RD5RCodeplug codeplug;
     if (parser.isSet("manufacturer")) {
       if (! RD5RFileReader::read(filename, &codeplug, errorMessage)) {
@@ -85,7 +101,7 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
                  << "': " << codeplug.errorMessage();
       return -1;
     }
-  } else if ("gd77" == radio) {
+  } else if (RadioInfo::GD77 == radio) {
     GD77Codeplug codeplug;
     if (parser.isSet("manufacturer")) {
       if (! GD77FileReader::read(filename, &codeplug, errorMessage)) {
@@ -103,9 +119,10 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
                  << "': " << codeplug.errorMessage();
       return -1;
     }
-  } else if ("opengd77" == radio) {
+  } else if (RadioInfo::OpenGD77 == radio) {
     if (parser.isSet("manufacturer")) {
-      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" << radio << "'.";
+      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" <<
+                    RadioInfo::byID(radio).name() << "'.";
       return -1;
     }
     OpenGD77Codeplug codeplug;
@@ -119,9 +136,25 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
                  << "': " << codeplug.errorMessage();
       return -1;
     }
-  } else if ("d878uv" == radio) {
+  } else if (RadioInfo::D868UVE == radio) {
+    D868UVCodeplug codeplug;
     if (parser.isSet("manufacturer")) {
-      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" << radio << "'.";
+      logError() << "Decoding of manufacturer codeplug is not implemented for radio '"
+                 << RadioInfo::byID(radio).name() << "'.";
+      return -1;
+    }
+    if (! codeplug.read(filename)) {
+      logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
+      return -1;
+    }
+    if (! codeplug.decode(&config)) {
+      logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
+      return -1;
+    }
+  } else if (RadioInfo::D878UV == radio) {
+    if (parser.isSet("manufacturer")) {
+      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" <<
+                    RadioInfo::byID(radio).name() << "'.";
       return -1;
     }
     D878UVCodeplug codeplug;
@@ -133,7 +166,12 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
       return -1;
     }
-  } else if ("d878uv2" == radio) {
+  } else if (RadioInfo::D878UVII == radio) {
+    if (parser.isSet("manufacturer")) {
+      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" <<
+                    RadioInfo::byID(radio).name() << "'.";
+      return -1;
+    }
     D878UV2Codeplug codeplug;
     if (! codeplug.read(filename)) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
@@ -143,17 +181,12 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
       return -1;
     }
-  } else if ("d868uv" == radio) {
-    D868UVCodeplug codeplug;
-    if (! codeplug.read(filename)) {
-      logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
+  } else if (RadioInfo::D578UV == radio) {
+    if (parser.isSet("manufacturer")) {
+      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" <<
+                    RadioInfo::byID(radio).name() << "'.";
       return -1;
     }
-    if (! codeplug.decode(&config)) {
-      logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
-      return -1;
-    }
-  } else if ("d578uv" == radio) {
     D578UVCodeplug codeplug;
     if (! codeplug.read(filename)) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
@@ -163,11 +196,8 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       logError() << "Cannot decode binary codeplug file '" << filename << "':" << codeplug.errorMessage();
       return -1;
     }
-  } else if (parser.isSet("radio")) {
-    logError() << "Unknown radio type '" << parser.value("radio") << "'.";
-    return -1;
   } else {
-    logError() << "Cannot determine binary codeplug type. Consider specifying the radio type using --radio.";
+    logError() << "Decoding not implemented for " << RadioInfo::byID(radio).name() << ".";
     return -1;
   }
 

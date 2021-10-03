@@ -9,42 +9,55 @@
   <title>DMR Networks</title>
 </info>
 
-Sie kennen nun alle wichtigen Konzepte des DMR-Betriebs und auch einige der technischen Details dazu, 
-wie das Erstellen von Codeplugs. Diese Konzepte gelten jedoch nur uneingeschränkt im sogenannten 
-Brandmeisternetz. Dies ist jenes Netz im Hintergrund, dass ihre Direkt- oder Gruppenrufe vermittelt und 
-Repeater miteinander verbindet. In Deutschland ist dies das dominierende Netz. Auch Weltweit sind die 
-meisten DMR Repeater (c.a., 1500) im Brandmeisternetz miteinander verbunden. Es gibt aber auch andere 
-DMR Netze. Zum Einen DMR-MARC (c.a., 500 Repeater) und zum Anderen DMR+ (c.a. 150 Repeater). Welches 
-Netz wo häufiger verwendet wird, hängt stark vom Land ab. So sind in Frankreich, Spanien, den BeNeLux 
-Staaten, Polen, Tschechien und der Slowakei fasst ausschließlich Brandmeister Repeater im Betrieb. 
-Während in Dänemark DMR+ deutlich mehr Repeater vernetzt. In Großbritannien, den USA und Österreich 
-sind DMR-MARC Repeater nicht selten. All diese Netze unterscheiden sich aber nicht technisch voneinander. 
-Das heißt, die Ihnen zugewiesene DMR-ID ist in allen Netzen gültig und sie können jedes Tier-II DMR 
-Funkgerät in allen Netzen verwenden. 
+<para>
+  Within the previous sections, I tried to outline the concepts and some technical details of a 
+  DMR network and how a codeplug might be assembled. These concepts, however, apply only to the
+  so-called <glossterm>Brandmeister</glossterm> network. This is the network in the background that
+  routes your private and group calls, connects repeaters etc. In Germany, this is the dominant 
+  network. But also world wide, it connects the majority of repeaters (about 5000). However, there
+  are also other networks. There is the <glossterm>DMR-MARC</glossterm> network and the 
+  <glossterm>DMR+</glossterm> network. Which network you are likely to encounter depends on your 
+  location. In countries like France, Spain, BeNeLux, Poland, Czech Republic and Slovakia, almost
+  all repeaters are connected to the Brandmeister network while in Denmark the DMR+ network 
+  dominates. In the USA and Austria, DMR-MARC repeaters aren't rare. All these networks do not 
+  differ on the technical level. That is, you DMR-ID is valid in all of these networks and you 
+  can use any DMR Tier II radio.
+</para>
 
-Lediglich die Konzepte der einzelnen Netze, vor allem wie Gruppenrufe realisiert werden, ist von Netz 
-zu Netz verschieden. Das heißt, Sie müssen die Kanäle zu einem DMR+ Repeater leicht anders konfigurieren 
-als Kanäle zu einem Brandmeister Repeater. 
+<para>
+  The concepts however, in particular how group calls are performed, depends heavily on the 
+  network. This means, that you need to configure the repeater channels for a DMR+ repeater
+  in a different way compared to a Brandmeister repeater.
+</para>
 
-\subsection{Reflektoren} \label{sec:reflector} \index{Reflektor}
-Im DMR+ Netz spielen sogenannte Reflektoren eine zentrale Rolle. Sie entsprechen in etwa den 
-Sprechgruppen, wie sie im Brandmeisternetz verwendet werden. 
+<section xml:id="itroReflector">
+<info><title>Reflectors (DMR+)</title></info>
 
-Der wesentliche Unterschied zu Sprechgruppen im Brandmeister Netz ist, dass diese Reflektoren nicht 
-einfach per Gruppenruf angerufen werden können, sondern zunächst per Direktruf an einem Repeater 
-temporär abonniert werden müssen. Danach verhalten sich alle Repeater, die diesen Reflektor abonniert 
-haben, wie eine Gruppe zusammen geschalteter FM Repeater. Das heißt, ein Gruppenruf zur lokalen 
-Sprechgruppe TG9 wird dann nicht nur lokal ausgesandt, sondern auch über alle Repeater die diesen 
-Reflektor abonniert haben.
+<para>
+  <glossterm>Reflector</glossterm>s play an important role in the DMR+ network. They represent
+  a talk group within the DMR+ network.
+</para>
 
-Dies hat den Vorteil, dass die Konfiguration des Funkgerätes viel einfacher ist: Es müssen lediglich 
-zwei Kanäle für jeden Repeater angelegt werden. Je einen für jeden Zeitschlitz und jeweils mit dem 
-Standardkontakt zur TG9. Um einen Reflektor am aktuellen Repeater zu abonnieren, wird einfach ein 
-Direktruf zu dem Reflektor aus der Kontaktliste heraus gestartet. Dieses Konzept ist auch näher an 
-den \emph{alten} Konzepten aus dem FM Repeaterbetrieb mit Echolink. Jedoch gehen dadurch modernere 
-Fähigkeiten des Netzes wie Roaming verloren. Dieses Konzept hat aber auch den Nachteil, dass die 
-Repeatertransparenz verloren geht. Anstatt einfach einen Gruppenruf zu der gewünschten Sprechgruppe 
-zu starten, muss zunächst der lokale Repeater \emph{konfiguriert} werden. Erst danach erfolgt alle 
-Kommunikation über die lokale Sprechgruppe TG9, auch wenn diese Kommunikation alles andere als lokal ist. 
+<para>
+  The major difference between a reflector and a talk group is, that they cannot be simply called
+  using a group call. Rather they are subscribed to a local repeater by a private call to the 
+  reflector. Then all repeaters subscribed to that reflector behave like a single repeater. You will
+  then participate on that reflector by performing a group call to TG9, the local talk group. Your
+  call will then be send to the reflector as well as to all other reflectors currently subscribed 
+  on the repeater and consequently to all repeater also subscribed to that reflector.
+</para>
+
+<para>
+  This has the advantage of a much simpler codeplug assembly as only two channels are configured 
+  for each repeater. One for each time slot. The default transmit contact will always be the 
+  local talk group TG9. To subscribe a reflector, a private call is started to the reflector from
+  the contact list. This implies that the contact list should contain all reflectors you are 
+  interested in. This concept is also much closer to the semi-analog concepts of EchoLink. However,
+  advanced features like roaming are not possible this way. Also the repeater transparency gets 
+  lost. Instead of simply starting a group call to the destination talk group, the local repeater 
+  needs to be <quote>configured</quote>. Once that configuration is done, the communication will
+  happen on the local talk group TG9, even if the communication is not local anymore. 
+</para>
+</section>
 
 </section>

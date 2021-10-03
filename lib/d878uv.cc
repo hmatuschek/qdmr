@@ -79,7 +79,7 @@ D878UV::D878UV(AnytoneInterface *device, QObject *parent)
   _supported_version = "V100";
 
   // Get device info and determine supported TX frequency bands
-  AnytoneInterface::RadioInfo info; _dev->getInfo(info);
+  AnytoneInterface::RadioVariant info; _dev->getInfo(info);
   switch (info.bands) {
   case 0x00:
   case 0x01:

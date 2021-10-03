@@ -33,23 +33,26 @@
   group list is then defined as a list containing the IDs of the referenced contacts.
 </para>
 
-<table>
-  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
-  <tbody>
-    <tr>
-      <td><token>id</token></td>
-      <td>Specifies the ID of the group list. This ID can then be used to refer to the group list
-        within digital channels. Any unique string is possible here.</td>
-    </tr>
-    <tr>
-      <td><token>name</token></td>
-      <td>Specifies the name of the group list. Any string is possible here.</td>
-    </tr>
-    <tr>
-      <td><token>contacts</token></td>
-      <td>A list of digital contact IDs. See <xref linkend="cpContacts"/> above.</td>
-    </tr>
-  </tbody>
-</table>
-
+<variablelist>
+  <title>Group list fields</title>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>Specifies the ID of the group list. This ID can then be used to refer to the group list
+        within digital channels. Any unique string is possible here.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>Specifies the name of the group list. Any string is possible here.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>contacts</token></term>
+    <listitem>
+      <para>A list of digital contact IDs. See <xref linkend="cpContacts"/> above.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
 </section>

@@ -38,16 +38,16 @@ RadioddityInterface::isOpen() const {
 void
 RadioddityInterface::close() {
   logDebug() << "Close HID connection.";
-  _identifier.clear();
+  _identifier = RadioInfo();
   HIDevice::close();
 }
 
-QString
+RadioInfo
 RadioddityInterface::identifier() {
   static unsigned char reply[38];
   unsigned char ack;
 
-  if (! _identifier.isEmpty())
+  if (_identifier.isValid())
     return _identifier;
 
   logDebug() << "Radioddity HID interface: Enter program mode.";
@@ -55,33 +55,33 @@ RadioddityInterface::identifier() {
   if (! hid_send_recv(CMD_PRG, 7, &ack, 1)) {
     _errorMessage = tr("Cannot identify radio: %1").arg(_errorMessage);
     logError() << _errorMessage;
-    return QString();
+    return RadioInfo();
   }
 
   if (ack != CMD_ACK[0]) {
     _errorMessage = tr("Cannot identify radio: Wrong PRD acknowledge %1, expected %2.")
         .arg(ack,0,10).arg(CMD_ACK[0], 0, 16);
     logError() << _errorMessage;
-    return QString();
+    return RadioInfo();
   }
 
   if (! hid_send_recv(CMD_PRG2, 2, reply, 16)) {
     _errorMessage = tr("Cannot identify radio: %1").arg(_errorMessage);
     logError() << _errorMessage;
-    return QString();
+    return RadioInfo();
   }
 
   if (! hid_send_recv(CMD_ACK, 1, &ack, 1)) {
     _errorMessage = tr("Cannot identify radio: %1").arg(_errorMessage);
     logError() << _errorMessage;
-    return QString();
+    return RadioInfo();
   }
 
   if (ack != CMD_ACK[0]) {
     _errorMessage = tr("Cannot identify radio: Wrong PRG2 acknowledge %1, expected %2.")
         .arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
     logError() << _errorMessage;
-    return QString();
+    return RadioInfo();
   }
 
   // Reply:
@@ -93,8 +93,16 @@ RadioddityInterface::identifier() {
   if (p)
     *p = 0;
 
-  _identifier = (char*)reply;
-  logDebug() << "Got device ID '" << _identifier << "'.";
+  if (0 == strcmp((char*)reply, "BF-5R")) {
+    _identifier = RadioInfo::byID(RadioInfo::RD5R);
+  } else if (0 == strcmp((char*)reply, "MD-760P")) {
+    _identifier = RadioInfo::byID(RadioInfo::GD77);
+  } else {
+    logError() << "Unknown Radioddity device '" << (char*)reply << "'.";
+    return RadioInfo();
+  }
+
+  logDebug() << "Got device '" << _identifier.name() << "'.";
   return _identifier;
 }
 
@@ -152,7 +160,7 @@ RadioddityInterface::read_finish()
 
   logDebug() << "Left program mode.";
 
-  _identifier.clear();
+  _identifier = RadioInfo();
 
   return true;
 }
@@ -213,7 +221,7 @@ RadioddityInterface::write_finish()
   }
 
   logDebug() << "Left program mode.";
-  _identifier.clear();
+  _identifier = RadioInfo();
 
   return true;
 }

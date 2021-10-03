@@ -34,7 +34,7 @@ enum {
 
 
 DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
-  : QObject(parent), RadioInterface(), _ctx(nullptr), _dev(nullptr), _ident(nullptr)
+  : QObject(parent), RadioInterface(), _ctx(nullptr), _dev(nullptr), _ident()
 {
   logDebug() << "Try to detect USB DFU interface " << QString::number(vid,16)
              << ":" << QString::number(pid,16) << ".";
@@ -72,7 +72,14 @@ DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
     return;
 
   // Get device identifier in a static buffer.
-  _ident = identify();
+  const char *idstr = identify();
+  if (idstr && (0==strcmp("MD-UV390", idstr))) {
+    _ident = RadioInfo::byID(RadioInfo::UV390);
+  } else if (idstr && (0==strcmp("2017", idstr))) {
+    _ident = RadioInfo::byID(RadioInfo::MD2017);
+  } else if (idstr) {
+    logError() << "Unknown TyT device '" << idstr << "'";
+  }
 
   // Zero address.
   set_address(0x00000000);
@@ -86,10 +93,10 @@ DFUDevice::~DFUDevice() {
 
 bool
 DFUDevice::isOpen() const {
-  return nullptr != _ident;
+  return _ident.isValid();
 }
 
-QString
+RadioInfo
 DFUDevice::identifier() {
   return _ident;
 }
@@ -101,7 +108,7 @@ DFUDevice::close() {
     libusb_close(_dev);
     libusb_exit(_ctx);
     _ctx = nullptr;
-    _ident = nullptr;
+    _ident = RadioInfo();
   }
 }
 
