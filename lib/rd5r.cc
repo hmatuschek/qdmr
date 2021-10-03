@@ -85,3 +85,9 @@ Codeplug &
 RD5R::codeplug() {
   return _codeplug;
 }
+
+RadioInfo
+RD5R::defaultRadioInfo() {
+  return RadioInfo(
+        RadioInfo::RD5R, "rd5r", "RD-5R", "Radioddity");
+}

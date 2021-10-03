@@ -28,6 +28,10 @@ public:
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
+  /** Returns the default radio information. The actual instance may have different properties
+   * due to variants of the same radio. */
+  static RadioInfo defaultRadioInfo();
+
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
   bool startDownload(bool blocking=false);

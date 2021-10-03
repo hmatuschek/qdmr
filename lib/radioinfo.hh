@@ -5,8 +5,12 @@
 #include <QHash>
 #include <QList>
 
-/** Provides some information about a radio model. This class is used to unify radio enumeration
- * and detection. */
+/** Provides some information about a radio model.
+ *
+ * This class is used to unify radio enumeration and detection. It also will contains the detailed
+ * features of the radio as used by the @c Radio::verify method.
+ *
+ * @since 0.9.0 This class will replace the Radio::Features class in future. */
 class RadioInfo
 {
 public:
@@ -29,15 +33,14 @@ public:
     D578UV
   };
 
-protected:
-  /** Hidden constructor. Use static methods the access radio info. */
+public:
+  /** Use static methods the access radio info or call @c Radio::defaultRadioInfo. */
   RadioInfo(Radio radio, const QString &name, const QString manufacturer,
             const QList<RadioInfo> &alias=QList<RadioInfo>());
-  /** Hidden constructor. Use static methods the access radio info. */
+  /** Use static methods the access radio info or call @c Radio::defaultRadioInfo. */
   RadioInfo(Radio radio, const QString &key, const QString &name, const QString manufacturer,
             const QList<RadioInfo> &alias=QList<RadioInfo>());
 
-public:
   /** Empty constructor. */
   RadioInfo();
 

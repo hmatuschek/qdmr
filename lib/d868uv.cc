@@ -141,3 +141,13 @@ const Radio::Features &
 D868UV::features() const {
   return _features;
 }
+
+RadioInfo
+D868UV::defaultRadioInfo() {
+  return RadioInfo(
+        RadioInfo::D868UVE, "d868uve", "AT-D868UVE", "AnyTone",
+        QList<RadioInfo>{
+          RadioInfo(RadioInfo::DMR6X2, "dmr6x2", "DMR-6X2", "BTech"),
+          RadioInfo(RadioInfo::D868UV, "d868uv", "AT-D868UV", "AnyTone")
+        });
+}

@@ -31,6 +31,10 @@ public:
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
+  /** Returns the default radio information. The actual instance may have different properties
+   * due to variants of the same radio. */
+  static RadioInfo defaultRadioInfo();
+
 public slots:
   /** Encodes the given user-database and uploades it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,

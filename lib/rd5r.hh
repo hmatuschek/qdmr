@@ -51,6 +51,8 @@ public:
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
+  static RadioInfo defaultRadioInfo();
+
 private:
   /** Device identifier string. */
 	QString _name;

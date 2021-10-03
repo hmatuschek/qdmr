@@ -150,3 +150,9 @@ const Radio::Features &
 D578UV::features() const {
   return _features;
 }
+
+RadioInfo
+D578UV::defaultRadioInfo() {
+  return RadioInfo(
+        RadioInfo::D578UV, "d578uv", "AT-D578UV", "AnyTone");
+}
