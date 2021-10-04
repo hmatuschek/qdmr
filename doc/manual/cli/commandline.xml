@@ -35,6 +35,9 @@
 </para>
 
 <xi:include href="codeplug.xml"/>
+<xi:include href="callsign.xml"/>
+<xi:include href="various.xml"/>
+<xi:include href="dangerzone.xml"/>
 <xi:include href="dmrconf.xml"/>
 
 </chapter>

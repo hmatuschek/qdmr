@@ -147,7 +147,7 @@ dmrconf decode --radio=uv390 codeplug.dfu codeplug.yaml]]></programlisting>
 
 
 <section>
-<info><title>Writing codeplugs</title></info>
+<info><title>Writing a codeplug</title></info>
 
 <para>
   To write a codeplug into the device, the <command>write</command> command is used. The codeplug
@@ -196,7 +196,6 @@ dmrconf decode --radio=uv390 codeplug.dfu codeplug.yaml]]></programlisting>
   programmed channels use the GPS or a roaming zone. (This depends also on the ability of the 
   radio.)
 </para>
-
 
 <section xml:id="cmdVerify">
 <info><title>Verify a codeplug</title></info>

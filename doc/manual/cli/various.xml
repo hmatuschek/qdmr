@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<section xml:id="cmdVarious"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Various features of <command>dmrconf</command></title>
+</info>
+
+<para>
+  Beside reading and writing codeplugs or writing the call-sign DB, there are some more commands 
+  and features that mainly concern the debugging of the codeplug and call-sign DB encoding and 
+  decoding. If you are interested in the codeplug internals, you may use these commands to study
+  them.
+</para>
+
+
+<section xml:id="cmdHelp">
+<info><title>Getting help</title></info>
+
+<para>
+  As usual for command line tools, a brief help text about the commands and options gets written
+  to <varname>stdout</varname> when the <option>--help</option> or <option>-h</option> option is 
+  passed. No other commands passed are executed then.
+</para>
+
+<para>
+  Similar to the <option>--help</option> option, it is possible to print the version number of 
+  <command>dmrconf</command> using the <option>--version</option> or <option>-v</option> option.
+  Like for the <option>--help</option>, no other commands passed get executed.
+</para>
+
+<para>
+  To get a list of keys identifying radio models when specified using the <option>--radio</option>
+  option, the <option>--list-radios</option> can be passed. This will print a small table to 
+  <varname>stdout</varname> that lists the keys for each known radio as well as the model and
+  manufacturer name.
+</para>
+</section>
+
+
+<section xml:id="cmdDetect">
+<info><title>Detecting the radio type</title></info>
+<para>
+  The command <command>detect</command> solely detects the radio. No data is written or read 
+  from the device (except of the radio model information). This command can be used to check 
+  whether a radio is detected correctly.
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[dmrconf detect]]></programlisting>
+</informalexample>
+
+<para>
+  This command will try to detect the connected radio. If a known radio is found, the model and
+  manufacturer name is written to <varname>stdout</varname>. If no radio is detected or if the 
+  model is unknown or unsupported, an error message is written to <varname>stderr</varname>.
+</para>
+</section>
+
+
+<section xml:id="cmdInfo">
+<info><title>Inspecting binary codeplugs</title></info>
+
+<para>
+  The <command>encode</command>, <command>encode-db</command> and <command>read</command> commands
+  can store the codeplug and call-sign DB in binary form in a DFU file. The generated file is a 
+  valid DFU (device firmware update) file, that can be handled with other DFU tools.
+</para>
+
+<para>
+  A DFU file may contains several so-called images. Each image may contains several so-called 
+  elements. The latter represents a segment of memory with an associated memory address. 
+</para>
+
+<para>
+  The <command>info</command> command produces a hex-dump of the DFU file that is written to 
+  <varname>stdout</varname>. It can then be inspected using <command>more</command> or 
+  <command>less</command>.
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[dmrconf info codeplug.dfu | less]]></programlisting>
+</informalexample>
+
+<para>
+  This example will generate a hex dump of the encoded codeplug in the specified DFU file
+  <filename>codeplug.dfu</filename>. The result is piped to <command>less</command> for easy 
+  reading. The hex dump also prints some information about the file structure as well as
+  memory addresses. It also collapses repetitive memory sections (similar to 
+  <command>hexdump -C</command>. To this end, this command is a helpful tool for debugging
+  the encoding of codeplugs and call-sign DBs.
+</para>
+</section>
+
+</section>
