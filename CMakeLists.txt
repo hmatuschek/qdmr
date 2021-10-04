@@ -6,6 +6,7 @@ set(RELEASE_SUFFIX "-alpha1")
 option(BUILD_TESTS "Build test programs" OFF)
 option(BUILD_DOCS  "Build API documentation" OFF)
 option(BUILD_MAN   "Build man page for dmrconf" OFF)
+option(INSTALL_UDEV_RULES "Install udev rules file." ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -18,6 +19,9 @@ find_package(Qt5Positioning REQUIRED)
 find_package(Qt5LinguistTools REQUIRED)
 find_package(LIBUSB_1 REQUIRED)
 find_package(YAML-CPP REQUIRED)
+
+get_property(YAMLCPP_LIBRARIES TARGET ${YAML_CPP_LIBRARIES} PROPERTY IMPORTED_LOCATION_RELEASE)
+message(STATUS "Using libyaml-cpp ${YAMLCPP_LIBRARIES}")
 
 if (${BUILD_MAN})
   find_program(XSLTPROC_EXECUTABLE xsltproc DOC "xsltproc for man-page generation." REQUIRED)
@@ -54,7 +58,7 @@ LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/src)
 set(LIBS ${Qt5Core_LIBRARIES} ${Qt5Core_QTMAIN_LIBRARIES} ${Qt5Widgets_LIBRARIES}
 	${Qt5UiTools_LIBRARIES} ${Qt5Network_LIBRARIES} ${Qt5Positioning_LIBRARIES}
   ${Qt5Test_LIBRARIES} ${Qt5SerialPort_LIBRARIES} ${LIBUSB_1_LIBRARIES}
-  ${YAML_CPP_LIBRARIES})
+  ${YAMLCPP_LIBRARIES})
 
 IF (UNIX AND APPLE)
  SET(LIBS ${LIBS} "-framework IOKit -framework CoreFoundation")
