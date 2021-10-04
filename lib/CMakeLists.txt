@@ -58,7 +58,7 @@ set_target_properties(libdmrconf PROPERTIES
   OUTPUT_NAME dmrconf
   VERSION "${PROJECT_VERSION}"
   SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
-target_link_libraries(libdmrconf ${LIBS})
+target_link_libraries(libdmrconf ${CORE_LIBS})
 
 install(TARGETS libdmrconf DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
 install(FILES ${libdmrconf_HEADERS} DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/libdmrconf)
@@ -67,5 +67,5 @@ install(FILES ${PROJECT_BINARY_DIR}/lib/config.h DESTINATION ${CMAKE_INSTALL_FUL
 
 if (UNIX AND NOT APPLE AND ${INSTALL_UDEV_RULES})
   install(FILES "${CMAKE_SOURCE_DIR}/dist/99-qdmr.rules" DESTINATION "/etc/udev/rules.d/")
-endif(UNIX AND NOT APPLE)
+endif(UNIX AND NOT APPLE AND ${INSTALL_UDEV_RULES})
 

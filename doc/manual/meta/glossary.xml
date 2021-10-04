@@ -7,6 +7,27 @@
   
   <glossentry>
     <glossterm>Admit Criterion</glossterm>
+    <glossdef>
+      <para>
+        The admit criterion specifies a criterion under which transmissions on a channel are 
+        allowed. These criteria can be defined for both, analog and DMR channels. Irrespective of
+        the channel type, the admit criteria <quote>always</quote> and <quote>channel free</quote>
+        can be selected. The former simply always allows to transmit. The former requires the 
+        channel to be free. 
+      </para>
+      <para>
+        For analog channels, usually there is also the criterion <quote>tone</quote>. This 
+        criterion would only allow transmissions if the matching CTCSS tone or DCS code has been
+        received. For analog repeater operation, the criterion <quote>channel free</quote> should
+        not be used as this would prevent any transmissions while the repeater is active.
+      </para>
+      <para>
+        For digital channels, usually there is also the criterion <quote>color code</quote>. This
+        criterion would only allow transmissions if the matching color code has been received. To 
+        this end, this criterion is similar to the <quote>tone</quote> criterion for analog 
+        channels.
+      </para>
+    </glossdef>
   </glossentry>
 
   <glossentry>
@@ -41,14 +62,46 @@
 
   <glossentry>
     <glossterm>Codeplug</glossterm>
+    <glossdef>
+      <para>
+        The term <quote>codeplug</quote> is rather loosely defined. Usually it refers to the binary
+        representation of the configuration of a radio that is written to the radio to configure it.
+        It contains all contacts, channels, zones, settings, etc that form the configuration of the
+        radio.
+      </para>
+    </glossdef>
   </glossentry>
 
   <glossentry>
     <glossterm>Color Code</glossterm>
+    <para>
+      A color code is some additional information attached to each DMR call. It is used to prevent 
+      interference between repeaters with overlapping ranges that operate at the same frequencies. 
+      In amateur radio, this may only happen in very densely populated areas. It is much more 
+      frequent in commercial applications, where a single company may got only a few frequencies 
+      assigned but needs much more repeaters to cover a campus reliably.
+    </para>
+    <para>
+      The color code is a number between 0 and 16. A radio or repeater may only react to calls with
+      matching color codes. Hence beside the actual input and output frequencies, the color code of
+      a repeater must be known to be able to access it.
+    </para>
   </glossentry>
 
   <glossentry>
     <glossterm>DAPNET</glossterm>
+    <glossdef>
+      <para>
+        <acronym>DAPNET</acronym>, short for Decentralized Amateur Paging Network does exactly what
+        it says. It is a network of transmitters that transmit pager messages in the UHF band, 
+        usually at 439.9875 MHz. As the old pager operated at a frequency near by, they can be 
+        modified to operate at that frequency and can therefore be used in amateur radio. 
+      </para>
+      <para>
+        The DAPNET is particularly popular with emergency operators as it allows for an convenient
+        and reliable multicast notification.
+      </para>
+    </glossdef>
   </glossentry>
   
   <glossentry>
@@ -66,10 +119,30 @@
 
   <glossentry>
     <glossterm>Group Call</glossterm>
+    <glossdef>
+      <para>
+        A group call is simply a call to a talk group. That is, not to a single participant but 
+        rather to a group of participants. Every participant that has this talk group in their 
+        group list can receive this call. See also <glossterm>Group List</glossterm> and
+        <glossterm>Talk Group</glossterm>.
+      </para>
+    </glossdef>
   </glossentry>
   
   <glossentry>
     <glossterm>Group List</glossterm>
+    <glossdef>
+      <para>
+        A group list is a simple list of talk groups. A group list is then assigned to a channel
+        to specify which group calls to receive on that channel. If a talk group is not listed in 
+        the group list of a channel, the radio will ignore calls to this talk group on that 
+        channel.
+      </para>
+      <para>
+        The DMR network cannot know which talk groups you are interested in. You have to tell your
+        radio using group lists.
+      </para>
+    </glossdef>
   </glossentry>
   
   <glossentry>
@@ -93,7 +166,7 @@
   </glossentry>
 
   <glossentry>
-    <glossterm>Talkgroup</glossterm>
+    <glossterm>Talk Group</glossterm>
   </glossentry>
   
   <glossentry>
