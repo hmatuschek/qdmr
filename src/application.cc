@@ -575,6 +575,13 @@ Application::uploadCallsignDB() {
   // this is part of the "auto-selection" of calls-signs for upload
   Settings settings;
   if (settings.selectUsingUserDMRID()) {
+    if (nullptr == _config->radioIDs()->defaultId()) {
+      QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
+                            tr("QDMR selects the call-signs to be uploaded based on the default DMR "
+                               "ID of the radio. No default ID set."));
+      radio->deleteLater();
+      return;
+    }
     // Sort w.r.t users DMR ID
     unsigned id = _config->radioIDs()->defaultId()->number();
     logDebug() << "Sort call-signs closest to ID=" << id << ".";
