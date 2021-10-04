@@ -51,7 +51,6 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     logError() << "Verification of binary code-plugs makes no sense.";
     return -1;
   } else if (parser.isSet("yaml") || (filename.endsWith(".yaml") || filename.endsWith(".yml"))) {
-    Config config;
     ConfigReader reader;
     if (! reader.read(&config, filename)) {
       logError() << "Cannot read config file '" << filename << ": " << reader.errorMessage();
