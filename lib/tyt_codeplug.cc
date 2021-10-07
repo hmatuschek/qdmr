@@ -3028,7 +3028,7 @@ TyTCodeplug::decode(Config *config) {
   Context ctx(config);
 
   // Clear config object
-  config->reset();
+  config->clear();
 
   return this->decodeElements(ctx);
 }

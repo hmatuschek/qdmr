@@ -2498,7 +2498,7 @@ RadioddityCodeplug::encodeElements(const Flags &flags, Context &ctx) {
 bool
 RadioddityCodeplug::decode(Config *config) {
   // Clear config object
-  config->reset();
+  config->clear();
 
   // Create index<->object table.
   Context ctx(config);

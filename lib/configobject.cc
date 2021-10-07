@@ -141,6 +141,13 @@ ConfigObject::serialize(const Context &context) {
   return node;
 }
 
+void
+ConfigObject::clear() {
+  foreach (ConfigObject *extension, _extensions)
+    extension->deleteLater();
+  _extensions.clear();
+}
+
 bool
 ConfigObject::populate(YAML::Node &node, const Context &context){
   if (context.contains(this))

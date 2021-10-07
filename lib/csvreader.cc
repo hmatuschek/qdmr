@@ -1720,7 +1720,7 @@ CSVReader::read(Config *config, QTextStream &stream, QString &errorMessage) {
     return false;
   }
 
-  config->reset();
+  config->clear();
 
   CSVReader reader(config);
   CSVParser parser(&reader);

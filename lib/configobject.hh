@@ -90,6 +90,8 @@ public:
   /** Recursively serializes the configuration to YAML nodes.
    * The complete configuration must be labeled first. */
   virtual YAML::Node serialize(const Context &context);
+  /** Clears the config object. */
+  virtual void clear();
 
   /** Returns @c true if the config object has the given extension. */
   virtual bool hasExtension(const QString &name) const;

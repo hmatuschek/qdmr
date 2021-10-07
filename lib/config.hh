@@ -75,7 +75,7 @@ public:
   bool requiresGPS() const;
 
   /** Clears the complete configuration. */
-  void reset();
+  void clear();
 
   /** Imports a configuration from the given file. */
   bool readCSV(const QString &filename, QString &errorMessage);

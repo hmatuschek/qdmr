@@ -227,7 +227,9 @@ Config::requiresGPS() const {
 
 
 void
-Config::reset() {
+Config::clear() {
+  ConfigObject::clear();
+
   // Reset lists
   _settings->clear();
   _radioIDs->clear();
@@ -238,10 +240,6 @@ Config::reset() {
   _scanlists->clear();
   _gpsSystems->clear();
   _roaming->clear();
-
-  foreach (ConfigObject *extension, _extensions) {
-    extension->deleteLater();
-  }
 
   emit modified(this);
 }

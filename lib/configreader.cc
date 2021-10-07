@@ -337,7 +337,7 @@ ConfigReader::read(Config *obj, const QString &filename) {
     return false;
   }
 
-  obj->reset();
+  obj->clear();
   ConfigObject::Context context;
 
   if (! parse(obj, node, context))

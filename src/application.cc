@@ -242,7 +242,7 @@ Application::newCodeplug() {
       return;
   }
 
-  _config->reset();
+  _config->clear();
   _config->setModified(false);
 }
 
@@ -287,7 +287,7 @@ Application::loadCodeplug() {
       QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
                             tr("Cannot read codeplug from file '%1': %2")
                             .arg(filename).arg(reader.errorMessage()));
-      _config->reset();
+      _config->clear();
     }
   } else {
     QTextStream stream(&file);
@@ -297,7 +297,7 @@ Application::loadCodeplug() {
       QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
                             tr("Cannot read codeplug from file '%1': %2")
                             .arg(filename).arg(errorMessage));
-      _config->reset();
+      _config->clear();
     }
   }
 }
@@ -475,7 +475,7 @@ Application::onCodeplugDownloadError(Radio *radio) {
 
 void
 Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
-  _config->reset();
+  _config->clear();
   _mainWindow->setWindowModified(false);
   if (codeplug->decode(_config)) {
     _mainWindow->statusBar()->showMessage(tr("Download complete"));
