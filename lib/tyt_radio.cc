@@ -6,7 +6,7 @@
 #define BSIZE 1024
 
 
-TyTRadio::TyTRadio(DFUDevice *device, QObject *parent)
+TyTRadio::TyTRadio(TyTInterface *device, QObject *parent)
   : Radio(parent), _dev(device), _codeplugFlags(), _config(nullptr)
 {
   if (! connect())
@@ -152,7 +152,7 @@ TyTRadio::connect() {
   if (_dev)
     _dev->deleteLater();
 
-  _dev = new DFUDevice(0x0483, 0xdf11);
+  _dev = new TyTInterface(0x0483, 0xdf11);
   if (!_dev->isOpen()) {
     _errorMessage = QString("Cannot open device at 0483:DF11: %1").arg(_dev->errorMessage());
     _dev->deleteLater();

@@ -40,7 +40,7 @@ class DM1701: public TyTRadio
 
 public:
   /** Do not construct this class directly, rather use @c Radio::detect. */
-  explicit DM1701(DFUDevice *device=nullptr, QObject *parent=nullptr);
+  explicit DM1701(TyTInterface *device=nullptr, QObject *parent=nullptr);
 
   const QString &name() const;
   const Radio::Features &features() const;

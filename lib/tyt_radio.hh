@@ -6,7 +6,7 @@
 #define TYT_RADIO_HH
 
 #include "radio.hh"
-#include "dfu_libusb.hh"
+#include "tyt_interface.hh"
 
 /** Implements an USB interface to TYT & Retevis radios.
  *
@@ -17,7 +17,7 @@ class TyTRadio: public Radio
 
 public:
   /** Do not construct this class directly, rather use @c Radio::detect. */
-  explicit TyTRadio(DFUDevice *device=nullptr, QObject *parent=nullptr);
+  explicit TyTRadio(TyTInterface *device=nullptr, QObject *parent=nullptr);
 
   virtual ~TyTRadio();
 
@@ -44,7 +44,7 @@ private:
 
 protected:
   /** The interface to the radio. */
-	DFUDevice *_dev;
+  TyTInterface *_dev;
   /** Holds the flags to controll assembly and upload of code-plugs. */
   Codeplug::Flags _codeplugFlags;
   /** The generic configuration. */

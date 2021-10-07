@@ -40,7 +40,7 @@ public:
   /** Constructor.
    * @param device Specifies the DFU device to use for communication with the device.
    * @param parent The QObject parent. */
-  MD2017(DFUDevice *device=nullptr, QObject *parent=nullptr);
+  MD2017(TyTInterface *device=nullptr, QObject *parent=nullptr);
   /** Desturctor. */
   virtual ~MD2017();
 

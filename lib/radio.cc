@@ -1,6 +1,9 @@
 #include "radio.hh"
+
+#include "anytone_interface.hh"
 #include "radioddity_interface.hh"
-#include "dfu_libusb.hh"
+#include "tyt_interface.hh"
+
 #include "rd5r.hh"
 #include "gd77.hh"
 #include "uv390.hh"
@@ -10,8 +13,10 @@
 #include "d878uv.hh"
 #include "d878uv2.hh"
 #include "d578uv.hh"
+
 #include "config.hh"
 #include "logger.hh"
+
 #include <QSet>
 
 
@@ -379,7 +384,7 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
 
   // Try TYT UV Family
   {
-    DFUDevice *dfu = new DFUDevice(0x0483, 0xdf11);
+    TyTInterface *dfu = new TyTInterface(0x0483, 0xdf11);
     if (dfu->isOpen()) {
       id = dfu->identifier();
       if (! id.isValid()) {

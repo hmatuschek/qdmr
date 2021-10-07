@@ -51,6 +51,7 @@ public:
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
+  /** Returns the default info about the radio. */
   static RadioInfo defaultRadioInfo();
 
 private:

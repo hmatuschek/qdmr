@@ -53,7 +53,7 @@ Radio::Features _md2017_features = {
 
 
 
-MD2017::MD2017(DFUDevice *device, QObject *parent)
+MD2017::MD2017(TyTInterface *device, QObject *parent)
   : TyTRadio(device, parent), _name("TyT DM-2017")
 {
   //_codeplug(nullptr), _callsigndb(nullptr);

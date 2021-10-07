@@ -235,7 +235,8 @@ ConfigObject::extension(const QString &name) const {
   return _extensions.value(name, nullptr);
 }
 
-ConfigObject *ConfigObject::extension(const QString &name) {
+ConfigObject *
+ConfigObject::extension(const QString &name) {
   return _extensions.value(name, nullptr);
 }
 

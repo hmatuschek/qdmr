@@ -39,7 +39,7 @@ public:
   /** Constructor.
    * @param device Specifies the DFU device to use for communication with the device.
    * @param parent The QObject parent. */
-  UV390(DFUDevice *device=nullptr, QObject *parent=nullptr);
+  UV390(TyTInterface *device=nullptr, QObject *parent=nullptr);
   /** Desturctor. */
   virtual ~UV390();
 

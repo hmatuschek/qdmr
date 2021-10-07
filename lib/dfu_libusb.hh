@@ -3,20 +3,20 @@
 
 #include <QObject>
 #include <libusb.h>
-#include "radiointerface.hh"
 
 /** This class implements DFU protocol to access radios.
  *
  * Many manufactures use the standardized DFU protocoll to programm codeplugs and update the
- * firmware of their radios. This class implements this protocol.
+ * firmware of their radios. This class implements this protocol, see
+ * https://www.usb.org/sites/default/files/DFU_1.1.pdf for details.
  *
  * @ingroup rif */
-class DFUDevice: public QObject, public RadioInterface
+class DFUDevice: public QObject
 {
 	Q_OBJECT
 
 private:
-  /** Current status. */
+  /** Status message from device. */
 	typedef struct {
 		unsigned  status       : 8;
 		unsigned  poll_timeout : 24;
@@ -30,21 +30,15 @@ public:
   /** Destructor. */
 	virtual ~DFUDevice();
 
-	bool isOpen() const;
-  RadioInfo identifier();
-	void close();
+  /** Closes the DFU iterface. */
+  void close();
 
-  /** Erases a memory section at @c start of size @c size. */
-  bool erase(unsigned start, unsigned size, void (*progress)(unsigned, void *)=nullptr, void *ctx=nullptr);
+  /** Downloads some data to the device. */
+  int download(unsigned block, uint8_t *data, unsigned len);
+  /** Uploads some data from the device. */
+  int upload(unsigned block, uint8_t *data, unsigned len);
 
-  bool read_start(uint32_t bank, uint32_t addr);
-  bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
-  bool read_finish();
-  bool write_start(uint32_t bank, uint32_t addr);
-  bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
-  bool write_finish();
-	bool reboot();
-
+  /** Returns the last error message. */
   const QString &errorMessage() const;
 
 protected:
@@ -60,16 +54,6 @@ protected:
 	int abort();
   /** Internal used function to wait for a response from the device. */
 	int wait_idle();
-  /** Internal used function to send a controll command to the device. */
-	int md380_command(uint8_t a, uint8_t b);
-  /** Internal used function to set the current I/O address. */
-	int set_address(uint32_t address);
-  /** Internal used function to erase a specific block. */
-	int erase_block(uint32_t address);
-  /** Internal used function to read the device identifier. */
-	const char *identify();
-  /** Internal used function to initialize the DFU connection to the device. */
-	const char *dfu_init(unsigned vid, unsigned pid);
 
 protected:
   /** USB context. */
@@ -78,8 +62,6 @@ protected:
 	libusb_device_handle *_dev;
   /** Device status. */
 	status_t _status;
-  /** Read identifier. */
-  RadioInfo _ident;
   /** Holds the last error message. */
   QString _errorMessage;
 };

@@ -56,7 +56,7 @@ static Radio::Features _dm1701_features =
 };
 
 
-DM1701::DM1701(DFUDevice *device, QObject *parent)
+DM1701::DM1701(TyTInterface *device, QObject *parent)
   : TyTRadio(device, parent), _name("Baofeng DM-1701"), _codeplug(), _callsigns()
 {
   // pass...

@@ -272,7 +272,9 @@ AbstractConfigReader::linkExtensions(
 {
   foreach (QString name, obj->extensionNames()) {
     YAML::Node extNode = node[name.toStdString()];
-    if (! extensions[name]->link(obj->extension(name), extNode, ctx)) {
+    AbstractConfigReader *reader = extensions[name];
+    ConfigObject *extension = obj->extension(name);
+    if (!reader->link(extension, extNode, ctx)) {
       _errorMessage = tr("%1:%2: Cannot link configuration extension '%3': %4")
           .arg(extNode.Mark().line).arg(extNode.Mark().column)
           .arg(name).arg(extensions[name]->errorMessage());

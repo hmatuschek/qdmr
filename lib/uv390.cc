@@ -53,7 +53,7 @@ Radio::Features _uv390_features = {
 
 
 
-UV390::UV390(DFUDevice *device, QObject *parent)
+UV390::UV390(TyTInterface *device, QObject *parent)
   : TyTRadio(device, parent), _name("TyT MD-UV390")
 {
   // pass...
