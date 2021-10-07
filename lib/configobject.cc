@@ -163,6 +163,13 @@ ConfigObject::populate(YAML::Node &node, const Context &context){
       QMetaEnum e = prop.enumerator();
       QVariant value = prop.read(this);
       const char *key = e.valueToKey(value.toInt());
+      if (nullptr == key) {
+        logError() << "Cannot map value " << value.toUInt()
+                   << " to enum " << e.name()
+                   << ". Ignore attribute but this points to an incompatibility in some codeplug. "
+                   << "Consider reporting it to https://github.com/hmatuschek/qdmr/issues.";
+        continue;
+      }
       node[prop.name()] = key;
     } else if (QString("bool") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).toBool();
