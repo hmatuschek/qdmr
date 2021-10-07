@@ -5,8 +5,8 @@
 
 /** Device specific implementation of the codeplug for the TyT MD-2017.
  *
- * The codeplug consists of two segments. The first segment starts at address @c 0x002800 and ends at
- * address @c 0x040800. The second segment starts at address @c 0x110800 and ends at @c 0x1a0800. The
+ * The codeplug consists of two segments. The first segment starts at address @c 0x002000 and ends at
+ * address @c 0x040000. The second segment starts at address @c 0x110000 and ends at @c 0x1a0000. The
  * segments must align with @c 0x400 (1024 bytes).
  *
  * @section md2017cpl Codeplug structure within radio

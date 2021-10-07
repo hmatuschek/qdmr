@@ -8,6 +8,8 @@
 #include "logger.hh"
 #include "config.hh"
 #include "radioinfo.hh"
+#include "md390_codeplug.hh"
+#include "md390_filereader.hh"
 #include "uv390_codeplug.hh"
 #include "uv390_filereader.hh"
 #include "md2017_codeplug.hh"
@@ -48,7 +50,24 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   RadioInfo::Radio radio = RadioInfo::byKey(parser.value("radio").toLower()).id();
   Config config;
 
-  if (RadioInfo::UV390 == radio) {
+  if (RadioInfo::MD390 == radio) {
+    MD390Codeplug codeplug;
+    if (parser.isSet("manufacturer")) {
+      if (! MD390FileReader::read(filename, &codeplug, errorMessage)) {
+        logError() << "Cannot decode manufacturer codeplug file '" << filename
+                   << "': " << errorMessage;
+        return -1;
+      }
+    } else if (! codeplug.read(filename)) {
+      logError() << "Cannot decode binary codeplug file '" << filename
+                 << "' : " << codeplug.errorMessage();
+      return -1;
+    }
+    if (! codeplug.decode(&config)) {
+      logError() << "Cannot decode binary codeplug file '" << filename
+                 << "': " << codeplug.errorMessage();
+    }
+  } else if (RadioInfo::UV390 == radio) {
     UV390Codeplug codeplug;
     if (parser.isSet("manufacturer")) {
       if (! UV390FileReader::read(filename, &codeplug, errorMessage)) {

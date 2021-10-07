@@ -5,8 +5,8 @@
 
 /** Device specific implementation of the codeplug for the TyT MD-UV390.
  *
- * The codeplug consists of two segments. The first segment starts at address @c 0x002800 and ends at
- * address @c 0x040800. The second segment starts at address @c 0x110800 and ends at @c 0x1a0800. The
+ * The codeplug consists of two segments. The first segment starts at address @c 0x002000 and ends at
+ * address @c 0x040000. The second segment starts at address @c 0x110000 and ends at @c 0x1a0000. The
  * segments must align with @c 0x400 (1024 bytes).
  *
  * @section uv390cpl Codeplug structure within radio
@@ -32,7 +32,7 @@
  *  <tr><td>0x02ef00</td> <td>0x02ef40</td> <td>0x00040</td> <td>VFO A channel, see @c TyTCodeplug::VFOChannelElement.</td></tr>
  *  <tr><td>0x02ef40</td> <td>0x02ef80</td> <td>0x00040</td> <td>VFO B channel, see @c TyTCodeplug::VFOChannelElement.</td></tr>
  *  <tr><td>0x02ef80</td> <td>0x02f000</td> <td>0x00080</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>Some unkown settings like current channel, see @c TyTCodeplug::BootSettingsElement.</td></tr>
+ *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>Boot settings, see @c TyTCodeplug::BootSettingsElement.</td></tr>
  *  <tr><td>0x02f010</td> <td>0x031000</td> <td>0x01ff0</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x031000</td> <td>0x03eac0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c TyTCodeplug::ZoneExtElement.</td></tr>
  *  <tr><td>0x03eac0</td> <td>0x03ec40</td> <td>0x00180</td> <td>Reserved, filled with @c 0xff. </td></tr>
