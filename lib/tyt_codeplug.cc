@@ -2039,9 +2039,11 @@ bool
 TyTCodeplug::GPSSystemElement::fromGPSSystemObj(GPSSystem *sys, Context &ctx) {
   clear();
   if (sys->hasContact())
-    setDestinationContactIndex(ctx.index(sys));
+    setDestinationContactIndex(ctx.index(sys->contactObj()));
   if (sys->hasRevertChannel())
     setRevertChannelIndex(ctx.index(sys->revertChannel()));
+  else
+    setRevertChannelSelected();
   setRepeatInterval(sys->period());
   return true;
 }

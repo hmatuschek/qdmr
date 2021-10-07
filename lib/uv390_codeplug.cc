@@ -365,10 +365,13 @@ bool
 UV390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
-    if (i < config->posSystems()->gpsCount())
+    if (i < config->posSystems()->gpsCount()) {
+      logDebug() << "Encode GPS system #" << i << " '" <<
+                    config->posSystems()->gpsSystem(i)->name() << "'.";
       gps.fromGPSSystemObj(config->posSystems()->gpsSystem(i), ctx);
-    else
+    } else {
       gps.clear();
+    }
   }
   return true;
 }

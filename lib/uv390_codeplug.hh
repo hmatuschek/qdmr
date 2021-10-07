@@ -45,7 +45,7 @@
  *  <tr><td>0x197e40</td> <td>0x1a0000</td> <td>0x081c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
  * </table>
  *
- * @ingroup uv930 */
+ * @ingroup uv390 */
 class UV390Codeplug : public TyTCodeplug
 {
   Q_OBJECT
