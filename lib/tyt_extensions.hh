@@ -30,6 +30,7 @@ public:
     EmergencyOff = 3,                   ///< Disable emergency.
     PowerSelect = 4,                    ///< Select TX power.
     MonitorToggle = 5,                  ///< Toggle monitor (promiscuous mode on digital channel, open squelch on analog channel).
+    NuisanceDelete = 6,                 ///< Nuisance delete.
     OneTouch1 = 7,                      ///< Perform one-touch action 1.
     OneTouch2 = 8,                      ///< Perform one-touch action 2.
     OneTouch3 = 9,                      ///< Perform one-touch action 3.
@@ -43,6 +44,7 @@ public:
     VoxToggle = 23,                     ///< Enable/disable VOX.
     ZoneIncrement = 24,                 ///< Switch to next zone.
     BatteryIndicator = 26,              ///< Show battery charge.
+    ManualDialForPrivate = 30,          ///< Manual dial for private.
     LoneWorkerToggle = 31,              ///< Toggle lone-worker.
     RecordToggle = 34,                  ///< Enable/disable recording (dep. on firmware).
     RecordPlayback = 35,                ///< Start/stop playback.
