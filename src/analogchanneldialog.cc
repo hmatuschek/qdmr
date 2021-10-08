@@ -154,7 +154,7 @@ AnalogChannelDialog::channel()
   else
     channel->setVOX(voxValue->value());
 
-  return _channel;
+  return channel;
 }
 
 void

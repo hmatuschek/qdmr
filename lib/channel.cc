@@ -4,6 +4,7 @@
 #include "rxgrouplist.hh"
 #include "config.hh"
 #include "scanlist.hh"
+#include "logger.hh"
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -634,8 +635,10 @@ ChannelList::ChannelList(QObject *parent)
 
 int
 ChannelList::add(ConfigObject *obj, int row) {
-  if ((nullptr == obj) || (! obj->is<Channel>()))
+  if ((nullptr == obj) || (! obj->is<Channel>())) {
+    logError() << "Cannot add nullptr or non-channel objects to channel list.";
     return -1;
+  }
   return ConfigObjectList::add(obj, row);
 }
 
