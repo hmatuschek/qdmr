@@ -78,16 +78,16 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     return -1;
   }
 
-  if (RadioInfo::UV390 == radio) {
-    UV390Codeplug codeplug;
+  if (RadioInfo::MD390 == radio) {
+    MD390Codeplug codeplug;
     codeplug.encode(&config, flags);
     if (! codeplug.write(parser.positionalArguments().at(2))) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
                  << "': " << codeplug.errorMessage();
       return -1;
     }
-  } else if (RadioInfo::MD390 == radio) {
-    MD390Codeplug codeplug;
+  } else if (RadioInfo::UV390 == radio) {
+    UV390Codeplug codeplug;
     codeplug.encode(&config, flags);
     if (! codeplug.write(parser.positionalArguments().at(2))) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)

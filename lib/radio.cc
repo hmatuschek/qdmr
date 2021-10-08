@@ -6,6 +6,7 @@
 
 #include "rd5r.hh"
 #include "gd77.hh"
+#include "md390.hh"
 #include "uv390.hh"
 #include "md2017.hh"
 #include "opengd77.hh"
@@ -393,7 +394,9 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
         dfu->deleteLater();
         return nullptr;
       }
-      if ((RadioInfo::UV390 == id.id()) || (force.isValid() && (RadioInfo::UV390 == force.id()))) {
+      if ((RadioInfo::MD390 == id.id()) || (force.isValid() && (RadioInfo::MD390 == force.id()))) {
+        return new MD390(dfu);
+      } else if ((RadioInfo::UV390 == id.id()) || (force.isValid() && (RadioInfo::UV390 == force.id()))) {
         return new UV390(dfu);
       } else if ((RadioInfo::MD2017 == id.id()) || (force.isValid() && (RadioInfo::MD2017 == force.id()))) {
         return new MD2017(dfu);
