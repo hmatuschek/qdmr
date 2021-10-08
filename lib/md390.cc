@@ -7,9 +7,11 @@ Radio::Features _md390_features = {
   .hasDigital = true,
   .hasAnalog = true,
 
+  // The frequency range actually depends on the model. It is not possible to infer the model.
+  // Hence all channels are read during connection and the frquency range is inspected.
   .frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 480.} },
 
-  .maxRadioIDs        = 1,  /// @todo MD390 supports multiple radio IDs, not implemented yet.
+  .maxRadioIDs        = 1,
   .needsDefaultRadioID = true,
   .maxIntroLineLength = 10,
 
@@ -19,7 +21,7 @@ Radio::Features _md390_features = {
 
   .maxZones = 250,
   .maxZoneNameLength = 16,
-  .maxChannelsInZone = 64,
+  .maxChannelsInZone = 16,
   .hasABZone = true,
 
   .hasScanlists = true,
@@ -46,9 +48,9 @@ Radio::Features _md390_features = {
   .maxRoamingZones = 0,
   .maxChannelsInRoamingZone = 0,
 
-  .hasCallsignDB = true,
+  .hasCallsignDB = false,
   .callsignDBImplemented = false,
-  .maxCallsignsInDB = 122197
+  .maxCallsignsInDB = 0
 };
 
 

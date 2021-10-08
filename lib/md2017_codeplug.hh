@@ -2,6 +2,7 @@
 #define MD2017_CODEPLUG_HH
 
 #include "tyt_codeplug.hh"
+#include "uv390_codeplug.hh"
 
 /** Device specific implementation of the codeplug for the TyT MD-2017.
  *
@@ -49,6 +50,10 @@
 class MD2017Codeplug : public TyTCodeplug
 {
   Q_OBJECT
+
+public:
+  /** Reuse TyT MD-UV390 channel element. */
+  typedef UV390Codeplug::ChannelElement ChannelElement;
 
 public:
   /** Constructor. */

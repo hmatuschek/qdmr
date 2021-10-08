@@ -30,7 +30,7 @@ public:
   /** Represents a single channel (analog or digital) within the TyT codeplug.
    *
    * Memory layout of encoded channel:
-   * @verbinclude tytchannel.txt */
+   * @verbinclude tyt_channel.txt */
   class ChannelElement: public Codeplug::Element
   {
   public:
@@ -68,23 +68,6 @@ public:
       ADMIT_TONE = 2,               ///< Allow TX if CTCSS tone matches.
       ADMIT_COLOR = 3,              ///< Allow TX if color-code matches.
     };
-
-    /** Again, I have no idea. */
-    enum InCall {
-      INCALL_ALWAYS = 0,
-      INCALL_ADMIT = 1,
-      INCALL_TXINT = 2
-    };
-
-    /** Turn-off tone frequency.
-     * This radio has a feature that allows to disable radios remotely by sending a specific tone.
-     * Certainly not a feature used in ham-radio. */
-    enum TurnOffFreq {
-      TURNOFF_NONE = 3,             ///< Turn-off disabled. Default!
-      TURNOFF_259_2HZ = 0,          ///< Turn-off on 259.2Hz tone.
-      TURNOFF_55_2HZ = 1            ///< Turn-off on 55.2Hz tone.
-    };
-
 
   protected:
     /** Constructs a channel from the given memory. */
@@ -141,9 +124,9 @@ public:
     /** Sets the color code of this channel. */
     virtual void setColorCode(uint8_t ts);
 
-    /** Returns the index (+1) of the privacy system (key). */
+    /** Returns the index of the privacy system (key). */
     virtual uint8_t privacyIndex() const;
-    /** Sets the index (+1) of the privacy system (key). */
+    /** Sets the index of the privacy system (key). */
     virtual void setPrivacyIndex(uint8_t ts);
     /** Returns the type of the privacy system. */
     virtual PrivacyType privacyType() const;
@@ -189,16 +172,6 @@ public:
     /** Sets the admit criterion for this channel. */
     virtual void setAdmitCriterion(Admit admit);
 
-    /** Returns the in-call criterion for this channel. */
-    virtual InCall inCallCriteria() const;
-    /** Sets the in-call criterion for this channel. */
-    virtual void setInCallCriteria(InCall crit);
-
-    /** Returns the remote turn-off/kill frequency for this channel. */
-    virtual TurnOffFreq turnOffFreq() const;
-    /** Sets the remote turn-off/kill frequency for this channel. */
-    virtual void setTurnOffFreq(TurnOffFreq freq);
-
     /** Returns the transmit contact index (+1) for this channel. */
     virtual uint16_t contactIndex() const;
     /** Sets the transmit contact index (+1) for this channel. */
@@ -238,11 +211,6 @@ public:
     /** Enables/disables DTMF decoding this channel. */
     virtual void setDTMFDecode(uint8_t idx, bool enable);
 
-    /** Returns the squelch level [0-10]. */
-    virtual unsigned squelch() const;
-    /** Sets the squelch level [0-10]. */
-    virtual void setSquelch(unsigned value);
-
     /** Returns the RX frequency in Hz. */
     virtual uint32_t rxFrequency() const;
     /** Sets the RX frequency in Hz. */
@@ -269,11 +237,6 @@ public:
     /** Sets the signaling system index (+1) for TX. */
     virtual void setTXSignalingSystemIndex(uint8_t idx);
 
-    /** Returns the power of this channel. */
-    virtual Channel::Power power() const;
-    /** Sets the power of this channel. */
-    virtual void setPower(Channel::Power pwr);
-
     /** Returns @c true if the channel transmits GPS information enabled. */
     virtual bool txGPSInfo() const;
     /** Enables/disables transmission of GPS information for this channel. */
@@ -282,21 +245,6 @@ public:
     virtual bool rxGPSInfo() const;
     /** Enables/disables reception of GPS information for this channel. */
     virtual void enableRXGPSInfo(bool enable);
-
-    /** Returns @c true if the channel allows interruption enabled. */
-    virtual bool allowInterrupt() const;
-    /** Enables/disables interruption for this channel. */
-    virtual void enableAllowInterrupt(bool enable);
-
-    /** Returns @c true if the channel has dual-capacity direct mode enabled. */
-    virtual bool dualCapacityDirectMode() const;
-    /** Enables/disables dual-capacity direct mode for this channel. */
-    virtual void enableDualCapacityDirectMode(bool enable);
-
-    /** Retruns @c true if the radio acts as the leader for this DCDM channel. */
-    virtual bool leaderOrMS() const;
-    /** Enables/disables this radio to be the leader for this DCDM channel. */
-    virtual void enableLeaderOrMS(bool enable);
 
     /** Returns the name of this channel. */
     virtual QString name() const;

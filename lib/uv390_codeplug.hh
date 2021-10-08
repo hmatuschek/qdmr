@@ -51,6 +51,84 @@ class UV390Codeplug : public TyTCodeplug
   Q_OBJECT
 
 public:
+  /** Extends the @c TyTCodeplug::ChannelElement for the TyT MD-UV390 and Retevis RT3S.
+   *
+   * Memory layout of encoded channel:
+   * @verbinclude uv390_channel.txt */
+  class ChannelElement: public TyTCodeplug::ChannelElement
+  {
+  public:
+    /** Again, I have no idea. */
+    enum InCall {
+      INCALL_ALWAYS = 0,
+      INCALL_ADMIT = 1,
+      INCALL_TXINT = 2
+    };
+
+    /** Turn-off tone frequency.
+     * This radio has a feature that allows to disable radios remotely by sending a specific tone.
+     * Certainly not a feature used in ham-radio. */
+    enum TurnOffFreq {
+      TURNOFF_NONE = 3,             ///< Turn-off disabled. Default!
+      TURNOFF_259_2HZ = 0,          ///< Turn-off on 259.2Hz tone.
+      TURNOFF_55_2HZ = 1            ///< Turn-off on 55.2Hz tone.
+    };
+
+
+  protected:
+    /** Constructs a channel from the given memory. */
+    ChannelElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructs a channel from the given memory. */
+    explicit ChannelElement(uint8_t *ptr);
+
+    /** Clears/resets the channel and therefore disables it. */
+    void clear();
+
+    /** Returns the in-call criterion for this channel. */
+    virtual InCall inCallCriteria() const;
+    /** Sets the in-call criterion for this channel. */
+    virtual void setInCallCriteria(InCall crit);
+
+    /** Returns the remote turn-off/kill frequency for this channel. */
+    virtual TurnOffFreq turnOffFreq() const;
+    /** Sets the remote turn-off/kill frequency for this channel. */
+    virtual void setTurnOffFreq(TurnOffFreq freq);
+
+    /** Returns the squelch level [0-10]. */
+    virtual unsigned squelch() const;
+    /** Sets the squelch level [0-10]. */
+    virtual void setSquelch(unsigned value);
+
+    /** Returns the power of this channel. */
+    virtual Channel::Power power() const;
+    /** Sets the power of this channel. */
+    virtual void setPower(Channel::Power pwr);
+
+    /** Returns @c true if the channel allows interruption enabled. */
+    virtual bool allowInterrupt() const;
+    /** Enables/disables interruption for this channel. */
+    virtual void enableAllowInterrupt(bool enable);
+
+    /** Returns @c true if the channel has dual-capacity direct mode enabled. */
+    virtual bool dualCapacityDirectMode() const;
+    /** Enables/disables dual-capacity direct mode for this channel. */
+    virtual void enableDualCapacityDirectMode(bool enable);
+
+    /** Retruns @c true if the radio acts as the leader for this DCDM channel. */
+    virtual bool leaderOrMS() const;
+    /** Enables/disables this radio to be the leader for this DCDM channel. */
+    virtual void enableLeaderOrMS(bool enable);
+
+    /** Constructs a generic @c Channel object from the codeplug channel. */
+    virtual Channel *toChannelObj() const;
+    /** Initializes this codeplug channel from the given generic configuration. */
+    virtual void fromChannelObj(const Channel *c, Context &ctx);
+  };
+
+
+public:
   /** Constructor. */
   explicit UV390Codeplug(QObject *parent = nullptr);
   /** Destructor. */

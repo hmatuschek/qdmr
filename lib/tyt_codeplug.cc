@@ -63,8 +63,6 @@ TyTCodeplug::ChannelElement::clear() {
   setBit(4,5);
   setAdmitCriterion(ADMIT_ALWAYS);
   clearBit(5,0);
-  setInCallCriteria(INCALL_ALWAYS);
-  setTurnOffFreq(TURNOFF_NONE);
   setContactIndex(0);
   setTXTimeOut(0);
   clearBit(8,6);
@@ -75,20 +73,15 @@ TyTCodeplug::ChannelElement::clear() {
   setPositioningSystemIndex(0);
   for (uint8_t i=0; i<8; i++)
     setDTMFDecode(i, false);
-  setSquelch(1);
   setRXFrequency(400000000UL);
   setTXFrequency(400000000UL);
   setRXSignaling(Signaling::SIGNALING_NONE);
   setTXSignaling(Signaling::SIGNALING_NONE);
   setRXSignalingSystemIndex(0);
   setTXSignalingSystemIndex(0);
-  setPower(Channel::Power::High);
   setBit(30,2); setBit(30,3); setBit(30,4); setBit(30,5); setBit(30,6); setBit(30,7);
   enableTXGPSInfo(true);
   enableRXGPSInfo(true);
-  enableAllowInterrupt(true);
-  enableDualCapacityDirectMode(false);
-  enableLeaderOrMS(true);
   setBit(31, 5); setBit(31, 6); setBit(31, 7);
   memset((_data+32), 0x00, sizeof(32));
 }
@@ -268,24 +261,6 @@ TyTCodeplug::ChannelElement::setAdmitCriterion(TyTCodeplug::ChannelElement::Admi
   setUInt2(4,6, uint8_t(admit));
 }
 
-TyTCodeplug::ChannelElement::InCall
-TyTCodeplug::ChannelElement::inCallCriteria() const {
-  return InCall(getUInt2(5,4));
-}
-void
-TyTCodeplug::ChannelElement::setInCallCriteria(InCall crit) {
-  setUInt2(5,4, uint8_t(crit));
-}
-
-TyTCodeplug::ChannelElement::TurnOffFreq
-TyTCodeplug::ChannelElement::turnOffFreq() const {
-  return TurnOffFreq(getUInt2(5,6));
-}
-void
-TyTCodeplug::ChannelElement::setTurnOffFreq(TurnOffFreq freq) {
-  setUInt2(5,6, uint8_t(freq));
-}
-
 uint16_t
 TyTCodeplug::ChannelElement::contactIndex() const {
   return getUInt16_le(6);
@@ -357,15 +332,6 @@ TyTCodeplug::ChannelElement::setDTMFDecode(uint8_t idx, bool enable) {
   setBit(14, idx, enable);
 }
 
-unsigned TyTCodeplug::ChannelElement::squelch() const {
-  return getUInt8(15);
-}
-void
-TyTCodeplug::ChannelElement::setSquelch(unsigned value) {
-  value = std::min(unsigned(10), value);
-  return setUInt8(15, value);
-}
-
 uint32_t
 TyTCodeplug::ChannelElement::rxFrequency() const {
   return getBCD8_le(16)*10;
@@ -420,32 +386,6 @@ TyTCodeplug::ChannelElement::setTXSignalingSystemIndex(uint8_t idx) {
   setUInt8(29, idx);
 }
 
-Channel::Power
-TyTCodeplug::ChannelElement::power() const {
-  switch (getUInt2(30, 0)) {
-  case 0: return Channel::Power::Low;
-  case 2: return Channel::Power::Mid;
-  case 3: return Channel::Power::High;
-  default: break;
-  }
-  return Channel::Power::Low;
-}
-void
-TyTCodeplug::ChannelElement::setPower(Channel::Power pwr) {
-  switch (pwr) {
-  case Channel::Power::Min:
-  case Channel::Power::Low:
-    setUInt2(30,0, 0);
-    break;
-  case Channel::Power::Mid:
-    setUInt2(30,0, 2);
-    break;
-  case Channel::Power::High:
-  case Channel::Power::Max:
-    setUInt2(30,0, 3);
-  }
-}
-
 bool
 TyTCodeplug::ChannelElement::txGPSInfo() const {
   return ! getBit(31, 0);
@@ -462,30 +402,6 @@ TyTCodeplug::ChannelElement::rxGPSInfo() const {
 void
 TyTCodeplug::ChannelElement::enableRXGPSInfo(bool enable) {
   setBit(31,1, !enable);
-}
-bool
-TyTCodeplug::ChannelElement::allowInterrupt() const {
-  return !getBit(31, 2);
-}
-void
-TyTCodeplug::ChannelElement::enableAllowInterrupt(bool enable) {
-  setBit(31,2, !enable);
-}
-bool
-TyTCodeplug::ChannelElement::dualCapacityDirectMode() const {
-  return !getBit(31, 3);
-}
-void
-TyTCodeplug::ChannelElement::enableDualCapacityDirectMode(bool enable) {
-  setBit(31,3, !enable);
-}
-bool
-TyTCodeplug::ChannelElement::leaderOrMS() const {
-  return !getBit(31, 4);
-}
-void
-TyTCodeplug::ChannelElement::enableLeaderOrMS(bool enable) {
-  setBit(31,4, !enable);
 }
 
 QString
@@ -515,7 +431,7 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
     }
     AnalogChannel *ach = new AnalogChannel();
     ach->setAdmit(admit_crit);
-    ach->setSquelch(squelch());
+    ach->setSquelchDefault();
     ach->setRXTone(rxSignaling());
     ach->setTXTone(txSignaling());
     ach->setBandwidth(bandwidth());
@@ -539,7 +455,6 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
   ch->setName(name());
   ch->setRXFrequency(double(rxFrequency())/1e6);
   ch->setTXFrequency(double(txFrequency())/1e6);
-  ch->setPower(power());
   ch->setTimeout(txTimeOut());
   ch->setRXOnly(rxOnly());
 
@@ -598,11 +513,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
   bool defaultVOXEnabled = (chan->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));
   bool channelVOXEnabled = (! (chan->voxDisabled()||chan->defaultVOX()));
   enableVOX(defaultVOXEnabled || channelVOXEnabled);
-  // encode power setting
-  if (chan->defaultPower())
-    setPower(ctx.config()->settings()->power());
-  else
-    setPower(chan->power());
+  // power setting must be set by specialized element
 
   if (chan->is<const DigitalChannel>()) {
     const DigitalChannel *dchan = chan->as<const DigitalChannel>();
@@ -620,7 +531,6 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
       setGroupListIndex(0);
     if (dchan->txContactObj())
       setContactIndex(ctx.index(dchan->txContactObj()));
-    setSquelch(0);
     setBandwidth(AnalogChannel::Bandwidth::Narrow);
     setRXSignaling(Signaling::SIGNALING_NONE);
     setTXSignaling(Signaling::SIGNALING_NONE);
@@ -632,10 +542,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
     const AnalogChannel *achan = chan->as<const AnalogChannel>();
     setMode(MODE_ANALOG);
     setBandwidth(achan->bandwidth());
-    if (achan->defaultSquelch())
-      setSquelch(ctx.config()->settings()->squelch());
-    else
-      setSquelch(achan->squelch());
+    // Squelch must be set by specialized element
     switch (achan->admit()) {
     case AnalogChannel::Admit::Always: setAdmitCriterion(ADMIT_ALWAYS); break;
     case AnalogChannel::Admit::Free: setAdmitCriterion(ADMIT_CH_FREE); break;

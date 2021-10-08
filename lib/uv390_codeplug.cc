@@ -51,6 +51,159 @@
 
 
 
+/* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::ChannelElement
+ * ******************************************************************************************** */
+UV390Codeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
+  : TyTCodeplug::ChannelElement(ptr, size)
+{
+  // pass...
+}
+
+UV390Codeplug::ChannelElement::ChannelElement(uint8_t *ptr)
+  : TyTCodeplug::ChannelElement(ptr, CHANNEL_SIZE)
+{
+  // pass...
+}
+
+void
+UV390Codeplug::ChannelElement::clear() {
+  Element::clear();
+
+  clearBit(5,0);
+  setInCallCriteria(INCALL_ALWAYS);
+  setTurnOffFreq(TURNOFF_NONE);
+  setSquelch(1);
+  setPower(Channel::Power::High);
+  enableAllowInterrupt(true);
+  enableDualCapacityDirectMode(false);
+  enableLeaderOrMS(true);
+}
+
+UV390Codeplug::ChannelElement::InCall
+UV390Codeplug::ChannelElement::inCallCriteria() const {
+  return InCall(getUInt2(5,4));
+}
+void
+UV390Codeplug::ChannelElement::setInCallCriteria(InCall crit) {
+  setUInt2(5,4, uint8_t(crit));
+}
+
+UV390Codeplug::ChannelElement::TurnOffFreq
+UV390Codeplug::ChannelElement::turnOffFreq() const {
+  return TurnOffFreq(getUInt2(5,6));
+}
+void
+UV390Codeplug::ChannelElement::setTurnOffFreq(TurnOffFreq freq) {
+  setUInt2(5,6, uint8_t(freq));
+}
+
+unsigned
+UV390Codeplug::ChannelElement::squelch() const {
+  return getUInt8(15);
+}
+void
+UV390Codeplug::ChannelElement::setSquelch(unsigned value) {
+  value = std::min(unsigned(10), value);
+  return setUInt8(15, value);
+}
+
+Channel::Power
+UV390Codeplug::ChannelElement::power() const {
+  switch (getUInt2(30, 0)) {
+  case 0: return Channel::Power::Low;
+  case 2: return Channel::Power::Mid;
+  case 3: return Channel::Power::High;
+  default: break;
+  }
+  return Channel::Power::Low;
+}
+void
+UV390Codeplug::ChannelElement::setPower(Channel::Power pwr) {
+  switch (pwr) {
+  case Channel::Power::Min:
+  case Channel::Power::Low:
+    setUInt2(30,0, 0);
+    break;
+  case Channel::Power::Mid:
+    setUInt2(30,0, 2);
+    break;
+  case Channel::Power::High:
+  case Channel::Power::Max:
+    setUInt2(30,0, 3);
+  }
+}
+
+bool
+UV390Codeplug::ChannelElement::allowInterrupt() const {
+  return !getBit(31, 2);
+}
+void
+UV390Codeplug::ChannelElement::enableAllowInterrupt(bool enable) {
+  setBit(31,2, !enable);
+}
+
+bool
+UV390Codeplug::ChannelElement::dualCapacityDirectMode() const {
+  return !getBit(31, 3);
+}
+void
+UV390Codeplug::ChannelElement::enableDualCapacityDirectMode(bool enable) {
+  setBit(31,3, !enable);
+}
+
+bool
+UV390Codeplug::ChannelElement::leaderOrMS() const {
+  return !getBit(31, 4);
+}
+void
+UV390Codeplug::ChannelElement::enableLeaderOrMS(bool enable) {
+  setBit(31,4, !enable);
+}
+
+
+Channel *
+UV390Codeplug::ChannelElement::toChannelObj() const {
+  if (! isValid())
+    return nullptr;
+
+  Channel *ch = TyTCodeplug::ChannelElement::toChannelObj();
+  if (nullptr == ch)
+    return nullptr;
+
+  // decode squelch setting
+  if (ch->is<AnalogChannel>()) {
+    AnalogChannel *ach = ch->as<AnalogChannel>();
+    ach->setSquelch(squelch());
+  }
+  // Common settings
+  ch->setPower(power());
+  return ch;
+}
+
+void
+UV390Codeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
+  TyTCodeplug::ChannelElement::fromChannelObj(chan, ctx);
+  // encode power setting
+  if (chan->defaultPower())
+    setPower(ctx.config()->settings()->power());
+  else
+    setPower(chan->power());
+  setSquelch(0);
+
+  if (chan->is<AnalogChannel>()) {
+    const AnalogChannel *achan = chan->as<const AnalogChannel>();
+    if (achan->defaultSquelch())
+      setSquelch(ctx.config()->settings()->squelch());
+    else
+      setSquelch(achan->squelch());
+  }
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of UV390Codeplug
+ * ******************************************************************************************** */
 UV390Codeplug::UV390Codeplug(QObject *parent)
   : TyTCodeplug(parent)
 {

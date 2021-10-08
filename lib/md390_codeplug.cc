@@ -42,9 +42,85 @@
 #define ADDR_EMERGENCY_SYSTEMS  0x005a60
 #define EMERGENCY_SYSTEM_SIZE   0x000028
 
-#define ADDR_VFO_CHANNEL_A      0x02ef00
-#define ADDR_VFO_CHANNEL_B      0x02ef40
 
+/* ********************************************************************************************* *
+ * Implementation of MD390Codeplug::ChannelElement
+ * ********************************************************************************************* */
+MD390Codeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
+  : TyTCodeplug::ChannelElement::ChannelElement(ptr, size)
+{
+  // pass...
+}
+
+MD390Codeplug::ChannelElement::ChannelElement(uint8_t *ptr)
+  : TyTCodeplug::ChannelElement(ptr, CHANNEL_SIZE)
+{
+  // pass...
+}
+
+void
+MD390Codeplug::ChannelElement::clear() {
+  TyTCodeplug::ChannelElement::clear();
+
+  enableTightSquelch(false);
+  enableCompressedUDPHeader(false);
+  enableReverseBurst(true);
+  setPower(Channel::Power::High);
+  setUInt8(0x0005, 0xc3);
+  setUInt8(0x000f, 0xff);
+}
+
+bool
+MD390Codeplug::ChannelElement::tightSquelchEnabled() const {
+  return !getBit(0x0000, 5);
+}
+void
+MD390Codeplug::ChannelElement::enableTightSquelch(bool enable) {
+  setBit(0x0000, 5, !enable);
+}
+
+bool
+MD390Codeplug::ChannelElement::compressedUDPHeader() const {
+  return !getBit(0x0003, 6);
+}
+void
+MD390Codeplug::ChannelElement::enableCompressedUDPHeader(bool enable) {
+  setBit(0x0003, 6, !enable);
+}
+
+bool
+MD390Codeplug::ChannelElement::reverseBurst() const {
+  return getBit(0x0004, 2);
+}
+void
+MD390Codeplug::ChannelElement::enableReverseBurst(bool enable) {
+  setBit(0x0004, 2, enable);
+}
+
+Channel::Power
+MD390Codeplug::ChannelElement::power() const {
+  if (getBit(0x0004, 5))
+    return Channel::Power::High;
+  return Channel::Power::Low;
+}
+void
+MD390Codeplug::ChannelElement::setPower(Channel::Power pwr) {
+  switch (pwr) {
+  case Channel::Power::Min:
+  case Channel::Power::Low:
+  case Channel::Power::Mid:
+    setBit(0x0004, 5, false);
+    break;
+  case Channel::Power::High:
+  case Channel::Power::Max:
+    setBit(0x0004, 5, true);
+  }
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of MD390Codeplug
+ * ********************************************************************************************* */
 MD390Codeplug::MD390Codeplug(QObject *parent)
 {
   addImage("TYT MD-390 Codeplug");
@@ -53,6 +129,12 @@ MD390Codeplug::MD390Codeplug(QObject *parent)
   clear();
 }
 
+bool
+MD390Codeplug::decodeElements(Context &ctx) {
+  logDebug() << "Decode MD390 codeplug, programmed with CPS version "
+             << TimestampElement(data(ADDR_TIMESTAMP)).cpsVersion() << ".";
+  return TyTCodeplug::decodeElements(ctx);
+}
 
 void
 MD390Codeplug::clearTimestamp() {
@@ -432,6 +514,5 @@ MD390Codeplug::clearEmergencySystems() {
 
 void
 MD390Codeplug::clearVFOSettings() {
-  VFOChannelElement(data(ADDR_VFO_CHANNEL_A)).clear();
-  VFOChannelElement(data(ADDR_VFO_CHANNEL_B)).clear();
+  // There is no VFO settings in MD-390 codeplugs.
 }
