@@ -56,6 +56,8 @@ private:
   QString _name;
   /** The codeplug object. */
   MD390Codeplug _codeplug;
+  /** Dynamic features, includes frequency range of channels read from device. */
+  Features _features;
 };
 
 #endif // MD2017_HH

@@ -15,7 +15,9 @@ TyTInterface::TyTInterface(unsigned vid, unsigned pid, QObject *parent)
 
   // Get device identifier in a static buffer.
   const char *idstr = identify();
-  if (idstr && (0==strcmp("MD-UV390", idstr))) {
+  if (idstr && (0==strcmp("MD390", idstr))) {
+    _ident = RadioInfo::byID(RadioInfo::MD390);
+  } else if (idstr && (0==strcmp("MD-UV390", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::UV390);
   } else if (idstr && (0==strcmp("2017", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::MD2017);

@@ -1628,7 +1628,7 @@ TyTCodeplug::GPSSystemElement::~GPSSystemElement() {
 bool
 TyTCodeplug::GPSSystemElement::isValid() const {
   return Element::isValid() && (! repeatIntervalDisabled()) &&
-      (0xffff != revertChannelIndex());
+      (!destinationContactDisabled());
 }
 
 void
