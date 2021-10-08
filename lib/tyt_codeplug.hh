@@ -259,31 +259,6 @@ public:
     virtual void fromChannelObj(const Channel *c, Context &ctx);
   };
 
-  /** Implements a VFO channel for TyT radios.
-   * This class is an extension of the normal ChannelElement that only implements the step-size
-   * feature and encodes it where the name used to be. Thus the memory layout and size is identical
-   * to the normal channel. */
-  class VFOChannelElement: public ChannelElement
-  {
-  protected:
-    /** Constructor from pointer to memory. */
-    VFOChannelElement(uint8_t *ptr, size_t size);
-
-  public:
-    /** Constructor from pointer to memory. */
-    VFOChannelElement(uint8_t *ptr);
-    /** Destructor. */
-    virtual ~VFOChannelElement();
-
-    QString name() const;
-    void setName(const QString &txt);
-
-    /** Returns the step-size for the VFO channel. */
-    virtual unsigned stepSize() const;
-    /** Sets the step-size for the VFO channel in Hz. */
-    virtual void setStepSize(unsigned ss_hz);
-  };
-
   /** Represents a digital (DMR) contact within the codeplug.
    *
    * Memory layout of encoded contact:
@@ -506,7 +481,7 @@ public:
   /** Codeplug representation of the general settings.
    *
    * Memory layout of encoded settings:
-   * @verbinclude tytsettings.txt */
+   * @verbinclude tyt_settings.txt */
   class GeneralSettingsElement: public Codeplug::Element
   {
   public:
@@ -683,38 +658,6 @@ public:
     virtual bool fromConfig(const Config *config);
     /** Updates config from general settings. */
     virtual bool updateConfig(Config *config);
-  };
-
-  /** Represents the boot-time settings (selected zone and channels) within the code-plug.
-   *
-   * Memory layout of encoded boot settings:
-   * @verbinclude tytbootsettings.txt */
-  class BootSettingsElement: public Codeplug::Element
-  {
-  protected:
-    /** Hidden constructor. */
-    BootSettingsElement(uint8_t *ptr, size_t size);
-
-  public:
-    /** Constructor. */
-    explicit BootSettingsElement(uint8_t *ptr);
-    /** Destructor. */
-    virtual ~BootSettingsElement();
-
-    void clear();
-
-    /** Returns the boot zone index. */
-    virtual unsigned zoneIndex() const;
-    /** Sets the boot zone index. */
-    virtual void setZoneIndex(unsigned idx);
-    /** Returns the channel index (within zone) for VFO A. */
-    virtual unsigned channelIndexA() const;
-    /** Sets the channel index (within zone) for VFO A. */
-    virtual void setChannelIndexA(unsigned idx);
-    /** Returns the channel index (within zone) for VFO B. */
-    virtual unsigned channelIndexB() const;
-    /** Sets the channel index (within zone) for VFO B. */
-    virtual void setChannelIndexB(unsigned idx);
   };
 
   /** Codeplug representation of programming time-stamp and CPS version.
@@ -1329,8 +1272,6 @@ public:
   /** Decodes the button settings. */
   virtual bool decodeButtonSetttings(Config *config) = 0;
 
-  /** Clears the boot settings in the codeplug. */
-  virtual void clearBootSettings() = 0;
   /** Clears the menu settings in the codeplug. */
   virtual void clearMenuSettings() = 0;
   /** Clears all text messages in the codeplug. */
@@ -1339,8 +1280,6 @@ public:
   virtual void clearPrivacyKeys() = 0;
   /** Clears all emergency systems in the codeplug. */
   virtual void clearEmergencySystems() = 0;
-  /** Clears the VFO settings in the codeplug. */
-  virtual void clearVFOSettings() = 0;
 };
 
 #endif // TYT_CODEPLUG_HH

@@ -204,6 +204,46 @@ UV390Codeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx)
 
 
 /* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::VFOChannelElement
+ * ******************************************************************************************** */
+UV390Codeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr, size_t size)
+  : ChannelElement(ptr, size)
+{
+  // pass...
+}
+
+UV390Codeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr)
+  : ChannelElement(ptr, CHANNEL_SIZE)
+{
+  // pass...
+}
+
+UV390Codeplug::VFOChannelElement::~VFOChannelElement() {
+  // pass...
+}
+
+QString
+UV390Codeplug::VFOChannelElement::name() const {
+  return "";
+}
+void
+UV390Codeplug::VFOChannelElement::setName(const QString &txt) {
+  // pass...
+}
+
+unsigned
+UV390Codeplug::VFOChannelElement::stepSize() const {
+  return (getUInt8(32)+1)*2500;
+}
+void
+UV390Codeplug::VFOChannelElement::setStepSize(unsigned ss_Hz) {
+  ss_Hz = std::min(50000U, std::max(ss_Hz, 2500U));
+  setUInt8(32, ss_Hz/2500-1);
+  setUInt8(33, 0xff);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of UV390Codeplug::GeneralSettingsElement
  * ******************************************************************************************** */
 UV390Codeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, size_t size)
@@ -399,6 +439,66 @@ UV390Codeplug::GeneralSettingsElement::updateConfig(Config *config) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::BootSettingsElement
+ * ******************************************************************************************** */
+UV390Codeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr, size_t size)
+  : Codeplug::Element(ptr, size)
+{
+  // pass...
+}
+
+UV390Codeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr)
+  : Codeplug::Element(ptr, 0x0010)
+{
+  // pass...
+}
+
+UV390Codeplug::BootSettingsElement::~BootSettingsElement() {
+  // pass...
+}
+
+void
+UV390Codeplug::BootSettingsElement::clear() {
+  setUInt24_le(0, 0xffffff);
+  setZoneIndex(1);
+  setChannelIndexA(1);
+  setUInt8(0x05, 0xff);
+  setChannelIndexB(1);
+  setUInt16_le(0x07, 0xffff);
+  setUInt16_le(0x09, 0x0001);
+  setUInt8(0x0b, 0xff);
+  setUInt32_le(0x0c, 0xffffffff);
+}
+
+unsigned
+UV390Codeplug::BootSettingsElement::zoneIndex() const {
+  return getUInt8(0x03);
+}
+void
+UV390Codeplug::BootSettingsElement::setZoneIndex(unsigned idx) {
+  setUInt8(0x03, idx);
+}
+
+unsigned
+UV390Codeplug::BootSettingsElement::channelIndexA() const {
+  return getUInt8(0x04);
+}
+void
+UV390Codeplug::BootSettingsElement::setChannelIndexA(unsigned idx) {
+  setUInt8(0x04, idx);
+}
+
+unsigned
+UV390Codeplug::BootSettingsElement::channelIndexB() const {
+  return getUInt8(0x06);
+}
+void
+UV390Codeplug::BootSettingsElement::setChannelIndexB(unsigned idx) {
+  setUInt8(0x06, idx);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of UV390Codeplug
  * ******************************************************************************************** */
 UV390Codeplug::UV390Codeplug(QObject *parent)
@@ -414,6 +514,14 @@ UV390Codeplug::UV390Codeplug(QObject *parent)
 
 UV390Codeplug::~UV390Codeplug() {
   // pass...
+}
+
+void
+UV390Codeplug::clear() {
+  TyTCodeplug::clear();
+
+  clearBootSettings();
+  clearVFOSettings();
 }
 
 void

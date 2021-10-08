@@ -127,6 +127,31 @@ public:
     virtual void fromChannelObj(const Channel *c, Context &ctx);
   };
 
+  /** Implements a VFO channel for TyT radios.
+   * This class is an extension of the normal ChannelElement that only implements the step-size
+   * feature and encodes it where the name used to be. Thus the memory layout and size is identical
+   * to the normal channel. */
+  class VFOChannelElement: public ChannelElement
+  {
+  protected:
+    /** Constructor from pointer to memory. */
+    VFOChannelElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor from pointer to memory. */
+    VFOChannelElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~VFOChannelElement();
+
+    QString name() const;
+    void setName(const QString &txt);
+
+    /** Returns the step-size for the VFO channel. */
+    virtual unsigned stepSize() const;
+    /** Sets the step-size for the VFO channel in Hz. */
+    virtual void setStepSize(unsigned ss_hz);
+  };
+
   /** Extends the common @c TyTCodeplug::GeneralSettings to implement the MD-UV390 specific
    * settings.
    *
@@ -225,11 +250,45 @@ public:
     virtual bool updateConfig(Config *config);
   };
 
+  /** Represents the boot-time settings (selected zone and channels) within the code-plug.
+   *
+   * Memory layout of encoded boot settings:
+   * @verbinclude tytbootsettings.txt */
+  class BootSettingsElement: public Codeplug::Element
+  {
+  protected:
+    /** Hidden constructor. */
+    BootSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit BootSettingsElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~BootSettingsElement();
+
+    void clear();
+
+    /** Returns the boot zone index. */
+    virtual unsigned zoneIndex() const;
+    /** Sets the boot zone index. */
+    virtual void setZoneIndex(unsigned idx);
+    /** Returns the channel index (within zone) for VFO A. */
+    virtual unsigned channelIndexA() const;
+    /** Sets the channel index (within zone) for VFO A. */
+    virtual void setChannelIndexA(unsigned idx);
+    /** Returns the channel index (within zone) for VFO B. */
+    virtual unsigned channelIndexB() const;
+    /** Sets the channel index (within zone) for VFO B. */
+    virtual void setChannelIndexB(unsigned idx);
+  };
+
 public:
   /** Constructor. */
   explicit UV390Codeplug(QObject *parent = nullptr);
   /** Destructor. */
   virtual ~UV390Codeplug();
+
+  void clear();
 
 public:
   void clearTimestamp();
@@ -272,13 +331,15 @@ public:
   bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx);
   bool decodeButtonSetttings(Config *config);
 
-  void clearBootSettings();
+  /** Resets the boot setting, e.g. initial channels and zone at bootup. */
+  virtual void clearBootSettings();
   void clearMenuSettings();
   void clearTextMessages();
   void clearPrivacyKeys();
   void clearEmergencySystems();
-  void clearVFOSettings();
+  /** Clears the VFO A & B. */
+  virtual void clearVFOSettings();
 
 };
 
-#endif // MD2017CODEPLUG_HH
+#endif // UV390CODEPLUG_HH

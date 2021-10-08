@@ -28,7 +28,6 @@
  *  <tr><td>0x0149e0</td> <td>0x018860</td> <td>0x03e80</td> <td>250 Zones @ 0x40 bytes each, see @c TyTCodeplug::ZoneElement.</td></tr>
  *  <tr><td>0x018860</td> <td>0x01edf0</td> <td>0x06590</td> <td>250 Scanlists @ 0x68 bytes each, see @c TyTCodeplug::ScanListElement.</td></tr>
  *  <tr><td>0x01ee00</td> <td>0x02e800</td> <td>0x0fa00</td> <td>1000 channels, see @c TyTCodeplug::ChannelElement.</td></tr>
- *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>??? Boot settings, see @c TyTCodeplug::BootSettingsElement.</td></tr>
  *  <tr><td>0x03ec40</td> <td>0x03ed40</td> <td>0x00100</td> <td>16 GPS systems @ 0x10 bytes each, see @c TyTCodeplug::GPSSystemElement.</td></tr>
  * </table>
  *
@@ -127,13 +126,10 @@ public:
   bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx);
   bool decodeButtonSetttings(Config *config);
 
-  void clearBootSettings();
   void clearMenuSettings();
   void clearTextMessages();
   void clearPrivacyKeys();
   void clearEmergencySystems();
-  /** There are no VFO settings in MD-390 codeplugs. Does nothing. */
-  void clearVFOSettings();
 };
 
 #endif // MD390CODEPLUG_HH

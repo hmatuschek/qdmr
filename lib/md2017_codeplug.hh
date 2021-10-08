@@ -55,8 +55,14 @@ public:
   /** Reuse TyT MD-UV390 channel element. */
   typedef UV390Codeplug::ChannelElement ChannelElement;
 
+  /** Reuse TyT MD-UV390 VFO channel element. */
+  typedef UV390Codeplug::VFOChannelElement VFOChannelElement;
+
   /** Reuse TyT MD-UV390 general settings element. */
   typedef UV390Codeplug::GeneralSettingsElement GeneralSettingsElement;
+
+  /** Reuse TyT MD-UV390 boot settings element. */
+  typedef UV390Codeplug::BootSettingsElement BootSettingsElement;
 
 public:
   /** Constructor. */
@@ -105,12 +111,13 @@ public:
   bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx);
   bool decodeButtonSetttings(Config *config);
 
-  void clearBootSettings();
+  virtual void clearBootSettings();
   void clearMenuSettings();
   void clearTextMessages();
   void clearPrivacyKeys();
   void clearEmergencySystems();
-  void clearVFOSettings();
+  /** Resets VFO settings. */
+  virtual void clearVFOSettings();
 
 };
 

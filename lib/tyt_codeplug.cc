@@ -563,46 +563,6 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
 
 
 /* ******************************************************************************************** *
- * Implementation of TyTCodeplug::VFOChannelElement
- * ******************************************************************************************** */
-TyTCodeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr, size_t size)
-  : ChannelElement(ptr, size)
-{
-  // pass...
-}
-
-TyTCodeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr)
-  : ChannelElement(ptr, CHANNEL_SIZE)
-{
-  // pass...
-}
-
-TyTCodeplug::VFOChannelElement::~VFOChannelElement() {
-  // pass...
-}
-
-QString
-TyTCodeplug::VFOChannelElement::name() const {
-  return "";
-}
-void
-TyTCodeplug::VFOChannelElement::setName(const QString &txt) {
-  // pass...
-}
-
-unsigned
-TyTCodeplug::VFOChannelElement::stepSize() const {
-  return (getUInt8(32)+1)*2500;
-}
-void
-TyTCodeplug::VFOChannelElement::setStepSize(unsigned ss_Hz) {
-  ss_Hz = std::min(50000U, std::max(ss_Hz, 2500U));
-  setUInt8(32, ss_Hz/2500-1);
-  setUInt8(33, 0xff);
-}
-
-
-/* ******************************************************************************************** *
  * Implementation of TyTCodeplug::ContactElement
  * ******************************************************************************************** */
 TyTCodeplug::ContactElement::ContactElement(uint8_t *ptr, size_t size)
@@ -1587,66 +1547,6 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   config->settings()->setIntroLine2(introLine2());
   config->settings()->setVOX(voxSesitivity());
   return true;
-}
-
-
-/* ******************************************************************************************** *
- * Implementation of TyTCodeplug::BootSettingsElement
- * ******************************************************************************************** */
-TyTCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr, size_t size)
-  : Codeplug::Element(ptr, size)
-{
-  // pass...
-}
-
-TyTCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr)
-  : Codeplug::Element(ptr, 0x0010)
-{
-  // pass...
-}
-
-TyTCodeplug::BootSettingsElement::~BootSettingsElement() {
-  // pass...
-}
-
-void
-TyTCodeplug::BootSettingsElement::clear() {
-  setUInt24_le(0, 0xffffff);
-  setZoneIndex(1);
-  setChannelIndexA(1);
-  setUInt8(0x05, 0xff);
-  setChannelIndexB(1);
-  setUInt16_le(0x07, 0xffff);
-  setUInt16_le(0x09, 0x0001);
-  setUInt8(0x0b, 0xff);
-  setUInt32_le(0x0c, 0xffffffff);
-}
-
-unsigned
-TyTCodeplug::BootSettingsElement::zoneIndex() const {
-  return getUInt8(0x03);
-}
-void
-TyTCodeplug::BootSettingsElement::setZoneIndex(unsigned idx) {
-  setUInt8(0x03, idx);
-}
-
-unsigned
-TyTCodeplug::BootSettingsElement::channelIndexA() const {
-  return getUInt8(0x04);
-}
-void
-TyTCodeplug::BootSettingsElement::setChannelIndexA(unsigned idx) {
-  setUInt8(0x04, idx);
-}
-
-unsigned
-TyTCodeplug::BootSettingsElement::channelIndexB() const {
-  return getUInt8(0x06);
-}
-void
-TyTCodeplug::BootSettingsElement::setChannelIndexB(unsigned idx) {
-  setUInt8(0x06, idx);
 }
 
 
@@ -2736,8 +2636,6 @@ TyTCodeplug::clear()
   this->clearTimestamp();
   // Clear general config
   this->clearGeneralSettings();
-  // Clear boot settings
-  this->clearBootSettings();
   // Clear menu settings
   this->clearMenuSettings();
   // Clear button settings
@@ -2754,8 +2652,6 @@ TyTCodeplug::clear()
   this->clearZones();
   // Clear scan lists;
   this->clearScanLists();
-  // Clear VFO A & B settings.
-  this->clearVFOSettings();
   // Clear GPS systems
   this->clearPositioningSystems();
   // Clear channels

@@ -502,11 +502,6 @@ MD390Codeplug::decodeButtonSetttings(Config *config) {
 }
 
 void
-MD390Codeplug::clearBootSettings() {
-  BootSettingsElement(data(ADDR_BOOTSETTINGS)).clear();
-}
-
-void
 MD390Codeplug::clearMenuSettings() {
   MenuSettingsElement(data(ADDR_MENUSETTINGS)).clear();
 }
@@ -527,9 +522,4 @@ MD390Codeplug::clearEmergencySystems() {
   EmergencySettingsElement(data(ADDR_EMERGENCY_SETTINGS)).clear();
   for (int i=0; i<NUM_EMERGENCY_SYSTEMS; i++)
     EmergencySystemElement(data(ADDR_EMERGENCY_SYSTEMS + i*EMERGENCY_SYSTEM_SIZE)).clear();
-}
-
-void
-MD390Codeplug::clearVFOSettings() {
-  // There is no VFO settings in MD-390 codeplugs.
 }
