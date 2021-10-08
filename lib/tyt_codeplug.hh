@@ -689,8 +689,8 @@ public:
 
   /** Represents a single GPS system within the codeplug.
    *
-   * Memory layout of encoded GPS system:
-   * @verbinclude tytgpssystem.txt */
+   * Memory layout of encoded GPS system (size 0x0010 bytes):
+   * @verbinclude tyt_gpssystem.txt */
   class GPSSystemElement: public Codeplug::Element
   {
   protected:
