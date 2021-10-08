@@ -30,6 +30,8 @@ public:
   /** Destructor. */
 	virtual ~DFUDevice();
 
+  /** Retuns @c true if the DFU device interface is open. */
+  bool isOpen() const;
   /** Closes the DFU iterface. */
   void close();
 

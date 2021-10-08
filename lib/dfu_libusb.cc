@@ -71,6 +71,11 @@ DFUDevice::~DFUDevice() {
   close();
 }
 
+bool
+DFUDevice::isOpen() const {
+  return nullptr != _dev;
+}
+
 void
 DFUDevice::close() {
   if (nullptr != _dev) {

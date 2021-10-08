@@ -7,6 +7,9 @@
 TyTInterface::TyTInterface(unsigned vid, unsigned pid, QObject *parent)
   : DFUDevice(vid, pid, parent), RadioInterface()
 {
+  if (! DFUDevice::isOpen())
+    return;
+
   // Enter Programming Mode.
   if (wait_idle())
     return;
@@ -43,7 +46,7 @@ TyTInterface::close() {
 
 bool
 TyTInterface::isOpen() const {
-  return _ident.isValid();
+  return DFUDevice::isOpen() && _ident.isValid();
 }
 
 const QString &
