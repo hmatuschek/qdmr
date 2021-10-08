@@ -72,6 +72,10 @@ public:
     /** Sets the power of this channel. */
     virtual void setPower(Channel::Power pwr);
 
+    /** Constructs a generic @c Channel object from the codeplug channel. */
+    virtual Channel *toChannelObj() const;
+    /** Initializes this codeplug channel from the given generic configuration. */
+    virtual void fromChannelObj(const Channel *c, Context &ctx);
   };
 
 public:

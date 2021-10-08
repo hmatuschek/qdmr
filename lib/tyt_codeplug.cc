@@ -457,7 +457,8 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
   ch->setTXFrequency(double(txFrequency())/1e6);
   ch->setTimeout(txTimeOut());
   ch->setRXOnly(rxOnly());
-
+  // Power setting must be overridden by specialized class
+  ch->setDefaultPower();
   if (vox())
     ch->setVOXDefault();
   else

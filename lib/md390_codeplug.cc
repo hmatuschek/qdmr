@@ -117,6 +117,23 @@ MD390Codeplug::ChannelElement::setPower(Channel::Power pwr) {
   }
 }
 
+Channel *
+MD390Codeplug::ChannelElement::toChannelObj() const {
+  Channel *ch = TyTCodeplug::ChannelElement::toChannelObj();
+  if (nullptr == ch)
+    return ch;
+
+  ch->setPower(power());
+  return ch;
+}
+
+void
+MD390Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
+  TyTCodeplug::ChannelElement::fromChannelObj(c, ctx);
+
+  setPower(c->power());
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of MD390Codeplug
