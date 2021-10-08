@@ -242,7 +242,7 @@ AnalogChannel::AnalogChannel(QObject *parent)
 }
 
 AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
-  : Channel(parent), _aprsSystem()
+  : Channel(other, parent), _aprsSystem()
 {
   setAdmit(other.admit());
   if (other.defaultSquelch())
@@ -420,7 +420,7 @@ DigitalChannel::DigitalChannel(QObject *parent)
 }
 
 DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
-  : Channel(parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
+  : Channel(other, parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
 {
   // Register default tags
   if (! ConfigObject::Context::hasTag(metaObject()->className(), "roaming", "!default"))
