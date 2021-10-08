@@ -55,6 +55,9 @@ public:
   /** Reuse TyT MD-UV390 channel element. */
   typedef UV390Codeplug::ChannelElement ChannelElement;
 
+  /** Reuse TyT MD-UV390 general settings element. */
+  typedef UV390Codeplug::GeneralSettingsElement GeneralSettingsElement;
+
 public:
   /** Constructor. */
   explicit MD2017Codeplug(QObject *parent = nullptr);

@@ -510,14 +510,6 @@ public:
   class GeneralSettingsElement: public Codeplug::Element
   {
   public:
-    /** Defines all possible transmit modes. */
-    enum TransmitMode {
-      LAST_CALL_CH = 0,
-      LAST_CALL_AND_HAND_CH = 1,
-      DESIGNED_CH = 2,
-      DESIGNED_AND_HAND_CH = 3,
-    };
-
     /** Defines all possible squelch modes. */
     enum MonitorType {
       MONITOR_SILENT       = 0,
@@ -544,11 +536,6 @@ public:
     virtual QString introLine2() const;
     /** Sets the second intro line. */
     virtual void setIntroLine2(const QString line);
-
-    /** Returns the transmit mode. */
-    virtual TransmitMode transmitMode() const;
-    /** Sets the transmit mode. */
-    virtual void setTransmitMode(TransmitMode mode);
 
     /** Returns the monitor type. */
     virtual MonitorType monitorType() const;
@@ -589,27 +576,10 @@ public:
     /** Enables/disables talk permit tone for analog channels. */
     virtual void enableTalkPermitToneAnalog(bool enable);
 
-    /** Returns @c true, if the speech synthesis is enabled. */
-    virtual bool channelVoiceAnnounce() const;
-    /** Enables/disables the speech synthesis. */
-    virtual void enableChannelVoiceAnnounce(bool enable);
     /** Returns @c true, if intro picture is enabled. */
     virtual bool introPicture() const;
     /** Enables/disables the intro picture. */
     virtual void enableIntroPicture(bool enable);
-    /** Returns @c true, if keypad tones are enabled. */
-    virtual bool keypadTones() const;
-    /** Enables/disables the keypad tones. */
-    virtual void enableKeypadTones(bool enable);
-
-    /** Returns @c true, if VFO A is in channel mode. */
-    virtual bool channelModeA() const;
-    /** Enables/disables the channel mode for VFO A. */
-    virtual void enableChannelModeA(bool enable);
-    /** Returns @c true, if VFO B is in channel mode. */
-    virtual bool channelModeB() const;
-    /** Enables/disables the channel mode for VFO B. */
-    virtual void enableChannelModeB(bool enable);
 
     /** Returns the default DMR ID of the radio. */
     virtual uint32_t dmrId() const;
@@ -681,11 +651,6 @@ public:
     /** Set keypad lock to manual. */
     virtual void keypadLockTimeSetManual();
 
-    /** Returns @c true, if the radio is in channel (and not VFO) mode. */
-    virtual bool channelMode() const;
-    /** Enable/disable channel mode. */
-    virtual void enableChannelMode(bool enable);
-
     /** Returns the 8-digit power-on password. */
     virtual uint32_t powerOnPassword() const;
     /** Sets the 8-digit power-on password. */
@@ -709,48 +674,10 @@ public:
     /** Disables the PC programming password. */
     virtual void pcProgPasswordDisable();
 
-    /** Returns @c true if group-call match is enabled. */
-    virtual bool groupCallMatch() const;
-    /** Enables/disables group-call match. */
-    virtual void enableGroupCallMatch(bool enable);
-    /** Returns @c true if private-call match is enabled. */
-    virtual bool privateCallMatch() const;
-    /** Enables/disables private-call match. */
-    virtual void enablePrivateCallMatch(bool enable);
-
-    /** Returns the time-zone. */
-    virtual QTimeZone timeZone() const;
-    /** Sets the time-zone. */
-    virtual void setTimeZone(const QTimeZone &zone);
-
     /** Returns the radio name. */
     virtual QString radioName() const;
     /** Sets the radio name. */
     virtual void setRadioName(const QString &name);
-
-    /** Returns the channel hang time. */
-    virtual unsigned channelHangTime() const;
-    /** Sets the channel hang time. */
-    virtual void setChannelHangTime(unsigned dur);
-    /** Returns @c true, if public zone is enabled. */
-    virtual bool publicZone() const;
-    /** Enables/disables public zone. */
-    virtual void enablePublicZone(bool enable);
-
-    /** Returns the n-th DMR id. */
-    virtual uint32_t additionalDMRId(unsigned n) const;
-    /** Sets the n-th DMR id. */
-    virtual void setAdditionalDMRId(unsigned n, uint32_t id);
-
-    /** Returns the microphone gain. */
-    virtual unsigned micLevel() const;
-    /** Sets the microphone gain. */
-    virtual void setMICLevel(unsigned val);
-
-    /** If @c true, radio ID editing is enabled. */
-    virtual bool editRadioID() const;
-    /** Enable/disable radio ID editing. */
-    virtual void enableEditRadioID(bool enable);
 
     /** Encodes the general settings. */
     virtual bool fromConfig(const Config *config);

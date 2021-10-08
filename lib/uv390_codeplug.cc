@@ -2,6 +2,7 @@
 #include "codeplugcontext.hh"
 #include "logger.hh"
 #include "tyt_extensions.hh"
+#include <QTimeZone>
 
 
 #define NUM_CHANNELS                3000
@@ -28,6 +29,7 @@
 
 #define ADDR_TIMESTAMP          0x002000
 #define ADDR_SETTINGS           0x002040
+#define SETTINGS_SIZE           0x0000b0
 #define ADDR_BOOTSETTINGS       0x02f000
 #define ADDR_MENUSETTINGS       0x0020f0
 #define ADDR_BUTTONSETTINGS     0x002100
@@ -198,6 +200,201 @@ UV390Codeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx)
     else
       setSquelch(achan->squelch());
   }
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::GeneralSettingsElement
+ * ******************************************************************************************** */
+UV390Codeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, size_t size)
+  : TyTCodeplug::GeneralSettingsElement(ptr, size)
+{
+  // pass...
+}
+
+UV390Codeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
+  : TyTCodeplug::GeneralSettingsElement(ptr, SETTINGS_SIZE)
+{
+  // pass...
+}
+
+void
+UV390Codeplug::GeneralSettingsElement::clear() {
+  TyTCodeplug::GeneralSettingsElement::clear();
+
+  setTransmitMode(DESIGNED_AND_HAND_CH);
+  enableChannelVoiceAnnounce(false);
+  setBit(0x43,0, 1); setBit(0x43,1, 1);
+  enableChannelModeA(true);
+  setUInt4(0x43,3, 0xf);
+  enableChannelModeB(true);
+
+  enableChannelMode(true);
+
+  enableGroupCallMatch(false);
+  enablePrivateCallMatch(false);
+  setBit(0x6b, 2, 1);
+  setTimeZone(QTimeZone::systemTimeZone());
+
+  setChannelHangTime(3000);
+  setUInt8(0x91, 0xff); setUInt2(0x92, 0, 0x03);
+  enablePublicZone(true);
+  setUInt5(0x92, 3, 0x1f);
+  setUInt8(0x93, 0xff);
+  setAdditionalDMRId(0, 1); setUInt8(0x97, 0);
+  setAdditionalDMRId(1, 2); setUInt8(0x9b, 0);
+  setAdditionalDMRId(2, 3); setUInt8(0x9f, 0);
+  setUInt3(0xa0, 0, 0b111);
+  setMICLevel(2);
+  enableEditRadioID(true);
+  setBit(0xa0, 7, true);
+  memset(_data+0xa1, 0xff, 15);
+}
+
+UV390Codeplug::GeneralSettingsElement::TransmitMode
+UV390Codeplug::GeneralSettingsElement::transmitMode() const {
+  return TransmitMode(getUInt2(0x40,6));
+}
+void
+UV390Codeplug::GeneralSettingsElement::setTransmitMode(TransmitMode mode) {
+  setUInt2(0x40,6, mode);
+}
+
+bool
+UV390Codeplug::GeneralSettingsElement::channelVoiceAnnounce() const {
+  return getBit(0x42,1);
+}
+void
+UV390Codeplug::GeneralSettingsElement::enableChannelVoiceAnnounce(bool enable) {
+  setBit(0x42,1, enable);
+}
+
+bool
+UV390Codeplug::GeneralSettingsElement::keypadTones() const {
+  return getBit(0x42,5);
+}
+void
+UV390Codeplug::GeneralSettingsElement::enableKeypadTones(bool enable) {
+  setBit(0x42,5, enable);
+}
+
+bool
+UV390Codeplug::GeneralSettingsElement::channelModeA() const {
+  return getBit(0x43,3);
+}
+void
+UV390Codeplug::GeneralSettingsElement::enableChannelModeA(bool enable) {
+  setBit(0x43,3, enable);
+}
+
+bool
+UV390Codeplug::GeneralSettingsElement::channelModeB() const {
+  return getBit(0x43,7);
+}
+void
+UV390Codeplug::GeneralSettingsElement::enableChannelModeB(bool enable) {
+  setBit(0x43,7, enable);
+}
+
+bool
+UV390Codeplug::GeneralSettingsElement::channelMode() const {
+  return 0xff == getUInt8(0x57);
+}
+void
+UV390Codeplug::GeneralSettingsElement::enableChannelMode(bool enable) {
+  setUInt8(0x57, enable ? 0xff : 0x00);
+}
+
+bool
+UV390Codeplug::GeneralSettingsElement::groupCallMatch() const {
+  return getBit(0x6b, 0);
+}
+void
+UV390Codeplug::GeneralSettingsElement::enableGroupCallMatch(bool enable) {
+  setBit(0x6b, 0, enable);
+}
+bool
+UV390Codeplug::GeneralSettingsElement::privateCallMatch() const {
+  return getBit(0x6b, 1);
+}
+void
+UV390Codeplug::GeneralSettingsElement::enablePrivateCallMatch(bool enable) {
+  setBit(0x6b, 1, enable);
+}
+
+QTimeZone
+UV390Codeplug::GeneralSettingsElement::timeZone() const {
+  return QTimeZone((int(getUInt5(0x6b, 3))-12)*3600);
+}
+void
+UV390Codeplug::GeneralSettingsElement::setTimeZone(const QTimeZone &zone) {
+  int idx = (zone.standardTimeOffset(QDateTime::currentDateTime())/3600)+12;
+  setUInt5(0x6b, 3, uint8_t(idx));
+}
+
+unsigned
+UV390Codeplug::GeneralSettingsElement::channelHangTime() const {
+  return unsigned(getUInt8(0x90))*100;
+}
+void
+UV390Codeplug::GeneralSettingsElement::setChannelHangTime(unsigned dur) {
+  setUInt8(0x90, dur/100);
+}
+
+bool
+UV390Codeplug::GeneralSettingsElement::publicZone() const {
+  return getBit(0x92, 2);
+}
+void
+UV390Codeplug::GeneralSettingsElement::enablePublicZone(bool enable) {
+  setBit(0x92, 2, enable);
+}
+
+uint32_t
+UV390Codeplug::GeneralSettingsElement::additionalDMRId(unsigned n) const {
+  return getUInt24_le(0x94+4*n);
+}
+void
+UV390Codeplug::GeneralSettingsElement::setAdditionalDMRId(unsigned n, uint32_t id) {
+  setUInt24_le(0x94+4*n, id);
+}
+
+unsigned
+UV390Codeplug::GeneralSettingsElement::micLevel() const {
+  return (unsigned(getUInt3(0xa0,3)+1)*100)/60;
+}
+void
+UV390Codeplug::GeneralSettingsElement::setMICLevel(unsigned level) {
+  setUInt3(0xa0,3, ((level-1)*60)/100);
+}
+
+bool
+UV390Codeplug::GeneralSettingsElement::editRadioID() const {
+  return !getBit(0xa0, 6);
+}
+void
+UV390Codeplug::GeneralSettingsElement::enableEditRadioID(bool enable) {
+  setBit(0xa0,6, !enable);
+}
+
+bool
+UV390Codeplug::GeneralSettingsElement::fromConfig(const Config *config) {
+  if (! TyTCodeplug::GeneralSettingsElement::fromConfig(config))
+    return false;
+
+  setTimeZone(QTimeZone::systemTimeZone());
+  setMICLevel(config->settings()->micLevel());
+  enableChannelVoiceAnnounce(config->settings()->speech());
+  return true;
+}
+
+bool
+UV390Codeplug::GeneralSettingsElement::updateConfig(Config *config) {
+  if (! TyTCodeplug::GeneralSettingsElement::updateConfig(config))
+    return false;
+  config->settings()->setMicLevel(micLevel());
+  config->settings()->enableSpeech(channelVoiceAnnounce());
+  return true;
 }
 
 

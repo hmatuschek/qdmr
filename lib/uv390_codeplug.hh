@@ -127,6 +127,103 @@ public:
     virtual void fromChannelObj(const Channel *c, Context &ctx);
   };
 
+  /** Extends the common @c TyTCodeplug::GeneralSettings to implement the MD-UV390 specific
+   * settings.
+   *
+   * Memory layout of the settings (size 0x???? bytes):
+   * @verbinclude uv390_settings.txt */
+  class GeneralSettingsElement: public TyTCodeplug::GeneralSettingsElement
+  {
+  protected:
+    /** Hidden constructor. */
+    GeneralSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    GeneralSettingsElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Defines all possible transmit modes. */
+    enum TransmitMode {
+      LAST_CALL_CH = 0,
+      LAST_CALL_AND_HAND_CH = 1,
+      DESIGNED_CH = 2,
+      DESIGNED_AND_HAND_CH = 3,
+    };
+
+    /** Returns the transmit mode. */
+    virtual TransmitMode transmitMode() const;
+    /** Sets the transmit mode. */
+    virtual void setTransmitMode(TransmitMode mode);
+
+    /** Returns @c true, if the speech synthesis is enabled. */
+    virtual bool channelVoiceAnnounce() const;
+    /** Enables/disables the speech synthesis. */
+    virtual void enableChannelVoiceAnnounce(bool enable);
+
+    /** Returns @c true, if keypad tones are enabled. */
+    virtual bool keypadTones() const;
+    /** Enables/disables the keypad tones. */
+    virtual void enableKeypadTones(bool enable);
+
+    /** Returns @c true, if VFO A is in channel mode. */
+    virtual bool channelModeA() const;
+    /** Enables/disables the channel mode for VFO A. */
+    virtual void enableChannelModeA(bool enable);
+    /** Returns @c true, if VFO B is in channel mode. */
+    virtual bool channelModeB() const;
+    /** Enables/disables the channel mode for VFO B. */
+    virtual void enableChannelModeB(bool enable);
+
+    /** Returns @c true, if the radio is in channel (and not VFO) mode. */
+    virtual bool channelMode() const;
+    /** Enable/disable channel mode. */
+    virtual void enableChannelMode(bool enable);
+
+    /** Returns @c true if group-call match is enabled. */
+    virtual bool groupCallMatch() const;
+    /** Enables/disables group-call match. */
+    virtual void enableGroupCallMatch(bool enable);
+    /** Returns @c true if private-call match is enabled. */
+    virtual bool privateCallMatch() const;
+    /** Enables/disables private-call match. */
+    virtual void enablePrivateCallMatch(bool enable);
+
+    /** Returns the time-zone. */
+    virtual QTimeZone timeZone() const;
+    /** Sets the time-zone. */
+    virtual void setTimeZone(const QTimeZone &zone);
+
+    /** Returns the channel hang time. */
+    virtual unsigned channelHangTime() const;
+    /** Sets the channel hang time. */
+    virtual void setChannelHangTime(unsigned dur);
+    /** Returns @c true, if public zone is enabled. */
+    virtual bool publicZone() const;
+    /** Enables/disables public zone. */
+    virtual void enablePublicZone(bool enable);
+
+    /** Returns the n-th DMR id. */
+    virtual uint32_t additionalDMRId(unsigned n) const;
+    /** Sets the n-th DMR id. */
+    virtual void setAdditionalDMRId(unsigned n, uint32_t id);
+
+    /** Returns the microphone gain. */
+    virtual unsigned micLevel() const;
+    /** Sets the microphone gain. */
+    virtual void setMICLevel(unsigned val);
+
+    /** If @c true, radio ID editing is enabled. */
+    virtual bool editRadioID() const;
+    /** Enable/disable radio ID editing. */
+    virtual void enableEditRadioID(bool enable);
+
+    /** Encodes the general settings. */
+    virtual bool fromConfig(const Config *config);
+    /** Updates config from general settings. */
+    virtual bool updateConfig(Config *config);
+  };
 
 public:
   /** Constructor. */

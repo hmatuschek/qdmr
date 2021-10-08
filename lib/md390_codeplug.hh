@@ -18,7 +18,7 @@
  *  <tr><td>0x00200c</td> <td>0x002040</td> <td>0x00034</td> <td>Reserved, filled with 0xff. </td></tr>
  *  <tr><td>0x002100</td> <td>0x002140</td> <td>0x00040</td> <td>Button config, see @c TyTCodeplug::ButtonSettingsElement.</td></tr>
  *  <tr><td>0x002140</td> <td>0x002180</td> <td>0x00040</td> <td>Reserved, filled with 0xff.</td></tr>
- *  <tr><td>0x002040</td> <td>0x0020f0</td> <td>0x000b0</td> <td>??? General settings see @c TyTCodeplug::GeneralSettingsElement.</td></tr>
+ *  <tr><td>0x002040</td> <td>0x0020f0</td> <td>0x000b0</td> <td>General settings see @c TyTCodeplug::GeneralSettingsElement.</td></tr>
  *  <tr><td>0x002180</td> <td>0x0059c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each, see @c UV390Codeplug::message_t.</td></tr>
  *  <tr><td>0x0059c0</td> <td>0x005a70</td> <td>0x000b0</td> <td>??? Privacy keys, see @c TyTCodeplug::EncryptionElement.</td></tr>
  *  <tr><td>0x005a70</td> <td>0x005a80</td> <td>0x00010</td> <td>Unknown settings</td></tr>
@@ -39,7 +39,10 @@ class MD390Codeplug : public TyTCodeplug
   Q_OBJECT
 
 public:
-  /** Extends the common @c TyTCodeplug::ChannelElement to implement the MD-390 specific settings.*/
+  /** Extends the common @c TyTCodeplug::ChannelElement to implement the MD-390 specific settings.
+   *
+   * Memory layout of the channel (size 0x0040 bytes):
+   * @verbinclude md390_channel.txt */
   class ChannelElement: public TyTCodeplug::ChannelElement
   {
   protected:

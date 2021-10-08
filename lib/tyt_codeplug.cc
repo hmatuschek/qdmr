@@ -11,6 +11,11 @@
 #include <QtEndian>
 
 
+#define CHANNEL_SIZE      0x000040
+#define SETTINGS_SIZE     0x000090
+#define CONTACT_SIZE      0x000024
+
+
 /* ******************************************************************************************** *
  * Implementation of TyTCodeplug::ChannelElement
  * ******************************************************************************************** */
@@ -21,7 +26,7 @@ TyTCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
 }
 
 TyTCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : Codeplug::Element(ptr, 0x0040)
+  : Codeplug::Element(ptr, CHANNEL_SIZE)
 {
   // pass...
 }
@@ -567,7 +572,7 @@ TyTCodeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr, size_t size)
 }
 
 TyTCodeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr)
-  : ChannelElement(ptr, 0x0040)
+  : ChannelElement(ptr, CHANNEL_SIZE)
 {
   // pass...
 }
@@ -607,7 +612,7 @@ TyTCodeplug::ContactElement::ContactElement(uint8_t *ptr, size_t size)
 }
 
 TyTCodeplug::ContactElement::ContactElement(uint8_t *ptr)
-  : Codeplug::Element(ptr, 0x0024)
+  : Codeplug::Element(ptr, CONTACT_SIZE)
 {
   // pass...
 }
@@ -1179,7 +1184,7 @@ TyTCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, size_t
 }
 
 TyTCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x00b0)
+  : Element(ptr, SETTINGS_SIZE)
 {
   // pass...
 }
@@ -1198,8 +1203,7 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   disableAllLEDs(false);
   setBit(0x40,3, 1);
   setMonitorType(MONITOR_OPEN_SQUELCH);
-  setBit(0x40,5, 1);
-  setTransmitMode(DESIGNED_AND_HAND_CH);
+  setUInt3(0x40, 5, 7);
 
   setSavePreamble(true);
   setSaveModeRX(true);
@@ -1210,17 +1214,11 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   enableTalkPermitToneDigital(false);
   enableTalkPermitToneAnalog(false);
 
-  setBit(0x42,0, 0);
-  enableChannelVoiceAnnounce(false);
-  setBit(0x42,2, 0); setBit(0x42,3, 1);
+  setBit(0x42,0, 0); setBit(0x41,1, 1); setBit(0x42,2, 0); setBit(0x42,3, 1);
   enableIntroPicture(true);
-  enableKeypadTones(false);
-  setBit(0x42,6, 1); setBit(0x42,7, 1);
+  setBit(0x42,5, 1); setBit(0x42,6, 1); setBit(0x42,7, 1);
 
-  setBit(0x43,0, 1); setBit(0x43,1, 1);
-  enableChannelModeA(true);
-  setUInt4(0x43,3, 0xf);
-  enableChannelModeB(true);
+  setUInt8(0x43, 0xff);
 
   setDMRId(0); setUInt8(0x47,0);
 
@@ -1240,34 +1238,15 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   setBacklightTime(10);
   setUInt6(0x55, 2, 0);
   keypadLockTimeSetManual();
-  enableChannelMode(true);
+  setUInt8(0x57, 0xff);
 
   setPowerOnPassword(0);
   radioProgPasswordDisable();
   pcProgPasswordDisable();
-  setUInt24_le(0x68, 0xffffff);
-
-  enableGroupCallMatch(false);
-  enablePrivateCallMatch(false);
-  setBit(0x6b, 2, 1);
-  setTimeZone(QTimeZone::systemTimeZone());
+  setUInt32_le(0x68, 0xffffffff);
   setUInt32_le(0x6c, 0xffffffff);
 
   setRadioName("");
-
-  setChannelHangTime(3000);
-  setUInt8(0x91, 0xff); setUInt2(0x92, 0, 0x03);
-  enablePublicZone(true);
-  setUInt5(0x92, 3, 0x1f);
-  setUInt8(0x93, 0xff);
-  setAdditionalDMRId(0, 1); setUInt8(0x97, 0);
-  setAdditionalDMRId(1, 2); setUInt8(0x9b, 0);
-  setAdditionalDMRId(2, 3); setUInt8(0x9f, 0);
-  setUInt3(0xa0, 0, 0b111);
-  setMICLevel(2);
-  enableEditRadioID(true);
-  setBit(0xa0, 7, true);
-  memset(_data+0xa1, 0xff, 15);
 }
 
 QString
@@ -1286,15 +1265,6 @@ TyTCodeplug::GeneralSettingsElement::introLine2() const {
 void
 TyTCodeplug::GeneralSettingsElement::setIntroLine2(const QString line) {
   writeUnicode(0x14, line, 10);
-}
-
-TyTCodeplug::GeneralSettingsElement::TransmitMode
-TyTCodeplug::GeneralSettingsElement::transmitMode() const {
-  return TransmitMode(getUInt2(0x40,6));
-}
-void
-TyTCodeplug::GeneralSettingsElement::setTransmitMode(TransmitMode mode) {
-  setUInt2(0x40,6, mode);
 }
 
 TyTCodeplug::GeneralSettingsElement::MonitorType
@@ -1379,48 +1349,12 @@ TyTCodeplug::GeneralSettingsElement::enableTalkPermitToneAnalog(bool enable) {
 }
 
 bool
-TyTCodeplug::GeneralSettingsElement::channelVoiceAnnounce() const {
-  return getBit(0x42,1);
-}
-void
-TyTCodeplug::GeneralSettingsElement::enableChannelVoiceAnnounce(bool enable) {
-  setBit(0x42,1, enable);
-}
-
-bool
 TyTCodeplug::GeneralSettingsElement::introPicture() const {
   return getBit(0x42,4);
 }
 void
 TyTCodeplug::GeneralSettingsElement::enableIntroPicture(bool enable) {
   setBit(0x42,4, enable);
-}
-
-bool
-TyTCodeplug::GeneralSettingsElement::keypadTones() const {
-  return getBit(0x42,5);
-}
-void
-TyTCodeplug::GeneralSettingsElement::enableKeypadTones(bool enable) {
-  setBit(0x42,5, enable);
-}
-
-bool
-TyTCodeplug::GeneralSettingsElement::channelModeA() const {
-  return getBit(0x43,3);
-}
-void
-TyTCodeplug::GeneralSettingsElement::enableChannelModeA(bool enable) {
-  setBit(0x43,3, enable);
-}
-
-bool
-TyTCodeplug::GeneralSettingsElement::channelModeB() const {
-  return getBit(0x43,7);
-}
-void
-TyTCodeplug::GeneralSettingsElement::enableChannelModeB(bool enable) {
-  setBit(0x43,7, enable);
 }
 
 uint32_t
@@ -1574,15 +1508,6 @@ TyTCodeplug::GeneralSettingsElement::keypadLockTimeSetManual() {
   setUInt8(0x56, 0xff);
 }
 
-bool
-TyTCodeplug::GeneralSettingsElement::channelMode() const {
-  return 0xff == getUInt8(0x57);
-}
-void
-TyTCodeplug::GeneralSettingsElement::enableChannelMode(bool enable) {
-  setUInt8(0x57, enable ? 0xff : 0x00);
-}
-
 uint32_t
 TyTCodeplug::GeneralSettingsElement::powerOnPassword() const {
   return getBCD8_le(0x58);
@@ -1626,33 +1551,6 @@ TyTCodeplug::GeneralSettingsElement::pcProgPasswordDisable() {
   memset(_data+0x60, 0xff, 8);
 }
 
-bool
-TyTCodeplug::GeneralSettingsElement::groupCallMatch() const {
-  return getBit(0x6b, 0);
-}
-void
-TyTCodeplug::GeneralSettingsElement::enableGroupCallMatch(bool enable) {
-  setBit(0x6b, 0, enable);
-}
-bool
-TyTCodeplug::GeneralSettingsElement::privateCallMatch() const {
-  return getBit(0x6b, 1);
-}
-void
-TyTCodeplug::GeneralSettingsElement::enablePrivateCallMatch(bool enable) {
-  setBit(0x6b, 1, enable);
-}
-
-QTimeZone
-TyTCodeplug::GeneralSettingsElement::timeZone() const {
-  return QTimeZone((int(getUInt5(0x6b, 3))-12)*3600);
-}
-void
-TyTCodeplug::GeneralSettingsElement::setTimeZone(const QTimeZone &zone) {
-  int idx = (zone.standardTimeOffset(QDateTime::currentDateTime())/3600)+12;
-  setUInt5(0x6b, 3, uint8_t(idx));
-}
-
 QString
 TyTCodeplug::GeneralSettingsElement::radioName() const {
   return readUnicode(0x70, 16);
@@ -1660,51 +1558,6 @@ TyTCodeplug::GeneralSettingsElement::radioName() const {
 void
 TyTCodeplug::GeneralSettingsElement::setRadioName(const QString &name) {
   writeUnicode(0x70, name, 16);
-}
-
-unsigned
-TyTCodeplug::GeneralSettingsElement::channelHangTime() const {
-  return unsigned(getUInt8(0x90))*100;
-}
-void
-TyTCodeplug::GeneralSettingsElement::setChannelHangTime(unsigned dur) {
-  setUInt8(0x90, dur/100);
-}
-
-bool
-TyTCodeplug::GeneralSettingsElement::publicZone() const {
-  return getBit(0x92, 2);
-}
-void
-TyTCodeplug::GeneralSettingsElement::enablePublicZone(bool enable) {
-  setBit(0x92, 2, enable);
-}
-
-uint32_t
-TyTCodeplug::GeneralSettingsElement::additionalDMRId(unsigned n) const {
-  return getUInt24_le(0x94+4*n);
-}
-void
-TyTCodeplug::GeneralSettingsElement::setAdditionalDMRId(unsigned n, uint32_t id) {
-  setUInt24_le(0x94+4*n, id);
-}
-
-unsigned
-TyTCodeplug::GeneralSettingsElement::micLevel() const {
-  return (unsigned(getUInt3(0xa0,3)+1)*100)/60;
-}
-void
-TyTCodeplug::GeneralSettingsElement::setMICLevel(unsigned level) {
-  setUInt3(0xa0,3, ((level-1)*60)/100);
-}
-
-bool
-TyTCodeplug::GeneralSettingsElement::editRadioID() const {
-  return !getBit(0xa0, 6);
-}
-void
-TyTCodeplug::GeneralSettingsElement::enableEditRadioID(bool enable) {
-  setBit(0xa0,6, !enable);
 }
 
 bool
@@ -1716,9 +1569,6 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
 
   setIntroLine1(config->settings()->introLine1());
   setIntroLine2(config->settings()->introLine2());
-  setTimeZone(QTimeZone::systemTimeZone());
-  setMICLevel(config->settings()->micLevel());
-  enableChannelVoiceAnnounce(config->settings()->speech());
   setVOXSesitivity(config->settings()->vox());
   return true;
 }
@@ -1735,8 +1585,6 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   }
   config->settings()->setIntroLine1(introLine1());
   config->settings()->setIntroLine2(introLine2());
-  config->settings()->setMicLevel(micLevel());
-  config->settings()->enableSpeech(channelVoiceAnnounce());
   config->settings()->setVOX(voxSesitivity());
   return true;
 }
