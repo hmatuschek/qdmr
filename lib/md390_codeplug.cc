@@ -280,29 +280,56 @@ MD390Codeplug::clearZones() {
 
 bool
 MD390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
-  for (int i=0; i<NUM_ZONES; i++) {
+  for (int i=0,z=0; i<NUM_ZONES; i++, z++) {
     ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
     zone.clear();
-    if (i < config->zones()->count()) {
-      zone.fromZoneObj(config->zones()->zone(i), ctx);
+
+    if (z < config->zones()->count()) {
+      // handle A list
+      Zone *obj = config->zones()->zone(z);
+      bool needs_ext = obj->B()->count();
+      // set name
+      if (needs_ext)
+        zone.setName(obj->name() + " A");
+      else
+        zone.setName(obj->name());
+      // fill channels
+      for (int c=0; c<16; c++) {
+        if (c < obj->A()->count())
+          zone.setMemberIndex(c, ctx.index(obj->A()->get(c)));
+      }
+      // If there is a B list, add a zone more
+      if (needs_ext) {
+        i++;
+        ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
+        zone.clear();
+        zone.setName(obj->name() + " B");
+        for (int c=0; c<16; c++) {
+          if (c < obj->B()->count())
+            zone.setMemberIndex(c, ctx.index(obj->B()->get(c)));
+        }
+      }
     }
   }
+
   return true;
 }
 
 bool
 MD390Codeplug::createZones(Config *config, Context &ctx) {
+  Zone *last_zone = nullptr;
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
       break;
-    if (Zone *obj = zone.toZoneObj()) {
+    bool is_ext = (nullptr != last_zone) && (zone.name().endsWith(" B")) &&
+        (zone.name().startsWith(last_zone->name()));
+    Zone *obj = last_zone;
+    if (! is_ext) {
+      last_zone = obj = new Zone(zone.name());
+      if (zone.name().endsWith(" A"))
+        obj->setName(zone.name().chopped(2));
       config->zones()->add(obj); ctx.add(obj, i+1);
-    } else {
-      _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid zone at index %2.")
-          .arg(__func__).arg(i);
-      logError() << _errorMessage;
-      return false;
     }
   }
 
@@ -311,14 +338,32 @@ MD390Codeplug::createZones(Config *config, Context &ctx) {
 
 bool
 MD390Codeplug::linkZones(Context &ctx) {
-  for (int i=0; i<NUM_ZONES; i++) {
+  Zone *last_zone = nullptr;
+  for (int i=0, z=0; i<NUM_ZONES; i++, z++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
       break;
-    if (! zone.linkZone(ctx.get<Zone>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode TyT codeplug: Cannot link zone at index %1.").arg(i);
-      logError() << _errorMessage;
-      return false;
+
+    if (ctx.has<Zone>(i+1)) {
+      Zone *obj = last_zone = ctx.get<Zone>(i+1);
+      for (int i=0; ((i<16) && zone.memberIndex(i)); i++) {
+        if (! ctx.has<Channel>(zone.memberIndex(i))) {
+          logWarn() << "Cannot link channel with index " << zone.memberIndex(i)
+                    << " channel not defined.";
+          continue;
+        }
+        obj->A()->add(ctx.get<Channel>(zone.memberIndex(i)));
+      }
+    } else {
+      Zone *obj = last_zone; last_zone = nullptr;
+      for (int i=0; ((i<16) && zone.memberIndex(i)); i++) {
+        if (! ctx.has<Channel>(zone.memberIndex(i))) {
+          logWarn() << "Cannot link channel with index " << zone.memberIndex(i)
+                    << " channel not defined.";
+          continue;
+        }
+        obj->B()->add(ctx.get<Channel>(zone.memberIndex(i)));
+      }
     }
   }
 

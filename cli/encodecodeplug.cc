@@ -11,6 +11,7 @@
 #include "rd5r_codeplug.hh"
 #include "gd77_codeplug.hh"
 #include "opengd77_codeplug.hh"
+#include "md390_codeplug.hh"
 #include "uv390_codeplug.hh"
 #include "md2017_codeplug.hh"
 #include "d868uv_codeplug.hh"
@@ -79,6 +80,14 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
 
   if (RadioInfo::UV390 == radio) {
     UV390Codeplug codeplug;
+    codeplug.encode(&config, flags);
+    if (! codeplug.write(parser.positionalArguments().at(2))) {
+      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
+                 << "': " << codeplug.errorMessage();
+      return -1;
+    }
+  } else if (RadioInfo::MD390 == radio) {
+    MD390Codeplug codeplug;
     codeplug.encode(&config, flags);
     if (! codeplug.write(parser.positionalArguments().at(2))) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
