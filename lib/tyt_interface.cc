@@ -7,8 +7,10 @@
 TyTInterface::TyTInterface(unsigned vid, unsigned pid, QObject *parent)
   : DFUDevice(vid, pid, parent), RadioInterface()
 {
-  if (! DFUDevice::isOpen())
+  if (! DFUDevice::isOpen()) {
+    logError() << _errorMessage;
     return;
+  }
 
   // Enter Programming Mode.
   if (wait_idle())
