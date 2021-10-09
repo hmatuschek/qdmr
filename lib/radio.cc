@@ -387,16 +387,15 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
     TyTInterface *dfu = new TyTInterface(0x0483, 0xdf11);
     if (dfu->isOpen()) {
       id = dfu->identifier();
-      if (! id.isValid()) {
+      if ((id.isValid() && (RadioInfo::UV390 == id.id())) || (force.isValid() && (RadioInfo::UV390 == force.id()))) {
+        return new UV390(dfu);
+      } else if ((id.isValid() && (RadioInfo::MD2017 == id.id())) || (force.isValid() && (RadioInfo::MD2017 == force.id()))) {
+        return new MD2017(dfu);
+      } else {
         errorMessage = tr("Cannot identify TyT radio: %1").arg(dfu->errorMessage());
         dfu->close();
         dfu->deleteLater();
         return nullptr;
-      }
-      if ((RadioInfo::UV390 == id.id()) || (force.isValid() && (RadioInfo::UV390 == force.id()))) {
-        return new UV390(dfu);
-      } else if ((RadioInfo::MD2017 == id.id()) || (force.isValid() && (RadioInfo::MD2017 == force.id()))) {
-        return new MD2017(dfu);
       }
     } else {
       dfu->deleteLater();
@@ -408,16 +407,15 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
     RadioddityInterface *hid = new RadioddityInterface(0x15a2, 0x0073);
     if (hid->isOpen()) {
       id = hid->identifier();
-      if (! id.isValid()) {
+      if ((id.isValid() && (RadioInfo::RD5R == id.id())) || (force.isValid() && (RadioInfo::RD5R == force.id()))) {
+        return new RD5R(hid);
+      } else if ((id.isValid() && (RadioInfo::GD77 == id.id())) || (force.isValid() && (RadioInfo::GD77 == force.id()))) {
+        return new GD77(hid);
+      } else {
         errorMessage = tr("Cannot identify Radioddity radio: %1").arg(hid->errorMessage());
         hid->close();
         hid->deleteLater();
         return nullptr;
-      }
-      if ((RadioInfo::RD5R == id.id()) || (force.isValid() && (RadioInfo::RD5R == force.id()))) {
-        return new RD5R(hid);
-      } else if ((RadioInfo::GD77 == id.id()) || (force.isValid() && (RadioInfo::GD77 == force.id()))) {
-        return new GD77(hid);
       }
     } else {
       hid->deleteLater();
@@ -429,14 +427,13 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
     OpenGD77Interface *ogd77 = new OpenGD77Interface();
     if (ogd77->isOpen()) {
       id = ogd77->identifier();
-      if (! id.isValid()) {
+      if ((id.isValid() && (RadioInfo::OpenGD77 == id.id())) || (force.isValid() && (RadioInfo::OpenGD77 == force.id()))) {
+        return new OpenGD77(ogd77);
+      } else {
         errorMessage = tr("Cannot identify OpenGD77 radio: %1").arg(ogd77->errorMessage());
         ogd77->close();
         ogd77->deleteLater();
         return nullptr;
-      }
-      if ((RadioInfo::OpenGD77 == id.id()) || (force.isValid() && (RadioInfo::OpenGD77 == force.id()))) {
-        return new OpenGD77(ogd77);
       }
     } else {
       ogd77->deleteLater();
@@ -448,20 +445,19 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
     AnytoneInterface *anytone = new AnytoneInterface();
     if (anytone->isOpen()) {
       id = anytone->identifier();
-      if (! id.isValid()) {
+      if ((id.isValid() && (RadioInfo::D868UVE == id.id())) || (force.isValid() && (RadioInfo::D868UVE == force.id()))) {
+        return new D868UV(anytone);
+      } else if ((id.isValid() && (RadioInfo::D878UV == id.id())) || (force.isValid() && (RadioInfo::D878UV == force.id()))) {
+        return new D878UV(anytone);
+      } else if ((id.isValid() && (RadioInfo::D878UVII == id.id())) || (force.isValid() && (RadioInfo::D878UVII == force.id()))) {
+        return new D878UV2(anytone);
+      } else if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
+        return new D578UV(anytone);
+      } else {
         errorMessage = tr("Cannot identify OpenGD77 radio: %1").arg(anytone->errorMessage());
         anytone->close();
         anytone->deleteLater();
         return nullptr;
-      }
-      if ((RadioInfo::D868UVE == id.id()) || (force.isValid() && (RadioInfo::D868UVE == force.id()))) {
-        return new D868UV(anytone);
-      } else if ((RadioInfo::D878UV == id.id()) || (force.isValid() && (RadioInfo::D878UV == force.id()))) {
-        return new D878UV(anytone);
-      } else if ((RadioInfo::D878UVII == id.id()) || (force.isValid() && (RadioInfo::D878UVII == force.id()))) {
-        return new D878UV2(anytone);
-      } else if ((RadioInfo::D578UV == id.id()) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
-        return new D578UV(anytone);
       }
     } else {
       anytone->deleteLater();
