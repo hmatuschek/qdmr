@@ -152,6 +152,42 @@ public:
     virtual void setStepSize(unsigned ss_hz);
   };
 
+  /** Extended zone data.
+   * The zone definition @c ZoneElement contains only a single set of 16 channels. For each zone
+   * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each.
+   *
+   * Memory layout of encoded zone extension:
+   * @verbinclude uv390_zoneext.txt */
+  class ZoneExtElement: public Codeplug::Element
+  {
+  protected:
+    /** Constructor. */
+    ZoneExtElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ZoneExtElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~ZoneExtElement();
+
+    void clear();
+
+    /** Returns the n-th member index of the channel list for A. */
+    virtual uint16_t memberIndexA(unsigned n) const;
+    /** Sets the n-th member index of the channel list for A. */
+    virtual void setMemberIndexA(unsigned n, uint16_t idx);
+    /** Returns the n-th member index of the channel list for B. */
+    virtual uint16_t memberIndexB(unsigned n) const;
+    /** Returns the n-th member index of the channel list for B. */
+    virtual void setMemberIndexB(unsigned n, uint16_t idx);
+
+    /** Encodes the given zone. */
+    virtual bool fromZoneObj(const Zone *zone, Context &ctx);
+    /** Links the given zone object.
+     * Thant is, extends channel list A and populates channel list B. */
+    virtual bool linkZoneObj(Zone *zone, Context &ctx);
+  };
+
   /** Extends the common @c TyTCodeplug::GeneralSettings to implement the MD-UV390 specific
    * settings.
    *
@@ -250,10 +286,10 @@ public:
     virtual bool updateConfig(Config *config);
   };
 
-  /** Represents the boot-time settings (selected zone and channels) within the code-plug.
+  /** Represents the boot-time settings (selected zone and channels) within the UV390 code-plug.
    *
    * Memory layout of encoded boot settings:
-   * @verbinclude tytbootsettings.txt */
+   * @verbinclude uv390_bootsettings.txt */
   class BootSettingsElement: public Codeplug::Element
   {
   protected:
@@ -281,6 +317,67 @@ public:
     /** Sets the channel index (within zone) for VFO B. */
     virtual void setChannelIndexB(unsigned idx);
   };
+
+  /** Represents the menu settings (selected zone and channels) within the UV390 code-plug.
+   *
+   * Memory layout of encoded boot settings:
+   * @verbinclude uv390_menusettings.txt */
+  class MenuSettingsElement: public TyTCodeplug::MenuSettingsElement
+  {
+  protected:
+    /** Hidden constructor. */
+    MenuSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit MenuSettingsElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Returns @c true if GPS settings menu is enabled. */
+    virtual bool gpsSettings() const;
+    /** Enables/disables GPS settings menu. */
+    virtual void enableGPSSettings(bool enable);
+    /** Returns @c true if recording menu is enabled. */
+    virtual bool recording() const;
+    /** Enables/disables recording menu. */
+    virtual void enableRecording(bool enable);
+
+    /** Returns @c true if group call match menu is enabled. */
+    virtual bool groupCallMatch() const;
+    /** Enables/disables group call match menu. */
+    virtual void enableGroupCallMatch(bool enable);
+    /** Returns @c true if private call match menu is enabled. */
+    virtual bool privateCallMatch() const;
+    /** Enables/disables private call match menu. */
+    virtual void enablePrivateCallMatch(bool enable);
+    /** Returns @c true if menu hang time item is enabled. */
+    virtual bool menuHangtimeItem() const;
+    /** Enables/disables menu hang time item. */
+    virtual void enableMenuHangtimeItem(bool enable);
+    /** Returns @c true if TX mode menu is enabled. */
+    virtual bool txMode() const;
+    /** Enables/disables TX mode menu. */
+    virtual void enableTXMode(bool enable);
+    /** Returns @c true if zone settings menu is enabled. */
+    virtual bool zoneSettings() const;
+    /** Enables/disables zone settings menu. */
+    virtual void enableZoneSettings(bool enable);
+    /** Returns @c true if new zone menu is enabled. */
+    virtual bool newZone() const;
+    /** Enables/disables new zone menu. */
+    virtual void enableNewZone(bool enable);
+
+    /** Returns @c true if edit zone menu is enabled. */
+    virtual bool editZone() const;
+    /** Enables/disables edit zone menu. */
+    virtual void enableEditZone(bool enable);
+    /** Returns @c true if new scan list menu is enabled. */
+    virtual bool newScanList() const;
+    /** Enables/disables new scan list menu. */
+    virtual void enableNewScanList(bool enable);
+  };
+
 
 public:
   /** Constructor. */

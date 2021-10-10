@@ -58,6 +58,9 @@ public:
   /** Reuse TyT MD-UV390 VFO channel element. */
   typedef UV390Codeplug::VFOChannelElement VFOChannelElement;
 
+  /** Reuse TyT MD-UV390 zone extension element. */
+  typedef UV390Codeplug::ZoneExtElement ZoneExtElement;
+
   /** Reuse TyT MD-UV390 general settings element. */
   typedef UV390Codeplug::GeneralSettingsElement GeneralSettingsElement;
 

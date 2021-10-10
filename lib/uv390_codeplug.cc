@@ -244,6 +244,92 @@ UV390Codeplug::VFOChannelElement::setStepSize(unsigned ss_Hz) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::ZoneElement
+ * ******************************************************************************************** */
+UV390Codeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr, size_t size)
+  : Codeplug::Element(ptr, size)
+{
+  // pass...
+}
+
+UV390Codeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr)
+  : Codeplug::Element(ptr, 0x00e0)
+{
+  // pass...
+}
+
+UV390Codeplug::ZoneExtElement::~ZoneExtElement() {
+  // pass...
+}
+
+void
+UV390Codeplug::ZoneExtElement::clear() {
+  memset(_data, 0x00, 0xe0);
+}
+
+uint16_t
+UV390Codeplug::ZoneExtElement::memberIndexA(unsigned n) const {
+  return getUInt16_le(0x00 + 2*n);
+}
+
+void
+UV390Codeplug::ZoneExtElement::setMemberIndexA(unsigned n, uint16_t idx) {
+  setUInt16_le(0x00 + 2*n, idx);
+}
+
+uint16_t
+UV390Codeplug::ZoneExtElement::memberIndexB(unsigned n) const {
+  return getUInt16_le(0x60 + 2*n);
+}
+
+void
+UV390Codeplug::ZoneExtElement::setMemberIndexB(unsigned n, uint16_t idx) {
+  setUInt16_le(0x60 + 2*n, idx);
+}
+
+bool
+UV390Codeplug::ZoneExtElement::fromZoneObj(const Zone *zone, Context &ctx) {
+  // Store remaining channels from list A
+  for (int i=16; i<64; i++) {
+    if (i < zone->A()->count())
+      setMemberIndexA(i-16, ctx.index(zone->A()->get(i)));
+    else
+      setMemberIndexA(i-16, 0);
+  }
+  // Store channel from list B
+  for (int i=0; i<64; i++) {
+    if (i < zone->B()->count())
+      setMemberIndexB(i, ctx.index(zone->B()->get(i)));
+    else
+      setMemberIndexB(i, 0);
+  }
+
+  return true;
+}
+
+bool
+UV390Codeplug::ZoneExtElement::linkZoneObj(Zone *zone, Context &ctx) {
+  for (int i=0; (i<48) && memberIndexA(i); i++) {
+    if (! ctx.has<Channel>(memberIndexA(i))) {
+      logWarn() << "Cannot link zone extension: Channel index " << memberIndexA(i) << " not defined.";
+      return false;
+    }
+    zone->A()->add(ctx.get<Channel>(memberIndexA(i)));
+  }
+
+  for (int i=0; (i<64) && memberIndexB(i); i++) {
+    if (! ctx.has<Channel>(memberIndexB(i))) {
+      logWarn() << "Cannot link zone extension: Channel index " << memberIndexB(i) << " not defined.";
+      return false;
+    }
+    zone->B()->add(ctx.get<Channel>(memberIndexB(i)));
+  }
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of UV390Codeplug::GeneralSettingsElement
  * ******************************************************************************************** */
 UV390Codeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, size_t size)
@@ -495,6 +581,141 @@ UV390Codeplug::BootSettingsElement::channelIndexB() const {
 void
 UV390Codeplug::BootSettingsElement::setChannelIndexB(unsigned idx) {
   setUInt8(0x06, idx);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::MenuSettingsElement
+ * ******************************************************************************************** */
+UV390Codeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr, size_t size)
+  : TyTCodeplug::MenuSettingsElement(ptr, size)
+{
+  // pass...
+}
+
+UV390Codeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr)
+  : TyTCodeplug::MenuSettingsElement(ptr)
+{
+  // pass...
+}
+
+void
+UV390Codeplug::MenuSettingsElement::clear() {
+  TyTCodeplug::MenuSettingsElement::clear();
+
+  enableGPSSettings(true);
+  enableRecording(true);
+
+  enableGroupCallMatch(true);
+  enablePrivateCallMatch(true);
+  enableMenuHangtimeItem(true);
+  enableTXMode(true);
+  enableZoneSettings(true);
+  enableNewZone(true);
+
+  enableEditZone(true);
+  enableNewScanList(true);
+
+  setBit(0x05, 0, true);
+  setBit(0x05, 1, true);
+  enableGroupCallMatch(true);
+  enablePrivateCallMatch(true);
+  enableMenuHangtimeItem(true);
+  enableTXMode(true);
+  enableZoneSettings(true);
+  enableNewZone(true);
+  enableEditZone(true);
+  enableNewScanList(true);
+}
+
+bool
+UV390Codeplug::MenuSettingsElement::gpsSettings() const {
+  return !getBit(0x04, 3);
+}
+void
+UV390Codeplug::MenuSettingsElement::enableGPSSettings(bool enable) {
+  setBit(0x04, 3, !enable);
+}
+
+bool
+UV390Codeplug::MenuSettingsElement::recording() const {
+  return getBit(0x04, 5);
+}
+void
+UV390Codeplug::MenuSettingsElement::enableRecording(bool enable) {
+  setBit(0x04, 5, enable);
+}
+
+bool
+UV390Codeplug::MenuSettingsElement::groupCallMatch() const {
+  return getBit(0x05, 2);
+}
+void
+UV390Codeplug::MenuSettingsElement::enableGroupCallMatch(bool enable) {
+  setBit(0x05, 2, enable);
+}
+
+bool
+UV390Codeplug::MenuSettingsElement::privateCallMatch() const {
+  return getBit(0x05, 3);
+}
+void
+UV390Codeplug::MenuSettingsElement::enablePrivateCallMatch(bool enable) {
+  setBit(0x05, 3, enable);
+}
+
+bool
+UV390Codeplug::MenuSettingsElement::menuHangtimeItem() const {
+  return getBit(0x05, 4);
+}
+void
+UV390Codeplug::MenuSettingsElement::enableMenuHangtimeItem(bool enable) {
+  setBit(0x05, 4, enable);
+}
+
+bool
+UV390Codeplug::MenuSettingsElement::txMode() const {
+  return getBit(0x05, 5);
+}
+void
+UV390Codeplug::MenuSettingsElement::enableTXMode(bool enable) {
+  setBit(0x05, 5, enable);
+}
+
+bool
+UV390Codeplug::MenuSettingsElement::zoneSettings() const {
+  return getBit(0x05, 6);
+}
+void
+UV390Codeplug::MenuSettingsElement::enableZoneSettings(bool enable) {
+  setBit(0x05, 6, enable);
+}
+
+bool
+UV390Codeplug::MenuSettingsElement::newZone() const {
+  return getBit(0x05, 7);
+}
+void
+UV390Codeplug::MenuSettingsElement::enableNewZone(bool enable) {
+  setBit(0x05, 7, enable);
+}
+
+bool
+UV390Codeplug::MenuSettingsElement::editZone() const {
+  return getBit(0x06, 0);
+}
+void
+UV390Codeplug::MenuSettingsElement::enableEditZone(bool enable) {
+  setBit(0x06, 0, enable);
+}
+
+bool
+UV390Codeplug::MenuSettingsElement::newScanList() const {
+  return getBit(0x06, 1);
+}
+void
+UV390Codeplug::MenuSettingsElement::enableNewScanList(bool enable) {
+  setBit(0x06, 1, enable);
 }
 
 

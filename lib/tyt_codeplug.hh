@@ -262,7 +262,7 @@ public:
   /** Represents a digital (DMR) contact within the codeplug.
    *
    * Memory layout of encoded contact:
-   * @verbinclude tytcontact.txt */
+   * @verbinclude tyt_contact.txt */
   class ContactElement: public Codeplug::Element
   {
   protected:
@@ -309,7 +309,7 @@ public:
    * The latter adds additional channels for VFO A and the channels for VFO B.
    *
    * Memory layout of encoded zone:
-   * @verbinclude tytzone.txt */
+   * @verbinclude tyt_zone.txt */
   class ZoneElement: public Codeplug::Element
   {
   protected:
@@ -343,46 +343,10 @@ public:
     virtual bool linkZone(Zone *zone, Context &ctx) const;
   };
 
-  /** Extended zone data.
-   * The zone definition @c ZoneElement contains only a single set of 16 channels. For each zone
-   * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each.
-   *
-   * Memory layout of encoded zone extension:
-   * @verbinclude tytzoneext.txt */
-  class ZoneExtElement: public Codeplug::Element
-  {
-  protected:
-    /** Constructor. */
-    ZoneExtElement(uint8_t *ptr, size_t size);
-
-  public:
-    /** Constructor. */
-    ZoneExtElement(uint8_t *ptr);
-    /** Destructor. */
-    virtual ~ZoneExtElement();
-
-    void clear();
-
-    /** Returns the n-th member index of the channel list for A. */
-    virtual uint16_t memberIndexA(unsigned n) const;
-    /** Sets the n-th member index of the channel list for A. */
-    virtual void setMemberIndexA(unsigned n, uint16_t idx);
-    /** Returns the n-th member index of the channel list for B. */
-    virtual uint16_t memberIndexB(unsigned n) const;
-    /** Returns the n-th member index of the channel list for B. */
-    virtual void setMemberIndexB(unsigned n, uint16_t idx);
-
-    /** Encodes the given zone. */
-    virtual bool fromZoneObj(const Zone *zone, Context &ctx);
-    /** Links the given zone object.
-     * Thant is, extends channel list A and populates channel list B. */
-    virtual bool linkZoneObj(Zone *zone, Context &ctx);
-  };
-
   /** Representation of an RX group list within the codeplug.
    *
    * Memory layout of encoded RX group list:
-   * @verbinclude tytgrouplist.txt */
+   * @verbinclude tyt_grouplist.txt */
   class GroupListElement: public Codeplug::Element
   {
   protected:
@@ -419,7 +383,7 @@ public:
   /** Represents a scan list within the codeplug.
    *
    * Memory layout of encoded scan list:
-   * @verbinclude tytscanlist.txt */
+   * @verbinclude tyt_scanlist.txt */
   class ScanListElement: public Codeplug::Element
   {
   protected:
@@ -663,7 +627,7 @@ public:
   /** Codeplug representation of programming time-stamp and CPS version.
    *
    * Memory layout of encoded timestamp:
-   * @verbinclude tyttimestamp.txt */
+   * @verbinclude tyt_timestamp.txt */
   class TimestampElement: public Codeplug::Element
   {
   protected:
@@ -744,7 +708,7 @@ public:
   /** Represents all menu settings within the codeplug on the radio.
    *
    * Memory representaion of the menu settings:
-   * @verbinclude tytmenusettings.txt */
+   * @verbinclude tyt_menusettings.txt */
   class MenuSettingsElement: public Codeplug::Element
   {
   protected:
@@ -871,52 +835,10 @@ public:
     virtual bool programRadio() const;
     /** Enables/disables program radio menu. */
     virtual void enableProgramRadio(bool enable);
-    /** Returns @c true if GPS settings menu is enabled. */
-    virtual bool gpsSettings() const;
-    /** Enables/disables GPS settings menu. */
-    virtual void enableGPSSettings(bool enable);
     /** Returns @c true if GPS information is enabled. */
     virtual bool gpsInformation() const;
     /** Enables/disables GPS information menu. */
     virtual void enableGPSInformation(bool enable);
-    /** Returns @c true if recording menu is enabled. */
-    virtual bool recording() const;
-    /** Enables/disables recording menu. */
-    virtual void enableRecording(bool enable);
-
-    /** Returns @c true if group call match menu is enabled. */
-    virtual bool groupCallMatch() const;
-    /** Enables/disables group call match menu. */
-    virtual void enableGroupCallMatch(bool enable);
-    /** Returns @c true if private call match menu is enabled. */
-    virtual bool privateCallMatch() const;
-    /** Enables/disables private call match menu. */
-    virtual void enablePrivateCallMatch(bool enable);
-    /** Returns @c true if menu hang time item is enabled. */
-    virtual bool menuHangtimeItem() const;
-    /** Enables/disables menu hang time item. */
-    virtual void enableMenuHangtimeItem(bool enable);
-    /** Returns @c true if TX mode menu is enabled. */
-    virtual bool txMode() const;
-    /** Enables/disables TX mode menu. */
-    virtual void enableTXMode(bool enable);
-    /** Returns @c true if zone settings menu is enabled. */
-    virtual bool zoneSettings() const;
-    /** Enables/disables zone settings menu. */
-    virtual void enableZoneSettings(bool enable);
-    /** Returns @c true if new zone menu is enabled. */
-    virtual bool newZone() const;
-    /** Enables/disables new zone menu. */
-    virtual void enableNewZone(bool enable);
-
-    /** Returns @c true if edit zone menu is enabled. */
-    virtual bool editZone() const;
-    /** Enables/disables edit zone menu. */
-    virtual void enableEditZone(bool enable);
-    /** Returns @c true if new scan list menu is enabled. */
-    virtual bool newScanList() const;
-    /** Enables/disables new scan list menu. */
-    virtual void enableNewScanList(bool enable);
   };
 
   /** Represents all button settings within the codeplug on the radio.

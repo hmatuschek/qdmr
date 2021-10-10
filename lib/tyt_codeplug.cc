@@ -747,92 +747,6 @@ TyTCodeplug::ZoneElement::linkZone(Zone *zone, Context &ctx) const {
 
 
 /* ******************************************************************************************** *
- * Implementation of TyTCodeplug::ZoneElement
- * ******************************************************************************************** */
-TyTCodeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr, size_t size)
-  : Codeplug::Element(ptr, size)
-{
-  // pass...
-}
-
-TyTCodeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr)
-  : Codeplug::Element(ptr, 0x00e0)
-{
-  // pass...
-}
-
-TyTCodeplug::ZoneExtElement::~ZoneExtElement() {
-  // pass...
-}
-
-void
-TyTCodeplug::ZoneExtElement::clear() {
-  memset(_data, 0x00, 0xe0);
-}
-
-uint16_t
-TyTCodeplug::ZoneExtElement::memberIndexA(unsigned n) const {
-  return getUInt16_le(0x00 + 2*n);
-}
-
-void
-TyTCodeplug::ZoneExtElement::setMemberIndexA(unsigned n, uint16_t idx) {
-  setUInt16_le(0x00 + 2*n, idx);
-}
-
-uint16_t
-TyTCodeplug::ZoneExtElement::memberIndexB(unsigned n) const {
-  return getUInt16_le(0x60 + 2*n);
-}
-
-void
-TyTCodeplug::ZoneExtElement::setMemberIndexB(unsigned n, uint16_t idx) {
-  setUInt16_le(0x60 + 2*n, idx);
-}
-
-bool
-TyTCodeplug::ZoneExtElement::fromZoneObj(const Zone *zone, Context &ctx) {
-  // Store remaining channels from list A
-  for (int i=16; i<64; i++) {
-    if (i < zone->A()->count())
-      setMemberIndexA(i-16, ctx.index(zone->A()->get(i)));
-    else
-      setMemberIndexA(i-16, 0);
-  }
-  // Store channel from list B
-  for (int i=0; i<64; i++) {
-    if (i < zone->B()->count())
-      setMemberIndexB(i, ctx.index(zone->B()->get(i)));
-    else
-      setMemberIndexB(i, 0);
-  }
-
-  return true;
-}
-
-bool
-TyTCodeplug::ZoneExtElement::linkZoneObj(Zone *zone, Context &ctx) {
-  for (int i=0; (i<48) && memberIndexA(i); i++) {
-    if (! ctx.has<Channel>(memberIndexA(i))) {
-      logWarn() << "Cannot link zone extension: Channel index " << memberIndexA(i) << " not defined.";
-      return false;
-    }
-    zone->A()->add(ctx.get<Channel>(memberIndexA(i)));
-  }
-
-  for (int i=0; (i<64) && memberIndexB(i); i++) {
-    if (! ctx.has<Channel>(memberIndexB(i))) {
-      logWarn() << "Cannot link zone extension: Channel index " << memberIndexB(i) << " not defined.";
-      return false;
-    }
-    zone->B()->add(ctx.get<Channel>(memberIndexB(i)));
-  }
-
-  return true;
-}
-
-
-/* ******************************************************************************************** *
  * Implementation of TyTCodeplug::GroupListElement
  * ******************************************************************************************** */
 TyTCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, size_t size)
@@ -1779,24 +1693,14 @@ TyTCodeplug::MenuSettingsElement::clear() {
   enablePassword(false);
   enableDisplayMode(true);
   enableProgramRadio(true);
-  enableGPSSettings(true);
+  setBit(0x04, 3, true);
   enableGPSInformation(true);
-  enableRecording(true);
+  setBit(0x04, 5, true);
   setBit(0x04, 6, true);
   setBit(0x04, 7, true);
 
-  setBit(0x05, 0, true);
-  setBit(0x05, 1, true);
-  enableGroupCallMatch(true);
-  enablePrivateCallMatch(true);
-  enableMenuHangtimeItem(true);
-  enableTXMode(true);
-  enableZoneSettings(true);
-  enableNewZone(true);
-
-  enableEditZone(true);
-  enableNewScanList(true);
-  setUInt6(6, 2, 0b111111);
+  setUInt8(0x05, 0xfb);
+  setUInt8(0x06, 0xff);
 
   memset(_data+0x07, 0xff, 9);
 }
@@ -2044,15 +1948,6 @@ TyTCodeplug::MenuSettingsElement::enableProgramRadio(bool enable) {
 }
 
 bool
-TyTCodeplug::MenuSettingsElement::gpsSettings() const {
-  return !getBit(0x04, 3);
-}
-void
-TyTCodeplug::MenuSettingsElement::enableGPSSettings(bool enable) {
-  setBit(0x04, 3, !enable);
-}
-
-bool
 TyTCodeplug::MenuSettingsElement::gpsInformation() const {
   return !getBit(0x04, 4);
 }
@@ -2060,88 +1955,6 @@ void
 TyTCodeplug::MenuSettingsElement::enableGPSInformation(bool enable) {
   setBit(0x04, 4, !enable);
 }
-
-bool
-TyTCodeplug::MenuSettingsElement::recording() const {
-  return getBit(0x04, 5);
-}
-void
-TyTCodeplug::MenuSettingsElement::enableRecording(bool enable) {
-  setBit(0x04, 5, enable);
-}
-
-bool
-TyTCodeplug::MenuSettingsElement::groupCallMatch() const {
-  return getBit(0x05, 2);
-}
-void
-TyTCodeplug::MenuSettingsElement::enableGroupCallMatch(bool enable) {
-  setBit(0x05, 2, enable);
-}
-
-bool
-TyTCodeplug::MenuSettingsElement::privateCallMatch() const {
-  return getBit(0x05, 3);
-}
-void
-TyTCodeplug::MenuSettingsElement::enablePrivateCallMatch(bool enable) {
-  setBit(0x05, 3, enable);
-}
-
-bool
-TyTCodeplug::MenuSettingsElement::menuHangtimeItem() const {
-  return getBit(0x05, 4);
-}
-void
-TyTCodeplug::MenuSettingsElement::enableMenuHangtimeItem(bool enable) {
-  setBit(0x05, 4, enable);
-}
-
-bool
-TyTCodeplug::MenuSettingsElement::txMode() const {
-  return getBit(0x05, 5);
-}
-void
-TyTCodeplug::MenuSettingsElement::enableTXMode(bool enable) {
-  setBit(0x05, 5, enable);
-}
-
-bool
-TyTCodeplug::MenuSettingsElement::zoneSettings() const {
-  return getBit(0x05, 6);
-}
-void
-TyTCodeplug::MenuSettingsElement::enableZoneSettings(bool enable) {
-  setBit(0x05, 6, enable);
-}
-
-bool
-TyTCodeplug::MenuSettingsElement::newZone() const {
-  return getBit(0x05, 7);
-}
-void
-TyTCodeplug::MenuSettingsElement::enableNewZone(bool enable) {
-  setBit(0x05, 7, enable);
-}
-
-bool
-TyTCodeplug::MenuSettingsElement::editZone() const {
-  return getBit(0x06, 0);
-}
-void
-TyTCodeplug::MenuSettingsElement::enableEditZone(bool enable) {
-  setBit(0x06, 0, enable);
-}
-
-bool
-TyTCodeplug::MenuSettingsElement::newScanList() const {
-  return getBit(0x06, 1);
-}
-void
-TyTCodeplug::MenuSettingsElement::enableNewScanList(bool enable) {
-  setBit(0x06, 1, enable);
-}
-
 
 /* ******************************************************************************************** *
  * Implementation of TyTCodeplug::ButtonSettingsElement
