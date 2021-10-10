@@ -53,8 +53,12 @@ DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
     return;
   }
 
-  if (libusb_kernel_driver_active(_dev, 0))
-    libusb_detach_kernel_driver(_dev, 0);
+  if (libusb_kernel_driver_active(_dev, 0) && libusb_detach_kernel_driver(_dev, 0)) {
+    logWarn() << tr("Cannot detatch kernel driver for device %1:%2. "
+                    "Claim interface will likely fail.").arg(vid,0,16).arg(pid,0,16);
+  }
+
+
 
   if (0 > (error = libusb_claim_interface(_dev, 0))) {
     _errorMessage = tr("%1 Failed to claim USB interface: %2 %3").arg(__func__).arg(error)

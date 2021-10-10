@@ -162,5 +162,8 @@ MD390::callsignDB() {
 
 RadioInfo
 MD390::defaultRadioInfo() {
-  return RadioInfo(RadioInfo::MD390, "md390", "MD-390", "TyT");
+  return RadioInfo(RadioInfo::MD390, "md390", "MD-390", "TyT",
+                   QList<RadioInfo>{
+                     RadioInfo(RadioInfo::RT8, "rt8", "RT8", "Retevis")
+                   });
 }
