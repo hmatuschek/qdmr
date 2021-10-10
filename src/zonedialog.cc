@@ -82,9 +82,9 @@ ZoneDialog::onAddChannelB() {
 
   QList<Channel *> channels = dia.channel();
   foreach (Channel *channel, channels) {
-    if (0 <= _zone.A()->indexOf(channel))
+    if (0 <= _zone.B()->indexOf(channel))
       continue;
-    _zone.A()->add(channel);
+    _zone.B()->add(channel);
   }
 }
 
