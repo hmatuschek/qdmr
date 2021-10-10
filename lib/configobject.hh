@@ -93,6 +93,8 @@ public:
   /** Clears the config object. */
   virtual void clear();
 
+  /** Returns the number of extensions. */
+  virtual unsigned extensionCount() const;
   /** Returns @c true if the config object has the given extension. */
   virtual bool hasExtension(const QString &name) const;
   /** Retunrs the list of extension names associated to this object. */
@@ -101,9 +103,19 @@ public:
   virtual const ConfigObject *extension(const QString &name) const;
   /** Returns the extension object. */
   virtual ConfigObject *extension(const QString &name);
+  /** Returns the n-th extension object. */
+  virtual const ConfigObject *extension(unsigned n) const;
+  /** Returns the n-th extension object. */
+  virtual ConfigObject *extension(unsigned n);
+  /** Returns the name for the n-th extension. */
+  virtual QString extensionName(unsigned n) const;
   /** Adds an extension to this object.
    * A existing extension with the same name will be replaced.*/
   virtual void addExtension(const QString &name, ConfigObject *ext);
+  /** Deletes an extension from this object. */
+  virtual void delExtension(const QString &name);
+  /** Deletes the n-th extension from this object. */
+  virtual void delExtension(unsigned n);
 
   /** Returns @c true if this object is of class @c Object. */
   template <class Object>
@@ -135,8 +147,10 @@ signals:
 protected:
   /** Base name for all IDs, used by @c label(). */
   QString _idBase;
-  /** The table of extensions. */
-  QHash<QString, ConfigObject *> _extensions;
+  /** List of extensions. This list owns the extension objects. */
+  QList<ConfigObject *> _extensions;
+  /** Table mapping name to extension. Holds week references to the extensions. */
+  QHash<QString, ConfigObject *> _extensionTable;
 };
 
 

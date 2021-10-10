@@ -116,8 +116,8 @@ ConfigObject::ConfigObject(const QString &idBase, QObject *parent)
 
 bool
 ConfigObject::label(Context &context) {
-  foreach(QString name, _extensions.keys()) {
-    _extensions[name]->label(context);
+  foreach(ConfigObject *ext, _extensions) {
+    ext->label(context);
   }
 
   // With empty ID base, skip labeling.
@@ -225,8 +225,8 @@ ConfigObject::populate(YAML::Node &node, const Context &context){
   }
 
   // Serialize extensions
-  foreach (QString name, _extensions.keys()) {
-    YAML::Node extNode = _extensions[name]->serialize(context);
+  foreach (QString name, _extensionTable.keys()) {
+    YAML::Node extNode = _extensionTable[name]->serialize(context);
     if (extNode.IsNull())
       return false;
     node[name.toStdString()] = extNode;
@@ -234,36 +234,79 @@ ConfigObject::populate(YAML::Node &node, const Context &context){
   return true;
 }
 
+unsigned
+ConfigObject::extensionCount() const {
+  return _extensions.count();
+}
+
 bool
 ConfigObject::hasExtension(const QString &name) const {
-  return _extensions.contains(name);
+  return _extensionTable.contains(name);
 }
 
 QList<QString>
 ConfigObject::extensionNames() const {
-  return _extensions.keys();
+  return _extensionTable.keys();
 }
 
 const ConfigObject *
 ConfigObject::extension(const QString &name) const {
-  return _extensions.value(name, nullptr);
+  return _extensionTable.value(name, nullptr);
 }
 
 ConfigObject *
 ConfigObject::extension(const QString &name) {
-  return _extensions.value(name, nullptr);
+  return _extensionTable.value(name, nullptr);
+}
+
+const ConfigObject *
+ConfigObject::extension(unsigned n) const {
+  return _extensions.value(n, nullptr);
+}
+
+ConfigObject *
+ConfigObject::extension(unsigned n) {
+  return _extensions.value(n, nullptr);
+}
+
+QString
+ConfigObject::extensionName(unsigned n) const {
+  if (n >= unsigned(_extensions.count()))
+    return QString();
+  return _extensionTable.key(_extensions.value(n));
 }
 
 void
 ConfigObject::addExtension(const QString &name, ConfigObject *ext) {
   if (nullptr == ext)
     return;
-  if (hasExtension(name))
-    _extensions[name]->deleteLater();
-  _extensions.insert(name, ext);
+  if (hasExtension(name)) {
+    ConfigObject *obj = _extensionTable[name];
+    _extensions.removeAll(obj);
+    _extensionTable.remove(name);
+    obj->deleteLater();
+  }
+  _extensions.append(ext);
+  _extensionTable.insert(name, ext);
   ext->setParent(this);
 }
 
+void
+ConfigObject::delExtension(const QString &name) {
+  if (! hasExtension(name))
+    return;
+  ConfigObject *obj = _extensionTable[name];
+  _extensions.removeAll(obj);
+  _extensionTable.remove(name);
+  obj->deleteLater();
+}
+
+void
+ConfigObject::delExtension(unsigned n) {
+  if (n >= unsigned(_extensions.count()))
+    return;
+  delExtension(extensionName(n));
+}
 
 /* ********************************************************************************************* *
  * Implementation of ConfigExtension

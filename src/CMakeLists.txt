@@ -7,7 +7,8 @@ SET(qdmr_SOURCES main.cc
   aprssystemdialog.cc releasenotes.cc roamingzonedialog.cc searchpopup.cc
   configobjectlistview.cc configobjecttableview.cc
   generalsettingsview.cc radioidlistview.cc contactlistview.cc grouplistsview.cc channellistview.cc
-  zonelistview.cc scanlistsview.cc positioningsystemlistview.cc roamingzonelistview.cc)
+  zonelistview.cc scanlistsview.cc positioningsystemlistview.cc roamingzonelistview.cc
+  extensionwrapper.cc)
 SET(qdmr_MOC_HEADERS
   configitemwrapper.hh
   application.hh settings.hh contactdialog.hh rxgrouplistdialog.hh
@@ -17,7 +18,8 @@ SET(qdmr_MOC_HEADERS
   aprssystemdialog.hh releasenotes.hh roamingzonedialog.hh searchpopup.hh
   configobjectlistview.hh configobjecttableview.hh
   generalsettingsview.hh radioidlistview.hh contactlistview.hh grouplistsview.hh channellistview.hh
-  zonelistview.hh scanlistsview.hh positioningsystemlistview.hh roamingzonelistview.hh)
+  zonelistview.hh scanlistsview.hh positioningsystemlistview.hh roamingzonelistview.hh
+  extensionwrapper.hh)
 SET(qdmr_HEADERS )
 SET(qdmr_UI_FORMS contactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
   digitalchanneldialog.ui scanlistdialog.ui configwizardstart.ui verifydialog.ui settingsdialog.ui
