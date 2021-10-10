@@ -22,7 +22,7 @@ contacts:
   - dmr: {id: cont8, name: Sa/Th, ring: false, type: GroupCall, number: 2629}
   - dmr: {id: cont9, name: SA/MV, ring: false, type: GroupCall, number: 2620}
   - dmr: {id: cont10, name: Hessen, ring: false, type: GroupCall, number: 2626}
-  - dmr: {id: cont11, name: HamRadio Village, ring: false, type: GroupCall, number: 3177826}
+  - dmr: {id: cont11, name: HamRadio Village, ring: false, type: GroupCall, number: 98638}
   - dmr: {id: cont12, name: All Call, ring: false, type: AllCall, number: 16777215}
   - dmr: {id: cont13, name: Simplex TG99, ring: false, type: GroupCall, number: 99}
   - dmr: {id: cont14, name: Cl Brandenburg, ring: false, type: GroupCall, number: 26209}
