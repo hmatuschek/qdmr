@@ -15,6 +15,7 @@ Currently, there are only few radios that are supported
   * Radioddity GD77 (since version 0.8.1)
   * Baofeng/Radioddity RD-5R & RD-5R+ (since version 0.2.0)
   * TYT MD-390 / Retevis RT8 (since version 0.9.0)
+  * TYT MD-UV380 (since version 0.9.0)
   * TYT MD-UV390 / Retevis RT3S (since version 0.3.0)
   * TYT MD-2017 / Retevis RT82 (since version 0.9.0)
   * Anytone AT-D878UV (since version 0.5.0)

@@ -844,7 +844,7 @@ public:
   /** Represents all button settings within the codeplug on the radio.
    *
    * Memory representation of the button settings:
-   * @verbinclude tytbuttonsettings.txt */
+   * @verbinclude tyt_buttonsettings.txt */
   class ButtonSettingsElement: public Codeplug::Element
   {
   public:
@@ -895,7 +895,7 @@ public:
   /** Represents a single one-touch setting within the codeplug on the radio.
    *
    * Memory representation of a one-touch setting:
-   * @verbinclude tytonetouchsetting.txt */
+   * @verbinclude tyt_onetouchsettings.txt */
   class OneTouchSettingElement: public Codeplug::Element
   {
   public:
@@ -953,7 +953,7 @@ public:
   /** Represents the emergency settings within the codeplug on the radio.
    *
    * Memory representation of the emergency settings:
-   * @verbinclude tytemergencysettings.txt */
+   * @verbinclude tyt_emergencysettings.txt */
   class EmergencySettingsElement: public Codeplug::Element
   {
   protected:
@@ -1000,7 +1000,7 @@ public:
   /** Represents a single emergency system within the radio.
    *
    * Memory representation of emergency system:
-   * @verbinclude tytemergencysystem.txt */
+   * @verbinclude tyt_emergencysystem.txt */
   class EmergencySystemElement: public Codeplug::Element
   {
   public:
@@ -1073,7 +1073,7 @@ public:
   /** Represents all encryption keys and settings within the codeplug on the device.
    *
    * Memory representation of encryption settings:
-   * @verbinclude tytprivacy.txt */
+   * @verbinclude tyt_privacy.txt */
   class EncryptionElement: public Codeplug::Element
   {
   protected:
