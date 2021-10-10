@@ -98,6 +98,7 @@ UV390::defaultRadioInfo() {
   return RadioInfo(
         RadioInfo::UV390, "uv390", "MD-UV390", "TyT",
         QList<RadioInfo>{
+          RadioInfo(RadioInfo::UV380, "MD-UV380", "TyT"),
           RadioInfo(RadioInfo::RT3S, "RT3S", "Retevis")
         });
 }

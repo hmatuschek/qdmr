@@ -22,6 +22,8 @@ TyTInterface::TyTInterface(unsigned vid, unsigned pid, QObject *parent)
   const char *idstr = identify();
   if (idstr && (0==strcmp("MD390", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::MD390);
+  } else if (idstr && (0==strcmp("MD-UV380", idstr))) {
+    _ident = RadioInfo::byID(RadioInfo::UV380);
   } else if (idstr && (0==strcmp("MD-UV390", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::UV390);
   } else if (idstr && (0==strcmp("2017", idstr))) {
