@@ -272,6 +272,8 @@ AbstractConfigReader::linkExtensions(
 {
   foreach (QString name, obj->extensionNames()) {
     YAML::Node extNode = node[name.toStdString()];
+    if (! extensions.contains(name))
+      continue;
     AbstractConfigReader *reader = extensions[name];
     ConfigObject *extension = obj->extension(name);
     if (!reader->link(extension, extNode, ctx)) {

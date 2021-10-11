@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>601</width>
-    <height>299</height>
+    <width>651</width>
+    <height>348</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,293 +15,316 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <layout class="QFormLayout" name="formLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="nameLabel">
-         <property name="text">
-          <string>Name</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="channelName">
-         <property name="minimumSize">
-          <size>
-           <width>200</width>
-           <height>0</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="rxFrequencyLabel">
-         <property name="text">
-          <string>Rx Frequency</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="rxFrequency"/>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="txFrequencyLabel">
-         <property name="text">
-          <string>Tx Frequency</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="txFrequency"/>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="powerLabel">
-         <property name="text">
-          <string>Power</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="txTimeoutLabel">
-         <property name="text">
-          <string>Tx Timeout</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="rxOnlyLabel">
-         <property name="text">
-          <string>Rx Only</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QCheckBox" name="rxOnly"/>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="scanListLabel">
-         <property name="text">
-          <string>Scan List</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QComboBox" name="scanList"/>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="dmrIDLabel">
-         <property name="text">
-          <string>DMR ID</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <widget class="QComboBox" name="dmrID"/>
-       </item>
-       <item row="3" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QComboBox" name="powerValue">
-           <item>
-            <property name="text">
-             <string>Max</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>High</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Mid</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Low</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Min</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="powerDefault">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="basicTab">
+      <attribute name="title">
+       <string>Basic</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="nameLabel">
            <property name="text">
-            <string>Default</string>
+            <string>Name</string>
            </property>
           </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="channelName">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="rxFrequencyLabel">
+           <property name="text">
+            <string>Rx Frequency</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="rxFrequency"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="txFrequencyLabel">
+           <property name="text">
+            <string>Tx Frequency</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="txFrequency"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="powerLabel">
+           <property name="text">
+            <string>Power</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="txTimeoutLabel">
+           <property name="text">
+            <string>Tx Timeout</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="rxOnlyLabel">
+           <property name="text">
+            <string>Rx Only</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QCheckBox" name="rxOnly"/>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="scanListLabel">
+           <property name="text">
+            <string>Scan List</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QComboBox" name="scanList"/>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="dmrIDLabel">
+           <property name="text">
+            <string>DMR ID</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QComboBox" name="dmrID"/>
+         </item>
+         <item row="3" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QComboBox" name="powerValue">
+             <item>
+              <property name="text">
+               <string>Max</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>High</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Mid</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Low</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Min</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="powerDefault">
+             <property name="text">
+              <string>Default</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="4" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QSpinBox" name="totValue">
+             <property name="toolTip">
+              <string>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</string>
+             </property>
+             <property name="specialValueText">
+              <string>Off</string>
+             </property>
+             <property name="suffix">
+              <string> s</string>
+             </property>
+             <property name="maximum">
+              <number>9999</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="totDefault">
+             <property name="text">
+              <string>Default</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>
-       <item row="4" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QSpinBox" name="totValue">
-           <property name="toolTip">
-            <string>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</string>
+       <item>
+        <layout class="QFormLayout" name="formLayout_2">
+         <item row="0" column="0">
+          <widget class="QLabel" name="txAdmitLabel">
+           <property name="text">
+            <string>Tx Admit</string>
            </property>
-           <property name="specialValueText">
-            <string>Off</string>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="txAdmit">
+           <item>
+            <property name="text">
+             <string>Always</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Channel Free</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Color Code</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="colorCodeLabel">
+           <property name="text">
+            <string>Color Code</string>
            </property>
-           <property name="suffix">
-            <string> s</string>
-           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="colorCode">
            <property name="maximum">
-            <number>9999</number>
+            <number>15</number>
+           </property>
+           <property name="value">
+            <number>1</number>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QCheckBox" name="totDefault">
+         <item row="2" column="0">
+          <widget class="QLabel" name="timeSlotLabel">
            <property name="text">
-            <string>Default</string>
+            <string>Time Slot</string>
            </property>
           </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="timeSlot">
+           <item>
+            <property name="text">
+             <string>TS 1</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>TS 2</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="rxGroupListLabel">
+           <property name="text">
+            <string>Rx Group List</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="rxGroupList"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="txContactLabel">
+           <property name="text">
+            <string>Tx Contact</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="txContact"/>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="posSysLabel">
+           <property name="text">
+            <string>Positioning System</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QComboBox" name="gpsSystem"/>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="roamLabel">
+           <property name="text">
+            <string>Roaming Zone</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QComboBox" name="roaming"/>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="voxLevelLabel">
+           <property name="text">
+            <string>VOX Level</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QSpinBox" name="voxValue">
+             <property name="specialValueText">
+              <string>Off</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="voxDefault">
+             <property name="text">
+              <string>Default</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>
       </layout>
-     </item>
-     <item>
-      <layout class="QFormLayout" name="formLayout_2">
-       <item row="0" column="0">
-        <widget class="QLabel" name="txAdmitLabel">
-         <property name="text">
-          <string>Tx Admit</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="txAdmit">
-         <item>
-          <property name="text">
-           <string>Always</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Channel Free</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Color Code</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="colorCodeLabel">
-         <property name="text">
-          <string>Color Code</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="colorCode">
-         <property name="maximum">
-          <number>15</number>
-         </property>
-         <property name="value">
-          <number>1</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="timeSlotLabel">
-         <property name="text">
-          <string>Time Slot</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QComboBox" name="timeSlot">
-         <item>
-          <property name="text">
-           <string>TS 1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>TS 2</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="rxGroupListLabel">
-         <property name="text">
-          <string>Rx Group List</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QComboBox" name="rxGroupList"/>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="txContactLabel">
-         <property name="text">
-          <string>Tx Contact</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QComboBox" name="txContact"/>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="posSysLabel">
-         <property name="text">
-          <string>Positioning System</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QComboBox" name="gpsSystem"/>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="roamLabel">
-         <property name="text">
-          <string>Roaming Zone</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QComboBox" name="roaming"/>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="voxLevelLabel">
-         <property name="text">
-          <string>VOX Level</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QSpinBox" name="voxValue">
-           <property name="specialValueText">
-            <string>Off</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="voxDefault">
-           <property name="text">
-            <string>Default</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+     </widget>
+     <widget class="QWidget" name="extTab">
+      <attribute name="title">
+       <string>Extended</string>
+      </attribute>
+      <attribute name="toolTip">
+       <string>Device specific settings</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QTreeView" name="extensionView"/>
        </item>
       </layout>
-     </item>
-    </layout>
+     </widget>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

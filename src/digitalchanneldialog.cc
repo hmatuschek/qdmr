@@ -3,6 +3,7 @@
 #include <QCompleter>
 #include "rxgrouplistdialog.hh"
 #include "repeaterdatabase.hh"
+#include "extensionwrapper.hh"
 #include "utils.hh"
 
 
@@ -10,7 +11,7 @@
  * Implementation of DigitalChannelDialog
  * ********************************************************************************************* */
 DigitalChannelDialog::DigitalChannelDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _channel(nullptr)
+  : QDialog(parent), _config(config), _channel(new DigitalChannel())
 {
   construct();
 }
@@ -97,6 +98,8 @@ DigitalChannelDialog::construct() {
   }
   voxDefault->setChecked(true); voxValue->setValue(0); voxValue->setEnabled(false);
 
+  extensionView->setModel(new ExtensionWrapper(_channel));
+
   if (_channel) {
     channelName->setText(_channel->name());
     rxFrequency->setText(format_frequency(_channel->rxFrequency()));
@@ -140,12 +143,7 @@ DigitalChannelDialog::construct() {
 DigitalChannel *
 DigitalChannelDialog::channel()
 {
-  DigitalChannel *channel = nullptr;
-  if (_channel) {
-    channel = _channel;
-  } else {
-    channel = new DigitalChannel();
-  }
+  DigitalChannel *channel = _channel;
 
   channel->setRadioIdObj(dmrID->currentData().value<RadioID*>());
   channel->setName(channelName->text());
