@@ -94,7 +94,7 @@ GenericListWrapper::onItemAdded(int idx) {
 void
 GenericListWrapper::onItemRemoved(int idx) {
   beginRemoveRows(QModelIndex(), idx, idx);
-  logDebug() << "Signal removal of item at idx=" << idx;
+  //logDebug() << "Signal removal of item at idx=" << idx;
   endRemoveRows();
 }
 
@@ -186,7 +186,7 @@ GenericTableWrapper::onItemAdded(int idx) {
 void
 GenericTableWrapper::onItemRemoved(int idx) {
   beginRemoveRows(QModelIndex(), idx, idx);
-  logDebug() << "Signal removal of item at idx=" << idx;
+  //logDebug() << "Signal removal of item at idx=" << idx;
   endRemoveRows();
 }
 

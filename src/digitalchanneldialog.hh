@@ -28,6 +28,7 @@ protected:
 protected:
   Config *_config;
   DigitalChannel *_channel;
+  bool _ownsChannel;
 };
 
 

@@ -4,6 +4,7 @@
 #include "rxgrouplistdialog.hh"
 #include "repeaterdatabase.hh"
 #include "extensionwrapper.hh"
+#include "propertydelegate.hh"
 #include "utils.hh"
 
 
@@ -11,13 +12,13 @@
  * Implementation of DigitalChannelDialog
  * ********************************************************************************************* */
 DigitalChannelDialog::DigitalChannelDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _channel(new DigitalChannel())
+  : QDialog(parent), _config(config), _channel(new DigitalChannel(this)), _ownsChannel(true)
 {
   construct();
 }
 
 DigitalChannelDialog::DigitalChannelDialog(Config *config, DigitalChannel *channel, QWidget *parent)
-  : QDialog(parent), _config(config), _channel(channel)
+  : QDialog(parent), _config(config), _channel(channel), _ownsChannel(false)
 {
   construct();
 }
@@ -98,7 +99,8 @@ DigitalChannelDialog::construct() {
   }
   voxDefault->setChecked(true); voxValue->setValue(0); voxValue->setEnabled(false);
 
-  extensionView->setModel(new ExtensionWrapper(_channel));
+  extensionView->setModel(new ExtensionWrapper(_channel, extensionView));
+  extensionView->setItemDelegateForColumn(1, new PropertyDelegate(extensionView));
 
   if (_channel) {
     channelName->setText(_channel->name());
@@ -171,6 +173,8 @@ DigitalChannelDialog::channel()
   else
     channel->setVOX(voxValue->value());
 
+  if (_ownsChannel)
+    channel->setParent(nullptr);
   return channel;
 }
 
