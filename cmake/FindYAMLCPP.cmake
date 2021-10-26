@@ -12,14 +12,12 @@ if (YAMLCPP_LIBRARIES AND YAMLCPP_INCLUDE_DIRS)
 else (YAMLCPP_LIBRARIES AND YAMLCPP_INCLUDE_DIRS)
   find_path(YAMLCPP_INCLUDE_DIR
     NAMES
-    yaml.h
+    yaml-cpp/yaml.h
     PATHS
       /usr/include
       /usr/local/include
       /opt/local
       /sw/include
-    PATH_SUFFIXES
-      yaml-cpp
   )
 
   find_library(YAMLCPP_LIBRARY
