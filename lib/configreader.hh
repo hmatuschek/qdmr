@@ -9,7 +9,7 @@
 #define CONFIGREADER_HH
 
 #include <QObject>
-#include <yaml-cpp/yaml.h>
+#include <yaml.h>
 #include "configobject.hh"
 
 class Config;

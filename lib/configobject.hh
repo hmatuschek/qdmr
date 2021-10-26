@@ -6,7 +6,7 @@
 #include <QHash>
 #include <QVector>
 
-#include <yaml-cpp/yaml.h>
+#include <yaml.h>
 
 // Forward declaration
 class ConfigExtension;
