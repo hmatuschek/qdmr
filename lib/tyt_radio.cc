@@ -15,8 +15,7 @@ TyTRadio::TyTRadio(TyTInterface *device, QObject *parent)
 
 TyTRadio::~TyTRadio() {
   if (_dev && _dev->isOpen()) {
-    logDebug() << "Reboot and close connection to radio.";
-    _dev->reboot();
+    logDebug() << "Close connection to TyT device.";
     _dev->close();
   }
   if (_dev) {
@@ -91,7 +90,7 @@ TyTRadio::run() {
     }
 
     if (! download()) {
-      _dev->reboot();
+      //_dev->reboot();
       _dev->close();
       _task = StatusError;
       emit downloadError(this);
@@ -99,7 +98,7 @@ TyTRadio::run() {
     }
 
     _task = StatusIdle;
-    _dev->reboot();
+    //_dev->reboot();
     _dev->close();
     emit downloadFinished(this, &codeplug());
     _config = nullptr;
@@ -139,7 +138,6 @@ TyTRadio::run() {
     _dev->reboot();
     _dev->close();
     emit uploadComplete(this);
-
   }
 }
 
