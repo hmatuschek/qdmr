@@ -511,8 +511,10 @@ Application::uploadCodeplug() {
     settings.ignoreFrequencyLimits()
   };
 
-  if (! verifyCodeplug(radio, false, flags))
+  if (! verifyCodeplug(radio, false, flags)) {
+    radio->deleteLater();
     return;
+  }
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
   progress->setValue(0);
