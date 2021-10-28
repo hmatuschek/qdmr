@@ -223,15 +223,9 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   if (3 <= parser.positionalArguments().size()) {
     QFileInfo info(parser.positionalArguments().at(2));
     if (("conf" == info.suffix()) || ("csv" == info.suffix()) || parser.isSet("csv")) {
-      QFile outfile(info.filePath());
-      if (! outfile.open(QIODevice::WriteOnly)) {
-        logError() << "Cannot write CSV codeplug file '" << outfile.fileName()
-                   << "': " << outfile.errorString();
-        return -1;
-      }
-      QTextStream stream(&outfile);
-      config.writeCSV(stream, errorMessage);
-      outfile.close();
+      logError() << "Export of the old table based format was disabled with 0.9.0. "
+                    "Import still works.";
+      return -1;
     } else if (("yaml" == info.suffix()) || parser.isSet("yaml")) {
       QFile outfile(info.filePath());
       if (! outfile.open(QIODevice::WriteOnly)) {
@@ -249,10 +243,9 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   } else {
     QTextStream stream(stdout);
     if (parser.isSet("csv")) {
-      if (! config.writeCSV(stream, errorMessage)) {
-        logError() << "Cannot serialize codeplug into CSV: " << errorMessage;
-        return -1;
-      }
+      logError() << "Export of the old table based format was disabled with 0.9.0. "
+                    "Import still works.";
+      return -1;
     } else if (parser.isSet("yaml")) {
       if (! config.toYAML(stream)) {
         logError() << "Cannot serialize codeplug into YAML.";
