@@ -269,25 +269,3 @@ Config::readCSV(QTextStream &stream, QString &errorMessage)
   return true;
 }
 
-bool
-Config::writeCSV(const QString &filename, QString &errorMessage) {
-  QFile file(filename);
-  if (! file.open(QIODevice::WriteOnly)) {
-    errorMessage = QString("Cannot open file %1: %2").arg(filename).arg(file.errorString());
-    return false;
-  }
-  QTextStream stream(&file);
-  return writeCSV(stream, errorMessage);
-}
-
-bool
-Config::writeCSV(QTextStream &stream, QString &errorMessage)
-{
-  if (! CSVWriter::write(this, stream, errorMessage))
-    return false;
-
-  _modified = false;
-  return true;
-}
-
-
