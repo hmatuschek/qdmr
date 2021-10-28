@@ -270,7 +270,10 @@ AbstractConfigReader::linkExtensions(
     const QHash<QString, AbstractConfigReader *> &extensions, ConfigObject *obj,
     const YAML::Node &node, const ConfigObject::Context &ctx)
 {
-  foreach (QString name, obj->extensionNames()) {
+  foreach (QString name, extensions.keys()) {
+    // skip extensions not set
+    if (! obj->hasExtension(name))
+      continue;
     YAML::Node extNode = node[name.toStdString()];
     AbstractConfigReader *reader = extensions[name];
     ConfigObject *extension = obj->extension(name);
