@@ -22,6 +22,7 @@ TyTRadio::~TyTRadio() {
     _dev->deleteLater();
     _dev = nullptr;
   }
+  logDebug() << "Destructed TyT radio.";
 }
 
 bool
