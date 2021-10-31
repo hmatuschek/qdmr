@@ -224,8 +224,6 @@ OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
 bool
 OpenGD77Interface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
 {
-  //logDebug() << "Write to bank " << bank << ", addr " << hex << addr << " " << nbytes <<"b.";
-
   if (EEPROM == bank) {
     if ((0 <= _sector) && (! finishWriteFlash()))
       return false;
@@ -487,7 +485,6 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len) {
 
 bool
 OpenGD77Interface::setFlashSector(uint32_t addr) {
-  //logDebug() << "Send set-flash-sector: 0x" << hex << addr << " ...";
   WriteRequest req; req.initSetFlashSector(addr);
   WriteResponse resp;
 
