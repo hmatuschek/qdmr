@@ -311,10 +311,21 @@ Application::saveCodeplug() {
   Settings settings;
   QString filename = QFileDialog::getSaveFileName(
         nullptr, tr("Save codeplug"), settings.lastDirectory().absolutePath(),
-        tr("Codeplug Files (*.yaml)"));
+        tr("Codeplug Files (*.yaml *.yml)"));
 
   if (filename.isEmpty())
     return;
+
+  if (filename.endsWith(".conf") || filename.endsWith("csv")){
+    QMessageBox::critical(nullptr, tr("Please use new YAML format."),
+                          tr("Saveing in the old table-based conf format was disabled with 0.9.0. "
+                             "Reading these files still works."));
+    return;
+  }
+
+  // append .yaml if missing
+  if ((!filename.endsWith(".yaml")) && (!filename.endsWith(".yml")))
+    filename.append(".yaml");
 
   QFile file(filename);
   if (! file.open(QIODevice::WriteOnly)) {
@@ -324,20 +335,12 @@ Application::saveCodeplug() {
   }
 
   QTextStream stream(&file);
-
-  // check for file suffix
   QFileInfo info(filename);
-  if (("conf" == info.suffix()) || ("csv" == info.suffix())) {
-    QMessageBox::critical(nullptr, tr("Please use new YAML format."),
-                          tr("Saveing in the old table-based conf format was disabled with 0.9.0. "
-                             "Reading these files still works."));
-  } else if ("yaml" == info.suffix()) {
-    if (_config->toYAML(stream)) {
-      _mainWindow->setWindowModified(false);
-    } else {
-      QMessageBox::critical(nullptr, tr("Cannot save codeplug"),
-                            tr("Cannot save codeplug to file '%1'.").arg(filename));
-    }
+  if (_config->toYAML(stream)) {
+    _mainWindow->setWindowModified(false);
+  } else {
+    QMessageBox::critical(nullptr, tr("Cannot save codeplug"),
+                          tr("Cannot save codeplug to file '%1'.").arg(filename));
   }
 
   file.flush();
