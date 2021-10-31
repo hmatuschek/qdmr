@@ -12,7 +12,7 @@ class VerifyDialog : public QDialog, private Ui::VerifyDialog
 public:
 
 public:
-  explicit VerifyDialog(const QList<VerifyIssue> &issues, QWidget *parent = nullptr);
+  explicit VerifyDialog(const QList<VerifyIssue> &issues, bool upload, QWidget *parent = nullptr);
 };
 
 #endif // VERIFYDIALOG_HH

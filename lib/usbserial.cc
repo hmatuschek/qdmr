@@ -8,8 +8,8 @@ USBSerial::USBSerial(unsigned vid, unsigned pid, QObject *parent)
   static int idMetaType = qRegisterMetaType<QSerialPort::SerialPortError>();
   Q_UNUSED(idMetaType);
 
-  //logDebug() << "Try to detect USB serial interface " << Qt::hex << vid << ":" << pid << ".";
-  logDebug() << "Try to detect USB serial interface " << QString::number(vid,16) << ":"
+  logDebug() << "Try to detect USB serial interface "
+             << QString::number(vid,16) << ":"
              << QString::number(pid,16) << ".";
 
   // Find matching serial port by VID/PID.

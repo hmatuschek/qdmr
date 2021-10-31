@@ -1,7 +1,7 @@
 #include "verifydialog.hh"
 #include <QPushButton>
 
-VerifyDialog::VerifyDialog(const QList<VerifyIssue> &issues, QWidget *parent)
+VerifyDialog::VerifyDialog(const QList<VerifyIssue> &issues, bool upload, QWidget *parent)
     : QDialog(parent)
 {
 	setupUi(this);
@@ -19,7 +19,9 @@ VerifyDialog::VerifyDialog(const QList<VerifyIssue> &issues, QWidget *parent)
     }
     listWidget->addItem(item);
   }
-
-  QPushButton *ignore = buttonBox->button(QDialogButtonBox::Ignore);
-  ignore->setEnabled(valid);
+  if (upload) {
+    buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
+    QPushButton *ignore = buttonBox->button(QDialogButtonBox::Ok);
+    ignore->setEnabled(valid);
+  }
 }

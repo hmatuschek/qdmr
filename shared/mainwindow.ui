@@ -248,10 +248,10 @@
      <normaloff>:/icons/download.png</normaloff>:/icons/download.png</iconset>
    </property>
    <property name="text">
-    <string>Download</string>
+    <string>Read</string>
    </property>
    <property name="toolTip">
-    <string>Downloads a codeplug from connected radios.</string>
+    <string>Reads a codeplug from connected radios.</string>
    </property>
   </action>
   <action name="actionUpload">
@@ -260,10 +260,10 @@
      <normaloff>:/icons/upload.png</normaloff>:/icons/upload.png</iconset>
    </property>
    <property name="text">
-    <string>Upload</string>
+    <string>Write</string>
    </property>
    <property name="toolTip">
-    <string>Uploads the codeplug to the connected radio.</string>
+    <string>Writes the codeplug to the connected radio.</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -308,10 +308,10 @@
      <normaloff>:/icons/userupload-4x.png</normaloff>:/icons/userupload-4x.png</iconset>
    </property>
    <property name="text">
-    <string>Upload Callsign DB</string>
+    <string>Write Callsign DB</string>
    </property>
    <property name="toolTip">
-    <string>Upload call-sign DB to radio.</string>
+    <string>Writes call-sign DB to radio.</string>
    </property>
   </action>
   <action name="actionRefreshCallsignDB">

@@ -81,10 +81,6 @@ public:
   bool readCSV(const QString &filename, QString &errorMessage);
   /** Imports a configuration from the given text stream in text format. */
   bool readCSV(QTextStream &stream, QString &errorMessage);
-  /** Exports the configuration to the given file. */
-  bool writeCSV(const QString &filename, QString &errorMessage);
-  /** Exports the configuration to the given text stream in text format. */
-  bool writeCSV(QTextStream &stream, QString &errorMessage);
 
 protected:
   bool populate(YAML::Node &node, const Context &context);

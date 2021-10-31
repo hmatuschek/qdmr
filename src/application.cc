@@ -263,7 +263,7 @@ Application::loadCodeplug() {
   QString filename = QFileDialog::getOpenFileName(
         nullptr, tr("Open codeplug"),
         settings.lastDirectory().absolutePath(),
-        tr("Codeplug Files (*.yaml *.conf *.csv *.txt);;All Files (*)"));
+        tr("Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)"));
   if (filename.isEmpty())
     return;
   QFile file(filename);
@@ -311,10 +311,21 @@ Application::saveCodeplug() {
   Settings settings;
   QString filename = QFileDialog::getSaveFileName(
         nullptr, tr("Save codeplug"), settings.lastDirectory().absolutePath(),
-        tr("Codeplug Files (*.yaml);;Codeplug Files (*.conf *.csv *.txt)"));
+        tr("Codeplug Files (*.yaml *.yml)"));
 
   if (filename.isEmpty())
     return;
+
+  if (filename.endsWith(".conf") || filename.endsWith("csv")){
+    QMessageBox::critical(nullptr, tr("Please use new YAML format."),
+                          tr("Saveing in the old table-based conf format was disabled with 0.9.0. "
+                             "Reading these files still works."));
+    return;
+  }
+
+  // append .yaml if missing
+  if ((!filename.endsWith(".yaml")) && (!filename.endsWith(".yml")))
+    filename.append(".yaml");
 
   QFile file(filename);
   if (! file.open(QIODevice::WriteOnly)) {
@@ -324,23 +335,12 @@ Application::saveCodeplug() {
   }
 
   QTextStream stream(&file);
-
-  // check for file suffix
   QFileInfo info(filename);
-  if (("conf" == info.suffix()) || ("csv" == info.suffix())) {
-    QString errorMessage;
-    if (_config->writeCSV(stream, errorMessage))
-      _mainWindow->setWindowModified(false);
-    else
-      QMessageBox::critical(nullptr, tr("Cannot save codeplug"),
-                            tr("Cannot save codeplug to file '%1': %2").arg(filename).arg(errorMessage));
-  } else if ("yaml" == info.suffix()) {
-    if (_config->toYAML(stream)) {
-      _mainWindow->setWindowModified(false);
-    } else {
-      QMessageBox::critical(nullptr, tr("Cannot save codeplug"),
-                            tr("Cannot save codeplug to file '%1'.").arg(filename));
-    }
+  if (_config->toYAML(stream)) {
+    _mainWindow->setWindowModified(false);
+  } else {
+    QMessageBox::critical(nullptr, tr("Cannot save codeplug"),
+                          tr("Cannot save codeplug to file '%1'.").arg(filename));
   }
 
   file.flush();
@@ -403,7 +403,7 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &f
   VerifyIssue::Type maxIssue = myRadio->verifyConfig(_config, issues, flags);
   if ( (flags.ignoreWarnings && (maxIssue>VerifyIssue::WARNING)) ||
        ((!flags.ignoreWarnings) && (maxIssue>=VerifyIssue::WARNING)) ) {
-    VerifyDialog dialog(issues);
+    VerifyDialog dialog(issues, (nullptr != radio));
     if (QDialog::Accepted != dialog.exec())
       verified = false;
   } else if (showSuccess) {
@@ -437,7 +437,7 @@ Application::downloadCodeplug() {
   Radio *radio = Radio::detect(errorMessage);
   if (nullptr == radio) {
     QMessageBox::critical(nullptr, tr("No Radio found."),
-                          tr("Can not download codeplug from device: No radio found.\nError: ")
+                          tr("Can not read codeplug from device: No radio found.\nError: ")
                           + errorMessage);
     return;
   }
@@ -448,21 +448,21 @@ Application::downloadCodeplug() {
   connect(radio, SIGNAL(downloadError(Radio *)), this, SLOT(onCodeplugDownloadError(Radio *)));
   connect(radio, SIGNAL(downloadFinished(Radio *, Codeplug *)), this, SLOT(onCodeplugDownloaded(Radio *, Codeplug *)));
   if (radio->startDownload(false)) {
-    _mainWindow->statusBar()->showMessage(tr("Download ..."));
+    _mainWindow->statusBar()->showMessage(tr("Read ..."));
     _mainWindow->setEnabled(false);
   } else {
-    QMessageBox::critical(nullptr, tr("Cannot download codeplug."),
-                          tr("Cannot download codeplug: %1").arg(radio->errorMessage()));
+    QMessageBox::critical(nullptr, tr("Cannot Read codeplug."),
+                          tr("Cannot read codeplug: %1").arg(radio->errorMessage()));
     progress->setVisible(false);
   }
 }
 
 void
 Application::onCodeplugDownloadError(Radio *radio) {
-  _mainWindow->statusBar()->showMessage(tr("Download error"));
-  QMessageBox::critical(0, tr("Download error"),
-                        tr("Cannot download codeplug from device. "
-                           "An error occurred during download: %1").arg(radio->errorMessage()));
+  _mainWindow->statusBar()->showMessage(tr("Read error"));
+  QMessageBox::critical(0, tr("Read error"),
+                        tr("Cannot read codeplug from device. "
+                           "An error occurred during read: %1").arg(radio->errorMessage()));
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
@@ -478,7 +478,7 @@ Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
   _config->clear();
   _mainWindow->setWindowModified(false);
   if (codeplug->decode(_config)) {
-    _mainWindow->statusBar()->showMessage(tr("Download complete"));
+    _mainWindow->statusBar()->showMessage(tr("Read complete"));
     _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
 
     _config->setModified(false);
@@ -502,7 +502,7 @@ Application::uploadCodeplug() {
   Radio *radio = Radio::detect(errorMessage);
   if (nullptr == radio) {
     QMessageBox::critical(nullptr, tr("No Radio found."),
-                          tr("Can not upload codeplug to device: No radio found.\nError: ")
+                          tr("Can not write codeplug to device: No radio found.\nError: ")
                           + errorMessage);
     return;
   }
@@ -514,8 +514,10 @@ Application::uploadCodeplug() {
     settings.ignoreFrequencyLimits()
   };
 
-  if (! verifyCodeplug(radio, false, flags))
+  if (! verifyCodeplug(radio, false, flags)) {
+    radio->deleteLater();
     return;
+  }
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
   progress->setValue(0);
@@ -530,8 +532,8 @@ Application::uploadCodeplug() {
      _mainWindow->statusBar()->showMessage(tr("Upload ..."));
      _mainWindow->setEnabled(false);
   } else {
-    QMessageBox::critical(nullptr, tr("Cannot upload codeplug."),
-                          tr("Cannot upload codeplug: %1").arg(radio->errorMessage()));
+    QMessageBox::critical(nullptr, tr("Cannot write codeplug."),
+                          tr("Cannot write codeplug: %1").arg(radio->errorMessage()));
     progress->setVisible(false);
   }
 }
@@ -546,7 +548,7 @@ Application::uploadCallsignDB() {
   if (nullptr == radio) {
     logDebug() << "No matching radio found.";
     QMessageBox::critical(nullptr, tr("No Radio found."),
-                          tr("Can not upload call-sign DB to device: No radio found.\nError: ")
+                          tr("Can not write call-sign DB to device: No radio found.\nError: ")
                           + errorMessage);
     return;
   }
@@ -554,9 +556,9 @@ Application::uploadCallsignDB() {
 
   if (! radio->features().hasCallsignDB) {
     logDebug() << "Radio " << radio->name() << " does not support call-sign DB.";
-    QMessageBox::information(nullptr, tr("Cannot upload call-sign DB."),
+    QMessageBox::information(nullptr, tr("Cannot write call-sign DB."),
                              tr("The detected radio '%1' does not support "
-                                "the upload of a call-sign DB.")
+                                "a call-sign DB.")
                              .arg(radio->name()));
     radio->deleteLater();
     return;
@@ -564,8 +566,8 @@ Application::uploadCallsignDB() {
   if (! radio->features().callsignDBImplemented) {
     logDebug() << "Radio " << radio->name()
                << " does support call-sign DB but it is not implemented yet.";
-    QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
-                          tr("The detected radio '%1' does support the upload of a call-sign DB. "
+    QMessageBox::critical(nullptr, tr("Cannot write call-sign DB."),
+                          tr("The detected radio '%1' does support a call-sign DB. "
                              "This feature, however, is not implemented yet.").arg(radio->name()));
     radio->deleteLater();
     return;
@@ -576,8 +578,8 @@ Application::uploadCallsignDB() {
   Settings settings;
   if (settings.selectUsingUserDMRID()) {
     if (nullptr == _config->radioIDs()->defaultId()) {
-      QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
-                            tr("QDMR selects the call-signs to be uploaded based on the default DMR "
+      QMessageBox::critical(nullptr, tr("Cannot write call-sign DB."),
+                            tr("QDMR selects the call-signs to be written based on the default DMR "
                                "ID of the radio. No default ID set."));
       radio->deleteLater();
       return;
@@ -611,13 +613,13 @@ Application::uploadCallsignDB() {
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
   if (radio->startUploadCallsignDB(_users, false, css)) {
-    logDebug() << "Start call-sign DB upload...";
-    _mainWindow->statusBar()->showMessage(tr("Upload call-sign DB ..."));
+    logDebug() << "Start call-sign DB write...";
+    _mainWindow->statusBar()->showMessage(tr("Write call-sign DB ..."));
     _mainWindow->setEnabled(false);
   } else {
-    logDebug() << "Cannot start call-sign DB upload.";
-    QMessageBox::critical(nullptr, tr("Cannot upload call-sign DB."),
-                          tr("Cannot upload call-sign DB: %1").arg(radio->errorMessage()));
+    logDebug() << "Cannot write call-sign DB.";
+    QMessageBox::critical(nullptr, tr("Cannot write call-sign DB."),
+                          tr("Cannot write call-sign DB: %1").arg(radio->errorMessage()));
     progress->setVisible(false);
   }
 }
@@ -625,12 +627,12 @@ Application::uploadCallsignDB() {
 
 void
 Application::onCodeplugUploadError(Radio *radio) {
-  _mainWindow->statusBar()->showMessage(tr("Upload error"));
+  _mainWindow->statusBar()->showMessage(tr("Write error"));
   QMessageBox::critical(
-        nullptr, tr("Upload error"),
-        tr("Cannot upload codeplug or call-sign DB to device. "
-           "An error occurred during upload: %1").arg(radio->errorMessage()));
-  logError() << "Upload error: " << radio->errorMessage() << ".";
+        nullptr, tr("Write error"),
+        tr("Cannot write codeplug or call-sign DB to device. "
+           "An error occurred during write: %1").arg(radio->errorMessage()));
+  logError() << "Write error: " << radio->errorMessage() << ".";
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
@@ -641,11 +643,11 @@ Application::onCodeplugUploadError(Radio *radio) {
 
 void
 Application::onCodeplugUploaded(Radio *radio) {
-  _mainWindow->statusBar()->showMessage(tr("Upload complete"));
+  _mainWindow->statusBar()->showMessage(tr("Write complete"));
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
-  logError() << "Upload complete.";
+  logError() << "Write complete.";
 
   if (radio->wait(250))
     radio->deleteLater();

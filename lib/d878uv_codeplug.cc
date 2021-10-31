@@ -2400,7 +2400,7 @@ D878UVCodeplug::allocateRoaming() {
     // Allocate roaming zone
     uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
     if (nullptr == data(addr, 0)) {
-      logDebug() << "Allocate roaming zone at " << hex << addr;
+      logDebug() << "Allocate roaming zone at " << QString::number(addr, 16);
       image(0).addElement(addr, ROAMING_ZONE_SIZE);
     }
   }

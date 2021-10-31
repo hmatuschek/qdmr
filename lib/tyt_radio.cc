@@ -15,14 +15,16 @@ TyTRadio::TyTRadio(TyTInterface *device, QObject *parent)
 
 TyTRadio::~TyTRadio() {
   if (_dev && _dev->isOpen()) {
-    logDebug() << "Reboot and close connection to radio.";
+    logDebug() << "Reboot TyT device.";
     _dev->reboot();
+    logDebug() << "Close connection to TyT device.";
     _dev->close();
   }
   if (_dev) {
     _dev->deleteLater();
     _dev = nullptr;
   }
+  logDebug() << "Destructed TyT radio.";
 }
 
 bool
@@ -139,7 +141,6 @@ TyTRadio::run() {
     _dev->reboot();
     _dev->close();
     emit uploadComplete(this);
-
   }
 }
 
@@ -149,11 +150,13 @@ TyTRadio::connect() {
     return true;
 
   // Connected but not open
-  if (_dev)
+  if (_dev) {
+    logDebug() << "Has a closed device interface. Reopen...";
     _dev->deleteLater();
+  }
 
   _dev = new TyTInterface(0x0483, 0xdf11);
-  if (!_dev->isOpen()) {
+  if (! _dev->isOpen()) {
     _errorMessage = QString("Cannot open device at 0483:DF11: %1").arg(_dev->errorMessage());
     _dev->deleteLater();
     _dev = nullptr;

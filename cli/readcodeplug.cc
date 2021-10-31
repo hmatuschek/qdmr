@@ -62,17 +62,9 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   logDebug() << "Save codeplug at '" << filename << "'.";
   // If output is CSV -> decode code-plug
   if (parser.isSet("csv") || (filename.endsWith(".conf") || filename.endsWith(".csv"))) {
-    // decode codeplug
-    if (! radio->codeplug().decode(&config)) {
-      logError() << "Cannot decode codeplug: " << radio->errorMessage();
-      return -1;
-    }
-
-    // try to write CSV file
-    if (! config.writeCSV(filename, errorMessage)) {
-      logError() << "Cannot write CSV file '" << filename << "': " << errorMessage;
-      return -1;
-    }
+    logError() << "Export of the old table based format was disabled with 0.9.0. "
+                  "Import still works.";
+    return -1;
   } else if (parser.isSet("yaml") || filename.endsWith(".yaml")) {
     // decode codeplug
     if (! radio->codeplug().decode(&config)) {

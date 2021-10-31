@@ -9,7 +9,9 @@
 HIDevice::HIDevice(int vid, int pid, QObject *parent)
   : QObject(parent), _ctx(nullptr), _dev(nullptr), _transfer(nullptr), _errorMessage()
 {
-  logDebug() << "Try to detect USB HID interface " << hex << vid << ":" << pid << ".";
+  logDebug() << "Try to detect USB HID interface "
+             << QString::number(vid, 16) << ":"
+             << QString::number(pid, 16) << ".";
 
   int error = libusb_init(&_ctx);
   if (error < 0) {
