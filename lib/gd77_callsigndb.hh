@@ -11,11 +11,11 @@
  * 10920 leading to a max DB size of 0x20000 bytes.
  *
  * The header is encoded as:
- * @verbinclude gd77callsigndb.txt
+ * @verbinclude gd77_callsign_db_header.txt
  * The number of DB entries is encoded as a 32bit little-endian integer.
  *
  * Each DB entry is encoded as:
- * @verbinclude gd77callsigndbentry.txt
+ * @verbinclude gd77_callsign_db_entry.txt
  * The DMR ID gets encoded a 8 BCD digits in little endian while the name is encoded as up-to 8
  * ASCII bytes 0-terminated and padded.
  *
@@ -24,30 +24,46 @@ class GD77CallsignDB : public CallsignDB
 {
   Q_OBJECT
 
+public:
   /** Represents a user-db entry within the binary codeplug. */
   struct __attribute__((packed)) userdb_entry_t {
     uint32_t number;                    ///< DMR ID stored in BCD little-endian.
     char name[8];                       ///< Call or name, upto 8 ASCII chars, 0x00 padded.
 
+    /** Constructor. */
     userdb_entry_t();
+    /** Resets the entry. */
     void clear();
 
+    /** Returns the DMR ID for the entry. */
     uint32_t getNumber() const;
+    /** Sets the DMR ID for the entry. */
     void setNumber(uint32_t number);
 
+    /** Returns the name of the entry. */
     QString getName() const;
+    /** Sets the name of the entry. */
     void setName(const QString &name);
 
+    /** Constructs an entry from the given user. */
     void fromEntry(const UserDatabase::User &user);
   };
 
+  /** Represents the binary call-sign database header.
+   *
+   * Memory representation of the call-sign DB header (size: 0x0c bytes):
+   * @verbinclude gd77_callsign_db_header.txt
+   **/
   struct __attribute__((packed)) userdb_t {
     char magic[8];                      ///< Fixed string 'ID-V001\0'
     uint32_t count;                     ///< Number of contacts in DB, 32bit little-endian.
 
+    /** Constructor. */
     userdb_t();
+    /** Resets the header. */
     void clear();
 
+    /** Sets the number of entries in the call-sign DB. */
     void setSize(uint32_t n);
   };
 
