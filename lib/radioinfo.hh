@@ -18,6 +18,7 @@ public:
   enum Radio {
     // Open soruce firmware
     OpenGD77,
+    OpenRTX,
     // Radioddity devices
     RD5R,
     GD77,
