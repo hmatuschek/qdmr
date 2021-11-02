@@ -17,12 +17,12 @@ class DFUDevice: public QObject
 
 private:
   /** Status message from device. */
-	typedef struct {
+  struct __attribute__((packed)) status_t {
 		unsigned  status       : 8;
 		unsigned  poll_timeout : 24;
 		unsigned  state        : 8;
 		unsigned  string_index : 8;
-	} status_t;
+  };
 
 public:
   /** Opens a connection to the USB-DFU devuce at vendor @c vid and product @c pid. */
@@ -54,7 +54,7 @@ protected:
 	int get_state(int &pstate);
   /** Internal used function to abort the current operation. */
 	int abort();
-  /** Internal used function to wait for a response from the device. */
+  /** Internal used function to busy-wait for a response from the device. */
 	int wait_idle();
 
 protected:
