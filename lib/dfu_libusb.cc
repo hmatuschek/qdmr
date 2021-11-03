@@ -33,6 +33,9 @@ enum {
 };
 
 
+/* ********************************************************************************************* *
+ * Implementation of DFUDevice
+ * ********************************************************************************************* */
 DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
   : QObject(parent), _ctx(nullptr), _dev(nullptr)
 {
@@ -230,3 +233,110 @@ DFUDevice::wait_idle()
 }
 
 
+/* ********************************************************************************************* *
+ * Implementation of DFUSEDevice
+ * ********************************************************************************************* */
+DFUSEDevice::DFUSEDevice(unsigned vid, unsigned pid, uint16_t blocksize, QObject *parent)
+  : DFUDevice(vid, pid, parent), _blocksize(blocksize)
+{
+  // pass...
+}
+
+void
+DFUSEDevice::close() {
+  leaveDFU();
+  DFUDevice::close();
+}
+
+uint16_t
+DFUSEDevice::blocksize() const {
+  return _blocksize;
+}
+
+bool
+DFUSEDevice::setAddress(uint32_t address) {
+  uint8_t cmd[5] ={
+    0x21, (uint8_t)address, (uint8_t)(address >> 8), (uint8_t)(address >> 16), (uint8_t)(address >> 24)
+  };
+
+  if (int error = download(0, cmd, 5)) {
+    _errorMessage = tr("Cannot set address to %1: %2").arg(address, 0, 16).arg(_errorMessage);
+    return error;
+  }
+
+  if (wait_idle()) {
+    _errorMessage = tr("Set address command failed: %1").arg(_errorMessage);
+    return false;
+  }
+  return true;
+}
+
+bool
+DFUSEDevice::readBlock(unsigned block, uint8_t *data) {
+  return 0 == upload(block+2, data, _blocksize);
+}
+
+bool
+DFUSEDevice::writeBlock(unsigned block, const uint8_t *data) {
+  return 0 == download(block+2, (uint8_t *)data, _blocksize);
+}
+
+bool
+DFUSEDevice::erasePage(uint32_t address) {
+  uint8_t cmd[5] ={
+    0x41, (uint8_t)address, (uint8_t)(address >> 8), (uint8_t)(address >> 16), (uint8_t)(address >> 24)
+  };
+
+  if (int error = download(0, cmd, 5)) {
+    _errorMessage = tr("Cannot erase page at address %1: %2").arg(address, 0, 16).arg(_errorMessage);
+    return error;
+  }
+
+  if (wait_idle()) {
+    _errorMessage = tr("Erase page command failed: %1").arg(_errorMessage);
+    return false;
+  }
+  return true;
+}
+
+bool
+DFUSEDevice::eraseAll() {
+  uint8_t cmd[1] ={0x41};
+
+  if (int error = download(0, cmd, 1)) {
+    _errorMessage = tr("Cannot erase entire memory: %1").arg(_errorMessage);
+    return error;
+  }
+
+  if (wait_idle()) {
+    _errorMessage = tr("Erase memory command failed: %1").arg(_errorMessage);
+    return false;
+  }
+  return true;
+}
+
+bool
+DFUSEDevice::releaseReadLock() {
+  uint8_t cmd[1] ={0x92};
+
+  if (int error = download(0, cmd, 1)) {
+    _errorMessage = tr("Cannot unlock memory: %1").arg(_errorMessage);
+    return error;
+  }
+
+  if (wait_idle()) {
+    _errorMessage = tr("Unlock memory command failed: %1").arg(_errorMessage);
+    return false;
+  }
+  return true;
+}
+
+bool
+DFUSEDevice::leaveDFU() {
+  if (int error = download(0, nullptr, 0)) {
+    _errorMessage = tr("Cannot leave DFU mode: %1").arg(_errorMessage);
+    return error;
+  }
+
+  return true;
+}
