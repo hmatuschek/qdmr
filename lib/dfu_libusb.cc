@@ -278,7 +278,13 @@ DFUSEDevice::readBlock(unsigned block, uint8_t *data) {
 
 bool
 DFUSEDevice::writeBlock(unsigned block, const uint8_t *data) {
-  return 0 == download(block+2, (uint8_t *)data, _blocksize);
+  if(download(block+2, (uint8_t *)data, _blocksize))
+    return false;
+
+  if (wait_idle())
+    return false;
+
+  return true;
 }
 
 bool

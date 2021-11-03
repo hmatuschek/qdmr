@@ -59,35 +59,8 @@
  *  <tr><td>0x07</td>     <td>16</td>         <td>Unknown</td></tr>
  * </table>
  *
- * @subsubsection tytidsa Set address
- * The request written is
- * @code
- * +------+------+------+------+------+
- * | 0x21 | Address little endian     |
- * +------+------+------+------+------+
- * @endcode
- * There is no response read back. Before reading or writing memory, the address must be set using
- * this command. The start block for reading/writing this memory, is 2.
- *
- * @subsubsection tytife Erase
- * The request written is
- * @code
- * +------+------+------+------+------+
- * | 0x41 | Address little endian     |
- * +------+------+------+------+------+
- * @endcode
- * There is no response read. The erased page size appears to be 0x010000 bytes.
- *
- * @subsection tytifrw Read and write memory
- * Before writing memory, it must be erased.
- *
- * Before reading and writing memory, the address must be set.
- *
- * After this, the memory can be read/written by simply writing to consecutive blocks starting
- * with block 2.
- *
  * @ingroup tyt */
-class TyTInterface : public DFUDevice, public RadioInterface
+class TyTInterface : public DFUSEDevice, public RadioInterface
 {
   Q_OBJECT
 
@@ -117,10 +90,6 @@ public:
 protected:
   /** Internal used function to send a controll command to the device. */
   int md380_command(uint8_t a, uint8_t b);
-  /** Internal used function to set the current I/O address. */
-  int set_address(uint32_t address);
-  /** Internal used function to erase a specific block. */
-  int erase_block(uint32_t address);
   /** Internal used function to read the device identifier. */
   const char *identify();
 

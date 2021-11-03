@@ -3,9 +3,12 @@
 #include <unistd.h>
 #include "utils.hh"
 
+// Block size for DfuSe transfer
+#define BSIZE 1024
+
 
 TyTInterface::TyTInterface(unsigned vid, unsigned pid, QObject *parent)
-  : DFUDevice(vid, pid, parent), RadioInterface()
+  : DFUSEDevice(vid, pid, BSIZE, parent), RadioInterface()
 {
   if (! DFUDevice::isOpen()) {
     logError() << _errorMessage;
@@ -38,9 +41,7 @@ TyTInterface::TyTInterface(unsigned vid, unsigned pid, QObject *parent)
   }
 
   // Zero address.
-  if(set_address(0x00000000)) {
-    _errorMessage = tr("Cannot set device address to 0x00000000: %1").arg(_errorMessage);
-    logError() << _errorMessage;
+  if(! setAddress(0x00000000)) {
     close(); return;
   }
 }
@@ -55,17 +56,17 @@ TyTInterface::close() {
   if (isOpen()) {
     _ident = RadioInfo();
   }
-  DFUDevice::close();
+  DFUSEDevice::close();
 }
 
 bool
 TyTInterface::isOpen() const {
-  return DFUDevice::isOpen() && _ident.isValid();
+  return DFUSEDevice::isOpen() && _ident.isValid();
 }
 
 const QString &
 TyTInterface::errorMessage() const {
-  return DFUDevice::errorMessage();
+  return DFUSEDevice::errorMessage();
 }
 
 RadioInfo
@@ -83,42 +84,6 @@ TyTInterface::md380_command(uint8_t a, uint8_t b)
 
   usleep(100000);
   return wait_idle();
-}
-
-
-int
-TyTInterface::set_address(uint32_t address)
-{
-  unsigned char cmd[5] =
-  { 0x21,
-    (uint8_t)address,
-    (uint8_t)(address >> 8),
-    (uint8_t)(address >> 16),
-    (uint8_t)(address >> 24), };
-
-  if (int error = download(0, cmd, 5))
-    return error;
-
-  return wait_idle();
-}
-
-
-int
-TyTInterface::erase_block(uint32_t address)
-{
-  unsigned char cmd[5] =
-  { 0x41,
-    (uint8_t)address,
-    (uint8_t)(address >> 8),
-    (uint8_t)(address >> 16),
-    (uint8_t)(address >> 24), };
-
-  if (int error = download(0, cmd, 5))
-    return error;
-
-  wait_idle();
-
-  return 0;
 }
 
 
@@ -154,13 +119,13 @@ TyTInterface::erase(unsigned start, unsigned size, void(*progress)(unsigned, voi
   size = end-start;
 
   for (unsigned i=0; i<size; i+=0x10000) {
-    erase_block(start+i);
+    erasePage(start+i);
     if (progress)
       progress((i*100)/size, ctx);
   }
 
   // Zero address.
-  return (0 == set_address(0x00000000));
+  return setAddress(0x00000000);
 }
 
 bool
@@ -181,7 +146,7 @@ TyTInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
   }
 
   uint32_t block = addr/1024;
-  return 0 == upload(block+2, data, nbytes);
+  return readBlock(block, data);
 }
 
 bool
@@ -208,10 +173,7 @@ TyTInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
   }
 
   uint32_t block = addr/1024;
-  if (download(block+2, data, nbytes))
-    return false;
-
-  return 0 == wait_idle();
+  return writeBlock(block, data);
 }
 
 bool
@@ -223,7 +185,6 @@ TyTInterface::write_finish() {
 
 bool
 TyTInterface::reboot() {
-
   if (! _ctx)
     return false;
 
