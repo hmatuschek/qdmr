@@ -58,12 +58,17 @@ def getData(p):
 
 
 cap = pyshark.FileCapture(sys.argv[1], include_raw=True, use_json=True)
+total = 0
 for p in cap:
   if isRequest(p):
     d = getData(p)
+    if (256 == len(d)): 
+      total += len(d)
     print(hexDump(d, "> "))
     print("")
   elif isResponse(p):
     d = getData(p)
     print(hexDump(d, "< "))
     print("")
+
+print("Total length written: {0}".format(total))
