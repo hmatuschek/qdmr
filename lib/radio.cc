@@ -291,7 +291,7 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                       VerifyIssue::NOTIFICATION,
                       tr("Radio does not support dual-zones. Zone '%1' will be split into two.")
                       .arg(zone->name())));
-      if (zone->name()+2 > features().maxZoneNameLength) {
+      if ((zone->name().size()+2) > features().maxZoneNameLength) {
         issues.append(VerifyIssue(
                         VerifyIssue::WARNING,
                         tr("Zone '%1' will be split into two but its name is too long to "

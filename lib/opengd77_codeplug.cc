@@ -193,6 +193,63 @@ OpenGD77Codeplug::ZoneElement::ZoneElement(uint8_t *ptr)
   // pass...
 }
 
+void
+OpenGD77Codeplug::ZoneElement::clear() {
+  RadioddityCodeplug::ZoneElement::clear();
+  memset(_data+0x0010, 0x00, 0xa0);
+}
+
+bool
+OpenGD77Codeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putInB) const {
+  if (! isValid()) {
+    logWarn() << "Cannot link zone: Zone is invalid.";
+    return false;
+  }
+
+  for (int i=0; (i<80) && hasMember(i); i++) {
+    if (ctx.has<Channel>(member(i))) {
+      if (! putInB)
+        zone->A()->add(ctx.get<Channel>(member(i)));
+      else
+        zone->B()->add(ctx.get<Channel>(member(i)));
+    } else {
+      logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
+                << member(i) << " out of bounds.";
+    }
+  }
+  return true;
+}
+
+void
+OpenGD77Codeplug::ZoneElement::fromZoneObjA(const Zone *zone, Context &ctx) {
+  if (zone->A()->count() && zone->B()->count())
+    setName(zone->name() + " A");
+  else
+    setName(zone->name());
+
+  for (int i=0; i<80; i++) {
+    if (i < zone->A()->count())
+      setMember(i, ctx.index(zone->A()->get(i)));
+    else
+      clearMember(i);
+  }
+}
+
+void
+OpenGD77Codeplug::ZoneElement::fromZoneObjB(const Zone *zone, Context &ctx) {
+  if (zone->A()->count() && zone->B()->count())
+    setName(zone->name() + " B");
+  else
+    setName(zone->name());
+
+  for (int i=0; i<80; i++) {
+    if (i < zone->B()->count())
+      setMember(i, ctx.index(zone->B()->get(i)));
+    else
+      clearMember(i);
+  }
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of OpenGD77Codeplug::ZoneBankElement
