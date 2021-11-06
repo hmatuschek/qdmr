@@ -7,6 +7,32 @@
 #include <QNetworkReply>
 #include <algorithm>
 #include "logger.hh"
+#include <QSet>
+
+static const QSet<double> _aprs_frequencies = {
+  144.390, 144.575, 144.660, 144.800, 144.930, 145.175, 145.570, 432.500
+};
+
+inline QString bandName(double MHz) {
+  if (30 >= MHz)
+    return "HF";
+  else if (300 >= MHz)
+    return "VHF";
+  else if (3000 >= MHz)
+    return "UHF";
+  else if (30000 >= MHz)
+    return "SHF";
+  return "EHF";
+}
+
+inline QString bandName(double rx, double tx) {
+  QString rband = bandName(rx), tband=bandName(tx);
+  if ((rx == tx) && (_aprs_frequencies.contains(rx)))
+    return "APRS";
+  else if (rband == tband)
+    return rband;
+  return QString("%1/%2").arg(rband,tband);
+}
 
 
 /// @cond with_internal_docs
@@ -164,8 +190,10 @@ RepeaterDatabase::data(const QModelIndex &index, int role) const {
   if (0 == index.column()) {
     // Call
     if (Qt::DisplayRole == role)
-      return tr("%1 (%2, %3)")
+      return tr("%1 (%2, %3, %4)")
           .arg(_repeater[index.row()].value("call").toString())
+          .arg(bandName(_repeater[index.row()].value("rx").toDouble(),
+                 _repeater[index.row()].value("tx").toDouble()))
           .arg(_repeater[index.row()].value("qth").toString())
           .arg(_repeater[index.row()].value("locator").toString());
       else
