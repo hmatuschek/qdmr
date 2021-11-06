@@ -457,6 +457,14 @@ ConfigObjectList::del(ConfigObject *obj) {
   return true;
 }
 
+void
+ConfigObjectList::clear() {
+  QVector<ConfigObject *> items = _items;
+  AbstractConfigObjectList::clear();
+  for (int i=0; i<items.count(); i++)
+    items[i]->deleteLater();
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ConfigObjectRefList
