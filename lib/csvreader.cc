@@ -671,7 +671,7 @@ CSVParser::_parse_contact(qint64 idx, CSVLexer &lexer) {
     return false;
   }
   bool dtmf = false;
-  DigitalContact::Type type;
+  DigitalContact::Type type = DigitalContact::PrivateCall;
   if ("group" == token.value.toLower()) {
     type = DigitalContact::GroupCall;
   } else if ("private" == token.value.toLower()) {
