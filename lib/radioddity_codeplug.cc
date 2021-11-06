@@ -442,9 +442,9 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
     const DigitalChannel *dc = c->as<const DigitalChannel>();
     setMode(MODE_DIGITAL);
     switch (dc->admit()) {
-      case DigitalChannel::Admit::Always: setAdmitCriterion(ADMIT_ALWAYS);
-      case DigitalChannel::Admit::Free: setAdmitCriterion(ADMIT_CH_FREE);
-      case DigitalChannel::Admit::ColorCode: setAdmitCriterion(ADMIT_COLOR);
+    case DigitalChannel::Admit::Always: setAdmitCriterion(ADMIT_ALWAYS); break;
+    case DigitalChannel::Admit::Free: setAdmitCriterion(ADMIT_CH_FREE); break;
+    case DigitalChannel::Admit::ColorCode: setAdmitCriterion(ADMIT_COLOR); break;
     }
     setTimeSlot(dc->timeSlot());
     setRXColorCode(dc->colorCode());
