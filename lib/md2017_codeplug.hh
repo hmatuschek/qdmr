@@ -114,6 +114,7 @@ public:
   bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx);
   bool decodeButtonSetttings(Config *config);
 
+  /** Resets/clears the boot settings. */
   virtual void clearBootSettings();
   void clearMenuSettings();
   void clearTextMessages();

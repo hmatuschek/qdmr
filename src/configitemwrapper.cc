@@ -21,6 +21,7 @@ GenericListWrapper::GenericListWrapper(AbstractConfigObjectList *list, QObject *
 
 int
 GenericListWrapper::rowCount(const QModelIndex &index) const {
+  Q_UNUSED(index)
   if (nullptr == _list)
     return 0;
   return _list->count();
@@ -28,6 +29,7 @@ GenericListWrapper::rowCount(const QModelIndex &index) const {
 
 int
 GenericListWrapper::columnCount(const QModelIndex &index) const {
+  Q_UNUSED(index)
   if (nullptr == _list)
     return 0;
   return 1;
@@ -121,6 +123,7 @@ GenericTableWrapper::GenericTableWrapper(AbstractConfigObjectList *list, QObject
 
 int
 GenericTableWrapper::rowCount(const QModelIndex &index) const {
+  Q_UNUSED(index)
   if (nullptr == _list)
     return 0;
   return _list->count();

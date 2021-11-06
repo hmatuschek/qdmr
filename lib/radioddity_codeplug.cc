@@ -345,6 +345,7 @@ RadioddityCodeplug::ChannelElement::setPower(Channel::Power pwr) {
 
 Channel *
 RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx) const {
+  Q_UNUSED(ctx)
   Channel *ch = nullptr;
   if (MODE_ANALOG == mode()) {
     AnalogChannel *ach = new AnalogChannel(); ch = ach;
@@ -678,6 +679,7 @@ RadioddityCodeplug::ContactElement::setRingStyle(unsigned style) {
 
 DigitalContact *
 RadioddityCodeplug::ContactElement::toContactObj(Context &ctx) const {
+  Q_UNUSED(ctx)
   if (! isValid())
     return nullptr;
   return new DigitalContact(type(), name(), number(), ring());
@@ -685,6 +687,7 @@ RadioddityCodeplug::ContactElement::toContactObj(Context &ctx) const {
 
 void
 RadioddityCodeplug::ContactElement::fromContactObj(const DigitalContact *cont, Context &ctx) {
+  Q_UNUSED(ctx)
   setName(cont->name());
   setNumber(cont->number());
   setType(cont->type());
@@ -745,6 +748,7 @@ RadioddityCodeplug::DTMFContactElement::setNumber(const QString &number) {
 
 DTMFContact *
 RadioddityCodeplug::DTMFContactElement::toContactObj(Context &ctx) const {
+  Q_UNUSED(ctx)
   if (! isValid())
     return nullptr;
   return new DTMFContact(name(), number());
@@ -752,6 +756,7 @@ RadioddityCodeplug::DTMFContactElement::toContactObj(Context &ctx) const {
 
 void
 RadioddityCodeplug::DTMFContactElement::fromContactObj(const DTMFContact *cont, Context &ctx) {
+  Q_UNUSED(ctx)
   setName(cont->name());
   setNumber(cont->number());
 }
@@ -814,6 +819,7 @@ RadioddityCodeplug::ZoneElement::clearMember(unsigned n) {
 
 Zone *
 RadioddityCodeplug::ZoneElement::toZoneObj(Context &ctx) const {
+  Q_UNUSED(ctx)
   if (! isValid())
     return nullptr;
   return new Zone(name());
@@ -963,6 +969,7 @@ RadioddityCodeplug::GroupListElement::clearMember(unsigned n) {
 
 RXGroupList *
 RadioddityCodeplug::GroupListElement::toRXGroupListObj(Context &ctx) {
+  Q_UNUSED(ctx)
   return new RXGroupList(name());
 }
 
@@ -1228,6 +1235,7 @@ RadioddityCodeplug::ScanListElement::setPrioritySampleTime(unsigned ms) {
 
 ScanList *
 RadioddityCodeplug::ScanListElement::toScanListObj(Context &ctx) const {
+  Q_UNUSED(ctx)
   return new ScanList(name());
 }
 
@@ -1692,6 +1700,7 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Conte
 
 bool
 RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &ctx) {
+  Q_UNUSED(ctx)
   if (! conf->radioIDs()->defaultId()) {
     int idx = conf->radioIDs()->add(new RadioID(name(), radioID()));
     conf->radioIDs()->setDefaultId(idx);

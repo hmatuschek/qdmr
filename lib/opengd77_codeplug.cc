@@ -408,16 +408,23 @@ OpenGD77Codeplug::clearScanLists() {
 }
 bool
 OpenGD77Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(config)
+  Q_UNUSED(flags)
+  Q_UNUSED(ctx)
   // Scan lists are not touched with OpenGD77 codeplug
   return true;
 }
 bool
 OpenGD77Codeplug::createScanLists(Config *config, Context &ctx) {
+  Q_UNUSED(config)
+  Q_UNUSED(ctx)
   // Scan lists are not touched with OpenGD77 codeplug
   return true;
 }
 bool
 OpenGD77Codeplug::linkScanLists(Config *config, Context &ctx) {
+  Q_UNUSED(config)
+  Q_UNUSED(ctx)
   // Scan lists are not touched with OpenGD77 codeplug
   return true;
 }
@@ -430,6 +437,8 @@ OpenGD77Codeplug::clearContacts() {
 
 bool
 OpenGD77Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement el(data(ADDR_CONTACTS + i*CONTACT_SIZE, IMAGE_CONTACTS));
     el.clear();
@@ -461,6 +470,8 @@ OpenGD77Codeplug::clearDTMFContacts() {
 
 bool
 OpenGD77Codeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   for (int i=0; i<NUM_DTMF_CONTACTS; i++) {
     DTMFContactElement el(data(ADDR_DTMF_CONTACTS + i*DTMF_CONTACT_SIZE, IMAGE_DTMF_CONTACTS));
     el.clear();
@@ -498,6 +509,8 @@ OpenGD77Codeplug::clearChannels() {
 
 bool
 OpenGD77Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
     uint8_t *ptr = nullptr;
     if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0, IMAGE_CHANNEL_BANK_0);
@@ -539,6 +552,8 @@ OpenGD77Codeplug::createChannels(Config *config, Context &ctx) {
 
 bool
 OpenGD77Codeplug::linkChannels(Config *config, Context &ctx) {
+  Q_UNUSED(config)
+
   for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
     uint8_t *ptr = nullptr;
     if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0, IMAGE_CHANNEL_BANK_0);
@@ -571,12 +586,16 @@ OpenGD77Codeplug::clearBootText() {
 
 bool
 OpenGD77Codeplug::encodeBootText(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+  Q_UNUSED(ctx)
+
   BootTextElement(data(ADDR_BOOT_TEXT, IMAGE_BOOT_TEXT)).fromConfig(config);
   return true;
 }
 
 bool
 OpenGD77Codeplug::decodeBootText(Config *config, Context &ctx) {
+  Q_UNUSED(ctx)
   BootTextElement(data(ADDR_BOOT_TEXT, IMAGE_BOOT_TEXT)).updateConfig(config);
   return true;
 }
@@ -597,6 +616,8 @@ OpenGD77Codeplug::clearZones() {
 
 bool
 OpenGD77Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   ZoneBankElement bank(data(ADDR_ZONE_BANK, IMAGE_ZONE_BANK));
 
   // Pack Zones
@@ -665,6 +686,8 @@ OpenGD77Codeplug::createZones(Config *config, Context &ctx) {
 
 bool
 OpenGD77Codeplug::linkZones(Config *config, Context &ctx) {
+  Q_UNUSED(config)
+
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
   ZoneBankElement bank(data(ADDR_ZONE_BANK, IMAGE_ZONE_BANK));
@@ -706,6 +729,8 @@ OpenGD77Codeplug::clearGroupLists() {
 
 bool
 OpenGD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK, IMAGE_GROUP_LIST_BANK)); bank.clear();
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (i >= config->rxGroupLists()->count())
@@ -732,6 +757,8 @@ OpenGD77Codeplug::createGroupLists(Config *config, Context &ctx) {
 
 bool
 OpenGD77Codeplug::linkGroupLists(Config *config, Context &ctx) {
+  Q_UNUSED(config)
+
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK, IMAGE_GROUP_LIST_BANK));
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (! bank.isEnabled(i))

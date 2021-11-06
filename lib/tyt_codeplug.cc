@@ -812,6 +812,7 @@ TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context 
 
 RXGroupList *
 TyTCodeplug::GroupListElement::toGroupListObj(Context &ctx) {
+  Q_UNUSED(ctx)
   if (! isValid())
     return nullptr;
   return new RXGroupList(name());
@@ -992,6 +993,7 @@ TyTCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, Context &ctx)
 
 ScanList *
 TyTCodeplug::ScanListElement::toScanListObj(Context &ctx) {
+  Q_UNUSED(ctx)
   if (! isValid())
     return nullptr;
   return new ScanList(name());

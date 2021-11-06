@@ -31,6 +31,8 @@ AbstractConfigReader::errorMessage() const {
 bool
 AbstractConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx)
 {
+  Q_UNUSED(ctx)
+
   const QMetaObject *meta = obj->metaObject();
 
   for (int p=QObject::staticMetaObject.propertyOffset(); p<meta->propertyCount(); p++) {
@@ -897,6 +899,7 @@ ConfigReader::parseDMRContact(Config *config, const YAML::Node &node, ConfigObje
 
 bool
 ConfigReader::parseDTMFContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+  Q_UNUSED(config); Q_UNUSED(ctx)
   _errorMessage = tr("%1:%2: DTMF contact reader not implemented yet.")
       .arg(node.Mark().line).arg(node.Mark().column);
   return false;
@@ -933,6 +936,9 @@ ConfigReader::linkDMRContact(DigitalContact *contact, const YAML::Node &node, co
 
 bool
 ConfigReader::linkDTMFContact(DTMFContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(contact)
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   _errorMessage = tr("%1:%2: DTMF contact not implemented yet.");
   return false;
 }
@@ -1239,6 +1245,8 @@ RadioSettingsReader::addExtension(ExtensionReader *ext) {
 
 ConfigObject *
 RadioSettingsReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   return new RadioSettings();
 }
 
@@ -1289,6 +1297,8 @@ RadioIdReader::addExtension(ExtensionReader *ext) {
 
 ConfigObject *
 RadioIdReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   return new RadioID("", 0);
 }
 
@@ -1407,6 +1417,8 @@ DigitalChannelReader::addExtension(ExtensionReader *ext) {
 
 ConfigObject *
 DigitalChannelReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   return new DigitalChannel();
 }
 
@@ -1458,6 +1470,8 @@ AnalogChannelReader::addExtension(ExtensionReader *ext) {
 
 ConfigObject *
 AnalogChannelReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   return new AnalogChannel();
 }
 
@@ -1539,6 +1553,8 @@ ZoneReader::addExtension(ExtensionReader *ext) {
 
 ConfigObject *
 ZoneReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   return new Zone("");
 }
 
@@ -1633,6 +1649,8 @@ DMRContactReader::addExtension(ExtensionReader *ext) {
 
 ConfigObject *
 DMRContactReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   return new DigitalContact(DigitalContact::PrivateCall, "", 0);
 }
 
@@ -1730,6 +1748,8 @@ GPSSystemReader::addExtension(ExtensionReader *ext) {
 
 ConfigObject *
 GPSSystemReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   return new GPSSystem("");
 }
 
@@ -1781,6 +1801,8 @@ APRSSystemReader::addExtension(ExtensionReader *ext) {
 
 ConfigObject *
 APRSSystemReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   return new APRSSystem("",nullptr, "", 0, "", 0);
 }
 
@@ -1873,6 +1895,8 @@ ScanListReader::addExtension(ExtensionReader *ext) {
 
 ConfigObject *
 ScanListReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   return new ScanList("");
 }
 
@@ -1924,6 +1948,8 @@ GroupListReader::addExtension(ExtensionReader *ext) {
 
 ConfigObject *
 GroupListReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   return new RXGroupList("");
 }
 
@@ -1977,6 +2003,8 @@ RoamingReader::addExtension(ExtensionReader *ext) {
 
 ConfigObject *
 RoamingReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   return new RoamingZone("");
 }
 

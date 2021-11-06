@@ -109,6 +109,8 @@ RadioddityInterface::identifier() {
 
 bool
 RadioddityInterface::read_start(uint32_t bank, uint32_t addr) {
+  Q_UNUSED(addr)
+
   if (! selectMemoryBank(MemoryBank(bank))) {
     _errorMessage = tr("Cannot select memory bank %1: %2").arg(bank).arg(_errorMessage);
     return false;
@@ -168,6 +170,8 @@ RadioddityInterface::read_finish()
 
 bool
 RadioddityInterface::write_start(uint32_t bank, uint32_t addr) {
+  Q_UNUSED(addr)
+
   if (! selectMemoryBank(MemoryBank(bank))) {
     _errorMessage = tr("Cannot select memory bank %1: %2").arg(bank).arg(_errorMessage);
     return false;

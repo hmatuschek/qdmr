@@ -83,6 +83,8 @@ MD2017Codeplug::clearGeneralSettings() {
 
 bool
 MD2017Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+  Q_UNUSED(ctx)
   return GeneralSettingsElement(data(ADDR_SETTINGS)).fromConfig(config);
 }
 
@@ -100,6 +102,7 @@ MD2017Codeplug::clearChannels() {
 
 bool
 MD2017Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   // Define Channels
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
@@ -153,6 +156,8 @@ MD2017Codeplug::clearContacts() {
 
 bool
 MD2017Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+  Q_UNUSED(ctx)
   // Encode contacts
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
@@ -192,6 +197,7 @@ MD2017Codeplug::clearZones() {
 
 bool
 MD2017Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
     ZoneExtElement ext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
@@ -256,6 +262,7 @@ MD2017Codeplug::clearGroupLists() {
 
 bool
 MD2017Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (i < config->rxGroupLists()->count())
@@ -307,6 +314,7 @@ MD2017Codeplug::clearScanLists() {
 
 bool
 MD2017Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   // Define Scanlists
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
@@ -361,6 +369,7 @@ MD2017Codeplug::clearPositioningSystems() {
 
 bool
 MD2017Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (i < config->posSystems()->gpsCount())
@@ -422,6 +431,8 @@ MD2017Codeplug::clearButtonSettings() {
 
 bool
 MD2017Codeplug::encodeButtonSettings(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+  Q_UNUSED(ctx)
   // Encode settings
   return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(config);
 }

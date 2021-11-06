@@ -750,6 +750,8 @@ D868UVCodeplug::allocateChannels() {
 
 bool
 D868UVCodeplug::encodeChannels(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   // Encode channels
   for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
@@ -829,6 +831,8 @@ D868UVCodeplug::allocateContacts() {
 
 bool
 D868UVCodeplug::encodeContacts(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   QVector<DigitalContact*> contacts;
   // Encode contacts and also collect id<->index map
   for (int i=0; i<ctx.config()->contacts()->digitalCount(); i++) {
@@ -888,6 +892,8 @@ D868UVCodeplug::allocateAnalogContacts() {
 
 bool
 D868UVCodeplug::encodeAnalogContacts(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   uint8_t *idxlst = data(ANALOGCONTACT_INDEX_LIST);
   memset(idxlst, 0xff, ANALOGCONTACT_LIST_SIZE);
   for (int i=0; i<ctx.config()->contacts()->dtmfCount(); i++) {
@@ -939,6 +945,8 @@ D868UVCodeplug::allocateRadioIDs() {
 
 bool
 D868UVCodeplug::encodeRadioID(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   // Encode radio IDs
   for (int i=0; i<ctx.config()->radioIDs()->count(); i++) {
     RadioIDElement(data(ADDR_RADIOIDS + i*RADIOID_SIZE)).fromRadioID(
@@ -988,6 +996,8 @@ D868UVCodeplug::allocateRXGroupLists() {
 
 bool
 D868UVCodeplug::encodeRXGroupLists(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   // Encode RX group-lists
   for (int i=0; i<ctx.config()->rxGroupLists()->count(); i++) {
     GroupListElement grp(data(ADDR_RXGRP_0 + i*RXGRP_OFFSET));
@@ -1050,6 +1060,8 @@ D868UVCodeplug::allocateZones() {
 
 bool
 D868UVCodeplug::encodeZones(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   // Encode zones
   unsigned zidx = 0;
   for (int i=0; i<ctx.config()->zones()->count(); i++) {
@@ -1191,6 +1203,8 @@ D868UVCodeplug::allocateScanLists() {
 
 bool
 D868UVCodeplug::encodeScanLists(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   // Encode scan lists
   for (int i=0; i<ctx.config()->scanlists()->count(); i++) {
     uint8_t bank = i/NUM_SCANLISTS_PER_BANK, idx = i%NUM_SCANLISTS_PER_BANK;

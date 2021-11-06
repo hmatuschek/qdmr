@@ -477,6 +477,7 @@ ConfigObjectRefList::ConfigObjectRefList(const QMetaObject &elementType, QObject
 
 bool
 ConfigObjectRefList::label(ConfigObject::Context &context) {
+  Q_UNUSED(context)
   // pass...
   return true;
 }

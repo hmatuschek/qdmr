@@ -131,6 +131,8 @@ OpenGD77::startDownload(bool blocking) {
 
 bool
 OpenGD77::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags) {
+  Q_UNUSED(flags)
+
   logDebug() << "Start upload to " << name() << "...";
 
   if (StatusIdle != _task) {

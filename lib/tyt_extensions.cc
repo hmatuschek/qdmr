@@ -16,6 +16,7 @@ TyTButtonSettings::TyTButtonSettings(QObject *parent)
 
 bool
 TyTButtonSettings::label(Context &context) {
+  Q_UNUSED(context)
   return true;
 }
 
@@ -80,5 +81,7 @@ TyTButtonSettingsReader::TyTButtonSettingsReader(QObject *parent)
 
 ConfigObject *
 TyTButtonSettingsReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   return new TyTButtonSettings();
 }

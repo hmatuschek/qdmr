@@ -278,6 +278,9 @@ OpenGD77Interface::write_finish() {
 
 bool
 OpenGD77Interface::read_start(uint32_t bank, uint32_t addr) {
+  Q_UNUSED(bank)
+  Q_UNUSED(addr)
+
   if (! sendShowCPSScreen())
     return false;
   if (! sendClearScreen())
@@ -342,6 +345,8 @@ OpenGD77Interface::reboot() {
 
 bool
 OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len) {
+  Q_UNUSED(len)
+
   if (! isOpen()) {
     _errorMessage = "Cannot read block: Device not open!";
     logError() << __FILE__ << ": " << _errorMessage;
@@ -433,6 +438,8 @@ OpenGD77Interface::writeEEPROM(uint32_t addr, const uint8_t *data, uint16_t len)
 
 bool
 OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len) {
+  Q_UNUSED(len)
+
   if (! isOpen()) {
     _errorMessage = "Cannot read block: Device not open!";
     logError() << _errorMessage;

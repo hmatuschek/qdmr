@@ -228,6 +228,7 @@ UV390Codeplug::VFOChannelElement::name() const {
 }
 void
 UV390Codeplug::VFOChannelElement::setName(const QString &txt) {
+  Q_UNUSED(txt)
   // pass...
 }
 
@@ -764,6 +765,8 @@ UV390Codeplug::clearGeneralSettings() {
 
 bool
 UV390Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+  Q_UNUSED(ctx)
   return GeneralSettingsElement(data(ADDR_SETTINGS)).fromConfig(config);
 }
 
@@ -781,6 +784,7 @@ UV390Codeplug::clearChannels() {
 
 bool
 UV390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   // Define Channels
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
@@ -834,6 +838,8 @@ UV390Codeplug::clearContacts() {
 
 bool
 UV390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+  Q_UNUSED(ctx)
   // Encode contacts
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
@@ -873,6 +879,7 @@ UV390Codeplug::clearZones() {
 
 bool
 UV390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
     ZoneExtElement ext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
@@ -937,6 +944,7 @@ UV390Codeplug::clearGroupLists() {
 
 bool
 UV390Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (i < config->rxGroupLists()->count())
@@ -988,6 +996,7 @@ UV390Codeplug::clearScanLists() {
 
 bool
 UV390Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   // Define Scanlists
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
@@ -1042,6 +1051,7 @@ UV390Codeplug::clearPositioningSystems() {
 
 bool
 UV390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (i < config->posSystems()->gpsCount()) {
@@ -1096,6 +1106,8 @@ UV390Codeplug::clearButtonSettings() {
 
 bool
 UV390Codeplug::encodeButtonSettings(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+  Q_UNUSED(ctx)
   // Encode settings
   return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(config);
 }

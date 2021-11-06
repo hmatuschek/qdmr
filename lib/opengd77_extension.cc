@@ -35,6 +35,8 @@ OpenGD77ChannelExtensionReader::OpenGD77ChannelExtensionReader(QObject *parent)
 
 ConfigObject *
 OpenGD77ChannelExtensionReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(node)
+  Q_UNUSED(ctx)
   return new OpenGD77ChannelExtension();
 }
 
@@ -72,6 +74,8 @@ OpenGD77ContactExtensionReader::OpenGD77ContactExtensionReader(QObject *parent)
 
 ConfigObject *
 OpenGD77ContactExtensionReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(ctx)
+  Q_UNUSED(node)
   return new OpenGD77ContactExtension();
 }
 

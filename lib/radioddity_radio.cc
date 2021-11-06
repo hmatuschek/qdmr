@@ -64,6 +64,7 @@ bool
 RadioddityRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
   Q_UNUSED(db);
   Q_UNUSED(blocking);
+  Q_UNUSED(selection);
 
   _errorMessage = tr("Radio does not support a callsign DB.");
 
