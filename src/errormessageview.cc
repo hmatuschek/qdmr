@@ -5,6 +5,9 @@ ErrorMessageView::ErrorMessageView(const ErrorStack &stack, QWidget *parent) :
   QDialog(parent), ui(new Ui::ErrorMessageView)
 {
   ui->setupUi(this);
+
+  QFont font = ui->errorMessage->font(); font.setBold(true);ui->errorMessage->setFont(font);
+
   if (! stack.hasErrorMessages()) {
     setWindowTitle(tr("Error: Unknown."));
     ui->errorMessage->setText("An unknown error has orccured.");
