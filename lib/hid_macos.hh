@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <IOKit/hid/IOHIDManager.h>
+#include "errorstack.hh"
 
 /** Implements the HID radio interface MacOS X API.
  * @ingroup rif */
@@ -49,7 +50,6 @@ protected:
 	unsigned char _receive_buf[42];
 	/** Receive result. */
 	volatile int _nbytes_received = 0;
-  QString _errorMessage;
 };
 
 #endif // HID_MACOS_HH

@@ -395,7 +395,8 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
       } else if ((id.isValid() && (RadioInfo::MD2017 == id.id())) || (force.isValid() && (RadioInfo::MD2017 == force.id()))) {
         return new MD2017(dfu);
       } else {
-        errorMessage = tr("Cannot identify TyT radio: %1").arg(dfu->errorMessage());
+        dfu->pushErrorMessage(ErrorStack::Message(__FILE__, __LINE__, "Cannot identify TyT radio."));
+        errorMessage = dfu->formatErrorMessages();
         dfu->close();
         dfu->deleteLater();
         return nullptr;
@@ -415,7 +416,9 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
       } else if ((id.isValid() && (RadioInfo::GD77 == id.id())) || (force.isValid() && (RadioInfo::GD77 == force.id()))) {
         return new GD77(hid);
       } else {
-        errorMessage = tr("Cannot identify Radioddity radio: %1").arg(hid->errorMessage());
+        ErrorStack::MessageStream(*hid, __FILE__, __LINE__)
+            << "Cannot identify Radioddity radio.";
+        errorMessage = hid->formatErrorMessages();
         hid->close();
         hid->deleteLater();
         return nullptr;
@@ -433,7 +436,10 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
       if ((id.isValid() && (RadioInfo::OpenGD77 == id.id())) || (force.isValid() && (RadioInfo::OpenGD77 == force.id()))) {
         return new OpenGD77(ogd77);
       } else {
-        errorMessage = tr("Cannot identify OpenGD77 radio: %1").arg(ogd77->errorMessage());
+        ogd77->pushErrorMessage(
+              ErrorStack::Message(
+                __FILE__, __LINE__, "Cannot identify OpenGD77 radio."));
+        errorMessage = ogd77->formatErrorMessages();
         ogd77->close();
         ogd77->deleteLater();
         return nullptr;
@@ -457,7 +463,10 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
       } else if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
         return new D578UV(anytone);
       } else {
-        errorMessage = tr("Cannot identify OpenGD77 radio: %1").arg(anytone->errorMessage());
+        anytone->pushErrorMessage(
+              ErrorStack::Message(
+                __FILE__, __LINE__, "Cannot identify AnyTone radio."));
+        errorMessage = anytone->formatErrorMessages();
         anytone->close();
         anytone->deleteLater();
         return nullptr;
@@ -478,17 +487,4 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
 Radio::Status
 Radio::status() const {
   return _task;
-}
-
-const QString &
-Radio::errorMessage() const {
-  return _errorMessage;
-}
-
-void
-Radio::clearError() {
-  if (StatusError == _task) {
-    _task = StatusIdle;
-    _errorMessage.clear();
-  }
 }

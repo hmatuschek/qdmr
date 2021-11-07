@@ -91,12 +91,12 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
 
   logDebug() << "Start upload to " << radio->name() << ".";
   if (! radio->startUpload(&config, true, flags)) {
-    logError() << "Codeplug upload error: " << radio->errorMessage();
+    logError() << "Codeplug upload error: " << radio->formatErrorMessages();
     return -1;
   }
 
   if (Radio::StatusError == radio->status()) {
-    logError() << "Codeplug upload error: " << radio->errorMessage();
+    logError() << "Codeplug upload error: " << radio->formatErrorMessages();
     return -1;
   }
 

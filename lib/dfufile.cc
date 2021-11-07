@@ -41,14 +41,9 @@ typedef struct __attribute((packed)) {
  * Implementation of DFUFile
  * ********************************************************************************************* */
 DFUFile::DFUFile(QObject *parent)
-  : QObject(parent)
+  : QObject(parent), ErrorStack()
 {
   // pass...
-}
-
-const QString &
-DFUFile::errorMessage() const {
-  return _errorMessage;
 }
 
 uint32_t
@@ -112,7 +107,7 @@ DFUFile::read(const QString &filename) {
   QFile file(filename);
 
   if (! file.open(QIODevice::ReadOnly)) {
-    _errorMessage = tr("Cannot read DFU file '%1': %2").arg(filename).arg(file.errorString());
+    errMsg() << "Cannot read DFU file '" << filename << "': " << file.errorString() << ".";
     return false;
   }
 
@@ -133,7 +128,8 @@ DFUFile::read(QFile &file)
 
   file_prefix_t prefix;
   if (sizeof(file_prefix_t) != file.read((char *)&prefix, sizeof(file_prefix_t))) {
-    _errorMessage = tr("Cannot read DFU file '%1': Cannot read prefix.").arg(file.fileName());
+    errMsg() << "Cannot read suffix: " << file.errorString() << ".";
+    errMsg() << "Cannot read DFU file '" << file.fileName() << "'.";
     return false;
   }
 
@@ -141,7 +137,8 @@ DFUFile::read(QFile &file)
   crc.update((const uint8_t *)&prefix, sizeof(file_prefix_t));
 
   if (memcmp(prefix.signature, "DfuSe", 5)) {
-    _errorMessage = tr("Cannot read DFU file '%1': Invalid DFU file signature. Not a DFU file?").arg(file.fileName());
+    errMsg() << "Invalid DFU file signature. Not a DFU file?";
+    errMsg() << "Cannot read DFU file '" << file.fileName() << "'.";
     return false;
   }
 
@@ -149,16 +146,18 @@ DFUFile::read(QFile &file)
   uint8_t  n_images = prefix.n_targets;
 
   for (uint8_t i=0; i<n_images; i++) {
-    Image img;
-    if (! img.read(file, crc, _errorMessage))
+    Image img; QString errorMessage;
+    if (! img.read(file, crc, errorMessage)) {
+      errMsg() << errorMessage;
       return false;
+    }
     _images.append(img);
   }
 
   file_suffix_t suffix;
   if (sizeof(file_suffix_t) != file.read((char *)&suffix, sizeof(suffix))) {
-    _errorMessage = tr("Cannot read DFU file '%1': Cannot read suffix: %2.")
-        .arg(file.fileName()).arg(file.errorString());
+    errMsg() << "Cannot read suffix: " << file.errorString() << ".";
+    errMsg() << "Cannot read DFU file '" << file.fileName() << "'.";
     return false;
   }
 
@@ -166,21 +165,23 @@ DFUFile::read(QFile &file)
   crc.update((const uint8_t *) &suffix, sizeof(file_suffix_t)-4);
 
   if (filesize != (size()-sizeof(file_suffix_t))) {
-    _errorMessage = tr("Cannot read DFU file '%1': Filesize %2 does not match declared content %3.")
-        .arg(file.fileName()).arg(size()-sizeof(file_suffix_t)).arg(filesize);
+    errMsg() << "Filesize " << (size()-sizeof(file_suffix_t))
+             << " does not match declared content " << filesize << ".";
+    errMsg() << "Cannot read DFU file '" << file.fileName() << "'.";
     return false;
   }
 
   if (memcmp(suffix.signature, "UFD", 3)) {
-    _errorMessage = tr("Cannot read DFU file '%1': Invalid suffix signature.").arg(file.fileName());
+    errMsg() << "Invalid suffix signature.";
+    errMsg() << "Cannot read DFU file '" << file.fileName() << "'.";
     return false;
   }
 
   if (crc.get() != suffix.crc) {
-    _errorMessage = tr("Cannot read DFU file '%1': Invalid checksum got %2 expected %3")
-        .arg(file.fileName()).arg(unsigned(suffix.crc), 8, 16, QChar('0'))
-        .arg(unsigned(crc.get()), 8, 16, QChar('0'));
-    //return false;
+    errMsg() << "Invalid checksum got " << QString::number(unsigned(suffix.crc),16)
+             << " expected " << QString::number(unsigned(crc.get())) << ".";
+    errMsg() << "Cannot read DFU file '" << file.fileName() << "'.";
+    return false;
   }
   return true;
 }
@@ -189,7 +190,7 @@ bool
 DFUFile::write(const QString &filename) {
   QFile file(filename);
   if (! file.open(QIODevice::WriteOnly)) {
-    _errorMessage = tr("Cannot create DFU file '%1': %2").arg(filename).arg(file.errorString());
+    errMsg() << "Cannot create DFU file '" << filename << "': " << file.errorString() << ".";
     return false;
   }
 
@@ -208,8 +209,8 @@ DFUFile::write(QFile &file) {
   prefix.n_targets = _images.size();
 
   if (sizeof(file_prefix_t) != file.write((char *)&prefix, sizeof(file_prefix_t))) {
-    _errorMessage = tr("Cannot write DFU prefix to '%1': %2")
-        .arg(file.fileName()).arg(file.errorString());
+    errMsg() << "Cannot write DFU prefix to '" << file.fileName()
+             << "': " << file.errorString() << ".";
     return false;
   }
 
@@ -217,8 +218,11 @@ DFUFile::write(QFile &file) {
   crc.update((uint8_t *)&prefix, sizeof(file_prefix_t));
 
   foreach (const Image &i, _images) {
-    if (! i.write(file, crc, _errorMessage))
+    QString errorMessage;
+    if (! i.write(file, crc, errorMessage)) {
+      errMsg() << errorMessage;
       return false;
+    }
   }
 
   file_suffix_t suffix;
@@ -234,8 +238,8 @@ DFUFile::write(QFile &file) {
   suffix.crc = qToLittleEndian(crc.get());
 
   if (sizeof(file_suffix_t) != file.write((char *)&suffix, sizeof(file_suffix_t))) {
-    _errorMessage = tr("Cannot write DFU suffix to '%1': %2")
-        .arg(file.fileName()).arg(file.errorString());
+    errMsg() << "Cannot write DFU suffix to '" << file.fileName()
+             << "': " << file.errorString() << ".";
     return false;
   }
 

@@ -81,9 +81,6 @@ public:
    * will be re-implemented by some interfaces (e.g., DFUDevice) to reboot the radio. By default
    * this function does nothing. */
 	virtual bool reboot();
-
-  /** Returns the last error message. */
-  virtual const QString &errorMessage() const = 0;
 };
 
 #endif // RADIOINFERFACE_HH

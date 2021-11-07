@@ -66,9 +66,6 @@ public:
 
   bool write_finish();
 
-  /** Retruns the last error message. */
-  inline const QString &errorMessage() const { return _errorMessage; }
-
 protected:
   /** Internal used function to select a memory bank. */
   bool selectMemoryBank(MemoryBank bank);

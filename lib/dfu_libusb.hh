@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <libusb.h>
+#include "errorstack.hh"
 
 /** This class implements DFU protocol to access radios.
  *
@@ -11,7 +12,7 @@
  * https://www.usb.org/sites/default/files/DFU_1.1.pdf for details.
  *
  * @ingroup rif */
-class DFUDevice: public QObject
+class DFUDevice: public QObject, public ErrorStack
 {
 	Q_OBJECT
 
@@ -40,9 +41,6 @@ public:
   /** Uploads some data from the device. */
   int upload(unsigned block, uint8_t *data, unsigned len);
 
-  /** Returns the last error message. */
-  const QString &errorMessage() const;
-
 protected:
   /** Internal used function to detach the device. */
 	int detach(int timeout);
@@ -64,8 +62,6 @@ protected:
 	libusb_device_handle *_dev;
   /** Device status. */
 	status_t _status;
-  /** Holds the last error message. */
-  QString _errorMessage;
 };
 
 #endif // DFU_LIBUSB_HH

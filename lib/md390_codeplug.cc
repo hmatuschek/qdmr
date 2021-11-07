@@ -214,8 +214,7 @@ MD390Codeplug::createChannels(Config *config, Context &ctx) {
     if (Channel *obj = chan.toChannelObj()) {
       config->channelList()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode codeplug: Invlaid channel at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg() << "Invlaid channel at index " << i << ".";
       return false;
     }
   }
@@ -229,8 +228,7 @@ MD390Codeplug::linkChannels(Context &ctx) {
     if (! chan.isValid())
       break;
     if (! chan.linkChannelObj(ctx.get<Channel>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode TyT codeplug: Cannot link channel at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg() << "Cannot link channel at index " << i << ".";
       return false;
     }
   }
@@ -268,8 +266,7 @@ MD390Codeplug::createContacts(Config *config, Context &ctx) {
     if (DigitalContact *obj = cont.toContactObj()) {
       config->contacts()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode TyT codeplug: Invlaid contact at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg() << "Invlaid contact at index " << i << ".";
       return false;
     }
   }
@@ -405,8 +402,7 @@ MD390Codeplug::createGroupLists(Config *config, Context &ctx) {
     if (RXGroupList *obj = glist.toGroupListObj(ctx)) {
       config->rxGroupLists()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode codeplug: Invlaid RX group list at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg() << "Invlaid group list at index " << i << ".";
       return false;
     }
   }
@@ -420,8 +416,7 @@ MD390Codeplug::linkGroupLists(Context &ctx) {
     if (! glist.isValid())
       break;
     if (! glist.linkGroupListObj(ctx.get<RXGroupList>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode codeplug: Cannot link group-list at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg() << "Cannot link group list at index " << i << ".";
       return false;
     }
   }
@@ -458,8 +453,7 @@ MD390Codeplug::createScanLists(Config *config, Context &ctx) {
     if (ScanList *obj = scan.toScanListObj(ctx)) {
       config->scanlists()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode TyT codeplug: Invlaid scanlist at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg() << "Invlaid scanlist at index " << i << ".";
       return false;
     }
   }
@@ -474,8 +468,7 @@ MD390Codeplug::linkScanLists(Context &ctx) {
       break;
 
     if (! scan.linkScanListObj(ctx.get<ScanList>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode codeplug: Cannot link scan-list at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg() << "Cannot link scan list at index " << i << ".";
       return false;
     }
   }
@@ -515,8 +508,7 @@ MD390Codeplug::createPositioningSystems(Config *config, Context &ctx) {
     if (GPSSystem *obj = gps.toGPSSystemObj()) {
       config->posSystems()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode codeplug: Invlaid GPS system at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg() << "Invlaid GPS system at index " << i << ".";
       return false;
     }
   }
@@ -531,8 +523,7 @@ MD390Codeplug::linkPositioningSystems(Context &ctx) {
     if (! gps.isValid())
       break;
     if (! gps.linkGPSSystemObj(ctx.get<GPSSystem>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode codeplug: Cannot link GPS system at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg() << "Cannot link GPS system at index " << i << ".";
       return false;
     }
   }

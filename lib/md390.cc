@@ -73,16 +73,14 @@ MD390::MD390(TyTInterface *device, QObject *parent)
   QByteArray buffer(total_size, 0xff);
 
   if (! _dev->read_start(0, addr_start)) {
-    _errorMessage = "Cannot read channels from MD-390, cannot determine variant: "
-        + _dev->errorMessage();
-    logError() << _errorMessage;
+    pushErrorMessage(_dev->errorMessages());
+    errMsg() << "Cannot read channels from MD-390, cannot determine variant.";
     return;
   }
   for (unsigned i=0; i<(total_size/BLOCK_SIZE); i++){
     if (! _dev->read(0, ADDR_CHANNELS, (uint8_t *)buffer.data()+i*BLOCK_SIZE, BLOCK_SIZE)) {
-      _errorMessage = "Cannot read channels from MD-390, cannot determine variant: "
-          + _dev->errorMessage();
-      logError() << _errorMessage;
+      pushErrorMessage(_dev->errorMessages());
+      errMsg() << "Cannot read channels from MD-390, cannot determine variant.";
       return;
     }
   }
@@ -123,10 +121,8 @@ MD390::MD390(TyTInterface *device, QObject *parent)
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{{450., 520.}};
     _name += "U";
   } else {
-    _errorMessage = tr("Cannot determine frequency range from channel frequencies between "
-                       "%1MHz and %2MHz. Will not check frequency ranges")
-        .arg(range.min).arg(range.max);
-    logError() << _errorMessage;
+    errMsg() << "Cannot determine frequency range from channel frequencies between "
+             << range.min << "MHz and " << range.max << "MHz. Will not check frequency ranges.";
   }
 }
 

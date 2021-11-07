@@ -12,6 +12,7 @@
 #include "radioinfo.hh"
 #include "codeplug.hh"
 #include "callsigndb.hh"
+#include "errorstack.hh"
 
 class Config;
 class UserDatabase;
@@ -80,7 +81,7 @@ struct VerifyFlags {
  *
  * @ingroup rif
  */
-class Radio : public QThread
+class Radio : public QThread, public ErrorStack
 {
 	Q_OBJECT
 
@@ -232,11 +233,6 @@ public:
   /** Returns the current status. */
   Status status() const;
 
-  /** Returns the last error message. */
-  const QString &errorMessage() const;
-  /** Clears the last error message and state. */
-  void clearError();
-
 public:
   /** Detects a radio and returns the corresponding device specific radio instance. */
   static Radio *detect(QString &errorMessage, const RadioInfo &force=RadioInfo());
@@ -278,8 +274,6 @@ signals:
 protected:
   /** The current state/task. */
   Status _task;
-  /** Holds the last error message. */
-  QString _errorMessage;
 };
 
 #endif // RADIO_HH

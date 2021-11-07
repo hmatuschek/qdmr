@@ -69,7 +69,7 @@ TyTRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignD
 
   logDebug() << "Encode call-sign DB.";
   if (nullptr == callsignDB()) {
-    _errorMessage = tr("Cannot upload callsign DB. DB not created.");
+    errMsg() << "Cannot upload callsign DB. DB not created.";
     return false;
   }
   callsignDB()->encode(db, selection);
@@ -157,7 +157,8 @@ TyTRadio::connect() {
 
   _dev = new TyTInterface(0x0483, 0xdf11);
   if (! _dev->isOpen()) {
-    _errorMessage = QString("Cannot open device at 0483:DF11: %1").arg(_dev->errorMessage());
+    pushErrorMessage(_dev->errorMessages());
+    errMsg() << "Cannot open device at 0483:DF11";
     _dev->deleteLater();
     _dev = nullptr;
     _task = StatusError;
@@ -176,11 +177,10 @@ TyTRadio::download() {
   size_t totb = 0;
   for (int n=0; n<codeplug().image(0).numElements(); n++) {
     if (! codeplug().image(0).element(n).isAligned(BSIZE)) {
-      _errorMessage = QString("%1 Cannot download codeplug: Codeplug element %2 (addr=%3, size=%4) "
-                              "is not aligned with blocksize %5.").arg(__func__)
-          .arg(n).arg(codeplug().image(0).element(n).address())
-          .arg(codeplug().image(0).element(n).data().size()).arg(BSIZE);
-      logError() << _errorMessage;
+      errMsg() << "Cannot download codeplug: Codeplug element " << n
+               << " (addr=" << codeplug().image(0).element(n).address()
+               << ", size=" << codeplug().image(0).element(n).data().size()
+               << ") is not aligned with blocksize " << BSIZE;
       return false;
     }
     totb += codeplug().image(0).element(n).data().size()/BSIZE;
@@ -194,9 +194,8 @@ TyTRadio::download() {
     unsigned b0 = addr/BSIZE, nb = size/BSIZE;
     for (unsigned b=0; b<nb; b++, bcount++) {
       if (! _dev->read(0, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE), BSIZE)) {
-        _errorMessage = QString("%1 Cannot download codeplug: %2").arg(__func__)
-            .arg(_dev->errorMessage());
-        logError() << _errorMessage;
+        pushErrorMessage(_dev->errorMessages());
+        errMsg() << "Cannot download codeplug.";
         return false;
       }
       emit downloadProgress(float(bcount*100)/totb);
@@ -212,9 +211,7 @@ TyTRadio::upload() {
 
   // Check every segment in the codeplug
   if (! codeplug().isAligned(BSIZE)) {
-    _errorMessage = QString("%1 Cannot upload codeplug: "
-                            "Codeplug is not aligned with blocksize %5.").arg(__func__).arg(BSIZE);
-    logError() << _errorMessage;
+    errMsg() << "Cannot upload codeplug: Codeplug is not aligned with blocksize " << BSIZE << ".";
     return false;
   }
 
@@ -229,9 +226,8 @@ TyTRadio::upload() {
       unsigned b0 = addr/BSIZE, nb = size/BSIZE;
       for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
         if (! _dev->read(0, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE), BSIZE)) {
-          _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
-              .arg(_dev->errorMessage());
-          logError() << _errorMessage;
+          pushErrorMessage(_dev->errorMessages());
+          errMsg() << "Cannot upload codeplug.";
           return false;
         }
         emit uploadProgress(float(bcount*50)/totb);
@@ -256,9 +252,8 @@ TyTRadio::upload() {
     unsigned b0 = addr/BSIZE, nb = size/BSIZE;
     for (size_t b=0; b<nb; b++,bcount+=BSIZE) {
       if (! _dev->write(0, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE), BSIZE)) {
-        _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
-            .arg(_dev->errorMessage());
-        logError() << _errorMessage;
+        pushErrorMessage(_dev->errorMessages());
+        errMsg() << "Cannot upload codeplug.";
         return false;
       }
       emit uploadProgress(50+float(bcount*50)/totb);
@@ -275,8 +270,7 @@ TyTRadio::uploadCallsigns() {
   logDebug() << "Check alignment.";
   // Check alignment in the codeplug
   if (! callsignDB()->isAligned(BSIZE)) {
-    _errorMessage = QString("%1 Cannot upload callsign db: Callsign DB is not aligned with blocksize %5.").arg(__func__);
-    logError() << _errorMessage;
+    errMsg() << "Cannot upload callsign db: Callsign DB is not aligned with blocksize " << BSIZE << ".";
     return false;
   }
 
@@ -295,9 +289,8 @@ TyTRadio::uploadCallsigns() {
   unsigned b0 = addr/BSIZE, nb = size/BSIZE;
   for (size_t b=0, bcount=0; b<nb; b++,bcount+=BSIZE) {
     if (! _dev->write(0, (b0+b)*BSIZE, callsignDB()->data((b0+b)*BSIZE), BSIZE)) {
-      _errorMessage = QString("%1 Cannot upload codeplug: %2").arg(__func__)
-          .arg(_dev->errorMessage());
-      logError() << _errorMessage;
+      pushErrorMessage(_dev->errorMessages());
+      errMsg() << "Cannot upload codeplug.";
       return false;
     }
     emit uploadProgress(50+float(bcount*50)/totb);

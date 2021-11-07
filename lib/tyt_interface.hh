@@ -112,8 +112,6 @@ public:
   /** Erases a memory section at @c start of size @c size. */
   bool erase(unsigned start, unsigned size, void (*progress)(unsigned, void *)=nullptr, void *ctx=nullptr);
 
-  const QString &errorMessage() const;
-
 protected:
   /** Internal used function to send a controll command to the device. */
   int md380_command(uint8_t a, uint8_t b);

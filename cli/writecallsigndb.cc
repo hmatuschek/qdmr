@@ -75,7 +75,7 @@ int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
   QObject::connect(radio, &Radio::uploadProgress, updateProgress);
 
   if (! radio->startUploadCallsignDB(&userdb, true, selection)) {
-    logError() << "Could not upload call-sign DB to radio: " << radio->errorMessage();
+    logError() << "Could not upload call-sign DB to radio: " << radio->formatErrorMessages();
     return -1;
   }
 

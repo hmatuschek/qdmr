@@ -95,7 +95,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     db.encode(&userdb, selection);
     if (! db.write(parser.positionalArguments().at(1))) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.errorMessage();
+                 << "': " << db.formatErrorMessages();
       return -1;
     }
   } else if (RadioInfo::MD2017 == radio) {
@@ -103,7 +103,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     db.encode(&userdb, selection);
     if (! db.write(parser.positionalArguments().at(1))) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.errorMessage();
+                 << "': " << db.formatErrorMessages();
       return -1;
     }
   } else if (RadioInfo::OpenGD77 == radio) {
@@ -111,7 +111,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     db.encode(&userdb, selection);
     if (! db.write(parser.positionalArguments().at(1))) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.errorMessage();
+                 << "': " << db.formatErrorMessages();
       return -1;
     }
   } else if (RadioInfo::GD77 == radio) {
@@ -119,7 +119,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     db.encode(&userdb, selection);
     if (! db.write(parser.positionalArguments().at(1))) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.errorMessage();
+                 << "': " << db.formatErrorMessages();
       return -1;
     }
   } else if ((RadioInfo::D868UVE == radio) || (RadioInfo::D878UV == radio)){
@@ -127,7 +127,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     db.encode(&userdb, selection);
     if (! db.write(parser.positionalArguments().at(1))) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.errorMessage();
+                 << "': " << db.formatErrorMessages();
       return -1;
     }
   } else if ((RadioInfo::D878UVII == radio) || (RadioInfo::D578UV == radio)){
@@ -135,7 +135,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     db.encode(&userdb, selection);
     if (! db.write(parser.positionalArguments().at(1))) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.errorMessage();
+                 << "': " << db.formatErrorMessages();
       return -1;
     }
   } else {

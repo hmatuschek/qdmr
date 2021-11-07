@@ -2,23 +2,23 @@
 #include "logger.hh"
 #include <unistd.h>
 #include "utils.hh"
-
+#include "errorstack.hh"
 
 TyTInterface::TyTInterface(unsigned vid, unsigned pid, QObject *parent)
   : DFUDevice(vid, pid, parent), RadioInterface()
 {
   if (! DFUDevice::isOpen()) {
-    logError() << _errorMessage;
+    errMsg() << "Cannot open TyTInterface.";
     return;
   }
 
   // Enter Programming Mode.
   if (wait_idle()) {
-    logError() << (_errorMessage = "Device not ready. Close device.");
+    errMsg() << "Device not ready. Close device.";
     close(); return;
   }
   if (md380_command(0x91, 0x01)) {
-    logError() << (_errorMessage = "Cannot enter programming mode. Close device.");
+    errMsg() << "Cannot enter programming mode. Close device.";
     close(); return;
   }
 
@@ -33,14 +33,13 @@ TyTInterface::TyTInterface(unsigned vid, unsigned pid, QObject *parent)
   } else if (idstr && (0==strcmp("2017", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::MD2017);
   } else if (idstr) {
-    logError() << (_errorMessage = tr("Unknown TyT device '%1'.").arg(idstr));
+    errMsg() << "Unknown TyT device '" << idstr << "'.";
     close(); return;
   }
 
   // Zero address.
   if(set_address(0x00000000)) {
-    _errorMessage = tr("Cannot set device address to 0x00000000: %1").arg(_errorMessage);
-    logError() << _errorMessage;
+    errMsg() << "Cannot set device address to 0x00000000.";
     close(); return;
   }
 }
@@ -61,11 +60,6 @@ TyTInterface::close() {
 bool
 TyTInterface::isOpen() const {
   return DFUDevice::isOpen() && _ident.isValid();
-}
-
-const QString &
-TyTInterface::errorMessage() const {
-  return DFUDevice::errorMessage();
 }
 
 RadioInfo
@@ -176,7 +170,7 @@ TyTInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
   Q_UNUSED(bank);
 
   if (nullptr == data) {
-    _errorMessage = tr("%1 Cannot write data into nullptr!").arg(__func__);
+    errMsg() << "Cannot write data into nullptr!";
     return false;
   }
 
@@ -203,7 +197,7 @@ TyTInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
   Q_UNUSED(bank);
 
   if (nullptr == data) {
-    _errorMessage = tr("%1 Cannot read data from nullptr!").arg(__func__);
+    errMsg() << "Cannot read data from nullptr!";
     return false;
   }
 
