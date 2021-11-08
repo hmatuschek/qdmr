@@ -64,8 +64,9 @@ bool
 RadioddityRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
   Q_UNUSED(db);
   Q_UNUSED(blocking);
+  Q_UNUSED(selection);
 
-  _errorMessage = tr("Radio does not support a callsign DB.");
+  errMsg() << "Radio does not support a callsign DB.";
 
   return false;
 }
@@ -143,8 +144,8 @@ RadioddityRadio::connect() {
     _dev->deleteLater();
   _dev = new RadioddityInterface(0x15a2, 0x0073);
   if (! _dev->isOpen()) {
-    _errorMessage = tr("%1(): Cannot connect to RD5R: %2")
-        .arg(__func__).arg(_dev->errorMessage());
+    pushErrorMessage(_dev->errorMessages());
+    errMsg() << "Cannot connect to RD5R.";
     _dev->deleteLater();
     _dev = nullptr;
     _task = StatusError;
@@ -173,8 +174,8 @@ RadioddityRadio::download() {
             (0x10000 > addr) ? RadioddityInterface::MEMBANK_CODEPLUG_LOWER : RadioddityInterface::MEMBANK_CODEPLUG_UPPER );
       // read
       if (! _dev->read(bank, (b0+i)*BSIZE, codeplug().data((b0+i)*BSIZE), BSIZE)) {
-        _errorMessage = tr("%1: Cannot download codeplug: %2").arg(__func__)
-            .arg(_dev->errorMessage());
+        pushErrorMessage(_dev->errorMessages());
+        errMsg() << "Cannot download codeplug.";
         return false;
       }
       emit downloadProgress(float(bcount*100)/btot);
@@ -207,8 +208,8 @@ RadioddityRadio::upload() {
               (0x10000 > addr) ? RadioddityInterface::MEMBANK_CODEPLUG_LOWER : RadioddityInterface::MEMBANK_CODEPLUG_UPPER );
         // read
         if (! _dev->read(bank, addr, codeplug().data(addr), BSIZE)) {
-          _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
-              .arg(_dev->errorMessage());
+          pushErrorMessage(_dev->errorMessages());
+          errMsg() << "Cannot upload codeplug.";
           return false;
         }
         emit uploadProgress(float(bcount*50)/btot);
@@ -218,8 +219,8 @@ RadioddityRadio::upload() {
 
   // Encode config into codeplug
   if (! codeplug().encode(_config, _codeplugFlags)) {
-    _errorMessage = tr("%1(): Upload failed: %2")
-        .arg(__func__).arg(codeplug().errorMessage());
+    pushErrorMessage(codeplug().errorMessages());
+    errMsg() << "Codeplug upload failed.";
     return false;
   }
 
@@ -235,8 +236,8 @@ RadioddityRadio::upload() {
             (0x10000 > addr) ? RadioddityInterface::MEMBANK_CODEPLUG_LOWER : RadioddityInterface::MEMBANK_CODEPLUG_UPPER );
       // write block
       if (! _dev->write(bank, addr, codeplug().data(addr), BSIZE)) {
-        _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
-            .arg(_dev->errorMessage());
+        pushErrorMessage(_dev->errorMessages());
+        errMsg() << "Cannot upload codeplug.";
         return false;
       }
       emit uploadProgress(50+float(bcount*50)/btot);

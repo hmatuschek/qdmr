@@ -21,6 +21,7 @@ GenericListWrapper::GenericListWrapper(AbstractConfigObjectList *list, QObject *
 
 int
 GenericListWrapper::rowCount(const QModelIndex &index) const {
+  Q_UNUSED(index)
   if (nullptr == _list)
     return 0;
   return _list->count();
@@ -28,6 +29,7 @@ GenericListWrapper::rowCount(const QModelIndex &index) const {
 
 int
 GenericListWrapper::columnCount(const QModelIndex &index) const {
+  Q_UNUSED(index)
   if (nullptr == _list)
     return 0;
   return 1;
@@ -121,6 +123,7 @@ GenericTableWrapper::GenericTableWrapper(AbstractConfigObjectList *list, QObject
 
 int
 GenericTableWrapper::rowCount(const QModelIndex &index) const {
+  Q_UNUSED(index)
   if (nullptr == _list)
     return 0;
   return _list->count();
@@ -263,11 +266,11 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     if (channel->defaultPower())
       return tr("[Default]");
     switch (channel->power()) {
-    case Channel::Power::Max: return tr("Max");
-    case Channel::Power::High: return tr("High");
-    case Channel::Power::Mid: return tr("Mid");
-    case Channel::Power::Low: return tr("Low");
-    case Channel::Power::Min: return tr("Min");
+    case Channel::Power::Max: return tr("Max"); break;
+    case Channel::Power::High: return tr("High"); break;
+    case Channel::Power::Mid: return tr("Mid"); break;
+    case Channel::Power::Low: return tr("Low"); break;
+    case Channel::Power::Min: return tr("Min"); break;
     }
   case 5:
     if (channel->defaultTimeout())
@@ -280,15 +283,15 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 7:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
       switch (digi->admit()) {
-      case DigitalChannel::Admit::Always: return tr("Always");
-      case DigitalChannel::Admit::Free: return tr("Free");
-      case DigitalChannel::Admit::ColorCode: return tr("Color");
+      case DigitalChannel::Admit::Always: return tr("Always"); break;
+      case DigitalChannel::Admit::Free: return tr("Free"); break;
+      case DigitalChannel::Admit::ColorCode: return tr("Color"); break;
       }
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
       switch (analog->admit()) {
-      case AnalogChannel::Admit::Always: return tr("Always");
-      case AnalogChannel::Admit::Free: return tr("Free");
-      case AnalogChannel::Admit::Tone: return tr("Tone");
+      case AnalogChannel::Admit::Always: return tr("Always"); break;
+      case AnalogChannel::Admit::Free: return tr("Free"); break;
+      case AnalogChannel::Admit::Tone: return tr("Tone"); break;
       }
     }
     break;

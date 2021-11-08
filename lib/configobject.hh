@@ -253,6 +253,7 @@ public:
   int add(ConfigObject *obj, int row=-1);
   bool take(ConfigObject *obj);
   bool del(ConfigObject *obj);
+  void clear();
 
   bool label(ConfigObject::Context &context);
   YAML::Node serialize(const ConfigObject::Context &context);

@@ -7,7 +7,6 @@
 #include <QFile>
 #include <cmath>
 #include "csvreader.hh"
-#include "csvwriter.hh"
 #include "userdatabase.hh"
 
 

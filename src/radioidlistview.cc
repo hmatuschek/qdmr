@@ -88,7 +88,6 @@ RadioIDListView::onDeleteID() {
 
 void
 RadioIDListView::onEditID(unsigned row) {
-
 }
 
 void

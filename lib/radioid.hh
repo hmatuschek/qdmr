@@ -86,8 +86,8 @@ public:
   RadioID *getId(int idx) const;
   /** Returns the current default ID for the radio. */
   RadioID * defaultId() const;
-  /** Sets the default DMR ID. This changes the index of all IDs. */
-  bool setDefaultId(unsigned idx);
+  /** Sets the default DMR ID. Pass idx=-1 to clear default ID. */
+  bool setDefaultId(int idx);
   /** Searches the DMR ID object associated with the given DMR ID. */
   RadioID *find(uint32_t id) const;
 

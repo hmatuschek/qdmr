@@ -500,6 +500,14 @@ ConfigObjectList::del(ConfigObject *obj) {
   return true;
 }
 
+void
+ConfigObjectList::clear() {
+  QVector<ConfigObject *> items = _items;
+  AbstractConfigObjectList::clear();
+  for (int i=0; i<items.count(); i++)
+    items[i]->deleteLater();
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ConfigObjectRefList
@@ -512,6 +520,7 @@ ConfigObjectRefList::ConfigObjectRefList(const QMetaObject &elementType, QObject
 
 bool
 ConfigObjectRefList::label(ConfigObject::Context &context) {
+  Q_UNUSED(context)
   // pass...
   return true;
 }

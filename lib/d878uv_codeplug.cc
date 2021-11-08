@@ -1195,11 +1195,13 @@ D878UVCodeplug::GPSMessageElement::setMessage(const QString &message) {
 
 bool
 D878UVCodeplug::GPSMessageElement::fromConfig(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags); Q_UNUSED(ctx)
   return true;
 }
 
 bool
 D878UVCodeplug::GPSMessageElement::updateConfig(Context &ctx) const {
+  Q_UNUSED(ctx)
   return true;
 }
 
@@ -1329,11 +1331,13 @@ D878UVCodeplug::GeneralSettingsExtensionElement::setGPSMode(GPSMode mode) {
 
 bool
 D878UVCodeplug::GeneralSettingsExtensionElement::fromConfig(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags); Q_UNUSED(ctx)
   return true;
 }
 
 bool
 D878UVCodeplug::GeneralSettingsExtensionElement::updateConfig(Context &ctx) {
+  Q_UNUSED(ctx)
   return true;
 }
 
@@ -1548,6 +1552,7 @@ D878UVCodeplug::AnalogAPRSSettingsElement::setPreWaveDelay(unsigned ms) {
 
 bool
 D878UVCodeplug::AnalogAPRSSettingsElement::fromAPRSSystem(const APRSSystem *sys, Context &ctx) {
+  Q_UNUSED(ctx)
   clear();
   setFrequency(sys->revertChannel()->txFrequency()*1e6);
   setTXTone(sys->revertChannel()->txTone());
@@ -2216,6 +2221,7 @@ D878UVCodeplug::allocateChannels() {
 
 bool
 D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   // Encode channels
   for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
@@ -2294,6 +2300,7 @@ D878UVCodeplug::allocateGPSSystems() {
 
 bool
 D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   // replaces D868UVCodeplug::encodeGPSSystems
 
   // Encode APRS system (there can only be one)
@@ -2408,6 +2415,8 @@ D878UVCodeplug::allocateRoaming() {
 
 bool
 D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   // Encode roaming channels
   QHash<DigitalChannel *, unsigned> roaming_ch_map;
   {
@@ -2470,6 +2479,7 @@ D878UVCodeplug::createRoaming(Context &ctx) {
 
 bool
 D878UVCodeplug::linkRoaming(Context &ctx) {
+  Q_UNUSED(ctx)
   // Pass, no need to link roaming channels.
   return true;
 }

@@ -34,6 +34,7 @@
 #include "scanlistsview.hh"
 #include "positioningsystemlistview.hh"
 #include "roamingzonelistview.hh"
+#include "errormessageview.hh"
 
 
 Application::Application(int &argc, char *argv[])
@@ -451,8 +452,7 @@ Application::downloadCodeplug() {
     _mainWindow->statusBar()->showMessage(tr("Read ..."));
     _mainWindow->setEnabled(false);
   } else {
-    QMessageBox::critical(nullptr, tr("Cannot Read codeplug."),
-                          tr("Cannot read codeplug: %1").arg(radio->errorMessage()));
+    ErrorMessageView(*radio).show();
     progress->setVisible(false);
   }
 }
@@ -460,9 +460,7 @@ Application::downloadCodeplug() {
 void
 Application::onCodeplugDownloadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Read error"));
-  QMessageBox::critical(0, tr("Read error"),
-                        tr("Cannot read codeplug from device. "
-                           "An error occurred during read: %1").arg(radio->errorMessage()));
+  ErrorMessageView(*radio).show();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
@@ -483,9 +481,7 @@ Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
 
     _config->setModified(false);
   } else {
-    QMessageBox::critical(
-          nullptr, tr("Cannot decode code-plug"),
-          tr("Cannot decode code-plug: %2").arg(codeplug->errorMessage()));
+    ErrorMessageView(*codeplug).show();
   }
   _mainWindow->setEnabled(true);
 
@@ -532,8 +528,7 @@ Application::uploadCodeplug() {
      _mainWindow->statusBar()->showMessage(tr("Upload ..."));
      _mainWindow->setEnabled(false);
   } else {
-    QMessageBox::critical(nullptr, tr("Cannot write codeplug."),
-                          tr("Cannot write codeplug: %1").arg(radio->errorMessage()));
+    ErrorMessageView(*radio).show();
     progress->setVisible(false);
   }
 }
@@ -617,9 +612,7 @@ Application::uploadCallsignDB() {
     _mainWindow->statusBar()->showMessage(tr("Write call-sign DB ..."));
     _mainWindow->setEnabled(false);
   } else {
-    logDebug() << "Cannot write call-sign DB.";
-    QMessageBox::critical(nullptr, tr("Cannot write call-sign DB."),
-                          tr("Cannot write call-sign DB: %1").arg(radio->errorMessage()));
+    ErrorMessageView(*radio).show();
     progress->setVisible(false);
   }
 }
@@ -628,11 +621,7 @@ Application::uploadCallsignDB() {
 void
 Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Write error"));
-  QMessageBox::critical(
-        nullptr, tr("Write error"),
-        tr("Cannot write codeplug or call-sign DB to device. "
-           "An error occurred during write: %1").arg(radio->errorMessage()));
-  logError() << "Write error: " << radio->errorMessage() << ".";
+  ErrorMessageView(*radio).show();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 

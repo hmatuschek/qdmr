@@ -2,6 +2,7 @@
 #define OPENGD77INTERFACE_HH
 
 #include "usbserial.hh"
+#include "errorstack.hh"
 
 /** Implements the interfact to a radio running the Open GD77 firmware.
  *

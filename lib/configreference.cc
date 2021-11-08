@@ -73,6 +73,7 @@ ConfigObjectReference::allow(const QMetaObject *elementType) {
 
 void
 ConfigObjectReference::onReferenceDeleted(QObject *obj) {
+  Q_UNUSED(obj)
   _object = nullptr;
   emit modified();
 }

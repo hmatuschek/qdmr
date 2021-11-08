@@ -96,7 +96,7 @@ D578UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
 }
 void
 D578UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
-  // pass...
+  Q_UNUSED(idx)
 }
 
 bool
@@ -134,6 +134,8 @@ D578UVCodeplug::allocateHotKeySettings() {
 
 bool
 D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   // Encode channels
   for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
@@ -204,6 +206,8 @@ D578UVCodeplug::allocateContacts() {
 
 bool
 D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   QVector<DigitalContact*> contacts;
   // Encode contacts and also collect id<->index map
   for (int i=0; i<ctx.config()->contacts()->digitalCount(); i++) {

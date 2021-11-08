@@ -43,7 +43,7 @@ public:
    * the codeplug that encodes a specific element. E.g., channels, contacts, zones, etc.
    * This class provies some helper methods to access specific members of the element.
    * @since 0.9.0 */
-  class Element
+  class Element: public ErrorStack
   {
   protected:
     /** Hidden constructor.

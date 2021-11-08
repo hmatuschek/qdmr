@@ -358,7 +358,7 @@ public:
    * Memmory layout of the DTMF contact:
    * @verbinclude radioddity_dtmfcontact.txt
    */
-  class DTMFContactElement: Element
+  class DTMFContactElement: public Element
   {
   protected:
     /** Hidden constructor. */
@@ -396,7 +396,7 @@ public:
    * Memmory layout of the zone:
    * @verbinclude radioddity_zone.txt
    */
-  class ZoneElement: Element
+  class ZoneElement: public Element
   {
   protected:
     /** Hidden constructor. */

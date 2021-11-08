@@ -631,6 +631,8 @@ AnytoneCodeplug::ChannelElement::enableSMS(bool enable) {
 
 Channel *
 AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
+  Q_UNUSED(ctx)
+
   Channel *ch;
 
   if ((Mode::Analog == mode()) || (Mode::MixedAnalog == mode())) {
@@ -906,6 +908,8 @@ AnytoneCodeplug::ContactElement::toContactObj(Context &ctx) const {
 
 bool
 AnytoneCodeplug::ContactElement::fromContactObj(const DigitalContact *contact, Context &ctx) {
+  Q_UNUSED(ctx)
+
   clear();
 
   setType(contact->type());
@@ -2190,6 +2194,7 @@ AnytoneCodeplug::BootSettingsElement::setPassword(const QString &txt) {
 
 bool
 AnytoneCodeplug::BootSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   setIntroLine1(ctx.config()->settings()->introLine1());
   setIntroLine2(ctx.config()->settings()->introLine2());
   return true;
@@ -2406,6 +2411,8 @@ AnytoneCodeplug::DMRAPRSSettingsElement::disableTimeSlotOverride() {
 
 bool
 AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   if (1 < ctx.config()->posSystems()->gpsCount()) {
     logDebug() << "D868UV only supports a single independent GPS positioning system.";
   } else if (0 == ctx.config()->posSystems()->gpsCount()) {

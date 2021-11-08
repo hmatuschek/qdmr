@@ -165,7 +165,7 @@ RD5RCodeplug::encodeElements(const Flags &flags, Context &ctx) {
 
   // Set timestamp
   if (! this->encodeTimestamp()) {
-    _errorMessage = tr("Cannot encode time-stamp: %1").arg(_errorMessage);
+    errMsg() << "Cannot encode time-stamp.";
     return false;
   }
 
@@ -226,6 +226,7 @@ RD5RCodeplug::clearContacts() {
 
 bool
 RD5RCodeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement el(data(ADDR_CONTACTS + i*CONTACT_SIZE));
     el.clear();
@@ -258,6 +259,7 @@ RD5RCodeplug::clearDTMFContacts() {
 
 bool
 RD5RCodeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   for (int i=0; i<NUM_DTMF_CONTACTS; i++) {
     DTMFContactElement el(data(ADDR_DTMF_CONTACTS + i*DTMF_CONTACT_SIZE));
     el.clear();
@@ -295,6 +297,7 @@ RD5RCodeplug::clearChannels() {
 
 bool
 RD5RCodeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
     uint8_t *ptr = nullptr;
     if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0);
@@ -336,6 +339,7 @@ RD5RCodeplug::createChannels(Config *config, Context &ctx) {
 
 bool
 RD5RCodeplug::linkChannels(Config *config, Context &ctx) {
+  Q_UNUSED(config)
   for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
     uint8_t *ptr = nullptr;
     if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0);
@@ -368,12 +372,15 @@ RD5RCodeplug::clearBootText() {
 
 bool
 RD5RCodeplug::encodeBootText(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+  Q_UNUSED(ctx)
   BootTextElement(data(ADDR_BOOT_TEXT)).fromConfig(config);
   return true;
 }
 
 bool
 RD5RCodeplug::decodeBootText(Config *config, Context &ctx) {
+  Q_UNUSED(ctx)
   BootTextElement(data(ADDR_BOOT_TEXT)).updateConfig(config);
   return true;
 }
@@ -394,6 +401,8 @@ RD5RCodeplug::clearZones() {
 
 bool
 RD5RCodeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   ZoneBankElement bank(data(ADDR_ZONE_BANK));
 
   // Pack Zones
@@ -462,6 +471,8 @@ RD5RCodeplug::createZones(Config *config, Context &ctx) {
 
 bool
 RD5RCodeplug::linkZones(Config *config, Context &ctx) {
+  Q_UNUSED(config)
+
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
   ZoneBankElement bank(data(ADDR_ZONE_BANK));
@@ -485,8 +496,7 @@ RD5RCodeplug::linkZones(Config *config, Context &ctx) {
       last_zone = ctx.get<Zone>(i+1);
     }
     if (! z.linkZoneObj(last_zone, ctx, extend_last_zone)) {
-      _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
-          .arg(__func__).arg(i);
+      errMsg() << "Cannot link zone at index " << i << ".";
       return false;
     }
   }
@@ -503,6 +513,8 @@ RD5RCodeplug::clearScanLists() {
 
 bool
 RD5RCodeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   ScanListBankElement bank(data(ADDR_SCAN_LIST_BANK));
   for (int i=0; i<NUM_SCAN_LISTS; i++) {
     if (i >= config->scanlists()->count()) {
@@ -529,6 +541,8 @@ RD5RCodeplug::createScanLists(Config *config, Context &ctx) {
 
 bool
 RD5RCodeplug::linkScanLists(Config *config, Context &ctx) {
+  Q_UNUSED(config)
+
   ScanListBankElement bank(data(ADDR_SCAN_LIST_BANK));
   for (int i=0; i<NUM_SCAN_LISTS; i++) {
     if (! bank.isEnabled(i))
@@ -548,6 +562,8 @@ RD5RCodeplug::clearGroupLists() {
 
 bool
 RD5RCodeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK)); bank.clear();
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (i >= config->rxGroupLists()->count())
@@ -574,6 +590,8 @@ RD5RCodeplug::createGroupLists(Config *config, Context &ctx) {
 
 bool
 RD5RCodeplug::linkGroupLists(Config *config, Context &ctx) {
+  Q_UNUSED(config)
+
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK));
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (! bank.isEnabled(i))
@@ -582,7 +600,7 @@ RD5RCodeplug::linkGroupLists(Config *config, Context &ctx) {
     /*logDebug() << "Link " << bank.contactCount(i) << " members of group list '"
                << ctx.get<RXGroupList>(i+1)->name() << "'.";*/
     if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx)) {
-      _errorMessage = tr("Cannot link group list '%1'.").arg(ctx.get<RXGroupList>(i+1)->name());
+      errMsg() << "Cannot link group list '" << ctx.get<RXGroupList>(i+1)->name() << "'.";
       return false;
     }
   }

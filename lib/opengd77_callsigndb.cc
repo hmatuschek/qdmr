@@ -25,11 +25,11 @@ OpenGD77CallsignDB::userdb_entry_t::clear() {
 
 uint32_t
 OpenGD77CallsignDB::userdb_entry_t::getNumber() const {
-  return decode_dmr_id_bcd((uint8_t *)&number);
+  return decode_dmr_id_bcd_le((uint8_t *)&number);
 }
 void
 OpenGD77CallsignDB::userdb_entry_t::setNumber(uint32_t number) {
-  encode_dmr_id_bcd((uint8_t *)&(this->number), number);
+  encode_dmr_id_bcd_le((uint8_t *)&(this->number), number);
 }
 
 QString
@@ -60,8 +60,9 @@ OpenGD77CallsignDB::userdb_t::userdb_t() {
 
 void
 OpenGD77CallsignDB::userdb_t::clear() {
+  memset(this, 0, sizeof(userdb_t));
   memcpy(magic, "ID-", 3);
-  size = 0x5d;
+  size = 0x5d; // <- 19 byte entries, 15byte name
   memcpy(version, "001", 3);
   count = 0;
   unused6 = unused9 = 0;

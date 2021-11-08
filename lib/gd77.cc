@@ -127,9 +127,7 @@ GD77::uploadCallsigns()
 
   // Check every segment in the codeplug
   if (! _callsigns.isAligned(BSIZE)) {
-    _errorMessage = QString("In %1(), cannot upload call-sign DB:\n\t "
-                            "Not aligned with block-size!").arg(__func__);
-    logError() << _errorMessage;
+    errMsg() << "Cannot upload call-sign DB: Not aligned with block-size " << BSIZE << ".";
     return false;
   }
 
@@ -148,9 +146,8 @@ GD77::uploadCallsigns()
       if (! _dev->write(bank, (b0+b)*BSIZE,
                         _callsigns.data((b0+b)*BSIZE, 0), BSIZE))
       {
-        _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
-            .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
-        logError() << _errorMessage;
+        pushErrorMessage(_dev->errorMessages());
+        errMsg() << "Cannot write block " << (b0+b) << ".";
         return false;
       }
       emit uploadProgress(float(bcount*100)/totb);

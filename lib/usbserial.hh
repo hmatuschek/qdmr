@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSerialPort>
 #include "radiointerface.hh"
+#include "errorstack.hh"
 
 /** Implements a serial connection to a radio via USB.
  *
@@ -11,7 +12,7 @@
  *
  * @ingroup rif
  */
-class USBSerial : public QSerialPort, public RadioInterface
+class USBSerial : public QSerialPort, public RadioInterface, public ErrorStack
 {
   Q_OBJECT
 
@@ -32,18 +33,11 @@ public:
   /** Closes the interface to the device. */
   void close();
 
-  /** Returns the last error message. */
-  const QString &errorMessage() const;
-
 protected slots:
   /** Callback for serial interface errors. */
   void onError(QSerialPort::SerialPortError error_t);
   /** Callback when closing interface. */
   void onClose();
-
-protected:
-  /** Holds the last error message. */
-  QString _errorMessage;
 };
 
 #endif // USBSERIAL_HH

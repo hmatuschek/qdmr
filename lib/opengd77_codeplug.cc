@@ -193,6 +193,63 @@ OpenGD77Codeplug::ZoneElement::ZoneElement(uint8_t *ptr)
   // pass...
 }
 
+void
+OpenGD77Codeplug::ZoneElement::clear() {
+  RadioddityCodeplug::ZoneElement::clear();
+  memset(_data+0x0010, 0x00, 0xa0);
+}
+
+bool
+OpenGD77Codeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putInB) const {
+  if (! isValid()) {
+    logWarn() << "Cannot link zone: Zone is invalid.";
+    return false;
+  }
+
+  for (int i=0; (i<80) && hasMember(i); i++) {
+    if (ctx.has<Channel>(member(i))) {
+      if (! putInB)
+        zone->A()->add(ctx.get<Channel>(member(i)));
+      else
+        zone->B()->add(ctx.get<Channel>(member(i)));
+    } else {
+      logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
+                << member(i) << " out of bounds.";
+    }
+  }
+  return true;
+}
+
+void
+OpenGD77Codeplug::ZoneElement::fromZoneObjA(const Zone *zone, Context &ctx) {
+  if (zone->A()->count() && zone->B()->count())
+    setName(zone->name() + " A");
+  else
+    setName(zone->name());
+
+  for (int i=0; i<80; i++) {
+    if (i < zone->A()->count())
+      setMember(i, ctx.index(zone->A()->get(i)));
+    else
+      clearMember(i);
+  }
+}
+
+void
+OpenGD77Codeplug::ZoneElement::fromZoneObjB(const Zone *zone, Context &ctx) {
+  if (zone->A()->count() && zone->B()->count())
+    setName(zone->name() + " B");
+  else
+    setName(zone->name());
+
+  for (int i=0; i<80; i++) {
+    if (i < zone->B()->count())
+      setMember(i, ctx.index(zone->B()->get(i)));
+    else
+      clearMember(i);
+  }
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of OpenGD77Codeplug::ZoneBankElement
@@ -351,16 +408,23 @@ OpenGD77Codeplug::clearScanLists() {
 }
 bool
 OpenGD77Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(config)
+  Q_UNUSED(flags)
+  Q_UNUSED(ctx)
   // Scan lists are not touched with OpenGD77 codeplug
   return true;
 }
 bool
 OpenGD77Codeplug::createScanLists(Config *config, Context &ctx) {
+  Q_UNUSED(config)
+  Q_UNUSED(ctx)
   // Scan lists are not touched with OpenGD77 codeplug
   return true;
 }
 bool
 OpenGD77Codeplug::linkScanLists(Config *config, Context &ctx) {
+  Q_UNUSED(config)
+  Q_UNUSED(ctx)
   // Scan lists are not touched with OpenGD77 codeplug
   return true;
 }
@@ -373,6 +437,8 @@ OpenGD77Codeplug::clearContacts() {
 
 bool
 OpenGD77Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement el(data(ADDR_CONTACTS + i*CONTACT_SIZE, IMAGE_CONTACTS));
     el.clear();
@@ -404,6 +470,8 @@ OpenGD77Codeplug::clearDTMFContacts() {
 
 bool
 OpenGD77Codeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   for (int i=0; i<NUM_DTMF_CONTACTS; i++) {
     DTMFContactElement el(data(ADDR_DTMF_CONTACTS + i*DTMF_CONTACT_SIZE, IMAGE_DTMF_CONTACTS));
     el.clear();
@@ -441,6 +509,8 @@ OpenGD77Codeplug::clearChannels() {
 
 bool
 OpenGD77Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
     uint8_t *ptr = nullptr;
     if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0, IMAGE_CHANNEL_BANK_0);
@@ -482,6 +552,8 @@ OpenGD77Codeplug::createChannels(Config *config, Context &ctx) {
 
 bool
 OpenGD77Codeplug::linkChannels(Config *config, Context &ctx) {
+  Q_UNUSED(config)
+
   for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
     uint8_t *ptr = nullptr;
     if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0, IMAGE_CHANNEL_BANK_0);
@@ -514,12 +586,16 @@ OpenGD77Codeplug::clearBootText() {
 
 bool
 OpenGD77Codeplug::encodeBootText(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+  Q_UNUSED(ctx)
+
   BootTextElement(data(ADDR_BOOT_TEXT, IMAGE_BOOT_TEXT)).fromConfig(config);
   return true;
 }
 
 bool
 OpenGD77Codeplug::decodeBootText(Config *config, Context &ctx) {
+  Q_UNUSED(ctx)
   BootTextElement(data(ADDR_BOOT_TEXT, IMAGE_BOOT_TEXT)).updateConfig(config);
   return true;
 }
@@ -540,6 +616,8 @@ OpenGD77Codeplug::clearZones() {
 
 bool
 OpenGD77Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   ZoneBankElement bank(data(ADDR_ZONE_BANK, IMAGE_ZONE_BANK));
 
   // Pack Zones
@@ -608,6 +686,8 @@ OpenGD77Codeplug::createZones(Config *config, Context &ctx) {
 
 bool
 OpenGD77Codeplug::linkZones(Config *config, Context &ctx) {
+  Q_UNUSED(config)
+
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
   ZoneBankElement bank(data(ADDR_ZONE_BANK, IMAGE_ZONE_BANK));
@@ -631,8 +711,7 @@ OpenGD77Codeplug::linkZones(Config *config, Context &ctx) {
       last_zone = ctx.get<Zone>(i+1);
     }
     if (! z.linkZoneObj(last_zone, ctx, extend_last_zone)) {
-      _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
-          .arg(__func__).arg(i);
+      errMsg() << "Cannot link zone at index " << i << ".";
       return false;
     }
   }
@@ -649,6 +728,8 @@ OpenGD77Codeplug::clearGroupLists() {
 
 bool
 OpenGD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK, IMAGE_GROUP_LIST_BANK)); bank.clear();
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (i >= config->rxGroupLists()->count())
@@ -675,6 +756,8 @@ OpenGD77Codeplug::createGroupLists(Config *config, Context &ctx) {
 
 bool
 OpenGD77Codeplug::linkGroupLists(Config *config, Context &ctx) {
+  Q_UNUSED(config)
+
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK, IMAGE_GROUP_LIST_BANK));
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (! bank.isEnabled(i))
@@ -683,7 +766,7 @@ OpenGD77Codeplug::linkGroupLists(Config *config, Context &ctx) {
     /*logDebug() << "Link " << bank.contactCount(i) << " members of group list '"
                << ctx.get<RXGroupList>(i+1)->name() << "'.";*/
     if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx)) {
-      _errorMessage = tr("Cannot link group list '%1'.").arg(ctx.get<RXGroupList>(i+1)->name());
+      errMsg() << "Cannot link group list '" << ctx.get<RXGroupList>(i+1)->name() << "'.";
       return false;
     }
   }

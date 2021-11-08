@@ -41,27 +41,27 @@ DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
 
   int error = libusb_init(&_ctx);
   if (error < 0) {
-    _errorMessage = tr("%1 Libusb init failed: %2 %3").arg(__func__).arg(error)
-        .arg(libusb_strerror((enum libusb_error) error));
+    errMsg() << "Libusb init failed (" << error << "): "
+             << libusb_strerror((enum libusb_error) error) << ".";
     return;
   }
 
   if (! (_dev = libusb_open_device_with_vid_pid(_ctx, vid, pid))) {
-    _errorMessage = tr("%1 Cannot open device %2, %3: %4 %5").arg(__func__).arg(vid,0,16).arg(pid,0,16)
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
+    errMsg() << "Cannot open device " << QString::number(vid, 16)
+             << ":" << QString::number(pid, 16)
+             << ": " << libusb_strerror((enum libusb_error) error);
     libusb_exit(_ctx);
     _ctx = nullptr;
     return;
   }
 
   if (libusb_kernel_driver_active(_dev, 0) && libusb_detach_kernel_driver(_dev, 0)) {
-    logWarn() << tr("Cannot detatch kernel driver for device %1:%2. "
-                    "Claim interface will likely fail.").arg(vid,0,16).arg(pid,0,16);
+    errMsg() << "Cannot detatch kernel driver for device " << QString::number(vid, 16)
+             << ":" << QString::number(pid, 16) << ". Interface claim will likely fail.";
   }
 
   if (0 > (error = libusb_claim_interface(_dev, 0))) {
-    _errorMessage = tr("%1 Failed to claim USB interface: %2 %3").arg(__func__).arg(error)
-        .arg(libusb_strerror((enum libusb_error) error));
+    errMsg() << "Failed to claim USB interface: " << libusb_strerror((enum libusb_error) error);
     libusb_close(_dev);
     _dev = nullptr;
     libusb_exit(_ctx);
@@ -95,11 +95,6 @@ DFUDevice::close() {
   _dev = nullptr;
 }
 
-const QString &
-DFUDevice::errorMessage() const {
-  return _errorMessage;
-}
-
 
 int
 DFUDevice::download(unsigned block, uint8_t *data, unsigned len) {
@@ -107,8 +102,7 @@ DFUDevice::download(unsigned block, uint8_t *data, unsigned len) {
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, block, 0, data, len, 0);
 
   if (error < 0) {
-    _errorMessage = tr("Cannot write to device: %1 %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
+    errMsg() << "Cannot write to device: " << libusb_strerror((enum libusb_error) error) << ".";
     return 1;
   }
 
@@ -121,8 +115,7 @@ DFUDevice::upload(unsigned block, uint8_t *data, unsigned len) {
         _dev, REQUEST_TYPE_TO_HOST, REQUEST_UPLOAD, block, 0, data, len, 0);
 
   if (error < 0) {
-    _errorMessage = tr("Cannot read block: %1 %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
+    errMsg() << "Cannot read block: " << libusb_strerror((enum libusb_error) error) << ".";
     return false;
   }
 
@@ -135,8 +128,7 @@ DFUDevice::detach(int timeout)
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DETACH, timeout, 0, nullptr, 0, 0);
   if (0 > error)
-    _errorMessage = tr("Cannot detatch device: %1 %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
+    errMsg() << "Cannot detatch device: " << libusb_strerror((enum libusb_error) error) << ".";
   return error;
 }
 
@@ -145,14 +137,9 @@ DFUDevice::get_status()
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_HOST, REQUEST_GETSTATUS, 0, 0, (unsigned char*)&_status, 6, 0);
-  if (0 > error) {
-    _errorMessage = tr("Cannot get status: %1 %2. Recv: %3, %4, %5, %6")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error))
-        .arg(_status.status).arg(_status.poll_timeout).arg(_status.state)
-        .arg(_status.string_index);
-    return error;
-  }
-  return 0;
+  if (0 > error)
+    errMsg() << "Cannot get status: " << libusb_strerror((enum libusb_error) error) << ".";
+  return error;
 }
 
 int
@@ -161,9 +148,8 @@ DFUDevice::clear_status()
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_CLRSTATUS, 0, 0, NULL, 0, 0);
   if (0 > error)
-    _errorMessage = tr("Cannot clear status: %1 %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
-  return 0;
+    errMsg() << "Cannot clear status: " << libusb_strerror((enum libusb_error) error) << ".";
+  return error;
 }
 
 int
@@ -175,9 +161,8 @@ DFUDevice::get_state(int &pstate)
         _dev, REQUEST_TYPE_TO_HOST, REQUEST_GETSTATE, 0, 0, &state, 1, 0);
   pstate = state;
   if (error < 0)
-    _errorMessage = tr("Cannot get state: %1 %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
-  return 0;
+    errMsg() << "Cannot get state: " << libusb_strerror((enum libusb_error) error) << ".";
+  return error;
 }
 
 int
@@ -186,8 +171,7 @@ DFUDevice::abort()
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_ABORT, 0, 0, NULL, 0, 0);
   if (error < 0)
-    _errorMessage = tr("Cannot abort: %1 %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
+    errMsg() << "Cannot abort: " << libusb_strerror((enum libusb_error) error) << ".";
   return error;
 }
 

@@ -3,10 +3,11 @@
 
 #include <QObject>
 #include <libusb.h>
+#include "errorstack.hh"
 
 /** Implements the HID radio interface using libusb.
  * @ingroup rif */
-class HIDevice: public QObject
+class HIDevice: public QObject, public ErrorStack
 {
 	Q_OBJECT
 
@@ -28,9 +29,6 @@ public:
   /** Close connection to device. */
 	void close();
 
-  /** Returns the last error message. */
-	inline const QString &errorMessage() const { return _errorMessage; }
-
 protected:
   /** Internal used implementation of send_recv(). */
 	int write_read(const unsigned char *data, unsigned length, unsigned char *reply, unsigned rlength);
@@ -48,8 +46,6 @@ protected:
 	unsigned char _receive_buf[42];
 	/** Receive result. */
 	volatile int _nbytes_received;
-	/** Holds the error message. */
-	QString _errorMessage;
 };
 
 #endif // HID_MACOS_HH

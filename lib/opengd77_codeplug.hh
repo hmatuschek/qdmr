@@ -110,6 +110,11 @@ public:
   public:
     /** Constructor. */
     explicit ZoneElement(uint8_t *ptr);
+
+    void clear();
+    bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
+    void fromZoneObjA(const Zone *zone, Context &ctx);
+    void fromZoneObjB(const Zone *zone, Context &ctx);
   };
 
   /** Implements the OpenGD77 specific zone bank.

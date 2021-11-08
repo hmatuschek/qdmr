@@ -5,28 +5,55 @@
 #include "userdatabase.hh"
 
 /** Represents and encodes the binary format for the call-sign database within the radio.
- * @ingroup opengd77 */
+ *
+ * The memory layout of the call-sign DB is relatively simple. The DB starts at address
+ * @c 0x00030000 with a maximum size of @c 0x00040000. The first 12bytes form the DB header
+ * (see @c OpenGD77CallsignDB::userdb_t) followed by the DB entries (see
+ * @c OpenGD77CallsignDB::userdb_entry_t).
+ *
+ * The entries can be of variable size. The size of each entry is encoded in the header. QDMR uses
+ * a fixed size of 19bytes per entry. The entries must be sorted in ascending order to allow for an
+ * efficient binary search. No index table is used here.
+ *
+ * @ingroup ogd77 */
 class OpenGD77CallsignDB : public CallsignDB
 {
   Q_OBJECT
 
-  /** Represents a user-db entry within the binary codeplug. */
+public:
+  /** Represents a user-db entry within the binary codeplug.
+   *
+   * Memory representation of the call-sign DB entry (size 0x13 bytes):
+   * @verbinclude opengd77_callsign_db_entry.txt */
   struct __attribute__((packed)) userdb_entry_t {
     uint32_t number;                    ///< DMR ID stored in BCD little-endian.
     char name[15];                      ///< Call or name, upto 15 ASCII chars, 0x00 padded.
 
+    /** Constructor. */
     userdb_entry_t();
+    /** Resets the entry. */
     void clear();
 
+    /** Returns the DMR ID number. */
     uint32_t getNumber() const;
+    /** Sets the DMR ID number. */
     void setNumber(uint32_t number);
 
+    /** Returns the name of the entry. */
     QString getName() const;
+    /** Sets the name of the entry, 15b max.
+     * The name gets truncated if longer than 15b. */
     void setName(const QString &name);
 
+    /** Encodes the given user. */
     void fromEntry(const UserDatabase::User &user);
   };
 
+  /** Represents the binary call-sign database header.
+   *
+   * Memory representation of the call-sign DB header (size: 0x0c bytes):
+   * @verbinclude opengd77_callsign_db_header.txt
+   **/
   struct __attribute__((packed)) userdb_t {
     char magic[3];                      ///< Fixed string 'ID-'
     uint8_t size;                       ///< Fixed to 0x5d for 15 byte names.
@@ -35,9 +62,11 @@ class OpenGD77CallsignDB : public CallsignDB
     uint16_t count;                     ///< Number of contacts in DB, 16bit little-endian.
     uint16_t unused9;                   ///< Unused, set to 0x0000.
 
+    /** Constructor. */
     userdb_t();
+    /** Resets the header. */
     void clear();
-
+    /** Sets the number of DB entries. This number is limited to USERDB_NUM_ENTRIES.*/
     void setSize(unsigned n);
   };
 

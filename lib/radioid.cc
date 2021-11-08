@@ -77,6 +77,7 @@ RadioIDList::RadioIDList(QObject *parent)
 void
 RadioIDList::clear() {
   ConfigObjectList::clear();
+  // default will be removed through deleted signal.
 }
 
 RadioID *
@@ -123,7 +124,7 @@ RadioIDList::addId(const QString &name, uint32_t id) {
 }
 
 bool
-RadioIDList::setDefaultId(unsigned idx) {
+RadioIDList::setDefaultId(int idx) {
   if (_default) {
     disconnect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
     if (0 <= indexOf(_default))
