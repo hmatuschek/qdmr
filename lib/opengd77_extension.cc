@@ -9,6 +9,11 @@ OpenGD77ChannelExtension::OpenGD77ChannelExtension(QObject *parent)
   // pass...
 }
 
+ConfigObject *
+OpenGD77ChannelExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  return nullptr;
+}
+
 OpenGD77ChannelExtension::Power
 OpenGD77ChannelExtension::power() const {
   return _power;
@@ -48,6 +53,11 @@ OpenGD77ContactExtension::OpenGD77ContactExtension(QObject *parent)
   : ConfigExtension("", parent), _timeSlotOverride(TimeSlotOverride::None)
 {
   // pass...
+}
+
+ConfigObject *
+OpenGD77ContactExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  return nullptr;
 }
 
 OpenGD77ContactExtension::TimeSlotOverride

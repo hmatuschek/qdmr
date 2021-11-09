@@ -8,7 +8,7 @@ SET(qdmr_SOURCES main.cc
   configobjectlistview.cc configobjecttableview.cc
   generalsettingsview.cc radioidlistview.cc contactlistview.cc grouplistsview.cc channellistview.cc
   zonelistview.cc scanlistsview.cc positioningsystemlistview.cc roamingzonelistview.cc
-  collapsablewidget.cc extensionwrapper.cc propertydelegate.ccerrormessageview.cc)
+  collapsablewidget.cc extensionwrapper.cc propertydelegate.cc errormessageview.cc)
 SET(qdmr_MOC_HEADERS
   configitemwrapper.hh
   application.hh settings.hh contactdialog.hh rxgrouplistdialog.hh

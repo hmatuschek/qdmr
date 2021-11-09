@@ -14,6 +14,16 @@
 /* ********************************************************************************************* *
  * Implementation of ScanList
  * ********************************************************************************************* */
+ScanList::ScanList(QObject *parent)
+  : ConfigObject("scan", parent), _name(), _channels(), _primary(), _secondary(), _revert()
+{
+  // Register "selected" channel tags for primary, secondary, revert and the channel list.
+  Context::setTag(metaObject()->className(), "primary", "!selected", SelectedChannel::get());
+  Context::setTag(metaObject()->className(), "secondary", "!selected", SelectedChannel::get());
+  Context::setTag(metaObject()->className(), "revert", "!selected", SelectedChannel::get());
+  Context::setTag(metaObject()->className(), "channels", "!selected", SelectedChannel::get());
+}
+
 ScanList::ScanList(const QString &name, QObject *parent)
   : ConfigObject("scan", parent), _name(name), _channels(), _primary(), _secondary(), _revert()
 {
@@ -45,7 +55,6 @@ ScanList::clear() {
   _channels.clear();
   emit modified(this);
 }
-
 
 const QString &
 ScanList::name() const {
@@ -173,6 +182,12 @@ ScanList::setRevertChannel(Channel *channel) {
   emit modified(this);
 }
 
+ConfigObject *
+ScanList::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+  return nullptr;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ScanLists
@@ -195,4 +210,18 @@ ScanLists::add(ConfigObject *obj, int row) {
   if (obj && obj->is<ScanList>())
     return ConfigObjectList::add(obj, row);
   return -1;
+}
+
+ConfigObject *
+ScanLists::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node)
+    return nullptr;
+
+  if (! node.IsMap()) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot create scan list: Expected object.";
+    return nullptr;
+  }
+
+  return new ScanList();
 }

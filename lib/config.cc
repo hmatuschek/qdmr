@@ -8,6 +8,7 @@
 #include <cmath>
 #include "csvreader.hh"
 #include "userdatabase.hh"
+#include "logger.hh"
 
 
 /* ********************************************************************************************* *
@@ -224,7 +225,6 @@ Config::requiresGPS() const {
   return chHasGPS;
 }
 
-
 void
 Config::clear() {
   ConfigObject::clear();
@@ -268,3 +268,137 @@ Config::readCSV(QTextStream &stream, QString &errorMessage)
   return true;
 }
 
+bool
+Config::readYAML(const QString &filename) {
+  YAML::Node node;
+  try {
+     node = YAML::LoadFile(filename.toStdString());
+  } catch (const YAML::Exception &err) {
+    errMsg() << "Cannot read YAML codeplug from file '"<< filename
+             << "': " << QString::fromStdString(err.msg) << ".";
+    return false;
+  }
+
+  if (! node) {
+    errMsg() << "Cannot read YAML codeplug from file '" << filename << "'.";
+    return false;
+  }
+
+  clear();
+  ConfigObject::Context context;
+
+  if (! parse(node, context))
+    return false;
+
+  if (! link(node, context))
+    return false;
+
+  return true;
+}
+
+ConfigObject *
+Config::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+  // No object is allocates here yet. All lists are allocated upon construction.
+  return nullptr;
+}
+
+bool
+Config::parse(const YAML::Node &node, Context &ctx)
+{
+  if (! node.IsMap()) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot read configuration"
+             << ": Element is not a map.";
+    return false;
+  }
+
+  if (node["version"] && node["version"].IsScalar()) {
+    ctx.setVersion(QString::fromStdString(node["version"].as<std::string>()));
+    logDebug() << "Using format version " << ctx.version() << ".";
+  } else {
+    logWarn() << "No version string set, assuming 0.9.0.";
+    ctx.setVersion("0.9.0");
+  }
+
+  if (! _settings->parse(node["settings"], ctx))
+    return false;
+  if (! _radioIDs->parse(node["radioIDs"], ctx))
+    return false;
+  if (! _contacts->parse(node["contacts"], ctx))
+    return false;
+  if (! _rxGroupLists->parse(node["groupLists"], ctx))
+    return false;
+  if (! _channels->parse(node["channels"], ctx))
+    return false;
+  if (! _zones->parse(node["zones"], ctx))
+    return false;
+  if (! _scanlists->parse(node["scanLists"], ctx))
+    return false;
+  if (! _gpsSystems->parse(node["positioning"], ctx))
+    return false;
+  if (! _roaming->parse(node["roaming"], ctx))
+    return false;
+
+  // also parses extensions
+  if (! ConfigObject::parse(node, ctx))
+    return false;
+
+  return true;
+}
+
+bool
+Config::link(const YAML::Node &node, const Context &ctx) {
+  // radio IDs must be linked before settings, as they may refer to the default DMR ID
+
+  if (! _radioIDs->link(node["radioIDs"], ctx))
+    return false;
+
+  if (! _settings->link(node["settings"], ctx))
+    return false;
+
+  // Link default radio ID separately as it is not a property of the settings but defined there
+  if (node["settings"] && node["settings"]["defaultID"] && node["settings"]["defaultID"].IsScalar()) {
+    YAML::Node defIDNode = node["settings"]["defaultID"];
+    QString id = QString::fromStdString(defIDNode.as<std::string>());
+    if (ctx.contains(id) && ctx.getObj(id)->is<RadioID>()) {
+      RadioID *def = ctx.getObj(id)->as<RadioID>();
+      radioIDs()->setDefaultId(radioIDs()->indexOf(def));
+      logDebug() << "Set default radio ID to '" << def->name() << "'.";
+    } else {
+      errMsg() << defIDNode.Mark().line << ":" << defIDNode.Mark().column
+               << "Default radio ID '" << id << " does not refer to a radio ID.";
+      return false;
+    }
+  } else if (radioIDs()->count()) {
+    // If no default is set, use first one.
+    radioIDs()->setDefaultId(0);
+  }
+
+  if (! _contacts->link(node["contacts"], ctx))
+    return false;
+
+  if (! _rxGroupLists->link(node["groupLists"], ctx))
+    return false;
+
+  if (! _channels->link(node["channels"], ctx))
+    return false;
+
+  if (! _zones->link(node["zones"], ctx))
+    return false;
+
+  if (! _scanlists->link(node["scanLists"], ctx))
+    return false;
+
+  if (! _gpsSystems->link(node["positioning"], ctx))
+    return false;
+
+  if (! _roaming->link(node["roaming"], ctx))
+    return false;
+
+  // also links extensions
+  if (! ConfigObject::link(node, ctx))
+    return false;
+
+  return true;
+}

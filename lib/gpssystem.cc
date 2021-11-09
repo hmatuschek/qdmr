@@ -8,6 +8,12 @@
 /* ********************************************************************************************* *
  * Implementation of PositioningSystem
  * ********************************************************************************************* */
+PositioningSystem::PositioningSystem(QObject *parent)
+  : ConfigObject("aprs", parent), _name(), _period(0)
+{
+  // pass...
+}
+
 PositioningSystem::PositioningSystem(const QString &name, unsigned period, QObject *parent)
   : ConfigObject("aprs", parent), _name(name), _period(period)
 {
@@ -16,6 +22,11 @@ PositioningSystem::PositioningSystem(const QString &name, unsigned period, QObje
 
 PositioningSystem::~PositioningSystem() {
   // pass...
+}
+
+ConfigObject *
+PositioningSystem::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  return nullptr;
 }
 
 const QString &
@@ -56,6 +67,20 @@ PositioningSystem::onReferenceModified() {
 /* ********************************************************************************************* *
  * Implementation of GPSSystem
  * ********************************************************************************************* */
+GPSSystem::GPSSystem(QObject *parent)
+  : PositioningSystem(parent), _contact(), _revertChannel()
+{
+  // Register '!selected' tag for revert channel
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+
+  // Allow revert channel to take a reference to the SelectedChannel singleton
+  _revertChannel.allow(SelectedChannel::get()->metaObject());
+
+  // Connect signals
+  connect(&_contact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_revertChannel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
 GPSSystem::GPSSystem(const QString &name, DigitalContact *contact,
                      DigitalChannel *revertChannel, unsigned period,
                      QObject *parent)
@@ -139,6 +164,14 @@ GPSSystem::revert() {
 /* ********************************************************************************************* *
  * Implementation of APRSSystem
  * ********************************************************************************************* */
+APRSSystem::APRSSystem(QObject *parent)
+  : PositioningSystem(parent), _channel(), _destination(), _destSSID(0),
+    _source(), _srcSSID(0), _path(), _icon(Icon::None), _message()
+{
+  // Connect to channel reference
+  connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
 APRSSystem::APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, unsigned destSSID,
                        const QString &src, unsigned srcSSID, const QString &path, Icon icon, const QString &message,
                        unsigned period, QObject *parent)
@@ -371,5 +404,28 @@ PositioningSystems::aprsSystem(int idx) const {
   return nullptr;
 }
 
+ConfigObject *
+PositioningSystems::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node)
+    return nullptr;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot create positioning system: Expected object with one child.";
+    return nullptr;
+  }
+
+  QString type = QString::fromStdString(node.begin()->first.as<std::string>());
+  if ("dmr" == type) {
+    return new GPSSystem();
+  } else if ("aprs"==type) {
+    return new APRSSystem();
+  }
+
+  errMsg() << node.Mark().line << ":" << node.Mark().column
+           << ": Cannot create positioning system: Unknown type '" << type << "'.";
+
+  return nullptr;
+}
 
 

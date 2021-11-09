@@ -22,19 +22,19 @@ class PositioningSystem: public ConfigObject
   Q_PROPERTY(unsigned period READ period WRITE setPeriod)
 
 protected:
+  /** Default constructor. */
+  explicit PositioningSystem(QObject *parent=nullptr);
   /** Hidden constructor.
    * The PositioningSystem class is not instantiated directly, use either @c GPSSystem or
    * @c APRSSystem instead.
    * @param name Specifies the name of the system.
    * @param period Specifies the auto-update period in seconds.
    * @param parent Specified the QObject parent object. */
-  explicit PositioningSystem(const QString &name, unsigned period=300, QObject *parent=nullptr);
+  PositioningSystem(const QString &name, unsigned period=300, QObject *parent=nullptr);
 
 public:
   /** Destructor. */
   virtual ~PositioningSystem();
-
-  using ConfigObject::serialize;
 
   /** Returns @c true if this positioning system is an instance of the specified system. */
   template <class System>
@@ -47,6 +47,8 @@ public:
   /** Casts this positioning system to an instance of the specified system. */
   template <class System>
   const System *as() const { return dynamic_cast<const System *>(this); }
+
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
   /** Returns the name of the GPS system. */
   const QString &name() const;
@@ -85,6 +87,8 @@ class GPSSystem : public PositioningSystem
   Q_PROPERTY(DigitalChannelReference* revert READ revert)
 
 public:
+  /** Default constructor. */
+  explicit GPSSystem(QObject *parent=nullptr);
   /** Constructor.
    *
    * Please note, that a contact needs to be set in order for the GPS system to work properly.
@@ -167,6 +171,8 @@ public:
   Q_ENUM(Icon)
 
 public:
+  /** Default constructor. */
+  explicit APRSSystem(QObject *parent=nullptr);
   /** Constructor for a APRS system.
    * @param name Specifies the name of the APRS system. This property is just a name, it does not
    *        affect the radio configuration.
@@ -182,10 +188,9 @@ public:
    * @param message An optional message to send.
    * @param period Specifies the auto-update period in seconds.
    * @param parent Specifies the QObject parent object. */
-  explicit APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, unsigned destSSID,
-                      const QString &src, unsigned srcSSID,
-                      const QString &path="", Icon icon=Icon::Jogger,
-                      const QString &message="", unsigned period=300, QObject *parent=nullptr);
+  APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, unsigned destSSID,
+             const QString &src, unsigned srcSSID, const QString &path="", Icon icon=Icon::Jogger,
+             const QString &message="", unsigned period=300, QObject *parent=nullptr);
 
   YAML::Node serialize(const Context &context);
 
@@ -282,6 +287,9 @@ public:
   /** Returns the APRS system at index @c idx.
    * That index is only within all defined APRS systems. */
   APRSSystem *aprsSystem(int idx) const;
+
+public:
+  ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx);
 };
 
 

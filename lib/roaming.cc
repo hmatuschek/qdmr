@@ -6,10 +6,21 @@
 /* ********************************************************************************************* *
  * Implementation of RoamingZone
  * ********************************************************************************************* */
+RoamingZone::RoamingZone(QObject *parent)
+  : ConfigObject("roam", parent), _name(), _channel()
+{
+  // pass...
+}
+
 RoamingZone::RoamingZone(const QString &name, QObject *parent)
   : ConfigObject("roam", parent), _name(name), _channel()
 {
   // pass...
+}
+
+ConfigObject *
+RoamingZone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  return nullptr;
 }
 
 RoamingZone &
@@ -138,4 +149,18 @@ RoamingZoneList::add(ConfigObject *obj, int row) {
   if (obj && obj->is<RoamingZone>())
     return ConfigObjectList::add(obj, row);
   return -1;
+}
+
+ConfigObject *
+RoamingZoneList::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node)
+    return nullptr;
+
+  if (! node.IsMap()) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot create roaming zone: Expected object.";
+    return nullptr;
+  }
+
+  return new RoamingZone();
 }

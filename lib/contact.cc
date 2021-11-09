@@ -1,11 +1,18 @@
 #include "contact.hh"
 #include "config.hh"
 #include "utils.hh"
+#include "logger.hh"
 
 
 /* ********************************************************************************************* *
  * Implementation of Contact
  * ********************************************************************************************* */
+Contact::Contact(QObject *parent)
+  : ConfigObject("cont", parent), _name(), _ring(false)
+{
+  // pass...
+}
+
 Contact::Contact(const QString &name, bool rxTone, QObject *parent)
   : ConfigObject("cont", parent), _name(name), _ring(rxTone)
 {
@@ -35,10 +42,38 @@ Contact::setRing(bool enable) {
   emit modified(this);
 }
 
+ConfigObject *
+Contact::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+  // There are no children yet
+  return nullptr;
+}
+
+bool
+Contact::parse(const YAML::Node &node, Context &ctx) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot parse contact: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node cnt = node.begin()->second;
+  return ConfigObject::parse(cnt, ctx);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of DTMFContact
  * ********************************************************************************************* */
+DTMFContact::DTMFContact(QObject *parent)
+  : Contact(parent), _number()
+{
+  // pass...
+}
+
 DTMFContact::DTMFContact(const QString &name, const QString &number, bool rxTone, QObject *parent)
   : Contact(name, rxTone, parent), _number(number.simplified())
 {
@@ -74,6 +109,12 @@ DTMFContact::serialize(const Context &context) {
 /* ********************************************************************************************* *
  * Implementation of DigitalContact
  * ********************************************************************************************* */
+DigitalContact::DigitalContact(QObject *parent)
+  : Contact(parent), _type(PrivateCall), _number(0)
+{
+  // pass...
+}
+
 DigitalContact::DigitalContact(Type type, const QString &name, unsigned number, bool rxTone, QObject *parent)
   : Contact(name, rxTone, parent), _type(type), _number(number)
 {
@@ -214,5 +255,31 @@ ContactList::dtmfContact(int idx) const {
         idx--;
     }
   }
+  return nullptr;
+}
+
+ConfigObject *
+ContactList::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+  Q_UNUSED(ctx)
+
+  if (! node)
+    return nullptr;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot create contact: Expected object with one child.";
+    return nullptr;
+  }
+
+  QString type = QString::fromStdString(node.begin()->first.as<std::string>());
+  if ("dmr" == type) {
+    return new DigitalContact();
+  } else if ("dtmf" == type) {
+    return new DTMFContact();
+  }
+
+  errMsg() << node.Mark().line << ":" << node.Mark().column
+           << ": Cannot create contact: Unknown type '" << type << "'.";
+
   return nullptr;
 }

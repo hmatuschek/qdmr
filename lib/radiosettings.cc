@@ -19,6 +19,11 @@ RadioSettings::clear() {
   disableTOT();
 }
 
+ConfigObject *
+RadioSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  return nullptr;
+}
+
 const QString &
 RadioSettings::introLine1() const {
   return _introLine1;

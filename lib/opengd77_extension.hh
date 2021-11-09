@@ -41,6 +41,8 @@ public:
   explicit OpenGD77ChannelExtension(QObject *parent=nullptr);
 
 public:
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+
   /** Returns the power settings for the channel. */
   Power power() const;
   /** Sets the power setting. */
@@ -93,6 +95,8 @@ public:
 public:
   /** Constructor. */
   explicit OpenGD77ContactExtension(QObject *parent=nullptr);
+
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
   /** Returns the time slot override. */
   TimeSlotOverride timeSlotOverride() const;

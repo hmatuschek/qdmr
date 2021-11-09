@@ -61,7 +61,7 @@ public:
   /** Constructor. */
   explicit TyTButtonSettings(QObject *parent=nullptr);
 
-  bool label(Context &context);
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
   /** Returns the action for the side button 1 short-press. */
   ButtonAction sideButton1Short() const;

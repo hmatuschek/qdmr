@@ -19,7 +19,8 @@
 #include <QAbstractProxyModel>
 #include <QMetaEnum>
 
-#include <QDebug>
+#include "opengd77_extension.hh"
+
 
 /* ********************************************************************************************* *
  * Implementation of Channel
@@ -227,6 +228,65 @@ Channel::populate(YAML::Node &node, const Context &context) {
   return true;
 }
 
+ConfigObject *
+Channel::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(node); Q_UNUSED(ctx)
+  if (0 == strcmp("opengd77", prop.name())) {
+    return new OpenGD77ChannelExtension();
+  }
+
+  errMsg() << "Cannot allocate instance for unknown child '" << prop.name() << "'.";
+  return nullptr;
+}
+
+bool
+Channel::parse(const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot parse channel: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node ch = node.begin()->second;
+  if ((!ch["power"]) || ("!default" == ch["power"].Tag())) {
+    setDefaultPower();
+  } else if (ch["power"] && ch["power"].IsScalar()) {
+    QMetaEnum meta = QMetaEnum::fromType<Channel::Power>();
+    setPower((Channel::Power)meta.keyToValue(ch["power"].as<std::string>().c_str()));
+  }
+
+  if ((!ch["timeout"]) || ("!default" == ch["timeout"].Tag())) {
+    setDefaultTimeout();
+  } else if (ch["timeout"] && ch["timeout"].IsScalar()) {
+    setTimeout(ch["timeout"].as<unsigned>());
+  }
+
+  if ((!ch["vox"]) || ("!default" == ch["vox"].Tag())) {
+    setVOXDefault();
+  } else if (ch["vox"] && ch["vox"].IsScalar()) {
+    setVOX(ch["vox"].as<unsigned>());
+  }
+
+  return ConfigObject::parse(ch, ctx);
+}
+
+bool
+Channel::link(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot link channel: Expected object with one child.";
+    return false;
+  }
+
+  return ConfigObject::link(node.begin()->second, ctx);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnalogChannel
@@ -394,6 +454,50 @@ AnalogChannel::populate(YAML::Node &node, const Context &context) {
   }
 
   return true;
+}
+
+bool
+AnalogChannel::parse(const YAML::Node &node, Context &ctx) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot parse analog channel: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node ch = node.begin()->second;
+
+  setRXTone(Signaling::SIGNALING_NONE);
+  if (ch["rxTone"] && ch["rxTone"].IsMap()) {
+    if (ch["rxTone"]["ctcss"] && ch["rxTone"]["ctcss"].IsScalar()) {
+      setRXTone(Signaling::fromCTCSSFrequency(ch["rxTone"]["ctcss"].as<double>()));
+    } else if (ch["rxTone"]["dcs"] && ch["rxTone"]["dcs"].IsScalar()) {
+      int code = ch["rxTone"]["dcs"].as<int>();
+      bool inverted = (code < 0); code = std::abs(code);
+      setRXTone(Signaling::fromDCSNumber(code, inverted));
+    }
+  }
+
+  setTXTone(Signaling::SIGNALING_NONE);
+  if (ch["txTone"] && ch["txTone"].IsMap()) {
+    if (ch["txTone"]["ctcss"] && ch["txTone"]["ctcss"].IsScalar()) {
+      setTXTone(Signaling::fromCTCSSFrequency(ch["txTone"]["ctcss"].as<double>()));
+    } else if (ch["txTone"]["dcs"] && ch["txTone"]["dcs"].IsScalar()) {
+      int code = ch["txTone"]["dcs"].as<int>();
+      bool inverted = (code < 0); code = std::abs(code);
+      setTXTone(Signaling::fromDCSNumber(code, inverted));
+    }
+  }
+
+  if ((!ch["squelch"]) || ("!default" == ch["squelch"].Tag())) {
+    setSquelchDefault();
+  } else if (ch["squelch"].IsDefined() && ch["squelch"].IsScalar()) {
+    setSquelch(ch["squelch"].as<unsigned>());
+  }
+
+  return Channel::parse(node, ctx);
 }
 
 
@@ -676,6 +780,31 @@ ChannelList::findAnalogChannelByTxFreq(double freq) const {
     if (1e-5 > std::abs(channel(i)->txFrequency()-freq))
       return channel(i)->as<AnalogChannel>();
   }
+  return nullptr;
+}
+
+ConfigObject *
+ChannelList::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+  Q_UNUSED(ctx)
+  if (! node)
+    return nullptr;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot create channel: Expected object with one child.";
+    return nullptr;
+  }
+
+  QString type = QString::fromStdString(node.begin()->first.as<std::string>());
+  if (("digital" == type) || ("dmr" == type)) {
+    return new DigitalChannel();
+  } else if (("analog" == type) || ("fm"==type)) {
+    return new AnalogChannel();
+  }
+
+  errMsg() << node.Mark().line << ":" << node.Mark().column
+           << ": Cannot create channel: Unknown type '" << type << "'.";
+
   return nullptr;
 }
 

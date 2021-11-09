@@ -17,11 +17,14 @@ class RadioID : public ConfigObject
   Q_PROPERTY(unsigned number READ number WRITE setNumber)
 
 public:
+  /** Default constructor. */
+  explicit RadioID(QObject *parent=nullptr);
+
   /** Constructor.
    * @param name Specifies the name of the ID.
    * @param number Specifies the DMR ID.
    * @param parent Specifies the parent QObject owning this object. */
-  explicit RadioID(const QString &name, uint32_t number, QObject *parent = nullptr);
+  RadioID(const QString &name, uint32_t number, QObject *parent = nullptr);
 
   /** Returns the name of the DMR ID. */
   const QString &name() const;
@@ -34,6 +37,9 @@ public:
   void setNumber(uint32_t number);
 
   YAML::Node serialize(const Context &context);
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  bool parse(const YAML::Node &node, ConfigObject::Context &ctx);
+  bool link(const YAML::Node &node, const ConfigObject::Context &ctx);
 
 signals:
   /** Gets emitted once the DMR is changed. */
@@ -97,6 +103,9 @@ public:
   virtual int addId(const QString &name, uint32_t id);
   /** Deletes and removes the given DMR ID. */
   virtual bool delId(uint32_t id);
+
+public:
+  ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx);
 
 protected slots:
   /** Gets call whenever the default DMR ID gets deleted. */

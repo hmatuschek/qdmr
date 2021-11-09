@@ -11,6 +11,12 @@ RadioID::RadioID(const QString &name, uint32_t id, QObject *parent)
   // pass...
 }
 
+RadioID::RadioID(QObject *parent)
+  : ConfigObject("id", parent), _name(""), _number(0)
+{
+  // pass...
+}
+
 const QString &
 RadioID::name() const {
   return _name;
@@ -43,6 +49,39 @@ RadioID::serialize(const Context &context) {
   node.SetStyle(YAML::EmitterStyle::Flow);
   type["dmr"] = node;
   return type;
+}
+
+ConfigObject *
+RadioID::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  return nullptr;
+}
+
+bool
+RadioID::parse(const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot parse radio id: Expected object with one child.";
+    return false;
+  }
+
+  return ConfigObject::parse(node.begin()->second, ctx);
+}
+
+bool
+RadioID::link(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot link radio id: Expected object with one child.";
+    return false;
+  }
+
+  return ConfigObject::link(node.begin()->second, ctx);
 }
 
 
@@ -147,6 +186,29 @@ RadioIDList::setDefaultId(int idx) {
 bool
 RadioIDList::delId(uint32_t id) {
   return del(find(id));
+}
+
+
+ConfigObject *
+RadioIDList::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node)
+    return nullptr;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot create radio id: Expected object with one child.";
+    return nullptr;
+  }
+
+  QString type = QString::fromStdString(node.begin()->first.as<std::string>());
+  if ("dmr" == type) {
+    return new RadioID();
+  }
+
+  errMsg() << node.Mark().line << ":" << node.Mark().column
+           << ": Cannot create radio id: Unknown type '" << type << "'.";
+
+  return nullptr;
 }
 
 void

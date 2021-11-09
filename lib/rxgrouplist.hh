@@ -21,10 +21,12 @@ class RXGroupList: public ConfigObject
   Q_PROPERTY(DigitalContactRefList* contacts READ contacts)
 
 public:
+  /** Default constructor. */
+  explicit RXGroupList(QObject *parent=nullptr);
   /** Constructor.
    * @param name Specifies the name of the group list.
    * @param parent @c QObject parent instance. */
-	explicit RXGroupList(const QString &name, QObject *parent=nullptr);
+  RXGroupList(const QString &name, QObject *parent=nullptr);
 
   /** Copy from other group list. */
   RXGroupList &operator =(const RXGroupList &other);
@@ -53,7 +55,9 @@ public:
   /** Returns the contact list. */
   DigitalContactRefList *contacts();
 
+public:
   YAML::Node serialize(const Context &context);
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
 protected slots:
   /** Internal used callback to handle list modifications. */
@@ -81,6 +85,9 @@ public:
 	RXGroupList *list(int idx) const;
 
   int add(ConfigObject *obj, int row=-1);
+
+public:
+  ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx);
 };
 
 #endif // RXGROUPLIST_HH

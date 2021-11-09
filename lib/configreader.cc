@@ -169,7 +169,7 @@ AbstractConfigReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
         // check for tags
         QString tag = QString::fromStdString(it->Tag());
         if ((!it->Scalar().size()) && (!tag.isEmpty())) {
-          if (0>refs->add(ctx.getTag(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
+          if (0 > refs->add(ctx.getTag(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
             _errorMessage = tr("%1:%2: Cannot set %3 for %4 of %5.")
                 .arg(it->Mark().line).arg(it->Mark().column).arg(tag).arg(prop.name()).arg(meta->className());
             logError() << _errorMessage;
@@ -1301,7 +1301,7 @@ ConfigObject *
 RadioIdReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
-  return new RadioID("", 0);
+  return new RadioID();
 }
 
 bool
@@ -1557,7 +1557,7 @@ ConfigObject *
 ZoneReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
-  return new Zone("");
+  return new Zone();
 }
 
 bool
@@ -1752,7 +1752,7 @@ ConfigObject *
 GPSSystemReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
-  return new GPSSystem("");
+  return new GPSSystem();
 }
 
 bool
@@ -1899,7 +1899,7 @@ ConfigObject *
 ScanListReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
-  return new ScanList("");
+  return new ScanList();
 }
 
 bool
@@ -1952,7 +1952,7 @@ ConfigObject *
 GroupListReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
-  return new RXGroupList("");
+  return new RXGroupList();
 }
 
 bool
@@ -2007,7 +2007,7 @@ ConfigObject *
 RoamingReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
-  return new RoamingZone("");
+  return new RoamingZone();
 }
 
 bool

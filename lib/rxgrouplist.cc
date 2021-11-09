@@ -16,6 +16,14 @@
 /* ********************************************************************************************* *
  * Implementation of RXGroupList
  * ********************************************************************************************* */
+RXGroupList::RXGroupList(QObject *parent)
+  : ConfigObject("grp", parent), _name(), _contacts()
+{
+  connect(&_contacts, SIGNAL(elementModified(int)), this, SLOT(onModified()));
+  connect(&_contacts, SIGNAL(elementRemoved(int)), this, SLOT(onModified()));
+  connect(&_contacts, SIGNAL(elementAdded(int)), this, SLOT(onModified()));
+}
+
 RXGroupList::RXGroupList(const QString &name, QObject *parent)
   : ConfigObject("grp", parent), _name(name), _contacts()
 {
@@ -91,6 +99,13 @@ RXGroupList::serialize(const Context &context) {
   return node;
 }
 
+ConfigObject *
+RXGroupList::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+  // There are no children yet.
+  return nullptr;
+}
+
 void
 RXGroupList::onModified() {
   emit modified(this);
@@ -121,4 +136,19 @@ RXGroupLists::add(ConfigObject *obj, int row) {
   return -1;
 }
 
+ConfigObject *
+RXGroupLists::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+  Q_UNUSED(ctx)
+
+  if (! node)
+    return nullptr;
+
+  if (! node.IsMap()) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot create group list: Expected object.";
+    return nullptr;
+  }
+
+  return new RXGroupList();
+}
 

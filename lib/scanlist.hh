@@ -25,6 +25,8 @@ class ScanList : public ConfigObject
   Q_PROPERTY(ChannelRefList * channels READ channels)
 
 public:
+  /** Default constructor. */
+  explicit ScanList(QObject *parent=nullptr);
   /** Constructs a scan list with the given name. */
 	ScanList(const QString &name, QObject *parent=nullptr);
 
@@ -83,6 +85,9 @@ public:
   /** Sets the TX channel. */
   void setRevertChannel(Channel *channel);
 
+public:
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+
 protected:
   /** The scanlist name. */
 	QString _name;
@@ -112,12 +117,8 @@ public:
 
   int add(ConfigObject *obj, int row=-1);
 
-	/** Implementation of QAbstractListModel, returns the number of scanlists. */
-	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  /** Implementation of QAbstractListModel, returns the item data at the given index. */
-	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-  /** Implementation of QAbstractListModel, returns the header data at the given section. */
-	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+public:
+  ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx);
 };
 
 

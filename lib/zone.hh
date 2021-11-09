@@ -23,8 +23,10 @@ class Zone : public ConfigObject
   Q_PROPERTY(ChannelRefList* B READ B)
 
 public:
+  /** Default constructor. */
+  explicit Zone(QObject *parent=nullptr);
   /** Constructs an empty Zone with the given name. */
-	explicit Zone(const QString &name, QObject *parent = nullptr);
+  Zone(const QString &name, QObject *parent = nullptr);
 
   /** Copies the given zone. */
   Zone &operator =(const Zone &other);
@@ -50,6 +52,9 @@ signals:
   /** Gets emitted whenever the zone gets modified. */
 	void modified();
 
+public:
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+
 protected:
   /** Holds the name of the zone. */
 	QString _name;
@@ -74,6 +79,9 @@ public:
 	Zone *zone(int idx) const;
 
   int add(ConfigObject *obj, int row=-1);
+
+public:
+  ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx);
 };
 
 

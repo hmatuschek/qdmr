@@ -8,6 +8,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "errorstack.hh"
+
 // Forward declaration
 class ConfigExtension;
 
@@ -19,7 +21,7 @@ class ConfigExtension;
  * codeplug element that gets referenced somewhere else, needs an ID.
  *
  * @ingroup config */
-class ConfigObject : public QObject
+class ConfigObject : public QObject, public ErrorStack
 {
   Q_OBJECT
 
@@ -90,6 +92,14 @@ public:
   /** Recursively serializes the configuration to YAML nodes.
    * The complete configuration must be labeled first. */
   virtual YAML::Node serialize(const Context &context);
+
+  /** Allocates an instance for the given property on the given YAML node. */
+  virtual ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) = 0;
+  /** Parses the given YAML node, updates the given object and updates the given context (IDs). */
+  virtual bool parse(const YAML::Node &node, ConfigObject::Context &ctx);
+  /** Links the given object to the rest of the codeplug using the given context. */
+  virtual bool link(const YAML::Node &node, const ConfigObject::Context &ctx);
+
   /** Clears the config object. */
   virtual void clear();
 
@@ -172,7 +182,7 @@ protected:
 
 /** Generic list class for config objects.
  * @ingroup config */
-class AbstractConfigObjectList: public QObject
+class AbstractConfigObjectList: public QObject, public ErrorStack
 {
   Q_OBJECT
 
@@ -254,6 +264,10 @@ public:
   bool take(ConfigObject *obj);
   bool del(ConfigObject *obj);
   void clear();
+
+  virtual ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) = 0;
+  virtual bool parse(const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool link(const YAML::Node &node, const ConfigObject::Context &ctx);
 
   bool label(ConfigObject::Context &context);
   YAML::Node serialize(const ConfigObject::Context &context);

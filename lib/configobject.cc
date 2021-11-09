@@ -5,6 +5,28 @@
 #include <QMetaProperty>
 #include <QMetaEnum>
 
+// Helper function to extract key names for a QMetaEnum
+inline QStringList enumKeys(const QMetaEnum &e) {
+  QStringList lst;
+  for (int i=0; i<e.keyCount(); i++)
+    lst.push_back(e.key(i));
+  return lst;
+}
+
+template <class T>
+bool propIsInstance(QMetaProperty &prop) {
+  if (QMetaType::UnknownType == prop.userType())
+    return false;
+  QMetaType type(prop.userType());
+  if (! (QMetaType::PointerToQObject & type.flags()))
+    return false;
+  const QMetaObject *propType = type.metaObject();
+  for (; nullptr != propType; propType = propType->superClass()) {
+    if (0==strcmp(T::staticMetaObject.className(), propType->className()))
+      return true;
+  }
+  return false;
+}
 
 /* ********************************************************************************************* *
  * Implementation of ConfigObject::Context
@@ -109,7 +131,7 @@ ConfigObject::Context::setTag(const QString &className, const QString &property,
  * Implementation of ConfigObject
  * ********************************************************************************************* */
 ConfigObject::ConfigObject(const QString &idBase, QObject *parent)
-  : QObject(parent), _idBase(idBase), _extensions()
+  : QObject(parent), ErrorStack(), _idBase(idBase), _extensions()
 {
   // pass...
 }
@@ -130,7 +152,27 @@ ConfigObject::label(Context &context) {
     id=QString("%1%2").arg(_idBase).arg(++n);
   }
 
-  return context.add(id, this);
+  if (! context.add(id, this))
+    return false;
+
+  // Label properties owning config objects, that is of type ConfigObject or ConfigObjectList
+  const QMetaObject *meta = metaObject();
+  for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
+    QMetaProperty prop = meta->property(p);
+    if (! prop.isValid())
+      continue;
+    if (prop.read(this).value<ConfigObjectList *>()) {
+      ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>();
+      if (! lst->label(context))
+        return false;
+    } else if (prop.read(this).value<ConfigObject *>()) {
+      ConfigObject *obj = prop.read(this).value<ConfigObject *>();
+      if (! obj->label(context))
+        return false;
+    }
+  }
+
+  return true;
 }
 
 YAML::Node
@@ -146,6 +188,20 @@ ConfigObject::clear() {
   foreach (ConfigObject *extension, _extensions)
     extension->deleteLater();
   _extensions.clear();
+
+  // Delete or clear all object owned by properites, that is ConfigObjectList and ConfigObject
+  const QMetaObject *meta = metaObject();
+  for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
+    QMetaProperty prop = meta->property(p);
+    if (! prop.isValid())
+      continue;
+    if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
+      lst->clear();
+    } else if (ConfigObject *obj = prop.read(this).value<ConfigObject *>()) {
+      obj->deleteLater();
+    }
+  }
+
 }
 
 bool
@@ -181,8 +237,7 @@ ConfigObject::populate(YAML::Node &node, const Context &context){
       node[prop.name()] = this->property(prop.name()).toDouble();
     } else if (QString("QString") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).toString().toStdString();
-    } else if (prop.read(this).value<ConfigObjectReference *>()) {
-      ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>();
+    } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
       ConfigObject *obj = ref->as<ConfigObject>();
       if (nullptr == obj)
         continue;
@@ -197,9 +252,8 @@ ConfigObject::populate(YAML::Node &node, const Context &context){
         return false;
       }
       node[prop.name()] = context.getId(obj).toStdString();
-    } else if (prop.read(this).value<ConfigObjectRefList *>()) {
-      ConfigObjectRefList *refs = prop.read(this).value<ConfigObjectRefList *>();
-      //logDebug() << "Serialize obj list w/ " << refs->count() << " elements." ;
+    } else if (ConfigObjectRefList *refs = prop.read(this).value<ConfigObjectRefList *>()) {
+      //logDebug() << "Serialize obj ref list w/ " << refs->count() << " elements." ;
       YAML::Node list = YAML::Node(YAML::NodeType::Sequence);
       list.SetStyle(YAML::EmitterStyle::Flow);
       for (int i=0; i<refs->count(); i++) {
@@ -218,6 +272,12 @@ ConfigObject::populate(YAML::Node &node, const Context &context){
         list.push_back(context.getId(obj).toStdString());
       }
       node[prop.name()] = list;
+    } else if (ConfigObject *obj = prop.read(this).value<ConfigObject *>()) {
+      // Serialize config objects in-place.
+      node[prop.name()] = obj->serialize(context);
+    } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
+      // Serialize config object lists in-place.
+      node[prop.name()] = lst->serialize(context);
     } else {
       logDebug() << "Unhandled property " << prop.name()
                  << " of unknown type " << prop.typeName() << ".";
@@ -231,6 +291,295 @@ ConfigObject::populate(YAML::Node &node, const Context &context){
       return false;
     node[name.toStdString()] = extNode;
   }
+  return true;
+}
+
+bool
+ConfigObject::parse(const YAML::Node &node, ConfigObject::Context &ctx) {
+  Q_UNUSED(ctx)
+
+  if (! node)
+    return false;
+
+  if (! node.IsMap()) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot parse element: Expected object.";
+    return false;
+  }
+
+  if (! node["id"]) {
+    logWarn() << node.Mark().line << ":" << node.Mark().column
+              << ": No id specified for " << metaObject()->className()
+              << ". Object cannot be referenced later.";
+  } else {
+    QString id = QString::fromStdString(node["id"].as<std::string>());
+    if (! ctx.add(id, this)) {
+      errMsg() << node["id"].Mark().line << ":" << node["id"].Mark().column
+               << ": Cannot register ID '" << id << "'.";
+      return false;
+    }
+  }
+
+  const QMetaObject *meta = this->metaObject();
+  for (int p=QObject::staticMetaObject.propertyOffset(); p<meta->propertyCount(); p++) {
+    QMetaProperty prop = meta->property(p);
+
+    if (! prop.isValid())
+      continue;
+
+    if (prop.isEnumType()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check enum key
+      if (! node[prop.name()].IsScalar()) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot parse " << prop.name() << " of " << meta->className()
+                 << ": Expected enum key.";
+        return false;
+      }
+      QMetaEnum e = prop.enumerator();
+      std::string key = node[prop.name()].as<std::string>();
+      bool ok=true; int value = e.keyToValue(key.c_str(), &ok);
+      if (! ok) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Unknown key '" << key.c_str() << "' for enum '" << prop.name()
+                 << "'. Expected one of " << enumKeys(e).join(", ") << ".";
+        return false;
+      }
+      // finally set property
+      prop.write(this, value);
+    } else if (QString("bool") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot parse " << prop.name() << " of " << meta->className()
+                 << ": Expected boolean value.";
+        return false;
+      }
+      prop.write(this, node[prop.name()].as<bool>());
+    } else if (QString("int") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot parse " << prop.name() << " of " << meta->className()
+                 << ": Expected integer value.";
+        return false;
+      }
+      prop.write(this, node[prop.name()].as<int>());
+    } else if (QString("uint") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot parse " << prop.name() << " of " << meta->className()
+                 << ": Expected unsigned integer value.";
+        return false;
+      }
+      prop.write(this, node[prop.name()].as<unsigned>());
+    } else if (QString("double") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot parse " << prop.name() << " of " << meta->className()
+                 << ": Expected floating point value.";
+        return false;
+      }
+      prop.write(this, node[prop.name()].as<double>());
+    } else if (QString("QString") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot parse " << prop.name() << " of " << meta->className()
+                 << ": Expected string.";
+        return false;
+      }
+      prop.write(this, QString::fromStdString(node[prop.name()].as<std::string>()));
+    } else if (prop.read(this).value<ConfigObjectReference *>()) {
+      // references are linked later
+      continue;
+    } else if (prop.read(this).value<ConfigObjectRefList *>()) {
+      // reference lists are linked later
+      continue;
+    } else if (propIsInstance<ConfigObject>(prop)) {
+      if (! node[prop.name()])
+        continue;
+      // check type
+      if (! node[prop.name()].IsMap()) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot parse " << prop.name() << " of " << meta->className()
+                 << ": Expected instance of '"
+                 << QMetaType::metaObjectForType(prop.userType())->className() << "'.";
+        return false;
+      }
+      // allocate instance
+      ConfigObject *obj = this->allocateChild(prop, node[prop.name()], ctx);
+      if (nullptr == obj) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot parse " << prop.name() << " of " << meta->className() << ".";
+        return false;
+      }
+      // parse instance
+      if (! obj->parse(node[prop.name()], ctx)) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot parse " << prop.name() << " of " << meta->className() << ".";
+        obj->deleteLater();
+        return false;
+      }
+      // Set property
+      prop.write(this, QVariant::fromValue(obj));
+    } else {
+      logDebug() << "Unhandled property " << prop.name()
+                 << " of unhandled type " << prop.typeName() << ".";
+    }
+  }
+
+  return true;
+}
+
+bool
+ConfigObject::link(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  Q_UNUSED(ctx)
+
+  const QMetaObject *meta = this->metaObject();
+
+  for (int p=QObject::staticMetaObject.propertyOffset(); p<meta->propertyCount(); p++) {
+    QMetaProperty prop = meta->property(p);
+    if (! prop.isValid())
+      continue;
+    if ((prop.isEnumType()) || (QString("bool") == prop.typeName()) || (QString("int") == prop.typeName()) ||
+        (QString("uint") == prop.typeName()) || (QString("double") == prop.typeName()) || (QString("QString") == prop.typeName()) ) {
+      continue;
+    } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
+      // If not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // check type
+      if (! node[prop.name()].IsScalar()) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot link " << prop.name() << " of " << meta->className()
+                 << ": Expected id.";
+        return false;
+      }
+      // handle tags
+      QString tag = QString::fromStdString(node[prop.name()].Tag());
+      if ((!node[prop.name()].Scalar().size()) && (!tag.isEmpty())) {
+        if (! ref->set(ctx.getTag(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
+          errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                   << ": Cannot link " << prop.name() << " of " << meta->className()
+                   << ": Uknown tag " << tag << ".";
+          return false;
+        }
+        continue;
+      }
+      // set reference
+      QString id = QString::fromStdString(node[prop.name()].as<std::string>());
+      if (! ref->set(ctx.getObj(id))) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot link " << prop.name() << " of " << meta->className()
+                 << ": Cannot set reference.";
+        return false;
+      }
+    } else if (ConfigObjectRefList *lst = prop.read(this).value<ConfigObjectRefList *>()) {
+      // If not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // check type
+      if (! node[prop.name()].IsSequence()) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot link " << prop.name() << " of " << meta->className()
+                 << ": Expected sequence.";
+        return false;
+      }
+      for (YAML::const_iterator it=node[prop.name()].begin(); it!=node[prop.name()].end(); it++) {
+        if (! it->IsScalar()) {
+          errMsg() << it->Mark().line << ":" << it->Mark().column
+                   << ": Cannot link " << prop.name() << " of " << meta->className()
+                   << ": Expected ID string.";
+          return false;
+        }
+        // check for tags
+        QString tag = QString::fromStdString(it->Tag());
+        if ((!it->Scalar().size()) && (!tag.isEmpty())) {
+          if (0 > lst->add(ctx.getTag(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
+            errMsg() << it->Mark().line << ":" << it->Mark().column
+                     << ": Cannot link " << prop.name() << " of " << meta->className()
+                     << ": Cannot add referece for tag '" << tag << "'.";
+            return false;
+          }
+          continue;
+        }
+        QString id = QString::fromStdString(it->as<std::string>());
+        if (! ctx.contains(id)) {
+          errMsg() << it->Mark().line << ":" << it->Mark().column
+                   << ": Cannot link " << prop.name() << " of " << meta->className()
+                   << ": Reference '" << id << "' not defined.";
+          return false;
+        }
+        if (0 > lst->add(ctx.getObj(id))) {
+          errMsg() << it->Mark().line << ":" << it->Mark().column
+                   << ": Cannot link " << prop.name() << " of " << meta->className()
+                   << ": Cannot add reference to '" << id << "' to list.";
+          return false;
+        }
+      }
+
+    } else if (ConfigObject *obj = prop.read(this).value<ConfigObject *>()) {
+      // If not set -> skip
+      if (! node[prop.name()])
+        continue;
+
+      // check type
+      if (! node[prop.name()].IsMap()) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot link " << prop.name() << " of " << meta->className()
+                 << ": Expected object.";
+        return false;
+      }
+
+      if (! obj->link(node[prop.name()], ctx)) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot link " << prop.name() << " of " << meta->className() << ".";
+        return false;
+      }
+    } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
+      // If not set -> skip
+      if (! node[prop.name()])
+        continue;
+
+      // check type
+      if (! node[prop.name()].IsSequence()) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot link " << prop.name() << " of " << meta->className()
+                 << ": Expected sequence.";
+        return false;
+      }
+
+      if (! lst->link(node[prop.name()], ctx)) {
+        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                 << ": Cannot link " << prop.name() << " of " << meta->className() << ".";
+        return false;
+      }
+    } else {
+      logDebug() << "Unhandled property " << prop.name()
+                 << " of unhandled type " << prop.typeName() << ".";
+    }
+  }
+
   return true;
 }
 
@@ -330,7 +679,7 @@ ConfigExtension::populate(YAML::Node &node, const Context &context) {
  * Implementation of AbstractConfigObjectList
  * ********************************************************************************************* */
 AbstractConfigObjectList::AbstractConfigObjectList(const QMetaObject &elementType, QObject *parent)
-  : QObject(parent), _elementType(elementType), _items()
+  : QObject(parent), ErrorStack(), _elementType(elementType), _items()
 {
   // pass...
 }
@@ -478,6 +827,70 @@ ConfigObjectList::serialize(const ConfigObject::Context &context) {
     list.push_back(node);
   }
   return list;
+}
+
+bool
+ConfigObjectList::parse(const YAML::Node &node, ConfigObject::Context &ctx) {
+  if (! node)
+    return false;
+
+  if (!node.IsSequence()) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot parse list: Expected list.";
+    return false;
+  }
+
+  for (YAML::Node::const_iterator it=node.begin(); it!=node.end(); it++) {
+    // Create object for node
+    ConfigObject *element = allocateChild(*it, ctx);
+    if (nullptr == element) {
+      errMsg() << it->Mark().line << ":" << it->Mark().column << ": Cannot parse list.";
+      return false;
+    }
+    if (! element->parse(*it, ctx)) {
+      errMsg() << it->Mark().line << ":" << it->Mark().column << ": Cannot parse list.";
+      element->deleteLater();
+      return false;
+    }
+    if (0 > add(element)) {
+      errMsg() << it->Mark().line << ":" << it->Mark().column
+               << ": Cannot add element to list.";
+      element->deleteLater();
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool
+ConfigObjectList::link(const YAML::Node &node, const ConfigObject::Context &ctx) {
+  if (! node)
+    return false;
+
+  if (!node.IsSequence()) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot parse list: Expected list.";
+    return false;
+  }
+  int i = 0;
+  YAML::Node::const_iterator it=node.begin();
+  for (; it!=node.end(); it++, i++) {
+    // Create object for node
+    ConfigObject *element = get(i);
+    if (nullptr == element) {
+      errMsg() << it->Mark().line << ":" << it->Mark().column
+               << ": Cannot link list, " << i << "-th element not present.";
+      return false;
+    }
+    if (! element->link(*it, ctx)) {
+      errMsg() << it->Mark().line << ":" << it->Mark().column
+               << ": Cannot link list.";
+      return false;
+    }
+  }
+
+  return true;
 }
 
 int ConfigObjectList::add(ConfigObject *obj, int row) {

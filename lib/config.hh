@@ -46,11 +46,6 @@ public:
   /** Sets the modified flag. */
   void setModified(bool modified);
 
-  bool label(Context &context);
-  using ConfigObject::serialize;
-  /** Serializes the configuration into the given stream as text. */
-  bool toYAML(QTextStream &stream);
-
   /** Returns the radio wide settings. */
   RadioSettings *settings() const;
   /** Returns the list of radio IDs. */
@@ -69,6 +64,7 @@ public:
   PositioningSystems *posSystems() const;
   /** Returns the list of roaming zones. */
   RoamingZoneList *roaming() const;
+
   /** Returns @c true if one of the digital channels has a roaming zone assigned. */
   bool requiresRoaming() const;
   /** Returns @c true if one of the channels has a GPS or APRS system assigned. */
@@ -77,10 +73,23 @@ public:
   /** Clears the complete configuration. */
   void clear();
 
+public:
   /** Imports a configuration from the given file. */
   bool readCSV(const QString &filename, QString &errorMessage);
   /** Imports a configuration from the given text stream in text format. */
   bool readCSV(QTextStream &stream, QString &errorMessage);
+
+  /** Imports a configuration from the given YAML file. */
+  bool readYAML(const QString &filename);
+
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  bool parse(const YAML::Node &node, Context &ctx);
+  bool link(const YAML::Node &node, const Context &ctx);
+
+public:
+  bool label(Context &context);
+  /** Serializes the configuration into the given stream as text. */
+  bool toYAML(QTextStream &stream);
 
 protected:
   bool populate(YAML::Node &node, const Context &context);

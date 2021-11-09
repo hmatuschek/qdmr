@@ -14,6 +14,16 @@
 /* ********************************************************************************************* *
  * Implementation of Zone
  * ********************************************************************************************* */
+Zone::Zone(QObject *parent)
+  : ConfigObject("zone", parent), _name(),
+    _A(), _B()
+{
+  connect(&_A, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
+  connect(&_A, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
+  connect(&_B, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
+  connect(&_B, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
+}
+
 Zone::Zone(const QString &name, QObject *parent)
   : ConfigObject("zone", parent), _name(name),
     _A(), _B()
@@ -22,6 +32,13 @@ Zone::Zone(const QString &name, QObject *parent)
   connect(&_A, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
   connect(&_B, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
   connect(&_B, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
+}
+
+ConfigObject *
+Zone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+  // There are no children yet.
+  return nullptr;
 }
 
 Zone &
@@ -94,3 +111,17 @@ ZoneList::add(ConfigObject *obj, int row) {
   return -1;
 }
 
+ConfigObject *
+ZoneList::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+  Q_UNUSED(ctx)
+  if (! node)
+    return nullptr;
+
+  if (! node.IsMap()) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot create zone: Expected object.";
+    return nullptr;
+  }
+
+  return new Zone();
+}

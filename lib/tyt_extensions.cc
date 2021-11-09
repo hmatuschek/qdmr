@@ -14,10 +14,9 @@ TyTButtonSettings::TyTButtonSettings(QObject *parent)
   _longPressDuration = 1000;
 }
 
-bool
-TyTButtonSettings::label(Context &context) {
-  Q_UNUSED(context)
-  return true;
+ConfigObject *
+TyTButtonSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  return nullptr;
 }
 
 TyTButtonSettings::ButtonAction

@@ -147,6 +147,11 @@ public:
   /** (Re-) Sets the default scan list for the channel. */
   bool setScanListObj(ScanList *list);
 
+public:
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  bool parse(const YAML::Node &node, Context &ctx);
+  bool link(const YAML::Node &node, const Context &ctx);
+
 protected:
   bool populate(YAML::Node &node, const Context &context);
 
@@ -260,6 +265,9 @@ public:
   /** Sets the APRS system. */
   void setAPRSSystem(APRSSystem *sys);
 
+public:
+  bool parse(const YAML::Node &node, Context &ctx);
+
 protected:
   bool populate(YAML::Node &node, const Context &context);
 
@@ -328,8 +336,6 @@ public:
   /** Copy constructor. */
   DigitalChannel(const DigitalChannel &other, QObject *parent=nullptr);
 
-  YAML::Node serialize(const Context &context);
-
   /** Returns the admit criterion for the channel. */
 	Admit admit() const;
   /** (Re-)Sets the admit criterion for the channel. */
@@ -389,6 +395,9 @@ public:
   RadioID *radioIdObj() const;
   /** Associates the given radio ID with this channel. Pass nullptr to set to default ID. */
   bool setRadioIdObj(RadioID *id);
+
+public:
+  YAML::Node serialize(const Context &context);
 
 protected:
   /** The admit criterion. */
@@ -457,6 +466,9 @@ public:
   DigitalChannel *findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, unsigned cc) const;
   /** Finds an analog channel with the given frequeny. */
   AnalogChannel *findAnalogChannelByTxFreq(double freq) const;
+
+public:
+  ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx);
 };
 
 

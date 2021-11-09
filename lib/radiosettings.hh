@@ -32,6 +32,7 @@ public:
 
   /** Resets the settings. */
   void clear();
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
   /** Returns the first intro line. */
   const QString &introLine1() const;

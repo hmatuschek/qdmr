@@ -21,6 +21,8 @@ class Contact: public ConfigObject
   Q_PROPERTY(bool ring READ ring WRITE setRing)
 
 protected:
+  /** Default constructor. */
+  explicit Contact(QObject *parent=nullptr);
   /** Hidden constructor.
    * @param name   Specifies the name of the contact.
    * @param ring Specifies whether a ring-tone for this contact is used.
@@ -55,6 +57,10 @@ public:
 		return dynamic_cast<const T *>(this);
 	}
 
+public:
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  bool parse(const YAML::Node &node, Context &ctx);
+
 protected:
   /** Contact name. */
 	QString _name;
@@ -73,6 +79,8 @@ class DTMFContact: public Contact
   Q_PROPERTY(QString number READ number WRITE setNumber)
 
 public:
+  /** Default constructor. */
+  explicit DTMFContact(QObject *parent=nullptr);
   /** Constructs a DTMF (analog) contact.
    * @param name   Specifies the contact name.
    * @param number Specifies the DTMF number (0-9,A,B,C,D,*,#).
@@ -80,13 +88,14 @@ public:
    * @param parent Specifies the QObject parent. */
   DTMFContact(const QString &name, const QString &number, bool ring=false, QObject *parent=nullptr);
 
-  YAML::Node serialize(const Context &context);
-
   /** Returns the DTMF number of this contact.
    * The number must consist of 0-9, a-f, * or #. */
 	const QString &number() const;
   /** (Re-)Sets the DTMF number of this contact. */
 	bool setNumber(const QString &number);
+
+public:
+  YAML::Node serialize(const Context &context);
 
 protected:
   /** The DTMF number. */
@@ -115,6 +124,8 @@ public:
   Q_ENUM(Type)
 
 public:
+  /** Default constructor. */
+  explicit DigitalContact(QObject *parent=nullptr);
   /** Constructs a DMR (digital) contact.
    * @param type   Specifies the call type (private, group, all-call).
    * @param name   Specifies the contact name.
@@ -122,8 +133,6 @@ public:
    * @param ring Specifies whether the ring-tone is enabled for this contact.
    * @param parent Specifies the QObject parent. */
   DigitalContact(Type type, const QString &name, unsigned number, bool ring=false, QObject *parent=nullptr);
-
-  YAML::Node serialize(const Context &context);
 
   /** Returns the call-type. */
 	Type type() const;
@@ -133,6 +142,9 @@ public:
 	unsigned number() const;
   /** (Re-)Sets the DMR number of the contact. */
 	bool setNumber(unsigned number);
+
+public:
+  YAML::Node serialize(const Context &context);
 
 protected:
   /** The call type. */
@@ -181,6 +193,9 @@ public:
   int indexOfDigital(DigitalContact *contact) const;
   /** Returns the index of the given DTMF contact within DTMF contacts. */
   int indexOfDTMF(DTMFContact *contact) const;
+
+public:
+  ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx);
 };
 
 #endif // CONTACT_HH

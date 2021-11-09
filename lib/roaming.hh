@@ -21,13 +21,18 @@ class RoamingZone : public ConfigObject
   Q_PROPERTY(DigitalChannelRefList * channels READ channels)
 
 public:
+  /** Default constructor. */
+  explicit RoamingZone(QObject *parent=nullptr);
+
   /** Constructor.
    * @param name Specifies the name of the roaming zone.
    * @param parent Specifies the QObject parent of this zone. */
-  explicit RoamingZone(const QString &name, QObject *parent = nullptr);
+  RoamingZone(const QString &name, QObject *parent = nullptr);
 
   /** Copies the given zone. */
   RoamingZone &operator =(const RoamingZone &other);
+
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
   /** Returns the number of zones. */
   int count() const;
@@ -109,6 +114,9 @@ public:
   RoamingZone *zone(int idx) const;
 
   int add(ConfigObject *obj, int row=-1);
+
+public:
+  ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx);
 };
 
 #endif // ROAMINGZONE_HH
