@@ -5,6 +5,7 @@
 #include <QTextStream>
 #include <QDateTime>
 #include <QFile>
+#include <QMetaProperty>
 #include <cmath>
 #include "csvreader.hh"
 #include "userdatabase.hh"
@@ -19,7 +20,8 @@ Config::Config(QObject *parent)
     _radioIDs(new RadioIDList(this)), _contacts(new ContactList(this)),
     _rxGroupLists(new RXGroupLists(this)), _channels(new ChannelList(this)),
     _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
-    _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this))
+    _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this)),
+    _tytButtonSettings(nullptr)
 {
   connect(_settings, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModified()));
   connect(_radioIDs, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
@@ -243,6 +245,21 @@ Config::clear() {
   emit modified(this);
 }
 
+TyTButtonSettings *
+Config::tytButtonSettings() const {
+  return _tytButtonSettings;
+}
+void
+Config::setTyTButtonSettings(TyTButtonSettings *ext) {
+  if (_tytButtonSettings)
+    _tytButtonSettings->deleteLater();
+  _tytButtonSettings = ext;
+  if (_tytButtonSettings) {
+    _tytButtonSettings->setParent(this);
+    connect(_tytButtonSettings, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModified()));
+  }
+}
+
 void
 Config::onConfigModified() {
   _modified = true;
@@ -298,8 +315,10 @@ Config::readYAML(const QString &filename) {
 
 ConfigObject *
 Config::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
-  // No object is allocates here yet. All lists are allocated upon construction.
+  Q_UNUSED(node); Q_UNUSED(ctx)
+  if (0==strcmp("tytButtonSettings", prop.name())) {
+    return new TyTButtonSettings();
+  }
   return nullptr;
 }
 
@@ -321,24 +340,43 @@ Config::parse(const YAML::Node &node, Context &ctx)
     ctx.setVersion("0.9.0");
   }
 
-  if (! _settings->parse(node["settings"], ctx))
+  if (node["settings"] && (! _settings->parse(node["settings"], ctx))) {
+    pushErrorMessage(*_settings);
     return false;
-  if (! _radioIDs->parse(node["radioIDs"], ctx))
+  }
+  if (node["radioIDs"] && (! _radioIDs->parse(node["radioIDs"], ctx))) {
+    pushErrorMessage(*_radioIDs);
     return false;
-  if (! _contacts->parse(node["contacts"], ctx))
+  }
+  if (node["contacts"] && (! _contacts->parse(node["contacts"], ctx))) {
+    pushErrorMessage(*_contacts);
     return false;
-  if (! _rxGroupLists->parse(node["groupLists"], ctx))
+  }
+  if (node["groupLists"] && (! _rxGroupLists->parse(node["groupLists"], ctx))) {
+    pushErrorMessage(*_rxGroupLists);
     return false;
-  if (! _channels->parse(node["channels"], ctx))
+  }
+  if (node["channels"] && (! _channels->parse(node["channels"], ctx))) {
+    pushErrorMessage(*_channels);
     return false;
-  if (! _zones->parse(node["zones"], ctx))
+  }
+  if (node["zones"] && (! _zones->parse(node["zones"], ctx))) {
+    pushErrorMessage(*_zones);
     return false;
-  if (! _scanlists->parse(node["scanLists"], ctx))
+  }
+  if (node["scanLists"] && (! _scanlists->parse(node["scanLists"], ctx))) {
+    pushErrorMessage(*_scanlists);
     return false;
-  if (! _gpsSystems->parse(node["positioning"], ctx))
+  }
+  if (node["positioning"] && (! _gpsSystems->parse(node["positioning"], ctx))) {
+    pushErrorMessage(*_gpsSystems);
     return false;
-  if (! _roaming->parse(node["roaming"], ctx))
+  }
+
+  if (node["roaming"] && (! _roaming->parse(node["roaming"], ctx))) {
+    pushErrorMessage(*_roaming);
     return false;
+  }
 
   // also parses extensions
   if (! ConfigObject::parse(node, ctx))
@@ -375,26 +413,34 @@ Config::link(const YAML::Node &node, const Context &ctx) {
     radioIDs()->setDefaultId(0);
   }
 
-  if (! _contacts->link(node["contacts"], ctx))
+  if (node["contacts"] && (! _contacts->link(node["contacts"], ctx))) {
+    pushErrorMessage(*_contacts);
     return false;
-
-  if (! _rxGroupLists->link(node["groupLists"], ctx))
+  }
+  if (node["groupLists"] && (! _rxGroupLists->link(node["groupLists"], ctx))) {
+    pushErrorMessage(*_rxGroupLists);
     return false;
-
-  if (! _channels->link(node["channels"], ctx))
+  }
+  if (node["channels"] && (! _channels->link(node["channels"], ctx))) {
+    pushErrorMessage(*_channels);
     return false;
-
-  if (! _zones->link(node["zones"], ctx))
+  }
+  if (node["zones"] && (! _zones->link(node["zones"], ctx))) {
+    pushErrorMessage(*_zones);
     return false;
-
-  if (! _scanlists->link(node["scanLists"], ctx))
+  }
+  if (node["scanLists"] && (! _scanlists->link(node["scanLists"], ctx))) {
+    pushErrorMessage(*_scanlists);
     return false;
-
-  if (! _gpsSystems->link(node["positioning"], ctx))
+  }
+  if (node["positioning"] && (! _gpsSystems->link(node["positioning"], ctx))) {
+    pushErrorMessage(*_gpsSystems);
     return false;
-
-  if (! _roaming->link(node["roaming"], ctx))
+  }
+  if (node["roaming"] && (! _roaming->link(node["roaming"], ctx))) {
+    pushErrorMessage(*_roaming);
     return false;
+  }
 
   // also links extensions
   if (! ConfigObject::link(node, ctx))

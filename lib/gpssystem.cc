@@ -24,11 +24,6 @@ PositioningSystem::~PositioningSystem() {
   // pass...
 }
 
-ConfigObject *
-PositioningSystem::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  return nullptr;
-}
-
 const QString &
 PositioningSystem::name() const {
   return _name;
@@ -56,6 +51,33 @@ PositioningSystem::populate(YAML::Node &node, const ConfigObject::Context &conte
   if (! ConfigObject::populate(node, context))
     return false;
   return true;
+}
+
+ConfigObject *
+PositioningSystem::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+  // No children yet
+  return nullptr;
+}
+
+bool
+PositioningSystem::parse(const YAML::Node &node, Context &ctx) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot parse positioning system: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node pos = node.begin()->second;
+  if (pos && (!pos["period"])) {
+    logWarn() << pos.Mark().line << ":" << pos.Mark().column
+              << ": Positioning system has no period.";
+  }
+
+  return ConfigObject::parse(pos, ctx);
 }
 
 void
@@ -99,15 +121,6 @@ GPSSystem::GPSSystem(const QString &name, DigitalContact *contact,
   // Connect signals
   connect(&_contact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_revertChannel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-}
-
-YAML::Node
-GPSSystem::serialize(const Context &context) {
-  YAML::Node node = PositioningSystem::serialize(context);
-  if (node.IsNull())
-    return node;
-  YAML::Node type; type["dmr"] = node;
-  return type;
 }
 
 bool
@@ -160,6 +173,15 @@ GPSSystem::revert() {
   return &_revertChannel;
 }
 
+YAML::Node
+GPSSystem::serialize(const Context &context) {
+  YAML::Node node = PositioningSystem::serialize(context);
+  if (node.IsNull())
+    return node;
+  YAML::Node type; type["dmr"] = node;
+  return type;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of APRSSystem
@@ -182,15 +204,6 @@ APRSSystem::APRSSystem(const QString &name, AnalogChannel *channel, const QStrin
   _channel.set(channel);
   // Connect to channel reference
   connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-}
-
-YAML::Node
-APRSSystem::serialize(const Context &context) {
-  YAML::Node node = PositioningSystem::serialize(context);
-  if (node.IsNull())
-    return node;
-  YAML::Node type; type["aprs"] = node;
-  return type;
 }
 
 AnalogChannel *
@@ -270,6 +283,15 @@ APRSSystem::setMessage(const QString &msg) {
   emit modified(this);
 }
 
+YAML::Node
+APRSSystem::serialize(const Context &context) {
+  YAML::Node node = PositioningSystem::serialize(context);
+  if (node.IsNull())
+    return node;
+  YAML::Node type; type["aprs"] = node;
+  return type;
+}
+
 bool
 APRSSystem::populate(YAML::Node &node, const Context &context) {
   if (! PositioningSystem::populate(node, context))
@@ -296,6 +318,61 @@ APRSSystem::populate(YAML::Node &node, const Context &context) {
   }
 
   return true;
+}
+
+
+bool
+APRSSystem::parse(const YAML::Node &node, Context &ctx) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg() << node.Mark().line << ":" << node.Mark().column
+             << ": Cannot parse APRS system: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node sys = node.begin()->second;
+  if (sys["source"] && sys["source"].IsScalar()) {
+    QString source = QString::fromStdString(sys["source"].as<std::string>());
+    QRegExp pattern("^([A-Z0-9]+)-(1?[0-9])$");
+    if (! pattern.exactMatch(source)) {
+      errMsg() << sys.Mark().line << ":" << sys.Mark().column
+               << ": Cannot parse APRS system: '" << source << "' not a valid source call and SSID.";
+      return false;
+    }
+    setSource(pattern.cap(1), pattern.cap(2).toUInt());
+  } else {
+    errMsg() << sys.Mark().line << ":" << sys.Mark().column
+             << ": Cannot parse APRS system: No source call+SSID specified.";
+    return false;
+  }
+
+  if (sys["destination"] && sys["destination"].IsScalar()) {
+    QString dest = QString::fromStdString(sys["destination"].as<std::string>());
+    QRegExp pattern("^([A-Z0-9]+)-(1?[0-9])$");
+    if (! pattern.exactMatch(dest)) {
+      errMsg() << sys.Mark().line << ":" << sys.Mark().column
+               << ": Cannot parse APRS system: '" << dest << "' not a valid destination call and SSID.";
+      return false;
+    }
+    setDestination(pattern.cap(1), pattern.cap(2).toUInt());
+  } else {
+    errMsg() << sys.Mark().line << ":" << sys.Mark().column
+             << ": Cannot parse APRS system: No destination call+SSID specified.";
+    return false;
+  }
+
+  if (sys["path"] && sys["path"].IsSequence()) {
+    QStringList path;
+    for (YAML::const_iterator it=sys["path"].begin(); it!=sys["path"].end(); it++) {
+      if (it->IsScalar())
+        path.append(QString::fromStdString(it->as<std::string>()));
+    }
+    setPath(path.join(""));
+  }
+
+  return PositioningSystem::parse(node, ctx);
 }
 
 
@@ -406,6 +483,7 @@ PositioningSystems::aprsSystem(int idx) const {
 
 ConfigObject *
 PositioningSystems::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+  Q_UNUSED(ctx)
   if (! node)
     return nullptr;
 

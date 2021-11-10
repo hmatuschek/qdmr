@@ -215,6 +215,11 @@ ConfigObject::populate(YAML::Node &node, const Context &context){
     QMetaProperty prop = meta->property(p);
     if (! prop.isValid())
       continue;
+    if (! prop.isScriptable()) {
+      logDebug() << "Do not serialize property '"
+                 << prop.name() << "': Marked as not scriptable.";
+      continue;
+    }
     if (prop.isEnumType()) {
       QMetaEnum e = prop.enumerator();
       QVariant value = prop.read(this);
@@ -326,6 +331,10 @@ ConfigObject::parse(const YAML::Node &node, ConfigObject::Context &ctx) {
 
     if (! prop.isValid())
       continue;
+    // If marked as non-scriptable, skip that property.
+    // It is handled separately or not at all.
+    if (! prop.isScriptable())
+      continue;
 
     if (prop.isEnumType()) {
       // If property is not set -> skip
@@ -430,7 +439,7 @@ ConfigObject::parse(const YAML::Node &node, ConfigObject::Context &ctx) {
       ConfigObject *obj = this->allocateChild(prop, node[prop.name()], ctx);
       if (nullptr == obj) {
         errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot parse " << prop.name() << " of " << meta->className() << ".";
+                 << ": Cannot allocate " << prop.name() << " of " << meta->className() << ".";
         return false;
       }
       // parse instance
@@ -442,9 +451,6 @@ ConfigObject::parse(const YAML::Node &node, ConfigObject::Context &ctx) {
       }
       // Set property
       prop.write(this, QVariant::fromValue(obj));
-    } else {
-      logDebug() << "Unhandled property " << prop.name()
-                 << " of unhandled type " << prop.typeName() << ".";
     }
   }
 
@@ -461,6 +467,10 @@ ConfigObject::link(const YAML::Node &node, const ConfigObject::Context &ctx) {
     QMetaProperty prop = meta->property(p);
     if (! prop.isValid())
       continue;
+    if (! prop.isScriptable()) {
+      //logDebug() << "Do not link property '" << prop.name() << "': Marked as not scriptable.";
+      continue;
+    }
     if ((prop.isEnumType()) || (QString("bool") == prop.typeName()) || (QString("int") == prop.typeName()) ||
         (QString("uint") == prop.typeName()) || (QString("double") == prop.typeName()) || (QString("QString") == prop.typeName()) ) {
       continue;
@@ -574,9 +584,6 @@ ConfigObject::link(const YAML::Node &node, const ConfigObject::Context &ctx) {
                  << ": Cannot link " << prop.name() << " of " << meta->className() << ".";
         return false;
       }
-    } else {
-      logDebug() << "Unhandled property " << prop.name()
-                 << " of unhandled type " << prop.typeName() << ".";
     }
   }
 
@@ -848,6 +855,7 @@ ConfigObjectList::parse(const YAML::Node &node, ConfigObject::Context &ctx) {
       return false;
     }
     if (! element->parse(*it, ctx)) {
+      pushErrorMessage(*element);
       errMsg() << it->Mark().line << ":" << it->Mark().column << ": Cannot parse list.";
       element->deleteLater();
       return false;

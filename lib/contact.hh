@@ -60,6 +60,7 @@ public:
 public:
   ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
   bool parse(const YAML::Node &node, Context &ctx);
+  bool link(const YAML::Node &node, const Context &ctx);
 
 protected:
   /** Contact name. */

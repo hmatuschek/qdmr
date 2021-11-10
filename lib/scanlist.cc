@@ -214,6 +214,8 @@ ScanLists::add(ConfigObject *obj, int row) {
 
 ConfigObject *
 ScanLists::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+  Q_UNUSED(ctx);
+
   if (! node)
     return nullptr;
 

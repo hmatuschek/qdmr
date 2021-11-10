@@ -61,8 +61,6 @@ public:
   /** Constructor. */
   explicit TyTButtonSettings(QObject *parent=nullptr);
 
-  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
-
   /** Returns the action for the side button 1 short-press. */
   ButtonAction sideButton1Short() const;
   /** Sets the action for the side button 1 short-press. */
@@ -85,6 +83,9 @@ public:
   unsigned longPressDuration() const;
   /** Sets the long-press duration in msec. */
   void setLongPressDuration(unsigned dur);
+
+public:
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
 protected:
   /** Holds the side button 1 short-press action. */

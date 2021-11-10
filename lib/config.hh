@@ -23,6 +23,7 @@
 #include "roaming.hh"
 #include "radioid.hh"
 #include "radiosettings.hh"
+#include "tyt_extensions.hh"
 
 // Forward declaration
 class UserDatabase;
@@ -36,6 +37,9 @@ class UserDatabase;
 class Config : public ConfigObject
 {
 	Q_OBJECT
+
+  /** Represents the button settings extension for TyT devices. */
+  Q_PROPERTY(TyTButtonSettings* tytButtonSettings READ tytButtonSettings WRITE setTyTButtonSettings)
 
 public:
   /** Constructs an empty configuration. */
@@ -72,6 +76,9 @@ public:
 
   /** Clears the complete configuration. */
   void clear();
+
+  TyTButtonSettings *tytButtonSettings() const;
+  void setTyTButtonSettings(TyTButtonSettings *ext);
 
 public:
   /** Imports a configuration from the given file. */
@@ -119,6 +126,8 @@ protected:
   PositioningSystems *_gpsSystems;
   /** The list of roaming zones. */
   RoamingZoneList *_roaming;
+  // Explicit extensions
+  TyTButtonSettings *_tytButtonSettings;
 };
 
 #endif // CONFIG_HH

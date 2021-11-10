@@ -20,6 +20,7 @@ RoamingZone::RoamingZone(const QString &name, QObject *parent)
 
 ConfigObject *
 RoamingZone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
   return nullptr;
 }
 
@@ -153,6 +154,8 @@ RoamingZoneList::add(ConfigObject *obj, int row) {
 
 ConfigObject *
 RoamingZoneList::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+  Q_UNUSED(ctx)
+
   if (! node)
     return nullptr;
 

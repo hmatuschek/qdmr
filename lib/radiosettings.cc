@@ -21,6 +21,8 @@ RadioSettings::clear() {
 
 ConfigObject *
 RadioSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+  // No children yet.
   return nullptr;
 }
 

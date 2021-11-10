@@ -28,14 +28,14 @@
 Channel::Channel(QObject *parent)
   : ConfigObject("ch", parent), _name(""), _rxFreq(0), _txFreq(0), _defaultPower(true),
     _power(Power::Low), _txTimeOut(std::numeric_limits<unsigned>::max()), _rxOnly(false),
-    _vox(std::numeric_limits<unsigned>::max()), _scanlist()
+    _vox(std::numeric_limits<unsigned>::max()), _scanlist(), _openGD77ChannelExtension(nullptr)
 {
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
 Channel::Channel(const Channel &other, QObject *parent)
-  : ConfigObject("ch", parent), _scanlist()
+  : ConfigObject("ch", parent), _scanlist(), _openGD77ChannelExtension(nullptr)
 {
   setName(other.name());
   setRXFrequency(other.rxFrequency());
@@ -196,6 +196,22 @@ Channel::setScanListObj(ScanList *list) {
 void
 Channel::onReferenceModified() {
   emit modified(this);
+}
+
+OpenGD77ChannelExtension *
+Channel::openGD77ChannelExtension() const {
+  return _openGD77ChannelExtension;
+}
+void
+Channel::setOpenGD77ChannelExtension(OpenGD77ChannelExtension *ext) {
+  if (_openGD77ChannelExtension == ext)
+    return;
+  if (_openGD77ChannelExtension)
+    _openGD77ChannelExtension->deleteLater();
+  _openGD77ChannelExtension = ext;
+  if (_openGD77ChannelExtension)
+    connect(_openGD77ChannelExtension, SIGNAL(modified(ConfigObject*)), this, SLOT(onReferenceModified()));
+
 }
 
 bool

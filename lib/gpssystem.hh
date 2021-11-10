@@ -48,8 +48,6 @@ public:
   template <class System>
   const System *as() const { return dynamic_cast<const System *>(this); }
 
-  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
-
   /** Returns the name of the GPS system. */
   const QString &name() const;
   /** Sets the name of the GPS system. */
@@ -59,6 +57,10 @@ public:
   unsigned period() const;
   /** Sets the update period in seconds. */
   void setPeriod(unsigned period);
+
+public:
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  bool parse(const YAML::Node &node, Context &ctx);
 
 protected:
   bool populate(YAML::Node &node, const ConfigObject::Context &context);
@@ -103,8 +105,6 @@ public:
             DigitalChannel *revertChannel = nullptr, unsigned period=300,
             QObject *parent = nullptr);
 
-  YAML::Node serialize(const Context &context);
-
   /** Returns @c true if a contact is set for the GPS system. */
   bool hasContact() const;
   /** Returns the destination contact for the GPS information or @c nullptr if not set. */
@@ -127,6 +127,9 @@ public:
   const DigitalChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
   DigitalChannelReference *revert();
+
+public:
+  YAML::Node serialize(const Context &context);
 
 protected:
   /** Holds the destination contact for the GPS information. */
@@ -192,8 +195,6 @@ public:
              const QString &src, unsigned srcSSID, const QString &path="", Icon icon=Icon::Jogger,
              const QString &message="", unsigned period=300, QObject *parent=nullptr);
 
-  YAML::Node serialize(const Context &context);
-
   /** Returns the transmit channel of the APRS system. */
   AnalogChannel *revertChannel() const;
   /** Sets the transmit channel of the APRS system. */
@@ -231,6 +232,10 @@ public:
   const QString &message() const;
   /** Sets the optional APRS message text. */
   void setMessage(const QString &msg);
+
+public:
+  YAML::Node serialize(const Context &context);
+  bool parse(const YAML::Node &node, Context &ctx);
 
 protected:
   bool populate(YAML::Node &node, const Context &context);

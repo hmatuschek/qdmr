@@ -7,6 +7,7 @@
 #include "configobject.hh"
 #include "configreference.hh"
 #include "signaling.hh"
+#include "opengd77_extension.hh"
 
 class Config;
 class RXGroupList;
@@ -34,16 +35,17 @@ class Channel: public ConfigObject
   Q_PROPERTY(double rxFrequency READ rxFrequency WRITE setRXFrequency)
   /** The transmit frequency of the channel. */
   Q_PROPERTY(double txFrequency READ txFrequency WRITE setTXFrequency)
-  // /** The transmit power. */
-  //Q_PROPERTY(Power power READ power WRITE setPower)
-  // /** The transmit timeout in seconds. */
-  //Q_PROPERTY(unsigned timeout READ timeout WRITE setTimeout)
+  /** The transmit power. */
+  Q_PROPERTY(Power power READ power WRITE setPower SCRIPTABLE false)
+  /** The transmit timeout in seconds. */
+  Q_PROPERTY(unsigned timeout READ timeout WRITE setTimeout SCRIPTABLE false)
   /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
   /** The scan list. */
   Q_PROPERTY(ScanListReference* scanList READ scanList)
-  // /** The VOX setting. */
-  //Q_PROPERTY(unsigned vox READ vox WRITE setVOX)
+  /** The VOX setting. */
+  Q_PROPERTY(unsigned vox READ vox WRITE setVOX SCRIPTABLE false)
+  Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
 
 public:
   /** Possible power settings. */
@@ -147,6 +149,9 @@ public:
   /** (Re-) Sets the default scan list for the channel. */
   bool setScanListObj(ScanList *list);
 
+  OpenGD77ChannelExtension *openGD77ChannelExtension() const;
+  void setOpenGD77ChannelExtension(OpenGD77ChannelExtension *ext);
+
 public:
   ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
   bool parse(const YAML::Node &node, Context &ctx);
@@ -178,6 +183,7 @@ protected:
   unsigned _vox;
   /** Default scan list of the channel. */
   ScanListReference _scanlist;
+  OpenGD77ChannelExtension *_openGD77ChannelExtension;
 };
 
 

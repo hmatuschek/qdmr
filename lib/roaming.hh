@@ -32,8 +32,6 @@ public:
   /** Copies the given zone. */
   RoamingZone &operator =(const RoamingZone &other);
 
-  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
-
   /** Returns the number of zones. */
   int count() const;
 
@@ -62,6 +60,9 @@ public:
   const DigitalChannelRefList *channels() const;
   /** Retruns the list of digital channels in this roaming zone. */
   DigitalChannelRefList *channels();
+
+public:
+  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
 protected:
   /** Holds the name of the roaming zone. */
