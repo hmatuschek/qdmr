@@ -5,7 +5,7 @@
  * Implementation of TyTButtonSettings
  * ******************************************************************************************** */
 TyTButtonSettings::TyTButtonSettings(QObject *parent)
-  : ConfigExtension("", parent)
+  : ConfigExtension(parent)
 {
   _sideButton1Short = Disabled;
   _sideButton1Long  = Tone1750Hz;
@@ -14,7 +14,7 @@ TyTButtonSettings::TyTButtonSettings(QObject *parent)
   _longPressDuration = 1000;
 }
 
-ConfigObject *
+ConfigItem *
 TyTButtonSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx);
   // There are no further extension/children to TyTButtonSettings.
@@ -80,8 +80,8 @@ TyTButtonSettingsReader::TyTButtonSettingsReader(QObject *parent)
   // pass...
 }
 
-ConfigObject *
-TyTButtonSettingsReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+TyTButtonSettingsReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
   return new TyTButtonSettings();

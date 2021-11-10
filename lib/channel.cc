@@ -210,13 +210,13 @@ Channel::setOpenGD77ChannelExtension(OpenGD77ChannelExtension *ext) {
     _openGD77ChannelExtension->deleteLater();
   _openGD77ChannelExtension = ext;
   if (_openGD77ChannelExtension)
-    connect(_openGD77ChannelExtension, SIGNAL(modified(ConfigObject*)), this, SLOT(onReferenceModified()));
+    connect(_openGD77ChannelExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
 
 }
 
 bool
 Channel::populate(YAML::Node &node, const Context &context) {
-  if (!ConfigObject::populate(node, context))
+  if (! ConfigObject::populate(node, context))
     return false;
 
   if (defaultPower()) {
@@ -244,7 +244,7 @@ Channel::populate(YAML::Node &node, const Context &context) {
   return true;
 }
 
-ConfigObject *
+ConfigItem *
 Channel::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
   Q_UNUSED(node); Q_UNUSED(ctx)
   if (0 == strcmp("opengd77", prop.name())) {
@@ -256,7 +256,7 @@ Channel::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Contex
 }
 
 bool
-Channel::parse(const YAML::Node &node, ConfigObject::Context &ctx) {
+Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! node)
     return false;
 
@@ -290,7 +290,7 @@ Channel::parse(const YAML::Node &node, ConfigObject::Context &ctx) {
 }
 
 bool
-Channel::link(const YAML::Node &node, const ConfigObject::Context &ctx) {
+Channel::link(const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! node)
     return false;
 
@@ -332,16 +332,6 @@ AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
 
   // Link APRS system reference
   connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-}
-
-YAML::Node
-AnalogChannel::serialize(const Context &context) {
-  YAML::Node node = Channel::serialize(context);
-  if (node.IsNull())
-    return node;
-  YAML::Node type;
-  type["analog"] = node;
-  return type;
 }
 
 AnalogChannel::Admit
@@ -431,6 +421,16 @@ AnalogChannel::aprsSystem() const {
 void
 AnalogChannel::setAPRSSystem(APRSSystem *sys) {
   _aprsSystem.set(sys);
+}
+
+YAML::Node
+AnalogChannel::serialize(const Context &context) {
+  YAML::Node node = Channel::serialize(context);
+  if (node.IsNull())
+    return node;
+  YAML::Node type;
+  type["analog"] = node;
+  return type;
 }
 
 bool
@@ -526,10 +526,10 @@ DigitalChannel::DigitalChannel(QObject *parent)
     _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
 {
   // Register default tags
-  if (! ConfigObject::Context::hasTag(metaObject()->className(), "roaming", "!default"))
-    ConfigObject::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigObject::Context::hasTag(metaObject()->className(), "radioID", "!default"))
-    ConfigObject::Context::setTag(metaObject()->className(), "radioID", "!default", DefaultRadioID::get());
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioID", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "radioID", "!default", DefaultRadioID::get());
 
   // Connect signals of references
   connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -543,10 +543,10 @@ DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
   : Channel(other, parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
 {
   // Register default tags
-  if (! ConfigObject::Context::hasTag(metaObject()->className(), "roaming", "!default"))
-    ConfigObject::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigObject::Context::hasTag(metaObject()->className(), "radioID", "!default"))
-    ConfigObject::Context::setTag(metaObject()->className(), "radioID", "!default", DefaultRadioID::get());
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioID", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "radioID", "!default", DefaultRadioID::get());
 
   setColorCode(other.colorCode());
   setTimeSlot(other.timeSlot());
@@ -764,7 +764,7 @@ ChannelList::add(ConfigObject *obj, int row) {
 
 Channel *
 ChannelList::channel(int idx) const {
-  if (ConfigObject *obj = get(idx))
+  if (ConfigItem *obj = get(idx))
     return obj->as<Channel>();
   return nullptr;
 }
@@ -799,8 +799,8 @@ ChannelList::findAnalogChannelByTxFreq(double freq) const {
   return nullptr;
 }
 
-ConfigObject *
-ChannelList::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigItem *
+ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
   Q_UNUSED(ctx)
   if (! node)
     return nullptr;

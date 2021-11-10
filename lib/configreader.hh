@@ -44,19 +44,19 @@ public:
   const QString &errorMessage() const;
 
   /** Allocates the @c ConfigObject depending on the parsed node. */
-  virtual ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx) = 0;
+  virtual ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx) = 0;
   /** Parses the given YAML node, updates the given object and updates the given context (IDs). */
-  virtual bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links the given object to the rest of the codeplug using the given context. */
-  virtual bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 protected:
   /** Parses the given extensions for the given object. */
-  virtual bool parseExtensions(const QHash<QString, AbstractConfigReader *> &extensions, ConfigObject *obj,
-                               const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseExtensions(const QHash<QString, AbstractConfigReader *> &extensions, ConfigItem *obj,
+                               const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links the given extensions for the given object. */
-  virtual bool linkExtensions(const QHash<QString, AbstractConfigReader *> &extensions, ConfigObject *obj,
-                              const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkExtensions(const QHash<QString, AbstractConfigReader *> &extensions, ConfigItem *obj,
+                              const YAML::Node &node, const ConfigItem::Context &ctx);
 
 protected:
   /** Holds the error message. */
@@ -88,115 +88,115 @@ public:
   /** Constructor. */
   explicit ConfigReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 protected:
   /** Parses radio settings. */
-  virtual bool parseSettings(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseSettings(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links radio settings. */
-  virtual bool linkSettings(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkSettings(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx);
 
   /** Parses radio IDs. */
-  virtual bool parseRadioIDs(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseRadioIDs(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links radio IDs. */
-  virtual bool linkRadioIDs(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkRadioIDs(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses a single radio ID. */
-  virtual bool parseRadioID(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseRadioID(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links a single radio ID. */
-  virtual bool linkRadioID(RadioID *id, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkRadioID(RadioID *id, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses a single DMR radio ID. */
-  virtual bool parseDMRRadioID(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseDMRRadioID(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links a single DMR radio ID. */
-  virtual bool linkDMRRadioID(RadioID *id, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkDMRRadioID(RadioID *id, const YAML::Node &node, const ConfigItem::Context &ctx);
 
   /** Parses channels. */
-  virtual bool parseChannels(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseChannels(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links channels. */
-  virtual bool linkChannels(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkChannels(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses single channel. */
-  virtual bool parseChannel(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseChannel(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links single channel. */
-  virtual bool linkChannel(Channel *channel, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkChannel(Channel *channel, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses digital channel. */
-  virtual bool parseDigitalChannel(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseDigitalChannel(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links digital channel. */
-  virtual bool linkDigitalChannel(DigitalChannel *channel, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkDigitalChannel(DigitalChannel *channel, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses analog channel. */
-  virtual bool parseAnalogChannel(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseAnalogChannel(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links analog channel. */
-  virtual bool linkAnalogChannel(AnalogChannel *channel, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkAnalogChannel(AnalogChannel *channel, const YAML::Node &node, const ConfigItem::Context &ctx);
 
   /** Parses zones. */
-  virtual bool parseZones(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseZones(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links zones. */
-  virtual bool linkZones(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkZones(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses single zone. */
-  virtual bool parseZone(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseZone(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links single zone. */
-  virtual bool linkZone(Zone *zone, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkZone(Zone *zone, const YAML::Node &node, const ConfigItem::Context &ctx);
 
   /** Parses scan lists. */
-  virtual bool parseScanLists(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseScanLists(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links scan lists. */
-  virtual bool linkScanLists(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkScanLists(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses single scan list. */
-  virtual bool parseScanList(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseScanList(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links single scan list. */
-  virtual bool linkScanList(ScanList *list, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkScanList(ScanList *list, const YAML::Node &node, const ConfigItem::Context &ctx);
 
   /** Parses contacts. */
-  virtual bool parseContacts(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseContacts(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links contacts. */
-  virtual bool linkContacts(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkContacts(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses single contact. */
-  virtual bool parseContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseContact(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links single contact. */
-  virtual bool linkContact(Contact *contact, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkContact(Contact *contact, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses private-call contact. */
-  virtual bool parseDMRContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseDMRContact(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links private-call contact. */
-  virtual bool linkDMRContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkDMRContact(DigitalContact *contact, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses DTMF contact. */
-  virtual bool parseDTMFContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseDTMFContact(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links DTMF contact. */
-  virtual bool linkDTMFContact(DTMFContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkDTMFContact(DTMFContact *contact, const YAML::Node &node, const ConfigItem::Context &ctx);
 
   /** Parses group lists. */
-  virtual bool parseGroupLists(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseGroupLists(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links group lists. */
-  virtual bool linkGroupLists(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkGroupLists(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses single group list. */
-  virtual bool parseGroupList(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseGroupList(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links single group list. */
-  virtual bool linkGroupList(RXGroupList *list, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkGroupList(RXGroupList *list, const YAML::Node &node, const ConfigItem::Context &ctx);
 
   /** Parses positioning systems. */
-  virtual bool parsePositioningSystems(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parsePositioningSystems(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links positioning systems. */
-  virtual bool linkPositioningSystems(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkPositioningSystems(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses single positioning system. */
-  virtual bool parsePositioningSystem(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parsePositioningSystem(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links single positioning system. */
-  virtual bool linkPositioningSystem(PositioningSystem *system, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkPositioningSystem(PositioningSystem *system, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses GPS positioning system. */
-  virtual bool parseGPSSystem(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseGPSSystem(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links GPS positioning system. */
-  virtual bool linkGPSSystem(GPSSystem *system, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkGPSSystem(GPSSystem *system, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses APRS positioning system. */
-  virtual bool parseAPRSSystem(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseAPRSSystem(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links APRS positioning system. */
-  virtual bool linkAPRSSystem(APRSSystem *system, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkAPRSSystem(APRSSystem *system, const YAML::Node &node, const ConfigItem::Context &ctx);
 
   /** Parses roaming zones. */
-  virtual bool parseRoamingZones(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseRoamingZones(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links roaming zones. */
-  virtual bool linkRoamingZones(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkRoamingZones(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx);
   /** Parses single roaming zone. */
-  virtual bool parseRoamingZone(Config *config, const YAML::Node &node, ConfigObject::Context &ctx);
+  virtual bool parseRoamingZone(Config *config, const YAML::Node &node, ConfigItem::Context &ctx);
   /** Links single roaming zone. */
-  virtual bool linkRoamingZone(RoamingZone *zone, const YAML::Node &node, const ConfigObject::Context &ctx);
+  virtual bool linkRoamingZone(RoamingZone *zone, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Reads the given YAML file and updates the give config. */
@@ -226,7 +226,7 @@ protected:
 public:
   /** Parses the node and updates the given object. This also associates the read ID with the
    * object in the context. */
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
 };
 
 /** Reads the global radio settings.
@@ -239,9 +239,9 @@ public:
   /** Constructor. */
   explicit RadioSettingsReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser. */
@@ -262,9 +262,9 @@ public:
   /** Constructor. */
   explicit RadioIdReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser. */
@@ -287,8 +287,8 @@ protected:
   explicit ChannelReader(QObject *parent=nullptr);
 
 public:
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser.
@@ -311,9 +311,9 @@ public:
   /** Constructor. */
   explicit DigitalChannelReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser.
@@ -336,9 +336,9 @@ public:
   /** Constructor. */
   explicit AnalogChannelReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser.
@@ -361,9 +361,9 @@ public:
   /** Constructor. */
   explicit ZoneReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser. */
@@ -386,8 +386,8 @@ protected:
   explicit ContactReader(QObject *parent=nullptr);
 
 public:
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser.
@@ -410,9 +410,9 @@ public:
   /** Hidden constructor. */
   explicit DMRContactReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser.
@@ -436,8 +436,8 @@ protected:
   explicit PositioningReader(QObject *parent=nullptr);
 
 public:
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser.
@@ -460,9 +460,9 @@ public:
   /** Constructor. */
   explicit GPSSystemReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser. */
@@ -484,9 +484,9 @@ public:
   /** Constructor. */
   explicit APRSSystemReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser. */
@@ -508,9 +508,9 @@ public:
   /** Constructor. */
   explicit ScanListReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser. */
@@ -532,9 +532,9 @@ public:
   /** Constructor. */
   explicit GroupListReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser. */
@@ -556,9 +556,9 @@ public:
   /** Constructor. */
   explicit RoamingReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-  bool parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
+  bool parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx);
 
 public:
   /** Adds an extension to the config parser. */

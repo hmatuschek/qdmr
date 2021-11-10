@@ -42,7 +42,7 @@ Contact::setRing(bool enable) {
   emit modified(this);
 }
 
-ConfigObject *
+ConfigItem *
 Contact::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
   // There are no children yet
@@ -111,7 +111,7 @@ DTMFContact::setNumber(const QString &number) {
 
 YAML::Node
 DTMFContact::serialize(const Context &context) {
-  YAML::Node node = ConfigObject::serialize(context);
+  YAML::Node node = Contact::serialize(context);
   if (node.IsNull())
     return node;
 
@@ -160,7 +160,7 @@ DigitalContact::setNumber(unsigned number) {
 
 YAML::Node
 DigitalContact::serialize(const Context &context) {
-  YAML::Node node = ConfigObject::serialize(context);
+  YAML::Node node = Contact::serialize(context);
   if (node.IsNull())
     return node;
 
@@ -273,8 +273,8 @@ ContactList::dtmfContact(int idx) const {
   return nullptr;
 }
 
-ConfigObject *
-ContactList::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigItem *
+ContactList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
   Q_UNUSED(ctx)
 
   if (! node)

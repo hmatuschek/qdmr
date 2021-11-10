@@ -41,7 +41,7 @@ public:
   explicit OpenGD77ChannelExtension(QObject *parent=nullptr);
 
 public:
-  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
   /** Returns the power settings for the channel. */
   Power power() const;
@@ -65,7 +65,7 @@ public:
   /** Constructor. */
   explicit OpenGD77ChannelExtensionReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
 
 private:
   /** Holds the instance of the config reader. */
@@ -96,7 +96,7 @@ public:
   /** Constructor. */
   explicit OpenGD77ContactExtension(QObject *parent=nullptr);
 
-  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
   /** Returns the time slot override. */
   TimeSlotOverride timeSlotOverride() const;
@@ -120,7 +120,7 @@ public:
   /** Constructor. */
   explicit OpenGD77ContactExtensionReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
 
 private:
   /** Holds the instance of the config reader. */

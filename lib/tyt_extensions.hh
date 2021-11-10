@@ -85,7 +85,7 @@ public:
   void setLongPressDuration(unsigned dur);
 
 public:
-  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
 protected:
   /** Holds the side button 1 short-press action. */
@@ -112,7 +112,7 @@ public:
   /** Constructor. */
   explicit TyTButtonSettingsReader(QObject *parent=nullptr);
 
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
 
 private:
   /** Holds the instance of the config reader. */

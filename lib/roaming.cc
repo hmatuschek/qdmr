@@ -18,12 +18,6 @@ RoamingZone::RoamingZone(const QString &name, QObject *parent)
   // pass...
 }
 
-ConfigObject *
-RoamingZone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
-  return nullptr;
-}
-
 RoamingZone &
 RoamingZone::operator =(const RoamingZone &other) {
   clear();
@@ -92,6 +86,12 @@ RoamingZone::channels() {
   return &_channel;
 }
 
+ConfigItem *
+RoamingZone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+  return nullptr;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of DefaultRoamingZone
@@ -140,7 +140,7 @@ RoamingZoneList::uniqueChannels(QSet<DigitalChannel *> &channels) const {
 
 RoamingZone *
 RoamingZoneList::zone(int idx) const {
-  if (ConfigObject *obj = get(idx))
+  if (ConfigItem *obj = get(idx))
     return obj->as<RoamingZone>();
   return nullptr;
 }
@@ -152,8 +152,8 @@ RoamingZoneList::add(ConfigObject *obj, int row) {
   return -1;
 }
 
-ConfigObject *
-RoamingZoneList::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigItem *
+RoamingZoneList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
   Q_UNUSED(ctx)
 
   if (! node)

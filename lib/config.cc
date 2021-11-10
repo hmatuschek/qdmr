@@ -16,14 +16,14 @@
  * Implementation of Config
  * ********************************************************************************************* */
 Config::Config(QObject *parent)
-  : ConfigObject("", parent), _modified(false), _settings(new RadioSettings(this)),
+  : ConfigItem(parent), _modified(false), _settings(new RadioSettings(this)),
     _radioIDs(new RadioIDList(this)), _contacts(new ContactList(this)),
     _rxGroupLists(new RXGroupLists(this)), _channels(new ChannelList(this)),
     _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
     _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this)),
     _tytButtonSettings(nullptr)
 {
-  connect(_settings, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModified()));
+  connect(_settings, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   connect(_radioIDs, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
   connect(_radioIDs, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
   connect(_radioIDs, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
@@ -63,7 +63,7 @@ Config::setModified(bool modified) {
 
 bool
 Config::label(Context &context) {
-  if (! ConfigObject::label(context))
+  if (! ConfigItem::label(context))
     return false;
 
   if (! _settings->label(context))
@@ -90,7 +90,7 @@ Config::label(Context &context) {
 
 bool
 Config::toYAML(QTextStream &stream) {
-  ConfigObject::Context context;
+  ConfigItem::Context context;
   if (! this->label(context))
     return false;
   YAML::Node doc = serialize(context);
@@ -143,7 +143,7 @@ Config::populate(YAML::Node &node, const Context &context)
       return false;
   }
 
-  if (! ConfigObject::populate(node, context))
+  if (! ConfigItem::populate(node, context))
     return false;
 
   return true;
@@ -229,7 +229,7 @@ Config::requiresGPS() const {
 
 void
 Config::clear() {
-  ConfigObject::clear();
+  ConfigItem::clear();
 
   // Reset lists
   _settings->clear();
@@ -256,7 +256,7 @@ Config::setTyTButtonSettings(TyTButtonSettings *ext) {
   _tytButtonSettings = ext;
   if (_tytButtonSettings) {
     _tytButtonSettings->setParent(this);
-    connect(_tytButtonSettings, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModified()));
+    connect(_tytButtonSettings, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   }
 }
 
@@ -302,7 +302,7 @@ Config::readYAML(const QString &filename) {
   }
 
   clear();
-  ConfigObject::Context context;
+  ConfigItem::Context context;
 
   if (! parse(node, context))
     return false;
@@ -313,7 +313,7 @@ Config::readYAML(const QString &filename) {
   return true;
 }
 
-ConfigObject *
+ConfigItem *
 Config::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
   Q_UNUSED(node); Q_UNUSED(ctx)
   if (0==strcmp("tytButtonSettings", prop.name())) {
@@ -379,7 +379,7 @@ Config::parse(const YAML::Node &node, Context &ctx)
   }
 
   // also parses extensions
-  if (! ConfigObject::parse(node, ctx))
+  if (! ConfigItem::parse(node, ctx))
     return false;
 
   return true;
@@ -443,7 +443,7 @@ Config::link(const YAML::Node &node, const Context &ctx) {
   }
 
   // also links extensions
-  if (! ConfigObject::link(node, ctx))
+  if (! ConfigItem::link(node, ctx))
     return false;
 
   return true;

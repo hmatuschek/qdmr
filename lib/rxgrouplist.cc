@@ -99,7 +99,7 @@ RXGroupList::serialize(const Context &context) {
   return node;
 }
 
-ConfigObject *
+ConfigItem *
 RXGroupList::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
   // There are no children yet.
@@ -124,7 +124,7 @@ RXGroupLists::RXGroupLists(QObject *parent)
 
 RXGroupList *
 RXGroupLists::list(int idx) const {
-  if (ConfigObject *obj = get(idx))
+  if (ConfigItem *obj = get(idx))
     return obj->as<RXGroupList>();
   return nullptr;
 }
@@ -136,8 +136,8 @@ RXGroupLists::add(ConfigObject *obj, int row) {
   return -1;
 }
 
-ConfigObject *
-RXGroupLists::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigItem *
+RXGroupLists::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
   Q_UNUSED(ctx)
 
   if (! node)

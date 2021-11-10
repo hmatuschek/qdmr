@@ -182,7 +182,7 @@ ScanList::setRevertChannel(Channel *channel) {
   emit modified(this);
 }
 
-ConfigObject *
+ConfigItem *
 ScanList::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
   return nullptr;
@@ -200,7 +200,7 @@ ScanLists::ScanLists(QObject *parent)
 
 ScanList *
 ScanLists::scanlist(int idx) const {
-  if (ConfigObject *obj = get(idx))
+  if (ConfigItem *obj = get(idx))
     return obj->as<ScanList>();
   return nullptr;
 }
@@ -212,8 +212,8 @@ ScanLists::add(ConfigObject *obj, int row) {
   return -1;
 }
 
-ConfigObject *
-ScanLists::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigItem *
+ScanLists::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
   Q_UNUSED(ctx);
 
   if (! node)

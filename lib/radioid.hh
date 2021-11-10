@@ -37,9 +37,9 @@ public:
   void setNumber(uint32_t number);
 
   YAML::Node serialize(const Context &context);
-  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
-  bool parse(const YAML::Node &node, ConfigObject::Context &ctx);
-  bool link(const YAML::Node &node, const ConfigObject::Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  bool parse(const YAML::Node &node, ConfigItem::Context &ctx);
+  bool link(const YAML::Node &node, const ConfigItem::Context &ctx);
 
 signals:
   /** Gets emitted once the DMR is changed. */
@@ -105,7 +105,7 @@ public:
   virtual bool delId(uint32_t id);
 
 public:
-  ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx);
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx);
 
 protected slots:
   /** Gets call whenever the default DMR ID gets deleted. */

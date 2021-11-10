@@ -58,7 +58,7 @@ public:
 	}
 
 public:
-  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
   bool parse(const YAML::Node &node, Context &ctx);
   bool link(const YAML::Node &node, const Context &ctx);
 
@@ -196,7 +196,7 @@ public:
   int indexOfDTMF(DTMFContact *contact) const;
 
 public:
-  ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx);
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx);
 };
 
 #endif // CONTACT_HH

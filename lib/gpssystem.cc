@@ -47,13 +47,13 @@ PositioningSystem::setPeriod(unsigned period) {
 }
 
 bool
-PositioningSystem::populate(YAML::Node &node, const ConfigObject::Context &context) {
+PositioningSystem::populate(YAML::Node &node, const ConfigItem::Context &context) {
   if (! ConfigObject::populate(node, context))
     return false;
   return true;
 }
 
-ConfigObject *
+ConfigItem *
 PositioningSystem::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
   // No children yet
@@ -387,7 +387,7 @@ PositioningSystems::PositioningSystems(QObject *parent)
 
 PositioningSystem *
 PositioningSystems::system(int idx) const {
-  if (ConfigObject *obj = get(idx))
+  if (ConfigItem *obj = get(idx))
     return obj->as<PositioningSystem>();
   return nullptr;
 }
@@ -481,8 +481,8 @@ PositioningSystems::aprsSystem(int idx) const {
   return nullptr;
 }
 
-ConfigObject *
-PositioningSystems::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigItem *
+PositioningSystems::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
   Q_UNUSED(ctx)
   if (! node)
     return nullptr;

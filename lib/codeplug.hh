@@ -8,7 +8,7 @@
 #include "config.hh"
 
 //class Config;
-class ConfigObject;
+class ConfigItem;
 
 
 /** This class defines the interface all device-specific code-plugs must implement.
@@ -190,12 +190,12 @@ public:
 
     /** Resolves the given index for the specifies element type.
      * @returns @c nullptr if the index is not defined or the type is unknown. */
-    ConfigObject *obj(const QMetaObject *elementType, unsigned idx);
+    ConfigItem *obj(const QMetaObject *elementType, unsigned idx);
     /** Returns the index for the given object.
      * @returns -1 if no index is associated with the object or its type is unknown. */
-    int index(ConfigObject *obj);
+    int index(ConfigItem *obj);
     /** Associates the given object with the given index. */
-    bool add(ConfigObject *obj, unsigned idx);
+    bool add(ConfigItem *obj, unsigned idx);
 
     /** Adds a table for the given type. */
     bool addTable(const QMetaObject *obj);
@@ -217,9 +217,9 @@ public:
     class Table {
     public:
       /** The index->object map. */
-      QHash<unsigned, ConfigObject *> objects;
+      QHash<unsigned, ConfigItem *> objects;
       /** The object->index map. */
-      QHash<ConfigObject *, unsigned> indices;
+      QHash<ConfigItem *, unsigned> indices;
     };
 
   protected:

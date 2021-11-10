@@ -55,7 +55,7 @@ void
 PropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
   const ExtensionWrapper *model = dynamic_cast<const ExtensionWrapper *>(index.model());
   if (model->isProperty(index)) {
-    ConfigObject *obj = model->parentObject(index);
+    ConfigItem *obj = model->parentObject(index);
     QMetaProperty prop = model->propertyAt(index);
     if (! prop.isValid())
       return;
@@ -88,7 +88,7 @@ void
 PropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel *abstractmodel, const QModelIndex &index) const {
   ExtensionWrapper *model = dynamic_cast<ExtensionWrapper *>(abstractmodel);
   if (model->isProperty(index)) {
-    ConfigObject *obj = model->parentObject(index);
+    ConfigItem *obj = model->parentObject(index);
     QMetaProperty prop = model->propertyAt(index);
     if (! prop.isValid())
       return;

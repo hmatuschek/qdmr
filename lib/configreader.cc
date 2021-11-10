@@ -29,7 +29,7 @@ AbstractConfigReader::errorMessage() const {
 }
 
 bool
-AbstractConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx)
+AbstractConfigReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx)
 {
   Q_UNUSED(ctx)
 
@@ -138,7 +138,7 @@ AbstractConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
 }
 
 bool
-AbstractConfigReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+AbstractConfigReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   const QMetaObject *meta = obj->metaObject();
 
   for (int p=QObject::staticMetaObject.propertyOffset(); p<meta->propertyCount(); p++) {
@@ -240,14 +240,14 @@ AbstractConfigReader::link(ConfigObject *obj, const YAML::Node &node, const Conf
 
 bool
 AbstractConfigReader::parseExtensions(
-    const QHash<QString, AbstractConfigReader *> &extensions, ConfigObject *obj,
-    const YAML::Node &node, ConfigObject::Context &ctx)
+    const QHash<QString, AbstractConfigReader *> &extensions, ConfigItem *obj,
+    const YAML::Node &node, ConfigItem::Context &ctx)
 {
   // Parse extensions:
   foreach (QString name, extensions.keys()) {
     if (node[name.toStdString()]) {
       YAML::Node extNode = node[name.toStdString()];
-      ConfigObject *ext = extensions[name]->allocate(extNode, ctx);
+      ConfigItem *ext = extensions[name]->allocate(extNode, ctx);
       if (!ext) {
         _errorMessage = tr("%1:%2: Cannot allocate extension '%3': %1")
             .arg(extNode.Mark().line).arg(extNode.Mark().column)
@@ -269,8 +269,8 @@ AbstractConfigReader::parseExtensions(
 
 bool
 AbstractConfigReader::linkExtensions(
-    const QHash<QString, AbstractConfigReader *> &extensions, ConfigObject *obj,
-    const YAML::Node &node, const ConfigObject::Context &ctx)
+    const QHash<QString, AbstractConfigReader *> &extensions, ConfigItem *obj,
+    const YAML::Node &node, const ConfigItem::Context &ctx)
 {
   foreach (QString name, extensions.keys()) {
     // skip extensions not set
@@ -280,7 +280,7 @@ AbstractConfigReader::linkExtensions(
     if (! extensions.contains(name))
       continue;
     AbstractConfigReader *reader = extensions[name];
-    ConfigObject *extension = obj->extension(name);
+    ConfigItem *extension = obj->extension(name);
     if (!reader->link(extension, extNode, ctx)) {
       _errorMessage = tr("%1:%2: Cannot link configuration extension '%3': %4")
           .arg(extNode.Mark().line).arg(extNode.Mark().column)
@@ -345,7 +345,7 @@ ConfigReader::read(Config *obj, const QString &filename) {
   }
 
   obj->clear();
-  ConfigObject::Context context;
+  ConfigItem::Context context;
 
   if (! parse(obj, node, context))
     return false;
@@ -356,14 +356,14 @@ ConfigReader::read(Config *obj, const QString &filename) {
   return true;
 }
 
-ConfigObject *
-ConfigReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+ConfigReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node); Q_UNUSED(ctx);
   return new Config();
 }
 
 bool
-ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx)
+ConfigReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx)
 {
   Config *config = qobject_cast<Config *>(obj);
   if (nullptr == config) {
@@ -420,7 +420,7 @@ ConfigReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
 }
 
 bool
-ConfigReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx)
+ConfigReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx)
 {
   Config *config = qobject_cast<Config *>(obj);
 
@@ -461,7 +461,7 @@ ConfigReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject
 
 
 bool
-ConfigReader::parseSettings(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseSettings(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   RadioSettingsReader reader;
   if (! reader.parse(config->settings(), node, ctx)) {
     _errorMessage = reader.errorMessage();
@@ -471,7 +471,7 @@ ConfigReader::parseSettings(Config *config, const YAML::Node &node, ConfigObject
 }
 
 bool
-ConfigReader::linkSettings(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkSettings(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (node["defaultID"] && node["defaultID"].IsScalar()) {
     QString id = QString::fromStdString(node["defaultID"].as<std::string>());
     if (ctx.contains(id) && ctx.getObj(id)->is<RadioID>()) {
@@ -492,7 +492,7 @@ ConfigReader::linkSettings(Config *config, const YAML::Node &node, const ConfigO
 
 
 bool
-ConfigReader::parseRadioIDs(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseRadioIDs(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (!node) {
     _errorMessage = tr("No radio IDs defined.");
     return false;
@@ -512,7 +512,7 @@ ConfigReader::parseRadioIDs(Config *config, const YAML::Node &node, ConfigObject
 }
 
 bool
-ConfigReader::parseRadioID(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseRadioID(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   if ((! node.IsMap()) || (1 != node.size())) {
     _errorMessage = tr("%1:%2: Radio ID must map with a single element specifying the type.")
         .arg(node.Mark().line).arg(node.Mark().column);
@@ -533,7 +533,7 @@ ConfigReader::parseRadioID(Config *config, const YAML::Node &node, ConfigObject:
 }
 
 bool
-ConfigReader::parseDMRRadioID(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseDMRRadioID(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   RadioIdReader reader;
   RadioID *id = qobject_cast<RadioID*>(reader.allocate(node, ctx));
   if (nullptr == id) {
@@ -550,7 +550,7 @@ ConfigReader::parseDMRRadioID(Config *config, const YAML::Node &node, ConfigObje
 }
 
 bool
-ConfigReader::linkRadioIDs(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkRadioIDs(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx) {
   YAML::const_iterator it=node.begin();
   int i=0;
   for (; (it!=node.end()) && (i<config->radioIDs()->count()); it++, i++) {
@@ -567,7 +567,7 @@ ConfigReader::linkRadioIDs(Config *config, const YAML::Node &node, const ConfigO
 }
 
 bool
-ConfigReader::linkRadioID(RadioID *id, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkRadioID(RadioID *id, const YAML::Node &node, const ConfigItem::Context &ctx) {
   std::string type = node.begin()->first.as<std::string>();
   if ("dmr" == type) {
     if (! linkDMRRadioID(id, node[type], ctx))
@@ -577,7 +577,7 @@ ConfigReader::linkRadioID(RadioID *id, const YAML::Node &node, const ConfigObjec
 }
 
 bool
-ConfigReader::linkDMRRadioID(RadioID *id, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkDMRRadioID(RadioID *id, const YAML::Node &node, const ConfigItem::Context &ctx) {
   RadioIdReader reader;
   if (! reader.link(id, node, ctx)) {
     _errorMessage = reader.errorMessage();
@@ -588,7 +588,7 @@ ConfigReader::linkDMRRadioID(RadioID *id, const YAML::Node &node, const ConfigOb
 
 
 bool
-ConfigReader::parseChannels(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseChannels(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! node) {
     _errorMessage = tr("No channels defined.");
     return false;
@@ -609,7 +609,7 @@ ConfigReader::parseChannels(Config *config, const YAML::Node &node, ConfigObject
 }
 
 bool
-ConfigReader::parseChannel(Config *config, const YAML::Node &node, ConfigObject::Context &ctx)  {
+ConfigReader::parseChannel(Config *config, const YAML::Node &node, ConfigItem::Context &ctx)  {
   if ((! node.IsMap()) || (1 != node.size())) {
     _errorMessage = tr("%1:%2: Expected map with a single element.")
         .arg(node.Mark().line, node.Mark().column);
@@ -633,7 +633,7 @@ ConfigReader::parseChannel(Config *config, const YAML::Node &node, ConfigObject:
 }
 
 bool
-ConfigReader::parseDigitalChannel(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseDigitalChannel(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   DigitalChannelReader reader;
   DigitalChannel *ch = reader.allocate(node, ctx)->as<DigitalChannel>();
   if (! ch) {
@@ -650,7 +650,7 @@ ConfigReader::parseDigitalChannel(Config *config, const YAML::Node &node, Config
 }
 
 bool
-ConfigReader::parseAnalogChannel(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseAnalogChannel(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   AnalogChannelReader reader;
   AnalogChannel *ch = reader.allocate(node, ctx)->as<AnalogChannel>();
   if (! ch) {
@@ -668,7 +668,7 @@ ConfigReader::parseAnalogChannel(Config *config, const YAML::Node &node, ConfigO
 }
 
 bool
-ConfigReader::linkChannels(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkChannels(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx) {
   YAML::const_iterator it=node.begin();
   int i=0;
   for (; (it!=node.end()) && (i<config->channelList()->count()); it++, i++) {
@@ -679,7 +679,7 @@ ConfigReader::linkChannels(Config *config, const YAML::Node &node, const ConfigO
 }
 
 bool
-ConfigReader::linkChannel(Channel *channel, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkChannel(Channel *channel, const YAML::Node &node, const ConfigItem::Context &ctx) {
   std::string type = node.begin()->first.as<std::string>();
   if ("analog" == type) {
     if (! linkAnalogChannel(channel->as<AnalogChannel>(), node[type], ctx))
@@ -692,7 +692,7 @@ ConfigReader::linkChannel(Channel *channel, const YAML::Node &node, const Config
 }
 
 bool
-ConfigReader::linkAnalogChannel(AnalogChannel *channel, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkAnalogChannel(AnalogChannel *channel, const YAML::Node &node, const ConfigItem::Context &ctx) {
   AnalogChannelReader reader;
   if (! reader.link(channel, node, ctx)) {
     _errorMessage = reader.errorMessage();
@@ -702,7 +702,7 @@ ConfigReader::linkAnalogChannel(AnalogChannel *channel, const YAML::Node &node, 
 }
 
 bool
-ConfigReader::linkDigitalChannel(DigitalChannel *channel, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkDigitalChannel(DigitalChannel *channel, const YAML::Node &node, const ConfigItem::Context &ctx) {
   DigitalChannelReader reader;
   if (! reader.link(channel, node, ctx)) {
     _errorMessage = reader.errorMessage();
@@ -713,7 +713,7 @@ ConfigReader::linkDigitalChannel(DigitalChannel *channel, const YAML::Node &node
 
 
 bool
-ConfigReader::parseZones(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseZones(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! node) {
     _errorMessage = tr("No zones defined.");
     return false;
@@ -734,7 +734,7 @@ ConfigReader::parseZones(Config *config, const YAML::Node &node, ConfigObject::C
 }
 
 bool
-ConfigReader::parseZone(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseZone(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   ZoneReader reader;
 
   Zone *zone = reader.allocate(node, ctx)->as<Zone>();
@@ -756,7 +756,7 @@ ConfigReader::parseZone(Config *config, const YAML::Node &node, ConfigObject::Co
 }
 
 bool
-ConfigReader::linkZones(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkZones(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx) {
   YAML::const_iterator it=node.begin();
   int i=0;
   for (; (it!=node.end()) && (i<config->zones()->count()); it++, i++) {
@@ -767,7 +767,7 @@ ConfigReader::linkZones(Config *config, const YAML::Node &node, const ConfigObje
 }
 
 bool
-ConfigReader::linkZone(Zone *zone, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkZone(Zone *zone, const YAML::Node &node, const ConfigItem::Context &ctx) {
   ZoneReader reader;
   if(! reader.link(zone, node, ctx)) {
     _errorMessage = reader.errorMessage();
@@ -778,7 +778,7 @@ ConfigReader::linkZone(Zone *zone, const YAML::Node &node, const ConfigObject::C
 
 
 bool
-ConfigReader::parseScanLists(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseScanLists(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! node)
     return true;
 
@@ -797,7 +797,7 @@ ConfigReader::parseScanLists(Config *config, const YAML::Node &node, ConfigObjec
 }
 
 bool
-ConfigReader::parseScanList(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseScanList(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   ScanListReader reader;
 
   ScanList *list = reader.allocate(node, ctx)->as<ScanList>();
@@ -819,7 +819,7 @@ ConfigReader::parseScanList(Config *config, const YAML::Node &node, ConfigObject
 }
 
 bool
-ConfigReader::linkScanLists(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkScanLists(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx) {
   YAML::const_iterator it=node.begin();
   int i=0;
   for (; (it!=node.end()) && (i<config->scanlists()->count()); it++, i++) {
@@ -830,13 +830,13 @@ ConfigReader::linkScanLists(Config *config, const YAML::Node &node, const Config
 }
 
 bool
-ConfigReader::linkScanList(ScanList *list, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkScanList(ScanList *list, const YAML::Node &node, const ConfigItem::Context &ctx) {
   return ScanListReader().link(list, node, ctx);
 }
 
 
 bool
-ConfigReader::parseContacts(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseContacts(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! node)
     return true;
 
@@ -855,7 +855,7 @@ ConfigReader::parseContacts(Config *config, const YAML::Node &node, ConfigObject
 }
 
 bool
-ConfigReader::parseContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx)  {
+ConfigReader::parseContact(Config *config, const YAML::Node &node, ConfigItem::Context &ctx)  {
   if ((! node.IsMap()) || (1 != node.size())) {
     _errorMessage = tr("%1:%2: Expected map with a single element.")
         .arg(node.Mark().line, node.Mark().column);
@@ -879,7 +879,7 @@ ConfigReader::parseContact(Config *config, const YAML::Node &node, ConfigObject:
 }
 
 bool
-ConfigReader::parseDMRContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseDMRContact(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   DMRContactReader reader;
   DigitalContact *cont = reader.allocate(node, ctx)->as<DigitalContact>();
   if (nullptr == cont) {
@@ -900,7 +900,7 @@ ConfigReader::parseDMRContact(Config *config, const YAML::Node &node, ConfigObje
 }
 
 bool
-ConfigReader::parseDTMFContact(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseDTMFContact(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   Q_UNUSED(config); Q_UNUSED(ctx)
   _errorMessage = tr("%1:%2: DTMF contact reader not implemented yet.")
       .arg(node.Mark().line).arg(node.Mark().column);
@@ -908,7 +908,7 @@ ConfigReader::parseDTMFContact(Config *config, const YAML::Node &node, ConfigObj
 }
 
 bool
-ConfigReader::linkContacts(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkContacts(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx) {
   YAML::const_iterator it=node.begin();
   int i=0;
   for (; (it!=node.end()) && (i<config->contacts()->count()); it++, i++) {
@@ -919,7 +919,7 @@ ConfigReader::linkContacts(Config *config, const YAML::Node &node, const ConfigO
 }
 
 bool
-ConfigReader::linkContact(Contact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkContact(Contact *contact, const YAML::Node &node, const ConfigItem::Context &ctx) {
   std::string type = node.begin()->first.as<std::string>();
   if ("dmr" == type) {
     if (! linkDMRContact(contact->as<DigitalContact>(), node[type], ctx))
@@ -932,12 +932,12 @@ ConfigReader::linkContact(Contact *contact, const YAML::Node &node, const Config
 }
 
 bool
-ConfigReader::linkDMRContact(DigitalContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkDMRContact(DigitalContact *contact, const YAML::Node &node, const ConfigItem::Context &ctx) {
   return DMRContactReader().link(contact, node, ctx);
 }
 
 bool
-ConfigReader::linkDTMFContact(DTMFContact *contact, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkDTMFContact(DTMFContact *contact, const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(contact)
   Q_UNUSED(node)
   Q_UNUSED(ctx)
@@ -947,7 +947,7 @@ ConfigReader::linkDTMFContact(DTMFContact *contact, const YAML::Node &node, cons
 
 
 bool
-ConfigReader::parseGroupLists(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseGroupLists(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! node) {
     _errorMessage = tr("No group lists defined.");
     return false;
@@ -968,7 +968,7 @@ ConfigReader::parseGroupLists(Config *config, const YAML::Node &node, ConfigObje
 }
 
 bool
-ConfigReader::parseGroupList(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseGroupList(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   GroupListReader reader;
 
   RXGroupList *list = reader.allocate(node, ctx)->as<RXGroupList>();
@@ -990,7 +990,7 @@ ConfigReader::parseGroupList(Config *config, const YAML::Node &node, ConfigObjec
 }
 
 bool
-ConfigReader::linkGroupLists(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkGroupLists(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx) {
   YAML::const_iterator it=node.begin();
   int i=0;
   for (; (it!=node.end()) && (i<config->rxGroupLists()->count()); it++, i++) {
@@ -1001,13 +1001,13 @@ ConfigReader::linkGroupLists(Config *config, const YAML::Node &node, const Confi
 }
 
 bool
-ConfigReader::linkGroupList(RXGroupList *list, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkGroupList(RXGroupList *list, const YAML::Node &node, const ConfigItem::Context &ctx) {
   return GroupListReader().link(list, node, ctx);
 }
 
 
 bool
-ConfigReader::parsePositioningSystems(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parsePositioningSystems(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! node)
     return true;
 
@@ -1026,7 +1026,7 @@ ConfigReader::parsePositioningSystems(Config *config, const YAML::Node &node, Co
 }
 
 bool
-ConfigReader::parsePositioningSystem(Config *config, const YAML::Node &node, ConfigObject::Context &ctx)  {
+ConfigReader::parsePositioningSystem(Config *config, const YAML::Node &node, ConfigItem::Context &ctx)  {
   if ((! node.IsMap()) || (1 != node.size())) {
     _errorMessage = tr("%1:%2: Expected map with a single element.")
         .arg(node.Mark().line, node.Mark().column);
@@ -1050,7 +1050,7 @@ ConfigReader::parsePositioningSystem(Config *config, const YAML::Node &node, Con
 }
 
 bool
-ConfigReader::parseGPSSystem(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseGPSSystem(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   GPSSystemReader reader;
 
   GPSSystem *sys = reader.allocate(node, ctx)->as<GPSSystem>();
@@ -1072,7 +1072,7 @@ ConfigReader::parseGPSSystem(Config *config, const YAML::Node &node, ConfigObjec
 }
 
 bool
-ConfigReader::parseAPRSSystem(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseAPRSSystem(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   APRSSystemReader reader;
 
   APRSSystem *sys = reader.allocate(node, ctx)->as<APRSSystem>();
@@ -1094,7 +1094,7 @@ ConfigReader::parseAPRSSystem(Config *config, const YAML::Node &node, ConfigObje
 }
 
 bool
-ConfigReader::linkPositioningSystems(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkPositioningSystems(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx) {
   YAML::const_iterator it=node.begin();
   int i=0;
   for (; (it!=node.end()) && (i<config->posSystems()->count()); it++, i++) {
@@ -1105,7 +1105,7 @@ ConfigReader::linkPositioningSystems(Config *config, const YAML::Node &node, con
 }
 
 bool
-ConfigReader::linkPositioningSystem(PositioningSystem *system, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkPositioningSystem(PositioningSystem *system, const YAML::Node &node, const ConfigItem::Context &ctx) {
   std::string type = node.begin()->first.as<std::string>();
   if ("dmr" == type) {
     if (! linkGPSSystem(system->as<GPSSystem>(), node[type], ctx))
@@ -1118,18 +1118,18 @@ ConfigReader::linkPositioningSystem(PositioningSystem *system, const YAML::Node 
 }
 
 bool
-ConfigReader::linkGPSSystem(GPSSystem *system, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkGPSSystem(GPSSystem *system, const YAML::Node &node, const ConfigItem::Context &ctx) {
   return GPSSystemReader().link(system, node, ctx);
 }
 
 bool
-ConfigReader::linkAPRSSystem(APRSSystem *system, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkAPRSSystem(APRSSystem *system, const YAML::Node &node, const ConfigItem::Context &ctx) {
   return APRSSystemReader().link(system, node, ctx);
 }
 
 
 bool
-ConfigReader::parseRoamingZones(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseRoamingZones(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! node)
     return true;
 
@@ -1148,7 +1148,7 @@ ConfigReader::parseRoamingZones(Config *config, const YAML::Node &node, ConfigOb
 }
 
 bool
-ConfigReader::parseRoamingZone(Config *config, const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigReader::parseRoamingZone(Config *config, const YAML::Node &node, ConfigItem::Context &ctx) {
   RoamingReader reader;
 
   RoamingZone *zone = reader.allocate(node, ctx)->as<RoamingZone>();
@@ -1170,7 +1170,7 @@ ConfigReader::parseRoamingZone(Config *config, const YAML::Node &node, ConfigObj
 }
 
 bool
-ConfigReader::linkRoamingZones(Config *config, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkRoamingZones(Config *config, const YAML::Node &node, const ConfigItem::Context &ctx) {
   YAML::const_iterator it=node.begin();
   int i=0;
   for (; (it!=node.end()) && (i<config->roaming()->count()); it++, i++) {
@@ -1181,7 +1181,7 @@ ConfigReader::linkRoamingZones(Config *config, const YAML::Node &node, const Con
 }
 
 bool
-ConfigReader::linkRoamingZone(RoamingZone *zone, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigReader::linkRoamingZone(RoamingZone *zone, const YAML::Node &node, const ConfigItem::Context &ctx) {
   return RoamingReader().link(zone, node, ctx);
 }
 
@@ -1196,7 +1196,7 @@ ObjectReader::ObjectReader(QObject *parent)
 }
 
 bool
-ObjectReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx)
+ObjectReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx)
 {
   if (! AbstractConfigReader::parse(obj, node, ctx))
     return false;
@@ -1206,16 +1206,18 @@ ObjectReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Con
     return false;
   }
 
-  if (node["id"] && node["id"].IsScalar()) {
-    QString id = QString::fromStdString(node["id"].as<std::string>());
-    if (ctx.contains(id)) {
-      _errorMessage = tr("Cannot parse object '%1': ID already used.").arg(id);
-      return false;
+  if (obj->is<ConfigObject>()) {
+    if (node["id"] && node["id"].IsScalar()) {
+      QString id = QString::fromStdString(node["id"].as<std::string>());
+      if (ctx.contains(id)) {
+        _errorMessage = tr("Cannot parse object '%1': ID already used.").arg(id);
+        return false;
+      }
+      //logDebug() << "Register object " << obj << " as '" << id << "'.";
+      ctx.add(id, obj->as<ConfigObject>());
+    } else {
+      logWarn() << "No ID associated with object, it cannot be referenced later.";
     }
-    //logDebug() << "Register object " << obj << " as '" << id << "'.";
-    ctx.add(id, obj);
-  } else {
-    logWarn() << "No ID associated with object, it cannot be referenced later.";
   }
 
   return true;
@@ -1245,15 +1247,15 @@ RadioSettingsReader::addExtension(ExtensionReader *ext) {
   return true;
 }
 
-ConfigObject *
-RadioSettingsReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+RadioSettingsReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
   return new RadioSettings();
 }
 
 bool
-RadioSettingsReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+RadioSettingsReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   RadioSettings *rid = qobject_cast<RadioSettings *>(obj);
 
   if (! AbstractConfigReader::parse(obj, node, ctx))
@@ -1266,7 +1268,7 @@ RadioSettingsReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObje
 }
 
 bool
-RadioSettingsReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+RadioSettingsReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! linkExtensions(_extensions, obj, node, ctx))
     return false;
 
@@ -1297,15 +1299,15 @@ RadioIdReader::addExtension(ExtensionReader *ext) {
   return true;
 }
 
-ConfigObject *
-RadioIdReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+RadioIdReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
   return new RadioID();
 }
 
 bool
-RadioIdReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+RadioIdReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   RadioID *rid = qobject_cast<RadioID *>(obj);
 
   if (! ObjectReader::parse(obj, node, ctx))
@@ -1318,7 +1320,7 @@ RadioIdReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
 }
 
 bool
-RadioIdReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+RadioIdReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! linkExtensions(_extensions, obj, node, ctx))
     return false;
 
@@ -1351,7 +1353,7 @@ ChannelReader::addExtension(ExtensionReader *ext) {
 
 
 bool
-ChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+ChannelReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
 
@@ -1383,7 +1385,7 @@ ChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
 }
 
 bool
-ChannelReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ChannelReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! ObjectReader::link(obj, node, ctx))
     return false;
 
@@ -1417,15 +1419,15 @@ DigitalChannelReader::addExtension(ExtensionReader *ext) {
   return true;
 }
 
-ConfigObject *
-DigitalChannelReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+DigitalChannelReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
   return new DigitalChannel();
 }
 
 bool
-DigitalChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+DigitalChannelReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! ChannelReader::parse(obj, node, ctx))
     return false;
 
@@ -1436,7 +1438,7 @@ DigitalChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObj
 }
 
 bool
-DigitalChannelReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+DigitalChannelReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! ChannelReader::link(obj, node, ctx))
     return false;
 
@@ -1470,15 +1472,15 @@ AnalogChannelReader::addExtension(ExtensionReader *ext) {
   return true;
 }
 
-ConfigObject *
-AnalogChannelReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+AnalogChannelReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
   return new AnalogChannel();
 }
 
 bool
-AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+AnalogChannelReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   AnalogChannel *channel = obj->as<AnalogChannel>();
 
   if (! ChannelReader::parse(obj, node, ctx))
@@ -1519,7 +1521,7 @@ AnalogChannelReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObje
 }
 
 bool
-AnalogChannelReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+AnalogChannelReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! ChannelReader::link(obj, node, ctx))
     return false;
 
@@ -1553,15 +1555,15 @@ ZoneReader::addExtension(ExtensionReader *ext) {
   return true;
 }
 
-ConfigObject *
-ZoneReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+ZoneReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
   return new Zone();
 }
 
 bool
-ZoneReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+ZoneReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
 
@@ -1572,7 +1574,7 @@ ZoneReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Conte
 }
 
 bool
-ZoneReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ZoneReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! ObjectReader::link(obj, node, ctx))
     return false;
 
@@ -1607,7 +1609,7 @@ ContactReader::addExtension(ExtensionReader *ext) {
 }
 
 bool
-ContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+ContactReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
 
@@ -1618,7 +1620,7 @@ ContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
 }
 
 bool
-ContactReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ContactReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! linkExtensions(_extensions, obj, node, ctx))
     return false;
 
@@ -1649,15 +1651,15 @@ DMRContactReader::addExtension(ExtensionReader *ext) {
   return ext;
 }
 
-ConfigObject *
-DMRContactReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+DMRContactReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
   return new DigitalContact(DigitalContact::PrivateCall, "", 0);
 }
 
 bool
-DMRContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+DMRContactReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! ContactReader::parse(obj, node, ctx))
     return false;
 
@@ -1668,7 +1670,7 @@ DMRContactReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject:
 }
 
 bool
-DMRContactReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+DMRContactReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! ContactReader::link(obj, node, ctx))
     return false;
 
@@ -1703,7 +1705,7 @@ PositioningReader::addExtension(ExtensionReader *ext) {
 }
 
 bool
-PositioningReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+PositioningReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
 
@@ -1714,7 +1716,7 @@ PositioningReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject
 }
 
 bool
-PositioningReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+PositioningReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! ObjectReader::link(obj, node, ctx))
     return false;
 
@@ -1748,15 +1750,15 @@ GPSSystemReader::addExtension(ExtensionReader *ext) {
   return true;
 }
 
-ConfigObject *
-GPSSystemReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+GPSSystemReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
   return new GPSSystem();
 }
 
 bool
-GPSSystemReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+GPSSystemReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! PositioningReader::parse(obj, node, ctx))
     return false;
 
@@ -1767,7 +1769,7 @@ GPSSystemReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::
 }
 
 bool
-GPSSystemReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+GPSSystemReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! PositioningReader::link(obj, node, ctx))
     return false;
 
@@ -1801,15 +1803,15 @@ APRSSystemReader::addExtension(ExtensionReader *ext) {
   return true;
 }
 
-ConfigObject *
-APRSSystemReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+APRSSystemReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
   return new APRSSystem("",nullptr, "", 0, "", 0);
 }
 
 bool
-APRSSystemReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+APRSSystemReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   APRSSystem *system = qobject_cast<APRSSystem *>(obj);
 
   if (! PositioningReader::parse(obj, node, ctx))
@@ -1861,7 +1863,7 @@ APRSSystemReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject:
 }
 
 bool
-APRSSystemReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+APRSSystemReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! PositioningReader::link(obj, node, ctx))
     return false;
 
@@ -1895,15 +1897,15 @@ ScanListReader::addExtension(ExtensionReader *ext) {
   return true;
 }
 
-ConfigObject *
-ScanListReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+ScanListReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
   return new ScanList();
 }
 
 bool
-ScanListReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+ScanListReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
 
@@ -1914,7 +1916,7 @@ ScanListReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::C
 }
 
 bool
-ScanListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+ScanListReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! ObjectReader::link(obj, node, ctx))
     return false;
 
@@ -1948,15 +1950,15 @@ GroupListReader::addExtension(ExtensionReader *ext) {
   return true;
 }
 
-ConfigObject *
-GroupListReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+GroupListReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
   return new RXGroupList();
 }
 
 bool
-GroupListReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+GroupListReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
 
@@ -1967,7 +1969,7 @@ GroupListReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::
 }
 
 bool
-GroupListReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx)
+GroupListReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx)
 {
   if (! ObjectReader::link(obj, node, ctx))
     return false;
@@ -2003,15 +2005,15 @@ RoamingReader::addExtension(ExtensionReader *ext) {
   return true;
 }
 
-ConfigObject *
-RoamingReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+RoamingReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
   return new RoamingZone();
 }
 
 bool
-RoamingReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Context &ctx) {
+RoamingReader::parse(ConfigItem *obj, const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! ObjectReader::parse(obj, node, ctx))
     return false;
 
@@ -2022,7 +2024,7 @@ RoamingReader::parse(ConfigObject *obj, const YAML::Node &node, ConfigObject::Co
 }
 
 bool
-RoamingReader::link(ConfigObject *obj, const YAML::Node &node, const ConfigObject::Context &ctx) {
+RoamingReader::link(ConfigItem *obj, const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! ObjectReader::link(obj, node, ctx))
     return false;
 

@@ -6,7 +6,7 @@
 
 /** Represents the common radio-global settings.
  * @ingroup conf */
-class RadioSettings : public ConfigObject
+class RadioSettings : public ConfigItem
 {
   Q_OBJECT
   /** The first intro line. */
@@ -82,7 +82,7 @@ public:
   void disableTOT();
 
 public:
-  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
 protected:
   /** Holds the first intro line. */

@@ -59,11 +59,11 @@ public:
   void setPeriod(unsigned period);
 
 public:
-  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
   bool parse(const YAML::Node &node, Context &ctx);
 
 protected:
-  bool populate(YAML::Node &node, const ConfigObject::Context &context);
+  bool populate(YAML::Node &node, const ConfigItem::Context &context);
 
 protected slots:
   /** Gets called, whenever a reference is modified. */
@@ -294,7 +294,7 @@ public:
   APRSSystem *aprsSystem(int idx) const;
 
 public:
-  ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx);
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx);
 };
 
 

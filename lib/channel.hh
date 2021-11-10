@@ -45,6 +45,7 @@ class Channel: public ConfigObject
   Q_PROPERTY(ScanListReference* scanList READ scanList)
   /** The VOX setting. */
   Q_PROPERTY(unsigned vox READ vox WRITE setVOX SCRIPTABLE false)
+  /** The OpenGD77 channel extension. */
   Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
 
 public:
@@ -149,11 +150,14 @@ public:
   /** (Re-) Sets the default scan list for the channel. */
   bool setScanListObj(ScanList *list);
 
+  /** Returns the channel extension for the OpenGD77 firmware.
+   * If this extension is not set, returns @c nullptr. */
   OpenGD77ChannelExtension *openGD77ChannelExtension() const;
+  /** Sets the OpenGD77 channel extension. */
   void setOpenGD77ChannelExtension(OpenGD77ChannelExtension *ext);
 
 public:
-  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
   bool parse(const YAML::Node &node, Context &ctx);
   bool link(const YAML::Node &node, const Context &ctx);
 
@@ -183,6 +187,7 @@ protected:
   unsigned _vox;
   /** Default scan list of the channel. */
   ScanListReference _scanlist;
+  /** Owns the OpenGD77 channel extension object. */
   OpenGD77ChannelExtension *_openGD77ChannelExtension;
 };
 
@@ -228,8 +233,6 @@ public:
   /** Copy constructor. */
   AnalogChannel(const AnalogChannel &other, QObject *parent=nullptr);
 
-  YAML::Node serialize(const Context &context);
-
   /** Returns the admit criterion for the analog channel. */
 	Admit admit() const;
   /** (Re-)Sets the admit criterion for the analog channel. */
@@ -272,6 +275,7 @@ public:
   void setAPRSSystem(APRSSystem *sys);
 
 public:
+  YAML::Node serialize(const Context &context);
   bool parse(const YAML::Node &node, Context &ctx);
 
 protected:
@@ -474,7 +478,7 @@ public:
   AnalogChannel *findAnalogChannelByTxFreq(double freq) const;
 
 public:
-  ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx);
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx);
 };
 
 

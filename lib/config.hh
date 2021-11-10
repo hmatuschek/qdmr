@@ -34,7 +34,7 @@ class UserDatabase;
  * configuration.
  *
  * @ingroup conf */
-class Config : public ConfigObject
+class Config : public ConfigItem
 {
 	Q_OBJECT
 
@@ -77,7 +77,10 @@ public:
   /** Clears the complete configuration. */
   void clear();
 
+  /** Returns the TyT button settings extension.
+   * If this extension is not set, returns @c nullptr. */
   TyTButtonSettings *tytButtonSettings() const;
+  /** Sets the TyT button settings extension. */
   void setTyTButtonSettings(TyTButtonSettings *ext);
 
 public:
@@ -89,7 +92,7 @@ public:
   /** Imports a configuration from the given YAML file. */
   bool readYAML(const QString &filename);
 
-  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
   bool parse(const YAML::Node &node, Context &ctx);
   bool link(const YAML::Node &node, const Context &ctx);
 
@@ -126,7 +129,7 @@ protected:
   PositioningSystems *_gpsSystems;
   /** The list of roaming zones. */
   RoamingZoneList *_roaming;
-  // Explicit extensions
+  /** Owns the tyt button settings. */
   TyTButtonSettings *_tytButtonSettings;
 };
 

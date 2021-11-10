@@ -366,7 +366,7 @@ Codeplug::Context::addTable(const QMetaObject *obj) {
   return true;
 }
 
-ConfigObject *
+ConfigItem *
 Codeplug::Context::obj(const QMetaObject *elementType, unsigned idx) {
   if (! hasTable(elementType))
     return nullptr;
@@ -374,7 +374,7 @@ Codeplug::Context::obj(const QMetaObject *elementType, unsigned idx) {
 }
 
 int
-Codeplug::Context::index(ConfigObject *obj) {
+Codeplug::Context::index(ConfigItem *obj) {
   if (nullptr == obj)
     return -1;
   if (! hasTable(obj->metaObject()))
@@ -383,7 +383,7 @@ Codeplug::Context::index(ConfigObject *obj) {
 }
 
 bool
-Codeplug::Context::add(ConfigObject *obj, unsigned idx) {
+Codeplug::Context::add(ConfigItem *obj, unsigned idx) {
   if (!hasTable(obj->metaObject()))
     return false;
   if (getTable(obj->metaObject()).indices.contains(obj))

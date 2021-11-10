@@ -92,7 +92,7 @@ Application::Application(int &argc, char *argv[])
   _releaseNotes.checkForUpdate();
 
   logDebug() << "Last known position: " << _currentPosition.toString();
-  connect(_config, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModifed()));
+  connect(_config, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModifed()));
 }
 
 Application::~Application() {

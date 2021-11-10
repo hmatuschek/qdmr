@@ -10,13 +10,13 @@ class ExtensionWrapper: public QAbstractItemModel
   Q_OBJECT
 
 public:
-  ExtensionWrapper(ConfigObject *obj, QObject *parent=nullptr);
+  ExtensionWrapper(ConfigItem *obj, QObject *parent=nullptr);
 
-  ConfigObject *parentObject(const QModelIndex &index) const;
+  ConfigItem *parentObject(const QModelIndex &index) const;
   bool isProperty(const QModelIndex &index) const;
   QMetaProperty propertyAt(const QModelIndex &index) const;
   bool isExtension(const QModelIndex &index) const;
-  ConfigObject *extensionAt(const QModelIndex &index) const;
+  ConfigItem *extensionAt(const QModelIndex &index) const;
 
   QModelIndex index(int row, int column, const QModelIndex &parent) const;
   QModelIndex parent(const QModelIndex &child) const;
@@ -29,10 +29,10 @@ public:
   QVariant data(const QModelIndex &index, int role) const;
 
 protected:
-  ConfigObject *item(const QModelIndex &item) const;
+  ConfigItem *item(const QModelIndex &item) const;
 
 protected:
-  ConfigObject *_object;
+  ConfigItem *_object;
 };
 
 #endif // EXTENSIONWRAPPER_HH

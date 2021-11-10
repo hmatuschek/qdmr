@@ -4,20 +4,20 @@
 #include "configreference.hh"
 
 
-ExtensionWrapper::ExtensionWrapper(ConfigObject *obj, QObject *parent)
+ExtensionWrapper::ExtensionWrapper(ConfigItem *obj, QObject *parent)
   : QAbstractItemModel(parent), _object(obj)
 {
   logDebug() << "Create extension wrapper...";
 }
 
-ConfigObject *
+ConfigItem *
 ExtensionWrapper::item(const QModelIndex &item) const {
   if (! item.isValid())
     return nullptr;
 
-  ConfigObject *pobj = _object;
+  ConfigItem *pobj = _object;
   if (nullptr != item.internalPointer())
-    pobj = reinterpret_cast<ConfigObject *>(item.internalPointer());
+    pobj = reinterpret_cast<ConfigItem *>(item.internalPointer());
 
   logDebug() << "Find item for " << item.row()
              << "@" << QString::number(reinterpret_cast<qintptr>(pobj), 16);
@@ -26,7 +26,7 @@ ExtensionWrapper::item(const QModelIndex &item) const {
   int pcount = meta->propertyCount() - QObject::staticMetaObject.propertyCount();
   if (item.row() < pcount) {
     QMetaProperty prop = meta->property(QObject::staticMetaObject.propertyCount() + item.row());
-    if (ConfigObject *item = prop.read(pobj).value<ConfigObject *>())
+    if (ConfigItem *item = prop.read(pobj).value<ConfigItem *>())
       return item;
     else
       return nullptr;
@@ -37,11 +37,11 @@ ExtensionWrapper::item(const QModelIndex &item) const {
   return nullptr;
 }
 
-ConfigObject *
+ConfigItem *
 ExtensionWrapper::parentObject(const QModelIndex &index) const {
-  ConfigObject *pobj = _object;
+  ConfigItem *pobj = _object;
   if (index.isValid())
-     pobj = reinterpret_cast<ConfigObject *>(index.internalId());
+     pobj = reinterpret_cast<ConfigItem *>(index.internalId());
   return pobj;
 }
 
@@ -50,7 +50,7 @@ ExtensionWrapper::isProperty(const QModelIndex &index) const {
   if (! index.isValid())
     return false;
 
-  ConfigObject *pobj = parentObject(index);
+  ConfigItem *pobj = parentObject(index);
   const QMetaObject *meta = pobj->metaObject();
   int propCount = meta->propertyCount() - QObject::staticMetaObject.propertyCount();
   return index.row() < propCount;
@@ -60,7 +60,7 @@ QMetaProperty
 ExtensionWrapper::propertyAt(const QModelIndex &index) const {
   if (! isProperty(index))
     return QMetaProperty();
-  ConfigObject *pobj = parentObject(index);
+  ConfigItem *pobj = parentObject(index);
   const QMetaObject *meta = pobj->metaObject();
   int propCount = meta->propertyCount() - QObject::staticMetaObject.propertyCount();
   if (index.row() < propCount)
@@ -73,18 +73,18 @@ ExtensionWrapper::isExtension(const QModelIndex &index) const {
   if (! index.isValid())
     return false;
 
-  ConfigObject *pobj = parentObject(index);
+  ConfigItem *pobj = parentObject(index);
   const QMetaObject *meta = pobj->metaObject();
   int propCount = meta->propertyCount() - QObject::staticMetaObject.propertyCount();
   int extCount = pobj->extensionCount();
   return (index.row() <= propCount) && (index.row() < (propCount+extCount));
 }
 
-ConfigObject *
+ConfigItem *
 ExtensionWrapper::extensionAt(const QModelIndex &index) const {
   if (! isExtension(index))
     return nullptr;
-  ConfigObject *pobj = parentObject(index);
+  ConfigItem *pobj = parentObject(index);
   const QMetaObject *meta = pobj->metaObject();
   int propCount = meta->propertyCount() - QObject::staticMetaObject.propertyCount();
   return pobj->extension(index.row()-propCount);
@@ -92,7 +92,7 @@ ExtensionWrapper::extensionAt(const QModelIndex &index) const {
 
 QModelIndex
 ExtensionWrapper::index(int row, int column, const QModelIndex &parent) const {
-  ConfigObject *pobj = _object;
+  ConfigItem *pobj = _object;
   if (parent.isValid())
     pobj = item(parent);
 
@@ -109,11 +109,11 @@ ExtensionWrapper::parent(const QModelIndex &child) const {
   if (! child.isValid())
     return QModelIndex();
 
-  ConfigObject *pobj = reinterpret_cast<ConfigObject*>(child.internalPointer());
+  ConfigItem *pobj = reinterpret_cast<ConfigItem*>(child.internalPointer());
   if (_object == pobj)
     return QModelIndex();
 
-  ConfigObject *gp = qobject_cast<ConfigObject*>(pobj->parent());
+  ConfigItem *gp = qobject_cast<ConfigItem*>(pobj->parent());
   if (nullptr == gp) {
     logError() << "Parent of object #" << QString::number(reinterpret_cast<quintptr>(pobj))
                << " not set!";
@@ -129,7 +129,7 @@ ExtensionWrapper::parent(const QModelIndex &child) const {
     QMetaProperty prop = meta->property(p);
     if (! prop.isValid())
       continue;
-    if (prop.read(gp).value<ConfigObject *>() == pobj) {
+    if (prop.read(gp).value<ConfigItem *>() == pobj) {
       return createIndex(p-QObject::staticMetaObject.propertyCount(), 0, reinterpret_cast<quintptr>(gp));
     }
   }
@@ -146,7 +146,7 @@ ExtensionWrapper::parent(const QModelIndex &child) const {
 
 int
 ExtensionWrapper::rowCount(const QModelIndex &parent) const {
-  ConfigObject *pobj = _object;
+  ConfigItem *pobj = _object;
   if (parent.isValid())
     pobj = item(parent);
 
@@ -168,12 +168,12 @@ ExtensionWrapper::columnCount(const QModelIndex &parent) const {
 
 Qt::ItemFlags
 ExtensionWrapper::flags(const QModelIndex &index) const {
-  ConfigObject *pobj = parentObject(index);
+  ConfigItem *pobj = parentObject(index);
   if (isProperty(index)) {
     // if is property
     // check if property is a config object or atomic (or reference)
     QMetaProperty prop = propertyAt(index);
-    if (prop.read(pobj).value<ConfigObject *>()) {
+    if (prop.read(pobj).value<ConfigItem *>()) {
       return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     } else {
       return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren;
@@ -187,9 +187,9 @@ ExtensionWrapper::flags(const QModelIndex &index) const {
 
 bool
 ExtensionWrapper::hasChildren(const QModelIndex &parent) const {
-  ConfigObject *pobj = _object;
+  ConfigItem *pobj = _object;
   if (parent.isValid())
-    pobj = reinterpret_cast<ConfigObject *>(parent.internalId());
+    pobj = reinterpret_cast<ConfigItem *>(parent.internalId());
 
   logDebug() << "Get children for " << parent.row() << "," << parent.column()
              << "@" << QString::number(reinterpret_cast<qintptr>(pobj));
@@ -202,7 +202,7 @@ ExtensionWrapper::hasChildren(const QModelIndex &parent) const {
     // if is property
     // check if property is a config object or atomic (or reference)
     QMetaProperty prop = meta->property(parent.row()+QObject::staticMetaObject.propertyCount());
-    if (! prop.read(pobj).value<ConfigObject *>())
+    if (! prop.read(pobj).value<ConfigItem *>())
       return false;
     return true;
   } else if (parent.row() < int(nprop + pobj->extensionCount())) {
@@ -217,7 +217,7 @@ ExtensionWrapper::data(const QModelIndex &index, int role) const {
   if (! index.isValid())
     return QVariant();
 
-  ConfigObject *pobj = parentObject(index);
+  ConfigItem *pobj = parentObject(index);
 
   if (isProperty(index)) {
     QMetaProperty prop =propertyAt(index);
@@ -248,7 +248,7 @@ ExtensionWrapper::data(const QModelIndex &index, int role) const {
     } else if (value.value<ConfigObjectReference *>() && (Qt::DisplayRole == role)) {
       const QMetaObject *mobj = QMetaType::metaObjectForType(prop.userType());
       ConfigObjectReference *ref = value.value<ConfigObjectReference *>();
-      ConfigObject *obj = ref->as<ConfigObject>();
+      ConfigItem *obj = ref->as<ConfigItem>();
       if (nullptr == obj)
         return tr("[None]");
 
@@ -258,7 +258,7 @@ ExtensionWrapper::data(const QModelIndex &index, int role) const {
       return value;
     }
   } else if (isExtension(index)) {
-    ConfigObject *extension = extensionAt(index);
+    ConfigItem *extension = extensionAt(index);
     if ((0 == index.column()) && (Qt::DisplayRole==role)) {
       return extension->metaObject()->className();
     }

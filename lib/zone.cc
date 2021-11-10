@@ -34,7 +34,7 @@ Zone::Zone(const QString &name, QObject *parent)
   connect(&_B, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
 }
 
-ConfigObject *
+ConfigItem *
 Zone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
   // There are no children yet.
@@ -99,7 +99,7 @@ ZoneList::ZoneList(QObject *parent)
 
 Zone *
 ZoneList::zone(int idx) const {
-  if (ConfigObject *obj = get(idx))
+  if (ConfigItem *obj = get(idx))
     return obj->as<Zone>();
   return nullptr;
 }
@@ -111,8 +111,8 @@ ZoneList::add(ConfigObject *obj, int row) {
   return -1;
 }
 
-ConfigObject *
-ZoneList::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigItem *
+ZoneList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
   Q_UNUSED(ctx)
   if (! node)
     return nullptr;

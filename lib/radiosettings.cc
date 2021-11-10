@@ -1,7 +1,7 @@
 #include "radiosettings.hh"
 
 RadioSettings::RadioSettings(QObject *parent)
-  : ConfigObject("", parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
+  : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
     _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(0)
 {
   // pass
@@ -19,7 +19,7 @@ RadioSettings::clear() {
   disableTOT();
 }
 
-ConfigObject *
+ConfigItem *
 RadioSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
   // No children yet.

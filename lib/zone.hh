@@ -53,7 +53,7 @@ signals:
 	void modified();
 
 public:
-  ConfigObject *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
 protected:
   /** Holds the name of the zone. */
@@ -81,7 +81,7 @@ public:
   int add(ConfigObject *obj, int row=-1);
 
 public:
-  ConfigObject *allocateChild(const YAML::Node &node, ConfigObject::Context &ctx);
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx);
 };
 
 

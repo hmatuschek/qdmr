@@ -51,13 +51,15 @@ RadioID::serialize(const Context &context) {
   return type;
 }
 
-ConfigObject *
+ConfigItem *
 RadioID::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+  // No extensions defined yet for RadioID
   return nullptr;
 }
 
 bool
-RadioID::parse(const YAML::Node &node, ConfigObject::Context &ctx) {
+RadioID::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
   if (! node)
     return false;
 
@@ -71,7 +73,7 @@ RadioID::parse(const YAML::Node &node, ConfigObject::Context &ctx) {
 }
 
 bool
-RadioID::link(const YAML::Node &node, const ConfigObject::Context &ctx) {
+RadioID::link(const YAML::Node &node, const ConfigItem::Context &ctx) {
   if (! node)
     return false;
 
@@ -121,7 +123,7 @@ RadioIDList::clear() {
 
 RadioID *
 RadioIDList::getId(int idx) const {
-  if (ConfigObject *obj = get(idx))
+  if (ConfigItem *obj = get(idx))
     return obj->as<RadioID>();
   return nullptr;
 }
@@ -189,8 +191,10 @@ RadioIDList::delId(uint32_t id) {
 }
 
 
-ConfigObject *
-RadioIDList::allocateChild(const YAML::Node &node, ConfigObject::Context &ctx) {
+ConfigItem *
+RadioIDList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
+  Q_UNUSED(ctx)
+
   if (! node)
     return nullptr;
 

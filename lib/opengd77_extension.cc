@@ -4,13 +4,15 @@
  * Implementation of OpenGD77ChannelExtension
  * ******************************************************************************************** */
 OpenGD77ChannelExtension::OpenGD77ChannelExtension(QObject *parent)
-  : ConfigExtension("", parent), _power(Power::Global)
+  : ConfigExtension(parent), _power(Power::Global)
 {
   // pass...
 }
 
-ConfigObject *
+ConfigItem *
 OpenGD77ChannelExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+  // No extensions yet for this extension
   return nullptr;
 }
 
@@ -38,8 +40,8 @@ OpenGD77ChannelExtensionReader::OpenGD77ChannelExtensionReader(QObject *parent)
   // pass...
 }
 
-ConfigObject *
-OpenGD77ChannelExtensionReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+OpenGD77ChannelExtensionReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(node)
   Q_UNUSED(ctx)
   return new OpenGD77ChannelExtension();
@@ -50,13 +52,15 @@ OpenGD77ChannelExtensionReader::allocate(const YAML::Node &node, const ConfigObj
  * Implementation of OpenGD77ContactExtension
  * ******************************************************************************************** */
 OpenGD77ContactExtension::OpenGD77ContactExtension(QObject *parent)
-  : ConfigExtension("", parent), _timeSlotOverride(TimeSlotOverride::None)
+  : ConfigExtension(parent), _timeSlotOverride(TimeSlotOverride::None)
 {
   // pass...
 }
 
-ConfigObject *
+ConfigItem *
 OpenGD77ContactExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+  // No extension yet of this extension
   return nullptr;
 }
 
@@ -82,8 +86,8 @@ OpenGD77ContactExtensionReader::OpenGD77ContactExtensionReader(QObject *parent)
   // pass...
 }
 
-ConfigObject *
-OpenGD77ContactExtensionReader::allocate(const YAML::Node &node, const ConfigObject::Context &ctx) {
+ConfigItem *
+OpenGD77ContactExtensionReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
   Q_UNUSED(ctx)
   Q_UNUSED(node)
   return new OpenGD77ContactExtension();
