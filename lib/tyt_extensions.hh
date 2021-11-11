@@ -2,7 +2,6 @@
 #define TYTBUTTONSETTINGSEXTENSION_HH
 
 #include "configobject.hh"
-#include "configreader.hh"
 
 /** Represents the TyT button settings extension.
  * @ingroup tyt */

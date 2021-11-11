@@ -7,7 +7,6 @@
 #define OPENGD77EXTENSION_HH
 
 #include "configobject.hh"
-#include "configreader.hh"
 
 /** Implements the channel extensions for the OpenGD77 radios.
  * @since 0.9.0

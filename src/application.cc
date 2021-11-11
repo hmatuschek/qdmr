@@ -24,7 +24,6 @@
 #include "searchpopup.hh"
 #include "contactselectiondialog.hh"
 #include "configitemwrapper.hh"
-#include "configreader.hh"
 #include "generalsettingsview.hh"
 #include "radioidlistview.hh"
 #include "contactlistview.hh"

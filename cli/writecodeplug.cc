@@ -8,7 +8,6 @@
 #include "radio.hh"
 #include "config.hh"
 #include "progressbar.hh"
-#include "configreader.hh"
 
 
 int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {

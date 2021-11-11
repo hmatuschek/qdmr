@@ -9,7 +9,6 @@
 #include "logger.hh"
 #include "config.hh"
 #include "csvreader.hh"
-#include "configreader.hh"
 #include "dfufile.hh"
 #include "rd5r.hh"
 #include "uv390.hh"
