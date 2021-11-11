@@ -153,8 +153,8 @@ OpenGD77Codeplug::ChannelElement::toChannelObj(Context &ctx) const {
 
   OpenGD77ChannelExtension *ext = new OpenGD77ChannelExtension(ch);
   ext->setPower(extendedPower());
+  ch->setOpenGD77ChannelExtension(ext);
 
-  ch->addExtension("openGD77", ext);
   return ch;
 }
 
@@ -174,11 +174,10 @@ OpenGD77Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
   if (c->defaultPower())
     setExtendedPower(Power::Global);
 
-  if (! c->hasExtension("openGD77"))
+  if (nullptr == c->openGD77ChannelExtension())
     return true;
 
-  const OpenGD77ChannelExtension *ext = c->extension("openGD77")->as<OpenGD77ChannelExtension>();
-  setExtendedPower(ext->power());
+  setExtendedPower(c->openGD77ChannelExtension()->power());
 
   return true;
 }
@@ -334,17 +333,18 @@ OpenGD77Codeplug::ContactElement::toContactObj(Context &ctx) const {
     ext->setTimeSlotOverride(OpenGD77ContactExtension::TimeSlotOverride::None);
   }
 
-  c->addExtension("openGD77", ext);
+  c->setOpenGD77ContactExtension(ext);
+
   return c;
 }
 
 void
 OpenGD77Codeplug::ContactElement::fromContactObj(const DigitalContact *c, Context &ctx) {
   GD77Codeplug::ContactElement::fromContactObj(c, ctx);
-  if (! c->hasExtension("openGD77"))
+  if (c->openGD77ContactExtension())
     return;
 
-  const OpenGD77ContactExtension *ext = c->extension("openGD77")->as<OpenGD77ContactExtension>();
+  const OpenGD77ContactExtension *ext = c->openGD77ContactExtension();
   if (OpenGD77ContactExtension::TimeSlotOverride::None != ext->timeSlotOverride()) {
     if (OpenGD77ContactExtension::TimeSlotOverride::TS1 == ext->timeSlotOverride())
       setTimeSlot(DigitalChannel::TimeSlot::TS1);

@@ -116,17 +116,13 @@ ConfigItem::Context::setTag(const QString &className, const QString &property, c
  * Implementation of ConfigItem
  * ********************************************************************************************* */
 ConfigItem::ConfigItem(QObject *parent)
-  : QObject(parent), ErrorStack(), _extensions()
+  : QObject(parent), ErrorStack()
 {
   // pass...
 }
 
 bool
 ConfigItem::label(ConfigObject::Context &context) {
-  foreach(ConfigItem *ext, _extensions) {
-    ext->label(context);
-  }
-
   // Label properties owning config objects, that is of type ConfigObject or ConfigObjectList
   const QMetaObject *meta = metaObject();
   for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
@@ -158,10 +154,6 @@ ConfigItem::serialize(const Context &context) {
 
 void
 ConfigItem::clear() {
-  foreach (ConfigItem *extension, _extensions)
-    extension->deleteLater();
-  _extensions.clear();
-
   // Delete or clear all object owned by properites, that is ConfigObjectList and ConfigObject
   const QMetaObject *meta = metaObject();
   for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
@@ -260,13 +252,6 @@ ConfigItem::populate(YAML::Node &node, const Context &context){
     }
   }
 
-  // Serialize extensions
-  foreach (QString name, _extensionTable.keys()) {
-    YAML::Node extNode = _extensionTable[name]->serialize(context);
-    if (extNode.IsNull())
-      return false;
-    node[name.toStdString()] = extNode;
-  }
   return true;
 }
 
@@ -546,80 +531,6 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx) {
   }
 
   return true;
-}
-
-unsigned
-ConfigItem::extensionCount() const {
-  return _extensions.count();
-}
-
-bool
-ConfigItem::hasExtension(const QString &name) const {
-  return _extensionTable.contains(name);
-}
-
-QList<QString>
-ConfigItem::extensionNames() const {
-  return _extensionTable.keys();
-}
-
-const ConfigItem *
-ConfigItem::extension(const QString &name) const {
-  return _extensionTable.value(name, nullptr);
-}
-
-ConfigItem *
-ConfigItem::extension(const QString &name) {
-  return _extensionTable.value(name, nullptr);
-}
-
-const ConfigItem *
-ConfigItem::extension(unsigned n) const {
-  return _extensions.value(n, nullptr);
-}
-
-ConfigItem *
-ConfigItem::extension(unsigned n) {
-  return _extensions.value(n, nullptr);
-}
-
-QString
-ConfigItem::extensionName(unsigned n) const {
-  if (n >= unsigned(_extensions.count()))
-    return QString();
-  return _extensionTable.key(_extensions.value(n));
-}
-
-void
-ConfigItem::addExtension(const QString &name, ConfigItem *ext) {
-  if (nullptr == ext)
-    return;
-  if (hasExtension(name)) {
-    ConfigItem *obj = _extensionTable[name];
-    _extensions.removeAll(obj);
-    _extensionTable.remove(name);
-    obj->deleteLater();
-  }
-  _extensions.append(ext);
-  _extensionTable.insert(name, ext);
-  ext->setParent(this);
-}
-
-void
-ConfigItem::delExtension(const QString &name) {
-  if (! hasExtension(name))
-    return;
-  ConfigItem *obj = _extensionTable[name];
-  _extensions.removeAll(obj);
-  _extensionTable.remove(name);
-  obj->deleteLater();
-}
-
-void
-ConfigItem::delExtension(unsigned n) {
-  if (n >= unsigned(_extensions.count()))
-    return;
-  delExtension(extensionName(n));
 }
 
 

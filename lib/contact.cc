@@ -2,7 +2,7 @@
 #include "config.hh"
 #include "utils.hh"
 #include "logger.hh"
-
+#include "opengd77_extension.hh"
 
 /* ********************************************************************************************* *
  * Implementation of Contact
@@ -112,7 +112,7 @@ DTMFContact::serialize(const Context &context) {
  * Implementation of DigitalContact
  * ********************************************************************************************* */
 DigitalContact::DigitalContact(QObject *parent)
-  : Contact(parent), _type(PrivateCall), _number(0)
+  : Contact(parent), _type(PrivateCall), _number(0), _openGD77(nullptr)
 {
   // pass...
 }
@@ -156,6 +156,23 @@ DigitalContact::serialize(const Context &context) {
   return type;
 }
 
+
+OpenGD77ContactExtension *
+DigitalContact::openGD77ContactExtension() const {
+  return _openGD77;
+}
+
+void
+DigitalContact::setOpenGD77ContactExtension(OpenGD77ContactExtension *ext) {
+  if (_openGD77)
+    _openGD77->deleteLater();
+  _openGD77 = ext;
+  if (_openGD77) {
+    _openGD77->setParent(this);
+    connect(_openGD77, &OpenGD77ContactExtension::modified,
+            [this](ConfigItem*){ emit modified(this); });
+  }
+}
 
 /* ********************************************************************************************* *
  * Implementation of ContactList

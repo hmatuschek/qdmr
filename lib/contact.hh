@@ -7,6 +7,7 @@
 
 
 class Config;
+class OpenGD77ContactExtension;
 
 /** Represents the base-class for all contact types, Analog (DTMF) or Digital (DMR).
  *
@@ -106,6 +107,8 @@ class DigitalContact: public Contact
   Q_PROPERTY(Type type READ type WRITE setType)
   /** The number of the contact. */
   Q_PROPERTY(unsigned number READ number WRITE setNumber)
+  /** The openGD77 extension to the digital channel. */
+  Q_PROPERTY(OpenGD77ContactExtension* openGD77 READ openGD77ContactExtension WRITE setOpenGD77ContactExtension)
 
 public:
   /** Possible call types for a contact. */
@@ -136,6 +139,11 @@ public:
   /** (Re-)Sets the DMR number of the contact. */
 	bool setNumber(unsigned number);
 
+  /** Returns the OpenGD77 extension, or @c nullptr if not set. */
+  OpenGD77ContactExtension *openGD77ContactExtension() const;
+  /** Sets the OpenGD77 extension. */
+  void setOpenGD77ContactExtension(OpenGD77ContactExtension *ext);
+
 public:
   YAML::Node serialize(const Context &context);
 
@@ -144,6 +152,8 @@ protected:
 	Type _type;
   /** The DMR number of the contact. */
 	unsigned _number;
+  /** Owns the OpenGD77 extensions to the digital contacts. */
+  OpenGD77ContactExtension *_openGD77;
 };
 
 
