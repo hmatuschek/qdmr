@@ -109,6 +109,10 @@ public:
   void pushErrorMessage(const Message &msg);
   /** Adds the error messages from another stack. */
   void pushErrorMessage(const ErrorStack &other);
+
+  /** Clears the error stack. */
+  void clearErrors();
+
 private:
   /** Holds the stack of error messages. */
   QList<Message> _errorMessageStack;

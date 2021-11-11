@@ -15,8 +15,6 @@ class RoamingZone : public ConfigObject
 {
   Q_OBJECT
 
-  /** The name of the roaming zone. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The channels in the roaming zone. */
   Q_PROPERTY(DigitalChannelRefList * channels READ channels)
 
@@ -37,11 +35,6 @@ public:
 
   /** Clears the zone list. */
   void clear();
-
-  /** Returns the name of the roaming zone. */
-  const QString &name() const;
-  /** Sets the name of the roaming zone. */
-  void setName(const QString &name);
 
   /** Retunrs the digital channel, which is the member at index @c idx (0-based).
    * @param idx Specifies the index of the member channel. */
@@ -65,8 +58,6 @@ public:
   ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
 protected:
-  /** Holds the name of the roaming zone. */
-  QString _name;
   /** Holds the actual channels of the roaming zone. */
   DigitalChannelRefList _channel;
 };

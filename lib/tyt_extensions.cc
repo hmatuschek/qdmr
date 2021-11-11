@@ -66,23 +66,3 @@ TyTButtonSettings::setLongPressDuration(unsigned dur) {
   _longPressDuration = dur;
 }
 
-
-/* ******************************************************************************************** *
- * Implementation of TyTButtonSettingsReader
- * ******************************************************************************************** */
-// Register extension to config reader
-AbstractConfigReader *
-TyTButtonSettingsReader::instance = ConfigReader::addExtension(new TyTButtonSettingsReader());
-
-TyTButtonSettingsReader::TyTButtonSettingsReader(QObject *parent)
-  : ExtensionReader(parent)
-{
-  // pass...
-}
-
-ConfigItem *
-TyTButtonSettingsReader::allocate(const YAML::Node &node, const ConfigItem::Context &ctx) {
-  Q_UNUSED(node)
-  Q_UNUSED(ctx)
-  return new TyTButtonSettings();
-}

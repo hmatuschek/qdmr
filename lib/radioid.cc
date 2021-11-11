@@ -5,26 +5,16 @@
 /* ********************************************************************************************* *
  * Implementation of RadioID
  * ********************************************************************************************* */
-RadioID::RadioID(const QString &name, uint32_t id, QObject *parent)
-  : ConfigObject("id", parent), _name(name), _number(id)
-{
-  // pass...
-}
-
 RadioID::RadioID(QObject *parent)
-  : ConfigObject("id", parent), _name(""), _number(0)
+  : ConfigObject("id", parent), _number(0)
 {
   // pass...
 }
 
-const QString &
-RadioID::name() const {
-  return _name;
-}
-
-void
-RadioID::setName(const QString &name) {
-  _name = name.simplified();
+RadioID::RadioID(const QString &name, uint32_t id, QObject *parent)
+  : ConfigObject(name, "id", parent), _number(id)
+{
+  // pass...
 }
 
 uint32_t

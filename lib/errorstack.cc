@@ -112,6 +112,11 @@ ErrorStack::formatErrorMessages(const QString &indent) const {
   return res;
 }
 
+void
+ErrorStack::clearErrors() {
+  _errorMessageStack.clear();
+}
+
 
 
 

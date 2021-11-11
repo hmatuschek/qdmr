@@ -15,8 +15,7 @@
  * Implementation of Zone
  * ********************************************************************************************* */
 Zone::Zone(QObject *parent)
-  : ConfigObject("zone", parent), _name(),
-    _A(), _B()
+  : ConfigObject("zone", parent), _A(), _B()
 {
   connect(&_A, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
   connect(&_A, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
@@ -25,8 +24,7 @@ Zone::Zone(QObject *parent)
 }
 
 Zone::Zone(const QString &name, QObject *parent)
-  : ConfigObject("zone", parent), _name(name),
-    _A(), _B()
+  : ConfigObject(name, "zone", parent), _A(), _B()
 {
   connect(&_A, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
   connect(&_A, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
@@ -57,19 +55,6 @@ Zone::clear() {
   _name.clear();
   _A.clear();
   _B.clear();
-}
-
-const QString &
-Zone::name() const {
-  return _name;
-}
-bool
-Zone::setName(const QString &name) {
-  if (name.simplified().isEmpty())
-    return false;
-  _name = name;
-  emit modified();
-  return true;
 }
 
 const ChannelRefList *

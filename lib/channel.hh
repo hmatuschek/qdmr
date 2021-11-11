@@ -29,8 +29,6 @@ class Channel: public ConfigObject
 {
 	Q_OBJECT
 
-  /** The name of the channel. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The receive frequency of the channel. */
   Q_PROPERTY(double rxFrequency READ rxFrequency WRITE setRXFrequency)
   /** The transmit frequency of the channel. */
@@ -85,11 +83,6 @@ public:
   const T *as() const{
 	  return dynamic_cast<const T *>(this);
   }
-
-  /** Returns the name of the channel. */
-  const QString &name() const;
-  /** (Re-)Sets the name of the channel. */
-  bool setName(const QString &name);
 
   /** Returns the RX frequency of the channel in MHz. */
   double rxFrequency() const;
@@ -169,8 +162,6 @@ protected slots:
   void onReferenceModified();
 
 protected:
-  /** The channel name. */
-  QString _name;
   /** The RX frequency in MHz. */
   double _rxFreq;
   /** The TX frequency in MHz. */

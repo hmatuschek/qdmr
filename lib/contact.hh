@@ -15,8 +15,6 @@ class Contact: public ConfigObject
 {
 	Q_OBJECT
 
-  /** The name of the contact. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** If @c true and supported by radio, ring on call from this contact. */
   Q_PROPERTY(bool ring READ ring WRITE setRing)
 
@@ -30,10 +28,6 @@ protected:
   Contact(const QString &name, bool ring=true, QObject *parent=nullptr);
 
 public:
-  /** Returns the name of the contact. */
-	const QString &name() const;
-  /** (Re)Sets the name of the contact. */
-	bool setName(const QString &name);
   /** Returns @c true if the ring-tone is enabled for this contact. */
   bool ring() const;
   /** Enables/disables the ring-tone for this contact. */
@@ -63,8 +57,6 @@ public:
   bool link(const YAML::Node &node, const Context &ctx);
 
 protected:
-  /** Contact name. */
-	QString _name;
   /** Ringtone enabled? */
   bool _ring;
 };

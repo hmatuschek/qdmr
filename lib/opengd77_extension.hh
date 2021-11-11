@@ -53,26 +53,6 @@ protected:
   Power _power;
 };
 
-/** Implements the config reader for OpenGD77 channel extensions.
- * @since 0.9.0
- * @ingroup ogd77ex */
-class OpenGD77ChannelExtensionReader: public ExtensionReader
-{
-  Q_OBJECT
-  Q_CLASSINFO("name", "openGD77")
-
-public:
-  /** Constructor. */
-  explicit OpenGD77ChannelExtensionReader(QObject *parent=nullptr);
-
-  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
-
-private:
-  /** Holds the instance of the config reader. */
-  static AbstractConfigReader *instance;
-};
-
-
 /** Implements the contact extensions for the OpenGD77 radios.
  * @since 0.9.0
  * @ingroup ogd77ex */
@@ -107,27 +87,6 @@ protected:
   /** Holds the time slot override. */
   TimeSlotOverride _timeSlotOverride;
 };
-
-/** Implements the config reader for OpenGD77 contact extensions.
- * @since 0.9.0
- * @ingroup ogd77ex */
-class OpenGD77ContactExtensionReader: public ExtensionReader
-{
-  Q_OBJECT
-  Q_CLASSINFO("name", "openGD77")
-
-public:
-  /** Constructor. */
-  explicit OpenGD77ContactExtensionReader(QObject *parent=nullptr);
-
-  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
-
-private:
-  /** Holds the instance of the config reader. */
-  static AbstractConfigReader *instance;
-};
-
-
 
 
 #endif // OPENGD77EXTENSION_HH

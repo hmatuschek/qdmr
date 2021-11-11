@@ -101,23 +101,4 @@ protected:
 };
 
 
-/** Parses the TyT config extensions.
- * @ingroup tyt */
-class TyTButtonSettingsReader: public ExtensionReader
-{
-  Q_OBJECT
-  Q_CLASSINFO("name", "tytButtonSettings")
-
-public:
-  /** Constructor. */
-  explicit TyTButtonSettingsReader(QObject *parent=nullptr);
-
-  ConfigItem *allocate(const YAML::Node &node, const ConfigItem::Context &ctx);
-
-private:
-  /** Holds the instance of the config reader. */
-  static AbstractConfigReader *instance;
-};
-
-
 #endif // TYTBUTTONSETTINGSEXTENSION_HH

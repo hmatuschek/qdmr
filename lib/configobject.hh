@@ -163,15 +163,31 @@ class ConfigObject: public ConfigItem
 {
   Q_OBJECT
 
+  /** The name of the object. */
+  Q_PROPERTY(QString name READ name WRITE setName)
+
 protected:
   /** Hidden constructor.
    * @param idBase Prefix for all generated IDs. If empty, no ID gets generated.
    * @param parent Specifies the QObject parent. */
   ConfigObject(const QString &idBase="id", QObject *parent = nullptr);
 
+  /** Hidden constructor.
+   * @param name Name of the object.
+   * @param idBase Prefix for all generated IDs. If empty, no ID gets generated.
+   * @param parent Specifies the QObject parent. */
+  ConfigObject(const QString &name, const QString &idBase="id", QObject *parent = nullptr);
+
+public:
+  /** Returns the name of the object. */
+  virtual const QString &name() const;
+  /** Sets the name of the object. */
+  virtual void setName(const QString &name);
+
 public:
   bool label(Context &context);
   bool parse(const YAML::Node &node, Context &ctx);
+
 protected:
   virtual bool populate(YAML::Node &node, const Context &context);
 
@@ -179,6 +195,8 @@ protected:
   /** Holds the base string to derive an ID from. All objects need some ID to be referenced within
    * a codeplug file. */
   QString _idBase;
+  /** Holds the name of the object. */
+  QString _name;
 };
 
 

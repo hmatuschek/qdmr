@@ -190,6 +190,7 @@ ConfigItem::clear() {
     }
   }
 
+  clearErrors();
 }
 
 bool
@@ -641,9 +642,28 @@ ConfigItem::delExtension(unsigned n) {
  * Implementation of ConfigObject
  * ********************************************************************************************* */
 ConfigObject::ConfigObject(const QString &idBase, QObject *parent)
-  : ConfigItem(parent), _idBase(idBase)
+  : ConfigItem(parent), _idBase(idBase), _name()
 {
   // pass...
+}
+
+ConfigObject::ConfigObject(const QString &name, const QString &idBase, QObject *parent)
+  : ConfigItem(parent), _idBase(idBase), _name(name)
+{
+  // pass...
+}
+
+const QString &
+ConfigObject::name() const {
+  return _name;
+}
+
+void
+ConfigObject::setName(const QString &name) {
+  if (name.simplified().isEmpty() || (_name == name.simplified()))
+    return;
+  _name = name;
+  emit modified(this);
 }
 
 bool
@@ -777,7 +797,7 @@ int AbstractConfigObjectList::add(ConfigObject *obj, int row) {
   _items.insert(row, obj);
   // Otherwise connect to object
   connect(obj, SIGNAL(destroyed(QObject*)), this, SLOT(onElementDeleted(QObject*)));
-  connect(obj, SIGNAL(modified(ConfigItem*)), this, SLOT(onElementModified(ConfigObject*)));
+  connect(obj, SIGNAL(modified(ConfigItem*)), this, SLOT(onElementModified(ConfigItem*)));
   emit elementAdded(row);
   return row;
 }

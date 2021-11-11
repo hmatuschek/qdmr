@@ -15,7 +15,7 @@
  * Implementation of ScanList
  * ********************************************************************************************* */
 ScanList::ScanList(QObject *parent)
-  : ConfigObject("scan", parent), _name(), _channels(), _primary(), _secondary(), _revert()
+  : ConfigObject("scan", parent), _channels(), _primary(), _secondary(), _revert()
 {
   // Register "selected" channel tags for primary, secondary, revert and the channel list.
   Context::setTag(metaObject()->className(), "primary", "!selected", SelectedChannel::get());
@@ -25,7 +25,7 @@ ScanList::ScanList(QObject *parent)
 }
 
 ScanList::ScanList(const QString &name, QObject *parent)
-  : ConfigObject("scan", parent), _name(name), _channels(), _primary(), _secondary(), _revert()
+  : ConfigObject(name, "scan", parent), _channels(), _primary(), _secondary(), _revert()
 {
   // Register "selected" channel tags for primary, secondary, revert and the channel list.
   Context::setTag(metaObject()->className(), "primary", "!selected", SelectedChannel::get());
@@ -55,21 +55,6 @@ ScanList::clear() {
   _channels.clear();
   emit modified(this);
 }
-
-const QString &
-ScanList::name() const {
-  return _name;
-}
-
-bool
-ScanList::setName(const QString &name) {
-  if (name.simplified().isEmpty())
-    return false;
-  _name = name.simplified();
-  emit modified(this);
-  return true;
-}
-
 
 const ChannelRefList *
 ScanList::channels() const {

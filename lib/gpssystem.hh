@@ -16,8 +16,6 @@ class PositioningSystem: public ConfigObject
 {
   Q_OBJECT
 
-  /** The name of the system. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The update period in seconds. */
   Q_PROPERTY(unsigned period READ period WRITE setPeriod)
 
@@ -48,11 +46,6 @@ public:
   template <class System>
   const System *as() const { return dynamic_cast<const System *>(this); }
 
-  /** Returns the name of the GPS system. */
-  const QString &name() const;
-  /** Sets the name of the GPS system. */
-  void setName(const QString &name);
-
   /** Returns the update period in seconds. */
   unsigned period() const;
   /** Sets the update period in seconds. */
@@ -70,8 +63,6 @@ protected slots:
   void onReferenceModified();
 
 protected:
-  /** Holds the name of the GPS system. */
-  QString _name;
   /** Holds the update period in seconds. */
   unsigned _period;
 };

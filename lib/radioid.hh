@@ -11,8 +11,6 @@ class RadioID : public ConfigObject
 {
   Q_OBJECT
 
-  /** The name of the radio ID. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The number of the radio ID. */
   Q_PROPERTY(unsigned number READ number WRITE setNumber)
 
@@ -25,11 +23,6 @@ public:
    * @param number Specifies the DMR ID.
    * @param parent Specifies the parent QObject owning this object. */
   RadioID(const QString &name, uint32_t number, QObject *parent = nullptr);
-
-  /** Returns the name of the DMR ID. */
-  const QString &name() const;
-  /** Sets the name of the DMR ID. */
-  void setName(const QString &name);
 
   /** Returns the DMR ID. */
   uint32_t number() const;
@@ -46,8 +39,6 @@ signals:
   void modified();
 
 protected:
-  /** Holds the name of the DMR ID. */
-  QString _name;
   /** Holds the DMR ID. */
   uint32_t _number;
 };

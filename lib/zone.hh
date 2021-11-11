@@ -15,8 +15,6 @@ class Zone : public ConfigObject
 {
 	Q_OBJECT
 
-  /** The name of the zone. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The A channels. */
   Q_PROPERTY(ChannelRefList* A READ A)
   /** The B channels. */
@@ -33,11 +31,6 @@ public:
 
   /** Clears this zone. */
   void clear();
-
-  /** Returns the name of the zone. */
-	const QString &name() const;
-  /** Sets the name of the zone. */
-	bool setName(const QString &name);
 
   /** Retruns the list of channels for VFO A in this zone. */
   const ChannelRefList *A() const;
@@ -56,8 +49,6 @@ public:
   ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
 protected:
-  /** Holds the name of the zone. */
-	QString _name;
   /** List of channels for VFO A. */
   ChannelRefList _A;
   /** List of channels for VFO B. */

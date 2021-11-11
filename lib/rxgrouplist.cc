@@ -17,7 +17,7 @@
  * Implementation of RXGroupList
  * ********************************************************************************************* */
 RXGroupList::RXGroupList(QObject *parent)
-  : ConfigObject("grp", parent), _name(), _contacts()
+  : ConfigObject("grp", parent), _contacts()
 {
   connect(&_contacts, SIGNAL(elementModified(int)), this, SLOT(onModified()));
   connect(&_contacts, SIGNAL(elementRemoved(int)), this, SLOT(onModified()));
@@ -25,7 +25,7 @@ RXGroupList::RXGroupList(QObject *parent)
 }
 
 RXGroupList::RXGroupList(const QString &name, QObject *parent)
-  : ConfigObject("grp", parent), _name(name), _contacts()
+  : ConfigObject(name, "grp", parent), _contacts()
 {
   connect(&_contacts, SIGNAL(elementModified(int)), this, SLOT(onModified()));
   connect(&_contacts, SIGNAL(elementRemoved(int)), this, SLOT(onModified()));
@@ -50,19 +50,6 @@ void
 RXGroupList::clear() {
   _contacts.clear();
   emit modified(this);
-}
-
-const QString &
-RXGroupList::name() const {
-  return _name;
-}
-
-bool
-RXGroupList::setName(const QString &name) {
-  if (name.simplified().isEmpty())
-    return false;
-  _name = name.simplified();
-  return true;
 }
 
 DigitalContact *

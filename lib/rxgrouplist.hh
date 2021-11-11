@@ -15,8 +15,6 @@ class RXGroupList: public ConfigObject
 {
 	Q_OBJECT
 
-  /** The name of the group list. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The list of contacts. */
   Q_PROPERTY(DigitalContactRefList* contacts READ contacts)
 
@@ -35,11 +33,6 @@ public:
   int count() const;
   /** Resets & clears this group list. */
   void clear();
-
-  /** Returns the name of this group list. */
-	const QString &name() const;
-  /** Sets the name of this group list. */
-	bool setName(const QString &name);
 
   /** Returns the contact at the given list index. */
 	DigitalContact *contact(int idx) const;
@@ -64,8 +57,6 @@ protected slots:
   void onModified();
 
 protected:
-  /** The group list name. */
-	QString _name;
   /** The list of contacts. */
   DigitalContactRefList _contacts;
 };

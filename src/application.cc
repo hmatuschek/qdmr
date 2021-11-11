@@ -68,10 +68,9 @@ Application::Application(int &argc, char *argv[])
         return;
       }
     } else if ("yaml" == info.suffix()) {
-      ConfigReader reader;
-      if (! reader.read(_config, argv[1])) {
+      if (! _config->readYAML(argv[1])) {
         logError() << "Cannot read yaml codeplug file '" << argv[1]
-                   << "': " << reader.errorMessage();
+                   << "': " << _config->formatErrorMessages();
         return;
       }
     }
@@ -281,13 +280,12 @@ Application::loadCodeplug() {
 
   QString errorMessage;
   if ("yaml" == info.suffix()){
-    ConfigReader reader;
-    if (reader.read(_config, filename)) {
+    if (_config->readYAML(filename)) {
       _mainWindow->setWindowModified(false);
     } else {
       QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
                             tr("Cannot read codeplug from file '%1': %2")
-                            .arg(filename).arg(reader.errorMessage()));
+                            .arg(filename).arg(_config->formatErrorMessages()));
       _config->clear();
     }
   } else {

@@ -26,7 +26,7 @@
  * Implementation of Channel
  * ********************************************************************************************* */
 Channel::Channel(QObject *parent)
-  : ConfigObject("ch", parent), _name(""), _rxFreq(0), _txFreq(0), _defaultPower(true),
+  : ConfigObject("ch", parent), _rxFreq(0), _txFreq(0), _defaultPower(true),
     _power(Power::Low), _txTimeOut(std::numeric_limits<unsigned>::max()), _rxOnly(false),
     _vox(std::numeric_limits<unsigned>::max()), _scanlist(), _openGD77ChannelExtension(nullptr)
 {
@@ -55,19 +55,6 @@ Channel::Channel(const Channel &other, QObject *parent)
 
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-}
-
-const QString &
-Channel::name() const {
-  return _name;
-}
-bool
-Channel::setName(const QString &name) {
-  if (name.simplified().isEmpty())
-    return false;
-  _name = name;
-  emit modified(this);
-  return true;
 }
 
 double Channel::rxFrequency() const {

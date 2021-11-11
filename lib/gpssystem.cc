@@ -9,30 +9,19 @@
  * Implementation of PositioningSystem
  * ********************************************************************************************* */
 PositioningSystem::PositioningSystem(QObject *parent)
-  : ConfigObject("aprs", parent), _name(), _period(0)
+  : ConfigObject("aprs", parent), _period(0)
 {
   // pass...
 }
 
 PositioningSystem::PositioningSystem(const QString &name, unsigned period, QObject *parent)
-  : ConfigObject("aprs", parent), _name(name), _period(period)
+  : ConfigObject(name, "aprs", parent), _period(period)
 {
   // pass...
 }
 
 PositioningSystem::~PositioningSystem() {
   // pass...
-}
-
-const QString &
-PositioningSystem::name() const {
-  return _name;
-}
-
-void
-PositioningSystem::setName(const QString &name) {
-  _name = name;
-  emit modified(this);
 }
 
 unsigned

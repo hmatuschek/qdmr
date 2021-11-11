@@ -13,8 +13,6 @@ class ScanList : public ConfigObject
 {
 	Q_OBJECT
 
-  /** The name of the scan list. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The primary channel. */
   Q_PROPERTY(ChannelReference* primary READ primary)
   /** The secondary channel. */
@@ -37,10 +35,6 @@ public:
 	int count() const;
   /** Clears the scan list. */
 	void clear();
-  /** Returns the name of the scanlist. */
-	const QString &name() const;
-  /** Sets the name of the scanlist. */
-	bool setName(const QString &name);
 
   /** Returns @c true if the given channel is part of this scanlist. */
   bool contains(Channel *channel) const;
@@ -89,8 +83,6 @@ public:
   ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
 protected:
-  /** The scanlist name. */
-	QString _name;
   /** The channel list. */
   ChannelRefList _channels;
   /** The priority channel. */

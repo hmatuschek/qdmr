@@ -7,13 +7,13 @@
  * Implementation of RoamingZone
  * ********************************************************************************************* */
 RoamingZone::RoamingZone(QObject *parent)
-  : ConfigObject("roam", parent), _name(), _channel()
+  : ConfigObject("roam", parent), _channel()
 {
   // pass...
 }
 
 RoamingZone::RoamingZone(const QString &name, QObject *parent)
-  : ConfigObject("roam", parent), _name(name), _channel()
+  : ConfigObject(name, "roam", parent), _channel()
 {
   // pass...
 }
@@ -36,19 +36,6 @@ void
 RoamingZone::clear() {
   _channel.clear();
 }
-
-
-const QString &
-RoamingZone::name() const {
-  return _name;
-}
-
-void
-RoamingZone::setName(const QString &name) {
-  _name = name;
-  emit modified(this);
-}
-
 
 DigitalChannel *
 RoamingZone::channel(int idx) const {

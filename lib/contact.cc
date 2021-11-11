@@ -8,28 +8,15 @@
  * Implementation of Contact
  * ********************************************************************************************* */
 Contact::Contact(QObject *parent)
-  : ConfigObject("cont", parent), _name(), _ring(false)
+  : ConfigObject("cont", parent), _ring(false)
 {
   // pass...
 }
 
 Contact::Contact(const QString &name, bool rxTone, QObject *parent)
-  : ConfigObject("cont", parent), _name(name), _ring(rxTone)
+  : ConfigObject(name, "cont", parent), _ring(rxTone)
 {
   // pass...
-}
-
-const QString &
-Contact::name() const {
-  return _name;
-}
-bool
-Contact::setName(const QString &name) {
-  if (name.simplified().isEmpty())
-    return false;
-  _name = name;
-  emit modified(this);
-  return true;
 }
 
 bool
