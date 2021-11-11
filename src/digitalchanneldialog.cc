@@ -99,43 +99,39 @@ DigitalChannelDialog::construct() {
   }
   voxDefault->setChecked(true); voxValue->setValue(0); voxValue->setEnabled(false);
 
-  extensionView->setModel(new ExtensionWrapper(_channel, extensionView));
-  extensionView->setItemDelegateForColumn(1, new PropertyDelegate(extensionView));
-
-  if (_channel) {
-    channelName->setText(_channel->name());
-    rxFrequency->setText(format_frequency(_channel->rxFrequency()));
-    txFrequency->setText(format_frequency(_channel->txFrequency()));
-    if (! _channel->defaultPower()) {
-      powerDefault->setChecked(false); powerValue->setEnabled(true);
-      switch (_channel->power()) {
-      case Channel::Power::Max: powerValue->setCurrentIndex(0); break;
-      case Channel::Power::High: powerValue->setCurrentIndex(1); break;
-      case Channel::Power::Mid: powerValue->setCurrentIndex(2); break;
+  channelName->setText(_channel->name());
+  rxFrequency->setText(format_frequency(_channel->rxFrequency()));
+  txFrequency->setText(format_frequency(_channel->txFrequency()));
+  if (! _channel->defaultPower()) {
+    powerDefault->setChecked(false); powerValue->setEnabled(true);
+    switch (_channel->power()) {
+    case Channel::Power::Max: powerValue->setCurrentIndex(0); break;
+    case Channel::Power::High: powerValue->setCurrentIndex(1); break;
+    case Channel::Power::Mid: powerValue->setCurrentIndex(2); break;
       case Channel::Power::Low: powerValue->setCurrentIndex(3); break;
-      case Channel::Power::Min: powerValue->setCurrentIndex(4); break;
-      }
-    }
-    if (! _channel->defaultTimeout()) {
-      totDefault->setChecked(false); totValue->setEnabled(true);
-      totValue->setValue(_channel->timeout());
-    }
-    rxOnly->setChecked(_channel->rxOnly());
-    switch (_channel->admit()) {
-      case DigitalChannel::Admit::Always: txAdmit->setCurrentIndex(0); break;
-      case DigitalChannel::Admit::Free: txAdmit->setCurrentIndex(1); break;
-      case DigitalChannel::Admit::ColorCode: txAdmit->setCurrentIndex(2); break;
-    }
-    colorCode->setValue(_channel->colorCode());
-    if (DigitalChannel::TimeSlot::TS1 == _channel->timeSlot())
-      timeSlot->setCurrentIndex(0);
-    else if (DigitalChannel::TimeSlot::TS2 == _channel->timeSlot())
-      timeSlot->setCurrentIndex(1);
-    if (! _channel->defaultVOX()) {
-      voxDefault->setChecked(false); voxValue->setEnabled(true);
-      voxValue->setValue(_channel->vox());
+    case Channel::Power::Min: powerValue->setCurrentIndex(4); break;
     }
   }
+  if (! _channel->defaultTimeout()) {
+    totDefault->setChecked(false); totValue->setEnabled(true);
+    totValue->setValue(_channel->timeout());
+  }
+  rxOnly->setChecked(_channel->rxOnly());
+  switch (_channel->admit()) {
+  case DigitalChannel::Admit::Always: txAdmit->setCurrentIndex(0); break;
+  case DigitalChannel::Admit::Free: txAdmit->setCurrentIndex(1); break;
+  case DigitalChannel::Admit::ColorCode: txAdmit->setCurrentIndex(2); break;
+  }
+  colorCode->setValue(_channel->colorCode());
+  if (DigitalChannel::TimeSlot::TS1 == _channel->timeSlot())
+    timeSlot->setCurrentIndex(0);
+  else if (DigitalChannel::TimeSlot::TS2 == _channel->timeSlot())
+    timeSlot->setCurrentIndex(1);
+  if (! _channel->defaultVOX()) {
+    voxDefault->setChecked(false); voxValue->setEnabled(true);
+    voxValue->setValue(_channel->vox());
+  }
+  extensionView->setObject(_channel);
 
   connect(powerDefault, SIGNAL(toggled(bool)), this, SLOT(onPowerDefaultToggled(bool)));
   connect(totDefault, SIGNAL(toggled(bool)), this, SLOT(onTimeoutDefaultToggled(bool)));

@@ -13,21 +13,6 @@ inline QStringList enumKeys(const QMetaEnum &e) {
   return lst;
 }
 
-template <class T>
-bool propIsInstance(QMetaProperty &prop) {
-  if (QMetaType::UnknownType == prop.userType())
-    return false;
-  QMetaType type(prop.userType());
-  if (! (QMetaType::PointerToQObject & type.flags()))
-    return false;
-  const QMetaObject *propType = type.metaObject();
-  for (; nullptr != propType; propType = propType->superClass()) {
-    if (0==strcmp(T::staticMetaObject.className(), propType->className()))
-      return true;
-  }
-  return false;
-}
-
 /* ********************************************************************************************* *
  * Implementation of ConfigObject::Context
  * ********************************************************************************************* */

@@ -196,9 +196,10 @@ Channel::setOpenGD77ChannelExtension(OpenGD77ChannelExtension *ext) {
   if (_openGD77ChannelExtension)
     _openGD77ChannelExtension->deleteLater();
   _openGD77ChannelExtension = ext;
-  if (_openGD77ChannelExtension)
+  if (_openGD77ChannelExtension) {
+    _openGD77ChannelExtension->setParent(this);
     connect(_openGD77ChannelExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
-
+  }
 }
 
 bool
@@ -234,7 +235,7 @@ Channel::populate(YAML::Node &node, const Context &context) {
 ConfigItem *
 Channel::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
   Q_UNUSED(node); Q_UNUSED(ctx)
-  if (0 == strcmp("opengd77", prop.name())) {
+  if (0 == strcmp("openGD77", prop.name())) {
     return new OpenGD77ChannelExtension();
   }
 

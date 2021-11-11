@@ -5,6 +5,7 @@
 #include <QString>
 #include <QHash>
 #include <QVector>
+#include <QMetaProperty>
 
 #include <yaml-cpp/yaml.h>
 
@@ -13,6 +14,22 @@
 // Forward declaration
 class ConfigObject;
 class ConfigExtension;
+
+/** Helper function to test property type. */
+template <class T>
+bool propIsInstance(QMetaProperty &prop) {
+  if (QMetaType::UnknownType == prop.userType())
+    return false;
+  QMetaType type(prop.userType());
+  if (! (QMetaType::PointerToQObject & type.flags()))
+    return false;
+  const QMetaObject *propType = type.metaObject();
+  for (; nullptr != propType; propType = propType->superClass()) {
+    if (0==strcmp(T::staticMetaObject.className(), propType->className()))
+      return true;
+  }
+  return false;
+}
 
 /** Base class for all configuration objects (channels, zones, contacts, etc).
  *

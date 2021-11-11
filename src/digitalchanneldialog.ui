@@ -319,8 +319,20 @@
        <string>Device specific settings</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
-        <widget class="QTreeView" name="extensionView"/>
+        <widget class="ExtensionView" name="extensionView" native="true"/>
        </item>
       </layout>
      </widget>
@@ -338,6 +350,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ExtensionView</class>
+   <extends>QWidget</extends>
+   <header>extensionview.hh</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

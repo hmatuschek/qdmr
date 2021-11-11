@@ -37,7 +37,7 @@ public:
 
 public:
   /** Constructor. */
-  explicit OpenGD77ChannelExtension(QObject *parent=nullptr);
+  Q_INVOKABLE explicit OpenGD77ChannelExtension(QObject *parent=nullptr);
 
 public:
   ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
