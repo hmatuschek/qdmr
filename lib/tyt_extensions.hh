@@ -60,6 +60,9 @@ public:
   /** Constructor. */
   explicit TyTButtonSettings(QObject *parent=nullptr);
 
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
+
   /** Returns the action for the side button 1 short-press. */
   ButtonAction sideButton1Short() const;
   /** Sets the action for the side button 1 short-press. */
@@ -99,5 +102,32 @@ protected:
   unsigned _longPressDuration;
 };
 
+
+/** Groups several extension for TyT devices.
+ * @ingroup tyt */
+class TyTConfigExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  /** The button settings for TyT devices. */
+  Q_PROPERTY(TyTButtonSettings* buttonSettings READ buttonSettings)
+
+public:
+  /** Constructor. Also allocates all associates extensions. */
+  explicit TyTConfigExtension(QObject *parent=nullptr);
+
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
+
+  /** Returns the button settings extension for TyT devices. */
+  TyTButtonSettings *buttonSettings() const;
+
+public:
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+
+protected:
+  /** Owns the button settings extension. */
+  TyTButtonSettings *_buttonSettings;
+};
 
 #endif // TYTBUTTONSETTINGSEXTENSION_HH

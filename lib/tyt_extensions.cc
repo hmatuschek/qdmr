@@ -14,11 +14,27 @@ TyTButtonSettings::TyTButtonSettings(QObject *parent)
   _longPressDuration = 1000;
 }
 
+bool
+TyTButtonSettings::copy(const ConfigItem &other) {
+  const TyTButtonSettings *ex = other.as<TyTButtonSettings>();
+  if ((nullptr==ex) || (!ConfigExtension::copy(other)))
+    return false;
+  _sideButton1Short = ex->_sideButton1Short;
+  _sideButton1Long = ex->_sideButton1Long;
+  _sideButton2Short = ex->_sideButton2Short;
+  _sideButton2Long = ex->_sideButton2Long;
+  _longPressDuration = ex->_longPressDuration;
+  return true;
+}
+
 ConfigItem *
-TyTButtonSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx);
-  // There are no further extension/children to TyTButtonSettings.
-  return nullptr;
+TyTButtonSettings::clone() const {
+  TyTButtonSettings *ex = new TyTButtonSettings();
+  if (! ex->copy(*this)) {
+    ex->deleteLater();
+    return nullptr;
+  }
+  return ex;
 }
 
 TyTButtonSettings::ButtonAction
@@ -66,3 +82,49 @@ TyTButtonSettings::setLongPressDuration(unsigned dur) {
   _longPressDuration = dur;
 }
 
+ConfigItem *
+TyTButtonSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx);
+  // There are no further extension/children to TyTButtonSettings.
+  return nullptr;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of TyTButtonSettings
+ * ******************************************************************************************** */
+TyTConfigExtension::TyTConfigExtension(QObject *parent)
+  : ConfigExtension(parent), _buttonSettings(new TyTButtonSettings(this))
+{
+  // Pass...
+}
+
+bool
+TyTConfigExtension::copy(const ConfigItem &other) {
+  const TyTConfigExtension *ex = other.as<TyTConfigExtension>();
+  if ((nullptr==ex) || (!ConfigExtension::copy(other)))
+    return false;
+  return _buttonSettings->copy(*_buttonSettings);
+}
+
+ConfigItem *
+TyTConfigExtension::clone() const {
+  TyTConfigExtension *ex = new TyTConfigExtension();
+  if (! ex->copy(*this)) {
+    ex->deleteLater();
+    return nullptr;
+  }
+  return ex;
+}
+
+TyTButtonSettings *
+TyTConfigExtension::buttonSettings() const {
+  return _buttonSettings;
+}
+
+ConfigItem *
+TyTConfigExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+  // All extensions are pre-allocated. So nothing to do here.
+  return nullptr;
+}

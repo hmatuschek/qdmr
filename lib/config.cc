@@ -21,7 +21,7 @@ Config::Config(QObject *parent)
     _rxGroupLists(new RXGroupLists(this)), _channels(new ChannelList(this)),
     _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
     _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this)),
-    _tytButtonSettings(nullptr)
+    _tytExtension(nullptr)
 {
   connect(_settings, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   connect(_radioIDs, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
@@ -245,18 +245,18 @@ Config::clear() {
   emit modified(this);
 }
 
-TyTButtonSettings *
-Config::tytButtonSettings() const {
-  return _tytButtonSettings;
+TyTConfigExtension *
+Config::tytExtension() const {
+  return _tytExtension;
 }
 void
-Config::setTyTButtonSettings(TyTButtonSettings *ext) {
-  if (_tytButtonSettings)
-    _tytButtonSettings->deleteLater();
-  _tytButtonSettings = ext;
-  if (_tytButtonSettings) {
-    _tytButtonSettings->setParent(this);
-    connect(_tytButtonSettings, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
+Config::setTyTExtension(TyTConfigExtension *ext) {
+  if (_tytExtension)
+    _tytExtension->deleteLater();
+  _tytExtension = ext;
+  if (_tytExtension) {
+    _tytExtension->setParent(this);
+    connect(_tytExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   }
 }
 
@@ -316,8 +316,8 @@ Config::readYAML(const QString &filename) {
 ConfigItem *
 Config::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
   Q_UNUSED(node); Q_UNUSED(ctx)
-  if (0==strcmp("tytButtonSettings", prop.name())) {
-    return new TyTButtonSettings();
+  if (0==strcmp("tyt", prop.name())) {
+    return new TyTConfigExtension(this);
   }
   return nullptr;
 }

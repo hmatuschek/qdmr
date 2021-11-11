@@ -98,6 +98,12 @@ protected:
   explicit ConfigItem(QObject *parent = nullptr);
 
 public:
+  /** Copies the given item into this. */
+  virtual bool copy(const ConfigItem &other);
+  /** Clones this item. */
+  virtual ConfigItem *clone() const = 0;
+
+public:
   /** Recursively labels the config object.
    * Does not assign a label if the @c idBase passed to the constructor is empty. */
   virtual bool label(Context &context);
@@ -166,6 +172,10 @@ protected:
   ConfigObject(const QString &name, const QString &idBase="id", QObject *parent = nullptr);
 
 public:
+  /** Copies the given object into this. */
+  virtual bool copy(const ConfigItem &other);
+
+public:
   /** Returns the name of the object. */
   virtual const QString &name() const;
   /** Sets the name of the object. */
@@ -198,6 +208,9 @@ protected:
   /** Hidden constructor. */
   explicit ConfigExtension(QObject *parent=nullptr);
 
+public:
+  bool copy(const ConfigItem &other);
+
 protected:
   bool populate(YAML::Node &node, const ConfigObject::Context &context);
 };
@@ -214,6 +227,8 @@ protected:
   explicit AbstractConfigObjectList(const QMetaObject &elementType=ConfigObject::staticMetaObject, QObject *parent = nullptr);
 
 public:
+  virtual bool copy(const AbstractConfigObjectList &other);
+
   /** Recursively labels the config object. */
   virtual bool label(ConfigItem::Context &context) = 0;
   /** Recursively serializes the configuration to YAML nodes.

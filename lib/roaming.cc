@@ -20,11 +20,26 @@ RoamingZone::RoamingZone(const QString &name, QObject *parent)
 
 RoamingZone &
 RoamingZone::operator =(const RoamingZone &other) {
-  clear();
-  _name = other._name;
-  for (int i=0; i<other._channel.count(); i++)
-    _channel.add(other._channel.get(i));
+  copy(other);
   return *this;
+}
+
+bool
+RoamingZone::copy(const ConfigItem &other) {
+  const RoamingZone *z = other.as<RoamingZone>();
+  if ((nullptr==z) || (! ConfigObject::copy(other)))
+    return false;
+  return _channel.copy(z->_channel);
+}
+
+ConfigItem *
+RoamingZone::clone() const {
+  RoamingZone *z = new RoamingZone();
+  if (! z->copy(*this)) {
+    z->deleteLater();
+    return nullptr;
+  }
+  return z;
 }
 
 int

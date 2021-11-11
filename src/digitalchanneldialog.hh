@@ -27,8 +27,8 @@ protected:
 
 protected:
   Config *_config;
+  DigitalChannel *_myChannel;
   DigitalChannel *_channel;
-  bool _ownsChannel;
 };
 
 

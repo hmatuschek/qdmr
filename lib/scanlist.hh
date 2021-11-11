@@ -30,6 +30,8 @@ public:
 
   /** Copies the given scan list. */
   ScanList &operator= (const ScanList &other);
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
 
   /** Returns the number of channels within the scanlist. */
 	int count() const;

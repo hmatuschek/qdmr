@@ -24,6 +24,15 @@ PositioningSystem::~PositioningSystem() {
   // pass...
 }
 
+bool
+PositioningSystem::copy(const ConfigItem &other) {
+  const PositioningSystem *s = other.as<PositioningSystem>();
+  if ((nullptr==s) || (! ConfigObject::copy(other)))
+    return false;
+  _period = s->_period;
+  return true;
+}
+
 unsigned
 PositioningSystem::period() const {
   return _period;
@@ -113,6 +122,26 @@ GPSSystem::GPSSystem(const QString &name, DigitalContact *contact,
 }
 
 bool
+GPSSystem::copy(const ConfigItem &other) {
+  const GPSSystem *sys = other.as<GPSSystem>();
+  if ((nullptr == sys) || (! PositioningSystem::copy(other)))
+    return false;
+  _contact.set(sys->contactObj());
+  _revertChannel.set(sys->revertChannel());
+  return true;
+}
+
+ConfigItem *
+GPSSystem::clone() const {
+  GPSSystem *sys = new GPSSystem();
+  if (! sys->copy(*this)) {
+    sys->deleteLater();
+    return nullptr;
+  }
+  return sys;
+}
+
+bool
 GPSSystem::hasContact() const {
   return ! _contact.isNull();
 }
@@ -193,6 +222,32 @@ APRSSystem::APRSSystem(const QString &name, AnalogChannel *channel, const QStrin
   _channel.set(channel);
   // Connect to channel reference
   connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+bool
+APRSSystem::copy(const ConfigItem &other) {
+  const APRSSystem *sys = other.as<APRSSystem>();
+  if ((nullptr == sys) || (! PositioningSystem::copy(other)))
+    return false;
+  _channel.set(sys->revertChannel());
+  _destination = sys->destination();
+  _destSSID = sys->_destSSID;
+  _source = sys->_source;
+  _srcSSID = sys->_srcSSID;
+  _path = sys->_path;
+  _icon = sys->_icon;
+  _message = sys->_message;
+  return true;
+}
+
+ConfigItem *
+APRSSystem::clone() const {
+  APRSSystem *sys = new APRSSystem();
+  if (! sys->copy(*this)) {
+    sys->deleteLater();
+    return nullptr;
+  }
+  return sys;
 }
 
 AnalogChannel *

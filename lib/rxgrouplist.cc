@@ -34,11 +34,16 @@ RXGroupList::RXGroupList(const QString &name, QObject *parent)
 
 RXGroupList &
 RXGroupList::operator =(const RXGroupList &other) {
-  clear();
-  _name = other.name();
-  for (int i=0; i<other.count(); i++)
-    _contacts.add(other._contacts.get(i));
+  copy(other);
   return *this;
+}
+
+bool
+RXGroupList::copy(const ConfigItem &other) {
+  const RXGroupList *l = other.as<RXGroupList>();
+  if ((nullptr == l) || (!ConfigObject::copy(other)))
+    return false;
+  return _contacts.copy(l->_contacts);
 }
 
 int

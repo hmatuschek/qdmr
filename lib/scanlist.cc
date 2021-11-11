@@ -36,14 +36,30 @@ ScanList::ScanList(const QString &name, QObject *parent)
 
 ScanList &
 ScanList::operator =(const ScanList &other) {
-  clear();
-  _name = other._name;
-  _primary.set(other._primary.as<Channel>());
-  _secondary.set(other._secondary.as<Channel>());
-  _revert.set(other._revert.as<Channel>());
-  for (int i=0; i<other._channels.count(); i++)
-    _channels.add(other._channels.get(i));
+  copy(other);
   return *this;
+}
+
+bool
+ScanList::copy(const ConfigItem &other) {
+  const ScanList *list = other.as<ScanList>();
+  if ((nullptr == list) || (! ConfigObject::copy(other)))
+    return false;
+  _primary.set(list->primaryChannel());
+  _secondary.set(list->secondaryChannel());
+  _revert.set(list->revertChannel());
+  _channels.copy(list->_channels);
+  return true;
+}
+
+ConfigItem *
+ScanList::clone() const {
+  ScanList *list = new ScanList();
+  if (! list->copy(*this)) {
+    list->deleteLater();
+    return nullptr;
+  }
+  return list;
 }
 
 void

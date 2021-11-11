@@ -29,6 +29,9 @@ protected:
   Contact(const QString &name, bool ring=true, QObject *parent=nullptr);
 
 public:
+  bool copy(const ConfigItem &other);
+
+public:
   /** Returns @c true if the ring-tone is enabled for this contact. */
   bool ring() const;
   /** Enables/disables the ring-tone for this contact. */
@@ -82,6 +85,9 @@ public:
    * @param parent Specifies the QObject parent. */
   DTMFContact(const QString &name, const QString &number, bool ring=false, QObject *parent=nullptr);
 
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
+
   /** Returns the DTMF number of this contact.
    * The number must consist of 0-9, a-f, * or #. */
 	const QString &number() const;
@@ -129,6 +135,9 @@ public:
    * @param ring Specifies whether the ring-tone is enabled for this contact.
    * @param parent Specifies the QObject parent. */
   DigitalContact(Type type, const QString &name, unsigned number, bool ring=false, QObject *parent=nullptr);
+
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
 
   /** Returns the call-type. */
 	Type type() const;

@@ -32,22 +32,32 @@ Zone::Zone(const QString &name, QObject *parent)
   connect(&_B, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
 }
 
-ConfigItem *
-Zone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
-  // There are no children yet.
-  return nullptr;
-}
-
 Zone &
 Zone::operator =(const Zone &other) {
-  clear();
-  _name = other._name;
-  for (int i=0; i<other._A.count(); i++)
-    _A.add(other._A.get(i));
-  for (int i=0; i<other._B.count(); i++)
-    _B.add(other._B.get(i));
+  copy(other);
   return *this;
+}
+
+bool
+Zone::copy(const ConfigItem &other) {
+  const Zone *z = other.as<Zone>();
+  if ((nullptr == z) || (! ConfigObject::copy(other)))
+    return false;
+
+  _A.copy(z->_A);
+  _B.copy(z->_B);
+
+  return true;
+}
+
+ConfigItem *
+Zone::clone() const {
+  Zone *z = new Zone();
+  if (! z->copy(*this)) {
+    z->deleteLater();
+    return nullptr;
+  }
+  return z;
 }
 
 void
@@ -70,6 +80,13 @@ const ChannelRefList *Zone::B() const {
 }
 ChannelRefList *Zone::B() {
   return &_B;
+}
+
+ConfigItem *
+Zone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+  // There are no children yet.
+  return nullptr;
 }
 
 

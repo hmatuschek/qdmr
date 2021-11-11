@@ -65,24 +65,7 @@ protected:
   Channel(const Channel &other, QObject *parent=nullptr);
 
 public:
-  /** Returns @c true if the channel is of type @c T. This can be used to text wheter this channel
-   * is actuially an analog or digital channel: @c channel->is<AnalogChannel>(). */
-  template<class T>
-  bool is() const {
-	  return 0 != dynamic_cast<const T *>(this);
-  }
-
-  /** Dynamic cast of channels. For example @c channel->as<AnalogChannel>(). */
-  template<class T>
-  T *as() {
-	  return dynamic_cast<T *>(this);
-  }
-
-  /** Dynamic cast of channels. For example @c channel->as<AnalogChannel>(). */
-  template<class T>
-  const T *as() const{
-	  return dynamic_cast<const T *>(this);
-  }
+  bool copy(const ConfigItem &other);
 
   /** Returns the RX frequency of the channel in MHz. */
   double rxFrequency() const;
@@ -224,6 +207,9 @@ public:
   /** Copy constructor. */
   AnalogChannel(const AnalogChannel &other, QObject *parent=nullptr);
 
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
+
   /** Returns the admit criterion for the analog channel. */
 	Admit admit() const;
   /** (Re-)Sets the admit criterion for the analog channel. */
@@ -337,6 +323,9 @@ public:
   /** Copy constructor. */
   DigitalChannel(const DigitalChannel &other, QObject *parent=nullptr);
 
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
+
   /** Returns the admit criterion for the channel. */
 	Admit admit() const;
   /** (Re-)Sets the admit criterion for the channel. */
@@ -434,6 +423,9 @@ protected:
 public:
   /** Destructor. */
   virtual ~SelectedChannel();
+
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
 
   /** Constructs/gets the singleton instance. */
   static SelectedChannel *get();

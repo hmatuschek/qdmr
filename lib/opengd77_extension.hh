@@ -39,13 +39,16 @@ public:
   /** Constructor. */
   Q_INVOKABLE explicit OpenGD77ChannelExtension(QObject *parent=nullptr);
 
-public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
 
   /** Returns the power settings for the channel. */
   Power power() const;
   /** Sets the power setting. */
   void setPower(Power power);
+
+public:
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
 protected:
   /** Holds the power setting. */
@@ -75,12 +78,16 @@ public:
   /** Constructor. */
   explicit OpenGD77ContactExtension(QObject *parent=nullptr);
 
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
 
   /** Returns the time slot override. */
   TimeSlotOverride timeSlotOverride() const;
   /** Sets the time slot override. */
   void setTimeSlotOverride(TimeSlotOverride ts);
+
+public:
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
 
 protected:
   /** Holds the time slot override. */

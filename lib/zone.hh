@@ -29,6 +29,9 @@ public:
   /** Copies the given zone. */
   Zone &operator =(const Zone &other);
 
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
+
   /** Clears this zone. */
   void clear();
 

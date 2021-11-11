@@ -12,8 +12,9 @@
  * Implementation of DigitalChannelDialog
  * ********************************************************************************************* */
 DigitalChannelDialog::DigitalChannelDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _channel(new DigitalChannel(this)), _ownsChannel(true)
+  : QDialog(parent), _config(config), _myChannel(), _channel(nullptr)
 {
+  _myChannel
   construct();
 }
 

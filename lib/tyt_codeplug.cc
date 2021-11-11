@@ -2038,28 +2038,28 @@ TyTCodeplug::ButtonSettingsElement::setLongPressDuration(unsigned ms) {
 bool
 TyTCodeplug::ButtonSettingsElement::fromConfig(const Config *config) {
   // Skip if not defined
-  if (nullptr == config->tytButtonSettings())
+  if (nullptr == config->tytExtension())
     return true;
 
-  setSideButton1Short(config->tytButtonSettings()->sideButton1Short());
-  setSideButton1Long(config->tytButtonSettings()->sideButton1Long());
-  setSideButton2Short(config->tytButtonSettings()->sideButton2Short());
-  setSideButton2Long(config->tytButtonSettings()->sideButton2Long());
-  setLongPressDuration(config->tytButtonSettings()->longPressDuration());
+  setSideButton1Short(config->tytExtension()->buttonSettings()->sideButton1Short());
+  setSideButton1Long(config->tytExtension()->buttonSettings()->sideButton1Long());
+  setSideButton2Short(config->tytExtension()->buttonSettings()->sideButton2Short());
+  setSideButton2Long(config->tytExtension()->buttonSettings()->sideButton2Long());
+  setLongPressDuration(config->tytExtension()->buttonSettings()->longPressDuration());
 
   return true;
 }
 
 bool
 TyTCodeplug::ButtonSettingsElement::updateConfig(Config *config) {
-  TyTButtonSettings *ext = new TyTButtonSettings(config);
-  config->setTyTButtonSettings(ext);
+  TyTConfigExtension *ext = new TyTConfigExtension(config);
+  config->setTyTExtension(ext);
 
-  ext->setSideButton1Short(sideButton1Short());
-  ext->setSideButton1Long(sideButton1Long());
-  ext->setSideButton2Short(sideButton2Short());
-  ext->setSideButton2Long(sideButton2Long());
-  ext->setLongPressDuration(longPressDuration());
+  ext->buttonSettings()->setSideButton1Short(sideButton1Short());
+  ext->buttonSettings()->setSideButton1Long(sideButton1Long());
+  ext->buttonSettings()->setSideButton2Short(sideButton2Short());
+  ext->buttonSettings()->setSideButton2Long(sideButton2Long());
+  ext->buttonSettings()->setLongPressDuration(longPressDuration());
 
   return true;
 }

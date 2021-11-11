@@ -37,24 +37,46 @@ Channel::Channel(QObject *parent)
 Channel::Channel(const Channel &other, QObject *parent)
   : ConfigObject("ch", parent), _scanlist(), _openGD77ChannelExtension(nullptr)
 {
-  setName(other.name());
-  setRXFrequency(other.rxFrequency());
-  setTXFrequency(other.txFrequency());
-  if (other.defaultPower())
-    setDefaultPower();
-  else
-    setPower(other.power());
-  if (other.defaultTimeout())
-    setDefaultTimeout();
-  else
-    setTimeout(other.timeout());
-  setRXOnly(other.rxOnly());
-  if (other.defaultVOX())
-    setVOXDefault();
-  setScanListObj(other.scanListObj());
+  copy(other);
 
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+bool
+Channel::copy(const ConfigItem &other) {
+  const Channel *c = other.as<Channel>();
+  if ((nullptr == c) || (! ConfigObject::copy(other)))
+    return false;
+
+  setName(c->name());
+  setRXFrequency(c->rxFrequency());
+  setTXFrequency(c->txFrequency());
+
+  if (c->defaultPower())
+    setDefaultPower();
+  else
+    setPower(c->power());
+
+  if (c->defaultTimeout())
+    setDefaultTimeout();
+  else
+    setTimeout(c->timeout());
+
+  setRXOnly(c->rxOnly());
+
+  if (c->defaultVOX())
+    setVOXDefault();
+  else
+    setVOX(c->vox());
+
+  setScanListObj(c->scanListObj());
+
+  if (c->openGD77ChannelExtension())
+    setOpenGD77ChannelExtension(
+          c->openGD77ChannelExtension()->clone()->as<OpenGD77ChannelExtension>());
+
+  return true;
 }
 
 double Channel::rxFrequency() const {
@@ -306,20 +328,40 @@ AnalogChannel::AnalogChannel(QObject *parent)
 }
 
 AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
-  : Channel(other, parent), _aprsSystem()
+  : Channel(parent), _aprsSystem()
 {
-  setAdmit(other.admit());
-  if (other.defaultSquelch())
-    setSquelchDefault();
-  else
-    setSquelch(other.squelch());
-  setRXTone(other.rxTone());
-  setTXTone(other.txTone());
-  setBandwidth(other.bandwidth());
-  setAPRSSystem(other.aprsSystem());
-
+  copy(other);
   // Link APRS system reference
   connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+bool
+AnalogChannel::copy(const ConfigItem &other) {
+  const AnalogChannel *c = other.as<AnalogChannel>();
+  if ((nullptr==c) || (! Channel::copy(other)))
+    return false;
+
+  setAdmit(c->admit());
+  if (c->defaultSquelch())
+    setSquelchDefault();
+  else
+    setSquelch(c->squelch());
+  setRXTone(c->rxTone());
+  setTXTone(c->txTone());
+  setBandwidth(c->bandwidth());
+  setAPRSSystem(c->aprsSystem());
+
+  return true;
+}
+
+ConfigItem *
+AnalogChannel::clone() const {
+  AnalogChannel *c = new AnalogChannel();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
 }
 
 AnalogChannel::Admit
@@ -528,7 +570,7 @@ DigitalChannel::DigitalChannel(QObject *parent)
 }
 
 DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
-  : Channel(other, parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
+  : Channel(parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
 {
   // Register default tags
   if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
@@ -536,13 +578,7 @@ DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
   if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioID", "!default"))
     ConfigItem::Context::setTag(metaObject()->className(), "radioID", "!default", DefaultRadioID::get());
 
-  setColorCode(other.colorCode());
-  setTimeSlot(other.timeSlot());
-  setGroupListObj(other.groupListObj());
-  setTXContactObj(other.txContactObj());
-  setAPRSObj(other.aprsObj());
-  setRoamingZone(other.roamingZone());
-  setRadioIdObj(other.radioIdObj());
+  copy(other);
 
   // Connect signals of references
   connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -550,6 +586,23 @@ DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
   connect(&_posSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_roaming, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_radioId, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+bool
+DigitalChannel::copy(const ConfigItem &other) {
+  const DigitalChannel *c = other.as<DigitalChannel>();
+  if ((nullptr == c) || (! Channel::copy(other)))
+    return false;
+
+  setColorCode(c->colorCode());
+  setTimeSlot(c->timeSlot());
+  setGroupListObj(c->groupListObj());
+  setTXContactObj(c->txContactObj());
+  setAPRSObj(c->aprsObj());
+  setRoamingZone(c->roamingZone());
+  setRadioIdObj(c->radioIdObj());
+
+  return true;
 }
 
 YAML::Node
@@ -722,6 +775,16 @@ SelectedChannel::SelectedChannel()
 
 SelectedChannel::~SelectedChannel() {
   SelectedChannel::_instance = nullptr;
+}
+
+bool
+SelectedChannel::copy(const ConfigItem &other) {
+  Q_UNUSED(other);
+  return false;
+}
+ConfigItem *
+SelectedChannel::clone() const {
+  return nullptr;
 }
 
 SelectedChannel *

@@ -34,17 +34,7 @@ public:
   /** Destructor. */
   virtual ~PositioningSystem();
 
-  /** Returns @c true if this positioning system is an instance of the specified system. */
-  template <class System>
-  bool is() const { return nullptr != dynamic_cast<const System *>(this); }
-
-  /** Casts this positioning system to an instance of the specified system. */
-  template <class System>
-  System *as() { return dynamic_cast<System *>(this); }
-
-  /** Casts this positioning system to an instance of the specified system. */
-  template <class System>
-  const System *as() const { return dynamic_cast<const System *>(this); }
+  bool copy(const ConfigItem &other);
 
   /** Returns the update period in seconds. */
   unsigned period() const;
@@ -95,6 +85,9 @@ public:
   GPSSystem(const QString &name, DigitalContact *contact=nullptr,
             DigitalChannel *revertChannel = nullptr, unsigned period=300,
             QObject *parent = nullptr);
+
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
 
   /** Returns @c true if a contact is set for the GPS system. */
   bool hasContact() const;
@@ -185,6 +178,9 @@ public:
   APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, unsigned destSSID,
              const QString &src, unsigned srcSSID, const QString &path="", Icon icon=Icon::Jogger,
              const QString &message="", unsigned period=300, QObject *parent=nullptr);
+
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
 
   /** Returns the transmit channel of the APRS system. */
   AnalogChannel *revertChannel() const;

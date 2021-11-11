@@ -122,6 +122,13 @@ ConfigItem::ConfigItem(QObject *parent)
 }
 
 bool
+ConfigItem::copy(const ConfigItem &other) {
+  Q_UNUSED(other);
+  this->clear();
+  return true;
+}
+
+bool
 ConfigItem::label(ConfigObject::Context &context) {
   // Label properties owning config objects, that is of type ConfigObject or ConfigObjectList
   const QMetaObject *meta = metaObject();
@@ -378,9 +385,9 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
                  << QMetaType::metaObjectForType(prop.userType())->className() << "'.";
         return false;
       }
-      // allocate instance
-      ConfigItem *obj = this->allocateChild(prop, node[prop.name()], ctx);
-      if (nullptr == obj) {
+      // allocate instance (if needed)
+      ConfigItem *obj = prop.read(this).value<ConfigItem*>();
+      if ((nullptr == obj) && (nullptr == (obj = this->allocateChild(prop, node[prop.name()], ctx)))) {
         errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                  << ": Cannot allocate " << prop.name() << " of " << meta->className() << ".";
         return false;
@@ -389,7 +396,8 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
       if (! obj->parse(node[prop.name()], ctx)) {
         errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                  << ": Cannot parse " << prop.name() << " of " << meta->className() << ".";
-        obj->deleteLater();
+        if (nullptr == obj->parent())
+          obj->deleteLater();
         return false;
       }
       // Set property
@@ -549,6 +557,15 @@ ConfigObject::ConfigObject(const QString &name, const QString &idBase, QObject *
   // pass...
 }
 
+bool
+ConfigObject::copy(const ConfigItem &other) {
+  const ConfigObject *o = other.as<ConfigObject>();
+  if ((nullptr == o) || ConfigItem::copy(other))
+    return false;
+  _name = o->_name;
+  return true;
+}
+
 const QString &
 ConfigObject::name() const {
   return _name;
@@ -636,6 +653,11 @@ ConfigExtension::ConfigExtension(QObject *parent)
 }
 
 bool
+ConfigExtension::copy(const ConfigItem &other) {
+  return ConfigItem::copy(other);
+}
+
+bool
 ConfigExtension::populate(YAML::Node &node, const Context &context) {
   // Call parent method
   if (! ConfigItem::populate(node, context))
@@ -651,6 +673,15 @@ AbstractConfigObjectList::AbstractConfigObjectList(const QMetaObject &elementTyp
   : QObject(parent), ErrorStack(), _elementType(elementType), _items()
 {
   // pass...
+}
+
+bool
+AbstractConfigObjectList::copy(const AbstractConfigObjectList &other) {
+  this->clear();
+  _elementType = other._elementType;
+  foreach (ConfigObject *item, other._items)
+    add(item);
+  return true;
 }
 
 int

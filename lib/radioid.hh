@@ -24,6 +24,9 @@ public:
    * @param parent Specifies the parent QObject owning this object. */
   RadioID(const QString &name, uint32_t number, QObject *parent = nullptr);
 
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
+
   /** Returns the DMR ID. */
   uint32_t number() const;
   /** Sets the DMR ID. */

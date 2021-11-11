@@ -30,6 +30,9 @@ public:
   /** Default constructor. */
   explicit RadioSettings(QObject *parent=nullptr);
 
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
+
   /** Resets the settings. */
   void clear();
 

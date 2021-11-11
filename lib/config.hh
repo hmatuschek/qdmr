@@ -38,8 +38,8 @@ class Config : public ConfigItem
 {
 	Q_OBJECT
 
-  /** Represents the button settings extension for TyT devices. */
-  Q_PROPERTY(TyTButtonSettings* tytButtonSettings READ tytButtonSettings WRITE setTyTButtonSettings)
+  /** Represents the config extension for TyT devices. */
+  Q_PROPERTY(TyTConfigExtension* tytExtension READ tytExtension WRITE setTyTExtension)
 
 public:
   /** Constructs an empty configuration. */
@@ -79,9 +79,9 @@ public:
 
   /** Returns the TyT button settings extension.
    * If this extension is not set, returns @c nullptr. */
-  TyTButtonSettings *tytButtonSettings() const;
+  TyTConfigExtension *tytExtension() const;
   /** Sets the TyT button settings extension. */
-  void setTyTButtonSettings(TyTButtonSettings *ext);
+  void setTyTExtension(TyTConfigExtension *ext);
 
 public:
   /** Imports a configuration from the given file. */
@@ -130,7 +130,7 @@ protected:
   /** The list of roaming zones. */
   RoamingZoneList *_roaming;
   /** Owns the tyt button settings. */
-  TyTButtonSettings *_tytButtonSettings;
+  TyTConfigExtension *_tytExtension;
 };
 
 #endif // CONFIG_HH
