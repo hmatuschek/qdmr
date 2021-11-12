@@ -169,8 +169,6 @@ ConfigItem::clear() {
       continue;
     if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
       lst->clear();
-    } else if (ConfigItem *obj = prop.read(this).value<ConfigItem *>()) {
-      obj->deleteLater();
     }
   }
 

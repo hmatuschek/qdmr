@@ -380,6 +380,7 @@ AnalogChannel::clone() const {
 
 void
 AnalogChannel::clear() {
+  Channel::clear();
   setAdmit(Admit::Always);
   setSquelchDefault();
   setRXTone(Signaling::SIGNALING_NONE);
@@ -632,6 +633,7 @@ DigitalChannel::copy(const ConfigItem &other) {
 
 void
 DigitalChannel::clear() {
+  Channel::clear();
   setColorCode(1);
   setTimeSlot(TimeSlot::TS1);
   setGroupListObj(nullptr);

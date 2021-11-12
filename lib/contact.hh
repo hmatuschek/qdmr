@@ -31,6 +31,7 @@ protected:
 
 public:
   bool copy(const ConfigItem &other);
+  void clear();
 
 public:
   /** Returns @c true if the ring-tone is enabled for this contact. */
@@ -88,6 +89,7 @@ public:
 
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
+  void clear();
 
   /** Returns the DTMF number of this contact.
    * The number must consist of 0-9, a-f, * or #. */
@@ -139,6 +141,7 @@ public:
 
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
+  void clear();
 
   /** Returns the call-type. */
 	Type type() const;

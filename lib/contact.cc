@@ -28,6 +28,12 @@ Contact::copy(const ConfigItem &other) {
   return true;
 }
 
+void
+Contact::clear() {
+  ConfigObject::clear();
+  _ring = false;
+}
+
 bool
 Contact::ring() const {
   return _ring;
@@ -110,6 +116,12 @@ DTMFContact::clone() const {
   return c;
 }
 
+void
+DTMFContact::clear() {
+  Contact::clear();
+  _number.clear();
+}
+
 const QString &
 DTMFContact::number() const {
   return _number;
@@ -158,9 +170,11 @@ DigitalContact::copy(const ConfigItem &other) {
     return false;
   _type = c->_type;
   _number = c->_number;
-  if (c->_openGD77)
+
+  if (c->openGD77ContactExtension())
     setOpenGD77ContactExtension(
           c->openGD77ContactExtension()->clone()->as<OpenGD77ContactExtension>());
+
   return true;
 }
 
@@ -172,6 +186,16 @@ DigitalContact::clone() const {
     return nullptr;
   }
   return c;
+}
+
+void
+DigitalContact::clear() {
+  Contact::clear();
+  _type = PrivateCall;
+  _number = 0;
+  if (_openGD77)
+    _openGD77->deleteLater();
+  _openGD77 = nullptr;
 }
 
 DigitalContact::Type
