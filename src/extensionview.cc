@@ -2,6 +2,8 @@
 #include "ui_extensionview.h"
 #include "propertydelegate.hh"
 #include "extensionwrapper.hh"
+#include <QMessageBox>
+
 
 ExtensionView::ExtensionView(QWidget *parent) :
   QWidget(parent), ui(new Ui::ExtensionView), _model(nullptr)
@@ -59,7 +61,9 @@ ExtensionView::onCreateExtension() {
     return;
   QModelIndex item = _proxy.mapToSource(
         ui->view->selectionModel()->selectedRows(0).first());
-  _model->createInstanceAt(item);
+  if (! _model->createInstanceAt(item))
+    QMessageBox::critical(nullptr, tr("Cannot create extension."),
+                          tr("Cannot create extension, consider reporting a bug."));
 }
 
 void

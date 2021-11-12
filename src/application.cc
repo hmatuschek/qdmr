@@ -34,6 +34,7 @@
 #include "positioningsystemlistview.hh"
 #include "roamingzonelistview.hh"
 #include "errormessageview.hh"
+#include "extensionview.hh"
 
 
 Application::Application(int &argc, char *argv[])
@@ -221,9 +222,16 @@ Application::createMainWindow() {
   _roamingZoneList = new RoamingZoneListView(_config);
   tabs->addTab(_roamingZoneList, tr("Roaming"));
 
+  // Wire-up "extension view"
+  _extensionView = new ExtensionView();
+  _extensionView->setObject(_config);
+  tabs->addTab(_extensionView, tr("Extensions"));
+
   if (! settings.showCommercialFeatures()) {
     tabs->removeTab(tabs->indexOf(_radioIdTab));
     _radioIdTab->setHidden(true);
+    tabs->removeTab(tabs->indexOf(_extensionView));
+    _extensionView->setHidden(true);
   }
 
   _mainWindow->restoreGeometry(settings.mainWindowState());
@@ -658,14 +666,21 @@ Application::showSettings() {
     QTabWidget *tabs = _mainWindow->findChild<QTabWidget*>("tabs");
     if (settings.showCommercialFeatures()) {
       if (-1 == tabs->indexOf(_radioIdTab)) {
-        QWidget *genSet = _mainWindow->findChild<QWidget*>("GeneralSettingsView");
-        tabs->insertTab(tabs->indexOf(genSet)+1, _radioIdTab, tr("Radio IDs"));
+        tabs->insertTab(tabs->indexOf(_generalSettings)+1, _radioIdTab, tr("Radio IDs"));
+        _mainWindow->update();
+      }
+      if (-1 == tabs->indexOf(_extensionView)) {
+        tabs->insertTab(tabs->indexOf(_roamingZoneList)+1, _extensionView, tr("Extensions"));
         _mainWindow->update();
       }
       _generalSettings->hideDMRID(true);
     } else if (! settings.showCommercialFeatures()) {
       if (-1 != tabs->indexOf(_radioIdTab)) {
         tabs->removeTab(tabs->indexOf(_radioIdTab));
+        _mainWindow->update();
+      }
+      if (-1 != tabs->indexOf(_extensionView)) {
+        tabs->removeTab(tabs->indexOf(_extensionView));
         _mainWindow->update();
       }
       _generalSettings->hideDMRID(false);

@@ -58,7 +58,7 @@ public:
 
 public:
   /** Constructor. */
-  explicit TyTButtonSettings(QObject *parent=nullptr);
+  Q_INVOKABLE explicit TyTButtonSettings(QObject *parent=nullptr);
 
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
@@ -114,7 +114,7 @@ class TyTConfigExtension: public ConfigExtension
 
 public:
   /** Constructor. Also allocates all associates extensions. */
-  explicit TyTConfigExtension(QObject *parent=nullptr);
+  Q_INVOKABLE explicit TyTConfigExtension(QObject *parent=nullptr);
 
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;

@@ -76,7 +76,7 @@ public:
 
 public:
   /** Constructor. */
-  explicit OpenGD77ContactExtension(QObject *parent=nullptr);
+  Q_INVOKABLE explicit OpenGD77ContactExtension(QObject *parent=nullptr);
 
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
