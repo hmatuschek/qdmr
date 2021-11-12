@@ -17,7 +17,8 @@ public:
   ~ContactListView();
 
 protected slots:
-  void onAddContact();
+  void onAddDMRContact();
+  void onAddDTMFContact();
   void onRemContact();
   void onEditContact(unsigned row);
 

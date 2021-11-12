@@ -1,6 +1,6 @@
 SET(qdmr_SOURCES main.cc
   configitemwrapper.cc
-  application.cc settings.cc contactdialog.cc rxgrouplistdialog.cc
+  application.cc settings.cc dmrcontactdialog.cc dtmfcontactdialog.cc rxgrouplistdialog.cc
 	analogchanneldialog.cc digitalchanneldialog.cc channelvalidator.cc channelcombobox.cc
   channelselectiondialog.cc zonedialog.cc scanlistdialog.cc
   ctcssbox.cc verifydialog.cc gpssystemdialog.cc contactselectiondialog.cc
@@ -11,7 +11,7 @@ SET(qdmr_SOURCES main.cc
   collapsablewidget.cc extensionview.cc extensionwrapper.cc propertydelegate.cc errormessageview.cc)
 SET(qdmr_MOC_HEADERS
   configitemwrapper.hh
-  application.hh settings.hh contactdialog.hh rxgrouplistdialog.hh
+  application.hh settings.hh dmrcontactdialog.hh dtmfcontactdialog.hh rxgrouplistdialog.hh
 	analogchanneldialog.hh digitalchanneldialog.hh channelvalidator.hh channelcombobox.hh
   channelselectiondialog.hh zonedialog.hh scanlistdialog.hh
   ctcssbox.hh verifydialog.hh gpssystemdialog.hh contactselectiondialog.hh
@@ -21,7 +21,7 @@ SET(qdmr_MOC_HEADERS
   zonelistview.hh scanlistsview.hh positioningsystemlistview.hh roamingzonelistview.hh
   collapsablewidget.hh extensionview.hh extensionwrapper.hh propertydelegate.hh errormessageview.hh)
 SET(qdmr_HEADERS )
-SET(qdmr_UI_FORMS contactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
+SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
   digitalchanneldialog.ui scanlistdialog.ui configwizardstart.ui verifydialog.ui settingsdialog.ui
   gpssystemdialog.ui aprssystemdialog.ui roamingzonedialog.ui
   configobjectlistview.ui configobjecttableview.ui

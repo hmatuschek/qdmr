@@ -17,7 +17,7 @@
  * Implementation of ContactDialog
  * ********************************************************************************************* */
 ContactDialog::ContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, QWidget *parent)
-  : QDialog(parent), _contact(nullptr), _user_completer(nullptr)
+  : QDialog(parent), _myContact(nullptr), _contact(nullptr), _user_completer(nullptr)
 {
   _user_completer = new QCompleter(users, this);
   _user_completer->setCompletionColumn(0);
@@ -36,9 +36,23 @@ ContactDialog::ContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, QWidge
   construct();
 }
 
-ContactDialog::ContactDialog(Contact *contact, QWidget *parent)
+ContactDialog::ContactDialog(Contact *contact, UserDatabase *users, TalkGroupDatabase *tgs, QWidget *parent)
   : QDialog(parent), _contact(contact), _user_completer(nullptr), _tg_completer(nullptr)
 {
+  _user_completer = new QCompleter(users, this);
+  _user_completer->setCompletionColumn(0);
+  _user_completer->setCaseSensitivity(Qt::CaseInsensitive);
+
+  _tg_completer = new QCompleter(tgs, this);
+  _tg_completer->setCompletionColumn(0);
+  _tg_completer->setCaseSensitivity(Qt::CaseInsensitive);
+
+  connect(_user_completer, SIGNAL(activated(QModelIndex)),
+          this, SLOT(onCompleterActivated(QModelIndex)));
+
+  connect(_tg_completer, SIGNAL(activated(QModelIndex)),
+          this, SLOT(onCompleterActivated(QModelIndex)));
+
   construct();
 }
 

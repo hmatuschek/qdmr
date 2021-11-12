@@ -1,6 +1,7 @@
 #include "contactlistview.hh"
 #include "ui_contactlistview.h"
-#include "contactdialog.hh"
+#include "dmrcontactdialog.hh"
+#include "dtmfcontactdialog.hh"
 #include "application.hh"
 #include "settings.hh"
 #include <QMessageBox>
@@ -19,7 +20,8 @@ ContactListView::ContactListView(Config *config, QWidget *parent)
 
   ui->listView->setModel(new ContactListWrapper(_config->contacts(), ui->listView));
 
-  connect(ui->addContact, SIGNAL(clicked()), this, SLOT(onAddContact()));
+  connect(ui->addDMRContact, SIGNAL(clicked()), this, SLOT(onAddDMRContact()));
+  connect(ui->addDTMFContact, SIGNAL(clicked()), this, SLOT(onAddDTMFContact()));
   connect(ui->remContact, SIGNAL(clicked()), this, SLOT(onRemContact()));
   connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditContact(unsigned)));
 }
@@ -29,9 +31,21 @@ ContactListView::~ContactListView() {
 }
 
 void
-ContactListView::onAddContact() {
+ContactListView::onAddDMRContact() {
   Application *app = qobject_cast<Application *>(QApplication::instance());
-  ContactDialog dialog(app->user(), app->talkgroup());
+  DMRContactDialog dialog(app->user(), app->talkgroup());
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  int row=-1;
+  if (ui->listView->hasSelection())
+    row = ui->listView->selection().second+1;
+  _config->contacts()->add(dialog.contact(), row);
+}
+
+void
+ContactListView::onAddDTMFContact() {
+  DTMFContactDialog dialog;
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -77,13 +91,21 @@ ContactListView::onRemContact() {
 
 void
 ContactListView::onEditContact(unsigned row) {
-  ContactDialog dialog(_config->contacts()->contact(row));
-  if (QDialog::Accepted != dialog.exec())
-    return;
+  Application *app = qobject_cast<Application *>(QApplication::instance());
+  Contact *contact = _config->contacts()->contact(row);
 
-  dialog.contact();
+  if (DigitalContact *digi = contact->as<DigitalContact>()) {
+    DMRContactDialog dialog(digi, app->user(), app->talkgroup());
+    if (QDialog::Accepted != dialog.exec())
+      return;
+    dialog.contact();
+  } else if (DTMFContact *dtmf = contact->as<DTMFContact>()) {
+    DTMFContactDialog dialog(dtmf);
+    if (QDialog::Accepted != dialog.exec())
+      return;
+    dialog.contact();
+  }
 }
-
 
 void
 ContactListView::loadHeaderState() {

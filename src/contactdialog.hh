@@ -22,7 +22,7 @@ class ContactDialog: public QDialog, private Ui::ContactDialog
 
 public:
   ContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, QWidget *parent=nullptr);
-  ContactDialog(Contact *contact, QWidget *parent=nullptr);
+  ContactDialog(Contact *contact, UserDatabase *users, TalkGroupDatabase *tgs, QWidget *parent=nullptr);
 
 	Contact *contact();
 
@@ -34,6 +34,7 @@ protected:
 	void construct();
 
 protected:
+  Contact *_myContact;
 	Contact *_contact;
   QCompleter *_user_completer;
   QCompleter *_tg_completer;
