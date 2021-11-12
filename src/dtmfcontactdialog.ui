@@ -21,7 +21,7 @@
      </property>
      <widget class="QWidget" name="basicTab">
       <attribute name="title">
-       <string>Tab 1</string>
+       <string>Basic</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout">
        <item row="0" column="0">
@@ -58,7 +58,7 @@
      </widget>
      <widget class="ExtensionView" name="extensionView">
       <attribute name="title">
-       <string>Tab 2</string>
+       <string>Extensions</string>
       </attribute>
      </widget>
     </widget>

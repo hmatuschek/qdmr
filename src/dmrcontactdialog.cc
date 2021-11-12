@@ -17,7 +17,8 @@
 
 DMRContactDialog::DMRContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, QWidget *parent)
   : QDialog(parent), _myContact(new DigitalContact(this)), _contact(nullptr),
-    _user_completer(nullptr), _tg_completer(nullptr)
+    _user_completer(nullptr), _tg_completer(nullptr),
+    ui(new Ui::DMRContactDialog)
 {
   _user_completer = new QCompleter(users, this);
   _user_completer->setCompletionColumn(0);
@@ -39,7 +40,8 @@ DMRContactDialog::DMRContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, 
 DMRContactDialog::DMRContactDialog(DigitalContact *contact, UserDatabase *users,
                                    TalkGroupDatabase *tgs, QWidget *parent)
   : QDialog(parent), _myContact(new DigitalContact(this)), _contact(contact),
-    _user_completer(nullptr), _tg_completer(nullptr)
+    _user_completer(nullptr), _tg_completer(nullptr),
+    ui(new Ui::DMRContactDialog)
 {
   _user_completer = new QCompleter(users, this);
   _user_completer->setCompletionColumn(0);

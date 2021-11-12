@@ -33,11 +33,11 @@ protected:
   void construct();
 
 private:
-  Ui::DMRContactDialog *ui;
   DigitalContact *_myContact;
   DigitalContact *_contact;
   QCompleter *_user_completer;
   QCompleter *_tg_completer;
+  Ui::DMRContactDialog *ui;
 };
 
 #endif // DMRCONTACTDIALOG_HH

@@ -11,7 +11,6 @@
 #include "verifydialog.hh"
 #include "analogchanneldialog.hh"
 #include "digitalchanneldialog.hh"
-#include "contactdialog.hh"
 #include "rxgrouplistdialog.hh"
 #include "zonedialog.hh"
 #include "scanlistdialog.hh"
