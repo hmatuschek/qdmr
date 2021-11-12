@@ -46,6 +46,16 @@ RXGroupList::copy(const ConfigItem &other) {
   return _contacts.copy(l->_contacts);
 }
 
+ConfigItem *
+RXGroupList::clone() const {
+  RXGroupList *lst = new RXGroupList();
+  if (! lst->copy(*this)) {
+    lst->deleteLater();
+    return nullptr;
+  }
+  return lst;
+}
+
 int
 RXGroupList::count() const {
   return _contacts.count();

@@ -28,6 +28,16 @@ RadioSettings::copy(const ConfigItem &other) {
   return true;
 }
 
+ConfigItem *
+RadioSettings::clone() const {
+  RadioSettings *set = new RadioSettings();
+  if (! set->copy(*this)) {
+    set->deleteLater();
+    return nullptr;
+  }
+  return set;
+}
+
 void
 RadioSettings::clear() {
   _introLine1.clear();

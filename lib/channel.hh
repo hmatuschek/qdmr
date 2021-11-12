@@ -66,6 +66,7 @@ protected:
 
 public:
   bool copy(const ConfigItem &other);
+  void clear();
 
   /** Returns the RX frequency of the channel in MHz. */
   double rxFrequency() const;
@@ -209,6 +210,7 @@ public:
 
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
+  void clear();
 
   /** Returns the admit criterion for the analog channel. */
 	Admit admit() const;
@@ -325,6 +327,7 @@ public:
 
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
+  void clear();
 
   /** Returns the admit criterion for the channel. */
 	Admit admit() const;

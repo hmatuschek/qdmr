@@ -2,12 +2,13 @@
 #define CONTACT_HH
 
 #include "configobject.hh"
+#include "opengd77_extension.hh"
 #include <QVector>
 #include <QAbstractTableModel>
 
 
 class Config;
-class OpenGD77ContactExtension;
+
 
 /** Represents the base-class for all contact types, Analog (DTMF) or Digital (DMR).
  *

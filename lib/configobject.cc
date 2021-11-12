@@ -560,7 +560,7 @@ ConfigObject::ConfigObject(const QString &name, const QString &idBase, QObject *
 bool
 ConfigObject::copy(const ConfigItem &other) {
   const ConfigObject *o = other.as<ConfigObject>();
-  if ((nullptr == o) || ConfigItem::copy(other))
+  if ((nullptr == o) || (!ConfigItem::copy(other)))
     return false;
   _name = o->_name;
   return true;

@@ -49,7 +49,6 @@ Channel::copy(const ConfigItem &other) {
   if ((nullptr == c) || (! ConfigObject::copy(other)))
     return false;
 
-  setName(c->name());
   setRXFrequency(c->rxFrequency());
   setTXFrequency(c->txFrequency());
 
@@ -79,7 +78,22 @@ Channel::copy(const ConfigItem &other) {
   return true;
 }
 
-double Channel::rxFrequency() const {
+void
+Channel::clear() {
+  ConfigObject::clear();
+  _rxFreq = 0; _txFreq = 0;
+  setDefaultPower();
+  setDefaultTimeout();
+  _rxOnly = false;
+  setVOXDefault();
+  _scanlist.clear();
+  if (_openGD77ChannelExtension)
+    _openGD77ChannelExtension->deleteLater();
+  _openGD77ChannelExtension = nullptr;
+}
+
+double
+Channel::rxFrequency() const {
   return _rxFreq;
 }
 bool
@@ -364,6 +378,16 @@ AnalogChannel::clone() const {
   return c;
 }
 
+void
+AnalogChannel::clear() {
+  setAdmit(Admit::Always);
+  setSquelchDefault();
+  setRXTone(Signaling::SIGNALING_NONE);
+  setTXTone(Signaling::SIGNALING_NONE);
+  setBandwidth(Bandwidth::Narrow);
+  setAPRSSystem(nullptr);
+}
+
 AnalogChannel::Admit
 AnalogChannel::admit() const {
   return _admit;
@@ -594,6 +618,7 @@ DigitalChannel::copy(const ConfigItem &other) {
   if ((nullptr == c) || (! Channel::copy(other)))
     return false;
 
+  setAdmit(c->admit());
   setColorCode(c->colorCode());
   setTimeSlot(c->timeSlot());
   setGroupListObj(c->groupListObj());
@@ -605,14 +630,25 @@ DigitalChannel::copy(const ConfigItem &other) {
   return true;
 }
 
-YAML::Node
-DigitalChannel::serialize(const Context &context) {
-  YAML::Node node = Channel::serialize(context);
-  if (node.IsNull())
-    return node;
-  YAML::Node type;
-  type["digital"] = node;
-  return type;
+void
+DigitalChannel::clear() {
+  setColorCode(1);
+  setTimeSlot(TimeSlot::TS1);
+  setGroupListObj(nullptr);
+  setTXContactObj(nullptr);
+  setAPRSObj(nullptr);
+  setRoamingZone(nullptr);
+  setRadioIdObj(nullptr);
+}
+
+ConfigItem *
+DigitalChannel::clone() const {
+  DigitalChannel *c = new DigitalChannel();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
 }
 
 DigitalChannel::Admit
@@ -759,6 +795,16 @@ DigitalChannel::setRadioIdObj(RadioID *id) {
     return false;
   emit modified(this);
   return true;
+}
+
+YAML::Node
+DigitalChannel::serialize(const Context &context) {
+  YAML::Node node = Channel::serialize(context);
+  if (node.IsNull())
+    return node;
+  YAML::Node type;
+  type["digital"] = node;
+  return type;
 }
 
 

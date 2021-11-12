@@ -227,6 +227,7 @@ protected:
   explicit AbstractConfigObjectList(const QMetaObject &elementType=ConfigObject::staticMetaObject, QObject *parent = nullptr);
 
 public:
+  /** Copies all elements from @c other to this list. */
   virtual bool copy(const AbstractConfigObjectList &other);
 
   /** Recursively labels the config object. */

@@ -45,6 +45,9 @@ public:
   /** Constructs an empty configuration. */
   explicit Config(QObject *parent = nullptr);
 
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
+
   /** Returns @c true if the config was modified, @see modified. */
   bool isModified() const;
   /** Sets the modified flag. */
