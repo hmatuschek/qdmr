@@ -5,23 +5,26 @@
 #include "zone.hh"
 #include "channel.hh"
 #include "channelselectiondialog.hh"
+#include "settings.hh"
 
 
 /* ********************************************************************************************* *
  * Implementation of ZoneDialog
  * ********************************************************************************************* */
 ZoneDialog::ZoneDialog(Config *config, Zone *zone, QWidget *parent)
-  : QDialog(parent), _config(config), _zone(""), _editZone(zone)
+  : QDialog(parent), _config(config), _myZone(new Zone(this)), _zone(zone)
 {
-  if (_editZone)
-    _zone = (*_editZone);
+  setWindowTitle(tr("Edit Zone"));
+  if (_zone)
+    _myZone->copy(*_zone);
+
   construct();
 }
 
 ZoneDialog::ZoneDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _zone(""), _editZone(nullptr)
+  : QDialog(parent), _config(config), _myZone(new Zone(this)), _zone(nullptr)
 {
-  _zone.clear();
+  setWindowTitle(tr("Create Zone"));
   construct();
 }
 
@@ -33,9 +36,14 @@ ZoneDialog::construct() {
   if (settings.hideZoneNote())
     zoneHint->setVisible(false);
 
-  zoneName->setText(_zone.name());
-  listAView->setModel(new ChannelRefListWrapper(_zone.A()));
-  listBView->setModel(new ChannelRefListWrapper(_zone.B()));
+  zoneName->setText(_myZone->name());
+  listAView->setModel(new ChannelRefListWrapper(_myZone->A()));
+  listBView->setModel(new ChannelRefListWrapper(_myZone->B()));
+
+  extensionView->setObject(_myZone);
+  if (! settings.showCommercialFeatures()) {
+    tabWidget->tabBar()->hide();
+  }
 
   connect(addChannelA, SIGNAL(clicked()), this, SLOT(onAddChannelA()));
   connect(remChannelA, SIGNAL(clicked()), this, SLOT(onRemChannelA()));
@@ -54,9 +62,9 @@ ZoneDialog::onAddChannelA() {
 
   QList<Channel *> channels = dia.channel();
   foreach (Channel *channel, channels) {
-    if (0 <= _zone.A()->indexOf(channel))
+    if (0 <= _myZone->A()->indexOf(channel))
       continue;
-    _zone.A()->add(channel);
+    _myZone->A()->add(channel);
   }
 }
 
@@ -67,9 +75,9 @@ ZoneDialog::onRemChannelA() {
   QPair<int, int> selection = listAView->selection();
   QList<Channel *> channels;
   for (int i=selection.first; i<=selection.second; i++)
-    channels.push_back(_zone.A()->get(i)->as<Channel>());
+    channels.push_back(_myZone->A()->get(i)->as<Channel>());
   foreach (Channel *channel, channels) {
-    _zone.A()->del(channel);
+    _myZone->A()->del(channel);
   }
 }
 
@@ -82,9 +90,9 @@ ZoneDialog::onAddChannelB() {
 
   QList<Channel *> channels = dia.channel();
   foreach (Channel *channel, channels) {
-    if (0 <= _zone.B()->indexOf(channel))
+    if (0 <= _myZone->B()->indexOf(channel))
       continue;
-    _zone.B()->add(channel);
+    _myZone->B()->add(channel);
   }
 }
 
@@ -95,9 +103,9 @@ ZoneDialog::onRemChannelB() {
   QPair<int, int> selection = listBView->selection();
   QList<Channel *> channels;
   for (int i=selection.first; i<=selection.second; i++)
-    channels.push_back(_zone.B()->get(i)->as<Channel>());
+    channels.push_back(_myZone->B()->get(i)->as<Channel>());
   foreach (Channel *channel, channels) {
-    _zone.B()->del(channel);
+    _myZone->B()->del(channel);
   }
 }
 
@@ -110,13 +118,15 @@ ZoneDialog::onHideZoneHint() {
 
 Zone *
 ZoneDialog::zone() {
-  Zone *zone = _editZone;
-  if (nullptr == zone)
-    zone = new Zone(zoneName->text(), this);
+  _myZone->setName(zoneName->text());
 
-  _zone.setName(zoneName->text());
-
-  (*zone) = _zone;
+  Zone *zone = _myZone;
+  if (_zone) {
+    _zone->copy(*_myZone);
+    zone = _zone;
+  } else {
+    _myZone->setParent(nullptr);
+  }
 
   return zone;
 }

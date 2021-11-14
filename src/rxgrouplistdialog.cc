@@ -2,6 +2,7 @@
 #include "config.hh"
 #include "contact.hh"
 #include "contactselectiondialog.hh"
+#include "settings.hh"
 
 #include <QInputDialog>
 #include <QMessageBox>
@@ -45,6 +46,7 @@ RXGroupListDialog::groupList() {
 void
 RXGroupListDialog::construct() {
   setupUi(this);
+  Settings settings;
 
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -53,7 +55,10 @@ RXGroupListDialog::construct() {
 
   groupListName->setText(_myGroupList->name());
   contactListView->setModel(new GroupListWrapper(_myGroupList, contactListView));
+
   extensionView->setObject(_myGroupList);
+  if (! settings.showCommercialFeatures())
+    tabWidget->tabBar()->hide();
 }
 
 
