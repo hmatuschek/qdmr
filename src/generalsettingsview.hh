@@ -18,6 +18,7 @@ public:
   ~GeneralSettingsView();
 
   void hideDMRID(bool hidden);
+  void hideExtensions(bool hidden);
 
 protected slots:
   void onConfigModified();

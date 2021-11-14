@@ -35,6 +35,8 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   ui->totValue->setValue(config->settings()->tot());
   ui->voxValue->setValue(config->settings()->vox());
 
+  ui->extensionView->setObject(config->settings());
+
   connect(_config, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   connect(ui->dmrID, SIGNAL(textEdited(QString)), this, SLOT(onDMRIDChanged()));
   connect(ui->radioName, SIGNAL(textEdited(QString)), this, SLOT(onNameChanged()));
@@ -55,6 +57,11 @@ GeneralSettingsView::~GeneralSettingsView() {
 void
 GeneralSettingsView::hideDMRID(bool hidden) {
   ui->dmrIDBox->setHidden(hidden);
+}
+
+void
+GeneralSettingsView::hideExtensions(bool hidden) {
+  ui->extensionBox->setHidden(hidden);
 }
 
 void

@@ -187,6 +187,7 @@ Application::createMainWindow() {
   tabs->addTab(_generalSettings, tr("Settings"));
   if (settings.showCommercialFeatures()) {
     _generalSettings->hideDMRID(true);
+    _generalSettings->hideExtensions(false);
   }
 
   // Wire-up "Radio IDs" view
@@ -673,6 +674,7 @@ Application::showSettings() {
         _mainWindow->update();
       }
       _generalSettings->hideDMRID(true);
+      _generalSettings->hideExtensions(false);
     } else if (! settings.showCommercialFeatures()) {
       if (-1 != tabs->indexOf(_radioIdTab)) {
         tabs->removeTab(tabs->indexOf(_radioIdTab));
@@ -683,6 +685,7 @@ Application::showSettings() {
         _mainWindow->update();
       }
       _generalSettings->hideDMRID(false);
+      _generalSettings->hideExtensions(true);
     }
   }
 }
