@@ -20,6 +20,7 @@
 <xi:include href="scanlists.xml"/>
 <xi:include href="aprs.xml"/>
 <xi:include href="roaming.xml"/>
+<xi:include href="extensions.xml"/>
 <xi:include href="programradio.xml"/>
 <xi:include href="settingsdialog.xml"/>
 
