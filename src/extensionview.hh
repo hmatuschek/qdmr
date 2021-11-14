@@ -24,7 +24,7 @@ public slots:
   void setObject(ConfigItem *obj);
 
 protected slots:
-  void onSelectedRowChanged(const QModelIndex &current, const QModelIndex &last);
+  void onSelectionChanged(const QItemSelection &current, const QItemSelection &last);
   void onCreateExtension();
   void onDeleteExtension();
 

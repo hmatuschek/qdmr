@@ -17,8 +17,8 @@ ExtensionView::ExtensionView(QWidget *parent) :
   ui->create->setEnabled(false);
   ui->remove->setEnabled(false);
 
-  connect(ui->view->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
-          this, SLOT(onSelectedRowChanged(QModelIndex,QModelIndex)));
+  connect(ui->view->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+          this, SLOT(onSelectionChanged(QItemSelection,QItemSelection)));
   connect(ui->create, SIGNAL(clicked(bool)), this, SLOT(onCreateExtension()));
   connect(ui->remove, SIGNAL(clicked(bool)), this, SLOT(onDeleteExtension()));
 }
@@ -37,23 +37,39 @@ ExtensionView::setObject(ConfigItem *obj) {
 }
 
 void
-ExtensionView::onSelectedRowChanged(const QModelIndex &current, const QModelIndex &last) {
+ExtensionView::onSelectionChanged(const QItemSelection &current, const QItemSelection &last) {
   Q_UNUSED(last)
-  if (nullptr == _model)
+  // If nothing is selected disable both
+  if (current.isEmpty() || (nullptr == _model)) {
+    ui->create->setEnabled(false);
+    ui->remove->setEnabled(false);
     return;
+  }
 
-  ConfigItem *obj = _model->parentObject(_proxy.mapToSource(current));
-  QMetaProperty prop = _model->propertyAt(_proxy.mapToSource(current));
-  if ((nullptr == obj) || (! prop.isValid()))
+  // Get selected row
+  QModelIndex row = ui->view->selectionModel()->selectedRows().first();
+  if (! row.isValid()) {
+    ui->create->setEnabled(false);
+    ui->remove->setEnabled(false);
     return;
+  }
+
+  ConfigItem *obj = _model->parentObject(_proxy.mapToSource(row));
+  QMetaProperty prop = _model->propertyAt(_proxy.mapToSource(row));
+  if ((nullptr == obj) || (! prop.isValid())) {
+    ui->create->setEnabled(false);
+    ui->remove->setEnabled(false);
+    return;
+  }
+
   if (! propIsInstance<ConfigItem>(prop)) {
     ui->create->setEnabled(false);
     ui->remove->setEnabled(false);
   } else if (prop.read(obj).value<ConfigItem*>()) {
     ui->create->setEnabled(false);
-    ui->remove->setEnabled(true);
+    ui->remove->setEnabled(prop.isWritable());
   } else {
-    ui->create->setEnabled(true);
+    ui->create->setEnabled(prop.isWritable());
     ui->remove->setEnabled(false);
   }
 }
@@ -67,6 +83,7 @@ ExtensionView::onCreateExtension() {
   if (! _model->createInstanceAt(item))
     QMessageBox::critical(nullptr, tr("Cannot create extension."),
                           tr("Cannot create extension, consider reporting a bug."));
+  ui->view->selectionModel()->clearSelection();
 }
 
 void
@@ -76,4 +93,5 @@ ExtensionView::onDeleteExtension() {
   QModelIndex item = _proxy.mapToSource(
         ui->view->selectionModel()->selectedRows(0).first());
   _model->deleteInstanceAt(item);
+  ui->view->selectionModel()->clearSelection();
 }

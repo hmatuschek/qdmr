@@ -238,6 +238,8 @@ PropertyWrapper::deleteInstanceAt(const QModelIndex &item) {
     return false;
   // If property is set -> delete
   if (ConfigItem *ext = prop.read(obj).value<ConfigItem*>()) {
+    if (! prop.isWritable())
+      return false;
     beginRemoveRows(item, 0, rowCount(item));
     prop.write(obj, QVariant::fromValue<ConfigItem*>(nullptr));
     endRemoveRows();
@@ -313,7 +315,10 @@ PropertyWrapper::flags(const QModelIndex &index) const {
   if (propIsInstance<ConfigItem>(prop)) {
     return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
   }
-  return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren;
+
+  if (prop.isWritable())
+    return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren;
+  return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
 }
 
 bool
