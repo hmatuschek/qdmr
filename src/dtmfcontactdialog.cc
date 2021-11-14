@@ -9,6 +9,7 @@ DTMFContactDialog::DTMFContactDialog(QWidget *parent) :
   QDialog(parent), _myContact(new DTMFContact(this)), _contact(nullptr),
   ui(new Ui::DTMFContactDialog)
 {
+  setWindowTitle(tr("Create DTMF Contact"));
   construct();
 }
 
@@ -16,6 +17,7 @@ DTMFContactDialog::DTMFContactDialog(DTMFContact *contact, QWidget *parent) :
   QDialog(parent), _myContact(new DTMFContact(this)), _contact(contact),
   ui(new Ui::DTMFContactDialog)
 {
+  setWindowTitle(tr("Edit DMR Contact"));
   if (_contact)
     _myContact->copy(*_contact);
 

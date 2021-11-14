@@ -20,6 +20,8 @@ DMRContactDialog::DMRContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, 
     _user_completer(nullptr), _tg_completer(nullptr),
     ui(new Ui::DMRContactDialog)
 {
+  setWindowTitle(tr("Create DMR Contact"));
+
   _user_completer = new QCompleter(users, this);
   _user_completer->setCompletionColumn(0);
   _user_completer->setCaseSensitivity(Qt::CaseInsensitive);
@@ -43,6 +45,7 @@ DMRContactDialog::DMRContactDialog(DigitalContact *contact, UserDatabase *users,
     _user_completer(nullptr), _tg_completer(nullptr),
     ui(new Ui::DMRContactDialog)
 {
+  setWindowTitle(tr("Edit DMR Contact"));
   _user_completer = new QCompleter(users, this);
   _user_completer->setCompletionColumn(0);
   _user_completer->setCaseSensitivity(Qt::CaseInsensitive);

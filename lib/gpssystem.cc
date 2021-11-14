@@ -126,8 +126,8 @@ GPSSystem::copy(const ConfigItem &other) {
   const GPSSystem *sys = other.as<GPSSystem>();
   if ((nullptr == sys) || (! PositioningSystem::copy(other)))
     return false;
-  _contact.set(sys->contactObj());
-  _revertChannel.set(sys->revertChannel());
+  _contact.copy(sys->contact());
+  _revertChannel.copy(sys->revert());
   return true;
 }
 
@@ -152,8 +152,13 @@ GPSSystem::contactObj() const {
 }
 
 void
-GPSSystem::setContact(DigitalContact *contact) {
+GPSSystem::setContactObj(DigitalContact *contact) {
   _contact.set(contact);
+}
+
+void
+GPSSystem::setContact(DigitalContactReference *contact) {
+  _contact.copy(contact);
 }
 
 const DigitalContactReference *
@@ -189,6 +194,11 @@ GPSSystem::revert() const {
 DigitalChannelReference*
 GPSSystem::revert() {
   return &_revertChannel;
+}
+
+void
+GPSSystem::setRevert(DigitalChannelReference *channel) {
+  _revertChannel.copy(channel);
 }
 
 YAML::Node
@@ -229,7 +239,7 @@ APRSSystem::copy(const ConfigItem &other) {
   const APRSSystem *sys = other.as<APRSSystem>();
   if ((nullptr == sys) || (! PositioningSystem::copy(other)))
     return false;
-  _channel.set(sys->revertChannel());
+  _channel.copy(sys->revert());
   _destination = sys->destination();
   _destSSID = sys->_destSSID;
   _source = sys->_source;
@@ -268,6 +278,11 @@ APRSSystem::revert() const {
 AnalogChannelReference *
 APRSSystem::revert() {
   return &_channel;
+}
+
+void
+APRSSystem::setRevert(AnalogChannelReference *ref) {
+  _channel.copy(ref);
 }
 
 const QString &

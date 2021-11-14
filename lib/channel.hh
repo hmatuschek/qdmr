@@ -40,7 +40,7 @@ class Channel: public ConfigObject
   /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
   /** The scan list. */
-  Q_PROPERTY(ScanListReference* scanList READ scanList)
+  Q_PROPERTY(ScanListReference* scanList READ scanList WRITE setScanList)
   /** The VOX setting. */
   Q_PROPERTY(unsigned vox READ vox WRITE setVOX SCRIPTABLE false)
   /** The OpenGD77 channel extension. */
@@ -121,7 +121,8 @@ public:
   const ScanListReference *scanList() const;
   /** Returns the reference to the scan list. */
   ScanListReference *scanList();
-
+  /** Sets the scan list reference. */
+  void setScanList(ScanListReference *ref);
   /** Returns the default scan list for the channel. */
   ScanList *scanListObj() const;
   /** (Re-) Sets the default scan list for the channel. */
@@ -184,7 +185,7 @@ class AnalogChannel: public Channel
   /** The band width of the channel. */
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
   /** The APRS system. */
-  Q_PROPERTY(APRSSystemReference* aprs READ aprs)
+  Q_PROPERTY(APRSSystemReference* aprs READ aprs WRITE setAPRS)
 
 public:
   /** Admit criteria of analog channel. */
@@ -248,6 +249,8 @@ public:
   const APRSSystemReference *aprs() const;
   /** Returns the reference to the APRS system. */
   APRSSystemReference *aprs();
+  /** Sets the APRS system reference. */
+  void setAPRS(APRSSystemReference *ref);
   /** Returns the APRS system used for this channel or @c nullptr if disabled. */
   APRSSystem *aprsSystem() const;
   /** Sets the APRS system. */
@@ -293,15 +296,15 @@ class DigitalChannel: public Channel
   /** The time slot of the channel. */
   Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
   /** The radio ID. */
-  Q_PROPERTY(RadioIDReference* radioID READ radioID)
+  Q_PROPERTY(RadioIDReference* radioId READ radioId WRITE setRadioId)
   /** The rx group list. */
-  Q_PROPERTY(GroupListReference* groupList READ groupList)
+  Q_PROPERTY(GroupListReference* groupList READ groupList WRITE setGroupList)
   /** The tx contact. */
-  Q_PROPERTY(DigitalContactReference* contact READ contact)
+  Q_PROPERTY(DigitalContactReference* contact READ contact WRITE setContact)
   /** The positioning system. */
-  Q_PROPERTY(PositioningSystemReference* aprs READ aprs)
+  Q_PROPERTY(PositioningSystemReference* aprs READ aprs WRITE setAPRS)
   /** The roaming zone. */
-  Q_PROPERTY(RoamingZoneReference* roaming READ roaming)
+  Q_PROPERTY(RoamingZoneReference* roaming READ roaming WRITE setRoaming)
 
 public:
   /** Possible admit criteria of digital channels. */
@@ -348,6 +351,8 @@ public:
   const GroupListReference *groupList() const;
   /** Returns a reference to the group list. */
   GroupListReference *groupList();
+  /** Sets the reference to the group list. */
+  void setGroupList(GroupListReference *ref);
   /** Retruns the RX group list for the channel. */
   RXGroupList *groupListObj() const;
   /** (Re-)Sets the RX group list for the channel. */
@@ -357,6 +362,8 @@ public:
   const DigitalContactReference *contact() const;
   /** Returns a reference to the transmit contact. */
   DigitalContactReference *contact();
+  /** Sets the reference to the transmit contact. */
+  void setContact(DigitalContactReference *ref);
   /** Returns the default TX contact to call on this channel. */
   DigitalContact *txContactObj() const;
   /** (Re-) Sets the default TX contact for this channel. */
@@ -366,6 +373,8 @@ public:
   const PositioningSystemReference *aprs() const;
   /** Returns a reference to the positioning system. */
   PositioningSystemReference *aprs();
+  /** Sets the reference to the positioning system. */
+  void setAPRS(PositioningSystemReference *ref);
   /** Returns the GPS system associated with this channel or @c nullptr if not set. */
   PositioningSystem *aprsObj() const;
   /** Associates the GPS System with this channel. */
@@ -375,15 +384,19 @@ public:
   const RoamingZoneReference *roaming() const;
   /** Returns a reference to the roaming zone. */
   RoamingZoneReference *roaming();
+  /** Sets the reference to the roaming zone. */
+  void setRoaming(RoamingZoneReference *ref);
   /** Returns the roaming zone associated with this channel or @c nullptr if not set. */
   RoamingZone *roamingZone() const;
   /** Associates the given roaming zone with this channel. */
   bool setRoamingZone(RoamingZone *zone);
 
   /** Returns the reference to the radio ID. */
-  const RadioIDReference *radioID() const;
+  const RadioIDReference *radioId() const;
   /** Returns the reference to the radio ID. */
-  RadioIDReference *radioID();
+  RadioIDReference *radioId();
+  /** Sets the reference to the radio ID. */
+  void setRadioId(RadioIDReference *ref);
   /** Returns the radio ID associated with this channel or @c nullptr if the default ID is used. */
   RadioID *radioIdObj() const;
   /** Associates the given radio ID with this channel. Pass nullptr to set to default ID. */

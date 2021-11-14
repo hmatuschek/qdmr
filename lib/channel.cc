@@ -69,7 +69,7 @@ Channel::copy(const ConfigItem &other) {
   else
     setVOX(c->vox());
 
-  setScanListObj(c->scanListObj());
+  _scanlist.copy(c->scanList());
 
   if (c->openGD77ChannelExtension())
     setOpenGD77ChannelExtension(
@@ -205,6 +205,14 @@ Channel::scanList() const {
 ScanListReference *
 Channel::scanList() {
   return &_scanlist;
+}
+
+void
+Channel::setScanList(ScanListReference *ref) {
+  if (nullptr == ref)
+    _scanlist.clear();
+  else
+    _scanlist.copy(ref);
 }
 
 ScanList *
@@ -363,7 +371,7 @@ AnalogChannel::copy(const ConfigItem &other) {
   setRXTone(c->rxTone());
   setTXTone(c->txTone());
   setBandwidth(c->bandwidth());
-  setAPRSSystem(c->aprsSystem());
+  _aprsSystem.copy(c->aprs());
 
   return true;
 }
@@ -467,6 +475,13 @@ AnalogChannel::aprs() const {
 APRSSystemReference *
 AnalogChannel::aprs() {
   return &_aprsSystem;
+}
+
+void
+AnalogChannel::setAPRS(APRSSystemReference *ref) {
+  if (nullptr == ref)
+    return _aprsSystem.clear();
+  _aprsSystem.copy(ref);
 }
 
 APRSSystem *
@@ -622,11 +637,11 @@ DigitalChannel::copy(const ConfigItem &other) {
   setAdmit(c->admit());
   setColorCode(c->colorCode());
   setTimeSlot(c->timeSlot());
-  setGroupListObj(c->groupListObj());
-  setTXContactObj(c->txContactObj());
-  setAPRSObj(c->aprsObj());
-  setRoamingZone(c->roamingZone());
-  setRadioIdObj(c->radioIdObj());
+  _rxGroup.copy(c->groupList());
+  _txContact.copy(c->contact());
+  _posSystem.copy(c->aprs());
+  _roaming.copy(c->roaming());
+  _radioId.copy(c->radioId());
 
   return true;
 }
@@ -695,6 +710,14 @@ DigitalChannel::groupList() {
   return &_rxGroup;
 }
 
+void
+DigitalChannel::setGroupList(GroupListReference *ref) {
+  if (nullptr == ref)
+    _rxGroup.clear();
+  else
+    _rxGroup.copy(ref);
+}
+
 RXGroupList *
 DigitalChannel::groupListObj() const {
   return _rxGroup.as<RXGroupList>();
@@ -716,6 +739,14 @@ DigitalChannel::contact() const {
 DigitalContactReference *
 DigitalChannel::contact() {
   return &_txContact;
+}
+
+void
+DigitalChannel::setContact(DigitalContactReference *ref) {
+  if (nullptr == ref)
+    _txContact.clear();
+  else
+    _txContact.copy(ref);
 }
 
 DigitalContact *
@@ -741,6 +772,14 @@ DigitalChannel::aprs() {
   return &_posSystem;
 }
 
+void
+DigitalChannel::setAPRS(PositioningSystemReference *ref) {
+  if (nullptr == ref)
+    _posSystem.clear();
+  else
+    _posSystem.copy(ref);
+}
+
 PositioningSystem *
 DigitalChannel::aprsObj() const {
   return _posSystem.as<PositioningSystem>();
@@ -764,6 +803,14 @@ DigitalChannel::roaming() {
   return &_roaming;
 }
 
+void
+DigitalChannel::setRoaming(RoamingZoneReference *ref) {
+  if (nullptr == ref)
+    _roaming.clear();
+  else
+    _roaming.copy(ref);
+}
+
 RoamingZone *
 DigitalChannel::roamingZone() const {
   return _roaming.as<RoamingZone>();
@@ -777,13 +824,21 @@ DigitalChannel::setRoamingZone(RoamingZone *zone) {
 }
 
 const RadioIDReference *
-DigitalChannel::radioID() const {
+DigitalChannel::radioId() const {
   return &_radioId;
 }
 
 RadioIDReference *
-DigitalChannel::radioID() {
+DigitalChannel::radioId() {
   return &_radioId;
+}
+
+void
+DigitalChannel::setRadioId(RadioIDReference *ref) {
+  if (nullptr == ref)
+    _radioId.clear();
+  else
+    _radioId.copy(ref);
 }
 
 RadioID *

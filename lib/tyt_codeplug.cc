@@ -1631,7 +1631,7 @@ TyTCodeplug::GPSSystemElement::linkGPSSystemObj(GPSSystem *sys, Context &ctx) {
     return false;
 
   if ((! destinationContactDisabled()) && (ctx.has<DigitalContact>(destinationContactIndex())))
-    sys->setContact(ctx.get<DigitalContact>(destinationContactIndex()));
+    sys->setContactObj(ctx.get<DigitalContact>(destinationContactIndex()));
 
   if (revertChannelIsSelected())
     sys->setRevertChannel(nullptr);

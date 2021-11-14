@@ -1909,7 +1909,7 @@ D878UVCodeplug::DMRAPRSSystemsElement::linkGPSSystem(int idx, GPSSystem *sys, Co
     ctx.config()->contacts()->add(cont);
   }
   // link contact to GPS system.
-  sys->setContact(cont);
+  sys->setContactObj(cont);
 
   return true;
 }

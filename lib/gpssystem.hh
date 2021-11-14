@@ -65,9 +65,9 @@ class GPSSystem : public PositioningSystem
   Q_OBJECT
 
   /** References the destination contact. */
-  Q_PROPERTY(DigitalContactReference* contact READ contact)
+  Q_PROPERTY(DigitalContactReference* contact READ contact WRITE setContact)
   /** References the revert channel. */
-  Q_PROPERTY(DigitalChannelReference* revert READ revert)
+  Q_PROPERTY(DigitalChannelReference* revert READ revert WRITE setRevert)
 
 public:
   /** Default constructor. */
@@ -94,11 +94,13 @@ public:
   /** Returns the destination contact for the GPS information or @c nullptr if not set. */
   DigitalContact *contactObj() const;
   /** Sets the destination contact for the GPS information. */
-  void setContact(DigitalContact *contactObj);
+  void setContactObj(DigitalContact *contactObj);
   /** Returns the reference to the destination contact. */
   const DigitalContactReference *contact() const;
   /** Returns the reference to the destination contact. */
   DigitalContactReference *contact();
+  /** Sets the reference to the destination contact for the GPS information. */
+  void setContact(DigitalContactReference *contactObj);
 
   /** Returns @c true if the GPS system has a revert channel set. If not, the GPS information will
    * be send on the current channel. */
@@ -111,6 +113,8 @@ public:
   const DigitalChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
   DigitalChannelReference *revert();
+  /** Sets the revert channel for the GPS information to be send on. */
+  void setRevert(DigitalChannelReference *channel);
 
 public:
   YAML::Node serialize(const Context &context);
@@ -130,7 +134,7 @@ class APRSSystem: public PositioningSystem
   Q_OBJECT
 
   /** The transmit channel. */
-  Q_PROPERTY(AnalogChannelReference* revert READ revert)
+  Q_PROPERTY(AnalogChannelReference* revert READ revert WRITE setRevert)
   /** The APRS icon. */
   Q_PROPERTY(Icon icon READ icon WRITE setIcon)
   /** An optional text message. */
@@ -190,6 +194,8 @@ public:
   const AnalogChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
   AnalogChannelReference *revert();
+  /** Sets the revert channel reference. */
+  void setRevert(AnalogChannelReference *ref);
 
   /** Retruns the destination call. */
   const QString &destination() const;

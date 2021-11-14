@@ -2101,7 +2101,7 @@ CSVReader::handleGPSSystem(
       logError() << errorMessage;
       return false;
     }
-    gps->setContact(_digital_contacts[contactIdx]);
+    gps->setContactObj(_digital_contacts[contactIdx]);
 
     if (revertChannelIdx) {
       if (! _channels.contains(revertChannelIdx))  {

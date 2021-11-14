@@ -14,6 +14,9 @@ ExtensionView::ExtensionView(QWidget *parent) :
   ui->view->setSelectionMode(QAbstractItemView::SingleSelection);
   ui->view->setSelectionBehavior(QAbstractItemView::SelectRows);
 
+  ui->create->setEnabled(false);
+  ui->remove->setEnabled(false);
+
   connect(ui->view->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
           this, SLOT(onSelectedRowChanged(QModelIndex,QModelIndex)));
   connect(ui->create, SIGNAL(clicked(bool)), this, SLOT(onCreateExtension()));

@@ -2450,7 +2450,7 @@ AnytoneCodeplug::DMRAPRSSettingsElement::linkGPSSystem(uint8_t i, Context &ctx) 
     cont = new DigitalContact(callType(), QString("GPS target"), destination());
     ctx.config()->contacts()->add(cont);
   }
-  ctx.get<GPSSystem>(i)->setContact(cont);
+  ctx.get<GPSSystem>(i)->setContactObj(cont);
 
   // Check if there is a revert channel set
   if ((! channelIsSelected(i)) && (ctx.has<Channel>(channelIndex(i))) && (ctx.get<Channel>(channelIndex(i)))->is<DigitalChannel>()) {
