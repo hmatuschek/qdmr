@@ -188,6 +188,9 @@ Application::createMainWindow() {
   if (settings.showCommercialFeatures()) {
     _generalSettings->hideDMRID(true);
     _generalSettings->hideExtensions(false);
+  } else {
+    _generalSettings->hideDMRID(false);
+    _generalSettings->hideExtensions(true);
   }
 
   // Wire-up "Radio IDs" view
