@@ -332,7 +332,6 @@ OpenGD77Codeplug::ContactElement::toContactObj(Context &ctx) const {
   } else {
     ext->setTimeSlotOverride(OpenGD77ContactExtension::TimeSlotOverride::None);
   }
-
   c->setOpenGD77ContactExtension(ext);
 
   return c;
@@ -344,14 +343,15 @@ OpenGD77Codeplug::ContactElement::fromContactObj(const DigitalContact *c, Contex
   if (c->openGD77ContactExtension())
     return;
 
-  const OpenGD77ContactExtension *ext = c->openGD77ContactExtension();
-  if (OpenGD77ContactExtension::TimeSlotOverride::None != ext->timeSlotOverride()) {
-    if (OpenGD77ContactExtension::TimeSlotOverride::TS1 == ext->timeSlotOverride())
-      setTimeSlot(DigitalChannel::TimeSlot::TS1);
-    else
-      setTimeSlot(DigitalChannel::TimeSlot::TS2);
-  } else {
-    disableTimeSlotOverride();
+  if(const OpenGD77ContactExtension *ext = c->openGD77ContactExtension()) {
+    if (OpenGD77ContactExtension::TimeSlotOverride::None != ext->timeSlotOverride()) {
+      if (OpenGD77ContactExtension::TimeSlotOverride::TS1 == ext->timeSlotOverride())
+        setTimeSlot(DigitalChannel::TimeSlot::TS1);
+      else
+        setTimeSlot(DigitalChannel::TimeSlot::TS2);
+    } else {
+      disableTimeSlotOverride();
+    }
   }
 }
 
