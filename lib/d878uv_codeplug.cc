@@ -1551,18 +1551,23 @@ D878UVCodeplug::AnalogAPRSSettingsElement::setPreWaveDelay(unsigned ms) {
 }
 
 bool
-D878UVCodeplug::AnalogAPRSSettingsElement::fromAPRSSystem(const APRSSystem *sys, Context &ctx) {
+D878UVCodeplug::AnalogAPRSSettingsElement::fromAPRSSystem(const APRSSystem *sys, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
   clear();
+  if (! sys->revertChannel()) {
+    errMsg(err) << "Cannot encode APRS settings: "
+                << "No revert channel defined for APRS system '" << sys->name() <<"'.";
+    return false;
+  }
   setFrequency(sys->revertChannel()->txFrequency()*1e6);
   setTXTone(sys->revertChannel()->txTone());
+  setPower(sys->revertChannel()->power());
   setManualTXInterval(sys->period());
   setAutoTXInterval(sys->period());
   setDestination(sys->destination(), sys->destSSID());
   setSource(sys->source(), sys->srcSSID());
   setPath(sys->path());
   setIcon(sys->icon());
-  setPower(sys->revertChannel()->power());
   setPreWaveDelay(0);
   return true;
 }

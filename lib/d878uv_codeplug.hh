@@ -951,7 +951,8 @@ public:
     virtual void setPreWaveDelay(unsigned ms);
 
     /** Configures this APRS system from the given generic config. */
-    virtual bool fromAPRSSystem(const APRSSystem *sys, Context &ctx);
+    virtual bool fromAPRSSystem(const APRSSystem *sys, Context &ctx,
+                                const ErrorStack &err=ErrorStack());
     /** Constructs a generic APRS system configuration from this APRS system. */
     virtual APRSSystem *toAPRSSystem();
     /** Links the transmit channel within the generic APRS system based on the transmit frequency
