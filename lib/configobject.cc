@@ -456,9 +456,9 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
                     << ": Cannot set reference.";
         return false;
       }
-      logDebug() << "Linked reference " << prop.name() << "='" << id
+      /*logDebug() << "Linked reference " << prop.name() << "='" << id
                  << "' to " << ctx.getObj(id)->metaObject()->className()
-                 << " '" << ctx.getObj(id)->name() << "'.";
+                 << " '" << ctx.getObj(id)->name() << "'.";*/
     } else if (ConfigObjectRefList *lst = prop.read(this).value<ConfigObjectRefList *>()) {
       // If not set -> skip
       if (! node[prop.name()])
