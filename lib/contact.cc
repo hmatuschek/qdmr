@@ -69,17 +69,7 @@ Contact::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
 
 bool
 Contact::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
-  if (! node)
-    return false;
-
-  if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg(err) << node.Mark().line << ":" << node.Mark().column
-                << ": Cannot link contact: Expected object with one child.";
-    return false;
-  }
-
-  YAML::Node cnt = node.begin()->second;
-  return ConfigObject::link(cnt, ctx, err);
+  return ConfigObject::link(node.begin()->second, ctx, err);
 }
 
 

@@ -78,6 +78,11 @@ PositioningSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack 
   return ConfigObject::parse(pos, ctx);
 }
 
+bool
+PositioningSystem::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+  return ConfigObject::link(node.begin()->second, ctx);
+}
+
 void
 PositioningSystem::onReferenceModified() {
   emit modified(this);

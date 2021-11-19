@@ -445,12 +445,20 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
       }
       // set reference
       QString id = QString::fromStdString(node[prop.name()].as<std::string>());
+      if (! ctx.contains(id)) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot link reference to '" << id << "', element not defined.";
+        return false;
+      }
       if (! ref->set(ctx.getObj(id))) {
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot link " << prop.name() << " of " << meta->className()
                     << ": Cannot set reference.";
         return false;
       }
+      logDebug() << "Linked reference " << prop.name() << "='" << id
+                 << "' to " << ctx.getObj(id)->metaObject()->className()
+                 << " '" << ctx.getObj(id)->name() << "'.";
     } else if (ConfigObjectRefList *lst = prop.read(this).value<ConfigObjectRefList *>()) {
       // If not set -> skip
       if (! node[prop.name()])

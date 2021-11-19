@@ -44,6 +44,7 @@ public:
 public:
   ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   bool populate(YAML::Node &node, const ConfigItem::Context &context);
