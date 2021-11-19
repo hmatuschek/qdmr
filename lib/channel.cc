@@ -598,8 +598,8 @@ DigitalChannel::DigitalChannel(QObject *parent)
   // Register default tags
   if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
     ConfigItem::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioID", "!default"))
-    ConfigItem::Context::setTag(metaObject()->className(), "radioID", "!default", DefaultRadioID::get());
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioId", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "radioId", "!default", DefaultRadioID::get());
 
   // Connect signals of references
   connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -615,8 +615,8 @@ DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
   // Register default tags
   if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
     ConfigItem::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioID", "!default"))
-    ConfigItem::Context::setTag(metaObject()->className(), "radioID", "!default", DefaultRadioID::get());
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioId", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "radioId", "!default", DefaultRadioID::get());
 
   copy(other);
 

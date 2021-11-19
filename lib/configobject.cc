@@ -282,6 +282,9 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
     if (! prop.isScriptable())
       continue;
 
+    /// @todo With Qt 5.15, we can use the REQUIRED flag to check for mandatory properties.
+    /// However, Ubuntu 20.04 (Focal) comes with Qt 5.12.
+
     if (prop.isEnumType()) {
       // If property is not set -> skip
       if (! node[prop.name()])

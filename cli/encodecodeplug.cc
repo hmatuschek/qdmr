@@ -144,7 +144,11 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     codeplug.setBitmaps(&config);
     codeplug.allocateUpdated();
     codeplug.allocateForEncoding();
-    codeplug.encode(&config, flags, err);
+    if (! codeplug.encode(&config, flags, err)) {
+      logError() << "Cannot encode codeplug file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
     codeplug.image(0).sort();
     if (! codeplug.write(parser.positionalArguments().at(2), err)) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)

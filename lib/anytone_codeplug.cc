@@ -2071,9 +2071,18 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
   }
   // Set default VOX sensitivity
   setVOXLevel(ctx.config()->settings()->vox());
-  // Set squelch level
-  setSquelchLevelA(ctx.config()->settings()->squelch());
-  setSquelchLevelB(ctx.config()->settings()->squelch());
+  // Set default squelch level
+  if (0 == ctx.config()->settings()->squelch()) {
+    setSquelchLevelA(0);
+    setSquelchLevelB(0);
+  } else if (1 == ctx.config()->settings()->squelch()) {
+    setSquelchLevelA(1);
+    setSquelchLevelB(1);
+  } else {
+    setSquelchLevelA(ctx.config()->settings()->squelch()/2);
+    setSquelchLevelB(ctx.config()->settings()->squelch()/2);
+  }
+
   return true;
 }
 
@@ -2084,7 +2093,7 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   // D868UV does not support speech synthesis?
   ctx.config()->settings()->enableSpeech(false);
   ctx.config()->settings()->setVOX(voxLevel());
-  ctx.config()->settings()->setSquelch(squelchLevelA());
+  ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB())*2);
   return true;
 }
 

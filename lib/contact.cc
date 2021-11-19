@@ -149,7 +149,7 @@ DigitalContact::DigitalContact(QObject *parent)
 }
 
 DigitalContact::DigitalContact(Type type, const QString &name, unsigned number, bool rxTone, QObject *parent)
-  : Contact(name, rxTone, parent), _type(type), _number(number)
+  : Contact(name, rxTone, parent), _type(type), _number(number), _openGD77(nullptr)
 {
   // pass...
 }
