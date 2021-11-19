@@ -82,7 +82,8 @@ public:
   void setRevertChannel(Channel *channel);
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   /** The channel list. */
@@ -112,7 +113,7 @@ public:
   int add(ConfigObject *obj, int row=-1);
 
 public:
-  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx);
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 

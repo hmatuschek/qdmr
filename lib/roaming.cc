@@ -89,8 +89,8 @@ RoamingZone::channels() {
 }
 
 ConfigItem *
-RoamingZone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+RoamingZone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   return nullptr;
 }
 
@@ -155,15 +155,15 @@ RoamingZoneList::add(ConfigObject *obj, int row) {
 }
 
 ConfigItem *
-RoamingZoneList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
+RoamingZoneList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
 
   if (! node)
     return nullptr;
 
   if (! node.IsMap()) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot create roaming zone: Expected object.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create roaming zone: Expected object.";
     return nullptr;
   }
 

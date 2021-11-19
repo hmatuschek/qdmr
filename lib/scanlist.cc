@@ -184,8 +184,9 @@ ScanList::setRevertChannel(Channel *channel) {
 }
 
 ConfigItem *
-ScanList::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+ScanList::allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                        const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   return nullptr;
 }
 
@@ -214,15 +215,15 @@ ScanLists::add(ConfigObject *obj, int row) {
 }
 
 ConfigItem *
-ScanLists::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
+ScanLists::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx);
 
   if (! node)
     return nullptr;
 
   if (! node.IsMap()) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot create scan list: Expected object.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create scan list: Expected object.";
     return nullptr;
   }
 

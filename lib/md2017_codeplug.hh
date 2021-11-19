@@ -78,41 +78,41 @@ public:
   bool encodeTimestamp();
 
   void clearGeneralSettings();
-  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx);
-  bool decodeGeneralSettings(Config *config);
+  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeGeneralSettings(Config *config, const ErrorStack &err=ErrorStack());
 
   void clearChannels();
-  bool encodeChannels(Config *config, const Flags &flags, Context &ctx);
-  bool createChannels(Config *config, Context &ctx);
-  bool linkChannels(Context &ctx);
+  bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearContacts();
-  bool encodeContacts(Config *config, const Flags &flags, Context &ctx);
-  bool createContacts(Config *config, Context &ctx);
+  bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearZones();
-  bool encodeZones(Config *config, const Flags &flags, Context &ctx);
-  bool createZones(Config *config, Context &ctx);
-  bool linkZones(Context &ctx);
+  bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearGroupLists();
-  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx);
-  bool createGroupLists(Config *config, Context &ctx);
-  bool linkGroupLists(Context &ctx);
+  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearScanLists();
-  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx);
-  bool createScanLists(Config *config, Context &ctx);
-  bool linkScanLists(Context &ctx);
+  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearPositioningSystems();
-  bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx);
-  bool createPositioningSystems(Config *config, Context &ctx);
-  bool linkPositioningSystems(Context &ctx);
+  bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkPositioningSystems(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
-  bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx);
-  bool decodeButtonSetttings(Config *config);
+  bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack());
 
   /** Resets/clears the boot settings. */
   virtual void clearBootSettings();

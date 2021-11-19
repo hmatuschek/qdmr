@@ -148,10 +148,10 @@ MD390Codeplug::MD390Codeplug(QObject *parent)
 }
 
 bool
-MD390Codeplug::decodeElements(Context &ctx) {
+MD390Codeplug::decodeElements(Context &ctx, const ErrorStack &err) {
   logDebug() << "Decode MD390 codeplug, programmed with CPS version "
              << TimestampElement(data(ADDR_TIMESTAMP)).cpsVersion() << ".";
-  return TyTCodeplug::decodeElements(ctx);
+  return TyTCodeplug::decodeElements(ctx, err);
 }
 
 void
@@ -172,14 +172,14 @@ MD390Codeplug::clearGeneralSettings() {
 }
 
 bool
-MD390Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) {
-  Q_UNUSED(flags)
-  Q_UNUSED(ctx)
+MD390Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   return GeneralSettingsElement(data(ADDR_SETTINGS)).fromConfig(config);
 }
 
 bool
-MD390Codeplug::decodeGeneralSettings(Config *config) {
+MD390Codeplug::decodeGeneralSettings(Config *config, const ErrorStack &err) {
+  Q_UNUSED(err)
   return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(config);
 }
 
@@ -191,8 +191,8 @@ MD390Codeplug::clearChannels() {
 }
 
 bool
-MD390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) {
-  Q_UNUSED(flags)
+MD390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   // Define Channels
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
@@ -206,7 +206,7 @@ MD390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) 
 }
 
 bool
-MD390Codeplug::createChannels(Config *config, Context &ctx) {
+MD390Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
@@ -214,7 +214,7 @@ MD390Codeplug::createChannels(Config *config, Context &ctx) {
     if (Channel *obj = chan.toChannelObj()) {
       config->channelList()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg() << "Invlaid channel at index " << i << ".";
+      errMsg(err) << "Invlaid channel at index " << i << ".";
       return false;
     }
   }
@@ -222,13 +222,13 @@ MD390Codeplug::createChannels(Config *config, Context &ctx) {
 }
 
 bool
-MD390Codeplug::linkChannels(Context &ctx) {
+MD390Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
       break;
     if (! chan.linkChannelObj(ctx.get<Channel>(i+1), ctx)) {
-      errMsg() << "Cannot link channel at index " << i << ".";
+      errMsg(err) << "Cannot link channel at index " << i << ".";
       return false;
     }
   }
@@ -243,9 +243,8 @@ MD390Codeplug::clearContacts() {
 }
 
 bool
-MD390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) {
-  Q_UNUSED(flags)
-  Q_UNUSED(ctx)
+MD390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Encode contacts
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
@@ -258,7 +257,7 @@ MD390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) 
 }
 
 bool
-MD390Codeplug::createContacts(Config *config, Context &ctx) {
+MD390Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
     if (! cont.isValid())
@@ -266,7 +265,7 @@ MD390Codeplug::createContacts(Config *config, Context &ctx) {
     if (DigitalContact *obj = cont.toContactObj()) {
       config->contacts()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg() << "Invlaid contact at index " << i << ".";
+      errMsg(err) << "Invlaid contact at index " << i << ".";
       return false;
     }
   }
@@ -282,8 +281,8 @@ MD390Codeplug::clearZones() {
 }
 
 bool
-MD390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
-  Q_UNUSED(flags)
+MD390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0,z=0; i<NUM_ZONES; i++, z++) {
     ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
     zone.clear();
@@ -320,7 +319,8 @@ MD390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
 }
 
 bool
-MD390Codeplug::createZones(Config *config, Context &ctx) {
+MD390Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   Zone *last_zone = nullptr;
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
@@ -341,7 +341,8 @@ MD390Codeplug::createZones(Config *config, Context &ctx) {
 }
 
 bool
-MD390Codeplug::linkZones(Context &ctx) {
+MD390Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   Zone *last_zone = nullptr;
   for (int i=0, z=0; i<NUM_ZONES; i++, z++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
@@ -381,8 +382,8 @@ MD390Codeplug::clearGroupLists() {
 }
 
 bool
-MD390Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx) {
-  Q_UNUSED(flags)
+MD390Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (i < config->rxGroupLists()->count())
@@ -394,7 +395,7 @@ MD390Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx
 }
 
 bool
-MD390Codeplug::createGroupLists(Config *config, Context &ctx) {
+MD390Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
@@ -402,7 +403,7 @@ MD390Codeplug::createGroupLists(Config *config, Context &ctx) {
     if (RXGroupList *obj = glist.toGroupListObj(ctx)) {
       config->rxGroupLists()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg() << "Invlaid group list at index " << i << ".";
+      errMsg(err) << "Invlaid group list at index " << i << ".";
       return false;
     }
   }
@@ -410,13 +411,13 @@ MD390Codeplug::createGroupLists(Config *config, Context &ctx) {
 }
 
 bool
-MD390Codeplug::linkGroupLists(Context &ctx) {
+MD390Codeplug::linkGroupLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
       break;
     if (! glist.linkGroupListObj(ctx.get<RXGroupList>(i+1), ctx)) {
-      errMsg() << "Cannot link group list at index " << i << ".";
+      errMsg(err) << "Cannot link group list at index " << i << ".";
       return false;
     }
   }
@@ -431,8 +432,8 @@ MD390Codeplug::clearScanLists() {
 }
 
 bool
-MD390Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx) {
-  Q_UNUSED(flags)
+MD390Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   // Define Scanlists
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
@@ -445,7 +446,7 @@ MD390Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx)
 }
 
 bool
-MD390Codeplug::createScanLists(Config *config, Context &ctx) {
+MD390Codeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
@@ -453,7 +454,7 @@ MD390Codeplug::createScanLists(Config *config, Context &ctx) {
     if (ScanList *obj = scan.toScanListObj(ctx)) {
       config->scanlists()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg() << "Invlaid scanlist at index " << i << ".";
+      errMsg(err) << "Invlaid scanlist at index " << i << ".";
       return false;
     }
   }
@@ -461,14 +462,14 @@ MD390Codeplug::createScanLists(Config *config, Context &ctx) {
 }
 
 bool
-MD390Codeplug::linkScanLists(Context &ctx) {
+MD390Codeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
       break;
 
     if (! scan.linkScanListObj(ctx.get<ScanList>(i+1), ctx)) {
-      errMsg() << "Cannot link scan list at index " << i << ".";
+      errMsg(err) << "Cannot link scan list at index " << i << ".";
       return false;
     }
   }
@@ -484,8 +485,8 @@ MD390Codeplug::clearPositioningSystems() {
 }
 
 bool
-MD390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx) {
-  Q_UNUSED(flags)
+MD390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (i < config->posSystems()->gpsCount()) {
@@ -500,7 +501,7 @@ MD390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Cont
 }
 
 bool
-MD390Codeplug::createPositioningSystems(Config *config, Context &ctx) {
+MD390Codeplug::createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
@@ -508,7 +509,7 @@ MD390Codeplug::createPositioningSystems(Config *config, Context &ctx) {
     if (GPSSystem *obj = gps.toGPSSystemObj()) {
       config->posSystems()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg() << "Invlaid GPS system at index " << i << ".";
+      errMsg(err) << "Invlaid GPS system at index " << i << ".";
       return false;
     }
   }
@@ -517,13 +518,13 @@ MD390Codeplug::createPositioningSystems(Config *config, Context &ctx) {
 }
 
 bool
-MD390Codeplug::linkPositioningSystems(Context &ctx) {
+MD390Codeplug::linkPositioningSystems(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
       break;
     if (! gps.linkGPSSystemObj(ctx.get<GPSSystem>(i+1), ctx)) {
-      errMsg() << "Cannot link GPS system at index " << i << ".";
+      errMsg(err) << "Cannot link GPS system at index " << i << ".";
       return false;
     }
   }
@@ -537,15 +538,15 @@ MD390Codeplug::clearButtonSettings() {
 }
 
 bool
-MD390Codeplug::encodeButtonSettings(Config *config, const Flags &flags, Context &ctx) {
-  Q_UNUSED(ctx)
-  Q_UNUSED(flags)
+MD390Codeplug::encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(flags); Q_UNUSED(err)
   // Encode settings
   return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(config);
 }
 
 bool
-MD390Codeplug::decodeButtonSetttings(Config *config) {
+MD390Codeplug::decodeButtonSetttings(Config *config, const ErrorStack &err) {
+  Q_UNUSED(err)
   return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).updateConfig(config);
 }
 

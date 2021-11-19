@@ -2048,6 +2048,7 @@ public:
 
     /** Clears the entry. */
     void clear();
+    /** Returns @c true if the contact map is valid. */
     bool isValid() const;
 
     /** Returns @c true if the entry is a group call. */
@@ -2077,7 +2078,7 @@ public:
   /** Clears and resets the complete codeplug to some default values. */
   virtual void clear() = 0;
 
-  virtual bool index(Config *config, Context &ctx) const;
+  virtual bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
   /** Sets all bitmaps for the given config. */
   virtual void setBitmaps(Config *config) = 0;

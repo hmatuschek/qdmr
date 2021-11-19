@@ -61,38 +61,40 @@ RadioID::serialize(const Context &context) {
 }
 
 ConfigItem *
-RadioID::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+RadioID::allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                       const Context &ctx, const ErrorStack &err)
+{
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // No extensions defined yet for RadioID
   return nullptr;
 }
 
 bool
-RadioID::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
+RadioID::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
   if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot parse radio id: Expected object with one child.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse radio id: Expected object with one child.";
     return false;
   }
 
-  return ConfigObject::parse(node.begin()->second, ctx);
+  return ConfigObject::parse(node.begin()->second, ctx, err);
 }
 
 bool
-RadioID::link(const YAML::Node &node, const ConfigItem::Context &ctx) {
+RadioID::link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
   if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot link radio id: Expected object with one child.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot link radio id: Expected object with one child.";
     return false;
   }
 
-  return ConfigObject::link(node.begin()->second, ctx);
+  return ConfigObject::link(node.begin()->second, ctx, err);
 }
 
 
@@ -201,15 +203,15 @@ RadioIDList::delId(uint32_t id) {
 
 
 ConfigItem *
-RadioIDList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
+RadioIDList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
 
   if (! node)
     return nullptr;
 
   if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot create radio id: Expected object with one child.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create radio id: Expected object with one child.";
     return nullptr;
   }
 
@@ -218,8 +220,8 @@ RadioIDList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
     return new RadioID();
   }
 
-  errMsg() << node.Mark().line << ":" << node.Mark().column
-           << ": Cannot create radio id: Unknown type '" << type << "'.";
+  errMsg(err) << node.Mark().line << ":" << node.Mark().column
+              << ": Cannot create radio id: Unknown type '" << type << "'.";
 
   return nullptr;
 }

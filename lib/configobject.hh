@@ -34,7 +34,7 @@ bool propIsInstance(QMetaProperty &prop) {
 /** Base class for all configuration objects (channels, zones, contacts, etc).
  *
  * @ingroup config */
-class ConfigItem : public QObject, public ErrorStack
+class ConfigItem : public QObject
 {
   Q_OBJECT
 
@@ -112,11 +112,12 @@ public:
   virtual YAML::Node serialize(const Context &context);
 
   /** Allocates an instance for the given property on the given YAML node. */
-  virtual ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) = 0;
+  virtual ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                                    const Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Parses the given YAML node, updates the given object and updates the given context (IDs). */
-  virtual bool parse(const YAML::Node &node, Context &ctx);
+  virtual bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links the given object to the rest of the codeplug using the given context. */
-  virtual bool link(const YAML::Node &node, const Context &ctx);
+  virtual bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Clears the config object. */
   virtual void clear();
@@ -183,7 +184,7 @@ public:
 
 public:
   bool label(Context &context);
-  bool parse(const YAML::Node &node, Context &ctx);
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   virtual bool populate(YAML::Node &node, const Context &context);
@@ -218,7 +219,7 @@ protected:
 
 /** Generic list class for config objects.
  * @ingroup config */
-class AbstractConfigObjectList: public QObject, public ErrorStack
+class AbstractConfigObjectList: public QObject
 {
   Q_OBJECT
 
@@ -305,11 +306,11 @@ public:
   void clear();
 
   /** Allocates a member objects for the given YAML node. */
-  virtual ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) = 0;
+  virtual ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Parses the list from the YAML node. */
-  virtual bool parse(const YAML::Node &node, ConfigItem::Context &ctx);
+  virtual bool parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links the list from the given YAML node. */
-  virtual bool link(const YAML::Node &node, const ConfigItem::Context &ctx);
+  virtual bool link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 
   bool label(ConfigItem::Context &context);
   YAML::Node serialize(const ConfigItem::Context &context);

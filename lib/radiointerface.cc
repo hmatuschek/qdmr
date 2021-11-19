@@ -10,16 +10,13 @@ RadioInterface::~RadioInterface() {
 }
 
 bool
-RadioInterface::read_finish() {
+RadioInterface::write_finish(const ErrorStack &err) {
+  Q_UNUSED(err)
   return true;
 }
 
 bool
-RadioInterface::write_finish() {
-  return true;
-}
-
-bool
-RadioInterface::reboot() {
+RadioInterface::reboot(const ErrorStack &err) {
+  Q_UNUSED(err)
   return true;
 }

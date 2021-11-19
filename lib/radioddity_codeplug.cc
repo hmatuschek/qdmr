@@ -2393,7 +2393,8 @@ RadioddityCodeplug::clear() {
 }
 
 bool
-RadioddityCodeplug::index(Config *config, Context &ctx) const {
+RadioddityCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err)
   // All indices as 1-based. That is, the first channel gets index 1.
 
   // Map radio IDs
@@ -2442,62 +2443,62 @@ RadioddityCodeplug::index(Config *config, Context &ctx) const {
 }
 
 bool
-RadioddityCodeplug::encode(Config *config, const Flags &flags) {
+RadioddityCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
   // Check if default DMR id is set.
   if (nullptr == config->radioIDs()->defaultId()) {
-    errMsg() << "No default radio ID specified.";
+    errMsg(err) << "No default radio ID specified.";
     return false;
   }
 
   // Create index<->object table.
   Context ctx(config);
-  if (! index(config, ctx))
+  if (! index(config, ctx, err))
     return false;
 
   return this->encodeElements(flags, ctx);
 }
 
 bool
-RadioddityCodeplug::encodeElements(const Flags &flags, Context &ctx) {
+RadioddityCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err) {
   // General config
-  if (! this->encodeGeneralSettings(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode general settings.";
+  if (! this->encodeGeneralSettings(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode general settings.";
     return false;
   }
 
   // Define Contacts
-  if (! this->encodeContacts(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode contacts.";
+  if (! this->encodeContacts(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode contacts.";
     return false;
   }
 
-  if (! this->encodeDTMFContacts(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode DTMF contacts.";
+  if (! this->encodeDTMFContacts(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode DTMF contacts.";
     return false;
   }
 
-  if (! this->encodeChannels(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode channels";
+  if (! this->encodeChannels(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode channels";
     return false;
   }
 
-  if (! this->encodeBootText(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode boot text.";
+  if (! this->encodeBootText(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode boot text.";
     return false;
   }
 
-  if (! this->encodeZones(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode zones.";
+  if (! this->encodeZones(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode zones.";
     return false;
   }
 
-  if (! this->encodeScanLists(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode scan lists.";
+  if (! this->encodeScanLists(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode scan lists.";
     return false;
   }
 
-  if (! this->encodeGroupLists(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode group lists.";
+  if (! this->encodeGroupLists(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode group lists.";
     return false;
   }
 
@@ -2505,75 +2506,75 @@ RadioddityCodeplug::encodeElements(const Flags &flags, Context &ctx) {
 }
 
 bool
-RadioddityCodeplug::decode(Config *config) {
+RadioddityCodeplug::decode(Config *config, const ErrorStack &err) {
   // Clear config object
   config->clear();
 
   // Create index<->object table.
   Context ctx(config);
 
-  return this->decodeElements(ctx);
+  return this->decodeElements(ctx, err);
 }
 
 bool
-RadioddityCodeplug::decodeElements(Context &ctx) {
-  if (! this->decodeGeneralSettings(ctx.config(), ctx)) {
-    errMsg() << "Cannot decode general settings.";
+RadioddityCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
+  if (! this->decodeGeneralSettings(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot decode general settings.";
     return false;
   }
 
-  if (! this->createContacts(ctx.config(), ctx)) {
-    errMsg() << "Cannot create contacts.";
+  if (! this->createContacts(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create contacts.";
     return false;
   }
 
-  if (! this->createDTMFContacts(ctx.config(), ctx)) {
-    errMsg() << "Cannot create DTMF contacts";
+  if (! this->createDTMFContacts(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create DTMF contacts";
     return false;
   }
 
-  if (! this->createChannels(ctx.config(), ctx)) {
-    errMsg() << "Cannot create channels.";
+  if (! this->createChannels(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create channels.";
     return false;
   }
 
-  if (! this->decodeBootText(ctx.config(), ctx)) {
-    errMsg() << "Cannot decode boot text.";
+  if (! this->decodeBootText(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot decode boot text.";
     return false;
   }
 
-  if (! this->createZones(ctx.config(), ctx)) {
-    errMsg() << "Cannot create zones.";
+  if (! this->createZones(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create zones.";
     return false;
   }
 
-  if (! this->createScanLists(ctx.config(), ctx)) {
-    errMsg() << "Cannot create scan lists.";
+  if (! this->createScanLists(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create scan lists.";
     return false;
   }
 
-  if (! this->createGroupLists(ctx.config(), ctx)) {
-    errMsg() << "Cannot create group lists.";
+  if (! this->createGroupLists(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create group lists.";
     return false;
   }
 
-  if (! this->linkChannels(ctx.config(), ctx)) {
-    errMsg() << "Cannot link channels.";
+  if (! this->linkChannels(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot link channels.";
     return false;
   }
 
-  if (! this->linkZones(ctx.config(), ctx)) {
-    errMsg() << "Cannot link zones.";
+  if (! this->linkZones(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot link zones.";
     return false;
   }
 
-  if (! this->linkScanLists(ctx.config(), ctx)) {
-    errMsg() << "Cannot link scan lists.";
+  if (! this->linkScanLists(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot link scan lists.";
     return false;
   }
 
-  if (! this->linkGroupLists(ctx.config(), ctx)) {
-    errMsg() << "Cannot link group lists.";
+  if (! this->linkGroupLists(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot link group lists.";
     return false;
   }
 

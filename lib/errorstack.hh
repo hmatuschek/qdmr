@@ -5,17 +5,17 @@
 
 /** Implements a stack of error messages to provide a pretty formatted error traceback.
  *
- * This class is intended to be used as a mix-in in other classes. That is:
+ * This class is intended to be used like:
  * @code
  * class MyClass: public ErrorStack
  * {
  *
  * // [...]
  *
- *   bool someMethod() {
+ *   bool someMethod(const ErrorStack &err=ErrorStack()) {
  *     // [...]
  *     if (someError) {
- *       errorMessage() << "Some error happend!";
+ *       errMsg() << "Some error happend!";
  *       return false;
  *     }
  *     // [...]
@@ -29,9 +29,10 @@
  * @code
  * // [...]
  * MyClass instance;
+ * ErrorStack err;
  *
- * if (! instance.someMethod()) {
- *   QString msg = instance.formatErrorMessages();
+ * if (! instance.someMethod(err)) {
+ *   QString msg = err.formatErrorMessages();
  *   // []
  * }
  * @endcode
@@ -39,6 +40,8 @@
 class ErrorStack
 {
 public:
+  class Stack;
+
   /** Represents a single error message. That is, a tuple of file, line and message. */
   class Message
   {
@@ -71,16 +74,13 @@ public:
   {
   public:
     /** Constructor. */
-    MessageStream(ErrorStack &stack, const QString &file, unsigned line);
+    MessageStream(const ErrorStack &stack, const QString &file, unsigned line);
     /** Destructor, puts the message on the stack. */
     virtual ~MessageStream();
 
-    /** Returns a reference to the error stack. */
-    ErrorStack &stack() const;
-
   protected:
     /** Holds a weak reference to the error stack to put the message on. */
-    ErrorStack &_stack;
+    const ErrorStack &_stack;
     /** The file path. */
     QString _file;
     /** The line number. */
@@ -89,36 +89,76 @@ public:
     QString _message;
   };
 
-protected:
-  /** Default constructor. */
-  ErrorStack();
+  /** The actual error message stack. */
+  class Stack
+  {
+  public:
+    /** Empty constructor. */
+    Stack() noexcept;
+
+  public:
+    /** Returns @c true if there are any error messages. */
+    bool isEmpty() const;
+    /** Returns the number of error messages. */
+    unsigned count() const;
+    /** Returns a specific error message. */
+    const Message &message(unsigned i) const;
+    /** Returns a formatted string of error messages. */
+    QString format(const QString &indent="  ") const;
+
+    /** Adds an error message to the stack. */
+    void push(const Message &msg);
+    /** Adds the error messages from another stack. */
+    void push(const Stack &other);
+
+    /** Clears the error stack. */
+    void clear();
+
+    /** Returns a new reference to the stack. */
+    Stack *ref();
+    /** Dereferences a stack, this decreases the ref count. When 0 is reached, the stack is
+     * destroyed. */
+    void unref();
+
+  private:
+    /** Reference counter. */
+    unsigned _refcount;
+    /** Holds the stack of error messages. */
+    QList<Message> _errorMessageStack;
+  };
 
 public:
-  /** Returns @c true if there are any error messages. */
-  bool hasErrorMessages() const;
-  /** Returns the number of error messages. */
-  unsigned errorMessageCount() const;
-  /** Returns a specific error message. */
-  const Message &errorMessage(unsigned i) const;
-  /** Returns a const reference to itself. Just a convenience method for more readablility. */
-  const ErrorStack &errorMessages() const;
+  /** Default constructor. */
+  ErrorStack() noexcept;
+  /** Copy constructor. */
+  ErrorStack(const ErrorStack &other);
+  /** Destructor. */
+  ~ErrorStack();
+
+  /** Copy assignment. */
+  ErrorStack &operator= (const ErrorStack &other);
+
+  /** Returns @c true, if the stack is empty. */
+  bool isEmpty() const;
+  /** Returns the number of elements on the stack. */
+  unsigned count() const;
+  /** Returns the i-th message from the stack. */
+  const Message &message(unsigned i) const;
+
+  /** Pushes a message on the stack. */
+  void push(const Message &msg) const;
+  /** Takes all messages from the other stack. */
+  void take(const ErrorStack &other) const;
   /** Returns a formatted string of error messages. */
-  QString formatErrorMessages(const QString &indent="  ") const;
+  QString format(const QString &indent="  ") const;
 
-  /** Adds an error message to the stack. */
-  void pushErrorMessage(const Message &msg);
-  /** Adds the error messages from another stack. */
-  void pushErrorMessage(const ErrorStack &other);
-
-  /** Clears the error stack. */
-  void clearErrors();
-
-private:
-  /** Holds the stack of error messages. */
-  QList<Message> _errorMessageStack;
+protected:
+  /** A reference to the actual message stack. */
+  Stack *_stack;
 };
 
 
-#define errMsg() (ErrorStack::MessageStream(*this, __FILE__, __LINE__))
+/** Utility macro to assemble a message stream. */
+#define errMsg(stack) (ErrorStack::MessageStream(stack, __FILE__, __LINE__))
 
 #endif // ERRORSTACK_HH

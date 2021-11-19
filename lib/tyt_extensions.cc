@@ -83,8 +83,10 @@ TyTButtonSettings::setLongPressDuration(unsigned dur) {
 }
 
 ConfigItem *
-TyTButtonSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx);
+TyTButtonSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                                 const Context &ctx, const ErrorStack &err)
+{
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // There are no further extension/children to TyTButtonSettings.
   return nullptr;
 }
@@ -123,8 +125,10 @@ TyTConfigExtension::buttonSettings() const {
 }
 
 ConfigItem *
-TyTConfigExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+TyTConfigExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                                  const Context &ctx, const ErrorStack &err)
+{
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // All extensions are pre-allocated. So nothing to do here.
   return nullptr;
 }

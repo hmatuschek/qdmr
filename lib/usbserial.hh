@@ -12,7 +12,7 @@
  *
  * @ingroup rif
  */
-class USBSerial : public QSerialPort, public RadioInterface, public ErrorStack
+class USBSerial : public QSerialPort, public RadioInterface
 {
   Q_OBJECT
 
@@ -21,8 +21,9 @@ protected:
    * product IDs.
    * @param vid Vendor ID of device.
    * @param pid Product ID of device.
+   * @param err The error stack, messages are put onto.
    * @param parent Specifies the parent object. */
-  explicit USBSerial(unsigned vid, unsigned pid, QObject *parent=nullptr);
+  explicit USBSerial(unsigned vid, unsigned pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
 public:
   /** Destrutor. */

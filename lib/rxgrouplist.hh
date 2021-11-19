@@ -52,7 +52,8 @@ public:
 
 public:
   YAML::Node serialize(const Context &context);
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected slots:
   /** Internal used callback to handle list modifications. */
@@ -80,7 +81,7 @@ public:
   int add(ConfigObject *obj, int row=-1);
 
 public:
-  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx);
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 #endif // RXGROUPLIST_HH

@@ -315,36 +315,38 @@ Config::readCSV(QTextStream &stream, QString &errorMessage)
 }
 
 bool
-Config::readYAML(const QString &filename) {
+Config::readYAML(const QString &filename, const ErrorStack &err) {
   YAML::Node node;
   try {
      node = YAML::LoadFile(filename.toStdString());
-  } catch (const YAML::Exception &err) {
-    errMsg() << "Cannot read YAML codeplug from file '"<< filename
-             << "': " << QString::fromStdString(err.msg) << ".";
+  } catch (const YAML::Exception &exc) {
+    errMsg(err) << "Cannot read YAML codeplug from file '"<< filename
+                << "': " << QString::fromStdString(exc.msg) << ".";
     return false;
   }
 
   if (! node) {
-    errMsg() << "Cannot read YAML codeplug from file '" << filename << "'.";
+    errMsg(err) << "Cannot read YAML codeplug from file '" << filename << "'.";
     return false;
   }
 
   clear();
   ConfigItem::Context context;
 
-  if (! parse(node, context))
+  if (! parse(node, context, err))
     return false;
 
-  if (! link(node, context))
+  if (! link(node, context, err))
     return false;
 
   return true;
 }
 
 ConfigItem *
-Config::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(node); Q_UNUSED(ctx)
+Config::allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                      const Context &ctx, const ErrorStack &err)
+{
+  Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   if (0==strcmp("tyt", prop.name())) {
     return new TyTConfigExtension(this);
   }
@@ -352,12 +354,12 @@ Config::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context
 }
 
 bool
-Config::parse(const YAML::Node &node, Context &ctx)
+Config::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
 {
   if (! node.IsMap()) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot read configuration"
-             << ": Element is not a map.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot read configuration"
+                << ": Element is not a map.";
     return false;
   }
 
@@ -369,59 +371,40 @@ Config::parse(const YAML::Node &node, Context &ctx)
     ctx.setVersion("0.9.0");
   }
 
-  if (node["settings"] && (! _settings->parse(node["settings"], ctx))) {
-    pushErrorMessage(*_settings);
+  if (node["settings"] && (! _settings->parse(node["settings"], ctx, err)))
     return false;
-  }
-  if (node["radioIDs"] && (! _radioIDs->parse(node["radioIDs"], ctx))) {
-    pushErrorMessage(*_radioIDs);
+  if (node["radioIDs"] && (! _radioIDs->parse(node["radioIDs"], ctx, err)))
     return false;
-  }
-  if (node["contacts"] && (! _contacts->parse(node["contacts"], ctx))) {
-    pushErrorMessage(*_contacts);
+  if (node["contacts"] && (! _contacts->parse(node["contacts"], ctx, err)))
     return false;
-  }
-  if (node["groupLists"] && (! _rxGroupLists->parse(node["groupLists"], ctx))) {
-    pushErrorMessage(*_rxGroupLists);
+  if (node["groupLists"] && (! _rxGroupLists->parse(node["groupLists"], ctx, err)))
     return false;
-  }
-  if (node["channels"] && (! _channels->parse(node["channels"], ctx))) {
-    pushErrorMessage(*_channels);
+  if (node["channels"] && (! _channels->parse(node["channels"], ctx, err)))
     return false;
-  }
-  if (node["zones"] && (! _zones->parse(node["zones"], ctx))) {
-    pushErrorMessage(*_zones);
+  if (node["zones"] && (! _zones->parse(node["zones"], ctx, err)))
     return false;
-  }
-  if (node["scanLists"] && (! _scanlists->parse(node["scanLists"], ctx))) {
-    pushErrorMessage(*_scanlists);
+  if (node["scanLists"] && (! _scanlists->parse(node["scanLists"], ctx, err)))
     return false;
-  }
-  if (node["positioning"] && (! _gpsSystems->parse(node["positioning"], ctx))) {
-    pushErrorMessage(*_gpsSystems);
+  if (node["positioning"] && (! _gpsSystems->parse(node["positioning"], ctx, err)))
     return false;
-  }
-
-  if (node["roaming"] && (! _roaming->parse(node["roaming"], ctx))) {
-    pushErrorMessage(*_roaming);
+  if (node["roaming"] && (! _roaming->parse(node["roaming"], ctx, err)))
     return false;
-  }
 
   // also parses extensions
-  if (! ConfigItem::parse(node, ctx))
+  if (! ConfigItem::parse(node, ctx, err))
     return false;
 
   return true;
 }
 
 bool
-Config::link(const YAML::Node &node, const Context &ctx) {
+Config::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
   // radio IDs must be linked before settings, as they may refer to the default DMR ID
 
-  if (! _radioIDs->link(node["radioIDs"], ctx))
+  if (! _radioIDs->link(node["radioIDs"], ctx, err))
     return false;
 
-  if (! _settings->link(node["settings"], ctx))
+  if (! _settings->link(node["settings"], ctx, err))
     return false;
 
   // Link default radio ID separately as it is not a property of the settings but defined there
@@ -433,8 +416,8 @@ Config::link(const YAML::Node &node, const Context &ctx) {
       radioIDs()->setDefaultId(radioIDs()->indexOf(def));
       logDebug() << "Set default radio ID to '" << def->name() << "'.";
     } else {
-      errMsg() << defIDNode.Mark().line << ":" << defIDNode.Mark().column
-               << "Default radio ID '" << id << " does not refer to a radio ID.";
+      errMsg(err) << defIDNode.Mark().line << ":" << defIDNode.Mark().column
+                  << "Default radio ID '" << id << " does not refer to a radio ID.";
       return false;
     }
   } else if (radioIDs()->count()) {
@@ -442,37 +425,23 @@ Config::link(const YAML::Node &node, const Context &ctx) {
     radioIDs()->setDefaultId(0);
   }
 
-  if (node["contacts"] && (! _contacts->link(node["contacts"], ctx))) {
-    pushErrorMessage(*_contacts);
+  if (node["contacts"] && (! _contacts->link(node["contacts"], ctx, err)))
     return false;
-  }
-  if (node["groupLists"] && (! _rxGroupLists->link(node["groupLists"], ctx))) {
-    pushErrorMessage(*_rxGroupLists);
+  if (node["groupLists"] && (! _rxGroupLists->link(node["groupLists"], ctx, err)))
     return false;
-  }
-  if (node["channels"] && (! _channels->link(node["channels"], ctx))) {
-    pushErrorMessage(*_channels);
+  if (node["channels"] && (! _channels->link(node["channels"], ctx, err)))
     return false;
-  }
-  if (node["zones"] && (! _zones->link(node["zones"], ctx))) {
-    pushErrorMessage(*_zones);
+  if (node["zones"] && (! _zones->link(node["zones"], ctx, err)))
     return false;
-  }
-  if (node["scanLists"] && (! _scanlists->link(node["scanLists"], ctx))) {
-    pushErrorMessage(*_scanlists);
+  if (node["scanLists"] && (! _scanlists->link(node["scanLists"], ctx, err)))
     return false;
-  }
-  if (node["positioning"] && (! _gpsSystems->link(node["positioning"], ctx))) {
-    pushErrorMessage(*_gpsSystems);
+  if (node["positioning"] && (! _gpsSystems->link(node["positioning"], ctx, err)))
     return false;
-  }
-  if (node["roaming"] && (! _roaming->link(node["roaming"], ctx))) {
-    pushErrorMessage(*_roaming);
+  if (node["roaming"] && (! _roaming->link(node["roaming"], ctx, err)))
     return false;
-  }
 
   // also links extensions
-  if (! ConfigItem::link(node, ctx))
+  if (! ConfigItem::link(node, ctx, err))
     return false;
 
   return true;

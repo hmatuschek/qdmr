@@ -81,7 +81,7 @@ struct VerifyFlags {
  *
  * @ingroup rif
  */
-class Radio : public QThread, public ErrorStack
+class Radio : public QThread
 {
 	Q_OBJECT
 
@@ -233,24 +233,31 @@ public:
   /** Returns the current status. */
   Status status() const;
 
+  /** Returns the error stack, passed to @c startDownload, @c startUpload or
+   * @c startUploadCallsignDB. It contains the error messages from the upload/download process. */
+  const ErrorStack &errorStack() const;
+
 public:
   /** Detects a radio and returns the corresponding device specific radio instance. */
-  static Radio *detect(QString &errorMessage, const RadioInfo &force=RadioInfo());
+  static Radio *detect(const RadioInfo &force=RadioInfo(), const ErrorStack &err=ErrorStack());
+  /** Detects a radio and returns the corresponding device specific radio instance. */
+  static Radio *detect(const ErrorStack &err=ErrorStack());
 
 public slots:
   /** Starts the download of the codeplug.
    * Once the download finished, the codeplug can be accessed and decoded using
    * the @c codeplug() method. */
-  virtual bool startDownload(bool blocking=false) = 0;
+  virtual bool startDownload(bool blocking=false, const ErrorStack &err=ErrorStack()) = 0;
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   virtual bool startUpload(
       Config *config, bool blocking=false,
-      const Codeplug::Flags &flags = Codeplug::Flags()) = 0;
+      const Codeplug::Flags &flags = Codeplug::Flags(), const ErrorStack &err=ErrorStack()) = 0;
   /** Assembles the callsign DB from the given one and uploads it to the device. */
   virtual bool startUploadCallsignDB(
       UserDatabase *db, bool blocking=false,
-      const CallsignDB::Selection &selection=CallsignDB::Selection()) = 0;
+      const CallsignDB::Selection &selection=CallsignDB::Selection(),
+      const ErrorStack &err=ErrorStack()) = 0;
 
 signals:
   /** Gets emitted once the codeplug download has been started. */
@@ -274,6 +281,8 @@ signals:
 protected:
   /** The current state/task. */
   Status _task;
+  /** The error stack. */
+  ErrorStack _errorStack;
 };
 
 #endif // RADIO_HH

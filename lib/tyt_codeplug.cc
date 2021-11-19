@@ -2392,7 +2392,9 @@ TyTCodeplug::~TyTCodeplug() {
 }
 
 bool
-TyTCodeplug::index(Config *config, Context &ctx) const {
+TyTCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err)
+
   // All indices as 1-based. That is, the first channel gets index 1.
 
   // Map radio IDs
@@ -2472,10 +2474,10 @@ TyTCodeplug::clear()
 }
 
 bool
-TyTCodeplug::encode(Config *config, const Flags &flags) {
+TyTCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
   // Check if default DMR id is set.
   if (nullptr == config->radioIDs()->defaultId()) {
-    errMsg() << "Cannot encode TyT codeplug: No default radio ID specified.";
+    errMsg(err) << "Cannot encode TyT codeplug: No default radio ID specified.";
     return false;
   }
 
@@ -2488,69 +2490,69 @@ TyTCodeplug::encode(Config *config, const Flags &flags) {
 }
 
 bool
-TyTCodeplug::decode(Config *config) {
+TyTCodeplug::decode(Config *config, const ErrorStack &err) {
   // Create index<->object table.
   Context ctx(config);
 
   // Clear config object
   config->clear();
 
-  return this->decodeElements(ctx);
+  return this->decodeElements(ctx, err);
 }
 
 bool
-TyTCodeplug::encodeElements(const Flags &flags, Context &ctx)
+TyTCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
   // Set timestamp
   if (! this->encodeTimestamp()) {
-    errMsg() << "Cannot encode time-stamp.";
+    errMsg(err) << "Cannot encode time-stamp.";
     return false;
   }
   // General config
   if (! this->encodeGeneralSettings(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode general settings.";
+    errMsg(err) << "Cannot encode general settings.";
     return false;
   }
 
   // Define Contacts
   if (! this->encodeContacts(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode contacts.";
+    errMsg(err) << "Cannot encode contacts.";
     return false;
   }
 
   // Define RX GroupLists
   if (! this->encodeGroupLists(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode group lists.";
+    errMsg(err) << "Cannot encode group lists.";
     return false;
   }
 
   // Define Channels
   if (! this->encodeChannels(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode channels.";
+    errMsg(err) << "Cannot encode channels.";
     return false;
   }
 
   // Define Zones
   if (! this->encodeZones(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode zones.";
+    errMsg(err) << "Cannot encode zones.";
     return false;
   }
 
   // Define Scanlists
   if (! this->encodeScanLists(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode scan lists.";
+    errMsg(err) << "Cannot encode scan lists.";
     return false;
   }
 
   // Define GPS systems
   if (! this->encodePositioningSystems(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode positioning systems.";
+    errMsg(err) << "Cannot encode positioning systems.";
     return false;
   }
 
   // Encode button settings
   if (! this->encodeButtonSettings(ctx.config(), flags, ctx)) {
-    errMsg() << "Cannot encode button settings.";
+    errMsg(err) << "Cannot encode button settings.";
     return false;
   }
 
@@ -2558,82 +2560,82 @@ TyTCodeplug::encodeElements(const Flags &flags, Context &ctx)
 }
 
 bool
-TyTCodeplug::decodeElements(Context &ctx) {
+TyTCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
   // General config
-  if (! this->decodeGeneralSettings(ctx.config())) {
-    errMsg() << "Cannot decode general settings.";
+  if (! this->decodeGeneralSettings(ctx.config(), err)) {
+    errMsg(err) << "Cannot decode general settings.";
     return false;
   }
 
   // Define Contacts
-  if (! this->createContacts(ctx.config(), ctx)) {
-    errMsg() << "Cannot create contacts.";
+  if (! this->createContacts(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create contacts.";
     return false;
   }
 
   // Define RX GroupLists
-  if (! this->createGroupLists(ctx.config(), ctx)) {
-    errMsg() << "Cannot create group lists.";
+  if (! this->createGroupLists(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create group lists.";
     return false;
   }
 
   // Define Channels
-  if (! this->createChannels(ctx.config(), ctx)) {
-    errMsg() << "Cannot create channels.";
+  if (! this->createChannels(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create channels.";
     return false;
   }
 
   // Define Zones
-  if (! this->createZones(ctx.config(), ctx)) {
-    errMsg() << "Cannot create zones.";
+  if (! this->createZones(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create zones.";
     return false;
   }
 
   // Define Scanlists
-  if (! this->createScanLists(ctx.config(), ctx)) {
-    errMsg() << "Cannot create scan lists.";
+  if (! this->createScanLists(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create scan lists.";
     return false;
   }
 
   // Define GPS systems
-  if (! this->createPositioningSystems(ctx.config(), ctx)) {
-    errMsg() << "Cannot create positioning systems.";
+  if (! this->createPositioningSystems(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create positioning systems.";
     return false;
   }
 
   // Decode button settings
-  if (! this->decodeButtonSetttings(ctx.config())) {
-    errMsg() << "Cannot decode button settings.";
+  if (! this->decodeButtonSetttings(ctx.config(), err)) {
+    errMsg(err) << "Cannot decode button settings.";
     return false;
   }
 
   // Link RX GroupLists
-  if (! this->linkGroupLists(ctx)) {
-    errMsg() << "Cannot link group lists.";
+  if (! this->linkGroupLists(ctx, err)) {
+    errMsg(err) << "Cannot link group lists.";
     return false;
   }
 
   // Link Channels
-  if (! this->linkChannels(ctx)) {
-    errMsg() << "Cannot link channels.";
+  if (! this->linkChannels(ctx, err)) {
+    errMsg(err) << "Cannot link channels.";
     return false;
   }
 
   // Link Zones
-  if (! this->linkZones(ctx)) {
-    errMsg() << "Cannot link zones.";
+  if (! this->linkZones(ctx, err)) {
+    errMsg(err) << "Cannot link zones.";
     return false;
   }
 
   // Link Scanlists
-  if (! this->linkScanLists(ctx)) {
-    errMsg() << "Cannot link scan lists.";
+  if (! this->linkScanLists(ctx, err)) {
+    errMsg(err) << "Cannot link scan lists.";
     return false;
   }
 
   // Link GPS systems
-  if (! this->linkPositioningSystems(ctx)) {
-    errMsg() << "Cannot link positioning systems.";
+  if (! this->linkPositioningSystems(ctx, err)) {
+    errMsg(err) << "Cannot link positioning systems.";
     return false;
   }
 

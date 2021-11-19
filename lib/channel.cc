@@ -277,24 +277,24 @@ Channel::populate(YAML::Node &node, const Context &context) {
 }
 
 ConfigItem *
-Channel::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
+Channel::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(node); Q_UNUSED(ctx)
   if (0 == strcmp("openGD77", prop.name())) {
     return new OpenGD77ChannelExtension();
   }
 
-  errMsg() << "Cannot allocate instance for unknown child '" << prop.name() << "'.";
+  errMsg(err) << "Cannot allocate instance for unknown child '" << prop.name() << "'.";
   return nullptr;
 }
 
 bool
-Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
+Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
   if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot parse channel: Expected object with one child.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse channel: Expected object with one child.";
     return false;
   }
 
@@ -318,21 +318,21 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
     setVOX(ch["vox"].as<unsigned>());
   }
 
-  return ConfigObject::parse(ch, ctx);
+  return ConfigObject::parse(ch, ctx, err);
 }
 
 bool
-Channel::link(const YAML::Node &node, const ConfigItem::Context &ctx) {
+Channel::link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
   if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot link channel: Expected object with one child.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot link channel: Expected object with one child.";
     return false;
   }
 
-  return ConfigObject::link(node.begin()->second, ctx);
+  return ConfigObject::link(node.begin()->second, ctx, err);
 }
 
 
@@ -543,13 +543,13 @@ AnalogChannel::populate(YAML::Node &node, const Context &context) {
 }
 
 bool
-AnalogChannel::parse(const YAML::Node &node, Context &ctx) {
+AnalogChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
   if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot parse analog channel: Expected object with one child.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse analog channel: Expected object with one child.";
     return false;
   }
 
@@ -583,7 +583,7 @@ AnalogChannel::parse(const YAML::Node &node, Context &ctx) {
     setSquelch(ch["squelch"].as<unsigned>());
   }
 
-  return Channel::parse(node, ctx);
+  return Channel::parse(node, ctx, err);
 }
 
 
@@ -954,14 +954,14 @@ ChannelList::findAnalogChannelByTxFreq(double freq) const {
 }
 
 ConfigItem *
-ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
+ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
   if (! node)
     return nullptr;
 
   if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot create channel: Expected object with one child.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create channel: Expected object with one child.";
     return nullptr;
   }
 
@@ -972,8 +972,8 @@ ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
     return new AnalogChannel();
   }
 
-  errMsg() << node.Mark().line << ":" << node.Mark().column
-           << ": Cannot create channel: Unknown type '" << type << "'.";
+  errMsg(err) << node.Mark().line << ":" << node.Mark().column
+              << ": Cannot create channel: Unknown type '" << type << "'.";
 
   return nullptr;
 }

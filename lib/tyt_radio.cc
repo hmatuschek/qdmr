@@ -28,11 +28,12 @@ TyTRadio::~TyTRadio() {
 }
 
 bool
-TyTRadio::startDownload(bool blocking) {
+TyTRadio::startDownload(bool blocking, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
   _task = StatusDownload;
+  _errorStack = err;
 
   if (blocking) {
     run();
@@ -44,7 +45,7 @@ TyTRadio::startDownload(bool blocking) {
 }
 
 bool
-TyTRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags) {
+TyTRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
@@ -52,29 +53,32 @@ TyTRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flag
     return false;
 
   _task = StatusUpload;
+  _errorStack = err;
   _codeplugFlags = flags;
+
   if (blocking) {
     this->run();
     return (StatusIdle == _task);
   }
-
   this->start();
   return true;
 }
 
 bool
-TyTRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
+TyTRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
   logDebug() << "Encode call-sign DB.";
   if (nullptr == callsignDB()) {
-    errMsg() << "Cannot upload callsign DB. DB not created.";
+    errMsg(err) << "Cannot upload callsign DB. DB not created.";
     return false;
   }
   callsignDB()->encode(db, selection);
 
   _task = StatusUploadCallsigns;
+  _errorStack = err;
+
   if (blocking) {
     this->run();
     return (StatusIdle == _task);
@@ -155,10 +159,9 @@ TyTRadio::connect() {
     _dev->deleteLater();
   }
 
-  _dev = new TyTInterface(0x0483, 0xdf11);
+  _dev = new TyTInterface(0x0483, 0xdf11, _errorStack);
   if (! _dev->isOpen()) {
-    pushErrorMessage(_dev->errorMessages());
-    errMsg() << "Cannot open device at 0483:DF11";
+    errMsg(_errorStack) << "Cannot open device at 0483:DF11";
     _dev->deleteLater();
     _dev = nullptr;
     _task = StatusError;
@@ -177,10 +180,11 @@ TyTRadio::download() {
   size_t totb = 0;
   for (int n=0; n<codeplug().image(0).numElements(); n++) {
     if (! codeplug().image(0).element(n).isAligned(BSIZE)) {
-      errMsg() << "Cannot download codeplug: Codeplug element " << n
-               << " (addr=" << codeplug().image(0).element(n).address()
-               << ", size=" << codeplug().image(0).element(n).data().size()
-               << ") is not aligned with blocksize " << BSIZE;
+      errMsg(_errorStack)
+          << "Cannot download codeplug: Codeplug element " << n
+          << " (addr=" << codeplug().image(0).element(n).address()
+          << ", size=" << codeplug().image(0).element(n).data().size()
+          << ") is not aligned with blocksize " << BSIZE;
       return false;
     }
     totb += codeplug().image(0).element(n).data().size()/BSIZE;
@@ -193,9 +197,8 @@ TyTRadio::download() {
     unsigned size = codeplug().image(0).element(n).data().size();
     unsigned b0 = addr/BSIZE, nb = size/BSIZE;
     for (unsigned b=0; b<nb; b++, bcount++) {
-      if (! _dev->read(0, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE), BSIZE)) {
-        pushErrorMessage(_dev->errorMessages());
-        errMsg() << "Cannot download codeplug.";
+      if (! _dev->read(0, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE), BSIZE, _errorStack)) {
+        errMsg(_errorStack) << "Cannot download codeplug.";
         return false;
       }
       emit downloadProgress(float(bcount*100)/totb);
@@ -211,7 +214,8 @@ TyTRadio::upload() {
 
   // Check every segment in the codeplug
   if (! codeplug().isAligned(BSIZE)) {
-    errMsg() << "Cannot upload codeplug: Codeplug is not aligned with blocksize " << BSIZE << ".";
+    errMsg(_errorStack)
+        << "Cannot upload codeplug: Codeplug is not aligned with blocksize " << BSIZE << ".";
     return false;
   }
 
@@ -225,9 +229,8 @@ TyTRadio::upload() {
       unsigned size = codeplug().image(0).element(n).data().size();
       unsigned b0 = addr/BSIZE, nb = size/BSIZE;
       for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
-        if (! _dev->read(0, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE), BSIZE)) {
-          pushErrorMessage(_dev->errorMessages());
-          errMsg() << "Cannot upload codeplug.";
+        if (! _dev->read(0, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE), BSIZE, _errorStack)) {
+          errMsg(_errorStack) << "Cannot upload codeplug.";
           return false;
         }
         emit uploadProgress(float(bcount*50)/totb);
@@ -241,7 +244,8 @@ TyTRadio::upload() {
 
   // then erase memory
   for (int i=0; i<codeplug().image(0).numElements(); i++)
-    _dev->erase(codeplug().image(0).element(i).address(), codeplug().image(0).element(i).memSize());
+    _dev->erase(codeplug().image(0).element(i).address(), codeplug().image(0).element(i).memSize(),
+                nullptr, nullptr, _errorStack);
 
   logDebug() << "Upload " << codeplug().image(0).numElements() << " elements.";
   // then, upload modified codeplug
@@ -251,9 +255,8 @@ TyTRadio::upload() {
     unsigned size = codeplug().image(0).element(n).memSize();
     unsigned b0 = addr/BSIZE, nb = size/BSIZE;
     for (size_t b=0; b<nb; b++,bcount+=BSIZE) {
-      if (! _dev->write(0, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE), BSIZE)) {
-        pushErrorMessage(_dev->errorMessages());
-        errMsg() << "Cannot upload codeplug.";
+      if (! _dev->write(0, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE), BSIZE, _errorStack)) {
+        errMsg(_errorStack) << "Cannot upload codeplug.";
         return false;
       }
       emit uploadProgress(50+float(bcount*50)/totb);
@@ -270,7 +273,8 @@ TyTRadio::uploadCallsigns() {
   logDebug() << "Check alignment.";
   // Check alignment in the codeplug
   if (! callsignDB()->isAligned(BSIZE)) {
-    errMsg() << "Cannot upload callsign db: Callsign DB is not aligned with blocksize " << BSIZE << ".";
+    errMsg(_errorStack) << "Cannot upload callsign db: Callsign DB is not aligned with blocksize "
+                        << BSIZE << ".";
     return false;
   }
 
@@ -278,7 +282,8 @@ TyTRadio::uploadCallsigns() {
   logDebug() << "Erase memory section for call-sign DB.";
   _dev->erase(callsignDB()->image(0).element(0).address(),
               callsignDB()->image(0).element(0).memSize(),
-              [](unsigned percent, void *ctx) { emit ((TyTRadio *)ctx)->uploadProgress(percent/2); }, this);
+              [](unsigned percent, void *ctx) { emit ((TyTRadio *)ctx)->uploadProgress(percent/2); },
+              this, _errorStack);
 
   logDebug() << "Upload " << callsignDB()->image(0).numElements() << " elements.";
   // Total amount of data to transfer
@@ -288,9 +293,8 @@ TyTRadio::uploadCallsigns() {
   unsigned size = callsignDB()->image(0).element(0).memSize();
   unsigned b0 = addr/BSIZE, nb = size/BSIZE;
   for (size_t b=0, bcount=0; b<nb; b++,bcount+=BSIZE) {
-    if (! _dev->write(0, (b0+b)*BSIZE, callsignDB()->data((b0+b)*BSIZE), BSIZE)) {
-      pushErrorMessage(_dev->errorMessages());
-      errMsg() << "Cannot upload codeplug.";
+    if (! _dev->write(0, (b0+b)*BSIZE, callsignDB()->data((b0+b)*BSIZE), BSIZE, _errorStack)) {
+      errMsg(_errorStack) << "Cannot upload codeplug.";
       return false;
     }
     emit uploadProgress(50+float(bcount*50)/totb);

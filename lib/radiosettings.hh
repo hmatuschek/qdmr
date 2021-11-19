@@ -85,7 +85,8 @@ public:
   void disableTOT();
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds the first intro line. */

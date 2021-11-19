@@ -1109,19 +1109,19 @@ public:
   /** Clears and resets the complete codeplug to some default values. */
   virtual void clear();
 
-  bool index(Config *config, Context &ctx) const;
+  bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
-	bool decode(Config *config);
+  bool decode(Config *config, const ErrorStack &err=ErrorStack());
   /** Encodes the given generic configuration as a binary codeplug. */
-  bool encode(Config *config, const Flags &flags = Flags());
+  bool encode(Config *config, const Flags &flags = Flags(), const ErrorStack &err=ErrorStack());
 
 public:
   /** Decodes the binary codeplug and stores its content in the given generic configuration using
    * the given context. */
-  virtual bool decodeElements(Context &ctx);
+  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Encodes the given generic configuration as a binary codeplug using the given context. */
-  virtual bool encodeElements(const Flags &flags, Context &ctx);
+  virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Clears the time-stamp in the codeplug. */
   virtual void clearTimestamp() = 0;
@@ -1131,68 +1131,68 @@ public:
   /** Clears the general settings in the codeplug. */
   virtual void clearGeneralSettings() = 0;
   /** Updates the general settings from the given configuration. */
-  virtual bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Updates the given configuration from the general settings. */
-  virtual bool decodeGeneralSettings(Config *config) = 0;
+  virtual bool decodeGeneralSettings(Config *config, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all contacts in the codeplug. */
   virtual void clearContacts() = 0;
   /** Encodes all digital contacts in the configuration into the codeplug. */
-  virtual bool encodeContacts(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a digital contact to the configuration for each one in the codeplug. */
-  virtual bool createContacts(Config *config, Context &ctx) = 0;
+  virtual bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all RX group lists in the codeplug. */
   virtual void clearGroupLists() = 0;
   /** Encodes all group lists in the configuration into the codeplug. */
-  virtual bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a RX group list to the configuration for each one in the codeplug. */
-  virtual bool createGroupLists(Config *config, Context &ctx) = 0;
+  virtual bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all added RX group lists within the configuration. */
-  virtual bool linkGroupLists(Context &ctx) = 0;
+  virtual bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all channels in the codeplug. */
   virtual void clearChannels() = 0;
   /** Encodes all channels in the configuration into the codeplug. */
-  virtual bool encodeChannels(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a channel to the configuration for each one in the codeplug. */
-  virtual bool createChannels(Config *config, Context &ctx) = 0;
+  virtual bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all added channels within the configuration. */
-  virtual bool linkChannels(Context &ctx) = 0;
+  virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all zones in the codeplug. */
   virtual void clearZones() = 0;
   /** Encodes all zones in the configuration into the codeplug. */
-  virtual bool encodeZones(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a zone to the configuration for each one in the codeplug. */
-  virtual bool createZones(Config *config, Context &ctx) = 0;
+  virtual bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all added zones within the configuration. */
-  virtual bool linkZones(Context &ctx) = 0;
+  virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all scan lists in the codeplug. */
   virtual void clearScanLists() = 0;
   /** Encodes all scan lists in the configuration into the codeplug. */
-  virtual bool encodeScanLists(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a scan list to the configuration for each one in the codeplug. */
-  virtual bool createScanLists(Config *config, Context &ctx) = 0;
+  virtual bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all added scan lists within the configuration. */
-  virtual bool linkScanLists(Context &ctx) = 0;
+  virtual bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all positioning systems in the codeplug. */
   virtual void clearPositioningSystems() = 0;
   /** Encodes all DMR positioning systems in the configuration into the codeplug. */
-  virtual bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a GPS positioning system to the configuration for each one in the codeplug. */
-  virtual bool createPositioningSystems(Config *config, Context &ctx) = 0;
+  virtual bool createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all added positioning systems within the configuration. */
-  virtual bool linkPositioningSystems(Context &ctx) = 0;
+  virtual bool linkPositioningSystems(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears the button settings in the codeplug. */
   virtual void clearButtonSettings() = 0;
   /** Encodes the button settings. */
-  virtual bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Decodes the button settings. */
-  virtual bool decodeButtonSetttings(Config *config) = 0;
+  virtual bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears the menu settings in the codeplug. */
   virtual void clearMenuSettings() = 0;

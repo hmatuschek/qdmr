@@ -63,7 +63,7 @@ class CRC32;
  *
  * @ingroup util
  */
-class DFUFile: public QObject, public ErrorStack
+class DFUFile: public QObject
 {
 	Q_OBJECT
 
@@ -211,17 +211,17 @@ public:
 
   /** Reads the specified DFU file.
    * @return @c false on error. */
-	bool read(const QString &filename);
+  bool read(const QString &filename, const ErrorStack &err=ErrorStack());
   /** Reads the specified DFU file.
    * @returns @c false on error. */
-	bool read(QFile &file);
+  bool read(QFile &file, const ErrorStack &err=ErrorStack());
 
   /** Writes to the specified file.
    * @returns @c false on error. */
-	bool write(const QString &filename);
+  bool write(const QString &filename, const ErrorStack &err=ErrorStack());
   /** Writes to the specified file.
    * @returns @c false on error. */
-	bool write(QFile &file);
+  bool write(QFile &file, const ErrorStack &err=ErrorStack());
 
   /** Dumps a text representation of the DFU file structure to the specified text stream. */
 	void dump(QTextStream &stream) const;

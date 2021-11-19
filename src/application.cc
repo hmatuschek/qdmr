@@ -67,9 +67,10 @@ Application::Application(int &argc, char *argv[])
         return;
       }
     } else if ("yaml" == info.suffix()) {
-      if (! _config->readYAML(argv[1])) {
+      ErrorStack err;
+      if (! _config->readYAML(argv[1], err)) {
         logError() << "Cannot read yaml codeplug file '" << argv[1]
-                   << "': " << _config->formatErrorMessages();
+                   << "': " << err.format();
         return;
       }
     }
@@ -288,17 +289,18 @@ Application::loadCodeplug() {
   QFileInfo info(filename);
   settings.setLastDirectoryDir(info.absoluteDir());
 
-  QString errorMessage;
   if ("yaml" == info.suffix()){
-    if (_config->readYAML(filename)) {
+    ErrorStack err;
+    if (_config->readYAML(filename, err)) {
       _mainWindow->setWindowModified(false);
     } else {
       QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
                             tr("Cannot read codeplug from file '%1': %2")
-                            .arg(filename).arg(_config->formatErrorMessages()));
+                            .arg(filename).arg(err.format()));
       _config->clear();
     }
   } else {
+    QString errorMessage;
     QTextStream stream(&file);
     if (_config->readCSV(stream, errorMessage)) {
       _mainWindow->setWindowModified(false);
@@ -379,14 +381,14 @@ Application::quitApplication() {
 
 void
 Application::detectRadio() {
-  QString errorMessage;
-  Radio *radio = Radio::detect(errorMessage);
+  ErrorStack err;
+  Radio *radio = Radio::detect(err);
   if (radio) {
     QMessageBox::information(nullptr, tr("Radio found"), tr("Found device '%1'.").arg(radio->name()));
     radio->deleteLater();
   } else {
     QMessageBox::information(nullptr, tr("No Radio found."),
-                             tr("No known radio detected. Check connection?\nError: %1").arg(errorMessage));
+                             tr("No known radio detected. Check connection?\nError: %1").arg(err.format()));
   }
   radio->deleteLater();
 }
@@ -395,15 +397,15 @@ Application::detectRadio() {
 bool
 Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &flags) {
   Radio *myRadio = radio;
-  QString errorMessage;
+  ErrorStack err;
 
   // If no radio is given -> try to detect the radio
   if (nullptr == myRadio)
-    myRadio = Radio::detect(errorMessage);
+    myRadio = Radio::detect(err);
   if (nullptr == myRadio) {
     QMessageBox::information(nullptr, tr("No Radio found."),
                              tr("Cannot verify codeplug: No known radio detected.\nError: ")
-                             + errorMessage);
+                             + err.format());
     return false;
   }
 
@@ -442,12 +444,12 @@ Application::downloadCodeplug() {
       return;
   }
 
-  QString errorMessage;
-  Radio *radio = Radio::detect(errorMessage);
+  ErrorStack err;
+  Radio *radio = Radio::detect(err);
   if (nullptr == radio) {
     QMessageBox::critical(nullptr, tr("No Radio found."),
-                          tr("Can not read codeplug from device: No radio found.\nError: ")
-                          + errorMessage);
+                          tr("Can not read codeplug from device: No radio found.\n")
+                          + err.format());
     return;
   }
 
@@ -460,7 +462,7 @@ Application::downloadCodeplug() {
     _mainWindow->statusBar()->showMessage(tr("Read ..."));
     _mainWindow->setEnabled(false);
   } else {
-    ErrorMessageView(*radio).show();
+    ErrorMessageView(err).show();
     progress->setVisible(false);
   }
 }
@@ -468,7 +470,7 @@ Application::downloadCodeplug() {
 void
 Application::onCodeplugDownloadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Read error"));
-  ErrorMessageView(*radio).show();
+  ErrorMessageView(radio->errorStack()).show();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
@@ -483,13 +485,14 @@ void
 Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
   _config->clear();
   _mainWindow->setWindowModified(false);
-  if (codeplug->decode(_config)) {
+  ErrorStack err;
+  if (codeplug->decode(_config, err)) {
     _mainWindow->statusBar()->showMessage(tr("Read complete"));
     _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
 
     _config->setModified(false);
   } else {
-    ErrorMessageView(*codeplug).show();
+    ErrorMessageView(err).show();
   }
   _mainWindow->setEnabled(true);
 
@@ -501,13 +504,13 @@ void
 Application::uploadCodeplug() {
   // Start upload
   Settings settings;
-  QString errorMessage;
+  ErrorStack err;
 
-  Radio *radio = Radio::detect(errorMessage);
+  Radio *radio = Radio::detect(err);
   if (nullptr == radio) {
     QMessageBox::critical(nullptr, tr("No Radio found."),
                           tr("Can not write codeplug to device: No radio found.\nError: ")
-                          + errorMessage);
+                          + err.format());
     return;
   }
 
@@ -532,11 +535,11 @@ Application::uploadCodeplug() {
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
-  if (radio->startUpload(_config, false, settings.codePlugFlags())) {
+  if (radio->startUpload(_config, false, settings.codePlugFlags(), err)) {
      _mainWindow->statusBar()->showMessage(tr("Upload ..."));
      _mainWindow->setEnabled(false);
   } else {
-    ErrorMessageView(*radio).show();
+    ErrorMessageView(err).show();
     progress->setVisible(false);
   }
 }
@@ -544,15 +547,15 @@ Application::uploadCodeplug() {
 void
 Application::uploadCallsignDB() {
   // Start upload
-  QString errorMessage;
+  ErrorStack err;
 
   logDebug() << "Detect radio...";
-  Radio *radio = Radio::detect(errorMessage);
+  Radio *radio = Radio::detect(err);
   if (nullptr == radio) {
     logDebug() << "No matching radio found.";
     QMessageBox::critical(nullptr, tr("No Radio found."),
                           tr("Can not write call-sign DB to device: No radio found.\nError: ")
-                          + errorMessage);
+                          + err.format());
     return;
   }
   logDebug() << "Found radio " << radio->name() << ".";
@@ -615,12 +618,12 @@ Application::uploadCallsignDB() {
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
-  if (radio->startUploadCallsignDB(_users, false, css)) {
+  if (radio->startUploadCallsignDB(_users, false, css, err)) {
     logDebug() << "Start call-sign DB write...";
     _mainWindow->statusBar()->showMessage(tr("Write call-sign DB ..."));
     _mainWindow->setEnabled(false);
   } else {
-    ErrorMessageView(*radio).show();
+    ErrorMessageView(err).show();
     progress->setVisible(false);
   }
 }
@@ -629,7 +632,7 @@ Application::uploadCallsignDB() {
 void
 Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Write error"));
-  ErrorMessageView(*radio).show();
+  ErrorMessageView(radio->errorStack()).show();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 

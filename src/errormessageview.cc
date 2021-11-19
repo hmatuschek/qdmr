@@ -8,21 +8,21 @@ ErrorMessageView::ErrorMessageView(const ErrorStack &stack, QWidget *parent) :
 
   QFont font = ui->errorMessage->font(); font.setBold(true);ui->errorMessage->setFont(font);
 
-  if (! stack.hasErrorMessages()) {
+  if (stack.isEmpty()) {
     setWindowTitle(tr("Error: Unknown."));
     ui->errorMessage->setText("An unknown error has orccured.");
     ui->errorStack->setVisible(false);
     return;
   }
 
-  setWindowTitle(tr("Error: %1").arg(stack.errorMessage(0).message()));
-  if (1 == stack.errorMessageCount())
-    ui->errorMessage->setText(stack.errorMessage(0).message());
+  setWindowTitle(tr("Error: %1").arg(stack.message(0).message()));
+  if (1 == stack.count())
+    ui->errorMessage->setText(stack.message(0).message());
   else
     ui->errorMessage->setText(
-          stack.errorMessage(0).message() +
-          ":" + stack.errorMessage(stack.errorMessageCount()-1).message());
-  ui->errorStack->setText(stack.formatErrorMessages());
+          stack.message(0).message() +
+          ":" + stack.message(stack.count()-1).message());
+  ui->errorStack->setText(stack.format());
 }
 
 ErrorMessageView::~ErrorMessageView()

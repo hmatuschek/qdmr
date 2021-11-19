@@ -51,8 +51,10 @@ RadioSettings::clear() {
 }
 
 ConfigItem *
-RadioSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+RadioSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                             const Context &ctx, const ErrorStack &err)
+{
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // No children yet.
   return nullptr;
 }

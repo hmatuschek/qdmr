@@ -52,20 +52,20 @@ PositioningSystem::populate(YAML::Node &node, const ConfigItem::Context &context
 }
 
 ConfigItem *
-PositioningSystem::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+PositioningSystem::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // No children yet
   return nullptr;
 }
 
 bool
-PositioningSystem::parse(const YAML::Node &node, Context &ctx) {
+PositioningSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
   if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot parse positioning system: Expected object with one child.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse positioning system: Expected object with one child.";
     return false;
   }
 
@@ -381,13 +381,13 @@ APRSSystem::populate(YAML::Node &node, const Context &context) {
 
 
 bool
-APRSSystem::parse(const YAML::Node &node, Context &ctx) {
+APRSSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
   if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot parse APRS system: Expected object with one child.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse APRS system: Expected object with one child.";
     return false;
   }
 
@@ -396,14 +396,14 @@ APRSSystem::parse(const YAML::Node &node, Context &ctx) {
     QString source = QString::fromStdString(sys["source"].as<std::string>());
     QRegExp pattern("^([A-Z0-9]+)-(1?[0-9])$");
     if (! pattern.exactMatch(source)) {
-      errMsg() << sys.Mark().line << ":" << sys.Mark().column
-               << ": Cannot parse APRS system: '" << source << "' not a valid source call and SSID.";
+      errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
+                  << ": Cannot parse APRS system: '" << source << "' not a valid source call and SSID.";
       return false;
     }
     setSource(pattern.cap(1), pattern.cap(2).toUInt());
   } else {
-    errMsg() << sys.Mark().line << ":" << sys.Mark().column
-             << ": Cannot parse APRS system: No source call+SSID specified.";
+    errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
+                << ": Cannot parse APRS system: No source call+SSID specified.";
     return false;
   }
 
@@ -411,14 +411,14 @@ APRSSystem::parse(const YAML::Node &node, Context &ctx) {
     QString dest = QString::fromStdString(sys["destination"].as<std::string>());
     QRegExp pattern("^([A-Z0-9]+)-(1?[0-9])$");
     if (! pattern.exactMatch(dest)) {
-      errMsg() << sys.Mark().line << ":" << sys.Mark().column
-               << ": Cannot parse APRS system: '" << dest << "' not a valid destination call and SSID.";
+      errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
+                  << ": Cannot parse APRS system: '" << dest << "' not a valid destination call and SSID.";
       return false;
     }
     setDestination(pattern.cap(1), pattern.cap(2).toUInt());
   } else {
-    errMsg() << sys.Mark().line << ":" << sys.Mark().column
-             << ": Cannot parse APRS system: No destination call+SSID specified.";
+    errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
+                << ": Cannot parse APRS system: No destination call+SSID specified.";
     return false;
   }
 
@@ -431,7 +431,7 @@ APRSSystem::parse(const YAML::Node &node, Context &ctx) {
     setPath(path.join(""));
   }
 
-  return PositioningSystem::parse(node, ctx);
+  return PositioningSystem::parse(node, ctx, err);
 }
 
 
@@ -541,14 +541,14 @@ PositioningSystems::aprsSystem(int idx) const {
 }
 
 ConfigItem *
-PositioningSystems::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
+PositioningSystems::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
   if (! node)
     return nullptr;
 
   if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot create positioning system: Expected object with one child.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create positioning system: Expected object with one child.";
     return nullptr;
   }
 
@@ -559,8 +559,8 @@ PositioningSystems::allocateChild(const YAML::Node &node, ConfigItem::Context &c
     return new APRSSystem();
   }
 
-  errMsg() << node.Mark().line << ":" << node.Mark().column
-           << ": Cannot create positioning system: Unknown type '" << type << "'.";
+  errMsg(err) << node.Mark().line << ":" << node.Mark().column
+              << ": Cannot create positioning system: Unknown type '" << type << "'.";
 
   return nullptr;
 }

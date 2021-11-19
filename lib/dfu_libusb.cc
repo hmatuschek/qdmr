@@ -33,7 +33,7 @@ enum {
 };
 
 
-DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
+DFUDevice::DFUDevice(unsigned vid, unsigned pid, const ErrorStack &err, QObject *parent)
   : QObject(parent), _ctx(nullptr), _dev(nullptr)
 {
   logDebug() << "Try to detect USB DFU interface " << QString::number(vid,16)
@@ -41,27 +41,27 @@ DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
 
   int error = libusb_init(&_ctx);
   if (error < 0) {
-    errMsg() << "Libusb init failed (" << error << "): "
-             << libusb_strerror((enum libusb_error) error) << ".";
+    errMsg(err) << "Libusb init failed (" << error << "): "
+                << libusb_strerror((enum libusb_error) error) << ".";
     return;
   }
 
   if (! (_dev = libusb_open_device_with_vid_pid(_ctx, vid, pid))) {
-    errMsg() << "Cannot open device " << QString::number(vid, 16)
-             << ":" << QString::number(pid, 16)
-             << ": " << libusb_strerror((enum libusb_error) error);
+    errMsg(err) << "Cannot open device " << QString::number(vid, 16)
+                << ":" << QString::number(pid, 16)
+                << ": " << libusb_strerror((enum libusb_error) error);
     libusb_exit(_ctx);
     _ctx = nullptr;
     return;
   }
 
   if (libusb_kernel_driver_active(_dev, 0) && libusb_detach_kernel_driver(_dev, 0)) {
-    errMsg() << "Cannot detatch kernel driver for device " << QString::number(vid, 16)
-             << ":" << QString::number(pid, 16) << ". Interface claim will likely fail.";
+    errMsg(err) << "Cannot detatch kernel driver for device " << QString::number(vid, 16)
+                << ":" << QString::number(pid, 16) << ". Interface claim will likely fail.";
   }
 
   if (0 > (error = libusb_claim_interface(_dev, 0))) {
-    errMsg() << "Failed to claim USB interface: " << libusb_strerror((enum libusb_error) error);
+    errMsg(err) << "Failed to claim USB interface: " << libusb_strerror((enum libusb_error) error);
     libusb_close(_dev);
     _dev = nullptr;
     libusb_exit(_ctx);
@@ -97,12 +97,12 @@ DFUDevice::close() {
 
 
 int
-DFUDevice::download(unsigned block, uint8_t *data, unsigned len) {
+DFUDevice::download(unsigned block, uint8_t *data, unsigned len, const ErrorStack &err) {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, block, 0, data, len, 0);
 
   if (error < 0) {
-    errMsg() << "Cannot write to device: " << libusb_strerror((enum libusb_error) error) << ".";
+    errMsg(err) << "Cannot write to device: " << libusb_strerror((enum libusb_error) error) << ".";
     return 1;
   }
 
@@ -110,12 +110,12 @@ DFUDevice::download(unsigned block, uint8_t *data, unsigned len) {
 }
 
 int
-DFUDevice::upload(unsigned block, uint8_t *data, unsigned len) {
+DFUDevice::upload(unsigned block, uint8_t *data, unsigned len, const ErrorStack &err) {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_HOST, REQUEST_UPLOAD, block, 0, data, len, 0);
 
   if (error < 0) {
-    errMsg() << "Cannot read block: " << libusb_strerror((enum libusb_error) error) << ".";
+    errMsg(err) << "Cannot read block: " << libusb_strerror((enum libusb_error) error) << ".";
     return false;
   }
 
@@ -123,37 +123,37 @@ DFUDevice::upload(unsigned block, uint8_t *data, unsigned len) {
 }
 
 int
-DFUDevice::detach(int timeout)
+DFUDevice::detach(int timeout, const ErrorStack &err)
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DETACH, timeout, 0, nullptr, 0, 0);
   if (0 > error)
-    errMsg() << "Cannot detatch device: " << libusb_strerror((enum libusb_error) error) << ".";
+    errMsg(err) << "Cannot detatch device: " << libusb_strerror((enum libusb_error) error) << ".";
   return error;
 }
 
 int
-DFUDevice::get_status()
+DFUDevice::get_status(const ErrorStack &err)
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_HOST, REQUEST_GETSTATUS, 0, 0, (unsigned char*)&_status, 6, 0);
   if (0 > error)
-    errMsg() << "Cannot get status: " << libusb_strerror((enum libusb_error) error) << ".";
+    errMsg(err) << "Cannot get status: " << libusb_strerror((enum libusb_error) error) << ".";
   return error;
 }
 
 int
-DFUDevice::clear_status()
+DFUDevice::clear_status(const ErrorStack &err)
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_CLRSTATUS, 0, 0, NULL, 0, 0);
   if (0 > error)
-    errMsg() << "Cannot clear status: " << libusb_strerror((enum libusb_error) error) << ".";
+    errMsg(err) << "Cannot clear status: " << libusb_strerror((enum libusb_error) error) << ".";
   return error;
 }
 
 int
-DFUDevice::get_state(int &pstate)
+DFUDevice::get_state(int &pstate, const ErrorStack &err)
 {
   unsigned char state;
 
@@ -161,17 +161,17 @@ DFUDevice::get_state(int &pstate)
         _dev, REQUEST_TYPE_TO_HOST, REQUEST_GETSTATE, 0, 0, &state, 1, 0);
   pstate = state;
   if (error < 0)
-    errMsg() << "Cannot get state: " << libusb_strerror((enum libusb_error) error) << ".";
+    errMsg(err) << "Cannot get state: " << libusb_strerror((enum libusb_error) error) << ".";
   return error;
 }
 
 int
-DFUDevice::abort()
+DFUDevice::abort(const ErrorStack &err)
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_ABORT, 0, 0, NULL, 0, 0);
   if (error < 0)
-    errMsg() << "Cannot abort: " << libusb_strerror((enum libusb_error) error) << ".";
+    errMsg(err) << "Cannot abort: " << libusb_strerror((enum libusb_error) error) << ".";
   return error;
 }
 

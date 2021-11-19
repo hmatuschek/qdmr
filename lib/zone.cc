@@ -83,8 +83,8 @@ ChannelRefList *Zone::B() {
 }
 
 ConfigItem *
-Zone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+Zone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // There are no children yet.
   return nullptr;
 }
@@ -114,14 +114,14 @@ ZoneList::add(ConfigObject *obj, int row) {
 }
 
 ConfigItem *
-ZoneList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
+ZoneList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
   if (! node)
     return nullptr;
 
   if (! node.IsMap()) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot create zone: Expected object.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create zone: Expected object.";
     return nullptr;
   }
 

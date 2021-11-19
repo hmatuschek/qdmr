@@ -336,25 +336,25 @@ public:
   virtual void allocateForEncoding();
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
-	bool decode(Config *config);
+  bool decode(Config *config, const ErrorStack &err=ErrorStack());
 
   /** Encodes the given generic configuration as a binary codeplug. */
-  bool encode(Config *config, const Flags &flags = Flags());
+  bool encode(Config *config, const Flags &flags=Flags(), const ErrorStack &err=ErrorStack());
 
 protected:
   /** Encodes the given config (via context) to the binary codeplug. */
-  virtual bool encodeElements(const Flags &flags, Context &ctx);
+  virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Decodes the downloaded codeplug. */
-  virtual bool decodeElements(Context &ctx);
+  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate channels from bitmap. */
   virtual void allocateChannels();
   /** Encode channels into codeplug. */
-  virtual bool encodeChannels(const Flags &flags, Context &ctx);
+  virtual bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create channels from codeplug. */
-  virtual bool createChannels(Context &ctx);
+  virtual bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link channels. */
-  virtual bool linkChannels(Context &ctx);
+  virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate VFO settings. */
   virtual void allocateVFOSettings();
@@ -362,57 +362,57 @@ protected:
   /** Allocate contacts from bitmaps. */
   virtual void allocateContacts();
   /** Encode contacts into codeplug. */
-  virtual bool encodeContacts(const Flags &flags, Context &ctx);
+  virtual bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create contacts from codeplug. */
-  virtual bool createContacts(Context &ctx);
+  virtual bool createContacts(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate analog contacts from bitmaps. */
   virtual void allocateAnalogContacts();
   /** Encode analog contacts into codeplug. */
-  virtual bool encodeAnalogContacts(const Flags &flags, Context &ctx);
+  virtual bool encodeAnalogContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create analog contacts from codeplug. */
-  virtual bool createAnalogContacts(Context &ctx);
+  virtual bool createAnalogContacts(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate radio IDs from bitmaps. */
   virtual void allocateRadioIDs();
   /** Encode radio ID into codeplug. */
-  virtual bool encodeRadioID(const Flags &flags, Context &ctx);
+  virtual bool encodeRadioID(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Set radio ID from codeplug. */
-  virtual bool setRadioID(Context &ctx);
+  virtual bool setRadioID(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocates RX group lists from bitmaps. */
   virtual void allocateRXGroupLists();
   /** Encode RX group lists into codeplug. */
-  virtual bool encodeRXGroupLists(const Flags &flags, Context &ctx);
+  virtual bool encodeRXGroupLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create RX group lists from codeplug. */
-  virtual bool createRXGroupLists(Context &ctx);
+  virtual bool createRXGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link RX group lists. */
-  virtual bool linkRXGroupLists(Context &ctx);
+  virtual bool linkRXGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate zones from bitmaps. */
   virtual void allocateZones();
   /** Encode zones into codeplug. */
-  virtual bool encodeZones(const Flags &flags, Context &ctx);
+  virtual bool encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create zones from codeplug. */
-  virtual bool createZones(Context &ctx);
+  virtual bool createZones(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link zones. */
-  virtual bool linkZones(Context &ctx);
+  virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate scanlists from bitmaps. */
   virtual void allocateScanLists();
   /** Encode scan lists into codeplug. */
-  virtual bool encodeScanLists(const Flags &flags, Context &ctx);
+  virtual bool encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create scan lists from codeplug. */
-  virtual bool createScanLists(Context &ctx);
+  virtual bool createScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link scan lists. */
-  virtual bool linkScanLists(Context &ctx);
+  virtual bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocates general settings memory section. */
   virtual void allocateGeneralSettings();
   /** Encodes the general settings section. */
-  virtual bool encodeGeneralSettings(const Flags &flags, Context &ctx);
+  virtual bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Decodes the general settings section. */
-  virtual bool decodeGeneralSettings(Context &ctx);
+  virtual bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocates zone channel list memory section. */
   virtual void allocateZoneChannelList();
@@ -423,18 +423,18 @@ protected:
   /** Allocates boot settings memory section. */
   virtual void allocateBootSettings();
   /** Encodes the boot settings section. */
-  virtual bool encodeBootSettings(const Flags &flags, Context &ctx);
+  virtual bool encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Decodes the boot settings section. */
-  virtual bool decodeBootSettings(Context &ctx);
+  virtual bool decodeBootSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocates GPS settings memory section. */
   virtual void allocateGPSSystems();
   /** Encodes the GPS settings section. */
-  virtual bool encodeGPSSystems(const Flags &flags, Context &ctx);
+  virtual bool encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create GPS systems from codeplug. */
-  virtual bool createGPSSystems(Context &ctx);
+  virtual bool createGPSSystems(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link GPS systems. */
-  virtual bool linkGPSSystems(Context &ctx);
+  virtual bool linkGPSSystems(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate refab SMS messages. */
   virtual void allocateSMSMessages();

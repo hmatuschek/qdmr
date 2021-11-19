@@ -116,7 +116,8 @@ public:
   explicit D868UVCallsignDB(QObject *parent=nullptr);
 
   /** Tries to encode as many entries of the given user-database. */
-  bool encode(UserDatabase *db, const Selection &selection=Selection());
+  bool encode(UserDatabase *db, const Selection &selection=Selection(),
+              const ErrorStack &err=ErrorStack());
 };
 
 #endif // D868UVCALLSIGNDB_HH

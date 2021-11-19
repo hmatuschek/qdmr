@@ -102,7 +102,7 @@ public:
   /** Destructor. */
   virtual ~TyTCallsignDB();
 
-  bool encode(UserDatabase *db, const Selection &selection);
+  bool encode(UserDatabase *db, const Selection &selection,const ErrorStack &err=ErrorStack());
 
 protected:
   /** Allocates required space for index and @c n call-signs. */

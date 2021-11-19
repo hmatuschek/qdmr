@@ -42,8 +42,8 @@ public:
   void setPeriod(unsigned period);
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
-  bool parse(const YAML::Node &node, Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   bool populate(YAML::Node &node, const ConfigItem::Context &context);
@@ -228,7 +228,7 @@ public:
 
 public:
   YAML::Node serialize(const Context &context);
-  bool parse(const YAML::Node &node, Context &ctx);
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   bool populate(YAML::Node &node, const Context &context);
@@ -287,7 +287,7 @@ public:
   APRSSystem *aprsSystem(int idx) const;
 
 public:
-  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx);
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 

@@ -35,8 +35,9 @@ class MD390 : public TyTRadio
 public:
   /** Constructor.
    * @param device Specifies the DFU device to use for communication with the device.
+   * @param err Passes an error stack to put error messages on.
    * @param parent The QObject parent. */
-  MD390(TyTInterface *device=nullptr, QObject *parent=nullptr);
+  MD390(TyTInterface *device=nullptr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
   const QString &name() const;
   const Features &features() const;

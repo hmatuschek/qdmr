@@ -87,7 +87,8 @@ public:
   void setLongPressDuration(unsigned dur);
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds the side button 1 short-press action. */
@@ -123,7 +124,8 @@ public:
   TyTButtonSettings *buttonSettings() const;
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Owns the button settings extension. */

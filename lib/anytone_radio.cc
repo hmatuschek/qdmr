@@ -73,11 +73,12 @@ AnytoneRadio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const Ver
 
 
 bool
-AnytoneRadio::startDownload(bool blocking) {
+AnytoneRadio::startDownload(bool blocking, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
   _task = StatusDownload;
+  _errorStack = err;
 
   if (blocking) {
     run();
@@ -93,7 +94,7 @@ AnytoneRadio::startDownload(bool blocking) {
 }
 
 bool
-AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags) {
+AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
@@ -102,6 +103,8 @@ AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &
 
   _task = StatusUpload;
   _codeplugFlags = flags;
+  _errorStack = err;
+
   if (blocking) {
     run();
     return (StatusIdle == _task);
@@ -116,13 +119,15 @@ AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &
 }
 
 bool
-AnytoneRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
+AnytoneRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
   Q_UNUSED(db);
   Q_UNUSED(blocking);
 
   _callsigns->encode(db, selection);
 
   _task = StatusUploadCallsigns;
+  _errorStack = err;
+
   if (blocking) {
     run();
     return (StatusIdle == _task);
@@ -215,10 +220,9 @@ AnytoneRadio::connect() {
     _dev->deleteLater();
 
   // If no connection -> open one.
-  _dev = new AnytoneInterface();
+  _dev = new AnytoneInterface(_errorStack);
   if (! _dev->isOpen()) {
-    pushErrorMessage(_dev->errorMessages());
-    errMsg() << "Cannot connect to device.";
+    errMsg(_errorStack) << "Cannot connect to device.";
     _task = StatusError;
     _dev->deleteLater();
     _dev = nullptr;
@@ -231,7 +235,7 @@ AnytoneRadio::connect() {
 bool
 AnytoneRadio::download() {
   if (nullptr == _codeplug) {
-    errMsg() << "Cannot download codeplug: Object not created yet.";
+    errMsg(_errorStack) << "Cannot download codeplug: Object not created yet.";
     return false;
   }
 
@@ -241,9 +245,8 @@ AnytoneRadio::download() {
   for (int n=0; n<_codeplug->image(0).numElements(); n++) {
     unsigned addr = _codeplug->image(0).element(n).address();
     unsigned size = _codeplug->image(0).element(n).data().size();
-    if (! _dev->read(0, addr, _codeplug->data(addr), size)) {
-      pushErrorMessage(_dev->errorMessages());
-      errMsg() << "Cannot download codeplug.";
+    if (! _dev->read(0, addr, _codeplug->data(addr), size, _errorStack)) {
+      errMsg(_errorStack) << "Cannot download codeplug.";
       return false;
     }
     emit downloadProgress(float(n*100)/_codeplug->image(0).numElements());
@@ -256,10 +259,10 @@ AnytoneRadio::download() {
   // Check every segment in the remaining codeplug
   for (int n=nstart; n<_codeplug->image(0).numElements(); n++) {
     if (! _codeplug->image(0).element(n).isAligned(RBSIZE)) {
-      errMsg() << "Cannot download codeplug: Codeplug element " << n
-               << " (addr=" << _codeplug->image(0).element(n).address()
-               << ", size=" << _codeplug->image(0).element(n).data().size()
-               << ") is not aligned with blocksize " << RBSIZE << ".";
+      errMsg(_errorStack) << "Cannot download codeplug: Codeplug element " << n
+                          << " (addr=" << _codeplug->image(0).element(n).address()
+                          << ", size=" << _codeplug->image(0).element(n).data().size()
+                          << ") is not aligned with blocksize " << RBSIZE << ".";
       return false;
     }
   }
@@ -268,9 +271,8 @@ AnytoneRadio::download() {
   for (int n=nstart; n<_codeplug->image(0).numElements(); n++) {
     unsigned addr = _codeplug->image(0).element(n).address();
     unsigned size = _codeplug->image(0).element(n).data().size();
-    if (! _dev->read(0, addr, _codeplug->data(addr), size)) {
-      pushErrorMessage(_dev->errorMessages());
-      errMsg() << "Cannot download codeplug.";
+    if (! _dev->read(0, addr, _codeplug->data(addr), size, _errorStack)) {
+      errMsg(_errorStack) << "Cannot download codeplug.";
       return false;
     }
     emit downloadProgress(float(n*100)/_codeplug->image(0).numElements());
@@ -282,7 +284,7 @@ AnytoneRadio::download() {
 bool
 AnytoneRadio::upload() {
   if (nullptr == _codeplug) {
-    errMsg() << "Cannot write codeplug: Object not created yet.";
+    errMsg(_errorStack) << "Cannot write codeplug: Object not created yet.";
     return false;
   }
 
@@ -291,9 +293,8 @@ AnytoneRadio::upload() {
   for (int n=0; n<_codeplug->image(0).numElements(); n++) {
     unsigned addr = _codeplug->image(0).element(n).address();
     unsigned size = _codeplug->image(0).element(n).data().size();
-    if (! _dev->read(0, addr, _codeplug->data(addr), size)) {
-      pushErrorMessage(_dev->errorMessages());
-      errMsg() << "Cannot read codeplug for update.";
+    if (! _dev->read(0, addr, _codeplug->data(addr), size, _errorStack)) {
+      errMsg(_errorStack) << "Cannot read codeplug for update.";
       return false;
     }
     emit uploadProgress(float(n*25)/_codeplug->image(0).numElements());
@@ -307,9 +308,8 @@ AnytoneRadio::upload() {
   for (int n=nbitmaps; n<_codeplug->image(0).numElements(); n++) {
     unsigned addr = _codeplug->image(0).element(n).address();
     unsigned size = _codeplug->image(0).element(n).data().size();
-    if (! _dev->read(0, addr, _codeplug->data(addr), size)) {
-      pushErrorMessage(_dev->errorMessages());
-      errMsg() << "Cannot read codeplug for update.";
+    if (! _dev->read(0, addr, _codeplug->data(addr), size, _errorStack)) {
+      errMsg(_errorStack) << "Cannot read codeplug for update.";
       return false;
     }
     emit uploadProgress(25+float(n*25)/_codeplug->image(0).numElements());
@@ -321,9 +321,8 @@ AnytoneRadio::upload() {
   _codeplug->allocateForEncoding();
 
   // Update binary codeplug from config
-  if (! _codeplug->encode(_config, _codeplugFlags)) {
-    pushErrorMessage(_codeplug->errorMessages());
-    errMsg() << "Cannot encode codeplug.";
+  if (! _codeplug->encode(_config, _codeplugFlags, _errorStack)) {
+    errMsg(_errorStack) << "Cannot encode codeplug.";
     return false;
   }
 
@@ -334,9 +333,8 @@ AnytoneRadio::upload() {
   for (int n=0; n<_codeplug->image(0).numElements(); n++) {
     unsigned addr = _codeplug->image(0).element(n).address();
     unsigned size = _codeplug->image(0).element(n).data().size();
-    if (! _dev->write(0, addr, _codeplug->data(addr), size)) {
-      pushErrorMessage(_dev->errorMessages());
-      errMsg() << "Cannot write codeplug.";
+    if (! _dev->write(0, addr, _codeplug->data(addr), size, _errorStack)) {
+      errMsg(_errorStack) << "Cannot write codeplug.";
       return false;
     }
     emit uploadProgress(50+float(n*50)/_codeplug->image(0).numElements());
@@ -359,9 +357,8 @@ AnytoneRadio::uploadCallsigns() {
     unsigned size = _callsigns->image(0).element(n).data().size();
     unsigned nblks = size/WBSIZE;
     for (unsigned i=0; i<nblks; i++) {
-      if (! _dev->write(0, addr+i*WBSIZE, _callsigns->data(addr)+i*WBSIZE, WBSIZE)) {
-        pushErrorMessage(_dev->errorMessages());
-        errMsg() << "Cannot write callsign db.";
+      if (! _dev->write(0, addr+i*WBSIZE, _callsigns->data(addr)+i*WBSIZE, WBSIZE, _errorStack)) {
+        errMsg(_errorStack) << "Cannot write callsign db.";
         _task = StatusError;
         return false;
       }

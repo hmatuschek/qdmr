@@ -2,7 +2,7 @@
 #include "logger.hh"
 #include <QSerialPortInfo>
 
-USBSerial::USBSerial(unsigned vid, unsigned pid, QObject *parent)
+USBSerial::USBSerial(unsigned vid, unsigned pid, const ErrorStack &err, QObject *parent)
   : QSerialPort(parent), RadioInterface()
 {
   static int idMetaType = qRegisterMetaType<QSerialPort::SerialPortError>();
@@ -24,17 +24,17 @@ USBSerial::USBSerial(unsigned vid, unsigned pid, QObject *parent)
       this->setPort(port);
       this->setBaudRate(115200);
       if (! this->open(QIODevice::ReadWrite)) {
-        errMsg() << "Cannot open serial port '" << port.portName()
-                 << "': " << this->errorString() << ".";
+        errMsg(err) << "Cannot open serial port '" << port.portName()
+                    << "': " << this->errorString() << ".";
       } else {
         break;
       }
     }
   }
 
-  if ((! this->isOpen()) && (!hasErrorMessages())) {
-    errMsg() << "No serial port found with " << QString::number(vid, 16)
-             << ":" << QString::number(pid, 16) << ".";
+  if (! this->isOpen()) {
+    errMsg(err) << "No serial port found with " << QString::number(vid, 16)
+                << ":" << QString::number(pid, 16) << ".";
     return;
   }
 
@@ -64,7 +64,7 @@ USBSerial::close() {
 
 void
 USBSerial::onError(QSerialPort::SerialPortError err) {
-  errMsg() << "Serial port error: (" << err << ") " << errorString() << ".";
+  logError() << "Serial port error: (" << err << ") " << errorString() << ".";
 }
 
 void

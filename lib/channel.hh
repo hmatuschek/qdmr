@@ -135,9 +135,9 @@ public:
   void setOpenGD77ChannelExtension(OpenGD77ChannelExtension *ext);
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx);
-  bool parse(const YAML::Node &node, Context &ctx);
-  bool link(const YAML::Node &node, const Context &ctx);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   bool populate(YAML::Node &node, const Context &context);
@@ -258,7 +258,7 @@ public:
 
 public:
   YAML::Node serialize(const Context &context);
-  bool parse(const YAML::Node &node, Context &ctx);
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   bool populate(YAML::Node &node, const Context &context);
@@ -477,7 +477,7 @@ public:
   AnalogChannel *findAnalogChannelByTxFreq(double freq) const;
 
 public:
-  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx);
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 

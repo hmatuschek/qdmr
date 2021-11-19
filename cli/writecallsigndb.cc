@@ -64,18 +64,19 @@ int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     }
   }
 
-  QString msg;
-  Radio *radio = Radio::detect(msg);
+  ErrorStack err;
+  Radio *radio = Radio::detect(RadioInfo(), err);
   if (nullptr == radio) {
     logError() << "Could not detect a known radio. Check connection?";
+    logError() << err.format();
     return -1;
   }
 
   showProgress();
   QObject::connect(radio, &Radio::uploadProgress, updateProgress);
 
-  if (! radio->startUploadCallsignDB(&userdb, true, selection)) {
-    logError() << "Could not upload call-sign DB to radio: " << radio->formatErrorMessages();
+  if (! radio->startUploadCallsignDB(&userdb, true, selection, err)) {
+    logError() << "Could not upload call-sign DB to radio: " << err.format();
     return -1;
   }
 

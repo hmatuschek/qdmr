@@ -17,13 +17,13 @@ Codeplug::Flags::Flags()
  * Implementation of CodePlug::Element
  * ********************************************************************************************* */
 Codeplug::Element::Element(uint8_t *ptr, size_t size)
-  : ErrorStack(), _data(ptr), _size(size)
+  : _data(ptr), _size(size)
 {
   // pass...
 }
 
 Codeplug::Element::Element(const Element &other)
-  : ErrorStack(), _data(other._data), _size(other._size)
+  : _data(other._data), _size(other._size)
 {
   // pass...
 }

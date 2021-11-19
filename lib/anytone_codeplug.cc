@@ -3881,7 +3881,9 @@ AnytoneCodeplug::~AnytoneCodeplug() {
 }
 
 bool
-AnytoneCodeplug::index(Config *config, Context &ctx) const {
+AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err)
+
   // All indices as 0-based. That is, the first channel gets index 0 etc.
 
   // Map radio IDs

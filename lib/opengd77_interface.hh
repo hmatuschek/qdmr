@@ -25,7 +25,7 @@ public:
 public:
   /** Constructs a new interface to a OpenGD77 device. If a matching device was found, @c isOpen
    * returns @c true. */
-  explicit OpenGD77Interface(QObject *parent=nullptr);
+  explicit OpenGD77Interface(const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
   virtual ~OpenGD77Interface();
 
@@ -33,17 +33,17 @@ public:
   void close();
 
   /** Returns an identifier of the radio. */
-  RadioInfo identifier();
+  RadioInfo identifier(const ErrorStack &err=ErrorStack());
 
-  bool read_start(uint32_t bank, uint32_t addr);
-  bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
-  bool read_finish();
+  bool read_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
+  bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
+  bool read_finish(const ErrorStack &err=ErrorStack());
 
-  bool write_start(uint32_t bank, uint32_t addr);
-  bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
-  bool write_finish();
+  bool write_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
+  bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
+  bool write_finish(const ErrorStack &err=ErrorStack());
 
-  bool reboot();
+  bool reboot(const ErrorStack &err=ErrorStack());
 
 protected:
   /** Represents a read message. */
@@ -190,32 +190,32 @@ protected:
 
 protected:
   /** Write some data to EEPROM at the given address. */
-  bool readEEPROM(uint32_t addr, uint8_t *data, uint16_t len);
+  bool readEEPROM(uint32_t addr, uint8_t *data, uint16_t len, const ErrorStack &err=ErrorStack());
   /** Read some data from EEPROM at the given address. */
-  bool writeEEPROM(uint32_t addr, const uint8_t *data, uint16_t len);
+  bool writeEEPROM(uint32_t addr, const uint8_t *data, uint16_t len, const ErrorStack &err=ErrorStack());
   /** Read some data from Flash at the given address. */
-  bool readFlash(uint32_t addr, uint8_t *data, uint16_t len);
+  bool readFlash(uint32_t addr, uint8_t *data, uint16_t len, const ErrorStack &err=ErrorStack());
   /** Select the correct Flash sector for the given address.
    * This command must be send before writing to the flash memory. */
-  bool setFlashSector(uint32_t addr);
+  bool setFlashSector(uint32_t addr, const ErrorStack &err=ErrorStack());
   /** Write some data to the given Flash memory. */
-  bool writeFlash(uint32_t addr, const uint8_t *data, uint16_t len);
+  bool writeFlash(uint32_t addr, const uint8_t *data, uint16_t len, const ErrorStack &err=ErrorStack());
   /** Finalize writing to the Flash memory. If not send after writing to a sector,
    * the changes are lost. */
-  bool finishWriteFlash();
+  bool finishWriteFlash(const ErrorStack &err=ErrorStack());
 
   /** Send a "show CPS screen" message. */
-  bool sendShowCPSScreen();
+  bool sendShowCPSScreen(const ErrorStack &err=ErrorStack());
   /** Send a "clear screen" message. */
-  bool sendClearScreen();
+  bool sendClearScreen(const ErrorStack &err=ErrorStack());
   /** Send a "display some text" message. */
-  bool sendDisplay(uint8_t x, uint8_t y, const char *message, uint8_t iSize, uint8_t alignment, uint8_t inverted);
+  bool sendDisplay(uint8_t x, uint8_t y, const char *message, uint8_t iSize, uint8_t alignment, uint8_t inverted, const ErrorStack &err=ErrorStack());
   /** Send a "render CPS screen" message. */
-  bool sendRenderCPS();
+  bool sendRenderCPS(const ErrorStack &err=ErrorStack());
   /** Send a "close screen" message. */
-  bool sendCloseScreen();
+  bool sendCloseScreen(const ErrorStack &err=ErrorStack());
   /** Sends some command message with the given options. */
-  bool sendCommand(CommandRequest::Option option);
+  bool sendCommand(CommandRequest::Option option, const ErrorStack &err=ErrorStack());
 
 protected:
   /** The current Flash sector, set to -1 if none is currently selected. */

@@ -40,8 +40,10 @@ OpenGD77ChannelExtension::setPower(Power power) {
 }
 
 ConfigItem *
-OpenGD77ChannelExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+OpenGD77ChannelExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                                        const Context &ctx, const ErrorStack &err)
+{
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // No extensions yet for this extension
   return nullptr;
 }
@@ -76,8 +78,9 @@ OpenGD77ContactExtension::clone() const {
 }
 
 ConfigItem *
-OpenGD77ContactExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+OpenGD77ContactExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                                        const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // No extension yet of this extension
   return nullptr;
 }

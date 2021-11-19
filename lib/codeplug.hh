@@ -43,7 +43,7 @@ public:
    * the codeplug that encodes a specific element. E.g., channels, contacts, zones, etc.
    * This class provies some helper methods to access specific members of the element.
    * @since 0.9.0 */
-  class Element: public ErrorStack
+  class Element
   {
   protected:
     /** Hidden constructor.
@@ -247,14 +247,14 @@ public:
    * This method must be implemented by any device or vendor specific codeplug to map config
    * objects to indices used within the binary codeplug to address each element (e.g., channels,
    * contacts etc.). */
-  virtual bool index(Config *config, Context &ctx) const = 0;
+  virtual bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const = 0;
 
   /** Decodes a binary codeplug to the given abstract configuration @c config.
    * This must be implemented by the device-specific codeplug. */
-	virtual bool decode(Config *config) = 0;
+  virtual bool decode(Config *config, const ErrorStack &err=ErrorStack()) = 0;
   /** Encodes a given abstract configuration (@c config) to the device specific binary code-plug.
    * This must be implemented by the device-specific codeplug. */
-  virtual bool encode(Config *config, const Flags &flags=Flags()) = 0;
+  virtual bool encode(Config *config, const Flags &flags=Flags(), const ErrorStack &err=ErrorStack()) = 0;
 };
 
 #endif // CODEPLUG_HH

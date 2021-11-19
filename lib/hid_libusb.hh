@@ -7,13 +7,13 @@
 
 /** Implements the HID radio interface using libusb.
  * @ingroup rif */
-class HIDevice: public QObject, public ErrorStack
+class HIDevice: public QObject
 {
 	Q_OBJECT
 
 public:
   /** Connects to the device with given vendor and product ID. */
-	HIDevice(int vid, int pid, QObject *parent=nullptr);
+  HIDevice(int vid, int pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
 	virtual ~HIDevice();
 
@@ -23,15 +23,18 @@ public:
    * @param data Pointer to the command/data to send.
    * @param nbytes The number of bytes to send.
    * @param rdata Pointer to receive buffer.
-   * @param rlength Size of receive buffer. */
-	bool hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned char *rdata, unsigned rlength);
+   * @param rlength Size of receive buffer.
+   * @param err Passes an error stack to put error messages on. */
+  bool hid_send_recv(const unsigned char *data, unsigned nbytes,
+                     unsigned char *rdata, unsigned rlength, const ErrorStack &err=ErrorStack());
 
   /** Close connection to device. */
 	void close();
 
 protected:
   /** Internal used implementation of send_recv(). */
-	int write_read(const unsigned char *data, unsigned length, unsigned char *reply, unsigned rlength);
+  int write_read(const unsigned char *data, unsigned length,
+                 unsigned char *reply, unsigned rlength, const ErrorStack &err=ErrorStack());
   /** Callback for response data. */
   static void read_callback(struct libusb_transfer *t);
 
@@ -46,6 +49,8 @@ protected:
 	unsigned char _receive_buf[42];
 	/** Receive result. */
 	volatile int _nbytes_received;
+  /** Internal used error stack for the static callback function. */
+  ErrorStack _cbError;
 };
 
 #endif // HID_MACOS_HH

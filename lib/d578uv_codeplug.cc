@@ -133,8 +133,8 @@ D578UVCodeplug::allocateHotKeySettings() {
 }
 
 bool
-D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx) {
-  Q_UNUSED(flags)
+D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
 
   // Encode channels
   for (int i=0; i<ctx.config()->channelList()->count(); i++) {
@@ -147,7 +147,9 @@ D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx) {
 }
 
 bool
-D578UVCodeplug::createChannels(Context &ctx) {
+D578UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // Create channels
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
@@ -164,7 +166,9 @@ D578UVCodeplug::createChannels(Context &ctx) {
 }
 
 bool
-D578UVCodeplug::linkChannels(Context &ctx) {
+D578UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // Link channel objects
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
     // Check if channel is enabled:
@@ -205,8 +209,8 @@ D578UVCodeplug::allocateContacts() {
 
 
 bool
-D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx) {
-  Q_UNUSED(flags)
+D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
 
   QVector<DigitalContact*> contacts;
   // Encode contacts and also collect id<->index map

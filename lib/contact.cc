@@ -45,40 +45,41 @@ Contact::setRing(bool enable) {
 }
 
 ConfigItem *
-Contact::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx)
+Contact::allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                       const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // There are no children yet
   return nullptr;
 }
 
 bool
-Contact::parse(const YAML::Node &node, Context &ctx) {
+Contact::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
   if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot parse contact: Expected object with one child.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse contact: Expected object with one child.";
     return false;
   }
 
   YAML::Node cnt = node.begin()->second;
-  return ConfigObject::parse(cnt, ctx);
+  return ConfigObject::parse(cnt, ctx, err);
 }
 
 bool
-Contact::link(const YAML::Node &node, const Context &ctx) {
+Contact::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
   if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot link contact: Expected object with one child.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot link contact: Expected object with one child.";
     return false;
   }
 
   YAML::Node cnt = node.begin()->second;
-  return ConfigObject::link(cnt, ctx);
+  return ConfigObject::link(cnt, ctx, err);
 }
 
 
@@ -353,15 +354,15 @@ ContactList::dtmfContact(int idx) const {
 }
 
 ConfigItem *
-ContactList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
+ContactList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
 
   if (! node)
     return nullptr;
 
   if ((! node.IsMap()) || (1 != node.size())) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot create contact: Expected object with one child.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create contact: Expected object with one child.";
     return nullptr;
   }
 
@@ -372,8 +373,8 @@ ContactList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx) {
     return new DTMFContact();
   }
 
-  errMsg() << node.Mark().line << ":" << node.Mark().column
-           << ": Cannot create contact: Unknown type '" << type << "'.";
+  errMsg(err) << node.Mark().line << ":" << node.Mark().column
+              << ": Cannot create contact: Unknown type '" << type << "'.";
 
   return nullptr;
 }

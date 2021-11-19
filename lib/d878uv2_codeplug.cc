@@ -60,8 +60,8 @@ D878UV2Codeplug::allocateContacts() {
 }
 
 bool
-D878UV2Codeplug::encodeContacts(const Flags &flags, Context &ctx) {
-  Q_UNUSED(flags)
+D878UV2Codeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
 
   QVector<DigitalContact*> contacts;
   // Encode contacts and also collect id<->index map

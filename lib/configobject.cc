@@ -116,7 +116,7 @@ ConfigItem::Context::setTag(const QString &className, const QString &property, c
  * Implementation of ConfigItem
  * ********************************************************************************************* */
 ConfigItem::ConfigItem(QObject *parent)
-  : QObject(parent), ErrorStack()
+  : QObject(parent)
 {
   // pass...
 }
@@ -171,8 +171,6 @@ ConfigItem::clear() {
       lst->clear();
     }
   }
-
-  clearErrors();
 }
 
 bool
@@ -261,15 +259,15 @@ ConfigItem::populate(YAML::Node &node, const Context &context){
 }
 
 bool
-ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
+ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
 
   if (! node)
     return false;
 
   if (! node.IsMap()) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot parse element: Expected object.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse element: Expected object.";
     return false;
   }
 
@@ -290,18 +288,18 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
         continue;
       // parse & check enum key
       if (! node[prop.name()].IsScalar()) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot parse " << prop.name() << " of " << meta->className()
-                 << ": Expected enum key.";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected enum key.";
         return false;
       }
       QMetaEnum e = prop.enumerator();
       std::string key = node[prop.name()].as<std::string>();
       bool ok=true; int value = e.keyToValue(key.c_str(), &ok);
       if (! ok) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Unknown key '" << key.c_str() << "' for enum '" << prop.name()
-                 << "'. Expected one of " << enumKeys(e).join(", ") << ".";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Unknown key '" << key.c_str() << "' for enum '" << prop.name()
+                    << "'. Expected one of " << enumKeys(e).join(", ") << ".";
         return false;
       }
       // finally set property
@@ -312,9 +310,9 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot parse " << prop.name() << " of " << meta->className()
-                 << ": Expected boolean value.";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected boolean value.";
         return false;
       }
       prop.write(this, node[prop.name()].as<bool>());
@@ -324,9 +322,9 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot parse " << prop.name() << " of " << meta->className()
-                 << ": Expected integer value.";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected integer value.";
         return false;
       }
       prop.write(this, node[prop.name()].as<int>());
@@ -336,9 +334,9 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot parse " << prop.name() << " of " << meta->className()
-                 << ": Expected unsigned integer value.";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected unsigned integer value.";
         return false;
       }
       prop.write(this, node[prop.name()].as<unsigned>());
@@ -348,9 +346,9 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot parse " << prop.name() << " of " << meta->className()
-                 << ": Expected floating point value.";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected floating point value.";
         return false;
       }
       prop.write(this, node[prop.name()].as<double>());
@@ -360,9 +358,9 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot parse " << prop.name() << " of " << meta->className()
-                 << ": Expected string.";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected string.";
         return false;
       }
       prop.write(this, QString::fromStdString(node[prop.name()].as<std::string>()));
@@ -377,23 +375,23 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
         continue;
       // check type
       if (! node[prop.name()].IsMap()) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot parse " << prop.name() << " of " << meta->className()
-                 << ": Expected instance of '"
-                 << QMetaType::metaObjectForType(prop.userType())->className() << "'.";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected instance of '"
+                    << QMetaType::metaObjectForType(prop.userType())->className() << "'.";
         return false;
       }
       // allocate instance (if needed)
       ConfigItem *obj = prop.read(this).value<ConfigItem*>();
       if ((nullptr == obj) && (nullptr == (obj = this->allocateChild(prop, node[prop.name()], ctx)))) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot allocate " << prop.name() << " of " << meta->className() << ".";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot allocate " << prop.name() << " of " << meta->className() << ".";
         return false;
       }
       // parse instance
       if (! obj->parse(node[prop.name()], ctx)) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot parse " << prop.name() << " of " << meta->className() << ".";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className() << ".";
         if (nullptr == obj->parent())
           obj->deleteLater();
         return false;
@@ -407,7 +405,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
 }
 
 bool
-ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx) {
+ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
 
   const QMetaObject *meta = this->metaObject();
@@ -429,18 +427,18 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx) {
         continue;
       // check type
       if (! node[prop.name()].IsScalar()) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot link " << prop.name() << " of " << meta->className()
-                 << ": Expected id.";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot link " << prop.name() << " of " << meta->className()
+                    << ": Expected id.";
         return false;
       }
       // handle tags
       QString tag = QString::fromStdString(node[prop.name()].Tag());
       if ((!node[prop.name()].Scalar().size()) && (!tag.isEmpty())) {
         if (! ref->set(ctx.getTag(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
-          errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                   << ": Cannot link " << prop.name() << " of " << meta->className()
-                   << ": Uknown tag " << tag << ".";
+          errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                      << ": Cannot link " << prop.name() << " of " << meta->className()
+                      << ": Uknown tag " << tag << ".";
           return false;
         }
         continue;
@@ -448,9 +446,9 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx) {
       // set reference
       QString id = QString::fromStdString(node[prop.name()].as<std::string>());
       if (! ref->set(ctx.getObj(id))) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot link " << prop.name() << " of " << meta->className()
-                 << ": Cannot set reference.";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot link " << prop.name() << " of " << meta->className()
+                    << ": Cannot set reference.";
         return false;
       }
     } else if (ConfigObjectRefList *lst = prop.read(this).value<ConfigObjectRefList *>()) {
@@ -459,40 +457,40 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx) {
         continue;
       // check type
       if (! node[prop.name()].IsSequence()) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot link " << prop.name() << " of " << meta->className()
-                 << ": Expected sequence.";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot link " << prop.name() << " of " << meta->className()
+                    << ": Expected sequence.";
         return false;
       }
       for (YAML::const_iterator it=node[prop.name()].begin(); it!=node[prop.name()].end(); it++) {
         if (! it->IsScalar()) {
-          errMsg() << it->Mark().line << ":" << it->Mark().column
-                   << ": Cannot link " << prop.name() << " of " << meta->className()
-                   << ": Expected ID string.";
+          errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                      << ": Cannot link " << prop.name() << " of " << meta->className()
+                      << ": Expected ID string.";
           return false;
         }
         // check for tags
         QString tag = QString::fromStdString(it->Tag());
         if ((!it->Scalar().size()) && (!tag.isEmpty())) {
           if (0 > lst->add(ctx.getTag(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
-            errMsg() << it->Mark().line << ":" << it->Mark().column
-                     << ": Cannot link " << prop.name() << " of " << meta->className()
-                     << ": Cannot add referece for tag '" << tag << "'.";
+            errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                        << ": Cannot link " << prop.name() << " of " << meta->className()
+                        << ": Cannot add referece for tag '" << tag << "'.";
             return false;
           }
           continue;
         }
         QString id = QString::fromStdString(it->as<std::string>());
         if (! ctx.contains(id)) {
-          errMsg() << it->Mark().line << ":" << it->Mark().column
-                   << ": Cannot link " << prop.name() << " of " << meta->className()
-                   << ": Reference '" << id << "' not defined.";
+          errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                      << ": Cannot link " << prop.name() << " of " << meta->className()
+                      << ": Reference '" << id << "' not defined.";
           return false;
         }
         if (0 > lst->add(ctx.getObj(id))) {
-          errMsg() << it->Mark().line << ":" << it->Mark().column
-                   << ": Cannot link " << prop.name() << " of " << meta->className()
-                   << ": Cannot add reference to '" << id << "' to list.";
+          errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                      << ": Cannot link " << prop.name() << " of " << meta->className()
+                      << ": Cannot add reference to '" << id << "' to list.";
           return false;
         }
       }
@@ -504,15 +502,15 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx) {
 
       // check type
       if (! node[prop.name()].IsMap()) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot link " << prop.name() << " of " << meta->className()
-                 << ": Expected object.";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot link " << prop.name() << " of " << meta->className()
+                    << ": Expected object.";
         return false;
       }
 
       if (! obj->link(node[prop.name()], ctx)) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot link " << prop.name() << " of " << meta->className() << ".";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot link " << prop.name() << " of " << meta->className() << ".";
         return false;
       }
     } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
@@ -522,15 +520,15 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx) {
 
       // check type
       if (! node[prop.name()].IsSequence()) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot link " << prop.name() << " of " << meta->className()
-                 << ": Expected sequence.";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot link " << prop.name() << " of " << meta->className()
+                    << ": Expected sequence.";
         return false;
       }
 
       if (! lst->link(node[prop.name()], ctx)) {
-        errMsg() << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                 << ": Cannot link " << prop.name() << " of " << meta->className() << ".";
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot link " << prop.name() << " of " << meta->className() << ".";
         return false;
       }
     }
@@ -616,7 +614,7 @@ ConfigObject::label(ConfigObject::Context &context) {
 }
 
 bool
-ConfigObject::parse(const YAML::Node &node, Context &ctx) {
+ConfigObject::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   if (! node["id"]) {
     logWarn() << node.Mark().line << ":" << node.Mark().column
               << ": No id specified for " << metaObject()->className()
@@ -624,8 +622,8 @@ ConfigObject::parse(const YAML::Node &node, Context &ctx) {
   } else {
     QString id = QString::fromStdString(node["id"].as<std::string>());
     if (! ctx.add(id, this)) {
-      errMsg() << node["id"].Mark().line << ":" << node["id"].Mark().column
-               << ": Cannot register ID '" << id << "'.";
+      errMsg(err) << node["id"].Mark().line << ":" << node["id"].Mark().column
+                  << ": Cannot register ID '" << id << "'.";
       return false;
     }
   }
@@ -668,7 +666,7 @@ ConfigExtension::populate(YAML::Node &node, const Context &context) {
  * Implementation of AbstractConfigObjectList
  * ********************************************************************************************* */
 AbstractConfigObjectList::AbstractConfigObjectList(const QMetaObject &elementType, QObject *parent)
-  : QObject(parent), ErrorStack(), _elementType(elementType), _items()
+  : QObject(parent), _elementType(elementType), _items()
 {
   // pass...
 }
@@ -827,13 +825,13 @@ ConfigObjectList::serialize(const ConfigItem::Context &context) {
 }
 
 bool
-ConfigObjectList::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
+ConfigObjectList::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
   if (!node.IsSequence()) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot parse list: Expected list.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse list: Expected list.";
     return false;
   }
 
@@ -841,18 +839,17 @@ ConfigObjectList::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
     // Create object for node
     ConfigItem *element = allocateChild(*it, ctx);
     if ((nullptr == element) || (!element->is<ConfigObject>())) {
-      errMsg() << it->Mark().line << ":" << it->Mark().column << ": Cannot parse list.";
+      errMsg(err) << it->Mark().line << ":" << it->Mark().column << ": Cannot parse list.";
       return false;
     }
-    if (! element->parse(*it, ctx)) {
-      pushErrorMessage(*element);
-      errMsg() << it->Mark().line << ":" << it->Mark().column << ": Cannot parse list.";
+    if (! element->parse(*it, ctx, err)) {
+      errMsg(err) << it->Mark().line << ":" << it->Mark().column << ": Cannot parse list.";
       element->deleteLater();
       return false;
     }
     if (0 > add(element->as<ConfigObject>())) {
-      errMsg() << it->Mark().line << ":" << it->Mark().column
-               << ": Cannot add element to list.";
+      errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                  << ": Cannot add element to list.";
       element->deleteLater();
       return false;
     }
@@ -862,13 +859,13 @@ ConfigObjectList::parse(const YAML::Node &node, ConfigItem::Context &ctx) {
 }
 
 bool
-ConfigObjectList::link(const YAML::Node &node, const ConfigItem::Context &ctx) {
+ConfigObjectList::link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
   if (!node.IsSequence()) {
-    errMsg() << node.Mark().line << ":" << node.Mark().column
-             << ": Cannot parse list: Expected list.";
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse list: Expected list.";
     return false;
   }
   int i = 0;
@@ -877,13 +874,13 @@ ConfigObjectList::link(const YAML::Node &node, const ConfigItem::Context &ctx) {
     // Create object for node
     ConfigItem *element = get(i);
     if (nullptr == element) {
-      errMsg() << it->Mark().line << ":" << it->Mark().column
-               << ": Cannot link list, " << i << "-th element not present.";
+      errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                  << ": Cannot link list, " << i << "-th element not present.";
       return false;
     }
-    if (! element->link(*it, ctx)) {
-      errMsg() << it->Mark().line << ":" << it->Mark().column
-               << ": Cannot link list.";
+    if (! element->link(*it, ctx, err)) {
+      errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                  << ": Cannot link list.";
       return false;
     }
   }

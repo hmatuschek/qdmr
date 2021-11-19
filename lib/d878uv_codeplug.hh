@@ -1036,6 +1036,7 @@ public:
 
     /** Resets the entry. */
     void clear();
+    /** Returns @c true if the APRS RX entry is valid. */
     bool isValid() const;
 
     /** Returns the call sign. */
@@ -1214,6 +1215,7 @@ public:
     /** Resets the key. */
     void clear();
 
+    /** Returns @c true if the key is set. */
     bool isValid() const;
 
     /** Returns the key index. */
@@ -1341,31 +1343,31 @@ public:
   void allocateForEncoding();
 
 protected:
-  bool decodeElements(Context &ctx);
-  bool encodeElements(const Flags &flags, Context &ctx);
+  bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void allocateChannels();
-  bool encodeChannels(const Flags &flags, Context &ctx);
-  bool createChannels(Context &ctx);
-  bool linkChannels(Context &ctx);
+  bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void allocateGeneralSettings();
-  bool encodeGeneralSettings(const Flags &flags, Context &ctx);
-  bool decodeGeneralSettings(Context &ctx);
+  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void allocateGPSSystems();
-  bool encodeGPSSystems(const Flags &flags, Context &ctx);
-  bool createGPSSystems(Context &ctx);
-  bool linkGPSSystems(Context &ctx);
+  bool encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createGPSSystems(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkGPSSystems(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocates memory to store all roaming channels and zones. */
   virtual void allocateRoaming();
   /** Encodes the roaming channels and zones. */
-  virtual bool encodeRoaming(const Flags &flags, Context &ctx);
+  virtual bool encodeRoaming(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Creates roaming channels and zones from codeplug. */
-  virtual bool createRoaming(Context &ctx);
+  virtual bool createRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links roaming channels and zones. */
-  virtual bool linkRoaming(Context &ctx);
+  virtual bool linkRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 #endif // D878UVCODEPLUG_HH

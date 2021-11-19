@@ -89,53 +89,72 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
   }
 
   RadioInfo::Radio radio = RadioInfo::byKey(parser.value("radio").toLower()).id();
+  ErrorStack err;
 
   if (RadioInfo::UV390 == radio) {
     UV390CallsignDB db;
-    db.encode(&userdb, selection);
-    if (! db.write(parser.positionalArguments().at(1))) {
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
+      return -1;
+    }
+    if (! db.write(parser.positionalArguments().at(1), err)) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.formatErrorMessages();
+                 << "': " << err.format();
       return -1;
     }
   } else if (RadioInfo::MD2017 == radio) {
     MD2017CallsignDB db;
-    db.encode(&userdb, selection);
-    if (! db.write(parser.positionalArguments().at(1))) {
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
+      return -1;
+    }
+    if (! db.write(parser.positionalArguments().at(1), err)) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.formatErrorMessages();
+                 << "': " << err.format();
       return -1;
     }
   } else if (RadioInfo::OpenGD77 == radio) {
     OpenGD77CallsignDB db;
-    db.encode(&userdb, selection);
-    if (! db.write(parser.positionalArguments().at(1))) {
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
+      return -1;
+    }
+    if (! db.write(parser.positionalArguments().at(1), err)) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.formatErrorMessages();
+                 << "': " << err.format();
       return -1;
     }
   } else if (RadioInfo::GD77 == radio) {
     GD77CallsignDB db;
-    db.encode(&userdb, selection);
-    if (! db.write(parser.positionalArguments().at(1))) {
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
+      return -1;
+    }
+    if (! db.write(parser.positionalArguments().at(1), err)) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.formatErrorMessages();
+                 << "': " << err.format();
       return -1;
     }
   } else if ((RadioInfo::D868UVE == radio) || (RadioInfo::D878UV == radio)){
     D868UVCallsignDB db;
-    db.encode(&userdb, selection);
-    if (! db.write(parser.positionalArguments().at(1))) {
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
+      return -1;
+    }
+    if (! db.write(parser.positionalArguments().at(1), err)) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.formatErrorMessages();
+                 << "': " << err.format();
       return -1;
     }
   } else if ((RadioInfo::D878UVII == radio) || (RadioInfo::D578UV == radio)){
     D878UV2CallsignDB db;
-    db.encode(&userdb, selection);
-    if (! db.write(parser.positionalArguments().at(1))) {
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
+      return -1;
+    }
+    if (! db.write(parser.positionalArguments().at(1), err)) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.formatErrorMessages();
+                 << "': " << err.format();
       return -1;
     }
   } else {
