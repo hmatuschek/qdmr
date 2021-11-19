@@ -103,7 +103,7 @@ DFUDevice::download(unsigned block, uint8_t *data, unsigned len, const ErrorStac
 
   if (error < 0) {
     errMsg(err) << "Cannot write to device: " << libusb_strerror((enum libusb_error) error) << ".";
-    return 1;
+    return error;
   }
 
   return get_status();
@@ -116,7 +116,7 @@ DFUDevice::upload(unsigned block, uint8_t *data, unsigned len, const ErrorStack 
 
   if (error < 0) {
     errMsg(err) << "Cannot read block: " << libusb_strerror((enum libusb_error) error) << ".";
-    return false;
+    return error;
   }
 
   return get_status();
@@ -127,9 +127,11 @@ DFUDevice::detach(int timeout, const ErrorStack &err)
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DETACH, timeout, 0, nullptr, 0, 0);
-  if (0 > error)
+  if (0 > error) {
     errMsg(err) << "Cannot detatch device: " << libusb_strerror((enum libusb_error) error) << ".";
-  return error;
+    return error;
+  }
+  return 0;
 }
 
 int
@@ -137,9 +139,11 @@ DFUDevice::get_status(const ErrorStack &err)
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_HOST, REQUEST_GETSTATUS, 0, 0, (unsigned char*)&_status, 6, 0);
-  if (0 > error)
+  if (0 > error) {
     errMsg(err) << "Cannot get status: " << libusb_strerror((enum libusb_error) error) << ".";
-  return error;
+    return error;
+  }
+  return 0;
 }
 
 int
@@ -147,9 +151,11 @@ DFUDevice::clear_status(const ErrorStack &err)
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_CLRSTATUS, 0, 0, NULL, 0, 0);
-  if (0 > error)
+  if (0 > error) {
     errMsg(err) << "Cannot clear status: " << libusb_strerror((enum libusb_error) error) << ".";
-  return error;
+    return error;
+  }
+  return 0;
 }
 
 int
@@ -160,9 +166,11 @@ DFUDevice::get_state(int &pstate, const ErrorStack &err)
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_HOST, REQUEST_GETSTATE, 0, 0, &state, 1, 0);
   pstate = state;
-  if (error < 0)
+  if (error < 0) {
     errMsg(err) << "Cannot get state: " << libusb_strerror((enum libusb_error) error) << ".";
-  return error;
+    return error;
+  }
+  return 0;
 }
 
 int
@@ -170,9 +178,11 @@ DFUDevice::abort(const ErrorStack &err)
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_ABORT, 0, 0, NULL, 0, 0);
-  if (error < 0)
+  if (error < 0) {
     errMsg(err) << "Cannot abort: " << libusb_strerror((enum libusb_error) error) << ".";
-  return error;
+    return error;
+  }
+  return 0;
 }
 
 

@@ -17,8 +17,10 @@ TyTInterface::TyTInterface(unsigned vid, unsigned pid, const ErrorStack &err, QO
     errMsg(err) << "Device not ready. Close device.";
     close(); return;
   }
+
   if (md380_command(0x91, 0x01, err)) {
     errMsg(err) << "Cannot enter programming mode. Close device.";
+    reboot(err);
     close(); return;
   }
 
