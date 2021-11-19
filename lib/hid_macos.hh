@@ -13,7 +13,7 @@ class HIDevice: public QObject
 
 public:
   /** Opens a connection to the device with given vendor and product ID. */
-	HIDevice(int vid, int pid, QObject *parent=nullptr);
+	HIDevice(int vid, int pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destrutor. */
 	virtual ~HIDevice();
 
@@ -25,7 +25,9 @@ public:
    * @param nbytes The number of bytes to send.
    * @param rdata Pointer to receive buffer.
    * @param rlength Size of receive buffer. */
-	bool hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned char *rdata, unsigned rlength);
+	bool hid_send_recv(const unsigned char *data, unsigned nbytes,
+                     unsigned char *rdata, unsigned rlength,
+                     const ErrorStack &err=ErrorStack());
 
   /** Close connection to device. */
 	void close();
