@@ -211,6 +211,15 @@ DigitalContact::setNumber(unsigned number) {
   return true;
 }
 
+ConfigItem *
+DigitalContact::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
+
+  if (0 == strcmp("openGD77", prop.name()))
+    return new OpenGD77ContactExtension();
+  return nullptr;
+}
+
 YAML::Node
 DigitalContact::serialize(const Context &context) {
   YAML::Node node = Contact::serialize(context);

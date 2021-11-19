@@ -1704,9 +1704,10 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &
   if (! conf->radioIDs()->defaultId()) {
     int idx = conf->radioIDs()->add(new RadioID(name(), radioID()));
     conf->radioIDs()->setDefaultId(idx);
+  } else {
+    conf->radioIDs()->defaultId()->setName(name());
+    conf->radioIDs()->defaultId()->setNumber(radioID());
   }
-  conf->radioIDs()->defaultId()->setName(name());
-  conf->radioIDs()->defaultId()->setNumber(radioID());
   conf->settings()->setVOX(voxSensitivity());
   return true;
 }

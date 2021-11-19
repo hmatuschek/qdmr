@@ -128,8 +128,8 @@ RadioIDList::RadioIDList(QObject *parent)
 
 void
 RadioIDList::clear() {
+  setDefaultId(-1);
   ConfigObjectList::clear();
-  // default will be removed through deleted signal.
 }
 
 RadioID *

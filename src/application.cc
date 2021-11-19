@@ -489,7 +489,6 @@ Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
   if (codeplug->decode(_config, err)) {
     _mainWindow->statusBar()->showMessage(tr("Read complete"));
     _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
-
     _config->setModified(false);
   } else {
     ErrorMessageView(err).show();

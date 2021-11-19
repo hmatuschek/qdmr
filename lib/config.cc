@@ -86,8 +86,6 @@ Config::isModified() const {
 void
 Config::setModified(bool modified) {
   _modified = modified;
-  if (_modified)
-    emit this->modified(this);
 }
 
 bool

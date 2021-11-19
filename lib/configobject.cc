@@ -167,7 +167,11 @@ ConfigItem::clear() {
     QMetaProperty prop = meta->property(p);
     if (! prop.isValid())
       continue;
-    if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
+    if (propIsInstance<ConfigItem>(prop) && prop.isWritable()) {
+      ConfigItem *item = prop.read(this).value<ConfigItem*>();
+      prop.write(this, QVariant::fromValue<ConfigItem*>(nullptr));
+      item->deleteLater();
+    } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
       lst->clear();
     }
   }
@@ -182,8 +186,8 @@ ConfigItem::populate(YAML::Node &node, const Context &context){
     if (! prop.isValid())
       continue;
     if (! prop.isScriptable()) {
-      logDebug() << "Do not serialize property '"
-                 << prop.name() << "': Marked as not scriptable.";
+      /*logDebug() << "Do not serialize property '"
+                 << prop.name() << "': Marked as not scriptable.";*/
       continue;
     }
     if (prop.isEnumType()) {
