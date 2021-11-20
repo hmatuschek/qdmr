@@ -27,7 +27,7 @@
  *  <tr><td>0x00ec20</td> <td>0x0149e0</td> <td>0x05dc0</td> <td>250 RX Group lists @ 0x60 bytes each, see @c TyTCodeplug::GroupListElement.</td></tr>
  *  <tr><td>0x0149e0</td> <td>0x018860</td> <td>0x03e80</td> <td>250 Zones @ 0x40 bytes each, see @c TyTCodeplug::ZoneElement.</td></tr>
  *  <tr><td>0x018860</td> <td>0x01edf0</td> <td>0x06590</td> <td>250 Scanlists @ 0x68 bytes each, see @c TyTCodeplug::ScanListElement.</td></tr>
- *  <tr><td>0x01ee00</td> <td>0x02e800</td> <td>0x0fa00</td> <td>1000 channels, see @c TyTCodeplug::ChannelElement.</td></tr>
+ *  <tr><td>0x01ee00</td> <td>0x02e800</td> <td>0x0fa00</td> <td>1000 channels, see @c MD390Codeplug::ChannelElement.</td></tr>
  *  <tr><td>0x03ec40</td> <td>0x03ed40</td> <td>0x00100</td> <td>16 GPS systems @ 0x10 bytes each, see @c TyTCodeplug::GPSSystemElement.</td></tr>
  * </table>
  *
