@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xmlid="extTyTChannelSettings"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Channel extension</title>  
+</info>
+
+<para>
+  This extension to the codeplug allows to set device specific channel settings for many TyT radios
+  (and therefore also many Retevis radios). Not all settings are present in all radios. Unsupported
+  settings are ignored during encoding or set to the default value during decoding.
+</para>
+
+<para>
+  This extension is applicable to the TyT MD-390, MD-UV380, MD-UV390, MD-2017 and Retevis RT8, 
+  RT3S, RT82 radios.
+</para>
+
+<example>
+  <title>Example channel settings specifying the default values for TyT/Retevis devices.</title>
+  <programlisting><![CDATA[tyt:
+  loneWorker: false
+  autoScan: false
+  talkaround: true
+  dataCallConfirmed: false
+  privateCallConfirmed: false
+  emergencyAlarmConfirmed: false
+  displayPTTId: true
+  rxRefFrequency: Low
+  txRefFrequency: Low
+  tightSquelch: false
+  compressedUDPHeader: false
+  reverseBurst: true
+  killTone: Off
+  inCallCriterion: Always
+  allowInterrupt: false
+  dcdm: false
+  dcdmLeader: false
+]]></programlisting>
+</example>
+
+<variablelist>
+  <title>Common channel setting fields</title>
+  <varlistentry>
+    <term><token>loneWorker</token></term>
+    <listitem>
+      <para>If <token>true</token>, the lone worker feature is enabled.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>autoScan</token></term>
+    <listitem>
+      <para>If <token>true</token>, the auto-scan feature is enabled.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>talkaround</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, talk around is enabled. That is, the radio will receive on the 
+        input and transmit on the output frequency of the repeater effectively bypassing the 
+        repeater.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>dataCallConfirmed</token></term> 
+    <term><token>privateCallConfirmed</token></term>
+    <term><token>emergencyAlarmConfirmed</token></term>
+    <listitem>
+      <para>
+        Enables the confirmation of data, private and emergency calls. These fields are usually
+        disabled as the radio will first establish the connection before the actual call can be 
+        started.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>displayPTTId</token></term>
+    <listitem>
+      <para>If <token>true</token>, the received analog PTT will be shown.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>rxRefFrequency</token></term>
+    <term><token>rxRefFrequency</token></term>
+    <listitem>
+      <para>
+        Specifies some weird reference frequency setting for RX and TX. By default the value <token>Low</token> is used. Possible values are 
+        <token>Low</token>, <token>Medium</token> and <token>High</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+<variablelist>
+  <title>Channel settings for TyT MD-390 and Retevis RT8</title>
+  <varlistentry>
+    <term><token>tightSquelch</token></term>
+    <listitem>
+      <para>If set to <token>true</token>, the silent squelch is used. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>compressedUDPHeader</token></term>
+    <listitem>
+      <para>Some unknown flag. Usually disabled.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>reverseBurst</token></term>
+    <listitem>
+      <para>If enabled (default), avoids a noise burst at the end of a transmission, when the squelch is controlled by a sub tone.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+<variablelist>
+  <title>Channel settings for TyT MD-390 and Retevis RT8</title>
+  <varlistentry>
+    <term><token>killTone</token></term>
+    <listitem>
+      <para>
+        Specifies the kill tone. Possible values are <token>Off</token>, <token>Tone259_2Hz</token>
+        and <token>Tone55_2Hz</token>. Disabling or setting the kill tone to 259.2Hz or 55.2Hz, 
+        respectively.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>inCallCriterion</token></term>
+    <listitem>
+      <para>Specifies the in-call criterion. Possible values are <token>Always</token>, 
+      <token>AdmitCriterion</token> and <token>TXInterrupt</token>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>allowInterrupt</token></term>
+    <listitem>
+      <para>
+        Enables/disables interrupts if <token>inCallCriterion</token> is set to 
+        <token>TXInterrupt</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>dcdm</token></term>
+    <listitem>
+      <para>If enabled, the dual-capacity direct mode is used for simplex operation.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>dcdmLeader</token></term>
+    <listitem>
+      <para>If DCDM is enabled, this flag specifies whether this radio is the channel leader. That 
+        is, if this radio provides the clock for the time-slots.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>

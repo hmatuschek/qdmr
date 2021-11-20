@@ -475,12 +475,14 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
     ch->setVOXDefault();
   else
     ch->disableVOX();
+
   // Apply common channel settings
   ex->enableLoneWorker(loneWorker());
   ex->enableAutoScan(autoScan());
   ex->enableTalkaround(talkaround());
   ex->setRXRefFrequency(rxRefFrequency());
   ex->setTXRefFrequency(txRefFrequency());
+  ch->setTyTChannelExtension(ex);
 
   return ch;
 }

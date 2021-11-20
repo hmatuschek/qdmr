@@ -12,8 +12,13 @@
 
 <para>
   This extension to the codeplug allows to specify the function for each of the programmable 
-  buttons on the radio. Please note that not all Radioddity radios have all buttons described 
+  buttons on the radio. Please note that not all TyT radios have all buttons described 
   here. 
+</para>
+
+<para>
+  This extension is applicable to the TyT MD-390, MD-UV380, MD-UV390, MD-2017 and Retevis RT8, 
+  RT3S, RT82 radios.
 </para>
 
 <example>

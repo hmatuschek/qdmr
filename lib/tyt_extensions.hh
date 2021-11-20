@@ -1,5 +1,5 @@
-#ifndef TYTBUTTONSETTINGSEXTENSION_HH
-#define TYTBUTTONSETTINGSEXTENSION_HH
+#ifndef TYTEXTENSION_HH
+#define TYTEXTENSION_HH
 
 #include "configobject.hh"
 
@@ -31,10 +31,20 @@ class TyTChannelExtension: public ConfigExtension
   Q_PROPERTY(RefFrequency rxRefFrequency READ rxRefFrequency WRITE setRXRefFrequency)
   /** Holds the reference frequency setting for TX. */
   Q_PROPERTY(RefFrequency txRefFrequency READ txRefFrequency WRITE setTXRefFrequency)
+
+  /** The tight-squelch feature. */
+  Q_PROPERTY(bool tightSquelch READ tightSquelch WRITE enableTightSquelch)
+  /** The compressed UDP header feature. */
+  Q_PROPERTY(bool compressedUDPHeader READ compressedUDPHeader WRITE enableCompressedUDPHeader)
+  /** The reverse-burst feature. */
+  Q_PROPERTY(bool reverseBurst READ reverseBurst WRITE enableReverseBurst)
+
   /** Holds the kill tone frequency. */
   Q_PROPERTY(KillTone killTone READ killTone WRITE setKillTone)
   /** Holds the in-call criterion. */
   Q_PROPERTY(InCallCriterion inCallCriterion READ inCallCriterion WRITE setInCallCriterion)
+  /** Holds the allow-interrupt flag. */
+  Q_PROPERTY(bool allowInterrupt READ allowInterrupt WRITE enableAllowInterrupt)
   /** If @c true, enables Dual-Capacity Direct Mode (DCDM, i.e., time-slots for simplex). */
   Q_PROPERTY(bool dcdm READ dcdm WRITE enableDCDM)
   /** If @c true, and dcdm is enabled, this radio is the leader, specifying the clock. */
