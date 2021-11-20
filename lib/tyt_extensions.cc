@@ -21,6 +21,24 @@ TyTChannelExtension::copy(const ConfigItem &other) {
   if ((nullptr == ex) || (! ConfigExtension::copy(other)))
     return false;
 
+  enableLoneWorker(ex->loneWorker());
+  enableAutoScan(ex->autoScan());
+  enableTalkaround(ex->talkaround());
+  enableDataCallConfirmed(ex->dataCallConfirmed());
+  enablePrivateCallConfirmed(ex->privateCallConfirmed());
+  enableEmergencyAlarmConfirmed(ex->emergencyAlarmConfirmed());
+  enableDisplayPTTId(ex->displayPTTId());
+  setRXRefFrequency(ex->rxRefFrequency());
+  setTXRefFrequency(ex->txRefFrequency());
+  enableTightSquelch(ex->tightSquelch());
+  enableCompressedUDPHeader(ex->compressedUDPHeader());
+  enableReverseBurst(ex->reverseBurst());
+  setKillTone(ex->killTone());
+  setInCallCriterion(ex->inCallCriterion());
+  enableAllowInterrupt(ex->allowInterrupt());
+  enableDCDM(ex->dcdm());
+  enableDCDMLeader(ex->dcdmLeader());
+
   return true;
 }
 
@@ -245,6 +263,71 @@ TyTChannelExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
 {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // There are no further extension/children to TyTChannelExtension.
+  return nullptr;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of TyTScanListExtension
+ * ******************************************************************************************** */
+TyTScanListExtension::TyTScanListExtension(QObject *parent)
+  : ConfigExtension(parent), _holdTime(500), _prioritySampleTime(2000)
+{
+  // pass...
+}
+
+bool
+TyTScanListExtension::copy(const ConfigItem &other) {
+  const TyTScanListExtension *ex = other.as<TyTScanListExtension>();
+  if ((nullptr==ex) || (!ConfigExtension::copy(other)))
+    return false;
+
+  setHoldTime(ex->holdTime());
+  setPrioritySampleTime(ex->prioritySampleTime());
+
+  return true;
+}
+
+ConfigItem *
+TyTScanListExtension::clone() const {
+  TyTScanListExtension *ex = new TyTScanListExtension();
+  if (! ex->copy(*this)) {
+    ex->deleteLater();
+    return nullptr;
+  }
+  return ex;
+}
+
+unsigned
+TyTScanListExtension::holdTime() const {
+  return _holdTime;
+}
+void
+TyTScanListExtension::setHoldTime(unsigned ms) {
+  if (_holdTime == ms)
+    return;
+  _holdTime = ms;
+  emit modified(this);
+}
+
+unsigned
+TyTScanListExtension::prioritySampleTime() const {
+  return _prioritySampleTime;
+}
+void
+TyTScanListExtension::setPrioritySampleTime(unsigned ms) {
+  if (_prioritySampleTime == ms)
+    return;
+  _prioritySampleTime = ms;
+  emit modified(this);
+}
+
+ConfigItem *
+TyTScanListExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                                    const Context &ctx, const ErrorStack &err)
+{
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
+  // There are no further extension/children to TyTScanListExtension.
   return nullptr;
 }
 

@@ -199,6 +199,45 @@ protected:
 };
 
 
+/** Represents device specific scan-list settings for TyT devices.
+ * @ingroup tyt */
+class TyTScanListExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  /** Holds the hold time in ms. */
+  Q_PROPERTY(unsigned holdTime READ holdTime WRITE setHoldTime)
+  /** Holds the sample time in ms for priority channels. */
+  Q_PROPERTY(unsigned prioritySampleTime READ prioritySampleTime WRITE setPrioritySampleTime)
+
+public:
+  /** Default constructor. */
+  Q_INVOKABLE explicit TyTScanListExtension(QObject *parent=nullptr);
+
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
+
+  /** Returns the hold time in ms. */
+  unsigned holdTime() const;
+  /** Sets the hold time im ms. */
+  void setHoldTime(unsigned ms);
+  /** Returns the sample time for priority channels in ms. */
+  unsigned prioritySampleTime() const;
+  /** Sets the sample time for priority channels in ms. */
+  void setPrioritySampleTime(unsigned ms);
+
+public:
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected:
+  /** The hold time in ms. */
+  unsigned _holdTime;
+  /** The sample time for priority channels in ms. */
+  unsigned _prioritySampleTime;
+};
+
+
 /** Represents the TyT button settings extension.
  * @ingroup tyt */
 class TyTButtonSettings : public ConfigExtension

@@ -1020,6 +1020,11 @@ TyTCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, Context &ctx)
     }
   }
 
+  if (TyTScanListExtension *ex = lst->tytScanListExtension()) {
+    setHoldTime(ex->holdTime());
+    setPrioritySampleTime(ex->prioritySampleTime());
+  }
+
   return true;
 }
 
@@ -1028,7 +1033,15 @@ TyTCodeplug::ScanListElement::toScanListObj(Context &ctx) {
   Q_UNUSED(ctx)
   if (! isValid())
     return nullptr;
-  return new ScanList(name());
+
+  ScanList *lst = new ScanList(name());
+  TyTScanListExtension *ex = new TyTScanListExtension();
+  lst->setTyTScanListExtension(ex);
+
+  ex->setHoldTime(holdTime());
+  ex->setPrioritySampleTime(prioritySampleTime());
+
+  return lst;
 }
 
 bool

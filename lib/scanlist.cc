@@ -15,7 +15,7 @@
  * Implementation of ScanList
  * ********************************************************************************************* */
 ScanList::ScanList(QObject *parent)
-  : ConfigObject("scan", parent), _channels(), _primary(), _secondary(), _revert()
+  : ConfigObject("scan", parent), _channels(), _primary(), _secondary(), _revert(), _tyt(nullptr)
 {
   // Register "selected" channel tags for primary, secondary, revert and the channel list.
   Context::setTag(metaObject()->className(), "primary", "!selected", SelectedChannel::get());
@@ -25,7 +25,7 @@ ScanList::ScanList(QObject *parent)
 }
 
 ScanList::ScanList(const QString &name, QObject *parent)
-  : ConfigObject(name, "scan", parent), _channels(), _primary(), _secondary(), _revert()
+  : ConfigObject(name, "scan", parent), _channels(), _primary(), _secondary(), _revert(), _tyt(nullptr)
 {
   // Register "selected" channel tags for primary, secondary, revert and the channel list.
   Context::setTag(metaObject()->className(), "primary", "!selected", SelectedChannel::get());
@@ -181,6 +181,21 @@ void
 ScanList::setRevertChannel(Channel *channel) {
   _revert.set(channel);
   emit modified(this);
+}
+
+TyTScanListExtension *
+ScanList::tytScanListExtension() const {
+  return _tyt;
+}
+void
+ScanList::setTyTScanListExtension(TyTScanListExtension *tyt) {
+  if (_tyt) {
+    _tyt->deleteLater();
+    _tyt = nullptr;
+  }
+  _tyt = tyt;
+  if (_tyt)
+    _tyt->setParent(this);
 }
 
 ConfigItem *

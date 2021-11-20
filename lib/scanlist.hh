@@ -6,6 +6,8 @@
 
 class Channel;
 #include "configreference.hh"
+#include "tyt_extensions.hh"
+
 
 /** Generic representation of a scan list.
  * @ingroup conf */
@@ -21,6 +23,9 @@ class ScanList : public ConfigObject
   Q_PROPERTY(ChannelReference* revert READ revert)
   /** The list of channels. */
   Q_PROPERTY(ChannelRefList * channels READ channels)
+
+  /** The TyT scan-list extension. */
+  Q_PROPERTY(TyTScanListExtension* tyt READ tytScanListExtension WRITE setTyTScanListExtension)
 
 public:
   /** Default constructor. */
@@ -81,6 +86,11 @@ public:
   /** Sets the TX channel. */
   void setRevertChannel(Channel *channel);
 
+  /** Returns the TyT scan-list extension instance (if set). */
+  TyTScanListExtension *tytScanListExtension() const;
+  /** Sets the TyT scan-list extension. */
+  void setTyTScanListExtension(TyTScanListExtension *tyt);
+
 public:
   ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
                             const Context &ctx, const ErrorStack &err=ErrorStack());
@@ -94,6 +104,9 @@ protected:
   ChannelReference _secondary;
   /** The transmit channel. */
   ChannelReference _revert;
+  /** TyT scan-list settings extension. */
+  TyTScanListExtension *_tyt;
+
 };
 
 
