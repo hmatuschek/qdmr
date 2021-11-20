@@ -14,6 +14,7 @@
 </para>
 
 <xi:include href="channel.xml"/>
+<xi:include href="scanlist.xml"/>
 <xi:include href="buttonsettings.xml"/>
 
 </section>

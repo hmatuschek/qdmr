@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xmlid="extTyTScanListSettings"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Scan-list settings extension</title>  
+</info>
+
+<para>
+  This extension to the codeplug allows to specify device specifics settings for scan-lists. 
+</para>
+
+<para>
+  This extension is applicable to the TyT MD-390, MD-UV380, MD-UV390, MD-2017 and Retevis RT8, 
+  RT3S, RT82 radios.
+</para>
+
+<example>
+  <title>TyT specific scan-list settings showing the default values.</title>
+  <programlisting><![CDATA[tyt:
+  holdTime: 500
+  prioritySampleTime: 2000
+]]></programlisting>
+</example>
+
+<variablelist>
+  <title>Scan-list settings fields</title>
+  <varlistentry>
+    <term><token>holdTime</token></term>
+    <listitem>
+      <para>Specifies the hold time in ms.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>prioritySampleTime</token></term>
+    <listitem>
+      <para>Specifies the sample-time in ms for priority channels.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</section>
