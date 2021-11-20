@@ -28,14 +28,16 @@
 Channel::Channel(QObject *parent)
   : ConfigObject("ch", parent), _rxFreq(0), _txFreq(0), _defaultPower(true),
     _power(Power::Low), _txTimeOut(std::numeric_limits<unsigned>::max()), _rxOnly(false),
-    _vox(std::numeric_limits<unsigned>::max()), _scanlist(), _openGD77ChannelExtension(nullptr)
+    _vox(std::numeric_limits<unsigned>::max()), _scanlist(), _openGD77ChannelExtension(nullptr),
+    _tytChannelExtension(nullptr)
 {
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
 Channel::Channel(const Channel &other, QObject *parent)
-  : ConfigObject("ch", parent), _scanlist(), _openGD77ChannelExtension(nullptr)
+  : ConfigObject("ch", parent), _scanlist(), _openGD77ChannelExtension(nullptr),
+    _tytChannelExtension(nullptr)
 {
   copy(other);
 
@@ -75,6 +77,10 @@ Channel::copy(const ConfigItem &other) {
     setOpenGD77ChannelExtension(
           c->openGD77ChannelExtension()->clone()->as<OpenGD77ChannelExtension>());
 
+  if (c->tytChannelExtension())
+    setTyTChannelExtension(
+          c->tytChannelExtension()->clone()->as<TyTChannelExtension>());
+
   return true;
 }
 
@@ -90,6 +96,9 @@ Channel::clear() {
   if (_openGD77ChannelExtension)
     _openGD77ChannelExtension->deleteLater();
   _openGD77ChannelExtension = nullptr;
+  if (_tytChannelExtension)
+    _tytChannelExtension->deleteLater();
+  _tytChannelExtension = nullptr;
 }
 
 double
@@ -243,6 +252,23 @@ Channel::setOpenGD77ChannelExtension(OpenGD77ChannelExtension *ext) {
   if (_openGD77ChannelExtension) {
     _openGD77ChannelExtension->setParent(this);
     connect(_openGD77ChannelExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
+  }
+}
+
+TyTChannelExtension *
+Channel::tytChannelExtension() const {
+  return _tytChannelExtension;
+}
+void
+Channel::setTyTChannelExtension(TyTChannelExtension *ext) {
+  if (_tytChannelExtension == ext)
+    return;
+  if (_tytChannelExtension)
+    _tytChannelExtension->deleteLater();
+  _tytChannelExtension = ext;
+  if (_tytChannelExtension) {
+    _tytChannelExtension->setParent(this);
+    connect(_tytChannelExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
   }
 }
 

@@ -73,30 +73,28 @@ UV390Codeplug::ChannelElement::clear() {
   Element::clear();
 
   clearBit(5,0);
-  setInCallCriteria(INCALL_ALWAYS);
-  setTurnOffFreq(TURNOFF_NONE);
+  setInCallCriteria(TyTChannelExtension::InCallCriterion::Always);
+  setTurnOffFreq(TyTChannelExtension::KillTone::Off);
   setSquelch(1);
   setPower(Channel::Power::High);
   enableAllowInterrupt(true);
   enableDualCapacityDirectMode(false);
-  enableLeaderOrMS(true);
+  enableDCDMLeader(true);
 }
 
-UV390Codeplug::ChannelElement::InCall
-UV390Codeplug::ChannelElement::inCallCriteria() const {
-  return InCall(getUInt2(5,4));
+TyTChannelExtension::InCallCriterion UV390Codeplug::ChannelElement::inCallCriteria() const {
+  return TyTChannelExtension::InCallCriterion(getUInt2(5,4));
 }
 void
-UV390Codeplug::ChannelElement::setInCallCriteria(InCall crit) {
+UV390Codeplug::ChannelElement::setInCallCriteria(TyTChannelExtension::InCallCriterion crit) {
   setUInt2(5,4, uint8_t(crit));
 }
 
-UV390Codeplug::ChannelElement::TurnOffFreq
-UV390Codeplug::ChannelElement::turnOffFreq() const {
-  return TurnOffFreq(getUInt2(5,6));
+TyTChannelExtension::KillTone UV390Codeplug::ChannelElement::turnOffFreq() const {
+  return TyTChannelExtension::KillTone(getUInt2(5,6));
 }
 void
-UV390Codeplug::ChannelElement::setTurnOffFreq(TurnOffFreq freq) {
+UV390Codeplug::ChannelElement::setTurnOffFreq(TyTChannelExtension::KillTone freq) {
   setUInt2(5,6, uint8_t(freq));
 }
 
@@ -155,11 +153,11 @@ UV390Codeplug::ChannelElement::enableDualCapacityDirectMode(bool enable) {
 }
 
 bool
-UV390Codeplug::ChannelElement::leaderOrMS() const {
+UV390Codeplug::ChannelElement::dcdmLeader() const {
   return !getBit(31, 4);
 }
 void
-UV390Codeplug::ChannelElement::enableLeaderOrMS(bool enable) {
+UV390Codeplug::ChannelElement::enableDCDMLeader(bool enable) {
   setBit(31,4, !enable);
 }
 
@@ -180,6 +178,16 @@ UV390Codeplug::ChannelElement::toChannelObj() const {
   }
   // Common settings
   ch->setPower(power());
+
+  // assemble extension
+  if (TyTChannelExtension *ex = ch->tytChannelExtension()) {
+    ex->setKillTone(turnOffFreq());
+    ex->setInCallCriterion(inCallCriteria());
+    ex->enableAllowInterrupt(allowInterrupt());
+    ex->enableDCDM(dualCapacityDirectMode());
+    ex->enableDCDMLeader(dcdmLeader());
+  }
+
   return ch;
 }
 
@@ -199,6 +207,15 @@ UV390Codeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx)
       setSquelch(ctx.config()->settings()->squelch());
     else
       setSquelch(achan->squelch());
+  }
+
+  // apply extensions
+  if (TyTChannelExtension *ex = chan->tytChannelExtension()) {
+    setTurnOffFreq(ex->killTone());
+    setInCallCriteria(ex->inCallCriterion());
+    enableAllowInterrupt(ex->allowInterrupt());
+    enableDualCapacityDirectMode(ex->dcdm());
+    enableDCDMLeader(ex->dcdmLeader());
   }
 }
 

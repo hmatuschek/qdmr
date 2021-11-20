@@ -7,6 +7,7 @@
 #include "configobject.hh"
 #include "configreference.hh"
 #include "signaling.hh"
+#include "tyt_extensions.hh"
 #include "opengd77_extension.hh"
 
 class Config;
@@ -45,6 +46,8 @@ class Channel: public ConfigObject
   Q_PROPERTY(unsigned vox READ vox WRITE setVOX SCRIPTABLE false)
   /** The OpenGD77 channel extension. */
   Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
+  /** The TyT channel extension. */
+  Q_PROPERTY(TyTChannelExtension* tyt READ tytChannelExtension WRITE setTyTChannelExtension)
 
 public:
   /** Possible power settings. */
@@ -134,6 +137,12 @@ public:
   /** Sets the OpenGD77 channel extension. */
   void setOpenGD77ChannelExtension(OpenGD77ChannelExtension *ext);
 
+  /** Returns the channel extension for TyT devices.
+   * If this extension is not set, returns @c nullptr. */
+  TyTChannelExtension *tytChannelExtension() const;
+  /** Sets the TyT channel extension. */
+  void setTyTChannelExtension(TyTChannelExtension *ext);
+
 public:
   ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -165,6 +174,8 @@ protected:
   ScanListReference _scanlist;
   /** Owns the OpenGD77 channel extension object. */
   OpenGD77ChannelExtension *_openGD77ChannelExtension;
+  /** Owns the TyT channel extension object. */
+  TyTChannelExtension *_tytChannelExtension;
 };
 
 

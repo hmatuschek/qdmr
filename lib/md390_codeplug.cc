@@ -124,6 +124,13 @@ MD390Codeplug::ChannelElement::toChannelObj() const {
     return ch;
 
   ch->setPower(power());
+
+  // Apply extension
+  if (ch->tytChannelExtension()) {
+    ch->tytChannelExtension()->enableTightSquelch(tightSquelchEnabled());
+    ch->tytChannelExtension()->enableCompressedUDPHeader(compressedUDPHeader());
+    ch->tytChannelExtension()->enableReverseBurst(reverseBurst());
+  }
   return ch;
 }
 
@@ -132,6 +139,13 @@ MD390Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   TyTCodeplug::ChannelElement::fromChannelObj(c, ctx);
 
   setPower(c->power());
+
+  // apply extensions (extension will be created in TyTCodeplug::ChannelElement::fromChannelObj)
+  if (TyTChannelExtension *ex = c->tytChannelExtension()) {
+    enableTightSquelch(ex->tightSquelch());
+    enableCompressedUDPHeader(ex->compressedUDPHeader());
+    enableReverseBurst(ex->reverseBurst());
+  }
 }
 
 

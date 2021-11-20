@@ -54,13 +54,6 @@ public:
       PRIV_ENHANCED = 2             ///< Enhenced privacy.
     };
 
-    /** I have absolutely no idea what this means. */
-    enum RefFrequency {
-      REF_LOW = 0,
-      REF_MEDIUM = 1,
-      REF_HIGH = 2
-    };
-
     /** TX Admit criterion. */
     enum Admit {
       ADMIT_ALWAYS = 0,             ///< Always allow TX.
@@ -144,13 +137,13 @@ public:
     virtual void enableDataCallConfirm(bool enable);
 
     /** Returns some weird reference frequency setting for reception. */
-    virtual RefFrequency rxRefFrequency() const;
+    virtual TyTChannelExtension::RefFrequency rxRefFrequency() const;
     /** Sets some weird reference frequency setting for reception. */
-    virtual void setRXRefFrequency(RefFrequency ref);
+    virtual void setRXRefFrequency(TyTChannelExtension::RefFrequency ref);
     /** Returns some weird reference frequency setting for transmission. */
-    virtual RefFrequency txRefFrequency() const;
+    virtual TyTChannelExtension::RefFrequency txRefFrequency() const;
     /** Sets some weird reference frequency setting for transmission. */
-    virtual void setTXRefFrequency(RefFrequency ref);
+    virtual void setTXRefFrequency(TyTChannelExtension::RefFrequency ref);
 
     /** Returns @c true if the channel has alarm confirmation enabled. */
     virtual bool emergencyAlarmACK() const;

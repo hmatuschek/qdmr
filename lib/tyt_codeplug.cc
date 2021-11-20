@@ -57,12 +57,12 @@ TyTCodeplug::ChannelElement::clear() {
   setPrivacyType(PRIV_NONE);
   enablePrivateCallConfirm(false);
   enableDataCallConfirm(false);
-  setRXRefFrequency(REF_LOW);
+  setRXRefFrequency(TyTChannelExtension::RefFrequency::Low);
   clearBit(3,2);
   enableEmergencyAlarmACK(false);
   clearBit(3,4); setBit(3,5); setBit(3,6);
   enableDisplayPTTId(true);
-  setTXRefFrequency(REF_LOW);
+  setTXRefFrequency(TyTChannelExtension::RefFrequency::Low);
   setBit(4,2); clearBit(4,3);
   enableVOX(false);
   setBit(4,5);
@@ -210,12 +210,12 @@ TyTCodeplug::ChannelElement::enableDataCallConfirm(bool enable) {
   setBit(2, 7, enable);
 }
 
-TyTCodeplug::ChannelElement::RefFrequency
+TyTChannelExtension::RefFrequency
 TyTCodeplug::ChannelElement::rxRefFrequency() const {
-  return TyTCodeplug::ChannelElement::RefFrequency(getUInt2(3,0));
+  return TyTChannelExtension::RefFrequency(getUInt2(3,0));
 }
 void
-TyTCodeplug::ChannelElement::setRXRefFrequency(TyTCodeplug::ChannelElement::RefFrequency ref) {
+TyTCodeplug::ChannelElement::setRXRefFrequency(TyTChannelExtension::RefFrequency ref) {
   setUInt2(3,0, uint8_t(ref));
 }
 
@@ -237,12 +237,12 @@ TyTCodeplug::ChannelElement::enableDisplayPTTId(bool enable) {
   setBit(3,7, !enable);
 }
 
-TyTCodeplug::ChannelElement::RefFrequency
+TyTChannelExtension::RefFrequency
 TyTCodeplug::ChannelElement::txRefFrequency() const {
-  return TyTCodeplug::ChannelElement::RefFrequency(getUInt2(4,0));
+  return TyTChannelExtension::RefFrequency(getUInt2(4,0));
 }
 void
-TyTCodeplug::ChannelElement::setTXRefFrequency(TyTCodeplug::ChannelElement::RefFrequency ref) {
+TyTCodeplug::ChannelElement::setTXRefFrequency(TyTChannelExtension::RefFrequency ref) {
   setUInt2(4,0, uint8_t(ref));
 }
 
@@ -424,6 +424,7 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
     return nullptr;
 
   Channel *ch = nullptr;
+  TyTChannelExtension *ex = new TyTChannelExtension();
 
   // decode power setting
   if (MODE_ANALOG == mode()) {
@@ -440,6 +441,8 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
     ach->setRXTone(rxSignaling());
     ach->setTXTone(txSignaling());
     ach->setBandwidth(bandwidth());
+    // Apply analog channel extension settings
+    ex->enableDisplayPTTId(displayPTTId());
     ch = ach;
   } else if (MODE_DIGITAL == mode()) {
     DigitalChannel::Admit admit_crit;
@@ -453,6 +456,10 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
     dch->setAdmit(admit_crit);
     dch->setColorCode(colorCode());
     dch->setTimeSlot(timeSlot());
+    // Apply digital channel extension settings
+    ex->enablePrivateCallConfirmed(privateCallConfirm());
+    ex->enableDataCallConfirmed(dataCallConfirm());
+    ex->enableEmergencyAlarmConfirmed(emergencyAlarmACK());
     ch = dch;
   }
 
@@ -468,6 +475,12 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
     ch->setVOXDefault();
   else
     ch->disableVOX();
+  // Apply common channel settings
+  ex->enableLoneWorker(loneWorker());
+  ex->enableAutoScan(autoScan());
+  ex->enableTalkaround(talkaround());
+  ex->setRXRefFrequency(rxRefFrequency());
+  ex->setTXRefFrequency(txRefFrequency());
 
   return ch;
 }
@@ -544,6 +557,11 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
       setPositioningSystemIndex(ctx.index(dchan->aprsObj()->as<GPSSystem>()));
       enableTXGPSInfo(true); enableRXGPSInfo(false);
     }
+    if (chan->tytChannelExtension()) {
+      enablePrivateCallConfirm(chan->tytChannelExtension()->privateCallConfirmed());
+      enableDataCallConfirm(chan->tytChannelExtension()->dataCallConfirmed());
+      enableEmergencyAlarmACK(chan->tytChannelExtension()->emergencyAlarmConfirmed());
+    }
   } else if (chan->is<AnalogChannel>()) {
     const AnalogChannel *achan = chan->as<const AnalogChannel>();
     setMode(MODE_ANALOG);
@@ -558,6 +576,18 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
     setTXSignaling(achan->txTone());
     setGroupListIndex(0);
     setContactIndex(0);
+    if (chan->tytChannelExtension()) {
+      enableDisplayPTTId(chan->tytChannelExtension()->displayPTTId());
+    }
+  }
+
+  // Apply channel extension (if set)
+  if (chan->tytChannelExtension()) {
+    enableLoneWorker(chan->tytChannelExtension()->loneWorker());
+    enableAutoScan(chan->tytChannelExtension()->autoScan());
+    enableTalkaround(chan->tytChannelExtension()->talkaround());
+    setRXRefFrequency(chan->tytChannelExtension()->rxRefFrequency());
+    setTXRefFrequency(chan->tytChannelExtension()->txRefFrequency());
   }
 }
 
