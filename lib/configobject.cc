@@ -236,7 +236,7 @@ ConfigItem::populate(YAML::Node &node, const Context &context){
         if (context.hasTag(prop.enclosingMetaObject()->className(), prop.name(), obj)) {
           YAML::Node tag(YAML::NodeType::Scalar);
           tag.SetTag(context.getTag(prop.enclosingMetaObject()->className(), prop.name(), obj).toStdString());
-          tag = tag.Tag().substr(1);
+          //tag = tag.Tag().substr(1);
           list.push_back(tag);
           continue;
         } else if (! context.contains(obj)) {
@@ -247,9 +247,11 @@ ConfigItem::populate(YAML::Node &node, const Context &context){
         list.push_back(context.getId(obj).toStdString());
       }
       node[prop.name()] = list;
-    } else if (ConfigItem *obj = prop.read(this).value<ConfigItem *>()) {
+    } else if (propIsInstance<ConfigItem>(prop)) {
+      ConfigItem *obj = prop.read(this).value<ConfigItem *>();
       // Serialize config objects in-place.
-      node[prop.name()] = obj->serialize(context);
+      if (obj)
+        node[prop.name()] = obj->serialize(context);
     } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
       // Serialize config object lists in-place.
       node[prop.name()] = lst->serialize(context);

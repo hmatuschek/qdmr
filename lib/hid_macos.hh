@@ -24,7 +24,8 @@ public:
    * @param data Pointer to the command/data to send.
    * @param nbytes The number of bytes to send.
    * @param rdata Pointer to receive buffer.
-   * @param rlength Size of receive buffer. */
+   * @param rlength Size of receive buffer.
+   * @param err The stack to put error messages on. */
 	bool hid_send_recv(const unsigned char *data, unsigned nbytes,
                      unsigned char *rdata, unsigned rlength,
                      const ErrorStack &err=ErrorStack());
