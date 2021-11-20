@@ -392,10 +392,15 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
   } else if (propIsInstance<ConfigItem>(prop)) {
     ConfigItem *item = value.value<ConfigItem*>();
     if (Qt::DisplayRole == role) {
-      if (nullptr == item)
+      if (nullptr == item) {
         return tr("[None]");
-      else
-        return item->metaObject()->className();
+      } else {
+        int infoidx = item->metaObject()->indexOfClassInfo("description");
+        if (0 > infoidx)
+          return item->metaObject()->className();
+        else
+          return item->metaObject()->classInfo(infoidx).value();
+      }
     }
   }
 
