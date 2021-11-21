@@ -1123,7 +1123,7 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   setBit(0x40,0, 0); setBit(0,1, 1);
   disableAllLEDs(false);
   setBit(0x40,3, 1);
-  setMonitorType(MONITOR_OPEN_SQUELCH);
+  setMonitorType(TyTSettingsExtension::MonitorType::Open);
   setUInt3(0x40, 5, 7);
 
   setSavePreamble(true);
@@ -1131,7 +1131,7 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   disableAllTones(false);
   setBit(0x41,3, 1);
   setChFreeIndicationTone(true);
-  enablePasswdAndLock(true);
+  enablePasswdAndLock(false);
   enableTalkPermitToneDigital(false);
   enableTalkPermitToneAnalog(false);
 
@@ -1153,7 +1153,7 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   setLoneWorkerResponseTime(1);
   setLoneWorkerReminderTime(10);
   setUInt8(0x52, 0x00);
-  setCcanDigitalHangTime(1000);
+  setScanDigitalHangTime(1000);
   setScanAnalogHangTime(1000);
 
   setBacklightTime(10);
@@ -1188,13 +1188,13 @@ TyTCodeplug::GeneralSettingsElement::setIntroLine2(const QString line) {
   writeUnicode(0x14, line, 10);
 }
 
-TyTCodeplug::GeneralSettingsElement::MonitorType
+TyTSettingsExtension::MonitorType
 TyTCodeplug::GeneralSettingsElement::monitorType() const {
-  return getBit(0x40,4) ? MONITOR_OPEN_SQUELCH : MONITOR_SILENT;
+  return getBit(0x40,4) ? TyTSettingsExtension::MonitorType::Open : TyTSettingsExtension::MonitorType::Silent;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setMonitorType(MonitorType type) {
-  setBit(0x40,4, MONITOR_OPEN_SQUELCH==type);
+TyTCodeplug::GeneralSettingsElement::setMonitorType(TyTSettingsExtension::MonitorType type) {
+  setBit(0x40,4, TyTSettingsExtension::MonitorType::Open==type);
 }
 
 bool
@@ -1378,7 +1378,7 @@ TyTCodeplug::GeneralSettingsElement::scanDigitalHangTime() const {
   return unsigned(getUInt8(0x53))*100;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setCcanDigitalHangTime(unsigned dur) {
+TyTCodeplug::GeneralSettingsElement::setScanDigitalHangTime(unsigned dur) {
   dur = std::min(10000U, dur);
   setUInt8(0x53, dur/100);
 }
@@ -1491,6 +1491,49 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
   setIntroLine1(config->settings()->introLine1());
   setIntroLine2(config->settings()->introLine2());
   setVOXSesitivity(config->settings()->vox());
+
+  if (TyTSettingsExtension *ex = config->settings()->tytExtension()) {
+    setMonitorType(ex->monitorType());
+    disableAllLEDs(ex->allLEDsDisabled());
+    enableTalkPermitToneDigital(ex->talkPermitToneDigital());
+    enableTalkPermitToneAnalog(ex->talkPermitToneAnalog());
+    enablePasswdAndLock(ex->passwordAndLock());
+    setChFreeIndicationTone(ex->channelFreeIndicationTone());
+    disableAllTones(ex->allTonesDisabled());
+    setSaveModeRX(ex->saveModeRX());
+    setSavePreamble(ex->savePreamble());
+    enableIntroPicture(ex->bootPicture());
+    setTXPreambleDuration(ex->txPreambleDuration());
+    setGroupCallHangTime(ex->groupCallHangTime());
+    setPrivateCallHangTime(ex->privateCallHangTime());
+    setLowBatteryInterval(ex->lowBatteryWarnInterval());
+    if (ex->callAlertToneContinuous())
+      setCallAlertToneContinuous();
+    else
+      setCallAlertToneDuration(ex->callAlertToneDuration());
+    setLoneWorkerResponseTime(ex->loneWorkerResponseTime());
+    setLoneWorkerReminderTime(ex->loneWorkerReminderTime());
+    setScanDigitalHangTime(ex->digitalScanHangTime());
+    setScanAnalogHangTime(ex->analogScanHangTime());
+    if (ex->backlightAlwaysOn())
+      backlightTimeSetAlways();
+    else
+      setBacklightTime(ex->backlightDuration());
+    if (ex->keypadLockManual())
+      keypadLockTimeSetManual();
+    else
+      setKeypadLockTime(ex->keypadLockTime());
+    if (! ex->powerOnPasswordEnabled())
+      setPowerOnPassword(0);
+    else
+      setPowerOnPassword(ex->powerOnPassword());
+    if (! ex->radioProgPasswordEnabled())
+      radioProgPasswordDisable();
+    else
+      setRadioProgPassword(ex->radioProgPassword());
+    setPCProgPassword(ex->pcProgPassword());
+  }
+
   return true;
 }
 
@@ -1507,6 +1550,43 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   config->settings()->setIntroLine1(introLine1());
   config->settings()->setIntroLine2(introLine2());
   config->settings()->setVOX(voxSesitivity());
+
+  // apply extension
+  TyTSettingsExtension *ex = new TyTSettingsExtension();
+  config->settings()->setTyTExtension(ex);
+
+  ex->setMonitorType(monitorType());
+  ex->disableAllLEDs(allLEDsDisabled());
+  ex->enableTalkPermitToneDigital(talkPermitToneDigital());
+  ex->enableTalkPermitToneAnalog(talkPermitToneAnalog());
+  ex->enablePasswordAndLock(passwdAndLock());
+  ex->enableChannelFreeIndicationTone(chFreeIndicationTone());
+  ex->disableAllTones(allTonesDisabled());
+  ex->enableSaveModeRX(saveModeRX());
+  ex->enableSavePreamble(savePreamble());
+  ex->enableBootPicture(introPicture());
+  ex->setTXPreambleDuration(txPreambleDuration());
+  ex->setGroupCallHangTime(groupCallHangTime());
+  ex->setPrivateCallHangTime(privateCallHangTime());
+  ex->setLowBatteryWarnInterval(lowBatteryInterval());
+  ex->enableCallAlertToneContinuous(callAlertToneIsContinuous());
+  if (! callAlertToneIsContinuous())
+    ex->setCallAlertToneDuration(callAlertToneDuration());
+  ex->setLoneWorkerResponseTime(loneWorkerResponseTime());
+  ex->setLoneWorkerReminderTime(loneWorkerReminderTime());
+  ex->setDigitalScanHangTime(scanDigitalHangTime());
+  ex->setAnalogScanHangTime(scanAnalogHangTime());
+  ex->enableBacklightAlwaysOn(backlightIsAlways());
+  if (! backlightIsAlways())
+    ex->setBacklightDuration(backlightTime());
+  ex->enableKeypadLockManual(keypadLockIsManual());
+  if (! keypadLockIsManual())
+    ex->setKeypadLockTime(keypadLockTime());
+  ex->enableRadioProgPassword(radioProgPasswordEnabled());
+  if (radioProgPasswordEnabled())
+    ex->setRadioProgPassword(ex->radioProgPassword());
+  ex->setPCProgPassword(pcProgPassword());
+
   return true;
 }
 

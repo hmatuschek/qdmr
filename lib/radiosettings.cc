@@ -2,7 +2,7 @@
 
 RadioSettings::RadioSettings(QObject *parent)
   : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
-    _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(0)
+    _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(0), _tytExtension(nullptr)
 {
   // pass
 }
@@ -25,6 +25,10 @@ RadioSettings::copy(const ConfigItem &other) {
     disableTOT();
   else
     setTOT(set->tot());
+
+  if (set->tytExtension())
+    setTyTExtension(set->tytExtension()->clone()->as<TyTSettingsExtension>());
+
   return true;
 }
 
@@ -48,13 +52,20 @@ RadioSettings::clear() {
   _power = Channel::Power::High;
   disableVOX();
   disableTOT();
+
+  setTyTExtension(nullptr);
 }
 
 ConfigItem *
 RadioSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node,
                              const Context &ctx, const ErrorStack &err)
 {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
+  Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
+
+  if (0 == strcmp("tyt", prop.name())) {
+    return new TyTSettingsExtension();
+  }
+
   // No children yet.
   return nullptr;
 }
@@ -156,3 +167,25 @@ RadioSettings::disableTOT() {
   setTOT(0);
 }
 
+TyTSettingsExtension *
+RadioSettings::tytExtension() const {
+  return _tytExtension;
+}
+void
+RadioSettings::setTyTExtension(TyTSettingsExtension *ext) {
+  if (_tytExtension) {
+    disconnect(_tytExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+    _tytExtension->deleteLater();
+  }
+  _tytExtension = ext;
+  if (_tytExtension) {
+    _tytExtension->setParent(this);
+    connect(_tytExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+  }
+  emit modified(this);
+}
+
+void
+RadioSettings::onExtensionModified() {
+  emit modified(this);
+}

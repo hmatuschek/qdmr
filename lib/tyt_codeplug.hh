@@ -441,13 +441,6 @@ public:
    * @verbinclude tyt_settings.txt */
   class GeneralSettingsElement: public Codeplug::Element
   {
-  public:
-    /** Defines all possible squelch modes. */
-    enum MonitorType {
-      MONITOR_SILENT       = 0,
-      MONITOR_OPEN_SQUELCH = 1
-    };
-
   protected:
     /** Hidden constructor. */
     GeneralSettingsElement(uint8_t *ptr, size_t size);
@@ -470,9 +463,9 @@ public:
     virtual void setIntroLine2(const QString line);
 
     /** Returns the monitor type. */
-    virtual MonitorType monitorType() const;
+    virtual TyTSettingsExtension::MonitorType monitorType() const;
     /** Sets the monitor type. */
-    virtual void setMonitorType(MonitorType type);
+    virtual void setMonitorType(TyTSettingsExtension::MonitorType type);
 
     /** Returns @c true if all LEDs are disabled. */
     virtual bool allLEDsDisabled() const;
@@ -559,7 +552,7 @@ public:
     /** Returns the scan digital hang time. */
     virtual unsigned scanDigitalHangTime() const;
     /** Sets the scan digital hang time. */
-    virtual void setCcanDigitalHangTime(unsigned ms);
+    virtual void setScanDigitalHangTime(unsigned ms);
     /** Returns the scan analog hang time. */
     virtual unsigned scanAnalogHangTime() const;
     /** Sets the scan analog hang time. */

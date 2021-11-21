@@ -339,6 +339,295 @@ protected:
 };
 
 
+/** Represents the TyT general settings extension.
+ * @ingroup tyt */
+class TyTSettingsExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  /** The monitor type setting. */
+  Q_PROPERTY(MonitorType monitorType READ monitorType WRITE setMonitorType)
+  /** If @c true, all LEDs are disabled. */
+  Q_PROPERTY(bool allLEDsDisabled READ allLEDsDisabled WRITE disableAllLEDs)
+  /** If @c true, the talk permit tone for digital channels is enabled. */
+  Q_PROPERTY(bool talkPermitToneDigital READ talkPermitToneDigital WRITE enableTalkPermitToneDigital)
+  /** If @c true, the talk permit tone for analog channels is enabled. */
+  Q_PROPERTY(bool talkPermitToneAnalog READ talkPermitToneAnalog WRITE enableTalkPermitToneAnalog)
+  /** If @c true, the password and lock is enabled. */
+  Q_PROPERTY(bool passwordAndLock READ passwordAndLock WRITE enablePasswordAndLock)
+  /** If @c true, the channel free tone is enabled. */
+  Q_PROPERTY(bool channelFreeIndicationTone READ channelFreeIndicationTone WRITE enableChannelFreeIndicationTone)
+  /** If @c true, all tones are disabled. */
+  Q_PROPERTY(bool allTonesDisabled READ allTonesDisabled WRITE disableAllTones)
+  /** If @c true, the save-mode RX is enabled. */
+  Q_PROPERTY(bool saveModeRX READ saveModeRX WRITE enableSaveModeRX)
+  /** If @c true, the save preamble is enabled. */
+  Q_PROPERTY(bool savePreamble READ savePreamble WRITE enableSavePreamble)
+  /** If @c true, a picture is shown during boot. */
+  Q_PROPERTY(bool bootPicture READ bootPicture WRITE enableBootPicture)
+  /** The transmit preamble duration in ms. */
+  Q_PROPERTY(unsigned txPreambleDuration READ txPreambleDuration WRITE setTXPreambleDuration)
+  /** The group hang time in ms. */
+  Q_PROPERTY(unsigned groupCallHangTime READ groupCallHangTime WRITE setGroupCallHangTime)
+  /** The private hang time in ms. */
+  Q_PROPERTY(unsigned privateCallHangTime READ privateCallHangTime WRITE setPrivateCallHangTime)
+  /** The low battery warn interval in seconds. */
+  Q_PROPERTY(unsigned lowBatteryWarnInterval READ lowBatteryWarnInterval WRITE setLowBatteryWarnInterval)
+  /** If @c true, the call alert-tone is continuous. */
+  Q_PROPERTY(bool callAlertToneContinuous READ callAlertToneContinuous WRITE enableCallAlertToneContinuous)
+  /** The call alert duration in seconds. */
+  Q_PROPERTY(unsigned callAlertToneDuration READ callAlertToneDuration WRITE setCallAlertToneDuration)
+  /** The lone-worker response time in minutes. */
+  Q_PROPERTY(unsigned loneWorkerResponseTime READ loneWorkerResponseTime WRITE setLoneWorkerResponseTime)
+  /** The lone-worker reminder time in seconds. */
+  Q_PROPERTY(unsigned loneWorkerReminderTime READ loneWorkerReminderTime WRITE setLoneWorkerReminderTime)
+  /** The digital channel scan hang time in ms. */
+  Q_PROPERTY(unsigned digitalScanHangTime READ digitalScanHangTime WRITE setDigitalScanHangTime)
+  /** The analog channel scan hang time in ms. */
+  Q_PROPERTY(unsigned analogScanHangTime READ analogScanHangTime WRITE setAnalogScanHangTime)
+  /** If @c true, the backlight is always on. */
+  Q_PROPERTY(bool backlightAlwaysOn READ backlightAlwaysOn WRITE enableBacklightAlwaysOn)
+  /** If @c backlightAlwaysOn is @c false, specifies the backlight duration in seconds. */
+  Q_PROPERTY(unsigned backlightDuration READ backlightDuration WRITE setBacklightDuration)
+  /** If @c true, the keypad is locked manually. */
+  Q_PROPERTY(bool keypadLockManual READ keypadLockManual WRITE enableKeypadLockManual)
+  /** If @c keypadLockManual is @c false, specifies the keypad lock time. */
+  Q_PROPERTY(unsigned keypadLockTime READ keypadLockTime WRITE setKeypadLockTime)
+  /** If @c true the power-on password is enabled. */
+  Q_PROPERTY(bool powerOnPasswordEnabled READ powerOnPasswordEnabled WRITE enablePowerOnPassword)
+  /** If @c powerOnPasswordEnabled is @c true, specifies the power-on password. */
+  Q_PROPERTY(unsigned powerOnPassword READ powerOnPassword WRITE setPowerOnPassword)
+  /** If @c true the radio programming password is enabled. */
+  Q_PROPERTY(bool radioProgPasswordEnabled READ radioProgPasswordEnabled WRITE enableRadioProgPassword)
+  /** If @c radioProgPasswordEnabled is @c true, specifies the radio programming password. */
+  Q_PROPERTY(unsigned radioProgPassword READ radioProgPassword WRITE setRadioProgPassword)
+  /** Specifies the PC programming password. */
+  Q_PROPERTY(QString pcProgPassword READ pcProgPassword WRITE setPCProgPassword)
+
+  Q_CLASSINFO("description", "Settings for MD-390, RT8, MD-UV390, RT3S, MD-2017, RT82.")
+  Q_CLASSINFO("longDescription", "Device specific radio settings for TyT and Retevis devices."
+                                 "Including TyT MD-390, MD-UV390, MD-2017 as well as Retevis RT8, "
+                                 "RT3S and RT82.")
+
+public:
+  /** Possible monitor types. */
+  enum class MonitorType {
+    Silent=0, Open=1
+  };
+  Q_ENUM(MonitorType)
+
+public:
+  /** Default constructor. */
+  Q_INVOKABLE explicit TyTSettingsExtension(QObject *parent=nullptr);
+
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
+
+  /** Returns the monitor type. */
+  MonitorType monitorType() const;
+  /** Sets the monitor type. */
+  void setMonitorType(MonitorType type);
+
+  /** Returns @c true if all LEDs are disabled. */
+  bool allLEDsDisabled() const;
+  /** Disables all LEDs. */
+  void disableAllLEDs(bool disable);
+
+  /** Returns @c true if the talk permit tone is enabled for digital channels.*/
+  bool talkPermitToneDigital() const;
+  /** Enables the talk permit tone for digital channels. */
+  void enableTalkPermitToneDigital(bool enable);
+
+  /** Returns @c true if the talk permit tone is enabled for analog channels.*/
+  bool talkPermitToneAnalog() const;
+  /** Enables the talk permit tone for analog channels. */
+  void enableTalkPermitToneAnalog(bool enable);
+
+  /** Returns @c true if the password and lock is enabled. */
+  bool passwordAndLock() const;
+  /** Enables the password and lock. */
+  void enablePasswordAndLock(bool enable);
+
+  /** Returns @c true if channel-free indication tone is enabled. */
+  bool channelFreeIndicationTone() const;
+  /** Enables channel-free indication tone. */
+  void enableChannelFreeIndicationTone(bool enable);
+
+  /** Returns @c true if all tones are disabled. */
+  bool allTonesDisabled() const;
+  /** Disables all tones. */
+  void disableAllTones(bool disable);
+
+  /** Returns @c true if the save mode RX is enabled. */
+  bool saveModeRX() const;
+  /** Enables the RX save-mode. */
+  void enableSaveModeRX(bool enable);
+
+  /** Returns @c true if the preamble is saved. */
+  bool savePreamble() const;
+  /** Enables preamble save. */
+  void enableSavePreamble(bool enable);
+
+  /** Returns @c true if a picture is shown during boot. */
+  bool bootPicture() const;
+  /** Enables the boot picture. */
+  void enableBootPicture(bool enable);
+
+  /** Returns the TX preamble duration in ms. */
+  unsigned txPreambleDuration() const;
+  /** Sets the TX preamble duration in ms. */
+  void setTXPreambleDuration(unsigned ms);
+
+  /** Returns the group call hang time in ms. */
+  unsigned groupCallHangTime() const;
+  /** Sets the group-call hang time in ms. */
+  void setGroupCallHangTime(unsigned ms);
+
+  /** Returns the private call hang time in ms. */
+  unsigned privateCallHangTime() const;
+  /** Sets the private-call hang time in ms. */
+  void setPrivateCallHangTime(unsigned ms);
+
+  /** Returns the low-battery warn interval in seconds. */
+  unsigned lowBatteryWarnInterval() const;
+  /** Sets the low-battery warn interval in seconds. */
+  void setLowBatteryWarnInterval(unsigned sec);
+
+  /** Returns @c true if the call alert-tone is continuous. */
+  bool callAlertToneContinuous() const;
+  /** Sets the call alert-tone continuous. */
+  void enableCallAlertToneContinuous(bool enable);
+  /** Returns the call alert-tone duration in seconds. */
+  unsigned callAlertToneDuration() const;
+  /** Sets the call alert-tone duration in seconds. */
+  void setCallAlertToneDuration(unsigned sec);
+
+  /** Returns the lone worker response time in minutes. */
+  unsigned loneWorkerResponseTime() const;
+  /** Sets the lone-worker response time in minutes. */
+  void setLoneWorkerResponseTime(unsigned min);
+
+  /** Returns the lone-worker reminder time in seconds. */
+  unsigned loneWorkerReminderTime() const;
+  /** Sets the lone-worker reminder timer in seconds. */
+  void setLoneWorkerReminderTime(unsigned sec);
+
+  /** Returns the hang time scanning for digital channels. */
+  unsigned digitalScanHangTime() const;
+  /** Sets the scan hang-time for digital channels. */
+  void setDigitalScanHangTime(unsigned ms);
+
+  /** Returns the hang time scanning for analog channels. */
+  unsigned analogScanHangTime() const;
+  /** Sets the scan hang-time for analog channels. */
+  void setAnalogScanHangTime(unsigned ms);
+
+  /** Returns @c true if the backlight is always on. */
+  bool backlightAlwaysOn() const;
+  /** Enables the backlight continuously. */
+  void enableBacklightAlwaysOn(bool enable);
+  /** Returns the backlight duration in seconds. */
+  unsigned backlightDuration() const;
+  /** Sets the backlight duration in seconds. */
+  void setBacklightDuration(unsigned sec);
+
+  /** Returns @c true if the keypad lock is manual. */
+  bool keypadLockManual() const;
+  /** Sets the keypad lock to manual. */
+  void enableKeypadLockManual(bool enable);
+  /** Retunrs the keypad lock time in seconds. */
+  unsigned keypadLockTime() const;
+  /** Sets the keypad lock time in seconds. */
+  void setKeypadLockTime(unsigned sec);
+
+  /** Returns @c true if power-on password is enabled. */
+  bool powerOnPasswordEnabled() const;
+  /** Enables the power on password. */
+  void enablePowerOnPassword(bool enable);
+  /** Returns the power-on password. */
+  unsigned powerOnPassword() const;
+  /** Sets the power-on password. */
+  void setPowerOnPassword(unsigned passwd);
+
+  /** Returns @c true if radio programming password is enabled. */
+  bool radioProgPasswordEnabled() const;
+  /** Enables the radio programming password. */
+  void enableRadioProgPassword(bool enable);
+  /** Returns the radio programming password. */
+  unsigned radioProgPassword() const;
+  /** Sets the radio programming password. */
+  void setRadioProgPassword(unsigned passwd);
+
+  /** Retunrs the PC programming password. */
+  const QString &pcProgPassword() const;
+  /** Sets PC programming password. */
+  void setPCProgPassword(const QString &passwd);
+
+public:
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
+protected:
+  /** Holds the monitor type. */
+  MonitorType _monitorType;
+  /** If @c true all LEDs are disabled. */
+  bool _allLEDsDisabled;
+  /** If @c true the talk-permit tone is enabled for digital channels. */
+  bool _talkPermitToneDigital;
+  /** If @c true the talk-permit tone is enabled for analog channels. */
+  bool _talkPermitToneAnalog;
+  /** If @c true the password and lock is enabled. */
+  bool _passwdAndLock;
+  /** If @c true, the channel free indication tone is enabled. */
+  bool _channelFreeIndicationTone;
+  /** If @c true, all tones are disabled. */
+  bool _allTonesDisabled;
+  /** If @c true, the save-mode RX is enabled. */
+  bool _saveModeRX;
+  /** If @c true the preamble is saved. */
+  bool _savePreamble;
+  /** If @c true the boot picture is enabled. */
+  bool _bootPicture;
+  /** Holds the TX preamble duration. */
+  unsigned _txPreambleDuration;
+  /** Holds the group-call hang time. */
+  unsigned _groupCallHangTime;
+  /** Holds the private-call hang time. */
+  unsigned _privateCallHangTime;
+  /** Holds the low-battery warn interval. */
+  unsigned _lowBatteryWarnInterval;
+  /** If @c true, the call alert-tone is continuous. */
+  bool _callAlertToneContinuous;
+  /** Holds the call alert-tone duration. */
+  unsigned _callAlertToneDuration;
+  /** Holds the lone-worker response time. */
+  unsigned _loneWorkerResponseTime;
+  /** Holds teh lone-worker reminder time. */
+  unsigned _loneWorkerReminderTime;
+  /** Holds the scan hang-time for digital channels. */
+  unsigned _digitalScanHangTime;
+  /** Holds the scan hang-time for analog channels. */
+  unsigned _analogScanHangTime;
+  /** If @c true, the backlight is always on. */
+  bool _backlightAlwaysOn;
+  /** Holds the backlight duration. */
+  unsigned _backlightDuration;
+  /** If @c true, the keypad lock is manual. */
+  bool _keypadLockManual;
+  /** Holds the keypad lock time. */
+  unsigned _keypadLockTime;
+  /** If @c true, the power-on password is enabled. */
+  bool _powerOnPasswordEnabled;
+  /** Holds the power-on password. */
+  unsigned _powerOnPassword;
+  /** If @c true, the radio programming password is enabled. */
+  bool _radioProgPasswordEnabled;
+  /** Holds the radio programming password. */
+  unsigned _radioProgPassword;
+  /** Holds the PC programming password. */
+  QString  _pcProgPassword;
+};
+
+
 /** Groups several extension for TyT devices.
  * @ingroup tyt */
 class TyTConfigExtension: public ConfigExtension
