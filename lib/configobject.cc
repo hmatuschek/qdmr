@@ -168,9 +168,9 @@ ConfigItem::clear() {
     if (! prop.isValid())
       continue;
     if (propIsInstance<ConfigItem>(prop) && prop.isWritable()) {
-      ConfigItem *item = prop.read(this).value<ConfigItem*>();
+      if (ConfigItem *item = prop.read(this).value<ConfigItem*>())
+        item->deleteLater();
       prop.write(this, QVariant::fromValue<ConfigItem*>(nullptr));
-      item->deleteLater();
     } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
       lst->clear();
     }
