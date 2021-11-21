@@ -35,7 +35,7 @@
 
   <refsect1>
     <title>Description</title>
-    <para><command>dmrconf</command> is a command-line tool to programm DMR radios. That is,
+    <para><command>dmrconf</command> is a command-line tool to program DMR radios. That is,
     generating and uploading codeplugs to these radios. To this end, <command>dmrconf</command>
     uses a common human-readable text format to describe the codeplug for all supported radios (see
     below). This allows to share codeplugs between different radios.</para>
@@ -249,7 +249,7 @@
 
   <refsect1>
     <title>Bugs</title>
-    <para>This programm is still under development and may contain bugs that
+    <para>This program is still under development and may contain bugs that
       may cause harm to the radios and may even destroy them. Hence you may
       use this software on your own risk. I you want to have guaranties,
       consider using the CPS (code-plug programming software) supplied with

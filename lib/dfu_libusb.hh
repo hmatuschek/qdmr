@@ -7,7 +7,7 @@
 
 /** This class implements DFU protocol to access radios.
  *
- * Many manufactures use the standardized DFU protocoll to programm codeplugs and update the
+ * Many manufactures use the standardized DFU protocoll to program codeplugs and update the
  * firmware of their radios. This class implements this protocol, see
  * https://www.usb.org/sites/default/files/DFU_1.1.pdf for details.
  *
