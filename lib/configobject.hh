@@ -148,6 +148,10 @@ protected:
 signals:
   /** Gets emitted once the config object is modified. */
   void modified(ConfigItem *obj);
+  /** Gets emitted before clearing the item. */
+  void beginClear();
+  /** Gets emitted after clearing the item. */
+  void endClear();
 };
 
 

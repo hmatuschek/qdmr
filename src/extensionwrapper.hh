@@ -62,6 +62,10 @@ public:
   QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 
 
+protected slots:
+  void onItemClearing();
+  void onItemCleared();
+
 protected:
   ConfigItem *_object;
 };

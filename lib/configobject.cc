@@ -161,6 +161,8 @@ ConfigItem::serialize(const Context &context) {
 
 void
 ConfigItem::clear() {
+  emit beginClear();
+
   // Delete or clear all object owned by properites, that is ConfigObjectList and ConfigObject
   const QMetaObject *meta = metaObject();
   for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
@@ -175,6 +177,8 @@ ConfigItem::clear() {
       lst->clear();
     }
   }
+
+  emit endClear();
 }
 
 bool

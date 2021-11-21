@@ -139,7 +139,10 @@ ExtensionProxy::mapFromSource(const QModelIndex &sourceIndex) const {
 PropertyWrapper::PropertyWrapper(ConfigItem *obj, QObject *parent)
   : QAbstractItemModel(parent), _object(obj)
 {
-  // pass...
+  if (_object) {
+    connect(_object, SIGNAL(beginClear()), this, SLOT(onItemClearing()));
+    connect(_object, SIGNAL(endClear()), this, SLOT(onItemCleared()));
+  }
 }
 
 ConfigItem *
@@ -405,4 +408,14 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
   }
 
   return QVariant();
+}
+
+void
+PropertyWrapper::onItemClearing() {
+  beginResetModel();
+}
+
+void
+PropertyWrapper::onItemCleared() {
+  endResetModel();
 }
