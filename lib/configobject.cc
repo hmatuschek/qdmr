@@ -123,8 +123,50 @@ ConfigItem::ConfigItem(QObject *parent)
 
 bool
 ConfigItem::copy(const ConfigItem &other) {
-  Q_UNUSED(other);
+  // check if other has the same type
+  if (strcmp(other.metaObject()->className(), metaObject()->className())) {
+    logError() << metaObject()->className() << " cannot copy from "
+               << other.metaObject()->className();
+    return false;
+  }
+
+  // clear this instance
   this->clear();
+
+  // Iterate over all properties
+  const QMetaObject *meta = metaObject();
+  for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
+    // This property
+    QMetaProperty prop = meta->property(p);
+    // the same property over at other
+    QMetaProperty oprop = other.metaObject()->property(p);
+
+    // Should never happen
+    if (! prop.isValid())
+      continue;
+    // true if the property is a basic type
+    bool isBasicType = ( prop.isEnumType() || (QVariant::Bool==prop.type()) ||
+                         (QVariant::Int==prop.type()) || (QVariant::UInt==prop.type()) ||
+                         (QVariant::Double==prop.type()) ||(QVariant::String==prop.type()));
+
+    // If a basic type -> simply copy value
+    if (isBasicType && prop.isWritable() && (prop.type()==oprop.type())) {
+      prop.write(this, oprop.read(&other));
+    } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
+      ref->copy(oprop.read(&other).value<ConfigObjectReference*>());
+    } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
+      lst->copy(*oprop.read(&other).value<ConfigObjectList*>());
+    } else if (ConfigObjectRefList *lst = prop.read(this).value<ConfigObjectRefList *>()) {
+      lst->copy(*oprop.read(&other).value<ConfigObjectRefList*>());
+    } else if (propIsInstance<ConfigItem>(prop)) {
+      if (oprop.read(&other).isNull())
+        prop.write(this, QVariant::fromValue<ConfigItem*>(nullptr));
+      else
+        prop.write(this, QVariant::fromValue<ConfigItem*>(
+                     oprop.read(&other).value<ConfigItem*>()->clone()));
+    }
+  }
+
   return true;
 }
 
@@ -800,6 +842,11 @@ AbstractConfigObjectList::moveDown(int first, int last) {
   return true;
 }
 
+const QMetaObject &
+AbstractConfigObjectList::elementType() const {
+  return _elementType;
+}
+
 void
 AbstractConfigObjectList::onElementModified(ConfigItem *obj) {
   int idx = indexOf(obj->as<ConfigObject>());
@@ -935,6 +982,15 @@ ConfigObjectList::clear() {
   AbstractConfigObjectList::clear();
   for (int i=0; i<items.count(); i++)
     items[i]->deleteLater();
+}
+
+bool
+ConfigObjectList::copy(const AbstractConfigObjectList &other) {
+  this->clear();
+  _elementType = other.elementType();
+  for (int i=0; i<other.count(); i++)
+    add(other.get(i)->clone()->as<ConfigObject>());
+  return true;
 }
 
 

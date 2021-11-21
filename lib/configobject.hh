@@ -308,6 +308,7 @@ public:
   bool take(ConfigObject *obj);
   bool del(ConfigObject *obj);
   void clear();
+  bool copy(const AbstractConfigObjectList &other);
 
   /** Allocates a member objects for the given YAML node. */
   virtual ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
