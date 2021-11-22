@@ -78,7 +78,6 @@ public:
   /** Default constructor. */
   Q_INVOKABLE explicit TyTChannelExtension(QObject *parent=nullptr);
 
-  bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
   /** Returns @c true if the lone worker feature is enabled. */
@@ -214,7 +213,6 @@ public:
   /** Default constructor. */
   Q_INVOKABLE explicit TyTScanListExtension(QObject *parent=nullptr);
 
-  bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
   /** Returns the hold time in ms. */
@@ -295,7 +293,6 @@ public:
   /** Constructor. */
   Q_INVOKABLE explicit TyTButtonSettings(QObject *parent=nullptr);
 
-  bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
   /** Returns the action for the side button 1 short-press. */
@@ -420,7 +417,6 @@ public:
   /** Default constructor. */
   Q_INVOKABLE explicit TyTSettingsExtension(QObject *parent=nullptr);
 
-  bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
   /** Returns the monitor type. */
@@ -641,7 +637,6 @@ public:
   /** Constructor. Also allocates all associates extensions. */
   Q_INVOKABLE explicit TyTConfigExtension(QObject *parent=nullptr);
 
-  bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
   /** Returns the button settings extension for TyT devices. */

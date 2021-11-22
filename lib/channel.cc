@@ -51,35 +51,12 @@ Channel::copy(const ConfigItem &other) {
   if ((nullptr == c) || (! ConfigObject::copy(other)))
     return false;
 
-  setRXFrequency(c->rxFrequency());
-  setTXFrequency(c->txFrequency());
-
   if (c->defaultPower())
     setDefaultPower();
-  else
-    setPower(c->power());
-
   if (c->defaultTimeout())
     setDefaultTimeout();
-  else
-    setTimeout(c->timeout());
-
-  setRXOnly(c->rxOnly());
-
   if (c->defaultVOX())
     setVOXDefault();
-  else
-    setVOX(c->vox());
-
-  _scanlist.copy(c->scanList());
-
-  if (c->openGD77ChannelExtension())
-    setOpenGD77ChannelExtension(
-          c->openGD77ChannelExtension()->clone()->as<OpenGD77ChannelExtension>());
-
-  if (c->tytChannelExtension())
-    setTyTChannelExtension(
-          c->tytChannelExtension()->clone()->as<TyTChannelExtension>());
 
   return true;
 }
@@ -389,15 +366,8 @@ AnalogChannel::copy(const ConfigItem &other) {
   if ((nullptr==c) || (! Channel::copy(other)))
     return false;
 
-  setAdmit(c->admit());
   if (c->defaultSquelch())
     setSquelchDefault();
-  else
-    setSquelch(c->squelch());
-  setRXTone(c->rxTone());
-  setTXTone(c->txTone());
-  setBandwidth(c->bandwidth());
-  _aprsSystem.copy(c->aprs());
 
   return true;
 }
@@ -652,24 +622,6 @@ DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
   connect(&_posSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_roaming, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_radioId, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-}
-
-bool
-DigitalChannel::copy(const ConfigItem &other) {
-  const DigitalChannel *c = other.as<DigitalChannel>();
-  if ((nullptr == c) || (! Channel::copy(other)))
-    return false;
-
-  setAdmit(c->admit());
-  setColorCode(c->colorCode());
-  setTimeSlot(c->timeSlot());
-  _rxGroup.copy(c->groupList());
-  _txContact.copy(c->contact());
-  _posSystem.copy(c->aprs());
-  _roaming.copy(c->roaming());
-  _radioId.copy(c->radioId());
-
-  return true;
 }
 
 void

@@ -38,14 +38,6 @@ RXGroupList::operator =(const RXGroupList &other) {
   return *this;
 }
 
-bool
-RXGroupList::copy(const ConfigItem &other) {
-  const RXGroupList *l = other.as<RXGroupList>();
-  if ((nullptr == l) || (!ConfigObject::copy(other)))
-    return false;
-  return _contacts.copy(l->_contacts);
-}
-
 ConfigItem *
 RXGroupList::clone() const {
   RXGroupList *lst = new RXGroupList();

@@ -28,7 +28,6 @@ public:
 
   /** Copy from other group list. */
   RXGroupList &operator =(const RXGroupList &other);
-  bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
   /** Returns the number of contacts within the group list. */

@@ -15,33 +15,6 @@ TyTChannelExtension::TyTChannelExtension(QObject *parent)
   // pass...
 }
 
-bool
-TyTChannelExtension::copy(const ConfigItem &other) {
-  const TyTChannelExtension *ex = other.as<TyTChannelExtension>();
-  if ((nullptr == ex) || (! ConfigExtension::copy(other)))
-    return false;
-
-  enableLoneWorker(ex->loneWorker());
-  enableAutoScan(ex->autoScan());
-  enableTalkaround(ex->talkaround());
-  enableDataCallConfirmed(ex->dataCallConfirmed());
-  enablePrivateCallConfirmed(ex->privateCallConfirmed());
-  enableEmergencyAlarmConfirmed(ex->emergencyAlarmConfirmed());
-  enableDisplayPTTId(ex->displayPTTId());
-  setRXRefFrequency(ex->rxRefFrequency());
-  setTXRefFrequency(ex->txRefFrequency());
-  enableTightSquelch(ex->tightSquelch());
-  enableCompressedUDPHeader(ex->compressedUDPHeader());
-  enableReverseBurst(ex->reverseBurst());
-  setKillTone(ex->killTone());
-  setInCallCriterion(ex->inCallCriterion());
-  enableAllowInterrupt(ex->allowInterrupt());
-  enableDCDM(ex->dcdm());
-  enableDCDMLeader(ex->dcdmLeader());
-
-  return true;
-}
-
 ConfigItem *
 TyTChannelExtension::clone() const {
   TyTChannelExtension *ex = new TyTChannelExtension();
@@ -276,18 +249,6 @@ TyTScanListExtension::TyTScanListExtension(QObject *parent)
   // pass...
 }
 
-bool
-TyTScanListExtension::copy(const ConfigItem &other) {
-  const TyTScanListExtension *ex = other.as<TyTScanListExtension>();
-  if ((nullptr==ex) || (!ConfigExtension::copy(other)))
-    return false;
-
-  setHoldTime(ex->holdTime());
-  setPrioritySampleTime(ex->prioritySampleTime());
-
-  return true;
-}
-
 ConfigItem *
 TyTScanListExtension::clone() const {
   TyTScanListExtension *ex = new TyTScanListExtension();
@@ -343,19 +304,6 @@ TyTButtonSettings::TyTButtonSettings(QObject *parent)
   _sideButton2Short = MonitorToggle;
   _sideButton2Long  = Disabled;
   _longPressDuration = 1000;
-}
-
-bool
-TyTButtonSettings::copy(const ConfigItem &other) {
-  const TyTButtonSettings *ex = other.as<TyTButtonSettings>();
-  if ((nullptr==ex) || (!ConfigExtension::copy(other)))
-    return false;
-  _sideButton1Short = ex->_sideButton1Short;
-  _sideButton1Long = ex->_sideButton1Long;
-  _sideButton2Short = ex->_sideButton2Short;
-  _sideButton2Long = ex->_sideButton2Long;
-  _longPressDuration = ex->_longPressDuration;
-  return true;
 }
 
 ConfigItem *
@@ -439,45 +387,6 @@ TyTSettingsExtension::TyTSettingsExtension(QObject *parent)
     _pcProgPassword("")
 {
   // pass...
-}
-
-bool
-TyTSettingsExtension::copy(const ConfigItem &other)
-{
-  const TyTSettingsExtension *ex = other.as<TyTSettingsExtension>();
-  if ((nullptr==ex) || (!ConfigExtension::copy(other)))
-    return false;
-
-  setMonitorType(ex->monitorType());
-  disableAllLEDs(ex->allLEDsDisabled());
-  enableTalkPermitToneDigital(ex->talkPermitToneDigital());
-  enableTalkPermitToneAnalog(ex->talkPermitToneAnalog());
-  enablePasswordAndLock(ex->passwordAndLock());
-  enableChannelFreeIndicationTone(ex->channelFreeIndicationTone());
-  disableAllTones(ex->allTonesDisabled());
-  enableSaveModeRX(ex->saveModeRX());
-  enableSavePreamble(ex->savePreamble());
-  enableBootPicture(ex->bootPicture());
-  setTXPreambleDuration(ex->txPreambleDuration());
-  setGroupCallHangTime(ex->groupCallHangTime());
-  setLowBatteryWarnInterval(ex->lowBatteryWarnInterval());
-  enableCallAlertToneContinuous(ex->callAlertToneContinuous());
-  setCallAlertToneDuration(ex->callAlertToneDuration());
-  setLoneWorkerResponseTime(ex->loneWorkerResponseTime());
-  setLoneWorkerReminderTime(ex->loneWorkerReminderTime());
-  setDigitalScanHangTime(ex->digitalScanHangTime());
-  setAnalogScanHangTime(ex->analogScanHangTime());
-  enableBacklightAlwaysOn(ex->backlightAlwaysOn());
-  setBacklightDuration(ex->backlightDuration());
-  enableKeypadLockManual(ex->keypadLockManual());
-  setKeypadLockTime(ex->keypadLockTime());
-  enablePowerOnPassword(ex->powerOnPasswordEnabled());
-  setPowerOnPassword(ex->powerOnPassword());
-  enableRadioProgPassword(ex->radioProgPasswordEnabled());
-  setRadioProgPassword(ex->radioProgPassword());
-  setPCProgPassword(ex->pcProgPassword());
-
-  return true;
 }
 
 ConfigItem *
@@ -849,14 +758,6 @@ TyTConfigExtension::TyTConfigExtension(QObject *parent)
   : ConfigExtension(parent), _buttonSettings(new TyTButtonSettings(this))
 {
   // Pass...
-}
-
-bool
-TyTConfigExtension::copy(const ConfigItem &other) {
-  const TyTConfigExtension *ex = other.as<TyTConfigExtension>();
-  if ((nullptr==ex) || (!ConfigExtension::copy(other)))
-    return false;
-  return _buttonSettings->copy(*_buttonSettings);
 }
 
 ConfigItem *

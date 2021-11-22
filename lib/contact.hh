@@ -30,7 +30,6 @@ protected:
   Contact(const QString &name, bool ring=true, QObject *parent=nullptr);
 
 public:
-  bool copy(const ConfigItem &other);
   void clear();
 
 public:
@@ -88,7 +87,6 @@ public:
    * @param parent Specifies the QObject parent. */
   DTMFContact(const QString &name, const QString &number, bool ring=false, QObject *parent=nullptr);
 
-  bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
   void clear();
 
@@ -140,7 +138,6 @@ public:
    * @param parent Specifies the QObject parent. */
   DigitalContact(Type type, const QString &name, unsigned number, bool ring=false, QObject *parent=nullptr);
 
-  bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
   void clear();
 

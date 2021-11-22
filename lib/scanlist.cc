@@ -40,18 +40,6 @@ ScanList::operator =(const ScanList &other) {
   return *this;
 }
 
-bool
-ScanList::copy(const ConfigItem &other) {
-  const ScanList *list = other.as<ScanList>();
-  if ((nullptr == list) || (! ConfigObject::copy(other)))
-    return false;
-  _primary.set(list->primaryChannel());
-  _secondary.set(list->secondaryChannel());
-  _revert.set(list->revertChannel());
-  _channels.copy(list->_channels);
-  return true;
-}
-
 ConfigItem *
 ScanList::clone() const {
   ScanList *list = new ScanList();

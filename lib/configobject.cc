@@ -142,8 +142,11 @@ ConfigItem::copy(const ConfigItem &other) {
     QMetaProperty oprop = other.metaObject()->property(p);
 
     // Should never happen
-    if (! prop.isValid())
+    if (! prop.isValid()) {
+      logWarn() << "Invalid property " << prop.name() << ". This should not happen.";
       continue;
+    }
+
     // true if the property is a basic type
     bool isBasicType = ( prop.isEnumType() || (QVariant::Bool==prop.type()) ||
                          (QVariant::Int==prop.type()) || (QVariant::UInt==prop.type()) ||
@@ -151,19 +154,63 @@ ConfigItem::copy(const ConfigItem &other) {
 
     // If a basic type -> simply copy value
     if (isBasicType && prop.isWritable() && (prop.type()==oprop.type())) {
-      prop.write(this, oprop.read(&other));
+      if (! prop.write(this, oprop.read(&other))) {
+        logError() << "Cannot set property '" << prop.name() << "' of "
+                   << this->metaObject()->className() << ".";
+        return false;
+      }
     } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
-      ref->copy(oprop.read(&other).value<ConfigObjectReference*>());
+      if (! ref->copy(oprop.read(&other).value<ConfigObjectReference*>())) {
+        logError() << "Cannot copy object reference '" << prop.name() << "' of "
+                   << this->metaObject()->className() << ".";
+        return false;
+      }
     } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
-      lst->copy(*oprop.read(&other).value<ConfigObjectList*>());
+      if (! lst->copy(*oprop.read(&other).value<ConfigObjectList*>())) {
+        logError() << "Cannot copy object list '" << prop.name() << "' of "
+                   << this->metaObject()->className() << ".";
+        return false;
+      }
     } else if (ConfigObjectRefList *lst = prop.read(this).value<ConfigObjectRefList *>()) {
-      lst->copy(*oprop.read(&other).value<ConfigObjectRefList*>());
+      if (! lst->copy(*oprop.read(&other).value<ConfigObjectRefList*>())) {
+        logError() << "Cannot copy reference list '" << prop.name() << "' of "
+                   << this->metaObject()->className() << ".";
+        return false;
+      }
     } else if (propIsInstance<ConfigItem>(prop)) {
-      if (oprop.read(&other).isNull())
-        prop.write(this, QVariant::fromValue<ConfigItem*>(nullptr));
-      else
-        prop.write(this, QVariant::fromValue<ConfigItem*>(
-                     oprop.read(&other).value<ConfigItem*>()->clone()));
+      // If the item is owned by this item
+      if (prop.isWritable()) {
+        // If the owned item is writeable -> clone if set in other
+        if (oprop.read(&other).isNull()) {
+          if (! prop.write(this, QVariant::fromValue<ConfigItem*>(nullptr))) {
+            logError() << "Cannot delete item '" << prop.name() << "' of "
+                       << this->metaObject()->className() << ".";
+            return false;
+          }
+        } else {
+          // Clone element form other item
+          ConfigItem *cl = oprop.read(&other).value<ConfigItem*>()->clone();
+          if (nullptr == cl) {
+            logError() << "Cannot clone item '" << oprop.name() << "' of "
+                       << other.metaObject()->className() << ".";
+            return false;
+          }
+          // Write clone
+          if (! prop.write(this, QVariant::fromValue<ConfigItem*>(cl))) {
+            logError() << "Cannot replace item '" << prop.name() << "' of "
+                       << this->metaObject()->className() << ".";
+            cl->deleteLater();
+            return false;
+          }
+        }
+      } else if (! oprop.read(&other).isNull()) {
+        // If the owned item is not writable (must be present) -> copy from other if set
+        if (! prop.read(this).value<ConfigItem*>()->copy(*oprop.read(&other).value<ConfigItem*>())) {
+          logError() << "Cannot copy fixed item '" << prop.name() << "' of "
+                     << this->metaObject()->className() << ".";
+          return false;
+        }
+      }
     }
   }
 
@@ -616,15 +663,6 @@ ConfigObject::ConfigObject(const QString &name, const QString &idBase, QObject *
   // pass...
 }
 
-bool
-ConfigObject::copy(const ConfigItem &other) {
-  const ConfigObject *o = other.as<ConfigObject>();
-  if ((nullptr == o) || (!ConfigItem::copy(other)))
-    return false;
-  _name = o->_name;
-  return true;
-}
-
 const QString &
 ConfigObject::name() const {
   return _name;
@@ -709,11 +747,6 @@ ConfigExtension::ConfigExtension(QObject *parent)
   : ConfigItem(parent)
 {
   // pass...
-}
-
-bool
-ConfigExtension::copy(const ConfigItem &other) {
-  return ConfigItem::copy(other);
 }
 
 bool

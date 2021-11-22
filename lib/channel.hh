@@ -339,7 +339,6 @@ public:
   /** Copy constructor. */
   DigitalChannel(const DigitalChannel &other, QObject *parent=nullptr);
 
-  bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
   void clear();
 

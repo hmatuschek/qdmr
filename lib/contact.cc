@@ -19,15 +19,6 @@ Contact::Contact(const QString &name, bool rxTone, QObject *parent)
   // pass...
 }
 
-bool
-Contact::copy(const ConfigItem &other) {
-  const Contact *c = other.as<Contact>();
-  if ((nullptr == c) || (! ConfigObject::copy(other)))
-    return false;
-  _ring = c->_ring;
-  return true;
-}
-
 void
 Contact::clear() {
   ConfigObject::clear();
@@ -88,15 +79,6 @@ DTMFContact::DTMFContact(const QString &name, const QString &number, bool rxTone
   // pass...
 }
 
-bool
-DTMFContact::copy(const ConfigItem &other) {
-  const DTMFContact *c = other.as<DTMFContact>();
-  if ((nullptr == c) || (! Contact::copy(other)))
-    return false;
-  _number = c->_number;
-  return true;
-}
-
 ConfigItem *
 DTMFContact::clone() const {
   DTMFContact *c = new DTMFContact();
@@ -152,21 +134,6 @@ DigitalContact::DigitalContact(Type type, const QString &name, unsigned number, 
   : Contact(name, rxTone, parent), _type(type), _number(number), _openGD77(nullptr)
 {
   // pass...
-}
-
-bool
-DigitalContact::copy(const ConfigItem &other) {
-  const DigitalContact *c = other.as<DigitalContact>();
-  if ((nullptr == c) || (!Contact::copy(other)))
-    return false;
-  _type = c->_type;
-  _number = c->_number;
-
-  if (c->openGD77ContactExtension())
-    setOpenGD77ContactExtension(
-          c->openGD77ContactExtension()->clone()->as<OpenGD77ContactExtension>());
-
-  return true;
 }
 
 ConfigItem *

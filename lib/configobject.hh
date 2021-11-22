@@ -33,7 +33,7 @@ bool propIsInstance(QMetaProperty &prop) {
 
 /** Base class for all configuration objects (channels, zones, contacts, etc).
  *
- * @ingroup config */
+ * @ingroup conf */
 class ConfigItem : public QObject
 {
   Q_OBJECT
@@ -177,10 +177,6 @@ protected:
   ConfigObject(const QString &name, const QString &idBase="id", QObject *parent = nullptr);
 
 public:
-  /** Copies the given object into this. */
-  virtual bool copy(const ConfigItem &other);
-
-public:
   /** Returns the name of the object. */
   virtual const QString &name() const;
   /** Sets the name of the object. */
@@ -212,9 +208,6 @@ Q_OBJECT
 protected:
   /** Hidden constructor. */
   explicit ConfigExtension(QObject *parent=nullptr);
-
-public:
-  bool copy(const ConfigItem &other);
 
 protected:
   bool populate(YAML::Node &node, const ConfigObject::Context &context);

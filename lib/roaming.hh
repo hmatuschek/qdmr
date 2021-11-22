@@ -29,7 +29,6 @@ public:
 
   /** Copies the given zone. */
   RoamingZone &operator =(const RoamingZone &other);
-  bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
   /** Returns the number of zones. */

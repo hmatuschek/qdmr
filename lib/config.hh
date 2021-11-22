@@ -1,12 +1,39 @@
 /** @defgroup conf Common codeplug configuration
  * This module collects all classes that represent the general configuration for all DMR codeplugs.
  *
- * To this end, it aims at covering the important features for ham radio applications but ignoring
- * all features that are more related to "professional" applications of these radios.
+ * To this end, it aims at covering the important features for ham radio applications.
+ * All features that are more related to "professional" applications and are specific to each radio,
+ * are implemented by so-called extensions, see @c ConfigExtension. The central class for the
+ * abstract configuration is @c Config, this class represents a complete configuration a.k.a.
+ * codeplug of a radio. It contains all the information being programmed into the radio irrespective
+ * of the model and manufacturer.
  *
- * The central class is @c Config, this class represents a complete configuration a.k.a. codeplug
- * of a radio. It contains all the information being programmed into the radio irrespective of the
- * model and manufacturer. */
+ * The entire configuration (abstract, device independent codeplug) consists of a tree of
+ * @c ConfigItem instances. This class forms the base-class of all elmenets in the configuration
+ * (excluding lists etc.). Each @c ConfigItem may have a set of properties. These properties are
+ * used to implement the majority of the common functionality concerning the abstract codeplug.
+ * These are
+ *   - Copying & cloning of elements of the configuration.
+ *   - Labeling of codeplug objects (eveything that has an ID for cross referencing).
+ *   - Serialzation into YAML (all properties are serialized into YAML automatically if not
+ *     prevented by marking the property as not @c SCRIPTABLE).
+ *   - Parsing of YAML codeplugs (automatic property parsing can be disabled on a per-property
+ *     bassis by marking it as not @c SCRIPTABLE).
+ *   - Generic editing of the properties in the GUI.
+ *   .
+ * To this end, the creation of codeplug extensions is pretty easy, as only the properties for the
+ * extension must be defined. The rest is taken care of by the default implementation of the
+ * @c ConfigItem::copy, @c ConfigItem::clone, @c ConfigItem::label, @c ConfigItem::serialize,
+ * @c ConfigItem::parse and @c ConfigItem::link methods. It is not neccessary to override any of
+ * these methods if there is a one-to-one mapping between the property and its YAML representation.
+ *
+ * Frequently, however, it is neccessary to represent a property in a different way in YAML. This
+ * is usually true if a property may hold different specializations of a common type. For example
+ * the channel list may hold analog and digital channels. In YAML, the type is specified explicitly
+ * as an enclosing map. This structure is not a one-to-one representation of the actual property
+ * (the channel list) to the YAML format. In these cases, the @c ConfigItem::parse and
+ * @c ConfigItem::link method might be overridden to implement this.
+ */
 
 #ifndef CONFIG_HH
 #define CONFIG_HH

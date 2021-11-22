@@ -38,18 +38,6 @@ Zone::operator =(const Zone &other) {
   return *this;
 }
 
-bool
-Zone::copy(const ConfigItem &other) {
-  const Zone *z = other.as<Zone>();
-  if ((nullptr == z) || (! ConfigObject::copy(other)))
-    return false;
-
-  _A.copy(z->_A);
-  _B.copy(z->_B);
-
-  return true;
-}
-
 ConfigItem *
 Zone::clone() const {
   Zone *z = new Zone();

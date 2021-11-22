@@ -39,7 +39,6 @@ public:
   /** Constructor. */
   Q_INVOKABLE explicit OpenGD77ChannelExtension(QObject *parent=nullptr);
 
-  bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
   /** Returns the power settings for the channel. */
@@ -54,6 +53,7 @@ protected:
   /** Holds the power setting. */
   Power _power;
 };
+
 
 /** Implements the contact extensions for the OpenGD77 radios.
  * @since 0.9.0
@@ -78,7 +78,6 @@ public:
   /** Constructor. */
   Q_INVOKABLE explicit OpenGD77ContactExtension(QObject *parent=nullptr);
 
-  bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
   /** Returns the time slot override. */

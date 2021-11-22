@@ -24,15 +24,6 @@ PositioningSystem::~PositioningSystem() {
   // pass...
 }
 
-bool
-PositioningSystem::copy(const ConfigItem &other) {
-  const PositioningSystem *s = other.as<PositioningSystem>();
-  if ((nullptr==s) || (! ConfigObject::copy(other)))
-    return false;
-  _period = s->_period;
-  return true;
-}
-
 unsigned
 PositioningSystem::period() const {
   return _period;
@@ -124,16 +115,6 @@ GPSSystem::GPSSystem(const QString &name, DigitalContact *contact,
   // Connect signals
   connect(&_contact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_revertChannel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-}
-
-bool
-GPSSystem::copy(const ConfigItem &other) {
-  const GPSSystem *sys = other.as<GPSSystem>();
-  if ((nullptr == sys) || (! PositioningSystem::copy(other)))
-    return false;
-  _contact.copy(sys->contact());
-  _revertChannel.copy(sys->revert());
-  return true;
 }
 
 ConfigItem *
@@ -244,14 +225,11 @@ APRSSystem::copy(const ConfigItem &other) {
   const APRSSystem *sys = other.as<APRSSystem>();
   if ((nullptr == sys) || (! PositioningSystem::copy(other)))
     return false;
-  _channel.copy(sys->revert());
   _destination = sys->destination();
   _destSSID = sys->_destSSID;
   _source = sys->_source;
   _srcSSID = sys->_srcSSID;
   _path = sys->_path;
-  _icon = sys->_icon;
-  _message = sys->_message;
   return true;
 }
 

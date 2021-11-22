@@ -17,15 +17,6 @@ RadioID::RadioID(const QString &name, uint32_t id, QObject *parent)
   // pass...
 }
 
-bool
-RadioID::copy(const ConfigItem &other) {
-  const RadioID *oid = other.as<RadioID>();
-  if ((nullptr == oid) || (! ConfigObject::copy(other)))
-    return false;
-  _number = oid->_number;
-  return true;
-}
-
 ConfigItem *
 RadioID::clone() const {
   RadioID *id = new RadioID();

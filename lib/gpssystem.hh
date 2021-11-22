@@ -34,8 +34,6 @@ public:
   /** Destructor. */
   virtual ~PositioningSystem();
 
-  bool copy(const ConfigItem &other);
-
   /** Returns the update period in seconds. */
   unsigned period() const;
   /** Sets the update period in seconds. */
@@ -87,7 +85,6 @@ public:
             DigitalChannel *revertChannel = nullptr, unsigned period=300,
             QObject *parent = nullptr);
 
-  bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
   /** Returns @c true if a contact is set for the GPS system. */

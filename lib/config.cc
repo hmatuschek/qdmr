@@ -55,6 +55,7 @@ Config::copy(const ConfigItem &other) {
   const Config *conf = other.as<Config>();
   if ((nullptr==conf) || (! ConfigItem::copy(other)))
     return false;
+
   _settings->copy(*conf->settings());
   _radioIDs->copy(*conf->radioIDs());
   _contacts->copy(*conf->contacts());
@@ -64,8 +65,7 @@ Config::copy(const ConfigItem &other) {
   _scanlists->copy(*conf->scanlists());
   _gpsSystems->copy(*conf->posSystems());
   _roaming->copy(*conf->roaming());
-  if (conf->tytExtension())
-    setTyTExtension(conf->tytExtension()->clone()->as<TyTConfigExtension>());
+
   return true;
 }
 

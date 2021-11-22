@@ -24,14 +24,6 @@ RoamingZone::operator =(const RoamingZone &other) {
   return *this;
 }
 
-bool
-RoamingZone::copy(const ConfigItem &other) {
-  const RoamingZone *z = other.as<RoamingZone>();
-  if ((nullptr==z) || (! ConfigObject::copy(other)))
-    return false;
-  return _channel.copy(z->_channel);
-}
-
 ConfigItem *
 RoamingZone::clone() const {
   RoamingZone *z = new RoamingZone();

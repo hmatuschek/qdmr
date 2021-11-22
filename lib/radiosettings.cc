@@ -12,23 +12,10 @@ RadioSettings::copy(const ConfigItem &other) {
   const RadioSettings *set = other.as<RadioSettings>();
   if ((nullptr==set) || (!ConfigItem::copy(other)))
     return false;
-  _introLine1 = set->introLine1();
-  _introLine2 = set->introLine2();
-  _micLevel = set->micLevel();
-  _speech = set->speech();
-  _power = set->power();
   if (set->voxDisabled())
     disableVOX();
-  else
-    setVOX(set->vox());
   if (set->totDisabled())
     disableTOT();
-  else
-    setTOT(set->tot());
-
-  if (set->tytExtension())
-    setTyTExtension(set->tytExtension()->clone()->as<TyTSettingsExtension>());
-
   return true;
 }
 
