@@ -376,13 +376,13 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
   } else if (Qt::ToolTipRole == role) {
     if (propIsInstance<ConfigItem>(prop)) {
       ConfigItem *item = prop.read(pobj).value<ConfigItem*>();
-      if (item && item->hasLongDescription()) {
+      if (item && item->hasLongDescription())
         return item->longDescription();
-      }
     }
-    if (pobj->hasLongDescription(prop)) {
+    if (pobj->hasLongDescription(prop))
       return pobj->longDescription(prop);
-    }
+    if (pobj->hasDescription(prop))
+      return pobj->description(prop);
     return QVariant();
   }
 

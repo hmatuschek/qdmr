@@ -1500,8 +1500,8 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
     enablePasswdAndLock(ex->passwordAndLock());
     setChFreeIndicationTone(ex->channelFreeIndicationTone());
     disableAllTones(ex->allTonesDisabled());
-    setSaveModeRX(ex->saveModeRX());
-    setSavePreamble(ex->savePreamble());
+    setSaveModeRX(ex->powerSaveMode());
+    setSavePreamble(ex->wakeupPreamble());
     enableIntroPicture(ex->bootPicture());
     setTXPreambleDuration(ex->txPreambleDuration());
     setGroupCallHangTime(ex->groupCallHangTime());
@@ -1562,8 +1562,8 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   ex->enablePasswordAndLock(passwdAndLock());
   ex->enableChannelFreeIndicationTone(chFreeIndicationTone());
   ex->disableAllTones(allTonesDisabled());
-  ex->enableSaveModeRX(saveModeRX());
-  ex->enableSavePreamble(savePreamble());
+  ex->enablePowerSaveMode(saveModeRX());
+  ex->enableWakeupPreamble(savePreamble());
   ex->enableBootPicture(introPicture());
   ex->setTXPreambleDuration(txPreambleDuration());
   ex->setGroupCallHangTime(groupCallHangTime());

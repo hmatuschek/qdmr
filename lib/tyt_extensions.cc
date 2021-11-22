@@ -377,8 +377,8 @@ TyTButtonSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node,
 TyTSettingsExtension::TyTSettingsExtension(QObject *parent)
   : ConfigExtension(parent), _monitorType(MonitorType::Open), _allLEDsDisabled(false),
     _talkPermitToneDigital(false), _talkPermitToneAnalog(false), _passwdAndLock(false),
-    _channelFreeIndicationTone(true), _allTonesDisabled(false), _saveModeRX(true),
-    _savePreamble(true), _bootPicture(true), _txPreambleDuration(600), _groupCallHangTime(3000),
+    _channelFreeIndicationTone(true), _allTonesDisabled(false), _powerSaveMode(true),
+    _wakeupPreamble(true), _bootPicture(true), _txPreambleDuration(600), _groupCallHangTime(3000),
     _lowBatteryWarnInterval(120), _callAlertToneContinuous(false), _callAlertToneDuration(0),
     _loneWorkerResponseTime(1), _loneWorkerReminderTime(10), _digitalScanHangTime(1000),
     _analogScanHangTime(1000), _backlightAlwaysOn(false), _backlightDuration(10),
@@ -485,26 +485,26 @@ TyTSettingsExtension::disableAllTones(bool disable) {
 }
 
 bool
-TyTSettingsExtension::saveModeRX() const {
-  return _saveModeRX;
+TyTSettingsExtension::powerSaveMode() const {
+  return _powerSaveMode;
 }
 void
-TyTSettingsExtension::enableSaveModeRX(bool enable) {
-  if (_saveModeRX == enable)
+TyTSettingsExtension::enablePowerSaveMode(bool enable) {
+  if (_powerSaveMode == enable)
     return;
-  _saveModeRX = enable;
+  _powerSaveMode = enable;
   emit modified(this);
 }
 
 bool
-TyTSettingsExtension::savePreamble() const {
-  return _savePreamble;
+TyTSettingsExtension::wakeupPreamble() const {
+  return _wakeupPreamble;
 }
 void
-TyTSettingsExtension::enableSavePreamble(bool enable) {
-  if (_savePreamble == enable)
+TyTSettingsExtension::enableWakeupPreamble(bool enable) {
+  if (_wakeupPreamble == enable)
     return;
-  _savePreamble = enable;
+  _wakeupPreamble = enable;
   emit modified(this);
 }
 

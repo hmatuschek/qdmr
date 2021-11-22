@@ -356,10 +356,18 @@ class TyTSettingsExtension: public ConfigExtension
   Q_PROPERTY(bool channelFreeIndicationTone READ channelFreeIndicationTone WRITE enableChannelFreeIndicationTone)
   /** If @c true, all tones are disabled. */
   Q_PROPERTY(bool allTonesDisabled READ allTonesDisabled WRITE disableAllTones)
-  /** If @c true, the save-mode RX is enabled. */
-  Q_PROPERTY(bool saveModeRX READ saveModeRX WRITE enableSaveModeRX)
-  /** If @c true, the save preamble is enabled. */
-  Q_PROPERTY(bool savePreamble READ savePreamble WRITE enableSavePreamble)
+  /** If @c true, the power save mode is enabled. */
+  Q_PROPERTY(bool powerSaveMode READ powerSaveMode WRITE enablePowerSaveMode)
+  Q_CLASSINFO("powerSaveModeDescription", "Puts the radio into sleep-mode when idle.")
+  Q_CLASSINFO("powerSaveModeLongDescription",
+              "When enabled, the radio enters a sleep mode when idle. That is, when on receive and "
+              "there is no activity on the current channel. However, the radio may need some time "
+              "to wake up from this mode. Hence, the 'wakeupPreamble' need to be enabled by all "
+              "radios in the network to provide this wake-up delay.")
+  /** If @c true, a wakeup preamble is send. */
+  Q_PROPERTY(bool wakeupPreamble READ wakeupPreamble WRITE enableWakeupPreamble)
+  Q_CLASSINFO("wakeupPreambleDescription", "If enabled, the radio will transmit a short wake-up "
+              "preamble before each call.")
   /** If @c true, a picture is shown during boot. */
   Q_PROPERTY(bool bootPicture READ bootPicture WRITE enableBootPicture)
   /** The transmit preamble duration in ms. */
@@ -454,15 +462,15 @@ public:
   /** Disables all tones. */
   void disableAllTones(bool disable);
 
-  /** Returns @c true if the save mode RX is enabled. */
-  bool saveModeRX() const;
-  /** Enables the RX save-mode. */
-  void enableSaveModeRX(bool enable);
+  /** Returns @c true if the power save mode is enabled. */
+  bool powerSaveMode() const;
+  /** Enables the power save mode. */
+  void enablePowerSaveMode(bool enable);
 
-  /** Returns @c true if the preamble is saved. */
-  bool savePreamble() const;
-  /** Enables preamble save. */
-  void enableSavePreamble(bool enable);
+  /** Returns @c true if the wake-up preamble is send. */
+  bool wakeupPreamble() const;
+  /** Enables transmission of wakeup preamble. */
+  void enableWakeupPreamble(bool enable);
 
   /** Returns @c true if a picture is shown during boot. */
   bool bootPicture() const;
@@ -577,10 +585,10 @@ protected:
   bool _channelFreeIndicationTone;
   /** If @c true, all tones are disabled. */
   bool _allTonesDisabled;
-  /** If @c true, the save-mode RX is enabled. */
-  bool _saveModeRX;
-  /** If @c true the preamble is saved. */
-  bool _savePreamble;
+  /** If @c true, the power save mode is enabled. */
+  bool _powerSaveMode;
+  /** If @c true, the wake-up preamble is send. */
+  bool _wakeupPreamble;
   /** If @c true the boot picture is enabled. */
   bool _bootPicture;
   /** Holds the TX preamble duration. */
