@@ -25,8 +25,10 @@ QWidget *
 PropertyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
   const PropertyWrapper *model = getModel(index.model());
   QMetaProperty prop = model->propertyAt(index);
+
   if (! prop.isValid())
     return nullptr;
+
   // Dispatch by type
   if (prop.isEnumType()) {
     return new QComboBox(parent);

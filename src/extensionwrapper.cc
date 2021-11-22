@@ -224,9 +224,9 @@ PropertyWrapper::createInstanceAt(const QModelIndex &item) {
   prop.write(obj, QVariant::fromValue(ext));
   endInsertRows();
   emit dataChanged(index(item.row(), 0, item.parent()),
-                   index(item.row(), 1, item.parent()));
+                   index(item.row(), 2, item.parent()));
   emit dataChanged(index(0, 0, item),
-                   index(ext->metaObject()->propertyCount(),1, item));
+                   index(ext->metaObject()->propertyCount(),2, item));
   return true;
 }
 
@@ -308,7 +308,7 @@ PropertyWrapper::rowCount(const QModelIndex &parent) const {
 int
 PropertyWrapper::columnCount(const QModelIndex &parent) const {
   Q_UNUSED(parent)
-  return 2;
+  return 3;
 }
 
 Qt::ItemFlags
@@ -319,7 +319,7 @@ PropertyWrapper::flags(const QModelIndex &index) const {
     return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
   }
 
-  if (prop.isWritable())
+  if (prop.isWritable() && (1 == index.column()))
     return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren;
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
 }
@@ -346,6 +346,7 @@ PropertyWrapper::headerData(int section, Qt::Orientation orientation, int role) 
   switch (section) {
   case 0: return tr("Property");
   case 1: return tr("Value");
+  case 2: return tr("Description");
   default: break;
   }
   // default
@@ -359,8 +360,31 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
 
   ConfigItem *pobj = parentObject(index);
   QMetaProperty prop = propertyAt(index);
-  if ((0 == index.column()) && (Qt::DisplayRole == role))
-    return prop.name();
+
+  if (0 == index.column()) {
+    if (Qt::DisplayRole == role)
+      return prop.name();
+  } else if ((2 == index.column()) && (Qt::DisplayRole == role)) {
+    if (propIsInstance<ConfigItem>(prop)) {
+      ConfigItem *item = prop.read(pobj).value<ConfigItem*>();
+      if (item && item->hasDescription())
+        return item->description();
+    }
+    if (pobj->hasDescription(prop))
+      return pobj->description(prop);
+    return QVariant();
+  } else if (Qt::ToolTipRole == role) {
+    if (propIsInstance<ConfigItem>(prop)) {
+      ConfigItem *item = prop.read(pobj).value<ConfigItem*>();
+      if (item && item->hasLongDescription()) {
+        return item->longDescription();
+      }
+    }
+    if (pobj->hasLongDescription(prop)) {
+      return pobj->longDescription(prop);
+    }
+    return QVariant();
+  }
 
   QVariant value = prop.read(pobj);
   if (prop.isEnumType() && ((Qt::DisplayRole == role) || (Qt::EditRole == role))) {
@@ -374,14 +398,14 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
       return QVariant();
     }
     return QString(key);
-  } else if ((QString("bool") == prop.typeName()) && (Qt::EditRole == role)) {
+  } else if ((QVariant::Bool == prop.type()) && (Qt::EditRole == role)) {
     return value;
-  } else if ((QString("bool") == prop.typeName()) && (Qt::DisplayRole == role)) {
+  } else if ((QVariant::Bool == prop.type()) && (Qt::DisplayRole == role)) {
     if (value.toBool())
       return tr("true");
     return tr("false");
-  } else if ( ((QString("int") == prop.typeName()) || (QString("uint") == prop.typeName()) ||
-               (QString("double") == prop.typeName()) || (QString("QString") == prop.typeName()))
+  } else if ( ((QVariant::Int == prop.type()) || (QVariant::UInt == prop.type()) ||
+               (QVariant::Double == prop.type()) || (QVariant::String == prop.type()))
               && ((Qt::DisplayRole == role) || (Qt::EditRole==role)) ) {
     return value;
   } else if (value.value<ConfigObjectReference *>() && (Qt::DisplayRole == role)) {
@@ -395,15 +419,10 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
   } else if (propIsInstance<ConfigItem>(prop)) {
     ConfigItem *item = value.value<ConfigItem*>();
     if (Qt::DisplayRole == role) {
-      if (nullptr == item) {
+      if (nullptr == item)
         return tr("[None]");
-      } else {
-        int infoidx = item->metaObject()->indexOfClassInfo("description");
-        if (0 > infoidx)
-          return item->metaObject()->className();
-        else
-          return item->metaObject()->classInfo(infoidx).value();
-      }
+      else
+        return tr("Instance of %1").arg(item->metaObject()->className());
     }
   }
 

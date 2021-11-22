@@ -647,6 +647,70 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
   return true;
 }
 
+bool
+ConfigItem::hasDescription() const {
+  const QMetaObject *meta = metaObject();
+  return (0 <= meta->indexOfClassInfo("description"));
+}
+
+bool
+ConfigItem::hasLongDescription() const {
+  const QMetaObject *meta = metaObject();
+  return (0 <= meta->indexOfClassInfo("longDescription"));
+}
+
+bool
+ConfigItem::hasDescription(const QMetaProperty &prop) const {
+  if (! prop.isValid())
+    return false;
+  QString infoName = QString("%1Description").arg(prop.name());
+  const QMetaObject *meta = metaObject();
+  return (0 <= meta->indexOfClassInfo(infoName.toLocal8Bit().constData()));
+}
+
+bool
+ConfigItem::hasLongDescription(const QMetaProperty &prop) const {
+  if (! prop.isValid())
+    return false;
+  QString infoName = QString("%1LongDescription").arg(prop.name());
+  const QMetaObject *meta = metaObject();
+  return (0 <= meta->indexOfClassInfo(infoName.toLocal8Bit().constData()));
+}
+
+QString
+ConfigItem::description() const {
+  if (! hasDescription())
+    return QString();
+  const QMetaObject *meta = metaObject();
+  return meta->classInfo(meta->indexOfClassInfo("description")).value();
+}
+
+QString
+ConfigItem::longDescription() const {
+  if (! hasLongDescription())
+    return QString();
+  const QMetaObject *meta = metaObject();
+  return meta->classInfo(meta->indexOfClassInfo("longDescription")).value();
+}
+
+QString
+ConfigItem::description(const QMetaProperty &prop) const {
+  if (! hasDescription(prop))
+    return QString();
+  QString infoName = QString("%1Description").arg(prop.name());
+  const QMetaObject *meta = metaObject();
+  return meta->classInfo(meta->indexOfClassInfo(infoName.toLocal8Bit().constData())).value();
+}
+
+QString
+ConfigItem::longDescription(const QMetaProperty &prop) const {
+  if (! hasLongDescription(prop))
+    return QString();
+  QString infoName = QString("%1LongDescription").arg(prop.name());
+  const QMetaObject *meta = metaObject();
+  return meta->classInfo(meta->indexOfClassInfo(infoName.toLocal8Bit().constData())).value();
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ConfigObject
@@ -747,14 +811,6 @@ ConfigExtension::ConfigExtension(QObject *parent)
   : ConfigItem(parent)
 {
   // pass...
-}
-
-bool
-ConfigExtension::populate(YAML::Node &node, const Context &context) {
-  // Call parent method
-  if (! ConfigItem::populate(node, context))
-    return false;
-  return true;
 }
 
 

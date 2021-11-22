@@ -140,6 +140,23 @@ public:
     return qobject_cast<Object *>(this);
   }
 
+  /** Retruns @c true if there is a class info "description" for this instance. */
+  bool hasDescription() const;
+  /** Retruns @c true if there is a class info "longDescription" for this instance. */
+  bool hasLongDescription() const;
+  /** Retruns @c true if there is a class info "[PropertyName]Description" for the given property. */
+  bool hasDescription(const QMetaProperty &prop) const;
+  /** Retruns @c true if there is a class info "[PropertyName]LongDescription" for the given property. */
+  bool hasLongDescription(const QMetaProperty &prop) const;
+  /** Retunrs the description of this instance if set by a class info. */
+  QString description() const;
+  /** Retunrs the long description of this instance if set by a class info. */
+  QString longDescription() const;
+  /** Retunrs the description of property if set by a class info. */
+  QString description(const QMetaProperty &prop) const;
+  /** Retunrs the long description of property if set by a class info. */
+  QString longDescription(const QMetaProperty &prop) const;
+
 protected:
   /** Recursively serializes the configuration to YAML nodes.
    * The complete configuration must be labeled first. */
@@ -208,9 +225,6 @@ Q_OBJECT
 protected:
   /** Hidden constructor. */
   explicit ConfigExtension(QObject *parent=nullptr);
-
-protected:
-  bool populate(YAML::Node &node, const ConfigObject::Context &context);
 };
 
 
