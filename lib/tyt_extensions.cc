@@ -379,12 +379,12 @@ TyTSettingsExtension::TyTSettingsExtension(QObject *parent)
     _talkPermitToneDigital(false), _talkPermitToneAnalog(false), _passwdAndLock(false),
     _channelFreeIndicationTone(true), _allTonesDisabled(false), _powerSaveMode(true),
     _wakeupPreamble(true), _bootPicture(true), _txPreambleDuration(600), _groupCallHangTime(3000),
-    _lowBatteryWarnInterval(120), _callAlertToneContinuous(false), _callAlertToneDuration(0),
-    _loneWorkerResponseTime(1), _loneWorkerReminderTime(10), _digitalScanHangTime(1000),
-    _analogScanHangTime(1000), _backlightAlwaysOn(false), _backlightDuration(10),
-    _keypadLockManual(true), _keypadLockTime(5*0xff), _powerOnPasswordEnabled(false),
-    _powerOnPassword(0), _radioProgPasswordEnabled(false), _radioProgPassword(0),
-    _pcProgPassword("")
+    _privateCallHangTime(3000), _lowBatteryWarnInterval(120), _callAlertToneContinuous(false),
+    _callAlertToneDuration(0), _loneWorkerResponseTime(1), _loneWorkerReminderTime(10),
+    _digitalScanHangTime(1000), _analogScanHangTime(1000), _backlightAlwaysOn(false),
+    _backlightDuration(10), _keypadLockManual(true), _keypadLockTime(5*0xff),
+    _powerOnPasswordEnabled(false), _powerOnPassword(0), _radioProgPasswordEnabled(false),
+    _radioProgPassword(0), _pcProgPassword("")
 {
   // pass...
 }
