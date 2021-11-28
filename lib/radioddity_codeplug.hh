@@ -797,7 +797,7 @@ public:
     virtual bool resetTone() const;
     /** Enables/disables reset tone. */
     virtual void enableResetTone(bool enable);
-    /** Returns @c true if the uknown number tone is enabled. */
+    /** Returns @c true if the unknown number tone is enabled. */
     virtual bool unknownNumberTone() const;
     /** Enables/disables reset tone. */
     virtual void enableUnknownNumberTone(bool enable);

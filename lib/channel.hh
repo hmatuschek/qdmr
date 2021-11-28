@@ -320,7 +320,7 @@ class DigitalChannel: public Channel
 public:
   /** Possible admit criteria of digital channels. */
   enum class Admit {
-    Always,      ///< No admit criteria, allows to transmit any time.
+    Always,      ///< No admit criteria, allows one to transmit any time.
     Free,        ///< Transmit only if channel is free.
     ColorCode    ///< Transmit only if channel is free and matches given color code.
   };

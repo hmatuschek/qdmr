@@ -18,7 +18,7 @@ class GPSSystem;
 /** Represents the device specific binary codeplug for Anytone AT-D878UV radios.
  *
  * In contrast to many other code-plugs, the code-plug for Anytone radios are spread over a large
- * memory area. In principle, this is a good idea, as it allows to upload only the portion of the
+ * memory area. In principle, this is a good idea, as it allows one to upload only the portion of the
  * codeplug that is actually configured. For example, if only a small portion of the available
  * contacts and channels are used, the amount of data that is written to the device can be
  * reduced.

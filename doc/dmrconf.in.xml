@@ -38,9 +38,9 @@
     <para><command>dmrconf</command> is a command-line tool to program DMR radios. That is,
     generating and uploading codeplugs to these radios. To this end, <command>dmrconf</command>
     uses a common human-readable text format to describe the codeplug for all supported radios (see
-    below). This allows to share codeplugs between different radios.</para>
+    below). This allows one to share codeplugs between different radios.</para>
 
-    <para>Additionally, <command>dmrconf</command> also allows to download codeplugs from the radio
+    <para>Additionally, <command>dmrconf</command> also allows one to download codeplugs from the radio
     and to store it in the human-readable text format. </para>
   </refsect1>
 

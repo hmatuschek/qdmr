@@ -56,7 +56,7 @@ DFUDevice::DFUDevice(unsigned vid, unsigned pid, const ErrorStack &err, QObject 
   }
 
   if (libusb_kernel_driver_active(_dev, 0) && libusb_detach_kernel_driver(_dev, 0)) {
-    errMsg(err) << "Cannot detatch kernel driver for device " << QString::number(vid, 16)
+    errMsg(err) << "Cannot detach kernel driver for device " << QString::number(vid, 16)
                 << ":" << QString::number(pid, 16) << ". Interface claim will likely fail.";
   }
 
@@ -128,7 +128,7 @@ DFUDevice::detach(int timeout, const ErrorStack &err)
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DETACH, timeout, 0, nullptr, 0, 0);
   if (0 > error) {
-    errMsg(err) << "Cannot detatch device: " << libusb_strerror((enum libusb_error) error) << ".";
+    errMsg(err) << "Cannot detach device: " << libusb_strerror((enum libusb_error) error) << ".";
     return error;
   }
   return 0;

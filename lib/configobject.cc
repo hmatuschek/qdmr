@@ -540,7 +540,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
         if (! ref->set(ctx.getTag(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
           errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                       << ": Cannot link " << prop.name() << " of " << meta->className()
-                      << ": Uknown tag " << tag << ".";
+                      << ": Unknown tag " << tag << ".";
           return false;
         }
         continue;

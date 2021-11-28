@@ -1084,7 +1084,7 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) {
   for (int i=0; ((i<31) && memberIndex(i)); i++) {
     if (! ctx.has<Channel>(memberIndex(i))) {
       logDebug() << "Cannot link scanlist to channel idx " << memberIndex(i)
-                    << ". Uknown channel index.";
+                    << ". Unknown channel index.";
       return false;
     }
     lst->addChannel(ctx.get<Channel>(memberIndex(i)));
