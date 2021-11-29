@@ -1,7 +1,8 @@
-# Retevis RT-73 Protocol
+# Retevis RT-73 (Kydera) Protocol
 
 The protocol appears to be a simple serial interface via USB. The protocol is very high-level. That is, the majority of information on where to read/write the codeplug and its size is not transferred between the host and device. 
 
+In fact this device is also known as the *Radioddity DB25-D* and *Kydera CDR-300UV*. As this device identifies itself as a `DRS-300UV+136-480MHZ` after entering the programming mode, I suspect that Retevis and Radioddity just re-sell a re-branded Kydera device. To this end, the protocol and base class for these devices will be called `kydera` in libdrmconf.
 
 ## Codeplug write
 
