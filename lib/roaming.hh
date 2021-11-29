@@ -15,30 +15,27 @@ class RoamingZone : public ConfigObject
 {
   Q_OBJECT
 
-  /** The name of the roaming zone. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The channels in the roaming zone. */
   Q_PROPERTY(DigitalChannelRefList * channels READ channels)
 
 public:
+  /** Default constructor. */
+  explicit RoamingZone(QObject *parent=nullptr);
+
   /** Constructor.
    * @param name Specifies the name of the roaming zone.
    * @param parent Specifies the QObject parent of this zone. */
-  explicit RoamingZone(const QString &name, QObject *parent = nullptr);
+  RoamingZone(const QString &name, QObject *parent = nullptr);
 
   /** Copies the given zone. */
   RoamingZone &operator =(const RoamingZone &other);
+  ConfigItem *clone() const;
 
   /** Returns the number of zones. */
   int count() const;
 
   /** Clears the zone list. */
   void clear();
-
-  /** Returns the name of the roaming zone. */
-  const QString &name() const;
-  /** Sets the name of the roaming zone. */
-  void setName(const QString &name);
 
   /** Retunrs the digital channel, which is the member at index @c idx (0-based).
    * @param idx Specifies the index of the member channel. */
@@ -58,9 +55,11 @@ public:
   /** Retruns the list of digital channels in this roaming zone. */
   DigitalChannelRefList *channels();
 
+public:
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
+
 protected:
-  /** Holds the name of the roaming zone. */
-  QString _name;
   /** Holds the actual channels of the roaming zone. */
   DigitalChannelRefList _channel;
 };
@@ -109,6 +108,9 @@ public:
   RoamingZone *zone(int idx) const;
 
   int add(ConfigObject *obj, int row=-1);
+
+public:
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 #endif // ROAMINGZONE_HH

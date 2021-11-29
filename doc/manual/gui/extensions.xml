@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="guiExtensions"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Edit Device Specific Extensions</title>
+</info>
+
+<para>
+  Since version 0.9.2, <application>qdmr</application> supports the editing of 
+  so-called device specific extensions. These extensions were introduced with version 
+  0.9.0 to allow to configure all features of a radio, although not
+  represented within the common codeplug structure used by <application>qdmr</application>, to 
+  program all supported radios. 
+</para>
+
+<para>
+  These extensions can be added to almost every element of a codeplug. For example contacts, 
+  channels, zones etc. They are stored in a common way to allow for a unified method for 
+  manipulating them. All extensions are displayed in a so-called <quote>Extension View</quote>,
+  a tree-like structure present for almost all codeplug elements. 
+</para>
+
+<para>
+  As <application>qdmr</application> is intended to be a clean and easy-to-use CPS for all radios, 
+  these device specific settings are normally hidden. To show them, you need to enable the 
+  <guilabel>Show Commercial Features</guilabel> option in the settings dialog (see 
+  <xref linkend="guiSettingsDialog"/>). 
+</para>
+
+<para>
+  As this extension view is common to all codeplug elements, this section will discuss the usage on
+  the codeplug extensions. When <guilabel>Show Commercial Features</guilabel> is enabled in the 
+  settings dialog, the codeplug extensions are shown in the last tab called 
+  <guilabel>Extensions</guilabel>. 
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-codeplug-extensions.png" width="13cm" align="center"/></imageobject>
+    <textobject>Screen shot of the codeplug extensions.</textobject>
+  </mediaobject>
+  <title>Extension view for the codeplug extensions.</title>
+</screenshot>
+
+<para>
+  Unless a codeplug is read from a device, the extensions are usually not set (see screen shot 
+  above). In these cases, the <guilabel>Value</guilabel> column of the extension view shows 
+  <guilabel>[None]</guilabel>. You can add these extensions to the codeplug by selecting the 
+  corresponding extension and click on the <guilabel>Create</guilabel> button at the bottom of the
+  extension view. 
+</para>
+
+<para>
+  Similarly, an extension can be removed from the codeplug by selecting it and clicking on the 
+  <guilabel>Remove</guilabel> button at the bottom of the extension view. 
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-codeplug-tyt-extensions.png" width="13cm" align="center"/></imageobject>
+    <textobject>Screen shot of the codeplug extensions for TyT devices.</textobject>
+  </mediaobject>
+  <title>Example for codeplug extensions for TyT devices.</title>
+</screenshot>
+
+<para>
+  Once an extension is added to the codeplug, it can be expanded to view and edit the contained 
+  settings. To edit a particular setting, simply double-click on the value. 
+</para>
+</section>

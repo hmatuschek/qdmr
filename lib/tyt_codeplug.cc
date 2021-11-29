@@ -57,12 +57,12 @@ TyTCodeplug::ChannelElement::clear() {
   setPrivacyType(PRIV_NONE);
   enablePrivateCallConfirm(false);
   enableDataCallConfirm(false);
-  setRXRefFrequency(REF_LOW);
+  setRXRefFrequency(TyTChannelExtension::RefFrequency::Low);
   clearBit(3,2);
   enableEmergencyAlarmACK(false);
   clearBit(3,4); setBit(3,5); setBit(3,6);
   enableDisplayPTTId(true);
-  setTXRefFrequency(REF_LOW);
+  setTXRefFrequency(TyTChannelExtension::RefFrequency::Low);
   setBit(4,2); clearBit(4,3);
   enableVOX(false);
   setBit(4,5);
@@ -210,12 +210,12 @@ TyTCodeplug::ChannelElement::enableDataCallConfirm(bool enable) {
   setBit(2, 7, enable);
 }
 
-TyTCodeplug::ChannelElement::RefFrequency
+TyTChannelExtension::RefFrequency
 TyTCodeplug::ChannelElement::rxRefFrequency() const {
-  return TyTCodeplug::ChannelElement::RefFrequency(getUInt2(3,0));
+  return TyTChannelExtension::RefFrequency(getUInt2(3,0));
 }
 void
-TyTCodeplug::ChannelElement::setRXRefFrequency(TyTCodeplug::ChannelElement::RefFrequency ref) {
+TyTCodeplug::ChannelElement::setRXRefFrequency(TyTChannelExtension::RefFrequency ref) {
   setUInt2(3,0, uint8_t(ref));
 }
 
@@ -237,12 +237,12 @@ TyTCodeplug::ChannelElement::enableDisplayPTTId(bool enable) {
   setBit(3,7, !enable);
 }
 
-TyTCodeplug::ChannelElement::RefFrequency
+TyTChannelExtension::RefFrequency
 TyTCodeplug::ChannelElement::txRefFrequency() const {
-  return TyTCodeplug::ChannelElement::RefFrequency(getUInt2(4,0));
+  return TyTChannelExtension::RefFrequency(getUInt2(4,0));
 }
 void
-TyTCodeplug::ChannelElement::setTXRefFrequency(TyTCodeplug::ChannelElement::RefFrequency ref) {
+TyTCodeplug::ChannelElement::setTXRefFrequency(TyTChannelExtension::RefFrequency ref) {
   setUInt2(4,0, uint8_t(ref));
 }
 
@@ -424,6 +424,7 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
     return nullptr;
 
   Channel *ch = nullptr;
+  TyTChannelExtension *ex = new TyTChannelExtension();
 
   // decode power setting
   if (MODE_ANALOG == mode()) {
@@ -440,6 +441,8 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
     ach->setRXTone(rxSignaling());
     ach->setTXTone(txSignaling());
     ach->setBandwidth(bandwidth());
+    // Apply analog channel extension settings
+    ex->enableDisplayPTTId(displayPTTId());
     ch = ach;
   } else if (MODE_DIGITAL == mode()) {
     DigitalChannel::Admit admit_crit;
@@ -453,6 +456,10 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
     dch->setAdmit(admit_crit);
     dch->setColorCode(colorCode());
     dch->setTimeSlot(timeSlot());
+    // Apply digital channel extension settings
+    ex->enablePrivateCallConfirmed(privateCallConfirm());
+    ex->enableDataCallConfirmed(dataCallConfirm());
+    ex->enableEmergencyAlarmConfirmed(emergencyAlarmACK());
     ch = dch;
   }
 
@@ -468,6 +475,14 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
     ch->setVOXDefault();
   else
     ch->disableVOX();
+
+  // Apply common channel settings
+  ex->enableLoneWorker(loneWorker());
+  ex->enableAutoScan(autoScan());
+  ex->enableTalkaround(talkaround());
+  ex->setRXRefFrequency(rxRefFrequency());
+  ex->setTXRefFrequency(txRefFrequency());
+  ch->setTyTChannelExtension(ex);
 
   return ch;
 }
@@ -544,6 +559,11 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
       setPositioningSystemIndex(ctx.index(dchan->aprsObj()->as<GPSSystem>()));
       enableTXGPSInfo(true); enableRXGPSInfo(false);
     }
+    if (chan->tytChannelExtension()) {
+      enablePrivateCallConfirm(chan->tytChannelExtension()->privateCallConfirmed());
+      enableDataCallConfirm(chan->tytChannelExtension()->dataCallConfirmed());
+      enableEmergencyAlarmACK(chan->tytChannelExtension()->emergencyAlarmConfirmed());
+    }
   } else if (chan->is<AnalogChannel>()) {
     const AnalogChannel *achan = chan->as<const AnalogChannel>();
     setMode(MODE_ANALOG);
@@ -558,6 +578,18 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
     setTXSignaling(achan->txTone());
     setGroupListIndex(0);
     setContactIndex(0);
+    if (chan->tytChannelExtension()) {
+      enableDisplayPTTId(chan->tytChannelExtension()->displayPTTId());
+    }
+  }
+
+  // Apply channel extension (if set)
+  if (chan->tytChannelExtension()) {
+    enableLoneWorker(chan->tytChannelExtension()->loneWorker());
+    enableAutoScan(chan->tytChannelExtension()->autoScan());
+    enableTalkaround(chan->tytChannelExtension()->talkaround());
+    setRXRefFrequency(chan->tytChannelExtension()->rxRefFrequency());
+    setTXRefFrequency(chan->tytChannelExtension()->txRefFrequency());
   }
 }
 
@@ -812,6 +844,7 @@ TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context 
 
 RXGroupList *
 TyTCodeplug::GroupListElement::toGroupListObj(Context &ctx) {
+  Q_UNUSED(ctx)
   if (! isValid())
     return nullptr;
   return new RXGroupList(name());
@@ -987,14 +1020,28 @@ TyTCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, Context &ctx)
     }
   }
 
+  if (TyTScanListExtension *ex = lst->tytScanListExtension()) {
+    setHoldTime(ex->holdTime());
+    setPrioritySampleTime(ex->prioritySampleTime());
+  }
+
   return true;
 }
 
 ScanList *
 TyTCodeplug::ScanListElement::toScanListObj(Context &ctx) {
+  Q_UNUSED(ctx)
   if (! isValid())
     return nullptr;
-  return new ScanList(name());
+
+  ScanList *lst = new ScanList(name());
+  TyTScanListExtension *ex = new TyTScanListExtension();
+  lst->setTyTScanListExtension(ex);
+
+  ex->setHoldTime(holdTime());
+  ex->setPrioritySampleTime(prioritySampleTime());
+
+  return lst;
 }
 
 bool
@@ -1037,7 +1084,7 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) {
   for (int i=0; ((i<31) && memberIndex(i)); i++) {
     if (! ctx.has<Channel>(memberIndex(i))) {
       logDebug() << "Cannot link scanlist to channel idx " << memberIndex(i)
-                    << ". Uknown channel index.";
+                    << ". Unknown channel index.";
       return false;
     }
     lst->addChannel(ctx.get<Channel>(memberIndex(i)));
@@ -1076,7 +1123,7 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   setBit(0x40,0, 0); setBit(0,1, 1);
   disableAllLEDs(false);
   setBit(0x40,3, 1);
-  setMonitorType(MONITOR_OPEN_SQUELCH);
+  setMonitorType(TyTSettingsExtension::MonitorType::Open);
   setUInt3(0x40, 5, 7);
 
   setSavePreamble(true);
@@ -1084,7 +1131,7 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   disableAllTones(false);
   setBit(0x41,3, 1);
   setChFreeIndicationTone(true);
-  enablePasswdAndLock(true);
+  enablePasswdAndLock(false);
   enableTalkPermitToneDigital(false);
   enableTalkPermitToneAnalog(false);
 
@@ -1106,7 +1153,7 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   setLoneWorkerResponseTime(1);
   setLoneWorkerReminderTime(10);
   setUInt8(0x52, 0x00);
-  setCcanDigitalHangTime(1000);
+  setScanDigitalHangTime(1000);
   setScanAnalogHangTime(1000);
 
   setBacklightTime(10);
@@ -1141,13 +1188,13 @@ TyTCodeplug::GeneralSettingsElement::setIntroLine2(const QString line) {
   writeUnicode(0x14, line, 10);
 }
 
-TyTCodeplug::GeneralSettingsElement::MonitorType
+TyTSettingsExtension::MonitorType
 TyTCodeplug::GeneralSettingsElement::monitorType() const {
-  return getBit(0x40,4) ? MONITOR_OPEN_SQUELCH : MONITOR_SILENT;
+  return getBit(0x40,4) ? TyTSettingsExtension::MonitorType::Open : TyTSettingsExtension::MonitorType::Silent;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setMonitorType(MonitorType type) {
-  setBit(0x40,4, MONITOR_OPEN_SQUELCH==type);
+TyTCodeplug::GeneralSettingsElement::setMonitorType(TyTSettingsExtension::MonitorType type) {
+  setBit(0x40,4, TyTSettingsExtension::MonitorType::Open==type);
 }
 
 bool
@@ -1331,7 +1378,7 @@ TyTCodeplug::GeneralSettingsElement::scanDigitalHangTime() const {
   return unsigned(getUInt8(0x53))*100;
 }
 void
-TyTCodeplug::GeneralSettingsElement::setCcanDigitalHangTime(unsigned dur) {
+TyTCodeplug::GeneralSettingsElement::setScanDigitalHangTime(unsigned dur) {
   dur = std::min(10000U, dur);
   setUInt8(0x53, dur/100);
 }
@@ -1444,6 +1491,49 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
   setIntroLine1(config->settings()->introLine1());
   setIntroLine2(config->settings()->introLine2());
   setVOXSesitivity(config->settings()->vox());
+
+  if (TyTSettingsExtension *ex = config->settings()->tytExtension()) {
+    setMonitorType(ex->monitorType());
+    disableAllLEDs(ex->allLEDsDisabled());
+    enableTalkPermitToneDigital(ex->talkPermitToneDigital());
+    enableTalkPermitToneAnalog(ex->talkPermitToneAnalog());
+    enablePasswdAndLock(ex->passwordAndLock());
+    setChFreeIndicationTone(ex->channelFreeIndicationTone());
+    disableAllTones(ex->allTonesDisabled());
+    setSaveModeRX(ex->powerSaveMode());
+    setSavePreamble(ex->wakeupPreamble());
+    enableIntroPicture(ex->bootPicture());
+    setTXPreambleDuration(ex->txPreambleDuration());
+    setGroupCallHangTime(ex->groupCallHangTime());
+    setPrivateCallHangTime(ex->privateCallHangTime());
+    setLowBatteryInterval(ex->lowBatteryWarnInterval());
+    if (ex->callAlertToneContinuous())
+      setCallAlertToneContinuous();
+    else
+      setCallAlertToneDuration(ex->callAlertToneDuration());
+    setLoneWorkerResponseTime(ex->loneWorkerResponseTime());
+    setLoneWorkerReminderTime(ex->loneWorkerReminderTime());
+    setScanDigitalHangTime(ex->digitalScanHangTime());
+    setScanAnalogHangTime(ex->analogScanHangTime());
+    if (ex->backlightAlwaysOn())
+      backlightTimeSetAlways();
+    else
+      setBacklightTime(ex->backlightDuration());
+    if (ex->keypadLockManual())
+      keypadLockTimeSetManual();
+    else
+      setKeypadLockTime(ex->keypadLockTime());
+    if (! ex->powerOnPasswordEnabled())
+      setPowerOnPassword(0);
+    else
+      setPowerOnPassword(ex->powerOnPassword());
+    if (! ex->radioProgPasswordEnabled())
+      radioProgPasswordDisable();
+    else
+      setRadioProgPassword(ex->radioProgPassword());
+    setPCProgPassword(ex->pcProgPassword());
+  }
+
   return true;
 }
 
@@ -1460,6 +1550,43 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   config->settings()->setIntroLine1(introLine1());
   config->settings()->setIntroLine2(introLine2());
   config->settings()->setVOX(voxSesitivity());
+
+  // apply extension
+  TyTSettingsExtension *ex = new TyTSettingsExtension();
+  config->settings()->setTyTExtension(ex);
+
+  ex->setMonitorType(monitorType());
+  ex->disableAllLEDs(allLEDsDisabled());
+  ex->enableTalkPermitToneDigital(talkPermitToneDigital());
+  ex->enableTalkPermitToneAnalog(talkPermitToneAnalog());
+  ex->enablePasswordAndLock(passwdAndLock());
+  ex->enableChannelFreeIndicationTone(chFreeIndicationTone());
+  ex->disableAllTones(allTonesDisabled());
+  ex->enablePowerSaveMode(saveModeRX());
+  ex->enableWakeupPreamble(savePreamble());
+  ex->enableBootPicture(introPicture());
+  ex->setTXPreambleDuration(txPreambleDuration());
+  ex->setGroupCallHangTime(groupCallHangTime());
+  ex->setPrivateCallHangTime(privateCallHangTime());
+  ex->setLowBatteryWarnInterval(lowBatteryInterval());
+  ex->enableCallAlertToneContinuous(callAlertToneIsContinuous());
+  if (! callAlertToneIsContinuous())
+    ex->setCallAlertToneDuration(callAlertToneDuration());
+  ex->setLoneWorkerResponseTime(loneWorkerResponseTime());
+  ex->setLoneWorkerReminderTime(loneWorkerReminderTime());
+  ex->setDigitalScanHangTime(scanDigitalHangTime());
+  ex->setAnalogScanHangTime(scanAnalogHangTime());
+  ex->enableBacklightAlwaysOn(backlightIsAlways());
+  if (! backlightIsAlways())
+    ex->setBacklightDuration(backlightTime());
+  ex->enableKeypadLockManual(keypadLockIsManual());
+  if (! keypadLockIsManual())
+    ex->setKeypadLockTime(keypadLockTime());
+  ex->enableRadioProgPassword(radioProgPasswordEnabled());
+  if (radioProgPasswordEnabled())
+    ex->setRadioProgPassword(ex->radioProgPassword());
+  ex->setPCProgPassword(pcProgPassword());
+
   return true;
 }
 
@@ -1629,7 +1756,7 @@ TyTCodeplug::GPSSystemElement::linkGPSSystemObj(GPSSystem *sys, Context &ctx) {
     return false;
 
   if ((! destinationContactDisabled()) && (ctx.has<DigitalContact>(destinationContactIndex())))
-    sys->setContact(ctx.get<DigitalContact>(destinationContactIndex()));
+    sys->setContactObj(ctx.get<DigitalContact>(destinationContactIndex()));
 
   if (revertChannelIsSelected())
     sys->setRevertChannel(nullptr);
@@ -2036,33 +2163,29 @@ TyTCodeplug::ButtonSettingsElement::setLongPressDuration(unsigned ms) {
 bool
 TyTCodeplug::ButtonSettingsElement::fromConfig(const Config *config) {
   // Skip if not defined
-  if (! config->hasExtension(TyTButtonSettings::staticMetaObject.className()))
+  if (nullptr == config->tytExtension())
     return true;
-  // Check type
-  const TyTButtonSettings *ext =
-      config->extension(TyTButtonSettings::staticMetaObject.className())->as<TyTButtonSettings>();
-  if (nullptr == ext)
-    return false;
 
-  setSideButton1Short(ext->sideButton1Short());
-  setSideButton1Long(ext->sideButton1Long());
-  setSideButton2Short(ext->sideButton2Short());
-  setSideButton2Long(ext->sideButton2Long());
-  setLongPressDuration(ext->longPressDuration());
+  setSideButton1Short(config->tytExtension()->buttonSettings()->sideButton1Short());
+  setSideButton1Long(config->tytExtension()->buttonSettings()->sideButton1Long());
+  setSideButton2Short(config->tytExtension()->buttonSettings()->sideButton2Short());
+  setSideButton2Long(config->tytExtension()->buttonSettings()->sideButton2Long());
+  setLongPressDuration(config->tytExtension()->buttonSettings()->longPressDuration());
 
   return true;
 }
 
 bool
 TyTCodeplug::ButtonSettingsElement::updateConfig(Config *config) {
-  TyTButtonSettings *ext = new TyTButtonSettings(config);
-  config->addExtension(TyTButtonSettings::staticMetaObject.className(), ext);
+  TyTConfigExtension *ext = new TyTConfigExtension(config);
+  config->setTyTExtension(ext);
 
-  ext->setSideButton1Short(sideButton1Short());
-  ext->setSideButton1Long(sideButton1Long());
-  ext->setSideButton2Short(sideButton2Short());
-  ext->setSideButton2Long(sideButton2Long());
-  ext->setLongPressDuration(longPressDuration());
+  ext->buttonSettings()->setSideButton1Short(sideButton1Short());
+  ext->buttonSettings()->setSideButton1Long(sideButton1Long());
+  ext->buttonSettings()->setSideButton2Short(sideButton2Short());
+  ext->buttonSettings()->setSideButton2Long(sideButton2Long());
+  ext->buttonSettings()->setLongPressDuration(longPressDuration());
+
   return true;
 }
 
@@ -2394,7 +2517,9 @@ TyTCodeplug::~TyTCodeplug() {
 }
 
 bool
-TyTCodeplug::index(Config *config, Context &ctx) const {
+TyTCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err)
+
   // All indices as 1-based. That is, the first channel gets index 1.
 
   // Map radio IDs
@@ -2474,10 +2599,10 @@ TyTCodeplug::clear()
 }
 
 bool
-TyTCodeplug::encode(Config *config, const Flags &flags) {
+TyTCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
   // Check if default DMR id is set.
   if (nullptr == config->radioIDs()->defaultId()) {
-    _errorMessage = tr("Cannot encode TyT codeplug: No default radio ID specified.");
+    errMsg(err) << "Cannot encode TyT codeplug: No default radio ID specified.";
     return false;
   }
 
@@ -2490,69 +2615,69 @@ TyTCodeplug::encode(Config *config, const Flags &flags) {
 }
 
 bool
-TyTCodeplug::decode(Config *config) {
+TyTCodeplug::decode(Config *config, const ErrorStack &err) {
   // Create index<->object table.
   Context ctx(config);
 
   // Clear config object
   config->clear();
 
-  return this->decodeElements(ctx);
+  return this->decodeElements(ctx, err);
 }
 
 bool
-TyTCodeplug::encodeElements(const Flags &flags, Context &ctx)
+TyTCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
   // Set timestamp
   if (! this->encodeTimestamp()) {
-    _errorMessage = tr("Cannot encode time-stamp: %1").arg(_errorMessage);
+    errMsg(err) << "Cannot encode time-stamp.";
     return false;
   }
   // General config
   if (! this->encodeGeneralSettings(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode general settings: %1").arg(_errorMessage);
+    errMsg(err) << "Cannot encode general settings.";
     return false;
   }
 
   // Define Contacts
   if (! this->encodeContacts(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode contacts: %1").arg(_errorMessage);
+    errMsg(err) << "Cannot encode contacts.";
     return false;
   }
 
   // Define RX GroupLists
   if (! this->encodeGroupLists(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode group lists: %1").arg(_errorMessage);
+    errMsg(err) << "Cannot encode group lists.";
     return false;
   }
 
   // Define Channels
   if (! this->encodeChannels(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode channels: %1").arg(_errorMessage);
+    errMsg(err) << "Cannot encode channels.";
     return false;
   }
 
   // Define Zones
   if (! this->encodeZones(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode zones: %1").arg(_errorMessage);
+    errMsg(err) << "Cannot encode zones.";
     return false;
   }
 
   // Define Scanlists
   if (! this->encodeScanLists(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode scan lists: %1").arg(_errorMessage);
+    errMsg(err) << "Cannot encode scan lists.";
     return false;
   }
 
   // Define GPS systems
   if (! this->encodePositioningSystems(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode positioning systems: %1").arg(_errorMessage);
+    errMsg(err) << "Cannot encode positioning systems.";
     return false;
   }
 
   // Encode button settings
   if (! this->encodeButtonSettings(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode button settings: %1").arg(_errorMessage);
+    errMsg(err) << "Cannot encode button settings.";
     return false;
   }
 
@@ -2560,82 +2685,82 @@ TyTCodeplug::encodeElements(const Flags &flags, Context &ctx)
 }
 
 bool
-TyTCodeplug::decodeElements(Context &ctx) {
+TyTCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
   // General config
-  if (! this->decodeGeneralSettings(ctx.config())) {
-    _errorMessage = tr("Cannot decode general settings: %1").arg(_errorMessage);
+  if (! this->decodeGeneralSettings(ctx.config(), err)) {
+    errMsg(err) << "Cannot decode general settings.";
     return false;
   }
 
   // Define Contacts
-  if (! this->createContacts(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot create contacts: %1").arg(_errorMessage);
+  if (! this->createContacts(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create contacts.";
     return false;
   }
 
   // Define RX GroupLists
-  if (! this->createGroupLists(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot create group lists: %1").arg(_errorMessage);
+  if (! this->createGroupLists(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create group lists.";
     return false;
   }
 
   // Define Channels
-  if (! this->createChannels(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot create channels: %1").arg(_errorMessage);
+  if (! this->createChannels(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create channels.";
     return false;
   }
 
   // Define Zones
-  if (! this->createZones(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot create zones: %1").arg(_errorMessage);
+  if (! this->createZones(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create zones.";
     return false;
   }
 
   // Define Scanlists
-  if (! this->createScanLists(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot create scan lists: %1").arg(_errorMessage);
+  if (! this->createScanLists(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create scan lists.";
     return false;
   }
 
   // Define GPS systems
-  if (! this->createPositioningSystems(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot create positioning systems: %1").arg(_errorMessage);
+  if (! this->createPositioningSystems(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create positioning systems.";
     return false;
   }
 
   // Decode button settings
-  if (! this->decodeButtonSetttings(ctx.config())) {
-    _errorMessage = tr("Cannot decode button settings: %1").arg(_errorMessage);
+  if (! this->decodeButtonSetttings(ctx.config(), err)) {
+    errMsg(err) << "Cannot decode button settings.";
     return false;
   }
 
   // Link RX GroupLists
-  if (! this->linkGroupLists(ctx)) {
-    _errorMessage = tr("Cannot link group lists: %1").arg(_errorMessage);
+  if (! this->linkGroupLists(ctx, err)) {
+    errMsg(err) << "Cannot link group lists.";
     return false;
   }
 
   // Link Channels
-  if (! this->linkChannels(ctx)) {
-    _errorMessage = tr("Cannot link channels: %1").arg(_errorMessage);
+  if (! this->linkChannels(ctx, err)) {
+    errMsg(err) << "Cannot link channels.";
     return false;
   }
 
   // Link Zones
-  if (! this->linkZones(ctx)) {
-    _errorMessage = tr("Cannot link zones: %1").arg(_errorMessage);
+  if (! this->linkZones(ctx, err)) {
+    errMsg(err) << "Cannot link zones.";
     return false;
   }
 
   // Link Scanlists
-  if (! this->linkScanLists(ctx)) {
-    _errorMessage = tr("Cannot link scan lists: %1").arg(_errorMessage);
+  if (! this->linkScanLists(ctx, err)) {
+    errMsg(err) << "Cannot link scan lists.";
     return false;
   }
 
   // Link GPS systems
-  if (! this->linkPositioningSystems(ctx)) {
-    _errorMessage = tr("Cannot link positioning systems: %1").arg(_errorMessage);
+  if (! this->linkPositioningSystems(ctx, err)) {
+    errMsg(err) << "Cannot link positioning systems.";
     return false;
   }
 

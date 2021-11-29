@@ -22,7 +22,7 @@ RadioIDListView::RadioIDListView(Config *config, QWidget *parent)
   ui->defaultID->setModel(new RadioIdListWrapper(_config->radioIDs(), ui->defaultID));
   ui->defaultID->setModelColumn(1);
 
-  connect(_config, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModified()));
+  connect(_config, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   connect(ui->addID, SIGNAL(clicked(bool)), this, SLOT(onAddID()));
   connect(ui->delID, SIGNAL(clicked(bool)), this, SLOT(onDeleteID()));
   connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditID(unsigned)));
@@ -88,7 +88,6 @@ RadioIDListView::onDeleteID() {
 
 void
 RadioIDListView::onEditID(unsigned row) {
-
 }
 
 void

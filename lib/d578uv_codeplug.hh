@@ -242,12 +242,12 @@ public:
 
   void allocateHotKeySettings();
 
-  bool encodeChannels(const Flags &flags, Context &ctx);
-  bool createChannels(Context &ctx);
-  bool linkChannels(Context &ctx);
+  bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void allocateContacts();
-  bool encodeContacts(const Flags &flags, Context &ctx);
+  bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 #endif // D578UV_CODEPLUG_HH

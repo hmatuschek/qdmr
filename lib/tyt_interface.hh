@@ -93,36 +93,34 @@ class TyTInterface : public DFUDevice, public RadioInterface
 
 public:
   /** Costructor. Opens an interface to the specified vendor and product ID. */
-  TyTInterface(unsigned vid, unsigned pid, QObject *parent=nullptr);
+  TyTInterface(unsigned vid, unsigned pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
   ~TyTInterface();
 
   bool isOpen() const;
-  RadioInfo identifier();
+  RadioInfo identifier(const ErrorStack &err=ErrorStack());
   void close();
 
-  bool read_start(uint32_t bank, uint32_t addr);
-  bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
-  bool read_finish();
-  bool write_start(uint32_t bank, uint32_t addr);
-  bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
-  bool write_finish();
-  bool reboot();
+  bool read_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
+  bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
+  bool read_finish(const ErrorStack &err=ErrorStack());
+  bool write_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
+  bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
+  bool write_finish(const ErrorStack &err=ErrorStack());
+  bool reboot(const ErrorStack &err=ErrorStack());
 
   /** Erases a memory section at @c start of size @c size. */
-  bool erase(unsigned start, unsigned size, void (*progress)(unsigned, void *)=nullptr, void *ctx=nullptr);
-
-  const QString &errorMessage() const;
+  bool erase(unsigned start, unsigned size, void (*progress)(unsigned, void *)=nullptr, void *ctx=nullptr, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Internal used function to send a controll command to the device. */
-  int md380_command(uint8_t a, uint8_t b);
+  int md380_command(uint8_t a, uint8_t b, const ErrorStack &err=ErrorStack());
   /** Internal used function to set the current I/O address. */
-  int set_address(uint32_t address);
+  int set_address(uint32_t address, const ErrorStack &err=ErrorStack());
   /** Internal used function to erase a specific block. */
-  int erase_block(uint32_t address);
+  int erase_block(uint32_t address, const ErrorStack &err=ErrorStack());
   /** Internal used function to read the device identifier. */
-  const char *identify();
+  const char *identify(const ErrorStack &err=ErrorStack());
 
 protected:
   /** Read identifier. */

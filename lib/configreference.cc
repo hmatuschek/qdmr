@@ -65,6 +65,14 @@ ConfigObjectReference::set(ConfigObject *object) {
 }
 
 bool
+ConfigObjectReference::copy(const ConfigObjectReference *ref) {
+  clear();
+  if (nullptr == ref)
+    return true;
+  return set(ref->_object);
+}
+
+bool
 ConfigObjectReference::allow(const QMetaObject *elementType) {
   if (! _elementTypes.contains(elementType->className()))
     _elementTypes.append(elementType->className());
@@ -73,6 +81,7 @@ ConfigObjectReference::allow(const QMetaObject *elementType) {
 
 void
 ConfigObjectReference::onReferenceDeleted(QObject *obj) {
+  Q_UNUSED(obj)
   _object = nullptr;
   emit modified();
 }

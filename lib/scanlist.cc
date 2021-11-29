@@ -14,8 +14,18 @@
 /* ********************************************************************************************* *
  * Implementation of ScanList
  * ********************************************************************************************* */
+ScanList::ScanList(QObject *parent)
+  : ConfigObject("scan", parent), _channels(), _primary(), _secondary(), _revert(), _tyt(nullptr)
+{
+  // Register "selected" channel tags for primary, secondary, revert and the channel list.
+  Context::setTag(metaObject()->className(), "primary", "!selected", SelectedChannel::get());
+  Context::setTag(metaObject()->className(), "secondary", "!selected", SelectedChannel::get());
+  Context::setTag(metaObject()->className(), "revert", "!selected", SelectedChannel::get());
+  Context::setTag(metaObject()->className(), "channels", "!selected", SelectedChannel::get());
+}
+
 ScanList::ScanList(const QString &name, QObject *parent)
-  : ConfigObject("scan", parent), _name(name), _channels(), _primary(), _secondary(), _revert()
+  : ConfigObject(name, "scan", parent), _channels(), _primary(), _secondary(), _revert(), _tyt(nullptr)
 {
   // Register "selected" channel tags for primary, secondary, revert and the channel list.
   Context::setTag(metaObject()->className(), "primary", "!selected", SelectedChannel::get());
@@ -26,14 +36,18 @@ ScanList::ScanList(const QString &name, QObject *parent)
 
 ScanList &
 ScanList::operator =(const ScanList &other) {
-  clear();
-  _name = other._name;
-  _primary.set(other._primary.as<Channel>());
-  _secondary.set(other._secondary.as<Channel>());
-  _revert.set(other._revert.as<Channel>());
-  for (int i=0; i<other._channels.count(); i++)
-    _channels.add(other._channels.get(i));
+  copy(other);
   return *this;
+}
+
+ConfigItem *
+ScanList::clone() const {
+  ScanList *list = new ScanList();
+  if (! list->copy(*this)) {
+    list->deleteLater();
+    return nullptr;
+  }
+  return list;
 }
 
 void
@@ -45,22 +59,6 @@ ScanList::clear() {
   _channels.clear();
   emit modified(this);
 }
-
-
-const QString &
-ScanList::name() const {
-  return _name;
-}
-
-bool
-ScanList::setName(const QString &name) {
-  if (name.simplified().isEmpty())
-    return false;
-  _name = name.simplified();
-  emit modified(this);
-  return true;
-}
-
 
 const ChannelRefList *
 ScanList::channels() const {
@@ -173,6 +171,28 @@ ScanList::setRevertChannel(Channel *channel) {
   emit modified(this);
 }
 
+TyTScanListExtension *
+ScanList::tytScanListExtension() const {
+  return _tyt;
+}
+void
+ScanList::setTyTScanListExtension(TyTScanListExtension *tyt) {
+  if (_tyt) {
+    _tyt->deleteLater();
+    _tyt = nullptr;
+  }
+  _tyt = tyt;
+  if (_tyt)
+    _tyt->setParent(this);
+}
+
+ConfigItem *
+ScanList::allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                        const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
+  return nullptr;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ScanLists
@@ -185,7 +205,7 @@ ScanLists::ScanLists(QObject *parent)
 
 ScanList *
 ScanLists::scanlist(int idx) const {
-  if (ConfigObject *obj = get(idx))
+  if (ConfigItem *obj = get(idx))
     return obj->as<ScanList>();
   return nullptr;
 }
@@ -195,4 +215,20 @@ ScanLists::add(ConfigObject *obj, int row) {
   if (obj && obj->is<ScanList>())
     return ConfigObjectList::add(obj, row);
   return -1;
+}
+
+ConfigItem *
+ScanLists::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx);
+
+  if (! node)
+    return nullptr;
+
+  if (! node.IsMap()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create scan list: Expected object.";
+    return nullptr;
+  }
+
+  return new ScanList();
 }

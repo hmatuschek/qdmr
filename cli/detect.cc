@@ -11,10 +11,10 @@ int detect(QCommandLineParser &parser, QCoreApplication &app) {
   Q_UNUSED(parser);
   Q_UNUSED(app);
 
-  QString errorMessage;
-  Radio *radio = Radio::detect(errorMessage);
+  ErrorStack err;
+  Radio *radio = Radio::detect(RadioInfo(), err);
   if (nullptr == radio) {
-    logError() << "No compatible radio found: " << errorMessage;
+    logError() << "No compatible radio found: " << err.format();
     return -1;
   }
 

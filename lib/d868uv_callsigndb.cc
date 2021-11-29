@@ -144,7 +144,9 @@ D868UVCallsignDB::D868UVCallsignDB(QObject *parent)
   addImage("AnyTone AT-D878UV Callsign database.");
 }
 
-bool D868UVCallsignDB::encode(UserDatabase *db, const Selection &selection) {
+bool D868UVCallsignDB::encode(UserDatabase *db, const Selection &selection, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // Determine size of call-sign DB in memory
   qint64 n = std::min(db->count(), qint64(MAX_CALLSIGNS));
   // If DB size is limited by settings

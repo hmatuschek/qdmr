@@ -1,4 +1,4 @@
-SRC = manual.xml $(shell find meta/ -name "*.*") $(shell find intro/ -name "*.*") $(shell find gui/ -name "*.*"")\
+SRC = manual.xml $(shell find meta/ -name "*.*") $(shell find intro/ -name "*.*") $(shell find gui/ -name "*.*")\
       $(shell find codeplug/ -name "*.*") $(shell find conf/ -name "*.*") $(shell find cli/ -name "*.*") 
 
 all: images manual.pdf manual.epub html 
@@ -7,7 +7,7 @@ images:
 	make -C intro/fig
 	make -C gui/fig
 	
-
+	
 manual.pdf: manual.fo
 	fop -fo manual.fo -pdf manual.pdf
 manual.fo: manual_combined.xml manual_fo.debian.xsl

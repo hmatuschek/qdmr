@@ -7,7 +7,7 @@
  * The aim of this project is, to define a minimal but sufficient generic configuration for all
  * radios, such that all relevant ham-radio features of the radios can be used. This is a challange,
  * as there are many manufacturers, each selling serveral different models, each having
- * a varity of different features. In fact, manufacturers provide a separate application to programm
+ * a varity of different features. In fact, manufacturers provide a separate application to program
  * each model. The resulting codeplugs are usually stored in a binary format,
  * similar to the actual codeplug being loaded onto the radio.
  *

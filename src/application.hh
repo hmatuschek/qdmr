@@ -21,7 +21,7 @@ class ZoneListView;
 class ScanListsView;
 class PositioningSystemListView;
 class RoamingZoneListView;
-
+class ExtensionView;
 
 class Application : public QApplication
 {
@@ -84,6 +84,7 @@ protected:
   ScanListsView *_scanLists;
   PositioningSystemListView *_posSysList;
   RoamingZoneListView *_roamingZoneList;
+  ExtensionView *_extensionView;
 
   RepeaterDatabase *_repeater;
   UserDatabase *_users;

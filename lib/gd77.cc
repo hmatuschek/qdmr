@@ -91,11 +91,12 @@ GD77::defaultRadioInfo() {
 
 
 bool
-GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
+GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
   logDebug() << "Start call-sign DB upload to " << name() << "...";
+  _errorStack = err;
 
   if (StatusIdle != _task) {
-    logError() << "Cannot upload to radio, radio is not idle.";
+    errMsg(err) << "Cannot upload to radio, radio is not idle.";
     return false;
   }
 
@@ -127,9 +128,7 @@ GD77::uploadCallsigns()
 
   // Check every segment in the codeplug
   if (! _callsigns.isAligned(BSIZE)) {
-    _errorMessage = QString("In %1(), cannot upload call-sign DB:\n\t "
-                            "Not aligned with block-size!").arg(__func__);
-    logError() << _errorMessage;
+    errMsg(_errorStack) << "Cannot upload call-sign DB: Not aligned with block-size " << BSIZE << ".";
     return false;
   }
 
@@ -146,11 +145,9 @@ GD77::uploadCallsigns()
           (0x10000 > addr) ? RadioddityInterface::MEMBANK_CALLSIGN_LOWER : RadioddityInterface::MEMBANK_CALLSIGN_UPPER );
     for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
       if (! _dev->write(bank, (b0+b)*BSIZE,
-                        _callsigns.data((b0+b)*BSIZE, 0), BSIZE))
+                        _callsigns.data((b0+b)*BSIZE, 0), BSIZE, _errorStack))
       {
-        _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
-            .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
-        logError() << _errorMessage;
+        errMsg(_errorStack) << "Cannot write block " << (b0+b) << ".";
         return false;
       }
       emit uploadProgress(float(bcount*100)/totb);

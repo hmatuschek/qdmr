@@ -38,7 +38,8 @@ public:
 public slots:
   /** Encodes the given user-database and uploades it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
-                             const CallsignDB::Selection &selection=CallsignDB::Selection());
+                             const CallsignDB::Selection &selection=CallsignDB::Selection(),
+                             const ErrorStack &err=ErrorStack());
 
 protected:
   /** Implements the actual callsign DB upload process. */

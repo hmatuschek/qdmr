@@ -9,8 +9,13 @@
   <title>TyT Codeplug Extensions</title>
 </info>
 
-<para></para>
+<para>
+  This section collects all device specific extensions to the codeplug for TyT and Retevis devices.
+</para>
 
+<xi:include href="channel.xml"/>
+<xi:include href="scanlist.xml"/>
 <xi:include href="buttonsettings.xml"/>
+<xi:include href="radiosettings.xml"/>
 
 </section>

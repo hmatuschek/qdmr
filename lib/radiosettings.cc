@@ -1,10 +1,32 @@
 #include "radiosettings.hh"
 
 RadioSettings::RadioSettings(QObject *parent)
-  : ConfigObject("", parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
-    _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(0)
+  : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
+    _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(0), _tytExtension(nullptr)
 {
   // pass
+}
+
+bool
+RadioSettings::copy(const ConfigItem &other) {
+  const RadioSettings *set = other.as<RadioSettings>();
+  if ((nullptr==set) || (!ConfigItem::copy(other)))
+    return false;
+  if (set->voxDisabled())
+    disableVOX();
+  if (set->totDisabled())
+    disableTOT();
+  return true;
+}
+
+ConfigItem *
+RadioSettings::clone() const {
+  RadioSettings *set = new RadioSettings();
+  if (! set->copy(*this)) {
+    set->deleteLater();
+    return nullptr;
+  }
+  return set;
 }
 
 void
@@ -17,6 +39,22 @@ RadioSettings::clear() {
   _power = Channel::Power::High;
   disableVOX();
   disableTOT();
+
+  setTyTExtension(nullptr);
+}
+
+ConfigItem *
+RadioSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                             const Context &ctx, const ErrorStack &err)
+{
+  Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
+
+  if (0 == strcmp("tyt", prop.name())) {
+    return new TyTSettingsExtension();
+  }
+
+  // No children yet.
+  return nullptr;
 }
 
 const QString &
@@ -116,3 +154,25 @@ RadioSettings::disableTOT() {
   setTOT(0);
 }
 
+TyTSettingsExtension *
+RadioSettings::tytExtension() const {
+  return _tytExtension;
+}
+void
+RadioSettings::setTyTExtension(TyTSettingsExtension *ext) {
+  if (_tytExtension) {
+    disconnect(_tytExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+    _tytExtension->deleteLater();
+  }
+  _tytExtension = ext;
+  if (_tytExtension) {
+    _tytExtension->setParent(this);
+    connect(_tytExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+  }
+  emit modified(this);
+}
+
+void
+RadioSettings::onExtensionModified() {
+  emit modified(this);
+}

@@ -15,27 +15,24 @@ class Zone : public ConfigObject
 {
 	Q_OBJECT
 
-  /** The name of the zone. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The A channels. */
   Q_PROPERTY(ChannelRefList* A READ A)
   /** The B channels. */
   Q_PROPERTY(ChannelRefList* B READ B)
 
 public:
+  /** Default constructor. */
+  explicit Zone(QObject *parent=nullptr);
   /** Constructs an empty Zone with the given name. */
-	explicit Zone(const QString &name, QObject *parent = nullptr);
+  Zone(const QString &name, QObject *parent = nullptr);
 
   /** Copies the given zone. */
   Zone &operator =(const Zone &other);
 
+  ConfigItem *clone() const;
+
   /** Clears this zone. */
   void clear();
-
-  /** Returns the name of the zone. */
-	const QString &name() const;
-  /** Sets the name of the zone. */
-	bool setName(const QString &name);
 
   /** Retruns the list of channels for VFO A in this zone. */
   const ChannelRefList *A() const;
@@ -50,9 +47,11 @@ signals:
   /** Gets emitted whenever the zone gets modified. */
 	void modified();
 
+public:
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
+
 protected:
-  /** Holds the name of the zone. */
-	QString _name;
   /** List of channels for VFO A. */
   ChannelRefList _A;
   /** List of channels for VFO B. */
@@ -74,6 +73,9 @@ public:
 	Zone *zone(int idx) const;
 
   int add(ConfigObject *obj, int row=-1);
+
+public:
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 

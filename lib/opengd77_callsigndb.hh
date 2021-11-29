@@ -78,7 +78,8 @@ public:
   virtual ~OpenGD77CallsignDB();
 
   /** Encodes as many entries as possible of the given user-database. */
-  virtual bool encode(UserDatabase *calldb, const Selection &selection=Selection());
+  virtual bool encode(UserDatabase *calldb, const Selection &selection=Selection(),
+                      const ErrorStack &err=ErrorStack());
 };
 
 #endif // OPENGD77CALLSIGNDB_HH

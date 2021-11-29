@@ -1,9 +1,9 @@
 # TYT MD-UV380
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", MODE="666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", MODE="660", GROUP="dialout"
 
 # Baofeng RD-5R, TD-5R
-SUBSYSTEM=="usb", ATTRS{idVendor}=="15a2", ATTRS{idProduct}=="0073", MODE="666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="15a2", ATTRS{idProduct}=="0073", MODE="660", GROUP="dialout"
 
-# Anytone AT-D868UV, AT-D878UV
+# Anytone AT-D868UV, AT-D878UV, etc
 # Ignore this device in Modem Manager
 ATTRS{idVendor}=="28e9" ATTRS{idProduct}=="018a", ENV{ID_MM_DEVICE_IGNORE}="1"

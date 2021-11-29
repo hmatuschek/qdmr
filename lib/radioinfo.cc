@@ -67,13 +67,6 @@ RadioInfo::RadioInfo()
   // pass...
 }
 
-RadioInfo::RadioInfo(const RadioInfo &other)
-  : _radio(other._radio), _key(other._key), _name(other._name), _manufacturer(other._manufacturer),
-    _alias(other._alias)
-{
-  // pass...
-}
-
 bool
 RadioInfo::isValid() const {
   return ! _key.isEmpty();

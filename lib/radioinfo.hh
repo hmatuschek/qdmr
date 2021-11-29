@@ -45,9 +45,6 @@ public:
   /** Empty constructor. */
   RadioInfo();
 
-  /** Copy constructor. */
-  RadioInfo(const RadioInfo &other);
-
   /** Retunrs @c true if the info is valid. */
   bool isValid() const;
 

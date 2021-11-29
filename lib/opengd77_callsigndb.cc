@@ -88,7 +88,9 @@ OpenGD77CallsignDB::~OpenGD77CallsignDB() {
 }
 
 bool
-OpenGD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection) {
+OpenGD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // Limit entries to USERDB_NUM_ENTRIES
   qint64 n = std::min(calldb->count(), qint64(USERDB_NUM_ENTRIES));
   if (selection.hasCountLimit())

@@ -5,17 +5,20 @@
 
 
 RoamingZoneDialog::RoamingZoneDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _zone(""), _editZone(nullptr)
+  : QDialog(parent), _config(config), _myZone(new RoamingZone(this)), _zone(nullptr)
 {
-  _zone.clear();
+  setWindowTitle(tr("Create Roaming Zone"));
   construct();
 }
 
 RoamingZoneDialog::RoamingZoneDialog(Config *config, RoamingZone *zone, QWidget *parent)
-  : QDialog(parent), _config(config), _zone(""), _editZone(zone)
+  : QDialog(parent), _config(config), _myZone(new RoamingZone(this)), _zone(zone)
 {
-  if (_editZone)
-    _zone = (*_editZone);
+  setWindowTitle(tr("Set Roaming Zone"));
+
+  if (_zone)
+    _myZone->copy(*_zone);
+
   construct();
 }
 
@@ -25,8 +28,12 @@ RoamingZoneDialog::construct() {
   setupUi(this);
   Settings settings;
 
-  zoneName->setText(_zone.name());
-  channelListView->setModel(new ChannelRefListWrapper(_zone.channels(), channelListView));
+  zoneName->setText(_myZone->name());
+  channelListView->setModel(new ChannelRefListWrapper(_myZone->channels(), channelListView));
+
+  extensionView->setObject(_myZone);
+  if (! settings.showCommercialFeatures())
+    tabWidget->tabBar()->hide();
 
   connect(add, SIGNAL(clicked(bool)), this, SLOT(onAddChannel()));
   connect(rem, SIGNAL(clicked(bool)), this, SLOT(onRemChannel()));
@@ -41,11 +48,11 @@ RoamingZoneDialog::onAddChannel() {
 
   QList<Channel *> lst = dia.channel();
   foreach (Channel *channel, lst) {
-    if (0 <= _zone.channels()->indexOf(channel))
+    if (0 <= _myZone->channels()->indexOf(channel))
       continue;
     if (channel->is<AnalogChannel>())
       continue;
-    _zone.addChannel(channel->as<DigitalChannel>());
+    _myZone->addChannel(channel->as<DigitalChannel>());
   }
 }
 
@@ -56,21 +63,23 @@ RoamingZoneDialog::onRemChannel() {
   QPair<int, int> selection = channelListView->selection();
   QList<DigitalChannel *> channels;
   for (int i=selection.first; i<=selection.second; i++)
-    channels.push_back(_zone.channels()->get(i)->as<DigitalChannel>());
+    channels.push_back(_myZone->channels()->get(i)->as<DigitalChannel>());
   foreach (DigitalChannel *channel, channels) {
-    _zone.channels()->del(channel);
+    _myZone->channels()->del(channel);
   }
 }
 
 RoamingZone *
 RoamingZoneDialog::zone() {
-  RoamingZone *zone = _editZone;
-  if (nullptr == zone)
-    zone = new RoamingZone(zoneName->text(), this);
+  _myZone->setName(zoneName->text().simplified());
 
-  _zone.setName(zoneName->text().simplified());
-
-  (*zone) = _zone;
+  RoamingZone *zone = _myZone;
+  if (_zone) {
+    _zone->copy(*_myZone);
+    zone = _zone;
+  } else {
+    _myZone->setParent(nullptr);
+  }
 
   return zone;
 }

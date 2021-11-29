@@ -3,10 +3,11 @@
 
 #include "configobject.hh"
 #include "channel.hh"
+#include "tyt_extensions.hh"
 
 /** Represents the common radio-global settings.
  * @ingroup conf */
-class RadioSettings : public ConfigObject
+class RadioSettings : public ConfigItem
 {
   Q_OBJECT
   /** The first intro line. */
@@ -26,9 +27,15 @@ class RadioSettings : public ConfigObject
   /** The default transmit timeout */
   Q_PROPERTY(unsigned tot READ tot WRITE setTOT)
 
+  /** The settings extension for TyT devices. */
+  Q_PROPERTY(TyTSettingsExtension* tyt READ tytExtension WRITE setTyTExtension)
+
 public:
   /** Default constructor. */
   explicit RadioSettings(QObject *parent=nullptr);
+
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
 
   /** Resets the settings. */
   void clear();
@@ -81,6 +88,19 @@ public:
   /** Disables the transmit timeout (TOT). */
   void disableTOT();
 
+  /** Returns the TyT device specific radio settings. */
+  TyTSettingsExtension *tytExtension() const;
+  /** Sets the TyT device specific radio settings. */
+  void setTyTExtension(TyTSettingsExtension *ext);
+
+public:
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected slots:
+  /** Internal used callback whenever an extension is modified. */
+  void onExtensionModified();
+
 protected:
   /** Holds the first intro line. */
   QString _introLine1;
@@ -98,6 +118,8 @@ protected:
   unsigned _vox;
   /** Holds the global transmit timeout. */
   unsigned _transmitTimeOut;
+  /** Device specific settings extension for TyT devices. */
+  TyTSettingsExtension *_tytExtension;
 };
 
 #endif // RADIOCONFIG_HH

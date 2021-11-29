@@ -34,7 +34,7 @@ own these radios to test the software with.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
  
- * **[Version 0.9.0-alpha3](https://github.com/hmatuschek/qdmr/releases/tag/v0.9.0-alpha3)** -- Reworked core library, added support for TyT MD-2017/Retevis RT82, TyT MD-390/Retevis RT8 & TyT MD-UV380.
+ * **[Version 0.9.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.9.3)** -- Reworked core library, added support for TyT MD-2017/Retevis RT82, TyT MD-390/Retevis RT8 & TyT MD-UV380.
  * **[Version 0.8.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.8.1)** -- Fixed Radioddity GD-77 support (callsign db still buggy).
  * **[Version 0.7.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.7.0)** -- Added AT-D868UVE support and many bugfixes.
  * **[Version 0.6.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.6.4)** -- Added APRS & roaming for AT-D878UV.

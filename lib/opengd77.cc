@@ -107,13 +107,14 @@ OpenGD77::defaultRadioInfo() {
 
 
 bool
-OpenGD77::startDownload(bool blocking) {
+OpenGD77::startDownload(bool blocking, const ErrorStack &err) {
   if (StatusIdle != _task) {
     logError() << "Cannot download from radio, radio is not idle.";
     return false;
   }
 
   _task = StatusDownload;
+  _errorStack = err;
 
   if (blocking) {
     run();
@@ -130,7 +131,9 @@ OpenGD77::startDownload(bool blocking) {
 
 
 bool
-OpenGD77::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags) {
+OpenGD77::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err) {
+  Q_UNUSED(flags)
+
   logDebug() << "Start upload to " << name() << "...";
 
   if (StatusIdle != _task) {
@@ -144,6 +147,8 @@ OpenGD77::startUpload(Config *config, bool blocking, const Codeplug::Flags &flag
   }
 
   _task = StatusUpload;
+  _errorStack = err;
+
   if (blocking) {
     run();
     return (StatusIdle == _task);
@@ -159,7 +164,7 @@ OpenGD77::startUpload(Config *config, bool blocking, const Codeplug::Flags &flag
 }
 
 bool
-OpenGD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
+OpenGD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
   logDebug() << "Start upload to " << name() << "...";
 
   if (StatusIdle != _task) {
@@ -172,6 +177,7 @@ OpenGD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignD
   _callsigns.encode(db, selection);
 
   _task = StatusUploadCallsigns;
+  _errorStack = err;
   if (blocking) {
     run();
     return (StatusIdle == _task);
@@ -261,11 +267,10 @@ OpenGD77::connect() {
   if (_dev)
     _dev->deleteLater();
 
-  _dev = new OpenGD77Interface();
+  _dev = new OpenGD77Interface(_errorStack);
   if (! _dev->isOpen()) {
     _task = StatusError;
-    _errorMessage = QString("Cannot connect to radio: %1").arg(_dev->errorString());
-    logError() << _errorMessage;
+    errMsg(_errorStack) << "Cannot connect to radio.";
     _dev->deleteLater();
     _dev = nullptr;
     return false;
@@ -281,25 +286,20 @@ OpenGD77::download()
   emit downloadStarted();
 
   if (_codeplug.numImages() != 2) {
-    _errorMessage = QString("In %1(), cannot download codeplug:\n\t"
-                            " Codeplug does not contain two images.").arg(__func__);
+    errMsg(_errorStack) << "Cannot download codeplug: Codeplug does not contain two images.";
     return false;
   }
 
   // Check every segment in the codeplug
   if (! _codeplug.isAligned(BSIZE)) {
-    _errorMessage = QString("In %1(), cannot download codeplug:\n\t "
-                            "Codeplug is not aligned with blocksize %5.").arg(__func__).arg(BSIZE);
-    logError() << _errorMessage;
+    errMsg(_errorStack) << "Cannot download codeplug: Codeplug is not aligned with blocksize " << BSIZE << ".";
     return false;
   }
 
   size_t totb = _codeplug.memSize();
 
-  if (! _dev->read_start(0, 0)) {
-    _errorMessage = QString("in %1(), cannot start codeplug download:\n\t %2")
-        .arg(__func__).arg(_dev->errorMessage());
-    logError() << _errorMessage;
+  if (! _dev->read_start(0, 0, _errorStack)) {
+    errMsg(_errorStack) << "Cannot start codeplug download.";
     _dev->close();
     return false;
   }
@@ -315,17 +315,15 @@ OpenGD77::download()
       unsigned b0 = addr/BSIZE, nb = size/BSIZE;
 
       for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
-        if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
-          _errorMessage = QString("In %1(), cannot read block %2:\n\t %3")
-              .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
-          logError() << _errorMessage;
+        if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE, _errorStack)) {
+          errMsg(_errorStack) << "Cannot read block " << (b0+b) << ".";
           return false;
         }
         QThread::usleep(100);
         emit downloadProgress(float(bcount*100)/totb);
       }
     }
-    _dev->read_finish();
+    _dev->read_finish(_errorStack);
   }
 
   return true;
@@ -338,26 +336,20 @@ OpenGD77::upload()
   emit uploadStarted();
 
   if (_codeplug.numImages() != 2) {
-    _errorMessage = QString("In %1(), cannot download codeplug:\n\t"
-                            " Codeplug does not contain two images.").arg(__func__);
-    logError() << _errorMessage;
+    errMsg(_errorStack) << "Cannot download codeplug: Codeplug does not contain two images.";
     return false;
   }
 
   // Check every segment in the codeplug
   if (! _codeplug.isAligned(BSIZE)) {
-    _errorMessage = QString("In %1(), cannot upload code-plug:\n\t "
-                            "Codeplug is not aligned with blocksize %5.").arg(__func__).arg(BSIZE);
-    logError() << _errorMessage;
+    errMsg(_errorStack) << "Cannot upload code-plug: Codeplug is not aligned with blocksize " << BSIZE << ".";
     return false;
   }
 
   size_t totb = _codeplug.memSize();
 
-  if (! _dev->read_start(0, 0)) {
-    _errorMessage = QString("in %1(), cannot start codeplug download:\n\t %2")
-        .arg(__func__).arg(_dev->errorMessage());
-    logError() << _errorMessage;
+  if (! _dev->read_start(0, 0, _errorStack)) {
+    errMsg(_errorStack) << "Cannot start codeplug download.";
     return false;
   }
 
@@ -371,10 +363,8 @@ OpenGD77::upload()
       unsigned size = _codeplug.image(image).element(n).data().size();
       unsigned b0 = addr/BSIZE, nb = size/BSIZE;
       for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
-        if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
-          _errorMessage = QString("In %1(), cannot read block %2:\n\t %3")
-              .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
-          logError() << _errorMessage;
+        if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE, _errorStack)) {
+          errMsg(_errorStack) << "Cannot read block " << (b0+b) << ".";
           return false;
         }
         QThread::usleep(100);
@@ -387,10 +377,8 @@ OpenGD77::upload()
   // Encode config into codeplug
   _codeplug.encode(_config);
 
-  if (! _dev->write_start(0,0)) {
-    _errorMessage = QString("in %1(), cannot start codeplug upload:\n\t %2")
-        .arg(__func__).arg(_dev->errorMessage());
-    logError() << _errorMessage;
+  if (! _dev->write_start(0,0, _errorStack)) {
+    errMsg(_errorStack) << "Cannot start codeplug upload.";
     return false;
   }
 
@@ -404,10 +392,8 @@ OpenGD77::upload()
       unsigned b0 = addr/BSIZE, nb = size/BSIZE;
 
       for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
-        if (! _dev->write(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
-          _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
-              .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
-          logError() << _errorMessage;
+        if (! _dev->write(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE, _errorStack)) {
+          errMsg(_errorStack) << "Cannot write block " << (b0+b) << ".";
           return false;
         }
         QThread::usleep(100);
@@ -428,18 +414,14 @@ OpenGD77::uploadCallsigns()
 
   // Check every segment in the codeplug
   if (! _callsigns.isAligned(BSIZE)) {
-    _errorMessage = QString("In %1(), cannot upload call-sign DB:\n\t "
-                            "Not aligned with block-size!").arg(__func__);
-    logError() << _errorMessage;
+    errMsg(_errorStack) << "Cannot upload call-sign DB: Not aligned with block-size " << BSIZE << "!";
     return false;
   }
 
   size_t totb = _callsigns.memSize();
 
-  if (! _dev->write_start(OpenGD77Codeplug::FLASH, 0)) {
-    _errorMessage = QString("in %1(), cannot start callsign DB upload:\n\t %2")
-        .arg(__func__).arg(_dev->errorMessage());
-    logError() << _errorMessage;
+  if (! _dev->write_start(OpenGD77Codeplug::FLASH, 0, _errorStack)) {
+    errMsg(_errorStack) << "Cannot start callsign DB upload.";
     return false;
   }
 
@@ -451,11 +433,9 @@ OpenGD77::uploadCallsigns()
     unsigned b0 = addr/BSIZE, nb = size/BSIZE;
     for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
       if (! _dev->write(OpenGD77Codeplug::FLASH, (b0+b)*BSIZE,
-                        _callsigns.data((b0+b)*BSIZE, 0), BSIZE))
+                        _callsigns.data((b0+b)*BSIZE, 0), BSIZE, _errorStack))
       {
-        _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
-            .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
-        logError() << _errorMessage;
+        errMsg(_errorStack) << "Cannot write block " << (b0+b) << ".";
         return false;
       }
       emit uploadProgress(float(bcount*100)/totb);

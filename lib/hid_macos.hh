@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <IOKit/hid/IOHIDManager.h>
+#include "errorstack.hh"
 
 /** Implements the HID radio interface MacOS X API.
  * @ingroup rif */
@@ -12,7 +13,7 @@ class HIDevice: public QObject
 
 public:
   /** Opens a connection to the device with given vendor and product ID. */
-	HIDevice(int vid, int pid, QObject *parent=nullptr);
+	HIDevice(int vid, int pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destrutor. */
 	virtual ~HIDevice();
 
@@ -23,8 +24,11 @@ public:
    * @param data Pointer to the command/data to send.
    * @param nbytes The number of bytes to send.
    * @param rdata Pointer to receive buffer.
-   * @param rlength Size of receive buffer. */
-	bool hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned char *rdata, unsigned rlength);
+   * @param rlength Size of receive buffer.
+   * @param err The stack to put error messages on. */
+	bool hid_send_recv(const unsigned char *data, unsigned nbytes,
+                     unsigned char *rdata, unsigned rlength,
+                     const ErrorStack &err=ErrorStack());
 
   /** Close connection to device. */
 	void close();
@@ -49,7 +53,6 @@ protected:
 	unsigned char _receive_buf[42];
 	/** Receive result. */
 	volatile int _nbytes_received = 0;
-  QString _errorMessage;
 };
 
 #endif // HID_MACOS_HH

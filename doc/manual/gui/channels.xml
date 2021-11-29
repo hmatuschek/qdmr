@@ -123,6 +123,12 @@
   location information is send over this channel (selecting <guilabel>None</guilabel> disables 
   GPS for this channel).
 </para>
+
+<para>
+  If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
+  <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
+  the device specific settings for the GPS system. 
+</para>
 </section>
 
 
@@ -172,6 +178,12 @@
 <para>
   Finally <guilabel>Bandwidth</guilabel> specifies the band-width of the transmission (i.e., 12.5 
   or 25 kHz).
+</para>
+
+<para>
+  If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
+  <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
+  the device specific settings for the GPS system. 
 </para>
 </section>
 

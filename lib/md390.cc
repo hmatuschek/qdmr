@@ -62,7 +62,7 @@ Radio::Features _md390_features = {
 
 
 
-MD390::MD390(TyTInterface *device, QObject *parent)
+MD390::MD390(TyTInterface *device, const ErrorStack &err, QObject *parent)
   : TyTRadio(device, parent), _name("TyT MD-390"), _features(_md390_features)
 {
   // Read channels and identify device variance based on the channel frequencies. This may block
@@ -72,21 +72,17 @@ MD390::MD390(TyTInterface *device, QObject *parent)
   uint total_size = align_size(addr_start+NUM_CHANNELS*CHANNEL_SIZE, BLOCK_SIZE)-addr_start;
   QByteArray buffer(total_size, 0xff);
 
-  if (! _dev->read_start(0, addr_start)) {
-    _errorMessage = "Cannot read channels from MD-390, cannot determine variant: "
-        + _dev->errorMessage();
-    logError() << _errorMessage;
+  if (! _dev->read_start(0, addr_start, err)) {
+    errMsg(err) << "Cannot read channels from MD-390, cannot determine variant.";
     return;
   }
   for (unsigned i=0; i<(total_size/BLOCK_SIZE); i++){
-    if (! _dev->read(0, ADDR_CHANNELS, (uint8_t *)buffer.data()+i*BLOCK_SIZE, BLOCK_SIZE)) {
-      _errorMessage = "Cannot read channels from MD-390, cannot determine variant: "
-          + _dev->errorMessage();
-      logError() << _errorMessage;
+    if (! _dev->read(0, ADDR_CHANNELS, (uint8_t *)buffer.data()+i*BLOCK_SIZE, BLOCK_SIZE, err)) {
+      errMsg(err) << "Cannot read channels from MD-390, cannot determine variant.";
       return;
     }
   }
-  _dev->read_finish();
+  _dev->read_finish(err);
 
   // Determine frequency range of channels
   unsigned channelCount = 0;
@@ -123,10 +119,8 @@ MD390::MD390(TyTInterface *device, QObject *parent)
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{{450., 520.}};
     _name += "U";
   } else {
-    _errorMessage = tr("Cannot determine frequency range from channel frequencies between "
-                       "%1MHz and %2MHz. Will not check frequency ranges")
-        .arg(range.min).arg(range.max);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot determine frequency range from channel frequencies between "
+                << range.min << "MHz and " << range.max << "MHz. Will not check frequency ranges.";
   }
 }
 

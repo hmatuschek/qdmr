@@ -57,24 +57,6 @@ public:
    * @verbinclude uv390_channel.txt */
   class ChannelElement: public TyTCodeplug::ChannelElement
   {
-  public:
-    /** Again, I have no idea. */
-    enum InCall {
-      INCALL_ALWAYS = 0,
-      INCALL_ADMIT = 1,
-      INCALL_TXINT = 2
-    };
-
-    /** Turn-off tone frequency.
-     * This radio has a feature that allows to disable radios remotely by sending a specific tone.
-     * Certainly not a feature used in ham-radio. */
-    enum TurnOffFreq {
-      TURNOFF_NONE = 3,             ///< Turn-off disabled. Default!
-      TURNOFF_259_2HZ = 0,          ///< Turn-off on 259.2Hz tone.
-      TURNOFF_55_2HZ = 1            ///< Turn-off on 55.2Hz tone.
-    };
-
-
   protected:
     /** Constructs a channel from the given memory. */
     ChannelElement(uint8_t *ptr, size_t size);
@@ -87,14 +69,14 @@ public:
     void clear();
 
     /** Returns the in-call criterion for this channel. */
-    virtual InCall inCallCriteria() const;
+    virtual TyTChannelExtension::InCallCriterion inCallCriteria() const;
     /** Sets the in-call criterion for this channel. */
-    virtual void setInCallCriteria(InCall crit);
+    virtual void setInCallCriteria(TyTChannelExtension::InCallCriterion crit);
 
     /** Returns the remote turn-off/kill frequency for this channel. */
-    virtual TurnOffFreq turnOffFreq() const;
+    virtual TyTChannelExtension::KillTone turnOffFreq() const;
     /** Sets the remote turn-off/kill frequency for this channel. */
-    virtual void setTurnOffFreq(TurnOffFreq freq);
+    virtual void setTurnOffFreq(TyTChannelExtension::KillTone freq);
 
     /** Returns the squelch level [0-10]. */
     virtual unsigned squelch() const;
@@ -117,9 +99,9 @@ public:
     virtual void enableDualCapacityDirectMode(bool enable);
 
     /** Retruns @c true if the radio acts as the leader for this DCDM channel. */
-    virtual bool leaderOrMS() const;
+    virtual bool dcdmLeader() const;
     /** Enables/disables this radio to be the leader for this DCDM channel. */
-    virtual void enableLeaderOrMS(bool enable);
+    virtual void enableDCDMLeader(bool enable);
 
     /** Constructs a generic @c Channel object from the codeplug channel. */
     virtual Channel *toChannelObj() const;
@@ -392,41 +374,41 @@ public:
   bool encodeTimestamp();
 
   void clearGeneralSettings();
-  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx);
-  bool decodeGeneralSettings(Config *config);
+  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeGeneralSettings(Config *config, const ErrorStack &err=ErrorStack());
 
   void clearChannels();
-  bool encodeChannels(Config *config, const Flags &flags, Context &ctx);
-  bool createChannels(Config *config, Context &ctx);
-  bool linkChannels(Context &ctx);
+  bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearContacts();
-  bool encodeContacts(Config *config, const Flags &flags, Context &ctx);
-  bool createContacts(Config *config, Context &ctx);
+  bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearZones();
-  bool encodeZones(Config *config, const Flags &flags, Context &ctx);
-  bool createZones(Config *config, Context &ctx);
-  bool linkZones(Context &ctx);
+  bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearGroupLists();
-  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx);
-  bool createGroupLists(Config *config, Context &ctx);
-  bool linkGroupLists(Context &ctx);
+  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearScanLists();
-  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx);
-  bool createScanLists(Config *config, Context &ctx);
-  bool linkScanLists(Context &ctx);
+  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearPositioningSystems();
-  bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx);
-  bool createPositioningSystems(Config *config, Context &ctx);
-  bool linkPositioningSystems(Context &ctx);
+  bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkPositioningSystems(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
-  bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx);
-  bool decodeButtonSetttings(Config *config);
+  bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack());
 
   /** Resets the boot setting, e.g. initial channels and zone at bootup. */
   virtual void clearBootSettings();

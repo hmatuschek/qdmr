@@ -6,6 +6,8 @@
 
 class Channel;
 #include "configreference.hh"
+#include "tyt_extensions.hh"
+
 
 /** Generic representation of a scan list.
  * @ingroup conf */
@@ -13,8 +15,6 @@ class ScanList : public ConfigObject
 {
 	Q_OBJECT
 
-  /** The name of the scan list. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The primary channel. */
   Q_PROPERTY(ChannelReference* primary READ primary)
   /** The secondary channel. */
@@ -24,21 +24,23 @@ class ScanList : public ConfigObject
   /** The list of channels. */
   Q_PROPERTY(ChannelRefList * channels READ channels)
 
+  /** The TyT scan-list extension. */
+  Q_PROPERTY(TyTScanListExtension* tyt READ tytScanListExtension WRITE setTyTScanListExtension)
+
 public:
+  /** Default constructor. */
+  explicit ScanList(QObject *parent=nullptr);
   /** Constructs a scan list with the given name. */
 	ScanList(const QString &name, QObject *parent=nullptr);
 
   /** Copies the given scan list. */
   ScanList &operator= (const ScanList &other);
+  ConfigItem *clone() const;
 
   /** Returns the number of channels within the scanlist. */
 	int count() const;
   /** Clears the scan list. */
 	void clear();
-  /** Returns the name of the scanlist. */
-	const QString &name() const;
-  /** Sets the name of the scanlist. */
-	bool setName(const QString &name);
 
   /** Returns @c true if the given channel is part of this scanlist. */
   bool contains(Channel *channel) const;
@@ -83,9 +85,16 @@ public:
   /** Sets the TX channel. */
   void setRevertChannel(Channel *channel);
 
+  /** Returns the TyT scan-list extension instance (if set). */
+  TyTScanListExtension *tytScanListExtension() const;
+  /** Sets the TyT scan-list extension. */
+  void setTyTScanListExtension(TyTScanListExtension *tyt);
+
+public:
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
+
 protected:
-  /** The scanlist name. */
-	QString _name;
   /** The channel list. */
   ChannelRefList _channels;
   /** The priority channel. */
@@ -94,6 +103,9 @@ protected:
   ChannelReference _secondary;
   /** The transmit channel. */
   ChannelReference _revert;
+  /** TyT scan-list settings extension. */
+  TyTScanListExtension *_tyt;
+
 };
 
 
@@ -112,12 +124,8 @@ public:
 
   int add(ConfigObject *obj, int row=-1);
 
-	/** Implementation of QAbstractListModel, returns the number of scanlists. */
-	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  /** Implementation of QAbstractListModel, returns the item data at the given index. */
-	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-  /** Implementation of QAbstractListModel, returns the header data at the given section. */
-	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+public:
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 

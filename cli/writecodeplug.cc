@@ -8,7 +8,6 @@
 #include "radio.hh"
 #include "config.hh"
 #include "progressbar.hh"
-#include "configreader.hh"
 
 
 int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
@@ -28,9 +27,9 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
   } else if (parser.isSet("yaml") || ("yaml" == fileinfo.suffix())) {
-    ConfigReader reader;
-    if (! reader.read(&config, fileinfo.canonicalFilePath())) {
-      logError() << "Cannot parse YAML codeplug '" << fileinfo.fileName() << "': " << reader.errorMessage();
+    ErrorStack err;
+    if (! config.readYAML(fileinfo.canonicalFilePath(), err)) {
+      logError() << "Cannot parse YAML codeplug '" << fileinfo.fileName() << "': " << err.format();
       return -1;
     }
   }
@@ -51,9 +50,10 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
   }
 
-  Radio *radio = Radio::detect(errorMessage, forceRadio);
+  ErrorStack err;
+  Radio *radio = Radio::detect(forceRadio, err);
   if (nullptr == radio) {
-    logError() << "Cannot detect radio: " << errorMessage;
+    logError() << "Cannot detect radio: " << err.format();
     return -1;
   }
 
@@ -90,13 +90,13 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     flags.autoEnableRoaming = true;
 
   logDebug() << "Start upload to " << radio->name() << ".";
-  if (! radio->startUpload(&config, true, flags)) {
-    logError() << "Codeplug upload error: " << radio->errorMessage();
+  if (! radio->startUpload(&config, true, flags, err)) {
+    logError() << "Codeplug upload error: " << err.format();
     return -1;
   }
 
   if (Radio::StatusError == radio->status()) {
-    logError() << "Codeplug upload error: " << radio->errorMessage();
+    logError() << "Codeplug upload error: " << err.format();
     return -1;
   }
 

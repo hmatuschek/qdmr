@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSerialPort>
 #include "radiointerface.hh"
+#include "errorstack.hh"
 
 /** Implements a serial connection to a radio via USB.
  *
@@ -20,8 +21,9 @@ protected:
    * product IDs.
    * @param vid Vendor ID of device.
    * @param pid Product ID of device.
+   * @param err The error stack, messages are put onto.
    * @param parent Specifies the parent object. */
-  explicit USBSerial(unsigned vid, unsigned pid, QObject *parent=nullptr);
+  explicit USBSerial(unsigned vid, unsigned pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
 public:
   /** Destrutor. */
@@ -32,18 +34,11 @@ public:
   /** Closes the interface to the device. */
   void close();
 
-  /** Returns the last error message. */
-  const QString &errorMessage() const;
-
 protected slots:
   /** Callback for serial interface errors. */
   void onError(QSerialPort::SerialPortError error_t);
   /** Callback when closing interface. */
   void onClose();
-
-protected:
-  /** Holds the last error message. */
-  QString _errorMessage;
 };
 
 #endif // USBSERIAL_HH

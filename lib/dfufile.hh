@@ -8,7 +8,7 @@
 #include <QTextStream>
 
 #include "addressmap.hh"
-
+#include "errorstack.hh"
 
 class CRC32;
 
@@ -209,22 +209,19 @@ public:
   /** Checks if all image addresses and sizes is aligned with the given block size. */
   bool isAligned(unsigned blocksize) const;
 
-  /** Returns the error message in case of an error. */
-	const QString &errorMessage() const;
-
   /** Reads the specified DFU file.
    * @return @c false on error. */
-	bool read(const QString &filename);
+  bool read(const QString &filename, const ErrorStack &err=ErrorStack());
   /** Reads the specified DFU file.
    * @returns @c false on error. */
-	bool read(QFile &file);
+  bool read(QFile &file, const ErrorStack &err=ErrorStack());
 
   /** Writes to the specified file.
    * @returns @c false on error. */
-	bool write(const QString &filename);
+  bool write(const QString &filename, const ErrorStack &err=ErrorStack());
   /** Writes to the specified file.
    * @returns @c false on error. */
-	bool write(QFile &file);
+  bool write(QFile &file, const ErrorStack &err=ErrorStack());
 
   /** Dumps a text representation of the DFU file structure to the specified text stream. */
 	void dump(QTextStream &stream) const;
@@ -235,8 +232,6 @@ public:
   virtual const unsigned char *data(uint32_t offset, uint32_t img=0) const;
 
 protected:
-  /// Holds the error string.
-	QString _errorMessage;
   /// The list of images.
 	QVector<Image> _images;
 };

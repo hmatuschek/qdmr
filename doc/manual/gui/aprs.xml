@@ -50,6 +50,12 @@
   to the position information. This should always be <guilabel>Selected</guilabel>. That is,
   the radio will always send the information on the currently selected channel. 
 </para>
+
+<para>
+  If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
+  <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
+  the device specific settings for the GPS system. 
+</para>
 </section>
 
 
@@ -85,6 +91,12 @@
   <guilabel>Update Period</guilabel> specifies how frequently an APRS packet should be send. 
   Finally, the <guilabel>Message</guilabel> field allows to  set an optional text message for the 
   packet. 
+</para>
+
+<para>
+  If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
+  <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
+  the device specific settings for the GPS system. 
 </para>
 </section>
 

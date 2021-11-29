@@ -48,7 +48,8 @@ public:
   virtual ~CallsignDB();
 
   /** Encodes the given user db into the device specific callsign db. */
-  virtual bool encode(UserDatabase *db, const Selection &selection=Selection()) = 0;
+  virtual bool encode(UserDatabase *db, const Selection &selection=Selection(),
+                      const ErrorStack &err=ErrorStack()) = 0;
 };
 
 #endif // CALLSIGNDB_HH

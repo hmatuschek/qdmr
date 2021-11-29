@@ -11,7 +11,6 @@
 #include "verifydialog.hh"
 #include "analogchanneldialog.hh"
 #include "digitalchanneldialog.hh"
-#include "contactdialog.hh"
 #include "rxgrouplistdialog.hh"
 #include "zonedialog.hh"
 #include "scanlistdialog.hh"
@@ -24,7 +23,6 @@
 #include "searchpopup.hh"
 #include "contactselectiondialog.hh"
 #include "configitemwrapper.hh"
-#include "configreader.hh"
 #include "generalsettingsview.hh"
 #include "radioidlistview.hh"
 #include "contactlistview.hh"
@@ -34,6 +32,8 @@
 #include "scanlistsview.hh"
 #include "positioningsystemlistview.hh"
 #include "roamingzonelistview.hh"
+#include "errormessageview.hh"
+#include "extensionview.hh"
 
 
 Application::Application(int &argc, char *argv[])
@@ -67,10 +67,10 @@ Application::Application(int &argc, char *argv[])
         return;
       }
     } else if ("yaml" == info.suffix()) {
-      ConfigReader reader;
-      if (! reader.read(_config, argv[1])) {
+      ErrorStack err;
+      if (! _config->readYAML(argv[1], err)) {
         logError() << "Cannot read yaml codeplug file '" << argv[1]
-                   << "': " << reader.errorMessage();
+                   << "': " << err.format();
         return;
       }
     }
@@ -91,7 +91,7 @@ Application::Application(int &argc, char *argv[])
   _releaseNotes.checkForUpdate();
 
   logDebug() << "Last known position: " << _currentPosition.toString();
-  connect(_config, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModifed()));
+  connect(_config, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModifed()));
 }
 
 Application::~Application() {
@@ -188,6 +188,10 @@ Application::createMainWindow() {
   tabs->addTab(_generalSettings, tr("Settings"));
   if (settings.showCommercialFeatures()) {
     _generalSettings->hideDMRID(true);
+    _generalSettings->hideExtensions(false);
+  } else {
+    _generalSettings->hideDMRID(false);
+    _generalSettings->hideExtensions(true);
   }
 
   // Wire-up "Radio IDs" view
@@ -222,9 +226,16 @@ Application::createMainWindow() {
   _roamingZoneList = new RoamingZoneListView(_config);
   tabs->addTab(_roamingZoneList, tr("Roaming"));
 
+  // Wire-up "extension view"
+  _extensionView = new ExtensionView();
+  _extensionView->setObject(_config);
+  tabs->addTab(_extensionView, tr("Extensions"));
+
   if (! settings.showCommercialFeatures()) {
     tabs->removeTab(tabs->indexOf(_radioIdTab));
     _radioIdTab->setHidden(true);
+    tabs->removeTab(tabs->indexOf(_extensionView));
+    _extensionView->setHidden(true);
   }
 
   _mainWindow->restoreGeometry(settings.mainWindowState());
@@ -278,18 +289,18 @@ Application::loadCodeplug() {
   QFileInfo info(filename);
   settings.setLastDirectoryDir(info.absoluteDir());
 
-  QString errorMessage;
   if ("yaml" == info.suffix()){
-    ConfigReader reader;
-    if (reader.read(_config, filename)) {
+    ErrorStack err;
+    if (_config->readYAML(filename, err)) {
       _mainWindow->setWindowModified(false);
     } else {
       QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
                             tr("Cannot read codeplug from file '%1': %2")
-                            .arg(filename).arg(reader.errorMessage()));
+                            .arg(filename).arg(err.format()));
       _config->clear();
     }
   } else {
+    QString errorMessage;
     QTextStream stream(&file);
     if (_config->readCSV(stream, errorMessage)) {
       _mainWindow->setWindowModified(false);
@@ -370,14 +381,14 @@ Application::quitApplication() {
 
 void
 Application::detectRadio() {
-  QString errorMessage;
-  Radio *radio = Radio::detect(errorMessage);
+  ErrorStack err;
+  Radio *radio = Radio::detect(err);
   if (radio) {
     QMessageBox::information(nullptr, tr("Radio found"), tr("Found device '%1'.").arg(radio->name()));
     radio->deleteLater();
   } else {
     QMessageBox::information(nullptr, tr("No Radio found."),
-                             tr("No known radio detected. Check connection?\nError: %1").arg(errorMessage));
+                             tr("No known radio detected. Check connection?\nError: %1").arg(err.format()));
   }
   radio->deleteLater();
 }
@@ -386,15 +397,15 @@ Application::detectRadio() {
 bool
 Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &flags) {
   Radio *myRadio = radio;
-  QString errorMessage;
+  ErrorStack err;
 
   // If no radio is given -> try to detect the radio
   if (nullptr == myRadio)
-    myRadio = Radio::detect(errorMessage);
+    myRadio = Radio::detect(err);
   if (nullptr == myRadio) {
     QMessageBox::information(nullptr, tr("No Radio found."),
                              tr("Cannot verify codeplug: No known radio detected.\nError: ")
-                             + errorMessage);
+                             + err.format());
     return false;
   }
 
@@ -433,12 +444,12 @@ Application::downloadCodeplug() {
       return;
   }
 
-  QString errorMessage;
-  Radio *radio = Radio::detect(errorMessage);
+  ErrorStack err;
+  Radio *radio = Radio::detect(err);
   if (nullptr == radio) {
     QMessageBox::critical(nullptr, tr("No Radio found."),
-                          tr("Can not read codeplug from device: No radio found.\nError: ")
-                          + errorMessage);
+                          tr("Can not read codeplug from device: No radio found.\n")
+                          + err.format());
     return;
   }
 
@@ -451,8 +462,7 @@ Application::downloadCodeplug() {
     _mainWindow->statusBar()->showMessage(tr("Read ..."));
     _mainWindow->setEnabled(false);
   } else {
-    QMessageBox::critical(nullptr, tr("Cannot Read codeplug."),
-                          tr("Cannot read codeplug: %1").arg(radio->errorMessage()));
+    ErrorMessageView(err).show();
     progress->setVisible(false);
   }
 }
@@ -460,9 +470,7 @@ Application::downloadCodeplug() {
 void
 Application::onCodeplugDownloadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Read error"));
-  QMessageBox::critical(0, tr("Read error"),
-                        tr("Cannot read codeplug from device. "
-                           "An error occurred during read: %1").arg(radio->errorMessage()));
+  ErrorMessageView(radio->errorStack()).show();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
@@ -477,15 +485,13 @@ void
 Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
   _config->clear();
   _mainWindow->setWindowModified(false);
-  if (codeplug->decode(_config)) {
+  ErrorStack err;
+  if (codeplug->decode(_config, err)) {
     _mainWindow->statusBar()->showMessage(tr("Read complete"));
     _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
-
     _config->setModified(false);
   } else {
-    QMessageBox::critical(
-          nullptr, tr("Cannot decode code-plug"),
-          tr("Cannot decode code-plug: %2").arg(codeplug->errorMessage()));
+    ErrorMessageView(err).show();
   }
   _mainWindow->setEnabled(true);
 
@@ -497,13 +503,13 @@ void
 Application::uploadCodeplug() {
   // Start upload
   Settings settings;
-  QString errorMessage;
+  ErrorStack err;
 
-  Radio *radio = Radio::detect(errorMessage);
+  Radio *radio = Radio::detect(err);
   if (nullptr == radio) {
     QMessageBox::critical(nullptr, tr("No Radio found."),
                           tr("Can not write codeplug to device: No radio found.\nError: ")
-                          + errorMessage);
+                          + err.format());
     return;
   }
 
@@ -528,12 +534,11 @@ Application::uploadCodeplug() {
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
-  if (radio->startUpload(_config, false, settings.codePlugFlags())) {
+  if (radio->startUpload(_config, false, settings.codePlugFlags(), err)) {
      _mainWindow->statusBar()->showMessage(tr("Upload ..."));
      _mainWindow->setEnabled(false);
   } else {
-    QMessageBox::critical(nullptr, tr("Cannot write codeplug."),
-                          tr("Cannot write codeplug: %1").arg(radio->errorMessage()));
+    ErrorMessageView(err).show();
     progress->setVisible(false);
   }
 }
@@ -541,15 +546,15 @@ Application::uploadCodeplug() {
 void
 Application::uploadCallsignDB() {
   // Start upload
-  QString errorMessage;
+  ErrorStack err;
 
   logDebug() << "Detect radio...";
-  Radio *radio = Radio::detect(errorMessage);
+  Radio *radio = Radio::detect(err);
   if (nullptr == radio) {
     logDebug() << "No matching radio found.";
     QMessageBox::critical(nullptr, tr("No Radio found."),
                           tr("Can not write call-sign DB to device: No radio found.\nError: ")
-                          + errorMessage);
+                          + err.format());
     return;
   }
   logDebug() << "Found radio " << radio->name() << ".";
@@ -612,14 +617,12 @@ Application::uploadCallsignDB() {
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
-  if (radio->startUploadCallsignDB(_users, false, css)) {
+  if (radio->startUploadCallsignDB(_users, false, css, err)) {
     logDebug() << "Start call-sign DB write...";
     _mainWindow->statusBar()->showMessage(tr("Write call-sign DB ..."));
     _mainWindow->setEnabled(false);
   } else {
-    logDebug() << "Cannot write call-sign DB.";
-    QMessageBox::critical(nullptr, tr("Cannot write call-sign DB."),
-                          tr("Cannot write call-sign DB: %1").arg(radio->errorMessage()));
+    ErrorMessageView(err).show();
     progress->setVisible(false);
   }
 }
@@ -628,11 +631,7 @@ Application::uploadCallsignDB() {
 void
 Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Write error"));
-  QMessageBox::critical(
-        nullptr, tr("Write error"),
-        tr("Cannot write codeplug or call-sign DB to device. "
-           "An error occurred during write: %1").arg(radio->errorMessage()));
-  logError() << "Write error: " << radio->errorMessage() << ".";
+  ErrorMessageView(radio->errorStack()).show();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
@@ -672,17 +671,26 @@ Application::showSettings() {
     QTabWidget *tabs = _mainWindow->findChild<QTabWidget*>("tabs");
     if (settings.showCommercialFeatures()) {
       if (-1 == tabs->indexOf(_radioIdTab)) {
-        QWidget *genSet = _mainWindow->findChild<QWidget*>("GeneralSettingsView");
-        tabs->insertTab(tabs->indexOf(genSet)+1, _radioIdTab, tr("Radio IDs"));
+        tabs->insertTab(tabs->indexOf(_generalSettings)+1, _radioIdTab, tr("Radio IDs"));
+        _mainWindow->update();
+      }
+      if (-1 == tabs->indexOf(_extensionView)) {
+        tabs->insertTab(tabs->indexOf(_roamingZoneList)+1, _extensionView, tr("Extensions"));
         _mainWindow->update();
       }
       _generalSettings->hideDMRID(true);
+      _generalSettings->hideExtensions(false);
     } else if (! settings.showCommercialFeatures()) {
       if (-1 != tabs->indexOf(_radioIdTab)) {
         tabs->removeTab(tabs->indexOf(_radioIdTab));
         _mainWindow->update();
       }
+      if (-1 != tabs->indexOf(_extensionView)) {
+        tabs->removeTab(tabs->indexOf(_extensionView));
+        _mainWindow->update();
+      }
       _generalSettings->hideDMRID(false);
+      _generalSettings->hideExtensions(true);
     }
   }
 }

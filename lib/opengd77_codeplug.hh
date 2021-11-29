@@ -110,6 +110,11 @@ public:
   public:
     /** Constructor. */
     explicit ZoneElement(uint8_t *ptr);
+
+    void clear();
+    bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
+    void fromZoneObjA(const Zone *zone, Context &ctx);
+    void fromZoneObjB(const Zone *zone, Context &ctx);
   };
 
   /** Implements the OpenGD77 specific zone bank.
@@ -168,48 +173,48 @@ public:
 
 public:
   void clearGeneralSettings();
-  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx);
-  bool decodeGeneralSettings(Config *config, Context &ctx);
+  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
   void clearMessages();
 
   void clearScanLists();
-  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx);
-  bool createScanLists(Config *config, Context &ctx);
-  bool linkScanLists(Config *config, Context &ctx);
+  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearContacts();
-  bool encodeContacts(Config *config, const Flags &flags, Context &ctx);
-  bool createContacts(Config *config, Context &ctx);
+  bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearDTMFContacts();
-  bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx);
-  bool createDTMFContacts(Config *config, Context &ctx);
+  bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createDTMFContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearChannels();
-  bool encodeChannels(Config *config, const Flags &flags, Context &ctx);
-  bool createChannels(Config *config, Context &ctx);
-  bool linkChannels(Config *config, Context &ctx);
+  bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearBootSettings();
   void clearMenuSettings();
 
   void clearBootText();
-  bool encodeBootText(Config *config, const Flags &flags, Context &ctx);
-  bool decodeBootText(Config *config, Context &ctx);
+  bool encodeBootText(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeBootText(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearVFOSettings();
 
   void clearZones();
-  bool encodeZones(Config *config, const Flags &flags, Context &ctx);
-  bool createZones(Config *config, Context &ctx);
-  bool linkZones(Config *config, Context &ctx);
+  bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearGroupLists();
-  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx);
-  bool createGroupLists(Config *config, Context &ctx);
-  bool linkGroupLists(Config *config, Context &ctx);
+  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 #endif // OPENGD77_CODEPLUG_HH

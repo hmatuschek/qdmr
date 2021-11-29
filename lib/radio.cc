@@ -291,7 +291,7 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
                       VerifyIssue::NOTIFICATION,
                       tr("Radio does not support dual-zones. Zone '%1' will be split into two.")
                       .arg(zone->name())));
-      if (zone->name()+2 > features().maxZoneNameLength) {
+      if ((zone->name().size()+2) > features().maxZoneNameLength) {
         issues.append(VerifyIssue(
                         VerifyIssue::WARNING,
                         tr("Zone '%1' will be split into two but its name is too long to "
@@ -380,12 +380,17 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
 
 
 Radio *
-Radio::detect(QString &errorMessage, const RadioInfo &force) {
+Radio::detect(const ErrorStack &err) {
+  return Radio::detect(RadioInfo(), err);
+}
+
+Radio *
+Radio::detect(const RadioInfo &force, const ErrorStack &err) {
   RadioInfo id;
 
   // Try TYT UV Family
   {
-    TyTInterface *dfu = new TyTInterface(0x0483, 0xdf11);
+    TyTInterface *dfu = new TyTInterface(0x0483, 0xdf11, err);
     if (dfu->isOpen()) {
       id = dfu->identifier();
       if ((id.isValid() && (RadioInfo::MD390 == id.id())) || (force.isValid() && (RadioInfo::MD390 == force.id()))) {
@@ -395,7 +400,6 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
       } else if ((id.isValid() && (RadioInfo::MD2017 == id.id())) || (force.isValid() && (RadioInfo::MD2017 == force.id()))) {
         return new MD2017(dfu);
       } else {
-        errorMessage = tr("Cannot identify TyT radio: %1").arg(dfu->errorMessage());
         dfu->close();
         dfu->deleteLater();
         return nullptr;
@@ -407,7 +411,7 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
 
   // Try Radioddity/Baofeng RD5R & GD-77
   {
-    RadioddityInterface *hid = new RadioddityInterface(0x15a2, 0x0073);
+    RadioddityInterface *hid = new RadioddityInterface(0x15a2, 0x0073, err);
     if (hid->isOpen()) {
       id = hid->identifier();
       if ((id.isValid() && (RadioInfo::RD5R == id.id())) || (force.isValid() && (RadioInfo::RD5R == force.id()))) {
@@ -415,7 +419,6 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
       } else if ((id.isValid() && (RadioInfo::GD77 == id.id())) || (force.isValid() && (RadioInfo::GD77 == force.id()))) {
         return new GD77(hid);
       } else {
-        errorMessage = tr("Cannot identify Radioddity radio: %1").arg(hid->errorMessage());
         hid->close();
         hid->deleteLater();
         return nullptr;
@@ -427,13 +430,12 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
 
   // Try Open GD77 firmware
   {
-    OpenGD77Interface *ogd77 = new OpenGD77Interface();
+    OpenGD77Interface *ogd77 = new OpenGD77Interface(err);
     if (ogd77->isOpen()) {
       id = ogd77->identifier();
       if ((id.isValid() && (RadioInfo::OpenGD77 == id.id())) || (force.isValid() && (RadioInfo::OpenGD77 == force.id()))) {
         return new OpenGD77(ogd77);
       } else {
-        errorMessage = tr("Cannot identify OpenGD77 radio: %1").arg(ogd77->errorMessage());
         ogd77->close();
         ogd77->deleteLater();
         return nullptr;
@@ -445,7 +447,7 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
 
   // Try Anytone USB-serial devices
   {
-    AnytoneInterface *anytone = new AnytoneInterface();
+    AnytoneInterface *anytone = new AnytoneInterface(err);
     if (anytone->isOpen()) {
       id = anytone->identifier();
       if ((id.isValid() && (RadioInfo::D868UVE == id.id())) || (force.isValid() && (RadioInfo::D868UVE == force.id()))) {
@@ -457,7 +459,6 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
       } else if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
         return new D578UV(anytone);
       } else {
-        errorMessage = tr("Cannot identify OpenGD77 radio: %1").arg(anytone->errorMessage());
         anytone->close();
         anytone->deleteLater();
         return nullptr;
@@ -467,10 +468,7 @@ Radio::detect(QString &errorMessage, const RadioInfo &force) {
     }
   }
 
-  if (errorMessage.isEmpty())
-    errorMessage = QString("%1(): No matching radio found.").arg(__func__);
-  else
-    errorMessage = QString("%1(): Cannot connect to radio: %2").arg(__func__).arg(errorMessage);
+  errMsg(err) << "Cannot connect to radio.";
   return nullptr;
 }
 
@@ -480,15 +478,7 @@ Radio::status() const {
   return _task;
 }
 
-const QString &
-Radio::errorMessage() const {
-  return _errorMessage;
-}
-
-void
-Radio::clearError() {
-  if (StatusError == _task) {
-    _task = StatusIdle;
-    _errorMessage.clear();
-  }
+const ErrorStack &
+Radio::errorStack() const {
+  return _errorStack;
 }

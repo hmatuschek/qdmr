@@ -5,20 +5,26 @@
 /* ********************************************************************************************* *
  * Implementation of RadioID
  * ********************************************************************************************* */
-RadioID::RadioID(const QString &name, uint32_t id, QObject *parent)
-  : ConfigObject("id", parent), _name(name), _number(id)
+RadioID::RadioID(QObject *parent)
+  : ConfigObject("id", parent), _number(0)
 {
   // pass...
 }
 
-const QString &
-RadioID::name() const {
-  return _name;
+RadioID::RadioID(const QString &name, uint32_t id, QObject *parent)
+  : ConfigObject(name, "id", parent), _number(id)
+{
+  // pass...
 }
 
-void
-RadioID::setName(const QString &name) {
-  _name = name.simplified();
+ConfigItem *
+RadioID::clone() const {
+  RadioID *id = new RadioID();
+  if (! id->copy(*this)) {
+    id->deleteLater();
+    return nullptr;
+  }
+  return id;
 }
 
 uint32_t
@@ -43,6 +49,43 @@ RadioID::serialize(const Context &context) {
   node.SetStyle(YAML::EmitterStyle::Flow);
   type["dmr"] = node;
   return type;
+}
+
+ConfigItem *
+RadioID::allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                       const Context &ctx, const ErrorStack &err)
+{
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
+  // No extensions defined yet for RadioID
+  return nullptr;
+}
+
+bool
+RadioID::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse radio id: Expected object with one child.";
+    return false;
+  }
+
+  return ConfigObject::parse(node.begin()->second, ctx, err);
+}
+
+bool
+RadioID::link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot link radio id: Expected object with one child.";
+    return false;
+  }
+
+  return ConfigObject::link(node.begin()->second, ctx, err);
 }
 
 
@@ -76,12 +119,13 @@ RadioIDList::RadioIDList(QObject *parent)
 
 void
 RadioIDList::clear() {
+  setDefaultId(-1);
   ConfigObjectList::clear();
 }
 
 RadioID *
 RadioIDList::getId(int idx) const {
-  if (ConfigObject *obj = get(idx))
+  if (ConfigItem *obj = get(idx))
     return obj->as<RadioID>();
   return nullptr;
 }
@@ -123,7 +167,7 @@ RadioIDList::addId(const QString &name, uint32_t id) {
 }
 
 bool
-RadioIDList::setDefaultId(unsigned idx) {
+RadioIDList::setDefaultId(int idx) {
   if (_default) {
     disconnect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
     if (0 <= indexOf(_default))
@@ -146,6 +190,31 @@ RadioIDList::setDefaultId(unsigned idx) {
 bool
 RadioIDList::delId(uint32_t id) {
   return del(find(id));
+}
+
+
+ConfigItem *
+RadioIDList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
+
+  if (! node)
+    return nullptr;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create radio id: Expected object with one child.";
+    return nullptr;
+  }
+
+  QString type = QString::fromStdString(node.begin()->first.as<std::string>());
+  if ("dmr" == type) {
+    return new RadioID();
+  }
+
+  errMsg(err) << node.Mark().line << ":" << node.Mark().column
+              << ": Cannot create radio id: Unknown type '" << type << "'.";
+
+  return nullptr;
 }
 
 void

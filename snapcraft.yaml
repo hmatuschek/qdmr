@@ -2,22 +2,22 @@ name: qdmr
 
 version: git
 grade: devel
-#version: 0.8.1
+#version: 0.9.2
 #grade: stable
 
 summary: Graphical code-plug programming tool for DMR radios.
 description: |
   qDMR is a simple to use and feature-rich code-plug programming software (CPS) for cheap DMR
   radios. Currently supported devices are:
-   * Radioddity/Baofeng RD-5R
-   * TYT MD-UV390
-   * Retevis RT3S
+   * TYT MD-390, MD-UV390, MD-2017
+   * Retevis RT8, RT82, RT3S
    * Open GD77 firmware (GD77, RD-5R & DM-1801)
    * AnyTone AT-D868UVE, AT-D878UV AT-D878UVII, AT-D578UV
-   * Radioddity GD77
+   * Radioddity GD77, RD-5R
+   * Baofeng DMR-6X2
 
 confinement: strict
-base: core18
+base: core20
 
 architectures:
   - build-on: amd64

@@ -19,57 +19,67 @@
 #include <QAbstractProxyModel>
 #include <QMetaEnum>
 
-#include <QDebug>
+#include "opengd77_extension.hh"
+
 
 /* ********************************************************************************************* *
  * Implementation of Channel
  * ********************************************************************************************* */
 Channel::Channel(QObject *parent)
-  : ConfigObject("ch", parent), _name(""), _rxFreq(0), _txFreq(0), _defaultPower(true),
+  : ConfigObject("ch", parent), _rxFreq(0), _txFreq(0), _defaultPower(true),
     _power(Power::Low), _txTimeOut(std::numeric_limits<unsigned>::max()), _rxOnly(false),
-    _vox(std::numeric_limits<unsigned>::max()), _scanlist()
+    _vox(std::numeric_limits<unsigned>::max()), _scanlist(), _openGD77ChannelExtension(nullptr),
+    _tytChannelExtension(nullptr)
 {
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
 Channel::Channel(const Channel &other, QObject *parent)
-  : ConfigObject("ch", parent), _scanlist()
+  : ConfigObject("ch", parent), _scanlist(), _openGD77ChannelExtension(nullptr),
+    _tytChannelExtension(nullptr)
 {
-  setName(other.name());
-  setRXFrequency(other.rxFrequency());
-  setTXFrequency(other.txFrequency());
-  if (other.defaultPower())
-    setDefaultPower();
-  else
-    setPower(other.power());
-  if (other.defaultTimeout())
-    setDefaultTimeout();
-  else
-    setTimeout(other.timeout());
-  setRXOnly(other.rxOnly());
-  if (other.defaultVOX())
-    setVOXDefault();
-  setScanListObj(other.scanListObj());
+  copy(other);
 
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
-const QString &
-Channel::name() const {
-  return _name;
-}
 bool
-Channel::setName(const QString &name) {
-  if (name.simplified().isEmpty())
+Channel::copy(const ConfigItem &other) {
+  const Channel *c = other.as<Channel>();
+  if ((nullptr == c) || (! ConfigObject::copy(other)))
     return false;
-  _name = name;
-  emit modified(this);
+
+  if (c->defaultPower())
+    setDefaultPower();
+  if (c->defaultTimeout())
+    setDefaultTimeout();
+  if (c->defaultVOX())
+    setVOXDefault();
+
   return true;
 }
 
-double Channel::rxFrequency() const {
+void
+Channel::clear() {
+  ConfigObject::clear();
+  _rxFreq = 0; _txFreq = 0;
+  setDefaultPower();
+  setDefaultTimeout();
+  _rxOnly = false;
+  setVOXDefault();
+  _scanlist.clear();
+  if (_openGD77ChannelExtension)
+    _openGD77ChannelExtension->deleteLater();
+  _openGD77ChannelExtension = nullptr;
+  if (_tytChannelExtension)
+    _tytChannelExtension->deleteLater();
+  _tytChannelExtension = nullptr;
+}
+
+double
+Channel::rxFrequency() const {
   return _rxFreq;
 }
 bool
@@ -183,6 +193,14 @@ Channel::scanList() {
   return &_scanlist;
 }
 
+void
+Channel::setScanList(ScanListReference *ref) {
+  if (nullptr == ref)
+    _scanlist.clear();
+  else
+    _scanlist.copy(ref);
+}
+
 ScanList *
 Channel::scanListObj() const {
   return _scanlist.as<ScanList>();
@@ -197,9 +215,43 @@ Channel::onReferenceModified() {
   emit modified(this);
 }
 
+OpenGD77ChannelExtension *
+Channel::openGD77ChannelExtension() const {
+  return _openGD77ChannelExtension;
+}
+void
+Channel::setOpenGD77ChannelExtension(OpenGD77ChannelExtension *ext) {
+  if (_openGD77ChannelExtension == ext)
+    return;
+  if (_openGD77ChannelExtension)
+    _openGD77ChannelExtension->deleteLater();
+  _openGD77ChannelExtension = ext;
+  if (_openGD77ChannelExtension) {
+    _openGD77ChannelExtension->setParent(this);
+    connect(_openGD77ChannelExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
+  }
+}
+
+TyTChannelExtension *
+Channel::tytChannelExtension() const {
+  return _tytChannelExtension;
+}
+void
+Channel::setTyTChannelExtension(TyTChannelExtension *ext) {
+  if (_tytChannelExtension == ext)
+    return;
+  if (_tytChannelExtension)
+    _tytChannelExtension->deleteLater();
+  _tytChannelExtension = ext;
+  if (_tytChannelExtension) {
+    _tytChannelExtension->setParent(this);
+    connect(_tytChannelExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
+  }
+}
+
 bool
 Channel::populate(YAML::Node &node, const Context &context) {
-  if (!ConfigObject::populate(node, context))
+  if (! ConfigObject::populate(node, context))
     return false;
 
   if (defaultPower()) {
@@ -227,6 +279,65 @@ Channel::populate(YAML::Node &node, const Context &context) {
   return true;
 }
 
+ConfigItem *
+Channel::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(node); Q_UNUSED(ctx)
+  if (0 == strcmp("openGD77", prop.name())) {
+    return new OpenGD77ChannelExtension();
+  }
+
+  errMsg(err) << "Cannot allocate instance for unknown child '" << prop.name() << "'.";
+  return nullptr;
+}
+
+bool
+Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse channel: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node ch = node.begin()->second;
+  if ((!ch["power"]) || ("!default" == ch["power"].Tag())) {
+    setDefaultPower();
+  } else if (ch["power"] && ch["power"].IsScalar()) {
+    QMetaEnum meta = QMetaEnum::fromType<Channel::Power>();
+    setPower((Channel::Power)meta.keyToValue(ch["power"].as<std::string>().c_str()));
+  }
+
+  if ((!ch["timeout"]) || ("!default" == ch["timeout"].Tag())) {
+    setDefaultTimeout();
+  } else if (ch["timeout"] && ch["timeout"].IsScalar()) {
+    setTimeout(ch["timeout"].as<unsigned>());
+  }
+
+  if ((!ch["vox"]) || ("!default" == ch["vox"].Tag())) {
+    setVOXDefault();
+  } else if (ch["vox"] && ch["vox"].IsScalar()) {
+    setVOX(ch["vox"].as<unsigned>());
+  }
+
+  return ConfigObject::parse(ch, ctx, err);
+}
+
+bool
+Channel::link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot link channel: Expected object with one child.";
+    return false;
+  }
+
+  return ConfigObject::link(node.begin()->second, ctx, err);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnalogChannel
@@ -242,30 +353,44 @@ AnalogChannel::AnalogChannel(QObject *parent)
 }
 
 AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
-  : Channel(other, parent), _aprsSystem()
+  : Channel(parent), _aprsSystem()
 {
-  setAdmit(other.admit());
-  if (other.defaultSquelch())
-    setSquelchDefault();
-  else
-    setSquelch(other.squelch());
-  setRXTone(other.rxTone());
-  setTXTone(other.txTone());
-  setBandwidth(other.bandwidth());
-  setAPRSSystem(other.aprsSystem());
-
+  copy(other);
   // Link APRS system reference
   connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
-YAML::Node
-AnalogChannel::serialize(const Context &context) {
-  YAML::Node node = Channel::serialize(context);
-  if (node.IsNull())
-    return node;
-  YAML::Node type;
-  type["analog"] = node;
-  return type;
+bool
+AnalogChannel::copy(const ConfigItem &other) {
+  const AnalogChannel *c = other.as<AnalogChannel>();
+  if ((nullptr==c) || (! Channel::copy(other)))
+    return false;
+
+  if (c->defaultSquelch())
+    setSquelchDefault();
+
+  return true;
+}
+
+ConfigItem *
+AnalogChannel::clone() const {
+  AnalogChannel *c = new AnalogChannel();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
+}
+
+void
+AnalogChannel::clear() {
+  Channel::clear();
+  setAdmit(Admit::Always);
+  setSquelchDefault();
+  setRXTone(Signaling::SIGNALING_NONE);
+  setTXTone(Signaling::SIGNALING_NONE);
+  setBandwidth(Bandwidth::Narrow);
+  setAPRSSystem(nullptr);
 }
 
 AnalogChannel::Admit
@@ -348,6 +473,13 @@ AnalogChannel::aprs() {
   return &_aprsSystem;
 }
 
+void
+AnalogChannel::setAPRS(APRSSystemReference *ref) {
+  if (nullptr == ref)
+    return _aprsSystem.clear();
+  _aprsSystem.copy(ref);
+}
+
 APRSSystem *
 AnalogChannel::aprsSystem() const {
   return _aprsSystem.as<APRSSystem>();
@@ -355,6 +487,16 @@ AnalogChannel::aprsSystem() const {
 void
 AnalogChannel::setAPRSSystem(APRSSystem *sys) {
   _aprsSystem.set(sys);
+}
+
+YAML::Node
+AnalogChannel::serialize(const Context &context) {
+  YAML::Node node = Channel::serialize(context);
+  if (node.IsNull())
+    return node;
+  YAML::Node type;
+  type["analog"] = node;
+  return type;
 }
 
 bool
@@ -396,6 +538,50 @@ AnalogChannel::populate(YAML::Node &node, const Context &context) {
   return true;
 }
 
+bool
+AnalogChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse analog channel: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node ch = node.begin()->second;
+
+  setRXTone(Signaling::SIGNALING_NONE);
+  if (ch["rxTone"] && ch["rxTone"].IsMap()) {
+    if (ch["rxTone"]["ctcss"] && ch["rxTone"]["ctcss"].IsScalar()) {
+      setRXTone(Signaling::fromCTCSSFrequency(ch["rxTone"]["ctcss"].as<double>()));
+    } else if (ch["rxTone"]["dcs"] && ch["rxTone"]["dcs"].IsScalar()) {
+      int code = ch["rxTone"]["dcs"].as<int>();
+      bool inverted = (code < 0); code = std::abs(code);
+      setRXTone(Signaling::fromDCSNumber(code, inverted));
+    }
+  }
+
+  setTXTone(Signaling::SIGNALING_NONE);
+  if (ch["txTone"] && ch["txTone"].IsMap()) {
+    if (ch["txTone"]["ctcss"] && ch["txTone"]["ctcss"].IsScalar()) {
+      setTXTone(Signaling::fromCTCSSFrequency(ch["txTone"]["ctcss"].as<double>()));
+    } else if (ch["txTone"]["dcs"] && ch["txTone"]["dcs"].IsScalar()) {
+      int code = ch["txTone"]["dcs"].as<int>();
+      bool inverted = (code < 0); code = std::abs(code);
+      setTXTone(Signaling::fromDCSNumber(code, inverted));
+    }
+  }
+
+  if ((!ch["squelch"]) || ("!default" == ch["squelch"].Tag())) {
+    setSquelchDefault();
+  } else if (ch["squelch"].IsDefined() && ch["squelch"].IsScalar()) {
+    setSquelch(ch["squelch"].as<unsigned>());
+  }
+
+  return Channel::parse(node, ctx, err);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of DigitalChannel
@@ -406,10 +592,10 @@ DigitalChannel::DigitalChannel(QObject *parent)
     _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
 {
   // Register default tags
-  if (! ConfigObject::Context::hasTag(metaObject()->className(), "roaming", "!default"))
-    ConfigObject::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigObject::Context::hasTag(metaObject()->className(), "radioID", "!default"))
-    ConfigObject::Context::setTag(metaObject()->className(), "radioID", "!default", DefaultRadioID::get());
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioId", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "radioId", "!default", DefaultRadioID::get());
 
   // Connect signals of references
   connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -420,21 +606,15 @@ DigitalChannel::DigitalChannel(QObject *parent)
 }
 
 DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
-  : Channel(other, parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
+  : Channel(parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
 {
   // Register default tags
-  if (! ConfigObject::Context::hasTag(metaObject()->className(), "roaming", "!default"))
-    ConfigObject::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigObject::Context::hasTag(metaObject()->className(), "radioID", "!default"))
-    ConfigObject::Context::setTag(metaObject()->className(), "radioID", "!default", DefaultRadioID::get());
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioId", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "radioId", "!default", DefaultRadioID::get());
 
-  setColorCode(other.colorCode());
-  setTimeSlot(other.timeSlot());
-  setGroupListObj(other.groupListObj());
-  setTXContactObj(other.txContactObj());
-  setAPRSObj(other.aprsObj());
-  setRoamingZone(other.roamingZone());
-  setRadioIdObj(other.radioIdObj());
+  copy(other);
 
   // Connect signals of references
   connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -444,14 +624,26 @@ DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
   connect(&_radioId, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
-YAML::Node
-DigitalChannel::serialize(const Context &context) {
-  YAML::Node node = Channel::serialize(context);
-  if (node.IsNull())
-    return node;
-  YAML::Node type;
-  type["digital"] = node;
-  return type;
+void
+DigitalChannel::clear() {
+  Channel::clear();
+  setColorCode(1);
+  setTimeSlot(TimeSlot::TS1);
+  setGroupListObj(nullptr);
+  setTXContactObj(nullptr);
+  setAPRSObj(nullptr);
+  setRoamingZone(nullptr);
+  setRadioIdObj(nullptr);
+}
+
+ConfigItem *
+DigitalChannel::clone() const {
+  DigitalChannel *c = new DigitalChannel();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
 }
 
 DigitalChannel::Admit
@@ -496,6 +688,14 @@ DigitalChannel::groupList() {
   return &_rxGroup;
 }
 
+void
+DigitalChannel::setGroupList(GroupListReference *ref) {
+  if (nullptr == ref)
+    _rxGroup.clear();
+  else
+    _rxGroup.copy(ref);
+}
+
 RXGroupList *
 DigitalChannel::groupListObj() const {
   return _rxGroup.as<RXGroupList>();
@@ -517,6 +717,14 @@ DigitalChannel::contact() const {
 DigitalContactReference *
 DigitalChannel::contact() {
   return &_txContact;
+}
+
+void
+DigitalChannel::setContact(DigitalContactReference *ref) {
+  if (nullptr == ref)
+    _txContact.clear();
+  else
+    _txContact.copy(ref);
 }
 
 DigitalContact *
@@ -542,6 +750,14 @@ DigitalChannel::aprs() {
   return &_posSystem;
 }
 
+void
+DigitalChannel::setAPRS(PositioningSystemReference *ref) {
+  if (nullptr == ref)
+    _posSystem.clear();
+  else
+    _posSystem.copy(ref);
+}
+
 PositioningSystem *
 DigitalChannel::aprsObj() const {
   return _posSystem.as<PositioningSystem>();
@@ -565,6 +781,14 @@ DigitalChannel::roaming() {
   return &_roaming;
 }
 
+void
+DigitalChannel::setRoaming(RoamingZoneReference *ref) {
+  if (nullptr == ref)
+    _roaming.clear();
+  else
+    _roaming.copy(ref);
+}
+
 RoamingZone *
 DigitalChannel::roamingZone() const {
   return _roaming.as<RoamingZone>();
@@ -578,13 +802,21 @@ DigitalChannel::setRoamingZone(RoamingZone *zone) {
 }
 
 const RadioIDReference *
-DigitalChannel::radioID() const {
+DigitalChannel::radioId() const {
   return &_radioId;
 }
 
 RadioIDReference *
-DigitalChannel::radioID() {
+DigitalChannel::radioId() {
   return &_radioId;
+}
+
+void
+DigitalChannel::setRadioId(RadioIDReference *ref) {
+  if (nullptr == ref)
+    _radioId.clear();
+  else
+    _radioId.copy(ref);
 }
 
 RadioID *
@@ -598,6 +830,16 @@ DigitalChannel::setRadioIdObj(RadioID *id) {
     return false;
   emit modified(this);
   return true;
+}
+
+YAML::Node
+DigitalChannel::serialize(const Context &context) {
+  YAML::Node node = Channel::serialize(context);
+  if (node.IsNull())
+    return node;
+  YAML::Node type;
+  type["digital"] = node;
+  return type;
 }
 
 
@@ -614,6 +856,16 @@ SelectedChannel::SelectedChannel()
 
 SelectedChannel::~SelectedChannel() {
   SelectedChannel::_instance = nullptr;
+}
+
+bool
+SelectedChannel::copy(const ConfigItem &other) {
+  Q_UNUSED(other);
+  return false;
+}
+ConfigItem *
+SelectedChannel::clone() const {
+  return nullptr;
 }
 
 SelectedChannel *
@@ -644,7 +896,7 @@ ChannelList::add(ConfigObject *obj, int row) {
 
 Channel *
 ChannelList::channel(int idx) const {
-  if (ConfigObject *obj = get(idx))
+  if (ConfigItem *obj = get(idx))
     return obj->as<Channel>();
   return nullptr;
 }
@@ -676,6 +928,31 @@ ChannelList::findAnalogChannelByTxFreq(double freq) const {
     if (1e-5 > std::abs(channel(i)->txFrequency()-freq))
       return channel(i)->as<AnalogChannel>();
   }
+  return nullptr;
+}
+
+ConfigItem *
+ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
+  if (! node)
+    return nullptr;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create channel: Expected object with one child.";
+    return nullptr;
+  }
+
+  QString type = QString::fromStdString(node.begin()->first.as<std::string>());
+  if (("digital" == type) || ("dmr" == type)) {
+    return new DigitalChannel();
+  } else if (("analog" == type) || ("fm"==type)) {
+    return new AnalogChannel();
+  }
+
+  errMsg(err) << node.Mark().line << ":" << node.Mark().column
+              << ": Cannot create channel: Unknown type '" << type << "'.";
+
   return nullptr;
 }
 

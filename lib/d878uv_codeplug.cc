@@ -1195,11 +1195,13 @@ D878UVCodeplug::GPSMessageElement::setMessage(const QString &message) {
 
 bool
 D878UVCodeplug::GPSMessageElement::fromConfig(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags); Q_UNUSED(ctx)
   return true;
 }
 
 bool
 D878UVCodeplug::GPSMessageElement::updateConfig(Context &ctx) const {
+  Q_UNUSED(ctx)
   return true;
 }
 
@@ -1329,11 +1331,13 @@ D878UVCodeplug::GeneralSettingsExtensionElement::setGPSMode(GPSMode mode) {
 
 bool
 D878UVCodeplug::GeneralSettingsExtensionElement::fromConfig(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags); Q_UNUSED(ctx)
   return true;
 }
 
 bool
 D878UVCodeplug::GeneralSettingsExtensionElement::updateConfig(Context &ctx) {
+  Q_UNUSED(ctx)
   return true;
 }
 
@@ -1547,17 +1551,23 @@ D878UVCodeplug::AnalogAPRSSettingsElement::setPreWaveDelay(unsigned ms) {
 }
 
 bool
-D878UVCodeplug::AnalogAPRSSettingsElement::fromAPRSSystem(const APRSSystem *sys, Context &ctx) {
+D878UVCodeplug::AnalogAPRSSettingsElement::fromAPRSSystem(const APRSSystem *sys, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
   clear();
+  if (! sys->revertChannel()) {
+    errMsg(err) << "Cannot encode APRS settings: "
+                << "No revert channel defined for APRS system '" << sys->name() <<"'.";
+    return false;
+  }
   setFrequency(sys->revertChannel()->txFrequency()*1e6);
   setTXTone(sys->revertChannel()->txTone());
+  setPower(sys->revertChannel()->power());
   setManualTXInterval(sys->period());
   setAutoTXInterval(sys->period());
   setDestination(sys->destination(), sys->destSSID());
   setSource(sys->source(), sys->srcSSID());
   setPath(sys->path());
   setIcon(sys->icon());
-  setPower(sys->revertChannel()->power());
   setPreWaveDelay(0);
   return true;
 }
@@ -1904,7 +1914,7 @@ D878UVCodeplug::DMRAPRSSystemsElement::linkGPSSystem(int idx, GPSSystem *sys, Co
     ctx.config()->contacts()->add(cont);
   }
   // link contact to GPS system.
-  sys->setContact(cont);
+  sys->setContactObj(cont);
 
   return true;
 }
@@ -2161,13 +2171,13 @@ D878UVCodeplug::setBitmaps(Config *config)
 
 
 bool
-D878UVCodeplug::encodeElements(const Flags &flags, Context &ctx)
+D878UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
   // Encode everything common between d868uv and d878uv radios.
-  if (! D868UVCodeplug::encodeElements(flags, ctx))
+  if (! D868UVCodeplug::encodeElements(flags, ctx, err))
     return false;
 
-  if (! this->encodeRoaming(flags, ctx))
+  if (! this->encodeRoaming(flags, ctx, err))
     return false;
 
   return true;
@@ -2175,16 +2185,16 @@ D878UVCodeplug::encodeElements(const Flags &flags, Context &ctx)
 
 
 bool
-D878UVCodeplug::decodeElements(Context &ctx)
+D878UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
 {
   // Decode everything commong between d868uv and d878uv codeplugs.
-  if (! D868UVCodeplug::decodeElements(ctx))
+  if (! D868UVCodeplug::decodeElements(ctx, err))
     return false;
 
-  if (! this->createRoaming(ctx))
+  if (! this->createRoaming(ctx, err))
     return false;
 
-  if (! this->linkRoaming(ctx))
+  if (! this->linkRoaming(ctx, err))
     return false;
 
   return true;
@@ -2215,7 +2225,8 @@ D878UVCodeplug::allocateChannels() {
 }
 
 bool
-D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx) {
+D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   // Encode channels
   for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
@@ -2227,7 +2238,9 @@ D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx) {
 }
 
 bool
-D878UVCodeplug::createChannels(Context &ctx) {
+D878UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // Create channels
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
@@ -2244,7 +2257,9 @@ D878UVCodeplug::createChannels(Context &ctx) {
 }
 
 bool
-D878UVCodeplug::linkChannels(Context &ctx) {
+D878UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // Link channel objects
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
     // Check if channel is enabled:
@@ -2268,14 +2283,18 @@ D878UVCodeplug::allocateGeneralSettings() {
 
 }
 bool
-D878UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx) {
+D878UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).fromConfig(flags, ctx);
   GPSMessageElement(data(ADDR_GENERAL_CONFIG_EXT1)).fromConfig(flags, ctx);
   GeneralSettingsExtensionElement(data(ADDR_GENERAL_CONFIG_EXT2)).fromConfig(flags, ctx);
   return true;
 }
 bool
-D878UVCodeplug::decodeGeneralSettings(Context &ctx) {
+D878UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx);
   GPSMessageElement(data(ADDR_GENERAL_CONFIG_EXT1)).updateConfig(ctx);
   GeneralSettingsElement(data(ADDR_GENERAL_CONFIG_EXT2)).updateConfig(ctx);
@@ -2293,7 +2312,8 @@ D878UVCodeplug::allocateGPSSystems() {
 }
 
 bool
-D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx) {
+D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   // replaces D868UVCodeplug::encodeGPSSystems
 
   // Encode APRS system (there can only be one)
@@ -2319,7 +2339,9 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx) {
 }
 
 bool
-D878UVCodeplug::createGPSSystems(Context &ctx) {
+D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // replaces D868UVCodeplug::createGPSSystems
 
   // Before creating any GPS/APRS systems, get global auto TX intervall
@@ -2352,7 +2374,8 @@ D878UVCodeplug::createGPSSystems(Context &ctx) {
 }
 
 bool
-D878UVCodeplug::linkGPSSystems(Context &ctx) {
+D878UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   // replaces D868UVCodeplug::linkGPSSystems
 
   // Link APRS system
@@ -2407,7 +2430,9 @@ D878UVCodeplug::allocateRoaming() {
 }
 
 bool
-D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx) {
+D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
+
   // Encode roaming channels
   QHash<DigitalChannel *, unsigned> roaming_ch_map;
   {
@@ -2438,7 +2463,9 @@ D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx) {
 }
 
 bool
-D878UVCodeplug::createRoaming(Context &ctx) {
+D878UVCodeplug::createRoaming(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   QHash<unsigned, DigitalChannel*> map;
   // Create or find roaming channels
   uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
@@ -2469,7 +2496,8 @@ D878UVCodeplug::createRoaming(Context &ctx) {
 }
 
 bool
-D878UVCodeplug::linkRoaming(Context &ctx) {
+D878UVCodeplug::linkRoaming(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   // Pass, no need to link roaming channels.
   return true;
 }

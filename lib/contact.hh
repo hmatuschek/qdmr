@@ -2,11 +2,13 @@
 #define CONTACT_HH
 
 #include "configobject.hh"
+#include "opengd77_extension.hh"
 #include <QVector>
 #include <QAbstractTableModel>
 
 
 class Config;
+
 
 /** Represents the base-class for all contact types, Analog (DTMF) or Digital (DMR).
  *
@@ -15,12 +17,12 @@ class Contact: public ConfigObject
 {
 	Q_OBJECT
 
-  /** The name of the contact. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** If @c true and supported by radio, ring on call from this contact. */
   Q_PROPERTY(bool ring READ ring WRITE setRing)
 
 protected:
+  /** Default constructor. */
+  explicit Contact(QObject *parent=nullptr);
   /** Hidden constructor.
    * @param name   Specifies the name of the contact.
    * @param ring Specifies whether a ring-tone for this contact is used.
@@ -28,10 +30,9 @@ protected:
   Contact(const QString &name, bool ring=true, QObject *parent=nullptr);
 
 public:
-  /** Returns the name of the contact. */
-	const QString &name() const;
-  /** (Re)Sets the name of the contact. */
-	bool setName(const QString &name);
+  void clear();
+
+public:
   /** Returns @c true if the ring-tone is enabled for this contact. */
   bool ring() const;
   /** Enables/disables the ring-tone for this contact. */
@@ -55,9 +56,13 @@ public:
 		return dynamic_cast<const T *>(this);
 	}
 
+public:
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
+
 protected:
-  /** Contact name. */
-	QString _name;
   /** Ringtone enabled? */
   bool _ring;
 };
@@ -73,6 +78,8 @@ class DTMFContact: public Contact
   Q_PROPERTY(QString number READ number WRITE setNumber)
 
 public:
+  /** Default constructor. */
+  explicit DTMFContact(QObject *parent=nullptr);
   /** Constructs a DTMF (analog) contact.
    * @param name   Specifies the contact name.
    * @param number Specifies the DTMF number (0-9,A,B,C,D,*,#).
@@ -80,13 +87,17 @@ public:
    * @param parent Specifies the QObject parent. */
   DTMFContact(const QString &name, const QString &number, bool ring=false, QObject *parent=nullptr);
 
-  YAML::Node serialize(const Context &context);
+  ConfigItem *clone() const;
+  void clear();
 
   /** Returns the DTMF number of this contact.
    * The number must consist of 0-9, a-f, * or #. */
 	const QString &number() const;
   /** (Re-)Sets the DTMF number of this contact. */
 	bool setNumber(const QString &number);
+
+public:
+  YAML::Node serialize(const Context &context);
 
 protected:
   /** The DTMF number. */
@@ -104,6 +115,8 @@ class DigitalContact: public Contact
   Q_PROPERTY(Type type READ type WRITE setType)
   /** The number of the contact. */
   Q_PROPERTY(unsigned number READ number WRITE setNumber)
+  /** The openGD77 extension to the digital channel. */
+  Q_PROPERTY(OpenGD77ContactExtension* openGD77 READ openGD77ContactExtension WRITE setOpenGD77ContactExtension)
 
 public:
   /** Possible call types for a contact. */
@@ -115,6 +128,8 @@ public:
   Q_ENUM(Type)
 
 public:
+  /** Default constructor. */
+  explicit DigitalContact(QObject *parent=nullptr);
   /** Constructs a DMR (digital) contact.
    * @param type   Specifies the call type (private, group, all-call).
    * @param name   Specifies the contact name.
@@ -123,7 +138,8 @@ public:
    * @param parent Specifies the QObject parent. */
   DigitalContact(Type type, const QString &name, unsigned number, bool ring=false, QObject *parent=nullptr);
 
-  YAML::Node serialize(const Context &context);
+  ConfigItem *clone() const;
+  void clear();
 
   /** Returns the call-type. */
 	Type type() const;
@@ -134,11 +150,22 @@ public:
   /** (Re-)Sets the DMR number of the contact. */
 	bool setNumber(unsigned number);
 
+  /** Returns the OpenGD77 extension, or @c nullptr if not set. */
+  OpenGD77ContactExtension *openGD77ContactExtension() const;
+  /** Sets the OpenGD77 extension. */
+  void setOpenGD77ContactExtension(OpenGD77ContactExtension *ext);
+
+public:
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err);
+  YAML::Node serialize(const Context &context);
+
 protected:
   /** The call type. */
 	Type _type;
   /** The DMR number of the contact. */
 	unsigned _number;
+  /** Owns the OpenGD77 extensions to the digital contacts. */
+  OpenGD77ContactExtension *_openGD77;
 };
 
 
@@ -181,6 +208,9 @@ public:
   int indexOfDigital(DigitalContact *contact) const;
   /** Returns the index of the given DTMF contact within DTMF contacts. */
   int indexOfDTMF(DTMFContact *contact) const;
+
+public:
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 #endif // CONTACT_HH

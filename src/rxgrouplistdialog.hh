@@ -32,7 +32,7 @@ protected:
 
 protected:
 	Config *_config;
-  RXGroupList _groupList;
+  RXGroupList *_myGroupList;
 	RXGroupList *_list;
 };
 

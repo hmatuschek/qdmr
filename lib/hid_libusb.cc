@@ -6,8 +6,8 @@
 #define MAX_RETRY       100                 // Number of retries
 
 
-HIDevice::HIDevice(int vid, int pid, QObject *parent)
-  : QObject(parent), _ctx(nullptr), _dev(nullptr), _transfer(nullptr), _errorMessage()
+HIDevice::HIDevice(int vid, int pid, const ErrorStack &err, QObject *parent)
+  : QObject(parent), _ctx(nullptr), _dev(nullptr), _transfer(nullptr)
 {
   logDebug() << "Try to detect USB HID interface "
              << QString::number(vid, 16) << ":"
@@ -15,17 +15,17 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
 
   int error = libusb_init(&_ctx);
   if (error < 0) {
-    _errorMessage = tr("Cannot init libusb (%1): %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
-    logError() << _errorMessage;
+    err.take(_cbError);
+    errMsg(err) << "Cannot init libusb (" << error
+                << "): " << libusb_strerror((enum libusb_error) error) << ".";
     _ctx = nullptr;
     return;
   }
 
   if (! (_dev = libusb_open_device_with_vid_pid(_ctx, vid, pid))) {
-    _errorMessage = tr("Cannot find USB device %1:%2")
-        .arg(vid,0,16).arg(pid,0,16);
-    logDebug() << _errorMessage;
+    err.take(_cbError);
+    errMsg(err) << "Cannot find USB device " << QString::number(vid, 16)
+                << ":" << QString::number(pid, 16) << ".";
     libusb_exit(_ctx);
     _ctx = nullptr;
     return;
@@ -36,9 +36,9 @@ HIDevice::HIDevice(int vid, int pid, QObject *parent)
 
   error = libusb_claim_interface(_dev, HID_INTERFACE);
   if (error < 0) {
-    _errorMessage = tr("Failed to claim USB interface: %1: %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
-    logError() << _errorMessage;
+    err.take(_cbError);
+    errMsg(err) << "Failed to claim USB interface (" << error
+                << "): " << libusb_strerror((enum libusb_error) error) << ".";
     libusb_close(_dev);
     libusb_exit(_ctx);
     _dev = nullptr;
@@ -78,7 +78,8 @@ HIDevice::close() {
 }
 
 bool
-HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned char *rdata, unsigned rlength) {
+HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes,
+                        unsigned char *rdata, unsigned rlength, const ErrorStack &err) {
   unsigned char buf[42];
   unsigned char reply[42];
   int reply_len;
@@ -94,24 +95,22 @@ HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned cha
 
   reply_len = write_read(buf, sizeof(buf), reply, sizeof(reply));
   if (reply_len < 0) {
+    err.take(_cbError);
     return false;
   }
 
   if (reply_len != sizeof(reply)) {
-    _errorMessage = tr("Short read: %1 bytes instead of %2!")
-        .arg(reply_len).arg((int)sizeof(reply));
-    logError() << _errorMessage;
+    errMsg(err) << "Short read: " << reply_len
+                << " bytes instead of " << (int)sizeof(reply) << "!";
     return false;
   }
   if (reply[0] != 3 || reply[1] != 0 || reply[3] != 0) {
-    _errorMessage = tr("Incorrect reply!");
-    logError() << _errorMessage;
+    errMsg(err) << "Incorrect reply!";
     return false;
   }
   if (reply[2] != rlength) {
-    _errorMessage = tr("Incorrect reply length %1, expected %1.")
-        .arg(reply[2]).arg(rlength);
-    logError() << _errorMessage;
+    errMsg(err) << "Incorrect reply length " << reply[2]
+                << ", expected " << rlength << ".";
     return false;
   }
 
@@ -121,7 +120,8 @@ HIDevice::hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned cha
 
 
 int
-HIDevice::write_read(const unsigned char *data, unsigned length, unsigned char *reply, unsigned rlength)
+HIDevice::write_read(const unsigned char *data, unsigned length,
+                     unsigned char *reply, unsigned rlength, const ErrorStack &err)
 {
   if (! _transfer) {
     // Allocate transfer descriptor on first invocation.
@@ -145,8 +145,9 @@ again:
         HID_INTERFACE, (unsigned char*)data, length, TIMEOUT_MSEC);
 
   if (result < 0) {
-    _errorMessage = tr("Error %1 transmitting data via control transfer: %2.")
-        .arg(result).arg(libusb_strerror((enum libusb_error) result));
+    err.take(_cbError);
+    errMsg(err) << "Error " << result << " transmitting data via control transfer: "
+                << libusb_strerror((enum libusb_error) result) << ".";
     _transfer = nullptr;
     return -1;
   }
@@ -158,9 +159,11 @@ again:
       if (result != LIBUSB_ERROR_BUSY &&
           result != LIBUSB_ERROR_TIMEOUT &&
           result != LIBUSB_ERROR_OVERFLOW &&
-          result != LIBUSB_ERROR_INTERRUPTED) {
-        _errorMessage = tr("Error %1 receiving data via interrupt transfer: %2.")
-            .arg(result).arg(libusb_strerror((enum libusb_error) result));
+          result != LIBUSB_ERROR_INTERRUPTED)
+      {
+        err.take(_cbError);
+        errMsg(err) << "Error " <<result << " receiving data via interrupt transfer: "
+                    << libusb_strerror((enum libusb_error) result) << ".";
         return result;
       }
     }
@@ -185,28 +188,28 @@ HIDevice::read_callback(struct libusb_transfer *t)
   HIDevice *self = (HIDevice *)t->user_data;
 
   switch (t->status) {
-    case LIBUSB_TRANSFER_COMPLETED:
-      memcpy(self->_receive_buf, t->buffer, t->actual_length);
-      self->_nbytes_received = t->actual_length;
-      break;
+  case LIBUSB_TRANSFER_COMPLETED:
+    memcpy(self->_receive_buf, t->buffer, t->actual_length);
+    self->_nbytes_received = t->actual_length;
+    break;
 
-    case LIBUSB_TRANSFER_CANCELLED:
-        self->_nbytes_received = LIBUSB_ERROR_INTERRUPTED;
-        self->_errorMessage = libusb_error_name(LIBUSB_ERROR_INTERRUPTED);
-        return;
+  case LIBUSB_TRANSFER_CANCELLED:
+    self->_nbytes_received = LIBUSB_ERROR_INTERRUPTED;
+    errMsg(self->_cbError) << libusb_error_name(LIBUSB_ERROR_INTERRUPTED);
+    return;
 
-    case LIBUSB_TRANSFER_NO_DEVICE:
-        self->_nbytes_received = LIBUSB_ERROR_NO_DEVICE;
-        self->_errorMessage = libusb_error_name(LIBUSB_ERROR_NO_DEVICE);
-        return;
+  case LIBUSB_TRANSFER_NO_DEVICE:
+    self->_nbytes_received = LIBUSB_ERROR_NO_DEVICE;
+    errMsg(self->_cbError) << libusb_error_name(LIBUSB_ERROR_NO_DEVICE);
+    return;
 
-    case LIBUSB_TRANSFER_TIMED_OUT:
-        self->_nbytes_received = LIBUSB_ERROR_TIMEOUT;
-        self->_errorMessage = libusb_error_name(LIBUSB_ERROR_TIMEOUT);
-        break;
+  case LIBUSB_TRANSFER_TIMED_OUT:
+    self->_nbytes_received = LIBUSB_ERROR_TIMEOUT;
+    errMsg(self->_cbError) << libusb_error_name(LIBUSB_ERROR_TIMEOUT);
+    break;
 
-    default:
-        self->_nbytes_received = LIBUSB_ERROR_IO;
-        self->_errorMessage = libusb_error_name(LIBUSB_ERROR_IO);
-   }
+  default:
+    self->_nbytes_received = LIBUSB_ERROR_IO;
+    errMsg(self->_cbError) << libusb_error_name(LIBUSB_ERROR_IO);
+  }
 }

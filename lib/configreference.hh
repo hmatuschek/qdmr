@@ -32,6 +32,8 @@ public:
   /** Sets the reference.
    * If set to @c nullptr, the reference gets cleared. */
   virtual bool set(ConfigObject *object);
+  /** Copies the reference from another reference. */
+  virtual bool copy(const ConfigObjectReference *ref);
   /** Adds a possible type to this reference. */
   virtual bool allow(const QMetaObject *elementType);
 

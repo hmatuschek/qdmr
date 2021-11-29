@@ -67,4 +67,10 @@
   </para>
 </tip>
 
+<para>
+  If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
+  <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
+  the device specific settings for the GPS system. 
+</para>
+
 </section>

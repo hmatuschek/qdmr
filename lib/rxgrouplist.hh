@@ -15,29 +15,25 @@ class RXGroupList: public ConfigObject
 {
 	Q_OBJECT
 
-  /** The name of the group list. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The list of contacts. */
   Q_PROPERTY(DigitalContactRefList* contacts READ contacts)
 
 public:
+  /** Default constructor. */
+  explicit RXGroupList(QObject *parent=nullptr);
   /** Constructor.
    * @param name Specifies the name of the group list.
    * @param parent @c QObject parent instance. */
-	explicit RXGroupList(const QString &name, QObject *parent=nullptr);
+  RXGroupList(const QString &name, QObject *parent=nullptr);
 
   /** Copy from other group list. */
   RXGroupList &operator =(const RXGroupList &other);
+  ConfigItem *clone() const;
 
   /** Returns the number of contacts within the group list. */
   int count() const;
   /** Resets & clears this group list. */
   void clear();
-
-  /** Returns the name of this group list. */
-	const QString &name() const;
-  /** Sets the name of this group list. */
-	bool setName(const QString &name);
 
   /** Returns the contact at the given list index. */
 	DigitalContact *contact(int idx) const;
@@ -53,15 +49,16 @@ public:
   /** Returns the contact list. */
   DigitalContactRefList *contacts();
 
+public:
   YAML::Node serialize(const Context &context);
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected slots:
   /** Internal used callback to handle list modifications. */
   void onModified();
 
 protected:
-  /** The group list name. */
-	QString _name;
   /** The list of contacts. */
   DigitalContactRefList _contacts;
 };
@@ -81,6 +78,9 @@ public:
 	RXGroupList *list(int idx) const;
 
   int add(ConfigObject *obj, int row=-1);
+
+public:
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 #endif // RXGROUPLIST_HH

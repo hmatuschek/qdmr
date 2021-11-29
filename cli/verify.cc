@@ -9,7 +9,6 @@
 #include "logger.hh"
 #include "config.hh"
 #include "csvreader.hh"
-#include "configreader.hh"
 #include "dfufile.hh"
 #include "rd5r.hh"
 #include "uv390.hh"
@@ -51,9 +50,10 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     logError() << "Verification of binary code-plugs makes no sense.";
     return -1;
   } else if (parser.isSet("yaml") || (filename.endsWith(".yaml") || filename.endsWith(".yml"))) {
-    ConfigReader reader;
-    if (! reader.read(&config, filename)) {
-      logError() << "Cannot read config file '" << filename << ": " << reader.errorMessage();
+    ErrorStack err;
+    if (! config.readYAML(filename,err)) {
+      logError() << "Cannot read codeplug file '" << filename
+                 << "': " << err.format();
       return -1;
     }
   } else {

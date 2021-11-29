@@ -26,11 +26,12 @@ RadioddityRadio::~RadioddityRadio() {
 }
 
 bool
-RadioddityRadio::startDownload(bool blocking) {
+RadioddityRadio::startDownload(bool blocking, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
   _task = StatusDownload;
+  _errorStack = err;
 
   if (blocking) {
     run();
@@ -42,7 +43,7 @@ RadioddityRadio::startDownload(bool blocking) {
 }
 
 bool
-RadioddityRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags) {
+RadioddityRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
@@ -56,16 +57,18 @@ RadioddityRadio::startUpload(Config *config, bool blocking, const Codeplug::Flag
     return (StatusIdle == _task);
   }
 
+  _errorStack = err;
   this->start();
   return true;
 }
 
 bool
-RadioddityRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
+RadioddityRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
   Q_UNUSED(db);
   Q_UNUSED(blocking);
+  Q_UNUSED(selection);
 
-  _errorMessage = tr("Radio does not support a callsign DB.");
+  errMsg(err) << "Radio does not support a callsign DB.";
 
   return false;
 }
@@ -141,10 +144,9 @@ RadioddityRadio::connect() {
   // If not open -> reconnect
   if (_dev)
     _dev->deleteLater();
-  _dev = new RadioddityInterface(0x15a2, 0x0073);
+  _dev = new RadioddityInterface(0x15a2, 0x0073, _errorStack);
   if (! _dev->isOpen()) {
-    _errorMessage = tr("%1(): Cannot connect to RD5R: %2")
-        .arg(__func__).arg(_dev->errorMessage());
+    errMsg(_errorStack) << "Cannot connect to RD5R.";
     _dev->deleteLater();
     _dev = nullptr;
     _task = StatusError;
@@ -172,16 +174,15 @@ RadioddityRadio::download() {
       RadioddityInterface::MemoryBank bank = (
             (0x10000 > addr) ? RadioddityInterface::MEMBANK_CODEPLUG_LOWER : RadioddityInterface::MEMBANK_CODEPLUG_UPPER );
       // read
-      if (! _dev->read(bank, (b0+i)*BSIZE, codeplug().data((b0+i)*BSIZE), BSIZE)) {
-        _errorMessage = tr("%1: Cannot download codeplug: %2").arg(__func__)
-            .arg(_dev->errorMessage());
+      if (! _dev->read(bank, (b0+i)*BSIZE, codeplug().data((b0+i)*BSIZE), BSIZE, _errorStack)) {
+        errMsg(_errorStack) << "Cannot download codeplug.";
         return false;
       }
       emit downloadProgress(float(bcount*100)/btot);
     }
   }
 
-  _dev->read_finish();
+  _dev->read_finish(_errorStack);
   return true;
 }
 
@@ -206,9 +207,8 @@ RadioddityRadio::upload() {
         RadioddityInterface::MemoryBank bank = (
               (0x10000 > addr) ? RadioddityInterface::MEMBANK_CODEPLUG_LOWER : RadioddityInterface::MEMBANK_CODEPLUG_UPPER );
         // read
-        if (! _dev->read(bank, addr, codeplug().data(addr), BSIZE)) {
-          _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
-              .arg(_dev->errorMessage());
+        if (! _dev->read(bank, addr, codeplug().data(addr), BSIZE, _errorStack)) {
+          errMsg(_errorStack) << "Cannot upload codeplug.";
           return false;
         }
         emit uploadProgress(float(bcount*50)/btot);
@@ -217,9 +217,8 @@ RadioddityRadio::upload() {
   }
 
   // Encode config into codeplug
-  if (! codeplug().encode(_config, _codeplugFlags)) {
-    _errorMessage = tr("%1(): Upload failed: %2")
-        .arg(__func__).arg(codeplug().errorMessage());
+  if (! codeplug().encode(_config, _codeplugFlags, _errorStack)) {
+    errMsg(_errorStack) << "Codeplug upload failed.";
     return false;
   }
 
@@ -234,9 +233,8 @@ RadioddityRadio::upload() {
       RadioddityInterface::MemoryBank bank = (
             (0x10000 > addr) ? RadioddityInterface::MEMBANK_CODEPLUG_LOWER : RadioddityInterface::MEMBANK_CODEPLUG_UPPER );
       // write block
-      if (! _dev->write(bank, addr, codeplug().data(addr), BSIZE)) {
-        _errorMessage = tr("%1: Cannot upload codeplug: %2").arg(__func__)
-            .arg(_dev->errorMessage());
+      if (! _dev->write(bank, addr, codeplug().data(addr), BSIZE, _errorStack)) {
+        errMsg(_errorStack) << "Cannot upload codeplug.";
         return false;
       }
       emit uploadProgress(50+float(bcount*50)/btot);

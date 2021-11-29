@@ -631,6 +631,8 @@ AnytoneCodeplug::ChannelElement::enableSMS(bool enable) {
 
 Channel *
 AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
+  Q_UNUSED(ctx)
+
   Channel *ch;
 
   if ((Mode::Analog == mode()) || (Mode::MixedAnalog == mode())) {
@@ -906,6 +908,8 @@ AnytoneCodeplug::ContactElement::toContactObj(Context &ctx) const {
 
 bool
 AnytoneCodeplug::ContactElement::fromContactObj(const DigitalContact *contact, Context &ctx) {
+  Q_UNUSED(ctx)
+
   clear();
 
   setType(contact->type());
@@ -2067,9 +2071,18 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
   }
   // Set default VOX sensitivity
   setVOXLevel(ctx.config()->settings()->vox());
-  // Set squelch level
-  setSquelchLevelA(ctx.config()->settings()->squelch());
-  setSquelchLevelB(ctx.config()->settings()->squelch());
+  // Set default squelch level
+  if (0 == ctx.config()->settings()->squelch()) {
+    setSquelchLevelA(0);
+    setSquelchLevelB(0);
+  } else if (1 == ctx.config()->settings()->squelch()) {
+    setSquelchLevelA(1);
+    setSquelchLevelB(1);
+  } else {
+    setSquelchLevelA(ctx.config()->settings()->squelch()/2);
+    setSquelchLevelB(ctx.config()->settings()->squelch()/2);
+  }
+
   return true;
 }
 
@@ -2080,7 +2093,7 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   // D868UV does not support speech synthesis?
   ctx.config()->settings()->enableSpeech(false);
   ctx.config()->settings()->setVOX(voxLevel());
-  ctx.config()->settings()->setSquelch(squelchLevelA());
+  ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB())*2);
   return true;
 }
 
@@ -2190,6 +2203,7 @@ AnytoneCodeplug::BootSettingsElement::setPassword(const QString &txt) {
 
 bool
 AnytoneCodeplug::BootSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   setIntroLine1(ctx.config()->settings()->introLine1());
   setIntroLine2(ctx.config()->settings()->introLine2());
   return true;
@@ -2406,6 +2420,8 @@ AnytoneCodeplug::DMRAPRSSettingsElement::disableTimeSlotOverride() {
 
 bool
 AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   if (1 < ctx.config()->posSystems()->gpsCount()) {
     logDebug() << "D868UV only supports a single independent GPS positioning system.";
   } else if (0 == ctx.config()->posSystems()->gpsCount()) {
@@ -2443,7 +2459,7 @@ AnytoneCodeplug::DMRAPRSSettingsElement::linkGPSSystem(uint8_t i, Context &ctx) 
     cont = new DigitalContact(callType(), QString("GPS target"), destination());
     ctx.config()->contacts()->add(cont);
   }
-  ctx.get<GPSSystem>(i)->setContact(cont);
+  ctx.get<GPSSystem>(i)->setContactObj(cont);
 
   // Check if there is a revert channel set
   if ((! channelIsSelected(i)) && (ctx.has<Channel>(channelIndex(i))) && (ctx.get<Channel>(channelIndex(i)))->is<DigitalChannel>()) {
@@ -3874,7 +3890,9 @@ AnytoneCodeplug::~AnytoneCodeplug() {
 }
 
 bool
-AnytoneCodeplug::index(Config *config, Context &ctx) const {
+AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err)
+
   // All indices as 0-based. That is, the first channel gets index 0 etc.
 
   // Map radio IDs
