@@ -4,6 +4,7 @@
 #include "ctcssbox.hh"
 #include "repeaterdatabase.hh"
 #include "utils.hh"
+#include "settings.hh"
 
 
 /* ********************************************************************************************* *
@@ -30,6 +31,7 @@ AnalogChannelDialog::AnalogChannelDialog(Config *config, AnalogChannel *channel,
 void
 AnalogChannelDialog::construct() {
   setupUi(this);
+  Settings settings;
 
   Application *app = qobject_cast<Application *>(qApp);
   FMRepeaterFilter *filter = new FMRepeaterFilter(this);
@@ -111,6 +113,9 @@ AnalogChannelDialog::construct() {
     voxDefault->setChecked(false); voxValue->setEnabled(true);
     voxValue->setValue(_myChannel->vox());
   }
+
+  if (! settings.showCommercialFeatures())
+    tabWidget->tabBar()->hide();
 
   extensionView->setObject(_myChannel);
 
