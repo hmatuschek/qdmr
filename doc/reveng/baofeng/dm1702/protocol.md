@@ -6,6 +6,7 @@ from the host gets replied by the device.
 
 The following sections will outline all requests and their responses.
 
+
 ## Read Memory/Registers
 
 ### Request
@@ -50,27 +51,33 @@ little-endian field. The length field is 16bit little-endian field.
 Like for the read response, the flags, address and length fields are copied from the request. The 
 fixed prefix is `S=0x53`. The header is followed by the requested payload of specified length.
 
+
 ## View (?!?)
 The purpose and format of this request and its responses is still unknown.
 
 ### Request
 ```
 +-----+-----+-----+-----+-----+
-| 'V' | Address ?             |
+| 'V' | Address ? |(Len)| Reg |
 +-----+-----+-----+-----+-----+
 ```
 These requests are of fixed size (5 bytes). The fixed prefix is `V=0x56`. The rest of the packet is
-still unknown but appears to at least contain some sort of an address in little endian.
+still unknown but appears to at least contain some sort of an address, optional length field and an 
+unknown bank/register field. If the length is not specified, the response length is determined by 
+the device. If it is specified, the device will always respond with the given amount. The unknown 
+last by appears to specify what should be returned. E.g., a register or property held in memory.
 
 ### Response 
 ```
 +-----+-----+-----+-----+ ... +-----+
-| 'V' | LSB | Len | Payload         |
+| 'V' | Ref | Len | Payload         |
 +-----+-----+-----+-----+ ... +-----+
 ```
 The response header is pretty short. It contains the same prefix `V=0x56` followed by the 
-least-significant byte of the address. I.e., the last byte of the request packet. Then there is a
-single-byte length of the payload. 
+last byte of the request packet (likely register, bank, property). Then there is a
+single-byte length of the payload. If the request length is `0`, this field contains the 
+response length.
+
 
 ## Write 
 The write request follows the request schema of the previous requests.
@@ -92,6 +99,7 @@ The device simply replies with an ACK.
 | 06H |
 +-----+
 ```
+
 
 ## ACK/Status request
 There are frequent 1-byte messages send to and from the device. This byte appears to be a kind of 
@@ -146,6 +154,7 @@ the device responds with a single ACK byte.
 | 06H |
 +-----+
 ```
+
 
 ## Unknown requests
 During the initial handshake, there are some unknown requests.
