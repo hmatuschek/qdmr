@@ -50,7 +50,7 @@ DTMFContactDialog::contact() {
   _myContact->setRing(ui->ringCheckBox->isChecked());
 
   DTMFContact *contact = _myContact;
-  if (nullptr == _contact) {
+  if (_contact) {
     _contact->copy(*_myContact);
     contact = _contact;
   } else {
