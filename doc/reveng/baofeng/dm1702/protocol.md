@@ -45,7 +45,7 @@ little-endian field. The length field is 16bit little-endian field.
 ```
 +-----+-----+-----+-----+-----+-----+-----+ ... +-----+
 | 'S' | Address         | Length    | Payload         |
-+-----+-----+-----+-----+-----+-----+-----+-...-+-----+
++-----+-----+-----+-----+-----+-----+-----+ ... +-----+
 ```
 Like for the read response, the flags, address and length fields are copied from the request. The 
 fixed prefix is `S=0x53`. The header is followed by the requested payload of specified length.
@@ -73,6 +73,8 @@ least-significant byte of the address. I.e., the last byte of the request packet
 single-byte length of the payload. 
 
 ## Write 
+The write request follows the request schema of the previous requests.
+
 ### Request 
 ```
 +-----+-----+-----+-----+-----+-----+-----+ ... +-----+
@@ -93,7 +95,84 @@ The device simply replies with an ACK.
 
 ## ACK/Status request
 There are frequent 1-byte messages send to and from the device. This byte appears to be a kind of 
-status request and acknowledgement responses. For example, after each read, get, view requests and
-response, a single `0x06` byte is send by the host which the device responses with the same byte.
+status request and acknowledgement response. For example, after each read, get, view requests and
+response, a single `0x06` byte is send by the host. The device then responses with the same byte.
 Also some control requests are ACKed by the device with this byte.
 
+
+## Control requests
+There are several one-off control requests send to the device during the initial handshake. These 
+requests usually prepare the device and put it into programming mode.
+
+### Search 
+The very first request send to the device is the search request. This identifies the connected device.
+```
++-----+-----+-----+-----+-----+-----+-----+
+| 'P' | 'S' | 'E' | 'A' | 'R' | 'C' | 'H' |
++-----+-----+-----+-----+-----+-----+-----+
+```
+the device responds with an ACK byte followed by the ID string. E.g.,
+```
++-----+-----+-----+-----+-----+-----+-----+-----+
+| 06H | 'D' | 'M' | '1' | '7' | '0' | '2' | 'S' |
++-----+-----+-----+-----+-----+-----+-----+-----+
+```
+The response appears to be of fixed size as there is no length field and no EOS symbol.
+
+### Enter Programming Mode (?)
+The second message send appears to put the radio in programming mode or prepares the device in some way.
+```
++-----+-----+-----+-----+-----+-----+-----+
+| 'P' | 'A' | 'S' | 'S' | 'S' | 'T' | 'A' |
++-----+-----+-----+-----+-----+-----+-----+
+```
+the device responds with some unknown data
+```
++-----+-----+-----+
+| 'P' | 00H | 00H |
++-----+-----+-----+
+```
+
+### System info request
+The third request appears to check for the device state.
+```
++-----+-----+-----+-----+-----+-----+-----+
+| 'S' | 'Y' | 'S' | 'I' | 'N' | 'F' | 'O' |
++-----+-----+-----+-----+-----+-----+-----+
+```
+the device responds with a single ACK byte.
+```
++-----+
+| 06H |
++-----+
+```
+
+## Unknown requests
+During the initial handshake, there are some unknown requests.
+
+### Unknown Request 1
+```
++-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+| ffH | ffH | ffH | ffH | 0cH | 'D' | 'M' | '1' | '7' | '0' | '2' | 'S' |
++-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+```
+the device responds with a single ACK byte
+```
++-----+
+| 06H |
++-----+
+```
+
+### Unknown Request 2
+Following the unknown request 1, the host sends a single byte
+```
++-----+
+| 02H |
++-----+
+```
+and the device responds with 
+```
++-----+-----+-----+-----+-----+-----+-----+-----+
+| ffH | ffH | ffH | ffH | ffH | ffH | ffH | ffH |
++-----+-----+-----+-----+-----+-----+-----+-----+
+```
