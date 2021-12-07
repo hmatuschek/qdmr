@@ -1461,11 +1461,11 @@ TyTCodeplug::GeneralSettingsElement::pcProgPasswordEnabled() const {
 }
 QString
 TyTCodeplug::GeneralSettingsElement::pcProgPassword() const {
-  return readASCII(0x60, 8);
+  return readASCII(0x60, 8, 0xff);
 }
 void
 TyTCodeplug::GeneralSettingsElement::setPCProgPassword(const QString &pass) {
-  writeASCII(0x60, pass, 8);
+  writeASCII(0x60, pass, 8, 0xff);
 }
 void
 TyTCodeplug::GeneralSettingsElement::pcProgPasswordDisable() {
