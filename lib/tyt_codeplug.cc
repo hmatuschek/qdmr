@@ -962,12 +962,12 @@ TyTCodeplug::ScanListElement::setHoldTime(unsigned time) {
 
 unsigned
 TyTCodeplug::ScanListElement::prioritySampleTime() const {
-  return unsigned(getUInt8(0x27))*250;
+  return unsigned(getUInt8(0x28))*250;
 }
 
 void
 TyTCodeplug::ScanListElement::setPrioritySampleTime(unsigned time) {
-  setUInt8(0x27, time/250);
+  setUInt8(0x28, time/250);
 }
 
 uint16_t
@@ -1035,9 +1035,9 @@ TyTCodeplug::ScanListElement::toScanListObj(Context &ctx) {
     return nullptr;
 
   ScanList *lst = new ScanList(name());
+
   TyTScanListExtension *ex = new TyTScanListExtension();
   lst->setTyTScanListExtension(ex);
-
   ex->setHoldTime(holdTime());
   ex->setPrioritySampleTime(prioritySampleTime());
 

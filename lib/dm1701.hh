@@ -23,7 +23,7 @@
 #include "tyt_radio.hh"
 #include "tyt_codeplug.hh"
 #include "tyt_callsigndb.hh"
-#include "uv390_codeplug.hh"
+#include "dm1701_codeplug.hh"
 #include "uv390_callsigndb.hh"
 
 
@@ -55,9 +55,7 @@ protected:
   /** The device identifier. */
 	QString _name;
   /** The actual binary codeplug representation. */
-	UV390Codeplug _codeplug;
-  /** The acutal binary callsign-db representation. */
-  UV390CallsignDB _callsigns;
+  DM1701Codeplug _codeplug;
 };
 
 #endif // DM1701_HH
