@@ -15,7 +15,7 @@
  *   - 250 zones, 64 channels each (A & B)
  *   - 250 scan lists, 31 channels each
  *   - ...
- * @ingroup dsc */
+ * @ingroup tyt */
 #ifndef DM1701_HH
 #define DM1701_HH
 
@@ -46,6 +46,10 @@ public:
   const Radio::Features &features() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
+
+  /** Returns the default radio information. The actual instance may have different properties
+   * due to variants of the same radio. */
+  static RadioInfo defaultRadioInfo();
 
 protected:
   /** The device identifier. */

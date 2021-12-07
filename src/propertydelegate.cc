@@ -23,6 +23,7 @@ PropertyDelegate::getModel(const QAbstractItemModel *model) {
 
 QWidget *
 PropertyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+  Q_UNUSED(option)
   const PropertyWrapper *model = getModel(index.model());
   QMetaProperty prop = model->propertyAt(index);
 

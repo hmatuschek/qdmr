@@ -50,10 +50,10 @@ class TyTChannelExtension: public ConfigExtension
   /** If @c true, and dcdm is enabled, this radio is the leader, specifying the clock. */
   Q_PROPERTY(bool dcdmLeader READ dcdmLeader WRITE enableDCDMLeader)
 
-  Q_CLASSINFO("description", "Settings for MD-390, RT8, MD-UV390, RT3S, MD-2017, RT82.")
+  Q_CLASSINFO("description", "Settings for MD-390, RT8, MD-UV390, RT3S, MD-2017, RT82, DM-1701, RT84.")
   Q_CLASSINFO("longDescription", "Device specific channel settings for TyT and Retevis devices."
-                                 "Including TyT MD-390, MD-UV390, MD-2017 as well as Retevis RT8, "
-                                 "RT3S and RT82.")
+                                 "Including TyT MD-390, MD-UV390, MD-2017, Retevis RT8, RT3S and RT82"
+                                 " as well as Baofeng DM-1701.")
 
 public:
   /** Possible reference frequency settings for RX & TX. */

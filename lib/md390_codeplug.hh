@@ -1,7 +1,7 @@
 #ifndef MD390CODEPLUG_HH
 #define MD390CODEPLUG_HH
 
-#include "tyt_codeplug.hh"
+#include "dm1701_codeplug.hh"
 
 /** Device specific implementation of the codeplug for the TyT MD-390(U/V).
  *
@@ -42,7 +42,7 @@ public:
    *
    * Memory layout of the channel (size 0x0040 bytes):
    * @verbinclude md390_channel.txt */
-  class ChannelElement: public TyTCodeplug::ChannelElement
+  class ChannelElement: public DM1701Codeplug::ChannelElement
   {
   protected:
     /** Hidden constructor. */
@@ -54,25 +54,10 @@ public:
 
     void clear();
 
-    /** Returns @c true if the squelch is 'tight'. */
-    virtual bool tightSquelchEnabled() const;
-    /** Enables/disables tight squelch. */
-    virtual void enableTightSquelch(bool enable);
-
     /** Returns @c true if the 'compressed UDP data header' is enabled. */
     virtual bool compressedUDPHeader() const;
     /** Enables/disables 'compressed UDP data header'. */
     virtual void enableCompressedUDPHeader(bool enable);
-
-    /** Returns @c true if the reversed burst is enabled. */
-    virtual bool reverseBurst() const;
-    /** Enables/disables reverse burst. */
-    virtual void enableReverseBurst(bool enable);
-
-    /** Returns the power of this channel. */
-    virtual Channel::Power power() const;
-    /** Sets the power of this channel. */
-    virtual void setPower(Channel::Power pwr);
 
     /** Constructs a generic @c Channel object from the codeplug channel. */
     virtual Channel *toChannelObj() const;

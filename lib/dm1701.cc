@@ -72,6 +72,12 @@ DM1701::features() const {
   return _dm1701_features;
 }
 
+RadioInfo
+DM1701::defaultRadioInfo() {
+  return RadioInfo(
+        RadioInfo::DM1701, "dm1701", "DM-1701", "Baofeng");
+}
+
 const Codeplug &
 DM1701::codeplug() const {
   return _codeplug;

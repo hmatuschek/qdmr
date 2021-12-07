@@ -1,18 +1,20 @@
-#include "md390_codeplug.hh"
+#include "dm1701_codeplug.hh"
+#include "codeplugcontext.hh"
 #include "logger.hh"
 
-
-#define NUM_CHANNELS                1000
-#define ADDR_CHANNELS           0x01ee00
+#define NUM_CHANNELS                3000
+#define ADDR_CHANNELS           0x110000
 #define CHANNEL_SIZE            0x000040
 
-#define NUM_CONTACTS                1000
-#define ADDR_CONTACTS           0x005f80
+#define NUM_CONTACTS               10000
+#define ADDR_CONTACTS           0x140000
 #define CONTACT_SIZE            0x000024
 
 #define NUM_ZONES                    250
 #define ADDR_ZONES              0x0149e0
 #define ZONE_SIZE               0x000040
+#define ADDR_ZONEEXTS           0x031000
+#define ZONEEXT_SIZE            0x0000e0
 
 #define NUM_GROUPLISTS               250
 #define ADDR_GROUPLISTS         0x00ec20
@@ -42,119 +44,163 @@
 #define ADDR_EMERGENCY_SYSTEMS  0x005a60
 #define EMERGENCY_SYSTEM_SIZE   0x000028
 
+#define ADDR_VFO_CHANNEL_A      0x02ef00
+#define ADDR_VFO_CHANNEL_B      0x02ef40
+
+
 
 /* ********************************************************************************************* *
- * Implementation of MD390Codeplug::ChannelElement
+ * Implementation of DM1701Codeplug::ChannelElement
  * ********************************************************************************************* */
-MD390Codeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
-  : DM1701Codeplug::ChannelElement::ChannelElement(ptr, size)
+DM1701Codeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
+  : TyTCodeplug::ChannelElement::ChannelElement(ptr, size)
 {
   // pass...
 }
 
-MD390Codeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : DM1701Codeplug::ChannelElement(ptr, CHANNEL_SIZE)
+DM1701Codeplug::ChannelElement::ChannelElement(uint8_t *ptr)
+  : TyTCodeplug::ChannelElement(ptr, CHANNEL_SIZE)
 {
   // pass...
 }
 
 void
-MD390Codeplug::ChannelElement::clear() {
-  DM1701Codeplug::ChannelElement::clear();
+DM1701Codeplug::ChannelElement::clear() {
+  TyTCodeplug::ChannelElement::clear();
 
-  enableCompressedUDPHeader(false);
+  enableTightSquelch(false);
+  enableReverseBurst(true);
+  setPower(Channel::Power::High);
+  setBit(0x0003, 6, true);
+  setUInt8(0x0005, 0xc3);
+  setUInt8(0x000f, 0xff);
 }
 
 bool
-MD390Codeplug::ChannelElement::compressedUDPHeader() const {
-  return !getBit(0x0003, 6);
+DM1701Codeplug::ChannelElement::tightSquelchEnabled() const {
+  return !getBit(0x0000, 5);
 }
 void
-MD390Codeplug::ChannelElement::enableCompressedUDPHeader(bool enable) {
-  setBit(0x0003, 6, !enable);
+DM1701Codeplug::ChannelElement::enableTightSquelch(bool enable) {
+  setBit(0x0000, 5, !enable);
+}
+
+bool
+DM1701Codeplug::ChannelElement::reverseBurst() const {
+  return getBit(0x0004, 2);
+}
+void
+DM1701Codeplug::ChannelElement::enableReverseBurst(bool enable) {
+  setBit(0x0004, 2, enable);
+}
+
+Channel::Power
+DM1701Codeplug::ChannelElement::power() const {
+  if (getBit(0x0004, 5))
+    return Channel::Power::High;
+  return Channel::Power::Low;
+}
+void
+DM1701Codeplug::ChannelElement::setPower(Channel::Power pwr) {
+  switch (pwr) {
+  case Channel::Power::Min:
+  case Channel::Power::Low:
+  case Channel::Power::Mid:
+    setBit(0x0004, 5, false);
+    break;
+  case Channel::Power::High:
+  case Channel::Power::Max:
+    setBit(0x0004, 5, true);
+  }
 }
 
 Channel *
-MD390Codeplug::ChannelElement::toChannelObj() const {
-  Channel *ch = DM1701Codeplug::ChannelElement::toChannelObj();
+DM1701Codeplug::ChannelElement::toChannelObj() const {
+  Channel *ch = TyTCodeplug::ChannelElement::toChannelObj();
   if (nullptr == ch)
     return ch;
 
+  ch->setPower(power());
+
   // Apply extension
   if (ch->tytChannelExtension()) {
-    ch->tytChannelExtension()->enableCompressedUDPHeader(compressedUDPHeader());
+    ch->tytChannelExtension()->enableTightSquelch(tightSquelchEnabled());
+    ch->tytChannelExtension()->enableReverseBurst(reverseBurst());
   }
   return ch;
 }
 
 void
-MD390Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  DM1701Codeplug::ChannelElement::fromChannelObj(c, ctx);
+DM1701Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
+  TyTCodeplug::ChannelElement::fromChannelObj(c, ctx);
+
+  setPower(c->power());
 
   // apply extensions (extension will be created in TyTCodeplug::ChannelElement::fromChannelObj)
   if (TyTChannelExtension *ex = c->tytChannelExtension()) {
-    enableCompressedUDPHeader(ex->compressedUDPHeader());
+    enableTightSquelch(ex->tightSquelch());
+    enableReverseBurst(ex->reverseBurst());
   }
 }
 
 
+
 /* ********************************************************************************************* *
- * Implementation of MD390Codeplug
+ * Implementation of DM1701Codeplug
  * ********************************************************************************************* */
-MD390Codeplug::MD390Codeplug(QObject *parent)
+DM1701Codeplug::DM1701Codeplug(QObject *parent)
   : TyTCodeplug(parent)
 {
-  addImage("TYT MD-390 Codeplug");
+  addImage("Baofeng DM-1701 Codeplug");
   image(0).addElement(0x002000, 0x3e000);
+  image(0).addElement(0x110000, 0x90000);
+
   // Clear entire codeplug
   clear();
 }
 
-bool
-MD390Codeplug::decodeElements(Context &ctx, const ErrorStack &err) {
-  logDebug() << "Decode MD390 codeplug, programmed with CPS version "
-             << TimestampElement(data(ADDR_TIMESTAMP)).cpsVersion() << ".";
-  return TyTCodeplug::decodeElements(ctx, err);
+DM1701Codeplug::~DM1701Codeplug() {
+  // pass...
 }
 
 void
-MD390Codeplug::clearTimestamp() {
+DM1701Codeplug::clearTimestamp() {
   TimestampElement(data(ADDR_TIMESTAMP)).clear();
 }
 
 bool
-MD390Codeplug::encodeTimestamp() {
+DM1701Codeplug::encodeTimestamp() {
   TimestampElement ts(data(ADDR_TIMESTAMP));
   ts.setTimestamp(QDateTime::currentDateTime());
   return true;
 }
 
 void
-MD390Codeplug::clearGeneralSettings() {
+DM1701Codeplug::clearGeneralSettings() {
   GeneralSettingsElement(data(ADDR_SETTINGS)).clear();
 }
 
 bool
-MD390Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   return GeneralSettingsElement(data(ADDR_SETTINGS)).fromConfig(config);
 }
 
 bool
-MD390Codeplug::decodeGeneralSettings(Config *config, const ErrorStack &err) {
+DM1701Codeplug::decodeGeneralSettings(Config *config, const ErrorStack &err) {
   Q_UNUSED(err)
   return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(config);
 }
 
 void
-MD390Codeplug::clearChannels() {
+DM1701Codeplug::clearChannels() {
   // Clear channels
   for (int i=0; i<NUM_CHANNELS; i++)
     ChannelElement(data(ADDR_CHANNELS+i*CHANNEL_SIZE)).clear();
 }
 
 bool
-MD390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   // Define Channels
   for (int i=0; i<NUM_CHANNELS; i++) {
@@ -169,7 +215,7 @@ MD390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, 
 }
 
 bool
-MD390Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
@@ -177,7 +223,7 @@ MD390Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &er
     if (Channel *obj = chan.toChannelObj()) {
       config->channelList()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invlaid channel at index " << i << ".";
+      errMsg(err) << "Invlaid channel at index %" << i << ".";
       return false;
     }
   }
@@ -185,7 +231,7 @@ MD390Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &er
 }
 
 bool
-MD390Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
@@ -199,14 +245,14 @@ MD390Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
 }
 
 void
-MD390Codeplug::clearContacts() {
+DM1701Codeplug::clearContacts() {
   // Clear contacts
   for (int i=0; i<NUM_CONTACTS; i++)
     ContactElement(data(ADDR_CONTACTS+i*CONTACT_SIZE)).clear();
 }
 
 bool
-MD390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Encode contacts
   for (int i=0; i<NUM_CONTACTS; i++) {
@@ -220,7 +266,7 @@ MD390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, 
 }
 
 bool
-MD390Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
     if (! cont.isValid())
@@ -236,67 +282,42 @@ MD390Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &er
 }
 
 void
-MD390Codeplug::clearZones() {
+DM1701Codeplug::clearZones() {
   // Clear zones & zone extensions
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement(data(ADDR_ZONES+i*ZONE_SIZE)).clear();
+    ZoneExtElement(data(ADDR_ZONEEXTS+i*ZONEEXT_SIZE)).clear();
   }
 }
 
 bool
-MD390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
-  for (int i=0,z=0; i<NUM_ZONES; i++, z++) {
+  for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
+    ZoneExtElement ext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
     zone.clear();
-
-    if (z < config->zones()->count()) {
-      // handle A list
-      Zone *obj = config->zones()->zone(z);
-      bool needs_ext = obj->B()->count();
-      // set name
-      if (needs_ext)
-        zone.setName(obj->name() + " A");
-      else
-        zone.setName(obj->name());
-      // fill channels
-      for (int c=0; c<16; c++) {
-        if (c < obj->A()->count())
-          zone.setMemberIndex(c, ctx.index(obj->A()->get(c)));
-      }
-      // If there is a B list, add a zone more
-      if (needs_ext) {
-        i++;
-        ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
-        zone.clear();
-        zone.setName(obj->name() + " B");
-        for (int c=0; c<16; c++) {
-          if (c < obj->B()->count())
-            zone.setMemberIndex(c, ctx.index(obj->B()->get(c)));
-        }
-      }
+    ext.clear();
+    if (i < config->zones()->count()) {
+      zone.fromZoneObj(config->zones()->zone(i), ctx);
+      if (config->zones()->zone(i)->B()->count() || (16 < config->zones()->zone(i)->A()->count()))
+        ext.fromZoneObj(config->zones()->zone(i), ctx);
     }
   }
-
   return true;
 }
 
 bool
-MD390Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-  Zone *last_zone = nullptr;
+DM1701Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
       break;
-    bool is_ext = (nullptr != last_zone) && (zone.name().endsWith(" B")) &&
-        (zone.name().startsWith(last_zone->name()));
-    Zone *obj = last_zone;
-    if (! is_ext) {
-      last_zone = obj = new Zone(zone.name());
-      if (zone.name().endsWith(" A"))
-        obj->setName(zone.name().chopped(2));
+    if (Zone *obj = zone.toZoneObj()) {
       config->zones()->add(obj); ctx.add(obj, i+1);
+    } else {
+      errMsg(err) << "Invlaid zone at index " << i << ".";
+      return false;
     }
   }
 
@@ -304,34 +325,19 @@ MD390Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) 
 }
 
 bool
-MD390Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-  Zone *last_zone = nullptr;
-  for (int i=0, z=0; i<NUM_ZONES; i++, z++) {
+DM1701Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
+  for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
       break;
-
-    if (ctx.has<Zone>(i+1)) {
-      Zone *obj = last_zone = ctx.get<Zone>(i+1);
-      for (int i=0; ((i<16) && zone.memberIndex(i)); i++) {
-        if (! ctx.has<Channel>(zone.memberIndex(i))) {
-          logWarn() << "Cannot link channel with index " << zone.memberIndex(i)
-                    << " channel not defined.";
-          continue;
-        }
-        obj->A()->add(ctx.get<Channel>(zone.memberIndex(i)));
-      }
-    } else {
-      Zone *obj = last_zone; last_zone = nullptr;
-      for (int i=0; ((i<16) && zone.memberIndex(i)); i++) {
-        if (! ctx.has<Channel>(zone.memberIndex(i))) {
-          logWarn() << "Cannot link channel with index " << zone.memberIndex(i)
-                    << " channel not defined.";
-          continue;
-        }
-        obj->B()->add(ctx.get<Channel>(zone.memberIndex(i)));
-      }
+    if (! zone.linkZone(ctx.get<Zone>(i+1), ctx)) {
+      errMsg(err) << "Cannot link zone at index " << i << ".";
+      return false;
+    }
+    ZoneExtElement zoneext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
+    if (! zoneext.linkZoneObj(ctx.get<Zone>(i), ctx)) {
+      errMsg(err) << "Cannot link zone extension at index " << i << ".";
+      return false;
     }
   }
 
@@ -339,13 +345,13 @@ MD390Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
 }
 
 void
-MD390Codeplug::clearGroupLists() {
+DM1701Codeplug::clearGroupLists() {
   for (int i=0; i<NUM_GROUPLISTS; i++)
     GroupListElement(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE)).clear();
 }
 
 bool
-MD390Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
@@ -358,7 +364,7 @@ MD390Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx
 }
 
 bool
-MD390Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
@@ -374,7 +380,7 @@ MD390Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &
 }
 
 bool
-MD390Codeplug::linkGroupLists(Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::linkGroupLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
@@ -388,14 +394,14 @@ MD390Codeplug::linkGroupLists(Context &ctx, const ErrorStack &err) {
 }
 
 void
-MD390Codeplug::clearScanLists() {
+DM1701Codeplug::clearScanLists() {
   // Clear scan lists
   for (int i=0; i<NUM_SCANLISTS; i++)
     ScanListElement(data(ADDR_SCANLISTS + i*SCANLIST_SIZE)).clear();
 }
 
 bool
-MD390Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   // Define Scanlists
   for (int i=0; i<NUM_SCANLISTS; i++) {
@@ -409,7 +415,7 @@ MD390Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx,
 }
 
 bool
-MD390Codeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
@@ -425,14 +431,14 @@ MD390Codeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &e
 }
 
 bool
-MD390Codeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
       break;
 
     if (! scan.linkScanListObj(ctx.get<ScanList>(i+1), ctx)) {
-      errMsg(err) << "Cannot link scan list at index " << i << ".";
+      errMsg(err) << "Cannot link scan list at index" << i << ".";
       return false;
     }
   }
@@ -441,30 +447,27 @@ MD390Codeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
 }
 
 void
-MD390Codeplug::clearPositioningSystems() {
+DM1701Codeplug::clearPositioningSystems() {
   // Clear GPS systems
   for (int i=0; i<NUM_GPSSYSTEMS; i++)
     GPSSystemElement(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE)).clear();
 }
 
 bool
-MD390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
-    if (i < config->posSystems()->gpsCount()) {
-      logDebug() << "Encode GPS system #" << i << " '" <<
-                    config->posSystems()->gpsSystem(i)->name() << "'.";
+    if (i < config->posSystems()->gpsCount())
       gps.fromGPSSystemObj(config->posSystems()->gpsSystem(i), ctx);
-    } else {
+    else
       gps.clear();
-    }
   }
   return true;
 }
 
 bool
-MD390Codeplug::createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
@@ -481,7 +484,7 @@ MD390Codeplug::createPositioningSystems(Config *config, Context &ctx, const Erro
 }
 
 bool
-MD390Codeplug::linkPositioningSystems(Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::linkPositioningSystems(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
@@ -496,42 +499,53 @@ MD390Codeplug::linkPositioningSystems(Context &ctx, const ErrorStack &err) {
 }
 
 void
-MD390Codeplug::clearButtonSettings() {
+DM1701Codeplug::clearBootSettings() {
+  BootSettingsElement(data(ADDR_BOOTSETTINGS)).clear();
+}
+
+void
+DM1701Codeplug::clearMenuSettings() {
+  MenuSettingsElement(data(ADDR_MENUSETTINGS)).clear();
+}
+
+void
+DM1701Codeplug::clearButtonSettings() {
   ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).clear();
 }
 
 bool
-MD390Codeplug::encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(ctx); Q_UNUSED(flags); Q_UNUSED(err)
+DM1701Codeplug::encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Encode settings
   return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(config);
 }
 
 bool
-MD390Codeplug::decodeButtonSetttings(Config *config, const ErrorStack &err) {
+DM1701Codeplug::decodeButtonSetttings(Config *config, const ErrorStack &err) {
   Q_UNUSED(err)
   return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).updateConfig(config);
 }
 
 void
-MD390Codeplug::clearMenuSettings() {
-  MenuSettingsElement(data(ADDR_MENUSETTINGS)).clear();
-}
-
-void
-MD390Codeplug::clearTextMessages() {
+DM1701Codeplug::clearTextMessages() {
   memset(data(ADDR_TEXTMESSAGES), 0, NUM_TEXTMESSAGES*TEXTMESSAGE_SIZE);
 }
 
 void
-MD390Codeplug::clearPrivacyKeys() {
+DM1701Codeplug::clearPrivacyKeys() {
   EncryptionElement(data(ADDR_PRIVACY_KEYS)).clear();
 
 }
 
 void
-MD390Codeplug::clearEmergencySystems() {
+DM1701Codeplug::clearEmergencySystems() {
   EmergencySettingsElement(data(ADDR_EMERGENCY_SETTINGS)).clear();
   for (int i=0; i<NUM_EMERGENCY_SYSTEMS; i++)
     EmergencySystemElement(data(ADDR_EMERGENCY_SYSTEMS + i*EMERGENCY_SYSTEM_SIZE)).clear();
+}
+
+void
+DM1701Codeplug::clearVFOSettings() {
+  VFOChannelElement(data(ADDR_VFO_CHANNEL_A)).clear();
+  VFOChannelElement(data(ADDR_VFO_CHANNEL_B)).clear();
 }

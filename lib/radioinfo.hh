@@ -31,7 +31,9 @@ public:
     DMR6X2 = D868UVE, // Actually a D868UV, implement!
     D878UV,
     D878UVII,
-    D578UV
+    D578UV,
+    // Baofeng/BTECH
+    DM1701, RT84 = DM1701
   };
 
 public:

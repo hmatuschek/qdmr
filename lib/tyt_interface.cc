@@ -34,6 +34,8 @@ TyTInterface::TyTInterface(unsigned vid, unsigned pid, const ErrorStack &err, QO
     _ident = RadioInfo::byID(RadioInfo::UV390);
   } else if (idstr && (0==strcmp("2017", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::MD2017);
+  } else if (idstr && (0==strcmp("1701", idstr))) {
+    _ident = RadioInfo::byID(RadioInfo::DM1701);
   } else if (idstr) {
     errMsg(err) << "Unknown TyT device '" << idstr << "'.";
     close(); return;
