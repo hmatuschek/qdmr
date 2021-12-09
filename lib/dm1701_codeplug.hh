@@ -95,12 +95,6 @@ public:
   /** Reuse TyT MD-UV390 zone extension element. */
   typedef UV390Codeplug::ZoneExtElement ZoneExtElement;
 
-  /** Reuse TyT MD-UV390 general settings element. */
-  typedef UV390Codeplug::GeneralSettingsElement GeneralSettingsElement;
-
-  /** Reuse TyT MD-UV390 boot settings element. */
-  typedef UV390Codeplug::BootSettingsElement BootSettingsElement;
-
 public:
   /** Constructor. */
   explicit DM1701Codeplug(QObject *parent = nullptr);
@@ -139,17 +133,15 @@ public:
   bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
-  void clearPositioningSystems();
-  bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkPositioningSystems(Context &ctx, const ErrorStack &err=ErrorStack());
-
   void clearButtonSettings();
   bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack());
 
-  /** Resets/clears the boot settings. */
-  virtual void clearBootSettings();
+  void clearPositioningSystems();
+  bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err);
+  bool linkPositioningSystems(Context &ctx, const ErrorStack &err);
+
   void clearMenuSettings();
   void clearTextMessages();
   void clearPrivacyKeys();

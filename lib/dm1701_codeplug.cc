@@ -447,63 +447,6 @@ DM1701Codeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
 }
 
 void
-DM1701Codeplug::clearPositioningSystems() {
-  // Clear GPS systems
-  for (int i=0; i<NUM_GPSSYSTEMS; i++)
-    GPSSystemElement(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE)).clear();
-}
-
-bool
-DM1701Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
-  for (int i=0; i<NUM_GPSSYSTEMS; i++) {
-    GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
-    if (i < config->posSystems()->gpsCount())
-      gps.fromGPSSystemObj(config->posSystems()->gpsSystem(i), ctx);
-    else
-      gps.clear();
-  }
-  return true;
-}
-
-bool
-DM1701Codeplug::createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err) {
-  for (int i=0; i<NUM_GPSSYSTEMS; i++) {
-    GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
-    if (! gps.isValid())
-      break;
-    if (GPSSystem *obj = gps.toGPSSystemObj()) {
-      config->posSystems()->add(obj); ctx.add(obj, i+1);
-    } else {
-      errMsg(err) << "Invlaid GPS system at index " << i << ".";
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool
-DM1701Codeplug::linkPositioningSystems(Context &ctx, const ErrorStack &err) {
-  for (int i=0; i<NUM_GPSSYSTEMS; i++) {
-    GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
-    if (! gps.isValid())
-      break;
-    if (! gps.linkGPSSystemObj(ctx.get<GPSSystem>(i+1), ctx)) {
-      errMsg(err) << "Cannot link GPS system at index " << i << ".";
-      return false;
-    }
-  }
-
-  return true;
-}
-
-void
-DM1701Codeplug::clearBootSettings() {
-  BootSettingsElement(data(ADDR_BOOTSETTINGS)).clear();
-}
-
-void
 DM1701Codeplug::clearMenuSettings() {
   MenuSettingsElement(data(ADDR_MENUSETTINGS)).clear();
 }
@@ -548,4 +491,31 @@ void
 DM1701Codeplug::clearVFOSettings() {
   VFOChannelElement(data(ADDR_VFO_CHANNEL_A)).clear();
   VFOChannelElement(data(ADDR_VFO_CHANNEL_B)).clear();
+}
+
+
+void
+DM1701Codeplug::clearPositioningSystems() {
+  // pass, nothing to do.
+}
+
+bool
+DM1701Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
+  // Pass, nothing to do
+  return true;
+}
+
+bool
+DM1701Codeplug::createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(ctx); Q_UNUSED(err)
+  // Pass, nothing to do
+  return true;
+}
+
+bool
+DM1701Codeplug::linkPositioningSystems(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  // Nothing to do
+  return true;
 }
