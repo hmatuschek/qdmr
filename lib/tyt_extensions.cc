@@ -378,13 +378,15 @@ TyTSettingsExtension::TyTSettingsExtension(QObject *parent)
   : ConfigExtension(parent), _monitorType(MonitorType::Open), _allLEDsDisabled(false),
     _talkPermitToneDigital(false), _talkPermitToneAnalog(false), _passwdAndLock(false),
     _channelFreeIndicationTone(true), _allTonesDisabled(false), _powerSaveMode(true),
-    _wakeupPreamble(true), _bootPicture(true), _txPreambleDuration(600), _groupCallHangTime(3000),
+    _wakeupPreamble(true), _bootPicture(true), _channelMode(true), _channelModeA(true),
+    _channelModeB(true), _txPreambleDuration(600), _groupCallHangTime(3000),
     _privateCallHangTime(3000), _lowBatteryWarnInterval(120), _callAlertToneContinuous(false),
     _callAlertToneDuration(0), _loneWorkerResponseTime(1), _loneWorkerReminderTime(10),
     _digitalScanHangTime(1000), _analogScanHangTime(1000), _backlightAlwaysOn(false),
     _backlightDuration(10), _keypadLockManual(true), _keypadLockTime(5*0xff),
     _powerOnPasswordEnabled(false), _powerOnPassword(0), _radioProgPasswordEnabled(false),
-    _radioProgPassword(0), _pcProgPassword("")
+    _radioProgPassword(0), _pcProgPassword(""), _privateCallMatch(true), _groupCallMatch(true),
+    _channelHangTime(3000)
 {
   // pass...
 }
@@ -517,6 +519,41 @@ TyTSettingsExtension::enableBootPicture(bool enable) {
   if (_bootPicture == enable)
     return;
   _bootPicture = enable;
+  emit modified(this);
+}
+
+
+bool
+TyTSettingsExtension::channelMode() const {
+  return _channelMode;
+}
+void
+TyTSettingsExtension::enableChannelMode(bool enable) {
+  if (_channelMode == enable)
+    return;
+  _channelMode = enable;
+  emit modified(this);
+}
+bool
+TyTSettingsExtension::channelModeA() const {
+  return _channelModeA;
+}
+void
+TyTSettingsExtension::enableChannelModeA(bool enable) {
+  if (_channelModeA == enable)
+    return;
+  _channelModeA = enable;
+  emit modified(this);
+}
+bool
+TyTSettingsExtension::channelModeB() const {
+  return _channelModeB;
+}
+void
+TyTSettingsExtension::enableChannelModeB(bool enable) {
+  if (_channelModeB == enable)
+    return;
+  _channelModeB = enable;
   emit modified(this);
 }
 
@@ -740,6 +777,42 @@ TyTSettingsExtension::setPCProgPassword(const QString &passwd) {
   if (_pcProgPassword == passwd)
     return;
   _pcProgPassword = passwd;
+  emit modified(this);
+}
+
+bool
+TyTSettingsExtension::privateCallMatch() const {
+  return _privateCallMatch;
+}
+void
+TyTSettingsExtension::enablePrivateCallMatch(bool enable) {
+  if (_privateCallMatch == enable)
+    return;
+  _privateCallMatch = enable;
+  emit modified(this);
+}
+
+bool
+TyTSettingsExtension::groupCallMatch() const {
+  return _groupCallMatch;
+}
+void
+TyTSettingsExtension::enableGroupCallMatch(bool enable) {
+  if (_groupCallMatch == enable)
+    return;
+  _groupCallMatch = enable;
+  emit modified(this);
+}
+
+unsigned
+TyTSettingsExtension::channelHangTime() const {
+  return _channelHangTime;
+}
+void
+TyTSettingsExtension::setChannelHangTime(unsigned ms) {
+  if (_channelHangTime == ms)
+    return;
+  _channelHangTime = ms;
   emit modified(this);
 }
 

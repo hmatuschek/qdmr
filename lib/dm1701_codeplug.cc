@@ -1,6 +1,8 @@
 #include "dm1701_codeplug.hh"
 #include "codeplugcontext.hh"
 #include "logger.hh"
+#include <QTimeZone>
+
 
 #define NUM_CHANNELS                3000
 #define ADDR_CHANNELS           0x110000
@@ -143,6 +145,137 @@ DM1701Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   }
 }
 
+
+/* ********************************************************************************************* *
+ * Implementation of DM1701Codeplug::GeneralSettingsElement
+ * ********************************************************************************************* */
+DM1701Codeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, size_t size)
+  : TyTCodeplug::GeneralSettingsElement(ptr, size)
+{
+  // pass...
+}
+
+DM1701Codeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
+  : TyTCodeplug::GeneralSettingsElement(ptr, 0x00b0)
+{
+  // pass...
+}
+
+void
+DM1701Codeplug::GeneralSettingsElement::clear() {
+  TyTCodeplug::GeneralSettingsElement::clear();
+
+  enableChannelModeA(true);
+  enableChannelModeB(true);
+  enableChannelMode(true);
+  enableGroupCallMatch(true);
+  enablePrivateCallMatch(true);
+  setTimeZone(QTimeZone::systemTimeZone());
+  setChannelHangTime(3000);
+
+  memset(_data+0x91, 0xff, 0x1f);
+}
+
+bool
+DM1701Codeplug::GeneralSettingsElement::channelModeA() const {
+  return getBit(0x43,3);
+}
+void
+DM1701Codeplug::GeneralSettingsElement::enableChannelModeA(bool enable) {
+  setBit(0x43,3, enable);
+}
+
+bool
+DM1701Codeplug::GeneralSettingsElement::channelModeB() const {
+  return getBit(0x43,7);
+}
+void
+DM1701Codeplug::GeneralSettingsElement::enableChannelModeB(bool enable) {
+  setBit(0x43,7, enable);
+}
+
+bool
+DM1701Codeplug::GeneralSettingsElement::channelMode() const {
+  return 0xff == getUInt8(0x57);
+}
+void
+DM1701Codeplug::GeneralSettingsElement::enableChannelMode(bool enable) {
+  setUInt8(0x57, enable ? 0xff : 0x00);
+}
+
+bool
+DM1701Codeplug::GeneralSettingsElement::groupCallMatch() const {
+  return getBit(0x6b, 0);
+}
+void
+DM1701Codeplug::GeneralSettingsElement::enableGroupCallMatch(bool enable) {
+  setBit(0x6b, 0, enable);
+}
+bool
+DM1701Codeplug::GeneralSettingsElement::privateCallMatch() const {
+  return getBit(0x6b, 1);
+}
+void
+DM1701Codeplug::GeneralSettingsElement::enablePrivateCallMatch(bool enable) {
+  setBit(0x6b, 1, enable);
+}
+
+QTimeZone
+DM1701Codeplug::GeneralSettingsElement::timeZone() const {
+  return QTimeZone((int(getUInt5(0x6b, 3))-12)*3600);
+}
+void
+DM1701Codeplug::GeneralSettingsElement::setTimeZone(const QTimeZone &zone) {
+  int idx = (zone.standardTimeOffset(QDateTime::currentDateTime())/3600)+12;
+  setUInt5(0x6b, 3, uint8_t(idx));
+}
+
+unsigned
+DM1701Codeplug::GeneralSettingsElement::channelHangTime() const {
+  return unsigned(getUInt8(0x90))*100;
+}
+void
+DM1701Codeplug::GeneralSettingsElement::setChannelHangTime(unsigned dur) {
+  setUInt8(0x90, dur/100);
+}
+
+bool
+DM1701Codeplug::GeneralSettingsElement::fromConfig(const Config *config) {
+  if (! TyTCodeplug::GeneralSettingsElement::fromConfig(config))
+    return false;
+
+  setTimeZone(QTimeZone::systemTimeZone());
+
+  // apply extension
+  if (TyTSettingsExtension *ex  = config->settings()->tytExtension()) {
+    enableChannelMode(ex->channelMode());
+    enableChannelModeA(ex->channelModeA());
+    enableChannelModeB(ex->channelModeB());
+    enableGroupCallMatch(ex->groupCallMatch());
+    enablePrivateCallMatch(ex->privateCallMatch());
+    setChannelHangTime(ex->channelHangTime());
+  }
+
+  return true;
+}
+
+bool
+DM1701Codeplug::GeneralSettingsElement::updateConfig(Config *config) {
+  if (! TyTCodeplug::GeneralSettingsElement::updateConfig(config))
+    return false;
+
+  // Update extension if set.
+  if (TyTSettingsExtension *ex = config->settings()->tytExtension()) {
+    ex->enableChannelMode(channelMode());
+    ex->enableChannelModeA(channelModeA());
+    ex->enableChannelModeB(channelModeB());
+    ex->enableGroupCallMatch(groupCallMatch());
+    ex->enablePrivateCallMatch(privateCallMatch());
+    ex->setChannelHangTime(channelHangTime());
+  }
+
+  return true;
+}
 
 
 /* ********************************************************************************************* *

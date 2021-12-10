@@ -19,28 +19,28 @@
  *  <tr><td>0x002000</td> <td>0x00200c</td> <td>0x0000c</td> <td>Timestamp see @c TyTCodeplug::TimestampElement.</td></tr>
  *  <tr><td>0x00200c</td> <td>0x002040</td> <td>0x00034</td> <td>Reserved, filled with 0xff. </td></tr>
  *  <tr><td>0x002040</td> <td>0x0020f0</td> <td>0x000b0</td> <td>General settings see @c TyTCodeplug::GeneralSettingsElement.</td></tr>
- *  <tr><td>0x0020f0</td> <td>0x002100</td> <td>0x00010</td> <td>Menu settings, see @c UV390Codeplug::menu_t</td></tr>
- *  <tr><td>0x002100</td> <td>0x002140</td> <td>0x00040</td> <td>Button config, see @c UV390Codeplug::buttons_t.</td></tr>
+ *  <tr><td>0x0020f0</td> <td>0x002100</td> <td>0x00010</td> <td>Menu settings, see @c TyTCodeplug::menu_t</td></tr>
+ *  <tr><td>0x002100</td> <td>0x002140</td> <td>0x00040</td> <td>Button config, see @c TyTCodeplug::buttons_t.</td></tr>
  *  <tr><td>0x002140</td> <td>0x002180</td> <td>0x00040</td> <td>Reserved, filled with 0xff.</td></tr>
- *  <tr><td>0x002180</td> <td>0x0059c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each, see @c UV390Codeplug::message_t.</td></tr>
- *  <tr><td>0x0059c0</td> <td>0x005a70</td> <td>0x000b0</td> <td>Privacy keys, see @c UV390Codeplug::privacy_t.</td></tr>
- *  <tr><td>0x005a50</td> <td>0x005f60</td> <td>0x00510</td> <td>Emergency Systems, see @c UV390Codeplug::emergency_t.</td></td>
+ *  <tr><td>0x002180</td> <td>0x0059c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each, see @c TyTCodeplug::message_t.</td></tr>
+ *  <tr><td>0x0059c0</td> <td>0x005a70</td> <td>0x000b0</td> <td>Privacy keys, see @c TyTCodeplug::privacy_t.</td></tr>
+ *  <tr><td>0x005a50</td> <td>0x005f60</td> <td>0x00510</td> <td>Emergency Systems, see @c TyTCodeplug::emergency_t.</td></td>
  *  <tr><td>0x005f60</td> <td>0x00ec20</td> <td>0x08cc0</td> <td>Reserved, filled with 0xff.</td></td>
  *  <tr><td>0x00ec20</td> <td>0x0149e0</td> <td>0x05dc0</td> <td>250 RX Group lists @ 0x60 bytes each, see @c TyTCodeplug::GroupListElement.</td></tr>
  *  <tr><td>0x0149e0</td> <td>0x018860</td> <td>0x03e80</td> <td>250 Zones @ 0x40 bytes each, see @c TyTCodeplug::ZoneElement.</td></tr>
  *  <tr><td>0x018860</td> <td>0x01edf0</td> <td>0x06590</td> <td>250 Scanlists @ 0x68 bytes each, see @c TyTCodeplug::ScanListElement.</td></tr>
  *  <tr><td>0x01edf0</td> <td>0x02ef00</td> <td>0x10110</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x02ef00</td> <td>0x02ef40</td> <td>0x00040</td> <td>VFO A channel, see @c TyTCodeplug::VFOChannelElement.</td></tr>
- *  <tr><td>0x02ef40</td> <td>0x02ef80</td> <td>0x00040</td> <td>VFO B channel, see @c TyTCodeplug::VFOChannelElement.</td></tr>
+ *  <tr><td>0x02ef00</td> <td>0x02ef40</td> <td>0x00040</td> <td>VFO A channel, see @c UV390Codeplug::VFOChannelElement.</td></tr>
+ *  <tr><td>0x02ef40</td> <td>0x02ef80</td> <td>0x00040</td> <td>VFO B channel, see @c UV390Codeplug::VFOChannelElement.</td></tr>
  *  <tr><td>0x02ef80</td> <td>0x02f000</td> <td>0x00080</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>Some unkown settings like current channel, see @c TyTCodeplug::BootSettingsElement.</td></tr>
  *  <tr><td>0x02f010</td> <td>0x031000</td> <td>0x01ff0</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x031000</td> <td>0x03eac0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c TyTCodeplug::ZoneExtElement.</td></tr>
+ *  <tr><td>0x031000</td> <td>0x03eac0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c UV390Codeplug::ZoneExtElement.</td></tr>
  *  <tr><td>0x03eac0</td> <td>0x03ec40</td> <td>0x00180</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x03ec40</td> <td>0x03ed40</td> <td>0x00100</td> <td>16 GPS systems @ 0x10 bytes each, see @c TyTCodeplug::GPSSystemElement.</td></tr>
  *  <tr><td>0x03ed40</td> <td>0x040000</td> <td>0x012c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><th colspan="4">Second segment 0x110000-0x1a0000</th></tr>
- *  <tr><td>0x110000</td> <td>0x13ee00</td> <td>0x2ee00</td> <td>3000 Channels @ 0x40 bytes each, see @c TyTCodeplug::ChannelElement.</td></tr>
+ *  <tr><td>0x110000</td> <td>0x13ee00</td> <td>0x2ee00</td> <td>3000 Channels @ 0x40 bytes each, see @c DM1701Codeplug::ChannelElement.</td></tr>
  *  <tr><td>0x13ee00</td> <td>0x140000</td> <td>0x01200</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x140000</td> <td>0x197e40</td> <td>0x57e40</td> <td>10000 Contacts @ 0x24 bytes each, see @c TyTCodeplug::ContactElement.</td></tr>
  *  <tr><td>0x197e40</td> <td>0x1a0000</td> <td>0x081c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
@@ -87,6 +87,62 @@ public:
     virtual Channel *toChannelObj() const;
     /** Initializes this codeplug channel from the given generic configuration. */
     virtual void fromChannelObj(const Channel *c, Context &ctx);
+  };
+
+  /** Extends the common @c TyTCodeplug::GeneralSettings to implement the DM-1701 specific
+   * settings.
+   *
+   * Memory layout of the settings (size 0x00b0 bytes):
+   * @verbinclude dm1701_settings.txt */
+  class GeneralSettingsElement: public TyTCodeplug::GeneralSettingsElement
+  {
+  protected:
+    /** Hidden constructor. */
+    GeneralSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    GeneralSettingsElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Returns @c true, if VFO A is in channel mode. */
+    virtual bool channelModeA() const;
+    /** Enables/disables the channel mode for VFO A. */
+    virtual void enableChannelModeA(bool enable);
+    /** Returns @c true, if VFO B is in channel mode. */
+    virtual bool channelModeB() const;
+    /** Enables/disables the channel mode for VFO B. */
+    virtual void enableChannelModeB(bool enable);
+
+    /** Returns @c true, if the radio is in channel (and not VFO) mode. */
+    virtual bool channelMode() const;
+    /** Enable/disable channel mode. */
+    virtual void enableChannelMode(bool enable);
+
+    /** Returns @c true if group-call match is enabled. */
+    virtual bool groupCallMatch() const;
+    /** Enables/disables group-call match. */
+    virtual void enableGroupCallMatch(bool enable);
+    /** Returns @c true if private-call match is enabled. */
+    virtual bool privateCallMatch() const;
+    /** Enables/disables private-call match. */
+    virtual void enablePrivateCallMatch(bool enable);
+
+    /** Returns the time-zone. */
+    virtual QTimeZone timeZone() const;
+    /** Sets the time-zone. */
+    virtual void setTimeZone(const QTimeZone &zone);
+
+    /** Returns the channel hang time in ms. */
+    virtual unsigned channelHangTime() const;
+    /** Sets the channel hang time in ms. */
+    virtual void setChannelHangTime(unsigned dur);
+
+    /** Encodes the general settings. */
+    virtual bool fromConfig(const Config *config);
+    /** Updates config from general settings. */
+    virtual bool updateConfig(Config *config);
   };
 
   /** Reuse TyT MD-UV390 VFO channel element. */

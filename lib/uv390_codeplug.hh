@@ -173,7 +173,7 @@ public:
   /** Extends the common @c TyTCodeplug::GeneralSettings to implement the MD-UV390 specific
    * settings.
    *
-   * Memory layout of the settings (size 0x???? bytes):
+   * Memory layout of the settings (size 0x00b0 bytes):
    * @verbinclude uv390_settings.txt */
   class GeneralSettingsElement: public TyTCodeplug::GeneralSettingsElement
   {

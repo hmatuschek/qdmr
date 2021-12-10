@@ -370,6 +370,12 @@ class TyTSettingsExtension: public ConfigExtension
               "preamble before each call.")
   /** If @c true, a picture is shown during boot. */
   Q_PROPERTY(bool bootPicture READ bootPicture WRITE enableBootPicture)
+  /** If @c true, the radio is in channel mode. */
+  Q_PROPERTY(bool channelMode READ channelMode WRITE enableChannelMode)
+  /** If @c true or channelMode is true, the VFO A is in channel mode. */
+  Q_PROPERTY(bool channelModeA READ channelModeA WRITE enableChannelModeA)
+  /** If @c true or channelMode is true, the VFO B is in channel mode. */
+  Q_PROPERTY(bool channelModeB READ channelModeB WRITE enableChannelModeB)
   /** The transmit preamble duration in ms. */
   Q_PROPERTY(unsigned txPreambleDuration READ txPreambleDuration WRITE setTXPreambleDuration)
   /** The group hang time in ms. */
@@ -408,6 +414,12 @@ class TyTSettingsExtension: public ConfigExtension
   Q_PROPERTY(unsigned radioProgPassword READ radioProgPassword WRITE setRadioProgPassword)
   /** Specifies the PC programming password. */
   Q_PROPERTY(QString pcProgPassword READ pcProgPassword WRITE setPCProgPassword)
+  /** If @c true, the private call IDs must match. */
+  Q_PROPERTY(bool privateCallMatch READ privateCallMatch WRITE enablePrivateCallMatch)
+  /** If @c true, the group call IDs must match. */
+  Q_PROPERTY(bool groupCallMatch READ groupCallMatch WRITE enableGroupCallMatch)
+  /** Holds the channel hang time in ms. */
+  Q_PROPERTY(unsigned channelHangTime READ channelHangTime WRITE setChannelHangTime)
 
   Q_CLASSINFO("description", "Settings for MD-390, RT8, MD-UV390, RT3S, MD-2017, RT82.")
   Q_CLASSINFO("longDescription", "Device specific radio settings for TyT and Retevis devices."
@@ -476,6 +488,19 @@ public:
   bool bootPicture() const;
   /** Enables the boot picture. */
   void enableBootPicture(bool enable);
+
+  /** Retunrs @c true if the radio is in channel mode. Overrides @c channelModeA and @c channelModeB. */
+  bool channelMode() const;
+  /** Enables/disables channel mode for the radio. */
+  void enableChannelMode(bool enable);
+  /** Retunrs @c true if VFO A is in channel mode. Overridden by @c channelMode. */
+  bool channelModeA() const;
+  /** Enables/disables channel mode for the VFO A. */
+  void enableChannelModeA(bool enable);
+  /** Retunrs @c true if VFO B is in channel mode. Overridden by @c channelMode. */
+  bool channelModeB() const;
+  /** Enables/disables channel mode for the VFO B. */
+  void enableChannelModeB(bool enable);
 
   /** Returns the TX preamble duration in ms. */
   unsigned txPreambleDuration() const;
@@ -567,6 +592,20 @@ public:
   /** Sets PC programming password. */
   void setPCProgPassword(const QString &passwd);
 
+  /** Returns @c true if the private call IDs must match. */
+  bool privateCallMatch() const;
+  /** Enables/disables private call match. */
+  void enablePrivateCallMatch(bool enable);
+  /** Returns @c true if the group call IDs must match. */
+  bool groupCallMatch() const;
+  /** Enables/disables group call match. */
+  void enableGroupCallMatch(bool enable);
+
+  /** Returns the channel hang time in ms. */
+  unsigned channelHangTime() const;
+  /** Sets the channel hang time in ms. */
+  void setChannelHangTime(unsigned ms);
+
 public:
   ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
                             const Context &ctx, const ErrorStack &err=ErrorStack());
@@ -591,6 +630,12 @@ protected:
   bool _wakeupPreamble;
   /** If @c true the boot picture is enabled. */
   bool _bootPicture;
+  /** If @c true or channelMode is true, the VFO A is in channel (memory) mode. */
+  bool _channelModeA;
+  /** If @c true or channelMode is true, the VFO B is in channel (memory) mode. */
+  bool _channelModeB;
+  /** If @c true, the radio is in channel (memory) mode. Overrides channelModeA and channelModeB. */
+  bool _channelMode;
   /** Holds the TX preamble duration. */
   unsigned _txPreambleDuration;
   /** Holds the group-call hang time. */
@@ -629,6 +674,12 @@ protected:
   unsigned _radioProgPassword;
   /** Holds the PC programming password. */
   QString  _pcProgPassword;
+  /** If @c true, the private call IDs must match. */
+  bool _privateCallMatch;
+  /** If @c true, the group call IDs must match. */
+  bool _groupCallMatch;
+  /** Holds the channel hang time in ms. */
+  unsigned _channelHangTime;
 };
 
 
