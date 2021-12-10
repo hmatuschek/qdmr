@@ -2,7 +2,6 @@
 #define DM1701_CODEPLUG_HH
 
 #include "tyt_codeplug.hh"
-#include "uv390_codeplug.hh"
 
 /** Device specific implementation of the codeplug for the Baofeng DM-1701.
  *
@@ -22,7 +21,7 @@
  *  <tr><td>0x0020f0</td> <td>0x002100</td> <td>0x00010</td> <td>Menu settings, see @c TyTCodeplug::MenuSettingsElement</td></tr>
  *  <tr><td>0x002100</td> <td>0x002140</td> <td>0x00040</td> <td>Button config, see @c DM1701Codeplug::ButtonSettingsElement.</td></tr>
  *  <tr><td>0x002140</td> <td>0x002180</td> <td>0x00040</td> <td>Reserved, filled with 0xff.</td></tr>
- *  <tr><td>0x002180</td> <td>0x0059c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each, see @c TyTCodeplug::message_t.</td></tr>
+ *  <tr><td>0x002180</td> <td>0x0059c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each.</td></tr>
  *  <tr><td>0x0059c0</td> <td>0x005a70</td> <td>0x000b0</td> <td>Privacy keys, see @c TyTCodeplug::EncryptionElement.</td></tr>
  *  <tr><td>0x005a50</td> <td>0x005f60</td> <td>0x00510</td> <td>Emergency Systems, see @c TyTCodeplug::EmergencySystemElement.</td></td>
  *  <tr><td>0x005f60</td> <td>0x00ec20</td> <td>0x08cc0</td> <td>Reserved, filled with 0xff.</td></td>
@@ -30,12 +29,12 @@
  *  <tr><td>0x0149e0</td> <td>0x018860</td> <td>0x03e80</td> <td>250 Zones @ 0x40 bytes each, see @c TyTCodeplug::ZoneElement.</td></tr>
  *  <tr><td>0x018860</td> <td>0x01edf0</td> <td>0x06590</td> <td>250 Scanlists @ 0x68 bytes each, see @c TyTCodeplug::ScanListElement.</td></tr>
  *  <tr><td>0x01edf0</td> <td>0x02ef00</td> <td>0x10110</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x02ef00</td> <td>0x02ef40</td> <td>0x00040</td> <td>VFO A channel, see @c UV390Codeplug::VFOChannelElement.</td></tr>
- *  <tr><td>0x02ef40</td> <td>0x02ef80</td> <td>0x00040</td> <td>VFO B channel, see @c UV390Codeplug::VFOChannelElement.</td></tr>
+ *  <tr><td>0x02ef00</td> <td>0x02ef40</td> <td>0x00040</td> <td>VFO A channel, see @c DM1701Codeplug::VFOChannelElement.</td></tr>
+ *  <tr><td>0x02ef40</td> <td>0x02ef80</td> <td>0x00040</td> <td>VFO B channel, see @c DM1701Codeplug::VFOChannelElement.</td></tr>
  *  <tr><td>0x02ef80</td> <td>0x02f000</td> <td>0x00080</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>Some unkown settings like current channel, see @c TyTCodeplug::BootSettingsElement.</td></tr>
  *  <tr><td>0x02f010</td> <td>0x031000</td> <td>0x01ff0</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x031000</td> <td>0x03eac0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c UV390Codeplug::ZoneExtElement.</td></tr>
+ *  <tr><td>0x031000</td> <td>0x03eac0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c DM1701Codeplug::ZoneExtElement.</td></tr>
  *  <tr><td>0x03eac0</td> <td>0x03ec40</td> <td>0x00180</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x03ec40</td> <td>0x03ed40</td> <td>0x00100</td> <td>16 GPS systems @ 0x10 bytes each, see @c TyTCodeplug::GPSSystemElement.</td></tr>
  *  <tr><td>0x03ed40</td> <td>0x040000</td> <td>0x012c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
@@ -87,6 +86,31 @@ public:
     virtual Channel *toChannelObj() const;
     /** Initializes this codeplug channel from the given generic configuration. */
     virtual void fromChannelObj(const Channel *c, Context &ctx);
+  };
+
+  /** Extends the @c ChannelElement to implement the VFO channel settings for the DM-1701.
+   * This class is an extension of the normal @c ChannelElement that only implements the step-size
+   * feature and encodes it where the name used to be. Thus the memory layout and size is identical
+   * to the normal channel. */
+  class VFOChannelElement: public ChannelElement
+  {
+  protected:
+    /** Constructor from pointer to memory. */
+    VFOChannelElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor from pointer to memory. */
+    VFOChannelElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~VFOChannelElement();
+
+    QString name() const;
+    void setName(const QString &txt);
+
+    /** Returns the step-size for the VFO channel. */
+    virtual unsigned stepSize() const;
+    /** Sets the step-size for the VFO channel in Hz. */
+    virtual void setStepSize(unsigned ss_hz);
   };
 
   /** Extends the common @c TyTCodeplug::GeneralSettingsElement to implement the DM-1701 specific
@@ -195,11 +219,41 @@ public:
     virtual bool updateConfig(Config *config);
   };
 
-  /** Reuse TyT MD-UV390 VFO channel element. */
-  typedef UV390Codeplug::VFOChannelElement VFOChannelElement;
+  /** Extended zone data for the DM-1701.
+   * The zone definition @c ZoneElement contains only a single set of 16 channels. For each zone
+   * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each.
+   *
+   * Memory layout of encoded zone extension:
+   * @verbinclude dm1701_zoneext.txt */
+  class ZoneExtElement: public Codeplug::Element
+  {
+  protected:
+    /** Constructor. */
+    ZoneExtElement(uint8_t *ptr, size_t size);
 
-  /** Reuse TyT MD-UV390 zone extension element. */
-  typedef UV390Codeplug::ZoneExtElement ZoneExtElement;
+  public:
+    /** Constructor. */
+    ZoneExtElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~ZoneExtElement();
+
+    void clear();
+
+    /** Returns the n-th member index of the channel list for A. */
+    virtual uint16_t memberIndexA(unsigned n) const;
+    /** Sets the n-th member index of the channel list for A. */
+    virtual void setMemberIndexA(unsigned n, uint16_t idx);
+    /** Returns the n-th member index of the channel list for B. */
+    virtual uint16_t memberIndexB(unsigned n) const;
+    /** Returns the n-th member index of the channel list for B. */
+    virtual void setMemberIndexB(unsigned n, uint16_t idx);
+
+    /** Encodes the given zone. */
+    virtual bool fromZoneObj(const Zone *zone, Context &ctx);
+    /** Links the given zone object.
+     * Thant is, extends channel list A and populates channel list B. */
+    virtual bool linkZoneObj(Zone *zone, Context &ctx);
+  };
 
 public:
   /** Constructor. */

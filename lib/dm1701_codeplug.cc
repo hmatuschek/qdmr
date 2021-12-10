@@ -28,9 +28,11 @@
 
 #define ADDR_TIMESTAMP          0x002000
 #define ADDR_SETTINGS           0x002040
+#define SETTINGS_SIZE           0x0000b0
 #define ADDR_BOOTSETTINGS       0x02f000
 #define ADDR_MENUSETTINGS       0x0020f0
 #define ADDR_BUTTONSETTINGS     0x002100
+#define BUTTONSETTINGS_SIZE     0x000014
 #define ADDR_PRIVACY_KEYS       0x0059c0
 
 #define NUM_GPSSYSTEMS                16
@@ -147,6 +149,47 @@ DM1701Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of DM1701Codeplug::VFOChannelElement
+ * ********************************************************************************************* */
+DM1701Codeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr, size_t size)
+  : ChannelElement(ptr, size)
+{
+  // pass...
+}
+
+DM1701Codeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr)
+  : ChannelElement(ptr, CHANNEL_SIZE)
+{
+  // pass...
+}
+
+DM1701Codeplug::VFOChannelElement::~VFOChannelElement() {
+  // pass...
+}
+
+QString
+DM1701Codeplug::VFOChannelElement::name() const {
+  return "";
+}
+void
+DM1701Codeplug::VFOChannelElement::setName(const QString &txt) {
+  Q_UNUSED(txt)
+  // pass...
+}
+
+unsigned
+DM1701Codeplug::VFOChannelElement::stepSize() const {
+  return (getUInt8(32)+1)*2500;
+}
+void
+DM1701Codeplug::VFOChannelElement::setStepSize(unsigned ss_Hz) {
+  ss_Hz = std::min(50000U, std::max(ss_Hz, 2500U));
+  setUInt8(32, ss_Hz/2500-1);
+  setUInt8(33, 0xff);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of DM1701Codeplug::GeneralSettingsElement
  * ********************************************************************************************* */
 DM1701Codeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, size_t size)
@@ -156,7 +199,7 @@ DM1701Codeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, siz
 }
 
 DM1701Codeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : TyTCodeplug::GeneralSettingsElement(ptr, 0x00b0)
+  : TyTCodeplug::GeneralSettingsElement(ptr, SETTINGS_SIZE)
 {
   // pass...
 }
@@ -287,7 +330,7 @@ DM1701Codeplug::ButtonSettingsElement::ButtonSettingsElement(uint8_t *ptr, size_
 }
 
 DM1701Codeplug::ButtonSettingsElement::ButtonSettingsElement(uint8_t *ptr)
-  : TyTCodeplug::ButtonSettingsElement(ptr, 0x0014)
+  : TyTCodeplug::ButtonSettingsElement(ptr, BUTTONSETTINGS_SIZE)
 {
   // pass...
 }
@@ -387,6 +430,92 @@ DM1701Codeplug::ButtonSettingsElement::updateConfig(Config *config) {
     ex->setProgButton1Long(progButton1Long());
     ex->setProgButton2Short(progButton2Short());
     ex->setProgButton2Long(progButton2Long());
+  }
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of UV390Codeplug::ZoneElement
+ * ******************************************************************************************** */
+DM1701Codeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr, size_t size)
+  : Codeplug::Element(ptr, size)
+{
+  // pass...
+}
+
+DM1701Codeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr)
+  : Codeplug::Element(ptr, ZONEEXT_SIZE)
+{
+  // pass...
+}
+
+DM1701Codeplug::ZoneExtElement::~ZoneExtElement() {
+  // pass...
+}
+
+void
+DM1701Codeplug::ZoneExtElement::clear() {
+  memset(_data, 0x00, 0xe0);
+}
+
+uint16_t
+DM1701Codeplug::ZoneExtElement::memberIndexA(unsigned n) const {
+  return getUInt16_le(0x00 + 2*n);
+}
+
+void
+DM1701Codeplug::ZoneExtElement::setMemberIndexA(unsigned n, uint16_t idx) {
+  setUInt16_le(0x00 + 2*n, idx);
+}
+
+uint16_t
+DM1701Codeplug::ZoneExtElement::memberIndexB(unsigned n) const {
+  return getUInt16_le(0x60 + 2*n);
+}
+
+void
+DM1701Codeplug::ZoneExtElement::setMemberIndexB(unsigned n, uint16_t idx) {
+  setUInt16_le(0x60 + 2*n, idx);
+}
+
+bool
+DM1701Codeplug::ZoneExtElement::fromZoneObj(const Zone *zone, Context &ctx) {
+  // Store remaining channels from list A
+  for (int i=16; i<64; i++) {
+    if (i < zone->A()->count())
+      setMemberIndexA(i-16, ctx.index(zone->A()->get(i)));
+    else
+      setMemberIndexA(i-16, 0);
+  }
+  // Store channel from list B
+  for (int i=0; i<64; i++) {
+    if (i < zone->B()->count())
+      setMemberIndexB(i, ctx.index(zone->B()->get(i)));
+    else
+      setMemberIndexB(i, 0);
+  }
+
+  return true;
+}
+
+bool
+DM1701Codeplug::ZoneExtElement::linkZoneObj(Zone *zone, Context &ctx) {
+  for (int i=0; (i<48) && memberIndexA(i); i++) {
+    if (! ctx.has<Channel>(memberIndexA(i))) {
+      logError() << "Cannot link zone extension: Channel index " << memberIndexA(i) << " not defined.";
+      return false;
+    }
+    zone->A()->add(ctx.get<Channel>(memberIndexA(i)));
+  }
+
+  for (int i=0; (i<64) && memberIndexB(i); i++) {
+    if (! ctx.has<Channel>(memberIndexB(i))) {
+      logWarn() << "Cannot link zone extension: Channel index " << memberIndexB(i) << " not defined.";
+      return false;
+    }
+    zone->B()->add(ctx.get<Channel>(memberIndexB(i)));
   }
 
   return true;
