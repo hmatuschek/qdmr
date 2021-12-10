@@ -243,15 +243,28 @@ class TyTButtonSettings : public ConfigExtension
   Q_OBJECT
 
   /** The action to perform on a short press on side button 1. */
-  Q_PROPERTY(ButtonAction sideButton1Short MEMBER _sideButton1Short READ sideButton1Short WRITE setSideButton1Short)
+  Q_PROPERTY(ButtonAction sideButton1Short READ sideButton1Short WRITE setSideButton1Short)
   /** The action to perform on a long press on side button 1. */
-  Q_PROPERTY(ButtonAction sideButton1Long MEMBER _sideButton1Long READ sideButton1Long WRITE setSideButton1Long)
+  Q_PROPERTY(ButtonAction sideButton1Long READ sideButton1Long WRITE setSideButton1Long)
   /** The action to perform on a short press on side button 2. */
-  Q_PROPERTY(ButtonAction sideButton2Short MEMBER _sideButton2Short READ sideButton2Short WRITE setSideButton2Short)
+  Q_PROPERTY(ButtonAction sideButton2Short READ sideButton2Short WRITE setSideButton2Short)
   /** The action to perform on a long press on side button 2. */
-  Q_PROPERTY(ButtonAction sideButton2Long MEMBER _sideButton2Long READ sideButton2Long WRITE setSideButton2Long)
+  Q_PROPERTY(ButtonAction sideButton2Long READ sideButton2Long WRITE setSideButton2Long)
+  /** The action to perform on a short press on side button 3. */
+  Q_PROPERTY(ButtonAction sideButton3Short READ sideButton3Short WRITE setSideButton3Short)
+  /** The action to perform on a long press on side button 3. */
+  Q_PROPERTY(ButtonAction sideButton3Long READ sideButton3Long WRITE setSideButton3Long)
+  /** The action to perform on a short press on programmable button 1. */
+  Q_PROPERTY(ButtonAction progButton1Short READ progButton1Short WRITE setProgButton1Short)
+  /** The action to perform on a long press on programmable button 1. */
+  Q_PROPERTY(ButtonAction progButton1Long READ progButton1Long WRITE setProgButton1Long)
+  /** The action to perform on a short press on programmable button 2. */
+  Q_PROPERTY(ButtonAction progButton2Short READ progButton2Short WRITE setProgButton2Short)
+  /** The action to perform on a long press on programmable button 2. */
+  Q_PROPERTY(ButtonAction progButton2Long READ progButton2Long WRITE setProgButton2Long)
+
   /** The duration of a long press in msec. */
-  Q_PROPERTY(unsigned longPressDuration MEMBER _longPressDuration READ longPressDuration WRITE setLongPressDuration)
+  Q_PROPERTY(unsigned longPressDuration READ longPressDuration WRITE setLongPressDuration)
 
 public:
   /** Possible actions for the side-buttons. */
@@ -313,6 +326,33 @@ public:
   /** Sets the action for the side button 2 long-press. */
   void setSideButton2Long(ButtonAction action);
 
+  /** Returns the action for the side button 3 short-press (Baofeng DM-1701). */
+  ButtonAction sideButton3Short() const;
+  /** Sets the action for the side button 3 short-press (Baofeng DM-1701). */
+  void setSideButton3Short(ButtonAction action);
+  /** Returns the action for the side button 3 long-press (Baofeng DM-1701). */
+  ButtonAction sideButton3Long() const;
+  /** Sets the action for the side button 3 long-press (Baofeng DM-1701). */
+  void setSideButton3Long(ButtonAction action);
+
+  /** Returns the action for the programmable button 1 short-press (Baofeng DM-1701). */
+  ButtonAction progButton1Short() const;
+  /** Sets the action for the programmable button 1 short-press (Baofeng DM-1701). */
+  void setProgButton1Short(ButtonAction action);
+  /** Returns the action for the programmable button 1 long-press (Baofeng DM-1701). */
+  ButtonAction progButton1Long() const;
+  /** Sets the action for the programmable button 1 long-press (Baofeng DM-1701). */
+  void setProgButton1Long(ButtonAction action);
+
+  /** Returns the action for the programmable button 2 short-press (Baofeng DM-1701). */
+  ButtonAction progButton2Short() const;
+  /** Sets the action for the programmable button 2 short-press (Baofeng DM-1701). */
+  void setProgButton2Short(ButtonAction action);
+  /** Returns the action for the programmable button 2 long-press (Baofeng DM-1701). */
+  ButtonAction progButton2Long() const;
+  /** Sets the action for the programmable button 2 long-press (Baofeng DM-1701). */
+  void setProgButton2Long(ButtonAction action);
+
   /** Returns the long-press duration in msec. */
   unsigned longPressDuration() const;
   /** Sets the long-press duration in msec. */
@@ -331,6 +371,19 @@ protected:
   ButtonAction _sideButton2Short;
   /** Holds the side button 2 long-press action. */
   ButtonAction _sideButton2Long;
+  /** Holds the side button 3 short-press action. */
+  ButtonAction _sideButton3Short;
+  /** Holds the side button 3 long-press action. */
+  ButtonAction _sideButton3Long;
+  /** Holds the prog button 1 short-press action. */
+  ButtonAction _progButton1Short;
+  /** Holds the prog button 1 long-press action. */
+  ButtonAction _progButton1Long;
+  /** Holds the prog button 2 short-press action. */
+  ButtonAction _progButton2Short;
+  /** Holds the prog button 2 long-press action. */
+  ButtonAction _progButton2Long;
+
   /** Holds the long-press duration in ms. */
   unsigned _longPressDuration;
 };

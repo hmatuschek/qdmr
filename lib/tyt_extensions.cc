@@ -303,6 +303,12 @@ TyTButtonSettings::TyTButtonSettings(QObject *parent)
   _sideButton1Long  = Tone1750Hz;
   _sideButton2Short = MonitorToggle;
   _sideButton2Long  = Disabled;
+  _sideButton3Short = Disabled;
+  _sideButton3Long = Disabled;
+  _progButton1Short = Disabled;
+  _progButton1Long = Disabled;
+  _progButton2Short = Disabled;
+  _progButton2Long = Disabled;
   _longPressDuration = 1000;
 }
 
@@ -322,7 +328,10 @@ TyTButtonSettings::sideButton1Short() const {
 }
 void
 TyTButtonSettings::setSideButton1Short(ButtonAction action) {
+  if (_sideButton1Short == action)
+    return;
   _sideButton1Short = action;
+  emit modified(this);
 }
 
 TyTButtonSettings::ButtonAction
@@ -331,7 +340,10 @@ TyTButtonSettings::sideButton1Long() const {
 }
 void
 TyTButtonSettings::setSideButton1Long(ButtonAction action) {
+  if (_sideButton1Long == action)
+    return;
   _sideButton1Long = action;
+  emit modified(this);
 }
 
 TyTButtonSettings::ButtonAction
@@ -340,7 +352,10 @@ TyTButtonSettings::sideButton2Short() const {
 }
 void
 TyTButtonSettings::setSideButton2Short(ButtonAction action) {
+  if (_sideButton2Short == action)
+    return;
   _sideButton2Short = action;
+  emit modified(this);
 }
 
 TyTButtonSettings::ButtonAction
@@ -349,7 +364,82 @@ TyTButtonSettings::sideButton2Long() const {
 }
 void
 TyTButtonSettings::setSideButton2Long(ButtonAction action) {
+  if (_sideButton2Long == action)
+    return;
   _sideButton2Long = action;
+  emit modified(this);
+}
+
+TyTButtonSettings::ButtonAction
+TyTButtonSettings::sideButton3Short() const {
+  return _sideButton3Short;
+}
+void
+TyTButtonSettings::setSideButton3Short(ButtonAction action) {
+  if (_sideButton3Short == action)
+    return;
+  _sideButton3Short = action;
+  emit modified(this);
+}
+
+TyTButtonSettings::ButtonAction
+TyTButtonSettings::sideButton3Long() const {
+  return _sideButton3Long;
+}
+void
+TyTButtonSettings::setSideButton3Long(ButtonAction action) {
+  if (_sideButton3Long == action)
+    return;
+  _sideButton3Long = action;
+  emit modified(this);
+}
+
+TyTButtonSettings::ButtonAction
+TyTButtonSettings::progButton1Short() const {
+  return _progButton1Short;
+}
+void
+TyTButtonSettings::setProgButton1Short(ButtonAction action) {
+  if (_progButton1Short == action)
+    return;
+  _progButton1Short = action;
+  emit modified(this);
+}
+
+TyTButtonSettings::ButtonAction
+TyTButtonSettings::progButton1Long() const {
+  return _progButton1Long;
+}
+void
+TyTButtonSettings::setProgButton1Long(ButtonAction action) {
+  if (_progButton1Long == action)
+    return;
+  _progButton1Long = action;
+  emit modified(this);
+}
+
+TyTButtonSettings::ButtonAction
+TyTButtonSettings::progButton2Short() const {
+  return _progButton2Short;
+}
+void
+TyTButtonSettings::setProgButton2Short(ButtonAction action) {
+  if (_progButton2Short == action)
+    return;
+  _progButton2Short = action;
+  emit modified(this);
+}
+
+TyTButtonSettings::ButtonAction
+TyTButtonSettings::progButton2Long() const {
+  return _progButton2Long;
+}
+void
+TyTButtonSettings::setProgButton2Long(ButtonAction action) {
+  if (_progButton2Long == action)
+    return;
+  _progButton2Long = action;
+  emit modified(this);
 }
 
 unsigned
@@ -378,8 +468,8 @@ TyTSettingsExtension::TyTSettingsExtension(QObject *parent)
   : ConfigExtension(parent), _monitorType(MonitorType::Open), _allLEDsDisabled(false),
     _talkPermitToneDigital(false), _talkPermitToneAnalog(false), _passwdAndLock(false),
     _channelFreeIndicationTone(true), _allTonesDisabled(false), _powerSaveMode(true),
-    _wakeupPreamble(true), _bootPicture(true), _channelMode(true), _channelModeA(true),
-    _channelModeB(true), _txPreambleDuration(600), _groupCallHangTime(3000),
+    _wakeupPreamble(true), _bootPicture(true), _channelModeA(true), _channelModeB(true),
+    _channelMode(true), _txPreambleDuration(600), _groupCallHangTime(3000),
     _privateCallHangTime(3000), _lowBatteryWarnInterval(120), _callAlertToneContinuous(false),
     _callAlertToneDuration(0), _loneWorkerResponseTime(1), _loneWorkerReminderTime(10),
     _digitalScanHangTime(1000), _analogScanHangTime(1000), _backlightAlwaysOn(false),

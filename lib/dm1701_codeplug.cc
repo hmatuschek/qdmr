@@ -277,6 +277,111 @@ DM1701Codeplug::GeneralSettingsElement::updateConfig(Config *config) {
   return true;
 }
 
+/* ********************************************************************************************* *
+ * Implementation of DM1701Codeplug::ButtonSettingsElement
+ * ********************************************************************************************* */
+DM1701Codeplug::ButtonSettingsElement::ButtonSettingsElement(uint8_t *ptr, size_t size)
+  : TyTCodeplug::ButtonSettingsElement(ptr, size)
+{
+  // pass...
+}
+
+DM1701Codeplug::ButtonSettingsElement::ButtonSettingsElement(uint8_t *ptr)
+  : TyTCodeplug::ButtonSettingsElement(ptr, 0x0014)
+{
+  // pass...
+}
+
+void
+DM1701Codeplug::ButtonSettingsElement::clear() {
+  setSideButton3Short(ButtonAction::Disabled);
+  setSideButton3Long(ButtonAction::Disabled);
+  setProgButton1Short(ButtonAction::Disabled);
+  setProgButton1Long(ButtonAction::Disabled);
+  setProgButton2Short(ButtonAction::Disabled);
+  setProgButton2Long(ButtonAction::Disabled);
+}
+
+TyTCodeplug::ButtonSettingsElement::ButtonAction
+DM1701Codeplug::ButtonSettingsElement::sideButton3Short() const {
+  return ButtonAction(getUInt8(0x06));
+}
+void
+DM1701Codeplug::ButtonSettingsElement::setSideButton3Short(ButtonAction action) {
+  setUInt8(0x06, action);
+}
+
+TyTCodeplug::ButtonSettingsElement::ButtonAction
+DM1701Codeplug::ButtonSettingsElement::sideButton3Long() const {
+  return ButtonAction(getUInt8(0x07));
+}
+void
+DM1701Codeplug::ButtonSettingsElement::setSideButton3Long(ButtonAction action) {
+  setUInt8(0x07, action);
+}
+
+TyTCodeplug::ButtonSettingsElement::ButtonAction
+DM1701Codeplug::ButtonSettingsElement::progButton1Short() const {
+  return ButtonAction(getUInt8(0x08));
+}
+void
+DM1701Codeplug::ButtonSettingsElement::setProgButton1Short(ButtonAction action) {
+  setUInt8(0x08, action);
+}
+
+TyTCodeplug::ButtonSettingsElement::ButtonAction
+DM1701Codeplug::ButtonSettingsElement::progButton1Long() const {
+  return ButtonAction(getUInt8(0x09));
+}
+void
+DM1701Codeplug::ButtonSettingsElement::setProgButton1Long(ButtonAction action) {
+  setUInt8(0x09, action);
+}
+
+TyTCodeplug::ButtonSettingsElement::ButtonAction
+DM1701Codeplug::ButtonSettingsElement::progButton2Short() const {
+  return ButtonAction(getUInt8(0x0a));
+}
+void
+DM1701Codeplug::ButtonSettingsElement::setProgButton2Short(ButtonAction action) {
+  setUInt8(0x0a, action);
+}
+
+TyTCodeplug::ButtonSettingsElement::ButtonAction
+DM1701Codeplug::ButtonSettingsElement::progButton2Long() const {
+  return ButtonAction(getUInt8(0x0b));
+}
+void
+DM1701Codeplug::ButtonSettingsElement::setProgButton2Long(ButtonAction action) {
+  setUInt8(0x0b, action);
+}
+
+bool
+DM1701Codeplug::ButtonSettingsElement::fromConfig(const Config *config) {
+  if (! TyTCodeplug::ButtonSettingsElement::fromConfig(config))
+    return false;
+
+  if (config->tytExtension()) {
+    TyTButtonSettings *ex = config->tytExtension()->buttonSettings();
+
+  }
+
+  return true;
+}
+
+bool
+DM1701Codeplug::ButtonSettingsElement::updateConfig(Config *config) {
+  if (! TyTCodeplug::ButtonSettingsElement::updateConfig(config))
+    return false;
+
+  if (config->tytExtension()) {
+    TyTButtonSettings *ex = config->tytExtension()->buttonSettings();
+
+  }
+
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of DM1701Codeplug

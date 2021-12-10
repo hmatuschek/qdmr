@@ -89,7 +89,7 @@ public:
     virtual void fromChannelObj(const Channel *c, Context &ctx);
   };
 
-  /** Extends the common @c TyTCodeplug::GeneralSettings to implement the DM-1701 specific
+  /** Extends the common @c TyTCodeplug::GeneralSettingsElement to implement the DM-1701 specific
    * settings.
    *
    * Memory layout of the settings (size 0x00b0 bytes):
@@ -142,6 +142,56 @@ public:
     /** Encodes the general settings. */
     virtual bool fromConfig(const Config *config);
     /** Updates config from general settings. */
+    virtual bool updateConfig(Config *config);
+  };
+
+  /** Extens the common @c TyTCodeplug::ButtonSettingsElement to implement the DM-1701 specific
+   * settings.
+   *
+   * Memory layout of the setting (size 0x0014 bytes):
+   * @verbinclude dm1701_buttonsettings.txt */
+  class ButtonSettingsElement: public TyTCodeplug::ButtonSettingsElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ButtonSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit ButtonSettingsElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Returns the action for a short press on side button 3. */
+    virtual ButtonAction sideButton3Short() const;
+    /** Sets the action for a short press on side button 3. */
+    virtual void setSideButton3Short(ButtonAction action);
+    /** Returns the action for a long press on side button 3. */
+    virtual ButtonAction sideButton3Long() const;
+    /** Sets the action for a long press on side button 3. */
+    virtual void setSideButton3Long(ButtonAction action);
+
+    /** Returns the action for a short press on programmable button 1. */
+    virtual ButtonAction progButton1Short() const;
+    /** Sets the action for a short press on programmable button 1. */
+    virtual void setProgButton1Short(ButtonAction action);
+    /** Returns the action for a long press on programmable button 1. */
+    virtual ButtonAction progButton1Long() const;
+    /** Sets the action for a long press on programmable button 1. */
+    virtual void setProgButton1Long(ButtonAction action);
+
+    /** Returns the action for a short press on programmable button 2. */
+    virtual ButtonAction progButton2Short() const;
+    /** Sets the action for a short press on programmable button 2. */
+    virtual void setProgButton2Short(ButtonAction action);
+    /** Returns the action for a long press on programmable button 2. */
+    virtual ButtonAction progButton2Long() const;
+    /** Sets the action for a long press on programmable button 2. */
+    virtual void setProgButton2Long(ButtonAction action);
+
+    /** Encodes the button settings. */
+    virtual bool fromConfig(const Config *config);
+    /** Updates config from button settings. */
     virtual bool updateConfig(Config *config);
   };
 
