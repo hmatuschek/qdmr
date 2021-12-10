@@ -363,7 +363,12 @@ DM1701Codeplug::ButtonSettingsElement::fromConfig(const Config *config) {
 
   if (config->tytExtension()) {
     TyTButtonSettings *ex = config->tytExtension()->buttonSettings();
-
+    setSideButton3Short(ex->sideButton3Short());
+    setSideButton3Long(ex->sideButton3Long());
+    setProgButton1Short(ex->progButton1Short());
+    setProgButton1Long(ex->progButton1Long());
+    setProgButton2Short(ex->progButton2Short());
+    setProgButton2Long(ex->progButton2Long());
   }
 
   return true;
@@ -376,7 +381,12 @@ DM1701Codeplug::ButtonSettingsElement::updateConfig(Config *config) {
 
   if (config->tytExtension()) {
     TyTButtonSettings *ex = config->tytExtension()->buttonSettings();
-
+    ex->setSideButton3Short(sideButton3Short());
+    ex->setSideButton3Long(sideButton3Long());
+    ex->setProgButton1Short(progButton1Short());
+    ex->setProgButton1Long(progButton1Long());
+    ex->setProgButton2Short(progButton2Short());
+    ex->setProgButton2Long(progButton2Long());
   }
 
   return true;
