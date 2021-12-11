@@ -64,6 +64,9 @@ public:
   /** Reuse TyT MD-UV390 boot settings element. */
   typedef UV390Codeplug::BootSettingsElement BootSettingsElement;
 
+  /** Reuse TyT MD-UV390 menu settings element. */
+  typedef UV390Codeplug::MenuSettingsElement MenuSettingsElement;
+
 public:
   /** Constructor. */
   explicit MD2017Codeplug(QObject *parent = nullptr);

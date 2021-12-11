@@ -735,30 +735,30 @@ public:
     /** Enables/disables manual dial. */
     virtual void enableManualDial(bool enable);
     /** Returns @c true if contact radio-check menu is enabled. */
-    virtual bool contactRadioCheck() const;
+    virtual bool remoteRadioCheck() const;
     /** Enables/disables contact radio-check menu. */
-    virtual void enableContactRadioCheck(bool enable);
+    virtual void enableRemoteRadioCheck(bool enable);
     /** Returns @c true if remote monitor menu is enabled. */
     virtual bool remoteMonitor() const;
     /** Enables/disables remote monitor menu. */
     virtual void enableRemoteMonitor(bool enable);
     /** Returns @c true if radio enable menu is enabled. */
-    virtual bool radioEnable() const;
+    virtual bool remoteRadioEnable() const;
     /** Enables/disables radio enable menu. */
-    virtual void enableRadioEnable(bool enable);
+    virtual void enableRemoteRadioEnable(bool enable);
     /** Returns @c true if radio disable menu is enabled. */
-    virtual bool radioDisable() const;
+    virtual bool remoteRadioDisable() const;
     /** Enables/disables radio disable menu. */
-    virtual void enableRadioDisable(bool enable);
+    virtual void enableRemoteRadioDisable(bool enable);
 
     /** Returns @c true if scan menu is enabled. */
     virtual bool scan() const;
     /** Enables/disables scan menu. */
     virtual void enableScan(bool enable);
     /** Returns @c true if edit scan-list menu is enabled. */
-    virtual bool editScanlist() const;
+    virtual bool scanListEditing() const;
     /** Enables/disables edit scan-list menu. */
-    virtual void enableEditScanlist(bool enable);
+    virtual void enableScanListEditing(bool enable);
     /** Returns @c true if call-log missed menu is enabled. */
     virtual bool callLogMissed() const;
     /** Enables/disables call-log missed menu. */
@@ -776,9 +776,9 @@ public:
     /** Enables/disables talkaround menu. */
     virtual void enableTalkaround(bool enable);
     /** Returns @c true if tone/alert menu is enabled. */
-    virtual bool toneAlert() const;
+    virtual bool alertTone() const;
     /** Enables/disables tone/alert  menu. */
-    virtual void enableToneAlert(bool enable);
+    virtual void enableAlertTone(bool enable);
 
     /** Returns @c true if power menu is enabled. */
     virtual bool power() const;
@@ -789,9 +789,9 @@ public:
     /** Enables/disables backlight menu. */
     virtual void enableBacklight(bool enable);
     /** Returns @c true if intro screen menu is enabled. */
-    virtual bool introScreen() const;
+    virtual bool bootScreen() const;
     /** Enables/disables intro screen menu. */
-    virtual void enableIntroScreen(bool enable);
+    virtual void enableBootScreen(bool enable);
     /** Returns @c true if keypad lock menu is enabled. */
     virtual bool keypadLock() const;
     /** Enables/disables keypad lock menu. */
@@ -818,13 +818,14 @@ public:
     /** Enables/disables display mode menu. */
     virtual void enableDisplayMode(bool enable);
     /** Returns @c true if program radio menu is enabled. */
-    virtual bool programRadio() const;
+    virtual bool radioProgramming() const;
     /** Enables/disables program radio menu. */
-    virtual void enableProgramRadio(bool enable);
-    /** Returns @c true if GPS information is enabled. */
-    virtual bool gpsInformation() const;
-    /** Enables/disables GPS information menu. */
-    virtual void enableGPSInformation(bool enable);
+    virtual void enableRadioProgramming(bool enable);
+
+    /** Encodes the menu settings. */
+    virtual bool fromConfig(const Config *config);
+    /** Updates config from menu settings. */
+    virtual bool updateConfig(Config *config);
   };
 
   /** Represents all button settings within the codeplug on the radio.

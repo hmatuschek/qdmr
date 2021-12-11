@@ -26,6 +26,7 @@
 #define ADDR_SETTINGS           0x002040
 #define ADDR_BOOTSETTINGS       0x02f000
 #define ADDR_MENUSETTINGS       0x0020f0
+#define MENUSETTINGS_SIZE       0x000010
 #define ADDR_BUTTONSETTINGS     0x002100
 #define ADDR_PRIVACY_KEYS       0x0059c0
 
@@ -95,6 +96,62 @@ MD390Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   if (TyTChannelExtension *ex = c->tytChannelExtension()) {
     enableCompressedUDPHeader(ex->compressedUDPHeader());
   }
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of MD390Codeplug::MenuSettingsElement
+ * ******************************************************************************************** */
+MD390Codeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr, size_t size)
+  : TyTCodeplug::MenuSettingsElement(ptr, size)
+{
+  // pass...
+}
+
+MD390Codeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr)
+  : TyTCodeplug::MenuSettingsElement(ptr, MENUSETTINGS_SIZE)
+{
+  // pass...
+}
+
+void
+MD390Codeplug::MenuSettingsElement::clear() {
+  TyTCodeplug::MenuSettingsElement::clear();
+
+  enableGPSInformation(true);
+}
+
+bool
+MD390Codeplug::MenuSettingsElement::gpsInformation() const {
+  return !getBit(0x04, 4);
+}
+void
+MD390Codeplug::MenuSettingsElement::enableGPSInformation(bool enable) {
+  setBit(0x04, 4, !enable);
+}
+
+bool
+MD390Codeplug::MenuSettingsElement::fromConfig(const Config *config) {
+  if (! TyTCodeplug::MenuSettingsElement::fromConfig(config))
+    return false;
+
+  if (TyTConfigExtension *ex = config->tytExtension()) {
+     enableGPSInformation(ex->menuSettings()->gpsInformation());
+  }
+
+  return true;
+}
+
+bool
+MD390Codeplug::MenuSettingsElement::updateConfig(Config *config) {
+  if (! TyTCodeplug::MenuSettingsElement::updateConfig(config))
+    return false;
+
+  if (TyTConfigExtension *ex = config->tytExtension()) {
+    ex->menuSettings()->enableGPSInformation(gpsInformation());
+  }
+
+  return true;
 }
 
 

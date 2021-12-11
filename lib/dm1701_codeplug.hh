@@ -31,9 +31,7 @@
  *  <tr><td>0x01edf0</td> <td>0x02ef00</td> <td>0x10110</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x02ef00</td> <td>0x02ef40</td> <td>0x00040</td> <td>VFO A channel, see @c DM1701Codeplug::VFOChannelElement.</td></tr>
  *  <tr><td>0x02ef40</td> <td>0x02ef80</td> <td>0x00040</td> <td>VFO B channel, see @c DM1701Codeplug::VFOChannelElement.</td></tr>
- *  <tr><td>0x02ef80</td> <td>0x02f000</td> <td>0x00080</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>Some unkown settings like current channel, see @c TyTCodeplug::BootSettingsElement.</td></tr>
- *  <tr><td>0x02f010</td> <td>0x031000</td> <td>0x01ff0</td> <td>Reserved, filled with @c 0xff. </td></tr>
+ *  <tr><td>0x02ef80</td> <td>0x031000</td> <td>0x02080</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x031000</td> <td>0x03eac0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c DM1701Codeplug::ZoneExtElement.</td></tr>
  *  <tr><td>0x03eac0</td> <td>0x03ec40</td> <td>0x00180</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x03ec40</td> <td>0x03ed40</td> <td>0x00100</td> <td>16 GPS systems @ 0x10 bytes each, see @c TyTCodeplug::GPSSystemElement.</td></tr>

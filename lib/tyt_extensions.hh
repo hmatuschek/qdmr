@@ -389,6 +389,279 @@ protected:
 };
 
 
+/** Represents the TyT menu settings extension.
+ * @ingroup tyt */
+class TyTMenuSettings : public ConfigExtension
+{
+  Q_OBJECT
+
+  /** If @c true, the menu hang time is infinite. */
+  Q_PROPERTY(bool hangtimeIsInfinite READ hangtimeIsInfinite WRITE setHangtimeInfinite)
+  /** The menu hang time in seconds. */
+  Q_PROPERTY(unsigned hangTime READ hangTime WRITE setHangTime)
+  /** If @c true, the text message menu is shown. */
+  Q_PROPERTY(bool textMessage READ textMessage WRITE enableTextMessage)
+  /** If @c true, the call-alert menu item is shown. */
+  Q_PROPERTY(bool callAlert READ callAlert WRITE enableCallAlert)
+  /** If @c true, the contact editing menu is shown. */
+  Q_PROPERTY(bool contactEditing READ contactEditing WRITE enableContactEditing)
+  /** If @c true, the manual dial menu item is shown. */
+  Q_PROPERTY(bool manualDial READ manualDial WRITE enableManualDial)
+  /** If @c true, the remote radio check menu item is shown. */
+  Q_PROPERTY(bool remoteRadioCheck READ remoteRadioCheck WRITE enableRemoteRadioCheck)
+  /** If @c true, the remote monitor menu item is shown. */
+  Q_PROPERTY(bool remoteMonitor READ remoteMonitor WRITE enableRemoteMonitor)
+  /** If @c true, the remote radio enable menu item is shown. */
+  Q_PROPERTY(bool remoteRadioEnable READ remoteRadioEnable WRITE enableRemoteRadioEnable)
+  /** If @c true, the remote radio disable menu item is shown. */
+  Q_PROPERTY(bool remoteRadioDisable READ remoteRadioDisable WRITE enableRemoteRadioDisable)
+  /** If @c true, the scan menu item is shown. */
+  Q_PROPERTY(bool scan READ scan WRITE enableScan)
+  /** If @c true, the scan list editing is enabled. */
+  Q_PROPERTY(bool scanListEditing READ scanListEditing WRITE enableScanListEditing)
+  /** If @c true, the list of missed calls is shown. */
+  Q_PROPERTY(bool callLogMissed READ callLogMissed WRITE enableCallLogMissed)
+  /** If @c true, the list of answered calls is shown. */
+  Q_PROPERTY(bool callLogAnswered READ callLogAnswered WRITE enableCallLogAnswered)
+  /** If @c true, the list of outgoing calls is shown. */
+  Q_PROPERTY(bool callLogOutgoing READ callLogOutgoing WRITE enableCallLogOutgoing)
+  /** If @c true, the talkaround menu item is shown. */
+  Q_PROPERTY(bool talkaround READ talkaround WRITE enableTalkaround)
+  /** If @c true, the alert-tone menu item is shown. */
+  Q_PROPERTY(bool alertTone READ alertTone WRITE enableAlertTone)
+  /** If @c true, the power settings menu item is shown. */
+  Q_PROPERTY(bool power READ power WRITE enablePower)
+  /** If @c true, the backlight menu item is shown. */
+  Q_PROPERTY(bool backlight READ backlight WRITE enableBacklight)
+  /** If @c true, the boot-screen settings menu item is shown. */
+  Q_PROPERTY(bool bootScreen READ bootScreen WRITE enableBootScreen)
+  /** If @c true, the keypad-lock settings menu item is shown. */
+  Q_PROPERTY(bool keypadLock READ keypadLock WRITE enableKeypadLock)
+  /** If @c true, the LED indicator settings menu item is shown. */
+  Q_PROPERTY(bool ledIndicator READ ledIndicator WRITE enableLEDIndicator)
+  /** If @c true, the squelch settings menu item is shown. */
+  Q_PROPERTY(bool squelch READ squelch WRITE enableSquelch)
+  /** If @c true, the VOX settings menu item is shown. */
+  Q_PROPERTY(bool vox READ vox WRITE enableVOX)
+  /** If @c true, the password menu item is shown. */
+  Q_PROPERTY(bool password READ password WRITE enablePassword)
+  /** If @c true, the display-mode settings menu item is shown. */
+  Q_PROPERTY(bool displayMode READ displayMode WRITE enableDisplayMode)
+  /** If @c true, radio programming on the radio is enabled. */
+  Q_PROPERTY(bool radioProgramming READ radioProgramming WRITE enableRadioProgramming)
+  /** If @c true, the positioning settings menu item is shown. */
+  Q_PROPERTY(bool gpsInformation READ gpsInformation WRITE enableGPSInformation)
+
+public:
+  /** Constructor. */
+  Q_INVOKABLE explicit TyTMenuSettings(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns @c true if the hang time is infinite. */
+  bool hangtimeIsInfinite() const;
+  /** Enables/disables inifinite hang time. */
+  void setHangtimeInfinite(bool infinite);
+
+  /** Returns the menu hang time in seconds. */
+  unsigned hangTime() const;
+  /** Sets the menu hang time in seconds. */
+  void setHangTime(unsigned sec);
+
+  /** Returns @c true if the text message menu item is enabled. */
+  bool textMessage() const;
+  /** Enables/disables the text message menu item. */
+  void enableTextMessage(bool enable);
+
+  /** Returns @c true if the call alert menu item is enabled. */
+  bool callAlert() const;
+  /** Enables/disables the call alert menu item. */
+  void enableCallAlert(bool enable);
+
+  /** Returns @c true if contact editing is enabled. */
+  bool contactEditing() const;
+  /** Enables/disables contact editing. */
+  void enableContactEditing(bool enable);
+
+  /** Returns @c true if the manual dial menu item is enabled. */
+  bool manualDial() const;
+  /** Enables/disables the manual dial menu item. */
+  void enableManualDial(bool enable);
+
+  /** Returns @c true if the remote radio check menu item is enabled. */
+  bool remoteRadioCheck() const;
+  /** Enables/disables the remote radio check menu item. */
+  void enableRemoteRadioCheck(bool enable);
+
+  /** Returns @c true if the remote montior menu item is enabled. */
+  bool remoteMonitor() const;
+  /** Enables/disables the remote monitor menu item. */
+  void enableRemoteMonitor(bool enable);
+
+  /** Returns @c true if the remote radio enable menu item is enabled. */
+  bool remoteRadioEnable() const;
+  /** Enables/disables the remote radio enable menu item. */
+  void enableRemoteRadioEnable(bool enable);
+
+  /** Returns @c true if the remote radio disable menu item is enabled. */
+  bool remoteRadioDisable() const;
+  /** Enables/disables the remote radio disable menu item. */
+  void enableRemoteRadioDisable(bool enable);
+
+  /** Returns @c true if the scan menu item is enabled. */
+  bool scan() const;
+  /** Enables/disables the scan menu item. */
+  void enableScan(bool enable);
+
+  /** Returns @c true if the scan list editing menu item is enabled. */
+  bool scanListEditing() const;
+  /** Enables/disables the scan list editing menu item. */
+  void enableScanListEditing(bool enable);
+
+  /** Returns @c true if the list of missed calls menu item is enabled. */
+  bool callLogMissed() const;
+  /** Enables/disables the list of missed calls menu item. */
+  void enableCallLogMissed(bool enable);
+
+  /** Returns @c true if the list of answered calls menu item is enabled. */
+  bool callLogAnswered() const;
+  /** Enables/disables the list of answered calls menu item. */
+  void enableCallLogAnswered(bool enable);
+
+  /** Returns @c true if the list of outgoing calls menu item is enabled. */
+  bool callLogOutgoing() const;
+  /** Enables/disables the list of outgoing calls menu item. */
+  void enableCallLogOutgoing(bool enable);
+
+  /** Returns @c true if the talkaround menu item is enabled. */
+  bool talkaround() const;
+  /** Enables/disables the talkaround menu item. */
+  void enableTalkaround(bool enable);
+
+  /** Returns @c true if the alert tone menu item is enabled. */
+  bool alertTone() const;
+  /** Enables/disables the alert tone menu item. */
+  void enableAlertTone(bool enable);
+
+  /** Returns @c true if the power menu item is enabled. */
+  bool power() const;
+  /** Enables/disables the power menu item. */
+  void enablePower(bool enable);
+
+  /** Returns @c true if the backlight menu item is enabled. */
+  bool backlight() const;
+  /** Enables/disables the backlight menu item. */
+  void enableBacklight(bool enable);
+
+  /** Returns @c true if the boot screen menu item is enabled. */
+  bool bootScreen() const;
+  /** Enables/disables the boot screen menu item. */
+  void enableBootScreen(bool enable);
+
+  /** Returns @c true if the keypad lock menu item is enabled. */
+  bool keypadLock() const;
+  /** Enables/disables the keypad lock menu item. */
+  void enableKeypadLock(bool enable);
+
+  /** Returns @c true if the LED indicator menu item is enabled. */
+  bool ledIndicator() const;
+  /** Enables/disables the LED indicator menu item. */
+  void enableLEDIndicator(bool enable);
+
+  /** Returns @c true if the squelch menu item is enabled. */
+  bool squelch() const;
+  /** Enables/disables the squelch menu item. */
+  void enableSquelch(bool enable);
+
+  /** Returns @c true if the VOX menu item is enabled. */
+  bool vox() const;
+  /** Enables/disables the VOX menu item. */
+  void enableVOX(bool enable);
+
+  /** Returns @c true if the password menu item is enabled. */
+  bool password() const;
+  /** Enables/disables the password menu item. */
+  void enablePassword(bool enable);
+
+  /** Returns @c true if the display mode menu item is enabled. */
+  bool displayMode() const;
+  /** Enables/disables the display mode menu item. */
+  void enableDisplayMode(bool enable);
+
+  /** Returns @c true if the radio programming menu item is enabled. */
+  bool radioProgramming() const;
+  /** Enables/disables the radio programming menu item. */
+  void enableRadioProgramming(bool enable);
+
+  /** Returns @c true if the GPS information menu item is enabled. */
+  bool gpsInformation() const;
+  /** Enables/disables the GPS information menu item. */
+  void enableGPSInformation(bool enable);
+
+public:
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected:
+  /** If @c true, the menu hang time is infinite. */
+  bool _inifiniteHangTime;
+  /** The menu hang time in seconds. */
+  unsigned _hangTime;
+  /** If @c true, the text message menu is shown. */
+  bool _textMessage;
+  /** If @c true, the call-alert menu item is shown. */
+  bool _callAlert;
+  /** If @c true, the contact editing menu is shown. */
+  bool _contactEditing;
+  /** If @c true, the manual dial menu item is shown. */
+  bool _manualDial;
+  /** If @c true, the remote radio check menu item is shown. */
+  bool _remoteRadioCheck;
+  /** If @c true, the remote monitor menu item is shown. */
+  bool _remoteMonitor;
+  /** If @c true, the remote radio enable menu item is shown. */
+  bool _remoteRadioEnable;
+  /** If @c true, the remote radio disable menu item is shown. */
+  bool _remoteRadioDisable;
+  /** If @c true, the scan menu item is shown. */
+  bool _scan;
+  /** If @c true, the scan list editing is enabled. */
+  bool _scanListEditing;
+  /** If @c true, the list of missed calls is shown. */
+  bool _callLogMissed;
+  /** If @c true, the list of answered calls is shown. */
+  bool _callLogAnswered;
+  /** If @c true, the list of outgoing calls is shown. */
+  bool _callLogOutgoing;
+  /** If @c true, the talkaround menu item is shown. */
+  bool _talkaround;
+  /** If @c true, the alert-tone menu item is shown. */
+  bool _alertTone;
+  /** If @c true, the power settings menu item is shown. */
+  bool _power;
+  /** If @c true, the backlight menu item is shown. */
+  bool _backlight;
+  /** If @c true, the boot-screen settings menu item is shown. */
+  bool _bootScreen;
+  /** If @c true, the keypad-lock settings menu item is shown. */
+  bool _keypadLock;
+  /** If @c true, the LED indicator settings menu item is shown. */
+  bool _ledIndicator;
+  /** If @c true, the squelch settings menu item is shown. */
+  bool _squelch;
+  /** If @c true, the VOX settings menu item is shown. */
+  bool _vox;
+  /** If @c true, the password menu item is shown. */
+  bool _password;
+  /** If @c true, the display-mode settings menu item is shown. */
+  bool _displayMode;
+  /** If @c true, radio programming on the radio is enabled. */
+  bool _radioProgramming;
+  /** If @c true, the positioning settings menu item is shown. */
+  bool _gpsInformation;
+};
+
+
 /** Represents the TyT general settings extension.
  * @ingroup tyt */
 class TyTSettingsExtension: public ConfigExtension
@@ -744,6 +1017,8 @@ class TyTConfigExtension: public ConfigExtension
 
   /** The button settings for TyT devices. */
   Q_PROPERTY(TyTButtonSettings* buttonSettings READ buttonSettings)
+  /** The menu settings for TyT devices. */
+  Q_PROPERTY(TyTMenuSettings* menuSettings READ menuSettings)
 
 public:
   /** Constructor. Also allocates all associates extensions. */
@@ -754,6 +1029,9 @@ public:
   /** Returns the button settings extension for TyT devices. */
   TyTButtonSettings *buttonSettings() const;
 
+  /** Returns the menu settings extension for TyT devices. */
+  TyTMenuSettings *menuSettings() const;
+
 public:
   ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
                             const Context &ctx, const ErrorStack &err=ErrorStack());
@@ -761,6 +1039,8 @@ public:
 protected:
   /** Owns the button settings extension. */
   TyTButtonSettings *_buttonSettings;
+  /** Owns the menu settings extension. */
+  TyTMenuSettings *_menuSettings;
 };
 
 #endif // TYTBUTTONSETTINGSEXTENSION_HH

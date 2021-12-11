@@ -462,6 +462,379 @@ TyTButtonSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node,
 
 
 /* ******************************************************************************************** *
+ * Implementation of TyTMenuSettings
+ * ******************************************************************************************** */
+TyTMenuSettings::TyTMenuSettings(QObject *parent)
+  : ConfigExtension(parent), _inifiniteHangTime(false), _hangTime(10), _textMessage(true),
+    _callAlert(true), _contactEditing(true), _manualDial(true), _remoteRadioCheck(true),
+    _remoteMonitor(true), _remoteRadioEnable(true), _remoteRadioDisable(true), _scan(true),
+    _scanListEditing(true), _callLogMissed(true), _callLogAnswered(true), _callLogOutgoing(true),
+    _talkaround(true), _alertTone(true), _power(true), _backlight(true), _bootScreen(true),
+    _keypadLock(true), _ledIndicator(true), _squelch(true), _vox(true), _password(true),
+    _displayMode(true), _radioProgramming(true), _gpsInformation(true)
+{
+  // pass...
+}
+
+ConfigItem *
+TyTMenuSettings::clone() const {
+  TyTMenuSettings *ex = new TyTMenuSettings();
+  if (! ex->copy(*this)) {
+    ex->deleteLater();
+    return nullptr;
+  }
+  return ex;
+}
+
+ConfigItem *
+TyTMenuSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
+  // There are no further extension/children to TyTButtonSettings.
+  return nullptr;
+}
+
+bool
+TyTMenuSettings::hangtimeIsInfinite() const {
+  return _inifiniteHangTime;
+}
+void
+TyTMenuSettings::setHangtimeInfinite(bool infinite) {
+  if (_inifiniteHangTime == infinite)
+    return;
+  _inifiniteHangTime = infinite;
+  if (_inifiniteHangTime)
+    _hangTime = 0;
+  emit modified(this);
+}
+
+unsigned
+TyTMenuSettings::hangTime() const {
+  return _hangTime;
+}
+
+void
+TyTMenuSettings::setHangTime(unsigned sec) {
+  if (_hangTime == sec)
+    return;
+  _hangTime = sec;
+  _inifiniteHangTime = (0 == _hangTime);
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::textMessage() const {
+  return _textMessage;
+}
+void
+TyTMenuSettings::enableTextMessage(bool enable) {
+  if (_textMessage == enable)
+    return;
+  _textMessage = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::callAlert() const {
+  return _callAlert;
+}
+void
+TyTMenuSettings::enableCallAlert(bool enable) {
+  if (_callAlert == enable)
+    return;
+  _callAlert = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::contactEditing() const {
+  return _contactEditing;
+}
+void
+TyTMenuSettings::enableContactEditing(bool enable) {
+  if (_contactEditing == enable)
+    return;
+  _contactEditing = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::manualDial() const {
+  return _manualDial;
+}
+void
+TyTMenuSettings::enableManualDial(bool enable) {
+  if (_manualDial == enable)
+    return;
+  _manualDial = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::remoteRadioCheck() const {
+  return _remoteRadioCheck;
+}
+void
+TyTMenuSettings::enableRemoteRadioCheck(bool enable) {
+  if (_remoteRadioCheck == enable)
+    return;
+  _remoteRadioCheck = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::remoteMonitor() const {
+  return _remoteMonitor;
+}
+void
+TyTMenuSettings::enableRemoteMonitor(bool enable) {
+  if (_remoteMonitor == enable)
+    return;
+  _remoteMonitor = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::remoteRadioEnable() const {
+  return _remoteRadioEnable;
+}
+void
+TyTMenuSettings::enableRemoteRadioEnable(bool enable) {
+  if (_remoteRadioEnable == enable)
+    return;
+  _remoteRadioEnable = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::remoteRadioDisable() const {
+  return _remoteRadioDisable;
+}
+void
+TyTMenuSettings::enableRemoteRadioDisable(bool enable) {
+  if (_remoteRadioDisable == enable)
+    return;
+  _remoteRadioDisable = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::scan() const {
+  return _scan;
+}
+void
+TyTMenuSettings::enableScan(bool enable) {
+  if (_scan == enable)
+    return;
+  _scan = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::scanListEditing() const {
+  return _scanListEditing;
+}
+void
+TyTMenuSettings::enableScanListEditing(bool enable) {
+  if (_scanListEditing == enable)
+    return;
+  _scanListEditing = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::callLogMissed() const {
+  return _callLogMissed;
+}
+void
+TyTMenuSettings::enableCallLogMissed(bool enable) {
+  if (_callLogMissed == enable)
+    return;
+  _callLogMissed = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::callLogAnswered() const {
+  return _callLogAnswered;
+}
+void
+TyTMenuSettings::enableCallLogAnswered(bool enable) {
+  if (_callLogAnswered == enable)
+    return;
+  _callLogAnswered = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::callLogOutgoing() const {
+  return _callLogOutgoing;
+}
+void
+TyTMenuSettings::enableCallLogOutgoing(bool enable) {
+  if (_callLogOutgoing == enable)
+    return;
+  _callLogOutgoing = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::talkaround() const {
+  return _talkaround;
+}
+void
+TyTMenuSettings::enableTalkaround(bool enable) {
+  if (_talkaround == enable)
+    return;
+  _talkaround = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::alertTone() const {
+  return _alertTone;
+}
+void
+TyTMenuSettings::enableAlertTone(bool enable) {
+  if (_alertTone == enable)
+    return;
+  _alertTone = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::power() const {
+  return _power;
+}
+void
+TyTMenuSettings::enablePower(bool enable) {
+  if (_power == enable)
+    return;
+  _power = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::backlight() const {
+  return _backlight;
+}
+void
+TyTMenuSettings::enableBacklight(bool enable) {
+  if (_backlight == enable)
+    return;
+  _backlight = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::bootScreen() const {
+  return _bootScreen;
+}
+void
+TyTMenuSettings::enableBootScreen(bool enable) {
+  if (_bootScreen == enable)
+    return;
+  _bootScreen = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::keypadLock() const {
+  return _keypadLock;
+}
+void
+TyTMenuSettings::enableKeypadLock(bool enable) {
+  if (_keypadLock == enable)
+    return;
+  _keypadLock = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::ledIndicator() const {
+  return _ledIndicator;
+}
+void
+TyTMenuSettings::enableLEDIndicator(bool enable) {
+  if (_ledIndicator == enable)
+    return;
+  _ledIndicator = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::squelch() const {
+  return _squelch;
+}
+void
+TyTMenuSettings::enableSquelch(bool enable) {
+  if (_squelch == enable)
+    return;
+  _squelch = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::vox() const {
+  return _vox;
+}
+void
+TyTMenuSettings::enableVOX(bool enable) {
+  if (_vox == enable)
+    return;
+  _vox = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::password() const {
+  return _password;
+}
+void
+TyTMenuSettings::enablePassword(bool enable) {
+  if (_password == enable)
+    return;
+  _password = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::displayMode() const {
+  return _displayMode;
+}
+void
+TyTMenuSettings::enableDisplayMode(bool enable) {
+  if (_displayMode == enable)
+    return;
+  _displayMode = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::radioProgramming() const {
+  return _radioProgramming;
+}
+void
+TyTMenuSettings::enableRadioProgramming(bool enable) {
+  if (_radioProgramming == enable)
+    return;
+  _radioProgramming = enable;
+  emit modified(this);
+}
+
+bool
+TyTMenuSettings::gpsInformation() const {
+  return _gpsInformation;
+}
+void
+TyTMenuSettings::enableGPSInformation(bool enable) {
+  if (_gpsInformation == enable)
+    return;
+  _gpsInformation = enable;
+  emit modified(this);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of TyTSettingsExtension
  * ******************************************************************************************** */
 TyTSettingsExtension::TyTSettingsExtension(QObject *parent)
@@ -918,7 +1291,8 @@ TyTSettingsExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
  * Implementation of TyTButtonSettings
  * ******************************************************************************************** */
 TyTConfigExtension::TyTConfigExtension(QObject *parent)
-  : ConfigExtension(parent), _buttonSettings(new TyTButtonSettings(this))
+  : ConfigExtension(parent), _buttonSettings(new TyTButtonSettings(this)),
+    _menuSettings(new TyTMenuSettings(this))
 {
   // Pass...
 }
@@ -936,6 +1310,11 @@ TyTConfigExtension::clone() const {
 TyTButtonSettings *
 TyTConfigExtension::buttonSettings() const {
   return _buttonSettings;
+}
+
+TyTMenuSettings *
+TyTConfigExtension::menuSettings() const {
+  return _menuSettings;
 }
 
 ConfigItem *

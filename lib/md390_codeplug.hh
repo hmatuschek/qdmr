@@ -65,6 +65,31 @@ public:
     virtual void fromChannelObj(const Channel *c, Context &ctx);
   };
 
+  /** Extends the @c TyTCodeplug::MenuSettingsElement to implement the MD-390 specific menu settings.
+   *
+   * Memory layout of the settings (size 0x???? bytes):
+   * @verbinclude md390_menusettings.txt */
+  class MenuSettingsElement: public TyTCodeplug::MenuSettingsElement
+  {
+  protected:
+    /** Hidden constructor. */
+    MenuSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit MenuSettingsElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Returns @c true if GPS information is enabled. */
+    virtual bool gpsInformation() const;
+    /** Enables/disables GPS information menu. */
+    virtual void enableGPSInformation(bool enable);
+
+    bool fromConfig(const Config *config);
+    bool updateConfig(Config *config);
+  };
+
 public:
   /** Empty constructor. */
   explicit MD390Codeplug(QObject *parent=nullptr);
