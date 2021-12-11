@@ -15,11 +15,6 @@
   extends the <token>settings</token> section of the codeplug. 
 </para>
 
-<para>
-  This extension is applicable to the TyT MD-390, MD-UV380, MD-UV390, MD-2017 and Retevis RT8, 
-  RT3S, RT82 radios.
-</para>
-
 <example>
   <title>TyT radio settings extension showing default values.</title>
   <programlisting><![CDATA[settings:

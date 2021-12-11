@@ -16,11 +16,6 @@
   settings are ignored during encoding or set to the default value during decoding.
 </para>
 
-<para>
-  This extension is applicable to the TyT MD-390, MD-UV380, MD-UV390, MD-2017 and Retevis RT8, 
-  RT3S, RT82 radios.
-</para>
-
 <example>
   <title>Example channel settings specifying the default values for TyT/Retevis devices.</title>
   <programlisting><![CDATA[tyt:
