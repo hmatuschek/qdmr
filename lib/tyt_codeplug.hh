@@ -939,7 +939,7 @@ public:
 
   /** Represents the emergency settings within the codeplug on the radio.
    *
-   * Memory representation of the emergency settings:
+   * Memory representation of the emergency settings (size 0x0010 bytes):
    * @verbinclude tyt_emergencysettings.txt */
   class EmergencySettingsElement: public Codeplug::Element
   {
@@ -986,7 +986,7 @@ public:
 
   /** Represents a single emergency system within the radio.
    *
-   * Memory representation of emergency system:
+   * Memory representation of emergency system (size 0x0028 bytes):
    * @verbinclude tyt_emergencysystem.txt */
   class EmergencySystemElement: public Codeplug::Element
   {

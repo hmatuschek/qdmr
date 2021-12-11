@@ -19,10 +19,10 @@
  *  <tr><td>0x002100</td> <td>0x002140</td> <td>0x00040</td> <td>Button config, see @c TyTCodeplug::ButtonSettingsElement.</td></tr>
  *  <tr><td>0x002140</td> <td>0x002180</td> <td>0x00040</td> <td>Reserved, filled with 0xff.</td></tr>
  *  <tr><td>0x002040</td> <td>0x0020f0</td> <td>0x000b0</td> <td>General settings see @c TyTCodeplug::GeneralSettingsElement.</td></tr>
- *  <tr><td>0x002180</td> <td>0x0059c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each, see @c UV390Codeplug::message_t.</td></tr>
+ *  <tr><td>0x002180</td> <td>0x0059c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each.</td></tr>
  *  <tr><td>0x0059c0</td> <td>0x005a70</td> <td>0x000b0</td> <td>??? Privacy keys, see @c TyTCodeplug::EncryptionElement.</td></tr>
- *  <tr><td>0x005a70</td> <td>0x005a80</td> <td>0x00010</td> <td>Unknown settings</td></tr>
- *  <tr><td>0x005a80</td> <td>0x005f90</td> <td>0x00510</td> <td>???Emergency Systems, see @c TyTCodeplug::EmergencySystemElement.</td></td>
+ *  <tr><td>0x005a70</td> <td>0x005a80</td> <td>0x00010</td> <td>Emergency system settings, see @c TyTCodeplug::EmergencySettingsElement.</td></td>
+ *  <tr><td>0x005a80</td> <td>0x005f80</td> <td>0x00500</td> <td>Emergency systems, see @c TyTCodeplug::EmergencySystemElement.</td></td>
  *  <tr><td>0x005f80</td> <td>0x00ec20</td> <td>0x008ca</td> <td>1000 contacts, see @c TyTCodeplug::ContactElement.</td></tr>
  *  <tr><td>0x00ec20</td> <td>0x0149e0</td> <td>0x05dc0</td> <td>250 RX Group lists @ 0x60 bytes each, see @c TyTCodeplug::GroupListElement.</td></tr>
  *  <tr><td>0x0149e0</td> <td>0x018860</td> <td>0x03e80</td> <td>250 Zones @ 0x40 bytes each, see @c TyTCodeplug::ZoneElement.</td></tr>
