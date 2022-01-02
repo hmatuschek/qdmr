@@ -77,6 +77,16 @@ GeneralSettingsView::onConfigModified() {
   ui->introLine2->setText(_config->settings()->introLine2());
   ui->mic->setValue(_config->settings()->micLevel());
   ui->speech->setChecked(_config->settings()->speech());
+  switch(_config->settings()->power()) {
+  case Channel::Power::Max: ui->powerValue->setCurrentIndex(0); break;
+  case Channel::Power::High: ui->powerValue->setCurrentIndex(1); break;
+  case Channel::Power::Mid: ui->powerValue->setCurrentIndex(2); break;
+  case Channel::Power::Low: ui->powerValue->setCurrentIndex(3); break;
+  case Channel::Power::Min: ui->powerValue->setCurrentIndex(4); break;
+  }
+  ui->squelchValue->setValue(_config->settings()->squelch());
+  ui->totValue->setValue(_config->settings()->tot());
+  ui->voxValue->setValue(_config->settings()->vox());
 }
 
 void
