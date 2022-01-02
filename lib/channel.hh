@@ -191,8 +191,8 @@ class AnalogChannel: public Channel
 
   /** The admit criterion of the channel. */
   Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
-  // /** The squelch level of the channel [1-10]. */
-  // Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch)
+  /** The squelch level of the channel [1-10]. */
+  Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch SCRIPTABLE false)
   /** The band width of the channel. */
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
   /** The APRS system. */
