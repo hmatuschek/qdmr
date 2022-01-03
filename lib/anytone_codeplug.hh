@@ -2078,7 +2078,7 @@ public:
   /** Clears and resets the complete codeplug to some default values. */
   virtual void clear() = 0;
 
-  virtual bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
+  bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
   /** Sets all bitmaps for the given config. */
   virtual void setBitmaps(Config *config) = 0;

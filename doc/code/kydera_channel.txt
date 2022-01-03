@@ -1,0 +1,33 @@
+     7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+00 | ID, 16bit uint little endian                                  | Name, 10 bytes ASCII, 0-terminated(?)                      ...
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+08  ...                                                                                                                            |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0c | RX Frequency in 10Hz(?), 32bit uint little-endian                                                                             |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+10 | TX Frequency in 10Hz(?), 32bit uint little-endian                                                                             |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+14 | Type  |PWR|BWD|ALM|PMT|PCT|TSR| Admit | ? |MST| RX Color Code | Unused?                       | Group list index              |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+18 | Scan list index               | Unused?       | EAS           | Unused?       | TXTT  | RXTT  | RX-tone number                |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+1C | TX-tone number                | TX Color Code | ? |TTD|TST|RTD| TX contact index              |APRS Ch. Idx.  | Unused?       |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+Where:
+ * TSR   : RX time-slot, 0=time-slot 1, 1=time-slot 2.
+ * PWR   : Transmit power, 0=low, 1=high.
+ * PMT   : Prompt enable, 0=off, 1=on.
+ * ALM   : Alarm enable, 0=off, 1=on.
+ * PCT   : ???, 0=PATCS, 1=OACSU.
+ * Type  : Channel type, 0=Analog, 1=DMR, 2=Analog+DMR-RX, 3=DMR+FM-RX
+ * BWD   : Bandwidth: 0=Narrow (12.5kHz), 1=Wide (25kHz).
+ * MST   : Message type: 0=Unconfirmed, 1=confirmed.
+ * Admit : Admit criterion: 0=Always, 1=Color Code, 2=Channel Free.
+ * EAS   : ???: 0=Off, 1=A1, 2=A2, 3=A3, 4=A4
+ * RXTT  : RX tone type: 0=Off, 1=CTCSS, 2=DCS, 3=DCS inverted.
+ * TXTT  : RX tone type: 0=Off, 1=CTCSS, 2=DCS, 3=DCS inverted.
+ * TST   : TX time-slot, 0=time-slot 1, 1=time-slot 2.
+ * RTD   : RX time-slot disable, 0=on, 1=off.
+ * TTD   : TX time-slot disable, 0=on, 1=off.

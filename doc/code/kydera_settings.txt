@@ -1,0 +1,120 @@
+     7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+00 | Radio name, 10bytes ASCII, 0-terminated (?)                                                                                ...
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+08  ...                                                            | Unused                                                     ...
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0c  ...                                                                                                                            |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+10 | DMR ID, 24bit uint, little-endian                                                             | Squelch B     | Squelch A     |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+14  ...                            | ? |KLM|BLA|LAN|BLO|KLA|BRT| ? | Unused                                                     ...
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+24 |MG1| ?   ?   ?   ? | MicGain 1 |MG2| ?   ?   ?   ? | MicGain 2 | ? |VOE| ?   ? | VOX sens      | ?   ?   ?   ?   ?   ?   ? |PRF|
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+28 | ?   ?   ?   ? | SMS Prompt    | ?   ?   ?   ? | PrivCallTone  | ?   ?   ?   ? | GrpGallTone   |KTE| ?   ?   ? | Key tone vol. |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+2c |LBT| ?   ?   ? |LowBat vol.    | ?   ?   ? |AIN|TXI|RXI|SCI|LBI| ?   ?   ? |HGE|HCE|MDE|NCE|CLE| ?   ?   ? |MDR|MOE|MIE|QME|MWE|
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+30 | ?   ?   ?   ?   ? |CLM|CLR|CLO| ?   ?   ? |SRS|ROA|SCM|SLE|SLS| ?   ?   ?   ?   ?   ?   ? |ZLE|FAC|CHS|MVE|DSM|LED|BLE|KLE|LSE|
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+34 | ?   ?   ?   ?   ?   ?   ? |ECL|SIG|BCL|BWS|SQL|SLM|RPS|PWS|ToT|POT|CLT|GCT|PCT|MST|PWT|MKT|KTP| ? |APR|SHM|DTM|TME|FMR|TOR|GPS|
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+38 | ?   ?   ?   ? |RSP|RCL|RLI|RSE| ?   ?   ?   ? |VER|ChC|RGL|RID| ?   ?   ? |REn|RDi|RMo|CAl|RCK| ?   ?   ?   ?   ?   ?   ? |VFO|
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+3c | ?   ?   ?   ?   ?   ?   ? |LRe| ?   ?   ?   ?   ?   ?   ? |ETT| Unused                                                        |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+40 | Unused                        | Longpress dur n*0.5+0.5 sec   | P1 long-press action          | P1 short-press action         |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+44 | P2 long-press action          | P2 short-press action         | P3 long-press action          | P3 short-press action         |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+48 | P4 long-press action          | P4 short-press action         | P5 long-press action          | P5 short-press action         |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+4c | P6 long-press action          | P6 short-press action         | Unused                                                        |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+Where:
+ * KLM: Keylock manual enable: 0=off, 1=on.
+ * BLA: Backlight auto: 0=off/on, 1=auto.
+ * LAN: Language: 0=Chineese, 1=English.
+ * BLO: Backlight on: 0=off/auto, 1=on.
+ * KLA: Keylock auto enable: 0=off, 1=on.
+ * BRT: Boot ring tone enable: 0=off, 1=on.
+ * MG1: Mic gain 1 enable: 0=off, 1=on.
+ * MG2: Mic gain 2 enable: 0=off, 1=on.
+ * VOE: VOX enable: 0=off, 1=on.
+ * PRF: Prompt-tone disable: 0=on, 1=off.
+ * KTE: Key-tone enable: 0=off, 1=on.
+ * LBT: Low-battery tone enable: 0=off, 1=on.
+ * AIN: Enable all indicators: 0=off, 1=on.
+ * TXI: Transmit indicator enable: 0=off, 1=on.
+ * RXI: Receive indicator enable: 0=off, 1=on.
+ * SCI: Scan indicator enable: 0=off, 1=on.
+ * LBI: Low-battery indicator enable: 0=off, 1=on.
+ * CLE: Menu contact list enable: 0=off, 1=on.
+ * NCE: Menu new-contact enable: 0=off, 1=on.
+ * MDE: Menu manual-dial enable: 0=off, 1=on.
+ * HCE: Menu ham-contacts enable: 0=off, 1=on.
+ * HGE: Menu ham-groups enable: 0=off, 1=on.
+ * MWE: Menu message write enable: 0=off, 1=on.
+ * QME: Menu quick-message enable: 0=off, 1=on.
+ * MIE: Menu message inbox enable: 0=off, 1=on.
+ * MOE: Menu message outbox enable: 0=off, 1=on.
+ * MDR: Menu message draft enable: 0=off, 1=on.
+ * CLO: Menu call-log outgoing enable: 0=off, 1=on.
+ * CLR: Menu call-log received enable: 0=off, 1=on.
+ * CLM: Menu call-log missed enable: 0=off, 1=on.
+ * SLS: Menu scan-list start/stop enable: 0=off, 1=on.
+ * SLE: Menu scan-list enable: 0=off, 1=on.
+ * SCM: Menu scan mode enable: 0=off, 1=on.
+ * ROA: Menu roaming start/stop enable: 0=off, 1=on.
+ * SRS: Menu scan-running start/stop enable: 0=off, 1=on.
+ * ZLE: Menu zone-list enable: 0=off, 1=on.
+ * LSE: Menu language-selection enable: 0=off, 1=on.
+ * KLE: Menu key-lock enable: 0=off, 1=on.
+ * BLE: Menu back-light enable: 0=off, 1=on.
+ * LED: Menu LEDs enable: 0=off, 1=on.
+ * DSM: Menu display-mode enable: 0=off, 1=on.
+ * MVE: Menu VOX enable: 0=off, 1=on.
+ * CHS: Menu channel switch enable: 0=off, 1=on.
+ * FAC: Menu factory reset enable: 0=off, 1=on.
+ * ECL: Menu Enc. level(?) enable: 0=off, 1=on.
+ * ToT: Menu transimit timeout enable: 0=off, 1=on.
+ * PWS: Menu power-set enable: 0=off, 1=on.
+ * RPS: Menu repeater-set enable: 0=off, 1=on.
+ * SLM: Menu sleep-mode enable: 0=off, 1=on.
+ * SQL: Menu squelch-level enable: 0=off, 1=on.
+ * BWS: Menu band-width enable: 0=off, 1=on.
+ * BCL: Menu busy-channel lockout enable: 0=off, 1=on.
+ * SIG: Menu signalling enable: 0=off, 1=on.
+ * KTP: Menu keytone profile enable: 0=off, 1=on.
+ * MKT: Menu keytone enable: 0=off, 1=on.
+ * PWT: Menu power tone enable: 0=off, 1=on.
+ * MST: Menu message tone enable: 0=off, 1=on.
+ * PCT: Menu private-call tone enable: 0=off, 1=on.
+ * GCT: Menu group-call tone enable: 0=off, 1=on.
+ * CLT: Menu call-tone enable: 0=off, 1=on.
+ * POT: Menu power-on tone enable: 0=off, 1=on.
+ * GPS: Menu GPS enable: 0=off, 1=on.
+ * TOR: Menu torch enable: 0=off, 1=on.
+ * FMR: Menu FM-radio enable: 0=off, 1=on.
+ * TME: Menu time enable: 0=off, 1=on.
+ * DTM: Menu DMTF enable: 0=off, 1=on.
+ * SHM: Menu Speaker/Handmic enable: 0=off, 1=on.
+ * APR: Menu APRS enable: 0=off, 1=on.
+ * RSE: Menu record set enable: 0=off, 1=on.
+ * RLI: Menu record list enable: 0=off, 1=on.
+ * RCL: Menu record clear enable: 0=off, 1=on.
+ * RSP: Menu record space enable: 0=off, 1=on.
+ * RID: Menu radio-id enable: 0=off, 1=on.
+ * RGL: Menu group list enable: 0=off, 1=on.
+ * ChC: Menu channel transmit contact enable: 0=off, 1=on.
+ * VER: Menu version enable: 0=off, 1=on.
+ * RCK: Menu radio-check enable: 0=off, 1=on.
+ * CAl: Menu call-alert enable: 0=off, 1=on.
+ * RMo: Menu radio-monitor enable: 0=off, 1=on.
+ * RDi: Menu radio-disable enable: 0=off, 1=on.
+ * REn: Menu radio-enable enable: 0=off, 1=on.
+ * VFO: Menu VFO enable: 0=off, 1=on.
+ * LRe: Menu local-repeater enable: 0=off, 1=on.
+ * ETT: Menu end-tone types enable: 0=off, 1=on.
