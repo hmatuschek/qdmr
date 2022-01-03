@@ -50,10 +50,10 @@ class TyTChannelExtension: public ConfigExtension
   /** If @c true, and dcdm is enabled, this radio is the leader, specifying the clock. */
   Q_PROPERTY(bool dcdmLeader READ dcdmLeader WRITE enableDCDMLeader)
 
-  Q_CLASSINFO("description", "Settings for MD-390, RT8, MD-UV390, RT3S, MD-2017, RT82.")
+  Q_CLASSINFO("description", "Settings for MD-390, RT8, MD-UV390, RT3S, MD-2017, RT82, DM-1701, RT84.")
   Q_CLASSINFO("longDescription", "Device specific channel settings for TyT and Retevis devices."
-                                 "Including TyT MD-390, MD-UV390, MD-2017 as well as Retevis RT8, "
-                                 "RT3S and RT82.")
+                                 "Including TyT MD-390, MD-UV390, MD-2017, Retevis RT8, RT3S and RT82"
+                                 " as well as Baofeng DM-1701.")
 
 public:
   /** Possible reference frequency settings for RX & TX. */
@@ -243,15 +243,28 @@ class TyTButtonSettings : public ConfigExtension
   Q_OBJECT
 
   /** The action to perform on a short press on side button 1. */
-  Q_PROPERTY(ButtonAction sideButton1Short MEMBER _sideButton1Short READ sideButton1Short WRITE setSideButton1Short)
+  Q_PROPERTY(ButtonAction sideButton1Short READ sideButton1Short WRITE setSideButton1Short)
   /** The action to perform on a long press on side button 1. */
-  Q_PROPERTY(ButtonAction sideButton1Long MEMBER _sideButton1Long READ sideButton1Long WRITE setSideButton1Long)
+  Q_PROPERTY(ButtonAction sideButton1Long READ sideButton1Long WRITE setSideButton1Long)
   /** The action to perform on a short press on side button 2. */
-  Q_PROPERTY(ButtonAction sideButton2Short MEMBER _sideButton2Short READ sideButton2Short WRITE setSideButton2Short)
+  Q_PROPERTY(ButtonAction sideButton2Short READ sideButton2Short WRITE setSideButton2Short)
   /** The action to perform on a long press on side button 2. */
-  Q_PROPERTY(ButtonAction sideButton2Long MEMBER _sideButton2Long READ sideButton2Long WRITE setSideButton2Long)
+  Q_PROPERTY(ButtonAction sideButton2Long READ sideButton2Long WRITE setSideButton2Long)
+  /** The action to perform on a short press on side button 3. */
+  Q_PROPERTY(ButtonAction sideButton3Short READ sideButton3Short WRITE setSideButton3Short)
+  /** The action to perform on a long press on side button 3. */
+  Q_PROPERTY(ButtonAction sideButton3Long READ sideButton3Long WRITE setSideButton3Long)
+  /** The action to perform on a short press on programmable button 1. */
+  Q_PROPERTY(ButtonAction progButton1Short READ progButton1Short WRITE setProgButton1Short)
+  /** The action to perform on a long press on programmable button 1. */
+  Q_PROPERTY(ButtonAction progButton1Long READ progButton1Long WRITE setProgButton1Long)
+  /** The action to perform on a short press on programmable button 2. */
+  Q_PROPERTY(ButtonAction progButton2Short READ progButton2Short WRITE setProgButton2Short)
+  /** The action to perform on a long press on programmable button 2. */
+  Q_PROPERTY(ButtonAction progButton2Long READ progButton2Long WRITE setProgButton2Long)
+
   /** The duration of a long press in msec. */
-  Q_PROPERTY(unsigned longPressDuration MEMBER _longPressDuration READ longPressDuration WRITE setLongPressDuration)
+  Q_PROPERTY(unsigned longPressDuration READ longPressDuration WRITE setLongPressDuration)
 
 public:
   /** Possible actions for the side-buttons. */
@@ -313,6 +326,33 @@ public:
   /** Sets the action for the side button 2 long-press. */
   void setSideButton2Long(ButtonAction action);
 
+  /** Returns the action for the side button 3 short-press (Baofeng DM-1701). */
+  ButtonAction sideButton3Short() const;
+  /** Sets the action for the side button 3 short-press (Baofeng DM-1701). */
+  void setSideButton3Short(ButtonAction action);
+  /** Returns the action for the side button 3 long-press (Baofeng DM-1701). */
+  ButtonAction sideButton3Long() const;
+  /** Sets the action for the side button 3 long-press (Baofeng DM-1701). */
+  void setSideButton3Long(ButtonAction action);
+
+  /** Returns the action for the programmable button 1 short-press (Baofeng DM-1701). */
+  ButtonAction progButton1Short() const;
+  /** Sets the action for the programmable button 1 short-press (Baofeng DM-1701). */
+  void setProgButton1Short(ButtonAction action);
+  /** Returns the action for the programmable button 1 long-press (Baofeng DM-1701). */
+  ButtonAction progButton1Long() const;
+  /** Sets the action for the programmable button 1 long-press (Baofeng DM-1701). */
+  void setProgButton1Long(ButtonAction action);
+
+  /** Returns the action for the programmable button 2 short-press (Baofeng DM-1701). */
+  ButtonAction progButton2Short() const;
+  /** Sets the action for the programmable button 2 short-press (Baofeng DM-1701). */
+  void setProgButton2Short(ButtonAction action);
+  /** Returns the action for the programmable button 2 long-press (Baofeng DM-1701). */
+  ButtonAction progButton2Long() const;
+  /** Sets the action for the programmable button 2 long-press (Baofeng DM-1701). */
+  void setProgButton2Long(ButtonAction action);
+
   /** Returns the long-press duration in msec. */
   unsigned longPressDuration() const;
   /** Sets the long-press duration in msec. */
@@ -331,8 +371,294 @@ protected:
   ButtonAction _sideButton2Short;
   /** Holds the side button 2 long-press action. */
   ButtonAction _sideButton2Long;
+  /** Holds the side button 3 short-press action. */
+  ButtonAction _sideButton3Short;
+  /** Holds the side button 3 long-press action. */
+  ButtonAction _sideButton3Long;
+  /** Holds the prog button 1 short-press action. */
+  ButtonAction _progButton1Short;
+  /** Holds the prog button 1 long-press action. */
+  ButtonAction _progButton1Long;
+  /** Holds the prog button 2 short-press action. */
+  ButtonAction _progButton2Short;
+  /** Holds the prog button 2 long-press action. */
+  ButtonAction _progButton2Long;
+
   /** Holds the long-press duration in ms. */
   unsigned _longPressDuration;
+};
+
+
+/** Represents the TyT menu settings extension.
+ * @ingroup tyt */
+class TyTMenuSettings : public ConfigExtension
+{
+  Q_OBJECT
+
+  /** If @c true, the menu hang time is infinite. */
+  Q_PROPERTY(bool hangtimeIsInfinite READ hangtimeIsInfinite WRITE setHangtimeInfinite)
+  /** The menu hang time in seconds. */
+  Q_PROPERTY(unsigned hangTime READ hangTime WRITE setHangTime)
+  /** If @c true, the text message menu is shown. */
+  Q_PROPERTY(bool textMessage READ textMessage WRITE enableTextMessage)
+  /** If @c true, the call-alert menu item is shown. */
+  Q_PROPERTY(bool callAlert READ callAlert WRITE enableCallAlert)
+  /** If @c true, the contact editing menu is shown. */
+  Q_PROPERTY(bool contactEditing READ contactEditing WRITE enableContactEditing)
+  /** If @c true, the manual dial menu item is shown. */
+  Q_PROPERTY(bool manualDial READ manualDial WRITE enableManualDial)
+  /** If @c true, the remote radio check menu item is shown. */
+  Q_PROPERTY(bool remoteRadioCheck READ remoteRadioCheck WRITE enableRemoteRadioCheck)
+  /** If @c true, the remote monitor menu item is shown. */
+  Q_PROPERTY(bool remoteMonitor READ remoteMonitor WRITE enableRemoteMonitor)
+  /** If @c true, the remote radio enable menu item is shown. */
+  Q_PROPERTY(bool remoteRadioEnable READ remoteRadioEnable WRITE enableRemoteRadioEnable)
+  /** If @c true, the remote radio disable menu item is shown. */
+  Q_PROPERTY(bool remoteRadioDisable READ remoteRadioDisable WRITE enableRemoteRadioDisable)
+  /** If @c true, the scan menu item is shown. */
+  Q_PROPERTY(bool scan READ scan WRITE enableScan)
+  /** If @c true, the scan list editing is enabled. */
+  Q_PROPERTY(bool scanListEditing READ scanListEditing WRITE enableScanListEditing)
+  /** If @c true, the list of missed calls is shown. */
+  Q_PROPERTY(bool callLogMissed READ callLogMissed WRITE enableCallLogMissed)
+  /** If @c true, the list of answered calls is shown. */
+  Q_PROPERTY(bool callLogAnswered READ callLogAnswered WRITE enableCallLogAnswered)
+  /** If @c true, the list of outgoing calls is shown. */
+  Q_PROPERTY(bool callLogOutgoing READ callLogOutgoing WRITE enableCallLogOutgoing)
+  /** If @c true, the talkaround menu item is shown. */
+  Q_PROPERTY(bool talkaround READ talkaround WRITE enableTalkaround)
+  /** If @c true, the alert-tone menu item is shown. */
+  Q_PROPERTY(bool alertTone READ alertTone WRITE enableAlertTone)
+  /** If @c true, the power settings menu item is shown. */
+  Q_PROPERTY(bool power READ power WRITE enablePower)
+  /** If @c true, the backlight menu item is shown. */
+  Q_PROPERTY(bool backlight READ backlight WRITE enableBacklight)
+  /** If @c true, the boot-screen settings menu item is shown. */
+  Q_PROPERTY(bool bootScreen READ bootScreen WRITE enableBootScreen)
+  /** If @c true, the keypad-lock settings menu item is shown. */
+  Q_PROPERTY(bool keypadLock READ keypadLock WRITE enableKeypadLock)
+  /** If @c true, the LED indicator settings menu item is shown. */
+  Q_PROPERTY(bool ledIndicator READ ledIndicator WRITE enableLEDIndicator)
+  /** If @c true, the squelch settings menu item is shown. */
+  Q_PROPERTY(bool squelch READ squelch WRITE enableSquelch)
+  /** If @c true, the VOX settings menu item is shown. */
+  Q_PROPERTY(bool vox READ vox WRITE enableVOX)
+  /** If @c true, the password menu item is shown. */
+  Q_PROPERTY(bool password READ password WRITE enablePassword)
+  /** If @c true, the display-mode settings menu item is shown. */
+  Q_PROPERTY(bool displayMode READ displayMode WRITE enableDisplayMode)
+  /** If @c true, radio programming on the radio is enabled. */
+  Q_PROPERTY(bool radioProgramming READ radioProgramming WRITE enableRadioProgramming)
+  /** If @c true, the positioning settings menu item is shown. */
+  Q_PROPERTY(bool gpsInformation READ gpsInformation WRITE enableGPSInformation)
+
+public:
+  /** Constructor. */
+  Q_INVOKABLE explicit TyTMenuSettings(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns @c true if the hang time is infinite. */
+  bool hangtimeIsInfinite() const;
+  /** Enables/disables inifinite hang time. */
+  void setHangtimeInfinite(bool infinite);
+
+  /** Returns the menu hang time in seconds. */
+  unsigned hangTime() const;
+  /** Sets the menu hang time in seconds. */
+  void setHangTime(unsigned sec);
+
+  /** Returns @c true if the text message menu item is enabled. */
+  bool textMessage() const;
+  /** Enables/disables the text message menu item. */
+  void enableTextMessage(bool enable);
+
+  /** Returns @c true if the call alert menu item is enabled. */
+  bool callAlert() const;
+  /** Enables/disables the call alert menu item. */
+  void enableCallAlert(bool enable);
+
+  /** Returns @c true if contact editing is enabled. */
+  bool contactEditing() const;
+  /** Enables/disables contact editing. */
+  void enableContactEditing(bool enable);
+
+  /** Returns @c true if the manual dial menu item is enabled. */
+  bool manualDial() const;
+  /** Enables/disables the manual dial menu item. */
+  void enableManualDial(bool enable);
+
+  /** Returns @c true if the remote radio check menu item is enabled. */
+  bool remoteRadioCheck() const;
+  /** Enables/disables the remote radio check menu item. */
+  void enableRemoteRadioCheck(bool enable);
+
+  /** Returns @c true if the remote montior menu item is enabled. */
+  bool remoteMonitor() const;
+  /** Enables/disables the remote monitor menu item. */
+  void enableRemoteMonitor(bool enable);
+
+  /** Returns @c true if the remote radio enable menu item is enabled. */
+  bool remoteRadioEnable() const;
+  /** Enables/disables the remote radio enable menu item. */
+  void enableRemoteRadioEnable(bool enable);
+
+  /** Returns @c true if the remote radio disable menu item is enabled. */
+  bool remoteRadioDisable() const;
+  /** Enables/disables the remote radio disable menu item. */
+  void enableRemoteRadioDisable(bool enable);
+
+  /** Returns @c true if the scan menu item is enabled. */
+  bool scan() const;
+  /** Enables/disables the scan menu item. */
+  void enableScan(bool enable);
+
+  /** Returns @c true if the scan list editing menu item is enabled. */
+  bool scanListEditing() const;
+  /** Enables/disables the scan list editing menu item. */
+  void enableScanListEditing(bool enable);
+
+  /** Returns @c true if the list of missed calls menu item is enabled. */
+  bool callLogMissed() const;
+  /** Enables/disables the list of missed calls menu item. */
+  void enableCallLogMissed(bool enable);
+
+  /** Returns @c true if the list of answered calls menu item is enabled. */
+  bool callLogAnswered() const;
+  /** Enables/disables the list of answered calls menu item. */
+  void enableCallLogAnswered(bool enable);
+
+  /** Returns @c true if the list of outgoing calls menu item is enabled. */
+  bool callLogOutgoing() const;
+  /** Enables/disables the list of outgoing calls menu item. */
+  void enableCallLogOutgoing(bool enable);
+
+  /** Returns @c true if the talkaround menu item is enabled. */
+  bool talkaround() const;
+  /** Enables/disables the talkaround menu item. */
+  void enableTalkaround(bool enable);
+
+  /** Returns @c true if the alert tone menu item is enabled. */
+  bool alertTone() const;
+  /** Enables/disables the alert tone menu item. */
+  void enableAlertTone(bool enable);
+
+  /** Returns @c true if the power menu item is enabled. */
+  bool power() const;
+  /** Enables/disables the power menu item. */
+  void enablePower(bool enable);
+
+  /** Returns @c true if the backlight menu item is enabled. */
+  bool backlight() const;
+  /** Enables/disables the backlight menu item. */
+  void enableBacklight(bool enable);
+
+  /** Returns @c true if the boot screen menu item is enabled. */
+  bool bootScreen() const;
+  /** Enables/disables the boot screen menu item. */
+  void enableBootScreen(bool enable);
+
+  /** Returns @c true if the keypad lock menu item is enabled. */
+  bool keypadLock() const;
+  /** Enables/disables the keypad lock menu item. */
+  void enableKeypadLock(bool enable);
+
+  /** Returns @c true if the LED indicator menu item is enabled. */
+  bool ledIndicator() const;
+  /** Enables/disables the LED indicator menu item. */
+  void enableLEDIndicator(bool enable);
+
+  /** Returns @c true if the squelch menu item is enabled. */
+  bool squelch() const;
+  /** Enables/disables the squelch menu item. */
+  void enableSquelch(bool enable);
+
+  /** Returns @c true if the VOX menu item is enabled. */
+  bool vox() const;
+  /** Enables/disables the VOX menu item. */
+  void enableVOX(bool enable);
+
+  /** Returns @c true if the password menu item is enabled. */
+  bool password() const;
+  /** Enables/disables the password menu item. */
+  void enablePassword(bool enable);
+
+  /** Returns @c true if the display mode menu item is enabled. */
+  bool displayMode() const;
+  /** Enables/disables the display mode menu item. */
+  void enableDisplayMode(bool enable);
+
+  /** Returns @c true if the radio programming menu item is enabled. */
+  bool radioProgramming() const;
+  /** Enables/disables the radio programming menu item. */
+  void enableRadioProgramming(bool enable);
+
+  /** Returns @c true if the GPS information menu item is enabled. */
+  bool gpsInformation() const;
+  /** Enables/disables the GPS information menu item. */
+  void enableGPSInformation(bool enable);
+
+public:
+  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected:
+  /** If @c true, the menu hang time is infinite. */
+  bool _inifiniteHangTime;
+  /** The menu hang time in seconds. */
+  unsigned _hangTime;
+  /** If @c true, the text message menu is shown. */
+  bool _textMessage;
+  /** If @c true, the call-alert menu item is shown. */
+  bool _callAlert;
+  /** If @c true, the contact editing menu is shown. */
+  bool _contactEditing;
+  /** If @c true, the manual dial menu item is shown. */
+  bool _manualDial;
+  /** If @c true, the remote radio check menu item is shown. */
+  bool _remoteRadioCheck;
+  /** If @c true, the remote monitor menu item is shown. */
+  bool _remoteMonitor;
+  /** If @c true, the remote radio enable menu item is shown. */
+  bool _remoteRadioEnable;
+  /** If @c true, the remote radio disable menu item is shown. */
+  bool _remoteRadioDisable;
+  /** If @c true, the scan menu item is shown. */
+  bool _scan;
+  /** If @c true, the scan list editing is enabled. */
+  bool _scanListEditing;
+  /** If @c true, the list of missed calls is shown. */
+  bool _callLogMissed;
+  /** If @c true, the list of answered calls is shown. */
+  bool _callLogAnswered;
+  /** If @c true, the list of outgoing calls is shown. */
+  bool _callLogOutgoing;
+  /** If @c true, the talkaround menu item is shown. */
+  bool _talkaround;
+  /** If @c true, the alert-tone menu item is shown. */
+  bool _alertTone;
+  /** If @c true, the power settings menu item is shown. */
+  bool _power;
+  /** If @c true, the backlight menu item is shown. */
+  bool _backlight;
+  /** If @c true, the boot-screen settings menu item is shown. */
+  bool _bootScreen;
+  /** If @c true, the keypad-lock settings menu item is shown. */
+  bool _keypadLock;
+  /** If @c true, the LED indicator settings menu item is shown. */
+  bool _ledIndicator;
+  /** If @c true, the squelch settings menu item is shown. */
+  bool _squelch;
+  /** If @c true, the VOX settings menu item is shown. */
+  bool _vox;
+  /** If @c true, the password menu item is shown. */
+  bool _password;
+  /** If @c true, the display-mode settings menu item is shown. */
+  bool _displayMode;
+  /** If @c true, radio programming on the radio is enabled. */
+  bool _radioProgramming;
+  /** If @c true, the positioning settings menu item is shown. */
+  bool _gpsInformation;
 };
 
 
@@ -370,6 +696,12 @@ class TyTSettingsExtension: public ConfigExtension
               "preamble before each call.")
   /** If @c true, a picture is shown during boot. */
   Q_PROPERTY(bool bootPicture READ bootPicture WRITE enableBootPicture)
+  /** If @c true, the radio is in channel mode. */
+  Q_PROPERTY(bool channelMode READ channelMode WRITE enableChannelMode)
+  /** If @c true or channelMode is true, the VFO A is in channel mode. */
+  Q_PROPERTY(bool channelModeA READ channelModeA WRITE enableChannelModeA)
+  /** If @c true or channelMode is true, the VFO B is in channel mode. */
+  Q_PROPERTY(bool channelModeB READ channelModeB WRITE enableChannelModeB)
   /** The transmit preamble duration in ms. */
   Q_PROPERTY(unsigned txPreambleDuration READ txPreambleDuration WRITE setTXPreambleDuration)
   /** The group hang time in ms. */
@@ -408,6 +740,12 @@ class TyTSettingsExtension: public ConfigExtension
   Q_PROPERTY(unsigned radioProgPassword READ radioProgPassword WRITE setRadioProgPassword)
   /** Specifies the PC programming password. */
   Q_PROPERTY(QString pcProgPassword READ pcProgPassword WRITE setPCProgPassword)
+  /** If @c true, the private call IDs must match. */
+  Q_PROPERTY(bool privateCallMatch READ privateCallMatch WRITE enablePrivateCallMatch)
+  /** If @c true, the group call IDs must match. */
+  Q_PROPERTY(bool groupCallMatch READ groupCallMatch WRITE enableGroupCallMatch)
+  /** Holds the channel hang time in ms. */
+  Q_PROPERTY(unsigned channelHangTime READ channelHangTime WRITE setChannelHangTime)
 
   Q_CLASSINFO("description", "Settings for MD-390, RT8, MD-UV390, RT3S, MD-2017, RT82.")
   Q_CLASSINFO("longDescription", "Device specific radio settings for TyT and Retevis devices."
@@ -476,6 +814,19 @@ public:
   bool bootPicture() const;
   /** Enables the boot picture. */
   void enableBootPicture(bool enable);
+
+  /** Retunrs @c true if the radio is in channel mode. Overrides @c channelModeA and @c channelModeB. */
+  bool channelMode() const;
+  /** Enables/disables channel mode for the radio. */
+  void enableChannelMode(bool enable);
+  /** Retunrs @c true if VFO A is in channel mode. Overridden by @c channelMode. */
+  bool channelModeA() const;
+  /** Enables/disables channel mode for the VFO A. */
+  void enableChannelModeA(bool enable);
+  /** Retunrs @c true if VFO B is in channel mode. Overridden by @c channelMode. */
+  bool channelModeB() const;
+  /** Enables/disables channel mode for the VFO B. */
+  void enableChannelModeB(bool enable);
 
   /** Returns the TX preamble duration in ms. */
   unsigned txPreambleDuration() const;
@@ -567,6 +918,20 @@ public:
   /** Sets PC programming password. */
   void setPCProgPassword(const QString &passwd);
 
+  /** Returns @c true if the private call IDs must match. */
+  bool privateCallMatch() const;
+  /** Enables/disables private call match. */
+  void enablePrivateCallMatch(bool enable);
+  /** Returns @c true if the group call IDs must match. */
+  bool groupCallMatch() const;
+  /** Enables/disables group call match. */
+  void enableGroupCallMatch(bool enable);
+
+  /** Returns the channel hang time in ms. */
+  unsigned channelHangTime() const;
+  /** Sets the channel hang time in ms. */
+  void setChannelHangTime(unsigned ms);
+
 public:
   ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
                             const Context &ctx, const ErrorStack &err=ErrorStack());
@@ -591,6 +956,12 @@ protected:
   bool _wakeupPreamble;
   /** If @c true the boot picture is enabled. */
   bool _bootPicture;
+  /** If @c true or channelMode is true, the VFO A is in channel (memory) mode. */
+  bool _channelModeA;
+  /** If @c true or channelMode is true, the VFO B is in channel (memory) mode. */
+  bool _channelModeB;
+  /** If @c true, the radio is in channel (memory) mode. Overrides channelModeA and channelModeB. */
+  bool _channelMode;
   /** Holds the TX preamble duration. */
   unsigned _txPreambleDuration;
   /** Holds the group-call hang time. */
@@ -629,6 +1000,12 @@ protected:
   unsigned _radioProgPassword;
   /** Holds the PC programming password. */
   QString  _pcProgPassword;
+  /** If @c true, the private call IDs must match. */
+  bool _privateCallMatch;
+  /** If @c true, the group call IDs must match. */
+  bool _groupCallMatch;
+  /** Holds the channel hang time in ms. */
+  unsigned _channelHangTime;
 };
 
 
@@ -640,6 +1017,8 @@ class TyTConfigExtension: public ConfigExtension
 
   /** The button settings for TyT devices. */
   Q_PROPERTY(TyTButtonSettings* buttonSettings READ buttonSettings)
+  /** The menu settings for TyT devices. */
+  Q_PROPERTY(TyTMenuSettings* menuSettings READ menuSettings)
 
 public:
   /** Constructor. Also allocates all associates extensions. */
@@ -650,6 +1029,9 @@ public:
   /** Returns the button settings extension for TyT devices. */
   TyTButtonSettings *buttonSettings() const;
 
+  /** Returns the menu settings extension for TyT devices. */
+  TyTMenuSettings *menuSettings() const;
+
 public:
   ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
                             const Context &ctx, const ErrorStack &err=ErrorStack());
@@ -657,6 +1039,8 @@ public:
 protected:
   /** Owns the button settings extension. */
   TyTButtonSettings *_buttonSettings;
+  /** Owns the menu settings extension. */
+  TyTMenuSettings *_menuSettings;
 };
 
 #endif // TYTBUTTONSETTINGSEXTENSION_HH

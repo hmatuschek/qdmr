@@ -1,7 +1,7 @@
 #ifndef UV390_CODEPLUG_HH
 #define UV390_CODEPLUG_HH
 
-#include "tyt_codeplug.hh"
+#include "dm1701_codeplug.hh"
 
 /** Device specific implementation of the codeplug for the TyT MD-UV390.
  *
@@ -21,10 +21,11 @@
  *  <tr><td>0x0020f0</td> <td>0x002100</td> <td>0x00010</td> <td>Menu settings, see @c TyTCodeplug::MenuSettingsElement.</td></tr>
  *  <tr><td>0x002100</td> <td>0x002140</td> <td>0x00040</td> <td>Button config, see @c TyTCodeplug::ButtonSettingsElement.</td></tr>
  *  <tr><td>0x002140</td> <td>0x002180</td> <td>0x00040</td> <td>Reserved, filled with 0xff.</td></tr>
- *  <tr><td>0x002180</td> <td>0x0059c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each, see @c UV390Codeplug::message_t.</td></tr>
+ *  <tr><td>0x002180</td> <td>0x0059c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each.</td></tr>
  *  <tr><td>0x0059c0</td> <td>0x005a70</td> <td>0x000b0</td> <td>Privacy keys, see @c TyTCodeplug::EncryptionElement.</td></tr>
- *  <tr><td>0x005a50</td> <td>0x005f60</td> <td>0x00510</td> <td>Emergency Systems, see @c TyTCodeplug::EmergencySystemElement.</td></td>
- *  <tr><td>0x005f60</td> <td>0x00ec20</td> <td>0x08cc0</td> <td>Reserved, filled with 0xff.</td></td>
+ *  <tr><td>0x005a70</td> <td>0x005a80</td> <td>0x00010</td> <td>Emergency system settings, see @c TyTCodeplug::EmergencySettingsElement.</td></td>
+ *  <tr><td>0x005a80</td> <td>0x005f80</td> <td>0x00500</td> <td>Emergency systems, see @c TyTCodeplug::EmergencySystemElement.</td></td>
+ *  <tr><td>0x005f80</td> <td>0x00ec20</td> <td>0x08ca0</td> <td>Reserved, filled with 0xff.</td></td>
  *  <tr><td>0x00ec20</td> <td>0x0149e0</td> <td>0x05dc0</td> <td>250 RX Group lists @ 0x60 bytes each, see @c TyTCodeplug::GroupListElement.</td></tr>
  *  <tr><td>0x0149e0</td> <td>0x018860</td> <td>0x03e80</td> <td>250 Zones @ 0x40 bytes each, see @c TyTCodeplug::ZoneElement.</td></tr>
  *  <tr><td>0x018860</td> <td>0x01edf0</td> <td>0x06590</td> <td>250 Scanlists @ 0x68 bytes each, see @c TyTCodeplug::ScanListElement.</td></tr>
@@ -34,7 +35,7 @@
  *  <tr><td>0x02ef80</td> <td>0x02f000</td> <td>0x00080</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>Boot settings, see @c TyTCodeplug::BootSettingsElement.</td></tr>
  *  <tr><td>0x02f010</td> <td>0x031000</td> <td>0x01ff0</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x031000</td> <td>0x03eac0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c TyTCodeplug::ZoneExtElement.</td></tr>
+ *  <tr><td>0x031000</td> <td>0x03eac0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c DM1701::ZoneExtElement.</td></tr>
  *  <tr><td>0x03eac0</td> <td>0x03ec40</td> <td>0x00180</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x03ec40</td> <td>0x03ed40</td> <td>0x00100</td> <td>16 GPS systems @ 0x10 bytes each, see @c TyTCodeplug::GPSSystemElement.</td></tr>
  *  <tr><td>0x03ed40</td> <td>0x040000</td> <td>0x012c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
@@ -134,48 +135,15 @@ public:
     virtual void setStepSize(unsigned ss_hz);
   };
 
-  /** Extended zone data.
-   * The zone definition @c ZoneElement contains only a single set of 16 channels. For each zone
-   * definition, there is a zone extension which extends a zone to zwo sets of 64 channels each.
-   *
-   * Memory layout of encoded zone extension:
-   * @verbinclude uv390_zoneext.txt */
-  class ZoneExtElement: public Codeplug::Element
-  {
-  protected:
-    /** Constructor. */
-    ZoneExtElement(uint8_t *ptr, size_t size);
-
-  public:
-    /** Constructor. */
-    ZoneExtElement(uint8_t *ptr);
-    /** Destructor. */
-    virtual ~ZoneExtElement();
-
-    void clear();
-
-    /** Returns the n-th member index of the channel list for A. */
-    virtual uint16_t memberIndexA(unsigned n) const;
-    /** Sets the n-th member index of the channel list for A. */
-    virtual void setMemberIndexA(unsigned n, uint16_t idx);
-    /** Returns the n-th member index of the channel list for B. */
-    virtual uint16_t memberIndexB(unsigned n) const;
-    /** Returns the n-th member index of the channel list for B. */
-    virtual void setMemberIndexB(unsigned n, uint16_t idx);
-
-    /** Encodes the given zone. */
-    virtual bool fromZoneObj(const Zone *zone, Context &ctx);
-    /** Links the given zone object.
-     * Thant is, extends channel list A and populates channel list B. */
-    virtual bool linkZoneObj(Zone *zone, Context &ctx);
-  };
+  /** Reuse zone extension from DM1701. */
+  typedef DM1701Codeplug::ZoneExtElement ZoneExtElement;
 
   /** Extends the common @c TyTCodeplug::GeneralSettings to implement the MD-UV390 specific
    * settings.
    *
-   * Memory layout of the settings (size 0x???? bytes):
+   * Memory layout of the settings (size 0x00b0 bytes):
    * @verbinclude uv390_settings.txt */
-  class GeneralSettingsElement: public TyTCodeplug::GeneralSettingsElement
+  class GeneralSettingsElement: public DM1701Codeplug::GeneralSettingsElement
   {
   protected:
     /** Hidden constructor. */
@@ -210,38 +178,6 @@ public:
     /** Enables/disables the keypad tones. */
     virtual void enableKeypadTones(bool enable);
 
-    /** Returns @c true, if VFO A is in channel mode. */
-    virtual bool channelModeA() const;
-    /** Enables/disables the channel mode for VFO A. */
-    virtual void enableChannelModeA(bool enable);
-    /** Returns @c true, if VFO B is in channel mode. */
-    virtual bool channelModeB() const;
-    /** Enables/disables the channel mode for VFO B. */
-    virtual void enableChannelModeB(bool enable);
-
-    /** Returns @c true, if the radio is in channel (and not VFO) mode. */
-    virtual bool channelMode() const;
-    /** Enable/disable channel mode. */
-    virtual void enableChannelMode(bool enable);
-
-    /** Returns @c true if group-call match is enabled. */
-    virtual bool groupCallMatch() const;
-    /** Enables/disables group-call match. */
-    virtual void enableGroupCallMatch(bool enable);
-    /** Returns @c true if private-call match is enabled. */
-    virtual bool privateCallMatch() const;
-    /** Enables/disables private-call match. */
-    virtual void enablePrivateCallMatch(bool enable);
-
-    /** Returns the time-zone. */
-    virtual QTimeZone timeZone() const;
-    /** Sets the time-zone. */
-    virtual void setTimeZone(const QTimeZone &zone);
-
-    /** Returns the channel hang time. */
-    virtual unsigned channelHangTime() const;
-    /** Sets the channel hang time. */
-    virtual void setChannelHangTime(unsigned dur);
     /** Returns @c true, if public zone is enabled. */
     virtual bool publicZone() const;
     /** Enables/disables public zone. */

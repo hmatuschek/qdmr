@@ -9,6 +9,7 @@
 #include "md390.hh"
 #include "uv390.hh"
 #include "md2017.hh"
+#include "dm1701.hh"
 #include "opengd77.hh"
 #include "d868uv.hh"
 #include "d878uv.hh"
@@ -399,6 +400,8 @@ Radio::detect(const RadioInfo &force, const ErrorStack &err) {
         return new UV390(dfu);
       } else if ((id.isValid() && (RadioInfo::MD2017 == id.id())) || (force.isValid() && (RadioInfo::MD2017 == force.id()))) {
         return new MD2017(dfu);
+      } else if ((id.isValid() && (RadioInfo::DM1701 == id.id())) || (force.isValid() && (RadioInfo::DM1701 == force.id()))) {
+        return new DM1701(dfu);
       } else {
         dfu->close();
         dfu->deleteLater();

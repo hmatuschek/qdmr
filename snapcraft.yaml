@@ -10,11 +10,11 @@ description: |
   qDMR is a simple to use and feature-rich code-plug programming software (CPS) for cheap DMR
   radios. Currently supported devices are:
    * TYT MD-390, MD-UV390, MD-2017
-   * Retevis RT8, RT82, RT3S
+   * Retevis RT8, RT82, RT3, RT3S, RT84
    * Open GD77 firmware (GD77, RD-5R & DM-1801)
    * AnyTone AT-D868UVE, AT-D878UV AT-D878UVII, AT-D578UV
    * Radioddity GD77, RD-5R
-   * Baofeng DMR-6X2
+   * Baofeng DMR-6X2, DM-1701
 
 confinement: strict
 base: core20

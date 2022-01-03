@@ -15,7 +15,7 @@
  *   - 250 zones, 64 channels each (A & B)
  *   - 250 scan lists, 31 channels each
  *   - ...
- * @ingroup dsc */
+ * @ingroup tyt */
 #ifndef DM1701_HH
 #define DM1701_HH
 
@@ -23,7 +23,7 @@
 #include "tyt_radio.hh"
 #include "tyt_codeplug.hh"
 #include "tyt_callsigndb.hh"
-#include "uv390_codeplug.hh"
+#include "dm1701_codeplug.hh"
 #include "uv390_callsigndb.hh"
 
 
@@ -47,13 +47,15 @@ public:
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
+  /** Returns the default radio information. The actual instance may have different properties
+   * due to variants of the same radio. */
+  static RadioInfo defaultRadioInfo();
+
 protected:
   /** The device identifier. */
 	QString _name;
   /** The actual binary codeplug representation. */
-	UV390Codeplug _codeplug;
-  /** The acutal binary callsign-db representation. */
-  UV390CallsignDB _callsigns;
+  DM1701Codeplug _codeplug;
 };
 
 #endif // DM1701_HH

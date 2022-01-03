@@ -81,7 +81,14 @@ RD5RCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
 
   if (c->is<AnalogChannel>()) {
     const AnalogChannel *ac = c->as<AnalogChannel>();
-    setSquelch(ac->squelch());
+    if (ac->defaultSquelch())
+      setSquelch(ctx.config()->settings()->squelch());
+    else if (ac->squelchDisabled())
+      setSquelch(0);
+    else
+      setSquelch(ac->squelch());
+  } else {
+    setSquelch(ctx.config()->settings()->squelch());
   }
 
   return true;

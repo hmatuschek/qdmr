@@ -48,8 +48,7 @@ DFUDevice::DFUDevice(unsigned vid, unsigned pid, const ErrorStack &err, QObject 
 
   if (! (_dev = libusb_open_device_with_vid_pid(_ctx, vid, pid))) {
     errMsg(err) << "Cannot open device " << QString::number(vid, 16)
-                << ":" << QString::number(pid, 16)
-                << ": " << libusb_strerror((enum libusb_error) error);
+                << ":" << QString::number(pid, 16) << ".";
     libusb_exit(_ctx);
     _ctx = nullptr;
     return;

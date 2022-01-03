@@ -14,6 +14,7 @@
 #define CHANNEL_SIZE      0x000040
 #define SETTINGS_SIZE     0x000090
 #define CONTACT_SIZE      0x000024
+#define MENUSETTINGS_SIZE 0x000010
 
 
 /* ******************************************************************************************** *
@@ -962,12 +963,12 @@ TyTCodeplug::ScanListElement::setHoldTime(unsigned time) {
 
 unsigned
 TyTCodeplug::ScanListElement::prioritySampleTime() const {
-  return unsigned(getUInt8(0x27))*250;
+  return unsigned(getUInt8(0x28))*250;
 }
 
 void
 TyTCodeplug::ScanListElement::setPrioritySampleTime(unsigned time) {
-  setUInt8(0x27, time/250);
+  setUInt8(0x28, time/250);
 }
 
 uint16_t
@@ -1035,9 +1036,9 @@ TyTCodeplug::ScanListElement::toScanListObj(Context &ctx) {
     return nullptr;
 
   ScanList *lst = new ScanList(name());
+
   TyTScanListExtension *ex = new TyTScanListExtension();
   lst->setTyTScanListExtension(ex);
-
   ex->setHoldTime(holdTime());
   ex->setPrioritySampleTime(prioritySampleTime());
 
@@ -1461,11 +1462,11 @@ TyTCodeplug::GeneralSettingsElement::pcProgPasswordEnabled() const {
 }
 QString
 TyTCodeplug::GeneralSettingsElement::pcProgPassword() const {
-  return readASCII(0x60, 8);
+  return readASCII(0x60, 8, 0xff);
 }
 void
 TyTCodeplug::GeneralSettingsElement::setPCProgPassword(const QString &pass) {
-  writeASCII(0x60, pass, 8);
+  writeASCII(0x60, pass, 8, 0xff);
 }
 void
 TyTCodeplug::GeneralSettingsElement::pcProgPasswordDisable() {
@@ -1777,7 +1778,7 @@ TyTCodeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr, size_t size)
 }
 
 TyTCodeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x10)
+  : Element(ptr, MENUSETTINGS_SIZE)
 {
   // pass...
 }
@@ -1794,23 +1795,23 @@ TyTCodeplug::MenuSettingsElement::clear() {
   enableCallAlert(true);
   enableContactEditing(true);
   enableManualDial(true);
-  enableContactRadioCheck(false);
+  enableRemoteRadioCheck(false);
   enableRemoteMonitor(false);
-  enableRadioEnable(false);
-  enableRadioDisable(false);
+  enableRemoteRadioEnable(false);
+  enableRemoteRadioDisable(false);
 
   setBit(0x02, 0, false);
   enableScan(true);
-  enableEditScanlist(true);
+  enableScanListEditing(true);
   enableCallLogMissed(true);
   enableCallLogAnswered(true);
   enableCallLogOutgoing(true);
   enableTalkaround(false);
-  enableToneAlert(true);
+  enableAlertTone(true);
 
   enablePower(true);
   enableBacklight(true);
-  enableIntroScreen(true);
+  enableBootScreen(true);
   enableKeypadLock(true);
   enableLEDIndicator(true);
   enableSquelch(true);
@@ -1819,13 +1820,12 @@ TyTCodeplug::MenuSettingsElement::clear() {
 
   enablePassword(false);
   enableDisplayMode(true);
-  enableProgramRadio(true);
+  enableRadioProgramming(true);
   setBit(0x04, 3, true);
-  enableGPSInformation(true);
+  setBit(0x04, 1, true);
   setBit(0x04, 5, true);
   setBit(0x04, 6, true);
   setBit(0x04, 7, true);
-
   setUInt8(0x05, 0xfb);
   setUInt8(0x06, 0xff);
 
@@ -1886,11 +1886,11 @@ TyTCodeplug::MenuSettingsElement::enableManualDial(bool enable) {
 }
 
 bool
-TyTCodeplug::MenuSettingsElement::contactRadioCheck() const {
+TyTCodeplug::MenuSettingsElement::remoteRadioCheck() const {
   return getBit(0x01, 4);
 }
 void
-TyTCodeplug::MenuSettingsElement::enableContactRadioCheck(bool enable) {
+TyTCodeplug::MenuSettingsElement::enableRemoteRadioCheck(bool enable) {
   setBit(0x01, 4, enable);
 }
 
@@ -1904,20 +1904,20 @@ TyTCodeplug::MenuSettingsElement::enableRemoteMonitor(bool enable) {
 }
 
 bool
-TyTCodeplug::MenuSettingsElement::radioEnable() const {
+TyTCodeplug::MenuSettingsElement::remoteRadioEnable() const {
   return getBit(0x01, 6);
 }
 void
-TyTCodeplug::MenuSettingsElement::enableRadioEnable(bool enable) {
+TyTCodeplug::MenuSettingsElement::enableRemoteRadioEnable(bool enable) {
   setBit(0x01, 6, enable);
 }
 
 bool
-TyTCodeplug::MenuSettingsElement::radioDisable() const {
+TyTCodeplug::MenuSettingsElement::remoteRadioDisable() const {
   return getBit(0x01, 7);
 }
 void
-TyTCodeplug::MenuSettingsElement::enableRadioDisable(bool enable) {
+TyTCodeplug::MenuSettingsElement::enableRemoteRadioDisable(bool enable) {
   setBit(0x01, 7, enable);
 }
 
@@ -1931,11 +1931,11 @@ TyTCodeplug::MenuSettingsElement::enableScan(bool enable) {
 }
 
 bool
-TyTCodeplug::MenuSettingsElement::editScanlist() const {
+TyTCodeplug::MenuSettingsElement::scanListEditing() const {
   return getBit(0x02, 2);
 }
 void
-TyTCodeplug::MenuSettingsElement::enableEditScanlist(bool enable) {
+TyTCodeplug::MenuSettingsElement::enableScanListEditing(bool enable) {
   setBit(0x02, 2, enable);
 }
 
@@ -1976,11 +1976,11 @@ TyTCodeplug::MenuSettingsElement::enableTalkaround(bool enable) {
 }
 
 bool
-TyTCodeplug::MenuSettingsElement::toneAlert() const {
+TyTCodeplug::MenuSettingsElement::alertTone() const {
   return getBit(0x02, 7);
 }
 void
-TyTCodeplug::MenuSettingsElement::enableToneAlert(bool enable) {
+TyTCodeplug::MenuSettingsElement::enableAlertTone(bool enable) {
   setBit(0x02, 7, enable);
 }
 
@@ -2003,11 +2003,11 @@ TyTCodeplug::MenuSettingsElement::enableBacklight(bool enable) {
 }
 
 bool
-TyTCodeplug::MenuSettingsElement::introScreen() const {
+TyTCodeplug::MenuSettingsElement::bootScreen() const {
   return getBit(0x03, 2);
 }
 void
-TyTCodeplug::MenuSettingsElement::enableIntroScreen(bool enable) {
+TyTCodeplug::MenuSettingsElement::enableBootScreen(bool enable) {
   setBit(0x03, 2, enable);
 }
 
@@ -2066,22 +2066,96 @@ TyTCodeplug::MenuSettingsElement::enableDisplayMode(bool enable) {
 }
 
 bool
-TyTCodeplug::MenuSettingsElement::programRadio() const {
+TyTCodeplug::MenuSettingsElement::radioProgramming() const {
   return ! getBit(0x04, 2);
 }
 void
-TyTCodeplug::MenuSettingsElement::enableProgramRadio(bool enable) {
+TyTCodeplug::MenuSettingsElement::enableRadioProgramming(bool enable) {
   setBit(0x04, 2, !enable);
 }
 
+
 bool
-TyTCodeplug::MenuSettingsElement::gpsInformation() const {
-  return !getBit(0x04, 4);
+TyTCodeplug::MenuSettingsElement::fromConfig(const Config *config) {
+  if (nullptr == config->tytExtension())
+    return true;
+
+  TyTMenuSettings *ex = config->tytExtension()->menuSettings();
+  if (ex->hangtimeIsInfinite())
+    infiniteMenuHangtime();
+  else
+    setMenuHangtime(ex->hangTime());
+  enableTextMessage(ex->textMessage());
+  enableCallAlert(ex->callAlert());
+  enableContactEditing(ex->contactEditing());
+  enableManualDial(ex->manualDial());
+  enableRemoteRadioCheck(ex->remoteRadioCheck());
+  enableRemoteMonitor(ex->remoteMonitor());
+  enableRemoteRadioEnable(ex->remoteRadioEnable());
+  enableRemoteRadioDisable(ex->remoteRadioDisable());
+  enableScan(ex->scan());
+  enableScanListEditing(ex->scanListEditing());
+  enableCallLogMissed(ex->callLogMissed());
+  enableCallLogAnswered(ex->callLogAnswered());
+  enableCallLogOutgoing(ex->callLogOutgoing());
+  enableTalkaround(ex->talkaround());
+  enableAlertTone(ex->alertTone());
+  enablePower(ex->power());
+  enableBacklight(ex->backlight());
+  enableBootScreen(ex->bootScreen());
+  enableKeypadLock(ex->keypadLock());
+  enableLEDIndicator(ex->ledIndicator());
+  enableSquelch(ex->squelch());
+  enableVOX(ex->vox());
+  enablePassword(ex->password());
+  enableDisplayMode(ex->displayMode());
+  enableRadioProgramming(ex->radioProgramming());
+
+  return true;
 }
-void
-TyTCodeplug::MenuSettingsElement::enableGPSInformation(bool enable) {
-  setBit(0x04, 4, !enable);
+
+bool
+TyTCodeplug::MenuSettingsElement::updateConfig(Config *config) {
+  TyTConfigExtension *ext = config->tytExtension();
+  if (nullptr == ext) {
+    ext = new TyTConfigExtension(config);
+    config->setTyTExtension(ext);
+  }
+
+  TyTMenuSettings *ex = ext->menuSettings();
+  if (menuHangtimeIsInfinite())
+    ex->setHangtimeInfinite(true);
+  else
+    ex->setHangTime(menuHangtime());
+  ex->enableTextMessage(textMessage());
+  ex->enableCallAlert(callAlert());
+  ex->enableContactEditing(contactEditing());
+  ex->enableManualDial(manualDial());
+  ex->enableRemoteRadioCheck(remoteRadioCheck());
+  ex->enableRemoteMonitor(remoteMonitor());
+  ex->enableRemoteRadioEnable(remoteRadioEnable());
+  ex->enableRemoteRadioDisable(remoteRadioDisable());
+  ex->enableScan(scan());
+  ex->enableScanListEditing(scanListEditing());
+  ex->enableCallLogMissed(callLogMissed());
+  ex->enableCallLogAnswered(callLogAnswered());
+  ex->enableCallLogOutgoing(callLogOutgoing());
+  ex->enableTalkaround(talkaround());
+  ex->enableAlertTone(alertTone());
+  ex->enablePower(power());
+  ex->enableBacklight(backlight());
+  ex->enableBootScreen(bootScreen());
+  ex->enableKeypadLock(keypadLock());
+  ex->enableLEDIndicator(ledIndicator());
+  ex->enableSquelch(squelch());
+  ex->enableVOX(vox());
+  ex->enablePassword(password());
+  ex->enableDisplayMode(displayMode());
+  ex->enableRadioProgramming(radioProgramming());
+
+  return true;
 }
+
 
 /* ******************************************************************************************** *
  * Implementation of TyTCodeplug::ButtonSettingsElement
@@ -2177,8 +2251,11 @@ TyTCodeplug::ButtonSettingsElement::fromConfig(const Config *config) {
 
 bool
 TyTCodeplug::ButtonSettingsElement::updateConfig(Config *config) {
-  TyTConfigExtension *ext = new TyTConfigExtension(config);
-  config->setTyTExtension(ext);
+  TyTConfigExtension *ext = config->tytExtension();
+  if (nullptr == ext) {
+    ext = new TyTConfigExtension(config);
+    config->setTyTExtension(ext);
+  }
 
   ext->buttonSettings()->setSideButton1Short(sideButton1Short());
   ext->buttonSettings()->setSideButton1Long(sideButton1Long());

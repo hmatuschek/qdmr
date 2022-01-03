@@ -14,6 +14,8 @@
 #include "uv390_filereader.hh"
 #include "md2017_codeplug.hh"
 #include "md2017_filereader.hh"
+#include "dm1701_codeplug.hh"
+#include "dm1701_filereader.hh"
 #include "rd5r_codeplug.hh"
 #include "rd5r_filereader.hh"
 #include "gd77_codeplug.hh"
@@ -89,6 +91,24 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     MD2017Codeplug codeplug;
     if (parser.isSet("manufacturer")) {
       if (! MD2017FileReader::read(filename, &codeplug, errorMessage)) {
+        logError() << "Cannot decode manufacturer codeplug file '" << filename
+                   << "': " << errorMessage;
+        return -1;
+      }
+    } else if (! codeplug.read(filename, err)) {
+      logError() << "Cannot decode binary codeplug file '" << filename
+                 << "' : " << err.format();
+      return -1;
+    }
+    if (! codeplug.decode(&config, err)) {
+      logError() << "Cannot decode binary codeplug file '" << filename
+                 << "': " << err.format();
+      return -1;
+    }
+  } else if (RadioInfo::DM1701 == radio) {
+    DM1701Codeplug codeplug;
+    if (parser.isSet("manufacturer")) {
+      if (! DM1701FileReader::read(filename, &codeplug, errorMessage)) {
         logError() << "Cannot decode manufacturer codeplug file '" << filename
                    << "': " << errorMessage;
         return -1;

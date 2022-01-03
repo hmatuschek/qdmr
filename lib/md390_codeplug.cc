@@ -26,6 +26,7 @@
 #define ADDR_SETTINGS           0x002040
 #define ADDR_BOOTSETTINGS       0x02f000
 #define ADDR_MENUSETTINGS       0x0020f0
+#define MENUSETTINGS_SIZE       0x000010
 #define ADDR_BUTTONSETTINGS     0x002100
 #define ADDR_PRIVACY_KEYS       0x0059c0
 
@@ -47,36 +48,22 @@
  * Implementation of MD390Codeplug::ChannelElement
  * ********************************************************************************************* */
 MD390Codeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
-  : TyTCodeplug::ChannelElement::ChannelElement(ptr, size)
+  : DM1701Codeplug::ChannelElement::ChannelElement(ptr, size)
 {
   // pass...
 }
 
 MD390Codeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : TyTCodeplug::ChannelElement(ptr, CHANNEL_SIZE)
+  : DM1701Codeplug::ChannelElement(ptr, CHANNEL_SIZE)
 {
   // pass...
 }
 
 void
 MD390Codeplug::ChannelElement::clear() {
-  TyTCodeplug::ChannelElement::clear();
+  DM1701Codeplug::ChannelElement::clear();
 
-  enableTightSquelch(false);
   enableCompressedUDPHeader(false);
-  enableReverseBurst(true);
-  setPower(Channel::Power::High);
-  setUInt8(0x0005, 0xc3);
-  setUInt8(0x000f, 0xff);
-}
-
-bool
-MD390Codeplug::ChannelElement::tightSquelchEnabled() const {
-  return !getBit(0x0000, 5);
-}
-void
-MD390Codeplug::ChannelElement::enableTightSquelch(bool enable) {
-  setBit(0x0000, 5, !enable);
 }
 
 bool
@@ -88,64 +75,83 @@ MD390Codeplug::ChannelElement::enableCompressedUDPHeader(bool enable) {
   setBit(0x0003, 6, !enable);
 }
 
-bool
-MD390Codeplug::ChannelElement::reverseBurst() const {
-  return getBit(0x0004, 2);
-}
-void
-MD390Codeplug::ChannelElement::enableReverseBurst(bool enable) {
-  setBit(0x0004, 2, enable);
-}
-
-Channel::Power
-MD390Codeplug::ChannelElement::power() const {
-  if (getBit(0x0004, 5))
-    return Channel::Power::High;
-  return Channel::Power::Low;
-}
-void
-MD390Codeplug::ChannelElement::setPower(Channel::Power pwr) {
-  switch (pwr) {
-  case Channel::Power::Min:
-  case Channel::Power::Low:
-  case Channel::Power::Mid:
-    setBit(0x0004, 5, false);
-    break;
-  case Channel::Power::High:
-  case Channel::Power::Max:
-    setBit(0x0004, 5, true);
-  }
-}
-
 Channel *
 MD390Codeplug::ChannelElement::toChannelObj() const {
-  Channel *ch = TyTCodeplug::ChannelElement::toChannelObj();
+  Channel *ch = DM1701Codeplug::ChannelElement::toChannelObj();
   if (nullptr == ch)
     return ch;
 
-  ch->setPower(power());
-
   // Apply extension
   if (ch->tytChannelExtension()) {
-    ch->tytChannelExtension()->enableTightSquelch(tightSquelchEnabled());
     ch->tytChannelExtension()->enableCompressedUDPHeader(compressedUDPHeader());
-    ch->tytChannelExtension()->enableReverseBurst(reverseBurst());
   }
   return ch;
 }
 
 void
 MD390Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  TyTCodeplug::ChannelElement::fromChannelObj(c, ctx);
-
-  setPower(c->power());
+  DM1701Codeplug::ChannelElement::fromChannelObj(c, ctx);
 
   // apply extensions (extension will be created in TyTCodeplug::ChannelElement::fromChannelObj)
   if (TyTChannelExtension *ex = c->tytChannelExtension()) {
-    enableTightSquelch(ex->tightSquelch());
     enableCompressedUDPHeader(ex->compressedUDPHeader());
-    enableReverseBurst(ex->reverseBurst());
   }
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of MD390Codeplug::MenuSettingsElement
+ * ******************************************************************************************** */
+MD390Codeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr, size_t size)
+  : TyTCodeplug::MenuSettingsElement(ptr, size)
+{
+  // pass...
+}
+
+MD390Codeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr)
+  : TyTCodeplug::MenuSettingsElement(ptr, MENUSETTINGS_SIZE)
+{
+  // pass...
+}
+
+void
+MD390Codeplug::MenuSettingsElement::clear() {
+  TyTCodeplug::MenuSettingsElement::clear();
+
+  enableGPSInformation(true);
+}
+
+bool
+MD390Codeplug::MenuSettingsElement::gpsInformation() const {
+  return !getBit(0x04, 4);
+}
+void
+MD390Codeplug::MenuSettingsElement::enableGPSInformation(bool enable) {
+  setBit(0x04, 4, !enable);
+}
+
+bool
+MD390Codeplug::MenuSettingsElement::fromConfig(const Config *config) {
+  if (! TyTCodeplug::MenuSettingsElement::fromConfig(config))
+    return false;
+
+  if (TyTConfigExtension *ex = config->tytExtension()) {
+     enableGPSInformation(ex->menuSettings()->gpsInformation());
+  }
+
+  return true;
+}
+
+bool
+MD390Codeplug::MenuSettingsElement::updateConfig(Config *config) {
+  if (! TyTCodeplug::MenuSettingsElement::updateConfig(config))
+    return false;
+
+  if (TyTConfigExtension *ex = config->tytExtension()) {
+    ex->menuSettings()->enableGPSInformation(gpsInformation());
+  }
+
+  return true;
 }
 
 

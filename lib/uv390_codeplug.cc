@@ -262,102 +262,16 @@ UV390Codeplug::VFOChannelElement::setStepSize(unsigned ss_Hz) {
 
 
 /* ******************************************************************************************** *
- * Implementation of UV390Codeplug::ZoneElement
- * ******************************************************************************************** */
-UV390Codeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr, size_t size)
-  : Codeplug::Element(ptr, size)
-{
-  // pass...
-}
-
-UV390Codeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr)
-  : Codeplug::Element(ptr, 0x00e0)
-{
-  // pass...
-}
-
-UV390Codeplug::ZoneExtElement::~ZoneExtElement() {
-  // pass...
-}
-
-void
-UV390Codeplug::ZoneExtElement::clear() {
-  memset(_data, 0x00, 0xe0);
-}
-
-uint16_t
-UV390Codeplug::ZoneExtElement::memberIndexA(unsigned n) const {
-  return getUInt16_le(0x00 + 2*n);
-}
-
-void
-UV390Codeplug::ZoneExtElement::setMemberIndexA(unsigned n, uint16_t idx) {
-  setUInt16_le(0x00 + 2*n, idx);
-}
-
-uint16_t
-UV390Codeplug::ZoneExtElement::memberIndexB(unsigned n) const {
-  return getUInt16_le(0x60 + 2*n);
-}
-
-void
-UV390Codeplug::ZoneExtElement::setMemberIndexB(unsigned n, uint16_t idx) {
-  setUInt16_le(0x60 + 2*n, idx);
-}
-
-bool
-UV390Codeplug::ZoneExtElement::fromZoneObj(const Zone *zone, Context &ctx) {
-  // Store remaining channels from list A
-  for (int i=16; i<64; i++) {
-    if (i < zone->A()->count())
-      setMemberIndexA(i-16, ctx.index(zone->A()->get(i)));
-    else
-      setMemberIndexA(i-16, 0);
-  }
-  // Store channel from list B
-  for (int i=0; i<64; i++) {
-    if (i < zone->B()->count())
-      setMemberIndexB(i, ctx.index(zone->B()->get(i)));
-    else
-      setMemberIndexB(i, 0);
-  }
-
-  return true;
-}
-
-bool
-UV390Codeplug::ZoneExtElement::linkZoneObj(Zone *zone, Context &ctx) {
-  for (int i=0; (i<48) && memberIndexA(i); i++) {
-    if (! ctx.has<Channel>(memberIndexA(i))) {
-      logError() << "Cannot link zone extension: Channel index " << memberIndexA(i) << " not defined.";
-      return false;
-    }
-    zone->A()->add(ctx.get<Channel>(memberIndexA(i)));
-  }
-
-  for (int i=0; (i<64) && memberIndexB(i); i++) {
-    if (! ctx.has<Channel>(memberIndexB(i))) {
-      logWarn() << "Cannot link zone extension: Channel index " << memberIndexB(i) << " not defined.";
-      return false;
-    }
-    zone->B()->add(ctx.get<Channel>(memberIndexB(i)));
-  }
-
-  return true;
-}
-
-
-/* ******************************************************************************************** *
  * Implementation of UV390Codeplug::GeneralSettingsElement
  * ******************************************************************************************** */
 UV390Codeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, size_t size)
-  : TyTCodeplug::GeneralSettingsElement(ptr, size)
+  : DM1701Codeplug::GeneralSettingsElement(ptr, size)
 {
   // pass...
 }
 
 UV390Codeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : TyTCodeplug::GeneralSettingsElement(ptr, SETTINGS_SIZE)
+  : DM1701Codeplug::GeneralSettingsElement(ptr, SETTINGS_SIZE)
 {
   // pass...
 }
@@ -369,18 +283,10 @@ UV390Codeplug::GeneralSettingsElement::clear() {
   setTransmitMode(DESIGNED_AND_HAND_CH);
   enableChannelVoiceAnnounce(false);
   setBit(0x43,0, 1); setBit(0x43,1, 1);
-  enableChannelModeA(true);
   setUInt4(0x43,3, 0xf);
-  enableChannelModeB(true);
 
-  enableChannelMode(true);
-
-  enableGroupCallMatch(false);
-  enablePrivateCallMatch(false);
   setBit(0x6b, 2, 1);
-  setTimeZone(QTimeZone::systemTimeZone());
 
-  setChannelHangTime(3000);
   setUInt8(0x91, 0xff); setUInt2(0x92, 0, 0x03);
   enablePublicZone(true);
   setUInt5(0x92, 3, 0x1f);
@@ -423,69 +329,6 @@ UV390Codeplug::GeneralSettingsElement::enableKeypadTones(bool enable) {
 }
 
 bool
-UV390Codeplug::GeneralSettingsElement::channelModeA() const {
-  return getBit(0x43,3);
-}
-void
-UV390Codeplug::GeneralSettingsElement::enableChannelModeA(bool enable) {
-  setBit(0x43,3, enable);
-}
-
-bool
-UV390Codeplug::GeneralSettingsElement::channelModeB() const {
-  return getBit(0x43,7);
-}
-void
-UV390Codeplug::GeneralSettingsElement::enableChannelModeB(bool enable) {
-  setBit(0x43,7, enable);
-}
-
-bool
-UV390Codeplug::GeneralSettingsElement::channelMode() const {
-  return 0xff == getUInt8(0x57);
-}
-void
-UV390Codeplug::GeneralSettingsElement::enableChannelMode(bool enable) {
-  setUInt8(0x57, enable ? 0xff : 0x00);
-}
-
-bool
-UV390Codeplug::GeneralSettingsElement::groupCallMatch() const {
-  return getBit(0x6b, 0);
-}
-void
-UV390Codeplug::GeneralSettingsElement::enableGroupCallMatch(bool enable) {
-  setBit(0x6b, 0, enable);
-}
-bool
-UV390Codeplug::GeneralSettingsElement::privateCallMatch() const {
-  return getBit(0x6b, 1);
-}
-void
-UV390Codeplug::GeneralSettingsElement::enablePrivateCallMatch(bool enable) {
-  setBit(0x6b, 1, enable);
-}
-
-QTimeZone
-UV390Codeplug::GeneralSettingsElement::timeZone() const {
-  return QTimeZone((int(getUInt5(0x6b, 3))-12)*3600);
-}
-void
-UV390Codeplug::GeneralSettingsElement::setTimeZone(const QTimeZone &zone) {
-  int idx = (zone.standardTimeOffset(QDateTime::currentDateTime())/3600)+12;
-  setUInt5(0x6b, 3, uint8_t(idx));
-}
-
-unsigned
-UV390Codeplug::GeneralSettingsElement::channelHangTime() const {
-  return unsigned(getUInt8(0x90))*100;
-}
-void
-UV390Codeplug::GeneralSettingsElement::setChannelHangTime(unsigned dur) {
-  setUInt8(0x90, dur/100);
-}
-
-bool
 UV390Codeplug::GeneralSettingsElement::publicZone() const {
   return getBit(0x92, 2);
 }
@@ -523,7 +366,7 @@ UV390Codeplug::GeneralSettingsElement::enableEditRadioID(bool enable) {
 
 bool
 UV390Codeplug::GeneralSettingsElement::fromConfig(const Config *config) {
-  if (! TyTCodeplug::GeneralSettingsElement::fromConfig(config))
+  if (! DM1701Codeplug::GeneralSettingsElement::fromConfig(config))
     return false;
 
   setTimeZone(QTimeZone::systemTimeZone());
@@ -534,7 +377,7 @@ UV390Codeplug::GeneralSettingsElement::fromConfig(const Config *config) {
 
 bool
 UV390Codeplug::GeneralSettingsElement::updateConfig(Config *config) {
-  if (! TyTCodeplug::GeneralSettingsElement::updateConfig(config))
+  if (! DM1701Codeplug::GeneralSettingsElement::updateConfig(config))
     return false;
   config->settings()->setMicLevel(micLevel());
   config->settings()->enableSpeech(channelVoiceAnnounce());

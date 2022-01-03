@@ -51,13 +51,13 @@ static Radio::Features _dm1701_features =
   .maxChannelsInRoamingZone = 0,
 
   .hasCallsignDB = true,
-  .callsignDBImplemented = true,
+  .callsignDBImplemented = false,
   .maxCallsignsInDB = 122197
 };
 
 
 DM1701::DM1701(TyTInterface *device, QObject *parent)
-  : TyTRadio(device, parent), _name("Baofeng DM-1701"), _codeplug(), _callsigns()
+  : TyTRadio(device, parent), _name("Baofeng DM-1701"), _codeplug()
 {
   // pass...
 }
@@ -70,6 +70,12 @@ DM1701::name() const {
 const Radio::Features &
 DM1701::features() const {
   return _dm1701_features;
+}
+
+RadioInfo
+DM1701::defaultRadioInfo() {
+  return RadioInfo(
+        RadioInfo::DM1701, "dm1701", "DM-1701", "Baofeng");
 }
 
 const Codeplug &

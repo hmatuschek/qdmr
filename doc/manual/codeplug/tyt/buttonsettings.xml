@@ -16,19 +16,21 @@
   here. 
 </para>
 
-<para>
-  This extension is applicable to the TyT MD-390, MD-UV380, MD-UV390, MD-2017 and Retevis RT8, 
-  RT3S, RT82 radios.
-</para>
-
 <example>
   <title></title>
-  <programlisting><![CDATA[tytButtonSettings:
-  sideButton1Short: Disabled
-  sideButton1Long: Tone1750Hz
-  sideButton2Short: MonitorToggle
-  sideButton2Long: Disabled
-  longPressDuration: 1000 
+  <programlisting><![CDATA[tytExtension:
+  buttonSettings:
+    longPressDuration: 1000 
+    sideButton1Short: Disabled
+    sideButton1Long: Tone1750Hz
+    sideButton2Short: MonitorToggle
+    sideButton2Long: Disabled
+    sideButton3Short: Disabled
+    sideButton3Long: Disabled
+    progButton1Short: Disabled
+    progButton1Long: Disabled
+    progButton2Short: Disabled
+    progButton2Long: Disabled
 ]]></programlisting>
 </example>
 
@@ -39,6 +41,12 @@
     <term><token>sideButton1Long</token></term>
     <term><token>sideButton2Short</token></term>
     <term><token>sideButton2Long</token></term>
+    <term><token>sideButton3Short</token> (Retevis RT84, Baofeng DM-1701)</term>
+    <term><token>sideButton3Long</token> (Retevis RT84, Baofeng DM-1701)</term>
+    <term><token>progButton1Short</token> (Retevis RT84, Baofeng DM-1701)</term>
+    <term><token>progButton1Long</token> (Retevis RT84, Baofeng DM-1701)</term>
+    <term><token>progButton2Short</token> (Retevis RT84, Baofeng DM-1701)</term>
+    <term><token>progButton2Long</token> (Retevis RT84, Baofeng DM-1701)</term>
     <listitem>
       <para>Specifies the different functions for each button press. Must be one of:
         <token>Disabled</token>, <token>ToggleAllAlertTones</token>, <token>EmergencyOn</token>, 

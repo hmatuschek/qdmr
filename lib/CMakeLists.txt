@@ -16,7 +16,7 @@ SET(libdmrconf_SOURCES
     md2017.cc md2017_codeplug.cc md2017_callsigndb.cc md2017_filereader.cc
     md390.cc md390_codeplug.cc md390_filereader.cc
     uv390.cc uv390_codeplug.cc uv390_callsigndb.cc uv390_filereader.cc
-    dm1701.cc
+    dm1701.cc dm1701_codeplug.cc dm1701_filereader.cc
     radioddity_radio.cc radioddity_codeplug.cc radioddity_interface.cc
     rd5r.cc rd5r_codeplug.cc rd5r_filereader.cc
     gd77.cc gd77_codeplug.cc gd77_callsigndb.cc gd77_filereader.cc
@@ -35,7 +35,7 @@ SET(libdmrconf_MOC_HEADERS
     md2017.hh md2017_codeplug.hh md2017_callsigndb.hh
     md390.hh md390_codeplug.hh
     uv390.hh uv390_codeplug.hh uv390_callsigndb.hh
-    dm1701.hh
+    dm1701.hh dm1701_codeplug.hh dm1701_filereader.hh
     radioddity_radio.hh radioddity_codeplug.hh radioddity_interface.hh
     rd5r.hh rd5r_codeplug.hh
     gd77.hh gd77_codeplug.hh gd77_callsigndb.hh

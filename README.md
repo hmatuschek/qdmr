@@ -22,6 +22,7 @@ Currently, there are only few radios that are supported
   * Anytone AT-D868UVE (since version 0.7.0)
   * Anytone AT-D878UVII (since version 0.8.0)
   * Anytone AT-D578UV (since version 0.8.0)
+  * BTECH DM-1701 / Retevis RT84 (since version 0.10.0)
   * BTECH DMR-6x2 (since version 0.5.0)
 
 A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available. 

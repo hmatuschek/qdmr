@@ -366,8 +366,8 @@ AnalogChannel::copy(const ConfigItem &other) {
   if ((nullptr==c) || (! Channel::copy(other)))
     return false;
 
-  if (c->defaultSquelch())
-    setSquelchDefault();
+  setRXTone(c->rxTone());
+  setTXTone(c->txTone());
 
   return true;
 }

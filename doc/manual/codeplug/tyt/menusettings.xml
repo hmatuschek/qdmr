@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xmlid="extTyTMenuSettings"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Menu settings extension</title>  
+</info>
+
+<para>
+  This extension to the codeplug allows to specify which menu items are enabled. This feature is 
+  frequently used in commercial applications to restrict the user to change certain settings in
+  the radio.
+</para>
+
+<example>
+  <title></title>
+  <programlisting><![CDATA[tytExtension:
+  menuSettings:
+    hangtimeIsInfinite: false
+    hangTime: 10
+    textMessage: true
+    callAlert: true
+    contactEditing: true
+    manualDial: true
+    remoteRadioCheck: true
+    remoteMonitor: true
+    remoteRadioEnable: true
+    remoteRadioDisable: true
+    scan: true
+    scanListEditing: true
+    callLogMissed: true
+    callLogAnswered: true
+    callLogOutgoing: true
+    talkaround: true
+    alertTone: true
+    power: true
+    backlight: true
+    bootScreen: true
+    keypadLock: true
+    ledIndicator: true
+    squelch: true
+    vox: true
+    password: true
+    displayMode: true
+    radioProgramming: true
+    gpsInformation: true
+]]></programlisting>
+</example>
+
+<variablelist>
+  <title>Menu settings fields</title>
+  <varlistentry>
+    <term><token>hangtimeIsInfinite</token></term>
+    <term><token>hangTime</token></term>
+    <listitem>
+      <para>
+        Specify the menu hang time. That is the duration, the menu is shown without any user 
+        action. If <token>hangtimeIsInfinite</token> is <token>true</token>, the menu is shown 
+        indefinitely, irrespective of the <token>hangTime</token> setting. If 
+        <token>hangtimeIsInfinite</token>  is <token>false</token>, the <token>hangTime</token> 
+        specifies the menu hang time in seconds.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>textMessage</token></term>
+    <listitem>
+      <para>Enables the text-messaging menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>callAlert</token></term>
+    <listitem>
+      <para>Enables the call alert menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>contactEditing</token></term>
+    <listitem>
+      <para>Enables the contact editing menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>manualDial</token></term>
+    <listitem>
+      <para>Enables manual dial.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>remoteRadioCheck</token></term>
+    <listitem>
+      <para>Enables the remote radio-check menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>remoteMonitor</token></term>
+    <listitem>
+      <para>Enables the remote monitor menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>remoteRadioEnable</token></term>
+    <term><token>remoteRadioDisable</token></term>
+    <listitem>
+      <para>Enables the remote radio enable and disable menu items.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>scan</token></term>
+    <term><token>scanListEditing</token></term>
+    <listitem>
+      <para>Enables the scan and scan list editing menu items.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>callLogMissed</token></term>
+    <term><token>callLogAnswered</token></term>
+    <term><token>callLogOutgoing</token></term>
+    <listitem>
+      <para>Enables the menu items for the list of missed, answered and outgoing calls.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>talkaround</token></term>
+    <listitem>
+      <para>Enables the talkaround menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>alertTone</token></term>
+    <listitem>
+      <para>Enables the alert tone settings menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>power</token></term>
+    <listitem>
+      <para>Enables the power settings menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>backlight</token></term>
+    <listitem>
+      <para>Enables the backlight settings menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>bootScreen</token></term>
+    <listitem>
+      <para>Enables the boot-screen settings menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>keypadLock</token></term>
+    <listitem>
+      <para>Enables the keypad lock settings menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ledIndicator</token></term>
+    <listitem>
+      <para>Enables the LED indicator settings menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>squelch</token></term>
+    <listitem>
+      <para>Enables the squelch settings menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>vox</token></term>
+    <listitem>
+      <para>Enables the VOX settings menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>password</token></term>
+    <listitem>
+      <para>Enables the password settings menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>displayMode</token></term>
+    <listitem>
+      <para>Enables the display mode settings menu item.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>radioProgramming</token></term>
+    <listitem>
+      <para>Enables radio programming from the keypad. E.g., editing channels etc.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>gpsInformation</token></term>
+    <listitem>
+      <para>Enables the GPS information menu item. This setting has only an effect on radios 
+        supporting GPS.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</section>

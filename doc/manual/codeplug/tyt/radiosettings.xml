@@ -15,11 +15,6 @@
   extends the <token>settings</token> section of the codeplug. 
 </para>
 
-<para>
-  This extension is applicable to the TyT MD-390, MD-UV380, MD-UV390, MD-2017 and Retevis RT8, 
-  RT3S, RT82 radios.
-</para>
-
 <example>
   <title>TyT radio settings extension showing default values.</title>
   <programlisting><![CDATA[settings:
@@ -35,7 +30,11 @@
     powerSaveMode: true
     wakeupPreamble: true
     bootPicture: true
+    channelMode: true
+    channelModeA: true
+    channelModeB: true
     txPreambleDuration: 600
+    channelHangTime: 3000
     groupCallHangTime: 3000
     privateCallHangTime: 3000
     lowBatteryWarnInterval: 120
@@ -54,6 +53,8 @@
     radioProgPasswordEnabled: false
     radioProgPassword: 0
     pcProgPassword: null
+    privateCallMatch: true
+    groupCallMatch: true
 ]]></programlisting>
 </example>
 
@@ -133,10 +134,30 @@
     </listitem>
   </varlistentry>
   <varlistentry>
+    <term><token>channelMode, channelModeA, channelModeB</token></term>
+    <listitem>
+      <para>
+        Controls the mode of the radio, VFO A and VFO B. If <token>channelMode</token>
+        is <token>true</token>, the entire radio operates in channel mode (memory mode). This also
+        overrides the <token>channelModeA</token> and <token>channelModeB</token> settings. If 
+        <token>channelMode</token> is set to <token>false</token>, the <token>channelModeA</token> 
+        and <token>channelModeB</token> specify the mode for the VFO A and B, respectively.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
     <term><token>txPreambleDuration</token></term>
     <listitem>
       <para>Specifies the transmit preamble duration in milliseconds. If this preamble is the 
         wake-up preamble, is unknown. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>channelHangTime</token></term>
+    <listitem>
+      <para>
+        Specifies the channel hang time in milliseconds.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -262,6 +283,12 @@
     <listitem>
       <para>Specifies the PC programming password. This password is then needed when programming 
         the radio through the CPS. An empty string disables this password. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>privateCallMatch</token>, <token>groupCallMatch</token></term>
+    <listitem>
+      <para>If <token>true</token>, the private and group call IDs must match.</para>
     </listitem>
   </varlistentry>
 </variablelist>
