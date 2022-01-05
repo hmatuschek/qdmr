@@ -1,7 +1,10 @@
 #include "kydera_radio.hh"
+#include "kydera_interface.hh"
 
 #include "config.hh"
 #include "logger.hh"
+
+#define BLOCK_SIZE 0x800 // = 2048 bytes
 
 
 KyderaRadio::KyderaRadio(const QString &name, KyderaInterface *device, QObject *parent)
@@ -16,14 +19,13 @@ KyderaRadio::KyderaRadio(const QString &name, KyderaInterface *device, QObject *
 }
 
 KyderaRadio::~KyderaRadio() {
-  /*if (_dev && _dev->isOpen()) {
-    _dev->reboot();
+  if (_dev && _dev->isOpen()) {
     _dev->close();
   }
   if (_dev) {
     _dev->deleteLater();
     _dev = nullptr;
-  }*/
+  }
 }
 
 const QString &
@@ -56,8 +58,8 @@ KyderaRadio::startDownload(bool blocking, const ErrorStack &err) {
   }
 
   // If non-blocking -> move device to this thread
-  /*if (_dev && _dev->isOpen())
-    _dev->moveToThread(this);*/
+  if (_dev && _dev->isOpen())
+    _dev->moveToThread(this);
   start();
 
   return true;
@@ -81,8 +83,8 @@ KyderaRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &f
   }
 
   // If non-blocking -> move device to this thread
-  /*if (_dev && _dev->isOpen())
-    _dev->moveToThread(this);*/
+  if (_dev && _dev->isOpen())
+    _dev->moveToThread(this);
   start();
 
   return true;
@@ -105,8 +107,8 @@ KyderaRadio::startUploadCallsignDB(UserDatabase *db, bool blocking,
   }
 
   // If non-blocking -> move device to this thread
-  /*if (_dev && _dev->isOpen())
-    _dev->moveToThread(this);*/
+  if (_dev && _dev->isOpen())
+    _dev->moveToThread(this);
   start();
 
   return true;
@@ -124,14 +126,13 @@ KyderaRadio::run() {
     emit downloadStarted();
 
     if (! download()) {
-      //_dev->reboot();
-      //_dev->close();
+      _dev->close();
       _task = StatusError;
       emit downloadError(this);
       return;
     }
 
-    //_dev->close();
+    _dev->close();
     _task = StatusIdle;
     emit downloadFinished(this, _codeplug);
     _config = nullptr;
@@ -145,15 +146,13 @@ KyderaRadio::run() {
     emit uploadStarted();
 
     if (! upload()) {
-      //_dev->reboot();
-      //_dev->close();
+      _dev->close();
       _task = StatusError;
       emit uploadError(this);
       return;
     }
 
-    //_dev->reboot();
-    //_dev->close();
+    _dev->close();
     _task = StatusIdle;
     emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {
@@ -166,15 +165,13 @@ KyderaRadio::run() {
     emit uploadStarted();
 
     if (! uploadCallsigns()) {
-      //_dev->reboot();
-      //_dev->close();
+      _dev->close();
       _task = StatusError;
       emit uploadError(this);
       return;
     }
 
-    //_dev->reboot();
-    //_dev->close();
+    _dev->close();
     _task = StatusIdle;
     emit uploadComplete(this);
   }
@@ -183,22 +180,22 @@ KyderaRadio::run() {
 bool
 KyderaRadio::connect() {
   // Check if there is a connection
-  /*if ((nullptr != _dev) && (_dev->isOpen()))
-    return true;*/
+  if ((nullptr != _dev) && (_dev->isOpen()))
+    return true;
 
   // If there is a connection but it is not open -> close it.
-  /*if (nullptr != _dev)
-    _dev->deleteLater();*/
+  if (nullptr != _dev)
+    _dev->deleteLater();
 
   // If no connection -> open one.
-  /*_dev = new AnytoneInterface(_errorStack);
+  _dev = new KyderaInterface(_errorStack);
   if (! _dev->isOpen()) {
     errMsg(_errorStack) << "Cannot connect to device.";
     _task = StatusError;
     _dev->deleteLater();
     _dev = nullptr;
     return false;
-  }*/
+  }
 
   return true;
 }
@@ -206,47 +203,39 @@ KyderaRadio::connect() {
 bool
 KyderaRadio::download() {
   if (nullptr == _codeplug) {
-    errMsg(_errorStack) << "Cannot download codeplug: Object not created yet.";
+    errMsg(_errorStack) << "Cannot read codeplug: Object not created yet.";
     return false;
   }
 
-  logDebug() << "Download of " << _codeplug->image(0).numElements() << " bitmaps.";
+  logDebug() << "Read entire codeplug (" << _codeplug->image(0).element(0).size() << "b).";
 
-  // Download bitmaps
-  /*for (int n=0; n<_codeplug->image(0).numElements(); n++) {
-    unsigned addr = _codeplug->image(0).element(n).address();
-    unsigned size = _codeplug->image(0).element(n).data().size();
-    if (! _dev->read(0, addr, _codeplug->data(addr), size, _errorStack)) {
-      errMsg(_errorStack) << "Cannot download codeplug.";
+  // Check alignment of codeplug
+  if (! _codeplug->image(0).element(0).isAligned(BLOCK_SIZE)) {
+    errMsg(_errorStack) << "Cannot read codeplug: Codeplug "
+                        << " (addr=" << _codeplug->image(0).element(0).address()
+                        << ", size=" << _codeplug->image(0).element(0).data().size()
+                        << ") is not aligned with blocksize " << BLOCK_SIZE << ".";
+    return false;
+  }
+
+  if (! _dev->read_start(0, _codeplug->image(0).element(0).size(), _errorStack)) {
+    errMsg(_errorStack) << "Cannot read codeplug from device.";
+    return false;
+  }
+
+  // Download codeplug
+  for (unsigned byte=0; byte<_codeplug->image(0).element(0).size(); byte+=BLOCK_SIZE) {
+    if (! _dev->read(0, byte, _codeplug->data(byte), BLOCK_SIZE, _errorStack)) {
+      errMsg(_errorStack) << "Cannot read codeplug.";
       return false;
     }
-    emit downloadProgress(float(n*100)/_codeplug->image(0).numElements());
-  }*/
+    emit downloadProgress(float(byte*100)/_codeplug->image(0).element(0).size());
+  }
 
-  // Allocate remaining memory sections
-  unsigned nstart = _codeplug->image(0).numElements();
-
-  // Check every segment in the remaining codeplug
-  /*for (int n=nstart; n<_codeplug->image(0).numElements(); n++) {
-    if (! _codeplug->image(0).element(n).isAligned(RBSIZE)) {
-      errMsg(_errorStack) << "Cannot download codeplug: Codeplug element " << n
-                          << " (addr=" << _codeplug->image(0).element(n).address()
-                          << ", size=" << _codeplug->image(0).element(n).data().size()
-                          << ") is not aligned with blocksize " << RBSIZE << ".";
-      return false;
-    }
-  }*/
-
-  // Download remaining memory sections
-  /*for (int n=nstart; n<_codeplug->image(0).numElements(); n++) {
-    unsigned addr = _codeplug->image(0).element(n).address();
-    unsigned size = _codeplug->image(0).element(n).data().size();
-    if (! _dev->read(0, addr, _codeplug->data(addr), size, _errorStack)) {
-      errMsg(_errorStack) << "Cannot download codeplug.";
-      return false;
-    }
-    emit downloadProgress(float(n*100)/_codeplug->image(0).numElements());
-  }*/
+  if (! _dev->read_finish(_errorStack)) {
+    errMsg(_errorStack) << "Cannot read codeplug from device.";
+    return false;
+  }
 
   return true;
 }
@@ -258,51 +247,60 @@ KyderaRadio::upload() {
     return false;
   }
 
-  // Download bitmaps first
-  /*size_t nbitmaps = _codeplug->numImages();
-  for (int n=0; n<_codeplug->image(0).numElements(); n++) {
-    unsigned addr = _codeplug->image(0).element(n).address();
-    unsigned size = _codeplug->image(0).element(n).data().size();
-    if (! _dev->read(0, addr, _codeplug->data(addr), size, _errorStack)) {
-      errMsg(_errorStack) << "Cannot read codeplug for update.";
+  logDebug() << "Read entire codeplug (" << _codeplug->image(0).element(0).size() << "b) for update.";
+
+  // Check alignment of codeplug
+  if (! _codeplug->image(0).element(0).isAligned(BLOCK_SIZE)) {
+    errMsg(_errorStack) << "Cannot read codeplug: Codeplug "
+                        << " (addr=" << _codeplug->image(0).element(0).address()
+                        << ", size=" << _codeplug->image(0).element(0).data().size()
+                        << ") is not aligned with blocksize " << BLOCK_SIZE << ".";
+    return false;
+  }
+
+  if (! _dev->read_start(0, _codeplug->image(0).element(0).size(), _errorStack)) {
+    errMsg(_errorStack) << "Cannot read codeplug from device for update.";
+    return false;
+  }
+
+  // Download codeplug
+  for (unsigned byte=0; byte<_codeplug->image(0).element(0).size(); byte+=BLOCK_SIZE) {
+    if (! _dev->read(0, byte, _codeplug->data(byte), BLOCK_SIZE, _errorStack)) {
+      errMsg(_errorStack) << "Cannot read codeplug.";
       return false;
     }
-    emit uploadProgress(float(n*25)/_codeplug->image(0).numElements());
-  }*/
+    emit uploadProgress(float(byte*50)/_codeplug->image(0).element(0).size());
+  }
 
-  // Allocate all memory sections that must be read first
-  // and written back to the device more or less untouched
-
-  // Download new memory sections for update
-  /*for (int n=nbitmaps; n<_codeplug->image(0).numElements(); n++) {
-    unsigned addr = _codeplug->image(0).element(n).address();
-    unsigned size = _codeplug->image(0).element(n).data().size();
-    if (! _dev->read(0, addr, _codeplug->data(addr), size, _errorStack)) {
-      errMsg(_errorStack) << "Cannot read codeplug for update.";
-      return false;
-    }
-    emit uploadProgress(25+float(n*25)/_codeplug->image(0).numElements());
-  }*/
+  if (! _dev->read_finish(_errorStack)) {
+    errMsg(_errorStack) << "Cannot read codeplug from device for update.";
+    return false;
+  }
 
   // Update binary codeplug from config
-  /*if (! _codeplug->encode(_config, _codeplugFlags, _errorStack)) {
+  if (! _codeplug->encode(_config, _codeplugFlags, _errorStack)) {
     errMsg(_errorStack) << "Cannot encode codeplug.";
     return false;
-  }*/
+  }
 
-  // Sort all elements before uploading
-  _codeplug->image(0).sort();
+  if (! _dev->write_start(0, _codeplug->image(0).element(0).size(), _errorStack)) {
+    errMsg(_errorStack) << "Cannot write codeplug.";
+    return false;
+  }
 
-  // Upload all elements back to the device
-  /*for (int n=0; n<_codeplug->image(0).numElements(); n++) {
-    unsigned addr = _codeplug->image(0).element(n).address();
-    unsigned size = _codeplug->image(0).element(n).data().size();
-    if (! _dev->write(0, addr, _codeplug->data(addr), size, _errorStack)) {
+  // Write codeplug back to the device
+  for (unsigned byte=0; byte<_codeplug->image(0).element(0).size(); byte+=BLOCK_SIZE) {
+    if (! _dev->write(0, byte, _codeplug->data(byte), BLOCK_SIZE, _errorStack)) {
       errMsg(_errorStack) << "Cannot write codeplug.";
       return false;
     }
-    emit uploadProgress(50+float(n*50)/_codeplug->image(0).numElements());
-  }*/
+    emit uploadProgress(50+float(byte*50)/_codeplug->image(0).element(0).size());
+  }
+
+  if (! _dev->write_finish(_errorStack)) {
+    errMsg(_errorStack) << "Cannot write codeplug.";
+    return false;
+  }
 
   return true;
 }

@@ -22,12 +22,14 @@ class CDR300UV : public KyderaRadio
 public:
   /** Constructor.
    * The constructor takes the ownership of the interface @c device. */
-  CDR300UV(const QString &name, KyderaInterface *device=nullptr, QObject *parent=nullptr);
+  CDR300UV(KyderaInterface *device=nullptr, QObject *parent=nullptr);
 
 
 public:
   /** Returns the default radio info for the Kydera CDR-300UV or Retevis RT73. */
   static RadioInfo defaultRadioInfo();
+
+  const Radio::Features &features() const;
 };
 
 #endif // CDR300UV_HH

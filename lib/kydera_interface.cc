@@ -202,8 +202,10 @@ KyderaInterface::write_finish(const ErrorStack &err) {
   uint32_t crc = qFromLittleEndian(*((uint32_t *)check.right(4).data()));
   ///@todo Implement checksum check.
 
-  // Read device status
+  ///@todo Read device status back.
+  QByteArray status = QSerialPort::readAll();
 
+  return true;
 }
 
 

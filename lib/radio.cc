@@ -3,6 +3,7 @@
 #include "anytone_interface.hh"
 #include "radioddity_interface.hh"
 #include "tyt_interface.hh"
+#include "kydera_interface.hh"
 
 #include "rd5r.hh"
 #include "gd77.hh"
@@ -15,6 +16,7 @@
 #include "d878uv.hh"
 #include "d878uv2.hh"
 #include "d578uv.hh"
+#include "cdr300uv.hh"
 
 #include "config.hh"
 #include "logger.hh"
@@ -393,7 +395,7 @@ Radio::detect(const RadioInfo &force, const ErrorStack &err) {
   {
     TyTInterface *dfu = new TyTInterface(0x0483, 0xdf11, err);
     if (dfu->isOpen()) {
-      id = dfu->identifier();
+      id = dfu->identifier(err);
       if ((id.isValid() && (RadioInfo::MD390 == id.id())) || (force.isValid() && (RadioInfo::MD390 == force.id()))) {
         return new MD390(dfu);
       } else if ((id.isValid() && (RadioInfo::UV390 == id.id())) || (force.isValid() && (RadioInfo::UV390 == force.id()))) {
@@ -416,7 +418,7 @@ Radio::detect(const RadioInfo &force, const ErrorStack &err) {
   {
     RadioddityInterface *hid = new RadioddityInterface(0x15a2, 0x0073, err);
     if (hid->isOpen()) {
-      id = hid->identifier();
+      id = hid->identifier(err);
       if ((id.isValid() && (RadioInfo::RD5R == id.id())) || (force.isValid() && (RadioInfo::RD5R == force.id()))) {
         return new RD5R(hid);
       } else if ((id.isValid() && (RadioInfo::GD77 == id.id())) || (force.isValid() && (RadioInfo::GD77 == force.id()))) {
@@ -435,7 +437,7 @@ Radio::detect(const RadioInfo &force, const ErrorStack &err) {
   {
     OpenGD77Interface *ogd77 = new OpenGD77Interface(err);
     if (ogd77->isOpen()) {
-      id = ogd77->identifier();
+      id = ogd77->identifier(err);
       if ((id.isValid() && (RadioInfo::OpenGD77 == id.id())) || (force.isValid() && (RadioInfo::OpenGD77 == force.id()))) {
         return new OpenGD77(ogd77);
       } else {
@@ -452,7 +454,7 @@ Radio::detect(const RadioInfo &force, const ErrorStack &err) {
   {
     AnytoneInterface *anytone = new AnytoneInterface(err);
     if (anytone->isOpen()) {
-      id = anytone->identifier();
+      id = anytone->identifier(err);
       if ((id.isValid() && (RadioInfo::D868UVE == id.id())) || (force.isValid() && (RadioInfo::D868UVE == force.id()))) {
         return new D868UV(anytone);
       } else if ((id.isValid() && (RadioInfo::D878UV == id.id())) || (force.isValid() && (RadioInfo::D878UV == force.id()))) {
@@ -471,6 +473,22 @@ Radio::detect(const RadioInfo &force, const ErrorStack &err) {
     }
   }
 
+  // Try Kytera device family
+  {
+    KyderaInterface *kydera = new KyderaInterface(err);
+    if (kydera->isOpen()) {
+      id = kydera->identifier(err);
+      if ((id.isValid() && (RadioInfo::CDR300UV == id.id())) || (force.isValid() && (RadioInfo::CDR300UV == force.id()))) {
+        return new CDR300UV(kydera);
+      } else {
+        kydera->close();
+        kydera->deleteLater();
+        return nullptr;
+      }
+    } else {
+      kydera->deleteLater();
+    }
+  }
   errMsg(err) << "Cannot connect to radio.";
   return nullptr;
 }
