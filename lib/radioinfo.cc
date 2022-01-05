@@ -11,6 +11,7 @@
 #include "d878uv2.hh"
 #include "d578uv.hh"
 #include "dm1701.hh"
+#include "cdr300uv.hh"
 
 
 QHash<QString, RadioInfo::Radio>
@@ -32,7 +33,9 @@ RadioInfo::_radiosByName = QHash<QString, RadioInfo::Radio>{
   {"dmr6x2",   RadioInfo::DMR6X2},
   {"d878uv",   RadioInfo::D878UV},
   {"d878uv2",  RadioInfo::D878UVII},
-  {"d578uv",   RadioInfo::D578UV}
+  {"d578uv",   RadioInfo::D578UV},
+  {"cdr300uv", RadioInfo::CDR300UV},
+  {"rt73",     RadioInfo::RT73}
 };
 
 QHash<unsigned, RadioInfo>
@@ -47,7 +50,8 @@ RadioInfo::_radiosById = QHash<unsigned, RadioInfo>{
   {RadioInfo::D868UVE,  D868UV::defaultRadioInfo()},
   {RadioInfo::D878UV,   D878UV::defaultRadioInfo()},
   {RadioInfo::D878UVII, D878UV2::defaultRadioInfo()},
-  {RadioInfo::D578UV,   D578UV::defaultRadioInfo()}
+  {RadioInfo::D578UV,   D578UV::defaultRadioInfo()},
+  {RadioInfo::CDR300UV, CDR300UV::defaultRadioInfo()}
 };
 
 

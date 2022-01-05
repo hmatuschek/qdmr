@@ -6,7 +6,6 @@
 #define __KYDERA_RADIO_HH__
 
 #include "radio.hh"
-//#include "anytone_interface.hh"
 #include "kydera_codeplug.hh"
 
 // Forward declaration

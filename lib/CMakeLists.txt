@@ -26,7 +26,7 @@ SET(libdmrconf_SOURCES
     d878uv.cc d878uv_codeplug.cc
     d578uv.cc d578uv_codeplug.cc
     d878uv2.cc d878uv2_codeplug.cc d878uv2_callsigndb.cc
-    kydera_radio.cc kydera_codeplug.cc
+    kydera_radio.cc kydera_interface.cc kydera_codeplug.cc
     cdr300uv.cc cdr300uv_codeplug.cc)
 SET(libdmrconf_MOC_HEADERS
     radio.hh ${hid_HEADERS} dfu_libusb.hh usbserial.hh
@@ -47,7 +47,7 @@ SET(libdmrconf_MOC_HEADERS
     d878uv.hh d878uv_codeplug.hh
     d578uv.hh d578uv_codeplug.hh
     d878uv2.hh d878uv2_codeplug.hh d878uv2_callsigndb.hh
-    kydera_radio.hh kydera_codeplug.hh
+    kydera_radio.hh kydera_interface.hh kydera_codeplug.hh
     cdr300uv.hh cdr300uv_codeplug.hh)
 SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh radioinfo.hh
     gd77_filereader.hh rd5r_filereader.hh uv390_filereader.hh md2017_filereader.hh
