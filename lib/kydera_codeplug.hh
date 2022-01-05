@@ -14,24 +14,81 @@ class KyderaCodeplug: public Codeplug
   Q_OBJECT
 
 public:
+  /** Helper class to read/store addresses within the codeplug. */
+  class AddressElement: public Codeplug::Element
+  {
+  public:
+    /** Constuctor. */
+    explicit AddressElement(uint8_t *ptr);
+
+    /** Reads the absolute address. */
+    unsigned address() const;
+    /** Writes an absolute address. */
+    void setAddress(unsigned addr);
+  };
+
   /** Base class of all Kydera encoded channel elements.
    *
    * Memory layout of the channel element (size 0x0020 bytes):
    * @verbinclude kydera_channel.txt */
   class ChannelElement: public Codeplug::Element
   {
+  public:
+    /** Possible channel modes. */
+    enum class Mode {
+      Analog=0,              ///< Analog, i.e., FM.
+      Digital=1,             ///< Digital, i.e., DMR.
+      Analog_RX_Digital=2,   ///< Analog channel (TX/RX in FM) but additional RX in FM.
+      Digital_RX_Analog=3    ///< Digital channel (TX/RX in DMR) but additional RX in DMR.
+    };
+
   protected:
     /** Hidden constructor. */
     ChannelElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
-    ChannelElement(uint8_t *ptr);
+    explicit ChannelElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ChannelElement();
 
     /** Resets the channel. */
     void clear();
+
+    /** Internal used index to reference this channel. */
+    virtual unsigned index() const;
+    /** Sets the internal index. */
+    virtual void setIndex(unsigned idx);
+
+    /** Returns the name of the channel. */
+    virtual QString name() const;
+    /** Sets the name of the channel. */
+    virtual void setName(const QString &name);
+
+    /** Returns the RX frequency of the channel in Hz. */
+    virtual uint32_t rxFrequency() const;
+    /** Sets the RX frequency of the channel in Hz. */
+    virtual void setRXFrequency(uint32_t freq);
+    /** Returns the TX frequency of the channel in Hz. */
+    virtual uint32_t txFrequency() const;
+    /** Sets the TX frequency of the channel in Hz. */
+    virtual void setTXFrequency(uint32_t freq);
+
+    /** Returns the channel mode. */
+    virtual Mode mode() const;
+    /** Sets the channel mode. */
+    virtual void setMode(Mode mode);
+
+    /** Returns the channel power setting. */
+    virtual Channel::Power power() const;
+    /** Sets the channel power. */
+    virtual void setPower(Channel::Power power);
+
+    /** Returns the analog channel bandwidth. */
+    virtual AnalogChannel::Bandwidth bandwidth() const;
+    /** Sets the analog channel bandwidth. */
+    virtual void setBandwidth(AnalogChannel::Bandwidth bw);
+
   };
 
   /** Base class of all Kydera encoded contact elements.
