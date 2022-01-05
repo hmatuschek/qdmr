@@ -315,50 +315,80 @@ KyderaInterface::readRadioInfo(const ErrorStack &err) {
 
   // Read only one block of the codeplug to obtain the radio ID.
   ReadCommand cmd(1);
-  if (sizeof(ReadCommand) != QSerialPort::write((char *)&cmd, sizeof(ReadCommand))) {
+  int nb = QSerialPort::write((char *)&cmd, sizeof(ReadCommand));
+  if (sizeof(ReadCommand) != nb) {
     _state = State::Error;
-    errMsg(err) << "Cannot send read command: " << USBSerial::errorString();
+    if (QSerialPort::NoError != QSerialPort::error())
+      errMsg(err) << "Cannot send read command: " << USBSerial::errorString();
+    else
+      errMsg(err) << "Cannot send read command: Incomplete write "
+                  << nb << "b of " << sizeof(ReadCommand) << "b.";
     return false;
   }
 
   ReadResponse resp;
-  if (sizeof(ReadResponse) != QSerialPort::read((char*)&resp, sizeof(ReadResponse))) {
+  nb = QSerialPort::read((char*)&resp, sizeof(ReadResponse));
+  if (sizeof(ReadResponse) != nb) {
     _state = State::Error;
-    errMsg(err) << "Cannot read response: " << USBSerial::errorString();
+    if (QSerialPort::NoError != QSerialPort::error())
+      errMsg(err) << "Cannot read response: " << USBSerial::errorString();
+    else
+      errMsg(err) << "Unpexected response: "
+                  << QByteArray((char *)&resp, nb).toHex();
     return false;
   }
+
   if (! resp.check()) {
     _state = State::Error;
-    errMsg(err) << "Device returned invalid response.";
+    errMsg(err) << "Device returned invalid response: "
+                << QByteArray((char *)&resp, sizeof(ReadResponse)).toHex();
     return false;
   }
 
   DeviceInfo info;
-  if (sizeof(DeviceInfo) != QSerialPort::read((char *)&info, sizeof(DeviceInfo))) {
+  nb = QSerialPort::read((char *)&info, sizeof(DeviceInfo));
+  if (sizeof(DeviceInfo) != nb) {
     _state = State::Error;
-    errMsg(err) << "Cannot read device info: " << USBSerial::errorString();
+    if (QSerialPort::NoError != QSerialPort::error())
+      errMsg(err) << "Cannot read device info: " << USBSerial::errorString();
+    else
+      errMsg(err) << "Unpexected response: "
+                  << QByteArray((char *)&info, nb).toHex();
     return false;
   }
 
   // Read the requested block of 2048 bytes
-  if (4 != QSerialPort::write("Read")) {
+  nb = QSerialPort::write("Read", 4);
+  if (4 != nb) {
     _state = State::Error;
-    errMsg(err) << "Cannot send read request: " << USBSerial::errorString();
+    if (QSerialPort::NoError != QSerialPort::error())
+      errMsg(err) << "Cannot send read request: " << USBSerial::errorString();
+    else
+      errMsg(err) << "Cannot send read request: Incomplete write "
+                  << nb << "b of 4b.";
     return false;
   }
 
-  QByteArray data = QSerialPort::read(0x800);
-  if (0x800 != data.size()) {
+  QByteArray data(0x800, 0x00);
+  nb= QSerialPort::read(data.data(), data.size());
+  if (data.size() != nb) {
     _state = State::Error;
-    errMsg(err) << "Cannot read payload: " << USBSerial::errorString();
+    if (QSerialPort::NoError != QSerialPort::error())
+      errMsg(err) << "Cannot read payload: " << USBSerial::errorString();
+    else
+      errMsg(err) << "Unpexected response: " << data.left(nb).toHex();
     return false;
   }
 
   // Read checksum to complete transfer
-  data = QSerialPort::read(13); // 'ChecksumR' + uint32
-  if (13 != data.size()) {
+  data.resize(13);
+  nb = QSerialPort::read(data.data(), data.size()); // 'ChecksumR' + uint32
+  if (data.size() != nb) {
     _state = State::Error;
-    errMsg(err) << "Cannot read checksum: " << USBSerial::errorString();
+    if (QSerialPort::NoError != QSerialPort::error())
+      errMsg(err) << "Cannot read checksum: " << USBSerial::errorString();
+    else
+      errMsg(err) << "Unpexected response: " << data.left(nb).toHex();
     return false;
   }
 
