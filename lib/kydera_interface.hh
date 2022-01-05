@@ -108,6 +108,9 @@ protected:
   /** If in idle mode, reads the radio ID. */
   bool readRadioInfo(const ErrorStack &err=ErrorStack());
 
+  /** Internal used method to read blocking. */
+  bool receive(char *buffer, unsigned size, const ErrorStack &err=ErrorStack());
+
 protected:
   /** Internal state of the interface. */
   State _state;

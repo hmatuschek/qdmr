@@ -124,7 +124,7 @@ KyderaInterface::write_start(uint32_t bank, uint32_t addr, const ErrorStack &err
   }
 
   WriteResponse resp;
-  if (sizeof(WriteResponse) != QSerialPort::read((char*)&resp, sizeof(WriteResponse))) {
+  if (! receive((char *)&resp, sizeof(WriteResponse), err)) {
     _state = State::Error;
     errMsg(err) << "Cannot read response: " << USBSerial::errorString();
     return false;
@@ -136,7 +136,7 @@ KyderaInterface::write_start(uint32_t bank, uint32_t addr, const ErrorStack &err
   }
 
   DeviceInfo info;
-  if (sizeof(DeviceInfo) != QSerialPort::read((char *)&info, sizeof(DeviceInfo))) {
+  if (! receive((char *)&info, sizeof(DeviceInfo), err)) {
     _state = State::Error;
     errMsg(err) << "Cannot read device info: " << USBSerial::errorString();
     return false;
@@ -174,8 +174,8 @@ KyderaInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, 
   }
 
   // Read response
-  QByteArray resp = QSerialPort::read(5);
-  if ("Write" != resp) {
+  QByteArray resp(5,0);
+  if ((!receive(resp.data(), resp.size())) || ("Write" != resp)) {
     _state = State::Error;
     errMsg(err) << "Cannot write to device: Invalid response.";
     return false;
@@ -193,8 +193,8 @@ KyderaInterface::write_finish(const ErrorStack &err) {
   }
 
   // Read checksum 'ChecksumW' + uint32
-  QByteArray check = QSerialPort::read(13);
-  if ((13 != check.size()) || (! check.startsWith("ChecksumW"))) {
+  QByteArray check(13,0);
+  if ((! receive(check.data(), check.size(), err)) || (! check.startsWith("ChecksumW"))) {
     _state = State::Error;
     errMsg(err) << "Cannot read checksum or invalid response.";
     return false;
@@ -228,10 +228,11 @@ KyderaInterface::read_start(uint32_t bank, uint32_t addr, const ErrorStack &err)
   }
 
   ReadResponse resp;
-  if (sizeof(ReadResponse) != QSerialPort::read((char*)&resp, sizeof(ReadResponse))) {
+  if (! receive((char *)&resp, sizeof(ReadResponse), err)) {
     _state = State::Error;
     errMsg(err) << "Cannot read response: " << USBSerial::errorString();
     return false;
+
   }
   if (! resp.check()) {
     _state = State::Error;
@@ -240,7 +241,7 @@ KyderaInterface::read_start(uint32_t bank, uint32_t addr, const ErrorStack &err)
   }
 
   DeviceInfo info;
-  if (sizeof(DeviceInfo) != QSerialPort::read((char *)&info, sizeof(DeviceInfo))) {
+  if (! receive((char *)&info, sizeof(DeviceInfo), err)) {
     _state = State::Error;
     errMsg(err) << "Cannot read device info: " << USBSerial::errorString();
     return false;
@@ -277,7 +278,7 @@ KyderaInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, c
   }
 
   // Read response containing data
-  if (nbytes != QSerialPort::read((char *)data, nbytes)) {
+  if (! receive((char *)data, nbytes, err)) {
     _state = State::Error;
     errMsg(err) << "Cannot read from device: " << QSerialPort::errorString();
     return false;
@@ -295,8 +296,8 @@ KyderaInterface::read_finish(const ErrorStack &err) {
   }
 
   // Read checksum 'ChecksumR' + uint32
-  QByteArray check = QSerialPort::read(13);
-  if ((13 != check.size()) || (! check.startsWith("ChecksumR"))) {
+  QByteArray check(13, 0);
+  if (! receive(check.data(), check.size(), err)){
     _state = State::Error;
     errMsg(err) << "Cannot read checksum or invalid response.";
     return false;
@@ -327,17 +328,11 @@ KyderaInterface::readRadioInfo(const ErrorStack &err) {
   }
 
   ReadResponse resp;
-  nb = QSerialPort::read((char*)&resp, sizeof(ReadResponse));
-  if (sizeof(ReadResponse) != nb) {
+  if (! receive((char *)&resp, sizeof(ReadResponse), err)) {
     _state = State::Error;
-    if (QSerialPort::NoError != QSerialPort::error())
-      errMsg(err) << "Cannot read response: " << USBSerial::errorString();
-    else
-      errMsg(err) << "Unpexected response: "
-                  << QByteArray((char *)&resp, nb).toHex();
+    errMsg(err) << "Cannot receive response for read command.";
     return false;
   }
-
   if (! resp.check()) {
     _state = State::Error;
     errMsg(err) << "Device returned invalid response: "
@@ -346,14 +341,9 @@ KyderaInterface::readRadioInfo(const ErrorStack &err) {
   }
 
   DeviceInfo info;
-  nb = QSerialPort::read((char *)&info, sizeof(DeviceInfo));
-  if (sizeof(DeviceInfo) != nb) {
+  if (! receive((char *)&info, sizeof(DeviceInfo), err)) {
     _state = State::Error;
-    if (QSerialPort::NoError != QSerialPort::error())
-      errMsg(err) << "Cannot read device info: " << USBSerial::errorString();
-    else
-      errMsg(err) << "Unpexected response: "
-                  << QByteArray((char *)&info, nb).toHex();
+    errMsg(err) << "Cannot receive device info.";
     return false;
   }
 
@@ -370,25 +360,17 @@ KyderaInterface::readRadioInfo(const ErrorStack &err) {
   }
 
   QByteArray data(0x800, 0x00);
-  nb= QSerialPort::read(data.data(), data.size());
-  if (data.size() != nb) {
+  if (! receive(data.data(), data.size(), err)) {
     _state = State::Error;
-    if (QSerialPort::NoError != QSerialPort::error())
-      errMsg(err) << "Cannot read payload: " << USBSerial::errorString();
-    else
-      errMsg(err) << "Unpexected response: " << data.left(nb).toHex();
+    errMsg(err) << "Cannot receive first codeplug block (2048b).";
     return false;
   }
 
   // Read checksum to complete transfer
   data.resize(13);
-  nb = QSerialPort::read(data.data(), data.size()); // 'ChecksumR' + uint32
-  if (data.size() != nb) {
+  if (! receive(data.data(), data.size(), err)) {
     _state = State::Error;
-    if (QSerialPort::NoError != QSerialPort::error())
-      errMsg(err) << "Cannot read checksum: " << USBSerial::errorString();
-    else
-      errMsg(err) << "Unpexected response: " << data.left(nb).toHex();
+    errMsg(err) << "Cannot receive checksum.";
     return false;
   }
 
@@ -400,6 +382,36 @@ KyderaInterface::readRadioInfo(const ErrorStack &err) {
     _state = State::Error;
     errMsg(err) << "Uknown Kydera device '" << deviceID << "'.";
     return false;
+  }
+
+  return true;
+}
+
+bool
+KyderaInterface::receive(char *buffer, unsigned size, const ErrorStack &err) {
+  if (State::Error == _state) {
+    errMsg(err) << "Cannot read from radio, interface not ready.";
+    return false;
+  }
+
+  // Read from device until complete response has been read
+  char *p = buffer;
+  int len = size;
+  while (len > 0) {
+    if (! waitForReadyRead(1000)) {
+      errMsg(err) << "Cannot read from device: Timeout.";
+      errMsg(err) << "Incomplete data: '" << QByteArray(buffer, size-len).toHex() << "'.";
+      return false;
+    }
+
+    int r = QSerialPort::read(p, len);
+    if (r < 0) {
+      errMsg(err) << "Cannot read from device: " << QSerialPort::errorString();
+      errMsg(err) << "Incomplete data: '" << QByteArray(buffer, size-len).toHex() << "'.";
+      return false;
+    }
+    p += r;
+    len-=r;
   }
 
   return true;
