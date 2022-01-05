@@ -76,6 +76,11 @@ RD5R::features() const {
   return _rd5r_features;
 }
 
+RadioInfo
+RD5R::info() const {
+  return defaultRadioInfo();
+}
+
 const Codeplug &
 RD5R::codeplug() const {
   return _codeplug;

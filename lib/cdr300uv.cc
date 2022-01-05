@@ -71,6 +71,12 @@ CDR300UV::CDR300UV(KyderaInterface *device, QObject *parent)
 }
 
 RadioInfo
+CDR300UV::info() const {
+  return defaultRadioInfo();
+}
+
+
+RadioInfo
 CDR300UV::defaultRadioInfo() {
   return RadioInfo(
         RadioInfo::CDR300UV, "cdr300uv", "CDR-300UV", "Kydera",

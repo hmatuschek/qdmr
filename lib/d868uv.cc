@@ -143,6 +143,11 @@ D868UV::features() const {
 }
 
 RadioInfo
+D868UV::info() const {
+  return defaultRadioInfo();
+}
+
+RadioInfo
 D868UV::defaultRadioInfo() {
   return RadioInfo(
         RadioInfo::D868UVE, "d868uve", "AT-D868UVE", "AnyTone",

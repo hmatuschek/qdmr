@@ -41,6 +41,7 @@ public:
   explicit D878UV2(AnytoneInterface *device=nullptr, QObject *parent=nullptr);
 
   const Radio::Features &features() const;
+  RadioInfo info() const;
 
   /** Returns the default radio information. The actual instance may have different properties
    * due to variants of the same radio. */

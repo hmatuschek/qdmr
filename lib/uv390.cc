@@ -73,6 +73,11 @@ UV390::features() const {
   return _uv390_features;
 }
 
+RadioInfo
+UV390::info() const {
+  return defaultRadioInfo();
+}
+
 const Codeplug &
 UV390::codeplug() const {
   return _codeplug;

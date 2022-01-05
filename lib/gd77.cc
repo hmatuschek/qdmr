@@ -73,6 +73,11 @@ GD77::features() const {
   return _gd77_features;
 }
 
+RadioInfo
+GD77::info() const {
+  return defaultRadioInfo();
+}
+
 const Codeplug &
 GD77::codeplug() const {
   return _codeplug;

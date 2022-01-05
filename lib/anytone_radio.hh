@@ -43,6 +43,7 @@ public:
   virtual ~AnytoneRadio();
 
   const QString &name() const;
+
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 

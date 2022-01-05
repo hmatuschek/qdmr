@@ -211,9 +211,11 @@ public:
 
   /** Returns the name of the radio (e.g., device identifier). */
 	virtual const QString &name() const = 0;
-
   /** Returns the features for the particular radio. */
 	virtual const Features &features() const = 0;
+
+  /** Returns some information about the specific radio. */
+  virtual RadioInfo info() const = 0;
 
   /** Returns the codeplug instance. */
   virtual const Codeplug &codeplug() const = 0;

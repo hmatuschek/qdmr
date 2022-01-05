@@ -89,6 +89,11 @@ OpenGD77::features() const {
   return _open_gd77_features;
 }
 
+RadioInfo
+OpenGD77::info() const {
+  return defaultRadioInfo();
+}
+
 const Codeplug &
 OpenGD77::codeplug() const {
   return _codeplug;

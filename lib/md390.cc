@@ -134,6 +134,11 @@ MD390::features() const {
   return _features;
 }
 
+RadioInfo
+MD390::info() const {
+  return defaultRadioInfo();
+}
+
 const Codeplug &
 MD390::codeplug() const {
   return _codeplug;

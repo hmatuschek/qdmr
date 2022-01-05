@@ -73,6 +73,11 @@ MD2017::features() const {
   return _md2017_features;
 }
 
+RadioInfo
+MD2017::info() const {
+  return defaultRadioInfo();
+}
+
 const Codeplug &
 MD2017::codeplug() const {
   return _codeplug;

@@ -25,6 +25,8 @@ public:
 
 	const QString &name() const;
   const Radio::Features &features() const;
+  RadioInfo info() const;
+
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
