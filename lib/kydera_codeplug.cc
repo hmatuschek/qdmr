@@ -3,7 +3,8 @@
 KyderaCodeplug::KyderaCodeplug(QObject *parent)
   : Codeplug(parent)
 {
-  // pass...
+  // The codeplug consists of a single element.
+  addImage("Kydera CDR-300UV codeplug");
 }
 
 bool

@@ -35,7 +35,7 @@ public:
     // Baofeng/BTECH
     DM1701, RT84 = DM1701,
     // Kydera devices
-    CDR300UV, RT73=CDR300UV
+    CDR300UV, RT73=CDR300UV, DB25D=CDR300UV
   };
 
 public:

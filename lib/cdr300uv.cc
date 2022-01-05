@@ -73,7 +73,11 @@ CDR300UV::CDR300UV(KyderaInterface *device, QObject *parent)
 RadioInfo
 CDR300UV::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::CDR300UV, "cdr300uv", "CDR-300UV", "Kydera");
+        RadioInfo::CDR300UV, "cdr300uv", "CDR-300UV", "Kydera",
+        QList<RadioInfo>{
+          RadioInfo(RadioInfo::RT73, "rt73", "RT73", "Retevis"),
+          RadioInfo(RadioInfo::DB25D, "db25d", "DB25-D", "Radioddity")
+        });
 }
 
 const Radio::Features &
