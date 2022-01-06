@@ -284,6 +284,8 @@ Channel::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Contex
   Q_UNUSED(node); Q_UNUSED(ctx)
   if (0 == strcmp("openGD77", prop.name())) {
     return new OpenGD77ChannelExtension();
+  } else if (0 == strcmp("tyt", prop.name())) {
+    return new TyTChannelExtension();
   }
 
   errMsg(err) << "Cannot allocate instance for unknown child '" << prop.name() << "'.";

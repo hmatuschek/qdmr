@@ -345,7 +345,7 @@ Config::allocateChild(QMetaProperty &prop, const YAML::Node &node,
                       const Context &ctx, const ErrorStack &err)
 {
   Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
-  if (0==strcmp("tyt", prop.name())) {
+  if (0==strcmp("tytExtension", prop.name())) {
     return new TyTConfigExtension(this);
   }
   return nullptr;
