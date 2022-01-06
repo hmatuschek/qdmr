@@ -90,10 +90,6 @@ public:
   /** Sets the TyT scan-list extension. */
   void setTyTScanListExtension(TyTScanListExtension *tyt);
 
-public:
-  /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());*/
-
 protected:
   /** The channel list. */
   ChannelRefList _channels;

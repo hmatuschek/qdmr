@@ -373,9 +373,9 @@ ConfigItem::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Con
   }
 
   const QMetaObject *propType = type.metaObject();
-  logDebug() << "Try to instantiate child of type " << prop.typeName()
+  /*logDebug() << "Try to instantiate child of type " << prop.typeName()
              << " for element " << prop.name()
-             << " in " << this->metaObject()->className() << ".";
+             << " in " << this->metaObject()->className() << ".";*/
 
   ConfigItem *item = qobject_cast<ConfigItem *>(
         propType->newInstance(Q_ARG(QObject *,this)));

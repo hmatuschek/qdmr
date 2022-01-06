@@ -279,20 +279,6 @@ Channel::populate(YAML::Node &node, const Context &context) {
   return true;
 }
 
-/*ConfigItem *
-Channel::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(node); Q_UNUSED(ctx)
-  if (0 == strcmp("openGD77", prop.name())) {
-    return new OpenGD77ChannelExtension();
-  } else if (0 == strcmp("tyt", prop.name())) {
-    return new TyTChannelExtension();
-  }
-
-  errMsg(err) << "Cannot allocate instance for unknown child '" << prop.name() << "'.";
-  return nullptr;
-}
-*/
-
 bool
 Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   if (! node)

@@ -42,13 +42,6 @@ PositioningSystem::populate(YAML::Node &node, const ConfigItem::Context &context
   return true;
 }
 
-/*ConfigItem *
-PositioningSystem::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
-  // No children yet
-  return nullptr;
-}*/
-
 bool
 PositioningSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   if (! node)
