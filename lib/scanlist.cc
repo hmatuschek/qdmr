@@ -186,7 +186,7 @@ ScanList::setTyTScanListExtension(TyTScanListExtension *tyt) {
     _tyt->setParent(this);
 }
 
-ConfigItem *
+/*ConfigItem *
 ScanList::allocateChild(QMetaProperty &prop, const YAML::Node &node,
                         const Context &ctx, const ErrorStack &err)
 {
@@ -198,7 +198,7 @@ ScanList::allocateChild(QMetaProperty &prop, const YAML::Node &node,
 
   errMsg(err) << "Cannot allocate instance for unknown child '" << prop.name() << "'.";
   return nullptr;
-}
+}*/
 
 
 /* ********************************************************************************************* *

@@ -70,12 +70,12 @@ ChannelRefList *Zone::B() {
   return &_B;
 }
 
-ConfigItem *
+/*ConfigItem *
 Zone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // There are no children yet.
   return nullptr;
-}
+}*/
 
 
 /* ********************************************************************************************* *

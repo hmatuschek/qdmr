@@ -35,13 +35,13 @@ Contact::setRing(bool enable) {
   emit modified(this);
 }
 
-ConfigItem *
+/*ConfigItem *
 Contact::allocateChild(QMetaProperty &prop, const YAML::Node &node,
                        const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // There are no children yet
   return nullptr;
-}
+}*/
 
 bool
 Contact::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
@@ -178,14 +178,14 @@ DigitalContact::setNumber(unsigned number) {
   return true;
 }
 
-ConfigItem *
+/*ConfigItem *
 DigitalContact::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
 
   if (0 == strcmp("openGD77", prop.name()))
     return new OpenGD77ContactExtension();
   return nullptr;
-}
+}*/
 
 YAML::Node
 DigitalContact::serialize(const Context &context) {

@@ -113,7 +113,7 @@ public:
 
   /** Allocates an instance for the given property on the given YAML node. */
   virtual ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                                    const Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+                                    const Context &ctx, const ErrorStack &err=ErrorStack());
   /** Parses the given YAML node, updates the given object and updates the given context (IDs). */
   virtual bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links the given object to the rest of the codeplug using the given context. */

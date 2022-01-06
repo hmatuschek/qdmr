@@ -48,8 +48,8 @@ signals:
 	void modified();
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());
+  /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());*/
 
 protected:
   /** List of channels for VFO A. */

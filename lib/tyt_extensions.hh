@@ -152,8 +152,8 @@ public:
   void enableDCDMLeader(bool enable);
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());
+  /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());*/
 
 protected:
   // Common properties
@@ -225,8 +225,8 @@ public:
   void setPrioritySampleTime(unsigned ms);
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());
+  /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());*/
 
 protected:
   /** The hold time in ms. */
@@ -359,8 +359,8 @@ public:
   void setLongPressDuration(unsigned dur);
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());
+  /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());*/
 
 protected:
   /** Holds the side button 1 short-press action. */
@@ -599,8 +599,8 @@ public:
   void enableGPSInformation(bool enable);
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());
+  /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());*/
 
 protected:
   /** If @c true, the menu hang time is infinite. */
@@ -933,8 +933,8 @@ public:
   void setChannelHangTime(unsigned ms);
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());
+  /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());*/
 protected:
   /** Holds the monitor type. */
   MonitorType _monitorType;
@@ -1033,8 +1033,8 @@ public:
   TyTMenuSettings *menuSettings() const;
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());
+  /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());*/
 
 protected:
   /** Owns the button settings extension. */
