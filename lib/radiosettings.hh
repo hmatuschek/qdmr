@@ -94,8 +94,8 @@ public:
   void setTyTExtension(TyTSettingsExtension *ext);
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());
+  /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());*/
 
 protected slots:
   /** Internal used callback whenever an extension is modified. */

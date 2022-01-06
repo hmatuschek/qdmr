@@ -357,6 +357,34 @@ ConfigItem::populate(YAML::Node &node, const Context &context){
   return true;
 }
 
+ConfigItem *
+ConfigItem::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(node); Q_UNUSED(ctx);
+
+  if (QMetaType::UnknownType == prop.userType()) {
+    errMsg(err) << "Cannot instantiate child of unregistered type " << prop.typeName() << ".";
+    return nullptr;
+  }
+
+  QMetaType type(prop.userType());
+  if (! (QMetaType::PointerToQObject & type.flags())) {
+    errMsg(err) << "Cannot instantiate child of non-qobject pointer type " << prop.typeName() << ".";
+    return nullptr;
+  }
+
+  const QMetaObject *propType = type.metaObject();
+  /*logDebug() << "Try to instantiate child of type " << prop.typeName()
+             << " for element " << prop.name()
+             << " in " << this->metaObject()->className() << ".";*/
+
+  ConfigItem *item = qobject_cast<ConfigItem *>(
+        propType->newInstance(Q_ARG(QObject *,this)));
+  if (! item) {
+    errMsg(err) << "Could not instantiate " << propType->className() << ".";
+  }
+  return item;
+}
+
 bool
 ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
@@ -483,23 +511,34 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
                     << QMetaType::metaObjectForType(prop.userType())->className() << "'.";
         return false;
       }
-      // allocate instance (if needed)
+      // Get object
       ConfigItem *obj = prop.read(this).value<ConfigItem*>();
-      if ((nullptr == obj) && (nullptr == (obj = this->allocateChild(prop, node[prop.name()], ctx)))) {
-        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                    << ": Cannot allocate " << prop.name() << " of " << meta->className() << ".";
-        return false;
+
+      // If not set and writable -> allocate and set
+      if ((nullptr == obj) && prop.isWritable()) {
+        if (nullptr == (obj = this->allocateChild(prop, node[prop.name()], ctx))) {
+          errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                                                       << ": Cannot allocate " << prop.name() << " of " << meta->className() << ".";
+          return false;
+        }
+        // Set property
+        if (! prop.write(this, QVariant::fromValue(obj))) {
+          if (nullptr == obj->parent())
+            obj->deleteLater();
+          errMsg(err) << "Cannot set writable property '" << prop.name()
+                      << "' in " << this->metaObject()->className() << ".";
+          return false;
+        }
       }
+
       // parse instance
-      if (! obj->parse(node[prop.name()], ctx)) {
+      if (obj && (! obj->parse(node[prop.name()], ctx))) {
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot parse " << prop.name() << " of " << meta->className() << ".";
         if (nullptr == obj->parent())
           obj->deleteLater();
         return false;
       }
-      // Set property
-      prop.write(this, QVariant::fromValue(obj));
     }
   }
 

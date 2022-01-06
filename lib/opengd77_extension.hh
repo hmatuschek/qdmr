@@ -52,7 +52,7 @@ public:
   void setPower(Power power);
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
+  //ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds the power setting. */
@@ -102,8 +102,8 @@ public:
   void setTimeSlotOverride(TimeSlotOverride ts);
 
 public:
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());
+  /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
+                            const Context &ctx, const ErrorStack &err=ErrorStack());*/
 
 protected:
   /** Holds the time slot override. */

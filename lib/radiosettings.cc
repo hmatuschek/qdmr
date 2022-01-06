@@ -43,7 +43,7 @@ RadioSettings::clear() {
   setTyTExtension(nullptr);
 }
 
-ConfigItem *
+/*ConfigItem *
 RadioSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node,
                              const Context &ctx, const ErrorStack &err)
 {
@@ -55,7 +55,7 @@ RadioSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node,
 
   // No children yet.
   return nullptr;
-}
+}*/
 
 const QString &
 RadioSettings::introLine1() const {

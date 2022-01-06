@@ -186,13 +186,6 @@ ScanList::setTyTScanListExtension(TyTScanListExtension *tyt) {
     _tyt->setParent(this);
 }
 
-ConfigItem *
-ScanList::allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                        const Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
-  return nullptr;
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of ScanLists

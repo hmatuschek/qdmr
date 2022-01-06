@@ -17,8 +17,8 @@
  *  <tr><th colspan="4">First segment 0x002000-0x040000</th></tr>
  *  <tr><td>0x002000</td> <td>0x00200c</td> <td>0x0000c</td> <td>Timestamp see @c TyTCodeplug::TimestampElement.</td></tr>
  *  <tr><td>0x00200c</td> <td>0x002040</td> <td>0x00034</td> <td>Reserved, filled with 0xff. </td></tr>
- *  <tr><td>0x002040</td> <td>0x0020f0</td> <td>0x000b0</td> <td>General settings see @c TyTCodeplug::GeneralSettingsElement.</td></tr>
- *  <tr><td>0x0020f0</td> <td>0x002100</td> <td>0x00010</td> <td>Menu settings, see @c TyTCodeplug::MenuSettingsElement.</td></tr>
+ *  <tr><td>0x002040</td> <td>0x0020f0</td> <td>0x000b0</td> <td>General settings see @c GeneralSettingsElement.</td></tr>
+ *  <tr><td>0x0020f0</td> <td>0x002100</td> <td>0x00010</td> <td>Menu settings, see @c MenuSettingsElement.</td></tr>
  *  <tr><td>0x002100</td> <td>0x002140</td> <td>0x00040</td> <td>Button config, see @c TyTCodeplug::ButtonSettingsElement.</td></tr>
  *  <tr><td>0x002140</td> <td>0x002180</td> <td>0x00040</td> <td>Reserved, filled with 0xff.</td></tr>
  *  <tr><td>0x002180</td> <td>0x0059c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each.</td></tr>
@@ -30,17 +30,17 @@
  *  <tr><td>0x0149e0</td> <td>0x018860</td> <td>0x03e80</td> <td>250 Zones @ 0x40 bytes each, see @c TyTCodeplug::ZoneElement.</td></tr>
  *  <tr><td>0x018860</td> <td>0x01edf0</td> <td>0x06590</td> <td>250 Scanlists @ 0x68 bytes each, see @c TyTCodeplug::ScanListElement.</td></tr>
  *  <tr><td>0x01edf0</td> <td>0x02ef00</td> <td>0x10110</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x02ef00</td> <td>0x02ef40</td> <td>0x00040</td> <td>VFO A channel, see @c TyTCodeplug::VFOChannelElement.</td></tr>
- *  <tr><td>0x02ef40</td> <td>0x02ef80</td> <td>0x00040</td> <td>VFO B channel, see @c TyTCodeplug::VFOChannelElement.</td></tr>
+ *  <tr><td>0x02ef00</td> <td>0x02ef40</td> <td>0x00040</td> <td>VFO A channel, see @c VFOChannelElement.</td></tr>
+ *  <tr><td>0x02ef40</td> <td>0x02ef80</td> <td>0x00040</td> <td>VFO B channel, see @c VFOChannelElement.</td></tr>
  *  <tr><td>0x02ef80</td> <td>0x02f000</td> <td>0x00080</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>Boot settings, see @c TyTCodeplug::BootSettingsElement.</td></tr>
+ *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>Boot settings, see @c BootSettingsElement.</td></tr>
  *  <tr><td>0x02f010</td> <td>0x031000</td> <td>0x01ff0</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x031000</td> <td>0x03eac0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c DM1701::ZoneExtElement.</td></tr>
+ *  <tr><td>0x031000</td> <td>0x03eac0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c DM1701Codeplug::ZoneExtElement.</td></tr>
  *  <tr><td>0x03eac0</td> <td>0x03ec40</td> <td>0x00180</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x03ec40</td> <td>0x03ed40</td> <td>0x00100</td> <td>16 GPS systems @ 0x10 bytes each, see @c TyTCodeplug::GPSSystemElement.</td></tr>
  *  <tr><td>0x03ed40</td> <td>0x040000</td> <td>0x012c0</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><th colspan="4">Second segment 0x110000-0x1a0000</th></tr>
- *  <tr><td>0x110000</td> <td>0x13ee00</td> <td>0x2ee00</td> <td>3000 Channels @ 0x40 bytes each, see @c TyTCodeplug::ChannelElement.</td></tr>
+ *  <tr><td>0x110000</td> <td>0x13ee00</td> <td>0x2ee00</td> <td>3000 Channels @ 0x40 bytes each, see @c ChannelElement.</td></tr>
  *  <tr><td>0x13ee00</td> <td>0x140000</td> <td>0x01200</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x140000</td> <td>0x197e40</td> <td>0x57e40</td> <td>10000 Contacts @ 0x24 bytes each, see @c TyTCodeplug::ContactElement.</td></tr>
  *  <tr><td>0x197e40</td> <td>0x1a0000</td> <td>0x081c0</td> <td>Reserved, filled with @c 0xff. </td></tr>

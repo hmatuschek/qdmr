@@ -111,9 +111,11 @@ public:
    * The complete configuration must be labeled first. */
   virtual YAML::Node serialize(const Context &context);
 
-  /** Allocates an instance for the given property on the given YAML node. */
+  /** Allocates an instance for the given property on the given YAML node.
+   * This is usually done automatically based on the meta-type of the property. To be able to
+   * instantiate the item, its default constructor must be Q_INVOKABLE. */
   virtual ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                                    const Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+                                    const Context &ctx, const ErrorStack &err=ErrorStack());
   /** Parses the given YAML node, updates the given object and updates the given context (IDs). */
   virtual bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links the given object to the rest of the codeplug using the given context. */

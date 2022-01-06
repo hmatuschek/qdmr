@@ -340,17 +340,6 @@ Config::readYAML(const QString &filename, const ErrorStack &err) {
   return true;
 }
 
-ConfigItem *
-Config::allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                      const Context &ctx, const ErrorStack &err)
-{
-  Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
-  if (0==strcmp("tyt", prop.name())) {
-    return new TyTConfigExtension(this);
-  }
-  return nullptr;
-}
-
 bool
 Config::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
 {

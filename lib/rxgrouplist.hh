@@ -51,8 +51,6 @@ public:
 
 public:
   YAML::Node serialize(const Context &context);
-  ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected slots:
   /** Internal used callback to handle list modifications. */

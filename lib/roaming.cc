@@ -80,12 +80,6 @@ RoamingZone::channels() {
   return &_channel;
 }
 
-ConfigItem *
-RoamingZone::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
-  return nullptr;
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of DefaultRoamingZone

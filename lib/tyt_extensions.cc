@@ -230,14 +230,14 @@ TyTChannelExtension::enableDCDMLeader(bool enable) {
   emit modified(this);
 }
 
-ConfigItem *
+/*ConfigItem *
 TyTChannelExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
                                    const Context &ctx, const ErrorStack &err)
 {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // There are no further extension/children to TyTChannelExtension.
   return nullptr;
-}
+}*/
 
 
 /* ******************************************************************************************** *
@@ -283,14 +283,14 @@ TyTScanListExtension::setPrioritySampleTime(unsigned ms) {
   emit modified(this);
 }
 
-ConfigItem *
+/*ConfigItem *
 TyTScanListExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
                                     const Context &ctx, const ErrorStack &err)
 {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // There are no further extension/children to TyTScanListExtension.
   return nullptr;
-}
+}*/
 
 
 /* ******************************************************************************************** *
@@ -451,14 +451,14 @@ TyTButtonSettings::setLongPressDuration(unsigned dur) {
   _longPressDuration = dur;
 }
 
-ConfigItem *
+/*ConfigItem *
 TyTButtonSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node,
                                  const Context &ctx, const ErrorStack &err)
 {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // There are no further extension/children to TyTButtonSettings.
   return nullptr;
-}
+}*/
 
 
 /* ******************************************************************************************** *
@@ -486,12 +486,12 @@ TyTMenuSettings::clone() const {
   return ex;
 }
 
-ConfigItem *
+/*ConfigItem *
 TyTMenuSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // There are no further extension/children to TyTButtonSettings.
   return nullptr;
-}
+}*/
 
 bool
 TyTMenuSettings::hangtimeIsInfinite() const {
@@ -1279,12 +1279,12 @@ TyTSettingsExtension::setChannelHangTime(unsigned ms) {
   emit modified(this);
 }
 
-ConfigItem *
+/*ConfigItem *
 TyTSettingsExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // No extensions to this extension.
   return nullptr;
-}
+}*/
 
 
 /* ******************************************************************************************** *
@@ -1317,11 +1317,11 @@ TyTConfigExtension::menuSettings() const {
   return _menuSettings;
 }
 
-ConfigItem *
+/*ConfigItem *
 TyTConfigExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
                                   const Context &ctx, const ErrorStack &err)
 {
   Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
   // All extensions are pre-allocated. So nothing to do here.
   return nullptr;
-}
+}*/

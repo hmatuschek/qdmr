@@ -51,15 +51,6 @@ RadioID::serialize(const Context &context) {
   return type;
 }
 
-ConfigItem *
-RadioID::allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                       const Context &ctx, const ErrorStack &err)
-{
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
-  // No extensions defined yet for RadioID
-  return nullptr;
-}
-
 bool
 RadioID::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   if (! node)
