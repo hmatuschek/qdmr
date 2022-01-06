@@ -65,20 +65,20 @@ KyderaCodeplug::ChannelElement::setName(const QString &name) {
 
 uint32_t
 KyderaCodeplug::ChannelElement::rxFrequency() const {
-  return getUInt32_le(0x000c)*10;
+  return getUInt32_le(0x000c);
 }
 void
 KyderaCodeplug::ChannelElement::setRXFrequency(uint32_t freq) {
-  setUInt32_le(0x000c, freq/10);
+  setUInt32_le(0x000c, freq);
 }
 
 uint32_t
 KyderaCodeplug::ChannelElement::txFrequency() const {
-  return getUInt32_le(0x0010)*10;
+  return getUInt32_le(0x0010);
 }
 void
 KyderaCodeplug::ChannelElement::setTXFrequency(uint32_t freq) {
-  setUInt32_le(0x0010, freq/10);
+  setUInt32_le(0x0010, freq);
 }
 
 KyderaCodeplug::ChannelElement::Mode
