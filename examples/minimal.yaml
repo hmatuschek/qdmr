@@ -7,7 +7,7 @@ settings:
   speech: false
   power: High
   squelch: 1
-  vox: 1
+  vox: 0
   tot: 0
   defaultID: id1
 radioIDs:
@@ -92,9 +92,4 @@ positioning:
       name: GPS System
       period: 300
       contact: cont5
-TyTButtonSettings:
-  sideButton1Long: ToggleAllAlertTones
-  sideButton2Short: PowerSelect
-  sideButton2Long: Tone1750Hz
-  longPressDuration: 1000
 ...
