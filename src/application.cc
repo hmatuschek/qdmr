@@ -704,6 +704,27 @@ Application::showAbout() {
   QTextEdit *text = dialog->findChild<QTextEdit *>("textEdit");
   text->setHtml(text->toHtml().arg(VERSION_STRING));
 
+  QTreeWidget *radioTab = dialog->findChild<QTreeWidget *>("radioTable");
+  radioTab->setColumnCount(1);
+  QHash<QString, QTreeWidgetItem*> items;
+  foreach (RadioInfo radio, RadioInfo::allRadios(false)) {
+    if (! items.contains(radio.manufactuer()))
+      items.insert(radio.manufactuer(),
+                   new QTreeWidgetItem(QStringList(radio.manufactuer())));
+    items[radio.manufactuer()]->addChild(
+          new QTreeWidgetItem(QStringList(radio.name())));
+    foreach (RadioInfo alias, radio.alias()) {
+      if (! items.contains(alias.manufactuer()))
+        items.insert(alias.manufactuer(),
+                     new QTreeWidgetItem(QStringList(alias.manufactuer())));
+      items[alias.manufactuer()]->addChild(
+            new QTreeWidgetItem(QStringList(tr("%1 (alias for %2 %3)").arg(alias.name())
+                                            .arg(radio.manufactuer()).arg(radio.name()))));
+    }
+  }
+  radioTab->insertTopLevelItems(0, items.values());
+  radioTab->sortByColumn(0,Qt::AscendingOrder);
+
   if (dialog) {
     dialog->exec();
     dialog->deleteLater();
