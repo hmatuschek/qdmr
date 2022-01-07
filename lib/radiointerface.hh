@@ -14,11 +14,52 @@
  * to the device, allow for reading and writing specific memory blocks.
  *
  * This class defines the common interface for all radio-interface classes, irrespective of the
- * actual communication protocol being used by the device.
+ * actual communication protocoe l being used by the device.
  *
  * @ingroup rif */
 class RadioInterface
 {
+public:
+  /** Abstract representation of some information about a possible radio interface. */
+  class Info {
+  public:
+    /** Possible interface types. */
+    enum class Class {
+      None,       ///< Class for invalid interface info.
+      Serial,     ///< Serial port interface class.
+      DFU,        ///< DFU interface class.
+      HID         ///< HID (human-interface device) interface class.
+    };
+
+  public:
+    /** Empty constructor. */
+    Info();
+    /** Destructor. */
+    virtual ~Info();
+
+    /** Copy constructor. */
+    Info(const Info &other);
+
+    /** Returns @c true if the interface info is valid. */
+    bool isValid() const;
+
+    /** Returns the interface class. */
+    Class interfaceClass() const;
+
+    /** Returns a human readable description of the interface. */
+    QString description() const;
+
+  protected:
+    /** The class of the interface. */
+    Class _class;
+    /** The USB vid. */
+    uint16_t _vid;
+    /** The USB pid. */
+    uint16_t _pid;
+    /** Holds a unique device descriptor. */
+    QString _device;
+  };
+
 protected:
   /** Hidden constructor. */
   explicit RadioInterface();
@@ -90,6 +131,10 @@ public:
    * this function does nothing.
    * @param err Passes an error stack to put error messages on. */
   virtual bool reboot(const ErrorStack &err=ErrorStack());
+
+public:
+  /** Searches for all possible radios connected. */
+  static QList<Info> detect();
 };
 
 #endif // RADIOINFERFACE_HH
