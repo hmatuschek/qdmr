@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include "logger.hh"
 
+#define USB_VID 0x15a2
+#define USB_PID 0x0073
+
 static const unsigned char CMD_PRG[]   = "\2PROGRA";
 static const unsigned char CMD_PRG2[]  = "M\2";
 static const unsigned char CMD_ACK[]   = "A";
@@ -17,8 +20,15 @@ static const unsigned char CMD_CWB1[]  = "CWB\4\0\1\0\0";
 static const unsigned char CMD_CWB3[]  = "CWB\4\0\3\0\0";
 static const unsigned char CMD_CWB4[]  = "CWB\4\0\4\0\0";
 
-RadioddityInterface::RadioddityInterface(int vid, int pid, const ErrorStack &err, QObject *parent)
-  : HIDevice(vid, pid, err, parent), _current_bank(MEMBANK_NONE), _identifier()
+RadioddityInterface::RadioddityInterface(const ErrorStack &err, QObject *parent)
+  : HIDevice(USB_VID, USB_PID, err, parent), _current_bank(MEMBANK_NONE), _identifier()
+{
+  if (isOpen())
+    identifier();
+}
+
+RadioddityInterface::RadioddityInterface(const RadioInterface::Descriptor &descr, const ErrorStack &err, QObject *parent)
+  : HIDevice(descr, err, parent), _current_bank(MEMBANK_NONE), _identifier()
 {
   if (isOpen())
     identifier();
@@ -29,6 +39,15 @@ RadioddityInterface::~RadioddityInterface() {
     close();
 }
 
+InterfaceInfo
+RadioddityInterface::interfaceInfo() {
+  return InterfaceInfo(InterfaceInfo::Class::HID, USB_VID, USB_PID);
+}
+
+QList<RadioInterface::Descriptor>
+RadioddityInterface::detect() {
+  return HIDevice::detect(USB_VID, USB_PID);
+}
 
 bool
 RadioddityInterface::isOpen() const {

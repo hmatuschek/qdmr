@@ -1,6 +1,10 @@
 #include "opengd77_interface.hh"
 #include "logger.hh"
+#include "radioinfo.hh"
 #include <QtEndian>
+
+#define USB_VID 0x1fc9
+#define USB_PID 0x0094
 
 #define BLOCK_SIZE  32
 #define SECTOR_SIZE 4096
@@ -156,13 +160,29 @@ OpenGD77Interface::CommandRequest::initCommand(Option option) {
  * Implementation of OpenGD77Interface
  * ********************************************************************************************* */
 OpenGD77Interface::OpenGD77Interface(const ErrorStack &err, QObject *parent)
-  : USBSerial(0x1fc9, 0x0094, err, parent), _sector(-1)
+  : USBSerial(USB_VID, USB_PID, err, parent), _sector(-1)
+{
+  // pass...
+}
+
+OpenGD77Interface::OpenGD77Interface(const RadioInterface::Descriptor &descr, const ErrorStack &err, QObject *parent)
+  : USBSerial(descr, err, parent), _sector(-1)
 {
   // pass...
 }
 
 OpenGD77Interface::~OpenGD77Interface() {
   // pass...
+}
+
+InterfaceInfo
+OpenGD77Interface::interfaceInfo() {
+  return InterfaceInfo(InterfaceInfo::Class::Serial, USB_VID, USB_PID);
+}
+
+QList<RadioInterface::Descriptor>
+OpenGD77Interface::detect() {
+  return USBSerial::detect(USB_VID, USB_PID);
 }
 
 void

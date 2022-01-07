@@ -144,7 +144,7 @@ RadioddityRadio::connect() {
   // If not open -> reconnect
   if (_dev)
     _dev->deleteLater();
-  _dev = new RadioddityInterface(0x15a2, 0x0073, _errorStack);
+  _dev = new RadioddityInterface(_errorStack);
   if (! _dev->isOpen()) {
     errMsg(_errorStack) << "Cannot connect to RD5R.";
     _dev->deleteLater();

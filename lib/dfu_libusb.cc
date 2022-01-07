@@ -33,6 +33,19 @@ enum {
 };
 
 
+/* ********************************************************************************************* *
+ * Implementation of DFUDevice::Descriptor
+ * ********************************************************************************************* */
+DFUDevice::Descriptor::Descriptor(const InterfaceInfo &info, uint8_t bus, uint8_t device)
+  : RadioInterface::Descriptor(info, QString("%1:%2").arg(bus).arg(device))
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of DFUDevice
+ * ********************************************************************************************* */
 DFUDevice::DFUDevice(unsigned vid, unsigned pid, const ErrorStack &err, QObject *parent)
   : QObject(parent), _ctx(nullptr), _dev(nullptr)
 {
@@ -73,8 +86,126 @@ DFUDevice::DFUDevice(unsigned vid, unsigned pid, const ErrorStack &err, QObject 
 }
 
 
+DFUDevice::DFUDevice(const RadioInterface::Descriptor &descr, const ErrorStack &err, QObject *parent)
+  : QObject(parent), _ctx(nullptr), _dev(nullptr)
+{
+  if (InterfaceInfo::Class::DFU != descr.interfaceClass()) {
+    errMsg(err) << "Cannot connect to DFU device using a non DFU descriptor: "
+                << descr.description() << ".";
+    return;
+  }
+
+  int error = libusb_init(&_ctx);
+  if (error < 0) {
+    errMsg(err) << "Libusb init failed (" << error << "): "
+                << libusb_strerror((enum libusb_error) error) << ".";
+    return;
+  }
+
+  int num=0;
+  libusb_device **lst;
+  libusb_device *dev=nullptr;
+  if (0 > (num = libusb_get_device_list(_ctx, &lst))) {
+    errMsg(err) << "Cannot obtain list of USB devices.";
+    libusb_exit(_ctx);
+    _ctx = nullptr;
+    return;
+  }
+
+  logDebug() << "Try to detect USB DFU interface " << descr.description() << ".";
+  USBDeviceAddress addr = descr.device().value<USBDeviceAddress>();
+  for (int i=0; (i<num)&&(nullptr!=lst[i]); i++) {
+    if (addr.bus != libusb_get_bus_number(lst[i]))
+      continue;
+    if (addr.device != libusb_get_device_address(lst[i]))
+      continue;
+    libusb_device_descriptor usb_descr;
+    if (0 > libusb_get_device_descriptor(lst[i],&usb_descr))
+      continue;
+    if (descr.vendorId() != usb_descr.idVendor)
+      continue;
+    if (descr.productId() != usb_descr.idProduct)
+      continue;
+    logDebug() << "Matching device found at bus " << addr.bus << ", device " << addr.device
+               << " with vendor ID " << QString::number(usb_descr.idVendor, 16)
+               << " and product ID " << QString::number(usb_descr.idProduct, 16) << ".";
+    libusb_ref_device(lst[i]); dev = lst[i];
+  }
+  // Unref all devices and free list, matching device was referenced earlier
+  libusb_free_device_list(lst, 1);
+
+  if (nullptr == dev) {
+    errMsg(err) << "No matching device found: " << descr.description() << ".";
+    libusb_exit(_ctx);
+    _ctx = nullptr;
+    return;
+  }
+
+  if (0 > (error = libusb_open(dev, &_dev))) {
+    errMsg(err) << "Cannot open device " << descr.description()
+                << ": " << libusb_strerror((enum libusb_error) error) << ".";
+    libusb_unref_device(dev);
+    libusb_exit(_ctx);
+    _ctx = nullptr;
+  }
+
+
+  if (libusb_kernel_driver_active(_dev, 0) && libusb_detach_kernel_driver(_dev, 0)) {
+    errMsg(err) << "Cannot detach kernel driver for device " << descr.description()
+                << ". Interface claim will likely fail.";
+  }
+
+  if (0 > (error = libusb_claim_interface(_dev, 0))) {
+    errMsg(err) << "Failed to claim USB interface "  << descr.description()
+                << ": " << libusb_strerror((enum libusb_error) error) << ".";
+    libusb_close(_dev);
+    _dev = nullptr;
+    libusb_exit(_ctx);
+    _ctx = nullptr;
+    return;
+  }
+
+  logDebug() << "Connected to DFU device " << descr.description() << ".";
+}
+
 DFUDevice::~DFUDevice() {
   close();
+}
+
+QList<RadioInterface::Descriptor>
+DFUDevice::detect(uint16_t vid, uint16_t pid)
+{
+  QList<RadioInterface::Descriptor> res;
+
+  int error, num;
+  libusb_context *ctx;
+  if (0 > (error = libusb_init(&ctx))) {
+    logError() << "Libusb init failed (" << error << "): "
+               << libusb_strerror((enum libusb_error) error) << ".";
+    return res;
+  }
+
+  libusb_device **lst;
+  if (0 == (num = libusb_get_device_list(ctx, &lst))) {
+    logDebug() << "No USB devices found at all.";
+    // unref devices and free list
+    libusb_free_device_list(lst, 1);
+    return res;
+  }
+
+  for (int i=0; (i<num)&&(nullptr!=lst[i]); i++) {
+    libusb_device_descriptor descr;
+    libusb_get_device_descriptor(lst[i], &descr);
+    if ((vid == descr.idVendor) && (pid == descr.idProduct)) {
+      res.append(DFUDevice::Descriptor(
+                   InterfaceInfo(InterfaceInfo::Class::DFU, vid, pid),
+                   libusb_get_bus_number(lst[i]),
+                   libusb_get_device_address(lst[i])));
+    }
+  }
+
+  libusb_free_device_list(lst, 1);
+  return res;
 }
 
 bool

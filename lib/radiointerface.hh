@@ -8,6 +8,14 @@
 #include "radioinfo.hh"
 #include "errorstack.hh"
 
+/** Just a helper struct to hold the bus number and device address of a specific USB device.
+ *
+ * @ingroup rif */
+struct USBDeviceAddress {
+  uint8_t bus;      ///< Holds the bus number.
+  uint8_t device;   ///< Holds the device address.
+};
+Q_DECLARE_METATYPE(USBDeviceAddress)
 
 /** Abstract radio interface.
  * A radion interface must provide means to communicate with the device. That is, open a connection
@@ -20,44 +28,31 @@
 class RadioInterface
 {
 public:
-  /** Abstract representation of some information about a possible radio interface. */
-  class Info {
-  public:
-    /** Possible interface types. */
-    enum class Class {
-      None,       ///< Class for invalid interface info.
-      Serial,     ///< Serial port interface class.
-      DFU,        ///< DFU interface class.
-      HID         ///< HID (human-interface device) interface class.
-    };
+  /** Base class for all radio iterface descriptors representing a unique interface to a
+   * connected radio. */
+  class Descriptor: public InterfaceInfo
+  {
+  protected:
+    /** Hidden constructor from info and path string. */
+    Descriptor(const InterfaceInfo &info, const QString &device);
+    /** Hidden constructor from info and USB device address. */
+    Descriptor(const InterfaceInfo &info, const USBDeviceAddress &device);
 
   public:
-    /** Empty constructor. */
-    Info();
-    /** Destructor. */
-    virtual ~Info();
-
     /** Copy constructor. */
-    Info(const Info &other);
+    Descriptor(const Descriptor &other);
 
-    /** Returns @c true if the interface info is valid. */
-    bool isValid() const;
+    /** Assignment */
+    Descriptor &operator =(const Descriptor &other);
 
-    /** Returns the interface class. */
-    Class interfaceClass() const;
-
-    /** Returns a human readable description of the interface. */
+    /** Returns a human readable description of the device. */
     QString description() const;
+    /** Returns the device information identifying the interface uniquely. */
+    const QVariant &device() const;
 
   protected:
-    /** The class of the interface. */
-    Class _class;
-    /** The USB vid. */
-    uint16_t _vid;
-    /** The USB pid. */
-    uint16_t _pid;
-    /** Holds a unique device descriptor. */
-    QString _device;
+    /** Holds some information to identify the radio interface uniquely. */
+    QVariant _device;
   };
 
 protected:
@@ -133,8 +128,8 @@ public:
   virtual bool reboot(const ErrorStack &err=ErrorStack());
 
 public:
-  /** Searches for all possible radios connected. */
-  static QList<Info> detect();
+  /** Searches for all connected radios (may contain false positives). */
+  static QList<Descriptor> detect();
 };
 
 #endif // RADIOINFERFACE_HH

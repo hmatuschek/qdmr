@@ -159,7 +159,7 @@ TyTRadio::connect() {
     _dev->deleteLater();
   }
 
-  _dev = new TyTInterface(0x0483, 0xdf11, _errorStack);
+  _dev = new TyTInterface(_errorStack);
   if (! _dev->isOpen()) {
     errMsg(_errorStack) << "Cannot open device at 0483:DF11";
     _dev->deleteLater();

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <libusb.h>
 #include "errorstack.hh"
+#include "radiointerface.hh"
 
 /** This class implements DFU protocol to access radios.
  *
@@ -26,8 +27,19 @@ private:
   };
 
 public:
+  /** Specialization to address a DFU device uniquely. */
+  class Descriptor: public RadioInterface::Descriptor
+  {
+  public:
+    /** Constructor from interface info, bus number and device address. */
+    Descriptor(const InterfaceInfo &info, uint8_t bus, uint8_t device);
+  };
+
+public:
   /** Opens a connection to the USB-DFU devuce at vendor @c vid and product @c pid. */
   DFUDevice(unsigned vid, unsigned pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+  /** Opens a connection to the USB-DFU devuce at vendor @c vid and product @c pid. */
+  DFUDevice(const RadioInterface::Descriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
 	virtual ~DFUDevice();
 
@@ -40,6 +52,10 @@ public:
   int download(unsigned block, uint8_t *data, unsigned len, const ErrorStack &err=ErrorStack());
   /** Uploads some data from the device. */
   int upload(unsigned block, uint8_t *data, unsigned len, const ErrorStack &err=ErrorStack());
+
+public:
+  /** Finds all DFU interfaces with the specified VID/PID combination. */
+  static QList<RadioInterface::Descriptor> detect(uint16_t vid, uint16_t pid);
 
 protected:
   /** Internal used function to detach the device. */

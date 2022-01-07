@@ -4,6 +4,7 @@
 #include <QObject>
 #include <IOKit/hid/IOHIDManager.h>
 #include "errorstack.hh"
+#include "radiointerface.hh"
 
 /** Implements the HID radio interface MacOS X API.
  * @ingroup rif */
@@ -32,6 +33,10 @@ public:
 
   /** Close connection to device. */
 	void close();
+
+public:
+  /** Finds all HID interfaces with the specified VID/PID combination. */
+  static QList<RadioInterface::Descriptor> detect(uint16_t vid, uint16_t pid);
 
 protected:
   /** Internal callback for response data. */

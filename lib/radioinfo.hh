@@ -5,6 +5,63 @@
 #include <QHash>
 #include <QList>
 
+/** Generic information about a possible radio interface. */
+class InterfaceInfo
+{
+public:
+  /** Possible interface types. */
+  enum class Class {
+    None,       ///< Class for invalid interface info.
+    Serial,     ///< Serial port interface class.
+    DFU,        ///< DFU interface class.
+    HID         ///< HID (human-interface device) interface class.
+  };
+
+public:
+  /** Empty constructor. */
+  InterfaceInfo();
+  /** Constructor from class, VID and PID. */
+  InterfaceInfo(Class cls, uint16_t vid, uint16_t pid);
+  /** Destructor. */
+  virtual ~InterfaceInfo();
+
+  /** Copy constructor. */
+  InterfaceInfo(const InterfaceInfo &other);
+  /** Assignment. */
+  InterfaceInfo &operator =(const InterfaceInfo &other);
+
+  /** Comparison. */
+  bool operator ==(const InterfaceInfo &other) const;
+  /** Comparison. */
+  bool operator !=(const InterfaceInfo &other) const;
+
+  /** Returns @c true if the interface info is valid. */
+  bool isValid() const;
+
+  /** Returns the interface class. */
+  Class interfaceClass() const;
+
+  /** Returns the vendor ID or 0 if not set. */
+  uint16_t vendorId() const;
+  /** Returns the product ID or 0 if not set. */
+  uint16_t productId() const;
+
+  /** Returns a brief human readable description of the interface. */
+  QString description() const;
+
+  /** Returns a more extensive human readable description of the interface. */
+  QString longDescription() const;
+
+protected:
+  /** The class of the interface. */
+  Class _class;
+  /** The USB vid. */
+  uint16_t _vid;
+  /** The USB pid. */
+  uint16_t _pid;
+};
+
+
 /** Provides some information about a radio model.
  *
  * This class is used to unify radio enumeration and detection. It also will contains the detailed
@@ -39,10 +96,10 @@ public:
 public:
   /** Use static methods the access radio info or call @c Radio::defaultRadioInfo. */
   RadioInfo(Radio radio, const QString &name, const QString manufacturer,
-            const QList<RadioInfo> &alias=QList<RadioInfo>());
+            const QList<RadioInfo> &alias=QList<RadioInfo>(), const InterfaceInfo &interface=InterfaceInfo());
   /** Use static methods the access radio info or call @c Radio::defaultRadioInfo. */
   RadioInfo(Radio radio, const QString &key, const QString &name, const QString manufacturer,
-            const QList<RadioInfo> &alias=QList<RadioInfo>());
+            const QList<RadioInfo> &alias=QList<RadioInfo>(), const InterfaceInfo &interface=InterfaceInfo());
 
   /** Empty constructor. */
   RadioInfo();
@@ -56,6 +113,8 @@ public:
   const QString &name() const;
   /** Retunrs the manufacturer name. */
   const QString &manufactuer() const;
+  /** Returns some information about the iterface to the radio. */
+  const InterfaceInfo &interface() const;
 
   /** Returns @c true if the radio has aliases.
    * That is other radios that are identical. */
@@ -76,6 +135,8 @@ public:
 
   /** Returns the list of all known radios. */
   static QList<RadioInfo> allRadios(bool flat=true);
+  /** Returns a list of all known radios for the specified interface. */
+  static QList<RadioInfo> allRadios(const InterfaceInfo &interface, bool flat=true);
 
 protected:
   /** Holds the radio id. */
@@ -88,6 +149,8 @@ protected:
   QString _manufacturer;
   /** Holds possible identical radios from other manufactuers. */
   QList<RadioInfo> _alias;
+  /** Holds some information about the interface to the radio. */
+  InterfaceInfo _interface;
 
 protected:
   /** Key->ID map. */

@@ -99,5 +99,6 @@ MD2017::defaultRadioInfo() {
         RadioInfo::MD2017, "md2017", "MD-2017", "TyT",
         QList<RadioInfo>{
           RadioInfo(RadioInfo::RT82, "RT82", "Retevis")
-        });
+        },
+        TyTInterface::interfaceInfo());
 }

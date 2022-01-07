@@ -51,16 +51,119 @@ RadioInfo::_radiosById = QHash<unsigned, RadioInfo>{
 };
 
 
-RadioInfo::RadioInfo(
-    Radio radio, const QString &name, const QString manufacturer, const QList<RadioInfo> &alias)
-  : _radio(radio), _key(name.toLower()), _name(name), _manufacturer(manufacturer), _alias(alias)
+
+/* ********************************************************************************************* *
+ * Implementation of InterfaceInfo
+ * ********************************************************************************************* */
+InterfaceInfo::InterfaceInfo()
+  : _class(Class::None), _vid(0), _pid(0)
 {
   // pass...
 }
 
+InterfaceInfo::InterfaceInfo(Class cls, uint16_t vid, uint16_t pid)
+  : _class(cls), _vid(vid), _pid(pid)
+{
+  // pass...
+}
+
+InterfaceInfo::InterfaceInfo(const InterfaceInfo &other)
+  : _class(other._class), _vid(other._vid), _pid(other._pid)
+{
+  // pass...
+}
+
+InterfaceInfo &
+InterfaceInfo::operator =(const InterfaceInfo &other) {
+  _class = other._class;
+  _vid = other._vid;
+  _pid = other._pid;
+  return *this;
+}
+
+bool
+InterfaceInfo::operator ==(const InterfaceInfo &other) const {
+  return (other._class == _class) && (other._vid == _vid) && (other._pid == _pid);
+}
+bool
+InterfaceInfo::operator !=(const InterfaceInfo &other) const {
+  return !(*this == other);
+}
+
+InterfaceInfo::~InterfaceInfo() {
+  // pass...
+}
+
+bool
+InterfaceInfo::isValid() const {
+  return Class::None != _class;
+}
+
+InterfaceInfo::Class
+InterfaceInfo::interfaceClass() const {
+  return _class;
+}
+
+uint16_t
+InterfaceInfo::vendorId() const {
+  return _vid;
+}
+uint16_t
+InterfaceInfo::productId() const {
+  return _pid;
+}
+
+QString
+InterfaceInfo::description() const {
+  QString res;
+  QTextStream stream(&res);
+  switch (_class) {
+  case Class::None:
+    stream << "Invalid";
+    break;
+  case Class::Serial:
+    stream << "USB-serial interface " << QString::number(_vid,16) << ":" << QString::number(_pid,16);
+    break;
+  case Class::DFU:
+    stream << "USB device in DFU mode " << QString::number(_vid,16) << ":" << QString::number(_pid,16);
+    break;
+  case Class::HID:
+    stream << "HID " << QString::number(_vid,16) << ":" << QString::number(_pid,16);
+    break;
+  }
+  return res;
+}
+
+QString
+InterfaceInfo::longDescription() const {
+  QStringList radios;
+  foreach (RadioInfo radio, RadioInfo::allRadios(*this, true)) {
+    radios.append(QString("%1 %2").arg(radio.manufactuer(), radio.name()));
+  }
+  // This should not happen
+  if (radios.isEmpty())
+    return QString("Unknown interface.");
+
+  return QString("Possibly interfacing %1").arg(radios.join(", "));
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioInfo
+ * ********************************************************************************************* */
 RadioInfo::RadioInfo(
-    Radio radio, const QString &key, const QString &name, const QString manufacturer, const QList<RadioInfo> &alias)
-  : _radio(radio), _key(key), _name(name), _manufacturer(manufacturer), _alias(alias)
+    Radio radio, const QString &name, const QString manufacturer,
+    const QList<RadioInfo> &alias, const InterfaceInfo &interface)
+  : _radio(radio), _key(name.toLower()), _name(name), _manufacturer(manufacturer), _alias(alias),
+    _interface(interface)
+{
+  // pass...
+}
+
+RadioInfo::RadioInfo(Radio radio, const QString &key, const QString &name, const QString manufacturer,
+                     const QList<RadioInfo> &alias, const InterfaceInfo &interface)
+  : _radio(radio), _key(key), _name(name), _manufacturer(manufacturer), _alias(alias),
+    _interface(interface)
 {
   // pass...
 }
@@ -89,6 +192,11 @@ RadioInfo::name() const {
 const QString &
 RadioInfo::manufactuer() const {
   return _manufacturer;
+}
+
+const InterfaceInfo &
+RadioInfo::interface() const {
+  return _interface;
 }
 
 bool
@@ -127,6 +235,23 @@ RadioInfo::allRadios(bool flat) {
   QList<RadioInfo> radios;
   QHash<unsigned, RadioInfo>::const_iterator it = _radiosById.constBegin();
   for (; it!=_radiosById.constEnd(); it++) {
+    radios.push_back(*it);
+    if (flat)
+      radios.append(it->_alias);
+  }
+  std::sort(radios.begin(), radios.end(), [](const RadioInfo &a, const RadioInfo &b) {
+    return a.id()<b.id();
+  });
+  return radios;
+}
+
+QList<RadioInfo>
+RadioInfo::allRadios(const InterfaceInfo &interface, bool flat) {
+  QList<RadioInfo> radios;
+  QHash<unsigned, RadioInfo>::const_iterator it = _radiosById.constBegin();
+  for (; it!=_radiosById.constEnd(); it++) {
+    if (it->interface() != interface)
+      continue;
     radios.push_back(*it);
     if (flat)
       radios.append(it->_alias);

@@ -154,5 +154,6 @@ D578UV::features() const {
 RadioInfo
 D578UV::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::D578UV, "d578uv", "AT-D578UV", "AnyTone");
+        RadioInfo::D578UV, "d578uv", "AT-D578UV", "AnyTone", QList<RadioInfo>(),
+        AnytoneInterface::interfaceInfo());
 }

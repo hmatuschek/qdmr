@@ -92,8 +92,11 @@ class TyTInterface : public DFUDevice, public RadioInterface
   Q_OBJECT
 
 public:
-  /** Costructor. Opens an interface to the specified vendor and product ID. */
-  TyTInterface(unsigned vid, unsigned pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+  /** Costructor. Searches and opens an interface to the specified vendor and product ID. */
+  TyTInterface(const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+  /** Costructor. Opens an interface to the specified interface. */
+  TyTInterface(const RadioInterface::Descriptor &descr,
+               const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
   ~TyTInterface();
 
@@ -111,6 +114,12 @@ public:
 
   /** Erases a memory section at @c start of size @c size. */
   bool erase(unsigned start, unsigned size, void (*progress)(unsigned, void *)=nullptr, void *ctx=nullptr, const ErrorStack &err=ErrorStack());
+
+public:
+  /** Returns some information about the interface. */
+  static InterfaceInfo interfaceInfo();
+  /** Tries to find all interfaces connected AnyTone radios. */
+  static QList<RadioInterface::Descriptor> detect();
 
 protected:
   /** Internal used function to send a controll command to the device. */

@@ -10,6 +10,7 @@
 
 #include <QThread>
 #include "radioinfo.hh"
+#include "radiointerface.hh"
 #include "codeplug.hh"
 #include "callsigndb.hh"
 #include "errorstack.hh"
@@ -242,6 +243,8 @@ public:
   static Radio *detect(const RadioInfo &force=RadioInfo(), const ErrorStack &err=ErrorStack());
   /** Detects a radio and returns the corresponding device specific radio instance. */
   static Radio *detect(const ErrorStack &err=ErrorStack());
+  /** Tries to detect the radio connected to the specified interface. */
+  static Radio *detect(const RadioInterface::Descriptor &descr, const RadioInfo &force=RadioInfo(), const ErrorStack &err=ErrorStack());
 
 public slots:
   /** Starts the download of the codeplug.
