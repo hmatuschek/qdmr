@@ -1,13 +1,11 @@
 #include "usbserial.hh"
 #include "logger.hh"
+#include <QFileInfo>
 #include <QSerialPortInfo>
 
 USBSerial::USBSerial(unsigned vid, unsigned pid, const ErrorStack &err, QObject *parent)
   : QSerialPort(parent), RadioInterface()
 {
-  static int idMetaType = qRegisterMetaType<QSerialPort::SerialPortError>();
-  Q_UNUSED(idMetaType);
-
   logDebug() << "Try to detect USB serial interface "
              << QString::number(vid,16) << ":"
              << QString::number(pid,16) << ".";
@@ -24,6 +22,29 @@ USBSerial::USBSerial(unsigned vid, unsigned pid, const ErrorStack &err, QObject 
       this->setPort(port);
       this->setBaudRate(115200);
       if (! this->open(QIODevice::ReadWrite)) {
+#ifdef Q_OS_UNIX
+        QFileInfo portFileInfo(port.systemLocation());
+        if (portFileInfo.exists() &&
+            ((! portFileInfo.isReadable()) || (! portFileInfo.isWritable())))
+        {
+          QString owner = QString(portFileInfo.permission(QFileDevice::ReadOwner) ? "r" : "-")
+              + (portFileInfo.permission(QFile::WriteOwner) ? "w" : "-")
+              + (portFileInfo.permission(QFile::ExeOwner) ? "x" : "-");
+          QString group = QString(portFileInfo.permission(QFileDevice::ReadGroup) ? "r" : "-")
+              + (portFileInfo.permission(QFile::WriteGroup) ? "w" : "-")
+              + (portFileInfo.permission(QFile::ExeGroup) ? "x" : "-");
+          QString other = QString(portFileInfo.permission(QFileDevice::ReadOther) ? "r" : "-")
+              + (portFileInfo.permission(QFile::WriteOther) ? "w" : "-")
+              + (portFileInfo.permission(QFile::ExeOther) ? "x" : "-");
+          errMsg(err) << "Insufficient rights to read or write '" << port.systemLocation()
+                      << "' (" << port.description() << "): "
+                      << portFileInfo.owner() << ": " << owner << ", "
+                      << portFileInfo.group() << ": " << group << ", other: " << other << ".";
+          if (portFileInfo.permission(QFile::ReadGroup | QFile::WriteGroup))
+            errMsg(err) << "A membership in the group " << portFileInfo.group()
+                        << " would grant access.";
+        }
+#endif
         errMsg(err) << "Cannot open serial port '" << port.portName()
                     << "': " << this->errorString() << ".";
       } else {
