@@ -14,11 +14,11 @@ class HIDevice: public QObject
 
 public:
   /** Specialization to address a HI device uniquely. */
-  class Descriptor: public RadioInterface::Descriptor
+  class Descriptor: public USBDeviceDescriptor
   {
   public:
     /** Constructor from interface info, bus number and device address. */
-    Descriptor(const InterfaceInfo &info, uint8_t bus, uint8_t device);
+    Descriptor(const USBDeviceInfo &info, uint8_t bus, uint8_t device);
   };
 
 
@@ -26,7 +26,7 @@ public:
   /** Connects to the device with given vendor and product ID. */
   HIDevice(int vid, int pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Connects to the device with given vendor and product ID. */
-  HIDevice(const RadioInterface::Descriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+  HIDevice(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
 	virtual ~HIDevice();
 
@@ -46,7 +46,7 @@ public:
 
 public:
   /** Finds all HID interfaces with the specified VID/PID combination. */
-  static QList<RadioInterface::Descriptor> detect(uint16_t vid, uint16_t pid);
+  static QList<USBDeviceDescriptor> detect(uint16_t vid, uint16_t pid);
 
 protected:
   /** Internal used implementation of send_recv(). */

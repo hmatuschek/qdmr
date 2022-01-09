@@ -52,7 +52,7 @@ TyTInterface::TyTInterface(const ErrorStack &err, QObject *parent)
   }
 }
 
-TyTInterface::TyTInterface(const RadioInterface::Descriptor &descr, const ErrorStack &err, QObject *parent)
+TyTInterface::TyTInterface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
   : DFUDevice(descr, err, parent), RadioInterface()
 {
   if (! DFUDevice::isOpen()) {
@@ -101,12 +101,12 @@ TyTInterface::~TyTInterface() {
     close();
 }
 
-InterfaceInfo
+USBDeviceInfo
 TyTInterface::interfaceInfo() {
-  return InterfaceInfo(InterfaceInfo::Class::DFU, USB_VID, USB_PID);
+  return USBDeviceInfo(USBDeviceInfo::Class::DFU, USB_VID, USB_PID);
 }
 
-QList<RadioInterface::Descriptor>
+QList<USBDeviceDescriptor>
 TyTInterface::detect() {
   return DFUDevice::detect(USB_VID, USB_PID);
 }

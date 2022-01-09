@@ -18,7 +18,7 @@ class USBSerial : public QSerialPort, public RadioInterface
 
 public:
   /** Specialization of radio interface info for serial ports. */
-  class Descriptor: public RadioInterface::Descriptor {
+  class Descriptor: public USBDeviceDescriptor {
   public:
     /** Constructor from VID, PID and device path. */
     Descriptor(uint16_t vid, uint16_t pid, const QString &device);
@@ -38,7 +38,7 @@ protected:
    * @param descriptor Specifies the device to open.
    * @param err The error stack, messages are put onto.
    * @param parent Specifies the parent object. */
-  explicit USBSerial(const RadioInterface::Descriptor &descriptor, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+  explicit USBSerial(const USBDeviceDescriptor &descriptor, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
 public:
   /** Destrutor. */
@@ -51,7 +51,7 @@ public:
 
 public:
   /** Searches for all USB serial ports with the specified VID/PID. */
-  static QList<RadioInterface::Descriptor> detect(uint16_t vid, uint16_t pid);
+  static QList<USBDeviceDescriptor> detect(uint16_t vid, uint16_t pid);
 
 protected slots:
   /** Callback for serial interface errors. */

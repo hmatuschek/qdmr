@@ -244,7 +244,7 @@ public:
   /** Detects a radio and returns the corresponding device specific radio instance. */
   static Radio *detect(const ErrorStack &err=ErrorStack());
   /** Tries to detect the radio connected to the specified interface. */
-  static Radio *detect(const RadioInterface::Descriptor &descr, const RadioInfo &force=RadioInfo(), const ErrorStack &err=ErrorStack());
+  static Radio *detect(const USBDeviceDescriptor &descr, const RadioInfo &force=RadioInfo(), const ErrorStack &err=ErrorStack());
 
 public slots:
   /** Starts the download of the codeplug.

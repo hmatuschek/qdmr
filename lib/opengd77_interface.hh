@@ -27,7 +27,7 @@ public:
    * returns @c true. */
   explicit OpenGD77Interface(const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Constructs a new interface to a specifc OpenGD77 device.  */
-  explicit OpenGD77Interface(const RadioInterface::Descriptor &descr,
+  explicit OpenGD77Interface(const USBDeviceDescriptor &descr,
                              const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
   virtual ~OpenGD77Interface();
@@ -50,9 +50,9 @@ public:
 
 public:
   /** Retruns some information about this interface. */
-  static InterfaceInfo interfaceInfo();
+  static USBDeviceInfo interfaceInfo();
   /** Tries to find all interfaces connected AnyTone radios. */
-  static QList<RadioInterface::Descriptor> detect();
+  static QList<USBDeviceDescriptor> detect();
 
 protected:
   /** Represents a read message. */

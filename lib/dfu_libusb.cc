@@ -36,8 +36,8 @@ enum {
 /* ********************************************************************************************* *
  * Implementation of DFUDevice::Descriptor
  * ********************************************************************************************* */
-DFUDevice::Descriptor::Descriptor(const InterfaceInfo &info, uint8_t bus, uint8_t device)
-  : RadioInterface::Descriptor(info, QString("%1:%2").arg(bus).arg(device))
+DFUDevice::Descriptor::Descriptor(const USBDeviceInfo &info, uint8_t bus, uint8_t device)
+  : USBDeviceDescriptor(info, QString("%1:%2").arg(bus).arg(device))
 {
   // pass...
 }
@@ -86,10 +86,10 @@ DFUDevice::DFUDevice(unsigned vid, unsigned pid, const ErrorStack &err, QObject 
 }
 
 
-DFUDevice::DFUDevice(const RadioInterface::Descriptor &descr, const ErrorStack &err, QObject *parent)
+DFUDevice::DFUDevice(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
   : QObject(parent), _ctx(nullptr), _dev(nullptr)
 {
-  if (InterfaceInfo::Class::DFU != descr.interfaceClass()) {
+  if (USBDeviceInfo::Class::DFU != descr.interfaceClass()) {
     errMsg(err) << "Cannot connect to DFU device using a non DFU descriptor: "
                 << descr.description() << ".";
     return;
@@ -172,10 +172,10 @@ DFUDevice::~DFUDevice() {
   close();
 }
 
-QList<RadioInterface::Descriptor>
+QList<USBDeviceDescriptor>
 DFUDevice::detect(uint16_t vid, uint16_t pid)
 {
-  QList<RadioInterface::Descriptor> res;
+  QList<USBDeviceDescriptor> res;
 
   int error, num;
   libusb_context *ctx;
@@ -193,12 +193,17 @@ DFUDevice::detect(uint16_t vid, uint16_t pid)
     return res;
   }
 
+  logDebug() << "Search for DFU devices matching VID:PID "
+             << QString::number(vid, 16) << ":" << QString::number(pid, 16) << ".";
   for (int i=0; (i<num)&&(nullptr!=lst[i]); i++) {
     libusb_device_descriptor descr;
     libusb_get_device_descriptor(lst[i], &descr);
     if ((vid == descr.idVendor) && (pid == descr.idProduct)) {
+      logDebug() << "Found device on bus=" << libusb_get_bus_number(lst[i])
+                 << ", device=" << libusb_get_device_address(lst[i])
+                 << " with " << QString::number(vid, 16) << ":" << QString::number(pid, 16) << ".";
       res.append(DFUDevice::Descriptor(
-                   InterfaceInfo(InterfaceInfo::Class::DFU, vid, pid),
+                   USBDeviceInfo(USBDeviceInfo::Class::DFU, vid, pid),
                    libusb_get_bus_number(lst[i]),
                    libusb_get_device_address(lst[i])));
     }

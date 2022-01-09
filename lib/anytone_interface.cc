@@ -105,7 +105,7 @@ AnytoneInterface::AnytoneInterface(const ErrorStack &err, QObject *parent)
   }
 }
 
-AnytoneInterface::AnytoneInterface(const RadioInterface::Descriptor &descriptor, const ErrorStack &err, QObject *parent)
+AnytoneInterface::AnytoneInterface(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
   : USBSerial(descriptor, err, parent), _state(STATE_INITIALIZED), _info()
 {
   if (isOpen()) {
@@ -130,12 +130,12 @@ AnytoneInterface::~AnytoneInterface() {
     this->close();
 }
 
-InterfaceInfo
+USBDeviceInfo
 AnytoneInterface::interfaceInfo() {
-  return InterfaceInfo(InterfaceInfo::Class::Serial, USB_VID, USB_PID);
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID, USB_PID);
 }
 
-QList<RadioInterface::Descriptor>
+QList<USBDeviceDescriptor>
 AnytoneInterface::detect() {
   return USBSerial::detect(USB_VID, USB_PID);
 }

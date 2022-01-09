@@ -5,17 +5,9 @@
 #define RADIOINFERFACE_HH
 
 #include <QString>
+#include "usbdevice.hh"
 #include "radioinfo.hh"
 #include "errorstack.hh"
-
-/** Just a helper struct to hold the bus number and device address of a specific USB device.
- *
- * @ingroup rif */
-struct USBDeviceAddress {
-  uint8_t bus;      ///< Holds the bus number.
-  uint8_t device;   ///< Holds the device address.
-};
-Q_DECLARE_METATYPE(USBDeviceAddress)
 
 /** Abstract radio interface.
  * A radion interface must provide means to communicate with the device. That is, open a connection
@@ -27,34 +19,6 @@ Q_DECLARE_METATYPE(USBDeviceAddress)
  * @ingroup rif */
 class RadioInterface
 {
-public:
-  /** Base class for all radio iterface descriptors representing a unique interface to a
-   * connected radio. */
-  class Descriptor: public InterfaceInfo
-  {
-  protected:
-    /** Hidden constructor from info and path string. */
-    Descriptor(const InterfaceInfo &info, const QString &device);
-    /** Hidden constructor from info and USB device address. */
-    Descriptor(const InterfaceInfo &info, const USBDeviceAddress &device);
-
-  public:
-    /** Copy constructor. */
-    Descriptor(const Descriptor &other);
-
-    /** Assignment */
-    Descriptor &operator =(const Descriptor &other);
-
-    /** Returns a human readable description of the device. */
-    QString description() const;
-    /** Returns the device information identifying the interface uniquely. */
-    const QVariant &device() const;
-
-  protected:
-    /** Holds some information to identify the radio interface uniquely. */
-    QVariant _device;
-  };
-
 protected:
   /** Hidden constructor. */
   explicit RadioInterface();
@@ -129,7 +93,7 @@ public:
 
 public:
   /** Searches for all connected radios (may contain false positives). */
-  static QList<Descriptor> detect();
+  static QList<USBDeviceDescriptor> detect();
 };
 
 #endif // RADIOINFERFACE_HH

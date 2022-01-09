@@ -477,7 +477,7 @@ Radio::detect(const RadioInfo &force, const ErrorStack &err) {
 
 
 Radio *
-Radio::detect(const RadioInterface::Descriptor &descr, const RadioInfo &force, const ErrorStack &err) {
+Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const ErrorStack &err) {
   if (! descr.isValid()) {
     errMsg(err) << "Cannot detect radio: Invalid interface descriptor.";
   }

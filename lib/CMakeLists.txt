@@ -8,7 +8,7 @@ ENDIF(APPLE)
 
 SET(libdmrconf_SOURCES
     utils.cc crc32.cc signaling.cc codeplugcontext.cc addressmap.cc radiointerface.cc errorstack.cc
-    radio.cc ${hid_SOURCES} dfu_libusb.cc usbserial.cc radioinfo.cc
+    usbdevice.cc radio.cc ${hid_SOURCES} dfu_libusb.cc usbserial.cc radioinfo.cc
     csvreader.cc dfufile.cc repeaterdatabase.cc userdatabase.cc logger.cc
     configobject.cc configreference.cc config.cc radiosettings.cc contact.cc rxgrouplist.cc channel.cc zone.cc
     scanlist.cc gpssystem.cc codeplug.cc roaming.cc callsigndb.cc talkgroupdatabase.cc radioid.cc
@@ -27,7 +27,7 @@ SET(libdmrconf_SOURCES
     d578uv.cc d578uv_codeplug.cc
     d878uv2.cc d878uv2_codeplug.cc d878uv2_callsigndb.cc)
 SET(libdmrconf_MOC_HEADERS
-    radio.hh ${hid_HEADERS} dfu_libusb.hh usbserial.hh
+    usbdevice.hh radio.hh ${hid_HEADERS} dfu_libusb.hh usbserial.hh
     csvreader.hh dfufile.hh repeaterdatabase.hh userdatabase.hh logger.hh
     configobject.hh configreference.hh config.hh radiosettings.hh contact.hh rxgrouplist.hh channel.hh zone.hh
     scanlist.hh gpssystem.hh codeplug.hh roaming.hh callsigndb.hh talkgroupdatabase.hh radioid.hh

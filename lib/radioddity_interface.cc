@@ -27,7 +27,7 @@ RadioddityInterface::RadioddityInterface(const ErrorStack &err, QObject *parent)
     identifier();
 }
 
-RadioddityInterface::RadioddityInterface(const RadioInterface::Descriptor &descr, const ErrorStack &err, QObject *parent)
+RadioddityInterface::RadioddityInterface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
   : HIDevice(descr, err, parent), _current_bank(MEMBANK_NONE), _identifier()
 {
   if (isOpen())
@@ -39,12 +39,12 @@ RadioddityInterface::~RadioddityInterface() {
     close();
 }
 
-InterfaceInfo
+USBDeviceInfo
 RadioddityInterface::interfaceInfo() {
-  return InterfaceInfo(InterfaceInfo::Class::HID, USB_VID, USB_PID);
+  return USBDeviceInfo(USBDeviceInfo::Class::HID, USB_VID, USB_PID);
 }
 
-QList<RadioInterface::Descriptor>
+QList<USBDeviceDescriptor>
 RadioddityInterface::detect() {
   return HIDevice::detect(USB_VID, USB_PID);
 }

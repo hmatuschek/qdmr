@@ -7,7 +7,7 @@
  * Implementation of USBSerial::Info
  * ******************************************************************************************** */
 USBSerial::Descriptor::Descriptor(uint16_t vid, uint16_t pid, const QString &device)
-  : RadioInterface::Descriptor(InterfaceInfo(Class::Serial, vid, pid), device)
+  : USBDeviceDescriptor(USBDeviceInfo(Class::Serial, vid, pid), device)
 {
   // pass...
 }
@@ -79,10 +79,10 @@ USBSerial::USBSerial(unsigned vid, unsigned pid, const ErrorStack &err, QObject 
           this, SLOT(onError(QSerialPort::SerialPortError)));
 }
 
-USBSerial::USBSerial(const RadioInterface::Descriptor &descriptor, const ErrorStack &err, QObject *parent)
+USBSerial::USBSerial(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
   : QSerialPort(parent), RadioInterface()
 {
-  if (InterfaceInfo::Class::Serial != descriptor.interfaceClass()) {
+  if (USBDeviceInfo::Class::Serial != descriptor.interfaceClass()) {
     errMsg(err) << "Cannot open serial port for a non-serial descriptor: "
                 << descriptor.description();
   }
@@ -155,15 +155,20 @@ USBSerial::onClose() {
   logDebug() << "Serial port will close now.";
 }
 
-QList<RadioInterface::Descriptor>
+QList<USBDeviceDescriptor>
 USBSerial::detect(uint16_t vid, uint16_t pid) {
-  QList<RadioInterface::Descriptor> interfaces;
+  QList<USBDeviceDescriptor> interfaces;
   // Find matching serial port by VID/PID.
+  logDebug() << "Search for serial port with matching VID:PID " <<
+                QString::number(vid, 16) << ":" << QString::number(pid, 16) << ".";
   QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
   foreach (QSerialPortInfo port, ports) {
     if (port.hasProductIdentifier() && (pid == port.productIdentifier()) &&
-        port.hasVendorIdentifier() && (vid == port.vendorIdentifier()))
+        port.hasVendorIdentifier() && (vid == port.vendorIdentifier())) {
       interfaces.append(Descriptor(vid, pid, port.systemLocation()));
+      logDebug() << "Found " << port.systemLocation() << " (USB "
+                 << QString::number(vid, 16) << ":" << QString::number(pid, 16) << ").";
+    }
   }
   return interfaces;
 }

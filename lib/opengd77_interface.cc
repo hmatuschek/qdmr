@@ -165,7 +165,7 @@ OpenGD77Interface::OpenGD77Interface(const ErrorStack &err, QObject *parent)
   // pass...
 }
 
-OpenGD77Interface::OpenGD77Interface(const RadioInterface::Descriptor &descr, const ErrorStack &err, QObject *parent)
+OpenGD77Interface::OpenGD77Interface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
   : USBSerial(descr, err, parent), _sector(-1)
 {
   // pass...
@@ -175,12 +175,12 @@ OpenGD77Interface::~OpenGD77Interface() {
   // pass...
 }
 
-InterfaceInfo
+USBDeviceInfo
 OpenGD77Interface::interfaceInfo() {
-  return InterfaceInfo(InterfaceInfo::Class::Serial, USB_VID, USB_PID);
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID, USB_PID);
 }
 
-QList<RadioInterface::Descriptor>
+QList<USBDeviceDescriptor>
 OpenGD77Interface::detect() {
   return USBSerial::detect(USB_VID, USB_PID);
 }

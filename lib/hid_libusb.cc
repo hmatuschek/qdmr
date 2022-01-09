@@ -8,8 +8,8 @@
 /* ********************************************************************************************* *
  * Implementation of HIDevice::Descriptor
  * ********************************************************************************************* */
-HIDevice::Descriptor::Descriptor(const InterfaceInfo &info, uint8_t bus, uint8_t device)
-  : RadioInterface::Descriptor(info, QString("%1:%2").arg(bus).arg(device))
+HIDevice::Descriptor::Descriptor(const USBDeviceInfo &info, uint8_t bus, uint8_t device)
+  : USBDeviceDescriptor(info, QString("%1:%2").arg(bus).arg(device))
 {
   // pass...
 }
@@ -58,10 +58,10 @@ HIDevice::HIDevice(int vid, int pid, const ErrorStack &err, QObject *parent)
   }
 }
 
-HIDevice::HIDevice(const RadioInterface::Descriptor &descr, const ErrorStack &err, QObject *parent)
+HIDevice::HIDevice(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
   : QObject(parent), _ctx(nullptr), _dev(nullptr), _transfer(nullptr)
 {
-  if (InterfaceInfo::Class::HID != descr.interfaceClass()) {
+  if (USBDeviceInfo::Class::HID != descr.interfaceClass()) {
     errMsg(err) << "Cannot connect to HID device using a non HID descriptor: "
                 << descr.description() << ".";
     return;
@@ -139,9 +139,9 @@ HIDevice::~HIDevice() {
   close();
 }
 
-QList<RadioInterface::Descriptor>
+QList<USBDeviceDescriptor>
 HIDevice::detect(uint16_t vid, uint16_t pid) {
-  QList<RadioInterface::Descriptor> res;
+  QList<USBDeviceDescriptor> res;
 
   int error, num;
   libusb_context *ctx;
@@ -159,12 +159,18 @@ HIDevice::detect(uint16_t vid, uint16_t pid) {
     return res;
   }
 
+  logDebug() << "Search for HID interfaces matching VID:PID "
+             << QString::number(vid, 16) << ":" << QString::number(pid, 16) << ".";
   for (int i=0; (i<num)&&(nullptr!=lst[i]); i++) {
     libusb_device_descriptor descr;
     libusb_get_device_descriptor(lst[i], &descr);
     if ((vid == descr.idVendor) && (pid == descr.idProduct)) {
+      logDebug() << "Found device on bus=" << libusb_get_bus_number(lst[i])
+                 << ", device=" << libusb_get_device_address(lst[i])
+                 << " matching " << QString::number(vid, 16) << ":"
+                 << QString::number(pid, 16) << ".";
       res.append(HIDevice::Descriptor(
-                   InterfaceInfo(InterfaceInfo::Class::HID, vid, pid),
+                   USBDeviceInfo(USBDeviceInfo::Class::HID, vid, pid),
                    libusb_get_bus_number(lst[i]),
                    libusb_get_device_address(lst[i])));
     }

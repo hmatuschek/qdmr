@@ -28,18 +28,18 @@ private:
 
 public:
   /** Specialization to address a DFU device uniquely. */
-  class Descriptor: public RadioInterface::Descriptor
+  class Descriptor: public USBDeviceDescriptor
   {
   public:
     /** Constructor from interface info, bus number and device address. */
-    Descriptor(const InterfaceInfo &info, uint8_t bus, uint8_t device);
+    Descriptor(const USBDeviceInfo &info, uint8_t bus, uint8_t device);
   };
 
 public:
   /** Opens a connection to the USB-DFU devuce at vendor @c vid and product @c pid. */
   DFUDevice(unsigned vid, unsigned pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Opens a connection to the USB-DFU devuce at vendor @c vid and product @c pid. */
-  DFUDevice(const RadioInterface::Descriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+  DFUDevice(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
 	virtual ~DFUDevice();
 
@@ -55,7 +55,7 @@ public:
 
 public:
   /** Finds all DFU interfaces with the specified VID/PID combination. */
-  static QList<RadioInterface::Descriptor> detect(uint16_t vid, uint16_t pid);
+  static QList<USBDeviceDescriptor> detect(uint16_t vid, uint16_t pid);
 
 protected:
   /** Internal used function to detach the device. */

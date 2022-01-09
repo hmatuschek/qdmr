@@ -11,13 +11,13 @@ int detect(QCommandLineParser &parser, QCoreApplication &app) {
   Q_UNUSED(parser);
   Q_UNUSED(app);
 
-  QList<RadioInterface::Descriptor> interfaces = RadioInterface::detect();
+  QList<USBDeviceDescriptor> interfaces = RadioInterface::detect();
   if (interfaces.isEmpty()) {
     logError() << "No compatible devices found.";
     return -1;
   }
 
-  foreach (RadioInterface::Descriptor interface, interfaces) {
+  foreach (USBDeviceDescriptor interface, interfaces) {
     logInfo() << "Found " << interface.description() << ". " << interface.longDescription() << ".";
   }
 
