@@ -240,9 +240,9 @@ public:
 
 public:
   /** Detects a radio and returns the corresponding device specific radio instance. */
-  static Radio *detect(const RadioInfo &force=RadioInfo(), const ErrorStack &err=ErrorStack());
-  /** Detects a radio and returns the corresponding device specific radio instance. */
   static Radio *detect(const ErrorStack &err=ErrorStack());
+  /** Detects a radio and returns the corresponding device specific radio instance. */
+  static Radio *detect(const RadioInfo &force=RadioInfo(), const ErrorStack &err=ErrorStack());
   /** Tries to detect the radio connected to the specified interface. */
   static Radio *detect(const USBDeviceDescriptor &descr, const RadioInfo &force=RadioInfo(), const ErrorStack &err=ErrorStack());
 

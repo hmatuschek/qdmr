@@ -1,19 +1,25 @@
+/** @defgroup detect Device detection and enumeration.
+ *
+ * @ingroup rif */
+
 #ifndef USBDEVICE_HH
 #define USBDEVICE_HH
 
 #include <inttypes.h>
 #include <QVariant>
 
-/** Just a helper struct to hold the bus number and device address of a specific USB device.
+/** Combines the USB bus and device ID to address a USB device uniquely.
  *
- * @ingroup rif */
+ * @ingroup dectect */
 struct USBDeviceAddress {
   uint8_t bus;      ///< Holds the bus number.
   uint8_t device;   ///< Holds the device address.
 };
 Q_DECLARE_METATYPE(USBDeviceAddress)
 
-/** Generic information about a possible radio interface. */
+/** Generic information about a possible radio interface.
+ * This class combines the USB vendor, product ID.
+ * @ingroup detect */
 class USBDeviceInfo
 {
 public:
@@ -71,7 +77,8 @@ protected:
 
 
 /** Base class for all radio iterface descriptors representing a unique interface to a
- * connected radio. */
+ * connected radio.
+ * @ingroup rif */
 class USBDeviceDescriptor: public USBDeviceInfo
 {
 protected:
