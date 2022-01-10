@@ -40,6 +40,8 @@ public:
   bool hasPosition() const;
   QGeoCoordinate position() const;
 
+  Radio *autoDetect(const ErrorStack &err=ErrorStack());
+
 public slots:
   void newCodeplug();
   void loadCodeplug();
@@ -94,6 +96,9 @@ protected:
   QGeoCoordinate _currentPosition;
 
   ReleaseNotes _releaseNotes;
+
+  // Last detected device:
+  USBDeviceDescriptor _lastDevice;
 };
 
 #endif // APPLICATION_HH
