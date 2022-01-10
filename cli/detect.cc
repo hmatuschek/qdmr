@@ -9,7 +9,8 @@
 
 int detect(QCommandLineParser &parser, QCoreApplication &app) {
   // Try to detect a radio
-  Radio *radio = autoDetect(parser, app);
+  ErrorStack err;
+  Radio *radio = autoDetect(parser, app, err);
   logInfo() << "Found: '" << radio->name() << "'.";
   delete  radio;
 

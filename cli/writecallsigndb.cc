@@ -63,16 +63,16 @@ int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     }
   }
 
-  Radio *radio = autoDetect(parser, app);
+  ErrorStack err;
+  Radio *radio = autoDetect(parser, app, err);
   if (nullptr == radio) {
-    logError() << "Could not detect radio.";
+    logError() << "Could not detect radio: " << err.format();
     return -1;
   }
 
   showProgress();
   QObject::connect(radio, &Radio::uploadProgress, updateProgress);
 
-  ErrorStack err;
   if (! radio->startUploadCallsignDB(&userdb, true, selection, err)) {
     logError() << "Could not upload call-sign DB to radio: " << err.format();
     return -1;

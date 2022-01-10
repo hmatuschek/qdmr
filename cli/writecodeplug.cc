@@ -34,9 +34,10 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   }
   logDebug() << "Read codeplug from '" << filename << "'.";
 
-  Radio *radio = autoDetect(parser, app);
+  ErrorStack err;
+  Radio *radio = autoDetect(parser, app, err);
   if (nullptr == radio) {
-    logError() << "Cannot detect radio.";
+    logError() << "Cannot detect radio:" << err.format();
     return -1;
   }
 
@@ -72,7 +73,6 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   if (parser.isSet("auto-enable-roaming"))
     flags.autoEnableRoaming = true;
 
-  ErrorStack err;
   logDebug() << "Start upload to " << radio->name() << ".";
   if (! radio->startUpload(&config, true, flags, err)) {
     logError() << "Codeplug upload error: " << err.format();

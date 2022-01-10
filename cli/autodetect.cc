@@ -54,14 +54,14 @@ printDevices(QTextStream &out, const QList<USBDeviceDescriptor> &devices) {
 }
 
 Radio *
-autoDetect(QCommandLineParser &parser, QCoreApplication &app) {
+autoDetect(QCommandLineParser &parser, QCoreApplication &app, const ErrorStack &err) {
   Q_UNUSED(app)
 
   logDebug() << "Autodetect radios.";
 
   QList<USBDeviceDescriptor> interfaces = USBDeviceDescriptor::detect();
   if (interfaces.isEmpty()) {
-    logError() << "No matching USB devices are found. Check connection?";
+    errMsg(err) << "No matching USB devices are found. Check connection?";
     return nullptr;
   }
 
@@ -76,21 +76,20 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app) {
       }
     }
     if (! device.isValid()) {
-      LogMessage msg(LogMessage::ERROR, __FILE__, __LINE__);
+      ErrorStack::MessageStream msg(err, __FILE__, __LINE__);
       msg << "Device handle '" << parser.value("device") << "' not found in:\n";
       printDevices(msg, interfaces);
       return nullptr;
     }
   } else if (1 != interfaces.size()) {
     // If no device is specified, there should only be one interface
-    logError() << "Cannot auto-detect radio, more than one matching USB devices found:"
-               << " Use --device option to specifiy to which device to talk to.";
-    LogMessage msg(LogMessage::INFO, __FILE__, __LINE__);
-    msg << "Devices found:\n";
+    ErrorStack::MessageStream msg(err, __FILE__, __LINE__);
+    msg << "Cannot auto-detect radio, more than one matching USB devices found:"
+        << " Use --device option to specifiy to which device to talk to. Devices found:\n";
     printDevices(msg, interfaces);
     return nullptr;
   } else if (! interfaces.first().isSave()) {
-    LogMessage msg(LogMessage::ERROR, __FILE__, __LINE__);
+    ErrorStack::MessageStream msg(err, __FILE__, __LINE__);
     msg << "It is not save to assume that the device:\n";
     printDevices(msg, interfaces);
     msg << "is a DMR radio. Please specify the device explicitly to verify correctness.";
@@ -107,13 +106,12 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app) {
   if (parser.isSet("radio")) {
     RadioInfo radio = RadioInfo::byKey(parser.value("radio").toLower());
     if (! radio.isValid()) {
-      logError() << "Uknown radio '" << parser.value("radio").toLower() << "'.";
+      errMsg(err) << "Uknown radio '" << parser.value("radio").toLower() << "'.";
       return nullptr;
     }
-    ErrorStack err;
     Radio *rad = Radio::detect(device, radio, err);
     if (nullptr == rad) {
-      logError() << "Cannot detect radio: " << err.format();
+      logError() << "Cannot detect radio.";
       return nullptr;
     }
     return rad;
@@ -123,18 +121,17 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app) {
     foreach (RadioInfo info, RadioInfo::allRadios(device)) {
       radios.append(info.key());
     }
-    logError() << "It is not possible to identify the radio connected to the device '"
-               << formatDeviceHandle(device) << ". You have to specify which radio to use using "
-               << "the --radio option. Possible radios for this device are "
-               << radios.join(", ") << ".";
+    errMsg(err) << "It is not possible to identify the radio connected to the device '"
+                << formatDeviceHandle(device) << ". You have to specify which radio to use using "
+                << "the --radio option. Possible radios for this device are "
+                << radios.join(", ") << ".";
     return nullptr;
   }
 
   // Try auto-detect:
-  ErrorStack err;
   Radio *rad = Radio::detect(device, RadioInfo(), err);
   if (nullptr == rad) {
-    logError() << "Cannot auto-detect radio: " << err.format();
+    errMsg(err) << "Cannot auto-detect radio.";
     return nullptr;
   }
   return rad;

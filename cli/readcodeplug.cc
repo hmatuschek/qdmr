@@ -22,9 +22,10 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   if (2 > parser.positionalArguments().size())
     parser.showHelp(-1);
 
-  Radio *radio = autoDetect(parser, app);
+  ErrorStack err;
+  Radio *radio = autoDetect(parser, app, err);
   if (nullptr == radio) {
-    logError() << "Cannot detect radio.";
+    logError() << "Cannot detect radio: " << err.format();
     return -1;
   }
 
@@ -33,7 +34,6 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   showProgress();
   QObject::connect(radio, &Radio::downloadProgress, updateProgress);
 
-  ErrorStack err;
   Config config;
   if (! radio->startDownload(true, err)) {
     logError() << "Codeplug download error: " << err.format();
