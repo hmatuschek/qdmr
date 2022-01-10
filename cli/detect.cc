@@ -11,7 +11,7 @@ int detect(QCommandLineParser &parser, QCoreApplication &app) {
   Q_UNUSED(parser);
   Q_UNUSED(app);
 
-  QList<USBDeviceDescriptor> interfaces = RadioInterface::detect();
+  QList<USBDeviceDescriptor> interfaces = USBDeviceDescriptor::detect();
   if (interfaces.isEmpty()) {
     logError() << "No compatible devices found.";
     return -1;
@@ -22,11 +22,24 @@ int detect(QCommandLineParser &parser, QCoreApplication &app) {
   }
 
   if (1 < interfaces.count()) {
-    logInfo() << "More than one interface detected. Do not proceed.";
+    logInfo() << "More than one interface detected. Please specify which device to use.";
     return 0;
   }
 
+  if (! interfaces.first().isSave()) {
+    logError() << "Is it not save to assume that the detected device " << interfaces.first().description()
+               << " is a DMR radio. Confirm by specifying the interface explicitly using --device."
+               << " This issue arises if a radio uses a generic USB-to-serial chip which may also be"
+               << " used by other devices.";
+    return -1;
+  }
+
   logDebug() << "Only a single known radio interface detected, try to detect specific radio.";
+  if (! interfaces.first().isIdentifiable()) {
+    logError() << "The protocol implemented by the radio does not provide means for identifying the"
+               << " device. You need to specify the radio explicitly using --radio.";
+    return -1;
+  }
 
   ErrorStack err;
   Radio *radio = Radio::detect(interfaces.first(), RadioInfo(), err);

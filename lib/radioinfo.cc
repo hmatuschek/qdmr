@@ -55,17 +55,17 @@ RadioInfo::_radiosById = QHash<unsigned, RadioInfo>{
 /* ********************************************************************************************* *
  * Implementation of RadioInfo
  * ********************************************************************************************* */
-RadioInfo::RadioInfo(
-    Radio radio, const QString &name, const QString manufacturer,
-    const QList<RadioInfo> &alias, const USBDeviceInfo &interface)
+RadioInfo::RadioInfo(Radio radio, const QString &name, const QString manufacturer,
+                     const USBDeviceInfo &interface, const QList<RadioInfo> &alias)
   : _radio(radio), _key(name.toLower()), _name(name), _manufacturer(manufacturer), _alias(alias),
     _interface(interface)
 {
   // pass...
 }
 
-RadioInfo::RadioInfo(Radio radio, const QString &key, const QString &name, const QString manufacturer,
-                     const QList<RadioInfo> &alias, const USBDeviceInfo &interface)
+RadioInfo::RadioInfo(Radio radio, const QString &key, const QString &name,
+                     const QString manufacturer, const USBDeviceInfo &interface,
+                     const QList<RadioInfo> &alias)
   : _radio(radio), _key(key), _name(name), _manufacturer(manufacturer), _alias(alias),
     _interface(interface)
 {

@@ -86,8 +86,7 @@ GD77::codeplug() {
 RadioInfo
 GD77::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::GD77, "gd77", "GD-77", "Radioddity",
-        QList<RadioInfo>(), RadioddityInterface::interfaceInfo());
+        RadioInfo::GD77, "gd77", "GD-77", "Radioddity", RadioddityInterface::interfaceInfo());
 }
 
 

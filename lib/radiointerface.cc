@@ -28,13 +28,3 @@ RadioInterface::reboot(const ErrorStack &err) {
   Q_UNUSED(err)
   return true;
 }
-
-QList<USBDeviceDescriptor>
-RadioInterface::detect() {
-  QList<USBDeviceDescriptor> res;
-  res.append(AnytoneInterface::detect());
-  res.append(OpenGD77Interface::detect());
-  res.append(RadioddityInterface::detect());
-  res.append(TyTInterface::detect());
-  return res;
-}

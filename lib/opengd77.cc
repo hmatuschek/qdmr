@@ -102,8 +102,7 @@ OpenGD77::codeplug() {
 RadioInfo
 OpenGD77::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::OpenGD77, "opengd77", "OpenGD77", "OpenGD77 Project",
-        QList<RadioInfo>(), OpenGD77Interface::interfaceInfo());
+        RadioInfo::OpenGD77, "opengd77", "OpenGD77", "OpenGD77 Project", OpenGD77Interface::interfaceInfo());
 }
 
 

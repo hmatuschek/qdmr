@@ -90,10 +90,6 @@ public:
    * this function does nothing.
    * @param err Passes an error stack to put error messages on. */
   virtual bool reboot(const ErrorStack &err=ErrorStack());
-
-public:
-  /** Searches for all connected radios (may contain false positives). */
-  static QList<USBDeviceDescriptor> detect();
 };
 
 #endif // RADIOINFERFACE_HH

@@ -75,8 +75,7 @@ DM1701::features() const {
 RadioInfo
 DM1701::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::DM1701, "dm1701", "DM-1701", "Baofeng",
-        QList<RadioInfo>(), TyTInterface::interfaceInfo());
+        RadioInfo::DM1701, "dm1701", "DM-1701", "Baofeng", TyTInterface::interfaceInfo());
 }
 
 const Codeplug &

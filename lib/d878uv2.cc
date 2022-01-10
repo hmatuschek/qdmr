@@ -153,6 +153,5 @@ D878UV2::features() const {
 RadioInfo
 D878UV2::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::D878UVII, "d878uv2", "AT-D878UVII", "AnyTone",
-        QList<RadioInfo>(), AnytoneInterface::interfaceInfo());
+        RadioInfo::D878UVII, "d878uv2", "AT-D878UVII", "AnyTone", AnytoneInterface::interfaceInfo());
 }

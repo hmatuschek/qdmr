@@ -1,7 +1,14 @@
 #include "usbdevice.hh"
 #include <QTextStream>
-
+#include <QSerialPortInfo>
+#include <libusb.h>
+#include "logger.hh"
 #include "radioinfo.hh"
+
+#include "anytone_interface.hh"
+#include "radioddity_interface.hh"
+#include "opengd77_interface.hh"
+#include "tyt_interface.hh"
 
 
 /* ********************************************************************************************* *
@@ -13,14 +20,15 @@ USBDeviceInfo::USBDeviceInfo()
   // pass...
 }
 
-USBDeviceInfo::USBDeviceInfo(Class cls, uint16_t vid, uint16_t pid)
-  : _class(cls), _vid(vid), _pid(pid)
+USBDeviceInfo::USBDeviceInfo(Class cls, uint16_t vid, uint16_t pid, bool save, bool identifiable)
+  : _class(cls), _vid(vid), _pid(pid), _save(save), _identifiable(identifiable)
 {
   // pass...
 }
 
 USBDeviceInfo::USBDeviceInfo(const USBDeviceInfo &other)
-  : _class(other._class), _vid(other._vid), _pid(other._pid)
+  : _class(other._class), _vid(other._vid), _pid(other._pid), _save(other._save),
+    _identifiable(other._identifiable)
 {
   // pass...
 }
@@ -30,6 +38,8 @@ USBDeviceInfo::operator =(const USBDeviceInfo &other) {
   _class = other._class;
   _vid = other._vid;
   _pid = other._pid;
+  _save = other._save;
+  _identifiable = other._identifiable;
   return *this;
 }
 
@@ -63,6 +73,16 @@ USBDeviceInfo::vendorId() const {
 uint16_t
 USBDeviceInfo::productId() const {
   return _pid;
+}
+
+bool
+USBDeviceInfo::isSave() const {
+  return _save;
+}
+
+bool
+USBDeviceInfo::isIdentifiable() const {
+  return _identifiable;
 }
 
 QString
@@ -129,6 +149,81 @@ USBDeviceDescriptor::operator =(const USBDeviceDescriptor &other) {
   return *this;
 }
 
+bool
+USBDeviceDescriptor::isValid() const {
+  // dispatch by device class
+  switch (_class) {
+  case Class::None:
+    return false;
+  case Class::Serial:
+    return validSerial();
+  case Class::DFU:
+  case Class::HID:
+    return validRawUSB();
+  }
+  return false;
+}
+
+bool
+USBDeviceDescriptor::validRawUSB() const {
+  int error, num;
+  libusb_context *ctx;
+  if (0 > (error = libusb_init(&ctx))) {
+    logError() << "Libusb init failed (" << error << "): "
+               << libusb_strerror((enum libusb_error) error) << ".";
+    return false;
+  }
+
+  libusb_device **lst;
+  if (0 == (num = libusb_get_device_list(ctx, &lst))) {
+    logDebug() << "No USB devices found at all.";
+    // unref devices and free list
+    libusb_free_device_list(lst, 1);
+    libusb_exit(ctx);
+    return false;
+  }
+
+  USBDeviceAddress addr = _device.value<USBDeviceAddress>();
+  logDebug() << "Search for a device matching VID:PID "
+             << QString::number(_vid, 16) << ":" << QString::number(_pid, 16)
+             << " at bus " << addr.bus << ", device " << addr.device << ".";
+  bool found = false;
+  for (int i=0; (i<num)&&(nullptr!=lst[i]); i++) {
+    libusb_device_descriptor descr;
+    libusb_get_device_descriptor(lst[i], &descr);
+    found = ( (_vid == descr.idVendor) && (_pid == descr.idProduct) &&
+              (libusb_get_bus_number(lst[i])==addr.bus) &&
+              (libusb_get_device_address(lst[i])==addr.device) );
+    if (found) {
+      logDebug() << "Found device on bus=" << libusb_get_bus_number(lst[i])
+                 << ", device=" << libusb_get_device_address(lst[i])
+                 << " with " << QString::number(_vid, 16) << ":" << QString::number(_pid, 16) << ".";
+      break;
+    }
+  }
+
+  // Free list and context
+  libusb_free_device_list(lst, 1);
+  libusb_exit(ctx);
+
+  // done.
+  return found;
+}
+
+bool
+USBDeviceDescriptor::validSerial() const {
+  QSerialPortInfo info(_device.toString());
+  logDebug() << "Check if serial port " << _device.toString() << " still exisist and has VID:PID "
+             << QString::number(_vid, 16) << ":" << QString::number(_pid, 16) << ".";
+
+  if (! info.isValid()) {
+    logDebug() << "Serial port " << _device.toString() << " is not valid anymore.";
+    return false;
+  }
+
+  return ((_vid == info.vendorIdentifier()) && (_pid == info.productIdentifier()));
+}
+
 QString
 USBDeviceDescriptor::description() const {
   if (USBDeviceInfo::Class::Serial == _class) {
@@ -148,4 +243,13 @@ USBDeviceDescriptor::device() const {
   return _device;
 }
 
+QList<USBDeviceDescriptor>
+USBDeviceDescriptor::detect() {
+  QList<USBDeviceDescriptor> res;
+  res.append(AnytoneInterface::detect());
+  res.append(OpenGD77Interface::detect());
+  res.append(RadioddityInterface::detect());
+  res.append(TyTInterface::detect());
+  return res;
+}
 

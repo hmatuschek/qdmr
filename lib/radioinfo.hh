@@ -41,10 +41,12 @@ public:
 public:
   /** Use static methods the access radio info or call @c Radio::defaultRadioInfo. */
   RadioInfo(Radio radio, const QString &name, const QString manufacturer,
-            const QList<RadioInfo> &alias=QList<RadioInfo>(), const USBDeviceInfo &interface=USBDeviceInfo());
+            const USBDeviceInfo &interface,
+            const QList<RadioInfo> &alias=QList<RadioInfo>());
   /** Use static methods the access radio info or call @c Radio::defaultRadioInfo. */
   RadioInfo(Radio radio, const QString &key, const QString &name, const QString manufacturer,
-            const QList<RadioInfo> &alias=QList<RadioInfo>(), const USBDeviceInfo &interface=USBDeviceInfo());
+            const USBDeviceInfo &interface,
+            const QList<RadioInfo> &alias=QList<RadioInfo>());
 
   /** Empty constructor. */
   RadioInfo();
