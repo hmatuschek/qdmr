@@ -51,6 +51,11 @@
 struct USBDeviceAddress {
   uint8_t bus;      ///< Holds the bus number.
   uint8_t device;   ///< Holds the device address.
+
+  /** Empty constructor. */
+  USBDeviceAddress();
+  /** Constructor from bus and device number. */
+  USBDeviceAddress(uint8_t busno, uint8_t deviceno);
 };
 Q_DECLARE_METATYPE(USBDeviceAddress)
 
@@ -138,6 +143,8 @@ protected:
   USBDeviceDescriptor(const USBDeviceInfo &info, const USBDeviceAddress &device);
 
 public:
+  /** Empty constructor. */
+  USBDeviceDescriptor();
   /** Copy constructor. */
   USBDeviceDescriptor(const USBDeviceDescriptor &other);
 

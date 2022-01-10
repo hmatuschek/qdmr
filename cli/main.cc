@@ -60,6 +60,13 @@ int main(int argc, char *argv[])
                      " Can be used with 'decode'.")
                    });
   parser.addOption({
+                     {"D","device"},
+                     QCoreApplication::translate("main", "Specifies the device to use to talk to "
+                     "the radio. If not specified, the dmrconf will try to detect the radio "
+                     "automatically. Please note, that for some radios the device must be specified."),
+                     QCoreApplication::translate("main", "DEVICE")
+                   });
+  parser.addOption({
                      {"R", "radio"},
                      QCoreApplication::translate("main", "Specifies the radio. This option can also "
                      "be used to override the auto-detection of radios. Be careful using this "

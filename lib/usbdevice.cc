@@ -12,7 +12,23 @@
 
 
 /* ********************************************************************************************* *
- * Implementation of InterfaceInfo
+ * Implementation of USBDeviceAddress
+ * ********************************************************************************************* */
+USBDeviceAddress::USBDeviceAddress()
+  : bus(0xff), device(0xff)
+{
+  // pass...
+}
+
+USBDeviceAddress::USBDeviceAddress(uint8_t busno, uint8_t deviceno)
+  : bus(busno), device(deviceno)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of USBDeviceInfo
  * ********************************************************************************************* */
 USBDeviceInfo::USBDeviceInfo()
   : _class(Class::None), _vid(0), _pid(0)
@@ -124,6 +140,12 @@ USBDeviceInfo::longDescription() const {
 /* ********************************************************************************************* *
  * Implementation of USBDeviceDescriptor
  * ********************************************************************************************* */
+USBDeviceDescriptor::USBDeviceDescriptor()
+  : USBDeviceInfo(), _device()
+{
+  // pass...
+}
+
 USBDeviceDescriptor::USBDeviceDescriptor(const USBDeviceInfo &info, const QString &device)
   : USBDeviceInfo(info), _device(device)
 {
@@ -151,6 +173,9 @@ USBDeviceDescriptor::operator =(const USBDeviceDescriptor &other) {
 
 bool
 USBDeviceDescriptor::isValid() const {
+  if (! USBDeviceInfo::isValid())
+    return false;
+
   // dispatch by device class
   switch (_class) {
   case Class::None:
