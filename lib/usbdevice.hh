@@ -8,34 +8,32 @@
  * device with a specific VID:PID combination may not be valid. To this end, some means of
  * discovering possible radios and selecting a specific one by the user are needed. Also some radios
  * do not identify themselves before any action is performed (i.e., reading, writing the codeplug
- * or callsign db). Hence for some devices, the user must specify the type of the radio. The latter
+ * or callsign db). Hence, for some devices, the user must specify the type of the radio. The latter
  * concerns the Kydera CDR-300UV, Retevis RT73 and similar devices.
  *
  * This module specifies the classes and functions to discover possible radios and to address each
  * one uniquely. They allow for an implementation of a semi-automatic device detection. That is,
  * for the majority of radios, if a single matching VID:PID combination is found, it can be assumed
  * that this device is a radio and it can then be identified by sending commands to it. Some radios,
- * however, like the Kydera CDr-300UV again cannot be identified before the actual codeplug read or
+ * however, like the Kydera CDR-300UV, cannot be identified before the actual codeplug read or
  * write operation. They simply do not provide a command for identification.
  *
  * For a save semi-automatic detection the following steps are performed:
  * @dotfile autodetect.dot "Semi-automatic radio detection"
  *
  *   -# Search for all USB devices with known VID:PID combinations. This can be done using the
- *      @c USBDeviceDescriptor::detect method. It returns a list of device descriptors found.
- *      If only one device is found, one may proceede with that one if it is save to assume that
- *      the device detected is a DMR radio. The latter is not true for radios using generic
- *      USB-serial interfaces as any other serial device may be connected. If severals are found or
+ *      @c USBDeviceDescriptor::detect method. It returns a list of matching device descriptors
+ *      found. If only one device is found, one may continue with that one if it is save to assume
+ *      that the device detected is a DMR radio. The latter is not true for radios using generic
+ *      USB CDC-ACM chips, as other serial devices may be connected. If several devices are found or
  *      it is not save to assume a DMR radio, the user must select a device.
  *   -# Once the USB device is selected, one needs to identify the connected radio. Unfortunately,
  *      not all radios can be identified easily by simply sending a command to it. To this end,
- *      one first needs to check if the selected radio is identifiable. This can be done by
- *      obtaining all known radios matching the selected USB device (VID:PID). This can be done
- *      using RadioInfo::allRadios passing the @c USBDeviceDescriptor. Each @c RadioInfo holds a
- *      flag @c RadioInfo::identifiable indicating whether the radio can be identified. If one of
- *      the returned radios is not identifiable, the user must select the specific radio. If all
- *      radios are identifiable, the auto-detection may complete by querying the radio for an ID.
- *
+ *      one first needs to check if the selected device is identifiable. That is, if the protocol
+ *      provides commands to identify the connected radio. The @c USBDeviceInfo provides this
+ *      information. If a device is not identifiable, the user must specify the specific connected
+ *      radio. This can be done by obtaining all known radios matching the selected USB device
+ *      (VID:PID) by calling RadioInfo::allRadios, passing the @c USBDeviceDescriptor.
  *
  * @ingroup rif */
 
@@ -45,7 +43,7 @@
 #include <inttypes.h>
 #include <QVariant>
 
-/** Combines the USB bus and device ID to address a USB device uniquely.
+/** Combines the USB bus and device number, to address a USB device uniquely.
  *
  * @ingroup detect */
 struct USBDeviceAddress {
@@ -60,7 +58,11 @@ struct USBDeviceAddress {
 Q_DECLARE_METATYPE(USBDeviceAddress)
 
 /** Generic information about a possible radio interface.
- * This class combines the USB vendor, product ID.
+ *
+ * This class combines the USB vendor, product ID and some meta information about the interface.
+ * In particular if it is save to access the device without user ineraction and if the protocol
+ * implements means for identifying the specific radio.
+ *
  * @ingroup detect */
 class USBDeviceInfo
 {
@@ -133,6 +135,10 @@ protected:
 
 /** Base class for all radio iterface descriptors representing a unique interface to a
  * connected radio.
+ *
+ * This class extends the @c USBDeviceInfo by some information to identify a USB uniquely. This is
+ * either the bus and device number or the path to the serial port.
+ *
  * @ingroup detect */
 class USBDeviceDescriptor: public USBDeviceInfo
 {
@@ -157,8 +163,11 @@ public:
 
   /** Returns a human readable description of the device. */
   QString description() const;
+
   /** Returns the device information identifying the interface uniquely. */
   const QVariant &device() const;
+  /** Returns a unique string representation of the device information. */
+  QString deviceHandle() const;
 
 public:
   /** Searches for all connected radios (may contain false positives). */

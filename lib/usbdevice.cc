@@ -268,6 +268,22 @@ USBDeviceDescriptor::device() const {
   return _device;
 }
 
+QString
+USBDeviceDescriptor::deviceHandle() const {
+  switch (_class) {
+  case Class::None:
+    break;
+  case Class::DFU:
+  case Class::HID:
+    return QString("%1:%2").arg(_device.value<USBDeviceAddress>().bus)
+        .arg(_device.value<USBDeviceAddress>().device);
+  case Class::Serial:
+    return _device.toString();
+  }
+
+  return "[invalid]";
+}
+
 QList<USBDeviceDescriptor>
 USBDeviceDescriptor::detect() {
   QList<USBDeviceDescriptor> res;

@@ -13,15 +13,6 @@ parseDeviceHandle(const QString &device) {
   return QVariant(device.simplified());
 }
 
-QString formatDeviceHandle(const USBDeviceDescriptor &device) {
-  if (! device.isValid())
-    return "[invalid]";
-  if (USBDeviceInfo::Class::Serial == device.interfaceClass())
-    return device.device().toString();
-  USBDeviceAddress addr = device.device().value<USBDeviceAddress>();
-  return QString("%1:%2").arg(addr.bus).arg(addr.device);
-}
-
 void
 printDevices(QTextStream &out, const QList<USBDeviceDescriptor> &devices) {
   out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << " Device";
@@ -100,7 +91,7 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app, const ErrorStack &
   }
 
   LogMessage msg(LogMessage::DEBUG, __FILE__, __LINE__);
-  msg << "Using device " << formatDeviceHandle(device) << ".";
+  msg << "Using device " << device.deviceHandle() << ".";
 
   // Handle identifiability of radio
   if (parser.isSet("radio")) {
@@ -122,7 +113,7 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app, const ErrorStack &
       radios.append(info.key());
     }
     errMsg(err) << "It is not possible to identify the radio connected to the device '"
-                << formatDeviceHandle(device) << ". You have to specify which radio to use using "
+                << device.deviceHandle() << ". You have to specify which radio to use using "
                 << "the --radio option. Possible radios for this device are "
                 << radios.join(", ") << ".";
     return nullptr;
