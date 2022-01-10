@@ -12,6 +12,7 @@
 #include "config.hh"
 #include "codeplug.hh"
 #include "progressbar.hh"
+#include "autodetect.hh"
 
 
 int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
@@ -21,25 +22,9 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   if (2 > parser.positionalArguments().size())
     parser.showHelp(-1);
 
-  RadioInfo forceRadio;
-  if (parser.isSet("radio")) {
-    logWarn() << "You force the radio type to be '" << parser.value("radio").toUpper()
-              << "' this is generally a very bad idea! You have been warned.";
-    forceRadio = RadioInfo::byKey(parser.value("radio").toLower());
-    if (! forceRadio.isValid()) {
-      QStringList radios;
-      foreach (RadioInfo info, RadioInfo::allRadios())
-        radios.append(info.key());
-      logError() << "Known radio key '" << parser.value("radio").toLower() << "'.";
-      logError() << "Known radios " << radios.join(", ") << ".";
-      return -1;
-    }
-  }
-
-  ErrorStack err;
-  Radio *radio = Radio::detect(forceRadio, err);
+  Radio *radio = autoDetect(parser, app);
   if (nullptr == radio) {
-    logError() << "Cannot detect radio: " << err.format();
+    logError() << "Cannot detect radio.";
     return -1;
   }
 
@@ -48,6 +33,7 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   showProgress();
   QObject::connect(radio, &Radio::downloadProgress, updateProgress);
 
+  ErrorStack err;
   Config config;
   if (! radio->startDownload(true, err)) {
     logError() << "Codeplug download error: " << err.format();

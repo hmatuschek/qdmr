@@ -55,6 +55,8 @@ printDevices(QTextStream &out, const QList<USBDeviceDescriptor> &devices) {
 
 Radio *
 autoDetect(QCommandLineParser &parser, QCoreApplication &app) {
+  Q_UNUSED(app)
+
   logDebug() << "Autodetect radios.";
 
   QList<USBDeviceDescriptor> interfaces = USBDeviceDescriptor::detect();
@@ -103,9 +105,9 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app) {
 
   // Handle identifiability of radio
   if (parser.isSet("radio")) {
-    RadioInfo radio = RadioInfo::byKey(parser.value("radio"));
+    RadioInfo radio = RadioInfo::byKey(parser.value("radio").toLower());
     if (! radio.isValid()) {
-      logError() << "Uknown radio '" << parser.value("radio") << "'.";
+      logError() << "Uknown radio '" << parser.value("radio").toLower() << "'.";
       return nullptr;
     }
     ErrorStack err;

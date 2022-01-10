@@ -8,11 +8,10 @@
 #include "userdatabase.hh"
 #include "progressbar.hh"
 #include "callsigndb.hh"
+#include "autodetect.hh"
 
 
 int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
-  Q_UNUSED(app)
-
   UserDatabase userdb;
   if (0 == userdb.count()) {
     logInfo() << "Downloading call-sign DB...";
@@ -64,17 +63,16 @@ int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     }
   }
 
-  ErrorStack err;
-  Radio *radio = Radio::detect(RadioInfo(), err);
+  Radio *radio = autoDetect(parser, app);
   if (nullptr == radio) {
-    logError() << "Could not detect a known radio. Check connection?";
-    logError() << err.format();
+    logError() << "Could not detect radio.";
     return -1;
   }
 
   showProgress();
   QObject::connect(radio, &Radio::uploadProgress, updateProgress);
 
+  ErrorStack err;
   if (! radio->startUploadCallsignDB(&userdb, true, selection, err)) {
     logError() << "Could not upload call-sign DB to radio: " << err.format();
     return -1;
