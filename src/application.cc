@@ -384,8 +384,10 @@ Application::quitApplication() {
 
 Radio *
 Application::autoDetect(const ErrorStack &err) {
-  // If the last detected device is still valid -> skip interface detection and selection
+  // If the last detected device is still valid
+  //  -> skip interface detection and selection
   if (! _lastDevice.isValid()) {
+    // First get all devices that are known by VID/PID
     QList<USBDeviceDescriptor> interfaces = USBDeviceDescriptor::detect();
     if (interfaces.isEmpty()) {
       errMsg(err) << tr("No matching devices found.");

@@ -16,14 +16,6 @@ DeviceSelectionDialog::DeviceSelectionDialog(const QList<USBDeviceDescriptor> &i
   if (_interfaces.count())
     ui->comboBox->setCurrentIndex(0);
 
-  // Update message
-  if (1 == _interfaces.size()) {
-    ui->message->setText(tr("The device found is not considered save to access. Are you sure that "
-                            "this is the connected radio?"));
-  } else {
-    ui->message->setText(tr("There are more than one matching devices. Please select one."));
-  }
-
   connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
