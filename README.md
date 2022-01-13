@@ -26,9 +26,11 @@ Currently, there are only few radios that are supported
   * BTECH DMR-6x2 (since version 0.5.0)
 
 A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available. 
-The limited amount of supported radios is due to the fact that I only
-own these radios to test the software with.
 
+## Questions?
+
+  * If you find any bugs or have suggestions to improve qdmr, consider [opening an issue](https://github.com/hmatuschek/qdmr/issues/new) or participate in one of the [discussions](https://github.com/hmatuschek/qdmr/discussions).
+  * There is also a *Matrix* chat at [#qdmr:darc.de](https://matrix.to/#/#qdmr:darc.de).
 
 ## Releases
 <a href="https://repology.org/project/qdmr/versions">
