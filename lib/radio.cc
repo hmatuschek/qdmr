@@ -381,105 +381,10 @@ Radio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlag
 
 
 Radio *
-Radio::detect(const ErrorStack &err) {
-  return Radio::detect(RadioInfo(), err);
-}
-
-Radio *
-Radio::detect(const RadioInfo &force, const ErrorStack &err) {
-  RadioInfo id;
-
-  // Try TYT UV Family
-  {
-    TyTInterface *dfu = new TyTInterface(err);
-    if (dfu->isOpen()) {
-      id = dfu->identifier();
-      if ((id.isValid() && (RadioInfo::MD390 == id.id())) || (force.isValid() && (RadioInfo::MD390 == force.id()))) {
-        return new MD390(dfu);
-      } else if ((id.isValid() && (RadioInfo::UV390 == id.id())) || (force.isValid() && (RadioInfo::UV390 == force.id()))) {
-        return new UV390(dfu);
-      } else if ((id.isValid() && (RadioInfo::MD2017 == id.id())) || (force.isValid() && (RadioInfo::MD2017 == force.id()))) {
-        return new MD2017(dfu);
-      } else if ((id.isValid() && (RadioInfo::DM1701 == id.id())) || (force.isValid() && (RadioInfo::DM1701 == force.id()))) {
-        return new DM1701(dfu);
-      } else {
-        dfu->close();
-        dfu->deleteLater();
-        return nullptr;
-      }
-    } else {
-      dfu->deleteLater();
-    }
-  }
-
-  // Try Radioddity/Baofeng RD5R & GD-77
-  {
-    RadioddityInterface *hid = new RadioddityInterface(err);
-    if (hid->isOpen()) {
-      id = hid->identifier();
-      if ((id.isValid() && (RadioInfo::RD5R == id.id())) || (force.isValid() && (RadioInfo::RD5R == force.id()))) {
-        return new RD5R(hid);
-      } else if ((id.isValid() && (RadioInfo::GD77 == id.id())) || (force.isValid() && (RadioInfo::GD77 == force.id()))) {
-        return new GD77(hid);
-      } else {
-        hid->close();
-        hid->deleteLater();
-        return nullptr;
-      }
-    } else {
-      hid->deleteLater();
-    }
-  }
-
-  // Try Open GD77 firmware
-  {
-    OpenGD77Interface *ogd77 = new OpenGD77Interface(err);
-    if (ogd77->isOpen()) {
-      id = ogd77->identifier();
-      if ((id.isValid() && (RadioInfo::OpenGD77 == id.id())) || (force.isValid() && (RadioInfo::OpenGD77 == force.id()))) {
-        return new OpenGD77(ogd77);
-      } else {
-        ogd77->close();
-        ogd77->deleteLater();
-        return nullptr;
-      }
-    } else {
-      ogd77->deleteLater();
-    }
-  }
-
-  // Try Anytone USB-serial devices
-  {
-    AnytoneInterface *anytone = new AnytoneInterface(err);
-    if (anytone->isOpen()) {
-      id = anytone->identifier();
-      if ((id.isValid() && (RadioInfo::D868UVE == id.id())) || (force.isValid() && (RadioInfo::D868UVE == force.id()))) {
-        return new D868UV(anytone);
-      } else if ((id.isValid() && (RadioInfo::D878UV == id.id())) || (force.isValid() && (RadioInfo::D878UV == force.id()))) {
-        return new D878UV(anytone);
-      } else if ((id.isValid() && (RadioInfo::D878UVII == id.id())) || (force.isValid() && (RadioInfo::D878UVII == force.id()))) {
-        return new D878UV2(anytone);
-      } else if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
-        return new D578UV(anytone);
-      } else {
-        anytone->close();
-        anytone->deleteLater();
-        return nullptr;
-      }
-    } else {
-      anytone->deleteLater();
-    }
-  }
-
-  errMsg(err) << "Cannot connect to radio.";
-  return nullptr;
-}
-
-
-Radio *
 Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const ErrorStack &err) {
   if (! descr.isValid()) {
     errMsg(err) << "Cannot detect radio: Invalid interface descriptor.";
+    return nullptr;
   }
   logDebug() << "Try to detect radio at " << descr.description() << ".";
 
@@ -502,7 +407,7 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
     }
     anytone->deleteLater();
     return nullptr;
-  }else if (OpenGD77Interface::interfaceInfo() == descr) {
+  } else if (OpenGD77Interface::interfaceInfo() == descr) {
     OpenGD77Interface *ogd77 = new OpenGD77Interface(descr, err);
     if (ogd77->isOpen()) {
       RadioInfo id = ogd77->identifier();
