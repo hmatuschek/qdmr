@@ -37,7 +37,7 @@ enum {
  * Implementation of DFUDevice::Descriptor
  * ********************************************************************************************* */
 DFUDevice::Descriptor::Descriptor(const USBDeviceInfo &info, uint8_t bus, uint8_t device)
-  : USBDeviceDescriptor(info, QString("%1:%2").arg(bus).arg(device))
+  : USBDeviceDescriptor(info, USBDeviceAddress(bus, device))
 {
   // pass...
 }

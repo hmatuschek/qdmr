@@ -55,6 +55,10 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app, const ErrorStack &
     errMsg(err) << "No matching USB devices are found. Check connection?";
     return nullptr;
   }
+  logDebug() << "Found " << interfaces.count() << " device(s):";
+  foreach (USBDeviceDescriptor d, interfaces) {
+    logDebug() << "  " << d.description() << ".";
+  }
 
   USBDeviceDescriptor device;
   if (parser.isSet("device")) {
@@ -90,8 +94,7 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app, const ErrorStack &
     device = interfaces.first();
   }
 
-  LogMessage msg(LogMessage::DEBUG, __FILE__, __LINE__);
-  msg << "Using device " << device.deviceHandle() << ".";
+  logDebug() << "Using device " << device.deviceHandle() << ".";
 
   // Handle identifiability of radio
   if (parser.isSet("radio")) {

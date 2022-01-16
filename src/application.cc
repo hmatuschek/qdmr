@@ -387,6 +387,7 @@ Application::autoDetect(const ErrorStack &err) {
   // If the last detected device is still valid
   //  -> skip interface detection and selection
   if (! _lastDevice.isValid()) {
+    logDebug() << "Last device is invalid, search for new one.";
     // First get all devices that are known by VID/PID
     QList<USBDeviceDescriptor> interfaces = USBDeviceDescriptor::detect();
     if (interfaces.isEmpty()) {
@@ -399,6 +400,8 @@ Application::autoDetect(const ErrorStack &err) {
         return nullptr;
       }
       _lastDevice = dialog.device();
+    } else {
+      _lastDevice = interfaces.first();
     }
   }
 
