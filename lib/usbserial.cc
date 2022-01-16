@@ -165,8 +165,8 @@ USBSerial::detect(uint16_t vid, uint16_t pid) {
   foreach (QSerialPortInfo port, ports) {
     if (port.hasProductIdentifier() && (pid == port.productIdentifier()) &&
         port.hasVendorIdentifier() && (vid == port.vendorIdentifier())) {
-      interfaces.append(Descriptor(vid, pid, port.systemLocation()));
-      logDebug() << "Found " << port.systemLocation() << " (USB "
+      interfaces.append(Descriptor(vid, pid, port.portName()));
+      logDebug() << "Found " << port.portName() << " (USB "
                  << QString::number(vid, 16) << ":" << QString::number(pid, 16) << ").";
     }
   }

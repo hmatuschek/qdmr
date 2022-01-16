@@ -238,15 +238,19 @@ USBDeviceDescriptor::validRawUSB() const {
 bool
 USBDeviceDescriptor::validSerial() const {
   QSerialPortInfo info(_device.toString());
+
   logDebug() << "Check if serial port " << _device.toString() << " still exisist and has VID:PID "
              << QString::number(_vid, 16) << ":" << QString::number(_pid, 16) << ".";
 
-  if (! info.isValid()) {
-    logDebug() << "Serial port " << _device.toString() << " is not valid anymore.";
+  if (info.isNull()) {
+    logDebug() << "Serial port " << info.portName() << "("
+               << _device.toString() << ") is not valid anymore.";
     return false;
   }
 
-  return ((_vid == info.vendorIdentifier()) && (_pid == info.productIdentifier()));
+  if (info.hasProductIdentifier() && info.hasVendorIdentifier())
+    return ((_vid == info.vendorIdentifier()) && (_pid == info.productIdentifier()));
+  return true;
 }
 
 QString
