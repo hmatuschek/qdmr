@@ -88,6 +88,7 @@ RD5RCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     else
       setSquelch(ac->squelch());
   } else {
+    // If digital channel, reuse global quelch setting
     setSquelch(ctx.config()->settings()->squelch());
   }
 
@@ -108,6 +109,20 @@ RD5RCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   return ch;
 }
 
+bool
+RD5RCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
+  if (! RadioddityCodeplug::ChannelElement::linkChannelObj(c, ctx))
+    return false;
+  /*
+  if (c->is<AnalogChannel>()) {
+    AnalogChannel *ac = c->as<AnalogChannel>();
+    if (ctx.config()->settings()->squelch() == ac->squelch()) {
+      ac->setSquelchDefault();
+    }
+  }
+  */
+  return true;
+}
 
 /* ********************************************************************************************* *
  * Implementation of RD5RCodeplug::TimestampElement

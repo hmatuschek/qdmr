@@ -5,6 +5,7 @@
 #include "signaling.hh"
 #include "channel.hh"
 #include "contact.hh"
+#include "radioddity_extensions.hh"
 
 class DigitalContact;
 class Zone;
@@ -699,25 +700,12 @@ public:
   class GeneralSettingsElement: public Element
   {
   public:
-    /** Possible monitor types. */
-    enum MonitorType {
-      OPEN_SQUELCH = 0,            ///< Monitoring by opening the squelch.
-      SILENT_MONITOR = 1           ///< Silent monitoring.
-    };
-
-    /** Possible ARTS tone settings. */
-    enum ARTSTone {
-      ARTS_DISABLED = 0,           ///< ARTS tone is disabled.
-      ARTS_ONCE     = 4,           ///< ARTS tone once.
-      ARTS_ALWAYS   = 8            ///< ARTS tone always.
-    };
-
-    /** Possible scan modes. */
-    enum ScanMode {
-      SCANMODE_TIME    = 0,
-      SCANMODE_CARRIER = 1,
-      SCANMODE_SEARCH  = 2
-    };
+    /** Use monitor type from extension. */
+    typedef RadiodditySettingsExtension::MonitorType MonitorType;
+    /** Use ARTS tone mode from extension. */
+    typedef RadiodditySettingsExtension::ARTSTone ARTSTone;
+    /** Use scan mode from extension. */
+    typedef RadiodditySettingsExtension::ScanMode ScanMode;
 
   protected:
     /** Hidden constructor. */
@@ -870,10 +858,14 @@ public:
     /** Sets the repeater STE in [0-10]. */
     virtual void setRepeaterSTE(unsigned ste);
 
+    /** Returns @c true if a programming password is set. */
+    virtual bool hasProgPassword() const;
     /** Returns the programming password. */
     virtual QString progPassword() const;
     /** Sets the programming password. */
     virtual void setProgPassword(const QString &pwd);
+    /** Resets the programming password. */
+    virtual void clearProgPassword();
 
     /** Encodes the general setting from the given config. */
     virtual bool fromConfig(const Config *conf, Context &ctx);

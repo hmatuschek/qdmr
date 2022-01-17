@@ -1364,7 +1364,7 @@ RadioddityCodeplug::GeneralSettingsElement::clear() {
   setUInt8(0x0010, 0);
 
   setPreambleDuration(360);
-  setMonitorType(SILENT_MONITOR);
+  setMonitorType(MonitorType::Silent);
   setVOXSensitivity(3);
   setLowBatteryWarnInterval(30);
   setCallAlertDuration(120);
@@ -1377,7 +1377,7 @@ RadioddityCodeplug::GeneralSettingsElement::clear() {
   enableUpChannelModeVFO(false);
   enableResetTone(false);
   enableUnknownNumberTone(false);
-  setARTSToneMode(ARTS_ONCE);
+  setARTSToneMode(ARTSTone::Once);
 
   enableDigitalTalkPermitTone(false);
   enableAnalogTalkPermitTone(false);
@@ -1397,13 +1397,13 @@ RadioddityCodeplug::GeneralSettingsElement::clear() {
   enableTXExitTone(false);
   enableTXOnActiveChannel(true);
   enableAnimation(false);
-  setScanMode(SCANMODE_TIME);
+  setScanMode(ScanMode::Time);
 
   setRepeaterEndDelay(0);
   setRepeaterSTE(0);
 
   setUInt8(0x001f, 0);
-  memset(_data+0x0020, 0xff, 8);
+  clearProgPassword();
 }
 
 QString
@@ -1671,6 +1671,10 @@ RadioddityCodeplug::GeneralSettingsElement::setRepeaterSTE(unsigned ste) {
   setUInt4(0x001e, 4, ste);
 }
 
+bool
+RadioddityCodeplug::GeneralSettingsElement::hasProgPassword() const {
+  return (0xff != _data[0x0020]) && (0x00 != _data[0x0020]);
+}
 QString
 RadioddityCodeplug::GeneralSettingsElement::progPassword() const {
   return readASCII(0x0020, 8, 0xff);
@@ -1678,6 +1682,10 @@ RadioddityCodeplug::GeneralSettingsElement::progPassword() const {
 void
 RadioddityCodeplug::GeneralSettingsElement::setProgPassword(const QString &pwd) {
   writeASCII(0x0020, pwd, 8, 0xff);
+}
+void
+RadioddityCodeplug::GeneralSettingsElement::clearProgPassword() {
+  memset(_data+0x0020, 0xff, 8);
 }
 
 bool
@@ -1694,7 +1702,44 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Conte
   }
 
   setVOXSensitivity(ctx.config()->settings()->vox());
-  // There is no global squelch settings either...
+  // There is no global squelch settings either
+
+  // Handle Radioddity extension
+  if (RadiodditySettingsExtension *ext = conf->settings()->radioddityExtension()) {
+    setPreambleDuration(ext->preambleDuration());
+    setMonitorType(ext->monitorType());
+    setLowBatteryWarnInterval(ext->lowBatteryWarnInterval());
+    setCallAlertDuration(ext->callAlertDuration());
+    setLoneWorkerResponsePeriod(ext->loneWorkerResponseTime());
+    setLoneWorkerReminderPeriod(ext->loneWorkerReminderPeriod());
+    setGroupCallHangTime(ext->groupCallHangTime());
+    setPrivateCallHangTime(ext->privateCallHangTime());
+    enableDownChannelModeVFO(ext->downChannelModeVFO());
+    enableUpChannelModeVFO(ext->upChannelModeVFO());
+    enableResetTone(ext->resetTone());
+    enableUnknownNumberTone(ext->unknownNumberTone());
+    setARTSToneMode(ext->artsToneMode());
+    enableDigitalTalkPermitTone(ext->digitalTalkPermitTone());
+    enableAnalogTalkPermitTone(ext->analogTalkPermitTone());
+    enableSelftestTone(ext->selftestTone());
+    enableFrequencyIndicationTone(ext->frequencyIndicationTone());
+    disableAllTones(ext->allTonesDisabled());
+    enableBatsaveRX(ext->powerSaveMode());
+    enableBatsavePreamble(ext->wakeupPreamble());
+    disableAllLEDs(ext->allLEDsDisabled());
+    inhibitQuickKeyOverride(ext->quickKeyOverrideInhibited());
+    enableTXExitTone(ext->txExitTone());
+    enableTXOnActiveChannel(ext->txOnActiveChannel());
+    enableAnimation(ext->animation());
+    setScanMode(ext->scanMode());
+    setRepeaterEndDelay(ext->repeaterEndDelay());
+    setRepeaterSTE(ext->repeaterSTE());
+    if (ext->progPassword().isEmpty())
+      clearProgPassword();
+    else
+      setProgPassword(ext->progPassword());
+  }
+
   return true;
 }
 
@@ -1709,6 +1754,49 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &
     conf->radioIDs()->defaultId()->setNumber(radioID());
   }
   conf->settings()->setVOX(voxSensitivity());
+  // There is no global squelch settings either, so set it to 1
+  conf->settings()->setSquelch(1);
+
+  // Allocate Radioddity extension if needed
+  RadiodditySettingsExtension *ext = conf->settings()->radioddityExtension();
+  if (nullptr == ext) {
+    ext = new RadiodditySettingsExtension();
+    conf->settings()->setRadioddityExtension(ext);
+  }
+  // Update settings extension
+  ext->setPreambleDuration(preambleDuration());
+  ext->setMonitorType(monitorType());
+  ext->setLowBatteryWarnInterval(lowBatteryWarnInterval());
+  ext->setCallAlertDuration(callAlertDuration());
+  ext->setLoneWorkerResponseTime(loneWorkerResponsePeriod());
+  ext->setLoneWorkerReminderPeriod(loneWorkerReminderPeriod());
+  ext->setGroupCallHangTime(groupCallHangTime());
+  ext->setPrivateCallHangTime(privateCallHangTime());
+  ext->enableDownChannelModeVFO(downChannelModeVFO());
+  ext->enableUpChannelModeVFO(upChannelModeVFO());
+  ext->enableResetTone(resetTone());
+  ext->enableUnknownNumberTone(unknownNumberTone());
+  ext->setARTSToneMode(artsToneMode());
+  ext->enableDigitalTalkPermitTone(digitalTalkPermitTone());
+  ext->enableAnalogTalkPermitTone(analogTalkPermitTone());
+  ext->enableSelftestTone(selftestTone());
+  ext->enableFrequencyIndicationTone(frequencyIndicationTone());
+  ext->disableAllTones(allTonesDisabled());
+  ext->enablePowerSaveMode(batsaveRX());
+  ext->enableWakeupPreamble(batsavePreamble());
+  ext->disableAllLEDs(allLEDsDisabled());
+  ext->inhibitQuickKeyOverride(quickKeyOverrideInhibited());
+  ext->enableTXExitTone(txExitTone());
+  ext->enableTXOnActiveChannel(txOnActiveChannel());
+  ext->enableAnimation(animation());
+  ext->setScanMode(scanMode());
+  ext->setRepeaterEndDelay(repeaterEndDelay());
+  ext->setRepeaterSTE(repeaterSTE());
+  if (hasProgPassword())
+    ext->setProgPassword(progPassword());
+  else
+    ext->setProgPassword("");
+
   return true;
 }
 
