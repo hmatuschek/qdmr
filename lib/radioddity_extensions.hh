@@ -42,7 +42,7 @@ class RadiodditySettingsExtension: public ConfigExtension
   /** If @c true, the self-test tone is enabled. */
   Q_PROPERTY(bool selftestTone READ selftestTone WRITE enableSelftestTone)
   /** If @c true, the frequency indication tone is enabled. */
-  Q_PROPERTY(bool frequencyIndicationTone READ frequencyIndicationTone WRITE enableFrequencyIndicationTone)
+  Q_PROPERTY(bool channelFreeIndicationTone READ channelFreeIndicationTone WRITE enableChannelFreeIndicationTone)
   /** If @c true, all tones are disabled. */
   Q_PROPERTY(bool allTonesDisabled READ allTonesDisabled WRITE disableAllTones)
   /** If @c true, the power save mode is enabled. */
@@ -182,10 +182,10 @@ public:
   /** Enables/disables self-test tone. */
   void enableSelftestTone(bool enable);
 
-  /** Returns @c true if the frequency indication tone is enabled. */
-  bool frequencyIndicationTone() const;
-  /** Enables/disables frequency indication tone. */
-  void enableFrequencyIndicationTone(bool enable);
+  /** Returns @c true if the channel-free indication tone is enabled. */
+  bool channelFreeIndicationTone() const;
+  /** Enables/disables the channel free indication tone. */
+  void enableChannelFreeIndicationTone(bool enable);
 
   /** Returns @c true if all tones are disabled. */
   bool allTonesDisabled() const;
@@ -278,8 +278,8 @@ protected:
   bool _analogTalkPermitTone;
   /** If @c true, the self-test tone is enabled. */
   bool _selftestTone;
-  /** If @c true, the frequency indication tone is enabled. */
-  bool _frequencyIndicationTone;
+  /** If @c true, the channel free indication tone is enabled. */
+  bool _channelFreeIndicationTone;
   /** If @c true, all tones are disabled. */
   bool _disableAllTones;
   /** If @c true, the power save mode is enabled. */

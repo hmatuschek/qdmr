@@ -1382,7 +1382,7 @@ RadioddityCodeplug::GeneralSettingsElement::clear() {
   enableDigitalTalkPermitTone(false);
   enableAnalogTalkPermitTone(false);
   enableSelftestTone(true);
-  enableFrequencyIndicationTone(false);
+  enableChannelFreeIndicationTone(false);
   setBit(0x001b, 4, false);
   disableAllTones(false);
   enableBatsaveRX(true);
@@ -1572,11 +1572,11 @@ RadioddityCodeplug::GeneralSettingsElement::enableSelftestTone(bool enable) {
   setBit(0x001b, 2, enable);
 }
 bool
-RadioddityCodeplug::GeneralSettingsElement::frequencyIndicationTone() const {
+RadioddityCodeplug::GeneralSettingsElement::channelFreeIndicationTone() const {
   return getBit(0x001b, 3);
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::enableFrequencyIndicationTone(bool enable) {
+RadioddityCodeplug::GeneralSettingsElement::enableChannelFreeIndicationTone(bool enable) {
   setBit(0x001b, 3, enable);
 }
 bool
@@ -1722,7 +1722,7 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Conte
     enableDigitalTalkPermitTone(ext->digitalTalkPermitTone());
     enableAnalogTalkPermitTone(ext->analogTalkPermitTone());
     enableSelftestTone(ext->selftestTone());
-    enableFrequencyIndicationTone(ext->frequencyIndicationTone());
+    enableChannelFreeIndicationTone(ext->channelFreeIndicationTone());
     disableAllTones(ext->allTonesDisabled());
     enableBatsaveRX(ext->powerSaveMode());
     enableBatsavePreamble(ext->wakeupPreamble());
@@ -1780,7 +1780,7 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &
   ext->enableDigitalTalkPermitTone(digitalTalkPermitTone());
   ext->enableAnalogTalkPermitTone(analogTalkPermitTone());
   ext->enableSelftestTone(selftestTone());
-  ext->enableFrequencyIndicationTone(frequencyIndicationTone());
+  ext->enableChannelFreeIndicationTone(channelFreeIndicationTone());
   ext->disableAllTones(allTonesDisabled());
   ext->enablePowerSaveMode(batsaveRX());
   ext->enableWakeupPreamble(batsavePreamble());

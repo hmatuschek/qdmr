@@ -9,7 +9,7 @@ RadiodditySettingsExtension::RadiodditySettingsExtension(QObject *parent)
     _loneWorkerReminderPeriod(10), _groupCallHangTime(3000), _privateCallHangTime(3000),
     _downChannelModeVFO(false), _upChannelModeVFO(false), _resetTone(false),
     _unknownNumberTone(false), _artsToneMode(ARTSTone::Once), _digitalTalkPermitTone(false),
-    _analogTalkPermitTone(false), _selftestTone(true), _frequencyIndicationTone(false),
+    _analogTalkPermitTone(false), _selftestTone(true), _channelFreeIndicationTone(false),
     _disableAllTones(false), _powerSaveMode(true), _wakeupPreamble(true), _disableAllLEDs(false),
     _quickKeyOverrideInhibited(false), _txExitTone(false), _txOnActiveChannel(true),
     _animation(false), _scanMode(ScanMode::Time), _repeaterEndDelay(0), _repeaterSTE(0),
@@ -221,14 +221,14 @@ RadiodditySettingsExtension::enableSelftestTone(bool enable) {
 }
 
 bool
-RadiodditySettingsExtension::frequencyIndicationTone() const {
-  return _frequencyIndicationTone;
+RadiodditySettingsExtension::channelFreeIndicationTone() const {
+  return _channelFreeIndicationTone;
 }
 void
-RadiodditySettingsExtension::enableFrequencyIndicationTone(bool enable) {
-  if (_frequencyIndicationTone == enable)
+RadiodditySettingsExtension::enableChannelFreeIndicationTone(bool enable) {
+  if (_channelFreeIndicationTone == enable)
     return;
-  _frequencyIndicationTone = enable;
+  _channelFreeIndicationTone = enable;
   emit modified(this);
 }
 

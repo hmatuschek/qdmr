@@ -806,10 +806,10 @@ public:
     virtual bool selftestTone() const;
     /** Enables/disables reset tone. */
     virtual void enableSelftestTone(bool enable);
-    /** Returns @c true if the frequency indication tone is enabled. */
-    virtual bool frequencyIndicationTone() const;
-    /** Enables/disables frequency indication tone. */
-    virtual void enableFrequencyIndicationTone(bool enable);
+    /** Returns @c true if the channel free indication tone is enabled. */
+    virtual bool channelFreeIndicationTone() const;
+    /** Enables/disables channel free indication tone. */
+    virtual void enableChannelFreeIndicationTone(bool enable);
     /** Returns @c true if all tones are disabled. */
     virtual bool allTonesDisabled() const;
     /** Disables/enables all tones. */

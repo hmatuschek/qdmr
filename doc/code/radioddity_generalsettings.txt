@@ -23,7 +23,7 @@
 where
 UNT = Unknown number tone; RST = Reset tone; UMV = Up-channel mode VFO; DMV = Down-channel mode VFO;
 SBP = Save battery by disable preamble; SBR = Save battery by disable receive; DAT = Disables all tones;
-FIT = Channel frequency indication tone; STT = Self-test pass tone; PAT = Talk permit tone ananlog;
+FIT = Channel free indication tone; STT = Self-test pass tone; PAT = Talk permit tone ananlog;
 PDT = Talk permit tone digital; IQO = Inhibit quick-key override; DAL = Disables all LEDs;
 ScanM = Scan mode; ANI = Enable animation; DBW = Always TX on active channel on double-wait;
 TXT = TX exit tone;
