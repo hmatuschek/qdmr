@@ -27,6 +27,8 @@ class Channel;
  * codeplug.
  *
  * @section rd5rcpl Codeplug structure within radio
+ * This implementation targets firmware version 2.1.6.
+ *
  * The memory representation of the codeplug within the radio is divided into two segments.
  * The first segment starts at the address 0x00080 and ends at 0x07c00 while the second section
  * starts at 0x08000 and ends at 0x1e300.
