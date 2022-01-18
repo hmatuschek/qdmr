@@ -214,6 +214,7 @@ ConfigItem::copy(const ConfigItem &other) {
     }
   }
 
+  emit modified(this);
   return true;
 }
 

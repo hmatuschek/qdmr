@@ -3,10 +3,10 @@
 #include "config.hh"
 #include "configobjecttableview.hh"
 #include "configitemwrapper.hh"
+#include "dmriddialog.hh"
 #include "settings.hh"
 #include <QMessageBox>
 #include <QHeaderView>
-
 
 RadioIDListView::RadioIDListView(Config *config, QWidget *parent)
   : QWidget(parent), ui(new Ui::RadioIDListView), _config(config)
@@ -44,15 +44,14 @@ RadioIDListView::onConfigModified() {
 
 void
 RadioIDListView::onAddID() {
-  /*RadioIdDialog dialog(_config);
-
+  DMRIDDialog dialog;
   if (QDialog::Accepted != dialog.exec())
     return;
 
   int row = -1;
   if (ui->listView->hasSelection())
     row = ui->listView->selection().second;
-  _config->scanlists()->add(dialog.scanlist(), row);*/
+  _config->radioIDs()->add(dialog.radioId(), row);
 }
 
 void
@@ -88,6 +87,14 @@ RadioIDListView::onDeleteID() {
 
 void
 RadioIDListView::onEditID(unsigned row) {
+  if (int(row) >= _config->radioIDs()->count())
+    return;
+  RadioID *id = _config->radioIDs()->getId(row);
+  DMRIDDialog dialog(id);
+  if (QDialog::Accepted != dialog.exec())
+    return;
+  // Apply changes
+  dialog.radioId();
 }
 
 void

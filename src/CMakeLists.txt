@@ -9,7 +9,7 @@ SET(qdmr_SOURCES main.cc
   generalsettingsview.cc radioidlistview.cc contactlistview.cc grouplistsview.cc channellistview.cc
   zonelistview.cc scanlistsview.cc positioningsystemlistview.cc roamingzonelistview.cc
   collapsablewidget.cc extensionview.cc extensionwrapper.cc propertydelegate.cc errormessageview.cc
-  deviceselectiondialog.cc radioselectiondialog.cc)
+  deviceselectiondialog.cc radioselectiondialog.cc dmriddialog.cc)
 SET(qdmr_MOC_HEADERS
   configitemwrapper.hh
   application.hh settings.hh dmrcontactdialog.hh dtmfcontactdialog.hh rxgrouplistdialog.hh
@@ -21,7 +21,7 @@ SET(qdmr_MOC_HEADERS
   generalsettingsview.hh radioidlistview.hh contactlistview.hh grouplistsview.hh channellistview.hh
   zonelistview.hh scanlistsview.hh positioningsystemlistview.hh roamingzonelistview.hh
   collapsablewidget.hh extensionview.hh extensionwrapper.hh propertydelegate.hh errormessageview.hh
-  deviceselectiondialog.hh radioselectiondialog.hh)
+  deviceselectiondialog.hh radioselectiondialog.hh dmriddialog.hh)
 SET(qdmr_HEADERS )
 SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
   digitalchanneldialog.ui scanlistdialog.ui configwizardstart.ui verifydialog.ui settingsdialog.ui
@@ -30,7 +30,7 @@ SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui 
   generalsettingsview.ui radioidlistview.ui contactlistview.ui grouplistsview.ui channellistview.ui
   zonelistview.ui scanlistsview.ui positioningsystemlistview.ui roamingzonelistview.ui
   errormessageview.ui extensionview.ui
-  deviceselectiondialog.ui radioselectiondialog.ui)
+  deviceselectiondialog.ui radioselectiondialog.ui dmriddialog.ui)
 
 qt5_wrap_cpp(qdmr_MOC_SOURCES ${qdmr_MOC_HEADERS})
 qt5_wrap_ui(qdmr_UI_SOURCES ${qdmr_UI_FORMS})
