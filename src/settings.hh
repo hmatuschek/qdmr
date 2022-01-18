@@ -76,17 +76,8 @@ public:
   QByteArray mainWindowState() const;
   void setMainWindowState(const QByteArray &state);
 
-  QByteArray radioIdListHeaderState() const;
-  void setRadioIdListHeaderState(const QByteArray &state);
-
-  QByteArray contactListHeaderState() const;
-  void setContactListHeaderState(const QByteArray &state);
-
-  QByteArray channelListHeaderState() const;
-  void setChannelListHeaderState(const QByteArray &state);
-
-  QByteArray positioningHeaderState() const;
-  void setPositioningHeaderState(const QByteArray &state);
+  QByteArray headerState(const QString &objName) const;
+  void setHeaderState(const QString &objName, const QByteArray &state);
 
   bool isUpdated() const;
   void markUpdated();

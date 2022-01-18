@@ -49,6 +49,7 @@ GPSSystemDialog::construct() {
     i++;
   }
 
+  extensionView->setObjectName("dmrAPRSSystemExtension");
   extensionView->setObject(_myGPSSystem);
   if (! settings.showCommercialFeatures())
     return tabWidget->tabBar()->hide();

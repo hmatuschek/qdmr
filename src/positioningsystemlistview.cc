@@ -124,11 +124,11 @@ PositioningSystemListView::onHideGPSNote() {
 void
 PositioningSystemListView::loadPositioningSectionState() {
   Settings settings;
-  ui->listView->header()->restoreState(settings.positioningHeaderState());
+  ui->listView->header()->restoreState(settings.headerState("positioningList"));
 }
 void
 PositioningSystemListView::storePositioningSectionState() {
   Settings settings;
-  settings.setPositioningHeaderState(ui->listView->header()->saveState());
+  settings.setHeaderState("positioningList", ui->listView->header()->saveState());
 }
 

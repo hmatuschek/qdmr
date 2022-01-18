@@ -27,6 +27,8 @@ protected slots:
   void onSelectionChanged(const QItemSelection &current, const QItemSelection &last);
   void onCreateExtension();
   void onDeleteExtension();
+  void loadSectionState();
+  void storeSectionState();
 
 private:
   Ui::ExtensionView *ui;

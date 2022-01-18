@@ -29,6 +29,8 @@ DMRIDDialog::construct() {
 
   if (! settings.showCommercialFeatures())
     ui->tabWidget->tabBar()->hide();
+
+  ui->extensionView->setObjectName("dmrRadioIdExtension");
   ui->extensionView->setObject(_myID);
 }
 

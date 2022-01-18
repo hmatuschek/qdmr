@@ -106,11 +106,11 @@ RadioIDListView::onDefaultIDSelected(int idx) {
 
 void
 RadioIDListView::loadHeaderState() {
-  ui->listView->header()->restoreState(Settings().radioIdListHeaderState());
+  ui->listView->header()->restoreState(Settings().headerState("radioIDList"));
 }
 void
 RadioIDListView::storeHeaderState() {
-  Settings().setRadioIdListHeaderState(ui->listView->header()->saveState());
+  Settings().setHeaderState("radioIDList", ui->listView->header()->saveState());
 }
 
 
