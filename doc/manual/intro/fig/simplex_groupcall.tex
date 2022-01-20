@@ -5,9 +5,9 @@
 \begin{document}
   \begin{tikzpicture}[every node/.style={scale=.8}]
    \activeuser{u1}{ 0,0}{DM3MAT};
-   \user{u2}{ 6,1}{DL1XYZ, TG99};
+   \user{u2}{ 6,2}{DL1XYZ, TG99};
    \user{u3}{ 6,0}{DL2XYZ, TG99};
-   \user{u4}{ 6,-1}{DL3XYZ};
+   \user{u4}{ 6,-2}{DL3XYZ};
    \path[->] (u1) edge[bend left] node[above, rotate=10]{$433.450 MHz$} node[below, rotate=10]{GC: TG99} (u2);
    \path[->] (u1) edge node[above]{$433.450 MHz$} node[below]{GC: TG99} (u3);
   \end{tikzpicture}

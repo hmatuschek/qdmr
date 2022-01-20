@@ -12,7 +12,7 @@
 <para>
   As DMR is a digital mode that transports digitalized speech, it is possible to transfer other
   data too. Consequently, there are some other digital services provided with DMR. First, there 
-  are text messages similar to the one provided by mobile phones. It is also possible to transfer 
+  are text messages similar to the one provided by mobile phones. It is also possible to forward 
   the own GPS position to the <glossterm>APRS</glossterm> network.
 </para>
 
@@ -75,7 +75,8 @@
 <para>
   Beside the text message services, it is also possible to transmit the position to the DMR 
   network using a special service number 262999. How the radio is configured to do that, 
-  depends heavily on the device being used.
+  depends heavily on the device being used. <application>qdmr</application> helps with the 
+  configuration by providing common means for these settings across all supported radios.
 </para>
 </section>
 

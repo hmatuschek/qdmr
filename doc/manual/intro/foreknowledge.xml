@@ -16,7 +16,7 @@
 
 <para>
   If you are not yet licensed and interested into amateur radio, consider reading this section. 
-  Otherwise, skip right to the next section <xref linkend="introOrigin"/>
+  Otherwise, skip right to <xref linkend="introOrigin"/>
 </para>
 
 <para>
@@ -45,21 +45,21 @@
 </para>
 
 <para>
-  On higher frequencies, however, radio waves behave more like light and it gets increasingly more
+  On higher frequencies, however, radio waves behave more like light and it gets increasingly
   difficult<footnote><para>Also on VHF and UHF, larger distances can be bridged using an elevated 
-    location and larger antennas.</para></footnote> to bridge significantly higher distances than 
-  to the horizon. This fact limits the operating range of simple hand-held radios. To still cover 
+    location and larger antennas.</para></footnote> to bridge significant distances beyond
+  the horizon. This fact limits the operating range of simple hand-held radios. To still cover 
   a large area, repeaters can be used.
 </para>
 
 <para>
-  Repeater or relais are autonomous amateur radio stations that are usually located on a mountain,
+  Repeaters are autonomous amateur radio stations that are usually located on a mountain,
   hill or high tower. This allows them to easily cover a large area. They receive signals from
   HAM operators and retransmit them at the same time. To do that, they cannot send and receive on 
-  the same frequency (otherwise they would interfere with themselves). Therefore, repeater operate
+  the same frequency (otherwise they would interfere with themselves). Therefore, repeaters operate
   in the so-called duplex mode. That is, the repeater receives on one frequency (the so-called 
-  input frequency) and simultaneously transmits the received signal on another frequency (the 
-  output frequency).
+  input frequency) and transmits the received signal on another frequency (the 
+  output frequency) simultaneously.
 </para>
 
 <example xml:id="figIntroFMRepeater">
@@ -74,7 +74,7 @@
 
 <para>
   For this example, DM3MAT sends on the input frequency 431.9625 MHz to the repeater DB0LDS. The 
-  repeater transmits the received singal on the output frequency 439.5625 MHz. On that frequency,
+  repeater transmits the received singal on its output frequency 439.5625 MHz. On that frequency,
   DL2XYZ receives the original call.
 </para>
 
@@ -96,7 +96,7 @@
   <title>Echolink</title>
 </info>
 <para>
-  However, there are situations, where two operators are war away and they cannot reach the same
+  However, there are situations, where two operators are far away and they cannot reach the same
   repeater. For these cases, it is possible to connect two repeaters via the 
   <link xlink:href="http://www.echolink.org/">EchoLink</link> network.
 </para>
@@ -127,7 +127,7 @@
 <para>
   Frequently, it is also possible to control a repeater over-the-air and to connect that repeater 
   to some other repeater via EchoLink. Usually, this can be done by sending the EchoLink number of 
-  the destination repeater you want to link to using DTMF to the local repeater. This is shown in 
+  the destination repeater using DTMF to the local repeater. This is shown in 
   <xref linkend="figIntroEchoLink"/> above. There, DM3MAT sends the EchoLink number 662699 of the 
   repeater DB0LEI near Leipzig to his local repeater DB0SP near Berlin. Then the local repeater
   (DB0SP) will link with the destination repeater (DB0LEI) via the EchoLink network. For some 

@@ -11,7 +11,7 @@
 
 <para>
   Usually all repeater within a region will subscribe the same talk groups. This allows to operate in 
-  these talk groups a repeater transparent way. It therefore does not matter which repeater is being 
+  these talk groups in a repeater transparent way. Therefore, it does not matter which repeater is being 
   used within the region, the same talk group remains reachable. In the region Berlin &amp; 
   Brandenburg, this it the TG2621.
 </para>
@@ -20,8 +20,10 @@
   It therefore makes sense to enter all repeaters into one list that have the same talk groups 
   subscribed. If the radio now would automatically select a reachable repeater, one could drive around
   in the region and would stay connected to these talk groups irrespective of the own position in the 
-  region. This feature exists and is called <glossterm>Roaming</glossterm>. Many of the slightly more 
-  expensive devices support this feature (e.g., AnyTone). The cheapest ones usually do not. 
+  region. This feature exists in many radios and is called <glossterm>Roaming</glossterm>. Many of the slightly more 
+  expensive devices support this feature (e.g., AnyTone). The cheapest ones usually do not<footnote>
+    <para>This is somewhat weird, as this feature is a pure firmware feature and does not need any
+      additional hardware.</para></footnote>. 
 </para>
 
 <para>
@@ -38,15 +40,15 @@
 </para>
 
 <para>
-  Did the radio find a stronger repeater in the roaming zone, it automatically changes to that repeater.
+  If the radio finds a stronger repeater in the roaming zone, it automatically changes to that repeater.
   The new repeater does not neccessarily needs to be the strongest in the zone. It only needs to be 
   stronger than the threshold. If no stronger repeater is found, the radio remains on the currently 
   selected one.
 </para>
 
 <para>
-  This roaming can also be set to <quote>manual</quote>. This is, the roaming search will only 
-  start if signal strength is lower than the threshold and the PTT is pressed or the search is 
+  This roaming can also be set to <quote>manual</quote>. That is, the roaming search will only 
+  start if the signal strength is lower than the threshold and the PTT is pressed or the search is 
   started from the menu.
 </para>
 </section>

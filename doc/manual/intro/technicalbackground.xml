@@ -10,7 +10,7 @@
 </info>
 
 <para>
-  In the previous sections, I tried to explain the basic concepts of the DMR operation. That is the
+  In the previous sections, I tried to explain the basic concepts of the DMR operation. That is, the
   repeater independent private and group calls. This section concerns the more technical 
   details of the DMR mode. In particular the <glossterm>Time Slot</glossterm> and <glossterm>Color 
   Code</glossterm>.
@@ -34,16 +34,16 @@
 </informalfigure>
 
 <para>
-  <glossterm>TDMA</glossterm> means <quote>time-division media access</quote> and means that two 
+  <glossterm>TDMA</glossterm> means <quote>time-division media access</quote> and describes that two 
   independent calls can happen simultaneously on one physical channel. To achieve this, each call
   is assigned a <glossterm>Time Slot</glossterm> (time slot 1 &amp; 2) and both are transmitting 
   and receiving only within their assigned time slot. These time slots are very short. For DMR they
   are only 30ms long. This short time, however, is sufficient to transfer audio for at least 60ms.
-  DMR therefore allows for two independent and simultaneous calls on a single channel.
+  Therefore, DMR allows for two independent and simultaneous calls on a single physical channel.
 </para>
 
 <para>
-  Who or better when time slot 1 or 2 happens, is determined by the repeater. The repeater defines
+  When time slot 1 or 2 <quote>happens</quote>, is determined by the repeater. The repeater defines
   the beat. This also implies that time slots are irrelevant for the simplex operation. Thus you 
   can ignore the time slot settings when programming simplex channels. (see 
   <xref linkend="introCodeplug"/>).
