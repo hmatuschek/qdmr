@@ -1752,7 +1752,7 @@ CSVReader::handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, Q
     return true;
   logDebug() << "Got " << ids.count() << " IDs...";
   for (int i=0; i<ids.count(); i++) {
-    RadioID *id = new RadioID("", ids.at(i));
+    DMRRadioID *id = new DMRRadioID("", ids.at(i));
     _config->radioIDs()->add(id);
     _radioIDs[i+1] = id;
   }

@@ -4,10 +4,31 @@
 #include "configobject.hh"
 #include <QAbstractListModel>
 
-/** Represents a DMR ID (radio ID) within the abstract config.
+
+/** Abstract base class for all radio IDs.
+ *
+ * That is, DMR radio IDs as well as DTMF, ZVEI, 5-tone etc PTT-IDs.
  *
  * @ingroup conf */
-class RadioID : public ConfigObject
+class RadioID: public ConfigObject
+{
+  Q_OBJECT
+
+protected:
+  /** Hidden default constructor.
+   * Use one of the derived classes to instantiate radio IDs. */
+  explicit RadioID(const QString &idBase, QObject *parent=nullptr);
+  /** Hidden constructor with name. */
+  RadioID(const QString &name, const QString &idBase, QObject *parent=nullptr);
+};
+
+
+/** Represents a DMR radio ID within the abstract config.
+ *
+ * This class is used to store the DMR ID(s) of the radio.
+ *
+ * @ingroup conf */
+class DMRRadioID : public RadioID
 {
   Q_OBJECT
 
@@ -16,13 +37,13 @@ class RadioID : public ConfigObject
 
 public:
   /** Default constructor. */
-  explicit RadioID(QObject *parent=nullptr);
+  explicit DMRRadioID(QObject *parent=nullptr);
 
   /** Constructor.
    * @param name Specifies the name of the ID.
    * @param number Specifies the DMR ID.
    * @param parent Specifies the parent QObject owning this object. */
-  RadioID(const QString &name, uint32_t number, QObject *parent = nullptr);
+  DMRRadioID(const QString &name, uint32_t number, QObject *parent = nullptr);
 
   ConfigItem *clone() const;
 
@@ -35,10 +56,6 @@ public:
   bool parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
   bool link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 
-signals:
-  /** Gets emitted once the DMR is changed. */
-  void modified();
-
 protected:
   /** Holds the DMR ID. */
   uint32_t _number;
@@ -47,7 +64,7 @@ protected:
 
 /** A singleton radio ID representing the default DMR radio ID within the abstract config.
  * @ingroup conf */
-class DefaultRadioID: public RadioID
+class DefaultRadioID: public DMRRadioID
 {
   Q_OBJECT
 
@@ -62,6 +79,40 @@ public:
 private:
   /** The singleton instance. */
   static DefaultRadioID *_instance;
+};
+
+
+/** Represents a DTMF radio ID as used for PTT-ID on analog channels.
+ *
+ * This class just holds the name and DTMF number of the ID.
+ * @ingroup conf */
+class DTMFRadioID: public RadioID
+{
+  Q_OBJECT
+
+  /** The DTMF number of the radio ID. */
+  Q_PROPERTY(QString number READ number WRITE setNumber)
+
+public:
+  /** Default constructor. */
+  explicit DTMFRadioID(QObject *parent=nullptr);
+
+  /** Constructor from name and number.
+   * @param name Specifies the name of the DTMF radio ID.
+   * @param number Specifies the DTMF number of the radio ID.
+   * @param parent Specifies the QObject parent, the object that owns this one. */
+  explicit DTMFRadioID(const QString &name, const QString &number, QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the DTMF number of the radio ID. */
+  const QString &number() const;
+  /** Sets the DTMF number of the radio ID. */
+  void setNumber(const QString &number);
+
+protected:
+  /** Holds the DTMF number of the radio ID. */
+  QString _number;
 };
 
 
@@ -81,13 +132,13 @@ public:
   void clear();
 
   /** Returns the radio ID at the given index. */
-  RadioID *getId(int idx) const;
+  DMRRadioID *getId(int idx) const;
   /** Returns the current default ID for the radio. */
-  RadioID * defaultId() const;
+  DMRRadioID * defaultId() const;
   /** Sets the default DMR ID. Pass idx=-1 to clear default ID. */
   bool setDefaultId(int idx);
   /** Searches the DMR ID object associated with the given DMR ID. */
-  RadioID *find(uint32_t id) const;
+  DMRRadioID *find(uint32_t id) const;
 
   int add(ConfigObject *obj, int row=-1);
 
@@ -105,7 +156,7 @@ protected slots:
 
 protected:
   /** Holds a weak reference to the default DMR radio ID. */
-  RadioID *_default;
+  DMRRadioID *_default;
 };
 
 

@@ -235,7 +235,7 @@ GPSSystemReference::GPSSystemReference(QObject *parent)
  * Implementation of RadioIDReference
  * ********************************************************************************************* */
 RadioIDReference::RadioIDReference(QObject *parent)
-  : ConfigObjectReference(RadioID::staticMetaObject, parent)
+  : ConfigObjectReference(DMRRadioID::staticMetaObject, parent)
 {
   // pass...
 }

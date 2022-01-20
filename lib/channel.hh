@@ -17,7 +17,7 @@ class ScanList;
 class APRSSystem;
 class PositioningSystem;
 class RoamingZone;
-class RadioID;
+class DMRRadioID;
 
 
 /** The base class of all channels (analog and digital) of a codeplug configuration.
@@ -407,9 +407,9 @@ public:
   /** Sets the reference to the radio ID. */
   void setRadioId(RadioIDReference *ref);
   /** Returns the radio ID associated with this channel or @c nullptr if the default ID is used. */
-  RadioID *radioIdObj() const;
+  DMRRadioID *radioIdObj() const;
   /** Associates the given radio ID with this channel. Pass nullptr to set to default ID. */
-  bool setRadioIdObj(RadioID *id);
+  bool setRadioIdObj(DMRRadioID *id);
 
 public:
   YAML::Node serialize(const Context &context);

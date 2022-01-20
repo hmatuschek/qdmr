@@ -3,8 +3,8 @@
 #include "settings.hh"
 #include <QIntValidator>
 
-DMRIDDialog::DMRIDDialog(RadioID *radioid, QWidget *parent) :
-  QDialog(parent), ui(new Ui::DMRIDDialog), _myID(new RadioID(this)), _editID(radioid)
+DMRIDDialog::DMRIDDialog(DMRRadioID *radioid, QWidget *parent) :
+  QDialog(parent), ui(new Ui::DMRIDDialog), _myID(new DMRRadioID(this)), _editID(radioid)
 {
   ui->setupUi(this);
   _myID->copy(*_editID);
@@ -13,7 +13,7 @@ DMRIDDialog::DMRIDDialog(RadioID *radioid, QWidget *parent) :
 }
 
 DMRIDDialog::DMRIDDialog(QWidget *parent) :
-  QDialog(parent), ui(new Ui::DMRIDDialog), _myID(new RadioID(this)), _editID(nullptr)
+  QDialog(parent), ui(new Ui::DMRIDDialog), _myID(new DMRRadioID(this)), _editID(nullptr)
 {
   ui->setupUi(this);
 
@@ -38,7 +38,7 @@ DMRIDDialog::~DMRIDDialog() {
   delete ui;
 }
 
-RadioID *
+DMRRadioID *
 DMRIDDialog::radioId() {
   _myID->setName(ui->name->text().simplified());
   _myID->setNumber(ui->dmrID->text().toUInt());

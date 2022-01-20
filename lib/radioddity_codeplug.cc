@@ -1747,7 +1747,7 @@ bool
 RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &ctx) {
   Q_UNUSED(ctx)
   if (! conf->radioIDs()->defaultId()) {
-    int idx = conf->radioIDs()->add(new RadioID(name(), radioID()));
+    int idx = conf->radioIDs()->add(new DMRRadioID(name(), radioID()));
     conf->radioIDs()->setDefaultId(idx);
   } else {
     conf->radioIDs()->defaultId()->setName(name());

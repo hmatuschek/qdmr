@@ -40,7 +40,7 @@ CodeplugContext::addRadioId(uint32_t id, int index, const QString &name) {
   return true;
 }
 
-RadioID *
+DMRRadioID *
 CodeplugContext::getRadioId(int idx) const {
   if (! _radioIDTable.contains(idx))
     return nullptr;

@@ -782,7 +782,7 @@ RadioIdListWrapper::data(const QModelIndex &index, int role) const {
   if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
     return QVariant();
 
-  RadioID *id = _list->get(index.row())->as<RadioID>();
+  DMRRadioID *id = _list->get(index.row())->as<DMRRadioID>();
 
   switch (index.column()) {
   case 0:

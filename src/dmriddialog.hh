@@ -14,18 +14,18 @@ class DMRIDDialog : public QDialog
 
 public:
   explicit DMRIDDialog(QWidget *parent = nullptr);
-  DMRIDDialog(RadioID *radioid, QWidget *parent = nullptr);
+  DMRIDDialog(DMRRadioID *radioid, QWidget *parent = nullptr);
   ~DMRIDDialog();
 
-  RadioID *radioId();
+  DMRRadioID *radioId();
 
 protected:
   void construct();
 
 private:
   Ui::DMRIDDialog *ui;
-  RadioID *_myID;
-  RadioID *_editID;
+  DMRRadioID *_myID;
+  DMRRadioID *_editID;
 };
 
 #endif // DMRIDDIALOG_HH

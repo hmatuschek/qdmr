@@ -77,11 +77,11 @@ RadioIDListView::onDeleteID() {
   }
   // collect all selected scan lists
   // need to collect them first as rows change when deleting
-  QList<RadioID *> ids; ids.reserve(numrows);
+  QList<DMRRadioID *> ids; ids.reserve(numrows);
   for(int i=rows.first; i<=rows.second; i++)
     ids.push_back(_config->radioIDs()->getId(i));
   // remove
-  foreach (RadioID *id, ids)
+  foreach (DMRRadioID *id, ids)
     _config->radioIDs()->del(id);
 }
 
@@ -89,7 +89,7 @@ void
 RadioIDListView::onEditID(unsigned row) {
   if (int(row) >= _config->radioIDs()->count())
     return;
-  RadioID *id = _config->radioIDs()->getId(row);
+  DMRRadioID *id = _config->radioIDs()->getId(row);
   DMRIDDialog dialog(id);
   if (QDialog::Accepted != dialog.exec())
     return;
