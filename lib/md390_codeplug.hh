@@ -67,7 +67,7 @@ public:
 
   /** Extends the @c TyTCodeplug::MenuSettingsElement to implement the MD-390 specific menu settings.
    *
-   * Memory layout of the settings (size 0x???? bytes):
+   * Memory layout of the settings (size 0x0010 bytes):
    * @verbinclude md390_menusettings.txt */
   class MenuSettingsElement: public TyTCodeplug::MenuSettingsElement
   {

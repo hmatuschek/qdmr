@@ -235,7 +235,7 @@ public:
   unsigned repeaterEndDelay() const;
   /** Sets the repeater end delay in seconds. */
   void setRepeaterEndDelay(unsigned delay);
-  /** Returns the repeater STE in seconds.. */
+  /** Returns the repeater STE in seconds. */
   unsigned repeaterSTE() const;
   /** Sets the repeater STE in seconds. */
   void setRepeaterSTE(unsigned ste);
