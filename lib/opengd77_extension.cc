@@ -30,15 +30,6 @@ OpenGD77ChannelExtension::setPower(Power power) {
   emit modified(this);
 }
 
-/*ConfigItem *
-OpenGD77ChannelExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                                        const Context &ctx, const ErrorStack &err)
-{
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
-  // No extensions yet for this extension
-  return nullptr;
-}*/
-
 
 /* ******************************************************************************************** *
  * Implementation of OpenGD77ContactExtension
@@ -58,14 +49,6 @@ OpenGD77ContactExtension::clone() const {
   }
   return ex;
 }
-
-/*ConfigItem *
-OpenGD77ContactExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                                        const Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
-  // No extension yet of this extension
-  return nullptr;
-}*/
 
 OpenGD77ContactExtension::TimeSlotOverride
 OpenGD77ContactExtension::timeSlotOverride() const {
