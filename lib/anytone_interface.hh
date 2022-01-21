@@ -34,9 +34,6 @@ public:
 public:
   /** Constructs a new interface to Anytone radios. If a matching device was found, @c isOpen
    * returns @c true. */
-  explicit AnytoneInterface(const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
-  /** Constructs a new interface to Anytone radios. If a matching device was found, @c isOpen
-   * returns @c true. */
   explicit AnytoneInterface(const USBDeviceDescriptor &descriptor,
                             const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */

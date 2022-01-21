@@ -18,46 +18,6 @@ HIDevice::Descriptor::Descriptor(const USBDeviceInfo &info, uint8_t bus, uint8_t
 /* ********************************************************************************************* *
  * Implementation of HIDevice
  * ********************************************************************************************* */
-HIDevice::HIDevice(int vid, int pid, const ErrorStack &err, QObject *parent)
-  : QObject(parent), _ctx(nullptr), _dev(nullptr), _transfer(nullptr)
-{
-  logDebug() << "Try to detect USB HID interface "
-             << QString::number(vid, 16) << ":"
-             << QString::number(pid, 16) << ".";
-
-  int error = libusb_init(&_ctx);
-  if (error < 0) {
-    err.take(_cbError);
-    errMsg(err) << "Cannot init libusb (" << error
-                << "): " << libusb_strerror((enum libusb_error) error) << ".";
-    _ctx = nullptr;
-    return;
-  }
-
-  if (! (_dev = libusb_open_device_with_vid_pid(_ctx, vid, pid))) {
-    err.take(_cbError);
-    errMsg(err) << "Cannot find USB device " << QString::number(vid, 16)
-                << ":" << QString::number(pid, 16) << ".";
-    libusb_exit(_ctx);
-    _ctx = nullptr;
-    return;
-  }
-
-  if (libusb_kernel_driver_active(_dev, 0))
-    libusb_detach_kernel_driver(_dev, 0);
-
-  error = libusb_claim_interface(_dev, HID_INTERFACE);
-  if (error < 0) {
-    err.take(_cbError);
-    errMsg(err) << "Failed to claim USB interface (" << error
-                << "): " << libusb_strerror((enum libusb_error) error) << ".";
-    libusb_close(_dev);
-    libusb_exit(_ctx);
-    _dev = nullptr;
-    _ctx = nullptr;
-  }
-}
-
 HIDevice::HIDevice(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
   : QObject(parent), _ctx(nullptr), _dev(nullptr), _transfer(nullptr)
 {

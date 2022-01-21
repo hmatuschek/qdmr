@@ -159,12 +159,6 @@ OpenGD77Interface::CommandRequest::initCommand(Option option) {
 /* ********************************************************************************************* *
  * Implementation of OpenGD77Interface
  * ********************************************************************************************* */
-OpenGD77Interface::OpenGD77Interface(const ErrorStack &err, QObject *parent)
-  : USBSerial(USB_VID, USB_PID, err, parent), _sector(-1)
-{
-  // pass...
-}
-
 OpenGD77Interface::OpenGD77Interface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
   : USBSerial(descr, err, parent), _sector(-1)
 {

@@ -85,26 +85,6 @@ AnytoneInterface::RadioVariant::isValid() const {
 /* ********************************************************************************************* *
  * Implementation of AnytoneInterface
  * ********************************************************************************************* */
-AnytoneInterface::AnytoneInterface(const ErrorStack &err, QObject *parent)
-  : USBSerial(USB_VID, USB_PID, err, parent), _state(STATE_INITIALIZED), _info()
-{
-  if (isOpen()) {
-    _state = STATE_OPEN;
-  } else {
-    _state = STATE_ERROR;
-    return;
-  }
-
-  // enter program mode
-  if (! this->enter_program_mode())
-    return;
-  // identify device
-  if (! this->request_identifier(_info)) {
-    _info = RadioVariant();
-    _state = STATE_ERROR;
-  }
-}
-
 AnytoneInterface::AnytoneInterface(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
   : USBSerial(descriptor, err, parent), _state(STATE_INITIALIZED), _info()
 {

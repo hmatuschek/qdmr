@@ -92,8 +92,6 @@ class TyTInterface : public DFUDevice, public RadioInterface
   Q_OBJECT
 
 public:
-  /** Costructor. Searches and opens an interface to the specified vendor and product ID. */
-  TyTInterface(const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Costructor. Opens an interface to the specified interface. */
   TyTInterface(const USBDeviceDescriptor &descr,
                const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);

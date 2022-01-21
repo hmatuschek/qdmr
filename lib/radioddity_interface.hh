@@ -29,8 +29,6 @@ public:
   };
 
 public:
-  /** Connects to the radio with given vendor and product ID. */
-  explicit RadioddityInterface(const ErrorStack &err=ErrorStack(), QObject *parent = nullptr);
   /** Connects to the radio via the given descriptor. */
   explicit RadioddityInterface(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent = nullptr);
   /** Destructor. */

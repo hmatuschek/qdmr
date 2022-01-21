@@ -37,8 +37,6 @@ public:
 
 public:
   /** Opens a connection to the USB-DFU devuce at vendor @c vid and product @c pid. */
-  DFUDevice(unsigned vid, unsigned pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
-  /** Opens a connection to the USB-DFU devuce at vendor @c vid and product @c pid. */
   DFUDevice(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
 	virtual ~DFUDevice();
