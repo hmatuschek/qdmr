@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 {
   // Install log handler to stderr.
   QTextStream out(stderr);
-  StreamLogHandler *handler = new StreamLogHandler(out, LogMessage::WARNING);
+  StreamLogHandler *handler = new StreamLogHandler(out, LogMessage::WARNING, true);
   Logger::get().addHandler(handler);
 
   // Instantiate core application
