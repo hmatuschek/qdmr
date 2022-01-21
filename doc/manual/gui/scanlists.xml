@@ -9,15 +9,16 @@
 </info>
 
 <para>
-  Scan lists are simple lists of channels that are scanned sequentially, when scanning is stated. A
-  <glossterm>ScanList</glossterm> may be associated with an channel.
+  Scan lists are simple lists of channels that are scanned sequentially, when scanning is started. A
+  <glossterm>ScanList</glossterm> may be associated with an analog or digital channel (see 
+  <xref linkend="guiChannels"/>).
 </para>
 
 <note>
   <para> 
     For many radios, you need to associate a scan list with a channel (see 
     <xref linkend="guiChannels"/> above) in the analog or digital channel edit dialog. This determines 
-    which scan list is used when a scan is started on a particular channel.
+    which scan list is used, when a scan is started on a particular channel.
   </para>
 </note>
 
@@ -32,14 +33,14 @@
 <para>
   A new scan list can be created by clicking on the <guibutton>Add Scan List</guibutton> button. A 
   scan list can be deleted by selecting the scan list and clicking on the <guibutton>Delete Scan 
-  List</guibutton> button. The order of the scan list can be changed by selecting a list an moving 
+  List</guibutton> button. The order of the scan list can be changed by selecting a list and moving 
   it up/down using the <guibutton>up</guibutton> and <guibutton>down</guibutton> buttons on the 
   right.
 </para>
 
 <para>
   Double-clicking on a scan list or clicking the <guibutton>Add Scan List</guibutton> button will 
-  open the scan-list edit-dialog. This dialog allows to alter/assemble the scan by adding, 
+  open the scan-list edit-dialog. This dialog allows to alter/assemble the scan list by adding, 
   removing or reordering the channels in the scan list.
 </para>
 
@@ -74,10 +75,10 @@
 </para>
 
 <para>
-  The optional <guilabel>Transmit Channel</guilabel> or <glossterm>Revert Channel</glossterm>specifies 
+  The optional <guilabel>Transmit Channel</guilabel> or <glossterm>Revert Channel</glossterm> specifies 
   the channel to transmit on during a scan. Here none, any channel, the selected channel and also the 
   <guilabel>Last</guilabel> channel can be chosen. The <guilabel>Last</guilabel> channel refers to 
-  the last active channel on the scan list. This allows to answer a call heard during a scan.
+  the last active channel on the scan list. This allows to answer a heard call during a scan.
 </para>
 
 <para>
@@ -91,7 +92,7 @@
 <para>
   If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
   <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
-  the device specific settings for the GPS system. 
+  the device specific settings for the scan list. 
 </para>
 </section>
 

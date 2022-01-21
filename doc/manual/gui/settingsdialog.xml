@@ -31,7 +31,7 @@
 
 <para>
   The first section concerns the location of the user. You may enter your <glossterm>Maidenhead 
-  Locator</glossterm> here or you may enable <guilabel>System location</guilabel>. The latter tires
+  Locator</glossterm> here or you may enable <guilabel>System location</guilabel>. The latter tries
   to obtain the current location from the operating system. This information is then used in the 
   channel editors (see <xref linkend="guiChannels"/>) to provide auto-completion for repeaters 
   nearby.
@@ -62,11 +62,11 @@
 </para>
 
 <para>
-  As described in the <xref linkend="guiProgram"/> section, the upload of a codeplug will be paused 
+  As described in <xref linkend="guiProgram"/>, the upload of a codeplug will be paused 
   if some verification warnings are issued. The <guilabel>Ignore verification warnings</guilabel>
   option allows to continue silently even in the presence of verification warnings. The may be 
   needed for some radios with some rather short communication timeout. The radio may reset the 
-  connection to the computer while the warning are shown. To prevent this, this option might be 
+  connection to the computer while the warnings are shown. To prevent this, this option might be 
   used.
 </para>
 
@@ -138,7 +138,8 @@
 
 <para>
   For now, there are not may commercial features supported by <application>qdmr</application>. 
-  Therefore not much is hidden except for the ability to define several DMR radio IDs.
+  Therefore not much is hidden except for the ability to define several DMR radio IDs and the 
+  device specific settings.
 </para>
 </section>
 </section>
