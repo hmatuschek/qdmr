@@ -17,10 +17,12 @@
 <note>
   <para>
     The OpenGD77 codeplug is a specialization of the GD77 codeplug. Consequently 
-    all <xref linkend="extRadioddity"/> are also applicable to the OpenGD77 codeplug.
+    all extensions described in <xref linkend="extRadioddity"/> are also applicable to the OpenGD77
+    codeplug.
   </para>
 </note>
 
 <xi:include href="channel.xml"/>
+<xi:include href="contact.xml"/>
 
 </section>

@@ -43,29 +43,49 @@
 <para>
   Each channel is defined within a single line. The first column is the unique channel
   identifier (any unique number among analog AND digital channels). The second column specifies the
-  channel name as a string. The third column specifies the RX frequency in MHz and the fourth
+  channel name as a string. 
+</para>
+<para>
+  The third column specifies the RX frequency in MHz and the fourth
   column the TX frequency in MHz. Alternatively, a TX frequency can also be specified in terms of
   an offset relative to the RX frequency. In this case, the offset must be prefixed with either
-  "+" or "-". The 5th (Power) column specifies the power level to use. Here, either the "High" or "Low"
+  "+" or "-". 
+</para>
+<para>
+  The 5th (Power) column specifies the power level to use. Here, either the "High" or "Low"
   keyword must be used. The 6th (Scan) column specifies the ID of the scan-list (see below) attached to
-  the channel. This list will be used whenever a scan is started on this channel. The 7th column
+  the channel. This list will be used whenever a scan is started on this channel. 
+</para>
+<para>
+  The 7th column
   (TOT) column specifies the TX time-out-timer in seconds or "-", if disabled. The 8th column
   (RO) specifies whether the channel is RX only ("+") or not ("-"). If enabled, you cannot transmit
-  on that particular channel. The 9th (Admit) colum specifies the TX admit criterion for the
+  on that particular channel. 
+</para>
+<para>
+  The 9th (Admit) colum specifies the TX admit criterion for the
   channel. This must be either "-" or one of the keywords "Free" and "Color". "-" indicates that
   there is no restriction in transmitting on that channel. The radio will transmit whenever PTT is
   pressed. The "Free" keyword indicates that the radio will only transmit if the channel is free.
   The "Color" keyword indicates that the radio will only transmit if the channel is free and the
-  color-code of the repeater matches the specified color-code of the channel (see next column). The
-  10th column specifies the color-code of the channel. The 10th (CC) column specifies the
+  color-code of the repeater matches the specified color-code of the channel (see next column). 
+</para>
+<para>
+  The 10th (CC) column specifies the
   color-code of the channel. To avoid interference between neighboring radios and repeaters on
   the same frequency (in case of DX conditions), the repeater and radio will only react to
   transmissions on a channel with the matching color-code. The color-code can be any number between
-  0 and 15. The 11th (TS) column specifies the time-slot for this channel. Due to the audio
+  0 and 15. 
+</para>
+<para>
+  The 11th (TS) column specifies the time-slot for this channel. Due to the audio
   compression used in DMR, it is possible to operate two independent channels on a single
   frequency by using time-slicing. DMR uses two time-slots. This option specifies which of the
   two time-slots is used for the channel. On simplex channels, this time-slicing is irrelevant, as
-  there is no central instance (the repeater) that defines what time-slot 1 or 2 is. The 12th (GPS)
+  there is no central instance (the repeater) that defines what time-slot 1 or 2 is. 
+</para>
+<para>
+  The 12th (GPS)
   column specifies the GPS or APRS system (see below) to use on that channel. The 13th (Roam) column 
   specifies the roaming zone. This can either be '-' meaning <emphasis>roaming disabled</emphasis>
   or an ID of a roaming zone specified below. Finally, the 14th column (ID) specifies the 

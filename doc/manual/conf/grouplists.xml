@@ -5,18 +5,18 @@
          xmlns:xlink="http://www.w3.org/1999/xlink">
 
 <info>
-  <title>RX group list table</title>
+  <title>Group list table</title>
 </info>
 
 <para>
-  RX group lists are simple named lists of one ore more contacts. These lists may include group,
-  all or even private calls. RX group lists are assigned to channels. They form a group of
+  Group lists are simple named lists of one ore more contacts. These lists may include group,
+  all or even private calls. Group lists are assigned to channels. They form a group of
   contacts (e.g., talk groups) you may want to listen to on a particular channel. Usually these
   group lists form a collection of talk groups that are specific for a particular region.
 </para>
 
 <para>
-  RX group lists are defined within the config file like
+  Group lists are defined within the config file like
 </para>
 
 <informalexample>
@@ -37,7 +37,7 @@
 </para>
 
 <para>
-  Following the "Grouplist" keyword, each RX group list is defined by a single line. The first
+  Following the "Grouplist" keyword, each group list is defined by a single line. The first
   column specifies the internal unique ID for the group list. This can be any number as long as
   it is unique. The second column contains the name of the group list as a string. This can be
   any non-empty string. The third column contains the comma-separated list of contact IDs that form

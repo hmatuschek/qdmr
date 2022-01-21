@@ -58,7 +58,7 @@ IntroLine2: "MY0CALL"
 
 <para>
   The microphone sensitivity/amplification can also be set (on some radios) using the MicLevel
-  entry. This entry is also a number between 1 and 10. The larger the level the larger the
+  entry. This entry is a number between 1 and 10. The larger the level, the larger the
   microphone amplification. This value may vary heavily from model to model.
 </para>
 

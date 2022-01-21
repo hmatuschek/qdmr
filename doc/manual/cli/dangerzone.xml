@@ -30,7 +30,7 @@
   the BTech DMR-6X2. Each model identifies itself correspondingly and thus is distinguished by the
   CPS. Some of these relationships between virtually identical models are known to 
   <application>qdmr</application> and <command>dmrconf</command>. In these cases, the CPS will 
-  treat these radios as identical. s
+  treat these radios as identical.
 </para>
 
 <para>

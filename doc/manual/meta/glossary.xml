@@ -147,18 +147,49 @@
   
   <glossentry>
     <glossterm>Maidenhead Locator</glossterm>
+    <glossdef>
+      <para>
+        The Maidenhead locator, also known as <quote>QTH locator</quote> or 
+        <quote>IARU locator</quote> is a means for transferring a geo-location over radio. Using a
+        so-called grid-square system.
+      </para>
+    </glossdef>
   </glossentry>
 
   <glossentry>
     <glossterm>Private Call</glossterm>
+    <glossdef>
+      <para>
+        A DMR call to an individual participant. Usually, radios do not receive private calls not
+        addressed to the radio. This therefore can be used to talk to a specific HAM over a 
+        repeater without disturbing other participants. The repeater however, will be blocked 
+        during that time.
+      </para>
+    </glossdef>
   </glossentry>
   
   <glossentry>
     <glossterm>Revert Channel</glossterm>
+    <glossdef>
+      <para>
+        A revert channel is a designated channel the radio resorts to, to transfer some information
+        or the radio switches to, when the PTT is pressed. This is usually used in the context of 
+        APRS (i.e., the channel to switch to send the position) or scan lists (i.e., the channel
+        the radio will switch to, when the PTT is pressed during the scan).
+      </para>
+    </glossdef>
   </glossentry>
 
   <glossentry>
     <glossterm>Roaming Zone</glossterm>
+    <glossdef>
+      <para>
+        A collection of channels usually sharing the same transmit contact. When roaming is enabled
+        (and supported by the radio) this list of channels is scanned for a reachable channel once 
+        the current repeater gets out-of-range. This way, one can stay in contact with a particular 
+        talk group when being mobile.
+      </para>
+    </glossdef>
   </glossentry>
 
   <glossentry>

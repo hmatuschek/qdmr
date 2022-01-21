@@ -35,46 +35,56 @@
   <varlistentry>
     <term><token>id</token></term>
     <listitem>
-      <para>Specifies the ID of the scan list. This ID can then be used to reference this scan 
-        list in <xref linkend="cpChannels"/>.</para>
+      <para>
+        Specifies the ID of the scan list. This ID can then be used to reference this scan 
+        list in <xref linkend="cpChannels"/>.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>name</token></term>
     <listitem>
-      <para>Specifies the name of the scan list. Any string is valid here.</para>
+      <para>
+        Specifies the name of the scan list. Any string is valid here.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>primary</token></term>
     <listitem>
-      <para>Specifies the primary priority channel. Usually this channel is scanned very frequently. 
+      <para>
+        Specifies the primary priority channel. Usually this channel is scanned very frequently. 
         If set, this must be a reference to a channel. If the tag <token>!selected</token> is used here,
-        the channel from which the scan got started is used as the primary priority channel.</para>
+        the channel from which the scan got started is used as the primary priority channel.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>secondary</token></term>
     <listitem>
-      <para>Specifies the secondary priority channel. Usually this channel is scanned frequently. 
+      <para>
+        Specifies the secondary priority channel. Usually this channel is scanned frequently. 
         If set, this must be a reference to a channel. If the tag <token>!selected</token> is used here,
-        the channel from which the scan got started is used as the secondary priority channel.</para>
+        the channel from which the scan got started is used as the secondary priority channel.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>revert</token></term>
     <listitem>
-      <para>Specifies the revert channel. That is, the channel to transmit on irrespective of the 
+      <para>
+        Specifies the revert channel. That is, the channel to transmit on irrespective of the 
         current channel being scanned. If set, this must be a reference to a channel. If the tag 
         <token>!selected</token> is used here, the channel from which the scan got started is used 
         as the transmit channel. If omitted the radio will transmit on the currently scanned 
-        channel.</para>
+        channel.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>channels</token></term>
     <listitem>
-      <para>Specifies the list of channels to scan. Must be a list of reference to channels.</para>
+      <para>Specifies the list of channels to scan. Must be a list of channel IDs.</para>
     </listitem>
   </varlistentry>
 </variablelist>
