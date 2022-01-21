@@ -130,7 +130,7 @@ D578UV::D578UV(AnytoneInterface *device, QObject *parent)
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.} };
     break;
   default:
-    logInfo() << "Unknown band-code" << QString::number(int(info.bands), 16)
+    logInfo() << "Unknown band-code 0x" << QString::number(int(info.bands), 16)
               << ": Set freq range to 136-174MHz and 400-480MHz.";
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 480.} };
     break;

@@ -200,7 +200,7 @@
         <term><option>-D</option> or <option>--device=DEVICE</option></term>
         <listitem>
           <para>
-            Specifies the device to use. Either a USB <term>BUS:DEVICE</term> 
+            Specifies the device to use. Either a USB <token>BUS:DEVICE</token> 
             number combination or the name of a serial interface. The device
             must be specified if the automatic radio detection fails or if 
             more than one radio is connected to the host.

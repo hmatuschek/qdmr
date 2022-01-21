@@ -77,35 +77,25 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
+         <item row="6" column="0">
           <widget class="QLabel" name="rxOnlyLabel">
            <property name="text">
             <string>Rx Only</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="6" column="1">
           <widget class="QCheckBox" name="rxOnly"/>
          </item>
-         <item row="6" column="0">
+         <item row="7" column="0">
           <widget class="QLabel" name="scanListLabel">
            <property name="text">
             <string>Scan List</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
-          <widget class="QComboBox" name="scanList"/>
-         </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="dmrIDLabel">
-           <property name="text">
-            <string>DMR ID</string>
-           </property>
-          </widget>
-         </item>
          <item row="7" column="1">
-          <widget class="QComboBox" name="dmrID"/>
+          <widget class="QComboBox" name="scanList"/>
          </item>
          <item row="3" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -174,18 +164,43 @@
            </item>
           </layout>
          </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="voxLevelLabel">
+           <property name="text">
+            <string>VOX Level</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QSpinBox" name="voxValue">
+             <property name="specialValueText">
+              <string>Off</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="voxDefault">
+             <property name="text">
+              <string>Default</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
         </layout>
        </item>
        <item>
         <layout class="QFormLayout" name="formLayout_2">
-         <item row="0" column="0">
+         <item row="1" column="0">
           <widget class="QLabel" name="txAdmitLabel">
            <property name="text">
             <string>Tx Admit</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="1" column="1">
           <widget class="QComboBox" name="txAdmit">
            <item>
             <property name="text">
@@ -204,14 +219,14 @@
            </item>
           </widget>
          </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QLabel" name="colorCodeLabel">
            <property name="text">
             <string>Color Code</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="2" column="1">
           <widget class="QSpinBox" name="colorCode">
            <property name="maximum">
             <number>15</number>
@@ -221,14 +236,14 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <widget class="QLabel" name="timeSlotLabel">
            <property name="text">
             <string>Time Slot</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <widget class="QComboBox" name="timeSlot">
            <item>
             <property name="text">
@@ -242,70 +257,55 @@
            </item>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="4" column="0">
           <widget class="QLabel" name="rxGroupListLabel">
            <property name="text">
             <string>Rx Group List</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="4" column="1">
           <widget class="QComboBox" name="rxGroupList"/>
          </item>
-         <item row="4" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="txContactLabel">
            <property name="text">
             <string>Tx Contact</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="5" column="1">
           <widget class="QComboBox" name="txContact"/>
          </item>
-         <item row="5" column="0">
+         <item row="6" column="0">
           <widget class="QLabel" name="posSysLabel">
            <property name="text">
             <string>Positioning System</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="6" column="1">
           <widget class="QComboBox" name="gpsSystem"/>
          </item>
-         <item row="6" column="0">
+         <item row="7" column="0">
           <widget class="QLabel" name="roamLabel">
            <property name="text">
             <string>Roaming Zone</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
+         <item row="7" column="1">
           <widget class="QComboBox" name="roaming"/>
          </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="voxLevelLabel">
+         <item row="0" column="0">
+          <widget class="QLabel" name="dmrIDLabel">
            <property name="text">
-            <string>VOX Level</string>
+            <string>DMR ID</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
-           <item>
-            <widget class="QSpinBox" name="voxValue">
-             <property name="specialValueText">
-              <string>Off</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="voxDefault">
-             <property name="text">
-              <string>Default</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="dmrID"/>
          </item>
         </layout>
        </item>
