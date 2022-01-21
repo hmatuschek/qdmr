@@ -15,32 +15,18 @@ parseDeviceHandle(const QString &device) {
 
 void
 printDevices(QTextStream &out, const QList<USBDeviceDescriptor> &devices) {
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << " Device";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << "Type";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(60); out << "Description";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "\n";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(18); out << "-";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "+-";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(18); out << "-";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "+-";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(60); out << "-";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "\n";
   foreach (USBDeviceDescriptor device, devices) {
     if (USBDeviceInfo::Class::None == device.interfaceClass())
       continue;
-    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(8);
+    out << "Device '";
     if (USBDeviceInfo::Class::Serial == device.interfaceClass()) {
-      out << device.device().toString();
+      out << device.device().toString() << "'\n";
     } else {
       USBDeviceAddress addr = device.device().value<USBDeviceAddress>();
-      out << addr.bus << ":" << addr.device;
+      out << QString("%1:%2").arg(addr.bus).arg(addr.device) << "'\n";
     }
-    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
-    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << device.description();
-    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
-    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << device.longDescription() << "\n";
+    out << " Type:        " << device.description() << "\n";
+    out << " Description: " << device.longDescription() << "\n";
   }
 }
 
