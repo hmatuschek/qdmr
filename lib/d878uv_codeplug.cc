@@ -2301,7 +2301,7 @@ D878UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
 
   GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx);
   GPSMessageElement(data(ADDR_GENERAL_CONFIG_EXT1)).updateConfig(ctx);
-  GeneralSettingsElement(data(ADDR_GENERAL_CONFIG_EXT2)).updateConfig(ctx);
+  GeneralSettingsExtensionElement(data(ADDR_GENERAL_CONFIG_EXT2)).updateConfig(ctx);
   return true;
 }
 
