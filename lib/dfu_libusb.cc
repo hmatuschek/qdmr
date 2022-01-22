@@ -37,7 +37,7 @@ enum {
  * Implementation of DFUDevice::Descriptor
  * ********************************************************************************************* */
 DFUDevice::Descriptor::Descriptor(const USBDeviceInfo &info, uint8_t bus, uint8_t device)
-  : USBDeviceDescriptor(info, USBDeviceAddress(bus, device))
+  : USBDeviceDescriptor(info, USBDeviceHandle(bus, device))
 {
   // pass...
 }
@@ -73,7 +73,7 @@ DFUDevice::DFUDevice(const USBDeviceDescriptor &descr, const ErrorStack &err, QO
   }
 
   logDebug() << "Try to detect USB DFU interface " << descr.description() << ".";
-  USBDeviceAddress addr = descr.device().value<USBDeviceAddress>();
+  USBDeviceHandle addr = descr.device().value<USBDeviceHandle>();
   for (int i=0; (i<num)&&(nullptr!=lst[i]); i++) {
     if (addr.bus != libusb_get_bus_number(lst[i]))
       continue;

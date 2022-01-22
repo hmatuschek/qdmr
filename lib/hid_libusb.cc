@@ -81,8 +81,14 @@ HIDevice::HIDevice(const USBDeviceDescriptor &descr, const ErrorStack &err, QObj
     _ctx = nullptr;
   }
 
-  if (libusb_kernel_driver_active(_dev, 0))
-    libusb_detach_kernel_driver(_dev, 0);
+  if (libusb_kernel_driver_active(_dev, 0)) {
+    error = libusb_detach_kernel_driver(_dev, 0);
+    if (error < 0) {
+      logWarn() << "Failed to detatch kernel from HID interface (" << error
+                << "): " << libusb_strerror((enum libusb_error) error) <<
+                   ". Device claim will likely fail.";
+    }
+  }
 
   error = libusb_claim_interface(_dev, HID_INTERFACE);
   if (error < 0) {

@@ -95,16 +95,20 @@
 /** Combines the USB bus and device number, to address a USB device uniquely.
  *
  * @ingroup detect */
-struct USBDeviceAddress {
-  uint8_t bus;      ///< Holds the bus number.
-  uint8_t device;   ///< Holds the device address.
+struct USBDeviceHandle {
+  uint8_t bus;         ///< Holds the bus number.
+  uint8_t device;      ///< Holds the device address.
+  uint32_t locationId; ///< On MacOS, holds the location ID.
 
   /** Empty constructor. */
-  USBDeviceAddress();
+  USBDeviceHandle();
   /** Constructor from bus and device number. */
-  USBDeviceAddress(uint8_t busno, uint8_t deviceno);
+  USBDeviceHandle(uint8_t busno, uint8_t deviceno, uint32_t locid=0);
+
+  /** Compares only wrt bus and device number. */
+  bool operator==(const USBDeviceHandle &other);
 };
-Q_DECLARE_METATYPE(USBDeviceAddress)
+Q_DECLARE_METATYPE(USBDeviceHandle)
 
 /** Generic information about a possible radio interface.
  *
@@ -195,7 +199,7 @@ protected:
   /** Hidden constructor from info and path string. */
   USBDeviceDescriptor(const USBDeviceInfo &info, const QString &device);
   /** Hidden constructor from info and USB device address. */
-  USBDeviceDescriptor(const USBDeviceInfo &info, const USBDeviceAddress &device);
+  USBDeviceDescriptor(const USBDeviceInfo &info, const USBDeviceHandle &device);
 
 public:
   /** Empty constructor. */

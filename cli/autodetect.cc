@@ -8,7 +8,7 @@ QVariant
 parseDeviceHandle(const QString &device) {
   QRegExp pattern("([0-9]+):([0-9]+)");
   if (pattern.exactMatch(device.simplified())) {
-    return QVariant::fromValue(USBDeviceAddress(pattern.cap(1).toUInt(), pattern.cap(2).toUInt()));
+    return QVariant::fromValue(USBDeviceHandle(pattern.cap(1).toUInt(), pattern.cap(2).toUInt()));
   }
   return QVariant(device.simplified());
 }
@@ -21,8 +21,11 @@ printDevices(QTextStream &out, const QList<USBDeviceDescriptor> &devices) {
     out << "Device '";
     if (USBDeviceInfo::Class::Serial == device.interfaceClass()) {
       out << device.device().toString() << "'\n";
-    } else {
-      USBDeviceAddress addr = device.device().value<USBDeviceAddress>();
+    } else if (USBDeviceInfo::Class::DFU == device.interfaceClass()) {
+      USBDeviceHandle addr = device.device().value<USBDeviceHandle>();
+      out << QString("%1:%2").arg(addr.bus).arg(addr.device) << "'\n";
+    } else if (USBDeviceInfo::Class::HID == device.interfaceClass()) {
+      USBDeviceHandle addr = device.device().value<USBDeviceHandle>();
       out << QString("%1:%2").arg(addr.bus).arg(addr.device) << "'\n";
     }
     out << " Type:        " << device.description() << "\n";

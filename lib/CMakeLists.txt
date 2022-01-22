@@ -1,6 +1,8 @@
 IF (APPLE)
  SET(hid_SOURCES hid_macos.cc)
  SET(hid_HEADERS hid_macos.hh)
+ #SET(hid_SOURCES hid_libusb.cc)
+ #SET(hid_HEADERS hid_libusb.hh)
 ELSE (APPLE)
  SET(hid_SOURCES hid_libusb.cc)
  SET(hid_HEADERS hid_libusb.hh)

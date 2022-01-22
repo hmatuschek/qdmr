@@ -14,16 +14,21 @@
 /* ********************************************************************************************* *
  * Implementation of USBDeviceAddress
  * ********************************************************************************************* */
-USBDeviceAddress::USBDeviceAddress()
+USBDeviceHandle::USBDeviceHandle()
   : bus(0xff), device(0xff)
 {
   // pass...
 }
 
-USBDeviceAddress::USBDeviceAddress(uint8_t busno, uint8_t deviceno)
-  : bus(busno), device(deviceno)
+USBDeviceHandle::USBDeviceHandle(uint8_t busno, uint8_t deviceno, uint32_t locid)
+  : bus(busno), device(deviceno), locationId(locid)
 {
   // pass...
+}
+
+bool
+USBDeviceHandle::operator==(const USBDeviceHandle &other) {
+  return (bus == other.bus) && (device == other.device);
 }
 
 
@@ -152,8 +157,8 @@ USBDeviceDescriptor::USBDeviceDescriptor(const USBDeviceInfo &info, const QStrin
   // pass...
 }
 
-USBDeviceDescriptor::USBDeviceDescriptor(const USBDeviceInfo &info, const USBDeviceAddress &device)
-  : USBDeviceInfo(info), _device(QVariant::fromValue<USBDeviceAddress>(device))
+USBDeviceDescriptor::USBDeviceDescriptor(const USBDeviceInfo &info, const USBDeviceHandle &device)
+  : USBDeviceInfo(info), _device(QVariant::fromValue<USBDeviceHandle>(device))
 {
   // pass...
 }
@@ -208,7 +213,7 @@ USBDeviceDescriptor::validRawUSB() const {
     return false;
   }
 
-  USBDeviceAddress addr = _device.value<USBDeviceAddress>();
+  USBDeviceHandle addr = _device.value<USBDeviceHandle>();
   logDebug() << "Search for a device matching VID:PID "
              << QString::number(_vid, 16) << ":" << QString::number(_pid, 16)
              << " at bus " << addr.bus << ", device " << addr.device << ".";
@@ -258,10 +263,10 @@ USBDeviceDescriptor::description() const {
   if (USBDeviceInfo::Class::Serial == _class) {
     return QString("Serial interface '%1'").arg(_device.toString());
   } else if (USBDeviceInfo::Class::DFU == _class) {
-    USBDeviceAddress addr = _device.value<USBDeviceAddress>();
+    USBDeviceHandle addr = _device.value<USBDeviceHandle>();
     return QString("USB device in DFU mode: bus %1, device %2").arg(addr.bus).arg(addr.device);
   } else if (USBDeviceInfo::Class::HID == _class) {
-    USBDeviceAddress addr = _device.value<USBDeviceAddress>();
+    USBDeviceHandle addr = _device.value<USBDeviceHandle>();
     return QString("USB HID: bus %1, device %2").arg(addr.bus).arg(addr.device);
   }
   return "Invalid";
@@ -279,8 +284,8 @@ USBDeviceDescriptor::deviceHandle() const {
     break;
   case Class::DFU:
   case Class::HID:
-    return QString("%1:%2").arg(_device.value<USBDeviceAddress>().bus)
-        .arg(_device.value<USBDeviceAddress>().device);
+    return QString("%1:%2").arg(_device.value<USBDeviceHandle>().bus)
+        .arg(_device.value<USBDeviceHandle>().device);
   case Class::Serial:
     return _device.toString();
   }
