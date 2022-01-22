@@ -12,7 +12,7 @@
 
 
 /* ********************************************************************************************* *
- * Implementation of USBDeviceAddress
+ * Implementation of USBDeviceHandle
  * ********************************************************************************************* */
 USBDeviceHandle::USBDeviceHandle()
   : bus(0xff), device(0xff)

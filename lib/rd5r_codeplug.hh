@@ -78,6 +78,7 @@ class RD5RCodeplug : public RadioddityCodeplug
 {
   Q_OBJECT
 
+public:
   /** Implements the specialization of the Radioddity channel for the RD5R radio.
    *
    * Memory layout of encoded channel:

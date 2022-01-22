@@ -66,12 +66,12 @@ RD5RCodeplug::ChannelElement::clear() {
 
 unsigned
 RD5RCodeplug::ChannelElement::squelch() const {
-  return std::min(getUInt8(0x0037), uint8_t(9))+1;
+  return getUInt8(0x0037);
 }
 void
 RD5RCodeplug::ChannelElement::setSquelch(unsigned level) {
-  level = std::max(std::min(10u, level), 1u);
-  setUInt8(0x0037, level-1);
+  level = std::min(9u, level);
+  setUInt8(0x0037, level);
 }
 
 bool

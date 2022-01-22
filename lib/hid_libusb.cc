@@ -9,7 +9,7 @@
  * Implementation of HIDevice::Descriptor
  * ********************************************************************************************* */
 HIDevice::Descriptor::Descriptor(const USBDeviceInfo &info, uint8_t bus, uint8_t device)
-  : USBDeviceDescriptor(info, USBDeviceAddress(bus, device))
+  : USBDeviceDescriptor(info, USBDeviceHandle(bus, device))
 {
   // pass...
 }
@@ -45,7 +45,7 @@ HIDevice::HIDevice(const USBDeviceDescriptor &descr, const ErrorStack &err, QObj
   }
 
   logDebug() << "Try to detect USB HID interface " << descr.description() << ".";
-  USBDeviceAddress addr = descr.device().value<USBDeviceAddress>();
+  USBDeviceHandle addr = descr.device().value<USBDeviceHandle>();
   for (int i=0; (i<num)&&(nullptr!=lst[i]); i++) {
     if (addr.bus != libusb_get_bus_number(lst[i]))
       continue;
