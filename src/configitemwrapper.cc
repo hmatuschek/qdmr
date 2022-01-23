@@ -2,6 +2,8 @@
 #include <cmath>
 #include "logger.hh"
 #include <QColor>
+#include <QPalette>
+#include <QWidget>
 
 
 /* ********************************************************************************************* *
@@ -226,19 +228,23 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
 
   if ((! index.isValid()) || (index.row()>=_list->count()))
     return QVariant();
+
   if (Qt::ForegroundRole == role) {
+    const QPalette &palette = qobject_cast<QWidget *>(QObject::parent())->palette();
+    QColor active   = palette.color(QPalette::Active, QPalette::Text);
+    QColor inactive = palette.color(QPalette::Inactive, QPalette::Text);
     bool isDigital = dynamic_cast<ChannelList *>(_list)->channel(index.row())->is<DigitalChannel>();
     switch(index.column()) {
     case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
-      return QColor(Qt::black);
+      return active;
     case 9: case 10: case 11: case 12: case 13:
-      return (isDigital ? QColor(Qt::black) : QColor(Qt::lightGray));
+      return (isDigital ? active : inactive);
     case 14:
-      return QColor(Qt::black);
+      return active;
     case 15:
-      return (isDigital ? QColor(Qt::black) : QColor(Qt::lightGray));
+      return (isDigital ? active : inactive);
     case 16: case 17: case 18: case 19:
-      return (isDigital ? QColor(Qt::lightGray) : QColor(Qt::black));
+      return (isDigital ? inactive : active);
     }
   }
 
