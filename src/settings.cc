@@ -406,7 +406,7 @@ SettingsDialog::positionUpdated(const QGeoPositionInfo &info) {
 
 void
 SettingsDialog::onDBLimitToggled(bool enable) {
-  Ui::SettingsDialog::dbLimit->setEnabled(! enable);
+  Ui::SettingsDialog::dbLimit->setEnabled(enable);
 }
 
 void
