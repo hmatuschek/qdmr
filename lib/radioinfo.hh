@@ -4,6 +4,8 @@
 #include <QString>
 #include <QHash>
 #include <QList>
+#include "usbdevice.hh"
+
 
 /** Provides some information about a radio model.
  *
@@ -41,9 +43,11 @@ public:
 public:
   /** Use static methods the access radio info or call @c Radio::defaultRadioInfo. */
   RadioInfo(Radio radio, const QString &name, const QString manufacturer,
+            const USBDeviceInfo &interface,
             const QList<RadioInfo> &alias=QList<RadioInfo>());
   /** Use static methods the access radio info or call @c Radio::defaultRadioInfo. */
   RadioInfo(Radio radio, const QString &key, const QString &name, const QString manufacturer,
+            const USBDeviceInfo &interface,
             const QList<RadioInfo> &alias=QList<RadioInfo>());
 
   /** Empty constructor. */
@@ -58,6 +62,8 @@ public:
   const QString &name() const;
   /** Retunrs the manufacturer name. */
   const QString &manufactuer() const;
+  /** Returns some information about the iterface to the radio. */
+  const USBDeviceInfo &interface() const;
 
   /** Returns @c true if the radio has aliases.
    * That is other radios that are identical. */
@@ -78,6 +84,8 @@ public:
 
   /** Returns the list of all known radios. */
   static QList<RadioInfo> allRadios(bool flat=true);
+  /** Returns a list of all known radios for the specified interface. */
+  static QList<RadioInfo> allRadios(const USBDeviceInfo &interface, bool flat=true);
 
 protected:
   /** Holds the radio id. */
@@ -90,6 +98,8 @@ protected:
   QString _manufacturer;
   /** Holds possible identical radios from other manufactuers. */
   QList<RadioInfo> _alias;
+  /** Holds some information about the interface to the radio. */
+  USBDeviceInfo _interface;
 
 protected:
   /** Key->ID map. */

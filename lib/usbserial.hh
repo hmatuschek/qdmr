@@ -16,14 +16,21 @@ class USBSerial : public QSerialPort, public RadioInterface
 {
   Q_OBJECT
 
+public:
+  /** Specialization of radio interface info for serial ports. */
+  class Descriptor: public USBDeviceDescriptor {
+  public:
+    /** Constructor from VID, PID and device path. */
+    Descriptor(uint16_t vid, uint16_t pid, const QString &device);
+  };
+
 protected:
   /** Constructs an opens new serial interface to the devices identified by the given vendor and
    * product IDs.
-   * @param vid Vendor ID of device.
-   * @param pid Product ID of device.
+   * @param descriptor Specifies the device to open.
    * @param err The error stack, messages are put onto.
    * @param parent Specifies the parent object. */
-  explicit USBSerial(unsigned vid, unsigned pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+  explicit USBSerial(const USBDeviceDescriptor &descriptor, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
 public:
   /** Destrutor. */
@@ -33,6 +40,10 @@ public:
   bool isOpen() const;
   /** Closes the interface to the device. */
   void close();
+
+public:
+  /** Searches for all USB serial ports with the specified VID/PID. */
+  static QList<USBDeviceDescriptor> detect(uint16_t vid, uint16_t pid);
 
 protected slots:
   /** Callback for serial interface errors. */

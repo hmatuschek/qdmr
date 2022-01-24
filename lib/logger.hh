@@ -131,8 +131,9 @@ public:
   /** Constructor.
    * @param stream Specifies the text stream to log into.
    * @param minLevel Specifies the minimum log-level to log.
+   * @param color If @c true, the output will be colored.
    * @param parent Specifies the parent object. */
-  StreamLogHandler(QTextStream &stream, LogMessage::Level minLevel=LogMessage::DEBUG, QObject *parent=nullptr);
+  StreamLogHandler(QTextStream &stream, LogMessage::Level minLevel=LogMessage::DEBUG, bool color=false, QObject *parent=nullptr);
 
   /** Returns the minimum log level. */
   LogMessage::Level minLevel() const;
@@ -146,6 +147,8 @@ protected:
   QTextStream &_stream;
   /** The minimum log level. */
   LogMessage::Level _minLevel;
+  /** If true, write messages using console colors. */
+  bool _color;
 };
 
 

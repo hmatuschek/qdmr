@@ -34,10 +34,13 @@
 #include "roamingzonelistview.hh"
 #include "errormessageview.hh"
 #include "extensionview.hh"
+#include "deviceselectiondialog.hh"
+#include "radioselectiondialog.hh"
 
 
 Application::Application(int &argc, char *argv[])
-  : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _repeater(nullptr)
+  : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _repeater(nullptr),
+    _lastDevice()
 {
   setApplicationName("qdmr");
   setOrganizationName("DM3MAT");
@@ -46,6 +49,12 @@ Application::Application(int &argc, char *argv[])
   // open logfile
   QString logdir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
   Logger::get().addHandler(new FileLogHandler(logdir+"/qdmr.log"));
+
+  // Register icon themes
+  QStringList iconPaths = QIcon::themeSearchPaths();
+  iconPaths.prepend(":/icons");
+  QIcon::setThemeSearchPaths(iconPaths);
+  onPaletteChanged(palette());
 
   Settings settings;
   _repeater   = new RepeaterDatabase(settings.position(), 7, this);
@@ -100,6 +109,18 @@ Application::~Application() {
   _mainWindow = nullptr;
 }
 
+bool
+Application::isDarkMode() const {
+  return isDarkMode(palette());
+}
+
+bool
+Application::isDarkMode(const QPalette &palette) const {
+  int text_hsv_value = palette.color(QPalette::WindowText).value(),
+      bg_hsv_value = palette.color(QPalette::Background).value();
+  return text_hsv_value > bg_hsv_value;
+}
+
 
 QMainWindow *
 Application::mainWindow() {
@@ -131,6 +152,7 @@ Application::createMainWindow() {
     return _mainWindow;
 
   Settings settings;
+  logDebug() << "Create main window using icon theme '" << QIcon::themeName() << "'.";
 
   QUiLoader loader;
   QFile uiFile("://ui/mainwindow.ui");
@@ -379,35 +401,68 @@ Application::quitApplication() {
 }
 
 
+Radio *
+Application::autoDetect(const ErrorStack &err) {
+  // If the last detected device is still valid
+  //  -> skip interface detection and selection
+  if (! _lastDevice.isValid()) {
+    logDebug() << "Last device is invalid, search for new one.";
+    // First get all devices that are known by VID/PID
+    QList<USBDeviceDescriptor> interfaces = USBDeviceDescriptor::detect();
+    if (interfaces.isEmpty()) {
+      errMsg(err) << tr("No matching devices found.");
+      return nullptr;
+    } else if ((1 != interfaces.count()) || (! interfaces.first().isSave())) {
+      // More than one device found, or device not save -> select by user
+      DeviceSelectionDialog dialog(interfaces);
+      if (QDialog::Accepted != dialog.exec()) {
+        return nullptr;
+      }
+      _lastDevice = dialog.device();
+    } else {
+      _lastDevice = interfaces.first();
+    }
+  }
+
+  // Check if device supports identification
+  RadioInfo radioInfo;
+  if (! _lastDevice.isIdentifiable()) {
+    RadioSelectionDialog dialog(_lastDevice);
+    if (QDialog::Accepted != dialog.exec()) {
+      return nullptr;
+    }
+    radioInfo = dialog.radioInfo();
+  }
+
+  Radio *radio = Radio::detect(_lastDevice, radioInfo, err);
+  if (nullptr == radio) {
+    QMessageBox::critical(nullptr, tr("Cannot connect to radio"),
+                          tr("Cannot connect to radio: %1").arg(err.format()));
+    return nullptr;
+  }
+
+  return radio;
+}
+
 void
 Application::detectRadio() {
-  ErrorStack err;
-  Radio *radio = Radio::detect(err);
-  if (radio) {
+  if (Radio *radio = autoDetect()) {
     QMessageBox::information(nullptr, tr("Radio found"), tr("Found device '%1'.").arg(radio->name()));
     radio->deleteLater();
-  } else {
-    QMessageBox::information(nullptr, tr("No Radio found."),
-                             tr("No known radio detected. Check connection?\nError: %1").arg(err.format()));
   }
-  radio->deleteLater();
 }
 
 
 bool
 Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &flags) {
   Radio *myRadio = radio;
-  ErrorStack err;
 
   // If no radio is given -> try to detect the radio
   if (nullptr == myRadio)
-    myRadio = Radio::detect(err);
-  if (nullptr == myRadio) {
-    QMessageBox::information(nullptr, tr("No Radio found."),
-                             tr("Cannot verify codeplug: No known radio detected.\nError: ")
-                             + err.format());
+    myRadio = autoDetect();
+  if (nullptr == myRadio)
     return false;
-  }
+
 
   bool verified = true;
   QList<VerifyIssue> issues;
@@ -444,21 +499,18 @@ Application::downloadCodeplug() {
       return;
   }
 
-  ErrorStack err;
-  Radio *radio = Radio::detect(err);
-  if (nullptr == radio) {
-    QMessageBox::critical(nullptr, tr("No Radio found."),
-                          tr("Can not read codeplug from device: No radio found.\n")
-                          + err.format());
+  Radio *radio = autoDetect();
+  if (nullptr == radio)
     return;
-  }
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
   progress->setValue(0); progress->setMaximum(100); progress->setVisible(true);
   connect(radio, SIGNAL(downloadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(downloadError(Radio *)), this, SLOT(onCodeplugDownloadError(Radio *)));
   connect(radio, SIGNAL(downloadFinished(Radio *, Codeplug *)), this, SLOT(onCodeplugDownloaded(Radio *, Codeplug *)));
-  if (radio->startDownload(false)) {
+
+  ErrorStack err;
+  if (radio->startDownload(false, err)) {
     _mainWindow->statusBar()->showMessage(tr("Read ..."));
     _mainWindow->setEnabled(false);
   } else {
@@ -503,15 +555,11 @@ void
 Application::uploadCodeplug() {
   // Start upload
   Settings settings;
-  ErrorStack err;
 
-  Radio *radio = Radio::detect(err);
-  if (nullptr == radio) {
-    QMessageBox::critical(nullptr, tr("No Radio found."),
-                          tr("Can not write codeplug to device: No radio found.\nError: ")
-                          + err.format());
+  Radio *radio = autoDetect();
+  if (nullptr == radio)
     return;
-  }
+
 
   // Verify codeplug against the detected radio before uploading,
   // but do not show a message on success.
@@ -534,6 +582,7 @@ Application::uploadCodeplug() {
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
+  ErrorStack err;
   if (radio->startUpload(_config, false, settings.codePlugFlags(), err)) {
      _mainWindow->statusBar()->showMessage(tr("Upload ..."));
      _mainWindow->setEnabled(false);
@@ -546,18 +595,9 @@ Application::uploadCodeplug() {
 void
 Application::uploadCallsignDB() {
   // Start upload
-  ErrorStack err;
-
-  logDebug() << "Detect radio...";
-  Radio *radio = Radio::detect(err);
-  if (nullptr == radio) {
-    logDebug() << "No matching radio found.";
-    QMessageBox::critical(nullptr, tr("No Radio found."),
-                          tr("Can not write call-sign DB to device: No radio found.\nError: ")
-                          + err.format());
+  Radio *radio = autoDetect();
+  if (nullptr == radio)
     return;
-  }
-  logDebug() << "Found radio " << radio->name() << ".";
 
   if (! radio->features().hasCallsignDB) {
     logDebug() << "Radio " << radio->name() << " does not support call-sign DB.";
@@ -617,6 +657,7 @@ Application::uploadCallsignDB() {
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
+  ErrorStack err;
   if (radio->startUploadCallsignDB(_users, false, css, err)) {
     logDebug() << "Start call-sign DB write...";
     _mainWindow->statusBar()->showMessage(tr("Write call-sign DB ..."));
@@ -704,6 +745,27 @@ Application::showAbout() {
   QTextEdit *text = dialog->findChild<QTextEdit *>("textEdit");
   text->setHtml(text->toHtml().arg(VERSION_STRING));
 
+  QTreeWidget *radioTab = dialog->findChild<QTreeWidget *>("radioTable");
+  radioTab->setColumnCount(1);
+  QHash<QString, QTreeWidgetItem*> items;
+  foreach (RadioInfo radio, RadioInfo::allRadios(false)) {
+    if (! items.contains(radio.manufactuer()))
+      items.insert(radio.manufactuer(),
+                   new QTreeWidgetItem(QStringList(radio.manufactuer())));
+    items[radio.manufactuer()]->addChild(
+          new QTreeWidgetItem(QStringList(radio.name())));
+    foreach (RadioInfo alias, radio.alias()) {
+      if (! items.contains(alias.manufactuer()))
+        items.insert(alias.manufactuer(),
+                     new QTreeWidgetItem(QStringList(alias.manufactuer())));
+      items[alias.manufactuer()]->addChild(
+            new QTreeWidgetItem(QStringList(tr("%1 (alias for %2 %3)").arg(alias.name())
+                                            .arg(radio.manufactuer()).arg(radio.name()))));
+    }
+  }
+  radioTab->insertTopLevelItems(0, items.values());
+  radioTab->sortByColumn(0,Qt::AscendingOrder);
+
   if (dialog) {
     dialog->exec();
     dialog->deleteLater();
@@ -740,5 +802,16 @@ Application::position() const {
   return _currentPosition;
 }
 
+void
+Application::onPaletteChanged(const QPalette &palette) {
+  // Set theme based on UI mode (light vs. dark).
+  if (isDarkMode(palette)) {
+    QIcon::setThemeName("dark");
+    logDebug() << "Set icon theme to 'dark'.";
+  } else {
+    QIcon::setThemeName("light");
+    logDebug() << "Set icon theme to 'light'.";
+  }
+}
 
 

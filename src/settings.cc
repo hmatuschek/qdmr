@@ -288,39 +288,18 @@ Settings::setMainWindowState(const QByteArray &state) {
 }
 
 QByteArray
-Settings::radioIdListHeaderState() const {
-  return value("radioIdListHeaderState", QByteArray()).toByteArray();
+Settings::headerState(const QString &objName) const {
+  if (objName.isEmpty())
+    return QByteArray();
+  QString key = QString("headerState/%1").arg(objName);
+  return value(key, QByteArray()).toByteArray();
 }
 void
-Settings::setRadioIdListHeaderState(const QByteArray &state) {
-  setValue("radioIdListHeaderState", state);
-}
-
-QByteArray
-Settings::contactListHeaderState() const {
-  return value("contactListHeaderState", QByteArray()).toByteArray();
-}
-void
-Settings::setContactListHeaderState(const QByteArray &state) {
-  setValue("contactListHeaderState", state);
-}
-
-QByteArray
-Settings::channelListHeaderState() const {
-  return value("channelListHeaderState", QByteArray()).toByteArray();
-}
-void
-Settings::setChannelListHeaderState(const QByteArray &state) {
-  setValue("channelListHeaderState", state);
-}
-
-QByteArray
-Settings::positioningHeaderState() const {
-  return value("positioningHeaderState", QByteArray()).toByteArray();
-}
-void
-Settings::setPositioningHeaderState(const QByteArray &state) {
-  setValue("positioningHeaderState", state);
+Settings::setHeaderState(const QString &objName, const QByteArray &state) {
+  if (objName.isEmpty())
+    return;
+  QString key = QString("headerState/%1").arg(objName);
+  setValue(key, state);
 }
 
 bool
@@ -427,7 +406,7 @@ SettingsDialog::positionUpdated(const QGeoPositionInfo &info) {
 
 void
 SettingsDialog::onDBLimitToggled(bool enable) {
-  Ui::SettingsDialog::dbLimit->setEnabled(! enable);
+  Ui::SettingsDialog::dbLimit->setEnabled(enable);
 }
 
 void

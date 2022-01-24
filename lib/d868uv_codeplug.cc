@@ -973,7 +973,7 @@ D868UVCodeplug::setRadioID(Context &ctx, const ErrorStack &err) {
       continue;
     RadioIDElement id(data(ADDR_RADIOIDS + i*RADIOID_SIZE));
     logDebug() << "Store id " << id.number() << " at idx " << i << ".";
-    if (RadioID *rid = id.toRadioID()) {
+    if (DMRRadioID *rid = id.toRadioID()) {
       ctx.config()->radioIDs()->add(rid);  ctx.add(rid, i);
     }
   }

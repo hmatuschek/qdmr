@@ -4,6 +4,7 @@
 #include <QObject>
 #include <IOKit/hid/IOHIDManager.h>
 #include "errorstack.hh"
+#include "radiointerface.hh"
 
 /** Implements the HID radio interface MacOS X API.
  * @ingroup rif */
@@ -12,8 +13,17 @@ class HIDevice: public QObject
 	Q_OBJECT
 
 public:
+  /** Specialization to address a HI device uniquely. */
+  class Descriptor: public USBDeviceDescriptor
+  {
+  public:
+    /** Constructor from interface info, bus number and device address. */
+    Descriptor(const USBDeviceInfo &info, uint32_t locationId, uint16_t device);
+  };
+
+public:
   /** Opens a connection to the device with given vendor and product ID. */
-	HIDevice(int vid, int pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+	HIDevice(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destrutor. */
 	virtual ~HIDevice();
 
@@ -32,6 +42,10 @@ public:
 
   /** Close connection to device. */
 	void close();
+
+public:
+  /** Finds all HID interfaces with the specified VID/PID combination. */
+  static QList<USBDeviceDescriptor> detect(uint16_t vid, uint16_t pid);
 
 protected:
   /** Internal callback for response data. */

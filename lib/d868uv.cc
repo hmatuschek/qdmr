@@ -150,9 +150,9 @@ D868UV::info() const {
 RadioInfo
 D868UV::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::D868UVE, "d868uve", "AT-D868UVE", "AnyTone",
+        RadioInfo::D868UVE, "d868uve", "AT-D868UVE", "AnyTone", AnytoneInterface::interfaceInfo(),
         QList<RadioInfo>{
-          RadioInfo(RadioInfo::DMR6X2, "dmr6x2", "DMR-6X2", "BTech"),
-          RadioInfo(RadioInfo::D868UV, "d868uv", "AT-D868UV", "AnyTone")
+          RadioInfo(RadioInfo::DMR6X2, "dmr6x2", "DMR-6X2", "BTech", AnytoneInterface::interfaceInfo()),
+          RadioInfo(RadioInfo::D868UV, "d868uv", "AT-D868UV", "AnyTone", AnytoneInterface::interfaceInfo())
         });
 }

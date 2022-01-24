@@ -716,7 +716,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
       dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
 
     // Link radio ID
-    RadioID *rid = ctx.get<RadioID>(radioIDIndex());
+    DMRRadioID *rid = ctx.get<DMRRadioID>(radioIDIndex());
     if (rid == ctx.config()->radioIDs()->defaultId())
       dc->setRadioIdObj(DefaultRadioID::get());
     else
@@ -1352,12 +1352,12 @@ AnytoneCodeplug::RadioIDElement::setName(const QString &name) {
   writeASCII(0x0005, name, 16, 0x00);
 }
 
-RadioID *
+DMRRadioID *
 AnytoneCodeplug::RadioIDElement::toRadioID() const {
-  return new RadioID(name(), number());
+  return new DMRRadioID(name(), number());
 }
 bool
-AnytoneCodeplug::RadioIDElement::fromRadioID(RadioID *id) {
+AnytoneCodeplug::RadioIDElement::fromRadioID(DMRRadioID *id) {
   setName(id->name());
   setNumber(id->number());
   return true;

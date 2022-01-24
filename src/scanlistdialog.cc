@@ -57,6 +57,7 @@ ScanListDialog::construct() {
 
   channelListView->setModel(new ChannelRefListWrapper(_myScanList->channels(), channelListView));
 
+  extensionView->setObjectName("scanListExtension");
   extensionView->setObject(_myScanList);
   if (! settings.showCommercialFeatures())
     tabWidget->tabBar()->hide();

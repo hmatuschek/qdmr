@@ -3,10 +3,10 @@
 #include "config.hh"
 #include "configobjecttableview.hh"
 #include "configitemwrapper.hh"
+#include "dmriddialog.hh"
 #include "settings.hh"
 #include <QMessageBox>
 #include <QHeaderView>
-
 
 RadioIDListView::RadioIDListView(Config *config, QWidget *parent)
   : QWidget(parent), ui(new Ui::RadioIDListView), _config(config)
@@ -44,15 +44,14 @@ RadioIDListView::onConfigModified() {
 
 void
 RadioIDListView::onAddID() {
-  /*RadioIdDialog dialog(_config);
-
+  DMRIDDialog dialog;
   if (QDialog::Accepted != dialog.exec())
     return;
 
   int row = -1;
   if (ui->listView->hasSelection())
     row = ui->listView->selection().second;
-  _config->scanlists()->add(dialog.scanlist(), row);*/
+  _config->radioIDs()->add(dialog.radioId(), row);
 }
 
 void
@@ -78,16 +77,24 @@ RadioIDListView::onDeleteID() {
   }
   // collect all selected scan lists
   // need to collect them first as rows change when deleting
-  QList<RadioID *> ids; ids.reserve(numrows);
+  QList<DMRRadioID *> ids; ids.reserve(numrows);
   for(int i=rows.first; i<=rows.second; i++)
     ids.push_back(_config->radioIDs()->getId(i));
   // remove
-  foreach (RadioID *id, ids)
+  foreach (DMRRadioID *id, ids)
     _config->radioIDs()->del(id);
 }
 
 void
 RadioIDListView::onEditID(unsigned row) {
+  if (int(row) >= _config->radioIDs()->count())
+    return;
+  DMRRadioID *id = _config->radioIDs()->getId(row);
+  DMRIDDialog dialog(id);
+  if (QDialog::Accepted != dialog.exec())
+    return;
+  // Apply changes
+  dialog.radioId();
 }
 
 void
@@ -99,11 +106,11 @@ RadioIDListView::onDefaultIDSelected(int idx) {
 
 void
 RadioIDListView::loadHeaderState() {
-  ui->listView->header()->restoreState(Settings().radioIdListHeaderState());
+  ui->listView->header()->restoreState(Settings().headerState("radioIDList"));
 }
 void
 RadioIDListView::storeHeaderState() {
-  Settings().setRadioIdListHeaderState(ui->listView->header()->saveState());
+  Settings().setHeaderState("radioIDList", ui->listView->header()->saveState());
 }
 
 

@@ -808,13 +808,13 @@ DigitalChannel::setRadioId(RadioIDReference *ref) {
     _radioId.copy(ref);
 }
 
-RadioID *
+DMRRadioID *
 DigitalChannel::radioIdObj() const {
-  return _radioId.as<RadioID>();
+  return _radioId.as<DMRRadioID>();
 }
 
 bool
-DigitalChannel::setRadioIdObj(RadioID *id) {
+DigitalChannel::setRadioIdObj(DMRRadioID *id) {
   if (! _radioId.set(id))
     return false;
   emit modified(this);

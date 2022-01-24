@@ -28,7 +28,7 @@
   as well its reply. Both operators transmit and receive on the same frequency (here the DMR calling
   channel at 433.450 MHz). Although other operators are in the area (DL2XYZ &amp; DL3XYZ) which 
   receive the signal, their radios remain silent. This is because this is a private call to a 
-  specific operator and only the radio of that operator will receive the call. All other ignore the
+  specific operator and only the radio of that operator will receive the call. All other radios will ignore the
   call. The channel, however, remains occupied during that call. 
 </para>
 
@@ -53,7 +53,7 @@
   group calls. A common talk group for the simplex mode has the number 99, (TG99, for <quote>talk 
   group 99</quote>). These group calls are then received by all radios that are configured 
   accordingly. Like for the repeater operation, also in simplex mode, the radio needs to know which 
-  groups the operator belongs to and therefore which talk groups to receive on which channels. This 
+  groups the operator belongs to and therefore, which talk groups to receive on which channels. This 
   is done using so-called <glossterm>Group List</glossterm>s, which are discussed later.
 </para>
 

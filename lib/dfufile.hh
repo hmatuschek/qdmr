@@ -12,7 +12,13 @@
 
 class CRC32;
 
-/** Implements reading and writing DFU files.
+/** A collection of images, each consisting of one or more memory sections.
+ *
+ * This class forms the base of all binary encoded codeplugs and call-sign DBs. To this end, it
+ * represents the codeplug or call-sign DB memory as written and stored inside the radio. It also
+ * implements the DFU file format (hence the name) and thus allows to store and load binary
+ * codeplugs or call-sign DBs in files. Please note, that binary codeplugs and call-sign DBs are
+ * highly vendor and device specific. Consequently, they should be be used to exchange codeplugs.
  *
  * DFU File consists of a file prefix followed by several images and a final file suffix. The file
  * prefix consists of a file signature of 5 bytes just consisting of the ASCII string "DfuSe",

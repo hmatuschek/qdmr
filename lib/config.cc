@@ -398,8 +398,8 @@ Config::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) 
   if (node["settings"] && node["settings"]["defaultID"] && node["settings"]["defaultID"].IsScalar()) {
     YAML::Node defIDNode = node["settings"]["defaultID"];
     QString id = QString::fromStdString(defIDNode.as<std::string>());
-    if (ctx.contains(id) && ctx.getObj(id)->is<RadioID>()) {
-      RadioID *def = ctx.getObj(id)->as<RadioID>();
+    if (ctx.contains(id) && ctx.getObj(id)->is<DMRRadioID>()) {
+      DMRRadioID *def = ctx.getObj(id)->as<DMRRadioID>();
       radioIDs()->setDefaultId(radioIDs()->indexOf(def));
       logDebug() << "Set default radio ID to '" << def->name() << "'.";
     } else {

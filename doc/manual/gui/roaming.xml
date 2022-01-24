@@ -10,7 +10,7 @@
 
 <para>
   Roaming is a feature that allows DMR radios to select an alternative repeater once you leave 
-  the range of the currently selected one. To do that you have to specify so-called 
+  the range of the currently selected one. To do that, you have to specify so-called 
   <glossterm>Roaming zone</glossterm>s. Within these zones, you collect all repeaters that provide 
   access to a particular talk group. When roaming is enabled, the radio will check periodically 
   whether the current repeater is still reachable. If not, the strongest repeater from the 
@@ -43,12 +43,12 @@
 </screenshot>
 
 <para>
-  Here you can edit the name of the roaming zone as well as selecting the channels that are part of this zone.
+  Here you can edit the name of the roaming zone as well as adding the channels that are part of this zone.
 </para>
 
 <para>
   If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
   <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
-  the device specific settings for the GPS system. 
+  the device specific settings for the roaming zone. 
 </para>
 </section>

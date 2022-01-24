@@ -1476,7 +1476,8 @@ D878UVCodeplug::AnalogAPRSSettingsElement::disableFixedLocation() {
 
 QString
 D878UVCodeplug::AnalogAPRSSettingsElement::destination() const {
-  return readASCII(0x0016, 6, 0x00);
+  // Terminated/padded with space
+  return readASCII(0x0016, 6, ' ');
 }
 unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::destinationSSID() const {
@@ -1484,12 +1485,14 @@ D878UVCodeplug::AnalogAPRSSettingsElement::destinationSSID() const {
 }
 void
 D878UVCodeplug::AnalogAPRSSettingsElement::setDestination(const QString &call, unsigned ssid) {
-  writeASCII(0x0016, call, 6, 0x00);
+  // Terminated/padded with space
+  writeASCII(0x0016, call, 6, ' ');
   setUInt8(0x001c, ssid);
 }
 QString
 D878UVCodeplug::AnalogAPRSSettingsElement::source() const {
-  return readASCII(0x001d, 6, 0x00);
+  // Terminated/padded with space
+  return readASCII(0x001d, 6, ' ');
 }
 unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::sourceSSID() const {
@@ -1497,7 +1500,8 @@ D878UVCodeplug::AnalogAPRSSettingsElement::sourceSSID() const {
 }
 void
 D878UVCodeplug::AnalogAPRSSettingsElement::setSource(const QString &call, unsigned ssid) {
-  writeASCII(0x001d, call, 6, 0x00);
+  // Terminated/padded with space
+  writeASCII(0x001d, call, 6, ' ');
   setUInt8(0x0023, ssid);
 }
 
@@ -2297,7 +2301,7 @@ D878UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
 
   GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx);
   GPSMessageElement(data(ADDR_GENERAL_CONFIG_EXT1)).updateConfig(ctx);
-  GeneralSettingsElement(data(ADDR_GENERAL_CONFIG_EXT2)).updateConfig(ctx);
+  GeneralSettingsExtensionElement(data(ADDR_GENERAL_CONFIG_EXT2)).updateConfig(ctx);
   return true;
 }
 

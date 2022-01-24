@@ -2,6 +2,9 @@
 #include "logger.hh"
 #include <QtEndian>
 
+#define USB_VID 0x28e9
+#define USB_PID 0x018a
+
 /* ********************************************************************************************* *
  * Implementation of AnytoneInterface::ReadRequest
  * ********************************************************************************************* */
@@ -82,8 +85,8 @@ AnytoneInterface::RadioVariant::isValid() const {
 /* ********************************************************************************************* *
  * Implementation of AnytoneInterface
  * ********************************************************************************************* */
-AnytoneInterface::AnytoneInterface(const ErrorStack &err, QObject *parent)
-  : USBSerial(0x28e9, 0x018a, err, parent), _state(STATE_INITIALIZED), _info()
+AnytoneInterface::AnytoneInterface(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
+  : USBSerial(descriptor, err, parent), _state(STATE_INITIALIZED), _info()
 {
   if (isOpen()) {
     _state = STATE_OPEN;
@@ -106,6 +109,17 @@ AnytoneInterface::~AnytoneInterface() {
   if (isOpen())
     this->close();
 }
+
+USBDeviceInfo
+AnytoneInterface::interfaceInfo() {
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID, USB_PID);
+}
+
+QList<USBDeviceDescriptor>
+AnytoneInterface::detect() {
+  return USBSerial::detect(USB_VID, USB_PID);
+}
+
 
 void
 AnytoneInterface::close() {
@@ -262,7 +276,6 @@ AnytoneInterface::reboot(const ErrorStack &err) {
   }
   return true;
 }
-
 
 bool
 AnytoneInterface::enter_program_mode(const ErrorStack &err) {

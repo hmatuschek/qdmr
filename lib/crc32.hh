@@ -3,7 +3,8 @@
 
 #include <QByteArray>
 
-/** Implements the CRC32 checksum.
+/** Implements the CRC32 checksum as used in DFU files.
+ *
  * @ingroup util */
 class CRC32
 {

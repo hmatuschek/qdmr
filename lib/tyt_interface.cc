@@ -4,8 +4,12 @@
 #include "utils.hh"
 #include "errorstack.hh"
 
-TyTInterface::TyTInterface(unsigned vid, unsigned pid, const ErrorStack &err, QObject *parent)
-  : DFUDevice(vid, pid, err, parent), RadioInterface()
+#define USB_VID 0x0483
+#define USB_PID 0xdf11
+
+
+TyTInterface::TyTInterface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
+  : DFUDevice(descr, err, parent), RadioInterface()
 {
   if (! DFUDevice::isOpen()) {
     errMsg(err) << "Cannot open TyTInterface.";
@@ -51,6 +55,16 @@ TyTInterface::TyTInterface(unsigned vid, unsigned pid, const ErrorStack &err, QO
 TyTInterface::~TyTInterface() {
   if (isOpen())
     close();
+}
+
+USBDeviceInfo
+TyTInterface::interfaceInfo() {
+  return USBDeviceInfo(USBDeviceInfo::Class::DFU, USB_VID, USB_PID);
+}
+
+QList<USBDeviceDescriptor>
+TyTInterface::detect() {
+  return DFUDevice::detect(USB_VID, USB_PID);
 }
 
 void

@@ -4,6 +4,8 @@
 #include "configobject.hh"
 #include "channel.hh"
 #include "tyt_extensions.hh"
+#include "radioddity_extensions.hh"
+
 
 /** Represents the common radio-global settings.
  * @ingroup conf */
@@ -29,6 +31,8 @@ class RadioSettings : public ConfigItem
 
   /** The settings extension for TyT devices. */
   Q_PROPERTY(TyTSettingsExtension* tyt READ tytExtension WRITE setTyTExtension)
+  /** The settings extension for Radioddity devices. */
+  Q_PROPERTY(RadiodditySettingsExtension * radioddity READ radioddityExtension WRITE setRadioddityExtension)
 
 public:
   /** Default constructor. */
@@ -93,9 +97,10 @@ public:
   /** Sets the TyT device specific radio settings. */
   void setTyTExtension(TyTSettingsExtension *ext);
 
-public:
-  /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());*/
+  /** Returns the Radioddity device specific radio settings. */
+  RadiodditySettingsExtension *radioddityExtension() const;
+  /** Sets the Radioddity device specific radio settings. */
+  void setRadioddityExtension(RadiodditySettingsExtension *ext);
 
 protected slots:
   /** Internal used callback whenever an extension is modified. */
@@ -120,6 +125,8 @@ protected:
   unsigned _transmitTimeOut;
   /** Device specific settings extension for TyT devices. */
   TyTSettingsExtension *_tytExtension;
+  /** Device specific settings extension for Radioddity devices. */
+  RadiodditySettingsExtension *_radioddityExtension;
 };
 
 #endif // RADIOCONFIG_HH

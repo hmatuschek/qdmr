@@ -2,6 +2,7 @@
 #include "ui_extensionview.h"
 #include "propertydelegate.hh"
 #include "extensionwrapper.hh"
+#include "settings.hh"
 #include <QMessageBox>
 
 
@@ -21,6 +22,10 @@ ExtensionView::ExtensionView(QWidget *parent) :
           this, SLOT(onSelectionChanged(QItemSelection,QItemSelection)));
   connect(ui->create, SIGNAL(clicked(bool)), this, SLOT(onCreateExtension()));
   connect(ui->remove, SIGNAL(clicked(bool)), this, SLOT(onDeleteExtension()));
+  connect(ui->view->header(), SIGNAL(sectionCountChanged(int,int)),
+          this, SLOT(loadSectionState()));
+  connect(ui->view->header(), SIGNAL(sectionResized(int,int,int)),
+          this, SLOT(storeSectionState()));
 }
 
 ExtensionView::~ExtensionView()
@@ -94,4 +99,16 @@ ExtensionView::onDeleteExtension() {
         ui->view->selectionModel()->selectedRows(0).first());
   _model->deleteInstanceAt(item);
   ui->view->selectionModel()->clearSelection();
+}
+
+void
+ExtensionView::loadSectionState() {
+  Settings settings;
+  ui->view->header()->restoreState(settings.headerState(this->objectName()));
+}
+
+void
+ExtensionView::storeSectionState() {
+  Settings settings;
+  settings.setHeaderState(this->objectName(), ui->view->header()->saveState());
 }

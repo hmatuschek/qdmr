@@ -27,7 +27,7 @@ RadioInfo::_radiosByName = QHash<QString, RadioInfo::Radio>{
   {"md2017",   RadioInfo::MD2017},
   {"rt82",     RadioInfo::RT82},
   {"dm1701",   RadioInfo::DM1701},
-  {"rt42",     RadioInfo::RT84},
+  {"rt84",     RadioInfo::RT84},
   {"d868uv",   RadioInfo::D868UV},
   {"d868uve",  RadioInfo::D868UVE},
   {"dmr6x2",   RadioInfo::DMR6X2},
@@ -56,16 +56,23 @@ RadioInfo::_radiosById = QHash<unsigned, RadioInfo>{
 };
 
 
-RadioInfo::RadioInfo(
-    Radio radio, const QString &name, const QString manufacturer, const QList<RadioInfo> &alias)
-  : _radio(radio), _key(name.toLower()), _name(name), _manufacturer(manufacturer), _alias(alias)
+
+/* ********************************************************************************************* *
+ * Implementation of RadioInfo
+ * ********************************************************************************************* */
+RadioInfo::RadioInfo(Radio radio, const QString &name, const QString manufacturer,
+                     const USBDeviceInfo &interface, const QList<RadioInfo> &alias)
+  : _radio(radio), _key(name.toLower()), _name(name), _manufacturer(manufacturer), _alias(alias),
+    _interface(interface)
 {
   // pass...
 }
 
-RadioInfo::RadioInfo(
-    Radio radio, const QString &key, const QString &name, const QString manufacturer, const QList<RadioInfo> &alias)
-  : _radio(radio), _key(key), _name(name), _manufacturer(manufacturer), _alias(alias)
+RadioInfo::RadioInfo(Radio radio, const QString &key, const QString &name,
+                     const QString manufacturer, const USBDeviceInfo &interface,
+                     const QList<RadioInfo> &alias)
+  : _radio(radio), _key(key), _name(name), _manufacturer(manufacturer), _alias(alias),
+    _interface(interface)
 {
   // pass...
 }
@@ -94,6 +101,11 @@ RadioInfo::name() const {
 const QString &
 RadioInfo::manufactuer() const {
   return _manufacturer;
+}
+
+const USBDeviceInfo &
+RadioInfo::interface() const {
+  return _interface;
 }
 
 bool
@@ -132,6 +144,23 @@ RadioInfo::allRadios(bool flat) {
   QList<RadioInfo> radios;
   QHash<unsigned, RadioInfo>::const_iterator it = _radiosById.constBegin();
   for (; it!=_radiosById.constEnd(); it++) {
+    radios.push_back(*it);
+    if (flat)
+      radios.append(it->_alias);
+  }
+  std::sort(radios.begin(), radios.end(), [](const RadioInfo &a, const RadioInfo &b) {
+    return a.id()<b.id();
+  });
+  return radios;
+}
+
+QList<RadioInfo>
+RadioInfo::allRadios(const USBDeviceInfo &interface, bool flat) {
+  QList<RadioInfo> radios;
+  QHash<unsigned, RadioInfo>::const_iterator it = _radiosById.constBegin();
+  for (; it!=_radiosById.constEnd(); it++) {
+    if (it->interface() != interface)
+      continue;
     radios.push_back(*it);
     if (flat)
       radios.append(it->_alias);

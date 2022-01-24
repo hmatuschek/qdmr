@@ -23,9 +23,9 @@ public:
   static const uint32_t FLASH  = 1;
 
 public:
-  /** Constructs a new interface to a OpenGD77 device. If a matching device was found, @c isOpen
-   * returns @c true. */
-  explicit OpenGD77Interface(const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+  /** Constructs a new interface to a specifc OpenGD77 device.  */
+  explicit OpenGD77Interface(const USBDeviceDescriptor &descr,
+                             const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
   virtual ~OpenGD77Interface();
 
@@ -44,6 +44,12 @@ public:
   bool write_finish(const ErrorStack &err=ErrorStack());
 
   bool reboot(const ErrorStack &err=ErrorStack());
+
+public:
+  /** Retruns some information about this interface. */
+  static USBDeviceInfo interfaceInfo();
+  /** Tries to find all interfaces connected AnyTone radios. */
+  static QList<USBDeviceDescriptor> detect();
 
 protected:
   /** Represents a read message. */

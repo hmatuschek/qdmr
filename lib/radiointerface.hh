@@ -5,16 +5,16 @@
 #define RADIOINFERFACE_HH
 
 #include <QString>
+#include "usbdevice.hh"
 #include "radioinfo.hh"
 #include "errorstack.hh"
-
 
 /** Abstract radio interface.
  * A radion interface must provide means to communicate with the device. That is, open a connection
  * to the device, allow for reading and writing specific memory blocks.
  *
  * This class defines the common interface for all radio-interface classes, irrespective of the
- * actual communication protocol being used by the device.
+ * actual communication protocoe l being used by the device.
  *
  * @ingroup rif */
 class RadioInterface

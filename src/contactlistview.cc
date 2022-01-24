@@ -110,10 +110,10 @@ ContactListView::onEditContact(unsigned row) {
 void
 ContactListView::loadHeaderState() {
   Settings settings;
-  ui->listView->header()->restoreState(settings.contactListHeaderState());
+  ui->listView->header()->restoreState(settings.headerState("contactList"));
 }
 void
 ContactListView::storeHeaderState() {
   Settings settings;
-  settings.setContactListHeaderState(ui->listView->header()->saveState());
+  settings.setHeaderState("contactList", ui->listView->header()->saveState());
 }

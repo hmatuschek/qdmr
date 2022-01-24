@@ -11,8 +11,8 @@
 
 <para>
   <acronym>DMR</acronym> (digital mobile radio) is a digital radio standard to transmit speech 
-  and data. That is, the speech is not directly modulated on the carrier but digitalized and 
-  compressed first using a lossy compression codec (VOCODER). The speech is then transmitted as 
+  and data. That is, the speech is not directly modulated on the carrier but is first digitalized and 
+  compressed using a lossy compression codec (VOCODER). The compressed speech is then transmitted as 
   data packets. The latter allows to attach meta-information to the data packet like source and
   destination of the packet. 
 </para> 
@@ -94,9 +94,9 @@
 </para>
 
 <para>
-  An there are groups. Each of these so-called <glossterm>Talk Group</glossterm>s is also assigned 
+  And there are groups. Each of these so-called <glossterm>Talk Group</glossterm>s is also assigned 
   a unique number. A talk group can be used to group all staff with a specific task (e.g., the 
-  security, fire brigade, etc.). It is then possible to reach all members of this group at once 
+  security, fire brigade, etc.). It is then possible to reach all members of this group at once, 
   by performing a <glossterm>Group Call</glossterm> to that talk group. The network, however, 
   does not know which participant is member of which group. Consequently, the radio of the participant 
   needs to know which group calls to accept and which to ignore.
@@ -123,9 +123,9 @@
 
 <para>
   <xref linkend="figIntroExNet1"/> is a simplified air port network (in reality, it is much larger 
-  and way more complex). Consider the situation, where a cleaning stuff 1 &amp; 2 want to communicate.
+  and way more complex). Consider the situation, where a cleaning stuff 1 &amp; 3 want to communicate.
   At the same time, the headquarters want to talk to security 1. In an simple analog network, the 
-  call between cleaning 1 &amp; 2 would block the entire network and therefore the call between 
+  call between cleaning 1 &amp; 3 would block the entire network and therefore the call between 
   the headquarters and security 1. 
 </para>
 
@@ -206,7 +206,7 @@
 
 <para>
   With these examples, the most basic terms of DMR (DMR-ID, talk group, private and group calls as 
-  well ass talk group subscriptions where introduced and explained on an example network. The 
+  well as talk group subscriptions where introduced and explained on an example network. The 
   following sections will concern the use DMR in ham radio.
 </para>
 </section>

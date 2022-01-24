@@ -159,5 +159,5 @@ D878UV::info() const {
 RadioInfo
 D878UV::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::D878UV, "d878uv", "AT-D878UV", "AnyTone");
+        RadioInfo::D878UV, "d878uv", "AT-D878UV", "AnyTone", AnytoneInterface::interfaceInfo());
 }

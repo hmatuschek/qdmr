@@ -49,9 +49,6 @@ protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
 	void run();
 
-  /** Connects to the radio, if a radio interface is passed to the constructor, this interface
-   * instance is used. */
-  bool connect();
   /** Implements the actual download process. */
   bool download();
   /** Implements the actual codeplug upload process. */

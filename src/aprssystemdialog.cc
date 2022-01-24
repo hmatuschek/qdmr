@@ -157,6 +157,7 @@ APRSSystemDialog::construct() {
   ui->updatePeriod->setValue(_myAPRS->period());
   ui->message->setText(_myAPRS->message());
 
+  ui->extensionView->setObjectName("aprsSystemExtension");
   ui->extensionView->setObject(_myAPRS);
   if (! settings.showCommercialFeatures())
     ui->tabWidget->tabBar()->hide();

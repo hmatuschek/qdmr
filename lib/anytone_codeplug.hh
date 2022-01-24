@@ -624,9 +624,9 @@ public:
     virtual void setName(const QString &name);
 
     /** Encodes the given RadioID. */
-    virtual bool fromRadioID(RadioID *id);
+    virtual bool fromRadioID(DMRRadioID *id);
     /** Constructs a new radio id. */
-    virtual RadioID *toRadioID() const;
+    virtual DMRRadioID *toRadioID() const;
   };
 
   /** Represents the base class for the settings element in all AnyTone codeplugs.

@@ -5,6 +5,7 @@
 #include "signaling.hh"
 #include "channel.hh"
 #include "contact.hh"
+#include "radioddity_extensions.hh"
 
 class DigitalContact;
 class Zone;
@@ -699,25 +700,12 @@ public:
   class GeneralSettingsElement: public Element
   {
   public:
-    /** Possible monitor types. */
-    enum MonitorType {
-      OPEN_SQUELCH = 0,            ///< Monitoring by opening the squelch.
-      SILENT_MONITOR = 1           ///< Silent monitoring.
-    };
-
-    /** Possible ARTS tone settings. */
-    enum ARTSTone {
-      ARTS_DISABLED = 0,           ///< ARTS tone is disabled.
-      ARTS_ONCE     = 4,           ///< ARTS tone once.
-      ARTS_ALWAYS   = 8            ///< ARTS tone always.
-    };
-
-    /** Possible scan modes. */
-    enum ScanMode {
-      SCANMODE_TIME    = 0,
-      SCANMODE_CARRIER = 1,
-      SCANMODE_SEARCH  = 2
-    };
+    /** Use monitor type from extension. */
+    typedef RadiodditySettingsExtension::MonitorType MonitorType;
+    /** Use ARTS tone mode from extension. */
+    typedef RadiodditySettingsExtension::ARTSTone ARTSTone;
+    /** Use scan mode from extension. */
+    typedef RadiodditySettingsExtension::ScanMode ScanMode;
 
   protected:
     /** Hidden constructor. */
@@ -818,10 +806,10 @@ public:
     virtual bool selftestTone() const;
     /** Enables/disables reset tone. */
     virtual void enableSelftestTone(bool enable);
-    /** Returns @c true if the frequency indication tone is enabled. */
-    virtual bool frequencyIndicationTone() const;
-    /** Enables/disables frequency indication tone. */
-    virtual void enableFrequencyIndicationTone(bool enable);
+    /** Returns @c true if the channel free indication tone is enabled. */
+    virtual bool channelFreeIndicationTone() const;
+    /** Enables/disables channel free indication tone. */
+    virtual void enableChannelFreeIndicationTone(bool enable);
     /** Returns @c true if all tones are disabled. */
     virtual bool allTonesDisabled() const;
     /** Disables/enables all tones. */
@@ -870,10 +858,14 @@ public:
     /** Sets the repeater STE in [0-10]. */
     virtual void setRepeaterSTE(unsigned ste);
 
+    /** Returns @c true if a programming password is set. */
+    virtual bool hasProgPassword() const;
     /** Returns the programming password. */
     virtual QString progPassword() const;
     /** Sets the programming password. */
     virtual void setProgPassword(const QString &pwd);
+    /** Resets the programming password. */
+    virtual void clearProgPassword();
 
     /** Encodes the general setting from the given config. */
     virtual bool fromConfig(const Config *conf, Context &ctx);

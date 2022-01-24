@@ -214,6 +214,7 @@ ConfigItem::copy(const ConfigItem &other) {
     }
   }
 
+  emit modified(this);
   return true;
 }
 
@@ -984,9 +985,13 @@ AbstractConfigObjectList::onElementModified(ConfigItem *obj) {
 
 void
 AbstractConfigObjectList::onElementDeleted(QObject *obj) {
-  int idx = indexOf(qobject_cast<ConfigObject *>(obj));
-  if (0 <= idx)
+  // Use reinterpret cast here as the obj may already be destroyed and this all RTTI freed.
+  // We just use the pointer address to remove the element here.
+  int idx = indexOf(reinterpret_cast<ConfigObject *>(obj));
+  if (0 <= idx) {
+    _items.remove(idx);
     emit elementRemoved(idx);
+  }
 }
 
 

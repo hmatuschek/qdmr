@@ -67,10 +67,10 @@
   <varlistentry>
     <term><token>number</token></term>
     <listitem>
-      <para>Specifies the DMR ID for this contact. That is any integer between 0 and 
+      <para>Specifies the DMR ID for this contact. That is, any integer between 0 and 
         16777215. This element is mandatory for all types except for the 
         <token>all</token>-call. For the all-call, the default number 16777215 will be 
-        used if omitted.</para>
+        used.</para>
     </listitem>
   </varlistentry>
   <varlistentry>

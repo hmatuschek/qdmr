@@ -95,6 +95,7 @@ DMRContactDialog::construct() {
   ui->numberLineEdit->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
   ui->ringCheckBox->setChecked(_myContact->ring());
 
+  ui->extensionView->setObjectName("dmrContactExtension");
   ui->extensionView->setObject(_myContact);
   if (! settings.showCommercialFeatures())
     ui->tabWidget->tabBar()->hide();

@@ -10,7 +10,13 @@
 </info>
 
 <para>
-  There are not extensions defined yet.
+  This section collects all device specific extensions to the codeplug for Radioddity and some Baofeng devices.
 </para>
+
+<para>
+  These extensions are applicable to Radioddity GD77 and Baofeng/Radioddity RD-5R radios.
+</para>
+
+<xi:include href="radiosettings.xml"/>
 
 </section>

@@ -35,6 +35,7 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   ui->totValue->setValue(config->settings()->tot());
   ui->voxValue->setValue(config->settings()->vox());
 
+  ui->extensionView->setObjectName("radioSettingsExtension");
   ui->extensionView->setObject(config->settings());
 
   connect(_config, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));

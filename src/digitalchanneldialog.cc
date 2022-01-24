@@ -137,6 +137,8 @@ DigitalChannelDialog::construct() {
     voxDefault->setChecked(false); voxValue->setEnabled(true);
     voxValue->setValue(_channel->vox());
   }
+
+  extensionView->setObjectName("digitalChannelExtension");
   extensionView->setObject(_myChannel);
 
   if (! settings.showCommercialFeatures())
@@ -150,7 +152,7 @@ DigitalChannelDialog::construct() {
 DigitalChannel *
 DigitalChannelDialog::channel()
 {
-  _myChannel->setRadioIdObj(dmrID->currentData().value<RadioID*>());
+  _myChannel->setRadioIdObj(dmrID->currentData().value<DMRRadioID*>());
   _myChannel->setName(channelName->text());
   _myChannel->setRXFrequency(rxFrequency->text().toDouble());
   _myChannel->setTXFrequency(txFrequency->text().toDouble());

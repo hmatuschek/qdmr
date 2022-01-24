@@ -29,8 +29,8 @@ public:
   };
 
 public:
-  /** Connects to the radio with given vendor and product ID. */
-  explicit RadioddityInterface(int vid, int pid, const ErrorStack &err=ErrorStack(), QObject *parent = nullptr);
+  /** Connects to the radio via the given descriptor. */
+  explicit RadioddityInterface(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent = nullptr);
   /** Destructor. */
   virtual ~RadioddityInterface();
 
@@ -67,6 +67,12 @@ public:
   bool write(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes, const ErrorStack &err=ErrorStack());
 
   bool write_finish(const ErrorStack &err=ErrorStack());
+
+public:
+  /** Returns some information about the interface. */
+  static USBDeviceInfo interfaceInfo();
+  /** Tries to find all interfaces connected AnyTone radios. */
+  static QList<USBDeviceDescriptor> detect();
 
 protected:
   /** Internal used function to select a memory bank. */

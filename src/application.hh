@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QGroupBox>
+#include <QIcon>
 #include "config.hh"
 #include <QGeoPositionInfoSource>
 #include "releasenotes.hh"
@@ -40,6 +41,10 @@ public:
   bool hasPosition() const;
   QGeoCoordinate position() const;
 
+  Radio *autoDetect(const ErrorStack &err=ErrorStack());
+
+  bool isDarkMode() const;
+  bool isDarkMode(const QPalette &palette) const;
 public slots:
   void newCodeplug();
   void loadCodeplug();
@@ -71,6 +76,8 @@ private slots:
 
   void positionUpdated(const QGeoPositionInfo &info);
 
+  void onPaletteChanged(const QPalette &palette);
+
 protected:
   Config *_config;
   QMainWindow *_mainWindow;
@@ -94,6 +101,9 @@ protected:
   QGeoCoordinate _currentPosition;
 
   ReleaseNotes _releaseNotes;
+
+  // Last detected device:
+  USBDeviceDescriptor _lastDevice;
 };
 
 #endif // APPLICATION_HH

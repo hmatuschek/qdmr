@@ -81,7 +81,10 @@ ConfigObjectReference::allow(const QMetaObject *elementType) {
 
 void
 ConfigObjectReference::onReferenceDeleted(QObject *obj) {
-  Q_UNUSED(obj)
+  // Check if destroyed obj is referenced one.
+  if (_object != reinterpret_cast<ConfigObject*>(obj))
+    return;
+  // If it is
   _object = nullptr;
   emit modified();
 }
@@ -235,7 +238,7 @@ GPSSystemReference::GPSSystemReference(QObject *parent)
  * Implementation of RadioIDReference
  * ********************************************************************************************* */
 RadioIDReference::RadioIDReference(QObject *parent)
-  : ConfigObjectReference(RadioID::staticMetaObject, parent)
+  : ConfigObjectReference(DMRRadioID::staticMetaObject, parent)
 {
   // pass...
 }

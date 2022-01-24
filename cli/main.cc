@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 {
   // Install log handler to stderr.
   QTextStream out(stderr);
-  StreamLogHandler *handler = new StreamLogHandler(out, LogMessage::WARNING);
+  StreamLogHandler *handler = new StreamLogHandler(out, LogMessage::WARNING, true);
   Logger::get().addHandler(handler);
 
   // Instantiate core application
@@ -57,6 +57,13 @@ int main(int argc, char *argv[])
                      {"m", "manufacturer"},
                      QCoreApplication::translate("main", "Given file is manufacturer codeplug file. "
                      " Can be used with 'decode'.")
+                   });
+  parser.addOption({
+                     {"D","device"},
+                     QCoreApplication::translate("main", "Specifies the device to use to talk to "
+                     "the radio. If not specified, the dmrconf will try to detect the radio "
+                     "automatically. Please note, that for some radios the device must be specified."),
+                     QCoreApplication::translate("main", "DEVICE")
                    });
   parser.addOption({
                      {"R", "radio"},
