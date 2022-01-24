@@ -46,9 +46,6 @@ protected:
   void run();
 
 private:
-  /** Connects to the radio, if a radio interface is passed to the constructor, this interface
-   * instance is used. */
-  virtual bool connect();
   /** Downloads the codeplug from the radio. This method block until the download is complete. */
   virtual bool download();
   /** Uploads the encoded codeplug to the radio. This method block until the upload is complete. */

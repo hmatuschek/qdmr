@@ -9,6 +9,7 @@
 #include "radioddity_interface.hh"
 #include "opengd77_interface.hh"
 #include "tyt_interface.hh"
+#include "kydera_interface.hh"
 
 
 /* ********************************************************************************************* *
@@ -300,6 +301,7 @@ USBDeviceDescriptor::detect() {
   res.append(OpenGD77Interface::detect());
   res.append(RadioddityInterface::detect());
   res.append(TyTInterface::detect());
+  res.append(KyderaInterface::detect());
   return res;
 }
 

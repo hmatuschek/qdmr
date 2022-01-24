@@ -91,7 +91,7 @@ protected:
 
 public:
   /** Constructs an interface to the Kydera device. */
-  KyderaInterface(const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+  KyderaInterface(const USBDeviceDescriptor &descriptor, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
   bool isOpen() const;
   RadioInfo identifier(const ErrorStack &err=ErrorStack());
@@ -104,10 +104,11 @@ public:
   bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
   bool read_finish(const ErrorStack &err);
 
-protected:
-  /** If in idle mode, reads the radio ID. */
-  bool readRadioInfo(const ErrorStack &err=ErrorStack());
+public:
+  /** Searches for all USB serial ports matching Kydera devices. */
+  static QList<USBDeviceDescriptor> detect();
 
+protected:
   /** Internal used method to read blocking. */
   bool receive(char *buffer, unsigned size, const ErrorStack &err=ErrorStack());
 

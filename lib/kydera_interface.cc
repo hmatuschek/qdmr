@@ -73,8 +73,8 @@ KyderaInterface::DeviceInfo::device() const {
 /* ********************************************************************************************* *
  * KyderaInterface
  * ********************************************************************************************* */
-KyderaInterface::KyderaInterface(const ErrorStack &err, QObject *parent)
-  : USBSerial(0x067B, 0x2303, err, parent), _state(State::Idle), _radioInfo()
+KyderaInterface::KyderaInterface(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
+  : USBSerial(descriptor, err, parent), _state(State::Idle), _radioInfo()
 {
   // Check state of serial interface
   if (! USBSerial::isOpen()) {
@@ -82,18 +82,16 @@ KyderaInterface::KyderaInterface(const ErrorStack &err, QObject *parent)
     _state = State::Error;
     return;
   }
-
-  // Read radio ID
-  if (! readRadioInfo(err)) {
-    errMsg(err) << "Cannot identify Kydera device.";
-    _state = State::Error;
-    return;
-  }
 }
 
 bool
 KyderaInterface::isOpen() const {
-  return USBSerial::isOpen() && (State::Error!=_state) && _radioInfo.isValid();
+  return USBSerial::isOpen() && (State::Error!=_state);
+}
+
+QList<USBDeviceDescriptor>
+KyderaInterface::detect() {
+  return USBSerial::detect(0x067B, 0x2303);
 }
 
 RadioInfo
@@ -306,86 +304,6 @@ KyderaInterface::read_finish(const ErrorStack &err) {
   return true;
 }
 
-bool
-KyderaInterface::readRadioInfo(const ErrorStack &err) {
-  // Check inferface state
-  if (State::Idle != _state) {
-    errMsg(err) << "Cannot read radio info, interface not in idle state.";
-    return false;
-  }
-
-  // Read only one block of the codeplug to obtain the radio ID.
-  ReadCommand cmd(1);
-  int nb = QSerialPort::write((char *)&cmd, sizeof(ReadCommand));
-  if (sizeof(ReadCommand) != nb) {
-    _state = State::Error;
-    if (QSerialPort::NoError != QSerialPort::error())
-      errMsg(err) << "Cannot send read command: " << USBSerial::errorString();
-    else
-      errMsg(err) << "Cannot send read command: Incomplete write "
-                  << nb << "b of " << sizeof(ReadCommand) << "b.";
-    return false;
-  }
-
-  ReadResponse resp;
-  if (! receive((char *)&resp, sizeof(ReadResponse), err)) {
-    _state = State::Error;
-    errMsg(err) << "Cannot receive response for read command.";
-    return false;
-  }
-  if (! resp.check()) {
-    _state = State::Error;
-    errMsg(err) << "Device returned invalid response: "
-                << QByteArray((char *)&resp, sizeof(ReadResponse)).toHex();
-    return false;
-  }
-
-  DeviceInfo info;
-  if (! receive((char *)&info, sizeof(DeviceInfo), err)) {
-    _state = State::Error;
-    errMsg(err) << "Cannot receive device info.";
-    return false;
-  }
-
-  // Read the requested block of 2048 bytes
-  nb = QSerialPort::write("Read", 4);
-  if (4 != nb) {
-    _state = State::Error;
-    if (QSerialPort::NoError != QSerialPort::error())
-      errMsg(err) << "Cannot send read request: " << USBSerial::errorString();
-    else
-      errMsg(err) << "Cannot send read request: Incomplete write "
-                  << nb << "b of 4b.";
-    return false;
-  }
-
-  QByteArray data(0x800, 0x00);
-  if (! receive(data.data(), data.size(), err)) {
-    _state = State::Error;
-    errMsg(err) << "Cannot receive first codeplug block (2048b).";
-    return false;
-  }
-
-  // Read checksum to complete transfer
-  data.resize(13);
-  if (! receive(data.data(), data.size(), err)) {
-    _state = State::Error;
-    errMsg(err) << "Cannot receive checksum.";
-    return false;
-  }
-
-  // Identify device by ID string
-  QString deviceID = info.device();
-  if ("DRS-300UV" == deviceID) {
-    _radioInfo = RadioInfo::byID(RadioInfo::CDR300UV);
-  } else {
-    _state = State::Error;
-    errMsg(err) << "Uknown Kydera device '" << deviceID << "'.";
-    return false;
-  }
-
-  return true;
-}
 
 bool
 KyderaInterface::receive(char *buffer, unsigned size, const ErrorStack &err) {

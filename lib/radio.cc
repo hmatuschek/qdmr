@@ -461,9 +461,9 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
 
   // Try Open GD77 firmware
   {
-    OpenGD77Interface *ogd77 = new OpenGD77Interface(err);
+    OpenGD77Interface *ogd77 = new OpenGD77Interface(descr, err);
     if (ogd77->isOpen()) {
-      id = ogd77->identifier(err);
+      RadioInfo id = ogd77->identifier(err);
       if ((id.isValid() && (RadioInfo::OpenGD77 == id.id())) || (force.isValid() && (RadioInfo::OpenGD77 == force.id()))) {
         return new OpenGD77(ogd77);
       } else {
@@ -478,9 +478,9 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
 
   // Try Anytone USB-serial devices
   {
-    AnytoneInterface *anytone = new AnytoneInterface(err);
+    AnytoneInterface *anytone = new AnytoneInterface(descr, err);
     if (anytone->isOpen()) {
-      id = anytone->identifier(err);
+      RadioInfo id = anytone->identifier(err);
       if ((id.isValid() && (RadioInfo::D868UVE == id.id())) || (force.isValid() && (RadioInfo::D868UVE == force.id()))) {
         return new D868UV(anytone);
       } else if ((id.isValid() && (RadioInfo::D878UV == id.id())) || (force.isValid() && (RadioInfo::D878UV == force.id()))) {
@@ -501,9 +501,9 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
 
   // Try Kytera device family
   {
-    KyderaInterface *kydera = new KyderaInterface(err);
+    KyderaInterface *kydera = new KyderaInterface(descr, err);
     if (kydera->isOpen()) {
-      id = kydera->identifier(err);
+      RadioInfo id = kydera->identifier(err);
       if ((id.isValid() && (RadioInfo::CDR300UV == id.id())) || (force.isValid() && (RadioInfo::CDR300UV == force.id()))) {
         return new CDR300UV(kydera);
       } else {

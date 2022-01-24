@@ -12,7 +12,7 @@ KyderaRadio::KyderaRadio(const QString &name, KyderaInterface *device, QObject *
     _codeplug(nullptr), _callsigns(nullptr)
 {
   // Open device to radio if not already present
-  if (! connect()) {
+  if ((nullptr == _dev) || (! _dev->isOpen())) {
     _task = StatusError;
     return;
   }  
@@ -117,7 +117,7 @@ KyderaRadio::startUploadCallsignDB(UserDatabase *db, bool blocking,
 void
 KyderaRadio::run() {
   if (StatusDownload == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (!_dev->isOpen())) {
       _task = StatusError;
       emit downloadError(this);
       return;
@@ -137,7 +137,7 @@ KyderaRadio::run() {
     emit downloadFinished(this, _codeplug);
     _config = nullptr;
   } else if (StatusUpload == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (!_dev->isOpen())) {
       _task = StatusError;
       emit uploadError(this);
       return;
@@ -156,7 +156,7 @@ KyderaRadio::run() {
     _task = StatusIdle;
     emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (!_dev->isOpen())) {
       _task = StatusError;
       emit uploadError(this);
       return;
@@ -175,29 +175,6 @@ KyderaRadio::run() {
     _task = StatusIdle;
     emit uploadComplete(this);
   }
-}
-
-bool
-KyderaRadio::connect() {
-  // Check if there is a connection
-  if ((nullptr != _dev) && (_dev->isOpen()))
-    return true;
-
-  // If there is a connection but it is not open -> close it.
-  if (nullptr != _dev)
-    _dev->deleteLater();
-
-  // If no connection -> open one.
-  _dev = new KyderaInterface(_errorStack);
-  if (! _dev->isOpen()) {
-    errMsg(_errorStack) << "Cannot connect to device.";
-    _task = StatusError;
-    _dev->deleteLater();
-    _dev = nullptr;
-    return false;
-  }
-
-  return true;
 }
 
 bool

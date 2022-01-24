@@ -80,9 +80,12 @@ RadioInfo
 CDR300UV::defaultRadioInfo() {
   return RadioInfo(
         RadioInfo::CDR300UV, "cdr300uv", "CDR-300UV", "Kydera",
+        USBDeviceInfo(USBDeviceInfo::Class::Serial, 0x067B, 0x2303, false, false),
         QList<RadioInfo>{
-          RadioInfo(RadioInfo::RT73, "rt73", "RT73", "Retevis"),
-          RadioInfo(RadioInfo::DB25D, "db25d", "DB25-D", "Radioddity")
+          RadioInfo(RadioInfo::RT73, "rt73", "RT73", "Retevis",
+            USBDeviceInfo(USBDeviceInfo::Class::Serial, 0x067B, 0x2303, false, false)),
+          RadioInfo(RadioInfo::DB25D, "db25d", "DB25-D", "Radioddity",
+            USBDeviceInfo(USBDeviceInfo::Class::Serial, 0x067B, 0x2303, false, false))
         });
 }
 
