@@ -48,6 +48,21 @@
         <file alias="16x16/actions/device-read.png">icons/light/16x16/actions/device-read.png</file>
         <file alias="16x16/actions/application-quit.png">icons/light/16x16/actions/application-quit.png</file>
         <file alias="16x16/apps/qdmr.png">icons/light/16x16/apps/qdmr.png</file>
+        <file alias="scalable/actions/help-contents.svg">icons/light/scalable/actions/help-contents.svg</file>
+        <file alias="scalable/actions/help-about.svg">icons/light/scalable/actions/help-about.svg</file>
+        <file alias="scalable/actions/edit-move-up.svg">icons/light/scalable/actions/edit-move-up.svg</file>
+        <file alias="scalable/actions/edit-move-down.svg">icons/light/scalable/actions/edit-move-down.svg</file>
+        <file alias="scalable/actions/document-verify.svg">icons/light/scalable/actions/document-verify.svg</file>
+        <file alias="scalable/actions/document-save-as.svg">icons/light/scalable/actions/document-save-as.svg</file>
+        <file alias="scalable/actions/document-open.svg">icons/light/scalable/actions/document-open.svg</file>
+        <file alias="scalable/actions/document-new.svg">icons/light/scalable/actions/document-new.svg</file>
+        <file alias="scalable/actions/document-download.svg">icons/light/scalable/actions/document-download.svg</file>
+        <file alias="scalable/actions/device-write.svg">icons/light/scalable/actions/device-write.svg</file>
+        <file alias="scalable/actions/device-search.svg">icons/light/scalable/actions/device-search.svg</file>
+        <file alias="scalable/actions/device-read.svg">icons/light/scalable/actions/device-read.svg</file>
+        <file alias="scalable/actions/application-settings.svg">icons/light/scalable/actions/application-settings.svg</file>
+        <file alias="application-quit.svg">icons/light/scalable/actions/application-quit.svg</file>
+        <file alias="scalable/apps/qdmr.svg">icons/light/scalable/apps/qdmr.svg</file>
     </qresource>
     <qresource prefix="/icons/dark">
         <file alias="index.theme">icons/dark/index.theme</file>
