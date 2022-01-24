@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QGroupBox>
+#include <QIcon>
 #include "config.hh"
 #include <QGeoPositionInfoSource>
 #include "releasenotes.hh"

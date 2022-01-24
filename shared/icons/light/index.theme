@@ -1,0 +1,22 @@
+[Icon Theme]
+Name = "Light Theme"
+Comment = "Default light icon theme."
+Directories = 16x16/actions,16x16/apps,32x32/actions,32x32/apps
+
+[16x16/actions]
+Size=16
+Context=Actions
+
+[16x16/apps]
+Size=16
+Context=Applications
+
+[32x32/actions]
+Size=32
+Context=Actions
+
+[32x32/apps]
+Size=32
+Context=Applications
+
+

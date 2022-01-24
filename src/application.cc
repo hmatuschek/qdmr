@@ -50,6 +50,13 @@ Application::Application(int &argc, char *argv[])
   QString logdir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
   Logger::get().addHandler(new FileLogHandler(logdir+"/qdmr.log"));
 
+  // Register icon themes
+  QStringList iconPaths = QIcon::themeSearchPaths();
+  iconPaths.prepend(":/icons");
+  QIcon::setThemeSearchPaths(iconPaths);
+  // Set theme based on UI mode (light vs. dark).
+  QIcon::setThemeName("light");
+
   Settings settings;
   _repeater   = new RepeaterDatabase(settings.position(), 7, this);
   _users      = new UserDatabase(30, this);
@@ -134,6 +141,7 @@ Application::createMainWindow() {
     return _mainWindow;
 
   Settings settings;
+  logDebug() << "Create main window using icon theme '" << QIcon::themeName() << "'.";
 
   QUiLoader loader;
   QFile uiFile("://ui/mainwindow.ui");
