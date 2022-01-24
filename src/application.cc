@@ -54,8 +54,7 @@ Application::Application(int &argc, char *argv[])
   QStringList iconPaths = QIcon::themeSearchPaths();
   iconPaths.prepend(":/icons");
   QIcon::setThemeSearchPaths(iconPaths);
-  // Set theme based on UI mode (light vs. dark).
-  QIcon::setThemeName("light");
+  onPaletteChanged(palette());
 
   Settings settings;
   _repeater   = new RepeaterDatabase(settings.position(), 7, this);
@@ -108,6 +107,18 @@ Application::~Application() {
   if (_mainWindow)
     delete _mainWindow;
   _mainWindow = nullptr;
+}
+
+bool
+Application::isDarkMode() const {
+  return isDarkMode(palette());
+}
+
+bool
+Application::isDarkMode(const QPalette &palette) const {
+  int text_hsv_value = palette.color(QPalette::WindowText).value(),
+      bg_hsv_value = palette.color(QPalette::Background).value();
+  return text_hsv_value > bg_hsv_value;
 }
 
 
@@ -791,5 +802,16 @@ Application::position() const {
   return _currentPosition;
 }
 
+void
+Application::onPaletteChanged(const QPalette &palette) {
+  // Set theme based on UI mode (light vs. dark).
+  if (isDarkMode(palette)) {
+    QIcon::setThemeName("dark");
+    logDebug() << "Set icon theme to 'dark'.";
+  } else {
+    QIcon::setThemeName("light");
+    logDebug() << "Set icon theme to 'light'.";
+  }
+}
 
 

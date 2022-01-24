@@ -1,7 +1,7 @@
 [Icon Theme]
 Name = "Light Theme"
 Comment = "Default light icon theme."
-Directories = 16x16/actions,16x16/apps,32x32/actions,32x32/apps
+Directories = 16x16/actions,16x16/apps,32x32/actions,32x32/apps,scalable/apps
 
 [16x16/actions]
 Size=16
@@ -19,4 +19,8 @@ Context=Actions
 Size=32
 Context=Applications
 
+[scalable/apps]
+size=128
+Type=Scalable
+Context=Applications
 

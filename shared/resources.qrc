@@ -19,34 +19,65 @@
     </qresource>
     <qresource prefix="/icons/light">
         <file alias="index.theme">icons/light/index.theme</file>
+        <file alias="32x32/actions/application-quit.png">icons/light/32x32/actions/application-quit.png</file>
+        <file alias="32x32/actions/device-read.png">icons/light/32x32/actions/device-read.png</file>
+        <file alias="32x32/actions/device-search.png">icons/light/32x32/actions/device-search.png</file>
+        <file alias="32x32/actions/device-write.png">icons/light/32x32/actions/device-write.png</file>
+        <file alias="32x32/actions/device-write-callsign.png">icons/light/32x32/actions/device-write-callsign.png</file>
+        <file alias="32x32/actions/document-download.png">icons/light/32x32/actions/document-download.png</file>
+        <file alias="32x32/actions/document-new.png">icons/light/32x32/actions/document-new.png</file>
+        <file alias="32x32/actions/document-open.png">icons/light/32x32/actions/document-open.png</file>
+        <file alias="32x32/actions/document-save-as.png">icons/light/32x32/actions/document-save-as.png</file>
+        <file alias="32x32/actions/document-verify.png">icons/light/32x32/actions/document-verify.png</file>
+        <file alias="32x32/actions/edit-move-down.png">icons/light/32x32/actions/edit-move-down.png</file>
+        <file alias="32x32/actions/edit-move-up.png">icons/light/32x32/actions/edit-move-up.png</file>
+        <file alias="32x32/actions/application-settings.png">icons/light/32x32/actions/application-settings.png</file>
+        <file alias="32x32/actions/help-about.png">icons/light/32x32/actions/help-about.png</file>
+        <file alias="32x32/actions/help-contents.png">icons/light/32x32/actions/help-contents.png</file>
+        <file alias="32x32/apps/qdmr.png">icons/light/32x32/apps/qdmr.png</file>
+        <file alias="16x16/actions/document-save-as.png">icons/light/16x16/actions/document-save-as.png</file>
+        <file alias="16x16/actions/document-open.png">icons/light/16x16/actions/document-open.png</file>
+        <file alias="16x16/actions/document-new.png">icons/light/16x16/actions/document-new.png</file>
+        <file alias="16x16/actions/document-download.png">icons/light/16x16/actions/document-download.png</file>
+        <file alias="16x16/actions/help-contents.png">icons/light/16x16/actions/help-contents.png</file>
+        <file alias="16x16/actions/help-about.png">icons/light/16x16/actions/help-about.png</file>
+        <file alias="16x16/actions/document-verify.png">icons/light/16x16/actions/document-verify.png</file>
+        <file alias="16x16/actions/device-write-callsign.png">icons/light/16x16/actions/device-write-callsign.png</file>
+        <file alias="16x16/actions/device-write.png">icons/light/16x16/actions/device-write.png</file>
+        <file alias="16x16/actions/device-search.png">icons/light/16x16/actions/device-search.png</file>
+        <file alias="16x16/actions/device-read.png">icons/light/16x16/actions/device-read.png</file>
+        <file alias="16x16/actions/application-quit.png">icons/light/16x16/actions/application-quit.png</file>
+        <file alias="16x16/apps/qdmr.png">icons/light/16x16/apps/qdmr.png</file>
     </qresource>
-    <qresource prefix="/icons/light/32x32/actions">
-        <file alias="device-read.png">icons/light/32x32/actions/device-read.png</file>
-        <file alias="device-search.png">icons/light/32x32/actions/device-search.png</file>
-        <file alias="device-write.png">icons/light/32x32/actions/device-write.png</file>
-        <file alias="device-write-callsign.png">icons/light/32x32/actions/device-write-callsign.png</file>
-        <file alias="help-about.png">icons/light/32x32/actions/show-about.png</file>
-        <file alias="help-contents.png">icons/light/32x32/actions/show-manual.png</file>
-        <file alias="show-settings.png">icons/light/32x32/actions/show-settings.png</file>
-        <file alias="application-quit.png">icons/light/32x32/actions/application-quit.png</file>
-        <file alias="document-verify.png">icons/light/32x32/actions/document-verify.png</file>
-        <file alias="document-new.png">icons/light/32x32/actions/document-new.png</file>
-        <file alias="document-open.png">icons/light/32x32/actions/document-open.png</file>
-        <file alias="document-save-as.png">icons/light/32x32/actions/document-save-as.png</file>
-        <file alias="edit-move-down.png">icons/light/32x32/actions/edit-move-down.png</file>
-        <file alias="edit-move-up.png">icons/light/32x32/actions/edit-move-up.png</file>
-        <file alias="document-download.png">icons/light/32x32/actions/document-download.png</file>
-    </qresource>
-    <qresource prefix="/icons/light/32x32/apps">
-        <file alias="qdmr.png">icons/light/32x32/apps/qdmr.png</file>
-    </qresource>
-    <qresource prefix="/icons/light/16x16/actions">
-        <file alias="document-new.png">icons/light/16x16/actions/document-new.png</file>
-        <file alias="document-open.png">icons/light/16x16/actions/document-open.png</file>
-        <file alias="document-save-as.png">icons/light/16x16/actions/document-save-as.png</file>
-        <file alias="document-download.png">icons/light/16x16/actions/document-download.png</file>
-    </qresource>
-    <qresource prefix="/icons/light/16x16/apps">
-        <file>icons/light/16x16/apps/qdmr.png</file>
+    <qresource prefix="/icons/dark">
+        <file alias="index.theme">icons/dark/index.theme</file>
+        <file alias="32x32/actions/help-contents.png">icons/dark/32x32/actions/help-contents.png</file>
+        <file alias="32x32/actions/help-about.png">icons/dark/32x32/actions/help-about.png</file>
+        <file alias="32x32/actions/edit-move-up.png">icons/dark/32x32/actions/edit-move-up.png</file>
+        <file alias="32x32/actions/edit-move-down.png">icons/dark/32x32/actions/edit-move-down.png</file>
+        <file alias="32x32/actions/document-verify.png">icons/dark/32x32/actions/document-verify.png</file>
+        <file alias="32x32/actions/document-save-as.png">icons/dark/32x32/actions/document-save-as.png</file>
+        <file alias="32x32/actions/document-open.png">icons/dark/32x32/actions/document-open.png</file>
+        <file alias="32x32/actions/document-new.png">icons/dark/32x32/actions/document-new.png</file>
+        <file alias="32x32/actions/device-write-callsign.png">icons/dark/32x32/actions/device-write-callsign.png</file>
+        <file alias="32x32/actions/device-write.png">icons/dark/32x32/actions/device-write.png</file>
+        <file alias="32x32/actions/device-search.png">icons/dark/32x32/actions/device-search.png</file>
+        <file alias="32x32/actions/device-read.png">icons/dark/32x32/actions/device-read.png</file>
+        <file alias="32x32/actions/application-settings.png">icons/dark/32x32/actions/application-settings.png</file>
+        <file alias="32x32/actions/application-quit.png">icons/dark/32x32/actions/application-quit.png</file>
+        <file alias="32x32/apps/qdmr.png">icons/dark/32x32/apps/qdmr.png</file>
+        <file alias="16x16/actions/help-contents.png">icons/dark/16x16/actions/help-contents.png</file>
+        <file alias="16x16/actions/help-about.png">icons/dark/16x16/actions/help-about.png</file>
+        <file alias="16x16/actions/document-verify.png">icons/dark/16x16/actions/document-verify.png</file>
+        <file alias="16x16/actions/document-save-as.png">icons/dark/16x16/actions/document-save-as.png</file>
+        <file alias="16x16/actions/document-open.png">icons/dark/16x16/actions/document-open.png</file>
+        <file alias="16x16/actions/document-new.png">icons/dark/16x16/actions/document-new.png</file>
+        <file alias="16x16/actions/document-download.png">icons/dark/16x16/actions/document-download.png</file>
+        <file alias="16x16/actions/device-write-callsign.png">icons/dark/16x16/actions/device-write-callsign.png</file>
+        <file alias="16x16/actions/device-write.png">icons/dark/16x16/actions/device-write.png</file>
+        <file alias="16x16/actions/device-search.png">icons/dark/16x16/actions/device-search.png</file>
+        <file alias="16x16/actions/device-read.png">icons/dark/16x16/actions/device-read.png</file>
+        <file alias="16x16/actions/application-quit.png">icons/dark/16x16/actions/application-quit.png</file>
+        <file alias="16x16/apps/qdmr.png">icons/dark/16x16/apps/qdmr.png</file>
     </qresource>
 </RCC>

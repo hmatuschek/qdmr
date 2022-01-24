@@ -283,8 +283,7 @@
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset theme="show-settings">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="application-settings"/>
    </property>
    <property name="text">
     <string>Settings</string>
@@ -307,7 +306,8 @@
   </action>
   <action name="actionRefreshCallsignDB">
    <property name="icon">
-    <iconset theme="document-download"/>
+    <iconset theme="document-download">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Refresh Callsign DB</string>
@@ -318,7 +318,8 @@
   </action>
   <action name="actionRefreshTalkgroupDB">
    <property name="icon">
-    <iconset theme="document-download"/>
+    <iconset theme="document-download">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Refresh Talkgroup DB</string>
@@ -329,7 +330,8 @@
   </action>
   <action name="actionRefreshRepeaterDB">
    <property name="icon">
-    <iconset theme="document-download"/>
+    <iconset theme="document-download">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Refresh Repeater DB</string>
