@@ -9,8 +9,8 @@
         <file alias="splash.png">logo256.png</file>
     </qresource>
     <qresource prefix="/ui">
-        <file>mainwindow.ui</file>
-        <file>aboutdialog.ui</file>
+        <file alias="aboutdialog.ui">ui/aboutdialog.ui</file>
+        <file alias="mainwindow.ui">ui/mainwindow.ui</file>
     </qresource>
     <qresource prefix="/icons/aprs">
         <file alias="table0.png">aprs/aprs-symbols-24-0.png</file>
@@ -19,7 +19,6 @@
     </qresource>
     <qresource prefix="/icons/light">
         <file alias="index.theme">icons/light/index.theme</file>
-        <file alias="32x32/actions/application-quit.png">icons/light/32x32/actions/application-quit.png</file>
         <file alias="32x32/actions/device-read.png">icons/light/32x32/actions/device-read.png</file>
         <file alias="32x32/actions/device-search.png">icons/light/32x32/actions/device-search.png</file>
         <file alias="32x32/actions/device-write.png">icons/light/32x32/actions/device-write.png</file>
@@ -46,7 +45,6 @@
         <file alias="16x16/actions/device-write.png">icons/light/16x16/actions/device-write.png</file>
         <file alias="16x16/actions/device-search.png">icons/light/16x16/actions/device-search.png</file>
         <file alias="16x16/actions/device-read.png">icons/light/16x16/actions/device-read.png</file>
-        <file alias="16x16/actions/application-quit.png">icons/light/16x16/actions/application-quit.png</file>
         <file alias="16x16/apps/qdmr.png">icons/light/16x16/apps/qdmr.png</file>
         <file alias="scalable/actions/help-contents.svg">icons/light/scalable/actions/help-contents.svg</file>
         <file alias="scalable/actions/help-about.svg">icons/light/scalable/actions/help-about.svg</file>
@@ -61,8 +59,10 @@
         <file alias="scalable/actions/device-search.svg">icons/light/scalable/actions/device-search.svg</file>
         <file alias="scalable/actions/device-read.svg">icons/light/scalable/actions/device-read.svg</file>
         <file alias="scalable/actions/application-settings.svg">icons/light/scalable/actions/application-settings.svg</file>
-        <file alias="application-quit.svg">icons/light/scalable/actions/application-quit.svg</file>
         <file alias="scalable/apps/qdmr.svg">icons/light/scalable/apps/qdmr.svg</file>
+        <file alias="32x32/actions/application-exit.png">icons/light/32x32/actions/application-exit.png</file>
+        <file alias="16x16/actions/application-exit.png">icons/light/16x16/actions/application-exit.png</file>
+        <file alias="scalable/actions/application-exit.png">icons/light/scalable/actions/application-exit.svg</file>
     </qresource>
     <qresource prefix="/icons/dark">
         <file alias="index.theme">icons/dark/index.theme</file>
@@ -79,7 +79,6 @@
         <file alias="32x32/actions/device-search.png">icons/dark/32x32/actions/device-search.png</file>
         <file alias="32x32/actions/device-read.png">icons/dark/32x32/actions/device-read.png</file>
         <file alias="32x32/actions/application-settings.png">icons/dark/32x32/actions/application-settings.png</file>
-        <file alias="32x32/actions/application-quit.png">icons/dark/32x32/actions/application-quit.png</file>
         <file alias="32x32/apps/qdmr.png">icons/dark/32x32/apps/qdmr.png</file>
         <file alias="16x16/actions/help-contents.png">icons/dark/16x16/actions/help-contents.png</file>
         <file alias="16x16/actions/help-about.png">icons/dark/16x16/actions/help-about.png</file>
@@ -92,7 +91,8 @@
         <file alias="16x16/actions/device-write.png">icons/dark/16x16/actions/device-write.png</file>
         <file alias="16x16/actions/device-search.png">icons/dark/16x16/actions/device-search.png</file>
         <file alias="16x16/actions/device-read.png">icons/dark/16x16/actions/device-read.png</file>
-        <file alias="16x16/actions/application-quit.png">icons/dark/16x16/actions/application-quit.png</file>
         <file alias="16x16/apps/qdmr.png">icons/dark/16x16/apps/qdmr.png</file>
+        <file alias="16x16/actions/application-exit.png">icons/dark/16x16/actions/application-exit.png</file>
+        <file alias="32x32/actions/application-exit.png">icons/dark/32x32/actions/application-exit.png</file>
     </qresource>
 </RCC>

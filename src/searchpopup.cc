@@ -29,13 +29,13 @@ SearchPopup::SearchPopup(QAbstractItemView *parent)
 
   _label = new QLabel();
   QToolButton *up = new QToolButton(this);
-  up->setIcon(QIcon(":/icons/up.png"));
+  up->setIcon(QIcon::fromTheme("edit-move-up"));
   connect(up, SIGNAL(clicked(bool)), this, SLOT(onPrevious()));
   QToolButton *down = new QToolButton(this);
-  down->setIcon(QIcon(":/icons/down.png"));
+  down->setIcon(QIcon::fromTheme("edit-move-down"));
   connect(down, SIGNAL(clicked(bool)), this, SLOT(onNext()));
   QToolButton *close = new QToolButton(this);
-  close->setIcon(QIcon(":/icons/close.png"));
+  close->setIcon(QIcon::fromTheme("application-exit"));
   connect(close, SIGNAL(clicked(bool)), this, SLOT(hide()));
 
   QHBoxLayout *layout = new QHBoxLayout();
