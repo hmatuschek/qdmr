@@ -1,6 +1,7 @@
 #ifndef SETTINGS_HH
 #define SETTINGS_HH
 
+#include <QDir>
 #include <QSettings>
 #include <QDateTime>
 #include <QGeoPositionInfoSource>
