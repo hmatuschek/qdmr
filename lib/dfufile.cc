@@ -205,7 +205,7 @@ DFUFile::write(QFile &file, const ErrorStack &err) {
   file_prefix_t prefix;
   memcpy(prefix.signature, "DfuSe", 5);
   prefix.version = 0x01;
-  prefix.image_size = qToLittleEndian(size()-sizeof(file_suffix_t));
+  prefix.image_size = qToLittleEndian(uint32_t(size()-sizeof(file_suffix_t)));
   prefix.n_targets = _images.size();
 
   if (sizeof(file_prefix_t) != file.write((char *)&prefix, sizeof(file_prefix_t))) {
