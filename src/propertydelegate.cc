@@ -53,6 +53,7 @@ PropertyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &opti
     return new QLineEdit(parent);
   } else if (prop.read(this).value<ConfigObjectReference *>()) {
     ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>();
+    // TODO Implement object selection based on ref->_elementTypes
     return new QComboBox(parent);
   } else if (propIsInstance<ConfigItem>(prop)) {
     return nullptr;
