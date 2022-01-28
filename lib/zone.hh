@@ -6,8 +6,9 @@
 #include <QVector>
 
 #include "configreference.hh"
-class Config;
+#include "anytone_extension.hh"
 
+class Config;
 
 /** Represents a zone within the generic configuration.
  * @ingroup conf */
@@ -19,6 +20,9 @@ class Zone : public ConfigObject
   Q_PROPERTY(ChannelRefList* A READ A)
   /** The B channels. */
   Q_PROPERTY(ChannelRefList* B READ B)
+
+  /** The AnyTone extensions. */
+  Q_PROPERTY(AnytoneZoneExtension* anytone READ anytoneExtension WRITE setAnytoneExtension)
 
 public:
   /** Default constructor. */
@@ -43,6 +47,11 @@ public:
   /** Retruns the list of channels for VFO B in this zone. */
   ChannelRefList* B();
 
+  /** Returns the AnyTone extension. */
+  AnytoneZoneExtension *anytoneExtension() const;
+  /** Sets the AnyTone extension. */
+  void setAnytoneExtension(AnytoneZoneExtension *ext);
+
 signals:
   /** Gets emitted whenever the zone gets modified. */
 	void modified();
@@ -52,6 +61,8 @@ protected:
   ChannelRefList _A;
   /** List of channels for VFO B. */
   ChannelRefList _B;
+  /** Owns the AnyTone extensions. */
+  AnytoneZoneExtension *_anytone;
 };
 
 

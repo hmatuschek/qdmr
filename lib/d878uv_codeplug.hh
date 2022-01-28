@@ -1353,6 +1353,10 @@ protected:
   bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
+  virtual void allocateZones();
+  virtual bool encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err=ErrorStack());
+
   void allocateGeneralSettings();
   bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());

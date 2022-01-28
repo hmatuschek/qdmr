@@ -23,7 +23,7 @@ SET(libdmrconf_SOURCES
     rd5r.cc rd5r_codeplug.cc rd5r_filereader.cc
     gd77.cc gd77_codeplug.cc gd77_callsigndb.cc gd77_filereader.cc
     opengd77.cc opengd77_interface.cc opengd77_codeplug.cc opengd77_extension.cc opengd77_callsigndb.cc
-    anytone_interface.cc anytone_radio.cc anytone_codeplug.cc
+    anytone_interface.cc anytone_radio.cc anytone_codeplug.cc anytone_extension.cc
     d868uv.cc d868uv_codeplug.cc d868uv_callsigndb.cc
     d878uv.cc d878uv_codeplug.cc
     d578uv.cc d578uv_codeplug.cc
@@ -42,7 +42,7 @@ SET(libdmrconf_MOC_HEADERS
     rd5r.hh rd5r_codeplug.hh
     gd77.hh gd77_codeplug.hh gd77_callsigndb.hh
     opengd77.hh opengd77_interface.hh opengd77_codeplug.hh opengd77_extension.hh opengd77_callsigndb.hh
-    anytone_interface.hh anytone_radio.hh anytone_codeplug.hh
+    anytone_interface.hh anytone_radio.hh anytone_codeplug.hh anytone_extension.hh
     d868uv.hh d868uv_codeplug.hh d868uv_callsigndb.hh
     d878uv.hh d878uv_codeplug.hh
     d578uv.hh d578uv_codeplug.hh

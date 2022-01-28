@@ -2129,9 +2129,6 @@ D878UVCodeplug::allocateUpdated() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateUpdated();
 
-  // Hidden zone map
-  image(0).addElement(ADDR_HIDDEN_ZONE_MAP, HIDDEN_ZONE_MAP_SIZE);
-
   // Encryption keys
   image(0).addElement(ADDR_ENCRYPTION_KEYS, ENCRYPTION_KEYS_SIZE);
 
@@ -2280,6 +2277,52 @@ D878UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
     if (ctx.has<Channel>(i))
       ch.linkChannelObj(ctx.get<Channel>(i), ctx);
   }
+  return true;
+}
+
+
+void
+D878UVCodeplug::allocateZones() {
+  D868UVCodeplug::allocateZones();
+  // Hidden zone map
+  image(0).addElement(ADDR_HIDDEN_ZONE_MAP, HIDDEN_ZONE_MAP_SIZE);
+}
+
+bool
+D878UVCodeplug::encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::encodeZone(i, zone, isB, flags, ctx, err))
+    return false;
+
+  AnytoneZoneExtension *ext = zone->anytoneExtension();
+  if (nullptr == ext)
+      return true;
+
+  if (ext->hidden()) {
+    // set bit
+    data(ADDR_HIDDEN_ZONE_MAP)[i/8] |= (1<<(i%8));
+  } else {
+    // clear bit
+    data(ADDR_HIDDEN_ZONE_MAP)[i/8] &= ~(1<<(i%8));
+  }
+
+  return true;
+}
+
+bool
+D878UVCodeplug::decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::decodeZone(i, zone, isB, ctx, err))
+    return false;
+  AnytoneZoneExtension *ext = zone->anytoneExtension();
+  if (nullptr == ext) {
+    ext = new AnytoneZoneExtension();
+    zone->setAnytoneExtension(ext);
+  }
+
+  if ((! isB) && (data(ADDR_HIDDEN_ZONE_MAP)[i/8] & (1<<(i%8))))
+    ext->enableHidden(true);
+  else
+    ext->enableHidden(false);
+
   return true;
 }
 
