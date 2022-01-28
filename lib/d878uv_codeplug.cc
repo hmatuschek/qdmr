@@ -21,6 +21,9 @@
 #define CHANNEL_BITMAP            0x024c1500
 #define CHANNEL_BITMAP_SIZE       0x00000200
 
+#define ADDR_HIDDEN_ZONE_MAP      0x024c1360
+#define HIDDEN_ZONE_MAP_SIZE      0x00000020
+
 #define ADDR_GENERAL_CONFIG       0x02500000
 #define GENERAL_CONFIG_SIZE       0x00000100
 
@@ -2125,6 +2128,9 @@ void
 D878UVCodeplug::allocateUpdated() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateUpdated();
+
+  // Hidden zone map
+  image(0).addElement(ADDR_HIDDEN_ZONE_MAP, HIDDEN_ZONE_MAP_SIZE);
 
   // Encryption keys
   image(0).addElement(ADDR_ENCRYPTION_KEYS, ENCRYPTION_KEYS_SIZE);
