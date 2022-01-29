@@ -42,7 +42,7 @@ ZoneDialog::construct() {
 
   extensionView->setObjectName("zoneExtension");
   extensionView->setObject(_myZone);
-  if (! settings.showCommercialFeatures()) {
+  if (! settings.showExtensions()) {
     tabWidget->tabBar()->hide();
   }
 
