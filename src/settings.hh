@@ -1,6 +1,7 @@
 #ifndef SETTINGS_HH
 #define SETTINGS_HH
 
+#include <QDir>
 #include <QSettings>
 #include <QDateTime>
 #include <QGeoPositionInfoSource>
@@ -60,6 +61,9 @@ public:
 
   bool showCommercialFeatures() const;
   void setShowCommercialFeatures(bool show);
+
+  bool showExtensions() const;
+  void setShowExtensions(bool show);
 
   bool hideGSPNote() const;
   void setHideGPSNote(bool hide);

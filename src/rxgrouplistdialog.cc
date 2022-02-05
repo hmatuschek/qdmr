@@ -58,7 +58,7 @@ RXGroupListDialog::construct() {
 
   extensionView->setObjectName("groupListExtension");
   extensionView->setObject(_myGroupList);
-  if (! settings.showCommercialFeatures())
+  if (! settings.showExtensions())
     tabWidget->tabBar()->hide();
 }
 

@@ -141,7 +141,7 @@ DigitalChannelDialog::construct() {
   extensionView->setObjectName("digitalChannelExtension");
   extensionView->setObject(_myChannel);
 
-  if (! settings.showCommercialFeatures())
+  if (! settings.showExtensions())
     tabWidget->tabBar()->hide();
 
   connect(powerDefault, SIGNAL(toggled(bool)), this, SLOT(onPowerDefaultToggled(bool)));

@@ -210,9 +210,12 @@ Application::createMainWindow() {
   tabs->addTab(_generalSettings, tr("Settings"));
   if (settings.showCommercialFeatures()) {
     _generalSettings->hideDMRID(true);
-    _generalSettings->hideExtensions(false);
   } else {
     _generalSettings->hideDMRID(false);
+  }
+  if (settings.showExtensions()) {
+    _generalSettings->hideExtensions(false);
+  } else {
     _generalSettings->hideExtensions(true);
   }
 
@@ -256,6 +259,8 @@ Application::createMainWindow() {
   if (! settings.showCommercialFeatures()) {
     tabs->removeTab(tabs->indexOf(_radioIdTab));
     _radioIdTab->setHidden(true);
+  }
+  if (! settings.showExtensions()) {
     tabs->removeTab(tabs->indexOf(_extensionView));
     _extensionView->setHidden(true);
   }
@@ -715,22 +720,26 @@ Application::showSettings() {
         tabs->insertTab(tabs->indexOf(_generalSettings)+1, _radioIdTab, tr("Radio IDs"));
         _mainWindow->update();
       }
-      if (-1 == tabs->indexOf(_extensionView)) {
-        tabs->insertTab(tabs->indexOf(_roamingZoneList)+1, _extensionView, tr("Extensions"));
-        _mainWindow->update();
-      }
       _generalSettings->hideDMRID(true);
-      _generalSettings->hideExtensions(false);
     } else if (! settings.showCommercialFeatures()) {
       if (-1 != tabs->indexOf(_radioIdTab)) {
         tabs->removeTab(tabs->indexOf(_radioIdTab));
         _mainWindow->update();
       }
+      _generalSettings->hideDMRID(false);
+    }
+    // Handle extensions
+    if (settings.showExtensions()) {
+      if (-1 == tabs->indexOf(_extensionView)) {
+        tabs->insertTab(tabs->indexOf(_roamingZoneList)+1, _extensionView, tr("Extensions"));
+        _mainWindow->update();
+      }
+      _generalSettings->hideExtensions(false);
+    } else {
       if (-1 != tabs->indexOf(_extensionView)) {
         tabs->removeTab(tabs->indexOf(_extensionView));
         _mainWindow->update();
       }
-      _generalSettings->hideDMRID(false);
       _generalSettings->hideExtensions(true);
     }
   }

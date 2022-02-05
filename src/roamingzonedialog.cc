@@ -33,7 +33,7 @@ RoamingZoneDialog::construct() {
 
   extensionView->setObjectName("roamingZoneExtension");
   extensionView->setObject(_myZone);
-  if (! settings.showCommercialFeatures())
+  if (! settings.showExtensions())
     tabWidget->tabBar()->hide();
 
   connect(add, SIGNAL(clicked(bool)), this, SLOT(onAddChannel()));

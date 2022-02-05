@@ -193,8 +193,7 @@
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset theme="application-exit">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="application-exit"/>
    </property>
    <property name="text">
     <string>Quit</string>
@@ -283,7 +282,8 @@
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset theme="application-settings"/>
+    <iconset theme="application-settings">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Settings</string>

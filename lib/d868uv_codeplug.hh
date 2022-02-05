@@ -393,10 +393,16 @@ protected:
   virtual void allocateZones();
   /** Encode zones into codeplug. */
   virtual bool encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Function to encode a single zone. */
+  virtual bool encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create zones from codeplug. */
   virtual bool createZones(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Function to decode a single zone. */
+  virtual bool decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link zones. */
   virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Function to link a single zone. */
+  virtual bool linkZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate scanlists from bitmaps. */
   virtual void allocateScanLists();

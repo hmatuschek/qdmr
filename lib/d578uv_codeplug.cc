@@ -120,7 +120,7 @@ D578UVCodeplug::D578UVCodeplug(QObject *parent)
 
 void
 D578UVCodeplug::allocateUpdated() {
-  D868UVCodeplug::allocateUpdated();
+  D878UVCodeplug::allocateUpdated();
 
   image(0).addElement(ADDR_UNKNOWN_SETTING_1, UNKNOWN_SETTING_1_SIZE);
   image(0).addElement(ADDR_UNKNOWN_SETTING_2, UNKNOWN_SETTING_2_SIZE);

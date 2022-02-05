@@ -240,6 +240,15 @@ Settings::setShowCommercialFeatures(bool show) {
 }
 
 bool
+Settings::showExtensions() const {
+  return value("showExtensions", false).toBool();
+}
+void
+Settings::setShowExtensions(bool show) {
+  setValue("showExtensions", show);
+}
+
+bool
 Settings::hideGSPNote() const {
   return value("hideGPSNote", false).toBool();
 }
@@ -363,6 +372,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   Ui::SettingsDialog::prefixes->setText(prefs_text.join(", "));
 
   Ui::SettingsDialog::commercialFeatures->setChecked(settings.showCommercialFeatures());
+  Ui::SettingsDialog::showExtensions->setChecked(settings.showExtensions());
 
   connect(Ui::SettingsDialog::dbLimitEnable, SIGNAL(toggled(bool)), this, SLOT(onDBLimitToggled(bool)));
   connect(Ui::SettingsDialog::useUserId, SIGNAL(toggled(bool)), this, SLOT(onUseUserDMRIdToggled(bool)));
@@ -439,6 +449,7 @@ SettingsDialog::accept() {
   settings.setCallSignDBPrefixes(prefs);
 
   settings.setShowCommercialFeatures(commercialFeatures->isChecked());
+  settings.setShowExtensions(showExtensions->isChecked());
 
   QDialog::accept();
 }
