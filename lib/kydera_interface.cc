@@ -10,8 +10,8 @@
 KyderaInterface::ReadCommand::ReadCommand(uint16_t blocks)
 {
   // Number of blocks is one less that the actual blocks being read
-  //if (blocks)
-  //  blocks--;
+  if (blocks)
+    blocks--;
   // Init fields
   memset(this, 0x00, sizeof(ReadCommand));
   memcpy(this->cmd, "Flash Read ", sizeof(this->cmd));
