@@ -973,7 +973,7 @@ D868UVCodeplug::setRadioID(Context &ctx, const ErrorStack &err) {
       continue;
     RadioIDElement id(data(ADDR_RADIOIDS + i*RADIOID_SIZE));
     logDebug() << "Store id " << id.number() << " at idx " << i << ".";
-    if (RadioID *rid = id.toRadioID()) {
+    if (DMRRadioID *rid = id.toRadioID()) {
       ctx.config()->radioIDs()->add(rid);  ctx.add(rid, i);
     }
   }
@@ -1091,7 +1091,11 @@ D868UVCodeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &
     for (int j=0; j<ctx.config()->zones()->zone(i)->A()->count(); j++) {
       channels[j] = qToLittleEndian(ctx.index(ctx.config()->zones()->zone(i)->A()->get(j)));
     }
+
+    if (! encodeZone(zidx, ctx.config()->zones()->zone(i), false, flags, ctx, err))
+      return false;
     zidx++;
+
     if (! ctx.config()->zones()->zone(i)->B()->count())
       continue;
 
@@ -1105,8 +1109,17 @@ D868UVCodeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &
     for (int j=0; j<ctx.config()->zones()->zone(i)->B()->count(); j++) {
       channels[j] = qToLittleEndian(ctx.index(ctx.config()->zones()->zone(i)->B()->get(j)));
     }
+
+    if (! encodeZone(zidx, ctx.config()->zones()->zone(i), true, flags, ctx, err))
+      return false;
     zidx++;
   }
+  return true;
+}
+
+bool
+D868UVCodeplug::encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(i); Q_UNUSED(zone); Q_UNUSED(isB); Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   return true;
 }
 
@@ -1135,13 +1148,27 @@ D868UVCodeplug::createZones(Context &ctx, const ErrorStack &err) {
     // If enabled, create zone with name
     if (! extend_last_zone) {
       last_zone = new Zone(zonename);
+      if (! decodeZone(i, last_zone, false, ctx, err)) {
+        last_zone->deleteLater();
+        return false;
+      }
       // add to config
       ctx.config()->zones()->add(last_zone); ctx.add(last_zone, i);
     } else {
       // when extending the last zone, chop its name to remove the "... A" part.
       last_zone->setName(last_zonebasename);
+      if (! decodeZone(i, last_zone, true, ctx, err)) {
+        last_zone->deleteLater();
+        return false;
+      }
     }
   }
+  return true;
+}
+
+bool
+D868UVCodeplug::decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(i); Q_UNUSED(zone); Q_UNUSED(isB); Q_UNUSED(ctx); Q_UNUSED(err)
   return true;
 }
 
@@ -1191,10 +1218,18 @@ D868UVCodeplug::linkZones(Context &ctx, const ErrorStack &err) {
       else
         last_zone->A()->add(ctx.get<Channel>(cidx));
     }
+
+    if (! linkZone(i, last_zone, extend_last_zone, ctx, err))
+      return false;
   }
   return true;
 }
 
+bool
+D868UVCodeplug::linkZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(i); Q_UNUSED(zone); Q_UNUSED(isB); Q_UNUSED(ctx); Q_UNUSED(err)
+  return true;
+}
 
 void
 D868UVCodeplug::allocateScanLists() {

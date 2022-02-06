@@ -315,7 +315,7 @@ protected:
   /** Index <-> RoamingZone map */
   QMap<int, RoamingZone *> _roamingZones;
   /** Index <-> radio ID map */
-  QMap<int, RadioID *> _radioIDs;
+  QMap<int, DMRRadioID *> _radioIDs;
 };
 
 #endif // CSVREADER_HH

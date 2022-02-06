@@ -96,9 +96,9 @@ UV390::callsignDB() {
 RadioInfo
 UV390::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::UV390, "uv390", "MD-UV390", "TyT",
+        RadioInfo::UV390, "uv390", "MD-UV390", "TyT", TyTInterface::interfaceInfo(),
         QList<RadioInfo>{
-          RadioInfo(RadioInfo::UV380, "MD-UV380", "TyT"),
-          RadioInfo(RadioInfo::RT3S, "RT3S", "Retevis")
+          RadioInfo(RadioInfo::UV380, "MD-UV380", "TyT", TyTInterface::interfaceInfo()),
+          RadioInfo(RadioInfo::RT3S, "RT3S", "Retevis", TyTInterface::interfaceInfo())
         });
 }

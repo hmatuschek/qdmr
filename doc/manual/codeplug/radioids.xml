@@ -26,7 +26,7 @@
 </example>
 
 <para> 
-  This radio ID got the identifier <token>id1</token>, name <token>DM3MAT</token> 
+  This DMR radio ID got the identifier <token>id1</token>, name <token>DM3MAT</token> 
   and number <token>2621370</token>.
 </para>
 

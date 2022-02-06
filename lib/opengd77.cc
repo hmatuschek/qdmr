@@ -61,9 +61,7 @@ static Radio::Features _open_gd77_features =
 OpenGD77::OpenGD77(OpenGD77Interface *device, QObject *parent)
   : Radio(parent), _name("Open GD-77"), _dev(device), _config(nullptr), _codeplug(), _callsigns()
 {
-  if (! connect())
-    return;
-  logDebug() << "Connected to radio '" << _name << "'.";
+  // pass...
 }
 
 OpenGD77::~OpenGD77() {
@@ -102,7 +100,7 @@ OpenGD77::codeplug() {
 RadioInfo
 OpenGD77::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::OpenGD77, "opengd77", "OpenGD77", "OpenGD77 Project");
+        RadioInfo::OpenGD77, "opengd77", "OpenGD77", "OpenGD77 Project", OpenGD77Interface::interfaceInfo());
 }
 
 
@@ -196,7 +194,7 @@ OpenGD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignD
 void
 OpenGD77::run() {
   if (StatusDownload == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       emit downloadError(this);
       return;
     }
@@ -217,7 +215,7 @@ OpenGD77::run() {
     emit downloadFinished(this, &_codeplug);
     _config = nullptr;
   } else if (StatusUpload == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       emit uploadError(this);
       return;
     }
@@ -237,7 +235,7 @@ OpenGD77::run() {
     _task = StatusIdle;
     emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       emit uploadError(this);
       return;
     }
@@ -257,26 +255,6 @@ OpenGD77::run() {
     _task = StatusIdle;
     emit uploadComplete(this);
   }
-}
-
-
-bool
-OpenGD77::connect() {
-  if (_dev && _dev->isOpen())
-    return true;
-  if (_dev)
-    _dev->deleteLater();
-
-  _dev = new OpenGD77Interface(_errorStack);
-  if (! _dev->isOpen()) {
-    _task = StatusError;
-    errMsg(_errorStack) << "Cannot connect to radio.";
-    _dev->deleteLater();
-    _dev = nullptr;
-    return false;
-  }
-
-  return true;
 }
 
 

@@ -34,7 +34,7 @@
 
 <para>
   To get a list of keys identifying radio models when specified using the <option>--radio</option>
-  option, the <option>--list-radios</option> can be passed. This will print a small table to 
+  option, <option>--list-radios</option> can be passed. This will print a small table to 
   <varname>stdout</varname> that lists the keys for each known radio as well as the model and
   manufacturer name.
 </para>
@@ -90,7 +90,7 @@
   <filename>codeplug.dfu</filename>. The result is piped to <command>less</command> for easy 
   reading. The hex dump also prints some information about the file structure as well as
   memory addresses. It also collapses repetitive memory sections (similar to 
-  <command>hexdump -C</command>. To this end, this command is a helpful tool for debugging
+  <command>hexdump -C</command>). To this end, this command is a helpful tool for debugging
   the encoding of codeplugs and call-sign DBs.
 </para>
 </section>

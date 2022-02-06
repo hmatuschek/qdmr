@@ -20,15 +20,15 @@
     
     <releaseinfo>
       <para>
-        This document covers <application>qdmr</application> version 0.10.0.
+        This document covers <application>qdmr</application> version 0.10.1.
       </para>
     </releaseinfo>
     
     <legalnotice>
       <para>
         This document is released under the conditions of the 
-        <link xlink:href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons
-          Attribution-ShareAlike 4.0</link>.
+        <link xlink:href="https://creativecommons.org/licenses/by-sa/3.0/">Creative Commons
+          Attribution-ShareAlike 3.0</link>.
       </para>
     </legalnotice>
 

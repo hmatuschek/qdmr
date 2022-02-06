@@ -21,6 +21,9 @@
 #define CHANNEL_BITMAP            0x024c1500
 #define CHANNEL_BITMAP_SIZE       0x00000200
 
+#define ADDR_HIDDEN_ZONE_MAP      0x024c1360
+#define HIDDEN_ZONE_MAP_SIZE      0x00000020
+
 #define ADDR_GENERAL_CONFIG       0x02500000
 #define GENERAL_CONFIG_SIZE       0x00000100
 
@@ -1476,7 +1479,8 @@ D878UVCodeplug::AnalogAPRSSettingsElement::disableFixedLocation() {
 
 QString
 D878UVCodeplug::AnalogAPRSSettingsElement::destination() const {
-  return readASCII(0x0016, 6, 0x00);
+  // Terminated/padded with space
+  return readASCII(0x0016, 6, ' ');
 }
 unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::destinationSSID() const {
@@ -1484,12 +1488,14 @@ D878UVCodeplug::AnalogAPRSSettingsElement::destinationSSID() const {
 }
 void
 D878UVCodeplug::AnalogAPRSSettingsElement::setDestination(const QString &call, unsigned ssid) {
-  writeASCII(0x0016, call, 6, 0x00);
+  // Terminated/padded with space
+  writeASCII(0x0016, call, 6, ' ');
   setUInt8(0x001c, ssid);
 }
 QString
 D878UVCodeplug::AnalogAPRSSettingsElement::source() const {
-  return readASCII(0x001d, 6, 0x00);
+  // Terminated/padded with space
+  return readASCII(0x001d, 6, ' ');
 }
 unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::sourceSSID() const {
@@ -1497,7 +1503,8 @@ D878UVCodeplug::AnalogAPRSSettingsElement::sourceSSID() const {
 }
 void
 D878UVCodeplug::AnalogAPRSSettingsElement::setSource(const QString &call, unsigned ssid) {
-  writeASCII(0x001d, call, 6, 0x00);
+  // Terminated/padded with space
+  writeASCII(0x001d, call, 6, ' ');
   setUInt8(0x0023, ssid);
 }
 
@@ -2275,6 +2282,52 @@ D878UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
 
 
 void
+D878UVCodeplug::allocateZones() {
+  D868UVCodeplug::allocateZones();
+  // Hidden zone map
+  image(0).addElement(ADDR_HIDDEN_ZONE_MAP, HIDDEN_ZONE_MAP_SIZE);
+}
+
+bool
+D878UVCodeplug::encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::encodeZone(i, zone, isB, flags, ctx, err))
+    return false;
+
+  AnytoneZoneExtension *ext = zone->anytoneExtension();
+  if (nullptr == ext)
+      return true;
+
+  if (ext->hidden()) {
+    // set bit
+    data(ADDR_HIDDEN_ZONE_MAP)[i/8] |= (1<<(i%8));
+  } else {
+    // clear bit
+    data(ADDR_HIDDEN_ZONE_MAP)[i/8] &= ~(1<<(i%8));
+  }
+
+  return true;
+}
+
+bool
+D878UVCodeplug::decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::decodeZone(i, zone, isB, ctx, err))
+    return false;
+  AnytoneZoneExtension *ext = zone->anytoneExtension();
+  if (nullptr == ext) {
+    ext = new AnytoneZoneExtension();
+    zone->setAnytoneExtension(ext);
+  }
+
+  if ((! isB) && (data(ADDR_HIDDEN_ZONE_MAP)[i/8] & (1<<(i%8))))
+    ext->enableHidden(true);
+  else
+    ext->enableHidden(false);
+
+  return true;
+}
+
+
+void
 D878UVCodeplug::allocateGeneralSettings() {
   // override allocation of general settings for D878UV code-plug. General settings are larger!
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
@@ -2297,7 +2350,7 @@ D878UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
 
   GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx);
   GPSMessageElement(data(ADDR_GENERAL_CONFIG_EXT1)).updateConfig(ctx);
-  GeneralSettingsElement(data(ADDR_GENERAL_CONFIG_EXT2)).updateConfig(ctx);
+  GeneralSettingsExtensionElement(data(ADDR_GENERAL_CONFIG_EXT2)).updateConfig(ctx);
   return true;
 }
 

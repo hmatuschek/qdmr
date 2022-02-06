@@ -4,7 +4,7 @@
      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 0004  ...                                                                                                                            |
      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-0008 | 8-digit BCD DMR ID                                                                                                            |
+0008 | 8-digit BCD DMR ID, big-endian.                                                                                               |
      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 000c | Unused set to 0x00000000                                                                                                      |
      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -21,9 +21,20 @@
 0024  ...                                                                                                                            |
      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 where
-UNT = Unknown number tone; RST = Reset tone; UMV = Up-channel mode VFO; DMV = Down-channel mode VFO;
-SBP = Save battery by disable preamble; SBR = Save battery by disable receive; DAT = Disables all tones;
-FIT = Channel frequency indication tone; STT = Self-test pass tone; PAT = Talk permit tone ananlog;
-PDT = Talk permit tone digital; IQO = Inhibit quick-key override; DAL = Disables all LEDs;
-ScanM = Scan mode; ANI = Enable animation; DBW = Always TX on active channel on double-wait;
-TXT = TX exit tone;
+UNT = Unknown number tone
+RST = Reset tone
+UMV = Up-channel mode VFO
+DMV = Down-channel mode VFO
+SBP = Send wakeup preamble.
+SBR = Enable sleep mode during RX.
+DAT = Disables all tones;
+FIT = Channel free indication tone
+STT = Self-test pass tone
+PAT = Talk permit tone ananlog
+PDT = Talk permit tone digital
+IQO = Inhibit quick-key override
+DAL = Disables all LEDs
+ScanM = Scan mode
+ANI = Enable animation
+DBW = Always TX on active channel on double-wait
+TXT = TX exit tone

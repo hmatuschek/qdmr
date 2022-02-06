@@ -12,8 +12,8 @@ AnytoneRadio::AnytoneRadio(const QString &name, AnytoneInterface *device, QObjec
   : Radio(parent), _name(name), _dev(device), _codeplugFlags(), _config(nullptr),
     _codeplug(nullptr), _callsigns(nullptr), _supported_version(), _version()
 {
-  // Open device to radio if not already present
-  if (! connect()) {
+  // Check if device is open
+  if ((nullptr==_dev) || (! _dev->isOpen())) {
     _task = StatusError;
     return;
   }  
@@ -144,7 +144,7 @@ AnytoneRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const Calls
 void
 AnytoneRadio::run() {
   if (StatusDownload == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       _task = StatusError;
       emit downloadError(this);
       return;
@@ -165,7 +165,7 @@ AnytoneRadio::run() {
     emit downloadFinished(this, _codeplug);
     _config = nullptr;
   } else if (StatusUpload == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       _task = StatusError;
       emit uploadError(this);
       return;
@@ -186,7 +186,7 @@ AnytoneRadio::run() {
     _task = StatusIdle;
     emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       _task = StatusError;
       emit uploadError(this);
       return;
@@ -207,29 +207,6 @@ AnytoneRadio::run() {
     _task = StatusIdle;
     emit uploadComplete(this);
   }
-}
-
-bool
-AnytoneRadio::connect() {
-  // Check if there is a connection
-  if ((nullptr != _dev) && (_dev->isOpen()))
-    return true;
-
-  // If there is a connection but it is not open -> close it.
-  if (nullptr != _dev)
-    _dev->deleteLater();
-
-  // If no connection -> open one.
-  _dev = new AnytoneInterface(_errorStack);
-  if (! _dev->isOpen()) {
-    errMsg(_errorStack) << "Cannot connect to device.";
-    _task = StatusError;
-    _dev->deleteLater();
-    _dev = nullptr;
-    return false;
-  }
-
-  return true;
 }
 
 bool

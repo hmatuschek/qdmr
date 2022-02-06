@@ -28,7 +28,7 @@ public:
   /** Adds the given radio ID at the given index to the list. */
   bool addRadioId(uint32_t id, int index, const QString &name="");
   /** Maps the given index to the associated radio ID. */
-  RadioID *getRadioId(int idx) const;
+  DMRRadioID *getRadioId(int idx) const;
 
   /** Returns @c true, if the given channel index has been defined before. */
   bool hasChannel(int index) const;

@@ -96,8 +96,8 @@ MD2017::callsignDB() {
 RadioInfo
 MD2017::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::MD2017, "md2017", "MD-2017", "TyT",
+        RadioInfo::MD2017, "md2017", "MD-2017", "TyT", TyTInterface::interfaceInfo(),
         QList<RadioInfo>{
-          RadioInfo(RadioInfo::RT82, "RT82", "Retevis")
+          RadioInfo(RadioInfo::RT82, "RT82", "Retevis", TyTInterface::interfaceInfo())
         });
 }

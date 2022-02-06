@@ -5,16 +5,13 @@
 #include "logger.hh"
 #include "radio.hh"
 #include "radiointerface.hh"
-
+#include "autodetect.hh"
 
 int detect(QCommandLineParser &parser, QCoreApplication &app) {
-  Q_UNUSED(parser);
-  Q_UNUSED(app);
-
+  // Try to detect a radio
   ErrorStack err;
-  Radio *radio = Radio::detect(RadioInfo(), err);
+  Radio *radio = autoDetect(parser, app, err);
   if (nullptr == radio) {
-    logError() << "No compatible radio found: " << err.format();
     return -1;
   }
 

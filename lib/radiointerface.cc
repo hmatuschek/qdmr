@@ -1,5 +1,13 @@
 #include "radiointerface.hh"
 
+#include "anytone_interface.hh"
+#include "opengd77_interface.hh"
+#include "radioddity_interface.hh"
+#include "tyt_interface.hh"
+
+/* ********************************************************************************************* *
+ * Implementation of RadioInterface
+ * ********************************************************************************************* */
 RadioInterface::RadioInterface()
 {
 	// pass...

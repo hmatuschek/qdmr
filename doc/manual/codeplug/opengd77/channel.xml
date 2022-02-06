@@ -36,7 +36,7 @@
 
 <section>
 <info>
-  <title>Attributes</title>
+  <title>Channel attributes</title>
 </info>
 
 <para>
@@ -55,7 +55,7 @@
         <token>P4W</token>, , <token>P5W</token>, <token>Max</token>. Where <token>Global</token> 
         implies that the global power settings is used and <token>Max</token> the maximal possible 
         power is used (usually 7W on VHF and 5.5W on UHF). This power setting overrides the 
-        common channel power setting.</para>
+        common channel power setting. See <xref linkend="cpChannels"/>.</para>
     </listitem>
   </varlistentry>
 </variablelist>

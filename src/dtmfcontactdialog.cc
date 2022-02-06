@@ -38,8 +38,9 @@ DTMFContactDialog::construct() {
   ui->numberLineEdit->setValidator(new QRegExpValidator(QRegExp("[0-9a-dA-D\\*#]+")));
   ui->ringCheckBox->setChecked(_myContact->ring());
 
+  ui->extensionView->setObjectName("dtmfContactExtension");
   ui->extensionView->setObject(_myContact);
-  if (! settings.showCommercialFeatures())
+  if (! settings.showExtensions())
     ui->tabWidget->tabBar()->hide();
 }
 

@@ -114,9 +114,10 @@ AnalogChannelDialog::construct() {
     voxValue->setValue(_myChannel->vox());
   }
 
-  if (! settings.showCommercialFeatures())
+  if (! settings.showExtensions())
     tabWidget->tabBar()->hide();
 
+  extensionView->setObjectName("AnalogChannelExtension");
   extensionView->setObject(_myChannel);
 
   connect(powerDefault, SIGNAL(toggled(bool)), this, SLOT(onPowerDefaultToggled(bool)));

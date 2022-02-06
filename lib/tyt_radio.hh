@@ -39,7 +39,6 @@ protected:
 	void run();
 
 private:
-  virtual bool connect();
   virtual bool download();
   virtual bool upload();
   virtual bool uploadCallsigns();

@@ -5,9 +5,9 @@
 #define RADIOINFERFACE_HH
 
 #include <QString>
+#include "usbdevice.hh"
 #include "radioinfo.hh"
 #include "errorstack.hh"
-
 
 /** Abstract radio interface.
  * A radion interface must provide means to communicate with the device. That is, open a connection
@@ -19,47 +19,6 @@
  * @ingroup rif */
 class RadioInterface
 {
-public:
-  /** Abstract representation of some information about a possible radio interface. */
-  class Info {
-  public:
-    /** Possible interface types. */
-    enum class Class {
-      None,       ///< Class for invalid interface info.
-      Serial,     ///< Serial port interface class.
-      DFU,        ///< DFU interface class.
-      HID         ///< HID (human-interface device) interface class.
-    };
-
-  public:
-    /** Empty constructor. */
-    Info();
-    /** Destructor. */
-    virtual ~Info();
-
-    /** Copy constructor. */
-    Info(const Info &other);
-
-    /** Returns @c true if the interface info is valid. */
-    bool isValid() const;
-
-    /** Returns the interface class. */
-    Class interfaceClass() const;
-
-    /** Returns a human readable description of the interface. */
-    QString description() const;
-
-  protected:
-    /** The class of the interface. */
-    Class _class;
-    /** The USB vid. */
-    uint16_t _vid;
-    /** The USB pid. */
-    uint16_t _pid;
-    /** Holds a unique device descriptor. */
-    QString _device;
-  };
-
 protected:
   /** Hidden constructor. */
   explicit RadioInterface();
@@ -131,10 +90,6 @@ public:
    * this function does nothing.
    * @param err Passes an error stack to put error messages on. */
   virtual bool reboot(const ErrorStack &err=ErrorStack());
-
-public:
-  /** Searches for all possible radios connected. */
-  static QList<Info> detect();
 };
 
 #endif // RADIOINFERFACE_HH

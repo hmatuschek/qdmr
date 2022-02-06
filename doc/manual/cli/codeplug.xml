@@ -13,7 +13,7 @@
   The major feature of the command line tool is certainly the ability to read and write codeplugs 
   from and to the device. The majority of the action happens automatically. Like the detection of
   the radio. If something goes wrong, an error message will be written to <varname>stderr</varname>. 
-  A more detailed logging can be enabled by passing the <option>--debug</option> flag.
+  A more detailed logging can be enabled by passing the <option>--verbose</option> flag.
 </para>
 
 
@@ -21,11 +21,11 @@
 <info><title>Reading a codeplug</title></info>
 <para>
   To read a codeplug, the <command>read</command> command is used. The codeplug can be stored in 
-  several formats. The human readable extensible codeplug format (YAML), the old table based format
-  and as a binary memory dump of the codeplug memory on the device. 
-  <command>dmrconf</command> detects the format based on the file extension or by means of additional 
-  flags. The latter is particularly important if the read codeplug should be written to 
-  <varname>stdout</varname> for piping it to another program for further processing.
+  several formats. The human readable extensible codeplug format (YAML) and as a binary memory dump
+  of the codeplug memory on the device. <command>dmrconf</command> detects the format based on the 
+  file extension or by means of an additional flag. The latter is particularly important if the 
+  read codeplug should be written to <varname>stdout</varname> for piping it to another program for
+  further processing.
 </para>
 
 <informalexample>
@@ -39,19 +39,6 @@
 </para>
 
 <para>
-  The same call with a file name <filename>codeplug.conf</filename> would store the codeplug in the
-  old table based <filename>conf</filename> format.
-</para>
-
-<note>
-  <para>
-    Not that the latter is way less expressive and does not support the storage of device specific 
-    settings. This format is basically kept for backwards compatibility and should not be used 
-    anymore.
-  </para>
-</note>
-
-<para>
   To store the memory dump of the codeplug memory of the radio, the file extension should be 
   <filename>dfu</filename>. 
 </para>
@@ -60,10 +47,9 @@
   As mentioned above, it is also possible to dump the decoded codeplug to <varname>stdout</varname> 
   allowing to pipe the codeplug into another program for processing. This can be done by omitting 
   the output filename. Then, however, the output format is not specified anymore. In this case, one
-  the explicit format flags <option>--yaml</option>, <option>--csv</option> or 
-  <option>--bin</option> must be used to specify in which format the codeplug should be written. 
-  These flags can also be used to store a codeplug in a particular format in arbitrarily named 
-  files. 
+  the explicit format flags <option>--yaml</option> or <option>--bin</option> must be used to 
+  specify in which format the codeplug should be written. These flags can also be used to store a 
+  codeplug in a particular format in arbitrarily named files. 
 </para>
 
 <informalexample>
@@ -86,7 +72,7 @@
 </para>
 
 <para>
-  The <command>decode</command> command then performs that second step. To do that, it needs
+  The <command>decode</command> command performs that second step. To do that, it needs
   two additional information: The radio type, from which this codeplug was read and the format
   to write the decoded format to. Like for the <command>read</command> command, the latter
   can be passed by the output filename extension or via an additional flag.
@@ -100,7 +86,7 @@ dmrconf decode --radio=uv390 codeplug.dfu codeplug.yaml]]></programlisting>
 <para>
   This example performs the same actions like a simple <command>read</command> command (assuming a
   TyT MD-UV390 is connected). It first downloads the binary codeplug. This time, the memory dump 
-  is stored in a binary from (<filename>dfu</filename> file). The second command then decodes 
+  is stored in a binary form (<filename>dfu</filename> file). The second command then decodes 
   the binary codeplug into the extensible codeplug format (<filename>yaml</filename> file), assuming 
   that the binary codeplug stems from a TyT MD-UV390.
 </para>
@@ -180,7 +166,7 @@ dmrconf decode --radio=uv390 codeplug.dfu codeplug.yaml]]></programlisting>
   There are also some flags controlling the assembly of the binary codeplug. When the  
   <option>--init-codeplug</option> flag is set, the codeplug will be generated from scratch using
   default values for all options not explicitly specified in the codeplug file. This might be used
-  to initialized a brand new radio. However, any changes made to the radio settings are lost. 
+  to initialize a brand new radio. However, any changes made to the radio are lost. 
 </para>
 
 <para>
@@ -210,7 +196,7 @@ dmrconf decode --radio=uv390 codeplug.dfu codeplug.yaml]]></programlisting>
 </informalexample>
 
 <para>
-  This command will verify the codeplug stored in <filename>codeplug.yml</filename> in the 
+  This command will verify the codeplug stored in <filename>codeplug.yaml</filename> in the 
   extensible codeplug format against an AnyTone AT-D878UV. Like for the <command>write</command>, 
   any issues are written to <varname>stderr</varname>.
 </para>

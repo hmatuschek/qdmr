@@ -10,7 +10,7 @@
 
 <para>
   A scan list is list of channels, that are scanned whenever scanning is started on a
-  channel the scan list is associated with. A single scan list might be associated with several
+  channel, the scan list is associated with. A single scan list might be associated with several
   channels. For example, all channels within that scan list.
 </para>
 

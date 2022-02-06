@@ -165,7 +165,8 @@ protected:
   virtual bool populate(YAML::Node &node, const Context &context);
 
 signals:
-  /** Gets emitted once the config object is modified. */
+  /** Gets emitted once the config object is modified.
+   * The instance passed is the modified item, this event is passed up the config tree. */
   void modified(ConfigItem *obj);
   /** Gets emitted before clearing the item. */
   void beginClear();

@@ -66,12 +66,12 @@ RD5RCodeplug::ChannelElement::clear() {
 
 unsigned
 RD5RCodeplug::ChannelElement::squelch() const {
-  return std::min(getUInt8(0x0037), uint8_t(9))+1;
+  return getUInt8(0x0037);
 }
 void
 RD5RCodeplug::ChannelElement::setSquelch(unsigned level) {
-  level = std::max(std::min(10u, level), 1u);
-  setUInt8(0x0037, level-1);
+  level = std::min(9u, level);
+  setUInt8(0x0037, level);
 }
 
 bool
@@ -88,6 +88,7 @@ RD5RCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     else
       setSquelch(ac->squelch());
   } else {
+    // If digital channel, reuse global quelch setting
     setSquelch(ctx.config()->settings()->squelch());
   }
 
@@ -108,6 +109,20 @@ RD5RCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   return ch;
 }
 
+bool
+RD5RCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
+  if (! RadioddityCodeplug::ChannelElement::linkChannelObj(c, ctx))
+    return false;
+  /*
+  if (c->is<AnalogChannel>()) {
+    AnalogChannel *ac = c->as<AnalogChannel>();
+    if (ctx.config()->settings()->squelch() == ac->squelch()) {
+      ac->setSquelchDefault();
+    }
+  }
+  */
+  return true;
+}
 
 /* ********************************************************************************************* *
  * Implementation of RD5RCodeplug::TimestampElement

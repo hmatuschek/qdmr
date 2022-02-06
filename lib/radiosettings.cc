@@ -2,7 +2,8 @@
 
 RadioSettings::RadioSettings(QObject *parent)
   : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
-    _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(0), _tytExtension(nullptr)
+    _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(0), _tytExtension(nullptr),
+    _radioddityExtension(nullptr)
 {
   // pass
 }
@@ -41,21 +42,8 @@ RadioSettings::clear() {
   disableTOT();
 
   setTyTExtension(nullptr);
+  setRadioddityExtension(nullptr);
 }
-
-/*ConfigItem *
-RadioSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                             const Context &ctx, const ErrorStack &err)
-{
-  Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
-
-  if (0 == strcmp("tyt", prop.name())) {
-    return new TyTSettingsExtension();
-  }
-
-  // No children yet.
-  return nullptr;
-}*/
 
 const QString &
 RadioSettings::introLine1() const {
@@ -168,6 +156,24 @@ RadioSettings::setTyTExtension(TyTSettingsExtension *ext) {
   if (_tytExtension) {
     _tytExtension->setParent(this);
     connect(_tytExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+  }
+  emit modified(this);
+}
+
+RadiodditySettingsExtension *
+RadioSettings::radioddityExtension() const {
+  return _radioddityExtension;
+}
+void
+RadioSettings::setRadioddityExtension(RadiodditySettingsExtension *ext) {
+  if (_radioddityExtension) {
+    disconnect(_radioddityExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+    _radioddityExtension->deleteLater();
+  }
+  _radioddityExtension = ext;
+  if (_radioddityExtension) {
+    _radioddityExtension->setParent(this);
+    connect(_radioddityExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
   }
   emit modified(this);
 }

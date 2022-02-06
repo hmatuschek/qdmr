@@ -59,8 +59,8 @@
 </para>
 
 <para>
-  The <guilabel>Speech Synthesis</guilabel> option allows to enable some speech synthesis by the 
-  radio. Some radios support some sort of speech synthesis to help visually impaired 
+  The <guilabel>Speech Synthesis</guilabel> option allows for enabling speech synthesis by the 
+  radio. Some radios support speech synthesis to help visually impaired 
   operators to handle the radio and navigate its menus. If this option is checked, the speech-synthesis 
   will be enabled if the radio supports this feature.
 </para>
@@ -69,14 +69,14 @@
   The <guilabel>Channel Default Values</guilabel> block allows to specify some default values that can 
   be referenced by channels (see <xref linkend="guiChannels"/> below). This serves two use cases. First, it 
   allows to set some channel properties for all channels that reference these values at once. More 
-  importantly, however, some radios do not allow to set these options on a per-channel basis. For these
+  importantly, however, some radios do not allow to set these options on a per-channel basis. For those
   radios, these values are used for all channels.
 </para>
 
 <para>
   If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
   <xref linkend="guiSettingsDialog"/>), an additional block labeled <guilabel>Extensions</guilabel> 
-  is shown at the left side. This view allows to add, remove and edit device specific radio 
+  is shown at the right side. This view allows to add, remove and edit device specific radio 
   settings. All device specific settings are handled and displayed in the same way. See 
   <xref linkend="guiExtensions"/> for some description of this process.
 </para>

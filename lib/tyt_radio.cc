@@ -9,8 +9,7 @@
 TyTRadio::TyTRadio(TyTInterface *device, QObject *parent)
   : Radio(parent), _dev(device), _codeplugFlags(), _config(nullptr)
 {
-  if (! connect())
-    return;
+  // pass...
 }
 
 TyTRadio::~TyTRadio() {
@@ -91,7 +90,7 @@ TyTRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignD
 void
 TyTRadio::run() {
   if (StatusDownload == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       emit downloadError(this);
       return;
     }
@@ -110,7 +109,7 @@ TyTRadio::run() {
     emit downloadFinished(this, &codeplug());
     _config = nullptr;
   } else if (StatusUpload == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       emit uploadError(this);
       return;
     }
@@ -128,7 +127,7 @@ TyTRadio::run() {
     _task = StatusIdle;
     emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       emit uploadError(this);
       return;
     }
@@ -146,29 +145,6 @@ TyTRadio::run() {
     _dev->close();
     emit uploadComplete(this);
   }
-}
-
-bool
-TyTRadio::connect() {
-  if (_dev && _dev->isOpen())
-    return true;
-
-  // Connected but not open
-  if (_dev) {
-    logDebug() << "Has a closed device interface. Reopen...";
-    _dev->deleteLater();
-  }
-
-  _dev = new TyTInterface(0x0483, 0xdf11, _errorStack);
-  if (! _dev->isOpen()) {
-    errMsg(_errorStack) << "Cannot open device at 0483:DF11";
-    _dev->deleteLater();
-    _dev = nullptr;
-    _task = StatusError;
-    return false;
-  }
-
-  return true;
 }
 
 bool

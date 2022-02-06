@@ -11,8 +11,8 @@
 <para>
   The second tab is the <guilabel>Contact List</guilabel>. Here all DMR contacts are defined, 
   irrespective of their type. It is not only possible to define digital DMR contacts (i.e., 
-  private, group and all calls) but also DTMF contact (and in future two-tone, five-tone contacts
-  too). This eases the control of the <glossterm>EchoLink</glossterm> features of repeaters.
+  private, group and all calls) but also DTMF contacts (and in future two-tone, five-tone contacts
+  too). This eases the control of the <glossterm>EchoLink</glossterm> feature of repeaters.
 </para>
 
 <screenshot>
@@ -28,13 +28,13 @@
   You can also delete a contact by selecting the contact in the list and clicking on the 
   <guibutton>Delete Contact</guibutton> button at the bottom. You may also reorder the contacts by 
   selecting a contact in the list and use the <guibutton>arrow-up</guibutton> and 
-  <guibutton>arrow-down</guibutton> buttons on the left to move the contact up and
+  <guibutton>arrow-down</guibutton> buttons on the right to move the contact up and
   down the list, respectively.
 </para>
 
 <para>
   When you create a code-plug, the contact list should contain all talk groups and reflectors you
-  are interested in as well as a so-called <glossterm>All Call</glossterm> contact to the number
+  are interested in, as well as a so-called <glossterm>All Call</glossterm> contact to the number
   <emphasis>16777215</emphasis>. Additionally you may add private calls to several operators you 
   know as well as some <emphasis>service numbers</emphasis>.
 </para>
@@ -60,8 +60,8 @@
 
 <tip>
   <para>
-    <application>qdmr</application> tries to download the current list of all registered user DMR-ids.
-    The contact dialog will use this information (once downloaded) to resolve call-signs to DMR ids.
+    <application>qdmr</application> tries to download the current list of all registered user DMR IDs.
+    The contact dialog will use this information (once downloaded) to resolve call-signs to DMR IDs.
     Just start entering the call-sign into the name field and matching call-signs are shown. The same
     holds true for Brandmeister <glossterm>Talkgroup</glossterm> names.
   </para>

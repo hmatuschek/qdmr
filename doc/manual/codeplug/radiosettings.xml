@@ -53,7 +53,7 @@
     <term><token>speech</token></term>
     <listitem>
       <para>Enables/disables the speech synthesis. Some radios can announce the current 
-        channel etc for the visually impaired. To enable that feature (if supported by the radio)
+        channel etc. for the visually impaired. To enable that feature (if supported by the radio)
         set this field to <token>true</token>. Must be a boolean value.</para>
     </listitem>
   </varlistentry>

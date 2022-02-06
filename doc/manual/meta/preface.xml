@@ -10,13 +10,14 @@
 
 <simplesect>
 <para>
-  Before you start with programming your <acronym>DMR</acronym> radio, 
+  Before you start programming your <acronym>DMR</acronym> radio, 
   <link xlink:href="https://www.dmrfordummies.com/">get familiar</link> with this digital 
-  mode. I have also written a brief introduction into <acronym>DMR</acronym>. You will find it 
+  mode. I have written a brief introduction into <acronym>DMR</acronym> too. You will find it 
   in <xref linkend="introduction"/> (also available 
   <link xlink:href="https://dm3mat.darc.de/qdmr/manual/script_de.pdf">in german</link>). If you 
-  are already familiar with <acronym>DMR</acronym>, skip that chapter and head directly to 
-  <xref linkend="gui"/>, where I describe how <application>qdmr</application> is used.
+  are already familiar with <acronym>DMR</acronym>, skip this chapter and head directly to 
+  <xref linkend="gui"/>, where I describe how <application>qdmr</application> is used. If you are
+  a fan of command line tools, have a look at <xref linkend="commandLine"/>.
 </para>
 
 <para>
@@ -30,8 +31,8 @@
 <para>
   Moreover, the resulting configuration (codeplug) is highly device-dependent. These
   codeplugs cannot be shared between different devices let alone between different vendors. For
-  commercial applications, this is not a big problem as a company will most likely buy identical
-  radios at once from one company. Thus codeplug can be shared between all radios.
+  commercial applications, this is not a big problem, as a company will likely buy identical
+  radios at once from one company. Thus codeplugs can be shared between all radios.
 </para>
 
 <para>
@@ -48,7 +49,7 @@
 </para>
 
 <para>
-  The aim of the <application>qdmr</application>project is to overcome these shortcomings of typical CPSs. It has a
+  The aim of the <application>qdmr</application> project is to overcome these shortcomings of typical CPSs. It has a
   reduced feature set only supporting those options necessary of amateur radio usage. It tries
   to be user-friendly by finding repeaters nearby and importing their input and output
   frequencies. Moreover, it stores the final codeplug not in a device-specific binary format but

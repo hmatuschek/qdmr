@@ -1,0 +1,14 @@
+[Icon Theme]
+Name = "Dark Theme"
+Comment = "Icon theme for dark modes."
+Directories = 16x16/actions, 16x16/apps, 32x32/actions, 32x32/apps
+
+[32x32/actions]
+Size=32
+Context=Actions
+
+[32x32/apps]
+Size=32
+Context=Applications
+
+

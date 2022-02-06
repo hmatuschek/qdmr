@@ -28,7 +28,7 @@
   the source and destination calls and SSIDs respectively. The 7th column specifies the path string. This is 
   list of calls and SSIDs stored as a string without any separators. The 8th column specifies the map 
   <link xlink:href="http://www.aprs.org/symbols/symbols-new.txt">icon name</link>. The name does not 
-  need to match official icon name exactly. The icon is identified as the closes matching icon name with 
+  need to match the official icon name exactly. The icon is identified as the closes matching icon name with 
   respect to the <link xlink:href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein 
   distance</link> between the given and all icon names. That is, <emphasis>jogger</emphasis> and 
   <emphasis>jogging</emphasis> will select the same icon. Finally, the 9th column specifies a freely 

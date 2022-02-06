@@ -1,6 +1,8 @@
 IF (APPLE)
  SET(hid_SOURCES hid_macos.cc)
  SET(hid_HEADERS hid_macos.hh)
+ #SET(hid_SOURCES hid_libusb.cc)
+ #SET(hid_HEADERS hid_libusb.hh)
 ELSE (APPLE)
  SET(hid_SOURCES hid_libusb.cc)
  SET(hid_HEADERS hid_libusb.hh)
@@ -8,7 +10,7 @@ ENDIF(APPLE)
 
 SET(libdmrconf_SOURCES
     utils.cc crc32.cc signaling.cc codeplugcontext.cc addressmap.cc radiointerface.cc errorstack.cc
-    radio.cc ${hid_SOURCES} dfu_libusb.cc usbserial.cc radioinfo.cc radiolimits.cc
+    usbdevice.cc radio.cc ${hid_SOURCES} dfu_libusb.cc usbserial.cc radioinfo.cc radiolimits.cc
     csvreader.cc dfufile.cc repeaterdatabase.cc userdatabase.cc logger.cc
     configobject.cc configreference.cc config.cc radiosettings.cc contact.cc rxgrouplist.cc channel.cc zone.cc
     scanlist.cc gpssystem.cc codeplug.cc roaming.cc callsigndb.cc talkgroupdatabase.cc radioid.cc
@@ -17,17 +19,17 @@ SET(libdmrconf_SOURCES
     md390.cc md390_codeplug.cc md390_filereader.cc
     uv390.cc uv390_codeplug.cc uv390_callsigndb.cc uv390_filereader.cc
     dm1701.cc dm1701_codeplug.cc dm1701_filereader.cc
-    radioddity_radio.cc radioddity_codeplug.cc radioddity_interface.cc
+    radioddity_radio.cc radioddity_codeplug.cc radioddity_extensions.cc radioddity_interface.cc
     rd5r.cc rd5r_codeplug.cc rd5r_filereader.cc
     gd77.cc gd77_codeplug.cc gd77_callsigndb.cc gd77_filereader.cc
     opengd77.cc opengd77_interface.cc opengd77_codeplug.cc opengd77_extension.cc opengd77_callsigndb.cc
-    anytone_interface.cc anytone_radio.cc anytone_codeplug.cc
+    anytone_interface.cc anytone_radio.cc anytone_codeplug.cc anytone_extension.cc
     d868uv.cc d868uv_codeplug.cc d868uv_callsigndb.cc
     d878uv.cc d878uv_codeplug.cc
     d578uv.cc d578uv_codeplug.cc
     d878uv2.cc d878uv2_codeplug.cc d878uv2_callsigndb.cc)
 SET(libdmrconf_MOC_HEADERS
-    radio.hh ${hid_HEADERS} dfu_libusb.hh usbserial.hh radiolimits.hh
+    usbdevice.hh radio.hh ${hid_HEADERS} dfu_libusb.hh usbserial.hh radiolimits.hh
     csvreader.hh dfufile.hh repeaterdatabase.hh userdatabase.hh logger.hh
     configobject.hh configreference.hh config.hh radiosettings.hh contact.hh rxgrouplist.hh channel.hh zone.hh
     scanlist.hh gpssystem.hh codeplug.hh roaming.hh callsigndb.hh talkgroupdatabase.hh radioid.hh
@@ -36,11 +38,11 @@ SET(libdmrconf_MOC_HEADERS
     md390.hh md390_codeplug.hh
     uv390.hh uv390_codeplug.hh uv390_callsigndb.hh
     dm1701.hh dm1701_codeplug.hh dm1701_filereader.hh
-    radioddity_radio.hh radioddity_codeplug.hh radioddity_interface.hh
+    radioddity_radio.hh radioddity_codeplug.hh radioddity_extensions.hh radioddity_interface.hh
     rd5r.hh rd5r_codeplug.hh
     gd77.hh gd77_codeplug.hh gd77_callsigndb.hh
     opengd77.hh opengd77_interface.hh opengd77_codeplug.hh opengd77_extension.hh opengd77_callsigndb.hh
-    anytone_interface.hh anytone_radio.hh anytone_codeplug.hh
+    anytone_interface.hh anytone_radio.hh anytone_codeplug.hh anytone_extension.hh
     d868uv.hh d868uv_codeplug.hh d868uv_callsigndb.hh
     d878uv.hh d878uv_codeplug.hh
     d578uv.hh d578uv_codeplug.hh

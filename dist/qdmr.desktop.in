@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=QDMR	
+Name=QDMR
 GenericName=Codeplug programming software for DMR radios.
 Comment=A universal codeplug programming software for DMR radios.
 Exec=qdmr

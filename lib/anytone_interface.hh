@@ -32,9 +32,10 @@ public:
   };
 
 public:
-  /** Constructs a new interface to Anyton radios. If a matching device was found, @c isOpen
+  /** Constructs a new interface to Anytone radios. If a matching device was found, @c isOpen
    * returns @c true. */
-  explicit AnytoneInterface(const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+  explicit AnytoneInterface(const USBDeviceDescriptor &descriptor,
+                            const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
   virtual ~AnytoneInterface();
 
@@ -57,6 +58,12 @@ public:
   bool write_finish(const ErrorStack &err=ErrorStack());
 
   bool reboot(const ErrorStack &err=ErrorStack());
+
+public:
+  /** Returns some information about this interface. */
+  static USBDeviceInfo interfaceInfo();
+  /** Tries to find all interfaces connected AnyTone radios. */
+  static QList<USBDeviceDescriptor> detect();
 
 protected:
   /** Send command message to radio to ender program state. */

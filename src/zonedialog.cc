@@ -40,8 +40,9 @@ ZoneDialog::construct() {
   listAView->setModel(new ChannelRefListWrapper(_myZone->A()));
   listBView->setModel(new ChannelRefListWrapper(_myZone->B()));
 
+  extensionView->setObjectName("zoneExtension");
   extensionView->setObject(_myZone);
-  if (! settings.showCommercialFeatures()) {
+  if (! settings.showExtensions()) {
     tabWidget->tabBar()->hide();
   }
 
