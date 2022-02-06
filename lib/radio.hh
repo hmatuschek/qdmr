@@ -17,7 +17,7 @@
 
 class Config;
 class UserDatabase;
-
+class RadioLimits;
 
 /** Simple container class to collect codeplug verification issues.
  * As all radios are programmed from a common configuration, some radios may not support all
@@ -87,7 +87,9 @@ class Radio : public QThread
 	Q_OBJECT
 
 public:
-  /** Represents a radio feature list, a generic configuration is verified against. */
+  /** Represents a radio feature list, a generic configuration is verified against.
+   *
+   * @deprecated Since version 0.10.2, use @c RadioLimits instead. */
   struct Features {
     /** Represents a frequency range [min, max]. */
     struct FrequencyRange {
@@ -213,8 +215,16 @@ public:
   /** Returns the name of the radio (e.g., device identifier). */
 	virtual const QString &name() const = 0;
 
-  /** Returns the features for the particular radio. */
+  /** Returns the features for the particular radio.
+   * @deprecated Since version 0.10.2, use @c RadioLimits from @c limits instead. */
 	virtual const Features &features() const = 0;
+
+  /** Returns the limits for this radio.
+   *
+   * Call @c RadioLimits::verifyConfig to verify a codeplug with respect to a radio.
+   *
+   * @since Version 0.10.2 */
+  //virtual const RadioLimits &limits() const = 0;
 
   /** Returns the codeplug instance. */
   virtual const Codeplug &codeplug() const = 0;
@@ -227,7 +237,9 @@ public:
   virtual CallsignDB *callsignDB();
 
   /** Verifies the configuration against the radio features.
-   * On exit, @c issues will contain the issues found and the maximum severity is returned. */
+   * On exit, @c issues will contain the issues found and the maximum severity is returned.
+   *
+   * @deprecated Since version 0.10.2, use @c limits().verifyConfig() instead. */
   virtual VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
                                          const VerifyFlags &flags=VerifyFlags());
 

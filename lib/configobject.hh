@@ -17,7 +17,7 @@ class ConfigExtension;
 
 /** Helper function to test property type. */
 template <class T>
-bool propIsInstance(QMetaProperty &prop) {
+bool propIsInstance(const QMetaProperty &prop) {
   if (QMetaType::UnknownType == prop.userType())
     return false;
   QMetaType type(prop.userType());

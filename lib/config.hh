@@ -65,6 +65,9 @@ class Config : public ConfigItem
 {
 	Q_OBJECT
 
+  /** The list of radio IDs. */
+  Q_PROPERTY(RadioIDList* radioIDs READ radioIDs SCRIPTABLE false)
+
   /** Represents the config extension for TyT devices. */
   Q_PROPERTY(TyTConfigExtension* tytExtension READ tytExtension WRITE setTyTExtension)
 

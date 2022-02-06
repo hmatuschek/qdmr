@@ -1,5 +1,7 @@
 #include "rd5r.hh"
 #include "config.hh"
+#include "radiolimits.hh"
+#include "rd5r_limits.hh"
 
 #define BSIZE 128
 
@@ -55,6 +57,7 @@ static Radio::Features _rd5r_features =
   .maxCallsignsInDB = 0
 };
 
+RadioLimits *RD5R::_limits = nullptr;
 
 RD5R::RD5R(RadioddityInterface *device, QObject *parent)
   : RadioddityRadio(device, parent), _name("Baofeng/Radioddity RD-5R"), _codeplug()
@@ -74,6 +77,13 @@ RD5R::name() const {
 const Radio::Features &
 RD5R::features() const {
   return _rd5r_features;
+}
+
+const RadioLimits &
+RD5R::limits() const {
+  if (nullptr == _limits)
+    _limits = new RD5RLimits();
+  return *_limits;
 }
 
 const Codeplug &

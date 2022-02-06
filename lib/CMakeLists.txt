@@ -20,7 +20,7 @@ SET(libdmrconf_SOURCES
     uv390.cc uv390_codeplug.cc uv390_callsigndb.cc uv390_filereader.cc
     dm1701.cc dm1701_codeplug.cc dm1701_filereader.cc
     radioddity_radio.cc radioddity_codeplug.cc radioddity_extensions.cc radioddity_interface.cc
-    rd5r.cc rd5r_codeplug.cc rd5r_filereader.cc
+    rd5r.cc rd5r_codeplug.cc rd5r_filereader.cc rd5r_limits.cc
     gd77.cc gd77_codeplug.cc gd77_callsigndb.cc gd77_filereader.cc
     opengd77.cc opengd77_interface.cc opengd77_codeplug.cc opengd77_extension.cc opengd77_callsigndb.cc
     anytone_interface.cc anytone_radio.cc anytone_codeplug.cc anytone_extension.cc
@@ -39,7 +39,7 @@ SET(libdmrconf_MOC_HEADERS
     uv390.hh uv390_codeplug.hh uv390_callsigndb.hh
     dm1701.hh dm1701_codeplug.hh dm1701_filereader.hh
     radioddity_radio.hh radioddity_codeplug.hh radioddity_extensions.hh radioddity_interface.hh
-    rd5r.hh rd5r_codeplug.hh
+    rd5r.hh rd5r_codeplug.hh rd5r_limits.hh
     gd77.hh gd77_codeplug.hh gd77_callsigndb.hh
     opengd77.hh opengd77_interface.hh opengd77_codeplug.hh opengd77_extension.hh opengd77_callsigndb.hh
     anytone_interface.hh anytone_radio.hh anytone_codeplug.hh anytone_extension.hh
