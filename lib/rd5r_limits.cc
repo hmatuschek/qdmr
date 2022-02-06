@@ -1,6 +1,9 @@
 #include "rd5r_limits.hh"
 #include "radioid.hh"
 #include "channel.hh"
+#include "scanlist.hh"
+#include "zone.hh"
+
 
 RD5RLimits::RD5RLimits(QObject *parent)
   : RadioLimits(parent)
@@ -28,11 +31,11 @@ RD5RLimits::RD5RLimits(QObject *parent)
                   {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
                   {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
                   {"timeout", new RadioLimitUInt(0, 3825)},
-                  /// @todo Implement RadioLimitBool for rxOnly check.
-                  /// @todo Implement RadioLimitObjRef for scanlist reference.
+                  {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
                   {"vox", new RadioLimitUInt(0, 10)},
-                  // openGD77 channel extension
-                  // tyt channel extension
+                  /// @todo Implement RadioLimitBool for rxOnly check.
+                  {"openGD77", new RadioLimitIgnored(RadioLimitIgnored::Hint)},
+                  {"tyt", new RadioLimitIgnored(RadioLimitIgnored::Hint)}
                 } },
               { DigitalChannel::staticMetaObject,
                 new RadioLimitObject {
@@ -41,12 +44,11 @@ RD5RLimits::RD5RLimits(QObject *parent)
                   {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
                   {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
                   {"timeout", new RadioLimitUInt(0, 3825)},
-                  /// @todo Implement RadioLimitBool for rxOnly check.
-                  /// @todo Implement RadioLimitObjRef for scanlist reference.
+                  {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
                   {"vox", new RadioLimitUInt(0, 10)},
                   /// @todo Implement RadioLimitBool for rxOnly check.
-                  // openGD77 channel extension
-                  // tyt channel extension
+                  {"openGD77", new RadioLimitIgnored(RadioLimitIgnored::Hint)},
+                  {"tyt", new RadioLimitIgnored(RadioLimitIgnored::Hint)}
                 } }
             }) },
 
@@ -54,8 +56,10 @@ RD5RLimits::RD5RLimits(QObject *parent)
     { "zones",
       new RadioLimitList(
             1, 250, new RadioLimitObject{
-              { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII)}
-              /// @todo Implement RadioLimitRefList for zone A&B
+              { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
+              { "A", new RadioLimitRefList(1, 16, Channel::staticMetaObject) },
+              { "B", new RadioLimitRefList(1, 16, Channel::staticMetaObject) },
+              { "anytone", new RadioLimitIgnored(RadioLimitIgnored::Hint) }
             }) }
   };
 }

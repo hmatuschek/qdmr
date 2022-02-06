@@ -3,7 +3,26 @@
  * a tree of objects that hold the limitations like string length, number of elements in a list etc.
  * for the various settings of a radio including their extensions.
  *
- * This system will replace the static @c Radio::Features struct.
+ * This system will replace the static @c Radio::Features struct. The associated limits for each
+ * radio can be obtained using the @c Radio::limits method.
+ *
+ * Many classes in this module provide an initializer list constructor. This allows for an easy
+ * construction of radio limits programmatically like
+ * @code
+ * new RadioLimitItem {                       // < Describes an ConfigItem
+ *   { "radioIDs",                            // < with an 'radioIDs' property
+ *     new RadioLimitList(                    // < that is a list,
+ *       1, 10,                               //   of at least one but max 10 elements
+ *       new RadioLimitObject {               // < of objects, with
+ *        { "name",                           // < a name
+ *          new RadioLimitString(1, 16) },    //   being a string between 1 and 10 chars
+ *        { "id",                             // < and an ID
+ *          new RadioLimitUInt(0, 16777216) } //   being an unsigned integer between 0 and 16777216
+ *       }
+ *     )
+ *   }
+ * };
+ * @endcode
  *
  * @ingroup conf */
 #ifndef RADIOLIMITS_HH
@@ -68,6 +87,11 @@ public:
   /** Constructs a new message and puts it into the list of issues. */
   Message &newMessage(Message::Severity severity = Message::Hint);
 
+  /** Retunrs the number of issues. */
+  int count() const;
+  /** Returns the n-th issue. */
+  const Message &message(int n) const;
+
 protected:
   /** The current item stack. */
   QStringList _stack;
@@ -120,6 +144,8 @@ public:
 public:
   /** Constructor for a ignored setting verification element. */
   RadioLimitIgnored(Notification notify=Silent, QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
 protected:
   /** Holds the level of the notification. */
@@ -317,7 +343,7 @@ public:
    * for this type.
    *
    * A dispatch for Analog and DigitalChannel may look like
-   * @code[*.cpp]
+   * @code
    * new RadioLimitObjects{
    *   { AnalogChannel::staticMetaObject, new RadioLimitObject{
    *       // Limits for analog channel objects
@@ -335,6 +361,33 @@ public:
 protected:
   /** Maps class-names to object limits. */
   QHash<QString,  RadioLimitObject *> _types;
+};
+
+
+/** Limits the possible classes a @c ConfigObjectReference may refer to.
+ * @ingroup limits */
+class RadioLimitObjRef: public RadioLimitElement
+{
+  Q_OBJECT
+
+public:
+  /** Constructor.
+   * @param type Specifies the type that might be referenced.
+   * @param allowNull If @c true, the reference may be a nullptr.
+   * @param parent Specifies the QObject parent. */
+  RadioLimitObjRef(const QMetaObject &type, bool allowNull=true, QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+
+protected:
+  /** Checks if the given type is one of the valid ones in @c _types. */
+  bool validType(const QMetaObject *type) const;
+
+protected:
+  /** If @c true, a null reference is allowed. */
+  bool _allowNull;
+  /** Possible classes of instances, the reference may point to. */
+  QSet<QString> _types;
 };
 
 
@@ -360,10 +413,41 @@ protected:
   qint64 _minSize;
   /** Holds the maximum size of the list. */
   qint64 _maxSize;
-  /** Holds the limits for all objects of the list. */
+  /** Holds the limits of the elements. */
   RadioLimitObject *_element;
 };
 
+
+/** Implements the limits for reference lists.
+ * @ingroup limits */
+class RadioLimitRefList: public RadioLimitElement
+{
+  Q_OBJECT
+
+public:
+  /** Constructor.
+   * @param minSize Specifies the minimum size of the list. If -1, no check is performed.
+   * @param maxSize Specifies the maximum size of the list. If -1, no check is performed.
+   * @param type Specifies the type, the references must be instances of.
+   * @param parent  Specifies the QObject parent. */
+  RadioLimitRefList(int minSize, int maxSize, const QMetaObject &type, QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+
+protected:
+  /** Checks if the given type is one of the valid ones in @c _types. */
+  bool validType(const QMetaObject *type) const;
+
+protected:
+  /** Holds the minimum size of the list. */
+  qint64 _minSize;
+  /** Holds the maximum size of the list. */
+  qint64 _maxSize;
+  /** Holds the limits for all objects of the list. */
+  RadioLimitObject *_element;
+  /** Possible classes of instances, the references may point to. */
+  QSet<QString> _types;
+};
 
 /** Represents the limits or the entire codeplug.
  *
@@ -380,7 +464,7 @@ public:
   RadioLimits(const std::initializer_list<std::pair<QString,RadioLimitElement *> > &list, QObject *parent=nullptr);
 
   /** Verifies the given configuration. */
-  bool verifyConfig(const Config *config, RadioLimitContext &context);
+  bool verifyConfig(const Config *config, RadioLimitContext &context) const;
 };
 
 #endif // RADIOLIMITS_HH

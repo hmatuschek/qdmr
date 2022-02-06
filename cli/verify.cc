@@ -10,6 +10,7 @@
 #include "config.hh"
 #include "csvreader.hh"
 #include "dfufile.hh"
+#include "radiolimits.hh"
 #include "rd5r.hh"
 #include "uv390.hh"
 #include "md2017.hh"
@@ -71,6 +72,11 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
   QString radio = parser.value("radio").toLower();
   if ("rd5r" == radio) {
     RD5R radio; radio.verifyConfig(&config, issues);
+    RadioLimitContext ctx;
+    radio.limits().verifyConfig(&config, ctx);
+    for (int i=0; i<ctx.count(); i++) {
+      logDebug() << ctx.message(i).format();
+    }
   } else if (("uv390" == radio) || ("rt3s" == radio)) {
     UV390 radio; radio.verifyConfig(&config, issues);
   } else if (("md2017" == radio) || ("rt82" == radio)) {
@@ -100,7 +106,9 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     logInfo() << "Some issues found for code-plug '" << filename
               << "' with radio '" << radio << "'.";
     foreach (const VerifyIssue &issue, issues) {
-      if (VerifyIssue::WARNING == issue.type()) {
+      if (VerifyIssue::NOTIFICATION == issue.type()) {
+        logInfo() << issue.message();
+      } else if (VerifyIssue::WARNING == issue.type()) {
         logWarn() << issue.message();
       } else if (VerifyIssue::ERROR == issue.type()) {
         logError() << issue.message();
