@@ -161,6 +161,40 @@ RadioLimitUInt::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
 
 
 /* ********************************************************************************************* *
+ * Implementation of RadioLimitUInt
+ * ********************************************************************************************* */
+RadioLimitEnum::RadioLimitEnum(const std::initializer_list<unsigned> &values, QObject *parent)
+  : RadioLimitValue(parent), _values(values)
+{
+  // pass...
+}
+
+bool
+RadioLimitEnum::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
+  if (! prop.isEnumType()) {
+    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    msg << "Cannot check property " << prop.name() << ": Expected enum type.";
+    return false;
+  }
+
+  unsigned value = prop.read(item).toUInt();
+  if (! _values.contains(value)) {
+    QMetaEnum e = prop.enumerator();
+    QStringList possible;
+    foreach (unsigned val, _values)
+      possible.append(e.valueToKey(val));
+
+    auto &msg = context.newMessage(RadioLimitContext::Message::Warning);
+    msg << "The enum value '" << e.valueToKey(value) << "' cannot be encoded. "
+        << "Valid values are " << possible.join(", ") << ". "
+        << "Another value might be chosen automatically.";
+  }
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RadioLimitFrequencies::FrequencyRange
  * ********************************************************************************************* */
 RadioLimitFrequencies::FrequencyRange::FrequencyRange(double lower, double upper)

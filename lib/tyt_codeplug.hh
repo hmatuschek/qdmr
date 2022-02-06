@@ -14,7 +14,6 @@ class Zone;
 class RXGroupList;
 class ScanList;
 class GPSSystem;
-class CodeplugContext;
 
 
 /** Base class of all TyT codeplugs. This class implements the majority of all codeplug elements

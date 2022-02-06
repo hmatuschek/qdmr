@@ -25,13 +25,28 @@ RD5RLimits::RD5RLimits(QObject *parent)
                 new RadioLimitObject {
                   {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
                   {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
-                  {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})}
+                  {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
+                  {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
+                  {"timeout", new RadioLimitUInt(0, 3825)},
+                  /// @todo Implement RadioLimitBool for rxOnly check.
+                  /// @todo Implement RadioLimitObjRef for scanlist reference.
+                  {"vox", new RadioLimitUInt(0, 10)},
+                  // openGD77 channel extension
+                  // tyt channel extension
                 } },
               { DigitalChannel::staticMetaObject,
                 new RadioLimitObject {
                   {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
                   {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
-                  {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})}
+                  {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
+                  {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
+                  {"timeout", new RadioLimitUInt(0, 3825)},
+                  /// @todo Implement RadioLimitBool for rxOnly check.
+                  /// @todo Implement RadioLimitObjRef for scanlist reference.
+                  {"vox", new RadioLimitUInt(0, 10)},
+                  /// @todo Implement RadioLimitBool for rxOnly check.
+                  // openGD77 channel extension
+                  // tyt channel extension
                 } }
             }) },
 
@@ -40,7 +55,7 @@ RD5RLimits::RD5RLimits(QObject *parent)
       new RadioLimitList(
             1, 250, new RadioLimitObject{
               { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII)}
-              /// @todo Implement RadioLimitRefList
+              /// @todo Implement RadioLimitRefList for zone A&B
             }) }
   };
 }

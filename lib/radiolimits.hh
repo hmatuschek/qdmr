@@ -12,12 +12,14 @@
 #include <QObject>
 #include <QTextStream>
 #include <QMetaType>
+#include <QSet>
 
 // Forward declaration
 class Config;
 class ConfigItem;
 class ConfigObject;
 class RadioLimits;
+
 
 /** Collects the issues found during verification.
  * This class also tracks where the issues arise.
@@ -197,6 +199,24 @@ protected:
   qint64 _minValue;
   /** Holds the maximum value. If -1, the check is disabled. */
   qint64 _maxValue;
+};
+
+
+/** Represents a limit for a set of enum values.
+ * @ingroup limits */
+class RadioLimitEnum: public RadioLimitValue
+{
+  Q_OBJECT
+
+public:
+  /** Constructor from initializer list of possible enum values. */
+  RadioLimitEnum(const std::initializer_list<unsigned> &values, QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+
+protected:
+  /** Holds the set of valid values. */
+  QSet<unsigned> _values;
 };
 
 
