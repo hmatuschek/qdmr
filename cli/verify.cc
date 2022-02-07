@@ -73,9 +73,10 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
   if ("rd5r" == radio) {
     RD5R radio; radio.verifyConfig(&config, issues);
     RadioLimitContext ctx;
-    radio.limits().verifyConfig(&config, ctx);
+    if (! radio.limits().verifyConfig(&config, ctx))
+      logError() << "Cannot verify codeplug for radio:";
     for (int i=0; i<ctx.count(); i++) {
-      logDebug() << ctx.message(i).format();
+      logInfo() << ctx.message(i).format();
     }
   } else if (("uv390" == radio) || ("rt3s" == radio)) {
     UV390 radio; radio.verifyConfig(&config, issues);

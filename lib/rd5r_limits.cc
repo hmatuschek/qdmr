@@ -55,11 +55,11 @@ RD5RLimits::RD5RLimits(QObject *parent)
     /* Define limits for zone list. */
     { "zones",
       new RadioLimitList(
-            1, 250, new RadioLimitObject{
-              { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
-              { "A", new RadioLimitRefList(1, 16, Channel::staticMetaObject) },
-              { "B", new RadioLimitRefList(1, 16, Channel::staticMetaObject) },
-              { "anytone", new RadioLimitIgnored(RadioLimitIgnored::Hint) }
-            }) }
+            1, 250, new RadioLimitSingleZone(                                     // up to 250 zones
+              16, {                                                               // 16 channels per zone
+                { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) }, // 16 ASCII chars in name
+                { "anytone", new RadioLimitIgnored(RadioLimitIgnored::Hint) }     // ignore AnyTone extensions
+              })
+            ) }
   };
 }

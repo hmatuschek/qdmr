@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(qdmr VERSION 0.10.1)
+project(qdmr VERSION 0.10.2)
 
 set(RELEASE_SUFFIX "")
 

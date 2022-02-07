@@ -244,7 +244,7 @@ RadioLimitFrequencies::RadioLimitFrequencies(QObject *parent)
   // pass...
 }
 
-RadioLimitFrequencies::RadioLimitFrequencies(const std::initializer_list<std::pair<double, double> > &ranges, QObject *parent)
+RadioLimitFrequencies::RadioLimitFrequencies(const RangeList &ranges, QObject *parent)
   : RadioLimitValue(parent), _frequencyRanges()
 {
   for (auto range=ranges.begin(); range!=ranges.end(); range++)
@@ -281,7 +281,7 @@ RadioLimitItem::RadioLimitItem(QObject *parent)
   // pass...
 }
 
-RadioLimitItem::RadioLimitItem(const std::initializer_list<std::pair<QString, RadioLimitElement *> > &list, QObject *parent)
+RadioLimitItem::RadioLimitItem(const PropList &list, QObject *parent)
   : RadioLimitElement(parent), _elements(list)
 {
   for (QHash<QString,RadioLimitElement*>::iterator item=_elements.begin(); item != _elements.end(); item++) {
@@ -338,7 +338,7 @@ RadioLimitObject::RadioLimitObject(QObject *parent)
   // pass...
 }
 
-RadioLimitObject::RadioLimitObject(const std::initializer_list<std::pair<QString, RadioLimitElement *> > &list, QObject *parent)
+RadioLimitObject::RadioLimitObject(const PropList &list, QObject *parent)
   : RadioLimitItem(list, parent)
 {
   // pass...
@@ -353,7 +353,7 @@ RadioLimitObject::verifyObject(const ConfigObject *item, RadioLimitContext &cont
 /* ********************************************************************************************* *
  * Implementation of RadioLimitObjects
  * ********************************************************************************************* */
-RadioLimitObjects::RadioLimitObjects(const std::initializer_list<std::pair<const QMetaObject &, RadioLimitObject *> > &list, QObject *parent)
+RadioLimitObjects::RadioLimitObjects(const TypeList &list, QObject *parent)
   : RadioLimitObject(parent), _types()
 {
   for (auto type=list.begin(); type!=list.end(); type++) {
@@ -463,7 +463,7 @@ RadioLimitList::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
       return false;
   }
 
-  return false;
+  return true;
 }
 
 
@@ -524,6 +524,33 @@ RadioLimitRefList::validType(const QMetaObject *type) const {
   if (type->superClass())
     return validType(type->superClass());
   return false;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioLimitSingleZone
+ * ********************************************************************************************* */
+RadioLimitSingleZone::RadioLimitSingleZone(qint64 maxSize, const PropList &list, QObject *parent)
+  : RadioLimitObject(list, parent)
+{
+  // A and B may hold up to maxSize references to channels
+  _elements["A"] = new RadioLimitRefList(1, maxSize, Channel::staticMetaObject, this);
+  _elements["B"] = new RadioLimitRefList(1, maxSize, Channel::staticMetaObject, this);
+}
+
+bool
+RadioLimitSingleZone::verifyItem(const ConfigItem *item, RadioLimitContext &context) const {
+  if (! RadioLimitObject::verifyItem(item, context))
+    return false;
+
+  const Zone *zone = item->as<Zone>();
+  if (zone && zone->B()->count()) {
+    auto &msg = context.newMessage();
+    msg << "This radio does not support dual channel zones. The zone '" << zone->name()
+        << "' will be split into two.";
+  }
+
+  return true;
 }
 
 

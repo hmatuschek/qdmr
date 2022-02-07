@@ -107,6 +107,10 @@ class RadioLimitElement: public QObject
 {
   Q_OBJECT
 
+public:
+  /** Initializer lists of ConfigItem properties. */
+  typedef std::initializer_list< std::pair<QString, RadioLimitElement *> > PropList;
+
 protected:
   /** Hidden constructor. */
   explicit RadioLimitElement(QObject *parent=nullptr);
@@ -253,6 +257,9 @@ class RadioLimitFrequencies: public RadioLimitValue
   Q_OBJECT
 
 public:
+  /** Typedef for the initializer list. */
+  typedef std::initializer_list<std::pair<double, double>> RangeList;
+public:
   /** Represents a single frequency range. */
   struct FrequencyRange {
     double min; ///< Lower frequency limit.
@@ -269,7 +276,7 @@ public:
   /** Empty constructor. */
   explicit RadioLimitFrequencies(QObject *parent=nullptr);
   /** Constructor from initializer list. */
-  RadioLimitFrequencies(const std::initializer_list<std::pair<double, double>> &ranges, QObject *parent=nullptr);
+  RadioLimitFrequencies(const RangeList &ranges, QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
@@ -294,7 +301,7 @@ public:
   explicit RadioLimitItem(QObject *parent=nullptr);
   /** Constructor from initializer list.
    * The ownership of all passed elements are taken. */
-  RadioLimitItem(const std::initializer_list<std::pair<QString, RadioLimitElement *> > &list, QObject *parent=nullptr);
+  RadioLimitItem(const PropList &list, QObject *parent=nullptr);
 
   virtual bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
   /** Verifies the properties of the given item. */
@@ -317,7 +324,7 @@ public:
   explicit RadioLimitObject(QObject *parent=nullptr);
   /** Constructor from initializer list.
    * The ownership of all passed elements are taken. */
-  RadioLimitObject(const std::initializer_list<std::pair<QString,RadioLimitElement *> > &list, QObject *parent=nullptr);
+  RadioLimitObject(const PropList &list, QObject *parent=nullptr);
 
   /** Verifies the properties of the given object. */
   virtual bool verifyObject(const ConfigObject *item, RadioLimitContext &context) const;
@@ -334,6 +341,10 @@ public:
 class RadioLimitObjects: public RadioLimitObject
 {
   Q_OBJECT
+
+public:
+  /** Initializer lists of type properties. */
+  typedef std::initializer_list<std::pair<const QMetaObject&, RadioLimitObject *> > TypeList;
 
 public:
   /** Constructor from initializer list.
@@ -354,7 +365,7 @@ public:
    * };
    * @endcode
    */
-  RadioLimitObjects(const std::initializer_list<std::pair<const QMetaObject&, RadioLimitObject *> > &list, QObject *parent=nullptr);
+  RadioLimitObjects(const TypeList &list, QObject *parent=nullptr);
 
   bool verifyItem(const ConfigItem *item, RadioLimitContext &context) const;
 
@@ -448,6 +459,29 @@ protected:
   /** Possible classes of instances, the references may point to. */
   QSet<QString> _types;
 };
+
+
+/** Specialized RadioLimitObject handling a zone for radio supporting only a single channel list
+ * per zone.
+ *
+ * Checks if a zone contains two sets of channel lists and notifies the user that the zone gets
+ * split.
+ *
+ * @ingroup limits */
+class RadioLimitSingleZone: public RadioLimitObject
+{
+  Q_OBJECT
+
+public:
+  /** Constructor.
+   * @param maxSize Specifies the maximum size of the zone. If -1, no check is performed.
+   * @param list Initializer list for further zone properties.
+   * @param parent Specifies the QObject parent. */
+  RadioLimitSingleZone(qint64 maxSize, const PropList &list, QObject *parent=nullptr);
+
+  bool verifyItem(const ConfigItem *item, RadioLimitContext &context) const;
+};
+
 
 /** Represents the limits or the entire codeplug.
  *
