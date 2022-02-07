@@ -65,8 +65,22 @@ class Config : public ConfigItem
 {
 	Q_OBJECT
 
+  /** The global radio settings. */
+  Q_PROPERTY(RadioSettings* settings READ settings SCRIPTABLE false)
   /** The list of radio IDs. */
   Q_PROPERTY(RadioIDList* radioIDs READ radioIDs SCRIPTABLE false)
+  /** The list of contacts. */
+  Q_PROPERTY(ContactList* contacts READ contacts SCRIPTABLE false)
+  /** The list of group lists. */
+  Q_PROPERTY(RXGroupLists* groupLists READ rxGroupLists SCRIPTABLE false)
+  /** The list of channels. */
+  Q_PROPERTY(ChannelList* channels READ channelList SCRIPTABLE false)
+  /** The list of zones. */
+  Q_PROPERTY(ZoneList* zones READ zones SCRIPTABLE false)
+  /** The list of positioning systems. */
+  Q_PROPERTY(PositioningSystems* positioning READ posSystems SCRIPTABLE false)
+  /** The list of roaming zones. */
+  Q_PROPERTY(RoamingZoneList* roaming READ roaming SCRIPTABLE false)
 
   /** Represents the config extension for TyT devices. */
   Q_PROPERTY(TyTConfigExtension* tytExtension READ tytExtension WRITE setTyTExtension)

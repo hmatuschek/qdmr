@@ -37,7 +37,7 @@ RadioLimitContext::Message::format() const {
   case Warning: stream << "Warn: "; break;
   case Critical: stream << "Crit: "; break;
   }
-  stream << " In " << _stack.join(", ") << ": " << _message;
+  stream << "In " << _stack.join(", ") << ": " << _message;
   stream.flush();
   return res;
 }
@@ -66,6 +66,16 @@ RadioLimitContext::count() const {
 const RadioLimitContext::Message &
 RadioLimitContext::message(int n) const {
   return _messages.at(n);
+}
+
+void
+RadioLimitContext::push(const QString &element) {
+  _stack.append(element);
+}
+
+void
+RadioLimitContext::pop() {
+  _stack.pop_back();
 }
 
 
@@ -135,12 +145,14 @@ RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
 
   if ((0<_maxLen) && (value.size() > int(_maxLen))) {
     auto &msg = context.newMessage();
-    msg << "String length of " << prop.name() << " exceeds maximum length " << _maxLen << ".";
+    msg << "String length of " << prop.name() << " (" << value.size()
+        << ") exceeds maximum length " << _maxLen << ".";
   }
 
   if ((0<_minLen) && (value.size() < int(_minLen))) {
     auto &msg = context.newMessage();
-    msg << "String length of " << prop.name() << " is shorter than " << _minLen << ".";
+    msg << "String length of " << prop.name() << " (" << value.size()
+        << ") is shorter than minimum size " << _minLen << ".";
   }
 
   return true;
@@ -306,7 +318,10 @@ RadioLimitItem::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
   if (prop.read(item).isNull())
     return true;
 
-  return verifyItem(prop.read(item).value<ConfigItem*>(), context);
+  context.push(prop.name());
+  bool success = verifyItem(prop.read(item).value<ConfigItem*>(), context);
+  context.pop();
+  return success;
 }
 
 bool
@@ -458,10 +473,18 @@ RadioLimitList::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
         << " elements, " << plist->count() << " elements found.";
     return false;
   }
+
+  context.push(prop.name());
   for (int i=0; i<plist->count(); i++) {
-    if (! _element->verifyObject(plist->get(i), context))
+    context.push(QString("element %1").arg(i));
+    if (! _element->verifyObject(plist->get(i), context)) {
+      context.pop();
+      context.pop();
       return false;
+    }
+    context.pop();
   }
+  context.pop();
 
   return true;
 }
@@ -484,7 +507,7 @@ RadioLimitRefList::verify(const ConfigItem *item, const QMetaProperty &prop, Rad
     return false;
   }
 
-  if (nullptr == prop.read(this).value<ConfigObjectRefList *>()) {
+  if (nullptr == prop.read(item).value<ConfigObjectRefList *>()) {
     auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
     msg << "Cannot check property " << prop.name() << ": Not an instance of ConfigObjectRefList.";
     return false;

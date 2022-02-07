@@ -92,6 +92,9 @@ public:
   /** Returns the n-th issue. */
   const Message &message(int n) const;
 
+  void push(const QString &element);
+  void pop();
+
 protected:
   /** The current item stack. */
   QStringList _stack;
