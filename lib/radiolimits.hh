@@ -40,6 +40,44 @@ class ConfigObject;
 class RadioLimits;
 
 
+/** Represents a single issue found during verification.
+ * @ingroup limits */
+class RadioLimitIssue: public QTextStream
+{
+public:
+  /** Defines the possible severity levels. */
+  enum Severity {
+    Silent,  ///< The user will not be notified.
+    Hint,    ///< Just a hint, a working codplug will be assembled.
+    Warning, ///< The codeplug gets changed but a working codeplug might be assembled.
+    Critical ///< Assembly of the codeplug will fail or a non-functional codeplug might be created.
+  };
+
+public:
+  /** Constructs an empty message for the specified severity at the specified point of the
+   * verification. */
+  RadioLimitIssue(Severity severity, const QStringList &stack);
+  /** Copy constructor. */
+  RadioLimitIssue(const RadioLimitIssue &other);
+
+  /** Copy assignment. */
+  RadioLimitIssue &operator =(const RadioLimitIssue &other);
+
+  /** Returns the severity of the issue. */
+  Severity severity() const;
+  /** Formats the message. */
+  QString format() const;
+
+protected:
+  /** Holds the severity of the issue. */
+  Severity _severity;
+  /** Holds the item-stack (where the issue occured). */
+  QStringList _stack;
+  /** Holds the text message. */
+  QString _message;
+};
+
+
 /** Collects the issues found during verification.
  * This class also tracks where the issues arise.
  *
@@ -47,59 +85,28 @@ class RadioLimits;
 class RadioLimitContext
 {
 public:
-  /** Represents a single issue found during verification. */
-  class Message: public QTextStream
-  {
-  public:
-    /** Defines the possible severity levels. */
-    enum Severity {
-      Hint,    ///< Just a hint, a working codplug will be assembled.
-      Warning, ///< The codeplug gets changed but a working codeplug might be assembled.
-      Critical ///< Assembly of the codeplug will fail or a non-functional codeplug might be created.
-    };
-
-  public:
-    /** Constructs an empty message for the specified severity at the specified point of the
-     * verification. */
-    Message(Severity severity, const QStringList &stack);
-    /** Copy constructor. */
-    Message(const Message &other);
-
-    /** Copy assignment. */
-    Message &operator =(const Message &other);
-
-    /** Formats the message. */
-    QString format() const;
-
-  protected:
-    /** Holds the severity of the issue. */
-    Severity _severity;
-    /** Holds the item-stack (where the issue occured). */
-    QStringList _stack;
-    /** Holds the text message. */
-    QString _message;
-  };
-
-public:
   /** Empty constructor. */
   explicit RadioLimitContext();
 
   /** Constructs a new message and puts it into the list of issues. */
-  Message &newMessage(Message::Severity severity = Message::Hint);
+  RadioLimitIssue &newMessage(RadioLimitIssue::Severity severity = RadioLimitIssue::Hint);
 
   /** Retunrs the number of issues. */
   int count() const;
   /** Returns the n-th issue. */
-  const Message &message(int n) const;
+  const RadioLimitIssue &message(int n) const;
 
+  /** Push a property name/element index onto the stack.
+   * This method is used to track the origin of an issue. */
   void push(const QString &element);
+  /** Pops the top-most property name/element index from the stack. */
   void pop();
 
 protected:
   /** The current item stack. */
   QStringList _stack;
   /** The list of issues found. */
-  QList<Message> _messages;
+  QList<RadioLimitIssue> _messages;
 };
 
 
@@ -126,37 +133,6 @@ public:
 public:
   /** Destructor. */
   virtual ~RadioLimitElement();
-};
-
-
-/** Represents an ignored element in the codeplug.
- *
- * Instances of this class might be used to inform the user about a configured feature not present
- * in the particular radio.
- *
- * @ingroup limits */
-class RadioLimitIgnored: public RadioLimitElement
-{
-  Q_OBJECT
-
-public:
-  /** Possible notification levels. */
-  enum Notification {
-    Silent,    ///< The user will not be notified.
-    Hint,      ///< The user receives a hint.
-    Warning,   ///< The user receives a warning.
-    Error      ///< A codeplug cannot be assembled.
-  };
-
-public:
-  /** Constructor for a ignored setting verification element. */
-  RadioLimitIgnored(Notification notify=Silent, QObject *parent=nullptr);
-
-  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
-
-protected:
-  /** Holds the level of the notification. */
-  Notification _notification;
 };
 
 
@@ -211,8 +187,62 @@ protected:
 };
 
 
+/** Verifies that a string matches a regular expression.
+ * @ingroup limits */
+class RadioLimitStringRegEx: public RadioLimitValue
+{
+  Q_OBJECT
+
+public:
+  /** Constructor.
+   * @param pattern Specifies the regular expression pattern, the string must match.
+   * @param parent Specifies the QObject parent. */
+  RadioLimitStringRegEx(const QString &pattern, QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+
+protected:
+  /** Holds the regular expression pattern. */
+  QRegExp _pattern;
+};
+
+
+/** Checks if a property is a boolean value.
+ * @ingroup limits */
+class RadioLimitBool: public RadioLimitValue
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit RadioLimitBool(QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+};
+
+
+/** Specifies an boolean value as ignored.
+ * If the boolean value is @c true, a message is generated indicating that this property is ignored.
+ * If the value is @c false, nothing happens. */
+class RadioLimitIgnoredBool: public RadioLimitBool
+{
+  Q_OBJECT
+
+public:
+  /** Constructor.
+   * @param notify Specifies the severity of the generated message. */
+  explicit RadioLimitIgnoredBool(RadioLimitIssue::Severity notify=RadioLimitIssue::Hint,
+                                 QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+
+protected:
+  /** The severity of the issue generated. */
+  RadioLimitIssue::Severity _severity;
+};
+
+
 /** Represents a limit for an unsigned integer value.
- *
  * @ingroup limits */
 class RadioLimitUInt: public RadioLimitValue
 {
@@ -222,8 +252,9 @@ public:
   /** Constructor.
    * @param minValue Specifies the minimum value. If -1, no check is performed.
    * @param maxValue Specifies the maximum value. If -1, no check is performed.
+   * @param defValue Specifies the default value. If -1, no default value is set.
    * @param parent Specifies the QObject parent. */
-  RadioLimitUInt(qint64 minValue=-1, qint64 maxValue=-1, QObject *parent=nullptr);
+  RadioLimitUInt(qint64 minValue=-1, qint64 maxValue=-1, qint64 defValue=-1, QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
@@ -232,6 +263,8 @@ protected:
   qint64 _minValue;
   /** Holds the maximum value. If -1, the check is disabled. */
   qint64 _maxValue;
+  /** Holds the default value. If -1, no default value is set. */
+  qint64 _defValue;
 };
 
 
@@ -331,6 +364,28 @@ public:
 
   /** Verifies the properties of the given object. */
   virtual bool verifyObject(const ConfigObject *item, RadioLimitContext &context) const;
+};
+
+
+/** Represents an ignored element in the codeplug.
+ *
+ * Instances of this class might be used to inform the user about a configured feature not present
+ * in the particular radio.
+ *
+ * @ingroup limits */
+class RadioLimitIgnored: public RadioLimitObject
+{
+  Q_OBJECT
+
+public:
+  /** Constructor for a ignored setting verification element. */
+  RadioLimitIgnored(RadioLimitIssue::Severity notify=RadioLimitIssue::Hint, QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+
+protected:
+  /** Holds the level of the notification. */
+  RadioLimitIssue::Severity _notification;
 };
 
 

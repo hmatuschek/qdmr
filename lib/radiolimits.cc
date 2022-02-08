@@ -4,24 +4,33 @@
 #include "config.hh"
 #include <QMetaProperty>
 
+// Utility function to check string content for ASCII encoding
+inline bool isascii(const QString &text) {
+  foreach (QChar c, text) {
+    if ((c<0x1f) && (0x7f != c))
+      return false;
+  }
+  return true;
+}
+
 
 /* ********************************************************************************************* *
- * Implementation of RadioLimitContext::Message
+ * Implementation of RadioLimitIssue
  * ********************************************************************************************* */
-RadioLimitContext::Message::Message(Severity severity, const QStringList &stack)
+RadioLimitIssue::RadioLimitIssue(Severity severity, const QStringList &stack)
   : QTextStream(), _severity(severity), _stack(stack), _message()
 {
   setString(&_message);
 }
 
-RadioLimitContext::Message::Message(const Message &other)
+RadioLimitIssue::RadioLimitIssue(const RadioLimitIssue &other)
   : QTextStream(), _severity(other._severity), _stack(other._stack), _message(other._message)
 {
   setString(&_message);
 }
 
-RadioLimitContext::Message &
-RadioLimitContext::Message::operator =(const Message &other) {
+RadioLimitIssue &
+RadioLimitIssue::operator =(const RadioLimitIssue &other) {
   QTextStream::flush();
   _severity = other._severity;
   _stack = other._stack;
@@ -29,10 +38,16 @@ RadioLimitContext::Message::operator =(const Message &other) {
   return *this;
 }
 
+RadioLimitIssue::Severity
+RadioLimitIssue::severity() const {
+  return _severity;
+}
+
 QString
-RadioLimitContext::Message::format() const {
+RadioLimitIssue::format() const {
   QString res; QTextStream stream(&res);
   switch (_severity) {
+  case Silent: stream << "Silent: "; break;
   case Hint: stream << "Hint: "; break;
   case Warning: stream << "Warn: "; break;
   case Critical: stream << "Crit: "; break;
@@ -52,9 +67,9 @@ RadioLimitContext::RadioLimitContext()
   // pass...
 }
 
-RadioLimitContext::Message &
-RadioLimitContext::newMessage(Message::Severity severity) {
-  _messages.push_back(Message(severity, _stack));
+RadioLimitIssue &
+RadioLimitContext::newMessage(RadioLimitIssue::Severity severity) {
+  _messages.push_back(RadioLimitIssue(severity, _stack));
   return _messages.back();
 }
 
@@ -63,7 +78,7 @@ RadioLimitContext::count() const {
   return _messages.count();
 }
 
-const RadioLimitContext::Message &
+const RadioLimitIssue &
 RadioLimitContext::message(int n) const {
   return _messages.at(n);
 }
@@ -96,8 +111,8 @@ RadioLimitElement::~RadioLimitElement() {
 /* ********************************************************************************************* *
  * Implementation of RadioLimitIgnored
  * ********************************************************************************************* */
-RadioLimitIgnored::RadioLimitIgnored(Notification notify, QObject *parent)
-  : RadioLimitElement(parent), _notification(notify)
+RadioLimitIgnored::RadioLimitIgnored(RadioLimitIssue::Severity notify, QObject *parent)
+  : RadioLimitObject(parent), _notification(notify)
 {
   // pass...
 }
@@ -105,9 +120,9 @@ RadioLimitIgnored::RadioLimitIgnored(Notification notify, QObject *parent)
 bool
 RadioLimitIgnored::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
   ConfigObject *obj = prop.read(item).value<ConfigObject *>();
-  if ((nullptr != obj) && (Silent != _notification)) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Hint);
-    msg << "Ignore property '" << prop.name() << "'. Not applicable.";
+  if (nullptr != obj) {
+    auto &msg = context.newMessage(_notification);
+    msg << "Ignore property '" << prop.name() << "'. Not applicable/supported by radio.";
   }
 
   return true;
@@ -136,7 +151,7 @@ RadioLimitString::RadioLimitString(int minLen, int maxLen, Encoding enc, QObject
 bool
 RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
   if (QVariant::String != prop.type()) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected string.";
     return false;
   }
@@ -145,14 +160,97 @@ RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
 
   if ((0<_maxLen) && (value.size() > int(_maxLen))) {
     auto &msg = context.newMessage();
-    msg << "String length of " << prop.name() << " (" << value.size()
+    msg << "String length of " << prop.name() << " ('" << value << "', " << value.size()
         << ") exceeds maximum length " << _maxLen << ".";
   }
 
   if ((0<_minLen) && (value.size() < int(_minLen))) {
     auto &msg = context.newMessage();
-    msg << "String length of " << prop.name() << " (" << value.size()
+    msg << "String length of " << prop.name() << " ('" << value << "', " << value.size()
         << ") is shorter than minimum size " << _minLen << ".";
+  }
+
+  if ((ASCII == _encoding) && (! isascii(value))) {
+    auto &msg = context.newMessage();
+    msg << "Cannot encode string '" << value << "' in ASCII.";
+  }
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioLimitStringRegEx
+ * ********************************************************************************************* */
+RadioLimitStringRegEx::RadioLimitStringRegEx(const QString &pattern, QObject *parent)
+  : RadioLimitValue(parent), _pattern(pattern)
+{
+  // pass...
+}
+
+bool
+RadioLimitStringRegEx::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
+  if (QVariant::String != prop.type()) {
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
+    msg << "Cannot check property " << prop.name() << ": Expected string.";
+    return false;
+  }
+
+  QString value = prop.read(item).toString();
+  if (! _pattern.exactMatch(value)) {
+    auto &msg = context.newMessage(RadioLimitIssue::Warning);
+    msg << "Value '" << value << "' of property " << prop.name()
+        << " does not match pattern '" << _pattern.pattern() << "'.";
+  }
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioLimitBool
+ * ********************************************************************************************* */
+RadioLimitBool::RadioLimitBool(QObject *parent)
+  : RadioLimitValue(parent)
+{
+  // pass...
+}
+
+bool
+RadioLimitBool::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
+  Q_UNUSED(item)
+
+  if (QVariant::Bool != prop.type()) {
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
+    msg << "Cannot check property " << prop.name() << ": Expected bool.";
+    return false;
+  }
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioLimitIgnoredBool
+ * ********************************************************************************************* */
+RadioLimitIgnoredBool::RadioLimitIgnoredBool(RadioLimitIssue::Severity notify, QObject *parent)
+  : RadioLimitBool(parent), _severity(notify)
+{
+  // pass...
+}
+
+bool
+RadioLimitIgnoredBool::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
+  if (QVariant::Bool != prop.type()) {
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
+    msg << "Cannot check property " << prop.name() << ": Expected bool.";
+    return false;
+  }
+
+  bool value = prop.read(item).toBool();
+  if (value) {
+    auto &msg = context.newMessage(_severity);
+    msg << "Setting " << prop.name() << " is ignored.";
   }
 
   return true;
@@ -162,8 +260,8 @@ RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
 /* ********************************************************************************************* *
  * Implementation of RadioLimitUInt
  * ********************************************************************************************* */
-RadioLimitUInt::RadioLimitUInt(qint64 minValue, qint64 maxValue, QObject *parent)
-  : RadioLimitValue(parent), _minValue(minValue), _maxValue(maxValue)
+RadioLimitUInt::RadioLimitUInt(qint64 minValue, qint64 maxValue, qint64 defValue, QObject *parent)
+  : RadioLimitValue(parent), _minValue(minValue), _maxValue(maxValue), _defValue(defValue)
 {
   // pass...
 }
@@ -171,19 +269,19 @@ RadioLimitUInt::RadioLimitUInt(qint64 minValue, qint64 maxValue, QObject *parent
 bool
 RadioLimitUInt::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
   if (QVariant::UInt != prop.type()) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected uint.";
     return false;
   }
 
   unsigned value = prop.read(item).toUInt();
 
-  if ((0<_maxValue) && (value > qint64(_maxValue))) {
+  if ((0<_maxValue) && (value > qint64(_maxValue)) && ((0>_defValue) || (value!=_defValue))) {
     auto &msg = context.newMessage();
     msg << "Value " << value << " of " << prop.name() << " exceeds maximum " << _maxValue << ".";
   }
 
-  if ((0<_minValue) && (value < qint64(_minValue))) {
+  if ((0<_minValue) && (value < qint64(_minValue)) && ((0>_defValue) || (value!=_defValue))) {
     auto &msg = context.newMessage();
     msg << "Value " << value << " of " << prop.name() << " is smaller than minimum " << _minValue << ".";
   }
@@ -204,7 +302,7 @@ RadioLimitEnum::RadioLimitEnum(const std::initializer_list<unsigned> &values, QO
 bool
 RadioLimitEnum::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
   if (! prop.isEnumType()) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected enum type.";
     return false;
   }
@@ -216,7 +314,7 @@ RadioLimitEnum::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
     foreach (unsigned val, _values)
       possible.append(e.valueToKey(val));
 
-    auto &msg = context.newMessage(RadioLimitContext::Message::Warning);
+    auto &msg = context.newMessage(RadioLimitIssue::Warning);
     msg << "The enum value '" << e.valueToKey(value) << "' cannot be encoded. "
         << "Valid values are " << possible.join(", ") << ". "
         << "Another value might be chosen automatically.";
@@ -266,7 +364,7 @@ RadioLimitFrequencies::RadioLimitFrequencies(const RangeList &ranges, QObject *p
 bool
 RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
   if (QVariant::Double != prop.type()) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected frequency in MHz.";
     return false;
   }
@@ -278,7 +376,7 @@ RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop,
       return true;
   }
 
-  RadioLimitContext::Message &msg = context.newMessage(RadioLimitContext::Message::Warning);
+  auto &msg = context.newMessage(RadioLimitIssue::Warning);
   msg << "Frequency " << value << "MHz is outside of allowed frequency ranges.";
   return true;
 }
@@ -304,13 +402,13 @@ RadioLimitItem::RadioLimitItem(const PropList &list, QObject *parent)
 bool
 RadioLimitItem::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
   if (! prop.isReadable()) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Not readable.";
     return false;
   }
 
   if (! propIsInstance<ConfigItem>(prop)) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Not an instance of ConfigItem.";
     return false;
   }
@@ -318,7 +416,7 @@ RadioLimitItem::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
   if (prop.read(item).isNull())
     return true;
 
-  context.push(prop.name());
+  context.push(QString("Property '%1'").arg(prop.name()));
   bool success = verifyItem(prop.read(item).value<ConfigItem*>(), context);
   context.pop();
   return success;
@@ -361,7 +459,10 @@ RadioLimitObject::RadioLimitObject(const PropList &list, QObject *parent)
 
 bool
 RadioLimitObject::verifyObject(const ConfigObject *item, RadioLimitContext &context) const {
-  return verifyItem(item, context);
+  context.push(QString("Object '%1'").arg(item->name()));
+  bool success = verifyItem(item, context);
+  context.pop();
+  return success;
 }
 
 
@@ -380,7 +481,7 @@ RadioLimitObjects::RadioLimitObjects(const TypeList &list, QObject *parent)
 bool
 RadioLimitObjects::verifyItem(const ConfigItem *item, RadioLimitContext &context) const {
   if (! _types.contains(item->metaObject()->className())) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check item of type " << item->metaObject()->className()
         << ". Unexpected type. Expected one of " << QStringList(_types.keys()).join(", ") << ".";
     return false;
@@ -403,7 +504,7 @@ RadioLimitObjRef::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
   ConfigObjectReference *ref = prop.read(item).value<ConfigObjectReference *>();
 
   if (nullptr == ref) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check type of property '" << prop.name() << "'. Exprected ConfigObjectReference.";
     return false;
   }
@@ -411,14 +512,16 @@ RadioLimitObjRef::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
   if (ref->isNull()) {
     if (_allowNull)
       return true;
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+
+    auto &msg = context.newMessage(RadioLimitIssue::Warning);
     msg << "Property '" << prop.name() << "' must refer to an instances of "
         << QStringList::fromSet(_types).join(", ") << ".";
-    return false;
+
+    return true;
   }
 
   if (! validType(ref->as<ConfigObject>()->metaObject())) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Property '" << prop.name() << "' must refer to an instances of "
         << QStringList::fromSet(_types).join(", ") << ".";
     return false;
@@ -449,34 +552,34 @@ RadioLimitList::RadioLimitList(int minSize, int maxSize, RadioLimitObject *eleme
 bool
 RadioLimitList::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
   if (! prop.isReadable()) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Not readable.";
     return false;
   }
 
   if (nullptr == prop.read(item).value<ConfigObjectList *>()) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Not an instance of ConfigObjectList.";
     return false;
   }
 
   const ConfigObjectList *plist = prop.read(item).value<ConfigObjectList*>();
   if ((0 <= _minSize) && (_minSize > plist->count())) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "List '" << prop.name() << "' requires at least " << _minSize
         << " elements, " << plist->count() << " elements found.";
     return false;
   }
   if ((0 <= _maxSize) && (_maxSize < plist->count())) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Warning);
+    auto &msg = context.newMessage(RadioLimitIssue::Warning);
     msg << "List '" << prop.name() << "' takes at most " << _minSize
         << " elements, " << plist->count() << " elements found.";
     return false;
   }
 
-  context.push(prop.name());
+  context.push(QString("List '%1'").arg(prop.name()));
   for (int i=0; i<plist->count(); i++) {
-    context.push(QString("element %1").arg(i));
+    context.push(QString("Element %1").arg(i));
     if (! _element->verifyObject(plist->get(i), context)) {
       context.pop();
       context.pop();
@@ -502,27 +605,27 @@ RadioLimitRefList::RadioLimitRefList(int minSize, int maxSize, const QMetaObject
 bool
 RadioLimitRefList::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
   if (! prop.isReadable()) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Not readable.";
     return false;
   }
 
   if (nullptr == prop.read(item).value<ConfigObjectRefList *>()) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Not an instance of ConfigObjectRefList.";
     return false;
   }
 
   const ConfigObjectRefList *plist = prop.read(item).value<ConfigObjectRefList*>();
   if ((0 <= _minSize) && (_minSize > plist->count())) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "List '" << prop.name() << "' requires at least " << _minSize
         << " elements, " << plist->count() << " elements found.";
     return false;
   }
 
   if ((0 <= _maxSize) && (_maxSize < plist->count())) {
-    auto &msg = context.newMessage(RadioLimitContext::Message::Warning);
+    auto &msg = context.newMessage(RadioLimitIssue::Warning);
     msg << "List '" << prop.name() << "' takes at most " << _minSize
         << " elements, " << plist->count() << " elements found.";
     return false;
@@ -530,7 +633,7 @@ RadioLimitRefList::verify(const ConfigItem *item, const QMetaProperty &prop, Rad
 
   for (int i=0; i<plist->count(); i++) {
     if (! validType(plist->get(i)->metaObject())) {
-      auto &msg = context.newMessage(RadioLimitContext::Message::Critical);
+      auto &msg = context.newMessage(RadioLimitIssue::Critical);
       msg << "Reference to " << plist->get(i)->metaObject()->className() << " is not allowed here. "
           << "Must be one of " << QStringList::fromSet(_types).join(", ") << ".";
       return false;
@@ -558,7 +661,7 @@ RadioLimitSingleZone::RadioLimitSingleZone(qint64 maxSize, const PropList &list,
 {
   // A and B may hold up to maxSize references to channels
   _elements["A"] = new RadioLimitRefList(1, maxSize, Channel::staticMetaObject, this);
-  _elements["B"] = new RadioLimitRefList(1, maxSize, Channel::staticMetaObject, this);
+  _elements["B"] = new RadioLimitRefList(0, maxSize, Channel::staticMetaObject, this);
 }
 
 bool

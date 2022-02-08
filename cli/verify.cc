@@ -69,15 +69,11 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
   }
 
   QList<VerifyIssue> issues;
+  RadioLimitContext ctx;
   QString radio = parser.value("radio").toLower();
   if ("rd5r" == radio) {
     RD5R radio; radio.verifyConfig(&config, issues);
-    RadioLimitContext ctx;
-    if (! radio.limits().verifyConfig(&config, ctx))
-      logError() << "Cannot verify codeplug for radio:";
-    for (int i=0; i<ctx.count(); i++) {
-      logInfo() << ctx.message(i).format();
-    }
+    radio.limits().verifyConfig(&config, ctx);
   } else if (("uv390" == radio) || ("rt3s" == radio)) {
     UV390 radio; radio.verifyConfig(&config, issues);
   } else if (("md2017" == radio) || ("rt82" == radio)) {
@@ -115,6 +111,15 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
         logError() << issue.message();
         valid = false;
       }
+    }
+  }
+
+  for (int i=0; i<ctx.count(); i++) {
+    switch (ctx.message(i).severity()) {
+    case RadioLimitIssue::Silent: logDebug() << ctx.message(i).format(); break;
+    case RadioLimitIssue::Hint: logInfo() << ctx.message(i).format(); break;
+    case RadioLimitIssue::Warning: logWarn() << ctx.message(i).format(); break;
+    case RadioLimitIssue::Critical: logError() << ctx.message(i).format(); break;
     }
   }
 

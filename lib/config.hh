@@ -77,6 +77,8 @@ class Config : public ConfigItem
   Q_PROPERTY(ChannelList* channels READ channelList SCRIPTABLE false)
   /** The list of zones. */
   Q_PROPERTY(ZoneList* zones READ zones SCRIPTABLE false)
+  /** The list of scan lists. */
+  Q_PROPERTY(ScanLists* scanLists READ scanlists SCRIPTABLE false)
   /** The list of positioning systems. */
   Q_PROPERTY(PositioningSystems* positioning READ posSystems SCRIPTABLE false)
   /** The list of roaming zones. */
