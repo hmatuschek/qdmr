@@ -459,9 +459,9 @@ RadioLimitObject::RadioLimitObject(const PropList &list, QObject *parent)
 
 bool
 RadioLimitObject::verifyObject(const ConfigObject *item, RadioLimitContext &context) const {
-  context.push(QString("Object '%1'").arg(item->name()));
+  //context.push(QString("Object '%1'").arg(item->name()));
   bool success = verifyItem(item, context);
-  context.pop();
+  //context.pop();
   return success;
 }
 
@@ -543,10 +543,24 @@ RadioLimitObjRef::validType(const QMetaObject *type) const {
 /* ********************************************************************************************* *
  * Implementation of RadioLimitList
  * ********************************************************************************************* */
-RadioLimitList::RadioLimitList(int minSize, int maxSize, RadioLimitObject *element, QObject *parent)
-  : RadioLimitElement(parent), _minSize(minSize), _maxSize(maxSize), _element(element)
+RadioLimitList::RadioLimitList(const QMetaObject &type, int minSize, int maxSize, RadioLimitObject *element, QObject *parent)
+  : RadioLimitElement(parent), _elements(), _minCount(), _maxCount()
 {
-  _element->setParent(this);
+  _elements.insert(type.className(), element);
+  _minCount.insert(type.className(), minSize);
+  _maxCount.insert(type.className(), maxSize);
+  element->setParent(this);
+}
+
+RadioLimitList::RadioLimitList(const std::initializer_list<ElementLimits> &elements, QObject *parent)
+  : RadioLimitElement(parent), _elements(), _minCount(), _maxCount()
+{
+  for (auto el=elements.begin(); el!=elements.end(); el++) {
+    QString className = el->type.className();
+    _elements.insert(className, el->structure); el->structure->setParent(this);
+    _minCount.insert(className, el->minCount);
+    _maxCount.insert(className, el->maxCount);
+  }
 }
 
 bool
@@ -564,32 +578,63 @@ RadioLimitList::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
   }
 
   const ConfigObjectList *plist = prop.read(item).value<ConfigObjectList*>();
-  if ((0 <= _minSize) && (_minSize > plist->count())) {
-    auto &msg = context.newMessage(RadioLimitIssue::Critical);
-    msg << "List '" << prop.name() << "' requires at least " << _minSize
-        << " elements, " << plist->count() << " elements found.";
-    return false;
-  }
-  if ((0 <= _maxSize) && (_maxSize < plist->count())) {
-    auto &msg = context.newMessage(RadioLimitIssue::Warning);
-    msg << "List '" << prop.name() << "' takes at most " << _minSize
-        << " elements, " << plist->count() << " elements found.";
-    return false;
-  }
+
+  QHash<QString, unsigned> counts;
+  foreach (QString type, _elements.keys())
+    counts.insert(type,0);
 
   context.push(QString("List '%1'").arg(prop.name()));
+
+  // Check type and structure
   for (int i=0; i<plist->count(); i++) {
-    context.push(QString("Element %1").arg(i));
-    if (! _element->verifyObject(plist->get(i), context)) {
+    // Check type
+    ConfigObject *obj = plist->get(i);
+    QString className = findClassName(*(obj->metaObject()));
+    if (className.isEmpty()) {
+      auto &msg = context.newMessage(RadioLimitIssue::Critical);
+      msg << "Unexpected element type '" << obj->metaObject()->className()
+          << "'. Expected one of " << _elements.keys().join(", ") << ".";
+      context.pop();
+      return false;
+    }
+
+    counts[className]++;
+
+    context.push(QString("Element %1 ('%2')").arg(i).arg(obj->name()));
+    if (! _elements[className]->verifyObject(obj, context)) {
       context.pop();
       context.pop();
       return false;
     }
     context.pop();
   }
+
+  // Check counts
+  foreach (QString className, _elements.keys()) {
+    if ((0 <= _minCount[className]) && (counts[className]<_minCount[className])) {
+      auto &msg = context.newMessage(RadioLimitIssue::Warning);
+      msg << "The number of elements of type '" << className << "' " << counts[className]
+             << " is less than the required count " << _minCount[className] << ".";
+    }
+    if ((0 <= _maxCount[className]) && (counts[className]>_maxCount[className])) {
+      auto &msg = context.newMessage(RadioLimitIssue::Warning);
+      msg << "The number of elements of type '" << className << "' " << counts[className]
+             << " is greater than the maximum count " << _maxCount[className] << ".";
+    }
+  }
+
   context.pop();
 
   return true;
+}
+
+QString
+RadioLimitList::findClassName(const QMetaObject &type) const {
+  if (_elements.contains(type.className()))
+    return type.className();
+  if (const QMetaObject *super = type.superClass())
+    return findClassName(*super);
+  return "";
 }
 
 

@@ -28,92 +28,89 @@ RD5RLimits::RD5RLimits(QObject *parent)
 
     /* Define limits for radio IDs. */
     { "radioIDs",
-      new RadioLimitList(
-            1, 1, new RadioLimitObjects {
-              { DMRRadioID::staticMetaObject,
-                new RadioLimitObject {
-                  {"name", new RadioLimitString(1,8, RadioLimitString::ASCII) },
-                  {"id", new RadioLimitUInt(0, 16777215)}
-                } }
-            })},
+      new RadioLimitList{
+        { DMRRadioID::staticMetaObject, 1, 1, new RadioLimitObject {
+            {"name", new RadioLimitString(1,8, RadioLimitString::ASCII) },
+            {"id", new RadioLimitUInt(0, 16777215)}
+          } }
+      } },
 
     /* Define limits for contacts. */
     { "contacts",
-      new RadioLimitList(    /// @todo Implement means for specifying the member-count limits by type.
-            1, 256, new RadioLimitObjects{
-              { DigitalContact::staticMetaObject, new RadioLimitObject{
-                  { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
-                  { "ring", new RadioLimitBool() },
-                  { "type", new RadioLimitEnum{
-                      (unsigned)DigitalContact::PrivateCall,
-                      (unsigned)DigitalContact::GroupCall,
-                      (unsigned)DigitalContact::AllCall
-                    }},
-                  { "number", new RadioLimitUInt(0, 16777215) }
-                } },
-              { DTMFContact::staticMetaObject, new RadioLimitObject{
-                  { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
-                  { "ring", new RadioLimitBool() },
-                  { "number", new RadioLimitStringRegEx("^[0-9A-Fa-f]+$") }
-                } }
-            }) },
+      new RadioLimitList{
+        { DigitalContact::staticMetaObject, 1, 256, new RadioLimitObject {
+            { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
+            { "ring", new RadioLimitBool() },
+            { "type", new RadioLimitEnum{
+                (unsigned)DigitalContact::PrivateCall,
+                    (unsigned)DigitalContact::GroupCall,
+                    (unsigned)DigitalContact::AllCall
+              }},
+            { "number", new RadioLimitUInt(0, 16777215) }
+          } },
+        { DTMFContact::staticMetaObject, 0, 8, new RadioLimitObject {
+            { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
+            { "ring", new RadioLimitBool() },
+            { "number", new RadioLimitStringRegEx("^[0-9A-Fa-f]+$") }
+          } }
+      } },
 
     /* Define limits for group lists. */
     { "groupLists",
       new RadioLimitList(
-            1, 64, new RadioLimitObject{
+            RXGroupList::staticMetaObject, 1, 64, new RadioLimitObject {
               { "name", new RadioLimitString(1,16, RadioLimitString::ASCII) },
               { "contacts", new RadioLimitRefList(1,16, DigitalContact::staticMetaObject) }
             }) },
 
     /* Define limits for channel list. */
-    { "channels",
-      new RadioLimitList(
-            1, 1024, new RadioLimitObjects{
+    { "channels", new RadioLimitList(
+            Channel::staticMetaObject, 1, 1024,
+            new RadioLimitObjects {
               { AnalogChannel::staticMetaObject,
                 new RadioLimitObject {
-                  {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
-                  {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
-                  {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
-                  {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
-                  {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},
-                  {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-                  {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
-                  {"rxOnly", new RadioLimitBool()},
-                  {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
-                  {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)},
-                  {"admit", new RadioLimitEnum{
-                     (unsigned)AnalogChannel::Admit::Always,
-                     (unsigned)AnalogChannel::Admit::Free,
-                     (unsigned)AnalogChannel::Admit::Tone
-                   } },
-                  {"squelch", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
-                  {"bandwidth", new RadioLimitEnum{
-                     (unsigned)AnalogChannel::Bandwidth::Narrow,
-                     (unsigned)AnalogChannel::Bandwidth::Wide
-                   }},
-                  {"aprs", new RadioLimitIgnored(RadioLimitIssue::Hint)}
+            {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
+            {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
+            {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
+            {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
+            {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},
+            {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
+            {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+            {"rxOnly", new RadioLimitBool()},
+            {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
+            {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)},
+            {"admit", new RadioLimitEnum{
+                (unsigned)AnalogChannel::Admit::Always,
+                    (unsigned)AnalogChannel::Admit::Free,
+                    (unsigned)AnalogChannel::Admit::Tone
+              } },
+            {"squelch", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+            {"bandwidth", new RadioLimitEnum{
+                (unsigned)AnalogChannel::Bandwidth::Narrow,
+                    (unsigned)AnalogChannel::Bandwidth::Wide
+              }},
+            {"aprs", new RadioLimitIgnored(RadioLimitIssue::Hint)}
                 } },
               { DigitalChannel::staticMetaObject,
                 new RadioLimitObject {
-                  {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
-                  {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
-                  {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
-                  {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
-                  {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},
-                  {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-                  {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
-                  {"rxOnly", new RadioLimitBool()},
-                  {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
-                  {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
+            {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
+            {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
+            {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
+            {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
+            {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},
+            {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
+            {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+            {"rxOnly", new RadioLimitBool()},
+            {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
+            {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
                 } }
-            }) },
+            } )},
 
     /* Define limits for zone list. */
     { "zones",
       new RadioLimitList(
-            1, 250, new RadioLimitSingleZone(                                     // up to 250 zones
-              16, {                                                               // 16 channels per zone
+            Zone::staticMetaObject, 1, 250, new RadioLimitSingleZone(
+              16, {
                 { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) }, // 16 ASCII chars in name
                 { "anytone", new RadioLimitIgnored(RadioLimitIssue::Hint) }     // ignore AnyTone extensions
               })
@@ -122,7 +119,7 @@ RD5RLimits::RD5RLimits(QObject *parent)
     /* Define limits for scan lists. */
     { "scanlists",
       new RadioLimitList(
-            1, 250, new RadioLimitObject{
+            ScanList::staticMetaObject, 1, 250, new RadioLimitObject{
               { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
               { "primary", new RadioLimitObjRef(Channel::staticMetaObject, false) },
               { "secondary", new RadioLimitObjRef(Channel::staticMetaObject, true) },
@@ -133,7 +130,7 @@ RD5RLimits::RD5RLimits(QObject *parent)
     /* Define limits for positioning systems. */
     { "positioning",
       new RadioLimitList(
-            -1, -1, new RadioLimitIgnored(RadioLimitIssue::Hint)
+            ConfigObject::staticMetaObject, -1, -1, new RadioLimitIgnored(RadioLimitIssue::Hint)
             ) }
 
   };

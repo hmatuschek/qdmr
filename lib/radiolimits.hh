@@ -467,23 +467,37 @@ class RadioLimitList: public RadioLimitElement
   Q_OBJECT
 
 public:
+  /** Helper struct to pass list entry definitions */
+  struct ElementLimits {
+    const QMetaObject &type;      ///< The type of the object
+    int minCount;                 ///< Minimum count of elements.
+    int maxCount;                 ///< Maximum count of elements.
+    RadioLimitObject *structure;  ///< The structure of the elements.
+  };
+
+public:
   /** Constructor.
    * @param minSize Specifies the minimum size of the list. If -1, no check is performed.
    * @param maxSize Specifies the maximum size of the list. If -1, no check is performed.
    * @param element Specifies the limits for all objects in the list. If the list contains instances
    *                of different ConfigObject types, use @c RadioLimitObjects dispatcher.
    * @param parent  Specifies the QObject parent. */
-  RadioLimitList(int minSize, int maxSize, RadioLimitObject *element, QObject *parent=nullptr);
+  RadioLimitList(const QMetaObject &type, int minSize, int maxSize, RadioLimitObject *element, QObject *parent=nullptr);
+  RadioLimitList(const std::initializer_list<ElementLimits> &elements, QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
 protected:
-  /** Holds the minimum size of the list. */
-  qint64 _minSize;
-  /** Holds the maximum size of the list. */
-  qint64 _maxSize;
-  /** Holds the limits of the elements. */
-  RadioLimitObject *_element;
+  /** Searches for the specified type or one of its super-clsases in the set of allowed types. */
+  QString findClassName(const QMetaObject &type) const;
+
+protected:
+  /** Maps typename to element definition. */
+  QHash<QString, RadioLimitObject *> _elements;
+  /** Maps typename to minimum count. */
+  QHash<QString, qint64> _minCount;
+  /** Maps typename to maximum count. */
+  QHash<QString, qint64> _maxCount;
 };
 
 
