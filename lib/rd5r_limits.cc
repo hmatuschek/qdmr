@@ -102,7 +102,19 @@ RD5RLimits::RD5RLimits(QObject *parent)
                   {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
                   {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
                   {"rxOnly", new RadioLimitBool()},
-                  /// @todo Handle transmit contact.
+                  {"admit", new RadioLimitEnum {
+                     unsigned(DigitalChannel::Admit::Always),
+                     unsigned(DigitalChannel::Admit::Free),
+                     unsigned(DigitalChannel::Admit::Free) } },
+                  {"colorCode", new RadioLimitUInt(0,16)},
+                  {"timeSlot", new RadioLimitEnum {
+                     unsigned(DigitalChannel::TimeSlot::TS1),
+                     unsigned(DigitalChannel::TimeSlot::TS2) } },
+                  {"radioID", new RadioLimitObjRef(RadioID::staticMetaObject, true)},
+                  {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
+                  {"contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, true)},
+                  /// @todo Handle positioning.
+                  /// @todo Handle Roaming
                   {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
                   {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
                 } }
