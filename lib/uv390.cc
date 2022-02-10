@@ -1,5 +1,5 @@
 #include "uv390.hh"
-
+#include "uv390_limits.hh"
 
 Radio::Features _uv390_features = {
   .betaWarning = true,
@@ -51,6 +51,7 @@ Radio::Features _uv390_features = {
   .maxCallsignsInDB = 122197
 };
 
+RadioLimits *UV390::_limits = nullptr;
 
 
 UV390::UV390(TyTInterface *device, QObject *parent)
@@ -71,6 +72,13 @@ UV390::name() const {
 const Radio::Features &
 UV390::features() const {
   return _uv390_features;
+}
+
+const RadioLimits &
+UV390::limits() const {
+  if (nullptr == _limits)
+    _limits = new UV390Limits();
+  return *_limits;
 }
 
 const Codeplug &

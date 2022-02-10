@@ -1,13 +1,15 @@
-#include "rd5r_limits.hh"
-#include "radioid.hh"
+#include "uv390_limits.hh"
 #include "channel.hh"
-#include "scanlist.hh"
-#include "zone.hh"
+#include "radioid.hh"
 #include "contact.hh"
 #include "rxgrouplist.hh"
+#include "scanlist.hh"
+#include "zone.hh"
+#include "gpssystem.hh"
+#include "roaming.hh"
 
 
-RD5RLimits::RD5RLimits(QObject *parent)
+UV390Limits::UV390Limits(QObject *parent)
   : RadioLimits(parent)
 {
   _elements = QHash<QString, RadioLimitElement*>{
@@ -15,14 +17,17 @@ RD5RLimits::RD5RLimits(QObject *parent)
     /* Define limits for the general settings. */
     { "settings",
       new RadioLimitItem{
-        { "introLine1", new RadioLimitString(-1, 16, RadioLimitString::ASCII) },
-        { "introLine2", new RadioLimitString(-1, 16, RadioLimitString::ASCII) },
+        { "introLine1", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },
+        { "introLine2", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },
         { "micLevel", new RadioLimitUInt(1, 10) },
         { "speech", new RadioLimitIgnoredBool() },
-        { "power", new RadioLimitEnum({unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}) },
+        { "power", new RadioLimitEnum {
+            unsigned(Channel::Power::Low),
+            unsigned(Channel::Power::Mid),
+            unsigned(Channel::Power::High) } },
         { "squlech", new RadioLimitUInt(0, 10) },
         { "vox", new RadioLimitUInt(0, 10) },
-        { "tot", new RadioLimitUInt(0, 3825) }
+        { "tot", new RadioLimitUInt(0, -1) }
         /// @todo check default radio ID.
       }
     },
@@ -31,7 +36,7 @@ RD5RLimits::RD5RLimits(QObject *parent)
     { "radioIDs",
       new RadioLimitList{
         { DMRRadioID::staticMetaObject, 1, 1, new RadioLimitObject {
-            {"name", new RadioLimitString(1,8, RadioLimitString::ASCII) },
+            {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode) },
             {"id", new RadioLimitUInt(0, 16777215)}
           } }
       } },
@@ -39,42 +44,38 @@ RD5RLimits::RD5RLimits(QObject *parent)
     /* Define limits for contacts. */
     { "contacts",
       new RadioLimitList{
-        { DigitalContact::staticMetaObject, 1, 256, new RadioLimitObject {
-            { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
+        { DigitalContact::staticMetaObject, 1, 10000, new RadioLimitObject {
+            { "name", new RadioLimitString(1, 16, RadioLimitString::Unicode) },
             { "ring", new RadioLimitBool() },
-            { "type", new RadioLimitEnum{
-                (unsigned)DigitalContact::PrivateCall,
-                    (unsigned)DigitalContact::GroupCall,
-                    (unsigned)DigitalContact::AllCall
+            { "type", new RadioLimitEnum {
+                (unsigned) DigitalContact::PrivateCall,
+                    (unsigned) DigitalContact::GroupCall,
+                    (unsigned) DigitalContact::AllCall
               }},
             { "number", new RadioLimitUInt(0, 16777215) }
           } },
-        { DTMFContact::staticMetaObject, 0, 8, new RadioLimitObject {
-            { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
-            { "ring", new RadioLimitBool() },
-            { "number", new RadioLimitStringRegEx("^[0-9A-Fa-f]+$") }
-          } }
+        { DTMFContact::staticMetaObject, -1, -1, new RadioLimitIgnored() }
       } },
 
     /* Define limits for group lists. */
     { "groupLists",
       new RadioLimitList(
-            RXGroupList::staticMetaObject, 1, 64, new RadioLimitObject {
-              { "name", new RadioLimitString(1,16, RadioLimitString::ASCII) },
-              { "contacts", new RadioLimitRefList(1,16, DigitalContact::staticMetaObject) }
+            RXGroupList::staticMetaObject, 1, 250, new RadioLimitObject {
+              { "name", new RadioLimitString(1, 16, RadioLimitString::Unicode) },
+              { "contacts", new RadioLimitRefList(1, 32, DigitalContact::staticMetaObject) }
             }) },
 
     /* Define limits for channel list. */
     { "channels", new RadioLimitList(
-            Channel::staticMetaObject, 1, 1024,
+            Channel::staticMetaObject, 1, 3000,
             new RadioLimitObjects {
               { AnalogChannel::staticMetaObject,
                 new RadioLimitObject {
-                  {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
-                  {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
-                  {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
+                  {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
+                  {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}})},
+                  {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}})},
                   {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
-                  {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},
+                  {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
                   {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
                   {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
                   {"rxOnly", new RadioLimitBool()},
@@ -94,11 +95,15 @@ RD5RLimits::RD5RLimits(QObject *parent)
                 } },
               { DigitalChannel::staticMetaObject,
                 new RadioLimitObject {
-                  {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
-                  {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
-                  {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
-                  {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
-                  {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},
+                  {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
+                  {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}})},
+                  {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}})},
+                  {"power", new RadioLimitEnum {
+                     unsigned(Channel::Power::Low),
+                     unsigned(Channel::Power::Mid),
+                     unsigned(Channel::Power::High),
+                   }},
+                  {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
                   {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
                   {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
                   {"rxOnly", new RadioLimitBool()},
@@ -111,19 +116,19 @@ RD5RLimits::RD5RLimits(QObject *parent)
     /* Define limits for zone list. */
     { "zones",
       new RadioLimitList(
-            Zone::staticMetaObject, 1, 250, new RadioLimitSingleZone(
-              16, {
-                { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) }, // 16 ASCII chars in name
-                { "anytone", new RadioLimitIgnored(RadioLimitIssue::Hint) }     // ignore AnyTone extensions
-              })
-            ) },
+            Zone::staticMetaObject, 1, 250, new RadioLimitObject {
+              { "name", new RadioLimitString(1, 16, RadioLimitString::Unicode) }, // 16 ASCII chars in name
+              { "A", new RadioLimitRefList(0, 64, Channel::staticMetaObject) },
+              { "B", new RadioLimitRefList(0, 64, Channel::staticMetaObject) },
+              { "anytone", new RadioLimitIgnored(RadioLimitIssue::Hint) }     // ignore AnyTone extensions
+            } ) },
 
     /* Define limits for scan lists. */
     { "scanlists",
       new RadioLimitList(
             ScanList::staticMetaObject, 1, 250, new RadioLimitObject{
-              { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
-              { "primary", new RadioLimitObjRef(Channel::staticMetaObject, false) },
+              { "name", new RadioLimitString(1, 16, RadioLimitString::Unicode) },
+              { "primary", new RadioLimitObjRef(Channel::staticMetaObject, true) },
               { "secondary", new RadioLimitObjRef(Channel::staticMetaObject, true) },
               { "revert", new RadioLimitObjRef(Channel::staticMetaObject, true) },
               { "channels", new RadioLimitRefList(0, 31, Channel::staticMetaObject) }
@@ -132,8 +137,12 @@ RD5RLimits::RD5RLimits(QObject *parent)
     /* Define limits for positioning systems. */
     { "positioning",
       new RadioLimitList(
-            ConfigObject::staticMetaObject, -1, -1, new RadioLimitIgnored(RadioLimitIssue::Hint)
-            ) }
+            GPSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
+              { "name", new RadioLimitString(0, -1, RadioLimitString::Unicode) }, /// @todo Implement RadioLimitStringIgnored.
+              { "period", new RadioLimitUInt(0, 7650) },
+              { "contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, false) },
+              { "revert", new RadioLimitObjRef(DigitalChannel::staticMetaObject, true) }
+            } ) }
 
     /// @todo handle roaming
   };

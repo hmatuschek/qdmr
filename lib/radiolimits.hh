@@ -230,7 +230,8 @@ class RadioLimitIgnoredBool: public RadioLimitBool
 
 public:
   /** Constructor.
-   * @param notify Specifies the severity of the generated message. */
+   * @param notify Specifies the severity of the generated message.
+   * @param parent Specifies the QObject parent. */
   explicit RadioLimitIgnoredBool(RadioLimitIssue::Severity notify=RadioLimitIssue::Hint,
                                  QObject *parent=nullptr);
 
@@ -477,12 +478,14 @@ public:
 
 public:
   /** Constructor.
+   * @param type Specifies the type of the elements.
    * @param minSize Specifies the minimum size of the list. If -1, no check is performed.
    * @param maxSize Specifies the maximum size of the list. If -1, no check is performed.
    * @param element Specifies the limits for all objects in the list. If the list contains instances
    *                of different ConfigObject types, use @c RadioLimitObjects dispatcher.
    * @param parent  Specifies the QObject parent. */
   RadioLimitList(const QMetaObject &type, int minSize, int maxSize, RadioLimitObject *element, QObject *parent=nullptr);
+  /** Constructor from initializer list. */
   RadioLimitList(const std::initializer_list<ElementLimits> &elements, QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
