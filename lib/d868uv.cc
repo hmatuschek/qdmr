@@ -1,8 +1,11 @@
 #include "d868uv.hh"
-#include "config.hh"
-#include "logger.hh"
+
 #include "d868uv_codeplug.hh"
 #include "d868uv_callsigndb.hh"
+#include "d868uv_limits.hh"
+
+#include "config.hh"
+#include "logger.hh"
 
 #define RBSIZE 16
 #define WBSIZE 16
@@ -70,7 +73,7 @@ static Radio::Features _d868uv_features =
 
 
 D868UV::D868UV(AnytoneInterface *device, QObject *parent)
-  : AnytoneRadio("Anytone AT-D868UV", device, parent), _features(_d868uv_features)
+  : AnytoneRadio("Anytone AT-D868UV", device, parent), _features(_d868uv_features), _limits(nullptr)
 {
   _codeplug = new D868UVCodeplug(this);
   _callsigns = new D868UVCallsignDB(this);
@@ -81,48 +84,62 @@ D868UV::D868UV(AnytoneInterface *device, QObject *parent)
   switch (info.bands) {
   case 0x00:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 480.} };
+    _limits = new D868UVLimits({ {136., 174.}, {400., 480.} }, this);
     break;
   case 0x01:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {144., 148.}, {420., 450.} };
+    _limits = new D868UVLimits({ {144., 148.}, {420., 450.} }, this);
     break;
   case 0x02:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {430., 450.} };
+    _limits = new D868UVLimits({ {136., 174.}, {430., 450.} }, this);
     break;
   case 0x03:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {144., 146.}, {430., 440.} };
+    _limits = new D868UVLimits({ {144., 146.}, {430., 440.} }, this);
     break;
   case 0x04:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {440., 480.} };
+    _limits = new D868UVLimits({ {136., 174.}, {440., 480.} }, this);
     break;
   case 0x05:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {144., 146.}, {440., 480.} };
+    _limits = new D868UVLimits({ {144., 146.}, {440., 480.} }, this);
     break;
   case 0x06:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {446., 447.} };
+    _limits = new D868UVLimits({ {136., 174.}, {446., 447.} }, this);
     break;
   case 0x07:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {144., 146.}, {446., 447.} };
+    _limits = new D868UVLimits({ {144., 146.}, {446., 447.} }, this);
     break;
   case 0x08:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {440., 470.} };
+    _limits = new D868UVLimits({ {136., 174.}, {440., 470.} }, this);
     break;
   case 0x09:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {144., 146.}, {430., 432.} };
+    _limits = new D868UVLimits({ {144., 146.}, {430., 432.} }, this);
     break;
   case 0x0a:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {144., 148.}, {430., 450.} };
+    _limits = new D868UVLimits({ {144., 148.}, {430., 450.} }, this);
     break;
   case 0x0b:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {144., 146.}, {430., 440.} };
+    _limits = new D868UVLimits({ {144., 146.}, {430., 440.} }, this);
     break;
   case 0x0c:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {403., 470.} };
+    _limits = new D868UVLimits({ {136., 174.}, {403., 470.} }, this);
     break;
 
   default:
     logInfo() << "Unknown band-code" << QString::number(int(info.bands), 16)
               << ": Set freq range to 136-174MHz and 400-480MHz.";
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 480.} };
+    _limits = new D868UVLimits({ {136., 174.}, {403., 470.} }, this);
     break;
   }
 
