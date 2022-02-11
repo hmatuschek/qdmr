@@ -83,7 +83,7 @@ UV390Limits::UV390Limits(QObject *parent)
                  (unsigned)AnalogChannel::Bandwidth::Narrow,
                  (unsigned)AnalogChannel::Bandwidth::Wide
                }},
-              {"aprs", new RadioLimitIgnored(RadioLimitIssue::Hint)}
+              {"aprs", new RadioLimitObjRefIgnored(RadioLimitIssue::Hint)}
             } },
           { DigitalChannel::staticMetaObject,
             new RadioLimitObject {
@@ -110,8 +110,8 @@ UV390Limits::UV390Limits(QObject *parent)
               {"radioID", new RadioLimitObjRef(RadioID::staticMetaObject, true)},
               {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
               {"contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, true)},
-              /// @todo Handle positioning.
-              /// @todo Handle Roaming
+              {"aprs", new RadioLimitObjRefIgnored()},
+              {"roaming", new RadioLimitObjRefIgnored()},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
             } }
@@ -139,7 +139,7 @@ UV390Limits::UV390Limits(QObject *parent)
   /* Define limits for positioning systems. */
   add("positioning", new RadioLimitList(
         GPSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
-          { "name", new RadioLimitString(0, -1, RadioLimitString::Unicode) }, /// @todo Implement RadioLimitStringIgnored.
+          { "name", new RadioLimitStringIgnored() },
           { "period", new RadioLimitUInt(0, 7650) },
           { "contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, false) },
           { "revert", new RadioLimitObjRef(DigitalChannel::staticMetaObject, true) }

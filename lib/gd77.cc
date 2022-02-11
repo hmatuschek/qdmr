@@ -1,4 +1,5 @@
 #include "gd77.hh"
+#include "gd77_limits.hh"
 
 #include "logger.hh"
 #include "config.hh"
@@ -56,6 +57,8 @@ static Radio::Features _gd77_features = {
   .maxCallsignsInDB = 10920
 };
 
+RadioLimits * GD77::_limits = nullptr;
+
 
 GD77::GD77(RadioddityInterface *device, QObject *parent)
   : RadioddityRadio(device, parent), _name("Radioddity GD-77"), _codeplug(), _callsigns()
@@ -71,6 +74,13 @@ GD77::name() const {
 const Radio::Features &
 GD77::features() const {
   return _gd77_features;
+}
+
+const RadioLimits &
+GD77::limits() const {
+  if (nullptr == _limits)
+    _limits = new GD77Limits();
+  return *_limits;
 }
 
 const Codeplug &

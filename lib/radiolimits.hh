@@ -62,6 +62,8 @@ public:
 
   /** Copy assignment. */
   RadioLimitIssue &operator =(const RadioLimitIssue &other);
+  /** Set message. */
+  RadioLimitIssue &operator =(const QString &message);
 
   /** Returns the severity of the issue. */
   Severity severity() const;
@@ -204,6 +206,24 @@ public:
 protected:
   /** Holds the regular expression pattern. */
   QRegExp _pattern;
+};
+
+
+/** Notifies the user that a string gets ignored.
+ * This is usually the case, when named elements are referenced within the codeplug by index.
+ * @ingroup limits */
+class RadioLimitStringIgnored: public RadioLimitValue {
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  RadioLimitStringIgnored(RadioLimitIssue::Severity severity=RadioLimitIssue::Hint, QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+
+protected:
+  /** Holds the severity of the message. */
+  RadioLimitIssue::Severity _severity;
 };
 
 
@@ -469,6 +489,26 @@ protected:
   bool _allowNull;
   /** Possible classes of instances, the reference may point to. */
   QSet<QString> _types;
+};
+
+
+/** Issues a notification if a reference is set.
+ * @ingroup limits */
+class RadioLimitObjRefIgnored: public RadioLimitObjRef
+{
+  Q_OBJECT
+
+public:
+  /** Constructor.
+   * @param notify Specifies the issue severity.
+   * @param parent Specifies the QObject parent. */
+  RadioLimitObjRefIgnored(RadioLimitIssue::Severity notify=RadioLimitIssue::Hint, QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+
+protected:
+  /** The severity of the issue. */
+  RadioLimitIssue::Severity _severity;
 };
 
 

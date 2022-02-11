@@ -38,6 +38,12 @@ RadioLimitIssue::operator =(const RadioLimitIssue &other) {
   return *this;
 }
 
+RadioLimitIssue &
+RadioLimitIssue::operator =(const QString &message) {
+  _message = message;
+  return *this;
+}
+
 RadioLimitIssue::Severity
 RadioLimitIssue::severity() const {
   return _severity;
@@ -129,8 +135,8 @@ RadioLimitIgnored::verify(const ConfigItem *item, const QMetaProperty &prop, Rad
 bool
 RadioLimitIgnored::verifyObject(const ConfigObject *item, RadioLimitContext &context) const {
   auto &msg = context.newMessage(_notification);
-  msg << "Ignore " << item->metaObject()->className()
-      << " '" << item->name() << "'. Not applicable/supported by this radio.";
+  msg = tr("Ignore %1 '%2'. Not applicable/supported by this radio.")
+      .arg(item->metaObject()->className()).arg(item->name());
   return true;
 }
 
@@ -207,6 +213,33 @@ RadioLimitStringRegEx::verify(const ConfigItem *item, const QMetaProperty &prop,
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
     msg << "Value '" << value << "' of property " << prop.name()
         << " does not match pattern '" << _pattern.pattern() << "'.";
+  }
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioLimitStringIgnored
+ * ********************************************************************************************* */
+RadioLimitStringIgnored::RadioLimitStringIgnored(RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitValue(parent), _severity(severity)
+{
+  // pass...
+}
+
+bool
+RadioLimitStringIgnored::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
+  if (QVariant::String != prop.type()) {
+    auto &msg = context.newMessage(RadioLimitIssue::Warning);
+    msg = tr("Expected value of '%1' to be string.").arg(prop.name());
+    return true;
+  }
+
+  QVariant value = prop.read(item);
+  if (! value.toString().isEmpty()) {
+    auto &msg = context.newMessage(_severity);
+    msg = tr("Value of '%1' is ignored. Not applicable/supported by the radio.").arg(prop.name());
   }
 
   return true;
@@ -552,6 +585,26 @@ RadioLimitObjRef::validType(const QMetaObject *type) const {
   if (type->superClass())
     return validType(type->superClass());
   return false;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioLimitObjRefIgnored
+ * ********************************************************************************************* */
+RadioLimitObjRefIgnored::RadioLimitObjRefIgnored(RadioLimitIssue::Severity notify, QObject *parent)
+  : RadioLimitObjRef(ConfigObject::staticMetaObject, true, parent), _severity(notify)
+{
+  // pass...
+}
+
+bool
+RadioLimitObjRefIgnored::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
+  if (! prop.read(item).isNull()) {
+    auto &msg = context.newMessage(_severity);
+    msg << "The reference '" << prop.name() <<
+           "' is ignored. Not applicable/supported by this radio.";
+  }
+  return true;
 }
 
 
