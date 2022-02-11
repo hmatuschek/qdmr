@@ -1,4 +1,5 @@
 #include "md2017.hh"
+#include "md2017_limits.hh"
 
 
 Radio::Features _md2017_features = {
@@ -52,6 +53,8 @@ Radio::Features _md2017_features = {
 };
 
 
+RadioLimits *MD2017::_limits = nullptr;
+
 
 MD2017::MD2017(TyTInterface *device, QObject *parent)
   : TyTRadio(device, parent), _name("TyT DM-2017")
@@ -71,6 +74,13 @@ MD2017::name() const {
 const Radio::Features &
 MD2017::features() const {
   return _md2017_features;
+}
+
+const RadioLimits &
+MD2017::limits() const {
+  if (nullptr == _limits)
+    _limits = new MD2017Limits();
+  return *_limits;
 }
 
 const Codeplug &
