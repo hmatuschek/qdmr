@@ -1,4 +1,6 @@
 #include "md390.hh"
+#include "md390_limits.hh"
+
 #include "logger.hh"
 #include "utils.hh"
 
@@ -63,7 +65,7 @@ Radio::Features _md390_features = {
 
 
 MD390::MD390(TyTInterface *device, const ErrorStack &err, QObject *parent)
-  : TyTRadio(device, parent), _name("TyT MD-390"), _features(_md390_features)
+  : TyTRadio(device, parent), _name("TyT MD-390"), _features(_md390_features), _limits(nullptr)
 {
   // Read channels and identify device variance based on the channel frequencies. This may block
   // the GUI for some time.
@@ -108,15 +110,19 @@ MD390::MD390(TyTInterface *device, const ErrorStack &err, QObject *parent)
 
   if ((137<=range.min) && (174>=range.max)) {
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{{136., 174.}};
+    _limits = new MD390Limits({{136., 174.}}, this);
     _name += "V";
   } else if ((350<=range.min) && (400>=range.max)) {
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{{350., 400.}};
+    _limits = new MD390Limits({{350., 400.}}, this);
     _name += "U";
   } else if ((400<=range.min) && (450>=range.max)) {
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{{400., 480.}};
+    _limits = new MD390Limits({{400., 480.}}, this);
     _name += "U";
   } else if ((450<=range.min) && (520>=range.max)) {
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{{450., 520.}};
+    _limits = new MD390Limits({{450., 520.}}, this);
     _name += "U";
   } else {
     errMsg(err) << "Cannot determine frequency range from channel frequencies between "
@@ -132,6 +138,11 @@ MD390::name() const {
 const Radio::Features &
 MD390::features() const {
   return _features;
+}
+
+const RadioLimits &
+MD390::limits() const {
+  return *_limits;
 }
 
 const Codeplug &

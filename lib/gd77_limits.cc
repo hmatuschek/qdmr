@@ -87,7 +87,6 @@ GD77Limits::GD77Limits(QObject *parent)
                  (unsigned)AnalogChannel::Bandwidth::Wide
                }},
               {"aprs", new RadioLimitObjRefIgnored()},
-              /// @todo handle OpenGD77 extension
               {"openGD77", new RadioLimitIgnored()},
               {"tyt", new RadioLimitIgnored()}
             } },
@@ -114,7 +113,6 @@ GD77Limits::GD77Limits(QObject *parent)
               {"contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, true)},
               {"aprs", new RadioLimitObjRefIgnored()},
               {"roaming", new RadioLimitObjRefIgnored()},
-              /// @todo handle OpenGD77 extension
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
             } }

@@ -41,7 +41,7 @@ public:
 
   const QString &name() const;
   const Features &features() const;
-
+  const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
@@ -59,6 +59,11 @@ private:
   MD390Codeplug _codeplug;
   /** Dynamic features, includes frequency range of channels read from device. */
   Features _features;
+
+private:
+  /** Instance of limits for this radio. Gets intantiated for every radio as it depends on the
+   * radio variant. */
+  RadioLimits *_limits;
 };
 
 #endif // MD2017_HH
