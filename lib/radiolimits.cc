@@ -120,11 +120,17 @@ RadioLimitIgnored::RadioLimitIgnored(RadioLimitIssue::Severity notify, QObject *
 bool
 RadioLimitIgnored::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
   ConfigObject *obj = prop.read(item).value<ConfigObject *>();
-  if (nullptr != obj) {
-    auto &msg = context.newMessage(_notification);
-    msg << "Ignore property '" << prop.name() << "'. Not applicable/supported by radio.";
-  }
+  if (nullptr != obj)
+    return verifyObject(obj, context);
 
+  return true;
+}
+
+bool
+RadioLimitIgnored::verifyObject(const ConfigObject *item, RadioLimitContext &context) const {
+  auto &msg = context.newMessage(_notification);
+  msg << "Ignore " << item->metaObject()->className()
+      << " '" << item->name() << "'. Not applicable/supported by this radio.";
   return true;
 }
 
@@ -397,6 +403,15 @@ RadioLimitItem::RadioLimitItem(const PropList &list, QObject *parent)
   for (QHash<QString,RadioLimitElement*>::iterator item=_elements.begin(); item != _elements.end(); item++) {
     item.value()->setParent(this);
   }
+}
+
+bool
+RadioLimitItem::add(const QString &prop, RadioLimitElement *structure) {
+  if (_elements.contains(prop) || (nullptr == structure))
+    return false;
+  _elements.insert(prop, structure);
+  structure->setParent(this);
+  return true;
 }
 
 bool

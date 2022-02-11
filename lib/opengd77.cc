@@ -1,5 +1,5 @@
 #include "opengd77.hh"
-
+#include "opengd77_limits.hh"
 #include "logger.hh"
 #include "config.hh"
 
@@ -57,6 +57,7 @@ static Radio::Features _open_gd77_features =
   .maxCallsignsInDB = 15796
 };
 
+RadioLimits *OpenGD77::_limits = nullptr;
 
 OpenGD77::OpenGD77(OpenGD77Interface *device, QObject *parent)
   : Radio(parent), _name("Open GD-77"), _dev(device), _config(nullptr), _codeplug(), _callsigns()
@@ -85,6 +86,13 @@ OpenGD77::name() const {
 const Radio::Features &
 OpenGD77::features() const {
   return _open_gd77_features;
+}
+
+const RadioLimits &
+OpenGD77::limits() const {
+  if (nullptr == _limits)
+    _limits = new OpenGD77Limits();
+  return *_limits;
 }
 
 const Codeplug &

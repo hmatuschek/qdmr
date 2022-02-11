@@ -340,6 +340,16 @@ public:
    * The ownership of all passed elements are taken. */
   RadioLimitItem(const PropList &list, QObject *parent=nullptr);
 
+  /** Adds a property declaration.
+   *
+   * The item takes the ownership of the structure declaration. If a property is already defined
+   * with the same name, @c false is returned.
+   *
+   * @param prop Specifies the name of the property.
+   * @param structure Specifies the structure declaration of the propery value.
+   * @returns @c false If a property with the same name is already defined. */
+  bool add(const QString &prop, RadioLimitElement *structure);
+
   virtual bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
   /** Verifies the properties of the given item. */
   virtual bool verifyItem(const ConfigItem *item, RadioLimitContext &context) const;
@@ -383,6 +393,7 @@ public:
   RadioLimitIgnored(RadioLimitIssue::Severity notify=RadioLimitIssue::Hint, QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+  bool verifyObject(const ConfigObject *item, RadioLimitContext &context) const;
 
 protected:
   /** Holds the level of the notification. */

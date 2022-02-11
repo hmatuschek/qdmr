@@ -25,6 +25,7 @@ public:
 
 	const QString &name() const;
   const Radio::Features &features() const;
+  const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
@@ -65,6 +66,10 @@ protected:
   OpenGD77Codeplug _codeplug;
   /** The acutal binary callsign DB representation. */
   OpenGD77CallsignDB _callsigns;
+
+private:
+  /** Holds the singleton instance. */
+  static RadioLimits *_limits;
 };
 
 #endif // OPENGD77_HH
