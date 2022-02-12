@@ -6,6 +6,8 @@
 /** Implements the limits for the AnyTone AT-D878UV. */
 class D878UVLimits: public RadioLimits
 {
+  Q_OBJECT
+
 public:
   /** Constructor. */
   D878UVLimits(const std::initializer_list<std::pair<double, double>> &freqRanges, QObject *parent=nullptr);
