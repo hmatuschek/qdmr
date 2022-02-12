@@ -29,9 +29,11 @@ public:
    * due to variants of the same radio. */
   static RadioInfo defaultRadioInfo();
 
-protected:
+private:
   /** Holds a copy of the specific radio features. */
   Radio::Features _features;
+  /** Holds the limits for the radio. */
+  RadioLimits *_limits;
 };
 
 #endif // __D878UV_HH__
