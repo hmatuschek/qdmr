@@ -41,14 +41,16 @@ public:
   explicit D878UV(AnytoneInterface *device=nullptr, QObject *parent=nullptr);
 
   const Radio::Features &features() const;
+  const RadioLimits &limits() const;
 
   /** Returns the default radio information. The actual instance may have different properties
    * due to variants of the same radio. */
   static RadioInfo defaultRadioInfo();
 
-protected:
+private:
   /** Holds a copy of the specific radio features. */
   Radio::Features _features;
+  RadioLimits *_limits;
 };
 
 #endif // __D878UV_HH__

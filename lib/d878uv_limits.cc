@@ -1,4 +1,4 @@
-#include "d868uv_limits.hh"
+#include "d878uv_limits.hh"
 #include "channel.hh"
 #include "radioid.hh"
 #include "contact.hh"
@@ -6,9 +6,10 @@
 #include "zone.hh"
 #include "scanlist.hh"
 #include "gpssystem.hh"
+#include "roaming.hh"
 
 
-D868UVLimits::D868UVLimits(const std::initializer_list<std::pair<double, double> > &freqRanges, QObject *parent)
+D878UVLimits::D878UVLimits(const std::initializer_list<std::pair<double, double> > &freqRanges, QObject *parent)
   : RadioLimits(parent)
 {
   /* Define limits for the general settings. */
@@ -72,8 +73,6 @@ D868UVLimits::D868UVLimits(const std::initializer_list<std::pair<double, double>
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
               {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
               {"rxOnly", new RadioLimitBool()},
-              {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
-              {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"admit", new RadioLimitEnum{
                  (unsigned)AnalogChannel::Admit::Always,
                  (unsigned)AnalogChannel::Admit::Free,
@@ -84,7 +83,9 @@ D868UVLimits::D868UVLimits(const std::initializer_list<std::pair<double, double>
                  (unsigned)AnalogChannel::Bandwidth::Narrow,
                  (unsigned)AnalogChannel::Bandwidth::Wide
                }},
-              {"aprs", new RadioLimitObjRefIgnored()}
+              {"aprs", new RadioLimitObjRef(APRSSystem::staticMetaObject)},
+              {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
+              {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
             } },
           { DigitalChannel::staticMetaObject,
             new RadioLimitObject {
@@ -107,8 +108,8 @@ D868UVLimits::D868UVLimits(const std::initializer_list<std::pair<double, double>
               {"radioID", new RadioLimitObjRef(RadioID::staticMetaObject, true)},
               {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
               {"contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, false)},
-              {"aprs", new RadioLimitObjRef(GPSSystem::staticMetaObject, true)},
-              {"roaming", new RadioLimitObjRefIgnored() },
+              {"aprs", new RadioLimitObjRef(PositioningSystem::staticMetaObject, true)},
+              {"roaming", new RadioLimitObjRef(RoamingZone::staticMetaObject, true) },
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
             } }
@@ -135,19 +136,27 @@ D868UVLimits::D868UVLimits(const std::initializer_list<std::pair<double, double>
           { "channels", new RadioLimitRefList(0, 31, Channel::staticMetaObject) }
         }));
 
-  /* Ignore positioning systems. */
-  add("positioning", new RadioLimitList(
-        GPSSystem::staticMetaObject, 0, 1, new RadioLimitObject {
-          { "name", new RadioLimitStringIgnored() },
-          { "period", new RadioLimitUInt(0, 7650) },
-          { "contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, false) },
-          { "revert", new RadioLimitObjRef(DigitalChannel::staticMetaObject, true) }
-        } ) );
+  /* Handle positioning systems. */
+  add("positioning", new RadioLimitList{
+        { GPSSystem::staticMetaObject, 0, 8, new RadioLimitObject {
+            { "name", new RadioLimitStringIgnored() },
+            { "period", new RadioLimitUInt(0, 7650) },
+            { "contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, false) },
+            { "revert", new RadioLimitObjRef(DigitalChannel::staticMetaObject, true) } } },
+        { APRSSystem::staticMetaObject, 0, 1, new RadioLimitObject {
+            { "name", new RadioLimitStringIgnored() },
+            { "period", new RadioLimitUInt(0, 7650) },
+            { "revert", new RadioLimitObjRef(AnalogChannel::staticMetaObject, false) },
+            { "icon", new RadioLimitEnum{} },
+            { "message", new RadioLimitString(0, 60, RadioLimitString::ASCII) }
+            ///@todo extend APRSSystem to expose other settings as properties.
+          }} } );
 
-
-  /* Ignore roaming zones. */
+  /* Handle roaming zones. */
   add("roaming",
-      new RadioLimitList(
-        ConfigObject::staticMetaObject, -1, -1, new RadioLimitIgnored(RadioLimitIssue::Hint)
-        ) );
+      new RadioLimitList(RoamingZone::staticMetaObject, 0, 64,
+                         new RadioLimitObject {
+                           { "name", new RadioLimitStringIgnored() },
+                           { "channels", new RadioLimitRefList(0, 64, DigitalChannel::staticMetaObject) }
+                         } ) );
 }

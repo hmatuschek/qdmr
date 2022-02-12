@@ -26,7 +26,7 @@ SET(libdmrconf_SOURCES
     opengd77_callsigndb.cc opengd77_limits.cc
     anytone_interface.cc anytone_radio.cc anytone_codeplug.cc anytone_extension.cc
     d868uv.cc d868uv_codeplug.cc d868uv_callsigndb.cc d868uv_limits.cc
-    d878uv.cc d878uv_codeplug.cc
+    d878uv.cc d878uv_codeplug.cc d878uv_limits.cc
     d578uv.cc d578uv_codeplug.cc
     d878uv2.cc d878uv2_codeplug.cc d878uv2_callsigndb.cc)
 SET(libdmrconf_MOC_HEADERS
@@ -46,7 +46,7 @@ SET(libdmrconf_MOC_HEADERS
     opengd77_callsigndb.hh opengd77_limits.hh
     anytone_interface.hh anytone_radio.hh anytone_codeplug.hh anytone_extension.hh
     d868uv.hh d868uv_codeplug.hh d868uv_callsigndb.hh d868uv_limits.hh
-    d878uv.hh d878uv_codeplug.hh
+    d878uv.hh d878uv_codeplug.hh d878uv_limits.hh
     d578uv.hh d578uv_codeplug.hh
     d878uv2.hh d878uv2_codeplug.hh d878uv2_callsigndb.hh)
 SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh radioinfo.hh
