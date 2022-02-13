@@ -85,70 +85,70 @@ D878UV2::D878UV2(AnytoneInterface *device, QObject *parent)
   case 0x01:
   case 0x04:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 480.} };
-    _limits = new D878UV2Limits({ {136., 174.}, {400., 480.} }, this);
+    _limits = new D878UV2Limits({ {136., 174.}, {400., 480.} }, info.version, this);
     break;
   case 0x02:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {430., 440.} };
-    _limits = new D878UV2Limits({ {136., 174.}, {430., 440.} }, this);
+    _limits = new D878UV2Limits({ {136., 174.}, {430., 440.} }, info.version, this);
     break;
   case 0x03:
   case 0x05:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {144., 146.}, {430., 440.} };
-    _limits = new D878UV2Limits({ {144., 146.}, {430., 440.} }, this);
+    _limits = new D878UV2Limits({ {144., 146.}, {430., 440.} }, info.version, this);
     break;
   case 0x06:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {446., 447.} };
-    _limits = new D878UV2Limits({ {136., 174.}, {446., 447.} }, this);
+    _limits = new D878UV2Limits({ {136., 174.}, {446., 447.} }, info.version, this);
     break;
   case 0x07:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {144., 148.}, {420., 450.} };
-    _limits = new D878UV2Limits({ {144., 148.}, {420., 450.} }, this);
+    _limits = new D878UV2Limits({ {144., 148.}, {420., 450.} }, info.version, this);
     break;
   case 0x08:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 470.} };
-    _limits = new D878UV2Limits({ {136., 174.}, {400., 470.} }, this);
+    _limits = new D878UV2Limits({ {136., 174.}, {400., 470.} }, info.version, this);
     break;
   case 0x09:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {144., 146.}, {430., 432.} };
-    _limits = new D878UV2Limits({ {144., 146.}, {430., 432.} }, this);
+    _limits = new D878UV2Limits({ {144., 146.}, {430., 432.} }, info.version, this);
     break;
   case 0x0a:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {144., 148.}, {430., 450.} };
-    _limits = new D878UV2Limits({ {144., 148.}, {430., 450.} }, this);
+    _limits = new D878UV2Limits({ {144., 148.}, {430., 450.} }, info.version, this);
     break;
   case 0x0b:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 520.} };
-    _limits = new D878UV2Limits({ {136., 174.}, {400., 520.} }, this);
+    _limits = new D878UV2Limits({ {136., 174.}, {400., 520.} }, info.version, this);
     break;
   case 0x0c:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 490.} };
-    _limits = new D878UV2Limits({ {136., 174.}, {400., 490.} }, this);
+    _limits = new D878UV2Limits({ {136., 174.}, {400., 490.} }, info.version, this);
     break;
   case 0x0d:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {403., 470.} };
-    _limits = new D878UV2Limits({ {136., 174.}, {403., 470.} }, this);
+    _limits = new D878UV2Limits({ {136., 174.}, {403., 470.} }, info.version, this);
     break;
   case 0x0e:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {220.,225.}, {400., 520.} };
-    _limits = new D878UV2Limits({ {136., 174.}, {220.,225.}, {400., 520.} }, this);
+    _limits = new D878UV2Limits({ {136., 174.}, {220.,225.}, {400., 520.} }, info.version, this);
     break;
   case 0x0f:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {144., 148.}, {400., 520.} };
-    _limits = new D878UV2Limits({ {144., 148.}, {400., 520.} }, this);
+    _limits = new D878UV2Limits({ {144., 148.}, {400., 520.} }, info.version, this);
     break;
   case 0x10:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {144., 147.}, {430., 440.} };
-    _limits = new D878UV2Limits({ {144., 147.}, {430., 440.} }, this);
+    _limits = new D878UV2Limits({ {144., 147.}, {430., 440.} }, info.version, this);
     break;
   case 0x11:
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.} };
-    _limits = new D878UV2Limits({ {136., 174.} }, this);
+    _limits = new D878UV2Limits({ {136., 174.} }, info.version, this);
     break;
   default:
     logInfo() << "Unknown band-code" << QString::number(int(info.bands), 16)
               << ": Set freq range to 136-174MHz and 400-480MHz.";
     _features.frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 480.} };
-    _limits = new D878UV2Limits({ {136., 174.}, {400., 480.} }, this);
+    _limits = new D878UV2Limits({ {136., 174.}, {400., 480.} }, "", this);
     break;
   }
 
@@ -165,6 +165,11 @@ D878UV2::D878UV2(AnytoneInterface *device, QObject *parent)
 const Radio::Features &
 D878UV2::features() const {
   return _features;
+}
+
+const RadioLimits &
+D878UV2::limits() const {
+  return *_limits;
 }
 
 RadioInfo

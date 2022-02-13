@@ -10,8 +10,13 @@
 
 
 MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &freqRanges, QObject *parent)
-  : RadioLimits(parent)
+  : RadioLimits(true, parent)
 {
+  // Define limits for call-sign DB
+  _hasCallSignDB          = false;
+  _callSignDBImplemented  = false;
+  _numCallSignDBEntries   = 0;
+
   add("settings", new RadioLimitItem {
         { "introLine1", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },
         { "introLine2", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },

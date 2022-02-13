@@ -9,6 +9,7 @@
 #include "config.hh"
 #include "progressbar.hh"
 #include "autodetect.hh"
+#include "radiolimits.hh"
 
 
 int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
@@ -41,22 +42,25 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     return -1;
   }
 
-  VerifyFlags verify_flags;
-  if (parser.isSet("ignore-limits"))
-    verify_flags.ignoreFrequencyLimits = true;
+  RadioLimitContext ctx(parser.isSet("ignore-limits"));
 
   bool verified = true;
-  QList<VerifyIssue> issues;
-  if (VerifyIssue::WARNING <= radio->verifyConfig(&config, issues, verify_flags)) {
-    foreach(const VerifyIssue &issue, issues) {
-      if (VerifyIssue::WARNING == issue.type()) {
-        logWarn() << "Verification Issue: " << issue.message();
-      } else if (VerifyIssue::ERROR == issue.type()) {
-        logError() << "Verification Issue: " << issue.message();
-        verified = false;
-      }
+  radio->limits().verifyConfig(&config, ctx);
+
+  // Only print warnings
+  for (int i=0; i<ctx.count(); i++) {
+    switch (ctx.message(i).severity()) {
+    case RadioLimitIssue::Warning:
+      logWarn() << "Verification Issue: " << ctx.message(i).format();
+      break;
+    case RadioLimitIssue::Critical:
+      logError() << "Verification Issue: " << ctx.message(i).format();
+      break;
+    default:
+      break;
     }
   }
+
   if (! verified) {
     logError() << "Cannot upload codeplug to device: Codeplug cannot be verified with radio.";
     return -1;

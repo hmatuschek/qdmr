@@ -44,6 +44,7 @@ public:
 
   const QString &name() const;
   const Radio::Features &features() const;
+  const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
@@ -56,6 +57,10 @@ protected:
 	QString _name;
   /** The actual binary codeplug representation. */
   DM1701Codeplug _codeplug;
+
+private:
+  /** Holds the singleton instance of the radio limits. */
+  static RadioLimits *_limits;
 };
 
 #endif // DM1701_HH

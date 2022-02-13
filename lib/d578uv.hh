@@ -24,6 +24,7 @@ public:
   explicit D578UV(AnytoneInterface *device=nullptr, QObject *parent=nullptr);
 
   const Radio::Features &features() const;
+  const RadioLimits &limits() const;
 
   /** Returns the default radio information. The actual instance may have different properties
    * due to variants of the same radio. */

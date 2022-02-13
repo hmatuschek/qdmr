@@ -5,6 +5,7 @@
 #include "radio.hh"
 #include "ui_verifydialog.h"
 
+class RadioLimitContext;
 
 class VerifyDialog : public QDialog, private Ui::VerifyDialog
 {
@@ -12,7 +13,7 @@ class VerifyDialog : public QDialog, private Ui::VerifyDialog
 public:
 
 public:
-  explicit VerifyDialog(const QList<VerifyIssue> &issues, bool upload, QWidget *parent = nullptr);
+  explicit VerifyDialog(const RadioLimitContext &ctx, bool upload, QWidget *parent = nullptr);
 };
 
 #endif // VERIFYDIALOG_HH

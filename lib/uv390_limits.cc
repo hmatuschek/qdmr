@@ -10,8 +10,13 @@
 
 
 UV390Limits::UV390Limits(QObject *parent)
-  : RadioLimits(parent)
+  : RadioLimits(false, parent)
 {
+  // Define limits for call-sign DB
+  _hasCallSignDB          = true;
+  _callSignDBImplemented  = false;
+  _numCallSignDBEntries   = 122197;
+
   add("settings", new RadioLimitItem {
         { "introLine1", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },
         { "introLine2", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },

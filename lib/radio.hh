@@ -224,7 +224,7 @@ public:
    * Call @c RadioLimits::verifyConfig to verify a codeplug with respect to a radio.
    *
    * @since Version 0.10.2 */
-  //virtual const RadioLimits &limits() const = 0;
+  virtual const RadioLimits &limits() const = 0;
 
   /** Returns the codeplug instance. */
   virtual const Codeplug &codeplug() const = 0;

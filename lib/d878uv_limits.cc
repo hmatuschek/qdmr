@@ -9,9 +9,15 @@
 #include "roaming.hh"
 
 
-D878UVLimits::D878UVLimits(const std::initializer_list<std::pair<double, double> > &freqRanges, QObject *parent)
-  : RadioLimits(parent)
+D878UVLimits::D878UVLimits(const std::initializer_list<std::pair<double, double> > &freqRanges,
+                           const QString &hardwareRevision, QObject *parent)
+  : AnytoneLimits(hardwareRevision, "V100", true, parent)
 {
+  // Define limits for call-sign DB
+  _hasCallSignDB          = true;
+  _callSignDBImplemented  = true;
+  _numCallSignDBEntries   = 200000;
+
   /* Define limits for the general settings. */
   add("settings",
       new RadioLimitItem{

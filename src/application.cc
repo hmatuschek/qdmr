@@ -8,6 +8,7 @@
 #include "codeplug.hh"
 #include "config.h"
 #include "settings.hh"
+#include "radiolimits.hh"
 #include "verifydialog.hh"
 #include "analogchanneldialog.hh"
 #include "digitalchanneldialog.hh"
@@ -459,7 +460,7 @@ Application::detectRadio() {
 
 
 bool
-Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &flags) {
+Application::verifyCodeplug(Radio *radio, bool showSuccess) {
   Radio *myRadio = radio;
 
   // If no radio is given -> try to detect the radio
@@ -468,13 +469,13 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &f
   if (nullptr == myRadio)
     return false;
 
-
+  Settings settings;
+  RadioLimitContext ctx(settings.ignoreFrequencyLimits());
+  myRadio->limits().verifyConfig(_config, ctx);
   bool verified = true;
-  QList<VerifyIssue> issues;
-  VerifyIssue::Type maxIssue = myRadio->verifyConfig(_config, issues, flags);
-  if ( (flags.ignoreWarnings && (maxIssue>VerifyIssue::WARNING)) ||
-       ((!flags.ignoreWarnings) && (maxIssue>=VerifyIssue::WARNING)) ) {
-    VerifyDialog dialog(issues, (nullptr != radio));
+  if ( (settings.ignoreVerificationWarning() && (ctx.maxSeverity()>RadioLimitIssue::Warning)) ||
+       ((!settings.ignoreVerificationWarning()) && (ctx.maxSeverity()>=RadioLimitIssue::Warning)) ) {
+    VerifyDialog dialog(ctx, (nullptr != radio));
     if (QDialog::Accepted != dialog.exec())
       verified = false;
   } else if (showSuccess) {
@@ -565,15 +566,7 @@ Application::uploadCodeplug() {
   if (nullptr == radio)
     return;
 
-
-  // Verify codeplug against the detected radio before uploading,
-  // but do not show a message on success.
-  VerifyFlags flags = {
-    settings.ignoreVerificationWarning(),
-    settings.ignoreFrequencyLimits()
-  };
-
-  if (! verifyCodeplug(radio, false, flags)) {
+  if (! verifyCodeplug(radio, false)) {
     radio->deleteLater();
     return;
   }

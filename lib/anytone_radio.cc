@@ -45,33 +45,6 @@ AnytoneRadio::codeplug() {
   return *_codeplug;
 }
 
-
-VerifyIssue::Type
-AnytoneRadio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlags &flags) {
-  VerifyIssue::Type issue = Radio::verifyConfig(config, issues, flags);
-
-  if (_supported_version.isEmpty() || _version.isEmpty())
-    return issue;
-
-  if (_supported_version < _version) {
-    issues.append(VerifyIssue(
-                    VerifyIssue::WARNING,
-                    tr("You are likely using a newer radio reversion (%1) than supported (%2) by qdmr. "
-                       "The codeplug might be incompatible. "
-                       "Notify the developers of qdmr about the new reversion.").arg(_version, _supported_version)));
-    issue = std::max(issue, VerifyIssue::WARNING);
-  } else if (_supported_version > _version) {
-    issues.append(VerifyIssue(
-                    VerifyIssue::WARNING,
-                    tr("You are likely using an older hardware reversion (%1) than supported (%2) by qdmr. "
-                       "The codeplug might be incompatible.").arg(_version, _supported_version)));
-    issue = std::max(issue, VerifyIssue::WARNING);
-  }
-  return issue;
-}
-
-
-
 bool
 AnytoneRadio::startDownload(bool blocking, const ErrorStack &err) {
   if (StatusIdle != _task)

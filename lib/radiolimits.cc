@@ -49,6 +49,11 @@ RadioLimitIssue::severity() const {
   return _severity;
 }
 
+const QString &
+RadioLimitIssue::message() const {
+  return _message;
+}
+
 QString
 RadioLimitIssue::format() const {
   QString res; QTextStream stream(&res);
@@ -67,8 +72,8 @@ RadioLimitIssue::format() const {
 /* ********************************************************************************************* *
  * Implementation of RadioLimitContext
  * ********************************************************************************************* */
-RadioLimitContext::RadioLimitContext()
-  : _stack()
+RadioLimitContext::RadioLimitContext(bool ignoreFrequencyLimits)
+  : _stack(), _ignoreFrequencyLimits(ignoreFrequencyLimits), _maxSeverity(RadioLimitIssue::Silent)
 {
   // pass...
 }
@@ -76,6 +81,8 @@ RadioLimitContext::RadioLimitContext()
 RadioLimitIssue &
 RadioLimitContext::newMessage(RadioLimitIssue::Severity severity) {
   _messages.push_back(RadioLimitIssue(severity, _stack));
+  if (severity > _maxSeverity)
+    _maxSeverity = severity;
   return _messages.back();
 }
 
@@ -97,6 +104,20 @@ RadioLimitContext::push(const QString &element) {
 void
 RadioLimitContext::pop() {
   _stack.pop_back();
+}
+
+bool
+RadioLimitContext::ignoreFrequencyLimits() const {
+  return _ignoreFrequencyLimits;
+}
+void
+RadioLimitContext::enableIgnoreFrequencyLimits(bool enable) {
+  _ignoreFrequencyLimits = enable;
+}
+
+RadioLimitIssue::Severity
+RadioLimitContext::maxSeverity() const {
+  return _maxSeverity;
 }
 
 
@@ -415,7 +436,9 @@ RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop,
       return true;
   }
 
-  auto &msg = context.newMessage(RadioLimitIssue::Warning);
+  auto &msg = context.newMessage(
+        context.ignoreFrequencyLimits() ?
+          RadioLimitIssue::Warning : RadioLimitIssue::Critical);
   msg << "Frequency " << value << "MHz is outside of allowed frequency ranges.";
   return true;
 }
@@ -796,8 +819,8 @@ RadioLimitSingleZone::verifyItem(const ConfigItem *item, RadioLimitContext &cont
 /* ********************************************************************************************* *
  * Implementation of RadioLimits
  * ********************************************************************************************* */
-RadioLimits::RadioLimits(QObject *parent)
-  : RadioLimitItem(parent)
+RadioLimits::RadioLimits(bool betaWarning, QObject *parent)
+  : RadioLimitItem(parent), _betaWarning(betaWarning)
 {
   // pass...
 }
@@ -809,6 +832,27 @@ RadioLimits::RadioLimits(const std::initializer_list<std::pair<QString, RadioLim
 }
 
 bool
+RadioLimits::hasCallSignDB() const {
+  return _hasCallSignDB;
+}
+
+bool
+RadioLimits::callSignDBImplemented() const {
+  return _callSignDBImplemented;
+}
+
+unsigned
+RadioLimits::numCallSignDBEntries() const {
+  return _numCallSignDBEntries;
+}
+
+bool
 RadioLimits::verifyConfig(const Config *config, RadioLimitContext &context) const {
+  if (_betaWarning) {
+    auto &msg = context.newMessage(RadioLimitIssue::Warning);
+    msg = tr("The support for this radio is still under development. Some features may sill be "
+             "missing or are not well tested.");
+  }
+
   return verifyItem(config, context);
 }

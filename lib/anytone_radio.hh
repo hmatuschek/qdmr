@@ -46,9 +46,6 @@ public:
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
-  VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
-                                 const VerifyFlags &flags=VerifyFlags());
-
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
   bool startDownload(bool blocking=false, const ErrorStack &err=ErrorStack());

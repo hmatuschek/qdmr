@@ -1,4 +1,6 @@
 #include "dm1701.hh"
+#include "dm1701_limits.hh"
+
 #include "config.hh"
 #include "logger.hh"
 #include "utils.hh"
@@ -55,6 +57,8 @@ static Radio::Features _dm1701_features =
   .maxCallsignsInDB = 122197
 };
 
+RadioLimits *DM1701::_limits = nullptr;
+
 
 DM1701::DM1701(TyTInterface *device, QObject *parent)
   : TyTRadio(device, parent), _name("Baofeng DM-1701"), _codeplug()
@@ -70,6 +74,13 @@ DM1701::name() const {
 const Radio::Features &
 DM1701::features() const {
   return _dm1701_features;
+}
+
+const RadioLimits &
+DM1701::limits() const {
+  if (nullptr == _limits)
+    _limits = new DM1701Limits();
+  return *_limits;
 }
 
 RadioInfo

@@ -52,8 +52,7 @@ public slots:
   void quitApplication();
 
   void detectRadio();
-  bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true,
-                      const VerifyFlags &flags=VerifyFlags());
+  bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true);
 
   void downloadCodeplug();
   void uploadCodeplug();

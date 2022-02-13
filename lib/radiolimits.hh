@@ -12,6 +12,7 @@
  * new RadioLimitItem {                       // < Describes an ConfigItem
  *   { "radioIDs",                            // < with an 'radioIDs' property
  *     new RadioLimitList(                    // < that is a list,
+ *       RadioId::staticMetaObject,           // < holding instances of RadioId,
  *       1, 10,                               //   of at least one but max 10 elements
  *       new RadioLimitObject {               // < of objects, with
  *        { "name",                           // < a name
@@ -67,6 +68,8 @@ public:
 
   /** Returns the severity of the issue. */
   Severity severity() const;
+  /** Returns the text message. */
+  const QString &message() const;
   /** Formats the message. */
   QString format() const;
 
@@ -88,7 +91,7 @@ class RadioLimitContext
 {
 public:
   /** Empty constructor. */
-  explicit RadioLimitContext();
+  explicit RadioLimitContext(bool ignoreFrequencyLimits=false);
 
   /** Constructs a new message and puts it into the list of issues. */
   RadioLimitIssue &newMessage(RadioLimitIssue::Severity severity = RadioLimitIssue::Hint);
@@ -104,11 +107,23 @@ public:
   /** Pops the top-most property name/element index from the stack. */
   void pop();
 
+  /** If @c true, frequency limit voilations are warnings. */
+  bool ignoreFrequencyLimits() const;
+  /** Enables/disables that frequency range voilations are handled as warnings. */
+  void enableIgnoreFrequencyLimits(bool enable=true);
+
+  /** Returns the highest severity of the messages. */
+  RadioLimitIssue::Severity maxSeverity() const;
+
 protected:
   /** The current item stack. */
   QStringList _stack;
   /** The list of issues found. */
   QList<RadioLimitIssue> _messages;
+  /** If @c true, any frequency range voilation is a warning. */
+  bool _ignoreFrequencyLimits;
+  /** Holds the highest severity of all messages. */
+  RadioLimitIssue::Severity _maxSeverity;
 };
 
 
@@ -619,12 +634,30 @@ class RadioLimits : public RadioLimitItem
 
 public:
   /** Empty constructor. */
-  explicit RadioLimits(QObject *parent = nullptr);
+  explicit RadioLimits(bool betaWarning, QObject *parent = nullptr);
   /** Constructor from initializer list. */
   RadioLimits(const std::initializer_list<std::pair<QString,RadioLimitElement *> > &list, QObject *parent=nullptr);
 
   /** Verifies the given configuration. */
-  bool verifyConfig(const Config *config, RadioLimitContext &context) const;
+  virtual bool verifyConfig(const Config *config, RadioLimitContext &context) const;
+
+  /** Returns @c true if the radio supportes a call-sign DB. */
+  bool hasCallSignDB() const;
+  /** Returns @c true if the call-sign DB is implemented. */
+  bool callSignDBImplemented() const;
+  /** Retunrs the maximum number of entries in the call-sign DB. */
+  unsigned numCallSignDBEntries() const;
+
+protected:
+  /** If @c true, a warning is issued that the radio is still under development and not well
+   * tested yet. */
+  bool _betaWarning;
+  /** If @c true, the radio supports a call-sign DB. */
+  bool _hasCallSignDB;
+  /** If @c true, the call-sign is implemented. */
+  bool _callSignDBImplemented;
+  /** Holds the number of possible call-sign DB entries. */
+  unsigned _numCallSignDBEntries;
 };
 
 #endif // RADIOLIMITS_HH

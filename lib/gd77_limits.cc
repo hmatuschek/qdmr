@@ -8,8 +8,13 @@
 
 
 GD77Limits::GD77Limits(QObject *parent)
-  : RadioLimits(parent)
+  : RadioLimits(true, parent)
 {
+  // Define limits for call-sign DB
+  _hasCallSignDB          = true;
+  _callSignDBImplemented  = true;
+  _numCallSignDBEntries   = 10920;
+
   /* Define limits for the general settings. */
   add("settings",
       new RadioLimitItem{

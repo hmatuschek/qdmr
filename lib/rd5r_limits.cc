@@ -8,8 +8,13 @@
 
 
 RD5RLimits::RD5RLimits(QObject *parent)
-  : RadioLimits(parent)
+  : RadioLimits(false, parent)
 {  
+  // Define limits for call-sign DB
+  _hasCallSignDB          = false;
+  _callSignDBImplemented  = false;
+  _numCallSignDBEntries   = 0;
+
   /* Define limits for the general settings. */
   add("settings",
       new RadioLimitItem{
