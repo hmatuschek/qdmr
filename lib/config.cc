@@ -1,15 +1,18 @@
 #include "config.hh"
 #include "config.h"
+
 #include "rxgrouplist.hh"
 #include "channel.hh"
+#include "encryptionextension.hh"
+#include "csvreader.hh"
+#include "userdatabase.hh"
+#include "logger.hh"
+
 #include <QTextStream>
 #include <QDateTime>
 #include <QFile>
 #include <QMetaProperty>
 #include <cmath>
-#include "csvreader.hh"
-#include "userdatabase.hh"
-#include "logger.hh"
 
 
 /* ********************************************************************************************* *
@@ -21,7 +24,7 @@ Config::Config(QObject *parent)
     _rxGroupLists(new RXGroupLists(this)), _channels(new ChannelList(this)),
     _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
     _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this)),
-    _tytExtension(nullptr)
+    _tytExtension(nullptr), _encryptionExtension(nullptr)
 {
   connect(_settings, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   connect(_radioIDs, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
@@ -272,12 +275,32 @@ Config::clear() {
   emit modified(this);
 }
 
+EncryptionExtension *
+Config::encryptionExtension() const {
+  return _encryptionExtension;
+}
+
+void
+Config::setEncryptionExtension(EncryptionExtension *ext) {
+  if (_encryptionExtension == ext)
+    return;
+  if (_encryptionExtension)
+    _encryptionExtension->deleteLater();
+  _encryptionExtension = ext;
+  if (_encryptionExtension) {
+    _encryptionExtension->setParent(this);
+    connect(_encryptionExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
+  }
+}
+
 TyTConfigExtension *
 Config::tytExtension() const {
   return _tytExtension;
 }
 void
 Config::setTyTExtension(TyTConfigExtension *ext) {
+  if (_tytExtension == ext)
+    return;
   if (_tytExtension)
     _tytExtension->deleteLater();
   _tytExtension = ext;
