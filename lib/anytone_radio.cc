@@ -10,7 +10,7 @@
 
 AnytoneRadio::AnytoneRadio(const QString &name, AnytoneInterface *device, QObject *parent)
   : Radio(parent), _name(name), _dev(device), _codeplugFlags(), _config(nullptr),
-    _codeplug(nullptr), _callsigns(nullptr), _supported_version(), _version()
+    _codeplug(nullptr), _callsigns(nullptr)
 {
   // Check if device is open
   if ((nullptr==_dev) || (! _dev->isOpen())) {

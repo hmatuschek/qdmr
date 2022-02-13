@@ -40,7 +40,6 @@ public:
   /** Do not construct this class directly, rather use @c Radio::detect. */
   explicit D868UV(AnytoneInterface *device=nullptr, QObject *parent=nullptr);
 
-  const Radio::Features &features() const;
   const RadioLimits &limits() const;
 
   /** Returns the default radio information. The actual instance may have different properties
@@ -48,8 +47,6 @@ public:
   static RadioInfo defaultRadioInfo();
 
 protected:
-  /** Features of detected radio, variant and mode. */
-  Radio::Features _features;
   /** Holds the limits for this radio.*/
   RadioLimits *_limits;
 };

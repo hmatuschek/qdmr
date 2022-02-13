@@ -45,7 +45,6 @@ public:
   virtual ~MD2017();
 
   const QString &name() const;
-  const Features &features() const;
   const RadioLimits &limits() const;
 
   const Codeplug &codeplug() const;

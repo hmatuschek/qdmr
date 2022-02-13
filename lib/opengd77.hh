@@ -24,7 +24,6 @@ public:
   virtual ~OpenGD77();
 
 	const QString &name() const;
-  const Radio::Features &features() const;
   const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();

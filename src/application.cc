@@ -597,7 +597,7 @@ Application::uploadCallsignDB() {
   if (nullptr == radio)
     return;
 
-  if (! radio->features().hasCallsignDB) {
+  if (! radio->limits().hasCallSignDB()) {
     logDebug() << "Radio " << radio->name() << " does not support call-sign DB.";
     QMessageBox::information(nullptr, tr("Cannot write call-sign DB."),
                              tr("The detected radio '%1' does not support "
@@ -606,7 +606,7 @@ Application::uploadCallsignDB() {
     radio->deleteLater();
     return;
   }
-  if (! radio->features().callsignDBImplemented) {
+  if (! radio->limits().callSignDBImplemented()) {
     logDebug() << "Radio " << radio->name()
                << " does support call-sign DB but it is not implemented yet.";
     QMessageBox::critical(nullptr, tr("Cannot write call-sign DB."),

@@ -46,7 +46,6 @@ public:
   virtual ~UV390();
 
   const QString &name() const;
-  const Features &features() const;
   const RadioLimits &limits() const;
 
   const Codeplug &codeplug() const;

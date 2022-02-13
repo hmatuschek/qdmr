@@ -43,7 +43,6 @@ public:
   explicit DM1701(TyTInterface *device=nullptr, QObject *parent=nullptr);
 
   const QString &name() const;
-  const Radio::Features &features() const;
   const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();

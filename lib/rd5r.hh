@@ -46,7 +46,6 @@ public:
   virtual ~RD5R();
 
 	const QString &name() const;
-	const Radio::Features &features() const;
   const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
