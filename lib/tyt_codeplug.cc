@@ -7,6 +7,7 @@
 #include "config.h"
 #include "logger.hh"
 #include "tyt_extensions.hh"
+#include "encryptionextension.hh"
 #include <QTimeZone>
 #include <QtEndian>
 
@@ -2537,13 +2538,13 @@ TyTCodeplug::EmergencySystemElement::revertChannelSelected() {
  * Implementation of TyTCodeplug::EncryptionElement
  * ******************************************************************************************** */
 TyTCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr, size_t size)
-  : Element(ptr, size)
+  : Element(ptr, size), _numEnhancedKeys(8), _numBasicKeys(16)
 {
   // pass...
 }
 
 TyTCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr)
-  : Element(ptr, 0xb0)
+  : Element(ptr, 0xb0), _numEnhancedKeys(8), _numBasicKeys(16)
 {
   // pass...
 }
@@ -2557,8 +2558,16 @@ TyTCodeplug::EncryptionElement::clear() {
   memset(_data, 0xff, 0xb0);
 }
 
+bool
+TyTCodeplug::EncryptionElement::isEnhancedKeySet(unsigned n) const {
+  QByteArray key = enhancedKey(n);
+  for (int i=0; i<16; i++)
+    if ('\xff' != key[i])
+      return true;
+  return false;
+}
 QByteArray
-TyTCodeplug::EncryptionElement::enhancedKey(unsigned n) {
+TyTCodeplug::EncryptionElement::enhancedKey(unsigned n) const {
   return QByteArray((char *)(_data+n*16), 16);
 }
 void
@@ -2568,15 +2577,80 @@ TyTCodeplug::EncryptionElement::setEnhancedKey(unsigned n, const QByteArray &key
   memcpy(_data+n*16, key.constData(), 16);
 }
 
+bool
+TyTCodeplug::EncryptionElement::isBasicKeySet(unsigned n) const {
+  QByteArray key = basicKey(n);
+  for (int i=0; i<2; i++)
+    if ('\xff' != key[i])
+      return true;
+  return false;
+}
 QByteArray
-TyTCodeplug::EncryptionElement::basicKey(unsigned n) {
+TyTCodeplug::EncryptionElement::basicKey(unsigned n) const {
   return QByteArray((char *)(_data+0x90+n*2), 2);
 }
 void
 TyTCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
   if (2 != key.size())
     return;
-  memcpy(_data+0x90+n*16, key.constData(), 2);
+  memcpy(_data+0x90+n*2, key.constData(), 2);
+}
+
+bool
+TyTCodeplug::EncryptionElement::fromEncryptionExt(EncryptionExtension *encr, Context &ctx) {
+  Q_UNUSED(ctx)
+
+  // Clear all keys
+  clear();
+
+  // Encode each key
+  unsigned basicCount=0, aesCount=0;
+  for (int i=0; i<encr->keys()->count(); i++) {
+    if (encr->keys()->get(i)->is<DMREncryptionKey>() && (_numBasicKeys > basicCount)) {
+      DMREncryptionKey *key = encr->keys()->get(i)->as<DMREncryptionKey>();
+      setBasicKey(basicCount++,key->key());
+    } else if (encr->keys()->get(i)->is<AESEncryptionKey>() && (_numEnhancedKeys > aesCount)) {
+      AESEncryptionKey *key = encr->keys()->get(i)->as<AESEncryptionKey>();
+      setEnhancedKey(aesCount++, key->key());
+    } else {
+      logWarn() << "Cannot encode key of type '" << encr->keys()->get(i)->metaObject()->className()
+                << "'.";
+    }
+  }
+
+  return true;
+}
+
+EncryptionExtension *
+TyTCodeplug::EncryptionElement::toEncryptionExt(Context &ctx) {
+  ctx.addTable(&DMREncryptionKey::staticMetaObject);
+  ctx.addTable(&AESEncryptionKey::staticMetaObject);
+
+  EncryptionExtension *ext = new EncryptionExtension();
+  for (unsigned i=0; i<_numEnhancedKeys; i++) {
+    if (! isEnhancedKeySet(i))
+      continue;
+    AESEncryptionKey *key = new AESEncryptionKey();
+    ctx.add(key,i+1);
+    key->fromHex(enhancedKey(i).toHex());
+    ext->keys()->add(key);
+  }
+  for (unsigned i=0; i<_numBasicKeys; i++) {
+    if (! isBasicKeySet(i))
+      continue;
+    DMREncryptionKey *key = new DMREncryptionKey();
+    ctx.add(key,i+1);
+    key->fromHex(basicKey(i).toHex());
+    ext->keys()->add(key);
+  }
+
+  return ext;
+}
+
+bool
+TyTCodeplug::EncryptionElement::linkEncryptionExt(EncryptionExtension *encr, Context &ctx) {
+  Q_UNUSED(encr); Q_UNUSED(ctx);
+  return true;
 }
 
 
@@ -2808,6 +2882,12 @@ TyTCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
   // Decode button settings
   if (! this->decodeButtonSetttings(ctx.config(), err)) {
     errMsg(err) << "Cannot decode button settings.";
+    return false;
+  }
+
+  // Decode encryption settings
+  if (! this->decodePrivacyKeys(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot decode encryption settings.";
     return false;
   }
 

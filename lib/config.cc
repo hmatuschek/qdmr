@@ -92,38 +92,38 @@ Config::setModified(bool modified) {
 }
 
 bool
-Config::label(Context &context) {
-  if (! ConfigItem::label(context))
+Config::label(Context &context, const ErrorStack &err) {
+  if (! ConfigItem::label(context, err))
     return false;
 
-  if (! _settings->label(context))
+  if (! _settings->label(context, err))
     return false;
-  if (! _radioIDs->label(context))
+  if (! _radioIDs->label(context, err))
     return false;
-  if (! _contacts->label(context))
+  if (! _contacts->label(context, err))
     return false;
-  if (! _rxGroupLists->label(context))
+  if (! _rxGroupLists->label(context, err))
     return false;
-  if (! _channels->label(context))
+  if (! _channels->label(context, err))
     return false;
-  if (! _zones->label(context))
+  if (! _zones->label(context, err))
     return false;
-  if (! _scanlists->label(context))
+  if (! _scanlists->label(context, err))
     return false;
-  if (! _gpsSystems->label(context))
+  if (! _gpsSystems->label(context, err))
     return false;
-  if (! _roaming->label(context))
+  if (! _roaming->label(context, err))
     return false;
 
   return true;
 }
 
 bool
-Config::toYAML(QTextStream &stream) {
+Config::toYAML(QTextStream &stream, const ErrorStack &err) {
   ConfigItem::Context context;
   if (! this->label(context))
     return false;
-  YAML::Node doc = serialize(context);
+  YAML::Node doc = serialize(context, err);
   if (doc.IsNull())
     return false;
   YAML::Emitter emitter;
@@ -133,47 +133,47 @@ Config::toYAML(QTextStream &stream) {
 }
 
 bool
-Config::populate(YAML::Node &node, const Context &context)
+Config::populate(YAML::Node &node, const Context &context, const ErrorStack &err)
 {
   node["version"] = VERSION_STRING;
 
-  if ((node["settings"]= _settings->serialize(context)).IsNull())
+  if ((node["settings"]= _settings->serialize(context, err)).IsNull())
     return false;
 
   if (_radioIDs->defaultId() && context.contains(_radioIDs->defaultId()))
     node["settings"]["defaultID"] = context.getId(_radioIDs->defaultId()).toStdString();
 
-  if ((node["radioIDs"] = _radioIDs->serialize(context)).IsNull())
+  if ((node["radioIDs"] = _radioIDs->serialize(context, err)).IsNull())
     return false;
 
-  if ((node["contacts"] = _contacts->serialize(context)).IsNull())
+  if ((node["contacts"] = _contacts->serialize(context, err)).IsNull())
     return false;
 
-  if ((node["groupLists"] = _rxGroupLists->serialize(context)).IsNull())
+  if ((node["groupLists"] = _rxGroupLists->serialize(context, err)).IsNull())
     return false;
 
-  if ((node["channels"] = _channels->serialize(context)).IsNull())
+  if ((node["channels"] = _channels->serialize(context, err)).IsNull())
     return false;
 
-  if ((node["zones"] = _zones->serialize(context)).IsNull())
+  if ((node["zones"] = _zones->serialize(context, err)).IsNull())
     return false;
 
   if (_scanlists->count()) {
-    if ((node["scanLists"] = _scanlists->serialize(context)).IsNull())
+    if ((node["scanLists"] = _scanlists->serialize(context, err)).IsNull())
       return false;
   }
 
   if (_gpsSystems->count()) {
-    if ((node["positioning"] = _gpsSystems->serialize(context)).IsNull())
+    if ((node["positioning"] = _gpsSystems->serialize(context, err)).IsNull())
       return false;
   }
 
   if (_roaming->count()) {
-    if ((node["roaming"] = _roaming->serialize(context)).IsNull())
+    if ((node["roaming"] = _roaming->serialize(context, err)).IsNull())
       return false;
   }
 
-  if (! ConfigItem::populate(node, context))
+  if (! ConfigItem::populate(node, context, err))
     return false;
 
   return true;

@@ -346,11 +346,14 @@ public:
   bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack());
 
+  void clearPrivacyKeys();
+  bool encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err);
+
   /** Resets the boot setting, e.g. initial channels and zone at bootup. */
   virtual void clearBootSettings();
   void clearMenuSettings();
   void clearTextMessages();
-  void clearPrivacyKeys();
   void clearEmergencySystems();
   /** Clears the VFO A & B. */
   virtual void clearVFOSettings();

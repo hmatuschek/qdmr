@@ -95,7 +95,7 @@ public:
 	bool setNumber(const QString &number);
 
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** The DTMF number. */
@@ -154,7 +154,7 @@ public:
   void setOpenGD77ContactExtension(OpenGD77ContactExtension *ext);
 
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** The call type. */

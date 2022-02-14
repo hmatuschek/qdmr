@@ -106,10 +106,10 @@ public:
 public:
   /** Recursively labels the config object.
    * Does not assign a label if the @c idBase passed to the constructor is empty. */
-  virtual bool label(Context &context);
+  virtual bool label(Context &context, const ErrorStack &err=ErrorStack());
   /** Recursively serializes the configuration to YAML nodes.
    * The complete configuration must be labeled first. */
-  virtual YAML::Node serialize(const Context &context);
+  virtual YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
   /** Allocates an instance for the given property on the given YAML node.
    * This is usually done automatically based on the meta-type of the property. To be able to
@@ -162,7 +162,7 @@ public:
 protected:
   /** Recursively serializes the configuration to YAML nodes.
    * The complete configuration must be labeled first. */
-  virtual bool populate(YAML::Node &node, const Context &context);
+  virtual bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 signals:
   /** Gets emitted once the config object is modified.
@@ -203,11 +203,11 @@ public:
   virtual void setName(const QString &name);
 
 public:
-  bool label(Context &context);
+  bool label(Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
-  virtual bool populate(YAML::Node &node, const Context &context);
+  virtual bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds the base string to derive an ID from. All objects need some ID to be referenced within
@@ -246,10 +246,10 @@ public:
   virtual bool copy(const AbstractConfigObjectList &other);
 
   /** Recursively labels the config object. */
-  virtual bool label(ConfigItem::Context &context) = 0;
+  virtual bool label(ConfigItem::Context &context, const ErrorStack &err=ErrorStack()) = 0;
   /** Recursively serializes the configuration to YAML nodes.
    * The complete configuration must be labeled first. */
-  virtual YAML::Node serialize(const ConfigItem::Context &context) = 0;
+  virtual YAML::Node serialize(const ConfigItem::Context &context, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Returns the number of elements in the list. */
   virtual int count() const;
@@ -327,8 +327,8 @@ public:
   /** Links the list from the given YAML node. */
   virtual bool link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 
-  bool label(ConfigItem::Context &context);
-  YAML::Node serialize(const ConfigItem::Context &context);
+  bool label(ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
+  YAML::Node serialize(const ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
 };
 
 
@@ -345,8 +345,8 @@ protected:
   explicit ConfigObjectRefList(const QMetaObject &elementType=ConfigObject::staticMetaObject, QObject *parent = nullptr);
 
 public:
-  bool label(ConfigItem::Context &context);
-  YAML::Node serialize(const ConfigItem::Context &context);
+  bool label(ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
+  YAML::Node serialize(const ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
 };
 
 

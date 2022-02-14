@@ -148,7 +148,7 @@ public:
   bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
-  bool populate(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 protected slots:
   /** Gets called whenever a referenced object is changed or deleted. */
@@ -267,11 +267,11 @@ public:
   void setAPRSSystem(APRSSystem *sys);
 
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
-  bool populate(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds the admit criterion. */
@@ -412,7 +412,7 @@ public:
   bool setRadioIdObj(DMRRadioID *id);
 
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** The admit criterion. */

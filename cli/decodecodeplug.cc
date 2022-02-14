@@ -263,7 +263,10 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
         return -1;
       }
       QTextStream stream(&outfile);
-      config.toYAML(stream);
+      if (! config.toYAML(stream, err)) {
+        logError() << "Cannot serialize codeplug to YAML:"
+                   << err.format(" ");
+      }
       outfile.close();
     } else {
       logError() << "Cannot determine codeplug output file format. Consider using --csv or --yaml.";
@@ -276,8 +279,9 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
                     "Import still works.";
       return -1;
     } else if (parser.isSet("yaml")) {
-      if (! config.toYAML(stream)) {
-        logError() << "Cannot serialize codeplug into YAML.";
+      if (! config.toYAML(stream, err)) {
+        logError() << "Cannot serialize codeplug into YAML:"
+                   << err.format(" ");
         return -1;
       }
     } else {

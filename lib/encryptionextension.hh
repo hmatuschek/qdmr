@@ -17,12 +17,16 @@ protected:
   /** Hidden constructor. */
   explicit EncryptionKey(QObject *parent=nullptr);
 
+public:
   void clear();
 
   /** Creates a key from the given hex-string. */
   virtual void fromHex(const QString &hex);
   /** Converts a key to a hex string. */
   virtual QString toHex() const;
+
+  /** Returns the binary key. */
+  const QByteArray &key() const;
 
 protected:
   /** Holds the key data.
@@ -42,7 +46,7 @@ class DMREncryptionKey: public EncryptionKey
 
 public:
   /** Empty constructor. */
-  explicit DMREncryptionKey(QObject *parent=nullptr);
+   Q_INVOKABLE explicit DMREncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   virtual void fromHex(const QString &hex);
@@ -60,7 +64,7 @@ class AESEncryptionKey: public EncryptionKey
 
 public:
   /** Empty constructor. */
-  explicit AESEncryptionKey(QObject *parent=nullptr);
+   Q_INVOKABLE explicit AESEncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   virtual void fromHex(const QString &hex);
@@ -80,7 +84,7 @@ public:
   /** Empty constructor. */
   explicit EncryptionKeys(QObject *parent=nullptr);
 
-  int add(ConfigObject *obj, int row);
+  int add(ConfigObject *obj, int row=-1);
 
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
@@ -100,7 +104,9 @@ class EncryptionExtension: public ConfigExtension
 
 public:
   /** Default constructor without any keys. */
-  explicit EncryptionExtension(QObject *parent=nullptr);
+   Q_INVOKABLE explicit EncryptionExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
 
   /** Returns the list of encryption keys. */
   EncryptionKeys *keys() const;

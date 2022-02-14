@@ -44,7 +44,7 @@ public:
   bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
-  bool populate(YAML::Node &node, const ConfigItem::Context &context);
+  bool populate(YAML::Node &node, const ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
 
 protected slots:
   /** Gets called, whenever a reference is modified. */
@@ -114,7 +114,7 @@ public:
   void setRevert(DigitalChannelReference *channel);
 
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds the destination contact for the GPS information. */
@@ -224,11 +224,11 @@ public:
   void setMessage(const QString &msg);
 
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
-  bool populate(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** A weak reference to the transmit channel. */

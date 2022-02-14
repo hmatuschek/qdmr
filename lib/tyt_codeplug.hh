@@ -1074,14 +1074,34 @@ public:
 
     void clear();
 
+    /** Retunrs @c true if the n-th "enhanced" key (128bit) is set.
+     * That is, if it is not filled with 0xff. */
+    virtual bool isEnhancedKeySet(unsigned n) const;
     /** Returns the n-th "enhanced" key (128bit). */
-    virtual QByteArray enhancedKey(unsigned n);
+    virtual QByteArray enhancedKey(unsigned n) const;
     /** Sets the n-th "enhanced" key (128bit). */
     virtual void setEnhancedKey(unsigned n, const QByteArray &key);
+
+    /** Retunrs @c true if the n-th "basic" key (16bit) is set.
+     * That is, if it is not filled with 0xff. */
+    virtual bool isBasicKeySet(unsigned n) const;
     /** Returns the n-th "basic" key (16bit). */
-    virtual QByteArray basicKey(unsigned n);
+    virtual QByteArray basicKey(unsigned n) const;
     /** Sets the n-th "basic" key (16bit). */
     virtual void setBasicKey(unsigned n, const QByteArray &key);
+
+    /** Encodes given encryption extension. */
+    virtual bool fromEncryptionExt(EncryptionExtension *encr, Context &ctx);
+    /** Constructs the encryption extension. */
+    virtual EncryptionExtension *toEncryptionExt(Context &ctx);
+    /** Links the given encryption extension. */
+    virtual bool linkEncryptionExt(EncryptionExtension *encr, Context &ctx);
+
+  protected:
+    /** Number of enhanced keys. */
+    unsigned _numEnhancedKeys;
+    /** Number of basic keys. */
+    unsigned _numBasicKeys;
   };
 
 protected:
@@ -1180,12 +1200,17 @@ public:
   /** Decodes the button settings. */
   virtual bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack()) = 0;
 
+  /** Clears all encryption keys in the codeplug. */
+  virtual void clearPrivacyKeys() = 0;
+  /** Encodes the encryption keys. */
+  virtual bool encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes the encryption keys. */
+  virtual bool decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
   /** Clears the menu settings in the codeplug. */
   virtual void clearMenuSettings() = 0;
   /** Clears all text messages in the codeplug. */
   virtual void clearTextMessages() = 0;
-  /** Clears all encryption keys in the codeplug. */
-  virtual void clearPrivacyKeys() = 0;
   /** Clears all emergency systems in the codeplug. */
   virtual void clearEmergencySystems() = 0;
 };

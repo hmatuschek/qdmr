@@ -30,6 +30,11 @@ EncryptionKey::toHex() const {
   return _key.toHex();
 }
 
+const QByteArray &
+EncryptionKey::key() const {
+  return _key;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of DMREncryptionKey
@@ -141,6 +146,16 @@ EncryptionExtension::EncryptionExtension(QObject *parent)
   : ConfigExtension(parent), _keys(new EncryptionKeys(this))
 {
   // pass...
+}
+
+ConfigItem *
+EncryptionExtension::clone() const {
+  EncryptionExtension *ext = new EncryptionExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
 }
 
 EncryptionKeys *

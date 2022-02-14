@@ -136,9 +136,12 @@ public:
   bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack());
 
+  void clearPrivacyKeys();
+  bool encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err);
+
   void clearMenuSettings();
   void clearTextMessages();
-  void clearPrivacyKeys();
   void clearEmergencySystems();
 };
 

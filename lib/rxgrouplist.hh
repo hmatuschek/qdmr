@@ -50,7 +50,7 @@ public:
   DigitalContactRefList *contacts();
 
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
 protected slots:
   /** Internal used callback to handle list modifications. */

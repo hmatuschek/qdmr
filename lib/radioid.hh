@@ -52,7 +52,7 @@ public:
   /** Sets the DMR ID. */
   void setNumber(uint32_t number);
 
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
   bool link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 

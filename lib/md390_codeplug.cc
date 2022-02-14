@@ -570,6 +570,44 @@ MD390Codeplug::decodeButtonSetttings(Config *config, const ErrorStack &err) {
   return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).updateConfig(config);
 }
 
+
+void
+MD390Codeplug::clearPrivacyKeys() {
+  EncryptionElement(data(ADDR_PRIVACY_KEYS)).clear();
+}
+
+bool
+MD390Codeplug::encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err);
+  // First, reset keys
+  clearPrivacyKeys();
+  // Get keys
+  EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
+  // If there is no encryption extension -> done.
+  if (! config->encryptionExtension())
+    return true;
+  // Otherwise encode
+  return keys.fromEncryptionExt(config->encryptionExtension(), ctx);
+}
+
+bool
+MD390Codeplug::decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err) {
+  // Get keys
+  EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
+  // Decode element
+  EncryptionExtension *ext = keys.toEncryptionExt(ctx);
+  // Handle errors
+  if (nullptr == ext) {
+    errMsg(err) << "Cannot create encryption extension.";
+    return false;
+  }
+
+  // Add encryption extension from codeplug
+  config->setEncryptionExtension(ext);
+  return true;
+}
+
+
 void
 MD390Codeplug::clearMenuSettings() {
   MenuSettingsElement(data(ADDR_MENUSETTINGS)).clear();
@@ -578,12 +616,6 @@ MD390Codeplug::clearMenuSettings() {
 void
 MD390Codeplug::clearTextMessages() {
   memset(data(ADDR_TEXTMESSAGES), 0, NUM_TEXTMESSAGES*TEXTMESSAGE_SIZE);
-}
-
-void
-MD390Codeplug::clearPrivacyKeys() {
-  EncryptionElement(data(ADDR_PRIVACY_KEYS)).clear();
-
 }
 
 void

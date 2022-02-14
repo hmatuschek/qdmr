@@ -102,8 +102,8 @@ DTMFContact::setNumber(const QString &number) {
 }
 
 YAML::Node
-DTMFContact::serialize(const Context &context) {
-  YAML::Node node = Contact::serialize(context);
+DTMFContact::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = Contact::serialize(context, err);
   if (node.IsNull())
     return node;
 
@@ -171,8 +171,8 @@ DigitalContact::setNumber(unsigned number) {
 }
 
 YAML::Node
-DigitalContact::serialize(const Context &context) {
-  YAML::Node node = Contact::serialize(context);
+DigitalContact::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = Contact::serialize(context, err);
   if (node.IsNull())
     return node;
 

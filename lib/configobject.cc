@@ -219,20 +219,21 @@ ConfigItem::copy(const ConfigItem &other) {
 }
 
 bool
-ConfigItem::label(ConfigObject::Context &context) {
+ConfigItem::label(ConfigObject::Context &context, const ErrorStack &err) {
   // Label properties owning config objects, that is of type ConfigObject or ConfigObjectList
   const QMetaObject *meta = metaObject();
+
   for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
     QMetaProperty prop = meta->property(p);
     if (! prop.isValid())
       continue;
     if (prop.read(this).value<ConfigObjectList *>()) {
       ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>();
-      if (! lst->label(context))
+      if (! lst->label(context, err))
         return false;
     } else if (prop.read(this).value<ConfigItem *>()) {
       ConfigItem *obj = prop.read(this).value<ConfigItem *>();
-      if (! obj->label(context))
+      if (! obj->label(context, err))
         return false;
     }
   }
@@ -242,7 +243,7 @@ ConfigItem::label(ConfigObject::Context &context) {
 
 
 YAML::Node
-ConfigItem::serialize(const Context &context) {
+ConfigItem::serialize(const Context &context, const ErrorStack &err) {
   YAML::Node node;
   if (! populate(node, context))
     return YAML::Node();
@@ -272,7 +273,7 @@ ConfigItem::clear() {
 }
 
 bool
-ConfigItem::populate(YAML::Node &node, const Context &context){
+ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack &err){
   // Serialize all properties
   const QMetaObject *meta = metaObject();
   for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
@@ -289,10 +290,10 @@ ConfigItem::populate(YAML::Node &node, const Context &context){
       QVariant value = prop.read(this);
       const char *key = e.valueToKey(value.toInt());
       if (nullptr == key) {
-        logError() << "Cannot map value " << value.toUInt()
-                   << " to enum " << e.name()
-                   << ". Ignore attribute but this points to an incompatibility in some codeplug. "
-                   << "Consider reporting it to https://github.com/hmatuschek/qdmr/issues.";
+        errMsg(err) << "Cannot map value " << value.toUInt()
+                    << " to enum " << e.name()
+                    << ". Ignore attribute but this points to an incompatibility in some codeplug. "
+                    << "Consider reporting it to https://github.com/hmatuschek/qdmr/issues.";
         continue;
       }
       node[prop.name()] = key;
@@ -316,8 +317,8 @@ ConfigItem::populate(YAML::Node &node, const Context &context){
         node[prop.name()] = tag;
         continue;
       } else if (! context.contains(obj)) {
-        logError() << "Cannot reference object of type " << obj->metaObject()->className()
-                   << " object not labeled.";
+        errMsg(err) << "Cannot reference object of type " << obj->metaObject()->className()
+                    << " object not labeled.";
         return false;
       }
       node[prop.name()] = context.getId(obj).toStdString();
@@ -334,8 +335,8 @@ ConfigItem::populate(YAML::Node &node, const Context &context){
           list.push_back(tag);
           continue;
         } else if (! context.contains(obj)) {
-          logError() << "Cannot reference object of type " << obj->metaObject()->className()
-                     << " object not labeled.";
+          errMsg(err) << "Cannot reference object of type " << obj->metaObject()->className()
+                      << " object not labeled.";
           return false;
         }
         list.push_back(context.getId(obj).toStdString());
@@ -781,8 +782,8 @@ ConfigObject::setName(const QString &name) {
 }
 
 bool
-ConfigObject::label(ConfigObject::Context &context) {
-  if (! ConfigItem::label(context))
+ConfigObject::label(ConfigObject::Context &context, const ErrorStack &err) {
+  if (! ConfigItem::label(context, err))
     return false;
 
   // With empty ID base, skip labeling.
@@ -795,8 +796,12 @@ ConfigObject::label(ConfigObject::Context &context) {
     id=QString("%1%2").arg(_idBase).arg(++n);
   }
 
-  if (! context.add(id, this))
+  if (! context.add(id, this)) {
+    if (context.contains(this))
+      errMsg(err) << "Object already in context with id '" << context.getId(this) << "'.";
+    errMsg(err) << "Cannot add element '" << id << "' to context.";
     return false;
+  }
 
   // Label properties owning config objects, that is of type ConfigObject or ConfigObjectList
   const QMetaObject *meta = metaObject();
@@ -837,10 +842,10 @@ ConfigObject::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
 }
 
 bool
-ConfigObject::populate(YAML::Node &node, const Context &context) {
+ConfigObject::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
   if (context.contains(this))
     node["id"] = context.getId(this).toStdString();
-  return ConfigItem::populate(node, context);
+  return ConfigItem::populate(node, context, err);
 }
 
 
@@ -1005,19 +1010,19 @@ ConfigObjectList::ConfigObjectList(const QMetaObject &elementType, QObject *pare
 }
 
 bool
-ConfigObjectList::label(ConfigItem::Context &context) {
+ConfigObjectList::label(ConfigItem::Context &context, const ErrorStack &err) {
   foreach (ConfigItem *obj, _items) {
-    if (! obj->label(context))
+    if (! obj->label(context, err))
       return false;
   }
   return true;
 }
 
 YAML::Node
-ConfigObjectList::serialize(const ConfigItem::Context &context) {
+ConfigObjectList::serialize(const ConfigItem::Context &context, const ErrorStack &err) {
   YAML::Node list(YAML::NodeType::Sequence);
   foreach (ConfigItem *obj, _items) {
-    YAML::Node node = obj->serialize(context);
+    YAML::Node node = obj->serialize(context, err);
     if (node.IsNull())
       return node;
     list.push_back(node);
@@ -1137,18 +1142,20 @@ ConfigObjectRefList::ConfigObjectRefList(const QMetaObject &elementType, QObject
 }
 
 bool
-ConfigObjectRefList::label(ConfigItem::Context &context) {
-  Q_UNUSED(context)
+ConfigObjectRefList::label(ConfigItem::Context &context, const ErrorStack &err) {
+  Q_UNUSED(context); Q_UNUSED(err);
   // pass...
   return true;
 }
 
 YAML::Node
-ConfigObjectRefList::serialize(const ConfigItem::Context &context) {
+ConfigObjectRefList::serialize(const ConfigItem::Context &context, const ErrorStack &err) {
   YAML::Node list(YAML::NodeType::Sequence);
   foreach (ConfigObject *obj, _items) {
-    if (! context.contains(obj))
+    if (! context.contains(obj)) {
+      errMsg(err) << "Cannot serialized ref list: Object '" << obj->name() << "' not in context!";
       return YAML::Node();
+    }
     list.push_back(context.getId(obj).toStdString());
   }
   return list;

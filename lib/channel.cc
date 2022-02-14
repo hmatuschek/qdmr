@@ -250,8 +250,8 @@ Channel::setTyTChannelExtension(TyTChannelExtension *ext) {
 }
 
 bool
-Channel::populate(YAML::Node &node, const Context &context) {
-  if (! ConfigObject::populate(node, context))
+Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
+  if (! ConfigObject::populate(node, context, err))
     return false;
 
   if (defaultPower()) {
@@ -479,18 +479,19 @@ AnalogChannel::setAPRSSystem(APRSSystem *sys) {
 }
 
 YAML::Node
-AnalogChannel::serialize(const Context &context) {
-  YAML::Node node = Channel::serialize(context);
+AnalogChannel::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = Channel::serialize(context, err);
   if (node.IsNull())
     return node;
+
   YAML::Node type;
   type["analog"] = node;
   return type;
 }
 
 bool
-AnalogChannel::populate(YAML::Node &node, const Context &context) {
-  if (! Channel::populate(node, context))
+AnalogChannel::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
+  if (! Channel::populate(node, context, err))
     return false;
 
   if (Signaling::SIGNALING_NONE != _rxTone) {
@@ -822,10 +823,11 @@ DigitalChannel::setRadioIdObj(DMRRadioID *id) {
 }
 
 YAML::Node
-DigitalChannel::serialize(const Context &context) {
-  YAML::Node node = Channel::serialize(context);
+DigitalChannel::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = Channel::serialize(context, err);
   if (node.IsNull())
     return node;
+
   YAML::Node type;
   type["digital"] = node;
   return type;

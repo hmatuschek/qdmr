@@ -51,6 +51,7 @@
 #include "radioid.hh"
 #include "radiosettings.hh"
 #include "tyt_extensions.hh"
+#include "encryptionextension.hh"
 
 // Forward declaration
 class UserDatabase;
@@ -155,12 +156,12 @@ public:
   bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
 
 public:
-  bool label(Context &context);
+  bool label(Context &context, const ErrorStack &err=ErrorStack());
   /** Serializes the configuration into the given stream as text. */
-  bool toYAML(QTextStream &stream);
+  bool toYAML(QTextStream &stream, const ErrorStack &err=ErrorStack());
 
 protected:
-  bool populate(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 protected slots:
   /** Iternal callback. */
