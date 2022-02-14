@@ -2561,10 +2561,11 @@ TyTCodeplug::EncryptionElement::clear() {
 bool
 TyTCodeplug::EncryptionElement::isEnhancedKeySet(unsigned n) const {
   QByteArray key = enhancedKey(n);
-  for (int i=0; i<16; i++)
-    if ('\xff' != key[i])
+  for (int i=0; i<16; i++) {
+    if (key[0] != key[i])
       return true;
-  return false;
+  }
+  return ('\xff' != key[0]) && ('\x00' != key[0]);
 }
 QByteArray
 TyTCodeplug::EncryptionElement::enhancedKey(unsigned n) const {
@@ -2581,9 +2582,9 @@ bool
 TyTCodeplug::EncryptionElement::isBasicKeySet(unsigned n) const {
   QByteArray key = basicKey(n);
   for (int i=0; i<2; i++)
-    if ('\xff' != key[i])
+    if (key[0] != key[i])
       return true;
-  return false;
+  return ('\xff'!=key[0]) && ('\x00' != key[0]);
 }
 QByteArray
 TyTCodeplug::EncryptionElement::basicKey(unsigned n) const {
@@ -2598,7 +2599,8 @@ TyTCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
 
 bool
 TyTCodeplug::EncryptionElement::fromEncryptionExt(EncryptionExtension *encr, Context &ctx) {
-  Q_UNUSED(ctx)
+  ctx.addTable(&DMREncryptionKey::staticMetaObject);
+  ctx.addTable(&AESEncryptionKey::staticMetaObject);
 
   // Clear all keys
   clear();
@@ -2609,9 +2611,11 @@ TyTCodeplug::EncryptionElement::fromEncryptionExt(EncryptionExtension *encr, Con
     if (encr->keys()->get(i)->is<DMREncryptionKey>() && (_numBasicKeys > basicCount)) {
       DMREncryptionKey *key = encr->keys()->get(i)->as<DMREncryptionKey>();
       setBasicKey(basicCount++,key->key());
+      ctx.add(key, basicCount);
     } else if (encr->keys()->get(i)->is<AESEncryptionKey>() && (_numEnhancedKeys > aesCount)) {
       AESEncryptionKey *key = encr->keys()->get(i)->as<AESEncryptionKey>();
       setEnhancedKey(aesCount++, key->key());
+      ctx.add(key, aesCount);
     } else {
       logWarn() << "Cannot encode key of type '" << encr->keys()->get(i)->metaObject()->className()
                 << "'.";
@@ -2631,6 +2635,7 @@ TyTCodeplug::EncryptionElement::toEncryptionExt(Context &ctx) {
     if (! isEnhancedKeySet(i))
       continue;
     AESEncryptionKey *key = new AESEncryptionKey();
+    key->setName(QString("Enhanced Key %1").arg(i+1));
     ctx.add(key,i+1);
     key->fromHex(enhancedKey(i).toHex());
     ext->keys()->add(key);
@@ -2639,6 +2644,7 @@ TyTCodeplug::EncryptionElement::toEncryptionExt(Context &ctx) {
     if (! isBasicKeySet(i))
       continue;
     DMREncryptionKey *key = new DMREncryptionKey();
+    key->setName(QString("Basic Key %1").arg(i+1));
     ctx.add(key,i+1);
     key->fromHex(basicKey(i).toHex());
     ext->keys()->add(key);

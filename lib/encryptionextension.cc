@@ -64,6 +64,32 @@ DMREncryptionKey::fromHex(const QString &hex) {
   EncryptionKey::fromHex(hex);
 }
 
+YAML::Node
+DMREncryptionKey::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = EncryptionKey::serialize(context, err);
+  if (node.IsNull())
+    return node;
+
+  YAML::Node type;
+  type["basic"] = node;
+  return type;
+}
+
+bool
+DMREncryptionKey::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse basic encryption key: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node key = node.begin()->second;
+  return EncryptionKey::parse(key, ctx, err);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AESEncryptionKey
@@ -93,6 +119,31 @@ AESEncryptionKey::fromHex(const QString &hex) {
   EncryptionKey::fromHex(hex);
 }
 
+YAML::Node
+AESEncryptionKey::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = EncryptionKey::serialize(context, err);
+  if (node.IsNull())
+    return node;
+
+  YAML::Node type;
+  type["aes"] = node;
+  return type;
+}
+
+bool
+AESEncryptionKey::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse enhanced encryption key: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node key = node.begin()->second;
+  return EncryptionKey::parse(key, ctx, err);
+}
 
 
 /* ********************************************************************************************* *

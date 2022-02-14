@@ -50,6 +50,10 @@ public:
 
   ConfigItem *clone() const;
   virtual void fromHex(const QString &hex);
+
+public:
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 
@@ -68,6 +72,10 @@ public:
 
   ConfigItem *clone() const;
   virtual void fromHex(const QString &hex);
+
+public:
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 
