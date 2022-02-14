@@ -92,33 +92,6 @@ Config::setModified(bool modified) {
 }
 
 bool
-Config::label(Context &context, const ErrorStack &err) {
-  if (! ConfigItem::label(context, err))
-    return false;
-
-  if (! _settings->label(context, err))
-    return false;
-  if (! _radioIDs->label(context, err))
-    return false;
-  if (! _contacts->label(context, err))
-    return false;
-  if (! _rxGroupLists->label(context, err))
-    return false;
-  if (! _channels->label(context, err))
-    return false;
-  if (! _zones->label(context, err))
-    return false;
-  if (! _scanlists->label(context, err))
-    return false;
-  if (! _gpsSystems->label(context, err))
-    return false;
-  if (! _roaming->label(context, err))
-    return false;
-
-  return true;
-}
-
-bool
 Config::toYAML(QTextStream &stream, const ErrorStack &err) {
   ConfigItem::Context context;
   if (! this->label(context))

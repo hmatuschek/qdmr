@@ -156,7 +156,6 @@ public:
   bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
 
 public:
-  bool label(Context &context, const ErrorStack &err=ErrorStack());
   /** Serializes the configuration into the given stream as text. */
   bool toYAML(QTextStream &stream, const ErrorStack &err=ErrorStack());
 

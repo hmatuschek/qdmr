@@ -783,9 +783,6 @@ ConfigObject::setName(const QString &name) {
 
 bool
 ConfigObject::label(ConfigObject::Context &context, const ErrorStack &err) {
-  if (! ConfigItem::label(context, err))
-    return false;
-
   // With empty ID base, skip labeling.
   if (_idBase.isEmpty())
     return true;
@@ -803,22 +800,8 @@ ConfigObject::label(ConfigObject::Context &context, const ErrorStack &err) {
     return false;
   }
 
-  // Label properties owning config objects, that is of type ConfigObject or ConfigObjectList
-  const QMetaObject *meta = metaObject();
-  for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
-    QMetaProperty prop = meta->property(p);
-    if (! prop.isValid())
-      continue;
-    if (prop.read(this).value<ConfigObjectList *>()) {
-      ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>();
-      if (! lst->label(context))
-        return false;
-    } else if (prop.read(this).value<ConfigItem *>()) {
-      ConfigItem *obj = prop.read(this).value<ConfigItem *>();
-      if (! obj->label(context))
-        return false;
-    }
-  }
+  if (! ConfigItem::label(context, err))
+    return false;
 
   return true;
 }
