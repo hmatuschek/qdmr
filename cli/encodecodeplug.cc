@@ -71,7 +71,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   } else if (parser.isSet("yaml") || ("yaml" == fileinfo.suffix())) {
     if (! config.readYAML(fileinfo.canonicalFilePath(), err)) {
       logError() << "Cannot parse YAML codeplug '" << fileinfo.fileName()
-                 << "': " << err.format();
+                 << "':\n" << err.format(" ");
       return -1;
     }
   } else {

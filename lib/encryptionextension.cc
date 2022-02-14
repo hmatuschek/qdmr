@@ -177,7 +177,7 @@ EncryptionKeys::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, 
   }
 
   QString type = QString::fromStdString(node.begin()->first.as<std::string>());
-  if ("dmr" == type) {
+  if ("basic" == type) {
     return new DMREncryptionKey();
   } else if ("aes" == type) {
     return new AESEncryptionKey();

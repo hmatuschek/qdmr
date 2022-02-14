@@ -245,7 +245,7 @@ ConfigItem::label(ConfigObject::Context &context, const ErrorStack &err) {
 YAML::Node
 ConfigItem::serialize(const Context &context, const ErrorStack &err) {
   YAML::Node node;
-  if (! populate(node, context))
+  if (! populate(node, context, err))
     return YAML::Node();
   return node;
 }
@@ -520,7 +520,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       if ((nullptr == obj) && prop.isWritable()) {
         if (nullptr == (obj = this->allocateChild(prop, node[prop.name()], ctx))) {
           errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                                                       << ": Cannot allocate " << prop.name() << " of " << meta->className() << ".";
+                      << ": Cannot allocate " << prop.name() << " of " << meta->className() << ".";
           return false;
         }
         // Set property
@@ -534,12 +534,70 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       }
 
       // parse instance
-      if (obj && (! obj->parse(node[prop.name()], ctx))) {
+      YAML::Node propNode = node[prop.name()];
+      if (obj && (! obj->parse(propNode, ctx))) {
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot parse " << prop.name() << " of " << meta->className() << ".";
         if (nullptr == obj->parent())
           obj->deleteLater();
         return false;
+      }
+    } else if (prop.read(this).value<ConfigObjectList *>()) {
+      if (! node[prop.name()])
+        continue;
+      // check type
+      if (! node[prop.name()].IsSequence()) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected instance of '"
+                    << QMetaType::metaObjectForType(prop.userType())->className() << "'.";
+        return false;
+      }
+      // Get list
+      ConfigObjectList *lst = prop.read(this).value<ConfigObjectList*>();
+      // If not set and writable -> allocate and set
+      if ((nullptr == lst) && prop.isWritable()) {
+        if (nullptr == (lst = this->allocateChild(prop, node[prop.name()], ctx)->as<ConfigObjectList>())) {
+          errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                      << ": Cannot allocate list " << prop.name() << " of " << meta->className() << ".";
+          return false;
+        }
+        // Set property
+        if (! prop.write(this, QVariant::fromValue(lst))) {
+          if (nullptr == lst->parent())
+            lst->deleteLater();
+          errMsg(err) << "Cannot set writable property '" << prop.name()
+                      << "' in " << this->metaObject()->className() << ".";
+          return false;
+        }
+      }
+
+      // Allocate elements
+      ConfigObject *obj = nullptr;
+      for (YAML::const_iterator it=node[prop.name()].begin(); it!=node[prop.name()].end(); it++) {
+        // allocate element
+        if (nullptr == (obj = lst->allocateChild(*it, ctx, err)->as<ConfigObject>())) {
+          errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                      << ": Cannot allocate child of list.";
+          return false;
+        }
+        // parse element
+        if (obj && (! obj->parse(*it, ctx))) {
+          errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                      << ": Cannot parse object of type " << obj->metaObject()->className();
+          if (nullptr == obj->parent())
+            obj->deleteLater();
+          return false;
+        }
+        // add element to list
+        if (-1 == lst->add(obj)) {
+          errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                      << ": Cannot add element '" << obj->name() << "' of type "
+                      << obj->metaObject()->className() << "' to list.";
+          if (nullptr == obj->parent())
+            obj->deleteLater();
+          return false;
+        }
       }
     }
   }
@@ -659,7 +717,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
         return false;
       }
 
-      if (! obj->link(node[prop.name()], ctx)) {
+      if (! obj->link(node[prop.name()], ctx, err)) {
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot link " << prop.name() << " of " << meta->className() << ".";
         return false;
@@ -677,7 +735,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
         return false;
       }
 
-      if (! lst->link(node[prop.name()], ctx)) {
+      if (! lst->link(node[prop.name()], ctx, err)) {
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot link " << prop.name() << " of " << meta->className() << ".";
         return false;

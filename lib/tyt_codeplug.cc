@@ -2610,7 +2610,7 @@ TyTCodeplug::EncryptionElement::fromEncryptionExt(EncryptionExtension *encr, Con
   for (int i=0; i<encr->keys()->count(); i++) {
     if (encr->keys()->get(i)->is<DMREncryptionKey>() && (_numBasicKeys > basicCount)) {
       DMREncryptionKey *key = encr->keys()->get(i)->as<DMREncryptionKey>();
-      setBasicKey(basicCount++,key->key());
+      setBasicKey(basicCount++, key->key());
       ctx.add(key, basicCount);
     } else if (encr->keys()->get(i)->is<AESEncryptionKey>() && (_numEnhancedKeys > aesCount)) {
       AESEncryptionKey *key = encr->keys()->get(i)->as<AESEncryptionKey>();
@@ -2805,6 +2805,12 @@ TyTCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &
   // Define RX GroupLists
   if (! this->encodeGroupLists(ctx.config(), flags, ctx)) {
     errMsg(err) << "Cannot encode group lists.";
+    return false;
+  }
+
+  // Define encryption keys
+  if (! this->encodePrivacyKeys(ctx.config(), flags, ctx)) {
+    errMsg(err) << "Cannot encode encryption keys.";
     return false;
   }
 
