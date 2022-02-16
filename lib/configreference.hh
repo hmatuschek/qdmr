@@ -8,7 +8,7 @@ class Channel;
 class DigitalChannel;
 class AnalogChannel;
 class ScanList;
-
+class EncryptionKey;
 
 /** Implements a reference to a config object.
  * This class is only used to implement the automatic generation/parsing of the YAML codeplug files.
@@ -258,6 +258,15 @@ class RoamingZoneReference: public ConfigObjectReference {
 public:
   /** Constructor. */
   explicit RoamingZoneReference(QObject *parent=nullptr);
+};
+
+
+class EncryptionKeyReference: public ConfigObjectReference {
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit EncryptionKeyReference(QObject *parent=nullptr);
 };
 
 

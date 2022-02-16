@@ -7,6 +7,7 @@
 #include "radioid.hh"
 #include "rxgrouplist.hh"
 #include "roaming.hh"
+#include "encryptionextension.hh"
 
 
 /* ********************************************************************************************* *
@@ -259,6 +260,16 @@ GroupListReference::GroupListReference(QObject *parent)
  * ********************************************************************************************* */
 RoamingZoneReference::RoamingZoneReference(QObject *parent)
   : ConfigObjectReference(RoamingZone::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of EncryptionKeyReference
+ * ********************************************************************************************* */
+EncryptionKeyReference::EncryptionKeyReference(QObject *parent)
+  : ConfigObjectReference(EncryptionKey::staticMetaObject, parent)
 {
   // pass...
 }

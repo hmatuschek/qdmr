@@ -486,6 +486,12 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
   ex->setTXRefFrequency(txRefFrequency());
   ch->setTyTChannelExtension(ex);
 
+  // If encryption is enabled, Add commercial extension to channel if needed
+  // the key will be linked later
+  if ((MODE_DIGITAL == mode()) && (PRIV_NONE != privacyType()) &&
+      (nullptr == ch->commercialExtension()))
+    ch->setCommercialExtension(new CommercialChannelExtension());
+
   return ch;
 }
 
@@ -512,6 +518,33 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
     if (positioningSystemIndex() && ctx.has<GPSSystem>(positioningSystemIndex())) {
       dc->setAPRSObj(ctx.get<GPSSystem>(positioningSystemIndex()));
     }
+
+    // Link encryption key if defined
+    if (PRIV_NONE != privacyType()) {
+      if (nullptr == c->commercialExtension()) {
+        logError() << "Cannot link encryption key: No commercial extension set.";
+        return false;
+      }
+      if (PRIV_BASIC == privacyType()) {
+        if (! ctx.has<DMREncryptionKey>(privacyIndex())) {
+          logError() << "Cannot link encryption key: No basic key with index " << privacyIndex()
+                     << " defined.";
+          return false;
+        }
+        c->commercialExtension()->setEncryptionKey(ctx.get<DMREncryptionKey>(privacyIndex()));
+      } else if (PRIV_ENHANCED == privacyType()) {
+        if (! ctx.has<AESEncryptionKey>(privacyIndex())) {
+          logError() << "Cannot link encryption key: No AES (enhances) key with index "
+                     << privacyIndex() << " defined.";
+          return false;
+        }
+        c->commercialExtension()->setEncryptionKey(ctx.get<AESEncryptionKey>(privacyIndex()));
+      } else {
+        logError() << "Unknown encryption key type " << privacyType() << ".";
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -565,6 +598,25 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
       enablePrivateCallConfirm(chan->tytChannelExtension()->privateCallConfirmed());
       enableDataCallConfirm(chan->tytChannelExtension()->dataCallConfirmed());
       enableEmergencyAlarmACK(chan->tytChannelExtension()->emergencyAlarmConfirmed());
+    }
+    // Link encryption key if set
+    if (chan->commercialExtension() && chan->commercialExtension()->encryptionKey()) {
+      // Check for index
+      if (0 > ctx.index(chan->commercialExtension()->encryptionKey())) {
+        logError() << "Cannot encode encryption key '"
+                   << chan->commercialExtension()->encryptionKey()->name()
+                   << "': Not indexed.";
+      } else if (chan->commercialExtension()->encryptionKey()->is<DMREncryptionKey>()) {
+        setPrivacyType(PRIV_BASIC);
+        setPrivacyIndex(ctx.index(chan->commercialExtension()->encryptionKey()));
+      } else if (chan->commercialExtension()->encryptionKey()->is<AESEncryptionKey>()) {
+        setPrivacyType(PRIV_ENHANCED);
+        setPrivacyIndex(ctx.index(chan->commercialExtension()->encryptionKey()));
+      } else {
+        logInfo() << "Ignore unknown encryption key type "
+                  << chan->commercialExtension()->encryptionKey()->metaObject()->className()
+                  << " for DMR channel.";
+      }
     }
   } else if (chan->is<AnalogChannel>()) {
     const AnalogChannel *achan = chan->as<const AnalogChannel>();

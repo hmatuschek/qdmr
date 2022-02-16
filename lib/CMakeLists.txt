@@ -14,7 +14,7 @@ SET(libdmrconf_SOURCES
     csvreader.cc dfufile.cc repeaterdatabase.cc userdatabase.cc logger.cc
     configobject.cc configreference.cc config.cc radiosettings.cc contact.cc rxgrouplist.cc
     channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc roaming.cc callsigndb.cc
-    talkgroupdatabase.cc radioid.cc encryptionextension.cc
+    talkgroupdatabase.cc radioid.cc encryptionextension.cc commercial_extension.cc
     tyt_radio.cc tyt_interface.cc tyt_codeplug.cc tyt_callsigndb.cc tyt_extensions.cc
     md2017.cc md2017_codeplug.cc md2017_callsigndb.cc md2017_filereader.cc md2017_limits.cc
     md390.cc md390_codeplug.cc md390_filereader.cc md390_limits.cc
@@ -35,7 +35,7 @@ SET(libdmrconf_MOC_HEADERS
     csvreader.hh dfufile.hh repeaterdatabase.hh userdatabase.hh logger.hh
     configobject.hh configreference.hh config.hh radiosettings.hh contact.hh rxgrouplist.hh
     channel.hh zone.hh scanlist.hh gpssystem.hh codeplug.hh roaming.hh callsigndb.hh
-    talkgroupdatabase.hh radioid.hh encryptionextension.hh
+    talkgroupdatabase.hh radioid.hh encryptionextension.hh commercial_extension.hh
     tyt_radio.hh tyt_interface.hh tyt_codeplug.hh tyt_callsigndb.hh tyt_extensions.hh
     md2017.hh md2017_codeplug.hh md2017_callsigndb.hh md2017_limits.hh
     md390.hh md390_codeplug.hh md390_limits.hh

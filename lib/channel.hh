@@ -9,6 +9,7 @@
 #include "signaling.hh"
 #include "tyt_extensions.hh"
 #include "opengd77_extension.hh"
+#include "commercial_extension.hh"
 
 class Config;
 class RXGroupList;
@@ -48,6 +49,8 @@ class Channel: public ConfigObject
   Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
   /** The TyT channel extension. */
   Q_PROPERTY(TyTChannelExtension* tyt READ tytChannelExtension WRITE setTyTChannelExtension)
+  /** The commercial channel extension. */
+  Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
 
 public:
   /** Possible power settings. */
@@ -143,6 +146,11 @@ public:
   /** Sets the TyT channel extension. */
   void setTyTChannelExtension(TyTChannelExtension *ext);
 
+  /** Retunrs the extension for commercial features. */
+  CommercialChannelExtension *commercialExtension() const;
+  /** Sets the commercial channel extension. */
+  void setCommercialExtension(CommercialChannelExtension *ext);
+
 public:
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
   bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
@@ -175,6 +183,8 @@ protected:
   OpenGD77ChannelExtension *_openGD77ChannelExtension;
   /** Owns the TyT channel extension object. */
   TyTChannelExtension *_tytChannelExtension;
+  /** Owns the commercial channel extension. */
+  CommercialChannelExtension *_commercialExtension;
 };
 
 
