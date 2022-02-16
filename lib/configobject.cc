@@ -13,6 +13,17 @@ inline QStringList enumKeys(const QMetaEnum &e) {
   return lst;
 }
 
+inline bool isInstanceOf(QObject *obj, const QStringList &typeNames) {
+  const QMetaObject *type = obj->metaObject();
+  while (type) {
+    if (typeNames.contains(type->className()))
+      return true;
+    type = type->superClass();
+  }
+  return false;
+}
+
+
 /* ********************************************************************************************* *
  * Implementation of ConfigObject::Context
  * ********************************************************************************************* */
@@ -615,6 +626,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
     QMetaProperty prop = meta->property(p);
     if (! prop.isValid())
       continue;
+
     if (! prop.isScriptable()) {
       //logDebug() << "Do not link property '" << prop.name() << "': Marked as not scriptable.";
       continue;
@@ -744,6 +756,40 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
   }
 
   return true;
+}
+
+const Config *
+ConfigItem::config() const {
+  if (nullptr == parent())
+    return nullptr;
+  if (ConfigItem *item = qobject_cast<ConfigItem*>(parent()))
+    return item->config();
+  if (ConfigObjectList *lst = qobject_cast<ConfigObjectList*>(parent()))
+    return lst->config();
+  return nullptr;
+}
+
+void
+ConfigItem::findItemsOfTypes(const QStringList &typeNames, QSet<ConfigItem *> &items) const {
+  // Do not check yourself
+  const QMetaObject *meta = metaObject();
+
+  // Visit all properties
+  for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
+    QMetaProperty prop = meta->property(p);
+    if (! prop.isValid())
+      continue;
+    if (! prop.isReadable())
+      continue;
+
+    if (ConfigItem *obj = prop.read(this).value<ConfigItem *>()) {
+      if (isInstanceOf(obj, typeNames))
+        items.insert(obj);
+      obj->findItemsOfTypes(typeNames, items);
+    } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
+      lst->findItemsOfTypes(typeNames, items);
+    }
+  }
 }
 
 bool
@@ -936,6 +982,24 @@ AbstractConfigObjectList::clear() {
   }
 }
 
+const Config *
+AbstractConfigObjectList::config() const {
+  if (nullptr == parent())
+    return nullptr;
+  if (ConfigItem *item = qobject_cast<ConfigItem *>(parent()))
+    return item->config();
+  return nullptr;
+}
+
+void
+AbstractConfigObjectList::findItemsOfTypes(const QStringList &typeNames, QSet<ConfigItem *> &items) const {
+  foreach (ConfigObject *obj, _items) {
+    if (isInstanceOf(obj, typeNames))
+      items.insert(obj);
+    obj->findItemsOfTypes(typeNames, items);
+  }
+}
+
 ConfigObject *AbstractConfigObjectList::get(int idx) const {
   return _items.value(idx, nullptr);
 }
@@ -953,7 +1017,7 @@ int AbstractConfigObjectList::add(ConfigObject *obj, int row) {
   if (! obj->inherits(_elementType.className())) {
     logError() << "Cannot add element of type " << obj->metaObject()->className()
                << " to list, expected instances of " << _elementType.className();
-    return false;
+    return -1;
   }
   _items.insert(row, obj);
   // Otherwise connect to object
@@ -1165,7 +1229,7 @@ ConfigObjectList::clear() {
 
 bool
 ConfigObjectList::copy(const AbstractConfigObjectList &other) {
-  this->clear();
+  clear();
   _elementType = other.elementType();
   for (int i=0; i<other.count(); i++)
     add(other.get(i)->clone()->as<ConfigObject>());

@@ -41,7 +41,7 @@ ZoneDialog::construct() {
   listBView->setModel(new ChannelRefListWrapper(_myZone->B()));
 
   extensionView->setObjectName("zoneExtension");
-  extensionView->setObject(_myZone);
+  extensionView->setObject(_myZone, _config);
   if (! settings.showExtensions()) {
     tabWidget->tabBar()->hide();
   }

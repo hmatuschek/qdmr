@@ -130,6 +130,8 @@ public:
   /** Clears the complete configuration. */
   void clear();
 
+  const Config *config() const;
+
   /** Returns the encryption settings extension.
    * If the extension is not set, @c nullptr is set. */
   EncryptionExtension *encryptionExtension() const;

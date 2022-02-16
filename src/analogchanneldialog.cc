@@ -57,7 +57,7 @@ AnalogChannelDialog::construct() {
   for (int i=0; i<_config->scanlists()->count(); i++) {
     ScanList *lst = _config->scanlists()->scanlist(i);
     scanList->addItem(lst->name(),QVariant::fromValue(lst));
-    if (_myChannel && (_myChannel->scanListObj() == lst) )
+    if (_myChannel && (_myChannel->scanList() == lst) )
       scanList->setCurrentIndex(i+1);
   }
   txAdmit->setItemData(0, unsigned(AnalogChannel::Admit::Always));
@@ -118,7 +118,7 @@ AnalogChannelDialog::construct() {
     tabWidget->tabBar()->hide();
 
   extensionView->setObjectName("AnalogChannelExtension");
-  extensionView->setObject(_myChannel);
+  extensionView->setObject(_myChannel, _config);
 
   connect(powerDefault, SIGNAL(toggled(bool)), this, SLOT(onPowerDefaultToggled(bool)));
   connect(totDefault, SIGNAL(toggled(bool)), this, SLOT(onTimeoutDefaultToggled(bool)));
@@ -152,7 +152,7 @@ AnalogChannelDialog::channel()
   _myChannel->setRXTone(Signaling::Code(rxTone->currentData().toUInt()));
   _myChannel->setTXTone(Signaling::Code(txTone->currentData().toUInt()));
   _myChannel->setBandwidth(AnalogChannel::Bandwidth(bandwidth->currentData().toUInt()));
-  _myChannel->setScanListObj(scanList->currentData().value<ScanList *>());
+  _myChannel->setScanList(scanList->currentData().value<ScanList *>());
   _myChannel->setAPRSSystem(aprsList->currentData().value<APRSSystem *>());
   if (voxDefault->isChecked())
     _myChannel->setVOXDefault();

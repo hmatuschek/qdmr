@@ -15,9 +15,9 @@
 #include "settings.hh"
 
 
-DMRContactDialog::DMRContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, QWidget *parent)
+DMRContactDialog::DMRContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, Config *context, QWidget *parent)
   : QDialog(parent), _myContact(new DigitalContact(this)), _contact(nullptr),
-    _user_completer(nullptr), _tg_completer(nullptr),
+    _user_completer(nullptr), _tg_completer(nullptr), _config(context),
     ui(new Ui::DMRContactDialog)
 {
   setWindowTitle(tr("Create DMR Contact"));
@@ -40,9 +40,9 @@ DMRContactDialog::DMRContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, 
 }
 
 DMRContactDialog::DMRContactDialog(DigitalContact *contact, UserDatabase *users,
-                                   TalkGroupDatabase *tgs, QWidget *parent)
+                                   TalkGroupDatabase *tgs, Config *context, QWidget *parent)
   : QDialog(parent), _myContact(new DigitalContact(this)), _contact(contact),
-    _user_completer(nullptr), _tg_completer(nullptr),
+    _user_completer(nullptr), _tg_completer(nullptr), _config(context),
     ui(new Ui::DMRContactDialog)
 {
   setWindowTitle(tr("Edit DMR Contact"));
@@ -96,7 +96,7 @@ DMRContactDialog::construct() {
   ui->ringCheckBox->setChecked(_myContact->ring());
 
   ui->extensionView->setObjectName("dmrContactExtension");
-  ui->extensionView->setObject(_myContact);
+  ui->extensionView->setObject(_myContact, _config);
   if (! settings.showExtensions())
     ui->tabWidget->tabBar()->hide();
 

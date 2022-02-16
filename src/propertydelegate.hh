@@ -3,6 +3,7 @@
 
 #include <QItemDelegate>
 
+class Config;
 class PropertyWrapper;
 
 class PropertyDelegate : public QItemDelegate
@@ -16,8 +17,13 @@ public:
   void setEditorData(QWidget *editor, const QModelIndex &index) const;
   void setModelData(QWidget *editor, QAbstractItemModel *abstractmodel, const QModelIndex &index) const;
 
+  void setConfig(Config *config);
+
 protected:
   static const PropertyWrapper *getModel(const QAbstractItemModel *model);
+
+protected:
+  Config *_config;
 };
 
 #endif // PROPERTYDELEGATE_HH

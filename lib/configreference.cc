@@ -80,6 +80,11 @@ ConfigObjectReference::allow(const QMetaObject *elementType) {
   return true;
 }
 
+const QStringList &
+ConfigObjectReference::elementTypeNames() const {
+  return _elementTypes;
+}
+
 void
 ConfigObjectReference::onReferenceDeleted(QObject *obj) {
   // Check if destroyed obj is referenced one.

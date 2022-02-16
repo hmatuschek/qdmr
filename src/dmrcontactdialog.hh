@@ -11,15 +11,15 @@ class QCompleter;
 class UserDatabase;
 class TalkGroupDatabase;
 class DigitalContact;
-
+class Config;
 
 class DMRContactDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  explicit DMRContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, QWidget *parent=nullptr);
-  explicit DMRContactDialog(DigitalContact *contact, UserDatabase *users, TalkGroupDatabase *tgs, QWidget *parent=nullptr);
+  explicit DMRContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, Config *context, QWidget *parent=nullptr);
+  explicit DMRContactDialog(DigitalContact *contact, UserDatabase *users, TalkGroupDatabase *tgs, Config *context, QWidget *parent=nullptr);
   ~DMRContactDialog();
 
 public:
@@ -37,6 +37,7 @@ private:
   DigitalContact *_contact;
   QCompleter *_user_completer;
   QCompleter *_tg_completer;
+  Config *_config;
   Ui::DMRContactDialog *ui;
 };
 

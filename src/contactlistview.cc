@@ -33,7 +33,7 @@ ContactListView::~ContactListView() {
 void
 ContactListView::onAddDMRContact() {
   Application *app = qobject_cast<Application *>(QApplication::instance());
-  DMRContactDialog dialog(app->user(), app->talkgroup());
+  DMRContactDialog dialog(app->user(), app->talkgroup(), _config);
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -45,7 +45,7 @@ ContactListView::onAddDMRContact() {
 
 void
 ContactListView::onAddDTMFContact() {
-  DTMFContactDialog dialog;
+  DTMFContactDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -95,12 +95,12 @@ ContactListView::onEditContact(unsigned row) {
   Contact *contact = _config->contacts()->contact(row);
 
   if (DigitalContact *digi = contact->as<DigitalContact>()) {
-    DMRContactDialog dialog(digi, app->user(), app->talkgroup());
+    DMRContactDialog dialog(digi, app->user(), app->talkgroup(), _config);
     if (QDialog::Accepted != dialog.exec())
       return;
     dialog.contact();
   } else if (DTMFContact *dtmf = contact->as<DTMFContact>()) {
-    DTMFContactDialog dialog(dtmf);
+    DTMFContactDialog dialog(dtmf, _config);
     if (QDialog::Accepted != dialog.exec())
       return;
     dialog.contact();

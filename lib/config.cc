@@ -248,6 +248,12 @@ Config::clear() {
   emit modified(this);
 }
 
+const Config *
+Config::config() const {
+  return this;
+}
+
+
 EncryptionExtension *
 Config::encryptionExtension() const {
   return _encryptionExtension;

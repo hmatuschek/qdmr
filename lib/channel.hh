@@ -42,7 +42,7 @@ class Channel: public ConfigObject
   /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
   /** The scan list. */
-  Q_PROPERTY(ScanListReference* scanList READ scanList WRITE setScanList)
+  Q_PROPERTY(ScanListReference* scanListRef READ scanListRef)
   /** The VOX setting. */
   Q_PROPERTY(unsigned vox READ vox WRITE setVOX SCRIPTABLE false)
   /** The OpenGD77 channel extension. */
@@ -124,15 +124,13 @@ public:
   void disableVOX();
 
   /** Returns the reference to the scan list. */
-  const ScanListReference *scanList() const;
+  const ScanListReference *scanListRef() const;
   /** Returns the reference to the scan list. */
-  ScanListReference *scanList();
-  /** Sets the scan list reference. */
-  void setScanList(ScanListReference *ref);
+  ScanListReference *scanListRef();
   /** Returns the default scan list for the channel. */
-  ScanList *scanListObj() const;
+  ScanList *scanList() const;
   /** (Re-) Sets the default scan list for the channel. */
-  bool setScanListObj(ScanList *list);
+  bool setScanList(ScanList *list);
 
   /** Returns the channel extension for the OpenGD77 firmware.
    * If this extension is not set, returns @c nullptr. */

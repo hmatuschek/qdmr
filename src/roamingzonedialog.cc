@@ -32,7 +32,7 @@ RoamingZoneDialog::construct() {
   channelListView->setModel(new ChannelRefListWrapper(_myZone->channels(), channelListView));
 
   extensionView->setObjectName("roamingZoneExtension");
-  extensionView->setObject(_myZone);
+  extensionView->setObject(_myZone, _config);
   if (! settings.showExtensions())
     tabWidget->tabBar()->hide();
 

@@ -254,7 +254,7 @@ Application::createMainWindow() {
 
   // Wire-up "extension view"
   _extensionView = new ExtensionView();
-  _extensionView->setObject(_config);
+  _extensionView->setObject(_config, _config);
   tabs->addTab(_extensionView, tr("Extensions"));
 
   if (! settings.showCommercialFeatures()) {

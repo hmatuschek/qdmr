@@ -12,6 +12,7 @@
 #include "errorstack.hh"
 
 // Forward declaration
+class Config;
 class ConfigObject;
 class ConfigExtension;
 
@@ -30,6 +31,7 @@ bool propIsInstance(const QMetaProperty &prop) {
   }
   return false;
 }
+
 
 /** Base class for all configuration objects (channels, zones, contacts, etc).
  *
@@ -123,6 +125,11 @@ public:
 
   /** Clears the config object. */
   virtual void clear();
+
+  /** Returns the config, the item belongs to or @c nullptr if not part of a config. */
+  virtual const Config *config() const;
+  /** Searches the config tree to find all instances of the given type names. */
+  virtual void findItemsOfTypes(const QStringList &typeNames, QSet<ConfigItem*> &items) const;
 
   /** Returns @c true if this object is of class @c Object. */
   template <class Object>
@@ -257,6 +264,11 @@ public:
   virtual int indexOf(ConfigObject *obj) const;
   /** Clears the list. */
   virtual void clear();
+
+  /** Returns the config object, this list belongs to. */
+  virtual const Config *config() const;
+  /** Searches the config tree to find all instances of the given type names. */
+  virtual void findItemsOfTypes(const QStringList &typeNames, QSet<ConfigItem*> &items) const;
 
   /** Returns the list element at the given index or @c nullptr if out of bounds. */
   virtual ConfigObject *get(int idx) const;

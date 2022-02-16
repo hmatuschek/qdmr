@@ -44,7 +44,7 @@ RadioIDListView::onConfigModified() {
 
 void
 RadioIDListView::onAddID() {
-  DMRIDDialog dialog;
+  DMRIDDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -90,7 +90,7 @@ RadioIDListView::onEditID(unsigned row) {
   if (int(row) >= _config->radioIDs()->count())
     return;
   DMRRadioID *id = _config->radioIDs()->getId(row);
-  DMRIDDialog dialog(id);
+  DMRIDDialog dialog(id, _config);
   if (QDialog::Accepted != dialog.exec())
     return;
   // Apply changes

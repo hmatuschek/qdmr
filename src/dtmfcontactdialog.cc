@@ -5,16 +5,16 @@
 #include "contact.hh"
 #include "settings.hh"
 
-DTMFContactDialog::DTMFContactDialog(QWidget *parent) :
-  QDialog(parent), _myContact(new DTMFContact(this)), _contact(nullptr),
+DTMFContactDialog::DTMFContactDialog(Config *context, QWidget *parent) :
+  QDialog(parent), _myContact(new DTMFContact(this)), _contact(nullptr), _config(context),
   ui(new Ui::DTMFContactDialog)
 {
   setWindowTitle(tr("Create DTMF Contact"));
   construct();
 }
 
-DTMFContactDialog::DTMFContactDialog(DTMFContact *contact, QWidget *parent) :
-  QDialog(parent), _myContact(new DTMFContact(this)), _contact(contact),
+DTMFContactDialog::DTMFContactDialog(DTMFContact *contact, Config *context, QWidget *parent) :
+  QDialog(parent), _myContact(new DTMFContact(this)), _contact(contact), _config(context),
   ui(new Ui::DTMFContactDialog)
 {
   setWindowTitle(tr("Edit DMR Contact"));
@@ -39,7 +39,7 @@ DTMFContactDialog::construct() {
   ui->ringCheckBox->setChecked(_myContact->ring());
 
   ui->extensionView->setObjectName("dtmfContactExtension");
-  ui->extensionView->setObject(_myContact);
+  ui->extensionView->setObject(_myContact, _config);
   if (! settings.showExtensions())
     ui->tabWidget->tabBar()->hide();
 }

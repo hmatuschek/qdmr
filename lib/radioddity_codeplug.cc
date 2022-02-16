@@ -389,7 +389,7 @@ bool
 RadioddityCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
   // Link common
   if (hasScanList() && ctx.has<ScanList>(scanListIndex()))
-    c->setScanListObj(ctx.get<ScanList>(scanListIndex()));
+    c->setScanList(ctx.get<ScanList>(scanListIndex()));
   // Link digital channel
   if (c->is<DigitalChannel>()) {
     DigitalChannel *dc = c->as<DigitalChannel>();
@@ -423,8 +423,8 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
   bool channelVOXEnabled = (! (c->voxDisabled()||c->defaultVOX()));
   enableVOX(defaultVOXEnabled || channelVOXEnabled);
 
-  if (c->scanListObj())
-    setScanListIndex(ctx.index(c->scanListObj()));
+  if (c->scanList())
+    setScanListIndex(ctx.index(c->scanList()));
 
   if (c->is<AnalogChannel>()) {
     const AnalogChannel *ac = c->as<const AnalogChannel>();

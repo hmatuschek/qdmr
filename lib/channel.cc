@@ -187,29 +187,21 @@ Channel::disableVOX() {
 }
 
 const ScanListReference *
-Channel::scanList() const {
+Channel::scanListRef() const {
   return &_scanlist;
 }
 
 ScanListReference *
-Channel::scanList() {
+Channel::scanListRef() {
   return &_scanlist;
 }
 
-void
-Channel::setScanList(ScanListReference *ref) {
-  if (nullptr == ref)
-    _scanlist.clear();
-  else
-    _scanlist.copy(ref);
-}
-
 ScanList *
-Channel::scanListObj() const {
+Channel::scanList() const {
   return _scanlist.as<ScanList>();
 }
 bool
-Channel::setScanListObj(ScanList *list) {
+Channel::setScanList(ScanList *list) {
   return _scanlist.set(list);
 }
 

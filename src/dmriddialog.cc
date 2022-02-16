@@ -3,8 +3,9 @@
 #include "settings.hh"
 #include <QIntValidator>
 
-DMRIDDialog::DMRIDDialog(DMRRadioID *radioid, QWidget *parent) :
-  QDialog(parent), ui(new Ui::DMRIDDialog), _myID(new DMRRadioID(this)), _editID(radioid)
+DMRIDDialog::DMRIDDialog(DMRRadioID *radioid, Config *context, QWidget *parent) :
+  QDialog(parent), ui(new Ui::DMRIDDialog), _myID(new DMRRadioID(this)), _editID(radioid),
+  _config(context)
 {
   ui->setupUi(this);
   _myID->copy(*_editID);
@@ -12,8 +13,9 @@ DMRIDDialog::DMRIDDialog(DMRRadioID *radioid, QWidget *parent) :
   construct();
 }
 
-DMRIDDialog::DMRIDDialog(QWidget *parent) :
-  QDialog(parent), ui(new Ui::DMRIDDialog), _myID(new DMRRadioID(this)), _editID(nullptr)
+DMRIDDialog::DMRIDDialog(Config *context, QWidget *parent) :
+  QDialog(parent), ui(new Ui::DMRIDDialog), _myID(new DMRRadioID(this)), _editID(nullptr),
+  _config(context)
 {
   ui->setupUi(this);
 
@@ -31,7 +33,7 @@ DMRIDDialog::construct() {
     ui->tabWidget->tabBar()->hide();
 
   ui->extensionView->setObjectName("dmrRadioIdExtension");
-  ui->extensionView->setObject(_myID);
+  ui->extensionView->setObject(_myID, _config);
 }
 
 DMRIDDialog::~DMRIDDialog() {

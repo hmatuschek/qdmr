@@ -58,7 +58,7 @@ DigitalChannelDialog::construct() {
   for (int i=0; i<_config->scanlists()->count(); i++) {
     scanList->addItem(_config->scanlists()->scanlist(i)->name(),
                       QVariant::fromValue(_config->scanlists()->scanlist(i)));
-    if (_myChannel && (_myChannel->scanListObj() == _config->scanlists()->scanlist(i)) )
+    if (_myChannel && (_myChannel->scanList() == _config->scanlists()->scanlist(i)) )
       scanList->setCurrentIndex(i+1);
   }
   txAdmit->setItemData(0, unsigned(DigitalChannel::Admit::Always));
@@ -139,7 +139,7 @@ DigitalChannelDialog::construct() {
   }
 
   extensionView->setObjectName("digitalChannelExtension");
-  extensionView->setObject(_myChannel);
+  extensionView->setObject(_myChannel, _config);
 
   if (! settings.showExtensions())
     tabWidget->tabBar()->hide();
@@ -165,7 +165,7 @@ DigitalChannelDialog::channel()
   else
     _myChannel->setTimeout(totValue->value());
   _myChannel->setRXOnly(rxOnly->isChecked());
-  _myChannel->setScanListObj(scanList->currentData().value<ScanList *>());
+  _myChannel->setScanList(scanList->currentData().value<ScanList *>());
   _myChannel->setAdmit(DigitalChannel::Admit(txAdmit->currentData().toUInt()));
   _myChannel->setColorCode(colorCode->value());
   _myChannel->setTimeSlot(DigitalChannel::TimeSlot(timeSlot->currentData().toUInt()));

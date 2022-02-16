@@ -732,7 +732,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
 
   // If channel has scan list
   if (hasScanListIndex() && ctx.has<ScanList>(scanListIndex()))
-    c->setScanListObj(ctx.get<ScanList>(scanListIndex()));
+    c->setScanList(ctx.get<ScanList>(scanListIndex()));
 
   return true;
 }
@@ -754,10 +754,10 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     setPower(c->power());
   // set tx-enable
   enableRXOnly(c->rxOnly());
-  if (nullptr == c->scanListObj())
+  if (nullptr == c->scanList())
     clearScanListIndex();
   else
-    setScanListIndex(ctx.index(c->scanListObj()));
+    setScanListIndex(ctx.index(c->scanList()));
 
   // Dispatch by channel type
   if (c->is<AnalogChannel>()) {

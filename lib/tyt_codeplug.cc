@@ -502,7 +502,7 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
     return false;
 
   if (scanListIndex() && ctx.has<ScanList>(scanListIndex())) {
-    c->setScanListObj(ctx.get<ScanList>(scanListIndex()));
+    c->setScanList(ctx.get<ScanList>(scanListIndex()));
   }
 
   if (MODE_ANALOG == mode()) {
@@ -561,8 +561,8 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
     setTXTimeOut(ctx.config()->settings()->tot());
   else
     setTXTimeOut(chan->timeout());
-  if (chan->scanListObj())
-    setScanListIndex(ctx.index(chan->scanListObj()));
+  if (chan->scanList())
+    setScanListIndex(ctx.index(chan->scanList()));
   else
     setScanListIndex(0);
   // Enable vox

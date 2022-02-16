@@ -37,6 +37,9 @@ public:
   /** Adds a possible type to this reference. */
   virtual bool allow(const QMetaObject *elementType);
 
+  /** Returns the type names of allowed objects. */
+  const QStringList &elementTypeNames() const;
+
   /** Returns the reference as the specified type. */
   template <class Type>
   Type *as() const {
@@ -261,6 +264,8 @@ public:
 };
 
 
+/** Implements a reference to an encryption key.
+ * @ingroup conf */
 class EncryptionKeyReference: public ConfigObjectReference {
   Q_OBJECT
 
