@@ -60,23 +60,28 @@ ExtensionView::onSelectionChanged(const QItemSelection &current, const QItemSele
     return;
   }
 
-  ConfigItem *obj = _model->parentObject(_proxy.mapToSource(row));
-  QMetaProperty prop = _model->propertyAt(_proxy.mapToSource(row));
-  if ((nullptr == obj) || (! prop.isValid())) {
-    ui->create->setEnabled(false);
-    ui->remove->setEnabled(false);
-    return;
-  }
+  if (_model->isProperty(_proxy.mapToSource(row))) {
+    ConfigItem *obj = _model->parentObject(_proxy.mapToSource(row));
+    QMetaProperty prop = _model->propertyAt(_proxy.mapToSource(row));
+    if ((nullptr == obj) || (! prop.isValid())) {
+      ui->create->setEnabled(false);
+      ui->remove->setEnabled(false);
+      return;
+    }
 
-  if (! propIsInstance<ConfigItem>(prop)) {
-    ui->create->setEnabled(false);
-    ui->remove->setEnabled(false);
-  } else if (prop.read(obj).value<ConfigItem*>()) {
-    ui->create->setEnabled(false);
-    ui->remove->setEnabled(prop.isWritable());
-  } else {
-    ui->create->setEnabled(prop.isWritable());
-    ui->remove->setEnabled(false);
+    if (! propIsInstance<ConfigItem>(prop)) {
+      ui->create->setEnabled(false);
+      ui->remove->setEnabled(false);
+    } else if (prop.read(obj).value<ConfigItem*>()) {
+      ui->create->setEnabled(false);
+      ui->remove->setEnabled(prop.isWritable());
+    } else {
+      ui->create->setEnabled(prop.isWritable());
+      ui->remove->setEnabled(false);
+    }
+  } else if (_model->isListElement(_proxy.mapToSource(row))) {
+    ConfigObjectList *lst = _model->parentList(_proxy.mapToSource(row));
+
   }
 }
 

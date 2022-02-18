@@ -34,6 +34,7 @@ int
 ExtensionProxy::rowCount(const QModelIndex &parent) const {
   if (nullptr == sourceModel())
     return 0;
+
   // Non root elements
   if (parent.isValid())
     return sourceModel()->rowCount(mapToSource(parent));
@@ -62,31 +63,30 @@ ExtensionProxy::parent(const QModelIndex &child) const {
     return QModelIndex();
 
   ConfigItem *root = qobject_cast<PropertyWrapper*>(sourceModel())->root();
-  ConfigItem *parent = reinterpret_cast<ConfigItem*>(child.internalPointer());
-  if ((root == parent) || (nullptr == parent))
+  QObject *pptr = reinterpret_cast<QObject*>(child.internalPointer());
+  if ((root == pptr) || (nullptr == pptr))
     return QModelIndex();
 
-  ConfigItem *gp = qobject_cast<ConfigItem*>(parent->parent());
-  if (nullptr == gp)
+  QObject *gpptr = pptr->parent();
+  if (nullptr == gpptr)
     return QModelIndex();
 
-  // Search for index of parent in grand-parent:
-  const QMetaObject *meta = gp->metaObject();
-  for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
-    QMetaProperty prop = meta->property(p);
-    if (! prop.isValid())
-      continue;
-    if (prop.read(gp).value<ConfigItem *>() == parent) {
-      if (root == gp)
+  if (root == gpptr) {
+    // Search for index of parent root:
+    const QMetaObject *meta = root->metaObject();
+    for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
+      QMetaProperty prop = meta->property(p);
+      if (! prop.isValid())
+        continue;
+      if (prop.read(root).value<ConfigItem *>() == pptr) {
         return createIndex(_indexS2P[p-QObject::staticMetaObject.propertyCount()], 0,
-            reinterpret_cast<quintptr>(gp));
-      else
-        return createIndex(p-QObject::staticMetaObject.propertyCount(), 0,
-            reinterpret_cast<quintptr>(gp));
+            reinterpret_cast<quintptr>(root));
+      }
     }
+    return QModelIndex();
   }
 
-  return QModelIndex();
+  return mapFromSource(sourceModel()->parent(child));
 }
 
 QModelIndex
@@ -155,25 +155,70 @@ PropertyWrapper::item(const QModelIndex &item) const {
   if (! item.isValid())
     return nullptr;
 
-  ConfigItem *pobj = _object;
+  // Get pointer to parent (either list or item)
+  QObject *pptr = _object;
   if (nullptr != item.internalPointer())
-    pobj = reinterpret_cast<ConfigItem *>(item.internalPointer());
-  const QMetaObject *meta = pobj->metaObject();
+    pptr = reinterpret_cast<QObject *>(item.internalPointer());
 
+  if (ConfigItem *pobj = qobject_cast<ConfigItem*>(pptr)) {
+    // If parent is item find corresponding property
+    const QMetaObject *meta = pobj->metaObject();
+    int pcount = meta->propertyCount() - QObject::staticMetaObject.propertyCount();
+    if (item.row() < pcount) {
+      QMetaProperty prop = meta->property(QObject::staticMetaObject.propertyCount() + item.row());
+      return prop.read(pobj).value<ConfigItem *>();
+    }
+  } else if (ConfigObjectList *plst = qobject_cast<ConfigObjectList*>(pptr)) {
+    // If parent is list
+    if (item.row() < plst->count())
+      return plst->get(item.row());
+  }
+
+  return nullptr;
+}
+
+ConfigObjectList *
+PropertyWrapper::list(const QModelIndex &item) const {
+  if (! item.isValid())
+    return nullptr;
+
+  QObject *pptr = reinterpret_cast<QObject*>(item.internalPointer());
+  ConfigItem *pobj = qobject_cast<ConfigItem*>(pptr);
+  if (nullptr == pobj)
+    return nullptr;
+
+  const QMetaObject *meta = pobj->metaObject();
   int pcount = meta->propertyCount() - QObject::staticMetaObject.propertyCount();
   if (item.row() < pcount) {
     QMetaProperty prop = meta->property(QObject::staticMetaObject.propertyCount() + item.row());
-    return prop.read(pobj).value<ConfigItem *>();
+    return prop.read(pobj).value<ConfigObjectList *>();
   }
+
+  return nullptr;
+}
+
+ConfigObjectList *
+PropertyWrapper::parentList(const QModelIndex &index) const {
+  if (! index.isValid())
+    return nullptr;
+
+  QObject *pptr = reinterpret_cast<QObject *>(index.internalId());
+  if (nullptr == pptr)
+    return nullptr;
+
+  if (ConfigObjectList *lst = qobject_cast<ConfigObjectList*>(pptr))
+    return lst;
+
   return nullptr;
 }
 
 ConfigItem *
 PropertyWrapper::parentObject(const QModelIndex &index) const {
-  ConfigItem *pobj = _object;
-  if (index.isValid())
-     pobj = reinterpret_cast<ConfigItem *>(index.internalId());
-  return pobj;
+  if (! index.isValid())
+     return _object;
+
+  QObject *pptr = reinterpret_cast<QObject*>(index.internalId());
+  return qobject_cast<ConfigItem*>(pptr);
 }
 
 QMetaProperty
@@ -187,12 +232,31 @@ PropertyWrapper::propertyAt(const QModelIndex &index) const {
   return QMetaProperty();
 }
 
+
 bool
 PropertyWrapper::isExtension(const QModelIndex &index) const {
   if (! index.isValid())
     return false;
   QMetaProperty prop = propertyAt(index);
   return propIsInstance<ConfigExtension>(prop);
+}
+
+bool
+PropertyWrapper::isProperty(const QModelIndex &index) const {
+  if (! index.isValid())
+    return true;
+  QObject *pptr = reinterpret_cast<QObject *>(index.internalPointer());
+  return nullptr != qobject_cast<ConfigItem*>(pptr);
+}
+
+bool
+PropertyWrapper::isListElement(const QModelIndex &index) const {
+  if (! index.isValid())
+    return false;
+  QObject *pptr = reinterpret_cast<QObject *>(index.internalPointer());
+  if (nullptr == pptr)
+    return false;
+  return nullptr != qobject_cast<ConfigObjectList*>(pptr);
 }
 
 bool
@@ -254,15 +318,21 @@ PropertyWrapper::deleteInstanceAt(const QModelIndex &item) {
 
 QModelIndex
 PropertyWrapper::index(int row, int column, const QModelIndex &parent) const {
-  ConfigItem *pobj = _object;
-  if (parent.isValid())
-    pobj = item(parent);
-  const QMetaObject *meta = pobj->metaObject();
-
-  int pcount = meta->propertyCount() - QObject::staticMetaObject.propertyCount();
-  if (row < pcount)
-    return createIndex(row, column, pobj);
-
+  if (! parent.isValid()) {
+    // Handle root element
+    const QMetaObject *meta = _object->metaObject();
+    int pcount = meta->propertyCount() - QObject::staticMetaObject.propertyCount();
+    if (row < pcount)
+      return createIndex(row, column, _object);
+  } else if (ConfigItem *pobj = item(parent)) {
+    const QMetaObject *meta = pobj->metaObject();
+    int pcount = meta->propertyCount() - QObject::staticMetaObject.propertyCount();
+    if (row < pcount)
+      return createIndex(row, column, pobj);
+  } else if (ConfigObjectList *plst = list(parent)) {
+    if (row < plst->count())
+      return createIndex(row, column, plst);
+  }
   return QModelIndex();
 }
 
@@ -271,22 +341,36 @@ PropertyWrapper::parent(const QModelIndex &child) const {
   if (! child.isValid())
     return QModelIndex();
 
-  ConfigItem *pobj = reinterpret_cast<ConfigItem*>(child.internalPointer());
-  if (_object == pobj)
+  QObject *pptr = reinterpret_cast<QObject*>(child.internalPointer());
+  // Handle root
+  if (ConfigItem *pobj = qobject_cast<ConfigItem*>(pptr)) {
+    if (_object == pobj)
+      return QModelIndex();
+  }
+
+  QObject *gpptr = pptr->parent();
+  // Should not happen
+  if (nullptr == gpptr)
     return QModelIndex();
 
-  ConfigItem *gp = qobject_cast<ConfigItem*>(pobj->parent());
-  if (nullptr == gp)
-    return QModelIndex();
-
-  // Search for parent in grand-parent's properties
-  const QMetaObject *meta = gp->metaObject();
-  for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
-    QMetaProperty prop = meta->property(p);
-    if (! prop.isValid())
-      continue;
-    if (prop.read(gp).value<ConfigItem *>() == pobj) {
-      return createIndex(p-QObject::staticMetaObject.propertyCount(), 0, reinterpret_cast<quintptr>(gp));
+  if (ConfigItem *gp = qobject_cast<ConfigItem*>(gpptr)) {
+    // If grand parent is item:
+    // Search for parent in grand-parent's properties
+    const QMetaObject *meta = gp->metaObject();
+    for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
+      QMetaProperty prop = meta->property(p);
+      if (! prop.isValid())
+        continue;
+      if (prop.read(gp).value<QObject *>() == pptr) {
+        return createIndex(p-QObject::staticMetaObject.propertyCount(), 0, reinterpret_cast<quintptr>(gp));
+      }
+    }
+  } else if (ConfigObjectList *gp = qobject_cast<ConfigObjectList*>(gpptr)) {
+    // If grand parent is item:
+    // Search for parent in grand-parent's elements
+    for (int i=0; i<gp->count(); i++) {
+      if (pptr == gp->get(i))
+        return createIndex(i, 0, reinterpret_cast<quintptr>(gp));
     }
   }
 
@@ -295,14 +379,22 @@ PropertyWrapper::parent(const QModelIndex &child) const {
 
 int
 PropertyWrapper::rowCount(const QModelIndex &parent) const {
-  ConfigItem *pobj = _object;
-  if (parent.isValid())
-    pobj = item(parent);
-  if (nullptr == pobj)
-    return 0;
-  const QMetaObject *meta = pobj->metaObject();
-  int c = (meta->propertyCount() - QObject::staticMetaObject.propertyCount());
-  return c;
+  if (! parent.isValid()) {
+    // If parent is root -> handle _object
+    const QMetaObject *meta = _object->metaObject();
+    return (meta->propertyCount() - QObject::staticMetaObject.propertyCount());
+  }
+
+  if (ConfigItem *pobj = item(parent)) {
+    // If parent is item -> return property count
+    const QMetaObject *meta = pobj->metaObject();
+    return (meta->propertyCount() - QObject::staticMetaObject.propertyCount());
+  } else if (ConfigObjectList *plst = list(parent)) {
+    // If parent is list -> return elment count.
+    return plst->count();
+  }
+
+  return 0;
 }
 
 int
@@ -313,28 +405,44 @@ PropertyWrapper::columnCount(const QModelIndex &parent) const {
 
 Qt::ItemFlags
 PropertyWrapper::flags(const QModelIndex &index) const {
-  // check if property is a config object or atomic (or reference)
-  QMetaProperty prop = propertyAt(index);
-  if (propIsInstance<ConfigItem>(prop)) {
+  if (isProperty(index)) {
+    // check if property is a config object or atomic (or reference)
+    QMetaProperty prop = propertyAt(index);
+    if (propIsInstance<ConfigItem>(prop) || propIsInstance<ConfigObjectList>(prop)) {
+      return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    }
+
+    if (prop.isWritable() && (1 == index.column()))
+      return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren;
+    return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
+  } else if (isListElement(index)) {
     return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
   }
-
-  if (prop.isWritable() && (1 == index.column()))
-    return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren;
-  return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
+  return Qt::NoItemFlags;
 }
 
 bool
-PropertyWrapper::hasChildren(const QModelIndex &parent) const {
-  if (! parent.isValid())
+PropertyWrapper::hasChildren(const QModelIndex &element) const {
+  // If root element
+  if (! element.isValid())
     return true;
-  ConfigItem* pobj = reinterpret_cast<ConfigItem *>(parent.internalId());
+  // Get parent object (might be item or list)
+  QObject *pptr = reinterpret_cast<QObject *>(element.internalId());
 
+  if (ConfigItem* pobj = qobject_cast<ConfigItem *>(pptr)) {
+    // If parent is item -> get addressed property
+    QMetaProperty prop = propertyAt(element);
+    // If property is an item or list (and is set)
+    if (propIsInstance<ConfigItem>(prop))
+      return nullptr != prop.read(pobj).value<ConfigItem*>();
+    else if (propIsInstance<ConfigObjectList>(prop))
+      return nullptr != prop.read(pobj).value<ConfigObjectList*>();
+  } else if (ConfigObjectList *lst = qobject_cast<ConfigObjectList*>(pptr)) {
+    // If parent is a list, check row index. List elements are always objects and have children.
+    return lst->count() > element.row();
+  }
 
-  QMetaProperty prop = propertyAt(parent);
-  if (! propIsInstance<ConfigItem>(prop))
-    return false;
-  return nullptr != prop.read(pobj).value<ConfigItem*>();
+  return false;
 }
 
 QVariant
@@ -358,73 +466,86 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
   if (! index.isValid())
     return QVariant();
 
-  ConfigItem *pobj = parentObject(index);
-  QMetaProperty prop = propertyAt(index);
-
-  if (0 == index.column()) {
-    if (Qt::DisplayRole == role)
-      return prop.name();
-  } else if ((2 == index.column()) && (Qt::DisplayRole == role)) {
-    if (propIsInstance<ConfigItem>(prop)) {
-      ConfigItem *item = prop.read(pobj).value<ConfigItem*>();
-      if (item && item->hasDescription())
-        return item->description();
-    }
-    if (pobj->hasDescription(prop))
-      return pobj->description(prop);
-    return QVariant();
-  } else if (Qt::ToolTipRole == role) {
-    if (propIsInstance<ConfigItem>(prop)) {
-      ConfigItem *item = prop.read(pobj).value<ConfigItem*>();
-      if (item && item->hasLongDescription())
-        return item->longDescription();
-    }
-    if (pobj->hasLongDescription(prop))
-      return pobj->longDescription(prop);
-    if (pobj->hasDescription(prop))
-      return pobj->description(prop);
-    return QVariant();
-  }
-
-  QVariant value = prop.read(pobj);
-  if (prop.isEnumType() && ((Qt::DisplayRole == role) || (Qt::EditRole == role))) {
-    QMetaEnum e = prop.enumerator();
-    const char *key = e.valueToKey(value.toInt());
-    if (nullptr == key) {
-      logError() << "Cannot map value " << value.toUInt()
-                 << " to enum " << e.name()
-                 << ". Ignore attribute but this points to an incompatibility in some codeplug. "
-                 << "Consider reporting it to https://github.com/hmatuschek/qdmr/issues.";
+  if (isProperty(index)) {
+    ConfigItem *pobj = parentObject(index);
+    QMetaProperty prop = propertyAt(index);
+    if (0 == index.column()) {
+      if (Qt::DisplayRole == role)
+        return prop.name();
+    } else if ((2 == index.column()) && (Qt::DisplayRole == role)) {
+      if (propIsInstance<ConfigItem>(prop)) {
+        ConfigItem *item = prop.read(pobj).value<ConfigItem*>();
+        if (item && item->hasDescription())
+          return item->description();
+      }
+      if (pobj->hasDescription(prop))
+        return pobj->description(prop);
+      return QVariant();
+    } else if (Qt::ToolTipRole == role) {
+      if (propIsInstance<ConfigItem>(prop)) {
+        ConfigItem *item = prop.read(pobj).value<ConfigItem*>();
+        if (item && item->hasLongDescription())
+          return item->longDescription();
+      }
+      if (pobj->hasLongDescription(prop))
+        return pobj->longDescription(prop);
+      if (pobj->hasDescription(prop))
+        return pobj->description(prop);
       return QVariant();
     }
-    return QString(key);
-  } else if ((QVariant::Bool == prop.type()) && (Qt::EditRole == role)) {
-    return value;
-  } else if ((QVariant::Bool == prop.type()) && (Qt::DisplayRole == role)) {
-    if (value.toBool())
-      return tr("true");
-    return tr("false");
-  } else if ( ((QVariant::Int == prop.type()) || (QVariant::UInt == prop.type()) ||
-               (QVariant::Double == prop.type()) || (QVariant::String == prop.type()))
-              && ((Qt::DisplayRole == role) || (Qt::EditRole==role)) ) {
-    return value;
-  } else if (value.value<ConfigObjectReference *>() && (Qt::DisplayRole == role)) {
-    ConfigObjectReference *ref = value.value<ConfigObjectReference *>();
-    ConfigObject *obj = ref->as<ConfigObject>();
-    if (nullptr == obj)
-      return tr("[None]");
-    return QString("%1 (%2)").arg(obj->name()).arg(obj->metaObject()->className());
-  } else if (value.value<ConfigObjectReference *>() && (Qt::EditRole == role)) {
-    return value;
-  } else if (propIsInstance<ConfigItem>(prop)) {
-    ConfigItem *item = value.value<ConfigItem*>();
-    if (Qt::DisplayRole == role) {
-      if (nullptr == item)
+
+    QVariant value = prop.read(pobj);
+    if (prop.isEnumType() && ((Qt::DisplayRole == role) || (Qt::EditRole == role))) {
+      QMetaEnum e = prop.enumerator();
+      const char *key = e.valueToKey(value.toInt());
+      if (nullptr == key) {
+        logError() << "Cannot map value " << value.toUInt()
+                   << " to enum " << e.name()
+                   << ". Ignore attribute but this points to an incompatibility in some codeplug. "
+                   << "Consider reporting it to https://github.com/hmatuschek/qdmr/issues.";
+        return QVariant();
+      }
+      return QString(key);
+    } else if ((QVariant::Bool == prop.type()) && (Qt::EditRole == role)) {
+      return value;
+    } else if ((QVariant::Bool == prop.type()) && (Qt::DisplayRole == role)) {
+      if (value.toBool())
+        return tr("true");
+      return tr("false");
+    } else if ( ((QVariant::Int == prop.type()) || (QVariant::UInt == prop.type()) ||
+                 (QVariant::Double == prop.type()) || (QVariant::String == prop.type()))
+                && ((Qt::DisplayRole == role) || (Qt::EditRole==role)) ) {
+      return value;
+    } else if (value.value<ConfigObjectReference *>() && (Qt::DisplayRole == role)) {
+      ConfigObjectReference *ref = value.value<ConfigObjectReference *>();
+      ConfigObject *obj = ref->as<ConfigObject>();
+      if (nullptr == obj)
         return tr("[None]");
-      else
-        return tr("Instance of %1").arg(item->metaObject()->className());
+      return QString("%1 (%2)").arg(obj->name()).arg(obj->metaObject()->className());
+    } else if (value.value<ConfigObjectReference *>() && (Qt::EditRole == role)) {
+      return value;
+    } else if (propIsInstance<ConfigItem>(prop)) {
+      ConfigItem *item = value.value<ConfigItem*>();
+      if (Qt::DisplayRole == role) {
+        if (nullptr == item)
+          return tr("[None]");
+        else
+          return tr("Instance of %1").arg(item->metaObject()->className());
+      }
+    } else if (propIsInstance<ConfigObjectList>(prop)) {
+      ConfigObjectList *lst = value.value<ConfigObjectList*>();
+      if (Qt::DisplayRole == role)
+        return tr("List of %1 instances").arg(lst->elementType().className());
     }
+  } else if (isListElement(index)) {
+    ConfigObjectList *lst = parentList(index);
+    if (index.row() >= lst->count())
+      return QVariant();
+
+    if ((0 == index.column()) && (Qt::DisplayRole == role))
+      return lst->get(index.row())->name();
   }
+
 
   return QVariant();
 }

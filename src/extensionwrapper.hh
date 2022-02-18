@@ -42,10 +42,15 @@ public:
 
   ConfigItem *root() const;
   ConfigItem *item(const QModelIndex &item) const;
+  ConfigObjectList *list(const QModelIndex &item) const;
 
+  ConfigObjectList *parentList(const QModelIndex &index) const;
   ConfigItem *parentObject(const QModelIndex &index) const;
   QMetaProperty propertyAt(const QModelIndex &index) const;
+
+  bool isProperty(const QModelIndex &index) const;
   bool isExtension(const QModelIndex &index) const;
+  bool isListElement(const QModelIndex &index) const;
 
   bool createInstanceAt(const QModelIndex &item);
   bool deleteInstanceAt(const QModelIndex &item);
