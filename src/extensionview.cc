@@ -69,19 +69,23 @@ ExtensionView::onSelectionChanged(const QItemSelection &current, const QItemSele
       return;
     }
 
-    if (! propIsInstance<ConfigItem>(prop)) {
+    if (propIsInstance<ConfigItem>(prop)) {
       ui->create->setEnabled(false);
       ui->remove->setEnabled(false);
-    } else if (prop.read(obj).value<ConfigItem*>()) {
-      ui->create->setEnabled(false);
-      ui->remove->setEnabled(prop.isWritable());
-    } else {
-      ui->create->setEnabled(prop.isWritable());
+      if (prop.read(obj).value<ConfigItem*>()) {
+        ui->create->setEnabled(false);
+        ui->remove->setEnabled(prop.isWritable());
+      } else {
+        ui->create->setEnabled(prop.isWritable());
+        ui->remove->setEnabled(false);
+      }
+    } else if (propIsInstance<ConfigObjectList>(prop)) {
+      ui->create->setEnabled(true);
       ui->remove->setEnabled(false);
     }
   } else if (_model->isListElement(_proxy.mapToSource(row))) {
-    ConfigObjectList *lst = _model->parentList(_proxy.mapToSource(row));
-
+    ui->create->setEnabled(false);
+    ui->remove->setEnabled(true);
   }
 }
 
@@ -89,11 +93,29 @@ void
 ExtensionView::onCreateExtension() {
   if ((! ui->view->selectionModel()->hasSelection()) || (nullptr == _model))
     return;
+
   QModelIndex item = _proxy.mapToSource(
         ui->view->selectionModel()->selectedRows(0).first());
-  if (! _model->createInstanceAt(item))
+
+  if (! _model->isProperty(item))
+    return;
+  QMetaProperty prop = _model->propertyAt(item);
+  ConfigItem *obj = _model->parentObject(item);
+  if ((nullptr == obj) || (! prop.isValid()))
+    return;
+
+  if (propIsInstance<ConfigItem>(prop) && (! _model->createInstanceAt(item))) {
     QMessageBox::critical(nullptr, tr("Cannot create extension."),
                           tr("Cannot create extension, consider reporting a bug."));
+    return;
+  } else if (propIsInstance<ConfigObjectList>(prop)) {
+    if (!_model->createElementAt(item)) {
+      QMessageBox::critical(nullptr, tr("Cannot create list element."),
+                            tr("Cannot create list element, consider reporting a bug."));
+      return;
+    }
+  }
+
   ui->view->selectionModel()->clearSelection();
 }
 

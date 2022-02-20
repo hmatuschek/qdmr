@@ -56,6 +56,8 @@ public:
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
+Q_DECLARE_OPAQUE_POINTER(DMREncryptionKey*)
+
 
 /** Represents an AES (enhanced) encryption key.
  *
@@ -77,6 +79,8 @@ public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 };
+
+Q_DECLARE_OPAQUE_POINTER(AESEncryptionKey*)
 
 
 /** The list of encryption keys.

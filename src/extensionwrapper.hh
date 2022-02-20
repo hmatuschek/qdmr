@@ -55,6 +55,9 @@ public:
   bool createInstanceAt(const QModelIndex &item);
   bool deleteInstanceAt(const QModelIndex &item);
 
+  bool createElementAt(const QModelIndex &item);
+  bool deleteElementAt(const QModelIndex &item);
+
   QModelIndex index(int row, int column, const QModelIndex &parent) const;
   QModelIndex parent(const QModelIndex &child) const;
 

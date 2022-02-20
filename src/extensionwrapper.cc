@@ -2,6 +2,7 @@
 #include <QMetaProperty>
 #include "logger.hh"
 #include "configreference.hh"
+#include "configobjecttypeselectiondialog.hh"
 
 
 /* ******************************************************************************************** *
@@ -261,6 +262,9 @@ PropertyWrapper::isListElement(const QModelIndex &index) const {
 
 bool
 PropertyWrapper::createInstanceAt(const QModelIndex &item) {
+  if (! isProperty(item))
+    return false;
+
   ConfigItem *obj = parentObject(item);
   QMetaProperty prop = propertyAt(item);
   if ((nullptr == obj) || (! prop.isValid()))
@@ -314,6 +318,37 @@ PropertyWrapper::deleteInstanceAt(const QModelIndex &item) {
     return true;
   }
   return false;
+}
+
+bool
+PropertyWrapper::createElementAt(const QModelIndex &item) {
+  ConfigItem *obj = parentObject(item);
+  QMetaProperty prop = propertyAt(item);
+  if ((nullptr == obj) || (! prop.isValid()))
+    return false;
+
+  ConfigObjectList *lst = prop.read(obj).value<ConfigObjectList*>();
+  if (nullptr == lst)
+    return false;
+
+  QMetaObject type(lst->elementType());
+
+  ConfigObjectTypeSelectionDialog dialog(lst->elementType());
+  if (QDialog::Accepted != dialog.exec())
+    return true;
+
+  // Instantiate element
+  ConfigObject *element = qobject_cast<ConfigObject *>(
+        type.newInstance(QGenericArgument(nullptr, lst)));
+  if (nullptr == element)
+    return false;
+
+  // store item
+  QModelIndex elementIndex = createIndex(lst->count(), 0, lst);
+  beginInsertRows(elementIndex, 0, element->metaObject()->propertyCount());
+  lst->add(element);
+  endInsertRows();
+  return true;
 }
 
 QModelIndex
