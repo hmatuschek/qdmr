@@ -331,17 +331,18 @@ PropertyWrapper::createElementAt(const QModelIndex &item) {
   if (nullptr == lst)
     return false;
 
-  QMetaObject type(lst->elementType());
-
-  ConfigObjectTypeSelectionDialog dialog(lst->elementType());
+  ConfigObjectTypeSelectionDialog dialog(lst->elementTypes());
   if (QDialog::Accepted != dialog.exec())
     return true;
+
+  QMetaObject type= dialog.selectedType();
 
   // Instantiate element
   ConfigObject *element = qobject_cast<ConfigObject *>(
         type.newInstance(QGenericArgument(nullptr, lst)));
   if (nullptr == element)
     return false;
+  element->setName(tr("new element"));
 
   // store item
   QModelIndex elementIndex = createIndex(lst->count(), 0, lst);
@@ -570,7 +571,7 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
     } else if (propIsInstance<ConfigObjectList>(prop)) {
       ConfigObjectList *lst = value.value<ConfigObjectList*>();
       if (Qt::DisplayRole == role)
-        return tr("List of %1 instances").arg(lst->elementType().className());
+        return tr("List of %1 instances").arg(lst->classNames().join(", "));
     }
   } else if (isListElement(index)) {
     ConfigObjectList *lst = parentList(index);
@@ -579,6 +580,10 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
 
     if ((0 == index.column()) && (Qt::DisplayRole == role))
       return lst->get(index.row())->name();
+    else if ((1 == index.column()) && (Qt::DisplayRole == role))
+      return lst->get(index.row())->description();
+    else if ((2 == index.column()) && (Qt::DisplayRole == role))
+      return lst->get(index.row())->longDescription();
   }
 
 

@@ -246,7 +246,9 @@ class AbstractConfigObjectList: public QObject
 
 protected:
   /** Hidden constructor. */
-  explicit AbstractConfigObjectList(const QMetaObject &elementType=ConfigObject::staticMetaObject, QObject *parent = nullptr);
+  explicit AbstractConfigObjectList(const QMetaObject &elementTypes=ConfigObject::staticMetaObject, QObject *parent = nullptr);
+  /** Hidden constructor from initializer list. */
+  AbstractConfigObjectList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent=nullptr);
 
 public:
   /** Copies all elements from @c other to this list. */
@@ -289,7 +291,9 @@ public:
   virtual bool moveDown(int first, int last);
 
   /** Returns the element type for this list. */
-  const QMetaObject &elementType() const;
+  const QList<QMetaObject> &elementTypes() const;
+  /** Retunrs a list of all class names. */
+  QStringList classNames() const;
 
 signals:
   /** Gets emitted if an element was added to the list. */
@@ -307,7 +311,7 @@ private slots:
 
 protected:
   /** Holds the static QMetaObject of the element type. */
-  QMetaObject _elementType;
+  QList<QMetaObject> _elementTypes;
   /** Holds the list items. */
   QVector<ConfigObject *> _items;
 };
@@ -323,7 +327,9 @@ class ConfigObjectList: public AbstractConfigObjectList
 
 protected:
   /** Hidden constructor. */
-  explicit ConfigObjectList(const QMetaObject &elementType=ConfigItem::staticMetaObject, QObject *parent = nullptr);
+  explicit ConfigObjectList(const QMetaObject &elementTypes=ConfigItem::staticMetaObject, QObject *parent = nullptr);
+  /** Hidden constructor from initializer list. */
+  ConfigObjectList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent=nullptr);
 
 public:
   int add(ConfigObject *obj, int row=-1);
@@ -354,7 +360,9 @@ class ConfigObjectRefList: public AbstractConfigObjectList
 
 protected:
   /** Hidden constructor. */
-  explicit ConfigObjectRefList(const QMetaObject &elementType=ConfigObject::staticMetaObject, QObject *parent = nullptr);
+  explicit ConfigObjectRefList(const QMetaObject &elementTypes=ConfigObject::staticMetaObject, QObject *parent = nullptr);
+  /** Hidden constructor from initializer list. */
+  ConfigObjectRefList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent=nullptr);
 
 public:
   bool label(ConfigItem::Context &context, const ErrorStack &err=ErrorStack());

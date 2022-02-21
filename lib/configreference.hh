@@ -162,7 +162,7 @@ class ChannelRefList: public ConfigObjectRefList
 
 protected:
   /** Hidden constructor. */
-  explicit ChannelRefList(const QMetaObject &elementType, QObject *parent = nullptr);
+  explicit ChannelRefList(const QMetaObject &elementTypes, QObject *parent = nullptr);
 
 public:
   /** Empty constructor. */

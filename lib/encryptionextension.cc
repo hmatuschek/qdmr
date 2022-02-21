@@ -150,7 +150,7 @@ AESEncryptionKey::parse(const YAML::Node &node, Context &ctx, const ErrorStack &
  * Implementation of EncryptionKeys
  * ********************************************************************************************* */
 EncryptionKeys::EncryptionKeys(QObject *parent)
-  : ConfigObjectList(EncryptionKey::staticMetaObject, parent)
+  : ConfigObjectList({DMREncryptionKey::staticMetaObject, AESEncryptionKey::staticMetaObject}, parent)
 {
   // pass...
 }

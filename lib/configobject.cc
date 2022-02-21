@@ -825,7 +825,7 @@ ConfigItem::hasLongDescription(const QMetaProperty &prop) const {
 QString
 ConfigItem::description() const {
   if (! hasDescription())
-    return QString();
+    return metaObject()->className();
   const QMetaObject *meta = metaObject();
   return meta->classInfo(meta->indexOfClassInfo("description")).value();
 }
@@ -950,7 +950,13 @@ ConfigExtension::ConfigExtension(QObject *parent)
  * Implementation of AbstractConfigObjectList
  * ********************************************************************************************* */
 AbstractConfigObjectList::AbstractConfigObjectList(const QMetaObject &elementType, QObject *parent)
-  : QObject(parent), _elementType(elementType), _items()
+  : QObject(parent), _elementTypes(), _items()
+{
+  _elementTypes.append(elementType);
+}
+
+AbstractConfigObjectList::AbstractConfigObjectList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent)
+  : QObject(parent), _elementTypes(elementTypes), _items()
 {
   // pass...
 }
@@ -958,7 +964,7 @@ AbstractConfigObjectList::AbstractConfigObjectList(const QMetaObject &elementTyp
 bool
 AbstractConfigObjectList::copy(const AbstractConfigObjectList &other) {
   this->clear();
-  _elementType = other._elementType;
+  _elementTypes = other._elementTypes;
   foreach (ConfigObject *item, other._items)
     add(item);
   return true;
@@ -1014,9 +1020,16 @@ int AbstractConfigObjectList::add(ConfigObject *obj, int row) {
   if (-1 == row)
     row = _items.size();
   // Check type
-  if (! obj->inherits(_elementType.className())) {
+  bool matchesType = false;
+  foreach (const QMetaObject &type, _elementTypes) {
+    if (obj->inherits(type.className())) {
+      matchesType = true;
+      break;
+    }
+  }
+  if (! matchesType) {
     logError() << "Cannot add element of type " << obj->metaObject()->className()
-               << " to list, expected instances of " << _elementType.className();
+               << " to list, expected instances of " << classNames().join(", ");
     return -1;
   }
   _items.insert(row, obj);
@@ -1081,9 +1094,18 @@ AbstractConfigObjectList::moveDown(int first, int last) {
   return true;
 }
 
-const QMetaObject &
-AbstractConfigObjectList::elementType() const {
-  return _elementType;
+const QList<QMetaObject> &
+AbstractConfigObjectList::elementTypes() const {
+  return _elementTypes;
+}
+
+QStringList
+AbstractConfigObjectList::classNames() const {
+  QStringList cls;
+  foreach (const QMetaObject &type, _elementTypes) {
+    cls.append(type.className());
+  }
+  return cls;
 }
 
 void
@@ -1110,6 +1132,12 @@ AbstractConfigObjectList::onElementDeleted(QObject *obj) {
  * ********************************************************************************************* */
 ConfigObjectList::ConfigObjectList(const QMetaObject &elementType, QObject *parent)
   : AbstractConfigObjectList(elementType, parent)
+{
+  // pass...
+}
+
+ConfigObjectList::ConfigObjectList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent)
+  : AbstractConfigObjectList(elementTypes, parent)
 {
   // pass...
 }
@@ -1230,7 +1258,7 @@ ConfigObjectList::clear() {
 bool
 ConfigObjectList::copy(const AbstractConfigObjectList &other) {
   clear();
-  _elementType = other.elementType();
+  _elementTypes = other.elementTypes();
   for (int i=0; i<other.count(); i++)
     add(other.get(i)->clone()->as<ConfigObject>());
   return true;
@@ -1242,6 +1270,12 @@ ConfigObjectList::copy(const AbstractConfigObjectList &other) {
  * ********************************************************************************************* */
 ConfigObjectRefList::ConfigObjectRefList(const QMetaObject &elementType, QObject *parent)
   : AbstractConfigObjectList(elementType, parent)
+{
+  // pass...
+}
+
+ConfigObjectRefList::ConfigObjectRefList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent)
+  : AbstractConfigObjectList(elementTypes, parent)
 {
   // pass...
 }

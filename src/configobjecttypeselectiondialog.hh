@@ -12,11 +12,14 @@ class ConfigObjectTypeSelectionDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit ConfigObjectTypeSelectionDialog(const QMetaObject &cls, QWidget *parent = nullptr);
+  explicit ConfigObjectTypeSelectionDialog(const QList<QMetaObject> &cls, QWidget *parent = nullptr);
   ~ConfigObjectTypeSelectionDialog();
+
+  const QMetaObject &selectedType() const;
 
 private:
   Ui::ConfigObjectTypeSelectionDialog *ui;
+  QList<QMetaObject> _types;
 };
 
 #endif // CONFIGOBJECTTYPESELECTIONDIALOG_HH

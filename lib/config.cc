@@ -94,11 +94,14 @@ Config::setModified(bool modified) {
 bool
 Config::toYAML(QTextStream &stream, const ErrorStack &err) {
   ConfigItem::Context context;
-  if (! this->label(context))
+  // Label all codeplug elements
+  if (! this->label(context, err))
     return false;
+  // Serialize into YAML
   YAML::Node doc = serialize(context, err);
   if (doc.IsNull())
     return false;
+  // Print YAML
   YAML::Emitter emitter;
   emitter << YAML::BeginDoc << doc << YAML::EndDoc;
   stream << emitter.c_str();

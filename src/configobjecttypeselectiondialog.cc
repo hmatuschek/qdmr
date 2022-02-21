@@ -2,22 +2,24 @@
 #include "ui_configobjecttypeselectiondialog.h"
 #include "logger.hh"
 
-ConfigObjectTypeSelectionDialog::ConfigObjectTypeSelectionDialog(const QMetaObject &cls, QWidget *parent)
-  : QDialog(parent), ui(new Ui::ConfigObjectTypeSelectionDialog)
+ConfigObjectTypeSelectionDialog::ConfigObjectTypeSelectionDialog(
+    const QList<QMetaObject> &cls, QWidget *parent)
+  : QDialog(parent), ui(new Ui::ConfigObjectTypeSelectionDialog), _types(cls)
 {
   ui->setupUi(this);
-  // Iterate over all classes that inherit from the given type and have an invokeable constructor.
-  for (int i=QMetaType::User; QMetaType(i).isValid(); i++) {
-    const QMetaObject *meta = QMetaType::metaObjectForType(i);
-    if (nullptr == meta)
-      continue;
-    logDebug() << "Check type '" << meta->className() << "'...";
-    if (meta->inherits(&cls))
-      ui->typeSelection->addItem(meta->className(), i);
+  // Iterate over all classes
+  foreach (const QMetaObject type, _types) {
+    logDebug() << "Inspect class '" << type.className() << "'.";
+    ui->typeSelection->addItem(type.className());
   }
 }
 
 ConfigObjectTypeSelectionDialog::~ConfigObjectTypeSelectionDialog()
 {
   delete ui;
+}
+
+const QMetaObject &
+ConfigObjectTypeSelectionDialog::selectedType() const {
+  return _types.at(ui->typeSelection->currentIndex());
 }
