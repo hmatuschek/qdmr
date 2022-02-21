@@ -20,8 +20,8 @@ ExtensionView::ExtensionView(QWidget *parent) :
 
   connect(ui->view->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
           this, SLOT(onSelectionChanged(QItemSelection,QItemSelection)));
-  connect(ui->create, SIGNAL(clicked(bool)), this, SLOT(onCreateExtension()));
-  connect(ui->remove, SIGNAL(clicked(bool)), this, SLOT(onDeleteExtension()));
+  connect(ui->create, SIGNAL(clicked(bool)), this, SLOT(onCreate()));
+  connect(ui->remove, SIGNAL(clicked(bool)), this, SLOT(onDelete()));
   connect(ui->view->header(), SIGNAL(sectionCountChanged(int,int)),
           this, SLOT(loadSectionState()));
   connect(ui->view->header(), SIGNAL(sectionResized(int,int,int)),
@@ -90,7 +90,7 @@ ExtensionView::onSelectionChanged(const QItemSelection &current, const QItemSele
 }
 
 void
-ExtensionView::onCreateExtension() {
+ExtensionView::onCreate() {
   if ((! ui->view->selectionModel()->hasSelection()) || (nullptr == _model))
     return;
 
@@ -99,6 +99,7 @@ ExtensionView::onCreateExtension() {
 
   if (! _model->isProperty(item))
     return;
+
   QMetaProperty prop = _model->propertyAt(item);
   ConfigItem *obj = _model->parentObject(item);
   if ((nullptr == obj) || (! prop.isValid()))
@@ -108,24 +109,25 @@ ExtensionView::onCreateExtension() {
     QMessageBox::critical(nullptr, tr("Cannot create extension."),
                           tr("Cannot create extension, consider reporting a bug."));
     return;
-  } else if (propIsInstance<ConfigObjectList>(prop)) {
-    if (!_model->createElementAt(item)) {
-      QMessageBox::critical(nullptr, tr("Cannot create list element."),
-                            tr("Cannot create list element, consider reporting a bug."));
-      return;
-    }
+  } else if (propIsInstance<ConfigObjectList>(prop) && !_model->createElementAt(item)) {
+    QMessageBox::critical(nullptr, tr("Cannot create list element."),
+                          tr("Cannot create list element, consider reporting a bug."));
+    return;
   }
 
   ui->view->selectionModel()->clearSelection();
 }
 
 void
-ExtensionView::onDeleteExtension() {
+ExtensionView::onDelete() {
   if ((! ui->view->selectionModel()->hasSelection()) || (nullptr == _model))
     return;
   QModelIndex item = _proxy.mapToSource(
         ui->view->selectionModel()->selectedRows(0).first());
-  _model->deleteInstanceAt(item);
+  if (_model->isProperty(item))
+    _model->deleteInstanceAt(item);
+  else if (_model->isListElement(item))
+    _model->deleteElementAt(item);
   ui->view->selectionModel()->clearSelection();
 }
 

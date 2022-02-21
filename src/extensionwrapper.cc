@@ -246,6 +246,7 @@ bool
 PropertyWrapper::isProperty(const QModelIndex &index) const {
   if (! index.isValid())
     return true;
+  // Index is property if parent is an ConfigItem
   QObject *pptr = reinterpret_cast<QObject *>(index.internalPointer());
   return nullptr != qobject_cast<ConfigItem*>(pptr);
 }
@@ -254,6 +255,7 @@ bool
 PropertyWrapper::isListElement(const QModelIndex &index) const {
   if (! index.isValid())
     return false;
+  // Index is list element if parent is ConfigObjectList
   QObject *pptr = reinterpret_cast<QObject *>(index.internalPointer());
   if (nullptr == pptr)
     return false;
@@ -345,10 +347,32 @@ PropertyWrapper::createElementAt(const QModelIndex &item) {
   element->setName(tr("new element"));
 
   // store item
-  QModelIndex elementIndex = createIndex(lst->count(), 0, lst);
-  beginInsertRows(elementIndex, 0, element->metaObject()->propertyCount());
+  beginInsertRows(item,lst->count(), lst->count()+1);
   lst->add(element);
   endInsertRows();
+  emit dataChanged(index(item.row(), 0, item.parent()),
+                   index(item.row(), 2, item.parent()));
+
+  QModelIndex elementIndex = createIndex(lst->count(), 0, lst);
+  beginInsertRows(elementIndex, 0, element->metaObject()->propertyCount());
+  endInsertRows();
+  emit dataChanged(index(0, 0, item),
+                   index(lst->count(), 2, item));
+  return true;
+}
+
+bool
+PropertyWrapper::deleteElementAt(const QModelIndex &item) {
+  ConfigObjectList *lst = parentList(item);
+  if (nullptr == lst)
+    return false;
+  if (item.row() >= lst->count())
+    return false;
+
+  beginRemoveRows(item, 0, rowCount(item));
+  lst->del(lst->get(item.row()));
+  endRemoveRows();
+
   return true;
 }
 
@@ -469,10 +493,13 @@ PropertyWrapper::hasChildren(const QModelIndex &element) const {
     // If parent is item -> get addressed property
     QMetaProperty prop = propertyAt(element);
     // If property is an item or list (and is set)
-    if (propIsInstance<ConfigItem>(prop))
+    if (propIsInstance<ConfigItem>(prop)) {
       return nullptr != prop.read(pobj).value<ConfigItem*>();
-    else if (propIsInstance<ConfigObjectList>(prop))
-      return nullptr != prop.read(pobj).value<ConfigObjectList*>();
+    } else if (propIsInstance<ConfigObjectList>(prop)) {
+      // If element and there are elements within the list.
+      ConfigObjectList *lst = prop.read(pobj).value<ConfigObjectList*>();
+      return (nullptr != lst) && (lst->count()>0);
+    }
   } else if (ConfigObjectList *lst = qobject_cast<ConfigObjectList*>(pptr)) {
     // If parent is a list, check row index. List elements are always objects and have children.
     return lst->count() > element.row();
