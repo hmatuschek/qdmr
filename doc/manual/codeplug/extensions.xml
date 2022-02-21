@@ -25,5 +25,6 @@
 <xi:include href="radioddity/extensions.xml"/>
 <xi:include href="tyt/extensions.xml"/>
 <xi:include href="anytone/extensions.xml"/>
+<xi:include href="commercial/extensions.xml"/>
 
 </chapter>
