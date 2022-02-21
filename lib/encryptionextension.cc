@@ -112,7 +112,7 @@ AESEncryptionKey::clone() const {
 
 void
 AESEncryptionKey::fromHex(const QString &hex) {
-  if (4 != hex.size()) {
+  if (32 != hex.size()) {
     logError() << "Cannot set AES ecryption key to '" << hex << "': Not a 16bit key.";
     return;
   }

@@ -17,6 +17,9 @@ public:
 
   const QMetaObject &selectedType() const;
 
+protected slots:
+  void onSelectionChanged(int currentIndex);
+
 private:
   Ui::ConfigObjectTypeSelectionDialog *ui;
   QList<QMetaObject> _types;
