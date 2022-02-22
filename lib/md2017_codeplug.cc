@@ -236,7 +236,7 @@ MD2017Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
       return false;
     }
     ZoneExtElement zoneext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
-    if (! zoneext.linkZoneObj(ctx.get<Zone>(i), ctx)) {
+    if (! zoneext.linkZoneObj(ctx.get<Zone>(i+1), ctx)) {
       errMsg(err) << "Cannot link zone extension at index " << i << ".";
       return false;
     }
