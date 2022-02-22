@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<section xmlid="extCom"
+<chapter xml:id="extCom"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -13,14 +13,22 @@
   This section collects all extensions that configure commercial features present in all radios.
 </para>
 
+<para>
+  DMR was developed as a digital replacement of the analog trunked radio systems used in commercial
+  context. To this end, there are many features of that are irrelevant or outright forbidden in an
+  amateur radio context. However, some HAM operators use their hand-held radios also for their 
+  day job and thus may need to configure some features that are only applicable in a commercial
+  context. To this end, qdmr allows to set some of the commercial features through extensions.
+</para>
+
 <warning>
   <para>
-    Some commercial features defined within the DMR standard, are illegal to use in an amateur 
-    radio use.
+    Some commercial features defined within the DMR standard are illegal to use in an amateur 
+    radio context. Check your local regulations!
   </para>  
 </warning>
 
 <xi:include href="channel.xml"/>
 <xi:include href="encryption.xml"/>
 
-</section>
+</chapter>

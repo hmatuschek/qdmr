@@ -20,7 +20,7 @@
     
     <releaseinfo>
       <para>
-        This document covers <application>qdmr</application> version 0.10.1.
+        This document covers <application>qdmr</application> version 0.10.2.
       </para>
     </releaseinfo>
     
@@ -43,6 +43,8 @@
   
   <xi:include  href="codeplug/format.xml"/>
   <xi:include  href="codeplug/extensions.xml"/>
+  <xi:include  href="codeplug/commercial/extensions.xml"/>
+
   <xi:include  href="conf/format.xml"/>
 
   <xi:include href="cli/commandline.xml"/>

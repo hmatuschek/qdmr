@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xmlid="extComEncryption"
+<section xml:id="extComEncryption"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -50,7 +50,7 @@
 </info>
 
 <para>
-  As only the size differs between the different key types, there are common attributes. 
+  As only the key size differs between the different key types, there are common attributes.
   Specifically, the ID and name of the key.
 </para>
 
