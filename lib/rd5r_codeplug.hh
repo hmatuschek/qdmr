@@ -105,7 +105,7 @@ public:
     bool linkChannelObj(Channel *c, Context &ctx) const;
   };
 
-  /** Implements the base class of a timestamp for all Radioddity codeplugs.
+  /** Implements the timestamp for RD-5R codeplugs.
    *
    * Encoding of messages (size: 0x0006b):
    * @verbinclude rd5r_timestamp.txt */
@@ -128,6 +128,22 @@ public:
     virtual QDateTime get() const;
     /** Sets the time stamp. */
     virtual void set(const QDateTime &ts=QDateTime::currentDateTime());
+  };
+
+  /** Implements the encoding/decoding of encryption keys for the RD-5R radio.
+   * @note The RD5R only supports a single basic DMR encryption key with a fixed value!
+   *
+   * Encoding of encryption keys (size: 0x00088):
+   * @verbinclude radioddity_privacy.txt */
+  class EncryptionElement: public RadioddityCodeplug::EncryptionElement
+  {
+  public:
+    /** Constructor. */
+    EncryptionElement(uint8_t *ptr);
+
+    bool isBasicKeySet(unsigned n) const;
+    QByteArray basicKey(unsigned n) const;
+    void setBasicKey(unsigned n, const QByteArray &key);
   };
 
 public:
@@ -188,6 +204,11 @@ public:
   bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  void clearEncryption();
+  bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool createEncryption(Config *config, Context &ctx, const ErrorStack &err);
+  bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err);
 };
 
 #endif // RD5R_CODEPLUG_HH

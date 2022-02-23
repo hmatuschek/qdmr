@@ -10,6 +10,9 @@
 #define ADDR_BUTTONS              0x000108
 #define ADDR_MESSAGES             0x000128
 
+#define ADDR_ENCRYPTION           0x001370
+#define ENCRYPTION_SIZE               0x88
+
 #define NUM_CONTACTS                   256
 #define ADDR_CONTACTS             0x001788
 #define CONTACT_SIZE              0x000018
@@ -160,6 +163,39 @@ RD5RCodeplug::TimestampElement::set(const QDateTime &ts) {
   setBCD2(0x0003, ts.date().day());
   setBCD2(0x0004, ts.time().hour());
   setBCD2(0x0005, ts.time().minute());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of RD5RCodeplug::EncryptionElement
+ * ******************************************************************************************** */
+RD5RCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr)
+  : RadioddityCodeplug::EncryptionElement(ptr)
+{
+  // pass...
+}
+
+bool
+RD5RCodeplug::EncryptionElement::isBasicKeySet(unsigned n) const {
+  if (n>0)
+    return false;
+  return RadioddityCodeplug::EncryptionElement::isBasicKeySet(n);
+}
+
+QByteArray
+RD5RCodeplug::EncryptionElement::basicKey(unsigned n) const {
+  if (n>0)
+    return QByteArray();
+  return QByteArray("\x53\x47\x4c\x39");
+}
+
+void
+RD5RCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
+  if ((0 != n) || (key != "\x53\x47\x4c\x39")){
+    logError() << "The RD5R only supports a single fixed DMR basic key '53474c39'.";
+    return;
+  }
+  RD5RCodeplug::EncryptionElement::setBasicKey(n, key);
 }
 
 
@@ -637,5 +673,41 @@ RD5RCodeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack &err
       return false;
     }
   }
+  return true;
+}
+
+
+void
+RD5RCodeplug::clearEncryption() {
+  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  enc.clear();
+}
+
+bool
+RD5RCodeplug::encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err);
+  clearEncryption();
+  if (nullptr == config->encryptionExtension())
+    return true;
+  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  return enc.fromEncryptionExt(config->encryptionExtension(), ctx);
+}
+
+bool
+RD5RCodeplug::createEncryption(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  if (EncryptionElement::PrivacyType::None == enc.privacyType())
+    return true;
+  EncryptionExtension *ext = enc.toEncryptionExt(ctx);
+  if (nullptr == ext)
+    return false;
+  config->setEncryptionExtension(ext);
+  return true;
+}
+
+bool
+RD5RCodeplug::linkEncryption(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(ctx); Q_UNUSED(err);
   return true;
 }

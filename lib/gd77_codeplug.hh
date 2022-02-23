@@ -284,6 +284,11 @@ public:
   bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  void clearEncryption();
+  bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool createEncryption(Config *config, Context &ctx, const ErrorStack &err);
+  bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err);
 };
 
 #endif // GD77_CODEPLUG_HH

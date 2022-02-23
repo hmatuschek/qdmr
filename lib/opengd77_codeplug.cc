@@ -780,3 +780,26 @@ OpenGD77Codeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack 
   }
   return true;
 }
+
+void
+OpenGD77Codeplug::clearEncryption() {
+  // Encryption not supported in OpenGD77 codeplug
+}
+bool
+OpenGD77Codeplug::encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
+  // Encryption not supported in OpenGD77 codeplug
+  return true;
+}
+bool
+OpenGD77Codeplug::createEncryption(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(ctx); Q_UNUSED(err)
+  // Encryption not supported in OpenGD77 codeplug
+  return true;
+}
+bool
+OpenGD77Codeplug::linkEncryption(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(ctx); Q_UNUSED(err)
+  // Encryption not supported in OpenGD77 codeplug
+  return true;
+}

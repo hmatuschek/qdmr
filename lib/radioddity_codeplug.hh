@@ -1246,6 +1246,56 @@ public:
     virtual void appendMessage(const QString msg);
   };
 
+
+  /** Represents all encryption keys and settings within the codeplug on the device.
+   *
+   * Memory representation of encryption settings:
+   * @verbinclude radioddity_privacy.txt */
+  class EncryptionElement: public Codeplug::Element
+  {
+  public:
+    /** Encodes possible privacy types. For now, only none (encryption disabled) and basic are
+     * supported. */
+    enum class PrivacyType {
+      None,   ///< No encryption at all.
+      Basic   ///< Use basic DMR encryption.
+    };
+
+  protected:
+    /** Hidden constructor. */
+    EncryptionElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit EncryptionElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~EncryptionElement();
+
+    void clear();
+
+    /** Returns the privacy type set. */
+    virtual PrivacyType privacyType() const;
+    /** Sets the privacy type. */
+    virtual void setPrivacyType(PrivacyType type);
+
+    /** Retunrs @c true if the n-th "basic" key (32bit) is set.
+     * That is, if it is not filled with 0xff. */
+    virtual bool isBasicKeySet(unsigned n) const;
+    /** Returns the n-th "basic" key (32bit). */
+    virtual QByteArray basicKey(unsigned n) const;
+    /** Sets the n-th "basic" key (32bit). */
+    virtual void setBasicKey(unsigned n, const QByteArray &key);
+    /** Resets the n-th basic key. */
+    virtual void clearBasicKey(unsigned n);
+
+    /** Encodes given encryption extension. */
+    virtual bool fromEncryptionExt(EncryptionExtension *encr, Context &ctx);
+    /** Constructs the encryption extension. */
+    virtual EncryptionExtension *toEncryptionExt(Context &ctx);
+    /** Links the given encryption extension. */
+    virtual bool linkEncryptionExt(EncryptionExtension *encr, Context &ctx);
+  };
+
 protected:
   /** Hidden constructor, use a device specific class to instantiate. */
   explicit RadioddityCodeplug(QObject *parent=nullptr);
@@ -1349,6 +1399,15 @@ public:
   virtual bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all group lists. */
   virtual bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
+  /** Clears all encryption keys. */
+  virtual void clearEncryption() = 0;
+  /** Encodes all encryption keys defined. */
+  virtual bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Creates all encryption keys. */
+  virtual bool createEncryption(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Links all encryption keys. */
+  virtual bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 };
 
 #endif // RADIODDITYCODEPLUG_HH

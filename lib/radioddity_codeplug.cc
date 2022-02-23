@@ -2439,6 +2439,131 @@ RadioddityCodeplug::MessageBankElement::appendMessage(const QString msg) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of RadioddityCodeplug::EncryptionElement
+ * ********************************************************************************************* */
+RadioddityCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr, size_t size)
+  : Codeplug::Element(ptr, size)
+{
+  // pass...
+}
+
+RadioddityCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr)
+  : Element(ptr, 0x88)
+{
+  // pass...
+}
+
+RadioddityCodeplug::EncryptionElement::~EncryptionElement() {
+  // pass...
+}
+
+void
+RadioddityCodeplug::EncryptionElement::clear() {
+  setPrivacyType(PrivacyType::None);
+  for (int i=0; i<16; i++) {
+    clearBasicKey(i);
+  }
+}
+
+RadioddityCodeplug::EncryptionElement::PrivacyType
+RadioddityCodeplug::EncryptionElement::privacyType() const {
+  return PrivacyType(getUInt8(0x0000));
+}
+void
+RadioddityCodeplug::EncryptionElement::setPrivacyType(PrivacyType type) {
+  setUInt8(0x0000, (uint8_t)type);
+}
+
+bool
+RadioddityCodeplug::EncryptionElement::isBasicKeySet(unsigned n) const {
+  if (n>=16)
+    return false;
+  unsigned byte=n/8, bit =n%8;
+  return getBit(0x0002+byte, bit);
+}
+QByteArray
+RadioddityCodeplug::EncryptionElement::basicKey(unsigned n) const {
+  if (n >= 16)
+    return QByteArray();
+  return QByteArray((const char *)_data+0x0008+0x08*n, 4);
+}
+void
+RadioddityCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
+  if ((n>=16) || (4 != key.size()))
+    return;
+  unsigned byte=n/8, bit =n%8;
+  memcpy(_data+0x0008 + 0x08*n, key.data(), 4);
+  memcpy(_data+0x0008 + 0x08*n + 0x04, key.data(), 4);
+  setBit(0x0002+byte, bit);
+  setPrivacyType(PrivacyType::Basic);
+}
+void
+RadioddityCodeplug::EncryptionElement::clearBasicKey(unsigned n) {
+  if (n>=16)
+    return;
+  unsigned byte=n/8, bit =n%8;
+  memset(_data+0x0008 + 0x08*n, 0xff, 4);
+  memset(_data+0x0008 + 0x08*n + 0x04, 0xff, 4);
+  clearBit(0x0002+byte, bit);
+}
+
+bool
+RadioddityCodeplug::EncryptionElement::fromEncryptionExt(EncryptionExtension *encr, Context &ctx) {
+  clear();
+
+  if (encr->keys()->count() > 16) {
+    logError() << "Cannot encode encryption extension. Can only encode 16 keys.";
+    return false;
+  }
+
+  for (int i=0; i<encr->keys()->count(); i++) {
+    if (! encr->keys()->get(i)->is<DMREncryptionKey>()) {
+      logError() << "Can only encode basic encryption keys.";
+      return false;
+    }
+    DMREncryptionKey *key = encr->keys()->get(i)->as<DMREncryptionKey>();
+    if (key->key().size() != 4) {
+      logError() << "Can only encode 32bit basic encryption keys.";
+      return false;
+    }
+    setBasicKey(i, key->key());
+    ctx.add(key, i+1);
+  }
+
+  return true;
+}
+
+EncryptionExtension *
+RadioddityCodeplug::EncryptionElement::toEncryptionExt(Context &ctx) {
+  if (PrivacyType::None == privacyType())
+    return nullptr;
+
+  EncryptionExtension *ext = new EncryptionExtension();
+  for (int i=0; i<16; i++) {
+    if (! isBasicKeySet(i))
+      continue;
+    // Assemble key
+    DMREncryptionKey *key = new DMREncryptionKey();
+    key->setName(QString("Basic Key %1").arg(i+1));
+    key->fromHex(basicKey(i).toHex());
+    // add key to extension
+    ext->keys()->add(key);
+    // register key index
+    ctx.add(key, i+1);
+  }
+
+  return ext;
+}
+
+bool
+RadioddityCodeplug::EncryptionElement::linkEncryptionExt(EncryptionExtension *encr, Context &ctx) {
+  Q_UNUSED(encr); Q_UNUSED(ctx);
+  // Keys do not need any linking step
+  return true;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug
  * ********************************************************************************************* */
 RadioddityCodeplug::RadioddityCodeplug(QObject *parent)
@@ -2479,6 +2604,8 @@ RadioddityCodeplug::clear() {
   clearScanLists();
   // clear group lists
   clearGroupLists();
+  // clear encryption keys
+  clearEncryption();
 }
 
 bool
@@ -2591,6 +2718,11 @@ RadioddityCodeplug::encodeElements(const Flags &flags, Context &ctx, const Error
     return false;
   }
 
+  if (! this->encodeEncryption(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode encryption keys.";
+    return true;
+  }
+
   return true;
 }
 
@@ -2632,6 +2764,11 @@ RadioddityCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! this->createEncryption(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot decode encryption keys.";
+    return false;
+  }
+
   if (! this->createZones(ctx.config(), ctx, err)) {
     errMsg(err) << "Cannot create zones.";
     return false;
@@ -2664,6 +2801,11 @@ RadioddityCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
 
   if (! this->linkGroupLists(ctx.config(), ctx, err)) {
     errMsg(err) << "Cannot link group lists.";
+    return false;
+  }
+
+  if (! this->linkEncryption(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot link encryption keys.";
     return false;
   }
 
