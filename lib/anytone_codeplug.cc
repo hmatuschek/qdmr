@@ -300,24 +300,24 @@ AnytoneCodeplug::ChannelElement::setRXCTCSS(Code tone) {
 Signaling::Code
 AnytoneCodeplug::ChannelElement::txDCS() const {
   uint16_t code = getUInt16_le(0x000c);
-  if (512 < code)
+  if (512 > code)
     return Signaling::fromDCSNumber(dec_to_oct(code), false);
   return Signaling::fromDCSNumber(dec_to_oct(code-512), true);
 }
 void
 AnytoneCodeplug::ChannelElement::setTXDCS(Code code) {
   if (Signaling::isDCSNormal(code))
-    setUInt8(0x000c, oct_to_dec(Signaling::toDCSNumber(code)));
+    setUInt16_le(0x000c, oct_to_dec(Signaling::toDCSNumber(code)));
   else if (Signaling::isDCSInverted(code))
-    setUInt8(0x000c, oct_to_dec(Signaling::toDCSNumber(code))+512);
+    setUInt16_le(0x000c, oct_to_dec(Signaling::toDCSNumber(code))+512);
   else
-    setUInt8(0x000c, 0);
+    setUInt16_le(0x000c, 0);
 }
 
 Signaling::Code
 AnytoneCodeplug::ChannelElement::rxDCS() const {
   uint16_t code = getUInt16_le(0x000e);
-  if (512 < code)
+  if (512 > code)
     return Signaling::fromDCSNumber(dec_to_oct(code), false);
   return Signaling::fromDCSNumber(dec_to_oct(code-512), true);
 }
