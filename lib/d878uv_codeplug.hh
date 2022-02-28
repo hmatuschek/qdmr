@@ -879,6 +879,7 @@ public:
 
     /** Resets the settings. */
     void clear();
+    bool isValid() const;
 
     /** Returns the transmit frequency in Hz. */
     virtual unsigned frequency() const;

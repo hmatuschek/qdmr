@@ -1368,6 +1368,14 @@ D878UVCodeplug::AnalogAPRSSettingsElement::clear() {
   setUInt8(0x003d, 0x01); setUInt8(0x003e, 0x03); setUInt8(0x003f, 0xff);
 }
 
+bool
+D878UVCodeplug::AnalogAPRSSettingsElement::isValid() const {
+  if (! Codeplug::Element::isValid())
+    return false;
+  return (0 != frequency()) && (! destination().simplified().isEmpty())
+      && (! source().simplified().isEmpty());
+}
+
 unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::frequency() const {
   return ((unsigned)getBCD8_be(0x0001))*10;
