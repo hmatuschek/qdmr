@@ -45,6 +45,7 @@ public:
 
   bool isDarkMode() const;
   bool isDarkMode(const QPalette &palette) const;
+
 public slots:
   void newCodeplug();
   void loadCodeplug();
