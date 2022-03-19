@@ -9,7 +9,8 @@ SET(qdmr_SOURCES main.cc
   generalsettingsview.cc radioidlistview.cc contactlistview.cc grouplistsview.cc channellistview.cc
   zonelistview.cc scanlistsview.cc positioningsystemlistview.cc roamingzonelistview.cc
   collapsablewidget.cc extensionview.cc extensionwrapper.cc propertydelegate.cc errormessageview.cc
-  deviceselectiondialog.cc radioselectiondialog.cc dmriddialog.cc configobjecttypeselectiondialog.cc)
+  deviceselectiondialog.cc radioselectiondialog.cc dmriddialog.cc configobjecttypeselectiondialog.cc
+  repeaterbookcompleter.cc)
 SET(qdmr_MOC_HEADERS
   configitemwrapper.hh
   application.hh settings.hh dmrcontactdialog.hh dtmfcontactdialog.hh rxgrouplistdialog.hh
@@ -21,7 +22,8 @@ SET(qdmr_MOC_HEADERS
   generalsettingsview.hh radioidlistview.hh contactlistview.hh grouplistsview.hh channellistview.hh
   zonelistview.hh scanlistsview.hh positioningsystemlistview.hh roamingzonelistview.hh
   collapsablewidget.hh extensionview.hh extensionwrapper.hh propertydelegate.hh errormessageview.hh
-  deviceselectiondialog.hh radioselectiondialog.hh dmriddialog.hh configobjecttypeselectiondialog.hh)
+  deviceselectiondialog.hh radioselectiondialog.hh dmriddialog.hh configobjecttypeselectiondialog.hh
+  repeaterbookcompleter.hh)
 SET(qdmr_HEADERS )
 SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
   digitalchanneldialog.ui scanlistdialog.ui configwizardstart.ui verifydialog.ui settingsdialog.ui

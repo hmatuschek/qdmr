@@ -5,7 +5,7 @@
 #include "repeaterdatabase.hh"
 #include "utils.hh"
 #include "settings.hh"
-
+#include "repeaterbookcompleter.hh"
 
 /* ********************************************************************************************* *
  * Implementation of AnalogChannelDialog
@@ -34,11 +34,12 @@ AnalogChannelDialog::construct() {
   Settings settings;
 
   Application *app = qobject_cast<Application *>(qApp);
-  FMRepeaterFilter *filter = new FMRepeaterFilter(this);
-  filter->setSourceModel(app->repeater());
-  QCompleter *completer = new QCompleter(filter, this);
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-  completer->setCompletionColumn(0);
+  //FMRepeaterFilter *filter = new FMRepeaterFilter(this);
+  //filter->setSourceModel(app->repeater());
+  //QCompleter *completer = new QCompleter(filter, this);
+  //completer->setCaseSensitivity(Qt::CaseInsensitive);
+  //completer->setCompletionColumn(0);
+  QCompleter *completer = new RepeaterBookCompleter(2, this);
   channelName->setCompleter(completer);
   connect(completer, SIGNAL(activated(const QModelIndex &)),
           this, SLOT(onRepeaterSelected(const QModelIndex &)));
