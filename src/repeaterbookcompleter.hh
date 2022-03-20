@@ -14,7 +14,7 @@
 class RepeaterBookEntry: public QObject
 {
 public:
-  explicit RepeaterBookEntry(const QJsonObject &obj, QObject *parent=nullptr);
+  explicit RepeaterBookEntry(QObject *parent=nullptr);
   RepeaterBookEntry(const RepeaterBookEntry &other);
 
   RepeaterBookEntry &operator =(const RepeaterBookEntry &other);
@@ -31,9 +31,11 @@ public:
   Signaling::Code rxTone() const;
   Signaling::Code txTone() const;
   unsigned int colorCode() const;
-  unsigned int age() const;
+  qint64 age() const;
 
-  QJsonObject toJson() const;
+  bool fromRepeaterBook(const QJsonObject &obj);
+  bool fromCache(const QJsonObject &obj);
+  QJsonObject toCache() const;
 
 protected:
   QString _id;
@@ -71,12 +73,14 @@ protected slots:
 
 protected:
   QString cachePath() const;
+  QString queryPath() const;
   bool updateEntry(const RepeaterBookEntry &entry);
 
 protected:
   QNetworkAccessManager _network;
   QNetworkReply *_currentReply;
   QList<RepeaterBookEntry> _items;
+  QHash<QString, QDateTime> _queries;
 };
 
 
