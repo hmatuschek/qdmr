@@ -3,25 +3,55 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QNetworkReply>
-#include "logger.hh"
 #include <QStandardPaths>
 #include <QDir>
 
+#include "logger.hh"
+#include "utils.hh"
+
+
+/* ********************************************************************************************* *
+ * Helper functions
+ * ********************************************************************************************* */
+static const QSet<double> _aprs_frequencies = {
+  144.390, 144.575, 144.660, 144.800, 144.930, 145.175, 145.570, 432.500
+};
+
+inline QString bandName(double MHz) {
+  if (30 >= MHz)
+    return "HF";
+  else if (300 >= MHz)
+    return "VHF";
+  else if (3000 >= MHz)
+    return "UHF";
+  else if (30000 >= MHz)
+    return "SHF";
+  return "EHF";
+}
+
+inline QString bandName(double rx, double tx) {
+  QString rband = bandName(rx), tband=bandName(tx);
+  if ((rx == tx) && (_aprs_frequencies.contains(rx)))
+    return "APRS";
+  else if (rband == tband)
+    return rband;
+  return QString("%1/%2").arg(rband,tband);
+}
 
 /* ********************************************************************************************* *
  * RepeaterBookEntry
  * ********************************************************************************************* */
 RepeaterBookEntry::RepeaterBookEntry(QObject *parent)
-  : QObject(parent), _id(), _call(), _location(), _rxFrequency(0), _txFrequency(0), _isFM(false),
-    _isDMR(false), _rxTone(Signaling::SIGNALING_NONE), _txTone(Signaling::SIGNALING_NONE),
-    _colorCode(0), _timestamp(QDateTime::currentDateTime())
+  : QObject(parent), _id(), _call(), _location(), _qth(), _rxFrequency(0), _txFrequency(0),
+    _isFM(false), _isDMR(false), _rxTone(Signaling::SIGNALING_NONE),
+    _txTone(Signaling::SIGNALING_NONE), _colorCode(0), _timestamp(QDateTime::currentDateTime())
 {
 }
 
 RepeaterBookEntry::RepeaterBookEntry(const RepeaterBookEntry &other)
   : QObject(other.parent()), _id(other._id), _call(other._call), _location(other._location),
-    _rxFrequency(other._rxFrequency), _txFrequency(other._txFrequency), _isFM(other._isFM),
-    _isDMR(other._isDMR), _rxTone(other._rxTone), _txTone(other._txTone),
+    _qth(other._qth), _rxFrequency(other._rxFrequency), _txFrequency(other._txFrequency),
+    _isFM(other._isFM), _isDMR(other._isDMR), _rxTone(other._rxTone), _txTone(other._txTone),
     _colorCode(other._colorCode), _timestamp(other._timestamp)
 {
   // pass...
@@ -32,6 +62,7 @@ RepeaterBookEntry::operator =(const RepeaterBookEntry &other) {
   _id = other._id;
   _call = other._call;
   _location = other._location;
+  _qth = other._qth;
   _rxFrequency = other._rxFrequency;
   _txFrequency = other._txFrequency;
   _isFM = other._isFM;
@@ -61,6 +92,16 @@ RepeaterBookEntry::call() const {
 const QGeoCoordinate &
 RepeaterBookEntry::location() const {
   return _location;
+}
+
+QString
+RepeaterBookEntry::locator() const {
+  return deg2loc(_location);
+}
+
+const QString &
+RepeaterBookEntry::qth() const {
+  return _qth;
 }
 
 double
@@ -113,6 +154,7 @@ RepeaterBookEntry::fromRepeaterBook(const QJsonObject &obj) {
   _rxFrequency = obj["Frequency"].toString().toDouble();
   _txFrequency = obj["Input Freq"].toString().toDouble();
   _location = QGeoCoordinate(obj["Lat"].toString().toDouble(), obj["Long"].toString().toDouble());
+  _qth = obj["Nearest City"].toString();
 
   if (obj["FM Analog"].toString() == "Yes") {
     _isFM = true;
@@ -121,13 +163,16 @@ RepeaterBookEntry::fromRepeaterBook(const QJsonObject &obj) {
     if (obj.contains("TSQ"))
       _rxTone = Signaling::fromCTCSSFrequency(obj["TSQ"].toString().toDouble());
   }
+
   if (obj["DMR"].toString() == "Yes") {
     _isDMR = true;
     if (obj.contains("DMR Color Code"))
       _colorCode = obj["DMR Color Code"].toString().toInt();
   }
+
   if (obj.contains("timestamp"))
     _timestamp = QDateTime::fromString(obj["timestamp"].toString(), Qt::ISODate);
+
   return isValid();
 }
 
@@ -140,6 +185,7 @@ RepeaterBookEntry::fromCache(const QJsonObject &obj) {
   _rxFrequency = obj["Frequency"].toDouble();
   _txFrequency = obj["Input Freq"].toDouble();
   _location = QGeoCoordinate(obj["Lat"].toDouble(), obj["Long"].toDouble());
+  _qth = obj["Nearest City"].toString();
   _isFM = obj["FM Analog"].toBool();
   _isDMR = obj["DMR"].toBool();
 
@@ -167,6 +213,7 @@ RepeaterBookEntry::toCache() const {
   obj.insert("Input Freq", _txFrequency);
   obj.insert("Lat", _location.latitude());
   obj.insert("Long", _location.longitude());
+  obj.insert("Nearest City", _qth);
   obj.insert("timestamp", _timestamp.toString(Qt::ISODate));
   obj.insert("FM Analog", _isFM);
   obj.insert("DMR", _isDMR);
@@ -204,7 +251,26 @@ QVariant
 RepeaterBookList::data(const QModelIndex &index, int role) const {
   if (index.row() >= _items.count())
     return QVariant();
-  return _items[index.row()].call();
+
+  if (Qt::EditRole == role) {
+    return _items[index.row()].call();
+  } else if (Qt::DisplayRole == role) {
+    return tr("%1 (%2, %3, %4)")
+        .arg(_items[index.row()].call())
+        .arg(bandName(_items[index.row()].rxFrequency(),
+             _items[index.row()].txFrequency()))
+        .arg(_items[index.row()].qth())
+        .arg(_items[index.row()].locator());
+
+  }
+  return QVariant();
+}
+
+const RepeaterBookEntry *
+RepeaterBookList::repeater(int row) const {
+  if (row >= _items.count())
+    return nullptr;
+  return &(_items[row]);
 }
 
 QString
@@ -215,7 +281,7 @@ RepeaterBookList::cachePath() const {
     logError() << "Cannot create path '" << path << "'.";
     return "";
   }
-  return path+"/repeaterbook.json";
+  return path+"/repeaterbook.cache.json";
 }
 
 QString
@@ -419,8 +485,8 @@ RepeaterBookList::updateEntry(const RepeaterBookEntry &entry) {
 /* ********************************************************************************************* *
  * RepeaterBookCompleter
  * ********************************************************************************************* */
-RepeaterBookCompleter::RepeaterBookCompleter(int minPrefixLength, QObject *parent)
-  : QCompleter(parent), _repeaterList(new RepeaterBookList(this)),
+RepeaterBookCompleter::RepeaterBookCompleter(int minPrefixLength, RepeaterBookList *repeater, QObject *parent)
+  : QCompleter(parent), _repeaterList(repeater),
     _minPrefixLength(minPrefixLength)
 {
   setModel(_repeaterList);
@@ -432,5 +498,61 @@ RepeaterBookCompleter::splitPath(const QString &path) const {
   if (path.length() >= _minPrefixLength)
     _repeaterList->search(path);
   return QCompleter::splitPath(path);
+}
+
+
+
+/* ********************************************************************************************* *
+ * NearestRepeaterFilter
+ * ********************************************************************************************* */
+NearestRepeaterFilter::NearestRepeaterFilter(RepeaterBookList *repeater, const QGeoCoordinate &location, QObject *parent)
+  : QSortFilterProxyModel(parent), _repeater(repeater), _location(location)
+{
+  setSourceModel(repeater);
+  sort(0);
+}
+
+bool
+NearestRepeaterFilter::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const {
+  double ldist = _location.distanceTo(_repeater->repeater(source_left.row())->location());
+  double rdist = _location.distanceTo(_repeater->repeater(source_right.row())->location());
+  return ldist < rdist;
+}
+
+
+/* ********************************************************************************************* *
+ * DMRRepeaterFilter
+ * ********************************************************************************************* */
+DMRRepeaterFilter::DMRRepeaterFilter(RepeaterBookList *repeater, const QGeoCoordinate &location, QObject *parent)
+  : NearestRepeaterFilter(repeater, location, parent)
+{
+  invalidateFilter();
+}
+
+bool
+DMRRepeaterFilter::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const  {
+  Q_UNUSED(source_parent);
+  if (source_row >= _repeater->rowCount(QModelIndex()))
+    return false;
+  bool isDMR = _repeater->repeater(source_row)->isDMR();
+  return isDMR;
+}
+
+
+/* ********************************************************************************************* *
+ * FMRepeaterFilter
+ * ********************************************************************************************* */
+FMRepeaterFilter::FMRepeaterFilter(RepeaterBookList *repeater, const QGeoCoordinate &location, QObject *parent)
+  : NearestRepeaterFilter(repeater, location, parent)
+{
+  invalidateFilter();
+}
+
+bool
+FMRepeaterFilter::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const  {
+  Q_UNUSED(source_parent);
+  if (source_row >= _repeater->rowCount(QModelIndex()))
+    return false;
+  return _repeater->repeater(source_row)->isFM();
 }
 

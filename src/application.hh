@@ -10,7 +10,7 @@
 #include "radio.hh"
 
 class QMainWindow;
-class RepeaterDatabase;
+class RepeaterBookList;
 class UserDatabase;
 class TalkGroupDatabase;
 class RadioIDListView;
@@ -35,7 +35,7 @@ public:
   QMainWindow *mainWindow();
 
   UserDatabase *user() const;
-  RepeaterDatabase *repeater() const;
+  RepeaterBookList *repeater() const;
   TalkGroupDatabase *talkgroup() const;
 
   bool hasPosition() const;
@@ -93,7 +93,7 @@ protected:
   RoamingZoneListView *_roamingZoneList;
   ExtensionView *_extensionView;
 
-  RepeaterDatabase *_repeater;
+  RepeaterBookList *_repeater;
   UserDatabase *_users;
   TalkGroupDatabase *_talkgroups;
 

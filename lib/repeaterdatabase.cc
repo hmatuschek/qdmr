@@ -233,21 +233,3 @@ RepeaterDatabase::data(const QModelIndex &index, int role) const {
   return QVariant();
 }
 
-
-
-DMRRepeaterFilter::DMRRepeaterFilter(QObject *parent)
-  : QSortFilterProxyModel(parent)
-{
-  setFilterKeyColumn(1);
-  setFilterRole(Qt::EditRole);
-  setFilterRegExp(QRegExp("^DMR$",Qt::CaseInsensitive));
-}
-
-
-FMRepeaterFilter::FMRepeaterFilter(QObject *parent)
-  : QSortFilterProxyModel(parent)
-{
-  setFilterKeyColumn(1);
-  setFilterRole(Qt::EditRole);
-  setFilterRegExp(QRegExp("^FM$",Qt::CaseInsensitive));
-}

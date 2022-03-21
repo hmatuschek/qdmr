@@ -62,27 +62,5 @@ private:
 };
 
 
-/** A filter proxy for DMR repeaters.
- * @ingroup util */
-class DMRRepeaterFilter: public QSortFilterProxyModel
-{
-  Q_OBJECT
-
-public:
-	/** Constructor. */
-  explicit DMRRepeaterFilter(QObject *parent=nullptr);
-};
-
-
-/** A filter proxy for analog FM repeaters.
- * @ingroup util */
-class FMRepeaterFilter: public QSortFilterProxyModel
-{
-  Q_OBJECT
-
-public:
-	/** Constructor. */
-  explicit FMRepeaterFilter(QObject *parent=nullptr);
-};
 
 #endif // REPEATERDATABASE_HH

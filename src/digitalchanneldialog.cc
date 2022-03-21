@@ -2,11 +2,12 @@
 #include "application.hh"
 #include <QCompleter>
 #include "rxgrouplistdialog.hh"
-#include "repeaterdatabase.hh"
+#include "repeaterbookcompleter.hh"
 #include "extensionwrapper.hh"
 #include "propertydelegate.hh"
 #include "settings.hh"
 #include "utils.hh"
+#include "logger.hh"
 
 
 /* ********************************************************************************************* *
@@ -34,12 +35,10 @@ DigitalChannelDialog::construct() {
   Settings settings;
 
   Application *app = qobject_cast<Application *>(qApp);
-  DMRRepeaterFilter *filter = new DMRRepeaterFilter(this);
+  DMRRepeaterFilter *filter = new DMRRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
-  QCompleter *completer = new QCompleter(filter, this);
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-  completer->setCompletionColumn(0);
-  completer->setCompletionRole(Qt::EditRole);
+  QCompleter *completer = new RepeaterBookCompleter(2, app->repeater(), this);
+  completer->setModel(filter);
   channelName->setCompleter(completer);
   connect(completer, SIGNAL(activated(const QModelIndex &)),
           this, SLOT(onRepeaterSelected(const QModelIndex &)));
@@ -198,8 +197,9 @@ DigitalChannelDialog::onRepeaterSelected(const QModelIndex &index) {
         channelName->completer()->completionModel())->mapToSource(index);
   src = qobject_cast<QAbstractProxyModel*>(
         channelName->completer()->model())->mapToSource(src);
-  double rx = app->repeater()->repeater(src.row()).value("tx").toDouble();
-  double tx = app->repeater()->repeater(src.row()).value("rx").toDouble();
+  double rx = app->repeater()->repeater(src.row())->txFrequency();
+  double tx = app->repeater()->repeater(src.row())->rxFrequency();
+  colorCode->setValue(app->repeater()->repeater(src.row())->colorCode());
   txFrequency->setText(QString::number(tx, 'f'));
   rxFrequency->setText(QString::number(rx, 'f'));
 }

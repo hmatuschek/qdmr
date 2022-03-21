@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QGeoCoordinate>
 #include <QDateTime>
+#include <QSortFilterProxyModel>
 #include "signaling.hh"
 #include "channel.hh"
 
@@ -24,6 +25,8 @@ public:
   const QString &id() const;
   const QString &call() const;
   const QGeoCoordinate &location() const;
+  QString locator() const;
+  const QString &qth() const;
   double rxFrequency() const;
   double txFrequency() const;
   bool isFM() const;
@@ -41,6 +44,7 @@ protected:
   QString _id;
   QString _call;
   QGeoCoordinate _location;
+  QString _qth;
   double _rxFrequency;
   double _txFrequency;
   bool _isFM;
@@ -61,6 +65,8 @@ public:
 
   int rowCount(const QModelIndex &parent) const;
   QVariant data(const QModelIndex &index, int role) const;
+
+  const RepeaterBookEntry *repeater(int row) const;
 
 public slots:
   /** Searches the repeater book for the given call (or part of it). */
@@ -89,13 +95,60 @@ class RepeaterBookCompleter: public QCompleter
   Q_OBJECT
 
 public:
-  explicit RepeaterBookCompleter(int minPrefixLength=2, QObject *parent=nullptr);
+  explicit RepeaterBookCompleter(int minPrefixLength, RepeaterBookList *repeater, QObject *parent=nullptr);
 
   QStringList splitPath(const QString &path) const;
 
 protected:
   RepeaterBookList *_repeaterList;
   int _minPrefixLength;
+};
+
+
+class NearestRepeaterFilter: public QSortFilterProxyModel
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit NearestRepeaterFilter(RepeaterBookList *repeater, const QGeoCoordinate &location, QObject *parent=nullptr);
+
+protected:
+  bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;
+
+protected:
+  RepeaterBookList *_repeater;
+  QGeoCoordinate _location;
+};
+
+
+/** A filter proxy for DMR repeaters.
+ * @ingroup util */
+class DMRRepeaterFilter: public NearestRepeaterFilter
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit DMRRepeaterFilter(RepeaterBookList *repeater, const QGeoCoordinate &location, QObject *parent=nullptr);
+
+protected:
+  bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+};
+
+
+/** A filter proxy for analog FM repeaters.
+ * @ingroup util */
+class FMRepeaterFilter: public NearestRepeaterFilter
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit FMRepeaterFilter(RepeaterBookList *repeater, const QGeoCoordinate &location, QObject *parent=nullptr);
+
+protected:
+  bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
 };
 
 #endif // REPEATERBOOKCOMPLETER_HH

@@ -34,12 +34,10 @@ AnalogChannelDialog::construct() {
   Settings settings;
 
   Application *app = qobject_cast<Application *>(qApp);
-  //FMRepeaterFilter *filter = new FMRepeaterFilter(this);
-  //filter->setSourceModel(app->repeater());
-  //QCompleter *completer = new QCompleter(filter, this);
-  //completer->setCaseSensitivity(Qt::CaseInsensitive);
-  //completer->setCompletionColumn(0);
-  QCompleter *completer = new RepeaterBookCompleter(2, this);
+  FMRepeaterFilter *filter = new FMRepeaterFilter(app->repeater(), app->position(), this);
+  filter->setSourceModel(app->repeater());
+  QCompleter *completer = new RepeaterBookCompleter(2, app->repeater(), this);
+  completer->setModel(filter);
   channelName->setCompleter(completer);
   connect(completer, SIGNAL(activated(const QModelIndex &)),
           this, SLOT(onRepeaterSelected(const QModelIndex &)));
@@ -179,8 +177,14 @@ AnalogChannelDialog::onRepeaterSelected(const QModelIndex &index) {
         channelName->completer()->completionModel())->mapToSource(index);
   src = qobject_cast<QAbstractProxyModel*>(
         channelName->completer()->model())->mapToSource(src);
-  double rx = app->repeater()->repeater(src.row()).value("tx").toDouble();
-  double tx = app->repeater()->repeater(src.row()).value("rx").toDouble();
+  double rx = app->repeater()->repeater(src.row())->rxFrequency();
+  double tx = app->repeater()->repeater(src.row())->txFrequency();
+  int idx = rxTone->findData(app->repeater()->repeater(src.row())->rxTone());
+  if (0 <= idx)
+    rxTone->setCurrentIndex(idx);
+  idx = txTone->findData(app->repeater()->repeater(src.row())->txTone());
+  if (0 <= idx)
+    txTone->setCurrentIndex(idx);
   txFrequency->setText(QString::number(tx, 'f'));
   rxFrequency->setText(QString::number(rx, 'f'));
 }

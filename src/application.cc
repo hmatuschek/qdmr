@@ -18,7 +18,7 @@
 #include "gpssystemdialog.hh"
 #include "roamingzonedialog.hh"
 #include "aprssystemdialog.hh"
-#include "repeaterdatabase.hh"
+#include "repeaterbookcompleter.hh"
 #include "userdatabase.hh"
 #include "talkgroupdatabase.hh"
 #include "searchpopup.hh"
@@ -58,7 +58,7 @@ Application::Application(int &argc, char *argv[])
   onPaletteChanged(palette());
 
   Settings settings;
-  _repeater   = new RepeaterDatabase(settings.position(), 7, this);
+  _repeater   = new RepeaterBookList(this);
   _users      = new UserDatabase(30, this);
   _talkgroups = new TalkGroupDatabase(30, this);
   _config = new Config(this);
@@ -141,8 +141,7 @@ Application::talkgroup() const {
   return _talkgroups;
 }
 
-RepeaterDatabase *
-Application::repeater() const{
+RepeaterBookList *Application::repeater() const{
   return _repeater;
 }
 
@@ -179,7 +178,6 @@ Application::createMainWindow() {
 
   QAction *refreshCallsignDB  = _mainWindow->findChild<QAction*>("actionRefreshCallsignDB");
   QAction *refreshTalkgroupDB  = _mainWindow->findChild<QAction*>("actionRefreshTalkgroupDB");
-  QAction *refreshRepeaterDB  = _mainWindow->findChild<QAction*>("actionRefreshRepeaterDB");
 
   QAction *about   = _mainWindow->findChild<QAction*>("actionAbout");
   QAction *sett    = _mainWindow->findChild<QAction*>("actionSettings");
@@ -196,7 +194,6 @@ Application::createMainWindow() {
 
   connect(refreshCallsignDB, SIGNAL(triggered()), _users, SLOT(download()));
   connect(refreshTalkgroupDB, SIGNAL(triggered()), _talkgroups, SLOT(download()));
-  connect(refreshRepeaterDB, SIGNAL(triggered()), _repeater, SLOT(download()));
 
   connect(findDev, SIGNAL(triggered()), this, SLOT(detectRadio()));
   connect(verCP, SIGNAL(triggered()), this, SLOT(verifyCodeplug()));
