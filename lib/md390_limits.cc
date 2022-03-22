@@ -7,6 +7,7 @@
 #include "zone.hh"
 #include "scanlist.hh"
 #include "gpssystem.hh"
+#include "roaming.hh"
 
 
 MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &freqRanges, QObject *parent)
@@ -88,7 +89,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &
                  (unsigned)AnalogChannel::Bandwidth::Narrow,
                  (unsigned)AnalogChannel::Bandwidth::Wide
                }},
-              {"aprs", new RadioLimitObjRefIgnored(RadioLimitIssue::Hint)}
+              {"aprs", new RadioLimitObjRefIgnored(nullptr, RadioLimitIssue::Hint)}
             } },
           { DigitalChannel::staticMetaObject,
             new RadioLimitObject {
@@ -116,7 +117,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &
               {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
               {"contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, true)},
               {"aprs", new RadioLimitObjRefIgnored()},
-              {"roaming", new RadioLimitObjRefIgnored()},
+              {"roaming", new RadioLimitObjRefIgnored(DefaultRoamingZone::get())},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
             } }

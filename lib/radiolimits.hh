@@ -515,15 +515,20 @@ class RadioLimitObjRefIgnored: public RadioLimitObjRef
 
 public:
   /** Constructor.
+   * @param defObj Specifies a weak reference to a default object that gets silently ignored.
    * @param notify Specifies the issue severity.
    * @param parent Specifies the QObject parent. */
-  RadioLimitObjRefIgnored(RadioLimitIssue::Severity notify=RadioLimitIssue::Hint, QObject *parent=nullptr);
+  RadioLimitObjRefIgnored(
+      ConfigObject *defObj=nullptr, RadioLimitIssue::Severity notify=RadioLimitIssue::Hint,
+      QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
 protected:
   /** The severity of the issue. */
   RadioLimitIssue::Severity _severity;
+  /** A weak reference to a default value, that gets silently ignored. */
+  ConfigObject *_default;
 };
 
 

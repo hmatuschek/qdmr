@@ -5,6 +5,7 @@
 #include "rxgrouplist.hh"
 #include "zone.hh"
 #include "scanlist.hh"
+#include "roaming.hh"
 
 
 GD77Limits::GD77Limits(QObject *parent)
@@ -117,7 +118,7 @@ GD77Limits::GD77Limits(QObject *parent)
               {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
               {"contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, true)},
               {"aprs", new RadioLimitObjRefIgnored()},
-              {"roaming", new RadioLimitObjRefIgnored()},
+              {"roaming", new RadioLimitObjRefIgnored(DefaultRoamingZone::get())},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
             } }

@@ -6,6 +6,7 @@
 #include "zone.hh"
 #include "scanlist.hh"
 #include "gpssystem.hh"
+#include "roaming.hh"
 
 
 D868UVLimits::D868UVLimits(const std::initializer_list<std::pair<double, double> > &freqRanges, const QString &hardwareRevision, QObject *parent)
@@ -113,7 +114,7 @@ D868UVLimits::D868UVLimits(const std::initializer_list<std::pair<double, double>
               {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
               {"contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, false)},
               {"aprs", new RadioLimitObjRef(GPSSystem::staticMetaObject, true)},
-              {"roaming", new RadioLimitObjRefIgnored() },
+              {"roaming", new RadioLimitObjRefIgnored(DefaultRoamingZone::get()) },
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
             } }

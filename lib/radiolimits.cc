@@ -155,6 +155,8 @@ RadioLimitIgnored::verify(const ConfigItem *item, const QMetaProperty &prop, Rad
 
 bool
 RadioLimitIgnored::verifyObject(const ConfigObject *item, RadioLimitContext &context) const {
+  if (nullptr == item)
+    return true;
   auto &msg = context.newMessage(_notification);
   msg = tr("Ignore %1 '%2'. Not applicable/supported by this radio.")
       .arg(item->metaObject()->className()).arg(item->name());
@@ -614,15 +616,20 @@ RadioLimitObjRef::validType(const QMetaObject *type) const {
 /* ********************************************************************************************* *
  * Implementation of RadioLimitObjRefIgnored
  * ********************************************************************************************* */
-RadioLimitObjRefIgnored::RadioLimitObjRefIgnored(RadioLimitIssue::Severity notify, QObject *parent)
-  : RadioLimitObjRef(ConfigObject::staticMetaObject, true, parent), _severity(notify)
+RadioLimitObjRefIgnored::RadioLimitObjRefIgnored(
+    ConfigObject *defObj, RadioLimitIssue::Severity notify, QObject *parent)
+  : RadioLimitObjRef(ConfigObject::staticMetaObject, true, parent), _severity(notify),
+    _default(defObj)
 {
   // pass...
 }
 
 bool
 RadioLimitObjRefIgnored::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (! prop.read(item).isNull()) {
+  // Get referenced object
+  ConfigObjectReference *ref = prop.read(item).value<ConfigObjectReference *>();
+  // If reference is set and not default reference
+  if ((! ref->isNull()) && (_default != ref->as<ConfigObject>())) {
     auto &msg = context.newMessage(_severity);
     msg << "The reference '" << prop.name() <<
            "' is ignored. Not applicable/supported by this radio.";

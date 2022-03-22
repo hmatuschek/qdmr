@@ -88,7 +88,7 @@ UV390Limits::UV390Limits(QObject *parent)
                  (unsigned)AnalogChannel::Bandwidth::Narrow,
                  (unsigned)AnalogChannel::Bandwidth::Wide
                }},
-              {"aprs", new RadioLimitObjRefIgnored(RadioLimitIssue::Hint)}
+              {"aprs", new RadioLimitObjRefIgnored(nullptr, RadioLimitIssue::Hint)}
             } },
           { DigitalChannel::staticMetaObject,
             new RadioLimitObject {
@@ -116,7 +116,7 @@ UV390Limits::UV390Limits(QObject *parent)
               {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
               {"contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, true)},
               {"aprs", new RadioLimitObjRefIgnored()},
-              {"roaming", new RadioLimitObjRefIgnored()},
+              {"roaming", new RadioLimitObjRefIgnored(DefaultRoamingZone::get())},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
             } }
