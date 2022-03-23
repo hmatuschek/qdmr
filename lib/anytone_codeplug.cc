@@ -904,11 +904,20 @@ AnytoneCodeplug::ContactElement::setAlertType(AnytoneContactExtension::AlertType
 DigitalContact *
 AnytoneCodeplug::ContactElement::toContactObj(Context &ctx) const {
   Q_UNUSED(ctx);
-  DigitalContact *cont = new DigitalContact(
-        type(), name(), number(), AnytoneContactExtension::AlertType::None != alertType());
+
+  // Common settings
+  DigitalContact *cont = new DigitalContact();
+  cont->setType(type());
+  cont->setName(name());
+  cont->setNumber(number());
+  cont->setRing(AnytoneContactExtension::AlertType::None != alertType());
+
+  // Create AnyTone specific extension
   AnytoneContactExtension *ext = new AnytoneContactExtension();
   cont->setAnytoneExtension(ext);
   ext->setAlertType(alertType());
+
+  return cont;
 }
 
 bool
