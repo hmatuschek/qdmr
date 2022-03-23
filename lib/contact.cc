@@ -117,13 +117,13 @@ DTMFContact::serialize(const Context &context, const ErrorStack &err) {
  * Implementation of DigitalContact
  * ********************************************************************************************* */
 DigitalContact::DigitalContact(QObject *parent)
-  : Contact(parent), _type(PrivateCall), _number(0), _openGD77(nullptr)
+  : Contact(parent), _type(PrivateCall), _number(0), _anytone(nullptr), _openGD77(nullptr)
 {
   // pass...
 }
 
 DigitalContact::DigitalContact(Type type, const QString &name, unsigned number, bool rxTone, QObject *parent)
-  : Contact(name, rxTone, parent), _type(type), _number(number), _openGD77(nullptr)
+  : Contact(name, rxTone, parent), _type(type), _number(number), _anytone(nullptr), _openGD77(nullptr)
 {
   // pass...
 }
@@ -146,6 +146,9 @@ DigitalContact::clear() {
   if (_openGD77)
     _openGD77->deleteLater();
   _openGD77 = nullptr;
+  if (_anytone)
+    _anytone->deleteLater();
+  _anytone = nullptr;
 }
 
 DigitalContact::Type
@@ -198,6 +201,24 @@ DigitalContact::setOpenGD77ContactExtension(OpenGD77ContactExtension *ext) {
             [this](ConfigItem*){ emit modified(this); });
   }
 }
+
+AnytoneContactExtension *
+DigitalContact::anytoneExtension() const {
+  return _anytone;
+}
+
+void
+DigitalContact::setAnytoneExtension(AnytoneContactExtension *ext) {
+  if (_anytone)
+    _anytone->deleteLater();
+  _anytone = ext;
+  if (_anytone) {
+    _anytone->setParent(this);
+    connect(_anytone, &OpenGD77ContactExtension::modified,
+            [this](ConfigItem*){ emit modified(this); });
+  }
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ContactList

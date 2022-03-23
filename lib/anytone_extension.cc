@@ -32,3 +32,30 @@ AnytoneZoneExtension::enableHidden(bool enable) {
 }
 
 
+/* ********************************************************************************************* *
+ * Implementation of AnytoneContactExtension
+ * ********************************************************************************************* */
+AnytoneContactExtension::AnytoneContactExtension(QObject *parent)
+  : ConfigExtension(parent), _alertType(AlertType::None)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneContactExtension::clone() const {
+  AnytoneContactExtension *obj = new AnytoneContactExtension();
+  if (! obj->copy(*this)) {
+    obj->deleteLater();
+    return nullptr;
+  }
+  return obj;
+}
+
+AnytoneContactExtension::AlertType
+AnytoneContactExtension::alertType() const {
+  return _alertType;
+}
+void
+AnytoneContactExtension::setAlertType(AlertType type) {
+  _alertType = type;
+}

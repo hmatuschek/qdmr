@@ -679,7 +679,6 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   ch->setRXFrequency(rxFrequency()/1e6);
   ch->setTXFrequency(txFrequency()/1e6);
   ch->setPower(power());
-  ch->setDefaultTimeout();
   ch->setRXOnly(rxOnly());
 
   // No per channel vox & tot setting
@@ -806,8 +805,10 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
       setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
       enableTXDigitalAPRS(true);
+      enableRXAPRS(false);
     } else {
       enableTXDigitalAPRS(false);
+      enableRXAPRS(false);
     }
     // Set radio ID
     if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
@@ -891,19 +892,23 @@ AnytoneCodeplug::ContactElement::setNumber(unsigned number) {
   setBCD8_be(0x0023, number);
 }
 
-AnytoneCodeplug::ContactElement::AlertType
+AnytoneContactExtension::AlertType
 AnytoneCodeplug::ContactElement::alertType() const {
-  return (AlertType) getUInt8(0x0027);
+  return (AnytoneContactExtension::AlertType) getUInt8(0x0027);
 }
 void
-AnytoneCodeplug::ContactElement::setAlertType(AlertType type) {
+AnytoneCodeplug::ContactElement::setAlertType(AnytoneContactExtension::AlertType type) {
   setUInt8(0x0027, (unsigned)type);
 }
 
 DigitalContact *
 AnytoneCodeplug::ContactElement::toContactObj(Context &ctx) const {
   Q_UNUSED(ctx);
-  return new DigitalContact(type(), name(), number(), AlertType::None != alertType());
+  DigitalContact *cont = new DigitalContact(
+        type(), name(), number(), AnytoneContactExtension::AlertType::None != alertType());
+  AnytoneContactExtension *ext = new AnytoneContactExtension();
+  cont->setAnytoneExtension(ext);
+  ext->setAlertType(alertType());
 }
 
 bool
@@ -915,7 +920,12 @@ AnytoneCodeplug::ContactElement::fromContactObj(const DigitalContact *contact, C
   setType(contact->type());
   setName(contact->name());
   setNumber(contact->number());
-  setAlertType(contact->ring() ? AlertType::Ring : AlertType::None);
+  setAlertType(contact->ring() ? AnytoneContactExtension::AlertType::Ring :
+                                 AnytoneContactExtension::AlertType::None);
+
+  if (AnytoneContactExtension *ext = contact->anytoneExtension()) {
+    setAlertType(ext->alertType());
+  }
 
   return true;
 }

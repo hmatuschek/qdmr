@@ -2,6 +2,7 @@
 #define ANYTONECODEPLUG_HH
 
 #include "codeplug.hh"
+#include "anytone_extension.hh"
 
 /** Base class interface for all Anytone radio codeplugs.
  *
@@ -354,14 +355,6 @@ public:
    */
   class ContactElement: public Element
   {
-  public:
-    /** Possible ring-tone types. */
-    enum class AlertType {
-      None = 0,                   ///< Alert disabled.
-      Ring = 1,                   ///< Ring tone.
-      Online = 2                  ///< WTF?
-    };
-
   protected:
     /** Hidden constructor. */
     ContactElement(uint8_t *ptr, unsigned size);
@@ -393,9 +386,9 @@ public:
     virtual void setNumber(unsigned number);
 
     /** Returns the alert type. */
-    virtual AlertType alertType() const;
+    virtual AnytoneContactExtension::AlertType alertType() const;
     /** Sets the alert type. */
-    virtual void setAlertType(AlertType type);
+    virtual void setAlertType(AnytoneContactExtension::AlertType type);
 
     /** Assembles a @c DigitalContact from this contact. */
     virtual DigitalContact *toContactObj(Context &ctx) const;

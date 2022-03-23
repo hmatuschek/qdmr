@@ -28,5 +28,38 @@ protected:
   bool _hidden;
 };
 
+/** Implements the AnyTone contact extension.
+ * @ingroup anytone */
+class AnytoneContactExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  /** Overrides the ring flag, allows to set None, Ring and Online. */
+  Q_PROPERTY(AlertType alertType READ alertType WRITE setAlertType)
+
+public:
+  /** Possible ring-tone types. */
+  enum class AlertType {
+    None = 0,                   ///< Alert disabled.
+    Ring = 1,                   ///< Ring tone.
+    Online = 2                  ///< WTF?
+  };
+  Q_ENUM(AlertType)
+
+public:
+  /** Default constructor. */
+  Q_INVOKABLE explicit AnytoneContactExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the alert type for the contact. */
+  AlertType alertType() const;
+  /** Sets the alert type for the contact. */
+  void setAlertType(AlertType type);
+
+protected:
+  /** Holds the alert type for the contact. */
+  AlertType _alertType;
+};
 
 #endif // ANYTONEEXTENSION_HH
