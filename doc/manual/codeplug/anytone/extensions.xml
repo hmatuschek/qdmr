@@ -10,7 +10,10 @@
 </info>
 
 <para>
-  There are no extensions defined yet.
+  This chapter documents the extensions and settings specific to AnyTone radios.
 </para>
+
+<xi:include href="contact.xml"/>
+<xi:include href="zone.xml"/>
 
 </section>
