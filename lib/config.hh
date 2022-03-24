@@ -87,7 +87,7 @@ class Config : public ConfigItem
   Q_PROPERTY(RoamingZoneList* roaming READ roaming SCRIPTABLE false)
 
   /** Represents the config extension for encryption keys. */
-  Q_PROPERTY(EncryptionExtension* encryption READ encryptionExtension WRITE setEncryptionExtension)
+  Q_PROPERTY(CommercialExtension* commercial READ commercialExtension)
   /** Represents the config extension for TyT devices. */
   Q_PROPERTY(TyTConfigExtension* tytExtension READ tytExtension WRITE setTyTExtension)
 
@@ -132,11 +132,8 @@ public:
 
   const Config *config() const;
 
-  /** Returns the encryption settings extension.
-   * If the extension is not set, @c nullptr is set. */
-  EncryptionExtension *encryptionExtension() const;
-  /** Sets the encryption settings extension. */
-  void setEncryptionExtension(EncryptionExtension *ext);
+  /** Returns the commercial extension. */
+  CommercialExtension *commercialExtension() const;
 
   /** Returns the TyT settings extension.
    * If this extension is not set, returns @c nullptr. */
@@ -191,8 +188,8 @@ protected:
   RoamingZoneList *_roaming;
   /** Owns the TyT settings extension. */
   TyTConfigExtension *_tytExtension;
-  /** Owns the encryption settings extension. */
-  EncryptionExtension *_encryptionExtension;
+  /** Owns the commercial extension. */
+  CommercialExtension *_commercialExtension;
 };
 
 #endif // CONFIG_HH

@@ -708,23 +708,17 @@ bool
 GD77Codeplug::encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err);
   clearEncryption();
-  if (nullptr == config->encryptionExtension())
-    return true;
   EncryptionElement enc(data(ADDR_ENCRYPTION));
-  return enc.fromEncryptionExt(config->encryptionExtension(), ctx);
+  return enc.fromCommercialExt(config->commercialExtension(), ctx);
 }
 
 bool
 GD77Codeplug::createEncryption(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err);
+  Q_UNUSED(config); Q_UNUSED(err);
   EncryptionElement enc(data(ADDR_ENCRYPTION));
   if (EncryptionElement::PrivacyType::None == enc.privacyType())
     return true;
-  EncryptionExtension *ext = enc.toEncryptionExt(ctx);
-  if (nullptr == ext)
-    return false;
-  config->setEncryptionExtension(ext);
-  return true;
+  return enc.updateCommercialExt(ctx);
 }
 
 bool

@@ -2508,20 +2508,20 @@ RadioddityCodeplug::EncryptionElement::clearBasicKey(unsigned n) {
 }
 
 bool
-RadioddityCodeplug::EncryptionElement::fromEncryptionExt(EncryptionExtension *encr, Context &ctx) {
+RadioddityCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *ext, Context &ctx) {
   clear();
 
-  if (encr->keys()->count() > 16) {
+  if (ext->encryptionKeys()->count() > 16) {
     logError() << "Cannot encode encryption extension. Can only encode 16 keys.";
     return false;
   }
 
-  for (int i=0; i<encr->keys()->count(); i++) {
-    if (! encr->keys()->get(i)->is<DMREncryptionKey>()) {
+  for (int i=0; i<ext->encryptionKeys()->count(); i++) {
+    if (! ext->encryptionKeys()->get(i)->is<DMREncryptionKey>()) {
       logError() << "Can only encode basic encryption keys.";
       return false;
     }
-    DMREncryptionKey *key = encr->keys()->get(i)->as<DMREncryptionKey>();
+    DMREncryptionKey *key = ext->encryptionKeys()->get(i)->as<DMREncryptionKey>();
     if (key->key().size() != 4) {
       logError() << "Can only encode 32bit basic encryption keys.";
       return false;
@@ -2533,12 +2533,11 @@ RadioddityCodeplug::EncryptionElement::fromEncryptionExt(EncryptionExtension *en
   return true;
 }
 
-EncryptionExtension *
-RadioddityCodeplug::EncryptionElement::toEncryptionExt(Context &ctx) {
+bool RadioddityCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
   if (PrivacyType::None == privacyType())
-    return nullptr;
+    return false;
 
-  EncryptionExtension *ext = new EncryptionExtension();
+  CommercialExtension *ext = ctx.config()->commercialExtension();
   for (int i=0; i<16; i++) {
     if (! isBasicKeySet(i))
       continue;
@@ -2547,7 +2546,7 @@ RadioddityCodeplug::EncryptionElement::toEncryptionExt(Context &ctx) {
     key->setName(QString("Basic Key %1").arg(i+1));
     key->fromHex(basicKey(i).toHex());
     // add key to extension
-    ext->keys()->add(key);
+    ext->encryptionKeys()->add(key);
     // register key index
     ctx.add(key, i+1);
   }
@@ -2556,8 +2555,8 @@ RadioddityCodeplug::EncryptionElement::toEncryptionExt(Context &ctx) {
 }
 
 bool
-RadioddityCodeplug::EncryptionElement::linkEncryptionExt(EncryptionExtension *encr, Context &ctx) {
-  Q_UNUSED(encr); Q_UNUSED(ctx);
+RadioddityCodeplug::EncryptionElement::linkCommercialExt(CommercialExtension *ext, Context &ctx) {
+  Q_UNUSED(ext); Q_UNUSED(ctx);
   // Keys do not need any linking step
   return true;
 }

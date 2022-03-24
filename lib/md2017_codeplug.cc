@@ -442,26 +442,22 @@ MD2017Codeplug::encodePrivacyKeys(Config *config, const Flags &flags, Context &c
   // Get keys
   EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
   // If there is no encryption extension -> done.
-  if (! config->encryptionExtension())
+  if (! config->commercialExtension())
     return true;
   // Otherwise encode
-  return keys.fromEncryptionExt(config->encryptionExtension(), ctx);
+  return keys.fromCommercialExt(config->commercialExtension(), ctx);
 }
 
 bool
 MD2017Codeplug::decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config)
   // Get keys
   EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
   // Decode element
-  EncryptionExtension *ext = keys.toEncryptionExt(ctx);
-  // Handle errors
-  if (nullptr == ext) {
-    errMsg(err) << "Cannot create encryption extension.";
+  if(! keys.updateCommercialExt(ctx)) {
+    errMsg(err) << "Cannot create encryption keys.";
     return false;
   }
-
-  // Add encryption extension from codeplug
-  config->setEncryptionExtension(ext);
   return true;
 }
 

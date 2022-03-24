@@ -976,27 +976,19 @@ UV390Codeplug::encodePrivacyKeys(Config *config, const Flags &flags, Context &ct
   clearPrivacyKeys();
   // Get keys
   EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
-  // If there is no encryption extension -> done.
-  if (! config->encryptionExtension())
-    return true;
-  // Otherwise encode
-  return keys.fromEncryptionExt(config->encryptionExtension(), ctx);
+  return keys.fromCommercialExt(config->commercialExtension(), ctx);
 }
 
 bool
 UV390Codeplug::decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config)
   // Get keys
   EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
   // Decode element
-  EncryptionExtension *ext = keys.toEncryptionExt(ctx);
-  // Handle errors
-  if (nullptr == ext) {
+  if (! keys.updateCommercialExt(ctx)) {
     errMsg(err) << "Cannot create encryption extension.";
     return false;
   }
-
-  // Add encryption extension from codeplug
-  config->setEncryptionExtension(ext);
   return true;
 }
 

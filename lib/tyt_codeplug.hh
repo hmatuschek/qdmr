@@ -1090,12 +1090,12 @@ public:
     /** Sets the n-th "basic" key (16bit). */
     virtual void setBasicKey(unsigned n, const QByteArray &key);
 
-    /** Encodes given encryption extension. */
-    virtual bool fromEncryptionExt(EncryptionExtension *encr, Context &ctx);
-    /** Constructs the encryption extension. */
-    virtual EncryptionExtension *toEncryptionExt(Context &ctx);
+    /** Encodes given commercial extension. */
+    virtual bool fromCommercialExt(CommercialExtension *encr, Context &ctx);
+    /** Updates the commercial extension. */
+    virtual bool updateCommercialExt(Context &ctx);
     /** Links the given encryption extension. */
-    virtual bool linkEncryptionExt(EncryptionExtension *encr, Context &ctx);
+    virtual bool linkCommercialExt(CommercialExtension *ext, Context &ctx);
 
   protected:
     /** Number of enhanced keys. */

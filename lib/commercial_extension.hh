@@ -3,6 +3,31 @@
 
 #include "configobject.hh"
 #include "configreference.hh"
+#include "encryptionextension.hh"
+
+/** Implements the generic extension for the codeplug to represent some commercial features of DMR.
+ * @ingroup conf */
+class CommercialExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  /** Read only property returning holding the list of encryption keys. */
+  Q_PROPERTY(EncryptionKeys* encryptionKeys READ encryptionKeys)
+
+public:
+  /** Default constructor. */
+  Q_INVOKABLE explicit CommercialExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the list of encryption keys. */
+  EncryptionKeys *encryptionKeys() const;
+
+protected:
+  /** Owns the instance of the encryption key list. */
+  EncryptionKeys *_encryptionKeys;
+};
+
 
 /** Implements the generic extension for all channels configuring commercial features of DMR.
  * @ingroup conf */

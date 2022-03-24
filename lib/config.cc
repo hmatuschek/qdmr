@@ -24,7 +24,7 @@ Config::Config(QObject *parent)
     _rxGroupLists(new RXGroupLists(this)), _channels(new ChannelList(this)),
     _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
     _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this)),
-    _tytExtension(nullptr), _encryptionExtension(nullptr)
+    _tytExtension(nullptr), _commercialExtension(new CommercialExtension(this))
 {
   connect(_settings, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   connect(_radioIDs, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
@@ -51,6 +51,8 @@ Config::Config(QObject *parent)
   connect(_roaming, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
   connect(_roaming, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
   connect(_roaming, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
+
+  connect(_commercialExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
 }
 
 bool
@@ -257,22 +259,9 @@ Config::config() const {
 }
 
 
-EncryptionExtension *
-Config::encryptionExtension() const {
-  return _encryptionExtension;
-}
-
-void
-Config::setEncryptionExtension(EncryptionExtension *ext) {
-  if (_encryptionExtension == ext)
-    return;
-  if (_encryptionExtension)
-    _encryptionExtension->deleteLater();
-  _encryptionExtension = ext;
-  if (_encryptionExtension) {
-    _encryptionExtension->setParent(this);
-    connect(_encryptionExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
-  }
+CommercialExtension *
+Config::commercialExtension() const {
+  return _commercialExtension;
 }
 
 TyTConfigExtension *

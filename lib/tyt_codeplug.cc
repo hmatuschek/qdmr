@@ -2650,7 +2650,7 @@ TyTCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
 }
 
 bool
-TyTCodeplug::EncryptionElement::fromEncryptionExt(EncryptionExtension *encr, Context &ctx) {
+TyTCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *encr, Context &ctx) {
   ctx.addTable(&DMREncryptionKey::staticMetaObject);
   ctx.addTable(&AESEncryptionKey::staticMetaObject);
 
@@ -2659,30 +2659,30 @@ TyTCodeplug::EncryptionElement::fromEncryptionExt(EncryptionExtension *encr, Con
 
   // Encode each key
   unsigned basicCount=0, aesCount=0;
-  for (int i=0; i<encr->keys()->count(); i++) {
-    if (encr->keys()->get(i)->is<DMREncryptionKey>() && (_numBasicKeys > basicCount)) {
-      DMREncryptionKey *key = encr->keys()->get(i)->as<DMREncryptionKey>();
+  for (int i=0; i<encr->encryptionKeys()->count(); i++) {
+    if (encr->encryptionKeys()->get(i)->is<DMREncryptionKey>() && (_numBasicKeys > basicCount)) {
+      DMREncryptionKey *key = encr->encryptionKeys()->get(i)->as<DMREncryptionKey>();
       setBasicKey(basicCount++, key->key());
       ctx.add(key, basicCount);
-    } else if (encr->keys()->get(i)->is<AESEncryptionKey>() && (_numEnhancedKeys > aesCount)) {
-      AESEncryptionKey *key = encr->keys()->get(i)->as<AESEncryptionKey>();
+    } else if (encr->encryptionKeys()->get(i)->is<AESEncryptionKey>() && (_numEnhancedKeys > aesCount)) {
+      AESEncryptionKey *key = encr->encryptionKeys()->get(i)->as<AESEncryptionKey>();
       setEnhancedKey(aesCount++, key->key());
       ctx.add(key, aesCount);
     } else {
-      logWarn() << "Cannot encode key of type '" << encr->keys()->get(i)->metaObject()->className()
-                << "'.";
+      logWarn() << "Cannot encode key of type '"
+                << encr->encryptionKeys()->get(i)->metaObject()->className() << "'.";
     }
   }
 
   return true;
 }
 
-EncryptionExtension *
-TyTCodeplug::EncryptionElement::toEncryptionExt(Context &ctx) {
+bool
+TyTCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
   ctx.addTable(&DMREncryptionKey::staticMetaObject);
   ctx.addTable(&AESEncryptionKey::staticMetaObject);
 
-  EncryptionExtension *ext = new EncryptionExtension();
+  CommercialExtension *ext = ctx.config()->commercialExtension();
   for (unsigned i=0; i<_numEnhancedKeys; i++) {
     if (! isEnhancedKeySet(i))
       continue;
@@ -2690,7 +2690,7 @@ TyTCodeplug::EncryptionElement::toEncryptionExt(Context &ctx) {
     key->setName(QString("Enhanced Key %1").arg(i+1));
     ctx.add(key,i+1);
     key->fromHex(enhancedKey(i).toHex());
-    ext->keys()->add(key);
+    ext->encryptionKeys()->add(key);
   }
   for (unsigned i=0; i<_numBasicKeys; i++) {
     if (! isBasicKeySet(i))
@@ -2699,15 +2699,15 @@ TyTCodeplug::EncryptionElement::toEncryptionExt(Context &ctx) {
     key->setName(QString("Basic Key %1").arg(i+1));
     ctx.add(key,i+1);
     key->fromHex(basicKey(i).toHex());
-    ext->keys()->add(key);
+    ext->encryptionKeys()->add(key);
   }
 
   return ext;
 }
 
 bool
-TyTCodeplug::EncryptionElement::linkEncryptionExt(EncryptionExtension *encr, Context &ctx) {
-  Q_UNUSED(encr); Q_UNUSED(ctx);
+TyTCodeplug::EncryptionElement::linkCommercialExt(CommercialExtension *ext, Context &ctx) {
+  Q_UNUSED(ext); Q_UNUSED(ctx);
   return true;
 }
 

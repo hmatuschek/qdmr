@@ -28,6 +28,23 @@
   </para>  
 </warning>
 
+<example>
+  <title>Example commercial extension defining an encryption key.</title>
+  <programlisting><![CDATA[commercial:
+  encryptionKeys:
+    - aes:
+      id: key1
+      name: Example key 1
+      key: 01234567890123456789012345678901
+]]></programlisting>
+</example>
+
+<para>
+  All commercial extensions are held under the <token>commercial</token> key within the codeplug.
+  For now, there is only one extension, the encryption extension listing the encryption keys 
+  described below.
+</para>
+
 <xi:include href="channel.xml"/>
 <xi:include href="encryption.xml"/>
 

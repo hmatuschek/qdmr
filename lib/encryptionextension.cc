@@ -189,27 +189,3 @@ EncryptionKeys::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, 
   return nullptr;
 
 }
-
-/* ********************************************************************************************* *
- * Implementation of EncryptionExtension
- * ********************************************************************************************* */
-EncryptionExtension::EncryptionExtension(QObject *parent)
-  : ConfigExtension(parent), _keys(new EncryptionKeys(this))
-{
-  // pass...
-}
-
-ConfigItem *
-EncryptionExtension::clone() const {
-  EncryptionExtension *ext = new EncryptionExtension();
-  if (! ext->copy(*this)) {
-    ext->deleteLater();
-    return nullptr;
-  }
-  return ext;
-}
-
-EncryptionKeys *
-EncryptionExtension::keys() const {
-  return _keys;
-}

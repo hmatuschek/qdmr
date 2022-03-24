@@ -18,8 +18,8 @@
 
 <example>
   <title></title>
-  <programlisting><![CDATA[encryption:
-  keys:
+  <programlisting><![CDATA[commercial:
+  encryptionKeys:
     - dmr: 
       id: key1
       name: Example key 1
@@ -32,11 +32,8 @@
 </example>
 
 <para> 
-  As extensions cannot be lists, the encryption extension is a mapping, that contains a single 
-  element named <token>keys</token>. This element is then the list of all defined keys. Each key
-  must either be a DMR (basic) or AES (enhanced) key. 
-</para>
-<para>
+  This extension is a simple list of keys held in the global <token>commercial</token> extension.
+  Each key must either be a DMR (basic) or AES (enhanced) key. 
   The former defines a simple 16bit key while the latter defines a 126bit AES key. To 
   differentiate these key types, each list entry must be a mapping with a single entry. The name
   specifies the type (i.e., either <token>dmr</token> or <token>aes</token>). The value then 

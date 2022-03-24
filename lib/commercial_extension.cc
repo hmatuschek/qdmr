@@ -2,6 +2,35 @@
 #include "encryptionextension.hh"
 
 
+/* ********************************************************************************************* *
+ * Implementation of CommercialExtension
+ * ********************************************************************************************* */
+CommercialExtension::CommercialExtension(QObject *parent)
+  : ConfigExtension(parent), _encryptionKeys(new EncryptionKeys(this))
+{
+  // pass...
+}
+
+ConfigItem *
+CommercialExtension::clone() const {
+  CommercialExtension *ext = new CommercialExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+EncryptionKeys *
+CommercialExtension::encryptionKeys() const {
+  return _encryptionKeys;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of CommercialChannelExtension
+ * ********************************************************************************************* */
 CommercialChannelExtension::CommercialChannelExtension(QObject *parent)
   : ConfigExtension(parent), _encryptionKey()
 {

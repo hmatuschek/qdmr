@@ -94,6 +94,8 @@ Q_DECLARE_OPAQUE_POINTER(AESEncryptionKey*)
  *
  * This list holds all encryption keys defined within the codeplug.
  *
+ * @warning Please note that this is a commercial feature and forbidden for HAM radio use.
+ *
  * @ingroup conf */
 class EncryptionKeys: public ConfigObjectList
 {
@@ -109,30 +111,5 @@ public:
 };
 
 
-/** An extension to the codeplug that implements DMR encryption keys.
- *
- * @warning Please note that this is a commercial feature and forbidden for HAM radio use.
- *
- * @ingroup conf */
-class EncryptionExtension: public ConfigExtension
-{
-  Q_OBJECT
-
-  /** The encryption keys. */
-  Q_PROPERTY(EncryptionKeys* keys READ keys)
-
-public:
-  /** Default constructor without any keys. */
-   Q_INVOKABLE explicit EncryptionExtension(QObject *parent=nullptr);
-
-  ConfigItem *clone() const;
-
-  /** Returns the list of encryption keys. */
-  EncryptionKeys *keys() const;
-
-protected:
-  /** Owns the list of keys. */
-  EncryptionKeys *_keys;
-};
 
 #endif // ENCRYPTIONEXTENSION_HH

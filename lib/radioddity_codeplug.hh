@@ -1289,11 +1289,11 @@ public:
     virtual void clearBasicKey(unsigned n);
 
     /** Encodes given encryption extension. */
-    virtual bool fromEncryptionExt(EncryptionExtension *encr, Context &ctx);
+    virtual bool fromCommercialExt(CommercialExtension *ext, Context &ctx);
     /** Constructs the encryption extension. */
-    virtual EncryptionExtension *toEncryptionExt(Context &ctx);
+    virtual bool updateCommercialExt(Context &ctx);
     /** Links the given encryption extension. */
-    virtual bool linkEncryptionExt(EncryptionExtension *encr, Context &ctx);
+    virtual bool linkCommercialExt(CommercialExtension *ext, Context &ctx);
   };
 
 protected:
