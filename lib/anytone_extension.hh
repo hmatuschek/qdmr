@@ -3,6 +3,109 @@
 
 #include "configobject.hh"
 
+
+/** Implements the common properties for analog and digital AnyTone channels.
+ * This class cannot be instantiated directly, use one of the derived classes.
+ * @ingroup anytone */
+class AnytoneChannelExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  /** If @c true, talkaround is enabled. */
+  Q_PROPERTY(bool talkaround READ talkaround WRITE enableTalkaround)
+
+protected:
+  /** Hidden constructor. */
+  explicit AnytoneChannelExtension(QObject *parent=nullptr);
+
+  /** Returns @c true, if talkaround is enabled. */
+  bool talkaround() const;
+  /** Enables/disables talkaround. */
+  void enableTalkaround(bool enable);
+
+protected:
+  /** If @c true, talkaround is enabled. */
+  bool _talkaround;
+};
+
+
+/** Implements the settings extension for FM channels on AnyTone devices.
+ * @ingroup anytone */
+class AnytoneAnalogChannelExtension: public AnytoneChannelExtension
+{
+  Q_OBJECT
+
+  /** If @c true, the CTCSS phase-reverse burst at the end of transmission is enabled. */
+  Q_PROPERTY(bool reverseBurst READ reverseBurst WRITE enableReverseBurst)
+  /** If @c true, the custom CTCSS tone is used for RX (open squelch). */
+  Q_PROPERTY(bool rxCustomCTCSS READ rxCustomCTCSS WRITE enableRXCustomCTCSS)
+  /** If @c true, the custom CTCSS tone is transmitted. */
+  Q_PROPERTY(bool txCustomCTCSS READ txCustomCTCSS WRITE enableTXCustomCTCSS)
+  /** Holds the custom CTCSS tone frequency in Hz. Resolution is 0.1Hz */
+  Q_PROPERTY(double customCTCSS READ customCTCSS WRITE setCustomCTCSS)
+
+public:
+  /** Default constructor. */
+  Q_INVOKABLE explicit AnytoneAnalogChannelExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns @c true, if the CTCSS phase-reverse burst is enabled. */
+  bool reverseBurst() const;
+  /** Enables/disables the CTCSS phase-reverse burst. */
+  void enableReverseBurst(bool enable);
+
+  /** Returns @c true, if the custom CTCSS frequency is used for RX (open squelch). */
+  bool rxCustomCTCSS() const;
+  /** Enables/disables usage of custom CTCSS frequeny for RX. */
+  void enableRXCustomCTCSS(bool enable);
+  /** Returns @c true, if the custom CTCSS frequency is used for TX (open squelch). */
+  bool txCustomCTCSS() const;
+  /** Enables/disables usage of custom CTCSS frequeny for TX. */
+  void enableTXCustomCTCSS(bool enable);
+  /** Returns the custom CTCSS frequency in Hz. Resolution is 0.1Hz. */
+  double customCTCSS() const;
+  /** Sets the custom CTCSS frequency in Hz. Resolution is 0.1Hz. */
+  void setCustomCTCSS(double freq);
+
+protected:
+  /** If @c true, the CTCSS phase-reverse burst at the end of transmission is enabled. */
+  bool _reverseBurst;
+  /** If @c true, the custom CTCSS tone is used for RX (open squelch). */
+  bool _rxCustomCTCSS;
+  /** If @c true, the custom CTCSS tone is transmitted. */
+  bool _txCustomCTCSS;
+  /** Holds the custom CTCSS tone frequency in Hz. Resolution is 0.1Hz */
+  double _customCTCSS;
+};
+
+
+/** Implements the settings extension for DMR channels on AnyTone devices.
+ * @ingroup anytone */
+class AnytoneDigitalChannelExtension: public AnytoneChannelExtension
+{
+  Q_OBJECT
+
+  /** If @c true, the call confirmation is enabled. */
+  Q_PROPERTY(bool callConfirm READ callConfirm WRITE enableCallConfirm)
+
+public:
+  /** Default constructor. */
+  Q_INVOKABLE explicit AnytoneDigitalChannelExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns @c true if the call confirmation is enabled. */
+  bool callConfirm() const;
+  /** Enables/disables the call confrimation. */
+  void enableCallConfirm(bool enabled);
+
+protected:
+  /** If @c true, the call confirmation is enabled. */
+  bool _callConfirm;
+};
+
+
 /** Implements the AnyTone extensions for zones.
  * @ingroup anytone */
 class AnytoneZoneExtension : public ConfigExtension
