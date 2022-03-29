@@ -1129,10 +1129,10 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) {
     lst->setRevertChannel(SelectedChannel::get());
   else if (ctx.has<Channel>(txChannelIndex()))
     lst->setRevertChannel(ctx.get<Channel>(txChannelIndex()));
-  else if (0xffff == priorityChannel2Index())
-    lst->setSecondaryChannel(nullptr);
+  else if (0xffff == txChannelIndex())
+    lst->setRevertChannel(nullptr);
   else
-    logWarn() << "Cannot deocde reference to secondary priority channel index " << txChannelIndex()
+    logWarn() << "Cannot deocde reference to transmit channel index " << txChannelIndex()
                 << " in scan list '" << name() << "'.";
 
   for (int i=0; ((i<31) && memberIndex(i)); i++) {
