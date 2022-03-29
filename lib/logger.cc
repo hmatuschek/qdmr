@@ -237,4 +237,5 @@ FileLogHandler::handle(const LogMessage &message) {
   }
   _stream << "in " << message.file() << "@" << message.line()
           << ": " << message.message() << "\n";
+  _stream.flush();
 }
