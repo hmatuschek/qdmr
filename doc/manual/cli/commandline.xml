@@ -39,5 +39,5 @@
 <xi:include href="various.xml"/>
 <xi:include href="dangerzone.xml"/>
 <xi:include href="dmrconf.xml"/>
-
+<xi:include href="qdmr.xml"/>
 </chapter>

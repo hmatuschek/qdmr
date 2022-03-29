@@ -108,6 +108,17 @@
   
   <glossentry>
     <glossterm>DCDM</glossterm>
+    <glossdef>
+      <para>
+        Stands for dual capacity direct mode. This allows for two independent connections on a 
+        single simplex channel by TDMA. Lacking a single central repeater, one of the 
+        participants must act as the so-called <emphasis>leader</emphasis>. This radio then defines
+        the clock and thus time slot 1 and 2. All remaining participants must act as so-called 
+        <emphasis>follower</emphasis>. They must synchronize to the clock of the 
+        <emphasis>leader</emphasis>. This obviously requires that all participants can reach the 
+        <emphasis>leader</emphasis> directly.
+      </para>
+    </glossdef>
   </glossentry>
 
   <glossentry>
@@ -206,6 +217,15 @@
     <glossterm>Talk Group</glossterm>
   </glossentry>
   
+  <glossentry>
+    <glossterm>TDMA</glossterm>
+    <glossdef>
+      <para>
+        See Time Slot.
+      </para>
+    </glossdef>
+  </glossentry>
+
   <glossentry>
     <glossterm>Time Slot</glossterm>
     <glossdef>

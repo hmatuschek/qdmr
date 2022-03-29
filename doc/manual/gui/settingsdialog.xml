@@ -73,7 +73,7 @@
 <para>
   The <guilabel>Ignore frequency limits</guilabel> option does exactly what it says. Usually, 
   programming a channel outside of the radios frequency range would issue an error. However, many
-  radios are able to receive and even transmit outside of the frequency rangs specified by the 
+  radios are able to receive and even transmit outside of the frequency range specified by the 
   manufacturer. But be aware, that transmitting outside the declared frequency range may destroy 
   the radio!
 </para>
