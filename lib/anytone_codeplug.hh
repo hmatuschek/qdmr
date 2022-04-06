@@ -54,15 +54,6 @@ public:
       DCS = 2                        ///< Use DCS codes.
     };
 
-    /** Possible squelch mode settings. */
-    enum class SquelchMode {
-      Carrier = 0,
-      SubTone = 1,
-      OptSig  = 2,
-      SubToneAndOptSig = 3,
-      SubToneOrOptSig = 4
-    };
-
     /** Defines possible admit criteria. */
     enum class Admit {
       Always = 0,                  ///< For both channel types.
@@ -207,9 +198,9 @@ public:
     virtual void setRadioIDIndex(unsigned idx);
 
     /** Returns @c true if the sequelch is silent and @c false if open. */
-    virtual SquelchMode squelchMode() const;
+    virtual AnytoneAnalogChannelExtension::SquelchMode squelchMode() const;
     /** Enables/disables silent squelch. */
-    virtual void setSquelchMode(SquelchMode mode);
+    virtual void setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode mode);
 
     /** Returns the admit criterion. */
     virtual Admit admit() const;

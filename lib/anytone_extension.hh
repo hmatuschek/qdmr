@@ -43,6 +43,19 @@ class AnytoneAnalogChannelExtension: public AnytoneChannelExtension
   Q_PROPERTY(bool txCustomCTCSS READ txCustomCTCSS WRITE enableTXCustomCTCSS)
   /** Holds the custom CTCSS tone frequency in Hz. Resolution is 0.1Hz */
   Q_PROPERTY(double customCTCSS READ customCTCSS WRITE setCustomCTCSS)
+  /** Holds the squelch mode. */
+  Q_PROPERTY(SquelchMode squelchMode READ squelchMode WRITE setSquelchMode)
+
+public:
+  /** Possible squelch mode settings. */
+  enum class SquelchMode {
+    Carrier = 0,
+    SubTone = 1,
+    OptSig  = 2,
+    SubToneAndOptSig = 3,
+    SubToneOrOptSig = 4
+  };
+  Q_ENUM(SquelchMode)
 
 public:
   /** Default constructor. */
@@ -68,6 +81,11 @@ public:
   /** Sets the custom CTCSS frequency in Hz. Resolution is 0.1Hz. */
   void setCustomCTCSS(double freq);
 
+  /** Returns the squelch mode. */
+  SquelchMode squelchMode() const;
+  /** Sets the squelch mode. */
+  void setSquelchMode(SquelchMode mode);
+
 protected:
   /** If @c true, the CTCSS phase-reverse burst at the end of transmission is enabled. */
   bool _reverseBurst;
@@ -77,6 +95,8 @@ protected:
   bool _txCustomCTCSS;
   /** Holds the custom CTCSS tone frequency in Hz. Resolution is 0.1Hz */
   double _customCTCSS;
+  /** Holds the squelch mode. */
+  SquelchMode _squelchMode;
 };
 
 

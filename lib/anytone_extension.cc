@@ -89,6 +89,18 @@ AnytoneAnalogChannelExtension::setCustomCTCSS(double freq) {
   emit modified(this);
 }
 
+AnytoneAnalogChannelExtension::SquelchMode
+AnytoneAnalogChannelExtension::squelchMode() const {
+  return _squelchMode;
+}
+void
+AnytoneAnalogChannelExtension::setSquelchMode(SquelchMode mode) {
+  if (mode == _squelchMode)
+    return;
+  _squelchMode = mode;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneDigitalChannelExtension

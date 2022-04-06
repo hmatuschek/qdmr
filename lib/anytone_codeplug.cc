@@ -367,12 +367,12 @@ AnytoneCodeplug::ChannelElement::setRadioIDIndex(unsigned idx) {
   return setUInt8(0x0018, idx);
 }
 
-AnytoneCodeplug::ChannelElement::SquelchMode
+AnytoneAnalogChannelExtension::SquelchMode
 AnytoneCodeplug::ChannelElement::squelchMode() const {
-  return (SquelchMode)getUInt3(0x0019, 4);
+  return (AnytoneAnalogChannelExtension::SquelchMode)getUInt3(0x0019, 4);
 }
 void
-AnytoneCodeplug::ChannelElement::setSquelchMode(SquelchMode mode) {
+AnytoneCodeplug::ChannelElement::setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode mode) {
   setUInt3(0x0019, 4, (unsigned)mode);
 }
 
@@ -772,9 +772,9 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     if (Signaling::SIGNALING_NONE != ac->rxTone())
-      setSquelchMode(SquelchMode::SubTone);
+      setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode::SubTone);
     else
-      setSquelchMode(SquelchMode::Carrier);
+      setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode::Carrier);
     // set bandwidth
     setBandwidth(ac->bandwidth());
   } else if (c->is<DigitalChannel>()) {
