@@ -3,9 +3,10 @@
 #include "logger.hh"
 #include "config.hh"
 #include <QMetaProperty>
+#include <ctype.h>
 
 // Utility function to check string content for ASCII encoding
-inline bool isascii(const QString &text) {
+inline bool qstring_is_ascii(const QString &text) {
   foreach (QChar c, text) {
     if ((c<0x1f) && (0x7f != c))
       return false;
@@ -205,7 +206,7 @@ RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
         << ") is shorter than minimum size " << _minLen << ".";
   }
 
-  if ((ASCII == _encoding) && (! isascii(value))) {
+  if ((ASCII == _encoding) && (! qstring_is_ascii(value))) {
     auto &msg = context.newMessage();
     msg << "Cannot encode string '" << value << "' in ASCII.";
   }
