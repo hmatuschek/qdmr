@@ -107,7 +107,6 @@
     </property>
     <addaction name="actionRefreshCallsignDB"/>
     <addaction name="actionRefreshTalkgroupDB"/>
-    <addaction name="actionRefreshRepeaterDB"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuDevice"/>
@@ -193,7 +192,8 @@
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset theme="application-exit"/>
+    <iconset theme="application-exit">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Quit</string>
@@ -326,18 +326,6 @@
    </property>
    <property name="toolTip">
     <string>Refreshes the downloaded talkgroup DB</string>
-   </property>
-  </action>
-  <action name="actionRefreshRepeaterDB">
-   <property name="icon">
-    <iconset theme="document-download">
-     <normaloff>.</normaloff>.</iconset>
-   </property>
-   <property name="text">
-    <string>Refresh Repeater DB</string>
-   </property>
-   <property name="toolTip">
-    <string>Refreshes the downloaded repeater DB</string>
    </property>
   </action>
  </widget>
