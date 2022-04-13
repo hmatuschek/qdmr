@@ -178,8 +178,10 @@ D878UVCodeplug::ChannelElement::setFrequencyCorrection(int corr) {
 Channel *
 D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   Channel *ch = AnytoneCodeplug::ChannelElement::toChannelObj(ctx);
+
   if (nullptr == ch)
     return nullptr;
+
   // Nothing else to do
   return ch;
 }

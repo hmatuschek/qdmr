@@ -81,6 +81,8 @@ AnytoneCodeplug::ChannelElement::clear() {
   setMode(Mode::Analog);
   setPower(Channel::Power::Low);
   setBandwidth(AnalogChannel::Bandwidth::Narrow);
+  setRXTone(Signaling::SIGNALING_NONE);
+  setTXTone(Signaling::SIGNALING_NONE);
   setBit(0x0008, 5, false); // Unused set to 0
 }
 

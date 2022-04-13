@@ -132,8 +132,8 @@ public:
     virtual Signaling::Code rxTone() const;
     /** Sets the RX signaling (tone). */
     virtual void setRXTone(Signaling::Code code);
-    /** Returns the TX signaling mode */
 
+    /** Returns the TX signaling mode */
     virtual SignalingMode txSignalingMode() const;
     /** Sets the TX signaling mode */
     virtual void setTXSignalingMode(SignalingMode mode);
