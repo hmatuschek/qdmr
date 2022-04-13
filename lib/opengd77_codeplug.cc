@@ -194,6 +194,8 @@ OpenGD77Codeplug::ChannelElement::toChannelObj(Context &ctx) const {
 
   OpenGD77ChannelExtension *ext = new OpenGD77ChannelExtension(ch);
   ext->setPower(extendedPower());
+  ext->enableScanZoneSkip(scanZoneSkip());
+  ext->enableScanAllSkip(scanAllSkip());
   ch->setOpenGD77ChannelExtension(ext);
 
   return ch;
@@ -251,6 +253,8 @@ OpenGD77Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
     return true;
 
   setExtendedPower(c->openGD77ChannelExtension()->power());
+  enableScanZoneSkip(c->openGD77ChannelExtension()->scanZoneSkip());
+  enableScanAllSkip(c->openGD77ChannelExtension()->scanAllSkip());
 
   return true;
 }

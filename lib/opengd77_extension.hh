@@ -17,6 +17,10 @@ class OpenGD77ChannelExtension: public ConfigExtension
 
   /** The channel transmit power. Overrides the common power settings. */
   Q_PROPERTY(Power power READ power WRITE setPower)
+  /** The zone skip flag. */
+  Q_PROPERTY(bool scanZoneSkip READ scanZoneSkip WRITE enableScanZoneSkip)
+  /** The all skip flag. */
+  Q_PROPERTY(bool scanAllSkip READ scanAllSkip WRITE enableScanAllSkip)
 
   Q_CLASSINFO("description", "Channel settings for OpenGD77 radios.")
   Q_CLASSINFO("longDescription", "This extension implements all channel settings specific to radios "
@@ -51,9 +55,22 @@ public:
   /** Sets the power setting. */
   void setPower(Power power);
 
+  /** Returns @c true if the zone skip flag is set. */
+  bool scanZoneSkip() const;
+  /** Enables/disables zone skip. */
+  void enableScanZoneSkip(bool enable);
+  /** Returns @c true if the all-skip flag is set. */
+  bool scanAllSkip() const;
+  /** Enables/disables all skip. */
+  void enableScanAllSkip(bool enable);
+
 protected:
   /** Holds the power setting. */
   Power _power;
+  /** Holds the zone skip flag. */
+  bool _zoneSkip;
+  /** Holds the all skip flag. */
+  bool _allSkip;
 };
 
 
