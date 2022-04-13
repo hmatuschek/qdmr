@@ -98,8 +98,8 @@ class OpenGD77ContactExtension: public ConfigExtension
 public:
   /** Possible values for the time-slot override option. */
   enum class TimeSlotOverride {
-    None = 0x01,                  ///< Do not override time-slot of channel.
-    TS1  = 0x00,                  ///< Force time-slot to TS1.
+    None = 0x00,                  ///< Do not override time-slot of channel.
+    TS1  = 0x01,                  ///< Force time-slot to TS1.
     TS2  = 0x02                   ///< Force time-slot to TS2.
   };
   Q_ENUM(TimeSlotOverride)
