@@ -83,6 +83,15 @@ public:
     Channel::Power power() const;
     void setPower(Channel::Power power);
 
+    /** If @c true, the scan zone skip is enabled. */
+    virtual bool scanZoneSkip() const;
+    /** Enables/disables scan zone skip. */
+    virtual void enableScanZoneSkip(bool enable);
+    /** If @c true, the scan all skip is enabled. */
+    virtual bool scanAllSkip() const;
+    /** Enables/disables scan all skip. */
+    virtual void enableScanAllSkip(bool enable);
+
     /** Returns extended power settings. */
     virtual Power extendedPower() const;
     /** Sets extended power. */
@@ -97,8 +106,37 @@ public:
     /** Sets the squelch to radio wide default. */
     virtual void setSquelchDefault();
 
+    /** Returns @c true if the channel specific radio ID is set. */
+    virtual bool hasRadioId() const;
+    /** Returns the radio ID for the channel. Only valid if @c hasRadioId() returns @c true. */
+    virtual unsigned radioId() const;
+    /** Sets and enables the radio ID for the channel. */
+    virtual void setRadioId(unsigned id);
+    /** Clears the radio ID. */
+    virtual void clearRadioId();
+
     Channel *toChannelObj(Context &ctx) const;
+    bool linkChannelObj(Channel *c, Context &ctx) const;
     bool fromChannelObj(const Channel *c, Context &ctx);
+
+    /* Reused fields in OpenGD77.
+     * The following properties are reused in the OpenGD77 firmware for other purposes.*/
+    /** Overridden, reused in OpenGD77. */
+    bool autoscan() const;
+    /** Overridden, reused in OpenGD77. */
+    void enableAutoscan(bool enable);
+    /** Overridden, reused in OpenGD77. */
+    bool loneWorker() const;
+    /** Overridden, reused in OpenGD77. */
+    void enableLoneWorker(bool enable);
+    /** Overridden, reused in OpenGD77. */
+    unsigned rxSignalingIndex() const;
+    /** Overridden, reused in OpenGD77. */
+    void setRXSignalingIndex(unsigned idx);
+    /** Overridden, reused in OpenGD77. */
+    PrivacyGroup privacyGroup() const ;
+    /** Overridden, reused in OpenGD77. */
+    void setPrivacyGroup(PrivacyGroup grp);
   };
 
   /** Implements the OpenGD77 specific zone.

@@ -69,8 +69,12 @@ OpenGD77Codeplug::ChannelElement::ChannelElement(uint8_t *ptr)
 
 void
 OpenGD77Codeplug::ChannelElement::clear() {
+  GD77Codeplug::ChannelElement::clear();
   setExtendedPower(Power::Global);
   setSquelchDefault();
+  enableScanZoneSkip(false);
+  enableScanAllSkip(false);
+  clearRadioId();
 }
 
 Channel::Power
@@ -134,6 +138,43 @@ OpenGD77Codeplug::ChannelElement::setSquelchDefault() {
   setUInt8(0x0037, 0);
 }
 
+bool
+OpenGD77Codeplug::ChannelElement::scanZoneSkip() const {
+  return getBit(0x0033, 5);
+}
+void
+OpenGD77Codeplug::ChannelElement::enableScanZoneSkip(bool enable) {
+  setBit(0x0033, 5, enable);
+}
+
+bool
+OpenGD77Codeplug::ChannelElement::scanAllSkip() const {
+  return getBit(0x0033, 4);
+}
+void
+OpenGD77Codeplug::ChannelElement::enableScanAllSkip(bool enable) {
+  setBit(0x0033, 4, enable);
+}
+
+bool
+OpenGD77Codeplug::ChannelElement::hasRadioId() const {
+  return getBit(0x0026, 7);
+}
+unsigned
+OpenGD77Codeplug::ChannelElement::radioId() const {
+  return getUInt24_be(0x0027);
+}
+void
+OpenGD77Codeplug::ChannelElement::setRadioId(unsigned id) {
+  setUInt24_be(0x0027, id);
+  setBit(0x0026, 7);
+}
+void
+OpenGD77Codeplug::ChannelElement::clearRadioId() {
+  setUInt24_be(0x0027, 0);
+  clearBit(0x0026, 7);
+}
+
 Channel *
 OpenGD77Codeplug::ChannelElement::toChannelObj(Context &ctx) const {
   Channel *ch = GD77Codeplug::ChannelElement::toChannelObj(ctx);
@@ -159,6 +200,30 @@ OpenGD77Codeplug::ChannelElement::toChannelObj(Context &ctx) const {
 }
 
 bool
+OpenGD77Codeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
+  if (! GD77Codeplug::ChannelElement::linkChannelObj(c, ctx))
+    return false;
+
+  if (c->is<DigitalChannel>()) {
+    DigitalChannel *dc = c->as<DigitalChannel>();
+    // Link radio ID
+    if (hasRadioId()) {
+      DMRRadioID *id = ctx.config()->radioIDs()->find(radioId());
+      if (nullptr == id) {
+        id = new DMRRadioID(QString("ID%1").arg(radioId()), radioId());
+        ctx.config()->radioIDs()->add(id);
+      }
+      dc->setRadioIdObj(id);
+    } else {
+      // If no radio ID is set, set default.
+      dc->setRadioIdObj(DefaultRadioID::get());
+    }
+  }
+
+  return true;
+}
+
+bool
 OpenGD77Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   if (! GD77Codeplug::ChannelElement::fromChannelObj(c, ctx))
     return false;
@@ -169,6 +234,14 @@ OpenGD77Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
       setSquelchDefault();
     else
       setSquelch(ac->squelch());
+  } else if (c->is<DigitalChannel>()) {
+    const DigitalChannel *dc = c->as<DigitalChannel>();
+    // Encode radio ID
+    if (DefaultRadioID::get() == dc->radioIdObj()) {
+      clearRadioId();
+    } else {
+      setRadioId(dc->radioIdObj()->number());
+    }
   }
 
   if (c->defaultPower())
@@ -180,6 +253,42 @@ OpenGD77Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
   setExtendedPower(c->openGD77ChannelExtension()->power());
 
   return true;
+}
+
+bool
+OpenGD77Codeplug::ChannelElement::autoscan() const {
+  return false;
+}
+void
+OpenGD77Codeplug::ChannelElement::enableAutoscan(bool enable) {
+  Q_UNUSED(enable)
+}
+
+bool
+OpenGD77Codeplug::ChannelElement::loneWorker() const {
+  return false;
+}
+void
+OpenGD77Codeplug::ChannelElement::enableLoneWorker(bool enable) {
+  Q_UNUSED(enable)
+}
+
+unsigned
+OpenGD77Codeplug::ChannelElement::rxSignalingIndex() const {
+  return 0;
+}
+void
+OpenGD77Codeplug::ChannelElement::setRXSignalingIndex(unsigned idx) {
+  Q_UNUSED(idx);
+}
+
+OpenGD77Codeplug::ChannelElement::PrivacyGroup
+OpenGD77Codeplug::ChannelElement::privacyGroup() const {
+  return PRIVGR_NONE;
+}
+void
+OpenGD77Codeplug::ChannelElement::setPrivacyGroup(PrivacyGroup grp) {
+  Q_UNUSED(grp);
 }
 
 
