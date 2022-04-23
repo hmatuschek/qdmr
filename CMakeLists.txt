@@ -7,6 +7,7 @@ option(BUILD_TESTS "Build test programs" OFF)
 option(BUILD_DOCS  "Build API documentation" OFF)
 option(BUILD_MAN   "Build man page for dmrconf" OFF)
 option(INSTALL_UDEV_RULES "Install udev rules file." ON)
+option(INSTALL_BUNDLE "Installs QDMR as an AppBundle under MacOS X" OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
