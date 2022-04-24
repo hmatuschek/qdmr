@@ -59,8 +59,8 @@ target_include_directories(qdmr PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 # Install binary only if not a bundle under MacOS X
 if (UNIX AND APPLE AND INSTALL_BUNDLE)
 	install(TARGETS qdmr
-		BUNDLE DESTINATION /Applications/
-		RESOURCE DESTINATION "/Applications/${CMAKE_PROJECT_NAME}.app/Contents/Resources")
+    BUNDLE DESTINATION ${BUNDLE_PATH}/
+    RESOURCE DESTINATION "${BUNDLE_PATH}/${CMAKE_PROJECT_NAME}.app/Contents/Resources")
 else()
 	install(TARGETS qdmr DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 endif(UNIX AND APPLE AND INSTALL_BUNDLE)
