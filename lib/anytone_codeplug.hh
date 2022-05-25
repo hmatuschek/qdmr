@@ -393,6 +393,13 @@ public:
    * @verbinclude anytone_dtmfcontact.txt */
   class DTMFContactElement: public Element
   {
+    enum Offsets {
+      DIGITS = 0x0,
+      DIGIT_COUNT = 0x7,
+      NAME = DIGIT_COUNT + 1
+    };
+    static const unsigned NAME_LEN = 15;
+
   protected:
     /** Hidden constructor. */
     DTMFContactElement(uint8_t *ptr, unsigned size);

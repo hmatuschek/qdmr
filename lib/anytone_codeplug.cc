@@ -969,7 +969,7 @@ AnytoneCodeplug::DTMFContactElement::clear() {
 QString
 AnytoneCodeplug::DTMFContactElement::number() const {
   QString number;
-  int n = getUInt8(0x0013);
+  int n = getUInt8(Offsets::DIGIT_COUNT);
   for (int i=0; i<n; i++) {
     uint8_t byte = _data[i/2];
     if (0 == (i%2))
@@ -983,8 +983,8 @@ void
 AnytoneCodeplug::DTMFContactElement::setNumber(const QString &number) {
   if (! validDTMFNumber(number))
     return;
-  memset(_data+0x0000, 0, 7);
-  setUInt8(0x0013, number.length());
+  memset(_data+Offsets::DIGITS, 0, Offsets::DIGIT_COUNT);
+  setUInt8(Offsets::DIGIT_COUNT, number.length());
   for (int i=0; i<number.length(); i++) {
     if (0 == (i%2))
       _data[i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<4);
@@ -995,11 +995,11 @@ AnytoneCodeplug::DTMFContactElement::setNumber(const QString &number) {
 
 QString
 AnytoneCodeplug::DTMFContactElement::name() const {
-  return readASCII(0x0020, 15, 0x00);
+  return readASCII(Offsets::NAME, NAME_LEN, 0x00);
 }
 void
 AnytoneCodeplug::DTMFContactElement::setName(const QString &name) {
-  writeASCII(0x0020, name, 15, 0x00);
+  writeASCII(Offsets::NAME, name, NAME_LEN, 0x00);
 }
 
 DTMFContact *
