@@ -762,7 +762,7 @@ RadioLimitRefList::verify(const ConfigItem *item, const QMetaProperty &prop, Rad
 
   const ConfigObjectRefList *plist = prop.read(item).value<ConfigObjectRefList*>();
   if ((0 <= _minSize) && (_minSize > plist->count())) {
-    auto &msg = context.newMessage(RadioLimitIssue::Critical);
+    auto &msg = context.newMessage(RadioLimitIssue::Warning);
     msg << "List '" << prop.name() << "' requires at least " << _minSize
         << " elements, " << plist->count() << " elements found.";
     return false;
