@@ -600,7 +600,7 @@ DM1701Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &e
     if (Channel *obj = chan.toChannelObj()) {
       config->channelList()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invlaid channel at index %" << i << ".";
+      errMsg(err) << "Invalid channel at index %" << i << ".";
       return false;
     }
   }
@@ -651,7 +651,7 @@ DM1701Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &e
     if (DigitalContact *obj = cont.toContactObj()) {
       config->contacts()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invlaid contact at index " << i << ".";
+      errMsg(err) << "Invalid contact at index " << i << ".";
       return false;
     }
   }
@@ -693,7 +693,7 @@ DM1701Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err)
     if (Zone *obj = zone.toZoneObj()) {
       config->zones()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invlaid zone at index " << i << ".";
+      errMsg(err) << "Invalid zone at index " << i << ".";
       return false;
     }
   }
@@ -749,7 +749,7 @@ DM1701Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack 
     if (RXGroupList *obj = glist.toGroupListObj(ctx)) {
       config->rxGroupLists()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invlaid group list at index " << i << ".";
+      errMsg(err) << "Invalid group list at index " << i << ".";
       return false;
     }
   }
@@ -800,7 +800,7 @@ DM1701Codeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &
     if (ScanList *obj = scan.toScanListObj(ctx)) {
       config->scanlists()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invlaid scanlist at index " << i << ".";
+      errMsg(err) << "Invalid scanlist at index " << i << ".";
       return false;
     }
   }

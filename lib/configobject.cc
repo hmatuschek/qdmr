@@ -696,7 +696,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
           if (0 > lst->add(ctx.getTag(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
             errMsg(err) << it->Mark().line << ":" << it->Mark().column
                         << ": Cannot link " << prop.name() << " of " << meta->className()
-                        << ": Cannot add referece for tag '" << tag << "'.";
+                        << ": Cannot add reference for tag '" << tag << "'.";
             return false;
           }
           continue;
@@ -1014,7 +1014,7 @@ int AbstractConfigObjectList::add(ConfigObject *obj, int row) {
   // Ignore nullptr
   if (nullptr == obj)
     return -1;
-  // If alread in list -> ignore
+  // If already in list -> ignore
   if (0 <= indexOf(obj))
     return -1;
   if (-1 == row)

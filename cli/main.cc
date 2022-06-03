@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   QCommandLineParser parser;
   parser.setApplicationDescription(
         QCoreApplication::translate(
-          "main", "Up- and download codeplugs for cheap Chineese DMR radios."));
+          "main", "Up- and download codeplugs for cheap Chinese DMR radios."));
 
   parser.addHelpOption();
   parser.addVersionOption();
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
         "command", QCoreApplication::translate(
           "main", "Specifies the command to perform. Either detect, verify, read, write, "
           "write-db, encode, encode-db, decode or info. Consult the man-page of dmrconf for a "
-          "detailed descriptoin of these commands."),
+          "detailed description of these commands."),
         QCoreApplication::translate("main", "[command]"));
 
   parser.addPositionalArgument(

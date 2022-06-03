@@ -8,7 +8,7 @@
 
 /** This class implements DFU protocol to access radios.
  *
- * Many manufactures use the standardized DFU protocoll to program codeplugs and update the
+ * Many manufactures use the standardized DFU protocol to program codeplugs and update the
  * firmware of their radios. This class implements this protocol, see
  * https://www.usb.org/sites/default/files/DFU_1.1.pdf for details.
  *
@@ -36,14 +36,14 @@ public:
   };
 
 public:
-  /** Opens a connection to the USB-DFU devuce at vendor @c vid and product @c pid. */
+  /** Opens a connection to the USB-DFU device at vendor @c vid and product @c pid. */
   DFUDevice(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
 	virtual ~DFUDevice();
 
-  /** Retuns @c true if the DFU device interface is open. */
+  /** Returns @c true if the DFU device interface is open. */
   bool isOpen() const;
-  /** Closes the DFU iterface. */
+  /** Closes the DFU interface. */
   void close();
 
   /** Downloads some data to the device. */

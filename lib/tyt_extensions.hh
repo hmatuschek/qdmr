@@ -171,9 +171,9 @@ protected:
   bool _emergencyAlarmConfirmed;
   /** Holds the display PTT ID flag. */
   bool _displayPTTId;
-  /** Holds the reference frequeny setting for RX. */
+  /** Holds the reference frequency setting for RX. */
   RefFrequency _rxRefFrequency;
-  /** Holds the reference frequeny setting for TX. */
+  /** Holds the reference frequency setting for TX. */
   RefFrequency _txRefFrequency;
 
   // MD-390 properties
@@ -460,7 +460,7 @@ public:
 
   /** Returns @c true if the hang time is infinite. */
   bool hangtimeIsInfinite() const;
-  /** Enables/disables inifinite hang time. */
+  /** Enables/disables infinite hang time. */
   void setHangtimeInfinite(bool infinite);
 
   /** Returns the menu hang time in seconds. */
@@ -815,15 +815,15 @@ public:
   /** Enables the boot picture. */
   void enableBootPicture(bool enable);
 
-  /** Retunrs @c true if the radio is in channel mode. Overrides @c channelModeA and @c channelModeB. */
+  /** Returns @c true if the radio is in channel mode. Overrides @c channelModeA and @c channelModeB. */
   bool channelMode() const;
   /** Enables/disables channel mode for the radio. */
   void enableChannelMode(bool enable);
-  /** Retunrs @c true if VFO A is in channel mode. Overridden by @c channelMode. */
+  /** Returns @c true if VFO A is in channel mode. Overridden by @c channelMode. */
   bool channelModeA() const;
   /** Enables/disables channel mode for the VFO A. */
   void enableChannelModeA(bool enable);
-  /** Retunrs @c true if VFO B is in channel mode. Overridden by @c channelMode. */
+  /** Returns @c true if VFO B is in channel mode. Overridden by @c channelMode. */
   bool channelModeB() const;
   /** Enables/disables channel mode for the VFO B. */
   void enableChannelModeB(bool enable);
@@ -890,7 +890,7 @@ public:
   bool keypadLockManual() const;
   /** Sets the keypad lock to manual. */
   void enableKeypadLockManual(bool enable);
-  /** Retunrs the keypad lock time in seconds. */
+  /** Returns the keypad lock time in seconds. */
   unsigned keypadLockTime() const;
   /** Sets the keypad lock time in seconds. */
   void setKeypadLockTime(unsigned sec);
@@ -913,7 +913,7 @@ public:
   /** Sets the radio programming password. */
   void setRadioProgPassword(unsigned passwd);
 
-  /** Retunrs the PC programming password. */
+  /** Returns the PC programming password. */
   const QString &pcProgPassword() const;
   /** Sets PC programming password. */
   void setPCProgPassword(const QString &passwd);
@@ -976,7 +976,7 @@ protected:
   unsigned _callAlertToneDuration;
   /** Holds the lone-worker response time. */
   unsigned _loneWorkerResponseTime;
-  /** Holds teh lone-worker reminder time. */
+  /** Holds the lone-worker reminder time. */
   unsigned _loneWorkerReminderTime;
   /** Holds the scan hang-time for digital channels. */
   unsigned _digitalScanHangTime;

@@ -9,7 +9,7 @@
 </info>
 
 <para>
-  The APRS system list specifies the various informations for transmitting your position using analog 
+  The APRS system list specifies the various information for transmitting your position using analog 
   APRS. As digital channels may use either DMR or analog APRS for position reporting, this list shares 
   a namespace with the GPS system list. That is, the ID must be unique across both lists.
 </para>

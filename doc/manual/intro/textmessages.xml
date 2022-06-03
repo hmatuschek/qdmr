@@ -68,9 +68,9 @@
 <para>
   As mentioned in the previous section, it is possible to report the own position via the 
   DMR network to the APRS network. This position can then be tracked at for example 
-  <link xlink:href="https://aprs.fi">aprs.fi</link>. To do that, a radio with a build-in 
+  <link xlink:href="https://aprs.fi">aprs.fi</link>. To do that, a radio with a built-in 
   GPS receiver is required. But not even these devices are expensive anymore. Simple DMR 
-  hand-helds with build-in GPS receivers are available for about 120€.
+  hand-helds with built-in GPS receivers are available for about 120€.
 </para>
 <para>
   Beside the text message services, it is also possible to transmit the position to the DMR 

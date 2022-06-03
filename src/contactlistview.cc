@@ -57,7 +57,7 @@ ContactListView::onAddDTMFContact() {
 
 void
 ContactListView::onRemContact() {
-  // Check if there is any contacts seleced
+  // Check if there is any contacts selected
   if (! ui->listView->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete contact"),

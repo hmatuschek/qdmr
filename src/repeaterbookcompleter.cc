@@ -403,7 +403,7 @@ RepeaterBookList::store() const {
 
 void
 RepeaterBookList::search(const QString &call) {
-  // Chancel running requests
+  // Cancel running requests
   if (_currentReply)
     _currentReply->abort();
 

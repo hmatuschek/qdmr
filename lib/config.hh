@@ -9,7 +9,7 @@
  * of the model and manufacturer.
  *
  * The entire configuration (abstract, device independent codeplug) consists of a tree of
- * @c ConfigItem instances. This class forms the base-class of all elmenets in the configuration
+ * @c ConfigItem instances. This class forms the base-class of all elements in the configuration
  * (excluding lists etc.). Each @c ConfigItem may have a set of properties. These properties are
  * used to implement the majority of the common functionality concerning the abstract codeplug.
  * These are
@@ -24,10 +24,10 @@
  * To this end, the creation of codeplug extensions is pretty easy, as only the properties for the
  * extension must be defined. The rest is taken care of by the default implementation of the
  * @c ConfigItem::copy, @c ConfigItem::clone, @c ConfigItem::label, @c ConfigItem::serialize,
- * @c ConfigItem::parse and @c ConfigItem::link methods. It is not neccessary to override any of
+ * @c ConfigItem::parse and @c ConfigItem::link methods. It is not necessary to override any of
  * these methods if there is a one-to-one mapping between the property and its YAML representation.
  *
- * Frequently, however, it is neccessary to represent a property in a different way in YAML. This
+ * Frequently, however, it is necessary to represent a property in a different way in YAML. This
  * is usually true if a property may hold different specializations of a common type. For example
  * the channel list may hold analog and digital channels. In YAML, the type is specified explicitly
  * as an enclosing map. This structure is not a one-to-one representation of the actual property
@@ -115,7 +115,7 @@ public:
   ChannelList *channelList() const;
   /** Returns the list of zones. */
   ZoneList *zones() const;
-  /** Retruns the list of scanlists. */
+  /** Returns the list of scanlists. */
   ScanLists *scanlists() const;
   /** Returns the list of positioning systems. */
   PositioningSystems *posSystems() const;

@@ -24,7 +24,7 @@ public:
   // QAbstractListModel interface
   /** Implements QAbstractTableModel, returns number of rows. */
   int rowCount(const QModelIndex &index) const;
-  /** Implements QAbstractTableModel, returns number of colums. */
+  /** Implements QAbstractTableModel, returns number of columns. */
   int columnCount(const QModelIndex &index) const;
 
 signals:
@@ -97,7 +97,7 @@ public:
 
 public:
   // QAbstractTableModel interface
-  /** Implements QAbstractTableModel, returns number of colums. */
+  /** Implements QAbstractTableModel, returns number of columns. */
   int columnCount(const QModelIndex &index) const;
   /** Implements QAbstractTableModel, returns data at cell. */
   QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;

@@ -11,7 +11,7 @@
  *
  * @section dm1701cpl Codeplug structure within radio
  * The codeplug structure is reverse engineered almost completely and can be programmed from
- * scratch. That is, it is not neccessary to update an existing codeplug on the radio.
+ * scratch. That is, it is not necessary to update an existing codeplug on the radio.
  * <table>
  *  <tr><th>Start</th>    <th>End</th>      <th>Size</th>    <th>Content</th></tr>
  *  <tr><th colspan="4">First segment 0x002000-0x040000</th></tr>
@@ -250,7 +250,7 @@ public:
     /** Encodes the given zone. */
     virtual bool fromZoneObj(const Zone *zone, Context &ctx);
     /** Links the given zone object.
-     * Thant is, extends channel list A and populates channel list B. */
+     * That is, extends channel list A and populates channel list B. */
     virtual bool linkZoneObj(Zone *zone, Context &ctx);
   };
 

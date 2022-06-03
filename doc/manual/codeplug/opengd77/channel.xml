@@ -67,7 +67,7 @@
       <para>
         In contrast to the original GD-77 firmware, OpenGD77 does not implement scanning by scan 
         lists. Instead, either all channels defined in the radio or all channels within the current
-        zone can be scanned. To exclude some channles from these scans, the 
+        zone can be scanned. To exclude some channels from these scans, the 
         <token>scanZoneSkip</token> and <token>scanAllSkip</token> flags can be used. When enabled,
         the channel will be excluded from the respective scan.
       </para>

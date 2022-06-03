@@ -70,11 +70,11 @@ public:
 
   /** Returns @c true, if the custom CTCSS frequency is used for RX (open squelch). */
   bool rxCustomCTCSS() const;
-  /** Enables/disables usage of custom CTCSS frequeny for RX. */
+  /** Enables/disables usage of custom CTCSS frequency for RX. */
   void enableRXCustomCTCSS(bool enable);
   /** Returns @c true, if the custom CTCSS frequency is used for TX (open squelch). */
   bool txCustomCTCSS() const;
-  /** Enables/disables usage of custom CTCSS frequeny for TX. */
+  /** Enables/disables usage of custom CTCSS frequency for TX. */
   void enableTXCustomCTCSS(bool enable);
   /** Returns the custom CTCSS frequency in Hz. Resolution is 0.1Hz. */
   double customCTCSS() const;
@@ -117,7 +117,7 @@ public:
 
   /** Returns @c true if the call confirmation is enabled. */
   bool callConfirm() const;
-  /** Enables/disables the call confrimation. */
+  /** Enables/disables the call confirmation. */
   void enableCallConfirm(bool enabled);
 
 protected:

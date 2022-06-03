@@ -50,7 +50,7 @@ protected:
 	QString _name;
   /** The codeplug. */
   GD77Codeplug _codeplug;
-  /** The acutal binary callsign DB representation. */
+  /** The actual binary callsign DB representation. */
   GD77CallsignDB _callsigns;
 
 private:

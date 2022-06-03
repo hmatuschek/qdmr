@@ -17,7 +17,7 @@ class RadioInfo
 public:
   /** Known radios. */
   enum Radio {
-    // Open soruce firmware
+    // Open source firmware
     OpenGD77,
     // Radioddity devices
     RD5R,
@@ -50,16 +50,16 @@ public:
   /** Empty constructor. */
   RadioInfo();
 
-  /** Retunrs @c true if the info is valid. */
+  /** Returns @c true if the info is valid. */
   bool isValid() const;
 
   /** Returns the radio key (used to identify radios in the command line). */
   const QString &key() const;
   /** Returns the radio name. */
   const QString &name() const;
-  /** Retunrs the manufacturer name. */
+  /** Returns the manufacturer name. */
   const QString &manufactuer() const;
-  /** Returns some information about the iterface to the radio. */
+  /** Returns some information about the interface to the radio. */
   const USBDeviceInfo &interface() const;
 
   /** Returns @c true if the radio has aliases.
@@ -68,7 +68,7 @@ public:
   /** Returns the list of alias radios. */
   const QList<RadioInfo> &alias() const;
 
-  /** Retuns the unique device ID (alias radios share ID). */
+  /** Returns the unique device ID (alias radios share ID). */
   Radio id() const;
 
 public:

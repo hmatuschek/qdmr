@@ -45,7 +45,7 @@ class DMREncryptionKey: public EncryptionKey
   Q_OBJECT
   Q_CLASSINFO("description", "A basic DMR encryption key.")
   Q_CLASSINFO("longDescription",
-              "This is a 16bit pre-shared key that can be used to encrypt/decrypt trafic on DMR "
+              "This is a 16bit pre-shared key that can be used to encrypt/decrypt traffic on DMR "
               "channels. Encryption is forbidden in HAM radio context!")
 
 public:
@@ -72,7 +72,7 @@ class AESEncryptionKey: public EncryptionKey
 
   Q_CLASSINFO("description", "An AES (enhanced) DMR encryption key.")
   Q_CLASSINFO("longDescription",
-              "This is a 128bit pre-shared key that can be used to encrypt/decrypt trafic on DMR "
+              "This is a 128bit pre-shared key that can be used to encrypt/decrypt traffic on DMR "
               "channels. Encryption is forbidden in HAM radio context!")
 
 public:

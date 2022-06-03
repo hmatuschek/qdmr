@@ -13,14 +13,14 @@ settings:
 radioIDs:
   - dmr: {id: id1, name: DM3MAT, number: 2621370}
 contacts:
-  - dmr: {id: cont1, name: Lokal, ring: false, type: GroupCall, number: 9}
+  - dmr: {id: cont1, name: Local, ring: false, type: GroupCall, number: 9}
   - dmr: {id: cont2, name: Regional, ring: false, type: GroupCall, number: 8}
   - dmr: {id: cont3, name: BB, ring: false, type: GroupCall, number: 2621}
   - dmr: {id: cont4, name: DL, ring: false, type: GroupCall, number: 262}
   - dmr: {id: cont5, name: BM APRS, ring: false, type: PrivateCall, number: 262999}
   - dmr: {id: cont6, name: HamRadioVillage, ring: false, type: GroupCall, number: 3177826}
 groupLists:
-  - {id: grp1, name: Lokal, contacts: [cont1, cont2, cont3]}
+  - {id: grp1, name: Local, contacts: [cont1, cont2, cont3]}
   - {id: grp2, name: DL, contacts: [cont4]}
   - {id: grp3, name: HamRadioVillage, contacts: [cont6]}
 channels:

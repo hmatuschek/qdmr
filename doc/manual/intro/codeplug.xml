@@ -241,7 +241,7 @@
 
 <para>
   In simplex operation, there is no repeater. That is, no instance that dictates a beat. To this 
-  end the choise of the time slot (TS) is irrelevant and usually TS1 is chosen.
+  end the choice of the time slot (TS) is irrelevant and usually TS1 is chosen.
 </para>
 
 <para>
@@ -367,7 +367,7 @@
   is set. If the channel <quote>DB0LDS TG9 TS2</quote> is selected and the PTT is pressed, 
   a call to TG9 is repeated only by the repeater DB0LDS. If the channel <quote>DB0LDS BB 
   TS2</quote> is selected and the PTT is pressed, a call to TG2621 is repeater by almost all 
-  repeaters in the region Berlin/Brandenbug. Therefor, chose a talk group that is sufficient
+  repeaters in the region Berlin/Brandenbug. Therefore, chose a talk group that is sufficient
   for you intended communication. 
 </para>
 
@@ -424,7 +424,7 @@
 
 <para>
   The option <glossterm>Privacy Group</glossterm> or <glossterm>Encryption Key</glossterm> refers
-  to a build-in method of encrypting the traffic. This is actually forbidden in amateur radio.
+  to a built-in method of encrypting the traffic. This is actually forbidden in amateur radio.
 </para>
 
 <para> 
@@ -439,7 +439,7 @@
   The option <glossterm>Talkaround</glossterm> allows to operate simplex on a repeater channel. 
   That is the radio transmits and receives on the repeater input frequency. This allows to bypass
   the repeater and to communicate directly with other participants on the same repeater channel.
-  Also this option makes litte sense in amateur radio.
+  Also this option makes little sense in amateur radio.
 </para>
 
 <para>

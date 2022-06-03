@@ -76,7 +76,7 @@ public:
 protected:
   /** Holds the severity of the issue. */
   Severity _severity;
-  /** Holds the item-stack (where the issue occured). */
+  /** Holds the item-stack (where the issue occurred). */
   QStringList _stack;
   /** Holds the text message. */
   QString _message;
@@ -96,7 +96,7 @@ public:
   /** Constructs a new message and puts it into the list of issues. */
   RadioLimitIssue &newMessage(RadioLimitIssue::Severity severity = RadioLimitIssue::Hint);
 
-  /** Retunrs the number of issues. */
+  /** Returns the number of issues. */
   int count() const;
   /** Returns the n-th issue. */
   const RadioLimitIssue &message(int n) const;
@@ -361,7 +361,7 @@ protected:
 /** Represents the limits for a @c ConfigItem instance.
  *
  * That is, it holds the limits for every property of the @c ConfigItem instance. This class
- * provides a initializer list constructor for easy programmatic contruction of limits.
+ * provides a initializer list constructor for easy programmatic construction of limits.
  *
  * @ingroup limits */
 class RadioLimitItem: public RadioLimitElement
@@ -381,7 +381,7 @@ public:
    * with the same name, @c false is returned.
    *
    * @param prop Specifies the name of the property.
-   * @param structure Specifies the structure declaration of the propery value.
+   * @param structure Specifies the structure declaration of the property value.
    * @returns @c false If a property with the same name is already defined. */
   bool add(const QString &prop, RadioLimitElement *structure);
 
@@ -646,11 +646,11 @@ public:
   /** Verifies the given configuration. */
   virtual bool verifyConfig(const Config *config, RadioLimitContext &context) const;
 
-  /** Returns @c true if the radio supportes a call-sign DB. */
+  /** Returns @c true if the radio supports a call-sign DB. */
   bool hasCallSignDB() const;
   /** Returns @c true if the call-sign DB is implemented. */
   bool callSignDBImplemented() const;
-  /** Retunrs the maximum number of entries in the call-sign DB. */
+  /** Returns the maximum number of entries in the call-sign DB. */
   unsigned numCallSignDBEntries() const;
 
 protected:

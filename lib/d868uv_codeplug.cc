@@ -489,7 +489,7 @@ D868UVCodeplug::D868UVCodeplug(QObject *parent)
   image(0).addElement(SCAN_BITMAP, SCAN_BITMAP_SIZE);
   // Radio IDs bitmaps
   image(0).addElement(RADIOID_BITMAP, RADIOID_BITMAP_SIZE);
-  // Messag bitmaps
+  // Message bitmaps
   image(0).addElement(MESSAGE_BYTEMAP, MESSAGE_BYTEMAP_SIZE);
   // Status messages
   image(0).addElement(STATUSMESSAGE_BITMAP, STATUSMESSAGE_BITMAP_SIZE);
@@ -1300,7 +1300,7 @@ D868UVCodeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
     ScanListElement scanl(data(addr));
     // Create scanlist
     ScanList *obj = ctx.get<ScanList>(i);
-    // Link scanlists immediately, all channels are defined allready
+    // Link scanlists immediately, all channels are defined already
     ctx.config()->scanlists()->add(obj); scanl.linkScanListObj(obj, ctx);
   }
   return true;

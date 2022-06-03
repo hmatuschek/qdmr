@@ -90,7 +90,7 @@ public:
     /** Sets the transmit time-out re-key delay in seconds. */
     virtual void setTXTimeOutRekeyDelay(unsigned delay);
 
-    /** Retunrs the admit criterion. */
+    /** Returns the admit criterion. */
     virtual Admit admitCriterion() const;
     /** Sets the admit criterion. */
     virtual void setAdmitCriterion(Admit admit);
@@ -229,7 +229,7 @@ public:
     ChannelBankElement(uint8_t *ptr, unsigned size);
 
   public:
-    /** Constrcutor. */
+    /** Constructor. */
     explicit ChannelBankElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ChannelBankElement();
@@ -237,7 +237,7 @@ public:
     /** Clears the bank. */
     void clear();
 
-    /** Retruns @c true if the channel is enabled. */
+    /** Returns @c true if the channel is enabled. */
     virtual bool isEnabled(unsigned idx) const ;
     /** Enable/disable a channel in the bank. */
     virtual void enable(unsigned idx, bool enabled);
@@ -356,7 +356,7 @@ public:
 
   /** Implements a base DTMF (analog) contact for Radioddity codeplugs.
    *
-   * Memmory layout of the DTMF contact:
+   * Memory layout of the DTMF contact:
    * @verbinclude radioddity_dtmfcontact.txt
    */
   class DTMFContactElement: public Element
@@ -394,7 +394,7 @@ public:
 
   /** Represents a zone within Radioddity codeplugs.
    *
-   * Memmory layout of the zone:
+   * Memory layout of the zone:
    * @verbinclude radioddity_zone.txt
    */
   class ZoneElement: public Element
@@ -441,7 +441,7 @@ public:
 
   /** Implements the base class for all zone banks of Radioddity codeplugs.
    *
-   * Memmory layout of the zone table/bank:
+   * Memory layout of the zone table/bank:
    * @verbinclude radioddity_zonebank.txt
    */
   class ZoneBankElement: public Element
@@ -451,7 +451,7 @@ public:
     ZoneBankElement(uint8_t *ptr, unsigned size);
 
   public:
-    /** Constuctor. */
+    /** Constructor. */
     explicit ZoneBankElement(uint8_t *ptr);
     /** Destructor. */
     ~ZoneBankElement();
@@ -459,7 +459,7 @@ public:
     /** Resets the bank. */
     void clear();
 
-    /** Retruns @c true if the channel is enabled. */
+    /** Returns @c true if the channel is enabled. */
     virtual bool isEnabled(unsigned idx) const ;
     /** Enable/disable a channel in the bank. */
     virtual void enable(unsigned idx, bool enabled);
@@ -469,7 +469,7 @@ public:
 
   /** Represents a base class for all group lists within Radioddity codeplugs.
    *
-   * Memmory layout of the RX group list:
+   * Memory layout of the RX group list:
    * @verbinclude radioddity_grouplist.txt
    */
   class GroupListElement: public Element
@@ -512,7 +512,7 @@ public:
 
   /** Implements a base class of group list memory banks for all Radioddity codeplugs.
    *
-   * Memmory layout of the group list table:
+   * Memory layout of the group list table:
    * @verbinclude radioddity_grouplistbank.txt
    */
   class GroupListBankElement: public Element
@@ -546,7 +546,7 @@ public:
 
   /** Implements the base class for scan lists of all Radioddity codeplugs.
    *
-   * Memmory layout of the scan list.
+   * Memory layout of the scan list.
    * @verbinclude radioddity_scanlist.txt
    */
   class ScanListElement: public Element
@@ -597,7 +597,7 @@ public:
     virtual bool hasMember(unsigned n) const;
     /** Returns @c true if the n-th member is selected channel. */
     virtual bool isSelected(unsigned n) const;
-    /** Retunrs the n-th member index. */
+    /** Returns the n-th member index. */
     virtual unsigned member(unsigned n) const;
     /** Sets the n-th member index. */
     virtual void setMember(unsigned n, unsigned idx);
@@ -651,12 +651,12 @@ public:
     /** Sets the hold time in ms. */
     virtual void setHoldTime(unsigned ms);
 
-    /** Retunrs the priority sample time in ms. */
+    /** Returns the priority sample time in ms. */
     virtual unsigned prioritySampleTime() const;
     /** Sets the priority sample time in ms. */
     virtual void setPrioritySampleTime(unsigned ms);
 
-    /** Constrcuts a @c ScanList object from this codeplug representation. */
+    /** Constructs a @c ScanList object from this codeplug representation. */
     virtual ScanList *toScanListObj(Context &ctx) const;
     /** Links a previously constructed @c ScanList object to the rest of the generic configuration. */
     virtual bool linkScanListObj(ScanList *lst, Context &ctx) const;
@@ -666,7 +666,7 @@ public:
 
   /** Implements the base class of scan lists banks for all Radioddity codeplugs.
    *
-   * Memmory layout of the scan list table.
+   * Memory layout of the scan list table.
    * @verbinclude radioddity_scanlistbank.txt
    */
   class ScanListBankElement: public Element
@@ -684,17 +684,17 @@ public:
     /** Resets the scan list bank. */
     void clear();
 
-    /** Retruns @c true if the n-th scan list is enabled. */
+    /** Returns @c true if the n-th scan list is enabled. */
     virtual bool isEnabled(unsigned n) const;
     /** Enable/disable n-th scan list. */
     virtual void enable(unsigned n, bool enabled);
-    /** Retunrs a pointer to the n-th scan list. */
+    /** Returns a pointer to the n-th scan list. */
     virtual uint8_t *get(unsigned n) const;
   };
 
   /** Implements the base class of general settings for all Radioddity codeplugs.
    *
-   * Memmory layout of the general settings
+   * Memory layout of the general settings
    * @verbinclude radioddity_generalsettings.txt
    */
   class GeneralSettingsElement: public Element
@@ -814,13 +814,13 @@ public:
     virtual bool allTonesDisabled() const;
     /** Disables/enables all tones. */
     virtual void disableAllTones(bool disable);
-    /** Returns @c true if reception is disabled for battery saveing. */
+    /** Returns @c true if reception is disabled for battery saving. */
     virtual bool batsaveRX() const;
-    /** Enables/disables battery saveing by disabling RX. */
+    /** Enables/disables battery saving by disabling RX. */
     virtual void enableBatsaveRX(bool enable);
-    /** Returns @c true if preable is disabled for battery saveing. */
+    /** Returns @c true if preable is disabled for battery saving. */
     virtual bool batsavePreamble() const;
-    /** Enables/disables battery saveing by disabling preamble. */
+    /** Enables/disables battery saving by disabling preamble. */
     virtual void enableBatsavePreamble(bool enable);
 
     /** Returns @c true if all LEDs are disabled. */
@@ -1175,7 +1175,7 @@ public:
     /** Enables/disables boot text. */
     virtual void enableBootText(bool enable);
 
-    /** Returns @c true if the boot passowrd is enabled. */
+    /** Returns @c true if the boot password is enabled. */
     virtual bool bootPasswordEnabled() const;
     /** Enables/disables the boot password. */
     virtual void enableBootPassword(bool enable);
@@ -1192,7 +1192,7 @@ public:
   class BootTextElement: public Element
   {
   protected:
-    /** Hiddden constructor. */
+    /** Hidden constructor. */
     BootTextElement(uint8_t *ptr, unsigned size);
 
   public:
@@ -1278,7 +1278,7 @@ public:
     /** Sets the privacy type. */
     virtual void setPrivacyType(PrivacyType type);
 
-    /** Retunrs @c true if the n-th "basic" key (32bit) is set.
+    /** Returns @c true if the n-th "basic" key (32bit) is set.
      * That is, if it is not filled with 0xff. */
     virtual bool isBasicKeySet(unsigned n) const;
     /** Returns the n-th "basic" key (32bit). */

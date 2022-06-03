@@ -41,7 +41,7 @@
 
 <para>
   If the radio finds a stronger repeater in the roaming zone, it automatically changes to that repeater.
-  The new repeater does not neccessarily needs to be the strongest in the zone. It only needs to be 
+  The new repeater does not necessarily needs to be the strongest in the zone. It only needs to be 
   stronger than the threshold. If no stronger repeater is found, the radio remains on the currently 
   selected one.
 </para>

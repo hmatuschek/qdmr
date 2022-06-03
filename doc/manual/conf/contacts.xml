@@ -20,7 +20,7 @@
 4       "Global"         Group   91       -
 5       "EU"             Group   92       -
 6       "Regional"       Group   8        -
-7       "Lokal"          Group   9        -
+7       "Local"          Group   9        -
 8       "Deutschland"    Group   262      -
 9       "Berlin/Brand"   Group   2621     -
 10      "Berlin City"    Group   26212    -
@@ -45,7 +45,7 @@
   column specifies the type of the contact. This must be one of the keywords "Private", "Group"
   or "All", meaning private, group or all-calls, respectively. The fourth column specifies the DMR ID
   for the contact. Please note, that an all-call requires the specific DMR ID 16777215 to work
-  as an all-call. The last colum specifies, whether an incoming call from this contact will cause a
+  as an all-call. The last column specifies, whether an incoming call from this contact will cause a
   ring-tone. Here "+" means enabled/yes and "-" disabled/no.
 </para>
 

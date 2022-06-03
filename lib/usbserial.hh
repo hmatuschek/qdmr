@@ -33,7 +33,7 @@ protected:
   explicit USBSerial(const USBDeviceDescriptor &descriptor, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
 public:
-  /** Destrutor. */
+  /** Destructor. */
   virtual ~USBSerial();
 
   /** If @c true, the device has been found and is open. */

@@ -22,17 +22,17 @@ class GPSSystem;
  *  <tr><th colspan="3">Channels</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>024C1500</td> <td>000200</td>      <td>Bitmap of 4000 channels, default 0x00, 0x00 padded.</td></tr>
- *  <tr><td>00800000</td> <td>max. 002000</td> <td>Channel bank 0 of upto 128 channels, see @c D578UVCodeplug::ChannelElement 64 b each. </td></tr>
+ *  <tr><td>00800000</td> <td>max. 002000</td> <td>Channel bank 0 of up to 128 channels, see @c D578UVCodeplug::ChannelElement 64 b each. </td></tr>
  *  <tr><td>00802000</td> <td>max, 002000</td> <td>Unknown data, Maybe extended channel information for channel bank 0?
  *    It is of exactly the same size as the channel bank 0. Mostly 0x00, a few 0xff.</td></tr>
- *  <tr><td>00840000</td> <td>max. 002000</td> <td>Channel bank 1 of upto 128 channels.</td></tr>
+ *  <tr><td>00840000</td> <td>max. 002000</td> <td>Channel bank 1 of up to 128 channels.</td></tr>
  *  <tr><td>00842000</td> <td>max. 002000</td> <td>Unknown data, related to CH bank 1?</td></tr>
  *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
- *  <tr><td>00FC0000</td> <td>max. 000800</td> <td>Channel bank 32, upto 32 channels.</td></tr>
+ *  <tr><td>00FC0000</td> <td>max. 000800</td> <td>Channel bank 32, up to 32 channels.</td></tr>
  *  <tr><td>00FC2000</td> <td>max. 000800</td> <td>Unknown data, related to CH bank 32.</td></tr>
  *  <tr><td>00FC0800</td> <td>000040</td>      <td>VFO A settings, see @c D578UVCodeplug::ChannelElement.</td></tr>
  *  <tr><td>00FC0840</td> <td>000040</td>      <td>VFO B settings, see @c D578UVCodeplug::ChannelElement.</td></tr>
- *  <tr><td>00FC2800</td> <td>000080</td>      <td>Unknonw data, related to VFO A+B?
+ *  <tr><td>00FC2800</td> <td>000080</td>      <td>Unknown data, related to VFO A+B?
  *    It is of exactly the same size as the two VFO channels. Mostly 0x00, a few 0xff. Same pattern as
  *    the unknown data associated with channel banks.</td></tr>
  *
@@ -43,7 +43,7 @@ class GPSSystem;
  *  <tr><td>01000000</td> <td>max. 01f400</td> <td>250 zones channel lists of 250 16bit indices each.
  *    0-based, little endian, default/padded=0xffff. Offset between channel lists 0x200, size of each list 0x1f4.</td></tr>
  *  <tr><td>02540000</td> <td>max. 001f40</td> <td>250 Zone names.
- *    Each zone name is upto 16 ASCII chars long and gets 0-padded to 32b.</td></tr>
+ *    Each zone name is up to 16 ASCII chars long and gets 0-padded to 32b.</td></tr>
  *
  *  <tr><th colspan="3">Roaming</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -67,7 +67,7 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">Analog Contacts</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>02900000</td> <td>000080</td>      <td>Index list of valid ananlog contacts.</td></tr>
+ *  <tr><td>02900000</td> <td>000080</td>      <td>Index list of valid analog contacts.</td></tr>
  *  <tr><td>02900100</td> <td>000080</td>      <td>Bytemap for 128 analog contacts.</td></tr>
  *  <tr><td>02940000</td> <td>max. 000180</td> <td>128 analog contacts. See @c AnytoneCodeplug::DTMFContactElement.
  *    As each analog contact is 24b, they do not align with the 16b transfer block-size. Hence
@@ -104,7 +104,7 @@ class GPSSystem;
  *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings, see @c D878UVCodeplug::AnalogAPRSSettingsElement.</td>
  *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings, see @c D878UVCodeplug::DMRAPRSSystemsElement.</td>
  *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings, see @c D878UVCodeplug::AnalogAPRSSettingsExtensionElement.</tr>
- *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, upto 60 chars ASCII, 0-padded.</td>
+ *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
  *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
  *    See @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
  *
@@ -136,7 +136,7 @@ class GPSSystem;
  *  <tr><td>025C0000</td> <td>000100</td> <td>4 analog quick-call settings.
  *    See @c AnytoneCodeplug::AnalogQuickCallElement.</td>
  *  <tr><td>025C0B00</td> <td>000010</td> <td>Status message bitmap.</td>
- *  <tr><td>025C0100</td> <td>000400</td> <td>Upto 32 status messages.
+ *  <tr><td>025C0100</td> <td>000400</td> <td>Up to 32 status messages.
  *    Length unknown, offset 0x20. ASCII 0x00 terminated and padded.</td>
  *  <tr><td>025C0500</td> <td>000470</td> <td>24 hot-key settings,
  *    see @c AnytoneCodeplug::HotKeyElement</td></tr>
@@ -147,7 +147,7 @@ class GPSSystem;
  *  <tr><td>024C1800</td> <td>000500</td> <td>32 DMR-Encryption keys,
  *    see @c D868UVCodeplug::dmr_encryption_key_t,
  *    40b each.</td></tr>
- *  <tr><td>024C4000</td> <td>004000</td> <td>Upto 256 AES encryption keys.
+ *  <tr><td>024C4000</td> <td>004000</td> <td>Up to 256 AES encryption keys.
  *    See @c D878UVCodeplug::AESEncryptionKeyElement.</td></tr>
  *
  *  <tr><th colspan="3">Misc</th></tr>
@@ -195,7 +195,7 @@ class D578UVCodeplug : public D878UVCodeplug
 public:
   /** Represents the actual channel encoded within the binary code-plug.
    *
-   * Memmory layout of encoded channel (size 0x40 bytes):
+   * Memory layout of encoded channel (size 0x40 bytes):
    * @verbinclude d578uv_channel.txt
    */
   class ChannelElement: public D878UVCodeplug::ChannelElement

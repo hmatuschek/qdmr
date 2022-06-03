@@ -137,7 +137,7 @@ dmrconf decode --radio=uv390 codeplug.dfu codeplug.yaml]]></programlisting>
 
 <para>
   To write a codeplug into the device, the <command>write</command> command is used. The codeplug
-  can be read from several formates. The extensible codeplug format (<filename>yaml</filename> 
+  can be read from several formats. The extensible codeplug format (<filename>yaml</filename> 
   file) as well as the old table based format (<filename>conf</filename> file). It is not possible
   to write binary codeplugs without decoding them first. Like for the <command>read</command> 
   command, <command>dmrconf</command> will detect the format based on the file extension or by 

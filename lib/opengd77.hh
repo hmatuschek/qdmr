@@ -63,7 +63,7 @@ protected:
 	Config *_config;
   /** The actual binary codeplug representation. */
   OpenGD77Codeplug _codeplug;
-  /** The acutal binary callsign DB representation. */
+  /** The actual binary callsign DB representation. */
   OpenGD77CallsignDB _callsigns;
 
 private:

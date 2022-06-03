@@ -2581,7 +2581,7 @@ RadioddityCodeplug::clear() {
   clearGeneralSettings();
   // Clear button settings
   clearButtonSettings();
-  // Clear messsages
+  // Clear messages
   clearMessages();
   // Clear emergency systems
   //clearEmergencySystems();

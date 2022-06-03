@@ -2,7 +2,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 00 | Action, 0=none                | Alarm duration in seconds     | TX duration in seconds        | RX duration in seconds        |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-04 | Channel index, 0-based, little endian                         | Channe select 1=current       | Alarm repeat 0=continuous     |
+04 | Channel index, 0-based, little endian                         | Channel select 1=current      | Alarm repeat 0=continuous     |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 08 | Voice switch BC dur in min+1  | Area switch BC dur in min+1   | VOX enable                    | RX alarm enable               |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+

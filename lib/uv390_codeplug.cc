@@ -666,7 +666,7 @@ UV390Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &er
     if (Channel *obj = chan.toChannelObj()) {
       config->channelList()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invlaid channel at index  " << i << ".";
+      errMsg(err) << "Invalid channel at index  " << i << ".";
       return false;
     }
   }
@@ -717,7 +717,7 @@ UV390Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &er
     if (DigitalContact *obj = cont.toContactObj()) {
       config->contacts()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invlaid contact at index " << i << ".";
+      errMsg(err) << "Invalid contact at index " << i << ".";
       return false;
     }
   }
@@ -759,7 +759,7 @@ UV390Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) 
     if (Zone *obj = zone.toZoneObj()) {
       config->zones()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invlaid zone at index " << i << ".";
+      errMsg(err) << "Invalid zone at index " << i << ".";
       return false;
     }
   }
@@ -816,7 +816,7 @@ UV390Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &
     if (RXGroupList *obj = glist.toGroupListObj(ctx)) {
       config->rxGroupLists()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invlaid RX group list at index " << i << ".";
+      errMsg(err) << "Invalid RX group list at index " << i << ".";
       return false;
     }
   }
@@ -867,7 +867,7 @@ UV390Codeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &e
     if (ScanList *obj = scan.toScanListObj(ctx)) {
       config->scanlists()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invlaid scan list at index " << i << ".";
+      errMsg(err) << "Invalid scan list at index " << i << ".";
       return false;
     }
   }
@@ -922,7 +922,7 @@ UV390Codeplug::createPositioningSystems(Config *config, Context &ctx, const Erro
     if (GPSSystem *obj = gps.toGPSSystemObj()) {
       config->posSystems()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invlaid GPS system at index " << i << ".";
+      errMsg(err) << "Invalid GPS system at index " << i << ".";
       return false;
     }
   }

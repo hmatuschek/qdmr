@@ -74,14 +74,14 @@
 
 <para>
   For this example, DM3MAT sends on the input frequency 431.9625 MHz to the repeater DB0LDS. The 
-  repeater transmits the received singal on its output frequency 439.5625 MHz. On that frequency,
+  repeater transmits the received signal on its output frequency 439.5625 MHz. On that frequency,
   DL2XYZ receives the original call.
 </para>
 
 <para>
   The <xref linkend="figIntroFMRepeater"/> shows a common repeater operation on UHF. Here, the 
   operator DM3MAT transmits its call to DL2XYZ not directly but on the input frequency of the 
-  repeater DL0LDS (431.9625 MHz). The repeater recevies the call and transmits it simultaneously
+  repeater DL0LDS (431.9625 MHz). The repeater receives the call and transmits it simultaneously
   on its output frequency (439.5625 MHz). This signal is then received by DL2XYZ. Consequently, 
   the call has reached its destination, although DM3MAT and DL2XYZ may not be able to communicate 
   directly. The reply of DL2XYZ to DM3MAT follows the same path. Here DL2XYZ transmits on the

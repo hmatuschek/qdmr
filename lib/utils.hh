@@ -1,5 +1,5 @@
 /** @defgroup util Utility functions and classes.
- * This module collects alls utility functions and classes. That is, functions to encode some
+ * This module collects all utility functions and classes. That is, functions to encode some
  * data and also classes implementing the DFU file format.
  */
 

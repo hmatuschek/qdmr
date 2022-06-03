@@ -354,7 +354,7 @@ Application::saveCodeplug() {
 
   if (filename.endsWith(".conf") || filename.endsWith("csv")){
     QMessageBox::critical(nullptr, tr("Please use new YAML format."),
-                          tr("Saveing in the old table-based conf format was disabled with 0.9.0. "
+                          tr("Saving in the old table-based conf format was disabled with 0.9.0. "
                              "Reading these files still works."));
     return;
   }

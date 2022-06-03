@@ -57,7 +57,7 @@ public:
   enum class Power {
     Max,  ///< Highest power setting (e.g. > 5W, if available).
     High, ///< High power setting (e.g, 5W).
-    Mid,  ///< Medium power setting (e.g., 2W, if avaliable)
+    Mid,  ///< Medium power setting (e.g., 2W, if available)
     Low,  ///< Low power setting (e.g., 1W).
     Min   ///< Lowest power setting (e.g., <1W, if available).
   };
@@ -83,7 +83,7 @@ public:
   /** (Re-)Sets the TX frequency of the channel in MHz. */
   bool setTXFrequency(double freq);
 
-  /** Retunrs @c true if the channel uses the global default power setting. */
+  /** Returns @c true if the channel uses the global default power setting. */
   bool defaultPower() const;
   /** Returns the power setting of the channel if the channel does not use the default power. */
   Power power() const;
@@ -112,7 +112,7 @@ public:
 
   /** Returns @c true if the VOX is disabled. */
   bool voxDisabled() const;
-  /** Retunrs @c true if the VOX is specified by the global default value. */
+  /** Returns @c true if the VOX is specified by the global default value. */
   bool defaultVOX() const;
   /** Returns the VOX level [0-10]. */
   unsigned vox() const;
@@ -144,7 +144,7 @@ public:
   /** Sets the TyT channel extension. */
   void setTyTChannelExtension(TyTChannelExtension *ext);
 
-  /** Retunrs the extension for commercial features. */
+  /** Returns the extension for commercial features. */
   CommercialChannelExtension *commercialExtension() const;
   /** Sets the commercial channel extension. */
   void setCommercialExtension(CommercialChannelExtension *ext);
@@ -370,7 +370,7 @@ public:
   GroupListReference *groupList();
   /** Sets the reference to the group list. */
   void setGroupList(GroupListReference *ref);
-  /** Retruns the RX group list for the channel. */
+  /** Returns the RX group list for the channel. */
   RXGroupList *groupListObj() const;
   /** (Re-)Sets the RX group list for the channel. */
   bool setGroupListObj(RXGroupList *rxg);
@@ -488,9 +488,9 @@ public:
 
   /** Gets the channel at the specified index. */
   Channel *channel(int idx) const;
-  /** Finds a digial channel with the given frequencies, time slot and color code. */
+  /** Finds a digital channel with the given frequencies, time slot and color code. */
   DigitalChannel *findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, unsigned cc) const;
-  /** Finds an analog channel with the given frequeny. */
+  /** Finds an analog channel with the given frequency. */
   AnalogChannel *findAnalogChannelByTxFreq(double freq) const;
 
 public:

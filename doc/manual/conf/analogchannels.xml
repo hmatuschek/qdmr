@@ -83,7 +83,7 @@
   frequency (e.g., in case of DX conditions). 
 </para>
 <para>
-  The 13th (Width) colum specifies the
+  The 13th (Width) column specifies the
   bandwidth of the channel in kHz. This can be 12.5kHz narrow-band or 25kHz wide-band.
   Finally, the 14th column specifies the APRS system ID to use or "-" for <emphasis>APRS 
   disabled</emphasis>.

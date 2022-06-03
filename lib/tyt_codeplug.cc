@@ -1112,7 +1112,7 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) {
   else if (0xffff == priorityChannel1Index())
     lst->setPrimaryChannel(nullptr);
   else
-    logWarn() << "Cannot deocde reference to priority channel index " << priorityChannel1Index()
+    logWarn() << "Cannot decode reference to priority channel index " << priorityChannel1Index()
                  << " in scan list '" << name() << "'.";
 
   if (0 == priorityChannel2Index())
@@ -1122,7 +1122,7 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) {
   else if (0xffff == priorityChannel2Index())
     lst->setSecondaryChannel(nullptr);
   else
-    logWarn() << "Cannot deocde reference to secondary priority channel index " << priorityChannel2Index()
+    logWarn() << "Cannot decode reference to secondary priority channel index " << priorityChannel2Index()
               << " in scan list '" << name() << "'.";
 
   if (0 == txChannelIndex())
@@ -1132,7 +1132,7 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) {
   else if (0xffff == txChannelIndex())
     lst->setRevertChannel(nullptr);
   else
-    logWarn() << "Cannot deocde reference to transmit channel index " << txChannelIndex()
+    logWarn() << "Cannot decode reference to transmit channel index " << txChannelIndex()
                 << " in scan list '" << name() << "'.";
 
   for (int i=0; ((i<31) && memberIndex(i)); i++) {

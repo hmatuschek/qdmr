@@ -27,7 +27,7 @@ public:
    * @verbinclude opengd77_callsign_db_entry.txt */
   struct __attribute__((packed)) userdb_entry_t {
     uint32_t number;                    ///< DMR ID stored in BCD little-endian.
-    char name[15];                      ///< Call or name, upto 15 ASCII chars, 0x00 padded.
+    char name[15];                      ///< Call or name, up to 15 ASCII chars, 0x00 padded.
 
     /** Constructor. */
     userdb_entry_t();

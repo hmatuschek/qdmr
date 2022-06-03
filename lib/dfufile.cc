@@ -25,7 +25,7 @@ typedef struct __attribute((packed)) {
 typedef struct __attribute((packed)) {
   uint8_t signature[6];      ///< Target signature, fixed "Target"
   uint8_t alternate_setting; ///< Alternate setting for image.
-  uint32_t is_named;         ///< Bool, if targed is named;
+  uint32_t is_named;         ///< Bool, if target is named;
   uint8_t name[255];         ///< Target name (0-padded?).
   uint32_t size;             ///< Size of complete image excl. prefix in big endian.
   uint32_t n_elements;       ///< Number of elements in image in big endian.
