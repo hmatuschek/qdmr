@@ -277,7 +277,7 @@
     <glossterm>Transmit Timeout</glossterm> <acronym>TOT</acronym>
     <glossdef>
       <para>
-        Specifies the time of continuos transmission, after which the transmission is interrupted 
+        Specifies the time of continuous transmission, after which the transmission is interrupted 
         automatically. This prevents the accidental blocking of a repeater or talk group by 
         transmitting continuously. 
       </para>

@@ -1610,7 +1610,7 @@ D878UVCodeplug::AnalogAPRSSettingsElement::linkAPRSSystem(APRSSystem *sys, Conte
     ch->setPower(power());
     ch->setTXTone(txTone());
     ch->setBandwidth(AnalogChannel::Bandwidth::Wide);
-    logInfo() << "No matching APRS chanel found for TX frequency " << frequency()/1e6
+    logInfo() << "No matching APRS channel found for TX frequency " << frequency()/1e6
               << "MHz, create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);
   }
@@ -2407,7 +2407,7 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
 
   // replaces D868UVCodeplug::createGPSSystems
 
-  // Before creating any GPS/APRS systems, get global auto TX intervall
+  // Before creating any GPS/APRS systems, get global auto TX interval
   AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTING));
   unsigned pos_intervall = aprs.autoTXInterval();
 

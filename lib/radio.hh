@@ -2,7 +2,7 @@
  * This module collects all classes are device specific.
  *
  * That is, implementing device specific configurations, aka codeplugs as well as the specific
- * communication whith these radios.
+ * communication with these radios.
  */
 
 #ifndef RADIO_HH
@@ -39,7 +39,7 @@ public:
     StatusDownload,        ///< Downloading codeplug.
     StatusUpload,          ///< Uploading codeplug.
     StatusUploadCallsigns, ///< Uploading codeplug.
-    StatusError            ///< An error occured.
+    StatusError            ///< An error occurred.
   } Status;
 
 public:

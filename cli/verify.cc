@@ -38,7 +38,7 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
 
   Config config;
 
-  // Determin type by ending or flag
+  // Determine type by ending or flag
   if (parser.isSet("csv") || (filename.endsWith(".conf") || filename.endsWith(".csv"))) {
     QTextStream stream(&file);
     QString errorMessage;

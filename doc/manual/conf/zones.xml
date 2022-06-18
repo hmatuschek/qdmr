@@ -37,7 +37,7 @@
 <para>
   The zone table starts with the keyword "Zone" and ends with an empty line. The remaining
   keywords (Name and Channels) are ignored but are part of the self-documentation of the
-  configuration file. The first colum specifies an unique identifier for each zone. This can be
+  configuration file. The first column specifies an unique identifier for each zone. This can be
   any integer as log as it is unique. The second (Name) column specifies the name of the zone as a
   string. Any string is valid here. The third column specifies the VFO (either A or B) for that
   zone. This allows to specify different channels for the two VFOs of the radio. For example, it

@@ -37,7 +37,7 @@
  *
  * @section detectExample A example for AnyTone devices
  * This example tries to detect an AnyTone device and reads the binary codeplug from it. Once the
- * codeplug is read, it is decoded into its generic device independet representation (@c Config).
+ * codeplug is read, it is decoded into its generic device independent representation (@c Config).
  *
  * @code
  * #include "libdmrconf/usbdevice.hh"
@@ -186,7 +186,7 @@ protected:
 };
 
 
-/** Base class for all radio iterface descriptors representing a unique interface to a
+/** Base class for all radio interface descriptors representing a unique interface to a
  * connected radio.
  *
  * This class extends the @c USBDeviceInfo by some information to identify a USB uniquely. This is

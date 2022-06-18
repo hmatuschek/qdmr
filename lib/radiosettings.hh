@@ -74,7 +74,7 @@ public:
   /** Sets the default channel power. */
   void setPower(Channel::Power power);
 
-  /** Retuns @c true if VOX is disabled by default. */
+  /** Returns @c true if VOX is disabled by default. */
   bool voxDisabled() const;
   /** Returns the default VOX level [0-10], 0=disabled. */
   unsigned vox() const;

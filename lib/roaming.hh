@@ -7,8 +7,8 @@
 
 /** Represents a RoamingZone within the abstract device configuration.
  *
- * A roaming zone collects a set of repeaters that act as alternatives to eachother. When a selected
- * repeater gets out of range, another one might be found automaticall from within the roaming zone.
+ * A roaming zone collects a set of repeaters that act as alternatives to each other. When a selected
+ * repeater gets out of range, another one might be found automatically from within the roaming zone.
  *
  * @ingroup config */
 class RoamingZone : public ConfigObject
@@ -37,7 +37,7 @@ public:
   /** Clears the zone list. */
   void clear();
 
-  /** Retunrs the digital channel, which is the member at index @c idx (0-based).
+  /** Returns the digital channel, which is the member at index @c idx (0-based).
    * @param idx Specifies the index of the member channel. */
   DigitalChannel *channel(int idx) const;
   /** Adds a channel to the roaming zone.
@@ -50,9 +50,9 @@ public:
   /** Removes the given channel from the roaming zone. */
   bool remChannel(DigitalChannel *ch);
 
-  /** Retruns the list of digital channels in this roaming zone. */
+  /** Returns the list of digital channels in this roaming zone. */
   const DigitalChannelRefList *channels() const;
-  /** Retruns the list of digital channels in this roaming zone. */
+  /** Returns the list of digital channels in this roaming zone. */
   DigitalChannelRefList *channels();
 
 protected:
@@ -70,7 +70,7 @@ class DefaultRoamingZone: public RoamingZone
   Q_OBJECT
 
 protected:
-  /** Hidden consturctor.
+  /** Hidden constructor.
    * Use @c DefaultRoamingZone::get() to obtain an instance. */
   explicit DefaultRoamingZone(QObject *parent=nullptr);
 

@@ -116,7 +116,7 @@ protected:
 };
 
 
-/** Represents the list of configued DMR IDs (radio IDs) within the abstract config.
+/** Represents the list of configured DMR IDs (radio IDs) within the abstract config.
  * There must always be at least one valid DMR ID. The first (index 0) ID is always the default
  * DMR ID of the radio.
  *
@@ -126,7 +126,7 @@ class RadioIDList: public ConfigObjectList
   Q_OBJECT
 
 public:
-  /** Contructor. */
+  /** Constructor. */
   explicit RadioIDList(QObject *parent=nullptr);
 
   void clear();

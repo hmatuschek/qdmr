@@ -29,7 +29,7 @@
  *  <tr><td>0x02dd0</td> <td>0x02f88</td> <td>0x01b8</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x02f88</td> <td>0x03388</td> <td>0x0400</td> <td>DTMF contacts, see RadioddityCodeplug::DTMFContactElement.</td></tr>
  *  <tr><td>0x03388</td> <td>0x03780</td> <td>0x03f8</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c RadioddityCodeplug::ChannelBankElement, @c OpenGD77Codeplug::ChannelElement.</td></tr>
+ *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 channels (bank 0), see @c RadioddityCodeplug::ChannelBankElement, @c OpenGD77Codeplug::ChannelElement.</td></tr>
  *  <tr><td>0x05390</td> <td>0x06000</td> <td>0x0c70</td> <td>??? Unknown ???</td></tr>
  *  <tr><th colspan="4">Second EEPROM segment 0x07500-0x13000</th></tr>
  *  <tr><td>0x07500</td> <td>0x07518</td> <td>0x0018</td> <td>??? Unknown ???</td></tr>
@@ -47,7 +47,7 @@
  *  <tr><td>0x00000</td> <td>0x011a0</td> <td>0x11a0</td> <td>??? Unknown ???</td></tr>
  *  <tr><th colspan="4">Second Flash segment 0x7b000-0x8ee60</th></tr>
  *  <tr><td>0x7b000</td> <td>0x7b1b0</td> <td>0x01b0</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x7b1b0</td> <td>0x87620</td> <td>0xc470</td> <td>Remaining 896 chanels (bank 1-7), see @c RadioddityCodeplug::ChannelBankElement and @c OpenGD77Codeplug::ChannelElement.</td></tr>
+ *  <tr><td>0x7b1b0</td> <td>0x87620</td> <td>0xc470</td> <td>Remaining 896 channels (bank 1-7), see @c RadioddityCodeplug::ChannelBankElement and @c OpenGD77Codeplug::ChannelElement.</td></tr>
  *  <tr><td>0x87620</td> <td>0x8d620</td> <td>0x6000</td> <td>1024 contacts, see @c OpenGD77Codeplug::ContactElement.</td></tr>
  *  <tr><td>0x8d620</td> <td>0x8e2a0</td> <td>0x0c80</td> <td>76 RX group lists, see @c GD77Codeplug::GroupListBankElement, @c GD77Codeplug::GroupListElement.</td></tr>
  *  <tr><td>0x8e2a0</td> <td>0x8ee60</td> <td>0x0bc0</td> <td>??? Unknown ???</td></tr>

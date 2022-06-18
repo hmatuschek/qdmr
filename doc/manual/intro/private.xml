@@ -12,7 +12,7 @@
 <para>
   Private calls allow to call other participants directly without interfering with other 
   calls (except for using the repeater). In the introduction into DMR above, the private call 
-  over several repeaters has been described. I consider this aspect of DMR particularily 
+  over several repeaters has been described. I consider this aspect of DMR particularly 
   interesting. With the exception of TG 8 &amp; 9, private and group calls are transparent 
   with respect to the repeaters used. It simply does not matter which repeaters are actually
   used to establish a connection. Therefore, I do not need ot know where the other 

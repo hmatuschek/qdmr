@@ -45,7 +45,7 @@ class CRC32;
  * @endcode
  *
  * Each image section consists of a image prefix followed by several element sections. The image
- * prefix consists of a 6byte signature containting the ASCII string "Target" followed by a
+ * prefix consists of a 6byte signature containing the ASCII string "Target" followed by a
  * single byte indicating the so-called "alternate settings" field, usually 0x01. The 32bit field
  * "is named" just indicates that the 255 byte name field is set (i.e., 0x01 in little endian).
  * The next field contains the 32 bit size of the image excluding the image prefix in little endian.
@@ -81,7 +81,7 @@ public:
 		Element();
     /** Constructs an element for the given address and of the given size. */
 		Element(uint32_t addr, uint32_t size);
-    /** Copy construtor. */
+    /** Copy constructor. */
 		Element(const Element &other);
     /** Copying assignment. */
 		Element &operator= (const Element &other);

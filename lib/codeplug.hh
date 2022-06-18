@@ -41,7 +41,7 @@ public:
 
   /** Represents the abstract base class of all codeplug elements. That is a memory region within
    * the codeplug that encodes a specific element. E.g., channels, contacts, zones, etc.
-   * This class provies some helper methods to access specific members of the element.
+   * This class provides some helper methods to access specific members of the element.
    * @since 0.9.0 */
   class Element
   {
@@ -73,65 +73,65 @@ public:
     /** Clears a specific bit at the given byte-offset. */
     void clearBit(unsigned offset, unsigned bit);
 
-    /** Reads a 2bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 2bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt2(unsigned offset, unsigned bit) const;
-    /** Stores a 2bit unsinged integer at the given byte- and bit-offset. */
+    /** Stores a 2bit unsigned integer at the given byte- and bit-offset. */
     void setUInt2(unsigned offset, unsigned bit, uint8_t value);
 
-    /** Reads a 3bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 3bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt3(unsigned offset, unsigned bit) const;
-    /** Stores a 3bit unsinged integer at the given byte- and bit-offset. */
+    /** Stores a 3bit unsigned integer at the given byte- and bit-offset. */
     void setUInt3(unsigned offset, unsigned bit, uint8_t value);
 
-    /** Reads a 4bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 4bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt4(unsigned offset, unsigned bit) const;
-    /** Stores a 4bit unsinged integer at the given byte- and bit-offset. */
+    /** Stores a 4bit unsigned integer at the given byte- and bit-offset. */
     void setUInt4(unsigned offset, unsigned bit, uint8_t value);
 
-    /** Reads a 5bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 5bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt5(unsigned offset, unsigned bit) const;
     /** Stores a 5bit iunsinged nteger at the given byte- and bit-offset. */
     void setUInt5(unsigned offset, unsigned bit, uint8_t value);
 
-    /** Reads a 6bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 6bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt6(unsigned offset, unsigned bit) const;
-    /** Stores a 6bit unsinged integer at the given byte- and bit-offset. */
+    /** Stores a 6bit unsigned integer at the given byte- and bit-offset. */
     void setUInt6(unsigned offset, unsigned bit, uint8_t value);
 
-    /** Reads a 8bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 8bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt8(unsigned offset) const;
-    /** Reads a 8bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 8bit unsigned integer at the given byte- and bit-offset. */
     void setUInt8(unsigned offset, uint8_t value);
     /** Reads a 8bit signed integer at the given byte- and bit-offset. */
     int8_t getInt8(unsigned offset) const;
     /** Reads a 8bit signed integer at the given byte- and bit-offset. */
     void setInt8(unsigned offset, int8_t value);
 
-    /** Reads a 16bit big-endian unsinged integer at the given byte-offset. */
+    /** Reads a 16bit big-endian unsigned integer at the given byte-offset. */
     uint16_t getUInt16_be(unsigned offset) const;
-    /** Reads a 16bit little-endian unsinged integer at the given byte-offset. */
+    /** Reads a 16bit little-endian unsigned integer at the given byte-offset. */
     uint16_t getUInt16_le(unsigned offset) const;
-    /** Stores a 16bit big-endian unsinged integer at the given byte-offset. */
+    /** Stores a 16bit big-endian unsigned integer at the given byte-offset. */
     void setUInt16_be(unsigned offset, uint16_t value);
-    /** Stores a 16bit little-endian unsinged integer at the given byte-offset. */
+    /** Stores a 16bit little-endian unsigned integer at the given byte-offset. */
     void setUInt16_le(unsigned offset, uint16_t value);
 
-    /** Reads a 24bit big-endian unsinged integer at the given byte-offset. */
+    /** Reads a 24bit big-endian unsigned integer at the given byte-offset. */
     uint32_t getUInt24_be(unsigned offset) const;
-    /** Reads a 24bit little-endian unsinged integer at the given byte-offset. */
+    /** Reads a 24bit little-endian unsigned integer at the given byte-offset. */
     uint32_t getUInt24_le(unsigned offset) const;
-    /** Stores a 24bit big-endian unsinged integer at the given byte-offset. */
+    /** Stores a 24bit big-endian unsigned integer at the given byte-offset. */
     void setUInt24_be(unsigned offset, uint32_t value);
-    /** Stores a 24bit little-endian unsinged integer at the given byte-offset. */
+    /** Stores a 24bit little-endian unsigned integer at the given byte-offset. */
     void setUInt24_le(unsigned offset, uint32_t value);
 
-    /** Reads a 32bit big-endian unsinged integer at the given byte-offset. */
+    /** Reads a 32bit big-endian unsigned integer at the given byte-offset. */
     uint32_t getUInt32_be(unsigned offset) const;
-    /** Reads a 32bit little-endian unsinged integer at the given byte-offset. */
+    /** Reads a 32bit little-endian unsigned integer at the given byte-offset. */
     uint32_t getUInt32_le(unsigned offset) const;
-    /** Stores a 32bit big-endian unsinged integer at the given byte-offset. */
+    /** Stores a 32bit big-endian unsigned integer at the given byte-offset. */
     void setUInt32_be(unsigned offset, uint32_t value);
-    /** Stores a 32bit little-endian unsinged integer at the given byte-offset. */
+    /** Stores a 32bit little-endian unsigned integer at the given byte-offset. */
     void setUInt32_le(unsigned offset, uint32_t value);
 
     /** Reads a 2-digit (1-byte/8bit) BDC value in big-endian at the given byte-offset. */
@@ -157,15 +157,15 @@ public:
     /** Stores a 8-digit (4-byte/32bit) BDC value in little-endian at the given byte-offset. */
     void setBCD8_le(unsigned offset, uint32_t value);
 
-    /** Reads upto @c maxlen ASCII chars at the given byte-offset using @c eos as the string termination char. */
+    /** Reads up to @c maxlen ASCII chars at the given byte-offset using @c eos as the string termination char. */
     QString readASCII(unsigned offset, unsigned maxlen, uint8_t eos=0x00) const;
-    /** Stores upto @c maxlen ASCII chars at the given byte-offset using @c eos as the string termination char.
+    /** Stores up to @c maxlen ASCII chars at the given byte-offset using @c eos as the string termination char.
      * The stored string gets padded with @c eos to @c maxlen. */
     void writeASCII(unsigned offset, const QString &txt, unsigned maxlen, uint8_t eos=0x00);
 
-    /** Reads upto @c maxlen unicode chars at the given byte-offset using @c eos as the string termination char. */
+    /** Reads up to @c maxlen unicode chars at the given byte-offset using @c eos as the string termination char. */
     QString readUnicode(unsigned offset, unsigned maxlen, uint16_t eos=0x0000) const;
-    /** Stores upto @c maxlen unicode chars at the given byte-offset using @c eos as the string termination char.
+    /** Stores up to @c maxlen unicode chars at the given byte-offset using @c eos as the string termination char.
      * The stored string gets padded with @c eos to @c maxlen. */
     void writeUnicode(unsigned offset, const QString &txt, unsigned maxlen, uint16_t eos=0x0000);
 

@@ -124,7 +124,7 @@ protected:
 };
 
 
-/** Represents an APRS system wihtin the generic config.
+/** Represents an APRS system within the generic config.
  * @ingroup conf */
 class APRSSystem: public PositioningSystem
 {
@@ -194,7 +194,7 @@ public:
   /** Sets the revert channel reference. */
   void setRevert(AnalogChannelReference *ref);
 
-  /** Retruns the destination call. */
+  /** Returns the destination call. */
   const QString &destination() const;
   /** Returns the destination SSID. */
   unsigned destSSID() const;
@@ -208,7 +208,7 @@ public:
   /** Sets the source call and SSID. */
   void setSource(const QString &call, unsigned ssid);
 
-  /** Retruns the APRS path. */
+  /** Returns the APRS path. */
   const QString &path() const;
   /** Sets the APRS path. */
   void setPath(const QString &path);
@@ -218,7 +218,7 @@ public:
   /** Sets the map icon. */
   void setIcon(Icon icon);
 
-  /** Retunrs the optional message. */
+  /** Returns the optional message. */
   const QString &message() const;
   /** Sets the optional APRS message text. */
   void setMessage(const QString &msg);

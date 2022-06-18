@@ -18,7 +18,7 @@ contacts:
   - dmr: {id: cont3, name: DL, ring: false, type: GroupCall, number: 262}
   - dmr: {id: cont4, name: DL MM, ring: false, type: GroupCall, number: 263}
   - dmr: {id: cont5, name: Regional, ring: false, type: GroupCall, number: 8}
-  - dmr: {id: cont6, name: Lokal, ring: false, type: GroupCall, number: 9}
+  - dmr: {id: cont6, name: Local, ring: false, type: GroupCall, number: 9}
   - dmr: {id: cont7, name: Bln/Brb, ring: false, type: GroupCall, number: 2621}
   - dmr: {id: cont8, name: Sa/Th, ring: false, type: GroupCall, number: 2629}
   - dmr: {id: cont9, name: SA/MV, ring: false, type: GroupCall, number: 2620}

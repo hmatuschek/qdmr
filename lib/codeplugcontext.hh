@@ -79,7 +79,7 @@ public:
   /** Gets an APRS system for the specified index or @c nullptr if not defined. */
   APRSSystem *getAPRSSystem(int index) const;
 
-  /** Retruns @c true if the given roaming zone index is defined. */
+  /** Returns @c true if the given roaming zone index is defined. */
   bool hasRoamingZone(int index) const;
   /** Associates the given roaming zone with the given index. */
   bool addRoamingZone(RoamingZone *zone, int index);

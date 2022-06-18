@@ -38,13 +38,13 @@ public:
   /** Clears this zone. */
   void clear();
 
-  /** Retruns the list of channels for VFO A in this zone. */
+  /** Returns the list of channels for VFO A in this zone. */
   const ChannelRefList *A() const;
-  /** Retruns the list of channels for VFO A in this zone. */
+  /** Returns the list of channels for VFO A in this zone. */
   ChannelRefList* A();
-  /** Retruns the list of channels for VFO B in this zone. */
+  /** Returns the list of channels for VFO B in this zone. */
   const ChannelRefList *B() const;
-  /** Retruns the list of channels for VFO B in this zone. */
+  /** Returns the list of channels for VFO B in this zone. */
   ChannelRefList* B();
 
   /** Returns the AnyTone extension. */

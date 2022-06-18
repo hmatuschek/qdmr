@@ -35,7 +35,7 @@ ZoneListView::onAddZone() {
 
 void
 ZoneListView::onRemZone() {
-  // Check if there is any zones seleced
+  // Check if there is any zones selected
   if (! ui->listView->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete zone"),

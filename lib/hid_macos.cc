@@ -46,7 +46,7 @@ HIDevice::HIDevice(const USBDeviceDescriptor &desc, const ErrorStack &err, QObje
   // Add the HID manager to the main run loop
   IOHIDManagerScheduleWithRunLoop(_HIDManager, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
 
-  // Open the HID mangager
+  // Open the HID manager
   IOReturn IOReturn = IOHIDManagerOpen(_HIDManager, kIOHIDOptionsTypeNone);
   if (IOReturn != kIOReturnSuccess) {
     errMsg(err) << "Cannot open HID manager for USB device "

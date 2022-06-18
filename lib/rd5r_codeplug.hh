@@ -20,7 +20,7 @@ class Channel;
  *
  * This difference looks like, as if the firmware code for the contacts stems from a different
  * device or was developed by a different engineer. Moreover, the message list again, uses yet
- * another method. Here a simple counter preceds the messages, indicating how many valid messages
+ * another method. Here a simple counter precedes the messages, indicating how many valid messages
  * there are. All in all, a rather inconsistent way of representing variable length lists in the
  * codeplug. I would guess, that over time, different people/teams worked on different revisions
  * of the firmware. It must have been a real nightmare to Serge Vakulenko reverse-engineering this
@@ -50,7 +50,7 @@ class Channel;
  *  <tr><td>0x01788</td> <td>0x02f88</td> <td>0x1800</td> <td>256 contacts, see @c RadioddityCodeplug::ContactElement.</td></tr>
  *  <tr><td>0x02f88</td> <td>0x03388</td> <td>0x0400</td> <td>32 DTMF contacts, see @c RadioddityCodeplug::DTMFContactElement.</td></tr>
  *  <tr><td>0x03388</td> <td>0x03780</td> <td>0x03f8</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c RadioddityCodeplug::ChannelBankElement
+ *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 channels (bank 0), see @c RadioddityCodeplug::ChannelBankElement
  *                                                            and @c RD5RCodeplug::ChannelElement.</td></tr>
  *  <tr><td>0x05390</td> <td>0x07518</td> <td>0x2188</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x07518</td> <td>0x07538</td> <td>0x0020</td> <td>Boot settings, see @c RadioddityCodeplug::BootSettingsElement.</td></tr>
@@ -65,7 +65,7 @@ class Channel;
  *  <tr><td>0x08000</td> <td>0x08010</td> <td>0x0010</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x08010</td> <td>0x0af10</td> <td>0x2f00</td> <td>250 zones, see @c RadioddityCodeplug::ZoneBankElement.</td></tr>
  *  <tr><td>0x0af10</td> <td>0x0b1b0</td> <td>0x02a0</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x0b1b0</td> <td>0x17620</td> <td>0xc470</td> <td>Remaining 896 chanels (bank 1-7), see @c RadioddityCodeplug::ChannelBankElement
+ *  <tr><td>0x0b1b0</td> <td>0x17620</td> <td>0xc470</td> <td>Remaining 896 channels (bank 1-7), see @c RadioddityCodeplug::ChannelBankElement
  *                                                            and @c RD5RCodeplug::ChannelElement.</td></tr>
  *  <tr><td>0x17620</td> <td>0x1cd10</td> <td>0x56f0</td> <td>250 scan lists, see @c RadioddityCodeplug::ScanListBankElement</td></tr>
  *  <tr><td>0x1cd10</td> <td>0x1d620</td> <td>0x0910</td> <td>??? Unknown ???</td></tr>

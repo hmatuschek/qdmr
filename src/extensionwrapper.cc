@@ -105,7 +105,7 @@ ExtensionProxy::mapToSource(const QModelIndex &proxyIndex) const {
           proxyIndex.row(), proxyIndex.column(), mapToSource(proxyIndex.parent()));
   }
 
-  // If index is an imediate child of root -> map only extensions
+  // If index is an immediate child of root -> map only extensions
   if (_indexP2S.contains(proxyIndex.row()))
     return sourceModel()->index(
           _indexP2S[proxyIndex.row()], proxyIndex.column(), QModelIndex());
@@ -450,7 +450,7 @@ PropertyWrapper::rowCount(const QModelIndex &parent) const {
     const QMetaObject *meta = pobj->metaObject();
     return (meta->propertyCount() - QObject::staticMetaObject.propertyCount());
   } else if (ConfigObjectList *plst = list(parent)) {
-    // If parent is list -> return elment count.
+    // If parent is list -> return element count.
     return plst->count();
   }
 

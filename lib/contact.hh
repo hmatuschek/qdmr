@@ -179,7 +179,7 @@ protected:
 /** Represents the list of contacts within the abstract radio configuration.
  *
  * A special feature of this list, is that DTMF and digital contacts can be accessed by their own
- * unique index altough they are held within this single list. Most radios manage digital and
+ * unique index although they are held within this single list. Most radios manage digital and
  * DTMF contacts in separate lists, hence a means to iterate over and get indices of digital and
  * DTMF contacts only is needed.
  *

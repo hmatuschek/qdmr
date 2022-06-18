@@ -6,7 +6,7 @@
 
 /** Implements the interfact to a radio running the Open GD77 firmware.
  *
- * This interface uses a USB serial-port to comunicate with the device. To find the corresponding
+ * This interface uses a USB serial-port to communicate with the device. To find the corresponding
  * port, the device-specific VID @c 0x1fc9 and PID @c 0x0094 are used. Hence no udev rules are
  * needed to access these devices. The user, however, should be a member of the @c dialout group
  * to get access to the serial interfaces.
@@ -23,7 +23,7 @@ public:
   static const uint32_t FLASH  = 1;
 
 public:
-  /** Constructs a new interface to a specifc OpenGD77 device.  */
+  /** Constructs a new interface to a specific OpenGD77 device.  */
   explicit OpenGD77Interface(const USBDeviceDescriptor &descr,
                              const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
@@ -46,7 +46,7 @@ public:
   bool reboot(const ErrorStack &err=ErrorStack());
 
 public:
-  /** Retruns some information about this interface. */
+  /** Returns some information about this interface. */
   static USBDeviceInfo interfaceInfo();
   /** Tries to find all interfaces connected AnyTone radios. */
   static QList<USBDeviceDescriptor> detect();
