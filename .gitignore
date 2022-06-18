@@ -1,6 +1,16 @@
 /doc/html/
 /doc/latex/
 /doc/reveng/cotre/*.pcapng.gz
+/doc/reveng/gd77/*.pcapng.gz
+/doc/manual/manual.pdf
+/doc/manual/manual_combined.xml
+/doc/manual/intro/fig/*.aux
+/doc/manual/intro/fig/*.log
+/doc/manual/intro/fig/*.png
+/doc/manual/html/*.html
+/doc/manual/html/manual.xml
+/doc/manual/html/docbook.css
+/doc/manual/html/fig
 /parts/
 /prime/
 /snap/

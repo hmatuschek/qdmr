@@ -1,5 +1,5 @@
 /** @defgroup util Utility functions and classes.
- * This module collects alls utility functions and classes. That is, functions to encode some
+ * This module collects all utility functions and classes. That is, functions to encode some
  * data and also classes implementing the DFU file format.
  */
 
@@ -11,6 +11,7 @@
 
 #include "signaling.hh"
 #include "gpssystem.hh"
+#include <QGeoCoordinate>
 
 /** Decodes the unicode string stored in @c data of size @c size. The @c fill code also defines the
  * end-of-string symbol.
@@ -77,6 +78,7 @@ bool validDTMFNumber(const QString &text);
 /** Formats a frequency in MHz passed as double. */
 QString format_frequency(double MHz);
 
+QString aprsicon2config(APRSSystem::Icon icon);
 QString aprsicon2name(APRSSystem::Icon icon);
 APRSSystem::Icon name2aprsicon(const QString &name);
 char aprsicon2iconcode(APRSSystem::Icon icon);
@@ -93,5 +95,8 @@ int levDist(const QString &source, const QString &target,
 uint32_t align_size(uint32_t size, uint32_t block);
 /** Decreases the address to be aligned with the given block size. */
 uint32_t align_addr(uint32_t addr, uint32_t block);
+
+QGeoCoordinate loc2deg(const QString &loc);
+QString deg2loc(const QGeoCoordinate &coor);
 
 #endif // UTILS_HH

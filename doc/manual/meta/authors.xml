@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<authorgroup xmlns="http://docbook.org/ns/docbook" 
+             xmlns:xlink="http://www.w3.org/1999/xlink" 
+             xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<author>
+  <personname>
+    <firstname>Hannes</firstname>
+    <surname>Matuschek</surname>
+  </personname>
+  <email>dm3mat@darc.de</email>
+  <affiliation>
+    <shortaffil>OV Y07</shortaffil>
+    <orgname>OV Y07, DARC</orgname>
+  </affiliation>
+</author>  
+
+</authorgroup>

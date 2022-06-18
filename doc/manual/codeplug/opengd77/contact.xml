@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="extOpenGD77Contact"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>DMR contact extension</title>
+</info>
+
+<para>
+  This extensions allows to specify some DMR contact attributes for devices running the OpenGD77 
+  firmware. This extension is only applicable to DMR (digital) contacts. 
+</para>
+
+<example>
+  <title></title>
+  <programlisting><![CDATA[contacts:
+  - dmr:
+    name: Example contact 
+    number: 1234567
+    openGD77:
+      timeSlotOverride: TS1
+]]></programlisting>
+</example>
+
+<para>
+  The OpenGD77 contact extension is a mapping named <token>openGD77</token>. It contains the 
+  device specific settings for that DMR contact.
+</para>
+
+
+<section>
+<info>
+  <title>Contact attributes</title>
+</info>
+
+<para>
+  For now, there is only one attribute allowing to override the time slot of a channel whenever 
+  this contact is selected as the destination contact for that channel.
+</para>
+
+<variablelist>
+  <title>Channel extension fields</title>
+  <varlistentry>
+    <term><token>timeSlotOverride</token></term>
+    <listitem>
+      <para>
+        OpenGD77 allows to override the time slot settings for each channel on the bases of
+        the selected transmit contact. If the contact has a time slot override set, this time 
+        slot is used instead of the channel time slot. This attribute is either <token>None</token>,
+        <token>TS1</token> or <token>TS2</token>. If <token>None</token> is set, the channel time slot 
+        will not be overridden.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+</section>

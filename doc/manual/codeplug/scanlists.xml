@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="cpScanLists"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Scan lists</title>
+</info>
+
+<para>
+  Scan lists are simple lists of channels to scan. A scan list might be associated with a channel.
+</para>
+
+<para>
+  As an example, consider the following scan list:
+</para>
+
+<example pgwide="1">
+  <title></title>
+  <programlisting><![CDATA[scanLists:
+  - id: scan1
+    name: KW
+    channels: [ch4, ch5, ch76, ch77, ch97, ch102, ch68, ch112] 
+]]></programlisting>
+</example>
+
+<para>
+  This scan list has the ID <emphasis>scan1</emphasis>, the name <emphasis>KW</emphasis> and contains several channels 
+  (both analog and digital).
+</para>
+
+<variablelist>
+  <title>Scan list fields</title>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>
+        Specifies the ID of the scan list. This ID can then be used to reference this scan 
+        list in <xref linkend="cpChannels"/>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>
+        Specifies the name of the scan list. Any string is valid here.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>primary</token></term>
+    <listitem>
+      <para>
+        Specifies the primary priority channel. Usually this channel is scanned very frequently. 
+        If set, this must be a reference to a channel. If the tag <token>!selected</token> is used here,
+        the channel from which the scan got started is used as the primary priority channel.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>secondary</token></term>
+    <listitem>
+      <para>
+        Specifies the secondary priority channel. Usually this channel is scanned frequently. 
+        If set, this must be a reference to a channel. If the tag <token>!selected</token> is used here,
+        the channel from which the scan got started is used as the secondary priority channel.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>revert</token></term>
+    <listitem>
+      <para>
+        Specifies the revert channel. That is, the channel to transmit on irrespective of the 
+        current channel being scanned. If set, this must be a reference to a channel. If the tag 
+        <token>!selected</token> is used here, the channel from which the scan got started is used 
+        as the transmit channel. If omitted the radio will transmit on the currently scanned 
+        channel.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>channels</token></term>
+    <listitem>
+      <para>Specifies the list of channels to scan. Must be a list of channel IDs.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<chapter xml:id="introduction" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Introduction</title>
+
+  <abstract>
+    <para>
+      The chapter tries to provide an introduction to <acronym>DMR</acronym>
+      (digital mobile radio) targeted at the unexperienced operator and anyone
+      interested in this topic. I try to hide details until it gets absolutely 
+      necessary to explain them. The majority of DMR introductions I've found, 
+      are more or less extensive glossaries (if you are interested in that, see 
+      <xref linkend="glossary"/>). They are hard to comprehend, unless one has at 
+      least some experience with DMR. 
+    </para>
+    <para>
+      The perceived complexity of DMR comes from its origin as a radio standard
+      for commercial applications at large events and companies (i.e., 
+      <link xlink:href="https://en.wikipedia.org/wiki/Trunked_radio_system">trunked
+      radio</link>). Therefore, I will first describe an example how DMR is used commercially
+      before I describe how it is used in amateur radio. I hope that this approach will make some
+      of the weird terms and concepts of DMR clearer.
+    </para>
+  </abstract>
+</info>
+
+<xi:include href="foreknowledge.xml"/>
+<xi:include href="origin.xml"/>
+<xi:include href="simplex.xml"/>
+<xi:include href="local.xml"/>
+<xi:include href="private.xml"/>
+<xi:include href="textmessages.xml"/>
+<xi:include href="talkgroup.xml"/>
+<xi:include href="roaming.xml"/>
+<xi:include href="technicalbackground.xml"/>
+<xi:include href="codeplug.xml"/>
+<xi:include href="networks.xml"/>
+
+</chapter>

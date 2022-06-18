@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <IOKit/hid/IOHIDManager.h>
+#include "errorstack.hh"
+#include "radiointerface.hh"
 
 /** Implements the HID radio interface MacOS X API.
  * @ingroup rif */
@@ -11,9 +13,18 @@ class HIDevice: public QObject
 	Q_OBJECT
 
 public:
+  /** Specialization to address a HI device uniquely. */
+  class Descriptor: public USBDeviceDescriptor
+  {
+  public:
+    /** Constructor from interface info, bus number and device address. */
+    Descriptor(const USBDeviceInfo &info, uint32_t locationId, uint16_t device);
+  };
+
+public:
   /** Opens a connection to the device with given vendor and product ID. */
-	HIDevice(int vid, int pid, QObject *parent=nullptr);
-  /** Destrutor. */
+	HIDevice(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+  /** Destructor. */
 	virtual ~HIDevice();
 
   /** Returns @c true if the connection was established. */
@@ -23,11 +34,18 @@ public:
    * @param data Pointer to the command/data to send.
    * @param nbytes The number of bytes to send.
    * @param rdata Pointer to receive buffer.
-   * @param rlength Size of receive buffer. */
-	bool hid_send_recv(const unsigned char *data, unsigned nbytes, unsigned char *rdata, unsigned rlength);
+   * @param rlength Size of receive buffer.
+   * @param err The stack to put error messages on. */
+	bool hid_send_recv(const unsigned char *data, unsigned nbytes,
+                     unsigned char *rdata, unsigned rlength,
+                     const ErrorStack &err=ErrorStack());
 
   /** Close connection to device. */
 	void close();
+
+public:
+  /** Finds all HID interfaces with the specified VID/PID combination. */
+  static QList<USBDeviceDescriptor> detect(uint16_t vid, uint16_t pid);
 
 protected:
   /** Internal callback for response data. */
@@ -49,7 +67,6 @@ protected:
 	unsigned char _receive_buf[42];
 	/** Receive result. */
 	volatile int _nbytes_received = 0;
-  QString _errorMessage;
 };
 
 #endif // HID_MACOS_HH

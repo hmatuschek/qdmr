@@ -1,0 +1,13 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+\input{repeater}
+\begin{document}
+ \begin{tikzpicture}[every node/.style={scale=.8}]
+  \user{U1}{0,0}{DM3MAT};
+  \activerepeater{R1}{3,1}{DL0LDS};
+  \activeuser{U2}{6,0}{DL2XYZ};
+  \path[->] (U2) edge node[above,rotate=-17] {$431.9625 MHz$} (R1) ;
+  \path[->] (R1) edge node[above,rotate=17] {$439.5625 MHz$} (U1);
+ \end{tikzpicture}
+\end{document}

@@ -6,6 +6,7 @@
 #include "config.h"
 #include "detect.hh"
 #include "verify.hh"
+#include "radioinfo.hh"
 #include "readcodeplug.hh"
 #include "writecodeplug.hh"
 #include "writecallsigndb.hh"
@@ -20,20 +21,20 @@ int main(int argc, char *argv[])
 {
   // Install log handler to stderr.
   QTextStream out(stderr);
-  StreamLogHandler *handler = new StreamLogHandler(out, LogMessage::WARNING);
+  StreamLogHandler *handler = new StreamLogHandler(out, LogMessage::WARNING, true);
   Logger::get().addHandler(handler);
 
   // Instantiate core application
   QCoreApplication app(argc, argv);
   app.setApplicationName("dmrconf");
-  app.setOrganizationName("dm3mat");
+  app.setOrganizationName("DM3MAT");
   app.setOrganizationDomain("dm3mat.darc.de");
   app.setApplicationVersion(VERSION_STRING);
 
   QCommandLineParser parser;
   parser.setApplicationDescription(
         QCoreApplication::translate(
-          "main", "Up- and download codeplugs for cheap Chineese DMR radios."));
+          "main", "Up- and download codeplugs for cheap Chinese DMR radios."));
 
   parser.addHelpOption();
   parser.addVersionOption();
@@ -46,6 +47,10 @@ int main(int argc, char *argv[])
                      QCoreApplication::translate("main", "Up- and download codeplugs in CSV format.")
                    });
   parser.addOption({
+                     {"y", "yaml"},
+                     QCoreApplication::translate("main", "Up- and download codeplugs in extensible YAML format.")
+                   });
+  parser.addOption({
                      {"b", "bin"},
                      QCoreApplication::translate("main", "Up- and download codeplugs in binary format.")
                    });
@@ -53,6 +58,13 @@ int main(int argc, char *argv[])
                      {"m", "manufacturer"},
                      QCoreApplication::translate("main", "Given file is manufacturer codeplug file. "
                      " Can be used with 'decode'.")
+                   });
+  parser.addOption({
+                     {"D","device"},
+                     QCoreApplication::translate("main", "Specifies the device to use to talk to "
+                     "the radio. If not specified, the dmrconf will try to detect the radio "
+                     "automatically. Please note, that for some radios the device must be specified."),
+                     QCoreApplication::translate("main", "DEVICE")
                    });
   parser.addOption({
                      {"R", "radio"},
@@ -63,13 +75,13 @@ int main(int argc, char *argv[])
                    });
   parser.addOption({
                      {"i", "id"},
-                     QCoreApplication::translate("main", "Specifes the DMR id."),
+                     QCoreApplication::translate("main", "Specifies the DMR id."),
                      QCoreApplication::translate("main", "ID")
                    });
   parser.addOption({
                      {"n", "limit"},
                      QCoreApplication::translate("main", "Limits several amonuts, depending on the "
-                     "context. When encoding/writing the callsign db, this option speicifies the "
+                     "context. When encoding/writing the callsign db, this option specifies the "
                      "maximum number of callsigns to encode."),
                      QCoreApplication::translate("main", "N")
                    });
@@ -89,24 +101,61 @@ int main(int argc, char *argv[])
   parser.addOption(QCommandLineOption(
                      "ignore-limits",
                      QCoreApplication::translate("main", "Disables some limit checks.")));
-
+  parser.addOption(QCommandLineOption(
+                     "list-radios",
+                     QCoreApplication::translate("main", "Lists all supported radios including the "
+                                                 "keys to be used with the --radio option.")));
   parser.addPositionalArgument(
         "command", QCoreApplication::translate(
           "main", "Specifies the command to perform. Either detect, verify, read, write, "
           "write-db, encode, encode-db, decode or info. Consult the man-page of dmrconf for a "
-          "detailed descriptoin of these commands."),
+          "detailed description of these commands."),
         QCoreApplication::translate("main", "[command]"));
 
   parser.addPositionalArgument(
         "file", QCoreApplication::translate(
-          "main", "The code-plug file. Either binary (extension .dfu) or text/csv (extension .conf "
-          "or .csv). The format can be forced using the --csc or --binary options."),
+          "main", "The code-plug file. Either binary (extension .dfu), text/csv (extension .conf "
+          "or .csv) or YAML format (extension .yaml). The format can be forced using the --csv, "
+          "--yaml or --binary options."),
         QCoreApplication::translate("main", "[filename]"));
 
   parser.process(app);
 
+  if (parser.isSet("list-radios")) {
+    QList<RadioInfo> radios = RadioInfo::allRadios();
+    QTextStream out(stdout);
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << " Key";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << "Name";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(60); out << "Manufacturer";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "\n";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(18); out << "-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "+-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(18); out << "-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "+-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(60); out << "-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "\n";
+    foreach (RadioInfo radio, radios) {
+      out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << (" " +radio.key());
+      out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
+      out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << radio.name();
+      out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
+      out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << radio.manufactuer() << "\n";
+    }
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(18); out << "-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "+-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(18); out << "-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "+-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(60); out << "-";
+    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "\n";
+    out.flush();
+    return 0;
+  }
+
   if (1 > parser.positionalArguments().size())
     parser.showHelp(-1);
+
   if (parser.isSet("verbose"))
     handler->setMinLevel(LogMessage::DEBUG);
 

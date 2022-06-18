@@ -28,8 +28,8 @@ UserDatabase::User::User(const QJsonObject &obj)
   // pass...
 }
 
-uint
-UserDatabase::User::distance(uint id) const {
+unsigned
+UserDatabase::User::distance(unsigned id) const {
   // Fix number of digits
   int a = this->id, b = id;
   int ad = std::ceil(std::log10(a));
@@ -48,7 +48,7 @@ UserDatabase::User::distance(uint id) const {
 /* ********************************************************************************************* *
  * Implementation of UserDatabase
  * ********************************************************************************************* */
-UserDatabase::UserDatabase(uint updatePeriodDays, QObject *parent)
+UserDatabase::UserDatabase(unsigned updatePeriodDays, QObject *parent)
   : QAbstractTableModel(parent), _user(), _network()
 {
   connect(&_network, SIGNAL(finished(QNetworkReply*)),
@@ -78,7 +78,7 @@ bool
 UserDatabase::load(const QString &filename) {
   QFile file(filename);
   if (! file.open(QIODevice::ReadOnly)) {
-    QString msg = QString("Cannot open user list '%1': ").arg(filename).arg(file.errorString());
+    QString msg = QString("Cannot open user list '%1': %2").arg(filename).arg(file.errorString());
     logError() << msg;
     emit error(msg);
     return false;
@@ -128,10 +128,28 @@ UserDatabase::load(const QString &filename) {
 }
 
 void
-UserDatabase::sortUsers(uint id) {
+UserDatabase::sortUsers(unsigned id) {
   // Sort repeater w.r.t. distance to ID
   std::stable_sort(_user.begin(), _user.end(), [id](const User &a, const User &b){
     return a.distance(id) < b.distance(id);
+  });
+}
+
+void
+UserDatabase::sortUsers(const QSet<unsigned> &ids) {
+  if (0 == ids.count())
+    return;
+
+  // Sort repeater w.r.t. distance to each ID
+  std::stable_sort(_user.begin(), _user.end(), [ids](const User &a, const User &b){
+    QSet<unsigned>::const_iterator id=ids.begin();
+    unsigned min_a = a.distance(*id), min_b = b.distance(*id);
+    id++;
+    for (; id!=ids.end(); id++) {
+      min_a = std::min(min_a, a.distance(*id));
+      min_b = std::min(min_b, b.distance(*id));
+    }
+    return min_a < min_b;
   });
 }
 
@@ -175,7 +193,7 @@ UserDatabase::downloadFinished(QNetworkReply *reply) {
   reply->deleteLater();
 }
 
-uint
+unsigned
 UserDatabase::dbAge() const {
   QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/user.json";
   QFileInfo info(path);

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="cpRoaming"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+
+<info>
+  <title>Roaming Zones</title>
+</info>
+
+<para>
+  Roaming zones are collections of channels, that are scanned for the strongest signal to 
+  maintain connection to a particular network or talk group. Consequently, they usually group
+  channels with the same talk group.
+</para>
+
+<para>
+  As an example, consider the following roaming zone:
+</para>
+
+<example pgwide="1">
+  <title></title>
+  <programlisting><![CDATA[roaming:
+  - id: roam1
+    name: Berlin/Brand
+    channels: [ch3, ch8, ch14, ch18, ch20, ch24, ch26, ch30, ch34, ch38, ch42, ch50] 
+]]></programlisting>
+</example>
+
+<para>
+  This zone has the ID <emphasis>roam1</emphasis> and the name <emphasis>Berlin/Brand</emphasis>. This group collects 
+all channels that provide access to the <emphasis>Berlin/Brandenburg</emphasis> talk group.
+</para>
+<variablelist>
+  <title>Roaming zone fields</title>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>Specifies the ID of the roaming zone. This ID can then be used to refer to this 
+        zone. Any unique string is valid here.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>Specifies the name of the roaming zone. Any string is valid here.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>channels</token></term>
+    <listitem>
+      <para>Specifies the member channels for this roaming zone. This must be a list of 
+        references to digital channels.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</section>

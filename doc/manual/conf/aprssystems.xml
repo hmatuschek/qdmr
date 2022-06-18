@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="confAPRS"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>APRS Systems</title>
+</info>
+
+<para>
+  The APRS system list specifies the various information for transmitting your position using analog 
+  APRS. As digital channels may use either DMR or analog APRS for position reporting, this list shares 
+  a namespace with the GPS system list. That is, the ID must be unique across both lists.
+</para>
+
+<informalexample pgwide="1">
+  <programlisting><![CDATA[APRS Name                Channel Period Source      Destination Path                   Icon        Message
+2    "APRS APAT81"       103     300    DM3MAT-7    APAT81-0    "WIDE1-1WIDE2-1"       "Jogger"    "Y07" 
+]]></programlisting>
+</informalexample>
+
+<para>
+  The first column specifies the ID of the APRS positioning system. This must be unique across APRS and DMR 
+  position reporting systems. The second column specifies the name of the system as a string. the third 
+  column specifies the revert channel. That is, the analog channel the APRS information is transmitted on.
+  The 4th column specifies the period with which the position gets reported. The 5th and 6th columns specify 
+  the source and destination calls and SSIDs respectively. The 7th column specifies the path string. This is 
+  list of calls and SSIDs stored as a string without any separators. The 8th column specifies the map 
+  <link xlink:href="http://www.aprs.org/symbols/symbols-new.txt">icon name</link>. The name does not 
+  need to match the official icon name exactly. The icon is identified as the closes matching icon name with 
+  respect to the <link xlink:href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein 
+  distance</link> between the given and all icon names. That is, <emphasis>jogger</emphasis> and 
+  <emphasis>jogging</emphasis> will select the same icon. Finally, the 9th column specifies a freely 
+  selectable text to be send with the position report.
+</para>
+
+</section>

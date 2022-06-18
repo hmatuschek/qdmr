@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="cpChannels"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Channels</title>
+</info>
+
+<para>
+  The <token>channels</token> list contains all channels defined within the codeplug. Usually, 
+  DMR radios support at least two different channel types. Digital channels (DMR) and analog 
+  channels (FM). To distinguish these two types, each entry of the channel list contains a 
+  map with a single entry. The key specifies the type (either <token>digital</token> or 
+  <token>analog</token>) while the value contains the actual channel definition.
+</para>
+
+<para>
+  As an example consider the following two channel definitions:
+</para>
+
+<example pgwide="1">
+  <title>Channel definition</title>
+  <programlisting><![CDATA[channels:
+  - digital:
+      id: ch5
+      name: BB DB0LDS TS2
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      power: High
+      timeout: 0
+      rxOnly: false
+      vox: !default
+      scanList: scan1
+      admit: ColorCode
+      colorCode: 1
+      timeSlot: TS2
+      groupList: grp2
+      contact: cont7
+      radioID: !default
+      roaming: !default
+  - analog:
+      id: ch76
+      name: DB0LDS
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      power: High
+      timeout: 0
+      rxOnly: false
+      vox: !default
+      squelch: !default
+      admit: Always
+      bandwidth: Narrow
+      rxTone: {ctcss: 67}
+      txTone: {ctcss: 67} 
+]]></programlisting>
+</example>
+
+<para>
+  The first channel is a digital (DMR) channel. Its ID is <emphasis>ch5</emphasis> and its name 
+  <emphasis>BB DB0LDS TS2</emphasis>. The second channel is an analog channel (FM) with ID <emphasis>ch76</emphasis> 
+  and name <emphasis>DB0LDS</emphasis>. Please note, that there are some common attributes like 
+  <token>rxFrequency</token>, <token>txFrequency</token>, <token>power</token>, <token>timeout</token>,
+  <token>rxOnly</token>, <token>vox</token> and <token>scanList</token> but also type-specific settings like 
+  <token>timeSlot</token> or <token>rxTone</token> which apply only to digital and analog 
+  channels respectively.
+</para>
+
+
+<section>
+<info>
+  <title>Common attributes</title>
+</info>
+
+<para>
+  The following attributes are common for all channel types.
+</para>
+
+<variablelist>
+  <title>Common channel fields</title>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>
+        Specifies the ID of the channel, this can be used later to reference this channel in 
+        <xref linkend="cpZones"/> and <xref linkend="cpScanLists"/>. Any unique string is 
+        valid here.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>
+        Specifies the name of the channel. Any string is valid here.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>rxFrequency</token>, <token>txFrequency</token></term>
+    <listitem>
+      <para>
+        Specifies the RX or TX frequency in MHz. Any floating point number is valid here.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>power</token></term>
+    <listitem>
+      <para>
+        Specifies the transmit power of the channel. Must be one of <token>Min</token>, 
+        <token>Low</token>, <token>Mid</token>, <token>High</token> or <token>Max</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>timeout</token></term>
+    <listitem>
+      <para>
+        Specifies the transmit timeout in seconds. Any integer is valid here. Omitting this 
+        field or setting it to <code>0</code> will disable the timeout. Setting it to 
+        <token>!default</token>, the global transmit timeout will be used. See 
+        <xref linkend="yamlRadioSettings"/>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>rxOnly</token></term>
+    <listitem>
+      <para>
+        If set to <token>true</token>, the channel can only receive. Omitting it or setting it
+        to <token>false</token> will allow transmission on the channel.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>vox</token></term>
+    <listitem>
+      <para>
+        Specifies the VOX sensitivity for this channel. If set to <token>!default</token>, 
+        the global VOX sensitivity will be used. See <xref linkend="yamlRadioSettings"/>. 
+        Omitting this value or setting it to 0, will disable the VOX for this channel.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>scanList</token></term>
+    <listitem>
+      <para>
+        Specifies the optional scan list for this channel. If set, this must be a reference to a 
+        <xref linkend="cpScanLists"/>.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+
+<section>
+<info>
+  <title>Digital channel attributes</title>
+</info>
+
+<para>
+  The following attributes apply only to digital (DMR) channels.
+</para>
+
+<variablelist>
+  <title>Digital channel fields</title>
+  <varlistentry>
+    <term><token>admit</token></term>
+    <listitem>
+      <para>
+        Specifies the admit criterion for the channel. This must be one of <token>Always</token>, 
+        <token>Free</token> or <token>ColorCode</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>colorCode</token></term>
+    <listitem>
+      <para>
+        Specifies the color code of the channel, any number between 0-16 is valid here.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>timeSlot</token></term>
+    <listitem>
+      <para>Specifies the time slot of the channel. Must be one of <token>TS1</token> or 
+        <token>TS2</token>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>groupList</token></term>
+    <listitem>
+      <para>
+        Specifies the RX group list for this channel. This must be a reference to a group list.
+        See <xref linkend="cpGroupLists"/> above.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>contact</token></term>
+    <listitem>
+      <para>
+        Specifies the default transmit contact. This must be a reference to a digital contact.
+        See <xref linkend="cpContacts"/> above. If omitted, no default transmit contact is 
+        associated with the channel. Some radios require all channels to have a transmit contact.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>aprs</token></term>
+    <listitem>
+      <para>
+        Specifies the positioning system for this channel. If set, this must be a reference 
+        to a positioning system (DMR or APRS). See <xref linkend="cpAPRS"/> below.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>roaming</token></term>
+    <listitem>
+      <para>
+        Specifies the roaming zone for this channel. If set it must be a reference to a roaming
+        zone. See <xref linkend="cpRoaming"/> below. To use the default roaming zone here, consider
+        using the <code>!default</code> tag instead of a direct reference to a specific zone. If 
+        omitted, no roaming zone (also not the default one) is associated with the channel.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>radioID</token></term>
+    <listitem>
+      <para>
+        Specifies the radio ID for this channel. If set, it must be a reference to one of the radio
+        DMR IDs. See <xref linkend="cpRadioIDs"/>. To use the default radio ID here, consider using 
+        the <code>!default</code> tag instead of a direct reference to a specific ID. If omitted 
+        the default radio ID is assumed.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+
+<section>
+<info>
+  <title>Analog channel attributes</title>
+</info>
+
+<para>
+  The following attributes apply only to analog (FM) channels.
+</para>
+
+<variablelist>
+  <title>Analog channel fields</title>
+  <varlistentry>
+    <term><token>admit</token></term>
+    <listitem>
+      <para>
+        Specifies the admit criterion for the channel. Must be one of <token>Always</token>,
+        <token>Free</token> or <token>Tone</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>squelch</token></term>
+    <listitem>
+      <para>
+        Specifies the squelch level for the channel. Must be an integer in the range of 
+        [1-10]. If set to 0, the squelch gets disabled. If set to <token>!default</token>, the 
+        global squelch setting is used. See <xref linkend="yamlRadioSettings"/> above.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>bandwidth</token></term>
+    <listitem>
+      <para>
+        Specifies the bandwidth of the channel. Must either be <token>Narrow</token> or 
+        <token>Wide</token> for 12.5kHz or 25kHz respectively.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>rxTone</token></term>
+    <listitem>
+      <para>Specifies the receive sub-tone setting for this channel. That is, the squelch will
+        only open when a certain subtone is received along with the signal. As there are two 
+        common subtone standards, this attribute is a map with a single entry. The key specifies
+        the type (either <token>ctcss</token> or <token>dcs</token>) while the value specifies the 
+        actual subtone. For CTCSS tones, the value is the subtone frequency in Hz. For DCS it is
+        the code number as an integer. For inverted DCS codes, use negative numbers.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>txTone</token></term>
+    <listitem>
+      <para>Specifies the transmit sub-tone setting for this channel. For details see 
+        <token>rxTone</token> above.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>aprs</token></term>
+    <listitem>
+      <para>Specifies the APRS positioning system of this channel. If set, it must be a 
+        reference to an analog APRS system.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+</section>

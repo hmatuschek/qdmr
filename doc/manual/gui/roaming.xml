@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<section xml:id="guiRoaming"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Roaming</title>
+</info>
+
+<para>
+  Roaming is a feature that allows DMR radios to select an alternative repeater once you leave 
+  the range of the currently selected one. To do that, you have to specify so-called 
+  <glossterm>Roaming zone</glossterm>s. Within these zones, you collect all repeaters that provide 
+  access to a particular talk group. When roaming is enabled, the radio will check periodically 
+  whether the current repeater is still reachable. If not, the strongest repeater from the 
+  selected roaming zone will then be selected instead. 
+</para>
+
+<para>
+  The <guilabel>Roaming</guilabel> tab collects all defined roaming zones. 
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-roamingzones.png" width="13cm" align="center"/></imageobject>
+    <textobject>Screen-shot of the list of roaming zones.</textobject>
+  </mediaobject>
+ <title>List of roaming zones.</title>
+</screenshot>
+
+<para>
+  Double-clicking on the roaming zone or clicking on the <guibutton>Add Roaming Zone</guibutton> 
+  button will open the <guilabel>Roaming Zone Editor</guilabel>.
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-edit-roamingzone.png" width="5cm" align="center"/></imageobject>
+    <textobject>Screen-shot of the edit-roaming-zone dialog.</textobject>
+  </mediaobject>
+ <title>The roaming-zone editing dialog.</title>
+</screenshot>
+
+<para>
+  Here you can edit the name of the roaming zone as well as adding the channels that are part of this zone.
+</para>
+
+<para>
+  If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
+  <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
+  the device specific settings for the roaming zone. 
+</para>
+</section>

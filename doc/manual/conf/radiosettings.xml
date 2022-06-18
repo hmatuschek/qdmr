@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="confRadioSettings"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>General configuration</title>  
+</info>
+
+
+<para>
+  The general configuration settings of some radios can be overly complex with a huge amount of
+  options. The vast majority of these settings, however, are useless for ham-radio purposes. Thus
+  the possible settings for the general configuration of the radio are reduced to 6 key-value
+  pairs.
+</para>
+
+<para>
+  The DMR ID of cause, is absolutely necessary and specifies your personal DMR number. Keep in
+  mind, that you do NOT need to get a unique DMR ID for each radio you own! All your radios can
+  share the same DMR ID. The DMR ID is specified using the "ID" keyword as
+</para>
+
+<informalexample>
+  <programlisting language="ini"><![CDATA[ID: 12345678
+]]></programlisting>
+</informalexample>
+
+<para>
+  In rare situations, where you actually need several different radio IDs (e.g., if you use the 
+  same radio for HAM and commercial applications), you may specify them as a comma separated list.
+  The first ID in the list will be handled as the default ID for the radio. 
+</para>
+
+<para>
+  The radio name is a string, that the radio may display somewhere on the screen. It does not have
+  any effect on the behavior of the radio or gets transmitted. You may set this entry to your
+  call-sign. For example:
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[Name: "DM3MAT" 
+]]></programlisting>
+</informalexample>
+
+<para>
+  The two intro lines might be shown on the screen of your radio on startup. You may set these
+  to any string you like. They are also cosmetic and don't have any effect on the behavior of
+  your radio. For example
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[IntroLine1: "Hello"
+IntroLine2: "MY0CALL"   
+]]></programlisting>
+</informalexample>
+
+<para>
+  The microphone sensitivity/amplification can also be set (on some radios) using the MicLevel
+  entry. This entry is a number between 1 and 10. The larger the level, the larger the
+  microphone amplification. This value may vary heavily from model to model.
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[MicLevel: 2
+]]></programlisting>
+</informalexample>
+
+<para>
+  The "Speech" option enables the speech synthesis of the radio if supported. Possible settings
+  are "on" and "off".
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[# Speech-synthesis ('On' or 'Off'):
+Speech: Off 
+]]></programlisting>
+</informalexample>
+
+</section>

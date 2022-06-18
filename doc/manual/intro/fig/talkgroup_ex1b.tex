@@ -1,0 +1,22 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+\input{repeater}
+\begin{document}
+  \begin{tikzpicture}[every node/.style={scale=.8}]
+   \user{u1}{ 0,0}{DM3MAT};
+   \user{u2}{ 2,0}{DL1XYZ};	
+   \user{u3}{ 6,0}{DL2XYZ};	
+   \draw[dotted] (7,4) -- (7,-1);
+   \activeuser{u4}{10,0}{I/DL3XYZ};
+   \activerepeater{R1}{1,3}{DB0ABC, TG2621};
+   \activerepeater{R2}{5,3}{DB0DEF, TG2621};
+   \activerepeater{R3}{9,3}{I0ABC, (TG2621)};
+   \path[->] (u4) edge node[above,rotate=-70]{GC: TG2621} (R3);
+   \path[->] (R1) edge node[above,rotate=70]{GC: TG2621} (u1);
+   \path[->] (R1) edge node[above,rotate=-70]{GC: TG2621} (u2);
+   \path[->] (R2) edge node[above,rotate=-70]{GC: TG2621} (u3);
+   \path[->] (R3) edge[bend right] node[below]{GC: TG2621} (R2);
+   \path[->] (R3) edge[bend right] node[above]{GC: TG2621} (R1);
+  \end{tikzpicture}
+\end{document}

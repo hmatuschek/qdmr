@@ -22,15 +22,14 @@ public:
 protected slots:
 	void onAddChannel();
 	void onRemChannel();
-	void onChannelUp();
-	void onChannelDown();
 
 protected:
 	void construct();
 
 protected:
 	Config *_config;
-	ScanList *_scanlist;
+  ScanList *_myScanList;
+  ScanList *_scanlist;
 };
 
 

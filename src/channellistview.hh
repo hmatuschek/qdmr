@@ -1,31 +1,35 @@
 #ifndef CHANNELLISTVIEW_HH
 #define CHANNELLISTVIEW_HH
 
-#include "channel.hh"
-
 #include <QWidget>
-#include <QTableView>
 
-class ChannelListView: public QWidget
+class Config;
+namespace Ui {
+  class ChannelListView;
+}
+
+class ChannelListView : public QWidget
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	ChannelListView(Config *config, QWidget *parent=nullptr);
+  explicit ChannelListView(Config *config, QWidget *parent = nullptr);
+  ~ChannelListView();
 
 protected slots:
-  void onChannelUp();
-  void onChannelDown();
   void onAddAnalogChannel();
   void onAddDigitalChannel();
+  void onCloneChannel();
   void onRemChannel();
-  void onEditChannel(const QModelIndex &index);
+  void onEditChannel(unsigned row);
+  void loadChannelListSectionState();
+  void storeChannelListSectionState();
 
-protected:
-	Config *_config;
-	ChannelList *_list;
-	QTableView *_view;
+
+
+private:
+  Ui::ChannelListView *ui;
+  Config *_config;
 };
-
 
 #endif // CHANNELLISTVIEW_HH

@@ -19,14 +19,12 @@
  * The radio can also hold up to 255 contacts (actually 256, but due to a bug in the firmware RX is
  * disabled whenever all 256 contacts are set), 64 RX group lists and 250 scanlists.
  *
- * @ingroup dsc */
+ * @ingroup radioddity */
 #ifndef RD5R_HH
 #define RD5R_HH
 
-#include "radio.hh"
-#include "hid_interface.hh"
+#include "radioddity_radio.hh"
 #include "rd5r_codeplug.hh"
-
 
 /** Implements an interface to the Baofeng/Radioddity RD-5R VHF/UHF 5W DMR (Tier I/II) radio.
  *
@@ -35,7 +33,7 @@
  * the radio to read and write codeplugs on the device.
  *
  * @ingroup rd5r */
-class RD5R: public Radio
+class RD5R: public RadioddityRadio
 {
 	Q_OBJECT
 
@@ -43,49 +41,27 @@ public:
   /** Constructor.
    * Do not call this constructor directly. Consider using the factory method
    * @c Radio::detect. */
-  RD5R(HID *device=nullptr, QObject *parent=nullptr);
+  RD5R(RadioddityInterface *device=nullptr, QObject *parent=nullptr);
 
   virtual ~RD5R();
 
 	const QString &name() const;
-	const Radio::Features &features() const;
-  const CodePlug &codeplug() const;
-  CodePlug &codeplug();
+  const RadioLimits &limits() const;
+  const Codeplug &codeplug() const;
+  Codeplug &codeplug();
 
-public slots:
-  /** Starts the download of the codeplug and derives the generic configuration from it. */
-  bool startDownload(bool blocking=false);
-  /** Derives the device-specific codeplug from the generic configuration and uploads that
-   * codeplug to the radio. */
-  bool startUpload(Config *config, bool blocking=false,
-                   const CodePlug::Flags &flags = CodePlug::Flags());
-  /** Encodes the given user-database and uploades it to the device. */
-  bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
-                             const CallsignDB::Selection &selection=CallsignDB::Selection());
-
-protected:
-  /** Main function running in a separate thread performing the up- and download to and from the
-   * device. */
-	void run();
-
-  /** Connect to the radio. */
-  bool connect();
-  /** Read codeplug. */
-  bool download();
-  /** Write/Update codeplug. */
-  bool upload();
+  /** Returns the default info about the radio. */
+  static RadioInfo defaultRadioInfo();
 
 private:
   /** Device identifier string. */
 	QString _name;
-  /** HID interface to the radio. */
-	HID *_dev;
-  /** Flags contolling the creation of the binary codeplug. */
-  CodePlug::Flags _codeplugFlags;
-  /** Current generic configuration. */
-	Config *_config;
   /** Current device specific codeplug. */
 	RD5RCodeplug _codeplug;
+
+private:
+  /** Holds the singleton instance of the radio limits. */
+  static RadioLimits *_limits;
 };
 
 #endif // RD5R_HH

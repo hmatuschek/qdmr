@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="cpGroupLists"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Group lists</title>
+</info>
+
+<para>
+  A group list collects several digital (DMR) contacts that should be received on a channel 
+  associated with this group list. Consequently, a group list consists of a name and a list 
+  of contact IDs. The <token>groupLists</token> element is then a list of several group list 
+  definitions.
+</para>
+
+<para>
+  As an example, consider the two group lists below:
+</para>
+
+<example pgwide="1">
+  <title>Group list definition</title>
+  <programlisting><![CDATA[groupLists:
+  - {id: grp1, name: DL, contacts: [cont1, cont2, cont3]}
+  - {id: grp2, name: Berlin/Brand, contacts: [cont6, cont5, cont7]}
+]]></programlisting>
+</example>
+
+<para>
+  The first group list has the internal ID <emphasis>grp1</emphasis>. This ID can then be used later
+  to reference this group list. The name is set to <emphasis>DL</emphasis>. The list of contacts of the 
+  group list is then defined as a list containing the IDs of the referenced contacts.
+</para>
+
+<variablelist>
+  <title>Group list fields</title>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>Specifies the ID of the group list. This ID can then be used to refer to the group list
+        within digital channels. Any unique string is possible here.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>Specifies the name of the group list. Any string is possible here.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>contacts</token></term>
+    <listitem>
+      <para>A list of digital contact IDs. See <xref linkend="cpContacts"/> above.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>

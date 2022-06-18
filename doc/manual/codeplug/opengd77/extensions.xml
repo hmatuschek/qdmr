@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<section xml:id="extOpenGD77"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>OpenGD77 Codeplug Extensions</title>
+</info>
+
+<para>
+  This chapter documents the extensions and settings specific to radios running the OpenGD77 
+  firmware.
+</para>
+
+<note>
+  <para>
+    The OpenGD77 codeplug is a specialization of the GD77 codeplug. Consequently 
+    all extensions described in <xref linkend="extRadioddity"/> are also applicable to the OpenGD77
+    codeplug.
+  </para>
+</note>
+
+<xi:include href="channel.xml"/>
+<xi:include href="contact.xml"/>
+
+</section>

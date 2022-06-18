@@ -1,0 +1,42 @@
+\newcommand{\repeater}[3]{%
+ \node ({#1}) at ({#2}) {%
+  \begin{tikzpicture}%
+   \draw [black,thick] (-.25,0) -- (0,0.5) -- (0.25,0) -- (-0.25,0);%
+   \draw [black,thick,domain=-45:225] plot ({0.2*cos(\x)}, {0.5+0.2*sin(\x)});%
+   \draw [black,thick,domain=-45:225] plot ({0.4*cos(\x)}, {0.5+0.4*sin(\x)});%
+   \node (xxx) at (0,-.2) {{#3}};%
+  \end{tikzpicture}%
+ } %
+}
+
+\newcommand{\activerepeater}[3]{%
+ \node ({#1}) at ({#2}) {%
+  \begin{tikzpicture}%
+   \draw [black,thick] (-.25,0) -- (0,0.5) -- (0.25,0) -- (-0.25,0);%
+   \draw [red,thick,domain=-45:225] plot ({0.2*cos(\x)}, {0.5+0.2*sin(\x)});%
+   \draw [red,thick,domain=-45:225] plot ({0.4*cos(\x)}, {0.5+0.4*sin(\x)});%
+   \node (xxx) at (0,-.2) {{#3}};%
+  \end{tikzpicture}%
+ } %
+}
+
+
+\newcommand{\user}[3]{%
+ \node ({#1}) at ({#2}) {%
+  \begin{tikzpicture}%
+   \draw [black,fill=black] (-.25,0) -- (0,0.5) -- (0.25,0) -- (-0.25,0);%
+   \draw [black,fill=black] (0,.5) circle (.2); %
+   \node (xxx) [text width=0.6cm, align=center] at (-.35cm,-.4) {{#3}};%
+  \end{tikzpicture}%
+ } %
+}
+
+\newcommand{\activeuser}[3]{%
+ \node ({#1}) at ({#2}) {%
+  \begin{tikzpicture}%
+   \draw [red,fill=red] (-.25,0) -- (0,0.5) -- (0.25,0) -- (-0.25,0);%
+   \draw [red,fill=red] (0,.5) circle (.2); %
+   \node (xxx) [text width=0.6cm, align=center] at (-.35cm,-.4) {{#3}};%
+  \end{tikzpicture}%
+ } %
+}

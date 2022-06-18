@@ -24,28 +24,29 @@ public:
   virtual ~OpenGD77();
 
 	const QString &name() const;
-  const Radio::Features &features() const;
-  const CodePlug &codeplug() const;
-  CodePlug &codeplug();
+  const RadioLimits &limits() const;
+  const Codeplug &codeplug() const;
+  Codeplug &codeplug();
+
+  /** Returns the default radio information. The actual instance may have different properties
+   * due to variants of the same radio. */
+  static RadioInfo defaultRadioInfo();
 
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
-  bool startDownload(bool blocking=false);
+  bool startDownload(bool blocking=false, const ErrorStack &err=ErrorStack());
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   bool startUpload(Config *config, bool blocking=false,
-                   const CodePlug::Flags &flags = CodePlug::Flags());
+                   const Codeplug::Flags &flags = Codeplug::Flags(), const ErrorStack &err=ErrorStack());
   /** Encodes the given user-database and uploades it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
-                             const CallsignDB::Selection &selection=CallsignDB::Selection());
+                             const CallsignDB::Selection &selection=CallsignDB::Selection(), const ErrorStack &err=ErrorStack());
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
 	void run();
 
-  /** Connects to the radio, if a radio interface is passed to the constructor, this interface
-   * instance is used. */
-  bool connect();
   /** Implements the actual download process. */
   bool download();
   /** Implements the actual codeplug upload process. */
@@ -62,8 +63,12 @@ protected:
 	Config *_config;
   /** The actual binary codeplug representation. */
   OpenGD77Codeplug _codeplug;
-  /** The acutal binary callsign DB representation. */
+  /** The actual binary callsign DB representation. */
   OpenGD77CallsignDB _callsigns;
+
+private:
+  /** Holds the singleton instance. */
+  static RadioLimits *_limits;
 };
 
 #endif // OPENGD77_HH

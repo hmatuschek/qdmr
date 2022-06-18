@@ -9,108 +9,93 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QInputDialog>
+#include "contact.hh"
 #include "config.hh"
 
 
 /* ********************************************************************************************* *
  * Implementation of RXGroupList
  * ********************************************************************************************* */
-RXGroupList::RXGroupList(const QString &name, QObject *parent)
-  : QAbstractListModel(parent), _name(name), _contacts()
+RXGroupList::RXGroupList(QObject *parent)
+  : ConfigObject("grp", parent), _contacts()
 {
-  // pass...
+  connect(&_contacts, SIGNAL(elementModified(int)), this, SLOT(onModified()));
+  connect(&_contacts, SIGNAL(elementRemoved(int)), this, SLOT(onModified()));
+  connect(&_contacts, SIGNAL(elementAdded(int)), this, SLOT(onModified()));
+}
+
+RXGroupList::RXGroupList(const QString &name, QObject *parent)
+  : ConfigObject(name, "grp", parent), _contacts()
+{
+  connect(&_contacts, SIGNAL(elementModified(int)), this, SLOT(onModified()));
+  connect(&_contacts, SIGNAL(elementRemoved(int)), this, SLOT(onModified()));
+  connect(&_contacts, SIGNAL(elementAdded(int)), this, SLOT(onModified()));
+}
+
+RXGroupList &
+RXGroupList::operator =(const RXGroupList &other) {
+  copy(other);
+  return *this;
+}
+
+ConfigItem *
+RXGroupList::clone() const {
+  RXGroupList *lst = new RXGroupList();
+  if (! lst->copy(*this)) {
+    lst->deleteLater();
+    return nullptr;
+  }
+  return lst;
 }
 
 int
 RXGroupList::count() const {
-  return _contacts.size();
+  return _contacts.count();
 }
 
 void
 RXGroupList::clear() {
-  beginResetModel();
   _contacts.clear();
-  endResetModel();
-  emit modified();
-}
-
-const QString &
-RXGroupList::name() const {
-  return _name;
-}
-
-bool
-RXGroupList::setName(const QString &name) {
-  if (name.simplified().isEmpty())
-    return false;
-  _name = name.simplified();
-  return true;
+  emit modified(this);
 }
 
 DigitalContact *
 RXGroupList::contact(int idx) const {
-  if (idx >= _contacts.size())
+  if (idx >= _contacts.count())
     return nullptr;
-  return _contacts.at(idx);
+  return _contacts.get(idx)->as<DigitalContact>();
 }
 
 int
-RXGroupList::addContact(DigitalContact *contact) {
-  if (_contacts.contains(contact))
-    return -1;
-  int idx = _contacts.size();
-  beginInsertRows(QModelIndex(), idx, idx);
-  connect(contact, SIGNAL(modified()), this, SIGNAL(modified()));
-  connect(contact, SIGNAL(destroyed(QObject*)), this, SLOT(onContactDeleted(QObject*)));
-  _contacts.append(contact);
-  endInsertRows();
-  emit modified();
-  return idx;
+RXGroupList::addContact(DigitalContact *contact, int idx) {
+  return _contacts.add(contact, idx);
 }
 
 bool
 RXGroupList::remContact(int idx) {
-  if (idx >= _contacts.size())
-    return false;
-  beginRemoveRows(QModelIndex(), idx, idx);
-  _contacts.remove(idx);
-  endRemoveRows();
-  emit modified();
-  return true;
+  return _contacts.del(_contacts.get(idx));
 }
 
-bool
-RXGroupList::remContact(DigitalContact *contact) {
-  if (! _contacts.contains(contact))
-    return false;
-  int idx = _contacts.indexOf(contact);
-  return remContact(idx);
+const DigitalContactRefList *
+RXGroupList::contacts() const {
+  return &_contacts;
+}
+
+DigitalContactRefList *
+RXGroupList::contacts() {
+  return &_contacts;
+}
+
+YAML::Node
+RXGroupList::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = ConfigObject::serialize(context, err);
+  node.SetStyle(YAML::EmitterStyle::Flow);
+  return node;
 }
 
 void
-RXGroupList::onContactDeleted(QObject *obj) {
-  if (DigitalContact *contact = reinterpret_cast<DigitalContact *>(obj))
-    remContact(contact);
-}
-
-int
-RXGroupList::rowCount(const QModelIndex &parent) const {
-  Q_UNUSED(parent);
-  return _contacts.size();
-}
-
-QVariant
-RXGroupList::data(const QModelIndex &index, int role) const {
-  if ((Qt::DisplayRole!=role) || (! index.isValid()) || (index.row()>=_contacts.size()))
-    return QVariant();
-  return _contacts[index.row()]->name();
-}
-
-QVariant
-RXGroupList::headerData(int section, Qt::Orientation orientation, int role) const {
-  if ((0!=section) || (Qt::Horizontal!=orientation) || (Qt::DisplayRole!=role))
-    return QVariant();
-  return tr("Group Call Contacts");
+RXGroupList::onModified() {
+  emit modified(this);
 }
 
 
@@ -118,146 +103,39 @@ RXGroupList::headerData(int section, Qt::Orientation orientation, int role) cons
  * Implementation of RXGroupLists
  * ********************************************************************************************* */
 RXGroupLists::RXGroupLists(QObject *parent)
-  : QAbstractListModel(parent), _lists()
+  : ConfigObjectList(RXGroupList::staticMetaObject, parent)
 {
   // pass...
 }
 
-int
-RXGroupLists::count() const {
-  return _lists.size();
-}
-
-void
-RXGroupLists::clear() {
-  beginResetModel();
-  for (int i=0; i<count(); i++)
-    _lists[i]->deleteLater();
-  _lists.clear();
-  endResetModel();
-  emit modified();
-}
-
-
-int
-RXGroupLists::indexOf(RXGroupList *list) const {
-  if (! _lists.contains(list))
-    return -1;
-  return _lists.indexOf(list);
-}
 
 RXGroupList *
 RXGroupLists::list(int idx) const {
-  if (idx >= _lists.size())
+  if (ConfigItem *obj = get(idx))
+    return obj->as<RXGroupList>();
+  return nullptr;
+}
+
+int
+RXGroupLists::add(ConfigObject *obj, int row) {
+  if (obj && obj->is<RXGroupList>())
+    return ConfigObjectList::add(obj, row);
+  return -1;
+}
+
+ConfigItem *
+RXGroupLists::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
+
+  if (! node)
     return nullptr;
-  return _lists.at(idx);
-}
 
-int
-RXGroupLists::addList(RXGroupList *list, int row) {
-  if (_lists.contains(list))
-    return -1;
-  if ((row<0) || (row>_lists.size()))
-    row = _lists.size();
-  beginInsertRows(QModelIndex(), row, row);
-  connect(list, SIGNAL(modified()), this, SIGNAL(modified()));
-  connect(list, SIGNAL(destroyed(QObject *)), this, SLOT(onListDeleted(QObject *)));
-  list->setParent(this);
-  _lists.insert(row, list);
-  endInsertRows();
-  emit modified();
-  return row;
-}
+  if (! node.IsMap()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create group list: Expected object.";
+    return nullptr;
+  }
 
-bool
-RXGroupLists::remList(int idx) {
-  if (idx >= _lists.size())
-    return false;
-  beginRemoveRows(QModelIndex(), idx, idx);
-  _lists.remove(idx);
-  endRemoveRows();
-  emit modified();
-  return true;
+  return new RXGroupList();
 }
-
-bool
-RXGroupLists::remList(RXGroupList *list) {
-  if (! _lists.contains(list))
-    return false;
-  int idx = _lists.indexOf(list);
-  return remList(idx);
-}
-
-bool
-RXGroupLists::moveUp(int row) {
-  if ((row <= 0) || (row>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  std::swap(_lists[row-1],_lists[row]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-RXGroupLists::moveUp(int first, int last) {
-  if ((first <= 0) || (last >= count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
-  for (int row=first; row<=last; row++)
-    std::swap(_lists[row-1],_lists[row]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-RXGroupLists::moveDown(int row) {
-  if ((row >= (count()-1)) || (row>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  std::swap(_lists[row+1], _lists[row]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-RXGroupLists::moveDown(int first, int last) {
-  if ((last >= (count()-1)) || (first<0))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
-  for (int row=last; row>=first; row--)
-    std::swap(_lists[row+1], _lists[row]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-int
-RXGroupLists::rowCount(const QModelIndex &parent) const {
-  Q_UNUSED(parent);
-  return _lists.size();
-}
-
-QVariant
-RXGroupLists::data(const QModelIndex &index, int role) const {
-  if ((Qt::DisplayRole!=role) || (! index.isValid()) || (index.row()>=_lists.size()))
-    return QVariant();
-  return _lists[index.row()]->name();
-}
-
-QVariant
-RXGroupLists::headerData(int section, Qt::Orientation orientation, int role) const {
-  if ((0!=section) || (Qt::Horizontal!=orientation) || (Qt::DisplayRole!=role))
-    return QVariant();
-  return tr("RX Group Lists");
-}
-
-void
-RXGroupLists::onListDeleted(QObject *obj) {
-  if (RXGroupList *list = reinterpret_cast<RXGroupList *>(obj))
-    remList(list);
-}
-
 

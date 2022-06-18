@@ -1,8 +1,8 @@
 #include "progressbar.hh"
 
-void showProgress(uint percent) {
+void showProgress(unsigned percent) {
   std::cerr << "[";
-  for (uint i=0; i<50; i++) {
+  for (unsigned i=0; i<50; i++) {
     if (percent/2 > i)
       std::cerr << "=";
     else
@@ -11,7 +11,7 @@ void showProgress(uint percent) {
   std::cerr << "] " << percent <<"%" << std::endl;
 }
 
-void updateProgress(uint percent) {
+void updateProgress(unsigned percent) {
   std::cerr << "\033[1A\033[K";
   showProgress(percent);
 }

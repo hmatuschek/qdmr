@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<chapter xml:id="cpExtensions"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Device specific extensions</title>
+</info>
+  
+<para>
+  The sole reason for introducing a new YAML based codeplug format was the ability to extend the
+  file format with device specific settings without breaking the format. This was simply impossible 
+  with the <emphasis>old</emphasis> table based text files.
+</para>
+
+<para>
+  The present YAML based codeplug file format is extensible at almost any level. That is, device 
+  specific elements can be added to single codeplug elements like channels, zones or contacts but 
+  also to the codeplug itself. The latter allows to extend the codeplug with new elements. 
+</para>
+
+<xi:include href="opengd77/extensions.xml"/>
+<xi:include href="radioddity/extensions.xml"/>
+<xi:include href="tyt/extensions.xml"/>
+<xi:include href="anytone/extensions.xml"/>
+
+</chapter>

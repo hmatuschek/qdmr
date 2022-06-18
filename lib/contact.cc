@@ -1,53 +1,90 @@
 #include "contact.hh"
 #include "config.hh"
 #include "utils.hh"
-
+#include "logger.hh"
+#include "opengd77_extension.hh"
 
 /* ********************************************************************************************* *
  * Implementation of Contact
  * ********************************************************************************************* */
-Contact::Contact(const QString &name, bool rxTone, QObject *parent)
-  : QObject(parent), _name(name), _rxTone(rxTone)
+Contact::Contact(QObject *parent)
+  : ConfigObject("cont", parent), _ring(false)
 {
   // pass...
 }
 
-const QString &
-Contact::name() const {
-  return _name;
+Contact::Contact(const QString &name, bool rxTone, QObject *parent)
+  : ConfigObject(name, "cont", parent), _ring(rxTone)
+{
+  // pass...
 }
-bool
-Contact::setName(const QString &name) {
-  if (name.simplified().isEmpty())
-    return false;
-  _name = name;
-  emit modified();
-  return true;
+
+void
+Contact::clear() {
+  ConfigObject::clear();
+  _ring = false;
 }
 
 bool
-Contact::rxTone() const {
-  return _rxTone;
+Contact::ring() const {
+  return _ring;
 }
 void
-Contact::setRXTone(bool enable) {
-  _rxTone = enable;
-  emit modified();
+Contact::setRing(bool enable) {
+  _ring = enable;
+  emit modified(this);
+}
+
+bool
+Contact::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse contact: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node cnt = node.begin()->second;
+  return ConfigObject::parse(cnt, ctx, err);
+}
+
+bool
+Contact::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+  return ConfigObject::link(node.begin()->second, ctx, err);
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of DTMFContact
  * ********************************************************************************************* */
+DTMFContact::DTMFContact(QObject *parent)
+  : Contact(parent), _number()
+{
+  // pass...
+}
+
 DTMFContact::DTMFContact(const QString &name, const QString &number, bool rxTone, QObject *parent)
   : Contact(name, rxTone, parent), _number(number.simplified())
 {
   // pass...
 }
 
-bool
-DTMFContact::isValid() const {
-  return validDTMFNumber(_number);
+ConfigItem *
+DTMFContact::clone() const {
+  DTMFContact *c = new DTMFContact();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
+}
+
+void
+DTMFContact::clear() {
+  Contact::clear();
+  _number.clear();
 }
 
 const QString &
@@ -60,18 +97,58 @@ DTMFContact::setNumber(const QString &number) {
   if (! validDTMFNumber(number))
     return false;
   _number = number.simplified();
-  emit modified();
+  emit modified(this);
   return true;
+}
+
+YAML::Node
+DTMFContact::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = Contact::serialize(context, err);
+  if (node.IsNull())
+    return node;
+
+  node.SetStyle(YAML::EmitterStyle::Flow);
+  YAML::Node type; type["dtmf"] = node;
+  return type;
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of DigitalContact
  * ********************************************************************************************* */
-DigitalContact::DigitalContact(Type type, const QString &name, uint number, bool rxTone, QObject *parent)
-  : Contact(name, rxTone, parent), _type(type), _number(number)
+DigitalContact::DigitalContact(QObject *parent)
+  : Contact(parent), _type(PrivateCall), _number(0), _anytone(nullptr), _openGD77(nullptr)
 {
   // pass...
+}
+
+DigitalContact::DigitalContact(Type type, const QString &name, unsigned number, bool rxTone, QObject *parent)
+  : Contact(name, rxTone, parent), _type(type), _number(number), _anytone(nullptr), _openGD77(nullptr)
+{
+  // pass...
+}
+
+ConfigItem *
+DigitalContact::clone() const {
+  DigitalContact *c = new DigitalContact();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
+}
+
+void
+DigitalContact::clear() {
+  Contact::clear();
+  _type = PrivateCall;
+  _number = 0;
+  if (_openGD77)
+    _openGD77->deleteLater();
+  _openGD77 = nullptr;
+  if (_anytone)
+    _anytone->deleteLater();
+  _anytone = nullptr;
 }
 
 DigitalContact::Type
@@ -84,16 +161,62 @@ DigitalContact::setType(DigitalContact::Type type) {
   _type = type;
 }
 
-uint
+unsigned
 DigitalContact::number() const {
   return _number;
 }
 
 bool
-DigitalContact::setNumber(uint number) {
+DigitalContact::setNumber(unsigned number) {
   _number = number;
-  emit modified();
+  emit modified(this);
   return true;
+}
+
+YAML::Node
+DigitalContact::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = Contact::serialize(context, err);
+  if (node.IsNull())
+    return node;
+
+  node.SetStyle(YAML::EmitterStyle::Flow);
+  YAML::Node type; type["dmr"] = node;
+  return type;
+}
+
+
+OpenGD77ContactExtension *
+DigitalContact::openGD77ContactExtension() const {
+  return _openGD77;
+}
+
+void
+DigitalContact::setOpenGD77ContactExtension(OpenGD77ContactExtension *ext) {
+  if (_openGD77)
+    _openGD77->deleteLater();
+  _openGD77 = ext;
+  if (_openGD77) {
+    _openGD77->setParent(this);
+    connect(_openGD77, &OpenGD77ContactExtension::modified,
+            [this](ConfigItem*){ emit modified(this); });
+  }
+}
+
+AnytoneContactExtension *
+DigitalContact::anytoneExtension() const {
+  return _anytone;
+}
+
+void
+DigitalContact::setAnytoneExtension(AnytoneContactExtension *ext) {
+  if (_anytone)
+    _anytone->deleteLater();
+  _anytone = ext;
+  if (_anytone) {
+    _anytone->setParent(this);
+    connect(_anytone, &OpenGD77ContactExtension::modified,
+            [this](ConfigItem*){ emit modified(this); });
+  }
 }
 
 
@@ -101,21 +224,23 @@ DigitalContact::setNumber(uint number) {
  * Implementation of ContactList
  * ********************************************************************************************* */
 ContactList::ContactList(QObject *parent)
-  : QAbstractTableModel(parent), _contacts()
+  : ConfigObjectList(Contact::staticMetaObject, parent)
 {
-  connect(this, SIGNAL(modified()), this, SLOT(onContactEdited()));
+  // pass...
 }
 
 int
-ContactList::count() const {
-  return _contacts.size();
+ContactList::add(ConfigObject *obj, int row) {
+  if ((nullptr == obj) || (! obj->is<Contact>()))
+    return -1;
+  return ConfigObjectList::add(obj, row);
 }
 
 int
 ContactList::digitalCount() const {
   int c=0;
-  for (int i=0; i<_contacts.size(); i++)
-    if (_contacts.at(i)->is<DigitalContact>())
+  for (int i=0; i<_items.size(); i++)
+    if (_items.at(i)->is<DigitalContact>())
       c++;
   return c;
 }
@@ -123,36 +248,20 @@ ContactList::digitalCount() const {
 int
 ContactList::dtmfCount() const {
   int c=0;
-  for (int i=0; i<_contacts.size(); i++)
-    if (_contacts.at(i)->is<DTMFContact>())
+  for (int i=0; i<_items.size(); i++)
+    if (_items.at(i)->is<DTMFContact>())
       c++;
   return c;
 }
 
-void
-ContactList::clear() {
-  beginResetModel();
-  for (int i=0; i<count(); i++)
-    _contacts[i]->deleteLater();
-  _contacts.clear();
-  endResetModel();
-  emit modified();
-}
-
-int
-ContactList::indexOf(Contact *contact) const {
-  if (! _contacts.contains(contact))
-    return -1;
-  return _contacts.indexOf(contact);
-}
 
 int
 ContactList::indexOfDigital(DigitalContact *contact) const {
   int idx = 0;
-  for (int i=0; i<_contacts.size(); i++) {
-    if (_contacts.at(i) == contact)
+  for (int i=0; i<_items.size(); i++) {
+    if (_items.at(i) == contact)
       return idx;
-    else if (_contacts.at(i)->is<DigitalContact>())
+    else if (_items.at(i)->is<DigitalContact>())
       idx++;
   }
   return -1;
@@ -161,10 +270,10 @@ ContactList::indexOfDigital(DigitalContact *contact) const {
 int
 ContactList::indexOfDTMF(DTMFContact *contact) const {
   int idx = 0;
-  for (int i=0; i<_contacts.size(); i++) {
-    if (_contacts.at(i) == contact)
+  for (int i=0; i<_items.size(); i++) {
+    if (_items.at(i) == contact)
       return idx;
-    else if (_contacts.at(i)->is<DTMFContact>())
+    else if (_items.at(i)->is<DTMFContact>())
       idx++;
   }
   return -1;
@@ -172,17 +281,17 @@ ContactList::indexOfDTMF(DTMFContact *contact) const {
 
 Contact *
 ContactList::contact(int idx) const {
-  if (idx >= _contacts.size())
+  if ((0>idx) || (idx >= count()))
     return nullptr;
-  return _contacts[idx];
+  return _items[idx]->as<Contact>();
 }
 
 DigitalContact *
 ContactList::digitalContact(int idx) const {
-  for (int i=0; i<_contacts.size(); i++) {
-    if (_contacts.at(i)->is<DigitalContact>()) {
+  for (int i=0; i<_items.size(); i++) {
+    if (_items.at(i)->is<DigitalContact>()) {
       if (0 == idx)
-        return _contacts.at(i)->as<DigitalContact>();
+        return _items.at(i)->as<DigitalContact>();
       else
         idx--;
     }
@@ -191,22 +300,22 @@ ContactList::digitalContact(int idx) const {
 }
 
 DigitalContact *
-ContactList::findDigitalContact(uint number) const {
-  for (int i=0; i<_contacts.size(); i++) {
-    if (! _contacts.at(i)->is<DigitalContact>())
+ContactList::findDigitalContact(unsigned number) const {
+  for (int i=0; i<_items.size(); i++) {
+    if (! _items.at(i)->is<DigitalContact>())
       continue;
-    if (_contacts.at(i)->as<DigitalContact>()->number() == number)
-      return _contacts.at(i)->as<DigitalContact>();
+    if (_items.at(i)->as<DigitalContact>()->number() == number)
+      return _items.at(i)->as<DigitalContact>();
   }
   return nullptr;
 }
 
 DTMFContact *
 ContactList::dtmfContact(int idx) const {
-  for (int i=0; i<_contacts.size(); i++) {
-    if (_contacts.at(i)->is<DTMFContact>()) {
+  for (int i=0; i<_items.size(); i++) {
+    if (_items.at(i)->is<DTMFContact>()) {
       if (0 == idx)
-        return _contacts.at(i)->as<DTMFContact>();
+        return _items.at(i)->as<DTMFContact>();
       else
         idx--;
     }
@@ -214,177 +323,28 @@ ContactList::dtmfContact(int idx) const {
   return nullptr;
 }
 
-bool
-ContactList::remContact(int idx) {
-  if (idx >= _contacts.size())
-    return false;
-  Contact *contact = _contacts[idx];
-  beginRemoveRows(QModelIndex(), idx, idx);
-  _contacts.remove(idx);
-  endRemoveRows();
-  contact->deleteLater();
-  emit modified();
-  return true;
-}
+ConfigItem *
+ContactList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
 
-bool
-ContactList::remContact(Contact *contact) {
-  if (! _contacts.contains(contact))
-    return false;
-  int idx = _contacts.indexOf(contact);
-  return remContact(idx);
-}
+  if (! node)
+    return nullptr;
 
-int
-ContactList::addContact(Contact *contact, int row) {
-  if (_contacts.contains(contact)) {
-    return _contacts.indexOf(contact);
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create contact: Expected object with one child.";
+    return nullptr;
   }
-  if ((row<0) || (row>_contacts.size()))
-    row = _contacts.size();
-  contact->setParent(this);
-  connect(contact, SIGNAL(destroyed(QObject*)), this, SLOT(onContactDeleted(QObject*)));
-  connect(contact, SIGNAL(modified()), this, SIGNAL(modified()));
-  beginInsertRows(QModelIndex(), row, row);
-  _contacts.insert(row, contact);
-  endInsertRows();
-  emit modified();
-  return row;
-}
 
-bool
-ContactList::moveUp(int row) {
-  if ((row <= 0) || (row>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  std::swap(_contacts[row-1],_contacts[row]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ContactList::moveUp(int first, int last) {
-  if ((first <= 0) || (last>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
-  for (int row=first; row<=last; row++)
-    std::swap(_contacts[row-1],_contacts[row]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ContactList::moveDown(int row) {
-  if ((row >= (count()-1)) || (0 > row))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  std::swap(_contacts[row+1],_contacts[row]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ContactList::moveDown(int first, int last) {
-  if ((last >= (count()-1)) || (0 > first))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
-  for (int row=last; row>=first; row--)
-    std::swap(_contacts[row+1],_contacts[row]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-int
-ContactList::rowCount(const QModelIndex &index) const {
-  Q_UNUSED(index);
-  return count();
-}
-
-int
-ContactList::columnCount(const QModelIndex &index) const {
-  Q_UNUSED(index);
-  return 4;
-}
-
-QVariant
-ContactList::data(const QModelIndex &index, int role) const {
-  if ((!index.isValid()) || (index.row()>=_contacts.size()))
-    return QVariant();
-
-  if (Qt::DisplayRole == role) {
-    Contact *contact = _contacts.at(index.row());
-    if (contact->is<DTMFContact>()) {
-      DTMFContact *dtmf = contact->as<DTMFContact>();
-      switch (index.column()) {
-        case 0:
-          return tr("DTMF");
-        case 1:
-          return dtmf->name();
-        case 2:
-          return dtmf->number();
-        case 3:
-          return (dtmf->rxTone() ? tr("On") : tr("Off"));
-        default:
-          return QVariant();
-      }
-    } else if (contact->is<DigitalContact>()) {
-      DigitalContact *digi = contact->as<DigitalContact>();
-      switch (index.column()) {
-        case 0:
-          switch (digi->type()) {
-            case DigitalContact::PrivateCall: return tr("Private Call");
-            case DigitalContact::GroupCall: return tr("Group Call");
-            case DigitalContact::AllCall: return tr("All Call");
-          }
-        case 1:
-          return digi->name();
-        case 2:
-          return digi->number();
-        case 3:
-          return (digi->rxTone() ? tr("On") : tr("Off"));
-        default:
-          return QVariant();
-      }
-    }
+  QString type = QString::fromStdString(node.begin()->first.as<std::string>());
+  if ("dmr" == type) {
+    return new DigitalContact();
+  } else if ("dtmf" == type) {
+    return new DTMFContact();
   }
-  return QVariant();
+
+  errMsg(err) << node.Mark().line << ":" << node.Mark().column
+              << ": Cannot create contact: Unknown type '" << type << "'.";
+
+  return nullptr;
 }
-
-
-QVariant
-ContactList::headerData(int section, Qt::Orientation orientation, int role) const {
-  if ((Qt::DisplayRole != role) || (Qt::Horizontal != orientation)) {
-    return QVariant();
-  }
-  if (0 == section) {
-    return tr("Type");
-  } else if (1 == section) {
-    return tr("Name");
-  } else if (2 == section) {
-    return tr("Number");
-  } else if (3 == section) {
-    return tr("RX Tone");
-  }
-  return QVariant();
-}
-
-void
-ContactList::onContactDeleted(QObject *obj) {
-  if (Contact *contact = reinterpret_cast<Contact *>(obj)) {
-    remContact(contact);
-  }
-}
-
-void
-ContactList::onContactEdited() {
-  if (0 == count())
-    return;
-  QModelIndex tl = index(0,0), br = index(count()-1, columnCount(QModelIndex()));
-  emit dataChanged(tl, br);
-}
-
-

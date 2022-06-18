@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<section xml:id="cmdWriteDB"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Writing the call-sign DB</title>
+</info>
+
+<para>
+  The command line interface also allows to write a call-sign DB (also known as <glossterm>Talker 
+  Alias</glossterm>) to the radio if the radio supports it. This can be done with the 
+  <command>write-db</command> command. This command behaves similar to the call-sign DB upload in 
+  <application>qdmr</application>. That is, it tries to select the call-signs being written 
+  automatically.
+</para>
+
+<para>
+  Although many radios provide a huge amount of memory for the call-sign DB, they cannot hold the 
+  entire list of assigned DMR IDs. Therefore, a selection of relevant call-signs must be done. 
+  <application>qdmr</application> and <command>dmrconf</command> do that based on the DMR ID of
+  the radio. DMR IDs are not random. They follow a pattern similar to land-line phone numbers. DMR
+  IDs within a certain continent, country and region share a common prefix. This way, it is 
+  possible to select DMR IDs that are <emphasis>close</emphasis> by selecting IDs that share a 
+  common prefix. 
+</para>
+
+<para>
+  <application>qdmr</application> and <command>dmrconf</command> use the default DMR ID
+  of the radio to select the call-signs to be written. This ID is obtained by 
+  <application>qdmr</application> from the codeplug. <command>dmrconf</command> does not require a
+  codeplug to be present for the upload. Consequently, it requires the explicit specification 
+  of the ID to base the selection on. The ID can be specified using the <option>--id</option> or 
+  <option>-I</option> options. It is also possible to just specify the prefix instead of an ID.
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[dmrconf write-db --id=2621]]></programlisting>
+</informalexample>
+
+<para>
+  This example writes a call-sign DB to the connected radio using the DMR prefix 2621 (for the 
+  region Berlin/Brandenburg in Germany). The radio will fill the available space with as many 
+  call-signs as possible. So for the previous example, <command>dmrconf</command> will not only
+  program all IDs with the prefix 2621 but as many as possible starting with those 
+  <emphasis>close</emphasis> to that prefix. It is possible to limit the number of call-signs 
+  encoded using the <option>--limit</option> or <option>-n</option> option.
+</para>
+
+<para>
+  Unfortunately, there is always an exception to a rule: Some countries have several prefixes or
+  you may program the call-signs of several countries that are not necessarily 
+  <emphasis>close</emphasis> in terms of their prefixes. For these cases, it is possible to 
+  specify a list of prefixes to the <option>--id</option> option.
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[dmrconf write-db --id=262,263 --limit=10000]]></programlisting>
+</informalexample>
+
+<para>
+  This example will select and write up to 10000 (given the radio can hold that amount) 
+  call-signs staring with those <emphasis>closest</emphasis> to the prefixes 262 and 263
+  (both prefixes for Germany).
+</para>
+
+<section xml:id="cmdEncodeDB">
+<info><title>Encoding a call-sign DB</title></info>
+
+<para>
+  Like for the binary codeplug, it is also possible to generate and store the binary representation
+  of the call-sign DB using the <command>encode-db</command> command. This command is only useful 
+  for debugging purposes as the binary representation of the call-sign DB cannot be written to the
+  device.
+</para>
+
+<para>
+  The <command>encode-db</command> takes the same arguments as the <command>write-db</command> 
+  command but additionally needs a filename to store the encoded DB into as well as the radio
+  to encode for using the <option>--radio</option> option.
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[dmrconf encode-db --radio=d878uv --id=262,263 --limit=10000 callsigns.dfu]]></programlisting>
+</informalexample>
+
+<para>
+  Like the previous example, this one encodes up to 10000 call-signs starting with those closest to
+  the prefixes 262 and 263 for a AnyTone AT-D878UV radio and stores the result into 
+  <filename>callsigns.dfu</filename>.
+</para>
+</section>
+</section>

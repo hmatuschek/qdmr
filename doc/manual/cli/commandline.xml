@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<chapter xml:id="commandLine"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>The <command>dmrconf</command> command line tool</title>
+</info>
+
+<para>
+  Beside the graphical user interface provided by <application>qdmr</application> (see 
+  <xref linkend="gui"/>), there is also a command line tool allowing to read/write codeplugs from 
+  and to the radios. It is based on the same library called 
+  <link xlink:href="https://dm3mat.darc.de/qdmr/libdmrconf">libdmrconf</link> and thus provides the
+  same features like <application>qdmr</application>.
+</para>
+
+<para>
+  This chapter will briefly describe the command line tool and how it can be used to handle 
+  codeplugs from the command line.
+</para>
+
+<para>
+  The command line tool might be helpful in cases, where the codeplug file (see 
+  <xref linkend="codeplug"/>) gets assembled by a script. Then the same script may
+  upload the codeplug to the radio using the command line tool.
+</para>
+
+<para>
+  Additionally to the the features of the GUI (see <xref linkend="gui"/>), the command line tool
+  provides some features to analyze the memory representation of the binary codeplugs as well as 
+  debugging their implementation.
+</para>
+
+<xi:include href="codeplug.xml"/>
+<xi:include href="callsign.xml"/>
+<xi:include href="various.xml"/>
+<xi:include href="dangerzone.xml"/>
+<xi:include href="dmrconf.xml"/>
+<xi:include href="qdmr.xml"/>
+</chapter>

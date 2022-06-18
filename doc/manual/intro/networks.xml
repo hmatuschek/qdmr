@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="introNetworks" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>DMR Networks</title>
+</info>
+
+<para>
+  Within the previous sections, I tried to outline the concepts and some technical details of a 
+  DMR network and how a codeplug might be assembled. These concepts, however, apply only to the
+  so-called <glossterm>Brandmeister</glossterm> network. This is the network in the background that
+  routes your private and group calls, connects repeaters etc. In Germany, this is the dominant 
+  network. But also world wide, it connects the majority of repeaters (about 5000). However, there
+  are also other networks. There is the <glossterm>DMR-MARC</glossterm> network and the 
+  <glossterm>DMR+</glossterm> network. Which network you are likely to encounter, depends on your 
+  location. In countries like France, Spain, BeNeLux, Poland, Czech Republic and Slovakia, almost
+  all repeaters are connected to the Brandmeister network, while in Denmark the DMR+ network 
+  dominates. In the USA and Austria, DMR-MARC repeaters aren't rare. All these networks do not 
+  differ on the technical level. That is, you DMR-ID is valid in all of these networks and you 
+  can use any DMR Tier II radio.
+</para>
+
+<para>
+  The concepts however, in particular how group calls are performed, depends heavily on the 
+  network. This means, that you need to configure the repeater channels for a DMR+ repeater
+  in a different way compared to a Brandmeister repeater.
+</para>
+
+<section xml:id="itroReflector">
+<info><title>Reflectors (DMR+)</title></info>
+
+<para>
+  <glossterm>Reflector</glossterm>s play an important role in the DMR+ network. They represent
+  a talk group within the DMR+ network.
+</para>
+
+<para>
+  The major difference between a reflector and a talk group is, that they cannot be simply called
+  using a group call. They are subscribed to a local repeater by a private call to the 
+  reflector. Then all repeaters subscribed to that reflector behave like a single repeater. You will
+  then participate on that reflector by performing a group call to TG9, the local talk group. Your
+  call will then be send to the reflector as well as to all other reflectors currently subscribed 
+  on the repeater and consequently to all repeater also subscribed to that reflector.
+</para>
+
+<para>
+  This has the advantage of a much simpler codeplug assembly, as only two channels are configured 
+  for each repeater. One for each time slot. The default transmit contact will always be the 
+  local talk group TG9. To subscribe a reflector, a private call is started to the reflector from
+  the contact list. This implies that the contact list should contain all reflectors you are 
+  interested in. This concept is also much closer to the semi-analog concepts of EchoLink. However,
+  advanced features like roaming are not possible this way. Also the repeater transparency gets 
+  lost. Instead of simply starting a group call to the destination talk group, the local repeater 
+  needs to be <quote>configured</quote>. Once that configuration is done, the communication will
+  happen on the local talk group TG9, even if the communication is not local anymore. 
+</para>
+</section>
+
+</section>

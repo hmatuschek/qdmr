@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="introCodeplug" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Codeplug Assembly</title>
+</info>
+
+<para>
+  After the basic concepts and technical details of the DMR mode has been discussed, it is time to 
+  consider the actual configuration of the DMR radios. This usually not done via the keypad of the 
+  radio but with the help of a separate software. The so-called <glossterm>CPS</glossterm> or 
+  codeplug programming software. 
+</para>
+
+<para>
+  Before we can start, we need like any other participant in the DMR network a unique number, the 
+  DMR ID.
+</para>
+
+<note>
+  <para>
+    You can get your personal and unique DMR ID from 
+    <link xlink:href="https://www.radioid.net/">radioid.net</link>. There you need to verify that
+    you are a licensed ham operator.
+  </para>
+</note>
+
+<para>
+  You will receive your personal DMR ID usually within 24h per Mail. Once you've got your ID, 
+  you can start.
+</para>
+
+<para>
+  As this script is intended for the beginners, it is very likely that you do not own a top-shelf 
+  Motorola device but rather one of the cheap devices of the common manufacturers.
+</para>
+
+<warning>
+  <para>
+    If you do not own a DMR device yet but consider to by one, you should explicitly check whether 
+    it supports DMR Tier I and II<footnote><para>As usual, DMR is not a single standard but a 
+      family of standards. Tier I describes the simplex operation while Tier II considers the 
+      repeater operation and time-slots. You will therefore need a device that also implements 
+      Tier II to be able to work with repeaters.</para></footnote>. Ignore any marketing BS and
+      check the technical description of the product for Tier I &amp; II. If it is not mentioned
+      there, simply skip that product. This is particularly true for the Baofeng MD-5R but not 
+      the RD-5R. 
+  </para>
+</warning>
+
+<para>
+  The manufacturer of the device of your choice will provide the CPS for download you need to program
+  your radio. Usually you will also find there firmware updates for your device. The manufacturers 
+  usually provide a separate CPS version for every device and even firmware revision. So please check
+  whether you've got the correct CPS version. The configuration of the device differs from device to
+  device and even more from manufacturer to manufacturer. The basic setup, however, remains the same.
+</para>
+
+<para>
+  When you start the CPS for the first time, you will likely note two things. First, that the user 
+  experience stems from the last millennium (about Windows 3.11). And second, that there are a tone
+  of obscure and badly translated options for your device. These options are usually named cryptic
+  and are not documented. 
+</para>
+
+<para>
+  The configuration of your device usually happens in five to six steps:
+</para>
+<orderedlist>
+  <listitem><para>General settings, </para></listitem>
+  <listitem><para>creating contacts, </para></listitem>
+  <listitem><para>assembling group lists, </para></listitem>
+  <listitem><para>creating channels, </para></listitem>
+  <listitem><para>assembling zones and </para></listitem>
+  <listitem><para>optionally assembling scan lists.</para></listitem>
+</orderedlist>
+
+<para>
+  Within the following sections, I want to guide you through these steps.
+</para>
+
+
+<section xml:id="introCPGeneral">
+<info><title>General radio-wide settings.</title></info>
+
+<para>
+  The single most important options within the general settings is your DMR ID and your call sign. These 
+  options are usually located under the label <guilabel>Radio Settings</guilabel> or 
+  <guilabel>General Settings</guilabel><footnote><para>The actual name may vary from manufacturer
+    to manufactuer.</para></footnote>.
+  Your DMR ID is entered in the field name <guilabel>Radio ID</guilabel>. Many radios support to 
+  enter several DMR IDs. This feature is usually not used in ham radio. In fact you will only always
+  need a single DMR ID even with several radios.
+</para>
+
+<para>
+  Your call can be entered in the <guilabel>Radio Name</guilabel> field.
+</para>
+</section>
+
+
+<section xml:id="introCPContact">
+<info><title>Creating Contacts</title></info>
+
+<para>
+  Once you have made these basic settings, you may create some contacts in your contact list. This 
+  list should contain all talk groups you are interested in, some private contacts to OM you know
+  as well as some <quote>service numbers</quote> for the <quote>echo</quote>-service, SMS service 
+  etc. A sample is shown in <xref linkend="tabIntroContacts"/>.
+</para>
+
+<table xml:id="tabIntroContacts">
+  <title>Example contacts for germany</title>
+  <thead>
+    <tr><td>Name</td> <td>Typ</td> <td>Nummer</td>  <td>Name</td> <td>Typ</td> <td>Nummer</td></tr>
+  </thead>
+  <tbody>
+    <tr><td>Local</td>       <td>group call</td> <td>9</td>     <td>Ham/SlHo</td>  <td>group call</td> <td>2622</td></tr>
+    <tr><td>Regional</td>    <td>group call</td> <td>8</td>     <td>NiSa/Bre</td>  <td>group call</td> <td>2623</td></tr>
+    <tr><td>TG99</td>        <td>group call</td> <td>99</td>    <td>NRW</td>       <td>group call</td> <td>2624</td></tr>
+    <tr><td>All call</td>    <td>all call</td> <td>16777215</td> <td>RhPf/Saar</td> <td>group call</td> <td>2625</td></tr>
+    <tr><td>World wide</td>  <td>group call</td> <td>91</td>    <td>Hessen</td>    <td>group call</td> <td>2626</td></tr>
+    <tr><td>Europe</td>      <td>group call</td> <td>92</td>    <td>BaWü</td>      <td>group call</td> <td>2627</td></tr>
+    <tr><td>D-A-CH</td>      <td>group call</td> <td>920</td>   <td>Bay</td>       <td>group call</td> <td>2628</td></tr>
+    <tr><td>Germany</td>     <td>group call</td> <td>262</td>   <td>Sa/Th</td>     <td>group call</td> <td>629</td></tr>
+    <tr><td>Austria</td>     <td>group call</td> <td>232</td>   <td>Echo Test</td> <td>private call</td> <td>262997</td></tr>
+    <tr><td>Switzerland</td> <td>group call</td> <td>228</td>   <td>SMS Serv.</td> <td>private call</td> <td>262993</td></tr>
+    <tr><td>EMCOM EU</td>    <td>group call</td> <td>9112</td>  <td>DAPNET</td>    <td>private call</td> <td>262994</td></tr>
+    <tr><td>EMCOM WW</td>    <td>group call</td> <td>9911</td>  <td>APRS GW</td>   <td>private call</td> <td>262999</td></tr>
+    <tr><td>MeVo/SaAn</td>   <td>group call</td> <td>2620</td>  <td>DM3MAT</td>    <td>private call</td> <td>2621370</td></tr>
+    <tr><td>Ber/Bra</td>     <td>group call</td> <td>2621</td>  <td>...</td>       <td>...</td>          <td>...</td></tr>
+  </tbody>
+</table>
+
+<para>
+  Of cause there are much more talk groups. There are also talk groups for specific topics which 
+  are not necessarily targeted at a specific region. A rather complete list can be found in the 
+  <link xlink:href="https://wiki.brandmeister.network/index.php/TalkGroups">Brandmeister Wiki</link>.
+</para>
+</section>
+
+
+<section xml:id="introCPGroupList">
+<info><title>Assemble group lists</title></info>
+
+<para>
+  The next step is to assemble so-called <glossterm>Group List</glossterm>s. These are simple lists of 
+  talk groups that you want to receive on a particular channel. As mentioned in the introduction, the 
+  network does not know which talk groups you are interested in. This must be programmed into the radio.
+  Group lists do exactly that: The specify which talk groups you want to receive. All others are ignored.
+</para>
+
+<para>
+  You should at least create two group lists. One for the simplex operation, one for regional communication
+  and optionally one for the trans-regional communication. You should also create one for each region you 
+  frequently visit.
+</para>
+
+<para>
+  The simplex group list is theoretically not necessary as simplex calls should always use the so-called 
+  <glossterm>All Call</glossterm>. Frequently, however, also the talkgroups TG99, TG9 and TG8 are used 
+  in simplex operation. Hence a group list with these talk groups is needed for simplex operation.
+</para>
+
+<para>
+  Your trans-regional talk group should include the talk groups for the entire world TG91, your 
+  continent (e.g., Europe TG92), your country (e.g., Germany TG262) and also the emergency talk 
+  group (e.g., 9112 in Europe).
+</para>
+
+<para>
+  Finally the talk group for the local/regional communication should contain the local TG9, 
+  regional TG8 and the talk group for your region (e.g., TG 2621 for my region Berlin/Brandenbug).
+  As I am also frequently in saxony, I also created a group list for that region. My 
+  group list settings are shown in <xref linkend="tabIntroGroupLists"/>.
+</para>
+  
+<table xml:id="tabIntroGroupLists">
+  <title>Example group lists</title>
+  <thead>
+    <tr><td>Name</td> <td>Group calls</td></tr>
+  </thead>
+  <tbody>
+    <tr><td>Simplex</td> <td>Local, Regional, TG99</td></tr>
+    <tr><td>WW/EU/DL</td> <td>World wide, Europe, D-A-CH, Germany, EMCOM EU</td></tr>
+    <tr><td>Ber/Bra</td> <td>Local, Regional, Ber/Bra</td></tr>
+    <tr><td>Sa/Th</td> <td>Local, Regional, Sa/Th</td></tr>
+  </tbody>
+</table>
+</section>
+
+
+<section xml:id="introCPChannel">
+<info><title>Creating channels</title></info>
+
+<para>
+  Before we start assembling any channels, I should mention that DMR radios are also able to 
+  transmit and receive analog FM. Thus, you can also use them for classic FM simplex and repeater 
+  operation. In this section, I describe the configuration of digital DMR channels usually called 
+  <quote>digital channels</quote>. The configuration of analog FM channels is not described. To 
+  create a DMR channel, you have to select <guilabel>digital</guilabel> for the <guilabel>channel 
+  type</guilabel>, for FM channels <guilabel>analog</guilabel>.
+</para>
+
+<para>
+  When you already have some experience with the analog FM repeater operation, the configuration 
+  of DMR channels may appear quiet weird. For analog FM repeaters, you usually configure exactly 
+  one channel. For DMR repeaters you will configure at least two (one for each time slot), but 
+  usually many more. To cut a long story short, let me explain it with a concrete example.
+</para>
+
+
+<section>
+<info><title>Creating Simplex Channels</title></info>
+<table xml:id="tabIntroCPSimplexChannels">
+  <title>Example simplex channel configuration</title>
+  <thead>
+    <tr><td>Name</td> <td>RX Freq.</td> <td>TX Freq.</td> <td>TS</td> <td>CC</td> <td>TX Contact</td> <td>Grp.List</td></tr>
+  </thead>
+  <tbody>
+    <tr><td>DMR S0</td> <td>433.4500 MHz</td> <td>433.4500 MHz</td> <td>1</td> <td>1</td> <td>all call</td> <td>simplex</td></tr>
+    <tr><td>DMR S1</td> <td>433.6125 MHz</td> <td>433.6125 MHz</td> <td>1</td> <td>1</td> <td>all call</td> <td>simplex</td></tr>
+    <tr><td>...</td> <td>...</td> <td>...</td> <td>...</td> <td>...</td> <td>...</td> <td>...</td></tr>
+  </tbody>
+</table>
+
+<para>
+  In <xref linkend="tabIntroCPSimplexChannels"/> an example for a simplex channel configuration is 
+  shown. Of cause, you should extend it to all 8 simplex channels. The first column simply specifies
+  the name of the channel.
+</para>
+
+<para>
+  The second and third columns specify the transmit and receive frequencies for these channels.
+  For simplex channels, RX and TX frequencies are the same.
+</para>  
+
+<para>
+  In simplex operation, there is no repeater. That is, no instance that dictates a beat. To this 
+  end the choice of the time slot (TS) is irrelevant and usually TS1 is chosen.
+</para>
+
+<para>
+  The color code, however, matters. Repeater as well as your radio will ignore calls with a mismatching
+  color code. For simplex channels, the color code 1 has been established.
+</para>
+
+<para>
+  The sixth column specifies the default transmit contact. For simplex channels, the so-called 
+  <glossterm>All Call</glossterm> should be chosen, to ensure that really everyone can receive the 
+  call irrespective of the receivers group list settings. The default transmit contact specifies 
+  the contact (private, group or all call) that is called whenever the PTT is pressed. As mentioned
+  earlier, there is an exception to that rule. Whenever you directly answer a call within in the 
+  so-called <glossterm>Hang Time</glossterm>, you will answer with the same call you received. 
+</para>
+
+<para>
+  The last column specifies the to so-called <glossterm>Group List</glossterm>. This list specifies
+  which talk groups are received on that channel. As mentioned earlier, no entry should be needed 
+  here, as the all-call should be used for the transmit contact on simplex channels. Unfortunately,
+  it is not uncommon to find several talk groups being used as transmit contacts on simplex 
+  channels like TG9, TG8, TG99. For these cases, a group list <quote>simplex</quote> was created 
+  earlier.
+</para>
+
+<para>
+  Within your CPS, you will find many more options for channels. The majority can be left 
+  untouched. At the end of this section, I will describe some of these settings briefly. Many of 
+  these settings are quite uncommon in amateur radio or even straight illegal.
+</para>
+
+<para>
+  The <glossterm>Admit Criterion</glossterm> specifies under which conditions your radio is 
+  allowed to transmit. For simplex channels, the option <guilabel>channel free</guilabel> should be
+  chosen. This configures the radio to only transmit if the channel is currently free.
+</para>
+</section>
+
+<section>
+<info><title>Creating repeater channels</title></info>
+
+<para>
+  Creating repeater channels is slightly more complex than creating simplex channels, as we need to
+  create several channels per repeater. Before you can create any channels, you need to know which 
+  DMR repeaters are near to you. A good overview provides the
+  <link xlink:href="https://repeaterbook.com">repater book</link>. There you can also filter for
+  DMR repeaters and you get all information you need to configure the DMR repater channels. That 
+  is input and output frequencies and the color code of the repeater.
+</para>
+
+<table orient="land" xml:id="tabIntroCPRepeaterChannels">
+  <title>Example channels for a single repeater DB0LDS</title>
+  <thead>
+    <tr><td>Name</td> <td>RX Freq. (output)</td> <td>TX Freq. (input)</td> <td>TS</td> <td>CC</td> <td>TX Contact</td> <td>Grp.List</td></tr>
+  </thead>
+  <tbody>
+    <tr><td>DB0LDS TS1</td> <td>439.5625 MHz</td> <td>431.9625 MHz</td> <td>1</td> <td>1</td> <td>-</td> <td>WW/EU/DL</td></tr>
+    <tr><td>DB0LDS DL TS1</td> <td>439.5625 MHz</td> <td>431.9625 MHz</td> <td>1</td> <td>1</td> <td>Germany</td> <td>WW/EU/DL</td></tr>
+    <tr><td>DB0LDS Sa/Th TS1</td> <td>439.5625 MHz</td> <td>431.9625 MHz</td> <td>1</td> <td>1</td> <td>Sa/Th</td> <td>Sa/Th</td></tr>
+    <tr><td>DB0LDS TG9 TS2</td> <td>439.5625 MHz</td> <td>431.9625 MHz</td> <td>2</td> <td>1</td> <td>TG9</td> <td>Ber/Bra</td></tr>
+    <tr><td>DB0LDS TG8 TS2</td> <td>439.5625 MHz</td> <td>431.9625 MHz</td> <td>2</td> <td>1</td> <td>TG8</td> <td>Ber/Bra</td></tr>
+    <tr><td>DB0LDS BB TS2</td> <td>439.5625 MHz</td> <td>431.9625 MHz</td> <td>2</td> <td>1</td> <td>Ber/Bra</td> <td>Ber/Bra</td></tr>
+  </tbody>
+</table>
+
+<para>
+  I think, it is the best to explain the creation of repeater channels using a concrete example for
+  a repeater near to me shown in <xref linkend="tabIntroCPRepeaterChannels"/>. This repeater has 
+  the call DB0LDS and has the input frequency 431.9625 MHz and output frequency 439.5625 MHz. 
+  According to repeater book, this repeater expects the color code 1. These are the elementary 
+  information you need to set for all channels using this repeater. Many CPSs allow to copy or 
+  clone channels. This way you only need to enter this basic information once.
+</para>
+
+<para>
+  At the end of <xref linkend="introTimeSlot"/>, I mentioned that trans-regional communication is 
+  happening on time slot 1 while regional communication is happening on time slot 2. This is 
+  visible in this example. The repeater is located in the region Berlin/Brandenbug (Ber/Bra),
+  consequently all channels with within-region talk-groups have the time slot 2, all others have
+  the time slot 1.
+</para>
+
+<para>
+  The first channel <quote>DB0LDS TS1</quote> is a generic channel for the time slot 1. There is no
+  default transmit contact defined for this channel. This channel can be used to perform arbitrary 
+  direct and group calls by selecting a contact or talk group from the contact list. This means, 
+  that a call cannot be started by simply pressing PTT on that channel. First, a contact must be 
+  selected that should get called.
+</para>
+
+<para>
+  The second channel <quote>DB0LDA DL TS1</quote> is almost identical to the first except for the 
+  default transmit contact. Here <quote>Germany</quote> (TG262) is selected. This means, if this 
+  channel is selected and the PTT is pressed, the talk group 262 is called. By configuring a 
+  separate channel for this talk group allows to start a call to it without having to search for 
+  it in the contact list. This also allows to temporarily subscribe this talk group on a repeater
+  easily, by simply pressing PTT briefly. 
+</para>
+
+<note>
+  <para>
+    Irrespective of the default transmit contact, you can always answer to a call within the hang 
+    time.
+  </para>
+</note>
+
+<para>
+  The third channel <quote>DB0LDS Sa/Th TS1</quote> is also similar to the first two. Here the 
+  default transmit contact is the talk group for Saxony/Thuringia (TG2629) to be able to 
+  subscribe that talk group at my local repeater and call it easily. Please not that for this 
+  channel the time slot 1 is used. The repeater is located in Brandenburg and therefore any 
+  communication with Saxony is inter-regional and should happen on the time slot 1. The group list
+  contains only the talk group for Saxony/Thuringia and thus other inter-regional talk groups 
+  are not received on that channel.
+</para>
+
+<para>
+  Channels four, five and six are for repeater-local (TG9), regional (TG8) and the talk group 
+  Berlin/Brandenburg (TG2621) calls. As this is all regional communication, it happens on the 
+  time slot 2. Also they all have the group list <quote>Ber/Bra</quote> set (see 
+  <xref linkend="tabIntroGroupLists"/>). Therefore, all regional talk groups (TG8, TG9, TG2621)
+  are received on that channel. As the default transmit contact, the corresponding talk group
+  is set. If the channel <quote>DB0LDS TG9 TS2</quote> is selected and the PTT is pressed, 
+  a call to TG9 is repeated only by the repeater DB0LDS. If the channel <quote>DB0LDS BB 
+  TS2</quote> is selected and the PTT is pressed, a call to TG2621 is repeater by almost all 
+  repeaters in the region Berlin/Brandenbug. Therefore, chose a talk group that is sufficient
+  for you intended communication. 
+</para>
+
+<note>
+  <para>
+    On any channel, you can start an arbitrary call (group, privat, all) by either selecting 
+    the contact from the contact list of even simply entering the DMR number into the keypad
+    of the radio. This is independent from the default contact on the current channel. In the
+    end, the default transmit contact is a convenience feature. With the default contact, 
+    channels for frequently used contacts can be created.
+  </para>
+</note>
+
+<para>
+  The so-called <glossterm>Admit Criterion</glossterm> should be set to <guilabel>Color 
+  Code</guilabel> for DMR repeater channel. This means, that the radio will only transmit if the 
+  channel is free and the color code of the repeater matches the color code of the channel.
+</para>
+</section>
+
+<section>
+<info><title>Other channel options</title></info>
+
+<para>
+  The user interface of the manufacturer CPS where you configure the channels, is usually very 
+  extensiv. There is a huge amount of options that control the behavior of the channel. The 
+  majority of these options are not used in ham radio applications. Some of these, however, I want
+  to describe here briefly.
+</para>
+
+<para>
+  The <glossterm>Admit Criterion</glossterm> was mentioned before. It controls under which 
+  conditions the radios can transmit. There are usually three options. <guilabel>Always</guilabel>
+  does exactly what it says: it allows to transmit always. This option should be chosen for 
+  analog FM repeater channels. <guilabel>Channel free</guilabel> means that the radio will only 
+  transmit if the current channel is free. This option should be choses for simplex channels.
+  When <guilabel>Color code</guilabel> is selected, the radio will only transmit if the channel is
+  free and the color code of the repeater matches the color code of the channel. This option should
+  be chosen for DMR repeater channels.
+</para>
+
+<para>
+  The <glossterm>TOT</glossterm> setting or <quote>transmit timeout</quote> secifies the maximum 
+  duration of continuous transmission. After that period of continuous transmission, the radio 
+  will stop the transmission automatically. The feature is used in commercial applications to avoid
+  the blocking of a channel or talk group by a participant. This option has little sense in amateur 
+  radio and can be set to infinity.
+</para>
+
+<para>
+  The <glossterm>Emergency System</glossterm> is a method to signal an alarm or an emergency 
+  situation. Also this feature is not used in amateur radio. 
+</para>
+
+<para>
+  The option <glossterm>Privacy Group</glossterm> or <glossterm>Encryption Key</glossterm> refers
+  to a built-in method of encrypting the traffic. This is actually forbidden in amateur radio.
+</para>
+
+<para> 
+  The flags <quote>Emergency Alarm Confirmed</quote>, <quote>Private Call Confirmed</quote> and 
+  <quote>Data Call Confirmed</quote> specify how the radio starts these calls. The radio will first
+  establish a call to the destination and will signal once the call is <quote>confirmed</quote>. 
+  Once the confirmation is received, the actual call starts. These options are not used in amateur
+  radio and should be disabled as they may interfere with the normal operation.
+</para>
+
+<para>
+  The option <glossterm>Talkaround</glossterm> allows to operate simplex on a repeater channel. 
+  That is the radio transmits and receives on the repeater input frequency. This allows to bypass
+  the repeater and to communicate directly with other participants on the same repeater channel.
+  Also this option makes little sense in amateur radio.
+</para>
+
+<para>
+  When the <glossterm>RX Only</glossterm> flag is enabled, the radio cannot transmit on that 
+  channel. This may be useful for out-of-band monitoring channels where you are not allowed 
+  to transmit.
+</para>
+
+<para>
+  The <glossterm>VOX</glossterm> feature is actually used in ham radio. It stands for <quote>voice 
+  operated switch</quote> and allows to start a call using the voice without the need to press PTT.
+  Some radios allow to enable this option on a per-channel bases others only radio-wide.
+</para>
+
+<para>
+  The <quote>Power</quote> option allows to specify the transmit power level. This can usually 
+  be set in predefined steps like <guilabel>Low</guilabel>, <guilabel>Middle</guilabel>, 
+  <guilabel>High</guilabel>. Some radios may also allow a fine grained setting of the power level.
+</para>
+
+<para>
+  The <glossterm>Scan List</glossterm> specifies a list of channel that are scanned if a scan is
+  started on that channel. This feature might be used as an alternative to a missing roaming 
+  feature (see <xref linkend="introRoaming"/>). 
+</para>
+</section>
+</section>
+
+
+<section xml:id="itroCPZone">
+<info><title>Assembling zones</title></info>
+
+<para>
+  Once you have assembled all channels of interest, you may notice that the list is quite long. 
+  Hence all DMR radios organize the channels in so-called <glossterm>Zone</glossterm>s. Zones are 
+  simple lists of channels that group them into relevant sets, usually based on the location. You 
+  may therefore collect all channels for <quote>Home</quote>, <quote>Work</quote> and 
+  <quote>Holidays</quote> into one zone each. How you organize your zones is up to you.
+</para>
+
+<para>
+  You may also organize these channels by talk groups. This way you may implement some kind of a 
+  manual roaming. Once you left the range of a repeater you may search for another one in the same
+  zone. This way you stay connected to a particular talk group. In contrast to the automatic roaming,
+  you have to select the repeater by hand.
+</para>
+
+<note>
+  <para>
+    Channels that are not assigned to any zone are usually not selectable by the radio. It is, 
+    however, perfectly fine to assign a channel to several zones.
+  </para>
+</note>
+</section>
+
+
+<section xml:id="introCPScanList">
+<info><title>Assembling scan lists</title></info>
+<para>
+  <glossterm>Scan List</glossterm>s are simple lists of channels. When the scan is started on a 
+  particular channel, the channels scan list is used. The radio will then step though that list
+  and may stop on a channel that shows activity. It is then possible to answer the received call.
+  This function allows for observing several channels. Additionally, it is usually possible to specify
+  one or more <quote>priority channels</quote> for a scan list. This channel is then visited more 
+  frequently and thus monitored more intensively.
+</para>
+</section>
+</section>

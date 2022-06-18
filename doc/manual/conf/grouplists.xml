@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="confGroupLists"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Group list table</title>
+</info>
+
+<para>
+  Group lists are simple named lists of one ore more contacts. These lists may include group,
+  all or even private calls. Group lists are assigned to channels. They form a group of
+  contacts (e.g., talk groups) you may want to listen to on a particular channel. Usually these
+  group lists form a collection of talk groups that are specific for a particular region.
+</para>
+
+<para>
+  Group lists are defined within the config file like
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[Grouplist Name            Contacts
+1         "Local"          7,9
+2         "Deutschland"    8
+3         "Global"         4
+4         "EU"             5
+5         "Sachs/Thu"      13,12
+6         "Simplex"        2,3,6,7
+7         "Berlin/Brand"   9,10,11,13
+]]></programlisting>
+</informalexample>
+
+<para>
+  The group list table starts with the keyword "Grouplist". The following keywords (Name &amp;
+  Contacts) are ignored, but form a kind of self-documentation for the config file.
+</para>
+
+<para>
+  Following the "Grouplist" keyword, each group list is defined by a single line. The first
+  column specifies the internal unique ID for the group list. This can be any number as long as
+  it is unique. The second column contains the name of the group list as a string. This can be
+  any non-empty string. The third column contains the comma-separated list of contact IDs that form
+  that group list.
+</para>
+
+</section>

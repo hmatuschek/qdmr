@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="introLocal" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Local Repeater Operation</title>
+</info>
+
+<para>
+  One central objective of DMR is to be repeater transparent. That is, it does not matter which 
+  repeater you use. You will always be able to reach the same groups and be always reachable 
+  through the same means (private or group call). This concept is violated by the talk groups 8
+  &amp; 9. The are the regional and local talk groups.
+</para>
+ 
+<example xml:id="figIntroTG9TG8">
+  <title>Two regions with two repeaters each.</title>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/repeater_local.png" width="10cm" align="center"/></imageobject>
+  </mediaobject>
+</example>
+
+<para> 
+  The talk group 9 (TG9) is the so-called local talk group. Group calls to that talk group are not 
+  forwarded though the network and only retransmitted locally. Usually <quote>locally</quote> means
+  only the repeater. Sometimes, however, these calls are also forwarded to other repeaters 
+  nearby. This case is shown in <xref linkend="figIntroTG9TG8"/> on the left side. Here DM3MAT sends 
+  a group call to TG9 via the repeater DB0ABC. This call is not forwarded to any other repeater and 
+  thus is only received in the local area around the repeater. DL1XYZ is in that local area and may 
+  receive that call if he configured his radio to receive calls from the TG9.
+</para>
+
+<para>
+  The talk group 8 (TG8) is the so-called regional talk group. A call to that talk group is usually 
+  forwarded to all repeaters within a specific region. Which repeaters are part of a 
+  <quote>region</quote>, is a decision of the repeater administrators. So it is hard to predict to 
+  which repeaters a regional call gets forwarded. In <xref linkend="figIntroTG9TG8"/> on the right
+  side, DL3XYZ sends a group call to TG8 to the repeater DB0GHI. This call gets forwarded to 
+  all repeaters in the <quote>region</quote>. In this case, also to the repeater DB0JKL within the
+  same region. Therefore, all participants within that region are able to receive the group call 
+  if they configured their radios accordingly. In this example, not only DL4XYZ received the call 
+  but also DL5XYZ who is not close to the repeater DB0GHI and would have missed a group call to the 
+  local talk group.
+</para>
+</section>

@@ -1,0 +1,40 @@
+       7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
+     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0000 | Radio name, 8 x 1byte ASCII encoded, 0xff terminated text                                                                  ...
+     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0004  ...                                                                                                                            |
+     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0008 | 8-digit BCD DMR ID                                                                                                            |
+     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+000c | Unused set to 0x00000000                                                                                                      |
+     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0010 | Unused set to 0x00            | Tx preamble N x 60ms          | Monitor type 0=open, 1=silent | VOX sensitivity [1..10]       |
+     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0014 | Low battery interval N x 5s   | Call alert dur N x 5s         | Lone worker response in min   | Lone worker reminder in sec   |
+     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0018 | Groupcall hang-time N x 500ms | Priv.call hang-time N x 500ms | ARTS tone     |UNT|RST|UMV|DMV|SBP|SBR|DAT| 0 |FIT|STT|PAT|PDT|
+     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+001c | 1 |IQO|DAL| 0   0   0   0   0 | ScanM |ANI|DBW|TXT| 0   0   0 | Rep. STE      | Rep. delay    | Unused set to 0x00            |
+     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0020 | Prog. passwd 8 x ASCII, 0xff terminated                                                                                    ...
+     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0024  ...                                                                                                                            |
+     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+where
+UNT = Unknown number tone
+RST = Reset tone
+UMV = Up-channel mode VFO
+DMV = Down-channel mode VFO
+SBP = Save battery by disable preamble
+SBR = Save battery by disable receive
+DAT = Disables all tones;
+FIT = Channel free indication tone
+STT = Self-test pass tone
+PAT = Talk permit tone analog
+PDT = Talk permit tone digital
+IQO = Inhibit quick-key override
+DAL = Disables all LEDs
+ScanM = Scan mode
+ANI = Enable animation
+DBW = Always TX on active channel on double-wait
+TXT = TX exit tone

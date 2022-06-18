@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="guiSettingsDialog"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" >
+
+
+<info>
+  <title>Application Settings Dialog</title>
+</info>
+
+<para>
+  The application settings dialog controls some of the behavior of <application>qdmr</application>.
+  The dialog is divided into 4 sections: <guilabel>Location</guilabel>, <guilabel>Radio 
+    Programming</guilabel>, <guilabel>Call-Sign DB</guilabel> and <guilabel>Extended Features</guilabel>.
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-settings-dialog.png" width="5cm" align="center"/></imageobject>
+    <textobject>Screen shot of the application settings dialog.</textobject>
+  </mediaobject>
+  <title>The settings dialog</title>
+</screenshot>
+
+
+<section>
+<info>
+  <title>Location settings</title>
+</info>
+
+<para>
+  The first section concerns the location of the user. You may enter your <glossterm>Maidenhead 
+  Locator</glossterm> here or you may enable <guilabel>System location</guilabel>. The latter tries
+  to obtain the current location from the operating system. This information is then used in the 
+  channel editors (see <xref linkend="guiChannels"/>) to provide auto-completion for repeaters 
+  nearby.
+</para>
+</section>
+
+
+<section>
+<info>
+  <title>Radio programming settings</title>
+</info>
+
+<para>
+  The second section controls the programming of the radio and how codeplugs are assembled. The 
+  first option <guilabel>Update codeplug</guilabel> specifies whether a codeplug is generated from
+  scratch or whether the codeplug currently programmed on the radio gets updated. 
+  <application>qdmr</application> does not implement all settings possible for all radios, 
+  consequently <guilabel>Update codeplug</guilabel> should be choses to maintain all settings 
+  of the radio that are not touched by <application>qdmr</application>.
+</para>
+
+<para>
+  For some radios, the GPS and roaming functionality must be enabled explicitly. The 
+  <guilabel>Auto-enable GPS</guilabel> and <guilabel>Auto-enable roaming</guilabel> options
+  can be used to automatically enable GPS or roaming. If selected, whenever any channel has a
+  GPS/APRS system or a roaming zone associated with it, the GPS and/or roaming gets enabled 
+  globally.
+</para>
+
+<para>
+  As described in <xref linkend="guiProgram"/>, the upload of a codeplug will be paused 
+  if some verification warnings are issued. The <guilabel>Ignore verification warnings</guilabel>
+  option allows to continue silently even in the presence of verification warnings. The may be 
+  needed for some radios with some rather short communication timeout. The radio may reset the 
+  connection to the computer while the warnings are shown. To prevent this, this option might be 
+  used.
+</para>
+
+<para>
+  The <guilabel>Ignore frequency limits</guilabel> option does exactly what it says. Usually, 
+  programming a channel outside of the radios frequency range would issue an error. However, many
+  radios are able to receive and even transmit outside of the frequency range specified by the 
+  manufacturer. But be aware, that transmitting outside the declared frequency range may destroy 
+  the radio!
+</para>
+</section>
+
+
+<section>
+<info>
+  <title>Call-sign DB settings</title>
+</info>
+
+<para>
+  The <guilabel>Call-Sign DB</guilabel> section collects options that control the automatic 
+  curation of the call-sign DB. Many radios allow to write a large database of call-signs 
+  and DMR IDs to the radio. These DBs are then used to resolve DMR IDs to call-signs, names
+  etc. and display them. 
+</para>
+
+<para>
+  Usually, curating these databases is a cumbersome task. <application>qdmr</application> tries to
+  automate this task. Usually, <application>qdmr</application> will select as many call-signs from
+  the global database it can fit into the radio. Although modern radios will provide a huge amount
+  memory, not all registered IDs can be programmed. In these cases, 
+  <application>qdmr</application> will select only the <emphasis>closest</emphasis> IDs to your
+  DMR ID (default Radio DMR ID, see <xref linkend="guiRadioSettings"/>). The DMR IDs are compared by 
+  the longest matching prefix. This makes sense as DMR IDs are not random. They share the same 
+  prefix for countries and regions. This way, <application>qdmr</application> will first select all
+  IDs from the same region followed by all IDs from the same country etc. Of cause, there is no 
+  rule without any exceptions. Some countries have several prefixes assigned. 
+</para>
+
+<para>
+  The <guilabel>Limit number of DB entries</guilabel> option and <guilabel>Number of DB 
+    entries</guilabel> field allow to limit the number of DB entries written to the device. If 
+  the <guilabel>Limit number of DB entries</guilabel> option is disabled, as many entries are 
+  written to the device as it can hold.
+</para>
+
+<para>
+  The <guilabel>Select using my DMR ID</guilabel> option and the <guilabel>Select using 
+    prefixes</guilabel> field can be used to control the selection of entries. If the
+  <guilabel>Select using my DMR ID</guilabel> option is enabled, the aforementioned algorithm is 
+  used to select the entries based on the default DMR ID. If this option is disabled, a list of 
+  prefixes must be specified in
+  the <guilabel>Select using prefixes</guilabel> field. This must be a list of comma-separated 
+  prefixes like <code>262, 263</code>. Whitespace are ignored. Then the DMR IDs closest to these 
+  prefixes are used to assemble the final call-sign DB.
+</para>
+</section>
+
+
+<section>
+<info>
+  <title>Extended feature settings</title>
+</info>
+
+<para>
+  DMR originated as a standard for commercial radios. Consequently, there are many features that 
+  are not relevant or even illegal for ham-radio use (e.g., encryption). However, some operators 
+  use their handhelds for both ham-radio and commercial applications. Consequently, 
+  <application>qdmr</application> cannot ignore commercial features. It can, however, hide them.
+  Enabling the <guilabel>Show commercial features</guilabel> options will show these features.
+</para>
+
+<para>
+  Starting with <application>qdmr</application> version 0.9.0, there are some 
+  device specific settings, allowing to configure features only present in one device and not 
+  represented in the general codeplug. These are called <emphasis>extensions</emphasis> and are 
+  usually hidden. To show these device specific extension, select <guilabel>Show device 
+    extensions</guilabel>.
+</para>
+</section>
+</section>
+  

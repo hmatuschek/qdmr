@@ -6,8 +6,11 @@
 
 #include "logger.hh"
 #include "config.hh"
+#include "radioinfo.hh"
 #include "uv390_callsigndb.hh"
+#include "md2017_callsigndb.hh"
 #include "opengd77_callsigndb.hh"
+#include "gd77_callsigndb.hh"
 #include "d868uv_callsigndb.hh"
 #include "d878uv2_callsigndb.hh"
 #include "crc32.hh"
@@ -35,14 +38,24 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
   }
 
   if (parser.isSet("id")) {
-    bool ok=true;
-    uint32_t id = parser.value("id").toUInt(&ok);
-    if (! ok) {
-      logError() << "Please specify a valid DMR ID for --id option.";
+    QStringList prefixes_text = parser.value("id").split(",");
+    QSet<unsigned> prefixes;
+    foreach (QString prefix_text, prefixes_text) {
+      bool ok=true; uint32_t prefix = prefix_text.toUInt(&ok);
+      if (ok)
+        prefixes.insert(prefix);
+    }
+
+    if (prefixes.isEmpty()) {
+      logError() << "Please specify a valid DMR ID or a list of DMR prefixes for --id option.";
       return -1;
     }
-    logDebug() << "Sort call-sign DB w.r.t. DMR ID " << id << ".";
-    userdb.sortUsers(id);
+    prefixes_text.clear();
+    foreach (unsigned prefix, prefixes) {
+      prefixes_text.append(QString::number(prefix));
+    }
+    logDebug() << "Sort call-sign DB w.r.t. DMR ID(s) {" << prefixes_text.join(", ") << "}.";
+    userdb.sortUsers(prefixes);
   } else {
     logWarn() << "No ID is specified, a more or less random set of call-signs will be used "
               << "if the radio cannot hold the entire call-sign DB of " << userdb.count()
@@ -66,40 +79,86 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     return -1;
   }
 
-  if (("uv390"==parser.value("radio").toLower()) || ("rt3s"==parser.value("radio").toLower())) {
+  if (! RadioInfo::hasRadioKey(parser.value("radio").toLower())) {
+    QStringList radios;
+    foreach (RadioInfo info, RadioInfo::allRadios())
+      radios.append(info.key());
+    logError() << "Unknown radio '" << parser.value("radio").toLower() << ".";
+    logError() << "Known radios " << radios.join(", ") << ".";
+    return -1;
+  }
+
+  RadioInfo::Radio radio = RadioInfo::byKey(parser.value("radio").toLower()).id();
+  ErrorStack err;
+
+  if (RadioInfo::UV390 == radio) {
     UV390CallsignDB db;
-    db.encode(&userdb, selection);
-    if (! db.write(parser.positionalArguments().at(1))) {
-      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.errorMessage();
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
       return -1;
     }
-  } else if ("opengd77"==parser.value("radio").toLower()) {
+    if (! db.write(parser.positionalArguments().at(1), err)) {
+      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
+  } else if (RadioInfo::MD2017 == radio) {
+    MD2017CallsignDB db;
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
+      return -1;
+    }
+    if (! db.write(parser.positionalArguments().at(1), err)) {
+      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
+  } else if (RadioInfo::OpenGD77 == radio) {
     OpenGD77CallsignDB db;
-    db.encode(&userdb, selection);
-    if (! db.write(parser.positionalArguments().at(1))) {
-      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.errorMessage();
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
       return -1;
     }
-  } else if (("d878uv"==parser.value("radio").toLower()) || ("d868uv"==parser.value("radio").toLower()) ){
+    if (! db.write(parser.positionalArguments().at(1), err)) {
+      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
+  } else if (RadioInfo::GD77 == radio) {
+    GD77CallsignDB db;
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
+      return -1;
+    }
+    if (! db.write(parser.positionalArguments().at(1), err)) {
+      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
+  } else if ((RadioInfo::D868UVE == radio) || (RadioInfo::D878UV == radio)){
     D868UVCallsignDB db;
-    db.encode(&userdb, selection);
-    if (! db.write(parser.positionalArguments().at(1))) {
-      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.errorMessage();
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
       return -1;
     }
-  } else if (("d878uv2"==parser.value("radio").toLower()) || ("d578uv"==parser.value("radio").toLower()) ){
-    D878UV2CallsignDB db;
-    db.encode(&userdb, selection);
-    if (! db.write(parser.positionalArguments().at(1))) {
+    if (! db.write(parser.positionalArguments().at(1), err)) {
       logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
-                 << "': " << db.errorMessage();
+                 << "': " << err.format();
+      return -1;
+    }
+  } else if ((RadioInfo::D878UVII == radio) || (RadioInfo::D578UV == radio)){
+    D878UV2CallsignDB db;
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
+      return -1;
+    }
+    if (! db.write(parser.positionalArguments().at(1), err)) {
+      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
       return -1;
     }
   } else {
-    logError() << "Cannot encode calls-sign DB: Unknown radio '" << parser.value("radio") << "'.";
+    logError() << "Cannot encode calls-sign DB: Not implemented for '" << parser.value("radio") << "'.";
     return -1;
   }
 

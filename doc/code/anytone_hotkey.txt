@@ -1,0 +1,20 @@
+     7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+00 | Type (0=call, 1=menu)         | Menu item                     | Call type                     | Digital call type             |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+04 | Contact index, 0-based, little endian, 0xffffffff=none                                                                        |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+08 | Message index, 0-based        | Unused filled with 0x00                                                                    ...
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+2c  ...                                                                                                                            |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+Field details:
+ - Menu item: 1=Show SMS nenu, 2=Show new SMS menu, 3=Show hot text menu, 4=Show SMS inbox, 5=Show SMS outbox, 6=Show contacts,
+   7=Show manual dial menu.
+ - Call type: 0=analog, 1=digital (only when Type=call).
+ - Digital call type: 0xff = off, 0=Group call, 1=Private call, 2=All call, 3=Hot text, 4=Call tip (?), 5=Status message.
+ - Contact index: May be analog quick call index (if Type=call, and Call type=analog) or contact index (if Type=call and
+   Call type=digital). 0xffffffff = none.
+ - Message index: May be SMS message index (if Digital call type=Hot text) or status message index
+   (if Digital call type=Status message). 0xff = none.

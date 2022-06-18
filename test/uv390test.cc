@@ -58,7 +58,7 @@ UV390Test::testDigitalContacts() {
   // Type group call, rx tone off
   QCOMPARE((int)*(uint8_t  *)_codeplug.data(0x140800+0x03), 0xc1);
   // Compare name
-  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x140800+0x04), 16, 0), QString("Lokal"));
+  QCOMPARE(decode_unicode((uint16_t *)_codeplug.data(0x140800+0x04), 16, 0), QString("Local"));
 
   /*
    * Test contact 02 (BB)

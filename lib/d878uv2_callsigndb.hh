@@ -23,11 +23,17 @@ class D878UV2CallsignDB : public D868UVCallsignDB
   Q_OBJECT
 
 public:
+  /** Same index entry used by the codeplug to map normal digital contacts to an contact index. Here
+   * it maps to the byte offset within the database entries. */
+  typedef D868UVCodeplug::ContactMapElement IndexEntryElement;
+
+public:
   /** Constructor, does not allocate any memory yet. */
   explicit D878UV2CallsignDB(QObject *parent=nullptr);
 
   /** Tries to encode as many entries of the given user-database. */
-  bool encode(UserDatabase *db, const Selection &selection=Selection());
+  bool encode(UserDatabase *db, const Selection &selection=Selection(),
+              const ErrorStack &err=ErrorStack());
 };
 
 #endif // D868UVCALLSIGNDB_HH

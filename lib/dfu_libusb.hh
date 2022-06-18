@@ -3,73 +3,71 @@
 
 #include <QObject>
 #include <libusb.h>
+#include "errorstack.hh"
 #include "radiointerface.hh"
 
 /** This class implements DFU protocol to access radios.
  *
- * Many manufactures use the standardized DFU protocoll to programm codeplugs and update the
- * firmware of their radios. This class implements this protocol.
+ * Many manufactures use the standardized DFU protocol to program codeplugs and update the
+ * firmware of their radios. This class implements this protocol, see
+ * https://www.usb.org/sites/default/files/DFU_1.1.pdf for details.
  *
  * @ingroup rif */
-class DFUDevice: public QObject, public RadioInterface
+class DFUDevice: public QObject
 {
 	Q_OBJECT
 
 private:
-  /** Current status. */
-	typedef struct {
+  /** Status message from device. */
+  struct __attribute__((packed)) status_t {
 		unsigned  status       : 8;
 		unsigned  poll_timeout : 24;
 		unsigned  state        : 8;
 		unsigned  string_index : 8;
-	} status_t;
+  };
 
 public:
-  /** Opens a connection to the USB-DFU devuce at vendor @c vid and product @c pid. */
-	DFUDevice(unsigned vid, unsigned pid, QObject *parent=nullptr);
+  /** Specialization to address a DFU device uniquely. */
+  class Descriptor: public USBDeviceDescriptor
+  {
+  public:
+    /** Constructor from interface info, bus number and device address. */
+    Descriptor(const USBDeviceInfo &info, uint8_t bus, uint8_t device);
+  };
+
+public:
+  /** Opens a connection to the USB-DFU device at vendor @c vid and product @c pid. */
+  DFUDevice(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
 	virtual ~DFUDevice();
 
-	bool isOpen() const;
-	QString identifier();
-	void close();
+  /** Returns @c true if the DFU device interface is open. */
+  bool isOpen() const;
+  /** Closes the DFU interface. */
+  void close();
 
-  /** Erases a memory section at @c start of size @c size. */
-  bool erase(uint start, uint size, void (*progress)(uint, void *)=nullptr, void *ctx=nullptr);
+  /** Downloads some data to the device. */
+  int download(unsigned block, uint8_t *data, unsigned len, const ErrorStack &err=ErrorStack());
+  /** Uploads some data from the device. */
+  int upload(unsigned block, uint8_t *data, unsigned len, const ErrorStack &err=ErrorStack());
 
-  bool read_start(uint32_t bank, uint32_t addr);
-  bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
-  bool read_finish();
-  bool write_start(uint32_t bank, uint32_t addr);
-  bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
-  bool write_finish();
-	bool reboot();
-
-  const QString &errorMessage() const;
+public:
+  /** Finds all DFU interfaces with the specified VID/PID combination. */
+  static QList<USBDeviceDescriptor> detect(uint16_t vid, uint16_t pid);
 
 protected:
   /** Internal used function to detach the device. */
-	int detach(int timeout);
+  int detach(int timeout, const ErrorStack &err=ErrorStack());
   /** Internal used function to read the current status. */
-	int get_status();
+  int get_status(const ErrorStack &err=ErrorStack());
   /** Internal used function to clear the status. */
-	int clear_status();
+  int clear_status(const ErrorStack &err=ErrorStack());
   /** Internal used function to read the state. */
-	int get_state(int &pstate);
+  int get_state(int &pstate, const ErrorStack &err=ErrorStack());
   /** Internal used function to abort the current operation. */
-	int abort();
-  /** Internal used function to wait for a response from the device. */
-	int wait_idle();
-  /** Internal used function to send a controll command to the device. */
-	int md380_command(uint8_t a, uint8_t b);
-  /** Internal used function to set the current I/O address. */
-	int set_address(uint32_t address);
-  /** Internal used function to erase a specific block. */
-	int erase_block(uint32_t address);
-  /** Internal used function to read the device identifier. */
-	const char *identify();
-  /** Internal used function to initialize the DFU connection to the device. */
-	const char *dfu_init(unsigned vid, unsigned pid);
+  int abort(const ErrorStack &err=ErrorStack());
+  /** Internal used function to busy-wait for a response from the device. */
+  int wait_idle();
 
 protected:
   /** USB context. */
@@ -78,10 +76,6 @@ protected:
 	libusb_device_handle *_dev;
   /** Device status. */
 	status_t _status;
-  /** Read identifier. */
-  const char *_ident;
-  /** Holds the last error message. */
-  QString _errorMessage;
 };
 
 #endif // DFU_LIBUSB_HH

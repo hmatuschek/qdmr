@@ -31,5 +31,5 @@ with
 RMode = Repater mode, BWd = Band width, PWR = Power, CMode = Channel mode, TAr=Talkaround, CaC = Call confirm, RXO = RX only,
 CTR = CTCSS phase reversal, TDC = TX DCS code, TCT = TX CTCSS tone, RDC = RX DCS code, RCT = RX CTCSS tone, SQM = Squelch mode,
 OptSig = Optional signalling, TxPer = TX permit, LWK = Lone worker, EEE = Enable enhanced encryption, RGP = Enable RX GPS,
-EAT = Enable adative TDMA, EST = Enable simplex TDMA, SMC = SMS confirmation, TSL = Time slot, XFR = Exlcude from roaming,
+EAT = Enable adative TDMA, EST = Enable simplex TDMA, SMC = SMS confirmation, TSL = Time slot, XFR = Exclude from roaming,
 ETM = Enable through mode, RNG = Ranging, APRSRep = Enable APRS/GPS report, MuK = Multiple keys, RnK = Random key, SMF = SMS forbid.

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="guiZones"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Assembling Zones</title>
+</info>
+
+<para>
+  You may program a myriad of different channels for you radio. To organize them in handy chunks,
+  zones are used. That is, a zone is just a named list of channels that are relevant for a
+  particular area or a particular situation.
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-zones.png" width="13cm" align="center"/></imageobject>
+  </mediaobject>
+ <title>The list of zones.</title>
+</screenshot>
+
+<para>
+  The <guilabel>Zones</guilabel> tab just lists all defined zones. You may add a 
+  <glossterm>Zone</glossterm> using the <guibutton>Add Zone</guibutton> button or you may delete 
+  one by selecting the zone in the list and clicking on <guibutton>Delete Zone</guibutton>. You may
+  also alter the ordering of the zones by selecting one from the list and using the 
+  <guibutton>up</guibutton> and <guibutton>down</guibutton> buttons on the right.
+</para>
+
+<para>
+  How zones are implemented differs from radio to radio. For example, some radios allow to set a
+  different zone for each VFO (A or B), consequently these zones are simple lists of channels.
+  Other radios allow to select a single zone for both VFOs. For these radios, a zone
+  consists of two lists of channels. One for each VFO. <application>qdmr</application> zones follow
+  the second approach. That is, a zone consists of two lists. One of each VFO. When programming 
+  radios that support only one channel list per zone, the zone is split into two (unless the second 
+  list is empty). One for each VFO and the A/B label is added to the name.
+</para>
+
+<para>
+  Double-clicking a zone or clicking on the <guibutton>Add Zone</guibutton> button will open the 
+  zone editor dialog.
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-edit-zone.png" width="7cm" align="center"/></imageobject>
+    <textobject>Screen-shot of the edit-zone dialog.</textobject>
+  </mediaobject>
+ <title>The zone editor.</title>
+</screenshot>
+
+<para>
+  This dialog allows for adding or removing channels, and changing the order of the channels within
+  the zone using the up- and down-buttons on the right.
+</para>
+
+</section>
+
+  

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="introPrivateCalls" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Private calls</title>
+</info>
+
+<para>
+  Private calls allow to call other participants directly without interfering with other 
+  calls (except for using the repeater). In the introduction into DMR above, the private call 
+  over several repeaters has been described. I consider this aspect of DMR particularly 
+  interesting. With the exception of TG 8 &amp; 9, private and group calls are transparent 
+  with respect to the repeaters used. It simply does not matter which repeaters are actually
+  used to establish a connection. Therefore, I do not need ot know where the other 
+  participants are located. 
+</para>
+
+<example xml:id="figIntroRepPriv">
+  <title>Direct calls between countries.</title>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/repeater_privatecall.png" width="5cm" align="center"/></imageobject>
+  </mediaobject>
+</example>
+
+<para>
+  Consider the typical vacation situation: An OM at his holiday location may want to participate
+  in his local afternoon net. He can do that by simply starting a group call to the nets talk group
+  over the repeater at his holiday location. Now the local holiday repeater has subscribed to the 
+  local talk group at home and the OM can participate as usual in the net. The other participants 
+  in the net may not even recognize that the OM is at his holiday location.
+</para>
+
+<para>
+  In a similar fashion, private calls can be started and received at the holiday location. The 
+  DMR network knows the repeater a participant was last active on. By briefly pressing the PTT
+  at the holiday repeater, the OM is registered and can now receive private calls at his 
+  holiday location. The friends at home may not even know where the OMs current location is nor 
+  which repeater to use to reach him. The network takes care of that.
+</para>
+
+<para>
+  <xref linkend="figIntroRepPriv"/> shows such a private call between countries. DM3MAT starts a 
+  private call to DL2XYZ using his local repeater DB0ABC. DL2XYZ, however, is at his holiday 
+  location in Italy. As he had registered himself at that repeater, the private call gets 
+  forwarded to the holiday repeater I0ABC in Italy, where DL2XYZ can receive it. DM3MAT does not 
+  need to know the location of the callee nor which repeaters are near to him. This automatic 
+  routing of calls (group and private calls) is a major advantage over the analog FM repeater 
+  network and EchoLink. For the latter, the ID of the destination repeater needs to be known.
+</para>
+</section>

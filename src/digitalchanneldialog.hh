@@ -18,12 +18,16 @@ public:
 
 protected slots:
   void onRepeaterSelected(const QModelIndex &index);
+  void onPowerDefaultToggled(bool checked);
+  void onTimeoutDefaultToggled(bool checked);
+  void onVOXDefaultToggled(bool checked);
 
 protected:
   void construct();
 
 protected:
   Config *_config;
+  DigitalChannel *_myChannel;
   DigitalChannel *_channel;
 };
 

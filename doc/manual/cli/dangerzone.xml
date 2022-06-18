@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<section xml:id="cmdDangerZone"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Danger zone</title>
+</info>
+
+<warning>
+  <para>
+    You are about to enter the land of pain. Continue on your own risk.
+  </para>
+</warning>
+
+<para>
+  Some radios are actually identical to others. They also identify them self as a different radio.
+  An example for such a radio is the Retevis RT3S, this radio is simply a relabeled TyT MD-UV390. 
+  The RT3S actually identifies itself as a MD-UV390. From the perspective of the CPS, these two 
+  radios are indistinguishable. Consequently, <application>qdmr</application> and 
+  <command>dmrconf</command> will always identify the RT3S as a MD-UV390.
+</para>
+
+<para>
+  There are, however, virtually identical radios. These are radios that actually identify them self
+  as different models but the firmware, communication protocol and codeplug is basically identical 
+  to another model. An example for such virtually identical models are the AnyTone AT-D868UV and 
+  the BTech DMR-6X2. Each model identifies itself correspondingly and thus is distinguished by the
+  CPS. Some of these relationships between virtually identical models are known to 
+  <application>qdmr</application> and <command>dmrconf</command>. In these cases, the CPS will 
+  treat these radios as identical.
+</para>
+
+<para>
+  Some of these close relationships between models are not known to <command>dmrconf</command>. In 
+  these cases, <command>dmrconf</command> will stop with an error that a radio is unknown although
+  it actually supported as a different model. In these rare cases, it is possible to override the
+  radio detection using the <option>--radio</option> option. 
+</para>
+
+<para>
+  This option is usually used to specify the type whenever the radio model is not detected. This 
+  option also overrides the model detection and thus allows to handle virtually identical radios.
+  For example, if the relation ship between the AT-D868UV and the DMR-6X2 would have not been 
+  known to <command>dmrconf</command>, a codeplug could read anyway from the device by calling
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[dmrconf read --radio=d868uv codeplug_6x2.yaml]]></programlisting>
+</informalexample>
+
+<para>
+  Here the radio detection (resulting the detection of a DMR-6X2) gets overridden and the radio is
+  handled as a AT-D868UV. 
+</para>
+
+<para>
+  If you know of such virtually identical radios that <command>dmrconf</command> does not 
+  recognize, consider filing an issue at 
+  <link xlink:href="https://github.com/hmatuschek/qdmr/issues">the bug tracker</link>.
+</para>
+
+<warning>
+  <para>
+    Of cause, handling a radio differently as it identifies itself may cause permanent damage to
+    the radio. So you should be very sure that the radios are actually identical when overriding
+    the radio detection routines.
+  </para>
+</warning>
+</section>

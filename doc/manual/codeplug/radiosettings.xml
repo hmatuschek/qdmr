@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="yamlRadioSettings"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+<info>
+  <title>Radio settings</title>
+</info>         
+
+<para>
+  The radio settings section contains all radio-wide settings. For example the microphone level, 
+  boot text etc. For now, there aren't many.
+</para>
+
+<para>
+  As an example, consider the following general settings
+</para>
+
+<example pgwide="1">
+  <title>General radio-wide settings.</title>
+  <programlisting language="yaml"><![CDATA[settings:
+  micLevel: 6
+  speech: false
+  introLine1: qDMR
+  introLine2: DM3MAT
+  defaultID: id1 
+  squelch: 1
+  vox: 0
+  power: High
+]]></programlisting>
+</example>
+
+<para>
+  Here, the microphone amplification is set to 6, the speech synthesis is disabled, the two boot
+  text lines are set to <quote>qDMR</quote> and <quote>DM3MAT</quote> respectively and the default 
+  DMR radio ID is set to <quote>id1</quote>. The latter is the id of a radio ID defined below. 
+</para>
+
+<para>
+  Also, the radio-wide default squelch, VOX and power level is set. These values can be referenced
+  later in channels. Also, some radios do not allow for these settings to be applied on a 
+  per-channel basis. For these radios, these values are used. 
+</para>
+
+<variablelist>
+  <title>Radio-wide Setting Fields</title>
+  <varlistentry>
+    <term><token>micLevel</token></term>
+    <listitem>
+      <para>Specifies the microphone amplification. Must be an integer between 1 and 10.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>speech</token></term>
+    <listitem>
+      <para>Enables/disables the speech synthesis. Some radios can announce the current 
+        channel etc. for the visually impaired. To enable that feature (if supported by the radio)
+        set this field to <token>true</token>. Must be a boolean value.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>introLine1</token></term>
+    <term><token>introLine2</token></term>
+    <listitem>
+      <para>Sets the two boot text lines (if supported by the radio). These text lines will show up 
+        on the boot of the radio. If the radio is set to show a picture during boot, these lines are 
+        not shown.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>defaultID</token></term>
+    <listitem>
+      <para>Specifies which radio ID will be used as the default DMR ID (see 
+        <xref linkend="cpRadioIDs"/> below). If none is specified, the first 
+        defined DMR radio ID will be used.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>squelch</token></term>
+    <listitem>
+      <para>Specifies the default squelch level. This value may be referenced in channels or 
+        represent the radio-wide squelch setting. Any value in [0-10] is valid, where 0 implies 
+        an open squelch (if supported by the radio).
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>vox</token></term>
+    <listitem>
+      <para>Specifies the default VOX sensitivity. This value may be referenced in channels or 
+        represent the radio-wide VOX sensitivity. Any value in [0-10] is valid here, where 0 
+        disables the VOX.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>power</token></term>
+    <listitem>
+      <para>Specifies the default transmit power. This value may be referenced in channels or 
+        represent the radio-wide power setting. Possible values are <token>Min</token>, 
+        <token>Low</token>, <token>Mid</token>, <token>High</token> and <token>Max</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</section>
+
+  

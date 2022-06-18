@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="cpContacts"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+         
+<info>
+  <title>Contacts</title>
+</info>
+
+<para>
+  The <token>contacts</token> element specifies a list of all contacts. Each contact is a map 
+  that contains a single entry to specify the contact type. The key specifies the type name and 
+  the value specifies the actual contact definition. Currently there are two possible contact 
+  types.
+</para>
+
+<para>
+  As an example consider this contact list, containing 4 contact definitions. One for each 
+  type.
+</para>
+
+<example pgwide="1">
+  <title>Contact definitions</title>
+  <programlisting language="yaml"><![CDATA[contacts:
+  - dmr: {id: ww, name: WW, type: GroupCall, number: 91}
+  - dmr: {id: cont24, name: DM3MAT Hannes, type: PrivateCall, ring: true, number: 2621370}
+  - dmr: {id: cont12, name: All Call, type: AllCall, number: 16777215}
+  - dtmf: {id: dtmf1, name: DTMF example, number: "#123*"} 
+]]></programlisting>
+</example>
+
+
+<section>
+<info>
+  <title>DMR Contacts (<token>dmr</token>)</title>
+</info>
+
+<para>
+  A DMR contact is a simple object and is usually defined in one line. Each contact contains
+  an optional <token>id</token> that will be used to reference this contact throughout the
+  codeplug (e.g., in channels, group lists, etc.). 
+</para>
+
+<variablelist>
+  <title>DMR Contact Fields</title>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>Specifies the identifier of the contact. This identifier can later be used to 
+        reference the contact. Any unique string is valid.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>Specifies the name of the contact. Any string is valid.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>type</token></term>
+    <listitem>
+      <para>Specifies the type of the contact. Must be one of <token>PrivateCall</token>,
+        <token>GroupCall</token> or <token>AllCall</token>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>number</token></term>
+    <listitem>
+      <para>Specifies the DMR ID for this contact. That is, any integer between 0 and 
+        16777215. This element is mandatory for all types except for the 
+        <token>all</token>-call. For the all-call, the default number 16777215 will be 
+        used.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ring</token></term>
+    <listitem>
+      <para>If <token>true</token>, the radio will ring whenever a call from this contact 
+        is received (if supported by the radio). Optional, if omitted set to 
+        <token>false</token>.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+
+<section>
+<info>
+  <title>Analog DMTF Contacts (<token>dtmf</token>)</title>
+</info>
+
+<para>
+  An analog DTMF contact can be used to store commonly used DTMF sequences. For example, it may be
+  used to control the <emphasis>EchoLink</emphasis> feature of a repeater.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>Specifies the identifier of the contact. This identifier can later be used to 
+        reference the contact. Any unique string is valid.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>Specifies the name of the contact. Any string is valid.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>number</token></term>
+    <listitem>
+      <para>Specifies the DTMF ID for this contact. That is any combination of numbers 
+        <token>0-9</token> and symbols <token>A-D</token>, <token>*</token>, <token>#</token>.
+        used.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ring</token></term>
+    <listitem>
+      <para>If <token>true</token>, the radio will ring whenever a call from this contact 
+        is received (if supported by the radio). Optional, if omitted set to 
+        <token>false</token>.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+</section> 
+  

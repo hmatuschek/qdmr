@@ -5,7 +5,7 @@
 
 /** Implements the interface to Anytone D868UV, D878UV, etc radios.
  *
- * This interface uses a USB serial-port to comunicate with the device. To find the corresponding
+ * This interface uses a USB serial-port to communicate with the device. To find the corresponding
  * port, the device-specific VID @c 0x28e9 and PID @c 0x018a are used. Hence no udev rules are
  * needed to access these devices. The user, however, should be a member of the @c dialout group
  * to get access to the serial interfaces.
@@ -17,7 +17,7 @@ class AnytoneInterface : public USBSerial
 
 public:
   /** Collects information about the particular radio being accessed. */
-  struct RadioInfo {
+  struct RadioVariant {
     /** The name of the radio. */
     QString name;
     /** A code for which bands are supported. */
@@ -26,15 +26,16 @@ public:
     QString version;
 
     /** Empty constructor. */
-    RadioInfo();
+    RadioVariant();
     /** Returns @c true if the radio info is valid. */
     bool isValid() const;
   };
 
 public:
-  /** Constructs a new interface to Anyton radios. If a matching device was found, @c isOpen
+  /** Constructs a new interface to Anytone radios. If a matching device was found, @c isOpen
    * returns @c true. */
-  explicit AnytoneInterface(QObject *parent=nullptr);
+  explicit AnytoneInterface(const USBDeviceDescriptor &descriptor,
+                            const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
   virtual ~AnytoneInterface();
 
@@ -42,31 +43,37 @@ public:
   void close();
 
   /** Returns an identifier of the radio. */
-  QString identifier();
+  RadioInfo identifier(const ErrorStack &err=ErrorStack());
 
   /** Reads the radio info from the device and returns it.
    * The information is only read once. */
-  bool getInfo(RadioInfo &info);
+  bool getInfo(RadioVariant &info);
 
-  bool read_start(uint32_t bank, uint32_t addr);
-  bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
-  bool read_finish();
+  bool read_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
+  bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
+  bool read_finish(const ErrorStack &err=ErrorStack());
 
-  bool write_start(uint32_t bank, uint32_t addr);
-  bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
-  bool write_finish();
+  bool write_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
+  bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
+  bool write_finish(const ErrorStack &err=ErrorStack());
 
-  bool reboot();
+  bool reboot(const ErrorStack &err=ErrorStack());
+
+public:
+  /** Returns some information about this interface. */
+  static USBDeviceInfo interfaceInfo();
+  /** Tries to find all interfaces connected AnyTone radios. */
+  static QList<USBDeviceDescriptor> detect();
 
 protected:
   /** Send command message to radio to ender program state. */
-  bool enter_program_mode();
+  bool enter_program_mode(const ErrorStack &err=ErrorStack());
   /** Sends a request to radio to identify itself. */
-  bool request_identifier(RadioInfo &info);
+  bool request_identifier(RadioVariant &info, const ErrorStack &err=ErrorStack());
   /** Sends a command message to radio to leave program state and reboot. */
-  bool leave_program_mode();
+  bool leave_program_mode(const ErrorStack &err=ErrorStack());
   /** Internal used method to send messages to and receive responses from radio. */
-  bool send_receive(const char *cmd, int clen, char *resp, int rlen);
+  bool send_receive(const char *cmd, int clen, char *resp, int rlen, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Binary representation of a read request to the radio. */
@@ -129,7 +136,7 @@ protected:
   /** Holds the state of the interface. */
   State _state;
   /** Holds the radio info. */
-  RadioInfo _info;
+  RadioVariant _info;
 };
 
 #endif // ANYTONEINTERFACE_HH

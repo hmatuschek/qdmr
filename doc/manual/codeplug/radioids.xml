@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="cpRadioIDs"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Radio IDs</title>
+</info>
+
+<para>
+  The <token>radioIDs</token>-element specifies a list of radio IDs. Each radio ID is a map that 
+  contains a single entry to specify the type. The key of the entry specifies the type name and 
+  the value specifies the actual radio ID definition. Currently only the type <token>dmr</token> 
+  is supported.
+</para>
+
+<para>
+  As an example consider this radio ID list, containing only a single ID.
+</para>
+
+<example pgwide="1">
+  <title>Radio ID definitions</title>
+  <programlisting language="yaml"><![CDATA[radioIDs:
+  - dmr: {id: id1, name: DM3MAT, number: 2621370} 
+]]></programlisting>
+</example>
+
+<para> 
+  This DMR radio ID got the identifier <token>id1</token>, name <token>DM3MAT</token> 
+  and number <token>2621370</token>.
+</para>
+
+
+<section>
+<info><title>DMR Radio IDs (<token>dmr</token>)</title></info>
+
+<para>
+  The DMR radio ID definition consist of an optional <token>id</token> (necessary to reference 
+  that ID later), a <token>name</token> and the DMR ID <token>number</token>. 
+</para>
+
+<variablelist>
+  <title>DMR Radio ID Fields</title>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>Specifies the identifier of the radio ID. This identifier can later be used to 
+      associate the radio ID to channels. Any unique string is valid.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>Specifies the name of the radio ID. This name may also be used as the radio name. 
+        Any non-empty string is valid.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>number</token></term>
+    <listitem><para>Specifies the DMR ID for this radio ID. That is any integer between 0 and 16777215.</para></listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+</section>
+  

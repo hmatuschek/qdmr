@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<chapter xml:id="confFormat"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+         
+<info>
+  <title>Table Based Codeplug Format</title>
+</info>        
+
+<warning>
+  <para>
+    This chapter describes the old and deprecated table based <filename>conf</filename> text-file
+    format. This format is already incomplete and will remains so. This documentation is maintained
+    for the sake of completeness but you should not use that format in future.
+  </para> 
+  <para>
+    <application>qdmr</application> will still be able to import this format but it will not save 
+    codeplugs in that format anymore. The new codeplug format is documented in 
+    <xref linkend="codeplug"/>.
+  </para>
+</warning>
+
+<para>
+  This configuration file format represents a generic configuration 
+  for a wide variety of radios. It is a simple text file containing simple key-value
+  definitions like the DMR ID as well as tables like the table of channels, contacts, etc.
+</para>
+
+<para>
+  The aim of this config format is to be human-readable and writable. This would allow
+  users to write config file by hand and share them easily, as well as enable users to modify shared
+  configurations using a text editor. To this end, the format must be intuitive and to some
+  degree self-documenting.
+</para>
+
+<para>
+  Within the following sections, I will describe that text format in some detail.
+</para>
+
+
+<section>
+<info>
+  <title>Line comments</title>
+</info>
+  
+<para>
+  To document your configuration, you may use so-called line-comments. These comments start with the
+  character <code>#</code> and end at the end-of-line.
+</para>
+
+<informalexample>
+  <programlisting language="ini"><![CDATA[# A comment, everything in this line is ignored
+ID: 12345678   # Another comment
+]]></programlisting>
+</informalexample>
+</section>
+
+
+<xi:include href="radiosettings.xml"/>
+<xi:include href="contacts.xml"/>
+<xi:include href="grouplists.xml"/>
+<xi:include href="digitalchannels.xml"/>
+<xi:include href="analogchannels.xml"/>
+<xi:include href="zones.xml"/>
+<xi:include href="scanlists.xml"/>
+<xi:include href="gpssystems.xml"/>
+<xi:include href="aprssystems.xml"/>
+<xi:include href="roaming.xml"/>
+
+</chapter>

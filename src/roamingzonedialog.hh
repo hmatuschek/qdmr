@@ -5,6 +5,8 @@
 #include "roaming.hh"
 #include "ui_roamingzonedialog.h"
 
+class Config;
+
 class RoamingZoneDialog : public QDialog, private Ui_RoamingZoneDialog
 {
   Q_OBJECT
@@ -19,11 +21,10 @@ protected slots:
 
   void onAddChannel();
   void onRemChannel();
-  void onChannelUp();
-  void onChannelDown();
 
 protected:
   Config *_config;
+  RoamingZone *_myZone;
   RoamingZone *_zone;
 };
 

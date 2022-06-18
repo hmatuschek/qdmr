@@ -1,26 +1,159 @@
 #include "radioid.hh"
+#include "logger.hh"
+#include "utils.hh"
 
 
 /* ********************************************************************************************* *
  * Implementation of RadioID
  * ********************************************************************************************* */
-RadioID::RadioID(uint32_t id, QObject *parent)
-  : QObject(parent), _id(id)
+RadioID::RadioID(const QString &idBase, QObject *parent)
+  : ConfigObject(idBase, parent)
 {
   // pass...
 }
 
+RadioID::RadioID(const QString &name, const QString &idBase, QObject *parent)
+  : ConfigObject(name, idBase, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of DMRRadioID
+ * ********************************************************************************************* */
+DMRRadioID::DMRRadioID(QObject *parent)
+  : RadioID("id", parent), _number(0)
+{
+  // pass...
+}
+
+DMRRadioID::DMRRadioID(const QString &name, uint32_t id, QObject *parent)
+  : RadioID(name, "id", parent), _number(id)
+{
+  // pass...
+}
+
+ConfigItem *
+DMRRadioID::clone() const {
+  DMRRadioID *id = new DMRRadioID();
+  if (! id->copy(*this)) {
+    id->deleteLater();
+    return nullptr;
+  }
+  return id;
+}
+
 uint32_t
-RadioID::id() const {
-  return _id;
+DMRRadioID::number() const {
+  return _number;
 }
 
 void
-RadioID::setId(uint32_t id) {
-  if (id == _id)
+DMRRadioID::setNumber(uint32_t id) {
+  if (id == _number)
     return;
-  _id = id;
-  emit modified();
+  _number = id;
+  emit modified(this);
+}
+
+YAML::Node
+DMRRadioID::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = RadioID::serialize(context, err);
+  if (node.IsNull())
+    return node;
+
+  YAML::Node type;
+  node.SetStyle(YAML::EmitterStyle::Flow);
+  type["dmr"] = node;
+
+  return type;
+}
+
+bool
+DMRRadioID::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse radio id: Expected object with one child.";
+    return false;
+  }
+
+  return ConfigObject::parse(node.begin()->second, ctx, err);
+}
+
+bool
+DMRRadioID::link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot link radio id: Expected object with one child.";
+    return false;
+  }
+
+  return ConfigObject::link(node.begin()->second, ctx, err);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of DefaultRadioID
+ * ********************************************************************************************* */
+DefaultRadioID *DefaultRadioID::_instance = nullptr;
+
+DefaultRadioID::DefaultRadioID(QObject *parent)
+  : DMRRadioID(tr("[Default]"),0,parent)
+{
+  // pass...
+}
+
+DefaultRadioID *
+DefaultRadioID::get() {
+  if (nullptr == _instance)
+    _instance = new DefaultRadioID();
+  return _instance;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of DTMFRadioID
+ * ********************************************************************************************* */
+DTMFRadioID::DTMFRadioID(QObject *parent)
+  : RadioID("id", parent)
+{
+  // pass...
+}
+
+DTMFRadioID::DTMFRadioID(const QString &name, const QString &number, QObject *parent)
+  : RadioID(name, "id", parent), _number()
+{
+  setNumber(number.simplified());
+}
+
+ConfigItem *
+DTMFRadioID::clone() const {
+  DTMFRadioID *newId = new DTMFRadioID();
+  if (! newId->copy(*this)) {
+    newId->deleteLater();
+    return nullptr;
+  }
+  return newId;
+}
+
+const QString &
+DTMFRadioID::number() const {
+  return _number;
+}
+void
+DTMFRadioID::setNumber(const QString &number) {
+  if (! validDTMFNumber(number))
+    return;
+  _number = number.simplified();
+  emit modified(this);
+  return;
 }
 
 
@@ -28,126 +161,112 @@ RadioID::setId(uint32_t id) {
  * Implementation of RadioIDList
  * ********************************************************************************************* */
 RadioIDList::RadioIDList(QObject *parent)
-  : QAbstractListModel(parent), _ids()
+  : ConfigObjectList(DMRRadioID::staticMetaObject, parent), _default(nullptr)
 {
-  _ids.append(new RadioID(0));
-  connect(_ids.at(0), SIGNAL(destroyed(QObject*)), this, SLOT(onIdDeleted(QObject*)));
+  // pass...
 }
 
 void
 RadioIDList::clear() {
-  beginResetModel();
-  foreach (RadioID *id, _ids) {
-    id->deleteLater();
-  }
-  _ids.clear();
-  _ids.push_back(new RadioID(0));
-  connect(_ids.at(0), SIGNAL(destroyed(QObject*)), this, SLOT(onIdDeleted(QObject*)));
-  endResetModel();
-  emit modified();
+  setDefaultId(-1);
+  ConfigObjectList::clear();
 }
 
-int
-RadioIDList::count() const {
-  return _ids.size();
+DMRRadioID *
+RadioIDList::getId(int idx) const {
+  if (ConfigItem *obj = get(idx))
+    return obj->as<DMRRadioID>();
+  return nullptr;
 }
 
-RadioID *
-RadioIDList::getId(uint idx) const {
-  if (int(idx) >= _ids.count())
-    return nullptr;
-  return _ids.at(idx);
+DMRRadioID *
+RadioIDList::defaultId() const {
+  return _default;
 }
 
-RadioID *
-RadioIDList::getDefaultId() const {
-  return getId(0);
-}
-
-RadioID *
+DMRRadioID *
 RadioIDList::find(uint32_t id) const {
-  foreach (RadioID *item, _ids) {
-    if (id == item->id())
-      return item;
+  for (int i=0; i<count(); i++) {
+    if (id == getId(i)->number())
+      return getId(i);
   }
   return nullptr;
 }
 
 int
-RadioIDList::indexOf(RadioID *id) const {
-  return _ids.indexOf(id);
-}
-
-int
-RadioIDList::addId(RadioID *id) {
-  if (nullptr == id)
+RadioIDList::add(ConfigObject *obj, int row) {
+  if ((nullptr == obj) || (! obj->is<DMRRadioID>()))
     return -1;
-  int r = _ids.count();
-  beginInsertRows(QModelIndex(), r,r);
-  id->setParent(this);
-  _ids.append(id);
-  connect(id, SIGNAL(destroyed(QObject*)), this, SLOT(onIdDeleted(QObject*)));
-  endInsertRows();
-  emit modified();
-  return r;
+
+  bool was_empty = (0 == count());
+  int idx = ConfigObjectList::add(obj, row);
+  if (0 > idx)
+    return idx;
+  // automatically select first added ID as default
+  if (was_empty && (nullptr == _default)) {
+    logDebug() << "Automatically set default radio id to " << obj->as<DMRRadioID>()->name() << ".";
+    setDefaultId(idx);
+  }
+  return idx;
 }
 
 int
-RadioIDList::addId(uint32_t id) {
-  return addId(new RadioID(id, this));
+RadioIDList::addId(const QString &name, uint32_t id) {
+  return add(new DMRRadioID(name, id, this));
 }
 
 bool
-RadioIDList::setDefault(uint idx) {
-  if (idx >= uint(count()))
-    return false;
-  if (0 == idx)
+RadioIDList::setDefaultId(int idx) {
+  if (_default) {
+    disconnect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
+    if (0 <= indexOf(_default))
+      emit elementModified(indexOf(_default));
+  }
+
+  if (0 > idx) {
+    _default = nullptr;
     return true;
-  beginMoveRows(QModelIndex(), idx, idx, QModelIndex(), 0);
-  RadioID *obj = _ids.at(idx);
-  _ids.removeAt(idx);
-  _ids.prepend(obj);
-  endMoveRows();
-  emit modified();
-  return true;
-}
+  }
 
-bool
-RadioIDList::delId(RadioID *id) {
-  if ((nullptr == id) || (! _ids.contains(id)))
+  _default = getId(idx);
+  if (nullptr == _default)
     return false;
-  int idx = _ids.indexOf(id);
-  beginRemoveRows(QModelIndex(), idx, idx);
-  _ids.removeAt(idx);
-  disconnect(id, SIGNAL(destroyed(QObject*)), this, SLOT(onIdDeleted(QObject*)));
-  id->deleteLater();
-  endRemoveRows();
-  emit modified();
+  connect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
+  emit elementModified(idx);
   return true;
 }
 
 bool
 RadioIDList::delId(uint32_t id) {
-  return delId(find(id));
+  return del(find(id));
+}
+
+
+ConfigItem *
+RadioIDList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
+
+  if (! node)
+    return nullptr;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create radio id: Expected object with one child.";
+    return nullptr;
+  }
+
+  QString type = QString::fromStdString(node.begin()->first.as<std::string>());
+  if ("dmr" == type) {
+    return new DMRRadioID();
+  }
+
+  errMsg(err) << node.Mark().line << ":" << node.Mark().column
+              << ": Cannot create radio id: Unknown type '" << type << "'.";
+
+  return nullptr;
 }
 
 void
-RadioIDList::onIdDeleted(QObject *obj) {
-  delId(qobject_cast<RadioID *>(obj));
-}
-
-int
-RadioIDList::rowCount(const QModelIndex &parent) const {
-  return count();
-}
-
-QVariant
-RadioIDList::data(const QModelIndex &index, int role) const {
-  if (index.row() >= count())
-    return QVariant();
-  if (Qt::DisplayRole == role)
-    return QVariant(QString::number(getId(index.row())->id()));
-  else if (Qt::EditRole == role)
-    return QVariant(getId(index.row())->id());
-  return QVariant();
+RadioIDList::onDefaultIdDeleted() {
+  _default = nullptr;
 }

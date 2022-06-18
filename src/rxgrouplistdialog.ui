@@ -6,97 +6,83 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>425</width>
+    <height>357</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Edit RX Group</string>
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Name</string>
-       </property>
-       <property name="buddy">
-        <cstring>groupListName</cstring>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="groupListName"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QListWidget" name="groupListWidget">
-       <property name="selectionMode">
-        <enum>QAbstractItemView::ExtendedSelection</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>Basic</string>
+      </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QPushButton" name="groupUp">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="../shared/resources.qrc">
-           <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
-         </property>
-         <property name="shortcut">
-          <string>Alt+Up</string>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Name</string>
+           </property>
+           <property name="buddy">
+            <cstring>groupListName</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="groupListName"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="ConfigObjectListView" name="contactListView" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="groupDown">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="../shared/resources.qrc">
-           <normaloff>:/icons/down.png</normaloff>:/icons/down.png</iconset>
-         </property>
-         <property name="shortcut">
-          <string>Alt+Down</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QPushButton" name="addContact">
+           <property name="text">
+            <string>Add Contact</string>
+           </property>
+           <property name="shortcut">
+            <string>Alt++</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="remContact">
+           <property name="text">
+            <string>Remove Contact</string>
+           </property>
+           <property name="shortcut">
+            <string>Alt+-</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="addContact">
-       <property name="text">
-        <string>Add Contact</string>
-       </property>
-       <property name="shortcut">
-        <string>Alt++</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="remContact">
-       <property name="text">
-        <string>Remove Contact</string>
-       </property>
-       <property name="shortcut">
-        <string>Alt+-</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+     </widget>
+     <widget class="ExtensionView" name="extensionView">
+      <attribute name="title">
+       <string>Extensions</string>
+      </attribute>
+     </widget>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -110,26 +96,22 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../shared/resources.qrc"/>
- </resources>
+ <customwidgets>
+  <customwidget>
+   <class>ExtensionView</class>
+   <extends>QWidget</extends>
+   <header>extensionview.hh</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ConfigObjectListView</class>
+   <extends>QWidget</extends>
+   <header>configobjectlistview.hh</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
  <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>RXGroupListDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
@@ -142,6 +124,22 @@
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>RXGroupListDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
      <y>274</y>
     </hint>
    </hints>

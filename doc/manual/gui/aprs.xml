@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="guiAPRS"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Setup GPS/APRS Position Reporting</title>
+</info>
+
+<para>
+  The <guilabel>GPS/APRS</guilabel> tab allows to specify several so-called positioning systems. A 
+  positioning system is a collection of settings on how GPS information is send to 
+  <glossterm>APRS</glossterm> network. 
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-positioning.png" width="13cm" align="center"/>></imageobject>
+    <textobject>Screen-shot of the GPS or APRS settings.</textobject>
+  </mediaobject>
+  <title>The list GPS/APRS systems.</title> 
+</screenshot>
+
+<section>
+<info>
+  <title>Edit/Create GPS Systems</title>
+</info> 
+
+<para>
+  Double-clicking a GPS system or clicking on the <guibutton>Add GPS System</guibutton> button 
+  will open the GPS system edit dialog. 
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-edit-gps.png" width="5cm" align="center"/></imageobject>
+  </mediaobject>
+ <title>The digital APRS editing dialog.</title>
+</screenshot>
+
+<para>
+  This dialog allows to specify how the GPS information is send through the DMR network. That is
+  the <guilabel>Name</guilabel> field specifies the name of the GPS system. The 
+  <guilabel>Destination</guilabel> field specifies the private-call contact, the information is 
+  send to. For example 262999 in the Brandmeister network. The <guilabel>Update Period</guilabel>
+  specifies the period in which the current GPS information is send to the contact. The 
+  <glossterm>Revert Channel</glossterm> specifies to which channel the radio should switch to, 
+  to send the position information. This should always be <guilabel>Selected</guilabel>. That is,
+  the radio will always send the information on the currently selected channel. 
+</para>
+
+<para>
+  If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
+  <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
+  the device specific settings for the GPS system. 
+</para>
+</section>
+
+
+<section>
+<info>
+  <title>Edit/Create APRS System</title>
+</info>
+
+<para>
+  Double-clicking an APRS system or clicking on the <guibutton>Add APRS System</guibutton> button 
+  will open the <glossterm>APRS</glossterm> system dialog. 
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-edit-aprs.png" width="5cm" align="center"/></imageobject>
+    <textobject>Screen-shot of the edit APRS dialog.</textobject>
+  </mediaobject>
+  <title>The analog APRS editing dialog.</title>
+</screenshot>
+
+<para>
+  This dialog allows to specify how the GPS information is send through the APRS network. That is
+  the <guilabel>Name</guilabel> field specifies the name of the APRS system. The 
+  <guilabel>Channel</guilabel> field specifies on which channel the APRS information should be 
+  send. This must be an analog channel with one of the typical 
+  <link xlink:href="https://en.wikipedia.org/wiki/Automatic_Packet_Reporting_System#Technical_information"
+     >APRS frequencies</link>. The <guilabel>Source</guilabel> field specifies your call and the 
+  source <glossterm>SSID</glossterm>, while the <guilabel>Destination</guilabel> field specifies the destination call and
+  SSID. Path is an optional string containing the APRS path for the packet. The 
+  <guilabel>Icon</guilabel> combo-box allows to select an icon for the packets. These icons are 
+  then shown on <link xlink:href="https://aprs.fi">APRS maps</link>. The 
+  <guilabel>Update Period</guilabel> specifies how frequently an APRS packet should be send. 
+  Finally, the <guilabel>Message</guilabel> field allows to  set an optional text message for the 
+  packet. 
+</para>
+
+<para>
+  If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
+  <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
+  the device specific settings for the APRS system. 
+</para>
+</section>
+
+</section>
+
+  

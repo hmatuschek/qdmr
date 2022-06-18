@@ -26,14 +26,13 @@ public:
 protected slots:
 	void onAddGroup();
 	void onRemGroup();
-  void onGroupUp();
-  void onGroupDown();
 
 protected:
 	void construct();
 
 protected:
 	Config *_config;
+  RXGroupList *_myGroupList;
 	RXGroupList *_list;
 };
 

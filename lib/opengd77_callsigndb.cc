@@ -25,11 +25,11 @@ OpenGD77CallsignDB::userdb_entry_t::clear() {
 
 uint32_t
 OpenGD77CallsignDB::userdb_entry_t::getNumber() const {
-  return decode_dmr_id_bcd((uint8_t *)&number);
+  return decode_dmr_id_bcd_le((uint8_t *)&number);
 }
 void
 OpenGD77CallsignDB::userdb_entry_t::setNumber(uint32_t number) {
-  encode_dmr_id_bcd((uint8_t *)&(this->number), number);
+  encode_dmr_id_bcd_le((uint8_t *)&(this->number), number);
 }
 
 QString
@@ -60,16 +60,17 @@ OpenGD77CallsignDB::userdb_t::userdb_t() {
 
 void
 OpenGD77CallsignDB::userdb_t::clear() {
+  memset(this, 0, sizeof(userdb_t));
   memcpy(magic, "ID-", 3);
-  size = 0x5d;
+  size = 0x5d; // <- 19 byte entries, 15byte name
   memcpy(version, "001", 3);
   count = 0;
   unused6 = unused9 = 0;
 }
 
 void
-OpenGD77CallsignDB::userdb_t::setSize(uint n) {
-  count = qToLittleEndian(std::min(n, uint(USERDB_NUM_ENTRIES)));
+OpenGD77CallsignDB::userdb_t::setSize(unsigned n) {
+  count = qToLittleEndian(std::min(n, unsigned(USERDB_NUM_ENTRIES)));
 }
 
 
@@ -87,7 +88,9 @@ OpenGD77CallsignDB::~OpenGD77CallsignDB() {
 }
 
 bool
-OpenGD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection) {
+OpenGD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // Limit entries to USERDB_NUM_ENTRIES
   qint64 n = std::min(calldb->count(), qint64(USERDB_NUM_ENTRIES));
   if (selection.hasCountLimit())
@@ -98,20 +101,20 @@ OpenGD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection) {
 
   // Select first n entries and sort them in ascending order of their IDs
   QVector<UserDatabase::User> users;
-  for (uint i=0; i<n; i++)
+  for (unsigned i=0; i<n; i++)
     users.append(calldb->user(i));
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
 
   // Allocate segment for user db if requested
-  uint size = align_size(sizeof(userdb_t)+n*sizeof(userdb_entry_t), BLOCK_SIZE);
+  unsigned size = align_size(sizeof(userdb_t)+n*sizeof(userdb_entry_t), BLOCK_SIZE);
   this->image(0).addElement(OFFSET_USERDB, size);
 
   // Encode user DB
   userdb_t *userdb = (userdb_t *)this->data(OFFSET_USERDB);
   userdb->clear(); userdb->setSize(n);
   userdb_entry_t *db = (userdb_entry_t *)this->data(OFFSET_USERDB+sizeof(userdb_t));
-  for (uint i=0; i<n; i++) {
+  for (unsigned i=0; i<n; i++) {
     db[i].fromEntry(users[i]);
   }
 

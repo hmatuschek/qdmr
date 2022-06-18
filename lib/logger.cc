@@ -119,8 +119,8 @@ Logger::get() {
 /* ********************************************************************************************* *
  * Implementation of StreamLogHandler
  * ********************************************************************************************* */
-StreamLogHandler::StreamLogHandler(QTextStream &stream, LogMessage::Level minLevel, QObject *parent)
-  : LogHandler(parent), _stream(stream), _minLevel(minLevel)
+StreamLogHandler::StreamLogHandler(QTextStream &stream, LogMessage::Level minLevel, bool color, QObject *parent)
+  : LogHandler(parent), _stream(stream), _minLevel(minLevel), _color(color)
 {
   // pass...
 }
@@ -140,14 +140,37 @@ StreamLogHandler::handle(const LogMessage &message) {
   if (message.level() < _minLevel)
     return;
   switch (message.level()) {
-  case LogMessage::DEBUG:   _stream << "Debug "; break;
-  case LogMessage::INFO:    _stream << "Info "; break;
-  case LogMessage::WARNING: _stream << "Warning "; break;
-  case LogMessage::ERROR:   _stream << "ERROR "; break;
-  case LogMessage::FATAL:   _stream << "FATAL "; break;
+  case LogMessage::DEBUG:
+    if (_color)
+      _stream << "\033[37m";
+    _stream << "Debug ";
+    break;
+  case LogMessage::INFO:
+    if (_color)
+      _stream << "\033[39m";
+    _stream << "Info ";
+    break;
+  case LogMessage::WARNING:
+    if (_color)
+      _stream << "\033[33m";
+    _stream << "Warning ";
+    break;
+  case LogMessage::ERROR:
+    if (_color)
+      _stream << "\033[31m";
+    _stream << "ERROR ";
+    break;
+  case LogMessage::FATAL:
+    if (_color)
+      _stream << "\033[30m\033[101m";
+    _stream << "FATAL ";
+    break;
   }
-  _stream << "in " << message.file() << "@" << message.line()
+  QFileInfo finfo(message.file());
+  _stream << "in " << finfo.fileName() << "@" << message.line()
           << ": " << message.message() << "\n";
+  if (_color)
+    _stream << "\033[39m";
   _stream.flush();
 }
 
@@ -214,4 +237,5 @@ FileLogHandler::handle(const LogMessage &message) {
   }
   _stream << "in " << message.file() << "@" << message.line()
           << ": " << message.message() << "\n";
+  _stream.flush();
 }

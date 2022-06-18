@@ -2,58 +2,65 @@
 
 #include <QCoreApplication>
 #include <QCommandLineParser>
+#include <QFileInfo>
 
 #include "logger.hh"
 #include "radio.hh"
 #include "config.hh"
 #include "progressbar.hh"
+#include "autodetect.hh"
+#include "radiolimits.hh"
 
 
 int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
-  Q_UNUSED(app);
-
   if (2 > parser.positionalArguments().size())
     parser.showHelp(-1);
 
   QString filename = parser.positionalArguments().at(1);
+  QFileInfo fileinfo(filename);
 
   QString errorMessage;
   Config config;
-  if (! config.readCSV(filename, errorMessage)) {
-    logError() << "Cannot read CSV file '" << filename << "': " << errorMessage;
-    return -1;
+  if (parser.isSet("csv") || ("csv" == fileinfo.suffix()) || ("conf"==fileinfo.suffix())) {
+    if (! config.readCSV(filename, errorMessage)) {
+      logError() << "Cannot read CSV file '" << filename << "': " << errorMessage;
+      return -1;
+    }
+  } else if (parser.isSet("yaml") || ("yaml" == fileinfo.suffix())) {
+    ErrorStack err;
+    if (! config.readYAML(fileinfo.canonicalFilePath(), err)) {
+      logError() << "Cannot parse YAML codeplug '" << fileinfo.fileName() << "': " << err.format();
+      return -1;
+    }
   }
   logDebug() << "Read codeplug from '" << filename << "'.";
 
-  QString forceRadio="";
-  if (parser.isSet("radio")) {
-    logWarn() << "You force the radio type to be '" << parser.value("radio").toUpper()
-              << "' this is generally a very bad idea! You have been warned.";
-    forceRadio = parser.value("radio");
-  }
-
-  Radio *radio = Radio::detect(errorMessage, forceRadio);
+  ErrorStack err;
+  Radio *radio = autoDetect(parser, app, err);
   if (nullptr == radio) {
-    logError() << "Cannot detect radio: " << errorMessage;
+    logError() << "Cannot detect radio:" << err.format();
     return -1;
   }
 
-  VerifyFlags verify_flags;
-  if (parser.isSet("ignore-limits"))
-    verify_flags.ignoreFrequencyLimits = true;
+  RadioLimitContext ctx(parser.isSet("ignore-limits"));
 
   bool verified = true;
-  QList<VerifyIssue> issues;
-  if (VerifyIssue::WARNING <= radio->verifyConfig(&config, issues, verify_flags)) {
-    foreach(const VerifyIssue &issue, issues) {
-      if (VerifyIssue::WARNING == issue.type()) {
-        logWarn() << "Verification Issue: " << issue.message();
-      } else if (VerifyIssue::ERROR == issue.type()) {
-        logError() << "Verification Issue: " << issue.message();
-        verified = false;
-      }
+  radio->limits().verifyConfig(&config, ctx);
+
+  // Only print warnings
+  for (int i=0; i<ctx.count(); i++) {
+    switch (ctx.message(i).severity()) {
+    case RadioLimitIssue::Warning:
+      logWarn() << "Verification Issue: " << ctx.message(i).format();
+      break;
+    case RadioLimitIssue::Critical:
+      logError() << "Verification Issue: " << ctx.message(i).format();
+      break;
+    default:
+      break;
     }
   }
+
   if (! verified) {
     logError() << "Cannot upload codeplug to device: Codeplug cannot be verified with radio.";
     return -1;
@@ -62,7 +69,7 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   showProgress();
   QObject::connect(radio, &Radio::uploadProgress, updateProgress);
 
-  CodePlug::Flags flags;
+  Codeplug::Flags flags;
   if (parser.isSet("init-codeplug"))
     flags.updateCodePlug = false;
   if (parser.isSet("auto-enable-gps"))
@@ -71,13 +78,13 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     flags.autoEnableRoaming = true;
 
   logDebug() << "Start upload to " << radio->name() << ".";
-  if (! radio->startUpload(&config, true, flags)) {
-    logError() << "Codeplug upload error: " << radio->errorMessage();
+  if (! radio->startUpload(&config, true, flags, err)) {
+    logError() << "Codeplug upload error: " << err.format();
     return -1;
   }
 
   if (Radio::StatusError == radio->status()) {
-    logError() << "Codeplug upload error: " << radio->errorMessage();
+    logError() << "Codeplug upload error: " << err.format();
     return -1;
   }
 

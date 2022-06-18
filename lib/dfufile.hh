@@ -8,11 +8,17 @@
 #include <QTextStream>
 
 #include "addressmap.hh"
-
+#include "errorstack.hh"
 
 class CRC32;
 
-/** Implements reading and writing DFU files.
+/** A collection of images, each consisting of one or more memory sections.
+ *
+ * This class forms the base of all binary encoded codeplugs and call-sign DBs. To this end, it
+ * represents the codeplug or call-sign DB memory as written and stored inside the radio. It also
+ * implements the DFU file format (hence the name) and thus allows to store and load binary
+ * codeplugs or call-sign DBs in files. Please note, that binary codeplugs and call-sign DBs are
+ * highly vendor and device specific. Consequently, they should be be used to exchange codeplugs.
  *
  * DFU File consists of a file prefix followed by several images and a final file suffix. The file
  * prefix consists of a file signature of 5 bytes just consisting of the ASCII string "DfuSe",
@@ -39,7 +45,7 @@ class CRC32;
  * @endcode
  *
  * Each image section consists of a image prefix followed by several element sections. The image
- * prefix consists of a 6byte signature containting the ASCII string "Target" followed by a
+ * prefix consists of a 6byte signature containing the ASCII string "Target" followed by a
  * single byte indicating the so-called "alternate settings" field, usually 0x01. The 32bit field
  * "is named" just indicates that the 255 byte name field is set (i.e., 0x01 in little endian).
  * The next field contains the 32 bit size of the image excluding the image prefix in little endian.
@@ -75,7 +81,7 @@ public:
 		Element();
     /** Constructs an element for the given address and of the given size. */
 		Element(uint32_t addr, uint32_t size);
-    /** Copy construtor. */
+    /** Copy constructor. */
 		Element(const Element &other);
     /** Copying assignment. */
 		Element &operator= (const Element &other);
@@ -89,7 +95,7 @@ public:
     /** Returns the memory size of the element. */
     uint32_t memSize() const;
     /** Checks if the element address and size is aligned with the given block size. */
-    bool isAligned(uint blocksize) const;
+    bool isAligned(unsigned blocksize) const;
     /** Returns a reference to the data. */
 		const QByteArray &data() const;
     /** Returns a reference to the data. */
@@ -155,7 +161,7 @@ public:
     /** Removes the i-th element from this image. */
 		void remElement(int i);
     /** Checks if all element addresses and sizes is aligned with the given block size. */
-    bool isAligned(uint blocksize) const;
+    bool isAligned(unsigned blocksize) const;
 
     /** Reads an image from the given file and updates the CRC. */
 		bool read(QFile &file, CRC32 &crc, QString &errorMessage);
@@ -207,24 +213,21 @@ public:
 	void remImage(int i);
 
   /** Checks if all image addresses and sizes is aligned with the given block size. */
-  bool isAligned(uint blocksize) const;
-
-  /** Returns the error message in case of an error. */
-	const QString &errorMessage() const;
+  bool isAligned(unsigned blocksize) const;
 
   /** Reads the specified DFU file.
    * @return @c false on error. */
-	bool read(const QString &filename);
+  bool read(const QString &filename, const ErrorStack &err=ErrorStack());
   /** Reads the specified DFU file.
    * @returns @c false on error. */
-	bool read(QFile &file);
+  bool read(QFile &file, const ErrorStack &err=ErrorStack());
 
   /** Writes to the specified file.
    * @returns @c false on error. */
-	bool write(const QString &filename);
+  bool write(const QString &filename, const ErrorStack &err=ErrorStack());
   /** Writes to the specified file.
    * @returns @c false on error. */
-	bool write(QFile &file);
+  bool write(QFile &file, const ErrorStack &err=ErrorStack());
 
   /** Dumps a text representation of the DFU file structure to the specified text stream. */
 	void dump(QTextStream &stream) const;
@@ -235,8 +238,6 @@ public:
   virtual const unsigned char *data(uint32_t offset, uint32_t img=0) const;
 
 protected:
-  /// Holds the error string.
-	QString _errorMessage;
   /// The list of images.
 	QVector<Image> _images;
 };

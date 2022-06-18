@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<glossary xml:id="glossary"
+          xmlns="http://docbook.org/ns/docbook" 
+          xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Glossary</title>
+  
+  <glossentry>
+    <glossterm>Admit Criterion</glossterm>
+    <glossdef>
+      <para>
+        The admit criterion specifies a criterion under which transmissions on a channel are 
+        allowed. These criteria can be defined for both, analog and DMR channels. Irrespective of
+        the channel type, the admit criteria <quote>always</quote> and <quote>channel free</quote>
+        can be selected. The former simply always allows to transmit. The former requires the 
+        channel to be free. 
+      </para>
+      <para>
+        For analog channels, usually there is also the criterion <quote>tone</quote>. This 
+        criterion would only allow transmissions if the matching CTCSS tone or DCS code has been
+        received. For analog repeater operation, the criterion <quote>channel free</quote> should
+        not be used as this would prevent any transmissions while the repeater is active.
+      </para>
+      <para>
+        For digital channels, usually there is also the criterion <quote>color code</quote>. This
+        criterion would only allow transmissions if the matching color code has been received. To 
+        this end, this criterion is similar to the <quote>tone</quote> criterion for analog 
+        channels.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>All Call</glossterm>
+    <glossdef>
+      <para>
+        An all-call is a special type of an DMR call to a special number (<emphasis>16777215</emphasis>). 
+        All radios are supposed to receive this call irrespective of their particular configuration. This
+        call type is usually used in emergency situations or on simplex channels.
+      </para>
+      <para>
+        Unfortunately, the local talk group (number 9) is frequently used on simplex channel although only 
+        those radios will receive calls to this talk group if it is in the group list assigned to the 
+        simplex channel. To be on the save side, use the all-call for simplex calls.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Automatic Packet Reporting System</glossterm> <acronym>APRS</acronym>
+    <glossdef>
+      <para>
+        The Automatic Packet Reporting System is a protocol that uses single broadcast frequencies 
+        to transmit small amounts of information though a network of repeaters. Usually but not 
+        limited to position reports. This allows other services (e.g.,
+        <link xlink:href="https://aprs.fi">aprs.fi</link> to display that information on a map. The
+        usual APRS frequencies are 144.390 MHz (North America), 144.800 MHz (Europe) and 
+        145.175 MHz (Australia).
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Codeplug</glossterm>
+    <glossdef>
+      <para>
+        The term <quote>codeplug</quote> is rather loosely defined. Usually it refers to the binary
+        representation of the configuration of a radio that is written to the radio to configure it.
+        It contains all contacts, channels, zones, settings, etc that form the configuration of the
+        radio.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Color Code</glossterm>
+    <glossdef>
+      <para>
+        A color code is some additional information attached to each DMR call. It is used to prevent 
+        interference between repeaters with overlapping ranges that operate at the same frequencies. 
+        In amateur radio, this may only happen in very densely populated areas. It is much more 
+        frequent in commercial applications, where a single company may got only a few frequencies 
+        assigned but needs much more repeaters to cover a campus reliably.
+      </para>
+      <para>
+        The color code is a number between 0 and 16. A radio or repeater may only react to calls with
+        matching color codes. Hence beside the actual input and output frequencies, the color code of
+        a repeater must be known to be able to access it.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>DAPNET</glossterm>
+    <glossdef>
+      <para>
+        <acronym>DAPNET</acronym>, short for Decentralized Amateur Paging Network does exactly what
+        it says. It is a network of transmitters that transmit pager messages in the UHF band, 
+        usually at 439.9875 MHz. As the old pager operated at a frequency near by, they can be 
+        modified to operate at that frequency and can therefore be used in amateur radio. 
+      </para>
+      <para>
+        The DAPNET is particularly popular with emergency operators as it allows for an convenient
+        and reliable multicast notification.
+      </para>
+    </glossdef>
+  </glossentry>
+  
+  <glossentry>
+    <glossterm>DCDM</glossterm>
+    <glossdef>
+      <para>
+        Stands for dual capacity direct mode. This allows for two independent connections on a 
+        single simplex channel by TDMA. Lacking a single central repeater, one of the 
+        participants must act as the so-called <emphasis>leader</emphasis>. This radio then defines
+        the clock and thus time slot 1 and 2. All remaining participants must act as so-called 
+        <emphasis>follower</emphasis>. They must synchronize to the clock of the 
+        <emphasis>leader</emphasis>. This obviously requires that all participants can reach the 
+        <emphasis>leader</emphasis> directly.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>EchoLink</glossterm>
+    <glossdef>
+      <para>
+        EchoLink is a network of analog FM repeaters that allows to link repeaters within this 
+        network temporarily. That is, two FM repeaters that are linked via EchoLink behave like 
+        a single repeater irrespective of their location. This network also allows to access
+        the repeaters directly though the internet. This is particularly helpful if one cannot 
+        reach any repeater.  
+      </para>  
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Group Call</glossterm>
+    <glossdef>
+      <para>
+        A group call is simply a call to a talk group. That is, not to a single participant but 
+        rather to a group of participants. Every participant that has this talk group in their 
+        group list can receive this call. See also <glossterm>Group List</glossterm> and
+        <glossterm>Talk Group</glossterm>.
+      </para>
+    </glossdef>
+  </glossentry>
+  
+  <glossentry>
+    <glossterm>Group List</glossterm>
+    <glossdef>
+      <para>
+        A group list is a simple list of talk groups. A group list is then assigned to a channel
+        to specify which group calls to receive on that channel. If a talk group is not listed in 
+        the group list of a channel, the radio will ignore calls to this talk group on that 
+        channel.
+      </para>
+      <para>
+        The DMR network cannot know which talk groups you are interested in. You have to tell your
+        radio using group lists.
+      </para>
+    </glossdef>
+  </glossentry>
+  
+  <glossentry>
+    <glossterm>Maidenhead Locator</glossterm>
+    <glossdef>
+      <para>
+        The Maidenhead locator, also known as <quote>QTH locator</quote> or 
+        <quote>IARU locator</quote> is a means for transferring a geo-location over radio. Using a
+        so-called grid-square system.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Private Call</glossterm>
+    <glossdef>
+      <para>
+        A DMR call to an individual participant. Usually, radios do not receive private calls not
+        addressed to the radio. This therefore can be used to talk to a specific HAM over a 
+        repeater without disturbing other participants. The repeater however, will be blocked 
+        during that time.
+      </para>
+    </glossdef>
+  </glossentry>
+  
+  <glossentry>
+    <glossterm>Revert Channel</glossterm>
+    <glossdef>
+      <para>
+        A revert channel is a designated channel the radio resorts to, to transfer some information
+        or the radio switches to, when the PTT is pressed. This is usually used in the context of 
+        APRS (i.e., the channel to switch to send the position) or scan lists (i.e., the channel
+        the radio will switch to, when the PTT is pressed during the scan).
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Roaming Zone</glossterm>
+    <glossdef>
+      <para>
+        A collection of channels usually sharing the same transmit contact. When roaming is enabled
+        (and supported by the radio) this list of channels is scanned for a reachable channel once 
+        the current repeater gets out-of-range. This way, one can stay in contact with a particular 
+        talk group when being mobile.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>SSID</glossterm>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Talk Group</glossterm>
+  </glossentry>
+  
+  <glossentry>
+    <glossterm>TDMA</glossterm>
+    <glossdef>
+      <para>
+        See Time Slot.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Time Slot</glossterm>
+    <glossdef>
+      <para>
+        Due to the lossy compression of audio data, it is possible to send more than twice the 
+        amount of audio data through a single 12.5kHz wide channel that needed. This allows to 
+        provide two independent audio streams within a single physical channel. 
+      </para>
+      <para>
+        There are basically two ways to separate these two audio stream. Either by frequency, 
+        effectively splitting the single 12.5kHz channel into two 6.25kHz wide ones. Alternatively,
+        one can split the channel in <quote>time</quote>. That is, the band width remains 12.5kHz
+        but each of the two simultaneous participants sends one after the other. One in time slot 1
+        and the other in time slot 2. This is called TDMA and DMR uses this technique to provide 
+        two independent audio and data streams within a single physical channel.
+      </para>
+      <para>
+        For this TDMA to work, one participant needs to define the <quote>clock</quote> to specify
+        when time slot 1 or 2 happen. This role is usually taken by the repeater but on direct 
+        simplex connections, one of the participants might provide that clock. This is then called
+        DCDM (Dual-Capacity Direct Mode). This mode, however, makes little sense in amateur radio
+        context.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Transmit Contact</glossterm>
+    <glossdef>
+      <para>
+        A transmit or default contact can be specified for each DMR channel. Some radios actually 
+        require that each channel has an transmit contact. This contact can be any contact you want
+        to call whenever the PTT is pressed on that channel. 
+      </para>
+      <para>
+        It, however, possible to answer any received call directly by pressing the PTT button 
+        within the so-called hang time, although the call may not match the transmit contact. 
+        These hang times can be set within the radio settings, usually for private and group calls
+        separately.
+      </para>
+      <para>
+        It is also possible to call any contact by selecting it from the contact list or by 
+        entering the contacts DMR ID into the keypad.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Transmit Timeout</glossterm> <acronym>TOT</acronym>
+    <glossdef>
+      <para>
+        Specifies the time of continuous transmission, after which the transmission is interrupted 
+        automatically. This prevents the accidental blocking of a repeater or talk group by 
+        transmitting continuously. 
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Scan List</glossterm>
+    <glossdef>
+      <para>
+        A scan list is just a list of analog and digital channels that one wants to scan. A scan
+        list can be associated with each channel. This scan list is then used whenever a scan is
+        started on that channel.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm>Zone</glossterm>
+    <glossdef>
+      <para>
+        As there are usually several channels defined per repeater (at least two), the number of 
+        defined channels grows rapidly. To organize this large number of channels, zones are used.
+        These zones usually collect all relevant channels for a region. That is all (analog and 
+        digital) channels associated with the local repeaters. The relevant zone is then selected 
+        via the keypad on the radio and only those channels in that zone are then accessible. 
+      </para>
+      <note>
+        <para>
+          A defined channel that is not member of any zone is usually not accessible in the radio.
+        </para>
+      </note>
+      <para>
+        Some radios allow to specify a different zones for each VFO. Others set a zone globally. 
+        In the latter case, the zone consists of two channel lists. One for each VFO.
+      </para>
+    </glossdef>
+  </glossentry>
+</glossary>

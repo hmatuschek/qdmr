@@ -1,6 +1,7 @@
 #ifndef SETTINGS_HH
 #define SETTINGS_HH
 
+#include <QDir>
 #include <QSettings>
 #include <QDateTime>
 #include <QGeoPositionInfoSource>
@@ -19,7 +20,7 @@ public:
 	explicit Settings(QObject *parent=nullptr);
 
 	QDateTime lastRepeaterUpdate() const;
-	bool repeaterUpdateNeeded(uint period=7) const;
+	bool repeaterUpdateNeeded(unsigned period=7) const;
 	void repeaterUpdated();
 
   bool queryPosition() const;
@@ -41,13 +42,28 @@ public:
   QDir lastDirectory() const;
   void setLastDirectoryDir(const QDir &dir);
 
-  CodePlug::Flags codePlugFlags() const;
+  Codeplug::Flags codePlugFlags() const;
+
+  bool limitCallSignDBEntries() const;
+  void setLimitCallSignDBEnties(bool enable);
+  unsigned maxCallSignDBEntries() const;
+  void  setMaxCallSignDBEntries(unsigned max);
+  bool selectUsingUserDMRID();
+  void setSelectUsingUserDMRID(bool enable);
+  QSet<unsigned> callSignDBPrefixes();
+  void setCallSignDBPrefixes(const QSet<unsigned> &prefixes);
 
   bool ignoreVerificationWarning() const;
   void setIgnoreVerificationWarning(bool ignore);
 
   bool ignoreFrequencyLimits() const;
   void setIgnoreFrequencyLimits(bool ignore);
+
+  bool showCommercialFeatures() const;
+  void setShowCommercialFeatures(bool show);
+
+  bool showExtensions() const;
+  void setShowExtensions(bool show);
 
   bool hideGSPNote() const;
   void setHideGPSNote(bool hide);
@@ -64,14 +80,8 @@ public:
   QByteArray mainWindowState() const;
   void setMainWindowState(const QByteArray &state);
 
-  QByteArray channelListHeaderState() const;
-  void setChannelListHeaderState(const QByteArray &state);
-
-  QByteArray contactListHeaderState() const;
-  void setContactListHeaderState(const QByteArray &state);
-
-  QByteArray positioningHeaderState() const;
-  void setPositioningHeaderState(const QByteArray &state);
+  QByteArray headerState(const QString &objName) const;
+  void setHeaderState(const QString &objName, const QByteArray &state);
 
   bool isUpdated() const;
   void markUpdated();
@@ -95,6 +105,8 @@ protected slots:
   void onSystemLocationToggled(bool enable);
   void positionUpdated(const QGeoPositionInfo &info);
   void onIgnoreFrequencyLimitsSet(bool enabled);
+  void onDBLimitToggled(bool enable);
+  void onUseUserDMRIdToggled(bool enable);
 
 protected:
   QGeoPositionInfoSource *_source;

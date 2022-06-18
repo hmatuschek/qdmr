@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<chapter xml:id="gui"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink" >
+<info>
+  <title>The Graphical User Interface</title>
+</info>
+  
+<para>
+  This chapter describes the graphical user interface (<acronym>GUI</acronym>) in some detail. 
+</para>
+
+<note>
+  <para>
+    <application>qdmr</application> aims at being a device and manufacturer independent CPS. To this 
+    end, the GUI reflects a device independent codeplug. This means, that not all of the shown 
+    features are present in all radios. For example, not all supported devices implement APRS or 
+    roaming. These settings are then ignored when generating the device specific binary codeplug.
+  </para>  
+</note>
+
+<xi:include href="radiosettings.xml"/>
+<xi:include href="contacts.xml"/>
+<xi:include href="grouplists.xml"/>
+<xi:include href="channels.xml"/>
+<xi:include href="zones.xml"/>
+<xi:include href="scanlists.xml"/>
+<xi:include href="aprs.xml"/>
+<xi:include href="roaming.xml"/>
+<xi:include href="extensions.xml"/>
+<xi:include href="programradio.xml"/>
+<xi:include href="settingsdialog.xml"/>
+
+</chapter>

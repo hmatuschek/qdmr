@@ -1,0 +1,19 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+\input{repeater}
+\begin{document}
+ \begin{tikzpicture}[every node/.style={scale=.8}]
+  \user{r1}{ 0,0}{Clean 1};
+  \user{r2}{ 2,0}{Clean 2};	
+  \draw[dotted] (3,4) -- (3,-1);
+  \user{s1}{ 4,0}{Security 1};
+  \user{z} { 6,0}{HQ};
+  \draw[dotted] (7,4) -- (7,-1);
+  \user{s2}{ 8,0}{Security 2};
+  \user{r3}{10,0}{Clean 3};
+  \repeater{R1}{1,3}{Terminal 1, TG: C,S};
+  \repeater{R2}{5,3}{Terminal 2, TG: C,S};
+  \repeater{R3}{9,3}{Apron, TG: S};
+ \end{tikzpicture}
+\end{document}

@@ -1,9 +1,14 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(qdmr VERSION 0.8.0)
+project(qdmr VERSION 0.10.2)
+
+set(RELEASE_SUFFIX "")
 
 option(BUILD_TESTS "Build test programs" OFF)
 option(BUILD_DOCS  "Build API documentation" OFF)
 option(BUILD_MAN   "Build man page for dmrconf" OFF)
+option(INSTALL_UDEV_RULES "Install udev rules file." ON)
+option(INSTALL_BUNDLE "Installs QDMR as an AppBundle under MacOS X" OFF)
+option(BUNDLE_PATH "Where to install the MacOS X application bundle." "~/Applications")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -15,6 +20,7 @@ find_package(Qt5SerialPort REQUIRED)
 find_package(Qt5Positioning REQUIRED)
 find_package(Qt5LinguistTools REQUIRED)
 find_package(LIBUSB_1 REQUIRED)
+find_package(YAMLCPP REQUIRED)
 
 if (${BUILD_MAN})
   find_program(XSLTPROC_EXECUTABLE xsltproc DOC "xsltproc for man-page generation." REQUIRED)
@@ -42,17 +48,20 @@ INCLUDE_DIRECTORIES(${Qt5SerialPort_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${Qt5Positioning_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${Qt5Test_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${LIBUSB_1_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${YAMLCPP_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/lib)
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/lib)
+
 LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/src)
 
-set(LIBS ${Qt5Core_LIBRARIES} ${Qt5Core_QTMAIN_LIBRARIES} ${Qt5Widgets_LIBRARIES}
-	${Qt5UiTools_LIBRARIES} ${Qt5Network_LIBRARIES} ${Qt5Positioning_LIBRARIES}
-  ${Qt5Test_LIBRARIES} ${Qt5SerialPort_LIBRARIES} ${LIBUSB_1_LIBRARIES})
+set(CORE_LIBS ${Qt5Core_LIBRARIES} ${Qt5Core_QTMAIN_LIBRARIES} ${Qt5Network_LIBRARIES}
+  ${Qt5Positioning_LIBRARIES} ${Qt5SerialPort_LIBRARIES} ${LIBUSB_1_LIBRARIES}
+  ${YAMLCPP_LIBRARIES})
+set(LIBS ${CORE_LIBS} ${Qt5Widgets_LIBRARIES} ${Qt5UiTools_LIBRARIES})
 
 IF (UNIX AND APPLE)
- SET(LIBS ${LIBS} "-framework IOKit -framework CoreFoundation")
+ SET(CORE_LIBS ${CORE_LIBS} "-framework IOKit -framework CoreFoundation")
 ENDIF(UNIX AND APPLE)
 
 set(PROJECT_VERSION_STRING "\"${PROJECT_VERSION}\"")
@@ -60,7 +69,7 @@ message(STATUS "Build version ${PROJECT_VERSION}")
 
 # Set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -Wall -Wsign-compare")
-set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}  -O0 -ggdb -fstack-protector")
+set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}  -O0 -ggdb -fstack-protector -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 
@@ -98,7 +107,7 @@ endif(BUILD_TESTS)
 # Source distribution packages:
 set(CPACK_SOURCE_GENERATOR "TGZ")
 set(CPACK_SOURCE_PACKAGE_FILE_NAME
-  "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
+  "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}${RELEASE_SUFFIX}")
 set(CPACK_SOURCE_IGNORE_FILES
   "/build/;/doc/html;/doc/latex;/doc/reveng;/doc/dmr-intro;/examples/*.dfu;/.git/;~$;.qm;*.user$;${CPACK_SOURCE_IGNORE_FILES}")
 

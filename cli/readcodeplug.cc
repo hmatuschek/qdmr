@@ -12,6 +12,7 @@
 #include "config.hh"
 #include "codeplug.hh"
 #include "progressbar.hh"
+#include "autodetect.hh"
 
 
 int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
@@ -21,62 +22,67 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   if (2 > parser.positionalArguments().size())
     parser.showHelp(-1);
 
-  QString forceRadio="";
-  if (parser.isSet("radio")) {
-    logWarn() << "You force the radio type to be '" << parser.value("radio").toUpper()
-              << "' this is generally a very bad idea! You have been warned.";
-    forceRadio = parser.value("radio");
-  }
-
-  QString errorMessage;
-  Radio *radio = Radio::detect(errorMessage, forceRadio);
+  ErrorStack err;
+  Radio *radio = autoDetect(parser, app, err);
   if (nullptr == radio) {
-    logError() << "Cannot detect radio: " << errorMessage;
+    logError() << "Cannot detect radio: " << err.format();
     return -1;
   }
 
   QString filename = parser.positionalArguments().at(1);
 
-  if (!parser.isSet("csv") && !filename.endsWith(".conf") && !filename.endsWith(".csv") &&
-      !parser.isSet("bin") && !filename.endsWith(".bin") && !filename.endsWith(".dfu")) {
-    logError() << "Cannot determine output filetype, consider using --csv or --bin options.";
-    return -1;
-  }
-
   showProgress();
   QObject::connect(radio, &Radio::downloadProgress, updateProgress);
 
   Config config;
-  if (! radio->startDownload(true)) {
-    logError() << "Codeplug download error: " << radio->errorMessage();
+  if (! radio->startDownload(true, err)) {
+    logError() << "Codeplug download error: " << err.format();
     return -1;
   }
 
   if (Radio::StatusError == radio->status()) {
-    logError() << "Codeplug download error: " << radio->errorMessage();
+    logError() << "Codeplug download error: " << err.format();
     return -1;
   }
 
   logDebug() << "Save codeplug at '" << filename << "'.";
   // If output is CSV -> decode code-plug
   if (parser.isSet("csv") || (filename.endsWith(".conf") || filename.endsWith(".csv"))) {
+    logError() << "Export of the old table based format was disabled with 0.9.0. "
+                  "Import still works.";
+    return -1;
+  } else if (parser.isSet("yaml") || filename.endsWith(".yaml")) {
     // decode codeplug
-    if (! radio->codeplug().decode(&config)) {
-      logError() << "Cannot decode codeplug: " << radio->errorMessage();
+    if (! radio->codeplug().decode(&config, err)) {
+      logError() << "Cannot decode codeplug: " << err.format();
       return -1;
     }
 
-    // try to write CSV file
-    if (! config.writeCSV(filename, errorMessage)) {
-      logError() << "Cannot write CSV file '" << filename << "': " << errorMessage;
+    // try to write YAML file
+    QFile file(filename);
+    if (! file.open(QIODevice::WriteOnly)) {
+      logError() << "Cannot write YAML file '" << filename << "': " << file.errorString();
       return -1;
     }
 
-    return 0;
+    QTextStream stream(&file);
+    if (! config.toYAML(stream)) {
+      logError() << "Cannot serialize config to YAML file '" << filename << "'.";
+      return -1;
+    }
+    stream.flush();
+    file.close();
+  } else if (parser.isSet("bin") || filename.endsWith(".bin") || filename.endsWith(".dfu")) {
+    // otherwise write binary code-plug
+    if (! radio->codeplug().write(filename, err)) {
+      logError() << "Cannot dump codplug into file '" << filename << "': " << err.format();
+      return -1;
+    }
+  } else {
+    logError() << "Cannot determine file output type from '" << filename << "'. "
+               << "Consider using --csv, --yaml or --bin.";
+    return -1;
   }
-
-  // otherwise write binary code-plug
-  radio->codeplug().write(filename);
 
   return 0;
 }

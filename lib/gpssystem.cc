@@ -2,12 +2,20 @@
 #include "contact.hh"
 #include "channel.hh"
 #include "logger.hh"
+#include "utils.hh"
+
 
 /* ********************************************************************************************* *
  * Implementation of PositioningSystem
  * ********************************************************************************************* */
-PositioningSystem::PositioningSystem(const QString &name, uint period, QObject *parent)
-  : QObject(parent), _name(name), _period(period)
+PositioningSystem::PositioningSystem(QObject *parent)
+  : ConfigObject("aprs", parent), _period(0)
+{
+  // pass...
+}
+
+PositioningSystem::PositioningSystem(const QString &name, unsigned period, QObject *parent)
+  : ConfigObject(name, "aprs", parent), _period(period)
 {
   // pass...
 }
@@ -16,126 +24,253 @@ PositioningSystem::~PositioningSystem() {
   // pass...
 }
 
-const QString &
-PositioningSystem::name() const {
-  return _name;
-}
-
-void
-PositioningSystem::setName(const QString &name) {
-  _name = name;
-  emit modified();
-}
-
-uint
+unsigned
 PositioningSystem::period() const {
   return _period;
 }
 
 void
-PositioningSystem::setPeriod(uint period) {
+PositioningSystem::setPeriod(unsigned period) {
   _period = period;
+  emit modified(this);
+}
+
+bool
+PositioningSystem::populate(YAML::Node &node, const ConfigItem::Context &context, const ErrorStack &err) {
+  if (! ConfigObject::populate(node, context, err))
+    return false;
+  return true;
+}
+
+bool
+PositioningSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse positioning system: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node pos = node.begin()->second;
+  if (pos && (!pos["period"])) {
+    logWarn() << pos.Mark().line << ":" << pos.Mark().column
+              << ": Positioning system has no period.";
+  }
+
+  return ConfigObject::parse(pos, ctx);
+}
+
+bool
+PositioningSystem::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+  return ConfigObject::link(node.begin()->second, ctx, err);
+}
+
+void
+PositioningSystem::onReferenceModified() {
+  emit modified(this);
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of GPSSystem
  * ********************************************************************************************* */
-GPSSystem::GPSSystem(const QString &name, DigitalContact *contact,
-                     DigitalChannel *revertChannel, uint period,
-                     QObject *parent)
-  : PositioningSystem(name, period, parent), _contact(contact), _revertChannel(revertChannel)
+GPSSystem::GPSSystem(QObject *parent)
+  : PositioningSystem(parent), _contact(), _revertChannel()
 {
-  if (_contact)
-    connect(_contact, SIGNAL(destroyed(QObject*)), this, SLOT(onContactDeleted()));
-  if (_revertChannel)
-    connect(_revertChannel, SIGNAL(destroyed(QObject*)), this, SLOT(onRevertChannelDeleted()));
+  // Register '!selected' tag for revert channel
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+
+  // Allow revert channel to take a reference to the SelectedChannel singleton
+  _revertChannel.allow(SelectedChannel::get()->metaObject());
+
+  // Connect signals
+  connect(&_contact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_revertChannel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+GPSSystem::GPSSystem(const QString &name, DigitalContact *contact,
+                     DigitalChannel *revertChannel, unsigned period,
+                     QObject *parent)
+  : PositioningSystem(name, period, parent), _contact(), _revertChannel()
+{
+  // Register '!selected' tag for revert channel
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+
+  // Set references.
+  _contact.set(contact);
+  _revertChannel.set(revertChannel);
+
+  // Allow revert channel to take a reference to the SelectedChannel singleton
+  _revertChannel.allow(SelectedChannel::get()->metaObject());
+
+  // Connect signals
+  connect(&_contact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_revertChannel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+ConfigItem *
+GPSSystem::clone() const {
+  GPSSystem *sys = new GPSSystem();
+  if (! sys->copy(*this)) {
+    sys->deleteLater();
+    return nullptr;
+  }
+  return sys;
 }
 
 bool
 GPSSystem::hasContact() const {
-  return nullptr != _contact;
+  return ! _contact.isNull();
 }
 
 DigitalContact *
-GPSSystem::contact() const {
-  return _contact;
+GPSSystem::contactObj() const {
+  return _contact.as<DigitalContact>();
 }
 
 void
-GPSSystem::setContact(DigitalContact *contact) {
-  if (_contact)
-    disconnect(_contact, SIGNAL(destroyed(QObject*)), this, SLOT(onContactDeleted()));
-  _contact = contact;
-  connect(_contact, SIGNAL(destroyed(QObject*)), this, SLOT(onContactDeleted()));
+GPSSystem::setContactObj(DigitalContact *contact) {
+  _contact.set(contact);
+}
+
+void
+GPSSystem::setContact(DigitalContactReference *contact) {
+  _contact.copy(contact);
+}
+
+const DigitalContactReference *
+GPSSystem::contact() const {
+  return &_contact;
+}
+
+DigitalContactReference *
+GPSSystem::contact() {
+  return &_contact;
 }
 
 bool
 GPSSystem::hasRevertChannel() const {
-  return nullptr != _revertChannel;
+  return ! _revertChannel.isNull();
 }
 
 DigitalChannel *
 GPSSystem::revertChannel() const {
-  return _revertChannel;
+  return _revertChannel.as<DigitalChannel>();
 }
 
 void
 GPSSystem::setRevertChannel(DigitalChannel *channel) {
-  if (_revertChannel)
-    disconnect(_revertChannel, SIGNAL(destroyed(QObject*)), this, SLOT(onRevertChannelDeleted()));
-  _revertChannel = channel;
-  if (_revertChannel)
-    connect(_revertChannel, SIGNAL(destroyed(QObject*)), this, SLOT(onRevertChannelDeleted()));
+  _revertChannel.set(channel);
+}
+
+const DigitalChannelReference*
+GPSSystem::revert() const {
+  return &_revertChannel;
+}
+
+DigitalChannelReference*
+GPSSystem::revert() {
+  return &_revertChannel;
 }
 
 void
-GPSSystem::onContactDeleted() {
-  _contact = nullptr;
+GPSSystem::setRevert(DigitalChannelReference *channel) {
+  _revertChannel.copy(channel);
 }
 
-void
-GPSSystem::onRevertChannelDeleted() {
-  _revertChannel = nullptr;
+YAML::Node
+GPSSystem::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = PositioningSystem::serialize(context, err);
+  if (node.IsNull())
+    return node;
+  YAML::Node type; type["dmr"] = node;
+  return type;
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of APRSSystem
  * ********************************************************************************************* */
-APRSSystem::APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, uint destSSID,
-                       const QString &src, uint srcSSID, const QString &path, Icon icon, const QString &message,
-                       uint period, QObject *parent)
-  : PositioningSystem(name, period, parent), _channel(channel), _destination(dest), _destSSID(destSSID),
+APRSSystem::APRSSystem(QObject *parent)
+  : PositioningSystem(parent), _channel(), _destination(), _destSSID(0),
+    _source(), _srcSSID(0), _path(), _icon(Icon::None), _message()
+{
+  // Connect to channel reference
+  connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+APRSSystem::APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, unsigned destSSID,
+                       const QString &src, unsigned srcSSID, const QString &path, Icon icon, const QString &message,
+                       unsigned period, QObject *parent)
+  : PositioningSystem(name, period, parent), _channel(), _destination(dest), _destSSID(destSSID),
     _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message)
 {
-  if (_channel)
-    connect(_channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
+  // Set channel reference
+  _channel.set(channel);
+  // Connect to channel reference
+  connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+bool
+APRSSystem::copy(const ConfigItem &other) {
+  const APRSSystem *sys = other.as<APRSSystem>();
+  if ((nullptr == sys) || (! PositioningSystem::copy(other)))
+    return false;
+  _destination = sys->destination();
+  _destSSID = sys->_destSSID;
+  _source = sys->_source;
+  _srcSSID = sys->_srcSSID;
+  _path = sys->_path;
+  return true;
+}
+
+ConfigItem *
+APRSSystem::clone() const {
+  APRSSystem *sys = new APRSSystem();
+  if (! sys->copy(*this)) {
+    sys->deleteLater();
+    return nullptr;
+  }
+  return sys;
 }
 
 AnalogChannel *
-APRSSystem::channel() const {
-  return _channel;
+APRSSystem::revertChannel() const {
+  return _channel.as<AnalogChannel>();
 }
+
 void
-APRSSystem::setChannel(AnalogChannel *channel) {
-  if (_channel)
-    disconnect(_channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
-  _channel = channel;
-  if (_channel)
-    connect(_channel, SIGNAL(destroyed(QObject*)), this, SLOT(onChannelDeleted(QObject*)));
+APRSSystem::setRevertChannel(AnalogChannel *channel) {
+  _channel.set(channel);
+}
+
+const AnalogChannelReference *
+APRSSystem::revert() const {
+  return &_channel;
+}
+
+AnalogChannelReference *
+APRSSystem::revert() {
+  return &_channel;
+}
+
+void
+APRSSystem::setRevert(AnalogChannelReference *ref) {
+  _channel.copy(ref);
 }
 
 const QString &
 APRSSystem::destination() const {
   return _destination;
 }
-uint
+unsigned
 APRSSystem::destSSID() const {
   return _destSSID;
 }
 void
-APRSSystem::setDestination(const QString &call, uint ssid) {
+APRSSystem::setDestination(const QString &call, unsigned ssid) {
   _destination = call;
   _destSSID = ssid;
 }
@@ -144,12 +279,12 @@ const QString &
 APRSSystem::source() const {
   return _source;
 }
-uint
+unsigned
 APRSSystem::srcSSID() const {
   return _srcSSID;
 }
 void
-APRSSystem::setSource(const QString &call, uint ssid) {
+APRSSystem::setSource(const QString &call, unsigned ssid) {
   _source = call;
   _srcSSID = ssid;
 }
@@ -180,12 +315,99 @@ APRSSystem::message() const {
 void
 APRSSystem::setMessage(const QString &msg) {
   _message = msg;
+  emit modified(this);
 }
 
-void
-APRSSystem::onChannelDeleted(QObject *obj) {
-  if (_channel == obj)
-    _channel = nullptr;
+YAML::Node
+APRSSystem::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = PositioningSystem::serialize(context, err);
+  if (node.IsNull())
+    return node;
+  YAML::Node type; type["aprs"] = node;
+  return type;
+}
+
+bool
+APRSSystem::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
+  if (! PositioningSystem::populate(node, context, err))
+    return false;
+
+  node["destination"] = QString("%1-%2").arg(_destination).arg(_destSSID).toStdString();
+  node["source"] = QString("%1-%2").arg(_source).arg(_srcSSID).toStdString();
+
+  QStringList path;
+  QRegExp pattern("([A-Za-z0-9]+-[0-9]+)");
+  int idx = 0;
+  while (0 <= (idx = pattern.indexIn(_path, idx))) {
+    path.append(pattern.cap(1));
+    idx += pattern.matchedLength();
+  }
+
+  if (path.count()) {
+    YAML::Node list = YAML::Node(YAML::NodeType::Sequence);
+    list.SetStyle(YAML::EmitterStyle::Flow);
+    foreach (QString call, path) {
+      list.push_back(call.toStdString());
+    }
+    node["path"] = list;
+  }
+
+  return true;
+}
+
+
+bool
+APRSSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse APRS system: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node sys = node.begin()->second;
+  if (sys["source"] && sys["source"].IsScalar()) {
+    QString source = QString::fromStdString(sys["source"].as<std::string>());
+    QRegExp pattern("^([A-Z0-9]+)-(1?[0-9])$");
+    if (! pattern.exactMatch(source)) {
+      errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
+                  << ": Cannot parse APRS system: '" << source << "' not a valid source call and SSID.";
+      return false;
+    }
+    setSource(pattern.cap(1), pattern.cap(2).toUInt());
+  } else {
+    errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
+                << ": Cannot parse APRS system: No source call+SSID specified.";
+    return false;
+  }
+
+  if (sys["destination"] && sys["destination"].IsScalar()) {
+    QString dest = QString::fromStdString(sys["destination"].as<std::string>());
+    QRegExp pattern("^([A-Z0-9]+)-(1?[0-9])$");
+    if (! pattern.exactMatch(dest)) {
+      errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
+                  << ": Cannot parse APRS system: '" << dest << "' not a valid destination call and SSID.";
+      return false;
+    }
+    setDestination(pattern.cap(1), pattern.cap(2).toUInt());
+  } else {
+    errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
+                << ": Cannot parse APRS system: No destination call+SSID specified.";
+    return false;
+  }
+
+  if (sys["path"] && sys["path"].IsSequence()) {
+    QStringList path;
+    for (YAML::const_iterator it=sys["path"].begin(); it!=sys["path"].end(); it++) {
+      if (it->IsScalar())
+        path.append(QString::fromStdString(it->as<std::string>()));
+    }
+    setPath(path.join(""));
+  }
+
+  return PositioningSystem::parse(node, ctx, err);
 }
 
 
@@ -193,144 +415,44 @@ APRSSystem::onChannelDeleted(QObject *obj) {
  * Implementation of GPSSystems table
  * ********************************************************************************************* */
 PositioningSystems::PositioningSystems(QObject *parent)
-  : QAbstractTableModel(parent), _posSystems()
+  : ConfigObjectList(PositioningSystem::staticMetaObject, parent)
 {
-  connect(this, SIGNAL(modified()), this, SLOT(onSystemEdited()));
-}
-
-int
-PositioningSystems::count() const {
-  return _posSystems.size();
-}
-
-void
-PositioningSystems::clear() {
-  beginResetModel();
-  for (int i=0; i<count(); i++)
-    _posSystems[i]->deleteLater();
-  _posSystems.clear();
-  endResetModel();
-  emit modified();
-}
-
-int
-PositioningSystems::indexOf(PositioningSystem *sys) const {
-  if (! _posSystems.contains(sys))
-    return -1;
-  return _posSystems.indexOf(sys);
+  // pass...
 }
 
 PositioningSystem *
 PositioningSystems::system(int idx) const {
-  if ((0>idx) || (idx >= _posSystems.size()))
-    return nullptr;
-  return _posSystems.at(idx);
+  if (ConfigItem *obj = get(idx))
+    return obj->as<PositioningSystem>();
+  return nullptr;
 }
 
 int
-PositioningSystems::addSystem(PositioningSystem *sys, int row) {
-  if (_posSystems.contains(sys))
-    return -1;
-  if (nullptr == sys)
-    return -1;
-  if ((row<0) || (row>_posSystems.size()))
-    row = _posSystems.size();
-  beginInsertRows(QModelIndex(), row, row);
-  sys->setParent(this);
-  connect(sys, SIGNAL(modified()), this, SIGNAL(modified()));
-  connect(sys, SIGNAL(destroyed(QObject *)), this, SLOT(onSystemDeleted(QObject *)));
-  _posSystems.insert(row, sys);
-  endInsertRows();
-  emit modified();
-  return row;
-}
-
-bool
-PositioningSystems::remSystem(int idx) {
-  if ((0>idx) || (idx >= count()))
-    return false;
-  beginRemoveRows(QModelIndex(), idx, idx);
-  PositioningSystem *sys = _posSystems.at(idx);
-  _posSystems.remove(idx);
-  sys->deleteLater();
-  endRemoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-PositioningSystems::remSystem(PositioningSystem *sys) {
-  if (! _posSystems.contains(sys))
-    return false;
-  int idx = _posSystems.indexOf(sys);
-  return remSystem(idx);
-}
-
-bool
-PositioningSystems::moveUp(int row) {
-  if ((0>=row) || (row>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  std::swap(_posSystems[row], _posSystems[row-1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-PositioningSystems::moveUp(int first, int last) {
-  if ((0>=first) || (last>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
-  for (int row=first; row<=last; row++)
-    std::swap(_posSystems[row], _posSystems[row-1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-PositioningSystems::moveDown(int row) {
-  if ((0>row) || ((row-1)>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  std::swap(_posSystems[row], _posSystems[row+1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-PositioningSystems::moveDown(int first, int last) {
-  if ((0>first) || ((last+1)>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first+2);
-  for (int row=last; row>=first; row--)
-    std::swap(_posSystems[row], _posSystems[row+1]);
-  endMoveRows();
-  emit modified();
-  return true;
+PositioningSystems::add(ConfigObject *obj, int row) {
+  if (obj && obj->is<PositioningSystem>())
+    return ConfigObjectList::add(obj, row);
+  return -1;
 }
 
 int
 PositioningSystems::gpsCount() const {
   int c=0;
-  for (int i=0; i<_posSystems.size(); i++)
-    if (_posSystems.at(i)->is<GPSSystem>())
+  for (int i=0; i<_items.size(); i++)
+    if (_items.at(i)->is<GPSSystem>())
       c++;
   return c;
 }
 
 int
-PositioningSystems::indexOfGPSSys(GPSSystem *gps) const {
-  if (! _posSystems.contains(gps))
+PositioningSystems::indexOfGPSSys(const GPSSystem *gps) const {
+  if (! _items.contains((GPSSystem *)gps))
     return -1;
 
   int idx=0;
   for (int i=0; i<count(); i++) {
-    if (gps == _posSystems.at(i))
+    if (gps == _items.at(i))
       return idx;
-    if (_posSystems.at(i)->is<GPSSystem>())
+    if (_items.at(i)->is<GPSSystem>())
       idx++;
   }
 
@@ -339,12 +461,12 @@ PositioningSystems::indexOfGPSSys(GPSSystem *gps) const {
 
 GPSSystem *
 PositioningSystems::gpsSystem(int idx) const {
-  if ((0>idx) || (idx >= _posSystems.size()))
+  if ((0>idx) || (idx >= _items.size()))
     return nullptr;
-  for (int i=0; i<_posSystems.size(); i++) {
-    if (_posSystems.at(i)->is<GPSSystem>()) {
+  for (int i=0; i<_items.size(); i++) {
+    if (_items.at(i)->is<GPSSystem>()) {
       if (0==idx)
-        return _posSystems.at(i)->as<GPSSystem>();
+        return _items.at(i)->as<GPSSystem>();
       else
         idx--;
     }
@@ -357,7 +479,7 @@ int
 PositioningSystems::aprsCount() const {
   int c=0;
   for (int i=0; i<count(); i++) {
-    if (_posSystems.at(i)->is<APRSSystem>())
+    if (_items.at(i)->is<APRSSystem>())
       c++;
   }
   return c;
@@ -365,14 +487,14 @@ PositioningSystems::aprsCount() const {
 
 int
 PositioningSystems::indexOfAPRSSys(APRSSystem *aprs) const {
-  if (! _posSystems.contains(aprs))
+  if (! _items.contains(aprs))
     return -1;
 
   int idx=0;
   for (int i=0; i<count(); i++) {
-    if (aprs == _posSystems.at(i))
+    if (aprs == _items.at(i))
       return idx;
-    if (_posSystems.at(i)->is<APRSSystem>())
+    if (_items.at(i)->is<APRSSystem>())
       idx++;
   }
 
@@ -381,12 +503,12 @@ PositioningSystems::indexOfAPRSSys(APRSSystem *aprs) const {
 
 APRSSystem *
 PositioningSystems::aprsSystem(int idx) const {
-  if ((0>idx) || (idx >= _posSystems.size()))
+  if ((0>idx) || (idx >= _items.size()))
     return nullptr;
-  for (int i=0; i<_posSystems.size(); i++) {
-    if (_posSystems.at(i)->is<APRSSystem>()) {
+  for (int i=0; i<_items.size(); i++) {
+    if (_items.at(i)->is<APRSSystem>()) {
       if (0==idx)
-        return _posSystems.at(i)->as<APRSSystem>();
+        return _items.at(i)->as<APRSSystem>();
       else
         idx--;
     }
@@ -394,95 +516,29 @@ PositioningSystems::aprsSystem(int idx) const {
   return nullptr;
 }
 
+ConfigItem *
+PositioningSystems::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
+  if (! node)
+    return nullptr;
 
-int
-PositioningSystems::rowCount(const QModelIndex &idx) const {
-  Q_UNUSED(idx);
-  return count();
-}
-int
-PositioningSystems::columnCount(const QModelIndex &idx) const {
-  Q_UNUSED(idx);
-  return 6;
-}
-
-QVariant
-PositioningSystems::data(const QModelIndex &index, int role) const {
-  if ((! index.isValid()) || (index.row()>=count()))
-    return QVariant();
-  if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
-    return QVariant();
-
-  PositioningSystem *sys = _posSystems.at(index.row());
-
-  switch (index.column()) {
-  case 0:
-    if (sys->is<GPSSystem>())
-      return tr("DMR");
-    else if (sys->is<APRSSystem>())
-      return tr("APRS");
-    else
-      return tr("OOps!");
-  case 1:
-    return sys->name();
-  case 2:
-    if (sys->is<GPSSystem>())
-      return sys->as<GPSSystem>()->contact()->name();
-    else if (sys->is<APRSSystem>())
-      return tr("%1-%2").arg(sys->as<APRSSystem>()->destination())
-          .arg(sys->as<APRSSystem>()->destSSID());
-  case 3:
-    return sys->period();
-  case 4:
-    if (sys->is<GPSSystem>())
-      return (sys->as<GPSSystem>()->hasRevertChannel() ?
-                sys->as<GPSSystem>()->revertChannel()->name() : tr("[Selected]"));
-    else if (sys->is<APRSSystem>())
-      return ((nullptr != sys->as<APRSSystem>()->channel()) ?
-                sys->as<APRSSystem>()->channel()->name() : tr("OOPS!"));
-  case 5:
-    if (sys->is<GPSSystem>())
-      return tr("[None]");
-    else if (sys->is<APRSSystem>())
-      return sys->as<APRSSystem>()->message();
-
-  default:
-    break;
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create positioning system: Expected object with one child.";
+    return nullptr;
   }
 
-  return QVariant();
-}
-
-QVariant
-PositioningSystems::headerData(int section, Qt::Orientation orientation, int role) const {
-  if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation))
-    return QVariant();
-  switch (section) {
-  case 0: return tr("Type");
-  case 1: return tr("Name");
-  case 2: return tr("Destination");
-  case 3: return tr("Period [s]");
-  case 4: return tr("Channel");
-  case 5: return tr("Message");
-  default:
-    break;
+  QString type = QString::fromStdString(node.begin()->first.as<std::string>());
+  if ("dmr" == type) {
+    return new GPSSystem();
+  } else if ("aprs"==type) {
+    return new APRSSystem();
   }
-  return QVariant();
-}
 
-void
-PositioningSystems::onSystemDeleted(QObject *obj) {
-  if (PositioningSystem *gps = reinterpret_cast<PositioningSystem *>(obj))
-    remSystem(gps);
-}
+  errMsg(err) << node.Mark().line << ":" << node.Mark().column
+              << ": Cannot create positioning system: Unknown type '" << type << "'.";
 
-void
-PositioningSystems::onSystemEdited() {
-  if (0 == count())
-    return;
-  QModelIndex tl = index(0,0), br = index(count()-1, columnCount(QModelIndex()));
-  emit dataChanged(tl, br);
+  return nullptr;
 }
-
 
 

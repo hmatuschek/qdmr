@@ -2,9 +2,8 @@
 #define PROGRESSBAR_HH
 
 #include <iostream>
-#include <cinttypes>
 
-void showProgress(uint percent=0);
-void updateProgress(uint percent);
+void showProgress(unsigned percent=0);
+void updateProgress(unsigned percent);
 
 #endif // PROGRESSBAR_HH

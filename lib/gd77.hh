@@ -4,67 +4,58 @@
  * \image html gd77.jpg "GD-77" width=200px
  * \image latex gd77.jpg "GD-77" width=200px
  *
- * @warning This device and its codplug are implemented based on the code by Serge and has not been
- * tested! I do not own a GD-77 or GD-77S, hence I cannot test and verify the implementation!
- *
- * @ingroup dsc */
+ * @ingroup radioddity */
 
 #ifndef GD77_HH
 #define GD77_HH
 
-#include "radio.hh"
-#include "hid_interface.hh"
+#include "radioddity_radio.hh"
+#include "radioddity_interface.hh"
 #include "gd77_codeplug.hh"
+#include "gd77_callsigndb.hh"
 
 
 /** Implements an USB interface to the Radioddity GD-77(S) VHF/UHF 5W DMR (Tier I&II) radios.
  *
  * @ingroup gd77 */
-class GD77 : public Radio
+class GD77 : public RadioddityRadio
 {
 	Q_OBJECT
 
 public:
 	/** Do not construct this class directly, rather use @c Radio::detect. */
-  explicit GD77(HID *device=nullptr, QObject *parent=nullptr);
-
-  virtual ~GD77();
+  explicit GD77(RadioddityInterface *device=nullptr, QObject *parent=nullptr);
 
 	const QString &name() const;
-  const Radio::Features &features() const;
-  const CodePlug &codeplug() const;
-  CodePlug &codeplug();
+  const RadioLimits &limits() const;
+  const Codeplug &codeplug() const;
+  Codeplug &codeplug();
+
+  /** Returns the default radio information. The actual instance may have different properties
+   * due to variants of the same radio. */
+  static RadioInfo defaultRadioInfo();
 
 public slots:
-  /** Starts the download of the codeplug and derives the generic configuration from it. */
-  bool startDownload(bool blocking=false);
-  /** Derives the device-specific codeplug from the generic configuration and uploads that
-   * codeplug to the radio. */
-  bool startUpload(Config *config, bool blocking=false,
-                   const CodePlug::Flags &flags = CodePlug::Flags());
   /** Encodes the given user-database and uploades it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
-                             const CallsignDB::Selection &selection=CallsignDB::Selection());
+                             const CallsignDB::Selection &selection=CallsignDB::Selection(),
+                             const ErrorStack &err=ErrorStack());
 
 protected:
-  /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
-	void run();
-  /** Connects to the device. */
-  bool connect();
-  /** Reads the codeplug from the device. */
-  bool download();
-  /** Writes the codeplug to the device. */
-  bool upload();
+  /** Implements the actual callsign DB upload process. */
+  bool uploadCallsigns();
 
 protected:
   /** The device identifier. */
 	QString _name;
-  /** The interface to the radio. */
-	HID *_dev;
-  /** The generic configuration. */
-	Config *_config;
-  /** The actual binary codeplug representation. */
-	GD77Codeplug _codeplug;
+  /** The codeplug. */
+  GD77Codeplug _codeplug;
+  /** The actual binary callsign DB representation. */
+  GD77CallsignDB _callsigns;
+
+private:
+  /** Holds the signleton instance of the radio limits for this radio. */
+  static RadioLimits *_limits;
 };
 
 #endif // GD77_HH

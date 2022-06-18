@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<section xml:id="cmdCodeplug"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Reading and writing codeplugs</title>
+</info>
+
+<para>
+  The major feature of the command line tool is certainly the ability to read and write codeplugs 
+  from and to the device. The majority of the action happens automatically. Like the detection of
+  the radio. If something goes wrong, an error message will be written to <varname>stderr</varname>. 
+  A more detailed logging can be enabled by passing the <option>--verbose</option> flag.
+</para>
+
+
+<section xml:id="cmdRead">
+<info><title>Reading a codeplug</title></info>
+<para>
+  To read a codeplug, the <command>read</command> command is used. The codeplug can be stored in 
+  several formats. The human readable extensible codeplug format (YAML) and as a binary memory dump
+  of the codeplug memory on the device. <command>dmrconf</command> detects the format based on the 
+  file extension or by means of an additional flag. The latter is particularly important if the 
+  read codeplug should be written to <varname>stdout</varname> for piping it to another program for
+  further processing.
+</para>
+
+<informalexample>
+  <programlisting language="bash"><![CDATA[dmrconf read codeplug.yaml]]></programlisting>
+</informalexample>
+
+<para>
+  Will simply read the codeplug from the detected device and stores it in the extensible codeplug 
+  format in the file <filename>codeplug.yaml</filename>. The format was detected by the file 
+  extension <filename>yaml</filename> which refers to the extensible codeplug format using YAML.
+</para>
+
+<para>
+  To store the memory dump of the codeplug memory of the radio, the file extension should be 
+  <filename>dfu</filename>. 
+</para>
+
+<para>
+  As mentioned above, it is also possible to dump the decoded codeplug to <varname>stdout</varname> 
+  allowing to pipe the codeplug into another program for processing. This can be done by omitting 
+  the output filename. Then, however, the output format is not specified anymore. In this case, one
+  the explicit format flags <option>--yaml</option> or <option>--bin</option> must be used to 
+  specify in which format the codeplug should be written. These flags can also be used to store a 
+  codeplug in a particular format in arbitrarily named files. 
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[dmrconf read --yaml | python my_script.py]]></programlisting>
+</informalexample>
+<para>
+  This example reads the codeplug from the connected device and decodes it. The decoded codeplug is
+  then piped to the python script <filename>my_script.py</filename>. 
+</para>
+
+
+<section xml:id="cmdDecode">
+<info><title>Decoding binary codeplugs</title></info>
+<para>
+  It is also possible decode binary codeplugs that has been read from the device earlier and 
+  stored as a memory dump (i.e., in a <filename>dfu</filename> file). This step is actually
+  the second step automatically performed during reading. When reading a codeplug, in a first step
+  the memory dump of the codeplug is read from the device. In a second step, the read binary 
+  codeplug is then decoded and dumped in a human readable format. 
+</para>
+
+<para>
+  The <command>decode</command> command performs that second step. To do that, it needs
+  two additional information: The radio type, from which this codeplug was read and the format
+  to write the decoded format to. Like for the <command>read</command> command, the latter
+  can be passed by the output filename extension or via an additional flag.
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[dmrconf read codeplug.dfu
+dmrconf decode --radio=uv390 codeplug.dfu codeplug.yaml]]></programlisting>
+</informalexample>
+
+<para>
+  This example performs the same actions like a simple <command>read</command> command (assuming a
+  TyT MD-UV390 is connected). It first downloads the binary codeplug. This time, the memory dump 
+  is stored in a binary form (<filename>dfu</filename> file). The second command then decodes 
+  the binary codeplug into the extensible codeplug format (<filename>yaml</filename> file), assuming 
+  that the binary codeplug stems from a TyT MD-UV390.
+</para>
+
+<para>
+  Since version 0.8.1, it is now also possible to decode some manufacturer binary codeplug files as
+  they are produced by the manufacturer CPS. To signal the decode command to treat the file as a
+  manufacturer CPS file, you need to pass the <option>-m</option> or <option>--manufacturer</option>
+  and the <option>--radio</option> option. The latter tells the <command>decode</command> command 
+  the format of the file. That is, the call
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[dmrconf decode -m --radio=uv390 manufacturer_cps_file.rdt codeplug.yaml]]></programlisting>
+</informalexample>
+
+<para>
+  Will decode the manufactuer CPS file <filename>manufacturer_cps_file.rdt</filename> assuming it 
+  is a file generated by the CPS for the TyT MD-UV390. Like for the <quote>normal</quote> decoding
+  the output format must be specified either by file extension or flag.
+</para>
+
+
+<section>
+<info><title>Debugging the codplug decoding</title></info>
+<para>
+  Under normal circumstances, it makes no sense to first read the binary codeplug from the device 
+  and then decoding it in a separate step as the read command will do that for you.
+</para> 
+
+<para>
+  However, if there is a bug in <command>dmrconf</command> that gets triggered by your codeplug on 
+  the device, the binary codeplug is an invaluable resource for debugging the application. Consider 
+  filing an issue at the <link xlink:href="https://github.com/hmatuschek/qdmr/issues">bug 
+  tracker</link> and include the binary codeplug as an attachment. 
+</para>
+
+<para>
+  If you like, you can also send me your codeplug directly. I'll keep it confidentially.
+</para>
+</section>
+</section>
+</section>
+
+
+<section>
+<info><title>Writing a codeplug</title></info>
+
+<para>
+  To write a codeplug into the device, the <command>write</command> command is used. The codeplug
+  can be read from several formats. The extensible codeplug format (<filename>yaml</filename> 
+  file) as well as the old table based format (<filename>conf</filename> file). It is not possible
+  to write binary codeplugs without decoding them first. Like for the <command>read</command> 
+  command, <command>dmrconf</command> will detect the format based on the file extension or by 
+  passed flags.
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[dmrconf write codeplug.yaml]]></programlisting>
+</informalexample>
+
+<para>
+  This example will write the codeplug stored in the extensible codeplug format in 
+  <filename>codeplug.yaml</filename> to the connected device. Before writing the codeplug to the 
+  device, the connected device gets detected and the codeplug gets verified.
+</para>
+
+<para>
+  If the verification step fails, one or more error messages are written to 
+  <varname>stderr</varname> describing the issue with the codeplug. One verification step is the
+  check whether all channel frequencies are within the frequency limits specified by the 
+  manufacturer. The latter check can be disabled using the 
+  <option>--ignore-frequency-limits</option> flag.
+</para>
+
+<para>
+  There are also some flags controlling the assembly of the binary codeplug. When the  
+  <option>--init-codeplug</option> flag is set, the codeplug will be generated from scratch using
+  default values for all options not explicitly specified in the codeplug file. This might be used
+  to initialize a brand new radio. However, any changes made to the radio are lost. 
+</para>
+
+<para>
+  When this option is not set, the codeplug gets encoded and written in a two-step process. First
+  the current binary codeplug is downloaded from the radio. Then the codeplug file is used to 
+  update the binary codeplug. The result is then written back to the device. This ensures that all
+  settings made in the radio are kept, unless they are explicitly set in the codeplug file.
+</para>
+
+<para>
+  The <option>--auto-enable-gps</option> and <option>--auto-enable-roaming</option> flags will 
+  tell <command>dmrconf</command> to enable the GPS or roaming feature whenever any of the 
+  programmed channels use the GPS or a roaming zone. (This depends also on the ability of the 
+  radio.)
+</para>
+
+<section xml:id="cmdVerify">
+<info><title>Verify a codeplug</title></info>
+<para>
+  The aforementioned verification of the codeplug file can also be performed separately using the
+  <command>verify</command>. This command also needs to know against which radio the codeplug 
+  should be verified. The radio must be specified using the <option>--radio</option> option.
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[dmrconf verify --radio=d878uv codeplug.yaml]]></programlisting>
+</informalexample>
+
+<para>
+  This command will verify the codeplug stored in <filename>codeplug.yaml</filename> in the 
+  extensible codeplug format against an AnyTone AT-D878UV. Like for the <command>write</command>, 
+  any issues are written to <varname>stderr</varname>.
+</para>
+
+<para>
+  Like for the <command>write</command> command, the verification can be altered using the
+  <option>--ignore-frequency-limits</option> flag.
+</para>
+</section>
+
+
+<section xml:id="cmdEncode">
+<info><title>Encoding codeplugs</title></info>
+
+<para>
+  Is is also possible to perform the encoding step of the codeplug separately. This can be done
+  with the <command>encode</command> command. Like for the <command>verify</command> command,
+  the <command>encode</command> command also needs the radio for which the codeplug should be 
+  encoded. The input format of the codeplug is again specified by either the file extension 
+  of the codeplug file or by flags.
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[dmrconf encode --radio=opengd77 codeplug.yaml codeplug.dfu]]></programlisting>
+</informalexample>
+
+<para>
+  This call will encode the codeplug <filename>codeplug.yaml</filename> specified in the extensible
+  codeplug format for a radio running the OpenGD77 firmware and stores the resulting binary 
+  codeplug in <filename>codeplug.dfu</filename>.
+</para>
+
+<para>
+  Like for the <command>write</command> command, the encoding can be controlled using the 
+  <option>--auto-enable-gps</option> and <option>--auto-enable-roaming</option> flags.
+</para>
+</section>
+</section>
+</section>

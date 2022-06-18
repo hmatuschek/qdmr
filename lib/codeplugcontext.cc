@@ -1,4 +1,6 @@
 #include "codeplugcontext.hh"
+#include "logger.hh"
+
 
 CodeplugContext::CodeplugContext(Config *config)
   : _config(config), _radioIDTable(), _channelTable(), _digitalContactTable(), _analogContactTable(),
@@ -22,23 +24,23 @@ bool
 CodeplugContext::setDefaultRadioId(uint32_t id, int index) {
   if (_radioIDTable.contains(0))
     return false;
-  _config->radioIDs()->getId(0)->setId(id);
+  _config->radioIDs()->getId(0)->setNumber(id);
   _radioIDTable[index] = 0;
   return true;
 }
 
 bool
-CodeplugContext::addRadioId(uint32_t id, int index) {
+CodeplugContext::addRadioId(uint32_t id, int index, const QString &name) {
   if (_radioIDTable.contains(index))
     return false;
-  int cidx = _config->radioIDs()->addId(id);
+  int cidx = _config->radioIDs()->addId(name, id);
   if (cidx < 0)
     return false;
   _radioIDTable[index] = cidx;
   return true;
 }
 
-RadioID *
+DMRRadioID *
 CodeplugContext::getRadioId(int idx) const {
   if (! _radioIDTable.contains(idx))
     return nullptr;
@@ -55,7 +57,8 @@ bool
 CodeplugContext::addChannel(Channel *ch, int index) {
   if (_channelTable.contains(index))
     return false;
-  int cidx = _config->channelList()->addChannel(ch);
+  //logDebug() << "Register channel '" << ch->name() << "' under idx=" << index << ".";
+  int cidx = _config->channelList()->add(ch);
   if (0 > cidx)
     return false;
   _channelTable[index] = cidx;
@@ -79,7 +82,8 @@ bool
 CodeplugContext::addDigitalContact(DigitalContact *con, int index) {
   if (_digitalContactTable.contains(index))
     return false;
-  int cidx = _config->contacts()->addContact(con);
+  //logDebug() << "Register contact '" << con->name() << "' under idx=" << index << ".";
+  int cidx = _config->contacts()->add(con);
   if (0 > cidx)
     return false;
   _digitalContactTable[index] = cidx;
@@ -103,7 +107,7 @@ bool
 CodeplugContext::addAnalogContact(DTMFContact *con, int index) {
   if (_analogContactTable.contains(index))
     return false;
-  int cidx = _config->contacts()->addContact(con);
+  int cidx = _config->contacts()->add(con);
   if (0 > cidx)
     return false;
   _analogContactTable[index] = cidx;
@@ -127,7 +131,7 @@ bool
 CodeplugContext::addGroupList(RXGroupList *grp, int index) {
   if (_groupListTable.contains(index))
     return false;
-  int cidx = _config->rxGroupLists()->addList(grp);
+  int cidx = _config->rxGroupLists()->add(grp);
   if (0 > cidx)
     return false;
   _groupListTable[index] = cidx;
@@ -159,7 +163,7 @@ CodeplugContext::addScanList(ScanList *lst, int index) {
   if (_scanListTable.contains(index))
     return false;
   int sidx = _config->scanlists()->count();
-  if (! _config->scanlists()->addScanList(lst))
+  if (0 > _config->scanlists()->add(lst))
     return false;
   _scanListTable[index] = sidx;
   return true;
@@ -183,7 +187,7 @@ CodeplugContext::addGPSSystem(GPSSystem *sys, int index) {
   if (_gpsSystemTable.contains(index))
     return false;
   int sidx = _config->posSystems()->gpsCount();
-  if (0 > _config->posSystems()->addSystem(sys))
+  if (0 > _config->posSystems()->add(sys))
     return false;
   _gpsSystemTable[index] = sidx;
   return true;
@@ -207,7 +211,7 @@ CodeplugContext::addAPRSSystem(APRSSystem *sys, int index) {
   if (_aprsSystemTable.contains(index))
     return false;
   int sidx = _config->posSystems()->aprsCount();
-  if (0 > _config->posSystems()->addSystem(sys))
+  if (0 > _config->posSystems()->add(sys))
     return false;
   _aprsSystemTable[index] = sidx;
   return true;
@@ -231,7 +235,7 @@ CodeplugContext::addRoamingZone(RoamingZone *zone, int index) {
   if (_roamingZoneTable.contains(index))
     return false;
   int sidx = _config->roaming()->count();
-  if (! _config->roaming()->addZone(zone))
+  if (! _config->roaming()->add(zone))
     return false;
   _roamingZoneTable[index] = sidx;
   return true;

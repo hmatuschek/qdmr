@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="guiRadioSettings"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>General configuration</title>
+</info>
+
+<para>
+  The figure below shows the <guilabel>General Configuration</guilabel> tab of 
+  <application>qdmr</application>. This tab is divided into 4 sections: 
+  <guilabel>DMR Radio ID</guilabel>, <guilabel>Boot Settings</guilabel>, 
+  <guilabel>Audio Settings</guilabel> and <guilabel>Channel Default Values</guilabel>. 
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-general-settings.png" width="13cm" align="center"/></imageobject>
+    <textobject>Screen shot of the general configuration like the DMR ID and the radio name.</textobject>
+  </mediaobject>
+  <title>General settings tab.</title>
+</screenshot>
+
+<para>
+  The general configuration of your radio is the simplest step: You only need to  enter your
+  DMR ID and your radio name. The latter is usually just your call sign. If you do not have a DMR
+  ID yet, you can request one at 
+  <link xlink:href="https://register.ham-digital.org/">ham-digital.org</link>.
+</para>
+
+<note>
+  <para>
+    You will always need only <emphasis>one</emphasis> DMR ID, even if you have several radios. The
+    DMR network is able to handle multiple endpoints with the same ID. Never request more than one 
+    ID, they are a limited resource.
+  </para>
+</note>
+
+<para>
+  In the rare case, where you actually need more than one DMR ID, for example if you the same 
+  radio from HAM as well as commercial applications, you may add your additional DMR IDs using
+  the <guilabel>Radio IDs</guilabel> tab. This tab is usually hidden and can be accessed by 
+  enabling <guibutton>Show commercial features</guibutton> in the application settings (see 
+  <xref linkend="guiSettingsDialog"/> below).
+</para>
+
+<para>
+  Within the <guilabel>Boot Settings</guilabel>, the <guilabel>Intro Line 1</guilabel> &amp; 
+  <guilabel>2</guilabel> specify the text that some radios show on startup. You may enter any text
+  here. Some radios show an image during boot. For those radios, these settings have no effect.
+</para>
+
+<para>
+  Within the <guilabel>Audio Settings</guilabel>, the <guilabel>MIC amp.</guilabel> option specifies 
+  the microphone amplification (if supported by the radio). This must be a value between 1 and 10, 
+  where 1 is the smallest amplification and 10 the loudest.
+</para>
+
+<para>
+  The <guilabel>Speech Synthesis</guilabel> option allows for enabling speech synthesis by the 
+  radio. Some radios support speech synthesis to help visually impaired 
+  operators to handle the radio and navigate its menus. If this option is checked, the speech-synthesis 
+  will be enabled if the radio supports this feature.
+</para>
+
+<para>
+  The <guilabel>Channel Default Values</guilabel> block allows to specify some default values that can 
+  be referenced by channels (see <xref linkend="guiChannels"/> below). This serves two use cases. First, it 
+  allows to set some channel properties for all channels that reference these values at once. More 
+  importantly, however, some radios do not allow to set these options on a per-channel basis. For those
+  radios, these values are used for all channels.
+</para>
+
+<para>
+  If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
+  <xref linkend="guiSettingsDialog"/>), an additional block labeled <guilabel>Extensions</guilabel> 
+  is shown at the right side. This view allows to add, remove and edit device specific radio 
+  settings. All device specific settings are handled and displayed in the same way. See 
+  <xref linkend="guiExtensions"/> for some description of this process.
+</para>
+</section>
+  
+  

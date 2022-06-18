@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="confScanLists"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<info>
+  <title>Scan lists</title>
+</info>
+
+<para>
+  A scan list is list of channels, that are scanned whenever scanning is started on a
+  channel, the scan list is associated with. A single scan list might be associated with several
+  channels. For example, all channels within that scan list.
+</para>
+
+<para>
+  The list of scan lists has the following form
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[Scanlist Name            PCh1 PCh2 TxCh Channels
+1        "KW"            1    84   Sel  1,84,2,9,11,8,14,4,5,20,21,19,6
+2        "DMR Simplex"   84   -    Sel  84,85,86,87,88,89,90,91
+]]></programlisting>
+</informalexample>
+
+<para>
+  The list of scan lists starts with the "Scanlist" keyword and ends with an empty line. The
+  remaining keywords (Name, PCh1, PCh2 &amp; Channels) are ignored but part of the self-documentation
+  of the configuration file format. A scan list is defined with every other line. The first column
+  specifies the unique identifier of the scan list. The second (Name) column specifies the name of
+  the scan list as a string. Any string will do. The third and fourth columns specify the first
+  and second priority channels for the scan list respectively. These priority channels are visited
+  more frequently during the scan. That is, the first priority channel is visited 50% of the time
+  while the second is visited 25% of the time. These channels might also be set to "-" indicating
+  that there is no priority channel. The 5th column specifies the transmit channel during the scan.
+  Possible options are "Last", "Sel" and any valid channel index. The "Sel" keyword implies that
+  the radio will transmit on the selected channel when the scan started. The "Last" keyword implies
+  that the radio will transmit on the channel at which the scan stopped on, while specifying any
+  channel index implies, that the radio will transmit on that channel. Finally the 6th column
+  specifies the comma-separated list of channels that form the scan list.
+</para>
+
+</section>

@@ -1,0 +1,11 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+\input{repeater}
+\begin{document}
+ \begin{tikzpicture}[every node/.style={scale=.8}]
+  \activeuser{U1}{0,0}{DM3MAT};
+  \user{U2}{6,0}{DL2XYZ};
+  \path[->] (U1) edge node[above] {$144.500 MHz$} (U2) ;
+ \end{tikzpicture}
+\end{document}

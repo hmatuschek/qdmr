@@ -1,0 +1,50 @@
+digraph detect {
+ graph [nodesep="0.5", ranksep="0.25"];
+ rankdir = LR;
+ enum [
+  label="Detect all devices\nmatching VID:PID";
+  shape=rect;
+ ];
+ single [
+  label="Only one USB\n device found?";
+  shape=diamond;
+ ];
+ save [
+  label="Save to assume\n device is radio?";
+  shape=diamond;
+ ];
+ userif [
+  label="User selects\n USB device.";
+  shape=parallelogram;
+ ];
+ ident [
+  label="All matching radios\n identifiable?";
+  shape=diamond;
+ ];
+ userdev [
+  label="User selects\n radio.";
+  shape=parallelogram;
+ ];
+ id [
+  label="Connect to radio\n and request identifier.";
+  shape=rect;
+ ];
+ end [
+  label="Radio detected\nselected.";
+  shape=oval;
+ ];
+
+ {rank = same; enum; single; save; ident; id; end; }
+ {rank = same; userif; userdev; }
+
+ enum:s -> single:n;
+ single:s -> save:n [label="yes"];
+ save:e -> userif:w [label="no"];
+ save:s -> ident:n [label="yes"];
+ single:e -> userif:n [label="no"];
+ userif:s -> ident:n;
+ ident:e -> userdev:w [label="no"];
+ ident:s -> id:n [label="yes"];
+ userdev:s -> end:e;
+ id:s -> end:n;
+}

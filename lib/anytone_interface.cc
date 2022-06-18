@@ -2,6 +2,9 @@
 #include "logger.hh"
 #include <QtEndian>
 
+#define USB_VID 0x28e9
+#define USB_PID 0x018a
+
 /* ********************************************************************************************* *
  * Implementation of AnytoneInterface::ReadRequest
  * ********************************************************************************************* */
@@ -67,14 +70,14 @@ AnytoneInterface::WriteRequest::WriteRequest(uint32_t addr, const char *data) {
 /* ********************************************************************************************* *
  * Implementation of AnytoneInterface::RadioInfo
  * ********************************************************************************************* */
-AnytoneInterface::RadioInfo::RadioInfo()
+AnytoneInterface::RadioVariant::RadioVariant()
   : name(""), bands(0x00), version("")
 {
   // pass...
 }
 
 bool
-AnytoneInterface::RadioInfo::isValid() const {
+AnytoneInterface::RadioVariant::isValid() const {
   return ! name.isEmpty();
 }
 
@@ -82,8 +85,8 @@ AnytoneInterface::RadioInfo::isValid() const {
 /* ********************************************************************************************* *
  * Implementation of AnytoneInterface
  * ********************************************************************************************* */
-AnytoneInterface::AnytoneInterface(QObject *parent)
-  : USBSerial(0x28e9, 0x018a, parent), _state(STATE_INITIALIZED), _info()
+AnytoneInterface::AnytoneInterface(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
+  : USBSerial(descriptor, err, parent), _state(STATE_INITIALIZED), _info()
 {
   if (isOpen()) {
     _state = STATE_OPEN;
@@ -97,7 +100,7 @@ AnytoneInterface::AnytoneInterface(QObject *parent)
     return;
   // identify device
   if (! this->request_identifier(_info)) {
-    _info = RadioInfo();
+    _info = RadioVariant();
     _state = STATE_ERROR;
   }
 }
@@ -106,6 +109,17 @@ AnytoneInterface::~AnytoneInterface() {
   if (isOpen())
     this->close();
 }
+
+USBDeviceInfo
+AnytoneInterface::interfaceInfo() {
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID, USB_PID);
+}
+
+QList<USBDeviceDescriptor>
+AnytoneInterface::detect() {
+  return USBSerial::detect(USB_VID, USB_PID);
+}
+
 
 void
 AnytoneInterface::close() {
@@ -123,13 +137,28 @@ AnytoneInterface::close() {
   }
 }
 
-QString
-AnytoneInterface::identifier() {
-  return _info.name;
+RadioInfo
+AnytoneInterface::identifier(const ErrorStack &err) {
+  if (! _info.isValid())
+    return RadioInfo();
+  if ("D868UVE" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D868UVE);
+  } else if ("D6X2UV" == _info.name) {
+    return RadioInfo::byID(RadioInfo::DMR6X2);
+  } else if ("D878UV" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D878UV);
+  } else if ("D878UV2" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D878UVII);
+  } else if ("D578UV" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D578UV);
+  }
+
+  errMsg(err) << "Unsupported AnyTone radio '" << _info.name << "'.";
+  return RadioInfo();
 }
 
 bool
-AnytoneInterface::getInfo(RadioInfo &info) {
+AnytoneInterface::getInfo(RadioVariant &info) {
   if (_info.isValid()) {
     info = _info;
     return true;
@@ -138,29 +167,25 @@ AnytoneInterface::getInfo(RadioInfo &info) {
 }
 
 bool
-AnytoneInterface::write_start(uint32_t bank, uint32_t addr)
+AnytoneInterface::write_start(uint32_t bank, uint32_t addr, const ErrorStack &err)
 {
-  Q_UNUSED(bank);
-  Q_UNUSED(addr);
-
-  if ((STATE_PROGRAM != _state) && (! enter_program_mode()))
+  Q_UNUSED(bank); Q_UNUSED(addr)
+  if ((STATE_PROGRAM != _state) && (! enter_program_mode(err)))
     return false;
 
   return true;
 }
 
 bool
-AnytoneInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
+AnytoneInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err)
 {
   if (0 != bank) {
-    _errorMessage = tr("Anytone: Cannot write to bank %1. There is only one (idx=0).").arg(bank);
-    logError() << _errorMessage;
+    errMsg(err) << "Anytone: Cannot write to bank " << bank << ". There is only one (idx=0).";
     return false;
   }
 
   if (STATE_PROGRAM != _state) {
-    _errorMessage = "Anytone: Cannot write data to device: Not in programming mode.";
-    logError() << _errorMessage;
+    errMsg(err) << "Anytone: Cannot write data to device: Not in programming mode.";
     return false;
   }
 
@@ -169,15 +194,13 @@ AnytoneInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
   for (int i=0; i<nbytes; i+=16) {
     uint8_t ack;
     WriteRequest req(addr+i, (const char *)(data+i));
-    if (! send_receive((const char *)&req, sizeof(WriteRequest),(char *)&ack, 1)) {
-      _errorMessage = tr("Anytone: Cannot write data to device: %1").arg(_errorMessage);
-      logError() << _errorMessage;
+    if (! send_receive((const char *)&req, sizeof(WriteRequest),(char *)&ack, 1, err)) {
+      errMsg(err) << "Anytone: Cannot write data to device.";
       return false;
     }
     if (0x06 != ack) {
-      _errorMessage = tr("Anytone: Cannot write data to device: Unexpected response %1, expected 06.")
-          .arg(ack, 2, 16, QChar('0'));
-      logError() << _errorMessage;
+      errMsg(err) << "Anytone: Cannot write data to device: Unexpected response "
+                  << (int)ack << ", expected 6.";
       return false;
     }
   }
@@ -186,33 +209,30 @@ AnytoneInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
 }
 
 bool
-AnytoneInterface::write_finish() {
-  // pass...
+AnytoneInterface::write_finish(const ErrorStack &err) {
+  Q_UNUSED(err)
   return true;
 }
 
 bool
-AnytoneInterface::read_start(uint32_t bank, uint32_t addr) {
-  Q_UNUSED(bank);
-  Q_UNUSED(addr);
+AnytoneInterface::read_start(uint32_t bank, uint32_t addr, const ErrorStack &err) {
+  Q_UNUSED(bank); Q_UNUSED(addr);
 
-  if ((STATE_PROGRAM != _state) && (! enter_program_mode()))
+  if ((STATE_PROGRAM != _state) && (! enter_program_mode(err)))
     return false;
 
   return true;
 }
 
 bool
-AnytoneInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
+AnytoneInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err) {
   if (0 != bank) {
-    _errorMessage = tr("Anytone: Cannot read from bank %1. There is only one (idx=0).").arg(bank);
-    logError() << _errorMessage;
+    errMsg(err) << "Anytone: Cannot read from bank " << bank << ". There is only one (idx=0).";
     return false;
   }
 
   if (STATE_PROGRAM != _state) {
-    _errorMessage = "Anytone: Cannot read data from device: Not in programming mode.";
-    logError() << _errorMessage;
+    errMsg(err) << "Anytone: Cannot read data from device: Not in programming mode.";
     return false;
   }
 
@@ -222,14 +242,13 @@ AnytoneInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) 
     ReadRequest req(addr + i);
     ReadResponse resp;
     if (! send_receive((const char *)&req, sizeof(ReadRequest),
-                       (char *)&resp, sizeof(ReadResponse))) {
-      _errorMessage = tr("Anytone: Cannot read data from device: %1").arg(_errorMessage);
-      logError() << _errorMessage;
+                       (char *)&resp, sizeof(ReadResponse), err)) {
+      errMsg(err) << "Anytone: Cannot read data from device.";
       return false;
     }
-    if (! resp.check(addr+i, _errorMessage)) {
-      _errorMessage = tr("Anytone: Cannot read data from device: %1").arg(_errorMessage);
-      logError() << _errorMessage;
+    QString error_message;
+    if (! resp.check(addr+i, error_message)) {
+      errMsg(err) << "Anytone: Cannot read data from device: " << error_message << ".";
       return false;
     }
     memcpy(data+i, resp.data, 16);
@@ -239,15 +258,15 @@ AnytoneInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) 
 }
 
 bool
-AnytoneInterface::read_finish() {
-  // pass...
+AnytoneInterface::read_finish(const ErrorStack &err) {
+  Q_UNUSED(err)
   return true;
 }
 
 bool
-AnytoneInterface::reboot() {
+AnytoneInterface::reboot(const ErrorStack &err) {
   if (STATE_PROGRAM == _state) {
-    if (! leave_program_mode())
+    if (! leave_program_mode(err))
       return false;
     _state = STATE_OPEN;
   }
@@ -258,32 +277,28 @@ AnytoneInterface::reboot() {
   return true;
 }
 
-
 bool
-AnytoneInterface::enter_program_mode() {
+AnytoneInterface::enter_program_mode(const ErrorStack &err) {
   if (STATE_PROGRAM == _state) {
     logDebug() << "Already in program mode. Skip.";
     return true;
   } else if (STATE_OPEN != _state) {
-    _errorMessage = tr("Anytone: Cannot enter program mode. Device is in state %1.").arg(_state);
-    logDebug() << _errorMessage;
+    errMsg(err) << "Anytone: Cannot enter program mode. Device is in state " << _state << ".";
     return false;
   }
 
   char ack[3];
   // send "enter program mode" command
-  if (! send_receive("PROGRAM", 7, ack, 3)) {
-    _errorMessage = tr("Anytone: Cannot enter program mode: %1").arg(_errorMessage);
-    logError() << _errorMessage;
+  if (! send_receive("PROGRAM", 7, ack, 3, err)) {
+    errMsg(err) << "Anytone: Cannot enter program mode.";
     return false;
   }
   // check response
   if (0 != memcmp(ack, "QX\6", 3)) {
-    _errorMessage = tr("Anytone: Cannot enter program mode: Unexpected response. "
-                       "Expected 515806 got %1%2%3.")
-        .arg((int)ack[0],2,16,QChar('0')).arg((int)ack[1],2,16,QChar('0'))
-        .arg((int)ack[2],2,16,QChar('0'));
-    logError() << _errorMessage;
+    errMsg(err) << "Anytone: Cannot enter program mode: Unexpected response. "
+                << "Expected 515806 got " << QString::number(ack[0], 16)
+                << QString::number(ack[1], 16)
+                << QString::number(ack[1], 16) << ".";
     close();
     _state = STATE_ERROR;
     return false;
@@ -294,28 +309,22 @@ AnytoneInterface::enter_program_mode() {
 }
 
 bool
-AnytoneInterface::request_identifier(RadioInfo &info) {
+AnytoneInterface::request_identifier(RadioVariant &info, const ErrorStack &err) {
   if (STATE_PROGRAM != _state) {
-      _errorMessage = tr("Anytone: Cannot request identifier. "
-                         "Device not in program mode, is in state %1.").arg(_state);
-      logDebug() << _errorMessage;
+      errMsg(err) << "Anytone: Cannot request identifier. Device not in program mode, is in state "
+               << _state << ".";
       return false;
     }
 
   RadioInfoResponse resp;
   // send "identify" command (in program mode)
   if (! send_receive("\2", 1, (char *)&resp, sizeof(RadioInfoResponse))) {
-    _errorMessage = tr("Anytone: Cannot request identifier: %1").arg(_errorMessage);
-    logError() << _errorMessage;
+    errMsg(err) << "Anytone: Cannot request identifier.";
     return false;
   }
   // check response
   if (('I'!=resp.prefix) || (0x06 != resp.eot)) {
-    _errorMessage = tr("Anytone: Cannot request identifier: Unexpected response. "
-                       "Expected 49...06 got %1...%2.")
-        .arg((int)resp.prefix,2,16,QChar('0'))
-        .arg((int)resp.eot,2,16,QChar('0'));
-    logError() << _errorMessage;
+    errMsg(err) << "Anytone: Cannot request identifier: Unexpected response.";
     close();
     _state = STATE_ERROR;
     return false;
@@ -328,19 +337,18 @@ AnytoneInterface::request_identifier(RadioInfo &info) {
 }
 
 bool
-AnytoneInterface::leave_program_mode() {
+AnytoneInterface::leave_program_mode(const ErrorStack &err) {
   if (STATE_OPEN == _state) {
     logDebug() << "Device in open mode -> no need to leave program mode.";
     return true;
   } else if (STATE_PROGRAM != _state) {
-    _errorMessage = tr("Anytone: Cannot leave program mode. Device in state %1.").arg(_state);
-    logError() << _errorMessage;
+    errMsg(err) << "Anytone: Cannot leave program mode. Device in state " << _state << ".";
     return false;
   }
 
   char ack[1];
   if (! send_receive("END", 3, ack, 1)) {
-    _errorMessage = tr("Anytone: Cannot leave program mode: %1").arg(_errorMessage);
+    errMsg(err) << "Anytone: Cannot leave program mode.";
     return false;
   }
 
@@ -350,11 +358,10 @@ AnytoneInterface::leave_program_mode() {
 }
 
 bool
-AnytoneInterface::send_receive(const char *cmd, int clen, char *resp, int rlen) {
+AnytoneInterface::send_receive(const char *cmd, int clen, char *resp, int rlen, const ErrorStack &err) {
   // Try to write command to device
   if (clen != QSerialPort::write(cmd, clen)) {
-    _errorMessage = "Cannot send command to device: " + QSerialPort::errorString();
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot send command to device.";
     close();
     _state = STATE_ERROR;
     return false;
@@ -365,8 +372,7 @@ AnytoneInterface::send_receive(const char *cmd, int clen, char *resp, int rlen) 
   int len = rlen;
   while (len > 0) {
     if (! waitForReadyRead(1000)) {
-      _errorMessage = "No response from device: Timeout.";
-      logError() << _errorMessage;
+      errMsg(err) << "No response from device: Timeout.";
       close();
       _state = STATE_ERROR;
       return false;
@@ -374,8 +380,7 @@ AnytoneInterface::send_receive(const char *cmd, int clen, char *resp, int rlen) 
 
     int r = QSerialPort::read(p, len);
     if (r < 0) {
-      _errorMessage = "Cannot read response from device: " + QSerialPort::errorString();
-      logError() << _errorMessage;
+      errMsg(err) << "Cannot read response from device.";
       close();
       _state = STATE_ERROR;
       return false;

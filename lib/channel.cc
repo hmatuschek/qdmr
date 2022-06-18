@@ -4,6 +4,7 @@
 #include "rxgrouplist.hh"
 #include "config.hh"
 #include "scanlist.hh"
+#include "logger.hh"
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -16,40 +17,78 @@
 #include "application.hh"
 #include <QCompleter>
 #include <QAbstractProxyModel>
+#include <QMetaEnum>
 
-#include <QDebug>
+#include "opengd77_extension.hh"
+
 
 /* ********************************************************************************************* *
  * Implementation of Channel
  * ********************************************************************************************* */
-Channel::Channel(const QString &name, double rx, double tx, Power power, uint txTimeout, bool rxOnly, ScanList *scanlist,
-                 QObject *parent)
-  : QObject(parent), _name(name), _rxFreq(rx), _txFreq(tx), _power(power), _txTimeOut(txTimeout),
-    _rxOnly(rxOnly), _scanlist(scanlist)
+Channel::Channel(QObject *parent)
+  : ConfigObject("ch", parent), _rxFreq(0), _txFreq(0), _defaultPower(true),
+    _power(Power::Low), _txTimeOut(std::numeric_limits<unsigned>::max()), _rxOnly(false),
+    _vox(std::numeric_limits<unsigned>::max()), _scanlist(), _openGD77ChannelExtension(nullptr),
+    _tytChannelExtension(nullptr), _commercialExtension(nullptr)
 {
-  // pass..
+  // Link scan list modification event (e.g., scan list gets deleted).
+  connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
-const QString &
-Channel::name() const {
-  return _name;
+Channel::Channel(const Channel &other, QObject *parent)
+  : ConfigObject("ch", parent), _scanlist(), _openGD77ChannelExtension(nullptr),
+    _tytChannelExtension(nullptr), _commercialExtension(nullptr)
+{
+  copy(other);
+
+  // Link scan list modification event (e.g., scan list gets deleted).
+  connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
+
 bool
-Channel::setName(const QString &name) {
-  if (name.simplified().isEmpty())
+Channel::copy(const ConfigItem &other) {
+  const Channel *c = other.as<Channel>();
+  if ((nullptr == c) || (! ConfigObject::copy(other)))
     return false;
-  _name = name;
-  emit modified();
+
+  if (c->defaultPower())
+    setDefaultPower();
+  if (c->defaultTimeout())
+    setDefaultTimeout();
+  if (c->defaultVOX())
+    setVOXDefault();
+
   return true;
 }
 
-double Channel::rxFrequency() const {
+void
+Channel::clear() {
+  ConfigObject::clear();
+  _rxFreq = 0; _txFreq = 0;
+  setDefaultPower();
+  setDefaultTimeout();
+  _rxOnly = false;
+  setVOXDefault();
+  _scanlist.clear();
+  if (_openGD77ChannelExtension)
+    _openGD77ChannelExtension->deleteLater();
+  _openGD77ChannelExtension = nullptr;
+  if (_tytChannelExtension)
+    _tytChannelExtension->deleteLater();
+  _tytChannelExtension = nullptr;
+  if (_commercialExtension)
+    _commercialExtension->deleteLater();
+  _commercialExtension = nullptr;
+}
+
+double
+Channel::rxFrequency() const {
   return _rxFreq;
 }
 bool
 Channel::setRXFrequency(double freq) {
   _rxFreq = freq;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -60,10 +99,14 @@ Channel::txFrequency() const {
 bool
 Channel::setTXFrequency(double freq) {
   _txFreq = freq;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
+bool
+Channel::defaultPower() const {
+  return _defaultPower;
+}
 Channel::Power
 Channel::power() const {
   return _power;
@@ -71,18 +114,39 @@ Channel::power() const {
 void
 Channel::setPower(Power power) {
   _power = power;
-  emit modified();
+  _defaultPower = false;
+  emit modified(this);
+}
+void
+Channel::setDefaultPower() {
+  _defaultPower = true;
 }
 
-uint
-Channel::txTimeout() const {
+bool
+Channel::defaultTimeout() const {
+  return std::numeric_limits<unsigned>::max() == timeout();
+}
+bool
+Channel::timeoutDisabled() const {
+  return 0 == timeout();
+}
+unsigned
+Channel::timeout() const {
   return _txTimeOut;
 }
 bool
-Channel::setTimeout(uint dur) {
+Channel::setTimeout(unsigned dur) {
   _txTimeOut = dur;
-  emit modified();
+  emit modified(this);
   return true;
+}
+void
+Channel::setDefaultTimeout() {
+  setTimeout(std::numeric_limits<unsigned>::max());
+}
+void
+Channel::disableTimeout() {
+  setTimeout(0);
 }
 
 bool
@@ -92,44 +156,242 @@ Channel::rxOnly() const {
 bool
 Channel::setRXOnly(bool enable) {
   _rxOnly = enable;
-  emit modified();
+  emit modified(this);
   return true;
+}
+
+bool
+Channel::voxDisabled() const {
+  return 0==vox();
+}
+bool
+Channel::defaultVOX() const {
+  return std::numeric_limits<unsigned>::max() == vox();
+}
+unsigned
+Channel::vox() const {
+  return _vox;
+}
+void
+Channel::setVOX(unsigned level) {
+  _vox = level;
+  emit modified(this);
+}
+void
+Channel::setVOXDefault() {
+  setVOX(std::numeric_limits<unsigned>::max());
+}
+void
+Channel::disableVOX() {
+  setVOX(0);
+}
+
+const ScanListReference *
+Channel::scanListRef() const {
+  return &_scanlist;
+}
+
+ScanListReference *
+Channel::scanListRef() {
+  return &_scanlist;
 }
 
 ScanList *
 Channel::scanList() const {
-  return _scanlist;
+  return _scanlist.as<ScanList>();
 }
 bool
 Channel::setScanList(ScanList *list) {
-  if (nullptr == list)
-    return false;
-  _scanlist = list;
-  if (_scanlist)
-    connect(_scanlist, SIGNAL(destroyed(QObject *)), this, SLOT(onScanListDeleted(QObject *)));
-  emit modified();
-  return true;
+  return _scanlist.set(list);
 }
 
 void
-Channel::onScanListDeleted(QObject *obj) {
-  ScanList *scanlist = reinterpret_cast<ScanList *>(obj);
-  if (_scanlist == scanlist)
-    _scanlist = nullptr;
+Channel::onReferenceModified() {
+  emit modified(this);
+}
+
+OpenGD77ChannelExtension *
+Channel::openGD77ChannelExtension() const {
+  return _openGD77ChannelExtension;
+}
+void
+Channel::setOpenGD77ChannelExtension(OpenGD77ChannelExtension *ext) {
+  if (_openGD77ChannelExtension == ext)
+    return;
+  if (_openGD77ChannelExtension)
+    _openGD77ChannelExtension->deleteLater();
+  _openGD77ChannelExtension = ext;
+  if (_openGD77ChannelExtension) {
+    _openGD77ChannelExtension->setParent(this);
+    connect(_openGD77ChannelExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
+  }
+}
+
+TyTChannelExtension *
+Channel::tytChannelExtension() const {
+  return _tytChannelExtension;
+}
+void
+Channel::setTyTChannelExtension(TyTChannelExtension *ext) {
+  if (_tytChannelExtension == ext)
+    return;
+  if (_tytChannelExtension)
+    _tytChannelExtension->deleteLater();
+  _tytChannelExtension = ext;
+  if (_tytChannelExtension) {
+    _tytChannelExtension->setParent(this);
+    connect(_tytChannelExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
+  }
+}
+
+CommercialChannelExtension *
+Channel::commercialExtension() const {
+  return _commercialExtension;
+}
+void
+Channel::setCommercialExtension(CommercialChannelExtension *ext) {
+  if (_commercialExtension == ext)
+    return;
+  if (_commercialExtension)
+    _commercialExtension->deleteLater();
+  _commercialExtension = ext;
+  if (_commercialExtension) {
+    _commercialExtension->setParent(this);
+    connect(_commercialExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
+  }
+}
+
+bool
+Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
+  if (! ConfigObject::populate(node, context, err))
+    return false;
+
+  if (defaultPower()) {
+    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
+    node["power"] = def;
+  } else {
+    QMetaEnum metaEnum = QMetaEnum::fromType<Power>();
+    node["power"] = metaEnum.valueToKey((unsigned)power());
+  }
+
+  if (defaultTimeout()) {
+    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
+    node["timeout"] = def;
+  } else {
+    node["timeout"] = timeout();
+  }
+
+  if (defaultVOX()) {
+    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
+    node["vox"] = def;
+  } else {
+    node["vox"] = vox();
+  }
+
+  return true;
+}
+
+bool
+Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse channel: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node ch = node.begin()->second;
+  if ((!ch["power"]) || ("!default" == ch["power"].Tag())) {
+    setDefaultPower();
+  } else if (ch["power"] && ch["power"].IsScalar()) {
+    QMetaEnum meta = QMetaEnum::fromType<Channel::Power>();
+    setPower((Channel::Power)meta.keyToValue(ch["power"].as<std::string>().c_str()));
+  }
+
+  if ((!ch["timeout"]) || ("!default" == ch["timeout"].Tag())) {
+    setDefaultTimeout();
+  } else if (ch["timeout"] && ch["timeout"].IsScalar()) {
+    setTimeout(ch["timeout"].as<unsigned>());
+  }
+
+  if ((!ch["vox"]) || ("!default" == ch["vox"].Tag())) {
+    setVOXDefault();
+  } else if (ch["vox"] && ch["vox"].IsScalar()) {
+    setVOX(ch["vox"].as<unsigned>());
+  }
+
+  return ConfigObject::parse(ch, ctx, err);
+}
+
+bool
+Channel::link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot link channel: Expected object with one child.";
+    return false;
+  }
+
+  return ConfigObject::link(node.begin()->second, ctx, err);
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of AnalogChannel
  * ********************************************************************************************* */
-AnalogChannel::AnalogChannel(const QString &name, double rxFreq, double txFreq, Power power,
-                             uint txTimeout, bool rxOnly, Admit admit, uint squelch,
-                             Signaling::Code rxTone, Signaling::Code txTone, Bandwidth bw,
-                             ScanList *list, APRSSystem *aprsSys, QObject *parent)
-  : Channel(name, rxFreq, txFreq, power, txTimeout, rxOnly, list, parent),
-    _admit(admit), _squelch(squelch), _rxTone(rxTone), _txTone(txTone), _bw(bw), _aprsSystem(aprsSys)
+AnalogChannel::AnalogChannel(QObject *parent)
+  : Channel(parent),
+    _admit(Admit::Always), _squelch(std::numeric_limits<unsigned>::max()),
+    _rxTone(Signaling::SIGNALING_NONE), _txTone(Signaling::SIGNALING_NONE), _bw(Bandwidth::Narrow),
+    _aprsSystem()
 {
-  // pass...
+  // Link APRS system reference
+  connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
+  : Channel(parent), _aprsSystem()
+{
+  copy(other);
+  // Link APRS system reference
+  connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+bool
+AnalogChannel::copy(const ConfigItem &other) {
+  const AnalogChannel *c = other.as<AnalogChannel>();
+  if ((nullptr==c) || (! Channel::copy(other)))
+    return false;
+
+  setRXTone(c->rxTone());
+  setTXTone(c->txTone());
+
+  return true;
+}
+
+ConfigItem *
+AnalogChannel::clone() const {
+  AnalogChannel *c = new AnalogChannel();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
+}
+
+void
+AnalogChannel::clear() {
+  Channel::clear();
+  setAdmit(Admit::Always);
+  setSquelchDefault();
+  setRXTone(Signaling::SIGNALING_NONE);
+  setTXTone(Signaling::SIGNALING_NONE);
+  setBandwidth(Bandwidth::Narrow);
+  setAPRSSystem(nullptr);
 }
 
 AnalogChannel::Admit
@@ -139,18 +401,34 @@ AnalogChannel::admit() const {
 void
 AnalogChannel::setAdmit(Admit admit) {
   _admit = admit;
-  emit modified();
+  emit modified(this);
 }
 
-uint
+bool
+AnalogChannel::defaultSquelch() const {
+  return std::numeric_limits<unsigned>::max()==squelch();
+}
+bool
+AnalogChannel::squelchDisabled() const {
+  return 0==squelch();
+}
+unsigned
 AnalogChannel::squelch() const {
   return _squelch;
 }
 bool
-AnalogChannel::setSquelch(uint val) {
+AnalogChannel::setSquelch(unsigned val) {
   _squelch = val;
-  emit modified();
+  emit modified(this);
   return true;
+}
+void
+AnalogChannel::disableSquelch() {
+  setSquelch(0);
+}
+void
+AnalogChannel::setSquelchDefault() {
+  setSquelch(std::numeric_limits<unsigned>::max());
 }
 
 Signaling::Code
@@ -160,7 +438,7 @@ AnalogChannel::rxTone() const {
 bool
 AnalogChannel::setRXTone(Signaling::Code code) {
   _rxTone = code;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -171,7 +449,7 @@ AnalogChannel::txTone() const {
 bool
 AnalogChannel::setTXTone(Signaling::Code code) {
   _txTone = code;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
@@ -182,50 +460,192 @@ AnalogChannel::bandwidth() const {
 bool
 AnalogChannel::setBandwidth(Bandwidth bw) {
   _bw = bw;
-  emit modified();
+  emit modified(this);
   return true;
+}
+
+const APRSSystemReference *
+AnalogChannel::aprs() const {
+  return &_aprsSystem;
+}
+
+APRSSystemReference *
+AnalogChannel::aprs() {
+  return &_aprsSystem;
+}
+
+void
+AnalogChannel::setAPRS(APRSSystemReference *ref) {
+  if (nullptr == ref)
+    return _aprsSystem.clear();
+  _aprsSystem.copy(ref);
 }
 
 APRSSystem *
 AnalogChannel::aprsSystem() const {
-  return _aprsSystem;
+  return _aprsSystem.as<APRSSystem>();
 }
 void
 AnalogChannel::setAPRSSystem(APRSSystem *sys) {
-  if (_aprsSystem)
-    disconnect(_aprsSystem, SIGNAL(destroyed(QObject*)), this, SLOT(onAPRSSystemDeleted()));
-  _aprsSystem = sys;
-  if (_aprsSystem)
-    connect(_aprsSystem, SIGNAL(destroyed(QObject*)), this, SLOT(onAPRSSystemDeleted()));
+  _aprsSystem.set(sys);
 }
 
-void
-AnalogChannel::onAPRSSystemDeleted() {
-  _aprsSystem = nullptr;
+YAML::Node
+AnalogChannel::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = Channel::serialize(context, err);
+  if (node.IsNull())
+    return node;
+
+  YAML::Node type;
+  type["analog"] = node;
+  return type;
+}
+
+bool
+AnalogChannel::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
+  if (! Channel::populate(node, context, err))
+    return false;
+
+  if (Signaling::SIGNALING_NONE != _rxTone) {
+    YAML::Node tone;
+    if (Signaling::isCTCSS(_rxTone))
+      tone["ctcss"] = Signaling::toCTCSSFrequency(_rxTone);
+    else if (Signaling::isDCSNormal(_rxTone))
+      tone["dcs"] = Signaling::toDCSNumber(_rxTone);
+    else if (Signaling::isDCSInverted(_rxTone))
+      tone["dcs"] = -Signaling::toDCSNumber(_rxTone);
+    tone.SetStyle(YAML::EmitterStyle::Flow);
+    node["rxTone"] = tone;
+  }
+
+  if (Signaling::SIGNALING_NONE != _txTone) {
+    YAML::Node tone;
+    if (Signaling::isCTCSS(_txTone))
+      tone["ctcss"] = Signaling::toCTCSSFrequency(_txTone);
+    else if (Signaling::isDCSNormal(_txTone))
+      tone["dcs"] = Signaling::toDCSNumber(_txTone);
+    else if (Signaling::isDCSInverted(_txTone))
+      tone["dcs"] = -Signaling::toDCSNumber(_txTone);
+    tone.SetStyle(YAML::EmitterStyle::Flow);
+    node["txTone"] = tone;
+  }
+
+  if (defaultSquelch()) {
+    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
+    node["squelch"] = def;
+  } else {
+    node["squelch"] = squelch();
+  }
+
+  return true;
+}
+
+bool
+AnalogChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse analog channel: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node ch = node.begin()->second;
+
+  setRXTone(Signaling::SIGNALING_NONE);
+  if (ch["rxTone"] && ch["rxTone"].IsMap()) {
+    if (ch["rxTone"]["ctcss"] && ch["rxTone"]["ctcss"].IsScalar()) {
+      setRXTone(Signaling::fromCTCSSFrequency(ch["rxTone"]["ctcss"].as<double>()));
+    } else if (ch["rxTone"]["dcs"] && ch["rxTone"]["dcs"].IsScalar()) {
+      int code = ch["rxTone"]["dcs"].as<int>();
+      bool inverted = (code < 0); code = std::abs(code);
+      setRXTone(Signaling::fromDCSNumber(code, inverted));
+    }
+  }
+
+  setTXTone(Signaling::SIGNALING_NONE);
+  if (ch["txTone"] && ch["txTone"].IsMap()) {
+    if (ch["txTone"]["ctcss"] && ch["txTone"]["ctcss"].IsScalar()) {
+      setTXTone(Signaling::fromCTCSSFrequency(ch["txTone"]["ctcss"].as<double>()));
+    } else if (ch["txTone"]["dcs"] && ch["txTone"]["dcs"].IsScalar()) {
+      int code = ch["txTone"]["dcs"].as<int>();
+      bool inverted = (code < 0); code = std::abs(code);
+      setTXTone(Signaling::fromDCSNumber(code, inverted));
+    }
+  }
+
+  if ((!ch["squelch"]) || ("!default" == ch["squelch"].Tag())) {
+    setSquelchDefault();
+  } else if (ch["squelch"].IsDefined() && ch["squelch"].IsScalar()) {
+    setSquelch(ch["squelch"].as<unsigned>());
+  }
+
+  return Channel::parse(node, ctx, err);
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of DigitalChannel
  * ********************************************************************************************* */
-DigitalChannel::DigitalChannel(const QString &name, double rxFreq, double txFreq, Power power,
-                               uint txto, bool rxOnly, Admit admit, uint colorCode,
-                               TimeSlot timeslot, RXGroupList *rxGroup, DigitalContact *txContact,
-                               PositioningSystem *posSystem, ScanList *list, RoamingZone *roaming, RadioID *radioID, QObject *parent)
-  : Channel(name, rxFreq, txFreq, power, txto, rxOnly, list, parent), _admit(admit),
-    _colorCode(colorCode), _timeSlot(timeslot), _rxGroup(rxGroup), _txContact(txContact),
-    _posSystem(posSystem), _roaming(roaming), _radioId(radioID)
+DigitalChannel::DigitalChannel(QObject *parent)
+  : Channel(parent), _admit(Admit::Always),
+    _colorCode(1), _timeSlot(TimeSlot::TS1),
+    _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
 {
-  if (_rxGroup)
-    connect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));
-  if (_txContact)
-    connect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
-  if (_posSystem)
-    connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
-  if (_roaming)
-    connect(_roaming, SIGNAL(destroyed()), this, SLOT(onRoamingZoneDeleted()));
-  if (_radioId)
-    connect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
+  // Register default tags
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioId", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "radioId", "!default", DefaultRadioID::get());
+
+  // Connect signals of references
+  connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_txContact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_posSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_roaming, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_radioId, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
+  : Channel(parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
+{
+  // Register default tags
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
+  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioId", "!default"))
+    ConfigItem::Context::setTag(metaObject()->className(), "radioId", "!default", DefaultRadioID::get());
+
+  copy(other);
+
+  // Connect signals of references
+  connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_txContact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_posSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_roaming, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_radioId, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+void
+DigitalChannel::clear() {
+  Channel::clear();
+  setColorCode(1);
+  setTimeSlot(TimeSlot::TS1);
+  setGroupListObj(nullptr);
+  setTXContactObj(nullptr);
+  setAPRSObj(nullptr);
+  setRoamingZone(nullptr);
+  setRadioIdObj(nullptr);
+}
+
+ConfigItem *
+DigitalChannel::clone() const {
+  DigitalChannel *c = new DigitalChannel();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
 }
 
 DigitalChannel::Admit
@@ -235,137 +655,196 @@ DigitalChannel::admit() const {
 void
 DigitalChannel::setAdmit(Admit admit) {
   _admit = admit;
-  emit modified();
+  emit modified(this);
 }
 
-uint
+unsigned
 DigitalChannel::colorCode() const {
   return _colorCode;
 }
 bool
-DigitalChannel::setColorCode(uint cc) {
+DigitalChannel::setColorCode(unsigned cc) {
   _colorCode = cc;
-  emit modified();
+  emit modified(this);
   return true;
 }
 
 DigitalChannel::TimeSlot
-DigitalChannel::timeslot() const {
+DigitalChannel::timeSlot() const {
   return _timeSlot;
 }
 bool
 DigitalChannel::setTimeSlot(TimeSlot slot) {
   _timeSlot = slot;
-  emit modified();
+  emit modified(this);
   return true;
+}
+
+const GroupListReference *
+DigitalChannel::groupList() const {
+  return &_rxGroup;
+}
+
+GroupListReference *
+DigitalChannel::groupList() {
+  return &_rxGroup;
+}
+
+void
+DigitalChannel::setGroupList(GroupListReference *ref) {
+  if (nullptr == ref)
+    _rxGroup.clear();
+  else
+    _rxGroup.copy(ref);
 }
 
 RXGroupList *
-DigitalChannel::rxGroupList() const {
-  return _rxGroup;
+DigitalChannel::groupListObj() const {
+  return _rxGroup.as<RXGroupList>();
 }
 
 bool
-DigitalChannel::setRXGroupList(RXGroupList *g) {
-  if (_rxGroup)
-    disconnect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));
-  _rxGroup = g;
-  if (_rxGroup)
-    connect(_rxGroup, SIGNAL(destroyed()), this, SLOT(onRxGroupDeleted()));
-  emit modified();
+DigitalChannel::setGroupListObj(RXGroupList *g) {
+  if(! _rxGroup.set(g))
+    return false;
+  emit modified(this);
   return true;
+}
+
+const DigitalContactReference *
+DigitalChannel::contact() const {
+  return &_txContact;
+}
+
+DigitalContactReference *
+DigitalChannel::contact() {
+  return &_txContact;
+}
+
+void
+DigitalChannel::setContact(DigitalContactReference *ref) {
+  if (nullptr == ref)
+    _txContact.clear();
+  else
+    _txContact.copy(ref);
 }
 
 DigitalContact *
-DigitalChannel::txContact() const {
-  return _txContact;
+DigitalChannel::txContactObj() const {
+  return _txContact.as<DigitalContact>();
 }
 
 bool
-DigitalChannel::setTXContact(DigitalContact *c) {
-  if (_txContact)
-    disconnect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
-  _txContact = c;
-  if (_txContact)
-    connect(_txContact, SIGNAL(destroyed()), this, SLOT(onTxContactDeleted()));
-  emit modified();
+DigitalChannel::setTXContactObj(DigitalContact *c) {
+  if(! _txContact.set(c))
+    return false;
+  emit modified(this);
   return true;
+}
+
+const PositioningSystemReference *
+DigitalChannel::aprs() const {
+  return &_posSystem;
+}
+
+PositioningSystemReference *
+DigitalChannel::aprs() {
+  return &_posSystem;
+}
+
+void
+DigitalChannel::setAPRS(PositioningSystemReference *ref) {
+  if (nullptr == ref)
+    _posSystem.clear();
+  else
+    _posSystem.copy(ref);
 }
 
 PositioningSystem *
-DigitalChannel::posSystem() const {
-  return _posSystem;
+DigitalChannel::aprsObj() const {
+  return _posSystem.as<PositioningSystem>();
 }
 
 bool
-DigitalChannel::setPosSystem(PositioningSystem *sys) {
-  if (_posSystem)
-    disconnect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
-  _posSystem = sys;
-  if (_posSystem)
-    connect(_posSystem, SIGNAL(destroyed()), this, SLOT(onPosSystemDeleted()));
-  emit modified();
+DigitalChannel::setAPRSObj(PositioningSystem *sys) {
+  if (! _posSystem.set(sys))
+    return false;
+  emit modified(this);
   return true;
 }
 
+const RoamingZoneReference *
+DigitalChannel::roaming() const {
+  return &_roaming;
+}
+
+RoamingZoneReference *
+DigitalChannel::roaming() {
+  return &_roaming;
+}
+
+void
+DigitalChannel::setRoaming(RoamingZoneReference *ref) {
+  if (nullptr == ref)
+    _roaming.clear();
+  else
+    _roaming.copy(ref);
+}
 
 RoamingZone *
-DigitalChannel::roaming() const {
-  return _roaming;
+DigitalChannel::roamingZone() const {
+  return _roaming.as<RoamingZone>();
 }
 
 bool
-DigitalChannel::setRoaming(RoamingZone *zone) {
-  if (_roaming)
-    disconnect(_roaming, SIGNAL(destroyed(QObject*)), this, SLOT(onRoamingZoneDeleted()));
-  _roaming = zone;
-  if (_roaming)
-    connect(_roaming, SIGNAL(destroyed(QObject*)), this, SLOT(onRoamingZoneDeleted()));
-  emit modified();
+DigitalChannel::setRoamingZone(RoamingZone *zone) {
+  _roaming.set(zone);
+  emit modified(this);
   return true;
 }
 
-RadioID *
+const RadioIDReference *
 DigitalChannel::radioId() const {
-  return _radioId;
+  return &_radioId;
+}
+
+RadioIDReference *
+DigitalChannel::radioId() {
+  return &_radioId;
+}
+
+void
+DigitalChannel::setRadioId(RadioIDReference *ref) {
+  if (nullptr == ref)
+    _radioId.clear();
+  else
+    _radioId.copy(ref);
+}
+
+DMRRadioID *
+DigitalChannel::radioIdObj() const {
+  return _radioId.as<DMRRadioID>();
 }
 
 bool
-DigitalChannel::setRadioId(RadioID *id) {
-  if (_radioId)
-    disconnect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
-  _radioId = id;
-  if (_radioId)
-    connect(_radioId, SIGNAL(destroyed(QObject*)), this, SLOT(onRadioIdDeleted()));
-  emit modified();
+DigitalChannel::setRadioIdObj(DMRRadioID *id) {
+  if (! _radioId.set(id))
+    return false;
+  emit modified(this);
   return true;
 }
 
+YAML::Node
+DigitalChannel::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = Channel::serialize(context, err);
+  if (node.IsNull())
+    return node;
 
-void
-DigitalChannel::onRxGroupDeleted() {
-  setRXGroupList(nullptr);
+  YAML::Node type;
+  type["digital"] = node;
+  return type;
 }
 
-void
-DigitalChannel::onTxContactDeleted() {
-  setTXContact(nullptr);
-}
-
-void
-DigitalChannel::onPosSystemDeleted() {
-  setPosSystem(nullptr);
-}
-
-void
-DigitalChannel::onRoamingZoneDeleted() {
-  setRoaming(nullptr);
-}
-
-void
-DigitalChannel::onRadioIdDeleted() {
-  setRadioId(nullptr);
-}
 
 /* ********************************************************************************************* *
  * Implementation of SelectedChannel
@@ -373,13 +852,23 @@ DigitalChannel::onRadioIdDeleted() {
 SelectedChannel *SelectedChannel::_instance = nullptr;
 
 SelectedChannel::SelectedChannel()
-  : Channel("[Selected]", 0, 0, Channel::LowPower, 0, true, nullptr, nullptr)
+  : Channel()
 {
-  // pass...
+  setName("[Selected]");
 }
 
 SelectedChannel::~SelectedChannel() {
   SelectedChannel::_instance = nullptr;
+}
+
+bool
+SelectedChannel::copy(const ConfigItem &other) {
+  Q_UNUSED(other);
+  return false;
+}
+ConfigItem *
+SelectedChannel::clone() const {
+  return nullptr;
 }
 
 SelectedChannel *
@@ -394,51 +883,38 @@ SelectedChannel::get() {
  * Implementation of ChannelList
  * ********************************************************************************************* */
 ChannelList::ChannelList(QObject *parent)
-  : QAbstractTableModel(parent), _channels()
+  : ConfigObjectList(Channel::staticMetaObject, parent)
 {
-  connect(this, SIGNAL(modified()), this, SLOT(onChannelEdited()));
+  // pass...
 }
 
 int
-ChannelList::count() const {
-  return _channels.size();
-}
-
-void
-ChannelList::clear() {
-  beginResetModel();
-  for (int i=0; i<count(); i++)
-    _channels[i]->deleteLater();
-  _channels.clear();
-  endResetModel();
-  emit modified();
-}
-
-int
-ChannelList::indexOf(Channel *channel) const {
-  if (! _channels.contains(channel))
+ChannelList::add(ConfigObject *obj, int row) {
+  if ((nullptr == obj) || (! obj->is<Channel>())) {
+    logError() << "Cannot add nullptr or non-channel objects to channel list.";
     return -1;
-  return _channels.indexOf(channel);
+  }
+  return ConfigObjectList::add(obj, row);
 }
 
 Channel *
 ChannelList::channel(int idx) const {
-  if ((0>idx) || (idx >= _channels.size()))
-    return nullptr;
-  return _channels.at(idx);
+  if (ConfigItem *obj = get(idx))
+    return obj->as<Channel>();
+  return nullptr;
 }
 
 DigitalChannel *
-ChannelList::findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, uint cc) const {
+ChannelList::findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, unsigned cc) const {
   for (int i=0; i<count(); i++) {
-    if (! _channels[i]->is<DigitalChannel>())
+    if (! _items[i]->is<DigitalChannel>())
       continue;
     /// @bug I should certainly change the frequency handling to integer values!
-    if ( (1e-6<std::abs(_channels[i]->txFrequency()-tx)) ||
-         (1e-6<std::abs(_channels[i]->rxFrequency()-rx)) )
+    if ( (1e-6<std::abs(channel(i)->txFrequency()-tx)) ||
+         (1e-6<std::abs(channel(i)->rxFrequency()-rx)) )
       continue;
-    DigitalChannel *digi = _channels[i]->as<DigitalChannel>();
-    if (digi->timeslot() != ts)
+    DigitalChannel *digi = channel(i)->as<DigitalChannel>();
+    if (digi->timeSlot() != ts)
       continue;
     if (digi->colorCode() != cc)
       continue;
@@ -450,330 +926,36 @@ ChannelList::findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot t
 AnalogChannel *
 ChannelList::findAnalogChannelByTxFreq(double freq) const {
   for (int i=0; i<count(); i++) {
-    if (! _channels[i]->is<AnalogChannel>())
+    if (! channel(i)->is<AnalogChannel>())
       continue;
-    if (1e-6 > std::abs(_channels[i]->txFrequency()-freq))
-      return _channels[i]->as<AnalogChannel>();
+    if (1e-5 > std::abs(channel(i)->txFrequency()-freq))
+      return channel(i)->as<AnalogChannel>();
   }
   return nullptr;
 }
 
-int
-ChannelList::addChannel(Channel *channel, int row) {
-  if (_channels.contains(channel))
-    return -1;
-  if ((row<0) || (row>_channels.size()))
-    row = _channels.size();
-  beginInsertRows(QModelIndex(), row, row);
-  connect(channel, SIGNAL(modified()), this, SIGNAL(modified()));
-  connect(channel, SIGNAL(destroyed(QObject *)), this, SLOT(onChannelDeleted(QObject *)));
-  _channels.insert(row, channel);
-  endInsertRows();
-  emit modified();
-  return row;
-}
+ConfigItem *
+ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
+  if (! node)
+    return nullptr;
 
-bool
-ChannelList::remChannel(int idx) {
-  if ((0>idx) || (idx >= _channels.size()))
-    return false;
-  beginRemoveRows(QModelIndex(), idx, idx);
-  Channel *channel = _channels.at(idx);
-  _channels.remove(idx);
-  channel->deleteLater();
-  endRemoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ChannelList::remChannel(Channel *channel) {
-  if (! _channels.contains(channel))
-    return false;
-  int idx = _channels.indexOf(channel);
-  return remChannel(idx);
-}
-
-bool
-ChannelList::moveUp(int row) {
-  if ((0>=row) || (row>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  std::swap(_channels[row], _channels[row-1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ChannelList::moveUp(int first, int last) {
-  if ((0>=first) || (last>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
-  for (int row=first; row<=last; row++)
-    std::swap(_channels[row], _channels[row-1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ChannelList::moveDown(int row) {
-  if ((0>row) || ((row+1)>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  std::swap(_channels[row], _channels[row+1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-bool
-ChannelList::moveDown(int first, int last) {
-  if ((0>first) || ((last+1)>=count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
-  for (int row=last; row>=first; row--)
-    std::swap(_channels[row], _channels[row+1]);
-  endMoveRows();
-  emit modified();
-  return true;
-}
-
-int
-ChannelList::rowCount(const QModelIndex &idx) const {
-  Q_UNUSED(idx);
-  return _channels.size();
-}
-int
-ChannelList::columnCount(const QModelIndex &idx) const {
-  Q_UNUSED(idx);
-  return 20;
-}
-
-inline QString formatFrequency(float f) {
-  int val = std::round(f*10000);
-  return QString::number(double(val)/10000, 'f', 4);
-}
-
-QVariant
-ChannelList::data(const QModelIndex &index, int role) const {
-  if ((! index.isValid()) || (index.row()>=_channels.size()))
-    return QVariant();
-  if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
-    return QVariant();
-
-  Channel *channel = _channels[index.row()];
-
-  switch (index.column()) {
-  case 0:
-    if (channel->is<AnalogChannel>())
-      return tr("Analog");
-    else
-      return tr("Digital");
-  case 1:
-    return channel->name();
-  case 2:
-    return formatFrequency(channel->rxFrequency());
-  case 3:
-    if (channel->txFrequency()<channel->rxFrequency())
-      return formatFrequency(channel->txFrequency()-channel->rxFrequency());
-    else
-      return formatFrequency(channel->txFrequency());
-  case 4:
-    switch (channel->power()) {
-    case Channel::MaxPower: return tr("Max");
-    case Channel::HighPower: return tr("High");
-    case Channel::MidPower: return tr("Mid");
-    case Channel::LowPower: return tr("Low");
-    case Channel::MinPower: return tr("Min");
-    }
-  case 5:
-    if (0 == channel->txTimeout())
-      return tr("-");
-    return QString::number(channel->txTimeout());
-  case 6:
-    return channel->rxOnly() ? tr("On") : tr("Off");
-  case 7:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      switch (digi->admit()) {
-      case DigitalChannel::AdmitNone: return tr("Always");
-      case DigitalChannel::AdmitFree: return tr("Free");
-      case DigitalChannel::AdmitColorCode: return tr("Color");
-      }
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      switch (analog->admit()) {
-      case AnalogChannel::AdmitNone: return tr("Always");
-      case AnalogChannel::AdmitFree: return tr("Free");
-      case AnalogChannel::AdmitTone: return tr("Tone");
-      }
-    }
-    break;
-  case 8:
-    if (channel->scanList()) {
-      return channel->scanList()->name();
-    } else {
-      return tr("-");
-    }
-  case 9:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      return digi->colorCode();
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
-  case 10:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      return (DigitalChannel::TimeSlot1 == digi->timeslot()) ? 1 : 2;
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
-  case 11:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->rxGroupList()) {
-        return digi->rxGroupList()->name();
-      } else {
-        return tr("-");
-      }
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
-  case 12:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->txContact())
-        return digi->txContact()->name();
-      else
-        return tr("-");
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
-  case 13:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->radioId())
-        return digi->radioId()->id();
-      else
-        return tr("[Default]");
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
-  case 14:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->posSystem())
-        return digi->posSystem()->name();
-      else
-        return tr("-");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (analog->aprsSystem())
-        return analog->aprsSystem()->name();
-      else
-        return tr("-");
-    }
-    break;
-  case 15:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->roaming())
-        return digi->roaming()->name();
-      else
-        return tr("-");
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
-  case 16:
-    if (channel->is<DigitalChannel>()) {
-      return tr("[None]");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (0 == analog->squelch()) {
-        return tr("Off");
-      } else
-        return analog->squelch();
-    }
-    break;
-  case 17:
-    if (channel->is<DigitalChannel>()) {
-      return tr("[None]");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (Signaling::SIGNALING_NONE == analog->rxTone()) {
-        return tr("Off");
-      } else
-        return Signaling::codeLabel(analog->rxTone());
-    }
-    break;
-  case 18:
-    if (channel->is<DigitalChannel>()) {
-      return tr("[None]");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (Signaling::SIGNALING_NONE == analog->txTone()) {
-        return tr("Off");
-      } else
-        return Signaling::codeLabel(analog->txTone());
-    }
-    break;
-  case 19:
-    if (channel->is<DigitalChannel>()) {
-      return tr("[None]");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (AnalogChannel::BWWide == analog->bandwidth()) {
-        return tr("Wide");
-      } else
-        return tr("Narrow");
-    }
-    break;
-
-  default:
-    break;
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create channel: Expected object with one child.";
+    return nullptr;
   }
 
-  return QVariant();
-}
-
-QVariant
-ChannelList::headerData(int section, Qt::Orientation orientation, int role) const {
-  if ((Qt::DisplayRole!=role) || (Qt::Horizontal!=orientation))
-    return QVariant();
-  switch (section) {
-  case 0: return tr("Type");
-  case 1: return tr("Name");
-  case 2: return tr("Rx Frequency");
-  case 3: return tr("Tx Frequency");
-  case 4: return tr("Power");
-  case 5: return tr("Timeout");
-  case 6: return tr("Rx Only");
-  case 7: return tr("Admit");
-  case 8: return tr("Scanlist");
-  case 9: return tr("CC");
-  case 10: return tr("TS");
-  case 11: return tr("RX Group List");
-  case 12: return tr("TX Contact");
-  case 13: return tr("DMR ID");
-  case 14: return tr("GPS/APRS");
-  case 15: return tr("Roaming");
-  case 16: return tr("Squelch");
-  case 17: return tr("Rx Tone");
-  case 18: return tr("Tx Tone");
-  case 19: return tr("Bandwidth");
-    default:
-      break;
+  QString type = QString::fromStdString(node.begin()->first.as<std::string>());
+  if (("digital" == type) || ("dmr" == type)) {
+    return new DigitalChannel();
+  } else if (("analog" == type) || ("fm"==type)) {
+    return new AnalogChannel();
   }
-  return QVariant();
-}
 
-void
-ChannelList::onChannelDeleted(QObject *obj) {
-  if (Channel *channel = reinterpret_cast<Channel *>(obj))
-    remChannel(channel);
-}
+  errMsg(err) << node.Mark().line << ":" << node.Mark().column
+              << ": Cannot create channel: Unknown type '" << type << "'.";
 
-void
-ChannelList::onChannelEdited() {
-  if (0 == count())
-    return;
-  QModelIndex tl = index(0,0), br = index(count()-1, columnCount(QModelIndex()));
-  emit dataChanged(tl, br);
+  return nullptr;
 }
-
 

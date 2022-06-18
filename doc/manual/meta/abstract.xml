@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<abstract xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>About This Document</title>
+  <!--<informalfigure pgwide="0">
+    <mediaobject>
+      <imageobject><imagedata fileref="fig/qdmr-channels.png" width="15cm" align="center"/></imageobject>
+      <textobject>Screen-shot of qdmr in action.</textobject>
+    </mediaobject>
+  </informalfigure>//-->
+  <para>
+    This document contains a brief manual for the <acronym>qdmr</acronym> graphical user interface 
+    (<acronym>GUI</acronym>) application to program <acronym>DMR</acronym> radios. The aim of this 
+    application is to provide a simple to use, platform and vendor independent and well documented 
+    codeplug programming software (<acronym>CPS</acronym>) for popular <acronym>DMR</acronym> radios.
+  </para>
+  <para>
+    This document is available in several formats: 
+  </para>
+  <itemizedlist>
+    <listitem><para><link xlink:href="https://dm3mat.darc.de/qdmr/manual/">HTML</link>,</para></listitem>
+    <listitem><para><link xlink:href="https://dm3mat.darc.de/qdmr/manual.pdf">PDF</link> and </para></listitem>
+    <listitem><para><link xlink:href="https://dm3mat.darc.de/qdmr/manual.epub">EPUB 3</link>.</para></listitem>
+  </itemizedlist>
+</abstract>

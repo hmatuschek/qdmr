@@ -9,7 +9,7 @@
  * efficiently. This should speedup the generation of codeplugs consisting of many small memory
  * sections.
  *
- * @ingroup util*/
+ * @ingroup util */
 class AddressMap
 {
 public:

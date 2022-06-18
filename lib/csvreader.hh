@@ -102,7 +102,7 @@ protected:
 
 /** Basic parse-handler interface.
  *
- * That is, a set of callbacks getting called by the parser on the occurence of a particular
+ * That is, a set of callbacks getting called by the parser on the occurrence of a particular
  * statement in the config file.
  * @ingroup conf */
 class CSVHandler: public QObject
@@ -126,7 +126,7 @@ public:
   /** Gets called once the second intro line has been parsed. */
   virtual bool handleIntroLine2(const QString &text, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the MIC level has been parsed. */
-  virtual bool handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
+  virtual bool handleMicLevel(unsigned level, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once the Speech flag has been parsed. */
   virtual bool handleSpeech(bool speech, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a DTMF contact has been parsed. */
@@ -154,7 +154,7 @@ public:
                                qint64 revertChannelIdx, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a APRS system has been parsed. */
   virtual bool handleAPRSSystem(qint64 idx, const QString &name, qint64 channelIdx, qint64 period,
-                                const QString &src, uint srcSSID, const QString &dest, uint destSSID,
+                                const QString &src, unsigned srcSSID, const QString &dest, unsigned destSSID,
                                 const QString &path, const QString &icon, const QString &message,
                                 qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a scan list has been parsed. */
@@ -265,7 +265,7 @@ public:
   virtual bool handleRadioName(const QString &name, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleIntroLine1(const QString &text, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleIntroLine2(const QString &text, qint64 line, qint64 column, QString &errorMessage);
-  virtual bool handleMicLevel(uint level, qint64 line, qint64 column, QString &errorMessage);
+  virtual bool handleMicLevel(unsigned level, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleSpeech(bool speech, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
                                  qint64 line, qint64 column, QString &errorMessage);
@@ -287,7 +287,7 @@ public:
   virtual bool handleGPSSystem(qint64 idx, const QString &name, qint64 contactIdx, qint64 period,
                                qint64 revertChannelIdx, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleAPRSSystem(qint64 idx, const QString &name, qint64 channelIdx, qint64 period,
-                                const QString &src, uint srcSSID, const QString &dest, uint destSSID, const QString &path,
+                                const QString &src, unsigned srcSSID, const QString &dest, unsigned destSSID, const QString &path,
                                 const QString &icon, const QString &message,
                                 qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleScanList(qint64 idx, const QString &name, qint64 pch1, qint64 pch2, qint64 txch,
@@ -315,7 +315,7 @@ protected:
   /** Index <-> RoamingZone map */
   QMap<int, RoamingZone *> _roamingZones;
   /** Index <-> radio ID map */
-  QMap<int, RadioID *> _radioIDs;
+  QMap<int, DMRRadioID *> _radioIDs;
 };
 
 #endif // CSVREADER_HH

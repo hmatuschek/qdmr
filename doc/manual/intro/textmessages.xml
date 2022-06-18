@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="introDataServices" 
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Data services</title>
+</info>
+
+<para>
+  As DMR is a digital mode that transports digitalized speech, it is possible to transfer other
+  data too. Consequently, there are some other digital services provided with DMR. First, there 
+  are text messages similar to the one provided by mobile phones. It is also possible to forward 
+  the own GPS position to the <glossterm>APRS</glossterm> network.
+</para>
+
+
+<section xml:id="introSMS">
+<info><title>Textmessages (SMS)</title></info>
+
+<para>
+  With this service, you can transfer short text messages to other participants (like a private call) 
+  or to a talk group (like a group call). The latter is rather uncommon and should be avoided. In 
+  principle a text messages works like a private call. If the destination is reachable, the text 
+  message will be routed to it.
+</para>
+
+<para> 
+  There are also service numbers (free of charge). If messages are send to them, certain 
+  information can be retrieved to forwarded to other networks (e.g. to the 
+  <glossterm>DAPNET</glossterm>). In Germany (and other countries) there are:
+</para>
+
+<orderedlist>
+  <listitem>
+    <para>262993 -- GPS and weather</para>
+    <itemizedlist>
+      <listitem><para>Send <token>help</token> and you will receive a list of commands.</para></listitem>
+      <listitem><para>Send <token>wx</token> and you will receive the weather at the location of 
+        the repeater you used.</para></listitem>
+      <listitem><para>Send <token>wx CITY</token> and you will receive the weather at the specified
+        city.</para></listitem>
+      <listitem><para>Send <token>gps</token> and the last GPS position is returned that you have 
+        send to the DMR network.</para></listitem>
+      <listitem><para>With <token>gps CALL</token> you can retrieve the last position send by the 
+        specified call.</para></listitem>
+      <listitem><para>Send <token>rssi</token> and you will receive a signal report from the 
+        repeater.</para></listitem>
+    </itemizedlist>
+  </listitem>
+  <listitem>
+    <para>262994 -- Repeater information &amp; pager messages</para>
+    <itemizedlist>
+      <listitem><para>Send <token>rpt</token> to receive a list of static an dynamic subscribed 
+      talk groups at the repeater. </para></listitem>
+      <listitem><para>Send <token>CALL MESSAGE</token> to send the given message to the given 
+        destination call in the DAPNET. </para></listitem>
+    </itemizedlist>
+  </listitem>
+</orderedlist>
+</section>
+
+
+<section xml:id="introAPRS">
+<info><title>Position reporting to the APRS network</title></info>
+<para>
+  As mentioned in the previous section, it is possible to report the own position via the 
+  DMR network to the APRS network. This position can then be tracked at for example 
+  <link xlink:href="https://aprs.fi">aprs.fi</link>. To do that, a radio with a built-in 
+  GPS receiver is required. But not even these devices are expensive anymore. Simple DMR 
+  hand-helds with built-in GPS receivers are available for about 120€.
+</para>
+<para>
+  Beside the text message services, it is also possible to transmit the position to the DMR 
+  network using a special service number 262999. How the radio is configured to do that, 
+  depends heavily on the device being used. <application>qdmr</application> helps with the 
+  configuration by providing common means for these settings across all supported radios.
+</para>
+</section>
+
+</section>

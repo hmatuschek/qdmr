@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<section xml:id="extRadioddity"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Radioddity Codeplug Extensions</title>
+</info>
+
+<para>
+  This section collects all device specific extensions to the codeplug for Radioddity and some Baofeng devices.
+</para>
+
+<para>
+  These extensions are applicable to Radioddity GD77 and Baofeng/Radioddity RD-5R radios.
+</para>
+
+<xi:include href="radiosettings.xml"/>
+
+</section>

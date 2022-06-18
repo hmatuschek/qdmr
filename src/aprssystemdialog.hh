@@ -27,6 +27,7 @@ protected:
 
 protected:
   Config *_config;
+  APRSSystem *_myAPRS;
   APRSSystem *_aprs;
 
 private:

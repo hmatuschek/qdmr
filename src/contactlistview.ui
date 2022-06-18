@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ContactListView</class>
+ <widget class="QWidget" name="ContactListView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>492</width>
+    <height>306</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="ConfigObjectTableView" name="listView" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="addDMRContact">
+       <property name="toolTip">
+        <string>Adds a contact to the list.</string>
+       </property>
+       <property name="accessibleName">
+        <string>Add contact button</string>
+       </property>
+       <property name="text">
+        <string>Add Digital Contact</string>
+       </property>
+       <property name="shortcut">
+        <string>Alt++</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="addDTMFContact">
+       <property name="text">
+        <string>Add DTMF Contact</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="remContact">
+       <property name="accessibleName">
+        <string>Delete contact button</string>
+       </property>
+       <property name="text">
+        <string>Delete Contact</string>
+       </property>
+       <property name="shortcut">
+        <string>Alt+-</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ConfigObjectTableView</class>
+   <extends>QWidget</extends>
+   <header>configobjecttableview.hh</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
