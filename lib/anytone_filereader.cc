@@ -6,12 +6,13 @@
 #include "d868uv_filereader.hh"
 #include "d878uv_filereader.hh"
 
+/** Internal used struct to read a CPS file header. */
 struct __attribute__((packed)) file_header {
-  char version[5];
-  uint32_t payload_size;
-  char modelname[7];
-  uint8_t _unused0010[3];
-  char hw_version[4];
+  char version[5];         ///< The version number.
+  uint32_t payload_size;   ///< The content size.
+  char modelname[7];       ///< The model name.
+  uint8_t _unused0010[3];  ///< Unused/reserved.
+  char hw_version[4];      ///< The hardware version.
 };
 
 
