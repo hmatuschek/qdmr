@@ -443,7 +443,7 @@ RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop,
         context.ignoreFrequencyLimits() ?
           RadioLimitIssue::Warning : RadioLimitIssue::Critical);
   msg << "Frequency " << value << "MHz is outside of allowed frequency ranges.";
-  return true;
+  return false;
 }
 
 
