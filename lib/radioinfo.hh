@@ -23,7 +23,7 @@ public:
     RD5R,
     GD77,
     // TyT devices
-    MD390, RT8 = MD390,
+    MD390, MD380 = MD390, RT8 = MD390,
     UV390, UV380 = UV390, RT3S = UV390,
     MD2017, RT82 = MD2017,
     // Anytone devices

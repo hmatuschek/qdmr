@@ -67,6 +67,8 @@ MD390::MD390(TyTInterface *device, const ErrorStack &err, QObject *parent)
     _limits = new MD390Limits({{450., 520.}}, this);
     _name += "U";
   } else {
+    // Invalid frequency range, needs "Ignore frequency limits" in settings to write any codeplug.
+    _limits = new MD390Limits({}, this);
     errMsg(err) << "Cannot determine frequency range from channel frequencies between "
                 << range.first << "MHz and " << range.second
                 << "MHz. Will not check frequency ranges.";
