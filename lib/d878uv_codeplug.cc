@@ -268,52 +268,61 @@ D878UVCodeplug::RoamingChannelElement::clear() {
 
 unsigned
 D878UVCodeplug::RoamingChannelElement::rxFrequency() const {
-  return getBCD8_be(0x0000)*10;
+  return getBCD8_be(Offsets::RXFrequency)*10;
 }
 void
 D878UVCodeplug::RoamingChannelElement::setRXFrequency(unsigned hz) {
-  setBCD8_be(0x0000, hz/10);
+  setBCD8_be(Offsets::RXFrequency, hz/10);
 }
 unsigned
 D878UVCodeplug::RoamingChannelElement::txFrequency() const {
-  return getBCD8_be(0x0004)*10;
+  return getBCD8_be(Offsets::TXFrequency)*10;
 }
 void
 D878UVCodeplug::RoamingChannelElement::setTXFrequency(unsigned hz) {
-  setBCD8_be(0x0004, hz/10);
+  setBCD8_be(Offsets::TXFrequency, hz/10);
+}
+
+bool
+D878UVCodeplug::RoamingChannelElement::hasColorCode() const {
+  return ColorCodeValue::Disabled == getUInt8(Offsets::ColorCode);
 }
 unsigned
 D878UVCodeplug::RoamingChannelElement::colorCode() const {
-  return getUInt8(0x0008);
+  return std::min(15u, (unsigned)getUInt8(Offsets::ColorCode));
 }
 void
 D878UVCodeplug::RoamingChannelElement::setColorCode(unsigned cc) {
-  setUInt8(0x0008, cc);
+  setUInt8(Offsets::ColorCode, cc);
+}
+void
+D878UVCodeplug::RoamingChannelElement::disableColorCode() {
+  setUInt8(Offsets::ColorCode, ColorCodeValue::Disabled);
 }
 
 DigitalChannel::TimeSlot
 D878UVCodeplug::RoamingChannelElement::timeSlot() const {
-  switch (getUInt8(0x0009)) {
-  case 0x00: return DigitalChannel::TimeSlot::TS1;
-  case 0x01: return DigitalChannel::TimeSlot::TS2;
+  switch (getUInt8(Offsets::TimeSlot)) {
+  case TimeSlotValue::TS1: return DigitalChannel::TimeSlot::TS1;
+  case TimeSlotValue::TS2: return DigitalChannel::TimeSlot::TS2;
   }
   return DigitalChannel::TimeSlot::TS1;
 }
 void
 D878UVCodeplug::RoamingChannelElement::setTimeSlot(DigitalChannel::TimeSlot ts) {
   switch (ts) {
-  case DigitalChannel::TimeSlot::TS1: setUInt8(0x0009, 0x00); break;
-  case DigitalChannel::TimeSlot::TS2: setUInt8(0x0009, 0x01); break;
+  case DigitalChannel::TimeSlot::TS1: setUInt8(Offsets::TimeSlot, TimeSlotValue::TS1); break;
+  case DigitalChannel::TimeSlot::TS2: setUInt8(Offsets::TimeSlot, TimeSlotValue::TS2); break;
   }
 }
 
 QString
 D878UVCodeplug::RoamingChannelElement::name() const {
-  return readASCII(0x000a, 16, 0x00);
+  return readASCII(Offsets::Name, Offsets::NameLength, 0x00);
 }
 void
 D878UVCodeplug::RoamingChannelElement::setName(const QString &name) {
-  writeASCII(0x000a, name, 16, 0x00);
+  writeASCII(Offsets::Name, name, Offsets::NameLength, 0x00);
 }
 
 bool

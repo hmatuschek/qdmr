@@ -664,6 +664,10 @@ DigitalChannel::colorCode() const {
 }
 bool
 DigitalChannel::setColorCode(unsigned cc) {
+  if (15 < cc) {
+    logWarn() << "Color-code " << cc << " is not in range [0,15], set to 15.";
+    cc = 15;
+  }
   _colorCode = cc;
   emit modified(this);
   return true;

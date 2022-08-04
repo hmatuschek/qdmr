@@ -1125,6 +1125,28 @@ public:
     /** Hidden constructor. */
     RoamingChannelElement(uint8_t *ptr, unsigned size);
 
+  protected:
+    /** Address offsets within the element. */
+    enum Offsets {
+      RXFrequency = 0x0000,
+      TXFrequency = 0x0004,
+      ColorCode   = 0x0008,
+      TimeSlot    = 0x0009,
+      Name        = 0x000a,
+      NameLength  = 16
+    };
+
+    /** Special values for the color code. */
+    enum ColorCodeValue {
+      Disabled = 16
+    };
+
+    /** Encoded values for the time slot. */
+    enum TimeSlotValue {
+      TS1 = 0,
+      TS2 = 1
+    };
+
   public:
     /** Constructor. */
     RoamingChannelElement(uint8_t *ptr);
@@ -1141,10 +1163,14 @@ public:
     /** Sets the TX frequency in Hz. */
     virtual void setTXFrequency(unsigned hz);
 
+    /** Returns @c true if the color code is set. */
+    virtual bool hasColorCode() const;
     /** Returns the color code. */
     virtual unsigned colorCode() const;
     /** Sets the color code. */
     virtual void setColorCode(unsigned cc);
+    /** Disables the color code for the roaming channel. */
+    virtual void disableColorCode();
 
     /** Returns the time slot. */
     virtual DigitalChannel::TimeSlot timeSlot() const;

@@ -141,7 +141,7 @@ UV390Limits::UV390Limits(QObject *parent)
           { "channels", new RadioLimitRefList(0, 31, Channel::staticMetaObject) }
         }) );
 
-  /* Define limits for positioning systems. */
+  /* Define limits for positioning systems in case, this is a MD-380G/MD-390G. */
   add("positioning", new RadioLimitList(
         GPSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
           { "name", new RadioLimitStringIgnored() },
