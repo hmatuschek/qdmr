@@ -30,7 +30,9 @@ TyTInterface::TyTInterface(const USBDeviceDescriptor &descr, const ErrorStack &e
 
   // Get device identifier in a static buffer.
   const char *idstr = identify(err);
-  if (idstr && (0==strcmp("MD390", idstr))) {
+  if (idstr && (0==strcmp("DR780", idstr))) {
+    _ident = RadioInfo::byID(RadioInfo::MD380);
+  } else if (idstr && (0==strcmp("MD390", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::MD390);
   } else if (idstr && (0==strcmp("MD-UV380", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::UV380);
@@ -38,7 +40,7 @@ TyTInterface::TyTInterface(const USBDeviceDescriptor &descr, const ErrorStack &e
     _ident = RadioInfo::byID(RadioInfo::UV390);
   } else if (idstr && (0==strcmp("2017", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::MD2017);
-  } else if (idstr && (0==strcmp("1701", idstr))) {
+  } else if (idstr && (0==strcmp("DM-1701", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::DM1701);
   } else if (idstr) {
     errMsg(err) << "Unknown TyT device '" << idstr << "'.";
