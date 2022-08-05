@@ -207,20 +207,36 @@ class BeforeReadResponse(Response):
 
 
 if "__main__" == __name__:
-  if 2 != len(sys.argv):
-    print("USAGE extract.py CAP_FILENAME")
+  if 3 != len(sys.argv):
+    print("USAGE extract.py CMD CAP_FILENAME")
     sys.exit(-1)
   
-  cap = pyshark.FileCapture(sys.argv[1])
-  for pkt in cap:
-    if len(devices) and not (int(pkt.usb.device_address) in devices):
-      continue
-    if not "scsi" in pkt:
-      continue
-    if ("scsi_sbc_opcode" not in pkt.scsi.field_names) or (0xff != int(str(pkt.scsi.get_field_value("scsi_sbc_opcode")))):
-      continue 
-    if "data" in pkt.scsi.field_names:
-      print(handlePacket(binascii.a2b_hex(pkt.scsi.data.raw_value)))
-    
+  cmd = sys.argv[1]
+  cap = pyshark.FileCapture(sys.argv[2])
+  if "decode" == cmd:
+    for pkt in cap:
+      if len(devices) and not (int(pkt.usb.device_address) in devices):
+        continue
+      if not "scsi" in pkt:
+        continue
+      if ("scsi_sbc_opcode" not in pkt.scsi.field_names) or (0xff != int(str(pkt.scsi.get_field_value("scsi_sbc_opcode")))):
+        continue 
+      if "data" in pkt.scsi.field_names:
+        print(handlePacket(binascii.a2b_hex(pkt.scsi.data.raw_value)))
+  elif "dump" == cmd:
+    for pkt in cap:
+      if len(devices) and not (int(pkt.usb.device_address) in devices):
+        continue
+      if not "scsi" in pkt:
+        continue
+      if ("scsi_sbc_opcode" not in pkt.scsi.field_names) or (0xff != int(str(pkt.scsi.get_field_value("scsi_sbc_opcode")))):
+        continue 
+      if "data" not in pkt.scsi.field_names:
+        continue
+      msg = handlePacket(binascii.a2b_hex(pkt.scsi.data.raw_value))
+      if not isinstance(msg, (ReadResponse, WriteRequest)):
+        continue
+      print(hexDump(msg._data, "", msg._addr*0x800))
+
     
 
