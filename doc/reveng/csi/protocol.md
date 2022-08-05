@@ -44,10 +44,10 @@ The second field contains the op-code of the request. The response copies that o
 | Code | Description |
 | ---- | ----------- |
 | 03h  | Read radio info |
-| 14h  | Unknown, before write |
-| 15h  | Unknown, before read | 
 | 10h  | Read |
 | 11h  | Write |
+| 14h  | Unknown, before write |
+| 15h  | Unknown, before read | 
 
 #### Payload length
 The third field contains the payload length as an 16bit integer in big-endian. 
