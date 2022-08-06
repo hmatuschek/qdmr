@@ -21,6 +21,7 @@ RXGroupListDialog::RXGroupListDialog(Config *config, QWidget *parent)
 RXGroupListDialog::RXGroupListDialog(Config *config, RXGroupList *list, QWidget *parent)
   : QDialog(parent), _config(config), _myGroupList(new RXGroupList(this)), _list(list)
 {
+  setWindowTitle(tr("Edit Group List"));
   if (_list)
     _myGroupList->copy(*_list);
 
@@ -65,7 +66,7 @@ RXGroupListDialog::construct() {
 
 void
 RXGroupListDialog::onAddGroup() {
-  MultiGroupCallSelectionDialog dialog(_config->contacts());
+  MultiGroupCallSelectionDialog dialog(_config->contacts(), false);
   if (QDialog::Accepted != dialog.exec())
     return;
 
