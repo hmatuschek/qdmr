@@ -885,10 +885,15 @@ bool
 TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context &ctx) {
   //logDebug() << "Encode group list '" << lst->name() << "' with " << lst->count() << " members.";
   setName(lst->name());
+  int j=0;
   for (int i=0; i<32; i++) {
-    if (i<lst->count()) {
-      logDebug() << "Add contact " << lst->contact(i)->name() << " to list.";
-      setMemberIndex(i, ctx.index(lst->contact(i)));
+    if (lst->count() > j) {
+      while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
+        logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
+                  << "' is not a private call. Skip entry.";
+        j++;
+      }
+      setMemberIndex(i, ctx.index(lst->contact(j))); j++;
     } else {
       setMemberIndex(i, 0);
     }
