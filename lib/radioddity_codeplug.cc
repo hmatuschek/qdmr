@@ -990,9 +990,14 @@ RadioddityCodeplug::GroupListElement::linkRXGroupListObj(int ncnt, RXGroupList *
 void
 RadioddityCodeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx) {
   setName(lst->name());
+  int j = 0;
   for (int i=0; i<15; i++) {
-    if (lst->count() > i) {
-      setMember(i, ctx.index(lst->contact(i)));
+    if (lst->count() > j) {
+      while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
+        logWarn() << "Contact '" << lst->contact(i)->name() << "' is not a private call.";
+        j++;
+      }
+      setMember(i, ctx.index(lst->contact(j))); j++;
     } else {
       clearMember(i);
     }
