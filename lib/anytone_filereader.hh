@@ -74,9 +74,13 @@ public:
 protected:
   /** Offset-element map. */
   CodeplugContext _context;
+  /** Pointer to the start. */
   const uint8_t * const _start;
+  /** Pointer to the entire data. */
   const uint8_t *_data;
+  /** Size of the entire blob. */
   size_t _size;
+  /** Error message. */
   QString &_message;
 };
 
