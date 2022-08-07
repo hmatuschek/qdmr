@@ -64,6 +64,7 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
       new RadioLimitList(
             RXGroupList::staticMetaObject, 1, 76, new RadioLimitObject {
               { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
+              // allow for any digital contact reference
               { "contacts", new RadioLimitRefList(1, 32, DigitalContact::staticMetaObject) }
         }));
 

@@ -60,7 +60,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &
   add("groupLists", new RadioLimitList(
         RXGroupList::staticMetaObject, 1, 250, new RadioLimitObject {
           { "name", new RadioLimitString(1, 16, RadioLimitString::Unicode) },
-          { "contacts", new RadioLimitRefList(1, 32, DigitalContact::staticMetaObject) }
+          { "contacts", new RadioLimitPrivateCallRefList(1, 32) }
         }) );
 
   /* Define limits for channel list. */

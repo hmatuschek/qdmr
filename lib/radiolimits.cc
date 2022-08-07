@@ -798,6 +798,62 @@ RadioLimitRefList::validType(const QMetaObject *type) const {
 
 
 /* ********************************************************************************************* *
+ * Implementation of RadioLimitPrivateCallRefList
+ * ********************************************************************************************* */
+RadioLimitPrivateCallRefList::RadioLimitPrivateCallRefList(int minSize, int maxSize, QObject *parent)
+  : RadioLimitElement(parent), _minSize(minSize), _maxSize(maxSize)
+{
+  // pass...
+}
+
+bool
+RadioLimitPrivateCallRefList::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
+  if (! prop.isReadable()) {
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
+    msg << "Cannot check property " << prop.name() << ": Not readable.";
+    return false;
+  }
+
+  if (nullptr == prop.read(item).value<ConfigObjectRefList *>()) {
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
+    msg << "Cannot check property " << prop.name() << ": Not an instance of ConfigObjectRefList.";
+    return false;
+  }
+
+  const ConfigObjectRefList *plist = prop.read(item).value<ConfigObjectRefList*>();
+  if ((0 <= _minSize) && (_minSize > plist->count())) {
+    auto &msg = context.newMessage(RadioLimitIssue::Warning);
+    msg << "List '" << prop.name() << "' requires at least " << _minSize
+        << " elements, " << plist->count() << " elements found.";
+    return false;
+  }
+
+  if ((0 <= _maxSize) && (_maxSize < plist->count())) {
+    auto &msg = context.newMessage(RadioLimitIssue::Warning);
+    msg << "List '" << prop.name() << "' takes at most " << _minSize
+        << " elements, " << plist->count() << " elements found.";
+    return false;
+  }
+
+  for (int i=0; i<plist->count(); i++) {
+    if (! plist->get(i)->is<DigitalContact>()) {
+      auto &msg = context.newMessage(RadioLimitIssue::Critical);
+      msg << "Reference to " << plist->get(i)->metaObject()->className() << " is not allowed here. "
+          << "Must be DigtialContact.";
+      return false;
+    }
+    if (DigitalContact::PrivateCall != plist->get(i)->as<DigitalContact>()->type()) {
+      auto &msg = context.newMessage(RadioLimitIssue::Critical);
+      msg << "Expected reference to a private call digital contact.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RadioLimitSingleZone
  * ********************************************************************************************* */
 RadioLimitSingleZone::RadioLimitSingleZone(qint64 maxSize, const PropList &list, QObject *parent)

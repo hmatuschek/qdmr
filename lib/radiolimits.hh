@@ -600,10 +600,32 @@ protected:
   qint64 _minSize;
   /** Holds the maximum size of the list. */
   qint64 _maxSize;
-  /** Holds the limits for all objects of the list. */
-  RadioLimitObject *_element;
   /** Possible classes of instances, the references may point to. */
   QSet<QString> _types;
+};
+
+
+/** Implements the limits for a list of references to private call contacts.
+ * This is used to restrict the elements of group lists to private calls.
+ * @ingroup limits */
+class RadioLimitPrivateCallRefList: public RadioLimitElement
+{
+  Q_OBJECT
+
+public:
+  /** Costructor
+   * @param minSize Specifies the minimum size of the list. If -1, no check is performed.
+   * @param maxSize Specifies the maximum size of the list. If -1, no check is performed.
+   * @param parent  Specifies the QObject parent. */
+  RadioLimitPrivateCallRefList(int minSize, int maxSize, QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+
+protected:
+  /** Holds the minimum size of the list. */
+  qint64 _minSize;
+  /** Holds the maximum size of the list. */
+  qint64 _maxSize;
 };
 
 
