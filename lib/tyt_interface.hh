@@ -116,7 +116,7 @@ public:
 public:
   /** Returns some information about the interface. */
   static USBDeviceInfo interfaceInfo();
-  /** Tries to find all interfaces connected AnyTone radios. */
+  /** Tries to find all interfaces connected TyT radios. */
   static QList<USBDeviceDescriptor> detect();
 
 protected:

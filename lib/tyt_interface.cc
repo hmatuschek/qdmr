@@ -52,6 +52,9 @@ TyTInterface::TyTInterface(const USBDeviceDescriptor &descr, const ErrorStack &e
     errMsg(err) << "Cannot set device address to 0x00000000.";
     close(); return;
   }
+
+  logDebug() << "Found device " << _ident.manufactuer() << " "<< _ident.name()
+             << " at " << descr.description() << ".";
 }
 
 TyTInterface::~TyTInterface() {

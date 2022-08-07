@@ -66,6 +66,9 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
         return new D878UV2(anytone);
       } else if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
         return new D578UV(anytone);
+      } else {
+        errMsg(err) << "Unhandled device " << id.manufactuer() << " " << id.name()
+                    << ". Device known but not implemented yet.";
       }
       anytone->close();
       anytone->deleteLater();
@@ -79,6 +82,9 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       RadioInfo id = ogd77->identifier();
       if ((id.isValid() && (RadioInfo::OpenGD77 == id.id())) || (force.isValid() && (RadioInfo::OpenGD77 == force.id()))) {
         return new OpenGD77(ogd77);
+      } else {
+        errMsg(err) << "Unhandled device " << id.manufactuer() << " " << id.name()
+                    << ". Device known but not implemented yet.";
       }
       ogd77->close();
       ogd77->deleteLater();
@@ -97,7 +103,11 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       } else if ((id.isValid() && (RadioInfo::MD2017 == id.id())) || (force.isValid() && (RadioInfo::MD2017 == force.id()))) {
         return new MD2017(dfu);
       } else if ((id.isValid() && (RadioInfo::DM1701 == id.id())) || (force.isValid() && (RadioInfo::DM1701 == force.id()))) {
+        logDebug() << "Create DM-1701 radio object.";
         return new DM1701(dfu);
+      } else {
+        errMsg(err) << "Unhandled device " << id.manufactuer() << " " << id.name()
+                    << ". Device known but not implemented yet.";
       }
       dfu->close();
       dfu->deleteLater();
@@ -114,10 +124,12 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       } else if ((id.isValid() && (RadioInfo::GD77 == id.id())) || (force.isValid() && (RadioInfo::GD77 == force.id()))) {
         return new GD77(hid);
       } else {
-        hid->close();
-        hid->deleteLater();
-        return nullptr;
+        errMsg(err) << "Unhandled device " << id.manufactuer() << " " << id.name()
+                    << ". Device known but not implemented yet.";
       }
+      hid->close();
+      hid->deleteLater();
+      return nullptr;
     }
     hid->deleteLater();
     return nullptr;
