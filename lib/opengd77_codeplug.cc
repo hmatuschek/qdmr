@@ -470,6 +470,35 @@ OpenGD77Codeplug::ContactElement::fromContactObj(const DigitalContact *c, Contex
 
 
 /* ******************************************************************************************** *
+ * Implementation of OpenGD77Codeplug::GroupListElement
+ * ******************************************************************************************** */
+OpenGD77Codeplug::GroupListElement::GroupListElement(uint8_t *ptr, unsigned size)
+  : GD77Codeplug::GroupListElement(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77Codeplug::GroupListElement::GroupListElement(uint8_t *ptr)
+  : GD77Codeplug::GroupListElement(ptr)
+{
+  // pass...
+}
+
+void
+OpenGD77Codeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx) {
+  setName(lst->name());
+  // Iterate over all 15 entries in the codeplug
+  for (int i=0; i<15; i++) {
+    if (lst->count() > i) {
+      setMember(i, ctx.index(lst->contact(i)));
+    } else {
+      // Clear entry.
+      clearMember(i);
+    }
+  }
+}
+
+/* ******************************************************************************************** *
  * Implementation of OpenGD77Codeplug
  * ******************************************************************************************** */
 OpenGD77Codeplug::OpenGD77Codeplug(QObject *parent)

@@ -205,6 +205,23 @@ public:
     void fromContactObj(const DigitalContact *c, Context &ctx);
   };
 
+  /** Implements the OpenGD77 specific group list.
+   *
+   * This class is identical to the GD77 one, but allows for private calls to be added to
+   * the group list. */
+  class GroupListElement: public GD77Codeplug::GroupListElement
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor. */
+    GroupListElement(uint8_t *ptr);
+
+    void fromRXGroupListObj(const RXGroupList *lst, Context &ctx);
+  };
+
 public:
   /** Constructs an empty codeplug for the GD-77. */
   explicit OpenGD77Codeplug(QObject *parent=nullptr);
