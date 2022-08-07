@@ -883,11 +883,13 @@ TyTCodeplug::GroupListElement::setMemberIndex(unsigned n, uint16_t idx) {
 
 bool
 TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context &ctx) {
-  //logDebug() << "Encode group list '" << lst->name() << "' with " << lst->count() << " members.";
   setName(lst->name());
+
   int j=0;
+  // Iterate over all 32 entries in the codeplug
   for (int i=0; i<32; i++) {
     if (lst->count() > j) {
+      // Skip non-private-call entries
       while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
         logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
                   << "' is not a private call. Skip entry.";
@@ -895,6 +897,7 @@ TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context 
       }
       setMemberIndex(i, ctx.index(lst->contact(j))); j++;
     } else {
+      // clear entry
       setMemberIndex(i, 0);
     }
   }

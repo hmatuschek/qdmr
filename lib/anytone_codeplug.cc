@@ -1093,15 +1093,27 @@ AnytoneCodeplug::GroupListElement::linkGroupList(RXGroupList *lst, Context &ctx)
 bool
 AnytoneCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context &ctx) {
   clear();
+
   // set name of group list
   setName(lst->name());
+
+  int j=0;
   // set members
   for (uint8_t i=0; i<64; i++) {
-    if (i < lst->count())
-      setMemberIndex(i, ctx.index(lst->contact(i)));
-    else
+    if (lst->count() > j) {
+      // Skip non-private-call entries
+      while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
+        logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
+                  << "' is not a private call. Skip entry.";
+        j++;
+      }
+      setMemberIndex(i, ctx.index(lst->contact(j))); j++;
+    } else {
+      // Clear entry
       clearMemberIndex(i);
+    }
   }
+
   return true;
 }
 
