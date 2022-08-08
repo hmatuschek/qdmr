@@ -453,8 +453,6 @@ OpenGD77Codeplug::ContactElement::toContactObj(Context &ctx) const {
 void
 OpenGD77Codeplug::ContactElement::fromContactObj(const DigitalContact *c, Context &ctx) {
   GD77Codeplug::ContactElement::fromContactObj(c, ctx);
-  if (c->openGD77ContactExtension())
-    return;
 
   if(const OpenGD77ContactExtension *ext = c->openGD77ContactExtension()) {
     if (OpenGD77ContactExtension::TimeSlotOverride::None != ext->timeSlotOverride()) {
