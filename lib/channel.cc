@@ -599,6 +599,9 @@ DigitalChannel::DigitalChannel(QObject *parent)
   if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioId", "!default"))
     ConfigItem::Context::setTag(metaObject()->className(), "radioId", "!default", DefaultRadioID::get());
 
+  // Set default DMR Id
+  _radioId.set(DefaultRadioID::get());
+
   // Connect signals of references
   connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_txContact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -635,7 +638,7 @@ DigitalChannel::clear() {
   setTXContactObj(nullptr);
   setAPRSObj(nullptr);
   setRoamingZone(nullptr);
-  setRadioIdObj(nullptr);
+  setRadioIdObj(DefaultRadioID::get());
 }
 
 ConfigItem *

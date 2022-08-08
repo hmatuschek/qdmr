@@ -414,9 +414,9 @@ public:
   RadioIDReference *radioId();
   /** Sets the reference to the radio ID. */
   void setRadioId(RadioIDReference *ref);
-  /** Returns the radio ID associated with this channel or @c nullptr if the default ID is used. */
+  /** Returns the radio ID associated with this channel. */
   DMRRadioID *radioIdObj() const;
-  /** Associates the given radio ID with this channel. Pass nullptr to set to default ID. */
+  /** Associates the given radio ID with this channel. */
   bool setRadioIdObj(DMRRadioID *id);
 
 public:
@@ -437,7 +437,7 @@ protected:
   PositioningSystemReference _posSystem;
   /** Roaming zone for the channel. */
   RoamingZoneReference _roaming;
-  /** Radio ID to use on this channel. @c nullptr if default ID is used. */
+  /** Radio ID to use on this channel. */
   RadioIDReference _radioId;
 };
 
