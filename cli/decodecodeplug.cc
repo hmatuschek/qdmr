@@ -60,17 +60,17 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     if (parser.isSet("manufacturer")) {
       if (! MD390FileReader::read(filename, &codeplug, errorMessage)) {
         logError() << "Cannot decode manufacturer codeplug file '" << filename
-                   << "': " << errorMessage;
+                   << "':\n" << errorMessage;
         return -1;
       }
     } else if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "' : " << err.format();
+                 << "' :\n" << err.format();
       return -1;
     }
     if (! codeplug.decode(&config, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "': " << err.format();
+                 << "':\n" << err.format();
     }
   } else if (RadioInfo::UV390 == radio) {
     UV390Codeplug codeplug;
@@ -82,29 +82,29 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       }
     } else if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "' : " << err.format();
+                 << "' :\n" << err.format();
       return -1;
     }
     if (! codeplug.decode(&config, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "': " << err.format();
+                 << "':\n" << err.format();
     }
   } else if (RadioInfo::MD2017 == radio) {
     MD2017Codeplug codeplug;
     if (parser.isSet("manufacturer")) {
       if (! MD2017FileReader::read(filename, &codeplug, errorMessage)) {
         logError() << "Cannot decode manufacturer codeplug file '" << filename
-                   << "': " << errorMessage;
+                   << "':\n" << errorMessage;
         return -1;
       }
     } else if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "' : " << err.format();
+                 << "' :\n" << err.format();
       return -1;
     }
     if (! codeplug.decode(&config, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "': " << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
   } else if (RadioInfo::DM1701 == radio) {
@@ -112,17 +112,17 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     if (parser.isSet("manufacturer")) {
       if (! DM1701FileReader::read(filename, &codeplug, errorMessage)) {
         logError() << "Cannot decode manufacturer codeplug file '" << filename
-                   << "': " << errorMessage;
+                   << "':\n" << errorMessage;
         return -1;
       }
     } else if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "' : " << err.format();
+                 << "' :\n" << err.format();
       return -1;
     }
     if (! codeplug.decode(&config, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "': " << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
   } else if (RadioInfo::RD5R == radio) {
@@ -130,17 +130,17 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     if (parser.isSet("manufacturer")) {
       if (! RD5RFileReader::read(filename, &codeplug, errorMessage)) {
         logError() << "Cannot decode manufacturer codeplug file '" << filename
-                   << "': " << errorMessage;
+                   << "':\n" << errorMessage;
         return -1;
       }
     } else if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "': " << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
     if (! codeplug.decode(&config, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "': " << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
   } else if (RadioInfo::GD77 == radio) {
@@ -148,17 +148,17 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     if (parser.isSet("manufacturer")) {
       if (! GD77FileReader::read(filename, &codeplug, errorMessage)) {
         logError() << "Cannot decode manufacturer codeplug file '" << filename
-                   << "': " << errorMessage;
+                   << "':\n" << errorMessage;
         return -1;
       }
     } else if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "': " << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
     if (! codeplug.decode(&config, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "': " << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
   } else if (RadioInfo::OpenGD77 == radio) {
@@ -170,12 +170,12 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     OpenGD77Codeplug codeplug;
     if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "': " << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
     if (! codeplug.decode(&config, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "': " << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
   } else if (RadioInfo::D868UVE == radio) {
@@ -187,12 +187,12 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
     if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':" << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
     if (! codeplug.decode(&config, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':" << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
   } else if (RadioInfo::D878UV == radio) {
@@ -204,12 +204,12 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     D878UVCodeplug codeplug;
     if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':" << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
     if (! codeplug.decode(&config, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':" << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
   } else if (RadioInfo::D878UVII == radio) {
@@ -221,12 +221,12 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     D878UV2Codeplug codeplug;
     if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename <<
-                    "':" << err.format();
+                    "':\n" << err.format();
       return -1;
     }
     if (! codeplug.decode(&config, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':" << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
   } else if (RadioInfo::D578UV == radio) {
@@ -238,12 +238,12 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     D578UVCodeplug codeplug;
     if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':" << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
     if (! codeplug.decode(&config, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':" << err.format();
+                 << "':\n" << err.format();
       return -1;
     }
   } else {
@@ -261,12 +261,12 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       QFile outfile(info.filePath());
       if (! outfile.open(QIODevice::WriteOnly)) {
         logError() << "Cannot write CSV codeplug file '" << outfile.fileName()
-                   << "': " << outfile.errorString();
+                   << "':\n" << outfile.errorString();
         return -1;
       }
       QTextStream stream(&outfile);
       if (! config.toYAML(stream, err)) {
-        logError() << "Cannot serialize codeplug to YAML:"
+        logError() << "Cannot serialize codeplug to YAML:\n"
                    << err.format(" ");
       }
       outfile.close();
@@ -282,7 +282,7 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     } else if (parser.isSet("yaml")) {
       if (! config.toYAML(stream, err)) {
-        logError() << "Cannot serialize codeplug into YAML:"
+        logError() << "Cannot serialize codeplug into YAML:\n"
                    << err.format(" ");
         return -1;
       }

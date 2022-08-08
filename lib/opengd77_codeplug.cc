@@ -407,11 +407,11 @@ OpenGD77Codeplug::ContactElement::markValid(bool valid) {
 
 bool
 OpenGD77Codeplug::ContactElement::overridesTimeSlot() const {
-  return TimeSlotOverride::None != (TimeSlotOverride)getUInt8(0x0017);
+  return TimeSlotOverride::None != (TimeSlotOverride)getUInt8(Offset::TimeSlotOverride);
 }
 DigitalChannel::TimeSlot
 OpenGD77Codeplug::ContactElement::timeSlot() const {
-  switch ((TimeSlotOverride)getUInt8(0x0017)) {
+  switch ((TimeSlotOverride)getUInt8(Offset::TimeSlotOverride)) {
   case TimeSlotOverride::TS1: return DigitalChannel::TimeSlot::TS1;
   case TimeSlotOverride::TS2: return DigitalChannel::TimeSlot::TS2;
   default: break;
@@ -421,13 +421,13 @@ OpenGD77Codeplug::ContactElement::timeSlot() const {
 void
 OpenGD77Codeplug::ContactElement::setTimeSlot(DigitalChannel::TimeSlot ts) {
   if (DigitalChannel::TimeSlot::TS1 == ts)
-    setUInt8(0x0017, (unsigned)TimeSlotOverride::TS1);
+    setUInt8(Offset::TimeSlotOverride, (unsigned)TimeSlotOverride::TS1);
   else
-    setUInt8(0x0017, (unsigned)TimeSlotOverride::TS2);
+    setUInt8(Offset::TimeSlotOverride, (unsigned)TimeSlotOverride::TS2);
 }
 void
 OpenGD77Codeplug::ContactElement::disableTimeSlotOverride() {
-  setUInt8(0x0017, (unsigned)TimeSlotOverride::None);
+  setUInt8(Offset::TimeSlotOverride, (unsigned)TimeSlotOverride::None);
 }
 
 DigitalContact *
@@ -487,8 +487,8 @@ OpenGD77Codeplug::GroupListElement::GroupListElement(uint8_t *ptr)
 void
 OpenGD77Codeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx) {
   setName(lst->name());
-  // Iterate over all 15 entries in the codeplug
-  for (int i=0; i<15; i++) {
+  // Iterate over all 32 entries in the codeplug
+  for (int i=0; i<32; i++) {
     if (lst->count() > i) {
       setMember(i, ctx.index(lst->contact(i)));
     } else {
@@ -880,11 +880,11 @@ OpenGD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &
 
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK, IMAGE_GROUP_LIST_BANK)); bank.clear();
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
-    if (i >= config->rxGroupLists()->count())
-      continue;
     GroupListElement el(bank.get(i));
-    el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx);
-    bank.setContactCount(i, config->rxGroupLists()->list(i)->count());
+    if (i < config->rxGroupLists()->count()) {
+      el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx);
+      bank.setContactCount(i, config->rxGroupLists()->list(i)->count());
+    }
   }
   return true;
 }

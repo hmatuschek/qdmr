@@ -179,6 +179,12 @@ public:
     /** Reuse enum from extension. */
     typedef OpenGD77ContactExtension::TimeSlotOverride TimeSlotOverride;
 
+    struct Offset {
+      enum {
+        TimeSlotOverride = 0x0017
+      };
+    };
+
   public:
     /** Constructor. */
     explicit ContactElement(uint8_t *ptr);

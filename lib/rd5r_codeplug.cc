@@ -637,7 +637,12 @@ RD5RCodeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx,
       continue;
     GroupListElement el(bank.get(i));
     el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx);
-    bank.setContactCount(i, config->rxGroupLists()->list(i)->count());
+    // Only group calls are encoded
+    int count = 0;
+    for (int j=0; j<config->rxGroupLists()->list(i)->count(); j++)
+      if (DigitalContact::GroupCall == config->rxGroupLists()->list(i)->contact(j)->type())
+        count++;
+    bank.setContactCount(i, count);
   }
   return true;
 }
