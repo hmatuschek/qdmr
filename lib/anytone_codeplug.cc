@@ -1100,16 +1100,16 @@ AnytoneCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Cont
   int j=0;
   // set members
   for (uint8_t i=0; i<64; i++) {
+    // Skip non-private-call entries
+    while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
+      logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
+                << "' is not a private call. Skip entry.";
+      j++;
+    }
+
     if (lst->count() > j) {
-      // Skip non-private-call entries
-      while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
-        logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
-                  << "' is not a private call. Skip entry.";
-        j++;
-      }
       setMemberIndex(i, ctx.index(lst->contact(j))); j++;
     } else {
-      // Clear entry
       clearMemberIndex(i);
     }
   }

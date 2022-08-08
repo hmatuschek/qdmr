@@ -888,14 +888,15 @@ TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context 
   int j=0;
   // Iterate over all 32 entries in the codeplug
   for (int i=0; i<32; i++) {
+    // Skip non-private-call entries
+    while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
+      logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
+                << "' is not a private call. Skip entry.";
+      j++;
+    }
     if (lst->count() > j) {
-      // Skip non-private-call entries
-      while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
-        logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
-                  << "' is not a private call. Skip entry.";
-        j++;
-      }
-      setMemberIndex(i, ctx.index(lst->contact(j))); j++;
+      setMemberIndex(i, ctx.index(lst->contact(j)));
+      j++;
     } else {
       // clear entry
       setMemberIndex(i, 0);
