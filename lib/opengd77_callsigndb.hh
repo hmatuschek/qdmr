@@ -59,8 +59,7 @@ public:
     uint8_t size;                       ///< Fixed to 0x5d for 15 byte names.
     char version[3];                    ///< Version string? Fixed to '001'
     uint8_t unused6;                    ///< Unused, set to 0x00.
-    uint16_t count;                     ///< Number of contacts in DB, 16bit little-endian.
-    uint16_t unused9;                   ///< Unused, set to 0x0000.
+    uint32_t count;                     ///< Number of contacts in DB, 32bit little-endian.
 
     /** Constructor. */
     userdb_t();

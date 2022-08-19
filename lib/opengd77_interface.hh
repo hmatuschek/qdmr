@@ -61,7 +61,8 @@ protected:
       READ_MCU_ROM = 5,
       READ_DISPLAY_BUFFER = 6,
       READ_WAV_BUFFER = 7,
-      READ_AMBE_BUFFER = 8
+      READ_AMBE_BUFFER = 8,
+      READ_FIRMWARE_INFO = 9
     } Command;
 
     /// 'R' read block, 'W' write block, 'C' command.
@@ -70,13 +71,15 @@ protected:
     uint8_t command;
     /// Memory address to read from in big endian.
     uint32_t address;
-    /// Amount of data to read, max 32 bytes in big endian.
+    /// Amount of data to read in big endian.
     uint16_t length;
 
     /** Constructs a FLASH read message. */
     bool initReadFlash(uint32_t address, uint16_t length);
     /** Constructs a EEPROM read message. */
     bool initReadEEPROM(uint32_t address, uint16_t length);
+    /** Constructs a firmware-info read message. */
+    bool initReadFirmwareInfo();
   } ReadRequest;
 
   /** Represents a read response message. */
@@ -85,8 +88,19 @@ protected:
     char type;
     /// Length of paylod.
     uint16_t length;
-    /// Payload.
-    uint8_t data[32];
+
+    union {
+      /// Data payload.
+      uint8_t data[32];
+      /** Radio info payload */
+      struct {
+        uint32_t _unknown00;  ///< Some unknown number in little endian, seen 0x0001.
+        uint32_t _unknown04;  ///< Some unknown number in little endian, seen 0x0003.
+        char fw_revision[16]; ///< Firmware revision ASCII, 0-padded.
+        char build_date[16];  ///< Firmware build time, YYYYMMDDhhmmss, 0-padded.
+        uint32_t _unknown24;  ///< Some unknown number in little endian, seen 0x4014
+      } radio_info;
+    };
   } ReadResponse;
 
   /** Represents a write message. */

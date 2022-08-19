@@ -64,7 +64,7 @@ RD5RLimits::RD5RLimits(QObject *parent)
       new RadioLimitList(
             RXGroupList::staticMetaObject, 1, 64, new RadioLimitObject {
               { "name", new RadioLimitString(1,16, RadioLimitString::ASCII) },
-              { "contacts", new RadioLimitPrivateCallRefList(1,16) }
+              { "contacts", new RadioLimitGroupCallRefList(1,16) }
         }));
 
   /* Define limits for channel list. */

@@ -605,10 +605,10 @@ protected:
 };
 
 
-/** Implements the limits for a list of references to private call contacts.
- * This is used to restrict the elements of group lists to private calls.
+/** Implements the limits for a list of references to group call contacts.
+ * This is used to restrict the elements of group lists to group calls.
  * @ingroup limits */
-class RadioLimitPrivateCallRefList: public RadioLimitElement
+class RadioLimitGroupCallRefList: public RadioLimitElement
 {
   Q_OBJECT
 
@@ -617,7 +617,7 @@ public:
    * @param minSize Specifies the minimum size of the list. If -1, no check is performed.
    * @param maxSize Specifies the maximum size of the list. If -1, no check is performed.
    * @param parent  Specifies the QObject parent. */
-  RadioLimitPrivateCallRefList(int minSize, int maxSize, QObject *parent=nullptr);
+  RadioLimitGroupCallRefList(int minSize, int maxSize, QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 

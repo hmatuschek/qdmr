@@ -800,14 +800,14 @@ RadioLimitRefList::validType(const QMetaObject *type) const {
 /* ********************************************************************************************* *
  * Implementation of RadioLimitPrivateCallRefList
  * ********************************************************************************************* */
-RadioLimitPrivateCallRefList::RadioLimitPrivateCallRefList(int minSize, int maxSize, QObject *parent)
+RadioLimitGroupCallRefList::RadioLimitGroupCallRefList(int minSize, int maxSize, QObject *parent)
   : RadioLimitElement(parent), _minSize(minSize), _maxSize(maxSize)
 {
   // pass...
 }
 
 bool
-RadioLimitPrivateCallRefList::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
+RadioLimitGroupCallRefList::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
   if (! prop.isReadable()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Not readable.";
@@ -842,9 +842,9 @@ RadioLimitPrivateCallRefList::verify(const ConfigItem *item, const QMetaProperty
           << "Must be DigtialContact.";
       return false;
     }
-    if (DigitalContact::PrivateCall != plist->get(i)->as<DigitalContact>()->type()) {
+    if (DigitalContact::GroupCall != plist->get(i)->as<DigitalContact>()->type()) {
       auto &msg = context.newMessage(RadioLimitIssue::Critical);
-      msg << "Expected reference to a private call digital contact.";
+      msg << "Expected reference to a group call digital contact.";
       return false;
     }
   }

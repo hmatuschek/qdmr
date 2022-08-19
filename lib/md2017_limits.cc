@@ -59,7 +59,7 @@ MD2017Limits::MD2017Limits(QObject *parent)
   add("groupLists", new RadioLimitList(
         RXGroupList::staticMetaObject, 1, 250, new RadioLimitObject {
           { "name", new RadioLimitString(1, 16, RadioLimitString::Unicode) },
-          { "contacts", new RadioLimitPrivateCallRefList(1, 32) }
+          { "contacts", new RadioLimitGroupCallRefList(1, 32) }
         }) );
 
   /* Define limits for channel list. */

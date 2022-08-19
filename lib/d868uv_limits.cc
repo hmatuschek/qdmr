@@ -60,7 +60,7 @@ D868UVLimits::D868UVLimits(const std::initializer_list<std::pair<double, double>
       new RadioLimitList(
             RXGroupList::staticMetaObject, 1, 250, new RadioLimitObject {
               { "name", new RadioLimitString(1,16, RadioLimitString::ASCII) },
-              { "contacts", new RadioLimitPrivateCallRefList(1, 64) }
+              { "contacts", new RadioLimitGroupCallRefList(1, 64) }
         }));
 
   /* Define limits for channel list. */
