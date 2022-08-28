@@ -11,7 +11,8 @@ class D578UVLimits: public AnytoneLimits
 
 public:
   /** Constructor. */
-  D578UVLimits(const std::initializer_list<std::pair<double, double>> &freqRanges,
+  D578UVLimits(const std::initializer_list<std::pair<double, double>> &rxFreqRanges,
+               const std::initializer_list<std::pair<double, double>> &txFreqRanges,
                const QString &hardwareRevision, QObject *parent=nullptr);
 };
 

@@ -21,49 +21,62 @@ D868UV::D868UV(AnytoneInterface *device, QObject *parent)
   AnytoneInterface::RadioVariant info; _dev->getInfo(info);
   switch (info.bands) {
   case 0x00:
-    _limits = new D868UVLimits({ {136., 174.}, {400., 480.} }, info.version, this);
+    _limits = new D868UVLimits({ {136., 174.}, {400., 480.} },
+                               { {136., 174.}, {400., 480.} }, info.version, this);
     break;
   case 0x01:
-    _limits = new D868UVLimits({ {144., 148.}, {420., 450.} }, info.version, this);
+    _limits = new D868UVLimits({ {144., 148.}, {420., 450.} },
+                               { {144., 148.}, {420., 450.} }, info.version, this);
     break;
   case 0x02:
-    _limits = new D868UVLimits({ {136., 174.}, {430., 450.} }, info.version, this);
+    _limits = new D868UVLimits({ {136., 174.}, {430., 440.} },
+                               { {136., 174.}, {430., 440.} }, info.version, this);
     break;
   case 0x03:
-    _limits = new D868UVLimits({ {144., 146.}, {430., 440.} }, info.version, this);
+    _limits = new D868UVLimits({ {144., 146.}, {430., 440.} },
+                               { {144., 146.}, {430., 440.} }, info.version, this);
     break;
   case 0x04:
-    _limits = new D868UVLimits({ {136., 174.}, {440., 480.} }, info.version, this);
+    _limits = new D868UVLimits({ {136., 174.}, {440., 480.} },
+                               { {136., 174.}, {440., 480.} }, info.version, this);
     break;
   case 0x05:
-    _limits = new D868UVLimits({ {144., 146.}, {440., 480.} }, info.version, this);
+    _limits = new D868UVLimits({ {144., 146.}, {440., 480.} },
+                               { {144., 146.}, {440., 480.} }, info.version, this);
     break;
   case 0x06:
-    _limits = new D868UVLimits({ {136., 174.}, {446., 447.} }, info.version, this);
+    _limits = new D868UVLimits({ {136., 174.}, {446., 447.} },
+                               { {136., 174.}, {446., 447.} }, info.version, this);
     break;
   case 0x07:
-    _limits = new D868UVLimits({ {144., 146.}, {446., 447.} }, info.version, this);
+    _limits = new D868UVLimits({ {144., 146.}, {446., 447.} },
+                               { {144., 146.}, {446., 447.} }, info.version, this);
     break;
   case 0x08:
-    _limits = new D868UVLimits({ {136., 174.}, {440., 470.} }, info.version, this);
+    _limits = new D868UVLimits({ {136., 174.}, {440., 470.} },
+                               { {136., 174.}, {440., 470.} }, info.version, this);
     break;
   case 0x09:
-    _limits = new D868UVLimits({ {144., 146.}, {430., 432.} }, info.version, this);
+    _limits = new D868UVLimits({ {144., 146.}, {430., 432.} },
+                               { {144., 146.}, {430., 432.} }, info.version, this);
     break;
   case 0x0a:
-    _limits = new D868UVLimits({ {144., 148.}, {430., 450.} }, info.version, this);
+    _limits = new D868UVLimits({ {136., 174.}, {400., 480.} },
+                               { {144., 148.}, {430., 450.} }, info.version, this);
     break;
   case 0x0b:
-    _limits = new D868UVLimits({ {144., 146.}, {430., 440.} }, info.version, this);
+    _limits = new D868UVLimits({ {136., 174.}, {400., 480.} },
+                               { {144., 146.}, {430., 440.} }, info.version, this);
     break;
   case 0x0c:
-    _limits = new D868UVLimits({ {136., 174.}, {403., 470.} }, info.version, this);
+    _limits = new D868UVLimits({ {136., 174.}, {403., 470.} },
+                               { {136., 174.}, {403., 470.} }, info.version, this);
     break;
 
   default:
     logInfo() << "Unknown band-code" << QString::number(int(info.bands), 16)
-              << ": Set freq range to 136-174MHz and 400-480MHz.";
-    _limits = new D868UVLimits({ {136., 174.}, {403., 470.} }, info.version, this);
+              << ": Ingore frequency limits.";
+    _limits = new D868UVLimits({}, {}, info.version, this);
     break;
   }
 }

@@ -9,7 +9,8 @@
 #include "roaming.hh"
 
 
-D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<double, double> > &freqRanges,
+D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<double, double> > &rxFreqRanges,
+                             const std::initializer_list<std::pair<double, double> > &txFreqRanges,
                              const QString &hardwareRevision, QObject *parent)
   : AnytoneLimits(hardwareRevision, "V100", true, parent)
 {
@@ -72,8 +73,8 @@ D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<double, doubl
           { AnalogChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::ASCII)},
-              {"rxFrequency", new RadioLimitFrequencies(freqRanges)},
-              {"txFrequency", new RadioLimitFrequencies(freqRanges)},
+              {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges)},
+              {"txFrequency", new RadioLimitFrequencies(txFreqRanges)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
@@ -96,8 +97,8 @@ D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<double, doubl
           { DigitalChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
-              {"rxFrequency", new RadioLimitFrequencies(freqRanges)},
-              {"txFrequency", new RadioLimitFrequencies(freqRanges)},
+              {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges)},
+              {"txFrequency", new RadioLimitFrequencies(txFreqRanges)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},

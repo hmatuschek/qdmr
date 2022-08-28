@@ -420,8 +420,9 @@ RadioLimitFrequencies::RadioLimitFrequencies(QObject *parent)
 RadioLimitFrequencies::RadioLimitFrequencies(const RangeList &ranges, QObject *parent)
   : RadioLimitValue(parent), _frequencyRanges()
 {
-  for (auto range=ranges.begin(); range!=ranges.end(); range++)
+  for (auto range=ranges.begin(); range!=ranges.end(); range++) {
     _frequencyRanges.append(FrequencyRange(range->first, range->second));
+  }
 }
 
 bool
