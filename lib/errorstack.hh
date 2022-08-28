@@ -15,7 +15,7 @@
  *   bool someMethod(const ErrorStack &err=ErrorStack()) {
  *     // [...]
  *     if (someError) {
- *       errMsg() << "Some error happend!";
+ *       errMsg() << "Some error happened!";
  *       return false;
  *     }
  *     // [...]
@@ -51,7 +51,7 @@ public:
     /** Constructor from file, line and message. */
     Message(const QString &file, unsigned line, const QString &message);
 
-    /** Retunrs the file name. */
+    /** Returns the file name. */
     const QString &file() const;
     /** Returns the line within the file. */
     unsigned line() const;

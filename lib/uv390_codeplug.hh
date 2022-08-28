@@ -11,7 +11,7 @@
  *
  * @section uv390cpl Codeplug structure within radio
  * The codeplug structure is reverse engineered almost completely and can be programmed from
- * scratch. That is, it is not neccessary to update an existing codeplug on the radio.
+ * scratch. That is, it is not necessary to update an existing codeplug on the radio.
  * <table>
  *  <tr><th>Start</th>    <th>End</th>      <th>Size</th>    <th>Content</th></tr>
  *  <tr><th colspan="4">First segment 0x002000-0x040000</th></tr>
@@ -99,7 +99,7 @@ public:
     /** Enables/disables dual-capacity direct mode for this channel. */
     virtual void enableDualCapacityDirectMode(bool enable);
 
-    /** Retruns @c true if the radio acts as the leader for this DCDM channel. */
+    /** Returns @c true if the radio acts as the leader for this DCDM channel. */
     virtual bool dcdmLeader() const;
     /** Enables/disables this radio to be the leader for this DCDM channel. */
     virtual void enableDCDMLeader(bool enable);
@@ -346,11 +346,14 @@ public:
   bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack());
 
+  void clearPrivacyKeys();
+  bool encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err);
+
   /** Resets the boot setting, e.g. initial channels and zone at bootup. */
   virtual void clearBootSettings();
   void clearMenuSettings();
   void clearTextMessages();
-  void clearPrivacyKeys();
   void clearEmergencySystems();
   /** Clears the VFO A & B. */
   virtual void clearVFOSettings();

@@ -78,7 +78,7 @@ ErrorStack::Stack::push(const Stack &other) {
 
 bool
 ErrorStack::Stack::isEmpty() const {
-  return 0!=count();
+  return 0 == count();
 }
 
 unsigned

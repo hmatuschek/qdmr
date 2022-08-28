@@ -178,8 +178,10 @@ D878UVCodeplug::ChannelElement::setFrequencyCorrection(int corr) {
 Channel *
 D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   Channel *ch = AnytoneCodeplug::ChannelElement::toChannelObj(ctx);
+
   if (nullptr == ch)
     return nullptr;
+
   // Nothing else to do
   return ch;
 }
@@ -266,52 +268,61 @@ D878UVCodeplug::RoamingChannelElement::clear() {
 
 unsigned
 D878UVCodeplug::RoamingChannelElement::rxFrequency() const {
-  return getBCD8_be(0x0000)*10;
+  return getBCD8_be(Offsets::RXFrequency)*10;
 }
 void
 D878UVCodeplug::RoamingChannelElement::setRXFrequency(unsigned hz) {
-  setBCD8_be(0x0000, hz/10);
+  setBCD8_be(Offsets::RXFrequency, hz/10);
 }
 unsigned
 D878UVCodeplug::RoamingChannelElement::txFrequency() const {
-  return getBCD8_be(0x0004)*10;
+  return getBCD8_be(Offsets::TXFrequency)*10;
 }
 void
 D878UVCodeplug::RoamingChannelElement::setTXFrequency(unsigned hz) {
-  setBCD8_be(0x0004, hz/10);
+  setBCD8_be(Offsets::TXFrequency, hz/10);
+}
+
+bool
+D878UVCodeplug::RoamingChannelElement::hasColorCode() const {
+  return ColorCodeValue::Disabled == getUInt8(Offsets::ColorCode);
 }
 unsigned
 D878UVCodeplug::RoamingChannelElement::colorCode() const {
-  return getUInt8(0x0008);
+  return std::min(15u, (unsigned)getUInt8(Offsets::ColorCode));
 }
 void
 D878UVCodeplug::RoamingChannelElement::setColorCode(unsigned cc) {
-  setUInt8(0x0008, cc);
+  setUInt8(Offsets::ColorCode, cc);
+}
+void
+D878UVCodeplug::RoamingChannelElement::disableColorCode() {
+  setUInt8(Offsets::ColorCode, ColorCodeValue::Disabled);
 }
 
 DigitalChannel::TimeSlot
 D878UVCodeplug::RoamingChannelElement::timeSlot() const {
-  switch (getUInt8(0x0009)) {
-  case 0x00: return DigitalChannel::TimeSlot::TS1;
-  case 0x01: return DigitalChannel::TimeSlot::TS2;
+  switch (getUInt8(Offsets::TimeSlot)) {
+  case TimeSlotValue::TS1: return DigitalChannel::TimeSlot::TS1;
+  case TimeSlotValue::TS2: return DigitalChannel::TimeSlot::TS2;
   }
   return DigitalChannel::TimeSlot::TS1;
 }
 void
 D878UVCodeplug::RoamingChannelElement::setTimeSlot(DigitalChannel::TimeSlot ts) {
   switch (ts) {
-  case DigitalChannel::TimeSlot::TS1: setUInt8(0x0009, 0x00); break;
-  case DigitalChannel::TimeSlot::TS2: setUInt8(0x0009, 0x01); break;
+  case DigitalChannel::TimeSlot::TS1: setUInt8(Offsets::TimeSlot, TimeSlotValue::TS1); break;
+  case DigitalChannel::TimeSlot::TS2: setUInt8(Offsets::TimeSlot, TimeSlotValue::TS2); break;
   }
 }
 
 QString
 D878UVCodeplug::RoamingChannelElement::name() const {
-  return readASCII(0x000a, 16, 0x00);
+  return readASCII(Offsets::Name, Offsets::NameLength, 0x00);
 }
 void
 D878UVCodeplug::RoamingChannelElement::setName(const QString &name) {
-  writeASCII(0x000a, name, 16, 0x00);
+  writeASCII(Offsets::Name, name, Offsets::NameLength, 0x00);
 }
 
 bool
@@ -1368,6 +1379,14 @@ D878UVCodeplug::AnalogAPRSSettingsElement::clear() {
   setUInt8(0x003d, 0x01); setUInt8(0x003e, 0x03); setUInt8(0x003f, 0xff);
 }
 
+bool
+D878UVCodeplug::AnalogAPRSSettingsElement::isValid() const {
+  if (! Codeplug::Element::isValid())
+    return false;
+  return (0 != frequency()) && (! destination().simplified().isEmpty())
+      && (! source().simplified().isEmpty());
+}
+
 unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::frequency() const {
   return ((unsigned)getBCD8_be(0x0001))*10;
@@ -1600,7 +1619,7 @@ D878UVCodeplug::AnalogAPRSSettingsElement::linkAPRSSystem(APRSSystem *sys, Conte
     ch->setPower(power());
     ch->setTXTone(txTone());
     ch->setBandwidth(AnalogChannel::Bandwidth::Wide);
-    logInfo() << "No matching APRS chanel found for TX frequency " << frequency()/1e6
+    logInfo() << "No matching APRS channel found for TX frequency " << frequency()/1e6
               << "MHz, create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);
   }
@@ -2110,6 +2129,12 @@ D878UVCodeplug::RadioInfoElement::maintainerNote() const {
 D878UVCodeplug::D878UVCodeplug(QObject *parent)
   : D868UVCodeplug(parent)
 {
+}
+
+void
+D878UVCodeplug::clear() {
+  D868UVCodeplug::clear();
+
   // Rename image
   image(0).setName("Anytone AT-D878UV Codeplug");
 
@@ -2117,11 +2142,6 @@ D878UVCodeplug::D878UVCodeplug(QObject *parent)
   image(0).addElement(ADDR_ROAMING_CHANNEL_BITMAP, ROAMING_CHANNEL_BITMAP_SIZE);
   // Roaming zone bitmaps
   image(0).addElement(ADDR_ROAMING_ZONE_BITMAP, ROAMING_ZONE_BITMAP_SIZE);
-}
-
-void
-D878UVCodeplug::clear() {
-  D868UVCodeplug::clear();
 }
 
 void
@@ -2397,7 +2417,7 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
 
   // replaces D868UVCodeplug::createGPSSystems
 
-  // Before creating any GPS/APRS systems, get global auto TX intervall
+  // Before creating any GPS/APRS systems, get global auto TX interval
   AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTING));
   unsigned pos_intervall = aprs.autoTXInterval();
 

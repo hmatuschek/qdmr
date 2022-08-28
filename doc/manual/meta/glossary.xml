@@ -74,18 +74,20 @@
 
   <glossentry>
     <glossterm>Color Code</glossterm>
-    <para>
-      A color code is some additional information attached to each DMR call. It is used to prevent 
-      interference between repeaters with overlapping ranges that operate at the same frequencies. 
-      In amateur radio, this may only happen in very densely populated areas. It is much more 
-      frequent in commercial applications, where a single company may got only a few frequencies 
-      assigned but needs much more repeaters to cover a campus reliably.
-    </para>
-    <para>
-      The color code is a number between 0 and 16. A radio or repeater may only react to calls with
-      matching color codes. Hence beside the actual input and output frequencies, the color code of
-      a repeater must be known to be able to access it.
-    </para>
+    <glossdef>
+      <para>
+        A color code is some additional information attached to each DMR call. It is used to prevent 
+        interference between repeaters with overlapping ranges that operate at the same frequencies. 
+        In amateur radio, this may only happen in very densely populated areas. It is much more 
+        frequent in commercial applications, where a single company may got only a few frequencies 
+        assigned but needs much more repeaters to cover a campus reliably.
+      </para>
+      <para>
+        The color code is a number between 0 and 16. A radio or repeater may only react to calls with
+        matching color codes. Hence beside the actual input and output frequencies, the color code of
+        a repeater must be known to be able to access it.
+      </para>
+    </glossdef>
   </glossentry>
 
   <glossentry>
@@ -104,6 +106,21 @@
     </glossdef>
   </glossentry>
   
+  <glossentry>
+    <glossterm>DCDM</glossterm>
+    <glossdef>
+      <para>
+        Stands for dual capacity direct mode. This allows for two independent connections on a 
+        single simplex channel by TDMA. Lacking a single central repeater, one of the 
+        participants must act as the so-called <emphasis>leader</emphasis>. This radio then defines
+        the clock and thus time slot 1 and 2. All remaining participants must act as so-called 
+        <emphasis>follower</emphasis>. They must synchronize to the clock of the 
+        <emphasis>leader</emphasis>. This obviously requires that all participants can reach the 
+        <emphasis>leader</emphasis> directly.
+      </para>
+    </glossdef>
+  </glossentry>
+
   <glossentry>
     <glossterm>EchoLink</glossterm>
     <glossdef>
@@ -201,18 +218,66 @@
   </glossentry>
   
   <glossentry>
+    <glossterm>TDMA</glossterm>
+    <glossdef>
+      <para>
+        See Time Slot.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
     <glossterm>Time Slot</glossterm>
+    <glossdef>
+      <para>
+        Due to the lossy compression of audio data, it is possible to send more than twice the 
+        amount of audio data through a single 12.5kHz wide channel that needed. This allows to 
+        provide two independent audio streams within a single physical channel. 
+      </para>
+      <para>
+        There are basically two ways to separate these two audio stream. Either by frequency, 
+        effectively splitting the single 12.5kHz channel into two 6.25kHz wide ones. Alternatively,
+        one can split the channel in <quote>time</quote>. That is, the band width remains 12.5kHz
+        but each of the two simultaneous participants sends one after the other. One in time slot 1
+        and the other in time slot 2. This is called TDMA and DMR uses this technique to provide 
+        two independent audio and data streams within a single physical channel.
+      </para>
+      <para>
+        For this TDMA to work, one participant needs to define the <quote>clock</quote> to specify
+        when time slot 1 or 2 happen. This role is usually taken by the repeater but on direct 
+        simplex connections, one of the participants might provide that clock. This is then called
+        DCDM (Dual-Capacity Direct Mode). This mode, however, makes little sense in amateur radio
+        context.
+      </para>
+    </glossdef>
   </glossentry>
 
   <glossentry>
     <glossterm>Transmit Contact</glossterm>
+    <glossdef>
+      <para>
+        A transmit or default contact can be specified for each DMR channel. Some radios actually 
+        require that each channel has an transmit contact. This contact can be any contact you want
+        to call whenever the PTT is pressed on that channel. 
+      </para>
+      <para>
+        It, however, possible to answer any received call directly by pressing the PTT button 
+        within the so-called hang time, although the call may not match the transmit contact. 
+        These hang times can be set within the radio settings, usually for private and group calls
+        separately.
+      </para>
+      <para>
+        It is also possible to call any contact by selecting it from the contact list or by 
+        entering the contacts DMR ID into the keypad.
+      </para>
+    </glossdef>
   </glossentry>
 
   <glossentry>
     <glossterm>Transmit Timeout</glossterm> <acronym>TOT</acronym>
     <glossdef>
       <para>
-        Specifies the time of continuos transmission, after which the transmission is interrupted 
+        Specifies the time of continuous transmission, after which the transmission is interrupted 
         automatically. This prevents the accidental blocking of a repeater or talk group by 
         transmitting continuously. 
       </para>
@@ -221,9 +286,34 @@
 
   <glossentry>
     <glossterm>Scan List</glossterm>
+    <glossdef>
+      <para>
+        A scan list is just a list of analog and digital channels that one wants to scan. A scan
+        list can be associated with each channel. This scan list is then used whenever a scan is
+        started on that channel.
+      </para>
+    </glossdef>
   </glossentry>
 
   <glossentry>
     <glossterm>Zone</glossterm>
+    <glossdef>
+      <para>
+        As there are usually several channels defined per repeater (at least two), the number of 
+        defined channels grows rapidly. To organize this large number of channels, zones are used.
+        These zones usually collect all relevant channels for a region. That is all (analog and 
+        digital) channels associated with the local repeaters. The relevant zone is then selected 
+        via the keypad on the radio and only those channels in that zone are then accessible. 
+      </para>
+      <note>
+        <para>
+          A defined channel that is not member of any zone is usually not accessible in the radio.
+        </para>
+      </note>
+      <para>
+        Some radios allow to specify a different zones for each VFO. Others set a zone globally. 
+        In the latter case, the zone consists of two channel lists. One for each VFO.
+      </para>
+    </glossdef>
   </glossentry>
 </glossary>

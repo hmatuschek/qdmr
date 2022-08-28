@@ -36,8 +36,8 @@ PositioningSystem::setPeriod(unsigned period) {
 }
 
 bool
-PositioningSystem::populate(YAML::Node &node, const ConfigItem::Context &context) {
-  if (! ConfigObject::populate(node, context))
+PositioningSystem::populate(YAML::Node &node, const ConfigItem::Context &context, const ErrorStack &err) {
+  if (! ConfigObject::populate(node, context, err))
     return false;
   return true;
 }
@@ -181,8 +181,8 @@ GPSSystem::setRevert(DigitalChannelReference *channel) {
 }
 
 YAML::Node
-GPSSystem::serialize(const Context &context) {
-  YAML::Node node = PositioningSystem::serialize(context);
+GPSSystem::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = PositioningSystem::serialize(context, err);
   if (node.IsNull())
     return node;
   YAML::Node type; type["dmr"] = node;
@@ -319,8 +319,8 @@ APRSSystem::setMessage(const QString &msg) {
 }
 
 YAML::Node
-APRSSystem::serialize(const Context &context) {
-  YAML::Node node = PositioningSystem::serialize(context);
+APRSSystem::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = PositioningSystem::serialize(context, err);
   if (node.IsNull())
     return node;
   YAML::Node type; type["aprs"] = node;
@@ -328,8 +328,8 @@ APRSSystem::serialize(const Context &context) {
 }
 
 bool
-APRSSystem::populate(YAML::Node &node, const Context &context) {
-  if (! PositioningSystem::populate(node, context))
+APRSSystem::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
+  if (! PositioningSystem::populate(node, context, err))
     return false;
 
   node["destination"] = QString("%1-%2").arg(_destination).arg(_destSSID).toStdString();

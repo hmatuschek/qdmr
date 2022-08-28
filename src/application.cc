@@ -8,6 +8,7 @@
 #include "codeplug.hh"
 #include "config.h"
 #include "settings.hh"
+#include "radiolimits.hh"
 #include "verifydialog.hh"
 #include "analogchanneldialog.hh"
 #include "digitalchanneldialog.hh"
@@ -17,7 +18,7 @@
 #include "gpssystemdialog.hh"
 #include "roamingzonedialog.hh"
 #include "aprssystemdialog.hh"
-#include "repeaterdatabase.hh"
+#include "repeaterbookcompleter.hh"
 #include "userdatabase.hh"
 #include "talkgroupdatabase.hh"
 #include "searchpopup.hh"
@@ -57,7 +58,7 @@ Application::Application(int &argc, char *argv[])
   onPaletteChanged(palette());
 
   Settings settings;
-  _repeater   = new RepeaterDatabase(settings.position(), 7, this);
+  _repeater   = new RepeaterBookList(this);
   _users      = new UserDatabase(30, this);
   _talkgroups = new TalkGroupDatabase(30, this);
   _config = new Config(this);
@@ -140,8 +141,7 @@ Application::talkgroup() const {
   return _talkgroups;
 }
 
-RepeaterDatabase *
-Application::repeater() const{
+RepeaterBookList *Application::repeater() const{
   return _repeater;
 }
 
@@ -178,7 +178,6 @@ Application::createMainWindow() {
 
   QAction *refreshCallsignDB  = _mainWindow->findChild<QAction*>("actionRefreshCallsignDB");
   QAction *refreshTalkgroupDB  = _mainWindow->findChild<QAction*>("actionRefreshTalkgroupDB");
-  QAction *refreshRepeaterDB  = _mainWindow->findChild<QAction*>("actionRefreshRepeaterDB");
 
   QAction *about   = _mainWindow->findChild<QAction*>("actionAbout");
   QAction *sett    = _mainWindow->findChild<QAction*>("actionSettings");
@@ -195,7 +194,6 @@ Application::createMainWindow() {
 
   connect(refreshCallsignDB, SIGNAL(triggered()), _users, SLOT(download()));
   connect(refreshTalkgroupDB, SIGNAL(triggered()), _talkgroups, SLOT(download()));
-  connect(refreshRepeaterDB, SIGNAL(triggered()), _repeater, SLOT(download()));
 
   connect(findDev, SIGNAL(triggered()), this, SLOT(detectRadio()));
   connect(verCP, SIGNAL(triggered()), this, SLOT(verifyCodeplug()));
@@ -253,7 +251,7 @@ Application::createMainWindow() {
 
   // Wire-up "extension view"
   _extensionView = new ExtensionView();
-  _extensionView->setObject(_config);
+  _extensionView->setObject(_config, _config);
   tabs->addTab(_extensionView, tr("Extensions"));
 
   if (! settings.showCommercialFeatures()) {
@@ -356,7 +354,7 @@ Application::saveCodeplug() {
 
   if (filename.endsWith(".conf") || filename.endsWith("csv")){
     QMessageBox::critical(nullptr, tr("Please use new YAML format."),
-                          tr("Saveing in the old table-based conf format was disabled with 0.9.0. "
+                          tr("Saving in the old table-based conf format was disabled with 0.9.0. "
                              "Reading these files still works."));
     return;
   }
@@ -459,7 +457,7 @@ Application::detectRadio() {
 
 
 bool
-Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &flags) {
+Application::verifyCodeplug(Radio *radio, bool showSuccess) {
   Radio *myRadio = radio;
 
   // If no radio is given -> try to detect the radio
@@ -468,13 +466,13 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &f
   if (nullptr == myRadio)
     return false;
 
-
+  Settings settings;
+  RadioLimitContext ctx(settings.ignoreFrequencyLimits());
+  myRadio->limits().verifyConfig(_config, ctx);
   bool verified = true;
-  QList<VerifyIssue> issues;
-  VerifyIssue::Type maxIssue = myRadio->verifyConfig(_config, issues, flags);
-  if ( (flags.ignoreWarnings && (maxIssue>VerifyIssue::WARNING)) ||
-       ((!flags.ignoreWarnings) && (maxIssue>=VerifyIssue::WARNING)) ) {
-    VerifyDialog dialog(issues, (nullptr != radio));
+  if ( (settings.ignoreVerificationWarning() && (ctx.maxSeverity()>RadioLimitIssue::Warning)) ||
+       ((!settings.ignoreVerificationWarning()) && (ctx.maxSeverity()>=RadioLimitIssue::Warning)) ) {
+    VerifyDialog dialog(ctx, (nullptr != radio));
     if (QDialog::Accepted != dialog.exec())
       verified = false;
   } else if (showSuccess) {
@@ -565,15 +563,7 @@ Application::uploadCodeplug() {
   if (nullptr == radio)
     return;
 
-
-  // Verify codeplug against the detected radio before uploading,
-  // but do not show a message on success.
-  VerifyFlags flags = {
-    settings.ignoreVerificationWarning(),
-    settings.ignoreFrequencyLimits()
-  };
-
-  if (! verifyCodeplug(radio, false, flags)) {
+  if (! verifyCodeplug(radio, false)) {
     radio->deleteLater();
     return;
   }
@@ -604,7 +594,7 @@ Application::uploadCallsignDB() {
   if (nullptr == radio)
     return;
 
-  if (! radio->features().hasCallsignDB) {
+  if (! radio->limits().hasCallSignDB()) {
     logDebug() << "Radio " << radio->name() << " does not support call-sign DB.";
     QMessageBox::information(nullptr, tr("Cannot write call-sign DB."),
                              tr("The detected radio '%1' does not support "
@@ -613,7 +603,7 @@ Application::uploadCallsignDB() {
     radio->deleteLater();
     return;
   }
-  if (! radio->features().callsignDBImplemented) {
+  if (! radio->limits().callSignDBImplemented()) {
     logDebug() << "Radio " << radio->name()
                << " does support call-sign DB but it is not implemented yet.";
     QMessageBox::critical(nullptr, tr("Cannot write call-sign DB."),

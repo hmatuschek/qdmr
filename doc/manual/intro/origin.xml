@@ -77,7 +77,7 @@
 <para> 
   DMR was designed to implements such complex communication networks without requiring from every
   participant to have detailed knowledge about the structure of the network. That is, the knowledge 
-  about where every repeater is installed and which participants are reachable on wich repeater.
+  about where every repeater is installed and which participants are reachable on which repeater.
 </para>
 
 <note>
@@ -172,7 +172,7 @@
 </para>
 
 <para>
-  This is due to the fact, that the DMR network does not know wich participants are members of 
+  This is due to the fact, that the DMR network does not know which participants are members of 
   which groups. As the cleaning crew is usually not on the apron, the apron repeater has not 
   subscribed the talk group <quote>cleaning</quote>. Therefore, it does not forward group calls 
   to that talk group.

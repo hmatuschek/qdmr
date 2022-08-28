@@ -13,6 +13,17 @@ inline QStringList enumKeys(const QMetaEnum &e) {
   return lst;
 }
 
+inline bool isInstanceOf(QObject *obj, const QStringList &typeNames) {
+  const QMetaObject *type = obj->metaObject();
+  while (type) {
+    if (typeNames.contains(type->className()))
+      return true;
+    type = type->superClass();
+  }
+  return false;
+}
+
+
 /* ********************************************************************************************* *
  * Implementation of ConfigObject::Context
  * ********************************************************************************************* */
@@ -219,20 +230,21 @@ ConfigItem::copy(const ConfigItem &other) {
 }
 
 bool
-ConfigItem::label(ConfigObject::Context &context) {
+ConfigItem::label(ConfigObject::Context &context, const ErrorStack &err) {
   // Label properties owning config objects, that is of type ConfigObject or ConfigObjectList
   const QMetaObject *meta = metaObject();
+
   for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
     QMetaProperty prop = meta->property(p);
     if (! prop.isValid())
       continue;
     if (prop.read(this).value<ConfigObjectList *>()) {
       ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>();
-      if (! lst->label(context))
+      if (! lst->label(context, err))
         return false;
     } else if (prop.read(this).value<ConfigItem *>()) {
       ConfigItem *obj = prop.read(this).value<ConfigItem *>();
-      if (! obj->label(context))
+      if (! obj->label(context, err))
         return false;
     }
   }
@@ -242,9 +254,9 @@ ConfigItem::label(ConfigObject::Context &context) {
 
 
 YAML::Node
-ConfigItem::serialize(const Context &context) {
+ConfigItem::serialize(const Context &context, const ErrorStack &err) {
   YAML::Node node;
-  if (! populate(node, context))
+  if (! populate(node, context, err))
     return YAML::Node();
   return node;
 }
@@ -272,7 +284,7 @@ ConfigItem::clear() {
 }
 
 bool
-ConfigItem::populate(YAML::Node &node, const Context &context){
+ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack &err){
   // Serialize all properties
   const QMetaObject *meta = metaObject();
   for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
@@ -289,10 +301,10 @@ ConfigItem::populate(YAML::Node &node, const Context &context){
       QVariant value = prop.read(this);
       const char *key = e.valueToKey(value.toInt());
       if (nullptr == key) {
-        logError() << "Cannot map value " << value.toUInt()
-                   << " to enum " << e.name()
-                   << ". Ignore attribute but this points to an incompatibility in some codeplug. "
-                   << "Consider reporting it to https://github.com/hmatuschek/qdmr/issues.";
+        errMsg(err) << "Cannot map value " << value.toUInt()
+                    << " to enum " << e.name()
+                    << ". Ignore attribute but this points to an incompatibility in some codeplug. "
+                    << "Consider reporting it to https://github.com/hmatuschek/qdmr/issues.";
         continue;
       }
       node[prop.name()] = key;
@@ -316,8 +328,8 @@ ConfigItem::populate(YAML::Node &node, const Context &context){
         node[prop.name()] = tag;
         continue;
       } else if (! context.contains(obj)) {
-        logError() << "Cannot reference object of type " << obj->metaObject()->className()
-                   << " object not labeled.";
+        errMsg(err) << "Cannot reference object of type " << obj->metaObject()->className()
+                    << " object not labeled.";
         return false;
       }
       node[prop.name()] = context.getId(obj).toStdString();
@@ -334,8 +346,8 @@ ConfigItem::populate(YAML::Node &node, const Context &context){
           list.push_back(tag);
           continue;
         } else if (! context.contains(obj)) {
-          logError() << "Cannot reference object of type " << obj->metaObject()->className()
-                     << " object not labeled.";
+          errMsg(err) << "Cannot reference object of type " << obj->metaObject()->className()
+                      << " object not labeled.";
           return false;
         }
         list.push_back(context.getId(obj).toStdString());
@@ -519,7 +531,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       if ((nullptr == obj) && prop.isWritable()) {
         if (nullptr == (obj = this->allocateChild(prop, node[prop.name()], ctx))) {
           errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                                                       << ": Cannot allocate " << prop.name() << " of " << meta->className() << ".";
+                      << ": Cannot allocate " << prop.name() << " of " << meta->className() << ".";
           return false;
         }
         // Set property
@@ -533,12 +545,70 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       }
 
       // parse instance
-      if (obj && (! obj->parse(node[prop.name()], ctx))) {
+      YAML::Node propNode = node[prop.name()];
+      if (obj && (! obj->parse(propNode, ctx))) {
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot parse " << prop.name() << " of " << meta->className() << ".";
         if (nullptr == obj->parent())
           obj->deleteLater();
         return false;
+      }
+    } else if (prop.read(this).value<ConfigObjectList *>()) {
+      if (! node[prop.name()])
+        continue;
+      // check type
+      if (! node[prop.name()].IsSequence()) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected instance of '"
+                    << QMetaType::metaObjectForType(prop.userType())->className() << "'.";
+        return false;
+      }
+      // Get list
+      ConfigObjectList *lst = prop.read(this).value<ConfigObjectList*>();
+      // If not set and writable -> allocate and set
+      if ((nullptr == lst) && prop.isWritable()) {
+        if (nullptr == (lst = this->allocateChild(prop, node[prop.name()], ctx)->as<ConfigObjectList>())) {
+          errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                      << ": Cannot allocate list " << prop.name() << " of " << meta->className() << ".";
+          return false;
+        }
+        // Set property
+        if (! prop.write(this, QVariant::fromValue(lst))) {
+          if (nullptr == lst->parent())
+            lst->deleteLater();
+          errMsg(err) << "Cannot set writable property '" << prop.name()
+                      << "' in " << this->metaObject()->className() << ".";
+          return false;
+        }
+      }
+
+      // Allocate elements
+      ConfigObject *obj = nullptr;
+      for (YAML::const_iterator it=node[prop.name()].begin(); it!=node[prop.name()].end(); it++) {
+        // allocate element
+        if (nullptr == (obj = lst->allocateChild(*it, ctx, err)->as<ConfigObject>())) {
+          errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                      << ": Cannot allocate child of list.";
+          return false;
+        }
+        // parse element
+        if (obj && (! obj->parse(*it, ctx))) {
+          errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                      << ": Cannot parse object of type " << obj->metaObject()->className();
+          if (nullptr == obj->parent())
+            obj->deleteLater();
+          return false;
+        }
+        // add element to list
+        if (-1 == lst->add(obj)) {
+          errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                      << ": Cannot add element '" << obj->name() << "' of type "
+                      << obj->metaObject()->className() << "' to list.";
+          if (nullptr == obj->parent())
+            obj->deleteLater();
+          return false;
+        }
       }
     }
   }
@@ -556,6 +626,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
     QMetaProperty prop = meta->property(p);
     if (! prop.isValid())
       continue;
+
     if (! prop.isScriptable()) {
       //logDebug() << "Do not link property '" << prop.name() << "': Marked as not scriptable.";
       continue;
@@ -625,7 +696,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
           if (0 > lst->add(ctx.getTag(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
             errMsg(err) << it->Mark().line << ":" << it->Mark().column
                         << ": Cannot link " << prop.name() << " of " << meta->className()
-                        << ": Cannot add referece for tag '" << tag << "'.";
+                        << ": Cannot add reference for tag '" << tag << "'.";
             return false;
           }
           continue;
@@ -658,7 +729,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
         return false;
       }
 
-      if (! obj->link(node[prop.name()], ctx)) {
+      if (! obj->link(node[prop.name()], ctx, err)) {
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot link " << prop.name() << " of " << meta->className() << ".";
         return false;
@@ -676,7 +747,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
         return false;
       }
 
-      if (! lst->link(node[prop.name()], ctx)) {
+      if (! lst->link(node[prop.name()], ctx, err)) {
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot link " << prop.name() << " of " << meta->className() << ".";
         return false;
@@ -685,6 +756,40 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
   }
 
   return true;
+}
+
+const Config *
+ConfigItem::config() const {
+  if (nullptr == parent())
+    return nullptr;
+  if (ConfigItem *item = qobject_cast<ConfigItem*>(parent()))
+    return item->config();
+  if (ConfigObjectList *lst = qobject_cast<ConfigObjectList*>(parent()))
+    return lst->config();
+  return nullptr;
+}
+
+void
+ConfigItem::findItemsOfTypes(const QStringList &typeNames, QSet<ConfigItem *> &items) const {
+  // Do not check yourself
+  const QMetaObject *meta = metaObject();
+
+  // Visit all properties
+  for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
+    QMetaProperty prop = meta->property(p);
+    if (! prop.isValid())
+      continue;
+    if (! prop.isReadable())
+      continue;
+
+    if (ConfigItem *obj = prop.read(this).value<ConfigItem *>()) {
+      if (isInstanceOf(obj, typeNames))
+        items.insert(obj);
+      obj->findItemsOfTypes(typeNames, items);
+    } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
+      lst->findItemsOfTypes(typeNames, items);
+    }
+  }
 }
 
 bool
@@ -720,7 +825,7 @@ ConfigItem::hasLongDescription(const QMetaProperty &prop) const {
 QString
 ConfigItem::description() const {
   if (! hasDescription())
-    return QString();
+    return metaObject()->className();
   const QMetaObject *meta = metaObject();
   return meta->classInfo(meta->indexOfClassInfo("description")).value();
 }
@@ -781,10 +886,7 @@ ConfigObject::setName(const QString &name) {
 }
 
 bool
-ConfigObject::label(ConfigObject::Context &context) {
-  if (! ConfigItem::label(context))
-    return false;
-
+ConfigObject::label(ConfigObject::Context &context, const ErrorStack &err) {
   // With empty ID base, skip labeling.
   if (_idBase.isEmpty())
     return true;
@@ -795,25 +897,15 @@ ConfigObject::label(ConfigObject::Context &context) {
     id=QString("%1%2").arg(_idBase).arg(++n);
   }
 
-  if (! context.add(id, this))
+  if (! context.add(id, this)) {
+    if (context.contains(this))
+      errMsg(err) << "Object already in context with id '" << context.getId(this) << "'.";
+    errMsg(err) << "Cannot add element '" << id << "' to context.";
     return false;
-
-  // Label properties owning config objects, that is of type ConfigObject or ConfigObjectList
-  const QMetaObject *meta = metaObject();
-  for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
-    QMetaProperty prop = meta->property(p);
-    if (! prop.isValid())
-      continue;
-    if (prop.read(this).value<ConfigObjectList *>()) {
-      ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>();
-      if (! lst->label(context))
-        return false;
-    } else if (prop.read(this).value<ConfigItem *>()) {
-      ConfigItem *obj = prop.read(this).value<ConfigItem *>();
-      if (! obj->label(context))
-        return false;
-    }
   }
+
+  if (! ConfigItem::label(context, err))
+    return false;
 
   return true;
 }
@@ -837,10 +929,10 @@ ConfigObject::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
 }
 
 bool
-ConfigObject::populate(YAML::Node &node, const Context &context) {
+ConfigObject::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
   if (context.contains(this))
     node["id"] = context.getId(this).toStdString();
-  return ConfigItem::populate(node, context);
+  return ConfigItem::populate(node, context, err);
 }
 
 
@@ -858,7 +950,13 @@ ConfigExtension::ConfigExtension(QObject *parent)
  * Implementation of AbstractConfigObjectList
  * ********************************************************************************************* */
 AbstractConfigObjectList::AbstractConfigObjectList(const QMetaObject &elementType, QObject *parent)
-  : QObject(parent), _elementType(elementType), _items()
+  : QObject(parent), _elementTypes(), _items()
+{
+  _elementTypes.append(elementType);
+}
+
+AbstractConfigObjectList::AbstractConfigObjectList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent)
+  : QObject(parent), _elementTypes(elementTypes), _items()
 {
   // pass...
 }
@@ -866,7 +964,7 @@ AbstractConfigObjectList::AbstractConfigObjectList(const QMetaObject &elementTyp
 bool
 AbstractConfigObjectList::copy(const AbstractConfigObjectList &other) {
   this->clear();
-  _elementType = other._elementType;
+  _elementTypes = other._elementTypes;
   foreach (ConfigObject *item, other._items)
     add(item);
   return true;
@@ -890,6 +988,24 @@ AbstractConfigObjectList::clear() {
   }
 }
 
+const Config *
+AbstractConfigObjectList::config() const {
+  if (nullptr == parent())
+    return nullptr;
+  if (ConfigItem *item = qobject_cast<ConfigItem *>(parent()))
+    return item->config();
+  return nullptr;
+}
+
+void
+AbstractConfigObjectList::findItemsOfTypes(const QStringList &typeNames, QSet<ConfigItem *> &items) const {
+  foreach (ConfigObject *obj, _items) {
+    if (isInstanceOf(obj, typeNames))
+      items.insert(obj);
+    obj->findItemsOfTypes(typeNames, items);
+  }
+}
+
 ConfigObject *AbstractConfigObjectList::get(int idx) const {
   return _items.value(idx, nullptr);
 }
@@ -898,16 +1014,23 @@ int AbstractConfigObjectList::add(ConfigObject *obj, int row) {
   // Ignore nullptr
   if (nullptr == obj)
     return -1;
-  // If alread in list -> ignore
+  // If already in list -> ignore
   if (0 <= indexOf(obj))
     return -1;
   if (-1 == row)
     row = _items.size();
   // Check type
-  if (! obj->inherits(_elementType.className())) {
+  bool matchesType = false;
+  foreach (const QMetaObject &type, _elementTypes) {
+    if (obj->inherits(type.className())) {
+      matchesType = true;
+      break;
+    }
+  }
+  if (! matchesType) {
     logError() << "Cannot add element of type " << obj->metaObject()->className()
-               << " to list, expected instances of " << _elementType.className();
-    return false;
+               << " to list, expected instances of " << classNames().join(", ");
+    return -1;
   }
   _items.insert(row, obj);
   // Otherwise connect to object
@@ -971,9 +1094,18 @@ AbstractConfigObjectList::moveDown(int first, int last) {
   return true;
 }
 
-const QMetaObject &
-AbstractConfigObjectList::elementType() const {
-  return _elementType;
+const QList<QMetaObject> &
+AbstractConfigObjectList::elementTypes() const {
+  return _elementTypes;
+}
+
+QStringList
+AbstractConfigObjectList::classNames() const {
+  QStringList cls;
+  foreach (const QMetaObject &type, _elementTypes) {
+    cls.append(type.className());
+  }
+  return cls;
 }
 
 void
@@ -1004,20 +1136,26 @@ ConfigObjectList::ConfigObjectList(const QMetaObject &elementType, QObject *pare
   // pass...
 }
 
+ConfigObjectList::ConfigObjectList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent)
+  : AbstractConfigObjectList(elementTypes, parent)
+{
+  // pass...
+}
+
 bool
-ConfigObjectList::label(ConfigItem::Context &context) {
+ConfigObjectList::label(ConfigItem::Context &context, const ErrorStack &err) {
   foreach (ConfigItem *obj, _items) {
-    if (! obj->label(context))
+    if (! obj->label(context, err))
       return false;
   }
   return true;
 }
 
 YAML::Node
-ConfigObjectList::serialize(const ConfigItem::Context &context) {
+ConfigObjectList::serialize(const ConfigItem::Context &context, const ErrorStack &err) {
   YAML::Node list(YAML::NodeType::Sequence);
   foreach (ConfigItem *obj, _items) {
-    YAML::Node node = obj->serialize(context);
+    YAML::Node node = obj->serialize(context, err);
     if (node.IsNull())
       return node;
     list.push_back(node);
@@ -1119,8 +1257,8 @@ ConfigObjectList::clear() {
 
 bool
 ConfigObjectList::copy(const AbstractConfigObjectList &other) {
-  this->clear();
-  _elementType = other.elementType();
+  clear();
+  _elementTypes = other.elementTypes();
   for (int i=0; i<other.count(); i++)
     add(other.get(i)->clone()->as<ConfigObject>());
   return true;
@@ -1136,19 +1274,27 @@ ConfigObjectRefList::ConfigObjectRefList(const QMetaObject &elementType, QObject
   // pass...
 }
 
+ConfigObjectRefList::ConfigObjectRefList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent)
+  : AbstractConfigObjectList(elementTypes, parent)
+{
+  // pass...
+}
+
 bool
-ConfigObjectRefList::label(ConfigItem::Context &context) {
-  Q_UNUSED(context)
+ConfigObjectRefList::label(ConfigItem::Context &context, const ErrorStack &err) {
+  Q_UNUSED(context); Q_UNUSED(err);
   // pass...
   return true;
 }
 
 YAML::Node
-ConfigObjectRefList::serialize(const ConfigItem::Context &context) {
+ConfigObjectRefList::serialize(const ConfigItem::Context &context, const ErrorStack &err) {
   YAML::Node list(YAML::NodeType::Sequence);
   foreach (ConfigObject *obj, _items) {
-    if (! context.contains(obj))
+    if (! context.contains(obj)) {
+      errMsg(err) << "Cannot serialized ref list: Object '" << obj->name() << "' not in context!";
       return YAML::Node();
+    }
     list.push_back(context.getId(obj).toStdString());
   }
   return list;

@@ -10,7 +10,7 @@
 #include "radio.hh"
 
 class QMainWindow;
-class RepeaterDatabase;
+class RepeaterBookList;
 class UserDatabase;
 class TalkGroupDatabase;
 class RadioIDListView;
@@ -35,7 +35,7 @@ public:
   QMainWindow *mainWindow();
 
   UserDatabase *user() const;
-  RepeaterDatabase *repeater() const;
+  RepeaterBookList *repeater() const;
   TalkGroupDatabase *talkgroup() const;
 
   bool hasPosition() const;
@@ -45,6 +45,7 @@ public:
 
   bool isDarkMode() const;
   bool isDarkMode(const QPalette &palette) const;
+
 public slots:
   void newCodeplug();
   void loadCodeplug();
@@ -52,8 +53,7 @@ public slots:
   void quitApplication();
 
   void detectRadio();
-  bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true,
-                      const VerifyFlags &flags=VerifyFlags());
+  bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true);
 
   void downloadCodeplug();
   void uploadCodeplug();
@@ -93,7 +93,7 @@ protected:
   RoamingZoneListView *_roamingZoneList;
   ExtensionView *_extensionView;
 
-  RepeaterDatabase *_repeater;
+  RepeaterBookList *_repeater;
   UserDatabase *_users;
   TalkGroupDatabase *_talkgroups;
 

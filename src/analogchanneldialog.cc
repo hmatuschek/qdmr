@@ -2,10 +2,9 @@
 #include "application.hh"
 #include <QCompleter>
 #include "ctcssbox.hh"
-#include "repeaterdatabase.hh"
 #include "utils.hh"
 #include "settings.hh"
-
+#include "repeaterbookcompleter.hh"
 
 /* ********************************************************************************************* *
  * Implementation of AnalogChannelDialog
@@ -34,11 +33,10 @@ AnalogChannelDialog::construct() {
   Settings settings;
 
   Application *app = qobject_cast<Application *>(qApp);
-  FMRepeaterFilter *filter = new FMRepeaterFilter(this);
+  FMRepeaterFilter *filter = new FMRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
-  QCompleter *completer = new QCompleter(filter, this);
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-  completer->setCompletionColumn(0);
+  QCompleter *completer = new RepeaterBookCompleter(2, app->repeater(), this);
+  completer->setModel(filter);
   channelName->setCompleter(completer);
   connect(completer, SIGNAL(activated(const QModelIndex &)),
           this, SLOT(onRepeaterSelected(const QModelIndex &)));
@@ -57,7 +55,7 @@ AnalogChannelDialog::construct() {
   for (int i=0; i<_config->scanlists()->count(); i++) {
     ScanList *lst = _config->scanlists()->scanlist(i);
     scanList->addItem(lst->name(),QVariant::fromValue(lst));
-    if (_myChannel && (_myChannel->scanListObj() == lst) )
+    if (_myChannel && (_myChannel->scanList() == lst) )
       scanList->setCurrentIndex(i+1);
   }
   txAdmit->setItemData(0, unsigned(AnalogChannel::Admit::Always));
@@ -118,7 +116,7 @@ AnalogChannelDialog::construct() {
     tabWidget->tabBar()->hide();
 
   extensionView->setObjectName("AnalogChannelExtension");
-  extensionView->setObject(_myChannel);
+  extensionView->setObject(_myChannel, _config);
 
   connect(powerDefault, SIGNAL(toggled(bool)), this, SLOT(onPowerDefaultToggled(bool)));
   connect(totDefault, SIGNAL(toggled(bool)), this, SLOT(onTimeoutDefaultToggled(bool)));
@@ -152,7 +150,7 @@ AnalogChannelDialog::channel()
   _myChannel->setRXTone(Signaling::Code(rxTone->currentData().toUInt()));
   _myChannel->setTXTone(Signaling::Code(txTone->currentData().toUInt()));
   _myChannel->setBandwidth(AnalogChannel::Bandwidth(bandwidth->currentData().toUInt()));
-  _myChannel->setScanListObj(scanList->currentData().value<ScanList *>());
+  _myChannel->setScanList(scanList->currentData().value<ScanList *>());
   _myChannel->setAPRSSystem(aprsList->currentData().value<APRSSystem *>());
   if (voxDefault->isChecked())
     _myChannel->setVOXDefault();
@@ -178,8 +176,14 @@ AnalogChannelDialog::onRepeaterSelected(const QModelIndex &index) {
         channelName->completer()->completionModel())->mapToSource(index);
   src = qobject_cast<QAbstractProxyModel*>(
         channelName->completer()->model())->mapToSource(src);
-  double rx = app->repeater()->repeater(src.row()).value("tx").toDouble();
-  double tx = app->repeater()->repeater(src.row()).value("rx").toDouble();
+  double rx = app->repeater()->repeater(src.row())->rxFrequency();
+  double tx = app->repeater()->repeater(src.row())->txFrequency();
+  int idx = rxTone->findData(app->repeater()->repeater(src.row())->rxTone());
+  if (0 <= idx)
+    rxTone->setCurrentIndex(idx);
+  idx = txTone->findData(app->repeater()->repeater(src.row())->txTone());
+  if (0 <= idx)
+    txTone->setCurrentIndex(idx);
   txFrequency->setText(QString::number(tx, 'f'));
   rxFrequency->setText(QString::number(rx, 'f'));
 }

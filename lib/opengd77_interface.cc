@@ -31,6 +31,14 @@ OpenGD77Interface::ReadRequest::initReadFlash(uint32_t addr, uint16_t length) {
   return true;
 }
 
+bool
+OpenGD77Interface::ReadRequest::initReadFirmwareInfo() {
+  this->type = 'R';
+  this->command = READ_FIRMWARE_INFO;
+  this->address = 0;
+  this->length = 0;
+  return true;
+}
 
 /* ********************************************************************************************* *
  * Implementation of OpenGD77Interface::WriteRequest

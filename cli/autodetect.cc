@@ -69,7 +69,7 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app, const ErrorStack &
     // If no device is specified, there should only be one interface
     ErrorStack::MessageStream msg(err, __FILE__, __LINE__);
     msg << "Cannot auto-detect radio, more than one matching USB devices found:"
-        << " Use --device option to specifiy to which device to talk to. Devices found:\n";
+        << " Use --device option to specify to which device to talk to. Devices found:\n";
     printDevices(msg, interfaces);
     return nullptr;
   } else if (! interfaces.first().isSave()) {
@@ -89,7 +89,7 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app, const ErrorStack &
   if (parser.isSet("radio")) {
     RadioInfo radio = RadioInfo::byKey(parser.value("radio").toLower());
     if (! radio.isValid()) {
-      errMsg(err) << "Uknown radio '" << parser.value("radio").toLower() << "'.";
+      errMsg(err) << "Unknown radio '" << parser.value("radio").toLower() << "'.";
       return nullptr;
     }
     Radio *rad = Radio::detect(device, radio, err);

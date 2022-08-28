@@ -2,7 +2,7 @@
  * This module collects all classes are device specific.
  *
  * That is, implementing device specific configurations, aka codeplugs as well as the specific
- * communication whith these radios.
+ * communication with these radios.
  */
 
 #ifndef RADIO_HH
@@ -17,61 +17,7 @@
 
 class Config;
 class UserDatabase;
-
-
-/** Simple container class to collect codeplug verification issues.
- * As all radios are programmed from a common configuration, some radios may not support all
- * features within the confiuration. Before uploading the device specific configuration, the
- * generic configuration gets verified against the device features. This may lead to several
- * issues/warning. This class represents such a issue/warning message.
- *
- * @ingroup rif */
-class VerifyIssue {
-public:
-  /** Issue type. */
-	typedef enum {
-    NONE = 0,     ///< All ok.
-    NOTIFICATION, ///< Inform user about changes made to the config to fit radio.
-    WARNING,      ///< Verification warning, some configured fature is just ignored for the particular radio.
-    ERROR         ///< Verification error, a consistent device specific configutation cannot be derived from the generic config.
-	} Type;
-
-public:
-  /** Constructor from @c type and @c message. */
-	inline VerifyIssue(Type type, const QString &message)
-	    : _type(type), _message(message) { }
-
-  /** Returns the verification issue type. */
-	inline Type type() const { return _type; }
-  /** Returns the verification issue message. */
-	inline const QString & message() const { return _message; }
-
-protected:
-  /** The issue type. */
-	Type _type;
-  /** The issue message. */
-	QString _message;
-};
-
-/** Flags to control the verification process.
- * @ingroup rif*/
-struct VerifyFlags {
-  /** If set, warnings will not interrupt the upload. */
-  bool ignoreWarnings;
-  /** If set, frequency limit voilations will be handled as warnings. */
-  bool ignoreFrequencyLimits;
-
-  /** Default constructor. */
-  inline VerifyFlags()
-    : ignoreWarnings(false), ignoreFrequencyLimits(false) {
-    // pass...
-  }
-  /** Full constructor. */
-  inline VerifyFlags(bool ignWarn, bool ignFreqLimits)
-    : ignoreWarnings(ignWarn), ignoreFrequencyLimits(ignFreqLimits) {
-    // pass...
-  }
-};
+class RadioLimits;
 
 
 /** Base class for all Radio objects.
@@ -87,121 +33,13 @@ class Radio : public QThread
 	Q_OBJECT
 
 public:
-  /** Represents a radio feature list, a generic configuration is verified against. */
-  struct Features {
-    /** Represents a frequency range [min, max]. */
-    struct FrequencyRange {
-      double min; ///< Lower frequency limit.
-      double max; ///< Upper frequency limit.
-      /** Constructs a frequency range from limits. */
-      FrequencyRange(double lower, double upper);
-      /** Constructs a frequency range from limits. */
-      FrequencyRange(double limits[2]);
-      /** Returns @c true if @c f is inside this limit. */
-      bool contains(double f) const;
-    };
-
-    /** A list of frequency limits. */
-    struct FrequencyLimits {
-      /** The actual list of frequency limits. */
-      QVector <FrequencyRange> ranges;
-      /** Constructs a list of frequency limits. */
-      FrequencyLimits(const QVector<FrequencyRange> &frequency_ranges);
-      /** Check if the given frequency is within one of the frequency limits. */
-      bool contains(double f) const;
-    };
-
-    /** If @c true, shows a beta warning at upload. */
-    bool betaWarning;
-
-    /** If @c true, the device supports DMR. */
-		bool hasDigital;
-    /** If @c true, the device supports FM. */
-		bool hasAnalog;
-
-    /** The frequency limits of the radio. */
-    FrequencyLimits frequencyLimits;
-
-    /** Maximum number of radio IDs. */
-    int maxRadioIDs;
-    /** If @c true, the radio requires a default radio ID. */
-    bool needsDefaultRadioID;
-
-    /** Maximum length of boot messages. */
-		int maxIntroLineLength;
-
-    /** Maximum number of channels. */
-		int maxChannels;
-    /** Maximum length of channel names. */
-		int maxChannelNameLength;
-    /** If @c true, the radio allows channels without default contact. */
-    bool allowChannelNoDefaultContact;
-
-    /** Maximum number of zones. */
-		int maxZones;
-    /** Maximum length of zone names. */
-		int maxZoneNameLength;
-    /** Maximum number of channels per zone. */
-		int maxChannelsInZone;
-    /** If @c true, the radio has a zone list for each VFO. */
-    bool hasABZone;
-
-    /** If true, the radio support scanlists. */
-    bool hasScanlists;
-    /** Maximum number of scanlists. */
-		int maxScanlists;
-    /** Maximum length of scanlist names. */
-		int maxScanlistNameLength;
-    /** Maximum number of channels per scanlist. */
-		int maxChannelsInScanlist;
-    /** Does scanlist needs a priority channel?. */
-    bool scanListNeedsPriority;
-
-    /** Maximum number of contacts. */
-		int maxContacts;
-    /** Maximum length of contact name. */
-		int maxContactNameLength;
-    /** Maximum number of RX group lists. */
-		int maxGrouplists;
-    /** Maximum length of grouplist name. */
-		int maxGrouplistNameLength;
-    /** Maximum number contacts per RX group list. */
-		int maxContactsInGrouplist;
-
-    /** If @c true, the device supports GPS. */
-    bool hasGPS;
-    /** Maximum number of different GPS systems. */
-    int maxGPSSystems;
-
-    /** If @c true, the device supports APRS (analog) position reporting. */
-    bool hasAPRS;
-    /** Maximum number of different APRS systems. */
-    int maxAPRSSystems;
-
-    /** If @c true, the device supports roaming. */
-    bool hasRoaming;
-    /** Specifies the maximum number of roaming channels. */
-    int maxRoamingChannels;
-    /** Specifies the maximum number of roaming zones. */
-    int maxRoamingZones;
-    /** Specifies the maximum number of channels per roaming zone. */
-    int maxChannelsInRoamingZone;
-
-    /** If true, the radio supports a callsign DB. */
-    bool hasCallsignDB;
-    /** If true, the callsign DB of the radio is implemented. */
-    bool callsignDBImplemented;
-    /** Maximum number of entries in callsign DB. */
-    unsigned maxCallsignsInDB;
-  };
-
   /** Possible states of the radio object. */
 	typedef enum {
     StatusIdle,            ///< Idle, nothing to do.
     StatusDownload,        ///< Downloading codeplug.
     StatusUpload,          ///< Uploading codeplug.
     StatusUploadCallsigns, ///< Uploading codeplug.
-    StatusError            ///< An error occured.
+    StatusError            ///< An error occurred.
   } Status;
 
 public:
@@ -212,11 +50,13 @@ public:
 
   /** Returns the name of the radio (e.g., device identifier). */
 	virtual const QString &name() const = 0;
-  /** Returns the features for the particular radio. */
-	virtual const Features &features() const = 0;
 
-  /** Returns some information about the specific radio. */
-  virtual RadioInfo info() const = 0;
+  /** Returns the limits for this radio.
+   *
+   * Call @c RadioLimits::verifyConfig to verify a codeplug with respect to a radio.
+   *
+   * @since Version 0.10.2 */
+  virtual const RadioLimits &limits() const = 0;
 
   /** Returns the codeplug instance. */
   virtual const Codeplug &codeplug() const = 0;
@@ -227,11 +67,6 @@ public:
   virtual const CallsignDB *callsignDB() const;
   /** Returns the call-sign DB instance. */
   virtual CallsignDB *callsignDB();
-
-  /** Verifies the configuration against the radio features.
-   * On exit, @c issues will contain the issues found and the maximum severity is returned. */
-  virtual VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
-                                         const VerifyFlags &flags=VerifyFlags());
 
   /** Returns the current status. */
   Status status() const;

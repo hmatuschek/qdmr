@@ -105,6 +105,8 @@ public:
   bool read_finish(const ErrorStack &err);
 
 public:
+  /** Returns some information about the interface. */
+  static USBDeviceInfo interfaceInfo();
   /** Searches for all USB serial ports matching Kydera devices. */
   static QList<USBDeviceDescriptor> detect();
 

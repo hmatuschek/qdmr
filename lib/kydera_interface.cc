@@ -2,7 +2,8 @@
 #include <QtEndian>
 
 #define BLOCK_SIZE 0x800 // 2048
-
+#define USB_VID    0x067B
+#define USB_PID    0x2303
 
 /* ********************************************************************************************* *
  * KyderaInterface::ReadRequest
@@ -89,9 +90,14 @@ KyderaInterface::isOpen() const {
   return USBSerial::isOpen() && (State::Error!=_state);
 }
 
+USBDeviceInfo
+KyderaInterface::interfaceInfo() {
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID, USB_PID);
+}
+
 QList<USBDeviceDescriptor>
 KyderaInterface::detect() {
-  return USBSerial::detect(0x067B, 0x2303);
+  return USBSerial::detect(USB_VID, USB_PID);
 }
 
 RadioInfo

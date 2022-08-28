@@ -14,7 +14,6 @@ class Zone;
 class RXGroupList;
 class ScanList;
 class GPSSystem;
-class CodeplugContext;
 
 
 /** Base class of all TyT codeplugs. This class implements the majority of all codeplug elements
@@ -51,7 +50,7 @@ public:
     enum PrivacyType {
       PRIV_NONE = 0,                ///< No privacy.
       PRIV_BASIC = 1,               ///< Basic privacy.
-      PRIV_ENHANCED = 2             ///< Enhenced privacy.
+      PRIV_ENHANCED = 2             ///< Enhanced privacy.
     };
 
     /** TX Admit criterion. */
@@ -82,7 +81,7 @@ public:
     /** Sets the mode of the channel. */
     virtual void setMode(Mode setMode);
 
-    /** Retuns the bandwidth of the (analog) channel. */
+    /** Returns the bandwidth of the (analog) channel. */
     virtual AnalogChannel::Bandwidth bandwidth() const;
     /** Sets the bandwidth of the (analog) channel. */
     virtual void setBandwidth(AnalogChannel::Bandwidth bw);
@@ -306,11 +305,11 @@ public:
   class ZoneElement: public Codeplug::Element
   {
   protected:
-    /** Construtor. */
+    /** Constructor. */
     ZoneElement(uint8_t *ptr, size_t size);
 
   public:
-    /** Construtor. */
+    /** Constructor. */
     ZoneElement(uint8_t *ptr);
     /** Desturctor. */
     virtual ~ZoneElement();
@@ -392,7 +391,7 @@ public:
     bool isValid() const;
     void clear();
 
-    /** Retruns the name of the scan list. */
+    /** Returns the name of the scan list. */
     virtual QString name() const;
     /** Sets the name of the scan list. */
     virtual void setName(const QString &nm);
@@ -558,7 +557,7 @@ public:
     /** Sets the scan analog hang time. */
     virtual void setScanAnalogHangTime(unsigned ms);
 
-    /** Retuns @c true if the backlight is always on. */
+    /** Returns @c true if the backlight is always on. */
     virtual bool backlightIsAlways() const;
     /** Returns the backlight time. */
     virtual unsigned backlightTime() const;
@@ -567,7 +566,7 @@ public:
     /** Turns the backlight always on. */
     virtual void backlightTimeSetAlways();
 
-    /** Retuns @c true if the keypad lock is manual. */
+    /** Returns @c true if the keypad lock is manual. */
     virtual bool keypadLockIsManual() const;
     /** Returns the keypad lock time. */
     virtual unsigned keypadLockTime() const;
@@ -693,7 +692,7 @@ public:
 
   /** Represents all menu settings within the codeplug on the radio.
    *
-   * Memory representaion of the menu settings:
+   * Memory representation of the menu settings:
    * @verbinclude tyt_menusettings.txt */
   class MenuSettingsElement: public Codeplug::Element
   {
@@ -908,7 +907,7 @@ public:
     OneTouchSettingElement(uint8_t *ptr, size_t size);
 
   public:
-    /** Constuctor. */
+    /** Constructor. */
     explicit OneTouchSettingElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~OneTouchSettingElement();
@@ -1075,14 +1074,34 @@ public:
 
     void clear();
 
+    /** Returns @c true if the n-th "enhanced" key (128bit) is set.
+     * That is, if it is not filled with 0xff. */
+    virtual bool isEnhancedKeySet(unsigned n) const;
     /** Returns the n-th "enhanced" key (128bit). */
-    virtual QByteArray enhancedKey(unsigned n);
+    virtual QByteArray enhancedKey(unsigned n) const;
     /** Sets the n-th "enhanced" key (128bit). */
     virtual void setEnhancedKey(unsigned n, const QByteArray &key);
+
+    /** Returns @c true if the n-th "basic" key (16bit) is set.
+     * That is, if it is not filled with 0xff. */
+    virtual bool isBasicKeySet(unsigned n) const;
     /** Returns the n-th "basic" key (16bit). */
-    virtual QByteArray basicKey(unsigned n);
+    virtual QByteArray basicKey(unsigned n) const;
     /** Sets the n-th "basic" key (16bit). */
     virtual void setBasicKey(unsigned n, const QByteArray &key);
+
+    /** Encodes given commercial extension. */
+    virtual bool fromCommercialExt(CommercialExtension *encr, Context &ctx);
+    /** Updates the commercial extension. */
+    virtual bool updateCommercialExt(Context &ctx);
+    /** Links the given encryption extension. */
+    virtual bool linkCommercialExt(CommercialExtension *ext, Context &ctx);
+
+  protected:
+    /** Number of enhanced keys. */
+    unsigned _numEnhancedKeys;
+    /** Number of basic keys. */
+    unsigned _numBasicKeys;
   };
 
 protected:
@@ -1181,12 +1200,17 @@ public:
   /** Decodes the button settings. */
   virtual bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack()) = 0;
 
+  /** Clears all encryption keys in the codeplug. */
+  virtual void clearPrivacyKeys() = 0;
+  /** Encodes the encryption keys. */
+  virtual bool encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes the encryption keys. */
+  virtual bool decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
   /** Clears the menu settings in the codeplug. */
   virtual void clearMenuSettings() = 0;
   /** Clears all text messages in the codeplug. */
   virtual void clearTextMessages() = 0;
-  /** Clears all encryption keys in the codeplug. */
-  virtual void clearPrivacyKeys() = 0;
   /** Clears all emergency systems in the codeplug. */
   virtual void clearEmergencySystems() = 0;
 };

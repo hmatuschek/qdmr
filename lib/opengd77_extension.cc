@@ -4,7 +4,7 @@
  * Implementation of OpenGD77ChannelExtension
  * ******************************************************************************************** */
 OpenGD77ChannelExtension::OpenGD77ChannelExtension(QObject *parent)
-  : ConfigExtension(parent), _power(Power::Global)
+  : ConfigExtension(parent), _power(Power::Global), _zoneSkip(false), _allSkip(false)
 {
   // pass...
 }
@@ -23,13 +23,29 @@ OpenGD77ChannelExtension::Power
 OpenGD77ChannelExtension::power() const {
   return _power;
 }
-
 void
 OpenGD77ChannelExtension::setPower(Power power) {
   _power = power;
   emit modified(this);
 }
 
+bool
+OpenGD77ChannelExtension::scanZoneSkip() const {
+  return _zoneSkip;
+}
+void
+OpenGD77ChannelExtension::enableScanZoneSkip(bool enable) {
+  _zoneSkip = enable;
+}
+
+bool
+OpenGD77ChannelExtension::scanAllSkip() const {
+  return _allSkip;
+}
+void
+OpenGD77ChannelExtension::enableScanAllSkip(bool enable) {
+  _allSkip = enable;
+}
 
 /* ******************************************************************************************** *
  * Implementation of OpenGD77ContactExtension

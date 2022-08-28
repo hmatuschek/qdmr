@@ -302,8 +302,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     }
     break;
   case 8:
-    if (channel->scanListObj()) {
-      return channel->scanListObj()->name();
+    if (channel->scanList()) {
+      return channel->scanList()->name();
     } else {
       return tr("-");
     }

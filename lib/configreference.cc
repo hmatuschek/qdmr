@@ -7,6 +7,7 @@
 #include "radioid.hh"
 #include "rxgrouplist.hh"
 #include "roaming.hh"
+#include "encryptionextension.hh"
 
 
 /* ********************************************************************************************* *
@@ -77,6 +78,11 @@ ConfigObjectReference::allow(const QMetaObject *elementType) {
   if (! _elementTypes.contains(elementType->className()))
     _elementTypes.append(elementType->className());
   return true;
+}
+
+const QStringList &
+ConfigObjectReference::elementTypeNames() const {
+  return _elementTypes;
 }
 
 void
@@ -259,6 +265,16 @@ GroupListReference::GroupListReference(QObject *parent)
  * ********************************************************************************************* */
 RoamingZoneReference::RoamingZoneReference(QObject *parent)
   : ConfigObjectReference(RoamingZone::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of EncryptionKeyReference
+ * ********************************************************************************************* */
+EncryptionKeyReference::EncryptionKeyReference(QObject *parent)
+  : ConfigObjectReference(EncryptionKey::staticMetaObject, parent)
 {
   // pass...
 }

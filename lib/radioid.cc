@@ -58,13 +58,15 @@ DMRRadioID::setNumber(uint32_t id) {
 }
 
 YAML::Node
-DMRRadioID::serialize(const Context &context) {
-  YAML::Node node = RadioID::serialize(context);
+DMRRadioID::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = RadioID::serialize(context, err);
   if (node.IsNull())
     return node;
+
   YAML::Node type;
   node.SetStyle(YAML::EmitterStyle::Flow);
   type["dmr"] = node;
+
   return type;
 }
 

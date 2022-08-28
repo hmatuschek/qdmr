@@ -72,7 +72,7 @@ parts:
     source: https://github.com/hmatuschek/qdmr.git
     source-type: git
     #source-tag: "v$SNAPCRAFT_PROJECT_VERSION"
-    configflags:
+    cmake-parameters:
       - "-DCMAKE_INSTALL_PREFIX=/usr"
       - "-DCMAKE_BUILD_TYPE=Release"
       - "-DBUILD_TESTS=Off"

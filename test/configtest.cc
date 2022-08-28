@@ -54,7 +54,7 @@ ConfigTest::testDigitalContacts() {
   /*
    * Test Contact 01
    */
-  QCOMPARE(_config.contacts()->digitalContact(0)->name(), QString("Lokal"));
+  QCOMPARE(_config.contacts()->digitalContact(0)->name(), QString("Local"));
   QCOMPARE(_config.contacts()->digitalContact(0)->number(), 9U);
   QCOMPARE(_config.contacts()->digitalContact(0)->type(), DigitalContact::GroupCall);
   QCOMPARE(_config.contacts()->digitalContact(0)->rxTone(), false); // receive tone (off)

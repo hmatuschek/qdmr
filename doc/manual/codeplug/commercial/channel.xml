@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="extComChannel"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Channel extension</title>
+</info>
+
+<para>
+  This extension allows to specify some channel settings specific for commercial applications
+  of DMR. For now, it only allow for specifying the encryption key for a digital channel.
+</para>
+
+<example>
+  <title></title>
+  <programlisting><![CDATA[channels:
+  - digital:
+      id: ch1
+      name: Example channel 
+      # all the other channel settings
+      commercial:
+        encryptionKey: KEY_LABEL
+]]></programlisting>
+</example>
+
+<para> 
+  The commercial channel extension is a mapping named <token>commercial</token>. It contains the 
+  settings for commercial features for that channel. 
+</para>
+
+
+<section>
+<info>
+  <title>Channel attributes</title>
+</info>
+
+<para>
+  For now, there is only one attribute specifying the encryption key associated with the channel.
+</para>
+
+<variablelist>
+  <title>Channel extension fields</title>
+  <varlistentry>
+    <term><token>encryptionKey</token></term>
+    <listitem>
+      <para>References a encryption key defined within the commercial codeplug extension. See <xref linkend="extComEncryption"/>.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</section>
+</section>
+        

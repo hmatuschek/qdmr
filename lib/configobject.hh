@@ -12,12 +12,13 @@
 #include "errorstack.hh"
 
 // Forward declaration
+class Config;
 class ConfigObject;
 class ConfigExtension;
 
 /** Helper function to test property type. */
 template <class T>
-bool propIsInstance(QMetaProperty &prop) {
+bool propIsInstance(const QMetaProperty &prop) {
   if (QMetaType::UnknownType == prop.userType())
     return false;
   QMetaType type(prop.userType());
@@ -30,6 +31,7 @@ bool propIsInstance(QMetaProperty &prop) {
   }
   return false;
 }
+
 
 /** Base class for all configuration objects (channels, zones, contacts, etc).
  *
@@ -106,10 +108,10 @@ public:
 public:
   /** Recursively labels the config object.
    * Does not assign a label if the @c idBase passed to the constructor is empty. */
-  virtual bool label(Context &context);
+  virtual bool label(Context &context, const ErrorStack &err=ErrorStack());
   /** Recursively serializes the configuration to YAML nodes.
    * The complete configuration must be labeled first. */
-  virtual YAML::Node serialize(const Context &context);
+  virtual YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
   /** Allocates an instance for the given property on the given YAML node.
    * This is usually done automatically based on the meta-type of the property. To be able to
@@ -123,6 +125,11 @@ public:
 
   /** Clears the config object. */
   virtual void clear();
+
+  /** Returns the config, the item belongs to or @c nullptr if not part of a config. */
+  virtual const Config *config() const;
+  /** Searches the config tree to find all instances of the given type names. */
+  virtual void findItemsOfTypes(const QStringList &typeNames, QSet<ConfigItem*> &items) const;
 
   /** Returns @c true if this object is of class @c Object. */
   template <class Object>
@@ -142,27 +149,27 @@ public:
     return qobject_cast<Object *>(this);
   }
 
-  /** Retruns @c true if there is a class info "description" for this instance. */
+  /** Returns @c true if there is a class info "description" for this instance. */
   bool hasDescription() const;
-  /** Retruns @c true if there is a class info "longDescription" for this instance. */
+  /** Returns @c true if there is a class info "longDescription" for this instance. */
   bool hasLongDescription() const;
-  /** Retruns @c true if there is a class info "[PropertyName]Description" for the given property. */
+  /** Returns @c true if there is a class info "[PropertyName]Description" for the given property. */
   bool hasDescription(const QMetaProperty &prop) const;
-  /** Retruns @c true if there is a class info "[PropertyName]LongDescription" for the given property. */
+  /** Returns @c true if there is a class info "[PropertyName]LongDescription" for the given property. */
   bool hasLongDescription(const QMetaProperty &prop) const;
-  /** Retunrs the description of this instance if set by a class info. */
+  /** Returns the description of this instance if set by a class info. */
   QString description() const;
-  /** Retunrs the long description of this instance if set by a class info. */
+  /** Returns the long description of this instance if set by a class info. */
   QString longDescription() const;
-  /** Retunrs the description of property if set by a class info. */
+  /** Returns the description of property if set by a class info. */
   QString description(const QMetaProperty &prop) const;
-  /** Retunrs the long description of property if set by a class info. */
+  /** Returns the long description of property if set by a class info. */
   QString longDescription(const QMetaProperty &prop) const;
 
 protected:
   /** Recursively serializes the configuration to YAML nodes.
    * The complete configuration must be labeled first. */
-  virtual bool populate(YAML::Node &node, const Context &context);
+  virtual bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 signals:
   /** Gets emitted once the config object is modified.
@@ -175,7 +182,7 @@ signals:
 };
 
 
-/** Base class of all labled and named objects.
+/** Base class of all labeled and named objects.
  * @ingroup config */
 class ConfigObject: public ConfigItem
 {
@@ -203,11 +210,11 @@ public:
   virtual void setName(const QString &name);
 
 public:
-  bool label(Context &context);
+  bool label(Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
-  virtual bool populate(YAML::Node &node, const Context &context);
+  virtual bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds the base string to derive an ID from. All objects need some ID to be referenced within
@@ -239,24 +246,31 @@ class AbstractConfigObjectList: public QObject
 
 protected:
   /** Hidden constructor. */
-  explicit AbstractConfigObjectList(const QMetaObject &elementType=ConfigObject::staticMetaObject, QObject *parent = nullptr);
+  explicit AbstractConfigObjectList(const QMetaObject &elementTypes=ConfigObject::staticMetaObject, QObject *parent = nullptr);
+  /** Hidden constructor from initializer list. */
+  AbstractConfigObjectList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent=nullptr);
 
 public:
   /** Copies all elements from @c other to this list. */
   virtual bool copy(const AbstractConfigObjectList &other);
 
   /** Recursively labels the config object. */
-  virtual bool label(ConfigItem::Context &context) = 0;
+  virtual bool label(ConfigItem::Context &context, const ErrorStack &err=ErrorStack()) = 0;
   /** Recursively serializes the configuration to YAML nodes.
    * The complete configuration must be labeled first. */
-  virtual YAML::Node serialize(const ConfigItem::Context &context) = 0;
+  virtual YAML::Node serialize(const ConfigItem::Context &context, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Returns the number of elements in the list. */
   virtual int count() const;
-  /** Retunrs the index of the given object within the list. */
+  /** Returns the index of the given object within the list. */
   virtual int indexOf(ConfigObject *obj) const;
   /** Clears the list. */
   virtual void clear();
+
+  /** Returns the config object, this list belongs to. */
+  virtual const Config *config() const;
+  /** Searches the config tree to find all instances of the given type names. */
+  virtual void findItemsOfTypes(const QStringList &typeNames, QSet<ConfigItem*> &items) const;
 
   /** Returns the list element at the given index or @c nullptr if out of bounds. */
   virtual ConfigObject *get(int idx) const;
@@ -277,7 +291,9 @@ public:
   virtual bool moveDown(int first, int last);
 
   /** Returns the element type for this list. */
-  const QMetaObject &elementType() const;
+  const QList<QMetaObject> &elementTypes() const;
+  /** Returns a list of all class names. */
+  QStringList classNames() const;
 
 signals:
   /** Gets emitted if an element was added to the list. */
@@ -288,14 +304,14 @@ signals:
   void elementRemoved(int idx);
 
 private slots:
-  /** Internal used callback to handle modified elments. */
+  /** Internal used callback to handle modified elements. */
   void onElementModified(ConfigItem *obj);
-  /** Internal used callback to handle deleted elments. */
+  /** Internal used callback to handle deleted elements. */
   void onElementDeleted(QObject *obj);
 
 protected:
   /** Holds the static QMetaObject of the element type. */
-  QMetaObject _elementType;
+  QList<QMetaObject> _elementTypes;
   /** Holds the list items. */
   QVector<ConfigObject *> _items;
 };
@@ -311,7 +327,9 @@ class ConfigObjectList: public AbstractConfigObjectList
 
 protected:
   /** Hidden constructor. */
-  explicit ConfigObjectList(const QMetaObject &elementType=ConfigItem::staticMetaObject, QObject *parent = nullptr);
+  explicit ConfigObjectList(const QMetaObject &elementTypes=ConfigItem::staticMetaObject, QObject *parent = nullptr);
+  /** Hidden constructor from initializer list. */
+  ConfigObjectList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent=nullptr);
 
 public:
   int add(ConfigObject *obj, int row=-1);
@@ -327,8 +345,8 @@ public:
   /** Links the list from the given YAML node. */
   virtual bool link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 
-  bool label(ConfigItem::Context &context);
-  YAML::Node serialize(const ConfigItem::Context &context);
+  bool label(ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
+  YAML::Node serialize(const ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
 };
 
 
@@ -342,11 +360,13 @@ class ConfigObjectRefList: public AbstractConfigObjectList
 
 protected:
   /** Hidden constructor. */
-  explicit ConfigObjectRefList(const QMetaObject &elementType=ConfigObject::staticMetaObject, QObject *parent = nullptr);
+  explicit ConfigObjectRefList(const QMetaObject &elementTypes=ConfigObject::staticMetaObject, QObject *parent = nullptr);
+  /** Hidden constructor from initializer list. */
+  ConfigObjectRefList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent=nullptr);
 
 public:
-  bool label(ConfigItem::Context &context);
-  YAML::Node serialize(const ConfigItem::Context &context);
+  bool label(ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
+  YAML::Node serialize(const ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
 };
 
 

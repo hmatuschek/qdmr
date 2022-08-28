@@ -37,7 +37,7 @@ public:
 
   /** Returns the contact at the given list index. */
 	DigitalContact *contact(int idx) const;
-  /** Adds a contect to the list. */
+  /** Adds a contact to the list. */
   int addContact(DigitalContact *contact, int idx=-1);
   /** Removes the given contact from the list. */
 	bool remContact(DigitalContact *contact);
@@ -50,7 +50,7 @@ public:
   DigitalContactRefList *contacts();
 
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
 protected slots:
   /** Internal used callback to handle list modifications. */

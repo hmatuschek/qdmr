@@ -45,8 +45,7 @@ public:
   virtual ~MD2017();
 
   const QString &name() const;
-  const Features &features() const;
-  RadioInfo info() const;
+  const RadioLimits &limits() const;
 
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
@@ -65,6 +64,10 @@ private:
   MD2017Codeplug _codeplug;
   /** The callsign DB object. */
   MD2017CallsignDB _callsigndb;
+
+private:
+  /** Singleton instance of the limits for this radio. */
+  static RadioLimits *_limits;
 };
 
 #endif // MD2017_HH

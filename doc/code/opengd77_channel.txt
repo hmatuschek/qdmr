@@ -14,17 +14,29 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 20 | CTCSS/DCS RX, 4-digit BCD little endian, 0xffff=off.          | CTCSS/DCS TX, 4-digit BCD little endian, 0xffff=off.          |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-24 | Unused, set to 0x00           | TX DTMF system index          | Unused set to 0x00            | RX DTMF system index          |
+24 | Unused, set to 0x00           | TX DTMF system index          |RID| Unused set to 0           | Radio ID, 24bit big-endian ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-28 | Unused, set to 0x16           | Privacy group index           | TX color-code                 | RX group list index (+1)      |
+28  ...                                                            | TX color-code                 | RX group list index (+1)      |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 2c | RX color code                 | Emergency system index (+1)   | Contact index (+1), little endian                             |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-30 |DCC|EAA| 0   0   0   0 | ARTS  | 0 |SLT| 0 |PRV| 0   0   0 |PCC|  STE  |NFS| 0 | PTTId | 0 |DCD| 0 |VOX|ASE|LWK|TLK|RXO|BW |SQT|
+30 |DCC|EAA| 0   0   0   0 | ARTS  | 0 |SLT| 0 |PRV| 0   0   0 |PCC|  STE  |NFS| 0 | PTTId | 0 |DCD| 0 |VOX|SZS|SAS|TLK|RXO|BW |SQT|
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 34 | Unused set to 0                                                                               | Squelch in 5%, 0=default      |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-DCC = Data call confirm, EAA = Emergency Alarm ACK, SLT = Repeater slot, PRV = Privacy Enable,
-PCC = Private call confirm, NSF = Non-STE Frequency, DCD = Direct call dual capacity mode, PWR = Power, ASE = Autoscan enable,
-LWK = Lone worker enable, TLK = Talk around enable, RXO = RX only, BW = Band width, SQT = Squelch type
+RID = Channel radio ID enable, default=0.
+DCC = Data call confirm,
+EAA = Emergency Alarm ACK,
+SLT = Repeater slot,
+PRV = Privacy Enable,
+PCC = Private call confirm,
+NSF = Non-STE Frequency,
+DCD = Direct call dual capacity mode,
+PWR = Power,
+SZS = Scan zone skip enable, default=off. Was "auto scan enable" in orig. GD77.
+SAS = Scan all skip enable, default=off. Was "lone worker enable" in orig. GD77.
+TLK = Talk around enable,
+RXO = RX only,
+BW  = Band width,
+SQT = Squelch type

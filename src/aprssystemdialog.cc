@@ -158,7 +158,7 @@ APRSSystemDialog::construct() {
   ui->message->setText(_myAPRS->message());
 
   ui->extensionView->setObjectName("aprsSystemExtension");
-  ui->extensionView->setObject(_myAPRS);
+  ui->extensionView->setObject(_myAPRS, _config);
   if (! settings.showExtensions())
     ui->tabWidget->tabBar()->hide();
 }

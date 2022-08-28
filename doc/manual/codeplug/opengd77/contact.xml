@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xmlid="extOpenGD77Contact"
+<section xml:id="extOpenGD77Contact"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -43,7 +43,7 @@
 </para>
 
 <variablelist>
-  <title><title>Channel extension fields</title></title>
+  <title>Channel extension fields</title>
   <varlistentry>
     <term><token>timeSlotOverride</token></term>
     <listitem>

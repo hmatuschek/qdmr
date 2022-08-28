@@ -55,7 +55,7 @@ namespace Signaling
    * DCS enum elements). */
   float toCTCSSFrequency(Code code);
   /** Maps a CTCSS frequency to the corresponding Signaling::Code enum element.
-   * Retuns @c SIGNALING_NONE if an invalid CTCSS frequency is given. */
+   * Returns @c SIGNALING_NONE if an invalid CTCSS frequency is given. */
   Code fromCTCSSFrequency(float freq);
 
   /** Returns @c true if a valid DCS code number is given. */
@@ -68,7 +68,7 @@ namespace Signaling
   uint16_t toDCSNumber(Code code);
   /** Maps a DCS number to the corresponding DCS Signaling::Code enum element.
    * The @c inverted parameter specifies whether an inverted code is used.
-   * Retruns SIGNALING_NONE if an invalid DCS number is given. */
+   * Returns SIGNALING_NONE if an invalid DCS number is given. */
   Code fromDCSNumber(uint16_t num, bool inverted);
 
   /** Maps a Signaling::Code enum element to its text label. */

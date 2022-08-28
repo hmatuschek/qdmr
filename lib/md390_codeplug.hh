@@ -10,7 +10,7 @@
  *
  * @section md390cpl Codeplug structure within radio
  * The codeplug structure is reverse engineered almost completely and can be programmed from
- * scratch. That is, it is not neccessary to update an existing codeplug on the radio.
+ * scratch. That is, it is not necessary to update an existing codeplug on the radio.
  * <table>
  *  <tr><th>Start</th>    <th>End</th>      <th>Size</th>    <th>Content</th></tr>
  *  <tr><th colspan="4">Segment 0x002000-0x040000</th></tr>
@@ -136,9 +136,12 @@ public:
   bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack());
 
+  void clearPrivacyKeys();
+  bool encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err);
+
   void clearMenuSettings();
   void clearTextMessages();
-  void clearPrivacyKeys();
   void clearEmergencySystems();
 };
 

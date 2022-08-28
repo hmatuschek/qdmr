@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+
+<refentry xml:id="qdmr"
+  xmlns="http://docbook.org/ns/docbook"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <refmeta>
+    <refentrytitle>qdmr</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="source">qdmr</refmiscinfo>
+    <refmiscinfo class="version">0.10.2</refmiscinfo>
+    <refmiscinfo class="manual">User Commands</refmiscinfo>
+  </refmeta>
+
+  <info>
+    <author>
+      <personname><firstname>Hannes</firstname> <surname>Matuschek</surname></personname>
+      <email>dm3mat@darc.de</email>
+      <contrib>Main author</contrib>
+    </author>
+  </info>
+
+  <refnamediv>
+    <refname>qdmr</refname>
+    <refpurpose>Graphical tool for programming DMR radios.</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>qdmr</command>
+      <arg choice="opt"><option>OPTIONS</option></arg>
+      <arg choice="opt"><option>CODEPLUG_FILE</option></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+    <para>
+      <command>qdmr</command> is a graphical tool to program DMR radios.
+      That is, reading, editing, generating and uploading codeplugs to these 
+      radios. 
+    </para>
+    <para>
+      The configuration of these radios is usually stored in a highly vendor
+      and device specific binary codeplug. <command>qdmr</command> stores this
+      configuration in a human-readable and device independent format, thus 
+      allowing for sharing codeplugs across devices.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+    <variablelist>
+      <varlistentry>
+        <term><option>CODEPLUG_FILE</option></term>
+        <listitem>
+          <para>
+            If the optional codeplug file is passed to qdmr, it gets loaded on 
+            startup. Otherwise, the application starts with an empty codeplug.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-style=STYLE</option></term>
+        <listitem>
+          <para>
+            This option allows to set a Qt style for the application. This can
+            be used to alter the style of the widgets. So call 
+            <cmd>qdmr -style=windows</cmd> if you fancy.
+          </para>
+          <para>
+            However, this option is of real use if you want to use a dark 
+            theme. By installing a dark Qt theme like kvantum-dark and starting
+            qdmr by passing this theme to the style option. That is
+          </para>
+          <para>
+            qdmr -style=kvantum-dark
+          </para>
+          <para>
+            You may set the Qt style for all Qt applications using the 
+            <env>QT_STYLE_OVERRIDE</env> environment variable.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-stylesheet=FILENAME</option></term>
+        <listitem>
+          <para>
+            This option allows for specifying a style sheet to alter the 
+            appearance of some or all widgets of qdmr. </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1>
+    <title>Logging</title>
+    <para>
+      Qdmr writes a lot of debug and error messages to <io>stderr</io>. This 
+      can be used to inspect some issues during reading/writing the a codeplug 
+      to the device. There is also a log file containing these messages usually
+      at <file>~/.local/share/DM3MAT/qdmr/qdmr.log</file>.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Bugs</title>
+    <para>
+      This program is still under development and may contain bugs that
+      may cause harm to the radios and may even destroy them. Hence you may
+      use this software on your own risk. I you want to have guaranties,
+      consider using the CPS (code-plug programming software) supplied with
+      your radio.
+    </para>
+    <para>
+      There are some issues with the so-called dark mode under Linux. The Qt 
+      library is not able to detect that the desktop has a dark mode theme. To
+      this end, qdmr cannot react to it too. To enable a dark theme for qdmr, 
+      see the <option>-style</option> option above.
+    </para>
+    <para>
+      Writing a single application supporting several radios of different 
+      manufacturers is a hard task. To this end, there are plenty of bugs to be
+      expected. If you stumble across one of them, consider opening an issue at
+      <xlink href="https://github.com/hmatuschek/qdmr/issues"/>.
+    </para>
+  </refsect1>
+</refentry>

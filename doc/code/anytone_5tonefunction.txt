@@ -12,4 +12,4 @@
 Field description:
  - Function: Specifies the function to perform. 0=OpenSquelch, 1=CallAll, 2=EmergencyAlarm, 3=RemoteKill, 4=RemoteStun,
    5=RemoteWakeup, 6=GroupCall
- - Reponse: 0=None, 1=Tone, 2=ToneRespond
+ - Response: 0=None, 1=Tone, 2=ToneRespond

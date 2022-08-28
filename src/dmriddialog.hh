@@ -13,8 +13,8 @@ class DMRIDDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit DMRIDDialog(QWidget *parent = nullptr);
-  DMRIDDialog(DMRRadioID *radioid, QWidget *parent = nullptr);
+  explicit DMRIDDialog(Config *context, QWidget *parent = nullptr);
+  DMRIDDialog(DMRRadioID *radioid, Config *context, QWidget *parent = nullptr);
   ~DMRIDDialog();
 
   DMRRadioID *radioId();
@@ -26,6 +26,7 @@ private:
   Ui::DMRIDDialog *ui;
   DMRRadioID *_myID;
   DMRRadioID *_editID;
+  Config *_config;
 };
 
 #endif // DMRIDDIALOG_HH

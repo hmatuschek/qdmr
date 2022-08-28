@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="extAnytoneContact"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>DMR contact extension</title>
+</info>
+
+<para>
+  This extensions allows to specify some DMR contact attributes for AnyTone devices. This extension
+  is only applicable to DMR (digital) contacts. 
+</para>
+
+<example>
+  <title></title>
+  <programlisting><![CDATA[contacts:
+  - dmr:
+    name: Example contact 
+    number: 1234567
+    anytone:
+      alertType: Online
+]]></programlisting>
+</example>
+
+<para>
+  The AnyTone contact extension is a mapping named <token>anytone</token>. It contains the 
+  device specific settings for that DMR contact.
+</para>
+
+
+<section>
+<info>
+  <title>Contact attributes</title>
+</info>
+
+<para>
+  For now, there is only one attribute allowing to override the alert type for a DMR contact.
+</para>
+
+<variablelist>
+  <title>Channel extension fields</title>
+  <varlistentry>
+    <term><token>alertType</token></term>
+    <listitem>
+      <para>
+        The alert type specifies the notification type when a call from that contact is received.
+        To this end, this field overrides the <token>ring</token> setting of the common  contact
+        settings. This attribute is either <token>None</token>, <token>Ring</token> or 
+        <token>Online</token>. If <token>None</token> is set, the notification is disabled.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+</section>

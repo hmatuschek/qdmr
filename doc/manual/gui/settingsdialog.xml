@@ -12,7 +12,7 @@
 <para>
   The application settings dialog controls some of the behavior of <application>qdmr</application>.
   The dialog is divided into 4 sections: <guilabel>Location</guilabel>, <guilabel>Radio 
-    Programming</guilabel>, <guilabel>Call-Sign DB</guilabel> and <guilabel>Commercial</guilabel>.
+    Programming</guilabel>, <guilabel>Call-Sign DB</guilabel> and <guilabel>Extended Features</guilabel>.
 </para>
 
 <screenshot>
@@ -73,7 +73,7 @@
 <para>
   The <guilabel>Ignore frequency limits</guilabel> option does exactly what it says. Usually, 
   programming a channel outside of the radios frequency range would issue an error. However, many
-  radios are able to receive and even transmit outside of the frequency rangs specified by the 
+  radios are able to receive and even transmit outside of the frequency range specified by the 
   manufacturer. But be aware, that transmitting outside the declared frequency range may destroy 
   the radio!
 </para>
@@ -94,9 +94,9 @@
 
 <para>
   Usually, curating these databases is a cumbersome task. <application>qdmr</application> tries to
-  automate this taks. Usually, <application>qdmr</application> will select as many call-signs from
+  automate this task. Usually, <application>qdmr</application> will select as many call-signs from
   the global database it can fit into the radio. Although modern radios will provide a huge amount
-  memory, not all registered IDs can be programmed. In these (all) cases, 
+  memory, not all registered IDs can be programmed. In these cases, 
   <application>qdmr</application> will select only the <emphasis>closest</emphasis> IDs to your
   DMR ID (default Radio DMR ID, see <xref linkend="guiRadioSettings"/>). The DMR IDs are compared by 
   the longest matching prefix. This makes sense as DMR IDs are not random. They share the same 
@@ -109,23 +109,25 @@
   The <guilabel>Limit number of DB entries</guilabel> option and <guilabel>Number of DB 
     entries</guilabel> field allow to limit the number of DB entries written to the device. If 
   the <guilabel>Limit number of DB entries</guilabel> option is disabled, as many entries are 
-  written to the deivce as it can hold.
+  written to the device as it can hold.
 </para>
 
 <para>
   The <guilabel>Select using my DMR ID</guilabel> option and the <guilabel>Select using 
     prefixes</guilabel> field can be used to control the selection of entries. If the
   <guilabel>Select using my DMR ID</guilabel> option is enabled, the aforementioned algorithm is 
-  used to select the entries. If this option is disabled, a list of prefixed must be specified in
-  the <guilabel>Select using prefixes</guilabel> field. Then the DMR IDs closest to these prefixes
-  are used to assemble the final call-sign DB.
+  used to select the entries based on the default DMR ID. If this option is disabled, a list of 
+  prefixes must be specified in
+  the <guilabel>Select using prefixes</guilabel> field. This must be a list of comma-separated 
+  prefixes like <code>262, 263</code>. Whitespace are ignored. Then the DMR IDs closest to these 
+  prefixes are used to assemble the final call-sign DB.
 </para>
 </section>
 
 
 <section>
 <info>
-  <title>Commercial feature settings</title>
+  <title>Extended feature settings</title>
 </info>
 
 <para>
@@ -137,9 +139,11 @@
 </para>
 
 <para>
-  For now, there are not may commercial features supported by <application>qdmr</application>. 
-  Therefore not much is hidden except for the ability to define several DMR radio IDs and the 
-  device specific settings.
+  Starting with <application>qdmr</application> version 0.9.0, there are some 
+  device specific settings, allowing to configure features only present in one device and not 
+  represented in the general codeplug. These are called <emphasis>extensions</emphasis> and are 
+  usually hidden. To show these device specific extension, select <guilabel>Show device 
+    extensions</guilabel>.
 </para>
 </section>
 </section>

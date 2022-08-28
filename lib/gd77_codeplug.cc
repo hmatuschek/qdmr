@@ -9,6 +9,9 @@
 #define ADDR_BUTTONS              0x000108
 #define ADDR_MESSAGE_BANK         0x000128
 
+#define ADDR_ENCRYPTION           0x001370
+#define ENCRYPTION_SIZE               0x88
+
 #define NUM_SCAN_LISTS                  64
 #define ADDR_SCAN_LIST_BANK       0x001790
 #define SCAN_LIST_SIZE            0x000058
@@ -691,5 +694,35 @@ GD77Codeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack &err
       return false;
     }
   }
+  return true;
+}
+
+
+void
+GD77Codeplug::clearEncryption() {
+  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  enc.clear();
+}
+
+bool
+GD77Codeplug::encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err);
+  clearEncryption();
+  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  return enc.fromCommercialExt(config->commercialExtension(), ctx);
+}
+
+bool
+GD77Codeplug::createEncryption(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(err);
+  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  if (EncryptionElement::PrivacyType::None == enc.privacyType())
+    return true;
+  return enc.updateCommercialExt(ctx);
+}
+
+bool
+GD77Codeplug::linkEncryption(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(ctx); Q_UNUSED(err);
   return true;
 }

@@ -44,7 +44,7 @@ private:
 protected:
   /** The interface to the radio. */
   RadioddityInterface *_dev;
-  /** Holds the flags to controll assembly and upload of code-plugs. */
+  /** Holds the flags to control assembly and upload of code-plugs. */
   Codeplug::Flags _codeplugFlags;
   /** The generic configuration. */
 	Config *_config;

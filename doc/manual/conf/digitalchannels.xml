@@ -63,7 +63,7 @@
   on that particular channel. 
 </para>
 <para>
-  The 9th (Admit) colum specifies the TX admit criterion for the
+  The 9th (Admit) column specifies the TX admit criterion for the
   channel. This must be either "-" or one of the keywords "Free" and "Color". "-" indicates that
   there is no restriction in transmitting on that channel. The radio will transmit whenever PTT is
   pressed. The "Free" keyword indicates that the radio will only transmit if the channel is free.

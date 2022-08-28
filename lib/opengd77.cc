@@ -1,62 +1,12 @@
 #include "opengd77.hh"
-
+#include "opengd77_limits.hh"
 #include "logger.hh"
 #include "config.hh"
 
 
 #define BSIZE 32
 
-static Radio::Features _open_gd77_features =
-{
-  .betaWarning = false,
-
-  .hasDigital = true,
-  .hasAnalog = true,
-
-  .frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 470.} },
-
-  .maxRadioIDs        = 1,
-  .needsDefaultRadioID = true,
-  .maxIntroLineLength = 16,
-
-  .maxChannels = 1024,
-  .maxChannelNameLength = 16,
-  .allowChannelNoDefaultContact = true,
-
-  .maxZones = 68,
-  .maxZoneNameLength = 16,
-  .maxChannelsInZone = 80,
-  .hasABZone = false,
-
-  .hasScanlists = false,
-  .maxScanlists = 64,
-  .maxScanlistNameLength = 16,
-  .maxChannelsInScanlist = 32,
-  .scanListNeedsPriority = true,
-
-  .maxContacts = 1024,
-  .maxContactNameLength = 16,
-
-  .maxGrouplists = 76,
-  .maxGrouplistNameLength = 16,
-  .maxContactsInGrouplist = 32,
-
-  .hasGPS = false,
-  .maxGPSSystems = 0,
-
-  .hasAPRS = false,
-  .maxAPRSSystems = 0,
-
-  .hasRoaming = false,
-  .maxRoamingChannels = 0,
-  .maxRoamingZones = 0,
-  .maxChannelsInRoamingZone = 0,
-
-  .hasCallsignDB = true,
-  .callsignDBImplemented = true,
-  .maxCallsignsInDB = 15796
-};
-
+RadioLimits *OpenGD77::_limits = nullptr;
 
 OpenGD77::OpenGD77(OpenGD77Interface *device, QObject *parent)
   : Radio(parent), _name("Open GD-77"), _dev(device), _config(nullptr), _codeplug(), _callsigns()
@@ -82,14 +32,11 @@ OpenGD77::name() const {
   return _name;
 }
 
-const Radio::Features &
-OpenGD77::features() const {
-  return _open_gd77_features;
-}
-
-RadioInfo
-OpenGD77::info() const {
-  return defaultRadioInfo();
+const RadioLimits &
+OpenGD77::limits() const {
+  if (nullptr == _limits)
+    _limits = new OpenGD77Limits();
+  return *_limits;
 }
 
 const Codeplug &

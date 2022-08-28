@@ -44,7 +44,7 @@ public:
   bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
-  bool populate(YAML::Node &node, const ConfigItem::Context &context);
+  bool populate(YAML::Node &node, const ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
 
 protected slots:
   /** Gets called, whenever a reference is modified. */
@@ -114,7 +114,7 @@ public:
   void setRevert(DigitalChannelReference *channel);
 
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds the destination contact for the GPS information. */
@@ -124,7 +124,7 @@ protected:
 };
 
 
-/** Represents an APRS system wihtin the generic config.
+/** Represents an APRS system within the generic config.
  * @ingroup conf */
 class APRSSystem: public PositioningSystem
 {
@@ -194,7 +194,7 @@ public:
   /** Sets the revert channel reference. */
   void setRevert(AnalogChannelReference *ref);
 
-  /** Retruns the destination call. */
+  /** Returns the destination call. */
   const QString &destination() const;
   /** Returns the destination SSID. */
   unsigned destSSID() const;
@@ -208,7 +208,7 @@ public:
   /** Sets the source call and SSID. */
   void setSource(const QString &call, unsigned ssid);
 
-  /** Retruns the APRS path. */
+  /** Returns the APRS path. */
   const QString &path() const;
   /** Sets the APRS path. */
   void setPath(const QString &path);
@@ -218,17 +218,17 @@ public:
   /** Sets the map icon. */
   void setIcon(Icon icon);
 
-  /** Retunrs the optional message. */
+  /** Returns the optional message. */
   const QString &message() const;
   /** Sets the optional APRS message text. */
   void setMessage(const QString &msg);
 
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
-  bool populate(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** A weak reference to the transmit channel. */

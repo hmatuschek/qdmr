@@ -43,7 +43,7 @@
 <para>
   This option is usually used to specify the type whenever the radio model is not detected. This 
   option also overrides the model detection and thus allows to handle virtually identical radios.
-  For example, if the relation ship between the AT-D868UV and the DMR-6X2 whould have not been 
+  For example, if the relation ship between the AT-D868UV and the DMR-6X2 would have not been 
   known to <command>dmrconf</command>, a codeplug could read anyway from the device by calling
 </para>
 
@@ -52,7 +52,7 @@
 </informalexample>
 
 <para>
-  Here the radio detection (resulting the detection of a DMR-6X2) gets overriden and the radio is
+  Here the radio detection (resulting the detection of a DMR-6X2) gets overridden and the radio is
   handled as a AT-D868UV. 
 </para>
 

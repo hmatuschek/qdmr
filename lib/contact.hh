@@ -2,6 +2,7 @@
 #define CONTACT_HH
 
 #include "configobject.hh"
+#include "anytone_extension.hh"
 #include "opengd77_extension.hh"
 #include <QVector>
 #include <QAbstractTableModel>
@@ -95,7 +96,7 @@ public:
 	bool setNumber(const QString &number);
 
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** The DTMF number. */
@@ -113,7 +114,9 @@ class DigitalContact: public Contact
   Q_PROPERTY(Type type READ type WRITE setType)
   /** The number of the contact. */
   Q_PROPERTY(unsigned number READ number WRITE setNumber)
-  /** The openGD77 extension to the digital channel. */
+  /** The AnyTone extension to the digital contact. */
+  Q_PROPERTY(AnytoneContactExtension* anytone READ anytoneExtension WRITE setAnytoneExtension)
+  /** The OpenGD77 extension to the digital contact. */
   Q_PROPERTY(OpenGD77ContactExtension* openGD77 READ openGD77ContactExtension WRITE setOpenGD77ContactExtension)
 
 public:
@@ -153,14 +156,21 @@ public:
   /** Sets the OpenGD77 extension. */
   void setOpenGD77ContactExtension(OpenGD77ContactExtension *ext);
 
+  /** Returns the AnyTone extension, or @c nullptr if not set. */
+  AnytoneContactExtension *anytoneExtension() const;
+  /** Sets the AnyTone extension. */
+  void setAnytoneExtension(AnytoneContactExtension *ext);
+
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** The call type. */
 	Type _type;
   /** The DMR number of the contact. */
 	unsigned _number;
+  /** Owns the AnytoneContactextension to the digital contacts. */
+  AnytoneContactExtension *_anytone;
   /** Owns the OpenGD77 extensions to the digital contacts. */
   OpenGD77ContactExtension *_openGD77;
 };
@@ -169,7 +179,7 @@ protected:
 /** Represents the list of contacts within the abstract radio configuration.
  *
  * A special feature of this list, is that DTMF and digital contacts can be accessed by their own
- * unique index altough they are held within this single list. Most radios manage digital and
+ * unique index although they are held within this single list. Most radios manage digital and
  * DTMF contacts in separate lists, hence a means to iterate over and get indices of digital and
  * DTMF contacts only is needed.
  *

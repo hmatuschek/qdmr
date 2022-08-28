@@ -24,9 +24,7 @@ public:
   virtual ~OpenGD77();
 
 	const QString &name() const;
-  const Radio::Features &features() const;
-  RadioInfo info() const;
-
+  const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
@@ -65,8 +63,12 @@ protected:
 	Config *_config;
   /** The actual binary codeplug representation. */
   OpenGD77Codeplug _codeplug;
-  /** The acutal binary callsign DB representation. */
+  /** The actual binary callsign DB representation. */
   OpenGD77CallsignDB _callsigns;
+
+private:
+  /** Holds the singleton instance. */
+  static RadioLimits *_limits;
 };
 
 #endif // OPENGD77_HH

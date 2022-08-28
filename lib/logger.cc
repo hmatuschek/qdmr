@@ -167,8 +167,8 @@ StreamLogHandler::handle(const LogMessage &message) {
     break;
   }
   QFileInfo finfo(message.file());
-  _stream << "in " << finfo.fileName() << "@" << message.line()
-          << ": " << message.message() << "\n";
+  _stream << "in " << finfo.dir().dirName() << "/" << finfo.fileName()
+          << "@" << message.line() << ": " << message.message() << "\n";
   if (_color)
     _stream << "\033[39m";
   _stream.flush();
@@ -235,6 +235,8 @@ FileLogHandler::handle(const LogMessage &message) {
   case LogMessage::ERROR:   _stream << "ERROR "; break;
   case LogMessage::FATAL:   _stream << "FATAL "; break;
   }
-  _stream << "in " << message.file() << "@" << message.line()
-          << ": " << message.message() << "\n";
+  QFileInfo finfo(message.file());
+  _stream << "in " << finfo.dir().dirName() << "/" << finfo.fileName()
+          << "@" << message.line() << ": " << message.message() << "\n";
+  _stream.flush();
 }

@@ -21,12 +21,12 @@ public:
   ~ExtensionView();
 
 public slots:
-  void setObject(ConfigItem *obj);
+  void setObject(ConfigItem *obj, Config *context);
 
 protected slots:
   void onSelectionChanged(const QItemSelection &current, const QItemSelection &last);
-  void onCreateExtension();
-  void onDeleteExtension();
+  void onCreate();
+  void onDelete();
   void loadSectionState();
   void storeSectionState();
 
