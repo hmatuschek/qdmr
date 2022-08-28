@@ -439,9 +439,14 @@ RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop,
       return true;
   }
 
-  auto &msg = context.newMessage(
-        context.ignoreFrequencyLimits() ?
-          RadioLimitIssue::Warning : RadioLimitIssue::Critical);
+  if (context.ignoreFrequencyLimits() || (0 == _frequencyRanges.size())) {
+    auto &msg = context.newMessage(RadioLimitIssue::Warning);
+    msg << "Frequency " << value << "MHz is outside of allowed frequency ranges or "
+        << "range cannot be determined.";
+    return true;
+  }
+
+  auto &msg = context.newMessage(RadioLimitIssue::Critical);
   msg << "Frequency " << value << "MHz is outside of allowed frequency ranges.";
   return false;
 }
