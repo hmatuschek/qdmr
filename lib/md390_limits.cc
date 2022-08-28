@@ -70,7 +70,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &
           { AnalogChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
-              {"rxFrequency", new RadioLimitFrequencies(freqRanges)},
+              {"rxFrequency", new RadioLimitFrequencies(freqRanges, true)},
               {"txFrequency", new RadioLimitFrequencies(freqRanges)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
@@ -94,7 +94,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &
           { DigitalChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
-              {"rxFrequency", new RadioLimitFrequencies(freqRanges)},
+              {"rxFrequency", new RadioLimitFrequencies(freqRanges, true)},
               {"txFrequency", new RadioLimitFrequencies(freqRanges)},
               {"power", new RadioLimitEnum {
                  unsigned(Channel::Power::Low),

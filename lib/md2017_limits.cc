@@ -69,7 +69,7 @@ MD2017Limits::MD2017Limits(QObject *parent)
           { AnalogChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
-              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}})},
+              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}}, true)},
               {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
@@ -93,7 +93,7 @@ MD2017Limits::MD2017Limits(QObject *parent)
           { DigitalChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
-              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}})},
+              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}}, true)},
               {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}})},
               {"power", new RadioLimitEnum {
                  unsigned(Channel::Power::Low),

@@ -76,7 +76,7 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
           { AnalogChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::ASCII)},
-              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
+              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}}, true)},
               {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},
@@ -101,7 +101,7 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
           { DigitalChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
-              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
+              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}}, true)},
               {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},
