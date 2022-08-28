@@ -360,6 +360,23 @@ protected:
 };
 
 
+/** Specialization for transmit frequency limits.
+ * The verification is only performed if the channel is not "RX Only".
+ * @ingroup limits. */
+class RadioLimitTransmitFrequencies: public RadioLimitFrequencies
+{
+  Q_OBJECT
+
+public:
+  /** Empty constructor. */
+  explicit RadioLimitTransmitFrequencies(QObject *parent=nullptr);
+  /** Constructor from initializer list. */
+  RadioLimitTransmitFrequencies(const RangeList &ranges, QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+};
+
+
 /** Represents the limits for a @c ConfigItem instance.
  *
  * That is, it holds the limits for every property of the @c ConfigItem instance. This class

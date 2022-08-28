@@ -454,6 +454,37 @@ RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop,
 
 
 /* ********************************************************************************************* *
+ * Implementation of RadioLimitTransmitFrequencies
+ * ********************************************************************************************* */
+RadioLimitTransmitFrequencies::RadioLimitTransmitFrequencies(QObject *parent)
+  : RadioLimitFrequencies(parent)
+{
+  // pass...
+}
+
+RadioLimitTransmitFrequencies::RadioLimitTransmitFrequencies(const RangeList &ranges, QObject *parent)
+  : RadioLimitFrequencies(ranges, false, parent)
+{
+  // pass...
+}
+
+bool
+RadioLimitTransmitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
+  if (QVariant::Double != prop.type()) {
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
+    msg << "Cannot check property " << prop.name() << ": Expected frequency in MHz.";
+    return false;
+  }
+
+  if (item->is<Channel>() && (! item->as<Channel>()->rxOnly())) {
+    return RadioLimitFrequencies::verify(item, prop, context);
+  }
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RadioLimitItem
  * ********************************************************************************************* */
 RadioLimitItem::RadioLimitItem(QObject *parent)

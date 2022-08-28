@@ -71,7 +71,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
               {"rxFrequency", new RadioLimitFrequencies(freqRanges, true)},
-              {"txFrequency", new RadioLimitFrequencies(freqRanges)},
+              {"txFrequency", new RadioLimitTransmitFrequencies(freqRanges)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
@@ -95,7 +95,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
               {"rxFrequency", new RadioLimitFrequencies(freqRanges, true)},
-              {"txFrequency", new RadioLimitFrequencies(freqRanges)},
+              {"txFrequency", new RadioLimitTransmitFrequencies(freqRanges)},
               {"power", new RadioLimitEnum {
                  unsigned(Channel::Power::Low),
                  unsigned(Channel::Power::Mid),

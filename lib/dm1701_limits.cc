@@ -70,7 +70,7 @@ DM1701Limits::DM1701Limits(QObject *parent)
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
               {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}}, true)},
-              {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}})},
+              {"txFrequency", new RadioLimitTransmitFrequencies({{136., 174.}, {400., 480.}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
@@ -94,7 +94,7 @@ DM1701Limits::DM1701Limits(QObject *parent)
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
               {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}}, true)},
-              {"txFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}})},
+              {"txFrequency", new RadioLimitTransmitFrequencies({{136., 174.}, {400., 480.}})},
               {"power", new RadioLimitEnum {
                  unsigned(Channel::Power::Low),
                  unsigned(Channel::Power::Mid),
