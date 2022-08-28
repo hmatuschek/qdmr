@@ -348,13 +348,15 @@ public:
   /** Empty constructor. */
   explicit RadioLimitFrequencies(QObject *parent=nullptr);
   /** Constructor from initializer list. */
-  RadioLimitFrequencies(const RangeList &ranges, QObject *parent=nullptr);
+  RadioLimitFrequencies(const RangeList &ranges, bool warnOnly=false, QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
 protected:
   /** Holds the frequency ranges for the device. */
   QList<FrequencyRange> _frequencyRanges;
+  /** If @c true, throw only a warning. */
+  bool _warnOnly;
 };
 
 

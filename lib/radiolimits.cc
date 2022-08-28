@@ -417,8 +417,8 @@ RadioLimitFrequencies::RadioLimitFrequencies(QObject *parent)
   // pass...
 }
 
-RadioLimitFrequencies::RadioLimitFrequencies(const RangeList &ranges, QObject *parent)
-  : RadioLimitValue(parent), _frequencyRanges()
+RadioLimitFrequencies::RadioLimitFrequencies(const RangeList &ranges, bool warnOnly, QObject *parent)
+  : RadioLimitValue(parent), _frequencyRanges(), _warnOnly(warnOnly)
 {
   for (auto range=ranges.begin(); range!=ranges.end(); range++) {
     _frequencyRanges.append(FrequencyRange(range->first, range->second));
@@ -440,7 +440,7 @@ RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop,
       return true;
   }
 
-  if (context.ignoreFrequencyLimits() || (0 == _frequencyRanges.size())) {
+  if (context.ignoreFrequencyLimits() || (0 == _frequencyRanges.size()) || _warnOnly) {
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
     msg << "Frequency " << value << "MHz is outside of allowed frequency ranges or "
         << "range cannot be determined.";

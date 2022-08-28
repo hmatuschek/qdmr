@@ -73,7 +73,7 @@ D578UVLimits::D578UVLimits(const std::initializer_list<std::pair<double, double>
           { AnalogChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::ASCII)},
-              {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges)},
+              {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges, true)},
               {"txFrequency", new RadioLimitFrequencies(txFreqRanges)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
@@ -97,7 +97,7 @@ D578UVLimits::D578UVLimits(const std::initializer_list<std::pair<double, double>
           { DigitalChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
-              {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges)},
+              {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges, true)},
               {"txFrequency", new RadioLimitFrequencies(txFreqRanges)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
