@@ -1,12 +1,26 @@
 #include "hid_macos.hh"
-
+#include <IOKit/IOKitLib.h>
+#include <IOKit/IOCFPlugIn.h>
+#include <IOKit/usb/IOUSBLib.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <logger.hh>
 
 
-HIDevice::HIDevice(int vid, int pid, const ErrorStack &err, QObject *parent)
+/* ********************************************************************************************* *
+ * Implementation of HIDevice::Descriptor
+ * ********************************************************************************************* */
+HIDevice::Descriptor::Descriptor(const USBDeviceInfo &info, uint32_t locationId, uint16_t device)
+  : USBDeviceDescriptor(info, USBDeviceHandle((locationId>>24), device, locationId))
+{
+  // pass...
+}
+
+/* ********************************************************************************************* *
+ * Implementation of HIDevice
+ * ********************************************************************************************* */
+HIDevice::HIDevice(const USBDeviceDescriptor &desc, const ErrorStack &err, QObject *parent)
   : QObject(parent), _dev(nullptr)
 {
   // Create the USB HID Manager.
@@ -18,8 +32,8 @@ HIDevice::HIDevice(int vid, int pid, const ErrorStack &err, QObject *parent)
         kCFAllocatorDefault, 2, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
 
   // Specify the USB device manufacturer and product in our matching dictionary.
-  CFDictionarySetValue(matchDict, CFSTR(kIOHIDVendorIDKey), CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &vid));
-  CFDictionarySetValue(matchDict, CFSTR(kIOHIDProductIDKey), CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &pid));
+  int locationId = desc.device().value<USBDeviceHandle>().locationId;
+  CFDictionarySetValue(matchDict, CFSTR(kIOHIDLocationIDKey), CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &locationId));
 
   // Apply the matching to our HID manager.
   IOHIDManagerSetDeviceMatching(_HIDManager, matchDict);
@@ -32,11 +46,11 @@ HIDevice::HIDevice(int vid, int pid, const ErrorStack &err, QObject *parent)
   // Add the HID manager to the main run loop
   IOHIDManagerScheduleWithRunLoop(_HIDManager, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
 
-  // Open the HID mangager
+  // Open the HID manager
   IOReturn IOReturn = IOHIDManagerOpen(_HIDManager, kIOHIDOptionsTypeNone);
   if (IOReturn != kIOReturnSuccess) {
     errMsg(err) << "Cannot open HID manager for USB device "
-                << QString::number(vid, 16) << ":" << QString::number(pid,16) << ".";
+                << QString::number(locationId,16) << ".";
     IOHIDManagerUnscheduleFromRunLoop(_HIDManager, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
     _HIDManager = nullptr;
     return;
@@ -51,7 +65,7 @@ HIDevice::HIDevice(int vid, int pid, const ErrorStack &err, QObject *parent)
   }
 
   errMsg(err) << "Cannot open USB device "
-              << QString::number(vid, 16) << ":" << QString::number(pid,16) << ".";
+              << QString::number(locationId,16) << ".";
   IOHIDManagerUnscheduleFromRunLoop(_HIDManager, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
   IOHIDManagerClose(_HIDManager, kIOHIDOptionsTypeNone);
   _HIDManager = nullptr;
@@ -65,6 +79,76 @@ HIDevice::~HIDevice() {
     IOHIDManagerClose(_HIDManager, kIOHIDOptionsTypeNone);
   }
 }
+
+QList<USBDeviceDescriptor>
+HIDevice::detect(uint16_t vid, uint16_t pid)
+{
+  /* Get the IO registry which has the system information for connected hardware. */
+  io_registry_entry_t entry = IORegistryGetRootEntry(kIOMasterPortDefault);
+  if (entry == 0)
+    return QList<USBDeviceDescriptor>();
+
+  /* Get an iterator for the USB plane. */
+  io_iterator_t iter    = 0;
+  kern_return_t kret = IORegistryEntryCreateIterator(entry, kIOUSBPlane, kIORegistryIterateRecursively, &iter);
+  if (kret != KERN_SUCCESS || iter == 0)
+    return QList<USBDeviceDescriptor>();
+
+  QList<USBDeviceDescriptor> devices;
+
+  io_service_t service = 0;
+  while ((service = IOIteratorNext(iter))) {
+    IOCFPlugInInterface  **plug  = NULL;
+    IOUSBDeviceInterface **dev   = NULL;
+    io_string_t            path;
+    SInt32                 score = 0;
+    IOReturn               ioret;
+
+    /* Pull out IO Plugins for each iterator. */
+    kret = IOCreatePlugInInterfaceForService(service, kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID, &plug, &score);
+    IOObjectRelease(service);
+    if (kret != KERN_SUCCESS || plug == NULL)
+      continue;
+
+    /* Get an IOUSBDeviceInterface for each USB device from the IO Plugin object. */
+    ioret = (*plug)->QueryInterface(plug, CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID), (void **)&dev);
+    (*plug)->Release(plug);
+    if (ioret != kIOReturnSuccess || dev == NULL)
+       continue;
+
+    /* Print out the path in the IO Plane the device is at. */
+    if (IORegistryEntryGetPath(service, kIOServicePlane, path) != KERN_SUCCESS) {
+      (*dev)->Release(dev);
+      continue;
+    }
+
+    UInt16 dev_vendor, dev_product, dev_addr;
+    UInt32 dev_location;
+    if ( ((*dev)->GetDeviceVendor(dev, &dev_vendor) != kIOReturnSuccess) || (dev_vendor != vid) )
+      continue;
+    if ( ((*dev)->GetDeviceProduct(dev, &dev_product) != kIOReturnSuccess) || (dev_product != pid) )
+      continue;
+    if ((*dev)->GetLocationID(dev, &dev_location) != kIOReturnSuccess)
+      continue;
+    if ((*dev)->GetDeviceAddress(dev, &dev_addr) != kIOReturnSuccess)
+      continue;
+
+    logDebug() << "Found device with vid:pid " << QString::number(vid, 16)
+               << ":" << QString::number(pid, 16) << " at "
+               << QString::number(dev_location, 16) << ".";
+
+    devices.append(HIDevice::Descriptor(
+                     USBDeviceInfo(USBDeviceInfo::Class::HID,
+                                   vid, pid),
+                     dev_location, dev_addr));
+    /* All done with this device. */
+    (*dev)->Release(dev);
+  }
+  IOObjectRelease(iter);
+
+  return devices;
+}
+
 bool
 HIDevice::isOpen() const {
   return nullptr != _dev;
@@ -185,7 +269,6 @@ HIDevice::callback_open(void *context, IOReturn result, void *sender, IOHIDDevic
   Q_UNUSED(sender);
 
   HIDevice *self = reinterpret_cast<HIDevice *>(context);
-
   IOReturn o = IOHIDDeviceOpen(deviceRef, kIOHIDOptionsTypeSeizeDevice);
   if (o != kIOReturnSuccess) {
     logError() << "Cannot open HID device!";

@@ -9,6 +9,7 @@
 #include "signaling.hh"
 #include "tyt_extensions.hh"
 #include "opengd77_extension.hh"
+#include "commercial_extension.hh"
 
 class Config;
 class RXGroupList;
@@ -17,7 +18,7 @@ class ScanList;
 class APRSSystem;
 class PositioningSystem;
 class RoamingZone;
-class RadioID;
+class DMRRadioID;
 
 
 /** The base class of all channels (analog and digital) of a codeplug configuration.
@@ -41,20 +42,22 @@ class Channel: public ConfigObject
   /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
   /** The scan list. */
-  Q_PROPERTY(ScanListReference* scanList READ scanList WRITE setScanList)
+  Q_PROPERTY(ScanListReference* scanListRef READ scanListRef)
   /** The VOX setting. */
   Q_PROPERTY(unsigned vox READ vox WRITE setVOX SCRIPTABLE false)
   /** The OpenGD77 channel extension. */
   Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
   /** The TyT channel extension. */
   Q_PROPERTY(TyTChannelExtension* tyt READ tytChannelExtension WRITE setTyTChannelExtension)
+  /** The commercial channel extension. */
+  Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
 
 public:
   /** Possible power settings. */
   enum class Power {
     Max,  ///< Highest power setting (e.g. > 5W, if available).
     High, ///< High power setting (e.g, 5W).
-    Mid,  ///< Medium power setting (e.g., 2W, if avaliable)
+    Mid,  ///< Medium power setting (e.g., 2W, if available)
     Low,  ///< Low power setting (e.g., 1W).
     Min   ///< Lowest power setting (e.g., <1W, if available).
   };
@@ -80,7 +83,7 @@ public:
   /** (Re-)Sets the TX frequency of the channel in MHz. */
   bool setTXFrequency(double freq);
 
-  /** Retunrs @c true if the channel uses the global default power setting. */
+  /** Returns @c true if the channel uses the global default power setting. */
   bool defaultPower() const;
   /** Returns the power setting of the channel if the channel does not use the default power. */
   Power power() const;
@@ -109,7 +112,7 @@ public:
 
   /** Returns @c true if the VOX is disabled. */
   bool voxDisabled() const;
-  /** Retunrs @c true if the VOX is specified by the global default value. */
+  /** Returns @c true if the VOX is specified by the global default value. */
   bool defaultVOX() const;
   /** Returns the VOX level [0-10]. */
   unsigned vox() const;
@@ -121,15 +124,13 @@ public:
   void disableVOX();
 
   /** Returns the reference to the scan list. */
-  const ScanListReference *scanList() const;
+  const ScanListReference *scanListRef() const;
   /** Returns the reference to the scan list. */
-  ScanListReference *scanList();
-  /** Sets the scan list reference. */
-  void setScanList(ScanListReference *ref);
+  ScanListReference *scanListRef();
   /** Returns the default scan list for the channel. */
-  ScanList *scanListObj() const;
+  ScanList *scanList() const;
   /** (Re-) Sets the default scan list for the channel. */
-  bool setScanListObj(ScanList *list);
+  bool setScanList(ScanList *list);
 
   /** Returns the channel extension for the OpenGD77 firmware.
    * If this extension is not set, returns @c nullptr. */
@@ -143,12 +144,17 @@ public:
   /** Sets the TyT channel extension. */
   void setTyTChannelExtension(TyTChannelExtension *ext);
 
+  /** Returns the extension for commercial features. */
+  CommercialChannelExtension *commercialExtension() const;
+  /** Sets the commercial channel extension. */
+  void setCommercialExtension(CommercialChannelExtension *ext);
+
 public:
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
   bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
-  bool populate(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 protected slots:
   /** Gets called whenever a referenced object is changed or deleted. */
@@ -175,6 +181,8 @@ protected:
   OpenGD77ChannelExtension *_openGD77ChannelExtension;
   /** Owns the TyT channel extension object. */
   TyTChannelExtension *_tytChannelExtension;
+  /** Owns the commercial channel extension. */
+  CommercialChannelExtension *_commercialExtension;
 };
 
 
@@ -267,11 +275,11 @@ public:
   void setAPRSSystem(APRSSystem *sys);
 
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
-  bool populate(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds the admit criterion. */
@@ -362,7 +370,7 @@ public:
   GroupListReference *groupList();
   /** Sets the reference to the group list. */
   void setGroupList(GroupListReference *ref);
-  /** Retruns the RX group list for the channel. */
+  /** Returns the RX group list for the channel. */
   RXGroupList *groupListObj() const;
   /** (Re-)Sets the RX group list for the channel. */
   bool setGroupListObj(RXGroupList *rxg);
@@ -406,13 +414,13 @@ public:
   RadioIDReference *radioId();
   /** Sets the reference to the radio ID. */
   void setRadioId(RadioIDReference *ref);
-  /** Returns the radio ID associated with this channel or @c nullptr if the default ID is used. */
-  RadioID *radioIdObj() const;
-  /** Associates the given radio ID with this channel. Pass nullptr to set to default ID. */
-  bool setRadioIdObj(RadioID *id);
+  /** Returns the radio ID associated with this channel. */
+  DMRRadioID *radioIdObj() const;
+  /** Associates the given radio ID with this channel. */
+  bool setRadioIdObj(DMRRadioID *id);
 
 public:
-  YAML::Node serialize(const Context &context);
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** The admit criterion. */
@@ -429,7 +437,7 @@ protected:
   PositioningSystemReference _posSystem;
   /** Roaming zone for the channel. */
   RoamingZoneReference _roaming;
-  /** Radio ID to use on this channel. @c nullptr if default ID is used. */
+  /** Radio ID to use on this channel. */
   RadioIDReference _radioId;
 };
 
@@ -480,9 +488,9 @@ public:
 
   /** Gets the channel at the specified index. */
   Channel *channel(int idx) const;
-  /** Finds a digial channel with the given frequencies, time slot and color code. */
+  /** Finds a digital channel with the given frequencies, time slot and color code. */
   DigitalChannel *findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, unsigned cc) const;
-  /** Finds an analog channel with the given frequeny. */
+  /** Finds an analog channel with the given frequency. */
   AnalogChannel *findAnalogChannelByTxFreq(double freq) const;
 
 public:

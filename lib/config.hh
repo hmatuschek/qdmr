@@ -9,7 +9,7 @@
  * of the model and manufacturer.
  *
  * The entire configuration (abstract, device independent codeplug) consists of a tree of
- * @c ConfigItem instances. This class forms the base-class of all elmenets in the configuration
+ * @c ConfigItem instances. This class forms the base-class of all elements in the configuration
  * (excluding lists etc.). Each @c ConfigItem may have a set of properties. These properties are
  * used to implement the majority of the common functionality concerning the abstract codeplug.
  * These are
@@ -24,10 +24,10 @@
  * To this end, the creation of codeplug extensions is pretty easy, as only the properties for the
  * extension must be defined. The rest is taken care of by the default implementation of the
  * @c ConfigItem::copy, @c ConfigItem::clone, @c ConfigItem::label, @c ConfigItem::serialize,
- * @c ConfigItem::parse and @c ConfigItem::link methods. It is not neccessary to override any of
+ * @c ConfigItem::parse and @c ConfigItem::link methods. It is not necessary to override any of
  * these methods if there is a one-to-one mapping between the property and its YAML representation.
  *
- * Frequently, however, it is neccessary to represent a property in a different way in YAML. This
+ * Frequently, however, it is necessary to represent a property in a different way in YAML. This
  * is usually true if a property may hold different specializations of a common type. For example
  * the channel list may hold analog and digital channels. In YAML, the type is specified explicitly
  * as an enclosing map. This structure is not a one-to-one representation of the actual property
@@ -51,9 +51,11 @@
 #include "radioid.hh"
 #include "radiosettings.hh"
 #include "tyt_extensions.hh"
+#include "encryptionextension.hh"
 
 // Forward declaration
 class UserDatabase;
+class EncryptionExtension;
 
 /** The config class, representing the codeplug configuration.
  *
@@ -65,6 +67,27 @@ class Config : public ConfigItem
 {
 	Q_OBJECT
 
+  /** The global radio settings. */
+  Q_PROPERTY(RadioSettings* settings READ settings SCRIPTABLE false)
+  /** The list of radio IDs. */
+  Q_PROPERTY(RadioIDList* radioIDs READ radioIDs SCRIPTABLE false)
+  /** The list of contacts. */
+  Q_PROPERTY(ContactList* contacts READ contacts SCRIPTABLE false)
+  /** The list of group lists. */
+  Q_PROPERTY(RXGroupLists* groupLists READ rxGroupLists SCRIPTABLE false)
+  /** The list of channels. */
+  Q_PROPERTY(ChannelList* channels READ channelList SCRIPTABLE false)
+  /** The list of zones. */
+  Q_PROPERTY(ZoneList* zones READ zones SCRIPTABLE false)
+  /** The list of scan lists. */
+  Q_PROPERTY(ScanLists* scanLists READ scanlists SCRIPTABLE false)
+  /** The list of positioning systems. */
+  Q_PROPERTY(PositioningSystems* positioning READ posSystems SCRIPTABLE false)
+  /** The list of roaming zones. */
+  Q_PROPERTY(RoamingZoneList* roaming READ roaming SCRIPTABLE false)
+
+  /** Represents the config extension for encryption keys. */
+  Q_PROPERTY(CommercialExtension* commercial READ commercialExtension)
   /** Represents the config extension for TyT devices. */
   Q_PROPERTY(TyTConfigExtension* tytExtension READ tytExtension WRITE setTyTExtension)
 
@@ -92,7 +115,7 @@ public:
   ChannelList *channelList() const;
   /** Returns the list of zones. */
   ZoneList *zones() const;
-  /** Retruns the list of scanlists. */
+  /** Returns the list of scanlists. */
   ScanLists *scanlists() const;
   /** Returns the list of positioning systems. */
   PositioningSystems *posSystems() const;
@@ -107,11 +130,17 @@ public:
   /** Clears the complete configuration. */
   void clear();
 
-  /** Returns the TyT button settings extension.
+  const Config *config() const;
+
+  /** Returns the commercial extension. */
+  CommercialExtension *commercialExtension() const;
+
+  /** Returns the TyT settings extension.
    * If this extension is not set, returns @c nullptr. */
   TyTConfigExtension *tytExtension() const;
-  /** Sets the TyT button settings extension. */
+  /** Sets the TyT settings extension. */
   void setTyTExtension(TyTConfigExtension *ext);
+
 
 public:
   /** Imports a configuration from the given file. */
@@ -126,12 +155,11 @@ public:
   bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
 
 public:
-  bool label(Context &context);
   /** Serializes the configuration into the given stream as text. */
-  bool toYAML(QTextStream &stream);
+  bool toYAML(QTextStream &stream, const ErrorStack &err=ErrorStack());
 
 protected:
-  bool populate(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 protected slots:
   /** Iternal callback. */
@@ -158,8 +186,10 @@ protected:
   PositioningSystems *_gpsSystems;
   /** The list of roaming zones. */
   RoamingZoneList *_roaming;
-  /** Owns the tyt button settings. */
+  /** Owns the TyT settings extension. */
   TyTConfigExtension *_tytExtension;
+  /** Owns the commercial extension. */
+  CommercialExtension *_commercialExtension;
 };
 
 #endif // CONFIG_HH

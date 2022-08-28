@@ -31,11 +31,12 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   case Channel::Power::Min: ui->powerValue->setCurrentIndex(4); break;
   }
 
-  ui->squelchValue->setValue(config->settings()->squelch());
-  ui->totValue->setValue(config->settings()->tot());
-  ui->voxValue->setValue(config->settings()->vox());
+  ui->squelchValue->setValue(_config->settings()->squelch());
+  ui->totValue->setValue(_config->settings()->tot());
+  ui->voxValue->setValue(_config->settings()->vox());
 
-  ui->extensionView->setObject(config->settings());
+  ui->extensionView->setObjectName("radioSettingsExtension");
+  ui->extensionView->setObject(_config->settings(), _config);
 
   connect(_config, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   connect(ui->dmrID, SIGNAL(textEdited(QString)), this, SLOT(onDMRIDChanged()));

@@ -9,7 +9,7 @@
 </info>
 
 <para>
-  You may programm a myriad of different channels for you radio. To organize them in handy chunks,
+  You may program a myriad of different channels for you radio. To organize them in handy chunks,
   zones are used. That is, a zone is just a named list of channels that are relevant for a
   particular area or a particular situation.
 </para>
@@ -22,7 +22,7 @@
 </screenshot>
 
 <para>
-  The <guilabel>Zones</guilabel> just lists all defined zones. You may add a 
+  The <guilabel>Zones</guilabel> tab just lists all defined zones. You may add a 
   <glossterm>Zone</glossterm> using the <guibutton>Add Zone</guibutton> button or you may delete 
   one by selecting the zone in the list and clicking on <guibutton>Delete Zone</guibutton>. You may
   also alter the ordering of the zones by selecting one from the list and using the 
@@ -36,7 +36,7 @@
   consists of two lists of channels. One for each VFO. <application>qdmr</application> zones follow
   the second approach. That is, a zone consists of two lists. One of each VFO. When programming 
   radios that support only one channel list per zone, the zone is split into two (unless the second 
-  list is empty). One of each VFO.
+  list is empty). One for each VFO and the A/B label is added to the name.
 </para>
 
 <para>
@@ -53,7 +53,8 @@
 </screenshot>
 
 <para>
-  This dialog allows to add, remove and change the order of the channels within the zone.
+  This dialog allows for adding or removing channels, and changing the order of the channels within
+  the zone using the up- and down-buttons on the right.
 </para>
 
 </section>

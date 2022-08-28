@@ -12,7 +12,7 @@
 <para>
   As mentioned in <xref linkend="introPrivateCalls"/>, DMR aims at being repeater transparent. That
   is, it does not matter which repeater is used for the operation. This is also true for talk 
-  groups. In this section, I'll continue with the example of a OM at his holiday location who wants
+  groups. In this section, I'll continue with the example of an OM at his holiday location, who wants
   to participate in his afternoon net. For example, the afternoon net is happening on the talk 
   group 2621 (Berlin/Brandenbug, BB). This talk group is usually statically subscribed on all 
   repeaters in the states Berlin and Brandenbug. That means that the local afternoon net can be 
@@ -34,9 +34,9 @@
 </example>
 
 <para>
-  For the OM at his holiday location, this it not true. An italian repeater will certainly not 
+  For the OM at his holiday location, this it not true. An Italian repeater will certainly not 
   subscribe the BB talk group statically. Therefore, the OM at the holiday location will not hear 
-  his afternoon net. He knows when this net starts. So he can perform a group call to the that TG 
+  his afternoon net. He knows, however, when this net starts. So he can perform a group call to the that TG 
   shortly before the net starts (see <xref linkend="figIntroTG"/> second image). This will 
   subscribe the BB talk group temporarily at the holiday repeater (I0ABC). Now, the OM can hear and
   participate in the afternoon net. The subscription will be renewed whenever he starts a group 
@@ -86,9 +86,9 @@
 </para>
 
 <para>
-  For this reason, some regional <emphasis>clusters</emphasis> of repeaters are linked to 
-  so-called <quote>Cluster</quote>. These cluster provide <quote>normal</quote> talk groups for the 
-  repeater within a region. These talk groups are then also reachable from the outside. A list of 
+  For this reason, some regional <emphasis>clusters</emphasis> of repeaters are linked to a
+  so-called <quote>Cluster</quote>. These clusters provide <quote>normal</quote> talk groups for the 
+  repeater within a region. These clusters are then also reachable from the outside. A list of 
   regional clusters and their associated talk group numbers can be obtained under 
   <link xlink:href="http://bm262.de/cluster/">bm262.de/cluster/</link>.
 </para>

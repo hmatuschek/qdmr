@@ -24,7 +24,7 @@ public:
   virtual ~OpenGD77();
 
 	const QString &name() const;
-  const Radio::Features &features() const;
+  const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
@@ -47,9 +47,6 @@ protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
 	void run();
 
-  /** Connects to the radio, if a radio interface is passed to the constructor, this interface
-   * instance is used. */
-  bool connect();
   /** Implements the actual download process. */
   bool download();
   /** Implements the actual codeplug upload process. */
@@ -66,8 +63,12 @@ protected:
 	Config *_config;
   /** The actual binary codeplug representation. */
   OpenGD77Codeplug _codeplug;
-  /** The acutal binary callsign DB representation. */
+  /** The actual binary callsign DB representation. */
   OpenGD77CallsignDB _callsigns;
+
+private:
+  /** Holds the singleton instance. */
+  static RadioLimits *_limits;
 };
 
 #endif // OPENGD77_HH

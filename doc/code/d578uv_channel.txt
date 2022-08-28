@@ -30,7 +30,7 @@
 Field description:
  - RMode: Repater mode where 0=simplex, 1=positive TX offset, 2=negative TX offset.
  - BWd: Band width where 0=narrow (12.5kHz), 1=wide (25kHz).
- - PWR: Power where 0=low, 1=mid, 2=heigh, 3=turbo.
+ - PWR: Power where 0=low, 1=mid, 2=high, 3=turbo.
  - CMode: Channel mode, 0=analog, 1=digital, 2=analog + digi RX, 3=digital + analog RX.
  - TAr: Enable talkaround.
  - CaC: Enable call confirm.
@@ -52,7 +52,7 @@ Field description:
  - EST: Enable simplex TDMA,
  - SMC: SMS confirmation,
  - TSL: Time slot where 0=TS1, 1=TS2
- - XFR: Exlcude from roaming
+ - XFR: Exclude from roaming
  - DAD: Data ACK disable.
  - ETM: Enable through mode
  - BTE: BlueTooth hands free enabled

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="extComEncryption"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Encryption extension</title>
+</info>
+
+<para>
+  This extension allows to configure the commercial encryption features of DMR. Almost all DMR 
+  radios implement means for encrypting the traffic. This feature however, is usually illegal 
+  when used within a amateur radio context.
+</para>
+
+<example>
+  <title></title>
+  <programlisting><![CDATA[commercial:
+  encryptionKeys:
+    - dmr: 
+      id: key1
+      name: Example key 1
+      key: ABCD
+    - aes:
+      id: key2
+      name: Example key 2
+      key: 01234567890123456789012345678901
+]]></programlisting>
+</example>
+
+<para> 
+  This extension is a simple list of keys held in the global <token>commercial</token> extension.
+  Each key must either be a DMR (basic) or AES (enhanced) key. 
+  The former defines a simple 16bit key while the latter defines a 126bit AES key. To 
+  differentiate these key types, each list entry must be a mapping with a single entry. The name
+  specifies the type (i.e., either <token>dmr</token> or <token>aes</token>). The value then 
+  specifies the properties of the key.
+</para>
+
+
+<section>
+<info>
+  <title>Common key attributes</title>
+</info>
+
+<para>
+  As only the key size differs between the different key types, there are common attributes.
+  Specifically, the ID and name of the key.
+</para>
+
+<variablelist>
+  <title>Common key fields</title>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>
+        Specifies the ID of the key. This ID can then be used to reference the key within the 
+        commercial digital channel extension. See <xref linkend="extComChannel"/>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>
+        Specifies the name of the key. This property is usually not encoded in the binary 
+        codeplug.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+
+<section>
+<info>
+  <title>DMR (basic) key attributes</title>
+</info>
+    
+<variablelist>
+  <title>DMR key fields</title>
+  <varlistentry>
+    <term><token>key</token></term>
+    <listitem>
+      <para>
+        Specifies the 16bit key as a HEX string. To this end, a 4-char hex string is specified.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+  
+
+<section>
+<info>
+  <title>AES (enhanced) key attributes</title>
+</info>
+    
+<para>
+</para>
+    
+<variablelist>
+  <title>AES key fields</title>
+  <varlistentry>
+    <term><token>key</token></term>
+    <listitem>
+      <para>
+        Specifies the 128bit key as a HEX string. To this end, a 32-char hex string is specified.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+  
+</section>
+        

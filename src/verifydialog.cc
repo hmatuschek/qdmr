@@ -1,24 +1,34 @@
 #include "verifydialog.hh"
+#include "radiolimits.hh"
 #include <QPushButton>
 
-VerifyDialog::VerifyDialog(const QList<VerifyIssue> &issues, bool upload, QWidget *parent)
+VerifyDialog::VerifyDialog(const RadioLimitContext &issues, bool upload, QWidget *parent)
     : QDialog(parent)
 {
 	setupUi(this);
 
   bool valid = true;
-  foreach (VerifyIssue issue, issues) {
+  for (int i=0; i<issues.count(); i++) {
+    const RadioLimitIssue &issue = issues.message(i);
     QListWidgetItem *item = new QListWidgetItem(issue.message());
-    if (VerifyIssue::ERROR == issue.type()) {
+    // Dispatch by severity
+    switch (issue.severity()) {
+    case RadioLimitIssue::Silent:
+      break;
+    case RadioLimitIssue::Hint:
+      item->setForeground(Qt::gray);
+      break;
+    case RadioLimitIssue::Warning:
+      item->setForeground(Qt::black);
+      break;
+    case RadioLimitIssue::Critical:
       item->setForeground(Qt::red);
       valid = false;
-    } else if (VerifyIssue::WARNING == issue.type()) {
-      item->setForeground(Qt::black);
-    } else if (VerifyIssue::NOTIFICATION == issue.type()) {
-      item->setForeground(Qt::gray);
+      break;
     }
     listWidget->addItem(item);
   }
+
   if (upload) {
     buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
     QPushButton *ignore = buttonBox->button(QDialogButtonBox::Ok);

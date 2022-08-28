@@ -8,39 +8,28 @@ QVariant
 parseDeviceHandle(const QString &device) {
   QRegExp pattern("([0-9]+):([0-9]+)");
   if (pattern.exactMatch(device.simplified())) {
-    return QVariant::fromValue(USBDeviceAddress(pattern.cap(1).toUInt(), pattern.cap(2).toUInt()));
+    return QVariant::fromValue(USBDeviceHandle(pattern.cap(1).toUInt(), pattern.cap(2).toUInt()));
   }
   return QVariant(device.simplified());
 }
 
 void
 printDevices(QTextStream &out, const QList<USBDeviceDescriptor> &devices) {
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << " Device";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << "Type";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(60); out << "Description";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "\n";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(18); out << "-";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "+-";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(18); out << "-";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "+-";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar('-'); out.setFieldWidth(60); out << "-";
-  out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "\n";
   foreach (USBDeviceDescriptor device, devices) {
     if (USBDeviceInfo::Class::None == device.interfaceClass())
       continue;
-    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(8);
+    out << "Device '";
     if (USBDeviceInfo::Class::Serial == device.interfaceClass()) {
-      out << device.device().toString();
-    } else {
-      USBDeviceAddress addr = device.device().value<USBDeviceAddress>();
-      out << addr.bus << ":" << addr.device;
+      out << device.device().toString() << "'\n";
+    } else if (USBDeviceInfo::Class::DFU == device.interfaceClass()) {
+      USBDeviceHandle addr = device.device().value<USBDeviceHandle>();
+      out << QString("%1:%2").arg(addr.bus).arg(addr.device) << "'\n";
+    } else if (USBDeviceInfo::Class::HID == device.interfaceClass()) {
+      USBDeviceHandle addr = device.device().value<USBDeviceHandle>();
+      out << QString("%1:%2").arg(addr.bus).arg(addr.device) << "'\n";
     }
-    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
-    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(18); out << device.description();
-    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << "| ";
-    out.setFieldAlignment(QTextStream::AlignLeft); out.setPadChar(' '); out.setFieldWidth(0); out << device.longDescription() << "\n";
+    out << " Type:        " << device.description() << "\n";
+    out << " Description: " << device.longDescription() << "\n";
   }
 }
 
@@ -80,7 +69,7 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app, const ErrorStack &
     // If no device is specified, there should only be one interface
     ErrorStack::MessageStream msg(err, __FILE__, __LINE__);
     msg << "Cannot auto-detect radio, more than one matching USB devices found:"
-        << " Use --device option to specifiy to which device to talk to. Devices found:\n";
+        << " Use --device option to specify to which device to talk to. Devices found:\n";
     printDevices(msg, interfaces);
     return nullptr;
   } else if (! interfaces.first().isSave()) {
@@ -100,7 +89,7 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app, const ErrorStack &
   if (parser.isSet("radio")) {
     RadioInfo radio = RadioInfo::byKey(parser.value("radio").toLower());
     if (! radio.isValid()) {
-      errMsg(err) << "Uknown radio '" << parser.value("radio").toLower() << "'.";
+      errMsg(err) << "Unknown radio '" << parser.value("radio").toLower() << "'.";
       return nullptr;
     }
     Radio *rad = Radio::detect(device, radio, err);

@@ -3,13 +3,14 @@
 
 #include <QApplication>
 #include <QGroupBox>
+#include <QIcon>
 #include "config.hh"
 #include <QGeoPositionInfoSource>
 #include "releasenotes.hh"
 #include "radio.hh"
 
 class QMainWindow;
-class RepeaterDatabase;
+class RepeaterBookList;
 class UserDatabase;
 class TalkGroupDatabase;
 class RadioIDListView;
@@ -34,13 +35,16 @@ public:
   QMainWindow *mainWindow();
 
   UserDatabase *user() const;
-  RepeaterDatabase *repeater() const;
+  RepeaterBookList *repeater() const;
   TalkGroupDatabase *talkgroup() const;
 
   bool hasPosition() const;
   QGeoCoordinate position() const;
 
   Radio *autoDetect(const ErrorStack &err=ErrorStack());
+
+  bool isDarkMode() const;
+  bool isDarkMode(const QPalette &palette) const;
 
 public slots:
   void newCodeplug();
@@ -49,8 +53,7 @@ public slots:
   void quitApplication();
 
   void detectRadio();
-  bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true,
-                      const VerifyFlags &flags=VerifyFlags());
+  bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true);
 
   void downloadCodeplug();
   void uploadCodeplug();
@@ -73,6 +76,8 @@ private slots:
 
   void positionUpdated(const QGeoPositionInfo &info);
 
+  void onPaletteChanged(const QPalette &palette);
+
 protected:
   Config *_config;
   QMainWindow *_mainWindow;
@@ -88,7 +93,7 @@ protected:
   RoamingZoneListView *_roamingZoneList;
   ExtensionView *_extensionView;
 
-  RepeaterDatabase *_repeater;
+  RepeaterBookList *_repeater;
   UserDatabase *_users;
   TalkGroupDatabase *_talkgroups;
 

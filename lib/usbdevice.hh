@@ -35,6 +35,55 @@
  *      radio. This can be done by obtaining all known radios matching the selected USB device
  *      (VID:PID) by calling RadioInfo::allRadios, passing the @c USBDeviceDescriptor.
  *
+ * @section detectExample A example for AnyTone devices
+ * This example tries to detect an AnyTone device and reads the binary codeplug from it. Once the
+ * codeplug is read, it is decoded into its generic device independent representation (@c Config).
+ *
+ * @code
+ * #include "libdmrconf/usbdevice.hh"
+ * #include "libdmrconf/anytone_radio.hh"
+ *
+ * int main(void)
+ * {
+ *   // First, search matching devices (only AnyTones)
+ *   // to find all supported devices, call @c USBDescriptor::detect();
+ *   QList<USBDeviceDescriptor> devices = AnytoneInterface::detect();
+ *   if (1 != devices.count()) {
+ *     // Either none or more than one device found...
+ *     return -1;
+ *   }
+ *
+ *   // A place to put error messages
+ *   ErrorStack err;
+ *   // Dedetect the specific radio and get radio descriptor.
+ *   // To detect any radio based on the selected descriptor, call @c Radio::detect().
+ *   Radio *radio = AnytoneRadio::detect(devices.first(), RadioInfo(), err);
+ *   if (nullptr == radio) {
+ *     // There went something wrong, check err.
+ *     return -1;
+ *   }
+ *
+ *   // Read codeplug from device blocking.
+ *   if (! radio->startDownload(true, err)) {
+ *     // Some read error, check err.
+ *     delete radio;
+ *     return -1;
+ *   }
+ *
+ *   // Decode codeplug into generic representation
+ *   Config genericCodeplug;
+ *   if (! radio->codeplug().decode(&genericCodeplug, err)) {
+ *     // Some decoding error, check err.
+ *     delete radio;
+ *     return -1;
+ *   }
+ *
+ *   // Do whatever you like with the codeplug.
+ *
+ *   return 0;
+ * }
+ * @endcode
+ *
  * @ingroup rif */
 
 #ifndef USBDEVICE_HH
@@ -46,16 +95,20 @@
 /** Combines the USB bus and device number, to address a USB device uniquely.
  *
  * @ingroup detect */
-struct USBDeviceAddress {
-  uint8_t bus;      ///< Holds the bus number.
-  uint8_t device;   ///< Holds the device address.
+struct USBDeviceHandle {
+  uint8_t bus;         ///< Holds the bus number.
+  uint8_t device;      ///< Holds the device address.
+  uint32_t locationId; ///< On MacOS, holds the location ID.
 
   /** Empty constructor. */
-  USBDeviceAddress();
+  USBDeviceHandle();
   /** Constructor from bus and device number. */
-  USBDeviceAddress(uint8_t busno, uint8_t deviceno);
+  USBDeviceHandle(uint8_t busno, uint8_t deviceno, uint32_t locid=0);
+
+  /** Compares only wrt bus and device number. */
+  bool operator==(const USBDeviceHandle &other);
 };
-Q_DECLARE_METATYPE(USBDeviceAddress)
+Q_DECLARE_METATYPE(USBDeviceHandle)
 
 /** Generic information about a possible radio interface.
  *
@@ -133,7 +186,7 @@ protected:
 };
 
 
-/** Base class for all radio iterface descriptors representing a unique interface to a
+/** Base class for all radio interface descriptors representing a unique interface to a
  * connected radio.
  *
  * This class extends the @c USBDeviceInfo by some information to identify a USB uniquely. This is
@@ -146,7 +199,7 @@ protected:
   /** Hidden constructor from info and path string. */
   USBDeviceDescriptor(const USBDeviceInfo &info, const QString &device);
   /** Hidden constructor from info and USB device address. */
-  USBDeviceDescriptor(const USBDeviceInfo &info, const USBDeviceAddress &device);
+  USBDeviceDescriptor(const USBDeviceInfo &info, const USBDeviceHandle &device);
 
 public:
   /** Empty constructor. */

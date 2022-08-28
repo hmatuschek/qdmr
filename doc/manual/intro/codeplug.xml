@@ -11,7 +11,7 @@
 
 <para>
   After the basic concepts and technical details of the DMR mode has been discussed, it is time to 
-  consider the actual configuration of the RMD radios. This usually not node via the keypad of the 
+  consider the actual configuration of the DMR radios. This usually not done via the keypad of the 
   radio but with the help of a separate software. The so-called <glossterm>CPS</glossterm> or 
   codeplug programming software. 
 </para>
@@ -68,7 +68,7 @@
 </para>
 
 <para>
-  The configuration of your device usually happens in five-six steps:
+  The configuration of your device usually happens in five to six steps:
 </para>
 <orderedlist>
   <listitem><para>General settings, </para></listitem>
@@ -88,7 +88,7 @@
 <info><title>General radio-wide settings.</title></info>
 
 <para>
-  The single most options within the general settings is your DMR ID and your call sign. These 
+  The single most important options within the general settings is your DMR ID and your call sign. These 
   options are usually located under the label <guilabel>Radio Settings</guilabel> or 
   <guilabel>General Settings</guilabel><footnote><para>The actual name may vary from manufacturer
     to manufactuer.</para></footnote>.
@@ -107,7 +107,7 @@
 <info><title>Creating Contacts</title></info>
 
 <para>
-  Once you have made the basic settings, you may create some contacts in your contact list. This 
+  Once you have made these basic settings, you may create some contacts in your contact list. This 
   list should contain all talk groups you are interested in, some private contacts to OM you know
   as well as some <quote>service numbers</quote> for the <quote>echo</quote>-service, SMS service 
   etc. A sample is shown in <xref linkend="tabIntroContacts"/>.
@@ -163,7 +163,7 @@
 <para>
   The simplex group list is theoretically not necessary as simplex calls should always use the so-called 
   <glossterm>All Call</glossterm>. Frequently, however, also the talkgroups TG99, TG9 and TG8 are used 
-  in simplex operation. Hence a group list with these talk groups is needed for the simplex operation.
+  in simplex operation. Hence a group list with these talk groups is needed for simplex operation.
 </para>
 
 <para>
@@ -175,8 +175,8 @@
 <para>
   Finally the talk group for the local/regional communication should contain the local TG9, 
   regional TG8 and the talk group for your region (e.g., TG 2621 for my region Berlin/Brandenbug).
-  As I am also frequently in saxony, I also created a group list for that region. My sample 
-  group lists are shown in <xref linkend="tabIntroGroupLists"/>.
+  As I am also frequently in saxony, I also created a group list for that region. My 
+  group list settings are shown in <xref linkend="tabIntroGroupLists"/>.
 </para>
   
 <table xml:id="tabIntroGroupLists">
@@ -199,7 +199,7 @@
 
 <para>
   Before we start assembling any channels, I should mention that DMR radios are also able to 
-  transmit and receive analog FM. You can also use them for classic FM simplex and repeater 
+  transmit and receive analog FM. Thus, you can also use them for classic FM simplex and repeater 
   operation. In this section, I describe the configuration of digital DMR channels usually called 
   <quote>digital channels</quote>. The configuration of analog FM channels is not described. To 
   create a DMR channel, you have to select <guilabel>digital</guilabel> for the <guilabel>channel 
@@ -209,7 +209,7 @@
 <para>
   When you already have some experience with the analog FM repeater operation, the configuration 
   of DMR channels may appear quiet weird. For analog FM repeaters, you usually configure exactly 
-  one channel. For DMR repeaters you will configure at least two (one for each time slot) but 
+  one channel. For DMR repeaters you will configure at least two (one for each time slot), but 
   usually many more. To cut a long story short, let me explain it with a concrete example.
 </para>
 
@@ -230,18 +230,18 @@
 
 <para>
   In <xref linkend="tabIntroCPSimplexChannels"/> an example for a simplex channel configuration is 
-  shown. You should of cause extend it to all 8 simplex channels. The first column simply specifies
+  shown. Of cause, you should extend it to all 8 simplex channels. The first column simply specifies
   the name of the channel.
 </para>
 
 <para>
-  The second and third columns specifies the transmit and receive frequencies for these channels.
-  For simplex channels, these frequencies are the same.
+  The second and third columns specify the transmit and receive frequencies for these channels.
+  For simplex channels, RX and TX frequencies are the same.
 </para>  
 
 <para>
   In simplex operation, there is no repeater. That is, no instance that dictates a beat. To this 
-  end the choise of the time slot (TS) is irrelevant and usually TS1 is chosen.
+  end the choice of the time slot (TS) is irrelevant and usually TS1 is chosen.
 </para>
 
 <para>
@@ -251,7 +251,7 @@
 
 <para>
   The sixth column specifies the default transmit contact. For simplex channels, the so-called 
-  <glossterm>All Call</glossterm> should be chosen to ensure that really everyone can receive the 
+  <glossterm>All Call</glossterm> should be chosen, to ensure that really everyone can receive the 
   call irrespective of the receivers group list settings. The default transmit contact specifies 
   the contact (private, group or all call) that is called whenever the PTT is pressed. As mentioned
   earlier, there is an exception to that rule. Whenever you directly answer a call within in the 
@@ -261,7 +261,7 @@
 <para>
   The last column specifies the to so-called <glossterm>Group List</glossterm>. This list specifies
   which talk groups are received on that channel. As mentioned earlier, no entry should be needed 
-  here as the all-call should be used as the transmit contact on simplex channels. Unfortunately,
+  here, as the all-call should be used for the transmit contact on simplex channels. Unfortunately,
   it is not uncommon to find several talk groups being used as transmit contacts on simplex 
   channels like TG9, TG8, TG99. For these cases, a group list <quote>simplex</quote> was created 
   earlier.
@@ -338,7 +338,7 @@
   channel is selected and the PTT is pressed, the talk group 262 is called. By configuring a 
   separate channel for this talk group allows to start a call to it without having to search for 
   it in the contact list. This also allows to temporarily subscribe this talk group on a repeater
-  easily by simply pressing PTT briefly. 
+  easily, by simply pressing PTT briefly. 
 </para>
 
 <note>
@@ -367,7 +367,7 @@
   is set. If the channel <quote>DB0LDS TG9 TS2</quote> is selected and the PTT is pressed, 
   a call to TG9 is repeated only by the repeater DB0LDS. If the channel <quote>DB0LDS BB 
   TS2</quote> is selected and the PTT is pressed, a call to TG2621 is repeater by almost all 
-  repeaters in the region Berlin/Brandenbug. Therefor, chose a talk group that is sufficient
+  repeaters in the region Berlin/Brandenbug. Therefore, chose a talk group that is sufficient
   for you intended communication. 
 </para>
 
@@ -392,8 +392,8 @@
 <info><title>Other channel options</title></info>
 
 <para>
-  The user interface of the manufacturer CPS where you configure the channels is usually very 
-  extensiv. There are a huge amount of options that control the behavior of the channel. The 
+  The user interface of the manufacturer CPS where you configure the channels, is usually very 
+  extensiv. There is a huge amount of options that control the behavior of the channel. The 
   majority of these options are not used in ham radio applications. Some of these, however, I want
   to describe here briefly.
 </para>
@@ -423,15 +423,15 @@
 </para>
 
 <para>
-  The option <glossterm>Privacy Group</glossterm> or <glossterm>Encryption Key</glossterm> revers
-  to a build-in method of encrypting the traffic. This is actually forbidden in amateur radio.
+  The option <glossterm>Privacy Group</glossterm> or <glossterm>Encryption Key</glossterm> refers
+  to a built-in method of encrypting the traffic. This is actually forbidden in amateur radio.
 </para>
 
 <para> 
   The flags <quote>Emergency Alarm Confirmed</quote>, <quote>Private Call Confirmed</quote> and 
   <quote>Data Call Confirmed</quote> specify how the radio starts these calls. The radio will first
   establish a call to the destination and will signal once the call is <quote>confirmed</quote>. 
-  Once the confirmation is received, the actual call starts. This options are not used in amateur
+  Once the confirmation is received, the actual call starts. These options are not used in amateur
   radio and should be disabled as they may interfere with the normal operation.
 </para>
 
@@ -439,7 +439,7 @@
   The option <glossterm>Talkaround</glossterm> allows to operate simplex on a repeater channel. 
   That is the radio transmits and receives on the repeater input frequency. This allows to bypass
   the repeater and to communicate directly with other participants on the same repeater channel.
-  Also this option make litte sense in amateur radio.
+  Also this option makes little sense in amateur radio.
 </para>
 
 <para>
@@ -473,9 +473,9 @@
 <info><title>Assembling zones</title></info>
 
 <para>
-  Once you have assembled all channels of interest, you may notice that the list is quite large. 
+  Once you have assembled all channels of interest, you may notice that the list is quite long. 
   Hence all DMR radios organize the channels in so-called <glossterm>Zone</glossterm>s. Zones are 
-  simple lists of channels that group them into relevant sets usually based on the location. You 
+  simple lists of channels that group them into relevant sets, usually based on the location. You 
   may therefore collect all channels for <quote>Home</quote>, <quote>Work</quote> and 
   <quote>Holidays</quote> into one zone each. How you organize your zones is up to you.
 </para>
@@ -502,7 +502,7 @@
   <glossterm>Scan List</glossterm>s are simple lists of channels. When the scan is started on a 
   particular channel, the channels scan list is used. The radio will then step though that list
   and may stop on a channel that shows activity. It is then possible to answer the received call.
-  This function allows to observe several channels. Additionally, it is usually possible to specify
+  This function allows for observing several channels. Additionally, it is usually possible to specify
   one or more <quote>priority channels</quote> for a scan list. This channel is then visited more 
   frequently and thus monitored more intensively.
 </para>

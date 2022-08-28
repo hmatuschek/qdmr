@@ -24,8 +24,6 @@ public:
 
 public:
   /** Connects to the device with given vendor and product ID. */
-  HIDevice(int vid, int pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
-  /** Connects to the device with given vendor and product ID. */
   HIDevice(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
 	virtual ~HIDevice();

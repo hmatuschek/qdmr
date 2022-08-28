@@ -15,11 +15,14 @@ class MultiGroupCallSelectionDialog: public QDialog
   Q_OBJECT
 
 public:
-  explicit MultiGroupCallSelectionDialog(ContactList *contacts, QWidget *parent=nullptr);
+  explicit MultiGroupCallSelectionDialog(ContactList *contacts, bool showPrivateCalls=false, QWidget *parent=nullptr);
 
   QList<DigitalContact *> contacts();
 
   void setLabel(const QString &text);
+
+protected slots:
+  void showPrivateCallsToggled(bool show);
 
 protected:
   QLabel *_label;

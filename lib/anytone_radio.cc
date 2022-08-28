@@ -10,10 +10,10 @@
 
 AnytoneRadio::AnytoneRadio(const QString &name, AnytoneInterface *device, QObject *parent)
   : Radio(parent), _name(name), _dev(device), _codeplugFlags(), _config(nullptr),
-    _codeplug(nullptr), _callsigns(nullptr), _supported_version(), _version()
+    _codeplug(nullptr), _callsigns(nullptr)
 {
-  // Open device to radio if not already present
-  if (! connect()) {
+  // Check if device is open
+  if ((nullptr==_dev) || (! _dev->isOpen())) {
     _task = StatusError;
     return;
   }  
@@ -44,33 +44,6 @@ Codeplug &
 AnytoneRadio::codeplug() {
   return *_codeplug;
 }
-
-
-VerifyIssue::Type
-AnytoneRadio::verifyConfig(Config *config, QList<VerifyIssue> &issues, const VerifyFlags &flags) {
-  VerifyIssue::Type issue = Radio::verifyConfig(config, issues, flags);
-
-  if (_supported_version.isEmpty() || _version.isEmpty())
-    return issue;
-
-  if (_supported_version < _version) {
-    issues.append(VerifyIssue(
-                    VerifyIssue::WARNING,
-                    tr("You are likely using a newer radio reversion (%1) than supported (%2) by qdmr. "
-                       "The codeplug might be incompatible. "
-                       "Notify the developers of qdmr about the new reversion.").arg(_version, _supported_version)));
-    issue = std::max(issue, VerifyIssue::WARNING);
-  } else if (_supported_version > _version) {
-    issues.append(VerifyIssue(
-                    VerifyIssue::WARNING,
-                    tr("You are likely using an older hardware reversion (%1) than supported (%2) by qdmr. "
-                       "The codeplug might be incompatible.").arg(_version, _supported_version)));
-    issue = std::max(issue, VerifyIssue::WARNING);
-  }
-  return issue;
-}
-
-
 
 bool
 AnytoneRadio::startDownload(bool blocking, const ErrorStack &err) {
@@ -144,7 +117,7 @@ AnytoneRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const Calls
 void
 AnytoneRadio::run() {
   if (StatusDownload == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       _task = StatusError;
       emit downloadError(this);
       return;
@@ -165,7 +138,7 @@ AnytoneRadio::run() {
     emit downloadFinished(this, _codeplug);
     _config = nullptr;
   } else if (StatusUpload == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       _task = StatusError;
       emit uploadError(this);
       return;
@@ -186,7 +159,7 @@ AnytoneRadio::run() {
     _task = StatusIdle;
     emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       _task = StatusError;
       emit uploadError(this);
       return;
@@ -207,29 +180,6 @@ AnytoneRadio::run() {
     _task = StatusIdle;
     emit uploadComplete(this);
   }
-}
-
-bool
-AnytoneRadio::connect() {
-  // Check if there is a connection
-  if ((nullptr != _dev) && (_dev->isOpen()))
-    return true;
-
-  // If there is a connection but it is not open -> close it.
-  if (nullptr != _dev)
-    _dev->deleteLater();
-
-  // If no connection -> open one.
-  _dev = new AnytoneInterface(_errorStack);
-  if (! _dev->isOpen()) {
-    errMsg(_errorStack) << "Cannot connect to device.";
-    _task = StatusError;
-    _dev->deleteLater();
-    _dev = nullptr;
-    return false;
-  }
-
-  return true;
 }
 
 bool

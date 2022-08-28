@@ -27,7 +27,7 @@ public:
   explicit GD77(RadioddityInterface *device=nullptr, QObject *parent=nullptr);
 
 	const QString &name() const;
-  const Radio::Features &features() const;
+  const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
@@ -50,8 +50,12 @@ protected:
 	QString _name;
   /** The codeplug. */
   GD77Codeplug _codeplug;
-  /** The acutal binary callsign DB representation. */
+  /** The actual binary callsign DB representation. */
   GD77CallsignDB _callsigns;
+
+private:
+  /** Holds the signleton instance of the radio limits for this radio. */
+  static RadioLimits *_limits;
 };
 
 #endif // GD77_HH

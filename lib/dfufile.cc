@@ -25,7 +25,7 @@ typedef struct __attribute((packed)) {
 typedef struct __attribute((packed)) {
   uint8_t signature[6];      ///< Target signature, fixed "Target"
   uint8_t alternate_setting; ///< Alternate setting for image.
-  uint32_t is_named;         ///< Bool, if targed is named;
+  uint32_t is_named;         ///< Bool, if target is named;
   uint8_t name[255];         ///< Target name (0-padded?).
   uint32_t size;             ///< Size of complete image excl. prefix in big endian.
   uint32_t n_elements;       ///< Number of elements in image in big endian.
@@ -205,7 +205,7 @@ DFUFile::write(QFile &file, const ErrorStack &err) {
   file_prefix_t prefix;
   memcpy(prefix.signature, "DfuSe", 5);
   prefix.version = 0x01;
-  prefix.image_size = qToLittleEndian(size()-sizeof(file_suffix_t));
+  prefix.image_size = qToLittleEndian(uint32_t(size()-sizeof(file_suffix_t)));
   prefix.n_targets = _images.size();
 
   if (sizeof(file_prefix_t) != file.write((char *)&prefix, sizeof(file_prefix_t))) {

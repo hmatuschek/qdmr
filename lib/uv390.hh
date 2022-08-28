@@ -25,6 +25,8 @@
 #include "uv390_codeplug.hh"
 #include "uv390_callsigndb.hh"
 
+class RadioLimits;
+
 /** Implements an USB interface to the TYT MD-UV390 & Retevis RT3S VHF/UHF 5W DMR (Tier I&II) radios.
  *
  * The TYT MD-UV390 and Retevis RT3S radios use the TyT typical DFU-style communication protocol
@@ -44,7 +46,7 @@ public:
   virtual ~UV390();
 
   const QString &name() const;
-  const Features &features() const;
+  const RadioLimits &limits() const;
 
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
@@ -63,6 +65,10 @@ private:
   UV390Codeplug _codeplug;
   /** The callsign DB object. */
   UV390CallsignDB _callsigndb;
+
+private:
+  /** Holds the singleton instance of the radio limits. */
+  static RadioLimits *_limits;
 };
 
 #endif // MD2017_HH

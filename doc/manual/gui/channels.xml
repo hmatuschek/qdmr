@@ -12,15 +12,15 @@
   Creating the list of channels for the DMR radio is the most cumbersome task. Remember, each
   repeater has two time-slots with possibly multiple talk-groups assigned to each time slot. For
   the sake of convenience, it is reasonable to define a channel for each talk-group you are
-  interested for each time-slot on every repeater. Thus, instead of a single channel per
-  analog repeater, you will likely define at least 3-4 channels per repeater in DMR. 
+  interested in, for each time-slot on every repeater. Thus, instead of a single channel per
+  analog repeater, you will likely define at least 3-4 channels per DMR repeater. 
 </para>
 
 <para>
   To ease the burden of creating a lot of channels, <application>qdmr</application> implements some
   features that should help you in creating these channel. One feature is the automatic retrieval 
   of repeater input and output frequencies from
-  <link xlink:href="https://repeatermap.de">repeatermap.de</link>. This is a world-wide map
+  <link xlink:href="https://repeaterbook.com">repeaterbook.com</link>. This is a world-wide database
   of ham-radio repeaters.
 </para>
 
@@ -41,14 +41,23 @@
 </screenshot>
 
 <para> 
-  The <guilabel>Channels</guilabel> tab shows the list of all defined channels, irrespective 
+  The <guilabel>Channels</guilabel> tab shows the list of all defined channels, irrespective of
   whether they are analog or digital (DMR) channels. You may add an analog or digital channel by 
   clicking on the <guibutton>Add Analog Channel</guibutton> or 
-  <guibutton>Add Digital Channel</guibutton> button on the bottom, respectively. You can also 
-  delete a channel, by selecting that channel in the list and clicking on the
+  <guibutton>Add Digital Channel</guibutton> button on the bottom, respectively. 
+</para>
+
+<para>
+  The <guilabel>Clone Channel</guilabel> button allows for cloning of a selected channel. This 
+  enables one to create a set of channels that differ only in the default transmit contact but 
+  share the same remaining settings.
+</para>
+
+<para>
+  You can also delete a channel, by selecting that channel in the list and clicking on the
   <guibutton>Delete Channel</guibutton> button at the bottom. You may move a channel up or down the
   list by selecting that channel and clicking on the <guibutton>arrow-up</guibutton> or 
-  <guibutton>-down</guibutton> button to the left, respectively. Finally you can edit a channel by 
+  <guibutton>-down</guibutton> button to the right, respectively. Finally you can edit a channel by 
   double-clicking it in the list. 
 </para>
 
@@ -90,44 +99,99 @@
   The <guilabel>Name</guilabel>, <guilabel>Rx</guilabel> and <guilabel>Tx Frequency</guilabel> 
   fields contain the chosen name of the channel as well as the transmit and receive frequencies. 
   The latter can be set automatically by using the repeater auto-completion feature: Start to enter
-  the call-sign of a repeater and the RX/TX frequencies will be set using the information from
-  <link xlink:href="https://repeatermap.de">repeatermap.de</link>. For simplex-channels RX
+  the call-sign of a repeater. A list of matching nearby repeaters is shown. Select a repeater 
+  from this list and the RX/TX frequencies will be set using the information from
+  <link xlink:href="https://repeaterbook.com">repeaterbook.com</link>. For simplex-channels RX
   and TX frequencies must be identical.
 </para>
 
 <para>
   The <guilabel>Power</guilabel> setting specifies the power used on that channel. For a nearby 
-  repeater, you may reduce the power. <guilabel>Tx Timeout</guilabel> (<glossterm>TOT</glossterm>)
+  repeater, you may reduce the power. If you check the <guilabel>Default</guilabel> box, the 
+  global power setting will be used. See <xref linkend="guiRadioSettings"/> above.
+</para>
+
+<para>
+  <guilabel>Tx Timeout</guilabel> (<glossterm>TOT</glossterm>)
   specifies the transmit timeout in seconds. This limits the continuous transmission time to this 
-  period. A value of 0 disables the timeout. <glossterm>Scan List</glossterm> allows to specify the 
+  period. A value of <guilabel>Off</guilabel> disables the timeout. If you check the 
+  <guilabel>Default</guilabel> box, the global TOT setting will be used. See 
+  <xref linkend="guiRadioSettings"/> above.
+</para>
+
+<para>
+  <guilabel>VOX Level</guilabel> specifies the sensitivity of the <glossterm>VOX</glossterm>
+  for this channel. If <guilabel>OFF</guilabel> is selected, the VOX is disabled for this channel.
+  If you check the <guilabel>Default</guilabel> box, the global VOX setting will be used. See 
+  <xref linkend="guiRadioSettings"/> above.
+</para>
+<para>
+  Checking <guilabel>Rx Only</guilabel> will disable transmission on this channel. 
+</para>
+
+<para>
+  <glossterm>Scan List</glossterm> allows to specify the 
   scan list associated with this channel. If a scan is started on this channel, this scan list will 
   be used. Each channel may have a different scan list.
 </para>
 
 <para>
+  The <guilabel>DMR ID</guilabel> field allows to select the Radio DMR ID for this channel. Some 
+  radios allow to program several DMR IDs to be used with one radio. This option makes not sense
+  for HAM-radio usage. However, if you use the same radio for HAM as well as commercial 
+  applications, you may need to set your HAM DMR ID for HAM-radio channels and your commercial ID
+  on commercial channels.
+</para>
+
+<para>
   The <guilabel>Tx Admit</guilabel> field specifies the <glossterm>Admit Criterion</glossterm>,
-  under which condition you are allowed to transmit on the channel. For DMR reapeater channels this 
-  should be set to <guilabel>Color Code</guilabel>, this means that you may only transmit if the 
+  under which you are allowed to transmit on the channel. For DMR repeater channels this 
+  should be set to <guilabel>Color Code</guilabel>. This means that you may only transmit if the 
   radio received the correct color code of the repeater before. On simplex channels 
-  <guilabel>Channel Free</guilabel> should be chosen.
+  <guilabel>Channel Free</guilabel> should be chosen and thus the radio will only transmit on 
+  the channel if the channel is free.
 </para>
 
 <para>
   The <glossterm>Color Code</glossterm> specifies the color code of the repeater. For simplex 
-  channels, this should be set to 1. The <glossterm>Time Slot</glossterm> specifies the time-slot 
-  of the repeater for this channel. All repeaters have two time slots but different talk groups 
-  might be associated with each time slot. The <glossterm>Group List</glossterm> specifies the 
-  list of group-calls you want to receive on this time-slot. The <guilabel>Tx Contact</guilabel> 
-  specifies the default <glossterm>Transmit Contact</glossterm> you want to call on this channel 
-  when pressing the PTT button. Finally, the <guilabel>GPS System</guilabel> specifies how you 
-  location information is send over this channel (selecting <guilabel>None</guilabel> disables 
-  GPS for this channel).
+  channels, this should be set to 1. For repeater channels, this must match the color code of 
+  the repeater. If the auto-completion feature is used, the color code is set automatically.
+</para>
+
+<para>
+  The <glossterm>Time Slot</glossterm> specifies the time-slot  of the repeater for this channel. 
+  All repeaters have two time slots but different talk groups might be associated with each time 
+  slot. You may need to consult the webpage of the repeater. In the <glossterm>Brandmeister 
+    network</glossterm>, usually the time-slot 2 is for local/regional communication while 
+  time-slot 1 is for <quote>DX</quote>.
+</para>
+
+<para>
+  The <glossterm>Group List</glossterm> specifies the list of group-calls you want to receive on 
+  this channel. See <xref linkend="guiGroupLists"/> above for details.
+</para>
+
+<para>
+  The <guilabel>Tx Contact</guilabel> specifies the default <glossterm>Transmit Contact</glossterm> 
+  you want to call on this channel when pressing the PTT button. 
+</para>
+
+<para>
+  The <guilabel>Positioning System</guilabel> (DMR ARPS) specifies how you location information is 
+  send over this channel (selecting <guilabel>None</guilabel> disables GPS for this channel). Please 
+  note, that this setting is ignored for radios without GPS.
+</para>
+
+<para>
+  The <guilabel>Roaming</guilabel> allows to associate a roaming zone (see <xref linkend="guiRoaming"/> 
+  below) with this channel. If the radios has the roaming feature, this zone is then used to search
+  for a another channel of another repeater that is reachable once this repeater get out-of-range.
 </para>
 
 <para>
   If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
   <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
-  the device specific settings for the GPS system. 
+  the device specific settings for the channel. 
 </para>
 </section>
 
@@ -140,7 +204,7 @@
 <para>
   When you double-click on an analog channel or click on the <guibutton>Add Analog 
   Channel</guibutton> button, the analog-channel-editor dialog will be shown. This dialog allows 
-  you to edit or create analog (FM) channels.
+  for editing or creating analog (FM) channels.
 </para>
 
 <screenshot>
@@ -154,7 +218,8 @@
 <para>
   The left column of field are identical to the digital channel dialog, that is 
   <guilabel>Name</guilabel>, <guilabel>Rx</guilabel> and <guilabel>Tx Frequency</guilabel>, 
-  <guilabel>Power</guilabel>, <guilabel>Tx Timeout</guilabel> and <guilabel>Scan List</guilabel>.
+  <guilabel>Power</guilabel>, <guilabel>Tx Timeout</guilabel>, <guilabel>VOX Level</guilabel> 
+  <guilabel>Rx Only</guilabel> and <guilabel>Scan List</guilabel>.
 </para>
 
 <para>
@@ -168,22 +233,36 @@
 </para>
 
 <para>
-  The <guilabel>Squelch</guilabel> field specifies the squelch threshold. <guilabel>Rx</guilabel>
-  and <guilabel>Tx Tone</guilabel> specify the <glossterm>CTCSS</glossterm>/<glossterm>DCS</glossterm>
-  tones for this channel/repeater. The <guilabel>Rx Tone</guilabel> specifies the subtone that is needed 
-  to open the squelch. The <guilabel>Tx Tone</guilabel> specifies the tone that gets transmitted (e.g., 
-  to open the repeater).
+  The <guilabel>Squelch</guilabel> field specifies the squelch threshold. If 
+  <guilabel>Open</guilabel> is selected, the squelch is disabled. If <guilabel>Default</guilabel>
+  is enabled, the global squelch level is used. See <xref linkend="guiRadioSettings"/> above.
 </para>
 
 <para>
-  Finally <guilabel>Bandwidth</guilabel> specifies the band-width of the transmission (i.e., 12.5 
-  or 25 kHz).
+  <guilabel>Rx</guilabel> and <guilabel>Tx Tone</guilabel> specify the 
+  <glossterm>CTCSS</glossterm>/<glossterm>DCS</glossterm>
+  tones for this channel/repeater. The <guilabel>Rx Tone</guilabel> specifies the sub-tone that is 
+  needed to open the squelch. The <guilabel>Tx Tone</guilabel> specifies the tone that gets 
+  transmitted (e.g., to open the repeater). If the auto-completion feature is used, these tones are
+  set automatically.
+</para>
+
+<para>
+  <guilabel>Bandwidth</guilabel> specifies the band-width of the transmission. Possible 
+  values are 12.5kHz (<guilabel>Narrow</guilabel>) or 25kHz (<guilabel>Wide</guilabel>).
+</para>
+
+<para>
+  <guilabel>APRS</guilabel> allows to specify an APRS system to be used on this channel. If the 
+  radio supports analog APRS, your position will be send using the frequency, destination and path
+  specified in this APRS system. If <guilabel>None</guilabel> is selected, APRS is disabled for
+  this channel. If your radio does not support APRS, this setting is ignored.
 </para>
 
 <para>
   If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
   <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
-  the device specific settings for the GPS system. 
+  the device specific settings for the channel. 
 </para>
 </section>
 

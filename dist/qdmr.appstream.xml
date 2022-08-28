@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (C) 2022 Hannes Matuschek <dm3mat@darc.de> -->
+
+<component type="desktop">
+  <id>qdmr.desktop</id>
+  <name>QDMR</name>
+  <project_license>GPL-3+</project_license>
+  <metadata_license>CC-BY-SA-3.0</metadata_license>
+  <summary>Codeplug programming software for DMR radios.</summary>
+
+  <description>
+    <p>
+      QDMR is a Qt5 application to program DMR radios. DMR is a digital modulation
+      standard used in amateur and commercial radio. To this end, QDMR is an 
+      alternative codeplug programming software (CPS) that supports several radios 
+      of several manufacturers. Including AnyTone AT-D868UVE, AT-D878UV, AT-878UVII, 
+      AT-D578UV, TyT MD-390, MD-UV380, MD-UV390, MD-2017, Retevis RT8, RT3S, RT82, 
+      Radioddity RD5R, GD-77, Baofeng DMR-6X2 and radio running the OpenGD77 
+      firmware.
+    </p>
+  </description>
+
+  <screenshots>
+    <screenshot type="default">
+      <image width="1409" height="620">https://raw.githubusercontent.com/hmatuschek/qdmr/master/doc/fig/qdmr-channels.png</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">http://dm3mat.darc.de/qdmr/</url>
+  <url type="bugtracker">https://github.com/hmatuschek/qdmr/issues</url>
+</component>
+
+  

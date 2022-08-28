@@ -7,6 +7,7 @@
 #include "config.h"
 #include "logger.hh"
 #include "tyt_extensions.hh"
+#include "encryptionextension.hh"
 #include <QTimeZone>
 #include <QtEndian>
 
@@ -485,6 +486,12 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
   ex->setTXRefFrequency(txRefFrequency());
   ch->setTyTChannelExtension(ex);
 
+  // If encryption is enabled, Add commercial extension to channel if needed
+  // the key will be linked later
+  if ((MODE_DIGITAL == mode()) && (PRIV_NONE != privacyType()) &&
+      (nullptr == ch->commercialExtension()))
+    ch->setCommercialExtension(new CommercialChannelExtension());
+
   return ch;
 }
 
@@ -495,7 +502,7 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
     return false;
 
   if (scanListIndex() && ctx.has<ScanList>(scanListIndex())) {
-    c->setScanListObj(ctx.get<ScanList>(scanListIndex()));
+    c->setScanList(ctx.get<ScanList>(scanListIndex()));
   }
 
   if (MODE_ANALOG == mode()) {
@@ -511,6 +518,33 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
     if (positioningSystemIndex() && ctx.has<GPSSystem>(positioningSystemIndex())) {
       dc->setAPRSObj(ctx.get<GPSSystem>(positioningSystemIndex()));
     }
+
+    // Link encryption key if defined
+    if (PRIV_NONE != privacyType()) {
+      if (nullptr == c->commercialExtension()) {
+        logError() << "Cannot link encryption key: No commercial extension set.";
+        return false;
+      }
+      if (PRIV_BASIC == privacyType()) {
+        if (! ctx.has<DMREncryptionKey>(privacyIndex())) {
+          logError() << "Cannot link encryption key: No basic key with index " << privacyIndex()
+                     << " defined.";
+          return false;
+        }
+        c->commercialExtension()->setEncryptionKey(ctx.get<DMREncryptionKey>(privacyIndex()));
+      } else if (PRIV_ENHANCED == privacyType()) {
+        if (! ctx.has<AESEncryptionKey>(privacyIndex())) {
+          logError() << "Cannot link encryption key: No AES (enhances) key with index "
+                     << privacyIndex() << " defined.";
+          return false;
+        }
+        c->commercialExtension()->setEncryptionKey(ctx.get<AESEncryptionKey>(privacyIndex()));
+      } else {
+        logError() << "Unknown encryption key type " << privacyType() << ".";
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -527,8 +561,8 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
     setTXTimeOut(ctx.config()->settings()->tot());
   else
     setTXTimeOut(chan->timeout());
-  if (chan->scanListObj())
-    setScanListIndex(ctx.index(chan->scanListObj()));
+  if (chan->scanList())
+    setScanListIndex(ctx.index(chan->scanList()));
   else
     setScanListIndex(0);
   // Enable vox
@@ -564,6 +598,25 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
       enablePrivateCallConfirm(chan->tytChannelExtension()->privateCallConfirmed());
       enableDataCallConfirm(chan->tytChannelExtension()->dataCallConfirmed());
       enableEmergencyAlarmACK(chan->tytChannelExtension()->emergencyAlarmConfirmed());
+    }
+    // Link encryption key if set
+    if (chan->commercialExtension() && chan->commercialExtension()->encryptionKey()) {
+      // Check for index
+      if (0 > ctx.index(chan->commercialExtension()->encryptionKey())) {
+        logError() << "Cannot encode encryption key '"
+                   << chan->commercialExtension()->encryptionKey()->name()
+                   << "': Not indexed.";
+      } else if (chan->commercialExtension()->encryptionKey()->is<DMREncryptionKey>()) {
+        setPrivacyType(PRIV_BASIC);
+        setPrivacyIndex(ctx.index(chan->commercialExtension()->encryptionKey()));
+      } else if (chan->commercialExtension()->encryptionKey()->is<AESEncryptionKey>()) {
+        setPrivacyType(PRIV_ENHANCED);
+        setPrivacyIndex(ctx.index(chan->commercialExtension()->encryptionKey()));
+      } else {
+        logInfo() << "Ignore unknown encryption key type "
+                  << chan->commercialExtension()->encryptionKey()->metaObject()->className()
+                  << " for DMR channel.";
+      }
     }
   } else if (chan->is<AnalogChannel>()) {
     const AnalogChannel *achan = chan->as<const AnalogChannel>();
@@ -830,13 +883,22 @@ TyTCodeplug::GroupListElement::setMemberIndex(unsigned n, uint16_t idx) {
 
 bool
 TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context &ctx) {
-  //logDebug() << "Encode group list '" << lst->name() << "' with " << lst->count() << " members.";
   setName(lst->name());
+
+  int j=0;
+  // Iterate over all 32 entries in the codeplug
   for (int i=0; i<32; i++) {
-    if (i<lst->count()) {
-      logDebug() << "Add contact " << lst->contact(i)->name() << " to list.";
-      setMemberIndex(i, ctx.index(lst->contact(i)));
+    // Skip non-private-call entries
+    while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
+      logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
+                << "' is not a private call. Skip entry.";
+      j++;
+    }
+    if (lst->count() > j) {
+      setMemberIndex(i, ctx.index(lst->contact(j)));
+      j++;
     } else {
+      // clear entry
       setMemberIndex(i, 0);
     }
   }
@@ -1059,7 +1121,7 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) {
   else if (0xffff == priorityChannel1Index())
     lst->setPrimaryChannel(nullptr);
   else
-    logWarn() << "Cannot deocde reference to priority channel index " << priorityChannel1Index()
+    logWarn() << "Cannot decode reference to priority channel index " << priorityChannel1Index()
                  << " in scan list '" << name() << "'.";
 
   if (0 == priorityChannel2Index())
@@ -1069,17 +1131,17 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) {
   else if (0xffff == priorityChannel2Index())
     lst->setSecondaryChannel(nullptr);
   else
-    logWarn() << "Cannot deocde reference to secondary priority channel index " << priorityChannel2Index()
+    logWarn() << "Cannot decode reference to secondary priority channel index " << priorityChannel2Index()
               << " in scan list '" << name() << "'.";
 
   if (0 == txChannelIndex())
     lst->setRevertChannel(SelectedChannel::get());
   else if (ctx.has<Channel>(txChannelIndex()))
     lst->setRevertChannel(ctx.get<Channel>(txChannelIndex()));
-  else if (0xffff == priorityChannel2Index())
-    lst->setSecondaryChannel(nullptr);
+  else if (0xffff == txChannelIndex())
+    lst->setRevertChannel(nullptr);
   else
-    logWarn() << "Cannot deocde reference to secondary priority channel index " << txChannelIndex()
+    logWarn() << "Cannot decode reference to transmit channel index " << txChannelIndex()
                 << " in scan list '" << name() << "'.";
 
   for (int i=0; ((i<31) && memberIndex(i)); i++) {
@@ -2537,13 +2599,13 @@ TyTCodeplug::EmergencySystemElement::revertChannelSelected() {
  * Implementation of TyTCodeplug::EncryptionElement
  * ******************************************************************************************** */
 TyTCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr, size_t size)
-  : Element(ptr, size)
+  : Element(ptr, size), _numEnhancedKeys(8), _numBasicKeys(16)
 {
   // pass...
 }
 
 TyTCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr)
-  : Element(ptr, 0xb0)
+  : Element(ptr, 0xb0), _numEnhancedKeys(8), _numBasicKeys(16)
 {
   // pass...
 }
@@ -2557,8 +2619,17 @@ TyTCodeplug::EncryptionElement::clear() {
   memset(_data, 0xff, 0xb0);
 }
 
+bool
+TyTCodeplug::EncryptionElement::isEnhancedKeySet(unsigned n) const {
+  QByteArray key = enhancedKey(n);
+  for (int i=0; i<16; i++) {
+    if (key[0] != key[i])
+      return true;
+  }
+  return ('\xff' != key[0]) && ('\x00' != key[0]);
+}
 QByteArray
-TyTCodeplug::EncryptionElement::enhancedKey(unsigned n) {
+TyTCodeplug::EncryptionElement::enhancedKey(unsigned n) const {
   return QByteArray((char *)(_data+n*16), 16);
 }
 void
@@ -2568,15 +2639,85 @@ TyTCodeplug::EncryptionElement::setEnhancedKey(unsigned n, const QByteArray &key
   memcpy(_data+n*16, key.constData(), 16);
 }
 
+bool
+TyTCodeplug::EncryptionElement::isBasicKeySet(unsigned n) const {
+  QByteArray key = basicKey(n);
+  for (int i=0; i<2; i++)
+    if (key[0] != key[i])
+      return true;
+  return ('\xff'!=key[0]) && ('\x00' != key[0]);
+}
 QByteArray
-TyTCodeplug::EncryptionElement::basicKey(unsigned n) {
+TyTCodeplug::EncryptionElement::basicKey(unsigned n) const {
   return QByteArray((char *)(_data+0x90+n*2), 2);
 }
 void
 TyTCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
   if (2 != key.size())
     return;
-  memcpy(_data+0x90+n*16, key.constData(), 2);
+  memcpy(_data+0x90+n*2, key.constData(), 2);
+}
+
+bool
+TyTCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *encr, Context &ctx) {
+  ctx.addTable(&DMREncryptionKey::staticMetaObject);
+  ctx.addTable(&AESEncryptionKey::staticMetaObject);
+
+  // Clear all keys
+  clear();
+
+  // Encode each key
+  unsigned basicCount=0, aesCount=0;
+  for (int i=0; i<encr->encryptionKeys()->count(); i++) {
+    if (encr->encryptionKeys()->get(i)->is<DMREncryptionKey>() && (_numBasicKeys > basicCount)) {
+      DMREncryptionKey *key = encr->encryptionKeys()->get(i)->as<DMREncryptionKey>();
+      setBasicKey(basicCount++, key->key());
+      ctx.add(key, basicCount);
+    } else if (encr->encryptionKeys()->get(i)->is<AESEncryptionKey>() && (_numEnhancedKeys > aesCount)) {
+      AESEncryptionKey *key = encr->encryptionKeys()->get(i)->as<AESEncryptionKey>();
+      setEnhancedKey(aesCount++, key->key());
+      ctx.add(key, aesCount);
+    } else {
+      logWarn() << "Cannot encode key of type '"
+                << encr->encryptionKeys()->get(i)->metaObject()->className() << "'.";
+    }
+  }
+
+  return true;
+}
+
+bool
+TyTCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
+  ctx.addTable(&DMREncryptionKey::staticMetaObject);
+  ctx.addTable(&AESEncryptionKey::staticMetaObject);
+
+  CommercialExtension *ext = ctx.config()->commercialExtension();
+  for (unsigned i=0; i<_numEnhancedKeys; i++) {
+    if (! isEnhancedKeySet(i))
+      continue;
+    AESEncryptionKey *key = new AESEncryptionKey();
+    key->setName(QString("Enhanced Key %1").arg(i+1));
+    ctx.add(key,i+1);
+    key->fromHex(enhancedKey(i).toHex());
+    ext->encryptionKeys()->add(key);
+  }
+  for (unsigned i=0; i<_numBasicKeys; i++) {
+    if (! isBasicKeySet(i))
+      continue;
+    DMREncryptionKey *key = new DMREncryptionKey();
+    key->setName(QString("Basic Key %1").arg(i+1));
+    ctx.add(key,i+1);
+    key->fromHex(basicKey(i).toHex());
+    ext->encryptionKeys()->add(key);
+  }
+
+  return ext;
+}
+
+bool
+TyTCodeplug::EncryptionElement::linkCommercialExt(CommercialExtension *ext, Context &ctx) {
+  Q_UNUSED(ext); Q_UNUSED(ctx);
+  return true;
 }
 
 
@@ -2728,6 +2869,12 @@ TyTCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &
     return false;
   }
 
+  // Define encryption keys
+  if (! this->encodePrivacyKeys(ctx.config(), flags, ctx)) {
+    errMsg(err) << "Cannot encode encryption keys.";
+    return false;
+  }
+
   // Define Channels
   if (! this->encodeChannels(ctx.config(), flags, ctx)) {
     errMsg(err) << "Cannot encode channels.";
@@ -2808,6 +2955,12 @@ TyTCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
   // Decode button settings
   if (! this->decodeButtonSetttings(ctx.config(), err)) {
     errMsg(err) << "Cannot decode button settings.";
+    return false;
+  }
+
+  // Decode encryption settings
+  if (! this->decodePrivacyKeys(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot decode encryption settings.";
     return false;
   }
 

@@ -8,50 +8,6 @@
 #define USB_PID 0xdf11
 
 
-TyTInterface::TyTInterface(const ErrorStack &err, QObject *parent)
-  : DFUDevice(USB_VID, USB_PID, err, parent), RadioInterface()
-{
-  if (! DFUDevice::isOpen()) {
-    errMsg(err) << "Cannot open TyTInterface.";
-    return;
-  }
-
-  // Enter Programming Mode.
-  if (wait_idle()) {
-    errMsg(err) << "Device not ready. Close device.";
-    close(); return;
-  }
-
-  if (md380_command(0x91, 0x01, err)) {
-    errMsg(err) << "Cannot enter programming mode. Close device.";
-    reboot(err);
-    close(); return;
-  }
-
-  // Get device identifier in a static buffer.
-  const char *idstr = identify(err);
-  if (idstr && (0==strcmp("MD390", idstr))) {
-    _ident = RadioInfo::byID(RadioInfo::MD390);
-  } else if (idstr && (0==strcmp("MD-UV380", idstr))) {
-    _ident = RadioInfo::byID(RadioInfo::UV380);
-  } else if (idstr && (0==strcmp("MD-UV390", idstr))) {
-    _ident = RadioInfo::byID(RadioInfo::UV390);
-  } else if (idstr && (0==strcmp("2017", idstr))) {
-    _ident = RadioInfo::byID(RadioInfo::MD2017);
-  } else if (idstr && (0==strcmp("1701", idstr))) {
-    _ident = RadioInfo::byID(RadioInfo::DM1701);
-  } else if (idstr) {
-    errMsg(err) << "Unknown TyT device '" << idstr << "'.";
-    close(); return;
-  }
-
-  // Zero address.
-  if(set_address(0x00000000, err)) {
-    errMsg(err) << "Cannot set device address to 0x00000000.";
-    close(); return;
-  }
-}
-
 TyTInterface::TyTInterface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
   : DFUDevice(descr, err, parent), RadioInterface()
 {
@@ -74,7 +30,9 @@ TyTInterface::TyTInterface(const USBDeviceDescriptor &descr, const ErrorStack &e
 
   // Get device identifier in a static buffer.
   const char *idstr = identify(err);
-  if (idstr && (0==strcmp("MD390", idstr))) {
+  if (idstr && (0==strcmp("DR780", idstr))) {
+    _ident = RadioInfo::byID(RadioInfo::MD380);
+  } else if (idstr && (0==strcmp("MD390", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::MD390);
   } else if (idstr && (0==strcmp("MD-UV380", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::UV380);
@@ -82,7 +40,7 @@ TyTInterface::TyTInterface(const USBDeviceDescriptor &descr, const ErrorStack &e
     _ident = RadioInfo::byID(RadioInfo::UV390);
   } else if (idstr && (0==strcmp("2017", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::MD2017);
-  } else if (idstr && (0==strcmp("1701", idstr))) {
+  } else if (idstr && (0==strcmp("DM-1701", idstr))) {
     _ident = RadioInfo::byID(RadioInfo::DM1701);
   } else if (idstr) {
     errMsg(err) << "Unknown TyT device '" << idstr << "'.";
@@ -94,6 +52,9 @@ TyTInterface::TyTInterface(const USBDeviceDescriptor &descr, const ErrorStack &e
     errMsg(err) << "Cannot set device address to 0x00000000.";
     close(); return;
   }
+
+  logDebug() << "Found device " << _ident.manufactuer() << " "<< _ident.name()
+             << " at " << descr.description() << ".";
 }
 
 TyTInterface::~TyTInterface() {

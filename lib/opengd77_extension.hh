@@ -17,6 +17,10 @@ class OpenGD77ChannelExtension: public ConfigExtension
 
   /** The channel transmit power. Overrides the common power settings. */
   Q_PROPERTY(Power power READ power WRITE setPower)
+  /** The zone skip flag. */
+  Q_PROPERTY(bool scanZoneSkip READ scanZoneSkip WRITE enableScanZoneSkip)
+  /** The all skip flag. */
+  Q_PROPERTY(bool scanAllSkip READ scanAllSkip WRITE enableScanAllSkip)
 
   Q_CLASSINFO("description", "Channel settings for OpenGD77 radios.")
   Q_CLASSINFO("longDescription", "This extension implements all channel settings specific to radios "
@@ -51,12 +55,22 @@ public:
   /** Sets the power setting. */
   void setPower(Power power);
 
-public:
-  //ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Returns @c true if the zone skip flag is set. */
+  bool scanZoneSkip() const;
+  /** Enables/disables zone skip. */
+  void enableScanZoneSkip(bool enable);
+  /** Returns @c true if the all-skip flag is set. */
+  bool scanAllSkip() const;
+  /** Enables/disables all skip. */
+  void enableScanAllSkip(bool enable);
 
 protected:
   /** Holds the power setting. */
   Power _power;
+  /** Holds the zone skip flag. */
+  bool _zoneSkip;
+  /** Holds the all skip flag. */
+  bool _allSkip;
 };
 
 
@@ -82,7 +96,8 @@ class OpenGD77ContactExtension: public ConfigExtension
               "channel for that contact that only differs in the time slot.")
 
 public:
-  /** Possible values for the time-slot override option. */
+  /** Possible values for the time-slot override option.
+   * Encoded values are correct for firmware 2022-02-28 (0118581D). */
   enum class TimeSlotOverride {
     None = 0x01,                  ///< Do not override time-slot of channel.
     TS1  = 0x00,                  ///< Force time-slot to TS1.
@@ -100,10 +115,6 @@ public:
   TimeSlotOverride timeSlotOverride() const;
   /** Sets the time slot override. */
   void setTimeSlotOverride(TimeSlotOverride ts);
-
-public:
-  /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());*/
 
 protected:
   /** Holds the time slot override. */

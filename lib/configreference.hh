@@ -8,7 +8,7 @@ class Channel;
 class DigitalChannel;
 class AnalogChannel;
 class ScanList;
-
+class EncryptionKey;
 
 /** Implements a reference to a config object.
  * This class is only used to implement the automatic generation/parsing of the YAML codeplug files.
@@ -36,6 +36,9 @@ public:
   virtual bool copy(const ConfigObjectReference *ref);
   /** Adds a possible type to this reference. */
   virtual bool allow(const QMetaObject *elementType);
+
+  /** Returns the type names of allowed objects. */
+  const QStringList &elementTypeNames() const;
 
   /** Returns the reference as the specified type. */
   template <class Type>
@@ -159,7 +162,7 @@ class ChannelRefList: public ConfigObjectRefList
 
 protected:
   /** Hidden constructor. */
-  explicit ChannelRefList(const QMetaObject &elementType, QObject *parent = nullptr);
+  explicit ChannelRefList(const QMetaObject &elementTypes, QObject *parent = nullptr);
 
 public:
   /** Empty constructor. */
@@ -258,6 +261,17 @@ class RoamingZoneReference: public ConfigObjectReference {
 public:
   /** Constructor. */
   explicit RoamingZoneReference(QObject *parent=nullptr);
+};
+
+
+/** Implements a reference to an encryption key.
+ * @ingroup conf */
+class EncryptionKeyReference: public ConfigObjectReference {
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit EncryptionKeyReference(QObject *parent=nullptr);
 };
 
 

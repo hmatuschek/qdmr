@@ -8,7 +8,7 @@ class UserDatabase;
 
 /** Abstract base class of all callsign database implementations.
  * This class defines the interface for all device-specific binary encodings of call sign
- * databases. The interface is particularily simple: reimplement the @c encode method.
+ * databases. The interface is particularly simple: reimplement the @c encode method.
  * @ingroup conf */
 class CallsignDB : public DFUFile
 {
@@ -34,7 +34,7 @@ public:
     void clearCountLimit();
 
   protected:
-    /** Specifies the maximum ammount of callsigns to add. If negative, the device limit should be
+    /** Specifies the maximum amount of callsigns to add. If negative, the device limit should be
      * used. */
     int64_t _count;
   };

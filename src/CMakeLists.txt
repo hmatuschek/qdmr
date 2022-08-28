@@ -9,7 +9,8 @@ SET(qdmr_SOURCES main.cc
   generalsettingsview.cc radioidlistview.cc contactlistview.cc grouplistsview.cc channellistview.cc
   zonelistview.cc scanlistsview.cc positioningsystemlistview.cc roamingzonelistview.cc
   collapsablewidget.cc extensionview.cc extensionwrapper.cc propertydelegate.cc errormessageview.cc
-  deviceselectiondialog.cc radioselectiondialog.cc)
+  deviceselectiondialog.cc radioselectiondialog.cc dmriddialog.cc configobjecttypeselectiondialog.cc
+  repeaterbookcompleter.cc)
 SET(qdmr_MOC_HEADERS
   configitemwrapper.hh
   application.hh settings.hh dmrcontactdialog.hh dtmfcontactdialog.hh rxgrouplistdialog.hh
@@ -21,7 +22,8 @@ SET(qdmr_MOC_HEADERS
   generalsettingsview.hh radioidlistview.hh contactlistview.hh grouplistsview.hh channellistview.hh
   zonelistview.hh scanlistsview.hh positioningsystemlistview.hh roamingzonelistview.hh
   collapsablewidget.hh extensionview.hh extensionwrapper.hh propertydelegate.hh errormessageview.hh
-  deviceselectiondialog.hh radioselectiondialog.hh)
+  deviceselectiondialog.hh radioselectiondialog.hh dmriddialog.hh configobjecttypeselectiondialog.hh
+  repeaterbookcompleter.hh)
 SET(qdmr_HEADERS )
 SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
   digitalchanneldialog.ui scanlistdialog.ui configwizardstart.ui verifydialog.ui settingsdialog.ui
@@ -30,14 +32,35 @@ SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui 
   generalsettingsview.ui radioidlistview.ui contactlistview.ui grouplistsview.ui channellistview.ui
   zonelistview.ui scanlistsview.ui positioningsystemlistview.ui roamingzonelistview.ui
   errormessageview.ui extensionview.ui
-  deviceselectiondialog.ui radioselectiondialog.ui)
+  deviceselectiondialog.ui radioselectiondialog.ui dmriddialog.ui configobjecttypeselectiondialog.ui)
 
 qt5_wrap_cpp(qdmr_MOC_SOURCES ${qdmr_MOC_HEADERS})
 qt5_wrap_ui(qdmr_UI_SOURCES ${qdmr_UI_FORMS})
 qt5_add_resources(qdmr_RCC_SOURCES ../shared/resources.qrc)
 
-add_executable(qdmr WIN32 ${qdmr_SOURCES} ${qdmr_MOC_SOURCES} ${qdmr_RCC_SOURCES} ${qdmr_UI_SOURCES})
+add_executable(qdmr WIN32
+  ${qdmr_SOURCES} ${qdmr_MOC_SOURCES} ${qdmr_RCC_SOURCES} ${qdmr_UI_SOURCES})
+
+if (UNIX AND APPLE AND INSTALL_BUNDLE)
+	set_target_properties(qdmr PROPERTIES
+		MACOSX_BUNDLE ON
+		MACOSX_BUNDLE_BUNDLE_NAME ${CMAKE_PROJECT_NAME}
+		MACOSX_BUNDLE_BUNDLE_VERSION ${CMAKE_PROJECT_VERSION}
+		MACOSX_BUNDLE_GUI_IDENTIFIER "de.darc.dm3mat.qdmr"
+		MACOSX_BUNDLE_ICON_FILE "Resources/qdmr.icns"
+		MACOSX_BUNDLE_LONG_VERSION_STRING ${CMAKE_PROJECT_VERSION}
+		MACOSX_BUNDLE_SHORT_VERSION_STRING "${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}"
+		RESOURCE "${CMAKE_SOURCE_DIR}/dist/macosx/qdmr.icns")
+endif(UNIX AND APPLE AND INSTALL_BUNDLE)
+
 target_link_libraries(qdmr ${LIBS} libdmrconf)
 target_include_directories(qdmr PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
-install(TARGETS qdmr DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 
+# Install binary only if not a bundle under MacOS X
+if (UNIX AND APPLE AND INSTALL_BUNDLE)
+	install(TARGETS qdmr
+    BUNDLE DESTINATION ${BUNDLE_PATH}/
+    RESOURCE DESTINATION "${BUNDLE_PATH}/${CMAKE_PROJECT_NAME}.app/Contents/Resources")
+else()
+	install(TARGETS qdmr DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
+endif(UNIX AND APPLE AND INSTALL_BUNDLE)

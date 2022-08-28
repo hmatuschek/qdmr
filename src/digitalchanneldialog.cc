@@ -2,11 +2,12 @@
 #include "application.hh"
 #include <QCompleter>
 #include "rxgrouplistdialog.hh"
-#include "repeaterdatabase.hh"
+#include "repeaterbookcompleter.hh"
 #include "extensionwrapper.hh"
 #include "propertydelegate.hh"
 #include "settings.hh"
 #include "utils.hh"
+#include "logger.hh"
 
 
 /* ********************************************************************************************* *
@@ -34,12 +35,10 @@ DigitalChannelDialog::construct() {
   Settings settings;
 
   Application *app = qobject_cast<Application *>(qApp);
-  DMRRepeaterFilter *filter = new DMRRepeaterFilter(this);
+  DMRRepeaterFilter *filter = new DMRRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
-  QCompleter *completer = new QCompleter(filter, this);
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-  completer->setCompletionColumn(0);
-  completer->setCompletionRole(Qt::EditRole);
+  QCompleter *completer = new RepeaterBookCompleter(2, app->repeater(), this);
+  completer->setModel(filter);
   channelName->setCompleter(completer);
   connect(completer, SIGNAL(activated(const QModelIndex &)),
           this, SLOT(onRepeaterSelected(const QModelIndex &)));
@@ -58,7 +57,7 @@ DigitalChannelDialog::construct() {
   for (int i=0; i<_config->scanlists()->count(); i++) {
     scanList->addItem(_config->scanlists()->scanlist(i)->name(),
                       QVariant::fromValue(_config->scanlists()->scanlist(i)));
-    if (_myChannel && (_myChannel->scanListObj() == _config->scanlists()->scanlist(i)) )
+    if (_myChannel && (_myChannel->scanList() == _config->scanlists()->scanlist(i)) )
       scanList->setCurrentIndex(i+1);
   }
   txAdmit->setItemData(0, unsigned(DigitalChannel::Admit::Always));
@@ -137,9 +136,11 @@ DigitalChannelDialog::construct() {
     voxDefault->setChecked(false); voxValue->setEnabled(true);
     voxValue->setValue(_channel->vox());
   }
-  extensionView->setObject(_myChannel);
 
-  if (! settings.showCommercialFeatures())
+  extensionView->setObjectName("digitalChannelExtension");
+  extensionView->setObject(_myChannel, _config);
+
+  if (! settings.showExtensions())
     tabWidget->tabBar()->hide();
 
   connect(powerDefault, SIGNAL(toggled(bool)), this, SLOT(onPowerDefaultToggled(bool)));
@@ -150,7 +151,7 @@ DigitalChannelDialog::construct() {
 DigitalChannel *
 DigitalChannelDialog::channel()
 {
-  _myChannel->setRadioIdObj(dmrID->currentData().value<RadioID*>());
+  _myChannel->setRadioIdObj(dmrID->currentData().value<DMRRadioID*>());
   _myChannel->setName(channelName->text());
   _myChannel->setRXFrequency(rxFrequency->text().toDouble());
   _myChannel->setTXFrequency(txFrequency->text().toDouble());
@@ -163,7 +164,7 @@ DigitalChannelDialog::channel()
   else
     _myChannel->setTimeout(totValue->value());
   _myChannel->setRXOnly(rxOnly->isChecked());
-  _myChannel->setScanListObj(scanList->currentData().value<ScanList *>());
+  _myChannel->setScanList(scanList->currentData().value<ScanList *>());
   _myChannel->setAdmit(DigitalChannel::Admit(txAdmit->currentData().toUInt()));
   _myChannel->setColorCode(colorCode->value());
   _myChannel->setTimeSlot(DigitalChannel::TimeSlot(timeSlot->currentData().toUInt()));
@@ -196,8 +197,9 @@ DigitalChannelDialog::onRepeaterSelected(const QModelIndex &index) {
         channelName->completer()->completionModel())->mapToSource(index);
   src = qobject_cast<QAbstractProxyModel*>(
         channelName->completer()->model())->mapToSource(src);
-  double rx = app->repeater()->repeater(src.row()).value("tx").toDouble();
-  double tx = app->repeater()->repeater(src.row()).value("rx").toDouble();
+  double rx = app->repeater()->repeater(src.row())->rxFrequency();
+  double tx = app->repeater()->repeater(src.row())->txFrequency();
+  colorCode->setValue(app->repeater()->repeater(src.row())->colorCode());
   txFrequency->setText(QString::number(tx, 'f'));
   rxFrequency->setText(QString::number(rx, 'f'));
 }

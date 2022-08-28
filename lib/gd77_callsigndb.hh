@@ -28,7 +28,7 @@ public:
   /** Represents a user-db entry within the binary codeplug. */
   struct __attribute__((packed)) userdb_entry_t {
     uint32_t number;                    ///< DMR ID stored in BCD little-endian.
-    char name[8];                       ///< Call or name, upto 8 ASCII chars, 0x00 padded.
+    char name[8];                       ///< Call or name, up to 8 ASCII chars, 0x00 padded.
 
     /** Constructor. */
     userdb_entry_t();

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>453</height>
+    <height>520</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -224,7 +224,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_4">
      <property name="title">
-      <string>Commercial</string>
+      <string>Extended Features</string>
      </property>
      <layout class="QFormLayout" name="formLayout_3">
       <item row="0" column="0">
@@ -236,6 +236,20 @@
       </item>
       <item row="0" column="1">
        <widget class="QCheckBox" name="commercialFeatures">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_13">
+        <property name="text">
+         <string>Show device extensions</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="showExtensions">
         <property name="text">
          <string/>
         </property>

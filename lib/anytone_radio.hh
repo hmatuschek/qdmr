@@ -46,9 +46,6 @@ public:
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
-  VerifyIssue::Type verifyConfig(Config *config, QList<VerifyIssue> &issues,
-                                 const VerifyFlags &flags=VerifyFlags());
-
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
   bool startDownload(bool blocking=false, const ErrorStack &err=ErrorStack());
@@ -65,9 +62,6 @@ protected:
   void run();
 
 private:
-  /** Connects to the radio, if a radio interface is passed to the constructor, this interface
-   * instance is used. */
-  virtual bool connect();
   /** Downloads the codeplug from the radio. This method block until the download is complete. */
   virtual bool download();
   /** Uploads the encoded codeplug to the radio. This method block until the upload is complete. */
@@ -92,10 +86,6 @@ protected:
   AnytoneCodeplug *_codeplug;
   /** The actual binary callsign database representation. */
   CallsignDB *_callsigns;
-  /** Holds the hardware version supported by qdmr. Used for codeplug compatibility. */
-  QString _supported_version;
-  /** Holds the hardware version of the radio. Used for codeplug compatibility. */
-  QString _version;
 };
 
 #endif // __D868UV_HH__

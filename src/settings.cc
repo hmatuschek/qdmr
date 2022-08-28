@@ -1,61 +1,9 @@
 #include "settings.hh"
 #include "logger.hh"
 #include "config.h"
+#include "utils.hh"
 #include <QStandardPaths>
 #include <QDir>
-
-QGeoCoordinate loc2deg(const QString &loc) {
-  double lon = 0, lat = 0;
-  if (2 > loc.size())
-    return QGeoCoordinate();
-
-  QChar l = loc[0].toUpper();
-  QChar c = loc[1].toUpper();
-  lon += double(int(l.toLatin1())-'A')*20;
-  lat += double(int(c.toLatin1())-'A')*10;
-
-  if (4 > loc.size()) {
-    lon = lon - 180;
-    lat = lat - 90;
-    return QGeoCoordinate(lat, lon);
-  }
-
-  l = loc[2].toUpper();
-  c = loc[3].toUpper();
-  lon += double(int(l.toLatin1())-'0')*2;
-  lat += double(int(c.toLatin1())-'0')*1;
-
-  if (6 > loc.size()){
-    lon = lon - 180;
-    lat = lat - 90;
-    return QGeoCoordinate(lat, lon);
-  }
-
-  l = loc[4].toUpper();
-  c = loc[5].toUpper();
-  lon += double(int(l.toLatin1())-'A')/12;
-  lat += double(int(c.toLatin1())-'A')/24;
-
-  lon = lon - 180;
-  lat = lat - 90;
-  return QGeoCoordinate(lat, lon);
-}
-
-QString deg2loc(const QGeoCoordinate &coor) {
-  QString loc;
-  double lon = coor.longitude()+180;
-  double lat = coor.latitude()+90;
-  char l = char(lon/20); lon -= 20*double(l);
-  char c = char(lat/10); lat -= 10*double(c);
-  loc.append(l+'A'); loc.append(c+'A');
-  l = char(lon/2); lon -= 2*double(l);
-  c = char(lat/1); lat -= 1*double(c);
-  loc.append(l+'0'); loc.append(c+'0');
-  l = char(lon*12); lon -= double(l)/12;
-  c = char(lat*24); lat -= double(c)/24;
-  loc.append(l+'a'); loc.append(c+'a');
-  return loc;
-}
 
 
 /* ********************************************************************************************* *
@@ -240,6 +188,15 @@ Settings::setShowCommercialFeatures(bool show) {
 }
 
 bool
+Settings::showExtensions() const {
+  return value("showExtensions", false).toBool();
+}
+void
+Settings::setShowExtensions(bool show) {
+  setValue("showExtensions", show);
+}
+
+bool
 Settings::hideGSPNote() const {
   return value("hideGPSNote", false).toBool();
 }
@@ -288,39 +245,18 @@ Settings::setMainWindowState(const QByteArray &state) {
 }
 
 QByteArray
-Settings::radioIdListHeaderState() const {
-  return value("radioIdListHeaderState", QByteArray()).toByteArray();
+Settings::headerState(const QString &objName) const {
+  if (objName.isEmpty())
+    return QByteArray();
+  QString key = QString("headerState/%1").arg(objName);
+  return value(key, QByteArray()).toByteArray();
 }
 void
-Settings::setRadioIdListHeaderState(const QByteArray &state) {
-  setValue("radioIdListHeaderState", state);
-}
-
-QByteArray
-Settings::contactListHeaderState() const {
-  return value("contactListHeaderState", QByteArray()).toByteArray();
-}
-void
-Settings::setContactListHeaderState(const QByteArray &state) {
-  setValue("contactListHeaderState", state);
-}
-
-QByteArray
-Settings::channelListHeaderState() const {
-  return value("channelListHeaderState", QByteArray()).toByteArray();
-}
-void
-Settings::setChannelListHeaderState(const QByteArray &state) {
-  setValue("channelListHeaderState", state);
-}
-
-QByteArray
-Settings::positioningHeaderState() const {
-  return value("positioningHeaderState", QByteArray()).toByteArray();
-}
-void
-Settings::setPositioningHeaderState(const QByteArray &state) {
-  setValue("positioningHeaderState", state);
+Settings::setHeaderState(const QString &objName, const QByteArray &state) {
+  if (objName.isEmpty())
+    return;
+  QString key = QString("headerState/%1").arg(objName);
+  setValue(key, state);
 }
 
 bool
@@ -384,6 +320,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   Ui::SettingsDialog::prefixes->setText(prefs_text.join(", "));
 
   Ui::SettingsDialog::commercialFeatures->setChecked(settings.showCommercialFeatures());
+  Ui::SettingsDialog::showExtensions->setChecked(settings.showExtensions());
 
   connect(Ui::SettingsDialog::dbLimitEnable, SIGNAL(toggled(bool)), this, SLOT(onDBLimitToggled(bool)));
   connect(Ui::SettingsDialog::useUserId, SIGNAL(toggled(bool)), this, SLOT(onUseUserDMRIdToggled(bool)));
@@ -427,7 +364,7 @@ SettingsDialog::positionUpdated(const QGeoPositionInfo &info) {
 
 void
 SettingsDialog::onDBLimitToggled(bool enable) {
-  Ui::SettingsDialog::dbLimit->setEnabled(! enable);
+  Ui::SettingsDialog::dbLimit->setEnabled(enable);
 }
 
 void
@@ -460,6 +397,7 @@ SettingsDialog::accept() {
   settings.setCallSignDBPrefixes(prefs);
 
   settings.setShowCommercialFeatures(commercialFeatures->isChecked());
+  settings.setShowExtensions(showExtensions->isChecked());
 
   QDialog::accept();
 }

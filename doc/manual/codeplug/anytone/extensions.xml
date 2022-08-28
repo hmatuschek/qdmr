@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<section xmlid="extAnyTone"
+<section xml:id="extAnyTone"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -10,7 +10,10 @@
 </info>
 
 <para>
-  There are no extensions defined yet.
+  This chapter documents the extensions and settings specific to AnyTone radios.
 </para>
+
+<xi:include href="contact.xml"/>
+<xi:include href="zone.xml"/>
 
 </section>

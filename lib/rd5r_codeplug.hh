@@ -20,13 +20,15 @@ class Channel;
  *
  * This difference looks like, as if the firmware code for the contacts stems from a different
  * device or was developed by a different engineer. Moreover, the message list again, uses yet
- * another method. Here a simple counter preceds the messages, indicating how many valid messages
+ * another method. Here a simple counter precedes the messages, indicating how many valid messages
  * there are. All in all, a rather inconsistent way of representing variable length lists in the
  * codeplug. I would guess, that over time, different people/teams worked on different revisions
  * of the firmware. It must have been a real nightmare to Serge Vakulenko reverse-engineering this
  * codeplug.
  *
  * @section rd5rcpl Codeplug structure within radio
+ * This implementation targets firmware version 2.1.6.
+ *
  * The memory representation of the codeplug within the radio is divided into two segments.
  * The first segment starts at the address 0x00080 and ends at 0x07c00 while the second section
  * starts at 0x08000 and ends at 0x1e300.
@@ -48,7 +50,8 @@ class Channel;
  *  <tr><td>0x01788</td> <td>0x02f88</td> <td>0x1800</td> <td>256 contacts, see @c RadioddityCodeplug::ContactElement.</td></tr>
  *  <tr><td>0x02f88</td> <td>0x03388</td> <td>0x0400</td> <td>32 DTMF contacts, see @c RadioddityCodeplug::DTMFContactElement.</td></tr>
  *  <tr><td>0x03388</td> <td>0x03780</td> <td>0x03f8</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c RadioddityCodeplug::ChannelBankElement.</td></tr>
+ *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 channels (bank 0), see @c RadioddityCodeplug::ChannelBankElement
+ *                                                            and @c RD5RCodeplug::ChannelElement.</td></tr>
  *  <tr><td>0x05390</td> <td>0x07518</td> <td>0x2188</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x07518</td> <td>0x07538</td> <td>0x0020</td> <td>Boot settings, see @c RadioddityCodeplug::BootSettingsElement.</td></tr>
  *  <tr><td>0x07538</td> <td>0x07540</td> <td>0x0008</td> <td>Menu settings, see @c RadioddityCodeplug::MenuSettingsElement.</td></tr>
@@ -62,7 +65,8 @@ class Channel;
  *  <tr><td>0x08000</td> <td>0x08010</td> <td>0x0010</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x08010</td> <td>0x0af10</td> <td>0x2f00</td> <td>250 zones, see @c RadioddityCodeplug::ZoneBankElement.</td></tr>
  *  <tr><td>0x0af10</td> <td>0x0b1b0</td> <td>0x02a0</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x0b1b0</td> <td>0x17620</td> <td>0xc470</td> <td>Remaining 896 chanels (bank 1-7), see @c RadioddityCodeplug::ChannelBankElement.</td></tr>
+ *  <tr><td>0x0b1b0</td> <td>0x17620</td> <td>0xc470</td> <td>Remaining 896 channels (bank 1-7), see @c RadioddityCodeplug::ChannelBankElement
+ *                                                            and @c RD5RCodeplug::ChannelElement.</td></tr>
  *  <tr><td>0x17620</td> <td>0x1cd10</td> <td>0x56f0</td> <td>250 scan lists, see @c RadioddityCodeplug::ScanListBankElement</td></tr>
  *  <tr><td>0x1cd10</td> <td>0x1d620</td> <td>0x0910</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x1d620</td> <td>0x1e2a0</td> <td>0x0c80</td> <td>64 RX group lists, see @c RadioddityCodeplug::GroupListBankElement</td></tr>
@@ -74,6 +78,7 @@ class RD5RCodeplug : public RadioddityCodeplug
 {
   Q_OBJECT
 
+public:
   /** Implements the specialization of the Radioddity channel for the RD5R radio.
    *
    * Memory layout of encoded channel:
@@ -97,9 +102,10 @@ class RD5RCodeplug : public RadioddityCodeplug
 
     bool fromChannelObj(const Channel *c, Context &ctx);
     Channel *toChannelObj(Context &ctx) const;
+    bool linkChannelObj(Channel *c, Context &ctx) const;
   };
 
-  /** Implements the base class of a timestamp for all Radioddity codeplugs.
+  /** Implements the timestamp for RD-5R codeplugs.
    *
    * Encoding of messages (size: 0x0006b):
    * @verbinclude rd5r_timestamp.txt */
@@ -122,6 +128,22 @@ class RD5RCodeplug : public RadioddityCodeplug
     virtual QDateTime get() const;
     /** Sets the time stamp. */
     virtual void set(const QDateTime &ts=QDateTime::currentDateTime());
+  };
+
+  /** Implements the encoding/decoding of encryption keys for the RD-5R radio.
+   * @note The RD5R only supports a single basic DMR encryption key with a fixed value!
+   *
+   * Encoding of encryption keys (size: 0x00088):
+   * @verbinclude radioddity_privacy.txt */
+  class EncryptionElement: public RadioddityCodeplug::EncryptionElement
+  {
+  public:
+    /** Constructor. */
+    EncryptionElement(uint8_t *ptr);
+
+    bool isBasicKeySet(unsigned n) const;
+    QByteArray basicKey(unsigned n) const;
+    void setBasicKey(unsigned n, const QByteArray &key);
   };
 
 public:
@@ -182,6 +204,11 @@ public:
   bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  void clearEncryption();
+  bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool createEncryption(Config *config, Context &ctx, const ErrorStack &err);
+  bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err);
 };
 
 #endif // RD5R_CODEPLUG_HH

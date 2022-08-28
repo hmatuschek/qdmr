@@ -5,7 +5,7 @@
 
 /** Implements the interface to Anytone D868UV, D878UV, etc radios.
  *
- * This interface uses a USB serial-port to comunicate with the device. To find the corresponding
+ * This interface uses a USB serial-port to communicate with the device. To find the corresponding
  * port, the device-specific VID @c 0x28e9 and PID @c 0x018a are used. Hence no udev rules are
  * needed to access these devices. The user, however, should be a member of the @c dialout group
  * to get access to the serial interfaces.
@@ -32,9 +32,6 @@ public:
   };
 
 public:
-  /** Constructs a new interface to Anytone radios. If a matching device was found, @c isOpen
-   * returns @c true. */
-  explicit AnytoneInterface(const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Constructs a new interface to Anytone radios. If a matching device was found, @c isOpen
    * returns @c true. */
   explicit AnytoneInterface(const USBDeviceDescriptor &descriptor,

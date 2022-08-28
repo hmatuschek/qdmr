@@ -9,8 +9,7 @@
 RadioddityRadio::RadioddityRadio(RadioddityInterface *device, QObject *parent)
   : Radio(parent), _dev(device), _codeplugFlags(), _config(nullptr)
 {
-  if (! connect())
-    return;
+  // pass...
 }
 
 RadioddityRadio::~RadioddityRadio() {
@@ -76,7 +75,7 @@ RadioddityRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const Ca
 void
 RadioddityRadio::run() {
   if (StatusDownload == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       emit downloadError(this);
       return;
     }
@@ -96,7 +95,7 @@ RadioddityRadio::run() {
     emit downloadFinished(this, &codeplug());
     _config = nullptr;
   } else if (StatusUpload == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       emit uploadError(this);
       return;
     }
@@ -115,7 +114,7 @@ RadioddityRadio::run() {
     _task = StatusIdle;
     emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {
-    if (! connect()) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
       emit uploadError(this);
       return;
     }
@@ -132,27 +131,7 @@ RadioddityRadio::run() {
     _dev->reboot();
     _dev->close();
     emit uploadComplete(this);
-
   }
-}
-
-bool
-RadioddityRadio::connect() {
-  // If connected -> done
-  if (_dev && _dev->isOpen())
-    return true;
-  // If not open -> reconnect
-  if (_dev)
-    _dev->deleteLater();
-  _dev = new RadioddityInterface(_errorStack);
-  if (! _dev->isOpen()) {
-    errMsg(_errorStack) << "Cannot connect to RD5R.";
-    _dev->deleteLater();
-    _dev = nullptr;
-    _task = StatusError;
-    return false;
-  }
-  return true;
 }
 
 bool

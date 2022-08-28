@@ -1,6 +1,7 @@
 #include "zone.hh"
 #include "channel.hh"
 #include "config.hh"
+#include "anytone_extension.hh"
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -15,7 +16,7 @@
  * Implementation of Zone
  * ********************************************************************************************* */
 Zone::Zone(QObject *parent)
-  : ConfigObject("zone", parent), _A(), _B()
+  : ConfigObject("zone", parent), _A(), _B(), _anytone(nullptr)
 {
   connect(&_A, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
   connect(&_A, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
@@ -24,7 +25,7 @@ Zone::Zone(QObject *parent)
 }
 
 Zone::Zone(const QString &name, QObject *parent)
-  : ConfigObject(name, "zone", parent), _A(), _B()
+  : ConfigObject(name, "zone", parent), _A(), _B(), _anytone(nullptr)
 {
   connect(&_A, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
   connect(&_A, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
@@ -59,15 +60,37 @@ const ChannelRefList *
 Zone::A() const {
   return &_A;
 }
-ChannelRefList *Zone::A() {
+ChannelRefList *
+Zone::A() {
   return &_A;
 }
 
-const ChannelRefList *Zone::B() const {
+const ChannelRefList *
+Zone::B() const {
   return &_B;
 }
-ChannelRefList *Zone::B() {
+ChannelRefList *
+Zone::B() {
   return &_B;
+}
+
+AnytoneZoneExtension *
+Zone::anytoneExtension() const {
+  return _anytone;
+}
+void
+Zone::setAnytoneExtension(AnytoneZoneExtension *ext) {
+  if (_anytone == ext)
+    return;
+  if (_anytone) {
+    disconnect(_anytone, SIGNAL(modified(ConfigItem*)), this, SIGNAL(modified(ConfigItem*)));
+    _anytone->deleteLater();
+  }
+  _anytone = ext;
+  if (_anytone) {
+    _anytone->setParent(this);
+    connect(_anytone, SIGNAL(modified(ConfigItem*)), this, SIGNAL(modified(ConfigItem*)));
+  }
 }
 
 

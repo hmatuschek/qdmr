@@ -4,7 +4,7 @@
  * Implementation of OpenGD77ChannelExtension
  * ******************************************************************************************** */
 OpenGD77ChannelExtension::OpenGD77ChannelExtension(QObject *parent)
-  : ConfigExtension(parent), _power(Power::Global)
+  : ConfigExtension(parent), _power(Power::Global), _zoneSkip(false), _allSkip(false)
 {
   // pass...
 }
@@ -23,22 +23,29 @@ OpenGD77ChannelExtension::Power
 OpenGD77ChannelExtension::power() const {
   return _power;
 }
-
 void
 OpenGD77ChannelExtension::setPower(Power power) {
   _power = power;
   emit modified(this);
 }
 
-/*ConfigItem *
-OpenGD77ChannelExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                                        const Context &ctx, const ErrorStack &err)
-{
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
-  // No extensions yet for this extension
-  return nullptr;
-}*/
+bool
+OpenGD77ChannelExtension::scanZoneSkip() const {
+  return _zoneSkip;
+}
+void
+OpenGD77ChannelExtension::enableScanZoneSkip(bool enable) {
+  _zoneSkip = enable;
+}
 
+bool
+OpenGD77ChannelExtension::scanAllSkip() const {
+  return _allSkip;
+}
+void
+OpenGD77ChannelExtension::enableScanAllSkip(bool enable) {
+  _allSkip = enable;
+}
 
 /* ******************************************************************************************** *
  * Implementation of OpenGD77ContactExtension
@@ -58,14 +65,6 @@ OpenGD77ContactExtension::clone() const {
   }
   return ex;
 }
-
-/*ConfigItem *
-OpenGD77ContactExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                                        const Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
-  // No extension yet of this extension
-  return nullptr;
-}*/
 
 OpenGD77ContactExtension::TimeSlotOverride
 OpenGD77ContactExtension::timeSlotOverride() const {

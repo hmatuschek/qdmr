@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="exRadioddityRadioSettings"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Radio settings extension</title>  
+</info>
+
+<para>
+  This extension allows to set the device-specific general settings for Radioddity radios. It 
+  extends the <token>settings</token> section of the codeplug. 
+</para>
+
+<example>
+  <title>Radioddity radio settings extension showing default values.</title>
+  <programlisting><![CDATA[settings:
+  [...]
+  radioddity:
+    preambleDuration: 360
+    monitorType: Open
+    lowBatteryWarnInterval: 30
+    callAlertDuration: 120
+    loneWorkerResponseTime: 1
+    loneWorkerReminderPeriod: 10
+    groupCallHangTime: 3000
+    privateCallHangTime: 3000
+    downChannelModeVFO: false
+    upChannelModeVFO: false
+    resetTone: false
+    unknownNumberTone: false
+    artsToneMode: Once
+    digitalTalkPermitTone: false
+    analogTalkPermitTone: false
+    selftestTone: true
+    channelFreeIndicationTone: false
+    allTonesDisabled: false
+    powerSaveMode: true
+    wakeupPreamble: true
+    allLEDsDisabled: false
+    quickKeyOverrideInhibited: false
+    txExitTone: false
+    txOnActiveChannel: false
+    animation: false
+    scanMode: Time
+    repeaterEndDelay: 0
+    repeaterSTE: 0
+    progPassword: ""
+]]></programlisting>
+</example>
+
+<variablelist>
+  <title>Radio settings fields</title>
+  <varlistentry>
+    <term><token>preambleDuration</token></term>
+    <listitem>
+      <para>
+        This sets the preamble duration in milliseconds. Default 360ms.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>monitorType</token></term>
+    <listitem>
+      <para>
+        Specifies the monitor type. Must be either <token>Open</token> or <token>Silent</token>. Default <token>Open</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>lowBatteryWarnInterval</token></term>
+    <listitem>
+      <para>
+        Specifies the interval in seconds, at which the radio will warn you about a low battery voltage. Default 30s.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>callAlertDuration</token></term>
+    <listitem>
+      <para>
+        Specifies the call alert duration in seconds. Default 120s. 
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>loneWorkerResponseTime</token></term>
+    <listitem>
+      <para>
+        When lone worker is enabled, specifies the time in minutes before the radio will start to 
+        remind the user. Default 1min.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>loneWorkerReminderPeriod</token></term>
+    <listitem>
+      <para>
+        Specifies the period in seconds for the lone worker reminder. Default 10s. 
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>groupCallHangTime</token></term>
+    <listitem>
+      <para>        
+        Specifies the group-call hang time in milliseconds. This is the time-period the user can 
+        answer a received group call by pressing PTT. After this time has passed, a press on the
+        PTT button will call the default contact on the selected channel. Default 3000ms.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>privateCallHangTime</token></term>
+    <listitem>
+      <para>        
+        Specifies the private-call hang time in milliseconds. This is the time-period the user can 
+        answer a received private call by pressing PTT. After this time has passed, a press on the
+        PTT button will call the default contact on the selected channel. Default 3000ms.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>downChannelModeVFO</token></term>
+    <listitem>
+      <para>  
+        If <token>true</token>, the channel-up button will tune the VFO. If <token>false</token>, 
+        it will step through the channels. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>upChannelModeVFO</token></term>
+    <listitem>
+      <para>  
+        If <token>true</token>, the channel-donw button will tune the VFO. If <token>false</token>, 
+        it will step through the channels. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>resetTone</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the call-reset tone is enabled. This tone indicates (if enabled) 
+        that the call hang-time has passed. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>unknownNumberTone</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the unknown number tone is enabled. This tone indicates (if 
+        enabled) that an incoming call is from an unknown number. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>artsToneMode</token></term>
+    <listitem>
+      <para>        
+        Specifies the ARTS tone mode. Must be one of <token>Disabled</token>, <token>Once</token> 
+        or <token>Always</token>. Default <token>Once</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>digitalTalkPermitTone</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the talk permit tone is enabled for digital channels. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>analogTalkPermitTone</token></term>
+    <listitem>
+      <para>        
+        If <token>true</token>, the talk permit tone is enabled for digital channels. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>selftestTone</token></term>
+    <listitem>
+      <para>        
+        If <token>true</token>, the self-test passed tone gets enabled. Default <token>true</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>channelFreeIndicationTone</token></term>
+    <listitem>
+      <para>  
+        If <token>true</token>, the channel-free indication tone gets enabled. Default 
+        <token>false</token>. Please note that the manufacturer CPS for the RD5R has a typo.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>allTonesDisabled</token></term>
+    <listitem>
+      <para> 
+        If <token>true</token>, all tones are disabled. This overrides other tone settings. Default <token>false</token>. 
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>powerSaveMode</token></term>
+    <listitem>
+      <para>
+        Puts the radio is a sleep mode when in idle state (no traffic on the channels). This 
+        allows for some power saving. However, the radio will need some time to wake up. 
+        Consequently, all other radios in the network need to transmit a wake-up preamble. 
+        Default <token>true</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>wakeupPreamble</token></term>
+    <listitem>
+      <para>
+        Enables the transmission of a short wake-up preamble allowing receiving radios to 
+        wake-up in time for the actual transmission. Default <token>true</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>allLEDsDisabled</token></term>
+    <listitem>
+      <para>  
+        If <token>true</token>, all LEDs are disabled. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>quickKeyOverrideInhibited</token></term>
+    <listitem>
+      <para>        
+        If <token>true</token>, allows the user to transmit on a busy channel irrespective of the 
+        channels admit criterion by double pressing the PTT. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>txExitTone</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, enables the so-called TX exit tone. This likely means a tone when 
+        releasing the PTT button. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>txOnActiveChannel</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the radio will transmit on the currently active channel (if 
+        double-wait) is enabled. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>animation</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the boot animation is enabled. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>scanMode</token></term>
+    <listitem>
+      <para>
+        Specifies the scan mode. Must be one of <token>Time</token>, <token>Carrier</token> or 
+        <token>Search</token>. Default <token>Time</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>repeaterEndDelay</token></term>
+    <listitem>
+      <para>
+        Specifies the delay after the end of a repeater transmission in seconds. Default 0s, off.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>repeaterSTE</token></term>
+    <listitem>
+      <para>
+        Specifies the repeater STE (what ever that means) in seconds. Default 0s, off.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>progPassword</token></term>
+    <listitem>
+      <para>
+        Specifies the CPS programming password. If empty or not set, the password is disabled. 
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</section>

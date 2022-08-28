@@ -102,7 +102,7 @@ protected:
 
 /** Basic parse-handler interface.
  *
- * That is, a set of callbacks getting called by the parser on the occurence of a particular
+ * That is, a set of callbacks getting called by the parser on the occurrence of a particular
  * statement in the config file.
  * @ingroup conf */
 class CSVHandler: public QObject
@@ -315,7 +315,7 @@ protected:
   /** Index <-> RoamingZone map */
   QMap<int, RoamingZone *> _roamingZones;
   /** Index <-> radio ID map */
-  QMap<int, RadioID *> _radioIDs;
+  QMap<int, DMRRadioID *> _radioIDs;
 };
 
 #endif // CSVREADER_HH

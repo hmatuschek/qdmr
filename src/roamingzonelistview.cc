@@ -48,7 +48,7 @@ RoamingZoneListView::onAddRoamingZone() {
 
 void
 RoamingZoneListView::onGenRoamingZone() {
-  MultiGroupCallSelectionDialog contSel(_config->contacts());
+  MultiGroupCallSelectionDialog contSel(_config->contacts(), false);
   contSel.setWindowTitle(tr("Generate roaming zone"));
   contSel.setLabel(tr("Create a roaming zone by collecting all channels with these group calls."));
 

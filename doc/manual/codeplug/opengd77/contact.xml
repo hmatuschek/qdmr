@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xmlid="extOpenGD77Contact"
+<section xml:id="extOpenGD77Contact"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -34,23 +34,29 @@
 
 <section>
 <info>
-  <title>Attributes</title>
+  <title>Contact attributes</title>
 </info>
 
-<table>
-  <thead> <tr><td>Element</td> <td>Description</td></tr> </thead>
-  <tbody>
-    <tr>
-      <td><token>timeSlotOverride</token></td>
-      <td>OpenGD77 allows to override the time slot settings for each channel on the bases of
+<para>
+  For now, there is only one attribute allowing to override the time slot of a channel whenever 
+  this contact is selected as the destination contact for that channel.
+</para>
+
+<variablelist>
+  <title>Channel extension fields</title>
+  <varlistentry>
+    <term><token>timeSlotOverride</token></term>
+    <listitem>
+      <para>
+        OpenGD77 allows to override the time slot settings for each channel on the bases of
         the selected transmit contact. If the contact has a time slot override set, this time 
         slot is used instead of the channel time slot. This attribute is either <token>None</token>,
         <token>TS1</token> or <token>TS2</token>. If <token>None</token> is set, the channel time slot 
         will not be overridden.
-      </td>
-    </tr>
-  </tbody>
-</table>
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
 </section>
 
 </section>

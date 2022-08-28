@@ -7,11 +7,19 @@
 #include <QDoubleValidator>
 #include "configreference.hh"
 #include "extensionwrapper.hh"
+#include "config.hh"
+#include "logger.hh"
+
 
 PropertyDelegate::PropertyDelegate(QObject *parent)
-  : QItemDelegate(parent)
+  : QItemDelegate(parent), _config(nullptr)
 {
   // pass...
+}
+
+void
+PropertyDelegate::setConfig(Config *config) {
+  _config = config;
 }
 
 const PropertyWrapper *
@@ -26,6 +34,7 @@ PropertyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &opti
   Q_UNUSED(option)
   const PropertyWrapper *model = getModel(index.model());
   QMetaProperty prop = model->propertyAt(index);
+  ConfigItem *obj = model->parentObject(index);
 
   if (! prop.isValid())
     return nullptr;
@@ -51,8 +60,7 @@ PropertyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &opti
     return edit;
   } else if (QVariant::String == prop.type()) {
     return new QLineEdit(parent);
-  } else if (prop.read(this).value<ConfigObjectReference *>()) {
-    ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>();
+  } else if (prop.read(obj).value<ConfigObjectReference *>()) {
     return new QComboBox(parent);
   } else if (propIsInstance<ConfigItem>(prop)) {
     return nullptr;
@@ -65,8 +73,10 @@ PropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
   const PropertyWrapper *model = getModel(index.model());
   ConfigItem *obj = model->parentObject(index);
   QMetaProperty prop = model->propertyAt(index);
+
   if (! prop.isValid())
     return;
+
   // Dispatch by type
   if (prop.isEnumType()) {
     QComboBox *box = dynamic_cast<QComboBox *>(editor);
@@ -90,9 +100,21 @@ PropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
     dynamic_cast<QLineEdit *>(editor)->setText(QString::number(prop.read(obj).toDouble()));
   } else if (QVariant::String == prop.type()) {
     dynamic_cast<QLineEdit *>(editor)->setText(prop.read(obj).toString());
-  } else if (prop.read(this).value<ConfigObjectReference *>()) {
+  } else if (prop.read(obj).value<ConfigObjectReference *>()) {
+    ConfigObjectReference *ref = prop.read(obj).value<ConfigObjectReference *>();
+    // Find all matching elements in config that can be referenced
+    QSet<ConfigItem *> items;
+    if (_config)
+      _config->findItemsOfTypes(ref->elementTypeNames(), items);
+    // Assemble combo box with references
     QComboBox *box = dynamic_cast<QComboBox*>(editor);
     box->addItem(tr("[None]"), QVariant::fromValue<ConfigObject*>(nullptr));
+    foreach (ConfigItem *item, items) {
+      if (! item->is<ConfigObject>())
+        continue;
+      ConfigObject *o = item->as<ConfigObject>();
+      box->addItem(o->name(),QVariant::fromValue<ConfigObject*>(o));
+    }
   }
 }
 
@@ -115,8 +137,8 @@ PropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel *abstractmode
     prop.write(obj, dynamic_cast<QLineEdit *>(editor)->text().toDouble());
   } else if (QVariant::String == prop.type()) {
     prop.write(obj, dynamic_cast<QLineEdit *>(editor)->text());
-  } else if (prop.read(this).value<ConfigObjectReference *>()) {
-    QComboBox *box = dynamic_cast<QComboBox*>(editor);
-    box->addItem(tr("[None]"));
+  } else if (prop.read(obj).value<ConfigObjectReference *>()) {
+    ConfigObjectReference *ref = prop.read(obj).value<ConfigObjectReference *>();
+    ref->set(dynamic_cast<QComboBox *>(editor)->currentData().value<ConfigObject*>());
   }
 }

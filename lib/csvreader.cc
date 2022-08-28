@@ -1752,7 +1752,7 @@ CSVReader::handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, Q
     return true;
   logDebug() << "Got " << ids.count() << " IDs...";
   for (int i=0; i<ids.count(); i++) {
-    RadioID *id = new RadioID("", ids.at(i));
+    DMRRadioID *id = new DMRRadioID("", ids.at(i));
     _config->radioIDs()->add(id);
     _radioIDs[i+1] = id;
   }
@@ -1931,7 +1931,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(scan);
         return false;
       }
-      _channels[idx]->as<DigitalChannel>()->setScanListObj(_scanlists[scan]);
+      _channels[idx]->as<DigitalChannel>()->setScanList(_scanlists[scan]);
     }
 
     // Check GPS System
@@ -2010,7 +2010,7 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
             .arg(line).arg(column).arg(name).arg(scan);
         return false;
       }
-      _channels[idx]->as<AnalogChannel>()->setScanListObj(_scanlists[scan]);
+      _channels[idx]->as<AnalogChannel>()->setScanList(_scanlists[scan]);
     }
 
     // Check APRS system

@@ -84,7 +84,7 @@ RD5RTest::testDigitalContacts() {
   /*
    * Test Contact 01
    */
-  QCOMPARE(decode_ascii(_codeplug.data(0x01788+0x00), 16, 0xff), QString("Lokal"));
+  QCOMPARE(decode_ascii(_codeplug.data(0x01788+0x00), 16, 0xff), QString("Local"));
   QCOMPARE(decode_dmr_id_bcd(_codeplug.data(0x01788+0x10)), 9U);
   QCOMPARE((int)*((uint8_t *)_codeplug.data(0x01788+0x14)), 0x00); // group call
   QCOMPARE((int)*((uint8_t *)_codeplug.data(0x01788+0x15)), 0x00); // receive tone (off)
@@ -136,7 +136,7 @@ RD5RTest::testRXGroups() {
   QCOMPARE(decode_ascii(_codeplug.data(0x1d6a0+0x00), 16, 0xff), QString("Berlin/Brand")); // Check name
   QCOMPARE((int)*((uint16_t *)_codeplug.data(0x1d6a0+0x10)), 0x01); // 1st member index +1
   QCOMPARE((int)*((uint16_t *)_codeplug.data(0x1d6a0+0x12)), 0x02); // 2nd member index +1
-  QCOMPARE((int)*((uint16_t *)_codeplug.data(0x1d6a0+0x14)), 0x00); // 3nd member index == 0 (EOL)
+  QCOMPARE((int)*((uint16_t *)_codeplug.data(0x1d6a0+0x14)), 0x00); // 3rd member index == 0 (EOL)
 }
 
 void

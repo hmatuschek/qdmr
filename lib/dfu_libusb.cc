@@ -37,7 +37,7 @@ enum {
  * Implementation of DFUDevice::Descriptor
  * ********************************************************************************************* */
 DFUDevice::Descriptor::Descriptor(const USBDeviceInfo &info, uint8_t bus, uint8_t device)
-  : USBDeviceDescriptor(info, USBDeviceAddress(bus, device))
+  : USBDeviceDescriptor(info, USBDeviceHandle(bus, device))
 {
   // pass...
 }
@@ -46,46 +46,6 @@ DFUDevice::Descriptor::Descriptor(const USBDeviceInfo &info, uint8_t bus, uint8_
 /* ********************************************************************************************* *
  * Implementation of DFUDevice
  * ********************************************************************************************* */
-DFUDevice::DFUDevice(unsigned vid, unsigned pid, const ErrorStack &err, QObject *parent)
-  : QObject(parent), _ctx(nullptr), _dev(nullptr)
-{
-  logDebug() << "Try to detect USB DFU interface " << QString::number(vid,16)
-             << ":" << QString::number(pid,16) << ".";
-
-  int error = libusb_init(&_ctx);
-  if (error < 0) {
-    errMsg(err) << "Libusb init failed (" << error << "): "
-                << libusb_strerror((enum libusb_error) error) << ".";
-    return;
-  }
-
-  if (! (_dev = libusb_open_device_with_vid_pid(_ctx, vid, pid))) {
-    errMsg(err) << "Cannot open device " << QString::number(vid, 16)
-                << ":" << QString::number(pid, 16) << ".";
-    libusb_exit(_ctx);
-    _ctx = nullptr;
-    return;
-  }
-
-  if (libusb_kernel_driver_active(_dev, 0) && libusb_detach_kernel_driver(_dev, 0)) {
-    errMsg(err) << "Cannot detach kernel driver for device " << QString::number(vid, 16)
-                << ":" << QString::number(pid, 16) << ". Interface claim will likely fail.";
-  }
-
-  if (0 > (error = libusb_claim_interface(_dev, 0))) {
-    errMsg(err) << "Failed to claim USB interface: " << libusb_strerror((enum libusb_error) error);
-    libusb_close(_dev);
-    _dev = nullptr;
-    libusb_exit(_ctx);
-    _ctx = nullptr;
-    return;
-  }
-
-  logDebug() << "Connected to DFU device " << QString::number(vid,16)
-             << ":" << QString::number(pid,16) << ".";
-}
-
-
 DFUDevice::DFUDevice(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
   : QObject(parent), _ctx(nullptr), _dev(nullptr)
 {
@@ -113,7 +73,7 @@ DFUDevice::DFUDevice(const USBDeviceDescriptor &descr, const ErrorStack &err, QO
   }
 
   logDebug() << "Try to detect USB DFU interface " << descr.description() << ".";
-  USBDeviceAddress addr = descr.device().value<USBDeviceAddress>();
+  USBDeviceHandle addr = descr.device().value<USBDeviceHandle>();
   for (int i=0; (i<num)&&(nullptr!=lst[i]); i++) {
     if (addr.bus != libusb_get_bus_number(lst[i]))
       continue;

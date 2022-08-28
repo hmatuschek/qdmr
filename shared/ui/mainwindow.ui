@@ -20,8 +20,8 @@
    <string>qdmr [*]</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
-    <normaloff>:/icons/logo.png</normaloff>:/icons/logo.png</iconset>
+   <iconset theme="qdmr">
+    <normaloff>.</normaloff>.</iconset>
   </property>
   <property name="accessibleName">
    <string>Main window</string>
@@ -78,7 +78,6 @@
      <string>File</string>
     </property>
     <addaction name="actionNewCodeplug"/>
-    <addaction name="actionCodeplugWizard"/>
     <addaction name="actionOpenCodeplug"/>
     <addaction name="actionSaveCodeplug"/>
     <addaction name="separator"/>
@@ -108,7 +107,6 @@
     </property>
     <addaction name="actionRefreshCallsignDB"/>
     <addaction name="actionRefreshTalkgroupDB"/>
-    <addaction name="actionRefreshRepeaterDB"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuDevice"/>
@@ -149,8 +147,8 @@
   </widget>
   <action name="actionNewCodeplug">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/new.png</normaloff>:/icons/new.png</iconset>
+    <iconset theme="document-new">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -162,22 +160,10 @@
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionCodeplugWizard">
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/dialog.png</normaloff>:/icons/dialog.png</iconset>
-   </property>
-   <property name="text">
-    <string>New with wizard ...</string>
-   </property>
-   <property name="toolTip">
-    <string>Creates a new codeplug with a wizard.</string>
-   </property>
-  </action>
   <action name="actionOpenCodeplug">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/open.png</normaloff>:/icons/open.png</iconset>
+    <iconset theme="document-open">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Open ...</string>
@@ -191,8 +177,8 @@
   </action>
   <action name="actionSaveCodeplug">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
+    <iconset theme="document-save-as">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Save ...</string>
@@ -205,6 +191,10 @@
    </property>
   </action>
   <action name="actionQuit">
+   <property name="icon">
+    <iconset theme="application-exit">
+     <normaloff>.</normaloff>.</iconset>
+   </property>
    <property name="text">
     <string>Quit</string>
    </property>
@@ -217,8 +207,8 @@
   </action>
   <action name="actionDetectDevice">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/search.png</normaloff>:/icons/search.png</iconset>
+    <iconset theme="device-search">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Detect</string>
@@ -229,8 +219,8 @@
   </action>
   <action name="actionVerifyCodeplug">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/check.png</normaloff>:/icons/check.png</iconset>
+    <iconset theme="document-verify">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Verify</string>
@@ -244,8 +234,8 @@
   </action>
   <action name="actionDownload">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/download.png</normaloff>:/icons/download.png</iconset>
+    <iconset theme="device-read">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Read</string>
@@ -256,8 +246,8 @@
   </action>
   <action name="actionUpload">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/upload.png</normaloff>:/icons/upload.png</iconset>
+    <iconset theme="device-write">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Write</string>
@@ -268,8 +258,8 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/about.png</normaloff>:/icons/about.png</iconset>
+    <iconset theme="help-about">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>About qdmr</string>
@@ -277,8 +267,8 @@
   </action>
   <action name="actionHelp">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+    <iconset theme="help-contents">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Help</string>
@@ -292,8 +282,8 @@
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/settings.png</normaloff>:/icons/settings.png</iconset>
+    <iconset theme="application-settings">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Settings</string>
@@ -304,8 +294,8 @@
   </action>
   <action name="actionUploadCallsignDB">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/userupload-4x.png</normaloff>:/icons/userupload-4x.png</iconset>
+    <iconset theme="device-write-callsign">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Write Callsign DB</string>
@@ -316,8 +306,8 @@
   </action>
   <action name="actionRefreshCallsignDB">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/cloud-download-4x.png</normaloff>:/icons/cloud-download-4x.png</iconset>
+    <iconset theme="document-download">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Refresh Callsign DB</string>
@@ -328,8 +318,8 @@
   </action>
   <action name="actionRefreshTalkgroupDB">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/cloud-download-4x.png</normaloff>:/icons/cloud-download-4x.png</iconset>
+    <iconset theme="document-download">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Refresh Talkgroup DB</string>
@@ -338,21 +328,7 @@
     <string>Refreshes the downloaded talkgroup DB</string>
    </property>
   </action>
-  <action name="actionRefreshRepeaterDB">
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/cloud-download-4x.png</normaloff>:/icons/cloud-download-4x.png</iconset>
-   </property>
-   <property name="text">
-    <string>Refresh Repeater DB</string>
-   </property>
-   <property name="toolTip">
-    <string>Refreshes the downloaded repeater DB</string>
-   </property>
-  </action>
  </widget>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

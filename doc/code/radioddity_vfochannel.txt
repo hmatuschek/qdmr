@@ -22,7 +22,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 30 |DCC|EAA| 0   0   0   0 | ARTS  | 0 |SLT| 0 |PRV| 0   0   0 |PCC|  STE  |NFS| 0 | PTTId | 0 |DCD|PWR|VOX|ASE|LWK|TLK|RXO|BW |SQT|
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-34 | Offset Frequency in 1kHz, 4-digit BCD, litte endian           | StepSize      |OffsDir| 0   0 |                               |
+34 | Offset Frequency in 1kHz, 4-digit BCD, little endian          | StepSize      |OffsDir| 0   0 |                               |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 DCC = Data call confirm, EAA = Emergency Alarm ACK, SLT = Repeater slot, PRV = Privacy Enable,

@@ -65,7 +65,7 @@ OpenGD77CallsignDB::userdb_t::clear() {
   size = 0x5d; // <- 19 byte entries, 15byte name
   memcpy(version, "001", 3);
   count = 0;
-  unused6 = unused9 = 0;
+  unused6 = 0;
 }
 
 void

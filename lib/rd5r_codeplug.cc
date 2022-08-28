@@ -10,6 +10,9 @@
 #define ADDR_BUTTONS              0x000108
 #define ADDR_MESSAGES             0x000128
 
+#define ADDR_ENCRYPTION           0x001370
+#define ENCRYPTION_SIZE               0x88
+
 #define NUM_CONTACTS                   256
 #define ADDR_CONTACTS             0x001788
 #define CONTACT_SIZE              0x000018
@@ -66,12 +69,12 @@ RD5RCodeplug::ChannelElement::clear() {
 
 unsigned
 RD5RCodeplug::ChannelElement::squelch() const {
-  return std::min(getUInt8(0x0037), uint8_t(9))+1;
+  return getUInt8(0x0037);
 }
 void
 RD5RCodeplug::ChannelElement::setSquelch(unsigned level) {
-  level = std::max(std::min(10u, level), 1u);
-  setUInt8(0x0037, level-1);
+  level = std::min(9u, level);
+  setUInt8(0x0037, level);
 }
 
 bool
@@ -88,6 +91,7 @@ RD5RCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     else
       setSquelch(ac->squelch());
   } else {
+    // If digital channel, reuse global quelch setting
     setSquelch(ctx.config()->settings()->squelch());
   }
 
@@ -108,6 +112,20 @@ RD5RCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   return ch;
 }
 
+bool
+RD5RCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
+  if (! RadioddityCodeplug::ChannelElement::linkChannelObj(c, ctx))
+    return false;
+  /*
+  if (c->is<AnalogChannel>()) {
+    AnalogChannel *ac = c->as<AnalogChannel>();
+    if (ctx.config()->settings()->squelch() == ac->squelch()) {
+      ac->setSquelchDefault();
+    }
+  }
+  */
+  return true;
+}
 
 /* ********************************************************************************************* *
  * Implementation of RD5RCodeplug::TimestampElement
@@ -145,6 +163,39 @@ RD5RCodeplug::TimestampElement::set(const QDateTime &ts) {
   setBCD2(0x0003, ts.date().day());
   setBCD2(0x0004, ts.time().hour());
   setBCD2(0x0005, ts.time().minute());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of RD5RCodeplug::EncryptionElement
+ * ******************************************************************************************** */
+RD5RCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr)
+  : RadioddityCodeplug::EncryptionElement(ptr)
+{
+  // pass...
+}
+
+bool
+RD5RCodeplug::EncryptionElement::isBasicKeySet(unsigned n) const {
+  if (n>0)
+    return false;
+  return RadioddityCodeplug::EncryptionElement::isBasicKeySet(n);
+}
+
+QByteArray
+RD5RCodeplug::EncryptionElement::basicKey(unsigned n) const {
+  if (n>0)
+    return QByteArray();
+  return QByteArray("\x53\x47\x4c\x39");
+}
+
+void
+RD5RCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
+  if ((0 != n) || (key != "\x53\x47\x4c\x39")){
+    logError() << "The RD5R only supports a single fixed DMR basic key '53474c39'.";
+    return;
+  }
+  RD5RCodeplug::EncryptionElement::setBasicKey(n, key);
 }
 
 
@@ -586,7 +637,12 @@ RD5RCodeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx,
       continue;
     GroupListElement el(bank.get(i));
     el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx);
-    bank.setContactCount(i, config->rxGroupLists()->list(i)->count());
+    // Only group calls are encoded
+    int count = 0;
+    for (int j=0; j<config->rxGroupLists()->list(i)->count(); j++)
+      if (DigitalContact::GroupCall == config->rxGroupLists()->list(i)->contact(j)->type())
+        count++;
+    bank.setContactCount(i, count);
   }
   return true;
 }
@@ -622,5 +678,35 @@ RD5RCodeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack &err
       return false;
     }
   }
+  return true;
+}
+
+
+void
+RD5RCodeplug::clearEncryption() {
+  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  enc.clear();
+}
+
+bool
+RD5RCodeplug::encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err);
+  clearEncryption();
+  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  return enc.fromCommercialExt(config->commercialExtension(), ctx);
+}
+
+bool
+RD5RCodeplug::createEncryption(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(err);
+  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  if (EncryptionElement::PrivacyType::None == enc.privacyType())
+    return true;
+  return enc.updateCommercialExt(ctx);
+}
+
+bool
+RD5RCodeplug::linkEncryption(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(ctx); Q_UNUSED(err);
   return true;
 }

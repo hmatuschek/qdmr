@@ -70,57 +70,6 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="txTimeoutLabel">
-           <property name="text">
-            <string>Tx Timeout</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="rxOnlyLabel">
-           <property name="text">
-            <string>Rx Only</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QCheckBox" name="rxOnly"/>
-         </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="scanListLabel">
-           <property name="text">
-            <string>Scan List</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <widget class="QComboBox" name="scanList"/>
-         </item>
-         <item row="4" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_7">
-           <item>
-            <widget class="QSpinBox" name="totValue">
-             <property name="specialValueText">
-              <string>Off</string>
-             </property>
-             <property name="suffix">
-              <string extracomment="Transmit time out (TOT) in seconds. A value of 0 means disabled."> s</string>
-             </property>
-             <property name="maximum">
-              <number>9999</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="totDefault">
-             <property name="text">
-              <string>Default</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
          <item row="3" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_8">
            <item>
@@ -160,6 +109,85 @@
             </widget>
            </item>
           </layout>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="txTimeoutLabel">
+           <property name="text">
+            <string>Tx Timeout</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <item>
+            <widget class="QSpinBox" name="totValue">
+             <property name="specialValueText">
+              <string>Off</string>
+             </property>
+             <property name="suffix">
+              <string extracomment="Transmit time out (TOT) in seconds. A value of 0 means disabled."> s</string>
+             </property>
+             <property name="maximum">
+              <number>9999</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="totDefault">
+             <property name="text">
+              <string>Default</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="vOXLevelLabel">
+           <property name="text">
+            <string>VOX Level</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <item>
+            <widget class="QSpinBox" name="voxValue">
+             <property name="specialValueText">
+              <string>Off</string>
+             </property>
+             <property name="maximum">
+              <number>10</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="voxDefault">
+             <property name="text">
+              <string>Default</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="rxOnlyLabel">
+           <property name="text">
+            <string>Rx Only</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QCheckBox" name="rxOnly"/>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="scanListLabel">
+           <property name="text">
+            <string>Scan List</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QComboBox" name="scanList"/>
          </item>
         </layout>
        </item>
@@ -263,34 +291,6 @@
            </item>
            <item>
             <widget class="QCheckBox" name="squelchDefault">
-             <property name="text">
-              <string>Default</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="vOXLevelLabel">
-           <property name="text">
-            <string>VOX Level</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_10">
-           <item>
-            <widget class="QSpinBox" name="voxValue">
-             <property name="specialValueText">
-              <string>Off</string>
-             </property>
-             <property name="maximum">
-              <number>10</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="voxDefault">
              <property name="text">
               <string>Default</string>
              </property>

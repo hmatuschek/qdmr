@@ -27,21 +27,13 @@ public:
 protected:
   /** Constructs an opens new serial interface to the devices identified by the given vendor and
    * product IDs.
-   * @param vid Vendor ID of device.
-   * @param pid Product ID of device.
-   * @param err The error stack, messages are put onto.
-   * @param parent Specifies the parent object. */
-  explicit USBSerial(unsigned vid, unsigned pid, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
-
-  /** Constructs an opens new serial interface to the devices identified by the given vendor and
-   * product IDs.
    * @param descriptor Specifies the device to open.
    * @param err The error stack, messages are put onto.
    * @param parent Specifies the parent object. */
   explicit USBSerial(const USBDeviceDescriptor &descriptor, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
 public:
-  /** Destrutor. */
+  /** Destructor. */
   virtual ~USBSerial();
 
   /** If @c true, the device has been found and is open. */

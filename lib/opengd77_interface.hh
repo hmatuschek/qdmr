@@ -6,7 +6,7 @@
 
 /** Implements the interfact to a radio running the Open GD77 firmware.
  *
- * This interface uses a USB serial-port to comunicate with the device. To find the corresponding
+ * This interface uses a USB serial-port to communicate with the device. To find the corresponding
  * port, the device-specific VID @c 0x1fc9 and PID @c 0x0094 are used. Hence no udev rules are
  * needed to access these devices. The user, however, should be a member of the @c dialout group
  * to get access to the serial interfaces.
@@ -23,10 +23,7 @@ public:
   static const uint32_t FLASH  = 1;
 
 public:
-  /** Constructs a new interface to a OpenGD77 device. If a matching device was found, @c isOpen
-   * returns @c true. */
-  explicit OpenGD77Interface(const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
-  /** Constructs a new interface to a specifc OpenGD77 device.  */
+  /** Constructs a new interface to a specific OpenGD77 device.  */
   explicit OpenGD77Interface(const USBDeviceDescriptor &descr,
                              const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
@@ -49,7 +46,7 @@ public:
   bool reboot(const ErrorStack &err=ErrorStack());
 
 public:
-  /** Retruns some information about this interface. */
+  /** Returns some information about this interface. */
   static USBDeviceInfo interfaceInfo();
   /** Tries to find all interfaces connected AnyTone radios. */
   static QList<USBDeviceDescriptor> detect();
@@ -64,7 +61,8 @@ protected:
       READ_MCU_ROM = 5,
       READ_DISPLAY_BUFFER = 6,
       READ_WAV_BUFFER = 7,
-      READ_AMBE_BUFFER = 8
+      READ_AMBE_BUFFER = 8,
+      READ_FIRMWARE_INFO = 9
     } Command;
 
     /// 'R' read block, 'W' write block, 'C' command.
@@ -73,13 +71,15 @@ protected:
     uint8_t command;
     /// Memory address to read from in big endian.
     uint32_t address;
-    /// Amount of data to read, max 32 bytes in big endian.
+    /// Amount of data to read in big endian.
     uint16_t length;
 
     /** Constructs a FLASH read message. */
     bool initReadFlash(uint32_t address, uint16_t length);
     /** Constructs a EEPROM read message. */
     bool initReadEEPROM(uint32_t address, uint16_t length);
+    /** Constructs a firmware-info read message. */
+    bool initReadFirmwareInfo();
   } ReadRequest;
 
   /** Represents a read response message. */
@@ -88,8 +88,19 @@ protected:
     char type;
     /// Length of paylod.
     uint16_t length;
-    /// Payload.
-    uint8_t data[32];
+
+    union {
+      /// Data payload.
+      uint8_t data[32];
+      /** Radio info payload */
+      struct {
+        uint32_t _unknown00;  ///< Some unknown number in little endian, seen 0x0001.
+        uint32_t _unknown04;  ///< Some unknown number in little endian, seen 0x0003.
+        char fw_revision[16]; ///< Firmware revision ASCII, 0-padded.
+        char build_date[16];  ///< Firmware build time, YYYYMMDDhhmmss, 0-padded.
+        uint32_t _unknown24;  ///< Some unknown number in little endian, seen 0x4014
+      } radio_info;
+    };
   } ReadResponse;
 
   /** Represents a write message. */

@@ -15,7 +15,7 @@ USBSerial::Descriptor::Descriptor(uint16_t vid, uint16_t pid, const QString &dev
 /* ******************************************************************************************** *
  * Implementation of USBSerial
  * ******************************************************************************************** */
-USBSerial::USBSerial(unsigned vid, unsigned pid, const ErrorStack &err, QObject *parent)
+/*USBSerial::USBSerial(unsigned vid, unsigned pid, const ErrorStack &err, QObject *parent)
   : QSerialPort(parent), RadioInterface()
 {
   logDebug() << "Try to detect USB serial interface "
@@ -71,13 +71,13 @@ USBSerial::USBSerial(unsigned vid, unsigned pid, const ErrorStack &err, QObject 
     return;
   }
 
-  logDebug() << "Openend serial port " << this->portName() << " with "
+  logDebug() << "Opened serial port " << this->portName() << " with "
              << this->baudRate() << "baud.";
 
   connect(this, SIGNAL(aboutToClose()), this, SLOT(onClose()));
   connect(this, SIGNAL(errorOccurred(QSerialPort::SerialPortError)),
           this, SLOT(onError(QSerialPort::SerialPortError)));
-}
+}*/
 
 USBSerial::USBSerial(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
   : QSerialPort(parent), RadioInterface()
@@ -121,7 +121,7 @@ USBSerial::USBSerial(const USBDeviceDescriptor &descriptor, const ErrorStack &er
     return;
   }
 
-  logDebug() << "Openend serial port " << this->portName() << " with "
+  logDebug() << "Opened serial port " << this->portName() << " with "
              << this->baudRate() << "baud.";
 
   connect(this, SIGNAL(aboutToClose()), this, SLOT(onClose()));

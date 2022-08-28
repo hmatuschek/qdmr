@@ -57,21 +57,27 @@
   <varlistentry>
     <term><token>id</token></term>
     <listitem>
-      <para>Specifies the ID of the system. This can be used reference this system in 
-        <xref linkend="cpChannels"/>. Any unique string is valid here.</para>
+      <para>
+        Specifies the ID of the system. This can be used reference this system in 
+        <xref linkend="cpChannels"/>. Any unique string is valid here.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>name</token></term>
     <listitem>
-      <para>Specifies the name of the position reporting system. Any string is valid here.</para>
+      <para>
+        Specifies the name of the position reporting system. Any string is valid here.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>period</token></term>
     <listitem>
-      <para>Specifies the update period in seconds. If omitted or set to <token>0</token>, the 
-        system will not send any updates periodically.</para>
+      <para>
+        Specifies the update period in seconds. If omitted or set to <token>0</token>, the 
+        system will not send any updates periodically.
+      </para>
     </listitem>
   </varlistentry>
 </variablelist>
@@ -92,16 +98,20 @@
   <varlistentry>
     <term><token>contact</token></term>
     <listitem>
-      <para>Specifies the digital contact, the GPS information is send to. This must be a 
-        reference to a digital contact.</para>
+      <para>
+        Specifies the digital contact, the GPS information is send to. This must be a 
+        reference to a digital contact.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>revert</token></term>
     <listitem>
-      <para>Specifies the revert channel. That is, the channel the data is send on. If set, 
+      <para>
+        Specifies the revert channel. That is, the channel the data is send on. If set, 
         it must be a reference to a digital channel. If omitted or set to <token>!selected</token>,
-        the currently active channel will be used to send the GPS information.</para>
+        the currently active channel will be used to send the GPS information.
+      </para>
     </listitem>
   </varlistentry>
 </variablelist>
@@ -122,42 +132,57 @@
   <varlistentry>
     <term><token>revert</token></term>
     <listitem>
-      <para>Specifies the revert channel. That is, the channel the APRS information is send on.
-        This must be a reference to an analog channel.</para>
+      <para>
+        Specifies the revert channel. That is, the channel the APRS information is send on.
+        This must be a reference to an analog channel. Usually a dedicated analog APRS channel is 
+        defined and referenced here.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>destination</token></term>
     <listitem>
-      <para>Specifies the destination call and SSID, the information is set to. This must be a
-        string in the form <token>CALL-SSID</token>.</para>
+      <para>
+        Specifies the destination call and SSID, the information is send to. This must be a
+        string in the form <token>CALL-SSID</token>. Please note that the call must match the 
+        format defined by the AX.25 protocol. That is, it may only contain letters and numbers and
+        cannot exceed the length of 6.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>source</token></term>
     <listitem>
-      <para>Specifies the source call and SSID. See <token>destination</token> for details.</para>
+      <para>
+        Specifies the source call and SSID. See <token>destination</token> for details.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>path</token></term>
     <listitem>
-      <para>Specifies the optional packet path. If set, this must be a list of <token>CALL-SSID</token> 
-        strings.</para>
+      <para>
+        Specifies the optional packet path. If set, this must be a list of <token>CALL-SSID</token> 
+        strings.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>icon</token></term>
     <listitem>
-      <para>Specifies the icon name to use. The icon name will be fuzzy matched. See 
+      <para>
+        Specifies the icon name to use. The icon name will be fuzzy matched. See 
         <link xlink:href="https://dm3mat.darc.de/qdmr/libdmrconf/classAPRSSystem.html">
-        for a complete list</link> of icon names.</para>
+        for a complete list</link> of icon names.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>message</token></term>
     <listitem>
-      <para>Specifies an optional message send along with the position information.</para>
+      <para>
+        Specifies an optional message send along with the position information.
+      </para>
     </listitem>
   </varlistentry>
 </variablelist>

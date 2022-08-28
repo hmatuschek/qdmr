@@ -5,13 +5,13 @@
          xmlns:xlink="http://www.w3.org/1999/xlink">
 
 <info>
-  <title>Assembling RX Groups</title>
+  <title>Assembling Group Lists</title>
 </info>
 
 <para>
-  <emphasis>RX groups</emphasis>, <emphasis>RX group lists</emphasis> or simply 
-  <glossterm>Group List</glossterm>s are just lists of <glossterm>Group Call</glossterm>s you wish 
-  to receive on each channel. Of cause, you may want to receive calls to different talk groups on one 
+  <emphasis>RX group lists</emphasis> or simply 
+  <glossterm>Group Lists</glossterm>s are just lists of <glossterm>Group Call</glossterm>s you may wish 
+  to receive on a channel. Of cause, you may want to receive calls to multiple talk groups on one 
   channel, hence you have to create these lists of talk groups beforehand. 
 </para>
 
@@ -24,7 +24,7 @@
 </screenshot>
 
 <para>
-  The <guilabel>RX Groups</guilabel> tab is just a simple list of all group lists you created. You 
+  The <guilabel>Group Lists</guilabel> tab is just a simple list of all group lists you created. You 
   may add a group list by clicking on the <guibutton>Add RX Group</guibutton> button at the bottom.
   You can delete a group list by seleting it in the list and clicking on the 
   <guibutton>Delete RX Group</guibutton> button there. You can also edit a RX group list by 
@@ -34,17 +34,17 @@
 <screenshot>
   <mediaobject>
     <imageobject><imagedata fileref="fig/qdmr-edit-rx-groups.png" width="5cm" align="center"/></imageobject>
-    <textobject>Screen-shot of the RX groups.</textobject>
+    <textobject>Screen-shot of the group list edit dialog.</textobject>
   </mediaobject>
   <title>The group list dialog.</title>
 </screenshot>
 
 <para>
-  When creating a new RX group list or when editing one, the <guilabel>Edit RX Group 
+  When creating a new group list or when editing one, the <guilabel>Edit Group 
   List</guilabel> dialog will open. Within this dialog, you can change the name of the group at the
   top. In the center of the dialog, you will find the list of group calls of this group list. You 
   can add group call to the list by clicking on the <guibutton>Add Contact</guibutton> button on 
-  the bottom. You can also remove contacts from the list by selecing the contact and clicking on the 
+  the bottom. You can also remove contacts from the list by selecting the contact and clicking on the 
   <guibutton>Remove Contact</guibutton> button. When you are done editing the group list, click on 
   the <guibutton>Ok</guibutton> button. The <guibutton>Cancel</guibutton> button will discard all 
   changes and closes the dialog.

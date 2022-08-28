@@ -39,7 +39,6 @@ protected:
 	void run();
 
 private:
-  virtual bool connect();
   virtual bool download();
   virtual bool upload();
   virtual bool uploadCallsigns();
@@ -47,7 +46,7 @@ private:
 protected:
   /** The interface to the radio. */
   TyTInterface *_dev;
-  /** Holds the flags to controll assembly and upload of code-plugs. */
+  /** Holds the flags to control assembly and upload of code-plugs. */
   Codeplug::Flags _codeplugFlags;
   /** The generic configuration. */
 	Config *_config;

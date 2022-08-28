@@ -8,15 +8,15 @@ namespace Ui {
 }
 
 class DTMFContact;
-
+class Config;
 
 class DTMFContactDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  explicit DTMFContactDialog(QWidget *parent = nullptr);
-  DTMFContactDialog(DTMFContact *contact, QWidget *parent = nullptr);
+  explicit DTMFContactDialog(Config *context, QWidget *parent = nullptr);
+  DTMFContactDialog(DTMFContact *contact, Config *context, QWidget *parent = nullptr);
   ~DTMFContactDialog();
 
   DTMFContact *contact();
@@ -27,6 +27,7 @@ protected:
 private:
   DTMFContact *_myContact;
   DTMFContact *_contact;
+  Config *_config;
   Ui::DTMFContactDialog *ui;
 };
 

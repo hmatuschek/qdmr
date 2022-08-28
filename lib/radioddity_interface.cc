@@ -20,13 +20,6 @@ static const unsigned char CMD_CWB1[]  = "CWB\4\0\1\0\0";
 static const unsigned char CMD_CWB3[]  = "CWB\4\0\3\0\0";
 static const unsigned char CMD_CWB4[]  = "CWB\4\0\4\0\0";
 
-RadioddityInterface::RadioddityInterface(const ErrorStack &err, QObject *parent)
-  : HIDevice(USB_VID, USB_PID, err, parent), _current_bank(MEMBANK_NONE), _identifier()
-{
-  if (isOpen())
-    identifier();
-}
-
 RadioddityInterface::RadioddityInterface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
   : HIDevice(descr, err, parent), _current_bank(MEMBANK_NONE), _identifier()
 {

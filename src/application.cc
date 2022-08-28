@@ -8,6 +8,7 @@
 #include "codeplug.hh"
 #include "config.h"
 #include "settings.hh"
+#include "radiolimits.hh"
 #include "verifydialog.hh"
 #include "analogchanneldialog.hh"
 #include "digitalchanneldialog.hh"
@@ -17,7 +18,7 @@
 #include "gpssystemdialog.hh"
 #include "roamingzonedialog.hh"
 #include "aprssystemdialog.hh"
-#include "repeaterdatabase.hh"
+#include "repeaterbookcompleter.hh"
 #include "userdatabase.hh"
 #include "talkgroupdatabase.hh"
 #include "searchpopup.hh"
@@ -50,8 +51,14 @@ Application::Application(int &argc, char *argv[])
   QString logdir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
   Logger::get().addHandler(new FileLogHandler(logdir+"/qdmr.log"));
 
+  // Register icon themes
+  QStringList iconPaths = QIcon::themeSearchPaths();
+  iconPaths.prepend(":/icons");
+  QIcon::setThemeSearchPaths(iconPaths);
+  onPaletteChanged(palette());
+
   Settings settings;
-  _repeater   = new RepeaterDatabase(settings.position(), 7, this);
+  _repeater   = new RepeaterBookList(this);
   _users      = new UserDatabase(30, this);
   _talkgroups = new TalkGroupDatabase(30, this);
   _config = new Config(this);
@@ -103,6 +110,18 @@ Application::~Application() {
   _mainWindow = nullptr;
 }
 
+bool
+Application::isDarkMode() const {
+  return isDarkMode(palette());
+}
+
+bool
+Application::isDarkMode(const QPalette &palette) const {
+  int text_hsv_value = palette.color(QPalette::WindowText).value(),
+      bg_hsv_value = palette.color(QPalette::Background).value();
+  return text_hsv_value > bg_hsv_value;
+}
+
 
 QMainWindow *
 Application::mainWindow() {
@@ -122,8 +141,7 @@ Application::talkgroup() const {
   return _talkgroups;
 }
 
-RepeaterDatabase *
-Application::repeater() const{
+RepeaterBookList *Application::repeater() const{
   return _repeater;
 }
 
@@ -134,6 +152,7 @@ Application::createMainWindow() {
     return _mainWindow;
 
   Settings settings;
+  logDebug() << "Create main window using icon theme '" << QIcon::themeName() << "'.";
 
   QUiLoader loader;
   QFile uiFile("://ui/mainwindow.ui");
@@ -159,7 +178,6 @@ Application::createMainWindow() {
 
   QAction *refreshCallsignDB  = _mainWindow->findChild<QAction*>("actionRefreshCallsignDB");
   QAction *refreshTalkgroupDB  = _mainWindow->findChild<QAction*>("actionRefreshTalkgroupDB");
-  QAction *refreshRepeaterDB  = _mainWindow->findChild<QAction*>("actionRefreshRepeaterDB");
 
   QAction *about   = _mainWindow->findChild<QAction*>("actionAbout");
   QAction *sett    = _mainWindow->findChild<QAction*>("actionSettings");
@@ -176,7 +194,6 @@ Application::createMainWindow() {
 
   connect(refreshCallsignDB, SIGNAL(triggered()), _users, SLOT(download()));
   connect(refreshTalkgroupDB, SIGNAL(triggered()), _talkgroups, SLOT(download()));
-  connect(refreshRepeaterDB, SIGNAL(triggered()), _repeater, SLOT(download()));
 
   connect(findDev, SIGNAL(triggered()), this, SLOT(detectRadio()));
   connect(verCP, SIGNAL(triggered()), this, SLOT(verifyCodeplug()));
@@ -191,9 +208,12 @@ Application::createMainWindow() {
   tabs->addTab(_generalSettings, tr("Settings"));
   if (settings.showCommercialFeatures()) {
     _generalSettings->hideDMRID(true);
-    _generalSettings->hideExtensions(false);
   } else {
     _generalSettings->hideDMRID(false);
+  }
+  if (settings.showExtensions()) {
+    _generalSettings->hideExtensions(false);
+  } else {
     _generalSettings->hideExtensions(true);
   }
 
@@ -231,12 +251,14 @@ Application::createMainWindow() {
 
   // Wire-up "extension view"
   _extensionView = new ExtensionView();
-  _extensionView->setObject(_config);
+  _extensionView->setObject(_config, _config);
   tabs->addTab(_extensionView, tr("Extensions"));
 
   if (! settings.showCommercialFeatures()) {
     tabs->removeTab(tabs->indexOf(_radioIdTab));
     _radioIdTab->setHidden(true);
+  }
+  if (! settings.showExtensions()) {
     tabs->removeTab(tabs->indexOf(_extensionView));
     _extensionView->setHidden(true);
   }
@@ -332,7 +354,7 @@ Application::saveCodeplug() {
 
   if (filename.endsWith(".conf") || filename.endsWith("csv")){
     QMessageBox::critical(nullptr, tr("Please use new YAML format."),
-                          tr("Saveing in the old table-based conf format was disabled with 0.9.0. "
+                          tr("Saving in the old table-based conf format was disabled with 0.9.0. "
                              "Reading these files still works."));
     return;
   }
@@ -435,7 +457,7 @@ Application::detectRadio() {
 
 
 bool
-Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &flags) {
+Application::verifyCodeplug(Radio *radio, bool showSuccess) {
   Radio *myRadio = radio;
 
   // If no radio is given -> try to detect the radio
@@ -444,13 +466,13 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &f
   if (nullptr == myRadio)
     return false;
 
-
+  Settings settings;
+  RadioLimitContext ctx(settings.ignoreFrequencyLimits());
+  myRadio->limits().verifyConfig(_config, ctx);
   bool verified = true;
-  QList<VerifyIssue> issues;
-  VerifyIssue::Type maxIssue = myRadio->verifyConfig(_config, issues, flags);
-  if ( (flags.ignoreWarnings && (maxIssue>VerifyIssue::WARNING)) ||
-       ((!flags.ignoreWarnings) && (maxIssue>=VerifyIssue::WARNING)) ) {
-    VerifyDialog dialog(issues, (nullptr != radio));
+  if ( (settings.ignoreVerificationWarning() && (ctx.maxSeverity()>RadioLimitIssue::Warning)) ||
+       ((!settings.ignoreVerificationWarning()) && (ctx.maxSeverity()>=RadioLimitIssue::Warning)) ) {
+    VerifyDialog dialog(ctx, (nullptr != radio));
     if (QDialog::Accepted != dialog.exec())
       verified = false;
   } else if (showSuccess) {
@@ -541,15 +563,7 @@ Application::uploadCodeplug() {
   if (nullptr == radio)
     return;
 
-
-  // Verify codeplug against the detected radio before uploading,
-  // but do not show a message on success.
-  VerifyFlags flags = {
-    settings.ignoreVerificationWarning(),
-    settings.ignoreFrequencyLimits()
-  };
-
-  if (! verifyCodeplug(radio, false, flags)) {
+  if (! verifyCodeplug(radio, false)) {
     radio->deleteLater();
     return;
   }
@@ -580,7 +594,7 @@ Application::uploadCallsignDB() {
   if (nullptr == radio)
     return;
 
-  if (! radio->features().hasCallsignDB) {
+  if (! radio->limits().hasCallSignDB()) {
     logDebug() << "Radio " << radio->name() << " does not support call-sign DB.";
     QMessageBox::information(nullptr, tr("Cannot write call-sign DB."),
                              tr("The detected radio '%1' does not support "
@@ -589,7 +603,7 @@ Application::uploadCallsignDB() {
     radio->deleteLater();
     return;
   }
-  if (! radio->features().callsignDBImplemented) {
+  if (! radio->limits().callSignDBImplemented()) {
     logDebug() << "Radio " << radio->name()
                << " does support call-sign DB but it is not implemented yet.";
     QMessageBox::critical(nullptr, tr("Cannot write call-sign DB."),
@@ -696,22 +710,26 @@ Application::showSettings() {
         tabs->insertTab(tabs->indexOf(_generalSettings)+1, _radioIdTab, tr("Radio IDs"));
         _mainWindow->update();
       }
-      if (-1 == tabs->indexOf(_extensionView)) {
-        tabs->insertTab(tabs->indexOf(_roamingZoneList)+1, _extensionView, tr("Extensions"));
-        _mainWindow->update();
-      }
       _generalSettings->hideDMRID(true);
-      _generalSettings->hideExtensions(false);
     } else if (! settings.showCommercialFeatures()) {
       if (-1 != tabs->indexOf(_radioIdTab)) {
         tabs->removeTab(tabs->indexOf(_radioIdTab));
         _mainWindow->update();
       }
+      _generalSettings->hideDMRID(false);
+    }
+    // Handle extensions
+    if (settings.showExtensions()) {
+      if (-1 == tabs->indexOf(_extensionView)) {
+        tabs->insertTab(tabs->indexOf(_roamingZoneList)+1, _extensionView, tr("Extensions"));
+        _mainWindow->update();
+      }
+      _generalSettings->hideExtensions(false);
+    } else {
       if (-1 != tabs->indexOf(_extensionView)) {
         tabs->removeTab(tabs->indexOf(_extensionView));
         _mainWindow->update();
       }
-      _generalSettings->hideDMRID(false);
       _generalSettings->hideExtensions(true);
     }
   }
@@ -783,5 +801,16 @@ Application::position() const {
   return _currentPosition;
 }
 
+void
+Application::onPaletteChanged(const QPalette &palette) {
+  // Set theme based on UI mode (light vs. dark).
+  if (isDarkMode(palette)) {
+    QIcon::setThemeName("dark");
+    logDebug() << "Set icon theme to 'dark'.";
+  } else {
+    QIcon::setThemeName("light");
+    logDebug() << "Set icon theme to 'light'.";
+  }
+}
 
 

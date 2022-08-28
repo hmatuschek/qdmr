@@ -12,7 +12,7 @@
  *
  * @section md2017cpl Codeplug structure within radio
  * The codeplug structure is reverse engineered almost completely and can be programmed from
- * scratch. That is, it is not neccessary to update an existing codeplug on the radio.
+ * scratch. That is, it is not necessary to update an existing codeplug on the radio.
  * <table>
  *  <tr><th>Start</th>    <th>End</th>      <th>Size</th>    <th>Content</th></tr>
  *  <tr><th colspan="4">First segment 0x002000-0x040000</th></tr>
@@ -34,7 +34,7 @@
  *  <tr><td>0x02ef00</td> <td>0x02ef40</td> <td>0x00040</td> <td>VFO A channel, see @c TyTCodeplug::VFOChannelElement.</td></tr>
  *  <tr><td>0x02ef40</td> <td>0x02ef80</td> <td>0x00040</td> <td>VFO B channel, see @c TyTCodeplug::VFOChannelElement.</td></tr>
  *  <tr><td>0x02ef80</td> <td>0x02f000</td> <td>0x00080</td> <td>Reserved, filled with @c 0xff. </td></tr>
- *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>Some unkown settings like current channel, see @c TyTCodeplug::BootSettingsElement.</td></tr>
+ *  <tr><td>0x02f000</td> <td>0x02f010</td> <td>0x00010</td> <td>Some unknown settings like current channel, see @c TyTCodeplug::BootSettingsElement.</td></tr>
  *  <tr><td>0x02f010</td> <td>0x031000</td> <td>0x01ff0</td> <td>Reserved, filled with @c 0xff. </td></tr>
  *  <tr><td>0x031000</td> <td>0x03eac0</td> <td>0x0dac0</td> <td>250 Zone-extensions @ 0xe0 bytes each, see @c TyTCodeplug::ZoneExtElement.</td></tr>
  *  <tr><td>0x03eac0</td> <td>0x03ec40</td> <td>0x00180</td> <td>Reserved, filled with @c 0xff. </td></tr>
@@ -115,11 +115,14 @@ public:
   bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack());
 
+  void clearPrivacyKeys();
+  bool encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+
   /** Resets/clears the boot settings. */
   virtual void clearBootSettings();
   void clearMenuSettings();
   void clearTextMessages();
-  void clearPrivacyKeys();
   void clearEmergencySystems();
   /** Resets VFO settings. */
   virtual void clearVFOSettings();

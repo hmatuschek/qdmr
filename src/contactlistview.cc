@@ -33,7 +33,7 @@ ContactListView::~ContactListView() {
 void
 ContactListView::onAddDMRContact() {
   Application *app = qobject_cast<Application *>(QApplication::instance());
-  DMRContactDialog dialog(app->user(), app->talkgroup());
+  DMRContactDialog dialog(app->user(), app->talkgroup(), _config);
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -45,7 +45,7 @@ ContactListView::onAddDMRContact() {
 
 void
 ContactListView::onAddDTMFContact() {
-  DTMFContactDialog dialog;
+  DTMFContactDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -57,7 +57,7 @@ ContactListView::onAddDTMFContact() {
 
 void
 ContactListView::onRemContact() {
-  // Check if there is any contacts seleced
+  // Check if there is any contacts selected
   if (! ui->listView->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete contact"),
@@ -95,12 +95,12 @@ ContactListView::onEditContact(unsigned row) {
   Contact *contact = _config->contacts()->contact(row);
 
   if (DigitalContact *digi = contact->as<DigitalContact>()) {
-    DMRContactDialog dialog(digi, app->user(), app->talkgroup());
+    DMRContactDialog dialog(digi, app->user(), app->talkgroup(), _config);
     if (QDialog::Accepted != dialog.exec())
       return;
     dialog.contact();
   } else if (DTMFContact *dtmf = contact->as<DTMFContact>()) {
-    DTMFContactDialog dialog(dtmf);
+    DTMFContactDialog dialog(dtmf, _config);
     if (QDialog::Accepted != dialog.exec())
       return;
     dialog.contact();
@@ -110,10 +110,10 @@ ContactListView::onEditContact(unsigned row) {
 void
 ContactListView::loadHeaderState() {
   Settings settings;
-  ui->listView->header()->restoreState(settings.contactListHeaderState());
+  ui->listView->header()->restoreState(settings.headerState("contactList"));
 }
 void
 ContactListView::storeHeaderState() {
   Settings settings;
-  settings.setContactListHeaderState(ui->listView->header()->saveState());
+  settings.setHeaderState("contactList", ui->listView->header()->saveState());
 }

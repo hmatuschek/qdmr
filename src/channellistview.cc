@@ -159,11 +159,11 @@ ChannelListView::onEditChannel(unsigned row) {
 void
 ChannelListView::loadChannelListSectionState() {
   Settings settings;
-  ui->listView->header()->restoreState(settings.channelListHeaderState());
+  ui->listView->header()->restoreState(settings.headerState("channelList"));
 }
 void
 ChannelListView::storeChannelListSectionState() {
   Settings settings;
-  settings.setChannelListHeaderState(ui->listView->header()->saveState());
+  settings.setHeaderState("channelList", ui->listView->header()->saveState());
 }
 
