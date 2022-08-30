@@ -15,6 +15,7 @@ D868UV::D868UV(AnytoneInterface *device, QObject *parent)
   : AnytoneRadio("Anytone AT-D868UV", device, parent), _limits(nullptr)
 {
   _codeplug = new D868UVCodeplug(this);
+  _codeplug->clear();
   _callsigns = new D868UVCallsignDB(this);
 
   // Get device info and determine supported TX frequency bands

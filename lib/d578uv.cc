@@ -15,6 +15,7 @@ D578UV::D578UV(AnytoneInterface *device, QObject *parent)
   : AnytoneRadio("Anytone AT-D578UV", device, parent), _limits(nullptr)
 {
   _codeplug = new D578UVCodeplug(this);
+  _codeplug->clear();
   _callsigns = new D878UV2CallsignDB(this);
 
   // Get device info and determine supported TX frequency bands

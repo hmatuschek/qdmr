@@ -473,7 +473,6 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 D868UVCodeplug::D868UVCodeplug(QObject *parent)
   : AnytoneCodeplug(parent)
 {
-  this->clear();
 }
 
 void

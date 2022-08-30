@@ -129,6 +129,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if (RadioInfo::D868UVE == radio) {
     D868UVCodeplug codeplug;
+    codeplug.clear();
     codeplug.setBitmaps(&config);
     codeplug.allocateUpdated();
     codeplug.allocateForEncoding();
@@ -141,6 +142,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if (RadioInfo::D878UV == radio) {
     D878UVCodeplug codeplug;
+    codeplug.clear();
     codeplug.setBitmaps(&config);
     codeplug.allocateUpdated();
     codeplug.allocateForEncoding();
@@ -157,6 +159,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if (RadioInfo::D878UVII == radio) {
     D878UV2Codeplug codeplug;
+    codeplug.clear();
     codeplug.setBitmaps(&config);
     codeplug.allocateUpdated();
     codeplug.allocateForEncoding();
@@ -169,6 +172,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if (RadioInfo::D578UV == radio) {
     D578UVCodeplug codeplug;
+    codeplug.clear();
     codeplug.setBitmaps(&config);
     codeplug.allocateUpdated();
     codeplug.allocateForEncoding();
