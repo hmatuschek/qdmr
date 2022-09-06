@@ -519,8 +519,8 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       // check type
       if (! node[prop.name()].IsMap()) {
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                    << ": Cannot parse " << prop.name() << " of " << meta->className()
-                    << ": Expected instance of '"
+                    << ": Cannot parse '" << prop.name() << "' of '" << meta->className()
+                    << "': Expected instance of '"
                     << QMetaType::metaObjectForType(prop.userType())->className() << "'.";
         return false;
       }

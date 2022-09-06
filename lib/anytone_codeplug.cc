@@ -896,7 +896,20 @@ AnytoneCodeplug::ContactElement::setNumber(unsigned number) {
 
 AnytoneContactExtension::AlertType
 AnytoneCodeplug::ContactElement::alertType() const {
-  return (AnytoneContactExtension::AlertType) getUInt8(0x0027);
+  switch (getUInt8(0x0027)) {
+  case (uint8_t)AnytoneContactExtension::AlertType::None:
+    return AnytoneContactExtension::AlertType::None;
+  case (uint8_t)AnytoneContactExtension::AlertType::Ring:
+    return AnytoneContactExtension::AlertType::Ring;
+  case (uint8_t)AnytoneContactExtension::AlertType::Online:
+    return AnytoneContactExtension::AlertType::Online;
+  default:
+    break;
+  }
+  logWarn() << "Unknown value " << getUInt8(0x0027)
+            << " for alert type of AnyTone contact element. Maybe the codeplug implementation is"
+               " outdated. Consider reporting it at https://github.com/hmatuschek/qdmr.";
+  return AnytoneContactExtension::AlertType::None;
 }
 void
 AnytoneCodeplug::ContactElement::setAlertType(AnytoneContactExtension::AlertType type) {
