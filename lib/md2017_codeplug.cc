@@ -47,6 +47,25 @@
 #define ADDR_VFO_CHANNEL_A      0x02ef00
 #define ADDR_VFO_CHANNEL_B      0x02ef40
 
+/* ********************************************************************************************* *
+ * MD2017Codeplug::ContactElement
+ * ********************************************************************************************* */
+MD2017Codeplug::ContactElement::ContactElement(uint8_t *ptr, size_t size)
+  : TyTCodeplug::ContactElement(ptr, size)
+{
+  // pass...
+}
+
+MD2017Codeplug::ContactElement::ContactElement(uint8_t *ptr)
+  : TyTCodeplug::ContactElement(ptr)
+{
+  // pass...
+}
+
+bool
+MD2017Codeplug::ContactElement::isValid() const {
+  return Codeplug::Element::isValid() && (! name().isEmpty());
+}
 
 
 MD2017Codeplug::MD2017Codeplug(QObject *parent)
