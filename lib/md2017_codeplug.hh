@@ -68,7 +68,10 @@ public:
   /** Reuse TyT MD-UV390 menu settings element. */
   typedef UV390Codeplug::MenuSettingsElement MenuSettingsElement;
 
-  /** Contact element for MD2017 codeplugs. */
+  /** Contact element for MD2017 codeplugs.
+   *
+   * Memory layout of encoded contact:
+   * @verbinclude tyt_contact.txt */
   class ContactElement: public TyTCodeplug::ContactElement
   {
   protected:

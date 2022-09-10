@@ -1114,7 +1114,7 @@ AnytoneCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Cont
   // set members
   for (uint8_t i=0; i<64; i++) {
     // Skip non-private-call entries
-    while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
+    while((lst->count() > j) && (DigitalContact::GroupCall != lst->contact(j)->type())) {
       logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
                 << "' is not a private call. Skip entry.";
       j++;

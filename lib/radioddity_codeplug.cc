@@ -995,9 +995,9 @@ RadioddityCodeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst,
   for (int i=0; i<15; i++) {
     if (lst->count() > j) {
       // Skip non-private-call entries
-      while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
+      while((lst->count() > j) && (DigitalContact::GroupCall != lst->contact(j)->type())) {
         logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
-                  << "' is not a private call. Skip entry.";
+                  << "' is not a group call. Skip entry.";
         j++;
       }
       setMember(i, ctx.index(lst->contact(j))); j++;
