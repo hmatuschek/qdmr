@@ -91,15 +91,14 @@ GD77::uploadCallsigns()
 
   size_t totb = _callsigns.memSize();
   unsigned bcount = 0;
-  // Then upload callsign DB
   for (int n=0; n<_callsigns.image(0).numElements(); n++) {
     unsigned addr = _callsigns.image(0).element(n).address();
     unsigned size = _callsigns.image(0).element(n).data().size();
     unsigned b0 = addr/BSIZE, nb = size/BSIZE;
-    RadioddityInterface::MemoryBank bank = (
-          (0x10000 > addr) ? RadioddityInterface::MEMBANK_CALLSIGN_LOWER : RadioddityInterface::MEMBANK_CALLSIGN_UPPER );
     for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
-      if (! _dev->write(bank, (b0+b)*BSIZE,
+      RadioddityInterface::MemoryBank bank = (
+            (0x10000 > (b0+b)*BSIZE) ? RadioddityInterface::MEMBANK_CALLSIGN_LOWER : RadioddityInterface::MEMBANK_CALLSIGN_UPPER );
+      if (! _dev->write(bank, ((b0+b)*BSIZE)&0xffff,
                         _callsigns.data((b0+b)*BSIZE, 0), BSIZE, _errorStack))
       {
         errMsg(_errorStack) << "Cannot write block " << (b0+b) << ".";
@@ -108,6 +107,7 @@ GD77::uploadCallsigns()
       emit uploadProgress(float(bcount*100)/totb);
     }
   }
+
 
   _dev->write_finish();
   return true;
