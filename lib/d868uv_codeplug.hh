@@ -61,10 +61,10 @@ class GPSSystem;
  *  <tr><td>02600000</td> <td>max. 009C40</td> <td>Index list of valid contacts.
  *    10000 32bit indices, little endian, default 0xffffffff</td></tr>
  *  <tr><td>02640000</td> <td>000500</td>      <td>Contact bitmap, 10000 bit, inverted, default 0xff, 0x00 padded.</td></tr>
- *  <tr><td>02680000</td> <td>max. 0f4240</td> <td>10000 contacts,
+ *  <tr><td>02680000</td> <td>max. 0186a0</td> <td>Bank 1 of 1000 contacts,
  *    see @c AnytoneCodeplug::ContactElement. As each contact is 100b, they do not align with the
  *    16b blocks being transferred to the device. Hence contacts are organized internally in groups
- *    of 4 contacts forming a "bank". </td></tr>
+ *    of 4 contacts. There are 10 banks, each containing 1000 contacts. The offset between banks is 0x40000. </td></tr>
  *  <tr><td>04340000</td> <td>max. 013880</td> <td>DMR ID to contact index map,
  *    see @c AnytoneCodeplug::ContactMapElement. Sorted by ID, empty entries set to
  *    @c 0xffffffffffffffff.</td>

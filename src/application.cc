@@ -682,7 +682,7 @@ Application::onCodeplugUploaded(Radio *radio) {
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
-  logError() << "Write complete.";
+  logDebug() << "Write complete.";
 
   if (radio->wait(250))
     radio->deleteLater();
