@@ -70,6 +70,9 @@ public:
 
   /** Contact element for MD2017 codeplugs.
    *
+   * This class implements the same momory layout as the base TyTCodeplug::ContactElement. It just
+   * overrides the @c isValid method.
+   *
    * Memory layout of encoded contact:
    * @verbinclude tyt_contact.txt */
   class ContactElement: public TyTCodeplug::ContactElement
