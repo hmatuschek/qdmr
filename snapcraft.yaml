@@ -1,9 +1,9 @@
 name: qdmr
 
 version: git
-#grade: devel
-version: 0.10.3
-grade: stable
+grade: devel
+#version: 0.10.3
+#grade: stable
 
 summary: Graphical code-plug programming tool for DMR radios.
 description: |
@@ -71,7 +71,7 @@ parts:
       - libyaml-cpp0.6
     source: https://github.com/hmatuschek/qdmr.git
     source-type: git
-    source-tag: "v$SNAPCRAFT_PROJECT_VERSION"
+    #source-tag: "v$SNAPCRAFT_PROJECT_VERSION"
     cmake-parameters:
       - "-DCMAKE_INSTALL_PREFIX=/usr"
       - "-DCMAKE_BUILD_TYPE=Release"
